@@ -5,7 +5,7 @@ use warnings;
 package Acme::Resume::Moose;
 
 # ABSTRACT: Imports methods and adds attributes
-our $VERSION = '0.0105';
+our $VERSION = '0.0106';
 
 use Moose::Exporter;
 use Acme::Resume::Types::Job;
@@ -129,7 +129,7 @@ Acme::Resume::Moose - Imports methods and adds attributes
 
 =head1 VERSION
 
-Version 0.0105, released 2021-09-29.
+Version 0.0106, released 2021-10-31.
 
 =head1 SOURCE
 

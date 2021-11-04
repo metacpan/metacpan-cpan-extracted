@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::LoginDetails;
-$Shipment::Temando::WSDL::Types::LoginDetails::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::LoginDetails::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
         [   qw(        loginId
               password
 
-              )
+            )
         ],
         {   'loginId'  => \%loginId_of,
             'password' => \%password_of,
@@ -65,7 +65,7 @@ Shipment::Temando::WSDL::Types::LoginDetails
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

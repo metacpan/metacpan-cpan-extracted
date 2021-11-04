@@ -29,3 +29,15 @@ Revision history for Perl extension OpenMP::Environment.
            the reading of the environment in C using "getenv"
            and how to implement this to create dynamic C
            methods that respect %ENV.
+
+1.1.1 Fri Jun 25 23:12:00 2021
+         - oof
+
+1.1.2 Fri Jun 26 23:12:00 2021
+         - added a more complex example, 2dheat conduction
+         - added a prime number finder example
+         - added first example that combines both O::E,
+           A::O, awareness of OMP_NUM_THREADS and simple
+           perlapi use that allows one to pass in an array
+           reference; values are then added using OpenMP's
+           "reduction" construct. y33t!

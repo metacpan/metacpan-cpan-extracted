@@ -1,3 +1,48 @@
+0.000096  2021-11-04 10:35:35-07:00 America/Los_Angeles
+
+    - Fix coverage code to reduce the number of queries used
+
+0.000095  2021-10-27 14:40:06-07:00 America/Los_Angeles
+
+    - Fix issue where retried jobs had a null filename for part of processing
+
+0.000094  2021-10-26 13:59:04-07:00 America/Los_Angeles
+
+    - Fix coverage collation in mysql
+
+0.000093  2021-10-26 10:06:37-07:00 America/Los_Angeles
+
+    - Fix coverage race condition
+
+0.000092  2021-10-25 10:30:20-07:00 America/Los_Angeles
+
+    - Fix bad db initialization stuff
+    - Fix #27 - datetime formats
+
+0.000091  2021-10-22 11:09:08-07:00 America/Los_Angeles
+
+    - Fix perofrmance of loading runs with lots of coverage
+    - Fix queued jobs having no filename
+    - Other misc fixes
+
+0.000090  2021-10-21 14:36:55-07:00 America/Los_Angeles
+
+    - Fix deleting covered runs again in light of new foreign key...
+
+0.000089  2021-10-21 14:03:53-07:00 America/Los_Angeles
+
+    - Fix coverage import with --retry on ByTest aggregator
+    - Fix deleting runs with coverage
+
+0.000088  2021-10-20 13:47:18-07:00 America/Los_Angeles
+
+    - Fix duration data
+
+0.000087  2021-10-20 10:49:00-07:00 America/Los_Angeles
+
+    - New coverage work
+    - New schema structure overhaul
+
 0.000086  2021-09-22 10:24:05-07:00 America/Los_Angeles
 
     - Stream results faster

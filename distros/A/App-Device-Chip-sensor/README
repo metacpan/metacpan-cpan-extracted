@@ -54,6 +54,13 @@ COMMANDLINE OPTIONS
       Device::Chip::Adapter to construct the chip adapter used for
       communication with the actual chip hardware.
 
+      * --mid3, -m
+
+      Enable "middle-of-3" filtering of gauge values, to reduce sensor
+      noise from unreliable sensors. At each round of readings, the most
+      recent three values from the sensor are sorted numerically and the
+      middle one is reported.
+
 PROVIDED METHODS
 
     The following methods are provided on the base class, intended for
@@ -102,6 +109,13 @@ PROVIDED METHODS
     simply await this future to run the logic. If it has other logic to
     perform as well it could combine this with other futures using a
     Future->needs_all or similar techniques.
+
+ print_readings
+
+       $app->print_readings( $sensors, $values )
+
+    Prints the sensor names and current readings in a human-readable format
+    to the currently-selected output handle (usually STDOUT).
 
 REQUIRED METHODS
 

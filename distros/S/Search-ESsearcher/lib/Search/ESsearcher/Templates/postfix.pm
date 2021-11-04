@@ -10,11 +10,11 @@ Search::ESsearcher::Templates::syslog - Provides postfix support for essearcher.
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 =head1 LOGSTASH
 
@@ -42,7 +42,8 @@ The important bit is "type" being set to "syslog". If that is not used,
 use the command line options field and fieldv.
 
 Install L<https://github.com/whyscream/postfix-grok-patterns> for pulling apart
-the postfix messages. These files are included with this as well.
+the postfix messages. These files are included with this as well. You will likely
+not want to use 51-filter-postfix-aggregate.conf as that is a bit buggy.
 
 
 =head1 Options

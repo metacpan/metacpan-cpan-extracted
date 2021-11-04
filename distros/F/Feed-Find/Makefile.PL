@@ -13,4 +13,5 @@ test_requires 'Test::LWP::UserAgent';
 
 author_tests('xt');
 auto_set_repository;
+githubmeta;
 WriteAll;

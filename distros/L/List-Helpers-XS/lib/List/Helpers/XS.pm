@@ -9,8 +9,8 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = (
-  'all' => [ qw/ shuffle_multi shuffle random_slice random_slice_void / ],
-  'slice' => [ qw/ random_slice random_slice_void / ],
+  'all' => [ qw/ shuffle_multi shuffle random_slice / ],
+  'slice' => [ qw/ random_slice / ],
   'shuffle' => [ qw/ shuffle shuffle_multi / ],
 );
 
@@ -18,7 +18,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw//;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 require XSLoader;
 XSLoader::load('List::Helpers::XS', $VERSION);
@@ -33,9 +33,9 @@ List::Helpers::XS - Perl extension to provide some usefull functions with arrays
 
   use List::Helpers::XS qw/ :shuffle :slice /;
 
-  my $slice = random_slice(\@list, $size); # returns array reference
+  my $slice = random_slice(\@list, $size); # returns array reference, @list is partitial shuffled
 
-  random_slice_void(\@list, $size);
+  random_slice(\@list, $size); # @list is now truncated and shuffled
 
   shuffle(\@list);
   shuffle(@list);
@@ -48,7 +48,6 @@ List::Helpers::XS - Perl extension to provide some usefull functions with arrays
   tie(@list, "MyPackage");
   shuffle(@list);
   shuffle(\@list);
-  random_slice_void(\@list, $size);
   my $slice = random_slice(\@list, $size); # returns array reference
 
 =head1 DESCRIPTION
@@ -70,17 +69,7 @@ So, if you need to shuffle and get back only a part of array, then this method c
 
 Be aware that the original array will be shuffled too, but it won't be sliced.
 
-=head2 random_slice_void
-
-This method receives the array and the amount of required elements to be shuffled,
-shuffles array's elements. Doesn't return anything.
-
-After method being called the passed array will contain only
-random C<num> elements from the original array.
-
-This method is a memory efficient, but it can a bit slow down in case of huge arrays and C<num>.
-
-In this case please consider the usage of C<random_slice> method.
+In void context the original list will be truncated and shuffled.
 
 =head2 shuflle
 
@@ -97,53 +86,13 @@ You can pass so many arguments as Perl stack allows.
 
 =head1 Benchmarks
 
-Below you can find some benchmarks of C<random_slice> and C<random_slice_void> methods
-in comparison with C<Array::Shuffle::shuffle_array> / C<Array::Shuffle::shuffle_huge_array>
-with C<splice> method invocation afterwards.
+Benchmarks of C<random_slice> method in comparison with C<List::MoreUtils::samples> and
+C<List::Util::sample> showed that current version of C<random_slice> is very similar to
+the first ones in some cases. But in case of huge amount of iterations it starts to slow
+down due to some performance degradation.
 
-Total amount of elements in initial array: 250
-
-                            shuffle_array and splice  random_slice  random_slice_void
-shuffle_array and splice                          --          -45%               -52%
-random_slice                                     82%            --               -12%
-random_slice_void                               107%           14%                 --
-
-Total amount of elements in initial array: 25_000
-
-                         shuffle_array and splice  random_slice_void  random_slice
-shuffle_array and splice                      --                -51%          -56%
-random_slice_void                            106%                 --           -9%
-random_slice                                 126%                10%            --
-
-Total amount of elements in initial array: 250_000
-
-                           shuffle_array and splice  random_slice_void  random_slice
-shuffle_array and splice                         --               -63%          -67%
-random_slice_void                              172%                 --           -9%
-random_slice                                   200%                10%            --
-
-The benchmark code is below:
-
-  cmpthese (
-      1_000_000,
-      {
-          'shuffle_array and splice' => sub {
-              my $arr = [@array];
-              if ($slice_size < scalar $arr->@*) {
-                  shuffle_array(@$arr);
-                  $arr = [splice(@$arr, 0, $slice_size)];
-              }
-          },
-          'random_slice' => sub {
-              my $arr = [@array];
-              $arr = random_slice($arr, $slice_size);
-          },
-          'random_slice_void' => sub {
-              my $arr = [@array];
-              random_slice_void($arr, $slice_size);
-          },
-      }
-    );
+So, the usage of C<List::MoreUtils::samples> (it's the fastest now) and C<List::Util::sample> is more preferable.
+I'll keep C<random_slice> for backward compatibility.
 
 The benchmark results for C<shuffle> method
 

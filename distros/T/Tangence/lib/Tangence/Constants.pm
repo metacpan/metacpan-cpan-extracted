@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2010-2016 -- leonerd@leonerd.org.uk
 
-package Tangence::Constants 0.26;
+package Tangence::Constants 0.27;
 
-use v5.14;
+use v5.26;
 use warnings;
 
 use Exporter 'import';

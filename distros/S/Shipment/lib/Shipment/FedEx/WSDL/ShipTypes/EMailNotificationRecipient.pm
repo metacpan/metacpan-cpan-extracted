@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::EMailNotificationRecipient;
-$Shipment::FedEx::WSDL::ShipTypes::EMailNotificationRecipient::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::EMailNotificationRecipient::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ Class::Std::initialize();
               Format
               Localization
 
-              )
+            )
         ],
         {   'EMailNotificationRecipientType' =>
               \%EMailNotificationRecipientType_of,
@@ -58,7 +58,7 @@ Class::Std::initialize();
             'NotifyOnException' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
             'NotifyOnDelivery' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'Format' =>
+            'Format'           =>
               'Shipment::FedEx::WSDL::ShipTypes::EMailNotificationFormatType',
             'Localization' => 'Shipment::FedEx::WSDL::ShipTypes::Localization',
         },
@@ -92,7 +92,7 @@ Shipment::FedEx::WSDL::ShipTypes::EMailNotificationRecipient
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

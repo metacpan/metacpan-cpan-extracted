@@ -52,7 +52,7 @@ foreach my $type (qw( FS FSRW ))
 
   $t->command_ok('PWD')
     ->code_is(257)
-    ->message_like(qr{"$tmp" is the current directory});
+    ->message_like(qr{"\Q$tmp\E" is the current directory});
 
   my $size = do {
     open my $fh, '>', "$tmp/roger.txt";

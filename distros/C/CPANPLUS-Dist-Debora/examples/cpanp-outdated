@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# List outdated Perl distributions that were installed with CPANPLUS.
+#
+# XXX Does not work "cpanp o" does not output the distribution names.
+# XXX Muss in Perl kodiert werden. Siehe CPANPLUS/Shell/Default.pm.
+set -e
+
+dists=$(mktemp)
+trap "rm -f $dists" EXIT
+
+if [ -f /etc/debian_version ]; then
+    zcat $(dpkg-query -W -f '${Package} ${Version}\n' | \
+    perl -anE 'printf "/usr/share/doc/%s/changelog.Debian.gz\n", $F[0] if $F[1] =~ /cpanplus/') | \
+    perl -anE 'say $F[2] if m{^  [*] Package}' | sort >$dists
+else
+    rpm -q --changelog $(rpm -qa --qf '%{NAME} %{VENDOR}\n' | \
+    perl -anE 'say $F[0] if $F[1] =~ /CPANPLUS/') | \
+    perl -anE 'say $F[2] if m{^- Package}' | sort >$dists
+fi
+
+cpanp o | perl -anE 'say $F[3]' | sort | comm -12 $dists -

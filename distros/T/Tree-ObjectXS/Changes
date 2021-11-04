@@ -1,11 +1,16 @@
-Revision history for Tree-ObjectXS
+0.030   2021-10-07  Released-By: PERLANCAR; Urgency: low
 
-0.02    2016-03-29 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Update mentioned module Role{,Bundle}::TinyCommons::Tree.
+
+
+0.02    2016-03-29  Released-By: PERLANCAR
 
 	- Make Tree::ObjectXS::Array more compatible with the new
 	  Tree::Object::Array, update doc.
 
 
-0.01    2016-03-28 (PERLANCAR)
+0.01    2016-03-28  Released-By: PERLANCAR
 
         - First release.

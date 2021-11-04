@@ -29,7 +29,7 @@ package Business::Tax::VAT::Validation;
 use strict;
 use warnings;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 use HTTP::Request::Common qw(POST);
 use LWP::UserAgent;
@@ -42,16 +42,16 @@ Business::Tax::VAT::Validation - Validate EU VAT numbers against VIES/HMRC
 =head1 SYNOPSIS
 
   use Business::Tax::VAT::Validation;
-  
+
   my $hvatn=Business::Tax::VAT::Validation->new();
-  
+
   # Check number
   if ($hvatn->check($VAT, [$member_state])){
         print "OK\n";
   } else {
         print $hvatn->get_last_error;
   }
-  
+
 =head1 DESCRIPTION
 
 This class provides an easy API to check European VAT numbers' syntax,
@@ -72,12 +72,12 @@ REST API provided by their HMRC.
 =item B<new> Class constructor.
 
     $hvatn=Business::Tax::VAT::Validation->new();
-    
-    
+
+
     If your system is located behind a proxy :
-    
+
     $hvatn=Business::Tax::VAT::Validation->new(-proxy => ['http', 'http://example.com:8001/']);
-    
+
     Note : See LWP::UserAgent for proxy options.
 
 =cut
@@ -155,7 +155,7 @@ May be used rather than C<GB> for checking a Northern Irish company.
 =back
 
     @ms=$hvatn->member_states;
-    
+
 =cut
 
 sub member_states {
@@ -191,7 +191,7 @@ sub regular_expressions {
 =over 4
 
 =item B<check> - Checks if a VAT number exists in the VIES database
-    
+
     $ok=$hvatn->check($vatNumber, [$countryCode]);
 
 You may either provide the VAT number under its complete form (e.g. BE-123456789, BE123456789)
@@ -222,9 +222,9 @@ sub check {
 
 =item B<local_check> - Checks if a VAT number format is valid
     This method is based on regexps only and DOES NOT ask the VIES database
-    
+
     $ok=$hvatn->local_check($VAT, [$member_state]);
-    
+
 
 =cut
 
@@ -259,11 +259,11 @@ This hashref will be reset every time you call check() or local_check()
 =cut
 
 sub information {
-    my ( $self, $key, @other ) = @_; 
+    my ( $self, $key, @other ) = @_;
     if ($key) {
-        return $self->{information}{$key} 
+        return $self->{information}{$key}
     } else {
-        return ($self->{information})    
+        return ($self->{information})
     }
 }
 
@@ -356,7 +356,6 @@ sub _check_vies {
   my ($self, $vatNumber, $countryCode) = @_;
   my $ua = $self->_get_ua();
   my $request = HTTP::Request->new(POST => $self->{baseurl});
-  $request->header(SOAPAction => 'http://www.w3.org/2003/05/soap-envelope');
   $request->content(_in_soap_envelope($vatNumber, $countryCode));
   $request->content_type("Content-Type: application/soap+xml; charset=utf-8");
 
@@ -557,6 +556,9 @@ Torsten Mueller, Archesoft, Germany
 
 =item *
 Dave Lambley (davel), GoDaddy, United Kingdom
+
+item *
+Tatu Wikman (tswfi)
 
 =back
 

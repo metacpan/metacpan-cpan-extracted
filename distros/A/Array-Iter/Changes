@@ -1,5 +1,11 @@
-Revision history for Perl extension Array-Iter
+0.021   2021-07-25  Released-By: PERLANCAR; Urgency: low
 
-0.01     2015-12-23 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Mention other ::Iter modules:
+	  {IntRange,NumSeq,Range}::Iter.
+
+
+0.01     2015-12-23  Released-By: PERLANCAR
 
          - first release.

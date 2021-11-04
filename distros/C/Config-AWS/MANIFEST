@@ -5,7 +5,6 @@ LICENSE
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README.md
 lib/Config/AWS.pm
 t/00-report-prereqs.dd
@@ -13,6 +12,7 @@ t/00-report-prereqs.t
 t/environment.t
 t/import.t
 t/list_profiles.t
+t/namespace.t
 t/read.t
 xt/author/00-compile.t
 xt/author/pod-syntax.t

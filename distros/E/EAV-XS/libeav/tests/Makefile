@@ -124,8 +124,10 @@ check-email: check-email-5322 check-email-6531
 
 check-email-822: t-822-email.bin
 	# === RFC 822 email address tests
-	./t-822-email.bin 45 1 ../data/pass-email-ascii.txt
-	./t-822-email.bin 0 44 ../data/fail-email-ascii.txt
+	./t-822-email.bin -P 45 -F 1  -f ../data/pass-email-ascii.txt
+	./t-822-email.bin -P 0  -F 44 -f ../data/fail-email-ascii.txt
+	./t-822-email.bin -P 5 -F 0 -s -f ../data/pass-email-ascii-slurp.txt
+	./t-822-email.bin -P 0 -F 7 -s -f ../data/fail-email-ascii-slurp.txt
 
 
 check-email-5321: t-5321-email.bin

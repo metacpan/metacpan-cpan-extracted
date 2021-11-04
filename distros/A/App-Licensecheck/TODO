@@ -4,7 +4,7 @@
     * parse environment variable LICENSECHECK_DEFAULTS
 
   * Maybe implement all this as a git module?
-    
+
   * implement environment variable LICENSECHECK_DEFAULTS
 
       and setting=value pairs in env vars LICENSECHECK LICENSECHECK_DIFF
@@ -56,10 +56,34 @@
 
   * support omitting copyright holders when permited by license
 
+  * Implement media-type handling:
+    * --accept
+      comma-separated list of media ranges to process
+      default: */*
+      set to "text/*" to skip binary files,
+      or set to "application/postscript;q=0.2;mbx=1024, text/*"
+      to process plaintext and small Postscript files
+      takes a string of same syntax as value part of HTTP Accept Header
+      (see <HTTP::Negotiate#ACCEPT-HEADERS>)
+    * map MIME types to comment styles
+      * Regexp::Common::comment
+      * Padre::Comment
+      * Syntax::Highlight::Engine::Kate
+      * licenseutils
+    * maybe use HTTP::Negotiate to resolve decoders and parsers to apply
   * Implement decoding options:
     * --decode-html
       regular expression for paths to parse as html.
       Pass empty regexp to only enable support (see --decode-magic).
+    * --decode-xml
+      regular expression for paths to parse as xml.
+      Pass empty regexp to only enable support (see --decode-magic).
+      * test detection of both metadata and comments
+        e.g. in Darktable 3.6.0 appdata in-file
+    * --decode-svg
+      regular expression for paths to parse as svg.
+      Pass empty regexp to only enable support (see --decode-magic).
+      * test detection of both RDF metadata and comments
     * --decode-exif
       regular expression for paths to extract EXIF and other metadata from
       (see exiftool and Image::ExifTool).
@@ -143,7 +167,7 @@
     + picolibc <https://keithp.com/cgit/picolibc.git/>
 
   * Maybe use libdata-binary-perl
-  * Maybe use Text::Locus to track (and emit in verbose/debug mode) where patterns are detected?
+  * Maybe use String::Tagged (or else perhaps Text::Locus) to track (and emit in verbose/debug mode) where patterns are detected?
 
   * Quality flagging
     + ambiguous: license ref pointing to multiple license fulltexts (e.g. "MIT" or "GNU" or "GPL"

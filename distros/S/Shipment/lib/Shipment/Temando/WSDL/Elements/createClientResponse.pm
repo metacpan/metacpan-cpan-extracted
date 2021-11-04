@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::createClientResponse;
-$Shipment::Temando::WSDL::Elements::createClientResponse::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::createClientResponse::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        clientId
 
-                  )
+                )
             ],
             {'clientId' => \%clientId_of,},
             {'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',},
@@ -72,7 +72,7 @@ Shipment::Temando::WSDL::Elements::createClientResponse
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

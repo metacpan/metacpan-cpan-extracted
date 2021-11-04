@@ -20,17 +20,23 @@ no_index:
 requires:
   Algorithm::Diff: '0'
   Encode::Locale: '0'
+  File::MimeInfo: '0'
+  File::MimeInfo::Magic: '0'
   File::ReadBackwards: '0'
   File::Slurper: '0'
+  HTTP::Date: '0'
+  IO::Scalar: '0'
   IO::Socket::SSL: '2.069'
   IRI: '0'
   Modern::Perl: '1.20180701'
   Mojolicious: '9'
   Net::IDN::Encode: '0'
   Net::SSLeay: '1.9'
+  Text::Wrapper: '0'
   URI::Escape: '0'
+  XML::LibXML: '0'
   perl: '5.026000'
 resources:
   repository: https://alexschroeder.ch/cgit/phoebe
-version: 4.01
+version: 4.02
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

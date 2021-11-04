@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail;
-$Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Status
               StatusCreateTime
 
-              )
+            )
         ],
         {   'Status'           => \%Status_of,
             'StatusCreateTime' => \%StatusCreateTime_of,
@@ -63,7 +63,7 @@ Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

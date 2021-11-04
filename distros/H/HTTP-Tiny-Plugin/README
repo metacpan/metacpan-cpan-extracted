@@ -2,8 +2,8 @@ NAME
     HTTP::Tiny::Plugin - HTTP::Tiny with plugins
 
 VERSION
-    This document describes version 0.003 of HTTP::Tiny::Plugin (from Perl
-    distribution HTTP-Tiny-Plugin), released on 2020-08-14.
+    This document describes version 0.004 of HTTP::Tiny::Plugin (from Perl
+    distribution HTTP-Tiny-Plugin), released on 2021-06-08.
 
 SYNOPSIS
      # set plugins to use, globally
@@ -53,11 +53,13 @@ DESCRIPTION
 
     *   http
 
-        Object. The HTTP::Tiny object.
+        Object. The HTTP::Tiny::Plugin object, which is a subclass of
+        HTTP::Tiny. In "before_instantiate" book, this is not yet available.
 
     *   ua
 
-        Like "http".
+        Contain the same object as "http", for
+        convenience/backward-compatibility.
 
     *   hook
 
@@ -105,6 +107,8 @@ DESCRIPTION
 
         Will also immediately stop hook execution for that stage.
 
+        Not observed in "before_instantiate" and "after_instantiate" hooks.
+
     *   98
 
         Repeat execution of hook-related method. For example, if we return
@@ -112,8 +116,21 @@ DESCRIPTION
 
         Will also immediately stop hook execution for that stage.
 
+        Not observed in "before_instantiate" and "after_instantiate" hooks.
+
   List of available hooks
     Below is the list of hooks in order of execution during a request:
+
+    *   before_instantiate
+
+        Will be called in "new()" before the HTTP::Tiny::Plugin object is
+        instantiated. Note that in this state, "http" and "ua" keys in $r is
+        not yet available.
+
+    *   after_instantiate
+
+        Will be called in "new()" after the HTTP::Tiny::Plugin object is
+        instantiated.
 
     *   before_request_once
 
@@ -139,6 +156,9 @@ DESCRIPTION
         Will be called after "request()". All plugins will be called. Stage
         will interpret 98 (repeat calling "request()", including the
         "before_request" hook but not the "before_request_once" hook).
+
+CONTRIBUTOR
+    perlancar (on netbook-zenbook-ux305) <perlancar@gmail.com>
 
 METHODS
   set_plugins
@@ -184,7 +204,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

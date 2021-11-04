@@ -16,7 +16,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.25';
+our $VERSION = '0.35';
 
 =head1 NAME
 
@@ -44,6 +44,12 @@ HTTP::Request::FromCurl - create a HTTP::Request from a curl command line
     for my $r (@requests) {
         $ua->request( $r->as_request )
     }
+
+=head1 RATIONALE
+
+C<curl> command lines are found everywhere in documentation. The Firefox
+developer tools can also copy network requests as C<curl> command lines from
+the network panel. This module enables converting these to Perl code.
 
 =head1 METHODS
 
@@ -92,16 +98,6 @@ C<< --data=@/etc/passwd >>. The default is to not read the contents of files
 specified this way.
 
 =back
-
-=head2 C<< ->squash_uri( $uri ) >>
-
-    my $uri = HTTP::Request::FromCurl->squash_uri(
-        URI->new( 'https://example.com/foo/bar/..' )
-    );
-    # https://example.com/foo/
-
-Helper method to clean up relative path elements from the URI the same way
-that curl does.
 
 =head1 GLOBAL VARIABLES
 
@@ -234,6 +230,20 @@ sub new( $class, %options ) {
                   :       ($class->_build_request( $cmd->[0], \%curl_options, %options ))[0]
                   ;
 }
+
+=head1 METHODS
+
+=head2 C<< ->squash_uri( $uri ) >>
+
+    my $uri = HTTP::Request::FromCurl->squash_uri(
+        URI->new( 'https://example.com/foo/bar/..' )
+    );
+    # https://example.com/foo/
+
+Helper method to clean up relative path elements from the URI the same way
+that curl does.
+
+=cut
 
 sub squash_uri( $class, $uri ) {
     my $u = $uri->clone;
@@ -594,9 +604,8 @@ L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
-Please report bugs in this module via the RT CPAN bug queue at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Request-FromCurl>
-or via mail to L<filter-signatures-Bugs@rt.cpan.org>.
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/HTTP-Request-FromCurl/issues>
 
 =head1 AUTHOR
 
@@ -604,7 +613,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2021 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

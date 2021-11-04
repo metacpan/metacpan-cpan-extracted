@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ShortAddress;
-$Shipment::Purolator::WSDLV2::Types::ShortAddress::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::ShortAddress::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               Country
               PostalCode
 
-              )
+            )
         ],
         {   'City'       => \%City_of,
             'Province'   => \%Province_of,
@@ -71,7 +71,7 @@ Shipment::Purolator::WSDLV2::Types::ShortAddress
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

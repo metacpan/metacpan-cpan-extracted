@@ -1,0 +1,29 @@
+---
+abstract: 'Set a column to securely hash on insert/update using bcrypt'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  Test::DBIx::Class: '0.52'
+  Test::More: '0.86'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-BcryptColumn
+requires:
+  Crypt::Eksblowfish: '0.009'
+  Crypt::URandom: '0.36'
+  Sub::Name: '0.26'
+resources:
+  bugtracker: https://github.com/jjn1056/DBIx-Class-BcryptColumn/issues
+  homepage: https://github.com/jjn1056/DBIx-Class-BcryptColumn
+  repository: https://github.com/jjn1056/DBIx-Class-BcryptColumn.git
+version: '0.001001'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

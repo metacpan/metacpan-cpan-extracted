@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Module Generic - ~/lib//media/sf_src/perl/Module-Generic/lib/Module/Generic/Null.pm
-## Version v1.0.1
+## Module Generic - ~/lib/Module/Generic/Null.pm
+## Version v1.0.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/05/20
+## Modified 2021/08/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,6 @@ BEGIN
 {
     use strict;
     use warnings;
-    use Want;
     use overload ('""'     => sub{ '' },
                   'eq'     => sub { _obj_eq(@_) },
                   'ne'     => sub { !_obj_eq(@_) },
@@ -27,7 +26,7 @@ BEGIN
                  );
     use Scalar::Util ();
     use Want;
-    our( $VERSION ) = 'v1.0.1';
+    our( $VERSION ) = 'v1.0.2';
 };
 
 sub new
@@ -43,7 +42,6 @@ sub new
 
 sub _obj_eq 
 {
-    ##return overload::StrVal( $_[0] ) eq overload::StrVal( $_[1] );
     no overloading;
     my $self = shift( @_ );
     my $other = shift( @_ );
@@ -52,12 +50,12 @@ sub _obj_eq
     {
         return( $self eq $other );
     }
-    ## Compare error message
+    # Compare error message
     elsif( !ref( $other ) )
     {
         return( '' eq $other );
     }
-    ## Otherwise some reference data to which we cannot compare
+    # Otherwise some reference data to which we cannot compare
     return( 0 ) ;
 }
 
@@ -65,13 +63,11 @@ AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
     my $self = shift( @_ );
-    # XXX Remove debugging
-#     my $debug = $self->{debug} = 3;
-#     print( STDERR __PACKAGE__, "::AUTOLOAD: self contains the following keys: '", join( "', '", keys( %$self ) ), "'\n" ) if( $debug );
+#     print( STDERR __PACKAGE__, "::AUTOLOAD: self contains the following keys: '", join( "', '", keys( %$self ) ), "'\n" ) if( $self->{debug} );
 #     my( $pack, $file, $line ) = caller;
 #     my $sub = ( caller( 1 ) )[3];
     my $what = ( defined( $self->{wants} ) && length( $self->{wants} ) )
-        ? $self->{wants}
+        ? uc( $self->{wants} )
         : Want::want( 'LIST' )
             ? 'LIST'
             : Want::want( 'HASH' )
@@ -93,11 +89,11 @@ AUTOLOAD
                                             : Want::want( 'VOID' )
                                                 ? 'VOID'
                                                 : '';
-#     print( STDERR __PACKAGE__, ": Method $method called in package $pack in file $file at line $line from subroutine $sub (AUTOLOAD = $AUTOLOAD) and expecting '$what'\n" ) if( $debug );
-    ## If we are chained, return our null object, so the chain continues to work
+#     print( STDERR __PACKAGE__, ": Method $method called in package $pack in file $file at line $line from subroutine $sub (AUTOLOAD = $AUTOLOAD) and expecting '$what'\n" ) if( $self->{debug} );
+    # If we are chained, return our null object, so the chain continues to work
     if( $what eq 'OBJECT' )
     {
-        ## No, this is NOT a typo. rreturn() is a function of module Want
+        # No, this is NOT a typo. rreturn() is a function of module Want
         rreturn( $_[0] );
     }
     elsif( $what eq 'CODE' )
@@ -116,7 +112,7 @@ AUTOLOAD
     {
         rreturn( \undef );
     }
-    ## Otherwise, we return undef; Empty return returns undef in scalar context and empty list in list context
+    # Otherwise, we return undef; Empty return returns undef in scalar context and empty list in list context
     return;
 };
 

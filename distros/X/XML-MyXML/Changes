@@ -1,5 +1,22 @@
 Revision history for XML-MyXML
 
+1.08 2021-10-19T09:50:29Z
+
+    - added namespace support to the path function, breaking some back-compat
+    - brought codebase quality up to date with my current Perl skills
+    - tests run on perl 5.8.1
+    - minor fix (removed a warning)
+
+    BREAKING CHANGES:
+        - The quotes in $obj->path('person[name="Alex"]') are interpreted as quote characters.
+          If you type the above, it will only match if there is a person element with
+          attribute name="&quot;Alex&quot;" .
+        - To include a "]" character in the attribute value of path, now you just escape it
+          with a backslash character in the path string. For example, to search for elements
+          with a name attribute of Al]ex, write this:
+          $obj->path('person[name=Al\]ex]')
+          "[" characters in attribute values in the path string don't need to be escaped.
+
 1.07 2021-09-22T03:17:40Z
 
     - minor internal changes

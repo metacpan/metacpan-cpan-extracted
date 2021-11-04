@@ -9,13 +9,17 @@ use strict;
 use warnings;
 
 package Playwright::Selectors;
-$Playwright::Selectors::VERSION = '0.016';
+$Playwright::Selectors::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
     my ( $self, %options ) = @_;
     $options{type} = 'Selectors';
     return $self->SUPER::new(%options);
+}
+
+sub spec {
+    return $Playwright::spec->{'Selectors'}{members};
 }
 
 sub register {
@@ -72,7 +76,7 @@ Playwright::Selectors - Automatically generated class for Playwright::Selectors
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 

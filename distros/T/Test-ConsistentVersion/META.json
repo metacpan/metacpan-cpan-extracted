@@ -4,13 +4,13 @@
       "Glenn Fowler <cebjyre@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-ConsistentVersion",
    "prereqs" : {
@@ -26,6 +26,7 @@
          "requires" : {
             "Test::Builder" : "0.94",
             "autodie" : "0",
+            "perl" : "5.006",
             "version" : "0"
          }
       }
@@ -33,7 +34,7 @@
    "provides" : {
       "Test::ConsistentVersion" : {
          "file" : "lib/Test/ConsistentVersion.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.3.1"
       }
    },
    "release_status" : "stable",
@@ -42,8 +43,9 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/cebjyre/Test-ConsistentVersion"
+         "url" : "https://github.com/cebjyre/Test-ConsistentVersion"
       }
    },
-   "version" : "v0.3.0"
+   "version" : "v0.3.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

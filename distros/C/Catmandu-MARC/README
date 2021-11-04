@@ -42,43 +42,79 @@ MODULES
 
       * Catmandu::Importer::MARC
 
+      * Catmandu::Importer::MARC::ALEPHSEQ
+
+      * Catmandu::Importer::MARC::ISO
+
+      * Catmandu::Importer::MARC::Line
+
+      * Catmandu::Importer::MARC::Lint
+
+      * Catmandu::Importer::MARC::MARCMaker
+
+      * Catmandu::Importer::MARC::MicroLIF
+
+      * Catmandu::Importer::MARC::MiJ
+
+      * Catmandu::Importer::MARC::RAW
+
+      * Catmandu::Importer::MARC::Record
+
+      * Catmandu::Importer::MARC::XML
+
       * Catmandu::Exporter::MARC
 
-      * Catmandu::Fix::marc_map
+      * Catmandu::Exporter::MARC::ALEPHSEQ
 
-      * Catmandu::Fix::marc_spec
+      * Catmandu::Exporter::MARC::ISO
+
+      * Catmandu::Exporter::MARC::Line
+
+      * Catmandu::Exporter::MARC::MARCMaker
+
+      * Catmandu::Exporter::MARC::MiJ
+
+      * Catmandu::Exporter::MARC::XML
 
       * Catmandu::Fix::marc_add
 
       * Catmandu::Fix::marc_append
 
-      * Catmandu::Fix::marc_replace_all
-
-      * Catmandu::Fix::marc_remove
-
-      * Catmandu::Fix::marc_xml
-
-      * Catmandu::Fix::marc_in_json
-
-      * Catmandu::Fix::marc_decode_dollar_subfields
-
-      * Catmandu::Fix::marc_set
-
       * Catmandu::Fix::marc_copy
 
       * Catmandu::Fix::marc_cut
 
+      * Catmandu::Fix::marc_decode_dollar_subfields
+
+      * Catmandu::Fix::marc_in_json
+
+      * Catmandu::Fix::marc_map
+
       * Catmandu::Fix::marc_paste
+
+      * Catmandu::Fix::marc_remove
+
+      * Catmandu::Fix::marc_replace_all
+
+      * Catmandu::Fix::marc_set
 
       * Catmandu::Fix::marc_sort
 
+      * Catmandu::Fix::marc_spec
+
+      * Catmandu::Fix::marc_xml
+
       * Catmandu::Fix::Bind::marc_each
 
-      * Catmandu::Fix::Condition::marc_match
+      * Catmandu::Fix::Condition::marc_all_match
+
+      * Catmandu::Fix::Condition::marc_any_match
 
       * Catmandu::Fix::Condition::marc_has
 
       * Catmandu::Fix::Condition::marc_has_many
+
+      * Catmandu::Fix::Condition::marc_match
 
       * Catmandu::Fix::Condition::marc_spec_has
 
@@ -87,6 +123,8 @@ MODULES
       * Catmandu::Fix::Inline::marc_add
 
       * Catmandu::Fix::Inline::marc_remove
+
+      * Catmandu::Fix::Inline::marc_set
 
 DESCRIPTION
 
@@ -123,7 +161,11 @@ CONTRIBUTORS
 
       * Carsten Klee, klee at cpan.org
 
-LICENSE AND COPYRIGHT
+COPYRIGHT
+
+    Copyright 2012- Patrick Hochstenbach , Carsten Klee, Johann Rolschewski
+
+LICENSE
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published

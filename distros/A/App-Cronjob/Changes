@@ -1,5 +1,8 @@
 Revision history for App-Cronjob
 
+1.200012  2021-10-30 23:17:41-04:00 America/New_York
+        - packaging tweaks
+
 1.200011  2021-01-11 19:06:44-05:00 America/New_York
         - always set a logging prefix, even if its just noise; this makes it
           easy to coordinate log lines

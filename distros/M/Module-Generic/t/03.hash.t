@@ -45,6 +45,7 @@ my $str = '{
 }
 ';
 is( $h->as_string, $str, 'Hash as string' );
+is( $h->as_json, '{"age":30,"email":"john.doe@example.com","first_name":"John","last_name":"Doe"}', 'as_json' );
 # No, that was a dumb idea
 # is( "$h", $str, 'Hash stringified' );
 my $json = '{

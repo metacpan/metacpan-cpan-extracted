@@ -1,20 +1,18 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Fit::Levmar;
 
-@EXPORT_OK  = qw(  levmar levmar_report levmar_chkjac PDL::PP levmar_der_ub PDL::PP levmar_der_lb PDL::PP levmar_der_ PDL::PP levmar_der_lb_ub PDL::PP levmar_diff_ub PDL::PP levmar_diff_lb PDL::PP levmar_diff_ PDL::PP levmar_diff_lb_ub PDL::PP _levmar_chkjac PDL::PP _levmar_chkjac_no_t );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(levmar levmar_report levmar_chkjac levmar_der_ levmar_der_lb levmar_der_ub levmar_der_lb_ub levmar_diff_ levmar_diff_lb levmar_diff_ub levmar_diff_lb_ub _levmar_chkjac _levmar_chkjac_no_t );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::Fit::Levmar::VERSION = '0.0100';
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '0.0103';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Fit::Levmar $VERSION;
 
@@ -548,7 +546,8 @@ See C<P>
 =item DIR
 
 The directory containing files created when compiling C<lpp>
-and C fit functions.  This defaults to './tempcode'; The .c,
+and C fit functions.  This defaults to being created by
+L<File::Temp/tempdir>. The .c,
 .o, and .so files will be written to this directory. This
 option actually falls through to levmar_func.  Such options
 should be in separate section, or otherwise noted.
@@ -1142,7 +1141,7 @@ Need to put the description from the C code in here.
 =for ref
 
 Make a human readable report from the hash ref returned
-by lemvar().
+by levmar().
 
 =for usage
 
@@ -1545,14 +1544,9 @@ sub levmar {
 	if ( chk_eq_dims($f,$p) < 0 ) {
 	    croak "p and FIX must have the same dimensions";
 	}
-	if ( not defined  $h->{UB} ) {
-	    $h->{UB} = ones($p);
-	    $h->{UB} *= $DBLMAX;
-	}
-	if (not defined  $h->{LB} ) {
-	    $h->{LB} = ones($p);
-	    $h->{LB} *= -$DBLMAX;
-	}
+	$h->{UB} = ones($p) * $DBLMAX if not defined $h->{UB};
+	$h->{LB} = ones($p) * -$DBLMAX if not defined $h->{LB};
+	$_ = topdl($_) for @$h{qw(UB LB)};
 	my $fi = PDL::Primitive::which($f == 1); # indices in p that we want to fix.
 	$h->{UB}->flat->index($fi) .= $p->flat->index($fi);
 	$h->{LB}->flat->index($fi) .= $p->flat->index($fi);
@@ -1764,7 +1758,7 @@ sub levmar_chkjac {
 
 
 
-*levmar_der_ub = \&PDL::levmar_der_ub;
+*levmar_der_ = \&PDL::levmar_der_;
 
 
 
@@ -1776,7 +1770,7 @@ sub levmar_chkjac {
 
 
 
-*levmar_der_ = \&PDL::levmar_der_;
+*levmar_der_ub = \&PDL::levmar_der_ub;
 
 
 
@@ -1788,7 +1782,7 @@ sub levmar_chkjac {
 
 
 
-*levmar_diff_ub = \&PDL::levmar_diff_ub;
+*levmar_diff_ = \&PDL::levmar_diff_;
 
 
 
@@ -1800,7 +1794,7 @@ sub levmar_chkjac {
 
 
 
-*levmar_diff_ = \&PDL::levmar_diff_;
+*levmar_diff_ub = \&PDL::levmar_diff_ub;
 
 
 
@@ -1848,5 +1842,3 @@ file.
 # Exit with OK status
 
 1;
-
-		   

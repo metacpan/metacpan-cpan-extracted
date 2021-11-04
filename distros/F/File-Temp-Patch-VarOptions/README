@@ -1,0 +1,69 @@
+NAME
+    File::Temp::Patch::VarOptions - Allow File::Temp's tempfile() and
+    tempdir() to receive options via package variables
+
+VERSION
+    This document describes version 0.001 of File::Temp::Patch::VarOptions
+    (from Perl distribution File-Temp-Patch-VarOptions), released on
+    2021-04-15.
+
+SYNOPSIS
+     use File::Temp::Patch::VarOptions;
+     use File::Temp qw(tempfile tempdir);
+
+     {
+         local $File::Temp::SUFFIX = '.html';
+         ($fh, $filename) = tempfile(); # use .html suffix
+         ...
+         ($fh, $filename) = tempfile('XXXXXXXX', SUFFIX=>''); # use empty suffix
+     }
+     ...
+     ($fh, $filename) = tempfile(); # use empty suffi
+
+DESCRIPTION
+    This patch allows File::Temp's "tempfile()" to get options from package
+    variables:
+
+     $File::Temp::TEMPLATE
+     $File::Temp::DIR
+     $File::Temp::SUFFIX
+     $File::Temp::UNLINK
+     $File::Temp::OPEN
+     $File::Temp::TMPDIR
+     $File::Temp::EXLOCK
+
+    and File::Temp's "tempdir()" to get options from package variables:
+
+     $File::Temp::CLEANUP
+     $File::Temp::DIR
+     $File::Temp::TMPDIR
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Temp-Patch-VarOptions>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Temp-Patch-VarOptions>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-File-Temp-Patch-VarOptions/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    A non-patch version of this functionality: File::Temp::VarOptions
+
+    File::Temp
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

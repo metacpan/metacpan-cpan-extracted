@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.022";
+our $VERSION = "0.025";
 
 =head1 NAME
 
@@ -109,6 +109,139 @@ want e.g. a C<Times 20> font to be of equal size in the two systems,
 it will set the PDF font size to 15.
 
 I<DBD: Is this really a good idea?>
+
+=head1 SUPPORTED MARKUP
+
+=head2 Span attributes
+
+=over 8
+
+=item font_desc="I<DESC>"
+
+Specifies a font to be used, e.g. C<Serif 20>.
+
+=item font_face="I<FAM>"
+
+Specifies a font family to be used.
+
+=item font_family="I<FAM>"
+
+Same as font_face="I<FAM>".
+
+=item size=I<FNUM>
+
+Font size (integer, or fractional).
+
+=item style="I<STYLE>"
+
+Specifes the font style, e.g. C<italic>.
+
+=item weight="I<WEIGHT>"
+
+Specifies the font weight, e.g. C<bold>.
+
+=item foreground="I<COLOR>"
+
+Specifies the foreground colour, e.g. C<black>.
+
+=item background="I<COLOR>"
+
+Specifies the background colour, e.g. C<white>.
+
+=item underline="I<TYPE>"
+
+Enables underlining.
+I<TYPE> must be C<none>, C<single>, or C<double>.
+
+=item underline_color="I<COLOR>"
+
+The colour to be used for underlining, if enabled.
+
+=item overline="I<TYPE>"
+
+Enables overlining.
+I<TYPE> must be C<none>, C<single>, or C<double>.
+
+=item overline_color="I<COLOR>"
+
+The colour to be used for ovderlining, if enabled.
+
+=item strikethrough="I<ARG>"
+
+Enables or diables overlining. I<ARG> must be C<true> or C<1> to
+enable, and C<false> or C<0> to disable.
+
+=item strikethrough_color="I<COLOR>"
+
+The colour to be used for striking, if enabled.
+
+=item rise=C<NUM>
+
+Rises the text by I<NUM> units. May be negative to lower the text.
+
+=back
+
+Also supported but not part of the official Pango Markup specification.
+
+=over 8
+
+=item href="C<URL>"
+
+Creates a clickable target that activates the I<URL>.
+
+=back
+
+=head2 Shortcuts
+
+Equivalent C<span> attributes for shortcuts.
+
+=over 8
+
+=item b
+
+weight=bold
+
+=item big
+
+larger
+
+=item emp
+
+style=italic
+
+=item i
+
+style=italic
+
+=item s
+
+strikethrough=true
+
+=item small
+
+size=smaller
+
+=item strong
+
+weight=bold
+
+=item sub
+
+size=smaller rise=300
+
+=item sup
+
+size=smaller rise=-300
+
+=item tt
+
+face=monospace
+
+=item u
+
+underline=single
+
+=back
 
 =cut
 
@@ -333,6 +466,13 @@ sub set_markup {
     my $fcur = $self->{_currentfont};
     my $fcol = $self->{_currentcolor};
     my $fsiz = $self->{_currentsize};
+    my $href;
+    my $undl;
+    my $uncl = $fcol;
+    my $ovrl;
+    my $ovcl = $fcol;
+    my $strk;
+    my $stcl = $fcol;
     my $base = 0;
 
     my $try_size = sub {
@@ -362,6 +502,9 @@ sub set_markup {
 	    # key=value
 	    if ( $k =~ /^([-\w]+)=(.+)$/ ) {
 		my ( $k, $v ) = ( $1, $2 );
+
+		# Ignore case unless required.
+		$v = lc $v unless $k =~ /^(link|href|a)$/;
 
 		# Strip quotes. Shouldn't be necessary now we use shellwords.
 		# $v =~ s/^(["'])(.*)\1$/$2/;
@@ -406,13 +549,13 @@ sub set_markup {
 
 		# <span variant="...">
 		# <span stretch="...">
-		elsif ( $k =~ /^variant|stretch$/ ) {
+		elsif ( $k =~ /^(variant|stretch)$/ ) {
 		    # ignore for now
 		}
 
 		# <span foreground="red">
 		# We allow 'color' as an alternative.
-		elsif ( $k =~ /^foreground|color$/ ) {
+		elsif ( $k =~ /^(foreground|color)$/ ) {
 		    $fcol = $v;
 		}
 
@@ -422,8 +565,19 @@ sub set_markup {
 		}
 
 		# <span underline="double">
-		elsif ( $k eq "underline" ) {
-		    # NYI.
+		elsif ( $k eq "underline" && $v =~ /^(none|single|double)$/i ) {
+		    $undl = lc $v;
+		}
+		elsif ( $k eq "underline_color" ) {
+		    $uncl = lc $v;
+		}
+
+		# <span overline="double">
+		elsif ( $k eq "overline" && $v =~ /^(none|single|double)$/i ) {
+		    $ovrl = lc $v;
+		}
+		elsif ( $k eq "overline_color" ) {
+		    $ovcl = lc $v;
 		}
 
 		# <span rise=324>
@@ -432,8 +586,14 @@ sub set_markup {
 		}
 
 		# <span strikethrough=false>
-		elsif ( $k eq "strikethrough" ) {
-		    # NYI.
+		elsif ( $k eq "strikethrough" && $v =~ /^(true|1)$/i ) {
+		    $strk = 1;
+		}
+		elsif ( $k eq "strikethrough" && $v =~ /^(false|0)$/i ) {
+		    $strk = 0;
+		}
+		elsif ( $k eq "strikethrough_color" ) {
+		    $stcl = $v;
 		}
 
 		# <span fallback=false>
@@ -444,6 +604,11 @@ sub set_markup {
 		# <span lang="en">
 		elsif ( $k eq "lang" ) {
 		    # Not supported.
+		}
+
+		# <span href="...">
+		elsif ( $k eq "href" ) {
+		    $href = $v;
 		}
 	    }
 
@@ -473,10 +638,9 @@ sub set_markup {
 		# Check if it is closing the currently pending markup.
 		if ( $stack[-1][0] =~ /^<\s*$k\b/ ) {
 		    # Restore.
-		    $fcur = $stack[-1][1];
-		    $fsiz = $stack[-1][2];
-		    $fcol = $stack[-1][3];
-		    $base = $stack[-1][4];
+		    ( undef,
+		      $fcur, $fsiz, $fcol, $undl, $uncl, $ovrl, $ovcl,
+		      $strk, $stcl, $base, $href ) = @{$stack[-1]};
 		    pop(@stack);
 		}
 		else {
@@ -495,9 +659,11 @@ sub set_markup {
 	# Opening markup, e.g. <b> or <span ...>.
 	elsif ( $a =~ m;^<\s*([-\w]+)(.*)>$; ) {
 	    my $k = lc $1;
-	    my $v = lc $2;
+	    my $v = $2;
 	    # Save.
-	    push( @stack, [ "<$k$v>", $fcur, $fsiz, $fcol, $base ] );
+	    push( @stack, [ "<$k".lc($v).">",
+			    $fcur, $fsiz, $fcol, $undl, $uncl, $ovrl, $ovcl,
+			    $strk, $stcl, $base, $href ] );
 
 	    # <b> <strong>
 	    if ( $k =~ /^(b|strong)$/ ) {
@@ -557,11 +723,18 @@ sub set_markup {
 	# Text.
 	else {
 	    push( @content,
-		  { text  => $a,
-		    font  => $fcur,
-		    size  => $fsiz,
-		    color => $fcol,
-		    base  => $base,
+		  { text       => $a,
+		    font       => $fcur,
+		    size       => $fsiz,
+		    color      => $fcol,
+		    underline  => $undl,
+		    ulcol      => $uncl,
+		    overline   => $ovrl,
+		    ovrcol     => $ovcl,
+		    strike     => $strk,
+		    strcol     => $stcl,
+		    base       => $base,
+		    href       => $href,
 		  } );
 	}
     }

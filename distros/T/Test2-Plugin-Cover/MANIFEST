@@ -5,8 +5,6 @@ LICENSE
 MANIFEST
 META.json
 META.yml
-MYMETA.json
-MYMETA.yml
 Makefile.PL
 README
 README.md
@@ -23,4 +21,5 @@ t/open.t
 t/subs.t
 t/sysopen.t
 t/sysopen2.t
+t/touch.t
 xt/author/pod-syntax.t

@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::InformationalMessage;
-$Shipment::Purolator::WSDL::Types::InformationalMessage::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::InformationalMessage::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Code
               Message
 
-              )
+            )
         ],
         {   'Code'    => \%Code_of,
             'Message' => \%Message_of,
@@ -61,7 +61,7 @@ Shipment::Purolator::WSDL::Types::InformationalMessage
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

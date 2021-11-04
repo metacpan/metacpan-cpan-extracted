@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::Libwebsockets:
+
+0.02 Mon 18 Oct 2021
+- Documentation tweaks
+- Fix context creation :)
+- Fix build on non-MULTIPLICITY Perls
+
+0.01 Sat 16 Oct 2021
+- Initial release

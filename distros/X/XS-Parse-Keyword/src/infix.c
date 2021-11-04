@@ -12,18 +12,18 @@
 
 #include "infix.h"
 
-#define HAVE_PERL_VERSION(R, V, S) \
-    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+#include "perl-backcompat.c.inc"
 
+#include "force_list_keeping_pushmark.c.inc"
 #include "make_argcheck_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"
-#include "op_sibling.c.inc"
+#include "op_sibling_splice.c.inc"
 
 #if HAVE_PERL_VERSION(5,32,0)
 #  define HAVE_OP_ISA
 #endif
 
-#if HAVE_PERL_VERSION(5,20,0)
+#if HAVE_PERL_VERSION(5,22,0)
    /* assert() can be used as an expression */
 #  define HAVE_ASSERT_AS_EXPRESSION
 #endif
@@ -37,10 +37,6 @@
 
 #ifndef block_end
 #  define block_end(a,b)         Perl_block_end(aTHX_ a,b)
-#endif
-
-#ifndef G_LIST
-#  define G_LIST  G_ARRAY
 #endif
 
 #ifndef XS_INTERNAL
@@ -132,28 +128,6 @@ static OP *new_op(pTHX_ const struct HooksAndData hd, U32 flags, OP *lhs, OP *rh
   /* TODO: opchecker? */
 
   return ret;
-}
-
-/* force_list_keeping_pushmark nulls out the OP_LIST itself but preserves
- * the OP_PUSHMARK inside it. This is essential or else op_contextualize()
- * will null out both of them and we lose the mark
- */
-/* copypasta from core's op.c */
-#define force_list_keeping_pushmark(o)  S_force_list(aTHX_ o)
-static OP *S_force_list(pTHX_ OP *o)
-{
-  if(!o || o->op_type != OP_LIST) {
-    OP *rest = NULL;
-    if(o) {
-      rest = OpSIBLING(o);
-      OpLASTSIB_set(o, NULL);
-    }
-    o = newLISTOP(OP_LIST, 0, o, NULL);
-    if(rest)
-      op_sibling_splice(o, cLISTOPo->op_last, 0, rest);
-  }
-  op_null(o);
-  return op_contextualize(o, G_LIST);
 }
 
 static bool op_extract_onerefgen(OP *o, OP **kidp)

@@ -1,5 +1,9 @@
 Revision history for No-Worries:
 
+1.7	Fri Oct 15 2021
+	* Fixed POD coverage testing (RT#131350).
+	* Fixed Makefile.PL (PREREQ_PM).
+
 1.6	Wed Apr  3 2019
 	* No::Worries::File: added file_update() to ease text file updates.
 	* No::Worries::Proc: added proc_status() to stringify a process status.

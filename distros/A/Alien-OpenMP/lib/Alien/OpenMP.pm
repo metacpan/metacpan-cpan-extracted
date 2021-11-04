@@ -1,80 +1,24 @@
 package Alien::OpenMP;
 
-use strict;
-use warnings;
+use parent 'Alien::Base';
 use Config ();
 
-our $VERSION = '0.003002';
-
-# set as package variable since %Config::Config is read only, (per docs and in practice)
-our $CCNAME = $Config::Config{ccname};
-
-# per-compiler meta data, each supported compiler will require an entry
-
-our $omp_flags = {
-    # used by ccflags, lddlflags
-    gcc => '-fopenmp',
-};
-
-our $omp_check_libs = {
-    # used by _check_libs, intended for use by Devel::CheckLib
-    gcc => [qw/gomp/],
-};
-
-our $omp_check_headers = {
-    # used by _check_headers, intended for use by Devel::CheckLib
-    gcc => [qw/omp.h/],
-};
+our $VERSION = '0.003005';
 
 # "public" Alien::Base method implementations
 
-sub cflags {
-    my $cn = $CCNAME;
-    _assert_os($omp_flags, $cn);
-    return $omp_flags->{$cn};
-}
-
 # we can reuse cflags for gcc/gomp; hopefully this will
 # remain the case for all supported compilers
-
-sub lddlflags {
-    my $cn = $CCNAME;
-    _assert_os($omp_flags, $cn);
-    return $omp_flags->{$cn};
-}
+sub lddlflags { shift->libs }
 
 # Inline related methods
 
 sub Inline {
   my ($self, $lang) = @_;
   return {
-    CCFLAGS     => cflags(),
-    LDDLFLAGS   => join( q{ }, $Config::Config{lddlflags}, lddlflags() ),
+    CCFLAGS     => $self->cflags(),
+    LDDLFLAGS   => join( q{ }, $Config::Config{lddlflags}, $self->lddlflags() ),
   };
-}
-
-# "private" internal helper subs
-
-sub _assert_os {
-    my ($omp, $cn) = @_;
-    # OpenMP pragmas live behind source code comments
-    if ( not defined $omp->{$cn} ) {
-      # dies the same way as ExtUtils::MakeMaker::os_unsupported()
-      die qq{OS unsupported\n};
-    }
-    return;
-}
-
-sub _check_libs {
-    my $cn = $CCNAME;
-    _assert_os($omp_check_libs, $cn);
-    return $omp_check_libs->{$cn};
-}
-
-sub _check_headers {
-    my $cn = $CCNAME;
-    _assert_os($omp_check_headers, $cn);
-    return $omp_check_headers->{$cn};
 }
 
 1;
@@ -124,6 +68,13 @@ C<-fopenmp> enables OpenMP support in via compiler and linker:
 
     gcc -fopenmp ./my-openmp.c -o my-openmp.x
 
+=item C<clang> EXPERIMENTAL
+
+C<-fopenmp> enables OpenMP support via compiler and linker in recent
+versions of C<clang>. MacOS shipped versions are missing the library
+which needs installing either with L<Homebrew|https://brew.sh> or
+L<Macports|https://www.macports.org>.
+
 =back
 
 =head2 Note On Compiler Support
@@ -159,7 +110,7 @@ module do not have access to an unsupported compiler.
 
 Returns flag used by a supported compiler to enable OpenMP. If not support,
 an empty string is provided since by definition all OpenMP programs
-must compile because OpenMP pramgas are annotations hidden behind source
+must compile because OpenMP pragmas are annotations hidden behind source
 code comments.
 
 Example, GCC uses, C<-fopenmp>.
@@ -178,7 +129,8 @@ L<Inline>). This method is not called directly, but used when compiling
 OpenMP programs with C<Inline::C>:
 
     use Alien::OpenMP; use Inline (
-        C           => 'DATA', with        => qw/Alien::OpenMP/,
+        C           => 'DATA',
+        with        => qw/Alien::OpenMP/,
     );
 
 The nice, compact form above replaces this mess:
@@ -188,22 +140,6 @@ The nice, compact form above replaces this mess:
         lddlflags   => join( q{ }, $Config::Config{lddlflags},
         Alien::OpenMP::lddlflags() ),
     );
-
-=item C<_check_libs>
-
-Internal method.
-
-Returns an array reference of libraries, e.g., C<gomp> for C<gcc>. It is
-meant specifically as an internal method to support L<Devel::CheckLib>
-in this module's C<Makefile.PL>.
-
-=item C<_check_headers>
-
-Internal method.
-
-Returns an array reference of header files, e.g., C<omp.h> for C<gcc>. It
-is meant specifically as an internal method to support L<Devel::CheckLib>
-in this module's C<Makefile.PL>.
 
 =back
 

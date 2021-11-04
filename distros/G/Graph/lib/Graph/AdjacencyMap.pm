@@ -351,7 +351,7 @@ sub get_ids_by_paths {
 	my @ret = map {
 	    my @ret2 = map {
 		my $k = $_;
-		$k = __strval($k, $f) if $a == 1 && ($f & _REF) && ref($k);
+		$k = __strval($k, $f) if $a == 1 && $is_ref && ref($k);
 		my $l = ($a == 0 && !$is_unord) ? join '|', map join(' ', sort @$_), @$k : $a == 1 ? "$k" : "@$k";
 		my $id = $pi->{ $l };
 		defined $id ? $id :
@@ -393,8 +393,9 @@ sub has_successor {
 sub __strval {
     my ($k, $f) = @_;
     return $k unless ref $k && ($f & _REF);
-    require overload;
-    (($f & _STR) xor overload::Method($k, '""')) ? overload::StrVal($k) : $k;
+    return "$k" if ($f & _STR);
+    require Scalar::Util;
+    Scalar::Util::refaddr($k);
 }
 
 sub __arg {

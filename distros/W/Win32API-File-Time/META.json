@@ -51,7 +51,7 @@
    "provides" : {
       "Win32API::File::Time" : {
          "file" : "lib/Win32API/File/Time.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -69,6 +69,6 @@
          "web" : "https://github.com/trwyant/perl-Win32API-File-Time"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -2,7 +2,7 @@ package AnyEvent::Discord;
 use v5.14;
 use Moops;
 
-class AnyEvent::Discord 0.6 {
+class AnyEvent::Discord 0.7 {
   use Algorithm::Backoff::Exponential;
   use AnyEvent::Discord::Payload;
   use AnyEvent::WebSocket::Client;
@@ -12,7 +12,7 @@ class AnyEvent::Discord 0.6 {
   use HTTP::Request;
   use HTTP::Headers;
 
-  our $VERSION = '0.6';
+  our $VERSION = '0.7';
   has version => ( is => 'ro', isa => Str, default => $VERSION );
 
   has token => ( is => 'rw', isa => Str, required => 1 );
@@ -40,14 +40,14 @@ class AnyEvent::Discord 0.6 {
   # True if caller manually disconnected, to avoid reconnection
   has _force_disconnect => ( is => 'rw', isa => Bool, default => 0 );
   # Host the backoff algorithm for reconnection
-  has _backoff => ( is => 'ro', default => sub { Algorithm::Backoff::Exponential->new( initial_delay => 4 ) } );
+  has _backoff => ( is => 'ro', default => sub { Algorithm::Backoff::Exponential->new( initial_delay => 1 ) } );
 
   method _build_internal_events() {
     return {
-      'guild_create' => [sub { $self->_event_guild_create(@_); }],
-      'guild_delete' => [sub { $self->_event_guild_delete(@_); }],
-      'channel_create' => [sub { $self->_event_channel_create(@_); }],
-      'channel_delete' => [sub { $self->_event_channel_delete(@_); }],
+      'guild_create'        => [sub { $self->_event_guild_create(@_); }],
+      'guild_delete'        => [sub { $self->_event_guild_delete(@_); }],
+      'channel_create'      => [sub { $self->_event_channel_create(@_); }],
+      'channel_delete'      => [sub { $self->_event_channel_delete(@_); }],
       'guild_member_create' => [sub { $self->_event_guild_member_create(@_); }],
       'guild_member_remove' => [sub { $self->_event_guild_member_remove(@_); }]
     };
@@ -122,6 +122,7 @@ class AnyEvent::Discord 0.6 {
             cb    => sub {
               $self->connect();
               $reconnect = undef;
+              AnyEvent->condvar->send();
             }
           );
         }
@@ -158,11 +159,12 @@ class AnyEvent::Discord 0.6 {
       $self->_discord_identify();
       $self->_debug('Completed connection sequence');
       $self->_backoff->success();
+      AnyEvent->condvar->send();
     });
   }
 
   method send($channel_id, $content) {
-    $self->_discord_api('POST', 'channels/' . $channel_id . '/messages', encode_json({content => $content}));
+    return $self->_discord_api('POST', 'channels/' . $channel_id . '/messages', encode_json({content => $content}));
   }
 
   method typing($channel_id) {
@@ -171,6 +173,7 @@ class AnyEvent::Discord 0.6 {
       interval => 5,
       cb       => sub {
         $self->_discord_api('POST', 'channels/' . $channel_id . '/typing');
+        AnyEvent->condvar->send();
       },
     );
   }
@@ -178,7 +181,7 @@ class AnyEvent::Discord 0.6 {
   method close() {
     $self->_force_disconnect(1);
     $self->{'_heartbeat'} = undef;
-    $self->{'_sequence'} = 0;
+    $self->{'_sequence'} = undef;
     $self->_socket->close();
   }
 
@@ -278,31 +281,31 @@ class AnyEvent::Discord 0.6 {
 
   # Send debug messages to console if verbose is >=1
   method _debug(Str $message) {
-    say $message if ($self->verbose);
+    say time . ' ' . $message if ($self->verbose);
   }
 
   # Send trace messages to console if verbose is 2
   method _trace(Str $message) {
-    say $message if ($self->verbose == 2);
+    say time . ' ' . $message if ($self->verbose and $self->verbose == 2);
   }
 
   # Called when Discord provides the 'hello' event
   method _event_hello(AnyEvent::Discord::Payload $payload) {
     $self->_debug('Received hello event');
-    my $interval = $payload->d->{'heartbeat_interval'}/1e3;
-    $self->_heartbeat(
-      AnyEvent->timer(
-        after    => $interval,
-        interval => $interval,
-        cb       => sub {
-          $self->_debug('Heartbeat');
-          $self->_ws_send_payload(AnyEvent::Discord::Payload->from_hashref({
-            op => 1,
-            d  => $self->_sequence()
-          }));
-        }
-      )
+    my $interval = $payload->d->{'heartbeat_interval'};
+    my $timer = AnyEvent->timer(
+      after    => $interval * rand() / 1000,
+      interval => $interval / 1000,
+      cb       => sub {
+        $self->_debug('Heartbeat');
+        $self->_ws_send_payload(AnyEvent::Discord::Payload->from_hashref({
+          op => 1,
+          d  => $self->_sequence()
+        }));
+        AnyEvent->condvar->send();
+      }
     );
+    $self->_heartbeat($timer);
   }
 
   # GUILD_CREATE event
@@ -447,6 +450,8 @@ Discord event types: https://discord.com/developers/docs/topics/gateway#list-of-
 Opcodes: https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-opcodes
 
 These events receive the parameters client, data object (d) and the opcode (op).
+The $client variable is this instance of AnyEvent::Discord, and the contents of
+$data and $op are dependent on the event type.
 
   sub event_responder {
     my ($client, $data, $opcode) = @_;

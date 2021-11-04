@@ -14,7 +14,7 @@ package Messaging::Message::Generator;
 use strict;
 use warnings;
 use 5.005; # need the four-argument form of substr()
-our $VERSION  = "1.6.1";
+our $VERSION  = "1.7";
 our $REVISION = sprintf("%d.%02d", q$Revision: 1.13 $ =~ /(\d+)\.(\d+)/);
 
 #
@@ -613,4 +613,4 @@ L<Messaging::Message>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2011-2016
+Copyright (C) CERN 2011-2021

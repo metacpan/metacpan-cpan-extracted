@@ -7,12 +7,13 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.7.0';
+our $VERSION = 'v0.7.1';
 
 use Carp qw/ croak /;
 use List::AllUtils qw/ natatime /;
 use Ref::Util qw/ is_coderef is_hashref is_ref is_regexpref /;
 
+# RECOMMEND PREREQ: List::SomeUtils::XS
 # RECOMMEND PREREQ: Ref::Util::XS
 
 use namespace::autoclean;
@@ -168,7 +169,7 @@ Hash::Match - match contents of a hash against rules
 
 =head1 VERSION
 
-version v0.7.0
+version v0.7.1
 
 =head1 SYNOPSIS
 
@@ -253,7 +254,7 @@ fail).
 =item C<-notany>
 
   {
-    -any => $rules,
+    -notany => $rules,
   }
 
 None of the C<$rules> can match.

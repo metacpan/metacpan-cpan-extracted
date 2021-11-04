@@ -1,9 +1,5 @@
 #!perl
 
-use strict;
-use warnings;
-
-
 use Test2::V0;
 use Test2::Tools::Compare qw[ object call ];
 
@@ -12,7 +8,8 @@ use PDL::Algorithm::Center qw[ sigma_clip ];
 use PDL::Lite;
 use PDL::Core qw( pdl zeroes );
 use PDL::Ufunc qw( dsum dsumover );
-use PDL::GSL::RNG;
+use PDL::IO::FITS;
+use Scalar::Util qw( blessed );
 
 use Data::Dump 'pp';
 
@@ -28,6 +25,29 @@ sub logit {
     $msg{center} = [ PDL::Core::topdl( $msg{center} )->list ];
     note pp \%msg;
 }
+
+# need to distinguish between PDL < 2.056, where dsum returns a Perl
+# scalar and PDL >= 2.056, where dsum returns an ndarray.  This complicates
+# checks for e.g. distance
+sub my_float {
+    my $expected = shift;
+
+    return validator (
+        sub {
+            my $got = $_;
+            my $ref;
+            $got = $got->at if  defined( $ref =  blessed $got ) && $ref eq 'PDL';;
+            !! float( $expected )->run( convert => sub { $_[0] } );
+        }
+       );
+}
+
+sub to_scalar {
+    my $what = shift;
+    my $ref = blessed $what;
+    return ( defined( $ref ) && $ref eq 'PDL' ) ? $what->sclr : $what;
+}
+
 
 ########################################
 # interface
@@ -247,30 +267,50 @@ for my $field ( qw( clip nsigma dtol ) ) {
 ########################################
 # operations
 
+my $coords_cache;
+
 sub _generate_sample {
 
     my %attr;
 
-    # so tests are reproducible
-    my $rng = PDL::GSL::RNG->new( 'taus' );
-    $rng->set_seed( 1 );
-    srand( 1 );
-
     $attr{nelem} = 100000;
 
+    $coords_cache //= do {
+        my $data = 't/data/rng.fits';
+
+        if ( -f $data ) {
+            PDL::IO::FITS::rfits( $data );
+        }
+
+        else {
+            require PDL::GSL::RNG;
+
+            # so tests are reproducible
+            my $rng = PDL::GSL::RNG->new( 'taus' );
+            $rng->set_seed( 1 );
+            $coords_cache = $rng->ran_bivariate_gaussian( 10, 8, 0.5, $attr{nelem} );
+            $coords_cache->wfits( $data );
+            $coords_cache;
+        }
+    };
+
+    $attr{coords} = $coords_cache->copy;
+
     # generate a bunch of coordinates
-    $attr{coords} = $rng->ran_bivariate_gaussian( 10, 8, 0.5, $attr{nelem} );
     $attr{initial_center} = pdl( 0.5, 0.5 );
-    $attr{average_center} = $attr{coords}->xchg(0,1)->average->unpdl;
+    $attr{average_center} = $attr{coords}->xchg( 0, 1 )->average->unpdl;
 
     # calculate sigma for those inside of a radius of 10
-    $attr{mask} = dsumover( ( $attr{coords} - $attr{initial_center} )**2 ) < 100;
-    $attr{inside} = $attr{coords}->xchg( 0, 1 )->whereND( $attr{mask} )->xchg( 0, 1 );
+    $attr{mask}
+      = dsumover( ( $attr{coords} - $attr{initial_center} )**2 ) < 100;
+    $attr{inside}
+      = $attr{coords}->xchg( 0, 1 )->whereND( $attr{mask} )->xchg( 0, 1 );
 
     $attr{ninside} = $attr{inside}->dim( 1 );
-    $attr{sigma} = sqrt( dsum( ( $attr{inside} - $attr{initial_center} )**2 ) / $attr{ninside} );
+    $attr{sigma}   = sqrt(
+        dsum( ( $attr{inside} - $attr{initial_center} )**2 ) / $attr{ninside} );
 
-    $attr{center} = [ 0.0126755884280886, 0.0337090322699186,];
+    $attr{center} = [ 0.0126755884280886, 0.0337090322699186, ];
 
     $attr{dist} = 0;
 
@@ -306,7 +346,9 @@ subtest 'coords, no clip, no initial center' => sub {
                 item float( $sample->average_center->[1] );
                 end;
             };
-            end();
+            call sigma => D();
+            call dist => U();
+            call clip => U();
         },
         "iteration 0",
     );
@@ -321,7 +363,7 @@ subtest 'coords, no clip, no initial center' => sub {
         $results,
         object {
             call iter => 70;
-            call dist => float( $sample->dist );
+            call dist => my_float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
             call center => array {
@@ -329,7 +371,6 @@ subtest 'coords, no clip, no initial center' => sub {
                 item float( $sample->center->[1] );
                 end;
             };
-            end(),
         },
         "iteration -1",
     );
@@ -366,7 +407,9 @@ subtest 'coords, no clip, initial center = [X,Y]' => sub {
                 item float( $sample->initial_center->at(1) );
                 end;
             };
-            end();
+            call sigma => D();
+            call dist => U();
+            call clip => U();
         },
         "iteration 0",
     );
@@ -381,7 +424,7 @@ subtest 'coords, no clip, initial center = [X,Y]' => sub {
         $results,
         object {
             call iter => 70;
-            call dist => float( $sample->dist );
+            call dist => my_float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
             call center => array {
@@ -389,7 +432,6 @@ subtest 'coords, no clip, initial center = [X,Y]' => sub {
                 item float( $sample->center->[1] );
                 end;
             };
-            end(),
         },
         "iteration -1",
     );
@@ -425,7 +467,9 @@ subtest 'coords, no clip, initial center = [ X, undef]' => sub {
                 item float( $sample->average_center->[1] );
                 end;
             };
-            end();
+            call sigma => D();
+            call dist => U();
+            call clip => U();
         },
         "iteration 0",
     );
@@ -440,7 +484,7 @@ subtest 'coords, no clip, initial center = [ X, undef]' => sub {
         $results,
         object {
             call iter => 70;
-            call dist => float( $sample->dist );
+            call dist => my_float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
             call center => array {
@@ -448,7 +492,6 @@ subtest 'coords, no clip, initial center = [ X, undef]' => sub {
                 item float( $sample->center->[1] );
                 end;
             };
-            end(),
         },
         "iteration -1",
     );
@@ -484,7 +527,9 @@ subtest 'coords, no clip, initial center => [undef,Y]' => sub {
                 item float( $sample->initial_center->at(1) );
                 end;
             };
-            end();
+            call sigma => D();
+            call dist => U();
+            call clip => U();
         },
         "iteration 0",
     );
@@ -499,7 +544,7 @@ subtest 'coords, no clip, initial center => [undef,Y]' => sub {
         $results,
         object {
             call iter => 70;
-            call dist => float( $sample->dist );
+            call dist => my_float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
             call center => array {
@@ -507,7 +552,6 @@ subtest 'coords, no clip, initial center => [undef,Y]' => sub {
                 item float( $sample->center->[1] );
                 end;
             };
-            end(),
         },
         "iteration -1",
     );
@@ -543,7 +587,9 @@ subtest 'coords, no clip, initial center => [undef, undef]' => sub {
                 item float( $sample->average_center->[1] );
                 end;
             };
-            end();
+            call sigma => D();
+            call dist => U();
+            call clip => U();
         },
         "iteration 0",
     );
@@ -558,7 +604,7 @@ subtest 'coords, no clip, initial center => [undef, undef]' => sub {
         $results,
         object {
             call iter => 70;
-            call dist => float( $sample->dist );
+            call dist => my_float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
             call center => array {
@@ -566,7 +612,6 @@ subtest 'coords, no clip, initial center => [undef, undef]' => sub {
                 item float( $sample->center->[1] );
                 end;
             };
-            end(),
         },
         "iteration -1",
     );
@@ -594,10 +639,11 @@ subtest 'coords + clip results' => sub {
     is(
         $results->iterations->[0],
         object {
-            call sigma => float( $sample->sigma );
+            call sigma => my_float( $sample->sigma );
             call nelem => $sample->ninside;
             call total_weight => $sample->ninside;
-            end();
+            call dist => U();
+            call clip => 10;
         },
         "iteration 0",
     );
@@ -612,7 +658,7 @@ subtest 'coords + clip results' => sub {
         $results,
         object {
             call iter => 56;
-            call dist => float( $sample->dist );
+            call dist => my_float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
             call center => array {
@@ -620,7 +666,6 @@ subtest 'coords + clip results' => sub {
                 item float( $sample->center->[1] );
                 end;
             };
-            end(),
         },
         "iteration -1",
     );
@@ -650,9 +695,11 @@ subtest 'coords + mask results' => sub {
     is(
        $results->{iterations}[0],
        object {
-           call sigma  => float( $sample->sigma );
+           call sigma  => my_float( $sample->sigma );
            call nelem => $sample->ninside;
            call total_weight => $sample->ninside;
+           call dist => U();
+           call clip => U();
        },
        "iteration 0",
       );
@@ -664,7 +711,7 @@ subtest 'coords + mask results' => sub {
         $results,
         object {
             call iter => 56;
-            call dist => float( $sample->dist );
+            call dist => my_float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
             call center => array {
@@ -672,7 +719,6 @@ subtest 'coords + mask results' => sub {
                 item float( $sample->center->[1] );
                 end;
             };
-            end(),
         },
         "iteration -1",
     );
@@ -688,7 +734,7 @@ subtest 'coords + clip + weight results' => sub {
 
     my $weight            = zeroes( $sample->nelem ) + 2;
     my $inside_weight     = $weight->where( $sample->mask );
-    my $inside_weight_sum = $inside_weight->dsum;
+    my $inside_weight_sum = to_scalar( $inside_weight->dsum );
 
     $sample->sigma( sqrt( dsum( $inside_weight * dsumover( ( $sample->inside - $sample->initial_center )**2 ) ) / $inside_weight_sum ) );
 
@@ -706,9 +752,11 @@ subtest 'coords + clip + weight results' => sub {
     is(
        $results->{iterations}[0],
        object {
-           call sigma  => float( $sample->sigma );
+           call sigma  => my_float( $sample->sigma );
            call nelem => $sample->ninside;
            call total_weight => $inside_weight_sum;
+           call dist => U();
+           call clip => 10;
        },
        "iteration 0",
       );
@@ -721,7 +769,7 @@ subtest 'coords + clip + weight results' => sub {
         $results,
         object {
             call iter => 56;
-            call dist => float( $sample->dist );
+            call dist => my_float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597 * 2;
             call center => array {
@@ -729,7 +777,6 @@ subtest 'coords + clip + weight results' => sub {
                 item float( $sample->center->[1] );
                 end;
             };
-            end(),
         },
         "iteration -1",
     );

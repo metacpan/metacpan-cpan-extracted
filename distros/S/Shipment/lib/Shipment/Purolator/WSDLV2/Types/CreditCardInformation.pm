@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::CreditCardInformation;
-$Shipment::Purolator::WSDLV2::Types::CreditCardInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::CreditCardInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               ExpiryYear
               CVV
 
-              )
+            )
         ],
         {   'Type'        => \%Type_of,
             'Number'      => \%Number_of,
@@ -81,7 +81,7 @@ Shipment::Purolator::WSDLV2::Types::CreditCardInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

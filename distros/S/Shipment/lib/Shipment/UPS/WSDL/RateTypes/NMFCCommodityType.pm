@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::NMFCCommodityType;
-$Shipment::UPS::WSDL::RateTypes::NMFCCommodityType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::NMFCCommodityType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        PrimeCode
               SubCode
 
-              )
+            )
         ],
         {   'PrimeCode' => \%PrimeCode_of,
             'SubCode'   => \%SubCode_of,
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::RateTypes::NMFCCommodityType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

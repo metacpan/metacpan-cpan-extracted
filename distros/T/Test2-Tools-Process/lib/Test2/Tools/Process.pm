@@ -13,6 +13,7 @@ use Test2::Compare::Number    ();
 use Test2::Compare::String    ();
 use Test2::Compare::Custom    ();
 use Test2::Compare ();
+use Return::MultiLevel qw( with_return );
 use Capture::Tiny qw( capture_stdout );
 use base qw( Exporter );
 
@@ -20,7 +21,7 @@ our @EXPORT = qw( process proc_event named_signal intercept_exit intercept_exec 
 our @CARP_NOT = qw( Test2::Tools::Process::SystemProc );
 
 # ABSTRACT: Unit tests for code that calls exit, exec, system or qx()
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 our %handlers;
@@ -57,7 +58,7 @@ sub process (&;@)
 
   $test_name = shift if defined $_[0];
 
-  Test2::Tools::Process::ReturnMultiLevel::with_return(sub {
+  with_return {
     my($return) = @_;
 
     local %handlers = %handlers;
@@ -143,13 +144,13 @@ sub process (&;@)
           };
           if($type eq 'system')
           {
-            Test2::Tools::Process::ReturnMultiLevel::with_return($inner);
+            with_return { $inner->(@_) };
             return -1 if exists $event->{errno};
             return $?;
           }
           else
           {
-            return scalar capture_stdout { Test2::Tools::Process::ReturnMultiLevel::with_return($inner) };
+            return scalar capture_stdout { with_return { $inner->(@_) } };
           }
         }
         else
@@ -179,7 +180,7 @@ sub process (&;@)
     }
 
     $sub->();
-  });
+  };
 
   @_ = (
     \@events,
@@ -222,7 +223,7 @@ sub intercept_exit (&)
 
   my $ret;
 
-  Test2::Tools::Process::ReturnMultiLevel::with_return(sub {
+  with_return {
     my $return = shift;
     local $handlers{exit} = sub {
       $ret = shift;
@@ -231,7 +232,7 @@ sub intercept_exit (&)
       $return->();
     };
     $sub->();
-  });
+  };
 
   $ret;
 }
@@ -243,14 +244,14 @@ sub intercept_exec (&)
 
   my $ret;
 
-  Test2::Tools::Process::ReturnMultiLevel::with_return(sub {
+  with_return {
     my $return = shift;
     local $handlers{exec} = sub {
       $ret = \@_;
       $return->();
     };
     $sub->();
-  });
+  };
 
   $ret;
 }
@@ -474,41 +475,6 @@ sub errno
   $self->{return}->();
 }
 
-package Test2::Tools::Process::ReturnMultiLevel;
-
-# this is forked from Return::MultiLevel (XS implementation only)
-# we can remove this when it gets a maintainer again.
-
-use Scope::Upper;
-use Carp ();
-use base qw( Exporter );
-our @EXPORT_OK = qw( with_return );
-
-$INC{'Test2/Tools/Process/ReturnMultiLevel.pm'} = __FILE__;
-
-sub with_return (&)
-{
-  my ($f) = @_;
-  my $ctx = Scope::Upper::HERE();
-  my @canary =
-    !$ENV{RETURN_MULTILEVEL_DEBUG}
-        ? '-'
-        : Carp::longmess "Original call to with_return"
-  ;
-
-  local $canary[0];
-  $f->(sub {
-    $canary[0]
-      and confess
-        $canary[0] eq '-'
-          ? ""
-          : "Captured stack:\n$canary[0]\n",
-        "Attempt to re-enter dead call frame"
-      ;
-      Scope::Upper::unwind(@_, $ctx);
-  })
-}
-
 1;
 
 __END__
@@ -523,7 +489,7 @@ Test2::Tools::Process - Unit tests for code that calls exit, exec, system or qx(
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -808,6 +774,9 @@ you aren't really terminating the process.
 This module installs handlers for C<exec>, C<exit>, C<system> and C<readpipe>, in
 the C<CORE::GLOBAL> namespace, so if your code is also installing handlers there
 then things might not work.
+
+This module is not apparently compatible with L<IPC::Run3>.  Use L<Capture::Tiny>
+instead, which is better maintained in my opinion.
 
 =head1 SEE ALSO
 

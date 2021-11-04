@@ -3,16 +3,15 @@
 #
 #  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::Packages;
+package Commandable::Finder::Packages 0.05;
 
-use strict;
+use v5.14;
 use warnings;
-use 5.014; # s///r
-
-our $VERSION = '0.04';
+use base qw( Commandable::Finder );
 
 use Carp;
 
+use Commandable::Command;
 use Module::Pluggable::Object;
 
 =head1 NAME
@@ -97,6 +96,7 @@ sub new
 
    my $name_method        = $args{name_method}        // "COMMAND_NAME";
    my $description_method = $args{description_method} // "COMMAND_DESC";
+   my $arguments_method   = $args{arguments_method}   // "COMMAND_ARGS";
 
    undef $name_method if $args{named_by_package};
 
@@ -111,6 +111,7 @@ sub new
       methods => {
          name => $name_method,
          desc => $description_method,
+         args => $arguments_method,
       },
    }, $class;
 }
@@ -142,13 +143,24 @@ sub _commands
 
          my $desc = ( $pkg->can( $self->{methods}{desc} ) or next )->( $pkg );
 
-         $commands{ $name } = Commandable::Finder::Packages::_Command->new(
+         my $args;
+         if( my $code = $pkg->can( $self->{methods}{args} ) ) {
+            $args = [
+               map { Commandable::Command::_Argument->new( %$_ ) } $code->( $pkg )
+            ];
+         }
+
+         $commands{ $name } = Commandable::Command->new(
             name        => $name,
             description => $desc,
+            arguments   => $args,
 
             package => $pkg,
          );
       }
+
+      $self->add_builtin_commands( \%commands );
+
       \%commands;
    };
 }
@@ -167,21 +179,6 @@ sub find_command
 
    return $self->_commands->{$cmd};
 }
-
-package # hide
-   Commandable::Finder::Packages::_Command;
-
-sub new
-{
-   my $class = shift;
-   my %args = @_;
-   bless [ @args{qw( name description package )} ], $class;
-}
-
-sub name        { shift->[0] }
-sub description { shift->[1] }
-
-sub package { shift->[2] }
 
 =head1 AUTHOR
 

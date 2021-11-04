@@ -1,6 +1,9 @@
 Revision history for Config::Generator:
 
-1.0	The May 24 2016
+1.1	Fri Oct 15 2021
+	* Fixed POD coverage testing (RT#131350).
+
+1.0	Tue May 24 2016
 	* Config::Generator::XML: added support for elements with string body.
 
 0.9	Mon Nov 30 2015

@@ -2,7 +2,8 @@
 abstract: 'Web interface for viewing and inspecting yath test logs'
 author:
   - 'Chad Granum <exodist@cpan.org>'
-build_requires: {}
+build_requires:
+  HTTP::Tiny::UNIX: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -28,6 +29,8 @@ requires:
   DBIx::QuickDB: '0.000020'
   Data::GUID: '0'
   DateTime: '0'
+  DateTime::Format::MySQL: '0'
+  DateTime::Format::Pg: '0'
   Email::Sender::Simple: '0'
   Email::Simple: '0'
   Email::Simple::Creator: '0'
@@ -53,7 +56,7 @@ requires:
   Test2: '1.302164'
   Test2::API: '1.302166'
   Test2::Formatter::Test2::Composer: '0'
-  Test2::Harness: '1.000065'
+  Test2::Harness: '1.000076'
   Test2::Harness::Util::HashBase: '0'
   Test2::Harness::Util::JSON: '0'
   Test2::Harness::Util::UUID: '0'
@@ -73,7 +76,7 @@ requires:
 resources:
   bugtracker: https://github.com/Test-More/Test2-Harness-UI/issues
   repository: https://github.com/Test-More/Test2-Harness-UI/
-version: '0.000086'
+version: '0.000096'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

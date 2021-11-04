@@ -76,10 +76,27 @@ BEGIN {
     $rsources = {
 
         'align32' => <<'----------',
-# should not get alignment here:
+# align just the last two lines
 my $c_sub_khwnd = WindowFromId $k_hwnd, 0x8008;    # FID_CLIENT
 ok $c_sub_khwnd, 'have kids client window';
 ok IsWindow($c_sub_khwnd), 'IsWindow works on the client';
+
+# parenless calls
+mkTextConfig $c, $x, $y, -anchor => 'se', $color;
+mkTextConfig $c, $x + 30, $y, -anchor => 's',  $color;
+mkTextConfig $c, $x + 60, $y, -anchor => 'sw', $color;
+mkTextConfig $c, $x, $y + 30, -anchor => 'e', $color;
+
+permute_test [ 'a', 'b', 'c' ],   '/', '/', [ 'a', 'b', 'c' ];
+permute_test [ 'a,', 'b', 'c,' ], '/', '/', [ 'a,', 'b', 'c,' ];
+permute_test [ 'a', ',', '#', 'c' ], '/', '/', [ 'a', ',', '#', 'c' ];
+permute_test [ 'f_oo', 'b_ar' ], '/', '/', [ 'f_oo', 'b_ar' ];
+
+# issue c093 - broken sub, but align fat commas
+use constant UNDEF_ONLY => sub { not defined $_[0] };
+use constant EMPTY_OR_UNDEF => sub {
+    !@_ or @_ == 1 && !defined $_[0];
+};
 ----------
 
         'bos' => <<'----------',
@@ -314,10 +331,27 @@ sub plugh () : Ugly('\(") : Bad;
             source => "align32",
             params => "def",
             expect => <<'#1...........',
-# should not get alignment here:
+# align just the last two lines
 my $c_sub_khwnd = WindowFromId $k_hwnd, 0x8008;    # FID_CLIENT
-ok $c_sub_khwnd, 'have kids client window';
+ok $c_sub_khwnd,           'have kids client window';
 ok IsWindow($c_sub_khwnd), 'IsWindow works on the client';
+
+# parenless calls
+mkTextConfig $c, $x,      $y,      -anchor => 'se', $color;
+mkTextConfig $c, $x + 30, $y,      -anchor => 's',  $color;
+mkTextConfig $c, $x + 60, $y,      -anchor => 'sw', $color;
+mkTextConfig $c, $x,      $y + 30, -anchor => 'e',  $color;
+
+permute_test [ 'a', 'b', 'c' ],      '/', '/', [ 'a', 'b', 'c' ];
+permute_test [ 'a,', 'b', 'c,' ],    '/', '/', [ 'a,', 'b', 'c,' ];
+permute_test [ 'a', ',', '#', 'c' ], '/', '/', [ 'a', ',', '#', 'c' ];
+permute_test [ 'f_oo', 'b_ar' ],     '/', '/', [ 'f_oo', 'b_ar' ];
+
+# issue c093 - broken sub, but align fat commas
+use constant UNDEF_ONLY     => sub { not defined $_[0] };
+use constant EMPTY_OR_UNDEF => sub {
+    !@_ or @_ == 1 && !defined $_[0];
+};
 #1...........
         },
 

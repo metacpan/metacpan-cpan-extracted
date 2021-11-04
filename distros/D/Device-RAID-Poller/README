@@ -12,6 +12,7 @@ The currently supported systems are listed below.
     ZFS
     Linux mdadm
     Adaptec arcconf
+	Avago tw_cli
 
 INSTALLATION
 

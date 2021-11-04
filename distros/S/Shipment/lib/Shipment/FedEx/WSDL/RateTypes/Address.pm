@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::Address;
-$Shipment::FedEx::WSDL::RateTypes::Address::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::Address::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               CountryCode
               Residential
 
-              )
+            )
         ],
         {   'StreetLines'         => \%StreetLines_of,
             'City'                => \%City_of,
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::RateTypes::Address
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

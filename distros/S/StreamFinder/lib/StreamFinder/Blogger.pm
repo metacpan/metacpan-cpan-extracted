@@ -104,14 +104,16 @@ general StreamFinder module.
 
 Depends:  
 
-L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
-and the separate application program:  youtube-dl.
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent> 
+
+The separate application program:  youtube-dl, or a compatable program 
+such as yt-dlp (only if wishing to use the I<-youtube> option).
 
 =head1 SUBROUTINES/METHODS
 
 =over 4
 
-=item B<new>(I<url> [, I<-youtube> => yes|no|only ] 
+=item B<new>(I<url> [, I<-youtube> => yes|no|first|last|only ] 
 [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] 
 [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
@@ -130,15 +132,14 @@ followed by all "mpd" streams, followed by non-playlists, followed by all
 remaining (playlists: (pls) streams.  More than one value can be specified to 
 control order of search.
 
-NOTE:  I<-keep> is ignored if I<-youtube> is set to "only".
+NOTE:  I<-keep> is ignored if I<-youtube> is set to "I<only>".
 
-The optional I<-youtube> argument can be set to "yes" - also include streams 
-youtube-dl finds, "no" - only include streams embedded in the video's 
-blogger.com page, or "only" - only include streams youtube-dl finds.  Default 
-is B<"yes">.  This is needed because currently the streams on the page: (mpd plays 
-best but is unseekable, and the m3u8 (HLS) stream doesn't seem to work well).  
-youtube-dl also returns a "chunky" m3u8 (HLS) stream that is seekable and seems 
-to work ok.
+The optional I<-youtube> argument can be set to "I<yes>" or "I<last>" - also 
+include streams youtube-dl finds; "I<no>" - only include streams embedded in 
+the video's blogger.com page, unless none are found; "I<only>" - only include 
+streams youtube-dl finds; or "I<first>" - include streams youtube-dl 
+finds first.  Default is B<"no">.
+
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
 then only secure ("https://") streams will be returned.
@@ -146,6 +147,14 @@ then only secure ("https://") streams will be returned.
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 Additional options:
+
+Certain youtube-dl (L<StreamFinder::Youtube>) configuration options, 
+namely I<format>, I<formatonly>, I<youtube-dl-args>, and I<youtube-dl-add-args> 
+can be overridden here by specifying I<youtube-format>, I<youtube-formatonly>, 
+I<youtube-dl-args>, and I<youtube-dl-add-args> arguments respectively.  It is 
+however, recommended to specify these in the Blogger-specific 
+configuration file (see B<CONFIGURATION FILES> below.  NOTE:  These are only 
+applicable when using the option: I<-youtube> => I<yes|only|top>, etc.
 
 I<-log> => "I<logfile>"
 
@@ -224,6 +233,11 @@ Returns the video's type ("Blogger").
 
 =head1 CONFIGURATION FILES
 
+The default root location directory for StreamFinder configuration files 
+is "~/.config/StreamFinder".  To use an alternate location directory, 
+specify it in the "I<STREAMFINDER>" environment variable, ie.:  
+B<$ENV{STREAMFINDER} = "/etc/StreamFinder">.
+
 =over 4
 
 =item ~/.config/StreamFinder/Blogger/config
@@ -231,18 +245,27 @@ Returns the video's type ("Blogger").
 Optional text file for specifying various configuration options 
 for a specific site (submodule).  Each option is specified on a 
 separate line in the format below:
+NOTE:  Do not follow the lines with a semicolon, comma, or any other 
+separator.  Non-numeric I<values> should be surrounded with quotes, either 
+single or double.  Blank lines and lines beginning with a "#" sign as 
+their first non-blank character are ignored as comments.
 
 'option' => 'value' [,]
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
 Among options valid for Blogger streams is the I<-keep> and 
-I<-youtube> options described in the B<new()> function.
+I<-youtube> options described in the B<new()> function.  Also, 
+various youtube-dl (L<StreamFinder::Youtube>) configuration options, 
+namely I<format>, I<formatonly>, I<youtube-dl-args>, and I<youtube-dl-add-args> 
+can be overridden here by specifying I<youtube-format>, I<youtube-formatonly>, 
+I<youtube-dl-args>, and I<youtube-dl-add-args> arguments respectively.  
+NOTE:  These are only applicable when using the option:  
+I<-youtube> => I<yes|only|top>, etc.
 
 =item ~/.config/StreamFinder/config
 
@@ -253,12 +276,12 @@ Each option is specified on a separate line in the format below:
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 =back
 
-NOTE:  Options specified in the options parameter list will override 
-those corresponding options specified in these files.
+NOTE:  Options specified in the options parameter list of the I<new()> 
+function will override those corresponding options specified in these files.
 
 =head1 KEYWORDS
 
@@ -270,7 +293,7 @@ L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
 
-youtube-dl
+youtube-dl (or yt-dlp, or other compatable program)
 
 wget
 
@@ -371,7 +394,7 @@ sub new
 	my $self = $class->SUPER::new('Blogger', @_);
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
-	$self->{'youtube'} = 'yes';
+	$self->{'youtube'} = 'no';
 	while (@_) {
 		if ($_[0] =~ /^\-?youtube$/o) {
 			shift;
@@ -454,7 +477,7 @@ ENDHTML
 	if ($html =~ s/^.+VIDEO_CONFIG\s*\=\s*\{//s) {
 		#$html =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 		$html =~ s/\\u00([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-		print "--HTML shortened to ===$html===\n";
+		print "--HTML shortened to ===$html===\n"  if ($DEBUG > 1);
 		$self->{'iconurl'} = ($html =~ m#\"thumbnail\"\:\"([^\"]+)#) ? $1 : '';
 		$self->{'id'} = ($html =~ m#\"iframe\_id\"\:\"([^\"]+)#) ? $1 : '';
 		if ($html =~ /\"streams\"\:\[([^\]]+)\]/s) {
@@ -468,7 +491,6 @@ ENDHTML
 			}
 			$self->{'imageurl'} = $self->{'iconurl'};
 			$self->{'total'} = $self->{'cnt'};
-print "--thumbnail=".$self->{'iconurl'}."=\n";
 			if ($self->{'total'} > 0) {
 				print STDERR "\n--SUCCESS2: CNT=".$self->{'total'}."= ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."\n--STREAMS=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 				$self->_log($url);
@@ -484,56 +506,33 @@ print "--thumbnail=".$self->{'iconurl'}."=\n";
 	}
 
 	if ($self->{'cnt'} <= 0 || $self->{'youtube'} =~ /(?:yes|top|first|last)/i) {
-		print STDERR "\n-2 NO STREAMS FOUND IN PAGE\n"  if ($DEBUG && $self->{'cnt'} <= 0);
-		print STDERR "\n-2 TRYING youtube-dl($self->{'youtube'})...\n"  if ($DEBUG && $self->{'youtube'} =~ /(?:yes|top|first)/i);
-		my $ytdlArgs = '--get-url --get-thumbnail --get-title --get-description -f "'
-				. ((defined $self->{'format'}) ? $self->{'format'} : 'mp4')
-				. '" ' . ((defined $self->{'youtube-dl-args'}) ? $self->{'youtube-dl-args'} : '');
-		my $try = 0;
-		my ($more, @ytdldata, @ytStreams);
-		my $prevDescription = $self->{'description'};
-
-RETRYIT:
-		if (defined($self->{'userid'}) && defined($self->{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
-			my $uid = $self->{'userid'};
-			my $upw = $self->{'userpw'};
-			$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url2fetch"`;
-		} else {
-			$_ = `youtube-dl $ytdlArgs "$url2fetch"`;
-		}
-		print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
-		@ytdldata = split /\r?\n/s;
-		return undef unless (scalar(@ytdldata) > 0);
-
-		#NOTE:  ytdldata is ORDERED:  TITLE?, STREAM-URLS, THEN THE ICON URL, THEN DESCRIPTION!:
-		unless ($ytdldata[0] =~ m#^https?\:\/\/#) {  #SHIFT OFF TITLE FROM TOP (IF NOT A URL!):
-			$_ = shift(@ytdldata);
-			$self->{'title'} ||= $_;
-		}
-		$more = 1;
-		@ytStreams = ();
-		while (@ytdldata) {
-			$_ = shift @ytdldata;
-			$more = 0  unless (m#^https?\:\/\/#o);
-			if ($more) {
-				push @ytStreams, $_  unless ($self->{'secure'} && $_ !~ /^https/o);
-			} else {
-				$self->{'description'} .= $_ . ' ';
+		my $haveYoutube = 0;
+		eval { require 'StreamFinder/Youtube.pm'; $haveYoutube = 1; };
+		print STDERR "\n-2 NO STREAMS FOUND IN PAGE (haveYoutube=$haveYoutube)\n"  if ($DEBUG && $self->{'cnt'} <= 0);
+		if ($haveYoutube) {
+			print STDERR "\n-2 TRYING youtube-dl($self->{'youtube'})...\n"  if ($DEBUG && $self->{'youtube'} =~ /(?:yes|top|first)/i);
+			my %globalArgs = (
+					'-noiframes' => 1, '-fast' => 1, '-debug' => $DEBUG
+			);
+			foreach my $arg (qw(secure log logfmt youtube-format youtube-formatonly
+					youtube-dl-args youtube-dl-add-args)) {
+				(my $arg0 = $arg) =~ s/^youtube\-(?!dl)//o;
+				$globalArgs{$arg0} = $self->{$arg}  if (defined $self->{$arg});
 			}
-		}
-		$self->{'iconurl'} = pop(@ytStreams)  if ($#ytStreams > 0);
-		if ($self->{'youtube'} =~ /(?:top|first)/i) {  #PUT youtube-dl STREAMS ON TOP:
-			unshift @{$self->{'streams'}}, @ytStreams;
-		} else {
-			push @{$self->{'streams'}}, @ytStreams;
-		}
-			
-		$self->{'cnt'} = scalar @{$self->{'streams'}};
-		unless ($try || $self->{'cnt'} > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
-			$try++;
-			$self->{'description'} = $prevDescription;
-			$ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//;
-			goto RETRYIT  if ($1);
+			my $yt = new StreamFinder::Youtube($url2fetch, %globalArgs);
+			if ($yt && $yt->count() > 0) {
+				my @ytStreams = $yt->get();
+				if ($self->{'youtube'} =~ /(?:top|first)/i) {  #PUT youtube-dl STREAMS ON TOP:
+					unshift @{$self->{'streams'}}, @ytStreams;
+				} else {
+					push @{$self->{'streams'}}, @ytStreams;
+				}
+				foreach my $field (qw(title description)) {
+					$self->{$field} ||= $yt->{$field}  if (defined($yt->{$field}) && $yt->{$field});
+				}
+				$self->{'cnt'} = scalar @{$self->{'streams'}};
+				print STDERR "i:Found stream(s) (".join('|',@ytStreams).") via youtube-dl.\n"  if ($DEBUG);
+			}
 		}
 		print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 	}

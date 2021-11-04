@@ -43,4 +43,3 @@ xt/mandatory_on_create.t
 xt/queue_change.t
 xt/required_fields.t
 xt/roles.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

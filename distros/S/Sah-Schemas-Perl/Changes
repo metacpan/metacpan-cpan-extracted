@@ -1,3 +1,11 @@
+0.040   2021-10-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix coerce/filter
+	  normalize_perl_{modname,modprefix,modname_or_prefix} that
+	  overeagerly replaced / or - with :: even in the args part, e.g.
+	  Foo-Bar=a,b/c to become Foo::Bar=a,b::c.
+
+
 0.039   2021-09-29  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux][schema perl::modname_with_optional_args] Allow array form to

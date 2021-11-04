@@ -1,3 +1,8 @@
+0.004   2021-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Recognize SI/SD/SL & HT.
+
+
 0.003   2021-06-04  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Allow 'POM' prefix in specified code.

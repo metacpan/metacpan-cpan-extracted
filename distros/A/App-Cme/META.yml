@@ -43,12 +43,12 @@ requires:
   Scalar::Util: '0'
   Tie::Hash: '0'
   YAML: '0'
-  perl: '5.010'
+  perl: '5.020'
 resources:
   bugtracker: https://github.com/dod38fr/cme-perl/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: https://github.com/dod38fr/cme-perl.git
-version: '1.033'
+version: '1.034'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: LGPL-2.1

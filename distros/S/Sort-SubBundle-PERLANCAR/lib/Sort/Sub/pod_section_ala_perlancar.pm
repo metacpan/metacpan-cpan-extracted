@@ -1,18 +1,19 @@
 package Sort::Sub::pod_section_ala_perlancar;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-22'; # DATE
-our $DIST = 'Sort-SubBundle-PERLANCAR'; # DIST
-our $VERSION = '0.090'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-17'; # DATE
+our $DIST = 'Sort-SubBundle-PERLANCAR'; # DIST
+our $VERSION = '0.092'; # VERSION
 
 our $SORT_SPEC = [
     # ORIGINAL XXX are for forked modules, where the ORIGINAL XXX sections are
     # the sections from the original (forked) module, and the XXX sections are
     # for the new module (the fork).
+
 
     # preamble
     'NAME',
@@ -21,12 +22,15 @@ our $SORT_SPEC = [
     'DEPRECATION NOTICE',
     'SYNOPSIS', 'ORIGINAL SYNOPSIS',
 
+
     # main content
     'DESCRIPTION', 'ORIGINAL DESCRIPTION',
+
 
     # Acme::CPANModules::*
     "ACME::CPANMODULES ENTRIES",
     "ACME::CPANMODULES FEATURE COMPARISON MATRIX",
+
 
     # Bencher::Scenario::*
     'BENCHMARKED MODULES',
@@ -34,26 +38,34 @@ our $SORT_SPEC = [
     'BENCHMARK DATASETS',
     'SAMPLE BENCHMARK RESULTS',
 
+
     # everything else that are uncategorized go here
     sub { 1 },
+
 
     # reference section
     'FUNCTIONS',
     'ATTRIBUTES',
     'METHODS',
 
+
     # reference section (CLI)
     'SUBCOMMANDS',
     'OPTIONS',
 
-    'IMPLEMENTATION NOTES', # from freebsd
+
+    # from bsd
+    'IMPLEMENTATION NOTES',
+
 
     # other content (CLI)
     'COMPLETION',
 
+
     # FAQ (after all content & references)
     'FAQ', 'ORIGINAL FAQ',
     'FAQS', 'ORIGINAL FAQS',
+
 
     # links/pointers (CLI)
     'CONFIGURATION FILE',
@@ -62,28 +74,41 @@ our $SORT_SPEC = [
     'ENVIRONMENT VARIABLES',
     'FILES',
 
-    'EXIT STATUS', # from freebsd
 
-    'EXAMPLES', # from freebsd
+    # exit status, diagnostics, errors. from bsd
+    'EXIT STATUS',
+    'DIAGNOSTICS',
+    # RETURN VALUE # for syscall
+    # ERRORS # for syscall
+
+
+    # examples, from bsd
+    'EXAMPLES',
+
 
     # todos
     'TODO', 'ORIGINAL TODO',
     'TODOS', 'ORIGINAL TODOS',
 
-    # links/pointers/extra information
-    'HISTORY', 'ORIGINAL HISTORY',
+
+    # links
     'HOMEPAGE', 'ORIGINAL HOMEPAGE',
     'SOURCE', 'ORIGINAL SOURCE',
-    'BUGS', 'ORIGINAL BUGS',
-    'GOTCHAS',
-    'CAVEATS',
     'SEE ALSO', 'ORIGINAL SEE ALSO',
 
-    # credits
+
+    # standards, from bsd
+    'STANDARDS',
+
+
+    # history
+    'HISTORY', 'ORIGINAL HISTORY',
+
+
+    # credits, authors, contributors, & copyright
     'CREDITS', 'ORIGINAL CREDITS',
     'THANKS', 'ORIGINAL THANKS',
 
-    # author, contributors, & copyright
     qr/^AUTHORS?/,
     qr/^ORIGINAL AUTHORS?/,
 
@@ -92,8 +117,15 @@ our $SORT_SPEC = [
     'CONTRIBUTING',
 
     'COPYRIGHT AND LICENSE', 'ORIGINAL COPYRIGHT AND LICENSE',
+    'COPYRIGHT & LICENSE', 'ORIGINAL COPYRIGHT & LICENSE',
     'COPYRIGHT', 'ORIGINAL COPYRIGHT',
     'LICENSE', 'ORIGINAL LICENSE',
+
+
+    # bugs/caveats
+    'BUGS', 'ORIGINAL BUGS',
+    'GOTCHAS',
+    'CAVEATS',
 ];
 
 sub meta {
@@ -129,7 +161,7 @@ Sort::Sub::pod_section_ala_perlancar - Sort POD sections (headings) PERLANCAR-st
 
 =head1 VERSION
 
-This document describes version 0.090 of Sort::Sub::pod_section_ala_perlancar (from Perl distribution Sort-SubBundle-PERLANCAR), released on 2021-08-22.
+This document describes version 0.092 of Sort::Sub::pod_section_ala_perlancar (from Perl distribution Sort-SubBundle-PERLANCAR), released on 2021-10-17.
 
 =head1 SYNOPSIS
 
@@ -180,14 +212,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sort-SubBu
 
 Source repository is at L<https://github.com/perlancar/perl-Sort-SubBundle-PERLANCAR>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-SubBundle-PERLANCAR>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Pod::Weaver::Plugin::PERLANCAR::SortSections>, which uses the sort
@@ -200,11 +224,36 @@ L<Sort::Sub>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-SubBundle-PERLANCAR>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

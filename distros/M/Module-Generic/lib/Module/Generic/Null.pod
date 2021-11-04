@@ -21,7 +21,7 @@ Module::Generic::Null - Null Value Chaining Object Class
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 
@@ -119,6 +119,16 @@ There is only 1 method. This module makes it possible to call it with any method
 =head2 new
 
 This takes an error object and an optional hash reference of key-value pairs and return the object.
+
+Possible options:
+
+=over 4
+
+=item I<wants>
+
+This can be any of (case do not actually matter): C<ARRAY>, C<BOOLEAN>, C<CODE>, C<GLOB>, C<HASH>, C<LIST>, C<OBJECT>, C<REFSCALAR>, C<SCALAR>, C<VOID>
+
+=back
 
 =head2 CREDITS
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Mercury::Magnet;
-$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.772';
+$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.791';
 #ABSTRACT: Oxford Instruments Mercury magnet power supply
 
 use v5.20;
@@ -34,6 +34,22 @@ has heater_delay => (
     isa     => 'Lab::Moose::PosInt',
     default => 60
 );
+
+has ATOB => (
+    is => 'ro',
+    isa => 'Lab::Moose::PosNum',
+    builder => '_build_ATOB',
+    lazy => 1,
+    );
+
+
+sub _build_ATOB {
+    my $self = shift;
+    my $magnet = $self->magnet();
+    return $self->oi_getter(cmd => "READ:DEV:GRP${magnet}:PSU:ATOB");
+}
+
+
 
 # default connection options:
 around default_connection_options => sub {
@@ -168,6 +184,8 @@ sub validated_magnet_setter {
 }
 
 
+
+
 sub oim_get_current {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
@@ -178,23 +196,31 @@ sub oim_get_current {
 }
 
 
-sub oim_get_field {
+sub oim_get_persistent_current {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $field
-        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:FLD", %args );
-    $field =~ s/T$//;
-    return $field;
+    my $current
+        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:PCUR", %args );
+    $current =~ s/A$//;
+    return $current;
+}
+
+
+
+sub oim_get_field {
+    my $self = shift;
+    my $current = $self->oim_get_current(@_);
+    my $rv = $current / $self->ATOB();
+    return sprintf("%.6f", $rv);
 }
 
 
 sub oim_get_persistent_field {
-    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
+    my $self = shift;
+    my $current = $self->oim_get_persistent_current(@_);
 
-    my $field
-        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:PFLD", %args );
-    $field =~ s/T$//;
-    return $field;
+    my $rv = $current / $self->ATOB();
+    return sprintf("%.6f", $rv)
 }
 
 
@@ -272,6 +298,8 @@ sub oim_get_current_sweeprate {
 sub oim_set_current_sweeprate {
     my ( $self, $value, $channel, %args ) = validated_magnet_setter( \@_ );
 
+    $value = sprintf("%.3f", $value);
+    
     my $rv = $self->oi_setter(
         cmd   => "SET:DEV:$channel:PSU:SIG:RCST",
         value => $value, %args
@@ -284,26 +312,20 @@ sub oim_set_current_sweeprate {
 
 
 sub oim_get_field_sweeprate {
-    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
-
-    my $sweeprate
-        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:RFST", %args );
-    $sweeprate =~ s/T\/m$//;
-    return $sweeprate;
+    my $self = shift;
+    my $current_sweeprate = $self->oim_get_current_sweeprate(@_);
+    my $rv = $current_sweeprate / $self->ATOB();
+    return sprintf("%.6f", $rv);
 }
 
 
 sub oim_set_field_sweeprate {
-    my ( $self, $value, $channel, %args ) = validated_magnet_setter( \@_ );
-
-    my $rv = $self->oi_setter(
-        cmd   => "SET:DEV:$channel:PSU:SIG:RFST",
-        value => $value, %args
-    );
-
-    # this returns tesla per minute
-    $rv =~ s/T\/m$//;
-    return $rv;
+    my $self = shift;
+    my %args = @_;
+    my $value = delete $args{value};
+    $value = $value * $self->ATOB();
+    my $rv = $self->oim_set_current_sweeprate(value => $value, %args);
+    return $rv / $self->ATOB();
 }
 
 
@@ -331,6 +353,8 @@ sub oim_set_current_setpoint {
         value => { isa => 'Num' },
     );
 
+    $value = sprintf("%.4f", $value);
+    
     my $rv = $self->oi_setter(
         cmd   => "SET:DEV:$channel:PSU:SIG:CSET",
         value => $value, %args
@@ -351,29 +375,25 @@ sub oim_get_current_setpoint {
 
 
 sub oim_set_field_setpoint {
-    my ( $self, $value, $channel, %args ) = validated_magnet_setter(
-        \@_,
-        value => { isa => 'Num' },
-    );
+    my $self = shift;
+    my %args = @_;
+    my $value = delete $args{value};
+    
+    $value = $value * $self->ATOB();
 
-    my $rv = $self->oi_setter(
-        cmd   => "SET:DEV:$channel:PSU:SIG:FSET",
-        value => $value, %args
-    );
-    $rv =~ s/T$//;
-    return $rv;
+    my $rv = $self->oim_set_current_setpoint(value => $value, %args);
+
+    $rv = $rv / $self->ATOB();
+    return sprintf("%.6f", $rv);
 }
 
 
 sub oim_get_field_setpoint {
-    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
+    my $self = shift;
 
-    my $result = $self->oi_getter(
-        cmd => "READ:DEV:$channel:PSU:SIG:FSET",
-        %args
-    );
-    $result =~ s/T$//;
-    return $result;
+    my $rv = $self->oim_get_current_setpoint(@_);
+
+    return $rv / $self->ATOB();
 }
 
 
@@ -381,6 +401,14 @@ sub oim_get_fieldconstant {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
     return $self->oi_getter( cmd => "READ:DEV:$channel:PSU:ATOB", %args );
 }
+
+
+
+sub field_step {
+    my $self = shift;
+    return 1e-4 / $self->oim_get_fieldconstant(@_);
+}
+
 
 ############### XPRESS interface #####################
 
@@ -530,7 +558,7 @@ Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury magnet p
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 SYNOPSIS
 
@@ -639,11 +667,18 @@ Reads out the momentary current of the PSU in Ampere.
 
 TODO: what happens if we're in persistent mode?
 
+=head2 oim_get_persistent_current
+
+ $field = $m->oim_get_persistent_current();
+
+Read PSU current for persistent mode in Amps.
+
 =head2 oim_get_field
 
  $field = $m->oim_get_field();
 
 Read PSU field in Tesla.
+Internally, this uses oim_get_current and calculates the field with the A-to-B factor.
 
 Returns 0 when in persistent mode.
 
@@ -652,6 +687,7 @@ Returns 0 when in persistent mode.
  $field = $m->oim_get_persistent_field();
 
 Read PSU field for persistent mode in Tesla.
+Internally, this uses oim_get_persistent_current and calculates the field with the A-to-B factor.
 
 =head2 oim_get_heater
 
@@ -758,6 +794,10 @@ Get the field setpoint in Tesla.
 
 Returns the current to field factor (A/T)
 
+=head2 field_step
+
+Return the minimum field stepwidth of the magnet
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
@@ -766,6 +806,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt
+            2021       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -9,7 +9,7 @@ use parent qw{ Astro::App::Satpass2::Macro };
 
 use Astro::App::Satpass2::Utils qw{ quoter ARRAY_REF @CARP_NOT };
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 sub execute {
     my ( $self, $name ) = @_;
@@ -30,6 +30,17 @@ sub execute {
     return $output;
 }
 
+sub completion {
+    my ( $self, $text ) = @_;
+    $self->{completion}
+	or return;
+    defined $text
+	or $text = '';
+    my @rslt = sort( grep { ! index $_, $text } @{ $self->{completion} } )
+	or return;
+    return \@rslt;
+}
+
 sub def {
     my ( $self ) = @_;
     my @def = @{ $self->{def} };
@@ -42,6 +53,11 @@ sub init {
     ARRAY_REF eq ref $self->{def}
 	or $self->wail( q{Attribute 'def' must be an array reference} );
     $self->{implements} = { map { $_ => 1 } $self->name() };
+
+    $self->{completion}
+	and @{ $self->{completion} } = map { split qr< \s+ >smx }
+	    @{ $self->{completion} };
+
     return;
 }
 
@@ -77,13 +93,23 @@ Documentation is for the benefit of the author only.
 
 =head1 METHODS
 
-This class provides the following methods overriding those of its
+This class provides the following methods in addition to those if its
 superclass:
+
+=head2 completion
+
+ my $completion = $self->completion( $text );
+
+This method returns a reference to an array containing all completions
+defined by the C<'completion'> argument to C<new()> that match C<$text>.
+If there are none, or if the C<'completion'> argument was not specified,
+nothing is returned.
 
 =head2 init
 
-The C<def> attribute is checked, and the C<implements> attribute
-populated.
+This method overrides the superclass method of the same name. In
+addition to the functionality of that method, The C<def> attribute is
+checked, and the C<implements> attribute populated.
 
 =head1 ATTRIBUTES
 

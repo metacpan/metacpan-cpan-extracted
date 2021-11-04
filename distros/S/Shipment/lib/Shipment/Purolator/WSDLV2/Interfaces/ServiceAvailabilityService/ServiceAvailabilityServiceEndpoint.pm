@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint;
-$Shipment::Purolator::WSDLV2::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -50,7 +50,7 @@ sub GetServicesOptions {
       "GetServicesOptions must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'GetServicesOptions',
+        {   operation   => 'GetServicesOptions',
             soap_action =>
               'http://purolator.com/pws/service/v2/GetServicesOptions',
             style => 'document',
@@ -111,7 +111,7 @@ sub GetServiceRules {
     die "GetServiceRules must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'GetServiceRules',
+        {   operation   => 'GetServiceRules',
             soap_action =>
               'http://purolator.com/pws/service/v2/GetServiceRules',
             style => 'document',
@@ -173,7 +173,7 @@ sub ValidateCityPostalCodeZip {
       "ValidateCityPostalCodeZip must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ValidateCityPostalCodeZip',
+        {   operation   => 'ValidateCityPostalCodeZip',
             soap_action =>
               'http://purolator.com/pws/service/v2/ValidateCityPostalCodeZip',
             style => 'document',
@@ -269,7 +269,7 @@ Shipment::Purolator::WSDLV2::Interfaces::ServiceAvailabilityService::ServiceAvai
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

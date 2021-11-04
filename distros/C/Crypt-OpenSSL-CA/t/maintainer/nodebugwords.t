@@ -10,17 +10,15 @@ DOCUMENTME, XXX and so on left in the source code.  Other markers
 
 =cut
 
-use Test::More;
+use Test2::V0;
 unless (eval <<"USE") {
 use Test::NoBreakpoints qw(all_perl_files);
 1;
 USE
-    plan skip_all => "Test::NoBreakpoints required";
+    skip_all("Test::NoBreakpoints required");
     warn $@ if $ENV{DEBUG};
     exit;
 }
-
-plan "no_plan";
 
 foreach my $file (all_perl_files(qw(Build.PL Build lib t))) {
     next if $file =~ m/nodebugwords\.t/; # Heh.
@@ -37,3 +35,5 @@ foreach my $file (all_perl_files(qw(Build.PL Build lib t))) {
     }
     ok(! $badwords_count, "no debug words found in $file");
 }
+
+done_testing;

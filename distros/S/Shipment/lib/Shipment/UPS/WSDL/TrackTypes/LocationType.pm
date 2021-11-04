@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::LocationType;
-$Shipment::UPS::WSDL::TrackTypes::LocationType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::LocationType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               XPathOfElement
               OriginalValue
 
-              )
+            )
         ],
         {   'LocationElementName' => \%LocationElementName_of,
             'XPathOfElement'      => \%XPathOfElement_of,
@@ -67,7 +67,7 @@ Shipment::UPS::WSDL::TrackTypes::LocationType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

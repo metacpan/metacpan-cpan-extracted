@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Rclone-Util
   homepage: https://metacpan.org/release/Rclone-Util
   repository: git://github.com/perlancar/perl-Rclone-Util.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

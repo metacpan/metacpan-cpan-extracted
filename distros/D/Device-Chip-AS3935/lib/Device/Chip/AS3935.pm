@@ -6,9 +6,11 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::AS3935 0.01;
+package Device::Chip::AS3935 0.02;
 class Device::Chip::AS3935
    extends Device::Chip;
+
+use Device::Chip::Sensor 0.19 -declare;
 
 use Data::Bitfield qw( bitfield boolfield enumfield intfield );
 use Future::AsyncAwait;
@@ -50,6 +52,13 @@ method I2C_options
       addr        => 0x02,
       max_bitrate => 400E3,
    );
+}
+
+async method initialize_sensors ()
+{
+   await $self->reset;
+
+   await $self->calibrate_rco;
 }
 
 =head1 METHODS
@@ -267,6 +276,28 @@ async method read_distance ()
 
    return $distance;
 }
+
+has $_pending_read_int_f;
+
+method next_read_int
+{
+   return $_pending_read_int_f //= $self->read_int->on_ready( sub { undef $_pending_read_int_f } );
+}
+
+foreach ( [ noise_high => "INT_NH" ], [ disturbance => "INT_D" ], [ strike => "INT_L" ] ) {
+   my ( $name, $intflag ) = @$_;
+
+   declare_sensor_counter "lightning_${name}_events" =>
+      method => async method {
+         my $ints = await $self->next_read_int;
+         return $ints->{$intflag};
+      };
+}
+
+declare_sensor lightning_distance =>
+   units => "km",
+   precision => 0,
+   method => "read_distance";
 
 =head1 AUTHOR
 

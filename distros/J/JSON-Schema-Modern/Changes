@@ -1,5 +1,12 @@
 Revision history for JSON-Schema-Modern
 
+0.523     2021-10-24 05:58:27Z
+          - fix tests that were relying on an optional prereq
+          - properly gate experimental features by version
+
+0.522     2021-10-22 22:26:29Z
+          - 'date-time' format now properly handles leap seconds
+
 0.521     2021-10-04 05:36:10Z
           - fix issues when referencing a schema in a metaschema:
             whose vocabulary is not known, but its keywords can still be

@@ -5,19 +5,21 @@ use strict;
 use warnings;
 
 use XML::MyXML::Object;
+use XML::MyXML::Util 'trim', 'strip_ns';
 
 use Encode;
 use Carp;
-use Scalar::Util qw/ weaken /;
+use Scalar::Util 'weaken';
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(tidy_xml object_to_xml xml_to_object simple_to_xml xml_to_simple check_xml xml_escape);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 my $DEFAULT_INDENTSTRING = ' ' x 4;
+
 
 =encoding utf-8
 
@@ -45,39 +47,53 @@ xml_escape, tidy_xml, xml_to_object, object_to_xml, simple_to_xml, xml_to_simple
 
 =head1 FEATURES & LIMITATIONS
 
-This module can parse XML comments, CDATA sections, XML entities (the standard five and numeric ones) and simple non-recursive C<< <!ENTITY> >>s
+This module can parse XML comments, CDATA sections, XML entities (the standard five and numeric ones) and
+simple non-recursive C<< <!ENTITY> >>s
 
 It will ignore (won't parse) C<< <!DOCTYPE...> >>, C<< <?...?> >> and other C<< <!...> >> special markup
 
-All strings (XML documents, attribute names, values, etc) produced by this module or passed as parameters to its functions, are strings that contain characters, rather than bytes/octets. Unless you use the C<bytes> function flag (see below), in which case the XML documents (and just the XML documents) will be byte/octet strings.
+All strings (XML documents, attribute names, values, etc) produced by this module or passed as parameters
+to its functions, are strings that contain characters, rather than bytes/octets. Unless you use the C<bytes>
+function flag (see below), in which case the XML documents (and just the XML documents) will be byte/octet
+strings.
 
 XML documents to be parsed may not contain the C<< > >> character unencoded in attribute values
 
 =head1 OPTIONAL FUNCTION FLAGS
 
-Some functions and methods in this module accept optional flags, listed under each function in the documentation. They are optional, default to zero unless stated otherwise, and can be used as follows: S<C<< function_name( $param1, { flag1 => 1, flag2 => 1 } ) >>>. This is what each flag does:
+Some functions and methods in this module accept optional flags, listed under each function in the
+documentation. They are optional, default to zero unless stated otherwise, and can be used as follows:
+S<C<< function_name( $param1, { flag1 => 1, flag2 => 1 } ) >>>. This is what each flag does:
 
 C<strip> : the function will strip initial and ending whitespace from all text values returned
 
-C<file> : the function will expect the path to a file containing an XML document to parse, instead of an XML string
+C<file> : the function will expect the path to a file containing an XML document to parse, instead of an
+XML string
 
-C<complete> : the function's XML output will include an XML declaration (C<< <?xml ... ?>  >>) in the beginning
+C<complete> : the function's XML output will include an XML declaration (C<< <?xml ... ?>  >>) in the
+beginning
 
-C<internal> : the function will only return the contents of an element in a hashref instead of the element itself (see L</SYNOPSIS> for example)
+C<internal> : the function will only return the contents of an element in a hashref instead of the
+element itself (see L</SYNOPSIS> for example)
 
 C<tidy> : the function will return tidy XML
 
-C<indentstring> : when producing tidy XML, this denotes the string with which child elements will be indented (Default is a string of 4 spaces)
+C<indentstring> : when producing tidy XML, this denotes the string with which child elements will be
+indented (Default is a string of 4 spaces)
 
-C<save> : the function (apart from doing what it's supposed to do) will also save its XML output in a file whose path is denoted by this flag
+C<save> : the function (apart from doing what it's supposed to do) will also save its XML output in a
+file whose path is denoted by this flag
 
 C<strip_ns> : strip the namespaces (characters up to and including ':') from the tags
 
-C<xslt> : will add a <?xml-stylesheet?> link in the XML that's being output, of type 'text/xsl', pointing to the filename or URL denoted by this flag
+C<xslt> : will add a <?xml-stylesheet?> link in the XML that's being output, of type 'text/xsl',
+pointing to the filename or URL denoted by this flag
 
-C<arrayref> : the function will create a simple arrayref instead of a simple hashref (which will preserve order and elements with duplicate tags)
+C<arrayref> : the function will create a simple arrayref instead of a simple hashref (which will preserve
+order and elements with duplicate tags)
 
-C<bytes> : the XML document string which is parsed and/or produced by this function, should contain bytes/octets rather than characters
+C<bytes> : the XML document string which is parsed and/or produced by this function, should contain
+bytes/octets rather than characters
 
 =head1 FUNCTIONS
 
@@ -85,7 +101,6 @@ C<bytes> : the XML document string which is parsed and/or produced by this funct
 
 sub _encode {
     my $string = shift;
-    my $entities = shift || {};
     defined $string or $string = '';
     my %replace =   (
                     '<' => '&lt;',
@@ -99,9 +114,11 @@ sub _encode {
     return $string;
 }
 
+
 =head2 xml_escape($string)
 
-Returns the same string, but with the C<< < >>, C<< > >>, C<< & >>, C<< " >> and C<< ' >> characters replaced by their XML entities (e.g. C<< &amp; >>).
+Returns the same string, but with the C<< < >>, C<< > >>, C<< & >>, C<< " >> and C<< ' >> characters
+replaced by their XML entities (e.g. C<< &amp; >>).
 
 =cut
 
@@ -116,47 +133,29 @@ sub _decode {
     my $entities = shift || {};
     my $flags = shift || {};
     defined $string or $string = '';
-    my %replace = ( %$entities, reverse(
-                    '<' => '&lt;',
-                    '>' => '&gt;',
-                    '&' => '&amp;',
-                    '\'' => '&apos;',
-                    '"' => '&quot;',
-    ));
-    my @capture = map "\Q$_\E", keys %replace;
-    push @capture, '&#x[0-9A-Fa-f]+;', '&#[0-9]+;';
+    my %replace = (
+        %$entities,
+        '&lt;'   => '<',
+        '&gt;'   => '>',
+        '&amp;'  => '&',
+        '&apos;' => "'",
+        '&quot;' => '"',
+    );
+    my @capture = map quotemeta, keys %replace;
+    push @capture, '\&\#x([0-9A-Fa-f]+)\;', '\&\#([0-9]+)\;';
     my $capture = "(".join("|", @capture).")";
-    my @captured = $string =~ /$capture/g;
-    @captured   or return $string;
-    my %conv;
-    foreach my $e (@captured) {
-        if (exists $conv{$e}) { next; }
-        if (exists $replace{$e}) {
-            $conv{$e} = $replace{$e};
-        } elsif ($e =~ /\A&#x([0-9a-fA-F]+);\z/) {
-            $conv{$e} = chr(hex($1));
-        } elsif ($e =~ /\A&#([0-9]+);\z/) {
-            $conv{$e} = chr($1);
-        }
-    }
-    my $keys = "(".join("|", map "\Q$_\E", keys %conv).")";
-    $string =~ s/$keys/$conv{$1}/g;
+    $string =~ s|
+        $capture
+    |
+        my $reference = $1;
+        my $number = $2;
+        $reference =~ /\&\#x/ ? chr(hex($number))
+            : $reference =~ /\&\#/ ? chr($number)
+            : $replace{$reference};
+    |gex;
     return $string;
 }
 
-sub _strip {
-    my $string = shift;
-
-    # NOTE: Replace this with the 'r' flag of the substitution operator
-    return defined $string ? ($string =~ /\A\s*(.*?)\s*\z/s)[0] : $string;
-}
-
-sub _strip_ns {
-    my $string = shift;
-
-    # NOTE: Replace this with the 'r' flag of the substitution operator
-    return defined $string ? ($string =~ /\A(?:.+\:)?(.*)\z/s)[0] : $string;
-}
 
 =head2 tidy_xml($raw_xml)
 
@@ -165,7 +164,6 @@ Returns the XML string in a tidy format (with tabs & newlines)
 Optional flags: C<file>, C<complete>, C<indentstring>, C<save>, C<bytes>
 
 =cut
-
 
 sub tidy_xml {
     my $xml = shift;
@@ -192,115 +190,104 @@ sub xml_to_object {
     my $flags = shift || {};
 
     if ($flags->{file}) {
-        open my $fh, '<', $xml  or croak "Error: The file '$xml' could not be opened for reading: $!";
-        $xml = join '', <$fh>;
+        open my $fh, '<', $xml or croak "Error: The file '$xml' could not be opened for reading: $!";
+        $xml = do { local $/; <$fh> };
         close $fh;
     }
 
     if ($flags->{bytes} or $flags->{file}) {
-        my (undef, undef, $encoding) = $xml =~ /<\?xml(\s[^>]+)?\sencoding=(['"])(.*?)\2/g;
-        $encoding = 'UTF-8'     if ! defined $encoding;
-        if ($encoding =~ /\Autf-?8\z/i) { $encoding = 'UTF-8'; }
-        eval {
-            $xml = decode($encoding, $xml, Encode::FB_CROAK);
-        };
-        ! $@    or croak 'Error: Input string is invalid UTF-8';
+        my (undef, undef, $encoding) = $xml =~ /<\?xml(\s[^>]+)?\sencoding=(['"])(.*?)\2/;
+        $encoding = 'UTF-8' if ! defined $encoding or $encoding =~ /^utf\-?8\z/i;
+        my $encoding_obj = find_encoding($encoding) or croak "Error: encoding '$encoding' not found";
+        eval { $xml = $encoding_obj->decode($xml, Encode::FB_CROAK); 1 }
+            or croak "Error: Input string is invalid $encoding";
     }
 
     my $entities = {};
 
     # Parse CDATA sections
-    $xml =~ s/<\!\[CDATA\[(.*?)\]\]>/_encode($1)/egs;
-    my @els = $xml =~ /(<!--.*?(?:-->|$)|<[^>]*?>|[^<>]+)/sg;
+    $xml =~ s/\<\!\[CDATA\[(.*?)\]\]\>/_encode($1)/egs;
+    my @items = $xml =~ /(<!--.*?(?:-->|$)|<[^>]*?>|[^<>]+)/sg;
     # Remove comments, special markup and initial whitespace
     {
-        my $init_ws = 1;
-        foreach my $el (@els) {
-            if ($el =~ /\A<!--/) {
-                if ($el !~ /-->\z/) { croak encode_utf8("Error: unclosed XML comment block - '$el'"); }
-                undef $el;
-            } elsif ($el =~ /\A<\?/) { # like <?xml?> or <?target?>
-                if ($el !~ /\?>\z/) { croak encode_utf8("Error: Erroneous special markup - '$el'"); }
-                undef $el;
-            } elsif (my ($entname, undef, $entvalue) = $el =~ /\A<!ENTITY\s+(\S+)\s+(['"])(.*?)\2\s*>\z/g) {
+        my $init_ws = 1; # whether we are inside initial whitespace
+        foreach my $item (@items) {
+            if ($item =~ /\A<!--/) {
+                if ($item !~ /-->\z/) { croak encode_utf8("Error: unclosed XML comment block - '$item'"); }
+                undef $item;
+            } elsif ($item =~ /\A<\?/) { # like <?xml?> or <?target?>
+                if ($item !~ /\?>\z/) { croak encode_utf8("Error: Erroneous special markup - '$item'"); }
+                undef $item;
+            } elsif (my ($entname, undef, $entvalue) = $item =~ /^<!ENTITY\s+(\S+)\s+(['"])(.*?)\2\s*>\z/) {
                 $entities->{"&$entname;"} = _decode($entvalue);
-                undef $el;
-            } elsif ($el =~ /<!/) { # like <!DOCTYPE> or <!ELEMENT> or <!ATTLIST>
-                undef $el;
+                undef $item;
+            } elsif ($item =~ /<!/) { # like <!DOCTYPE> or <!ELEMENT> or <!ATTLIST>
+                undef $item;
             } elsif ($init_ws) {
-                if ($el =~ /\S/) {
+                if ($item =~ /\S/) {
                     $init_ws = 0;
                 } else {
-                    undef $el;
+                    undef $item;
                 }
             }
         }
-        @els = grep { defined $_ } @els;
-        if (! @els) { croak "Error: No elements in XML document"; }
+        @items = grep defined, @items or croak "Error: No elements in the XML document";
     }
     my @stack;
-    my $object = bless ({ content => [] }, 'XML::MyXML::Object');
+    my $object = bless ({
+        content      => [],
+        full_ns_info => {},
+        ns_data      => {},
+    }, 'XML::MyXML::Object');
     my $pointer = $object;
-    foreach my $el (@els) {
-        if ($el =~ /\A<\/?>\z/) {
-            croak encode_utf8("Error: Strange element: '$el'");
-        } elsif ($el =~ /\A<\/[^\s>]+>\z/) {
-            my ($element) = $el =~ /\A<\/(\S+)>\z/g;
-            if (! length($element)) { croak encode_utf8("Error: Strange element: '$el'"); }
-            if ($stack[-1]{element} ne $element) { croak encode_utf8("Error: Incompatible stack element: stack='".$stack[-1]{element}."' element='$el'"); }
-            my $stackentry = pop @stack;
-            if ($#{$stackentry->{content}} == -1) {
-                delete $stackentry->{content};
-            }
-            $pointer = $stackentry->{parent};
-        } elsif ($el =~ /\A<[^>]+\/>\z/) {
-            my ($element) = $el =~ /\A<([^\s>\/]+)/g;
-            if (! length($element)) { croak encode_utf8("Error: Strange element: '$el'"); }
-            $el =~ s/\A<\Q$element\E//;
-            $el =~ s/\/>\z//;
-            my @attrs = $el =~ /\s+(\S+=(['"]).*?\2)/g;
-            my $i = 1;
-            @attrs = grep {$i++ % 2} @attrs;
+    foreach my $item (@items) {
+        if ($item =~ /^\<\/?\>\z/) {
+            croak encode_utf8("Error: Strange tag: '$item'");
+        } elsif ($item =~ /^\<\/([^\s>]+)\>\z/) {
+            my ($el_name) = $1;
+            $stack[-1]{el_name} eq $el_name
+                or croak encode_utf8("Error: Incompatible stack element: stack='$stack[-1]{el_name}' item='$item'");
+            my $stack_entry = pop @stack;
+            delete $stack_entry->{content} if ! @{$stack_entry->{content}};
+            $pointer = $stack_entry->{parent};
+        } elsif ($item =~ /^\<[^>]+?(\/)?\>\z/) {
+            my $is_self_closing = defined $1;
+            my ($el_name) = $item =~ /^<([^\s>\/]+)/;
+            defined $el_name or croak encode_utf8("Error: Strange tag: '$item'");
+            $item =~ s/^\<\Q$el_name\E//;
+            $item =~ s/\/>\z//;
+            my @attrs = $item =~ /\s+(\S+=(['"]).*?\2)/g;
+            my $i = 0;
+            @attrs = grep {++$i % 2} @attrs;
             my %attr;
             foreach my $attr (@attrs) {
-                my ($name, undef, $value) = $attr =~ /\A(\S+?)=(['"])(.*?)\2\z/g;
-                if (! length($name) or ! defined($value)) { croak encode_utf8("Error: Strange attribute: '$attr'"); }
-                $attr{$name} = _decode($value, $entities);
+                my ($attr_name, undef, $attr_value) = $attr =~ /^(\S+?)=(['"])(.*?)\2\z/;
+                defined $attr_name or croak encode_utf8("Error: Strange attribute: '$attr'");
+                $attr{$attr_name} = _decode($attr_value, $entities);
             }
-            my $entry = { element => $element, attrs => \%attr, parent => $pointer };
-            weaken( $entry->{parent} );
-            bless $entry, 'XML::MyXML::Object';
+            my $entry = bless {
+                el_name => $el_name,
+                attrs   => \%attr,
+                $is_self_closing ? () : (content => []),
+                parent  => $pointer,
+            }, 'XML::MyXML::Object';
+            weaken $entry->{parent};
+            $entry->_apply_namespace_declarations;
+            push @stack, $entry unless $is_self_closing;
             push @{$pointer->{content}}, $entry;
-        } elsif ($el =~ /\A<[^\s>\/][^>]*>\z/) {
-            my ($element) = $el =~ /\A<([^\s>]+)/g;
-            if (! length($element)) { croak encode_utf8("Error: Strange element: '$el'"); }
-            $el =~ s/\A<\Q$element\E//;
-            $el =~ s/>\z//;
-            my @attrs = $el =~ /\s+(\S+=(['"]).*?\2)/g;
-            my $i = 1;
-            @attrs = grep {$i++ % 2} @attrs;
-            my %attr;
-            foreach my $attr (@attrs) {
-                my ($name, undef, $value) = $attr =~ /\A(\S+?)=(['"])(.*?)\2\z/g;
-                if (! length($name) or ! defined($value)) { croak encode_utf8("Error: Strange attribute: '$attr'"); }
-                $attr{$name} = _decode($value, $entities);
-            }
-            my $entry = { element => $element, attrs => \%attr, content => [], parent => $pointer };
-            weaken( $entry->{parent} );
-            bless $entry, 'XML::MyXML::Object';
-            push @stack, $entry;
-            push @{$pointer->{content}}, $entry;
-            $pointer = $entry;
-        } elsif ($el =~ /\A[^<>]*\z/) {
-            my $entry = { value => _decode($el, $entities), parent => $pointer };
-            weaken( $entry->{parent} );
-            bless $entry, 'XML::MyXML::Object';
+            $pointer = $entry unless $is_self_closing;
+        } elsif ($item =~ /^[^<>]*\z/) {
+            my $entry = bless {
+                text => _decode($item, $entities),
+                parent => $pointer,
+            }, 'XML::MyXML::Object';
+            weaken $entry->{parent};
             push @{$pointer->{content}}, $entry;
         } else {
-            croak encode_utf8("Error: Strange element: '$el'");
+            croak encode_utf8("Error: Strange element: '$item'");
         }
     }
-    if (@stack) { croak encode_utf8("Error: The <$stack[-1]{element}> element has not been closed in XML"); }
+    ! @stack or croak encode_utf8("Error: The <$stack[-1]{el_name}> element has not been closed in the XML document");
     $object = $object->{content}[0];
     $object->{parent} = undef;
     return $object;
@@ -311,10 +298,10 @@ sub _objectarray_to_xml {
 
     my $xml = '';
     foreach my $stuff (@$object) {
-        if (! defined $stuff->{element} and defined $stuff->{value}) {
-            $xml .= _encode($stuff->{value});
+        if (! defined $stuff->{el_name} and defined $stuff->{text}) {
+            $xml .= _encode($stuff->{text});
         } else {
-            $xml .= "<".$stuff->{element};
+            $xml .= "<".$stuff->{el_name};
             foreach my $attrname (keys %{$stuff->{attrs}}) {
                 $xml .= " ".$attrname.'="'._encode($stuff->{attrs}{$attrname}).'"';
             }
@@ -323,12 +310,13 @@ sub _objectarray_to_xml {
             } else {
                 $xml .= ">";
                 $xml .= _objectarray_to_xml($stuff->{content});
-                $xml .= "</".$stuff->{element}.">";
+                $xml .= "</".$stuff->{el_name}.">";
             }
         }
     }
     return $xml;
 }
+
 
 =head2 object_to_xml($object)
 
@@ -352,32 +340,36 @@ sub _tidy_object {
 
     my $indentstring = exists $flags->{indentstring} ? $flags->{indentstring} : $DEFAULT_INDENTSTRING;
 
-    if (! defined $object->{content} or ! @{$object->{content}}) { return; }
+    return unless defined $object->{content} and @{$object->{content}};
     my $hastext;
     my @children = @{$object->{content}};
     foreach my $i (0..$#children) {
         my $child = $children[$i];
-        if (defined $child->{value}) {
-            if ($child->{value} =~ /\S/) {
-                $hastext = 1;
-                last;
-            }
+        if (defined $child->{text} and $child->{text} =~ /\S/) {
+            $hastext = 1;
+            last;
         }
     }
-    if ($hastext) { return; }
+    return if $hastext;
 
-    @{$object->{content}} = grep { ! defined $_->{value} or $_->{value} !~ /\A\s*\z/ } @{$object->{content}};
+    @{$object->{content}} = grep { ! defined $_->{text} or $_->{text} =~ /\S/ } @{$object->{content}};
 
     @children = @{$object->{content}};
     $object->{content} = [];
     for my $i (0..$#children) {
-        my $whitespace = bless ({ value => "\n".($indentstring x ($tabs+1)), parent => $object }, 'XML::MyXML::Object');
-        weaken( $whitespace->{parent} );
+        my $whitespace = bless {
+            text => "\n".($indentstring x ($tabs+1)),
+            parent => $object,
+        }, 'XML::MyXML::Object';
+        weaken $whitespace->{parent};
         push @{$object->{content}}, $whitespace;
         push @{$object->{content}}, $children[$i];
     }
-    my $whitespace = bless ({ value => "\n".($indentstring x ($tabs)), parent => $object }, 'XML::MyXML::Object');
-    weaken( $whitespace->{parent} );
+    my $whitespace = bless {
+        text => "\n".($indentstring x $tabs),
+        parent => $object,
+    }, 'XML::MyXML::Object';
+    weaken $whitespace->{parent};
     push @{$object->{content}}, $whitespace;
 
     for my $i (0..$#{$object->{content}}) {
@@ -531,7 +523,8 @@ represent the key (=tag+attrs) as a string, like this (also in the previous exam
 
 This concludes the mini-tutorial of the simple_to_xml function.
 
-All the strings in C<$simple_array_ref> need to contain characters, rather than bytes/octets. The C<bytes> optional flag only affects the produced XML string.
+All the strings in C<$simple_array_ref> need to contain characters, rather than bytes/octets. The C<bytes>
+optional flag only affects the produced XML string.
 
 Optional flags: C<complete>, C<tidy>, C<indentstring>, C<save>, C<xslt>, C<bytes>
 
@@ -544,24 +537,30 @@ sub simple_to_xml {
     my $xml = '';
     my ($key, $value, @residue) = (ref $arref eq 'HASH') ? %$arref : @$arref;
     $key = _key_to_string($key);
-    if (@residue) { croak "Error: the provided simple ref contains more than 1 top element"; }
-    my ($tag) = $key =~ /\A(\S+)/g;
-    croak encode_utf8("Error: Strange key: $key") if ! defined $tag;
+    ! @residue or croak "Error: the provided simple ref contains more than 1 top element";
+    my ($el_name) = $key =~ /^(\S+)/;
+    defined $el_name or croak encode_utf8 "Error: Strange key: $key";
 
     if (! ref $value) {
         if ($key eq '!as_is') {
+            check_xml $value or croak "invalid xml: $value";
             $xml .= $value;
         } elsif (defined $value and length $value) {
-            $xml .= "<$key>"._encode($value)."</$tag>";
+            $xml .= "<$key>"._encode($value)."</$el_name>";
         } else {
             $xml .= "<$key/>";
         }
     } else {
-        $xml .= "<$key>"._arrayref_to_xml($value, $flags)."</$tag>";
+        $xml .= "<$key>@{[ _arrayref_to_xml($value, $flags) ]}</$el_name>";
     }
-    if ($flags->{tidy}) { $xml = tidy_xml($xml, { exists $flags->{indentstring} ? (indentstring => $flags->{indentstring}) : () }); }
-    my $decl = $flags->{complete} ? '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>'."\n" : '';
-    $decl .= "<?xml-stylesheet type=\"text/xsl\" href=\"$flags->{xslt}\"?>\n" if $flags->{xslt};
+    if ($flags->{tidy}) {
+        $xml = tidy_xml($xml, {
+            exists $flags->{indentstring} ? (indentstring => $flags->{indentstring}) : ()
+        });
+    }
+    my $decl = '';
+    $decl .= qq'<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n' if $flags->{complete};
+    $decl .= qq'<?xml-stylesheet type="text/xsl" href="$flags->{xslt}"?>\n' if $flags->{xslt};
     $xml = $decl . $xml;
 
     if (defined $flags->{save}) {
@@ -571,7 +570,7 @@ sub simple_to_xml {
         close $fh;
     }
 
-    $xml = encode_utf8($xml)    if $flags->{bytes};
+    $xml = encode_utf8($xml) if $flags->{bytes};
     return $xml;
 }
 
@@ -591,7 +590,7 @@ sub _key_to_string {
         return $key;
     } else {
         my ($tag, %attrs) = _flatten($key);
-        return $tag . join('', map ' '.$_.'="'._encode($attrs{$_}).'"', grep {defined $attrs{$_}} keys %attrs);
+        return $tag . join('', map " $_=\""._encode($attrs{$_}).'"', grep {defined $attrs{$_}} keys %attrs);
     }
 }
 
@@ -606,25 +605,25 @@ sub _arrayref_to_xml {
     foreach (my $i = 0; $i <= $#$arref; ) {
         my $key = $arref->[$i++];
         $key = _key_to_string($key);
-        my ($tag) = $key =~ /\A(\S+)/g;
-        croak encode_utf8("Error: Strange key: $key") if ! defined $tag;
+        my ($el_name) = $key =~ /^(\S+)/;
+        defined $el_name or croak encode_utf8 "Error: Strange key: $key";
         my $value = $arref->[$i++];
 
         if ($key eq '!as_is') {
-            $xml .= $value if check_xml($value);
+            check_xml $value or croak "invalid xml: $value";
+            $xml .= $value;
         } elsif (! ref $value) {
             if (defined $value and length $value) {
-                $xml .= "<$key>"._encode($value)."</$tag>";
+                $xml .= "<$key>@{[ _encode($value) ]}</$el_name>";
             } else {
                 $xml .= "<$key/>";
             }
         } else {
-            $xml .= "<$key>"._arrayref_to_xml($value, $flags)."</$tag>";
+            $xml .= "<$key>@{[ _arrayref_to_xml($value, $flags) ]}</$el_name>";
         }
     }
     return $xml;
 }
-
 
 sub _hashref_to_xml {
     my $hashref = shift;
@@ -633,23 +632,25 @@ sub _hashref_to_xml {
     my $xml = '';
 
     while (my ($key, $value) = each %$hashref) {
-        my ($tag) = $key =~ /\A(\S+)/g;
-        croak encode_utf8("Error: Strange key: $key") if ! defined $tag;
+        my ($el_name) = $key =~ /^(\S+)/;
+        defined $el_name or croak encode_utf8 "Error: Strange key: $key";
 
         if ($key eq '!as_is') {
-            $xml .= $value if check_xml($value);
+            check_xml $value or croak "invalid xml: $value";
+            $xml .= $value;
         } elsif (! ref $value) {
             if (defined $value and length $value) {
-                $xml .= "<$key>"._encode($value)."</$tag>";
+                $xml .= "<$key>@{[ _encode($value) ]}</$el_name>";
             } else {
                 $xml .= "<$key/>";
             }
         } else {
-            $xml .= "<$key>"._arrayref_to_xml($value, $flags)."</$tag>";
+            $xml .= "<$key>@{[ _arrayref_to_xml($value, $flags) ]}</$el_name>";
         }
     }
     return $xml;
 }
+
 
 =head2 xml_to_simple($raw_xml)
 
@@ -675,76 +676,63 @@ sub xml_to_simple {
 
     my $object = xml_to_object($xml, $flags);
 
-    my $return = defined $object ? $object->simplify($flags) : $object;
+    $object = $object->simplify($flags) if defined $object;
 
-    return $return;
+    return $object;
 }
 
 sub _objectarray_to_simple {
     my $object = shift;
     my $flags = shift || {};
 
-    if (! defined $object) { return undef; }
+    defined $object or return undef;
 
-    if ($flags->{arrayref}) {
-        return _objectarray_to_simple_arrayref($object, $flags);
-    } else {
-        return _objectarray_to_simple_hashref($object, $flags);
-    }
+    return $flags->{arrayref}
+        ? _objectarray_to_simple_arrayref($object, $flags)
+        : _objectarray_to_simple_hashref($object, $flags);
 }
 
 sub _objectarray_to_simple_hashref {
     my $object = shift;
     my $flags = shift || {};
 
-    if (! defined $object) { return undef; }
+    defined $object or return undef;
 
     my $hashref = {};
 
     foreach my $stuff (@$object) {
-        if (defined $stuff->{element}) {
-            my $key = $stuff->{element};
-            if ($flags->{strip_ns}) { $key = _strip_ns($key); }
+        if (defined(my $key = $stuff->{el_name})) {
+            $key = strip_ns $key if $flags->{strip_ns};
             $hashref->{ $key } = _objectarray_to_simple($stuff->{content}, $flags);
-        } elsif (defined $stuff->{value}) {
-            my $value = $stuff->{value};
-            if ($flags->{strip}) { $value = _strip($value); }
+        }
+        elsif (defined(my $value = $stuff->{text})) {
+            $value = trim $value if $flags->{strip};
             return $value if $value =~ /\S/;
         }
     }
 
-    if (keys %$hashref) {
-        return $hashref;
-    } else {
-        return undef;
-    }
+    return %$hashref ? $hashref : undef;
 }
 
 sub _objectarray_to_simple_arrayref {
     my $object = shift;
     my $flags = shift || {};
 
-    if (! defined $object) { return undef; }
+    defined $object or return undef;
 
     my $arrayref = [];
 
     foreach my $stuff (@$object) {
-        if (defined $stuff->{element}) {
-            my $key = $stuff->{element};
-            if ($flags->{strip_ns}) { $key = _strip_ns($key); }
+        if (defined(my $key = $stuff->{el_name})) {
+            $key = strip_ns $key if $flags->{strip_ns};
             push @$arrayref, ( $key, _objectarray_to_simple($stuff->{content}, $flags) );
-        } elsif (defined $stuff->{value}) {
-            my $value = $stuff->{value};
-            if ($flags->{strip}) { $value = _strip($value); }
+        } elsif (defined(my $value = $stuff->{text})) {
+            $value = trim $value if $flags->{strip};
             return $value if $value =~ /\S/;
         }
     }
 
-    if (@$arrayref) {
-        return $arrayref;
-    } else {
-        return undef;
-    }
+    return @$arrayref ? $arrayref : undef;
 }
 
 
@@ -760,9 +748,10 @@ sub check_xml {
     my $xml = shift;
     my $flags = shift || {};
 
-    my $obj = eval { xml_to_object($xml, $flags) };
-    return ! $@;
+    my $ok = eval { xml_to_object($xml, $flags); 1 };
+    return !!$ok;
 }
+
 
 1; # End of XML::MyXML
 
@@ -773,7 +762,13 @@ __END__
 
 =head2 $obj->path("subtag1/subsubtag2[attr1=val1][attr2]/.../subsubsubtagX")
 
-Returns the element specified by the path as an XML::MyXML::Object object. When there are more than one tags with the specified name in the last step of the path, it will return all of them as an array. In scalar context will only return the first one. Simple CSS3-style attribute selectors are allowed in the path next to the tagnames, for example: C<< p[class=big] >> will only return C<< <p> >> elements that contain an attribute called "class" with a value of "big". p[class] on the other hand will return p elements having a "class" attribute, but that attribute can have any value. It's possible to surround attribute values with quotes, like so: C<< input[name="foo[]"] >>
+Returns the element specified by the path as an XML::MyXML::Object object. When there are more than one tags
+with the specified name in the last step of the path, it will return all of them as an array. In scalar
+context will only return the first one. Simple CSS3-style attribute selectors are allowed in the path next
+to the tagnames, for example: C<< p[class=big] >> will only return C<< <p> >> elements that contain an
+attribute called "class" with a value of "big". p[class] on the other hand will return p elements having a
+"class" attribute, but that attribute can have any value. It's possible to surround attribute values with
+quotes, like so: C<< input[name="foo[]"] >>
 
 An example... To print the last names of all the students from the following XML, do:
 
@@ -825,11 +820,64 @@ If you wish to describe the root element in the path as well, prepend it in the 
         print "The two are identical", "\n";
     }
 
+B<Since XML::MyXML version 1.08, the path method supports namespaces.>
+
+You can replace the namespace prefix of an attribute or an element name in the path string with the
+namespace name inside curly brackets, and place the curly-bracketed expression after the local part.
+
+B<< I<Example #1:> >> Suppose the XML you want to go through is:
+
+    <stream:stream xmlns:stream="http://foo/bar">
+        <a>b</a>
+    </stream:stream>
+
+Then this will return the string C<"b">:
+
+    $obj->path('/stream{http://foo/bar}/a')->value;
+
+B<< I<Example #2:> >> Suppose the XML you want to go through is:
+
+    <stream xmlns="http://foo/bar">
+        <a>b</a>
+    </stream>
+
+Then both of these expressions will return C<"b">:
+
+    $obj->path('/stream/a{http://foo/bar}')->value;
+    $obj->path('/stream{http://foo/bar}/a{http://foo/bar}')->value;
+
+B<Since XML::MyXML version 1.08, quotes in attribute match strings have no special meaning.>
+
+If you want to use the "]" character in attribute values, you need to escape it with a
+backslash character. As you need if you want to use the "}" character in a namespace value
+in the path string.
+
+B<< I<Example #1:> >> Suppose the XML you want to go through is:
+
+    <stream xmlns:o="http://foo}bar">
+        <a o:name="c]d">b</a>
+    </stream>
+
+Then this expression will return C<"b">:
+
+    $obj->path('/stream/a[name{http://foo\}bar}=c\]d]')->value;
+
+B<< I<Example #2:> >> You can match attribute values containing quote characters with just C<"> in the path string.
+
+If the XML is:
+
+    <stream id="&quot;1&quot;">a</stream>
+
+...then this will return the string C<"a">:
+
+    $obj->path('/stream[id="1"]')->value;
+
 Optional flags: none
 
 =head2 $obj->text([set_value]), also known as $obj->value([set_value])
 
-If provided a set_value, will delete all contents of $obj and will place C<set_value> as its text contents. Otherwise will return the text contents of this object, and of its descendants, in a single string.
+If provided a set_value, will delete all contents of $obj and will place C<set_value> as its text contents.
+Otherwise will return the text contents of this object, and of its descendants, in a single string.
 
 Optional flags: C<strip>
 
@@ -841,7 +889,9 @@ Optional flags: C<bytes>
 
 =head2 $obj->attr('attrname' [, 'attrvalue'])
 
-Gets/Sets the value of the 'attrname' attribute of the top element. Returns undef if attribute does not exist. If called without the 'attrname' parameter, returns a hash with all attribute => value pairs. If setting with an attrvalue of C<undef>, then removes that attribute entirely.
+Gets/Sets the value of the 'attrname' attribute of the top element. Returns undef if attribute does not exist.
+If called without the 'attrname' parameter, returns a hash with all attribute => value pairs. If setting with
+an attrvalue of C<undef>, then removes that attribute entirely.
 
 Input parameters and output are all in character strings, rather than octets/bytes.
 
@@ -849,20 +899,26 @@ Optional flags: none
 
 =head2 $obj->tag
 
-Returns the tag of the $obj element. E.g. if $obj represents an <rss:item> element, C<< $obj->tag >> will return the string 'rss:item'.
-Returns undef if $obj doesn't represent a tag.
+Returns the tag of the $obj element. E.g. if $obj represents an <rss:item> element, C<< $obj->tag >> will
+return the string 'rss:item'. Returns undef if $obj doesn't represent a tag.
 
 Optional flags: C<strip_ns>
 
+=head2 $obj->name
+
+Same as C<< $obj->tag >> (alias).
+
 =head2 $obj->parent
 
-Returns the XML::MyXML::Object element that is the parent of $obj in the document. Returns undef if $obj doesn't have a parent.
+Returns the XML::MyXML::Object element that is the parent of $obj in the document. Returns undef if $obj
+doesn't have a parent.
 
 Optional flags: none
 
 =head2 $obj->simplify
 
-Returns a very simple hashref, like the one returned with C<&XML::MyXML::xml_to_simple>. Same restrictions and warnings apply.
+Returns a very simple hashref, like the one returned with C<&XML::MyXML::xml_to_simple>. Same restrictions
+and warnings apply.
 
 Optional flags: C<internal>, C<strip>, C<strip_ns>, C<arrayref>
 

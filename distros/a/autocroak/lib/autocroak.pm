@@ -1,6 +1,5 @@
 package autocroak;
-our $VERSION = 0.001;
-
+$autocroak::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -87,7 +86,7 @@ autocroak - Replace functions with ones that succeed or die with lexical scope
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

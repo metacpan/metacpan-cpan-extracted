@@ -176,41 +176,42 @@ Visualize control characters.
 
 ######################################################################
 
-my %control = (
-    nul => [ 's', "\000", "\x{2400}" ], # ␀ SYMBOL FOR NULL
-    soh => [ 's', "\001", "\x{2401}" ], # ␁ SYMBOL FOR START OF HEADING
-    stx => [ 's', "\002", "\x{2402}" ], # ␂ SYMBOL FOR START OF TEXT
-    etx => [ 's', "\003", "\x{2403}" ], # ␃ SYMBOL FOR END OF TEXT
-    eot => [ 's', "\004", "\x{2404}" ], # ␄ SYMBOL FOR END OF TRANSMISSION
-    enq => [ 's', "\005", "\x{2405}" ], # ␅ SYMBOL FOR ENQUIRY
-    ack => [ 's', "\006", "\x{2406}" ], # ␆ SYMBOL FOR ACKNOWLEDGE
-    bel => [ 's', "\007", "\x{2407}" ], # ␇ SYMBOL FOR BELL
-    bs  => [ 's', "\010", "\x{2408}" ], # ␈ SYMBOL FOR BACKSPACE
-    ht  => [ 's', "\011", "\x{2409}" ], # ␉ SYMBOL FOR HORIZONTAL TABULATION
-    nl  => [  '', "\012", "\x{240A}" ], # ␊ SYMBOL FOR LINE FEED
-    vt  => [ 's', "\013", "\x{240B}" ], # ␋ SYMBOL FOR VERTICAL TABULATION
-    np  => [ 's', "\014", "\x{240C}" ], # ␌ SYMBOL FOR FORM FEED
-    cr  => [ 's', "\015", "\x{240D}" ], # ␍ SYMBOL FOR CARRIAGE RETURN
-    so  => [ 's', "\016", "\x{240E}" ], # ␎ SYMBOL FOR SHIFT OUT
-    si  => [ 's', "\017", "\x{240F}" ], # ␏ SYMBOL FOR SHIFT IN
-    dle => [ 's', "\020", "\x{2410}" ], # ␐ SYMBOL FOR DATA LINK ESCAPE
-    dc1 => [ 's', "\021", "\x{2411}" ], # ␑ SYMBOL FOR DEVICE CONTROL ONE
-    dc2 => [ 's', "\022", "\x{2412}" ], # ␒ SYMBOL FOR DEVICE CONTROL TWO
-    dc3 => [ 's', "\023", "\x{2413}" ], # ␓ SYMBOL FOR DEVICE CONTROL THREE
-    dc4 => [ 's', "\024", "\x{2414}" ], # ␔ SYMBOL FOR DEVICE CONTROL FOUR
-    nak => [ 's', "\025", "\x{2415}" ], # ␕ SYMBOL FOR NEGATIVE ACKNOWLEDGE
-    syn => [ 's', "\026", "\x{2416}" ], # ␖ SYMBOL FOR SYNCHRONOUS IDLE
-    etb => [ 's', "\027", "\x{2417}" ], # ␗ SYMBOL FOR END OF TRANSMISSION BLOCK
-    can => [ 's', "\030", "\x{2418}" ], # ␘ SYMBOL FOR CANCEL
-    em  => [ 's', "\031", "\x{2419}" ], # ␙ SYMBOL FOR END OF MEDIUM
-    sub => [ 's', "\032", "\x{241A}" ], # ␚ SYMBOL FOR SUBSTITUTE
-    esc => [  '', "\033", "\x{241B}" ], # ␛ SYMBOL FOR ESCAPE
-    fs  => [ 's', "\034", "\x{241C}" ], # ␜ SYMBOL FOR FILE SEPARATOR
-    gs  => [ 's', "\035", "\x{241D}" ], # ␝ SYMBOL FOR GROUP SEPARATOR
-    rs  => [ 's', "\036", "\x{241E}" ], # ␞ SYMBOL FOR RECORD SEPARATOR
-    us  => [ 's', "\037", "\x{241F}" ], # ␟ SYMBOL FOR UNIT SEPARATOR
-    sp  => [ 's', "\040", "\x{2420}" ], # ␠ SYMBOL FOR SPACE
-    del => [ 's', "\177", "\x{2421}" ], # ␡ SYMBOL FOR DELETE
+my %control  = (
+    nul  => [ 's', "\000", "\x{2400}" ], # ␀ SYMBOL FOR NULL
+    soh  => [ 's', "\001", "\x{2401}" ], # ␁ SYMBOL FOR START OF HEADING
+    stx  => [ 's', "\002", "\x{2402}" ], # ␂ SYMBOL FOR START OF TEXT
+    etx  => [ 's', "\003", "\x{2403}" ], # ␃ SYMBOL FOR END OF TEXT
+    eot  => [ 's', "\004", "\x{2404}" ], # ␄ SYMBOL FOR END OF TRANSMISSION
+    enq  => [ 's', "\005", "\x{2405}" ], # ␅ SYMBOL FOR ENQUIRY
+    ack  => [ 's', "\006", "\x{2406}" ], # ␆ SYMBOL FOR ACKNOWLEDGE
+    bel  => [ 's', "\007", "\x{2407}" ], # ␇ SYMBOL FOR BELL
+    bs   => [ 's', "\010", "\x{2408}" ], # ␈ SYMBOL FOR BACKSPACE
+    ht   => [ 's', "\011", "\x{2409}" ], # ␉ SYMBOL FOR HORIZONTAL TABULATION
+    nl   => [  '', "\012", "\x{240A}" ], # ␊ SYMBOL FOR LINE FEED
+    vt   => [ 's', "\013", "\x{240B}" ], # ␋ SYMBOL FOR VERTICAL TABULATION
+    np   => [ 's', "\014", "\x{240C}" ], # ␌ SYMBOL FOR FORM FEED
+    cr   => [ 's', "\015", "\x{240D}" ], # ␍ SYMBOL FOR CARRIAGE RETURN
+    so   => [ 's', "\016", "\x{240E}" ], # ␎ SYMBOL FOR SHIFT OUT
+    si   => [ 's', "\017", "\x{240F}" ], # ␏ SYMBOL FOR SHIFT IN
+    dle  => [ 's', "\020", "\x{2410}" ], # ␐ SYMBOL FOR DATA LINK ESCAPE
+    dc1  => [ 's', "\021", "\x{2411}" ], # ␑ SYMBOL FOR DEVICE CONTROL ONE
+    dc2  => [ 's', "\022", "\x{2412}" ], # ␒ SYMBOL FOR DEVICE CONTROL TWO
+    dc3  => [ 's', "\023", "\x{2413}" ], # ␓ SYMBOL FOR DEVICE CONTROL THREE
+    dc4  => [ 's', "\024", "\x{2414}" ], # ␔ SYMBOL FOR DEVICE CONTROL FOUR
+    nak  => [ 's', "\025", "\x{2415}" ], # ␕ SYMBOL FOR NEGATIVE ACKNOWLEDGE
+    syn  => [ 's', "\026", "\x{2416}" ], # ␖ SYMBOL FOR SYNCHRONOUS IDLE
+    etb  => [ 's', "\027", "\x{2417}" ], # ␗ SYMBOL FOR END OF TRANSMISSION BLOCK
+    can  => [ 's', "\030", "\x{2418}" ], # ␘ SYMBOL FOR CANCEL
+    em   => [ 's', "\031", "\x{2419}" ], # ␙ SYMBOL FOR END OF MEDIUM
+    sub  => [ 's', "\032", "\x{241A}" ], # ␚ SYMBOL FOR SUBSTITUTE
+    esc  => [  '', "\033", "\x{241B}" ], # ␛ SYMBOL FOR ESCAPE
+    fs   => [ 's', "\034", "\x{241C}" ], # ␜ SYMBOL FOR FILE SEPARATOR
+    gs   => [ 's', "\035", "\x{241D}" ], # ␝ SYMBOL FOR GROUP SEPARATOR
+    rs   => [ 's', "\036", "\x{241E}" ], # ␞ SYMBOL FOR RECORD SEPARATOR
+    us   => [ 's', "\037", "\x{241F}" ], # ␟ SYMBOL FOR UNIT SEPARATOR
+    sp   => [ 's', "\040", "\x{2420}" ], # ␠ SYMBOL FOR SPACE
+    del  => [ 's', "\177", "\x{2421}" ], # ␡ SYMBOL FOR DELETE
+    nbsp => [ 's', "\240", "\x{2423}" ], # ␣ OPEN BOX
 );
 
 use List::Util qw(pairmap);
@@ -225,7 +226,7 @@ sub visible {
     my %opt = @_;
     my %flag = pairmap { $a => $b->[0] } %control;
     lock_keys %flag;
-    if (my $all = delete $opt{all}) {
+    if (defined(my $all = delete $opt{all})) {
 	$flag{$_} = $all for keys %flag;
     }
     my($tabstyle, $s_char, $c_char) = ('bar', '', '');
@@ -269,6 +270,13 @@ Name is C<tabstyle>, C<all>, or one of these: [ nul soh stx etx eot
 enq ack bel bs ht nl vt np cr so si dle dc1 dc2 dc3 dc4 nak syn etb
 can em sub esc fs gs rs us sp del ].
 
+     000 nul  001 soh  002 stx  003 etx  004 eot  005 enq  006 ack  007 bel
+     010 bs   011 ht   012 nl   013 vt   014 np   015 cr   016 so   017 si
+     020 dle  021 dc1  022 dc2  023 dc3  024 dc4  025 nak  026 syn  027 etb
+     030 can  031 em   032 sub  033 esc  034 fs   035 gs   036 rs   037 us
+     040 sp
+     240 nbsp
+
 If the name is C<all>, the value is set for all characters.
 Default is equivalent to:
 
@@ -302,8 +310,8 @@ Reverse output.
 
 sub rev_char {
     while (<>) {
-	print reverse /./g;
-	print "\n" if /\n\z/;
+	my $lb = s/(\R)\z// ? $1 : '';
+	print reverse(/\X/g), $lb;
     }
 }
 

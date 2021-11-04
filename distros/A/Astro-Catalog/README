@@ -46,7 +46,7 @@ NB: Astro::Catalog::Star is maintained for backwards compatibility.
 
 The following classes can be used to query various online databases
 for astronomical objects. They all return an Astro::Catalog object
-populated with matching Astro::Catalog::Star objects.
+populated with matching Astro::Catalog::Item objects.
 
   Astro::Catalog::Query::2MASS
     Queries the Two Micron All Sky Survey (2MASS) catalogue.

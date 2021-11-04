@@ -14,19 +14,15 @@ use lib 't/lib';
 use MyTest::Helper qw( dies is_approx );
 
 subtest 'chebpoly.' => sub {
-    is_approx(
-        chebpoly( 3, pdl( [ 0.5, 1, 1.2 ] ) ),
+    is_approx chebpoly( 3, pdl( [ 0.5, 1, 1.2 ] ) ),
         [ -1, 1, 3.312 ],
-        'chebpoly takes piddle'
-    );
+        'chebpoly takes piddle';
 
-    is_approx(
-        chebpoly( 3, [ 0.5, 1, 1.2 ] ),
+    is_approx chebpoly( 3, [ 0.5, 1, 1.2 ] ),
         [ -1, 1, 3.312 ],
-        'chebpoly takes arrayref',
-    );
+        'chebpoly takes arrayref';
 
-    is chebpoly( 3, 1.2 ), 3.312, 'chebpoly takes plain scalar';
+    is_approx chebpoly( 3, 1.2 ), 3.312, 'chebpoly takes plain scalar';
 };
 
 
@@ -47,11 +43,9 @@ subtest 'relation between periodic and symmetric.' => sub {
         my @cos  = map 0 + $_, cos_pow_to_mult( @{$in} );
         my @mult = map 0 + $_, cos_mult_to_pow( @cos );
 
-        is_deeply \@cos, $want, '[ ' . join( ' ', @{$in} ) . ' ]'
-            or diag '[ ' . join( ' ', @cos ) . ' ]';
+        is_deeply \@cos, $want, "[ @$in ]" or diag "[ @cos ]";
 
-        is_deeply \@mult, $in, 'Roundtrip: [ ' . join( ' ', @{$in} ) . ' ]'
-            or diag '[ ' . join( ' ', @mult ) . ' ]';
+        is_deeply \@mult, $in, "Roundtrip: [ @$in ]" or diag "[ @mult ]";
     }
 
     dies { cos_pow_to_mult( 0 .. 7 ) } qr/number of args not less than 8/,

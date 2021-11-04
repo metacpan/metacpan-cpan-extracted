@@ -1,0 +1,17 @@
+[Unit]
+Description=MToken server
+After=network.target network-online.target remote-fs.target
+Documentation=man:mtoken(1)
+
+[Service]
+Type=forking
+PIDFile=/var/run/mtoken/mtoken.pid
+EnvironmentFile=/etc/sysconfig/mtoken
+
+ExecStart=/usr/bin/mtoken $MTOKEN_OPTS server start
+ExecReload=/usr/bin/mtoken $MTOKEN_OPTS server reload
+ExecStop=/usr/bin/mtoken $MTOKEN_OPTS server stop
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -141,6 +141,12 @@ When you call a proxy connector without sufficient arguments to perform the
 query, you will receive a value of _connector_ for type. Running a get\_\*
 method against such a node will cause the connector to die!
 
+## cleanup
+
+Advise connectors to close, release or flush any open handle or sessions.
+Should be called directly before the program terminates. Connectors might
+be stale and not respond any longer after this was called.
+
 # IMPLEMENTATION GUIDELINES
 
 You SHOULD use the \_node\_not\_exists method if the requested path does not exist
@@ -177,6 +183,13 @@ You MUST also implement the get\_meta method. If you have a connector with a
 fixed type, you MAY check if the particular path exists and return
 the result of _\_node\_not\_exists_.
 
+## cleanup
+
+Connectors that keep locks or use long-lived sessions that are not
+bound to the lifetime of the perl process should implement this method
+and cleanup their mess. While it would be nice, that connectors can be
+revived after cleanup was called, this is not a strict requirement.
+
 # AUTHORS
 
 Scott Hardin <mrscotty@cpan.org>
@@ -187,6 +200,6 @@ Oliver Welter
 
 # COPYRIGHT
 
-Copyright 2013 OpenXPKI Foundation
+Copyright 2013/2021 White Rabbit Security Gmbh
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

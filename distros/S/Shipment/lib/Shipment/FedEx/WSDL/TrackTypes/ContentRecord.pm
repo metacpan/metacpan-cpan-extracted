@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::ContentRecord;
-$Shipment::FedEx::WSDL::TrackTypes::ContentRecord::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::ContentRecord::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,15 +33,15 @@ Class::Std::initialize();
               ReceivedQuantity
               Description
 
-              )
+            )
         ],
         {   'PartNumber'       => \%PartNumber_of,
             'ItemNumber'       => \%ItemNumber_of,
             'ReceivedQuantity' => \%ReceivedQuantity_of,
             'Description'      => \%Description_of,
         },
-        {   'PartNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ItemNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'PartNumber'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ItemNumber'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'ReceivedQuantity' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
@@ -72,7 +72,7 @@ Shipment::FedEx::WSDL::TrackTypes::ContentRecord
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

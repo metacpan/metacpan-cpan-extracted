@@ -15,7 +15,7 @@ use integer;
 use Test::More;
 use Data::Dumper;
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 
 my ($pos, $move, $undo_info, $before);
 
@@ -60,7 +60,7 @@ $pos = Chess::Plisco->new('rnbqkbnr/ppp1pppp/3p4/8/7P/7R/PPPPPPP1/RNBQKBN1 b kq 
 $before = $pos->copy;
 $move = $pos->parseMove('c8h3');
 ok $move, 'parse c8h3';
-is(cp_move_piece($move), CP_BISHOP);
+is((($move >> 15) & 0x7), CP_BISHOP);
 $undo_info = $pos->doMove($move);
 ok $undo_info;
 ok $pos->undoMove($undo_info);

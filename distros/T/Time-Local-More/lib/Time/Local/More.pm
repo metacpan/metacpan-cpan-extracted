@@ -3,7 +3,7 @@ package Time::Local::More;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-06-17'; # DATE
 our $DIST = 'Time-Local-More'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -498,7 +498,7 @@ Time::Local::More - More functions for producing Unix epoch timestamp or localti
 
 =head1 VERSION
 
-This document describes version 0.001 of Time::Local::More (from Perl distribution Time-Local-More), released on 2021-06-17.
+This document describes version 0.002 of Time::Local::More (from Perl distribution Time-Local-More), released on 2021-06-17.
 
 =head1 SYNOPSIS
 
@@ -987,7 +987,12 @@ feature.
 
 L<Time::Local>
 
-C<localtime()> and C<gmtime()> in L<perlfunc>
+C<localtime()> and C<gmtime()> in L<perlfunc>.
+
+You can also use L<DateTime> to calculate these "start of period" epochs. For
+example, to get start of month epoch: C<< DateTime->now->set(day => 1)->epoch
+>>. Note that L<DateTime> has a significantly larger footprint than
+L<Time::Local>.
 
 =head1 AUTHOR
 

@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+devdata/Menlo-CLI-Compat.v1.9022.pm.txt
 dist.ini
 lib/App/ShellCompleter/cpanm.pm
 script/_cpanm

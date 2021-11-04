@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ArrayOfDocumentDetail;
-$Shipment::Purolator::WSDLV2::Types::ArrayOfDocumentDetail::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::ArrayOfDocumentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        DocumentDetail
 
-              )
+            )
         ],
         {'DocumentDetail' => \%DocumentDetail_of,},
         {   'DocumentDetail' =>
@@ -56,7 +56,7 @@ Shipment::Purolator::WSDLV2::Types::ArrayOfDocumentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

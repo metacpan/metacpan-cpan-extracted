@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionDetail;
-$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               EMailDetail
               PrintDetail
 
-              )
+            )
         ],
         {   'DispositionType' => \%DispositionType_of,
             'Grouping'        => \%Grouping_of,
@@ -75,7 +75,7 @@ Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

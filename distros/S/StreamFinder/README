@@ -125,10 +125,11 @@ DESCRIPTION
     your needs.
 
     The currently-supported websites are: podcasts.apple.com
-    (StreamFinder::Apple), bitchute.com (StreamFinder::Bitchute, blogger.com
-    (StreamFinder::Blogger), brighteon.com (StreamFinder::Brighteon),
-    castbox.fm (StreamFinder::Castbox), podcasts.google.com
-    (StreamFinder::Google), iheartradio.com (StreamFinder::IHeartRadio),
+    (StreamFinder::Apple), bitchute.com (StreamFinder::Bitchute),
+    blogger.com (StreamFinder::Blogger), brighteon.com
+    (StreamFinder::Brighteon), castbox.fm (StreamFinder::Castbox),
+    podcasts.google.com (StreamFinder::Google), iheartradio.com
+    (StreamFinder::IHeartRadio), odysee.com (StreamFinder::Odysee),
     radio.net (StreamFinder::RadioNet), rumble.com (StreamFinder::Rumble),
     sermonaudio.com (StreamFinder::SermonAudio), spreaker.com podcasts
     (StreamFinder::Spreaker), tunein.com (StreamFinder::Tunein), vimeo.com
@@ -140,7 +141,7 @@ DESCRIPTION
     NOTE: StreamFinder::Reciva has been removed, as that site has now closed
     down.
 
-    NOTE: For some sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox,
+    NOTE: For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox,
     Google, etc. the "station" object actually refers to a specific video or
     podcast, but functions the same way.
 
@@ -210,7 +211,12 @@ SUBROUTINES/METHODS
         fallback "Anystream" module, specify: *-omit* =>
         *"Youtube,Anystream"*, which will cause StreamFinder::Anystream and
         StreamFinder::Youtube to not be used for the stream search. Default
-        is for all installed submodules to be considered.
+        is for all installed submodules to be considered. NOTE: Omitting a
+        module from being considered when seeking to match the correct
+        module by site URL, this does NOT prevent that module from being
+        invoked by a selected module for an embedded link, OR in the case of
+        StreamFinder::Youtube being omitted, will still be invoked, if
+        required or needed by a non-omitted module initially selected!
 
         Another global option (applicable to all submodules) is the
         *-secure* option who's argument can be either 0 or 1 (*false* or
@@ -319,14 +325,23 @@ SUBROUTINES/METHODS
     $station->getType()
         Returns the station / podcast / video's type (*submodule-name*).
         (one of: "Anystream", "Apple", "BitChute", "Blogger", "Brighteon",
-        "Castbox", "Google", "IHeartRadio", "RadioNet", "Rumble",
+        "Castbox", "Google", "IHeartRadio", "Odysee", "RadioNet", "Rumble",
         "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" -
         depending on the sight that matched the URL).
 
 CONFIGURATION FILES
+    The default root location directory for StreamFinder configuration files
+    is "~/.config/StreamFinder". To use an alternate location directory,
+    specify it in the "*STREAMFINDER*" environment variable, ie.:
+    $ENV{STREAMFINDER} = "/etc/StreamFinder".
+
     ~/.config/StreamFinder/config
         Optional text file for specifying various configuration options.
         Each option is specified on a separate line in the formats below:
+        NOTE: Do not follow the lines with a semicolon, comma, or any other
+        separator. Non-numeric *values* should be surrounded with quotes,
+        either single or double. Blank lines and lines beginning with a "#"
+        sign as their first non-blank character are ignored as comments.
 
         'option' => 'value' [, ...]
 
@@ -336,8 +351,7 @@ CONFIGURATION FILES
 
         and the options are loaded into a hash used by all sites
         (submodules) that support them. Valid options include *-debug* =>
-        [0|1|2], and most of the LWP::UserAgent options. Blank lines and
-        lines starting with a "#" sign are ignored.
+        [0|1|2] and most of the LWP::UserAgent options.
 
     ~/.config/StreamFinder/*submodule*/config
         Optional text file for specifying various configuration options for
@@ -352,21 +366,23 @@ CONFIGURATION FILES
         'option' => {'key1' => 'value1', 'key2' => 'value2', ...} [, ...]
 
         and the options are loaded into a hash used only by the specific
-        (submodule) specified. Valid options include *-debug* => [0|1|2],
-        and most of the LWP::UserAgent options. Blank lines and lines
-        starting with a "#" sign are ignored.
+        (submodule) specified. Valid options include *-debug* => [0|1|2] and
+        most of the LWP::UserAgent options.
 
         NOTE: Options specified here override any specified in
         *~/.config/StreamFinder/config*.
 
-    NOTE: Options specified in the options parameter list will override any
-    corresponding options specified in either of these files.
+    NOTE: Options specified in the options parameter list of the *new()*
+    function will override those corresponding options specified in these
+    files.
 
 DEPENDENCIES
     URI::Escape, HTML::Entities, LWP::UserAgent
 
 RECCOMENDS
-    youtube-dl (for Youtube, Brighteon, Tunein, Vimeo)
+    youtube-dl, or other compatable program such as yt-dlp, etc. (for
+    Youtube, Bitchute, Blogger, Brighteon, Odysee, Tunein, Vimeo) NOTE:
+    Required for Youtube, Odysee, and Tunein (except for podcasts).
 
     wget
 

@@ -1,5 +1,5 @@
 package App::gimpgitbuild::API::Worker;
-$App::gimpgitbuild::API::Worker::VERSION = '0.30.0';
+$App::gimpgitbuild::API::Worker::VERSION = '0.30.2';
 use strict;
 use warnings;
 use 5.014;
@@ -71,6 +71,7 @@ sub _git_build
     my $extra_configure_args = ( $args->{extra_configure_args} // [] );
     my $extra_meson_args     = ( $args->{extra_meson_args}     // [] );
     my $SHELL_PREFIX         = "set -e -x";
+    my $install_before_test  = ( $args->{install_before_test} // '' );
 
     if ( defined($skip_builds_re) and $id =~ $skip_builds_re )
     {
@@ -136,6 +137,13 @@ sub _git_build
         return;
     }
 
+    my $test_install_order = sub {
+        my ( $test_cmd, $install_cmd ) = @_;
+        return $install_before_test
+            ? [ @$install_cmd, @$test_cmd ]
+            : [ @$test_cmd, @$install_cmd ];
+    };
+
     my $gen_meson_build_cmds = sub {
         return [
             $shell_cmd->(qq#mkdir -p "$BUILD_DIR"#),
@@ -144,8 +152,12 @@ sub _git_build
 qq#meson --prefix="$prefix" $UBUNTU_MESON_LIBDIR_OVERRIDE @{$extra_meson_args} ..#
             ),
             $shell_cmd->(qq#ninja $PAR_JOBS#),
-            $shell_cmd->(qq#ninja $PAR_JOBS test#),
-            $shell_cmd->(qq#ninja $PAR_JOBS install#),
+            @{
+                $test_install_order->(
+                    [ $shell_cmd->(qq#ninja $PAR_JOBS test#), ],
+                    [ $shell_cmd->(qq#ninja $PAR_JOBS install#), ]
+                )
+            },
         ];
     };
     my $gen_autoconf_build_cmds = sub {
@@ -156,8 +168,12 @@ qq#meson --prefix="$prefix" $UBUNTU_MESON_LIBDIR_OVERRIDE @{$extra_meson_args} .
             $shell_cmd->(
                 qq#../configure @{$extra_configure_args} --prefix="$prefix"#),
             $shell_cmd->(qq#make $PAR_JOBS#),
-            $shell_cmd->(qq#@{[_check()]}#),
-            $shell_cmd->(qq#make install#),
+            @{
+                $test_install_order->(
+                    [ $shell_cmd->(qq#@{[_check()]}#), ],
+                    [ $shell_cmd->(qq#make install#), ]
+                )
+            },
         ];
     };
     my $gen_clean_mode_cmds =
@@ -294,6 +310,7 @@ sub _run_all
             extra_configure_args => [ qw# --enable-debug --with-lua=no #, ],
             extra_meson_args     => [ qw# -Dlua=false #, ],
             git_checkout_subdir  => "git/gimp",
+            install_before_test  => 1,
             url                  => $worker->_get_gnome_git_url("gimp"),
             prefix               => $obj->gimp_p,
             use_meson            => $BUILD_GIMP_USING_MESON,
@@ -349,7 +366,7 @@ App::gimpgitbuild::API::Worker - common API
 
 =head1 VERSION
 
-version 0.30.0
+version 0.30.2
 
 =head1 METHODS
 

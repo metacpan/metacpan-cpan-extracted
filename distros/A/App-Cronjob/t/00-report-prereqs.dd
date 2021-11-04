@@ -1,10 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
-                                      },
-                        'suggests' => {
-                                        'JSON::PP' => '2.27300'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
@@ -29,6 +26,7 @@ do { my $x = {
                                       'Sys::Hostname::Long' => '0',
                                       'Text::Template' => '0',
                                       'Time::HiRes' => '0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

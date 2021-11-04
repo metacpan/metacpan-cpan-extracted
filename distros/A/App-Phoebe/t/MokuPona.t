@@ -19,7 +19,7 @@ use File::Slurper qw(read_text write_text);
 
 my $msg;
 if (not $ENV{TEST_AUTHOR}) {
-  $msg = 'Contributions are an author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+  $msg = 'This is an author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
 }
 plan skip_all => $msg if $msg;
 our $dir;

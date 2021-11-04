@@ -1,5 +1,10 @@
 Revision history for Perl module GnuCash::SQLite.
 
+0.09 10 Oct 2021
+    - Fix incorrect account balance when accounts have foreign currency
+      transactions
+    - Add tests and sample DB for foreign currency transactions
+
 0.08 10 Apr 2020
     - Updated dependency DBD::SQLite to minimum 1.42 to prevent failing
       tests

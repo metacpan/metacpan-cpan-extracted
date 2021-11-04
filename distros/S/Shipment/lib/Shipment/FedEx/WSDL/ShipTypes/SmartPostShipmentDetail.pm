@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               HubId
               CustomerManifestId
 
-              )
+            )
         ],
         {   'Indicia'              => \%Indicia_of,
             'AncillaryEndorsement' => \%AncillaryEndorsement_of,
@@ -74,7 +74,7 @@ Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

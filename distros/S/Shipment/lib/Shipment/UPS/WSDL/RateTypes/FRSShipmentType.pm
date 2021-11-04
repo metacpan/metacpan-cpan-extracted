@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::FRSShipmentType;
-$Shipment::UPS::WSDL::RateTypes::FRSShipmentType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::FRSShipmentType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        TransportationCharges
 
-              )
+            )
         ],
         {'TransportationCharges' => \%TransportationCharges_of,},
         {   'TransportationCharges' =>
@@ -56,7 +56,7 @@ Shipment::UPS::WSDL::RateTypes::FRSShipmentType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

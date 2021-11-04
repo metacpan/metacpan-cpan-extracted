@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ValidateShipmentRequestContainer;
-$Shipment::Purolator::WSDL::Types::ValidateShipmentRequestContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ValidateShipmentRequestContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        Shipment
 
-              )
+            )
         ],
         {'Shipment' => \%Shipment_of,},
         {'Shipment' => 'Shipment::Purolator::WSDL::Types::Shipment',},
@@ -58,7 +58,7 @@ Shipment::Purolator::WSDL::Types::ValidateShipmentRequestContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

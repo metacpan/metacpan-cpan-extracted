@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::GetFullEstimateRequestContainer;
-$Shipment::Purolator::WSDLV2::Types::GetFullEstimateRequestContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::GetFullEstimateRequestContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -34,9 +34,9 @@ Class::Std::initialize();
         [   qw(        Shipment
               ShowAlternativeServicesIndicator
 
-              )
+            )
         ],
-        {   'Shipment' => \%Shipment_of,
+        {   'Shipment'                         => \%Shipment_of,
             'ShowAlternativeServicesIndicator' =>
               \%ShowAlternativeServicesIndicator_of,
         },
@@ -46,7 +46,7 @@ Class::Std::initialize();
         },
         {
 
-            'Shipment' => 'Shipment',
+            'Shipment'                         => 'Shipment',
             'ShowAlternativeServicesIndicator' =>
               'ShowAlternativeServicesIndicator',
         }
@@ -69,7 +69,7 @@ Shipment::Purolator::WSDLV2::Types::GetFullEstimateRequestContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

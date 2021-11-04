@@ -144,7 +144,7 @@ closely tracked.
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by José Joaquín Atria.
+This software is copyright (c) 2018-2021 by José Joaquín Atria.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

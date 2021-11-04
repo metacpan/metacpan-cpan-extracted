@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfOptionPrice;
-$Shipment::Purolator::WSDL::Types::ArrayOfOptionPrice::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ArrayOfOptionPrice::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        OptionPrice
 
-              )
+            )
         ],
         {'OptionPrice' => \%OptionPrice_of,},
         {'OptionPrice' => 'Shipment::Purolator::WSDL::Types::OptionPrice',},
@@ -54,7 +54,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfOptionPrice
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

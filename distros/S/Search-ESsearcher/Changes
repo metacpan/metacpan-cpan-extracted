@@ -1,5 +1,14 @@
 Revision history for Search-ESsearcher
 
+0.4.3	 2021-11-04/04:00
+		 -Remove mutate from geoip on fail2ban.
+		  This removes the need for mappings in Elasticsearch.
+		 -Add back in GeoIP for Postfix.
+
+0.4.2	 2021-10-21/23:15
+		 - Include logstash examples.
+		 - Update Postfix logstash bits.
+
 0.4.1	 2019-12-08/04:05
 		 - Remove accidentally included emacs save.
 		 - Correct datestamp on previous change log entry.

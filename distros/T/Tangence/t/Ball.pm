@@ -1,16 +1,15 @@
 package t::Ball;
 
-use v5.14;
+use v5.26;
+use warnings;
+use experimental 'signatures';
 
 use base qw( Tangence::Object t::Colourable );
 
 use Tangence::Constants;
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
    my $self = $class->SUPER::new( %args );
 
    $self->set_prop_colour( $args{colour} ) if defined $args{colour};
@@ -27,10 +26,8 @@ sub describe
 
 our $last_bounce_ctx;
 
-sub method_bounce
+sub method_bounce ( $self, $ctx, $howhigh )
 {
-   my $self = shift;
-   my ( $ctx, $howhigh ) = @_;
    $last_bounce_ctx = $ctx;
    $self->fire_event( "bounced", $howhigh );
    return "bouncing";

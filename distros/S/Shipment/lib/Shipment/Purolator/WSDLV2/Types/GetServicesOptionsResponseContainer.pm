@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::GetServicesOptionsResponseContainer;
-$Shipment::Purolator::WSDLV2::Types::GetServicesOptionsResponseContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::GetServicesOptionsResponseContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
         [   qw(        ResponseInformation
               Services
 
-              )
+            )
         ],
         {   'ResponseInformation' => \%ResponseInformation_of,
             'Services'            => \%Services_of,
@@ -66,7 +66,7 @@ Shipment::Purolator::WSDLV2::Types::GetServicesOptionsResponseContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -9,22 +9,22 @@ require 'testrail-replay';
 use Test::More 'tests' => 6;
 use Capture::Tiny qw{capture_merged};
 use Test::Fatal;
-use Test::MockModule qw{strict};
+use Test::MockModule;
 
 my $utilmock = Test::MockModule->new('TestRail::Utils');
-$utilmock->redefine('getHandle', sub { bless({},"TestRail::API") } );
-$utilmock->redefine('parseConfig', sub { {} });
-$utilmock->redefine('interrogateUser', sub {} );
+$utilmock->mock('getHandle', sub { bless({},"TestRail::API") } );
+$utilmock->mock('parseConfig', sub { {} });
+$utilmock->mock('interrogateUser', sub {} );
 
 my $apimock = Test::MockModule->new('TestRail::API');
-$apimock->redefine('new', sub{ return bless({},shift) });
-$apimock->redefine('getProjectByName', sub { { id => 666 } });
-$apimock->redefine('getRunByName', sub { { id => 333 } });
-$apimock->redefine('getPlanByName', sub { { id => 222, config => 'BogusConfig' } } );
-$apimock->redefine('getChildRuns', sub { { [{ id => 111 }] } });
-$apimock->redefine('statusNamesToIds', sub { shift; shift eq 'failed' ? [5] : [4] });
+$apimock->mock('new', sub{ return bless({},shift) });
+$apimock->mock('getProjectByName', sub { { id => 666 } });
+$apimock->mock('getRunByName', sub { { id => 333 } });
+$apimock->mock('getPlanByName', sub { { id => 222, config => 'BogusConfig' } } );
+$apimock->mock('getChildRuns', sub { { [{ id => 111 }] } });
+$apimock->mock('statusNamesToIds', sub { shift; shift eq 'failed' ? [5] : [4] });
 
-$apimock->redefine('getTests', sub {
+$apimock->mock('getTests', sub {
     my ($self,$run_id) = @_;
     return [
         {
@@ -35,7 +35,7 @@ $apimock->redefine('getTests', sub {
     ];
 });
 
-$apimock->redefine('getTestResults', sub {
+$apimock->mock('getTestResults', sub {
     return [
         {
             'elapsed' => '1s',
@@ -67,7 +67,7 @@ subtest "Happy path - plan mode" => sub {
     is($code,0,"OK Exit code");
 };
 
-$apimock->redefine('getTestResults', sub {
+$apimock->mock('getTestResults', sub {
     return [
         {
             'elapsed' => '1s',

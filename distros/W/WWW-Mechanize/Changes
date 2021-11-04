@@ -1,5 +1,9 @@
 Revision history for WWW::Mechanize
 
+2.06      2021-10-25 20:56:12Z
+    [DOCUMENTATION]
+    - Document methods that don't work with :content_file (GH#219) (Julien Fiegehenn)
+
 2.05      2021-09-21 14:06:00Z
     - Update docs for protocols_allowed and protocols_forbidden (GH#323) (Olaf
       Alders)
@@ -10,6 +14,7 @@ Revision history for WWW::Mechanize
 
     [DOCUMENTATION]
     - Document that form_id() accepts an id, not a name (GH#319) (Olaf Alders)
+    - Clarify documentation (GH#320) (Julien Fiegehenn)
 
 2.03      2020-11-10 14:47:04Z
     [FIXED]
@@ -106,8 +111,8 @@ Revision history for WWW::Mechanize
     - Fixed pod error as reported by CPANTS. (GH#264) (Mohammad S Anwar)
 
     [ENHANCEMENTS]
-    - Upgrade to HTML::TreeBuilder version 5 to get support for weak references in
-      HTML::Element (GH#251) (Julien Fiegehenn)
+    - Upgrade to HTML::TreeBuilder version 5 to get support for weak references
+      in HTML::Element (GH#251) (GH#262) (Julien Fiegehenn)
 
 1.89      2018-10-18 19:13:34Z
     [ENHANCEMENTS]

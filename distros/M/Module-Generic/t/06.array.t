@@ -1,13 +1,13 @@
 #!/usr/bin/perl
-
-# t/05.scalar.t - check scalar manipulation object
-
-use Test::More qw( no_plan );
-use strict;
-use warnings;
-use lib './lib';
-use JSON;
-use Nice::Try;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More qw( no_plan );
+    use JSON;
+    use Nice::Try;
+};
 
 BEGIN { use_ok( 'Module::Generic::Array' ) || BAIL_OUT( "Unable to load Module::Generic::Array" ); }
 # use warnings 'Module::Generic::Array';
@@ -179,6 +179,13 @@ $splice_ret = $a_splice->splice( 7 )->clone;
 isa_ok( $splice_ret, 'Module::Generic::Array', 'splice in object context' );
 is( "@$splice_ret", 'I will defend to the death your right to say it', 'splice returned value in object context' );
 
+my $ar_split = Module::Generic::Array->new->split( qr/[[:blank:]\h]+/, "I disapprove of what you say, but I will defend to the death your right to say it" );
+isa_ok( $ar_split, 'Module::Generic::Array', 'split returns an Module::Generic::Array' );
+is( $ar_split->length, 18, 'split array size' ); # 18
+# or in list context and using the method as a class method
+my @split_words = Module::Generic::Array->split( qr/[[:blank:]\h]+/, "I disapprove of what you say, but I will defend to the death your right to say it" );
+is( scalar( @split_words ), 18, 'split array size in list context' ); # 18
+
 is( $a2->clone->undef->length, 0, 'undef' );
 is( $a2->values->as_string, 'This should have been set', 'values' );
 
@@ -327,5 +334,52 @@ catch( $e )
     # diag( "Error encoding: $e" );
     fail( 'TO_JSON' );
 }
+
+my $cardinals = [qw( first second third fourth fifth sixth seventh eighth ninth tenth )];
+for( 0..$#$cardinals )
+{
+    my $method = $cardinals->[ $_ ];
+    is( $a13->$method, ($_ + 1), $cardinals->[$_] );
+}
+
+my $val = $a14->get_null(1);
+is( $val, 'John', 'get_null(1) in scalar context' );
+$val = $a14->get_null(1)->length;
+is( $val, 4, 'get_null(1) in object context' );
+$val = $a14->get_null(4);
+# isa_ok( $val, 'Module::Generic::Null', 'get_null(4) out of bound returns Module::Generic::Null' );
+ok( !defined( $val ), 'get_null(4) out of bound returns undef' );
+$val = $a14->get_null(4)->dummy;
+ok( !defined( $val ), 'get_null(4)->dummy (using Module::Generic::Null) out of bound returns undef' );
+
+my $a = Module::Generic::Array->new( 30..39 );
+is( $a->length, 10, 'array allocation for pack' );
+my $s = $a->pack( 'H2' x 10 );
+isa_ok( $s, 'Module::Generic::Scalar', 'pack returns a Module::Generic::Scalar object' );
+is( $s->scalar, '0123456789', 'pack' );
+
+my $intersec1 = [qw( Jack John Paul Peter )];
+my $intersec2 = [qw( Emmanuel Gabriel Raphael Peter Michel )];
+my $intersec = Module::Generic::Array->new( $intersec1 )->intersection( $intersec2 );
+isa_ok( $intersec, 'Module::Generic::Array', 'intersection returns an Module::Generic::Array object' );
+is_deeply( $intersec, [qw( Peter )], 'intersection' );
+is( $intersec->length, 1, 'intersection size' );
+is( $intersec->first, 'Peter', 'intersection value' );
+$intersec = Module::Generic::Array->new( $intersec1 )->intersection( Module::Generic::Array->new( $intersec2 ) );
+is_deeply( $intersec, [qw( Peter )], 'intersection using array objects' );
+
+my $values = Module::Generic::Array->new( [qw( 9 5 12 3 7 )] );
+my $max = $values->max;
+isa_ok( $max, 'Module::Generic::Scalar', 'max return a Module::Generic::Scalar object' );
+is( "$max", 12, 'max' );
+
+my $max_list = Module::Generic::Array->new;
+# $max is undef
+my $max_val  = $max_list->max;
+# returns false
+ok( !$max_val->defined, 'max on empty list returns undef as an object' );
+
+my $min = $values->min;
+is( "$min", 3, 'min' );
 
 done_testing();

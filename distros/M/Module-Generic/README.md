@@ -25,6 +25,8 @@ SYNOPSIS
         sub address { return( shift->_set_get_object( 'address', 'My::Address', @_ ) ); }
         sub age { return( shift->_set_get_number( 'age', @_ ) ); }
         sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
+        sub uuid { return( shift->_set_get_uuid( 'uuid', @_ ) ); }
+        sub remote_addr { return( shift->_set_get_ip( 'remote_addr', @_ ) ); }
         sub discount
         {
             return( shift->_set_get_class_array( 'discount',
@@ -57,7 +59,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.15.8
+        v0.15.9
 
 DESCRIPTION
 ===========
@@ -1068,6 +1070,28 @@ purpose is for this method to be potentially superseded in your own
 module. In your own module, you would call
 [\"\_\_instantiate\_object\"](#instantiate_object){.perl-module}
 
+\_can
+-----
+
+Provided with a value and a method name, and this will return true if
+the value provided is an object that [\"can\" in
+UNIVERSAL](https://metacpan.org/pod/UNIVERSAL#can){.perl-module} perform
+the method specified, or false otherwise.
+
+This makes it more convenient to write:
+
+        if( $self->_can( $obj, 'some_method' ) )
+        {
+            # ...
+        }
+
+than to write:
+
+        if( Scalar::Util::bless( $obj ) && $obj->can( 'some_method' )
+        {
+            # ...
+        }
+
 \_get\_args\_as\_array
 ----------------------
 
@@ -1200,6 +1224,20 @@ It would rather return the module package name: `My::Module`
 Same as [\"\_is\_array\"](#is_array){.perl-module}, but for hash
 reference.
 
+\_is\_ip
+--------
+
+Returns true if the given IP has a syntax compliant with IPv4 or IPv6
+including CIDR notation or not, false otherwise.
+
+For this method to work, you need to have installed
+[Regexp::Common::net](https://metacpan.org/pod/Regexp::Common::net){.perl-module}
+
+\_is\_number
+------------
+
+Returns true if the provided value looks like a number, false otherwise.
+
 \_is\_object
 ------------
 
@@ -1213,6 +1251,17 @@ to achieve that purpose.
 
 Provided with some data, this checks if the data is of type scalar
 reference, e.g. `SCALAR(0x7fc0d3b7cea0)`, even if it is an object.
+
+\_is\_uuid
+----------
+
+Provided with a non-zero length value and this will check if it looks
+like a valid `UUID`, i.e. a unique universal ID, and upon successful
+validation will set the value and return its representation as a
+[Module::Generic::Scalar](https://metacpan.org/pod/Module::Generic::Scalar){.perl-module}
+object.
+
+An empty string or `undef` can be provided and will not be checked.
 
 \_load\_class
 -------------
@@ -1598,6 +1647,22 @@ Then populating the data :
 
         printf( "Customer name is %s\n", $object->metadata->last_name );
 
+\_set\_get\_ip
+--------------
+
+This helper method takes a value and check if it is a valid IP address
+using [\"\_is\_ip\"](#is_ip){.perl-module}. If `undef` or zero-byte
+value is provided, it will merely accept it, as it can be used to reset
+the value by the caller.
+
+If a value is successfully set, it returns a
+[Module::Generic::Scalar](https://metacpan.org/pod/Module::Generic::Scalar){.perl-module}
+object representing the string passed.
+
+From there you can pass the result to
+[Net::IP](https://metacpan.org/pod/Net::IP){.perl-module} in your own
+code, assuming you have that module installed.
+
 \_set\_get\_lvalue
 ------------------
 
@@ -1793,6 +1858,21 @@ undef, thus it cannot be chained. Maybe it should return a
 [Module::Generic::Null](https://metacpan.org/pod/Module::Generic::Null){.perl-module}
 object ?
 
+\_set\_get\_uuid
+----------------
+
+Provided with an object property name, and an UUID (Universal Unique
+Identifier) and this stores it as an object of
+[Module::Generic::Scalar](https://metacpan.org/pod/Module::Generic::Scalar){.perl-module}.
+
+If an empty or undefined value is provided, it will be stored as is.
+
+However, if there is no value and this method is called in object
+context, such as in chaining, this will return a special
+[Module::Generic::Null](https://metacpan.org/pod/Module::Generic::Null){.perl-module}
+object that prevents perl error that whatever method follows was called
+on an undefined value.
+
 \_to\_array\_object
 -------------------
 
@@ -1858,7 +1938,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5640c90ecf38)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x563220691c88)"}\>
 
 COPYRIGHT & LICENSE
 ===================

@@ -84,8 +84,6 @@ extra setup: correctly configuring your AWS environment AND your MySQL Client.
 
 =head1 SEE ALSO
 
-L<https://www.capside.com/es/labs/rds-aurora-database-with-iam-authentication/>
-
 L<https://github.com/pplu/perl-rds-iam-authentication>
 
 =head1 BUGS and SOURCE
@@ -97,12 +95,11 @@ Please report bugs to: L<https://github.com/pplu/AWSv4Signer/issues>
 =head1 AUTHOR
 
     Jose Luis Martinez
-    CAPSiDE
-    jlmartinez@capside.com
+    pplusdomain@gmail.com
 
 =head1 COPYRIGHT and LICENSE
 
-Copyright (c) 2018 by CAPSiDE
+Copyright (c) 2018 by Jose Luis Martinez
 
 This code is distributed under the Apache 2 License. The full text of the license can be found in the LICENSE file included with this module.
 

@@ -1,5 +1,5 @@
 package Selenium::Remote::Finders;
-$Selenium::Remote::Finders::VERSION = '1.44';
+$Selenium::Remote::Finders::VERSION = '1.45';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Selenium::Remote::Finders - Handle construction of generic parameter finders
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 DESCRIPTION
 

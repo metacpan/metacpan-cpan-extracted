@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-RcloneUtils",
   "EXE_FILES" => [
+    "script/list-rclone-remotes",
     "script/parse-rclone-config"
   ],
   "LICENSE" => "perl",
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.827",
-    "Rclone::Util" => 0,
+    "Rclone::Util" => "0.002",
     "Sah::Schema::dirname" => 0,
     "Sah::Schema::filename" => 0,
     "strict" => 0,
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,7 +56,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
-  "Rclone::Util" => 0,
+  "Rclone::Util" => "0.002",
   "Sah::Schema::dirname" => 0,
   "Sah::Schema::filename" => 0,
   "Test::More" => 0,

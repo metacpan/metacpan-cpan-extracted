@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst::View::MojoTemplate.
 
+0.004 - 2021-10-18
+  - fixed typo in previous release
+
+0.003 - 2021-10-18
+  - content keys don't die if not defined.  Turns out that's a better default for views
+  - new stash helper because why not.
+
 0.002 - 2020-05-07
   - Don't always pass $c->model to template since its often undefined and results
     in Catalyst logs getting noisy about this.

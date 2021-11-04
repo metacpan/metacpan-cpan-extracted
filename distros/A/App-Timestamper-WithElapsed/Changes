@@ -1,5 +1,10 @@
 Revision history for App-Timestamper-WithElapsed
 
+0.6.1       2021-10-18
+    - Fix some failing tests due to interfered stdout.
+        - https://github.com/shlomif/App-Timestamper/issues/1
+        - Thanks to https://github.com/eserte .
+
 0.6.0       2021-10-07
     - Add the "--output" flag.
 

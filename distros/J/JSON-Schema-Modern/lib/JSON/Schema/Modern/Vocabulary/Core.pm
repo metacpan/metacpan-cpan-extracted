@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.521';
+our $VERSION = '0.523';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use strictures 2;
 use JSON::Schema::Modern::Utilities qw(is_type abort assert_keyword_type canonical_schema_uri E assert_uri_reference assert_uri jsonp);
 use Moo;
@@ -151,7 +152,7 @@ sub _traverse_keyword_anchor {
 
   return E($state, '%s value "%s" does not match required syntax',
       $state->{keyword}, ($state->{keyword} eq '$id' ? '#' : '').$schema->{$state->{keyword}})
-    if $state->{spec_version} =~ /^draft(7|2019-09)$/
+    if $state->{spec_version} =~ /^draft(?:7|2019-09)$/
         and $schema->{$state->{keyword}} !~ /^[A-Za-z][A-Za-z0-9_:.-]*$/
       or $state->{spec_version} eq 'draft2020-12'
         and $schema->{$state->{keyword}} !~ /^[A-Za-z_][A-Za-z0-9._-]*$/;
@@ -312,7 +313,7 @@ sub _traverse_keyword_vocabulary {
   my @vocabulary_classes;
   foreach my $uri (sort keys %{$schema->{'$vocabulary'}}) {
     $valid = 0, next if not assert_keyword_type({ %$state, _schema_path_suffix => $uri }, $schema, 'boolean');
-    $valid = 0, next if not assert_uri({ %$state, _schema_path_suffix => $uri }, $schema, $uri);
+    $valid = 0, next if not assert_uri({ %$state, _schema_path_suffix => $uri }, undef, $uri);
   }
 
   $valid = E($state, 'metaschemas must have an $id')
@@ -405,7 +406,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.521
+version 0.523
 
 =head1 DESCRIPTION
 

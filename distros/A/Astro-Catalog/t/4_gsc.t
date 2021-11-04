@@ -1,32 +1,27 @@
 #!perl
 # Astro::Catalog::Query::GSC test harness
 
-# strict
 use strict;
 
-#load test
 use Test::More tests => 159;
 use Data::Dumper;
 
 # Catalog modules need to be loaded first
 BEGIN {
-  use_ok( "Astro::Catalog::Star");
-  use_ok( "Astro::Catalog");
-  use_ok( "Astro::Catalog::Query::GSC");
+    use_ok( "Astro::Catalog::Item");
+    use_ok( "Astro::Catalog");
+    use_ok( "Astro::Catalog::Query::GSC");
 }
 use Astro::Flux;
 use Astro::Fluxes;
 use Number::Uncertainty;
 
 # Load the generic test code
-my $p = ( -d "t" ?  "t/" : "");
+my $p = (-d "t" ? "t/" : "");
 do $p."helper.pl" or die "Error reading test functions: $!";
 
 
-# T E S T   H A R N E S S --------------------------------------------------
-
 # Grab GSC sample from the DATA block
-# -----------------------------------
 my @buffer = <DATA>;
 chomp @buffer;
 
@@ -37,90 +32,79 @@ my $catalog_data = new Astro::Catalog();
 my $star;
 
 # Parse data block
-# ----------------
-foreach my $line ( 0 .. $#buffer ) {
+foreach my $line (0 .. $#buffer) {
+    # split each line
+    my @separated = split /\s+/, $buffer[$line];
 
-   # split each line
-   my @separated = split( /\s+/, $buffer[$line] );
+    # check that there is something on the line
+    if (defined $separated[0]) {
 
+        # create a temporary place holder object
+        $star = new Astro::Catalog::Item();
 
-   # check that there is something on the line
-   if ( defined $separated[0] ) {
+        # ID
+        my $id = $separated[2];
+        $star->id( $id );
 
-       # create a temporary place holder object
-       $star = new Astro::Catalog::Star();
+        # RA
+        my $objra = "$separated[3] $separated[4] $separated[5]";
 
-       # ID
-       my $id = $separated[2];
-       $star->id( $id );
+        # Dec
+        my $objdec = "$separated[6] $separated[7] $separated[8]";
 
-       # debugging
-       #print "# ID $id star $line\n";
+        $star->coords(new Astro::Coords(
+                name => $id,
+                ra => $objra,
+                dec => $objdec,
+                units => 'sex',
+                type => 'J2000',
+            ));
 
-       # RA
-       my $objra = "$separated[3] $separated[4] $separated[5]";
+        $star->fluxes(new Astro::Fluxes(
+                    new Astro::Flux(
+                        new Number::Uncertainty(
+                            Value => $separated[10],
+                            Error => $separated[11]),
+                        'mag', "B")));
 
-       # Dec
-       my $objdec = "$separated[6] $separated[7] $separated[8]";
+        # Quality
+        my $quality = $separated[13];
+        $star->quality($quality);
 
-       $star->coords( new Astro::Coords( name => $id,
-                                         ra => $objra,
-                                         dec => $objdec,
-                                         units => 'sex',
-                                         type => 'J2000',
-                                       ));
+        # Field
+        my $field = $separated[12];
+        $star->field($field);
 
-       # B Magnitude
-       #my %b_mag = ( B => $separated[10] );
-       #$star->magnitudes( \%b_mag );
+        # GSC, obvious!
+        $star->gsc("TRUE");
 
-       # B mag error
-       #my %mag_errors = ( B => $separated[11] );
-       #$star->magerr( \%mag_errors );
+        # Distance
+        my $distance = $separated[16];
+        $star->distance($distance);
 
-       $star->fluxes( new Astro::Fluxes( new Astro::Flux(
-                new Number::Uncertainty( Value => $separated[10],
-                                         Error => $separated[11] ),
-                 'mag', "B" )));
-
-       # Quality
-       my $quality = $separated[13];
-       $star->quality( $quality );
-
-       # Field
-       my $field = $separated[12];
-       $star->field( $field );
-
-       # GSC, obvious!
-       $star->gsc( "TRUE" );
-
-       # Distance
-       my $distance = $separated[16];
-       $star->distance( $distance );
-
-       # Position Angle
-       my $pos_angle = $separated[17];
-       $star->posangle( $pos_angle );
+        # Position Angle
+        my $pos_angle = $separated[17];
+        $star->posangle($pos_angle);
 
     }
 
     # Push the star into the catalog
-    # ------------------------------
-    $catalog_data->pushstar( $star );
+    $catalog_data->pushstar($star);
 }
 
 # field centre
-$catalog_data->fieldcentre( RA => '01 10 12.9',
-                            Dec => '+60 04 35.9',
-                            Radius => '5' );
+$catalog_data->fieldcentre(
+        RA => '01 10 12.9',
+        Dec => '+60 04 35.9',
+        Radius => '5');
 
 
 # Grab comparison from ESO/ST-ECF Archive Site
-# --------------------------------------------
 
-my $gsc_byname = new Astro::Catalog::Query::GSC(  RA => "01 10 12.9",
-                                                  Dec => "+60 04 35.9",
-                                                  Radius => '5' );
+my $gsc_byname = new Astro::Catalog::Query::GSC(
+        RA => "01 10 12.9",
+        Dec => "+60 04 35.9",
+        Radius => '5' );
 
 SKIP: {
     print "# Connecting to ESO/ST-ECF GSC Catalogue\n";
@@ -140,8 +124,6 @@ SKIP: {
 
     print "# Continuing tests\n";
 
-    # C O M P A R I S O N ------------------------------------------------------
-
     # check sizes
     print "# DAT has " . $catalog_data->sizeof() . " stars\n";
     print "# NET has " . $catalog_byname->sizeof() . " stars\n";
@@ -150,12 +132,8 @@ SKIP: {
     compare_catalog( $catalog_byname, $catalog_data);
 }
 
-#print join("\n",$gsc_byname->_dump_raw)."\n";
-
-# quitting time
 exit;
 
-# D A T A   B L O C K  -----------------------------------------------------
 # nr gsc_id     ra   (2000) dec          pos-e mag  mag-e b c  pl  mu    d'  pa
 __DATA__
    1 0403000551 01 09 55.34 +60 00 37.4   0.2 12.18 0.40  1 0 01MU F;   4.54 209

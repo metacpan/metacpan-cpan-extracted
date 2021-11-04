@@ -5,7 +5,7 @@
 
 package Alien::libvterm;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use POSIX qw( WEXITSTATUS );
 
@@ -35,7 +35,7 @@ provides a simple access to its configuration. If not, the process of
 installing it will install a locally-bundled copy of the library into perl's
 arch-specific library directory.
 
-This module bundles F<libvterm> version 0.1.4.
+This module bundles F<libvterm> version 0.2.
 
 =head1 METHODS
 

@@ -1,5 +1,22 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+1.00 2021-10-25T12:47:33Z
+
+1.00 2021-10-25T12:46:24Z
+
+    - Version 1.00
+
+0.9922 2021-10-17T08:05:22Z
+
+    - Deprecate "re" parameter.
+    - Improve handling of DEFAULT config parameter.
+
+0.9921 2021-10-13T00:26:37Z
+
+    - Allow must parameter to take multiple codes.
+    - Do not require Clone.pm
+    - Fix bug of handling coderef in any param.
+
 0.9920 2021-09-27T07:02:57Z
 
     - Introduce "any" validator.

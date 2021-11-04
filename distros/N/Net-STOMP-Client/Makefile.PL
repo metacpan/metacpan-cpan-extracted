@@ -7,7 +7,7 @@ my(%param, $emv, $name);
 %param = (
     NAME                   => 'Net::STOMP::Client',
     AUTHOR                 => 'Lionel Cons <lionel.cons@cern.ch>',
-    VERSION                => '2.3',
+    VERSION                => '2.5',
     ABSTRACT_FROM          => 'lib/Net/STOMP/Client.pm',
     LICENSE                => 'perl',
     PL_FILES               => {},
@@ -21,6 +21,7 @@ my(%param, $emv, $name);
 	# optional: Authen::Credential
         'Encode'           => 0,
         'IO::Socket::INET' => 0,
+        'IO::Socket::IP'   => 0,
 	# optional: IO::Socket::SSL
         'List::Util'       => 0,
 	# optional: Messaging::Message

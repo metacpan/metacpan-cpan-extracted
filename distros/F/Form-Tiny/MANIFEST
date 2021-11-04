@@ -12,8 +12,11 @@ lib/Form/Tiny/Hook.pm
 lib/Form/Tiny/Inline.pm
 lib/Form/Tiny/Manual.pod
 lib/Form/Tiny/Manual/Compatibility.pod
+lib/Form/Tiny/Manual/Cookbook.pod
 lib/Form/Tiny/Manual/Internals.pod
+lib/Form/Tiny/Manual/Performance.pod
 lib/Form/Tiny/Meta.pm
+lib/Form/Tiny/Meta/Consistent.pm
 lib/Form/Tiny/Meta/Filtered.pm
 lib/Form/Tiny/Meta/Strict.pm
 lib/Form/Tiny/Path.pm
@@ -31,6 +34,7 @@ t/014-cloning.t
 t/02-inline.t
 t/03-errors.t
 t/030-adding-errors.t
+t/031-errors-hash.t
 t/04-format.t
 t/05-required.t
 t/06-strictness.t
@@ -54,7 +58,9 @@ t/22-default.t
 t/23-nesting-escape.t
 t/24-context.t
 t/25-messages.t
+t/250-form-messages.t
 t/26-additional-validators.t
+t/27-consistent-api.t
 t/99-examples/inline-form.t
 t/99-examples/metaobject.t
 t/99-examples/regular-form.t

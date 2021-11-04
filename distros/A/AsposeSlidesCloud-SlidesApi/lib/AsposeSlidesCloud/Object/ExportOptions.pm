@@ -166,7 +166,7 @@ __PACKAGE__->method_documentation({
     'default_regular_font' => {
     	datatype => 'string',
     	base_name => 'DefaultRegularFont',
-    	description => 'Setting user password to protect the PDF document. ',
+    	description => 'Default regular font for rendering the presentation. ',
     	format => '',
     	read_only => '',
     		},

@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ no_index:
 provides:
   WorkerManager:
     file: lib/WorkerManager.pm
-    version: '0.1001'
+    version: '0.1002'
   WorkerManager::Client::TheSchwartz:
     file: lib/WorkerManager/Client/TheSchwartz.pm
   WorkerManager::TheSchwartz:
@@ -37,7 +37,6 @@ requires:
   File::Pid: '0'
   Module::Load: '0'
   Parallel::ForkManager: '2.02'
-  Proc::Daemon: '0'
   TheSchwartz: '0'
   TheSchwartz::Simple: '0'
   Time::HiRes: '0'
@@ -47,9 +46,10 @@ resources:
   bugtracker: https://github.com/hatena/WorkerManager/issues
   homepage: https://github.com/hatena/WorkerManager
   repository: git://github.com/hatena/WorkerManager.git
-version: '0.1001'
+version: '0.1002'
 x_authority: cpan:HATENA
 x_contributors:
+  - 'Asato Wakisaka <asato.wakisaka@gmail.com>'
   - 'Kentaro Kuribayashi <kentarok@gmail.com>'
   - 'Shinji Tanaka <stanaka@hatena.ne.jp>'
   - 'Takumi Akiyama <t.akiym@gmail.com>'
@@ -61,7 +61,7 @@ x_contributors:
   - 'mechairoi <ttsujikawa@gmail.com>'
   - 'motemen <motemen@gmail.com>'
   - 'motemen <motemen@hatena.ne.jp>'
-  - 'nanto_vi, TOYAMA Nao <nanto@moon.email.ne.jp>'
+  - 'nanto_vi <nanto@moon.email.ne.jp>'
   - 'onishi <onishi@hatena.ne.jp>'
   - 'shiba_yu36 <shibayu36@gmail.com>'
   - 'wakabatan <wakabatan@localhost.localdomain>'

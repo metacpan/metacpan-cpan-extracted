@@ -18,46 +18,47 @@ meta-spec:
 name: PPIx-QuoteLike
 no_index:
   directory:
+    - eg
     - inc
     - t
     - xt
 provides:
   PPIx::QuoteLike:
     file: lib/PPIx/QuoteLike.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Constant:
     file: lib/PPIx/QuoteLike/Constant.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Dumper:
     file: lib/PPIx/QuoteLike/Dumper.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Token:
     file: lib/PPIx/QuoteLike/Token.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Token::Control:
     file: lib/PPIx/QuoteLike/Token/Control.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Token::Delimiter:
     file: lib/PPIx/QuoteLike/Token/Delimiter.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Token::Interpolation:
     file: lib/PPIx/QuoteLike/Token/Interpolation.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Token::String:
     file: lib/PPIx/QuoteLike/Token/String.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Token::Structure:
     file: lib/PPIx/QuoteLike/Token/Structure.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Token::Unknown:
     file: lib/PPIx/QuoteLike/Token/Unknown.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Token::Whitespace:
     file: lib/PPIx/QuoteLike/Token/Whitespace.pm
-    version: '0.017'
+    version: '0.018'
   PPIx::QuoteLike::Utils:
     file: lib/PPIx/QuoteLike/Utils.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   Carp: '0'
   Encode: '0'
@@ -78,5 +79,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-QuoteLike
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-PPIx-QuoteLike.git
-version: '0.017'
+version: '0.018'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

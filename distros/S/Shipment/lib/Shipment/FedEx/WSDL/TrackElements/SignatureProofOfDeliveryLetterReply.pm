@@ -1,6 +1,6 @@
 
 package Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterReply;
-$Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterReply::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterReply::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::FedEx::WSDL::TrackElements::SignatureProofOfDeliveryLetterReply
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ClientDetail;
-$Shipment::FedEx::WSDL::ShipTypes::ClientDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ClientDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               IntegratorId
               Localization
 
-              )
+            )
         ],
         {   'AccountNumber' => \%AccountNumber_of,
             'MeterNumber'   => \%MeterNumber_of,
@@ -71,7 +71,7 @@ Shipment::FedEx::WSDL::ShipTypes::ClientDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

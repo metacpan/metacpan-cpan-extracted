@@ -1,6 +1,7 @@
 package Form::Tiny::Meta::Strict;
 
 use v5.10;
+use strict;
 use warnings;
 
 use Form::Tiny::Utils qw(try);
@@ -8,7 +9,7 @@ use Form::Tiny::Error;
 
 use Moo::Role;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use constant {
 	MARKER_NONE => "",
@@ -84,7 +85,7 @@ sub _check_strict
 	};
 
 	if ($error) {
-		$obj->add_error(Form::Tiny::Error::IsntStrict->new);
+		$obj->add_error($self->build_error(IsntStrict =>));
 	}
 
 	return $input;

@@ -22,6 +22,30 @@ my %messages = (
         "title"=> "Resource not found",
         "message"=> "The requested resource could not be found but may be available again in the future." 
     },
+    "405"=> {
+        "title"=> "Method Not Allowed",
+        "message"=> "Request method is not supported for the requested resource." 
+    },
+    "406"=> {
+        "title"=> "Not Acceptable",
+        "message"=> "The requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request." 
+    },
+    "410"=> {
+        "title"=> "Gone",
+        "message"=> "The requested resource is no longer available and will not be available again." 
+    },
+    "411"=> {
+        "title"=> "Length Required",
+        "message"=> "The 'Content-Length' is not defined. The server will not accept the request without it." 
+    },
+    "415"=> {
+        "title"=> "Unsupported Media Type",
+        "message"=> "The server will not accept the request, because the media type is not supported." 
+    },
+    "418"=> {
+        "title"=> "I'm a Teapot!",
+        "message"=> "Any attempt to brew coffee with a teapot should result in the error code '418 I'm a teapot'. The resulting entity body MAY be short and stout." 
+    },
     "500"=> {
         "title"=> "Webservice currently unavailable",
         "message"=> "An unexpected condition was encountered.\nOur service team has been dispatched to bring it back online." 

@@ -1,6 +1,7 @@
 package Form::Tiny::Path;
 
 use v5.10;
+use strict;
 use warnings;
 use Moo;
 use Carp qw(croak);
@@ -8,7 +9,7 @@ use Types::Standard qw(ArrayRef);
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 our $nesting_separator = q{.};
 our $array_marker = q{*};

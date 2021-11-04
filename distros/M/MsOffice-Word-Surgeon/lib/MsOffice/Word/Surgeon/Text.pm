@@ -10,14 +10,15 @@ use namespace::clean -except => 'meta';
 has 'xml_before'   => (is => 'ro', isa => 'Str');
 has 'literal_text' => (is => 'ro', isa => 'Str', required => 1);
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 
 sub as_xml {
   my $self = shift;
 
   my $xml = $self->xml_before // '';
-  if (my $lit_txt = $self->literal_text) {
+  my $lit_txt = $self->literal_text;
+  if (defined $lit_txt && $lit_txt ne '') {
     my $space_attr  = maybe_preserve_spaces($lit_txt);
     $xml .= "<w:t$space_attr>$lit_txt</w:t>";
   }
@@ -139,7 +140,20 @@ sub replace {
 
 sub to_uppercase {
   my $self = shift;
-  $self->{literal_text} = uc($self->{literal_text});
+
+  # split text fragments around HTML entities
+  my @fragments             = split /(&\w+?;)/, $self->{literal_text};
+  my $txt_after_last_entity = pop @fragments;
+  my $txt_upcase            = "";
+
+  # assemble upcased text fragments
+  while (my ($txt_before, $entity) = splice (@fragments, 0, 2)) {
+    $txt_upcase .= uc($txt_before) . $entity;
+  }
+  $txt_upcase .= uc($txt_after_last_entity);
+
+  # return the upcased text
+  $self->{literal_text} = $txt_upcase;
 }
 
 

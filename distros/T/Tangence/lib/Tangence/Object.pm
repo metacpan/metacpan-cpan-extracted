@@ -1,14 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Object 0.26;
+package Tangence::Object 0.27;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental 'signatures';
 
 use Carp;
+
+use Syntax::Keyword::Match;
 
 use Tangence::Constants;
 
@@ -42,11 +45,8 @@ instead the C<Tangence::Registry> should be used to construct one.
 
 =cut
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
    defined( my $id = delete $args{id} ) or croak "Need a id";
    my $registry = delete $args{registry} or croak "Need a registry";
 
@@ -85,11 +85,8 @@ Not to be confused with Perl's own C<DESTROY> method.
 
 =cut
 
-sub destroy
+sub destroy ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    $self->{destroying} = 1;
 
    my $outstanding = 1;
@@ -167,11 +164,8 @@ sub registry
    return $self->{registry};
 }
 
-sub smash
+sub smash ( $self, $smashkeys )
 {
-   my $self = shift;
-   my ( $smashkeys ) = @_;
-
    return undef unless $smashkeys and @$smashkeys;
 
    my @keys;
@@ -263,11 +257,8 @@ invoked with the given arguments.
 
 =cut
 
-sub fire_event
+sub fire_event ( $self, $event, @args )
 {
-   my $self = shift;
-   my ( $event, @args ) = @_;
-
    $event eq "destroy" and croak "$self cannot fire destroy event directly";
 
    $self->can_event( $event ) or croak "$self has no event $event";
@@ -294,11 +285,8 @@ calling C<unsubscribe_event>.
 
 =cut
 
-sub subscribe_event
+sub subscribe_event ( $self, $event, $callback )
 {
-   my $self = shift;
-   my ( $event, $callback ) = @_;
-
    $self->can_event( $event ) or croak "$self has no event $event";
 
    my $sublist = ( $self->{event_subs}->{$event} ||= [] );
@@ -318,11 +306,8 @@ C<subscribe_event>.
 
 =cut
 
-sub unsubscribe_event
+sub unsubscribe_event ( $self, $event, $id )
 {
-   my $self = shift;
-   my ( $event, $id ) = @_;
-
    my $sublist = $self->{event_subs}->{$event} or return;
 
    my $index;
@@ -377,11 +362,8 @@ C<unwatch_property>.
 
 =cut
 
-sub watch_property
+sub watch_property ( $self, $prop, %callbacks )
 {
-   my $self = shift;
-   my ( $prop, %callbacks ) = @_;
-
    my $pdef = $self->can_property( $prop ) or croak "$self has no property $prop";
 
    my $callbacks = {};
@@ -419,11 +401,8 @@ C<watch_property>.
 
 =cut
 
-sub unwatch_property
+sub unwatch_property ( $self, $prop, $id )
 {
-   my $self = shift;
-   my ( $prop, $id ) = @_;
-
    my $watchlist = $self->{properties}->{$prop}->callbacks or return;
 
    my $index;
@@ -436,11 +415,8 @@ sub unwatch_property
 
 ### Message handling
 
-sub handle_request_CALL
+sub handle_request_CALL ( $self, $ctx, $message )
 {
-   my $self = shift;
-   my ( $ctx, $message ) = @_;
-
    my $method = $message->unpack_str();
 
    my $mdef = $self->can_method( $method ) or die "Object cannot respond to method $method\n";
@@ -458,11 +434,8 @@ sub handle_request_CALL
    return $response;
 }
 
-sub generate_message_EVENT
+sub generate_message_EVENT ( $self, $conn, $event, @args )
 {
-   my $self = shift;
-   my ( $conn, $event, @args ) = @_;
-
    my $edef = $self->can_event( $event ) or die "Object cannot respond to event $event";
 
    my $response = Tangence::Message->new( $conn, MSG_EVENT )
@@ -475,11 +448,8 @@ sub generate_message_EVENT
    return $response;
 }
 
-sub handle_request_GETPROP
+sub handle_request_GETPROP ( $self, $ctx, $message )
 {
-   my $self = shift;
-   my ( $ctx, $message ) = @_;
-
    my $prop = $message->unpack_str();
 
    my $pdef = $self->can_property( $prop ) or die "Object does not have property $prop";
@@ -495,11 +465,8 @@ sub handle_request_GETPROP
    return $response;
 }
 
-sub handle_request_GETPROPELEM
+sub handle_request_GETPROPELEM ( $self, $ctx, $message )
 {
-   my $self = shift;
-   my ( $ctx, $message ) = @_;
-
    my $prop = $message->unpack_str();
 
    my $pdef = $self->can_property( $prop ) or die "Object does not have property $prop";
@@ -509,16 +476,18 @@ sub handle_request_GETPROPELEM
    $self->can( $m ) or die "Object cannot get property $prop\n";
 
    my $result;
-   if( $dim == DIM_QUEUE or $dim == DIM_ARRAY ) {
-      my $idx = $message->unpack_int();
-      $result = $self->$m()->[$idx];
-   }
-   elsif( $dim == DIM_HASH ) {
-      my $key = $message->unpack_str();
-      $result = $self->$m()->{$key};
-   }
-   else {
-      die "Property $prop cannot fetch elements";
+   match( $dim : == ) {
+      case( DIM_QUEUE ), case( DIM_ARRAY ) {
+         my $idx = $message->unpack_int();
+         $result = $self->$m()->[$idx];
+      }
+      case( DIM_HASH ) {
+         my $key = $message->unpack_str();
+         $result = $self->$m()->{$key};
+      }
+      default {
+         die "Property $prop cannot fetch elements";
+      }
    }
 
    my $response = Tangence::Message->new( $ctx->stream, MSG_RESULT );
@@ -527,11 +496,8 @@ sub handle_request_GETPROPELEM
    return $response;
 }
 
-sub handle_request_SETPROP
+sub handle_request_SETPROP ( $self, $ctx, $message )
 {
-   my $self = shift;
-   my ( $ctx, $message ) = @_;
-
    my $prop  = $message->unpack_str();
 
    my $pdef = $self->can_property( $prop ) or die "Object does not have property $prop\n";
@@ -546,11 +512,8 @@ sub handle_request_SETPROP
    return Tangence::Message->new( $self, MSG_OK );
 }
 
-sub generate_message_UPDATE
+sub generate_message_UPDATE ( $self, $conn, $prop, $how, @args )
 {
-   my $self = shift;
-   my ( $conn, $prop, $how, @args ) = @_;
-
    my $pdef = $self->can_property( $prop ) or die "Object does not have property $prop\n";
    my $dim = $pdef->dimension;
 
@@ -574,93 +537,86 @@ sub generate_message_UPDATE
    return $message;
 }
 
-sub _generate_message_UPDATE_scalar
+sub _generate_message_UPDATE_scalar ( $self, $message, $how, $pdef, @args )
 {
-   my $self = shift;
-   my ( $message, $how, $pdef, @args ) = @_;
-
    croak "Change type $how is not valid for a scalar property";
 }
 
-sub _generate_message_UPDATE_hash
+sub _generate_message_UPDATE_hash ( $self, $message, $how, $pdef, @args )
 {
-   my $self = shift;
-   my ( $message, $how, $pdef, @args ) = @_;
-
-   if( $how == CHANGE_ADD ) {
-      my ( $key, $value ) = @args;
-      $message->pack_str( $key );
-      $pdef->type->pack_value( $message, $value );
-   }
-   elsif( $how == CHANGE_DEL ) {
-      my ( $key ) = @args;
-      $message->pack_str( $key );
-   }
-   else {
-      croak "Change type $how is not valid for a hash property";
+   match( $how : == ) {
+      case( CHANGE_ADD ) {
+         my ( $key, $value ) = @args;
+         $message->pack_str( $key );
+         $pdef->type->pack_value( $message, $value );
+      }
+      case( CHANGE_DEL ) {
+         my ( $key ) = @args;
+         $message->pack_str( $key );
+      }
+      default {
+         croak "Change type $how is not valid for a hash property";
+      }
    }
 }
 
-sub _generate_message_UPDATE_queue
+sub _generate_message_UPDATE_queue ( $self, $message, $how, $pdef, @args )
 {
-   my $self = shift;
-   my ( $message, $how, $pdef, @args ) = @_;
-
-   if( $how == CHANGE_PUSH ) {
-      $message->pack_all_sametype( $pdef->type, @args );
-   }
-   elsif( $how == CHANGE_SHIFT ) {
-      my ( $count ) = @args;
-      $message->pack_int( $count );
-   }
-   else {
-      croak "Change type $how is not valid for a queue property";
+   match( $how : == ) {
+      case( CHANGE_PUSH ) {
+         $message->pack_all_sametype( $pdef->type, @args );
+      }
+      case( CHANGE_SHIFT ) {
+         my ( $count ) = @args;
+         $message->pack_int( $count );
+      }
+      default {
+         croak "Change type $how is not valid for a queue property";
+      }
    }
 }
 
-sub _generate_message_UPDATE_array
+sub _generate_message_UPDATE_array ( $self, $message, $how, $pdef, @args )
 {
-   my $self = shift;
-   my ( $message, $how, $pdef, @args ) = @_;
-
-   if( $how == CHANGE_PUSH ) {
-      $message->pack_all_sametype( $pdef->type, @args );
-   }
-   elsif( $how == CHANGE_SHIFT ) {
-      my ( $count ) = @args;
-      $message->pack_int( $count );
-   }
-   elsif( $how == CHANGE_SPLICE ) {
-      my ( $start, $count, @values ) = @args;
-      $message->pack_int( $start );
-      $message->pack_int( $count );
-      $message->pack_all_sametype( $pdef->type, @values );
-   }
-   elsif( $how == CHANGE_MOVE ) {
-      my ( $index, $delta ) = @args;
-      $message->pack_int( $index );
-      $message->pack_int( $delta );
-   }
-   else {
-      croak "Change type $how is not valid for an array property";
+   match( $how : == ) {
+      case( CHANGE_PUSH ) {
+         $message->pack_all_sametype( $pdef->type, @args );
+      }
+      case( CHANGE_SHIFT ) {
+         my ( $count ) = @args;
+         $message->pack_int( $count );
+      }
+      case( CHANGE_SPLICE ) {
+         my ( $start, $count, @values ) = @args;
+         $message->pack_int( $start );
+         $message->pack_int( $count );
+         $message->pack_all_sametype( $pdef->type, @values );
+      }
+      case( CHANGE_MOVE ) {
+         my ( $index, $delta ) = @args;
+         $message->pack_int( $index );
+         $message->pack_int( $delta );
+      }
+      default {
+         croak "Change type $how is not valid for an array property";
+      }
    }
 }
 
-sub _generate_message_UPDATE_objset
+sub _generate_message_UPDATE_objset ( $self, $message, $how, $pdef, @args )
 {
-   my $self = shift;
-   my ( $message, $how, $pdef, @args ) = @_;
-
-   if( $how == CHANGE_ADD ) {
-      my ( $value ) = @args;
-      $pdef->type->pack_value( $message, $value );
-   }
-   elsif( $how == CHANGE_DEL ) {
-      my ( $id ) = @args;
-      $message->pack_int( $id );
-   }
-   else {
-      croak "Change type $how is not valid for an objset property";
+   match( $how : == ) {
+      case( CHANGE_ADD ) {
+         my ( $value ) = @args;
+         $pdef->type->pack_value( $message, $value );
+      }
+      case( CHANGE_DEL ) {
+         my ( $id ) = @args;
+         $message->pack_int( $id );
+      }
+      default {
+         croak "Change type $how is not valid for an objset property";
+      }
    }
 }
 

@@ -453,13 +453,13 @@ Target command is given as an argument:
 
     % optex command
 
-or symbolic link file linked to B<optex>:
+or as a symbolic linked file to B<optex>:
 
     command -> optex
 
 If the configuration file F<~/.optex.d/>I<command>F<.rc> exists, it is
-read before execution and command arguments are pre-processed using
-that configuration.
+evaluated before execution and command arguments are pre-processed
+using it.
 
 
 =head2 OPTION ALIASES
@@ -509,11 +509,11 @@ Command aliases can be set in the configuration file like this:
     [alias]
         pgrep = [ "greple", "-Mperl", "--code" ]
 
-Alias name is used to find rc file and module directory.  In above
+Alias name is used to find rc file and module directory.  In the above
 example, F<~/.optex.d/pgrep.rc> and F<~/.optex.d/pgrep/> will be
-reffered.
+referred.
 
-Read CONFIGURATION FILE section.
+Read L<CONFIGURATION FILE> section.
 
 =head2 MACROS
 
@@ -685,6 +685,16 @@ module.
 =item -MB<debug>
 
 Print debug messages.
+
+=item -MB<util::argv>
+
+Module to manipulate command argument.
+See L<App::optex::util::argv> for detail.
+
+=item -MB<util::filter>
+
+Module to implement command input/output filters.
+See L<App::optex::util::filter> for detail.
 
 =back
 

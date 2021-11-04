@@ -1,5 +1,5 @@
 package Shipment::Service;
-$Shipment::Service::VERSION = '3.05';
+$Shipment::Service::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -117,8 +117,8 @@ has 'options' => (
 
 
 has 'extras' => (
-    is  => 'rw',
-    isa => HashRef [InstanceOf ['Shipment::Service']],
+    is      => 'rw',
+    isa     => HashRef [InstanceOf ['Shipment::Service']],
     default => sub { {} },
 );
 
@@ -143,7 +143,7 @@ Shipment::Service
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

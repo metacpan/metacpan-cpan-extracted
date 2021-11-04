@@ -1,3 +1,43 @@
+2.050003 - 2021-10-19
+
+  [BUG FIXES]
+
+  * #832 fix dancer layout for API requests
+
+2.050001 - 2021-10-12
+
+  [BUG FIXES]
+
+  * #761 Sometimes queries status return null values
+  * #765 Issues with IP Reports
+
+2.050000 - 2021-10-12
+
+  [NEW FEATURES]
+
+  * #827 add ignore_interface_types setting
+
+  [ENHANCEMENTS]
+
+  * replace jquery.load with fetch
+
+  [BUG FIXES]
+
+  * #761 Sometimes queries status return null values
+  * #765 Issues with IP Reports
+
+2.049011 - 2021-10-12
+
+  [BUG FIXES]
+
+  * fix dns_opt in docker-compose.yml
+
+2.049010 - 2021-10-11
+
+  [ENHANCEMENTS]
+
+  * require SNMP::Info 3.81
+
 2.049009 - 2021-10-06
 
   [BUG FIXES]

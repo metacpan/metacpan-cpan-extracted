@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail;
-$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        PrinterId
 
-              )
+            )
         ],
         {'PrinterId' => \%PrinterId_of,},
         {'PrinterId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
@@ -54,7 +54,7 @@ Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

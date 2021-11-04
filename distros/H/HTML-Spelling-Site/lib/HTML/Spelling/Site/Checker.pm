@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Checker;
-$HTML::Spelling::Site::Checker::VERSION = '0.6.0';
+$HTML::Spelling::Site::Checker::VERSION = '0.8.0';
 use strict;
 use warnings;
 use autodie;
@@ -17,9 +17,9 @@ use Digest ();
 
 has '_inside' =>
     ( is => 'rw', isa => 'HashRef', default => sub { return +{}; } );
-has 'whitelist_parser' => ( is => 'ro', required => 1 );
-has 'check_word_cb'    => ( is => 'ro', isa      => 'CodeRef', required => 1 );
-has 'timestamp_cache_fn' => ( is => 'ro', isa => 'Str', required => 1 );
+has 'whitelist_parser'   => ( is => 'ro', required => 1 );
+has 'check_word_cb'      => ( is => 'ro', isa => 'CodeRef', required => 1 );
+has 'timestamp_cache_fn' => ( is => 'ro', isa => 'Str',     required => 1 );
 
 sub _tag
 {
@@ -256,7 +256,7 @@ HTML::Spelling::Site::Checker - does the actual checking.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 SYNOPSIS
 

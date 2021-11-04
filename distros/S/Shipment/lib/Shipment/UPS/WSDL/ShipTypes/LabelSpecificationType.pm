@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType;
-$Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               HTTPUserAgent
               LabelStockSize
 
-              )
+            )
         ],
         {   'LabelImageFormat' => \%LabelImageFormat_of,
             'HTTPUserAgent'    => \%HTTPUserAgent_of,
@@ -39,7 +39,7 @@ Class::Std::initialize();
         },
         {   'LabelImageFormat' =>
               'Shipment::UPS::WSDL::ShipTypes::LabelImageFormatType',
-            'HTTPUserAgent' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'HTTPUserAgent'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'LabelStockSize' =>
               'Shipment::UPS::WSDL::ShipTypes::LabelStockSizeType',
         },
@@ -68,7 +68,7 @@ Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

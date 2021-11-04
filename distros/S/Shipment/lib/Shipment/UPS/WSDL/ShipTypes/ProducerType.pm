@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ProducerType;
-$Shipment::UPS::WSDL::ShipTypes::ProducerType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ProducerType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               TaxIdentificationNumber
               Address
 
-              )
+            )
         ],
         {   'Option'                  => \%Option_of,
             'CompanyName'             => \%CompanyName_of,
@@ -72,7 +72,7 @@ Shipment::UPS::WSDL::ShipTypes::ProducerType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

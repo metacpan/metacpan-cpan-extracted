@@ -1,5 +1,5 @@
 package CHI::Driver::Role::Universal;
-$CHI::Driver::Role::Universal::VERSION = '0.60';
+$CHI::Driver::Role::Universal::VERSION = '0.61';
 use CHI::Constants qw(CHI_Meta_Namespace);
 use Moo::Role;
 use strict;

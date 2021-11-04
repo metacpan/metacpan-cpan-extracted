@@ -1,5 +1,9 @@
 Revision history for Device-Chip-MAX44009
 
+0.03    2021-07-18
+        [CHANGES]
+         * Use the I²C txn ->write_then_read to simplify sensor read operations
+
 0.02    2021-06-04
         [CHANGES]
          * Use the Device::Chip::Adapter v0.18 I²C ->txn API with the

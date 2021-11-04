@@ -108,4 +108,30 @@ my %sensors = map { $_->name => $_ } @sensors;
    is( int await $fH, 42,    'humidity value' );
 }
 
+# failures are not cached
+{
+   $adapter->expect_write_then_read( "\xF7", 8 )
+      ->fails( "I2C read timeout\n" );
+
+   my $fT = $sensors{temperature}->read;
+   my $fP = $sensors{pressure}->read;
+   my $fH = $sensors{humidity}->read;
+
+   is( $fT->failure, "I2C read timeout\n", 'temperature failed' );
+   is( $fP->failure, "I2C read timeout\n", 'pressure failed' );
+   is( $fH->failure, "I2C read timeout\n", 'humidity failed' );
+
+   # Second attempt should succeed
+   $adapter->expect_write_then_read( "\xF7", 8 )
+      ->returns( "\x53\xCF\x00\x80\x20\x00\x63\xC0" );
+
+   $fT = $sensors{temperature}->read;
+   $fP = $sensors{pressure}->read;
+   $fH = $sensors{humidity}->read;
+
+   is( int await $fT, 22,    'temperature value' );
+   is( int await $fP, 96956, 'pressure value' );
+   is( int await $fH, 41,    'humidity value' );
+}
+
 done_testing;

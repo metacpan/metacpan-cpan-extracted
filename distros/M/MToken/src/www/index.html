@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>MToken REST API</title>
+    <meta charset="utf-8" />
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="MToken REST API" />
+    <meta name="author" content="Serż Minus" />
+    <meta name="copyright" content="Copyright &copy; 1998-2021 D&amp;D Corporation. All Rights Reserved" />
+    <meta name="theme-color" content="#f0f0f2" />
+
+    <style media="all">
+        * {
+            font-family: Arial,Helvetica,sans-serif;
+        }
+        body {
+            background-color: #f0f0f2;
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+            width: 75%;
+            font-size: 1rem;
+            padding-bottom: 2rem;
+        }
+        pre {
+            background-color: #eee;
+            border: 1px solid #666;
+            margin: 1rem 0;
+            padding: 0.5rem;
+        }
+        pre, code {
+            font-family: "Consolas","Bitstream Vera Sans Mono","Courier New",Courier,monospace;
+            font-size: 1rem;
+            text-indent: 0;
+        }
+        code {
+            margin: 0;
+            padding: 0;
+        }
+        hr {
+            height: 1px;
+            color: #666;
+            background-color: #666;
+            border: 0;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>MToken REST API</h1>
+<hr />
+
+<p>This REST MToken web service allows you to work with a remote repository for your tarballs. This service supports the publication and storage of your tarballs, allows you to download any stored tarball at any time, and also allows you to delete (revoke) unnecessary tarballs. The tarball files (tarballs) is a snapshots of your token devices which was encrypted of your public PGP key.</p>
+
+<p>To work with the service, you need to use the mtoken program, it allows you to perform all basic operations with tarballs and also allows you to compare tarballs with each other</p>
+
+<p>Tarball file format: <code>C%Y%m%dT%H%M%S.tkn</code></p>
+<ul>
+    <li><code>%Y</code> The year as a decimal number including the century</li>
+    <li><code>%m</code> The minute as a decimal number (range 00 to 59)</li>
+    <li><code>%d</code> The day of the month as a decimal number (range 01 to 31)</li>
+    <li><code>%H</code> The hour as a decimal number using a 24-hour clock (range 00 to 23)</li>
+    <li><code>%M</code> The minute as a decimal number (range 00 to 59)</li>
+    <li><code>%S</code> The second as a decimal number (range 00 to 60)</li>
+</ul>
+<p><em>See also strftime(3) man page for more</em></p>
+
+
+<h2>GET /mtoken</h2>
+<p>Returns information about repository and shows list of stored token-folders (branches)</p>
+
+<pre><code>curl -v --insecure https://admin:admin@localhost:8642/mtoken
+
+&gt; GET /mtoken HTTP/1.1
+&gt; Host: localhost:8642
+&gt; Authorization: Basic YWRtaW46YWRtaW4=
+&gt; User-Agent: curl/7.68.0
+&gt; Accept: */*
+&gt;
+
+&lt; HTTP/1.1 200 OK
+&lt; Content-Length: 347
+&lt; Content-Type: application/json
+&lt; Server: MToken/1.03
+&lt; Date: Sat, 09 Oct 2021 05:59:52 GMT
+&lt;
+
+{
+    "generated": "2021-10-09 05:57:39 GMT",
+    "message": "Ok",
+    "tokens": ["test","bar","foo"]
+}
+</code></pre>
+
+<p>Format of the JSON response:</p>
+<ul>
+    <li><code>generated</code> is date of response in GMT [optioanal]</li>
+    <li><code>message</code> is a response message or text of error</li>
+    <li><code>tokens</code> is array of the token names [optional]</li>
+</ul>
+
+<h2>PUT /mtoken/&lt;TOKEN_NAME&gt;/&lt;TARBALL_FILE.tkn&gt;</h2>
+<p>Performs commit operation. Uploading tarball file (TARBALL_FILE.tkn) to repository for token (TOKEN_NAME)</p>
+
+<pre><code>curl -v --insecure -X PUT -F size=20210 \
+  -F md5=ede8216798c1649c79e70ac69f2f6e7a -F tarball=@C20211009T090718.tkn \
+  https://admin:admin@localhost:8642/mtoken/test/C20211009T090718.tkn
+
+&gt; PUT /mtoken/test/C20211009T090718.tkn HTTP/1.1
+&gt; Host: localhost:8642
+&gt; Authorization: Basic YWRtaW46YWRtaW4=
+&gt; Content-Type: multipart/form-data; boundary=KqfJX
+&gt; User-Agent: curl/7.68.0
+&gt; Content-Length: 20466
+&gt;
+
+&lt; Content-Length: 120
+&lt; Date: Sat, 09 Oct 2021 06:07:18 GMT
+&lt; Server: MToken/1.03
+&lt; Content-Type: application/json
+&lt;
+
+{
+    "md5": "ede8216798c1649c79e70ac69f2f6e7a",
+    "message": "Ok",
+    "size": "20210",
+    "tarball": "C20211009T090718.tkn",
+    "token":"test"
+}
+</code></pre>
+
+<p>Format of the JSON response:</p>
+<ul>
+    <li><code>md5</code> is MD5 hash (checksum) of the tarball file [optional]</li>
+    <li><code>message</code> is a response message or text of error</li>
+    <li><code>size</code> is size of the tarball file, bytes [optioanal]</li>
+    <li><code>tarball</code> is the tarball file [optional]</li>
+    <li><code>token</code> is a token name [optional]</li>
+</ul>
+
+
+<h2>GET /mtoken/&lt;TOKEN_NAME&gt;/&lt;TARBALL_FILE.tkn&gt;</h2>
+<p>This method performs getting (downloading) the tarball file (TARBALL_FILE.tkn) from repository of specified token (TOKEN_NAME)</p>
+
+<pre><code>curl -v --insecure -o C20211009T090718.tkn \
+  https://admin:admin@localhost:8642/mtoken/test/C20211009T090718.tkn
+
+&gt; GET /mtoken/test/C20211009T090718.tkn HTTP/1.1
+&gt; Host: localhost:8642
+&gt; Authorization: Basic YWRtaW46YWRtaW4=
+&gt; User-Agent: curl/7.68.0
+&gt; Accept: */*
+&gt;
+
+&lt; HTTP/1.1 200 OK
+&lt; ETag: "ce143b537c146024251dcd1a903205fb"
+&lt; Accept-Ranges: bytes
+&lt; Date: Sat, 09 Oct 2021 06:33:12 GMT
+&lt; Server: MToken/1.03
+&lt; Content-Type: application/octet-stream
+&lt; Last-Modified: Sat, 09 Oct 2021 06:23:55 GMT
+&lt; Content-Length: 20210
+&lt;
+
+... see C20211009T090718.tkn file ...
+</code></pre>
+
+
+<h2>DELETE /mtoken/&lt;TOKEN_NAME&gt;/&lt;TARBALL_FILE.tkn&gt;</h2>
+<p>This method performs deleting (revoke) the tarball file (TARBALL_FILE.tkn) from repository of specified token (TOKEN_NAME)</p>
+
+<pre><code>curl -v --insecure -X DELETE \
+  https://admin:admin@localhost:8642/mtoken/test/C20211009T090718.tkn
+
+&gt; DELETE /mtoken/test/C20211009T090718.tkn HTTP/1.1
+&gt; Host: localhost:8642
+&gt; Authorization: Basic YWRtaW46YWRtaW4=
+&gt; User-Agent: curl/7.68.0
+&gt; Accept: */*
+&gt;
+
+&lt; HTTP/1.1 200 OK
+&lt; Date: Sat, 09 Oct 2021 06:51:06 GMT
+&lt; Content-Type: application/json
+&lt; Server: MToken/1.03
+&lt; Content-Length: 64
+&lt;
+
+{
+    "message": "Ok",
+    "tarball": "C20211009T090718.tkn",
+    "token": "test"
+}
+</code></pre>
+
+<p>Format of the JSON response:</p>
+<ul>
+    <li><code>message</code> is a response message or text of error</li>
+    <li><code>tarball</code> is the tarball file [optional]</li>
+    <li><code>token</code> is a token name [optional]</li>
+</ul>
+
+
+</body>
+</html>

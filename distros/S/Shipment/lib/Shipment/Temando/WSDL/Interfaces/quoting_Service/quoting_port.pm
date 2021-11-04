@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port;
-$Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::VERSION = '3.05';
+$Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -58,7 +58,7 @@ sub getQuotesByRequest {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -111,7 +111,7 @@ sub makeBookingByRequest {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -161,7 +161,7 @@ sub getRequest {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -214,7 +214,7 @@ sub getRequestsRequiringBooking {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -257,7 +257,7 @@ sub addBookingDetails {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::addBookingDetails )],
             },
             header => {
@@ -265,7 +265,7 @@ sub addBookingDetails {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -308,7 +308,7 @@ sub createClient {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::createClient )],
             },
             header => {
@@ -316,7 +316,7 @@ sub createClient {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -359,7 +359,7 @@ sub updateClient {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::updateClient )],
             },
             header => {
@@ -367,7 +367,7 @@ sub updateClient {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -417,7 +417,7 @@ sub getClient {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -460,7 +460,7 @@ sub lodgeDispatch {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::lodgeDispatch )],
             },
             header => {
@@ -468,7 +468,7 @@ sub lodgeDispatch {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -511,7 +511,7 @@ sub cancelRequest {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::cancelRequest )],
             },
             header => {
@@ -519,7 +519,7 @@ sub cancelRequest {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -572,7 +572,7 @@ sub updateTrackingDetails {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -615,7 +615,7 @@ sub getManifest {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::getManifest )],
             },
             header => {
@@ -623,7 +623,7 @@ sub getManifest {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -666,7 +666,7 @@ sub confirmManifest {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::confirmManifest )],
             },
             header => {
@@ -674,7 +674,7 @@ sub confirmManifest {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -717,7 +717,7 @@ sub getLocations {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::getLocations )],
             },
             header => {
@@ -725,7 +725,7 @@ sub getLocations {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -768,7 +768,7 @@ sub createLocation {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::createLocation )],
             },
             header => {
@@ -776,7 +776,7 @@ sub createLocation {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -819,7 +819,7 @@ sub updateLocation {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::updateLocation )],
             },
             header => {
@@ -827,7 +827,7 @@ sub updateLocation {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Temando::WSDL::Elements::TemandoSecurity )],
 
             },
@@ -896,7 +896,7 @@ Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

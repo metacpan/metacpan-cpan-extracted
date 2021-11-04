@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Struct 0.26;
+use v5.26;
+use Object::Pad 0.41;
 
-use v5.14;
-use warnings;
-use base qw( Tangence::Meta::Struct );
+package Tangence::Struct 0.27;
+class Tangence::Struct isa Tangence::Meta::Struct;
 
 use Carp;
 
@@ -17,26 +17,15 @@ use Tangence::Meta::Field;
 our %STRUCTS_BY_NAME;
 our %STRUCTS_BY_PERLNAME;
 
-sub new
+sub make ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
    my $name = $args{name};
 
-   return $STRUCTS_BY_NAME{$name} ||= $class->SUPER::new( @_ );
+   return $STRUCTS_BY_NAME{$name} //= $class->new( %args );
 }
 
-sub _new_type
+sub declare ( $class, $perlname, %args )
 {
-   my ( $sig ) = @_;
-   return Tangence::Type->new_from_sig( $sig );
-}
-
-sub declare
-{
-   my $class = shift;
-   my ( $perlname, %args ) = @_;
-
    ( my $name = $perlname ) =~ s{::}{.}g;
    $name = $args{name} if $args{name};
 
@@ -44,12 +33,12 @@ sub declare
    for( $_ = 0; $_ < @{$args{fields}}; $_ += 2 ) {
       push @fields, Tangence::Meta::Field->new(
          name => $args{fields}[$_],
-         type => Tangence::Type->new_from_sig( $args{fields}[$_+1] ),
+         type => Tangence::Type->make_from_sig( $args{fields}[$_+1] ),
       );
    }
 
-   my $self = $class->new( name => $name );
-   $self->{perlname} = $perlname;
+   my $self = $class->make( name => $name );
+   $self->_set_perlname( $perlname );
 
    $self->define(
       fields => \@fields,
@@ -80,9 +69,7 @@ sub define
 
    # Now construct the actual perl package
    my %subs = (
-      new => sub {
-         my $class = shift;
-         my %args = @_;
+      new => sub ( $class, %args ) {
          exists $args{$_} or croak "$class is missing $_" for @fieldnames;
          bless [ @args{@fieldnames} ], $class;
       },
@@ -96,27 +83,22 @@ sub define
    }
 }
 
-sub for_name
+sub for_name ( $class, $name )
 {
-   my $class = shift;
-   my ( $name ) = @_;
-
-   return $STRUCTS_BY_NAME{$name} || croak "Unknown Tangence::Struct for '$name'";
+   return $STRUCTS_BY_NAME{$name} // croak "Unknown Tangence::Struct for '$name'";
 }
 
-sub for_perlname
+sub for_perlname ( $class, $perlname )
 {
-   my $class = shift;
-   my ( $perlname ) = @_;
-
-   return $STRUCTS_BY_PERLNAME{$perlname} || croak "Unknown Tangence::Struct for '$perlname'";
+   return $STRUCTS_BY_PERLNAME{$perlname} // croak "Unknown Tangence::Struct for '$perlname'";
 }
 
-sub perlname
+has $perlname :writer(_set_perlname);
+
+method perlname
 {
-   my $self = shift;
-   return $self->{perlname} if $self->{perlname};
-   ( my $perlname = $self->name ) =~ s{\.}{::}g; # s///rg in 5.14
+   return $perlname if defined $perlname;
+   ( $perlname = $self->name ) =~ s{\.}{::}g; # s///rg in 5.14
    return $perlname;
 }
 

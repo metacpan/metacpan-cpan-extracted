@@ -1,5 +1,9 @@
 Revision history for Device-Chip-MPL3115A2
 
+0.09    2021-10-22
+        [BUGFIXES]
+         * Make sure not to cache adapter failures
+
 0.08    2021-01-02
         [CHANGES]
          * Implement the Device::Chip::Sensor API

@@ -28,13 +28,13 @@ Target command is given as an argument:
 
     % optex command
 
-or symbolic link file linked to **optex**:
+or as a symbolic linked file to **optex**:
 
     command -> optex
 
 If the configuration file `~/.optex.d/`_command_`.rc` exists, it is
-read before execution and command arguments are pre-processed using
-that configuration.
+evaluated before execution and command arguments are pre-processed
+using it.
 
 ## OPTION ALIASES
 
@@ -83,11 +83,11 @@ Command aliases can be set in the configuration file like this:
     [alias]
         pgrep = [ "greple", "-Mperl", "--code" ]
 
-Alias name is used to find rc file and module directory.  In above
+Alias name is used to find rc file and module directory.  In the above
 example, `~/.optex.d/pgrep.rc` and `~/.optex.d/pgrep/` will be
-reffered.
+referred.
 
-Read CONFIGURATION FILE section.
+Read ["CONFIGURATION FILE"](#configuration-file) section.
 
 ## MACROS
 
@@ -255,6 +255,16 @@ addressed with and without `App::optex` prefix.
 - -M**debug**
 
     Print debug messages.
+
+- -M**util::argv**
+
+    Module to manipulate command argument.
+    See [App::optex::util::argv](https://metacpan.org/pod/App::optex::util::argv) for detail.
+
+- -M**util::filter**
+
+    Module to implement command input/output filters.
+    See [App::optex::util::filter](https://metacpan.org/pod/App::optex::util::filter) for detail.
 
 # OPTIONS
 

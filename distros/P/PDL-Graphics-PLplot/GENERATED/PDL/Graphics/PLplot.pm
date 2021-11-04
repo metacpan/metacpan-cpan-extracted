@@ -1,16 +1,14 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Graphics::PLplot;
 
-our @EXPORT_OK = qw(PL_PARSE_PARTIAL PL_PARSE_FULL PL_PARSE_QUIET PL_PARSE_NODELETE PL_PARSE_SHOWALL PL_PARSE_OVERRIDE PL_PARSE_NOPROGRAM PL_PARSE_NODASH PL_PARSE_SKIP PL_NOTSET DRAW_LINEX DRAW_LINEY DRAW_LINEXY MAG_COLOR BASE_CONT TOP_CONT SURF_CONT DRAW_SIDES FACETED MESH PL_FCI_SANS PL_FCI_MONO PLK_BackSpace PLK_Tab PLK_Linefeed PLK_Return PLK_Escape PLK_Delete PLK_Clear PLK_Pause PLK_Scroll_Lock PLK_Home PLK_Left PLK_Up PLK_Right PLK_Down PLK_Prior PLK_Next PLK_End PLK_Begin PLK_Select PLK_Print PLK_Execute PLK_Insert PLK_Undo PLK_Redo PLK_Menu PLK_Find PLK_Cancel PLK_Help PLK_Break PLK_Mode_switch PLK_script_switch PLK_Num_Lock PLK_KP_Space PLK_KP_Tab PLK_KP_Enter PLK_KP_F1 PLK_KP_F2 PLK_KP_F3 PLK_KP_F4 PLK_KP_Equal PLK_KP_Multiply PLK_KP_Add PLK_KP_Separator PLK_KP_Subtract PLK_KP_Decimal PLK_KP_Divide PLK_KP_0 PLK_KP_1 PLK_KP_2 PLK_KP_3 PLK_KP_4 PLK_KP_5 PLK_KP_6 PLK_KP_7 PLK_KP_8 PLK_KP_9 PLK_F1 PLK_F2 PLK_F3 PLK_F4 PLK_F5 PLK_F6 PLK_F7 PLK_F8 PLK_F9 PLK_F10 PLK_F11 PLK_L1 PLK_F12 PLK_L2 PLK_F13 PLK_L3 PLK_F14 PLK_L4 PLK_F15 PLK_L5 PLK_F16 PLK_L6 PLK_F17 PLK_L7 PLK_F18 PLK_L8 PLK_F19 PLK_L9 PLK_F20 PLK_L10 PLK_F21 PLK_R1 PLK_F22 PLK_R2 PLK_F23 PLK_R3 PLK_F24 PLK_R4 PLK_F25 PLK_R5 PLK_F26 PLK_R6 PLK_F27 PLK_R7 PLK_F28 PLK_R8 PLK_F29 PLK_R9 PLK_F30 PLK_R10 PLK_F31 PLK_R11 PLK_F32 PLK_R12 PLK_R13 PLK_F33 PLK_F34 PLK_R14 PLK_F35 PLK_R15 PLK_Shift_L PLK_Shift_R PLK_Control_L PLK_Control_R PLK_Caps_Lock PLK_Shift_Lock PLK_Meta_L PLK_Meta_R PLK_Alt_L PLK_Alt_R PLK_Super_L PLK_Super_R PLK_Hyper_L PLK_Hyper_R GRID_CSA GRID_DTLI GRID_NNI GRID_NNIDW GRID_NNLI GRID_NNAIDW PL_X_AXIS PL_Y_AXIS PL_Z_AXIS PL_COLORBAR_SHADE PL_COLORBAR_SHADE_LABEL PL_COLORBAR_IMAGE PL_COLORBAR_GRADIENT PL_COLORBAR_CAP_NONE PL_COLORBAR_CAP_LOW PL_COLORBAR_CAP_HIGH PL_COLORBAR_LABEL_LEFT PL_COLORBAR_LABEL_RIGHT PL_COLORBAR_LABEL_TOP PL_COLORBAR_LABEL_BOTTOM PL_LEGEND_BACKGROUND PL_LEGEND_BOUNDING_BOX PL_LEGEND_COLOR_BOX PL_LEGEND_LINE PL_LEGEND_NONE PL_LEGEND_ROW_MAJOR PL_LEGEND_SYMBOL PL_LEGEND_TEXT_LEFT PL_POSITION_BOTTOM PL_POSITION_INSIDE PL_POSITION_LEFT PL_POSITION_OUTSIDE PL_POSITION_RIGHT PL_POSITION_SUBPAGE PL_POSITION_TOP PL_POSITION_VIEWPORT plplot_use_standard_argument_order PDL::PP pladv PDL::PP plaxes PDL::PP plbin plbop PDL::PP plbox PDL::PP plbox3 plclear PDL::PP plcol0 PDL::PP plcol1 PDL::PP plcpstrm PDL::PP pldid2pc PDL::PP pldip2dc plend plend1 PDL::PP plenv PDL::PP plenv0 pleop PDL::PP plerrx PDL::PP plerry plfamadv PDL::PP plfill3 plflush PDL::PP plfont PDL::PP plfontld PDL::PP plgchr PDL::PP plgcompression PDL::PP plgdidev PDL::PP plgdiori PDL::PP plgdiplt PDL::PP plgfam PDL::PP plglevel PDL::PP plgpage plgra PDL::PP plgspa PDL::PP plgvpd PDL::PP plgvpw PDL::PP plgxax PDL::PP plgyax PDL::PP plgzax plinit PDL::PP pljoin pllab PDL::PP pllightsource PDL::PP pllsty PDL::PP plmtex PDL::PP plmtex3 PDL::PP plpat PDL::PP plprec PDL::PP plpsty PDL::PP plptex PDL::PP plptex3 plreplot PDL::PP plschr PDL::PP plscmap0n PDL::PP plscmap1n PDL::PP plscol0 PDL::PP plscolbg PDL::PP plscolor PDL::PP plscompression plsdev PDL::PP plsdidev PDL::PP plsdimap PDL::PP plsdiori PDL::PP plsdiplt PDL::PP plsdiplz PDL::PP pl_setcontlabelparam PDL::PP pl_setcontlabelformat PDL::PP plsfam plsfnam PDL::PP plsmaj PDL::PP plsmin PDL::PP plsori PDL::PP plspage PDL::PP plspause PDL::PP plsstrm PDL::PP plssub PDL::PP plssym PDL::PP plstar PDL::PP plstart PDL::PP plstripa PDL::PP plstripd PDL::PP plsvpa PDL::PP plsxax PDL::PP plsxwin PDL::PP plsyax PDL::PP plszax pltext PDL::PP plvasp PDL::PP plvpas PDL::PP plvpor plvsta PDL::PP plw3d PDL::PP plwidth PDL::PP plwind plsetopt PDL::PP plP_gpixmm PDL::PP plscolbga PDL::PP plscol0a PDL::PP plline PDL::PP plpath PDL::PP plcolorpoints PDL::PP plsmem PDL::PP plfbox PDL::PP plfbox1 PDL::PP plunfbox PDL::PP plunfbox1 PDL::PP plParseOpts PDL::PP plpoin PDL::PP plpoin3 PDL::PP plline3 PDL::PP plpoly3 PDL::PP plhist PDL::PP plfill PDL::PP plgradient PDL::PP plsym PDL::PP plsurf3d PDL::PP plsurf3dl PDL::PP plstyl PDL::PP plseed PDL::PP plrandd pltr0 pltr1 pltr2 PDL::PP plAllocGrid plFreeGrid PDL::PP plAlloc2dGrid plFree2dGrid PDL::PP init_pltr PDL::PP plmap PDL::PP plstring PDL::PP plstring3 PDL::PP plmeridians PDL::PP plshades PDL::PP plcont PDL::PP plmesh PDL::PP plmeshc PDL::PP plot3d PDL::PP plot3dc PDL::PP plscmap1l PDL::PP plshade1 PDL::PP plimage PDL::PP plimagefr plxormod plGetCursor plgstrm plgdev plgfnam plmkstrm plgver PDL::PP plstripc PDL::PP plgriddata plarc plstransform plslabelfunc pllegend plspal0 plspal1 plbtime plconfigtime plctime pltimefmt plsesc PDL::PP plvect PDL::PP plsvect PDL::PP plhlsrgb PDL::PP plgcol0 PDL::PP plgcolbg PDL::PP plscmap0 PDL::PP plscmap1 PDL::PP plgcol0a PDL::PP plgcolbga PDL::PP plscmap0a PDL::PP plscmap1a PDL::PP plscmap1la PDL::PP plgfont PDL::PP plsfont PDL::PP plcalc_world  plgfci  plsfci pl_cmd pl_setCairoCtx );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(PL_PARSE_PARTIAL PL_PARSE_FULL PL_PARSE_QUIET PL_PARSE_NODELETE PL_PARSE_SHOWALL PL_PARSE_OVERRIDE PL_PARSE_NOPROGRAM PL_PARSE_NODASH PL_PARSE_SKIP PL_NOTSET DRAW_LINEX DRAW_LINEY DRAW_LINEXY MAG_COLOR BASE_CONT TOP_CONT SURF_CONT DRAW_SIDES FACETED MESH PL_FCI_SANS PL_FCI_MONO PLK_BackSpace PLK_Tab PLK_Linefeed PLK_Return PLK_Escape PLK_Delete PLK_Clear PLK_Pause PLK_Scroll_Lock PLK_Home PLK_Left PLK_Up PLK_Right PLK_Down PLK_Prior PLK_Next PLK_End PLK_Begin PLK_Select PLK_Print PLK_Execute PLK_Insert PLK_Undo PLK_Redo PLK_Menu PLK_Find PLK_Cancel PLK_Help PLK_Break PLK_Mode_switch PLK_script_switch PLK_Num_Lock PLK_KP_Space PLK_KP_Tab PLK_KP_Enter PLK_KP_F1 PLK_KP_F2 PLK_KP_F3 PLK_KP_F4 PLK_KP_Equal PLK_KP_Multiply PLK_KP_Add PLK_KP_Separator PLK_KP_Subtract PLK_KP_Decimal PLK_KP_Divide PLK_KP_0 PLK_KP_1 PLK_KP_2 PLK_KP_3 PLK_KP_4 PLK_KP_5 PLK_KP_6 PLK_KP_7 PLK_KP_8 PLK_KP_9 PLK_F1 PLK_F2 PLK_F3 PLK_F4 PLK_F5 PLK_F6 PLK_F7 PLK_F8 PLK_F9 PLK_F10 PLK_F11 PLK_L1 PLK_F12 PLK_L2 PLK_F13 PLK_L3 PLK_F14 PLK_L4 PLK_F15 PLK_L5 PLK_F16 PLK_L6 PLK_F17 PLK_L7 PLK_F18 PLK_L8 PLK_F19 PLK_L9 PLK_F20 PLK_L10 PLK_F21 PLK_R1 PLK_F22 PLK_R2 PLK_F23 PLK_R3 PLK_F24 PLK_R4 PLK_F25 PLK_R5 PLK_F26 PLK_R6 PLK_F27 PLK_R7 PLK_F28 PLK_R8 PLK_F29 PLK_R9 PLK_F30 PLK_R10 PLK_F31 PLK_R11 PLK_F32 PLK_R12 PLK_R13 PLK_F33 PLK_F34 PLK_R14 PLK_F35 PLK_R15 PLK_Shift_L PLK_Shift_R PLK_Control_L PLK_Control_R PLK_Caps_Lock PLK_Shift_Lock PLK_Meta_L PLK_Meta_R PLK_Alt_L PLK_Alt_R PLK_Super_L PLK_Super_R PLK_Hyper_L PLK_Hyper_R GRID_CSA GRID_DTLI GRID_NNI GRID_NNIDW GRID_NNLI GRID_NNAIDW PL_X_AXIS PL_Y_AXIS PL_Z_AXIS PL_COLORBAR_SHADE PL_COLORBAR_SHADE_LABEL PL_COLORBAR_IMAGE PL_COLORBAR_GRADIENT PL_COLORBAR_CAP_NONE PL_COLORBAR_CAP_LOW PL_COLORBAR_CAP_HIGH PL_COLORBAR_LABEL_LEFT PL_COLORBAR_LABEL_RIGHT PL_COLORBAR_LABEL_TOP PL_COLORBAR_LABEL_BOTTOM PL_LEGEND_BACKGROUND PL_LEGEND_BOUNDING_BOX PL_LEGEND_COLOR_BOX PL_LEGEND_LINE PL_LEGEND_NONE PL_LEGEND_ROW_MAJOR PL_LEGEND_SYMBOL PL_LEGEND_TEXT_LEFT PL_POSITION_BOTTOM PL_POSITION_INSIDE PL_POSITION_LEFT PL_POSITION_OUTSIDE PL_POSITION_RIGHT PL_POSITION_SUBPAGE PL_POSITION_TOP PL_POSITION_VIEWPORT plplot_use_standard_argument_order pladv plaxes plbin plbop plbox plbox3 plclear plcol0 plcol1 plcpstrm pldid2pc pldip2dc plend plend1 plenv plenv0 pleop plerrx plerry plfamadv plfill3 plflush plfont plfontld plgchr plgcompression plgdidev plgdiori plgdiplt plgfam plglevel plgpage plgra plgspa plgvpd plgvpw plgxax plgyax plgzax plinit pljoin pllab pllightsource pllsty plmtex plmtex3 plpat plprec plpsty plptex plptex3 plreplot plschr plscmap0n plscmap1n plscol0 plscolbg plscolor plscompression plsdev plgDevs plgFileDevs plsdidev plsdimap plsdiori plsdiplt plsdiplz pl_setcontlabelparam pl_setcontlabelformat plsfam plsfnam plsmaj plsmin plsori plspage plspause plsstrm plssub plssym plstar plstart plstripa plstripd plsvpa plsxax plsxwin plsyax plszax pltext plvasp plvpas plvpor plvsta plw3d plwidth plwind plsetopt plP_gpixmm plscolbga plscol0a plline plpath plcolorpoints plsmem plfbox plfbox1 plunfbox plunfbox1 plParseOpts plpoin plpoin3 plline3 plpoly3 plhist plfill plgradient plsym plsurf3d plsurf3dl plstyl plseed plrandd pltr0 pltr1 pltr2 plAllocGrid plFreeGrid plAlloc2dGrid plFree2dGrid init_pltr plmap plstring plstring3 plmeridians plshades plcont plmesh plmeshc plot3d plot3dc plscmap1l plshade1 plimage plimagefr plxormod plGetCursor plgstrm plgdev plgfnam plmkstrm plgver plstripc plgriddata plarc plstransform plslabelfunc pllegend plspal0 plspal1 plbtime plconfigtime plctime pltimefmt plsesc plvect plsvect plhlsrgb plgcol0 plgcolbg plscmap0 plscmap1 plgcol0a plgcolbga plscmap0a plscmap1a plscmap1la plgfont plsfont plcalc_world plgfci plsfci pl_cmd pl_setCairoCtx );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
-
 
 
    
@@ -26,7 +24,7 @@ use Carp qw(confess);
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.78'
+$VERSION = '0.80'
 };
 
 =head1 NAME
@@ -2320,10 +2318,7 @@ sub close {
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -3940,6 +3935,34 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 *plscompression = \&PDL::plscompression;
 
+
+
+=head2 plgDevs
+
+=for sig
+
+  $devices = plgDevs ()
+
+=for ref
+
+Returns a HashRef of all device names (key)
+and their menu strings (value).
+
+=cut
+
+
+=head2 plgFileDevs
+
+=for sig
+
+  $devices = plgFileDevs ()
+
+=for ref
+
+Returns a HashRef of file-oriented device names (key)
+and their menu strings (value).
+
+=cut
 
 
 
@@ -7095,5 +7118,3 @@ and L<PDL::TriD>.
 # Exit with OK status
 
 1;
-
-		   

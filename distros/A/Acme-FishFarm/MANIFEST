@@ -1,0 +1,32 @@
+Changes
+docs/Acme-FishFarm-1.00.html
+docs/Acme-FishFarm-Feeder-1.00.html
+docs/Acme-FishFarm-OxygenMaintainer-1.00.html
+docs/Acme-FishFarm-WaterConditionMonitor-1.00.html
+docs/Acme-FishFarm-WaterFiltration-1.00.html
+docs/Acme-FishFarm-WaterLevelMaintainer-1.00.html
+docs/items_list
+docs/specifications
+lib/Acme/FishFarm.pm
+lib/Acme/FishFarm/Feeder.pm
+lib/Acme/FishFarm/OxygenMaintainer.pm
+lib/Acme/FishFarm/WaterConditionMonitor.pm
+lib/Acme/FishFarm/WaterFiltration.pm
+lib/Acme/FishFarm/WaterLevelMaintainer.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/02-fish_farm.t
+t/04-feeder.t
+t/06-water_filtration.t
+t/08-water_level_maintainer.t
+t/10-water_condition_monitor.t
+t/12-oxygen_maintainer.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

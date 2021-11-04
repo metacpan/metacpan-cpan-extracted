@@ -292,6 +292,7 @@ sub ACTION_code
 
    my $blib = File::Spec->catdir( $self->base_dir, "blib" );
 
+   my $bindir = File::Spec->catdir( $blib, "script" );
    my $libdir = File::Spec->catdir( $blib, "arch" );
    my $incdir = File::Spec->catdir( $libdir, "include" );
    my $mandir = File::Spec->catdir( $blib, "libdoc" );
@@ -313,6 +314,7 @@ sub ACTION_code
       );
 
       $self->make_in_srcdir( "install",
+         "BINDIR=$bindir",
          "LIBDIR=$libdir",
          "INCDIR=$incdir",
          "MAN3DIR=$mandir",
@@ -406,7 +408,7 @@ sub ACTION_install
 
    my $pcfile = "$instlibdir/pkgconfig/$pkgconfig_module.pc";
    if( -f $pcfile ) {
-      print "Relocating $pcfile";
+      print "Relocating $pcfile\n";
 
       open my $in, "<", $pcfile or die "Cannot open $pcfile for reading - $!";
       open my $out, ">", "$pcfile.new" or die "Cannot open $pcfile.new for writing - $!";

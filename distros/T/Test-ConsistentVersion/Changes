@@ -1,5 +1,10 @@
 Revision history for Test-ConsistentVersion
 
+0.3.1  Sun Oct 31 2021
+       Explicitly require minimum perl version of 5.6
+              (we need the 3 argument version of open
+              to be available)
+
 0.3.0  Wed Nov 12 2014
        Don't fail on version numbers that have 'v'
             prepended (eg this changelog entry could

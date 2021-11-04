@@ -866,7 +866,7 @@ SKIP: {
 		$proxy_parameters{ftp} = 'ftp.example.org:2121';
 	}
 	my $proxy = Firefox::Marionette::Proxy->new(%proxy_parameters);
-	($skip_message, $firefox) = start_firefox(0, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, strict_file_interactability => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', unhandled_prompt_behavior => 'accept and notify', moz_webdriver_click => 1, moz_accessibility_checks => 1, moz_use_non_spec_compliant_pointer_origin => 1, timeouts => Firefox::Marionette::Timeouts->new(page_load => 54_321, script => 4567, implicit => 6543)));
+	($skip_message, $firefox) = start_firefox(0, kiosk => 1, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, strict_file_interactability => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', unhandled_prompt_behavior => 'accept and notify', moz_webdriver_click => 1, moz_accessibility_checks => 1, moz_use_non_spec_compliant_pointer_origin => 1, timeouts => Firefox::Marionette::Timeouts->new(page_load => 54_321, script => 4567, implicit => 6543)));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -1049,7 +1049,7 @@ SKIP: {
 
 SKIP: {
 	diag("Starting new firefox for testing proxies");
-	($skip_message, $firefox) = start_firefox(0, chatty => 1, debug => 1, page_load => 65432, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( pac => URI->new('https://proxy.example.org')), moz_headless => 1));
+	($skip_message, $firefox) = start_firefox(0, chatty => 1, devtools => 1, debug => 1, page_load => 65432, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( pac => URI->new('https://proxy.example.org')), moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -1091,9 +1091,6 @@ SKIP: {
 		ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
 		ok($capabilities->proxy()->https() eq 'proxy.example.org:3128', "\$capabilities->proxy()->https() is 'proxy.example.org:3128'");
 		ok($capabilities->proxy()->http() eq 'proxy.example.org:3128', "\$capabilities->proxy()->http() is 'proxy.example.org:3128'");
-		if ($major_version < 90) {
-			ok($capabilities->proxy()->ftp() eq 'proxy.example.org:3128', "\$capabilities->proxy()->ftp() is 'proxy.example.org:3128'");
-		}
 	}
 	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
@@ -1553,6 +1550,7 @@ SKIP: {
 	}
 }
 
+my $bad_network_behaviour;
 SKIP: {
 	diag("Starting new firefox for testing metacpan and w3schools, with find, downloads, extensions and actions");
 	($skip_message, $firefox) = start_firefox(0, debug => 0, page_load => 600000, script => 5432, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, page_load_strategy => 'eager'));
@@ -1653,9 +1651,9 @@ SKIP: {
 	my $new_window_handle;
 	foreach my $handle ($firefox->window_handles()) {
 		if ($major_version < 90) {
-			ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+			ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
 		} else {
-			ok($handle =~ /^$guid_regex$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+			ok($handle =~ /^$guid_regex$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
 		}
 		if ($handle ne $original_window_handle) {
 			$new_window_handle = $handle;
@@ -1764,6 +1762,7 @@ SKIP: {
 		} else {
 			diag("\$firefox->capabilities()->proxy() is not supported for " . $firefox->capabilities()->browser_version());
 		}
+		$bad_network_behaviour = 1;
 		diag("Skipping metacpan tests as loading $metacpan_uri sent firefox to $uri");
 		skip("Skipping metacpan tests as loading $metacpan_uri sent firefox to $uri", 223);
 	}
@@ -1792,6 +1791,69 @@ SKIP: {
 			diag("\$firefox->active_frame is not supported for $major_version.$minor_version.$patch_version:$@");
 		}
 		ok(not(defined $active_frame), "\$firefox->active_frame() is undefined for " . $firefox->uri());
+	}
+	my @links = $firefox->links();
+	ok(scalar @links, "Found " . (scalar @links) . " links in metacpan.org");
+	foreach my $link (@links) {
+		if (defined $link->url()) {
+			ok($link->url(), "Link from metacpan.org has a url of " . $link->url());
+		}
+		if (my $text = $link->text()) {
+			ok($link->text(), "Link from metacpan.org has text of " . $text);
+		}
+		if ($link->name()) {
+			ok($link->name(), "Link from metacpan.org has name of " . $link->name());
+		}
+		if (defined $link->tag()) {
+			ok($link->tag(), "Link from metacpan.org has a tag of " . $link->tag());
+		}
+		if (defined $link->base()) {
+			ok($link->base(), "Link from metacpan.org has a base of " . $link->base());
+		}
+		if ($link->URI()) {
+			ok($link->URI() && $link->URI()->isa('URI::URL'), "Link from metacpan.org has a URI of " . $link->URI());
+		}
+		if ($link->url_abs()) {
+			ok($link->url_abs(), "Link from metacpan.org has a url_abs of " . $link->url_abs());
+		}
+		my %attributes = $link->attrs();
+		my $count = 0;
+		foreach my $key (sort { $a cmp $b } keys %attributes) {
+			ok($key, "Link from metacpan.org has a attribute called '" . $key . "' with a value of '" . $attributes{$key} . "'");
+			$count += 1;
+		}
+		ok($count, "Link from metacpan.org has $count attributes");
+	}
+	my @images = $firefox->images();
+	foreach my $image (@images) {
+		ok($image->url(), "Image from metacpan.org has a url of " . $image->url());
+		ok($image->height(), "Image from metacpan.org has height of " . $image->height());
+		ok($image->width(), "Image from metacpan.org has width of " . $image->width());
+		if ($image->alt()) {
+			ok($image->alt(), "Image from metacpan.org has alt of " . $image->alt());
+		}
+		if ($image->name()) {
+			ok($image->name(), "Image from metacpan.org has name of " . $image->name());
+		}
+		if (defined $image->tag()) {
+			ok($image->tag() =~ /^(image|input)$/smx, "Image from metacpan.org has a tag of " . $image->tag());
+		}
+		if (defined $image->base()) {
+			ok($image->base(), "Image from metacpan.org has a base of " . $image->base());
+		}
+		if ($image->URI()) {
+			ok($image->URI() && $image->URI()->isa('URI::URL'), "Image from metacpan.org has a URI of " . $image->URI());
+		}
+		if ($image->url_abs()) {
+			ok($image->url_abs(), "Image from metacpan.org has a url_abs of " . $image->url_abs());
+		}
+		my %attributes = $image->attrs();
+		my $count = 0;
+		foreach my $key (sort { $a cmp $b } keys %attributes) {
+			ok($key, "Image from metacpan.org has a attribute called '" . $key . "' with a value of '" . $attributes{$key} . "'");
+			$count += 1;
+		}
+		ok($count, "Image from metacpan.org has $count attributes");
 	}
 	my $search_box_id;
 	foreach my $element ($firefox->has_tag('input')) {
@@ -2340,6 +2402,7 @@ SKIP: {
 	if (out_of_time()) {
 		skip("Running out of time.  Trying to shutdown tests as fast as possible", 36);
 	}
+	my $dummy_object = bless {}, 'What::is::this::object';
 	foreach my $name ('click', 'clear', 'is_selected', 'is_enabled', 'is_displayed', 'type', 'tag_name', 'rect', 'text') {
 		eval {
 			$firefox->$name({});
@@ -2349,6 +2412,10 @@ SKIP: {
 			$firefox->$name(q[]);
 		};
 		ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->$name() with a non ref parameter produces a Firefox::Marionette::Exception exception");
+		eval {
+			$firefox->$name($dummy_object);
+		};
+		ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->$name() with a non Element blessed parameter produces a Firefox::Marionette::Exception exception");
 	}
 	ok($firefox->find_name('lucky')->click($element), "Clicked the \"I'm Feeling Lucky\" button");
 	diag("Going to Test::More page with a page load strategy of " . ($capabilities->page_load_strategy() || ''));
@@ -2815,12 +2882,112 @@ SKIP: {
 	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
 
+SKIP: {
+	if ($ENV{RELEASE_TESTING}) {
+		diag("Starting new firefox for testing images and links");
+		($skip_message, $firefox) = start_firefox(0, visible => 0, debug => 1);
+		if (!$skip_message) {
+			$at_least_one_success = 1;
+		}
+		if ($skip_message) {
+			skip($skip_message, 8);
+		}
+		ok($firefox, "Firefox has started in Marionette mode with visible set to 0");
+		my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
+		SKIP: {
+			if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} ne 'localhost')) {
+				diag("\$capabilities->proxy is not supported for remote hosts");
+				skip("\$capabilities->proxy is not supported for remote hosts", 3);
+			} elsif (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_PORT})) {
+				diag("\$capabilities->proxy is not supported for remote hosts");
+				skip("\$capabilities->proxy is not supported for remote hosts", 3);
+			} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
+				if (my $pid = fork) {
+					$firefox->go($daemon->url() . '?links_and_images');
+					foreach my $image ($firefox->images()) {
+						ok($image->tag(), "Image tag is defined as " . $image->tag());
+					}
+					foreach my $link ($firefox->links()) {
+						if (defined $link->text()) {
+							ok(defined $link->text(), "Link text is defined as " . $link->text());
+						} else {
+							ok(1, "Link text is not defined");
+						}
+					}
+					while(kill 0, $pid) {
+						kill $signals_by_name{TERM}, $pid;
+						sleep 1;
+						waitpid $pid, POSIX::WNOHANG();
+					}
+				} elsif (defined $pid) {
+					eval {
+						local $SIG{ALRM} = sub { die "alarm during links and images server\n" };
+						alarm 40;
+						$0 = "[Test HTTP Links and Images Server for " . getppid . "]";
+						while (my $connection = $daemon->accept()) {
+							diag("Accepted connection");
+							if (my $child = fork) {
+								waitpid $child, 0;
+							} elsif (defined $child) {
+								eval {
+									local $SIG{ALRM} = sub { die "alarm during links and images server accept\n" };
+									alarm 40;
+									if (my $request = $connection->get_request()) {
+										diag("Got request (pid: $$) for " . $request->uri());
+										my ($headers, $response);
+										if ($request->uri() =~ /image[.]png/) {
+											$headers = HTTP::Headers->new('Content-Type', 'image/png');
+											$response = HTTP::Response->new(200, "OK", $headers, MIME::Base64::decode_base64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWP48Gr6fwAIsANxwk14sgAAAABJRU5ErkJggg=="));
+										} else {
+											$headers = HTTP::Headers->new('Content-Type', 'text/html');
+											$response = HTTP::Response->new(200, "OK", $headers, '<!DOCTYPE html><html lang="en-AU"><head><title>Test</title><meta/></head><body><form action="/submit"><input type="image" alt="no idea" src="/image.png"></form><a href="http://example.com/"></a></body></html>');
+										}
+										$connection->send_response($response);
+									}
+									$connection->close;
+									diag("Connection closed (pid: $$)");
+									$connection = undef;
+									exit 0;
+								} or do {
+									chomp $@;
+									diag("Caught exception in links and images server accept:$@");
+								};
+								diag("Connection error");
+								exit 1;
+							} else {
+								diag("Failed to fork connection:$!");
+								die "Failed to fork:$!";
+							}
+						}
+					} or do {
+						chomp $@;
+						diag("Caught exception in links and images server:$@");
+					};
+					exit 1;
+				} else {
+					diag("Failed to fork http proxy:$!");
+					die "Failed to fork:$!";
+				}
+			} else {
+				skip("No forking available for $^O", 3);
+				diag("No forking available for $^O");
+			}
+		}
+		local $TODO = $major_version == 60 ? "Not entirely stable in firefox 60" : q[];
+		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
+	}
+}
+
 sub display_name {
 	my ($certificate) = @_;
 	return $certificate->display_name() || $certificate->nickname();
 }
 
 SKIP: {
+	if ($bad_network_behaviour) {
+		diag("Skipping proxy by argument, capabilities, window switching and certificates tests because these tests fail when metacpan connections are re-routed above");
+		skip("Skipping proxy by argument, capabilities, window switching and certificates tests because these tests fail when metacpan connections are re-routed above", 32);
+	}
 	diag("Starting new firefox for testing proxy by argument, capabilities, window switching and certificates");
 	my $proxy_host = 'all.example.org';
 	($skip_message, $firefox) = start_firefox(1, import_profile_paths => [ 't/data/logins.json', 't/data/key4.db' ], manual_certificate_add => 1, console => 1, debug => 0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
@@ -2851,9 +3018,6 @@ SKIP: {
 			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 4);
 		}
 		ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
-		if ($major_version < 90) {
-			ok($capabilities->proxy()->ftp() eq "$proxy_host:80", "\$capabilities->proxy()->ftp() is '$proxy_host:80'");
-		}
 		ok($capabilities->proxy()->http() eq "$proxy_host:80", "\$capabilities->proxy()->http() is '$proxy_host:80'");
 		ok($capabilities->proxy()->https() eq "$proxy_host:80", "\$capabilities->proxy()->https() is '$proxy_host:80'");
 	}

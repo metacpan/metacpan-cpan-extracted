@@ -12,9 +12,13 @@ a tarball for this test (eg C<./Build dist>).
 
 =cut
 
-use Test::More;
+use Test2::V0;
+
+# Dear Test::Kwalitee, kindly stop second-guessing my Build.PL regarding
+# whether this test should run; and focus on doing your job:
+$ENV{"AUTHOR_TESTING"} = 1;
 
 eval { require Test::Kwalitee; Test::Kwalitee->import() };
 
-plan( skip_all => 'Test::Kwalitee not installed; skipping' ) if $@;
+skip_all('Test::Kwalitee not installed; skipping') if $@;
 

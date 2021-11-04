@@ -21,7 +21,7 @@
 
 use strict ;
 
-use version ; our $VERSION = "1.99" ;
+use version ; our $VERSION = "1.2" ;
 
 package uHTMLnode;
 
@@ -204,6 +204,102 @@ sub appendChild( $ )
   my $new  = shift;
 
   return $Node->addChild( $new, $Node->{LastChild} ) ;
+}
+
+sub findChild
+{
+  my $Node  = shift;
+  my $name  = shift;
+  my $child = shift;
+  my( $C,$R ) ;
+
+  return undef unless $name ne '' and $Node->{FirstChild} ;
+  undef $child unless ref $child eq 'uHTMLnode' and $child != $Node ;
+
+  for( $C = $Node->{FirstChild}; $C; $C=$C->{Next} )
+  {
+    $C == $child and undef $child, next if $child ;
+    return $C                           if $name eq $C->{Name} ;
+    return $R                           if $R = $C->findChild( $name,$child ) ;
+  }
+  return undef ;
+}
+
+sub adoptChildren
+{
+  my $Node  = shift;
+  my $from  = shift;
+  my $child = shift;
+  my( $C,$F,$L ) ;
+
+  return undef unless ref $from eq 'uHTMLnode' and $from->{FirstChild} ;
+  for( $C=$from; $C; $C=$C->{Parent} )
+  {
+    return undef if $C == $Node ;
+  }
+  undef $child unless ref $child eq 'uHTMLnode' and $child->{Parent} == $Node ;
+
+  for( $F=$C=$from->{FirstChild}; $C; $C=$C->{Next} )
+  {
+    $C->{Parent} = $Node ;
+    $L           = $C ;
+  }
+  delete $from->{FirstChild} ;
+  delete $from->{LastChild} ;
+
+  if( $child )
+  {
+    if( $child->{Next} )
+    {
+      $L->{Next}         = $child->{Next} ;
+      $L->{Next}->{Prev} = $L ;
+    }
+    else
+    {
+      $Node->{LastChild} = $L ;
+    }
+    $child->{Next} = $F ;
+  }
+  else
+  {
+    if( $Node->{FirstChild} )
+    {
+      $L->{Next}         = $Node->{FirstChild} ;
+      $L->{Next}->{Prev} = $L ;
+    }
+    else
+    {
+      $Node->{LastChild} = $L ;
+    }
+    $Node->{FirstChild} = $F ;
+  }
+
+  return $F ;
+}
+
+sub replace
+{
+  my $Node  = shift;
+  my $new   = shift;
+  my $KeepT = shift;
+  my $C ;
+
+  return undef unless ref $new eq 'uHTMLnode' ;
+
+  print STDERR "Replace node $Node->{Name} with $new->{Name}\n" ;
+
+  for( $C=$new; $C; $C=$C->{Parent} )
+  {
+    return undef if $C == $Node ;
+  }
+  $new->detach() if $new->{Parent} or $new->{Prev} or $new->{Next} ;
+
+  $new->{Prev}    = $Node->{Prev}   ;
+  $new->{Next}    = $Node->{Next}   ;
+  $new->{Parent}  = $Node->{Parent} ;
+  $new->{Trailer} = $Node->{Trailer} if $KeepT ;
+
+  return $Node->detach() ;
 }
 
 sub detach
@@ -495,7 +591,6 @@ sub map( $$ )
     $C = $T, $T = $T->{Next}, $C->delete() while $T ;
   }
 
-  push @HTML,$Node->{Trailer} ;
 
   return( $Node->{HTML} = \@HTML ) ;
 }
@@ -595,7 +690,7 @@ sub _close( $$ )
 
   my( $p, $e ) ;
 
-  for( $p = $Node; $p and $p->{Name} ne $Name or $p->{End} ; $p=$p->{Prev} ) {} ;
+  for( $p = $Node; $p and $p->{Name} ne $Name or $p->{XMLClose} or $p->{End} ; $p=$p->{Prev} ) {} ;
   errorMsg( 0,"wrong close of $Name." ) and return undef unless $p ;
 
   if( $p and $p->{Next} )
@@ -808,10 +903,11 @@ sub _struct( $$$ )
         }
       }
       lc $tag eq 'style' || lc $tag eq 'svg' || lc $tag eq 'script' && !exists $Attributes{'src'} ?
-            $String =~ m/\G[^>]*>(.*?)(?=<\/$tag>)/sgci :
-            $String =~ m/\G[^>]*>([^<]*)/sgc ;
-      $New = uHTMLnode->new( $tag,$1,$Prev,$env ) ;
+            $String =~ m/\G[^>]*?(\/)?>(.*?)(?=<\/$tag>)/sgci :
+            $String =~ m/\G[^>]*?(\/)?>([^<]*)/sgc ;
+      $New = uHTMLnode->new( $tag,$2,$Prev,$env ) ;
       $New->attributes( \%Attributes ) if %Attributes ;
+      $New->XMLClose( $1 ) ;
     }
     elsif( $tag =~ m/^\/(\w[\w:-]*)$/s )
     {
@@ -1077,11 +1173,11 @@ Check if some code is bound to the tag $Name.
 
 Check if some code is bound to the attribute variable $Name.
 
-    uHTML::FileStart
+    uHTML::fileStart
 
 Set the current file name for debug output. Ignored in production mode.
 
-    uHTML::FileEnd
+    uHTML::fileEnd
 
 Reset the current file name for debug output to the previous name. Ignored in production mode.
 
@@ -1230,6 +1326,24 @@ Add a child node as new last child.
 
 The node $Child mustn't be a child of $node. If $Child has its parent node set, it
 will be correctly moved within the B<uHTML> document.
+
+    $node->adoptChildren( $From,$Child ) ;
+
+Transfer the children of one node to another.
+
+The children of the node $From are moved to the $node and inserted if $Child is given
+after $Child or ahead of all children of $node if $Child is not defined.
+
+    $node->findChild( $Name,$Child ) ;
+
+Find a child node of $node named $Name after the child $Child. If $Child is undefined,
+find first child node named $Name.
+
+    $node->replace( $New,$KeepTrailer ) ;
+
+Replaces a node in the B<uHTML> structure. Normally the trailing text gets replaced
+in process too. To keep it, $KeepTrailer must be true. Returns the detached original
+node if successful.
 
     $node->detach( $KeepTrailer ) ;
 

@@ -15,7 +15,7 @@ use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use utf8;
 
-our $VERSION  = version->new(1.1.14);
+our $VERSION  = version->new(1.1.16);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -174,7 +174,12 @@ sub fmt_table {
     my $fmt = "%-25s % 7d";
     my $max = 1;
     my $users = $stats->[0]{users}   || {};
-    my $total = $stats->[0]{commits} || 0;
+    my %totals = (
+        commit_count  => 0,
+        lines_added   => 0,
+        lines_removed => 0,
+        files         => 0,
+    );
 
     if ($option{changes}) {
         $fmt .= " % 9d % 9d % 5d";
@@ -190,6 +195,14 @@ sub fmt_table {
         keys %$users;
 
     for my $user (@users) {
+        %totals = (
+            commit_count  => ($totals{commit_count}  + $users->{$user}{commit_count} || 0),
+            $users->{$user}{changes} ? (
+                lines_added   => ($totals{lines_added}   + ($users->{$user}{changes}{lines_added} || 0)),
+                lines_removed => ($totals{lines_removed} + ($users->{$user}{changes}{lines_removed} || 0)),
+                files         => ($totals{files}         + ($users->{$user}{changes}{files} || 0)),
+            ) : ()
+        );
         my @out = (
             $user,
             $users->{$user}{commit_count},
@@ -199,7 +212,19 @@ sub fmt_table {
         );
         printf "$fmt\n", @out[0..$max];
     }
-    print "Total commits = $total\n";
+    if ($option{changes}) {
+        my @out = (
+            'Total',
+            $totals{commit_count},
+            $totals{lines_added},
+            $totals{lines_removed},
+            $totals{files},
+        );
+        printf "\n$fmt\n", @out[0..$max];
+    }
+    else {
+        print "Total commits = $totals{commit_count}\n";
+    }
 
     return;
 }
@@ -229,7 +254,7 @@ git-committers - Stats on the number of commits by committer
 
 =head1 VERSION
 
-This documentation refers to git-committers version 1.1.14
+This documentation refers to git-committers version 1.1.16
 
 =head1 SYNOPSIS
 

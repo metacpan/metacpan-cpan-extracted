@@ -1,3 +1,8 @@
+0.13    2021-10-21
+    - Fix "Discrepancy between distro and Shell.pm version number"
+        - https://github.com/shlomif/Term-Shell/pull/4
+        - Thanks to @EmilianoBruni .
+
 0.12    2020-10-14
     - Rebuild for new dist.ini / weaver.ini / etc. deps
 

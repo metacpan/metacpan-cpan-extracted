@@ -4,13 +4,13 @@
 # Author: Roland Mosler - Roland@Place.Ug
 #
 # Das ist eine uHTML-Bibliothek von Place.Ug
-# Es ist erlaubt dieses Paket unter der aktuellen GNU LGPL zu nutzen
+# Es ist erlaubt dieses Paket unter der GPLv3 zu nutzen
 # Bei Weiterentwicklungen ist die Ursprungsbibliothek zu nennen
 #
 # Fehler und Verbesserungen bitte an uHTML@Place.Ug
 #
 # This is a uHTML library from Place.Ug
-# It is allowed to use this library under the actual GNU LGPL
+# It is allowed to use this library under the GPLv3
 # The name of this library is to be named in all derivations
 #
 # Please report errors to uHTML@Place.Ug

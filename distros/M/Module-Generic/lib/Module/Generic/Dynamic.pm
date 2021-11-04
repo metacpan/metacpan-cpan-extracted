@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.0.1
+## Version v1.0.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/04/18
+## Modified 2021/09/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use warnings::register;
     use Scalar::Util ();
     # use Class::ISA;
-    our( $VERSION ) = 'v1.0.1';
+    our( $VERSION ) = 'v1.0.2';
 };
 
 sub new
@@ -130,12 +130,26 @@ EOT
             $clean_field =~ s/^\d+//g;
             # Possibly there is no acceptable characters to make a field out of it
             next unless( length( $clean_field ) );
-            eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_scalar_as_object( '$clean_field', \@_ ) ); }" );
+            my $func_name = '_set_get_scalar_as_object';
+            if( $clean_field =~ /(^|\b)date|datetime($|\b)/ )
+            {
+                $func_name = '_set_get_datetime';
+            }
+            elsif( $clean_field =~ /(^|\b)(uri|url)($|\b)/ || $hash->{ $k } =~ /^https?\:\/{2}/ )
+            {
+                $func_name = '_set_get_uri';
+            }
+            eval( "sub ${new_class}::${clean_field} { return( shift->${func_name}( '$clean_field', \@_ ) ); }" );
             $self->$clean_field( $hash->{ $k } );
         }
         else
         {
-            $self->$k( $hash->{ $k } );
+            my $clean_field = $k;
+            $clean_field =~ tr/-/_/;
+            $clean_field =~ s/\_{2,}/_/g;
+            $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
+            $clean_field =~ s/^\d+//g;
+            $self->$clean_field( $hash->{ $k } );
         }
     }
     return( $self );
@@ -179,6 +193,18 @@ AUTOLOAD
             ( $ref eq 'scalar' && ( $$ref == 1 || $$ref == 0 ) ) )
         {
             $handler = '_set_get_boolean';
+        }
+        elsif( !$ref && $method =~ /(?<=[^a-zA-Z0-9])(date|datetime)(?!>[^a-zA-Z0-9])/ )
+        {
+            $handler = '_set_get_datetime';
+        }
+        elsif( !$ref && ( $method =~ /(?<=[^a-zA-Z0-9])(uri|url)(?!>[^a-zA-Z0-9])/ || $_[0] =~ /^https?\:\/{2}/ ) )
+        {
+            $handler = '_set_get_uri';
+        }
+        elsif( !$ref && $_[0] =~ /^[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12}$/ )
+        {
+            $handler = '_set_get_uuid';
         }
         eval( "sub ${class}::${method} { return( shift->$handler( '$method', \@_ ) ); }" );
         die( $@ ) if( $@ );

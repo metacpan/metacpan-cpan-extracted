@@ -13,7 +13,7 @@
 package Net::STOMP::Client::HeartBeat;
 use strict;
 use warnings;
-our $VERSION  = "2.3";
+our $VERSION  = "2.5";
 our $REVISION = sprintf("%d.%02d", q$Revision: 2.4 $ =~ /(\d+)\.(\d+)/);
 
 #
@@ -292,4 +292,4 @@ L<Time::HiRes>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2017
+Copyright (C) CERN 2010-2021

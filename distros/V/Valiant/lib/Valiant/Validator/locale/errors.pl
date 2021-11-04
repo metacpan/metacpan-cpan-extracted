@@ -2,6 +2,8 @@
   en => {
     errors => {
       messages => {
+        # scalar
+        is_not_a_scalar => 'must be a string or number',
         # numericality
         less_than_or_equal_to_err => 'must be less than or equal to {{count}}',
         is_number_err => "is not a number",

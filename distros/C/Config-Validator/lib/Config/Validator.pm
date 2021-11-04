@@ -13,7 +13,7 @@
 package Config::Validator;
 use strict;
 use warnings;
-our $VERSION  = "1.3";
+our $VERSION  = "1.4";
 our $REVISION = sprintf("%d.%02d", q$Revision: 1.36 $ =~ /(\d+)\.(\d+)/);
 
 #

@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::createClient;
-$Shipment::Temando::WSDL::Elements::createClient::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::createClient::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ use warnings;
                   client
                   promotionCode
 
-                  )
+                )
             ],
             {   'loginDetails'  => \%loginDetails_of,
                 'client'        => \%client_of,
@@ -54,7 +54,7 @@ use warnings;
             },
             {   'loginDetails' =>
                   'Shipment::Temando::WSDL::Types::LoginDetails',
-                'client' => 'Shipment::Temando::WSDL::Types::Client',
+                'client'        => 'Shipment::Temando::WSDL::Types::Client',
                 'promotionCode' =>
                   'Shipment::Temando::WSDL::Types::PromotionCode',
             },
@@ -86,7 +86,7 @@ Shipment::Temando::WSDL::Elements::createClient
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

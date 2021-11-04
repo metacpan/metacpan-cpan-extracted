@@ -1,6 +1,17 @@
 Changelog for DBIx-OnlineDDL
 
-v0.930.1 2021-01-27T20:24:46
+v0.940.0 2021-10-08T16:27:10
+ - Update README (Brendan Byrd)
+ - Pull request #5: SM-3087 (Brendan Byrd)
+ - Improve speed of trigger name lookups for MySQL (Brendan Byrd)
+ - Allow existing triggers on a table for MySQL 5.7+ (Brendan Byrd)
+ - Standardize DBMS version extraction to its own helper method (Brendan
+   Byrd)
+ - Pull request #4: SM-3039 (Brendan Byrd)
+ - Detect default FK indexes and rename them (in MySQL 5.7) if they ever
+   change names (Brendan Byrd)
+
+v0.930.1 2021-01-27T20:24:06
  - Update README (Brendan Byrd)
  - Use an optimized SQL statement for MySQL's foreign_key_info (Brendan
    Byrd)
@@ -14,6 +25,9 @@ v0.920.1 2020-05-08T19:14:18
  - Move xt tests where they belong (Andrew Hewus Fresh)
  - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
 
+v0.920.0 2019-08-08T15:14:41
+ - No changes found
+
 0.92 2019-08-08T15:14:41
  - Fix year in CHANGES (Brendan Byrd)
  - Version changes to 0.92 (Brendan Byrd)
@@ -22,9 +36,6 @@ v0.920.1 2020-05-08T19:14:18
  - SM-1858 Fix typos in pod. (Tom Christiansen)
  - SM-1858: Use MooX::StrictConstructor to prevent attribute misspellings
    (Brendan Byrd)
-
-v0.920.0 2019-08-08T15:14:41
- - No changes found
 
 0.91 2019-01-29T20:08:03
  - POD version fixes to 0.91 (Brendan Byrd)

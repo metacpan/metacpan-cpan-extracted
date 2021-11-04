@@ -1,5 +1,5 @@
 package CHI::Driver::Role::HasSubcaches;
-$CHI::Driver::Role::HasSubcaches::VERSION = '0.60';
+$CHI::Driver::Role::HasSubcaches::VERSION = '0.61';
 use Moo::Role;
 use CHI::Types qw(:all);
 use MooX::Types::MooseLike::Base qw(:all);

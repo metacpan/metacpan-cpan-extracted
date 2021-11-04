@@ -1,3 +1,6 @@
+0.07 2021-10-26
+ - S3: Enable response header override parameters (lucas1)
+
 0.06 2021-09-03
  - S3: enable version parameter for S3 objects (mschout)
 

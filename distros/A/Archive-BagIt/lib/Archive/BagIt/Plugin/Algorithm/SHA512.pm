@@ -3,15 +3,11 @@ use strict;
 use warnings;
 use Carp qw( croak );
 use Moo;
-use Net::SSLeay ();
 use namespace::autoclean;
 with 'Archive::BagIt::Role::Algorithm';
+with 'Archive::BagIt::Role::OpenSSL';
+our $VERSION = '0.083'; # VERSION
 # ABSTRACT: The default SHA algorithms plugin (default for v1.0)
-our $VERSION = '0.081'; # VERSION
-
-sub BEGIN {
-    Net::SSLeay::OpenSSL_add_all_digests();
-}
 
 has '+plugin_name' => (
     is => 'ro',
@@ -33,33 +29,10 @@ has '_digest' => (
 
 sub _build_digest_sha {
     my ($self) = @_;
-    my $md  = Net::SSLeay::EVP_get_digestbyname($self->name);
-    my $digest = Net::SSLeay::EVP_MD_CTX_create();
-    Net::SSLeay::EVP_DigestInit($digest, $md);
-    return $digest;
+    return $self->_init_digest();
 }
 
-sub get_hash_string {
-    my ($self, $fh) = @_;
-    my $blksize = $self->get_optimal_bufsize($fh);
-    my $buffer;
-    while (read($fh, $buffer, $blksize)) {
-        Net::SSLeay::EVP_DigestUpdate($self->_digest, $buffer);
-    }
-    my $result = Net::SSLeay::EVP_DigestFinal($self->_digest);
-    Net::SSLeay::EVP_MD_CTX_destroy($self->_digest);
-    delete $self->{_digest};
-    return unpack('H*', $result);
-}
 
-sub verify_file {
-    my ($self, $filename) = @_;
-    open(my $fh, '<:raw', $filename) || croak ("Can't open '$filename', $!");
-    binmode($fh);
-    my $digest = $self->get_hash_string($fh);
-    close $fh || croak("could not close file '$filename', $!");
-    return $digest;
-}
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -75,7 +48,7 @@ Archive::BagIt::Plugin::Algorithm::SHA512 - The default SHA algorithms plugin (d
 
 =head1 VERSION
 
-version 0.081
+version 0.083
 
 =head1 AVAILABILITY
 

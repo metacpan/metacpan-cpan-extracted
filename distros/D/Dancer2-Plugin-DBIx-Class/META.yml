@@ -14,6 +14,7 @@ build_requires:
   IPC::Open3: '0'
   JSON::MaybeXS: '0'
   Plack::Test: '0'
+  Test2::V0: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,19 +28,25 @@ name: Dancer2-Plugin-DBIx-Class
 provides:
   Dancer2::Plugin::DBIx::Class:
     file: lib/Dancer2/Plugin/DBIx/Class.pm
-    version: '1.03'
+    version: '1.06'
+  Dancer2::Plugin::DBIx::Class::ExportBuilder:
+    file: lib/Dancer2/Plugin/DBIx/Class/ExportBuilder.pm
+    version: '1.06'
 requires:
   Carp: '0'
   Class::C3::Componentised: '0'
   Dancer2::Plugin: '0'
-  Try::Tiny: '0'
+  Modern::Perl: '0'
+  Moo: '0'
+  curry: '0'
   perl: '5.012'
 resources:
   bugtracker: https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class/-/issues
   repository: https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class.git
-version: '1.03'
+version: '1.06'
 x_contributors:
   - 'D Ruth Holloway <ruthh@clearbuilt.com>'
+  - 'Jason A. Crome <jason@crome-plated.com>'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

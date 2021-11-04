@@ -1,48 +1,52 @@
-use Test::More;
-use strict;
-use warnings;
-use Net::SAML2;
-use MIME::Base64;
-use Data::Dumper;
-use File::Slurp;
-use LWP::UserAgent;
+use Test::Lib;
+use Test::Net::SAML2;
 
-my $sp = Net::SAML2::SP->new(
-        id               => 'http://localhost:3000',
-        url              => 'http://localhost:3000',
-        cert             => 't/sign-nopw-cert.pem',
-        cacert           => 't/cacert.pem',
-        org_name         => 'Test',
-        org_display_name => 'Test',
-        org_contact      => 'test@example.com',
+use Net::SAML2::IdP;
+
+my $sp = net_saml2_sp();
+
+my $metadata = path('t/idp-metadata.xml')->slurp;
+
+my $idp = Net::SAML2::IdP->new_from_xml(
+    xml    => $metadata,
+    cacert => 't/cacert.pem'
 );
-ok($sp);
 
-my $metadata = read_file('t/idp-metadata.xml');
-ok($metadata);
-my $idp = Net::SAML2::IdP->new_from_xml( xml => $metadata, cacert => 't/cacert.pem' );
-ok($idp);
+isa_ok($idp, "Net::SAML2::IdP");
 
 my $sso_url = $idp->sso_url($idp->binding('redirect'));
-ok($sso_url);
+is(
+    $sso_url,
+    'http://sso.dev.venda.com/opensso/SSORedirect/metaAlias/idp',
+    'Redirect URI is correct'
+);
+
 my $authnreq = $sp->authn_request(
     $idp->entityid,
-    $idp->format('persistent'),
+    $idp->format('persistent')
 )->as_xml;
-ok($authnreq);
+
+my $xp = get_xpath($authnreq);
 
 my $redirect = $sp->sso_redirect_binding($idp, 'SAMLRequest');
-ok($redirect);
+isa_ok($redirect, 'Net::SAML2::Binding::Redirect');
 
-my $location = $redirect->sign(
-        $authnreq,
-        'http://return/url',
+my $location = $redirect->sign($authnreq, 'http://return/url');
+
+# TODO: Use URI to grab the base URI and query params to check if
+# everything exists
+
+like(
+    $location,
+    qr#\Qhttp://sso.dev.venda.com/opensso/SSORedirect/metaAlias/idp?SAMLRequest=\E#,
+    "location checks out"
 );
-ok($location);
 
 my ($request, $relaystate) = $redirect->verify($location);
-ok($request);
-ok($relaystate);
-ok($relaystate eq 'http://return/url');
+
+test_xml_attribute_ok($xp, '/saml2p:AuthnRequest/@ID', qr/^NETSAML2_/,
+    "Found a requestID");
+
+is($relaystate, 'http://return/url', "Relay state shows correct uri");
 
 done_testing;

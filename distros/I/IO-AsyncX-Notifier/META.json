@@ -1,0 +1,94 @@
+{
+   "abstract" : "Combining IO::Async::Notifier with Object::Pad",
+   "author" : [
+      "Tom Molesworth <TEAM@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IO-AsyncX-Notifier",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::TEAM" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Async::Notifier" : "0.79",
+            "Object::Pad" : "0.55"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Ryu::Observable" : "3.000",
+            "Test::CheckDeps" : "0.010",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "IO::AsyncX::Notifier" : {
+         "file" : "lib/IO/AsyncX/Notifier.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/team-at-cpan/IO-AsyncX-Notifier/issues"
+      },
+      "homepage" : "https://github.com/team-at-cpan/IO-AsyncX-Notifier",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/team-at-cpan/IO-AsyncX-Notifier.git",
+         "web" : "https://github.com/team-at-cpan/IO-AsyncX-Notifier"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:TEAM",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

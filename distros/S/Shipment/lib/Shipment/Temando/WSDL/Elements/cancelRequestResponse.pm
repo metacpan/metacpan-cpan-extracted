@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::cancelRequestResponse;
-$Shipment::Temando::WSDL::Elements::cancelRequestResponse::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::cancelRequestResponse::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -55,7 +55,7 @@ Shipment::Temando::WSDL::Elements::cancelRequestResponse
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

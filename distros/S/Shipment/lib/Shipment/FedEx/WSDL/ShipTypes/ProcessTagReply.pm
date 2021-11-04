@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ProcessTagReply;
-$Shipment::FedEx::WSDL::ShipTypes::ProcessTagReply::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ProcessTagReply::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Version
               CompletedShipmentDetail
 
-              )
+            )
         ],
         {   'HighestSeverity'         => \%HighestSeverity_of,
             'Notifications'           => \%Notifications_of,
@@ -80,7 +80,7 @@ Shipment::FedEx::WSDL::ShipTypes::ProcessTagReply
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

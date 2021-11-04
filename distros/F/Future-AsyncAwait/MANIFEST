@@ -3,6 +3,7 @@ Changes
 hax/cx_pushblock.c.inc
 hax/cx_pusheval.c.inc
 hax/docatch.c.inc
+hax/newOP_CUSTOM.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
 hax/README
@@ -33,10 +34,12 @@ t/12closure.t
 t/13regexp.t
 t/14packagevar.t
 t/15local-errsv.t
+t/16state.t
 t/20context-block.t
 t/21context-while.t
 t/22context-foreach.t
 t/23context-map.t
+t/24context-foreach-list.t
 t/30stringeval.t
 t/31destroy.t
 t/32compile-errors.t
@@ -53,6 +56,7 @@ t/80async-method.t
 t/80await+defer.t
 t/80await+dynamically.t
 t/80await+feature-try.t
+t/80await+matchcase.t
 t/80await+SKT.t
 t/81async-method+dynamically.t
 t/81memory-growth.t

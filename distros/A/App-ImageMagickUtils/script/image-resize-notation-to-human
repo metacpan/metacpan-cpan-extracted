@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-05'; # DATE
+our $DATE = '2021-10-12'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Math/Image/CalcResized/image_resize_notation_to_human",
@@ -38,13 +38,19 @@ image-resize-notation-to-human - Translate ImageMagick-like resize notation (e.g
 
 =head1 VERSION
 
-This document describes version 0.005 of image-resize-notation-to-human (from Perl distribution App-ImageMagickUtils), released on 2021-10-05.
+This document describes version 0.008 of image-resize-notation-to-human (from Perl distribution App-ImageMagickUtils), released on 2021-10-12.
 
 =head1 SYNOPSIS
 
 Usage:
 
 % B<image-resize-notation-to-human> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<resize>E<gt>
+
+=head1 DESCRIPTION
+
+Resize notation supports most syntax from ImageMagick geometry. See
+L<Math::Image::CalcResized> and ImageMagick documentation on geometry for more
+details.
 
 =head1 OPTIONS
 

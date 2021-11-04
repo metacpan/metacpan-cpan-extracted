@@ -3,13 +3,10 @@
 #
 #  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
 
-package Commandable::Invocation;
+package Commandable::Invocation 0.05;
 
-use strict;
+use v5.14;
 use warnings;
-use 5.010; # //
-
-our $VERSION = '0.04';
 
 =head1 NAME
 

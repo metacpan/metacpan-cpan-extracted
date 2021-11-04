@@ -99,7 +99,35 @@ sudo wg-meta enable wg0 WG_0_PEER_A_PUBLIC_KEY
 # Apply config
 sudo wg-meta apply wg0
 
+# Add new peer
+# Note: To automatically set the DNS and endpoint address, make sure you add #+DNSHost and #+FQDN to your hosts interface config
+wg-meta addpeer wg0 10.60.0.10 alias tobi_laptop
+
+[Interface]
+Address = 10.60.0.10
+ListenPort = 44544
+PrivateKey = PEER_PRIVATE_KEY
+DNS = 10.20.0.1
+#+Alias = tobi_laptop
+
+[Peer]
+PublicKey = HOST_PUBLIC_KEY
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = your.fqdn.con:51888
+PersistentKeepalive = 25
+
 ```
+
+
+## Migrating from `0.2.x`
+
+With the introduction of version `0.3.x`, the way custom attributes work has slightly changed:
+
+- There is no "in-config" name for custom attributes anymore, they are written down as initially defined.
+- All predefined custom attributes like `name` and `description` have been removed (an exception is the `alias` attribute). To use
+your own custom attributes, register them using `WGmeta::Wrapper::Config->new([..], $custom_attributes)` or when using the CLI interface, by prefixing them with `+`. 
+  As a consequence `WGmeta::Wrapper::Config->add_peer()` has no `name` parameter anymore, set additional attributes by calling `WGmeta::Wrapper::Config->set()`
+  
 
 ## Under the hood
 
@@ -121,5 +149,5 @@ AllowedIPs = fdc9:281f:04d7:9ee9::1/128
 Endpoint = wg.example.com
 ```
 
-Development of this project is sponsored by [OETIKER+PARTNER AG](https://oetiker.ch)
+Initial development of this project is sponsored by [OETIKER+PARTNER AG](https://oetiker.ch)
 

@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.013     2021-10-22 22:00:15Z
+        - reflect schema validation failure (against the metaschema) in the
+          results tally
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/fd0aa9f8e2497d9048e17f071abb8fa409f5cb52...329efe59c65ea9f49af9c5c07dd6f5d22cb67ef4
+
 1.012     2021-07-22 05:14:11Z
         - updated test suite to commit fd0aa9f8e2497d9048e17f071abb8fa409f5cb52
 

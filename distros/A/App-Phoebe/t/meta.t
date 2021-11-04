@@ -40,10 +40,10 @@ for my $file (qw(script/phoebe blib/lib/App/Phoebe.pm),
   }
 }
 
-my $checker = Pod::Checker->new(-warnings => 2);
-for my $path (qw(script/phoebe blib/lib/App/Phoebe.pm),
+for my $path (qw(blib/lib/App/Phoebe.pm),
 	      (map { "blib/lib/App/Phoebe/$_" } sort grep /\.pm$/, read_dir("blib/lib/App/Phoebe")),
 	      (map { "blib/script/$_" } sort grep /^[a-z].*[a-z]$/, read_dir("blib/script"))) {
+  my $checker = Pod::Checker->new(-warnings => 2);
   $checker = $checker->parse_from_file($path, \*STDERR);
   my $file = $path;
   $file =~ s/.*\///; # strip directory for the message

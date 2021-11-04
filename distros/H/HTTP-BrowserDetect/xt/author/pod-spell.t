@@ -224,6 +224,7 @@ reneeb
 rkimball
 robin
 rubylib
+samsung
 seamonkey
 specialarchiver
 staroffice

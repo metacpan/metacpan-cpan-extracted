@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::SignatureImageType;
-$Shipment::UPS::WSDL::TrackTypes::SignatureImageType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::SignatureImageType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,13 +29,13 @@ Class::Std::initialize();
         [   qw(        GraphicImage
               ImageFormat
 
-              )
+            )
         ],
         {   'GraphicImage' => \%GraphicImage_of,
             'ImageFormat'  => \%ImageFormat_of,
         },
         {   'GraphicImage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ImageFormat' =>
+            'ImageFormat'  =>
               'Shipment::UPS::WSDL::TrackTypes::ImageFormatType',
         },
         {
@@ -62,7 +62,7 @@ Shipment::UPS::WSDL::TrackTypes::SignatureImageType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

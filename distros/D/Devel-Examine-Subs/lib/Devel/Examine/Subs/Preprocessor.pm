@@ -3,7 +3,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.71';
+our $VERSION = '1.74';
 
 use Carp;
 use Symbol qw(delete_package);
@@ -283,6 +283,11 @@ __END__
 =head1 NAME
 
 Devel::Examine::Subs::Preprocessor - Provides core pre_proc callbacks for
+
+=for html
+<a href="https://github.com/stevieb9/devel-examine-subs/actions"><img src="https://github.com/stevieb9/devel-examine-subs/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/devel-examine-subs?branch=master'><img src='https://coveralls.io/repos/stevieb9/devel-examine-subs/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
 Devel::Examine::Subs
 
 =head1 SYNOPSIS

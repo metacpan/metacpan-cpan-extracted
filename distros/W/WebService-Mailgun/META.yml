@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,9 +24,10 @@ no_index:
 provides:
   WebService::Mailgun:
     file: lib/WebService/Mailgun.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   Class::Accessor::Lite: '0'
+  File::Temp: '0'
   Furl: '0'
   HTTP::Request::Common: '0'
   IO::Socket::SSL: '0'
@@ -38,8 +39,9 @@ resources:
   bugtracker: https://github.com/kan/p5-web-service-mailgun/issues
   homepage: https://github.com/kan/p5-web-service-mailgun
   repository: git://github.com/kan/p5-web-service-mailgun.git
-version: '0.11'
+version: '0.12'
 x_contributors:
   - 'Josh Rabinowitz <joshr@joshr.com>'
+  - 'justingit <perl@justinsimoni.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

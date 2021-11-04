@@ -5,10 +5,11 @@ use namespace::autoclean;
 use Carp qw( croak );
 use File::Spec ();
 use Moo::Role;
+use IO::Async::Function;
 with 'Archive::BagIt::Role::Plugin';
 with 'Archive::BagIt::Role::Portability';
 # ABSTRACT: A role that handles all manifest files for a specific Algorithm
-our $VERSION = '0.081'; # VERSION
+our $VERSION = '0.083'; # VERSION
 
 has 'algorithm' => (
     is => 'rw',
@@ -56,16 +57,6 @@ after BUILD => sub {
     $self->{bagit}->{manifests}->{$algorithm} = $self;
 };
 
-sub verify_file {
-}
-
-sub verify {
-}
-
-sub manifest {
-}
-
-
 has 'manifest_entries' => (
     is => 'ro',
     lazy => 1,
@@ -111,8 +102,6 @@ sub _build_manifest_entries {
     return;
 }
 
-
-
 sub _fill_digest_hashref {
     my ($self, $bagit, $localname) = @_;
     my $digest_hashref;
@@ -133,10 +122,39 @@ sub _fill_digest_hashref {
 # $tmp->{filename} = $filename;
 sub calc_digests {
     my ($self, $bagit, $filenames_ref) = @_;
+    my $function = IO::Async::Function->new(
+        code      => sub {
+            my ($tmp_bagit, $tmp_localname) = @_;
+            return $self->_fill_digest_hashref($tmp_bagit, $tmp_localname);
+        },
+        #min_workers=>2,
+        #max_workers=>10,
+        #idle_timeout => 1
+    );
+    my $async_loop = $self->_ioloop;
+    $async_loop-> add ( $function);
     #the parallel version fails with Parallel::Iterator, therefore back to serial version
-    my @digest_hashes = map {
-        $self->_fill_digest_hashref($bagit, $_);
-    } @{ $filenames_ref };
+    my @digest_hashes;
+    my %digest_results;
+    my @functions = map {
+        my $localname = $_;
+        $function->call(
+            args=> [$bagit, $localname]
+        )->on_done(
+            sub {
+                my $digest = shift;
+                $digest_results{$localname} = $digest;
+            }
+        )->on_fail(sub {
+            die "could not calc digest $_[0]";
+        });
+    } @{ $filenames_ref};
+
+    foreach my $f (@functions) {
+        $f->get;
+    }
+    $async_loop->remove( $function);
+    @digest_hashes = map { $digest_results{$_} } @{ $filenames_ref };
     return \@digest_hashes;
 }
 
@@ -314,7 +332,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.081
+version 0.083
 
 =head2 calc_digests($bagit, $filenames_ref, $opts)
 

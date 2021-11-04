@@ -1,3 +1,10 @@
+0.005   2021-05-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add a FAQ item.
+
+
 0.004   2020-01-04  Released-By: PERLANCAR; Urgency: medium
 
 	- In list context, module_source() now returns (module_source,

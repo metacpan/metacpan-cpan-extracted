@@ -8,7 +8,7 @@ use Moo;
 extends 'AnyEvent::FTP::Client::Site::Base';
 
 # ABSTRACT: Site specific commands for Proftpd
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 sub utime   { shift->client->push_command([SITE => "UTIME $_[0] $_[1]"]   ) }
@@ -37,7 +37,7 @@ AnyEvent::FTP::Client::Site::Proftpd - Site specific commands for Proftpd
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

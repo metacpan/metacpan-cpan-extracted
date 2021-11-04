@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ValidateShipmentResponseContainer;
-$Shipment::Purolator::WSDL::Types::ValidateShipmentResponseContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ValidateShipmentResponseContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
         [   qw(        ResponseInformation
               ValidShipment
 
-              )
+            )
         ],
         {   'ResponseInformation' => \%ResponseInformation_of,
             'ValidShipment'       => \%ValidShipment_of,
@@ -66,7 +66,7 @@ Shipment::Purolator::WSDL::Types::ValidateShipmentResponseContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

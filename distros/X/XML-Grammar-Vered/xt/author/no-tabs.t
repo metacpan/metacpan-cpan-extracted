@@ -9,7 +9,9 @@ use Test::NoTabs;
 my @files = (
     'lib/XML/Grammar/Vered.pm',
     't/00-compile.t',
+    't/data/system-tests-1/expected-docbook/doc-with-author-info--derived-from--perl-begin-page.docbook.xml',
     't/data/system-tests-1/expected-docbook/perl-begin-page.docbook.xml',
+    't/data/system-tests-1/input-xml/doc-with-author-info--derived-from--perl-begin-page.xml-grammar-vered.xml',
     't/data/system-tests-1/input-xml/perl-begin-page.xml-grammar-vered.xml',
     't/xslt.t'
 );

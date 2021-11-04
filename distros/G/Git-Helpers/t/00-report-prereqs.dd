@@ -41,20 +41,19 @@ do { my $x = {
                                       'File::pushd' => '0',
                                       'Getopt::Long' => '0',
                                       'Git::Sub' => '0',
-                                      'MetaCPAN::Client' => '0',
+                                      'MetaCPAN::Client' => '2.029000',
                                       'Moo' => '0',
                                       'MooX::Options' => '0',
                                       'Pod::Usage' => '0',
                                       'String::Trim' => '0',
                                       'Sub::Exporter' => '0',
-                                      'Term::Choose' => '0',
+                                      'Term::Choose' => '1.743',
                                       'Try::Tiny' => '0',
                                       'Types::Standard' => '0',
                                       'URI' => '0',
-                                      'URI::FromHash' => '0',
                                       'URI::Heuristic' => '0',
                                       'URI::git' => '0',
-                                      'perl' => '5.006',
+                                      'perl' => 'v5.12.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -76,7 +75,7 @@ do { my $x = {
                                    'Test::More' => '0',
                                    'Test::Requires::Git' => '1.005',
                                    'Test::RequiresInternet' => '0',
-                                   'perl' => '5.006'
+                                   'perl' => 'v5.12.0'
                                  }
                  }
      };

@@ -27,6 +27,7 @@ requires:
   URI: '0'
   perl: '5.008001'
 resources:
+  homepage: https://github.com/davorg/Feed-Find/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg/Feed-Find.git
 version: '0.11'

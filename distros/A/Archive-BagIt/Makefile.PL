@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Archive-BagIt",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Archive::BagIt",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -23,12 +23,16 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "File::Spec" => 0,
     "IO::AIO" => 0,
+    "IO::Async" => 0,
+    "IO::Async::Function" => 0,
+    "IO::Async::Loop" => 0,
     "List::Util" => "1.450",
     "Moo" => 0,
     "Moo::Role" => 0,
     "Net::SSLeay" => "1.43",
     "POSIX" => 0,
     "Time::HiRes" => 0,
+    "feature" => 0,
     "namespace::autoclean" => 0,
     "open" => 0,
     "strict" => 0,
@@ -51,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.081",
+  "VERSION" => "0.083",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,6 +75,9 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "IO::AIO" => 0,
+  "IO::Async" => 0,
+  "IO::Async::Function" => 0,
+  "IO::Async::Loop" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.450",
@@ -83,6 +90,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Warnings" => 0,
   "Time::HiRes" => 0,
+  "feature" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,
   "open" => 0,

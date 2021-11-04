@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::EMailLabelDetail;
-$Shipment::FedEx::WSDL::ShipTypes::EMailLabelDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::EMailLabelDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        NotificationEMailAddress
               NotificationMessage
 
-              )
+            )
         ],
         {   'NotificationEMailAddress' => \%NotificationEMailAddress_of,
             'NotificationMessage'      => \%NotificationMessage_of,
@@ -63,7 +63,7 @@ Shipment::FedEx::WSDL::ShipTypes::EMailLabelDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -30,6 +30,9 @@
 # define SvREFCNT_dec_NN(sv) SvREFCNT_dec (sv)
 #endif
 
+// perl's is_utf8_string interprets len=0 as "calculate len", but we want it to mean 0
+#define cbor_is_utf8_string(str,len) (!(len) || is_utf8_string ((str), (len)))
+
 // known major and minor types
 enum cbor_type
 {
@@ -203,7 +206,7 @@ shrink (SV *sv)
 }
 
 // minimum length of a string to be registered for stringref
-ecb_inline int
+ecb_inline STRLEN
 minimum_string_length (UV idx)
 {
   return idx <=          23 ?  3
@@ -989,7 +992,7 @@ decode_he (dec_t *dec, HV *hv)
         dec->cur += len;
 
         if (ecb_expect_false (dec->cbor.flags & F_VALIDATE_UTF8))
-          if (!is_utf8_string (key, len))
+          if (!cbor_is_utf8_string ((U8 *)key, len))
             ERR ("corrupted CBOR data (invalid UTF-8 in map key)");
 
         hv_store (hv, key, -len, decode_sv (dec), 0);
@@ -1128,7 +1131,7 @@ decode_str (dec_t *dec, int utf8)
   if (utf8)
     {
       if (ecb_expect_false (dec->cbor.flags & F_VALIDATE_UTF8))
-        if (!is_utf8_string (SvPVX (sv), SvCUR (sv)))
+        if (!cbor_is_utf8_string (SvPVX (sv), SvCUR (sv)))
           ERR ("corrupted CBOR data (invalid UTF-8 in text string)");
 
       SvUTF8_on (sv);
@@ -1472,7 +1475,7 @@ decode_cbor (SV *string, CBOR *cbor, char **offset_return)
       if (dec.err_sv)
         sv_2mortal (dec.err_sv);
 
-      croak ("%s, at offset %d (octet 0x%02x)", dec.err, dec.cur - (U8 *)data, (int)(uint8_t)*dec.cur);
+      croak ("%s, at offset %ld (octet 0x%02x)", dec.err, (long)(dec.cur - (U8 *)data), (int)(uint8_t)*dec.cur);
     }
 
   sv = sv_2mortal (sv);
@@ -1571,6 +1574,7 @@ incr_parse (CBOR *self, SV *cborstr)
 
                       case MAJOR_MAP     >> MAJOR_SHIFT:
                         len <<= 1;
+                        /* FALLTHROUGH */
                       case MAJOR_ARRAY   >> MAJOR_SHIFT:
                         if (len)
                           {

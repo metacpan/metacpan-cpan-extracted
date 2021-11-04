@@ -1,7 +1,9 @@
 package Array::Iter;
 
-our $DATE = '2015-12-23'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-25'; # DATE
+our $DIST = 'Array-Iter'; # DIST
+our $VERSION = '0.021'; # VERSION
 
 use strict;
 use warnings;
@@ -40,7 +42,7 @@ Array::Iter - Generate a coderef iterator for an array
 
 =head1 VERSION
 
-This document describes version 0.01 of Array::Iter (from Perl distribution Array-Iter), released on 2015-12-23.
+This document describes version 0.021 of Array::Iter (from Perl distribution Array-Iter), released on 2021-07-25.
 
 =head1 SYNOPSIS
 
@@ -76,9 +78,11 @@ with an exhausted iterator.
 
 =for Pod::Coverage .+
 
-=head1 SEE ALSO
+=head1 FUNCTIONS
 
-L<Array::Iterator>, which also lists some other related modules.
+=head2 array_iter($aryref) => coderef
+
+=head2 list_iter(@elems) => coderef
 
 =head1 HOMEPAGE
 
@@ -96,13 +100,21 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Array::Iterator>, which creates (several kinds of) iterator objects. The
+module also lists some other related modules.
+
+Other C<*::Iter> modules to create simple (coderef) iterator: L<Range::Iter>,
+L<IntRange::Iter>, L<NumSeq::Iter>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

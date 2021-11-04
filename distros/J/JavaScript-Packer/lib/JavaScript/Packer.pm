@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # =========================================================================== #
 
-our $VERSION = "2.06";
+our $VERSION = "2.07";
 
 our @BOOLEAN_ACCESSORS = ( 'no_compress_comment', 'remove_copyright' );
 
@@ -50,7 +50,11 @@ our $DICTIONARY = {
     REGEXP      => qr~\/(\\[\/\\]|[^*\/])(\\.|[^\/\n\\])*\/[gim]*~,
     OPERATOR    => qr'return|typeof|[\[(\^=,{}:;&|!*?]',
     CONDITIONAL => qr~\/\*\@\w*|\w*\@\*\/|\/\/\@\w*|\@(?>\w+)~,
-    COMMENT1    => qr~\/\/(\@)?([^\n]*)?\n~,
+
+    # single line comments
+    COMMENT1    => qr~\/\/([\@#])?([^\n]*)?\n~,
+
+    # multline comments
     COMMENT2    => qr~\/\*[^*]*\*+(?:[^\/][^*]*\*+)*\/~
 };
 
@@ -71,7 +75,7 @@ our $COMMENTS = [
         regexp      => ';;;[^\n]*\n',
         replacement => ''
     },
-    { regexp => $DICTIONARY->{COMMENT1} . '\s*(' . $DICTIONARY->{REGEXP} . ')?' },
+    { regexp => $DICTIONARY->{COMMENT1} . '\s*(' . $DICTIONARY->{REGEXP} . ')?', },
     { regexp => '(' . $DICTIONARY->{COMMENT2} . ')\s*(' . $DICTIONARY->{REGEXP} . ')?' }
 ];
 
@@ -300,7 +304,11 @@ sub init {
 
     $self->{comments}->{reggrp_data}->[-2]->{replacement} = sub {
         my $submatches = $_[0]->{submatches};
-        if ( $submatches->[0] eq '@' ) {
+        if ( $submatches->[0] eq '#' ) {
+            my $cmnt = sprintf( "//%s%s__NEW_LINE__", @{$submatches}[0 .. 1] );
+            return $cmnt;
+        }
+        elsif ( $submatches->[0] eq '@' ) {
             $reggrp_comments->exec( \$submatches->[1] );
             $reggrp_clean->exec( \$submatches->[1] );
             $reggrp_whitespace->exec( \$submatches->[1] );
@@ -613,6 +621,11 @@ sub minify {
         ${$javascript} = ( $self->copyright() || $self->_copyright_comment() ) . ${$javascript};
     }
 
+    # GH #9 bodge for sourceMappingURL
+    ${$javascript} =~ s/__NEW_LINE__\s/\n/xsmg;
+    ${$javascript} =~ s!//#sourceMappingURL!//# sourceMappingURL!g;
+    chomp( ${$javascript} );
+
     return ${$javascript} if ( $cont eq 'scalar' );
 }
 
@@ -734,7 +747,7 @@ JavaScript::Packer - Perl version of Dean Edwards' Packer.js
 
 =head1 VERSION
 
-Version 2.06
+Version 2.07
 
 =head1 DESCRIPTION
 

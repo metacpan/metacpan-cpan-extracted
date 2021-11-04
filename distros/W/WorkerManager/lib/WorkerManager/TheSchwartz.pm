@@ -15,10 +15,11 @@ sub new {
 
     my $databases;
     if ($databases = delete $options->{databases}) {
-        $databases = [$databases] unless UNIVERSAL::isa($databases, 'ARRAY');
+        $databases = [$databases] unless ref($databases) eq 'ARRAY';
     } else {
         croak 'not specified database information in config file for worker manager';
     }
+    my $has_custom_verbose = exists $options->{verbose};
     my $client = TheSchwartz->new( databases => $databases, %$options);
 
     my $self = bless {
@@ -26,6 +27,7 @@ sub new {
         worker => $worker,
         terminate => undef,
         start_time => undef,
+        has_custom_verbose => $has_custom_verbose,
     }, $class;
     $self->init;
     $self;
@@ -33,24 +35,29 @@ sub new {
 
 sub init {
     my $self = shift;
-    $self->{client}->set_verbose(
-        sub {
-            my $msg = shift;
-            my $job = shift;
-            # $WorkerManager::LOGGER->('TheSchwartz', $msg) if($msg =~ /Working/);
-            if($msg =~ /Working/){
-                $self->{start_time} = time;
+
+    if (!$self->{has_custom_verbose}) {
+        $self->{client}->set_verbose(
+            sub {
+                my $msg = shift;
+                my $job = shift;
+                # $WorkerManager::LOGGER->('TheSchwartz', $msg) if($msg =~ /Working/);
+                if($msg =~ /Working/){
+                    $self->{start_time} = time;
+                }
+                return if($msg =~ /found no jobs/);
+                if($msg =~ /^job completed|^job failed/){
+                    $msg .= sprintf " %s", $job->funcname;
+                    $msg .= sprintf " process:%d", (time - $self->{start_time}) * 1000 if($self->{start_time});
+                    $msg .= sprintf " delay:%d", ($self->{start_time} - $job->insert_time) * 1000 if($job && $self->{start_time});
+                    $self->{start_time} = undef;
+                };
+                $WorkerManager::LOGGER->('TheSchwartz', $msg) unless($msg =~ /found no jobs/);
             }
-            return if($msg =~ /found no jobs/);
-            if($msg =~ /^job completed|^job failed/){
-                $msg .= sprintf " %s", $job->funcname;
-                $msg .= sprintf " process:%d", (time - $self->{start_time}) * 1000 if($self->{start_time});
-                $msg .= sprintf " delay:%d", ($self->{start_time} - $job->insert_time) * 1000 if($job && $self->{start_time});
-                $self->{start_time} = undef;
-            };
-            $WorkerManager::LOGGER->('TheSchwartz', $msg) unless($msg =~ /found no jobs/);
-        });
-    if (UNIVERSAL::isa($self->{worker}, 'ARRAY')){
+        );
+    }
+
+    if (ref($self->{worker}) eq 'ARRAY') {
         for (@{$self->{worker}}){
             Module::Load::load($_);
             $_->can('work') or die "cannot ${_}->work";

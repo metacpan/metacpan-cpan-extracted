@@ -7,48 +7,31 @@ GLXFBConfig           O_GLXFBConfig
 
 INPUT
 O_GLXContext
-	if (sv_derived_from($arg, \"X11::GLX::Context\")) {
-		$var= ($type) PerlXlib_get_magic_dpy_innerptr($arg, 1);
-	} else {
-		croak( \"%s is not a %s\", \"$var\", \"X11::GLX::Context\" );
-	}
+    $var= ($type) PerlXlib_objref_get_pointer($arg, \"GLXContext\", PerlXlib_OR_DIE);
 
 OUTPUT
 O_GLXContext
-	sv_setsv($arg, $var?
-		PerlXlib_obj_for_display_innerptr(dpy, $var, "X11::GLX::Context", SVt_PVHV, 1)
-		: &PL_sv_undef
-	);
+    sv_setsv($arg, PerlXlib_get_objref($var, PerlXlib_AUTOCREATE, \"GLXContext\",
+        SVt_PVHV, \"X11::GLX::Context\", dpy));
+	/* set autofree, by default */
+	if ($var) hv_stores((HV*)SvRV($arg), "autofree", newSViv(1));
 
 INPUT
 O_GLXContextOrNull
-	if (!SvOK($arg))
-		$var= NULL;
-	else if (sv_derived_from($arg, \"X11::GLX::Context\")) {
-		$var= ($type) PerlXlib_get_magic_dpy_innerptr($arg, 0);
-	} else {
-		croak( \"%s is not a %s\", \"$var\", \"X11::GLX::Context\" );
-	}
+    $var= ($type) PerlXlib_objref_get_pointer($arg, \"GLXContext\", PerlXlib_OR_NULL);
 
 INPUT
 O_GLXContextImported
-	if (sv_derived_from($arg, \"X11::GLX::Context::Imported\")) {
-		$var= ($type) PerlXlib_get_magic_dpy_innerptr($arg, 1);
-	} else {
+	if (!sv_derived_from($arg, \"X11::GLX::Context::Imported\")) {
 		croak( \"%s is not a %s\", \"$var\", \"X11::GLX::Context::Imported\" );
 	}
+    $var= ($type) PerlXlib_objref_get_pointer($arg, \"GLXContext\", PerlXlib_OR_NULL);
 
 OUTPUT
 O_GLXContextImported
-	sv_setsv($arg, $var?
-		PerlXlib_obj_for_display_innerptr(dpy, $var, "X11::GLX::Context::Imported", SVt_PVHV, 1)
-		: &PL_sv_undef
-	);
+    sv_setsv($arg, PerlXlib_get_objref($var, PerlXlib_AUTOCREATE, \"GLXContext\",
+        SVt_PVHV, \"X11::GLX::Context::Imported\", dpy));
 
 INPUT
 O_GLXFBConfig
-	if (sv_derived_from($arg, \"X11::GLX::FBConfig\")) {
-		$var= ($type) SvIV((SV*)SvRV($arg));
-	} else {
-		croak( \"%s is not a %s\", \"$var\", \"X11::GLX::FBConfig\" );
-	}
+    $var= ($type) PerlXlib_objref_get_pointer($arg, \"GLXFBConfig\", PerlXlib_OR_NULL);

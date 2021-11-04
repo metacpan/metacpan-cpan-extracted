@@ -1,11 +1,10 @@
 #!/usr/bin/env perl
 
-use v5.14;
+use strict;
 use warnings;
 
-use App::ansicolumn;
-
-App::ansicolumn->new->run(@ARGV);
+use  App::ansicolumn;
+exit App::ansicolumn->new->run(splice @ARGV);
 
 __END__
 
@@ -31,11 +30,11 @@ ansicolumn [options] [file ...]
     -D                   document mode
     -C#                  number of panes
     -S#                  pane width
-    -F                   full-width
+    -W                   widen to terminal width
     -p                   paragraph mode
 
-    -B[=#], --border[=#] print border with optiona style
-    -U[=#], --fillup[=#] fill-up unit (pane|page|none)
+    -B, --border[=#]     print border with optiona style
+    -F, --fillup[=#]     fill-up unit (pane|page|none)
 
     --height=#           page height
     --column-unit=#      column unit (default 8)
@@ -56,7 +55,7 @@ ansicolumn [options] [file ...]
 
 =head1 VERSION
 
-Version 1.14
+Version 1.15
 
 =head1 DESCRIPTION
 
@@ -133,7 +132,7 @@ minus one.
 
 Document mode.  Set these options.
 
-    --fullwidth
+    --widen
     --linebreak=all
     --linestyle=wrap
     --boundary=word
@@ -148,14 +147,14 @@ L<App::optex::textconv>.
 =item B<-C>#, B<--pane>=#
 
 Output is formatted in the specified number of panes.  Setting number
-of panes implies B<--fullwidth> option enabled.
+of panes implies B<--widen> option enabled.
 
 =item B<-S>#, B<--pane-width>=#, B<--pw>=#
 
 Specify pane width.  This includes border spaces.  See L</CALCULATION>
 section.
 
-=item B<-F>, B<--fullwidth>
+=item B<-W>, B<--widen>
 
 Use full width of the terminal.  Each panes are expanded to fill
 terminal width, unless B<--pane-width> is specified.
@@ -164,7 +163,7 @@ terminal width, unless B<--pane-width> is specified.
 
 Insert empty line between every successive non-empty lines.
 
-=item B<--border>[=I<style>], B<-B>[I<style>]
+=item B<--border>[=I<style>], B<-B>
 
 Print border.  Enabled by B<--page> option automatically.  If the
 optional I<style> is given, it is used as a border style and precedes
@@ -172,12 +171,14 @@ to B<--border-style> option.  Use B<--border=none> to disable it.
 
 Border style is specified by B<--border-style> option.
 
-=item B<--fillup>[=C<pane>|C<page>|C<none>], B<-U>[...]
+=item B<--fillup>[=C<pane>|C<page>|C<none>], B<-F>
 
 Fill up final pane or page by empty lines.  Parameter is optional and
 considered as 'pane' by default.  Set by B<--page> option
 automatically.  Use B<--fillup=none> if you want to explicitly disable
 it.
+
+Option B<-U> is a shortcut for B<--border=pane>.
 
 =item B<--height>=#
 
@@ -376,7 +377,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-#  LocalWords:  ansicolumn fillrows tabstop columnunit fullwidth DOCX
+#  LocalWords:  ansicolumn fillrows tabstop columnunit widen DOCX
 #  LocalWords:  linestyle linebreak docx runin runout perldoc cpanm
 #  LocalWords:  CPANMINUS perl CPAN Kazumasa Utashiro optex wordwrap
 #  LocalWords:  Unicode ansicolumnrc

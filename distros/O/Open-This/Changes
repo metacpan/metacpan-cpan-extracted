@@ -1,5 +1,12 @@
 Revision history for Open-This
 
+0.000027  2021-10-29 21:59:06Z
+    - Trim text before parsing it (GH#42) (Olaf Alders)
+
+0.000026  2021-10-19 21:29:37Z
+    - Override $ENV{EDITOR} via -e|--editor (GH#40) (Olaf Alders)
+    - Avoid invoking an editor via -p|--print (GH#40) (Olaf Alders)
+
 0.000025  2021-08-17 19:33:19Z
     - Move Test::Simple to test requires from runtime requires (GH#38) (Olaf
       Alders)
@@ -88,4 +95,4 @@ Revision history for Open-This
     - Pod formatting
 
 0.000001  2018-02-06 16:14:35Z
-    - Initial release.
+    - initial release.

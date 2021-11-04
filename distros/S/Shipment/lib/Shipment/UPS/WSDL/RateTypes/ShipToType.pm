@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::ShipToType;
-$Shipment::UPS::WSDL::RateTypes::ShipToType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::ShipToType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ Class::Std::initialize();
         [   qw(        Name
               Address
               Phone
-              )
+            )
         ],
         {   'Name'    => \%Name_of,
             'Address' => \%Address_of,
@@ -65,7 +65,7 @@ Shipment::UPS::WSDL::RateTypes::ShipToType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

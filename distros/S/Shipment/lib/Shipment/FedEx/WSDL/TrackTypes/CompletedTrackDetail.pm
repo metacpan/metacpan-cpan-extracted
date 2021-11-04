@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail;
-$Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               TrackDetailsCount
               TrackDetails
 
-              )
+            )
         ],
         {   'HighestSeverity'   => \%HighestSeverity_of,
             'Notifications'     => \%Notifications_of,
@@ -89,7 +89,7 @@ Shipment::FedEx::WSDL::TrackTypes::CompletedTrackDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

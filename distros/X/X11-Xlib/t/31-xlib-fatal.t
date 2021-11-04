@@ -21,7 +21,7 @@ isa_ok( $conn, 'X11::Xlib', 'display connection' );
 my $conn2= XOpenDisplay();
 my $conn3= XOpenDisplay();
 
-is( scalar keys %X11::Xlib::_connections, 3, 'three registered connections' );
+is( scalar X11::Xlib->_all_connections, 3, 'three registered connections' );
 
 ok( !$X11::Xlib::_error_fatal_installed,    'fatal handler not installed' );
 ok( !$X11::Xlib::_error_fatal_trapped,      'no fatal error' );

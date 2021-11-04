@@ -10,8 +10,8 @@ my $hash = App::Bitcoin::PaperWallet->generate('silly entropy that should never 
 is $hash->{mnemonic}, 'ivory obscure session offer multiply chuckle follow current prepare awful decline stand soul erode modify ribbon best indicate frequent girl torch food market evidence', 'mnemonic ok';
 
 # those addresses take password into account
-is $hash->{addresses}[0], '3DG5rqGa7xFhYRxJYQnU1GPqLBmYnxpwDu', 'compat address ok';
-is $hash->{addresses}[1], 'bc1q2v0rc9vasw49dmnlttn5evj5t7yajt9hf85gfn', 'native address ok';
+is $hash->{addresses}[0], '3QUyruDJ9oce8KNJELPWAxfcvcvESuGrds', 'compat address ok';
+is $hash->{addresses}[1], 'bc1qngdesm3ljdfyxsskvsxz4034vlyk9cjm7r6k5p', 'native address ok';
 
 # test data generated using https://iancoleman.io/bip39/
 

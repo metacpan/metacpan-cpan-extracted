@@ -22,7 +22,7 @@ use enum
 
 use Moo;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 extends 'CXC::Number::Sequence';
 
@@ -397,7 +397,7 @@ CXC::Number::Sequence::Linear - Numeric Sequence with Equal Spacing
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

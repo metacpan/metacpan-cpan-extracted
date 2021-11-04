@@ -4,6 +4,69 @@ NAME
 
 SYNOPSIS
 
+        # On the command line
+    
+        # Set your default webid
+        export SOLID_WEBID=https://timbl.inrupt.net/profile/card#me
+    
+        # Authentication to a pod
+        solid_auth.pl authenticate
+    
+        # Get the http headers for a authenticated request
+        solid_auth.pl headers GET https://timbl.inrupt.net/inbox/
+    
+        # Act like a curl command and fetch authenticated content
+        solid_auth.pl curl -X GET https://timbl.inrupt.net/inbox/
+    
+        # Add some data
+        solid_auth.pl curl -X POST \
+                -H "Content-Type: text/plain" \
+                -d "abc" \
+                https://timbl.inrupt.net/public/
+        
+        # Add a file
+        solid_auth.pl curl -X PUT \
+                -H "Content-Type: application/ld+json" \
+                -d "@myfile.jsonld" \
+                https://timbl.inrupt.net/public/myfile.jsonld 
+    
+        # Set a solid base url
+        export SOLID_REMOTE_BASE=https://timbl.inrupt.net
+    
+        # List all resources on some Pod path
+        solid_auth.pl list /public/
+    
+        # Get some data
+        solid_auth.pl get /inbox/
+    
+        # Post some data
+        solid_auth.pl post /inbox/ myfile.jsonld 
+    
+        # Put some data
+        solid_auth.pl put /public/myfile.txt myfile.txt 
+    
+        # Create a folder
+        solid_auth.pl put /public/mytestfolder/
+    
+        # Delete some data
+        solid_auth.pl delete /public/myfile.txt
+    
+        # Mirror a resource, container or tree
+        solid_auth.pl mirror /public/ ./my_copy
+    
+        # Upload a directory to the pod
+        #  Add the -x option to do it for real (only a test without this option)
+        solid_auth.pl -r upload /data/my_copy /public/
+    
+        # Clean all files in a container
+        #  Add the -x option to do it for real (only a test without this option)
+        solid_auth.pl --keep clean /demo/
+    
+        # Clean a complete container 
+        #  Add the -x option to do it for real (only a test without this option)
+        solid_auth.pl -r clean /demo/
+    
+        # In a perl program
         use Web::Solid::Auth;
         use Web::Solid::Auth::Listener;
     
@@ -46,6 +109,11 @@ SYNOPSIS
     
             #..do you curl..lwp::agent..or what ever with the headers
         }
+
+INSTALLATION
+
+    See the https://metacpan.org/dist/Web-Solid-Auth/source/INSTALL file in
+    the distribution.
 
 DESCRIPTION
 
@@ -101,11 +169,9 @@ SEE ALSO
 INSPIRATION
 
     This was very much inspired by the Python solid-flask code by Rai
-    http://agentydragon.com at https://gitlab.com/agentydragon/solid-flask
-
-CONTRIBUTORS
-
-    Patrick Hochstenbach, patrick.hochstenbach at ugent.be
+    http://agentydragon.com at https://gitlab.com/agentydragon/solid-flask,
+    and Jeff Zucker's <https://github.com/jeff-zucker> Solid-Shell at
+    https://www.npmjs.com/package/solid-shell.
 
 COPYRIGHT AND LICENSE
 

@@ -8,7 +8,7 @@ use warnings;
 use MooX qw/late/;
 use List::MoreUtils qw/any/;
 
-use HTML::Spelling::Site::Finder;
+use HTML::Spelling::Site::Finder ();
 
 my @prunes = ();
 
@@ -52,8 +52,8 @@ use utf8;
 
 use MooX qw/late/;
 
-use Text::Hunspell;
-use HTML::Spelling::Site::Checker;
+use Text::Hunspell                ();
+use HTML::Spelling::Site::Checker ();
 
 has 'obj' => (
     is      => 'ro',
@@ -109,8 +109,10 @@ has 'files' => (
     is      => 'ro',
     default => sub { return Shlomif::Spelling::FindFiles->new->list_htmls(); }
 );
-has 'obj' =>
-    ( is => 'ro', default => sub { return Shlomif::Spelling::Check->new(); } );
+has 'obj' => (
+    is      => 'ro',
+    default => sub { return Shlomif::Spelling::Check->new(); }
+);
 
 sub test
 {
@@ -139,4 +141,3 @@ use Test::Builder::Tester tests => 1;
 
     test_test("test works");
 }
-

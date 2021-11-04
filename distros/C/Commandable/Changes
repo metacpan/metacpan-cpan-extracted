@@ -1,5 +1,16 @@
 Revision history for Commandable
 
+0.05    2021-10-10
+        [CHANGES]
+         * Added Commandable::Finder::SubAttributes
+         * Document the Commandable::Command result structure
+         * Initial support for declaring positional arguments to commands
+         * Assist with parsing command arguments out of invocation instances
+         * Provide automatic built-in `help` command
+         * Added some convenient wrappers for commandline scripts:
+            + Commandable::Finder::SubAttributes->new_for_main
+            + Commandable::Finder->find_and_invoke_ARGV
+
 0.04    2020-01-20 18:51:50
         [CHANGES]
          * Renamed $inv->remaining to ->peek_remaining

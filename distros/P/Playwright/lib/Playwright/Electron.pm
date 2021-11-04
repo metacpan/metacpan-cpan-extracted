@@ -9,13 +9,17 @@ use strict;
 use warnings;
 
 package Playwright::Electron;
-$Playwright::Electron::VERSION = '0.016';
+$Playwright::Electron::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
     my ( $self, %options ) = @_;
     $options{type} = 'Electron';
     return $self->SUPER::new(%options);
+}
+
+sub spec {
+    return $Playwright::spec->{'Electron'}{members};
 }
 
 sub launch {
@@ -72,7 +76,7 @@ Playwright::Electron - Automatically generated class for Playwright::Electron
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 

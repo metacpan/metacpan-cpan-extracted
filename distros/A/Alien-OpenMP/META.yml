@@ -3,22 +3,44 @@ abstract: 'Encapsulate system info for OpenMP'
 author:
   - 'oodler <oodler@cpan.org>'
 build_requires:
-  Devel::CheckLib: '0'
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  File::Spec: '0'
   Test::More: '0'
 configure_requires:
-  Devel::CheckLib: '0'
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+  Alien::Build: '1.40'
+  Alien::Build::MM: '0.32'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-OpenMP
-resources:
-  homepage: https://github.com/oodler577/p5-Alien-OpenMP
-  repository: https://github.com/oodler577/p5-Alien-OpenMP.git
-version: '0.003002'
-x_generated_by_perl: v5.32.1
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Alien::OpenMP:
+    file: lib/Alien/OpenMP.pm
+    version: '0.003005'
+  Alien::OpenMP::configure:
+    file: lib/Alien/OpenMP/configure.pm
+    version: '0.003005'
+version: '0.003005'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  requires:
+    share: {}
+    system: {}
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

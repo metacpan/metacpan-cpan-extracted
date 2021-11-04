@@ -6,12 +6,13 @@ Astro::Catalog::Query::CMC - A query request to the Carlsberg Meridian Catalog
 
 =head1 SYNOPSIS
 
-  $gsc = new Astro::Catalog::Query::CMC( RA        => $ra,
-                                         Dec       => $dec,
-                                         Radius    => $radius,
-                                         Nout      => $number_out );
+    $gsc = new Astro::Catalog::Query::CMC( 
+            RA        => $ra,
+            Dec       => $dec,
+            Radius    => $radius,
+            Nout      => $number_out);
 
-  my $catalog = $gsc->querydb();
+    my $catalog = $gsc->querydb();
 
 =head1 WARNING
 
@@ -33,23 +34,18 @@ See L<Astro::Catalog::BaseQuery> for the catalog-independent methods.
 
 =cut
 
-# L O A D   M O D U L E S --------------------------------------------------
-
-use 5.006;
 use strict;
 use warnings;
-use base qw/ Astro::Catalog::Transport::REST /;
-use vars qw/ $VERSION $DEBUG /;
+use base qw/Astro::Catalog::Transport::REST/;
 
 use File::Spec;
 use Carp;
 
-# generic catalog objects
 use Astro::Catalog;
-use Astro::Catalog::Star;
+use Astro::Catalog::Item;
 
-$VERSION = "4.35";
-$DEBUG = 0;
+our $VERSION = '4.36';
+our $DEBUG = 0;
 
 =begin __PRIVATE_METHODS__
 
@@ -64,7 +60,7 @@ These methods are for internal use only.
 =cut
 
 sub _default_remote_host {
-  return "vizier.u-strasbg.fr";
+    return "vizier.u-strasbg.fr";
 }
 
 =item B<_default_url_path>
@@ -72,7 +68,7 @@ sub _default_remote_host {
 =cut
 
 sub _default_url_path {
-  return "viz-bin/asu-acl?";
+    return "viz-bin/asu-acl?";
 }
 
 =item B<_get_allowed_options>
@@ -84,14 +80,14 @@ by the remote system (and to be included in the query).
 =cut
 
 sub _get_allowed_options {
-  my $self = shift;
-  return (
-          ra => '-c.ra',
-          dec => '-c.dec',
-          radmax => '-c.rm',
-          nout => '-out.max',
-          catalog => '-source',
-         );
+    my $self = shift;
+    return (
+        ra => '-c.ra',
+        dec => '-c.dec',
+        radmax => '-c.rm',
+        nout => '-out.max',
+        catalog => '-source',
+    );
 }
 
 
@@ -102,18 +98,18 @@ Get the default query state.
 =cut
 
 sub _get_default_options {
-  return (
-          # Internal
-          catalog => 'I/282/cmc12',
+    return (
+        # Internal
+        catalog => 'I/282/cmc12',
 
-          # Target information
-          ra => undef,
-          dec => undef,
+        # Target information
+        ra => undef,
+        dec => undef,
 
-          # Limits
-          radmax => 5,
-          nout => 20000,
-         );
+        # Limits
+        radmax => 5,
+        nout => 20000,
+    );
 }
 
 =item B<_parse_query>
@@ -125,13 +121,15 @@ make and parse the results.
 =cut
 
 sub _parse_query {
-  my $self = shift;
+    my $self = shift;
 
-  print $self->{BUFFER} if $DEBUG;
-  return new Astro::Catalog( Format => 'TST', Data => $self->{BUFFER},
-                             Origin => 'Carlsberg Meridian Catalogue (CMC/11)',
-                             ReadOpt => { ra_col => 2, dec_col => 4, }
-                           );
+    print $self->{BUFFER} if $DEBUG;
+    return new Astro::Catalog(
+            Format => 'TST',
+            Data => $self->{BUFFER},
+            Origin => 'Carlsberg Meridian Catalogue (CMC/11)',
+            ReadOpt => {ra_col => 2, dec_col => 4,}
+        );
 }
 
 
@@ -144,8 +142,8 @@ the form required for a query to a remote server. Methods for converting
 from the internal representation to the external query format are
 provided in the form of _from_$opt. ie:
 
-  ($outkey, $outvalue) = $q->_from_ra();
-  ($outkey, $outvalue) = $q->_from_object();
+    ($outkey, $outvalue) = $q->_from_ra();
+    ($outkey, $outvalue) = $q->_from_object();
 
 The base class only includes one to one mappings.
 
@@ -167,14 +165,18 @@ This method also returns, the values from the parent class.
 =cut
 
 sub _translate_one_to_one {
-  my $self = shift;
-  # convert to a hash-list
-  return ($self->SUPER::_translate_one_to_one,
-          map { $_, undef }(qw/
-                            catalog
-                            /)
-         );
+    my $self = shift;
+    # convert to a hash-list
+    return ($self->SUPER::_translate_one_to_one,
+            map { $_, undef }(qw/
+                catalog
+                /)
+           );
 }
+
+1;
+
+__END__
 
 =back
 
@@ -196,7 +198,3 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 Tim Jenness E<lt>tjenness@cpan.orgE<gt>
 
 =cut
-
-# L A S T  O R D E R S ------------------------------------------------------
-
-1;

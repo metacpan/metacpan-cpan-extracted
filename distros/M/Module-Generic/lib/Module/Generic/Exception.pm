@@ -35,14 +35,14 @@ sub init
     my $self = shift( @_ );
     # require Data::Dumper::Concise;
     # print( STDERR __PACKAGE__, "::init() Got here with args: ", Data::Dumper::Concise::Dumper( \@_ ), "\n" );
-    $self->{code} = '';
-    $self->{type} = '';
-    $self->{file} = '';
-    $self->{line} = '';
-    $self->{message} = '';
-    $self->{package} = '';
-    $self->{retry_after} = '';
-    $self->{subroutine} = '';
+    $self->{code} = '' unless( length( $self->{code} ) );
+    $self->{type} = '' unless( length( $self->{type} ) );
+    $self->{file} = '' unless( length( $self->{file} ) );
+    $self->{line} = '' unless( length( $self->{line} ) );
+    $self->{message} = '' unless( length( $self->{message} ) );
+    $self->{package} = '' unless( length( $self->{package} ) );
+    $self->{retry_after} = '' unless( length( $self->{retry_after} ) );
+    $self->{subroutine} = '' unless( length( $self->{subroutine} ) );
     my $args = {};
     if( @_ )
     {
@@ -217,7 +217,9 @@ sub throw
     die( $e );
 }
 
-## Devel::StackTrace has a stringification overloaded so users can use the object to get more information or simply use it as a string to get the stack trace equivalent of doing $trace->as_string
+sub TO_JSON { return( shift->as_string ); }
+
+# Devel::StackTrace has a stringification overloaded so users can use the object to get more information or simply use it as a string to get the stack trace equivalent of doing $trace->as_string
 sub trace { return( shift->_set_get_object( 'trace', 'Devel::StackTrace', @_ ) ); }
 
 sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }

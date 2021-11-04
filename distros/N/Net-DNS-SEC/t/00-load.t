@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 00-load.t 1809 2020-10-02 12:42:17Z willem $	-*-perl-*-
+# $Id: 00-load.t 1831 2021-02-11 23:03:17Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -17,7 +17,6 @@ my @module = qw(
 		Net::DNS::SEC::Keyset
 		Net::DNS::SEC::Private
 		Net::DNS::SEC::libcrypto
-		File::Find
 		File::Spec
 		IO::File
 		MIME::Base64
@@ -68,8 +67,7 @@ eval {
 	my $x = pack 'H*', 'cadb74b9950fcf3728ad232626b0dc63f350c25dd09456cd155f413d35205ce9';
 	my $y = pack 'H*', '050fd637ab18f8f443eac48c26c12566e655e4d3b15046e0fef296a8835ebeee';
 	foreach my $H ( $d, $q ) {	## including specific case  (alpha mod q) = 0
-		my $eckey = Net::DNS::SEC::libcrypto::EC_KEY_new_ECCGOST();
-		Net::DNS::SEC::libcrypto::EC_KEY_set_public_key_affine_coordinates( $eckey, $x, $y );
+		my $eckey = Net::DNS::SEC::libcrypto::EC_KEY_new_ECCGOST( $x, $y );
 		Net::DNS::SEC::libcrypto::ECCGOST_verify( $H, $r, $s, $eckey );
 	}
 };

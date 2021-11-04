@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.081'; # VERSION
+our $VERSION = '0.083'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -211,6 +211,7 @@ sub get_baginfo_values_by_key {
     if (defined $searchkey) {
         my $lc_flag = $self->is_baginfo_key_reserved( $searchkey );
         foreach my $entry (@{ $info }) {
+            return unless defined $entry;
             my ($key, $value) = %{ $entry };
             if ( __case_aware_compare_for_baginfo( $key, $searchkey, $lc_flag) ) {
                 push @values, $value;
@@ -272,7 +273,7 @@ sub _find_baginfo_idx {
         my $info = $self->bag_info();
         my $size = scalar(@{$info});
         my $lc_flag = $self->is_baginfo_key_reserved($searchkey);
-        foreach my $idx (0.. $size-1) {
+        foreach my $idx (reverse 0.. $size-1) { # for multiple entries return the latest addition
             my %entry = %{$info->[$idx]};
             my ($key, $value) = %entry;
             if (__case_aware_compare_for_baginfo($key, $searchkey, $lc_flag)) {
@@ -330,7 +331,7 @@ sub delete_baginfo_by_key {
     my ($self, $searchkey) = @_;
     my $idx = $self->_find_baginfo_idx($searchkey);
     if (defined $idx) {
-        delete $self->{bag_info}[$idx];
+        splice @{$self->{bag_info}}, $idx, 1; # delete nth indexed entry
     }
     return 1;
 }
@@ -364,7 +365,7 @@ sub append_baginfo_by_key {
         if ($searchkey =~ m/:/) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
         if ($self->is_baginfo_key_reserved_as_uniq($searchkey)) {
             if (defined $self->get_baginfo_values_by_key($searchkey)) {
-                # hmm, search key is mrked as uniq and still exists
+                # hmm, search key is marked as uniq and still exists
                 return;
             }
         }
@@ -954,7 +955,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.081
+version 0.083
 
 =head1 NAME
 
@@ -1023,21 +1024,44 @@ Try this:
 
 Similar for tagmanifests
 
-=head2 How fast is C<Archive::BagIt::Fast>?
+=head2 How fast is L<Archive::BagIt>?
 
-It depends. On my system with SSD and a 38MB bag with 48 payload files the results for C<verify_bag()> are:
+I have made great efforts to optimize Archive::BagIt for high throughput. There are two limiting factors:
 
-                  Rate        Base         Fast
-   Base         102%           --         -10%
-   Fast         125%           11%           --
+=over
 
-On network filesystem (CIFS, 1Gb) with same Bag:
+=item calculation of checksums, by switching from the module "Digest" to OpenSSL by using L<Net::SSLeay> a significant
+   speed increase could be achieved.
 
-                  Rate         Fast         Base
-   Fast         2.20/s          --          -11%
-   Base         2.48/s          13%         --
+=item loading the files referenced in the manifest files was previously done serially and using synchronous I/O. By
+   using the L<IO::Async> module, the files are loaded asynchronously and the checksums are calculated in parallel.
+   If the underlying file system supports parallel accesses, the performance gain is huge.
 
-But you should measure which variant is best for you. In general the default C<Archive::BagIt> is fast enough.
+=back
+
+On my system with 8cores, SSD and a large 9GB bag with 568 payload files the results for C<verify_bag()> are:
+
+                    processing time          run time             throughput
+   Version       user time    system time    total time    total    MB/s
+    v0.71        38.31s        1.60s         39.938s       100%     230
+    v0.81        25.48s        1.68s         27.1s          67%     340
+    v0.82        48.85s        3.89s          6.84s         17%    1346
+
+=head2 How fast is L<Archive::BagIt::Fast>?
+
+It depends. On my system with 8cores, SSD and a 38MB bag with 48 payload files the results for C<verify_bag()> are:
+
+                  Rate         Base         Fast
+   Base         3.01/s           --         -21%
+   Fast         3.80/s          26%           --
+
+On my system with 8cores, SSD and a large 9GB bag with 568 payload files the results for C<verify_bag()> are:
+
+                s/iter         Base         Fast
+   Base           74.6           --          -9%
+   Fast           68.3           9%           --
+
+But you should measure which variant is best for you. In general the default L<Archive::BagIt> is fast enough.
 
 =head2 How to update an old bag of version v0.97 to v1.0?
 
@@ -1193,10 +1217,10 @@ getter returns an anonymous function with following interface:
    my $digest = $self->digest_callback;
    &$digest( $digestobject, $filename);
 
-This anonymous function MUST use the C<get_hash_string()> function of the C<Archive::BagIt::Role::Algorithm> role,
-which is implemented by each C<Archive::BagIt::Plugin::Algorithm::XXXX> module.
+This anonymous function MUST use the C<get_hash_string()> function of the L<Archive::BagIt::Role::Algorithm> role,
+which is implemented by each L<Archive::BagIt::Plugin::Algorithm::XXXX> module.
 
-See C<Archive::BagIt::Fast> for details.
+See L<Archive::BagIt::Fast> for details.
 
 =head2 get_baginfo_values_by_key($searchkey)
 
@@ -1217,7 +1241,8 @@ Warnings pushed to C< warnings() >
 
 =head2 delete_baginfo_by_key( $searchkey )
 
-deletes an entry of given $searchkey if exists
+deletes an entry of given $searchkey if exists.
+If multiple entries with $searchkey exists, only the last one is deleted.
 
 =head2 exists_baginfo_key( $searchkey )
 

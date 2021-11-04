@@ -6,30 +6,9 @@ INSTALLATION INSTRUCTIONS
     make install
     make clean
 
+Coming soon...
+
 REQUIREMENTS
 
     * openssl
     * gpg
-    * mod_perl (mod-perl2)
-    * perl-libwww
-
-USING IN DEVELOPMENT MODE
-
-    0. Set PERL5LIB
-       export PERL5LIB=/home/user/modules/MToken/lib
-
-    1. Initialize project
-       perl bin/mtoken -d -D foo init myfooproject
-
-    2. Make
-       cd foo
-       perl Makefile.PL
-       make
-       make test
-       make clean
-
-    3. Debugging
-       perl Makefile.PL
-       make init
-       make test
-       make clean

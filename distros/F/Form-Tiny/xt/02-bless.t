@@ -1,4 +1,5 @@
 use v5.10;
+use strict;
 use warnings;
 use Test::More;
 
@@ -19,16 +20,18 @@ package ChildForm
 {
 	use Form::Tiny -nomoo;
 
-	use parent -norequire, ParentForm;
+	use parent -norequire, 'ParentForm';
 
 	form_field 'f2';
 }
 
 my $form = ChildForm->new;
-$form->set_input({
-	f1 => 'field f1',
-	f2 => 'field f2',
-});
+$form->set_input(
+	{
+		f1 => 'field f1',
+		f2 => 'field f2',
+	}
+);
 
 ok $form->valid;
 ok $form->DOES('Form::Tiny::Form');

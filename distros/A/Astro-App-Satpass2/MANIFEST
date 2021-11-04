@@ -58,6 +58,7 @@ META.yml
 README
 script/satpass2
 t/basic.t
+t/complete.t
 t/data.tle
 t/format.t
 t/format_dump.t
@@ -89,6 +90,7 @@ tools/intrinsic-magnitude
 xt/author/basic.t
 xt/author/carp_not.t
 xt/author/changes.t
+xt/author/consistent_module_versions.t
 xt/author/critic.t
 xt/author/dependencies.t
 xt/author/executable.t

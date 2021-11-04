@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ContentDetail;
-$Shipment::Purolator::WSDLV2::Types::ContentDetail::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::ContentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ Class::Std::initialize();
               TextileIndicator
               TextileManufacturer
 
-              )
+            )
         ],
         {   'Description'               => \%Description_of,
             'HarmonizedCode'            => \%HarmonizedCode_of,
@@ -117,7 +117,7 @@ Shipment::Purolator::WSDLV2::Types::ContentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

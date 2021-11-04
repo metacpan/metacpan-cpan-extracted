@@ -11,6 +11,8 @@ README.md
 cpanfile
 dist.ini
 examples/cpan2rpm
+examples/cpanp-outdated
+examples/cpanp-packages
 lib/CPANPLUS/Dist/Debora.pm
 lib/CPANPLUS/Dist/Debora/License.pm
 lib/CPANPLUS/Dist/Debora/Package.pm

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType;
-$Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType::VERSION = '3.05';
+$Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ Class::Std::initialize();
               Urbanization
               CountryCode
 
-              )
+            )
         ],
         {   'ConsigneeName'       => \%ConsigneeName_of,
             'AttentionName'       => \%AttentionName_of,
@@ -105,7 +105,7 @@ Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

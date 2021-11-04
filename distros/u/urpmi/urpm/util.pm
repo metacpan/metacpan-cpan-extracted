@@ -37,10 +37,36 @@ our @EXPORT = qw(add2hash_
     wc_l
 );
 
+
+=head1 NAME
+
+urpm::util - Misc. utilities subs for urpmi
+
+Mostly a subset of L<MDK::Common>
+
+See C<perldoc MDK::Common> for more documentation
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
+=over
+
+=cut
+
 sub min  { my $n = shift; $_ < $n and $n = $_ foreach @_; $n }
 sub max  { my $n = shift; $_ > $n and $n = $_ foreach @_; $n }
 
-#- quoting/unquoting a string that may be containing space chars.
+=item quotespace($str)
+
+=item unquotespace($str)
+
+Quoting/unquoting a string that may be containing space chars.
+
+=cut
+
 sub quotespace		 { my $x = $_[0] || ''; $x =~ s/(\s)/\\$1/g; $x }
 sub unquotespace	 { my $x = $_[0] || ''; $x =~ s/\\(\s)/$1/g; $x }
 
@@ -57,7 +83,12 @@ sub file2absolute_file {
     $f;
 }
 
-#- reduce pathname by removing <something>/.. each time it appears (or . too).
+=item reduce_pathname($url)
+
+Reduce pathname by removing <something>/.. each time it appears (or . too).
+
+=cut
+
 sub reduce_pathname {
     my ($url) = @_;
 
@@ -92,8 +123,13 @@ sub reduce_pathname {
     $host . $dir;
 }
 
-#- offset pathname by returning the right things to add to a relative directory
-#- to make no change. url is needed to resolve going before to top base.
+=item offset_pathname($url, $offset)
+
+Offset pathname by returning the right things to add to a relative directory
+to make no change. url is needed to resolve going before to top base.
+
+=cut
+
 sub offset_pathname {
     my ($url, $offset) = map { reduce_pathname($_) } @_;
 
@@ -134,7 +170,12 @@ sub move {
     rename($file, $dest) || !system("/bin/mv", "-f", $file, $dest);
 }
 
-#- file_size is useful to write file_size(...) > 32 without having warnings if file doesn't exist
+=item file_size($file)
+
+It is useful to write file_size(...) > 32 without having warnings if file doesn't exist
+
+=cut
+
 sub file_size {
     my ($file) = @_;
     -s $file || 0;
@@ -227,7 +268,13 @@ sub append_to_file {
     1;
 }
 
-#- return the UEFI machine type short name
+=item uefi_type()
+
+Return the UEFI machine type short name
+
+=cut
+
+# FIXME: move into urpm::sys ?
 sub uefi_type() {
     if (-e '/sys/firmware/efi/fw_platform_size') {
         # No support for ARM yet
@@ -239,16 +286,7 @@ sub uefi_type() {
 
 1;
 
-
-=head1 NAME
-
-urpm::util - Misc. utilities subs for urpmi
-
-Mostly a subset of L<MDK::Common>
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
+=back
 
 =head1 COPYRIGHT
 

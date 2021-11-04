@@ -7,7 +7,7 @@ use warnings;
 use parent 'Exporter::Tiny';
 use custom::failures ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @EXPORT_OK;
 BEGIN {
@@ -42,7 +42,7 @@ CXC::Number::Grid::Failure - CXC::Number::Sequence Exceptions
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 BUGS
 

@@ -11,7 +11,8 @@ use Astro::App::Satpass2::Macro::Code;
 use Astro::App::Satpass2::ParseTime;
 use Astro::App::Satpass2::Utils qw{
     :ref
-    __arguments expand_tilde find_package_pod
+    __arguments __legal_options
+    expand_tilde find_package_pod
     has_method instance load_package
     my_dist_config quoter
     __parse_class_and_args
@@ -59,6 +60,8 @@ use Scalar::Util 1.26 qw{ blessed isdual openhandle };
 use Text::Abbrev;
 use Text::ParseWords ();	# Used only for {level1} stuff.
 
+our $READLINE_OBJ;	# Used for readline completion.
+
 use constant ASTRO_SPACETRACK_VERSION => 0.105;
 use constant DEFAULT_STDOUT_LAYERS	=> ':encoding(utf-8)';
 
@@ -84,7 +87,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -171,6 +174,16 @@ my %twilight_abbr = abbrev (keys %twilight_def);
 #		attribute. These are begin() and end(), and anything
 #		that might dispatch either of these. At the moment this
 #		means if() and time().
+#	  -completion - Requires as argument the name of the command
+#	        completion method. This can not be checked at compile
+#	        time. It will be called with the following arguments:
+#	        $code - the relevant code reference
+#	        $text - the text being completed
+#	        $line - the line being completed
+#	        $start - the current position in the line.
+#	        It should return either a reference to an array
+#	        containing possible completions, or nothing to fall
+#	        through to standard completion
 #
 #	Verb(options)
 #
@@ -202,7 +215,8 @@ my %twilight_abbr = abbrev (keys %twilight_def);
 
     sub Tweak : ATTR(CODE,RAWDATA) {
 	my ( undef, undef, $code, $name, $data ) = @_;
-	$attr{$code}{$name} = _attr_hash( $name, $data, qw{ unsatisfied! } );
+	$attr{$code}{$name} = _attr_hash( $name, $data,
+	    qw{ completion=s unsatisfied! } );
 	return;
     }
 
@@ -1667,6 +1681,9 @@ sub location : Verb( dump! ) {
     # TODO the %mac_cmd hash is only needed for level1 compatibility.
     # Once that goes away, it can too PROVIDED we also drop the
     # subcommand defaulting functionality.
+    # Subcommand defaulting dropped 2021-09-20 unless explicitly level1,
+    # after I discovered that my init file defined an unwanted macro
+    # when I mistyped 'define' as 'defined'.
     my %mac_cmd;
     {
 	my $stb = __PACKAGE__ . '::';
@@ -1674,7 +1691,7 @@ sub location : Verb( dump! ) {
 	{
 	    no strict qw{ refs };
 	    foreach my $entry ( keys %{ $stb } ) {
-		$entry =~ m/ \A _macro_ ( \w+ ) /smx
+		$entry =~ m/ \A _macro_sub_ ( \w+ ) /smx
 		    or next;
 		# Strictly speaking I should make sure the {CODE} slot
 		# is occupied here.
@@ -1691,31 +1708,37 @@ sub location : Verb( dump! ) {
     }
 
     # NOTE that we must not define command options here, but on the
-    # individual _macro_* methods. Or at least we must not define any
-    # command options here that get passed to the _macro_* methods.
-    sub macro : Verb() {
+    # individual _macro_sub_* methods. Or at least we must not define
+    # any command options here that get passed to the _macro_sub_*
+    # methods.
+    sub macro : Verb() Tweak( -completion _readline_complete_subcommand ) {
 	my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
 	my $cmd;
 	if (!@args) {
 	    $cmd = 'brief';
-	} elsif ($mac_cmd{$args[0]}) {
-	    $cmd = $mac_cmd{shift @args};
-	} elsif (@args > 1) {
-	    $cmd = 'define';
+	} elsif ( $self->{frame}[-1]{level1} ) {
+	    if ($mac_cmd{$args[0]}) {
+		$cmd = $mac_cmd{shift @args};
+	    } elsif (@args > 1) {
+		$cmd = 'define';
+	    } else {
+		$cmd = 'list';
+	    }
 	} else {
-	    $cmd = 'list';
+	    defined( $cmd = $mac_cmd{ $args[0] } )
+		or $cmd = $args[0];
+	    shift @args;
 	}
 
-	my $code = $self->can( "_macro_$cmd" )
+	my $code = $self->can( "_macro_sub_$cmd" )
 	    or $self->wail( "Subcommand '$cmd' unknown" );
 	return $code->( $self, @args );
     }
-
 }
 
-# Calls to the following _macro_... methods are generated dynamically
+# Calls to the following _macro_sub_... methods are generated dynamically
 # above, so there is no way Perl::Critic can find them.
-sub _macro_brief : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
+sub _macro_sub_brief : Verb() Tweak( -completion _macro_list_complete ) {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, undef, @args ) = __arguments( @_ );
     my $output;
     foreach my $name (sort @args ? @args : keys %{$self->{macro}}) {
@@ -1724,13 +1747,14 @@ sub _macro_brief : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
     return $output;
 }
 
-sub _macro_define : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
-    my ( $self, undef, $name, @args ) = __arguments( @_ );
+sub _macro_sub_define : Verb( completion=s@ ) {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self, $opt, $name, @args ) = __arguments( @_ );
     my $output;
     defined $name
 	or return $self->__wail( 'You must provide a name for the macro' );
     @args
 	or return $self->__wail( 'You must provide a definition for the macro' );
+
     $name !~ m/ \W /smx
 	and $name !~ m/ \A _ /smx
 	or return $self->__wail("Invalid macro name '$name'");
@@ -1742,6 +1766,7 @@ sub _macro_define : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
 	Astro::App::Satpass2::Macro::Command->new(
 	    name	=> $name,
 	    parent	=> $self,
+	    completion	=> $opt->{completion},
 	    def		=> \@args,
 	    generate	=> \&_macro_define_generator,
 	    level1	=> $self->{frame}[-1]{level1},
@@ -1751,17 +1776,23 @@ sub _macro_define : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
 }
 
 sub _macro_define_generator {
-    my ( $self, @args ) = @_;
+    my ( $self, @args ) = @_;	# $self if Macro object
     my $output;
     foreach my $macro ( @args ) {
-	$output .= "macro define $macro \\\n    " .
-	    join( " \\\n    ", map { quoter( $_ ) } $self->def() ) .
+	if ( my $comp = $self->completion() ) {
+	    $output .= "macro define \\\n    " .
+		"--completion '@$comp' \\\n    " .
+		"$macro \\\n    ";
+	} else {
+	    $output .= "macro define $macro \\\n    ";
+	}
+	$output .= join( " \\\n    ", map { quoter( $_ ) } $self->def() ) .
 	    "\n";
     }
     return $output;
 }
 
-sub _macro_delete : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
+sub _macro_sub_delete : Verb() Tweak( -completion _macro_list_complete ) {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, undef, @args ) = __arguments( @_ );
     my $output;
     foreach my $name (@args ? @args : keys %{$self->{macro}}) {
@@ -1770,7 +1801,7 @@ sub _macro_delete : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
     return $output;
 }
 
-sub _macro_list : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
+sub _macro_sub_list : Verb() Tweak( -completion _macro_list_complete ) {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, undef, @args ) = __arguments( @_ );
     my $output;
     foreach my $name (sort @args ? @args : keys %{$self->{macro}}) {
@@ -1781,7 +1812,24 @@ sub _macro_list : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
     return $output;
 }
 
-sub _macro_load : Verb( lib=s verbose! ) {	## no critic (ProhibitUnusedPrivateSubroutines)
+sub _macro_list_complete {	## no critic (ProhibitUnusedPrivateSubroutines)
+    # my ( $invocant, $code, $text, $line, $start ) = @_;
+    my ( $invocant, undef, undef, $line, undef ) = @_;
+    ref $invocant
+	or return;
+    my @part = _readline_line_to_parts( $line );
+    3 == @part
+	or return;
+    my $re = qr< \A \Q$part[2]\E >smx;
+    my @rslt;
+    foreach ( sort keys %{ $invocant->{macro} } ) {
+	m/$re/smx
+	    and push @rslt, $_;
+    }
+    return \@rslt;
+}
+
+sub _macro_sub_load : Verb( lib=s verbose! ) {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, $opt, $name, @args ) = __arguments( @_ );
     my $output;
     defined $name
@@ -1855,7 +1903,7 @@ sub magnitude_table : Verb( name! reload! ) {
 
 # Attributes must all be on one line to process correctly under Perl
 # 5.8.8.
-sub pass : Verb( :compute ) {
+sub pass : Verb( :compute __pass_options ) {
     my ( $self, $opt, @args ) = __arguments( @_ );
 
     $self->_apply_boolean_default(
@@ -2897,195 +2945,17 @@ sub _sky_list_body {
     }
 }
 
-{
-    my %go;
+sub sky : Verb() Tweak( -completion _readline_complete_subcommand ) {
+    my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
 
-    my %handler = (
-	list	=> sub {
-	    my ( $self ) = @_;		# Arguments unused
-	    my $output;
-	    foreach my $body (
-		map { $_->[1] }
-		sort { $a->[0] cmp $b->[0] }
-		map { [ lc( $_->get( 'name' ) || $_->get( 'id' ) ), $_ ] }
-		@{$self->{sky}}
-	    ) {
-		$output .= _sky_list_body( $body );
-	    }
-	    unless (@{$self->{sky}}) {
-		$self->{warn_on_empty}
-		    and $self->whinge( 'The sky is empty' );
-	    }
-	    return $output;
-	},
-	add	=> sub {
-	    my ( $self, @args ) = @_;
-	    my $name = shift @args
-		or $self->wail( 'You did not specify what to add' );
-	    defined $self->_find_in_sky( $name )
-		and return;
-	    if ( my $obj = $self->_sky_object( $name, fatal => 0 ) ) {
-		push @{ $self->{sky} }, $obj;
-	    } else {
-		@args >= 2
-		    or $self->wail(
-		    'You must give at least right ascension and declination' );
-		my $ra = deg2rad( $self->__parse_angle( shift @args ) );
-		my $dec = deg2rad( $self->__parse_angle( shift @args ) );
-		my $rng = @args ?
-		    $self->__parse_distance( shift @args, '1pc' ) :
-		    10000 * PARSEC;
-		my $pmra = @args ? do {
-		    my $angle = shift @args;
-		    $angle =~ s/ s \z //smxi
-			or $angle *= 24 / 360 / cos( $ra );
-		    deg2rad( $angle / SPY2DPS );
-		} : 0;
-		my $pmdec = @args ? deg2rad( shift( @args ) / SPY2DPS ) : 0;
-		my $pmrec = @args ? shift @args : 0;
-		push @{ $self->{sky} }, Astro::Coord::ECI::Star->new(
-		    debug	=> $self->{debug},
-		    name	=> $name,
-		    sun		=> $self->_sky_object( 'sun' ),
-		)->position( $ra, $dec, $rng, $pmra, $pmdec, $pmrec );
-	    }
-	    return;
-	},
-	class	=> sub {
-	    my ( $self, @arg ) = @_;
-	    $go{class} ||= Getopt::Long::Parser->new(
-#		config	=> [ qw{ require_order } ],
-	    );
-	    my %opt;
-	    if ( HASH_REF eq ref $arg[0] ) {
-		%opt = %{ shift @arg };
-	    } else {
-		$go{class}->getoptionsfromarray(
-		    \@arg, \%opt, qw{ add! delete! } )
-		    or $self->wail( 'Invalid option' );
-	    };
-	    $opt{add}
-		and $opt{delete}
-		and $self->wail( 'May not specify both add and delete' );
+    my $verb = lc ( shift @args || 'list' );
 
-	    if ( $opt{delete} ) {
-		foreach my $name ( @arg ) {
-		    $name =~ m/ \A sun \z /smxi
-			and $self->wail( 'Can not remove Sun class' );
-		    defined $self->_find_in_sky( $name )
-			and $self->wail( 'Can not remove in-use class' );
-		    delete $self->{sky_class}{ fold_case( $name ) };
-		}
-	    } elsif ( @arg < 2 ) {
-		@arg
-		    or @arg = sort keys %{ $self->{sky_class} };
-		return join '', map {
-		    $self->_sky_class_components( $_ ) . "\n" }
-		    @arg;
-	    } else {
-		my ( $name, $class, @attr ) = @arg;
-		$self->load_package( { fatal => 'wail' }, $class );
-		my $want_class = $name =~ m/ \A sun \z /smxi ?
-		    SUN_CLASS_DEFAULT :
-		    'Astro::Coord::ECI';
-		embodies( $class, $want_class )
-		    or $self->wail(
-		    "Must be a subclass of $want_class" );
-		+{ @attr }->{name}
-		    and $self->wail( 'May not specify name explicitly' );
-		# name must be last, because _sky_class_components()
-		# needs to recover it.
-		push @attr, name => $name;
-		my $obj = $class->new( @attr );	# To validate @attr
-		my $folded_name = fold_case( $name );
-		$self->{sky_class}{$folded_name} = [ $class, @attr ];
-		$self->_replace_in_sky( $folded_name )
-		    or $opt{add}
-		    and push @{ $self->{sky} }, $obj;
-		$self->{_help_module}{$folded_name} = $class;
-		if ( $name =~ m/ \A sun \z /smxi ) {
-		    foreach my $body (
-			@{ $self->{bodies} }, @{ $self->{sky} }
-		    ) {
-			$body->set(
-			    sun => $self->_sky_object( 'sun' ),
-			);
-		    }
-		}
-	    }
-
-	    return;
-	},
-	clear	=> sub {
-	    my ( $self ) = @_;		# Arguments unused
-	    @{ $self->{sky} } = ();
-	    return;
-	},
-	drop	=> sub {
-	    my ( $self, @args ) = @_;
-	    @args or $self->wail(
-		'You must specify at least one name to drop' );
-	    foreach my $name ( @args ) {
-		$self->_drop_from_sky( $name );
-	    }
-	    return;
-	},
-	load	=> sub {	# Undocumented. That means I can revoke
-				# at any time, without notice. If you
-				# need this functionality, please
-				# contact me.
-	    my ( $self, @args ) = @_;
-	    my $tle;
-	    foreach my $fn ( @args ) {
-		local $/ = undef;
-		open my $fh, '<', $fn
-		    or $self->wail( "Failed to open $fn: $!" );
-		$tle .= <$fh>;
-		close $fh;
-	    }
-	    return $self->_sky_tle( $tle );
-	},
-	lookup	=> sub {
-	    my ( $self, @args ) = @_;
-	    my $output;
-	    my $name = shift @args;
-	    defined $self->_find_in_sky( $name )
-		and $self->wail( "Duplicate sky entry '$name'" );
-	    my ($ra, $dec, $rng, $pmra, $pmdec, $pmrec) =
-		$self->_simbad4 ($name);
-	    $rng = sprintf '%.2f', $rng;
-	    $output .= 'sky add ' . quoter ($name) .
-		" $ra $dec $rng $pmra $pmdec $pmrec\n";
-	    $ra = deg2rad ($self->__parse_angle ($ra));
-	    my $body = Astro::Coord::ECI::Star->new(
-		name	=> $name,
-		sun	=> $self->_sky_object( 'sun' ),
-	      );
-	    $body->position ($ra, deg2rad ($self->__parse_angle ($dec)),
-		$rng * PARSEC, deg2rad ($pmra * 24 / 360 / cos ($ra) / SPY2DPS),
-		deg2rad ($pmdec / SPY2DPS), $pmrec);
-	    push @{$self->{sky}}, $body;
-	    return $output;
-	},
-	tle	=> \&_sky_tle,	# Undocumented. That means I can revoke
-				# at any time, without notice. If you
-				# need this functionality, please
-				# contact me.
-    );
-
-    sub sky : Verb() {
-	my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
-
-	my $verb = lc ( shift @args || 'list' );
-
-	if ( my $code = $handler{$verb} ) {
-	    return $code->( $self, @args );
-	} else {
-	    $self->wail("'sky' subcommand '$verb' not known");
-	}
-	return;	# We can't get here, but Perl::Critic does not know this.
+    if ( my $code = $self->can( "_sky_sub_$verb") ) {
+	return $code->( $self, @args );
+    } else {
+	$self->wail("'sky' subcommand '$verb' not known");
     }
-
+    return;	# We can't get here, but Perl::Critic does not know this.
 }
 
 # Given the name of a potential background object, return its
@@ -3122,8 +2992,197 @@ sub _sky_object {
     return;
 }
 
-sub _sky_tle {
-    my ( $self, $tle ) = @_;
+# Calls to the following _macro_sub_... methods are generated dynamically
+# above, so there is no way Perl::Critic can find them.
+sub _sky_sub_add : Verb()  {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
+    my $name = shift @args
+	or $self->wail( 'You did not specify what to add' );
+    defined $self->_find_in_sky( $name )
+	and return;
+    if ( my $obj = $self->_sky_object( $name, fatal => 0 ) ) {
+	push @{ $self->{sky} }, $obj;
+    } else {
+	@args >= 2
+	    or $self->wail(
+	    'You must give at least right ascension and declination' );
+	my $ra = deg2rad( $self->__parse_angle( shift @args ) );
+	my $dec = deg2rad( $self->__parse_angle( shift @args ) );
+	my $rng = @args ?
+	    $self->__parse_distance( shift @args, '1pc' ) :
+	    10000 * PARSEC;
+	my $pmra = @args ? do {
+	    my $angle = shift @args;
+	    $angle =~ s/ s \z //smxi
+		or $angle *= 24 / 360 / cos( $ra );
+	    deg2rad( $angle / SPY2DPS );
+	} : 0;
+	my $pmdec = @args ? deg2rad( shift( @args ) / SPY2DPS ) : 0;
+	my $pmrec = @args ? shift @args : 0;
+	push @{ $self->{sky} }, Astro::Coord::ECI::Star->new(
+	    debug	=> $self->{debug},
+	    name	=> $name,
+	    sun		=> $self->_sky_object( 'sun' ),
+	)->position( $ra, $dec, $rng, $pmra, $pmdec, $pmrec );
+    }
+    return;
+}
+
+sub _sky_sub_class : Verb( add! delete! ) {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self, $opt, @arg ) = __arguments( @_ );
+
+    $opt->{add}
+	and $opt->{delete}
+	and $self->wail( 'May not specify both add and delete' );
+
+    if ( $opt->{delete} ) {
+	foreach my $name ( @arg ) {
+	    $name =~ m/ \A sun \z /smxi
+		and $self->wail( 'Can not remove Sun class' );
+	    defined $self->_find_in_sky( $name )
+		and $self->wail( 'Can not remove in-use class' );
+	    delete $self->{sky_class}{ fold_case( $name ) };
+	}
+    } elsif ( @arg < 2 ) {
+	@arg
+	    or @arg = sort keys %{ $self->{sky_class} };
+	return join '', map {
+	    $self->_sky_class_components( $_ ) . "\n" }
+	    @arg;
+    } else {
+	my ( $name, $class, @attr ) = @arg;
+	$self->load_package( { fatal => 'wail' }, $class );
+	my $want_class = $name =~ m/ \A sun \z /smxi ?
+	    SUN_CLASS_DEFAULT :
+	    'Astro::Coord::ECI';
+	embodies( $class, $want_class )
+	    or $self->wail(
+	    "Must be a subclass of $want_class" );
+	+{ @attr }->{name}
+	    and $self->wail( 'May not specify name explicitly' );
+	# name must be last, because _sky_class_components()
+	# needs to recover it.
+	push @attr, name => $name;
+	my $obj = $class->new( @attr );
+	my $folded_name = fold_case( $name );
+	$self->{sky_class}{$folded_name} = [ $class, @attr ];
+	$self->_replace_in_sky( $folded_name, $obj )
+	    or $opt->{add}
+	    and push @{ $self->{sky} }, $obj;
+	$self->{_help_module}{$folded_name} = $class;
+	if ( $obj->isa( 'Astro::Coord::ECI::Sun' ) ) {
+	    foreach my $body (
+		@{ $self->{bodies} }, @{ $self->{sky} }
+	    ) {
+		$body->set(
+		    sun => $self->_sky_object( 'sun' ),
+		);
+	    }
+	}
+    }
+
+    return;
+}
+
+sub _sky_sub_clear : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self ) = __arguments( @_ );	# $opt and args unused
+    @{ $self->{sky} } = ();
+    return;
+}
+
+sub _sky_sub_drop : Verb() Tweak( -completion _sky_body_complete ) {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
+    @args or $self->wail(
+	'You must specify at least one name to drop' );
+    foreach my $name ( @args ) {
+	$self->_drop_from_sky( $name );
+    }
+    return;
+}
+
+sub _sky_body_complete {	## no critic (ProhibitUnusedPrivateSubroutines)
+    # my ( $invocant, $code, $text, $line, $start ) = @_;
+    my ( $invocant, undef, undef, $line, undef ) = @_;
+    ref $invocant
+	or return;
+    my @part = _readline_line_to_parts( $line );
+    3 == @part
+	or return;
+    my $re = qr< \A \Q$part[2]\E >smxi;
+    my @rslt;
+    foreach my $body ( @{ $invocant->{sky} } ) {
+	if ( ( my $name = $body->get( 'name' ) ) =~ $re ) {
+	    push @rslt, $name;
+	} elsif ( ( my $id = $body->get( 'id' ) ) =~ $re ) {
+	    push @rslt, $id;
+	}
+    }
+    return [ sort @rslt ];
+}
+
+sub _sky_sub_list : Verb( verbose! ) {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self, $opt ) = __arguments( @_ );	# args unused
+    my $output;
+    foreach my $body (
+	map { $_->[1] }
+	sort { $a->[0] cmp $b->[0] }
+	map { [ lc( $_->get( 'name' ) || $_->get( 'id' ) ), $_ ] }
+	@{$self->{sky}}
+    ) {
+	$output .= _sky_list_body( $body );
+	if ( $opt->{verbose} ) {
+	    $output .= "#   Class: @{[ ref $body ]}\n";
+	}
+    }
+    unless (@{$self->{sky}}) {
+	$self->{warn_on_empty}
+	    and $self->whinge( 'The sky is empty' );
+    }
+    return $output;
+}
+
+# Undocumented. That means I can revoke at any time, without notice. If
+# you need this functionality, please contact me.
+sub _sky_sub_load : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
+    my $tle;
+    foreach my $fn ( @args ) {
+	local $/ = undef;
+	open my $fh, '<', $fn
+	    or $self->wail( "Failed to open $fn: $!" );
+	$tle .= <$fh>;
+	close $fh;
+    }
+    return $self->_sky_sub_tle( $tle );
+}
+
+sub _sky_sub_lookup : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
+    my $output;
+    my $name = shift @args;
+    defined $self->_find_in_sky( $name )
+	and $self->wail( "Duplicate sky entry '$name'" );
+    my ($ra, $dec, $rng, $pmra, $pmdec, $pmrec) =
+	$self->_simbad4 ($name);
+    $rng = sprintf '%.2f', $rng;
+    $output .= 'sky add ' . quoter ($name) .
+	" $ra $dec $rng $pmra $pmdec $pmrec\n";
+    $ra = deg2rad ($self->__parse_angle ($ra));
+    my $body = Astro::Coord::ECI::Star->new(
+	name	=> $name,
+	sun	=> $self->_sky_object( 'sun' ),
+      );
+    $body->position ($ra, deg2rad ($self->__parse_angle ($dec)),
+	$rng * PARSEC, deg2rad ($pmra * 24 / 360 / cos ($ra) / SPY2DPS),
+	deg2rad ($pmdec / SPY2DPS), $pmrec);
+    push @{$self->{sky}}, $body;
+    return $output;
+}
+
+# Undocumented. That means I can revoke at any time, without notice. If
+# you need this functionality, please contact me.
+sub _sky_sub_tle : Verb() {
+    my ( $self, undef, $tle ) = __arguments( @_ );	# $opt unused
     my @bodies = Astro::Coord::ECI::TLE::Set->aggregate(
 	Astro::Coord::ECI::TLE->parse( $tle ) );
     my %extant = map { $_->get( 'id' ) => 1 }
@@ -3428,7 +3487,7 @@ sub time_parser : Verb() {
     goto &_helper_handler;
 }
 
-sub tle : Verb( :compute ) {
+sub tle : Verb( :compute __tle_options ) {
     my ( $self, $opt, @args ) = __arguments( @_ );
     @args
 	and not $opt->{choose}
@@ -4251,6 +4310,8 @@ sub _get_interactive {
 #	Note that the return from this subroutine may or may not be
 #	chomped.
 
+my $readline_word_break_re;
+
 {
     my $rl;
 
@@ -4267,9 +4328,17 @@ sub _get_interactive {
 		eval {
 		    load_package( 'Term::ReadLine' )
 			or return;
-		    $rl ||= Term::ReadLine->new('satpass2');
+		    unless ( $rl ) {
+			$rl = Term::ReadLine->new( 'satpass2' );
+			if ( $INC{'Term/ReadLine/readline.pm'} ) {
+			    no warnings qw{ once };
+			    $readline::rl_completion_function =
+				__PACKAGE__->can( '__readline_completer_function' );
+			}
+		    }
 		    sub {
 			defined $buffer or return $buffer;
+			local $READLINE_OBJ = $self;
 			return ( $buffer = $rl->readline($_[0]) );
 		    }
 		} || sub {
@@ -4289,6 +4358,168 @@ sub _get_interactive {
 	    }
 	};
     }
+}
+
+sub __readline_completer_function {
+    my ( $text, $line, $start ) = @_;
+
+    my $invocant = $READLINE_OBJ || __PACKAGE__;
+
+    $readline_word_break_re ||= qr<
+	[\Q$readline::rl_completer_word_break_characters\E]+
+    >smx;
+
+    $start
+	or return $invocant->_readline_complete_command( $text );
+
+    my ( $cmd ) = split $readline_word_break_re, $line, 2;
+    my $code;
+    not $cmd =~ s/ \A core [.] //smx
+	and ref $invocant
+	and $invocant->{macro}{$cmd}
+	and $code = $invocant->{macro}{$cmd}->implements( $cmd );
+    $code ||= $invocant->can( $cmd );
+
+    if ( CODE_REF eq ref $code ) {
+	# builtins and code macros go here
+
+	my $rslt;
+
+	if ( my $method = $invocant->__get_attr( $code, Tweak => {}
+	    )->{completion} ) {
+	    $rslt = $invocant->$method( $code, $text, $line, $start )
+		and return @{ $rslt };
+	}
+
+	$rslt = $invocant->_readline_complete_options( $code, $text,
+	    $line, $start )
+	    and @{ $rslt }
+	    and return @{ $rslt };
+
+    } elsif ( my $macro = $invocant->{macro}{$cmd} ) {
+	# command macros go here
+
+	my $rslt;
+	$rslt = $macro->completion( $text )
+	    and return @{ $rslt };
+    }
+
+    my @files = bsd_glob( "$text*" );
+    if ( $readline::var_CompleteAddsuffix ) {
+	foreach ( @files ) {
+	    if (-l $_) {
+##		$_ .= '@';
+	    } elsif (-d _) {
+		$_ .= '/';
+		$readline::rl_completer_terminator_character = '';
+	    } elsif (-x _) {
+##		$_ .= '*';
+	    } elsif (-S _ || -p _) {
+##		$_ .= '=';
+	    }
+	}
+    }
+    return @files;
+}
+
+{
+    my @builtins;
+    sub _readline_complete_command {
+	my ( $invocant, $text ) = @_;
+	unless ( @builtins ) {
+	    my $stash = ( ref $invocant || $invocant ) . '::';
+	    no strict qw{ refs };
+	    foreach my $sym ( keys %$stash ) {
+		$sym =~ m/ \A _ /smx
+		    and next;
+		my $code = $invocant->can( $sym )
+		    or next;
+		$invocant->__get_attr( $code, 'Verb' )
+		    or next;
+		push @builtins, $sym;
+	    }
+	    @builtins = sort @builtins;
+	}
+	my @rslt;
+	if ( $text =~ s/ \A core [.] //smx ) {
+	    my $match = qr< \A \Q$text\E >smx;
+	    @rslt = map { "core.$_" } grep { $_ =~ $match } @builtins;
+	} else {
+	    my $match = qr< \A \Q$text\E >smx;
+	    @rslt = grep { $_ =~ $match } @builtins, 'core.',
+		ref $invocant ? keys %{ $invocant->{macro} } : ();
+	}
+	1 == @rslt
+	    and $rslt[0] =~ m/ \W \z /smx
+	    and $readline::rl_completer_terminator_character = '';
+	return ( sort @rslt );
+    }
+}
+
+sub _readline_complete_options {
+    # my ( $invocant, $code, $text, $line, $start ) = @_;
+    my ( $invocant, $code, $text ) = @_;
+    $text =~ m/ \A ( --? ) ( .* ) /smx
+	or return;
+    my ( $prefix, $match ) = ( $1, $2 );
+    my $lgl = $invocant->__legal_options( $code );
+    my $re = qr< \A \Q$match\E >smx;
+    my @rslt;
+    foreach ( @{ $lgl } ) {
+	next if ref;
+	# De-alias before modifying
+	( my $o = $_ ) =~ s/ [!=?] .* //smx;
+	push @rslt, grep { m/$re/ } split qr< \| >smx, $o;
+    }
+    @rslt
+	and return [ map { "$prefix$_" } sort @rslt ];
+    return;
+}
+
+# The following subroutine is called dynamically
+sub _readline_complete_subcommand { ## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $invocant, $code, $text, $line, $start ) = @_;
+    my @part = _readline_line_to_parts( $line );
+    my @rslt;
+    if ( 2 == @part ) {
+	my $re = qr< \A _$part[0]_sub_ ( \Q$part[1]\E \w* ) >smx;
+	my $stash = ( ref $invocant || $invocant ) . '::';
+	no strict qw{ refs };
+	foreach my $key ( keys %$stash ) {
+	    $key =~ m/$re/smx
+		and push @rslt, "$1";
+	}
+	return [ sort @rslt ];
+    }
+
+    $code = $invocant->can( "_$part[0]_sub_$part[1]" )
+	or return;
+
+    my $r;
+    $r = $invocant->_readline_complete_options( $code, $text, $line,
+	$start )
+	and return $r;
+
+    my $complete = $invocant->__get_attr( $code, Tweak => {} )->{completion}
+	or return;
+
+    $r = $invocant->$complete( $code, $text, $line, $start )
+	and return $r;
+
+    return;
+}
+
+sub _readline_line_to_parts {
+    my ( $line ) = @_;
+    my @parts = split $readline_word_break_re, $line;
+    $line =~ m/ \s+ \z /smx	# Trailing spaces do not produce an
+	and push @parts, '';	# empty part, so we force one.
+    # NOTE that we strip the leading 'core.' if any, so the return from
+    # this method does not distinguish between a core command and the
+    # same-named macro if any.
+    @parts
+	and $parts[0] =~ s/ \A core [.] //smx;
+    return @parts;
 }
 
 sub _get_time_parser_attribute {
@@ -4731,18 +4962,20 @@ sub _read_continuation {
     return $more;
 }
 
-# my ( $obj ) = $self->_replace_in_sky( $name );
+# my ( $old_obj ) = $self->_replace_in_sky( $name, $new_obj );
 # This is restricted to objects constructed via {sky_class}.
 # The return is an array containing the replaced body, or nothing if
-# the body was not found.
+# the body was not found. The $new_obj is optional; if not provided a
+# new object is created.
 sub _replace_in_sky {
-    my ( $self, $name, $class ) = @_;
-    ( $class ||= $self->{sky_class}{ fold_case( $name ) } )
+    my ( $self, $name, $new_obj ) = @_;
+    $new_obj
+	or $self->{sky_class}{ fold_case( $name ) }
 	or $self->weep( "Can not replace $name; no class defined" );
     defined( my $inx = $self->_find_in_sky( $name ) )
 	or return;
-    return splice @{ $self->{sky} }, $inx, $inx + 1, $self->_sky_object(
-	$name );
+    return splice @{ $self->{sky} }, $inx, $inx + 1,
+	$new_obj || $self->_sky_object( $name );
 }
 
 #	$self->_rewrite_level1_command( $buffer, $context );
@@ -5995,6 +6228,11 @@ This module is only used directly if you are specifying URLs as input
 (see L</SPECIFYING INPUT DATA>). It is implied, though, by a number of
 the other optional modules.
 
+=item L<Term::ReadLine|Term::ReadLine>
+
+If this can be loaded B<and> it can load C<Term::ReadLine::Perl> you get
+interactive command editing and completion.
+
 =item L<Time::HiRes|Time::HiRes>
 
 This module is only used by the L<time()|/time> method. If you are not
@@ -6940,13 +7178,25 @@ example, 'say' can be defined in terms of 'echo' by
 
  $satpass2->macro( define => say => 'echo $@' );
 
+The C<'define'>> subcommand supports the following options:
+
+=over
+
+=item -completion
+
+This option specifies a space-delimited list of completions for the
+macro arguments. It can be specified more than once, in which case all
+completion specifications will be concatenated.
+
+=back
+
 The first argument of the C<'load'> subcommand is the name of a Perl
 module (e.g. C<My::Macros>) that implements one or more code macros.
 Subsequent arguments, if any, are the names of macros to load from the
 module. If no subsequent arguments are given, all macros defined by the
 macro are loaded.
 
-The following options are supported:
+The C<'load'> subcommand supports the following options:
 
 =over
 
@@ -7306,10 +7556,17 @@ these is the C<exit> command, the run will end at this step.
 By default, commands come from C<STDIN>, but any commands passed as
 arguments are executed first. How commands are read from C<STDIN>
 depends on a number of factors. If C<STDIN> is a terminal and
-Term::ReadLine can be loaded, a Term::ReadLine object is instantiated
-and used to read input.  If C<STDIN> is a terminal and Term::ReadLine
+L<Term::ReadLine|Term::ReadLine> can be loaded, a
+L<Term::ReadLine|Term::ReadLine> object is instantiated and used to read
+input.  If C<STDIN> is a terminal and L<Term::ReadLine|Term::ReadLine>
 can not be loaded, the prompt is printed to C<STDERR> and C<STDIN> is
 read.  If C<STDIN> is not a terminal, it is read.
+
+If L<Term::ReadLine|Term::ReadLine> is in use and can load
+C<Term::ReadLine::Perl>, command editing, history, and completion are
+available. Completion will include at least command, macro, and option
+names, in addition to the file name completion built into
+C<Term::ReadLine::Perl>.
 
 The default command acquisition behavior can be changed by passing, as
 the first argument, a code reference. This should refer to a subroutine

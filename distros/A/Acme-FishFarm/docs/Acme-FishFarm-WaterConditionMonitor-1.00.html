@@ -1,0 +1,318 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Acme::FishFarm::WaterConditionMonitor - Water Condition Monitor for Acme::FishFarm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORT">EXPORT</a></li>
+  <li><a href="#CREATION-RELATED-SUBROUTINES-METHODS">CREATION RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#install-sensors">install ( %sensors )</a></li>
+      <li><a href="#add_oxygen_maintainer-oxygen_maintainer">add_oxygen_maintainer ( $oxygen_maintainer )</a></li>
+    </ul>
+  </li>
+  <li><a href="#WATER-CONDITIONS-RELATED-SUBROUTINES-METHODS">WATER CONDITIONS RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#current_ph-new_ph">current_ph ( $new_ph )</a></li>
+      <li><a href="#ph_threshold">ph_threshold</a></li>
+      <li><a href="#set_ph_threshold-ph_value">set_ph_threshold ( $ph_value )</a></li>
+      <li><a href="#ph_is_normal">ph_is_normal</a></li>
+      <li><a href="#current_temperature-new_temperature">current_temperature ( $new_temperature )</a></li>
+      <li><a href="#temperature_threshold">temperature_threshold</a></li>
+      <li><a href="#set_temperature_threshold-celcius">set_temperature_threshold ( $celcius )</a></li>
+      <li><a href="#temperature_is_normal">temperature_is_normal</a></li>
+      <li><a href="#lacking_oxygen">lacking_oxygen</a></li>
+      <li><a href="#current_turbidity-new_turbidity">current_turbidity ( $new_turbidity )</a></li>
+      <li><a href="#turbidity_threshold">turbidity_threshold</a></li>
+      <li><a href="#set_turbidity_threshold-new_turbidity_threshold">set_turbidity_threshold ( $new_turbidity_threshold )</a></li>
+      <li><a href="#water_dirty">water_dirty</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUZZER-RELATED-SUBROUTINES-METHODS">BUZZER RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#is_on_buzzer_short">is_on_buzzer_short</a></li>
+      <li><a href="#is_on_buzzer_long">is_on_buzzer_long</a></li>
+    </ul>
+  </li>
+  <li><a href="#Private-Methods-for-Buzzers">Private Methods for Buzzers</a></li>
+  <li><a href="#LED-LIGHTS-RELATED-SUBROUTINES-METHODS">LED LIGHTS RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#on_LED_pH">on_LED_pH</a></li>
+      <li><a href="#is_on_LED_pH">is_on_LED_pH</a></li>
+      <li><a href="#on_LED_temperature">on_LED_temperature</a></li>
+      <li><a href="#is_on_LED_temperature">is_on_LED_temperature</a></li>
+      <li><a href="#on_LED_DO">on_LED_DO</a></li>
+      <li><a href="#is_on_LED_DO">is_on_LED_DO</a></li>
+      <li><a href="#on_LED_turbidity">on_LED_turbidity</a></li>
+      <li><a href="#is_on_LED_turbidity">is_on_LED_turbidity</a></li>
+      <li><a href="#lighted_LED_count">lighted_LED_count</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Acme::FishFarm::WaterConditionMonitor - Water Condition Monitor for Acme::FishFarm</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 1.00</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    use Acme::FishFarm::WaterConditionMonitor;
+    # missing stuff will be added in the next release</code></pre>
+
+<h1 id="EXPORT">EXPORT</h1>
+
+<p>None</p>
+
+<h1 id="CREATION-RELATED-SUBROUTINES-METHODS">CREATION RELATED SUBROUTINES/METHODS</h1>
+
+<p>Only 3 sensors are built-in. However, there is a 4th socket for the oxygen maintainer. For this socket, you&#39;ll need to manuall connect an Acme::FishFarm::OxygenMaintainer object by calling the <code>add_oxygen_maintainer</code> method.</p>
+
+<p>More sockets might be available in the future.</p>
+
+<h2 id="install-sensors">install ( %sensors )</h2>
+
+<p>Installs a water condition monitoring system.</p>
+
+<p>The <code>%sensors</code> included are:</p>
+
+<dl>
+
+<dt id="pH">pH</dt>
+<dd>
+
+<p>Optional. The default threshold range is <code>[6.5, 7.5]</code> and the default pH is <code>7.0</code>.</p>
+
+<p>This will set the threshold value of the water pH. Please pass in an array reference to this key in the form of <code>[min_pH, max_pH]</code></p>
+
+<p>The values are in the range of <code>1-14</code>.</p>
+
+</dd>
+<dt id="temperature">temperature</dt>
+<dd>
+
+<p>Optional. The default threshold range is <code>[20, 25]</code> degree celcius and the default temprature is <code>25</code>.</p>
+
+<p>This will set the threshold value of the water temperature. Please pass in an array reference to this key in the form of <code>[min_temperature, max_temperature]</code></p>
+
+<p>The ranges of values are between 0 and 50 degree <b>celciuls</b></p>
+
+</dd>
+<dt id="turbidity">turbidity</dt>
+<dd>
+
+<p>Optional. The default threshold is <code>180 ntu</code> and the default turbidity is set to <code>10 ntu</code>.</p>
+
+<p>This will set the threshold of the turbidity of the water.</p>
+
+<p>The range of values are between 0 and 300 ntu.</p>
+
+</dd>
+</dl>
+
+<h2 id="add_oxygen_maintainer-oxygen_maintainer">add_oxygen_maintainer ( $oxygen_maintainer )</h2>
+
+<p>Connects the oxygen maintainer to this monitoring system.</p>
+
+<p>For now, this module can only check if the oxygen is lacking or not. This module contains a user friendly method compared to the standard terminology used in the <code>Acme::FishFarm::OxygenMaintainer</code> module. Other user friendly methods will be added in the future.</p>
+
+<h1 id="WATER-CONDITIONS-RELATED-SUBROUTINES-METHODS">WATER CONDITIONS RELATED SUBROUTINES/METHODS</h1>
+
+<h2 id="current_ph-new_ph">current_ph ( $new_ph )</h2>
+
+<p>Sets / returns the current pH of the water.</p>
+
+<p><code>$new_pH</code> is optional. If present, the current pH will be set to <code>$new_ph</code>. Otherwise, returns the current pH reading.</p>
+
+<h2 id="ph_threshold">ph_threshold</h2>
+
+<p>Returns the pH threshold as an array ref.</p>
+
+<h2 id="set_ph_threshold-ph_value">set_ph_threshold ( $ph_value )</h2>
+
+<p>Sets the pH threshold.</p>
+
+<h2 id="ph_is_normal">ph_is_normal</h2>
+
+<p>Returns true if the current pH is within the set range of threshold.</p>
+
+<p>The pH LED will light up and a short buzzer will be turned on if the pH is not normal.</p>
+
+<p>The long buzzer will not be affected, you&#39;ll need to turn it on yourself.</p>
+
+<h2 id="current_temperature-new_temperature">current_temperature ( $new_temperature )</h2>
+
+<p>Sets / returns the current temperature of the water.</p>
+
+<p><code>$new_temperature</code> is optional. If present, the current temperature will be set to <code>$new_temperature</code>. Otherwise, returns the current temperature reading.</p>
+
+<h2 id="temperature_threshold">temperature_threshold</h2>
+
+<p>Returns the acceptable temperature range as an array ref.</p>
+
+<h2 id="set_temperature_threshold-celcius">set_temperature_threshold ( $celcius )</h2>
+
+<p>Sets the water temperature threshold.</p>
+
+<h2 id="temperature_is_normal">temperature_is_normal</h2>
+
+<p>Returns true if the current temperature is within the set range of threshold.</p>
+
+<h2 id="lacking_oxygen">lacking_oxygen</h2>
+
+<p>Returns true if the current DO content is lower then the threshold.</p>
+
+<h2 id="current_turbidity-new_turbidity">current_turbidity ( $new_turbidity )</h2>
+
+<p>Sets / returns the current turbidity of the water.</p>
+
+<p><code>$new_turbidity</code> is optional. If present, the current turbidity will be set to <code>$new_turbidity</code>. Otherwise, returns the current turbidity reading.</p>
+
+<h2 id="turbidity_threshold">turbidity_threshold</h2>
+
+<p>Returns the turbidity threshold.</p>
+
+<h2 id="set_turbidity_threshold-new_turbidity_threshold">set_turbidity_threshold ( $new_turbidity_threshold )</h2>
+
+<p>Sets the turbidity threshold to <code>$new_turbidity_threshold</code>.</p>
+
+<h2 id="water_dirty">water_dirty</h2>
+
+<p>Returns true if the current turbidity is highter then the threshold.</p>
+
+<h1 id="BUZZER-RELATED-SUBROUTINES-METHODS">BUZZER RELATED SUBROUTINES/METHODS</h1>
+
+<h2 id="is_on_buzzer_short">is_on_buzzer_short</h2>
+
+<p>Returns true if the short buzzer is turned on.</p>
+
+<p>A short buzzer will buzz if there is 1 abnormal condition. If more than 1 abnormal conditions are present, the long buzzer will be turned on and this short buzzer will be turned off so that it&#39;s not too noisy :)</p>
+
+<h2 id="is_on_buzzer_long">is_on_buzzer_long</h2>
+
+<p>Returns true if the long buzzer is turned on and also turns off the short buzzer to reduce noise.</p>
+
+<h1 id="Private-Methods-for-Buzzers">Private Methods for Buzzers</h1>
+
+<dl>
+
+<dt id="tweak_buzzers-self">&amp;_tweak_buzzers ( $self )</dt>
+<dd>
+
+<p>Tweak the buzzers. It&#39;s either the short buzzer or the long buzzer switched on only.</p>
+
+</dd>
+</dl>
+
+<h1 id="LED-LIGHTS-RELATED-SUBROUTINES-METHODS">LED LIGHTS RELATED SUBROUTINES/METHODS</h1>
+
+<p>An LED is lighted up if the corresponding parameter are in an abnormal state. This action is to be done in through the main script.</p>
+
+<h2 id="on_LED_pH">on_LED_pH</h2>
+
+<p>Lights up the LED for pH sensor, indicating abnormal pH.</p>
+
+<h2 id="is_on_LED_pH">is_on_LED_pH</h2>
+
+<p>Returns true if the LED of pH is lighted up.</p>
+
+<h2 id="on_LED_temperature">on_LED_temperature</h2>
+
+<p>Lights up the LED for temperature sensor, indicating abnormal water temperature.</p>
+
+<h2 id="is_on_LED_temperature">is_on_LED_temperature</h2>
+
+<p>Returns true if the LED of temperature is lighted up.</p>
+
+<h2 id="on_LED_DO">on_LED_DO</h2>
+
+<p>Lights up the LED for dissolved oxygen sensor, indicating low DO content. You fish might die :)</p>
+
+<h2 id="is_on_LED_DO">is_on_LED_DO</h2>
+
+<p>Returns true if the LED of DO is lighted up.</p>
+
+<h2 id="on_LED_turbidity">on_LED_turbidity</h2>
+
+<p>Light up the LED for turbidity sensor, indicating high level of waste etc. Fish might die :)</p>
+
+<h2 id="is_on_LED_turbidity">is_on_LED_turbidity</h2>
+
+<p>Returns true if the LED of DO is lighted up.</p>
+
+<h2 id="lighted_LED_count">lighted_LED_count</h2>
+
+<p>Returns the number of LEDs lighted up currently</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Raphael Jong Jun Jie, <code>&lt;ellednera at cpan.org&gt;</code></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-. at rt.cpan.org</code>, or through the web interface at <a href="https://rt.cpan.org/NoAuth/ReportBug.html?Queue=.">https://rt.cpan.org/NoAuth/ReportBug.html?Queue=.</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc Acme::FishFarm::WaterConditionMonitor</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
+
+<p><a href="https://rt.cpan.org/NoAuth/Bugs.html?Dist=.">https://rt.cpan.org/NoAuth/Bugs.html?Dist=.</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="https://cpanratings.perl.org/d/.">https://cpanratings.perl.org/d/.</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="https://metacpan.org/release/.">https://metacpan.org/release/.</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Besiyata d&#39;shmaya</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>This software is Copyright (c) 2021 by Raphael Jong Jun Jie.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

@@ -27,5 +27,5 @@ return {
         'Test::Pod' => 1.22,
     },
 
-    REPOSITORY => [ github => 'mauke' ],
+    REPOSITORY => [ github => 'uperl' ],
 };

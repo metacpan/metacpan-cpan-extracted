@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsage;
-$Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsage::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsage::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               InternalId
               InternalImageType
 
-              )
+            )
         ],
         {   'Type'              => \%Type_of,
             'Id'                => \%Id_of,
@@ -73,7 +73,7 @@ Shipment::FedEx::WSDL::CloseTypes::CustomerImageUsage
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

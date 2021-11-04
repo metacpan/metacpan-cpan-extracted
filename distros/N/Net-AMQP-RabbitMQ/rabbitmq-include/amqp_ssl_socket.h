@@ -86,6 +86,18 @@ int AMQP_CALL amqp_ssl_socket_set_cacert(amqp_socket_t *self,
                                          const char *cacert);
 
 /**
+ * Set the password of key in PEM format.
+ *
+ * \param [in,out] self An SSL/TLS socket object.
+ * \param [in] passwd The password of key in PEM format.
+ *
+ * \since v0.11.0
+ */
+AMQP_PUBLIC_FUNCTION
+void AMQP_CALL amqp_ssl_socket_set_key_passwd(amqp_socket_t *self,
+                                              const char *passwd);
+
+/**
  * Set the client key.
  *
  * \param [in,out] self An SSL/TLS socket object.
@@ -100,6 +112,24 @@ int AMQP_CALL amqp_ssl_socket_set_cacert(amqp_socket_t *self,
 AMQP_PUBLIC_FUNCTION
 int AMQP_CALL amqp_ssl_socket_set_key(amqp_socket_t *self, const char *cert,
                                       const char *key);
+
+/**
+ * Set the client key use the engine.
+ *
+ * This function requires amqp_set_ssl_engine() has been called.
+ *
+ * \param [in,out] self An SSL/TLS socket object.
+ * \param [in] cert Path to the client certificate in PEM foramt.
+ * \param [in] the key ID.
+ *
+ * \return \ref AMQP_STATUS_OK on success an \ref amqp_status_enum value on
+ *  failure.
+ *
+ * \since v0.11.0
+ */
+AMQP_PUBLIC_FUNCTION
+int AMQP_CALL amqp_ssl_socket_set_key_engine(amqp_socket_t *self,
+                                             const char *cert, const char *key);
 
 /**
  * Set the client key from a buffer.
@@ -236,6 +266,22 @@ void AMQP_CALL amqp_set_initialize_ssl_library(amqp_boolean_t do_initialize);
  */
 AMQP_PUBLIC_FUNCTION
 int AMQP_CALL amqp_initialize_ssl_library(void);
+
+/**
+ * Set the engine for underlying SSL/TLS library.
+ *
+ * This function is thread-safe, and may be called more than once.
+ *
+ * This function requires amqp_initialize_ssl_library() or amqp_ssl_socket_new()
+ * has been called.
+ *
+ * \param [in] engine the engine ID
+ * \return AMQP_STATUS_OK on success.
+ *
+ * \since v0.11.0
+ */
+AMQP_PUBLIC_FUNCTION
+int amqp_set_ssl_engine(const char *engine);
 
 /**
  * Uninitialize the underlying SSL/TLS library.

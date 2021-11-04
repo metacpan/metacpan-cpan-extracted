@@ -1,3 +1,8 @@
+0.878   2021-05-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Remove leading indentation in single-line argument dump.
+
+
 0.877   2021-05-24  Released-By: PERLANCAR; Urgency: medium
 
 	- Tweak generated subroutine result documentation some more.

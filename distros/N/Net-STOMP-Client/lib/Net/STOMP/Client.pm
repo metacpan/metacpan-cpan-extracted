@@ -13,8 +13,8 @@
 package Net::STOMP::Client;
 use strict;
 use warnings;
-our $VERSION  = "2.3";
-our $REVISION = sprintf("%d.%02d", q$Revision: 2.6 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "2.5";
+our $REVISION = sprintf("%d.%02d", q$Revision: 2.8 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -980,7 +980,7 @@ more information
 =item C<sockopts>
 
 arbitrary socket options (as a hash reference) that will be passed to
-IO::Socket::INET->new() or IO::Socket::SSL->new()
+IO::Socket::IP->new() or IO::Socket::SSL->new()
 
 =item C<client_heart_beat>
 
@@ -1090,8 +1090,8 @@ This attribute should contain a reference to hash with the following keys:
 
 =item connect
 
-TCP-level timeout that will be given to the underlying L<IO::Socket::INET>
-or L<IO::Socket::SSL> object (default: none)
+TCP-level timeout that will be given to the underlying L<IO::Socket::IP> or
+L<IO::Socket::SSL> object (default: none)
 
 =item connected
 
@@ -1118,7 +1118,7 @@ All values are in seconds. No timeout means wait until the operation
 succeeds.
 
 As a shortcut, the C<timeout> attribute can also be a scalar. In this case,
-only the C<connect> and C<connected> operations use this value.
+only the C<connect>, C<connected> and C<disconnect> operations use this value.
 
 =head1 STOMP METHODS
 
@@ -1427,4 +1427,4 @@ L<No::Worries::Log>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2017
+Copyright (C) CERN 2010-2021

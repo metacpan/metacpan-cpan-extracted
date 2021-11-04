@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::Money;
-$Shipment::FedEx::WSDL::RateTypes::Money::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::Money::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Currency
               Amount
 
-              )
+            )
         ],
         {   'Currency' => \%Currency_of,
             'Amount'   => \%Amount_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::RateTypes::Money
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

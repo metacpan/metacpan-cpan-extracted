@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+# Copyright (c) 2021 by Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
+
+# generate polynomials C, D, satisfying the identity of Aurifeuille,
+# Le Lasseur and Lucas: for n > 1, square-free,
+#   n === 1 (mod 4): Phi_n(x)  = C^2 - n*x*D^2
+#   else:            Phi_2n(x) = C^2 - n*x*D^2
+
+use strict;
+use warnings;
+use Math::BigInt lib => 'GMP';
+use Math::Polynomial::Cyclotomic qw(cyclo_lucas_cd);
+
+local $Math::Polynomial::max_degree;
+
+my $USAGE = "usage: lucas_cd n\n";
+die $USAGE if @ARGV != 1 || $ARGV[0] !~ /^[1-9][0-9]*\z/;
+
+my $n = Math::BigInt->new($ARGV[0]);
+my $n1 = 1 == $n % 4? $n: $n * 2;
+my ($C, $D) = cyclo_lucas_cd($n);
+my @c = reverse $C->coefficients;
+my @d = reverse $D->coefficients;
+local $" = q[,];
+print "[$n1,$n,[@c],[@d]]\n";
+
+__END__

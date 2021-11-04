@@ -64,7 +64,7 @@
    "provides" : {
       "App::Timestamper::WithElapsed" : {
          "file" : "lib/App/Timestamper/WithElapsed.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/shlomif/App-Timestamper"
       }
    },
-   "version" : "0.6.0",
+   "version" : "0.6.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

@@ -39,7 +39,7 @@ use inc::Module::Install;
 name 'X11-XCB';
 all_from 'lib/X11/XCB.pm';
 
-repository 'git://code.stapelberg.de/X11-XCB';
+repository 'https://github.com/stapelberg/X11-XCB';
 
 requires 'Mouse';
 requires 'MouseX::NativeTraits';
@@ -83,6 +83,11 @@ WriteMakefile(
 postamble <<'END_OF_MAKEFILE';
 XCB_xs.inc:
 	$(PERL) -I. -M_GenerateMyXS -E '_GenerateMyXS::generate()'
+
+XCB.inc: XCB_xs.inc
+	## Recover from the removal of $@
+	@test -f $@ || rm -f XCB_xs.inc
+	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) XCB_xs.inc
 
 XCB.c: XCB_xs.inc XCB_util.inc XCB.inc
 

@@ -1,7 +1,8 @@
 #
-# $Id: Makefile.PL 1809 2020-10-02 12:42:17Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1853 2021-10-11 10:40:59Z willem $	-*-perl-*-
 #
 
+use 5.008008;
 use strict;
 use warnings;
 use Config;
@@ -20,7 +21,7 @@ my %metadata = (
 	ABSTRACT_FROM	 => 'lib/Net/DNS/SEC.pm',
 	AUTHOR		 => $MM < 6.58 ? "$author[0] et al" : [@author],
 	LICENSE		 => 'mit',
-	MIN_PERL_VERSION => 5.006,
+	MIN_PERL_VERSION => 5.008008,
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.66,
 		},

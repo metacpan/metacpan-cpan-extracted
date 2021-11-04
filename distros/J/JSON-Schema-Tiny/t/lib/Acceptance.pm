@@ -31,7 +31,8 @@ sub acceptance_tests {
     verbose => 1,
     test_schemas => 0,
     %{$options{acceptance}},
-    $ENV{TEST_DIR} ? (test_dir => $ENV{TEST_DIR}) : (),
+    $ENV{TEST_DIR} ? (test_dir => $ENV{TEST_DIR})
+      : $ENV{TEST_PREFIXDIR} ? (test_dir => path($ENV{TEST_PREFIXDIR}, 'tests', $options{acceptance}{specification})) : (),
   );
 
   my $js = JSON::Schema::Tiny->new(%{$options{evaluator}});

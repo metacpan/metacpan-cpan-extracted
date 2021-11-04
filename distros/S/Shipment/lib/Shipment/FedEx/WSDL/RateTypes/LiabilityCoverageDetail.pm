@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail;
-$Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        CoverageType
               CoverageAmount
 
-              )
+            )
         ],
         {   'CoverageType'   => \%CoverageType_of,
             'CoverageAmount' => \%CoverageAmount_of,
@@ -62,7 +62,7 @@ Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

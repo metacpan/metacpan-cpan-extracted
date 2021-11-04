@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.022";
+our $VERSION = "0.025";
 
 =head1 NAME
 

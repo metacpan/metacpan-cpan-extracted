@@ -1404,8 +1404,9 @@ AWAIT_GET(SV *self_sv)
         if (RESULT_IS_RESOLVED(self->promise->finished.result)) {
             int i;
 
+            if (!result_count) XSRETURN_EMPTY;
+
             switch (GIMME_V) {
-                if (!result_count) XSRETURN_EMPTY;
 
                 case G_ARRAY:
                     EXTEND(SP, result_count);

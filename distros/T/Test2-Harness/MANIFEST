@@ -12,6 +12,7 @@ TODO
 appveyor.yml
 cpanfile
 dist.ini
+foo.jsonl
 lib/App/Yath.pm
 lib/App/Yath/Command.pm
 lib/App/Yath/Command/auditor.pm
@@ -69,6 +70,8 @@ lib/Test2/Harness/IPC.pm
 lib/Test2/Harness/IPC/Process.pm
 lib/Test2/Harness/Log.pm
 lib/Test2/Harness/Log/CoverageAggregator.pm
+lib/Test2/Harness/Log/CoverageAggregator/ByRun.pm
+lib/Test2/Harness/Log/CoverageAggregator/ByTest.pm
 lib/Test2/Harness/Plugin.pm
 lib/Test2/Harness/Renderer.pm
 lib/Test2/Harness/Renderer/Formatter.pm
@@ -101,14 +104,6 @@ lib/Test2/Harness/Util/Queue.pm
 lib/Test2/Harness/Util/Term.pm
 lib/Test2/Harness/Util/UUID.pm
 lib/Test2/Tools/HarnessTester.pm
-old/Auditor.pm
-old/Auditor/TimeTracker.pm
-old/Auditor/Watcher.pm
-old/Collector.pm
-old/Collector/JobDir.pm
-old/Collector/TapParser.pm
-old/auditor.pm
-old/collector.pm
 scripts/yath
 t/0-load_all.t
 t/1-pod_name.t
@@ -131,6 +126,9 @@ t/integration/coverage/lib/Plugin.pm
 t/integration/coverage/once.tx
 t/integration/coverage/open.tx
 t/integration/coverage/x.tx
+t/integration/coverage2.t
+t/integration/coverage3.t
+t/integration/coverage4.t
 t/integration/encoding.t
 t/integration/encoding/no-plugin.tx
 t/integration/encoding/plugin.tx
@@ -333,4 +331,3 @@ t2/vars.t
 test.pl
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
-xxx.jsonl

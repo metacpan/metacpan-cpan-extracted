@@ -1,7 +1,9 @@
 use v5.10;
+use strict;
 use warnings;
 
 {
+
 	package MetaForm;
 
 	# Moo for easy role mixing and a constructor
@@ -17,9 +19,11 @@ use warnings;
 	create_form_meta(__PACKAGE__, qw());
 
 	# add a requried field
-	__PACKAGE__->form_meta->add_field('field-name' => (
-		required => 1,
-	));
+	__PACKAGE__->form_meta->add_field(
+		'field-name' => (
+			required => 1,
+		)
+	);
 
 	1;
 }

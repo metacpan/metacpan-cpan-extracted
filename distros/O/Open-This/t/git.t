@@ -4,7 +4,7 @@ use warnings;
 use Carp::Always;
 use Git::Helpers qw( is_inside_work_tree );
 use Open::This qw( maybe_get_url_from_parsed_text );
-use Test::More;
+use Test::More import => [qw( done_testing is ok skip )];
 use Test::Requires::Git;
 use URI ();
 

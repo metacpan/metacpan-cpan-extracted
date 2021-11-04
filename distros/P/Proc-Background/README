@@ -1,4 +1,4 @@
-Package Proc::Background Version 1.21
+Package Proc::Background Version 1.30
 
 This is the Proc::Background package.  It provides a generic interface
 to running background processes.  Through this interface, users can
@@ -10,12 +10,14 @@ methods are provided to users of the Proc::Background package:
 
     new:        start a new background process.
     alive:      test to see if the process is still alive.
-    die:        reliably try to kill the process.
+    suspend:    pause the process
+    resume:     resume a paused process
+    terminate:  reliably try to kill the process.
     wait:       wait for the process to exit and return the exit status.
     start_time: return the time that the process started.
     end_time:   return the time when the exit status was retrieved.
 
-A generic function, timed-system, is also included that lets a
+A generic function, timed_system, is also included that lets a
 background process run for a specified amount of time, and if the
 process did not exit, then the process is killed.
 

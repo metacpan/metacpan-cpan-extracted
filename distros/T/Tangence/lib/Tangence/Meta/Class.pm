@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Class 0.26;
+use v5.26;
+use Object::Pad 0.43;
 
-use v5.14;
-use warnings;
+package Tangence::Meta::Class 0.27;
+class Tangence::Meta::Class :strict(params);
 
 use Carp;
 
@@ -33,13 +34,13 @@ Returns a new instance representing the given name.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
-   my $self = bless { name => delete $args{name} }, $class;
-   return $self;
-}
+has $name    :param :reader;
+has $defined        :reader = 0;
+
+has @superclasses;
+has %methods;
+has %events;
+has %properties;
 
 =head2 define
 
@@ -68,18 +69,15 @@ C<Tangence::Meta::Class> references.
 
 =cut
 
-sub define
+method define ( %args )
 {
-   my $self = shift;
-   my %args = @_;
+   $defined and croak "Cannot define $name twice";
 
-   $self->defined and croak "Cannot define ".$self->name." twice";
-
-   $args{superclasses} ||= [];
-   $args{methods}      ||= {};
-   $args{events}       ||= {};
-   $args{properties}   ||= {};
-   $self->{$_} = $args{$_} for keys %args;
+   $defined++;
+   @superclasses = @{ delete $args{superclasses} // [] };
+   %methods      = %{ delete $args{methods}      // {} };
+   %events       = %{ delete $args{events}       // {} };
+   %properties   = %{ delete $args{properties}   // {} };
 }
 
 =head1 ACCESSORS
@@ -94,12 +92,6 @@ Returns true if a definintion for the class has been provided using C<define>.
 
 =cut
 
-sub defined
-{
-   my $self = shift;
-   return exists $self->{superclasses};
-}
-
 =head2 name
 
    $name = $class->name
@@ -107,12 +99,6 @@ sub defined
 Returns the name of the class
 
 =cut
-
-sub name
-{
-   my $self = shift;
-   return $self->{name};
-}
 
 =head2 perlname
 
@@ -123,9 +109,8 @@ replaced by double colons (C<::>).
 
 =cut
 
-sub perlname
+method perlname
 {
-   my $self = shift;
    ( my $perlname = $self->name ) =~ s{\.}{::}g; # s///rg in 5.14
    return $perlname;
 }
@@ -139,11 +124,10 @@ references.
 
 =cut
 
-sub direct_superclasses
+method direct_superclasses
 {
-   my $self = shift;
-   $self->defined or croak $self->name . " is not yet defined";
-   return @{ $self->{superclasses} };
+   $defined or croak "$name is not yet defined";
+   return @superclasses;
 }
 
 =head2 direct_methods
@@ -156,11 +140,10 @@ L<Tangence::Meta::Method> instances.
 
 =cut
 
-sub direct_methods
+method direct_methods
 {
-   my $self = shift;
-   $self->defined or croak $self->name . " is not yet defined";
-   return $self->{methods};
+   $defined or croak "$name is not yet defined";
+   return { %methods };
 }
 
 =head2 direct_events
@@ -173,11 +156,10 @@ L<Tangence::Meta::Event> instances.
 
 =cut
 
-sub direct_events
+method direct_events
 {
-   my $self = shift;
-   $self->defined or croak $self->name . " is not yet defined";
-   return $self->{events};
+   $defined or croak "$name is not yet defined";
+   return { %events };
 }
 
 =head2 direct_properties
@@ -190,11 +172,10 @@ L<Tangence::Meta::Property> instances.
 
 =cut
 
-sub direct_properties
+method direct_properties
 {
-   my $self = shift;
-   $self->defined or croak $self->name . " is not yet defined";
-   return $self->{properties};
+   $defined or croak "$name is not yet defined";
+   return { %properties };
 }
 
 =head1 AGGREGATE ACCESSORS
@@ -213,13 +194,12 @@ references.
 
 =cut
 
-sub superclasses
+method superclasses
 {
-   my $self = shift;
    # This algorithm doesn't have to be particularly good, C3 or whatever.
    # We're not really forming a search order, mearly uniq'ifying
    my %seen;
-   return grep { !$seen{$_}++ } map { $_, $_->superclasses } $self->direct_superclasses;
+   return grep { !$seen{$_}++ } map { $_, $_->superclasses } @superclasses;
 }
 
 =head2 methods
@@ -231,9 +211,8 @@ names to L<Tangence::Meta::Method> instances.
 
 =cut
 
-sub methods
+method methods
 {
-   my $self = shift;
    my %methods;
    foreach ( $self, $self->superclasses ) {
       my $m = $_->direct_methods;
@@ -251,10 +230,8 @@ if no such method exists.
 
 =cut
 
-sub method
+method method ( $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
    return $self->methods->{$name};
 }
 
@@ -267,9 +244,8 @@ names to L<Tangence::Meta::Event> instances.
 
 =cut
 
-sub events
+method events
 {
-   my $self = shift;
    my %events;
    foreach ( $self, $self->superclasses ) {
       my $e = $_->direct_events;
@@ -287,10 +263,8 @@ no such event exists.
 
 =cut
 
-sub event
+method event ( $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
    return $self->events->{$name};
 }
 
@@ -303,9 +277,8 @@ names to L<Tangence::Meta::Property> instances.
 
 =cut
 
-sub properties
+method properties
 {
-   my $self = shift;
    my %properties;
    foreach ( $self, $self->superclasses ) {
       my $p = $_->direct_properties;
@@ -323,10 +296,8 @@ C<undef> if no such property exists.
 
 =cut
 
-sub property
+method property ( $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
    return $self->properties->{$name};
 }
 

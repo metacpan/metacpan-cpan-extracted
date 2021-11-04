@@ -7,11 +7,12 @@ package App::CPANtoRPM;
 
 use warnings;
 use strict;
-use POSIX;
+use locale;
+use POSIX qw(locale_h);
 use IO::File;
 
 our($VERSION);
-$VERSION = "1.10";
+$VERSION="1.11";
 
 $| = 1;
 
@@ -39,7 +40,11 @@ our %Macros     = (0 => {
 
 our ($OUTPUT,@OUTPUT,%package,$MAN);
 $package{'VERSION'} = $VERSION;
+
+my $old_locale = setlocale(LC_TIME);
+setlocale(LC_TIME, "C");
 $package{'date'}    = POSIX::strftime("%a %b %d %Y",localtime());
+setlocale(LC_TIME, $old_locale);
 
 ###############################################################################
 ###############################################################################
@@ -114,8 +119,12 @@ sub _new {
    $package{'CMD'}     = $COM;
    $package{'command'} = $0;
    $package{'args'}    = $self->_args();
-   $package{'date'}    = POSIX::strftime("%a %b %d %Y",localtime());
    $package{'self'}    = $self;
+
+   my $old_locale = setlocale(LC_TIME);
+   setlocale(LC_TIME, "C");
+   $package{'date'}    = POSIX::strftime("%a %b %d %Y",localtime());
+   setlocale(LC_TIME, $old_locale);
 
    return $self;
 }
@@ -3527,7 +3536,7 @@ sub _strace {
    }
 
    my($strace_pid,$strace_fh);
-   $strace_pid = open $strace_fh, "-|", "$strace -qp $pid 2>&1"  ||
+   $strace_pid = open $strace_fh, "-|", "LC_ALL=C $strace -qp $pid 2>&1"  ||
      $self->_log_message('ERR',"Unable to run strace: $!");
 
    local $SIG{ALRM} = sub { kill INT => $strace_pid };
@@ -3544,9 +3553,9 @@ sub _strace {
       kill TERM => $pid;
       return "WAITING";
 
-   } elsif ($trace =~ /No such process/  ||
-            $trace =~ /Operation not permitted/  ||
-            $trace =~ /Cannot control process/) {
+   } elsif ($trace =~ /No such process/o  ||
+            $trace =~ /Operation not permitted/o  ||
+            $trace =~ /Cannot control process/o) {
       # If the process is done or in defunct state
       return "DONE";
    }
@@ -4387,6 +4396,7 @@ Summary:        <summary>
 License:        <license>
 Group:          <group>
 URL:            <url>
+BugURL:         <url>
 BuildArch:      <arch>
 Source0:        <name>-%{version}.tar.gz
 

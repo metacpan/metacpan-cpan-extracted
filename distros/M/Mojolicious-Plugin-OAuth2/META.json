@@ -1,10 +1,10 @@
 {
-   "abstract" : "Auth against OAuth2 APIs",
+   "abstract" : "Auth against OAuth2 APIs including OpenID Connect",
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -29,9 +29,14 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Crypt::OpenSSL::Bignum" : "0.09",
+            "Crypt::OpenSSL::RSA" : "0.31",
+            "Mojo::JWT" : "0.09"
+         },
          "requires" : {
             "IO::Socket::SSL" : "1.94",
-            "Mojolicious" : "7.53"
+            "Mojolicious" : "8.25"
          }
       },
       "test" : {
@@ -52,10 +57,10 @@
          "web" : "https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2"
       }
    },
-   "version" : "1.59",
+   "version" : "2.01",
    "x_contributors" : [
       "Marcus Ramberg <mramberg@cpan.org>",
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

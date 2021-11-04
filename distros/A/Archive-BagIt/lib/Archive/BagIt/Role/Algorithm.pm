@@ -2,9 +2,11 @@ package Archive::BagIt::Role::Algorithm;
 use strict;
 use warnings;
 use Moo::Role;
+use Carp qw(croak);
+use feature qw( current_sub);
 with 'Archive::BagIt::Role::Plugin';
 # ABSTRACT: A role that defines the interface to a hashing algorithm
-our $VERSION = '0.081'; # VERSION
+our $VERSION = '0.083'; # VERSION
 
 has 'name' => (
     is => 'ro',
@@ -20,16 +22,6 @@ sub get_optimal_bufsize {
         return $blksize;
     }
     return 8192;
-}
-
-sub get_hash_string {
-    my ($self, $fh) = @_;
-    return;
-}
-
-sub verify_file {
-    my ($self, $fh) = @_;
-    return;
 }
 
 sub register_plugin {
@@ -55,7 +47,7 @@ Archive::BagIt::Role::Algorithm - A role that defines the interface to a hashing
 
 =head1 VERSION
 
-version 0.081
+version 0.083
 
 =head1 AVAILABILITY
 

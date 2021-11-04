@@ -3,7 +3,7 @@ use warnings;
 
 use Open::This qw( parse_text to_editor_args );
 use Path::Tiny qw( path );
-use Test::More;
+use Test::More import => [ 'done_testing', 'is', 'ok' ];
 use Test::Differences qw( eq_or_diff );
 use Test::Warnings ();
 
@@ -137,13 +137,13 @@ local $ENV{EDITOR} = 'vim';
 }
 
 {
-    my $text = 't/lib/Foo/Bar.pm line 222.';
+    my $text = " \n t/lib/Foo/Bar.pm line 222. \n";
     eq_or_diff(
         parse_text($text),
         {
             file_name     => 't/lib/Foo/Bar.pm',
             line_number   => 222,
-            original_text => $text,
+            original_text => 't/lib/Foo/Bar.pm line 222.',
         },
         'line 222'
     );

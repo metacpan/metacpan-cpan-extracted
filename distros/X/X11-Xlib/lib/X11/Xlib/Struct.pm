@@ -4,7 +4,7 @@ use warnings;
 use X11::Xlib ();
 use Carp ();
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 =head1 NAME
 
@@ -31,6 +31,10 @@ able to call methods on them.
 This attribute is implemented "inside-out", so it can't be seen in a dump of the
 perl data, and requires help from DESTROY to clean up.  (handled by this class's
 destructor)
+
+=cut
+
+*display= *X11::Xlib::Opaque::display;
 
 =head1 METHODS
 
@@ -166,7 +170,7 @@ Michael Conrad, E<lt>mike@nrdvana.netE<gt>
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2020 by Michael Conrad
+Copyright (C) 2017-2021 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

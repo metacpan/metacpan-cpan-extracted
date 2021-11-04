@@ -1,0 +1,325 @@
+# You may disable specific policies appending the following annotation
+#
+# ## no critic (..., ...)
+#
+# to the corresponding code line. To direct perlcritic to ignore the
+# "## no critic" annotations, use the --force option.
+
+# Policies shipped with Perl::Critic 1.125 were considered for the below
+# defintion of the new policy theme "critic".
+
+severity = brutal
+theme    = critic
+verbose  = %f: %m at line %l, column %c.  (Policy: %p)\n
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitLvalueSubstr]
+add_themes = critic
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval]
+add_themes     = critic
+allow_includes = 1
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit]
+add_themes = critic
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitUniversalCan]
+add_themes = critic
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitUniversalIsa]
+add_themes = critic
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitUselessTopic]
+# KNOWN BUGS: This policy flags a false positive on reverse() called in list
+# context, since reverse() in list context does not assume $_.
+add_themes = critic
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep]
+add_themes = critic
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidMap]
+add_themes = critic
+
+[Perl::Critic::Policy::BuiltinFunctions::RequireBlockGrep]
+add_themes = critic
+
+[Perl::Critic::Policy::BuiltinFunctions::RequireBlockMap]
+add_themes = critic
+
+[Perl::Critic::Policy::BuiltinFunctions::RequireSimpleSortBlock]
+add_themes = critic
+
+[Perl::Critic::Policy::ClassHierarchies::ProhibitExplicitISA]
+# Note: Some people prefer parent over base.
+add_themes = critic
+
+[Perl::Critic::Policy::CodeLayout::ProhibitHardTabs]
+add_themes         = critic
+allow_leading_tabs = 0
+
+[Perl::Critic::Policy::CodeLayout::ProhibitTrailingWhitespace]
+add_themes = critic
+
+[Perl::Critic::Policy::CodeLayout::RequireConsistentNewlines]
+add_themes = critic
+
+[Perl::Critic::Policy::ControlStructures::ProhibitCStyleForLoops]
+add_themes = critic
+
+[Perl::Critic::Policy::ControlStructures::ProhibitCascadingIfElse]
+add_themes = critic
+max_elsif  = 1
+
+[Perl::Critic::Policy::ControlStructures::ProhibitDeepNests]
+# Martin Fowler's book "Refactoring: Improving The Design of Existing Code".
+add_themes = critic
+max_nests  = 5
+
+[Perl::Critic::Policy::ControlStructures::ProhibitLabelsWithSpecialBlockNames]
+add_themes = critic
+
+[Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions]
+# Read the LIMITATIONS that this policy has.
+add_themes = critic
+
+[Perl::Critic::Policy::ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+add_themes = critic
+
+[Perl::Critic::Policy::ControlStructures::ProhibitUnreachableCode]
+add_themes = critic
+
+[Perl::Critic::Policy::Documentation::PodSpelling]
+add_themes =
+
+[Perl::Critic::Policy::Documentation::RequirePackageMatchesPodName]
+add_themes = critic
+
+[Perl::Critic::Policy::InputOutput::ProhibitBacktickOperators]
+add_themes           = critic
+only_in_void_context = 1
+
+[Perl::Critic::Policy::InputOutput::ProhibitBarewordFileHandles]
+add_themes = critic
+
+[Perl::Critic::Policy::InputOutput::ProhibitExplicitStdin]
+add_themes = critic
+
+[Perl::Critic::Policy::InputOutput::ProhibitInteractiveTest]
+add_themes = critic
+
+[Perl::Critic::Policy::InputOutput::ProhibitJoinedReadline]
+add_themes = critic
+
+[Perl::Critic::Policy::InputOutput::ProhibitReadlineInForLoop]
+add_themes = critic
+
+[Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen]
+add_themes = critic
+
+[Perl::Critic::Policy::InputOutput::RequireBriefOpen]
+# http://www.perlmonks.org/?node_id=1134785
+add_themes = critic
+lines      = 9
+
+[Perl::Critic::Policy::InputOutput::RequireCheckedSyscalls]
+# Covers the policies
+# Perl::Critic::Policy::InputOutput::RequireCheckedClose and
+# Perl::Critic::Policy::InputOutput::RequireCheckedOpen
+add_themes        = critic
+exclude_functions = print say
+functions         = :builtins
+
+[Perl::Critic::Policy::InputOutput::RequireEncodingWithUTF8Layer]
+add_themes = critic
+
+[Perl::Critic::Policy::Miscellanea::ProhibitUnrestrictedNoCritic]
+add_themes = critic
+
+[Perl::Critic::Policy::Miscellanea::ProhibitUselessNoCritic]
+add_themes = critic
+
+[Perl::Critic::Policy::Modules::ProhibitAutomaticExportation]
+add_themes = critic
+
+[Perl::Critic::Policy::Modules::ProhibitConditionalUseStatements]
+add_themes = critic
+
+[Perl::Critic::Policy::Modules::ProhibitEvilModules]
+add_themes = critic
+modules    = Class::ISA Error Pod::Plainer Shell Switch
+
+[Perl::Critic::Policy::Modules::ProhibitExcessMainComplexity]
+# http://en.wikipedia.org/wiki/Cyclomatic_complexity
+add_themes = critic
+max_mccabe = 20
+
+[Perl::Critic::Policy::Modules::ProhibitMultiplePackages]
+add_themes = critic
+
+[Perl::Critic::Policy::Modules::RequireBarewordIncludes]
+add_themes = critic
+
+[Perl::Critic::Policy::Modules::RequireEndWithOne]
+add_themes = critic
+
+[Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage]
+add_themes = critic
+
+[Perl::Critic::Policy::Modules::RequireNoMatchVarsWithUseEnglish]
+add_themes = critic
+
+[Perl::Critic::Policy::Objects::ProhibitIndirectSyntax]
+add_themes = critic
+# The new() subroutine is configured by default; any additional forbid values
+# are in addition to new().
+forbid     = create destroy
+
+[Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches]
+add_themes = critic
+
+[Perl::Critic::Policy::RegularExpressions::ProhibitSingleCharAlternation]
+add_themes = critic
+
+[Perl::Critic::Policy::RegularExpressions::ProhibitUnusedCapture]
+add_themes = critic
+
+[Perl::Critic::Policy::RegularExpressions::ProhibitUnusualDelimiters]
+add_themes         = critic
+allow_all_brackets = 0
+
+[Perl::Critic::Policy::RegularExpressions::ProhibitUselessTopic]
+add_themes = critic
+
+[Perl::Critic::Policy::RegularExpressions::RequireBracesForMultiline]
+add_themes         = critic
+allow_all_brackets = 0
+
+[Perl::Critic::Policy::Subroutines::ProhibitAmpersandSigils]
+add_themes = critic
+
+[Perl::Critic::Policy::Subroutines::ProhibitBuiltinHomonyms]
+# Read the CAVEATS.
+add_themes = critic
+
+[Perl::Critic::Policy::Subroutines::ProhibitExcessComplexity]
+# http://en.wikipedia.org/wiki/Cyclomatic_complexity
+add_themes = critic
+max_mccabe = 20
+
+[Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef]
+# http://perlmonks.org/index.pl?node_id=741847
+add_themes = critic
+
+[Perl::Critic::Policy::Subroutines::ProhibitManyArgs]
+add_themes    = critic
+max_arguments = 5
+
+[Perl::Critic::Policy::Subroutines::ProhibitNestedSubs]
+add_themes = critic
+
+[Perl::Critic::Policy::Subroutines::ProhibitReturnSort]
+# KNOWN BUGS: This Policy is not sensitive to the wantarray() function.
+add_themes = critic
+
+[Perl::Critic::Policy::Subroutines::ProhibitSubroutinePrototypes]
+add_themes = critic
+
+[Perl::Critic::Policy::Subroutines::ProhibitUnusedPrivateSubroutines]
+add_themes = critic
+
+[Perl::Critic::Policy::Subroutines::ProtectPrivateSubs]
+add_themes = critic
+
+[Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
+add_themes                  = critic
+allow_delegation_to         = SUPER:: NEXT::
+allow_subscripts            = 0
+short_subroutine_statements = 0
+
+[Perl::Critic::Policy::Subroutines::RequireFinalReturn]
+add_themes     = critic
+terminal_funcs = return carp croak die exec exit goto throw
+
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict]
+add_themes = critic
+allow      = refs
+
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitNoWarnings]
+add_themes                      = critic
+allow_with_category_restriction = 1
+
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitProlongedStrictureOverride]
+add_themes = critic
+statements = 3
+
+[Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict]
+add_themes = critic
+
+[Perl::Critic::Policy::TestingAndDebugging::RequireUseWarnings]
+add_themes = critic
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+add_themes                            = critic
+allow_if_string_contains_single_quote = 1
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLeadingZeros]
+add_themes = critic
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+add_themes       = critic
+max_chain_length = 3
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers]
+# Not yet configured completely.
+add_themes     = critic
+allowed_values = -1 0 1
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitMixedBooleanOperators]
+add_themes = critic
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
+add_themes                     = critic
+back_quote_allowed_operators   =
+double_quote_allowed_operators =
+single_quote_allowed_operators =
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator]
+add_themes = critic
+
+[Perl::Critic::Policy::ValuesAndExpressions::RequireConstantVersion]
+add_themes                             = critic
+allow_version_without_use_on_same_line = 1
+
+[Perl::Critic::Policy::ValuesAndExpressions::RequireNumberSeparators]
+add_themes = critic
+min_value  = 10000
+
+[Perl::Critic::Policy::ValuesAndExpressions::RequireQuotedHeredocTerminator]
+add_themes = critic
+
+[Perl::Critic::Policy::ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
+add_themes = critic
+
+[Perl::Critic::Policy::Variables::ProhibitConditionalDeclarations]
+add_themes = critic
+
+[Perl::Critic::Policy::Variables::ProhibitLocalVars]
+add_themes = critic
+
+[Perl::Critic::Policy::Variables::ProhibitMatchVars]
+add_themes = critic
+
+[Perl::Critic::Policy::Variables::ProhibitUnusedVariables]
+add_themes = critic
+
+[Perl::Critic::Policy::Variables::RequireInitializationForLocalVars]
+add_themes = critic
+
+[Perl::Critic::Policy::Variables::RequireLexicalLoopIterators]
+add_themes = critic
+
+[Perl::Critic::Policy::Variables::RequireLocalizedPunctuationVars]
+add_themes = critic
+allow      =
+
+[Perl::Critic::Policy::Variables::RequireNegativeIndices]
+add_themes = critic

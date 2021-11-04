@@ -726,8 +726,8 @@ sub _rpm_version() {
 sub should_we_migrate_back_rpmdb_db_version {
     my ($urpm, $state) = @_;
 
-    my ($pkg) = urpm::select::selected_packages_providing($urpm, $state, 'rpm') or return;
-    urpm::select::was_pkg_name_installed($state->{rejected}, 'rpm') and return;
+    my ($pkg) = selected_packages_providing($urpm, $state, 'rpm') or return;
+    was_pkg_name_installed($state->{rejected}, 'rpm') and return;
     my ($rooted_libbdb_version) = map { _libdb_version($_) } $pkg->requires; # perl_checker: $self = revision
     my $rooted_rpm_version = version->new("v" . $pkg->version); # perl_checker: $self = revision
 
@@ -757,9 +757,9 @@ sub should_we_migrate_back_rpmdb_db_version {
 }
 
 sub migrate_forward_rpmdb_db_if_needed {
-    my ($urpm, $state) = @_;
+    my ($urpm) = @_;
 
-    my ($pkg) = selected_packages_providing($urpm, $state, 'rpm') or return;
+    my ($pkg) = $urpm->packages_providing('rpm') or return;
     my $rooted_rpm_version = version->new("v" . $pkg->version); # perl_checker: $self = revision
     my $rpm_version = _rpm_version(); # perl_checker: $self = revision
 
@@ -769,7 +769,7 @@ sub migrate_forward_rpmdb_db_if_needed {
 	    if (-f "$urpm->{root}/var/lib/rpm/Packages") {
 		$urpm->{debug} and $urpm->{debug}("Migrating chrooted db");
 		$urpm->{need_migrate_rpmdb_now} = '4.16';
-		urpm::sys::migrate_forward_rpmdb_db_version($urpm, $urpm->{root});
+		urpm::sys::migrate_forward_rpmdb_db_version($urpm);
 		return 1;
 	    }
 	}

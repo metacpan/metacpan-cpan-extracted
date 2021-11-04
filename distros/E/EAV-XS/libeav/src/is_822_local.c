@@ -47,7 +47,7 @@ is_822_local (const char *start, const char *end)
              * See SPACE check below.
              */
             if (!qpair && ISCNTRL(ch))
-                    return inverse(EEAV_LPART_CTRL_CHAR);
+                return inverse(EEAV_LPART_CTRL_CHAR);
             switch (ch) {
             case '"': {
                 /* quote-strings are allowed at the start
@@ -84,10 +84,11 @@ is_822_local (const char *start, const char *end)
             /* excepting CR, and including linear-white-space> */
             case '\r': {
                 /* allow folding, i.e. 1*([CRLF] LWSP-char) */
-                if ((end - cp) >= 2 && cp[1] == '\n' && (cp[2] == '\v' || cp[2] == ' '))
-                    break;
-                /* invalid folding syntax */
-                return inverse(EEAV_LPART_INVALID_FOLDING);
+                if ((cp + 2) <= end && cp[1] == '\n' && (cp[2] == '\t' || cp[2] == ' '))
+                    cp += 2;
+                else /* invalid folding syntax */
+                    return inverse(EEAV_LPART_INVALID_FOLDING);
+                break;
             }
             /* XXX: there is should be a check for single LF ... */
             }

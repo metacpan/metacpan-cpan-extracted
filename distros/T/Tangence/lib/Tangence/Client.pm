@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Client 0.26;
+package Tangence::Client 0.27;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental 'signatures';
 
 use base qw( Tangence::Stream );
 
@@ -207,11 +208,8 @@ case the application requires features in a newer version than that.
 
 =cut
 
-sub tangence_connected
+sub tangence_connected ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my $version_minor_min = max( VERSION_MINOR_MIN, $args{version_minor_min} || 0 );
 
    $self->request(
@@ -242,11 +240,8 @@ sub tangence_connected
    );
 }
 
-sub tangence_initialised
+sub tangence_initialised ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my $request = Tangence::Message->new( $self, MSG_GETROOT );
    TYPE_ANY->pack_value( $request, $self->identity );
 
@@ -282,11 +277,8 @@ sub tangence_initialised
    )->retain;
 }
 
-sub handle_request_EVENT
+sub handle_request_EVENT ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $objid = $message->unpack_int();
 
    $self->respond( $token, Tangence::Message->new( $self, MSG_OK ) );
@@ -296,11 +288,8 @@ sub handle_request_EVENT
    }
 }
 
-sub handle_request_UPDATE
+sub handle_request_UPDATE ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $objid = $message->unpack_int();
 
    $self->respond( $token, Tangence::Message->new( $self, MSG_OK ) );
@@ -310,11 +299,8 @@ sub handle_request_UPDATE
    }
 }
 
-sub handle_request_DESTROY
+sub handle_request_DESTROY ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $objid = $message->unpack_int();
 
    if( my $obj = $self->objectproxies->{$objid} ) {
@@ -325,21 +311,15 @@ sub handle_request_DESTROY
    $self->respond( $token, Tangence::Message->new( $self, MSG_OK ) );
 }
 
-sub get_by_id
+sub get_by_id ( $self, $id )
 {
-   my $self = shift;
-   my ( $id ) = @_;
-
    return $self->objectproxies->{$id} if exists $self->objectproxies->{$id};
 
    croak "Have no proxy of object id $id";
 }
 
-sub make_proxy
+sub make_proxy ( $self, $id, $classname, $smashdata )
 {
-   my $self = shift;
-   my ( $id, $classname, $smashdata ) = @_;
-
    if( exists $self->objectproxies->{$id} ) {
       croak "Already have an object id $id";
    }

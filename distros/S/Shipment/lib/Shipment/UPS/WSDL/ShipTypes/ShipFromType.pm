@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipFromType;
-$Shipment::UPS::WSDL::ShipTypes::ShipFromType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ShipFromType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Class::Std::initialize();
               FaxNumber
               Address
 
-              )
+            )
         ],
         {   'Name'                    => \%Name_of,
             'AttentionName'           => \%AttentionName_of,
@@ -86,7 +86,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipFromType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

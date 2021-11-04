@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 How to read the documentation
 
@@ -223,7 +223,7 @@ the constructor:
      log_file => 'some_file.yml'
  );
 
-All communication will be logged in the human readable file F<some_file.yml>.  
+All communication will be logged in the human readable file F<some_file.yml>.
 
 =head1 Types of instrument drivers
 
@@ -298,7 +298,7 @@ Schwarz FSV spectrum analyzer:
      connection_type => 'VXI11',
      connection_options => {host => '...'},
  );
- 
+
  # Set sweep start/stop frequencies
  $analyzer->sense_frequency_start(value => 1e9);
  $analyzer->sense_frequency_stop(value => 1e9);
@@ -450,6 +450,20 @@ data files:
     );
  };
 
+=head2 Multiple instruments executing the same sweep
+
+If you are working with multiple Lock-In amplifiers for example and you want to
+sweep the lock-in-frequency, it is of course necessary to change the frequency
+of every involved Lock-In amplifier to keep them synchronous. To do that, you
+simply replace the single instrument with an array referrence of multiple
+devices when defining the sweep:
+
+    my $frq_sweep = sweep(
+      type       => 'Step::Frequency',
+      instrument => [$LOCKIN_REF, $LOCKIN_DUT, $LOCKIN_OUT],
+      from => 105, to => 2005, step => 100
+    );
+
 =head2 Multi-dimensional sweeps: Data file dimensions and file name extensions
 
 =head3 2D sweeps
@@ -578,7 +592,7 @@ value.
 Let us add a simple line plot to our IV measurement:
 
  my $datafile = sweep_datafile(columns => [qw/voltage current/]);
- 
+
  $datafile->add_plot(
      x => 'voltage',
      y => 'current',
@@ -662,7 +676,7 @@ We can draw multiple curves in a single plot window:
 Let us add a color plot to the gate/bias 2D sweep:
 
  my $datafile = sweep_datafile(columns => [qw/gate bias current/]);
- 
+
  $datafile->add_plot(
      type => 'pm3d',
      x    => 'gate',
@@ -689,7 +703,7 @@ C<hard_copy_terminal_options> options:
      hard_copy                  => 'data.jpg',
      hard_copy_terminal         => 'jpeg',
      hard_copy_terminal_options => {linewidth => 0.5}
- ); 
+ );
 
 =head3 Plot and curve options
 
@@ -713,7 +727,7 @@ L<PDL::Graphics::Gnuplot> separates between plot options and curve options.
          linetype  => 2, # color
          linewidth => 2,
      },
- );      
+ );
 
 More plot and curve options are documented in L<PDL::Graphics::Gnuplot>.
 
@@ -758,7 +772,7 @@ increasing delay of the measurement.
 =head3 Refresh interval
 
 We can set a mininum time between redraws of the live plot. This becomes handy
-for large plot, where the redrawing the plot is slow. 
+for large plot, where the redrawing the plot is slow.
 
  # Wait at least 10 minutes before redraw:
  $datafile->add_plot(
@@ -895,7 +909,7 @@ C<points>, C<rates>, and C<intervals> arguments:
      points => [-1, -0.1, 0.1, 1],
      # start rate: 1
      # use slow rate 0.01 between points -0.1 and 0.1
-     rates => [1, 0.1, 0.01, 0.1], 
+     rates => [1, 0.1, 0.01, 0.1],
      intervals => [0.5], # one measurement every 0.5 seconds
  );
 
@@ -964,48 +978,48 @@ For example, the 2D sweep example from above could be rewritten like this:
 
  use Lab::Moose; # get instrument, datafolder, datafile, linspace
  use Lab::Moose::Countdown; # get countdown
- 
+
  my $gate_source = instrument(
      type            => 'DummySource',
      connection_type => 'Debug',
      connection_options => {verbose => 0},
-     
+
      # Safety limits:
      max_units => 10, min_units => -10,
      max_units_per_step => 0.11, max_units_per_second => 10
  );
-  
+
  my $bias_source = instrument(
      type               => 'DummySource',
      connection_type => 'Debug',
      connection_options => {verbose => 0},
- 
+
      # Safety limits:
      max_units => 10, min_units => -10,
      max_units_per_step => 0.11, max_units_per_second => 10
  );
- 
+
  my $folder = datafolder();
  my $datafile = datafile(folder => $folder, filename => 'data.dat',
                          columns => [qw/gate bias current/]);
- 
+
  $datafile->add_plot(
      type => 'pm3d',
      x => 'gate',
      y => 'bias',
      z => 'current'
      );
- 
+
  my @gate_values = linspace(from => 0, to => 1, step => 0.1);
  my @bias_values = linspace(from => -1, to => 1, step => 0.1);
- 
+
  for my $gate_value (@gate_values) {
      $gate_source->set_level(value => $gate_value);
-     
+
      # go to bias sweep start point and wait 5 sec
      $bias_source->set_level(value => $bias_values[0]);
      countdown(5);
-     
+
      for my $bias_value (@bias_values) {
          $bias_source->set_level(value => $bias_value);
          $datafile->log(
@@ -1016,7 +1030,7 @@ For example, the 2D sweep example from above could be rewritten like this:
      }
      $datafile->new_block();
  }
- 
+
  $bias_source->set_level(value => 0);
 
 One can also use the stabilization routines used by some sweep types like the
@@ -1032,7 +1046,7 @@ Step::Temperature sweep:
      instrument => $instrument,
      setpoint   => $temp,
      getter     => 'get_T',
-     tolerance_setpoint   => 0.1, 
+     tolerance_setpoint   => 0.1,
      tolerance_std_dev    => 0.1,
      measurement_interval => 10,
      observation_time     => 100,
@@ -1054,6 +1068,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2017       Andreas K. Huettel
             2018       Andreas K. Huettel, Simon Reinhardt
             2019-2020  Simon Reinhardt
+            2021       Fabian Weinelt
 
 
 This is free software; you can redistribute it and/or modify it under

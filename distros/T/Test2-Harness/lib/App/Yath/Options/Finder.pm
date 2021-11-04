@@ -2,7 +2,7 @@ package App::Yath::Options::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000073';
+our $VERSION = '1.000080';
 
 use Test2::Harness::Util qw/mod2file/;
 
@@ -49,7 +49,7 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
     );
 
     option changed_only => (
-        description => "Only search for tests for changed files (Requires --coverage-from, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())",
+        description => "Only search for tests for changed files (Requires a coverage data source, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())",
         applicable => \&changes_applicable,
     );
 
@@ -86,25 +86,6 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
         description => "What plugin should be used to detect changed files.",
         long_examples => [' Git', ' +App::Yath::Plugin::Git'],
         applicable => \&changes_applicable,
-    );
-
-    option coverage_manager => (
-        type => 's',
-        description => "Coverage 'from' manager to use when coverage data does not provide one",
-        long_examples => [ ' My::Coverage::Manager'],
-        applicable => \&changes_applicable,
-    );
-
-    option coverage_from => (
-        type => 's',
-        description => "Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.",
-        long_examples => [' path/to/log.jsonl', ' http://example.com/coverage', ' path/to/coverage.json']
-    );
-
-    option maybe_coverage_from => (
-        type => 's',
-        description => "Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.",
-        long_examples => [' path/to/log.jsonl', ' http://example.com/coverage', ' path/to/coverage.json']
     );
 
     option durations => (
@@ -290,7 +271,7 @@ Can be specified multiple times
 
 =item --no-changed-only
 
-Only search for tests for changed files (Requires --coverage-from, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())
+Only search for tests for changed files (Requires a coverage data source, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())
 
 
 =item --changes-diff path/to/diff.diff
@@ -325,24 +306,6 @@ Can be specified multiple times
 =item --no-changes-plugin
 
 What plugin should be used to detect changed files.
-
-
-=item --coverage-from path/to/log.jsonl
-
-=item --coverage-from http://example.com/coverage
-
-=item --coverage-from path/to/coverage.json
-
-=item --no-coverage-from
-
-Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
-
-
-=item --coverage-manager My::Coverage::Manager
-
-=item --no-coverage-manager
-
-Coverage 'from' manager to use when coverage data does not provide one
 
 
 =item --default-at-search ARG
@@ -418,17 +381,6 @@ Can be specified multiple times
 Specify valid test filename extensions, default: t and t2
 
 Can be specified multiple times
-
-
-=item --maybe-coverage-from path/to/log.jsonl
-
-=item --maybe-coverage-from http://example.com/coverage
-
-=item --maybe-coverage-from path/to/coverage.json
-
-=item --no-maybe-coverage-from
-
-Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
 
 
 =item --maybe-durations file.json

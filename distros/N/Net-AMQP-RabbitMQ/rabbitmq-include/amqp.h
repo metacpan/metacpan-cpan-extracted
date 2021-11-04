@@ -221,7 +221,7 @@ AMQP_BEGIN_DECLS
 #define AMQP_VERSION_MAJOR 0
 #define AMQP_VERSION_MINOR 11
 #define AMQP_VERSION_PATCH 0
-#define AMQP_VERSION_IS_RELEASE 0
+#define AMQP_VERSION_IS_RELEASE 1
 
 /**
  * \def AMQP_VERSION_CODE
@@ -575,8 +575,8 @@ typedef struct amqp_pool_t_ {
                     * own block in the large_blocks block list */
 
   amqp_pool_blocklist_t pages; /**< blocks that are the size of pagesize */
-  amqp_pool_blocklist_t
-      large_blocks; /**< allocations larger than the pagesize */
+  amqp_pool_blocklist_t large_blocks; /**< allocations larger than the pagesize
+                                       */
 
   int next_page;     /**< an index to the next unused page block */
   char *alloc_block; /**< pointer to the current allocation block */
@@ -608,8 +608,8 @@ typedef struct amqp_frame_t_ {
                            */
   amqp_channel_t channel; /**< the channel the frame was received on */
   union {
-    amqp_method_t
-        method; /**< a method, use if frame_type == AMQP_FRAME_METHOD */
+    amqp_method_t method; /**< a method, use if frame_type == AMQP_FRAME_METHOD
+                           */
     struct {
       uint16_t class_id;        /**< the class for the properties */
       uint64_t body_size;       /**< size of the body in bytes */
@@ -770,7 +770,8 @@ typedef enum amqp_status_enum_ {
   AMQP_STATUS_SSL_PEER_VERIFY_FAILED = -0x0202,     /**< SSL validation of peer
                                                          certificate failed. */
   AMQP_STATUS_SSL_CONNECTION_FAILED = -0x0203, /**< SSL handshake failed. */
-  _AMQP_STATUS_SSL_NEXT_VALUE = -0x0204        /**< Internal value */
+  AMQP_STATUS_SSL_SET_ENGINE_FAILED = -0x0204, /**< SSL setting engine failed */
+  _AMQP_STATUS_SSL_NEXT_VALUE = -0x0205        /**< Internal value */
 } amqp_status_enum;
 
 /**
@@ -1044,7 +1045,7 @@ amqp_connection_state_t AMQP_CALL amqp_new_connection(void);
  * of the socket outside of the library will lead to undefined behavior.
  * Additionally rabbitmq-c may use the socket differently version-to-version,
  * what may work in one version, may break in the next version. Be sure to
- * throughly test any applications that use the socket returned by this
+ * thoroughly test any applications that use the socket returned by this
  * function especially when using a newer version of rabbitmq-c
  *
  * \param [in] state the connection object
@@ -2200,16 +2201,16 @@ void AMQP_CALL amqp_destroy_message(amqp_message_t *message);
  * \since v0.4.0
  */
 typedef struct amqp_envelope_t_ {
-  amqp_channel_t channel; /**< channel message was delivered on */
-  amqp_bytes_t
-      consumer_tag;      /**< the consumer tag the message was delivered to */
-  uint64_t delivery_tag; /**< the messages delivery tag */
+  amqp_channel_t channel;     /**< channel message was delivered on */
+  amqp_bytes_t consumer_tag;  /**< the consumer tag the message was delivered to
+                               */
+  uint64_t delivery_tag;      /**< the messages delivery tag */
   amqp_boolean_t redelivered; /**< flag indicating whether this message is being
                                  redelivered */
   amqp_bytes_t exchange;      /**< exchange this message was published to */
-  amqp_bytes_t
-      routing_key; /**< the routing key this message was published with */
-  amqp_message_t message; /**< the message */
+  amqp_bytes_t routing_key; /**< the routing key this message was published with
+                             */
+  amqp_message_t message;   /**< the message */
 } amqp_envelope_t;
 
 /**

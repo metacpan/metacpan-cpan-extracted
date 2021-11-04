@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::RatedPackageType;
-$Shipment::UPS::WSDL::RateTypes::RatedPackageType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::RatedPackageType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               Weight
               BillingWeight
 
-              )
+            )
         ],
         {   'TransportationCharges' => \%TransportationCharges_of,
             'SurePostDasCharges'    => \%SurePostDasCharges_of,
@@ -52,8 +52,8 @@ Class::Std::initialize();
               'Shipment::UPS::WSDL::RateTypes::ChargesType',
             'ServiceOptionsCharges' =>
               'Shipment::UPS::WSDL::RateTypes::ChargesType',
-            'TotalCharges' => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
-            'Weight'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'TotalCharges'  => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
+            'Weight'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'BillingWeight' =>
               'Shipment::UPS::WSDL::RateTypes::BillingWeightType',
         },
@@ -85,7 +85,7 @@ Shipment::UPS::WSDL::RateTypes::RatedPackageType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

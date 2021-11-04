@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::Piece;
-$Shipment::Purolator::WSDLV2::Types::Piece::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::Piece::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Height
               Options
 
-              )
+            )
         ],
         {   'Weight'  => \%Weight_of,
             'Length'  => \%Length_of,
@@ -43,10 +43,10 @@ Class::Std::initialize();
             'Height'  => \%Height_of,
             'Options' => \%Options_of,
         },
-        {   'Weight' => 'Shipment::Purolator::WSDLV2::Types::Weight',
-            'Length' => 'Shipment::Purolator::WSDLV2::Types::Dimension',
-            'Width'  => 'Shipment::Purolator::WSDLV2::Types::Dimension',
-            'Height' => 'Shipment::Purolator::WSDLV2::Types::Dimension',
+        {   'Weight'  => 'Shipment::Purolator::WSDLV2::Types::Weight',
+            'Length'  => 'Shipment::Purolator::WSDLV2::Types::Dimension',
+            'Width'   => 'Shipment::Purolator::WSDLV2::Types::Dimension',
+            'Height'  => 'Shipment::Purolator::WSDLV2::Types::Dimension',
             'Options' =>
               'Shipment::Purolator::WSDLV2::Types::ArrayOfOptionIDValuePair',
         },
@@ -77,7 +77,7 @@ Shipment::Purolator::WSDLV2::Types::Piece
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

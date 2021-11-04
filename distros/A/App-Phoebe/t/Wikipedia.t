@@ -22,7 +22,7 @@ our $host;
 our $port;
 our @use = qw(Web Wikipedia);
 
-plan skip_all => 'Contributions are an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
+plan skip_all => 'This is an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
 
 # make sure starting phoebe starts knows localhost is the proxy
 our @config = (<<'EOT');

@@ -1,6 +1,7 @@
 #!perl
 BEGIN
 {
+    use lib './lib';
     use Test::More;
 	unless( $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} )
 	{

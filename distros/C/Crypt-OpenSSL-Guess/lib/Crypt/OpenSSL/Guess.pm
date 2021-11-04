@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 use Config;
 use English qw( $OSNAME -no_match_vars );
@@ -70,6 +70,14 @@ sub openssl_lib_paths {
             }
         }
     }
+    elsif ($^O eq 'darwin') {
+        for my $dir (@lib_paths) {
+            if (-f "$dir/libcrypto.dylib" && -f "$dir/libssl.dylib") {
+                @lib_paths = ($dir);
+                last;
+            }
+        }
+    }
     elsif ($^O eq 'VMS') {
         if (-r 'sslroot:[000000]openssl.cnf') {      # openssl.org source install
             @lib_paths = ('SSLLIB');
@@ -118,6 +126,7 @@ sub find_openssl_prefix {
 
     my @guesses = (
         '/home/linuxbrew/.linuxbrew/opt/openssl/bin/openssl' => '/home/linuxbrew/.linuxbrew/opt/openssl', # LinuxBrew openssl
+        '/opt/homebrew/opt/openssl/bin/openssl' => '/opt/homebrew/opt/openssl', # macOS ARM homebrew
         '/usr/local/opt/openssl/bin/openssl' => '/usr/local/opt/openssl', # OSX homebrew openssl
         '/usr/local/bin/openssl'         => '/usr/local', # OSX homebrew openssl
         '/opt/local/bin/openssl'         => '/opt/local', # Macports openssl
@@ -225,7 +234,7 @@ Crypt::OpenSSL::Guess - Guess OpenSSL include path
 
 Crypt::OpenSSL::Guess provides helpers to guess OpenSSL include path on any platforms.
 
-Often MacOS's homebrew OpenSSL cause a problem on installation due to include path is not added.
+Often macOS's homebrew OpenSSL cause a problem on installation due to include path is not added.
 Some CPAN module provides to modify include path with configure-args, but L<Carton> or L<Module::CPANfile>
 is not supported to pass configure-args to each modules. Crypt::OpenSSL::* modules should use it on your L<Makefile.PL>.
 
@@ -240,25 +249,25 @@ Original code is taken from C<inc/Module/Install/PRIVATE/Net/SSLeay.pm> by L<Net
 
 This functions returns include paths in the format passed to CC. If OpenSSL could not find, then empty string is returned.
 
-    openssl_inc_paths(); # on MacOS: "-I/usr/local/opt/openssl/include"
+    openssl_inc_paths(); # on macOS: "-I/usr/local/opt/openssl/include"
 
 =item openssl_lib_paths()
 
 This functions returns library paths in the format passed to CC. If OpenSSL could not find, then empty string is returned.
 
-    openssl_lib_paths(); # on MacOS: "-L/usr/local/opt/openssl -L/usr/local/opt/openssl/lib"
+    openssl_lib_paths(); # on macOS: "-L/usr/local/opt/openssl/lib"
 
 =item find_openssl_prefix([$dir])
 
 This function returns OpenSSL's prefix. If set C<OPENSSL_PREFIX> environment variable, you can overwrite the return value.
 
-    find_openssl_prefix(); # on MacOS: "/usr/local/opt/openssl"
+    find_openssl_prefix(); # on macOS: "/usr/local/opt/openssl"
 
 =item find_openssl_exec($prefix)
 
 This functions returns OpenSSL's executable path.
 
-    find_openssl_exec(); # on MacOS: "/usr/local/opt/openssl/bin/openssl"
+    find_openssl_exec(); # on macOS: "/usr/local/opt/openssl/bin/openssl"
 
 =item ($major, $minor, $letter) = openssl_version()
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 use Carp qw( carp );
 use DateTime::Locale;
@@ -493,7 +493,7 @@ DateTime::Locale::Base - Base class for individual locale objects (deprecated)
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 
@@ -803,8 +803,6 @@ Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-Locale/issu
 
 There is a mailing list available for users of this distribution,
 L<mailto:datetime@perl.org>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 

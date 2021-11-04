@@ -8,7 +8,7 @@
 
 use Test::More;
 
-my $not = 32;
+my $not = 33;
 
 SKIP: {
     eval( 'use JavaScript::Packer' );
@@ -28,6 +28,7 @@ SKIP: {
     fileTest( 's10', 'shrink',    'compression level "shrink" with quoted args' );
     fileTest( 's11', 'best',      'compression level "best" with long javascript matching _encode62 ord match 57' );
     fileTest( 's12', 'best',      'compression level "best" with long javascript matching _encode62 ord match 65' );
+    fileTest( 's13', 'minify',    'compression level "minify" keep sourceMappingURL' );
 
     my $packer = JavaScript::Packer->init();
 

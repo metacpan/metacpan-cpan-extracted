@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ShipmentManifestDocumentCriteria;
-$Shipment::Purolator::WSDL::Types::ShipmentManifestDocumentCriteria::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ShipmentManifestDocumentCriteria::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        ManifestDate
 
-              )
+            )
         ],
         {'ManifestDate' => \%ManifestDate_of,},
         {'ManifestDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
@@ -54,7 +54,7 @@ Shipment::Purolator::WSDL::Types::ShipmentManifestDocumentCriteria
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

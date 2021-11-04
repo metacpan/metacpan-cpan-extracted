@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+
+package AB::CD::EF::Z;
+
+use applib "FindApp::Utils::Package";
+
+#print applib->old;
+
+my @p = (
+    PACKAGE,
+    PACKAGE->super,
+    PACKAGE->super(2),
+    PACKAGE->right(2),
+    PACKAGE->left,
+    PACKAGE("fred"),
+    PACKAGE("aaron"),
+    PACKAGE("ABC::DEF"),
+    PACKAGE("ABBA"),
+    PACKAGE("AB::BA"),
+); 
+
+say "SORT cmp";
+say for sort {$a cmp $b } @p;
+
+say "\nSORT <=>";
+say for sort {$a <=> $b } @p;
+

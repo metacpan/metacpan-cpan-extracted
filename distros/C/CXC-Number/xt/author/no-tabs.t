@@ -30,6 +30,7 @@ my @files = (
     't/Grid/interface.t',
     't/Grid/join.t',
     't/Grid/overlay.t',
+    't/Grid/regressions.t',
     't/Grid/select.t',
     't/Grid/split.t',
     't/Sequence/Fixed/sequence.t',

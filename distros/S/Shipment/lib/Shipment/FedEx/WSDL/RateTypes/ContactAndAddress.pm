@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::ContactAndAddress;
-$Shipment::FedEx::WSDL::RateTypes::ContactAndAddress::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::ContactAndAddress::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Contact
               Address
 
-              )
+            )
         ],
         {   'Contact' => \%Contact_of,
             'Address' => \%Address_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::RateTypes::ContactAndAddress
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

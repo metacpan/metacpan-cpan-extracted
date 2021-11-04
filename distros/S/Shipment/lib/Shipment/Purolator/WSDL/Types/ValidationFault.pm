@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ValidationFault;
-$Shipment::Purolator::WSDL::Types::ValidationFault::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ValidationFault::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use warnings;
 __PACKAGE__->_set_element_form_qualified(1);
 
 sub get_xmlns {
-    'http://www.microsoft.com/practices/EnterpriseLibrary/2007/01/wcf/validation'
+    'http://www.microsoft.com/practices/EnterpriseLibrary/2007/01/wcf/validation';
 }
 
 our $XML_ATTRIBUTE_CLASS;
@@ -29,7 +29,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        Details
 
-              )
+            )
         ],
         {'Details' => \%Details_of,},
         {   'Details' =>
@@ -58,7 +58,7 @@ Shipment::Purolator::WSDL::Types::ValidationFault
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

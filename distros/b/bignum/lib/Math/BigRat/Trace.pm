@@ -2,7 +2,6 @@
 
 package Math::BigRat::Trace;
 
-require 5.010;
 use strict;
 use warnings;
 
@@ -11,7 +10,7 @@ use Math::BigRat;
 
 our @ISA = qw(Exporter Math::BigRat);
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 use overload;                   # inherit overload from Math::BigRat
 

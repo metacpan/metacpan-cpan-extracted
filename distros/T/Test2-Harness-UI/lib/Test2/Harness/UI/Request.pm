@@ -2,7 +2,7 @@ package Test2::Harness::UI::Request;
 use strict;
 use warnings;
 
-our $VERSION = '0.000086';
+our $VERSION = '0.000096';
 
 use Data::GUID;
 use Carp qw/croak/;
@@ -64,7 +64,7 @@ sub session_host {
     my $host = $schema->resultset('SessionHost')->find(
         {
             session_id => $session->session_id,
-            address    => $self->address,
+            address    => $self->address // 'SOCKET',
             agent      => $self->user_agent,
         }
     );
@@ -72,7 +72,7 @@ sub session_host {
     $host //= $schema->resultset('SessionHost')->create({
         session_host_id => Data::GUID->new->as_string,
         session_id      => $session->session_id,
-        address         => $self->address,
+        address         => $self->address // 'SOCKET',
         agent           => $self->user_agent,
     });
 

@@ -41,6 +41,26 @@ class Colour {
       'reader method complains if given any arguments' );
    like( $@, qr/^Too many arguments for subroutine 'Colour::red'$MATCH_ARGCOUNT(?: at \S+ line $LINE\.)?$/,
       'exception message from too many arguments to reader' );
+
+   class AllTheTypesReader {
+      has @av :reader;
+      has %hv :reader;
+      ADJUST {
+         @av = qw( one two three );
+         %hv = (one => 1, two => 2);
+      }
+   }
+
+   my $allthetypes = AllTheTypesReader->new;
+   is_deeply( [ $allthetypes->av ], [qw( one two three )], ':reader on array slot' );
+   is_deeply( { $allthetypes->hv }, { one => 1, two => 2 }, ':reader on hash slot' );
+
+   is( scalar $allthetypes->av, 3, ':reader on array slot in scalar context' );
+
+   # On perl 5.26 onwards this yields the number of keys; before that it
+   # stringifies to something like "2/8" but that's not terribly reliable, so
+   # don't bother testing that
+   is( scalar $allthetypes->hv, 2, ':reader on hash slot in scalar context' ) if $] >= 5.028;
 }
 
 # writers
@@ -61,6 +81,21 @@ class Colour {
       'writer method complains if given no argument' );
    like( $@, qr/^Too few arguments for subroutine 'Colour::set_red'$MATCH_ARGCOUNT(?: at \S+ line $LINE\.)?$/,
       'exception message from too few arguments to writer' );
+
+   class AllTheTypesWriter {
+      has @av :writer;
+      has %hv :writer;
+      method test
+      {
+         Test::More::is_deeply( \@av, [qw( four five six )], ':writer on array slot' );
+         Test::More::is_deeply( \%hv, { three => 3, four => 4 }, ':writer on hash slot' );
+      }
+   }
+
+   my $allthetypes = AllTheTypesWriter->new;
+   $allthetypes->set_av(qw( four five six ));
+   $allthetypes->set_hv( three => 3, four => 4 );
+   $allthetypes->test;
 }
 
 done_testing;

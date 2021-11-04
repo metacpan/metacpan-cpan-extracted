@@ -2,7 +2,7 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '1.000073';
+our $VERSION = '1.000080';
 
 use App::Yath::Options;
 require App::Yath::Command::test;
@@ -250,13 +250,21 @@ Can be specified multiple times
 
 =over 4
 
-=item --cover-aggregator ARG
+=item --cover-aggregator ByTest
 
-=item --cover-aggregator=ARG
+=item --cover-aggregator ByRun
+
+=item --cover-aggregator +Custom::Aggregator
+
+=item --cover-agg ByTest
+
+=item --cover-agg ByRun
+
+=item --cover-agg +Custom::Aggregator
 
 =item --no-cover-aggregator
 
-Choose an aggregator (default Test2::Harness::Log::CoverageAggregator)
+Choose a custom aggregator subclass
 
 
 =item --cover-class ARG
@@ -297,6 +305,57 @@ Can be specified multiple times
 Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
 
 
+=item --cover-from path/to/log.jsonl
+
+=item --cover-from http://example.com/coverage
+
+=item --cover-from path/to/coverage.jsonl
+
+=item --no-cover-from
+
+This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will not be run if the file/url is invalid.
+
+
+=item --cover-from-type json
+
+=item --cover-from-type jsonl
+
+=item --cover-from-type log
+
+=item --no-cover-from-type
+
+File type for coverage source. Usually it can be detected, but when it cannot be you should specify. "json" is old style single-blob coverage data, "jsonl" is the new by-test style, "log" is a logfile from a previous run.
+
+
+=item --cover-manager My::Coverage::Manager
+
+=item --no-cover-manager
+
+Coverage 'from' manager to use when coverage data does not provide one
+
+
+=item --cover-maybe-from path/to/log.jsonl
+
+=item --cover-maybe-from http://example.com/coverage
+
+=item --cover-maybe-from path/to/coverage.jsonl
+
+=item --no-cover-maybe-from
+
+This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will coninue if even if the coverage file/url is invalid.
+
+
+=item --cover-maybe-from-type json
+
+=item --cover-maybe-from-type jsonl
+
+=item --cover-maybe-from-type log
+
+=item --no-cover-maybe-from-type
+
+Same as "from_type" but for "maybe_from". Defaults to "from_type" if that is specified, otherwise auto-detect
+
+
 =item --cover-metrics
 
 =item --no-cover-metrics
@@ -321,11 +380,13 @@ Can be specified multiple times
 
 =item --cover-write
 
+=item --cover-write=coverage.jsonl
+
 =item --cover-write=coverage.json
 
 =item --no-cover-write
 
-Create a json file of all coverage data seen during the run (This implies --cover-files).
+Create a json or jsonl file of all coverage data seen during the run (This implies --cover-files).
 
 
 =back

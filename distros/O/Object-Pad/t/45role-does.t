@@ -88,4 +88,15 @@ class FClassTwo isa FBaseTwo does ARole {
    ok( FClassTwo->DOES( "FakeRole42" ), 'Foreign base class DOES method' );
 }
 
+role DRole does ARole {
+}
+
+class DClass does DRole {
+}
+
+{
+   ok( DClass->DOES( "DRole" ), 'Sanity?' );
+   ok( DClass->DOES( "ARole" ), 'Class does role inherited by role' );
+}
+
 done_testing;

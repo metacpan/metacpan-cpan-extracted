@@ -12,316 +12,362 @@
 
 #include "PerlXlib.h"
 
-static MGVTBL PerlXlib_dpy_mg_vtbl;
-static MGVTBL PerlXlib_dpy_innerptr_mg_vtbl;
+#define OR_NULL    PerlXlib_OR_NULL
+#define OR_UNDEF   PerlXlib_OR_UNDEF
+#define OR_DIE     PerlXlib_OR_DIE
+#define AUTOCREATE PerlXlib_AUTOCREATE
 
-/* Get the Display* pointer from an instance of X11::Xlib.  If this object has not
- * had that type of magic attached, this returns NULL, unless you asked for not_null
- * then it throws an exception.
+static const char* T_DISPLAY= "Display";
+static const char* OBJ_CACHE_NAME= "X11::Xlib::_obj_cache";
+
+static struct PerlXlib_fields* PerlXlib_get_magic_fields(SV *sv, int create_flag);
+
+/*-----------------------------------------------------------------------------------
+ * This struct is attached to each of the X11::Xlib objects that reference C structs.
  */
-extern Display * PerlXlib_get_magic_dpy(SV *sv, Bool not_null) {
-    MAGIC *mg= NULL;
-    if (sv_isobject(sv)) {
-        for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
-            if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &PerlXlib_dpy_mg_vtbl) {
-                if (!mg->mg_ptr && not_null) break;
-                return (Display*) mg->mg_ptr;
+struct PerlXlib_fields {
+    SV *self;              /* reference to the SV this struct is attached to */
+	SV *display_sv;        /* optional reference to Display, no lifespan tracking */
+    void *ptr;             /* struct/opaque pointer to something in xlib */
+    const char *ptr_type;  /* static string identifying the type of the object */
+    int xfree_cleanup: 1;  /* whether to call XFree(ptr) during destructor */
+    struct PerlXlib_fields *parent; /* Object whose ->ptr owns the lifespan of this ->ptr */
+    AV *dependents;        /* weak references to X11::Xlib objects whose ptr depends on this object */
+};
+
+static void PerlXlib_fields_init(struct PerlXlib_fields *fields, SV *self) {
+    Zero(fields, 1, struct PerlXlib_fields);
+    fields->self= self;
+}
+
+/* Set the ->ptr field, but also update the cache of pointers-to-objects.
+ * type is optional, but useful for debugging.
+ * obj is the *inner* SV/HV/AV of the object not a RV pointing to it.
+ */
+static void PerlXlib_fields_set_ptr(struct PerlXlib_fields *fields, void *ptr, const char *type) {
+    HV *cache= NULL;
+    SV **ent, *sv;
+    if (fields->ptr == ptr)
+        return; /* nothing to do */
+    if (fields->ptr) { /* remove any previous object from cache */
+        cache= get_hv(OBJ_CACHE_NAME, GV_ADD);
+        hv_delete(cache, (void*) &fields->ptr, sizeof(void*), G_DISCARD);
+    }
+    fields->ptr= ptr;
+    fields->ptr_type= ptr? type : NULL;
+    fields->xfree_cleanup= 0;
+    if (fields->self && fields->ptr) {
+        if (!cache) cache= get_hv(OBJ_CACHE_NAME, GV_ADD);
+        sv= newRV_inc(fields->self); /* create new weak-ref to the object */
+        sv_rvweaken(sv);
+        ent= hv_store(cache, (void*) &fields->ptr, sizeof(void*), sv, 0);
+        if (!ent) {
+            sv_2mortal(sv);
+            croak("Can't cache X11 wrapper object into %s", OBJ_CACHE_NAME);
+        }
+    }
+}
+
+/* Set 'fields' as the parent of 'dep', adding a weak-ref to 'dep' in the dependents list.
+ * dep is the *inner* SV/AV/HV of the object, not a RV pointing to it.
+ */
+static void PerlXlib_fields_add_dependent(struct PerlXlib_fields *fields, SV *dep) {
+    int i;
+    SV **ent, *sv;
+    AV *deps= fields->dependents? fields->dependents : (fields->dependents= newAV());
+    struct PerlXlib_fields *dep_fields= PerlXlib_get_magic_fields(dep, AUTOCREATE);
+
+    if (dep_fields->parent)
+        croak("Dependent object already has a parent");
+    /* sanity check to avoid pointless refcnt management below */
+    if (SvMAGICAL(deps))
+        croak("bug");
+    /* The list contains weak references, and every now and then we should clean up any
+     * that got un-set.  Do this every time the list reaches a multiple of 8. */
+    if (!(av_len(deps) & 7)) {
+        for (i= av_len(deps); i >= 0; --i) {
+            ent= av_fetch(deps, i, 0);
+            if (ent && !SvROK(*ent)) {
+                sv= av_pop(deps);
+                if (i <= av_len(deps)) av_store(deps, i, sv);
+                else SvREFCNT_dec(sv);
             }
         }
     }
-    if (not_null) {
-        if (SvTRUE(get_sv("X11::Xlib::_error_fatal_trapped", GV_ADD)))
-            croak("Cannot call further Xlib functions after fatal Xlib error");
-        if (mg) /* has magic, but NULL pointer */
-            croak("X11 connection was closed");
-        if (!sv_derived_from(sv, "X11::Xlib"))
-            croak("Invalid X11 connection; must be instance of X11::Xlib");
-        croak("Invalid X11 connection; missing 'magic' Display* reference");
-    }
-    return NULL;    
+    av_push(deps, sv_rvweaken(newRV_inc(dep)));
+    dep_fields->parent= fields;
 }
 
-/* This sets magic on an object that marks it as a X11::Xlib instance.
- * If the object becomes cached under the $X11::Xlib::_connections (and old
- * cache entry removed if any).  Any future call to PerlXlib_obj_for_display
- * for this display pinter will return this cached X11::Xlib instance.
+/* When the C-level object responsible for this object's C-level data gets freed,
+ * Set the pointers to NULL.  This chains through all dependents.
+ * At the end, there are no more dependents.
  */
-extern SV * PerlXlib_set_magic_dpy(SV *sv, Display *dpy) {
-    MAGIC *mg= NULL;
-    Display *old_dpy= NULL;
-    SV **fp;
-    HV *cache;
-    
-    if (!sv_isobject(sv))
-        croak("Can't add magic Display* to non-object");
-    
-    /* Search for existing Magic that would hold this pointer */
-    for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
-        if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &PerlXlib_dpy_mg_vtbl) {
-            old_dpy= (Display*) mg->mg_ptr;
-            mg->mg_ptr= (void*) dpy;
-            break;
+static void PerlXlib_fields_invalidate_dependents(struct PerlXlib_fields *fields) {
+    struct PerlXlib_fields *peer_fields;
+    int i;
+    SV **ent;
+    /* If other C-level objects depended on this one, their wrappers also need ->ptr set to NULL. */
+    if (fields->dependents) {
+        for (i= av_len(fields->dependents); i >= 0; --i) {
+            ent= av_fetch(fields->dependents, i, 0);
+            if (ent && SvROK(*ent)) {
+                if (peer_fields= PerlXlib_get_magic_fields(SvRV(*ent), 0)) {
+                    if (peer_fields->xfree_cleanup)
+                        warn("An object using XFree was incorrectly listed as a dependent on another object");
+                    else {
+                        peer_fields->parent= NULL;
+                        if (peer_fields->ptr)
+                            PerlXlib_fields_set_ptr(peer_fields, NULL, NULL);
+                        if (peer_fields->dependents)
+                            PerlXlib_fields_invalidate_dependents(peer_fields);
+                    }
+                }
+            }
         }
+        /* no more dependents */
+        av_clear(fields->dependents);
+        sv_2mortal((SV*)fields->dependents);
+        fields->dependents= NULL;
     }
-    
-    /* If value remains unchanged, nothing to do */
-    if (dpy == old_dpy) return sv;
-    /* If magic doesn't exist, add it */
-    if (!mg)
-        sv_magicext(SvRV(sv), NULL, PERL_MAGIC_ext, &PerlXlib_dpy_mg_vtbl, (const char *) dpy, 0);
-    
-    cache= get_hv("X11::Xlib::_connections", GV_ADD);
-    /* Object might be cached under old dpy key.  Remove the cache reference. */
-    if (old_dpy)
-        hv_delete(cache, (void*) &old_dpy, sizeof(old_dpy), G_DISCARD);
-    
-    /* Cache a weak ref to this object keyed by the new Display* value */
-    if (dpy) {
-        fp= hv_fetch(cache, (void*) &dpy, sizeof(dpy), 1);
-        if (!fp) croak("failed to add item to hash (tied?)");
-        if (*fp && SvROK(*fp) && SvRV(*fp) != SvRV(sv))
-            warn("Replacing cached connection object for Display* 0x%p!", dpy);
-        /* New weak-ref to this object
-          * Docs warn that sv_setsv might de-allocate mortal sources, so inc ref count temporarily
-          */
-        SvREFCNT_inc(sv);
-        if (!*fp) *fp= newSVsv(sv); else sv_setsv(*fp, sv);
-        sv_2mortal(sv);
-        sv_rvweaken(*fp);
-    }
-    return sv;
 }
 
-/* Converting a Display* to a \X11::Xlib is difficult because we want
- * to re-use the existing object.  We cache them in %X11::Xlib::_connections.
- * This function returns a pointer to an RV (or to undef) which the caller does not need to free.
- * The RV references an instance of X11::Xlib (or subclass).
- * If 'create' is true, it creates (and caches) a new X11::Xlib instance if the Display* value
- * was not bound to a previous instance.
- *
- * Roughly equivalent to:
- *   return undef unless $dpy;
- *   return $X11::Xlib::_connections{ pack 'P', $dpy } // (create? X11::Xlib->new(display => $dpy) : $dpy)
- */
-extern SV * PerlXlib_obj_for_display(Display *dpy, int create) {
-    SV **fp, *self;
-    if (!dpy) {
-        /* Translate NULL to undef */
-        return &PL_sv_undef;
+/* Called automatically when the magic-bearing object is freed */
+static void PerlXlib_fields_free(struct PerlXlib_fields *fields) {
+    /* un-set the ->ptr, which by extension removes the containing object from the object cache */
+    if (fields->ptr) {
+        if (fields->xfree_cleanup)
+            XFree(fields->ptr);
+        PerlXlib_fields_set_ptr(fields, NULL, NULL);
     }
-    else {
-        fp= hv_fetch(get_hv("X11::Xlib::_connections", GV_ADD), (void*) &dpy, sizeof(dpy), 0);
-        /* Return existing object if we have one for this Display* already */
-        if (fp && *fp && SvROK(*fp)) {
+    /* release the reference to the X11::Xlib instance if this object was holding one */
+    if (fields->display_sv) {
+        sv_2mortal(fields->display_sv);
+        fields->display_sv= NULL;
+    }
+    /* No need to tell the parent we're gone because the parent holds a weak-ref */
+    fields->parent= NULL;
+    /* tell dependent objects that they are no longer valid */
+    PerlXlib_fields_invalidate_dependents(fields);
+    fields->self= NULL;
+    Safefree(fields);
+}
+
+/*------------------------------------------------------------------------------------
+ * This defines the "Magic" that perl attaches to a scalar.
+ */
+static int PerlXlib_magic_free(pTHX_ SV* sv, MAGIC* mg) {
+    if (mg->mg_ptr)
+        PerlXlib_fields_free((struct PerlXlib_fields*) mg->mg_ptr);
+    return 0; // ignored anyway
+}
+#ifdef USE_ITHREADS
+static int PerlXlib_magic_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param) {
+    croak("This object cannot be shared between threads");
+    return 0;
+};
+#else
+#define PerlXlib_magic_dup 0
+#endif
+static MGVTBL PerlXlib_magic_vt= {
+	0, /* get */
+	0, /* write */
+	0, /* length */
+	0, /* clear */
+	PerlXlib_magic_free,
+	0, /* copy */
+	PerlXlib_magic_dup
+#ifdef MGf_LOCAL
+	,0
+#endif
+};
+
+/* Get existing magic fields or attach magic fields to the object.
+ * The sv should be the inner SV/HV/AV of the object, not an RV pointing to it.
+ * Use AUTOCREATE to attach magic if it wasn't present.
+ * Use NOTNULL for a built-in croak() if the return value would be NULL.
+ */
+static struct PerlXlib_fields* PerlXlib_get_magic_fields(SV *sv, int create_flag) {
+	MAGIC* magic;
+    struct PerlXlib_fields *fields;
+	if (SvMAGICAL(sv)) {
+        /* Iterate magic attached to this scalar, looking for one with our vtable */
+        for (magic= SvMAGIC(sv); magic; magic = magic->mg_moremagic)
+            if (magic->mg_type == PERL_MAGIC_ext && magic->mg_virtual == &PerlXlib_magic_vt)
+                /* If found, the mg_ptr points to the fields structure. */
+                return (struct PerlXlib_fields*) magic->mg_ptr;
+    }
+    if (create_flag == OR_DIE)
+        croak("Object lacks X11 magic");
+    if (create_flag == AUTOCREATE) {
+        Newx(fields, 1, struct PerlXlib_fields);
+        PerlXlib_fields_init(fields, sv);
+        magic= sv_magicext(sv, NULL, PERL_MAGIC_ext, &PerlXlib_magic_vt, (const char*) fields, 0);
+#ifdef USE_ITHREADS
+        magic->mg_flags |= MGf_DUP;
+#endif
+        return fields;
+    }
+	return NULL;
+}
+
+
+/*----------------------------------------------------------------------------------------
+ * Public API
+ */
+
+/* This gets a cached object known to wrap the C-level pointer 'thing'.
+ * If 'thing' is NULL, this always returns NULL regardless of create_flag.
+ * If one does not exist and 'create' is requested, this will create a new wrapper
+ * object of the given svtype blessed as thing_class, and optionally listing it as
+ * a dependency of 'parent'.
+ * Returns a mortal reference to the object.
+ */
+extern SV * PerlXlib_get_objref(void *thing, int create_flag,
+    const char *thing_type, int svtype, const char *thing_class, void *parent
+) {
+    HV *cache, *pkg;
+    GV *build_method;
+    AV *isa;
+    SV **ent, *ret, *parent_objref;
+    struct PerlXlib_fields *f, *parent_fields;
+
+    if (thing) {
+        ent= hv_fetch(get_hv(OBJ_CACHE_NAME, GV_ADD), (void*) &thing, sizeof(thing), 0);
+        /* Return existing object?  It's a weak-ref, so check that it still points to something. */
+        if (ent && SvROK(*ent))
             /* create strong-ref from weakref */
-            return sv_mortalcopy(*fp);
-        }
-        else if (create) {
-            /* Always create instance of X11::Xlib.  X11::Xlib::Display can re-bless as needed. */
-            self= sv_2mortal(newRV_noinc((SV*) newHV()));
-            sv_bless(self, gv_stashpv("X11::Xlib", GV_ADD));
-            PerlXlib_set_magic_dpy(self, dpy); /* This also adds it to the _connections cache */
-            return self;
-        }
-        else {
-            return sv_2mortal(newSVuv(PTR2UV(dpy)));
-        }
+            return sv_mortalcopy(*ent);
     }
-}
 
-/* Get the "magic" attribute of "some pointer relevant to Xlib" on the given Perl object.
- * This is a sort of generic storage for any pointer valid within the lifespan of a Display*,
- * usually referring to C data structures Xlib allocated.  (The Display* pointer itself is
- * handled by different magic, above)
- */
-extern void * PerlXlib_get_magic_dpy_innerptr(SV *sv, Bool not_null) {
-    MAGIC *mg= NULL;
-    if (sv_isobject(sv)) {
-        for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
-            if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &PerlXlib_dpy_innerptr_mg_vtbl) {
-                if (!mg->mg_ptr && not_null) break;
-                return mg->mg_ptr;
-            }
-        }
-    }
-    if (not_null)
-        croak("Object lacks Xlib magic pointer");
-    return NULL;
-}
-
-/* Set the "magic" attribute of "some pointer relevant to Xlib" on the given Perl object.
- * This is a sort of generic storage for any pointer valid within the lifespan of a Display*,
- * usually referring to C data structures Xlib allocated.  (The Display* pointer itself is
- * handled by different magic, above)
- */
-extern SV * PerlXlib_set_magic_dpy_innerptr(SV *sv, void *innerptr) {
-    MAGIC *mg= NULL;
-    SV **fp;
-    HV *cache;
-    
-    if (!sv_isobject(sv))
-        croak("Can't add magic Xlib pointer to non-object");
-    
-    /* Search for existing Magic that would hold this pointer */
-    for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
-        if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &PerlXlib_dpy_innerptr_mg_vtbl) {
-            mg->mg_ptr= innerptr;
-            return sv;
-        }
-    }
-    
-    /* If magic doesn't exist, add it */
-    sv_magicext(SvRV(sv), NULL, PERL_MAGIC_ext, &PerlXlib_dpy_innerptr_mg_vtbl, (const char *) innerptr, 0);
-    return sv;
-}
-
-/* Retrieve a pointer to a RV (which caller does not need to free) that refers to
- * the value of ->display for this object.
- * See PerlXlib_set_displayobj_of_opaque.
- * Equivalent to:
- *   $X11::Xlib::_display_attr{ pack 'P', refaddr $obj }
- */
-extern SV * PerlXlib_get_displayobj_of_opaque(void *opaque) {
-    SV **elem= hv_fetch(get_hv("X11::Xlib::_display_attr", GV_ADD),
-        (void*)&opaque, sizeof(void*), 0);
-    return (elem && *elem && sv_isobject(*elem))? *elem : &PL_sv_undef;
-}
-
-/* This stores a "display" attribute of any object, using the inside-out pattern.
- * (where the object's address is used as a key in a global hashref; object destructors
- *  are responsible for removing the attribute when the object goes out of scope)
- * This allows perl to maintain normal reference counts without XS hackery.
- * (but implemented in XS anyway for speed)
- *
- * Equivalent to:
- *    $X11::Xlib::_display_attr{ pack 'P', refaddr $obj }= $display_attr_value;
- *
- * If dpy_sv is NULL or undef, this is equivalent to:
- *    delete $X11::Xlib::_display_attr{ pack 'P', refaddr $obj };
- */
-extern void PerlXlib_set_displayobj_of_opaque(void *opaque, SV *dpy_sv) {
-    SV **elem;
-    if (dpy_sv && SvOK(dpy_sv)) {
-        elem= hv_fetch(get_hv("X11::Xlib::_display_attr", GV_ADD),
-            (void*)&opaque, sizeof(void*), 1);
-        if (!elem) croak("Can't write X11::Xlib::_display_attr");
-        if (*elem && SvROK(*elem)) {
-            if (SvRV(dpy_sv) == SvRV(*elem))
-                return; /* redundant.  ignore it. */
-            croak("Can't modify display attribute once it is initialized");
-        }
-        if (!*elem) *elem= newSV(0);
-        sv_setsv(*elem, dpy_sv);
-    }
-    else {
-        hv_delete(get_hv("X11::Xlib::_display_attr", GV_ADD),
-            (void*)&opaque, sizeof(void*), G_DISCARD);
-    }
-}
-
-/* This function takes a pointer to a C-level thing which is related to a display
- * and inflates it to an object cached within the display's X11::Xlib instance,
- * if possible.  If 'create' is true, it will create the inflated object if one
- * doesn't exist in cache already.
- *
- * This returns a pointer to an RV that the caller does not need to clean up.
- * (either mortal, or held in the cache).
- */
-extern SV * PerlXlib_obj_for_display_innerptr(Display *dpy, void *thing, const char *thing_class, int objsvtype, bool create) {
-    SV **elem= NULL, *ret= NULL, *dpy_obj= NULL;
-    HV *obj_cache= NULL;
-    
-    if (!thing)
+    if (create_flag == OR_NULL)
+        return NULL;
+    if (create_flag == OR_UNDEF || (create_flag == AUTOCREATE && !thing))
         return &PL_sv_undef;
-
-    if (dpy) {
-        dpy_obj= PerlXlib_obj_for_display(dpy, 1);
-        /* record which display it came from, in a strong-ref global */
-        PerlXlib_set_displayobj_of_opaque(thing, dpy_obj);
-    } else {
-        dpy_obj= PerlXlib_get_displayobj_of_opaque(thing);
-    }
+    if (create_flag != AUTOCREATE)
+        croak("No such reference");
     
-    /* If we have the display object, check its cache to see if this thing
-      * already has a cached wrapper object. */
-    if (dpy_obj && SvOK(dpy_obj)) {
-        /* first get the cache hashref */
-        elem= hv_fetch((HV*)SvRV(dpy_obj), "_obj_cache", 10, 1);
-        if (!elem) croak("Can't create $display->{_obj_cache}");
-        if (*elem && SvROK(*elem) && SvTYPE(SvRV(*elem)) == SVt_PVHV)
-            obj_cache= (HV*) SvRV(*elem);
-        else {
-            obj_cache= newHV();
-            if (*elem) sv_setsv(*elem, sv_2mortal(newRV_noinc((SV*) obj_cache)));
-            else *elem= newRV_noinc((SV*) newHV());
-        }
-        /* then check the obj_cache for a match */
-        elem= hv_fetch(obj_cache, (void*) &thing, sizeof(thing), 1);
-        if (elem && *elem && SvOK(*elem))
-            return *elem;
-    }
-    /* No object, unless we're allowed to create one */
-    if (!create)
-        return &PL_sv_undef;
-    
-    /* If a display was given, we have an object cache and a new slot created
-     * in it which needs filled.  Needs filled with undef now before possibly
-     * throwing exceptions below. */
-    if (obj_cache) {
-        if (!elem) croak("Can't write to $display->{obj_cache}");
-        if (!*elem) *elem= newSV(0); /* slot was added in cache HV, need to populate it */
-        /* Now, after creating the object, need this SV to become a weak-ref to it */
-    }
-    
-    if (objsvtype == SVt_PVMG) {
+    /* Doesn't exist.  Create a new one. */
+    pkg= gv_stashpv(thing_class, GV_ADD);
+    if (svtype == SVt_PVMG) {
         /* return value is a new mortal RV pointing to a PV blessed as thing_class,
           * and the PV points to thing.
           */
         ret= sv_setref_pv(sv_newmortal(), thing_class, thing);
     }
-    else if (objsvtype == SVt_PVHV) {
+    else if (svtype == SVt_PVHV) {
         /* return value is a new mortal RV pointing to a HV blessed as thing_class,
           * and with "dpy_innerptr" magic attached holding the pointer to thing.
           */
         ret= sv_2mortal(newRV_noinc((SV*) newHV()));
-        sv_bless(ret, gv_stashpv(thing_class, GV_ADD));
-        PerlXlib_set_magic_dpy_innerptr(ret, thing);
+        sv_bless(ret, pkg);
     }
-    else if (objsvtype == SVt_PVAV) {
+    else if (svtype == SVt_PVAV) {
         /* return value is a new mortal RV pointing to a AV blessed as thing_class,
           * and with "dpy_innerptr" magic attached holding the pointer to thing.
           */
         ret= sv_2mortal(newRV_noinc((SV*) newAV()));
-        sv_bless(ret, gv_stashpv(thing_class, GV_ADD));
-        PerlXlib_set_magic_dpy_innerptr(ret, thing);
+        sv_bless(ret, pkg);
     }
     else
-        croak("Unsupported svtype in PerlXlib_obj_for_display_innerptr");
-    
-    /* store a weak reference in the object cache, if object cache is available. */
-    if (obj_cache) {
-        /* ret is mortal, and sv_setsv warns that mortals might get freed... so do this silly dance */
-        SvREFCNT_inc(ret);
-        sv_setsv(*elem, ret);
-        sv_rvweaken(*elem); /* obj_cache elem is now a weak-ref */
-        sv_2mortal(ret);
+        croak("Unsupported svtype in PerlXlib_get_obj_for_ptr");
+
+    f= PerlXlib_get_magic_fields(SvRV(ret), AUTOCREATE);
+    PerlXlib_fields_set_ptr(f, thing, thing_type); /* adds weak-ref to cache */
+    /* If there is an owner, add this object to the owner's list */
+    if (parent) {
+        parent_objref= PerlXlib_get_objref(parent, OR_NULL, NULL, 0, NULL, NULL);
+        if (!parent_objref || !SvROK(parent_objref))
+            croak("No containing object for parent pointer %p", parent);
+        parent_fields= PerlXlib_get_magic_fields(SvRV(parent_objref), AUTOCREATE);
+        PerlXlib_fields_add_dependent(parent_fields, SvRV(ret));
+        /* If the parent is a Display, also reference it as the ->display attribute */
+        if (parent_fields->ptr_type == T_DISPLAY)
+            f->display_sv= newRV_inc(parent_fields->self);
     }
-    
+    /* Call the 'BUILD' method of the package, if any */
+    if ((build_method= gv_fetchmeth(pkg, "BUILD", 5, 0)) && GvCV(build_method)) {
+        dSP;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        EXTEND(SP, 1);
+        PUSHs(sv_mortalcopy(ret));
+        PUTBACK;
+        call_sv((SV*) GvCV(build_method), G_DISCARD);
+        FREETMPS;
+        LEAVE;
+    }
     return ret;
 }
 
-extern void * PerlXlib_sv_to_display_innerptr(SV *sv, bool not_null) {
-    void *ptr;
-    if (sv && sv_isobject(sv)) {
-        if (SvTYPE(SvRV(sv)) < SVt_PVAV)
-            ptr= INT2PTR(void*, SvIV((SV*)SvRV(sv)));
-        else
-            ptr= PerlXlib_get_magic_dpy_innerptr(sv, not_null);
-        if (ptr) return ptr;
+/* If objref is an object with X11 magic attached, this retrieves the ->ptr from its fields.
+ */
+extern void* PerlXlib_objref_get_pointer(SV *objref, const char *ptr_type, int fail_flag) {
+    struct PerlXlib_fields *f= NULL;
+    if (sv_isobject(objref)) {
+        f= PerlXlib_get_magic_fields(SvRV(objref), OR_NULL);
+        if (f && f->ptr) {
+            if (ptr_type && !(f->ptr_type && 0 == strcmp(f->ptr_type, ptr_type)))
+                croak("Object pointer is %s (need %s)", f->ptr_type? f->ptr_type : "(unknown)", ptr_type);
+            return f->ptr;
+        }
+        if (fail_flag == OR_DIE)
+            croak("No Xlib pointer attached to this object");
     }
-    if (not_null)
-        croak("Not an Xlib opaque pointer");
+    /* OR_NULL permits things like an SV set to zero, or undef, but still rejects nonsense arguments */
+    else if ((fail_flag == OR_DIE) || !(!SvOK(objref) || looks_like_number(objref) && SvIV(objref) == 0))
+        croak("Not a reference to a %s", ptr_type);
     return NULL;
+}
+
+extern void PerlXlib_objref_set_pointer(SV *objref, void *pointer, const char *ptr_type) {
+    struct PerlXlib_fields *f= NULL;
+    if (!sv_isobject(objref))
+        croak("Not an object");
+    f= PerlXlib_get_magic_fields(SvRV(objref), AUTOCREATE);
+    if (f->ptr_type && pointer) {
+        if (!ptr_type || 0 != strcmp(ptr_type, f->ptr_type))
+            croak("Cannot replace pointer with different type (%s != %s)", ptr_type? ptr_type : "NULL", f->ptr_type);
+        ptr_type= f->ptr_type; /* preserve T_DISPLAY special case */
+    } else if (ptr_type && 0 == strcmp(ptr_type, T_DISPLAY)) {
+        ptr_type= T_DISPLAY; /* T_DISPLAY special case, used as a flag */
+    }
+    PerlXlib_fields_set_ptr(f, pointer, ptr_type);
+}
+
+/* Same as PerlXlib_get_objref, but with a few special cases.
+ * When given a pointer and the create flag is false, this returns the pointer as an integer.
+ * This handles cases like returning the event->display field which might have been corrupted with
+ * any value, and prevents creating new X11::Xlib connections for those.
+ */
+extern SV * PerlXlib_get_display_objref(Display *dpy, int create_flag) {
+    SV *objref= PerlXlib_get_objref(dpy, create_flag == OR_UNDEF? OR_NULL : create_flag,
+        T_DISPLAY, SVt_PVHV, "X11::Xlib", NULL);
+    /* objref is either a strong&mortal reference to X11::Xlib, or NULL, or undef.
+     * For the NULL/undef case, just return the pointer as an integer. */
+    if (objref && SvOK(objref))
+        return objref;
+    if (create_flag == OR_DIE)
+        croak("No such display %p", dpy);
+    return dpy? sv_2mortal(newSVuv(PTR2UV(dpy)))
+        : create_flag == OR_NULL? NULL
+        : &PL_sv_undef;
+}
+
+/* Get the Display* pointer from an instance of X11::Xlib.
+ * This is the same as PerlXlib_objref_get_pointer but with improved diagnostics.
+ */
+extern Display* PerlXlib_display_objref_get_pointer(SV *displayref, int fail_flag) {
+    void *pointer= PerlXlib_objref_get_pointer(displayref, T_DISPLAY, 0);
+    if (!pointer && fail_flag == OR_DIE) {
+        if (SvTRUE(get_sv("X11::Xlib::_error_fatal_trapped", GV_ADD)))
+            croak("Cannot call further Xlib functions after fatal Xlib error");
+        if (!sv_derived_from(displayref, "X11::Xlib"))
+            croak("Invalid X11 connection parameter; must be instance of X11::Xlib");
+        /* has magic, but NULL pointer */
+        croak("X11 connection was closed");
+    }
+    return pointer;
 }
 
 /* Return the X11 Screen* pointer from a Perl X11::Xlib::Screen object.
@@ -329,24 +375,24 @@ extern void * PerlXlib_sv_to_display_innerptr(SV *sv, bool not_null) {
  * and a second field of ->{screen_number}.  Use thes two values to call
  * ScreenOfDisplay to get the Screen* pointer.
  */
-extern Screen * PerlXlib_sv_to_screen(SV *sv, bool not_null) {
+extern Screen * PerlXlib_screen_objref_get_pointer(SV *sv, int fail_flag) {
     HV *hv;
     SV **elem;
     Display *dpy;
     int screennum;
     
     if (!sv || !SvROK(sv) || !SvTYPE(SvRV(sv)) == SVt_PVHV) {
-        if (not_null || (sv && SvOK(sv)))
+        if (fail_flag == OR_DIE || (sv && SvOK(sv)))
             croak("expected X11::Xlib::Screen object");
         return NULL;
     }
     
     hv= (HV*) SvRV(sv);
     elem= hv_fetch(hv, "display", 7, 0);
-    if (!elem || !*elem || !(dpy= PerlXlib_get_magic_dpy(*elem, 1)))
+    if (!elem || !(dpy= PerlXlib_display_objref_get_pointer(*elem, OR_NULL)))
         croak("missing $screen->{display}");
     elem= hv_fetch(hv, "screen_number", 13, 0);
-    if (!elem || !*elem || !SvIOK(*elem))
+    if (!elem || !SvIOK(*elem))
         croak("missing $screen->{screen_number}");
     screennum= SvIV(*elem);
     if (screennum >= ScreenCount(dpy) || screennum < 0)
@@ -359,44 +405,75 @@ extern Screen * PerlXlib_sv_to_screen(SV *sv, bool not_null) {
  * This is done by getting the X11::Xlib instance for the screen's Display pointer,
  * and then getting the screen object from the X11::Xlib object.
  */
-extern SV * PerlXlib_obj_for_screen(Screen *screen) {
-    Display *dpy;
-    SV *dpy_sv, *ret= NULL;
+extern SV * PerlXlib_get_screen_objref(Screen *screen, int create_flag) {
+    Display *dpy= NULL;
+    SV *dpy_sv= NULL, *ret= NULL;
     int i;
     
-    if (!screen)
-        return &PL_sv_undef;
+    if (!screen) {
+        if (create_flag == OR_DIE) croak("NULL Screen pointer");
+        if (create_flag == OR_UNDEF || create_flag == AUTOCREATE) return &PL_sv_undef;
+        return NULL;
+    }
+    /* from here on, it's basically AUTOCREATE because screen objects aren't cached by pointer */
+
     dpy= DisplayOfScreen(screen);
+    dpy_sv= PerlXlib_get_display_objref(dpy, OR_DIE);
+
     /* There's actually no way to get the screen number from the pointer,
       * other than subtraction on private pointers...  so just iterate.
       * There's probably only one anyway. */
-    for (i= 0; i < ScreenCount(dpy); i++) {
-        if (screen == ScreenOfDisplay(dpy, i)) {
-            /* Need a X11::Xlib::Display object */
-            dpy_sv= PerlXlib_obj_for_display(dpy, 1);
-            /* Then call $display->screen(i) method */
-            dSP;
-            ENTER;
-            SAVETMPS;
-            PUSHMARK(SP);
-            EXTEND(SP, 2);
-            PUSHs(sv_mortalcopy(dpy_sv));
-            PUSHs(sv_2mortal(newSViv(i)));
-            PUTBACK;
-            if (call_method("screen", G_SCALAR) != 1)
-                croak("stack assertion failed");
-            SPAGAIN;
-            ret= POPs;
-            SvREFCNT_inc(ret); /* make sure it lives a little longer */
-            PUTBACK;
-            FREETMPS;
-            LEAVE;
-            sv_2mortal(ret);
+    for (i= ScreenCount(dpy) - 1; i >= 0; --i)
+        if (screen == ScreenOfDisplay(dpy, i))
             break;
-        }
-    }
-    if (!ret) croak("Corrupt Xlib screen/display structures!");
+    if (i < 0)
+        croak("Corrupt Xlib screen/display structures!");
+    /* Then call $display->screen(i) method */
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_mortalcopy(dpy_sv));
+    PUSHs(sv_2mortal(newSViv(i)));
+    PUTBACK;
+    if (call_method("screen", G_SCALAR) != 1)
+        croak("stack assertion failed");
+    SPAGAIN;
+    ret= POPs;
+    SvREFCNT_inc(ret); /* make sure it lives a little longer */
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    sv_2mortal(ret);
     return ret;
+}
+
+/* Read-accessor for the $obj->display attribute */
+extern SV * PerlXlib_objref_get_display(SV *objref) {
+    struct PerlXlib_fields *f;
+    if (!sv_isobject(objref))
+        croak("Not an object - can't read attribute of %s", SvPV_nolen(objref));
+    f= PerlXlib_get_magic_fields(SvRV(objref), OR_NULL);
+    return (f && f->ptr_type == T_DISPLAY)? objref  /* X11::Xlib is its own ->display attribute */
+        : (f && f->display_sv && sv_isobject(f->display_sv))? f->display_sv
+        : &PL_sv_undef;
+}
+
+/* Write-accessor for the $obj->display attribute */
+extern void PerlXlib_objref_set_display(SV *objref, SV *dpy_sv) {
+    struct PerlXlib_fields *f;
+    if (!sv_isobject(objref))
+        croak("Not an object");
+    f= PerlXlib_get_magic_fields(SvRV(objref), AUTOCREATE);
+    if (dpy_sv && sv_isobject(dpy_sv)) { /* being assigned */
+        if (f->display_sv) sv_setsv(f->display_sv, dpy_sv);
+        else f->display_sv= newSVsv(dpy_sv);
+    }
+    else if (f->display_sv) { /* being unset */
+        sv_2mortal(f->display_sv);
+        f->display_sv= NULL;
+    }
 }
 
 /* Allow unsigned integer, or hashref with field ->{xid} */
@@ -434,10 +511,10 @@ void PerlXlib_sanity_check_data_structures() {
     for (hv_iterinit(dpys); (dpy_he= hv_iternext(dpys)); ) {
         dpy_sv= hv_iterval(dpys, dpy_he);
         /* SV refcnt should be exactly 1, and should be weakref.  Ref'd object should have >1 refcnt */
-        if (SvREFCNT(dpy_sv) != 1) croak("Refcnt of %_connections member is %d", SvREFCNT(dpy_sv));
-        if (!SvROK(dpy_sv) || !SvWEAKREF(dpy_sv)) croak("%_connections member is not a weakref");
-        if (!sv_derived_from(dpy_sv, "X11::Xlib")) croak("%_connections contains non-X11::Xlib object");
-        dpy= PerlXlib_get_magic_dpy(dpy_sv, 1 /* assert non-null */);
+        if (SvREFCNT(dpy_sv) != 1) croak("Refcnt of %%_connections member is %d", SvREFCNT(dpy_sv));
+        if (!SvROK(dpy_sv) || !SvWEAKREF(dpy_sv)) croak("%%_connections member is not a weakref");
+        if (!sv_derived_from(dpy_sv, "X11::Xlib")) croak("%%_connections contains non-X11::Xlib object");
+        dpy= PerlXlib_display_objref_get_pointer(dpy_sv, OR_DIE);
         /* Check each of the objects in the $dpy->{_obj_cache} */
         elem= hv_fetch((HV*)SvRV(dpy_sv), "_obj_cache", 10, 0);
         if (elem) {
@@ -453,7 +530,7 @@ void PerlXlib_sanity_check_data_structures() {
                 if (!SvROK(obj_sv) || !SvWEAKREF(obj_sv)) croak("_obj_cache member is not a weakref");
                 if (!sv_derived_from(obj_sv, "X11::Xlib::Opaque")) croak("_obj_cache member is not a X11::Xlib::Opaque");
                 opaque= (SvTYPE(SvRV(obj_sv)) <= SVt_PVMG)? INT2PTR(void*, SvIV(SvRV(obj_sv)))
-                    : PerlXlib_get_magic_dpy_innerptr(obj_sv, 1 /* not null */);
+                    : PerlXlib_objref_get_pointer(obj_sv, NULL, OR_DIE);
                 /* the pointer should have a ->display attribute attached */
                 elem= hv_fetch(display_attr, (void*) &opaque, sizeof(void*), 0);
                 if (!elem || !*elem || !SvROK(*elem))
@@ -494,7 +571,7 @@ void PerlXlib_sanity_check_data_structures() {
  */
 void* PerlXlib_get_struct_ptr(SV *sv, int lvalue, const char* pkg, int struct_size, PerlXlib_struct_pack_fn *packer) {
     SV *tmp, *refsv= NULL;
-    void* buf;
+    char* buf;
     size_t n;
 
     if (SvROK(sv)) {
@@ -506,7 +583,7 @@ void* PerlXlib_get_struct_ptr(SV *sv, int lvalue, const char* pkg, int struct_si
             if (sv_isobject(refsv) && !sv_isa(refsv, pkg)) {
                 if (!sv_derived_from(refsv, lvalue? "X11::Xlib::Struct" : pkg)) {
                     buf= SvPV(refsv, n);
-                    croak("Can't coerce %.*s to %s %s", n, buf, pkg, lvalue? "lvalue":"rvalue");
+                    croak("Can't coerce %.*s to %s %s", (int) n, buf, pkg, lvalue? "lvalue":"rvalue");
                 }
             }
         }
@@ -524,7 +601,7 @@ void* PerlXlib_get_struct_ptr(SV *sv, int lvalue, const char* pkg, int struct_si
         }
         else if (SvTYPE(sv) >= SVt_PVAV) { /* not a scalar */
             buf= SvPV(refsv, n);
-            croak("Can't coerce %.*s to %s %s", n, buf, pkg, lvalue? "lvalue":"rvalue");
+            croak("Can't coerce %.*s to %s %s", (int) n, buf, pkg, lvalue? "lvalue":"rvalue");
         }
     }
     
@@ -545,7 +622,7 @@ void* PerlXlib_get_struct_ptr(SV *sv, int lvalue, const char* pkg, int struct_si
     else if (!SvPOK(sv))
         croak("Paramters requiring %s can only be coerced from string, string ref, hashref, or undef", pkg);
     else if (SvCUR(sv) < struct_size)
-        croak("Scalars used as %s must be at least length %d (got %d)", pkg, struct_size, SvCUR(sv));
+        croak("Scalars used as %s must be at least length %d (got %d)", pkg, (int) struct_size, (int) SvCUR(sv));
     /* Make sure we have the padding even if the user tinkered with the buffer */
     SvPV_force(sv, n);
     SvGROW(sv, struct_size+X11_Xlib_Struct_Padding);
@@ -651,7 +728,7 @@ int PerlXlib_X_IO_error_handler(Display *d) {
     SAVETMPS;
     PUSHMARK(SP);
     EXTEND(SP, 1);
-    PUSHs(PerlXlib_obj_for_display(d, 1));
+    PUSHs(PerlXlib_get_display_objref(d, OR_UNDEF));
     PUTBACK;
     call_pv("X11::Xlib::_error_fatal", G_VOID|G_DISCARD|G_EVAL|G_KEEPERR);
     FREETMPS;
@@ -744,7 +821,7 @@ void PerlXlib_XEvent_pack(XEvent *s, HV *fields, Bool consume) {
     }
     if (s->type) {
       fp= hv_fetch(fields, "display", 7, 0);
-      if (fp && *fp) { s->xany.display= PerlXlib_get_magic_dpy(*fp, 0);; if (consume) hv_delete(fields, "display", 7, G_DISCARD); }
+      if (fp && *fp) { s->xany.display= PerlXlib_display_objref_get_pointer(*fp, PerlXlib_OR_NULL);; if (consume) hv_delete(fields, "display", 7, G_DISCARD); }
       fp= hv_fetch(fields, "send_event", 10, 0);
       if (fp && *fp) { s->xany.send_event= SvIV(*fp);; if (consume) hv_delete(fields, "send_event", 10, G_DISCARD); }
       fp= hv_fetch(fields, "serial", 6, 0);
@@ -756,7 +833,7 @@ void PerlXlib_XEvent_pack(XEvent *s, HV *fields, Bool consume) {
       fp= hv_fetch(fields, "serial", 6, 0);
       if (fp && *fp) { s->xerror.serial= SvUV(*fp);; if (consume) hv_delete(fields, "serial", 6, G_DISCARD); }
       fp= hv_fetch(fields, "display", 7, 0);
-      if (fp && *fp) { s->xerror.display= PerlXlib_get_magic_dpy(*fp, 0);; if (consume) hv_delete(fields, "display", 7, G_DISCARD); }
+      if (fp && *fp) { s->xerror.display= PerlXlib_display_objref_get_pointer(*fp, PerlXlib_OR_NULL);; if (consume) hv_delete(fields, "display", 7, G_DISCARD); }
     }
     switch( s->type ) {
     case ButtonPress:
@@ -1165,13 +1242,13 @@ void PerlXlib_XEvent_unpack(XEvent *s, HV *fields) {
     SV *sv= NULL;
     if (!hv_store(fields, "type", 4, (sv= newSViv(s->type)), 0)) goto store_fail;
     if (s->type) {
-      if (!hv_store(fields, "display"   ,  7, (sv=newSVsv(s->xany.display? PerlXlib_obj_for_display(s->xany.display, 0) : &PL_sv_undef)), 0)) goto store_fail;
+      if (!hv_store(fields, "display"   ,  7, (sv=newSVsv(PerlXlib_get_display_objref(s->xany.display, PerlXlib_AUTOCREATE))), 0)) goto store_fail;
       if (!hv_store(fields, "send_event", 10, (sv=newSViv(s->xany.send_event)), 0)) goto store_fail;
       if (!hv_store(fields, "serial"    ,  6, (sv=newSVuv(s->xany.serial)), 0)) goto store_fail;
       if (!hv_store(fields, "type"      ,  4, (sv=newSViv(s->xany.type)), 0)) goto store_fail;
     }
     else {
-      if (!hv_store(fields, "display"   ,  7, (sv=newSVsv(s->xerror.display? PerlXlib_obj_for_display(s->xerror.display, 0) : &PL_sv_undef)), 0)) goto store_fail;
+      if (!hv_store(fields, "display"   ,  7, (sv=newSVsv(PerlXlib_get_display_objref(s->xerror.display, PerlXlib_AUTOCREATE))), 0)) goto store_fail;
       if (!hv_store(fields, "serial"    ,  6, (sv=newSVuv(s->xerror.serial)), 0)) goto store_fail;
     }
     switch( s->type ) {
@@ -1447,7 +1524,7 @@ void PerlXlib_XVisualInfo_pack(XVisualInfo *s, HV *fields, Bool consume) {
     if (fp && *fp) { s->screen= SvIV(*fp); if (consume) hv_delete(fields, "screen", 6, G_DISCARD); }
 
     fp= hv_fetch(fields, "visual", 6, 0);
-    if (fp && *fp) { s->visual= (Visual *) PerlXlib_sv_to_display_innerptr(*fp, 0); if (consume) hv_delete(fields, "visual", 6, G_DISCARD); }
+    if (fp && *fp) { s->visual= (Visual *) PerlXlib_objref_get_pointer(*fp, "Visual", PerlXlib_OR_NULL); if (consume) hv_delete(fields, "visual", 6, G_DISCARD); }
 
     fp= hv_fetch(fields, "visualid", 8, 0);
     if (fp && *fp) { s->visualid= SvUV(*fp); if (consume) hv_delete(fields, "visualid", 8, G_DISCARD); }
@@ -1459,8 +1536,8 @@ void PerlXlib_XVisualInfo_unpack_obj(XVisualInfo *s, HV *fields, SV *obj_ref) {
      * so track allocated SV in this var.
      */
     SV *sv= NULL;
-    SV *dpy_sv= obj_ref && SvROK(obj_ref)? PerlXlib_get_displayobj_of_opaque((void*)SvRV(obj_ref)) : NULL;
-    Display *dpy= dpy_sv && SvROK(dpy_sv)? PerlXlib_get_magic_dpy(dpy_sv, 0) : NULL;
+    SV *dpy_sv= PerlXlib_objref_get_display(obj_ref);
+    Display *dpy= PerlXlib_display_objref_get_pointer(dpy_sv, PerlXlib_OR_NULL);
     if (!hv_store(fields, "bits_per_rgb", 12, (sv=newSViv(s->bits_per_rgb)), 0)) goto store_fail;
     if (!hv_store(fields, "blue_mask" ,  9, (sv=newSVuv(s->blue_mask)), 0)) goto store_fail;
     if (!hv_store(fields, "class"     ,  5, (sv=newSViv(s->class)), 0)) goto store_fail;
@@ -1469,7 +1546,7 @@ void PerlXlib_XVisualInfo_unpack_obj(XVisualInfo *s, HV *fields, SV *obj_ref) {
     if (!hv_store(fields, "green_mask", 10, (sv=newSVuv(s->green_mask)), 0)) goto store_fail;
     if (!hv_store(fields, "red_mask"  ,  8, (sv=newSVuv(s->red_mask)), 0)) goto store_fail;
     if (!hv_store(fields, "screen"    ,  6, (sv=newSViv(s->screen)), 0)) goto store_fail;
-    if (!hv_store(fields, "visual"    ,  6, (sv=newSVsv(s->visual? PerlXlib_obj_for_display_innerptr(dpy, s->visual, "X11::Xlib::Visual", SVt_PVMG, 1) : &PL_sv_undef)), 0)) goto store_fail;
+    if (!hv_store(fields, "visual"    ,  6, (sv=newSVsv(PerlXlib_get_objref(s->visual, PerlXlib_AUTOCREATE, "Visual", SVt_PVMG, "X11::Xlib::Visual", dpy))), 0)) goto store_fail;
     if (!hv_store(fields, "visualid"  ,  8, (sv=newSVuv(s->visualid)), 0)) goto store_fail;
     return;
     store_fail:
@@ -1583,10 +1660,10 @@ void PerlXlib_XWindowAttributes_pack(XWindowAttributes *s, HV *fields, Bool cons
     if (fp && *fp) { s->save_under= SvIV(*fp); if (consume) hv_delete(fields, "save_under", 10, G_DISCARD); }
 
     fp= hv_fetch(fields, "screen", 6, 0);
-    if (fp && *fp) { s->screen= PerlXlib_sv_to_screen(*fp, 0); if (consume) hv_delete(fields, "screen", 6, G_DISCARD); }
+    if (fp && *fp) { s->screen= PerlXlib_screen_objref_get_pointer(*fp, PerlXlib_OR_NULL); if (consume) hv_delete(fields, "screen", 6, G_DISCARD); }
 
     fp= hv_fetch(fields, "visual", 6, 0);
-    if (fp && *fp) { s->visual= (Visual *) PerlXlib_sv_to_display_innerptr(*fp, 0); if (consume) hv_delete(fields, "visual", 6, G_DISCARD); }
+    if (fp && *fp) { s->visual= (Visual *) PerlXlib_objref_get_pointer(*fp, "Visual", PerlXlib_OR_NULL); if (consume) hv_delete(fields, "visual", 6, G_DISCARD); }
 
     fp= hv_fetch(fields, "width", 5, 0);
     if (fp && *fp) { s->width= SvIV(*fp); if (consume) hv_delete(fields, "width", 5, G_DISCARD); }
@@ -1627,8 +1704,8 @@ void PerlXlib_XWindowAttributes_unpack_obj(XWindowAttributes *s, HV *fields, SV 
     if (!hv_store(fields, "override_redirect", 17, (sv=newSViv(s->override_redirect)), 0)) goto store_fail;
     if (!hv_store(fields, "root"      ,  4, (sv=newSVuv(s->root)), 0)) goto store_fail;
     if (!hv_store(fields, "save_under", 10, (sv=newSViv(s->save_under)), 0)) goto store_fail;
-    if (!hv_store(fields, "screen"    ,  6, (sv=newSVsv(s->screen? PerlXlib_obj_for_screen(s->screen) : &PL_sv_undef)), 0)) goto store_fail;
-    if (!hv_store(fields, "visual"    ,  6, (sv=newSVsv(s->visual? PerlXlib_obj_for_display_innerptr(dpy, s->visual, "X11::Xlib::Visual", SVt_PVMG, 1) : &PL_sv_undef)), 0)) goto store_fail;
+    if (!hv_store(fields, "screen"    ,  6, (sv=newSVsv(PerlXlib_get_screen_objref(s->screen, PerlXlib_OR_UNDEF))), 0)) goto store_fail;
+    if (!hv_store(fields, "visual"    ,  6, (sv=newSVsv(PerlXlib_get_objref(s->visual, PerlXlib_AUTOCREATE, "Visual", SVt_PVMG, "X11::Xlib::Visual", dpy))), 0)) goto store_fail;
     if (!hv_store(fields, "width"     ,  5, (sv=newSViv(s->width)), 0)) goto store_fail;
     if (!hv_store(fields, "win_gravity", 11, (sv=newSViv(s->win_gravity)), 0)) goto store_fail;
     if (!hv_store(fields, "x"         ,  1, (sv=newSViv(s->x)), 0)) goto store_fail;
@@ -1944,4 +2021,41 @@ extern void PerlXlib_XRectangle_unpack(XRectangle *s, HV *fields) {
 }
 extern void PerlXlib_XRenderPictFormat_unpack(XRenderPictFormat *s, HV *fields) {
     PerlXlib_XRenderPictFormat_unpack_obj(s, fields, NULL);
+}
+extern Display * PerlXlib_get_magic_dpy(SV *objref, Bool not_null) {
+    return PerlXlib_display_objref_get_pointer(objref, not_null? OR_DIE : OR_NULL);
+}
+extern SV * PerlXlib_set_magic_dpy(SV *objref, Display *dpy) {
+    PerlXlib_objref_set_pointer(objref, dpy, T_DISPLAY);
+    return objref;
+}
+extern SV * PerlXlib_obj_for_display(Display *dpy, int create) {
+    return PerlXlib_get_display_objref(dpy, create? AUTOCREATE : OR_NULL);
+}
+extern void * PerlXlib_get_magic_dpy_innerptr(SV *objref, Bool not_null) {
+    return PerlXlib_objref_get_pointer(objref, NULL, not_null? OR_DIE : OR_NULL);
+}
+extern SV * PerlXlib_set_magic_dpy_innerptr(SV *objref, void *opaque) {
+    PerlXlib_objref_set_pointer(objref, opaque, NULL);
+    return objref;
+}
+extern void * PerlXlib_sv_to_display_innerptr(SV *sv, bool not_null) {
+    return PerlXlib_objref_get_pointer(sv, NULL, not_null? OR_DIE : OR_NULL);
+}
+extern SV * PerlXlib_obj_for_display_innerptr(Display *dpy, void *thing, const char *thing_class, int objsvtype, bool create) {
+    return PerlXlib_get_objref(thing, create? AUTOCREATE : OR_UNDEF, thing_class, objsvtype, thing_class, dpy);
+}
+extern SV * PerlXlib_get_displayobj_of_opaque(void *opaque) {
+    SV *obj= PerlXlib_get_objref(opaque, OR_DIE, NULL, 0, NULL, NULL);
+    return PerlXlib_objref_get_display(obj);
+}
+extern void PerlXlib_set_displayobj_of_opaque(void *opaque, SV *dpy_sv) {
+    SV *obj= PerlXlib_get_objref(opaque, OR_DIE, NULL, 0, NULL, NULL);
+    return PerlXlib_objref_set_pointer(obj, dpy_sv, T_DISPLAY);
+}
+extern SV * PerlXlib_obj_for_screen(Screen *screen) {
+    return PerlXlib_get_screen_objref(screen, OR_UNDEF);
+}
+extern Screen * PerlXlib_sv_to_screen(SV *sv, bool not_null) {
+    return PerlXlib_screen_objref_get_pointer(sv, not_null? OR_DIE : OR_NULL);
 }

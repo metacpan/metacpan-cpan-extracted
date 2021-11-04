@@ -13,11 +13,11 @@ Device::RAID::Poller - Basic RAID status poller, returning RAID disk devices, ty
 
 =head1 VERSION
 
-Version 0.1.2
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.2.0';
 
 
 =head1 SYNOPSIS
@@ -272,14 +272,15 @@ This can be any of the following values.
 
     bad - missing disks
     good - all disks are present
+    initializing - Array is being created.
     rebuilding - one or more drives is being rebuilt
     unknown - Unable to determine the current status.
 
-=head2 name
+=head3 name
 
 The name of the device.
 
-=head2 backend
+=head3 backend
 
 The backend that put polled this device. This is the name of the module
 under "Device::RAID::Poller::Backends::". So "Device::RAID::Poller::Backends::ZFS"
@@ -314,6 +315,7 @@ This can be any of the following values.
     good - BBU is good.
     charging - BBU is charging.
     unknown - BBU status is not known.
+    testing - BBU is currently in testing mode
 
 =head1 BACKENDS
 
@@ -388,6 +390,10 @@ L<https://cpanratings.perl.org/d/Device-RAID-Poller>
 =item * Search CPAN
 
 L<https://metacpan.org/release/Device-RAID-Poller>
+
+=item * Repository
+
+L<https://github.com/VVelox/Device-RAID-Poller>
 
 =back
 

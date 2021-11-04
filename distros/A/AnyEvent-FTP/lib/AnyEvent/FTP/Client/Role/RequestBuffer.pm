@@ -7,7 +7,7 @@ use Moo::Role;
 use AnyEvent;
 
 # ABSTRACT: Request buffer role for asynchronous ftp client
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 has request_buffer => (
@@ -138,7 +138,7 @@ AnyEvent::FTP::Client::Role::RequestBuffer - Request buffer role for asynchronou
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 DESCRIPTION
 

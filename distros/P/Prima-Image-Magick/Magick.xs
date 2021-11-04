@@ -201,13 +201,13 @@ PPCODE:
 	default:
 		croak("Image::Magick object contains more than one image, unsupported");
 	}
-	
+
 	/* prepare prima object */
 	allocate_prima_image( 
 		ST( 1), 
 		ip-> columns, 
 		ip-> rows, 
-		ip-> colorspace == RGBColorspace
+		ip-> colorspace != GRAYColorspace
 	);
 	read_prima_image_data( ST( 1), &pim);
 
@@ -226,7 +226,7 @@ PPCODE:
 		ip, 
 		0, 0, /* offsets */
 		ip-> columns, ip-> rows,
-		( ip-> colorspace == RGBColorspace) ? "BGR" : "I",
+		( ip-> colorspace == GRAYColorspace) ? "I" : "BGR",
 		CharPixel,
 		buffer,
 		exception
@@ -242,7 +242,7 @@ PPCODE:
 	{
 		unsigned char * in, * out;
 		unsigned int lw, y;
-		lw = pim. width * (( ip-> colorspace == RGBColorspace) ? 3 : 1);
+		lw = pim. width * (( ip-> colorspace == GRAYColorspace) ? 1 : 3);
 		for (
 			y = 0, in = buffer, out = pim. data + pim. line_size * ( pim. height - 1);
 			y < pim. height;

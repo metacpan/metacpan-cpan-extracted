@@ -55,10 +55,10 @@ sub finalize_message_info {
   my ($self, $c, $code, $lang, %args) = @_;
   my $message_info = $self->get_message_info($c, $lang, $code);
   return +{
-    meta => {
+    info => {
       lang => $lang, 
       uri => delete($args{uri}), 
-      %{$args{meta}||+{} },
+      %{$args{info}||+{} },
     },
     errors => [
       {
@@ -125,7 +125,7 @@ response.  You can override if you want to change or add to this data.
 By default you get an error message that looks like this:
 
     {
-       "meta" : {
+       "info" : {
           "lang" : "en_US",
           "uri" : "http://localhost:5000/"
        },
@@ -138,11 +138,11 @@ By default you get an error message that looks like this:
        ]
     }
 
-When dispatching an error you can add to the C<meta> and C<errors> keys by passing information
+When dispatching an error you can add to the C<info> and C<errors> keys by passing information
 via the arguments to C<$c->dispatch_error>.   For example:
 
     $c->dispatch_error(400 =>
-      meta => { error_count = 2 },
+      info => { error_count = 2 },
       errors => [
         {
           field => 'name',
@@ -159,7 +159,7 @@ via the arguments to C<$c->dispatch_error>.   For example:
 Will result in:
 
     {
-       "meta" : {
+       "info" : {
           "lang" : "en_US",
           "uri" : "http://localhost:5000/"
        },

@@ -13,7 +13,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION = version->new(1.1.14);
+our $VERSION = version->new(1.1.16);
 our $workflow = App::Git::Workflow->new;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -109,7 +109,7 @@ sub do_delete {
         if ( !$option{test} ) {
             if ($remote) {
                 eval {
-                    $workflow->git->push($remote, ":refs/heads/$name");
+                    $workflow->git->push($remote, '--no-verify', ":refs/heads/$name");
                     1;
                 } or do {
                     return 0;
@@ -160,7 +160,7 @@ git-branch-clean - Clean old branches out of the repository
 
 =head1 VERSION
 
-This documentation refers to git-branch-clean version 1.1.14
+This documentation refers to git-branch-clean version 1.1.16
 
 =head1 SYNOPSIS
 

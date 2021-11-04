@@ -3,7 +3,7 @@ package Net::DNS::SEC::ECDSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ECDSA.pm 1807 2020-09-28 11:38:28Z willem $)[2];
+our $VERSION = (qw$Id: ECDSA.pm 1853 2021-10-11 10:40:59Z willem $)[2];
 
 
 =head1 NAME
@@ -44,7 +44,7 @@ public key resource record.
 use integer;
 use MIME::Base64;
 
-use constant ECDSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_EC_KEY');
+use constant ECDSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_ECDSA');
 
 BEGIN { die 'ECDSA disabled or application has no "use Net::DNS::SEC"' unless ECDSA_configured }
 
@@ -65,12 +65,7 @@ sub sign {
 	die 'private key not ECDSA' unless $nid;
 
 	my $rawkey = pack "a$keylen", decode_base64( $private->PrivateKey );
-
-	my $eckey = Net::DNS::SEC::libcrypto::EC_KEY_new_by_curve_name($nid);
-	Net::DNS::SEC::libcrypto::EC_KEY_set_private_key( $eckey, $rawkey );
-
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
-	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_EC_KEY( $evpkey, $eckey );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_ECDSA( $nid, $rawkey, '' );
 
 	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, $evpmd );
 	return _ASN1decode( $asn1, $keylen );
@@ -86,12 +81,8 @@ sub verify {
 
 	return unless $sigbin;
 
-	my $eckey = Net::DNS::SEC::libcrypto::EC_KEY_new_by_curve_name($nid);
 	my ( $x, $y ) = unpack "a$keylen a$keylen", $keyrr->keybin;
-	Net::DNS::SEC::libcrypto::EC_KEY_set_public_key_affine_coordinates( $eckey, $x, $y );
-
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
-	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_EC_KEY( $evpkey, $eckey );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_ECDSA( $nid, $x, $y );
 
 	my $asn1 = _ASN1encode( $sigbin, $keylen );
 	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, $evpmd );
@@ -146,7 +137,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

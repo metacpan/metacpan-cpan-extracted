@@ -2,7 +2,7 @@ package App::Yath::Plugin::YathUI;
 use strict;
 use warnings;
 
-our $VERSION = '1.000073';
+our $VERSION = '1.000080';
 
 use File::Spec;
 use Test2::Harness::Util qw/read_file mod2file/;
@@ -133,7 +133,7 @@ option_group {prefix => 'yathui', category => "YathUI Options"} => sub {
 
         if ($has_coverage) {
             my $curl = join '/' => ($url, 'coverage', $project);
-            $settings->finder->field(($grace ? 'maybe_coverage_from' : 'coverage_from'), $curl);
+            $settings->cover->field(($grace ? 'maybe_from' : 'from'), $curl);
         }
 
         if ($has_durations) {

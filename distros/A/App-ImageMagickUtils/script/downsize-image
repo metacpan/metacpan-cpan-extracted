@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-05'; # DATE
+our $DATE = '2021-10-12'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/downsize_image",
@@ -39,13 +39,13 @@ downsize-image - Reduce image size, by default via compressing to JPEG quality 4
 
 =head1 VERSION
 
-This document describes version 0.005 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2021-10-05.
+This document describes version 0.008 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2021-10-12.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<downsize-image> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--downsize-to>=I<str>] [B<--dry-run>|B<-n>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<-q>=I<int>] [B<--files-json>=I<json>] [B<--dont-downsize>|B<--no-downsize>] -- E<lt>I<file>E<gt> ...
+% B<downsize-image> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--delete-original>|B<-D>|B<--no-delete-original>|B<--nodelete-original>] [B<--downsize-to>=I<str>] [B<--dry-run>|B<-n>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<-q>=I<int>] [B<--files-json>=I<json>] [B<--dont-downsize>|B<--no-downsize>] -- E<lt>I<file>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -67,6 +67,8 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--delete-original>, B<-D>
 
 =item B<--dont-downsize>
 
@@ -303,6 +305,7 @@ which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-F
 
 List of available configuration parameters:
 
+ delete_original (see --delete-original)
  downsize_to (see --downsize-to)
  files (see --file)
  format (see --format)
@@ -330,9 +333,9 @@ The default setting is to downsize to 1024p:
 
  % downsize-image *
 
-Do not downsize, just recompress to JPEG quality 40:
+Do not downsize, just recompress to JPEG quality 40, delete original files:
 
- % downsize-image --dont-downsize *
+ % downsize-image --dont-downsize --delete-original *
 
 =head1 HOMEPAGE
 

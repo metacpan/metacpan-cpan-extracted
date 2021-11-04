@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use 5.006; # "our" keyword
+use 5.008; # These days, there is just no point in supporting older versions
 
 =head1 NAME
 
@@ -390,29 +390,16 @@ sub new {
 
 =item I<requires_for_build ()>
 
-Returns a list of packages that are required by I<My::Module::Build> for running
-Build.PL and the Build file respectively, and should therefore be appended to
-the C<configure_requires> and C<build_requires> hashes as shown in L</SYNOPSIS>.
+Returns a list of (non-core, as of Perl 5.8) packages that are
+required by I<My::Module::Build> for running Build.PL and the Build
+file respectively, and should therefore be appended to the
+C<configure_requires> and C<build_requires> hashes as shown in
+L</SYNOPSIS>.
 
 =cut
 
 sub requires_for_configure {
-       ('IO::File'              => 0,
-        'File::Path'            => 0,
-        'File::Spec'            => 0,
-        'File::Spec::Functions' => 0,
-        'File::Spec::Unix'      => 0,
-        'File::Find'            => 0,
-        'Module::Build'         => 0.29,
-        'Module::Build::Compat' => 0,
-        'FindBin'               => 0, # As per L</SYNOPSIS>
-
-        # The following are actually requirements for tests:
-        'File::Temp' => 0,  # for tempdir() in My::Tests::Below
-        'Fatal' => 0, # Used to cause tests to die early if fixturing
-                      # fails, see sample in this module's test suite
-                      # (at the bottom of this file)
-       );
+    return ('Module::Build'         => 0.29);
 }
 
 sub requires_for_build { return requires_for_configure }
@@ -436,15 +423,6 @@ sub maintainer_mode_enabled {
     foreach my $vc_dir (qw(CVS .svn .hg .git)) {
         return 1 if -d catdir($self->base_dir, $vc_dir);
     }
-
-    my $svk_cmd = sprintf("yes n | svk info '%s' 2>%s",
-                           catdir($self->base_dir, "Build.PL"),
-                           File::Spec->devnull);
-    `$svk_cmd`; return 1 if ! $?;
-    # `svk info` puts the terminal into non-echo mode if run before
-    # initializing a main depot.  Shame, shame...
-    eval { require Term::ReadKey; 1 } and
-      Term::ReadKey::ReadMode("normal");
 
     return 0;
 }
@@ -473,6 +451,7 @@ bugfixes until you install YAML.
 
 MESSAGE
     foreach my $testmod (qw(Test::NoBreakpoints
+                            Test::Kwalitee Test::Dependencies
                             Test::Pod Test::Pod::Coverage)) {
         unless ($self->check_installed_status($testmod, 0)->{ok})
             { $self->show_warning(<<"MESSAGE")};
@@ -1246,6 +1225,7 @@ sub find_test_files_predicate {
     return 1 if m/My.Tests.Below\.pm$/;
     return if m/\b[_.]svn\b/; # Subversion metadata
     return 1 if m/\.t$/;
+    return if m/[#~]/;  # Some kind of temp file
     my $module = catfile($self->base_dir, $_);
     local *MODULE;
     unless (open(MODULE, "<", $module)) {
@@ -1327,12 +1307,12 @@ PREAMBLE
         return $self->SUPER::fake_makefile(@_). <<'MAIN_SCREEN_TURN_ON';
 # In 2101 AD war was beginning...
 your:
-	@echo
-	@echo -n "     All your codebase"
+	@/bin/echo
+	@/bin/echo -n "     All your codebase"
 
 time:
-	@echo " are belong to us !"
-	@echo
+	@/bin/echo " are belong to us !"
+	@/bin/echo
 
 MAIN_SCREEN_TURN_ON
     }
@@ -1576,7 +1556,7 @@ require My::Tests::Below unless caller;
 
 __END__
 
-use Test::More "no_plan";
+use Test2::V0;
 
 ########### Dependent graph stuff ################
 
@@ -1631,7 +1611,7 @@ HEADER
     BEGIN { *write_file = \&My::Module::Build::write_file;
             *read_file  = \&My::Module::Build::read_file; }
 
-    use Test::More;
+    use Test2::V0;
     use Fatal qw(mkdir chdir);
 
     local @ARGV = qw(--noinstall-everything);
@@ -1641,8 +1621,7 @@ HEADER
     $define_options =~ s/\.\.\.//g;
     my $builder = eval $define_options; die $@ if $@;
 
-    isa_ok($builder, "Fake::Module::Build",
-           "construction of builder successful");
+    isa_ok($builder, "Fake::Module::Build");
 
     is(scalar keys %My::Module::Build::declared_options,
        2, "Number of declarations seen");
@@ -1666,6 +1645,7 @@ HEADER
 
 ####################### Main test suite ###########################
 
+use Cwd qw(getcwd);
 use File::Copy qw(copy);
 use File::Spec::Functions qw(catfile catdir);
 use IO::Pipe;
@@ -1755,8 +1735,9 @@ mkdir("$fakemoduledir/$_") foreach
         lib/My lib/My/Private lib/My/Private/Stuff));
 
 use FindBin qw($Bin $Script);
-copy(catfile($Bin, $Script),
-            "$fakemoduledir/inc/My/Module/Build.pm");
+my ($thisfile) = catfile($Bin, $Script) =~ m/^(.*)$/;  # Untainted
+
+copy($thisfile, "$fakemoduledir/inc/My/Module/Build.pm");
 write_file(catfile($fakemoduledir, qw(lib My Private Stuff Indeed.pm)),
            <<"BOGON");
 #!perl -w
@@ -1769,6 +1750,8 @@ use strict;
 BOGON
 
 my ($perl) = ($^X =~ m/^(.*)$/); # Untainted
+
+my ($pwd_orig) = getcwd() =~ m/^(.*)$/; # Untainted
 chdir($fakemoduledir);
 
 my $pipe = new IO::Pipe();
@@ -1863,6 +1846,8 @@ PREAMBLE
     $pipe->close();
     is($?, 0, "You are on the way to destruction")
         or warn $text;
-    like($text, qr/belong/, "Still first hit on Google, after all these years!");
+    like($text, qr/belong/, "No longer the first hit on Google, ever since someone invented the Zig language. Oh well.");
 }
 
+chdir($pwd_orig);
+done_testing;

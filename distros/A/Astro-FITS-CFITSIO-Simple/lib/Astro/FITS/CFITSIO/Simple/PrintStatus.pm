@@ -1,26 +1,28 @@
 package Astro::FITS::CFITSIO::Simple::PrintStatus;
 
-our $VERSION = '0.18';
+# ABSTRACT: generate a progress status update
+
+use strict;
+use warnings;
+
+our $VERSION = '0.19';
 
 sub new
 {
   my ( $class, $what, $nrows ) = @_;
 
   # if a boolean (i.e. scalar)
-  if ( ! ref $what ) 
+  if ( ! ref $what )
   {
     # if its false, return undef
-    return undef unless $what;
+    return unless $what;
 
     # if its true, try to use Term::ProgressBar if it's available, else fall back
     # to our primitive efforts
     unless ( -1 == $what )
     {
-      eval "require Term::ProgressBar";
-
-      # yes!
-      return Astro::FITS::CFITSIO::Simple::PrintStatusProgressBar->new( $nrows )
-	unless ( $@ );
+      eval { require Term::ProgressBar }
+        && return Astro::FITS::CFITSIO::Simple::PrintStatusProgressBar->new( $nrows );
     }
 
     # no, piggy back on glob support
@@ -85,23 +87,23 @@ sub update
   sub new { bless {fh => $_[1], nrows => $_[2]}, $_[0] }
 
 
-  sub start { $self = shift;
-	      $self->{fh}->print( sprintf( "    " , shift) );
-	      $self->{fh}->flush;
-	    }
+  sub start { my $self = shift;
+              $self->{fh}->print( sprintf( "    " , shift) );
+              $self->{fh}->flush;
+            }
 
   sub output { my ( $self, $rows ) = @_;
-	       my $pct_done = int( 100 * $rows / $self->{nrows} );
-	       $self->{fh}->print( sprintf( "\b\b\b\b%3d%" , $pct_done) );
-	       $self->{fh}->flush;
-	       $self->next_update( $rows );
-	     }
+               my $pct_done = int( 100 * $rows / $self->{nrows} );
+               $self->{fh}->print( sprintf( "\b\b\b\b%3d%" , $pct_done) );
+               $self->{fh}->flush;
+               $self->next_update( $rows );
+             }
 
-  sub finish { $self = shift;
-	       $self->output( $self->{nrows}, $self->{nrows} );
-	       $self->{fh}->print( "\n" );
-	       $self->{fh}->flush;
-	     }
+  sub finish { my $self = shift;
+               $self->output( $self->{nrows}, $self->{nrows} );
+               $self->{fh}->print( "\n" );
+               $self->{fh}->flush;
+             }
 }
 
 {
@@ -111,9 +113,9 @@ sub update
   sub new { bless {coderef => $_[1], nrows => $_[2]}, $_[0] }
 
   sub output { my ( $self, $rows, $nrows )  = @_;
-	       $self->{coderef}->($rows, $nrows);
-	       $self->next_update( $rows );
-	     };
+               $self->{coderef}->($rows, $nrows);
+               $self->next_update( $rows );
+             };
 }
 
 {
@@ -128,10 +130,10 @@ sub update
 
     require Term::ProgressBar;
 
-    $self->{progress} = 
+    $self->{progress} =
       Term::ProgressBar->new( { count => $self->{nrows},
-				ETA => 'linear',
-			      } )
+                                ETA => 'linear',
+                              } )
       or die( "unable to create ProgressBar\n" );
 
     $self->{progress}->minor(0);
@@ -153,11 +155,31 @@ sub update
   }
 }
 
+#
+# This file is part of Astro-FITS-CFITSIO-Simple
+#
+# This software is Copyright (c) 2008 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+1;
+
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Pete Ratzlaff Smithsonian Astrophysical Observatory
 
 =head1 NAME
 
 Astro::FITS::CFITSIO::Simple::PrintStatus - generate a progress status update
+
+=head1 VERSION
+
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -225,17 +247,64 @@ will cause an actual change in the output.  It is usually used as such:
   $ps->finish
     if $nmax >= $next_update;
 
-
-
 =item finish
 
   $status->finish;
 
 This should be called after all of the rows have been written.
 
+=back
+
+=for Pod::Coverage next_update
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-astro-fits-cfitsio-simple@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-FITS-CFITSIO-Simple
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/astro-fits-cfitsio-simple
+
+and may be cloned from
+
+  https://gitlab.com/djerius/astro-fits-cfitsio-simple.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Astro::FITS::CFITSIO::Simple|Astro::FITS::CFITSIO::Simple>
 
 =back
 
+=head1 AUTHORS
 
+=over 4
 
-1;
+=item *
+
+Diab Jerius <djerius@cpan.org>
+
+=item *
+
+Pete Ratzlaff
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -292,7 +292,7 @@ use Locale::SubCountry::Codes;
 #-------------------------------------------------------------------------------
 
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 # Define all the methods for the 'world' class here. Note that because the
 # name space inherits from the Locale::SubCountry name space, the
@@ -348,7 +348,7 @@ sub all_codes
 #-------------------------------------------------------------------------------
 
 package Locale::SubCountry;
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 #-------------------------------------------------------------------------------
 # Initialization code which will be run first to create global data structure.

@@ -1,9 +1,9 @@
 package HTTP::Tiny::Plugin;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-14'; # DATE
+our $DATE = '2021-06-08'; # DATE
 our $DIST = 'HTTP-Tiny-Plugin'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -17,6 +17,17 @@ if ($ENV{HTTP_TINY_PLUGINS}) {
     __PACKAGE__->set_plugins(@{
         JSON::PP::decode_json($ENV{HTTP_TINY_PLUGINS})
       });
+}
+
+sub new {
+    my $class = shift;
+
+    my $r = {http=>undef, ua=>undef, argv=>[@_]};
+    $class->_run_hooks('before_instantiate', {all=>1}, $r);
+    my $self = $class->SUPER::new(@_);
+    $r->{http} = $r->{ua} = $self;
+    $self->_run_hooks('after_instantiate', {all=>1}, $r);
+    $self;
 }
 
 sub import {
@@ -94,7 +105,7 @@ HTTP::Tiny::Plugin - HTTP::Tiny with plugins
 
 =head1 VERSION
 
-This document describes version 0.003 of HTTP::Tiny::Plugin (from Perl distribution HTTP-Tiny-Plugin), released on 2020-08-14.
+This document describes version 0.004 of HTTP::Tiny::Plugin (from Perl distribution HTTP-Tiny-Plugin), released on 2021-06-08.
 
 =head1 SYNOPSIS
 
@@ -151,11 +162,12 @@ Hash.
 
 =item * http
 
-Object. The HTTP::Tiny object.
+Object. The HTTP::Tiny::Plugin object, which is a subclass of L<HTTP::Tiny>. In
+C<before_instantiate> book, this is not yet available.
 
 =item * ua
 
-Like C<http>.
+Contain the same object as C<http>, for convenience/backward-compatibility.
 
 =item * hook
 
@@ -208,12 +220,16 @@ L</before_request> then C<request()> will be skipped.
 
 Will also immediately stop hook execution for that stage.
 
+Not observed in C<before_instantiate> and C<after_instantiate> hooks.
+
 =item * 98
 
 Repeat execution of hook-related method. For example, if we return 98 in
 L</after_request> then C<request()> will be repeated.
 
 Will also immediately stop hook execution for that stage.
+
+Not observed in C<before_instantiate> and C<after_instantiate> hooks.
 
 =back
 
@@ -222,6 +238,15 @@ Will also immediately stop hook execution for that stage.
 Below is the list of hooks in order of execution during a request:
 
 =over
+
+=item * before_instantiate
+
+Will be called in C<new()> before the HTTP::Tiny::Plugin object is instantiated.
+Note that in this state, C<http> and C<ua> keys in C<$r> is not yet available.
+
+=item * after_instantiate
+
+Will be called in C<new()> after the HTTP::Tiny::Plugin object is instantiated.
 
 =item * before_request_once
 
@@ -247,6 +272,12 @@ interpret 98 (repeat calling C<request()>, including the L</before_request> hook
 but not the L</before_request_once> hook).
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-zenbook-ux305)
+
+perlancar (on netbook-zenbook-ux305) <perlancar@gmail.com>
 
 =head1 METHODS
 
@@ -299,7 +330,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

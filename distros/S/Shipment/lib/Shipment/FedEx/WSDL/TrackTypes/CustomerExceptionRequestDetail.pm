@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail;
-$Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               StatusDescription
               CreateTime
 
-              )
+            )
         ],
         {   'Id'                => \%Id_of,
             'StatusCode'        => \%StatusCode_of,
@@ -71,7 +71,7 @@ Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

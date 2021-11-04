@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package App::Cronjob;
+package App::Cronjob 1.200012;
 # ABSTRACT: wrap up programs to be run as cron jobs
-$App::Cronjob::VERSION = '1.200011';
+
 use Digest::MD5 qw(md5_hex);
 use Errno;
 use Fcntl qw( :DEFAULT :flock );
@@ -263,9 +263,9 @@ END_TEMPLATE
 }
 
 {
-  package App::Cronjob::Exception;
-$App::Cronjob::Exception::VERSION = '1.200011';
-sub new {
+  package App::Cronjob::Exception 1.200012;
+
+  sub new {
     my ($class, $type, $text, $extra) = @_;
     bless { type => $type, text => $text, extra => $extra } => $class;
   }
@@ -285,7 +285,17 @@ App::Cronjob - wrap up programs to be run as cron jobs
 
 =head1 VERSION
 
-version 1.200011
+version 1.200012
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 SEE INSTEAD
 
@@ -299,11 +309,11 @@ For a full description of the program's behavior, consult L<cronjob>.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords chromatic Mark Jason Dominus Ricardo Signes Rob N ★
+=for stopwords chromatic Mark Jason Dominus Rob N ★
 
 =over 4
 
@@ -314,10 +324,6 @@ chromatic <chromatic@wgz.org>
 =item *
 
 Mark Jason Dominus <mjd@plover.com>
-
-=item *
-
-Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

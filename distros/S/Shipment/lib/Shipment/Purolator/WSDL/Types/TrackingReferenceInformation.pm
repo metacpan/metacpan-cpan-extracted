@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::TrackingReferenceInformation;
-$Shipment::Purolator::WSDL::Types::TrackingReferenceInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::TrackingReferenceInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               Reference3
               Reference4
 
-              )
+            )
         ],
         {   'Reference1' => \%Reference1_of,
             'Reference2' => \%Reference2_of,
@@ -71,7 +71,7 @@ Shipment::Purolator::WSDL::Types::TrackingReferenceInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

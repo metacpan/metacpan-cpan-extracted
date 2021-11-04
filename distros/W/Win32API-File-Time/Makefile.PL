@@ -29,6 +29,17 @@ my %args = (
     VERSION_FROM	=> $meta->version_from(),
 );
 
+$mmv >= 6.31
+    and $args{LICENSE} = $meta->license();
+
+if ( $mmv >= 6.4501 ) {
+    $args{META_ADD} = {
+	no_index => $meta->no_index(),
+	$meta->provides(),
+    };
+    $args{META_MERGE} = $meta->meta_merge();
+}
+
 $mmv >= 6.4701
     and $args{MIN_PERL_VERSION} = $meta->requires_perl();
 

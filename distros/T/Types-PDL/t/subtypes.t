@@ -15,9 +15,9 @@ my $d3   = PDL->new( [ [] ], [ [] ] );
 
 #<<< notidy
 
-subtest 'Piddle1D' => sub {
+subtest 'NDArray1D' => sub {
 
-    my $t = Piddle1D;
+    my $t = NDArray1D;
 
     ok(  $t->check( $null ), 'null' );
     ok( !$t->check( $d0 ),   '0D' );
@@ -25,17 +25,17 @@ subtest 'Piddle1D' => sub {
     ok( !$t->check( $d2 ),   '2D' );
     ok( !$t->check( $d3 ),   '3D' );
 
-    $t = Piddle1D[ empty => 1 ];
+    $t = NDArray1D[ empty => 1 ];
 
     ok( $t->check( $d1 ),
-        'Piddle1d[ empty => 1 ]',
+        'NDArray1d[ empty => 1 ]',
       );
 
 };
 
-subtest 'Piddle2D' => sub {
+subtest 'NDArray2D' => sub {
 
-    my $t = Piddle2D;
+    my $t = NDArray2D;
 
     ok( !$t->check( $null ), 'null' );
     ok( !$t->check( $d0 ),   '0D' );
@@ -45,9 +45,9 @@ subtest 'Piddle2D' => sub {
 
 };
 
-subtest 'Piddle3D' => sub {
+subtest 'NDArray3D' => sub {
 
-    my $t = Piddle3D;
+    my $t = NDArray3D;
 
     ok( !$t->check( $null ), 'null' );
     ok( !$t->check( $d0 ),   '0D' );

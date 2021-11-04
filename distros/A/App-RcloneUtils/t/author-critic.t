@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/RcloneUtils.pm','script/parse-rclone-config'];
+my $filenames = ['lib/App/RcloneUtils.pm','script/list-rclone-remotes','script/parse-rclone-config'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

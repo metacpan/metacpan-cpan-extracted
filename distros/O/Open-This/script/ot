@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Getopt::Long qw( GetOptions );
 use Open::This qw(
     editor_args_from_parsed_text
     maybe_get_url_from_parsed_text
@@ -14,10 +15,14 @@ use Pod::Usage qw( pod2usage );
 pod2usage("Error: missing argument\n") unless @ARGV;
 
 my $browse;
-if ( $ARGV[0] eq '-b' ) {
-    shift @ARGV;
-    $browse = 1;
-}
+my $editor;
+my $print;
+
+GetOptions(
+    'browse|b'   => \$browse,
+    'editor|e=s' => \$editor,
+    'print|p'    => \$print,
+);
 
 my $parsed = parse_text(@ARGV);
 if ( !$parsed ) {
@@ -41,10 +46,18 @@ if ($browse) {
     return undef;
 }
 
+local $ENV{EDITOR} = $editor || $ENV{EDITOR};
+
 my @editor_args = editor_args_from_parsed_text($parsed);
 
-$ENV{EDITOR} ? exec $ENV{EDITOR}, @editor_args
-             : die('Please ensure your $EDITOR env var has been set');
+if ($print) {
+    print STDOUT join( ' ', @editor_args ), "\n";
+    exit(0);
+}
+
+$ENV{EDITOR}
+    ? exec $ENV{EDITOR}, @editor_args
+    : die('Please set your $EDITOR env var or use the --editor arg');
 
 # ABSTRACT: parse text and (hopefully) open an editor with the correct arguments
 # PODNAME: ot
@@ -61,7 +74,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000025
+version 0.000027
 
 =head1 SYNOPSIS
 
@@ -117,6 +130,12 @@ version 0.000025
     # open "/foo/bar.java:[3,5]" as it appears in Maven's test output
     ot /foo/bar.java:[3,5]
 
+    # override $ENV{EDITOR}. [-e|--editor]
+    ot -e kate Foo::Bar
+
+    # Don't open anything. Just print to STDOUT. [-p|--print]
+    ot -p kate Foo::Bar
+
 =head1 DESCRIPTION
 
 It can be a pain to have to copy Perl module names from a stack trace or some
@@ -131,6 +150,37 @@ names into the appropriate line numbers.  It will look in a lib or t/lib
 directory relative to your current path.  If it thinks it has a Perl module
 name it will also try to require it and use %INC in order to find the module on
 disks.  All security caveats apply when requiring 3rd party modules.
+
+=head1 PARAMETERS
+
+=head2 -b|--browse
+
+Open the file on the GitHub web site using your default browser, rather than
+invoking a local editor.
+
+    ot -b Foo::Bar
+
+=head2 -e|--editor
+
+Can be used to override C<$ENV{EDITOR}>. Helpful for writing editor-specific
+plugins.
+
+    ot -e kate Foo::Bar
+
+    ot --editor kate Foo::Bar
+
+=head2 -p|--print
+
+Print the editor arguments to C<STDOUT> rather than invoking an editor. Helpful
+for writing editor-specific plugins.
+
+    ot -p Foo::Bar
+
+    ot --print Foo::Bar
+
+    ot -p -e kate Foo::Bar
+
+    ot --print --editor kate Foo::Bar
 
 =head1 ENVIRONMENT VARIABLES
 

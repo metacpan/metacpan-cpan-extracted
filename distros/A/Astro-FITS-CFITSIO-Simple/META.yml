@@ -1,27 +1,74 @@
---- #YAML:1.0
-name:               Astro-FITS-CFITSIO-Simple
-version:            0.18
-abstract:           ~
+---
+abstract: 'read and write FITS tables'
 author:
-    - Diab Jerius <djerius@cpan.org>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Diab Jerius <djerius@cpan.org>'
+  - 'Pete Ratzlaff'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Astro::FITS::CFITSIO:  1.02
-    Astro::FITS::CFITSIO::CheckStatus:  0.03
-    Astro::FITS::Header::CFITSIO:  0
-    Params::Validate:     0.72
-    PDL:                  0
-    Scalar::Util:         0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::Lib: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Astro-FITS-CFITSIO-Simple
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Astro::FITS::CFITSIO::Simple:
+    file: lib/Astro/FITS/CFITSIO/Simple.pm
+    version: '0.19'
+  Astro::FITS::CFITSIO::Simple::Cleanup:
+    file: lib/Astro/FITS/CFITSIO/Simple.pm
+    version: '0.19'
+  Astro::FITS::CFITSIO::Simple::Image:
+    file: lib/Astro/FITS/CFITSIO/Simple/Image.pm
+    version: '0.19'
+  Astro::FITS::CFITSIO::Simple::PDL:
+    file: lib/Astro/FITS/CFITSIO/Simple/PDL.pm
+    version: '0.19'
+  Astro::FITS::CFITSIO::Simple::PrintStatus:
+    file: lib/Astro/FITS/CFITSIO/Simple/PrintStatus.pm
+    version: '0.19'
+  Astro::FITS::CFITSIO::Simple::PrintStatusCode:
+    file: lib/Astro/FITS/CFITSIO/Simple/PrintStatus.pm
+    version: '0.19'
+  Astro::FITS::CFITSIO::Simple::PrintStatusObj:
+    file: lib/Astro/FITS/CFITSIO/Simple/PrintStatus.pm
+    version: '0.19'
+  Astro::FITS::CFITSIO::Simple::PrintStatusProgressBar:
+    file: lib/Astro/FITS/CFITSIO/Simple/PrintStatus.pm
+    version: '0.19'
+  Astro::FITS::CFITSIO::Simple::Table:
+    file: lib/Astro/FITS/CFITSIO/Simple/Table.pm
+    version: '0.19'
+requires:
+  Astro::FITS::CFITSIO: '0'
+  Astro::FITS::CFITSIO::CheckStatus: '0'
+  Astro::FITS::Header: '0'
+  Astro::FITS::Header::CFITSIO: '0'
+  PDL: '0'
+  Params::Validate: '0'
+  Term::ProgressBar: '0'
+  perl: '5.008002'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-FITS-CFITSIO-Simple
+  repository: https://gitlab.com/djerius/astro-fits-cfitsio-simple.git
+version: '0.19'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

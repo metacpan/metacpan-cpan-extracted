@@ -8,6 +8,10 @@ pmake.bat
 MANIFEST
 LICENSE
 CONTRIBUTING
+t/1001_num_base2.t
+t/1002_num_base8.t
+t/1003_num_base10.t
+t/1004_num_base16.t
 t/2001_basic_transpile.t
 t/2002_basic_2quote.t
 t/2003_basic_3quote_s.t
@@ -83,6 +87,9 @@ t/5003_opendir.t
 t/5004_stat.t
 t/5005_tr.t
 t/5006_unlink.t
+t/5007_opendir.t
+t/5008_signatures.t
+t/5009_xx_modifier.t
 t/6101_filetest.t
 t/6102_filetest.t
 t/6103_filetest.t

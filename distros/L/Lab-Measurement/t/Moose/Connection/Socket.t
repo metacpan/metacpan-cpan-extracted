@@ -9,9 +9,9 @@ use Lab::Moose::Connection::Socket;
 use IO::Socket::INET;
 
 my $device = IO::Socket::INET->new(
-    Type   => SOCK_STREAM,
-    Reuse  => 1,
-    Listen => 5
+    Type      => SOCK_STREAM,
+    ReuseAddr => 1,
+    Listen    => 5
 ) or die "cannot open socket";
 
 my $port = $device->sockport();

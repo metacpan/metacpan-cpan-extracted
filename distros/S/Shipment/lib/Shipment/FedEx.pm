@@ -1,5 +1,5 @@
 package Shipment::FedEx;
-$Shipment::FedEx::VERSION = '3.05';
+$Shipment::FedEx::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ has 'proxy_domain' => (
         qw(
           wsbeta.fedex.com:443
           ws.fedex.com:443
-          )
+        )
     ],
     default => 'wsbeta.fedex.com:443',
 );
@@ -75,7 +75,7 @@ has 'label_stock_type' => (
           PAPER_8.5X11_BOTTOM_HALF_LABEL
           PAPER_8.5X11_TOP_HALF_LABEL
           PAPER_LETTER
-          )
+        )
     ],
     lazy    => 1,
     builder => 1,
@@ -194,7 +194,7 @@ sub _build_services {
               { SequenceNumber => $sequence,
                 InsuredValue   => {
                     Currency => $_->insured_value->code || $self->currency,
-                    Amount => $_->insured_value->value,
+                    Amount   => $_->insured_value->value,
                 },
                 Weight => {
                     Value => $_->weight,
@@ -225,7 +225,7 @@ sub _build_services {
 
     try {
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->getRates(
+        $response                    = $interface->getRates(
             {   WebAuthenticationDetail => {
                     UserCredential => {
                         Key      => $self->key,
@@ -249,8 +249,8 @@ sub _build_services {
                     PackagingType => 'YOUR_PACKAGING',
                     Shipper       => {
                         Address => {
-                            StreetLines => \@from_streetlines,
-                            City        => $self->from_address()->city,
+                            StreetLines         => \@from_streetlines,
+                            City                => $self->from_address()->city,
                             StateOrProvinceCode =>
                               $self->from_address()->province_code,
                             PostalCode  => $self->from_address()->postal_code,
@@ -259,8 +259,8 @@ sub _build_services {
                     },
                     Recipient => {
                         Address => {
-                            StreetLines => \@to_streetlines,
-                            City        => $self->to_address()->city,
+                            StreetLines         => \@to_streetlines,
+                            City                => $self->to_address()->city,
                             StateOrProvinceCode =>
                               $self->to_address()->province_code,
                             PostalCode  => $self->to_address()->postal_code,
@@ -346,7 +346,7 @@ sub rate {
         $service_id = $self->services->{$service_id}->id;
     }
     catch {
-        warn $_ if $self->debug;
+        warn $_                                    if $self->debug;
         warn "service ($service_id) not available" if $self->debug;
         $self->error("service ($service_id) not available");
         $service_id = '';
@@ -380,7 +380,7 @@ sub rate {
           { SequenceNumber => $sequence,
             InsuredValue   => {
                 Currency => $_->insured_value->code || $self->currency,
-                Amount => $_->insured_value->value,
+                Amount   => $_->insured_value->value,
             },
             Weight => {
                 Value => $_->weight,
@@ -412,7 +412,7 @@ sub rate {
 
     try {
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->getRates(
+        $response                    = $interface->getRates(
             {   WebAuthenticationDetail => {
                     UserCredential => {
                         Key      => $self->key,
@@ -445,8 +445,8 @@ sub rate {
                     },
                     Shipper => {
                         Address => {
-                            StreetLines => \@from_streetlines,
-                            City        => $self->from_address()->city,
+                            StreetLines         => \@from_streetlines,
+                            City                => $self->from_address()->city,
                             StateOrProvinceCode =>
                               $self->from_address()->province_code,
                             PostalCode  => $self->from_address()->postal_code,
@@ -455,8 +455,8 @@ sub rate {
                     },
                     Recipient => {
                         Address => {
-                            StreetLines => \@to_streetlines,
-                            City        => $self->to_address()->city,
+                            StreetLines         => \@to_streetlines,
+                            City                => $self->to_address()->city,
                             StateOrProvinceCode =>
                               $self->to_address()->province_code,
                             PostalCode  => $self->to_address()->postal_code,
@@ -526,7 +526,7 @@ sub ship {
         $service_id = $self->services->{$service_id}->id;
     }
     catch {
-        warn $_ if $self->debug;
+        warn $_                                    if $self->debug;
         warn "service ($service_id) not available" if $self->debug;
         $self->error("service ($service_id) not available");
         $service_id = '';
@@ -615,7 +615,7 @@ sub ship {
 
         try {
             $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-            $response = $interface->processShipment(
+            $response                    = $interface->processShipment(
                 {   WebAuthenticationDetail => {
                         UserCredential => {
                             Key      => $self->key,
@@ -870,7 +870,7 @@ sub cancel {
 
     try {
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->deleteShipment(
+        $response                    = $interface->deleteShipment(
             {   WebAuthenticationDetail => {
                     UserCredential => {
                         Key      => $self->key,
@@ -942,7 +942,7 @@ sub track {
 
     try {
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->track(
+        $response                    = $interface->track(
             {   WebAuthenticationDetail => {
                     UserCredential => {
                         Key      => $self->key,
@@ -1063,7 +1063,7 @@ sub end_of_day {
 
     try {
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->groundClose(
+        $response                    = $interface->groundClose(
             {   WebAuthenticationDetail => {
                     UserCredential => {
                         Key      => $self->key,
@@ -1095,7 +1095,7 @@ sub end_of_day {
         $self->manifest(
             Shipment::Label->new(
                 content_type => 'text/plain',
-                data =>
+                data         =>
                   decode_base64($response->get_Manifest->get_File->get_value),
                 file_name => 'manifest_' . DateTime->now->ymd('_') . '.txt',
             )
@@ -1131,7 +1131,7 @@ Shipment::FedEx
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

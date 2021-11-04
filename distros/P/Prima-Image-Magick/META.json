@@ -4,7 +4,7 @@
       "Dmitry Karasik <dmitry@karasik.eu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -32,11 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Image::Magick" : "1",
-            "Prima" : "1"
+            "Image::Magick" : "0",
+            "Prima" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

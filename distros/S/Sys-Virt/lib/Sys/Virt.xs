@@ -1275,6 +1275,48 @@ _domain_event_memory_failure_callback(virConnectPtr con,
 
 
 static int
+_domain_event_memory_device_size_change_callback(virConnectPtr con,
+						 virDomainPtr dom,
+						 const char *alias,
+						 unsigned long long size,
+						 void *opaque)
+{
+    AV *data = opaque;
+    SV **self;
+    SV **cb;
+    SV *domref;
+    dSP;
+
+    self = av_fetch(data, 0, 0);
+    cb = av_fetch(data, 1, 0);
+
+    SvREFCNT_inc(*self);
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(*self);
+    domref = sv_newmortal();
+    sv_setref_pv(domref, "Sys::Virt::Domain", (void *) dom);
+    virDomainRef(dom);
+    XPUSHs(domref);
+    XPUSHs(sv_2mortal(newSVpv(alias, 0)));
+    XPUSHs(sv_2mortal(virt_newSVull(size)));
+    PUTBACK;
+
+    call_sv(*cb, G_DISCARD);
+
+    FREETMPS;
+    LEAVE;
+
+    SvREFCNT_dec(*self);
+
+    return 0;
+}
+
+
+static int
 _network_event_lifecycle_callback(virConnectPtr con,
 				  virNetworkPtr net,
 				  int event,
@@ -3881,6 +3923,9 @@ PREINIT:
           break;
       case VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE:
           callback = VIR_DOMAIN_EVENT_CALLBACK(_domain_event_memory_failure_callback);
+          break;
+      case VIR_DOMAIN_EVENT_ID_MEMORY_DEVICE_SIZE_CHANGE:
+          callback = VIR_DOMAIN_EVENT_CALLBACK(_domain_event_memory_device_size_change_callback);
           break;
       default:
           callback = VIR_DOMAIN_EVENT_CALLBACK(_domain_event_generic_callback);
@@ -9828,6 +9873,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_ID_METADATA_CHANGE, EVENT_ID_METADATA_CHANGE);
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD, EVENT_ID_BLOCK_THRESHOLD);
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE, EVENT_ID_MEMORY_FAILURE);
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_ID_MEMORY_DEVICE_SIZE_CHANGE, EVENT_ID_MEMORY_DEVICE_SIZE_CHANGE);
 
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_WATCHDOG_NONE, EVENT_WATCHDOG_NONE);
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_WATCHDOG_PAUSE, EVENT_WATCHDOG_PAUSE);
@@ -10443,6 +10489,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_AP_CARD, LIST_CAP_AP_CARD);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_AP_MATRIX, LIST_CAP_AP_MATRIX);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_AP_QUEUE, LIST_CAP_AP_QUEUE);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_VPD, LIST_CAP_VPD);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_ACTIVE, LIST_ACTIVE);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_INACTIVE, LIST_INACTIVE);
 

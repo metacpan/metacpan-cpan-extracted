@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionsStatusCode;
-$Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionsStatusCode::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionsStatusCode::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionsStatusCode
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

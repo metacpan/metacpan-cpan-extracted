@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ServiceRule;
-$Shipment::Purolator::WSDLV2::Types::ServiceRule::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::ServiceRule::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -55,7 +55,7 @@ Class::Std::initialize();
               MaximumSize
               MaximumDeclaredValue
 
-              )
+            )
         ],
         {   'ServiceID'            => \%ServiceID_of,
             'MinimumTotalPieces'   => \%MinimumTotalPieces_of,
@@ -137,7 +137,7 @@ Shipment::Purolator::WSDLV2::Types::ServiceRule
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

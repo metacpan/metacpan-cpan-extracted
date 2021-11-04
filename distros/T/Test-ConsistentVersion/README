@@ -1,4 +1,4 @@
-Test-ConsistentVersion version 0.3.0
+Test-ConsistentVersion version 0.3.1
 
 The purpose of this module is to make it easy for other distribution
 authors to have consistent version numbers within the modules (and
@@ -26,13 +26,14 @@ DEPENDENCIES
 Test::Builder
 autodie
 version
+perl 5.6+
 
 Optional:
 Test::Pod::Content
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2010, Glenn Fowler
+Copyright (C) 2021, Glenn Fowler
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::EtdDetail;
-$Shipment::FedEx::WSDL::RateTypes::EtdDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::EtdDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Documents
               DocumentReferences
 
-              )
+            )
         ],
         {   'RequestedDocumentCopies' => \%RequestedDocumentCopies_of,
             'Documents'               => \%Documents_of,
@@ -69,7 +69,7 @@ Shipment::FedEx::WSDL::RateTypes::EtdDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

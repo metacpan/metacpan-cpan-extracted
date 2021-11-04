@@ -1,0 +1,58 @@
+# -*- mode: perl -*-
+use alienfile;
+use lib q{lib};
+use Alien::OpenMP::configure;
+no lib q{lib};
+
+configure {
+  if ($^O eq 'darwin') {
+    requires 'File::Which' => '1.27';
+    requires 'Path::Tiny'  => '0.053';
+  }
+  if (!Alien::OpenMP::configure->is_known) {
+    Alien::OpenMP::configure->unsupported(__PACKAGE__);
+    exit;
+  }
+};
+
+plugin 'Probe::CBuilder' => (
+  cflags  => Alien::OpenMP::configure->cflags,
+  lang    => 'C',
+  libs    => Alien::OpenMP::configure->libs,
+  options => {quiet => 0},
+  program => join("\n" => <DATA>),
+);
+
+after probe => sub {
+  # only reached on success AFAICT
+  shift->install_prop->{'alien_openmp_compiler_has_openmp'} = 1;
+};
+
+share {
+  before download => sub {
+    my $build = shift;
+    Alien::OpenMP::configure->unsupported($build);
+    exit;
+  };
+};
+
+
+__DATA__
+/*
+   the following should only pass if running in a properly
+   supported OpenMP environment; modifications to this should
+   ensure it's not just testing for a successful compile and link
+*/
+// done before thread fork
+#include <omp.h>
+int main () {
+  omp_set_num_threads(3);
+  int ans = 42;
+// thread section follows
+#pragma omp parallel
+#pragma omp master
+  ans = omp_get_num_threads(); // done in parallel section, but only by master thread (0)
+  if (3 == ans)
+    return 0;   // good
+  return 1;     // bad
+} // end of implicit main

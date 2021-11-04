@@ -11,7 +11,7 @@ use LWP::UserAgent;
 use Menlo::Index::MetaCPAN;
 use URI::cpan;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -51,19 +51,26 @@ sub run {
 	if (! getopts('h', $self->{'_opts'}) || @ARGV < 1
 		|| $self->{'_opts'}->{'h'}) {
 
-		print STDERR "Usage: $0 [-h] [--version] module_name\n";
+		print STDERR "Usage: $0 [-h] [--version] module_name[module_version]\n";
 		print STDERR "\t-h\t\tHelp.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tmodule_name\tModule name. e.g. ".
 			"App::Pod::Example\n";
+		print STDERR "\tmodule_version\tModule version. e.g. \@1.23, ~1.23 etc.\n";
 		return 1;
 	}
-	$self->{'_module_name'} = shift @ARGV;
+	$self->{'_module_name_and_version'} = shift @ARGV;
+
+	# Parse module name and version.
+	$self->_process_module_name_and_version;
 
 	# Get meta information for module name.
 	# XXX Why not small dist?.
 	my $res = Menlo::Index::MetaCPAN->new->search_packages({
 		'package' => $self->{'_module_name'},
+		exists $self->{'_module_version_range'}
+			? ('version_range' => $self->{'_module_version_range'})
+			: (),
 	});
 	if (! defined $res) {
 		err "Module '".$self->{'_module_name'}."' doesn't exist.";
@@ -89,6 +96,27 @@ sub run {
 	print "Package on '$res->{'download_uri'}' was downloaded.\n";
 	
 	return 0;
+}
+
+# Code from Menlo::CLI::Compat
+sub _process_module_name_and_version {
+	my $self = shift;
+
+	my $module = $self->{'_module_name_and_version'};
+
+	# Plack@1.2 -> Plack~"==1.2"
+	# BUT don't expand @ in git URLs
+	$module =~ s/^([A-Za-z0-9_:]+)@([v\d\._]+)$/$1~== $2/;
+
+	# Plack~1.20, DBI~"> 1.0, <= 2.0"
+	if ($module =~ /\~[v\d\._,\!<>= ]+$/) {
+		($self->{'_module_name'}, $self->{'_module_version_range'})
+			= split '~', $module, 2;
+	} else {
+		$self->{'_module_name'} = $module;
+	}
+
+	return;
 }
 
 1;
@@ -186,6 +214,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

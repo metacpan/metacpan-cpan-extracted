@@ -1,9 +1,11 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c : */
 
 #ifndef parse_subsignature
 
 #define PERL_EXT
 #include "feature.h"
+
+#include "make_argcheck_aux.c.inc"
 
 /*
  * Need to grab some things that aren't quite core perl API
@@ -198,10 +200,8 @@ endofelems:
   Perl_ck_warner_d(aTHX_ packWARN(WARN_EXPERIMENTAL__SIGNATURES),
     "The signatures feature is experimental");
 
-  UNOP_AUX_item *aux = (UNOP_AUX_item *)PerlMemShared_malloc(sizeof(UNOP_AUX_item) * 3);
-  aux[0].iv = parser->sig_elems;
-  aux[1].iv = parser->sig_optelems;
-  aux[2].iv = parser->sig_slurpy;
+  UNOP_AUX_item *aux = make_argcheck_aux(
+    parser->sig_elems, parser->sig_optelems, parser->sig_slurpy);
 
   OP *checkop = newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux);
 

@@ -5,6 +5,7 @@ use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More;
@@ -27,6 +28,15 @@ my @warnings = warnings {
       validate_formats => 1,
     },
     output_file => $version.'-additional-tests.txt',
+    test => {
+      todo_tests => [
+        { file => [
+            # these all depend on optional prereqs
+            !eval { +require Time::Moment; 1 } ? qw(format-date-time.json format-date.json format-time.json) : (),
+            !eval { +require DateTime::Format::RFC3339; 1 } ? 'format-date-time.json' : (),
+          ] },
+      ],
+    },
   );
 };
 

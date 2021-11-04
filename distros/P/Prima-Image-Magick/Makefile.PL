@@ -7,37 +7,46 @@ eval {
 	require Prima::Config;
 	$d = join(' ', map { "-D$_" } @{$Prima::Config::Config{cdefs}});
 	$i = join(' ', map { "-I$_" } @{$Prima::Config::Config{incpaths}});
-        for ( '/usr/include', @{$Prima::Config::Config{incpaths}}) {
-                $i .= " -I$_/ImageMagick" if -d "$_/ImageMagick";
-        }
-	if ( $^O =~ /win32/i ) {
-		for my $p ( split ";", $ENV{PATH}) {
-			$i .= " -I\"$p/include\"" if -d "$p/include/magick";
+
+	if ( `pkg-config --cflags MagickCore` =~ /^(.+)$/ ) {
+		$i .= " $1";
+	} else {
+        	for ( '/usr/include', @{$Prima::Config::Config{incpaths}}) {
+        	        $i .= " -I$_/ImageMagick" if -d "$_/ImageMagick";
+        	}
+		if ( $^O =~ /win32/i ) {
+			for my $p ( split ";", $ENV{PATH}) {
+				$i .= " -I\"$p/include\"" if -d "$p/include/magick";
+			}
 		}
 	}
 	$l = $Prima::Config::Config{libname} if $^O =~ /win32/i;
 	$i .= ' -Iinclude';
 };
 
-my $libname = 'MagickCore';
+my $magicklib = '-lMagickCore';
 if ( 
 	`convert -version` =~ /Version: ImageMagick (\d+\.\d+\.\d+)/ 
 ) {
 	my $v = $1;
 	$v =~ s/\.//g;
-	$libname = 'Magick' if $v < 641;
+	if ($v < 641) {
+		$magicklib = '-lMagick';
+	} elsif ( `pkg-config --libs MagickCore` =~ /^(.+)$/ ) {
+		$magicklib = $1;
+	}
 }
 
 WriteMakefile(
 	NAME              => 'Prima::Image::Magick',
 	VERSION_FROM      => 'lib/Prima/Image/Magick.pm',
 	PREREQ_PM         => {
-		'Prima'		=> 1,
-		'Image::Magick' => 1,
+		'Prima'		=> 0,
+		'Image::Magick' => 0,
 	},
 	ABSTRACT_FROM     => 'lib/Prima/Image/Magick.pm',
 	AUTHOR            => 'Dmitry Karasik <dmitry@karasik.eu.org>',
-	LIBS              => [ "$l -l$libname" ],
+	LIBS              => [ "$l $magicklib" ],
 	DEFINE            => $d,
 	INC               => $i,
 	OBJECT            => "prima\$(OBJ_EXT) mag\$(OBJ_EXT) Magick\$(OBJ_EXT)",

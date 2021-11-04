@@ -10,7 +10,7 @@ use File::Spec;
 extends 'AnyEvent::FTP::Server::Context';
 
 # ABSTRACT: FTP server context that uses real file system (no transfers)
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::Auth';
@@ -307,7 +307,7 @@ AnyEvent::FTP::Server::Context::FS - FTP server context that uses real file syst
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

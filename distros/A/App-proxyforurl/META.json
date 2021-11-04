@@ -52,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/app-proxyforurl"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],

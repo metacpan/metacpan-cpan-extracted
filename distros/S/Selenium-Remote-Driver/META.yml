@@ -24,7 +24,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,100 +33,100 @@ name: Selenium-Remote-Driver
 provides:
   Selenium::ActionChains:
     file: lib/Selenium/ActionChains.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::CanStartBinary:
     file: lib/Selenium/CanStartBinary.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::CanStartBinary::FindBinary:
     file: lib/Selenium/CanStartBinary/FindBinary.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::CanStartBinary::ProbePort:
     file: lib/Selenium/CanStartBinary/ProbePort.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Chrome:
     file: lib/Selenium/Chrome.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Edge:
     file: lib/Selenium/Edge.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Firefox:
     file: lib/Selenium/Firefox.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Firefox::Binary:
     file: lib/Selenium/Firefox/Binary.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Firefox::Profile:
     file: lib/Selenium/Firefox/Profile.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::InternetExplorer:
     file: lib/Selenium/InternetExplorer.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::PhantomJS:
     file: lib/Selenium/PhantomJS.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::Commands:
     file: lib/Selenium/Remote/Commands.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::Driver:
     file: lib/Selenium/Remote/Driver.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::Driver::CanSetWebdriverContext:
     file: lib/Selenium/Remote/Driver/CanSetWebdriverContext.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::Driver::Firefox::Profile:
     file: lib/Selenium/Remote/Driver/Firefox/Profile.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::ErrorHandler:
     file: lib/Selenium/Remote/ErrorHandler.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::Finders:
     file: lib/Selenium/Remote/Finders.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::Mock::Commands:
     file: lib/Selenium/Remote/Mock/Commands.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::Mock::RemoteConnection:
     file: lib/Selenium/Remote/Mock/RemoteConnection.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::RemoteConnection:
     file: lib/Selenium/Remote/RemoteConnection.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::Spec:
     file: lib/Selenium/Remote/Spec.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::WDKeys:
     file: lib/Selenium/Remote/WDKeys.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Remote::WebElement:
     file: lib/Selenium/Remote/WebElement.pm
-    version: '1.44'
+    version: '1.45'
   Selenium::Waiter:
     file: lib/Selenium/Waiter.pm
-    version: '1.44'
+    version: '1.45'
   Test::Selenium::Chrome:
     file: lib/Test/Selenium/Chrome.pm
-    version: '1.44'
+    version: '1.45'
   Test::Selenium::Edge:
     file: lib/Test/Selenium/Edge.pm
-    version: '1.44'
+    version: '1.45'
   Test::Selenium::Firefox:
     file: lib/Test/Selenium/Firefox.pm
-    version: '1.44'
+    version: '1.45'
   Test::Selenium::InternetExplorer:
     file: lib/Test/Selenium/InternetExplorer.pm
-    version: '1.44'
+    version: '1.45'
   Test::Selenium::PhantomJS:
     file: lib/Test/Selenium/PhantomJS.pm
-    version: '1.44'
+    version: '1.45'
   Test::Selenium::Remote::Driver:
     file: lib/Test/Selenium/Remote/Driver.pm
-    version: '1.44'
+    version: '1.45'
   Test::Selenium::Remote::Role::DoesTesting:
     file: lib/Test/Selenium/Remote/Role/DoesTesting.pm
-    version: '1.44'
+    version: '1.45'
   Test::Selenium::Remote::WebElement:
     file: lib/Test/Selenium/Remote/WebElement.pm
-    version: '1.44'
+    version: '1.45'
 requires:
   Archive::Zip: '0'
   Carp: '0'
@@ -170,14 +170,14 @@ resources:
   bugtracker: https://github.com/teodesian/Selenium-Remote-Driver/issues
   homepage: https://github.com/teodesian/Selenium-Remote-Driver
   repository: https://github.com/teodesian/Selenium-Remote-Driver.git
-version: '1.44'
+version: '1.45'
 x_contributors:
   - 'Allen Lew <allen@alew.org>'
   - 'A.MacLeay <a.macleay@gmail.com>'
   - 'Andy Jack <andyjack@users.noreply.github.com>'
   - 'Andy Jack <github@veracity.ca>'
   - 'Bas Bloemsaat <bas@bloemsaat.com>'
-  - 'Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>'
+  - 'bernhard <Bernhard.Schmalhofer@gmx.de>'
   - 'Blake GH <blake@mobiusconsortium.org>'
   - 'Brian Horakh <brianh@zoovy.com>'
   - 'Charles Howes <charles.howes@globalrelay.net>'
@@ -221,5 +221,6 @@ x_contributors:
   - 'Viťas Strádal <vitas@matfyz.cz>'
   - 'Yuki Kimoto <kimoto.yuki@gmail.com>'
   - 'Yves Lavoie <ylavoie@yveslavoie.com>'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Apache-2.0

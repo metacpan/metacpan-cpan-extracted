@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/App/RcloneUtils.pm
+script/list-rclone-remotes
 script/parse-rclone-config
 t/00-compile.t
 t/author-critic.t

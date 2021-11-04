@@ -17,6 +17,7 @@ my @cases = (
     [ 'Br[C@@](N)(O)C', 'Br([C@@](N)(O)(C))', 'C([C@@](O)(N)(Br))' ],
     [ '[C@@](C)(Br)(O)N', '[C@@](C)(Br)(O)(N)', 'N([C@@](O)(Br)(C))' ],
     [ '[C@@](Br)(N)(O)C', '[C@@](Br)(N)(O)(C)', 'C([C@@](O)(N)(Br))' ],
+    [ 'C1OCC[C@]1(Cl)Br', 'C1(O(C(C([C@]1(Cl)(Br)))))', 'Br([C@@]1(Cl)(C(C(O(C1)))))' ],
 );
 
 plan tests => 2 * scalar @cases;

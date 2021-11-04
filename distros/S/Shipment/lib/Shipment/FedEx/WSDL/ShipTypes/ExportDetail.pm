@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ExportDetail;
-$Shipment::FedEx::WSDL::ShipTypes::ExportDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ExportDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               PermitNumber
               DestinationControlDetail
 
-              )
+            )
         ],
         {   'B13AFilingOption'          => \%B13AFilingOption_of,
             'ExportComplianceStatement' => \%ExportComplianceStatement_of,
@@ -74,7 +74,7 @@ Shipment::FedEx::WSDL::ShipTypes::ExportDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

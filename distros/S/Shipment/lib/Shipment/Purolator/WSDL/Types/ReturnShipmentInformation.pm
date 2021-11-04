@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ReturnShipmentInformation;
-$Shipment::Purolator::WSDL::Types::ReturnShipmentInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ReturnShipmentInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        NumberOfReturnShipments
               ReturnShipment
 
-              )
+            )
         ],
         {   'NumberOfReturnShipments' => \%NumberOfReturnShipments_of,
             'ReturnShipment'          => \%ReturnShipment_of,
@@ -63,7 +63,7 @@ Shipment::Purolator::WSDL::Types::ReturnShipmentInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

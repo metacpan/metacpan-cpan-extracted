@@ -241,8 +241,8 @@ Basque Spain locale.
 
 =head3 Narrow (format)
 
-  K.a.
-  K.o.
+  a
+  o
 
 =head2 Date Formats
 
@@ -416,6 +416,12 @@ Basque Spain locale.
    2008-02-05T18:30:30 = K.o. 2008. urteko ots. 5
    1995-12-22T09:05:02 = K.o. 1995. urteko abe. 22
   -0010-09-15T04:44:23 = K.a. -10. urteko ira. 15
+
+=head3 GyMd (GGGGG y-MM-dd)
+
+   2008-02-05T18:30:30 = o 2008-02-05
+   1995-12-22T09:05:02 = o 1995-12-22
+  -0010-09-15T04:44:23 = a -10-09-15
 
 =head3 H (HH)
 

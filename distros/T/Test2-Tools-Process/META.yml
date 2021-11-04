@@ -3,14 +3,14 @@ abstract: 'Unit tests for code that calls exit, exec, system or qx()'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   Test::More: '0.98'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,22 +20,22 @@ requires:
   Capture::Tiny: '0'
   Class::Tiny: '0'
   Ref::Util: '0'
-  Scope::Upper: '0'
+  Return::MultiLevel: '0'
   Test2::API: '1.302015'
-  Test2::Compare: '0.000060'
-  Test2::Compare::Array: '0.000060'
-  Test2::Compare::Custom: '0.000060'
-  Test2::Compare::Number: '0.000060'
-  Test2::Compare::String: '0.000060'
-  Test2::Compare::Wildcard: '0.000060'
-  Test2::Tools::Compare: '0.000060'
+  Test2::Compare: '0.000121'
+  Test2::Compare::Array: '0.000121'
+  Test2::Compare::Custom: '0.000121'
+  Test2::Compare::Number: '0.000121'
+  Test2::Compare::String: '0.000121'
+  Test2::Compare::Wildcard: '0.000121'
+  Test2::Tools::Compare: '0.000121'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/uperl/Test2-Tools-Process/issues
   homepage: https://metacpan.org/pod/Test2::Tools::Process
   repository: git://github.com/uperl/Test2-Tools-Process.git
-version: '0.05'
-x_generated_by_perl: v5.33.6
+version: '0.06'
+x_generated_by_perl: v5.35.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

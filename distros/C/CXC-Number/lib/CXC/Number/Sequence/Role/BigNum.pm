@@ -6,7 +6,7 @@ use feature ':5.24';
 
 use Moo::Role;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use experimental 'signatures';
 use namespace::clean;
@@ -43,7 +43,7 @@ CXC::Number::Sequence::Role::BigNum - Role to return Math::BigFloats from Sequen
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

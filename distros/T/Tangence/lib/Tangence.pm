@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2010 -- leonerd@leonerd.org.uk
 
-package Tangence 0.26;
+package Tangence 0.27;
 
-use v5.14;
+use v5.26;
 use warnings;
 
 # This package contains no code other than a declaration of the version.

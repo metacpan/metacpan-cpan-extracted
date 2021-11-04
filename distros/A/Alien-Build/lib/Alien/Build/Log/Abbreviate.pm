@@ -9,13 +9,13 @@ use File::chdir;
 use parent qw( Alien::Build::Log );
 
 # ABSTRACT: Log class for Alien::Build which is less verbose
-our $VERSION = '2.42'; # VERSION
+our $VERSION = '2.45'; # VERSION
 
 
 sub _colored
 {
   my($code, @out) = @_;
-  -t STDOUT ? Term::ANSIColor::_colored($code, @out) : @out;
+  -t STDOUT ? Term::ANSIColor::colored($code, @out) : @out;
 }
 
 my $root = path("$CWD");
@@ -65,7 +65,7 @@ Alien::Build::Log::Abbreviate - Log class for Alien::Build which is less verbose
 
 =head1 VERSION
 
-version 2.42
+version 2.45
 
 =head1 SYNOPSIS
 

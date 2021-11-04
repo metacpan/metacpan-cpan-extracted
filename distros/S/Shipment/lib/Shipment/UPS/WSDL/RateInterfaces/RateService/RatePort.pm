@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateInterfaces::RateService::RatePort;
-$Shipment::UPS::WSDL::RateInterfaces::RateService::RatePort::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateInterfaces::RateService::RatePort::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -30,7 +30,7 @@ sub ProcessRate {
     die "ProcessRate must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ProcessRate',
+        {   operation   => 'ProcessRate',
             soap_action =>
               'http://onlinetools.ups.com/webservices/RateBinding/v1.1',
             style => 'document',
@@ -40,7 +40,7 @@ sub ProcessRate {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::RateElements::RateRequest )],
             },
             header => {
@@ -48,7 +48,7 @@ sub ProcessRate {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::RateElements::UPSSecurity )],
 
             },
@@ -65,7 +65,7 @@ sub ProcessRate {
                     'use'         => 'literal',
                     namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                     encodingStyle => '',
-                    parts =>
+                    parts         =>
                       [qw( Shipment::UPS::WSDL::RateElements::RateResponse )],
                 },
             }
@@ -116,7 +116,7 @@ Shipment::UPS::WSDL::RateInterfaces::RateService::RatePort
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

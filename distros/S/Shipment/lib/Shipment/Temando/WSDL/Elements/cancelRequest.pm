@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::cancelRequest;
-$Shipment::Temando::WSDL::Elements::cancelRequest::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::cancelRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ use warnings;
             [   qw(        requestId
                   reference
 
-                  )
+                )
             ],
             {   'requestId' => \%requestId_of,
                 'reference' => \%reference_of,
@@ -81,7 +81,7 @@ Shipment::Temando::WSDL::Elements::cancelRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

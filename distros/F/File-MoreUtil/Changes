@@ -1,3 +1,8 @@
+0.625   2021-10-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add functions: dir_not_empty() and its alias dir_has_entries().
+
+
 0.624   2020-05-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- Add functions: dir_has_non_subdirs, get_dir_non_subdirs.

@@ -13,6 +13,7 @@ bin/knights_tour.pl
 cgi-bin/hc.cgi
 dist.ini
 hamilton.ini
+junk/Build
 lib/Graph/Undirected/Hamiltonicity.pm
 lib/Graph/Undirected/Hamiltonicity.pod
 lib/Graph/Undirected/Hamiltonicity/Output.pm

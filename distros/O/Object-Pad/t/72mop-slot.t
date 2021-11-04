@@ -18,6 +18,7 @@ my $classmeta = Object::Pad::MOP::Class->for_class( "Example" );
 my $slotmeta = $classmeta->get_slot( '$slot' );
 
 is( $slotmeta->name, "\$slot", '$slotmeta->name' );
+is( $slotmeta->sigil, "\$", '$slotmeta->sigil' );
 is( $slotmeta->class->name, "Example", '$slotmeta->class gives class' );
 
 is_deeply( [ $classmeta->slots ], [ $slotmeta ],

@@ -13,8 +13,8 @@
 package Config::Generator::Util;
 use strict;
 use warnings;
-our $VERSION  = "1.0";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.12 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "1.1";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.13 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -46,7 +46,11 @@ sub format_profile (@) {
         $name = shift(@list);
         $value = shift(@list);
         if ($name eq "#") {
-            $contents .= "# $value\n";
+            if (length($value)) {
+                $contents .= "# $value\n";
+            } else {
+                $contents .= "#\n";
+            }
         } else {
             $contents .= "export $name=\"$value\"\n";
         }

@@ -55,6 +55,6 @@
          "web" : "https://github.com/FractalBoy/perl-language-server"
       }
    },
-   "version" : "0.896",
+   "version" : "0.897",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

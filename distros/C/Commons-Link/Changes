@@ -1,0 +1,6 @@
+0.02 2021-11-03T17:50:53+01:00
+ - Fix abstract.
+ - Regen examples/ex2.pl example.
+
+0.01 2021-11-03T17:25:35+01:00
+ - First version.

@@ -1,0 +1,25 @@
+Revision history for FindApp
+
+0.0.6   2021-11-01 09:46:40 -0600 (MDT)
+  - Quote the $VERSION v-string so it can be indexed 
+    properly by the toolchain and placed on metacpan &c.
+  - Don't return lists in random hash traversal order that
+    changes between test runs.
+  - Fiddle with the tests to get them to run more modernly,
+    including without dot in libpath
+
+0.0.5   Fri Nov 11 13:49:36 MST 2016
+  - Remove the Carp::Always import accidentally
+    left in FindApp::Vars that was being used for
+    temporary debugging.
+
+0.0.4   Sun Nov  6 14:09:51 MST 2016
+  - Add work-arounds for Env.pm bugs triggering warnings when 
+    expanding @WHATEVER variables that are originally undefined
+    in %ENV.
+
+0.0.3   Sat Nov  5 19:23:47 MDT 2016
+  - Remove dependency on manpath program.
+
+0.0.2   Wed Aug  3 22:07:35 MDT 2016
+  - Corrected prototype clobbering of foreign utils.

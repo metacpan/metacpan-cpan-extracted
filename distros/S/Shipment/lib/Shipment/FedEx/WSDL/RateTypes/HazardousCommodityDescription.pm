@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::HazardousCommodityDescription;
-$Shipment::FedEx::WSDL::RateTypes::HazardousCommodityDescription::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::HazardousCommodityDescription::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               SubsidiaryClasses
               LabelText
 
-              )
+            )
         ],
         {   'Id'                 => \%Id_of,
             'PackingGroup'       => \%PackingGroup_of,
@@ -49,7 +49,7 @@ Class::Std::initialize();
             'SubsidiaryClasses'  => \%SubsidiaryClasses_of,
             'LabelText'          => \%LabelText_of,
         },
-        {   'Id' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'Id'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'PackingGroup' =>
               'Shipment::FedEx::WSDL::RateTypes::HazardousCommodityPackingGroupType',
             'ProperShippingName' =>
@@ -88,7 +88,7 @@ Shipment::FedEx::WSDL::RateTypes::HazardousCommodityDescription
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

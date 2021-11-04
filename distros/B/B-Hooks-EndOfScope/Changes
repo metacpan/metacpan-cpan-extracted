@@ -1,5 +1,8 @@
 Revision history for B-Hooks-EndOfScope
 
+0.25      2021-10-10 19:34:55Z
+  - add test of dieing inside an on_scope_end() (PR#8)
+
 0.24      2018-04-21 14:11:08Z
   - no changes since last trial release
 

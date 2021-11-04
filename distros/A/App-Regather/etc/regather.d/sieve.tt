@@ -19,6 +19,6 @@
 [% END -%]
 #
 
-[% mu_sieveOnReceive %]
+[% mu_sieveOnReceive.remove('\r') %]
 
 # End of script

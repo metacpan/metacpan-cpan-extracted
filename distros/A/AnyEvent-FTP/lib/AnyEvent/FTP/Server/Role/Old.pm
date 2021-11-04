@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Role for old archaic FTP server commands
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 has syst => (
@@ -59,7 +59,7 @@ AnyEvent::FTP::Server::Role::Old - Role for old archaic FTP server commands
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

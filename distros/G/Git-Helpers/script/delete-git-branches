@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Options;
-our $VERSION = '1.000000';
+our $VERSION = '1.000001';
 use Moo;
 use MooX::Options;
 
@@ -26,7 +26,7 @@ our $VERSION = '0.000022';
 use Capture::Tiny qw( capture );
 use Git::Sub;
 use String::Trim qw( trim );
-use Term::Choose ();
+use Term::Choose 1.743 ();
 
 ## no critic (ControlStructures::ProhibitMutatingListFunctions)
 
@@ -46,7 +46,7 @@ if ( $options->grep ) {
 my $term  = Term::Choose->new;
 my @reply = $term->choose(
     \@branches,
-    { layout => 3, prompt => 'Which branch(es) would you like to delete?', }
+    { layout => 2, prompt => 'Which branch(es) would you like to delete?', }
 );
 
 for my $branch (@reply) {
@@ -110,7 +110,7 @@ delete-git-branches - Interactively delete git branches
 
 =head1 VERSION
 
-version 1.000000
+version 1.000001
 
 =head1 SYNOPSIS
 

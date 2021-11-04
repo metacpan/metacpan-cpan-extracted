@@ -4,7 +4,7 @@ use 5.010001;
 
 package RT::Extension::REST2;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 our $REST_PATH = '/REST/2.0';
 
 use Plack::Builder;
@@ -15,6 +15,13 @@ use RT::Extension::REST2::Dispatcher;
 =head1 NAME
 
 RT::Extension::REST2 - Adds a modern REST API to RT under /REST/2.0/
+
+=head1 RT VERSION
+
+Works with RT 4.4.
+
+REST2 is core in RT 5.0.0 and later, so you do not need this extension
+for those versions.
 
 =head1 INSTALLATION
 

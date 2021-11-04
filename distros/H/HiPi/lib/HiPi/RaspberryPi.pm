@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.83';
+our $VERSION ='0.86';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
@@ -223,7 +223,7 @@ my %_revinfostash = (
         '15' => 'UNKNOWN Rasberry Pi Model 15',         # 0F
         '16' => 'Raspberry Pi Compute Module 3 Plus',   # 10
         '17' => 'Raspberry Pi 4 Model B',               # 11
-        '18' => 'UNKNOWN Rasberry Pi Model 18',         # 12
+        '18' => 'Raspberry Pi Zero 2',                  # 12
         '19' => 'Raspberry Pi Model 400',               # 13
         '20' => 'Raspberry Pi Compute Module 4',        # 14
     },
@@ -269,7 +269,7 @@ my %_revinfostash = (
         '15' => 'unknown',
         '16' => 'Q1 2019',
         '17' => 'Q2 2019',
-        '18' => 'unknown',
+        '18' => 'Q4 2021',
         '19' => 'Q4 2020',
         '20' => 'Q4 2020',
     },
@@ -420,7 +420,7 @@ sub _configure {
             $binfo->{revisionnumber} = $schemerev;
             
             $israspberry2 = ( $schemetype == 4 ) ? 1 : 0;
-            $israspberry3 = ( $schemetype == 8 || $schemetype == 10 || $schemetype == 13 || $schemetype == 14 || $schemetype == 16 ) ? 1 : 0;
+            $israspberry3 = ( $schemetype == 8 || $schemetype == 10 || $schemetype == 13 || $schemetype == 14 || $schemetype == 16 || $schemetype == 18 ) ? 1 : 0;
             $israspberry4 = ( $schemetype == 17 ) ? 1 : 0;
             
             $_config = { %$binfo };

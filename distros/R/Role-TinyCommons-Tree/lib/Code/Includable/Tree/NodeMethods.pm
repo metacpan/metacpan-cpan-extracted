@@ -1,11 +1,12 @@
 package Code::Includable::Tree::NodeMethods;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-02'; # DATE
-our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.127'; # VERSION
-
 use strict;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-07'; # DATE
+our $DIST = 'Role-TinyCommons-Tree'; # DIST
+our $VERSION = '0.128'; # VERSION
+
 our $IGNORE_NO_CHILDREN_METHOD = 1;
 
 our $GET_PARENT_METHOD = 'parent';
@@ -96,7 +97,7 @@ sub first_node {
     for (descendants($self)) {
         return $_ if $code->($_);
     }
-    undef;
+    undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 }
 
 sub is_first_child {
@@ -186,7 +187,7 @@ sub is_nth_last_child_of_type {
 
 sub prev_sibling {
     my $self = shift;
-    my $parent = $self->$GET_PARENT_METHOD or return undef;
+    my $parent = $self->$GET_PARENT_METHOD or return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     my $refaddr = Scalar::Util::refaddr($self);
     my @siblings = _children_as_list($parent);
     for my $i (1..$#siblings) {
@@ -194,7 +195,7 @@ sub prev_sibling {
             return $siblings[$i-1];
         }
     }
-    undef;
+    undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 }
 
 sub prev_siblings {
@@ -212,7 +213,7 @@ sub prev_siblings {
 
 sub next_sibling {
     my $self = shift;
-    my $parent = $self->$GET_PARENT_METHOD or return undef;
+    my $parent = $self->$GET_PARENT_METHOD or return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     my $refaddr = Scalar::Util::refaddr($self);
     my @siblings = _children_as_list($parent);
     for my $i (0..$#siblings-1) {
@@ -220,7 +221,7 @@ sub next_sibling {
             return $siblings[$i+1];
         }
     }
-    undef;
+    undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 }
 
 sub next_siblings {
@@ -318,7 +319,7 @@ Code::Includable::Tree::NodeMethods - Tree node routines
 
 =head1 VERSION
 
-This document describes version 0.127 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2021-07-02.
+This document describes version 0.128 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2021-10-07.
 
 =head1 DESCRIPTION
 
@@ -504,15 +505,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Role-TinyC
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Tree>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tree>.
 
 =head1 SEE ALSO
 
@@ -523,11 +516,36 @@ module via consuming role.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Tree>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

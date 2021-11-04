@@ -2,9 +2,9 @@ Build.PL
 Changes
 inc/Alien/make/Module/Build.pm
 lib/Alien/libvterm.pm
-libvterm-0.1.4.tar.gz
-MANIFEST			This list of files
-README
+libvterm-0.2.tar.gz
 LICENSE
-META.yml
+MANIFEST			This list of files
 META.json
+META.yml
+README

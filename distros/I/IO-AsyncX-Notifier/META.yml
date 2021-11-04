@@ -1,0 +1,45 @@
+---
+abstract: 'Combining IO::Async::Notifier with Object::Pad'
+author:
+  - 'Tom Molesworth <TEAM@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Ryu::Observable: '3.000'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-AsyncX-Notifier
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  IO::AsyncX::Notifier:
+    file: lib/IO/AsyncX/Notifier.pm
+    version: '0.001'
+requires:
+  IO::Async::Notifier: '0.79'
+  Object::Pad: '0.55'
+resources:
+  bugtracker: https://github.com/team-at-cpan/IO-AsyncX-Notifier/issues
+  homepage: https://github.com/team-at-cpan/IO-AsyncX-Notifier
+  repository: https://github.com/team-at-cpan/IO-AsyncX-Notifier.git
+version: '0.001'
+x_authority: cpan:TEAM
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::LabelSpecification;
-$Shipment::FedEx::WSDL::RateTypes::LabelSpecification::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::LabelSpecification::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               PrintedLabelOrigin
               CustomerSpecifiedDetail
 
-              )
+            )
         ],
         {   'LabelFormatType'          => \%LabelFormatType_of,
             'ImageType'                => \%ImageType_of,
@@ -93,7 +93,7 @@ Shipment::FedEx::WSDL::RateTypes::LabelSpecification
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

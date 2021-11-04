@@ -11,7 +11,3 @@ See INSTALL for instructions on building and installing and
 dependencies on external libraries. In brief, you need only
 a standard PDL installation and lapack and blas shared
 libraries and headers.
-
-Note: pdlscantree.pl was removed because it confuses CPAN
-See ./pdlscantree.pl in this directory for installing online pdl docs.
-It is modified a bit from the one supplied in PDL 2.4.2.

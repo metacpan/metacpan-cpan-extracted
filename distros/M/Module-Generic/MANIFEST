@@ -1,5 +1,4 @@
 CHANGES
-Changes
 CONTRIBUTING.md
 lib/Module/Generic.pm
 lib/Module/Generic/Array.pm
@@ -22,6 +21,7 @@ lib/Module/Generic/Null.pm
 lib/Module/Generic/Null.pod
 lib/Module/Generic/Number.pm
 lib/Module/Generic/Number.pod
+lib/Module/Generic/RegexpCapture.pod
 lib/Module/Generic/Scalar.pm
 lib/Module/Generic/Scalar.pod
 lib/Module/Generic/Scalar/IO.pod

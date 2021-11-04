@@ -4,7 +4,6 @@ author:
   - 'José Joaquín Atria <jjatria@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  File::Share: '0.03'
   File::Spec: '0'
   Test2::Tools::Spec: '0'
   Test2::V0: '0'
@@ -31,32 +30,20 @@ no_index:
 provides:
   Config::AWS:
     file: lib/Config/AWS.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Exporter::Tiny: '1'
-  File::Glob: '0'
   Path::Tiny: '0.076'
   Ref::Util: '0'
   perl: '5.010'
 resources:
   bugtracker: https://gitlab.com/jjatria/Config-AWS/issues
   repository: git://gitlab.com/jjatria/Config-AWS.git
-version: '0.09'
+version: '0.10'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
   plugins:
-    -
-      class: Dist::Zilla::Plugin::NextRelease
-      name: NextRelease
-      version: '6.020'
-    -
-      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
-      config:
-        Dist::Zilla::Role::FileWatcher:
-          version: '0.006'
-      name: MarkdownInBuild
-      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -155,7 +142,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0
+          git_version: 2.33.1
           repo_root: .
       name: '@Starter::Git/Git::Check'
       version: '2.047'
@@ -216,7 +203,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0
+          git_version: 2.33.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -229,11 +216,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.09
+          tag: v0.10
           tag_format: v%v
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0
+          git_version: 2.33.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -265,7 +252,7 @@ x_Dist_Zilla:
             - (?^:^)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0
+          git_version: 2.33.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -320,6 +307,21 @@ x_Dist_Zilla:
       name: '@Starter::Git/ExecDir'
       version: '6.020'
     -
+      class: Dist::Zilla::Plugin::StaticInstall
+      config:
+        Dist::Zilla::Plugin::StaticInstall:
+          dry_run: 0
+          mode: on
+      name: StaticInstall
+      version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: MarkdownInBuild
+      version: '0.163250'
+    -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
       version: '1.006'
@@ -339,7 +341,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.32.0
+          git_version: 2.33.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -395,6 +397,9 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.020'
+x_contributors:
+  - 'James Raspass <jraspass@gmail.com>'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

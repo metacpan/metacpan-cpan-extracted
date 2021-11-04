@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::SenderInformation;
-$Shipment::Purolator::WSDL::Types::SenderInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::SenderInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Address
               TaxNumber
 
-              )
+            )
         ],
         {   'Address'   => \%Address_of,
             'TaxNumber' => \%TaxNumber_of,
@@ -61,7 +61,7 @@ Shipment::Purolator::WSDL::Types::SenderInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackStatusDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackStatusDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackStatusDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Location
               AncillaryDetails
 
-              )
+            )
         ],
         {   'CreationTime'     => \%CreationTime_of,
             'Code'             => \%Code_of,
@@ -77,7 +77,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackStatusDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

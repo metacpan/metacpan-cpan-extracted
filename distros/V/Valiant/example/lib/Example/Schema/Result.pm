@@ -7,6 +7,7 @@ use base 'DBIx::Class';
 
 __PACKAGE__->load_components(qw/
   Valiant::Result
+  BcryptColumn
   Core
   InflateColumn::DateTime/);
 

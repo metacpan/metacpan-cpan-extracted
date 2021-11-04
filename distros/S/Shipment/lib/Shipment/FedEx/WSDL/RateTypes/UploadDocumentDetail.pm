@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail;
-$Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               FileName
               DocumentContent
 
-              )
+            )
         ],
         {   'LineNumber'        => \%LineNumber_of,
             'CustomerReference' => \%CustomerReference_of,
@@ -49,11 +49,11 @@ Class::Std::initialize();
         {   'LineNumber' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'CustomerReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DocumentProducer' =>
+            'DocumentProducer'  =>
               'Shipment::FedEx::WSDL::RateTypes::UploadDocumentProducerType',
             'DocumentType' =>
               'Shipment::FedEx::WSDL::RateTypes::UploadDocumentType',
-            'FileName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'FileName'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'DocumentContent' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
         },
@@ -85,7 +85,7 @@ Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

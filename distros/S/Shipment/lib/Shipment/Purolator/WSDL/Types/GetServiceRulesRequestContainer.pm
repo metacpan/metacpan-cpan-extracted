@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::GetServiceRulesRequestContainer;
-$Shipment::Purolator::WSDL::Types::GetServiceRulesRequestContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::GetServiceRulesRequestContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               SenderAddress
               ReceiverAddress
 
-              )
+            )
         ],
         {   'BillingAccountNumber' => \%BillingAccountNumber_of,
             'SenderAddress'        => \%SenderAddress_of,
@@ -73,7 +73,7 @@ Shipment::Purolator::WSDL::Types::GetServiceRulesRequestContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::CloseDocumentSpecification;
-$Shipment::FedEx::WSDL::CloseTypes::CloseDocumentSpecification::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::CloseDocumentSpecification::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        CloseDocumentTypes
               Op950Detail
 
-              )
+            )
         ],
         {   'CloseDocumentTypes' => \%CloseDocumentTypes_of,
             'Op950Detail'        => \%Op950Detail_of,
@@ -62,7 +62,7 @@ Shipment::FedEx::WSDL::CloseTypes::CloseDocumentSpecification
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -47,6 +47,9 @@ do { my $x = {
                                       'strict' => '0',
                                       'utf8' => '0',
                                       'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'Business::ISBN' => '3.005'
                                     }
                     },
        'test' => {

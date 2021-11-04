@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::DeleteShipmentRequest;
-$Shipment::FedEx::WSDL::ShipTypes::DeleteShipmentRequest::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::DeleteShipmentRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               TrackingId
               DeletionControl
 
-              )
+            )
         ],
         {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
             'ClientDetail'            => \%ClientDetail_of,
@@ -89,7 +89,7 @@ Shipment::FedEx::WSDL::ShipTypes::DeleteShipmentRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

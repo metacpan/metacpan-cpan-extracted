@@ -58,7 +58,9 @@ t/04king-shift.t
 t/04legal-moves.t
 t/04material.t
 t/04move-generator.t
+t/04move-gives-check.t
 t/04move-legal.t
+t/04pseudo-legal-attacks.t
 t/04see.t
 t/04zobrist-keys.t
 t/05bugs.t
@@ -67,6 +69,10 @@ t/05perft-by-copy.t
 t/05perft-by-undo.t
 t/11evaluate-compare.t
 t/11evaluate-move.t
+t/20draw-detection.t
+t/20evaluate-pesto.t
+t/20evaluate-update.t
+t/20game-phase.t
 t/20transposition-table.t
 t/30dm1-epd.t
 t/30dm2-epd.t

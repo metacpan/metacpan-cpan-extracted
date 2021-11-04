@@ -63,7 +63,7 @@
       },
       "urpmi" : {
          "file" : "urpmi.pm",
-         "version" : "v8.126.0"
+         "version" : "v8.127.0"
       }
    },
    "release_status" : "stable",
@@ -71,9 +71,9 @@
       "repository" : {
          "type" : "git",
          "url" : "git://git.mageia.org/software/rpm/urpmi/",
-         "web" : "http://gitweb.mageia.org/software/rpm/urpmi/"
+         "web" : "https://gitweb.mageia.org/software/rpm/urpmi/"
       }
    },
-   "version" : "v8.126",
+   "version" : "v8.127",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

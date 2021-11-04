@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Registry 0.26;
+use v5.26;
+use Object::Pad 0.51;
 
-use v5.14;
-use warnings;
-use base qw( Tangence::Object );
+package Tangence::Registry 0.27;
+class Tangence::Registry isa Tangence::Object;
 
 use Carp;
 
@@ -75,33 +75,33 @@ connections to that server.
 
 =cut
 
-sub new
+sub BUILDARGS ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
-   my $tanfile = $args{tanfile};
-   croak "Expected 'tanfile'" unless defined $tanfile;
-
-   my $id = 0;
-
-   my $self = $class->SUPER::new(
-      id => $id,
+   return (
+      id => 0,
       registry => "BOOTSTRAP",
       meta => Tangence::Class->for_perlname( $class ),
+      %args,
    );
+}
+
+has $_nextid = 1;
+has @_freeids;
+has %_objects;
+
+ADJUST
+{
+   my $id = 0;
    weaken( $self->{registry} = $self );
 
-   $self->{objects} = { $id => $self };
-   weaken( $self->{objects}{$id} );
+   %_objects = ( $id => $self );
+   weaken( $_objects{$id} );
    $self->add_prop_objects( $id => $self->describe );
+}
 
-   $self->{nextid}  = 1;
-   $self->{freeids} = []; # free'd ids we can reuse
-
-   $self->load_tanfile( $tanfile );
-
-   return $self;
+ADJUSTPARAMS ( $params )
+{
+   $self->load_tanfile( delete $params->{tanfile} );
 }
 
 =head1 METHODS
@@ -118,18 +118,13 @@ This method is exposed to clients.
 
 =cut
 
-sub get_by_id
+method get_by_id ( $id )
 {
-   my $self = shift;
-   my ( $id ) = @_;
-
-   return $self->{objects}->{$id};
+   return $_objects{$id};
 }
 
-sub method_get_by_id
+method method_get_by_id ( $ctx, $id )
 {
-   my $self = shift;
-   my ( $ctx, $id ) = @_;
    return $self->get_by_id( $id );
 }
 
@@ -142,12 +137,9 @@ additional arguments are passed to the object's constructor.
 
 =cut
 
-sub construct
+method construct ( $type, @args )
 {
-   my $self = shift;
-   my ( $type, @args ) = @_;
-
-   my $id = shift @{ $self->{freeids} } || ( $self->{nextid}++ );
+   my $id = shift @_freeids // ( $_nextid++ );
 
    Tangence::Class->for_perlname( $type ) or
       croak "Registry cannot construct a '$type' as no class definition exists";
@@ -163,26 +155,23 @@ sub construct
 
    $self->fire_event( "object_constructed", $id );
 
-   weaken( $self->{objects}->{$id} = $obj );
+   weaken( $_objects{$id} = $obj );
    $self->add_prop_objects( $id => $obj->describe );
 
    return $obj;
 }
 
-sub destroy_object
+method destroy_object ( $obj )
 {
-   my $self = shift;
-   my ( $obj ) = @_;
-
    my $id = $obj->id;
 
-   exists $self->{objects}->{$id} or croak "Cannot destroy ID $id - does not exist";
+   exists $_objects{$id} or croak "Cannot destroy ID $id - does not exist";
 
    $self->del_prop_objects( $id );
 
    $self->fire_event( "object_destroyed", $id );
 
-   push @{ $self->{freeids} }, $id; # Recycle the ID
+   push @_freeids, $id; # Recycle the ID
 }
 
 =head2 load_tanfile
@@ -194,41 +183,33 @@ file.
 
 =cut
 
-sub load_tanfile
+method load_tanfile ( $tanfile )
 {
-   my $self = shift;
-   my ( $tanfile ) = @_;
-
    # Merely constructing this has the side-effect of declaring all the classes
    Tangence::Registry::Parser->new->from_file( $tanfile );
 }
 
-package # hide from CPAN
-   Tangence::Registry::Parser;
-use base qw( Tangence::Compiler::Parser );
-
-sub make_class
+class Tangence::Registry::Parser isa Tangence::Compiler::Parser
 {
-   my $self = shift;
-   return Tangence::Class->new( @_ );
-}
+   method make_class
+   {
+      return Tangence::Class->make( @_ );
+   }
 
-sub make_struct
-{
-   my $self = shift;
-   return Tangence::Struct->new( @_ );
-}
+   method make_struct
+   {
+      return Tangence::Struct->make( @_ );
+   }
 
-sub make_property
-{
-   my $self = shift;
-   return Tangence::Property->new( @_ );
-}
+   method make_property
+   {
+      return Tangence::Property->new( @_ );
+   }
 
-sub make_type
-{
-   my $self = shift;
-   return Tangence::Type->new( @_ );
+   method make_type
+   {
+      return Tangence::Type->make( @_ );
+   }
 }
 
 =head1 AUTHOR

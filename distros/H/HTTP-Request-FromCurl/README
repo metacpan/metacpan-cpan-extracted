@@ -34,9 +34,8 @@ L<https://perlmonks.org/>.
 
 BUG TRACKER
 
-Please report bugs in this module via the RT CPAN bug queue at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Request-FromCurl>
-or via mail to L<filter-signatures-Bugs@rt.cpan.org>.
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/HTTP-Request-FromCurl/issues>
 
 
 SEE ALSO
@@ -65,4 +64,4 @@ This module is released under the same terms as Perl itself.
 
 COPYRIGHT (c)
 
-Copyright 2018-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2021 by Max Maischein C<corion@cpan.org>.

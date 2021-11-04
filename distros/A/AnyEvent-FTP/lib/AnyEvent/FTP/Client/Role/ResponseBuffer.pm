@@ -7,7 +7,7 @@ use Moo::Role;
 use AnyEvent::FTP::Client::Response;
 
 # ABSTRACT: Response buffer role for asynchronous ftp client
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 sub on_next_response
@@ -68,7 +68,7 @@ AnyEvent::FTP::Client::Role::ResponseBuffer - Response buffer role for asynchron
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 DESCRIPTION
 

@@ -18,14 +18,9 @@ urpm::lock - urpm/rpm DB locking related routines for urpmi
 
 =head1 DESCRIPTION
 
+=head1 CLASS FUNCTIONS
+
 =over
-
-=cut 
-
-
-################################################################################
-#- class functions
-
 
 =item rpm_db($urpm, $b_exclusive, %options)
 
@@ -58,11 +53,29 @@ sub urpmi_db {
     urpm::lock->new($urpm, "$urpm->{statedir}/.LOCK", 'urpmi', $b_exclusive, %options);
 }
 
+=back
 
-################################################################################
-#- methods
+=head1 METHODS
 
-# (options: nofatal, wait)
+=over
+
+=item new($_class, $urpm, $file, $db_name, $b_exclusive, %options)
+
+Create a new lock.
+You don't want to use it directly. Either use urpmi_db() or rpm_db().
+
+Options:
+
+=over 4
+
+=item * nofatal
+
+=item * wait
+
+=back
+
+=cut
+
 sub new {
     my ($_class, $urpm, $file, $db_name, $b_exclusive, %options) = @_;
     
@@ -120,6 +133,14 @@ sub _lock {
     $lock->{locked} = 1;
     $lock->{exclusive} = $b_exclusive;
 }
+
+
+=item unlock($lock)
+
+Free a lock.
+
+=cut
+
 
 sub unlock {
     my ($lock) = @_;

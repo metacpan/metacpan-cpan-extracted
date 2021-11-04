@@ -26,7 +26,7 @@ our $galleries_dir = "$server->{wiki_dir}/galleries";
 our $galleries_host = "localhost";
 EOF
 
-plan skip_all => 'Contributions are an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
+plan skip_all => 'This is an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
 
 require './t/test.pl';
 

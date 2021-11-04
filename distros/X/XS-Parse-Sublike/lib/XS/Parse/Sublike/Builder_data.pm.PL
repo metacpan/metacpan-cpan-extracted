@@ -22,7 +22,7 @@ $outh->print( scalar do {
    <$in_h> } );
 
 __DATA__
-package XS::Parse::Sublike::Builder_data 0.13;
+package XS::Parse::Sublike::Builder_data 0.14;
 
 use v5.14;
 use warnings;

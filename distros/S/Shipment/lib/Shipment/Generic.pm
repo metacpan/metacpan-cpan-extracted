@@ -1,5 +1,5 @@
 package Shipment::Generic;
-$Shipment::Generic::VERSION = '3.05';
+$Shipment::Generic::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -13,7 +13,7 @@ sub _build_services {
             id   => 'generic',
             name => 'Generic Service',
         ),
-    };
+    }
 }
 
 
@@ -44,7 +44,7 @@ sub ship {
     if (!$tracking_id) {
         foreach (@{$self->packages}) {
             $tracking_id = $_->tracking_id if $_->tracking_id;
-            last if $_->tracking_id;
+            last                           if $_->tracking_id;
         }
     }
 
@@ -115,7 +115,7 @@ Shipment::Generic
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

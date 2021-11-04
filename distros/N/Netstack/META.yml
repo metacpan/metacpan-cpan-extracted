@@ -3,7 +3,7 @@ abstract: 'Network automation development toolkit'
 author:
   - 'WENWU YAN <968826@gmail.com>'
 build_requires:
-  Mojo::Util: '0'
+  DDP: '0'
   Test::Simple: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -20,6 +20,7 @@ requires:
   Digest::MD5: '0'
   Expect: '0'
   Mail::Sender: '0'
+  Mojo::Util: '0'
   Moose: '0'
   Moose::Role: '0'
   POSIX: '0'
@@ -31,7 +32,7 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: '0.015'
+version: '0.019'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: BSD

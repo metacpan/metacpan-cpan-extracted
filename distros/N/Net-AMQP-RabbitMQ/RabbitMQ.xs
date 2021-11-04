@@ -30,6 +30,7 @@
 /* perl Makefile.PL; make CCFLAGS=-DDEBUG */
 #if DEBUG
  #define __DEBUG__(X)  X
+ extern void dump_table(amqp_table_t table);
 #else
  #define __DEBUG__(X) /* NOOP */
 #endif
@@ -1134,10 +1135,11 @@ BOOT:
   PERL_MATH_INT64_LOAD_OR_CROAK;
 
 int
-net_amqp_rabbitmq_connect(conn, hostname, options)
+net_amqp_rabbitmq_connect(conn, hostname, options, client_properties = NULL)
   Net::AMQP::RabbitMQ conn
   char *hostname
   HV *options
+  HV *client_properties
   PREINIT:
     amqp_socket_t *sock;
     char *user = "guest";
@@ -1158,6 +1160,7 @@ net_amqp_rabbitmq_connect(conn, hostname, options)
     int ssl_init = 1;
     char *sasl_method = "plain";
     amqp_sasl_method_enum sasl_type = AMQP_SASL_METHOD_PLAIN;
+    amqp_table_t client_properties_tbl = amqp_empty_table;
   CODE:
     str_from_hv(options, user);
     str_from_hv(options, password);
@@ -1175,6 +1178,11 @@ net_amqp_rabbitmq_connect(conn, hostname, options)
     int_from_hv(options, ssl_verify_host);
     int_from_hv(options, ssl_init);
     str_from_hv(options, sasl_method);
+
+    if(client_properties)
+    {
+      hash_to_amqp_table(client_properties, &client_properties_tbl, 1);
+    }
 
     if(timeout >= 0) {
      to.tv_sec = floor(timeout);
@@ -1229,7 +1237,7 @@ net_amqp_rabbitmq_connect(conn, hostname, options)
     }
 
     die_on_error(aTHX_ amqp_socket_open_noblock(sock, hostname, port, (timeout<0)?NULL:&to), conn, "opening socket");
-    die_on_amqp_error(aTHX_ amqp_login(conn, vhost, channel_max, frame_max, heartbeat, sasl_type, user, password), conn, "Logging in");
+    die_on_amqp_error(aTHX_ amqp_login_with_properties(conn, vhost, channel_max, frame_max, heartbeat, &client_properties_tbl, sasl_type, user, password), conn, "Logging in");
 
     maybe_release_buffers(conn);
 
@@ -1286,17 +1294,25 @@ net_amqp_rabbitmq_exchange_declare(conn, channel, exchange, options = NULL, args
     {
       hash_to_amqp_table(args, &arguments, 1);
     }
-    amqp_exchange_declare(
-      conn,
-      channel,
-      amqp_cstring_bytes(exchange),
-      amqp_cstring_bytes(exchange_type),
-      passive,
-      (amqp_boolean_t)durable,
-      (amqp_boolean_t)auto_delete,
-      (amqp_boolean_t)internal,
-      arguments
+    __DEBUG__(
+      warn("%d: amqp_declare_exchange with channel:%d, exchange:%s, and exchange_type:%s\n",
+        __LINE__,
+        channel,
+        exchange,
+        exchange_type
+      );
+      dump_table(arguments);
     );
+    amqp_exchange_declare(
+        conn,
+        channel,
+        amqp_cstring_bytes(exchange),
+        amqp_cstring_bytes(exchange_type),
+        passive,
+        (amqp_boolean_t)durable,
+        (amqp_boolean_t)auto_delete,
+        (amqp_boolean_t)internal,
+        arguments);
     maybe_release_buffers(conn);
     die_on_amqp_error(aTHX_ amqp_get_rpc_reply(conn), conn, "Declaring exchange");
 
@@ -1925,6 +1941,60 @@ net_amqp_rabbitmq_tx_rollback(conn, channel, args = NULL)
   CODE:
     amqp_tx_rollback(conn, channel);
     die_on_amqp_error(aTHX_ amqp_get_rpc_reply(conn), conn, "Rolling Back transaction");
+
+SV* net_amqp_rabbitmq_get_rpc_timeout(conn)
+  Net::AMQP::RabbitMQ conn
+  PREINIT:
+    struct timeval *timeout_tv;
+    HV *output;
+  CODE:
+    timeout_tv = amqp_get_rpc_timeout(conn);
+    if (timeout_tv == NULL) {
+      __DEBUG__( warn("%d get_rpc_timeout: Timeout is NULL, returning undef.", __LINE__) );
+      RETVAL = &PL_sv_undef;
+    } else {
+      __DEBUG__( warn("%d get_rpc_timeout: Timeout is non-NULL, returning hashref.", __LINE__) );
+      output = newHV();
+      hv_stores(output, "tv_sec", newSVi64( timeout_tv->tv_sec ));
+      hv_stores(output, "tv_usec", newSVi64( timeout_tv->tv_usec ));
+      RETVAL = newRV_noinc( output );
+    }
+  OUTPUT:
+    RETVAL
+
+void net_amqp_rabbitmq__set_rpc_timeout(conn, args = NULL)
+  Net::AMQP::RabbitMQ conn
+  SV* args
+  PREINIT:
+    struct timeval timeout = {0,0};
+    struct timeval *old_timeout = NULL;
+    int tv_sec = 0;
+    int tv_usec = 0;
+    int res = 0;
+  CODE:
+    old_timeout = amqp_get_rpc_timeout(conn);
+
+    // If we are setting the RPC timeout to NULL...
+    if (args == NULL || !SvOK(args) || args == &PL_sv_undef) {
+      __DEBUG__( warn("%d set_rpc_timeout: No args. Setting to unlimited RPC timeout.", __LINE__) );
+
+      if (old_timeout != NULL) {
+        __DEBUG__( warn("%d set_rpc_timeout: Changing to unlimited RPC timeout.", __LINE__) );
+        amqp_set_rpc_timeout( conn, NULL );
+      }
+    }
+
+    // If we are setting the RPC timeout to something other than NULL...
+    else {
+      int_from_hv(SvRV(args), tv_sec);
+      int_from_hv(SvRV(args), tv_usec);
+      __DEBUG__( warn("%d set_rpc_timeout: Setting to tv_sec:%d and tv_usec:%d.", __LINE__, tv_sec, tv_usec) );
+      // If we need to allocate the timeout...
+
+      timeout.tv_sec = tv_sec;
+      timeout.tv_usec = tv_usec;
+      die_on_error(aTHX_ amqp_set_rpc_timeout(conn, &timeout), conn, "Set RPC Timeout");
+    }
 
 void
 net_amqp_rabbitmq_basic_qos(conn, channel, args = NULL)

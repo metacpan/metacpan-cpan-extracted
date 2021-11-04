@@ -1,0 +1,84 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::RegexpCapture - A Regexp Result Object
+
+=head1 SYNOPSIS
+
+    if( my $rv = $s->replace( qr/[[:blank:]\h]+/, '_' ) )
+    {
+        my $first_match = $rv->capture->first;
+        # Do something
+    }
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This is a regular expression result object class. It makes it possible to execute regular expression using chaining and retrieve capture group later from this class object.
+
+=head1 METHODS
+
+=head2 capture
+
+This returns an array object (L<Module::Generic::Array>) of capture groups equivalent to C<@{^CAPTURE}>
+
+You can get the equivalent of C<$1> with:
+
+    $re->capture->first;
+    # or
+    $re->capture->get(0);
+
+C<$2> with
+
+    $re->capture->second;
+    # or
+    $re->capture->get(1);
+    # etc...
+
+=head2 matched
+
+Returns an integer value representing the number of successful match in the regular expression. It is equivalent to doing:
+
+    my $n = $string =~ s/[[:blank:]\h]+//gs;
+
+C<$n> would contain the same value as $re->matched
+
+=head2 name
+
+If the regular expression was using named captures, such as
+
+    qr/(?<my_name>.*?)/
+
+This method will return an object whose methods are named after each named capture. For example, using the case above:
+
+    my $str = $re->name->my_name;
+
+=head2 result
+
+Returns an array object (L<Module::Generic::Array>) of returned values from the regular expression. This is equivalent to:
+
+    my @result = $string =~ s/[[:blank:]\h]+//gs;
+
+Note that L</result> can return an array object with one empty entry. This is what perl returns in list context when there is no match. If you want to check whether your regular expression matched or not, use L</matched> instead.
+
+=head1 SEE ALSO
+
+L<Module::Generic::Scalar/like>, L<Module::Generic::Scalar/match>, L<Module::Generic::Scalar/replace>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::XAVTypemaps::XAVService;
-$Shipment::UPS::WSDL::XAVTypemaps::XAVService::VERSION = '3.05';
+$Shipment::UPS::WSDL::XAVTypemaps::XAVService::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -134,10 +134,10 @@ our $typemap_1 = {
       'SOAP::WSDL::XSD::Typelib::Builtin::string',
     'XAVResponse/Candidate/AddressKeyFormat/Region' =>
       'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    'Fault' => 'SOAP::WSDL::SOAP::Typelib::Fault11',
+    'Fault'                       => 'SOAP::WSDL::SOAP::Typelib::Fault11',
     'Errors/ErrorDetail/Location' =>
       'Shipment::UPS::WSDL::XAVTypes::LocationType',
-    'Fault/faultactor' => 'SOAP::WSDL::XSD::Typelib::Builtin::token',
+    'Fault/faultactor'          => 'SOAP::WSDL::XSD::Typelib::Builtin::token',
     'UPSSecurity/UsernameToken' =>
       'Shipment::UPS::WSDL::XAVElements::UPSSecurity::_UsernameToken',
     'XAVRequest/AddressKeyFormat/PoliticalDivision2' =>
@@ -155,6 +155,7 @@ our $typemap_1 = {
     'Errors/ErrorDetail/PrimaryErrorCode/Code' =>
       'SOAP::WSDL::XSD::Typelib::Builtin::string'
 };
+
 
 sub get_class {
     my $name = join '/', @{$_[1]};
@@ -177,7 +178,7 @@ Shipment::UPS::WSDL::XAVTypemaps::XAVService
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

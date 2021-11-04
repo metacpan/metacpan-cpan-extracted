@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail;
-$Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Window
               Description
 
-              )
+            )
         ],
         {   'Type'        => \%Type_of,
             'Window'      => \%Window_of,
@@ -67,7 +67,7 @@ Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,15 +1,15 @@
 package t::TestObj;
 
-use v5.14;
+use v5.26;
+use warnings;
+use experimental 'signatures';
 
 use base qw( Tangence::Object );
 
 use Tangence::Constants;
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
    my $self = $class->SUPER::new( %args );
 
    for (qw( scalar array queue hash s_scalar )) {
@@ -25,10 +25,8 @@ sub describe
    return (ref $self) . qq([scalar=) . $self->get_prop_scalar . q(]);
 }
 
-sub method_method
+sub method_method ( $self, $ctx, $i, $s )
 {
-   my $self = shift;
-   my ( $ctx, $i, $s ) = @_;
    return "$i/$s";
 }
 
@@ -43,11 +41,8 @@ sub init_prop_hash   { { one => 1, two => 2, three => 3 } }
 sub init_prop_queue  { [ 1, 2, 3 ] }
 sub init_prop_array  { [ 1, 2, 3 ] }
 
-sub add_number
+sub add_number ( $self, $name, $num )
 {
-   my $self = shift;
-   my ( $name, $num ) = @_;
-
    if( index( my $scalar = $self->get_prop_scalar, $num ) == -1 ) {
       $scalar .= $num;
       $self->set_prop_scalar( $scalar );
@@ -60,11 +55,8 @@ sub add_number
    }
 }
 
-sub del_number
+sub del_number ( $self, $num )
 {
-   my $self = shift;
-   my ( $num ) = @_;
-
    my $hash = $self->get_prop_hash;
    my $name;
    $hash->{$_} == $num and ( $name = $_, last ) for keys %$hash;

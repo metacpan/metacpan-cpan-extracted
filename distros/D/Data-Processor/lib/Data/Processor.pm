@@ -2,7 +2,7 @@ package Data::Processor;
 
 use strict;
 use 5.010_001;
-our $VERSION = '1.0.6';
+our $VERSION = '1.0.7';
 
 use Carp;
 use Scalar::Util qw(blessed);
@@ -153,12 +153,12 @@ sub validate_schema {
                 description => {
                     description => 'the description of this content of this key',
                     optional => 1,
-                    validator => $vf->rx(qr(.+),'expected a description string'),
+                    validator => $vf->rx(qr(^.+$),'expected a description string'),
                 },
                 example => {
                     description => 'an example value for this key',
                     optional => 1,
-                    validator => $vf->rx(qr(.+),'expected an example string'),
+                    validator => $vf->rx(qr(^.+$),'expected an example string'),
                 },
                 no_descend_into => {
                     optional => 1,
@@ -180,7 +180,7 @@ sub validate_schema {
                 error_msg => {
                     description => 'an error message for the case that the value regexp does not match',
                     optional => 1,
-                    validator => $vf->rx(qr(.+),'expected an error message string'),
+                    validator => $vf->rx(qr(^.+$),'expected an error message string'),
                 },
                 optional => {
                     description => 'is this key optional ?',
@@ -205,8 +205,13 @@ sub validate_schema {
                     validator => sub {
                         my ($value, $parent) = @_;
                         return 'allow_empty can only be set for array' if !$parent->{array};
-                        return $value =~ /^[01]$/ ? undef : 'Expected 0 or 1';
+                        return $bool->($value);
                     }
+                },
+                order => {
+                    description => 'numeric value to specify the validation order',
+                    optional => 1,
+                    validator => $vf->rx(qr(^\d+$), 'expected an integer'),
                 },
                 members => {
                     description => 'what keys do I expect in a hash hanging off this key',

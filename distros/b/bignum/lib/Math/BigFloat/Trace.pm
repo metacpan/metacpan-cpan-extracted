@@ -2,7 +2,6 @@
 
 package Math::BigFloat::Trace;
 
-require 5.010;
 use strict;
 use warnings;
 
@@ -11,7 +10,7 @@ use Math::BigFloat;
 
 our @ISA = qw(Exporter Math::BigFloat);
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 use overload;                   # inherit overload from Math::BigFloat
 

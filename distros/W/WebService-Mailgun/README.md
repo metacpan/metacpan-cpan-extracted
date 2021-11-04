@@ -60,6 +60,44 @@ my $res = $mailgun->message({
 
 [https://documentation.mailgun.com/en/latest/api-sending.html#sending](https://documentation.mailgun.com/en/latest/api-sending.html#sending)
 
+## mime($args)
+
+Send a MIME message you build yourself, usually by using a library to create that MIME message. 
+The `to` parameter needs to be passed as one of the arguments. 
+Either the `file` or `message` parameter will also need to be passed. 
+
+The `file` parameter should contain the path to the filename that holds the MIME message. 
+The `message` parameter should contain either a string or a reference to a string that holds the MIME message: 
+
+```perl
+# send MIME message via a filename: 
+my $res = $mailgun->message({
+    to      => 'bar@example.com',
+            file    => '/path/to/filename.mime',    
+});
+
+# send MIME message via a string:
+    use MIME::Entity; 
+    my $str = MIME::Entity->build(
+            From    => 'justin@dadamailproject.com',
+    To      => 'justin@dadamailproject.com',
+    Subject => "Subject",
+    Data    => 'Messag4')->as_string;
+    
+my $res = $mailgun->message({
+    to       => 'bar@example.com',
+            message  => $str,
+});
+
+# or send MIME message via a string ref:    
+my $res = $mailgun->message({
+    to       => 'bar@example.com',
+            message  => \$str,
+});
+```
+
+[https://documentation.mailgun.com/en/latest/api-sending.html#sending](https://documentation.mailgun.com/en/latest/api-sending.html#sending)
+
 ## lists()
 
 Get list of mailing lists.

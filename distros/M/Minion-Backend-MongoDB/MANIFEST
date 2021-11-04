@@ -10,6 +10,6 @@ examples/minion_bench.pl
 lib/Minion/Backend/MongoDB.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
-t/mongo.t
+t/10-mongo.t
 xt/author/00-compile.t
 xt/author/pod-syntax.t

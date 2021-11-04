@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => $] >= 5.033008 ? 49 : 48;
+use Test::More tests => 19;
 
 use bignum qw/oct hex/;
 
@@ -61,60 +61,3 @@ bignum->round_mode('odd');
 is(bignum->round_mode(), 'odd', 'get round mode again');
 bignum->round_mode('even');
 is(bignum->round_mode(), 'even', 'get round mode again');
-
-###############################################################################
-# hex() and oct()
-
-my @table =
-  (
-
-   [ 'hex(1)',       1 ],
-   [ 'hex(01)',      1 ],
-   [ 'hex(0x1)',     1 ],
-   [ 'hex("01")',    1 ],
-   [ 'hex("0x1")',   1 ],
-   [ 'hex("0X1")',   1 ],
-   [ 'hex("x1")',    1 ],
-   [ 'hex("X1")',    1 ],
-   [ 'hex("af")',  175 ],
-
-   [ 'oct(1)',       1 ],
-   [ 'oct(01)',      1 ],
-   [ 'oct(" 1")',    1 ],
-
-   [ 'oct(0x1)',     1 ],
-   [ 'oct("0x1")',   1 ],
-   [ 'oct("0X1")',   1 ],
-   [ 'oct("x1")',    1 ],
-   [ 'oct("X1")',    1 ],
-   [ 'oct(" 0x1")',  1 ],
-
-   [ 'oct(0b1)',     1 ],
-   [ 'oct("0b1")',   1 ],
-   [ 'oct("0B1")',   1 ],
-   [ 'oct("b1")',    1 ],
-   [ 'oct("B1")',    1 ],
-   [ 'oct(" 0b1")',  1 ],
-
-   [ 'oct("0o1")',   1 ],
-   [ 'oct("0O1")',   1 ],
-   [ 'oct("o1")',    1 ],
-   [ 'oct("O1")',    1 ],
-   [ 'oct(" 0o1")',  1 ],
-
-  );
-
-if ($] >= "5.033008") {         # must be quoted due to pragma
-    push @table, [ 'oct(0o1)', 1 ];
-}
-
-for my $entry (@table) {
-    my ($test, $want) = @$entry;
-
-    subtest $test, sub {
-        plan tests => 2;
-        my $got = eval $test;
-        cmp_ok($got, '==', $want, 'the output value is correct');
-        is(ref($x), "Math::BigFloat", 'the reference type is correct');
-    };
-}

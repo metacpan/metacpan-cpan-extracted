@@ -1,6 +1,8 @@
-Revision history for PDL-DSP-Fir
+0.006 2021-10-14
+- build fixes
 
-Not current. Look at git log instead.
+0.005 2012-08-02
+- use own constant for PI for compatibility with older PDL
 
 0.004    Date/time
         third version

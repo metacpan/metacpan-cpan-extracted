@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail;
-$Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Option
               Eligibility
 
-              )
+            )
         ],
         {   'Option'      => \%Option_of,
             'Eligibility' => \%Eligibility_of,
@@ -63,7 +63,7 @@ Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

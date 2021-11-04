@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::AppointmentType;
-$Shipment::UPS::WSDL::TrackTypes::AppointmentType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::AppointmentType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               BeginTime
               EndTime
 
-              )
+            )
         ],
         {   'Made'      => \%Made_of,
             'Requested' => \%Requested_of,
@@ -71,7 +71,7 @@ Shipment::UPS::WSDL::TrackTypes::AppointmentType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

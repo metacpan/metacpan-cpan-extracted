@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightSpecialServicePayment;
-$Shipment::FedEx::WSDL::RateTypes::FreightSpecialServicePayment::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::FreightSpecialServicePayment::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        SpecialService
               PaymentType
 
-              )
+            )
         ],
         {   'SpecialService' => \%SpecialService_of,
             'PaymentType'    => \%PaymentType_of,
@@ -63,7 +63,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightSpecialServicePayment
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

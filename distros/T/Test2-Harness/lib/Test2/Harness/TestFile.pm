@@ -2,7 +2,7 @@ package Test2::Harness::TestFile;
 use strict;
 use warnings;
 
-our $VERSION = '1.000073';
+our $VERSION = '1.000080';
 
 use Carp qw/croak/;
 
@@ -420,6 +420,7 @@ sub queue_item {
         conflicts   => $self->conflicts_list,
         duration    => $duration,
         file        => $self->file,
+        rel_file    => $self->relative,
         job_id      => gen_uuid(),
         job_name    => $job_name,
         run_id      => $run_id,

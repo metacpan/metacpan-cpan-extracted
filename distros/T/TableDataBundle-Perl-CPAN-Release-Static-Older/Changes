@@ -1,0 +1,9 @@
+20210927.1  2021-10-05  Released-By: PERLANCAR; Urgency: medium
+
+	    - Rename module/dist
+	      TableDataBundle-{,Perl-}CPAN-Release-Static-Older.
+
+
+20210927.0  2021-09-27  Released-By: PERLANCAR
+
+            - First release.

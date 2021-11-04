@@ -1,5 +1,5 @@
 package XML::Grammar::Vered;
-$XML::Grammar::Vered::VERSION = '0.0.13';
+$XML::Grammar::Vered::VERSION = '0.2.1';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ XML::Grammar::Vered - a vered by any other name will translate as sweet.
 
 =head1 VERSION
 
-version 0.0.13
+version 0.2.1
 
 =head1 SYNOPSIS
 

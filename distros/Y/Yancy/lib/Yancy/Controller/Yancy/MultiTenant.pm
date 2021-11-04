@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::MultiTenant;
-our $VERSION = '1.077';
+our $VERSION = '1.084';
 # ABSTRACT: A controller to show a user only their content
 
 #pod =head1 SYNOPSIS
@@ -202,8 +202,8 @@ sub get {
 #pod a schema. If the user is making a C<GET> request, they will simply
 #pod be shown the template. If the user is making a C<POST> or C<PUT>
 #pod request, the form parameters will be read, the data will be validated
-#pod against L<the schema configuration|Yancy::Help::Config/Data
-#pod Collections>, and the user will either be shown the form again with the
+#pod against L<the schema configuration|Yancy::Guides::Schema>,
+#pod and the user will either be shown the form again with the
 #pod result of the form submission (success or failure) or the user will be
 #pod forwarded to another place.
 #pod
@@ -343,7 +343,7 @@ Yancy::Controller::Yancy::MultiTenant - A controller to show a user only their c
 
 =head1 VERSION
 
-version 1.077
+version 1.084
 
 =head1 SYNOPSIS
 
@@ -462,8 +462,8 @@ This route creates a new item or updates an existing item in
 a schema. If the user is making a C<GET> request, they will simply
 be shown the template. If the user is making a C<POST> or C<PUT>
 request, the form parameters will be read, the data will be validated
-against L<the schema configuration|Yancy::Help::Config/Data
-Collections>, and the user will either be shown the form again with the
+against L<the schema configuration|Yancy::Guides::Schema>,
+and the user will either be shown the form again with the
 result of the form submission (success or failure) or the user will be
 forwarded to another place.
 

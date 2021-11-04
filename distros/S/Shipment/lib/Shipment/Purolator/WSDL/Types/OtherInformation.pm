@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::OtherInformation;
-$Shipment::Purolator::WSDL::Types::OtherInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::OtherInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        CostCentre
               SpecialInstructions
 
-              )
+            )
         ],
         {   'CostCentre'          => \%CostCentre_of,
             'SpecialInstructions' => \%SpecialInstructions_of,
@@ -62,7 +62,7 @@ Shipment::Purolator::WSDL::Types::OtherInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

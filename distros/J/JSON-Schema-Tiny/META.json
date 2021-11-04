@@ -190,7 +190,7 @@
    "provides" : {
       "JSON::Schema::Tiny" : {
          "file" : "lib/JSON/Schema/Tiny.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -205,7 +205,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Tiny"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035003"
@@ -889,7 +889,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20210820"
+                  "Module::CoreList" : "5.20210920"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1107,7 +1107,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.010",
+                  "tag" : "v0.011",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

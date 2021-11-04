@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.30.0';
+$App::gimpgitbuild::Command::build::VERSION = '0.30.2';
 use strict;
 use warnings;
 use autodie;
@@ -31,7 +31,7 @@ sub opt_spec
 
 }
 
-sub _which_xvfb_run
+sub _ascertain_xvfb_run_presence
 {
     my $path = which('xvfb-run');
     if ( not defined($path) )
@@ -53,6 +53,17 @@ sub _ascertain_lack_of_gtk_warnings
             die
 "There may be gtk warnings (e.g: in KDE Plasma 5 on Fedora 32 ). Please fix them.";
         }
+    }
+    return;
+}
+
+sub _ascertain_gjs_presence
+{
+    my $path = which('gjs');
+    if ( not defined($path) )
+    {
+        die
+"gjs must be present for GIMP's tests to succeed - please install it (see: https://gitlab.gnome.org/GNOME/gimp/-/issues/7341 )";
     }
     return;
 }
@@ -84,8 +95,9 @@ sub execute
     $ENV{PATH}            = $env->{PATH};
     $ENV{PKG_CONFIG_PATH} = $env->{PKG_CONFIG_PATH};
     $ENV{XDG_DATA_DIRS}   = $env->{XDG_DATA_DIRS};
-    _which_xvfb_run();
+    _ascertain_xvfb_run_presence();
     _ascertain_lack_of_gtk_warnings();
+    _ascertain_gjs_presence();
 
     $worker->_run_the_mode_on_all_repositories();
 
@@ -105,7 +117,7 @@ __END__
 
 =head1 VERSION
 
-version 0.30.0
+version 0.30.2
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

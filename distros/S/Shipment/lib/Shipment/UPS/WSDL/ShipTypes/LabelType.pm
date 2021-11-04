@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::LabelType;
-$Shipment::UPS::WSDL::ShipTypes::LabelType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::LabelType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,10 +40,10 @@ Class::Std::initialize();
               HTMLImage
               PDF417
 
-              )
+            )
         ],
-        {   'ImageFormat'  => \%ImageFormat_of,
-            'GraphicImage' => \%GraphicImage_of,
+        {   'ImageFormat'                        => \%ImageFormat_of,
+            'GraphicImage'                       => \%GraphicImage_of,
             'InternationalSignatureGraphicImage' =>
               \%InternationalSignatureGraphicImage_of,
             'HTMLImage' => \%HTMLImage_of,
@@ -58,8 +58,8 @@ Class::Std::initialize();
         },
         {
 
-            'ImageFormat'  => 'ImageFormat',
-            'GraphicImage' => 'GraphicImage',
+            'ImageFormat'                        => 'ImageFormat',
+            'GraphicImage'                       => 'GraphicImage',
             'InternationalSignatureGraphicImage' =>
               'InternationalSignatureGraphicImage',
             'HTMLImage' => 'HTMLImage',
@@ -84,7 +84,7 @@ Shipment::UPS::WSDL::ShipTypes::LabelType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

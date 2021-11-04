@@ -1,12 +1,14 @@
 package Test::ConsistentVersion;
 
+use 5.006;
+
 use warnings;
 use autodie;
 use strict;
 use Carp;
 use Test::Builder;
 
-use version; our $VERSION = qv('0.3.0');
+use version; our $VERSION = qv('0.3.1');
 
 my $TEST = Test::Builder->new;
 my %ARGS;
@@ -136,7 +138,7 @@ Test::ConsistentVersion - Ensures a CPAN distribution has consistent versioning.
 
 =head1 VERSION
 
-This document describes Test::ConsistentVersion version 0.3.0
+This document describes Test::ConsistentVersion version 0.3.1
 
 
 =head1 SYNOPSIS
@@ -189,6 +191,8 @@ Test::ConsistentVersion requires no configuration files or environment variables
 
 =over
 
+=item perl 5.6 or greater
+
 =item L<Test::Builder>
 
 =item L<autodie>
@@ -208,7 +212,7 @@ For ensuring the module version matches that referenced in the POD.
 
 =head1 INCOMPATIBILITIES
 
-None reported.
+Perl 5.6 or greater is required.
 
 
 =head1 BUGS AND LIMITATIONS
@@ -216,20 +220,19 @@ None reported.
 No bugs have been reported.
 
 Please report any bugs or feature requests to
-C<bug-test-consistentversion@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+L<https://github.com/cebjyre/Test-ConsistentVersion/issues>.
 
 
 =head1 AUTHOR
 
 Glenn Fowler  C<< <cebjyre@cpan.org> >>
 
-Thanks to L<http://www.affinitylive.com>.
+Thanks to L<http://www.accelo.com>.
 
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2014, Glenn Fowler C<< <cebjyre@cpan.org> >>. All rights reserved.
+Copyright (c) 2021, Glenn Fowler C<< <cebjyre@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

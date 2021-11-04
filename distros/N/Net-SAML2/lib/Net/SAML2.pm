@@ -4,66 +4,11 @@ use warnings;
 
 require 5.008_001;
 
-our $VERSION = '0.17';
-$VERSION = eval $VERSION;
+# ABSTRACT: SAML2 bindings and protocol implementation
 
-=head1 NAME
+our $VERSION = '0.44';
+$VERSION = eval {$VERSION};
 
-Net::SAML2 - SAML bindings and protocol implementation
-
-=head1 SYNOPSIS
-
-  # generate a redirect off to the IdP:
-
-        my $idp = Net::SAML2::IdP->new($IDP);
-        my $sso_url = $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect');
-        
-        my $authnreq = Net::SAML2::Protocol::AuthnRequest->new(
-                issuer        => 'http://localhost:3000/metadata.xml',
-                destination   => $sso_url,
-                nameid_format => $idp->format('persistent'),
-        )->as_xml;
-
-        my $redirect = Net::SAML2::Binding::Redirect->new(
-                key => 'sign-nopw-cert.pem',
-                url => $sso_url,
-        );
-
-        my $url = $redirect->sign($authnreq);
-
-  # handle the POST back from the IdP, via the browser:
-
-        my $post = Net::SAML2::Binding::POST->new;
-        my $ret = $post->handle_response(
-                $saml_response
-        );
-        
-        if ($ret) {
-                my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-                        xml => decode_base64($saml_response)
-                );
-
-                # ...
-        }
-
-=head1 DESCRIPTION
-
-Support for the Web Browser SSO profile of SAML2. 
-
-This is a very early release, but one which will correctly perform the
-SSO process.
-
-=head1 MAJOR CAVEATS
-
-=over
-
-=item SP-side protocol only
-
-=item Requires XML metadata from the IdP
-
-=back
-
-=cut
 
 # entities
 use Net::SAML2::IdP;
@@ -81,11 +26,151 @@ use Net::SAML2::Protocol::LogoutResponse;;
 use Net::SAML2::Protocol::Assertion;
 use Net::SAML2::Protocol::ArtifactResolve;
 
+
+1;
+
+__END__
+
 =pod
 
-=head1 AUTHOR
+=encoding UTF-8
 
-Chris Andrews <chrisandrews@venda.com>
+=head1 NAME
+
+Net::SAML2 - SAML2 bindings and protocol implementation
+
+=head1 VERSION
+
+version 0.44
+
+=head1 SYNOPSIS
+
+  See TUTORIAL.md for implementation documentation and
+  t/12-full-client.t for a pseudo implementation following the tutorial
+
+  # generate a redirect off to the IdP:
+
+        my $idp = Net::SAML2::IdP->new($IDP);
+        my $sso_url = $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect');
+
+        my $authnreq = Net::SAML2::Protocol::AuthnRequest->new(
+                issuer        => 'http://localhost:3000/metadata.xml',
+                destination   => $sso_url,
+                nameid_format => $idp->format('persistent'),
+        )->as_xml;
+
+        my $authnreq = Net::SAML2::Protocol::AuthnRequest->new(
+          id            => 'NETSAML2_Crypt::OpenSSL::Random::random_pseudo_bytes(16),
+          issuer        => $self->{id},		# Service Provider (SP) Entity ID
+          destination   => $sso_url,		# Identity Provider (IdP) SSO URL
+          provider_name => $provider_name,	# Service Provider (SP) Human Readable Name
+          issue_instant => DateTime->now,	# Defaults to Current Time
+        );
+
+        my $request_id = $authnreq->id;	# Store and Compare to InResponseTo
+
+        # or
+
+        my $request_id = 'NETSAML2_' . unpack 'H*', Crypt::OpenSSL::Random::random_pseudo_bytes(16);
+
+        my $authnreq = Net::SAML2::Protocol::AuthnRequest->as_xml(
+          id            => $request_id,		# Unique Request ID will be returned in response
+          issuer        => $self->{id},		# Service Provider (SP) Entity ID
+          destination   => $sso_url,		# Identity Provider (IdP) SSO URL
+          provider_name => $provider_name,	# Service Provider (SP) Human Readable Name
+          issue_instant => DateTime->now,	# Defaults to Current Time
+        );
+
+        my $redirect = Net::SAML2::Binding::Redirect->new(
+                key => '/path/to/SPsign-nopw-key.pem',
+                url => $sso_url,
+                param => 'SAMLRequest' OR 'SAMLResponse',
+                cert => '/path/to/IdP-cert.pem'
+        );
+
+        my $url = $redirect->sign($authnreq);
+
+        my $ret = $redirect->verify($url);
+
+  # handle the POST back from the IdP, via the browser:
+
+        my $post = Net::SAML2::Binding::POST->new;
+        my $ret = $post->handle_response(
+                $saml_response
+        );
+
+        if ($ret) {
+                my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                        xml => decode_base64($saml_response)
+                );
+
+                # ...
+        }
+
+=head1 DESCRIPTION
+
+Support for the Web Browser SSO profile of SAML2.
+
+Net::SAML2 correctly perform the SSO process against numerous SAML
+Identity Providers (IdPs).  It has been tested against:
+
+=over
+
+=item GSuite (Google)
+
+=item Azure (Microsoft Office 365)
+
+=item OneLogin
+
+=item Jump
+
+=item Mircosoft ADFS
+
+=item Keycloak
+
+=item Auth0 (requires Net::SAML2 >=0.39)
+
+=item PingIdentity
+
+=back
+
+=head1 NAME
+
+Net::SAML2 - SAML bindings and protocol implementation
+
+=head1 MAJOR CAVEATS
+
+=over
+
+=item SP-side protocol only
+
+=item Requires XML metadata from the IdP
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item Chris Andrews <chris@nodnol.org>
+
+=item Oskari Okko Ojala <okko@frantic.com>
+
+=item Peter Marschall <peter@adpm.de>
+
+=item Mike Wisener <xmikew@cpan.org>
+
+=item Jeff Fearn <jfearn@redhat.com>
+
+=item Alessandro Ranellucci <aar@cpan.org>
+
+=item Mike Wisener <mwisener@secureworks.com>, xmikew <github@32ths.com>
+
+=item xmikew <github@32ths.com>
+
+=item Timothy Legge <timlegge@gmail.com>
+
+=back
 
 =head1 COPYRIGHT
 
@@ -100,6 +185,15 @@ Copyright 2010, 2011 Venda Ltd.
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=cut
+=head1 AUTHOR
 
-1;
+Chris Andrews  <chrisa@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

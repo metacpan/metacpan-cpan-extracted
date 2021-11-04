@@ -17,13 +17,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Minion::Backend::MongoDB",
   "PREREQ_PM" => {
-    "DateTime" => 0,
-    "DateTime::Set" => 0,
-    "DateTime::Span" => 0,
     "ExtUtils::MakeMaker" => "7.12",
     "Minion" => "10.17",
     "MongoDB" => "2.0",
-    "Sys::Hostname" => 0
+    "Sys::Hostname" => 0,
+    "Time::Moment" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => "7.12",
@@ -31,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::UseAllModules" => "0.15"
   },
-  "VERSION" => "1.10",
+  "VERSION" => "1.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,16 +37,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "DateTime" => 0,
-  "DateTime::Set" => 0,
-  "DateTime::Span" => 0,
   "ExtUtils::MakeMaker" => "7.12",
   "File::Spec" => 0,
   "Minion" => "10.17",
   "MongoDB" => "2.0",
   "Sys::Hostname" => 0,
   "Test::More" => "0.98",
-  "Test::UseAllModules" => "0.15"
+  "Test::UseAllModules" => "0.15",
+  "Time::Moment" => 0
 );
 
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               DeliveryCommitment
               DispatchDate
 
-              )
+            )
         ],
         {   'ConfirmationNumber' => \%ConfirmationNumber_of,
             'AccessTime'         => \%AccessTime_of,
@@ -83,7 +83,7 @@ Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

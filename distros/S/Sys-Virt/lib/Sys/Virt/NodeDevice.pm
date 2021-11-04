@@ -236,6 +236,10 @@ Include s390 AP matrix devices
 
 Include s390 AP queue devices
 
+=item Sys::Virt::NodeDevice::LIST_CAP_VPD
+
+Include PCI devices with VPD
+
 =item Sys::Virt::NodeDevice::LIST_ACTIVE
 
 Include active devices

@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.521';
+our $VERSION = '0.523';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use strictures 2;
 use List::Util 'any';
 use Ref::Util 0.100 'is_plain_arrayref';
@@ -373,7 +374,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.521
+version 0.523
 
 =head1 DESCRIPTION
 

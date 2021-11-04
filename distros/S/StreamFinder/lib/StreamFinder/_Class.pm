@@ -33,6 +33,7 @@ use vars qw(@ISA @EXPORT);
 
 my $DEBUG = 0;
 my $bummer = ($^O =~ /MSWin/);
+my $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0";
 
 sub new
 {
@@ -42,18 +43,20 @@ sub new
 	my $self = {'_objname' => $objname};
 
 	my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
-	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
+	$homedir ||= $ENV{'LOGDIR'}  if ($bummer && $ENV{'LOGDIR'});
 	$homedir =~ s#[\/\\]$##;
+	my $configdir = (defined $ENV{STREAMFINDER}) ? $ENV{STREAMFINDER} : "${homedir}/.config/StreamFinder";
+	$configdir =~ s#[\/\\]$##;
 	@{$self->{'_userAgentOps'}} = ();
-	foreach my $p ("${homedir}/.config/StreamFinder/config", "${homedir}/.config/StreamFinder/${objname}/config") {
+	foreach my $p ("${configdir}/config", "${configdir}/${objname}/config") {
 		if (open IN, $p) {
 			my ($atr, $val);
 			while (<IN>) {
 				chomp;
 				next  if (/^\s*\#/o);
 				($atr, $val) = split(/\s*\=\>\s*/o, $_, 2);
-				eval "\$self->{$atr} = $val";  #CATCH JSON-LIKE ARGS, IE. "arg => {key => value, ...}"
-				eval "\$self->{$atr} = \"\Q$val\E\""  if ($@);  #CATCH UNESCAPED ARGS, IE. "arg => str[with brackets,commas,etc.]"
+				eval "\$self->{'$atr'} = $val";  #CATCH JSON-LIKE ARGS, IE. "arg => {key => value, ...}"
+				eval "\$self->{'$atr'} = \"\Q$val\E\""  if ($@);  #CATCH UNESCAPED ARGS, IE. "arg => str[with brackets,commas,etc.]"
 			}
 			close IN;
 		}
@@ -63,7 +66,7 @@ sub new
 			proxy no_proxy)) {
 		push @{$self->{'_userAgentOps'}}, $i, $self->{$i}  if (defined $self->{$i});
 	}
-	push (@{$self->{'_userAgentOps'}}, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
+	push (@{$self->{'_userAgentOps'}}, 'agent', $AGENT)
 			unless (defined $self->{'agent'});
 	$self->{'timeout'} = 10  unless (defined $self->{'timeout'});
 	$self->{'secure'} = 0    unless (defined $self->{'secure'});
@@ -96,7 +99,9 @@ sub new
 	$self->{'year'} = '';
 	$self->{'genre'} = '';
 	$self->{'iconurl'} = '';
+	$self->{'imageurl'} = '';
 	$self->{'articonurl'} = '';
+	$self->{'artimageurl'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;
 	$self->{'total'} = 0;
@@ -255,19 +260,25 @@ sub getIconData
 sub getImageURL
 {
 	my $self = shift;
-	return $self->{'imageurl'};  #URL TO THE STATION'S BANNER IMAGE, IF ANY.
+	return $self->{'imageurl'};  #URL TO THE STATION'S|CHANNEL'S BANNER IMAGE, IF ANY.
+	return (defined($_[0]) && $_[0] =~ /^\-?artist/i)
+			? $self->{'artimageurl'} : $self->{'imageurl'};  #URL TO THE STATION'S|CHANNEL'S BANNER IMAGE, IF ANY.
 }
 
 sub getImageData
 {
 	my $self = shift;
-	return ()  unless ($self->{'imageurl'});
+
+	my $whichurl = (defined($_[0]) && $_[0] =~ /^\-?artist/i)
+			? 'artimageurl' : 'imageurl';
+	return ()  unless ($self->{$whichurl});
+
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	my $art_image = '';
-	my $response = $ua->get($self->{'imageurl'});
+	my $response = $ua->get($self->{$whichurl});
 	if ($response->is_success) {
 		$art_image = $response->decoded_content;
 	} else {
@@ -275,13 +286,13 @@ sub getImageData
 		my $no_wget = system('wget','-V');
 		unless ($no_wget) {
 			print STDERR "\n..trying wget...\n"  if ($DEBUG);
-			my $iconUrl = $self->{'iconurl'};
+			my $iconUrl = $self->{$whichurl};
 			$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$iconUrl\" 2>/dev/null `;
 		}
 	}
 	return ()  unless ($art_image);
-	my $image_ext = $self->{'imageurl'};
-	$image_ext = ($self->{'imageurl'} =~ /\.(\w+)$/) ? $1 : 'png';
+	my $image_ext = $self->{$whichurl};
+	$image_ext = ($self->{$whichurl} =~ /\.(\w+)$/) ? $1 : 'png';
 	$image_ext =~ s/[^A-Za-z].*$//;
 	return ($image_ext, $art_image);
 }

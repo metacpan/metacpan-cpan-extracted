@@ -6,44 +6,24 @@ build_requires:
   Convert::ASN1: 0.2
   Devel::Leak: 0
   Devel::Mallinfo: 0
-  Fatal: 0
-  File::Find: 0
-  File::Path: 0
   File::Slurp: 0
-  File::Spec: 0
-  File::Spec::Functions: 0
-  File::Spec::Unix: 0
-  File::Temp: 0
-  FindBin: 0
-  IO::File: 0
+  File::Which: 0
   IPC::Run: 0
   Inline: 0.4
   Inline::C: 0
-  MIME::Base64: 0
   Module::Build: 0.29
-  Module::Build::Compat: 0
   Net::SSLeay: 1.25
-  POSIX: 0
-  Test::Builder: 0
-  Test::Group: 0
-  Test::More: 0
+  Test2::API: 0
+  Test2::Tools::Basic: 0
+  Test2::Tools::Compare: 0
+  Test2::V0: 0
   Test::Taint: 0
 configure_requires:
-  Fatal: 0
-  File::Find: 0
-  File::Path: 0
-  File::Spec: 0
-  File::Spec::Functions: 0
-  File::Spec::Unix: 0
-  File::Temp: 0
-  FindBin: 0
-  IO::File: 0
   Inline: 0.4
   Inline::C: 0
   Module::Build: 0.29
-  Module::Build::Compat: 0
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -60,7 +40,11 @@ no_index:
 provides:
   Crypt::OpenSSL::CA:
     file: lib/Crypt/OpenSSL/CA.pm
-    version: 0.24
+    version: 0.91
+  Crypt::OpenSSL::CA::ASN1_INTEGER:
+    file: lib/Crypt/OpenSSL/CA.pm
+  Crypt::OpenSSL::CA::ASN1_TIME:
+    file: lib/Crypt/OpenSSL/CA.pm
   Crypt::OpenSSL::CA::CONF:
     file: lib/Crypt/OpenSSL/CA.pm
   Crypt::OpenSSL::CA::ENGINE:
@@ -80,8 +64,8 @@ provides:
   Crypt::OpenSSL::CA::X509_NAME:
     file: lib/Crypt/OpenSSL/CA.pm
 requires:
-  XSLoader: 0
+  perl: 5.008
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.24
+version: 0.91
 x_serialization_backend: CPAN::Meta::YAML version 0.018

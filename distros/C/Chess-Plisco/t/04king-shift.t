@@ -13,7 +13,7 @@ use strict;
 
 use Test::More tests => 9;
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 
 my $pos = Chess::Plisco->new;
 ok $pos, 'created';

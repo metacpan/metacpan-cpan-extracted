@@ -1,4 +1,4 @@
-<weatherdata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://api.met.no/weatherapi/locationforecast/1.9/schema" created="2014-08-15T08:20:47Z">
+<weatherdata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://api.met.no/weatherapi/locationforecast/2.0/schema" created="2014-08-15T08:20:47Z">
    <meta>
       <model name="LOCAL" termin="2014-08-15T00:00:00Z" runended="2014-08-15T02:27:47Z" nextrun="2014-08-15T10:00:00Z" from="2014-08-15T09:00:00Z" to="2014-08-17T18:00:00Z" />
       <model name="EPS" termin="2014-08-14T12:00:00Z" runended="2014-08-14T21:51:01Z" nextrun="2014-08-15T10:00:00Z" from="2014-08-18T00:00:00Z" to="2014-08-24T06:00:00Z" />
@@ -22,25 +22,25 @@
       <time datatype="forecast" from="2014-08-15T08:00:00Z" to="2014-08-15T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T07:00:00Z" to="2014-08-15T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T06:00:00Z" to="2014-08-15T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T03:00:00Z" to="2014-08-15T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T10:00:00Z" to="2014-08-15T10:00:00Z">
@@ -61,25 +61,25 @@
       <time datatype="forecast" from="2014-08-15T09:00:00Z" to="2014-08-15T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T08:00:00Z" to="2014-08-15T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T07:00:00Z" to="2014-08-15T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T04:00:00Z" to="2014-08-15T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T11:00:00Z" to="2014-08-15T11:00:00Z">
@@ -100,25 +100,25 @@
       <time datatype="forecast" from="2014-08-15T10:00:00Z" to="2014-08-15T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T09:00:00Z" to="2014-08-15T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T08:00:00Z" to="2014-08-15T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T05:00:00Z" to="2014-08-15T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T12:00:00Z" to="2014-08-15T12:00:00Z">
@@ -141,25 +141,25 @@
       <time datatype="forecast" from="2014-08-15T11:00:00Z" to="2014-08-15T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T10:00:00Z" to="2014-08-15T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T09:00:00Z" to="2014-08-15T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T06:00:00Z" to="2014-08-15T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="0"/>
          </location>
       </time>
@@ -181,25 +181,25 @@
       <time datatype="forecast" from="2014-08-15T12:00:00Z" to="2014-08-15T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T11:00:00Z" to="2014-08-15T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T10:00:00Z" to="2014-08-15T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T07:00:00Z" to="2014-08-15T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T14:00:00Z" to="2014-08-15T14:00:00Z">
@@ -220,25 +220,25 @@
       <time datatype="forecast" from="2014-08-15T13:00:00Z" to="2014-08-15T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Sun" number="1"/>
+<symbol id="Sun" number="1" code="clearsky_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T12:00:00Z" to="2014-08-15T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Sun" number="1"/>
+<symbol id="Sun" number="1" code="clearsky_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T11:00:00Z" to="2014-08-15T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T08:00:00Z" to="2014-08-15T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T15:00:00Z" to="2014-08-15T15:00:00Z">
@@ -259,25 +259,25 @@
       <time datatype="forecast" from="2014-08-15T14:00:00Z" to="2014-08-15T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T13:00:00Z" to="2014-08-15T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T12:00:00Z" to="2014-08-15T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T09:00:00Z" to="2014-08-15T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T16:00:00Z" to="2014-08-15T16:00:00Z">
@@ -298,25 +298,25 @@
       <time datatype="forecast" from="2014-08-15T15:00:00Z" to="2014-08-15T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T14:00:00Z" to="2014-08-15T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T13:00:00Z" to="2014-08-15T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T10:00:00Z" to="2014-08-15T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T17:00:00Z" to="2014-08-15T17:00:00Z">
@@ -337,25 +337,25 @@
       <time datatype="forecast" from="2014-08-15T16:00:00Z" to="2014-08-15T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T15:00:00Z" to="2014-08-15T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T14:00:00Z" to="2014-08-15T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T11:00:00Z" to="2014-08-15T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T18:00:00Z" to="2014-08-15T18:00:00Z">
@@ -378,25 +378,25 @@
       <time datatype="forecast" from="2014-08-15T17:00:00Z" to="2014-08-15T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Sun" number="1"/>
+<symbol id="Sun" number="1" code="clearsky_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T16:00:00Z" to="2014-08-15T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T15:00:00Z" to="2014-08-15T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T12:00:00Z" to="2014-08-15T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
 <symbolProbability unit="probabilitycode" value="0"/>
          </location>
       </time>
@@ -418,25 +418,25 @@
       <time datatype="forecast" from="2014-08-15T18:00:00Z" to="2014-08-15T19:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T17:00:00Z" to="2014-08-15T19:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T16:00:00Z" to="2014-08-15T19:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T13:00:00Z" to="2014-08-15T19:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T20:00:00Z" to="2014-08-15T20:00:00Z">
@@ -457,25 +457,25 @@
       <time datatype="forecast" from="2014-08-15T19:00:00Z" to="2014-08-15T20:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T18:00:00Z" to="2014-08-15T20:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T17:00:00Z" to="2014-08-15T20:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T14:00:00Z" to="2014-08-15T20:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T21:00:00Z" to="2014-08-15T21:00:00Z">
@@ -496,25 +496,25 @@
       <time datatype="forecast" from="2014-08-15T20:00:00Z" to="2014-08-15T21:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T19:00:00Z" to="2014-08-15T21:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T18:00:00Z" to="2014-08-15T21:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T15:00:00Z" to="2014-08-15T21:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T22:00:00Z" to="2014-08-15T22:00:00Z">
@@ -535,25 +535,25 @@
       <time datatype="forecast" from="2014-08-15T21:00:00Z" to="2014-08-15T22:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T20:00:00Z" to="2014-08-15T22:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T19:00:00Z" to="2014-08-15T22:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T16:00:00Z" to="2014-08-15T22:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T23:00:00Z" to="2014-08-15T23:00:00Z">
@@ -574,25 +574,25 @@
       <time datatype="forecast" from="2014-08-15T22:00:00Z" to="2014-08-15T23:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T21:00:00Z" to="2014-08-15T23:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T20:00:00Z" to="2014-08-15T23:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T17:00:00Z" to="2014-08-15T23:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T00:00:00Z" to="2014-08-16T00:00:00Z">
@@ -615,25 +615,25 @@
       <time datatype="forecast" from="2014-08-15T23:00:00Z" to="2014-08-16T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T22:00:00Z" to="2014-08-16T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T21:00:00Z" to="2014-08-16T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T18:00:00Z" to="2014-08-16T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="0"/>
          </location>
       </time>
@@ -655,25 +655,25 @@
       <time datatype="forecast" from="2014-08-16T00:00:00Z" to="2014-08-16T01:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T23:00:00Z" to="2014-08-16T01:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T22:00:00Z" to="2014-08-16T01:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T19:00:00Z" to="2014-08-16T01:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T02:00:00Z" to="2014-08-16T02:00:00Z">
@@ -694,25 +694,25 @@
       <time datatype="forecast" from="2014-08-16T01:00:00Z" to="2014-08-16T02:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T00:00:00Z" to="2014-08-16T02:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T23:00:00Z" to="2014-08-16T02:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T20:00:00Z" to="2014-08-16T02:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T03:00:00Z" to="2014-08-16T03:00:00Z">
@@ -733,25 +733,25 @@
       <time datatype="forecast" from="2014-08-16T02:00:00Z" to="2014-08-16T03:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T01:00:00Z" to="2014-08-16T03:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T00:00:00Z" to="2014-08-16T03:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T21:00:00Z" to="2014-08-16T03:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T04:00:00Z" to="2014-08-16T04:00:00Z">
@@ -772,25 +772,25 @@
       <time datatype="forecast" from="2014-08-16T03:00:00Z" to="2014-08-16T04:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T02:00:00Z" to="2014-08-16T04:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T01:00:00Z" to="2014-08-16T04:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T22:00:00Z" to="2014-08-16T04:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T05:00:00Z" to="2014-08-16T05:00:00Z">
@@ -811,25 +811,25 @@
       <time datatype="forecast" from="2014-08-16T04:00:00Z" to="2014-08-16T05:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T03:00:00Z" to="2014-08-16T05:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T02:00:00Z" to="2014-08-16T05:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-15T23:00:00Z" to="2014-08-16T05:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T06:00:00Z" to="2014-08-16T06:00:00Z">
@@ -852,25 +852,25 @@
       <time datatype="forecast" from="2014-08-16T05:00:00Z" to="2014-08-16T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T04:00:00Z" to="2014-08-16T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T03:00:00Z" to="2014-08-16T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T00:00:00Z" to="2014-08-16T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="0"/>
          </location>
       </time>
@@ -892,25 +892,25 @@
       <time datatype="forecast" from="2014-08-16T06:00:00Z" to="2014-08-16T07:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T05:00:00Z" to="2014-08-16T07:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T04:00:00Z" to="2014-08-16T07:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T01:00:00Z" to="2014-08-16T07:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T08:00:00Z" to="2014-08-16T08:00:00Z">
@@ -931,25 +931,25 @@
       <time datatype="forecast" from="2014-08-16T07:00:00Z" to="2014-08-16T08:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T06:00:00Z" to="2014-08-16T08:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T05:00:00Z" to="2014-08-16T08:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T02:00:00Z" to="2014-08-16T08:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T09:00:00Z" to="2014-08-16T09:00:00Z">
@@ -970,25 +970,25 @@
       <time datatype="forecast" from="2014-08-16T08:00:00Z" to="2014-08-16T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T07:00:00Z" to="2014-08-16T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T06:00:00Z" to="2014-08-16T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T03:00:00Z" to="2014-08-16T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.4"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T10:00:00Z" to="2014-08-16T10:00:00Z">
@@ -1009,25 +1009,25 @@
       <time datatype="forecast" from="2014-08-16T09:00:00Z" to="2014-08-16T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T08:00:00Z" to="2014-08-16T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T07:00:00Z" to="2014-08-16T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T04:00:00Z" to="2014-08-16T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.3"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T11:00:00Z" to="2014-08-16T11:00:00Z">
@@ -1048,25 +1048,25 @@
       <time datatype="forecast" from="2014-08-16T10:00:00Z" to="2014-08-16T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T09:00:00Z" to="2014-08-16T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T08:00:00Z" to="2014-08-16T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T05:00:00Z" to="2014-08-16T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T12:00:00Z" to="2014-08-16T12:00:00Z">
@@ -1089,25 +1089,25 @@
       <time datatype="forecast" from="2014-08-16T11:00:00Z" to="2014-08-16T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T10:00:00Z" to="2014-08-16T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T09:00:00Z" to="2014-08-16T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T06:00:00Z" to="2014-08-16T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="0"/>
          </location>
       </time>
@@ -1129,25 +1129,25 @@
       <time datatype="forecast" from="2014-08-16T12:00:00Z" to="2014-08-16T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T11:00:00Z" to="2014-08-16T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T10:00:00Z" to="2014-08-16T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T07:00:00Z" to="2014-08-16T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T14:00:00Z" to="2014-08-16T14:00:00Z">
@@ -1168,25 +1168,25 @@
       <time datatype="forecast" from="2014-08-16T13:00:00Z" to="2014-08-16T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="LightCloud" number="2"/>
+<symbol id="LightCloud" number="2" code="fair_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T12:00:00Z" to="2014-08-16T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T11:00:00Z" to="2014-08-16T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T08:00:00Z" to="2014-08-16T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T15:00:00Z" to="2014-08-16T15:00:00Z">
@@ -1207,25 +1207,25 @@
       <time datatype="forecast" from="2014-08-16T14:00:00Z" to="2014-08-16T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T13:00:00Z" to="2014-08-16T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T12:00:00Z" to="2014-08-16T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T09:00:00Z" to="2014-08-16T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T16:00:00Z" to="2014-08-16T16:00:00Z">
@@ -1246,25 +1246,25 @@
       <time datatype="forecast" from="2014-08-16T15:00:00Z" to="2014-08-16T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T14:00:00Z" to="2014-08-16T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T13:00:00Z" to="2014-08-16T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T10:00:00Z" to="2014-08-16T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T17:00:00Z" to="2014-08-16T17:00:00Z">
@@ -1285,25 +1285,25 @@
       <time datatype="forecast" from="2014-08-16T16:00:00Z" to="2014-08-16T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T15:00:00Z" to="2014-08-16T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T14:00:00Z" to="2014-08-16T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T11:00:00Z" to="2014-08-16T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T18:00:00Z" to="2014-08-16T18:00:00Z">
@@ -1326,25 +1326,25 @@
       <time datatype="forecast" from="2014-08-16T17:00:00Z" to="2014-08-16T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T16:00:00Z" to="2014-08-16T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T15:00:00Z" to="2014-08-16T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T12:00:00Z" to="2014-08-16T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="0"/>
          </location>
       </time>
@@ -1366,25 +1366,25 @@
       <time datatype="forecast" from="2014-08-16T18:00:00Z" to="2014-08-16T19:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T17:00:00Z" to="2014-08-16T19:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T16:00:00Z" to="2014-08-16T19:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T13:00:00Z" to="2014-08-16T19:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T20:00:00Z" to="2014-08-16T20:00:00Z">
@@ -1405,25 +1405,25 @@
       <time datatype="forecast" from="2014-08-16T19:00:00Z" to="2014-08-16T20:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T18:00:00Z" to="2014-08-16T20:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T17:00:00Z" to="2014-08-16T20:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T14:00:00Z" to="2014-08-16T20:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T21:00:00Z" to="2014-08-16T21:00:00Z">
@@ -1444,25 +1444,25 @@
       <time datatype="forecast" from="2014-08-16T20:00:00Z" to="2014-08-16T21:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T19:00:00Z" to="2014-08-16T21:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T18:00:00Z" to="2014-08-16T21:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T15:00:00Z" to="2014-08-16T21:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T22:00:00Z" to="2014-08-16T22:00:00Z">
@@ -1483,25 +1483,25 @@
       <time datatype="forecast" from="2014-08-16T21:00:00Z" to="2014-08-16T22:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T20:00:00Z" to="2014-08-16T22:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T19:00:00Z" to="2014-08-16T22:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T16:00:00Z" to="2014-08-16T22:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T23:00:00Z" to="2014-08-16T23:00:00Z">
@@ -1522,25 +1522,25 @@
       <time datatype="forecast" from="2014-08-16T22:00:00Z" to="2014-08-16T23:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T21:00:00Z" to="2014-08-16T23:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T20:00:00Z" to="2014-08-16T23:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T17:00:00Z" to="2014-08-16T23:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T00:00:00Z" to="2014-08-17T00:00:00Z">
@@ -1563,25 +1563,25 @@
       <time datatype="forecast" from="2014-08-16T23:00:00Z" to="2014-08-17T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T22:00:00Z" to="2014-08-17T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T21:00:00Z" to="2014-08-17T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T18:00:00Z" to="2014-08-17T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="0"/>
          </location>
       </time>
@@ -1603,25 +1603,25 @@
       <time datatype="forecast" from="2014-08-17T00:00:00Z" to="2014-08-17T01:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T23:00:00Z" to="2014-08-17T01:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T22:00:00Z" to="2014-08-17T01:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T19:00:00Z" to="2014-08-17T01:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T02:00:00Z" to="2014-08-17T02:00:00Z">
@@ -1642,25 +1642,25 @@
       <time datatype="forecast" from="2014-08-17T01:00:00Z" to="2014-08-17T02:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T00:00:00Z" to="2014-08-17T02:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T23:00:00Z" to="2014-08-17T02:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T20:00:00Z" to="2014-08-17T02:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T03:00:00Z" to="2014-08-17T03:00:00Z">
@@ -1681,25 +1681,25 @@
       <time datatype="forecast" from="2014-08-17T02:00:00Z" to="2014-08-17T03:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T01:00:00Z" to="2014-08-17T03:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T00:00:00Z" to="2014-08-17T03:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T21:00:00Z" to="2014-08-17T03:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T04:00:00Z" to="2014-08-17T04:00:00Z">
@@ -1720,25 +1720,25 @@
       <time datatype="forecast" from="2014-08-17T03:00:00Z" to="2014-08-17T04:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T02:00:00Z" to="2014-08-17T04:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T01:00:00Z" to="2014-08-17T04:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T22:00:00Z" to="2014-08-17T04:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T05:00:00Z" to="2014-08-17T05:00:00Z">
@@ -1759,25 +1759,25 @@
       <time datatype="forecast" from="2014-08-17T04:00:00Z" to="2014-08-17T05:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T03:00:00Z" to="2014-08-17T05:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T02:00:00Z" to="2014-08-17T05:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-16T23:00:00Z" to="2014-08-17T05:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T06:00:00Z" to="2014-08-17T06:00:00Z">
@@ -1800,25 +1800,25 @@
       <time datatype="forecast" from="2014-08-17T05:00:00Z" to="2014-08-17T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T04:00:00Z" to="2014-08-17T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T03:00:00Z" to="2014-08-17T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T00:00:00Z" to="2014-08-17T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="0"/>
          </location>
       </time>
@@ -1840,25 +1840,25 @@
       <time datatype="forecast" from="2014-08-17T06:00:00Z" to="2014-08-17T07:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T05:00:00Z" to="2014-08-17T07:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T04:00:00Z" to="2014-08-17T07:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T01:00:00Z" to="2014-08-17T07:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T08:00:00Z" to="2014-08-17T08:00:00Z">
@@ -1879,25 +1879,25 @@
       <time datatype="forecast" from="2014-08-17T07:00:00Z" to="2014-08-17T08:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T06:00:00Z" to="2014-08-17T08:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T05:00:00Z" to="2014-08-17T08:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T02:00:00Z" to="2014-08-17T08:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T09:00:00Z" to="2014-08-17T09:00:00Z">
@@ -1918,25 +1918,25 @@
       <time datatype="forecast" from="2014-08-17T08:00:00Z" to="2014-08-17T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T07:00:00Z" to="2014-08-17T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T06:00:00Z" to="2014-08-17T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T03:00:00Z" to="2014-08-17T09:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T10:00:00Z" to="2014-08-17T10:00:00Z">
@@ -1957,25 +1957,25 @@
       <time datatype="forecast" from="2014-08-17T09:00:00Z" to="2014-08-17T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T08:00:00Z" to="2014-08-17T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T07:00:00Z" to="2014-08-17T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T04:00:00Z" to="2014-08-17T10:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T11:00:00Z" to="2014-08-17T11:00:00Z">
@@ -1996,25 +1996,25 @@
       <time datatype="forecast" from="2014-08-17T10:00:00Z" to="2014-08-17T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T09:00:00Z" to="2014-08-17T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T08:00:00Z" to="2014-08-17T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T05:00:00Z" to="2014-08-17T11:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T12:00:00Z" to="2014-08-17T12:00:00Z">
@@ -2037,25 +2037,25 @@
       <time datatype="forecast" from="2014-08-17T11:00:00Z" to="2014-08-17T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T10:00:00Z" to="2014-08-17T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T09:00:00Z" to="2014-08-17T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T06:00:00Z" to="2014-08-17T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2077,25 +2077,25 @@
       <time datatype="forecast" from="2014-08-17T12:00:00Z" to="2014-08-17T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.5"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T11:00:00Z" to="2014-08-17T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.5"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T10:00:00Z" to="2014-08-17T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.5"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T07:00:00Z" to="2014-08-17T13:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.5"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T14:00:00Z" to="2014-08-17T14:00:00Z">
@@ -2116,25 +2116,25 @@
       <time datatype="forecast" from="2014-08-17T13:00:00Z" to="2014-08-17T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.0" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="Rain" number="10"/>
+<symbol id="Rain" number="10" code="heavyrain"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T12:00:00Z" to="2014-08-17T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.0" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRainThunder" number="22"/>
+<symbol id="LightRainThunder" number="22" code="rainandthunder"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T11:00:00Z" to="2014-08-17T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.0" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRainThunder" number="22"/>
+<symbol id="LightRainThunder" number="22" code="rainandthunder"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T08:00:00Z" to="2014-08-17T14:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.0" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRainThunder" number="22"/>
+<symbol id="LightRainThunder" number="22" code="rainandthunder"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T15:00:00Z" to="2014-08-17T15:00:00Z">
@@ -2155,25 +2155,25 @@
       <time datatype="forecast" from="2014-08-17T14:00:00Z" to="2014-08-17T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.1" minvalue="0.0" maxvalue="2.4"/>
-<symbol id="Drizzle" number="46"/>
+<symbol id="Drizzle" number="46" code="lightrain"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T13:00:00Z" to="2014-08-17T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.2" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRain" number="9"/>
+<symbol id="LightRain" number="9" code="rain"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T12:00:00Z" to="2014-08-17T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.2" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRainThunder" number="22"/>
+<symbol id="LightRainThunder" number="22" code="rainandthunder"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T09:00:00Z" to="2014-08-17T15:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.2" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRainThunder" number="22"/>
+<symbol id="LightRainThunder" number="22" code="rainandthunder"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T16:00:00Z" to="2014-08-17T16:00:00Z">
@@ -2194,25 +2194,25 @@
       <time datatype="forecast" from="2014-08-17T15:00:00Z" to="2014-08-17T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T14:00:00Z" to="2014-08-17T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.1" minvalue="0.0" maxvalue="2.4"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T13:00:00Z" to="2014-08-17T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.2" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRain" number="9"/>
+<symbol id="LightRain" number="9" code="rain"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T10:00:00Z" to="2014-08-17T16:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.2" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRainThunder" number="22"/>
+<symbol id="LightRainThunder" number="22" code="rainandthunder"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T17:00:00Z" to="2014-08-17T17:00:00Z">
@@ -2233,25 +2233,25 @@
       <time datatype="forecast" from="2014-08-17T16:00:00Z" to="2014-08-17T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T15:00:00Z" to="2014-08-17T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T14:00:00Z" to="2014-08-17T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.1" minvalue="0.0" maxvalue="2.4"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T11:00:00Z" to="2014-08-17T17:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.2" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRainThunder" number="22"/>
+<symbol id="LightRainThunder" number="22" code="rainandthunder"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T18:00:00Z" to="2014-08-17T18:00:00Z">
@@ -2274,25 +2274,25 @@
       <time datatype="forecast" from="2014-08-17T17:00:00Z" to="2014-08-17T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T16:00:00Z" to="2014-08-17T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T15:00:00Z" to="2014-08-17T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
          </location>
       </time>
       <time datatype="forecast" from="2014-08-17T12:00:00Z" to="2014-08-17T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.2" minvalue="0.1" maxvalue="4.1"/>
-<symbol id="LightRainThunder" number="22"/>
+<symbol id="LightRainThunder" number="22" code="rainandthunder"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2309,7 +2309,7 @@
       <time datatype="forecast" from="2014-08-17T18:00:00Z" to="2014-08-18T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2326,7 +2326,7 @@
       <time datatype="forecast" from="2014-08-18T00:00:00Z" to="2014-08-18T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2343,7 +2343,7 @@
       <time datatype="forecast" from="2014-08-18T06:00:00Z" to="2014-08-18T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2360,7 +2360,7 @@
       <time datatype="forecast" from="2014-08-18T12:00:00Z" to="2014-08-18T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="2"/>
          </location>
       </time>
@@ -2377,7 +2377,7 @@
       <time datatype="forecast" from="2014-08-18T18:00:00Z" to="2014-08-19T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2394,7 +2394,7 @@
       <time datatype="forecast" from="2014-08-19T00:00:00Z" to="2014-08-19T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2411,7 +2411,7 @@
       <time datatype="forecast" from="2014-08-19T06:00:00Z" to="2014-08-19T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2428,7 +2428,7 @@
       <time datatype="forecast" from="2014-08-19T12:00:00Z" to="2014-08-19T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2445,7 +2445,7 @@
       <time datatype="forecast" from="2014-08-19T18:00:00Z" to="2014-08-20T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2462,7 +2462,7 @@
       <time datatype="forecast" from="2014-08-20T00:00:00Z" to="2014-08-20T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2479,7 +2479,7 @@
       <time datatype="forecast" from="2014-08-20T06:00:00Z" to="2014-08-20T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2496,7 +2496,7 @@
       <time datatype="forecast" from="2014-08-20T12:00:00Z" to="2014-08-20T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="2.6"/>
-<symbol id="LightRainSun" number="5"/>
+<symbol id="LightRainSun" number="5" code="rainshowers_day"/>
 <symbolProbability unit="probabilitycode" value="2"/>
          </location>
       </time>
@@ -2513,7 +2513,7 @@
       <time datatype="forecast" from="2014-08-20T18:00:00Z" to="2014-08-21T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2530,7 +2530,7 @@
       <time datatype="forecast" from="2014-08-21T00:00:00Z" to="2014-08-21T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.1"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="2"/>
          </location>
       </time>
@@ -2547,7 +2547,7 @@
       <time datatype="forecast" from="2014-08-21T06:00:00Z" to="2014-08-21T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2564,7 +2564,7 @@
       <time datatype="forecast" from="2014-08-21T12:00:00Z" to="2014-08-21T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="4.1"/>
-<symbol id="LightRain" number="9"/>
+<symbol id="LightRain" number="9" code="rain"/>
 <symbolProbability unit="probabilitycode" value="2"/>
          </location>
       </time>
@@ -2581,7 +2581,7 @@
       <time datatype="forecast" from="2014-08-21T18:00:00Z" to="2014-08-22T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.1"/>
-<symbol id="LightRain" number="9"/>
+<symbol id="LightRain" number="9" code="rain"/>
 <symbolProbability unit="probabilitycode" value="2"/>
          </location>
       </time>
@@ -2598,7 +2598,7 @@
       <time datatype="forecast" from="2014-08-22T00:00:00Z" to="2014-08-22T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="1.2"/>
-<symbol id="LightRain" number="9"/>
+<symbol id="LightRain" number="9" code="rain"/>
 <symbolProbability unit="probabilitycode" value="2"/>
          </location>
       </time>
@@ -2615,7 +2615,7 @@
       <time datatype="forecast" from="2014-08-22T06:00:00Z" to="2014-08-22T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2632,7 +2632,7 @@
       <time datatype="forecast" from="2014-08-22T12:00:00Z" to="2014-08-22T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="5.1"/>
-<symbol id="Rain" number="10"/>
+<symbol id="Rain" number="10" code="heavyrain"/>
 <symbolProbability unit="probabilitycode" value="2"/>
          </location>
       </time>
@@ -2649,7 +2649,7 @@
       <time datatype="forecast" from="2014-08-22T18:00:00Z" to="2014-08-23T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2666,7 +2666,7 @@
       <time datatype="forecast" from="2014-08-23T00:00:00Z" to="2014-08-23T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="2"/>
          </location>
       </time>
@@ -2683,7 +2683,7 @@
       <time datatype="forecast" from="2014-08-23T06:00:00Z" to="2014-08-23T12:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2700,7 +2700,7 @@
       <time datatype="forecast" from="2014-08-23T12:00:00Z" to="2014-08-23T18:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="Cloud" number="4"/>
+<symbol id="Cloud" number="4" code="cloudy"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2717,7 +2717,7 @@
       <time datatype="forecast" from="2014-08-23T18:00:00Z" to="2014-08-24T00:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>
@@ -2734,7 +2734,7 @@
       <time datatype="forecast" from="2014-08-24T00:00:00Z" to="2014-08-24T06:00:00Z">
          <location altitude="0" latitude="63.5908" longitude="10.7414">
             <precipitation unit="mm" value="0.0"/>
-<symbol id="PartlyCloud" number="3"/>
+<symbol id="PartlyCloud" number="3" code="partlycloudy_day"/>
 <symbolProbability unit="probabilitycode" value="1"/>
          </location>
       </time>

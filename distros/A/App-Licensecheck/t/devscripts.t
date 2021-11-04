@@ -104,9 +104,9 @@ subtest 'regexp killer' => sub {
 subtest 'info at end' => sub {
 	run_ok @CMD,
 		qw(-m --shortname-scheme=debian --copyright --lines 0 t/devscripts/info-at-eof.h);
-	like stdout,
-		qr{Expat\t1994-2012 Lua.org, PUC-Rio.*},
-		'Testing stdout';
+	unlike stdout,
+		qr{notice and this},
+		'does not capture non-copyright string';
 	is stderr, '', 'No stderr';
 };
 

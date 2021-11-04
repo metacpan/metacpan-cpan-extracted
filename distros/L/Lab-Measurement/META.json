@@ -2,11 +2,10 @@
    "abstract" : "Test and measure with Perl",
    "author" : [
       "Andreas K. H\u00fcttel <mail@akhuettel.de>",
-      "Simon Reinhardt <simon.reinhardt@physik.uni-r.de>",
-      "Eugeniy E. Mikhailov <evgmik@gmail.com>"
+      "Simon Reinhardt <simon.reinhardt@physik.uni-r.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -101,10 +100,15 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Find" : "0",
             "File::Glob" : "0",
             "File::Slurper" : "0",
+            "File::Spec" : "0",
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "IO::Uncompress::Bunzip2" : "0",
@@ -134,9 +138,9 @@
       "x_IRC" : "irc://irc.libera.chat/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.772",
+   "version" : "3.791",
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

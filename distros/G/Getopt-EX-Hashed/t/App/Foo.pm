@@ -13,6 +13,12 @@ if (our $ACCESSOR_DEFAULT_RO) {
 if (our $ACCESSOR_DEFAULT_RW) {
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
 }
+if (our $ACCESSOR_DEFAULT_ERROR1) {
+    Getopt::EX::Hashed->configure(DEFAULT => 'rw' );
+}
+if (our $ACCESSOR_DEFAULT_ERROR2) {
+    Getopt::EX::Hashed->configure(DEFAULT => [ 'rw' ]);
+}
 
 if (defined our $REPLACE_UNDERSCORE) {
     Getopt::EX::Hashed->configure(REPLACE_UNDERSCORE => $REPLACE_UNDERSCORE);

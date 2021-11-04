@@ -89,16 +89,14 @@ Provide no password when you run the command.
 
     openssl pkcs12 -export -inkey key.pem -in cert.pem -out cert.p12
 
-In Firefox, go to Preferences → Privacy & Security → Certificates, click on the
-View Certificates button, switch the Your Certificates tab, click on Import… and
-pick the F<cert.p12> file you just created.
+In Firefox, go to “Preferences” → “Privacy & Security” → “Certificates”; under
+“When a server requests your personal certificate” check the option “Select one
+automatically”; click on the “View Certificates” button, switch to the “Your
+Certificates” tab, click on “Import…” and pick the F<cert.p12> file you just
+created.
 
-Once you have done this and you visit the site, it’ll ask you what client
-certificate to use. Sadly, at this point Firefox will ask you for a certificate
-whenever you visit a Phoebe wiki, even if you don’t intend to identify yourself
-because Phoebe always tries to read the client’s client certificate. You can
-always cancel, but there’s that uncomfortable moment when you visit a new Phoebe
-wiki…
+Once you have done this and you visit the Phoebe site, it’ll use the client
+certificate you provided or it’ll ask you what client certificate to use.
 
 =cut
 

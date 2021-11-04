@@ -1,3 +1,16 @@
+0.63 2021-10-08
+
+ * This version instroduces no changes to the Perl modules, only the tests.
+
+ * Remove tests that don't work on old Perls and that were actually testing
+   Math::Big(Int|Float|Rat) more than big(int|num|rat).
+
+ * Skip tests that don't work on older versions of Perl.
+
+ * Remove Perl v5.10.0 as dependency. This distribution is compatible with Perls
+   back to at least v5.6.1, although some functionality (e.g., nesting the
+   pragmas) requires more recent versions of Perl.
+
 0.62 2021-10-03
 
  * Add support for multiple options in import(), so that one can use, e.g.,

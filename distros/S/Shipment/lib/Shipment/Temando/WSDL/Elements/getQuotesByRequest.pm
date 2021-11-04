@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::getQuotesByRequest;
-$Shipment::Temando::WSDL::Elements::getQuotesByRequest::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::getQuotesByRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ use warnings;
                   quoteFilter
                   clientId
 
-                  )
+                )
             ],
             {   'anythings'   => \%anythings_of,
                 'anywhere'    => \%anywhere_of,
@@ -87,7 +87,7 @@ use warnings;
 
     package Shipment::Temando::WSDL::Elements::getQuotesByRequest::_anythings;
     $Shipment::Temando::WSDL::Elements::getQuotesByRequest::_anythings::VERSION
-      = '3.05';
+      = '3.06';
     use strict;
     use warnings;
     {
@@ -110,7 +110,7 @@ use warnings;
             __PACKAGE__->_factory(
                 [   qw(        anything
 
-                      )
+                    )
                 ],
                 {'anything' => \%anything_of,},
                 {'anything' => 'Shipment::Temando::WSDL::Types::Anything',},
@@ -143,7 +143,7 @@ Shipment::Temando::WSDL::Elements::getQuotesByRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

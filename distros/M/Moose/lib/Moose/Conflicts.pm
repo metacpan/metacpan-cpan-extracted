@@ -99,6 +99,7 @@ use Dist::CheckConflicts
         Scalar::Util
         Sub::Exporter
         Sub::Name
+        Sub::Util
         Try::Tiny
         parent
         strict

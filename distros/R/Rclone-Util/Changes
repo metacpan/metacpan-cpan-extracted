@@ -1,3 +1,8 @@
+0.002   2021-05-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add function: list_rclone_remotes().
+
+
 0.001   2021-05-09  Released-By: PERLANCAR
 
         - First release, extracted from Complete-Rclone.

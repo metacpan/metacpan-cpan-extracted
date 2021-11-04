@@ -2,11 +2,17 @@ NAME
     Require::Util - Utilities related to require()
 
 VERSION
-    This document describes version 0.001 of Require::Util (from Perl
+    This document describes version 0.002 of Require::Util (from Perl
     distribution Require-Util), released on 2021-06-29.
 
 SYNOPSIS
      use Require::Util qw(require_any try_require);
+
+     if (try_require "Foo::Bar") {
+         # use Foo::Bar's function
+     }
+
+     my $modname = require_any "Foo::Bar", "Baz/Qux.pm", "Quux";
 
 DESCRIPTION
     EXPERIMENTAL.

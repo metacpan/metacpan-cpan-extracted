@@ -1,8 +1,38 @@
 [
     {
         "description": "validation of date strings",
-        "schema": {"format": "date"},
+        "schema": { "format": "date" },
         "tests": [
+            {
+                "description": "all string formats ignore integers",
+                "data": 12,
+                "valid": true
+            },
+            {
+                "description": "all string formats ignore floats",
+                "data": 13.7,
+                "valid": true
+            },
+            {
+                "description": "all string formats ignore objects",
+                "data": {},
+                "valid": true
+            },
+            {
+                "description": "all string formats ignore arrays",
+                "data": [],
+                "valid": true
+            },
+            {
+                "description": "all string formats ignore booleans",
+                "data": false,
+                "valid": true
+            },
+            {
+                "description": "all string formats ignore nulls",
+                "data": null,
+                "valid": true
+            },
             {
                 "description": "a valid date string",
                 "data": "1963-06-19",
@@ -154,13 +184,38 @@
                 "valid": false
             },
             {
-                "description": "invalidates non-padded month dates",
+                "description": "non-padded month dates are not valid",
                 "data": "1998-1-20",
                 "valid": false
             },
             {
-                "description": "invalidates non-padded day dates",
+                "description": "non-padded day dates are not valid",
                 "data": "1998-01-1",
+                "valid": false
+            },
+            {
+                "description": "invalid month",
+                "data": "1998-13-01",
+                "valid": false
+            },
+            {
+                "description": "invalid month-day combination",
+                "data": "1998-04-31",
+                "valid": false
+            },
+            {
+                "description": "2021 is not a leap year",
+                "data": "2021-02-29",
+                "valid": false
+            },
+            {
+                "description": "2020 is a leap year",
+                "data": "2020-02-29",
+                "valid": true
+            },
+            {
+                "description": "non-ascii digits should be rejected",
+                "data": "1963-06-1৪",
                 "valid": false
             }
         ]

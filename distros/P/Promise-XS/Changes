@@ -1,5 +1,8 @@
 Revision history for Perl extension Promise::XS:
 
+0.16 Fri 15 Oct 2021
+- Fix typo in AWAIT_GET method.
+
 0.15 Wed 17 Aug 2021
 - Hard-code the name of the converter sub in XS. This improves compatibility
   with perlcc.

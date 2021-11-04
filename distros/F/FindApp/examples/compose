@@ -1,0 +1,7 @@
+#!/bin/sh -x
+
+perl -MFindApp=-vars -E 'say for @Bin'
+perl -MFindApp=-git,-vars -E 'say for @Bin'
+perl -MFindApp=-devperl,-vars -E 'say for @Bin'
+perl -MFindApp=-git,-devperl,-vars -E 'say for @Bin'
+perl -MFindApp=-devperl,-git,-vars -E 'say for @Bin'

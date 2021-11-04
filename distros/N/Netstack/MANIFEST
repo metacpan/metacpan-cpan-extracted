@@ -11,7 +11,14 @@ lib/Netstack.pm
 lib/Netstack/Config/Content/Role.pm
 lib/Netstack/Config/Content/Static.pm
 lib/Netstack/Connector/Cisco.pm
+lib/Netstack/Connector/CiscoWlc.pm
 lib/Netstack/Connector/H3c.pm
+lib/Netstack/Connector/Ios.pm
+lib/Netstack/Connector/IosXe.pm
+lib/Netstack/Connector/Juniper.pm
+lib/Netstack/Connector/Nxos.pm
+lib/Netstack/Connector/PaloAlto.pm
+lib/Netstack/Connector/Radware.pm
 lib/Netstack/Connector/Role.pm
 lib/Netstack/Connector/Srx.pm
 lib/Netstack/DBI/Pg.pm
@@ -25,3 +32,4 @@ t/utils/cache.t
 t/utils/date.t
 t/utils/ip.t
 t/utils/set.t
+t/utils/ssh.pl

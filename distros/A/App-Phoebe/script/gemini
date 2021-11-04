@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
 
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -22,7 +22,7 @@ gemini - a command line client for the Gemini protocol
 
 =head1 SYNOPSIS
 
-B<gemini> [B<--help>] [B<--verbose>] [B<--cert_file=>I<filename>
+B<gemini> [B<--help>] [B<--force>] [B<--verbose>] [B<--cert_file=>I<filename>
 B<--key_file=>I<filename>] I<URL>
 
 =head1 DESCRIPTION
@@ -52,6 +52,13 @@ links, grep then filters for the links to thumbnails, extract the URL using cut
 (assuming a space between "=>" and the URL), and download each URL, and save the
 output in the filename indicated by the URL.
 
+When the script downloads binary data, then it won't print it to a terminal
+unless you use C<--force>; redirecting binary data to a file or piping it to
+some other script is fine, though.
+
+Use C<--verbose> to see what URL the script is requesting. This is useful when
+debugging issues around decoding and encoding.
+
 =head2 Client Certificates
 
 You can provide a certificate and a key file:
@@ -65,8 +72,8 @@ use Modern::Perl '2018';
 use Mojo::IOLoop;
 use Pod::Text;
 use Getopt::Long;
-use Encode::Locale qw(decode_argv);
-use Encode qw(decode decode_utf8 encode_utf8);
+use Encode::Locale qw(decode_argv $ENCODING_CONSOLE_OUT);
+use Encode qw(encode decode_utf8 encode_utf8);
 use Net::IDN::Encode qw(:all);
 use URI::Escape;
 use IRI;
@@ -74,11 +81,13 @@ use IRI;
 my $cert;
 my $key;
 my $help;
+my $force;
 my $verbose;
 
 GetOptions(
   'help' => \$help,
   'verbose' => \$verbose,
+  'force' => \$force,
   'cert_file=s' => \$cert,
   'key_file=s' => \$key)
     or die("Error in command line arguments\n");
@@ -103,7 +112,7 @@ die "⚠ The URI '$uri' must have an authority\n" unless $iri->authority;
 
 my $host = domain_to_ascii(decode_utf8 $iri->host);
 my $port = $iri->port || 1965;
-my $unsafe = "^A-Za-z0-9\-\._~"; # the default
+my $unsafe = "^A-Za-z0-9\-\._~%"; # the default + already encoded
 my $path = uri_escape_utf8($iri->path, $unsafe . "/"); # path separator are safe
 my $query = uri_escape_utf8($iri->query, $unsafe . "&;="); # parameter separators are safe
 my $fragment = uri_escape_utf8($iri->fragment); # use the default
@@ -130,11 +139,8 @@ Mojo::IOLoop->client({
     my ($header, $mimetype, $encoding);
     $stream->on(read => sub {
       my ($stream, $bytes) = @_;
-      if ($header and $encoding) {
-	print decode($encoding, $bytes);
-      } elsif ($header) {
-	print $bytes;
-      } else {
+      if (not $header) {
+	# decide how to decode the bytes
 	($header) = $bytes =~ /^(.*?)\r\n/;
 	$header = decode_utf8 $header;
 	warn "$header\n";
@@ -143,11 +149,36 @@ Mojo::IOLoop->client({
 	  $encoding = $1 || 'UTF-8';
 	}
 	$bytes =~ s/^(.*?)\r\n//;
-	if ($encoding) {
-	  print decode($encoding, $bytes);
+	return unless $bytes;
+	if (-t STDOUT) {
+	  # connected to a tty
+	  if ($force) {
+	    binmode(STDOUT, ":raw");
+	    print $bytes;
+	  } elsif ($encoding) {
+	    if ($encoding eq $ENCODING_CONSOLE_OUT) {
+	      print $bytes;
+	    } else {
+	      warn "The console takes $ENCODING_CONSOLE_OUT but this text uses $encoding, so better not print it (use --force to do it anyway)\n";
+	      warn "Or even better, redirect it to a file:\n";
+	      warn "gemini $uri > data.txt\n";
+	      Mojo::IOLoop->stop;
+	    }
+	  } else {
+	    my $extension = extension($header);
+	    warn "Better not to print binary data to a terminal (use --force to do it anyway)\n";
+	    warn "Or even better, redirect it to a file:\n";
+	    warn "gemini $uri > data.$extension\n";
+	    Mojo::IOLoop->stop;
+	  }
 	} else {
+	  # connected to a file or pipe
+	  binmode(STDOUT, ":raw");
 	  print $bytes;
 	}
+      } else {
+	# continuing to print
+	print $bytes;
       }});
     # Write request
     warn "Requesting $uri\n" if $verbose;
@@ -155,3 +186,16 @@ Mojo::IOLoop->client({
 
 # Start event loop if necessary
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+# Helper
+sub extension {
+  $_ = shift;
+  return 'gmi' if /text\/gemini/;
+  return 'txt' if /text\/plain/;
+  return 'md' if /text\/markdown/;
+  return 'html' if /text\/html/;
+  return 'png' if /image\/png/;
+  return 'jpg' if /image\/jpeg/;
+  return 'gif' if /image\/gif/;
+  return 'txt';
+}

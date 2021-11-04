@@ -1,5 +1,14 @@
 Revision history for Future-AsyncAwait
 
+0.54    2021-10-26
+        [CHANGES]
+         * Add unit-test for await from within perl 5.35.5's multi-variable
+           `for_list` feature
+         * Add cross-module test for compatibility with Syntax::Keyword::Match
+
+        [BUGFIXES]
+         * Handle `state` vars correctly (RT139821)
+
 0.53    2021-08-26
         [CHANGES]
          * Updated for XS::Parse::Keyword 0.13

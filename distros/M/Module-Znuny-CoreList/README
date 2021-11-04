@@ -1,0 +1,55 @@
+NAME
+
+    Module::Znuny::CoreList
+
+VERSION
+
+    version 1.00
+
+SYNOPSIS
+
+     use Module::Znuny::CoreList;
+    
+     my @znuny_versions = Module::Znuny::CoreList->shipped(
+        '6.0.x',
+        'Kernel::System::DB',
+     );
+    
+     # returns (6.0.31, 6.0.32, ...)
+    
+     my @modules = Module::Znuny::CoreList->modules( '6.0.32' );
+     my @modules = Module::Znuny::CoreList->modules( '6.1.x' );
+    
+     # methods to check for CPAN modules shipped with Znuny
+    
+     my @cpan_modules = Module::Znuny::CoreList->cpan_modules( '6.0.x' );
+    
+     my @znuny_versions = Module::Znuny::CoreList->shipped(
+        '6.0.x',
+        'CGI',
+     );
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2021 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2021 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

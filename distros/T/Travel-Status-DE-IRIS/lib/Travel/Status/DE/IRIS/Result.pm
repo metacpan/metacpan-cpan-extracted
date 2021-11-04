@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq lastval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.60';
+our $VERSION = '1.61';
 
 my %translation = (
 	1 => 'Nähere Informationen in Kürze',
@@ -74,7 +74,7 @@ my %translation = (
 	48 => 'Verspätung aus vorheriger Fahrt',
 	49 => 'Kurzfristiger Personalausfall',
 	50 => 'Kurzfristige Erkrankung von Personal',
-	51 => 'Verspätetes Personal aus vorheiger Fahrt',
+	51 => 'Verspätetes Personal aus vorheriger Fahrt',
 	52 => 'Streik',
 	53 => 'Unwetterauswirkungen',
 	54 => 'Verfügbarkeit der Gleise derzeit eingeschränkt',
@@ -876,7 +876,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 DESCRIPTION
 

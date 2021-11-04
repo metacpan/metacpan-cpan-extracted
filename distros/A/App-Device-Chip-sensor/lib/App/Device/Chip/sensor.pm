@@ -1,21 +1,24 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use Object::Pad 0.19;
 
-package App::Device::Chip::sensor 0.02;
+package App::Device::Chip::sensor 0.03;
 class App::Device::Chip::sensor;
 
 use Carp;
 
+use Feature::Compat::Defer;
 use Future::AsyncAwait;
 
 use Device::Chip::Adapter;
 use Future::IO 0.08; # ->alarm
 use Getopt::Long qw( GetOptionsFromArray );
+use List::Util qw( all max );
+use Scalar::Util qw( refaddr );
 
 =head1 NAME
 
@@ -75,6 +78,12 @@ Adapter configuration string to pass to L<Device::Chip::Adapter/new_from_descrip
 to construct the chip adapter used for communication with the actual chip
 hardware.
 
+=item * --mid3, -m
+
+Enable "middle-of-3" filtering of gauge values, to reduce sensor noise from
+unreliable sensors. At each round of readings, the most recent three values
+from the sensor are sorted numerically and the middle one is reported.
+
 =back
 
 =cut
@@ -84,12 +93,20 @@ method _chipconfigs { @_CHIPCONFIGS }  # for unit testing
 
 has $_interval :reader = 10;
 
+has $_best_effort;
+
+has $_mid3;
+
 method OPTSPEC
 {
    return (
       'b|blib' => sub { require blib; blib->import; },
 
       'i|interval=i' => \$_interval,
+
+      'm|mid3' => \$_mid3,
+
+      'B|best-effort' => \$_best_effort,
    );
 }
 
@@ -204,11 +221,20 @@ instances of each of the configured chips (from the L</chips> method).
 =cut
 
 has $_sensors; # arrayref
+
+has $_chipname_width;
+has $_sensorname_width;
+
+sub _chipname ( $chip ) { return ( ref $chip ) =~ s/^Device::Chip:://r }
+
 async method sensors
 {
    return @$_sensors if $_sensors;
 
    @$_sensors = map { $_->list_sensors } await $self->chips;
+
+   $_chipname_width   = max map { length _chipname $_ } @$_chips;
+   $_sensorname_width = max map { length $_->name } @$_sensors;
 
    await $self->after_sensors( @$_sensors );
 
@@ -241,11 +267,13 @@ async method run ()
 
    $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
-   END {
+   defer {
       $chips[0] and $chips[0]->protocol->power(0)->get;
    }
 
    my @sensors = await $self->sensors;
+
+   my %readings_by_chip;
 
    my $waittime = Time::HiRes::time();
    while(1) {
@@ -253,13 +281,80 @@ async method run ()
       my $now = Time::HiRes::time();
 
       my @values = await Future->needs_all(
-         map { $_->read } @sensors
+         map {
+            my $sensor = $_;
+            my $f = $sensor->read;
+            $f = $f->else( async sub ($failure, @) {
+               my $sensorname = $sensor->name;
+               my $chipname   = ref ( $sensor->chip );
+               warn "Unable to read $sensorname of $chipname: $failure";
+               return undef;
+            } ) if $_best_effort;
+            $f;
+         } @sensors
       );
+
+      if( $_mid3 ) {
+         foreach my $idx ( 0 .. $#sensors ) {
+            my $sensor = $sensors[$idx];
+            my $value  = $values[$idx];
+
+            next unless $sensor->type eq "gauge";
+
+            # Accumulate the past 3 readings
+            my $readings = $readings_by_chip{ refaddr $sensor } //= [];
+            push @$readings, $value;
+            shift @$readings while @$readings > 3;
+
+            # Take the middle of the 3
+            if( @$readings == 3 and all { defined } @$readings ) {
+               my @sorted = sort { $a <=> $b } @$readings;
+               $values[$idx] = $sorted[1];
+            }
+         }
+      }
 
       $self->output_readings( $now, \@sensors, \@values );
 
       $waittime += $_interval;
       await Future::IO->alarm( $waittime );
+   }
+}
+
+=head2 print_readings
+
+   $app->print_readings( $sensors, $values )
+
+Prints the sensor names and current readings in a human-readable format to the
+currently-selected output handle (usually C<STDOUT>).
+
+=cut
+
+method print_readings ( $sensors, $values )
+{
+   foreach my $i ( 0 .. $#$sensors ) {
+      my $sensor = $sensors->[$i];
+      my $value  = $values->[$i];
+
+      my $chip = $sensor->chip;
+      my $chipname = _chipname $chip;
+
+      my $units = $sensor->units;
+      $units = " $units" if defined $units;
+
+      my $valuestr;
+      if( !defined $value ) {
+         $valuestr = "<undef>";
+      }
+      elsif( $sensor->type eq "gauge" ) {
+         $valuestr = sprintf "%s%s", $sensor->format( $value ), $units // "";
+      }
+      else {
+         $valuestr = sprintf "%s%s/sec", $sensor->format( $value / $self->interval ), $units // "";
+      }
+
+      printf "% *s/% *s: %s\n",
+         $_chipname_width, $chipname, $_sensorname_width, $sensor->name, $valuestr;
    }
 }
 

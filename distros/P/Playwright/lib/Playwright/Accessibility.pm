@@ -9,13 +9,17 @@ use strict;
 use warnings;
 
 package Playwright::Accessibility;
-$Playwright::Accessibility::VERSION = '0.016';
+$Playwright::Accessibility::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
     my ( $self, %options ) = @_;
     $options{type} = 'Accessibility';
     return $self->SUPER::new(%options);
+}
+
+sub spec {
+    return $Playwright::spec->{'Accessibility'}{members};
 }
 
 sub snapshot {
@@ -72,7 +76,7 @@ Playwright::Accessibility - Automatically generated class for Playwright::Access
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 

@@ -1,9 +1,11 @@
+.github/workflows/perltest.yml
 Changes
 inc/Module/Install.pm
 inc/Module/Install/AuthorTests.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/ReadmeFromPod.pm
@@ -20,6 +22,8 @@ README
 t/00-compile.t
 t/01-find.t
 t/02-fileurl.t
+t/data/autodiscover/fix_uri
+t/data/autodiscover/strip_wayback
 t/data/href.html
 t/data/link.html
 xt/pod.t

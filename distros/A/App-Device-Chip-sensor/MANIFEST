@@ -1,14 +1,18 @@
 bin/device-chip-sensor
 bin/device-chip-sensor-datalogger
+bin/device-chip-sensor-exporter
 Build.PL
 Changes
 lib/App/Device/Chip/sensor.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/10args.t
 t/11chips.t
+t/12readings.t
+t/13print_readings.t
+t/20mid3.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

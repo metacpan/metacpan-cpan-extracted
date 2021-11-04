@@ -6,7 +6,7 @@ API routes work as expected.
 
 =head1 SEE ALSO
 
-L<Yancy::Backend::Test>
+L<Yancy::Backend::Memory>
 
 =cut
 
@@ -19,8 +19,8 @@ use Mojo::File qw( path );
 use lib "".path( $Bin, 'lib' );
 use Local::Test qw( init_backend );
 
-my $schema = \%Yancy::Backend::Test::SCHEMA;
-my $schema_micro = \%Yancy::Backend::Test::SCHEMA_MICRO;
+my $schema = \%Local::Test::SCHEMA;
+my $schema_micro = \%Local::Test::SCHEMA_MICRO;
 my %data = (
     people => [
         {
@@ -564,7 +564,7 @@ sub test_api {
           ->json_is( '/id' => $items{user}[0]{id} )
           ->json_is( '/username' => 'doug' )
           ->json_is( '/email' => 'doug@example.com' )
-          ->json_is( '/password' => 'ignore' )
+          ->json_is( '/password' => undef )
           ->json_is( '/access' => 'user' )
           ->json_is( '/age' => 35 )
           ->json_is( '/plugin' => 'password' )
@@ -578,7 +578,7 @@ sub test_api {
               ->json_is( '/id' => $items{user}[1]{id} )
               ->json_is( '/username' => 'joe/' )
               ->json_is( '/email' => 'joel@example.com' )
-              ->json_is( '/password' => 'ignore' )
+              ->json_is( '/password' => undef )
               ->json_is( '/access' => 'user' )
               ->json_is( '/age' => 32 )
               ->json_is( '/plugin' => 'password' )

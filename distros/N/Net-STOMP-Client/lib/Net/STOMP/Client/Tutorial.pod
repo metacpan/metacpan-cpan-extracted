@@ -517,4 +517,4 @@ L<Net::STOMP::Client::Version>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2017
+Copyright (C) CERN 2010-2021

@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint;
-$Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -47,7 +47,7 @@ sub GetQuickEstimate {
     die "GetQuickEstimate must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'GetQuickEstimate',
+        {   operation   => 'GetQuickEstimate',
             soap_action =>
               'http://purolator.com/pws/service/v2/GetQuickEstimate',
             style => 'document',
@@ -108,7 +108,7 @@ sub GetFullEstimate {
     die "GetFullEstimate must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'GetFullEstimate',
+        {   operation   => 'GetFullEstimate',
             soap_action =>
               'http://purolator.com/pws/service/v2/GetFullEstimate',
             style => 'document',
@@ -204,7 +204,7 @@ Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEnd
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

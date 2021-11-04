@@ -1,5 +1,12 @@
 Revision history for `optex' command.
 
+v0.5.2 2021-11-01T08:36:05Z
+
+    - Update util::filter::rev_char() to handle logical characters.
+    - Make util::filter::visible() to accept empty parameter.
+    - Add document for util::argv and util::filter.
+    - Add non-blocking space in -Mutil::filter::visible.
+
 v0.5.1 2021-09-12T13:54:25Z
 
     - Fix for unexpected regex behavior.

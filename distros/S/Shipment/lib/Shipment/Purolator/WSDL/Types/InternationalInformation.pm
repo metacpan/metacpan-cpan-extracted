@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::InternationalInformation;
-$Shipment::Purolator::WSDL::Types::InternationalInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::InternationalInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,14 +40,14 @@ Class::Std::initialize();
               ImportExportType
               CustomsInvoiceDocumentIndicator
 
-              )
+            )
         ],
-        {   'DocumentsOnlyIndicator' => \%DocumentsOnlyIndicator_of,
-            'ContentDetails'         => \%ContentDetails_of,
-            'BuyerInformation'       => \%BuyerInformation_of,
-            'PreferredCustomsBroker' => \%PreferredCustomsBroker_of,
-            'DutyInformation'        => \%DutyInformation_of,
-            'ImportExportType'       => \%ImportExportType_of,
+        {   'DocumentsOnlyIndicator'          => \%DocumentsOnlyIndicator_of,
+            'ContentDetails'                  => \%ContentDetails_of,
+            'BuyerInformation'                => \%BuyerInformation_of,
+            'PreferredCustomsBroker'          => \%PreferredCustomsBroker_of,
+            'DutyInformation'                 => \%DutyInformation_of,
+            'ImportExportType'                => \%ImportExportType_of,
             'CustomsInvoiceDocumentIndicator' =>
               \%CustomsInvoiceDocumentIndicator_of,
         },
@@ -68,12 +68,12 @@ Class::Std::initialize();
         },
         {
 
-            'DocumentsOnlyIndicator' => 'DocumentsOnlyIndicator',
-            'ContentDetails'         => 'ContentDetails',
-            'BuyerInformation'       => 'BuyerInformation',
-            'PreferredCustomsBroker' => 'PreferredCustomsBroker',
-            'DutyInformation'        => 'DutyInformation',
-            'ImportExportType'       => 'ImportExportType',
+            'DocumentsOnlyIndicator'          => 'DocumentsOnlyIndicator',
+            'ContentDetails'                  => 'ContentDetails',
+            'BuyerInformation'                => 'BuyerInformation',
+            'PreferredCustomsBroker'          => 'PreferredCustomsBroker',
+            'DutyInformation'                 => 'DutyInformation',
+            'ImportExportType'                => 'ImportExportType',
             'CustomsInvoiceDocumentIndicator' =>
               'CustomsInvoiceDocumentIndicator',
         }
@@ -96,7 +96,7 @@ Shipment::Purolator::WSDL::Types::InternationalInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

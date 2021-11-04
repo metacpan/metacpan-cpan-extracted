@@ -1,5 +1,11 @@
 Revision history for Net-STOMP-Client:
 
+2.5	Thu Oct 14 2021
+	* Fixed Makefile.PL (PREREQ_PM).
+
+2.4	Wed Oct 13 2021
+	* Fixed the timeout documentation (RT#124655).
+
 2.3	Tue Jan 31 2017
 	* Allow underscores in failover URIs (RT#119869).
 

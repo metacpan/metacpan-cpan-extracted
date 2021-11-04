@@ -54,7 +54,7 @@ EOF
         system(qq{$OPENSSL genrsa -out $key{$i} >$DEVNULL 2>&1}) and die $!;
         system(qq{$OPENSSL req -new -key $key{$i} -out $csr{$i} -config $conf_file >$DEVNULL 2>&1}) and die $!;
         system(qq{$OPENSSL x509 -in $csr{$i} -out $crt{$i} -req -signkey $key{$i} -set_serial $i >$DEVNULL 2>&1}) and die $!;
-        system(qq{$OPENSSL pkcs12 -export -out $p12{$i} -inkey $key{$i} -in $crt{$i} -passout pass:Secret123 >$DEVNULL 2>&1}) and die $!;
+        system(qq{$OPENSSL pkcs12 -export -descert -out $p12{$i} -inkey $key{$i} -in $crt{$i} -passout pass:Secret123 >$DEVNULL 2>&1}) and die $!;
     }
 };
 

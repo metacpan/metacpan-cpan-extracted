@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Argument 0.26;
+use v5.26;
+use Object::Pad 0.43;
 
-use v5.14;
-use warnings;
+package Tangence::Meta::Argument 0.27;
+class Tangence::Meta::Argument :strict(params);
 
 =head1 NAME
 
@@ -45,12 +46,8 @@ Type of the arugment as a L<Tangence::Meta::Type> reference
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
-   bless \%args, $class;
-}
+has $name :reader :param = undef;
+has $type :reader :param;
 
 =head1 ACCESSORS
 
@@ -64,12 +61,6 @@ Returns the name of the class
 
 =cut
 
-sub name
-{
-   my $self = shift;
-   return $self->{name};
-}
-
 =head2 type
 
    $type = $argument->type
@@ -77,12 +68,6 @@ sub name
 Return the type as a L<Tangence::Meta::Type> reference.
 
 =cut
-
-sub type
-{
-   my $self = shift;
-   return $self->{type};
-}
 
 =head1 AUTHOR
 

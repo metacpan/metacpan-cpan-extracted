@@ -84,6 +84,7 @@ sub defaults {
             squash_spaces     => 0,
             tab_width         => 2,
             table_expand      => 1,
+            trunc_fract_first => 1,
             undef             => '',
         },
         insert => {

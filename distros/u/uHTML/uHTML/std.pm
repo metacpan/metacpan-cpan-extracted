@@ -4,13 +4,13 @@
 # Author: Roland Mosler - Roland@Place.Ug
 #
 # Das ist eine uHTML-Bibliothek von Place.Ug
-# Es ist erlaubt dieses Paket unter der aktuellen GNU LGPL zu nutzen
+# Es ist erlaubt dieses Paket unter der GPLv3 zu nutzen
 # Bei Weiterentwicklungen ist die Ursprungsbibliothek zu nennen
 #
 # Fehler und Verbesserungen bitte an uHTML@Place.Ug
 #
 # This is a uHTML library from Place.Ug
-# It is allowed to use this library under the actual GNU LGPL
+# It is allowed to use this library under the GPLv3
 # The name of this library is to be named in all derivations
 #
 # Please report errors to uHTML@Place.Ug
@@ -22,7 +22,7 @@ use strict ;
 
 package uHTML::std ;
 
-use version ; our $VERSION = "2.28" ;
+use version ; our $VERSION = "2.32" ;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -49,6 +49,7 @@ sub DoIf( $ )
   my $Node = shift ;
 
   my $Child ;
+
 
   if( eval( $Node->attr( 'cond' ) ) )
   {
@@ -226,7 +227,7 @@ sub Include( $ )
         $Node->errorMsg( "Include: File \"$FN\" not readable." ) if $Node->testAttr( 'warn' ) ;
       }
     }
-    $Node->HTML( @Text ) ;
+    $Node->HTML( @Text ) if @Text ;
   }
   else
   {
@@ -302,7 +303,7 @@ sub _Replace( $$$ )
   print STDERR "Insert $Var = '${$Node->{'ENV'}->{'uHTML.Defines'}->{$Var}}[0]'\n" if $DEBUG > 1 and ref $D eq 'ARRAY' ;
   print STDERR "Insert $Var = ''\n" if $DEBUG > 1 and ref $D ne 'ARRAY' ;
 
-  return( ref $D eq 'ARRAY' ? join '',uHTML::recode( $D->[0],$Node->{'ENV'} ) : '' ) ;
+  return( ref $D eq 'ARRAY' ? join( '',uHTML::recode( $D->[0],$Node->{'ENV'} ) ) : '' ) ;
 }
 
 sub Define( $ )
@@ -395,14 +396,14 @@ sub _checkMacro( $$ )
   if( ref $env->{'uHTML.Macros'} ne 'HASH' )
   {
 #
+    my( %Macros,%MacroVal,%MacroHTML,%MacroBody ) ;
 
-      my( %Macros,%MacroVal,%MacroHTML,%MacroBody ) ;
     $env->{'uHTML.Macros'}    = \%Macros ;   #$MACROS{$env->{'HTTP_HOST'}}->{'Macros'} ;
     $env->{'uHTML.MacroVal'}  = \%MacroVal ; #$MACROS{$env->{'HTTP_HOST'}}->{'MacroVal'} ;
     $env->{'uHTML.MacroHTML'} = \%MacroHTML ;#$MACROS{$env->{'HTTP_HOST'}}->{'MacroHTML'} ;
     $env->{'uHTML.MacroBody'} = \%MacroBody ;#$MACROS{$env->{'HTTP_HOST'}}->{'MacroBody'} ;
+    return undef ;
   }
-
 
   return $env->{'uHTML.Macros'}->{$Name} ;
 }
@@ -456,22 +457,22 @@ sub _DoMacro( $ )
   $Node->attr( $_ ) or $Node->deleteAttr( $_ ) foreach qw( createonly replace ) ;
   $Node->testAttr( $_ ) or $Node->setAttr( $_,$env->{'uHTML.MacroVal'}->{$Name}->{$_} ) foreach @{$env->{'uHTML.MacroAttr'}->{$Name}} ;
   print STDERR "Execute macro $Name(${\(join ',',map \"$_='${\($Node->attr($_))}'\",keys %{$Node->attributes()})})\n" if $DEBUG > 0 ;
-  Define( $Node ) ;
-  $Macro->map( '','' ) ;
-  ClearDef( $Node ) ;
 
+  Define( $Node ) ;
   if( $env->{'uHTML.MacroBody'}->{$Name} )
   {
-    my( $H,$T ) = split m/<MacroBody>/s,$Macro->HTML(),2 ;
-    $T =~ s/<MacroBody>//sg ;
     $Node->map( '','' ) ;
+    $Macro->map( '','' ) ;
+    my( $H,$T ) = split m/<MacroBody>/s,$Macro->HTML(),2 ;
     unshift @{$Node->{HTML}},$H ;
     push    @{$Node->{HTML}},$T ;
   }
   else
   {
+    $Macro->map( '','' ) ;
     $Node->{HTML} = $Macro->{HTML} ;
   }
+  ClearDef( $Node ) ;
 }
 
 sub _findMacroBody
@@ -480,14 +481,14 @@ sub _findMacroBody
 
   return undef unless $Node->firstChild() ;
 
-  my( $Child,$Body ) ;
+  my( $Child,$MBody ) ;
 
   for( $Child = $Node->firstChild() ; $Child ; $Child=$Child->next() )
   {
-    return $Child if $Child->name() eq 'MacroBody' ;
-    return $Body  if $Body = _findMacroBody( $Child ) ;
+    $MBody ? $Child->delete()         : ($MBody = $Child) if $Child->name() eq 'MacroBody' ;
+    $MBody ? _findMacroBody( $Child ) : ($MBody = _findMacroBody( $Child )) ;
   }
-  return undef ;
+  return $MBody ;
 }
 
 sub Macro( $ )
@@ -499,20 +500,24 @@ sub Macro( $ )
 
   return unless $Node->end() and $Name = $Node->attr( 'name' ) ;
   return if     $Replace = _checkMacro( $env,$Name ) and not $Node->testAttr( 'replace' ) ;
-  print STDERR "Define Macro '$Name\(${\($Node->attr( 'attributes' ))}\)'\n" if $DEBUG > 0 ;
-  $env->{'uHTML.MacroBody'}->{$Name} = _findMacroBody( $env->{'uHTML.Macros'}->{$Name} = $Node ) ;
+  print STDERR "Define Macro '$Name\(${\($Node->attr( 'attributes' ))}\)'\n" if $DEBUG > 1 ;
+
+  $env->{'uHTML.MacroBody'}->{$Name} = _findMacroBody( $env->{'uHTML.Macros'}->{$Name} = $Node->copy() ) ;
+
   if( $Node->testAttr( 'attributes' ) )
   {
     my( @AT,@A ) ;
 
     if( @AT = ($Node->attr( 'attributes' ) =~ m/([^,'"=\s]+)(?:\s*\=\s*((?:\\,|[^'",])(?:\\,|[^,\s])*|'(?:\\'|[^'])*'|"(?:\\"|[^"])*")?)?\s*,?/sg) )
     {
-      $_ & 1 ? $AT[$_] =~ m/^["']/ && $AT[$_] =~ s/^["']|["']$//g : push @A,$AT[$_] foreach 0 .. $#AT ;
+      $_ & 1 ? $AT[$_] =~ m/^["']/ && $AT[$_] =~ s/^["']|["']$//g : push( @A,$AT[$_] ) foreach 0 .. $#AT ;
       %{$env->{'uHTML.MacroVal'}->{$Name}} = ( @AT ) ;
-      $env->{'uHTML.MacroAttr'}->{$Name} = \@A ;
+      $env->{'uHTML.MacroAttr'}->{$Name}   = \@A ;
     }
   }
+
   return if $Replace ;
+  print STDERR "Register Macro '$Name'\n" if $DEBUG > 0 and $env->{'uHTML.Macros'}->{$Name} and $Name eq 'Help' ;
   uHTML::registerTag( $Name,\&_DoMacro,1 ) ;
   uHTML::registerVar( $Name,\&_getMacroValue,1 ) ;
 }
@@ -571,7 +576,7 @@ sub _filterNode
 
   for( my $Child = $Node->{FirstChild} ; $Child ; $Child = $Child->{Next} )
   {
-    _filterNode( $Child,$R ) ;
+    _filterNode( $Child,$R ) unless $Node->{Name} =~ m/^skip/ ;
   }
 }
 
@@ -579,8 +584,9 @@ sub skipLF
 {
   my $Node = shift ;
 
+#   my $R = $Node->testAttr( 'keepspaces' ) ? qr/\n/ :
   my $R = $Node->testAttr( 'keepspaces' ) ? qr/\n/ :
-          $Node->testAttr( 'allspaces' )  ? qr/(?:\s*\n\s*)+/ : qr/\n\s*/ ;
+          $Node->testAttr( 'allspaces' )  ? qr/(?: *\n *)+/ : qr/\n */ ;
   _filterNode( $Node,$R ) ;
   if( $R = $Node->attr( 'tag' ) )
   {

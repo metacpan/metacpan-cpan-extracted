@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CustomerSpecifiedLabelDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CustomerSpecifiedLabelDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CustomerSpecifiedLabelDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -43,14 +43,14 @@ Class::Std::initialize();
               AdditionalLabels
               AirWaybillSuppressionCount
 
-              )
+            )
         ],
-        {   'DocTabContent' => \%DocTabContent_of,
-            'CustomContent' => \%CustomContent_of,
+        {   'DocTabContent'                => \%DocTabContent_of,
+            'CustomContent'                => \%CustomContent_of,
             'ConfigurableReferenceEntries' =>
               \%ConfigurableReferenceEntries_of,
-            'MaskedData'   => \%MaskedData_of,
-            'ScncOverride' => \%ScncOverride_of,
+            'MaskedData'                     => \%MaskedData_of,
+            'ScncOverride'                   => \%ScncOverride_of,
             'TermsAndConditionsLocalization' =>
               \%TermsAndConditionsLocalization_of,
             'AdditionalLabels'           => \%AdditionalLabels_of,
@@ -75,11 +75,11 @@ Class::Std::initialize();
         },
         {
 
-            'DocTabContent'                => 'DocTabContent',
-            'CustomContent'                => 'CustomContent',
-            'ConfigurableReferenceEntries' => 'ConfigurableReferenceEntries',
-            'MaskedData'                   => 'MaskedData',
-            'ScncOverride'                 => 'ScncOverride',
+            'DocTabContent'                  => 'DocTabContent',
+            'CustomContent'                  => 'CustomContent',
+            'ConfigurableReferenceEntries'   => 'ConfigurableReferenceEntries',
+            'MaskedData'                     => 'MaskedData',
+            'ScncOverride'                   => 'ScncOverride',
             'TermsAndConditionsLocalization' =>
               'TermsAndConditionsLocalization',
             'AdditionalLabels'           => 'AdditionalLabels',
@@ -104,7 +104,7 @@ Shipment::FedEx::WSDL::ShipTypes::CustomerSpecifiedLabelDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

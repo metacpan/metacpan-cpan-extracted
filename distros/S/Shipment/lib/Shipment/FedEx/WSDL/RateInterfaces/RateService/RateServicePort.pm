@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateInterfaces::RateService::RateServicePort;
-$Shipment::FedEx::WSDL::RateInterfaces::RateService::RateServicePort::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateInterfaces::RateService::RateServicePort::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -40,7 +40,7 @@ sub getRates {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::FedEx::WSDL::RateElements::RateRequest )],
             },
             header => {
@@ -59,7 +59,7 @@ sub getRates {
                     'use'         => 'literal',
                     namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                     encodingStyle => '',
-                    parts =>
+                    parts         =>
                       [qw( Shipment::FedEx::WSDL::RateElements::RateReply )],
                 },
             }
@@ -110,7 +110,7 @@ Shipment::FedEx::WSDL::RateInterfaces::RateService::RateServicePort
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

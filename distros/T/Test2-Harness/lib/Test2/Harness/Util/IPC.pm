@@ -2,7 +2,7 @@ package Test2::Harness::Util::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '1.000073';
+our $VERSION = '1.000080';
 
 use Cwd qw/getcwd/;
 use Config qw/%Config/;
@@ -105,7 +105,8 @@ sub _run_cmd_fork {
 
     swap_io(\*STDERR, $stderr, $die) if $stderr;
     swap_io(\*STDOUT, $stdout, $die) if $stdout;
-    $stdin ? swap_io(\*STDIN,  $stdin,  $die) : close(STDIN);
+    swap_io(\*STDIN,  $stdin,  $die) if $stdin;
+    open(STDIN, "<", "/dev/null") if !$stdin;
 
     @$cmd = map { ref($_) eq 'CODE' ? $_->() : $_ } @$cmd;
 

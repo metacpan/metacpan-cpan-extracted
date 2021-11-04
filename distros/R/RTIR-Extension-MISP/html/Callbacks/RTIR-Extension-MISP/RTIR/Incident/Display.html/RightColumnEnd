@@ -1,0 +1,16 @@
+<div class="ticket-info-misp"><&|/l&>Loading...</&></div>
+
+<script type="text/javascript">
+jQuery( function() {
+    jQuery('.ticket-info-misp').load(RT.Config.WebPath + '/Helpers/MISPEventDetails?EventID=<% $event_id %> .titlebox');
+});
+</script>
+
+<%init>
+my $event_id = $Ticket->FirstCustomFieldValue('MISP Event ID');
+return unless $event_id;
+</%init>
+
+<%args>
+$Ticket
+</%args>

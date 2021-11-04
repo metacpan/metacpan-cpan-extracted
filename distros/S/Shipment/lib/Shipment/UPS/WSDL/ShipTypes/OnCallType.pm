@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::OnCallType;
-$Shipment::UPS::WSDL::ShipTypes::OnCallType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::OnCallType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        PickupDetails
 
-              )
+            )
         ],
         {'PickupDetails' => \%PickupDetails_of,},
         {   'PickupDetails' =>
@@ -56,7 +56,7 @@ Shipment::UPS::WSDL::ShipTypes::OnCallType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

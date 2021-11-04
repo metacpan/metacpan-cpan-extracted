@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-App-BashCompleter-cpanm"
       }
    },
-   "version" : "0.210",
+   "version" : "0.211",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

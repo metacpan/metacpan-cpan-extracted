@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.077';
+our $VERSION = '1.084';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -62,7 +62,7 @@ our $VERSION = '1.077';
 #pod =item type
 #pod
 #pod The type of the input field to create. One of the JSON schema types.
-#pod See L<Yancy::Help::Config/Data Collections> for details on the supported
+#pod See L<Yancy::Guides::Schema/Types> for details on the supported
 #pod types.
 #pod
 #pod =item name
@@ -78,7 +78,7 @@ our $VERSION = '1.077';
 #pod
 #pod For C<string> types, the format the string should take. One of the
 #pod supported JSON schema formats, along with some additional ones. See
-#pod L<Yancy::Help::Config/Generated Forms> for details on the supported
+#pod L<Yancy::Guides::Schema/Types> for details on the supported
 #pod formats.
 #pod
 #pod =item pattern
@@ -130,7 +130,7 @@ our $VERSION = '1.077';
 #pod =back
 #pod
 #pod Most of these properties are the same as the JSON schema field
-#pod properties. See L<Yancy::Help::Config/Generated Forms> for details on
+#pod properties. See L<Yancy::Guides::Schema/Declaring a Schema> for details on
 #pod how Yancy translates JSON schema into forms.
 #pod
 #pod =head2 yancy->form->input_for
@@ -200,12 +200,12 @@ our $VERSION = '1.077';
 #pod =item title
 #pod
 #pod The field's title. Defaults to the C<title> defined for this property
-#pod in the schema (see L<Yancy::Help::Config>), or the field's name.
+#pod in the schema (see L<Yancy::Guides::Schema>), or the field's name.
 #pod
 #pod =item description
 #pod
 #pod The field's description. Optional. Defaults to the C<description> defined
-#pod for this property in the schema (see L<Yancy::Help::Config>).
+#pod for this property in the schema (see L<Yancy::Guides::Schema>).
 #pod
 #pod =item class
 #pod
@@ -283,7 +283,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.077
+version 1.084
 
 =head1 SYNOPSIS
 
@@ -345,7 +345,7 @@ C<%args> is a list of name/value pairs with the following keys:
 =item type
 
 The type of the input field to create. One of the JSON schema types.
-See L<Yancy::Help::Config/Data Collections> for details on the supported
+See L<Yancy::Guides::Schema/Types> for details on the supported
 types.
 
 =item name
@@ -361,7 +361,7 @@ the current request parameters.
 
 For C<string> types, the format the string should take. One of the
 supported JSON schema formats, along with some additional ones. See
-L<Yancy::Help::Config/Generated Forms> for details on the supported
+L<Yancy::Guides::Schema/Types> for details on the supported
 formats.
 
 =item pattern
@@ -413,7 +413,7 @@ form.
 =back
 
 Most of these properties are the same as the JSON schema field
-properties. See L<Yancy::Help::Config/Generated Forms> for details on
+properties. See L<Yancy::Guides::Schema/Declaring a Schema> for details on
 how Yancy translates JSON schema into forms.
 
 =head2 yancy->form->input_for
@@ -483,12 +483,12 @@ is a hash with the following keys:
 =item title
 
 The field's title. Defaults to the C<title> defined for this property
-in the schema (see L<Yancy::Help::Config>), or the field's name.
+in the schema (see L<Yancy::Guides::Schema>), or the field's name.
 
 =item description
 
 The field's description. Optional. Defaults to the C<description> defined
-for this property in the schema (see L<Yancy::Help::Config>).
+for this property in the schema (see L<Yancy::Guides::Schema>).
 
 =item class
 

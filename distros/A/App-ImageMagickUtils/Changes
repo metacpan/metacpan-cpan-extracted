@@ -1,3 +1,28 @@
+0.008   2021-10-12  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] [doc] Rebuild with Math::Image::CalcResized 0.005 to add
+          description to image-resize-notation-to-human.
+
+
+0.007   2021-10-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli convert-image-to] [cli convert-image-to-pdf] Also add
+	  --delete-original (-D) option.
+
+	- [doc] List included CLIs in main module's Description.
+
+
+0.006   2021-10-12  Released-By: PERLANCAR; Urgency: medium
+
+	[cli downsize-image]
+
+        - Add option --delete-original.
+
+        - [ux] Return 500 if all files failed.
+
+
 0.005   2021-10-05  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utilities: convert-image-to, convert-image-to-pdf.

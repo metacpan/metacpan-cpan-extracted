@@ -1,126 +1,54 @@
-NAME
-
-    MToken - Tokens processing system (Security)
-
-VERSION
-
-    Version 1.03
+This is the tokens processing system
 
 SYNOPSIS
 
-        mtoken init MyToken
-        perl Makefile.PL
-        make init
-        make help
+  cd /mnt/mydrive
+  mtoken init MyToken
+  mtoken status
 
-DESCRIPTION
+STEP1
 
-    Tokens processing system (Security)
+  Initialize (create) a token device
 
-    STEP1
+    cd /my/token/dir
+    mtoken init MyToken
+    mtoken status
 
-      Create a token device
+STEP2
 
-          cd /my/token/dir
-          mtoken init MyToken
+  Add file to device
 
-    STEP2
+    mtoken add file.txt
 
-      Initialize the MyToken device
+  Show file list on device
 
-          perl Makefile.PL
-          make init
+    mtoken list
 
-      Get help page
+  Show file from device on screen
 
-          make help
+    mtoken show file.txt
 
-      Test the device
+  Delete file from device
 
-          make test
+    mtoken delete file.txt
 
-    STEP3
+STEP3
 
-      Generate GPG key pair
+  Create tarball (snapshot of current token device) and send it to server
 
-          make gengpgkey
+    mtoken commit
 
-    STEP4
+  Show list of all available tarballs on server
 
-      Add file to device
+    mtoken status
 
-          make add
+  Restore token device from server tarball
 
-      Update file on device
+    mtoken up
 
-          make update
+STEP4
 
-      Delete file from device
+  Cleaning the device (delete all temporary files)
 
-          make delete
-
-      Show file list on device
-
-          make show
-
-    STEP5
-
-      Backup current token device to server
-
-          make backup
-
-      Show list of all available backups on server
-
-          make list
-
-      Show information about last backup stored on server
-
-          make info
-
-    STEP6
-
-      Restore token device from server backup
-
-          make restore
-
-    STEP7
-
-      Cleaning the device (delete all temporary files)
-
-          make clean
-
-HISTORY
-
-    See Changes file
-
-DEPENDENCIES
-
-    LWP, CTK, openssl, gnupg
-
-TO DO
-
-    See TODO file
-
-BUGS
-
-    * none noted
-
-SEE ALSO
-
-    CTK
-
-AUTHOR
-
-    Serż Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
-
-COPYRIGHT
-
-    Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
-
-LICENSE
-
-    This program is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
-
-    See LICENSE file and https://dev.perl.org/licenses/
+    make clean
 

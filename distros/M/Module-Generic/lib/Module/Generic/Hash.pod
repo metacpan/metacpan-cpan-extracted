@@ -105,7 +105,7 @@ Module::Generic::Hash - Hash Manipulation Object Class
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 
@@ -161,6 +161,14 @@ Possible optional parameters are:
 Provided with an integer and this actives or deactivates debugging messages. Nothing meaningful happens below 3
 
 =back
+
+=head2 as_hash
+
+Returns the hash object as a regular hash reference. It copies all the keys and their values into a new anonymous hash and returns it.
+
+=head2 as_json
+
+Returns a json representation of the hash
 
 =head2 as_string
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail;
-$Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               SmartPostHubId
               SmartPostIndicia
 
-              )
+            )
         ],
         {   'FreightGuarantee' => \%FreightGuarantee_of,
             'SmartPostHubId'   => \%SmartPostHubId_of,
@@ -39,7 +39,7 @@ Class::Std::initialize();
         },
         {   'FreightGuarantee' =>
               'Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeType',
-            'SmartPostHubId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SmartPostHubId'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'SmartPostIndicia' =>
               'Shipment::FedEx::WSDL::RateTypes::SmartPostIndiciaType',
         },
@@ -68,7 +68,7 @@ Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

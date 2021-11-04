@@ -9,7 +9,7 @@ require 5.010000;
 
 use feature 'state';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
 
@@ -17,8 +17,6 @@ use Try::Tiny;
 use Safe::Isa;
 use Ref::Util qw< is_arrayref is_ref is_coderef  >;
 
-use custom::failures;
-use Package::Stash;
 use Hash::Wrap ( { -as => '_wrap_hash' } );
 
 use PDL::Algorithm::Center::Failure ':all';
@@ -64,6 +62,8 @@ sub _sigma_clip_initialize {
 
     my ( $init_clip, $dtol, $coords, $mask, $weight, $current, $work ) = @_;
 
+    # initialize the sigma_clip specific fields the docs promise will be there
+    $current->{dist} = undef;
     $current->{clip} = $init_clip;
 
     my $r2 = $work->{r2} = PDL->null;
@@ -1317,7 +1317,7 @@ PDL::Algorithm::Center - Various methods of finding the center of a sample
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 

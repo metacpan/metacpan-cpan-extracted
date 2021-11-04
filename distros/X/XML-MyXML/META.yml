@@ -4,7 +4,8 @@ author:
   - 'Alexander Karelas <karjala@cpan.org>'
 build_requires:
   File::Temp: '0'
-  Test::More: '0.47'
+  Test::Harness: '3.42'
+  Test::More: '1.302188'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -27,10 +28,12 @@ no_index:
 provides:
   XML::MyXML:
     file: lib/XML/MyXML.pm
-    version: '1.07'
+    version: '1.08'
   XML::MyXML::Object:
     file: lib/XML/MyXML/Object.pm
-    version: '1.07'
+    version: '1.08'
+  XML::MyXML::Util:
+    file: lib/XML/MyXML/Util.pm
 requires:
   Carp: '0'
   Encode: '0'
@@ -41,7 +44,7 @@ resources:
   bugtracker: https://github.com/akarelas/xml-myxml/issues
   homepage: https://github.com/akarelas/xml-myxml
   repository: git://github.com/akarelas/xml-myxml.git
-version: '1.07'
+version: '1.08'
 x_authority: cpan:KARJALA
 x_contributors:
   - 'Alexander Karelas <alex.karelas@gmail.com>'

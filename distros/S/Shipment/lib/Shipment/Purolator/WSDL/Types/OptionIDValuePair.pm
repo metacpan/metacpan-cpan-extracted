@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::OptionIDValuePair;
-$Shipment::Purolator::WSDL::Types::OptionIDValuePair::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::OptionIDValuePair::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        ID
               Value
 
-              )
+            )
         ],
         {   'ID'    => \%ID_of,
             'Value' => \%Value_of,
@@ -61,7 +61,7 @@ Shipment::Purolator::WSDL::Types::OptionIDValuePair
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

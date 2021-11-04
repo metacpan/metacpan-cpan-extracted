@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction;
-$Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -38,17 +38,17 @@ Class::Std::initialize();
               OriginalRequestTime
               RequestedAppointmentTime
 
-              )
+            )
         ],
-        {   'Description'    => \%Description_of,
-            'DeliveryOption' => \%DeliveryOption_of,
-            'StatusDetail'   => \%StatusDetail_of,
+        {   'Description'                        => \%Description_of,
+            'DeliveryOption'                     => \%DeliveryOption_of,
+            'StatusDetail'                       => \%StatusDetail_of,
             'OriginalEstimatedDeliveryTimestamp' =>
               \%OriginalEstimatedDeliveryTimestamp_of,
             'OriginalRequestTime'      => \%OriginalRequestTime_of,
             'RequestedAppointmentTime' => \%RequestedAppointmentTime_of,
         },
-        {   'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'Description'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'DeliveryOption' =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackDeliveryOptionType',
             'StatusDetail' =>
@@ -62,9 +62,9 @@ Class::Std::initialize();
         },
         {
 
-            'Description'    => 'Description',
-            'DeliveryOption' => 'DeliveryOption',
-            'StatusDetail'   => 'StatusDetail',
+            'Description'                        => 'Description',
+            'DeliveryOption'                     => 'DeliveryOption',
+            'StatusDetail'                       => 'StatusDetail',
             'OriginalEstimatedDeliveryTimestamp' =>
               'OriginalEstimatedDeliveryTimestamp',
             'OriginalRequestTime'      => 'OriginalRequestTime',
@@ -89,7 +89,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

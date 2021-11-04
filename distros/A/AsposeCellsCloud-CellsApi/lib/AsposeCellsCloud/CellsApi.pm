@@ -3293,10 +3293,10 @@ sub cells_charts_delete_worksheet_clear_charts {
     __PACKAGE__->method_documentation->{ 'cells_charts_delete_worksheet_delete_chart' } = { 
     	summary => 'Delete worksheet chart by index.',
         params => $params,
-        returns => 'ChartsResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return ChartsResponse
+# @return CellsCloudResponse
 #
 sub cells_charts_delete_worksheet_delete_chart {
     my ($self, %args) = @_;
@@ -3374,7 +3374,7 @@ sub cells_charts_delete_worksheet_delete_chart {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('ChartsResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -4059,10 +4059,10 @@ sub cells_charts_post_worksheet_chart {
     __PACKAGE__->method_documentation->{ 'cells_charts_post_worksheet_chart_legend' } = { 
     	summary => 'Update chart legend',
         params => $params,
-        returns => 'LegendResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return LegendResponse
+# @return CellsCloudResponse
 #
 sub cells_charts_post_worksheet_chart_legend {
     my ($self, %args) = @_;
@@ -4145,7 +4145,7 @@ sub cells_charts_post_worksheet_chart_legend {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('LegendResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -4196,10 +4196,10 @@ sub cells_charts_post_worksheet_chart_legend {
     __PACKAGE__->method_documentation->{ 'cells_charts_post_worksheet_chart_title' } = { 
     	summary => 'Update chart title',
         params => $params,
-        returns => 'TitleResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return TitleResponse
+# @return CellsCloudResponse
 #
 sub cells_charts_post_worksheet_chart_title {
     my ($self, %args) = @_;
@@ -4282,7 +4282,7 @@ sub cells_charts_post_worksheet_chart_title {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('TitleResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -4405,10 +4405,10 @@ sub cells_charts_post_worksheet_chart_title {
     __PACKAGE__->method_documentation->{ 'cells_charts_put_worksheet_add_chart' } = { 
     	summary => 'Add new chart to worksheet.',
         params => $params,
-        returns => 'ChartsResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return ChartsResponse
+# @return CellsCloudResponse
 #
 sub cells_charts_put_worksheet_add_chart {
     my ($self, %args) = @_;
@@ -4549,7 +4549,7 @@ sub cells_charts_put_worksheet_add_chart {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('ChartsResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -4726,10 +4726,10 @@ sub cells_charts_put_worksheet_chart_legend {
     __PACKAGE__->method_documentation->{ 'cells_charts_put_worksheet_chart_title' } = { 
     	summary => 'Add chart title / Set chart title visible',
         params => $params,
-        returns => 'TitleResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return TitleResponse
+# @return CellsCloudResponse
 #
 sub cells_charts_put_worksheet_chart_title {
     my ($self, %args) = @_;
@@ -4812,7 +4812,7 @@ sub cells_charts_put_worksheet_chart_title {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('TitleResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -8050,10 +8050,10 @@ sub cells_hypelinks_get_worksheet_hyperlinks {
     __PACKAGE__->method_documentation->{ 'cells_hypelinks_post_worksheet_hyperlink' } = { 
     	summary => 'Update worksheet hyperlink by index.',
         params => $params,
-        returns => 'HyperlinkResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return HyperlinkResponse
+# @return CellsCloudResponse
 #
 sub cells_hypelinks_post_worksheet_hyperlink {
     my ($self, %args) = @_;
@@ -8136,7 +8136,7 @@ sub cells_hypelinks_post_worksheet_hyperlink {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('HyperlinkResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -8205,10 +8205,10 @@ sub cells_hypelinks_post_worksheet_hyperlink {
     __PACKAGE__->method_documentation->{ 'cells_hypelinks_put_worksheet_hyperlink' } = { 
     	summary => 'Add worksheet hyperlink.',
         params => $params,
-        returns => 'HyperlinkResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return HyperlinkResponse
+# @return CellsCloudResponse
 #
 sub cells_hypelinks_put_worksheet_hyperlink {
     my ($self, %args) = @_;
@@ -8324,7 +8324,7 @@ sub cells_hypelinks_put_worksheet_hyperlink {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('HyperlinkResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -8570,7 +8570,6 @@ sub cells_list_objects_delete_worksheet_list_objects {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param int $listobjectindex list object index. (required)
-# @param string $format export format. (optional)
 # @param string $folder Document&#39;s folder. (optional)
 # @param string $storage_name storage name. (optional)
 {
@@ -8590,11 +8589,6 @@ sub cells_list_objects_delete_worksheet_list_objects {
         description => 'list object index.',
         required => '1',
     },
-    'format' => {
-        data_type => 'string',
-        description => 'export format.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document&#39;s folder.',
@@ -8609,10 +8603,10 @@ sub cells_list_objects_delete_worksheet_list_objects {
     __PACKAGE__->method_documentation->{ 'cells_list_objects_get_worksheet_list_object' } = { 
     	summary => 'Get worksheet list object info by index.',
         params => $params,
-        returns => 'string',
+        returns => 'ListObjectResponse',
         };
 }
-# @return string
+# @return ListObjectResponse
 #
 sub cells_list_objects_get_worksheet_list_object {
     my ($self, %args) = @_;
@@ -8646,11 +8640,6 @@ sub cells_list_objects_get_worksheet_list_object {
         $header_params->{'Accept'} = $_header_accept;
     }
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if ( exists $args{'format'}) {
-        $query_params->{'format'} = $self->{api_client}->to_query_value($args{'format'});
-    }
 
     # query params
     if ( exists $args{'folder'}) {
@@ -8695,7 +8684,7 @@ sub cells_list_objects_get_worksheet_list_object {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    my $_response_object = $self->{api_client}->deserialize('ListObjectResponse', $response);
     return $_response_object;
 }
 
@@ -9437,10 +9426,10 @@ sub cells_list_objects_post_worksheet_list_object_summarize_with_pivot_table {
     __PACKAGE__->method_documentation->{ 'cells_list_objects_put_worksheet_list_object' } = { 
     	summary => 'Add a list object into worksheet.',
         params => $params,
-        returns => 'ListObjectResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return ListObjectResponse
+# @return CellsCloudResponse
 #
 sub cells_list_objects_put_worksheet_list_object {
     my ($self, %args) = @_;
@@ -9561,7 +9550,7 @@ sub cells_list_objects_put_worksheet_list_object {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('ListObjectResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -10258,10 +10247,10 @@ sub cells_ole_objects_post_update_worksheet_ole_object {
     __PACKAGE__->method_documentation->{ 'cells_ole_objects_put_worksheet_ole_object' } = { 
     	summary => 'Add OLE object',
         params => $params,
-        returns => 'OleObjectResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return OleObjectResponse
+# @return CellsCloudResponse
 #
 sub cells_ole_objects_put_worksheet_ole_object {
     my ($self, %args) = @_;
@@ -10362,7 +10351,7 @@ sub cells_ole_objects_put_worksheet_ole_object {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('OleObjectResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -13039,10 +13028,10 @@ sub cells_pictures_get_worksheet_pictures {
     __PACKAGE__->method_documentation->{ 'cells_pictures_post_worksheet_picture' } = { 
     	summary => 'Update worksheet picture by index.',
         params => $params,
-        returns => 'PictureResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return PictureResponse
+# @return CellsCloudResponse
 #
 sub cells_pictures_post_worksheet_picture {
     my ($self, %args) = @_;
@@ -13125,7 +13114,7 @@ sub cells_pictures_post_worksheet_picture {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('PictureResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -13200,10 +13189,10 @@ sub cells_pictures_post_worksheet_picture {
     __PACKAGE__->method_documentation->{ 'cells_pictures_put_worksheet_add_picture' } = { 
     	summary => 'Add a new worksheet picture.',
         params => $params,
-        returns => 'PicturesResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return PicturesResponse
+# @return CellsCloudResponse
 #
 sub cells_pictures_put_worksheet_add_picture {
     my ($self, %args) = @_;
@@ -13299,7 +13288,7 @@ sub cells_pictures_put_worksheet_add_picture {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('PicturesResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -16195,10 +16184,10 @@ sub cells_pivot_tables_put_pivot_table_field {
     __PACKAGE__->method_documentation->{ 'cells_pivot_tables_put_worksheet_pivot_table' } = { 
     	summary => 'Add a pivot table into worksheet.',
         params => $params,
-        returns => 'PivotTableResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return PivotTableResponse
+# @return CellsCloudResponse
 #
 sub cells_pivot_tables_put_worksheet_pivot_table {
     my ($self, %args) = @_;
@@ -16289,7 +16278,7 @@ sub cells_pivot_tables_put_worksheet_pivot_table {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('PivotTableResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -20380,10 +20369,10 @@ sub cells_post_worksheet_unmerge {
     __PACKAGE__->method_documentation->{ 'cells_properties_delete_document_properties' } = { 
     	summary => 'Delete all custom document properties and clean built-in ones.',
         params => $params,
-        returns => 'CellsDocumentPropertiesResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return CellsDocumentPropertiesResponse
+# @return CellsCloudResponse
 #
 sub cells_properties_delete_document_properties {
     my ($self, %args) = @_;
@@ -20437,7 +20426,7 @@ sub cells_properties_delete_document_properties {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('CellsDocumentPropertiesResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -20476,10 +20465,10 @@ sub cells_properties_delete_document_properties {
     __PACKAGE__->method_documentation->{ 'cells_properties_delete_document_property' } = { 
     	summary => 'Delete document property.',
         params => $params,
-        returns => 'CellsDocumentPropertiesResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return CellsDocumentPropertiesResponse
+# @return CellsCloudResponse
 #
 sub cells_properties_delete_document_property {
     my ($self, %args) = @_;
@@ -20545,7 +20534,7 @@ sub cells_properties_delete_document_property {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('CellsDocumentPropertiesResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -20788,10 +20777,10 @@ sub cells_properties_get_document_property {
     __PACKAGE__->method_documentation->{ 'cells_properties_put_document_property' } = { 
     	summary => 'Set/create document property.',
         params => $params,
-        returns => 'CellsDocumentPropertyResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return CellsDocumentPropertyResponse
+# @return CellsCloudResponse
 #
 sub cells_properties_put_document_property {
     my ($self, %args) = @_;
@@ -20862,7 +20851,7 @@ sub cells_properties_put_document_property {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('CellsDocumentPropertyResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -23729,10 +23718,10 @@ sub cells_shapes_post_worksheet_shape {
     __PACKAGE__->method_documentation->{ 'cells_shapes_put_worksheet_shape' } = { 
     	summary => 'Add shape in worksheet',
         params => $params,
-        returns => 'ShapeResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return ShapeResponse
+# @return CellsCloudResponse
 #
 sub cells_shapes_put_worksheet_shape {
     my ($self, %args) = @_;
@@ -23838,7 +23827,7 @@ sub cells_shapes_put_worksheet_shape {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('ShapeResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -24387,7 +24376,7 @@ sub cells_sparkline_groups_post_worksheet_sparkline_group {
 
     # parse inputs
     my $_resource_path = '/cells/{name}/worksheets/{sheetName}/sparklinegroups/{sparklineGroupIndex}';
-    
+
     my $_method = 'POST';
     my $query_params = {};
     my $header_params = {};
@@ -24430,7 +24419,7 @@ sub cells_sparkline_groups_post_worksheet_sparkline_group {
         my $_base_value = $self->{api_client}->to_path_value($args{'sparkline_group_index'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
-    
+
     $self->{api_client}->check_access_token();
     my $_body_data;
     # body params
@@ -27942,10 +27931,10 @@ sub cells_workbook_put_workbook_water_marker {
     __PACKAGE__->method_documentation->{ 'cells_worksheet_validations_delete_worksheet_validation' } = { 
     	summary => 'Delete worksheet validation by index.',
         params => $params,
-        returns => 'ValidationResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return ValidationResponse
+# @return CellsCloudResponse
 #
 sub cells_worksheet_validations_delete_worksheet_validation {
     my ($self, %args) = @_;
@@ -28023,7 +28012,7 @@ sub cells_worksheet_validations_delete_worksheet_validation {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('ValidationResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 

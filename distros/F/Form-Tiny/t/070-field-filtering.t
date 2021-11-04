@@ -1,14 +1,16 @@
 use v5.10;
+use strict;
 use warnings;
 use Test::More;
 
 {
+
 	package TestForm;
 	use Form::Tiny -filtered;
 	use Types::Standard qw(Str);
 
 	form_field 'f1';
-	field_filter Str, sub { shift() . '+'};
+	field_filter Str, sub { shift() . '+' };
 
 	form_field 'f2';
 

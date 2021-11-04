@@ -88,7 +88,41 @@ my $builddir='';my @ls_tmp=();
 
 # https://www.cartoonify.de/
 
+# MAILWIZZ Delivery Server Settings
+#
+# Name: getwisdom_net                   Port*: 587
+# From name: GetWisdom                  Monthly quota: 0
+# Use for: All                          Reply-To email: contact@getwisdom.net
+# Hostname*: mail.getwisdom.net         Protocol: TLS
+# Probablity: 100%                      Pause after send: 0
+# Signing enabled: Yes                  Force Reply-To: Never
+# Username: brian.kelly@getwisdom.net   Timeout*: 30
+# Hourly quota: 0                       Bounce Server: choose
+# Force FROM: Always                    Max. connection message: 1
+# Password: ********                    From email*: contact@getwisdom.net
+# Daily quota: 0                        Tracking domain: Choose
+# Force Sender: No
+
+# MAILWIZZ bounce server
+#
+# Hostname*: mail.getwisdom.net         Service*: IMAP
+# Search charset: UTF-8                 Username*: brian.kelly@getwisdom.net
+# Port*: 993                            Disable authenticator:
+# Password*: ********                   Protocol: SSL
+# Delete all messages: No               Email: brian.kelly@getwisdom.net
+# Validate ssl*: Yes
+
+
 my $configure_emailserver=sub {
+
+   # USEFUL TESTING SITES
+   #
+   # https://www.linuxbabe.com/mail-server/how-to-stop-your-emails-being-marked-as-spam
+   # https://mxtoolbox.com
+   # https://mail-tester.com
+   # https://ipvoid.com
+   # https://postmaster.google.com/managedomains
+   # https://bgp.he.net/ip/xx.xxx.xxx.xx#_dns (check dns name servers)
 
    my $selection=$_[0]||'';
    my $domain_url=$_[1]||'';
@@ -2820,7 +2854,39 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'postconf -e \'smtpd_sasl_path = private/auth\'',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_sasl_local_domain = $mydomain\'',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_sasl_security_options = noanonymous\'',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_sasl_auth_enable = yes\'',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_tls_security_level = may\'',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_sasl_auth_enable = yes\'',
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_tls_received_headers = yes\'',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_tls_auth_only = no\'',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_tls_log_level = 1\'',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_tls_note_starttls_offer = yes\'',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_tls_session_cache_timeout = 3600s\'',
+         '__display__');
    }
+   # TROUBLESHOOTING THE CONNECTION
+   # http://orcorc.blogspot.com/2010/04/running-down-stray-errors.html 
+   # openssl s_client -connect localhost:25 -starttls smtp
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e \'smtp_tls_CAfile = /etc/ssl/certs/ca-bundle.crt\'',
       '__display__');
@@ -3185,6 +3251,9 @@ END
       "sed -i \'s/#protocols/protocols/\' ".
       "/usr/local/etc/dovecot/dovecot.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'s/#listen =/listen =/\' ".
+      "/usr/local/etc/dovecot/dovecot.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/lmtp submission/lmtp submission sieve/\' ".
       "/usr/local/etc/dovecot/dovecot.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3517,6 +3586,9 @@ END
       "tar xvf $gtarfile",'__display__');
    $gtarfile=~s/.tar.gz$//;
    ($stdout,$stderr)=$handle->cwd($gtarfile);
+   # https://copypaste.guru/WhereIsMyPHPpackage/how-to-install-the-php-package-tecnickcom-tcpdf-with-composer
+   # composer require tecnickcom/tcpdf
+   # composer require setasign/fpdi
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".
       "https://getcomposer.org/composer-stable.phar",
@@ -4289,6 +4361,12 @@ END
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e "non_smtpd_milters = inet:127.0.0.1:11332"',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e "default_destination_rate_delay = 2s"',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e "default_destination_recipient_limit = 50"',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service postfix restart','__display__');
@@ -5169,7 +5247,7 @@ END
    CNAME  mail                    @
    CNAME  postfixadmin            @
    MX     @                10     mail.domain_url   3600
-   TXT                            v=spf1 mx ~all    3600
+   TXT                            v=spf1 mx -all    3600
 
    Domain URL
                 ]I[{1,'fullauto.com',46}

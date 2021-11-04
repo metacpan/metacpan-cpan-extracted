@@ -1,16 +1,21 @@
-0.12    2017-02-19 (PERLANCAR)
+0.130   2021-05-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add participant: Array::Set::Naive.
+
+
+0.12    2017-02-19  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [build] Split benchmark result table into per-dataset and per-tag.
 
 
-0.11    2017-02-19 (PERLANCAR)
+0.11    2017-02-19  Released-By: PERLANCAR
 
 	- Add participant: List::Collection.
 
 
-0.10    2017-01-25 (PERLANCAR)
+0.10    2017-01-25  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -19,14 +24,14 @@
           type=x_benchmarks.
 
 
-0.09    2016-06-26 (PERLANCAR)
+0.09    2016-06-26  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to show abstract.
 
 
-0.08    2016-01-05 (PERLANCAR)
+0.08    2016-01-05  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -34,20 +39,20 @@
           (0.03) which shows sample benchmark participants & results in POD.
 
 
-0.07    2015-11-29 (PERLANCAR)
+0.07    2015-11-29  Released-By: PERLANCAR
 
 	- Specify minimum version for List::MoreUtils (singleton() is
 	  available from 0.47).
 
 
-0.06    2015-11-19 (PERLANCAR)
+0.06    2015-11-19  Released-By: PERLANCAR
 
         - [dist] Rebuild with DZP:Bencher::Scenario 0.02 (benchmarked modules
           becomes RuntimeRequires prereqs instead of just RuntimeRecommends,
           [Experimental] add t/bench-*.t to run benchmarks during testing.)
 
 
-0.05    2015-11-18 (PERLANCAR)
+0.05    2015-11-18  Released-By: PERLANCAR
 
 	- Add participants: Set::Array, Array::AsObject, Set::Object,
 	  Set::Tiny.
@@ -55,21 +60,21 @@
 	- [doc] Mention Benchmark::Featureset::SetOps [GH#1].
 
 
-0.04    2015-11-13 (PERLANCAR)
+0.04    2015-11-13  Released-By: PERLANCAR
 
 	- Add dataset: num1000 (not included by default).
 
 
-0.03    2015-11-13 (PERLANCAR)
+0.03    2015-11-13  Released-By: PERLANCAR
 
 	- Add dataset: num100.
 
 
-0.02    2015-11-13 (PERLANCAR)
+0.02    2015-11-13  Released-By: PERLANCAR
 
 	- Add participant: Array::Set.
 
 
-0.01    2015-11-13 (PERLANCAR)
+0.01    2015-11-13  Released-By: PERLANCAR
 
         - First release.

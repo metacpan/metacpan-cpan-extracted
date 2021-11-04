@@ -8,18 +8,19 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
-        'Archive::Extract'      => 0.80,
-        'CGI'                   => 4.32,
-        'CTK'                   => 2.00,
-        'Digest::MD5'           => 2.54,
-        'Digest::SHA1'          => 2.13,
-        'File::HomeDir'         => 1.00,
-        'File::Spec'            => 3.62,
-        'HTTP::Message'         => 6.11,
-        'LWP'                   => 5.80,
-        'LWP::Protocol::https'  => 6.00,
-        'Try::Tiny'             => 0.20,
-        'URI'                   => 1.70,
+        'Archive::Tar'          => 1.80, # perl-Archive-Tar
+        'CTK'                   => 2.03, # perl-CTK (libctk-perl)
+        'DBD::SQLite'           => 1.00, # perl-DBD-SQLite (libdbd-sqlite3-perl)
+        'Digest::MD5'           => 2.52, # perl-Digest-MD5
+        'Digest::SHA'           => 4.00, # perl-Digest-SHA
+        'Encode::Locale'        => 1.00, # perl-Encode-Locale
+        'File::HomeDir'         => 1.00, # perl-File-HomeDir
+        'File::Spec'            => 3.40,
+        'List::Util'            => 1.50, # (libscalar-list-utils-perl)
+        'Mojolicious'           => 7.94, # perl-Mojolicious (libmojolicious-perl)
+        'Text::SimpleTable'     => 2.00, # (libtext-simpletable-perl)
+        'Try::Tiny'             => 0.10, # (libtry-tiny-perl)
+        'URI'                   => 1.70, # (liburi-perl)
     };
 
 my $exefiles = [qw(
@@ -46,4 +47,8 @@ WriteMakefile(
             license         => 'https://dev.perl.org/licenses',
         },
     },
+    clean => {
+            FILES => '*.tmp',
+        },
+
 );

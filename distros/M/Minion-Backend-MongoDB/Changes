@@ -1,7 +1,17 @@
 Revision history for Perl extension Minion-Backend-MongoDB
 
-1.09 2021-09-23T14:22:00Z (ebruni)
+1.12 2021-11-04T14:25:00 (ebruni)
+    - Removed some references to DateTime which cause fails in tests
+
+1.11 2021-11-04T13:44:00 (ebruni)
+    - More optimization in enqueue/dequeue jobs
+    - Solved a concurrency bug which afflicted all module versions
+    - Moved from DateTime to Time::Moment
+
+1.10 2021-09-23T14:22:00Z (ebruni)
     - Some optimization in enqueue/dequeue jobs
+
+1.09 2021-09-08T10:20:00Z (ebruni)
     - Solved a bug where process forks while MongoDB not reconnect
 
 1.08 2021-09-05T17:03:00Z (ebruni)

@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000073';
+our $VERSION = '1.000080';
 
 use App::Yath::Options;
 
@@ -281,9 +281,10 @@ sub render {
     my $settings  = $self->settings;
     my $renderers = $self->renderers;
     my $logger    = $self->logger;
-    my $plugins = $self->settings->harness->plugins;
+    my $plugins   = $self->settings->harness->plugins;
 
-    $plugins = [grep {$_->can('handle_event')} @$plugins];
+    my $handle_plugins   = [grep { $_->can('handle_event') } @$plugins];
+    my $annotate_plugins = [grep { $_->can('annotate_event') } @$plugins];
 
     # render results from log
     my $reader = $self->renderer_reader();
@@ -310,23 +311,61 @@ sub render {
             next;
         }
 
-        print $logger $line if $logger;
         my $e = decode_json($line);
-        last unless defined $e;
 
-        bless($e, 'Test2::Harness::Event');
+        if (defined $e) {
+            bless($e, 'Test2::Harness::Event');
+            my $fd = $e->{facet_data} //= {};
+
+            my $changed = 0;
+            for my $p (@$annotate_plugins) {
+                my %inject = $p->annotate_event($e, $settings);
+                next unless keys %inject;
+                $changed++;
+
+                # Can add new facets, but not modify existing ones.
+                # Someone could force the issue by modifying the event directly
+                # inside 'annotate_event', this is not supported, but also not
+                # forbidden, user beware.
+                for my $f (keys %inject) {
+                    if (exists $fd->{$f}) {
+                        if ('ARRAY' eq ref($fd->{$f})) {
+                            push @{$fd->{$f}} => @{$inject{$f}};
+                        }
+                        else {
+                            warn "Plugin '$p' tried to add facet '$f' via 'annotate_event()', but it is already present and not a list, ignoring plugin annotation.\n";
+                        }
+                    }
+                    else {
+                        $fd->{$f} = $inject{$f};
+                    }
+                }
+
+            }
+
+            if ($logger) {
+                if ($changed) {
+                    my $newline = $e->as_json;
+                    print $logger $newline, "\n";
+                }
+                else {
+                    print $logger $line;
+                }
+            }
+        }
+        else {
+            last;
+        }
 
         if (my $final = $e->{facet_data}->{harness_final}) {
             $self->{+FINAL_DATA} = $final;
         }
-        else {
-            $_->render_event($e) for @$renderers;
-        }
+        $_->render_event($e) for @$renderers;
 
         $self->{+TESTS_SEEN}++   if $e->{facet_data}->{harness_job_launch};
         $self->{+ASSERTS_SEEN}++ if $e->{facet_data}->{assert};
 
-        $_->handle_event($e, $settings) for @$plugins;
+        $_->handle_event($e, $settings) for @$handle_plugins;
 
         $ipc->wait() if $ipc;
     }
@@ -341,7 +380,10 @@ sub stop {
     my $logger    = $self->logger;
 
     $self->teardown_plugins($renderers, $logger);
-    close($logger) if $logger;
+    if ($logger) {
+        print $logger "null\n";
+        close($logger);
+    }
 
     $_->finish() for @$renderers;
 
@@ -434,8 +476,12 @@ sub populate_queue {
     my @files = @{$finder->find_files($plugins, $self->settings)};
 
     for my $plugin (@$plugins) {
-        next unless $plugin->can('sort_files');
-        @files = $plugin->sort_files(@files);
+        if ($plugin->can('sort_files_2')) {
+            @files = $plugin->sort_files_2(settings => $settings, files => \@files);
+        }
+        elsif ($plugin->can('sort_files')) {
+            @files = $plugin->sort_files(@files);
+        }
     }
 
     my $job_count = 0;
@@ -931,13 +977,21 @@ Can be specified multiple times
 
 =over 4
 
-=item --cover-aggregator ARG
+=item --cover-aggregator ByTest
 
-=item --cover-aggregator=ARG
+=item --cover-aggregator ByRun
+
+=item --cover-aggregator +Custom::Aggregator
+
+=item --cover-agg ByTest
+
+=item --cover-agg ByRun
+
+=item --cover-agg +Custom::Aggregator
 
 =item --no-cover-aggregator
 
-Choose an aggregator (default Test2::Harness::Log::CoverageAggregator)
+Choose a custom aggregator subclass
 
 
 =item --cover-class ARG
@@ -978,6 +1032,57 @@ Can be specified multiple times
 Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
 
 
+=item --cover-from path/to/log.jsonl
+
+=item --cover-from http://example.com/coverage
+
+=item --cover-from path/to/coverage.jsonl
+
+=item --no-cover-from
+
+This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will not be run if the file/url is invalid.
+
+
+=item --cover-from-type json
+
+=item --cover-from-type jsonl
+
+=item --cover-from-type log
+
+=item --no-cover-from-type
+
+File type for coverage source. Usually it can be detected, but when it cannot be you should specify. "json" is old style single-blob coverage data, "jsonl" is the new by-test style, "log" is a logfile from a previous run.
+
+
+=item --cover-manager My::Coverage::Manager
+
+=item --no-cover-manager
+
+Coverage 'from' manager to use when coverage data does not provide one
+
+
+=item --cover-maybe-from path/to/log.jsonl
+
+=item --cover-maybe-from http://example.com/coverage
+
+=item --cover-maybe-from path/to/coverage.jsonl
+
+=item --no-cover-maybe-from
+
+This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will coninue if even if the coverage file/url is invalid.
+
+
+=item --cover-maybe-from-type json
+
+=item --cover-maybe-from-type jsonl
+
+=item --cover-maybe-from-type log
+
+=item --no-cover-maybe-from-type
+
+Same as "from_type" but for "maybe_from". Defaults to "from_type" if that is specified, otherwise auto-detect
+
+
 =item --cover-metrics
 
 =item --no-cover-metrics
@@ -1002,11 +1107,13 @@ Can be specified multiple times
 
 =item --cover-write
 
+=item --cover-write=coverage.jsonl
+
 =item --cover-write=coverage.json
 
 =item --no-cover-write
 
-Create a json file of all coverage data seen during the run (This implies --cover-files).
+Create a json or jsonl file of all coverage data seen during the run (This implies --cover-files).
 
 
 =back
@@ -1114,7 +1221,7 @@ Can be specified multiple times
 
 =item --no-changed-only
 
-Only search for tests for changed files (Requires --coverage-from, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())
+Only search for tests for changed files (Requires a coverage data source, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())
 
 
 =item --changes-diff path/to/diff.diff
@@ -1149,24 +1256,6 @@ Can be specified multiple times
 =item --no-changes-plugin
 
 What plugin should be used to detect changed files.
-
-
-=item --coverage-from path/to/log.jsonl
-
-=item --coverage-from http://example.com/coverage
-
-=item --coverage-from path/to/coverage.json
-
-=item --no-coverage-from
-
-Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
-
-
-=item --coverage-manager My::Coverage::Manager
-
-=item --no-coverage-manager
-
-Coverage 'from' manager to use when coverage data does not provide one
 
 
 =item --default-at-search ARG
@@ -1242,17 +1331,6 @@ Can be specified multiple times
 Specify valid test filename extensions, default: t and t2
 
 Can be specified multiple times
-
-
-=item --maybe-coverage-from path/to/log.jsonl
-
-=item --maybe-coverage-from http://example.com/coverage
-
-=item --maybe-coverage-from path/to/coverage.json
-
-=item --no-maybe-coverage-from
-
-Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
 
 
 =item --maybe-durations file.json

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ServiceOptionType;
-$Shipment::UPS::WSDL::TrackTypes::ServiceOptionType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::ServiceOptionType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Value
               AdditionalAttribute
 
-              )
+            )
         ],
         {   'Type'                => \%Type_of,
             'Value'               => \%Value_of,
@@ -68,7 +68,7 @@ Shipment::UPS::WSDL::TrackTypes::ServiceOptionType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

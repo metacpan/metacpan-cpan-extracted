@@ -43,10 +43,17 @@ sub _run_command($self) {
     # get pubkey of iface priv-key
     my $iface_pubkey = get_pub_key($iface_privkey);
 
+    # get interface config
+    my %host_interface = $self->wg_meta->get_interface_section($self->{interface}, $self->{interface});
+    my $fqdn = exists($host_interface{FQDN}) ? $host_interface{FQDN} : 'insert.valid.fqdn.not.valid';
+
     # lets create a temporary interface
     $self->wg_meta->add_interface('temp', $self->{ips}, 44544, $self->{priv_key});
     $self->wg_meta->add_peer('temp', '0.0.0.0/0, ::/0', $iface_pubkey);
-    $self->wg_meta->set('temp', $iface_pubkey, 'endpoint', "insert.valid.fqdn.not.valid:$iface_listen");
+    $self->wg_meta->set('temp', $iface_pubkey, 'endpoint', "$fqdn:$iface_listen");
+    if (exists($host_interface{DNSHost})){
+        $self->wg_meta->set('temp', 'temp', 'dns', $host_interface{DNSHost});
+    }
     $self->wg_meta->set('temp', $iface_pubkey, 'persistent-keepalive', 25);
 
     my $unknown_handler_temp = sub($attribute, $value) {
@@ -85,7 +92,8 @@ sub cmd_help($self) {
     print "Usage: wg-meta addpeer <interface> <ip-address> [attr1 value1] [attr2 value2] ...\n\n"
         . "Notes: \nAttributes meant to reside in the [Interface] section are only applied to the peer's interface\n"
         . "wg-meta attributes are applied to the host's peer config and the client interface config\n"
-        . "and finally, attributes meant to be in the [Peer] section are only applied to the host's peer entry\n\n"
+        . "and finally, attributes meant to be in the [Peer] section are only applied to the host's peer entry.\n\n"
+        . "To automatically fill in dns and endpoint name, make sure #+DNSHost and #+FQDN is present in [Interface]\n"
         . "Do not forget to reload the configuration afterwards!\n";
 
     exit();

@@ -66,7 +66,7 @@ use constant CODE_REF	=> ref sub {};
     our @EXPORT = @funcs;	## no critic (ProhibitAutomaticExportation)
 }
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 our $XS_VERSION = $VERSION;
 our $ALPHA_VERSION = $VERSION;
 $VERSION =~ s/_//g;

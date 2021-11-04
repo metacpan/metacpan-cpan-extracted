@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+# Copyright (c) 2021 by Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
+
+# partial integer factorization of x^n - 1 with positive integers x and n.
+
+use strict;
+use warnings;
+use Math::BigInt lib => 'GMP';
+use Math::Polynomial::Cyclotomic qw(cyclo_int_factors);
+
+local $Math::Polynomial::max_degree;
+
+my $USAGE = "usage: int_factors x n\n";
+die $USAGE if @ARGV != 2 || grep {!/^[1-9][0-9]*\z/} @ARGV;
+
+my ($x, $n) = map { Math::BigInt->new($_) } @ARGV;
+my @f = cyclo_int_factors($x, $n);
+print "$x^$n - 1 = ", join(q[*], @f), "\n";
+
+__END__

@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::makeBookingByRequest;
-$Shipment::Temando::WSDL::Elements::makeBookingByRequest::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::makeBookingByRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -70,7 +70,7 @@ use warnings;
                   clientId
                   labelPrinterType
 
-                  )
+                )
             ],
             {   'anythings'        => \%anythings_of,
                 'anywhere'         => \%anywhere_of,
@@ -102,7 +102,7 @@ use warnings;
                 'payment'     => 'Shipment::Temando::WSDL::Types::Payment',
                 'instructions' =>
                   'Shipment::Temando::WSDL::Types::Instructions',
-                'comments' => 'Shipment::Temando::WSDL::Types::Comments',
+                'comments'  => 'Shipment::Temando::WSDL::Types::Comments',
                 'reference' =>
                   'Shipment::Temando::WSDL::Types::ClientReference',
                 'promotionCode' =>
@@ -136,7 +136,7 @@ use warnings;
 
     package Shipment::Temando::WSDL::Elements::makeBookingByRequest::_anythings;
     $Shipment::Temando::WSDL::Elements::makeBookingByRequest::_anythings::VERSION
-      = '3.05';
+      = '3.06';
     use strict;
     use warnings;
     {
@@ -159,7 +159,7 @@ use warnings;
             __PACKAGE__->_factory(
                 [   qw(        anything
 
-                      )
+                    )
                 ],
                 {'anything' => \%anything_of,},
                 {'anything' => 'Shipment::Temando::WSDL::Types::Anything',},
@@ -192,7 +192,7 @@ Shipment::Temando::WSDL::Elements::makeBookingByRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

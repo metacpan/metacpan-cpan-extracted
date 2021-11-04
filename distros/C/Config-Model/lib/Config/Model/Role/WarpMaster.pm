@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::WarpMaster 2.142;
+package Config::Model::Role::WarpMaster 2.144;
 
 # ABSTRACT: register and trigger a warped element
 
@@ -106,7 +106,7 @@ Config::Model::Role::WarpMaster - register and trigger a warped element
 
 =head1 VERSION
 
-version 2.142
+version 2.144
 
 =head1 SYNOPSIS
 

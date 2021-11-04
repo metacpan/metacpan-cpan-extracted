@@ -1,13 +1,13 @@
 
 package Shipment::Purolator::WSDLV2::Elements::ValidationFault;
-$Shipment::Purolator::WSDLV2::Elements::ValidationFault::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Elements::ValidationFault::VERSION = '3.06';
 use strict;
 use warnings;
 
 {    # BLOCK to scope variables
 
     sub get_xmlns {
-        'http://www.microsoft.com/practices/EnterpriseLibrary/2007/01/wcf/validation'
+        'http://www.microsoft.com/practices/EnterpriseLibrary/2007/01/wcf/validation';
     }
 
     __PACKAGE__->__set_name('ValidationFault');
@@ -36,7 +36,7 @@ Shipment::Purolator::WSDLV2::Elements::ValidationFault
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

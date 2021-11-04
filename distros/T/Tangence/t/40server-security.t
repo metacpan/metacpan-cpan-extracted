@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.26;
 use warnings;
+
+use Future::AsyncAwait 0.47;
 
 use Test::More;
 
@@ -28,10 +30,13 @@ my ( $server, $client ) = make_serverclient( $registry );
 my $proxy = $client->rootobj;
 
 # gutwrench into the objectproxy to make a new one with a different ID
-$proxy->{id} == $obj->id or die "ARGH failed to have correct object ID in proxy";
+$proxy->id == $obj->id or die "ARGH failed to have correct object ID in proxy";
 
-my $proxy2 = { %$proxy, id => $obj2->id };
-bless $proxy2, ref $proxy;
+my $proxy2 = Tangence::ObjectProxy->new(
+   client => $proxy->client,
+   id     => $obj2->id,
+   class  => $obj->class,
+);
 
 # $proxy2 should now not work for anything
 
@@ -71,7 +76,7 @@ bless $proxy2, ref $proxy;
 
 # as argument to otherwise-allowed object
 {
-   $proxy->set_property( "objset", [ $proxy ] )->get; # is allowed
+   await $proxy->set_property( "objset", [ $proxy ] ); # is allowed
 
    my $f = $proxy->set_property( "objset", [ $proxy2 ] );
 

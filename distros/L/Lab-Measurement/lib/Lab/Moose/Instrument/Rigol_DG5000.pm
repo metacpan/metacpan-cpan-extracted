@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Rigol_DG5000;
-$Lab::Moose::Instrument::Rigol_DG5000::VERSION = '3.772';
+$Lab::Moose::Instrument::Rigol_DG5000::VERSION = '3.791';
 #ABSTRACT: Rigol DG5000 series Function/Arbitrary Waveform Generator
 
 use v5.20;
@@ -316,26 +316,6 @@ sub get_offset{
 #
 
 
-
-sub source_apply_ramp {
-    my ( $self, $channel, %args ) = validated_channel_getter(
-        \@_,
-        freq   => { isa => 'Num' },
-        amp    => { isa => 'Num' },
-        offset => { isa => 'Num' },
-        phase  => { isa => 'Num' },
-    );
-
-    my ( $freq, $amp, $offset, $phase )
-        = delete @args{qw/freq amp offset phase/};
-
-    $self->write(
-        command => "SOURCE${channel}:APPLY:RAMP $freq,$amp,$offset,$phase",
-        %args
-    );
-}
-
-
 sub source_apply_pulse {
     my ( $self, $channel, %args ) = validated_channel_getter(
         \@_,
@@ -355,6 +335,25 @@ sub source_apply_pulse {
 }
 
 
+
+sub source_apply_ramp {
+    my ( $self, $channel, %args ) = validated_channel_getter(
+        \@_,
+        freq   => { isa => 'Num' },
+        amp    => { isa => 'Num' },
+        offset => { isa => 'Num' },
+        phase  => { isa => 'Num' },
+    );
+
+    my ( $freq, $amp, $offset, $phase )
+        = delete @args{qw/freq amp offset phase/};
+
+    $self->write(
+        command => "SOURCE${channel}:APPLY:RAMP $freq,$amp,$offset,$phase",
+        %args
+    );
+}
+
 sub source_apply_sinusoid {
     my ( $self, $channel, %args ) = validated_channel_getter(
         \@_,
@@ -373,7 +372,6 @@ sub source_apply_sinusoid {
     );
 }
 
-
 sub source_apply_square {
     my ( $self, $channel, %args ) = validated_channel_getter(
         \@_,
@@ -391,7 +389,6 @@ sub source_apply_square {
         %args
     );
 }
-
 
 sub source_apply_arb {
     my ( $self, $channel, %args ) = validated_channel_getter(
@@ -746,7 +743,7 @@ Lab::Moose::Instrument::Rigol_DG5000 - Rigol DG5000 series Function/Arbitrary Wa
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 SYNOPSIS
 
@@ -759,9 +756,10 @@ version 3.772
     function => 'PULSE'
     );
 
-All C<source_*> commands accept a C<channel> argument, which can be 1 or 2. On
-initalization an argument instrument_nselect can be passed to specify a default
-channel, though if instrument_nselect is not passed the default channel is 1:
+All C<source_*>, C<set_*> and C<get_*> commands accept a C<channel> argument,
+which can be 1 or 2. On initalization an argument C<instrument_nselect> can be
+passed to specify a default channel, though if C<instrument_nselect> is not passed
+the default channel is 1:
 
  $rigol->source_function_shape(value => 'SIN'); # Channel 1
  $rigol->source_function_shape(value => 'SQU', channel => 2); # Channel 2
@@ -810,12 +808,18 @@ of the arbitrary waveform to be output is greater than 16 Mpts, ranging up to
  $rigol->play_coefficient(value => 10);
 
 When using the arbitrary waveform in play mode, a frequency division coefficient
-N can be used to reduce the sample rate fs via the relations
-=item fs = 1G/2^N, When N≤2
-=item fs = 1G/((N-2)*8), When N>2
-The range of N is from 0 to 268435456 (2^28)
+C<N> can be used to reduce the sample rate fs via the relations
 
-See the Rigols user manual page 3-4 and following for more information.
+=over 4
+
+=item * fs = 1G/2^N, When N≤2
+
+=item * fs = 1G/((N-2)*8), when N>2
+
+=back
+
+The range of N is from 0 to 268435456 (2^28). See the Rigol user manual page
+3-4 and following for more information.
 
 =head2 phase_align
 
@@ -834,78 +838,66 @@ Turn output channels on or off.
 =head2 set_pulsewidth/get_pulsewidth
 
  $rigol->set_pulsewidth(channel => 1, value => 0.0000001, constant_delay => 1);
+ $rigol->get_pulsewidth();
 
-When the output functon is PULSE these subroutines set/get the pulses width.
-This reduces the pulse delay however, since the pulse period stays the same.
+When the output functon is C<PULSE> these subroutines set/get the pulses width
+in s. This reduces the pulse delay however, since the pulse period stays the same.
 An optional parameter C<constant_delay> can be passed to adapt the waveform period
 and keep the delay constant.
 
 =head2 set_pulsedelay/get_pulsedelay
 
  $rigol->set_pulsedelay(channel => 1, value => 0.0000003, constant_width => 1);
+ $rigol->get_pulsedelay();
 
-When the output functon is PULSE these subroutines set/get the pulses width.
-This reduces the pulse delay however, since the pulse period stays the same.
+When the output functon is C<PULSE> these subroutines set/get the pulses width
+in s. This reduces the pulse delay however, since the pulse period stays the same.
 As with the delay an optional parameter C<constant_width> can be passed to adapt
 the waveform period and keep the width constant.
 
 =head2 set_period/get_period
 
- $rigol->set_pulsedelay(channel => 1, value => 0.00000045);
+ $rigol->set_period(channel => 1, value => 0.00000045);
+ $rigol->get_period();
 
-Set/query the current waveforms period.
+Set/query the current waveforms period in s.
 
 =head2 set_frq/get_frq
 
  $rigol->set_frq(channel => 1, value => 10000000);
+ $rigol->get_frq();
 
-Set/query the current waveforms frequency in Hz. This subroutine is used in
+Set/query the current waveforms frequency in Hz. This subroutine is used for
 frequency sweeps.
 
 =head2 set_voltage/get_voltage
 
  $rigol->set_voltage(channel => 1, value => 1);
+ $rigol->get_voltage();
 
 Set/query the current waveforms peak-to-peak amplitude in volts.
 
 =head2 set_level/get_level
 
  $rigol->set_level(channel => 1, value => 1);
+ $rigol->get_level();
 
 Set/query the current waveforms maximum amplitude amplitude in volts. This
-subroutine is used in voltage sweeps.
+subroutine is used for voltage sweeps.
 
 =head2 set_level_low/get_level_low
 
  $rigol->set_level_low(channel => 1, value => 1);
+ $rigol->get_level_low();
 
 Set/query the current waveforms minimum amplitude amplitude in volts.
 
 =head2 set_offset/get_offset
 
  $rigol->set_offset(channel => 1, value => 0.5);
+ $rigol->get_offset();
 
 Set/query the current waveforms dc offset in volts.
-
-=head2 source_apply_ramp/source_apply_sinusoid/source_apply_square/source_apply_arb
-
- $rigol->source_apply_ramp(
-     freq => ...,
-     amp => ...,
-     offset => ...,
-     phase => ...
- );
-
-Apply a ramp, sine, square function or arbitrary waveform with the given parameters,
-
-=over
-
-=item * freq = frequency in Hz
-=item * amp = amplitude in Volts
-=item * offset = DC offset in Volts
-=item * phase = phase in degrees (0 to 360)
-
-=back
 
 =head2 source_apply_pulse
 
@@ -918,26 +910,40 @@ Apply a ramp, sine, square function or arbitrary waveform with the given paramet
 
 Apply a pulse function with the given parameters,
 
-=over
+=over 4
 
-=item * freq = frequency in Hz
-=item * amp = amplitude in Volts
-=item * offset = DC offset in Volts
-=item * delay = pulse delay in seconds
+=item * C<freq> = frequency in Hz
+
+=item * C<amp> = amplitude in Volts
+
+=item * C<offset> = DC offset in Volts
+
+=item * C<delay> = pulse delay in seconds
 
 =back
 
-=head2 source_apply_sinusoid
+=head2 source_apply_ramp/square/arb
 
- $rigol->source_apply_sinusoid(freq => 50000000, amp => 1, offset => 0, phase => 0);
+ $rigol->source_apply_ramp(
+     freq => ...,
+     amp => ...,
+     offset => ...,
+     phase => ...
+ );
 
-=head2 source_apply_square
+Apply a ramp, sine, square function or arbitrary waveform with the given parameters,
 
- $rigol->source_apply_square(freq => 50000000, amp => 1, offset => 0, phase => 0);
+=over 4
 
-=head2 source_apply_arb
+=item * C<freq> = frequency in Hz
 
- $rigol->source_apply_arb(freq => 50000000, amp => 1, offset => 0, phase => 0);
+=item * C<amp> = amplitude in Volts
+
+=item * C<offset> = DC offset in Volts
+
+=item * C<phase> = phase in degrees (0 to 360)
+
+=back
 
 =head2 source_burst_mode/source_burst_mode_query
 
@@ -1035,7 +1041,7 @@ Allowed values: C<SIN, SQU, RAMP, PULSE, NOISE, USER, DC, SINC, EXPR, EXPF, CARD
  my $values = [-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6];
  $rigol->trace_data_data(data => $values);
 
-=head2 trace_data_value, trace_data_value_query
+=head2 trace_data_value/trace_data_value_query
 
  $rigol->trace_data_value(point => 2, data => 8192);
 
@@ -1043,19 +1049,19 @@ Modify the second point to the decimal number 8192.
 
  $rigol->trace_data_value_query(point => 2);
 
-=head2 trace_data_points, trace_data_points_query
+=head2 trace_data_points/trace_data_points_query
 
  $rigol->trace_data_points(value => 3);
  say $rigol->trace_data_points_query();
 
-=head2 trace_data_points_interpolate, trace_data_points_interpolate_query
+=head2 trace_data_points_interpolate/trace_data_points_interpolate_query
 
  $rigol->trace_data_points_interpolate(value => 'LIN');
  say $rigol->trace_data_points_interpolate_query();
 
 Allowed values: C<LIN, SINC, OFF>.
 
-=head2 trace_data_points_interpolate, trace_data_points_interpolate_query
+=head2 trace_data_dac
 
  $rigol->trace_data_dac(value => '16383,8192,0,0,8192,8192,6345,0');
 
@@ -1068,7 +1074,7 @@ interpolate.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2020       Simon Reinhardt
-            2021       Fabian Weinelt, Simon Reinhardt
+            2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

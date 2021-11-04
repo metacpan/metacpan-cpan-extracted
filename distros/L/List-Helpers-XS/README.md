@@ -8,9 +8,9 @@
 ```perl
   use List::Helpers::XS qw/ :shuffle :slice /;
 
-  my @slice = random_slice(\@list, $size);
+  my $slice = random_slice(\@list, $size); # returns array reference, @list is partitial shuffled
 
-  random_slice_void(\@list, $size);
+  random_slice(\@list, $size); # @list is now truncated and shuffled
 
   shuffle(\@list);
   shuffle(@list);
@@ -23,7 +23,6 @@
   tie(@list, "MyPackage");
   shuffle(@list);
   shuffle(\@list);
-  random_slice_void(\@list, $size);
   my $slice = random_slice(\@list, $size); # returns array reference
 ```
 
@@ -50,19 +49,8 @@
 
     Also the original array will be shuffled at the end.
 
-##### random_slice_void
+    In void context the original list will be truncated and shuffled.
 
-    This method receives the array and the amount of required elements to be shuffled,
-    shuffles array's elements and returns the array reference to the new
-    arrays with C<num> elements from original one.
-
-    If "num" is equal or higher than amount of elements in array, then
-    it won't do any work.
-
-    It doesn't shuffle the whole array, it shuffles only C<num> elements and returns only them.
-    So, if you need to shuffle and get back only a part of array, then this method can be faster than others approaches.
-
-    Be aware that the original array will be shuffled too, but it won't be sliced.
 
 ##### shuflle
       Shuffles the provided array.
@@ -76,58 +64,15 @@
     You can pass so many arguments as Perl stack allows.
 
 ### Benchmarks
-    Below you can find some benchmarks of "random_slice" and
-    "random_slice_void" methods in comparison with
-    "Array::Shuffle::shuffle_array" /
-    "Array::Shuffle::shuffle_huge_array" with "splice" method
-    invocation afterwards.
+    Benchmarks of "random_slice" method in comparison with
+    "List::MoreUtils::samples" and "List::Util::sample" showed that current
+    version of "random_slice" is very similar to the first ones in some
+    cases. But in case of huge amount of iterations it starts to slow down
+    due to some performance degradation.
 
-Total amount of elements in initial array: 250
-```
-                            shuffle_array and splice  random_slice  random_slice_void
-shuffle_array and splice                          --          -45%               -52%
-random_slice                                     82%            --               -12%
-random_slice_void                               107%           14%                 --
-
-Total amount of elements in initial array: 25_000
-
-                         shuffle_array and splice  random_slice_void  random_slice
-shuffle_array and splice                      --                -51%          -56%
-random_slice_void                            106%                 --           -9%
-random_slice                                 126%                10%            --
-
-Total amount of elements in initial array: 250_000
-
-                           shuffle_array and splice  random_slice_void  random_slice
-shuffle_array and splice                         --               -63%          -67%
-random_slice_void                              172%                 --           -9%
-random_slice                                   200%                10%            --
-```
-
-The benchmark code is below:
-
-```perl
-  cmpthese (
-      1_000_000,
-      {
-          'shuffle_array and splice' => sub {
-              my $arr = [@array];
-              if ($slice_size < scalar $arr->@*) {
-                  shuffle_array(@$arr);
-                  $arr = [splice(@$arr, 0, $slice_size)];
-              }
-          },
-          'random_slice' => sub {
-              my $arr = [@array];
-              $arr = random_slice($arr, $slice_size);
-          },
-          'random_slice_void' => sub {
-              my $arr = [@array];
-              random_slice_void($arr, $slice_size);
-          },
-      }
-    );
-```
+    So, the usage of "List::MoreUtils::samples" (it's the fastest now) and
+    "List::Util::sample" is more preferable. I'll keep "random_slice" for
+    backward compatibility.
 
 The benchmark results for "shuffle"
 

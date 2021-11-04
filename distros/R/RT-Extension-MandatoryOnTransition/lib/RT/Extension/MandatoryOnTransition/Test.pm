@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/Users/sunnavy/bps/git/rt/local/lib /Users/sunnavy/bps/git/rt/lib);
+use lib qw(/Users/jbrandt/work/bps/rt/local/lib /Users/jbrandt/work/bps/rt/lib);
 
 package RT::Extension::MandatoryOnTransition::Test;
 

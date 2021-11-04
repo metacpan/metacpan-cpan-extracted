@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::SendNotificationsRequest;
-$Shipment::FedEx::WSDL::TrackTypes::SendNotificationsRequest::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::SendNotificationsRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -51,7 +51,7 @@ Class::Std::initialize();
               SenderContactName
               NotificationDetail
 
-              )
+            )
         ],
         {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
             'ClientDetail'            => \%ClientDetail_of,
@@ -122,7 +122,7 @@ Shipment::FedEx::WSDL::TrackTypes::SendNotificationsRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

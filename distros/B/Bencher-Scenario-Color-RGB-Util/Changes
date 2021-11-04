@@ -1,0 +1,9 @@
+0.002   2021-10-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename dist/module
+	  Bencher::Scenario::{ColorRGBUtil,Color::RGB::Util}.
+
+
+0.001   2018-09-26  Released-By: PERLANCAR
+
+        - First release.

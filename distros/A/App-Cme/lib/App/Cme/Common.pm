@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2020 by Dominique Dumont.
+# This software is Copyright (c) 2014-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.033';
+$App::Cme::Common::VERSION = '1.034';
 use strict;
 use warnings;
 use 5.10.1;
@@ -25,6 +25,7 @@ use Encode qw(decode_utf8);
 
 my @store;
 
+## no critic (Variables::ProhibitPackageVars)
 $::_use_log4perl_to_warn = 1;
 
 sub cme_global_options {
@@ -58,7 +59,7 @@ sub check_unknown_args {
 
     my @unknown_options = grep { /^-/ } @$args ;
     # $self->usage_error("Unknown option: @unknown_options") if @unknown_options;
-    warn("Unknown option: @unknown_options. Unknown option will soon be a fatal error.") if @unknown_options;
+    warn("Unknown option: @unknown_options. Unknown option will soon be a fatal error.\n") if @unknown_options;
     return;
 }
 
@@ -117,6 +118,10 @@ sub process_args {
             my $insert = $message ? " ( $message )": '';
             die "application $application requires a 3rd argument$insert. "
                 . "I.e. 'cme $command $application <backend_arg>'\n";
+        }
+
+        if ( $appli_info->{$application}{use_backend_argument_as_config_file} ) {
+            $config_file = $appli_info->{$application}{config_dir} . '/' . $b_arg;
         }
     }
 
@@ -199,7 +204,7 @@ sub run_tk_ui {
     require Tk::ErrorDialog;
     Tk->import;
 
-    no warnings 'once'; ## no critic TestingAndDebugging::ProhibitNoWarnings
+    no warnings 'once'; ## no critic (TestingAndDebugging::ProhibitNoWarnings)
     my $mw = MainWindow->new;
     $mw->withdraw;
 
@@ -243,7 +248,7 @@ sub get_documentation {
     my $pkg = blessed ($self);
     $pkg =~ s!::!/!g;
     my $pom = $parser->parse_file($INC{$pkg.'.pm'})
-        || die $parser->error();
+        || croak $parser->error();
 
     my $sections = $pom->head1();
     my @ret ;
@@ -267,7 +272,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 SYNOPSIS
 
@@ -283,7 +288,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2020 by Dominique Dumont.
+This software is Copyright (c) 2014-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

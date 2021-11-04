@@ -38,7 +38,7 @@ no_index:
 provides:
   Redis::Fast:
     file: lib/Redis/Fast.pm
-    version: '0.31'
+    version: '0.33'
   Redis::Fast::Hash:
     file: lib/Redis/Fast/Hash.pm
   Redis::Fast::List:
@@ -46,14 +46,14 @@ provides:
   Redis::Fast::Sentinel:
     file: lib/Redis/Fast/Sentinel.pm
 requires:
-  Time::HiRes: '0'
+  Time::HiRes: '1.77'
   Try::Tiny: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/shogo82148/Redis-Fast/issues
   homepage: https://github.com/shogo82148/Redis-Fast
   repository: git://github.com/shogo82148/Redis-Fast.git
-version: '0.31'
+version: '0.33'
 x_contributors:
   - 'Aaron Crane <arc@aaroncrane.co.uk>'
   - 'Aaron Crane <arc@cpan.org>'
@@ -73,6 +73,7 @@ x_contributors:
   - 'João Bolila <joao@bolila.com>'
   - 'Masayuki Matsuki <y.songmu@gmail.com>'
   - 'Michael Klishin <michaelklishin@me.com>'
+  - 'Michael Kröll <michael.kroell@geizhals.at>'
   - 'Michiel Beijen <michiel.beijen@otrs.com>'
   - 'Mikio Fujita <mikio.fjt@gmail.com>'
   - 'Pedro Melo <melo@simplicidade.org>'

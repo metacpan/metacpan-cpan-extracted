@@ -9,17 +9,11 @@ use PDL::Fit::Levmar;
 use PDL::Fit::Levmar::Func;
 use PDL::NiceSlice;
 use PDL::Core ':Internal'; # For topdl()
-
+use Test::More;
 use strict;
-use vars ( '$testno', '$ok_count', '$not_ok_count', '@g',
-            '$Type' );
 
 #  @g is global options to levmar
-
-@g = (  );
-
-$ok_count = 0;
-$not_ok_count = 0;
+my @g = (  );
 
 sub tapprox {
         my($a,$b) = @_;
@@ -43,24 +37,8 @@ sub tapprox_cruder {
         $d < 0.0005;
 }
 
-sub ok {  
-    my ($v, $s) = @_;
-    $testno = 0 unless defined $testno;	
-    $testno++;
-    $s = '' unless defined $s;
-    if ( not $v ) {
-	print "not ";
-	$s = " *** " . $s;
-	$not_ok_count++;
-    }
-    else {
-	$ok_count++;
-    }
-    print "ok - $testno $s\n";   
-}
-
 sub check_type {
-    my (@d) = @_;
+    my ($Type, @d) = @_;
     my $i=0;
     foreach ( @d )  {
 	die "$i: not $Type" unless $Type == $_->type;
@@ -75,8 +53,7 @@ sub deb  { print STDERR $_[0],"\n" }
 #-------------------------------------------------
 # Rosebrock
 sub rosenbrock {
-
-
+    my ($Type) = @_;
     my $st = '
 #define ROSD 105.0
  function mros
@@ -107,20 +84,19 @@ sub rosenbrock {
     
     my @opts = ( MAXITS => 5000 );
     my $h1 = levmar($p,$x, FUNC => $st, @opts, @g );
-    check_type($h1->{INFO});
+    check_type($Type, $h1->{INFO});
     my $h2 = levmar($p,$x, CSRC => 't/ros.c' , @opts,@g );
-    check_type($h2->{INFO});
+    check_type($Type, $h2->{INFO});
     ok(levmar_report($h1) eq levmar_report($h2), "Rosenbrock  csrc == def");
     my $h3 = levmar($p,$x, FUNC => $rf, JFUNC => $rderiv, @opts, DERIVATIVE => 'analytic',@g);
-    check_type($h3->{INFO});
+    check_type($Type, $h3->{INFO});
     ok ( tapprox_cruder($h2->{P},$h3->{P}), "Rosenbrock  perl sub == def");
-
-
 } 
 
 #-------------------------------------------------
 # modified Rosenbrock problem
 sub modified_rosenbrock {
+    my ($Type) = @_;
 
 my $csrc = '
 #define MODROSLAM 1E02
@@ -199,10 +175,10 @@ my $defst2 = "
     my $h2 = levmar($p,$x, CSRC => $csrc, MAXITS => $maxits, DERIVATIVE => 'numeric',@g);
     my $h3 = levmar($p,$x, FUNC => $defst, MAXITS => $maxits, DERIVATIVE => 'numeric',@g);
     my $h4 = levmar($p,$x, FUNC => $defst2, MAXITS => $maxits ,@g);
-    check_type($h1->{INFO});
-    check_type($h2->{INFO});
-    check_type($h3->{INFO});
-    check_type($h4->{INFO});
+    check_type($Type, $h1->{INFO});
+    check_type($Type, $h2->{INFO});
+    check_type($Type, $h3->{INFO});
+    check_type($Type, $h4->{INFO});
 
     if ( $Type != float ) {  # float and double differ by maybe %1 
      my $fhand = $h3->{FUNC};
@@ -222,6 +198,7 @@ my $defst2 = "
 #-------------------------------------------------
 # Powell's Problem
 sub powell {
+    my ($Type) = @_;
 
     my $csrc = '
 /* Powell\'s function, minimum at (0, 0) */
@@ -286,14 +263,15 @@ my $defst = '
     my @opts = ( MAXITS => 1000, DERIVATIVE => 'numeric' );
     my $h0 = levmar($p,$x, CSRC => $csrc, @opts,@g);
     my $h1 = levmar($p,$x, FUNC => $defst, @opts ,@g);
-    check_type($h0->{INFO});
-    check_type($h1->{INFO});
+    check_type($Type, $h0->{INFO});
+    check_type($Type, $h1->{INFO});
     ok(levmar_report($h0) eq levmar_report($h1), "Powell  csrc == def"); 
 }
 
 #-------------------------------------------------
 # Boggs Tolle problem 3
 sub boggs_tolle_3 {
+    my ($Type) = @_;
 
     my $csrc =  '
 /* Boggs - Tolle problem 3 (linearly constrained),*/
@@ -408,7 +386,7 @@ my $defst = '
    my @opts = ( MAXITS => 1000 ,@g);
 
    my $h1 = levmar($p,$x, CSRC => $csrc, A => $A, B => $b , @opts );
-   check_type($h1->{INFO});   
+   check_type($Type, $h1->{INFO});
    ok(tapprox_cruder($h1->{P},$correct_minimum), "Boggs Tolle " .
           $h1->{P} . "   " .  $correct_minimum );
 
@@ -441,6 +419,7 @@ my $defst = '
 
 
 sub hock_schittkowski {
+    my ($Type) = @_;
 
    my $csrc = '
     
@@ -503,6 +482,7 @@ register int j=0;
 }
 
 sub hock_schittkowski_mod2_52 {
+    my ($Type) = @_;
  #   Hock - Schittkowski modified #2 problem 52 
 
   my $csrc = '
@@ -568,6 +548,7 @@ register int j=0;
 }
 
 sub hock_schittkowski_mod_76 {
+    my ($Type) = @_;
 #  /* Hock - Schittkowski modified problem 76 */
 
  my $csrc = '
@@ -632,6 +613,7 @@ register int j=0;
 
 
 sub hatfldb {
+    my ($Type) = @_;
 
 my $csrc = '
 
@@ -746,7 +728,7 @@ my $defst = '
   my $h;
 
   $h = levmar($p,$x, CSRC => $csrc, UB => $ub, LB => $lb, @opts, DERIVATIVE => 'analytic');
-  check_type($h->{INFO});   
+  check_type($Type, $h->{INFO});
   ok(tapprox($h->{P},$correct_minimum), "Hatfld b, csrc, analytic");
 
   $h = levmar($p,$x, FUNC => $defst, UB => $ub, LB => $lb, @opts, DERIVATIVE => 'numeric');
@@ -778,33 +760,18 @@ my $defst = '
 
 
 
-print "1..25\n";
-
-print "# type double\n";
-$Type = double;
-rosenbrock();
-modified_rosenbrock();
-powell();
-if ($PDL::Fit::Levmar::HAVE_LAPACK) {
- hock_schittkowski_mod_76();
- hock_schittkowski_mod2_52();
- hock_schittkowski();
- boggs_tolle_3();
+for (double, float) {
+rosenbrock($_);
+modified_rosenbrock($_);
+powell($_);
+if ($_ == double && $PDL::Fit::Levmar::HAVE_LAPACK) {
+ hock_schittkowski_mod_76($_);
+ hock_schittkowski_mod2_52($_);
+ hock_schittkowski($_);
+ boggs_tolle_3($_);
 }
-else {
- ok(1);
- ok(1);
- ok(1);
+hatfldb($_);
 }
-hatfldb();
-
-print "# type float\n";
-$Type = float;
-rosenbrock();
-modified_rosenbrock();
-powell();
-#boggs_tolle_3();
-hatfldb();
 
 =pod
 
@@ -817,5 +784,4 @@ foreach my $name (qw( mros ros powell modros mhatfldb bt3 hatfldb )) {
 
 =cut
 
-print "# Ok count: $ok_count, Not ok count: $not_ok_count\n";
-
+done_testing;

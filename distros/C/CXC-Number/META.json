@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -145,67 +145,67 @@
    "provides" : {
       "CXC::Number" : {
          "file" : "lib/CXC/Number.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Grid" : {
          "file" : "lib/CXC/Number/Grid.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Grid::Failure" : {
          "file" : "lib/CXC/Number/Grid/Failure.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Grid::Role::BigNum" : {
          "file" : "lib/CXC/Number/Grid/Role/BigNum.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Grid::Role::PDL" : {
          "file" : "lib/CXC/Number/Grid/Role/PDL.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Grid::Types" : {
          "file" : "lib/CXC/Number/Grid/Types.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Sequence" : {
          "file" : "lib/CXC/Number/Sequence.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Sequence::Failure" : {
          "file" : "lib/CXC/Number/Sequence/Failure.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Sequence::Fixed" : {
          "file" : "lib/CXC/Number/Sequence/Fixed.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Sequence::Linear" : {
          "file" : "lib/CXC/Number/Sequence/Linear.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Sequence::Ratio" : {
          "file" : "lib/CXC/Number/Sequence/Ratio.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Sequence::Role::BigNum" : {
          "file" : "lib/CXC/Number/Sequence/Role/BigNum.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Sequence::Role::PDL" : {
          "file" : "lib/CXC/Number/Sequence/Role/PDL.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Sequence::Types" : {
          "file" : "lib/CXC/Number/Sequence/Types.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Sequence::Utils" : {
          "file" : "lib/CXC/Number/Sequence/Utils.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CXC::Number::Types" : {
          "file" : "lib/CXC/Number/Types.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -219,7 +219,7 @@
          "web" : "https://gitlab.com/djerius/cxc-number"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "GPL-3.0-only"

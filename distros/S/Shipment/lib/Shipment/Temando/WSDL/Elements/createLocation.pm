@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::createLocation;
-$Shipment::Temando::WSDL::Elements::createLocation::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::createLocation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ use warnings;
             [   qw(        clientId
                   location
 
-                  )
+                )
             ],
             {   'clientId' => \%clientId_of,
                 'location' => \%location_of,
@@ -79,7 +79,7 @@ Shipment::Temando::WSDL::Elements::createLocation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

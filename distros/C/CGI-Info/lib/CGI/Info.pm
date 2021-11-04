@@ -11,7 +11,7 @@ use 5.008;
 use Log::Any qw($log);
 # use Cwd;
 # use JSON::Parse;
-use JSON;
+use JSON::MaybeXS;
 use List::MoreUtils;	# Can go when expect goes
 # use Sub::Private;
 use Sys::Path;
@@ -26,11 +26,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.71
+Version 0.73
 
 =cut
 
-our $VERSION = '0.71';
+our $VERSION = '0.73';
 
 =head1 SYNOPSIS
 
@@ -91,22 +91,15 @@ sub new {
 		warn 'expect must be a reference to an array';
 		return;
 	}
-	return bless {
-		# _script_name => undef,
-		# _script_path => undef,
-		# _site => undef,
-		# _cgi_site => undef,
-		# _domain => undef,
-		# _paramref => undef,
-		_allow => $args{allow} ? $args{allow} : undef,
-		_expect => $args{expect} ? $args{expect} : undef,
-		_upload_dir => $args{upload_dir} ? $args{upload_dir} : undef,
-		_max_upload_size => $args{max_upload_size} || 512 * 1024,
-		_logger => $args{logger},
-		_syslog => $args{syslog},
-		_cache => $args{cache},	# e.g. CHI
-		# _status => 200,
-	}, $class;
+
+	my %defaults = (
+		max_upload_size => 512 * 1024,
+		allow => undef,
+		expect => undef,
+		upload_dir => undef
+	);
+
+	return bless { %defaults, %args }, $class;
 }
 
 =head2 script_name
@@ -126,10 +119,10 @@ This is useful for POSTing, thus avoiding putting hardcoded paths into forms
 sub script_name {
 	my $self = shift;
 
-	unless($self->{_script_name}) {
+	unless($self->{script_name}) {
 		$self->_find_paths();
 	}
-	return $self->{_script_name};
+	return $self->{script_name};
 }
 
 sub _find_paths {
@@ -139,28 +132,28 @@ sub _find_paths {
 	File::Basename->import();
 
 	if($ENV{'SCRIPT_NAME'}) {
-		$self->{_script_name} = File::Basename::basename($ENV{'SCRIPT_NAME'});
+		$self->{script_name} = File::Basename::basename($ENV{'SCRIPT_NAME'});
 	} else {
-		$self->{_script_name} = File::Basename::basename($0);
+		$self->{script_name} = File::Basename::basename($0);
 	}
-	$self->{_script_name} = $self->_untaint_filename({
-		filename => $self->{_script_name}
+	$self->{script_name} = $self->_untaint_filename({
+		filename => $self->{script_name}
 	});
 
 	if($ENV{'SCRIPT_FILENAME'}) {
-		$self->{_script_path} = $ENV{'SCRIPT_FILENAME'};
+		$self->{script_path} = $ENV{'SCRIPT_FILENAME'};
 	} elsif($ENV{'SCRIPT_NAME'} && $ENV{'DOCUMENT_ROOT'}) {
 		my $script_name = $ENV{'SCRIPT_NAME'};
 		if(substr($script_name, 0, 1) eq '/') {
 			# It's usually the case, e.g. /cgi-bin/foo.pl
 			$script_name = substr($script_name, 1);
 		}
-		$self->{_script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
+		$self->{script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
 	} elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
 		if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) &&
 		   (-r $ENV{'SCRIPT_NAME'})) {
 			# Called from a command line with a full path
-			$self->{_script_path} = $ENV{'SCRIPT_NAME'};
+			$self->{script_path} = $ENV{'SCRIPT_NAME'};
 		} else {
 			require Cwd;
 			Cwd->import;
@@ -171,17 +164,17 @@ sub _find_paths {
 				$script_name = substr($script_name, 1);
 			}
 
-			$self->{_script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
+			$self->{script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
 		}
 	} elsif(File::Spec->file_name_is_absolute($0)) {
 		# Called from a command line with a full path
-		$self->{_script_path} = $0;
+		$self->{script_path} = $0;
 	} else {
-		$self->{_script_path} = File::Spec->rel2abs($0);
+		$self->{script_path} = File::Spec->rel2abs($0);
 	}
 
-	$self->{_script_path} = $self->_untaint_filename({
-		filename => $self->{_script_path}
+	$self->{script_path} = $self->_untaint_filename({
+		filename => $self->{script_path}
 	});
 }
 
@@ -207,10 +200,10 @@ Finds the full path name of the script.
 sub script_path {
 	my $self = shift;
 
-	unless($self->{_script_path}) {
+	unless($self->{script_path}) {
 		$self->_find_paths();
 	}
-	return $self->{_script_path};
+	return $self->{script_path};
 }
 
 =head2 script_dir
@@ -229,22 +222,21 @@ Returns the file system directory containing the script.
 sub script_dir {
 	my $self = shift;
 
-	unless($self->{_script_path}) {
+	unless($self->{script_path}) {
 		$self->_find_paths();
 	}
 
-	# Don't use File::Spec->splitpath() since that can leave in the trailing
-	# slash
+	# Don't use File::Spec->splitpath() since that can leave the trailing slash
 	if($^O eq 'MSWin32') {
-		if($self->{_script_path} =~ /(.+)\\.+?$/) {
+		if($self->{script_path} =~ /(.+)\\.+?$/) {
 			return $1;
 		}
 	} else {
-		if($self->{_script_path} =~ /(.+)\/.+?$/) {
+		if($self->{script_path} =~ /(.+)\/.+?$/) {
 			return $1;
 		}
 	}
-	return $self->{_script_path};
+	return $self->{script_path};
 }
 
 =head2 host_name
@@ -271,20 +263,20 @@ There is a good chance that this will be domain_name() prepended with either
 sub host_name {
 	my $self = shift;
 
-	unless($self->{_site}) {
+	unless($self->{site}) {
 		$self->_find_site_details();
 	}
 
-	return $self->{_site};
+	return $self->{site};
 }
 
 sub _find_site_details {
 	my $self = shift;
 
-	if($self->{_logger}) {
-		$self->{_logger}->trace('Entering _find_site_details');
+	if($self->{logger}) {
+		$self->{logger}->trace('Entering _find_site_details');
 	}
-	if($self->{_site} && $self->{_cgi_site}) {
+	if($self->{site} && $self->{cgi_site}) {
 		return;
 	}
 
@@ -292,44 +284,44 @@ sub _find_site_details {
 	URI::Heuristic->import;
 
 	if($ENV{'HTTP_HOST'}) {
-		$self->{_cgi_site} = URI::Heuristic::uf_uristr($ENV{'HTTP_HOST'});
+		$self->{cgi_site} = URI::Heuristic::uf_uristr($ENV{'HTTP_HOST'});
 		# Remove trailing dots from the name.  They are legal in URLs
 		# and some sites link using them to avoid spoofing (nice)
-		if($self->{_cgi_site} =~ /(.*)\.+$/) {
-			$self->{_cgi_site} = $1;
+		if($self->{cgi_site} =~ /(.*)\.+$/) {
+			$self->{cgi_site} = $1;
 		}
 	} elsif($ENV{'SERVER_NAME'}) {
-		$self->{_cgi_site} = URI::Heuristic::uf_uristr($ENV{'SERVER_NAME'});
+		$self->{cgi_site} = URI::Heuristic::uf_uristr($ENV{'SERVER_NAME'});
 		if(defined($self->protocol()) && ($self->protocol() ne 'http')) {
-			$self->{_cgi_site} =~ s/^http//;
-			$self->{_cgi_site} = $self->protocol() . $self->{_cgi_site};
+			$self->{cgi_site} =~ s/^http//;
+			$self->{cgi_site} = $self->protocol() . $self->{cgi_site};
 		}
 	} else {
 		require Sys::Hostname;
 		Sys::Hostname->import;
 
-		$self->{_cgi_site} = Sys::Hostname::hostname();
+		$self->{cgi_site} = Sys::Hostname::hostname();
 	}
 
-	unless($self->{_site}) {
-		$self->{_site} = $self->{_cgi_site};
+	unless($self->{site}) {
+		$self->{site} = $self->{cgi_site};
 	}
-	if($self->{_site} =~ /^https?:\/\/(.+)/) {
-		$self->{_site} = $1;
+	if($self->{site} =~ /^https?:\/\/(.+)/) {
+		$self->{site} = $1;
 	}
-	unless($self->{_cgi_site} =~ /^https?:\/\//) {
+	unless($self->{cgi_site} =~ /^https?:\/\//) {
 		my $protocol = $self->protocol();
 
 		unless($protocol) {
 			$protocol = 'http';
 		}
-		$self->{_cgi_site} = "$protocol://" . $self->{_cgi_site};
+		$self->{cgi_site} = "$protocol://" . $self->{cgi_site};
 	}
-	unless($self->{_site} && $self->{_cgi_site}) {
+	unless($self->{site} && $self->{cgi_site}) {
 		$self->_warn('Could not determine site name');
 	}
-	if($self->{_logger}) {
-		$self->{_logger}->trace('Leaving _find_site_details');
+	if($self->{logger}) {
+		$self->{logger}->trace('Leaving _find_site_details');
 	}
 }
 
@@ -343,19 +335,19 @@ Usually it will be similar to host_name, but will lack the http:// prefix.
 sub domain_name {
 	my $self = shift;
 
-	if($self->{_domain}) {
-		return $self->{_domain};
+	if($self->{domain}) {
+		return $self->{domain};
 	}
 	$self->_find_site_details();
 
-	if($self->{_site}) {
-		$self->{_domain} = $self->{_site};
-		if($self->{_domain} =~ /^www\.(.+)/) {
-			$self->{_domain} = $1;
+	if($self->{site}) {
+		$self->{domain} = $self->{site};
+		if($self->{domain} =~ /^www\.(.+)/) {
+			$self->{domain} = $1;
 		}
 	}
 
-	return $self->{_domain};
+	return $self->{domain};
 }
 
 =head2 cgi_host_url
@@ -367,11 +359,11 @@ Return the URL of the machine running the CGI script.
 sub cgi_host_url {
 	my $self = shift;
 
-	unless($self->{_cgi_site}) {
+	unless($self->{cgi_site}) {
 		$self->_find_site_details();
 	}
 
-	return $self->{_cgi_site};
+	return $self->{cgi_site};
 }
 
 =head2 params
@@ -466,7 +458,7 @@ If the request is an XML request (i.e. the content type of the POST is text/xml)
 CGI::Info will put the request into the params element 'XML', thus:
 
 	use CGI::Info;
-	...
+	# ...
 	my $info = CGI::Info->new();
 	my $paramsref = $info->params();	# See BUGS below
 	my $xml = $$paramsref{'XML'};
@@ -479,28 +471,28 @@ sub params {
 
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	if((defined($self->{_paramref})) && ((!defined($args{'allow'})) || defined($self->{_allow}) && ($args{'allow'} eq $self->{_allow}))) {
-		return $self->{_paramref};
+	if((defined($self->{paramref})) && ((!defined($args{'allow'})) || defined($self->{allow}) && ($args{'allow'} eq $self->{allow}))) {
+		return $self->{paramref};
 	}
 
 	if(defined($args{allow})) {
-		$self->{_allow} = $args{allow};
+		$self->{allow} = $args{allow};
 	}
 	if(defined($args{expect})) {
 		if(ref($args{expect}) eq 'ARRAY') {
-			$self->{_expect} = $args{expect};
+			$self->{expect} = $args{expect};
 		} else {
 			$self->_warn('expect must be a reference to an array');
 		}
 	}
 	if(defined($args{upload_dir})) {
-		$self->{_upload_dir} = $args{upload_dir};
+		$self->{upload_dir} = $args{upload_dir};
 	}
 	if(defined($args{logger})) {
-		$self->{_logger} = $args{logger};
+		$self->{logger} = $args{logger};
 	}
-	if($self->{_logger}) {
-		$self->{_logger}->trace('Entering params');
+	if($self->{logger}) {
+		$self->{logger}->trace('Entering params');
 	}
 
 	my @pairs;
@@ -512,22 +504,22 @@ sub params {
 			@pairs = @ARGV;
 			if(defined($pairs[0])) {
 				if($pairs[0] eq '--robot') {
-					$self->{_is_robot} = 1;
+					$self->{is_robot} = 1;
 					shift @pairs;
 				} elsif($pairs[0] eq '--mobile') {
-					$self->{_is_mobile} = 1;
+					$self->{is_mobile} = 1;
 					shift @pairs;
 				} elsif($pairs[0] eq '--search-engine') {
-					$self->{_is_search_engine} = 1;
+					$self->{is_search_engine} = 1;
 					shift @pairs;
 				} elsif($pairs[0] eq '--tablet') {
-					$self->{_is_tablet} = 1;
+					$self->{is_tablet} = 1;
 					shift @pairs;
 				}
 			}
 		} elsif($stdin_data) {
 			@pairs = split(/\n/, $stdin_data);
-		} elsif(!$self->{_args_read}) {
+		} elsif(!$self->{args_read}) {
 			my $oldfh = select(STDOUT);
 			print "Entering debug mode\n",
 				"Enter key=value pairs - end with quit\n";
@@ -535,7 +527,7 @@ sub params {
 
 			# Avoid prompting for the arguments more than once
 			# if just 'quit' is entered
-			$self->{_args_read} = 1;
+			$self->{args_read} = 1;
 
 			while(<STDIN>) {
 				chop(my $line = $_);
@@ -546,23 +538,25 @@ sub params {
 			}
 		}
 	} elsif(($ENV{'REQUEST_METHOD'} eq 'GET') || ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
-		unless($ENV{'QUERY_STRING'}) {
+		if(my $query = $ENV{'QUERY_STRING'}) {
+			if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
+				$self->_warn('Multipart/form-data not supported for GET');
+			}
+			$query =~ s/\\u0026/\&/g;
+			@pairs = split(/&/, $query);
+		} else {
 			return;
 		}
-		if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
-			$self->_warn('Multipart/form-data not supported for GET');
-		}
-		@pairs = split(/&/, $ENV{'QUERY_STRING'});
 	} elsif($ENV{'REQUEST_METHOD'} eq 'POST') {
 		if(!defined($ENV{'CONTENT_LENGTH'})) {
-			$self->{_status} = 411;
+			$self->{status} = 411;
 			return;
 		}
 		my $content_length = $ENV{'CONTENT_LENGTH'};
-		if(($self->{_max_upload_size} >= 0) && ($content_length > $self->{_max_upload_size})) {	# Set maximum posts
+		if(($self->{max_upload_size} >= 0) && ($content_length > $self->{max_upload_size})) {	# Set maximum posts
 			# TODO: Design a way to tell the caller to send HTTP
 			# status 413
-			$self->{_status} = 413;
+			$self->{status} = 413;
 			$self->_warn('Large upload prohibited');
 			return;
 		}
@@ -584,32 +578,32 @@ sub params {
 				# push(@pairs, @getpairs);
 			# }
 		} elsif($content_type =~ /multipart\/form-data/i) {
-			if(!defined($self->{_upload_dir})) {
+			if(!defined($self->{upload_dir})) {
 				$self->_warn({
 					warning => 'Attempt to upload a file when upload_dir has not been set'
 				});
 				return;
 			}
-			if(!File::Spec->file_name_is_absolute($self->{_upload_dir})) {
+			if(!File::Spec->file_name_is_absolute($self->{upload_dir})) {
 				$self->_warn({
-					warning => "upload_dir $self->{_upload_dir} isn't a full pathname"
+					warning => "upload_dir $self->{upload_dir} isn't a full pathname"
 				});
-				delete $self->{_upload_dir};
+				delete $self->{upload_dir};
 				return;
 			}
-			if(!-d $self->{_upload_dir}) {
+			if(!-d $self->{upload_dir}) {
 				$self->_warn({
-					warning => "upload_dir $self->{_upload_dir} isn't a directory"
+					warning => "upload_dir $self->{upload_dir} isn't a directory"
 				});
-				delete $self->{_upload_dir};
+				delete $self->{upload_dir};
 				return;
 			}
-			if(!-w $self->{_upload_dir}) {
-				delete $self->{_paramref};
+			if(!-w $self->{upload_dir}) {
+				delete $self->{paramref};
 				$self->_warn({
-					warning => "upload_dir $self->{_upload_dir} isn't writeable"
+					warning => "upload_dir $self->{upload_dir} isn't writeable"
 				});
-				delete $self->{_upload_dir};
+				delete $self->{upload_dir};
 				return;
 			}
 			if($content_type =~ /boundary=(\S+)$/) {
@@ -633,7 +627,7 @@ sub params {
 
 			$FORM{XML} = $buffer;
 
-			$self->{_paramref} = \%FORM;
+			$self->{paramref} = \%FORM;
 
 			return \%FORM;
 		} elsif($content_type =~ /application\/json/i) {
@@ -672,15 +666,15 @@ sub params {
 			});
 		}
 	} elsif($ENV{'REQUEST_METHOD'} eq 'OPTIONS') {
-		$self->{_status} = 405;
+		$self->{status} = 405;
 		return;
 	} elsif($ENV{'REQUEST_METHOD'} eq 'DELETE') {
-		$self->{_status} = 405;
+		$self->{status} = 405;
 		return;
 	} else {
 		# TODO: Design a way to tell the caller to send HTTP
 		# status 501
-		$self->{_status} = 501;
+		$self->{status} = 501;
 		$self->_warn({
 			warning => 'Use POST, GET or HEAD'
 		});
@@ -711,27 +705,27 @@ sub params {
 
 		$key = _sanitise_input($key);
 
-		if($self->{_allow}) {
+		if($self->{allow}) {
 			# Is this a permitted argument?
-			if(!exists($self->{_allow}->{$key})) {
-				if($self->{_logger}) {
-					$self->{_logger}->info("discard $key");
+			if(!exists($self->{allow}->{$key})) {
+				if($self->{logger}) {
+					$self->{logger}->info("discard $key");
 				}
 				next;
 			}
 
 			# Do we allow any value, or must it be validated?
-			if(defined($self->{_allow}->{$key})) {
-				if($value !~ $self->{_allow}->{$key}) {
-					if($self->{_logger}) {
-						$self->{_logger}->info("block $key = $value");
+			if(defined($self->{allow}->{$key})) {
+				if($value !~ $self->{allow}->{$key}) {
+					if($self->{logger}) {
+						$self->{logger}->info("block $key = $value");
 					}
 					next;
 				}
 			}
 		}
 
-		if($self->{_expect} && (List::MoreUtils::none { $_ eq $key } @{$self->{_expect}})) {
+		if($self->{expect} && (List::MoreUtils::none { $_ eq $key } @{$self->{expect}})) {
 			next;
 		}
 		$value = _sanitise_input($value);
@@ -744,19 +738,19 @@ sub params {
 			   ($value =~ /((\%27)|(\'))union/ix) ||
 			   ($value =~ /select[[a-z]\s\*]from/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
-				if($self->{_logger}) {
+				if($self->{logger}) {
 					if($ENV{'REMOTE_ADDR'}) {
-						$self->{_logger}->warn($ENV{'REMOTE_ADDR'}, ": SQL injection attempt blocked for '$value'");
+						$self->{logger}->warn($ENV{'REMOTE_ADDR'}, ": SQL injection attempt blocked for '$value'");
 					} else {
-						$self->{_logger}->warn("SQL injection attempt blocked for '$value'");
+						$self->{logger}->warn("SQL injection attempt blocked for '$value'");
 					}
 				}
 				return;
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
-				if($self->{_logger}) {
-					$self->{_logger}->warn("XSS injection attempt blocked for '$value'");
+				if($self->{logger}) {
+					$self->{logger}->warn("XSS injection attempt blocked for '$value'");
 				}
 				return;
 			}
@@ -775,14 +769,14 @@ sub params {
 		return;
 	}
 
-	if($self->{_logger}) {
+	if($self->{logger}) {
 		while(my ($key,$value) = each %FORM) {
-			$self->{_logger}->debug("$key=$value");
+			$self->{logger}->debug("$key=$value");
 			$log->debug("$key=$value");
 		}
 	}
 
-	$self->{_paramref} = \%FORM;
+	$self->{paramref} = \%FORM;
 
 	return \%FORM;
 }
@@ -819,7 +813,7 @@ sub param {
 		return $self->params();
 	}
 	# Is this a permitted argument?
-	if($self->{_allow} && !exists($self->{_allow}->{$field})) {
+	if($self->{allow} && !exists($self->{allow}->{$field})) {
 		$self->_warn({
 			warning => "param: $field isn't in the allow list"
 		});
@@ -855,22 +849,22 @@ sub _warn {
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
 
-	if($self->{_syslog}) {
+	if($self->{syslog}) {
 		require Sys::Syslog;
 
 		Sys::Syslog->import();
-		if(ref($self->{_syslog} eq 'HASH')) {
-			Sys::Syslog::setlogsock($self->{_syslog});
+		if(ref($self->{syslog} eq 'HASH')) {
+			Sys::Syslog::setlogsock($self->{syslog});
 		}
 		openlog($self->script_name(), 'cons,pid', 'user');
 		syslog('warning', $warning);
 		closelog();
 	}
 
-	if($self->{_logger}) {
-		$self->{_logger}->warn($warning);
-	} elsif(!defined($self->{_syslog})) {
-		carp($warning);
+	if($self->{logger}) {
+		$self->{logger}->warn($warning);
+	} elsif(!defined($self->{syslog})) {
+		Carp::carp($warning);
 	}
 }
 
@@ -894,13 +888,13 @@ sub _sanitise_input($) {
 sub _multipart_data {
 	my ($self, $args) = @_;
 
-	if($self->{_logger}) {
-		$self->{_logger}->trace('Entering _multipart_data');
+	if($self->{logger}) {
+		$self->{logger}->trace('Entering _multipart_data');
 	}
 	my $total_bytes = $$args{length};
 
-	if($self->{_logger}) {
-		$self->{_logger}->trace("_multipart_data: total_bytes = $total_bytes");
+	if($self->{logger}) {
+		$self->{logger}->trace("_multipart_data: total_bytes = $total_bytes");
 	}
 	if($total_bytes == 0) {
 		return;
@@ -959,9 +953,9 @@ sub _multipart_data {
 						});
 
 						# Don't do this since it taints the string and I can't work out how to untaint it
-						# my $full_path = Cwd::realpath(File::Spec->catfile($self->{_upload_dir}, $filename));
+						# my $full_path = Cwd::realpath(File::Spec->catfile($self->{upload_dir}, $filename));
 						# $full_path =~ m/^(\/[\w\.]+)$/;
-						my $full_path = File::Spec->catfile($self->{_upload_dir}, $filename);
+						my $full_path = File::Spec->catfile($self->{upload_dir}, $filename);
 						unless(open($fout, '>', $full_path)) {
 							$self->_warn("Can't open $full_path");
 						}
@@ -1014,52 +1008,52 @@ All tablets are mobile, but not all mobile devices are tablets.
 sub is_mobile {
 	my $self = shift;
 
-	if(defined($self->{_is_mobile})) {
-		return $self->{_is_mobile};
+	if(defined($self->{is_mobile})) {
+		return $self->{is_mobile};
 	}
 
 	if($ENV{'HTTP_X_WAP_PROFILE'}) {
 		# E.g. Blackberry
 		# TODO: Check the sanity of this variable
-		$self->{_is_mobile} = 1;
+		$self->{is_mobile} = 1;
 		return 1;
 	}
 
 	if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
 		if($agent =~ /.+(Android|iPhone).+/) {
-			$self->{_is_mobile} = 1;
+			$self->{is_mobile} = 1;
 			return 1;
 		}
 
 		# From http://detectmobilebrowsers.com/
 		if ($agent =~ m/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i || substr($ENV{'HTTP_USER_AGENT'}, 0, 4) =~ m/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i) {
-			$self->{_is_mobile} = 1;
+			$self->{is_mobile} = 1;
 			return 1;
 		}
 
 		# Save loading and calling HTTP::BrowserDetect
 		my $remote = $ENV{'REMOTE_ADDR'};
-		if(defined($remote) && $self->{_cache}) {
-			my $is_mobile = $self->{_cache}->get("is_mobile/$remote/$agent");
+		if(defined($remote) && $self->{cache}) {
+			my $is_mobile = $self->{cache}->get("is_mobile/$remote/$agent");
 			if(defined($is_mobile)) {
-				$self->{_is_mobile} = $is_mobile;
+				$self->{is_mobile} = $is_mobile;
 				return $is_mobile;
 			}
 		}
 
-		unless($self->{_browser_detect}) {
+		unless($self->{browser_detect}) {
 			if(eval { require HTTP::BrowserDetect; }) {
 				HTTP::BrowserDetect->import();
-				$self->{_browser_detect} = HTTP::BrowserDetect->new($agent);
+				$self->{browser_detect} = HTTP::BrowserDetect->new($agent);
 			}
 		}
-		if($self->{_browser_detect}) {
-			my $device = $self->{_browser_detect}->device();
+		if($self->{browser_detect}) {
+			my $device = $self->{browser_detect}->device();
 			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i));
-			if($self->{_cache} && defined($remote)) {
-				$self->{_cache}->set("is_mobile/$remote/$agent", $is_mobile, '1 day');
+			if($self->{cache} && defined($remote)) {
+				$self->{cache}->set("is_mobile/$remote/$agent", $is_mobile, '1 day');
 			}
-			$self->{_is_mobile} = $is_mobile;
+			$self->{is_mobile} = $is_mobile;
 			return $is_mobile;
 		}
 	}
@@ -1076,18 +1070,18 @@ Returns a boolean if the website is being viewed on a tablet such as an iPad.
 sub is_tablet {
 	my $self = shift;
 
-	if(defined($self->{_is_tablet})) {
-		return $self->{_is_tablet};
+	if(defined($self->{is_tablet})) {
+		return $self->{is_tablet};
 	}
 
 	if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /.+(iPad|TabletPC).+/)) {
 		# TODO: add others when I see some nice user_agents
-		$self->{_is_tablet} = 1;
+		$self->{is_tablet} = 1;
 	} else {
-		$self->{_is_tablet} = 0;
+		$self->{is_tablet} = 0;
 	}
 
-	return $self->{_is_tablet};
+	return $self->{is_tablet};
 }
 
 =head2 as_string
@@ -1118,8 +1112,8 @@ sub as_string {
 			$rc = "$_=$value";
 		}
 	}
-	if($rc && $self->{_logger}) {
-		$self->{_logger}->debug("is_string: returning '$rc'");
+	if($rc && $self->{logger}) {
+		$self->{logger}->debug("is_string: returning '$rc'");
 	}
 
 	return defined($rc) ? $rc : '';
@@ -1144,8 +1138,7 @@ sub protocol {
 
 	my $port = $ENV{'SERVER_PORT'};
 	if(defined($port)) {
-		my $name = getservbyport($port, 'tcp');
-		if(defined($name)) {
+		if(defined(my $name = getservbyport($port, 'tcp'))) {
 			if($name =~ /https?/) {
 				return $name;
 			} elsif($name eq 'www') {
@@ -1286,17 +1279,17 @@ sub logdir {
 
 	if(defined($dir)) {
 		# No sanity testing is done
-		return $self->{_logdir} = $dir;
+		return $self->{logdir} = $dir;
 	}
 
-	foreach my $rc($self->{_logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir()) {
+	foreach my $rc($self->{logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir()) {
 		if(defined($rc) && length($rc) && (-d $rc) && (-w $rc)) {
 			$dir = $rc;
 			last;
 		}
 	}
 	carp("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
-	$self->{_logdir} ||= $dir;
+	$self->{logdir} ||= $dir;
 
 	return $dir;
 }
@@ -1317,8 +1310,8 @@ Is the visitor a real person or a robot?
 sub is_robot {
 	my $self = shift;
 
-	if(defined($self->{_is_robot})) {
-		return $self->{_is_robot};
+	if(defined($self->{is_robot})) {
+		return $self->{is_robot};
 	}
 
 	my $agent = $ENV{'HTTP_USER_AGENT'};
@@ -1330,7 +1323,7 @@ sub is_robot {
 	}
 
 	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner/i) {
-		$self->{_is_robot} = 1;
+		$self->{is_robot} = 1;
 		return 1;
 	}
 
@@ -1375,54 +1368,55 @@ sub is_robot {
 			# Mine
 			'http://www.seokicks.de/robot.html',
 		);
+		$referrer =~ s/\\/_/g;
 		if(($referrer =~ /\)/) || (List::MoreUtils::any { $_ =~ /^$referrer/ } @crawler_lists)) {
-			if($self->{_logger}) {
-				$self->{_logger}->debug("is_robot: blocked trawler $referrer");
+			if($self->{logger}) {
+				$self->{logger}->debug("is_robot: blocked trawler $referrer");
 			}
-			$self->{_is_robot} = 1;
+			$self->{is_robot} = 1;
 			return 1;
 		}
 	}
 
 	my $key;
 
-	if($self->{_cache}) {
+	if($self->{cache}) {
 		$key = "is_robot/$remote/$agent";
-		if(defined(my $is_robot = $self->{_cache}->get($key))) {
-			$self->{_is_robot} = $is_robot;
+		if(defined(my $is_robot = $self->{cache}->get($key))) {
+			$self->{is_robot} = $is_robot;
 			return $is_robot;
 		}
 	}
 
-	unless($self->{_browser_detect}) {
+	unless($self->{browser_detect}) {
 		if(eval { require HTTP::BrowserDetect; }) {
 			HTTP::BrowserDetect->import();
-			$self->{_browser_detect} = HTTP::BrowserDetect->new($agent);
+			$self->{browser_detect} = HTTP::BrowserDetect->new($agent);
 		}
 	}
-	if($self->{_browser_detect}) {
-		my $is_robot = $self->{_browser_detect}->robot();
-		if(defined($is_robot) && $self->{_logger}) {
-			$self->{_logger}->debug("HTTP::BrowserDetect '$ENV{HTTP_USER_AGENT}' returns $is_robot");
+	if($self->{browser_detect}) {
+		my $is_robot = $self->{browser_detect}->robot();
+		if(defined($is_robot) && $self->{logger}) {
+			$self->{logger}->debug("HTTP::BrowserDetect '$ENV{HTTP_USER_AGENT}' returns $is_robot");
 		}
 		$is_robot = (defined($is_robot) && ($is_robot)) ? 1 : 0;
-		if($self->{_logger}) {
-			$self->{_logger}->debug("is_robot: $is_robot");
+		if($self->{logger}) {
+			$self->{logger}->debug("is_robot: $is_robot");
 		}
 
 		if($is_robot) {
-			if($self->{_cache}) {
-				$self->{_cache}->set($key, $is_robot, '1 day');
+			if($self->{cache}) {
+				$self->{cache}->set($key, $is_robot, '1 day');
 			}
-			$self->{_is_robot} = $is_robot;
+			$self->{is_robot} = $is_robot;
 			return $is_robot;
 		}
 	}
 
-	if($self->{_cache}) {
-		$self->{_cache}->set($key, 0, '1 day');
+	if($self->{cache}) {
+		$self->{cache}->set($key, 0, '1 day');
 	}
-	$self->{_is_robot} = 0;
+	$self->{is_robot} = 0;
 	return 0;
 }
 
@@ -1443,8 +1437,8 @@ Is the visitor a search engine?
 sub is_search_engine {
 	my $self = shift;
 
-	if(defined($self->{_is_search_engine})) {
-		return $self->{_is_search_engine};
+	if(defined($self->{is_search_engine})) {
+		return $self->{is_search_engine};
 	}
 
 	my $remote = $ENV{'REMOTE_ADDR'};
@@ -1457,12 +1451,12 @@ sub is_search_engine {
 
 	my $key;
 
-	if($self->{_cache}) {
+	if($self->{cache}) {
 		$key = "is_search/$remote/$agent";
 
-		my $is_search = $self->{_cache}->get($key);
+		my $is_search = $self->{cache}->get($key);
 		if(defined($is_search)) {
-			$self->{_is_search_engine} = $is_search;
+			$self->{is_search_engine} = $is_search;
 			return $is_search;
 		}
 	}
@@ -1470,27 +1464,27 @@ sub is_search_engine {
 	# Don't use HTTP_USER_AGENT to detect more than we really have to since
 	# that is easily spoofed
 	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
-		if($self->{_cache}) {
-			$self->{_cache}->set($key, 1, '1 day');
+		if($self->{cache}) {
+			$self->{cache}->set($key, 1, '1 day');
 		}
 		return 1;
 	}
 
-	unless($self->{_browser_detect}) {
+	unless($self->{browser_detect}) {
 		if(eval { require HTTP::BrowserDetect; }) {
 			HTTP::BrowserDetect->import();
-			$self->{_browser_detect} = HTTP::BrowserDetect->new($agent);
+			$self->{browser_detect} = HTTP::BrowserDetect->new($agent);
 		}
 	}
-	if(my $browser = $self->{_browser_detect}) {
+	if(my $browser = $self->{browser_detect}) {
 		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo() || $browser->bingbot());
 		if((!$is_search) && $agent =~ /SeznamBot\//) {
 			$is_search = 1;
 		}
-		if($self->{_cache}) {
-			$self->{_cache}->set($key, $is_search, '1 day');
+		if($self->{cache}) {
+			$self->{cache}->set($key, $is_search, '1 day');
 		}
-		$self->{_is_search_engine} = $is_search;
+		$self->{is_search_engine} = $is_search;
 		return $is_search;
 	}
 
@@ -1498,17 +1492,17 @@ sub is_search_engine {
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
 	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
-		if($self->{_cache}) {
-			$self->{_cache}->set($key, 1, '1 day');
+		if($self->{cache}) {
+			$self->{cache}->set($key, 1, '1 day');
 		}
-		$self->{_is_search_engine} = 1;
+		$self->{is_search_engine} = 1;
 		return 1;
 	}
 
-	if($self->{_cache}) {
-		$self->{_cache}->set($key, 0, '1 day');
+	if($self->{cache}) {
+		$self->{cache}->set($key, 0, '1 day');
 	}
-	$self->{_is_search_engine} = 0;
+	$self->{is_search_engine} = 0;
 	return 0;
 }
 
@@ -1558,13 +1552,14 @@ cookie isn't in the jar.
 
 Deprecated - use cookie() instead.
 
-	use CGI::Info;
+    use CGI::Info;
 
-	my $i = CGI::Info->new();
-	my $name = $i->get_cookie(cookie_name => 'name');
-	print "Your name is $name\n";
-	my $address = $i->get_cookie('address');
-	print "Your address is $address\n";
+    my $i = CGI::Info->new();
+    my $name = $i->get_cookie(cookie_name => 'name');
+    print "Your name is $name\n";
+    my $address = $i->get_cookie('address');
+    print "Your address is $address\n";
+
 =cut
 
 sub get_cookie {
@@ -1584,7 +1579,7 @@ sub get_cookie {
 		return;
 	}
 
-	unless($self->{_jar}) {
+	unless($self->{jar}) {
 		unless(defined($ENV{'HTTP_COOKIE'})) {
 			return;
 		}
@@ -1592,12 +1587,12 @@ sub get_cookie {
 
 		foreach my $cookie(@cookies) {
 			my ($name, $value) = split(/=/, $cookie);
-			$self->{_jar}->{$name} = $value;
+			$self->{jar}->{$name} = $value;
 		}
 	}
 
-	if(exists($self->{_jar}->{$params{'cookie_name'}})) {
-		return $self->{_jar}->{$params{'cookie_name'}};
+	if(exists($self->{jar}->{$params{'cookie_name'}})) {
+		return $self->{jar}->{$params{'cookie_name'}};
 	}
 	return;	# Return undef
 }
@@ -1608,10 +1603,11 @@ Returns a cookie's value, or undef if no name is given, or the requested
 cookie isn't in the jar.
 API is the same as "param", it will replace the "get_cookie" method in the future.
 
-	use CGI::Info;
+    use CGI::Info;
 
-	my $name = CGI::Info->new()->cookie(name);
-	print "Your name is $name\n";
+    my $name = CGI::Info->new()->cookie('name');
+    print "Your name is $name\n";
+
 =cut
 
 sub cookie {
@@ -1622,7 +1618,7 @@ sub cookie {
 		return;
 	}
 
-	unless($self->{_jar}) {
+	unless($self->{jar}) {
 		unless(defined($ENV{'HTTP_COOKIE'})) {
 			return;
 		}
@@ -1630,12 +1626,12 @@ sub cookie {
 
 		foreach my $cookie(@cookies) {
 			my ($name, $value) = split(/=/, $cookie);
-			$self->{_jar}->{$name} = $value;
+			$self->{jar}->{$name} = $value;
 		}
 	}
 
-	if(exists($self->{_jar}->{$field})) {
-		return $self->{_jar}->{$field};
+	if(exists($self->{jar}->{$field})) {
+		return $self->{jar}->{$field};
 	}
 	return;	# Return undef
 }
@@ -1650,10 +1646,20 @@ sub status {
 	my $self = shift;
 
 	if(my $status = shift) {
-		$self->{_status} = $status;
+		$self->{status} = $status;
+	}
+	if(!defined($self->{status})) {
+		if(defined(my $method = $ENV{'REQUEST_METHOD'})) {
+			if(($method eq 'OPTIONS') || ($method eq 'DELETE')) {
+				return 405;
+			} elsif(($method eq 'POST') && !defined($ENV{'CONTENT_LENGTH'})) {
+				return 411;
+			}
+		}
+		return 200;
 	}
 
-	return $self->{_status} || 200;
+	return $self->{status} || 200;
 }
 
 =head2 set_logger
@@ -1675,7 +1681,9 @@ sub set_logger {
 		$params{'logger'} = shift;
 	}
 
-	$self->{_logger} = $params{'logger'};
+	$self->{logger} = $params{'logger'};
+
+	return $self;
 }
 
 =head2 reset

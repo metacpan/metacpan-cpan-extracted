@@ -1,3 +1,32 @@
+1.000080  2021-11-04 11:13:07-07:00 America/Los_Angeles
+
+    - Add sort_files_2 for plugins to add settings and future-proof it
+
+1.000079  2021-10-29 10:42:39-07:00 America/Los_Angeles
+
+    - smarter reloader, bit via callbacks, not assumptions
+
+1.000078  2021-10-28 15:38:10-07:00 America/Los_Angeles
+
+    - Disable the feature from the last commit, it needs rethinking thanks to
+      things like Moose.
+
+1.000077  2021-10-28 15:14:09-07:00 America/Los_Angeles
+
+    - Make reloader smarter, do not delete subs from other files when reloading a file
+
+1.000076  2021-10-22 10:29:22-07:00 America/Los_Angeles
+
+    - Add relative filename to the queued task
+
+1.000075  2021-10-21 14:05:27-07:00 America/Los_Angeles
+
+    - Fix missing Changes entry for last release
+
+1.000074  2021-10-20 09:58:05-07:00 America/Los_Angeles
+
+    - Better coverage aggregation and plugin capabilities
+
 1.000073  2021-09-21 10:25:42-07:00 America/Los_Angeles
 
     - Load coverage module EARLY in the runner spawn process

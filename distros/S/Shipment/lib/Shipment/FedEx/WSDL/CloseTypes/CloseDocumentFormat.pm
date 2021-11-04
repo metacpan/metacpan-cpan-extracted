@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::CloseDocumentFormat;
-$Shipment::FedEx::WSDL::CloseTypes::CloseDocumentFormat::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::CloseDocumentFormat::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               ProvideInstructions
               Localization
 
-              )
+            )
         ],
         {   'Dispositions'        => \%Dispositions_of,
             'TopOfPageOffset'     => \%TopOfPageOffset_of,
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::CloseTypes::CloseDocumentFormat
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

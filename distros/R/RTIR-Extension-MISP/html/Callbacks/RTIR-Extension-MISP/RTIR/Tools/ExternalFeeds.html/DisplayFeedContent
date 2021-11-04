@@ -1,0 +1,72 @@
+% my $feed = $FeedsObj->fetch_misp_feed($FeedName, $session{CurrentUser});
+<&|/Widgets/TitleBox,
+  title => $feed->{Title} || '',
+  class => "external-feeds fullwidth",
+  bodyclass => "",
+&>
+% if ( not $ok ) {
+    <& /Elements/ListActions, actions => $msg &>
+% }
+% else {
+  <div class="table-responsive">
+    <p class="mt-3 mt-1 ml-3">
+      <% $feed->{Description} %>
+%       if ( $feed->{PubDate} || $feed->{LastBuildDate}) {
+      <i><&|/l, $feed->{PubDate} || $feed->{LastBuildDate} || '-'&>updated [_1]</&></i>
+%       }
+    </p>
+    <table cellspacing="0" class="table collection collection-as-table">
+      <thead>
+        <tr class="collection-as-table">
+          <th class="collection-as-table"><&|/l&>Date</&></th>
+          <th class="collection-as-table"><&|/l&>Information</&></th>
+          <th class="collection-as-table"><&|/l&>Event ID</&></th>
+          <th class="collection-as-table"><&|/l&>Creator Org</&></th>
+          <th class="collection-as-table"><&|/l&>Threat ID</&></th>
+          <th class="collection-as-table">
+            <% loc('Create a new [_1]', $ticket_type) %>
+            <span class="far fa-question-circle icon-helper" data-toggle="tooltip" data-placement="top" data-original-title="<&|/l&>This will take you to a partially prefilled creation form.</&>"></span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="list-item">
+%         my $i = 1;
+%         foreach my $item (@{ $feed->{items} }) {
+        <tr class="<% $i%2 ? 'oddline' : 'evenline'%>" >
+          <td class="collection-as-table align-text-top"><% $item->{date} %></td>
+          <td class="collection-as-table align-text-top"><% $item->{info} %></td>
+          <td class="collection-as-table align-text-top"><a href="https://100.26.234.31/events/view/<% $item->{id} %>" target="_New_"><% $item->{id} %></a></td>
+          <td class="collection-as-table align-text-top"><% $item->{creator_org} %></td>
+          <td class="collection-as-table align-text-top"><% $item->{threat_level_id} %></td>
+          <td class="collection-as-table align-text-top">
+            <form action="<% $create_URI %>" name="CreateIncident-<% $i %>" id="CreateIncident-<% $i %>"  method="post">
+              <input type="hidden" value="<% $item->{info} %>" name="Subject">
+              <input type="hidden" value="<% $item->{id} %>" name="<% 'CustomField-' . $cf_misp_id->Id %>">
+              <input type="hidden" value="<% $item->{uuid} %>" Name="<% 'CustomField-' . $cf_uuid->Id %>">
+              <input type="hidden" value="<% $Lifecycle %>" Name="Lifecycle">
+              <input type="submit" class="button btn btn-primary form-control" value="<&|/l&>Create new ticket</&>" />
+            </form>
+          </td>
+        </tr>
+%         $i++;
+%     }
+      </tbody>
+    </table>
+  </div>
+%   }
+</&>
+<%init>
+my ($ok, $msg) = $FeedsObj->InitMISP();
+
+my $ticket_type = lc RT::IR::TicketType( Lifecycle => $Lifecycle );
+my $create_URI = RT::IR->HREFTo('Incident/Create.html');
+
+my $cf_misp_id = RT::IR::GetCustomField('MISP Event ID');
+my $cf_uuid = RT::IR::GetCustomField('MISP Event UUID');
+
+</%init>
+<%args>
+$FeedsObj
+$FeedName
+$Lifecycle => 'incidents'
+</%args>

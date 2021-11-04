@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::ShipElements::ShipmentResponse;
-$Shipment::UPS::WSDL::ShipElements::ShipmentResponse::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipElements::ShipmentResponse::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ use warnings;
             [   qw(        Response
                   ShipmentResults
 
-                  )
+                )
             ],
             {   'Response'        => \%Response_of,
                 'ShipmentResults' => \%ShipmentResults_of,
@@ -77,7 +77,7 @@ Shipment::UPS::WSDL::ShipElements::ShipmentResponse
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

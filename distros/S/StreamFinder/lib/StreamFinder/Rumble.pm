@@ -217,6 +217,11 @@ Returns the video's type ("Rumble").
 
 =head1 CONFIGURATION FILES
 
+The default root location directory for StreamFinder configuration files 
+is "~/.config/StreamFinder".  To use an alternate location directory, 
+specify it in the "I<STREAMFINDER>" environment variable, ie.:  
+B<$ENV{STREAMFINDER} = "/etc/StreamFinder">.
+
 =over 4
 
 =item ~/.config/StreamFinder/Rumble/config
@@ -224,13 +229,16 @@ Returns the video's type ("Rumble").
 Optional text file for specifying various configuration options 
 for a specific site (submodule).  Each option is specified on a 
 separate line in the format below:
+NOTE:  Do not follow the lines with a semicolon, comma, or any other 
+separator.  Non-numeric I<values> should be surrounded with quotes, either 
+single or double.  Blank lines and lines beginning with a "#" sign as 
+their first non-blank character are ignored as comments.
 
 'option' => 'value' [,]
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
@@ -246,12 +254,12 @@ Each option is specified on a separate line in the format below:
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 =back
 
-NOTE:  Options specified in the options parameter list will override 
-those corresponding options specified in these files.
+NOTE:  Options specified in the options parameter list of the I<new()> 
+function will override those corresponding options specified in these files.
 
 =head1 KEYWORDS
 

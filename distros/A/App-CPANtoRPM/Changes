@@ -2,6 +2,13 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
+1.11  2021-11-01
+  - Optimized some regexps.  Patch by Bogdan.
+  - Forced strace to run in English so messages can be parsed.  Patch by Bogdan.
+  - Added BugURL to spec file.  Patch by Bogdan.
+  - Fixed the date so that rpmbuild works even in other locales.  Problem
+    reported by Bogdan.
+
 1.10  2021-08-30
   - Several fixes and improvements requested by Sven Willenbuecher.
        Several fixes for AIX

@@ -26,39 +26,89 @@
             <authorgroup>
                 <author>
                     <personname>
-                        <firstname>Unknown</firstname>
-                        <surname>Unknown</surname>
+                        <firstname>
+                            <xsl:choose>
+                                <xsl:when test="vrd:info/vrd:author/vrd:personname/vrd:firstname">
+                                    <xsl:value-of select="vrd:info/vrd:author/vrd:personname/vrd:firstname" />
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:text>Unknown</xsl:text>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </firstname>
+                        <surname>
+                            <xsl:choose>
+                                <xsl:when test="vrd:info/vrd:author/vrd:personname/vrd:surname">
+                                    <xsl:value-of select="vrd:info/vrd:author/vrd:personname/vrd:surname" />
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:text>Unknown</xsl:text>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </surname>
                     </personname>
                     <affiliation>
                         <address>
-                            <email>me@example.com</email>
-                            <uri type="homepage" xlink:href="https://www.shlomifish.org/">Shlomi Fish’s Homepage</uri>
+                            <email>
+                                <xsl:choose>
+                                    <xsl:when test="vrd:info/vrd:author/vrd:email">
+                                        <xsl:value-of select="vrd:info/vrd:author/vrd:email" />
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>me@example.com</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </email>
+                            <xsl:if test="vrd:info/vrd:author/vrd:uri[@type='homepage']">
+                                <uri>
+                                    <xsl:attribute name="type">
+                                        <xsl:text>homepage</xsl:text>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="xlink:href">
+                                        <xsl:value-of select="vrd:info/vrd:author/vrd:uri[@type='homepage']/@xlink:href"/>
+                                    </xsl:attribute>
+                                    <xsl:value-of select="vrd:info/vrd:author/vrd:uri[@type='homepage']/text()"/>
+                                </uri>
+                            </xsl:if>
                         </address>
                     </affiliation>
                 </author>
              </authorgroup>
 
         <copyright>
-             <year>2021</year>
-            <holder>Unknown</holder>
+            <year>
+                <xsl:choose>
+                    <xsl:when test="vrd:info/vrd:copyright/vrd:year">
+                        <xsl:value-of select="vrd:info/vrd:copyright/vrd:year" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>2021</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </year>
+            <holder>
+                <xsl:choose>
+                    <xsl:when test="vrd:info/vrd:copyright/vrd:holder">
+                        <xsl:value-of select="vrd:info/vrd:copyright/vrd:holder" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>Unknown</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </holder>
         </copyright>
         <legalnotice xml:id="main_legal_notice">
-            <para>
-                This document is copyrighted by Unknown.
-            </para>
+            <xsl:choose>
+                <xsl:when test="vrd:info/vrd:legalnotice">
+                    <xsl:apply-templates select="vrd:info/vrd:legalnotice/*" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <para>
+                        This document is copyrighted by Unknown.
+                    </para>
+                </xsl:otherwise>
+            </xsl:choose>
         </legalnotice>
-
-        <revhistory>
-
-            <revision>
-                <revnumber>4902</revnumber>
-                <date>2011-06-05</date>
-                <authorinitials>shlomif</authorinitials>
-                <revremark>
-                    Change ASCII double quotes and single quotes to Unicode.
-                </revremark>
-            </revision>
-        </revhistory>
 
         </info>
         <xsl:apply-templates select="vrd:body/vrd:preface" />

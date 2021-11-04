@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::CommitDetail;
-$Shipment::FedEx::WSDL::RateTypes::CommitDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::CommitDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -69,7 +69,7 @@ Class::Std::initialize();
               RequiredDocuments
               FreightCommitDetail
 
-              )
+            )
         ],
         {   'CommodityName'            => \%CommodityName_of,
             'ServiceType'              => \%ServiceType_of,
@@ -101,7 +101,7 @@ Class::Std::initialize();
             'AppliedSubOptions' =>
               'Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail',
             'CommitTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-            'DayOfWeek' => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
+            'DayOfWeek'   => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
             'TransitTime' =>
               'Shipment::FedEx::WSDL::RateTypes::TransitTimeType',
             'MaximumTransitTime' =>
@@ -174,7 +174,7 @@ Shipment::FedEx::WSDL::RateTypes::CommitDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

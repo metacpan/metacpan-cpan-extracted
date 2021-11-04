@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.19'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,31 +28,31 @@ no_index:
 provides:
   Avro:
     file: lib/Avro.pm
-    version: 1.10.2
+    version: 1.11.0
   Avro::BinaryDecoder:
     file: lib/Avro/BinaryDecoder.pm
-    version: 1.10.2
+    version: 1.11.0
   Avro::BinaryEncoder:
     file: lib/Avro/BinaryEncoder.pm
-    version: 1.10.2
+    version: 1.11.0
   Avro::DataFile:
     file: lib/Avro/DataFile.pm
-    version: 1.10.2
+    version: 1.11.0
   Avro::DataFileReader:
     file: lib/Avro/DataFileReader.pm
-    version: 1.10.2
+    version: 1.11.0
   Avro::DataFileWriter:
     file: lib/Avro/DataFileWriter.pm
-    version: 1.10.2
+    version: 1.11.0
   Avro::Protocol:
     file: lib/Avro/Protocol.pm
-    version: 1.10.2
+    version: 1.11.0
   Avro::Protocol::Message:
     file: lib/Avro/Protocol/Message.pm
-    version: 1.10.2
+    version: 1.11.0
   Avro::Schema:
     file: lib/Avro/Schema.pm
-    version: 1.10.2
+    version: 1.11.0
 requires:
   Compress::Zlib: 0
   Compress::Zstd: 0
@@ -67,4 +67,4 @@ requires:
   perl: 5.10.1
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
-version: 1.10.2
+version: 1.11.0

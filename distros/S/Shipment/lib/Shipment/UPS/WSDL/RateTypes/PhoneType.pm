@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::PhoneType;
-$Shipment::UPS::WSDL::RateTypes::PhoneType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::PhoneType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ Class::Std::initialize();
 
     __PACKAGE__->_factory(
         [   qw(        Number
-              )
+            )
         ],
         {'Number' => \%Number_of,},
         {'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
@@ -50,7 +50,7 @@ Shipment::UPS::WSDL::RateTypes::PhoneType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

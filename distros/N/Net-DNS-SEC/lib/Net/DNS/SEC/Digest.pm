@@ -3,7 +3,7 @@ package Net::DNS::SEC::Digest;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Digest.pm 1807 2020-09-28 11:38:28Z willem $)[2];
+our $VERSION = (qw$Id: Digest.pm 1849 2021-08-19 08:25:20Z willem $)[2];
 
 
 =head1 NAME
@@ -27,7 +27,6 @@ Interface package providing access to the message digest algorithm
 implementations within the OpenSSL libcrypto library.
 
 =cut
-
 
 
 use constant libcrypto_available => Net::DNS::SEC::libcrypto->can('EVP_MD_CTX_new');
@@ -55,24 +54,28 @@ sub new {
 	my ( $class, @param ) = @_;
 	my ($index) = reverse split '::', join '_', $class, @param;
 	my $evpmd   = $digest{$index};
-	my $mdobj   = Net::DNS::SEC::libcrypto::EVP_MD_CTX_new();
-	Net::DNS::SEC::libcrypto::EVP_DigestInit( $mdobj, &$evpmd );
-	return bless( \$mdobj, $class );
+	my $mdctx   = Net::DNS::SEC::libcrypto::EVP_MD_CTX_new();
+	Net::DNS::SEC::libcrypto::EVP_DigestInit( $mdctx, &$evpmd );
+	return bless( {ctx => $mdctx, md => &$evpmd}, $class );
 }
 
 sub add {
-	my $object = shift;
-	return Net::DNS::SEC::libcrypto::EVP_DigestUpdate( $$object, shift );
+	my $self = shift;
+	return Net::DNS::SEC::libcrypto::EVP_DigestUpdate( $self->{ctx}, shift );
 }
 
 sub digest {
-	my $object = shift;
-	return Net::DNS::SEC::libcrypto::EVP_DigestFinal($$object);
+	my $self = shift;
+	my $dgst = Net::DNS::SEC::libcrypto::EVP_DigestFinal( $self->{ctx} );
+
+	# reinitialise; emulate API offered by Digest::SHA
+	Net::DNS::SEC::libcrypto::EVP_DigestInit( $self->{ctx}, $self->{md} );
+	return $dgst;
 }
 
 DESTROY {
-	my $object = shift;
-	return Net::DNS::SEC::libcrypto::EVP_MD_CTX_free($$object);
+	my $self = shift;
+	return Net::DNS::SEC::libcrypto::EVP_MD_CTX_free( $self->{ctx} );
 }
 
 
@@ -127,7 +130,7 @@ contributors to the OpenSSL cryptographic library.
 
 =head1 COPYRIGHT
 
-Copyright (c)2020 Dick Franks.
+Copyright (c)2020,2021 Dick Franks.
 
 All rights reserved.
 
@@ -136,7 +139,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

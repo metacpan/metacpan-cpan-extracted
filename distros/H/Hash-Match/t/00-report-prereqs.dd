@@ -24,6 +24,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
+                                        'List::SomeUtils::XS' => '0',
                                         'Ref::Util::XS' => '0'
                                       },
                       'requires' => {

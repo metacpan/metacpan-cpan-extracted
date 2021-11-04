@@ -26,9 +26,8 @@ sub normalize_shortcut {
 sub validate_each {
   my ($self, $record, $attribute, $value, $opts) = @_;
 
-  # If a row is marked to be deleted then don't bother to validate it.
+  # If a row is marked to be deleted then don't bother to validate it
   my @rows = grep { not $_->is_removed } @{$value->get_cache||[]};
-  my $count = scalar(@rows);
   
   # If there's zero $count and skip_if_empty is true (default is false) then
   # don't bother doing any more validations.
@@ -36,32 +35,46 @@ sub validate_each {
     return if $self->skip_if_empty;
   }
 
-  $record->errors->add($attribute, $self->too_few_msg, +{%$opts, count=>$count, min=>$self->min})
-    if $self->has_min and $count < $self->min;
-
-  $record->errors->add($attribute, $self->too_many_msg, +{%$opts, count=>$count, max=>$self->max})
-    if $self->has_max and $count > $self->max;
-
-  return unless $self->validations;
-
+  # Ok, now run validations.  If we find even one row is invalid, then we need
+  # to mark the attribute as invalid.
   my $found_errors = 0;
-  my $rowidx = 0;
   foreach my $row (@rows) {
     $row->validate(%$opts); #unless $row->validated
     $found_errors = 1 if $row->errors->size;
-
-    if($row->errors->size) {
-      $found_errors = 1;
-      my $errors = $row->errors;
-      $errors->each(sub {
-        my ($index, $message) = @_;
-        #warn "${attribute}.@{[$rowidx++}.${index}";
-        $record->errors->add("${attribute}.${rowidx}.${index}", $message);
-      });
-    }
-
-    $rowidx++;
   }
+
+  # Ok, next if we are asking to aggregate the nested errors, do that
+  if($self->validations) {
+    my $rowidx = 0;
+    foreach my $row (@rows) {
+      if($row->errors->size) {
+        my $errors = $row->errors;
+        $errors->each(sub {
+          my ($index, $message) = @_;
+          $record->errors->add("${attribute}.${rowidx}.${index}", $message);
+        });
+      }
+      $rowidx++;
+    }
+  }
+
+  if($self->has_min || $self->has_max) {
+
+    # If a row is not in storage and can't be saved since its invalid, we don't count it
+    # toward mins or maxes.  Otherwise we could mark good rows for deletion but still pass
+    # the count tests with new not stored but invalid rows.  If however the new rows are
+    # valid then they will get saved so we can count them.  We also don't count it if its
+    # marked not to be inserted (generally this is the case with _add.
+
+    my $count = scalar(grep { !$_->{__valiant_donot_insert} } grep { $_->in_storage || !$_->errors->size } @rows);
+
+    $record->errors->add($attribute, $self->too_few_msg, +{%$opts, count=>$count, min=>$self->min})
+      if $self->has_min and $count < $self->min;
+
+    $record->errors->add($attribute, $self->too_many_msg, +{%$opts, count=>$count, max=>$self->max})
+      if $self->has_max and $count > $self->max;
+  }
+
   $record->errors->add($attribute, $self->invalid_msg, $opts) if $found_errors;
 }
 

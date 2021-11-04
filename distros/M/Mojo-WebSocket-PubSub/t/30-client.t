@@ -28,7 +28,7 @@ my $t = Test::Mojo->new('Skel');
 my $url = $t->ua->server->url->to_string;
 
 subtest 'subscriber survives for more than timeout period' => sub {
-    my $ps = new Mojo::WebSocket::PubSub(url => "${url}psws");
+    my $ps = new Mojo::WebSocket::PubSub(url => "${url}psws")->connect;
     my $timeout = 2;
     Mojo::IOLoop->stream($ps->tx->connection)->timeout($timeout);
     # reset keepalive timer
@@ -40,15 +40,17 @@ subtest 'subscriber survives for more than timeout period' => sub {
 
 
 subtest 'subscribers on different channel' => sub {
-    my $ps_s = new Mojo::WebSocket::PubSub(url => "${url}psws");
-    my $ps_r = new Mojo::WebSocket::PubSub(url => "${url}psws");
-    my $ps_o = new Mojo::WebSocket::PubSub(url => "${url}psws");
+    my $ps_s = new Mojo::WebSocket::PubSub(url => "${url}psws")->connect;
+    my $ps_r = new Mojo::WebSocket::PubSub(url => "${url}psws")->connect;
+    my $ps_o = new Mojo::WebSocket::PubSub(url => "${url}psws")->connect;
+    my $ps_w = new Mojo::WebSocket::PubSub(url => "${url}psws")->connect;
 
     my $ch1 = "foo";
     my $ch2 = "bar";
 
     my $rc_r = 0;
     my $rc_o = 0;
+    my $rc_w = 0;
 
     $ps_r->listen($ch1);
     $ps_r->on(notify => sub {$rc_r = 1});
@@ -56,11 +58,17 @@ subtest 'subscribers on different channel' => sub {
     $ps_o->listen($ch2);
     $ps_o->on(notify => sub {$rc_o = 1});
 
+    $ps_w->listen($ch1);
+    $ps_w->listen($ch2);
+    $ps_w->on(notify => sub {$rc_w = 1});
+
     $ps_s->listen($ch1);
     $ps_s->publish("newrec");
 
+
     is($rc_r,1, "Subscriber on same channel received message");
-    is($rc_o,0, "Subscriber on different channel didn't receive message");
+    is($rc_o,0, "The one on different channel didn't receive message");
+    is($rc_o,0, "The one changed to different channel didn't receive message");
 };
 
 done_testing();

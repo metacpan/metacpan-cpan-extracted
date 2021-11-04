@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::ShipElements::Response;
-$Shipment::UPS::WSDL::ShipElements::Response::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipElements::Response::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::UPS::WSDL::ShipElements::Response
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

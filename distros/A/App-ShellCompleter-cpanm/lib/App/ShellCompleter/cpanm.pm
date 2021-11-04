@@ -3,7 +3,7 @@ package App::ShellCompleter::cpanm;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-05-22'; # DATE
 our $DIST = 'App-ShellCompleter-cpanm'; # DIST
-our $VERSION = '0.210'; # VERSION
+our $VERSION = '0.211'; # VERSION
 
 use 5.010001;
 use strict;
@@ -149,8 +149,8 @@ sub run_completer {
     die "This script is for shell completion only\n"
         unless $ENV{GETOPT_LONG_DUMP} || $ENV{COMP_LINE} || $ENV{COMMAND_LINE};
 
-    # the list of options is taken from App::cpanminus::script and should be
-    # updated from time to time.
+    # the list of options is taken from Menlo::CLI:Compat. should be updated
+    # from time to time.
     GetOptionsWithCompletion(
         sub {
             my %args  = @_;
@@ -195,9 +195,11 @@ sub run_completer {
         'l|local-lib=s'   => $noop,
         'L|local-lib-contained=s' => $noop,
         'self-contained!' => $noop,
+        'exclude-vendor!' => $noop,
         'mirror=s@'       => $noop,
         'mirror-only!'    => $noop,
         'mirror-index=s'  => $noop,
+        'M|from=s'        => $noop, # url (this is --mirror and --mirror-only combined)
         'cpanmetadb=s'    => $noop,
         'cascade-search!' => $noop,
         'prompt!'         => $noop,
@@ -222,6 +224,7 @@ sub run_completer {
         'format=s'   => $noop,
         'save-dists=s' => $noop,
         'skip-configure!' => $noop,
+        'static-install!' => $noop,
         'dev!'       => $noop,
         'metacpan!'  => $noop,
         'report-perl-version!' => $noop,
@@ -230,6 +233,8 @@ sub run_completer {
         'test-timeout=i' => $noop,
         'with-develop' => $noop,
         'without-develop' => $noop,
+        'with-configure' => $noop,
+        'without-configure' => $noop,
         'with-feature=s' => $noop,
         'without-feature=s' => $noop,
         'with-all-features' => $noop,
@@ -255,7 +260,7 @@ App::ShellCompleter::cpanm - Shell completion for cpanm
 
 =head1 VERSION
 
-This document describes version 0.210 of App::ShellCompleter::cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2021-05-22.
+This document describes version 0.211 of App::ShellCompleter::cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2021-05-22.
 
 =head1 SYNOPSIS
 

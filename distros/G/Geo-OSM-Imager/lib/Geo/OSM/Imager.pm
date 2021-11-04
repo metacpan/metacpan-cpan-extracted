@@ -4,7 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Math::Trig;
 use Geo::Ellipsoid;
@@ -90,12 +90,14 @@ know what you're doing.
 
 The base URL for downloading files. If you are using a local
 tileserver, or a public tileserver other than OpenStreetMap, set it
-here.
+here. (A slash will be added, so don't end with one - usually this
+shouldn't matter but tile.openstreetmap.org at least cares about the
+difference.)
 
     ua - user-agent
 
 Tileserver usage policy requires a "Valid HTTP User-Agent identifying
-application".
+application". As a matter of policy you must set this yourself.
 
 =cut
 
@@ -107,7 +109,7 @@ sub new {
             tileage => 604800,
             tiledir => "$ENV{HOME}/Maps/OSM",
             tilesize => 256,
-            tileurl => 'https://tile.openstreetmap.org/',
+            tileurl => 'https://tile.openstreetmap.org',
           };
   if (%p) {
     foreach my $param (qw(margin marginlat marginlon maxx maxy tileage tiledir tilesize tileurl ua)) {

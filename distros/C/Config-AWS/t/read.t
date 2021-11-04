@@ -28,6 +28,9 @@ parent =
 empty_value =
 parent =
   child = bad child
+false_parent = 0
+  child = ignored
+trailing_empty =
 CONFIG
 
 $DIR->child('credentials/.aws/credentials')->touch->spew(<<'CREDENTIALS');
@@ -61,6 +64,8 @@ my %PROFILES = (
     bad => {
         empty_value => '',
         parent => { child => 'bad child' },
+        false_parent => 0,
+        trailing_empty => '',
     },
 );
 
@@ -152,6 +157,14 @@ describe 'Config::AWS read tests' => sub {
                 $input = \$string;
             };
 
+            case 'Read handle' => sub {
+                $input = $file->openr_utf8;
+            };
+
+            before_each 'Reset handles' => sub {
+                seek $input, 0, 0 if is_globref $input;
+            };
+
             it 'Uses the default profile' => sub {
                 is Config::AWS::read( $input ),
                     $PROFILES{default}, 'Read default profile';
@@ -161,7 +174,9 @@ describe 'Config::AWS read tests' => sub {
                 local $ENV{AWS_DEFAULT_PROFILE} = 'alternate';
                 is Config::AWS::read( $input ),
                     $PROFILES{alternate}, 'Read alternate profile';
+            };
 
+            it 'Reads the profile from undef ENV' => sub {
                 $ENV{AWS_DEFAULT_PROFILE} = undef;
                 is Config::AWS::read( $input ),
                     $PROFILES{default}, 'Read default profile if undef';
@@ -170,7 +185,9 @@ describe 'Config::AWS read tests' => sub {
             it 'Takes a profile argument' => sub {
                 is Config::AWS::read( $input, 'alternate' ),
                     $PROFILES{alternate}, 'Read given profile';
+            };
 
+            it 'Takes a profile argument over ENV' => sub {
                 local $ENV{AWS_DEFAULT_PROFILE} = 'alternate';
                 is Config::AWS::read( $input, 'default' ),
                     $PROFILES{default}, 'Given profile overrides ENV';

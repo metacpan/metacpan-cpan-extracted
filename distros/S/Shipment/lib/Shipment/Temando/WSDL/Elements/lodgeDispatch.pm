@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::lodgeDispatch;
-$Shipment::Temando::WSDL::Elements::lodgeDispatch::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::lodgeDispatch::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ use warnings;
                   bookingNumber
                   dispatchDetails
 
-                  )
+                )
             ],
             {   'requestId'       => \%requestId_of,
                 'bookingNumber'   => \%bookingNumber_of,
@@ -87,7 +87,7 @@ Shipment::Temando::WSDL::Elements::lodgeDispatch
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

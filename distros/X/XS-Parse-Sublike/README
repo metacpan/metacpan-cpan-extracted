@@ -93,6 +93,10 @@ XS FUNCTIONS
     hookdata is an opaque pointer which is passed through to each of the
     hook stage functions when they are invoked.
 
+    Note that this function is now vaguely discouraged, in favour of using
+    a prefixing keyword instead, by using the XS_PARSE_SUBLIKE_FLAG_PREFIX
+    flag.
+
 PARSE CONTEXT
 
     The various hook stages all share state about the ongoing parse process
@@ -117,16 +121,31 @@ PARSE HOOKS
 
       If set, the optional filter_attr stage will be invoked.
 
+    XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL
+
+      If not set, the require_parts field will imply the
+      XS_PARSE_SUBLIKE_PART_BODY flag, making the body part required. By
+      setting this flag this will no longer happen. If all hooks agree,
+      then the body will become optional.
+
+    XS_PARSE_SUBLIKE_FLAG_PREFIX
+
+      If set, the keyword is considered to be a prefix that can be placed
+      in front of sub or another sub-like keyword, to add its set of hooks
+      in addition to those of the following keyword. These prefices may be
+      further stacked.
+
     In addition there are two U8 fields named require_parts and skip_parts
     which control the behaviour of various parts of the syntax which are
     usually optional. Any parts with bits set in require_parts become
     non-optional, and an error if they are missing. Any parts with bits set
     in skip_parts will skip the relevant part of the parsing process.
 
-    When two sets of hooks are combined by the xs_parse_sublike_any
-    function, these bitmasks are accumulated together with inclusive or.
-    Any part required by either set of hooks will still be required; any
-    step skipped by either will be skipped entirely.
+    When multiple sets of hooks are combined by the xs_parse_sublike_any
+    function, or as part of parsing prefixing keywords, these bitmasks are
+    accumulated together with inclusive or. Any part required by any set of
+    hooks will still be required; any step skipped by either will be
+    skipped entirely.
 
     If the same bit is set in both fields then the relevant parsing step
     will not be performed but it will still be an error for that section to
@@ -157,6 +176,24 @@ PARSE HOOKS
       a function definition, because such syntax only applies when use
       feature 'signatures' is in effect, and only on supporting perl
       versions.
+
+    XS_PARSE_SUBLIKE_PART_BODY
+
+      The actual body of the function, expressed as a brace-delimited
+      block.
+
+      This part cannot be skipped, but it can be made optional by omitting
+      it from the require_parts field. Instead of the block, it is
+      permitted to place a single semicolon (;) to act as a statement
+      terminator; thus giving the same syntax as a subroutine forward
+      declaration.
+
+      In this case, the body and cv fields of the context structure will
+      remain NULL.
+
+      This flag is currently implied on the require_parts field if the hook
+      does not supply the XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL flag; meaning
+      that most use-cases will make it a required part.
 
  The permit Stage
 

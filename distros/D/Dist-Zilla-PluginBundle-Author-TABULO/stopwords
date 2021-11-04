@@ -1,0 +1,39 @@
+
+# stopwords - for the POD spell checker
+
+## stopwords -- general
+optimizations
+unsetting
+
+## stopwords -- brands and technical terms
+darkpan
+dir
+distro
+distros
+GitHub
+repo
+str
+vcs
+
+## stopwords -- Odd
+MAXWORDLENGTH
+mayhap
+
+
+## stopwords -- dzil related
+ArchiveRelease
+AutoPrereqs
+AutoVersion
+BeforeRelease
+FakeRelease
+GithubMeta
+MetaResources
+ModuleBuild
+ModuleBuildTiny
+PodCoverage
+RewriteVersion
+SurgicalPodWeaver
+TaskWeaver
+cpanfile
+trustme
+

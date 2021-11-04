@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -112,11 +112,11 @@
    "provides" : {
       "Path::Tiny" : {
          "file" : "lib/Path/Tiny.pm",
-         "version" : "0.118"
+         "version" : "0.120"
       },
       "Path::Tiny::Error" : {
          "file" : "lib/Path/Tiny.pm",
-         "version" : "0.118"
+         "version" : "0.120"
       }
    },
    "release_status" : "stable",
@@ -131,7 +131,7 @@
          "web" : "https://github.com/dagolden/Path-Tiny"
       }
    },
-   "version" : "0.118",
+   "version" : "0.120",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alex Efros <powerman@powerman.name>",
@@ -141,6 +141,7 @@
       "Dave Rolsky <autarch@urth.org>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Doug Bell <madcityzen@gmail.com>",
+      "Flavio Poletti <flavio@polettix.it>",
       "Gabor Szabo <szabgab@cpan.org>",
       "Gabriel Andrade <gabiruh@gmail.com>",
       "George Hartzell <hartzell@cpan.org>",
@@ -167,8 +168,8 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>",
       "\uae40\ub3c4\ud615 - Keedi Kim <keedi@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Apache-2.0"
 }
 

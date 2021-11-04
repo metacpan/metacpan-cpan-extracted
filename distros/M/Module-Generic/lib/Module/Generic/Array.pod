@@ -175,7 +175,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v1.0.2
+    v1.1.0
 
 =head1 DESCRIPTION
 
@@ -267,6 +267,14 @@ To exit the loop, return C<undef()>, for example:
         print( "ok, this one\n" );
     });
 
+=head2 eighth
+
+Returns the corresponding value at the offset position 7 in the array by calling L</get_null>.
+
+It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
+
+If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
+
 =head2 empty
 
 This is just an intuitive alias for L</reset>
@@ -288,6 +296,14 @@ say "@$even";
 Produces: C<1 3 5 7 9>
 
 See also L</odd>
+
+=head2 fifth
+
+Returns the corresponding value at the offset position 4 in the array by calling L</get_null>.
+
+It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
+
+If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
 
 =head2 first
 
@@ -395,6 +411,14 @@ To exit the loop, return C<undef()>, for example:
         print( "ok, this one\n" );
     });
 
+=head2 fourth
+
+Returns the corresponding value at the offset position 3 in the array by calling L</get_null>.
+
+It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
+
+If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
+
 =head2 get
 
 Provided an integer representing an offset and this returns the corresponding value in the array. Offsets start from 0. A blank value will be treated as 0.
@@ -411,8 +435,25 @@ In non-object context, will return the value as is, and in object context and if
     say $a->get(0)->length; # 5
     # but
     say $a->get(0); # returns "Hello" as a regular string
+    say $a->get(2); # returns undef
+    say $a->get(2)->length;
+    # object context, an Module::Generic::Scalar object is returned
+    # here 0 would be returned
+    say $a->get(2)->defined; # false
 
 See also L</index>
+
+=head2 get_null
+
+This operates the same way as L</get>, except that if the value at the offset given is L<perlfunc/undef>, then, instead of returning a L<Module::Generic::Scalar> object representing that value, it will return instead a L<Module::Generic::Null> object.
+
+This works better if you intend to store some objects in the array, and C<undef> went in instead, but you chain the calls expecting a method of that object to return a value. If a L<Module::Generic::Scalar> object were returned, you would end up with undesirable result. With a L<Module::Generic::Null> object, it will silently accepts any chaining methods you pass (it uses AUTOLOAD to do that) and ultimately (when you are out of object context) return C<undef>.
+
+    my $a = Module::Generic::Array->new( [qw( Hello world )] );
+    say $a->get(2)->length; # undef
+    say $a->get(2)->whatever; # undef
+    say $a->ge(2)->method1->method2->name; # undef
+    say $a->get(2); # undef
 
 =head2 grep
 
@@ -442,6 +483,17 @@ And in object context:
     say $a->index( 1 )->substr( 0, 2 ); # returns "Ja"
 
 If there is nothing at the given offset, possibly because the array is smaller, then this would return undef in non-object context, or in object context, a L<Module::Generic::Scalar> object representing C<undef()>
+
+=head2 intersection
+
+Provided with an array object, an array reference or a list of elements and this will return a new array object containing all the common elements in both the current array object and the provided list or array reference.
+
+    my $intersec1 = [qw( Jack John Paul Peter )];
+    my $intersec2 = [qw( Emmanuel Gabriel Raphael Peter Michel )];
+    my $intersec = Module::Generic::Array->new( $intersec1 )->intersection( $intersec2 );
+    # $intersec now contains 'Peter'
+
+This method basically creates a hash of the current array object and then using L</grep> on the newly provided data, check if any entry exists in the hash and return the result as a new object.
 
 =head2 iterator
 
@@ -501,6 +553,22 @@ For each iteration of the array, C<$_> is made available.
 
     print( $a->map(sub{ $_->value })->join( "\n" ), "\n" );
 
+=head2 max
+
+Returns the the element in the array object that has the highest numerical value, as a L<Module::Generic::Scalar> object. For example:
+
+    my $values = Module::Generic::Array->new( [qw( 9 5 12 3 7 )] );
+    my $max = $values->max;
+    # $max is 12
+
+If the array object, is empty, it will return an L<Module::Generic::Scalar> object representing C<undef>. For example:
+
+    my $list = Module::Generic::Array->new;
+    my $max  = $list->max; # $max is undef
+    $max->defined: # returns false
+
+This method is a wrapper around L<List::Util/max>
+
 =head2 merge
 
 Provided with a list of L<Module::Generic::Array> object and this will merge them with our current one, i.e. the one used to call this L</merge> method.
@@ -515,6 +583,30 @@ For example:
 Alternatively, you could simply do:
 
     $a->push( $b->list );
+
+Note that this will not discard duplicates, if any. If you want to reove possibke duplicates, you could do:
+
+    $a->merge( $b )->unique;
+
+=head2 min
+
+Same as L</max>, but returns the the element in the array object that has the lowest numerical value, as a L<Module::Generic::Scalar> object. For example:
+
+    my $values = Module::Generic::Array->new( [qw( 9 5 12 3 7 )] );
+    my $min = $values->max;
+    # $min is 3
+
+=head2 ninth
+
+Returns the corresponding value at the offset position 8 in the array by calling L</get_null>.
+
+It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
+
+If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
+
+=head2 object
+
+Returns the current object. This is useful when chaining to force an object context.
 
 =head2 odd
 
@@ -564,6 +656,17 @@ See L</splice> especially if you want to remove segments of elements from the cu
     print( $a->splice( 1 ) ); # removes and returns John Peter Gabriel Raphael Emmanuel
 
 See L</get> or L</index> if you want to return only one element at a certain offset position.
+
+=head2 pack
+
+    my $a = Module::Generic::Array->new( 30..39 );
+    my $s = $a->pack( 'H2' x 10 );
+
+Like L<perlfunc/pack>, this takes a template and convert the array object. "The resulting string is the concatenation of the converted values."
+
+It returns a new L<Module::Generic::Scalar> object.
+
+See also L<Module::Generic::Scalar/pack>
 
 =head2 pop
 
@@ -678,6 +781,14 @@ Returns a the array in reverse order in list context or a new L<Module::Generic:
 
 Returns the size of the array. It basically calls L</length>
 
+=head2 second
+
+Returns the corresponding value at the offset position 1 in the array by calling L</get_null>.
+
+It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
+
+If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
+
 =head2 set
 
 Provided with an array, an array reference or an array-based object and this replaces all the data in the current object by the ones provided.
@@ -687,6 +798,14 @@ Note that if an array object is provided, it will copy the content of that objec
     $a->set( qw( John Jack Peter ) ); # Using an array of elements
     $a->set( [qw( John Jack Peter )] ); # Using an array reference of elements
     $a->set( $a2 ); # Using another array object, whatever its class may be
+
+=head2 seventh
+
+Returns the corresponding value at the offset position 6 in the array by calling L</get_null>.
+
+It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
+
+If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
 
 =head2 shift
 
@@ -699,6 +818,14 @@ For example:
     say $a->shift->length; # 5
     # but
     say $a->shift; # returns "Hello" as a regular string
+
+=head2 sixth
+
+Returns the corresponding value at the offset position 5 in the array by calling L</get_null>.
+
+It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
+
+If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
 
 =head2 size
 
@@ -737,7 +864,7 @@ Here we use the method "length" but any L<Module::Generic::Array> method workds
 
 =head2 split
 
-Just like the normal L<perlfunct/"split"> function, it takes a string or expression and split the data provided into a list of elements.
+Just like the normal L<perlfunc/"split"> function, it takes a string or expression and split the data provided into a list of elements.
 
 It returns the list in list context, and returns a new L<Module::Generic::Array> object in scalar context.
 
@@ -748,6 +875,22 @@ It achieves this by creating a new L<Module::Generic::Scalar> object out of the 
     $a->length; # 18
     # or in list context and using the method as a class method
     my @words = Module::Generic::Array->split( qr/[[:blank:]\h]+/, "I disapprove of what you say, but I will defend to the death your right to say it" );
+
+=head2 tenth
+
+Returns the corresponding value at the offset position 9 in the array by calling L</get_null>.
+
+It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
+
+If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
+
+=head2 third
+
+Returns the corresponding value at the offset position 2 in the array by calling L</get_null>.
+
+It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
+
+If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
 
 =head2 undef
 

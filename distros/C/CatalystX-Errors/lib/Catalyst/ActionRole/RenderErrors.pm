@@ -26,7 +26,7 @@ my $normalize_code = sub {
 my $finalize_args = sub {
   my ($self, $obj) = @_;
   my %args = ();
-  $args{meta} = $obj->meta if $obj->can('meta');
+  $args{info} = $obj->info if $obj->can('info');
   $args{errors} = $obj->errors if $obj->can('errors');
   return %args;
 };
@@ -38,12 +38,16 @@ around 'execute', sub {
   return $ret if $self->$dont_dispatch_error($controller, $c);
 
   my @errors = @{$c->error};
+  my $first = $errors[-1]; # We only handle the last error in the stack
   $c->clear_errors;
-  if($self->$looks_like_error_obj(my $first = $errors[0])) {
+
+  if($self->$looks_like_error_obj($first)) {
     my $code = $self->$normalize_code($first);
-    my %args = $self->$finalize_args($first);      
+    my %args = $self->$finalize_args($first);
+    $c->log->error($first);
     $c->dispatch_error($code, %args);
   } else {
+    $c->log->error($first);
     $c->dispatch_error(500);
   }
 
@@ -90,7 +94,7 @@ This will give you a servicable http 500 error via content negotiation which you
 desired (see L<CatalystX::Errors>).
 
 If the first error in  C<$c->error> is an object that does either C<code> or C<status> then we use that
-error to get the HTTP status code and any additional C<meta> or C<errors> arguments (if those methods
+error to get the HTTP status code and any additional C<info> or C<errors> arguments (if those methods
 exist on the object.  If its not then we just return a simple HTTP 500 Bad request.  In that case we
 won't return any information in C<$c->error> since that might leack contain Perl debugging info.
 

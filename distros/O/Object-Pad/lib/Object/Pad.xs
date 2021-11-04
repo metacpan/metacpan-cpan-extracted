@@ -445,7 +445,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
         if(!rolemeta || rolemeta->type != METATYPE_ROLE)
           croak("%" SVf " is not a role", SVfARG(rolename));
 
-        mop_class_compose_role(meta, rolemeta);
+        mop_class_add_role(meta, rolemeta);
       }
     }
   }
@@ -750,7 +750,7 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 {
   enum PhaserType type = PTR2UV(hookdata);
   U32 i;
-  AV *slots = compclassmeta->slots;
+  AV *slots = compclassmeta->direct_slots;
   U32 nslots = av_count(slots);
 
   switch(type) {
@@ -862,7 +862,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 {
   enum PhaserType type = PTR2UV(hookdata);
   PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(compclassmeta->methodscope));
-  I32 nslots = av_count(compclassmeta->slots);
+  I32 nslots = av_count(compclassmeta->direct_slots);
   PADNAME **snames = PadnamelistARRAY(slotnames);
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
   OP *slotops = NULL;
@@ -907,7 +907,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 
   int i;
   for(i = 0; i < nslots; i++) {
-    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(compclassmeta->slots)[i];
+    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(compclassmeta->direct_slots)[i];
     PADNAME *slotname = snames[i + 1];
 
     if(!slotname
@@ -1126,12 +1126,10 @@ static int dumppackage_class(pTHX_ const SV *sv)
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->stash, "the Object::Pad stash");
   if(meta->pending_submeta)
     ret += DMD_ANNOTATE_SV(sv, (SV *)meta->pending_submeta, "the Object::Pad pending submeta AV");
-  if(meta->roles)
-    ret += DMD_ANNOTATE_SV(sv, (SV *)meta->roles, "the Object::Pad roles AV");
 
   I32 i;
-  for(i = 0; i < av_count(meta->slots); i++)
-    ret += dump_slotmeta(aTHX_ sv, (SlotMeta *)AvARRAY(meta->slots)[i]);
+  for(i = 0; i < av_count(meta->direct_slots); i++)
+    ret += dump_slotmeta(aTHX_ sv, (SlotMeta *)AvARRAY(meta->direct_slots)[i]);
 
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->initslots, "the Object::Pad initslots CV");
 
@@ -1145,6 +1143,8 @@ static int dumppackage_class(pTHX_ const SV *sv)
     case METATYPE_CLASS:
       if(meta->cls.foreign_new)
         ret += DMD_ANNOTATE_SV(sv, (SV *)meta->cls.foreign_new, "the Object::Pad foreign superclass constructor CV");
+      if(meta->cls.direct_roles)
+        ret += DMD_ANNOTATE_SV(sv, (SV *)meta->cls.direct_roles, "the Object::Pad direct roles AV");
       break;
 
     case METATYPE_ROLE:

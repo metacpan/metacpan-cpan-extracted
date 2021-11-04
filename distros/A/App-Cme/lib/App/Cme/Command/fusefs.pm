@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2020 by Dominique Dumont.
+# This software is Copyright (c) 2014-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application with fuse
 
 package App::Cme::Command::fusefs ;
-$App::Cme::Command::fusefs::VERSION = '1.033';
+$App::Cme::Command::fusefs::VERSION = '1.034';
 use strict;
 use warnings;
 use 5.10.1;
@@ -26,8 +26,7 @@ sub validate_args {
     $self->check_unknown_args($args);
     $self->process_args($opt,$args);
 
-    eval { require Config::Model::FuseUI; };
-    my $has_fuse = $@ ? 0 : 1;
+    my $has_fuse = eval { require Config::Model::FuseUI; 1; };
 
     die "could not load Config::Model::FuseUI. Is Fuse installed ?\n"
         unless $has_fuse;
@@ -111,7 +110,7 @@ App::Cme::Command::fusefs - Edit the configuration of an application with fuse
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 SYNOPSIS
 
@@ -141,7 +140,7 @@ Use this option to debug fuse problems.
 =item -dir-char
 
 Fuse will fail if an element name or key name contains '/'. You can specify a
-subsitution string to replace '/' in the fused dir. Default is C<< <slash> >>.
+substitution string to replace '/' in the fused dir. Default is C<< <slash> >>.
 
 =back
 
@@ -155,7 +154,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2020 by Dominique Dumont.
+This software is Copyright (c) 2014-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

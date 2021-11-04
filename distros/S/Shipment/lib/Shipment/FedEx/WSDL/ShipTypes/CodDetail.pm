@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CodDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CodDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CodDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               CodRecipient
               ReferenceIndicator
 
-              )
+            )
         ],
         {   'CodCollectionAmount'      => \%CodCollectionAmount_of,
             'AddTransportationCharges' => \%AddTransportationCharges_of,
@@ -48,7 +48,7 @@ Class::Std::initialize();
               'Shipment::FedEx::WSDL::ShipTypes::CodAddTransportationChargesType',
             'CollectionType' =>
               'Shipment::FedEx::WSDL::ShipTypes::CodCollectionType',
-            'CodRecipient' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
+            'CodRecipient'       => 'Shipment::FedEx::WSDL::ShipTypes::Party',
             'ReferenceIndicator' =>
               'Shipment::FedEx::WSDL::ShipTypes::CodReturnReferenceIndicatorType',
         },
@@ -79,7 +79,7 @@ Shipment::FedEx::WSDL::ShipTypes::CodDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

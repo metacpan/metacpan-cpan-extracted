@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::EMailNotificationRecipientType;
-$Shipment::FedEx::WSDL::CloseTypes::EMailNotificationRecipientType::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::EMailNotificationRecipientType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Shipment::FedEx::WSDL::CloseTypes::EMailNotificationRecipientType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::RequestedShipment;
-$Shipment::FedEx::WSDL::RateTypes::RequestedShipment::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::RequestedShipment::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -81,30 +81,30 @@ Class::Std::initialize();
               PackageDetail
               RequestedPackageLineItems
 
-              )
+            )
         ],
-        {   'ShipTimestamp'            => \%ShipTimestamp_of,
-            'DropoffType'              => \%DropoffType_of,
-            'ServiceType'              => \%ServiceType_of,
-            'PackagingType'            => \%PackagingType_of,
-            'TotalWeight'              => \%TotalWeight_of,
-            'TotalInsuredValue'        => \%TotalInsuredValue_of,
-            'Shipper'                  => \%Shipper_of,
-            'Recipient'                => \%Recipient_of,
-            'RecipientLocationNumber'  => \%RecipientLocationNumber_of,
-            'Origin'                   => \%Origin_of,
-            'ShippingChargesPayment'   => \%ShippingChargesPayment_of,
-            'SpecialServicesRequested' => \%SpecialServicesRequested_of,
-            'ExpressFreightDetail'     => \%ExpressFreightDetail_of,
-            'FreightShipmentDetail'    => \%FreightShipmentDetail_of,
-            'DeliveryInstructions'     => \%DeliveryInstructions_of,
+        {   'ShipTimestamp'                => \%ShipTimestamp_of,
+            'DropoffType'                  => \%DropoffType_of,
+            'ServiceType'                  => \%ServiceType_of,
+            'PackagingType'                => \%PackagingType_of,
+            'TotalWeight'                  => \%TotalWeight_of,
+            'TotalInsuredValue'            => \%TotalInsuredValue_of,
+            'Shipper'                      => \%Shipper_of,
+            'Recipient'                    => \%Recipient_of,
+            'RecipientLocationNumber'      => \%RecipientLocationNumber_of,
+            'Origin'                       => \%Origin_of,
+            'ShippingChargesPayment'       => \%ShippingChargesPayment_of,
+            'SpecialServicesRequested'     => \%SpecialServicesRequested_of,
+            'ExpressFreightDetail'         => \%ExpressFreightDetail_of,
+            'FreightShipmentDetail'        => \%FreightShipmentDetail_of,
+            'DeliveryInstructions'         => \%DeliveryInstructions_of,
             'VariableHandlingChargeDetail' =>
               \%VariableHandlingChargeDetail_of,
-            'CustomsClearanceDetail' => \%CustomsClearanceDetail_of,
-            'PickupDetail'           => \%PickupDetail_of,
-            'SmartPostDetail'        => \%SmartPostDetail_of,
-            'BlockInsightVisibility' => \%BlockInsightVisibility_of,
-            'LabelSpecification'     => \%LabelSpecification_of,
+            'CustomsClearanceDetail'        => \%CustomsClearanceDetail_of,
+            'PickupDetail'                  => \%PickupDetail_of,
+            'SmartPostDetail'               => \%SmartPostDetail_of,
+            'BlockInsightVisibility'        => \%BlockInsightVisibility_of,
+            'LabelSpecification'            => \%LabelSpecification_of,
             'ShippingDocumentSpecification' =>
               \%ShippingDocumentSpecification_of,
             'RateRequestTypes'          => \%RateRequestTypes_of,
@@ -208,7 +208,7 @@ Shipment::FedEx::WSDL::RateTypes::RequestedShipment
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

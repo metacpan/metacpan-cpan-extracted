@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::PendingShipmentDetail;
-$Shipment::FedEx::WSDL::RateTypes::PendingShipmentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::PendingShipmentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               ExpirationDate
               EmailLabelDetail
 
-              )
+            )
         ],
         {   'Type'             => \%Type_of,
             'ExpirationDate'   => \%ExpirationDate_of,
@@ -67,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::PendingShipmentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

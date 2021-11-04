@@ -1,5 +1,9 @@
 Revision history for Return-MultiLevel
 
+0.06 2021-10-11 16:57:42 -0600
+  - Fixed test bug (rt#133221)
+  - New caretaker maintainer, new repository https://github.com/uperl/Return-MultiLevel
+
 0.05    2017-09-10
         - formally recommend Scope::Upper be installed in the distribution
           metadata

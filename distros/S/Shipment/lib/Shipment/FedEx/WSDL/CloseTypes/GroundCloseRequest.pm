@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::GroundCloseRequest;
-$Shipment::FedEx::WSDL::CloseTypes::GroundCloseRequest::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::GroundCloseRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -36,7 +36,7 @@ Class::Std::initialize();
               Version
               TimeUpToWhichShipmentsAreToBeClosed
 
-              )
+            )
         ],
         {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
             'ClientDetail'            => \%ClientDetail_of,
@@ -57,10 +57,10 @@ Class::Std::initialize();
         },
         {
 
-            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-            'ClientDetail'            => 'ClientDetail',
-            'TransactionDetail'       => 'TransactionDetail',
-            'Version'                 => 'Version',
+            'WebAuthenticationDetail'             => 'WebAuthenticationDetail',
+            'ClientDetail'                        => 'ClientDetail',
+            'TransactionDetail'                   => 'TransactionDetail',
+            'Version'                             => 'Version',
             'TimeUpToWhichShipmentsAreToBeClosed' =>
               'TimeUpToWhichShipmentsAreToBeClosed',
         }
@@ -83,7 +83,7 @@ Shipment::FedEx::WSDL::CloseTypes::GroundCloseRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

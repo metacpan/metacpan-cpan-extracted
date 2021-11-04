@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Compiler::Parser 0.26;
+use v5.26;
+use Object::Pad 0.41;
 
-use v5.14;
-use warnings;
-use base qw( Parser::MGC );
+package Tangence::Compiler::Parser 0.27;
+class Tangence::Compiler::Parser isa Parser::MGC;
 
+use Syntax::Keyword::Dynamically;
 use Syntax::Keyword::Match;
 
 use File::Basename qw( dirname );
@@ -68,11 +69,17 @@ The contents of the struct block will be a list of C<field> declarations.
 
 =cut
 
-sub parse
-{
-   my $self = shift;
+has $_package;
 
-   local $self->{package} = \my %package;
+# Parser::MGC version 0.20 adds this method. Before then, this workaround is
+# known to be safe
+if( $Parser::MGC::VERSION < 0.20 ) {
+   *filename = sub ( $self ) { $self->{filename} };
+}
+
+method parse
+{
+   dynamically $_package = \my %package;
 
    while( !$self->at_eos ) {
       match( $self->token_kw(qw( class struct include )) : eq ) {
@@ -99,7 +106,7 @@ sub parse
             $self->scope_of( '{', sub { $self->parse_structblock( $struct ) }, '}' ),
          }
          case( 'include' ) {
-            my $filename = dirname($self->{filename}) . "/" . $self->token_string;
+            my $filename = dirname($self->filename) . "/" . $self->token_string;
 
             my $subparser = (ref $self)->new;
             my $included = $subparser->from_file( $filename );
@@ -154,11 +161,8 @@ An C<isa> declaration declares a superclass of the class, by its name (C)
 
 =cut
 
-sub parse_classblock
+method parse_classblock ( $class )
 {
-   my $self = shift;
-   my ( $class ) = @_;
-
    my %methods;
    my %events;
    my %properties;
@@ -239,7 +243,7 @@ sub parse_classblock
          case( 'isa' ) {
             my $supername = $self->token_ident;
 
-            my $super = $self->{package}{$supername} or
+            my $super = $_package->{$supername} or
                $self->fail( "Unrecognised superclass $supername" );
 
             push @superclasses, $super;
@@ -257,9 +261,8 @@ sub parse_classblock
    );
 }
 
-sub parse_arglist
+method parse_arglist
 {
-   my $self = shift;
    return $self->scope_of(
       "(",
       sub { $self->list_of( ",", \&parse_arg ) },
@@ -267,9 +270,8 @@ sub parse_arglist
    );
 }
 
-sub parse_arg
+method parse_arg
 {
-   my $self = shift;
    my $name;
    my $type = $self->parse_type;
    $self->maybe( sub {
@@ -278,11 +280,8 @@ sub parse_arg
    return $self->make_argument( name => $name, type => $type );
 }
 
-sub parse_structblock
+method parse_structblock ( $struct )
 {
-   my $self = shift;
-   my ( $struct ) = @_;
-
    my @fields;
    my %fieldnames;
 
@@ -337,10 +336,8 @@ my @basic_types = qw(
    any
 );
 
-sub parse_type
+method parse_type
 {
-   my $self = shift;
-
    $self->any_of(
       sub {
          my $aggregate = $self->token_kw(qw( list dict ));
@@ -370,10 +367,8 @@ my %dimensions = (
    objset => DIM_OBJSET,
 );
 
-sub parse_dim
+method parse_dim
 {
-   my $self = shift;
-
    my $dimname = $self->token_kw( keys %dimensions );
 
    return $dimensions{$dimname};
@@ -396,9 +391,8 @@ parser will call C<define> on it.
 
 =cut
 
-sub make_class
+method make_class
 {
-   shift;
    require Tangence::Meta::Class;
    return Tangence::Meta::Class->new( @_ );
 }
@@ -412,9 +406,8 @@ parser will call C<define> on it.
 
 =cut
 
-sub make_struct
+method make_struct
 {
-   shift;
    require Tangence::Meta::Struct;
    return Tangence::Meta::Struct->new( @_ );
 }
@@ -436,23 +429,20 @@ or L<Tangence::Meta::Property> to go in a class.
 
 =cut
 
-sub make_method
+method make_method
 {
-   shift;
    require Tangence::Meta::Method;
    return Tangence::Meta::Method->new( @_ );
 }
 
-sub make_event
+method make_event
 {
-   shift;
    require Tangence::Meta::Event;
    return Tangence::Meta::Event->new( @_ );
 }
 
-sub make_property
+method make_property
 {
-   shift;
    require Tangence::Meta::Property;
    return Tangence::Meta::Property->new( @_ );
 }
@@ -466,9 +456,8 @@ or event argument.
 
 =cut
 
-sub make_argument
+method make_argument
 {
-   my $self = shift;
    require Tangence::Meta::Argument;
    return Tangence::Meta::Argument->new( @_ );
 }
@@ -481,9 +470,8 @@ Return a new instance of L<Tangence::Meta::Field> to use for a structure type.
 
 =cut
 
-sub make_field
+method make_field
 {
-   my $self = shift;
    require Tangence::Meta::Field;
    return Tangence::Meta::Field->new( @_ );
 }
@@ -501,11 +489,10 @@ aggregate and member type.
 
 =cut
 
-sub make_type
+method make_type
 {
-   my $self = shift;
    require Tangence::Meta::Type;
-   return Tangence::Meta::Type->new( @_ );
+   return Tangence::Meta::Type->make( @_ );
 }
 
 =head1 AUTHOR

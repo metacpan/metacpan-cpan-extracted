@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,20 +19,22 @@ no_index:
     - t
     - inc
 requires:
-  Archive::Extract: '0.8'
-  CGI: '4.32'
-  CTK: '2'
-  Digest::MD5: '2.54'
-  Digest::SHA1: '2.13'
+  Archive::Tar: '1.8'
+  CTK: '2.03'
+  DBD::SQLite: '1'
+  Digest::MD5: '2.52'
+  Digest::SHA: '4'
+  Encode::Locale: '1'
   File::HomeDir: '1'
-  File::Spec: '3.62'
-  HTTP::Message: '6.11'
-  LWP: '5.8'
-  LWP::Protocol::https: '6'
-  Try::Tiny: '0.2'
+  File::Spec: '3.4'
+  List::Util: '1.5'
+  Mojolicious: '7.94'
+  Text::SimpleTable: '2'
+  Try::Tiny: '0.1'
   URI: '1.7'
   perl: '5.016001'
 resources:
   homepage: https://www.serzik.com
   license: https://dev.perl.org/licenses
-version: '1.03'
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

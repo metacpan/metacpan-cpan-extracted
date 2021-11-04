@@ -4,7 +4,7 @@ use Catmandu::Util qw(:io :is :check);
 use MARC::Schema;
 use Moo;
 
-our $VERSION = '1.254';
+our $VERSION = '1.271';
 
 with qw(Catmandu::Validator);
 
@@ -108,5 +108,9 @@ Don't report fields not included in the schema.
 Don't report subfields not included in the schema.
 
 =back
+
+=head1 AUTHOR
+
+Johann Rolschewski,  E<lt>jorol at cpanE<gt>
 
 =cut

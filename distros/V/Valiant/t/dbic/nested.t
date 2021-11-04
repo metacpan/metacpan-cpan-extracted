@@ -615,9 +615,10 @@ Schema->resultset("Role")->populate([
       ok my $row = $rs->next;
       is $row->role->label, 'admin';
     }
-    ok !$rs->next;
+    my $row = $rs->next;
+    ok !$row;
   }
-  
+
   is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
     person_roles => [
       "Person Roles Is Invalid",
@@ -736,6 +737,126 @@ Schema->resultset("Role")->populate([
     is $second->value, '222222';
   }
 
+}
+
+# Can I mess with other peoples data??
+
+# Person 1
+{
+  ok my $person1 = Schema
+    ->resultset('Person')
+    ->create({
+      username => 'person_one',
+      last_name => 'napiorkowski',
+      first_name => 'john',
+      state => { abbreviation => 'TX' },
+      person_roles => [
+        {role => {label=>'admin'}},
+      ],
+    });
+
+  ok $person1->valid;
+  ok $person1->in_storage;
+  is $person1->person_roles->count, 1;
+
+  my $p1_rs = $person1->person_roles;
+  is $p1_rs->next->role->label, 'admin';
+  ok !$p1_rs->next;
+
+  ok $person1->id;
+
+  eval { Schema
+    ->resultset('Person')
+    ->create({
+      username => 'person_two',
+      last_name => 'napiorkowski',
+      first_name => 'john',
+      state => { abbreviation => 'TX' },
+      person_roles => [
+        {role => {label=>'user'}},
+        {
+          person_id => $person1->id,
+          role_id => 3,
+        }
+      ],
+    });
+  } || do {
+    ok $@->isa('DBIx::Class::Valiant::Util::Exception::BadParameterFK');
+  };
+
+
+
+  my $person2 = Schema
+    ->resultset('Person')
+    ->create({
+      username => 'person_two',
+      last_name => 'napiorkowski',
+      first_name => 'john',
+      state => { abbreviation => 'TX' },
+      person_roles => [
+        {role => {label=>'user'}},
+        {
+          role_id => 3,
+        }
+      ],
+    });
+
+  ok $person2->valid;
+  ok $person2->in_storage;
+  is $person2->person_roles->count, 2;
+  ok $person2->id;
+
+  my $p2_rs = $person2->person_roles;
+  is $p2_rs->next->role->label, 'user';
+  is $p2_rs->next->role->label, 'superuser';
+  ok !$p2_rs->next;
+
+  ok my $person1_new = Schema->resultset('Person')->find({id=>$person1->id});
+  
+  eval {
+    $person1_new->update({
+     username => 'person_one_new',
+      person_roles => [
+        { person_id => $person2->id, role_id=>2 } # try to mess with p2
+      ],
+    });
+  } || do {
+    ok $@->isa('DBIx::Class::Valiant::Util::Exception::BadParameterFK');
+  };
+
+  ok my $oneone = Schema
+    ->resultset('OneOne')
+    ->create({
+      value => 'test100',
+      one => {
+        value => 'hhh1222',
+      },
+    }), 'created fixture';
+
+  ok $oneone->valid;
+  ok $oneone->in_storage;
+  ok my $one_id = $oneone->one->id;
+
+  eval {
+    Schema
+    ->resultset('OneOne')
+    ->create({
+      value => 'test100',
+      one => {
+        one_id => 1,
+        value => 'hhh1222',
+      },
+    });
+  } || do {
+    ok $@->isa('DBIx::Class::Valiant::Util::Exception::BadParameters');
+  };
+
+  ok my $oneone_new = Schema->resultset('OneOne')->find({id=>$oneone->id});
+  eval {
+    $oneone_new->update({one => { one_id=>1, value => "sdfsfsdf" }});
+  } || do {
+    ok $@->isa('DBIx::Class::Valiant::Util::Exception::BadParameterFK');
+  };
 }
 
 done_testing;

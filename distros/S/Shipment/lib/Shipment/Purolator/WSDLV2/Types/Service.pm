@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::Service;
-$Shipment::Purolator::WSDLV2::Types::Service::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::Service::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               PackageTypeDescription
               Options
 
-              )
+            )
         ],
         {   'ID'                     => \%ID_of,
             'Description'            => \%Description_of,
@@ -77,7 +77,7 @@ Shipment::Purolator::WSDLV2::Types::Service
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -27,6 +27,8 @@
       },
       "configure" : {
          "requires" : {
+            "Alien::PLplot" : "0",
+            "Devel::CheckLib" : "0",
             "PDL::Core::Dev" : "0"
          }
       },
@@ -53,6 +55,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.78",
+   "version" : "0.80",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

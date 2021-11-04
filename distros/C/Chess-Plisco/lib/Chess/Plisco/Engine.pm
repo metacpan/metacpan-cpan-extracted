@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine;
-$Chess::Plisco::Engine::VERSION = '0.3';
+$Chess::Plisco::Engine::VERSION = '0.4';
 use strict;
 use integer;
 
@@ -42,7 +42,7 @@ use constant UCI_OPTIONS => [
 		callback => '__clearTranspositionTable',
 	},
 	{
-		name => 'Batch Mode',
+		name => 'Batch',
 		type => 'check',
 		default => 'false',
 		callback => '__changeBatchMode',
@@ -90,7 +90,7 @@ sub uci {
 	$self->__output(<<"EOF");
 Welcome to Plisco $version!
 
-This engine implements the UCI protocol (see
+Plisco is a chess engine written in Perl that implements the UCI protocol (see
 http://wbec-ridderkerk.nl/html/UCIProtocol.html).
 
 Try 'help' for a list of commands!
@@ -108,8 +108,6 @@ EOF
 sub __onEof {
 	my ($self, $line) = @_;
 
-	print STDERR "Connection to UI lost.\n";
-	$self->{__tree}->{move_now} = 1 if $self->{__tree};
 	$self->{__abort} = 1;
 
 	return $self;
@@ -145,12 +143,31 @@ sub __onUciCmdFen {
 	return $self;
 }
 
+sub __onUciCmdBoard {
+	my ($self) = @_;
+
+	my $board = $self->{__position}->board;
+	$self->{__out}->print($board);
+
+	return;
+}
+
 sub __onUciCmdEvaluate {
 	my ($self) = @_;
 
 	my $score = $self->{__position}->evaluate;
 
-	$self->{__out}->print("$score cp\n");
+	my ($cp_pos_game_phase, $cp_pos_opening_score, $cp_pos_endgame_score) = (
+		Chess::Plisco::Engine::Position::CP_POS_GAME_PHASE,
+		Chess::Plisco::Engine::Position::CP_POS_OPENING_SCORE,
+		Chess::Plisco::Engine::Position::CP_POS_ENDGAME_SCORE,
+	);
+
+	my $phase = $self->{__position}->[$cp_pos_game_phase];
+	my $op_score = $self->{__position}->[$cp_pos_opening_score];
+	my $eg_score = $self->{__position}->[$cp_pos_endgame_score];
+
+	$self->{__out}->print("$score cp (phase: $phase, opening: $op_score, endgame: $eg_score)\n");
 
 	return $self;
 }
@@ -220,13 +237,16 @@ sub __onUciCmdGo {
 		return $self;
 	}
 
-	my $watcher = $self->{__options}->{'Batch Mode'} eq 'true'
-		? BatchWatcher->new : $self->{__watcher};
+	if ($self->{__options}->{'Batch'} eq 'true') {
+		$self->{__watcher}->setBatchMode(1);
+	} else {
+		$self->{__watcher}->setBatchMode(0);
+	}
 
 	my $tree = Chess::Plisco::Engine::Tree->new(
 		$self->{__position}->copy,
 		$self->{__tt},
-		$watcher,
+		$self->{__watcher},
 		$info,
 		$self->{__signatures});
 	$tree->{debug} = 1 if $self->{__debug};
@@ -246,6 +266,8 @@ sub __onUciCmdGo {
 		my $cn = $self->{__position}->moveCoordinateNotation($bestmove);
 		$self->__output("bestmove $cn");
 	}
+
+	$self->{__watcher}->setBatchMode(0);
 
 	return $self;
 }
@@ -410,6 +432,7 @@ sub __onUciCmdHelp {
         isready - ping the engine
         stop - move immediately
         fen - print the current position as FEN
+        board - print a compact representation of the board
         evaluate - print the static score of the current position
         see MOVE - do a static exchange evaluation for MOVE
         help - show available commands
@@ -506,19 +529,5 @@ sub __trim {
 
 	return $what;
 }
-
-package BatchWatcher;
-$BatchWatcher::VERSION = '0.3';
-use strict;
-
-sub new {
-	my ($class) = @_;
-
-	my $self = "";
-
-	bless \$self, $class;
-}
-
-sub check {}
 
 1;

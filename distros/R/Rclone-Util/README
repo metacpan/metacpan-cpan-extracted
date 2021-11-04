@@ -2,10 +2,36 @@ NAME
     Rclone::Util - Utility routines related to rclone
 
 VERSION
-    This document describes version 0.001 of Rclone::Util (from Perl
-    distribution Rclone-Util), released on 2021-05-09.
+    This document describes version 0.002 of Rclone::Util (from Perl
+    distribution Rclone-Util), released on 2021-05-15.
 
 FUNCTIONS
+  list_rclone_remotes
+    Usage:
+
+     list_rclone_remotes(%args) -> [status, msg, payload, meta]
+
+    List known rclone remotes from rclone configuration file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   rclone_config_dirs => *array[dirname]*
+
+    *   rclone_config_filenames => *array[filename]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   parse_rclone_config
     Usage:
 

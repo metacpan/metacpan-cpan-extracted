@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::DispatchDetails;
-$Shipment::Temando::WSDL::Types::DispatchDetails::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::DispatchDetails::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -133,7 +133,7 @@ Class::Std::initialize();
               destinationFax
               destinationEmail
 
-              )
+            )
         ],
         {   'reference'               => \%reference_of,
             'carrierName'             => \%carrierName_of,
@@ -191,7 +191,7 @@ Class::Std::initialize();
         {   'reference' => 'Shipment::Temando::WSDL::Types::CarrierReference',
             'carrierName' => 'Shipment::Temando::WSDL::Types::CompanyName',
             'carrierId'   => 'Shipment::Temando::WSDL::Types::CarrierId',
-            'accountNo' =>
+            'accountNo'   =>
               'Shipment::Temando::WSDL::Types::CarrierAccountNumber',
             'creatorId' => 'Shipment::Temando::WSDL::Types::CarrierCreatorId',
             'currency'  => 'Shipment::Temando::WSDL::Types::CurrencyType',
@@ -201,7 +201,7 @@ Class::Std::initialize();
             'consignmentNumber' =>
               'Shipment::Temando::WSDL::Types::ConsignmentNumber',
             'consignmentDate' => 'Shipment::Temando::WSDL::Types::Date',
-            'deliveryMethod' =>
+            'deliveryMethod'  =>
               'Shipment::Temando::WSDL::Types::DeliveryMethod',
             'rateName'    => 'Shipment::Temando::WSDL::Types::RateName',
             'description' => 'Shipment::Temando::WSDL::Types::ItemDescription',
@@ -222,7 +222,7 @@ Class::Std::initialize();
             'surcharges' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
             'tax'        => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
             'totalPrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-            'originZoneName' => 'Shipment::Temando::WSDL::Types::ZoneName',
+            'originZoneName'    => 'Shipment::Temando::WSDL::Types::ZoneName',
             'originContactName' =>
               'Shipment::Temando::WSDL::Types::ContactName',
             'originCompanyName' =>
@@ -327,7 +327,7 @@ Shipment::Temando::WSDL::Types::DispatchDetails
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -19,6 +19,7 @@
     GyMMM => "MMM y G",
     GyMMMEd => "E d. MMM y G",
     GyMMMd => "d. MMM y G",
+    GyMd => "dd.MM.y GGGGG",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -127,8 +128,8 @@
     "e.Kr.",
   ],
   era_wide => [
-    "f.Kr.",
-    "e.Kr.",
+    "f\N{U+00f8}r Kristus",
+    "etter Kristus",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %d. %b %H:%M:%S %z %Y",
@@ -270,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 39,
+  version => 40,
 }

@@ -1,5 +1,10 @@
 Revision history for Device-Chip
 
+0.20    2021-10-18
+        [CHANGES]
+         * Use ADJUST blocks from Object::Pad to avoid BUILD blocks
+         * Define an I²C transaction helper ->write_then_read method
+
 0.19    2021-07-06
         [CHANGES]
          * Support 'counter' sensor types in addition to 'gauge'

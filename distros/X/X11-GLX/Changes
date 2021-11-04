@@ -1,21 +1,28 @@
+Version 0.06 - 2021-10-09
+  - Fix several bugs that made it impossible for 0.05 to have ever worked
+    (despite the fact that it did work on several systems)
+  - Fix broken test case when using recent Xlib built on XCB when testing
+    on a X server lacking indirect rendering support.
+  - Upgrade to back-end C API of X11::Xlib 0.22
+
 Version 0.05 - 2018-06-06
- - Fix bugs in previous that broke error reporting
+  - Fix bugs in previous that broke error reporting
 
 Version 0.04 - 2018-06-06
- - Remove runtime dependency on OpenGL module, so that OpenGL::Modern
-   may be used instead.  (OpenGL still required for test cases)
+  - Remove runtime dependency on OpenGL module, so that OpenGL::Modern
+    may be used instead.  (OpenGL still required for test cases)
 
 Version 0.03 - 2017-07-16
- - Most GLX_ constants are exportable now
- - GLXFBConfig (and related functions) support
- - Tighter integration with X11::Xlib, giving all objects ->display attr
- - More test cases with better feature-detection of server
- - ::DWIM module now uses FBConfig setup by default, when available
- - More "DWIM" in ::DWIM module
+  - Most GLX_ constants are exportable now
+  - GLXFBConfig (and related functions) support
+  - Tighter integration with X11::Xlib, giving all objects ->display attr
+  - More test cases with better feature-detection of server
+  - ::DWIM module now uses FBConfig setup by default, when available
+  - More "DWIM" in ::DWIM module
 
 Version 0.02 - 2017-04-07
- - Corrrected "configure requires" prereqs in META & Makefile.PL
+  - Corrrected "configure requires" prereqs in META & Makefile.PL
 
 Version 0.01 - 2017-04-07
- - Initial release, supporting basic glX and import_context extension
- - DWIM module for "making it go" with minimal effort.
+  - Initial release, supporting basic glX and import_context extension
+  - DWIM module for "making it go" with minimal effort.

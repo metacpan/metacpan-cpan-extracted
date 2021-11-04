@@ -1,5 +1,9 @@
 Revision history for Perl extension Geo-OSM-Imager
 
+0.04 2021-10-27T13:01:06Z
+
+    - Correct default tileserver URL following external changes
+
 0.03 2017-05-05T17:47:19Z
 
     - add dependency on LWP::UserAgent

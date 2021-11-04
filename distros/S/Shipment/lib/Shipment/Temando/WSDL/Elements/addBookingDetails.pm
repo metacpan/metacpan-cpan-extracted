@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::addBookingDetails;
-$Shipment::Temando::WSDL::Elements::addBookingDetails::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::addBookingDetails::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ use warnings;
                   consignmentDocument
                   consignmentDocumentType
 
-                  )
+                )
             ],
             {   'requestId'               => \%requestId_of,
                 'bookingNumber'           => \%bookingNumber_of,
@@ -99,7 +99,7 @@ Shipment::Temando::WSDL::Elements::addBookingDetails
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

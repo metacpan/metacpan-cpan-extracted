@@ -1,13 +1,11 @@
 package App::gimpgitbuild::Command::cleanbuild;
-$App::gimpgitbuild::Command::cleanbuild::VERSION = '0.30.0';
+$App::gimpgitbuild::Command::cleanbuild::VERSION = '0.30.2';
 use strict;
 use warnings;
 use autodie;
 use 5.014;
 
 use App::gimpgitbuild -command;
-
-use File::Which qw/ which /;
 
 use App::gimpgitbuild::API::Worker ();
 
@@ -53,7 +51,7 @@ __END__
 
 =head1 VERSION
 
-version 0.30.0
+version 0.30.2
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

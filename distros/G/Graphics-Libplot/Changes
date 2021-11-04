@@ -1,4 +1,6 @@
-Revision history for Perl extension Libplot.
+2.2.3 2021-10-14
+- fix for no . in @INC
+- build updates
 
 2.2.2   Fri, 28 Jul 2006 22:20:49 -0700
         Olle Nilsson provided a fix that prevented output other

@@ -1,0 +1,134 @@
+# NAME
+
+DBIx::Class::BcryptColumn - Set a column to securely hash on insert/update using bcrypt
+
+# SYNOPSIS
+
+    __PACKAGE__->load_components('BcryptColumn');
+     
+    __PACKAGE__->add_columns(
+        password => {
+          data_type => 'text',
+          bcrypt => 1, # Or a hashref of option overrides, see below
+        },
+    );
+
+# DESCRIPTION
+
+It's considered best practice to store credential data about your system users (such as passwords)
+using a one way hashing algorithm.  That way if your system gets hack and your database becomes
+compromised then at least the hackers won't know everyone's password.  It also is useful as a
+protective measure against in-house bad actors who have access to your production system as part
+of their regular job duties.
+
+There's a few distributions on CPAN to make it easier to do this with [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).  The two most
+commonly cited are [DBIx::Class::PassphraseColumn](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3APassphraseColumn) and [DBIx::Class::EncodedColumn](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AEncodedColumn).  Those are
+both good choices for this problem and all things equal you might want to review those before making
+a final choice.  The main reason I wrote this was to solve two issues for me.  First, both of those
+perform hashing on `new` or `set_column` instead of on insert / update as this module does.  That
+approach is considered more secure by the DBIC community since it means that there is never a time
+where unhashed passwords are in DBIC code and if you have a core dump or similar error those plain
+text passwords have no chance of ending up in a file readable by an unauthorized person.  However if
+you are using [Valiant](https://metacpan.org/pod/Valiant) and its DBIC glue [DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant) this means you can't apply any
+validation rules at the DBIC level such as minimal password complexity, or do things like use the
+confirmation validator, since hashing on `new` / `set_column` would happen before validation occurs
+(In [DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant) validation doesn't happen until you try to update / insert the data, or if
+you manually invoke `validate`).  So For [Valiant](https://metacpan.org/pod/Valiant) users I wrote this as an option to allow you
+to do those things if you are willing to accept the additional risk of plain text passwords in live
+memory.  Personal I find this to be a minimal additional risk since it's likely those password will reside
+in other parts of the code memory space anyway (such as in [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest)).  If this risk
+bothers you and you still want to use [DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant) then you can do password validation work 
+prior to sending the data to [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).  For example if you are using [Catalyst](https://metacpan.org/pod/Catalyst) you can invoke
+some validation work from the controller before sending parameters to DBIC.
+
+As a second difference, this distribution only does hashing using the bcrypt algorithm (via
+[Crypt::Eksblowfish::Bcrypt](https://metacpan.org/pod/Crypt%3A%3AEksblowfish%3A%3ABcrypt)).  As of late 2021 this is my goto hashing algorithm and the defaults
+I have set should be sufficient to protect you against all but nation state level hackers.  You can 
+tweak the defaults a bit to make it a harder algorithm at a higher performance cost.  The other popular
+modules mentioned above support a lot of different hashing approaches and if you are not schooled
+in security its very easy to accidentally choose a configuration that is not secure. With this
+module its very easy to get a setup that is considered secure today (just follow the ["SYNOPSIS"](#synopsis)).
+If for some reason bcrypt becomes no longer considered secure I will mark this distribution as deprecated.
+
+**NOTE**: When using this with [DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant) you should add it AFTER adding the [DBIx::Class::Valiant::Result](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant%3A%3AResult)
+component.  Otherwise you will still get passwords hashed prior to running validations, which will
+negate the entire point.
+
+**NOTE**: Bcrypt has one downside in that it will truncate values at 72 bytes.  This might be an issue
+if you are using this in a country with 2 or 4 byte wide characters (such as Chinese or Japanese
+characters).  There are ways around this (the most common approach is to pre hash the password using
+a cheaper algorithm like SHA-1) but for now those options are not available in this code.  You'd need
+to override or wrap the ["bcrypt"](#bcrypt) method.  If this becomes a common issue I will consider adding an
+option for this (open issues on the issue tracker and hassle the author :) ).
+
+# CONFIGURATION
+
+This component permits the following configuration.  Example usage:
+
+    __PACKAGE__->load_components('BcryptColumn');
+     
+    __PACKAGE__->add_columns(
+      password => {
+        data_type => 'text',
+        bcrypt => {
+          cost => $alt_cost,
+          check_method => $alternative_check_method,
+        }
+      },
+    );
+
+- cost
+
+    Defaults to 12.  You can use this to change the cost used to generate the hash.  I don't recommend using
+    a smaller value; using a higher one might cause performance issues on equipment commonly available in
+    late 2021 when this module was written.
+
+- check\_method
+
+    By default we create a method called `check_${column}` which is useful when you want to see if a
+    proposed value is the same as the stored but hashed value.  Useful for things like logging into a
+    website.  If you prefer or need a different method name you can override it here.
+
+# METHODS
+
+This component contains the following public methods.
+
+## bcrypt\_columns
+
+Returns an array of columns marked to be hashed.
+
+## bcrypt
+
+Arguments: ($value, $cost)
+
+Returns a hashed version of `$value` using [Crypt::Eksblowfish::Bcrypt](https://metacpan.org/pod/Crypt%3A%3AEksblowfish%3A%3ABcrypt).  This is used internally
+by the component to hash columns but I've exposed it as a public method since you might find it
+useful to have in your code.
+
+## default\_cost
+
+Returns the default cost we use for `bcrypt`.  This is 12 unless you override. If you want a bigger cost
+its best to set this via column level configuration.
+
+## generate\_salt
+
+Arguments ($size).
+
+Returns a salt suitable for using with `bcrypt`.  You might like to have access to this for things like
+creating tokens.  The default $size is 16, which should not be changed for salts that are used with bcrypt
+but we offer an argument here in cast you want to make larger results. Just remember that this also runs
+the random value thru base64 so you always get a longer strong than the size specified (although its always
+the same length in the end).
+
+# AUTHOR
+
+     John Napiorkowski <jnapiork@cpan.org>
+    
+
+# COPYRIGHT
+
+Copyright (c) 2021 the above named AUTHOR
+
+# LICENSE
+
+You may distribute this code under the same terms as Perl itself.

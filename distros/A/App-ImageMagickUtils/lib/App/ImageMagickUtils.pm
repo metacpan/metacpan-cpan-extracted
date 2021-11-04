@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-05'; # DATE
+our $DATE = '2021-10-12'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -19,7 +19,7 @@ $SPEC{':package'} = {
     summary => 'Utilities related to ImageMagick',
 };
 
-our %arg0_files = (
+our %argspec0_files = (
     files => {
         'x.name.is_plural' => 1,
         'x.name.singular' => 'file',
@@ -27,6 +27,13 @@ our %arg0_files = (
         req => 1,
         pos => 0,
         slurpy => 1,
+    },
+);
+
+our %argspecopt_delete_original = (
+    delete_original => {
+        schema => 'bool*',
+        cmdline_aliases => {D=>{}},
     },
 );
 
@@ -52,7 +59,7 @@ or (if downsizing is done):
 
 _
     args => {
-        %arg0_files,
+        %argspec0_files,
         q => {
             schema => ['int*', between=>[0,100]],
             default => 40,
@@ -74,6 +81,7 @@ _
                 no_downsize   => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
             },
         },
+        %argspecopt_delete_original,
     },
     features => {
         dry_run => 1,
@@ -87,8 +95,8 @@ _
             'x.doc.show_result' => 0,
         },
         {
-            summary => 'Do not downsize, just recompress to JPEG quality 40',
-            src => 'downsize-image --dont-downsize *',
+            summary => 'Do not downsize, just recompress to JPEG quality 40, delete original files',
+            src => 'downsize-image --dont-downsize --delete-original *',
             src_plang => 'bash',
             test => 0,
             'x.doc.show_result' => 0,
@@ -111,8 +119,10 @@ sub downsize_image {
         return [400, "convert path $convert_path is not executable"] unless -x $convert_path;
     }
 
+    my ($num_files, $num_success) = (0, 0);
     for my $file (@{$args{files}}) {
         log_info "Processing file %s ...", $file;
+        $num_files++;
 
         unless (-f $file) {
             log_error "No such file %s, skipped", $file;
@@ -164,10 +174,17 @@ sub downsize_image {
         if ($?) {
             my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
             log_error "convert for $file failed: exit_code=$exit_code, signal=$signal, core_dump=$core_dump";
+        } else {
+            if ($args{delete_original}) {
+                # currently we ignore the results
+                log_trace "Deleting original file %s ...", $file;
+                unlink $file;
+            }
+            $num_success++;
         }
     }
 
-    [200];
+    $num_success == 0 ? [500, "All files failed"] : [200];
 }
 
 $SPEC{convert_image_to} = {
@@ -186,12 +203,13 @@ is basically equivalent to:
 
 _
     args => {
-        %arg0_files,
+        %argspec0_files,
         to => {
             schema => ['str*', match=>qr/\A\w+\z/],
             req => 1,
             examples => [qw/pdf jpg png/], # for tab completion
         },
+        %argspecopt_delete_original,
     },
     #features => {
     #    dry_run => 1,
@@ -222,6 +240,11 @@ sub convert_image_to {
 
         if ($ps->is_success) {
             $envres->add_result(200, "OK", {item_id=>$file});
+            if ($args{delete_original}) {
+                # currently we ignore the result of deletion
+                log_trace "Deleting original file %s ...", $file;
+                unlink $file;
+            }
         } else {
             $envres->add_result(500, "Failed (exit code ".$ps->exitstatus.")", {item_id=>$file});
         }
@@ -248,7 +271,8 @@ which in turn is equivalent to:
 
 _
     args => {
-        %arg0_files,
+        %argspec0_files,
+        %argspecopt_delete_original,
     },
     #features => {
     #    dry_run => 1,
@@ -279,7 +303,25 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.005 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2021-10-05.
+This document describes version 0.008 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2021-10-12.
+
+=head1 DESCRIPTION
+
+This distribution includes the following CLI utilities related to ImageMagick:
+
+=over
+
+=item * L<calc-image-resized-size>
+
+=item * L<convert-image-to>
+
+=item * L<convert-image-to-pdf>
+
+=item * L<downsize-image>
+
+=item * L<image-resize-notation-to-human>
+
+=back
 
 =head1 FUNCTIONS
 
@@ -306,6 +348,8 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<delete_original> => I<bool>
 
 =item * B<files>* => I<array[filename]>
 
@@ -353,6 +397,8 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<delete_original> => I<bool>
+
 =item * B<files>* => I<array[filename]>
 
 
@@ -398,6 +444,8 @@ This function supports dry-run operation.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<delete_original> => I<bool>
 
 =item * B<downsize_to> => I<str> (default: 1024)
 

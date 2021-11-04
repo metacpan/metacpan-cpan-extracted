@@ -1,3 +1,9 @@
+- Further prevent SRPM to conflicts with its own build deps with rpm-4.16+
+
+Version 5.124 - 19 October 2021
+
+- Prevent SRPM to conflicts with its own build deps
+
 Version 5.123 - 4 November 2020
 
 - Fix file descriptor leak in rpm transactions

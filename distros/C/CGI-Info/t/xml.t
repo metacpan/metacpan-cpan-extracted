@@ -5,7 +5,7 @@ use warnings;
 use Test::Most tests => 10;
 use Test::NoWarnings;
 
-eval 'use autodie qw(:all)';	# Test for open/close failures
+eval { use autodie qw(:all) };	# Test for open/close failures
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -19,13 +19,11 @@ XML: {
 	$ENV{'CONTENT_TYPE'} = 'text/xml; charset=utf-8';
 	$ENV{'CONTENT_LENGTH'} = length($xml);
 
-	my @expect = ('XML');
-
 	open (my $fin, '<', \$xml);
 	local *STDIN = $fin;
 
 	my $i = new_ok('CGI::Info');
-	my %p = %{$i->params({expect => \@expect})};
+	my %p = %{$i->params({ expect => ['XML'] })};
 	ok(exists($p{XML}));
 	is($p{XML}, $xml);	# Fails on Perl 5.6.2
 	is($i->as_string(), "XML=$xml");

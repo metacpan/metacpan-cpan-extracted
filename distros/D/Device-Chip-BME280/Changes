@@ -1,5 +1,9 @@
 Revision history for Device-Chip-BME280
 
+0.03    2021-10-22
+        [CHANGES]
+         * Make sure not to cache adapter failures
+
 0.02    2021-01-02
         [CHANGES]
          * Implement the Device::Chip::Sensor API

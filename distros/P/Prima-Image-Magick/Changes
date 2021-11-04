@@ -11,3 +11,5 @@ Revision history for Perl extension Prima::Image::Magick.
 0.06  - force-convert 16-bit (and higher) image data into 8-bits
 
 0.07 - compatibility fixes
+
+0.08 - compatibility fixes

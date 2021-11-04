@@ -28,7 +28,7 @@ $outh->print( scalar do {
    <$in_h> } );
 
 __DATA__
-package XS::Parse::Infix::Builder_data 0.19;
+package XS::Parse::Infix::Builder_data 0.21;
 
 use v5.14;
 use warnings;

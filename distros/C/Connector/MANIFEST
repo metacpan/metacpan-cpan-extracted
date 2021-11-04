@@ -38,6 +38,7 @@ lib/Connector/Proxy/SOAP/Lite.pm
 lib/Connector/Proxy/YAML.pm
 lib/Connector/Role/LocalPath.pm
 lib/Connector/Role/SSLUserAgent.pm
+lib/Connector/Role/SessionCache.pm
 lib/Connector/Tee.pm
 lib/Connector/Types.pm
 lib/Connector/Wrapper.pm

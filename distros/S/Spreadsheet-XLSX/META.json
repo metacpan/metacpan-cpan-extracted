@@ -5,13 +5,13 @@
       "Mike Blackwell <mike.blackwell@rrd.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Spreadsheet-XLSX",
    "no_index" : {
@@ -34,11 +34,23 @@
       "runtime" : {
          "requires" : {
             "Archive::Zip" : "1.18",
-            "Spreadsheet::ParseExcel" : "0",
-            "Test::NoWarnings" : "0"
+            "Spreadsheet::ParseExcel" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Warnings" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.15"
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/asb-capfan/Spreadsheet-XLSX"
+      }
+   },
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -111,32 +111,36 @@ One or more stream URLs can be returned for each station or podcast.
 =item B<new>(I<ID>|I<url> [, I<-keep|-skip> => I<streamtypes>] 
 [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ] ... ])
 
-Accepts an iheartradio.com station / podcast ID or URL and creates and returns a 
-new station (or podcast) object, or I<undef> if the URL is not a valid IHeart 
+Accepts an iheartradio.com station / podcast ID or URL and creates and returns 
+a new station (or podcast) object, or I<undef> if the URL is not a valid IHeart 
 station or podcast, or no streams are found.  The URL can be the full URL, 
-ie. https://www.iheart.com/live/B<station-id>, https://B<station-id>.iheart.com, 
+ie. https://www.iheart.com/live/B<station-id>, 
+https://B<station-id>.iheart.com, 
 https://www.iheart.com/podcast/B<podcast-id>/episode/B<episode-id>, 
 https://www.iheart.com/podcast/B<podcast-id>, or just 
 B<station-id>, or I<podcast-id/episode-id>.  NOTE:  For podcasts, you must 
 include the I<episode-id> if not specifying a full URL, otherwise, the 
-I<podcast-id> will be interpreted as a I<station-id> (and you likely won't get any 
-streams)!
+I<podcast-id> will be interpreted as a I<station-id> (and you likely won't get 
+any streams), but if specifying a full URL and no I<episode-id> is specified, 
+the first (latest) episode for the podcast channel is returned.
 
 I<-keep> and I<-skip> specify a list of one or more I<streamtypes> to either 
-include or skip respectively.  The list for each can be either a comma-separated 
-string or an array reference ([...]) of stream types, in the order they should be 
-returned.  Each stream type in the list can be one of:  any, secure, secure_pls, 
-pls, secure_hls, hls, secure_shortcast, shortcast, secure_rtmp, rtmp, (I<ext>, 
-ie. mp4) etc.  NOTE:  If you specify the I<-secure> option, described below, as 1 
-(true), and only non-secure* options above for I<-keep>, you won't get any streams!
+include or skip respectively.  The list for each can be either a 
+comma-separated string or an array reference ([...]) of stream types, in the 
+order they should be returned.  Each stream type in the list can be one of:  
+any, secure, secure_pls, pls, secure_hls, hls, secure_shortcast, shortcast, 
+secure_rtmp, rtmp, (I<ext>, ie. mp4) etc.  NOTE:  If you specify the I<-secure> 
+option, described below, as 1 (true), and only non-secure* options above for 
+I<-keep>, you won't get any streams!
 
-DEFAULT I<-keep> list is 'secure_shoutcast, shoutcast, secure, any', meaning that all 
-secure_shoutcast (https:) streams followed by any other shoutcast streams, then all 
-other secure (https:) streams, followed by any remaining (http:) streams (.m3u8, etc.).  
-More than one value can be specified to control order of search.
+DEFAULT I<-keep> list is 'secure_shoutcast, shoutcast, secure, any', meaning 
+that all secure_shoutcast (https:) streams followed by any other shoutcast 
+streams, then all other secure (https:) streams, followed by any remaining 
+(http:) streams (.m3u8, etc.).  More than one value can be specified to 
+control order of search.
 
-The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
-then only secure ("https://") streams will be returned.
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
+If 1 then only secure ("https://") streams will be returned.
 
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
@@ -144,8 +148,9 @@ Additional options:
 
 I<-log> => "I<logfile>"
 
-Specify path to a log file.  If a valid and writable file is specified, A line will be 
-appended to this file every time one or more streams is successfully fetched for a url.
+Specify path to a log file.  If a valid and writable file is specified, A line 
+will be appended to this file every time one or more streams is successfully 
+fetched for a url.
 
 DEFAULT I<-none-> (no logging).
 
@@ -153,11 +158,12 @@ I<-logfmt> specifies a format string for lines written to the log file.
 
 DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
 
-The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
-[site]:  The site name (IHeartRadio).  [url]:  The url searched for streams.  
-[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
-[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "I<-na->", if no value).
+The valid field I<[variables]> are:  [stream]: The url of the first/best 
+stream found.  [site]:  The site name (IHeartRadio).  [url]:  The url 
+searched for streams.  [time]: Perl timestamp when the line was logged.  
+[title], [artist], [album], [description], [year], [genre], [total], 
+[albumartist]:  The corresponding field data returned (or "I<-na->", 
+if no value).
 
 =item $station->B<get>()
 
@@ -198,23 +204,35 @@ it is always the station's title.
 =item $station->B<getIconURL>()
 
 Returns the URL for the station's "cover art" icon image, if any.
+If B<'artist'> is specified, the podcast channel artist's icon url 
+is returned, if any.  NOTE:  The B<'artist'> option will return an 
+empty string unless the station is a podcast.
 
 =item $station->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
+If B<'artist'> is specified, the podcast channel artist's icon data 
+is returned, if any.  NOTE:  The B<'artist'> option will return an 
+empty string unless the station is a podcast.
 
 =item $station->B<getImageURL>()
 
 Returns the URL for the station's "cover art" (usually larger) 
 banner image.  NOTE:  For IHeart podcasts, this will be the same as the 
 icon url.
+If B<'artist'> is specified, the podcast channel artist's image url 
+is returned, if any.  NOTE:  The B<'artist'> option will return an 
+empty string unless the station is a podcast.
 
 =item $station->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual station's banner image (binary data).
 NOTE:  For IHeart podcasts, this will be the same as the icon url.
+If B<'artist'> is specified, the podcast channel artist's image data 
+is returned, if any.  NOTE:  The B<'artist'> option will return an 
+empty string unless the station is a podcast.
 
 =item $station->B<getType>()
 
@@ -224,6 +242,11 @@ Returns the station's type ("IHeartRadio").
 
 =head1 CONFIGURATION FILES
 
+The default root location directory for StreamFinder configuration files 
+is "~/.config/StreamFinder".  To use an alternate location directory, 
+specify it in the "I<STREAMFINDER>" environment variable, ie.:  
+B<$ENV{STREAMFINDER} = "/etc/StreamFinder">.
+
 =over 4
 
 =item ~/.config/StreamFinder/IHeartRadio/config
@@ -231,15 +254,19 @@ Returns the station's type ("IHeartRadio").
 Optional text file for specifying various configuration options 
 for a specific site (submodule).  Each option is specified on a 
 separate line in the format below:
+NOTE:  Do not follow the lines with a semicolon, comma, or any other 
+separator.  Non-numeric I<values> should be surrounded with quotes, either 
+single or double.  Blank lines and lines beginning with a "#" sign as 
+their first non-blank character are ignored as comments.
 
 'option' => 'value' [,]
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
-Options specified here override any specified in I<~/.config/StreamFinder/config>.
+Options specified here override any specified in 
+I<~/.config/StreamFinder/config>.
 
 Among options valid for IHeartRadio streams are the I<-keep> and 
 I<-skip> options described in the B<new()> function.
@@ -253,12 +280,12 @@ Each option is specified on a separate line in the format below:
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 =back
 
-NOTE:  Options specified in the options parameter list will override 
-those corresponding options specified in these files.
+NOTE:  Options specified in the options parameter list of the I<new()> 
+function will override those corresponding options specified in these files.
 
 =head1 KEYWORDS
 
@@ -274,9 +301,11 @@ wget
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-streamFinder-iheartradio at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=StreamFinder-IHeartRadio>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to 
+C<bug-streamFinder-iheartradio at rt.cpan.org>, or through the web interface at 
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=StreamFinder-IHeartRadio>.  
+I will be notified, and then you'll automatically be notified of progress on 
+your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -468,9 +497,40 @@ TRYIT:
 			}
 		}
 		unless ($tryit || $self->{'cnt'} > 0) {
-			print "--no streams found, ID=".$self->{'id'}."= url=$url2fetch= PODCAST PG, MAYBE?\n"  if ($DEBUG);
-			if ($html =~ m#\"\,\"url\"\:\"\/podcast\/$self->{'id'}\/?\"\,\"episodeIds\"\:\[(\d+)#s) {
-				my $episodeID = $1;
+			print "--no streams found, ID=".$self->{'id'}."= url=$url2fetch= PODCAST PAGE, MAYBE?\n"  if ($DEBUG);
+			my $episodeID = '';
+			my $episodeList = '';
+			my $firstEpisode = ($html =~ m#\"episodes\"\:\{\"([\d]+)\"\:#s) ? $1 : '';
+			if ($html =~ m#\"\,\"url\"\:\"\/podcast\/$self->{'id'}\/?\"\,\"episodeIds\"\:\[([^\]]+)\]#s) {
+				$episodeList = $1;
+				if ($firstEpisode && $episodeList =~ /\b$firstEpisode$/) {  #THE EPISODE LIST IS IN REVERSE ORDER!:
+					($episodeID = $episodeList) =~ s/\D.*$//;  #WE WANT THE FIRST ONE.
+				} elsif ($episodeList =~ /(\d+)$/) {
+					$episodeID = $1;
+				}
+			} elsif ($firstEpisode) {
+				while ($html =~ s#\"episodeIds\"\:\[([^\]]+)\]##s) {
+					$episodeList = $1;
+					if ($episodeList =~ /\b$firstEpisode$/) {  #THE EPISODE LIST IS IN REVERSE ORDER!:
+						($episodeID = $episodeList) =~ s/\D.*$//;  #WE WANT THE FIRST ONE.
+						last;
+					}
+				}
+			}
+			$episodeID ||= $firstEpisode;
+			if ($episodeID) {
+				if ($html =~ m#\<h1[^\>]*\>([^\<]+)#si) {
+					$self->{'artist'} = $1;
+					while ($html =~ s#\<img([^\>]+)\>##si) {
+						my $imgdata = $1;
+						if ($imgdata =~ m#\balt\=\"$self->{'artist'}\"#
+								&& $imgdata =~ m#\bsrc\=\"([^\"]+)#) {
+							$self->{'artimageurl'} = $self->{'articonurl'} = $1;
+							$self->{'articonurl'} =~ s/\?.*$//;
+							last;
+						}
+					}
+				}
 				$url2fetch =~ s#\/$##;
 				$url2fetch .= "/episode/$episodeID";
 				$self->{'id'} .= "/$episodeID";
@@ -480,6 +540,14 @@ TRYIT:
 			}
 		}
 		return undef  unless ($self->{'cnt'} > 0);
+
+		unless ($self->{'articonurl'}) {
+			if ($html =~ m#\"image\"\:\"([^\"]+)\"\,\"url\"\:#s) {
+				$self->{'artimageurl'} = $self->{'articonurl'} = $1;
+				$self->{'articonurl'} =~ s/\?.*$//;
+				print STDERR "--found channel art url=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+			}
+		}
 		my $id = $url;
 		$id =~ s#\/$##;
 		$id = $1  if ($id =~ m#([^\/]+)\/episode\/#);
@@ -516,7 +584,7 @@ TRYIT:
 			$self->{'artist'} = uri_unescape($self->{'artist'});
 			print STDERR "i:Found artist name (".$self->{'artist'}.").\n"  if ($DEBUG);
 		}
-		$self->{'year'} = ($html =~ m#\<p\>©\s*(\d\d\d\d)#s) ? $1 : '';
+		$self->{'year'} = ($html =~ m#\<p\>.*?\xa9\s*(\d\d\d\d)#s) ? $1 : '';
 		$self->{'year'} ||= $1  if ($html =~ m#(\d\d\d\d)\<\!\-\-#s);
 		$self->{'genre'} = 'Podcast';
 		$self->{'imageurl'} = ($html =~ s#\"imageUrl\"\:\"([^\"]+)\"##s) ? $1 : '';

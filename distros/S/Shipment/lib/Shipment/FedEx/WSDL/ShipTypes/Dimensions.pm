@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::Dimensions;
-$Shipment::FedEx::WSDL::ShipTypes::Dimensions::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::Dimensions::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               Height
               Units
 
-              )
+            )
         ],
         {   'Length' => \%Length_of,
             'Width'  => \%Width_of,
@@ -73,7 +73,7 @@ Shipment::FedEx::WSDL::ShipTypes::Dimensions
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -32,7 +32,7 @@ foreach
     $test ( qw ( spiralbox ccurve rothello spiraltext movingeye ) ) {
 	print "trying $test\n";
 	pl_parampl ("VANISH_ON_DELETE", "no");  # reset this each time
-	require "examples/$test";
+	require "./examples/$test";
         print "ok $i\n";
 	$i++;
     }

@@ -1,5 +1,5 @@
 package X11::GLX::Context::Imported;
-$X11::GLX::Context::Imported::VERSION = '0.05';
+$X11::GLX::Context::Imported::VERSION = '0.06';
 # All details are handled by XS or parent class
 require X11::GLX::Context;
 
@@ -20,7 +20,7 @@ X11::GLX::Context::Imported - Wrapper for GLXContext which were imported using g
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2021 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Perl::Critic::Policy::Community::Each';
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 sub default_themes { 'freenode' }
 
@@ -17,7 +17,12 @@ Perl::Critic::Policy::Freenode::Each - Don't use each to iterate through a hash
 
 =head1 DESCRIPTION
 
-Legacy C<freenode> theme alias of L<Perl::Critic::Policy::Community::Each>.
+Legacy C<freenode> theme policy alias.
+
+=head1 POLICY MOVED
+
+This policy has been moved to the C<community> theme and renamed to
+L<Perl::Critic::Policy::Community::Each>.
 
 =head1 AFFILIATION
 

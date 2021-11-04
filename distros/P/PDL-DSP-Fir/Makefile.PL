@@ -3,9 +3,6 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-# Note: There is a version string in both
-# Fir.pm and Simple.pm
-
 WriteMakefile(
     NAME                => 'PDL::DSP::Fir',
     AUTHOR              => q{John Lapeyre <jlapeyre@cpan.org>},
@@ -13,10 +10,6 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/PDL/DSP/Fir.pm',
     LICENSE => 'perl',
     PL_FILES            => {},
-    PM => {
-        'lib/PDL/DSP/Fir.pm' => '$(INST_LIBDIR)/Fir.pm',
-        'lib/PDL/DSP/Fir/Simple.pm' => '$(INST_LIBDIR)/Fir/Simple.pm',
-    },
     PREREQ_PM => {
         'Test::More' => 0,
         'PDL' => 0,
@@ -24,6 +17,18 @@ WriteMakefile(
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'PDL-DSP-* ' },
+    META_MERGE => {
+      "meta-spec" => { version => 2 },
+      resources => {
+        bugtracker  => {web=>'https://github.com/jlapeyre/PDL-DSP-Fir/issues'},
+        repository  => {
+           url => 'git://github.com/jlapeyre/PDL-DSP-Fir.git',
+           type => 'git',
+           web => 'https://github.com/jlapeyre/PDL-DSP-Fir',
+        },
+        x_IRC => 'irc://irc.perl.org/#pdl',
+      },
+    },
 );
 
 

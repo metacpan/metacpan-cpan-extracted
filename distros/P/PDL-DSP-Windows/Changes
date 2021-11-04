@@ -1,5 +1,44 @@
 Revision history for PDL-DSP-Windows
 
+0.100     2021-11-01 20:51:14 GMT
+
+No changes since last release
+
+0.008006  2021-10-30 15:32:56 BST (TRIAL RELEASE)
+
+Changes:
+  * Plot tests now use the 'svg' gnuplot device, and are skipped in
+    environments that do not support it.
+
+0.008005  2021-10-29 17:31:53 BST (TRIAL RELEASE)
+
+Fixes:
+  * Fixed scallop_loss tests in older versions of PDL
+
+0.008004  2021-10-28 23:19:18 BST (TRIAL RELEASE)
+
+Fixes:
+  * Fixed a check that would sometimes fail in Windows machines
+  * Fixed a long-standing issue with calculation of a window's
+    scalloping loss.
+
+0.008003  2021-10-27 17:52:36 BST (TRIAL RELEASE)
+
+Fixes:
+  * Fix a wrong dependency introduced in namespace test
+
+0.008002  2021-10-26 21:36:20 BST (TRIAL RELEASE)
+
+Changes:
+  * Drop dependency on namespace::clean
+
+0.008001  2021-10-18 19:51:22 BST (TRIAL RELEASE)
+
+Changes:
+  * Remove package variables deprecated in 0.007001
+  * Tweaked distribution packaging, removing some authoring
+    files from the distributed tarball
+
 0.008     2019-12-09 19:06:23 GMT
 
 Fixes:

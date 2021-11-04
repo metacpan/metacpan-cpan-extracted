@@ -1,5 +1,20 @@
 Revision history for XS-Parse-Sublike
 
+0.14    2021-10-28
+        [CHANGES]
+         * Added XS_PARSE_SUBLIKE_FLAG_PREFIX; discourage the _any() function
+           to achieve similar effect
+         * Added XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL to permit bodyless sublike
+           declarations
+         * Better compiletime warnings when a sub declaration lacks a
+           body-delimiting brace
+
+        [BUGFIXES]
+         * Fix for Perl < 5.20 on Win32 (thanks ilmari) (RT139296)
+         * Handle the new OP_ARGCHECK aux structure of perl 5.31.5 (thanks
+           ilmari) (RT139295)
+         * Accomodate newly-added core sv_setrv_*() functions
+
 0.13    2021-08-30
         [CHANGES]
          * New ABI version 4

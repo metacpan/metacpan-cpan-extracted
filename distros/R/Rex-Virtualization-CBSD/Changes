@@ -1,0 +1,9 @@
+Revision history for Rex-Virtualization-CBSD
+
+1.0.0	 2021-10-16/20:15
+		 - Add checkpoint support.
+		 - Add snapshot support.
+		 - Rename most of the bhyve methods to start with b.
+
+0.0.1	 2021-10-14/13:00
+		 - Initial release.

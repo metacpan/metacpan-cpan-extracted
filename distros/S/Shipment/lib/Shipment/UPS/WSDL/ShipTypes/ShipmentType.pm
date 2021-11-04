@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipmentType;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -58,7 +58,7 @@ Class::Std::initialize();
               ShipmentServiceOptions
               Package
 
-              )
+            )
         ],
         {   'Description'            => \%Description_of,
             'ReturnService'          => \%ReturnService_of,
@@ -78,7 +78,7 @@ Class::Std::initialize();
             'ShipmentServiceOptions'  => \%ShipmentServiceOptions_of,
             'Package'                 => \%Package_of,
         },
-        {   'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'Description'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'ReturnService' =>
               'Shipment::UPS::WSDL::ShipTypes::ReturnServiceType',
             'DocumentsOnlyIndicator' =>
@@ -108,14 +108,14 @@ Class::Std::initialize();
         },
         {
 
-            'Description'            => 'Description',
-            'ReturnService'          => 'ReturnService',
-            'DocumentsOnlyIndicator' => 'DocumentsOnlyIndicator',
-            'Shipper'                => 'Shipper',
-            'ShipTo'                 => 'ShipTo',
-            'ShipFrom'               => 'ShipFrom',
-            'PaymentInformation'     => 'PaymentInformation',
-            'FRSPaymentInformation'  => 'FRSPaymentInformation',
+            'Description'                        => 'Description',
+            'ReturnService'                      => 'ReturnService',
+            'DocumentsOnlyIndicator'             => 'DocumentsOnlyIndicator',
+            'Shipper'                            => 'Shipper',
+            'ShipTo'                             => 'ShipTo',
+            'ShipFrom'                           => 'ShipFrom',
+            'PaymentInformation'                 => 'PaymentInformation',
+            'FRSPaymentInformation'              => 'FRSPaymentInformation',
             'GoodsNotInFreeCirculationIndicator' =>
               'GoodsNotInFreeCirculationIndicator',
             'ShipmentRatingOptions'   => 'ShipmentRatingOptions',
@@ -133,7 +133,7 @@ Class::Std::initialize();
 
 package Shipment::UPS::WSDL::ShipTypes::ShipmentType::_ShipmentServiceOptions;
 $Shipment::UPS::WSDL::ShipTypes::ShipmentType::_ShipmentServiceOptions::VERSION
-  = '3.05';
+  = '3.06';
 use strict;
 use warnings;
 {
@@ -186,7 +186,7 @@ use warnings;
                   CommercialInvoiceRemovalIndicator
                   UPScarbonneutralIndicator
 
-                  )
+                )
             ],
             {   'SaturdayDeliveryIndicator' => \%SaturdayDeliveryIndicator_of,
                 'OnCall'                    => \%OnCall_of,
@@ -204,8 +204,8 @@ use warnings;
             },
             {   'SaturdayDeliveryIndicator' =>
                   'SOAP::WSDL::XSD::Typelib::Builtin::string',
-                'OnCall' => 'Shipment::UPS::WSDL::ShipTypes::OnCallType',
-                'COD'    => 'Shipment::UPS::WSDL::ShipTypes::CODType',
+                'OnCall'       => 'Shipment::UPS::WSDL::ShipTypes::OnCallType',
+                'COD'          => 'Shipment::UPS::WSDL::ShipTypes::CODType',
                 'Notification' =>
                   'Shipment::UPS::WSDL::ShipTypes::NotificationType',
                 'LabelDelivery' =>
@@ -263,7 +263,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipmentType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

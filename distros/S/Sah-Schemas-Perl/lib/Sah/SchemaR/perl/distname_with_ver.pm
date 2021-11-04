@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::distname_with_ver;
 
-our $DATE = '2021-09-29'; # DATE
-our $VERSION = '0.039'; # VERSION
+our $DATE = '2021-10-05'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nFor convenience (particularly in CLI with tab completion), you can input one of:\n\n    Foo::Bar\@1.23\n    Foo/Bar\@1.23\n    Foo/Bar.pm\@1.23\n    Foo.Bar\@1.23\n\nand it will be coerced into Foo-Bar form.\n\n",examples=>[{valid=>0,value=>""},{valid=>0,value=>"Foo-Bar"},{valid=>0,value=>"Foo::Bar"},{valid=>1,value=>"Foo-Bar\@1.0.0"},{valid=>1,validated_value=>"Foo-Bar\@1.0.0",value=>"Foo::Bar\@1.0.0"},{valid=>1,value=>"Foo-Bar\@0.5_001"},{valid=>1,validated_value=>"Foo-Bar\@0.5_001",value=>"Foo::Bar\@0.5_001"},{valid=>0,value=>"Foo-Bar\@a"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*\@[0-9][0-9A-Za-z]*(\\.[0-9A-Za-z_]+)*\\z",summary=>"Perl distribution name with version number suffix, e.g. Foo-Bar\@0.001","x.completion"=>"perl_distname","x.perl.coerce_rules"=>["From_str::normalize_perl_distname"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::perl::distname_with_ver - Perl distribution name with version numb
 
 =head1 VERSION
 
-This document describes version 0.039 of Sah::SchemaR::perl::distname_with_ver (from Perl distribution Sah-Schemas-Perl), released on 2021-09-29.
+This document describes version 0.040 of Sah::SchemaR::perl::distname_with_ver (from Perl distribution Sah-Schemas-Perl), released on 2021-10-05.
 
 =head1 DESCRIPTION
 

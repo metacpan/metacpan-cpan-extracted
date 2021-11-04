@@ -34,7 +34,7 @@ use warnings FATAL => 'all';
 use experimental 'signatures';
 
 
-our $VERSION = "0.3.1";
+our $VERSION = "0.3.2";
 
 use constant FALSE => 0;
 use constant TRUE => 1;

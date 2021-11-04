@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Type::MergeKey;
 
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.029'; # VERSION
 
 sub new {
     my ($class) = @_;

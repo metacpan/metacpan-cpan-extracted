@@ -6,9 +6,9 @@ Astro::Catalog::IO::Northstar - NorthStar format catalogue parser
 
 =head1 SYNOPSIS
 
-  $cat = Astro::Catalog::IO::Northstar->_read_catalog( \@lines );
-  $arrref = Astro::Catalog::IO::Northstar->_write_catalog( $cat, %options );
-  $filename = Astro::Catalog::IO::Northstar->_default_file();
+    $cat = Astro::Catalog::IO::Northstar->_read_catalog(\@lines);
+    $arrref = Astro::Catalog::IO::Northstar->_write_catalog($cat, %options);
+    $filename = Astro::Catalog::IO::Northstar->_default_file();
 
 =head1 DESCRIPTION
 
@@ -19,7 +19,6 @@ C<Astro::Catalog> C<write_catalog> and C<read_catalog> methods.
 
 =cut
 
-use 5.006;
 use warnings;
 use warnings::register;
 use Carp;
@@ -28,14 +27,12 @@ use strict;
 use Astro::Telescope;
 use Astro::Coords;
 use Astro::Catalog;
-use Astro::Catalog::Star;
+use Astro::Catalog::Item;
 
-use base qw/ Astro::Catalog::IO::ASCII /;
+use base qw/Astro::Catalog::IO::ASCII/;
 
-use vars qw/$VERSION $DEBUG /;
-
-$VERSION = '4.35';
-$DEBUG   = 0;
+our $VERSION = '4.36';
+our $DEBUG = 0;
 
 =head1 METHODS
 
@@ -46,78 +43,84 @@ $DEBUG   = 0;
 Parses the catalogue lines and returns a new C<Astro::Catalog>
 object containing the catalog entries.
 
- $cat = Astro::Catalog::IO::Northstar->_read_catalog( \@lines, %options );
+    $cat = Astro::Catalog::IO::Northstar->_read_catalog(\@lines, %options);
 
 Supported options (with defaults) are:
 
-  telescope => Name of telescope to associate with each coordinate entry
-               (defaults to JCMT). If the telescope option is specified
-               but is undef or empty string, no telescope is used.
+    telescope => Name of telescope to associate with each coordinate entry
+                 (defaults to JCMT). If the telescope option is specified
+                 but is undef or empty string, no telescope is used.
 
 =cut
 
 sub _read_catalog {
-  my $class = shift;
-  my $lines = shift;
+    my $class = shift;
+    my $lines = shift;
 
-  # Default options
-  my %defaults = ( telescope => 'JCMT',
-                   incplanets => 1);
+    # Default options
+    my %defaults = (
+        telescope => 'JCMT',
+        incplanets => 1);
 
-  my %options = (%defaults, @_);
+    my %options = (%defaults, @_);
 
-  croak "Must supply catalogue contents as a reference to an array"
-    unless ref($lines) eq 'ARRAY';
+    croak "Must supply catalogue contents as a reference to an array"
+        unless ref($lines) eq 'ARRAY';
 
-  # Create a new telescope to associate with this
-  my $tel;
-  $tel = new Astro::Telescope( $options{telescope} )
-    if $options{telescope};
+    # Create a new telescope to associate with this
+    my $tel;
+    $tel = new Astro::Telescope($options{telescope})
+        if $options{telescope};
 
-  # Go through each line and parse it
-  my @stars;
-  for my $line (@$lines) {
-    $line =~ s/^\s*//;
-    $line =~ s/\s*$//;
-    next unless $line =~ /\w/;
-    my ($name, $c1, $c2, $system, $comment) = split (/\s+/,$line,5);
-    next unless (defined $c1 && defined $c2 && defined $system);
+    # Go through each line and parse it
+    my @stars;
+    for my $line (@$lines) {
+        $line =~ s/^\s*//;
+        $line =~ s/\s*$//;
+        next unless $line =~ /\w/;
+        my ($name, $c1, $c2, $system, $comment) = split (/\s+/,$line,5);
+        next unless (defined $c1 && defined $c2 && defined $system);
 
-    # skip "OTHER" since we do not know what to do with it
-    next if $system =~ /other/i;
+        # skip "OTHER" since we do not know what to do with it
+        next if $system =~ /other/i;
 
-    my ($ctype1, $ctype2);
-    if ($system =~ /gal/i) {
-      $ctype1 = "long";
-      $ctype2 = "lat";
-    } else {
-      $ctype1 = "ra";
-      $ctype2 = "dec";
+        my ($ctype1, $ctype2);
+        if ($system =~ /gal/i) {
+            $ctype1 = "long";
+            $ctype2 = "lat";
+        }
+        else {
+            $ctype1 = "ra";
+            $ctype2 = "dec";
+        }
+
+        my $c = new Astro::Coords(
+            $ctype1 => $c1,
+            $ctype2 => $c2,
+            type => $system,
+            name => $name,
+        );
+        $c->telescope($tel) if defined $tel;
+        $c->comment($comment) if (defined $comment && $comment =~ /\w/);
+
+        # Field name should simply be linked to the telescope
+        my $field = (defined $tel ? $tel->name : '<UNKNOWN>');
+
+        # now need the Item
+        my $item = new Astro::Catalog::Item(
+            id => $name,
+            field => $field,
+            coords => $c,
+            comment => $comment);
+        push(@stars, $item);
     }
 
-    my $c = new Astro::Coords( $ctype1 => $c1,
-                               $ctype2 => $c2,
-                               type => $system,
-                               name => $name,
-                             );
-    $c->telescope($tel) if defined $tel;
-    $c->comment($comment) if (defined $comment && $comment =~ /\w/);
-
-    # Field name should simply be linked to the telescope
-    my $field = (defined $tel ? $tel->name : '<UNKNOWN>' );
-
-    # now need the Item
-    my $item = new Astro::Catalog::Item( id => $name,
-                                         field => $field,
-                                         coords => $c,
-                                         comment => $comment );
-    push(@stars, $item);
-
-  }
-
-  return Astro::Catalog->new( Stars => \@stars, Origin => 'NorthStar' );
-
+    return Astro::Catalog->new(Stars => \@stars, Origin => 'NorthStar');
 }
+
+1;
+
+__END__
 
 =back
 
@@ -169,5 +172,3 @@ Place,Suite 330, Boston, MA  02111-1307, USA
 Tim Jenness E<lt>tjenness@cpan.orgE<gt>
 
 =cut
-
-1;

@@ -3,14 +3,14 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-sslmaker",
    "no_index" : {
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -34,7 +32,13 @@
          "requires" : {
             "Applify" : "0.12",
             "File::umask" : "0.01",
+            "IO::Socket::IP" : "0.38",
             "Path::Tiny" : "0.05"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
@@ -45,9 +49,15 @@
       },
       "homepage" : "https://github.com/jhthorsen/app-sslmaker",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/app-sslmaker.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/app-sslmaker.git",
+         "web" : "https://github.com/jhthorsen/app-sslmaker"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.16",
+   "x_contributors" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>",
+      "__DATA__"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

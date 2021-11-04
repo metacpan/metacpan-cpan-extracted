@@ -5,7 +5,7 @@ package Catalyst::Plugin::Digress;
 use Scalar::Util ();
 use Carp ();
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 sub digress {
 	my $c = shift;
@@ -62,12 +62,12 @@ Catalyst::Plugin::Digress - A cleaner, simpler, action-only $c->forward
 
 =head1 SYNOPSIS
 
- $c->forward( 'some/other/action' );
- $c->forward( 'action_in_same_controller' );
- $c->forward( $self->action_for( 'action_in_same_controller' ) );
+ $c->digress( 'some/other/action' );
+ $c->digress( 'action_in_same_controller' );
+ $c->digress( $self->action_for( 'action_in_same_controller' ) );
  
- my %form = $c->forward( 'validate_params', {
-   name  => { required => },
+ my %form = $c->digress( 'validate_params', {
+   name  => { required => 1 },
    email => { type => 'Str' },
  } );
 
@@ -132,7 +132,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Aristotle Pagaltzis.
+This software is copyright (c) 2021 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

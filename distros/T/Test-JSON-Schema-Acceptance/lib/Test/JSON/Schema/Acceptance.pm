@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.011-2-gce88fcc
+package Test::JSON::Schema::Acceptance; # git description: v1.012-5-g5a236b9
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -179,6 +179,7 @@ sub acceptance {
           }
           @{$options->{todo_tests}};
 
+      my $schema_fails;
       if ($self->test_schemas) {
         die 'specification_version unknown: cannot evaluate schema against metaschema'
           if not $self->_has_specification;
@@ -191,6 +192,7 @@ sub acceptance {
         if (not $result) {
           $ctx->fail('schema for '.$one_file->{file}.': "'.$test_group->{description}.'" fails to validate against '.$metaspec_uri.':');
           $ctx->note($self->_json_encoder->encode($result));
+          $schema_fails = 1;
         }
       }
 
@@ -219,6 +221,7 @@ sub acceptance {
             @{$options->{todo_tests}};
 
         my $result = $self->_run_test($one_file, $test_group, $test, $options);
+        $result = 0 if $schema_fails;
 
         ++$results{ $result ? 'pass' : $todo ? 'todo_fail' : 'fail' };
       }
@@ -444,7 +447,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
 =head1 SYNOPSIS
 

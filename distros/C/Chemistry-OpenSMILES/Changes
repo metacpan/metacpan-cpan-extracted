@@ -1,3 +1,21 @@
+0.7.0 2021-10-30
+
+    - Fixing important issue with representing tetrahedral chiral centers
+      by introducing 'chirality_neighbours' key to atom hashes.
+
+0.6.0 2021-10-18
+
+    - Allowing multi-digit hydrogen counts if enabled via parser option.
+    - Standardizing chiral markers for allenal carbons.
+    - Not standardizing chiral markers in raw output.
+    - Reporting '@' and '@@' chiralities with other than 4 neighbours as
+      they cannot be processed right now.
+
+0.5.2 2021-10-11
+
+    - Creating explicitly refvertexed Graph objects to get around all the
+      problems caused by interpreting them as scalar values.
+
 0.5.1 2021-08-29
 
     - Working around an incompatibility with Graph v0.9721.

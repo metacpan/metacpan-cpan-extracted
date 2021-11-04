@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Type
               ChargeAmount
 
-              )
+            )
         ],
         {   'Type'         => \%Type_of,
             'ChargeAmount' => \%ChargeAmount_of,
@@ -62,7 +62,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

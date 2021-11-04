@@ -1,0 +1,12 @@
+<%init>
+if ( $ARGSRef->{CreateMISPEvent} || $ARGSRef->{UpdateMISPEvent} ) {
+    my ($ok, $msg) = RTIR::Extension::MISP::AddRTIRObjectToMISP($Ticket);
+
+    push @$Actions, $msg;
+}
+</%init>
+<%args>
+$Ticket
+$Actions
+$ARGSRef
+</%args>

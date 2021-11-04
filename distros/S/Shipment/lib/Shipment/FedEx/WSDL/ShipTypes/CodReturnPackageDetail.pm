@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               Barcodes
               Label
 
-              )
+            )
         ],
         {   'CollectionAmount' => \%CollectionAmount_of,
             'Electronic'       => \%Electronic_of,
@@ -71,7 +71,7 @@ Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

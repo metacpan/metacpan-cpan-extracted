@@ -24,7 +24,7 @@ no_index:
 provides:
   Win32API::File::Time:
     file: lib/Win32API/File/Time.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -39,5 +39,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Win32API-File-Time
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Win32API-File-Time.git
-version: '0.011'
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

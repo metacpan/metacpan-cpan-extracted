@@ -10,7 +10,7 @@ use Digest::SHA ();
 our @CARP_NOT = qw( alienfile Alien::Build Alien::Build::Meta );
 
 # ABSTRACT: Plugin base class for Alien::Build
-our $VERSION = '2.42'; # VERSION
+our $VERSION = '2.45'; # VERSION
 
 
 sub new
@@ -146,7 +146,7 @@ Alien::Build::Plugin - Plugin base class for Alien::Build
 
 =head1 VERSION
 
-version 2.42
+version 2.45
 
 =head1 SYNOPSIS
 

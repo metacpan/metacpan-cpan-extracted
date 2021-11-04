@@ -1,0 +1,62 @@
+{
+   "abstract" : "what modules shipped with versions of Znuny (>= 2.3.x)",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-Znuny-CoreList",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "FindBin" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Znuny::CoreList" : {
+         "file" : "lib/Module/Znuny/CoreList.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Module-Znuny-CoreList/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Module-Znuny-CoreList",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Module-Znuny-CoreList.git",
+         "web" : "http://github.com/reneeb/Module-Znuny-CoreList"
+      }
+   },
+   "version" : "1.00",
+   "x_contributors" : [
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+}
+

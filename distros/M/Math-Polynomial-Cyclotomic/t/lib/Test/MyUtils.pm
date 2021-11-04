@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2019 Martin Becker, Blaubeuren.
+# Copyright (c) 2008-2021 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -16,7 +16,7 @@ use warnings;
 use Config;
 use base 'Exporter';
 
-our $VERSION   = '0.011';
+our $VERSION   = '0.012';
 our @EXPORT    = qw(use_or_bail maintainer_only);
 our @EXPORT_OK = qw(
     slurp_or_bail this_perl report_version

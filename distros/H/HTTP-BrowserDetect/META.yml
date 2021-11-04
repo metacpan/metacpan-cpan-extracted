@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.34'
+version: '3.35'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -275,6 +275,7 @@ x_Dist_Zilla:
             - puf
             - realplayer
             - rubylib
+            - samsung
             - seamonkey
             - specialarchiver
             - staroffice
@@ -489,7 +490,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0
+          git_version: 2.33.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.048'
@@ -497,7 +498,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.32.0
+          git_version: 2.33.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -589,7 +590,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0
+          git_version: 2.33.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -602,11 +603,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.34
+          tag: v3.35
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0
+          git_version: 2.33.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -644,7 +645,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0
+          git_version: 2.33.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -658,7 +659,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0
+          git_version: 2.33.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.048'

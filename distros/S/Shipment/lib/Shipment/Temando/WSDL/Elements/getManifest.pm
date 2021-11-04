@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::getManifest;
-$Shipment::Temando::WSDL::Elements::getManifest::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::getManifest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ use warnings;
                   lastConfirmed
                   listRequests
 
-                  )
+                )
             ],
             {   'type'             => \%type_of,
                 'labelPrinterType' => \%labelPrinterType_of,
@@ -112,7 +112,7 @@ Shipment::Temando::WSDL::Elements::getManifest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,8 @@
+0.3.2 2021-12-10 Tobias Bossert (tobib at cpan.org)
+- added: CLI: Support for DNS hostname and endpoint FQDN
+- changed: CLI: wg-meta show output is now easier to read
+- fix: PresistentKeepalive -> PersistentKeepalive Resolves #15
+
 0.3.1 2021-07-06 Tobias Bossert (tobib at cpan.org)
 - Improved doc
 - fix: concurrency test -> added small delay between writes

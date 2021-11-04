@@ -26,7 +26,7 @@ SKIP: {
 
 my $smiley =
     sub { eval sprintf q("\\N{%s}"), $_[0] }->("WHITE SMILING FACE")
-    or skip "Unicode charname is not supported.";
+    or skip "Unicode charname is not supported.", 3;
 
 is(ansiecho('--no-escape', '\N{WHITE SMILING FACE}')->{stdout},
    '\N{WHITE SMILING FACE}'."\n",

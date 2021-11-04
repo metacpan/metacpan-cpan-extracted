@@ -1,3 +1,54 @@
+0.35 2021-10-25
+    * Wget 1.14 does not send an Accept-Encoding header; adjust the test suite
+      more for that
+
+0.34 2021-10-24
+    * Wget 1.14 does not send an Accept-Encoding header; adjust the test suite
+      for that
+    * Don't test the Perl version compatibility in the author tests anymore
+
+0.33 2021-10-23
+    * Mark the tests testing the --compression option as TODO, so they don't
+      fail even if --compression is not supported by the local version of Wget.
+      This is easier than trying to find out whether the option is supported
+      just for the sake of the test suite.
+
+0.32 2021-10-22
+    * Wget only supports the --compression option since 1.19.2 , and then only
+      if compiled with zlib.
+
+      We skip the test on Wget versions smaller than 1.19.2 and hope that all
+      later versions are compiled with zlib.
+
+0.31 2021-10-21
+    * More test suite resiliency fixes
+      This time I was able to replicate a part
+
+0.30 2021-10-20
+    * More test suite resiliency fixes
+      Unfortunately I can't conveniently replicate the situation on my system
+
+0.29 2021-10-19
+    * Various test suite resiliency fixes, reported by SREZIC
+
+0.28 2021-10-17
+    * Rename ::FromWGet to ::FromWget , to match other CPAN modules
+    * Print the content, not the status code in the utilities pwget.pl
+      and pcurl.pl
+    * Add a tool to print generated Perl code for wget or curl
+    * Support --no-check-certificate option for wget
+
+0.27 2021-10-15
+    * Add HTTP::Request::FromWGet
+    * HTTP::Request::FromFetch now optionally takes named arguments
+    * Curl seems to URL-encode differently between versions - we adapt our
+      tests to ignore the difference, but we use the "old" style of URL-encoding
+      The curl versions making the change seem to be 7.74 (%) and 7.78 (+)
+
+0.26 2021-10-14
+    * Fix synopses to be more illustrative
+    * Update bugtracker URLs
+
 0.25 2020-10-14
     * Output more diagnostics on failure/suspect requests to find out
       what makes the test suite unhappy on Cygwin

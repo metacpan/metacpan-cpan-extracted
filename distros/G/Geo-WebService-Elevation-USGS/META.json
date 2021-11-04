@@ -15,6 +15,7 @@
    "name" : "Geo-WebService-Elevation-USGS",
    "no_index" : {
       "directory" : [
+         "eg",
          "inc",
          "t",
          "xt"
@@ -54,7 +55,7 @@
    "provides" : {
       "Geo::WebService::Elevation::USGS" : {
          "file" : "lib/Geo/WebService/Elevation/USGS.pm",
-         "version" : "0.119"
+         "version" : "0.120"
       }
    },
    "release_status" : "stable",
@@ -72,6 +73,6 @@
          "web" : "https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS"
       }
    },
-   "version" : "0.119",
+   "version" : "0.120",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

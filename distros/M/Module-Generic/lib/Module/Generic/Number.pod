@@ -618,6 +618,10 @@ Returns the tangent of the number object. See L<POSIX/"tan"> for more details.
 
 Set or gets the thousand separator used in formatting the number.
 
+=head2 TO_JSON
+
+Special method called by L<JSON> to transform this object into a string suitable to be added in a json data.
+
 =head2 unformat
 
 Provided with a string containing a number, and this returns a number as a L<Module::Generic::Number> object.

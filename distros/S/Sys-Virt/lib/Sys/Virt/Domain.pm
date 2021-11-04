@@ -3750,6 +3750,11 @@ threshold. The event is useful for thin-provisioned storage.
 The event occurs when the hypervisor detects hardware
 memory corruption.
 
+=item Sys::Virt::Domain::EVENT_ID_MEMORY_DEVICE_SIZE_CHANGE
+
+The event occurs when the guest accepts a request to change
+the memory device size.
+
 =back
 
 =head2 IO ERROR EVENT CONSTANTS

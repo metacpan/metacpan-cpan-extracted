@@ -1,5 +1,11 @@
 Revision history for Perl module Chemistry::Elements
 
+1.075 2021-10-26T17:12:19Z
+	* Minor fix to Changes file because I had the first two dates in the
+	wrong order
+	* On the repo side, fixed up the GitHub actions to do more testing
+	and to report to Coveralls. It's all changed since last I looked.
+
 1.074 2021-01-15T08:26:43Z
 	* freshen distro, remove Travis CI, add Github Actions
 
@@ -37,7 +43,7 @@ Revision history for Perl module Chemistry::Elements
 1.05_02 - 2008-08-29
 	* Fix some element name typoes
 	* All of this is now in github
-	git://github.com/briandfoy/chemistry--elements.git
+	https://github.com/briandfoy/chemistry-elements.git
 
 1.05_01 - 2008-06-28
 	* Adding multi-language support
@@ -58,10 +64,11 @@ Revision history for Perl module Chemistry::Elements
 	* Fixed up the distro to have tests and more documentation
 	* Added license info: this package is under the same terms as Perl itself
 
-0.97.1018 - 1997-10-19
-	* original version; created by h2xs 1.18
-
 0.97.1102 - 1997-11-02
 	* gutsy enough to actually release it for testing and comments
 	* working on a German version to be released RSN (just need a free hour)
+
+0.97.1018 - 1997-10-19
+	* original version; created by h2xs 1.18
+
 

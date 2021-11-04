@@ -55,6 +55,7 @@ t/additional-tests-draft2019-09/README
 t/additional-tests-draft2019-09/anchor.json
 t/additional-tests-draft2019-09/badRef.json
 t/additional-tests-draft2019-09/faux-buggy-schemas.json
+t/additional-tests-draft2019-09/format-date-time.json
 t/additional-tests-draft2019-09/format-date.json
 t/additional-tests-draft2019-09/format-duration.json
 t/additional-tests-draft2019-09/format-ipv4.json
@@ -75,6 +76,7 @@ t/additional-tests-draft2020-12/anchor.json
 t/additional-tests-draft2020-12/badRef.json
 t/additional-tests-draft2020-12/dynamicRef.json
 t/additional-tests-draft2020-12/faux-buggy-schemas.json
+t/additional-tests-draft2020-12/format-date-time.json
 t/additional-tests-draft2020-12/format-date.json
 t/additional-tests-draft2020-12/format-duration.json
 t/additional-tests-draft2020-12/format-ipv4.json
@@ -93,6 +95,7 @@ t/additional-tests-draft7.t
 t/additional-tests-draft7/README
 t/additional-tests-draft7/badRef.json
 t/additional-tests-draft7/faux-buggy-schemas.json
+t/additional-tests-draft7/format-date-time.json
 t/additional-tests-draft7/format-date.json
 t/additional-tests-draft7/format-duration.json
 t/additional-tests-draft7/format-ipv4.json

@@ -5,55 +5,54 @@ use strict;
 use File::Temp;
 
 BEGIN {
-  use_ok( "Astro::Catalog" );
+    use_ok( "Astro::Catalog" );
 }
 
 # Load the generic test code
-my $p = ( -d "t" ?  "t/" : "");
+my $p = (-d "t" ? "t/" : "");
 do $p."helper.pl" or die "Error reading test functions: $!";
 
 # Read in the catalogue from the DATA block
-my $cat = new Astro::Catalog( Format => 'Cluster', Data => \*DATA );
+my $cat = new Astro::Catalog(Format => 'Cluster', Data => \*DATA);
 
 # Is it an Astro::Catalog object?
-isa_ok( $cat, "Astro::Catalog" );
+isa_ok($cat, "Astro::Catalog");
 
 # Write the catalogue out to disk.
 my $tempfile = File::Temp->new();
-ok( $cat->write_catalog( Format => 'Cluster',
-                         File   => $tempfile,
-                       ),
-    "Writing catalogue to disk" );
+ok($cat->write_catalog(
+            Format => 'Cluster',
+            File   => $tempfile,
+            ),
+        "Writing catalogue to disk" );
 
 # Read it back in...
-my $newcat = new Astro::Catalog( Format => 'Cluster',
-                                 File   => $tempfile,
-                               );
+my $newcat = new Astro::Catalog(
+        Format => 'Cluster',
+        File   => $tempfile,
+    );
 
 # ...check to make sure it's an Astro::Catalog object...
-isa_ok( $newcat, "Astro::Catalog" );
+isa_ok($newcat, "Astro::Catalog");
 
 # ...and that it's the same as the old catalogue.
-compare_catalog( $cat, $newcat );
+compare_catalog($cat, $newcat);
 
 # Pop off the first item.
 my $item = $cat->popstar;
 
 # Is it an Astro::Catalog::Item object?
-isa_ok( $item, "Astro::Catalog::Item" );
+isa_ok($item, "Astro::Catalog::Item");
 
 # Check its attributes.
-is( $item->id, "2", "Cluster Star ID" );
-is( $item->field, "00081", "Cluster Star field" );
-is( $item->ra, "10 44 57.00", "Cluster Star RA" );
-is( $item->dec, "+12 34 53.50", "Cluster Star Dec" );
-is( $item->get_magnitude( 'B' ), 9.3, "Cluster Star B magnitude" );
-is( $item->get_errors( 'B' ), 0.2, "Cluster Star B magnitude error" );
+is($item->id, "2", "Cluster Star ID");
+is($item->field, "00081", "Cluster Star field");
+is($item->ra, "10 44 57.00", "Cluster Star RA");
+is($item->dec, "+12 34 53.50", "Cluster Star Dec");
+is($item->get_magnitude( 'B' ), 9.3, "Cluster Star B magnitude");
+is($item->get_errors( 'B' ), 0.2, "Cluster Star B magnitude error");
 
-# All done.
 exit;
-
-# D A T A   B L O C K --------------------------------------------------------
 
 __DATA__
 5 colours were created

@@ -19,10 +19,15 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
-    't/01schema.t',
+    't/01_schema_terms.t',
+    't/02_same_word.t',
     't/lib/TestSchema.pm',
+    't/lib/TestSchema/Result/Boxes.pm',
     't/lib/TestSchema/Result/Car.pm',
-    't/lib/TestSchema/Result/Human.pm'
+    't/lib/TestSchema/Result/Human.pm',
+    't/lib/TestSchema/Result/Widget.pm',
+    't/lib/TestSchema2.pm',
+    't/lib/TestSchema2/Result/Moose.pm'
 );
 
 notabs_ok($_) foreach @files;

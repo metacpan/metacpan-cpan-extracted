@@ -1,3 +1,7 @@
+1.0.7  2021-10-27 07:42:33 CEST
+       2021-10-27
+    - (hadfl) transform sibling values before validating
+
 1.0.6  2020-05-10 06:17:19 CEST
     - (hadfl) complete array allow_empty
 

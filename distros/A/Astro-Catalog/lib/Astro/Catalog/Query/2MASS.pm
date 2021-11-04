@@ -6,12 +6,13 @@ Astro::Catalog::Query::2MASS - A query request to the 2MASS Catalog
 
 =head1 SYNOPSIS
 
-  $gsc = new Astro::Catalog::Query::2MASS( RA        => $ra,
-                                         Dec       => $dec,
-                                         Radius    => $radius,
-                                         Nout      => $number_out );
+    $gsc = new Astro::Catalog::Query::2MASS(
+            RA        => $ra,
+            Dec       => $dec,
+            Radius    => $radius,
+            Nout      => $number_out);
 
-  my $catalog = $gsc->querydb();
+    my $catalog = $gsc->querydb();
 
 =head1 WARNING
 
@@ -33,22 +34,17 @@ See L<Astro::Catalog::BaseQuery> for the catalog-independent methods.
 
 =cut
 
-# L O A D   M O D U L E S --------------------------------------------------
-
-use 5.006;
 use strict;
 use warnings;
-use base qw/ Astro::Catalog::Transport::REST /;
-use vars qw/ $VERSION /;
+use base qw/Astro::Catalog::Transport::REST/;
 
 use File::Spec;
 use Carp;
 
-# generic catalog objects
 use Astro::Catalog;
-use Astro::Catalog::Star;
+use Astro::Catalog::Item;
 
-$VERSION = "4.35";
+our $VERSION = '4.36';
 
 =begin __PRIVATE_METHODS__
 
@@ -63,7 +59,7 @@ These methods are for internal use only.
 =cut
 
 sub _default_remote_host {
-  return "vizier.u-strasbg.fr";
+    return "vizier.u-strasbg.fr";
 }
 
 =item B<_default_url_path>
@@ -71,7 +67,7 @@ sub _default_remote_host {
 =cut
 
 sub _default_url_path {
-  return "viz-bin/asu-acl?";
+    return "viz-bin/asu-acl?";
 }
 
 =item B<_get_allowed_options>
@@ -83,16 +79,15 @@ by the remote system (and to be included in the query).
 =cut
 
 sub _get_allowed_options {
-  my $self = shift;
-  return (
-          ra => '-c.ra',
-          dec => '-c.dec',
-          radmax => '-c.rm',
-          nout => '-out.max',
-          catalog => '-source',
-         );
+    my $self = shift;
+    return (
+        ra => '-c.ra',
+        dec => '-c.dec',
+        radmax => '-c.rm',
+        nout => '-out.max',
+        catalog => '-source',
+    );
 }
-
 
 =item B<_get_default_options>
 
@@ -101,18 +96,18 @@ Get the default query state.
 =cut
 
 sub _get_default_options {
-  return (
-          # Internal
-          catalog => '2MASS',
+    return (
+        # Internal
+        catalog => '2MASS',
 
-          # Target information
-          ra => undef,
-          dec => undef,
+        # Target information
+        ra => undef,
+        dec => undef,
 
-          # Limits
-          radmax => 5,
-          nout => 20000,
-         );
+        # Limits
+        radmax => 5,
+        nout => 20000,
+    );
 }
 
 =item B<_parse_query>
@@ -124,88 +119,88 @@ make and parse the results.
 =cut
 
 sub _parse_query {
-  my $self = shift;
+    my $self = shift;
 
-  #print $self->{BUFFER};
-  my $query = new Astro::Catalog( Format  => 'TST',
-                                  Data => $self->{BUFFER},
-                                  Origin  => '2MASS Catalogue',
-                                  ReadOpt => { ra_col => 1, dec_col => 2, id_col => 0 } );
+    my $query = new Astro::Catalog(
+            Format  => 'TST',
+            Data => $self->{BUFFER},
+            Origin  => '2MASS Catalogue',
+            ReadOpt => {ra_col => 1, dec_col => 2, id_col => 0});
 
-  # Grab each star in the catalog and add some value to it
-  my $catalog = new Astro::Catalog( );
-  $catalog->origin( $query->origin() );
-  $catalog->set_coords( $query->get_coords() ) if defined $query->get_coords();
+    # Grab each star in the catalog and add some value to it
+    my $catalog = new Astro::Catalog( );
+    $catalog->origin($query->origin());
+    $catalog->set_coords($query->get_coords()) if defined $query->get_coords();
 
-  my ( @oldstars, @newstars );
-  @oldstars = $query->allstars();
-  foreach my $i ( 0 ... $query->sizeof() ) {
+    my (@oldstars, @newstars);
+    @oldstars = $query->allstars();
+    foreach my $i (0 ... $query->sizeof()) {
+        my $star = $oldstars[$i];
 
-    my $star = $oldstars[$i];
+        # Ungodly hack warning...
+        # -----------------------
+        # We have J, H and K magnitudes, we probably also want some
+        # colours, so lets generate some here and push it into the
+        # star object. This is 2MASS specific so goes here, but in
+        # reality we probably want something general in Star.pm which
+        # dynamically generates colours and errors depending on the
+        # stored magnitudes.
 
-    # Ungodly hack warning...
-    # -----------------------
-    # We have J, H and K magnitudes, we probably also want some
-    # colours, so lets generate some here and push it into the
-    # star object. This is 2MASS specific so goes here, but in
-    # reality we probably want something general in Star.pm which
-    # dynamically generates colours and errors depending on the
-    # stored magnitudes.
+        # generate the colours
+        my $j_minus_h = $star->get_magnitude('J') -
+            $star->get_magnitude('H') if defined $star;
 
-    # generate the colours
-    my $j_minus_h = $star->get_magnitude( 'J' ) -
-                    $star->get_magnitude( 'H' ) if defined $star;
+        my $j_minus_k = $star->get_magnitude('J') -
+            $star->get_magnitude('K') if defined $star;
 
-    my $j_minus_k = $star->get_magnitude( 'J' ) -
-                    $star->get_magnitude( 'K' ) if defined $star;
+        my $h_minus_k = $star->get_magnitude('H') -
+            $star->get_magnitude('K') if defined $star;
 
-    my $h_minus_k = $star->get_magnitude( 'H' ) -
-                    $star->get_magnitude( 'K' ) if defined $star;
+        # generate the deltas
+        my $delta_j = $star->get_errors('J') if defined $star;
+        my $delta_h = $star->get_errors('H') if defined $star;
+        my $delta_k = $star->get_errors('K') if defined $star;
 
-    # generate the deltas
-    my $delta_j = $star->get_errors( 'J' ) if defined $star;
-    my $delta_h = $star->get_errors( 'H' ) if defined $star;
-    my $delta_k = $star->get_errors( 'K' ) if defined $star;
+        # quick kludge, stars without errors will get flagged bad anyway
+        $delta_j = 0.000 unless defined $delta_j;
+        $delta_h = 0.000 unless defined $delta_h;
+        $delta_k = 0.000 unless defined $delta_k;
 
-    # quick kludge, stars without errors will get flagged bad anyway
-    $delta_j = 0.000 unless defined $delta_j;
-    $delta_h = 0.000 unless defined $delta_h;
-    $delta_k = 0.000 unless defined $delta_k;
+        my $delta_jmh = (($delta_j ** 2.0) + ($delta_h ** 2.0)) ** (1.0 / 2.0);
+        my $delta_jmk = (($delta_j ** 2.0) + ($delta_k ** 2.0)) ** (1.0 / 2.0);
+        my $delta_hmk = (($delta_h ** 2.0) + ($delta_k ** 2.0)) ** (1.0 / 2.0);
 
-    my $delta_jmh = ( ( $delta_j ** 2.0 ) + ( $delta_h ** 2.0 ) ) ** (1.0/2.0);
-    my $delta_jmk = ( ( $delta_j ** 2.0 ) + ( $delta_k ** 2.0 ) ) ** (1.0/2.0);
-    my $delta_hmk = ( ( $delta_h ** 2.0 ) + ( $delta_k ** 2.0 ) ) ** (1.0/2.0);
+        # fudge accuracy for readable catalogues
+        $j_minus_h = sprintf("%.4f", $j_minus_h) if defined $star;
+        $j_minus_k = sprintf("%.4f", $j_minus_k) if defined $star;
+        $h_minus_k = sprintf("%.4f", $h_minus_k) if defined $star;
+        $delta_jmh = sprintf("%.4f", $delta_jmh) if defined $star;
+        $delta_jmk = sprintf("%.4f", $delta_jmk) if defined $star;
+        $delta_hmk = sprintf("%.4f", $delta_hmk) if defined $star;
 
-    # fudge accuracy for readable catalogues
-    $j_minus_h = sprintf("%.4f", $j_minus_h ) if defined $star;
-    $j_minus_k = sprintf("%.4f", $j_minus_k ) if defined $star;
-    $h_minus_k = sprintf("%.4f", $h_minus_k ) if defined $star;
-    $delta_jmh = sprintf("%.4f", $delta_jmh ) if defined $star;
-    $delta_jmk = sprintf("%.4f", $delta_jmk ) if defined $star;
-    $delta_hmk = sprintf("%.4f", $delta_hmk ) if defined $star;
+        # generate the hashes
+        my %colours = (
+                'J-H' => $j_minus_h,
+                'J-K' => $j_minus_k,
+                'H-K' => $h_minus_k) if defined $star;
 
-    # generate the hashes
-    my %colours = ( 'J-H' => $j_minus_h,
-                    'J-K' => $j_minus_k,
-                    'H-K' => $h_minus_k ) if defined $star;
+        my %col_errors = (
+                'J-H' => $delta_jmh,
+                'J-K' => $delta_jmk,
+                'H-K' => $delta_hmk) if defined $star;
 
-    my %col_errors = ( 'J-H' => $delta_jmh,
-                       'J-K' => $delta_jmk,
-                       'H-K' => $delta_hmk ) if defined $star;
+        # append to star object
+        $star->colours(\%colours) if defined $star;
+        $star->colerr(\%col_errors) if defined $star;
 
-    # append to star object
-    $star->colours( \%colours ) if defined $star;
-    $star->colerr( \%col_errors ) if defined $star;
+        $newstars[$i] = $star if defined $star;
 
-    $newstars[$i] = $star if defined $star;
+    }
+    $catalog->pushstar( @newstars );
 
-  }
-  $catalog->pushstar( @newstars );
-
-  # return the modified catalogue
-  return $catalog;
+    # return the modified catalogue
+    return $catalog;
 }
-
 
 =back
 
@@ -216,8 +211,8 @@ the form required for a query to a remote server. Methods for converting
 from the internal representation to the external query format are
 provided in the form of _from_$opt. ie:
 
-  ($outkey, $outvalue) = $q->_from_ra();
-  ($outkey, $outvalue) = $q->_from_object();
+    ($outkey, $outvalue) = $q->_from_ra();
+    ($outkey, $outvalue) = $q->_from_object();
 
 The base class only includes one to one mappings.
 
@@ -229,7 +224,7 @@ Return a list of internal options (as defined in C<_get_allowed_options>)
 that are known to support a one-to-one mapping of the internal value
 to the external value.
 
-  %one = $q->_translate_one_to_one();
+    %one = $q->_translate_one_to_one();
 
 Returns a hash with keys and no values (this makes it easy to
 check for the option).
@@ -239,14 +234,18 @@ This method also returns, the values from the parent class.
 =cut
 
 sub _translate_one_to_one {
-  my $self = shift;
-  # convert to a hash-list
-  return ($self->SUPER::_translate_one_to_one,
-          map { $_, undef }(qw/
-                            catalog
-                            /)
-         );
+    my $self = shift;
+    # convert to a hash-list
+    return ($self->SUPER::_translate_one_to_one,
+            map { $_, undef }(qw/
+                catalog
+                /)
+           );
 }
+
+1;
+
+__END__
 
 =back
 
@@ -268,7 +267,3 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 Tim Jenness E<lt>tjenness@cpan.orgE<gt>
 
 =cut
-
-# L A S T  O R D E R S ------------------------------------------------------
-
-1;

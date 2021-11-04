@@ -275,10 +275,14 @@ sub add_proximity_and_sort {
 	$_->{proximity_corrected} = $_->{proximity} * _random_correction();
 	$_->{proximity_corrected} *= _between_country_correction($country_code, $_->{country}) if $best;
 	$_->{proximity_corrected} *= _between_continent_correction($best->{continent}, $_->{continent}) if $best;
+	$_->{proximity_corrected} *= _protocol_correction($_->{url});
     }
-    # prefer http mirrors by sorting them to the beginning
-    @$mirrors = sort { ($b->{url} =~ m!^http://!) <=> ($a->{url} =~ m!^http://!)
-		       || $a->{proximity_corrected} <=> $b->{proximity_corrected} } @$mirrors;
+
+    @$mirrors = sort { $a->{proximity_corrected} <=> $b->{proximity_corrected} } @$mirrors;
+
+    #foreach (@$mirrors) {
+    #	    print $_->{proximity_corrected} . " " . $_->{proximity}  . " " . $_->{url} . "\n";
+    #}
 }
 
 # add +/- 5% random
@@ -292,12 +296,22 @@ sub _between_country_correction {
     $here && $mirror or return 1;
     $here eq $mirror ? 0.5 : 1;
 }
+
 sub _between_continent_correction {
     my ($here, $mirror) = @_;
     $here && $mirror or return 1;
     $here eq $mirror ? 0.5 : # favor same continent
       $here eq 'SA' && $mirror eq 'NA' ? 0.9 : # favor going "South America" -> "North America"
 	1;
+}
+
+sub _protocol_correction {
+    my ($url) = @_;
+    # favor encrypted protocols, then http
+    ( $url =~ m!https://! ) and return 0.7;
+    ( $url =~ m!ftps://! ) and return 0.8;
+    ( $url =~ m!http://! ) and return 0.9;
+    1;
 }
 
 sub _mirrors_raw {
@@ -324,15 +338,15 @@ sub _mageia_mirrorlist {
     my ($product_id, $o_arch) = @_;
 
     #- contact the following URL to retrieve the list of mirrors.
-    #- http://wiki.mandriva.com/en/Product_id
+    #- https://wiki.mageia.org/en/Product_id
     my $_product_type = lc($product_id->{type}); $product_id =~ s/\s//g;
     my $arch = $o_arch || $product_id->{arch};
 
     my @para = grep { $_ } $ENV{URPMI_ADDMEDIA_REASON};
     my $product_version = $ENV{URPMI_ADDMEDIA_PRODUCT_VERSION} || $product_id->{version};
 
-    #"http://mirrors.mageia.org/api/$product_type.$product_version.$arch.list"
-    "http://mirrors.mageia.org/api/mageia.$product_version.$arch.list"
+    #"https://mirrors.mageia.org/api/$product_type.$product_version.$arch.list"
+    "https://mirrors.mageia.org/api/mageia.$product_version.$arch.list"
       . (@para ? '?' . join('&', @para) : '');
 }
 

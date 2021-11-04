@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::EdtTaxDetail;
-$Shipment::FedEx::WSDL::RateTypes::EdtTaxDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::EdtTaxDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               Formula
               Amount
 
-              )
+            )
         ],
         {   'TaxType'       => \%TaxType_of,
             'EffectiveDate' => \%EffectiveDate_of,
@@ -86,7 +86,7 @@ Shipment::FedEx::WSDL::RateTypes::EdtTaxDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

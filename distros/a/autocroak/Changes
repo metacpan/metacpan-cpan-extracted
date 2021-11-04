@@ -1,4 +1,8 @@
 Revision history for autocroak
 
+0.002     2021-10-29 14:43:43+02:00 Europe/Amsterdam
+          - Fix locale handling on perls before 5.26
+          - Allow systems without WIFEXIT (e.g. Windows)
+
 0.001     2021-09-30 00:25:34+02:00 Europe/Amsterdam
           Initial release to an unsuspecting world

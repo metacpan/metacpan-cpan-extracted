@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification;
-$Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -47,12 +47,12 @@ Class::Std::initialize();
               Op900Detail
               FreightAddressLabelDetail
 
-              )
+            )
         ],
-        {   'ShippingDocumentTypes'       => \%ShippingDocumentTypes_of,
-            'CertificateOfOrigin'         => \%CertificateOfOrigin_of,
-            'CommercialInvoiceDetail'     => \%CommercialInvoiceDetail_of,
-            'CustomPackageDocumentDetail' => \%CustomPackageDocumentDetail_of,
+        {   'ShippingDocumentTypes'        => \%ShippingDocumentTypes_of,
+            'CertificateOfOrigin'          => \%CertificateOfOrigin_of,
+            'CommercialInvoiceDetail'      => \%CommercialInvoiceDetail_of,
+            'CustomPackageDocumentDetail'  => \%CustomPackageDocumentDetail_of,
             'CustomShipmentDocumentDetail' =>
               \%CustomShipmentDocumentDetail_of,
             'GeneralAgencyAgreementDetail' =>
@@ -82,12 +82,12 @@ Class::Std::initialize();
         },
         {
 
-            'ShippingDocumentTypes'        => 'ShippingDocumentTypes',
-            'CertificateOfOrigin'          => 'CertificateOfOrigin',
-            'CommercialInvoiceDetail'      => 'CommercialInvoiceDetail',
-            'CustomPackageDocumentDetail'  => 'CustomPackageDocumentDetail',
-            'CustomShipmentDocumentDetail' => 'CustomShipmentDocumentDetail',
-            'GeneralAgencyAgreementDetail' => 'GeneralAgencyAgreementDetail',
+            'ShippingDocumentTypes'          => 'ShippingDocumentTypes',
+            'CertificateOfOrigin'            => 'CertificateOfOrigin',
+            'CommercialInvoiceDetail'        => 'CommercialInvoiceDetail',
+            'CustomPackageDocumentDetail'    => 'CustomPackageDocumentDetail',
+            'CustomShipmentDocumentDetail'   => 'CustomShipmentDocumentDetail',
+            'GeneralAgencyAgreementDetail'   => 'GeneralAgencyAgreementDetail',
             'NaftaCertificateOfOriginDetail' =>
               'NaftaCertificateOfOriginDetail',
             'Op900Detail'               => 'Op900Detail',
@@ -112,7 +112,7 @@ Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

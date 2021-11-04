@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ShipToRequestType;
-$Shipment::UPS::WSDL::TrackTypes::ShipToRequestType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::ShipToRequestType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        Address
 
-              )
+            )
         ],
         {'Address' => \%Address_of,},
         {'Address' => 'Shipment::UPS::WSDL::TrackTypes::AddressRequestType',},
@@ -54,7 +54,7 @@ Shipment::UPS::WSDL::TrackTypes::ShipToRequestType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

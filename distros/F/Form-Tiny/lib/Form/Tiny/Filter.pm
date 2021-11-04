@@ -1,13 +1,14 @@
 package Form::Tiny::Filter;
 
 use v5.10;
+use strict;
 use warnings;
 use Moo;
 use Types::Standard qw(HasMethods CodeRef Maybe Str);
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 has "type" => (
 	is => "ro",
@@ -17,7 +18,7 @@ has "type" => (
 
 has 'field' => (
 	is => 'ro',
-	isa => Maybe[Str],
+	isa => Maybe [Str],
 	default => sub { undef },
 );
 
@@ -36,10 +37,10 @@ sub check_field
 
 sub filter
 {
-	my ($self, $value) = @_;
+	my ($self, $value, @params) = @_;
 
 	if ($self->type->check($value)) {
-		return $self->code->($value);
+		return $self->code->(@params, $value);
 	}
 
 	return $value;
@@ -92,6 +93,8 @@ Accepts a single string, which is a name of a field. Returns a boolean value, wh
 
 =head2 filter
 
-Accepts a single scalar, checks if it matches the type and runs the code reference with it as an argument.
+	$filtered = $filter->filter($filtered, @more_params);
+
+Accepts a single scalar, checks if it matches the type and runs the code reference with it as an argument. Can accept more parameters, which will be inserted before the value in the subroutine call (the value is always the last parameter to the coderef).
 
 The return value is the scalar value, either changed or unchanged.

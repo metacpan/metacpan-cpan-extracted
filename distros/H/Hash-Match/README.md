@@ -4,7 +4,7 @@ Hash::Match - match contents of a hash against rules
 
 # VERSION
 
-version v0.7.0
+version v0.7.1
 
 # SYNOPSIS
 
@@ -102,7 +102,7 @@ You can specify more complex rules using special key names:
 
     ```perl
     {
-      -any => $rules,
+      -notany => $rules,
     }
     ```
 

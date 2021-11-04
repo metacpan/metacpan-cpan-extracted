@@ -1,5 +1,5 @@
 package CHI;
-$CHI::VERSION = '0.60';
+$CHI::VERSION = '0.61';
 use 5.006;
 use Carp;
 use CHI::Stats;
@@ -175,7 +175,7 @@ CHI - Unified cache handling interface
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -268,7 +268,7 @@ Optional logging and statistics collection of cache activity
 
 =head1 CONSTRUCTOR
 
-To create a new cache object, call C<<CHI-E<gt>new>. It takes the common
+To create a new cache object, call C<CHI-E<gt>new>. It takes the common
 options listed below. I<driver> is required; all others are optional.
 
 Some drivers will take additional constructor options. For example, the File
@@ -432,7 +432,7 @@ serialized; plain scalars will be placed in the cache as-is.
 If this is a string, a L<Data::Serializer|Data::Serializer> object will be
 created, with the string passed as the 'serializer' option and raw=1. Common
 options include 'Storable', 'Data::Dumper', and 'YAML'. If this is a hashref,
-L<Data::Serializer|Data::Serializer-E<gt>new> will be called with the hash. You
+L<Data::Serializer-E<gt>new|Data::Serializer> will be called with the hash. You
 will need to ensure Data::Serializer is installed to use these options.
 
 Otherwise, this must be a L<Data::Serializer|Data::Serializer> object or
@@ -1543,7 +1543,7 @@ Jonathan Swartz <swartz@pobox.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Jonathan Swartz.
+This software is copyright (c) 2021 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

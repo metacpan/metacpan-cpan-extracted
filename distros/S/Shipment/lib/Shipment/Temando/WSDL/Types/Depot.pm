@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Depot;
-$Shipment::Temando::WSDL::Types::Depot::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Depot::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -51,7 +51,7 @@ Class::Std::initialize();
               fax
               instructions
 
-              )
+            )
         ],
         {   'name'         => \%name_of,
             'street'       => \%street_of,
@@ -65,16 +65,16 @@ Class::Std::initialize();
             'fax'          => \%fax_of,
             'instructions' => \%instructions_of,
         },
-        {   'name'    => 'Shipment::Temando::WSDL::Types::DepotName',
-            'street'  => 'Shipment::Temando::WSDL::Types::Address',
-            'suburb'  => 'Shipment::Temando::WSDL::Types::Suburb',
-            'city'    => 'Shipment::Temando::WSDL::Types::City',
-            'state'   => 'Shipment::Temando::WSDL::Types::State',
-            'code'    => 'Shipment::Temando::WSDL::Types::PostalCode',
-            'country' => 'Shipment::Temando::WSDL::Types::CountryCode',
-            'phone1'  => 'Shipment::Temando::WSDL::Types::Phone',
-            'phone2'  => 'Shipment::Temando::WSDL::Types::Phone',
-            'fax'     => 'Shipment::Temando::WSDL::Types::Fax',
+        {   'name'         => 'Shipment::Temando::WSDL::Types::DepotName',
+            'street'       => 'Shipment::Temando::WSDL::Types::Address',
+            'suburb'       => 'Shipment::Temando::WSDL::Types::Suburb',
+            'city'         => 'Shipment::Temando::WSDL::Types::City',
+            'state'        => 'Shipment::Temando::WSDL::Types::State',
+            'code'         => 'Shipment::Temando::WSDL::Types::PostalCode',
+            'country'      => 'Shipment::Temando::WSDL::Types::CountryCode',
+            'phone1'       => 'Shipment::Temando::WSDL::Types::Phone',
+            'phone2'       => 'Shipment::Temando::WSDL::Types::Phone',
+            'fax'          => 'Shipment::Temando::WSDL::Types::Fax',
             'instructions' =>
               'Shipment::Temando::WSDL::Types::DepotInstructions',
         },
@@ -111,7 +111,7 @@ Shipment::Temando::WSDL::Types::Depot
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

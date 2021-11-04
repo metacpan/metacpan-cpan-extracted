@@ -97,7 +97,7 @@ Kinyarwanda locale.
   Gashyantare
   Werurwe
   Mata
-  Gicuransi
+  Gicurasi
   Kamena
   Nyakanga
   Kanama
@@ -143,7 +143,7 @@ Kinyarwanda locale.
   Gashyantare
   Werurwe
   Mata
-  Gicuransi
+  Gicurasi
   Kamena
   Nyakanga
   Kanama
@@ -416,6 +416,12 @@ Kinyarwanda locale.
    2008-02-05T18:30:30 = CE 2008 gas. 5
    1995-12-22T09:05:02 = CE 1995 uku. 22
   -0010-09-15T04:44:23 = BCE -10 nze. 15
+
+=head3 GyMd (GGGGG y-MM-dd)
+
+   2008-02-05T18:30:30 = CE 2008-02-05
+   1995-12-22T09:05:02 = CE 1995-12-22
+  -0010-09-15T04:44:23 = BCE -10-09-15
 
 =head3 H (HH)
 

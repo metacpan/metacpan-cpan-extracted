@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ValidateCityPostalCodeZipResponseContainer;
-$Shipment::Purolator::WSDL::Types::ValidateCityPostalCodeZipResponseContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ValidateCityPostalCodeZipResponseContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
         [   qw(        ResponseInformation
               SuggestedAddresses
 
-              )
+            )
         ],
         {   'ResponseInformation' => \%ResponseInformation_of,
             'SuggestedAddresses'  => \%SuggestedAddresses_of,
@@ -67,7 +67,7 @@ Shipment::Purolator::WSDL::Types::ValidateCityPostalCodeZipResponseContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.1.5
+## Version v0.1.8
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/08/08
+## Modified 2021/10/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,9 +17,10 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
+    use version;
     use parent qw( Module::Generic );
     use Data::UUID ();
-    use Fcntl qw( :DEFAULT :flock );
+    use Fcntl qw( :DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END );
     use File::Copy ();
     use File::Glob ();
     use File::Spec ();
@@ -35,11 +36,12 @@ BEGIN
     # Export Fcntl O_* constants for convenience
     our @EXPORT = grep( /^O_/, keys( %Fcntl:: ) );
     use overload (
-        q{""}    => sub    { $_[0]->filename },
-        bool     => sub () { 1 },
+        q{""}    => sub{ $_[0]->filename },
+        bool     => sub{ 1 },
         fallback => 1,
     );
-    our $VERSION = 'v0.1.5';
+    use constant HAS_PERLIO_MMAP => ( version->parse($]) >= version->parse('v5.16.0') ? 1 : 0 );
+    our $VERSION = 'v0.1.8';
     ## https://en.wikipedia.org/wiki/Path_(computing)
     ## perlport
     our $OS2SEP  =
@@ -99,6 +101,9 @@ BEGIN
     };
     our $DIR_SEP = $OS2SEP->{ lc( $^O ) };
     our $MODE_BITS = {};
+    our $DEFAULT_MMAP_SIZE = 10240;
+    # Default to use PerlIO mmap layer if possible
+    our $MMAP_USE_FILE_MAP = 0;
 };
 
 INIT
@@ -113,6 +118,8 @@ INIT
     my $m = 0;
     $MODE_BITS->{ $_ } = ( 1 << $m++ ) for( qw( ox ow or gx gw gr ux uw ur ) );
 };
+
+my $FILES_TO_REMOVE = {};
 
 sub init
 {
@@ -141,6 +148,7 @@ sub init
     # directory or file. This is instrumental in playing with paths before applying them to
     # the filesystem
     $self->{type}           = '';
+    $self->{use_file_map}   = $MMAP_USE_FILE_MAP unless( CORE::exists( $self->{use_file_map} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{_handle}        = '';
@@ -176,6 +184,8 @@ sub init
         $self->{base_dir} = $base_dir;
     }
     $file = $self->filename( $file ) || return( $self->pass_error );
+    # Idea borrowed from File::Temp
+    $FILES_TO_REMOVE->{ $$ }->{ $file } = 1 if( $self->{auto_remove} );
     $self->{_orig} = [CORE::caller(1)];
     return( $self );
 }
@@ -223,15 +233,15 @@ sub append
                 if( $self->can_read )
                 {
                     $pos = $io->tell;
+                    $io->seek(0, 2);
                 }
-                $io->seek(0, 2);
             }
             else
             {
                 $io = $self->open( $opts->{mode}, @_ ) || return( $self->pass_error );
             }
             $io->print( ref( $data ) ? $$data : $data ) ||
-                return( $self->error( "Unable to write ", length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) );
+                return( $self->error( "Unable to write ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) );
             if( $opened )
             {
                 if( defined( $pos ) )
@@ -246,15 +256,48 @@ sub append
         }
         catch( $e )
         {
-            return( $self->error( "An unexpected error occured while trying to append ", length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $e" ) );
+            return( $self->error( "An unexpected error occured while trying to append ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $e" ) );
         }
     }
     return( $self );
 }
 
-sub auto_remove { return( shift->_set_get_boolean( 'auto_remove', @_ ) ); }
+# sub auto_remove { return( shift->_set_get_boolean( 'auto_remove', @_ ) ); }
+sub auto_remove
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $v = $self->_set_get_boolean( 'auto_remove', @_ );
+        $FILES_TO_REMOVE->{ $$ } = {} if( !exists( $FILES_TO_REMOVE->{ $$ } ) );
+        my $file = $self->filename;
+        if( $v )
+        {
+            $FILES_TO_REMOVE->{ $$ }->{ $file } = 1;
+        }
+        else
+        {
+            CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
+        }
+    }
+    return( $self->_set_get_boolean( 'auto_remove' ) );
+}
 
-sub autoflush { return( shift->_set_get_boolean( 'autoflush', @_ ) ); }
+sub autoflush
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $v = $self->_set_get_boolean( 'autoflush', @_ );
+        my $fh = $self->opened;
+        if( $fh && !$self->is_dir )
+        {
+            $fh->autoflush( $v );
+        }
+        return( $v );
+    }
+    return( $self->_set_get_boolean( 'autoflush' ) );
+}
 
 sub base_dir { return( shift->_make_abs( 'base_dir', @_ ) ); }
 
@@ -313,6 +356,8 @@ sub baseinfo
 sub basename { return( scalar( shift->baseinfo( @_ ) ) ); }
 
 sub binmode { return( shift->_filehandle_method( 'binmode', 'file', @_ ) ); }
+
+sub blocking { return( shift->_filehandle_method( 'blocking', 'file', @_ ) ); }
 
 sub can_append
 {
@@ -454,7 +499,8 @@ sub child
         }
     }
     $new = File::Spec->catpath( $vol, $path, $file );
-    return( $self->new( $new ) );
+    # We do not resolve the overall file path, because the user may depend on what he/she provided us initially, or here as a child
+    return( $self->new( $new, { resolved => 1 } ) );
 }
 
 sub chmod
@@ -626,7 +672,7 @@ sub collapse_dots
     }
     
     ## -1 is used to ensure trailing blank entries do not get removed
-    my @segments = split( "\Q$sep\E", $path, -1 );
+    my @segments = CORE::split( "\Q$sep\E", $path, -1 );
     $self->message( 3, "Found ", scalar( @segments ), " segments: ", sub{ $self->dump( \@segments ) } );
     for( my $i = 0; $i < scalar( @segments ); $i++ )
     {
@@ -646,7 +692,7 @@ sub collapse_dots
         }
     }
     ## Finally, the output buffer is returned as the result of remove_dot_segments.
-    my $new_path = join( $sep, @new );
+    my $new_path = CORE::join( $sep, @new );
     # substr( $new_path, 0, 0 ) = $sep unless( substr( $new_path, 0, 1 ) eq '/' );
     substr( $new_path, 0, 0 ) = $sep unless( File::Spec->file_name_is_absolute( $new_path ) );
     $self->message( 4, "Adding back new path '$new_path' to uri '$u'." );
@@ -740,6 +786,23 @@ sub content
         return( $self->error( "An unexpected error has occurred while trying to get the content for \"${file}\": $e" ) );
     }
     return( $a );
+}
+
+sub content_objects
+{
+    my $self = shift( @_ );
+    return( $self->error( "This method \"content_objects\" can only be used on directories." ) ) if( !$self->is_dir );
+    my $ref = $self->content;
+    return( $self->error( "Array provided is not an array reference or an array object." ) ) if( !$self->_is_array( $ref ) );
+    unless( $self->_is_a( $ref, 'Module::Generic::Array' ) )
+    {
+        $ref = $self->new_array( $ref ) || return( $self->pass_error );
+    }
+    my $new = $ref->map(sub
+    {
+        return( $self->new( $_ ) );
+    });
+    return( $new );
 }
 
 sub copy { return( shift->_move_or_copy( copy => @_ ) ); }
@@ -867,6 +930,8 @@ sub empty
     return( $self );
 }
 
+sub eof { return( shift->_filehandle_method( 'eof', 'file', @_ ) ); }
+
 sub exists { return( shift->finfo->exists ); }
 
 sub extension
@@ -898,6 +963,10 @@ sub extension
         return( $self->new_scalar( $ext ) );
     }
 }
+
+sub fcntl { return( shift->_filehandle_method( 'fcntl', 'file', @_ ) ); }
+
+sub fdopen { return( shift->_filehandle_method( 'fdopen', 'file', @_ ) ); }
 
 sub file
 {
@@ -942,7 +1011,7 @@ sub file
         }
         else
         {
-            return( $_[0]->error( "Unknown set of parameters: '", join( "', '", @_ ), "'." ) );
+            return( $_[0]->error( "Unknown set of parameters: '", CORE::join( "', '", @_ ), "'." ) );
         }
     }
     else
@@ -1108,7 +1177,17 @@ sub flatten
     return( $self->new( $self->collapse_dots( "$path", { separator => $DIR_SEP } )->file( $^O ) ) );
 }
 
+sub flush { return( shift->_filehandle_method( 'flush', 'file', @_ ) ); }
+
+sub format_write { return( shift->_filehandle_method( 'format_write', 'file', @_ ) ); }
+
 sub fragments { return( shift->split( remove_leading_sep => 1 ) ); }
+
+sub getc { return( shift->_filehandle_method( 'getc', 'file', @_ ) ); }
+
+sub getline { return( shift->_filehandle_method( 'getline', 'file', @_ ) ); }
+
+sub getlines { return( shift->_filehandle_method( 'getlines', 'file', @_ ) ); }
 
 sub gobble { return( shift->load( @_ ) ); }
 
@@ -1122,6 +1201,8 @@ sub handle
     $opened = $self->open( @_ ) || return( $self->pass_error );
     return( $opened );
 }
+
+sub ioctl { return( shift->_filehandle_method( 'ioctl', 'file', @_ ) ); }
 
 sub is_absolute { return( File::Spec->file_name_is_absolute( shift->filepath ) ); }
 
@@ -1303,18 +1384,33 @@ sub load
             return( $self->error( "Unable to open file \"$file\" in read mode: $!" ) );
         }
         $fh->binmode( ":${binmode}" ) if( CORE::length( $binmode ) );
+        my $pos;
+        if( $self->can_read )
+        {
+            $pos = $fh->tell;
+            $self->message( 3, "File can be read. Current position is '$pos'" );
+            # Move at the beginning of the file
+            $fh->seek(0, 0);
+        }
         my $size;
+        my $buf;
         if( $binmode eq ':unix' && ( $size = -s( $fh ) ) )
         {
-            my $buf;
             $fh->read( $buf, $size );
             return( $buf );
         }
         else
         {
             local $/;
-            return( scalar( <$fh> ) );
+            $buf = scalar( <$fh> );
         }
+        if( defined( $pos ) )
+        {
+            # Restore cursor position in file
+            $fh->seek( $pos, 0 );
+        }
+        $self->message( 3, "Returning ", CORE::length( $buf // '' ), " bytes of data." );
+        return( $buf );
     }
     catch( $e )
     {
@@ -1465,7 +1561,7 @@ sub mkpath
                     my $before = URI::file->new( $current_path )->file( $^O );
                     my $after  = URI::file->new( $actual )->abs( $before )->file( $^O );
                     $params->{recurse}++;
-                    return( $process->( $after, $params ) );
+                    $process->( $after, $params );
                 }
                 catch( $e )
                 {
@@ -1489,6 +1585,184 @@ sub mkpath
         $new->push( $o );
     }
     return( $new );
+}
+
+# $self->mmap( my $var, 8196, '+<' );
+# $self->mmap( my $var, 8196 );
+# Use the size of $var
+# $self->mmap( my $var );
+# Ref: <https://www.man7.org/linux/man-pages/man2/mmap.2.html>
+sub mmap
+{
+    my $self = shift( @_ );
+    return( $self->error( "\$file->mmap( my \$variable ); or \$file->mmap( my \$variable, '+>' );" ) ) if( @_ < 1 || @_ > 3 );
+    my $file = $self->filename || return( $self->error( "There is no file associated with this object!" ) );
+    # Make sure the file exists
+    $self->touch unless( $self->exists );
+    my $opened;
+    my $fh = $opened = $self->opened;
+    if( !$fh )
+    {
+        $fh = $self->open( '+<' ) || return( $self->pass_error );
+    }
+    my $has_size = ( @_ >= 2 ? 1 : 0 );
+    my $var_size = CORE::length( $_[0] // '' );
+    my $size = (
+        @_ >= 2
+            ? $_[1]
+            : ( CORE::defined( $_[0] ) && CORE::length( $_[0] ) )
+                ? CORE::length( $_[0] ) 
+                : $DEFAULT_MMAP_SIZE
+    );
+    return( $self->error( "mmap size is set to 0, which is not possible." ) ) if( !$size );
+    $self->message( 3, "Variable provided is ", CORE::length( $_[0] // '' ), " bytes big ($_[0])." );
+    my $mode = ( @_ == 3 ? $_[2] : '+<' );
+    my $ok_modes = [qw( > +> >> +>> < +< )];
+    my $map =
+    {
+    'r'  => '<',
+    'r+' => '+<',
+    'w'  => '>',
+    'w+' => '+>',
+    'a'  => '>>',
+    'a+' => '+>>',
+    };
+    # File::Map does not recognise the mode with letters
+    $mode = $map->{ lc( $mode ) } if( CORE::exists( $map->{ lc( $mode ) } ) );
+    
+    if( !scalar( grep( $_ eq $mode, @$ok_modes ) ) )
+    {
+        return( $self->error( "Unsupported file mode '$mode'" ) );
+    }
+    elsif( $mode eq '>' || $mode eq '+>' || $mode eq '>>' || $mode eq '+>>' )
+    {
+        warnings::warn( "Do not use mode '", ( $_[2] || $mode ), "', this will not work as you would expect. Alway prefer < for read-only or +< for read-write\n" ) if( warnings::enabled() );
+    }
+    elsif( !HAS_PERLIO_MMAP && $mode =~ /^([\<\>\+]+)[[:blank:]\h]*\:encoding\([[:blank:]\h]*utf\-?8[[:blank:]\h]*\)$/i )
+    {
+        $mode = "${1}:utf8";
+        warnings::warn( "Use of utf8 encoding is supported by File::Map, but result is unknown\n" ) if( warnings::enabled() );
+    }
+    elsif( !HAS_PERLIO_MMAP && $mode =~ /\:(\w+)\([^\)]+\)/ )
+    {
+        return( $self->error( "You cannot use encoding $1 with File::Map. Encoding do not work with File::Map" ) );
+    }
+    
+    $self->message( 3, "mode is '$mode' and can write ? ", ( $self->can_write ? 'yes' : 'no' ) );
+    $self->autoflush(1);
+    # If we can write to file, we ensure the file has the same size as the one specified,
+    # or else File::Map would issue an exception.
+    # Afterward, when there is changes, it is ok for the data to be smaller
+    if( $self->can_write )
+    {
+        if( $mode eq '>' || $mode eq '+>' || $mode eq '+<' || $mode eq '>>' )
+        {
+            my $fsize = $self->length;
+            # Need to fill the file with the required allocation
+            $self->message( 3, "Is required size '$size' > file size '$fsize' ?" );
+            # No size argument was provided, so the size was guessed from the variable length
+            # There is no prefix to the data
+            if( !$has_size && $var_size )
+            {
+                # Position at beginning of file
+                $self->seek( 0, SEEK_SET ) || return( $self->pass_error );
+                $self->message( 3, "Filling file with the value of the variable which is $size bytes of data" );
+                $self->print( $_[0] ) || return( $self->pass_error );
+                $self->truncate( $self->tell ) || return( $self->error( "Unable to truncate the file: $!" ) );
+                $self->seek( 0, SEEK_SET ) || return( $self->pass_error );
+            }
+            else
+            {
+                if( $var_size && $var_size > $size )
+                {
+                    return( $self->error( "The mmap size specified ($size) is lower than the size of the variable provided ($var_size)." ) );
+                }
+                elsif( !$var_size && $size < $fsize )
+                {
+                    return( $self->error( "File already contain $fsize bytes of data, but required size ($size) is smaller than current content. You need to either set the required size to $fsize or empty or adjust the file content beforehand." ) );
+                }
+                
+                if( $var_size )
+                {
+                    # Position at beginning of file
+                    $self->seek( 0, SEEK_SET ) || return( $self->pass_error );
+                    $self->print( $_[0] . ( ( $size - $var_size ) x "\000" ) ) || return( $self->pass_error );
+                    # Cut everything after
+                    $self->truncate( $self->tell ) || return( $self->error( "Unable to truncate the file: $!" ) );
+                    $self->seek( 0, SEEK_SET ) || return( $self->pass_error );
+                }
+                else
+                {
+                    # Current file size is smaller than our required size, so we expand it with nulls
+                    if( $size > $fsize )
+                    {
+                        # So we know how much to grab to return content initially
+                        $var_size = $fsize;
+                        # Position ourself
+                        $self->seek( 0, SEEK_END ) || return( $self->pass_error );
+                        $self->print( "\000" x ( $size - $fsize ) ) || return( $self->pass_error );
+                        $self->seek( 0, SEEK_SET ) || return( $self->pass_error );
+                    }
+                    elsif( $size == $fsize )
+                    {
+                        $var_size = $fsize;
+                    }
+                    else
+                    {
+                        return( $self->error( "File already contain $fsize bytes of data, but required size ($size) is smaller than current content. You need to either set the required size to $fsize or empty or adjust the file content beforehand." ) );
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        $self->message( 3, "Cannot write to file '$file'" );
+        my $fsize = $file->length;
+        if( $size > $fsize )
+        {
+            $self->message( 3, "Required size is $size but file size is smaller with $fsize bytes, and I do not have permission to write to it to fill the gap necessary for File::Map to work." );
+            warnings::warn( "Required size is $size but file size is smaller with $fsize bytes, and I do not have permission to write to it to fill the gap necessary for File::Map to work.\n" ) if( warnings::enabled() );
+        }
+    }
+    # If it was not initially opened, close it now
+    # If the user had opened it, he/she will receive an error that he/she needs to close it first and that's ok for he/she to receive this error
+    $self->close if( !$opened );
+    
+    $self->message( 3, "mmmapping using file '$file' with mode '$mode'" );
+    if( HAS_PERLIO_MMAP && !$self->use_file_map )
+    {
+        my $io = $self->open( "${mode}:mmap" ) || return( $self->pass_error );
+        my $object = tie( $_[0], 'Module::Generic::File::Map', {
+            file    => $file,
+            fh      => $io,
+            debug   => $self->debug,
+            me      => $self,
+            size    => $size,
+            # initial variable data length, if any. This could be zero
+            length  => $var_size,
+        });
+        $self->message( 3, "tie Module::Generic::File::Map returned $object. Is variable tied ? ", tied( $_[0] ) ? 'yes' : 'no' );
+        return( $object );
+    }
+    else
+    {
+        $self->message( 3, "Using File::Map" );
+        if( !$self->_load_class( 'File::Map' ) )
+        {
+            return( $self->error( "You perl version ($]) does not support PerlIO mmap, or you have set the property \"use_file_map\" to true and you do not have File::Map installed. Install File::Map at least if you want to use this method." ) );
+        }
+        
+        try
+        {
+            File::Map::map_file( $_[0], $file, $mode, 0, $size );
+            return( $self );
+        }
+        catch( $e )
+        {
+            return( $self->error( "An error occurred while using mmap with File::Map: $e" ) );
+        }
+    }
 }
 
 sub move { return( shift->_move_or_copy( move => @_ ) ); }
@@ -1623,8 +1897,8 @@ sub opened
         {
             return( $self->new_null );
         }
-        $self->message( 3, "fileno for $fh is: ", CORE::fileno( $fh ) );
-        $self->message( 3, "Is file opened ? ", ( !$self->is_dir && $fh->opened ) ? 'yes' : 'no' );
+        # $self->message( 3, "fileno for $fh is: ", CORE::fileno( $fh ) );
+        # $self->message( 3, "Is file opened ? ", ( !$self->is_dir && $fh->opened ) ? 'yes' : 'no' );
         # Maybe the underlying file handle was closed, and if so we update our stored value
         if( !CORE::fileno( $fh ) )
         {
@@ -1665,6 +1939,8 @@ sub parent
 }
 
 sub print { return( shift->_filehandle_method( 'print', 'file', @_ ) ); }
+
+sub printflush { return( shift->_filehandle_method( 'printflush', 'file', @_ ) ); }
 
 sub printf { return( shift->_filehandle_method( 'printf', 'file', @_ ) ); }
 
@@ -1740,7 +2016,7 @@ sub remove { return( shift->delete( @_ ) ); }
 sub resolve
 {
     my $self = shift( @_ );
-    my $path = shift( @_ );
+    my $path = shift( @_ ) || $self->filename;
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{recurse} //= 0;
     my $max_recursion = $self->max_recursion;
@@ -1873,7 +2149,7 @@ sub rmtree
             try
             {
                 $self->message( 4, "${prefix} Actually removing file \"${f}\"" );
-                unlink( $f ) || do
+                CORE::unlink( $f ) || do
                 {
                     $self->message( 4, "${prefix} Unable to remove file \"${f}\": $!" );
                     $error_files->push( $f );
@@ -2074,7 +2350,7 @@ sub symlink
     my $dest = $this->filepath;
     try
     {
-        symlink( $file, $dest ) || return( $self->error( "Unable to create link from \"${file}\" to \"${dest}\": $!" ) );
+        CORE::symlink( $file, $dest ) || return( $self->error( "Unable to create link from \"${file}\" to \"${dest}\": $!" ) );
         return( $self );
     }
     catch( $e )
@@ -2083,7 +2359,15 @@ sub symlink
     }
 }
 
+sub sync { return( shift->_filehandle_method( 'sync', 'file', @_ ) ); }
+
 sub sys_tmpdir { return( __PACKAGE__->new( File::Spec->tmpdir ) ); }
+
+sub sysread { return( shift->_filehandle_method( 'sysread', 'file', @_ ) ); }
+
+sub sysseek { return( shift->_filehandle_method( 'sysseek', 'file', @_ ) ); }
+
+sub syswrite { return( shift->_filehandle_method( 'syswrite', 'file', @_ ) ); }
 
 sub tell { return( shift->_filehandle_method( 'tell', 'file|directory', @_ ) ); }
 
@@ -2238,7 +2522,7 @@ sub touch
         my $io = $self->open( '>' ) || return( $self->pass_error );
         $self->message( 3, "Closing file '$file'." );
         $io->close;
-        $self->message( 3, "File descriptor is now '", CORE::fileno( $io ), "'." );
+        # $self->message( 3, "File descriptor is now '", CORE::fileno( $io ), "'." );
     }
     else
     {
@@ -2273,6 +2557,8 @@ sub type
     }
     return( $self->_set_get_scalar( 'type' ) );
 }
+
+sub ungetc { return( shift->_filehandle_method( 'ungetc', 'file', @_ ) ); }
 
 sub unlink
 {
@@ -2326,12 +2612,13 @@ sub unlock
     my $file = $self->filepath;
     my $io = $self->opened;
     return( $self->error( "File is not opened yet. You must open the file \"${file}\" first to unlock semaphore." ) ) if( !$io );
-    ## $self->message( 3, "Removing lock for semaphore id \"$semid\" and locked value '$self->{locked}'." );
-    my $flags = $self->locked | LOCK_UN;
-    $flags ^= LOCK_NB if( $flags & LOCK_NB );
+    # $self->message( 3, "Removing lock for semaphore id \"$semid\" and locked value '$self->{locked}'." );
+    # my $flags = $self->locked | LOCK_UN;
+    # $flags ^= LOCK_NB if( $flags & LOCK_NB );
+    my $flags = LOCK_UN;
     try
     {
-        my $rc = $io->flock( $flags ) || return( $self->error( "Unable to remove the lock from file \"${file}\": $!" ) );
+        my $rc = $io->flock( $flags ) || return( $self->error( "Unable to remove the lock from file \"${file}\" using flags '$flags': $!" ) );
         if( $rc )
         {
             $self->locked( 0 );
@@ -2347,6 +2634,28 @@ sub unlock
         return( $self->error( "An unexpected error has occurred while trying to unlock file \"${file}\": $e" ) );
     }
 }
+
+sub unmap
+{
+    my $self = shift( @_ );
+    return( $self->error( "No variable provided to unmap" ) ) if( !scalar( @_ ) );
+    return( $self->error( "Variable provided is undefined" ) ) if( !defined( $_[0] ) );
+    try
+    {
+        if( !$self->_load_class( 'File::Map' ) )
+        {
+            return( $self->error( "Unable to unmap. File::Map is not installed on your system" ) );
+        }
+        File::Map::unmap( $_[0] );
+        return( $self );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error calling File::Map::unmap on the variable provided: $e" ) );
+    }
+}
+
+sub use_file_map { return( shift->_set_get_boolean( 'use_file_map', @_ ) ); }
 
 sub volume
 {
@@ -2404,6 +2713,8 @@ sub DESTROY
     my $orig = $self->{_orig};
     if( $self->auto_remove )
     {
+        return unless( CORE::exists( $FILES_TO_REMOVE->{ $$ }->{ $file } ) );
+        CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
         my @info = caller();
         my $sub = [caller(1)]->[3];
         $self->message( 3, "Removing file '", $self->filepath, "' that was created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2] in sub $sub" );
@@ -2416,12 +2727,56 @@ sub DESTROY
             $self->delete;
         }
     }
-#     else
-#     {
-#         my @info = caller();
+    else
+    {
+        my @info = caller();
 #         $self->debug(3);
-#         $self->message( 3, "File '", $self->filepath, "' is NOT going to be removed. Created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2]" );
-#     }
+        $self->message( 3, "File '", $self->filepath, "' is NOT going to be removed. Created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2]" );
+    }
+};
+
+# XXX END
+END
+{
+    # Need to be done last, so we can ensure they are empty before they are removed
+    my @dirs_to_remove = ();
+    # We use File::Spec to get the current directory rather than our cwd() method, 
+    # because we do not want to create a new object in a destruction block
+    my $cwd = File::Spec->rel2abs(File::Spec->curdir);
+    foreach my $pid ( keys( %$FILES_TO_REMOVE ) )
+    {
+        # print( STDERR "END: Checking pid $pid against current pid '$$'\n" );
+        next if( $pid ne $$ );
+        foreach my $file ( keys( %{$FILES_TO_REMOVE->{ $$ }} ) )
+        {
+            # print( STDERR "END: Checking file '$file' whether it is a file or a directory\n" );
+            next if( !$file || !-e( $file ) );
+            if( -d( $file ) )
+            {
+                push( @dirs_to_remove, $file );
+                next;
+            }
+            # print( STDERR "END: Removing file '$file'\n" );
+            CORE::unlink( $file );
+        }
+        foreach my $dir ( @dirs_to_remove )
+        {
+            if( $cwd eq $dir )
+            {
+                my $updir = Cwd::abs_path( File::Spec->updir );
+                warnings::warn( "You currently are inside a directory to remove ($dir), moving you up to $updir\n" ) if( warnings::enabled() );
+                CORE::chdir( $updir ) || do
+                {
+                    warnings::warn( "Unable to move to directory '$updir' above current directory: $!\n" ) if( warnings::enabled() );
+                    next;
+                };
+            }
+            CORE::rmdir( $dir ) || do
+            {
+                warnings::warn( "Unable to remove directory $dir: $!\n" ) if( warnings::enabled() );
+            };
+        }
+    }
 };
 
 sub FREEZE { return( shift->filepath ) }
@@ -2447,10 +2802,14 @@ sub _filehandle_method
         my $opened = $self->opened || 
             return( $self->error( ucfirst( $type ), " \"${file}\" is not opened yet." ) );
         $self->message( 3, "File handle is '$opened'. Calling method '$what' with arguments: '", CORE::join( "', '", @_ ), "'." );
-        return( $opened->$what( @_ ) );
+        # return( $opened->$what( @_ ) );
+        my $rv = $opened->$what( @_ );
+        return( $self->error({ skip_frames => 1, message => "Error with $what on file \"$file\": $!" }) ) if( !CORE::defined( $rv ) );
+        return( $rv );
     }
     catch( $e )
     {
+        warn( "An unexpected error occurred while trying to call ${what} on ${type} \"${file}\": $e\n" );
         return( $self->error( "An unexpected error occurred while trying to call ${what} on ${type} \"${file}\": $e" ) );
     }
 }
@@ -2698,6 +3057,141 @@ sub _prev_cwd { return( shift->_set_get_scalar( '_prev_cwd', @_ ) ); }
     sub flock { CORE::flock( shift( @_ ), shift( @_ ) ); }
 }
 
+# XXX Module::Generic::File::Map class
+{
+    package
+        Module::Generic::File::Map;
+    BEGIN
+    {
+        use strict;
+        use warnings;
+        use parent qw( Tie::Scalar );
+    };
+    
+    sub TIESCALAR
+    {
+        my $this = shift( @_ );
+        my $class = ref( $this ) || $this;
+        my $opts = shift( @_ );
+        if( ref( $opts ) ne 'HASH' )
+        {
+            warn( "I was expecting an hash reference of options, but got instead '$opts'\n" );
+            return;
+        }
+        
+        my $io = $opts->{fh} || do
+        {
+            warn( "No file handle provided\n" );
+            return;
+        };
+        my $file = $opts->{file} || do
+        {
+            warn( "No file path was provided.\n" );
+            return;
+        };
+        my $ref = \$file;
+        ${$$ref} = $opts;
+        return( bless( $ref => $class ) );
+    }
+    
+    sub FETCH
+    {
+        my $self = shift( @_ );
+        my $fh = ${$$self}->{fh} || do
+        {
+            warn( "Filehandle is gone!\n" );
+            return;
+        };
+        # $self->message( 3, "Returning content of mmap" );
+        my $parent  = ${$$self}->{me};
+        my $data    = $parent->load;
+        # Initial variable length, if any, because initially the file may be padded with nulls
+        # and we do not want them. We could use unpack( 'A*', $data );, but the variable data
+        # itself could have some nulls too, so we cannot rely on this.
+        my $var_len = ${$$self}->{length} // 0;
+        # $data =~ s/\0+$//gs;
+        # $data = unpack( 'A*', $data );
+        $self->message( 3, "Returning ", CORE::length( substr( $data, 0, $var_len ) ), " bytes of data." ) if( $var_len );
+        return( substr( $data, 0, $var_len ) ) if( $var_len );
+        #$data = unpack( 'Z*', $data );
+        $data =~ s/\0+$//g;
+        $self->message( 3, "Returning ", CORE::length( $data ), " bytes of data." );
+        return( $data );
+    }
+    
+    sub STORE
+    {
+        my $self = shift( @_ );
+        my $fh = ${$$self}->{fh} || do
+        {
+            warn( "Filehandle is gone!\n" );
+            return;
+        };
+        # $self->message( 3, "Saving '$_[0]' to mmap" );
+        my $size   = ${$$self}->{size};
+        my $parent = ${$$self}->{me};
+        unless( $fh->opened )
+        {
+            warn( "filehandle is not opened for file \"", $parent->filename, "\".\n" );
+        }
+        $parent->lock( shared => 1 );
+        $fh->seek(0,0) || do
+        {
+            warn( "Unable to set position at beginning in file \"", $parent->filename, "\": $!\n" );
+            # return;
+        };
+        $self->message( 3, "Writing ", CORE::length( $_[0] // '' ), " bytes of data." );
+        # This needs to be print and not syswrite, because we cannot mix syswrite and read/print
+        $fh->print( $_[0] ) || do
+        {
+            warn( "Unable to write ", CORE::length( $_[0] // '' ), " byte(s) to file \"", $parent->filename, "\": $!\n" );
+            return;
+        };
+        $parent->unlock;
+        $fh->sync;
+        $fh->flush;
+        $self->message( 3, "File \"", $parent->filename, "\" is ", $parent->size, " big." );
+        # $fh->print( "\000" x ( $size - length( $_[0] ) ) );
+        if( !CORE::defined( $fh->truncate( $fh->tell ) ) )
+        {
+            warn( "Unable to truncate file \"", $parent->filename, "\": $!\n" );
+            return;
+        };
+        CORE::delete( ${$$self}->{length} );
+        $self->message( 3, "Ok, returning." );
+    }
+    
+    sub DESTROY
+    {
+        my $self = shift( @_ );
+        undef( $self );
+    }
+    
+    sub message
+    {
+        my $self = shift( @_ );
+        my $parent = ${$$self}->{me};
+        return( $parent->message( @_ ) );
+    }
+#     sub message
+#     {
+#         my $self = shift( @_ );
+#         my $parent = ${$$self}->{me};
+#         return if( !scalar( @_ ) );
+#         return if( $_[0] =~ /^\d+$/ && $_[0] >= $parent->debug );
+#         shift( @_ );
+#         $txt = join( '', map( ( ref( $_ ) eq 'CODE' ) ? $_->() : ( $_ // '' ), @_ ) );
+#         my( $pkg, $file, $line, @otherInfo ) = caller( $stackFrame );
+#         my $sub = ( caller( $stackFrame + 1 ) )[3] // '';
+#         my $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
+#         my $mesg_raw = "${pkg}::${sub2}( $self ) [$line]: " . $txt;
+#         $mesg_raw    =~ s/\n$//gs;
+#         my $prefix = '##';
+#         my $mesg = "${prefix} " . join( "\n${prefix} ", split( /\n/, $mesg_raw ) );
+#         print( STDERR $mesg, "\n" );
+#     }
+}
+
 1;
 
 # XXX POD
@@ -2758,7 +3252,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.8
 
 =head1 DESCRIPTION
 
@@ -2863,7 +3357,7 @@ This returns a list containing:
 
 In scalar context, it returns the file base name as a L<Module::Generic::Scalar> object.
 
-This methods accepts as an optional parameter a list or an array reference of possible extensions.
+This method accepts as an optional parameter a list or an array reference of possible extensions.
 
 =head2 basename
 
@@ -2878,6 +3372,10 @@ You can provide optionally a list or array reference of possible extensions or r
 =head2 binmode
 
 Sets or get the file binmode.
+
+=head2 blocking
+
+Turns on or off blocking or non-blocking io for file opened.
 
 =head2 can_append
 
@@ -2964,6 +3462,12 @@ If this is a regular file, it returns its content as an L<Module::Generic::Array
 
 If an error occurred, it returns undef and set an exception object.
 
+=head2 content_objects
+
+This methods works exclusively on directory object, and will return C<undef> and set an L<error|Module::Generic/error> if you attempt to use it on anything else but a directory object.
+
+It returns an L<array object|Module::Generic::Array> of L<file objects|Module::Generic::File>. Do not use this on directory containing very large number of items for obvious reasons.
+
 =head2 copy
 
 Takes a dstination, and attempt to copy itself to the destination.
@@ -3020,6 +3524,10 @@ If the element is a directory, it will remove all element within using L</rmtree
 
 It returns the current object upon success or undef and sets an exception object if an error occurred.
 
+=head2 eof
+
+Returns true when the end of file is reached, false otherwise.
+
 =head2 exists
 
 Returns true if the underlying directory or file exists, false otherwise.
@@ -3037,6 +3545,12 @@ Extension is simply defined with the regular expression C<\.(\w+)$>
     my $f = file( "/some/where/file.txt" );
     my $new = $f->extension( 'pl' ); # /some/where/file.pl
     my $new = $f->extension( undef() ); # /some/where/file
+
+=head2 fcntl
+
+=head2 fdopen
+
+Creates a new L<IO::Handle> object based on the file's file descriptor.
 
 =head2 filehandle
 
@@ -3088,6 +3602,16 @@ This will resolve the file/directory path and remove the possible dots in its pa
 
 It will return a new object, or undef and set an exception object if an error occurred.
 
+=head2 flush
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
+As described in the L<IO::Handle> documentation, this "causes perl to flush any buffered data at the perlio api level. Any unread data in the buffer will be discarded, and any unwritten data will be written to the underlying file descriptor. Returns C<0 but true> on success, C<undef> on error."
+
+=head2 format_write
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
 =head2 fragments
 
 Returns an array object (L<Module::Generic::Array>) of path fragments. For example:
@@ -3096,6 +3620,24 @@ Assuming the file object is: /some/where/in/time.txt
 
     my $frags = $f->fragments;
     # Returns: ['some', 'where', 'in', 'time.txt'];
+
+=head2 getc
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
+This "pushes a character with the given ordinal value back onto the given handle's input stream. Only one character of pushback per handle is guaranteed."
+
+=head2 getline
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
+"This works like <$io> described in C<I/O Operators> in perlop except that it's more readable and can be safely called in a list context but still returns just one line. If used as the conditional within a C<while> or C-style C<for> loop, however, you will need to emulate the functionality of <$io> with C<defined($_ = $io->getline)>."
+
+=head2 getlines
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
+"This works like <$io> when called in a list context to read all the remaining lines in a file, except that it's more readable. It will also croak() if accidentally called in a scalar context."
 
 =head2 gobble
 
@@ -3118,6 +3660,10 @@ See also L</unload>
 Returns the current file/directory handle if it is already opened, or attempts to open it.
 
 It will return undef and set an exception object if an error occurred.
+
+=head2 ioctl
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
 
 =head2 is_absolute
 
@@ -3306,6 +3852,107 @@ It returns an array object (L<Module::Generic::Array>) of all the path fragments
 
 If an error occurred, this returns undef and set an exception object.
 
+=head2 mmap
+
+    use Module::Generic::File qw( tempfile );
+    my $file = tempfile({ unlink => 1 });
+    $file->mmap( my $var, 10240, '+<' );
+    # or
+    $file->mmap( my $var, 10240 );
+    # or; the size will be derived from the size of the variable $var content
+    $file->mmap( my $var );
+    # then:
+    $var = "Hello there";
+    $var =~ s/Hello/Good bye/;
+
+With fork:
+
+    use Module::Generic::File qw( tempfile );
+    use POSIX ();
+    use Storable ();
+    
+    my $file = tempfile({ unlink => 1 });
+    $file->mmap( my $result, 10240, '+<' );
+    # Block signal for fork
+    my $sigset = POSIX::SigSet->new( POSIX::SIGINT );
+    POSIX::sigprocmask( POSIX::SIG_BLOCK, $sigset ) || 
+        die( "Cannot block SIGINT for fork: $!\n" );
+    my $pid = fork();
+    # Parent
+    if( $pid )
+    {
+        POSIX::sigprocmask( POSIX::SIG_UNBLOCK, $sigset ) || 
+            die( "Cannot unblock SIGINT for fork: $!\n" );
+        if( kill( 0 => $pid ) || $!{EPERM} )
+        {
+            # Blocking wait; use POSIX::WNOHANG for non-blocking wait
+            waitpid( $pid, 0 );
+            print( "Exit value: ", ( $? >> 8 ), "\n" );
+            print( "Signal: ", ( $? & 127 ), "\n" );
+            print( "Has core dump? ", ( $? & 128 ), "\n" );
+        }
+        else
+        {
+            print( "Child $pid already gone\n" );
+        }
+        my $object = Storable::thaw( $result );
+    }
+    elsif( $pid == 0 )
+    {
+        # Do some work
+        my $object = My::Package->new;
+        $result = Storable::freeze( $object );
+    }
+    else
+    {
+        if( $! == POSIX::EAGAIN() )
+        {
+            die( "fork cannot allocate sufficient memory to copy the parent's page tables and allocate a task structure for the child.\n" );
+        }
+        elsif( $! == POSIX::ENOMEM() )
+        {
+            die( "fork failed to allocate the necessary kernel structures because memory is tight.\n" );
+        }
+        else
+        {
+            die( "Unable to fork a new process: $!\n" );
+        }
+    }
+
+Provided with some option parameters and this will create a mmap. Mmap are powerful in that they can be used and shared among processes including fork, I<but excluding threads>. Of course, it you want to share objects or other less simple structures, you need to use serialisers like L<Storable> or L<Sereal>.
+
+If the file is not opened yet, this will open it using the mode specified, or C<+<> by default. If the file is already opened, an error will be returned that the file cannot be opened by C<mmap> because it is already opened.
+
+If your perl version is greater or equal to v5.16.0, then it will use perl native L<PerlIO|PerlIO/:mmap>, otherwise if you have L<File::Map> installed, it will use it as a substitute.
+
+You can force this method to use L<File::Map> by either setting the global package variable C<$MMAP_USE_FILE_MAP> to true, or the object property L</use_file_map> to true.
+
+If L<File::Map> is used, you can call L</unmap> to terminate the tie, but you should not need to do it since L<File::Map> does it automatically for you. This is not necessary if you are using perl's native L<mmap|PerlIO/:mmap>
+
+The options parameters are:
+
+=over 4
+
+=item 1. I<variable>
+
+A variable that will be tied to the file object.
+
+=item 2. I<size>
+
+The maximum size of the variable allocated in the mmap'ed file. If this not provided, then the size will be derived from the size of the variable, or if the variable is not defined or empty, it will use the package global variable C<$DEFAULT_MMAP_SIZE>, which is set to 10Kb (10240 bytes) by default.
+
+For those with a perl version lower than C<5.16.0>, be careful that if you use more than the size allocated, this will raise an error with L<File::Map>. With L<PerlIO> there is no such restriction.
+
+=item 3. I<mode>
+
+The mode in which to mmap open the file. Possible modes are the same as with L<open|perlfunc/open>, however, C<mmap> will not work if you chose a mode like: >, +>, >> or +>>, thus if you want to mmap the file in read only, use < and if you want read-write, use +<. You can also use letters, such as C<r> for read-only and C<r+> for read-write.
+
+The mode can be accompanied by a PerlIO layer like C<:raw>, which is the default, or C<:encoding(utf-8)>, but note that while L<PerlIO> mmap, if your perl version is greater or equal to C<v5.16.0>, will work fine with utf-8, L<File::Map> warns of possibly unknown results when using utf-8 encoder. So if your perl version is equal or greater than C<5.16.0> you are safe, but otherwise, be careful if all works as you expect. Of course, if you use serialisers like L<Storable> or L<Sereal>, then you should not use an encoding, or at least use C<:raw>, which, again, is the default for L<File::Map>
+
+=back
+
+See also L<BSD documentation for mmap|https://man.openbsd.org/mmap>
+
 =head2 move
 
 This behaves exactly like L</copy> except it moves the element instead of copying it.
@@ -3373,6 +4020,12 @@ Calls L<perlfunc/print> on the file handle and pass it whatever arguments is pro
 =head2 printf
 
 Calls L<perlfunc/printf> on the file handle and pass it whatever arguments is provided.
+
+=head2 printflush
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
+"Turns on autoflush, print ARGS and then restores the autoflush status of the C<IO::Handle> object. Returns the return value from print."
 
 =head2 println
 
@@ -3521,6 +4174,24 @@ On the following operating system not supported by perl, this will merely return
 
 This returns the current object upon success and undef and sets an exception object if an error occurred.
 
+=head2 sync
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
+"L</sync> synchronizes a file's in-memory state  with  that  on the physical medium. L</sync> does not operate at the perlio api level, but operates on the file descriptor (similar to L<perlfunc/sysread>, L<perlfunc/sysseek> and L<perlfunc/systell>). This means that any data held at the L<perlio|PerlIO> api level will not be synchronized. To synchronize data that is buffered at the perlio api level you must use the flush method. L</sync> is not implemented on all platforms. Returns C<0 but true> on success, C<undef> on error, C<undef> for an invalid handle. See fsync(3c)."
+
+=head2 sysread
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
+=head2 sysseek
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
+=head2 syswrite
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
 =head2 tell
 
 Calls L<perlfunc/tell> on the current element file handle, passing it whatever information was provided.
@@ -3597,6 +4268,12 @@ Returns the type of element this object represents. It can be either C<file> or 
 
 If there is no value set, this will try to guess it.
 
+=head2 ungetc
+
+This is a thin wrapper around L<IO::Handle> method of the same name.
+
+"Pushes a character with the given ordinal value back onto the given handle's input stream. Only one character of pushback per handle is guaranteed."
+
 =head2 unlink
 
 This will attempt to remove the underlying file.
@@ -3632,6 +4309,20 @@ Just like L</unload>, this takes some data and some options passed as a list or 
 This will unlock the underlying file if it was locked.
 
 It returns the current object upon success, or undef and sets an exception object if an error occurred.
+
+=head2 unmap
+
+    $file->unmap( $var ) || die( $file->error );
+
+Untie the previously tied variable to the file object. See L</mmap>
+
+This is useful only if you are using L<File::Map>, which happens if your perl version is lower than C<5.16.0> or if you have set the global package variable C<MMAP_USE_FILE_MAP> to a true value, or if you have set the file object property L</use_file_map> to a true value.
+
+=head2 use_file_map
+
+Set or get the boolean value for using L<File::Map> in the L</mmap> method. By default, the value is taken from the package global variable C<$MMAP_USE_FILE_MAP>, and also by default if your perl version is greater or equal to C<v5.16.0>, then L</mmap> will use L<PerlIO/:mmap>. By setting this to true, you can force L/mmap> to use L<File::Map> rather than L<PerlIO/:mmap>
+
+It returns the current file object upon success, or C<undef> and sets an L<error|Module::Generic/error> object upon failure.
 
 =head2 volume
 

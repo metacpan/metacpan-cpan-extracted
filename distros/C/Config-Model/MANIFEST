@@ -10,6 +10,7 @@ META.yml
 MODELS
 README.install.pod
 README.md
+SIGNATURE
 TODO
 build-from-git.md
 contrib/bash_completion.cme_multistrap
@@ -48,10 +49,12 @@ lib/Config/Model/Node.pm
 lib/Config/Model/ObjTreeScanner.pm
 lib/Config/Model/Report.pm
 lib/Config/Model/Role/ComputeFunction.pm
+lib/Config/Model/Role/Constants.pm
 lib/Config/Model/Role/FileHandler.pm
 lib/Config/Model/Role/Grab.pm
 lib/Config/Model/Role/HelpAsText.pm
 lib/Config/Model/Role/NodeLoader.pm
+lib/Config/Model/Role/Utils.pm
 lib/Config/Model/Role/WarpMaster.pm
 lib/Config/Model/SearchElement.pm
 lib/Config/Model/SimpleUI.pm
@@ -172,6 +175,8 @@ t/node-load.t
 t/node.t
 t/node_get_set.t
 t/obj_tree_scanner.t
+t/perl-critic.t
+t/perlcriticrc
 t/pod.t
 t/pod_generation.t
 t/recursive_warp_value.t

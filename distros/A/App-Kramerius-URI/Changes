@@ -1,0 +1,9 @@
+0.03 2021-10-28T19:44:47+02:00
+ - Add missing test dependency.
+
+0.02 2021-10-26T13:58:56+02:00
+ - Add basic tests.
+ - Rewrite to use of Data::Kramerius.
+
+0.01 2021-10-22T16:11:58+02:00
+ - First version.

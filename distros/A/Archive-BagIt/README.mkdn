@@ -4,7 +4,7 @@ Archive::BagIt - The main module to handle bags.
 
 # VERSION
 
-version 0.081
+version 0.083
 
 # NAME
 
@@ -56,21 +56,39 @@ Try this:
 
 Similar for tagmanifests
 
-## How fast is `Archive::BagIt::Fast`?
+## How fast is [Archive::BagIt](https://metacpan.org/pod/Archive%3A%3ABagIt)?
 
-It depends. On my system with SSD and a 38MB bag with 48 payload files the results for `verify_bag()` are:
+I have made great efforts to optimize Archive::BagIt for high throughput. There are two limiting factors:
 
-                   Rate        Base         Fast
-    Base         102%           --         -10%
-    Fast         125%           11%           --
+- calculation of checksums, by switching from the module "Digest" to OpenSSL by using [Net::SSLeay](https://metacpan.org/pod/Net%3A%3ASSLeay) a significant
+   speed increase could be achieved.
+- loading the files referenced in the manifest files was previously done serially and using synchronous I/O. By
+   using the [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync) module, the files are loaded asynchronously and the checksums are calculated in parallel.
+   If the underlying file system supports parallel accesses, the performance gain is huge.
 
-On network filesystem (CIFS, 1Gb) with same Bag:
+On my system with 8cores, SSD and a large 9GB bag with 568 payload files the results for `verify_bag()` are:
 
-                   Rate         Fast         Base
-    Fast         2.20/s          --          -11%
-    Base         2.48/s          13%         --
+                     processing time          run time             throughput
+    Version       user time    system time    total time    total    MB/s
+     v0.71        38.31s        1.60s         39.938s       100%     230
+     v0.81        25.48s        1.68s         27.1s          67%     340
+     v0.82        48.85s        3.89s          6.84s         17%    1346
 
-But you should measure which variant is best for you. In general the default `Archive::BagIt` is fast enough.
+## How fast is [Archive::BagIt::Fast](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3AFast)?
+
+It depends. On my system with 8cores, SSD and a 38MB bag with 48 payload files the results for `verify_bag()` are:
+
+                   Rate         Base         Fast
+    Base         3.01/s           --         -21%
+    Fast         3.80/s          26%           --
+
+On my system with 8cores, SSD and a large 9GB bag with 568 payload files the results for `verify_bag()` are:
+
+                 s/iter         Base         Fast
+    Base           74.6           --          -9%
+    Fast           68.3           9%           --
+
+But you should measure which variant is best for you. In general the default [Archive::BagIt](https://metacpan.org/pod/Archive%3A%3ABagIt) is fast enough.
 
 ## How to update an old bag of version v0.97 to v1.0?
 
@@ -221,10 +239,10 @@ getter returns an anonymous function with following interface:
     my $digest = $self->digest_callback;
     &$digest( $digestobject, $filename);
 
-This anonymous function MUST use the `get_hash_string()` function of the `Archive::BagIt::Role::Algorithm` role,
-which is implemented by each `Archive::BagIt::Plugin::Algorithm::XXXX` module.
+This anonymous function MUST use the `get_hash_string()` function of the [Archive::BagIt::Role::Algorithm](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3ARole%3A%3AAlgorithm) role,
+which is implemented by each [Archive::BagIt::Plugin::Algorithm::XXXX](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3APlugin%3A%3AAlgorithm%3A%3AXXXX) module.
 
-See `Archive::BagIt::Fast` for details.
+See [Archive::BagIt::Fast](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3AFast) for details.
 
 ## get\_baginfo\_values\_by\_key($searchkey)
 
@@ -245,7 +263,8 @@ Warnings pushed to ` warnings() `
 
 ## delete\_baginfo\_by\_key( $searchkey )
 
-deletes an entry of given $searchkey if exists
+deletes an entry of given $searchkey if exists.
+If multiple entries with $searchkey exists, only the last one is deleted.
 
 ## exists\_baginfo\_key( $searchkey )
 

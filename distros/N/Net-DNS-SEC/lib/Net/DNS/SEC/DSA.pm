@@ -3,7 +3,7 @@ package Net::DNS::SEC::DSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: DSA.pm 1807 2020-09-28 11:38:28Z willem $)[2];
+our $VERSION = (qw$Id: DSA.pm 1853 2021-10-11 10:40:59Z willem $)[2];
 
 
 =head1 NAME
@@ -44,7 +44,7 @@ public key resource record.
 use integer;
 use MIME::Base64;
 
-use constant DSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_DSA');
+use constant DSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_DSA');
 
 BEGIN { die 'DSA disabled or application has no "use Net::DNS::SEC"' unless DSA_configured }
 
@@ -63,16 +63,11 @@ sub sign {
 	my $index = $private->algorithm;
 	my $evpmd = $parameters{$index} || die 'private key not DSA';
 
-	my ( $p, $q, $g, $x, $y ) = map { decode_base64( $private->$_ ) }
-			qw(prime subprime base private_value public_value);
+	my ( $p, $q, $g, $x, $y ) =
+			map { decode_base64( $private->$_ ) } qw(prime subprime base private_value public_value);
 	my $t = ( length($g) - 64 ) / 8;
 
-	my $dsa = Net::DNS::SEC::libcrypto::DSA_new();
-	Net::DNS::SEC::libcrypto::DSA_set0_pqg( $dsa, $p, $q, $g );
-	Net::DNS::SEC::libcrypto::DSA_set0_key( $dsa, $y, $x );
-
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
-	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_DSA( $evpkey, $dsa );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_DSA( $p, $q, $g, $y, $x );
 
 	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, $evpmd );
 	return _ASN1decode( $asn1, $t );
@@ -91,12 +86,7 @@ sub verify {
 	my $len = 64 + 8 * unpack( 'C', $key );			# RFC2536, section 2
 	my ( $q, $p, $g, $y ) = unpack "x a20 a$len a$len a$len", $key;
 
-	my $dsa = Net::DNS::SEC::libcrypto::DSA_new();
-	Net::DNS::SEC::libcrypto::DSA_set0_pqg( $dsa, $p, $q, $g );
-	Net::DNS::SEC::libcrypto::DSA_set0_key( $dsa, $y, '' );
-
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
-	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_DSA( $evpkey, $dsa );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_DSA( $p, $q, $g, $y, '' );
 
 	my $asn1 = _ASN1encode($sigbin);
 	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, $evpmd );
@@ -150,7 +140,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

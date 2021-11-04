@@ -1,19 +1,41 @@
-use Test::More;
-use strict;
-use warnings;
-use Net::SAML2;
+use Test::Lib;
+use Test::Net::SAML2;
+
+use Net::SAML2::Protocol::ArtifactResolve;
 
 my $ar = Net::SAML2::Protocol::ArtifactResolve->new(
-        issuer => 'http://some/sp',
-        destination => 'http://some/idp',
-        artifact => 'some-artifact',
+    issuer      => 'http://some/sp',
+    destination => 'http://some/idp',
+    artifact    => 'some-artifact',
+    provider    => 'Net-SAML2 Test',
 );
-ok($ar);
+
+
+isa_ok($ar, 'Net::SAML2::Protocol::ArtifactResolve');
+
+my $override
+    = Sub::Override->override(
+    'Net::SAML2::Protocol::ArtifactResolve::issue_instant' =>
+        sub { return 'myissueinstant' });
+
+$override->override(
+    'Net::SAML2::Protocol::ArtifactResolve::id' => sub { return 'myid' });
+
 my $xml = $ar->as_xml;
-ok($xml);
-#diag($xml);
 
-ok(qr/ID=".+"/, $xml);
-ok(qr/IssueInstant=".+"/, $xml);
+my $xp = get_xpath(
+    $xml,
+    samlp => 'urn:oasis:names:tc:SAML:2.0:protocol',
+    saml  => 'urn:oasis:names:tc:SAML:2.0:assertion',
+);
 
+test_xml_attribute_ok($xp, '/samlp:ArtifactResolve/@ID', 'myid');
+test_xml_attribute_ok($xp, '/samlp:ArtifactResolve/@IssueInstant',
+    'myissueinstant');
+
+test_xml_value_ok($xp, '/samlp:ArtifactResolve/samlp:Artifact',
+    'some-artifact',);
+
+test_xml_attribute_ok($xp, '/samlp:ArtifactResolve/@ProviderName',
+    'Net-SAML2 Test',);
 done_testing;

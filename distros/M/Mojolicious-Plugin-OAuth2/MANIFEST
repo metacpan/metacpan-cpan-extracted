@@ -1,9 +1,12 @@
+.github/workflows/linux.yml
+.github/workflows/macos.yml
 .perltidyrc
+.pls_cache/index
 .ship.conf
-.travis.yml
 Changes
 cpanfile
 lib/Mojolicious/Plugin/OAuth2.pm
+lib/Mojolicious/Plugin/OAuth2/Mock.pm
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -15,6 +18,6 @@ t/error.t
 t/Helper.pm
 t/live.t
 t/mocked.t
-t/mocked_blocking.t
+t/openid-connect.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

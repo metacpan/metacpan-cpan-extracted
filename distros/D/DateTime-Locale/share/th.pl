@@ -20,6 +20,7 @@
     GyMMMEEEEd => "EEEE\N{U+0e17}\N{U+0e35}\N{U+0e48} d MMM G y",
     GyMMMEd => "E d MMM G y",
     GyMMMd => "d MMM G y",
+    GyMd => "d/M/GGGGG y",
     H => "HH",
     Hm => "HH:mm \N{U+0e19}.",
     Hms => "HH:mm:ss",
@@ -275,5 +276,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 39,
+  version => 40,
 }

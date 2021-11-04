@@ -43,11 +43,10 @@ sub _buildErrorCode {
     '% Incomplete command',
     '% Ambiguous command',
     '% Permission denied',
-    '% Permission denied',
     'command authorization failed',
     'Invalid input detected|Type help or ',
     'Line has invalid autocommand',
-    'Invalid input detected|Incomplete command'
+    'Invalid input detected|Incomplete command',
   ];
   return $codes;
 }
@@ -58,14 +57,30 @@ sub _buildErrorCode {
 sub _buildBufferCode {
   my $self    = shift;
   my %mapping = (
-    qr/--More--/mi               => 'Y',
-    qr/\[startup-config\]\?/mi   => ' ',
-    qr/overwrite\?\s*\[Y\/N\]/mi => 'Y',
-    qr/^\%.+\z/mi                => 'Y',
+    more     => qr/--More--/m,
+    interact => {
+      qr/\[startup-config\]\?/mi   => ' ',
+      qr/overwrite\?\s*\[Y\/N\]/mi => 'Y',
+    }
   );
   # 返回数据字典
   return \%mapping;
 }
 
+#------------------------------------------------------------------------------
+# 具体实现 runCommands，编写进入特权模式、退出保存配置的逻辑
+#------------------------------------------------------------------------------
+sub runCommands {
+  my ( $self, $commands ) = @_;
+  # 用户传递的具体配置 | 需要先初始化配置
+  $self->setCommands($commands);
+  # 配置下发前 | 切入配置模式
+  $self->addCommand('conf t');
+  # 完成配置后 | 报错具体配置
+  $self->pushCommand("copy run start");
+
+  # 执行调度，配置批量下发
+  $self->execCommands( reverse $self->commands->@* );
+}
 __PACKAGE__->meta->make_immutable;
 1;

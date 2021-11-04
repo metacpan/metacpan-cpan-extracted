@@ -5,8 +5,23 @@ TODO: document encode_cbor_sharing?
 TODO: weaken cyclic structures?
 TODO: large negative integers
 TODO: type cast tests.
+TODO: round-tripping of types, such as float16 - maybe types::Serialiser support?
 TODO: possibly implement https://peteroupc.github.io/CBOR/extended.html, but NaNs are nonportable. rely on libecb?
 TODO: https://github.com/svaarala/cbor-specs/blob/master/cbor-nonutf8-string-tags.rst, but maybe that is overkill?
+
+1.86 Thu 04 Nov 2021 17:48:16 CET
+	- fixed a wrong printf format specifier (reported by Petr Písař).
+
+1.85 Sat 23 Oct 2021 04:59:56 CEST
+	- left debugging printf in code, need a test for that :(
+
+1.84 Thu 21 Oct 2021 03:11:52 CEST
+	- fix a bug in validate_utf8 where we call perl's is_utf8_string with
+          a lenght of zero for empty strings, but perl interprets that as
+          "calculate length", causing spurious validation errors for
+          empty strings.
+	- include validate_utf8 in new_safe.
+	- avoid some warnings.
 
 1.83 Tue Dec  8 09:27:06 CET 2020
 	- add CBOR::XS::as_map cast function.

@@ -1,7 +1,7 @@
 # ABSTRACT: TestRail testing harness
 # PODNAME: Test::Rail::Harness
 package Test::Rail::Harness;
-$Test::Rail::Harness::VERSION = '0.049';
+$Test::Rail::Harness::VERSION = '0.051';
 use strict;
 use warnings;
 
@@ -83,7 +83,7 @@ Test::Rail::Harness - TestRail testing harness
 
 =head1 VERSION
 
-version 0.049
+version 0.051
 
 =head1 DESCRIPTION
 

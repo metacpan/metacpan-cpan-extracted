@@ -1,0 +1,13 @@
+#
+# This file must only contain KEY=VALUE lines. Do not use advanced
+# shell script constructs and etc.
+#
+
+## General options:
+## -c /etc/mtoken/mtoken.conf
+
+## Init options:
+## -d : debug mode (DO NOT USE THIS OPTION! No daemonize service, for development only)
+## -v : verbose mode
+
+MTOKEN_OPTS=""

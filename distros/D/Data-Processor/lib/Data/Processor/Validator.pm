@@ -42,21 +42,31 @@ sub validate {
     $self->{data} = shift;
     croak ('cannot validate without "data"') unless $self->{data};
     $self->{errors} = Data::Processor::Error::Collection->new();
+    # caching 'schema_key' to avoid running _schema_twin_key multiple
+    # times since errors will be added to the collection
+    $self->{schema_keys} = {
+        map { $_ => $self->_schema_twin_key($_) } keys %{$self->{data}}
+    };
 
-    $self->_add_defaults();
+    $self->_add_defaults_and_transform();
 
-    for my $key (keys %{$self->{data}}){
+    my $order = sub {
+        my ($a, $b) = @_;
+
+        return 1 if !$self->{schema_keys}->{$a}
+            || !$self->{schema}->{$self->{schema_keys}->{$a}}->{order};
+        return -1 if !$self->{schema_keys}->{$b}
+            || !$self->{schema}->{$self->{schema_keys}->{$b}}->{order};
+        return $self->{schema}->{$self->{schema_keys}->{$a}}->{order}
+            <=> $self->{schema}->{$self->{schema_keys}->{$b}}->{order};
+    };
+
+    for my $key (sort { $order->($a, $b) } keys %{$self->{data}}) {
         $self->explain (">>'$key'");
 
-        # the shema key is ?
-        # from here we know to have a "twin" key $schema_key in the schema
-        my $schema_key = $self->_schema_twin_key($key) or next;
+        my $schema_key = $self->{schema_keys}->{$key} or next;
 
-        # transformer (transform first)
-        my $e = $self->{transformer}->transform($key,$schema_key, $self);
-        $self->error($e) if $e;
-
-        # now validate
+        # validate
         $self->__value_is_valid( $key );
         $self->__validator_returns_undef($key, $schema_key);
 
@@ -159,17 +169,25 @@ sub explain {
 }
 
 
-# add defaults. Go over all keys *on that level* and if there is not
-# a value (or, most oftenly, a key) in data, add the key and the
-# default value.
+# add defaults and transform. Go over all keys *on that level*
+# and if there is not a value (or, most oftenly, a key) in data,
+# add the key and the default value.
 
-sub _add_defaults{
-    my $self    = shift;
+sub _add_defaults_and_transform {
+    my $self = shift;
 
     for my $key (keys %{$self->{schema}}){
         next unless $self->{schema}->{$key}->{default};
         $self->{data}->{$key} = $self->{schema}->{$key}->{default}
             unless $self->{data}->{$key};
+    }
+
+    for my $key (keys %{$self->{data}}){
+        my $schema_key = $self->{schema_keys}->{$key} or next;
+
+        # transformer
+        my $e = $self->{transformer}->transform($key, $schema_key, $self);
+        $self->error($e) if $e;
     }
 }
 

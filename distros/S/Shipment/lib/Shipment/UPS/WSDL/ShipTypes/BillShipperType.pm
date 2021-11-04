@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::BillShipperType;
-$Shipment::UPS::WSDL::ShipTypes::BillShipperType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::BillShipperType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        AccountNumber
               CreditCard
 
-              )
+            )
         ],
         {   'AccountNumber' => \%AccountNumber_of,
             'CreditCard'    => \%CreditCard_of,
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::BillShipperType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

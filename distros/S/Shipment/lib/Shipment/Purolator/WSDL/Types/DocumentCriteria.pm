@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::DocumentCriteria;
-$Shipment::Purolator::WSDL::Types::DocumentCriteria::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::DocumentCriteria::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,12 +29,12 @@ Class::Std::initialize();
         [   qw(        PIN
               DocumentTypes
 
-              )
+            )
         ],
         {   'PIN'           => \%PIN_of,
             'DocumentTypes' => \%DocumentTypes_of,
         },
-        {   'PIN' => 'Shipment::Purolator::WSDL::Types::PIN',
+        {   'PIN'           => 'Shipment::Purolator::WSDL::Types::PIN',
             'DocumentTypes' =>
               'Shipment::Purolator::WSDL::Types::DocumentTypes',
         },
@@ -62,7 +62,7 @@ Shipment::Purolator::WSDL::Types::DocumentCriteria
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

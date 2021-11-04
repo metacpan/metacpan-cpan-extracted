@@ -21,7 +21,10 @@
 package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
-our $VERSION = '20210717';
+our $VERSION = '20211029';
+
+# this can be turned on for extra checking during development
+use constant DEVEL_MODE => 0;
 
 use Perl::Tidy::LineBuffer;
 use Carp;
@@ -55,6 +58,7 @@ use vars qw{
   @current_depth
   @total_depth
   $total_depth
+  $next_sequence_number
   @nesting_sequence_number
   @current_sequence_number
   @paren_type
@@ -227,6 +231,35 @@ sub Die {
     my ($msg) = @_;
     Perl::Tidy::Die($msg);
     croak "unexpected return from Perl::Tidy::Die";
+}
+
+sub Fault {
+    my ($msg) = @_;
+
+    # This routine is called for errors that really should not occur
+    # except if there has been a bug introduced by a recent program change.
+    # Please add comments at calls to Fault to explain why the call
+    # should not occur, and where to look to fix it.
+    my ( $package0, $filename0, $line0, $subroutine0 ) = caller(0);
+    my ( $package1, $filename1, $line1, $subroutine1 ) = caller(1);
+    my ( $package2, $filename2, $line2, $subroutine2 ) = caller(2);
+    my $input_stream_name = get_input_stream_name();
+
+    Die(<<EOM);
+==============================================================================
+While operating on input stream with name: '$input_stream_name'
+A fault was detected at line $line0 of sub '$subroutine1'
+in file '$filename1'
+which was called from line $line1 of sub '$subroutine2'
+Message: '$msg'
+This is probably an error introduced by a recent programming change.
+Perl::Tidy::Tokenizer.pm reports VERSION='$VERSION'.
+==============================================================================
+EOM
+
+    # We shouldn't get here, but this return is to keep Perl-Critic from
+    # complaining.
+    return;
 }
 
 sub bad_pattern {
@@ -422,6 +455,15 @@ sub warning {
     return;
 }
 
+sub get_input_stream_name {
+    my $input_stream_name = "";
+    my $logger_object     = $tokenizer_self->[_logger_object_];
+    if ($logger_object) {
+        $input_stream_name = $logger_object->get_input_stream_name();
+    }
+    return $input_stream_name;
+}
+
 sub complain {
     my $msg           = shift;
     my $logger_object = $tokenizer_self->[_logger_object_];
@@ -601,9 +643,10 @@ EOM
             );
         }
         else {
-            warning(
-"hit EOF in here document starting at line $started_looking_for_here_target_at with empty target string\n"
-            );
+            warning(<<EOM);
+Hit EOF in here document starting at line $started_looking_for_here_target_at with empty target string.
+  (Perl will match to the end of file but this may not be intended).
+EOM
         }
         my $nearly_matched_here_target_at =
           $tokenizer_self->[_nearly_matched_here_target_at_];
@@ -714,6 +757,7 @@ sub get_line {
     my $write_logfile_entry = sub {
         my ($msg) = @_;
         write_logfile_entry("Line $input_line_number: $msg");
+        return;
     };
 
     # Find and remove what characters terminate this line, including any
@@ -747,6 +791,8 @@ sub get_line {
     #   HERE_END       - last line of here-doc (target word)
     #   FORMAT         - format section
     #   FORMAT_END     - last line of format section, '.'
+    #   SKIP           - code skipping section
+    #   SKIP_END       - last line of code skipping section, '#>>V'
     #   DATA_START     - __DATA__ line
     #   DATA           - unidentified text following __DATA__
     #   END_START      - __END__ line
@@ -884,9 +930,9 @@ sub get_line {
     # print line unchanged if in skipped section
     elsif ( $tokenizer_self->[_in_skipped_] ) {
 
-        # NOTE: marked as the existing type 'FORMAT' to keep html working
-        $line_of_tokens->{_line_type} = 'FORMAT';
+        $line_of_tokens->{_line_type} = 'SKIP';
         if ( $input_line =~ /$code_skipping_pattern_end/ ) {
+            $line_of_tokens->{_line_type} = 'SKIP_END';
             $write_logfile_entry->("Exiting code-skipping section\n");
             $tokenizer_self->[_in_skipped_] = 0;
         }
@@ -1061,7 +1107,7 @@ sub get_line {
                 $line_of_tokens->{_line_type} = 'POD_START';
                 warning(
 "=cut starts a pod section .. this can fool pod utilities.\n"
-                );
+                ) unless (DEVEL_MODE);
                 $write_logfile_entry->("Entering POD section\n");
             }
         }
@@ -1077,8 +1123,7 @@ sub get_line {
     # handle start of skipped section
     if ( $tokenizer_self->[_in_skipped_] ) {
 
-        # NOTE: marked as the existing type 'FORMAT' to keep html working
-        $line_of_tokens->{_line_type} = 'FORMAT';
+        $line_of_tokens->{_line_type} = 'SKIP';
         $write_logfile_entry->("Entering code-skipping section\n");
         return $line_of_tokens;
     }
@@ -1344,6 +1389,7 @@ sub prepare_for_a_new_file {
     @total_depth             = ();
     @nesting_sequence_number = ( 0 .. @closing_brace_names - 1 );
     @current_sequence_number = ();
+    $next_sequence_number    = 2;    # The value 1 is reserved for SEQ_ROOT
 
     @paren_type                     = ();
     @paren_semicolon_count          = ();
@@ -1549,7 +1595,7 @@ sub prepare_for_a_new_file {
         (
             $routput_token_list,    $routput_token_type,
             $routput_block_type,    $routput_container_type,
-            $routput_type_sequence, $routput_type_sequence,
+            $routput_type_sequence, $routput_indent_flag,
         ) = @{$rTV2};
 
         (
@@ -1579,6 +1625,90 @@ sub prepare_for_a_new_file {
             $last_last_nonblank_type_sequence,
             $last_nonblank_prototype,
         ) = @{$rTV6};
+        return;
+    }
+
+    sub split_pretoken {
+
+        my ($numc) = @_;
+
+     # Split the leading $numc characters from the current token (at index=$i)
+     # which is pre-type 'w' and insert the remainder back into the pretoken
+     # stream with appropriate settings.  Since we are splitting a pre-type 'w',
+     # there are three cases, depending on if the remainder starts with a digit:
+     # Case 1: remainder is type 'd', all digits
+     # Case 2: remainder is type 'd' and type 'w': digits and other characters
+     # Case 3: remainder is type 'w'
+
+        # Examples, for $numc=1:
+        #   $tok    => $tok_0 $tok_1 $tok_2
+        #   'x10'   => 'x'    '10'                # case 1
+        #   'x10if' => 'x'    '10'   'if'         # case 2
+        #   '0ne    => 'O'            'ne'        # case 3
+
+        # where:
+        #   $tok_1 is a possible string of digits (pre-type 'd')
+        #   $tok_2 is a possible word (pre-type 'w')
+
+        # return 1 if successful
+        # return undef if error (shouldn't happen)
+
+        # Calling routine should update '$type' and '$tok' if successful.
+
+        my $pretoken = $rtokens->[$i];
+        if (   $pretoken
+            && length($pretoken) > $numc
+            && substr( $pretoken, $numc ) =~ /^(\d*)(.*)$/ )
+        {
+
+            # Split $tok into up to 3 tokens:
+            my $tok_0 = substr( $pretoken, 0, $numc );
+            my $tok_1 = defined($1) ? $1 : "";
+            my $tok_2 = defined($2) ? $2 : "";
+
+            my $len_0 = length($tok_0);
+            my $len_1 = length($tok_1);
+            my $len_2 = length($tok_2);
+
+            my $pre_type_0 = 'w';
+            my $pre_type_1 = 'd';
+            my $pre_type_2 = 'w';
+
+            my $pos_0 = $rtoken_map->[$i];
+            my $pos_1 = $pos_0 + $len_0;
+            my $pos_2 = $pos_1 + $len_1;
+
+            my $isplice = $i + 1;
+
+            # Splice in any digits
+            if ($len_1) {
+                splice @{$rtoken_map},  $isplice, 0, $pos_1;
+                splice @{$rtokens},     $isplice, 0, $tok_1;
+                splice @{$rtoken_type}, $isplice, 0, $pre_type_1;
+                $max_token_index++;
+                $isplice++;
+            }
+
+            # Splice in any trailing word
+            if ($len_2) {
+                splice @{$rtoken_map},  $isplice, 0, $pos_2;
+                splice @{$rtokens},     $isplice, 0, $tok_2;
+                splice @{$rtoken_type}, $isplice, 0, $pre_type_2;
+                $max_token_index++;
+            }
+
+            $rtokens->[$i] = $tok_0;
+            return 1;
+        }
+        else {
+
+            # Shouldn't get here
+            if (DEVEL_MODE) {
+                Fault(<<EOM);
+While working near line number $input_line_number, bad arg '$tok' passed to sub split_pretoken()
+EOM
+            }
+        }
         return;
     }
 
@@ -1646,7 +1776,7 @@ sub prepare_for_a_new_file {
             @brace_package,                  @square_bracket_type,
             @square_bracket_structural_type, @depth_array,
             @starting_line_of_current_depth, @nested_ternary_flag,
-            @nested_statement_type,
+            @nested_statement_type,          $next_sequence_number,
         );
 
         # save all lexical variables
@@ -1709,6 +1839,33 @@ sub prepare_for_a_new_file {
         ( $i, $tok, $type, $id_scan_state, $identifier ) =
           scan_identifier_do( $i, $id_scan_state, $identifier, $rtokens,
             $max_token_index, $expecting, $paren_type[$paren_depth] );
+
+        # Check for signal to fix a special variable adjacent to a keyword,
+        # such as '$^One$0'.
+        if ( $id_scan_state eq '^' ) {
+
+            # Try to fix it by splitting the pretoken
+            if (   $i > 0
+                && $rtokens->[ $i - 1 ] eq '^'
+                && split_pretoken(1) )
+            {
+                $identifier = substr( $identifier, 0, 3 );
+                $tok        = $identifier;
+            }
+            else {
+
+                # This shouldn't happen ...
+                my $var    = substr( $tok, 0, 3 );
+                my $excess = substr( $tok, 3 );
+                interrupt_logfile();
+                warning(<<EOM);
+$input_line_number: Trouble parsing at characters '$excess' after special variable '$var'.
+A space may be needed after '$var'. 
+EOM
+                resume_logfile();
+            }
+            $id_scan_state = "";
+        }
         return;
     }
 
@@ -2073,7 +2230,12 @@ EOM
                     || $last_nonblank_type eq 'U' )    # possible object
               )
             {
-                $type = 'Z';
+
+                # An identifier followed by '->' is not indirect object;
+                # fixes b1175, b1176
+                my ( $next_nonblank_type, $i_next ) =
+                  find_next_noncomment_type( $i, $rtokens, $max_token_index );
+                $type = 'Z' if ( $next_nonblank_type ne '->' );
             }
         },
         '(' => sub {
@@ -2791,9 +2953,6 @@ EOM
             # check for special variables like ${^WARNING_BITS}
             if ( $expecting == TERM ) {
 
-                # FIXME: this should work but will not catch errors
-                # because we also have to be sure that previous token is
-                # a type character ($,@,%).
                 if (   $last_nonblank_token eq '{'
                     && ( $next_tok !~ /^\d/ )
                     && ( $next_tok =~ /^\w/ ) )
@@ -2805,6 +2964,24 @@ EOM
                     $tok  = $tok . $next_tok;
                     $i    = $i + 1;
                     $type = 'w';
+
+                    # Optional coding to try to catch syntax errors. This can
+                    # be removed if it ever causes incorrect warning messages.
+                    # The '{^' should be preceded by either by a type or '$#'
+                    # Examples:
+                    #   $#{^CAPTURE}       ok
+                    #   *${^LAST_FH}{NAME} ok
+                    #   @{^HOWDY}          ok
+                    #   $hash{^HOWDY}      error
+
+                    # Note that a type sigil '$' may be tokenized as 'Z'
+                    # after something like 'print', so allow type 'Z'
+                    if (   $last_last_nonblank_type ne 't'
+                        && $last_last_nonblank_type ne 'Z'
+                        && $last_last_nonblank_token ne '$#' )
+                    {
+                        warning("Possible syntax error near '{^'\n");
+                    }
                 }
 
                 else {
@@ -2860,8 +3037,16 @@ EOM
                 elsif ( $expecting == TERM ) {
                     unless ($saw_error) {
 
-                        # shouldn't happen..
-                        warning("Program bug; didn't find here doc target\n");
+                        # shouldn't happen..arriving here implies an error in
+                        # the logic in sub 'find_here_doc'
+                        if (DEVEL_MODE) {
+                            Fault(<<EOM);
+Program bug; didn't find here doc target
+EOM
+                        }
+                        warning(
+"Possible program error: didn't find here doc target\n"
+                        );
                         report_definite_bug();
                     }
                 }
@@ -2904,8 +3089,16 @@ EOM
                 elsif ( $expecting == TERM ) {
                     unless ($saw_error) {
 
-                        # shouldn't happen..
-                        warning("Program bug; didn't find here doc target\n");
+                        # shouldn't happen..arriving here implies an error in
+                        # the logic in sub 'find_here_doc'
+                        if (DEVEL_MODE) {
+                            Fault(<<EOM);
+Program bug; didn't find here doc target
+EOM
+                        }
+                        warning(
+"Possible program error: didn't find here doc target\n"
+                        );
                         report_definite_bug();
                     }
                 }
@@ -3435,20 +3628,23 @@ EOM
                     }
                 }
 
-                $last_last_nonblank_token      = $last_nonblank_token;
-                $last_last_nonblank_type       = $last_nonblank_type;
-                $last_last_nonblank_block_type = $last_nonblank_block_type;
-                $last_last_nonblank_container_type =
-                  $last_nonblank_container_type;
-                $last_last_nonblank_type_sequence =
-                  $last_nonblank_type_sequence;
-                $last_nonblank_token          = $tok;
-                $last_nonblank_type           = $type;
-                $last_nonblank_prototype      = $prototype;
-                $last_nonblank_block_type     = $block_type;
-                $last_nonblank_container_type = $container_type;
-                $last_nonblank_type_sequence  = $type_sequence;
-                $last_nonblank_i              = $i_tok;
+                # fix c090, only rotate vars if a new token will be stored
+                if ( $i_tok >= 0 ) {
+                    $last_last_nonblank_token      = $last_nonblank_token;
+                    $last_last_nonblank_type       = $last_nonblank_type;
+                    $last_last_nonblank_block_type = $last_nonblank_block_type;
+                    $last_last_nonblank_container_type =
+                      $last_nonblank_container_type;
+                    $last_last_nonblank_type_sequence =
+                      $last_nonblank_type_sequence;
+                    $last_nonblank_token          = $tok;
+                    $last_nonblank_type           = $type;
+                    $last_nonblank_prototype      = $prototype;
+                    $last_nonblank_block_type     = $block_type;
+                    $last_nonblank_container_type = $container_type;
+                    $last_nonblank_type_sequence  = $type_sequence;
+                    $last_nonblank_i              = $i_tok;
+                }
 
                 # Patch for c030: Fix things in case a '->' got separated from
                 # the subsequent identifier by a side comment.  We need the
@@ -3499,7 +3695,25 @@ EOM
                     scan_identifier();
                 }
 
-                last if ($id_scan_state);
+                if ($id_scan_state) {
+
+                    # Still scanning ...
+                    # Check for side comment between sub and prototype (c061)
+
+                    # done if nothing left to scan on this line
+                    last if ( $i > $max_token_index );
+
+                    my ( $next_nonblank_token, $i_next ) =
+                      find_next_nonblank_token_on_this_line( $i, $rtokens,
+                        $max_token_index );
+
+                    # done if it was just some trailing space
+                    last if ( $i_next > $max_token_index );
+
+                    # something remains on the line ... must be a side comment
+                    next;
+                }
+
                 next if ( ( $i > 0 ) || $type );
 
                 # didn't find any token; start over
@@ -3729,8 +3943,18 @@ EOM
                            # a key with 18 a's.  But something like
                            #    push @array, a x18;
                            # is a syntax error.
-                            if ( $expecting == OPERATOR && $tok =~ /^x\d+$/ ) {
+                            if (
+                                   $expecting == OPERATOR
+                                && substr( $tok, 0, 1 ) eq 'x'
+                                && ( length($tok) == 1
+                                    || substr( $tok, 1, 1 ) =~ /^\d/ )
+                              )
+                            {
                                 $type = 'n';
+                                if ( split_pretoken(1) ) {
+                                    $type = 'x';
+                                    $tok  = 'x';
+                                }
                             }
                             else {
 
@@ -3786,13 +4010,14 @@ EOM
                 # Decide if 'sub :' can be the start of a sub attribute list.
                 # We will decide based on if the colon is followed by a
                 # bareword which is not a keyword.
+                # Changed inext+1 to inext to fixed case b1190.
                 my $sub_attribute_ok_here;
                 if (   $is_sub{$tok_kw}
                     && $expecting != OPERATOR
                     && $next_nonblank_token eq ':' )
                 {
                     my ( $nn_nonblank_token, $i_nn ) =
-                      find_next_nonblank_token( $i_next + 1,
+                      find_next_nonblank_token( $i_next,
                         $rtokens, $max_token_index );
                     $sub_attribute_ok_here =
                          $nn_nonblank_token =~ /^\w/
@@ -3801,12 +4026,15 @@ EOM
                 }
 
                 # handle operator x (now we know it isn't $x=)
-                if (   $expecting == OPERATOR
+                if (
+                       $expecting == OPERATOR
                     && substr( $tok, 0, 1 ) eq 'x'
-                    && $tok =~ /^x\d*$/ )
+                    && ( length($tok) == 1
+                        || substr( $tok, 1, 1 ) =~ /^\d/ )
+                  )
                 {
-                    if ( $tok eq 'x' ) {
 
+                    if ( $tok eq 'x' ) {
                         if ( $rtokens->[ $i + 1 ] eq '=' ) {    # x=
                             $tok  = 'x=';
                             $type = $tok;
@@ -3816,12 +4044,17 @@ EOM
                             $type = 'x';
                         }
                     }
-
-                    # NOTE: mark something like x4 as an integer for now
-                    # It gets fixed downstream.  This is easier than
-                    # splitting the pretoken.
                     else {
+
+                        # Split a pretoken like 'x10' into 'x' and '10'.
+                        # Note: In previous versions of perltidy it was marked
+                        # as a number, $type = 'n', and fixed downstream by the
+                        # Formatter.
                         $type = 'n';
+                        if ( split_pretoken(1) ) {
+                            $type = 'x';
+                            $tok  = 'x';
+                        }
                     }
                 }
                 elsif ( $tok_kw eq 'CORE::' ) {
@@ -4243,7 +4476,14 @@ EOM
                 if ( !defined($number) ) {
 
                     # shouldn't happen - we should always get a number
-                    warning("non-number beginning with digit--program bug\n");
+                    if (DEVEL_MODE) {
+                        Fault(<<EOM);
+non-number beginning with digit--program bug
+EOM
+                    }
+                    warning(
+"Unexpected error condition: non-number beginning with digit\n"
+                    );
                     report_definite_bug();
                 }
             }
@@ -4955,7 +5195,7 @@ EOM
 
         return;
     }
-}    # end tokenize_this_line
+} ## end tokenize_this_line
 
 #########i#############################################################
 # Tokenizer routines which assist in identifying token types
@@ -4966,6 +5206,10 @@ my %op_expected_table;
 
 # exceptions to perl's weird parsing rules after type 'Z'
 my %is_weird_parsing_rule_exception;
+
+my %is_paren_dollar;
+
+my %is_n_v;
 
 BEGIN {
 
@@ -4997,7 +5241,13 @@ BEGIN {
 
     # Fix for git #62: added '*' and '%'
     @q = qw( < ? * % );
-    @{is_weird_parsing_rule_exception}{@q} = (OPERATOR) x scalar(@q);
+    @{is_weird_parsing_rule_exception}{@q} = (1) x scalar(@q);
+
+    @q = qw<) $>;
+    @{is_paren_dollar}{@q} = (1) x scalar(@q);
+
+    @q = qw( n v );
+    @{is_n_v}{@q} = (1) x scalar(@q);
 
 }
 
@@ -5087,7 +5337,8 @@ sub operator_expected {
         # FIXME: it would be cleaner to make this a special type
         # expecting VERSION or {} after package NAMESPACE
         # TODO: maybe mark these words as type 'Y'?
-        if (   $statement_type =~ /^package\b/
+        if (   substr( $last_nonblank_token, 0, 7 ) eq 'package'
+            && $statement_type      =~ /^package\b/
             && $last_nonblank_token =~ /^package\b/ )
         {
             $op_expected = TERM;
@@ -5150,10 +5401,12 @@ sub operator_expected {
             $op_expected = OPERATOR;    # block mode following }
         }
 
-        elsif ( $last_nonblank_token =~ /^(\)|\$|\-\>)/ ) {
+        ##elsif ( $last_nonblank_token =~ /^(\)|\$|\-\>)/ ) {
+        elsif ( $is_paren_dollar{ substr( $last_nonblank_token, 0, 1 ) }
+            || substr( $last_nonblank_token, 0, 2 ) eq '->' )
+        {
             $op_expected = OPERATOR;
             if ( $last_nonblank_token eq '$' ) { $op_expected = UNKNOWN }
-
         }
 
         # Check for smartmatch operator before preceding brace or square
@@ -5202,7 +5455,8 @@ sub operator_expected {
     #     use Module VERSION LIST
     # We could avoid this exception by writing a special sub to parse 'use'
     # statements and perhaps mark these numbers with a new type V (for VERSION)
-    elsif ( $last_nonblank_type =~ /^[nv]$/ ) {
+    ##elsif ( $last_nonblank_type =~ /^[nv]$/ ) {
+    elsif ( $is_n_v{$last_nonblank_type} ) {
         $op_expected = OPERATOR;
         if ( $statement_type eq 'use' ) {
             $op_expected = UNKNOWN;
@@ -5229,6 +5483,14 @@ sub operator_expected {
         # angle.t
         if ( $last_nonblank_token =~ /^\w/ ) {
             $op_expected = UNKNOWN;
+        }
+
+        # Exception to weird parsing rules for 'x(' ... see case b1205:
+        # In something like 'print $vv x(...' the x is an operator;
+        # Likewise in 'print $vv x$ww' the x is an operatory (case b1207)
+        # otherwise x follows the weird parsing rules.
+        elsif ( $tok eq 'x' && $next_type =~ /^[\(\$\@\%]$/ ) {
+            $op_expected = OPERATOR;
         }
 
         # The 'weird parsing rules' of next section do not work for '<' and '?'
@@ -5651,6 +5913,18 @@ sub report_unexpected {
     return;
 }
 
+my %is_sigil_or_paren;
+my %is_R_closing_sb;
+
+BEGIN {
+
+    my @q = qw< $ & % * @ ) >;
+    @{is_sigil_or_paren}{@q} = (1) x scalar(@q);
+
+    @q = qw(R ]);
+    @{is_R_closing_sb}{@q} = (1) x scalar(@q);
+}
+
 sub is_non_structural_brace {
 
     # Decide if a brace or bracket is structural or non-structural
@@ -5677,13 +5951,18 @@ sub is_non_structural_brace {
     # otherwise, it is non-structural if it is decorated
     # by type information.
     # For example, the '{' here is non-structural:   ${xxx}
+    # Removed '::' to fix c074
+    ## $last_nonblank_token =~ /^([\$\@\*\&\%\)]|->|::)/
     return (
-        $last_nonblank_token =~ /^([\$\@\*\&\%\)]|->|::)/
+        ## $last_nonblank_token =~ /^([\$\@\*\&\%\)]|->)/
+        $is_sigil_or_paren{ substr( $last_nonblank_token, 0, 1 ) }
+          || substr( $last_nonblank_token, 0, 2 ) eq '->'
 
           # or if we follow a hash or array closing curly brace or bracket
           # For example, the second '{' in this is non-structural: $a{'x'}{'y'}
           # because the first '}' would have been given type 'R'
-          || $last_nonblank_type =~ /^([R\]])$/
+          ##|| $last_nonblank_type =~ /^([R\]])$/
+          || $is_R_closing_sb{$last_nonblank_type}
     );
 }
 
@@ -5746,8 +6025,18 @@ sub increase_nesting_depth {
     # Sequence numbers increment by number of items.  This keeps
     # a unique set of numbers but still allows the relative location
     # of any type to be determined.
-    $nesting_sequence_number[$aa] += scalar(@closing_brace_names);
-    my $seqno = $nesting_sequence_number[$aa];
+
+    ########################################################################
+    # OLD SEQNO METHOD for incrementing sequence numbers.
+    # Keep this coding awhile for possible testing.
+    ## $nesting_sequence_number[$aa] += scalar(@closing_brace_names);
+    ## my $seqno = $nesting_sequence_number[$aa];
+
+    # NEW SEQNO METHOD, continuous sequence numbers. This allows sequence
+    # numbers to be used as array indexes, and allows them to be compared.
+    my $seqno = $next_sequence_number++;
+    ########################################################################
+
     $current_sequence_number[$aa][ $current_depth[$aa] ] = $seqno;
 
     $starting_line_of_current_depth[$aa][ $current_depth[$aa] ] =
@@ -5963,8 +6252,9 @@ sub peek_ahead_for_nonblank_token {
         $line =~ s/^\s*//;                 # trim leading blanks
         next if ( length($line) <= 0 );    # skip blank
         next if ( $line =~ /^#/ );         # skip comment
-        my ( $rtok, $rmap, $rtype ) =
-          pre_tokenize( $line, 2 );        # only need 2 pre-tokens
+
+        # Updated from 2 to 3 to get trigraphs, added for case b1175
+        my ( $rtok, $rmap, $rtype ) = pre_tokenize( $line, 3 );
         my $j = $max_token_index + 1;
 
         foreach my $tok ( @{$rtok} ) {
@@ -6112,7 +6402,7 @@ sub guess_if_pattern_or_division {
         # usually indicates a pattern.  We can use this to break ties.
 
         my $is_pattern_by_spacing =
-          ( $i > 1 && $next_token ne ' ' && $rtokens->[ $i - 2 ] eq ' ' );
+          ( $i > 1 && $next_token !~ m/^\s/ && $rtokens->[ $i - 2 ] =~ m/^\s/ );
 
         # look for a possible ending / on this line..
         my $in_quote        = 1;
@@ -6597,8 +6887,13 @@ sub scan_id_do {
     if ( $id_scan_state && ( !defined($type) || !$type ) ) {
 
         # shouldn't happen:
+        if (DEVEL_MODE) {
+            Fault(<<EOM);
+Program bug in scan_id: undefined type but scan_state=$id_scan_state
+EOM
+        }
         warning(
-"Program bug in scan_id: undefined type but scan_state=$id_scan_state\n"
+"Possible program bug in sub scan_id: undefined type but scan_state=$id_scan_state\n"
         );
         report_definite_bug();
     }
@@ -6729,6 +7024,17 @@ sub do_scan_package {
     return ( $i, $tok, $type );
 }
 
+my %is_special_variable_char;
+
+BEGIN {
+
+    # These are the only characters which can (currently) form special
+    # variables, like $^W: (issue c066).
+    my @q =
+      qw{ ? A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ };
+    @{is_special_variable_char}{@q} = (1) x scalar(@q);
+}
+
 sub scan_identifier_do {
 
     # This routine assembles tokens into identifiers.  It maintains a
@@ -6805,11 +7111,10 @@ sub scan_identifier_do {
         }
         else {
 
-            # shouldn't happen
-            my ( $a, $b, $c ) = caller;
-            warning("Program Bug: scan_identifier given bad token = $tok \n");
-            warning("   called from sub $a  line: $c\n");
-            report_definite_bug();
+            # shouldn't happen: bad call parameter
+            Fault(<<EOM);
+Program Bug: scan_identifier received bad starting token = '$tok'
+EOM
         }
         $saw_type = !$saw_alpha;
     }
@@ -6984,17 +7289,30 @@ sub scan_identifier_do {
             }
             elsif ( $tok eq '^' ) {
 
-                # check for some special variables like $^W
+                # check for some special variables like $^ $^W
                 if ( $identifier =~ /^[\$\*\@\%]$/ ) {
                     $identifier .= $tok;
-                    $id_scan_state = 'A';
+                    $type = 'i';
 
-                    # Perl accepts '$^]' or '@^]', but
-                    # there must not be a space before the ']'.
+                    # There may be one more character, not a space, after the ^
                     my $next1 = $rtokens->[ $i + 1 ];
-                    if ( $next1 eq ']' ) {
+                    my $chr   = substr( $next1, 0, 1 );
+                    if ( $is_special_variable_char{$chr} ) {
+
+                        # It is something like $^W
+                        # Test case (c066) : $^Oeq'linux'
                         $i++;
                         $identifier .= $next1;
+
+                        # If pretoken $next1 is more than one character long,
+                        # set a flag indicating that it needs to be split.
+                        $id_scan_state = ( length($next1) > 1 ) ? '^' : "";
+                        last;
+                    }
+                    else {
+
+                        # it is just $^
+                        # Simple test case (c065): '$aa=$^if($bb)';
                         $id_scan_state = "";
                         last;
                     }
@@ -7233,6 +7551,39 @@ sub scan_identifier_do {
                 if ( $identifier eq '&' || $i == 0 ) { $identifier = ''; }
                 $i             = $i_save;
                 $id_scan_state = '';
+                last;
+            }
+            elsif ( $tok eq '^' ) {
+                if ( $identifier eq '&' ) {
+
+                    # Special variable (c066)
+                    $identifier .= $tok;
+                    $type = '&';
+
+                    # There may be one more character, not a space, after the ^
+                    my $next1 = $rtokens->[ $i + 1 ];
+                    my $chr   = substr( $next1, 0, 1 );
+                    if ( $is_special_variable_char{$chr} ) {
+
+                        # It is something like &^O
+                        $i++;
+                        $identifier .= $next1;
+
+                        # If pretoken $next1 is more than one character long,
+                        # set a flag indicating that it needs to be split.
+                        $id_scan_state = ( length($next1) > 1 ) ? '^' : "";
+                    }
+                    else {
+
+                        # it is &^
+                        $id_scan_state = "";
+                    }
+                    last;
+                }
+                else {
+                    $identifier = '';
+                    $i          = $i_save;
+                }
                 last;
             }
             else {
@@ -7582,15 +7933,16 @@ sub scan_identifier_do {
                     $max_token_index );
                 if ($error) { warning("Possibly invalid sub\n") }
 
-            # Patch part #2 to fixes cases b994 and b1053:
-            # Do not let spaces be part of the token of an anonymous sub keyword
-            # which we marked as type 'k' above...i.e. for something like:
-            #    'sub : lvalue { ...'
-            # Back up and let it be parsed as a blank
+                # Patch part #2 to fixes cases b994 and b1053:
+                # Do not let spaces be part of the token of an anonymous sub
+                # keyword which we marked as type 'k' above...i.e. for
+                # something like:
+                #    'sub : lvalue { ...'
+                # Back up and let it be parsed as a blank
                 if (   $type eq 'k'
                     && $attrs
                     && $i > $i_entry
-                    && substr( $rtokens->[$i], 0, 1 ) eq ' ' )
+                    && substr( $rtokens->[$i], 0, 1 ) =~ m/\s/ )
                 {
                     $i--;
                 }
@@ -7633,7 +7985,7 @@ sub scan_identifier_do {
                         else {
                             warning(
 "already saw definition of 'sub $subname' in package '$package' at line $lno\n"
-                            );
+                            ) unless (DEVEL_MODE);
                         }
                     }
                     $saw_function_definition{$subname}{$package} =
@@ -7716,6 +8068,42 @@ sub find_next_nonblank_token {
         return ( " ", $i ) unless defined($next_nonblank_token);
     }
     return ( $next_nonblank_token, $i );
+}
+
+sub find_next_noncomment_type {
+    my ( $i, $rtokens, $max_token_index ) = @_;
+
+    # Given the current character position, look ahead past any comments
+    # and blank lines and return the next token, including digraphs and
+    # trigraphs.
+
+    my ( $next_nonblank_token, $i_next ) =
+      find_next_nonblank_token( $i, $rtokens, $max_token_index );
+
+    # skip past any side comment
+    if ( $next_nonblank_token eq '#' ) {
+        ( $next_nonblank_token, $i_next ) =
+          find_next_nonblank_token( $i_next, $rtokens, $max_token_index );
+    }
+
+    goto RETURN if ( !$next_nonblank_token || $next_nonblank_token eq " " );
+
+    # check for possible a digraph
+    goto RETURN if ( !defined( $rtokens->[ $i_next + 1 ] ) );
+    my $test2 = $next_nonblank_token . $rtokens->[ $i_next + 1 ];
+    goto RETURN if ( !$is_digraph{$test2} );
+    $next_nonblank_token = $test2;
+    $i_next              = $i_next + 1;
+
+    # check for possible a trigraph
+    goto RETURN if ( !defined( $rtokens->[ $i_next + 1 ] ) );
+    my $test3 = $next_nonblank_token . $rtokens->[ $i_next + 1 ];
+    goto RETURN if ( !$is_trigraph{$test3} );
+    $next_nonblank_token = $test3;
+    $i_next              = $i_next + 1;
+
+  RETURN:
+    return ( $next_nonblank_token, $i_next );
 }
 
 sub is_possible_numerator {
@@ -7907,9 +8295,13 @@ sub find_angle_operator_termination {
             # It may be possible that a quote ends midway in a pretoken.
             # If this happens, it may be necessary to split the pretoken.
             if ($error) {
+                if (DEVEL_MODE) {
+                    Fault(<<EOM);
+unexpected error condition returned by inverse_pretoken_map
+EOM
+                }
                 warning(
                     "Possible tokinization error..please check this line\n");
-                report_possible_bug();
             }
 
             # count blanks on inside of brackets
@@ -8004,8 +8396,11 @@ sub scan_number_do {
 
     # Look for bad starting characters; Shouldn't happen..
     if ( $first_char !~ /[\d\.\+\-Ee]/ ) {
-        warning("Program bug - scan_number given character $first_char\n");
-        report_definite_bug();
+        if (DEVEL_MODE) {
+            Fault(<<EOM);
+Program bug - scan_number given bad first character = '$first_char'
+EOM
+        }
         return ( $i, $type, $number );
     }
 
@@ -8041,10 +8436,10 @@ sub scan_number_do {
            [Pp][+-]?[0-9a-fA-F]          # REQUIRED exponent with digit
            [0-9a-fA-F_]*)                # optional Additional exponent digits
 
-	   # or hex integer
+           # or hex integer
            |([xX][0-9a-fA-F_]+)        
 
-	   # or octal fraction
+           # or octal fraction
            |([oO]?[0-7_]+          # string of octal digits
            (\.([0-7][0-7_]*)?)?    # optional decimal and fraction
            [Pp][+-]?[0-7]          # REQUIRED exponent, no underscore
@@ -8059,7 +8454,7 @@ sub scan_number_do {
            [Pp][+-]?[01]           # Required exponent indicator, no underscore
            [01_]*)                 # additional exponent bits
 
-	   # or binary integer
+           # or binary integer
            |([bB][01_]+)           # 'b' with string of binary digits 
 
            )/gx
@@ -8732,6 +9127,8 @@ The following additional token types are defined:
     HERE_END       - last line of here-doc (target word)
     FORMAT         - format section
     FORMAT_END     - last line of format section, '.'
+    SKIP           - code skipping section
+    SKIP_END       - last line of code skipping section, '#>>V'
     DATA_START     - __DATA__ line
     DATA           - unidentified text following __DATA__
     END_START      - __END__ line

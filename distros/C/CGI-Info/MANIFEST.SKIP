@@ -65,3 +65,4 @@
 \.releaserc
 \.lwpcookies
 CGI-.*
+.test-script-*

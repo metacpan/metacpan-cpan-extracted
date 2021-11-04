@@ -1,5 +1,9 @@
 Revision history for File-XDG
 
+0.08      2021-10-14 10:59:35 -0600
+  - Fix typo which caused confusing diagnostic when an invalid
+    key is passed into the constructor (gh#12, gh#13)
+
 0.07      2021-07-04 13:54:24 -0600
   - Documentation changes only.
 

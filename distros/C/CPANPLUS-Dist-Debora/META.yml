@@ -21,28 +21,28 @@ name: CPANPLUS-Dist-Debora
 provides:
   CPANPLUS::Dist::Debora:
     file: lib/CPANPLUS/Dist/Debora.pm
-    version: '0.003'
+    version: '0.004'
   CPANPLUS::Dist::Debora::License:
     file: lib/CPANPLUS/Dist/Debora/License.pm
-    version: '0.003'
+    version: '0.004'
   CPANPLUS::Dist::Debora::Package:
     file: lib/CPANPLUS/Dist/Debora/Package.pm
-    version: '0.003'
+    version: '0.004'
   CPANPLUS::Dist::Debora::Package::Debian:
     file: lib/CPANPLUS/Dist/Debora/Package/Debian.pm
-    version: '0.003'
+    version: '0.004'
   CPANPLUS::Dist::Debora::Package::RPM:
     file: lib/CPANPLUS/Dist/Debora/Package/RPM.pm
-    version: '0.003'
+    version: '0.004'
   CPANPLUS::Dist::Debora::Package::Tar:
     file: lib/CPANPLUS/Dist/Debora/Package/Tar.pm
-    version: '0.003'
+    version: '0.004'
   CPANPLUS::Dist::Debora::Pod:
     file: lib/CPANPLUS/Dist/Debora/Pod.pm
-    version: '0.003'
+    version: '0.004'
   CPANPLUS::Dist::Debora::Util:
     file: lib/CPANPLUS/Dist/Debora/Util.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Archive::Tar: '0'
   CPAN::Meta: '0'
@@ -77,7 +77,7 @@ resources:
   bugtracker: https://gitlab.com/voegelas/cpanplus-dist-debora/-/issues
   homepage: https://gitlab.com/voegelas/cpanplus-dist-debora
   repository: https://gitlab.com/voegelas/cpanplus-dist-debora.git
-version: '0.003'
+version: '0.004'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

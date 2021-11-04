@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -307,7 +307,7 @@ sub provides {
         push @provides, @{$PROVIDES_FOR{$dist_name}};
     }
 
-    return wantarray ? @provides : \@provides;
+    return \@provides;
 }
 
 sub _date {
@@ -666,13 +666,13 @@ sub _read_epochs {
 
     my $name;
     if (open my $fh, '<', '/var/lib/dpkg/available') {
-        while (<$fh>) {
-            chomp;
+        while (my $line = <$fh>) {
+            chomp $line;
 
-            if (m{^ Package: \h+ (.+) $}xms) {
+            if ($line =~ m{^ Package: \h+ (.+) $}xms) {
                 $name = $1;
             }
-            elsif (m{^ Version: \h+ (\d+) :}xms) {
+            elsif ($line =~ m{^ Version: \h+ (\d+) :}xms) {
                 my $epoch = $1;
 
                 if (defined $name) {
@@ -680,14 +680,14 @@ sub _read_epochs {
                     undef $name;
                 }
             }
-            elsif (m{^$}xms) {
+            elsif ($line eq q{}) {
                 undef $name;
             }
         }
         close $fh or undef;
     }
 
-    return wantarray ? %epoch_for : \%epoch_for;
+    return \%epoch_for;
 }
 
 sub _get_epoch_from_env {
@@ -918,7 +918,7 @@ CPANPLUS::Dist::Debora::Package::Debian - Create Debian packages
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -991,9 +991,11 @@ F<~/.cpanplus/5.34.0/build/XXXX/Some-Module-1.0/debian>.
 
 =head2 provides
 
-  my @provides = $package->provides;
+  for my $package_name (@{$package->provides}) {
+    say $package_name;
+  }
 
-Returns an array of virtual packages that are provided by this package.
+Returns virtual packages that are provided by this package.
 
 =head2 changelog
 

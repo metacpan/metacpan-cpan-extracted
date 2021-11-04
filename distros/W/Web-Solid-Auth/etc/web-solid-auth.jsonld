@@ -1,0 +1,15 @@
+{
+  "@context": "https://www.w3.org/ns/solid/oidc-context.jsonld",
+
+  "client_id": "https://hochstenbach.inrupt.net/public/web-solid-auth.jsonld#this",
+  "client_name": "Web-Solid-Auth",
+  "redirect_uris": [ "http://localhost:3000/callback" ],
+  "client_uri": "https://hochstenbach.inrupt.net/",
+  "logo_uri": "https://hochstenbach.inrupt.net/public/web-solid-auth-logo.png",
+  "tos_uri": "https://hochstenbach.inrupt.net/public/web-solid-auth-tos.html",
+  "scope": "openid profile offline_access",
+  "grant_types": [ "refresh_token", "authorization_code" ],
+  "response_types": [ "code" ],
+  "default_max_age": 3600,
+  "require_auth_time": true
+}

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentPart;
-$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentPart::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentPart::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        DocumentPartSequenceNumber
               Image
 
-              )
+            )
         ],
         {   'DocumentPartSequenceNumber' => \%DocumentPartSequenceNumber_of,
             'Image'                      => \%Image_of,
@@ -62,7 +62,7 @@ Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentPart
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

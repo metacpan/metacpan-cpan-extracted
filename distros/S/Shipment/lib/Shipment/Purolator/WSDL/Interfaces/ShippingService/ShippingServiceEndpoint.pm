@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Interfaces::ShippingService::ShippingServiceEndpoint;
-$Shipment::Purolator::WSDL::Interfaces::ShippingService::ShippingServiceEndpoint::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Interfaces::ShippingService::ShippingServiceEndpoint::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -46,7 +46,7 @@ sub CreateShipment {
     die "CreateShipment must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'CreateShipment',
+        {   operation   => 'CreateShipment',
             soap_action =>
               'http://purolator.com/pws/service/v1/CreateShipment',
             style => 'document',
@@ -65,7 +65,7 @@ sub CreateShipment {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -124,7 +124,7 @@ sub VoidShipment {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -165,7 +165,7 @@ sub ValidateShipment {
     die "ValidateShipment must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ValidateShipment',
+        {   operation   => 'ValidateShipment',
             soap_action =>
               'http://purolator.com/pws/service/v1/ValidateShipment',
             style => 'document',
@@ -184,7 +184,7 @@ sub ValidateShipment {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -243,7 +243,7 @@ sub Consolidate {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -319,7 +319,7 @@ Shipment::Purolator::WSDL::Interfaces::ShippingService::ShippingServiceEndpoint
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

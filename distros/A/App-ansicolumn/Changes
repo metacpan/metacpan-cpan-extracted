@@ -1,5 +1,11 @@
 Revision history for Perl extension App-ansicolumn
 
+1.15 2021-10-28T04:03:11Z
+
+    - Rename --fullwidth -> --widen.
+    - Rename -F -> -W and do not take optional argument.
+    - Rename -U -> -F and do not take optional argument.
+
 1.14 2021-09-28T08:28:21Z
 
     - Introduce -U as a alias for --fillup.

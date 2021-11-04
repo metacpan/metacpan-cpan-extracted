@@ -1,9 +1,9 @@
 package Rclone::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-09'; # DATE
+our $DATE = '2021-05-15'; # DATE
 our $DIST = 'Rclone-Util'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -83,6 +83,21 @@ sub parse_rclone_config {
     [200, "OK", $merged_config_hash];
 }
 
+$SPEC{list_rclone_remotes} = {
+    v => 1.1,
+    summary => 'List known rclone remotes from rclone configuration file',
+    args => {
+        %argspecs_common,
+    },
+};
+sub list_rclone_remotes {
+    my %args = @_;
+    my $res = parse_rclone_config(%args);
+    return $res unless $res->[0] == 200;
+    my $config = $res->[2];
+    [200, "OK", [sort keys %$config]];
+}
+
 1;
 # ABSTRACT: Utility routines related to rclone
 
@@ -98,11 +113,45 @@ Rclone::Util - Utility routines related to rclone
 
 =head1 VERSION
 
-This document describes version 0.001 of Rclone::Util (from Perl distribution Rclone-Util), released on 2021-05-09.
+This document describes version 0.002 of Rclone::Util (from Perl distribution Rclone-Util), released on 2021-05-15.
 
 =for Pod::Coverage .+
 
 =head1 FUNCTIONS
+
+
+=head2 list_rclone_remotes
+
+Usage:
+
+ list_rclone_remotes(%args) -> [status, msg, payload, meta]
+
+List known rclone remotes from rclone configuration file.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<rclone_config_dirs> => I<array[dirname]>
+
+=item * B<rclone_config_filenames> => I<array[filename]>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 parse_rclone_config

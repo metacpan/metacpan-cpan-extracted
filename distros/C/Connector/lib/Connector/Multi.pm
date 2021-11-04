@@ -109,6 +109,20 @@ sub exists {
     return $self->_route_call( @_ );
 }
 
+sub cleanup {
+    my $self = shift;
+    foreach my $cache_id (keys %{$self->_config()}) {
+        # do not cleanup the base connector
+        next unless ($cache_id);
+        eval {
+            $self->_config()->{$cache_id}->cleanup();
+            $self->log()->debug("Cleanup ok on $cache_id");
+        };
+        delete $self->_config()->{$cache_id};
+        $self->log()->warn("Error on cleanup in $cache_id: $EVAL_ERROR") if ($EVAL_ERROR);
+    }
+}
+
 sub _route_call {
 
     my $self = shift;

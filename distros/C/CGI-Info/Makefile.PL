@@ -23,7 +23,9 @@ WriteMakefile(
 	'INC' => '',     # e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
+		'LWP::UserAgent' => 0,
 		'Test::Carp' => 0,
+		'Test::Compile' => 0,
 		'Test::Exception' => 0.42,
 		'Test::Requires' => 0,
 		'Test::Most' => 0,
@@ -48,8 +50,8 @@ WriteMakefile(
 		'File::Basename' => 0,
 		'String::Clean::XSS' => 0,
 		'Log::Any' => 0,
-		'JSON' => 0,
-		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
+		'JSON::MaybeXS' => 0,
+		# 'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 		# 'String::EscapeCage' => 0.02,
 		'Class::Autouse' => 0,
 		'namespace::clean' => 0,

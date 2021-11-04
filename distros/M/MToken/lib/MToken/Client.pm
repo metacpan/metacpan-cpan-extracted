@@ -1,4 +1,4 @@
-package MToken::Client; # $Id: Client.pm 69 2019-06-09 16:17:44Z minus $
+package MToken::Client; # $Id: Client.pm 107 2021-10-10 20:04:42Z minus $
 use strict;
 use feature qw/say/;
 use utf8;
@@ -11,21 +11,29 @@ MToken::Client - Client for interaction with MToken server
 
 =head1 VIRSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
     use MToken::Client;
 
-    my $clinet = new MToken::Client(
-        uri => "http://localhost/mtoken",
+    my $clinet = MToken::Client->new(
+        url => "https://localhost:8642",
+        username            => "username", # optional
+        password            => "password", # optional
+        pwcache             => "/path/to/pwcache.tmp",
+        pwcache_ttl         => 300, # 5 min. Default
+        max_redirects       => 2, # Default: 10
+        connect_timeout     => 3, # Default: 10 sec
+        inactivity_timeout  => 5, # Default: 30 sec
+        request_timeout     => 10, # Default: 5 min (300 sec)
     );
-    my $status = $clinet->check;
+    my $status = $client->check();
 
     if ($status) {
-    print STDOUT $client->response;
+        print STDOUT $client->res->body;
     } else {
-    print STDERR $clinet->error;
+        print STDERR $clinet->error;
     }
 
 =head1 DESCRIPTION
@@ -34,42 +42,53 @@ Client for interaction with MToken server
 
 =head2 new
 
-    my $client = new MToken::Client(
-        uri     => "http://localhost/mtoken",
-        user    => $user, # optional
-        password    => $password, # optional
-        timeout => $timeout, # default: 180
+    my $clinet = MToken::Client->new(
+        url => "https://localhost:8642",
+        username            => "username", # optional
+        password            => "password", # optional
+        pwcache             => "/path/to/pwcache.tmp",
+        pwcache_ttl         => 300, # 5 min. Default
+        max_redirects       => 2, # Default: 10
+        connect_timeout     => 3, # Default: 10 sec
+        inactivity_timeout  => 5, # Default: 30 sec
+        request_timeout     => 10, # Default: 5 min (300 sec)
     );
 
 Returns client
 
 =over 8
 
-=item B<timeout>
+=item B<max_redirects>
 
-Timeout for LWP requests, in seconds.
+Maximum number of redirects the user agent will follow before it fails. Default - 10
 
-Default: 180 seconds (5 mins)
+=item B<password>
+
+Default password for basic authentication
+
+=item B<pwcache>
+
+Full path to file of password cache
+
+=item B<pwcache_ttl>
+
+Time to Live of pwcache file. Default - 300 sec
+
+=item B<*timeout>
+
+Timeout for connections, requests and inactivity periods in seconds.
 
 =item B<ua>
 
-The LWP::UserAgent object
-
-=item B<uri>
-
-URI object, that describes URL of the WEB Server. See B<url> attribute
+The Mojo UserAgent object
 
 =item B<url>
 
-Full URL of the WEB Server. See B<uri> attribute
+Full URL of the WEB Server
 
-=item B<verbose>
+=item B<username>
 
-Enable verbose mode. Possible boolean value: 0 or 1
-
-Add request and response data to trace stack if verbose is true
-
-Default: false
+Default username for basic authentication
 
 =back
 
@@ -78,6 +97,7 @@ Default: false
 =head2 check
 
     my $status = $client->check;
+    my $status = $client->check(URL);
 
 Returns check-status of server. 0 - Error; 1 - Ok
 
@@ -95,31 +115,16 @@ Returns HTTP code of the response
 
 =head2 credentials
 
-    $client->credentials("username", "password", "realm")
+    my $userinfo = $client->credentials($MOJO_URL_OBJECT, 1)
 
-Set credentials for User Agent by Realm (name of basic authentication)
-
-=head2 del
-
-    my $status = $clinet->del(
-        file => $filename,
-    );
-
-Request for deleting of the file on server by filename.
-The method returns status of operation: 0 - Error; 1 - Ok
-
-See README file for details of data format
+Gets credentials for User Agent
 
 =head2 download
 
-    my $status = $clinet->download(
-        file => $filename,
-    );
+    my $status = $client->download(TOKEN_NAME => TARBALL_FILE_PATH);
 
-Request for download file on server by filename.
+Request for download file from server by file path.
 The method returns status of operation: 0 - Error; 1 - Ok
-
-See README file for details of data format
 
 =head2 error
 
@@ -129,39 +134,27 @@ Returns error string
 
 =head2 info
 
-    my $status = $clinet->info( $filename );
+    my $status = $clinet->info();
+    my $status = $clinet->info( TOKEN_NAME );
 
-Request for getting information about file on server by filename or file id.
-The method returns info as hash
-
-=head2 line
-
-    my $status_line = $clinet->line;
-
-Returns HTTP status line of response
-
-=head2 list
-
-    my $status = $clinet->list( $filter );
-
-Request for getting list of files on server.
-The method returns array of files
+Request for getting information about token storage or about list of stored token tarballs.
 
 =head2 remove
 
-    my $status = $clinet->remove("filename");
+    my $status = $client->remove(TOKEN_NAME => TARBALL_FILE_NAME);
 
-Remove file from server by name and returns status value
+Request for deleting of the file on server by filename.
+The method returns status of operation: 0 - Error; 1 - Ok
 
 =head2 req
 
     my $request = $clinet->req;
 
-Returns HTTP::Request object
+Returns Mojo::Message::Request object
 
 =head2 request
 
-    my $json = $clinet->request("METHOD", "PATH", "DATA");
+    my $json = $clinet->request("METHOD", "PATH", ...ATTRIBUTES...);
 
 Send request
 
@@ -169,7 +162,7 @@ Send request
 
     my $response = $clinet->res;
 
-Returns HTTP::Response object
+Returns Mojo::Message::Response object
 
 =head2 status
 
@@ -184,32 +177,30 @@ Returns object status value. 0 - Error; 1 - Ok
 
 Gets trace stack or pushes new trace record to trace stack
 
-=head2 transaction
+=head2 tx
 
-    print $client->transaction;
+    my $status = $clinet->tx($tx);
 
-Gets transaction string
+Works with Mojo::Transaction object, interface with it
 
-=head2 update
+=head2 ua
 
-    my $status = $clinet->update("filename");
+    my $ua = $clinet->ua;
 
-Update file on server by name and returns status value
+Returns Mojo::UserAgent object
 
 =head2 upload
 
-    $status = $clinet->upload(
-        file    => $file,
-        filename=> $filename,
-        sha1    => $sha1, # Optional
-        md5     => $md5,  # Optional
-        size    => $filesize,
-    );
+    my $status = $client->upload(TOKEN_NAME => TARBALL_FILE_PATH);
 
-Request for uploading of backup on server.
+Request for uploading of tarball on server.
 The method returns status of operation: 0 - Error; 1 - Ok
 
-See README file for details of data format
+=head2 url
+
+    my $url_object = $clinet->url;
+
+Returns Mojo::URL object
 
 =head1 HISTORY
 
@@ -217,19 +208,15 @@ See C<Changes> file
 
 =head1 DEPENDENCIES
 
-L<CTK>, L<LWP>, L<HTTP::Message>
+L<Mojolicious>
 
 =head1 TO DO
 
 See C<TODO> file
 
-=head1 BUGS
-
-* none noted
-
 =head1 SEE ALSO
 
-L<CTK>, L<LWP>, L<HTTP::Message>, L<URI>
+L<CTK>, L<Mojo::UserAgent>
 
 =head1 AUTHOR
 
@@ -237,7 +224,7 @@ Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2021 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -249,156 +236,85 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = '1.01';
+$VERSION = '1.02';
 
-use Carp;
-use CTK::Util qw/ :BASE /;
-use CTK::TFVals qw/ :ALL /;
-use CTK::ConfGenUtil;
-use Time::HiRes qw/gettimeofday/;
-use Try::Tiny;
-use MToken::Util;
-use MToken::Const qw/DIR_TMP PWCACHE_FILE/;
-use CTK::Serializer;
-use File::Basename qw/basename/;
+use Mojo::UserAgent;
+use Mojo::Asset::File;
+use Mojo::File qw/path/;
+use Mojo::URL;
+use Mojo::Util qw/steady_time/;
 
-# LWP (libwww)
-use URI;
-use HTTP::Request;
-use HTTP::Response;
-use HTTP::Headers;
-use HTTP::Headers::Util;
-use HTTP::Request::Common qw//;
+use CTK::Util qw/dtf lf_normalize touch/;
+
+use MToken::Util qw/md5sum parse_credentials tcd_save tcd_load/;
+use MToken::Const;
 
 use constant {
-        HTTP_TIMEOUT        => 180,
-        MAX_REDIRECT        => 10,
-        TRANSACTION_MASK    => "%s%s >>> %s [%s in %s%s]", # GET /auth >>> 200 OK [1.04 KB in 0.0242 seconds (43.1 KB/sec)]
-        SERIALIZE_FORMAT    => 'json',
+        MAX_REDIRECTS       => 10,
+        CONNECT_TIMEOUT     => 10,
+        INACTIVITY_TIMEOUT  => 30,
+        REQUEST_TIMEOUT     => 180,
+        TRANSACTION_MASK    => "%s %s >>> %s %s [%s in %s%s]", # GET /auth >>> 200 OK [1.04 KB in 0.0242 seconds (43.1 KB/sec)]
         CONTENT_TYPE        => "application/json",
-        NO_JSON_RESPONSE    => 1,
-        SR_ATTRS            => {
-            json => [
-                { # For serialize
-                    utf8 => 0,
-                    pretty => 1,
-                    allow_nonref => 1,
-                    allow_blessed => 1,
-                },
-                { # For deserialize
-                    utf8 => 0,
-                    allow_nonref => 1,
-                    allow_blessed => 1,
-                },
-            ],
-        },
+        PWCACHE_TTL         => 300, # 5 min (Time to Live)
     };
 
-$SIG{INT} = sub { die "Interrupted\n"; };
-$| = 1;  # autoflush
 
 sub new {
     my $class = shift;
     my %args  = @_;
 
     # General
-    $args{verbose} ||= 0; # Display content
+    $args{url} ||= ""; # base url
+    $args{prefix} = "";
+    if ($args{url}) {
+        $args{url} =~ s/\/+$//; $args{url} .= "/"; # Correct slash
+        $args{url} =~ s/mtoken\///; # Delete mtoken prefix
+        $args{url} = Mojo::URL->new($args{url});
+        $args{prefix} = $args{url}->path;
+    }
     $args{status} = 1; # 0 - error, 1 - ok
     $args{error} = ""; # string
     $args{code} = 0;   # integer
-    $args{line} = "";  # line
-    $args{res_time} = 0;
-    $args{trace_redirects} = [];
-    $args{trace} = [];
-
-    # TimeOut
-    $args{timeout} ||= HTTP_TIMEOUT; # TimeOut
-
-    # Other defaults
+    $args{trace} = []; # trace pool
+    $args{tx_time} = 0;
     $args{req} = undef;
     $args{res} = undef;
-
-    # Serializer
-    my $sr = new CTK::Serializer(SERIALIZE_FORMAT, attrs => SR_ATTRS);
-    croak(sprintf("Can't create json serializer: %s", $sr->error)) unless $sr->status;
-    $args{sr} = $sr;
-
-    # Initial URI & URL
-    if ($args{uri}) {
-        $args{url} = scalar($args{uri}->canonical->as_string);
-    } else {
-        if ($args{url}) {
-            $args{uri} = new URI($args{url});
+    $args{user} ||= "";
+    $args{password} ||= "";
+    if ($args{url} && $args{user}) { # Set userinfo
+        $args{url}->userinfo(sprintf("%s:%s", $args{user}, $args{password}))
+    } elsif ($args{url}) {
+        ($args{user}, $args{password}) = (parse_credentials($args{url}->to_unsafe_string));
+    }
+    $args{pwcache} ||= ""; # pwcache file
+    $args{pwcache_ttl} //= PWCACHE_TTL;
+    if ($args{pwcache} && -e $args{pwcache}) { # Set pwcache
+        my $pwcache_path = path($args{pwcache});
+        if ($args{pwcache_ttl} && ($pwcache_path->stat->mtime + $args{pwcache_ttl}) < time) { # expired
+            $pwcache_path->remove;
         } else {
-            croak("Can't defined URL or URI");
+            touch($args{pwcache});
         }
     }
-    my $userinfo = $args{uri}->userinfo;
 
     # User Agent
     my $ua = $args{ua};
     unless ($ua) {
-        my %uaopt = (
-                agent                   => __PACKAGE__."/".$VERSION,
-                max_redirect            => MAX_REDIRECT,
-                timeout                 => $args{timeout},
-                requests_redirectable   => ['GET','HEAD'],
-                protocols_allowed       => ['http', 'https'],
+        # Create the instance
+        $ua = Mojo::UserAgent->new(
+                max_redirects       => $args{max_redirects} || MAX_REDIRECTS,
+                connect_timeout     => $args{connect_timeout} || CONNECT_TIMEOUT,
+                inactivity_timeout  => $args{inactivity_timeout} || INACTIVITY_TIMEOUT,
+                request_timeout     => $args{request_timeout} || REQUEST_TIMEOUT,
+                insecure            => $args{insecure} || 0,
             );
-        $ua = new MToken::Client::UserAgent(%uaopt);
-        $ua->default_header('Cache-Control' => "no-cache");
         $args{ua} = $ua;
     }
-    $ua->{x_userinfo} = $userinfo;
-
-    # URL Replacement (Redirect)
-    $args{redirect} = {};
-    my @trace_redirects = ();
-    my $turl = $args{url};
-    if ($args{redirect}->{$turl}) {
-        $args{url} = $args{redirect}->{$turl};
-        $args{uri} = new URI($args{url});
-    } else {
-        my $tres = $args{ua}->head($args{url});
-        my $dst_url;
-        foreach my $r ($tres->redirects) { # Redirects detected!
-            next unless $r->header('location');
-            my $dst_uri = new URI($r->header('location'));
-            $dst_uri->userinfo($userinfo) if $userinfo;
-            $dst_url = $dst_uri->canonical->as_string;
-            my $src_url = $r->request->uri->canonical->as_string;
-            push @trace_redirects, sprintf("Redirect detected (%s): %s ==> %s", $r->status_line, $src_url, $dst_url);
-        }
-        if ($dst_url) {
-            $args{redirect}->{$turl} = $dst_url; # Set SRC_URL -> DST_URL
-            $args{url} = $dst_url;
-            $args{uri} = new URI($dst_url);
-        }
-    }
-    $args{trace_redirects} = [@trace_redirects];
 
     my $self = bless {%args}, $class;
     return $self;
 }
-sub credentials {
-    my $self = shift;
-    my $user = shift;
-    my $password = shift;
-    my $realm = shift || $self->{realm};
-
-    $self->{user} = $user;
-    $self->{password} = $password;
-    #$self->req->authorization_basic( $user, $password ) if defined $user;
-    $self->{ua}->credentials($self->{uri}->host_port, $realm, $user, $password) if defined $user;
-    #$self->{ua}->add_handler( request_prepare => sub {
-    #        my($req, $ua, $h) = @_;
-    #        $req->authorization_basic( $user, $password ) if defined $user;
-    #        return $req;
-    #    } );
-
-    return 1;
-}
-
 sub error {
     my $self = shift;
     my $e = shift;
@@ -417,35 +333,6 @@ sub code {
     $self->{code} = $c if defined $c;
     return $self->{code};
 }
-sub line {
-    my $self = shift;
-    my $l = shift;
-    $self->{line} = $l if defined $l;
-    return $self->{line};
-}
-sub req {
-    my $self = shift;
-    return $self->{req};
-}
-sub res {
-    my $self = shift;
-    return $self->{res};
-}
-sub transaction {
-    my $self = shift;
-    my $res = $self->res;
-    return 'NOOP' unless $res;
-    my $length = $res->content_length || 0;
-    my $rtime = $self->{res_time} // 0;
-    return sprintf(TRANSACTION_MASK,
-        $self->req->method, # Method
-        sprintf(" %s", _hide_pasword($res->request->uri)->canonical->as_string), # URL
-        $self->line // "ERROR", # Line
-        _fbytes($length), # Length
-        _fduration($rtime), # Duration
-        $rtime ? sprintf(" (%s/sec)", _fbytes($length/$rtime)) : "",
-      )
-}
 sub trace {
     my $self = shift;
     my $v = shift;
@@ -457,386 +344,227 @@ sub trace {
     my $trace = $self->{trace} || [];
     return join("\n",@$trace);
 }
-
 sub cleanup {
     my $self = shift;
-    my $status = shift || 0;
-    $self->{status} = $status;
+    $self->{status} = 1;
     $self->{error} = "";
     $self->{code} = 0;
-    $self->{line} = "";
-    $self->{res_time} = 0;
     undef $self->{req};
     $self->{req} = undef;
     undef $self->{res};
     $self->{res} = undef;
     undef $self->{trace};
-    my $trace = $self->{trace_redirects} || [];
-    $self->{trace} = [@$trace];
+    $self->{trace} = [];
     return $self;
 }
-
-sub request {
+sub req {
     my $self = shift;
-    my $method = shift || "GET";
-    my $path = shift;
-    my $data = shift;
-    my $no_json_response = shift;
-    $self->cleanup;
+    return $self->{req};
+}
+sub res {
+    my $self = shift;
+    return $self->{res};
+}
+sub url {
+    my $self = shift;
+    return $self->{url};
+}
+sub ua {
+    my $self = shift;
+    return $self->{ua};
+}
+sub tx {
+    my $self = shift;
+    my $tx = shift;
 
-    my $ua = $self->{ua}; # UserAgent
-    my $sr = $self->{sr}; # Serializer
-    my $start_time = gettimeofday()*1;
-
-    # URI
-    my $uri = $self->{uri}->clone;
-    $uri->path($path) if defined $path;
-
-    # Prepare Request
-    my $req = new HTTP::Request(uc($method), $uri);
-    if ($method eq "POST") {
-        unless (defined($data) && ( is_hash($data) or !ref($data) )) {
-            croak("Data not specified! Please use HASH-ref or text data");
-        }
-        my ($req_content, $boundary);
-        if (is_hash($data)) { # form-data
-            my $ct = "multipart/form-data"; # "application/x-www-form-urlencoded"
-            ($req_content, $boundary) = HTTP::Request::Common::form_data($data, HTTP::Request::Common::boundary(6), $req);
-            $req->header('Content-Type' =>
-                    HTTP::Headers::Util::join_header_words( $ct, undef, boundary => $boundary )
-                ); # might be redundant
-        } else {
-            $req->header('Content-Type', CONTENT_TYPE);
-            $req_content = $data;
-        }
-        if (defined($req_content) && !ref($req_content)) {
-            Encode::_utf8_on($req_content);
-            $req->header('Content-Length' => length(Encode::encode("utf8", $req_content)));
-            $req->content(Encode::encode("utf8", $req_content));
-        } else {
-            $req->header('Content-Length' => 0);
-        }
-    } elsif ($method eq "PUT") {
-        $req->header('Content-Type', 'application/octet-stream');
-        if (length($data)) { # File for uploading!
-            my $file = $data;
-            my $sizef = (-s $file) || 0;
-            $req->header('Content-Length', $sizef);
-            my $fh;
-            $req->content(sub {
-                unless ($fh) {
-                    open($fh, "<", $file) || croak("Can't open file $file: $!");
-                    binmode($fh);
-                }
-                my $buf = "";
-                my $n = read($fh, $buf, 1024);
-                if ($n) {
-                    $sizef -= $n;
-                    #say(sprintf("sizef=%d; n=%d", $sizef, $n));
-                    return $buf;
-                }
-                close($fh);
-                return "";
-            });
-        } else {
-            $req->header('Content-Length', 0);
-        }
+    # Check Error
+    my $err = $tx->error;
+    unless (!$err || $err->{code}) {
+        $self->error($err->{message});
+        $self->status(0);
     }
-    $self->{req} = $req;
-
-    # Send Request
-    my $is_callback = ($data && ref($data) eq 'CODE') ? 1 : 0;
-    my $res = $is_callback ? $ua->request($req, $data) : $ua->request($req);
-    $self->{res} = $res;
-    $self->{res_time} = sprintf("%.*f",4, gettimeofday()*1 - $start_time) * 1;
-    my ($stat, $line, $code);
-    my $req_string = sprintf("%s %s", $method, _hide_pasword($res->request->uri)->canonical->as_string);
-    $stat = $res->is_success ? 1 : 0;
-    $self->status($stat);
-    $code = $res->code;
-    $self->code($code);
-    $line = $res->status_line;
-    $self->line($line);
-    $self->error(sprintf("%s >>> %s", $req_string, $line)) unless $stat;
+    $self->code($tx->res->code || "000");
+    $self->status($tx->res->is_success ? 1 : 0);
+    $self->error($tx->res->json("/message") || $err->{message} || "Unknown error" )
+        if $tx->res->is_error && !$self->error;
 
     # Tracing
-    {
-        # Request
-        $self->trace($req_string);
-        $self->trace($res->request->headers_as_string);
-        $self->trace(
-            sprintf("-----BEGIN REQUEST CONTENT-----\n%s\n-----END REQUEST CONTENT-----", $req->content)
-        ) if ($self->{verbose} && defined($req->content) && length($req->content));
-
-        # Response
-        $self->trace($line);
-        $self->trace($res->headers_as_string);
-        $self->trace(
-            sprintf("-----BEGIN RESPONSE CONTENT-----\n%s\n-----END RESPONSE CONTENT-----", $res->content)
-        ) if ($self->{verbose} && defined($res->content) && length($res->content));
+    my $length = $tx->res->body_size || 0;
+    my $rtime = $self->{tx_time} // 0;
+    $self->trace(sprintf(TRANSACTION_MASK,
+        $tx->req->method, $tx->req->url->to_abs, # Method & URL
+        $self->code, $tx->res->message || $err->{message} || "Unknown error", # Line
+        _fbytes($length), # Length
+        _fduration($rtime), # Duration
+        $rtime ? sprintf(" (%s/sec)", _fbytes($length/$rtime)) : "",
+      ));
+    my $req_hdrs = $tx->req->headers->to_string;
+    if ($req_hdrs) {
+        $self->trace(join("\n", map {$_ = "> $_"} split(/\n/, $req_hdrs)));
+        $self->trace(">");
+    }
+    my $res_hdrs = $tx->res->headers->to_string;
+    if ($res_hdrs) {
+        $self->trace(join("\n", map {$_ = "< $_"} split(/\n/, $res_hdrs)));
+        $self->trace("<");
     }
 
-    # Return
-    return () if $no_json_response || $method eq "HEAD";
+    # Request And Response
+    $self->{req} = $tx->req;
+    $self->{res} = $tx->res;
 
-    # DeSerialization
-    my $content = $res->decoded_content // '';
-    return () unless length($content);
-    my $structure = $sr->deserialize($content);
-    unless ($sr->status) {
-        if ($stat) {
-            $self->status(0);
-            $self->error($sr->error);
-        }
-        return ();
-    }
-    my %json = %$structure if $structure && ref($structure) eq 'HASH';
-    if ($stat) {
-        my $err = _check_response($structure);
-        if ($err) {
-            $self->status(0);
-            $self->error($err);
-            return %json;
-        }
-    }
-    return %json;
+    return $self->status;
 }
+sub request {
+    my $self = shift;
+    my $meth = shift;
+    my $_url = shift;
+    my @params = @_;
+    $self->cleanup(); # Cleanup first
 
+    # Set URL + credentials
+    my $url = $_url
+        ? Mojo::URL->new("$_url")
+        : $self->{url}
+            ? $self->url->clone
+            : Mojo::URL->new(DEFAULT_URL);
+    $url->userinfo($self->credentials($url)) if $_url;
+
+    # Request #1
+    my $start_time = steady_time() * 1;
+    my $tx = $self->ua->build_tx($meth, $url, @params); # Create transaction (tx) #1
+    my $status = $self->tx($self->ua->start($tx)); # Run it and validate!);
+    $self->{tx_time} = sprintf("%.*f",4, steady_time()*1 - $start_time) * 1;
+
+    # Auth test
+    if (!$status && $self->code == 401) {
+        $self->cleanup();
+        # Request #2
+        $url->userinfo($self->credentials($url, 1));
+        $tx = $self->ua->build_tx($meth, $url, @params); # Create transaction (tx) #2
+        $status = $self->tx($self->ua->start($tx)); # Run it and validate!);
+        $self->{tx_time} = sprintf("%.*f",4, steady_time()*1 - $start_time) * 1;
+        if (!$status && $self->code == 401) {
+            $self->{user} = "";
+            $self->{password} = "";
+            path($self->{pwcache})->remove if $self->{pwcache} && -e $self->{pwcache};
+        } elsif ($status && $self->{pwcache}) {
+            tcd_save($self->{pwcache}, $url->userinfo);
+        }
+    }
+
+    return $status;
+}
+sub credentials {
+    my $self = shift;
+    my $url = shift;
+    my $ask = shift(@_) ? 1 : 0;
+    $url ||= $self->{url};
+    my ($user, $password);
+
+    # return predefined credentials
+    return sprintf("%s:%s", $self->{user}, $self->{password}) if $self->{user};
+
+    # return if url contains credentials
+    ($user, $password) = (parse_credentials($url->to_unsafe_string));
+    return sprintf("%s:%s", $user, $password) if $user;
+
+    # Get from cache
+    if ($self->{pwcache} && -e $self->{pwcache}) {
+        my $pair = tcd_load($self->{pwcache}) // "";
+        ($user, $password) = split(/\:/, $pair);
+        return sprintf("%s:%s", $user, $password) if $user;
+        unlink($self->{pwcache});
+    }
+
+    # prompt if ask flag is true and is terminal
+    if ($ask && -t STDIN) {
+        my $realm = 'server';
+        printf STDERR "Enter username for %s at %s: ", $realm, $url->host_port;
+        $user = <STDIN>;
+        chomp($user);
+        if (length($user)) {
+            print STDERR "Password: ";
+            system("stty -echo") unless IS_MSWIN;
+            $password = <STDIN>;
+            system("stty echo") unless IS_MSWIN;
+            print STDERR "\n";  # because we disabled echo
+            chomp($password);
+            $self->{user} = $user;
+            $self->{password} = $password;
+        } else {
+            return "";
+        }
+        return sprintf("%s:%s", $user, $password);
+    }
+    return "";
+}
 sub check {
     my $self = shift;
-    $self->request("HEAD", @_);
-	unless ($self->status) {
-		my $code = $self->code || 500;
-		if ($code >=400) {
-			my $cachefn = File::Spec->catfile(DIR_TMP, PWCACHE_FILE);
-			if (-e $cachefn and -f $cachefn) {
-				unlink $cachefn;
-				$self->request("HEAD", @_);
-			}
-		}
-	}
-    return 0 unless $self->status;
-    return 1;
+    my $url = shift;
+    if (!$url && $self->{url}) {
+        $url = $self->url->clone;
+        $url->path("mtoken/");
+    }
+    return $self->request(HEAD => $url);
 }
-sub list {
+sub upload {
     my $self = shift;
-    my $filter = shift;
-    my %json = $self->request("GET");
-    return unless $self->status;
-    my $files = $json{data}{files} || [];
-    return @$files unless defined $filter and $filter ne "";
-    return grep { $_->{filename} && index($_->{filename}, $filter) >= 0 } @$files;
+    my $token = shift;
+    my $file = shift;
+    my $filepath = path($file);
+    my $filename = $filepath->basename;
+    my $url = $self->url->clone->path(sprintf("mtoken/%s/%s", $token, $filename));
+
+    my $asset_file = Mojo::Asset::File->new(path => $file);
+    $self->request(PUT => $url =>
+        { # Headers
+            'User-Agent' => sprintf("%s/%s", __PACKAGE__, $self->VERSION),
+            'Content-Type' => 'multipart/form-data',
+        },
+        form => {
+            size => $asset_file->size,
+            md5 => md5sum($asset_file->path),
+            tarball => {
+                file        => $asset_file,
+                filename    => $filename,
+                'Content-Type' => 'application/octet-stream',
+            },
+        },
+    );
 }
 sub info {
     my $self = shift;
-    my $filename_or_id = shift;
-    my ($id,$filename);
-    if ($filename_or_id && $filename_or_id =~ /^([0-9]{8})$/) {
-        $id = $1
-    } elsif ($filename_or_id) {
-        $filename = basename($filename_or_id);
-    } else {
-        $self->error("Incorrect filename or ID");
-        $self->status(0);
-        return ();
-    }
-
-    my %json = $self->request("GET");
-    return () unless $self->status;
-    my $files = $json{data}{files} || [];
-    my $ret;
-    if ($id) {
-        ($ret) = grep { $_->{date_sfx} && $_->{date_sfx} == $id } @$files;
-        return () unless $ret;
-        return %$ret;
-    }
-    ($ret) = grep { $_->{filename} && $_->{filename} eq $filename } @$files;
-    return () unless $ret;
-    return %$ret;
-}
-sub upload {
-    # Returns status
-    my $self = shift;
-    my $file = shift;
-    unless (defined($file) && length($file)) {
-        $self->error("Incorrect file");
-        $self->status(0);
-        return 0;
-    }
-    my $filename = basename($file);
-    my $req_object = "index_post";
-    my %json = $self->request("POST", undef, {
-        object  => $req_object,
-        md5     => MToken::Util::md5sum($file),
-        sha1    => MToken::Util::sha1sum($file),
-        size    => MToken::Util::filesize($file),
-        file1   => [
-                $file, $filename,
-                #"Content-Type" => 'text/html',
-            ],
-    });
-    my $res_object = $json{response_object} || '';
-    if ($req_object ne $res_object) {
-        $self->status(0);
-        $self->error(sprintf("Object mismatch: Expected: %s; Got: %s", $req_object, $res_object));
-    }
-    return $self->status;
-}
-sub update {
-    my $self = shift;
-    my $file = shift;
-    unless (defined($file) && length($file)) {
-        $self->error("Incorrect file");
-        $self->status(0);
-        return 0;
-    }
-    my $filename = basename($file);
-
-    my $curpath = "";
-    if ($self->{updpath}) {
-        $curpath = $self->{updpath};
-    } else {
-        $curpath = $self->{uri}->path || "";
-        $curpath =~ s/\/+$//;
-        $self->{updpath} = $curpath;
-    }
-
-    my $req_object = "file_put";
-    my %json = $self->request("PUT", join("/", $curpath, $filename), $file);
-    my $res_object = $json{response_object} || '';
-    if ($req_object ne $res_object) {
-        $self->status(0);
-        $self->error(sprintf("Object mismatch: Expected: %s; Got: %s", $req_object, $res_object));
-        return 0;
-    }
-
-    my $out_md5 = $json{data}{out}{out_md5};
-    if ($out_md5) {
-        my $in_md5 = MToken::Util::md5sum($file) || '';
-        unless ($in_md5 eq $out_md5) {
-            $self->status(0);
-            $self->error(sprintf("File md5sum mismatch: Expected: %s; Got: %s", $in_md5, $out_md5));
-
-        }
-    }
-    my $out_sha1 = $json{data}{out}{out_sha1};;
-    if ($out_sha1) {
-        my $in_sha1 = MToken::Util::sha1sum($file);
-        unless ($in_sha1 eq $out_sha1) {
-            $self->status(0);
-            $self->error(sprintf("File sha1sum mismatch: Expected: %s; Got: %s", $in_sha1, $out_sha1));
-        }
-    }
-
-    return $self->status;
+    my $token = shift;
+    my $url = $token
+        ? $self->url->clone->path(sprintf("mtoken/%s", $token))
+        : $self->url->clone->path("mtoken");
+    return $self->request(GET => $url);
 }
 sub remove {
     my $self = shift;
+    my $token = shift;
     my $file = shift;
-    unless (defined($file) && length($file)) {
-        $self->error("Incorrect file");
-        $self->status(0);
-        return 0;
-    }
-    my $filename = basename($file);
-
-    my $curpath = "";
-    if ($self->{rmvpath}) {
-        $curpath = $self->{rmvpath};
-    } else {
-        $curpath = $self->{uri}->path || "";
-        $curpath =~ s/\/+$//;
-        $self->{rmvpath} = $curpath;
-    }
-
-    my %json = $self->request("DELETE", join("/", $curpath, $filename));
-    return $self->status;
+    my $filepath = path($file);
+    my $filename = $filepath->basename;
+    my $url = $self->url->clone->path(sprintf("mtoken/%s/%s", $token, $filename));
+    return $self->request(DELETE => $url);
 }
 sub download {
-    # Returns message or undef
     my $self = shift;
-    my $file = shift; # name of file we download into
-    unless (defined($file) && length($file)) {
-        $self->error("Incorrect file");
-        $self->status(0);
-        return;
-    }
-    my $filename = basename($file);
-
-    my $curpath = "";
-    if ($self->{dldpath}) {
-        $curpath = $self->{dldpath};
-    } else {
-        $curpath = $self->{uri}->path || "";
-        $curpath =~ s/\/+$//;
-        $self->{dldpath} = $curpath;
-    }
-
-    my $f_init;
-    my $length;    # total number of bytes to download
-    my $size = 0;  # number of bytes received
-
-    $self->request("GET", join("/", $curpath, $filename), sub {
-        my $buf = shift;
-        unless(defined $f_init) {
-            my $res = shift;
-            $f_init = 1;
-            unless(fileno(FILE_DOWNLOAD)) {
-                open(FILE_DOWNLOAD, ">", $file) || croak("Can't open $file: $!");
-            }
-            binmode FILE_DOWNLOAD;
-            $length = $res->content_length;
-        }
-        print FILE_DOWNLOAD $buf or croak("Can't write to $file: $!");
-        $size += length($buf);
-    }, NO_JSON_RESPONSE);
-    my $msg;
-    if (fileno(FILE_DOWNLOAD)) {
-        close(FILE_DOWNLOAD) || croak("Can't write to $file: $!");
-        if ($length && $size != $length) {
-            unlink($file);
-            $self->error(srintf("File %s error. %s of %s received", $file, _fbytes($size), _fbytes($length)));
-            $self->status(0);
-            return;
-        } else {
-            $msg = sprintf("File %s: %s received", $file, _fbytes($size));
-        }
-    }
-    my $res = $self->res;
-    if ($res->header("X-Died") || !$res->is_success) {
-        if (my $died = $res->header("X-Died")) {
-            $self->error($died);
-        } else {
-            $self->error("Can't get file");
-        }
-        unlink($file);
-        $self->status(0);
-        return;
-    }
-
-    return $self->status ? $msg : undef;
+    my $token = shift;
+    my $file = shift;
+    my $filepath = path($file);
+    my $filename = $filepath->basename;
+    my $url = $self->url->clone->path(sprintf("mtoken/%s/%s", $token, $filename));
+    my $status = $self->request(GET => $url);
+    return $status unless $status;
+    $self->res->save_to($file);
+    return 1 if $filepath->stat->size;
+    $self->error("Can't download file");
+    return $self->status(0);
 }
 
-sub _check_response {
-    # Returns error string when status = 0 and error is not empty
-    my $res = shift;
-    # Returns:
-    #  "..." - errors!
-    #  undef - no errors
-    my @error;
-    if (is_hash($res)) {
-        return undef if value($res => "status"); # OK
-        my $errors = array($res => "error");
-        foreach my $err (@$errors) {
-            if (is_hash($err)) {
-                push @error, sprintf("E%04d %s", uv2zero(value($err => "code")), uv2null(value($err => "message")));
-            }
-        }
-    } else {
-        return "The response has not valid JSON format";
-    }
-    return join "; ", @error;
-}
 sub _fduration {
     my $msecs = shift || 0;
     my $secs = int($msecs);
@@ -865,63 +593,7 @@ sub _fbytes {
         return "$n bytes";
     }
 }
-sub _hide_pasword {
-    my $src = shift;
-    my $uri_wop = $src->clone;
-    my $info = $uri_wop->userinfo();
-    if ($info) {
-        $info =~ s/:.*//;
-        $uri_wop->userinfo(sprintf("%s:*****", $info));
-    }
-    return $uri_wop;
-}
 
 1;
 
-# We make our own specialization of LWP::UserAgent that asks for
-# user/password if document is protected.
-package # Hide it from PAUSE
-    MToken::Client::UserAgent;
-use LWP::UserAgent;
-use MToken::Const;
-use MToken::Util qw/parse_credentials tcd_save tcd_load/;
-use base 'LWP::UserAgent';
-sub get_basic_credentials {
-    my($self, $realm, $uri, $proxy) = @_;
-    my $uri2 = $uri->clone;
-    $uri2->userinfo($self->{x_userinfo}) if $self->{x_userinfo};
-    my $netloc = $uri->host_port;
-    my ($user, $password) = (parse_credentials($uri2->as_string));
-	my $cachefn = File::Spec->catfile(DIR_TMP, PWCACHE_FILE);
-    if ($user) {
-        return ($user, $password);
-	} elsif (-f $cachefn and -r _ and -s _) {
-		my $pair = tcd_load($cachefn) // "";
-		($user, $password) = split(/\:/, $pair);
-		unless (defined($user) && length($user)) {
-			unlink($cachefn);
-			return (undef, undef);
-		}
-		return ($user, $password);
-    } elsif (-t) {
-        print STDERR "Enter username for $realm at $netloc: ";
-        $user = <STDIN>;
-        chomp($user);
-        return (undef, undef) unless length $user;
-        print STDERR "Password: ";
-        system("stty -echo") unless MSWIN;
-        $password = <STDIN>;
-        system("stty echo") unless MSWIN;
-        print STDERR "\n";  # because we disabled echo
-        chomp($password);
-		tcd_save($cachefn, sprintf("%s:%s", $user, $password))
-			if $password !~ /\:/; # See also MToken::Client::check function!
-        return ($user, $password);
-    } else {
-        return (undef, undef);
-    }
-    #return if $proxy;
-    #return $self->credentials($uri->host_port, $realm);
-}
-
-1;
+__END__

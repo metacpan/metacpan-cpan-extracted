@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Authentication role for FTP server
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 has user => (is => 'rw');
@@ -137,7 +137,7 @@ AnyEvent::FTP::Server::Role::Auth - Authentication role for FTP server
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

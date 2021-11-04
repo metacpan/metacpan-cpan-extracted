@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Instrument;
-$Lab::Moose::Instrument::SCPI::Instrument::VERSION = '3.772';
+$Lab::Moose::Instrument::SCPI::Instrument::VERSION = '3.791';
 #ABSTRACT: Role for SCPI INSTrument subsystem.
 
 use v5.20;
@@ -44,7 +44,7 @@ Lab::Moose::Instrument::SCPI::Instrument - Role for SCPI INSTrument subsystem.
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 METHODS
 

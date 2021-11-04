@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.029'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -225,6 +225,7 @@ package YAML::PP::Preserve::Hash;
 # experimental
 use Tie::Hash;
 use base qw/ Tie::StdHash /;
+use Scalar::Util qw/ reftype blessed /;
 
 sub TIEHASH {
     my ($class) = @_;
@@ -239,6 +240,14 @@ sub STORE {
     my $keys = $self->{keys};
     unless (exists $self->{data}->{ $key }) {
         push @$keys, $key;
+    }
+    if (ref $val and not blessed($val)) {
+        if (reftype($val) eq 'HASH' and not tied %$val) {
+            tie %$val, 'YAML::PP::Preserve::Hash'
+        }
+        elsif (reftype($val) eq 'ARRAY' and not tied @$val) {
+            tie @$val, 'YAML::PP::Preserve::Array'
+        }
     }
     $self->{data}->{ $key } = $val;
 }
@@ -290,6 +299,7 @@ package YAML::PP::Preserve::Array;
 # experimental
 use Tie::Array;
 use base qw/ Tie::StdArray /;
+use Scalar::Util qw/ reftype blessed /;
 
 sub TIEARRAY {
     my ($class) = @_;
@@ -308,13 +318,27 @@ sub FETCHSIZE {
     return $#{ $self->{data} } + 1;
 }
 
+sub _preserve {
+    my ($val) = @_;
+    if (ref $val and not blessed($val)) {
+        if (reftype($val) eq 'HASH' and not tied %$val) {
+            tie %$val, 'YAML::PP::Preserve::Hash';
+        }
+        elsif (reftype($val) eq 'ARRAY' and not tied @$val) {
+            tie @$val, 'YAML::PP::Preserve::Array';
+        }
+    }
+    return $val;
+}
+
 sub STORE {
     my ($self, $i, $val) = @_;
+    _preserve($val);
     $self->{data}->[ $i ] = $val;
 }
 sub PUSH {
     my ($self, @args) = @_;
-    push @{ $self->{data} }, @args;
+    push @{ $self->{data} }, map { _preserve $_ } @args;
 }
 sub STORESIZE {
     my ($self, $i) = @_;
@@ -338,11 +362,11 @@ sub SHIFT {
 }
 sub UNSHIFT {
     my ($self, @args) = @_;
-    unshift @{ $self->{data} }, @args;
+    unshift @{ $self->{data} }, map { _preserve $_ } @args;
 }
 sub SPLICE {
     my ($self, $offset, $length, @args) = @_;
-    splice @{ $self->{data} }, $offset, $length, @args;
+    splice @{ $self->{data} }, $offset, $length, map { _preserve $_ } @args;
 }
 sub EXTEND {}
 
@@ -827,7 +851,7 @@ You can define a certain scalar style when dumping data.
 Figuring out the best style is a hard task and practically impossible to get
 it right for all cases. It's also a matter of taste.
 
-    use YAML::PP::Common qw/ PRESERVE_SCALAR_STYLE /;
+    use YAML::PP::Common qw/ PRESERVE_SCALAR_STYLE YAML_LITERAL_SCALAR_STYLE /;
     my $yp = YAML::PP->new(
         preserve => PRESERVE_SCALAR_STYLE,
     );
@@ -855,7 +879,10 @@ style instead of block style.
 If you add C<PRESERVE_ORDER> to the C<preserve> option, it will also keep the
 order of the keys in a hash.
 
-    use YAML::PP::Common qw/ PRESERVE_ORDER PRESERVE_FLOW_STYLE /;
+    use YAML::PP::Common qw/
+        PRESERVE_ORDER PRESERVE_FLOW_STYLE
+        YAML_FLOW_MAPPING_STYLE YAML_FLOW_SEQUENCE_STYLE
+    /;
     my $yp = YAML::PP->new(
         preserve => PRESERVE_FLOW_STYLE | PRESERVE_ORDER
     );

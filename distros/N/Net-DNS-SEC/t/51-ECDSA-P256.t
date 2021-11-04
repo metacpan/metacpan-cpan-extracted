@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 51-ECDSA-P256.t 1808 2020-09-28 22:08:11Z willem $	-*-perl-*-
+# $Id: 51-ECDSA-P256.t 1830 2021-01-26 09:08:12Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -20,7 +20,7 @@ foreach my $package ( sort keys %prerequisite ) {
 }
 
 plan skip_all => 'disabled ECDSA'
-		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_EC_KEY') };
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_ECDSA') };
 
 plan tests => 13;
 

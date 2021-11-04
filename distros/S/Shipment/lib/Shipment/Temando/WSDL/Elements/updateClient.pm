@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::updateClient;
-$Shipment::Temando::WSDL::Elements::updateClient::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::updateClient::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        client
 
-                  )
+                )
             ],
             {'client' => \%client_of,},
             {'client' => 'Shipment::Temando::WSDL::Types::Client',},
@@ -72,7 +72,7 @@ Shipment::Temando::WSDL::Elements::updateClient
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

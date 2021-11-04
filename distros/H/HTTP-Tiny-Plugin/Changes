@@ -1,3 +1,8 @@
+0.004   2021-06-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Introduce hooks {before,after}_instantiate.
+
+
 0.003   2020-08-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Add hook: before_request_once.

@@ -32,6 +32,14 @@ Provided with scalar reference, an array or just a regular string and this retur
 
 If an array reference or an array-based object is provided like L<Module::Generic::Array>, this will concatenate all the array elements
 
+=head2 append
+
+Provided with a string, and this will add it to the end of the string object.
+
+    # $s is 'Hello'
+    $s->append( ' world' );
+    # now this is: Hello world
+
 =head2 as_array
 
 Returns the current string value as an L<Module::Generic::Array> object.
@@ -64,14 +72,6 @@ Returns the object string as a string.
     print( "Hello $s\n" );
     # Hello Mary Jane
 
-=head2 append
-
-Provided with a string, and this will add it to the end of the string object.
-
-    # $s is 'Hello'
-    $s->append( ' world' );
-    # now this is: Hello world
-
 =head2 capitalise
 
 Returns a new L<Module::Generic::Scalar> object representing the string with the words capitalised, done in a smart way. That is the special words like C<and>, C<but>, C<if>, C<on>, C<or>, C<the>, C<to>, etc. are not capitalised.
@@ -80,11 +80,13 @@ This is based on the work done by L<John Gruber and Aristotle Pagaltzis|https://
 
 =head2 chomp
 
-Just like L<perlfunc/"chomp">, this remove the trailing new lines in the string, if any.
+Just like L<perlfunc/"chomp">, this removes the trailing new lines in the string object, if any.
+
+As per the perl documentation for L<perlfunc/chomp>, "it returns the total number of characters removed from all its arguments."
 
 =head2 chop
 
-Just like L<perlfunc/"chop">, this remove the trailing character in the string, no matter what it is.
+Just like L<perlfunc/"chop">, this removes the trailing character in the string object, no matter what it is, and returns the character chopped.
 
 =head2 clone
 
@@ -97,6 +99,10 @@ This takes a "salt" and returns an encrypted version of the string. See L<perlfu
 =head2 defined
 
 Returns true or false whether the string object contains a defined string, i.e. not C<undef>
+
+=head2 empty
+
+Alias for L</reset>. This empties the scalar object, making it zero-byte in length.
 
 =head2 fc
 
@@ -119,7 +125,7 @@ Returns the hex value of the string.
 
 =head2 index
 
-Given a sub string and an optional position, and this returns the position at which the sub string was found.
+Given a sub string and an optional position, and this returns the position at which the sub string was found. as a L<Module::Generic::Number> object.
 
 See L<perlfunc/"index">
 
@@ -221,6 +227,27 @@ Provided with a string or a regular express and this return the value of the reg
     my $s = "I disapprove of what you say, but I will defend to the death your right to say it";
     print( "Matches? ", $s->like( qr/\bapprove[[:blank:]\h]+what\b/ ) ? 'yes' : 'no', "\n" ); # print yes
 
+If there is no match, it returns 0, but in object, list or scalar context or when there are matches, it returns a L<Module::Generic::RegexpCapture> object. This object stringifies into the number of matches, so you can do:
+
+    if( $s->like( qr/[[:blank:]\h]+/ ) )
+    {
+        # Do something
+    }
+
+or
+
+    if( my $rv = $s->like( qr/([[:blank:]\h]+)/ )->result )
+    {
+        my $first_match = $rv->capture->first;
+        # Do something
+    }
+
+See also L</match> and L</replace>
+
+=head2 lower
+
+Alias for L</lc>
+
 =head2 ltrim
 
 This removes any new line and space characters, i.e. C<\r> and C<\n> at the B<begining> of the string.
@@ -242,6 +269,33 @@ Provided with a string or a regular expression like the one created with L<perlf
     $s->match( qr/WORLD/i ); # pass
     $s->match( 'monde' ); # obviously fail
 
+If there is no match, it returns 0, but in object, list or scalar context or when there are matches, it returns a L<Module::Generic::RegexpCapture> object. This object stringifies into the number of matches, so you can do:
+
+    if( $s->match( qr/[[:blank:]\h]+/ ) )
+    {
+        # Do something
+    }
+
+or
+
+    if( my $rv = $s->match( qr/([[:blank:]\h]+)/ )->result )
+    {
+        my $first_match = $rv->capture->first;
+        # Do something
+    }
+
+See also L</like> and L</replace>
+
+=head2 object
+
+Returns the current object. This is useful when chaining to force an object context. For example, with L</unpack>. In scalar context, L</unpack>, as per the L<perlfunc/unpack> documentation will return the first element:
+
+    my $unpack = $unpack_data->unpack( "A10xA28xA8A*" );
+
+But what if we wanted C<$unpack> to not be the first element, but the array object? For that, we would need to call L</unpack> in object context:
+
+    my $unpack = $unpack_data->unpack( "A10xA28xA8A*" )->object;
+
 =head2 open
 
 Opens the scalar in read/write mode and returns an object with same capabilities as regular file handle.
@@ -249,6 +303,14 @@ Opens the scalar in read/write mode and returns an object with same capabilities
 =head2 ord
 
 This returns the value of L<perlfunc/"ord"> on the string, as a L<Module::Generic::Number> object.
+
+=head2 pack
+
+Like L<perlfunc/pack>, this takes a template and convert the string object. "The resulting string is the concatenation of the converted values."
+
+It returns a new L<Module::Generic::Scalar> object.
+
+See also L<Module::Generic::Array/pack>
 
 =head2 pad
 
@@ -281,8 +343,25 @@ Given a string, this return a new L<Module::Generic::Scalar> object with the giv
 Provided with a string or a regular expression and a replacement string and this will replace all instance of the string or regular expression with the replacement string provided.
 
     # $s is Hello world
-    $s->replace( ' ', '_' ); # Hello_world
-    $s->replace( qr/[[:blank:]\h]+/, '_' ); # Hello_world
+    my $rv = $s->replace( ' ', '_' ); # Hello_world
+    my $rv = $s->replace( qr/[[:blank:]\h]+/, '_' ); # Hello_world
+
+If there is no match, it returns 0, but in object, list or scalar context or when there are matches, it returns a L<Module::Generic::RegexpCapture> object. This object stringifies into the number of matches, so you can do:
+
+    if( $s->replace( qr/[[:blank:]\h]+/, '_' ) )
+    {
+        # Do something
+    }
+
+or
+
+    if( my $rv = $s->replace( qr/([[:blank:]\h]+)/, '_' )->result )
+    {
+        my $first_match = $rv->capture->first;
+        # Do something
+    }
+
+See also L</like> and L</match>
 
 =head2 reset
 
@@ -390,6 +469,23 @@ If you stringify it like
     print( "$s" ? 'defined' : 'undefined', "\n" );
 
 It would still return as defined, because this would be a defined string, albeit empty
+
+=head2 unpack
+
+    my $array = $s->unpack( "W" );
+    # Returns the ord() value as a Module::Generic::Array object
+    $s->unpack( "W" )->length;
+    # Object context. Ditto
+    my( $date, $desc, $income, $expend ) = $s->unpack( "A10xA27xA7A*" );
+    # Returns a regular list of values
+
+Does the reverse of L</pack>. Provided with a template, it takes the string object and expands it out into a list of values.
+
+It returns an L<Module::Generic::Array> object in object or scalar context, and a regular list in list context.
+
+=head2 upper
+
+Alias for L</uc>
 
 =head1 SEE ALSO
 

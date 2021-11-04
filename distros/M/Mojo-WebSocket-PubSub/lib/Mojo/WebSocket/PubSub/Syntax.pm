@@ -1,5 +1,5 @@
 package Mojo::WebSocket::PubSub::Syntax;
-$Mojo::WebSocket::PubSub::Syntax::VERSION = '0.04';
+$Mojo::WebSocket::PubSub::Syntax::VERSION = '0.06';
 use Mojo::Base 'Mojo::EventEmitter';
 use Time::HiRes qw(gettimeofday);
 
@@ -124,7 +124,7 @@ Mojo::WebSocket::PubSub::Syntax - Syntax parser/builder for communication in Moj
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

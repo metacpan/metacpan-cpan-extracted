@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::DeliveryDetailType;
-$Shipment::UPS::WSDL::TrackTypes::DeliveryDetailType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::DeliveryDetailType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Date
               Time
 
-              )
+            )
         ],
         {   'Type' => \%Type_of,
             'Date' => \%Date_of,
@@ -67,7 +67,7 @@ Shipment::UPS::WSDL::TrackTypes::DeliveryDetailType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use English;
 
-use Test::More tests => 48;
+use Test::More tests => 49;
 use Path::Class;
 use DateTime;
 
@@ -167,3 +167,6 @@ is( $conn->get('foo'), 'test2', 'Cache with prefix - branch 2' );
 
 $conn->PREFIX('');
 is( $conn->get('foo'), undef, 'Cache with prefix - no prefix' );
+
+$conn->cleanup();
+is(scalar keys %{ $conn->_config() }, 1);

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::NotificationType;
-$Shipment::UPS::WSDL::ShipTypes::NotificationType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::NotificationType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        NotificationCode
               EMail
 
-              )
+            )
         ],
         {   'NotificationCode' => \%NotificationCode_of,
             'EMail'            => \%EMail_of,
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::NotificationType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

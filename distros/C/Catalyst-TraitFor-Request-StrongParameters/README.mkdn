@@ -1,0 +1,368 @@
+# NAME
+
+Catalyst::TraitFor::Request::StrongParameters - Enforce structural rules on your body and data parameters
+
+# SYNOPSIS
+
+For [Catalyst](https://metacpan.org/pod/Catalyst) v5.90090+
+
+       package MyApp;
+    
+       use Catalyst;
+    
+       MyApp->request_class_traits(['Catalyst::TraitFor::Request::StrongParameters']);
+       MyApp->setup;
+    
+
+For [Catalyst](https://metacpan.org/pod/Catalyst) older than v5.90090
+
+       package MyApp;
+    
+       use Catalyst;
+       use CatalystX::RoleApplicator;
+    
+       MyApp->apply_request_class_roles('Catalyst::TraitFor::Request::StrongParameters');
+       MyApp->setup;
+    
+
+In a controller:
+
+    package MyApp::Controller::User;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub user :Local {
+      my ($self, $c) = @_;
+
+      # Basically this is like a whitelist for the allowed parameters.  This is not a replacement
+      # for form validation but rather prior layer to make sure the incoming is semantically
+      # acceptable.  It also does some sanity cleanup like flatten unexpected arrays.  The following
+      # would accept body parameters like the following:
+      #
+      # $c->req->body_parameters == +{
+      #   username => 'jnap',
+      #   password => 'youllneverguess',
+      #   password_confirmation => 'youllneverguess'
+      #   'name.first' => 'John',
+      #   'name.last' => 'Napiorkowski',
+      #   'email[0]' => 'jjn1056@example1.com',
+      #   'email[1]' => 'jjn1056@example2.com',
+      # }
+
+      my %body_parameters = $c->req->strong_body
+        ->permitted('username', 'password', 'password_confirmation', name => ['first', 'last'], +{email=>[]} )
+        ->to_hash;
+
+      # %body_parameters then looks like this, which is a form suitable for validating and creating
+      # or updating a database.
+      #
+      # %body_parameters == (
+      #   username => 'jnap',
+      #   password => 'youllneverguess',
+      #   password_confirmation => 'youllneverguess'
+      #   name => +{
+      #     first => 'John',
+      #     last => 'Napiorkowski',
+      #   },
+      #   email => ['jjn1056@example1.com', 'jjn1056@example2.com'],
+      # );
+
+      # If you don't have theses that meant the request was ill-formed.
+      $c->detach('errors/400_bad_request') unless %body_parameters; 
+
+      # Ok so now you know %body_parameters are 'well-formed', you can use them to do stuff like
+      # value validation and updating a databases, etc.
+
+      my $new_user = $c->model('Schema::User')->validate_and_create(\%body_parameters);
+    }
+
+# DESCRIPTION
+
+**WARNING**: Renamed to [Catalyst::TraitFor::Request::StructuredParameters](https://metacpan.org/pod/Catalyst%3A%3ATraitFor%3A%3ARequest%3A%3AStructuredParameters) based on community feedback.
+This is just a release to say that and to tell you to change you Makefile if you are using this.   Don't 
+use it for new code!  I will eventually remove it from the index and it won't receive any new fixes.
+
+WARNING: This is a quick midnight hack and the code could have sharp edges.   Happy to take broken
+test cases.
+
+When your web application receives incoming POST body or data you should treat that data with suspicion.
+Even prior to validation you need to make sure the incoming structure is well formed (this is most
+important when you have deeply nested structures, which can be a major security risk both in parsing
+and in using that data to do things like update a database). [Catalyst::TraitFor::Request::StrongParameters](https://metacpan.org/pod/Catalyst%3A%3ATraitFor%3A%3ARequest%3A%3AStrongParameters)
+offers a structured approach to whitelisting your incoming POSTed data, as well as a safe way to introduce
+nested data structures into your classic HTML Form posted data.  It is also compatible for POSTed data
+(such as JSON POSTed data) although in the case of body data such as JSON we merely whitelist the fields
+and structure since JSON can already support nested data structures.
+
+This is similar to a concept called 'strong parameters' in Rails although my implementation is somewhat
+different based on the varying needs of the [Catalyst](https://metacpan.org/pod/Catalyst) framework.   However I consider this beta code
+and subject to change should real life use cases arise that indicate a different approach is warranted.
+
+# METHODS
+
+This role defines the following methods:
+
+## strong\_body
+
+Returns an instance of [Catalyst::Utils::StrongParameters](https://metacpan.org/pod/Catalyst%3A%3AUtils%3A%3AStrongParameters) preconfigured with the current contents
+of ->body\_parameters. Any arguments are passed to that instances ["permitted"](#permitted) methods before return.
+
+## strong\_query
+
+Parses the URI query string; otherwise same as ["strong\_body"](#strong_body).
+
+## strong\_data
+
+The same as ["strong\_body"](#strong_body) except aimed at body data such as JSON post.   Basically works
+the same except the default for handling array values is to leave them alone rather than to flatten.
+
+# PARAMETER OBJECT METHODS
+
+The instance of [Catalyst::Utils::StrongParameters](https://metacpan.org/pod/Catalyst%3A%3AUtils%3A%3AStrongParameters) which is returned by any of the three builder
+methods above (["strong\_body"](#strong_body), ["strong\_query and ) supports the following methods."](#strong_query-and-strong_data-supports-the-following-methods)
+
+## namespace (\\@fields)
+
+Sets the current 'namespace' to start looking for fields and values.  Useful when all the fields are
+under a key.  For example if the value of ->body\_parameters is:
+
+    +{
+        'person.name' => 'John',
+        'person.age' => 52,
+    }
+
+If you set the namespace to `['person']` then you can create rule specifications that assume to be
+'under' that key.  See the ["SYNOPSIS"](#synopsis) for an example.
+
+## permitted (?\\@namespace, @rules)
+
+An array of rule specifications that are used to filter the current parameters as passed by the user
+and present a sanitized version that can safely be used in your code. 
+
+If the first argument is an arrayref, that value is used to set the starting ["namespace"](#namespace).
+
+## required (?\\@namespace, @rules)
+
+An array of rule specifications that are used to filter the current parameters as passed by the user
+and present a sanitized version that can safely be used in your code. 
+
+If user submitted parameters do not match the spec an exception is throw ([Catalyst::Exception::MissingParameter](https://metacpan.org/pod/Catalyst%3A%3AException%3A%3AMissingParameter)
+If you want to use required parameters then you should add code to catch this error and handle it
+(see below for more)
+
+If the first argument is an arrayref, that value is used to set the starting ["namespace"](#namespace).
+
+## flatten\_array\_value ($bool)
+
+Switch to indicated if you want to flatten any arrayref values to 'pick last'.   This is true by default
+for body and query parameters since its a common hack around quirks with certain types of HTML form controls
+(like checkboxes) which don't return a value when not selected or checked.
+
+## to\_hash
+
+Returns the currently filtered parameters based on the current permitted and/or required specifications. 
+
+# CHAINING
+
+All the public methods for [Catalyst::Utils::StrongParameters](https://metacpan.org/pod/Catalyst%3A%3AUtils%3A%3AStrongParameters) return the current instance so that
+you can chain methods easilu (except for ["to\_hash"](#to_hash)).   If you chain ["permitted"](#permitted) and ["required"](#required)
+the accepted hashrefs are merged.
+
+# RULE SPECIFICATIONS
+
+[Catalyst::TraitFor::Request::StrongParameters](https://metacpan.org/pod/Catalyst%3A%3ATraitFor%3A%3ARequest%3A%3AStrongParameters) offers a concise DSL for describing permitted and required
+parameters, including flat parameters, hashes, arrays and any combination thereof.
+
+Given body\_parameters of the following:
+
+    +{
+      'person.name' => 'John', 
+      'person.age' => '52',
+      'person.address.street' => '15604 Harry Lind Road',
+      'person.address.zip' => '78621',
+      'person.email[0]' => 'jjn1056@gmail.com',
+      'person.email[1]' => 'jjn1056@yahoo.com',
+      'person.credit_cards[0].number' => '245345345345345',
+      'person.credit_cards[0].exp' => '2024-01-01',
+      'person.credit_cards[1].number' => '666677777888878',
+      'person.credit_cards[1].exp' => '2024-01-01',
+      'person.credit_cards[].number' => '444444433333',
+      'person.credit_cards[].exp' => '4024-01-01',
+    }
+
+    my %data = $c->req->strong_body
+      ->namespace(['person'])
+      ->permitted('name','age');
+
+    # %data = ( name => 'John', age => 53 );
+    
+    my %data = $c->req->strong_body
+      ->namespace(['person'])
+      ->permitted('name','age', address => ['street', 'zip']); # arrayref means the following are subkeys
+
+    # %data = (
+    #   name => 'John', 
+    #   age => 53, 
+    #   address => +{
+    #     street => '15604 Harry Lind Road',
+    #     zip '78621',
+    #   }
+    # );
+
+    my %data = $c->req->strong_body
+      ->namespace(['person'])
+      ->permitted('name','age', +{email => []} );  # wrapping in a hashref mean 'under this is an arrayref
+
+    # %data = (
+    #   name => 'John', 
+    #   age => 53,
+    #   email => ['jjn1056@gmail.com', 'jjn1056@yahoo.com']
+    # );
+    
+    # Combine hashref and arrayref to indicate array of subkeyu
+    my %data = $c->req->strong_body
+      ->namespace(['person'])
+      ->permitted('name','age', +{credit_cards => [qw/number exp/]} ); 
+
+    # %data = (
+    #   name => 'John', 
+    #   age => 53,
+    #   credit_cards => [
+    #     {
+    #       number => "245345345345345",
+    #       exp => "2024-01-01",
+    #     },
+    #     {
+    #       number => "666677777888878",
+    #       exp => "2024-01-01",
+    #     },
+    #     {
+    #       number => "444444433333",
+    #       exp => "4024-01-01",
+    #     },
+    #   ]
+    # );
+
+You can specify more than one specification for the same key.  For example if body
+parameters are:
+
+    +{
+      'person.credit_cards[0].number' => '245345345345345',
+      'person.credit_cards[0].exp' => '2024-01-01',
+      'person.credit_cards[1].number' => '666677777888878',
+      'person.credit_cards[1].exp.year' => '2024',
+      'person.credit_cards[1].exp.month' => '01',
+    }
+
+    my %data = $c->req->strong_body
+      ->namespace(['person'])
+      ->permitted(+{credit_cards => ['number', 'exp', exp=>[qw/year month/] ]} ); 
+
+    # %data = (
+    #   credit_cards => [
+    #     {
+    #       number => "245345345345345",
+    #       exp => "2024-01-01",
+    #     },
+    #     {
+    #       number => "666677777888878",
+    #       exp => +{
+    #         year => '2024',
+    #         month => '01'
+    #       },
+    #     },
+    #   ]
+    # );
+
+## ARRAY DATA AND ARRAY VALUE FLATTENING
+
+Please note this only applies to ["strong\_body"](#strong_body) / ["strong\_query"](#strong_query)
+
+In the situation when you have a array value for a given namespace specification such as
+the following :
+
+    'person.name' => 2,
+    'person.name' => 'John', # flatten array should jsut pick the last one
+
+We automatically pick the last POSTed value.  This can be a useful hack around some HTML form elements
+that don't set an 'off' value (like checkboxes).
+
+## 'EMPTY' FINAL INDEXES
+
+Please note this only applies to ["strong\_body"](#strong_body) / ["strong\_query"](#strong_query)
+
+Since the index values used to sort arrays are not preserved (they indicate order but are not used to
+set the index since that could open your code to potential hackers) we permit a final 'empty' index:
+
+    'person.credit_cards[0].number' => '245345345345345',
+    'person.credit_cards[0].exp' => '2024-01-01',
+    'person.credit_cards[1].number' => '666677777888878',
+    'person.credit_cards[1].exp' => '2024-01-01',
+    'person.credit_cards[].number' => '444444433333',
+    'person.credit_cards[].exp' => '4024-01-01',
+
+This 'empty' index will always be considered the finall element when sorting
+
+# EXCEPTIONS
+
+The following exceptions can be raised by these methods and you should add code to recognize and
+handle them.  For example you can add a global or controller scoped 'end' action:
+
+    sub end :Action {
+      my ($self, $c) = @_;
+      if(my $error = $c->last_error) {
+        $c->clear_errors;
+        if(blessed($error) && $error->isa('Catalyst::Exception::StrongParameter')) {
+          # Handle the error perhaps by forwarding to a view and setting a 4xx 
+          # bad request response code.
+        }
+      }
+    }
+
+## Exception: Base Class
+
+[Catalyst::Exception::StrongParameter](https://metacpan.org/pod/Catalyst%3A%3AException%3A%3AStrongParameter)
+
+There's a number of different exceptions that this trait can throw but they all inherit from
+[Catalyst::Exception::StrongParameter](https://metacpan.org/pod/Catalyst%3A%3AException%3A%3AStrongParameter) so you can just check for that since those are all going
+to be considered 'Bad Request' type issues.
+
+## EXCEPTION: MISSING PARAMETER
+
+[Catalyst::Exception::MissingParameter](https://metacpan.org/pod/Catalyst%3A%3AException%3A%3AMissingParameter) ISA [Catalyst::Exception::StrongParameter](https://metacpan.org/pod/Catalyst%3A%3AException%3A%3AStrongParameter)
+
+If you use ["required"](#required) and a parameter is not present you will raise this exception, which will
+contain a message indicating the first found missing parameter.  For example:
+
+    "Required parameter 'username' is missing."
+
+This will not be an exhaustive list of the missing parameters and this feature in not intended to
+be used as a sort of form validation system.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest)
+
+# COPYRIGHT & LICENSE
+
+Copyright 20121, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 167:
+
+    Nested L<> are illegal.  Pretending inner one is X<...> so can continue looking for other errors.
+
+    Unterminated L<...> sequence

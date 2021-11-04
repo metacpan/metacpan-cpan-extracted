@@ -27,7 +27,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.010"
+            "perl" : "5.013002"
          }
       },
       "develop" : {
@@ -44,9 +44,13 @@
       },
       "runtime" : {
          "requires" : {
+            "DDP" : "0",
             "Mojolicious" : "9.00",
+            "Regexp::Pattern" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::Shell" : "0.12",
             "Time::HiRes" : "0",
-            "perl" : "5.010"
+            "perl" : "5.013002"
          }
       },
       "test" : {
@@ -57,7 +61,7 @@
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "Test::More" : "0",
-            "perl" : "5.010",
+            "perl" : "5.013002",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -66,15 +70,19 @@
    "provides" : {
       "Mojo::WebSocket::PubSub" : {
          "file" : "lib/Mojo/WebSocket/PubSub.pm",
-         "version" : "0.04"
+         "version" : "0.06"
+      },
+      "Mojo::WebSocket::PubSub::Shell" : {
+         "file" : "lib/Mojo/WebSocket/PubSub/Shell.pm",
+         "version" : "0.06"
       },
       "Mojo::WebSocket::PubSub::Syntax" : {
          "file" : "lib/Mojo/WebSocket/PubSub/Syntax.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Mojolicious::Plugin::PubSub::WebSocket" : {
          "file" : "lib/Mojolicious/Plugin/PubSub/WebSocket.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -86,7 +94,7 @@
          "web" : "https://github.com/EmilianoBruni/mojo-websocket-pubsub"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

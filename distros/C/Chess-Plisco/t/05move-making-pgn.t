@@ -22,7 +22,7 @@ sub significant_for_repetition;
 
 eval { require Chess::PGN::Parse };
 if ($@) {
-	plan skip_all => 'You have to install PGN::Parse to run these tests.';
+	plan skip_all => 'You have to install Chess::PGN::Parse to run these tests.';
 	exit 0;
 }
 

@@ -16,6 +16,7 @@ my @files = (
     'lib/Archive/BagIt/Plugin/Manifest/SHA512.pm',
     'lib/Archive/BagIt/Role/Algorithm.pm',
     'lib/Archive/BagIt/Role/Manifest.pm',
+    'lib/Archive/BagIt/Role/OpenSSL.pm',
     'lib/Archive/BagIt/Role/Plugin.pm',
     'lib/Archive/BagIt/Role/Portability.pm',
     't/00-compile.t',

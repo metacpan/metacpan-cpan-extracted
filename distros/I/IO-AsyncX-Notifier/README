@@ -1,0 +1,43 @@
+NAME
+
+    IO::AsyncX::Notifier - easier IO::Async::Notifiers with Object::Pad
+
+SYNOPSIS
+
+     use Object::Pad;
+     class Example isa IO::AsyncX::Notifier {
+      # This will be populated by ->configure(example_slot => ...)
+      # or ->new(example_slot => ...)
+      has $example_slot;
+      # This will be updated by ->configure (or ->new) in a similar fashion
+      use Ryu::Observable;
+      has $observable_slot { Ryu::Observable->new };
+    
+      # You can have as many other slots as you want, main limitation
+      # at the moment is that they have to be scalars.
+    
+      method current_values () {
+       'Example slot: ' . $example_slot,
+       ' and observable set to ' . $observable_slot->as_string
+      }
+     }
+     my $obj = Example->new(
+      example_slot    => 'xyz',
+      observable_slot => 'starting value'
+     );
+     print join "\n", $obj->current_values;
+
+DESCRIPTION
+
+    Provides some helper logic to simplify Object::Pad-based
+    IO::Async::Notifier subclasses.
+
+AUTHOR
+
+    Tom Molesworth <TEAM@cpan.org>
+
+LICENSE
+
+    Copyright Tom Molesworth 2021. Licensed under the same terms as Perl
+    itself.
+

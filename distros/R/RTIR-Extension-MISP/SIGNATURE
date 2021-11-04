@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 4fcd07bd62b213a55f7cadf7f92e23e886ecdc19 Changes
+SHA1 3f4927938fd77feca692f6fcce5ec80c61d8051f MANIFEST
+SHA1 2e2f7c7c0765ace35c0b055d719fac6ea72d389a META.yml
+SHA1 1783c9b31e68acad94e9592bcf9d3a7797c0caec Makefile.PL
+SHA1 8650d41b74b970b1c916406c7d4e491610f721c7 README
+SHA1 eff693f3066e76fb55c46d4c7a92bac3f8d2016f devel/create-event-misp.py
+SHA1 508a3ad16688f66f4e250d3b0741f81f62c807af etc/MISP_Config.pm
+SHA1 92523a040a0077f2323ef56c02075639e03fdfb9 etc/initialdata
+SHA1 4337c644a2e4e1d6b828289c81864817437a7863 html/Callbacks/RTIR-Extension-MISP/Elements/Tabs/Privileged
+SHA1 08025cecfc76b6b0c328e77ad62d6d0f27e9021f html/Callbacks/RTIR-Extension-MISP/RTIR/Incident/Display.html/ProcessArguments
+SHA1 4f0a0caf72c7335b34114bf63f27dda0fbb918d6 html/Callbacks/RTIR-Extension-MISP/RTIR/Incident/Display.html/RightColumnEnd
+SHA1 7f828ad0c6a6b1586326dcfcad83c8f4060dc667 html/Callbacks/RTIR-Extension-MISP/RTIR/Tools/ExternalFeeds.html/AfterFeedsList
+SHA1 1144723b20e5a1aa597536c96740e3161c8d19e9 html/Callbacks/RTIR-Extension-MISP/RTIR/Tools/ExternalFeeds.html/DisplayFeedContent
+SHA1 a76f22c598775e42abfb6326a59e4b08e06a2242 html/Helpers/MISPEventDetails
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 ad0193a17bb21562d27ac9a5f7a2fd782a3fafb5 inc/Module/Install/RTx.pm
+SHA1 a17d6d01c9da7a5bed6fcef0038727e63d9b932a inc/Module/Install/RTx/Runtime.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 61eb6159a86c81ec77f4a7ae9a177e187cad4634 inc/YAML/Tiny.pm
+SHA1 cb0c3eda5322984885ad06b9141754315bc75ef0 lib/RT/IR/ExternalFeeds_Vendor.pm
+SHA1 e9f91725d48f5f92c670e20d8977f0eb0cd0bbab lib/RTIR/Extension/MISP.pm
+SHA1 eaa9379dba3c9d101241cf5a59637295327354d5 patches/Add-callbacks-to-the-feed-listing-and-display-pages.patch
+SHA1 d86bd707826c37cf5d007433306a50c8af2b9a63 static/css/rtir-extension-misp.css
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEFelFwSnB+u9xCpouFedxUadmpRQFAmF5uBwACgkQFedxUadm
+pRQ6mAf/Z9N21MH9KZbNaRklB1pnq1ZAe7TL96ihjV5gkipdEBdopin/beU31loT
+I82CW5AjaEFN8ISJq4V3ECow6PsFCqOE1cyI2IYVfIiiq/Sh68h9wDvCesAc9Eb7
+wprh4N3fjzWWyC2avfhjsUEqRypzHVDTR17vKEylMgsiDjMJV4W00tKHTP/dXb0T
+DxzBPT1CICDtYJCKGBrcFSF4UrGV09HKKKgPptT0WQ/4z6ttTttyNJmbG5ClFPc0
+uf3fc+w86eKeZa3idcgIGmHwZ8bbIxDg8jdpiJUStl2MFBAEg9qzo7Y6S4UfXi4x
+nNIHFwxIBxhjGawCTyy7nFloXqEOnw==
+=AgKp
+-----END PGP SIGNATURE-----

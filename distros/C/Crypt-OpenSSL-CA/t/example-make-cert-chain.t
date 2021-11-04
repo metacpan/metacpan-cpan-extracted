@@ -10,7 +10,7 @@ works and produces an RFC3280-valid certificate chain.
 
 =cut
 
-use Test::More "no_plan";
+use Test2::V0;
 
 use Crypt::OpenSSL::CA::Test qw(run_perl_script_ok run_thru_openssl
                                 dumpasn1_available run_dumpasn1
@@ -68,3 +68,4 @@ if (dumpasn1_available()) {
 }
 
 
+done_testing;

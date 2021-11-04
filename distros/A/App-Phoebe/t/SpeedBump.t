@@ -19,7 +19,7 @@ use File::Slurper qw(write_text);
 
 my $msg;
 if (not $ENV{TEST_AUTHOR}) {
-  $msg = 'Contributions are an author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+  $msg = 'This is an author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
 } else {
   for my $module (qw(Net::IP Net::DNS)) {
     if (not defined eval "require $module") {

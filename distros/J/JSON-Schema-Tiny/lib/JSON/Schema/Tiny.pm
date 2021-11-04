@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: v0.009-7-g8a6730f
+package JSON::Schema::Tiny; # git description: v0.010-3-g6a5c007
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use 5.016;  # for the unicode_strings feature
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -1363,7 +1363,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

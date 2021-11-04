@@ -1,3 +1,11 @@
+0.003   2021-05-12  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with updated BorderStyle POD::Weaver plugin to show
+          examples including one using Text::Table::More.
+
+
 0.002   2020-06-11  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

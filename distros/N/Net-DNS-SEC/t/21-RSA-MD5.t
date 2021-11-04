@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 21-RSA-MD5.t 1808 2020-09-28 22:08:11Z willem $	-*-perl-*-
+# $Id: 21-RSA-MD5.t 1830 2021-01-26 09:08:12Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -8,7 +8,7 @@ use IO::File;
 use Test::More;
 
 my %prerequisite = (
-	'Net::DNS::SEC' => 1.01,
+	'Net::DNS::SEC' => 1.15,
 	'MIME::Base64'	=> 2.13,
 	);
 
@@ -20,7 +20,7 @@ foreach my $package ( sort keys %prerequisite ) {
 }
 
 plan skip_all => 'disabled RSA'
-		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_RSA') };
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_RSA') };
 
 plan tests => 8;
 

@@ -4,8 +4,12 @@ use utf8;
 use Test::More;
 use File::Spec;
 
+my $t = File::Spec->rel2abs('t');
 my $lib = File::Spec->rel2abs('lib');
 my $bin = File::Spec->rel2abs('script/optex');
+
+
+$ENV{HOME} = "$t/home";
 
 is(optex(), 2);
 

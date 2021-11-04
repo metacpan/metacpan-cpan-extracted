@@ -1,0 +1,57 @@
+Acme-FishFarm (Version 1.00)
+
+This is a module for creating a virtual fish farm (aquaculture) with automated systems. 
+
+This module is not meant to implement everything found in the real aquaculture field. As a 
+matter of fact, this is part of an assignment which I think it would be good to pack those 
+features into a module.
+
+This module might probably be good for fun :)
+
+The Acme::FishFarm distribution comes along with several other related modules. These are 
+the automated systems used in aquaculture. These modules are:
+
+1. Acme::FishFarm::Feeder
+2. Acme::FishFarm::WaterFiltration
+3. Acme::FishFarm::WaterLevelMaintainer
+4. Acme::FishFarm::WaterConditionMonitor
+5. Acme::FishFarm::OxygenMaintainer
+
+The offline documentations for all these modules can be found in the "docs" directory.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::FishFarm
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-FishFarm
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Acme-FishFarm
+
+    Search CPAN
+        https://metacpan.org/release/Acme-FishFarm
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2021 by Raphael Jong Jun Jie.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

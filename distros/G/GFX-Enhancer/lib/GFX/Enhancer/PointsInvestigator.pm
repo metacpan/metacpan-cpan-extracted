@@ -8,48 +8,38 @@ sub new {
 	my $self = {};
 
 	$class = ref($class) || $class;
-
 	bless $self, $class;
 }
 
-sub calculate_neighbourhood {
-	my ($self, $rgba_index, @previous_lines_points, $imgrepr) = @_;
+sub calculate_neighbourhood_of_point {
+  my ($self, $rgba_index, $imgrepr, $threshold) = @_;
+  
+  my @return_rgbasl = ();
+  
+  ### search for neighbourhood of $rgba_index'd points
+  ### each loop consists of a width in the png rect (width x height)
 
-	my @return_rgbasl = ();
+  ### match if there are adjacent points width -1, width + 1 and intermediate width itself
+  my @neighbourhood_points = ();
+  if ($rgba_index > $imgrepr->{width} + 1) {
+    push(@neighbourhood_points, $imgrepr->{points}[$rgba_index - $imgrepr->{width}]);
+    push(@neighbourhood_points, $imgrepr->{points}[$rgba_index - $imgrepr->{width} - 1]);
+    push(@neighbourhood_points, $imgrepr->{points}[$rgba_index - $imgrepr->{width} + 1]);
+  }
 
-	### search for neighbourhood of $rgba_index'd points
-	### each loop consists of a width in the png rect
+  if ($rgba_index < $imgrepr->{width} * $imgrepr->{height} + 1) {
+    push(@neighbourhood_points, $imgrepr->{points}[$rgba_index + $imgrepr->{width}]);
+    push(@neighbourhood_points, $imgrepr->{points}[$rgba_index + $imgrepr->{width} - 1]);
+    push(@neighbourhood_points, $imgrepr->{points}[$rgba_index + $imgrepr->{width} + 1]);
+  }
+  
+  for (my $i = 0; $i < length (@neighbourhood_points); $i++) {
+    if (@neighbourhood_points[$i]->threshold_colour($imgrepr->{points}[$rgba_index], $threshold)) {
+      push (@return_rgbasl, @neighbourhood_points[$i]);
+    }
+  } 
+  return @return_rgbasl;	
+}
 
-	### previous line fetch NOTE reverse
-	my @prevs = ();
-	for (my $j = 0; $j < reverse (@previous_lines_points); $j++) { 
-		### < further $i
-		if (@previous_lines_points[$j]->{index} < $imgrepr->{points}[$rgba_index]->{index} / 4) {
-			push(@prevs, @previous_lines_points[$j]);
-		} else {
-			last;
-		}
-	}
-		
-	@prevs = reverse (@prevs);
-
-	if (length (@prevs) != 0) { 
-
-		for (my $i = $imgrepr->{points}[$rgba_index]->{index} / 4; $i < $imgrepr->{width}; $i++) {
-			for (my $j = 0; $j < length(@prevs); $j++) {
-				if (@prevs[$j]->{index} / 4 <= $i - $imgrepr->{width}) {
-					for (my $k = 0; $k < length(@prevs); $k++) {
-						### match if there are adjacent points width -1, width + 1 and intermediate width itself
-						if (@prevs[$k]->{index} / 4 == @prevs[$j] - $imgrepr->{width} or @prevs[$k]->{index} / 4 == @prevs[$j] - $imgrepr->{width} - 1 or @prevs[$k]->{index} / 4 == @prevs[$j] - $imgrepr->{width} + 1) {
-	push (@return_rgbasl, $imgrepr->{points}[$rgba_index]) unless ($imgrepr->{points}[$rgba_index] ~~ @return_rgbasl); ### unless element in already list
-}
-}
-}
-}				
-}
-} else {
-	### FIXME
-}
-	return @return_rgbasl;	
-}
 1;
+  

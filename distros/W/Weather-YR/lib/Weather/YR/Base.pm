@@ -14,11 +14,11 @@ has 'service_url' => (
     isa     => 'Mojo::URL',
     is      => 'ro',
     lazy    => 1,
-    default => sub { Mojo::URL->new('http://api.met.no') },
+    default => sub { Mojo::URL->new('https://api.met.no') },
 );
 
 has [ 'lat', 'lon', 'msl' ] => (
-    isa      => 'Maybe[Num]',
+    isa      => 'Num',
     is       => 'rw',
     required => 0,
     default  => 0,
@@ -31,10 +31,10 @@ has 'xml' => (
 );
 
 has 'lang' => (
-    isa      => 'Maybe[Str]',
+    isa      => 'Str',
     is       => 'rw',
     required => 0,
-    default  => 'nb',
+    default  => 'en',
 );
 
 has 'tz' => (
@@ -57,6 +57,18 @@ has 'xml_ref' => (
     lazy_build => 1,
 );
 
+# Make sure that 'lat' and 'lon' is restricted to four decimals, ref.
+# https://api.met.no/doc/TermsOfService#traffic
+around [ 'lat', 'lon' ] => sub {
+    my $orig  = shift;
+    my $self  = shift;
+    my $value = shift || $self->$orig;
+
+    $value = sprintf( '%0.4f', $value );
+
+    return $self->$orig( $value );
+};
+
 sub _build_xml_ref {
     my $self = shift;
 
@@ -78,8 +90,9 @@ sub _build_xml_ref {
     if ( length $self->xml ) {
         if ( $self->can('schema_url') ) {
             eval {
-                my $xml_doc = XML::LibXML->new->load_xml( string => $self->xml );
-                my $schema  = XML::LibXML::Schema->new( location => $self->schema_url );
+                my $xml_doc  = XML::LibXML->new->load_xml( string => $self->xml );
+                my $response = $self->ua->get( $self->schema_url->to_string );
+                my $schema   = XML::LibXML::Schema->new( string => $response->decoded_content );
 
                 $schema->validate( $xml_doc );
             };
@@ -91,7 +104,6 @@ sub _build_xml_ref {
                 my $result = undef;
 
                 eval {
-                    # $result = XML::Bare->new( text => $self->xml )->parse;
                     $result = XML::Simple::XMLin( $self->xml, ForceArray => 0 );
                 };
 
@@ -124,7 +136,6 @@ sub date_to_datetime {
 
     return $date;
 }
-
 
 __PACKAGE__->meta->make_immutable;
 

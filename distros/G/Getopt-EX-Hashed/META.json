@@ -1,5 +1,5 @@
 {
-   "abstract" : "Hash store object automation",
+   "abstract" : "Hash store object automation for Getopt::Long",
    "author" : [
       "Kazumasa Utashiro"
    ],
@@ -42,7 +42,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Clone" : "0",
             "List::Util" : "0",
             "perl" : "v5.14.0"
          }
@@ -57,7 +56,7 @@
    "provides" : {
       "Getopt::EX::Hashed" : {
          "file" : "lib/Getopt/EX/Hashed.pm",
-         "version" : "0.9920"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -71,7 +70,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-Hashed"
       }
    },
-   "version" : "0.9920",
+   "version" : "1.00",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

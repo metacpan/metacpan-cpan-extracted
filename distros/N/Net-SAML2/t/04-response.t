@@ -1,7 +1,8 @@
-use Test::More;
-use Net::SAML2;
+use Test::Lib;
+use Test::Net::SAML2;
+
+use Net::SAML2::Protocol::Assertion;
 use MIME::Base64;
-use Data::Dumper;
 
 my $xml = <<XML;
 <samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s2aa6f0dee017e82ced11a3c7c0be88ee42d3a9cb5" InResponseTo="N3k95Hg41WCHdwc9mqXynLPhB" Version="2.0" IssueInstant="2010-11-12T12:26:44Z" Destination="http://ct.local/saml/consumer-post"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://openam.nodnol.org:8080/opensso</saml:Issuer><samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
@@ -60,27 +61,27 @@ XML
 
 my $response = encode_base64($xml);
 
-my $sp = Net::SAML2::SP->new(
-        id               => 'http://localhost:3000',
-        url              => 'http://localhost:3000',
-        cert             => 't/sign-nopw-cert.pem',
-        cacert           => 't/cacert.pem',
-        org_name         => 'Test',
-        org_display_name => 'Test',
-        org_contact      => 'test@example.com',
-);
+my $sp = net_saml2_sp();
 
 my $post = $sp->post_binding;
-my $subject = $post->handle_response($response);
-ok($subject);
-ok(qr/verified/, $subject);
-#diag "subject: $subject\n";
 
-my $assertion_xml = decode_base64($response);
-my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-        xml => $xml,
+my $subject;
+
+lives_ok(
+    sub {
+        $subject = $post->handle_response($response);
+    },
+    '$sp->handle_response works'
 );
-ok($assertion);
-#diag Dumper { assertion => $assertion };
+
+
+ok(defined $subject, "->handle response verified something");
+like($subject, qr/verified/, "Matches the verified string");
+
+## TODO: Move to t/03-assertion
+my $assertion_xml = decode_base64($response);
+my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+
+isa_ok($assertion, 'Net::SAML2::Protocol::Assertion');
 
 done_testing;

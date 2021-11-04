@@ -6,7 +6,7 @@ use Test::File::ShareDir::Dist { 'DateTime-Locale' => 'share' };
 
 use DateTime::Locale;
 
-my $loc = DateTime::Locale->load('root');
+my $loc = DateTime::Locale->load('und');
 
 is(
     $loc->default_date_format_length, 'medium',

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem;
-$Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               Dimensions
               Volume
 
-              )
+            )
         ],
         {   'FreightClass' => \%FreightClass_of,
             'Packaging'    => \%Packaging_of,
@@ -83,7 +83,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.35;
 
-package Device::Chip::Adapter 0.19;
+package Device::Chip::Adapter 0.20;
 role Device::Chip::Adapter :repr(HASH) :compat(invokable);
 
 use utf8;
@@ -501,11 +501,11 @@ start condition.
    } );
 
 Performs a complete custom I²C transaction. Within the code block invoked by
-the transaction, the C<write> and C<read> methods may be called on the passed
-C<$helper> instance, but they will B<not> cause stop conditions to be sent on
-the wire. A stop condition will be sent after the code has finished. The
-return value from this method will be whatever is returned by the inner code
-block.
+the transaction, the C<write>, C<read> and C<write_then_read> methods may be
+called on the passed C<$helper> instance, but they will B<not> cause stop
+conditions to be sent on the wire. A stop condition will be sent after the
+code has finished. The return value from this method will be whatever is
+returned by the inner code block.
 
 This method acts as a mutex lock, ensuring only one transaction can run
 concurrently. This mutex is also used by the C<read>, C<write> and

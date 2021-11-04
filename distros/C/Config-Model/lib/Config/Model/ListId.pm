@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ListId 2.142;
+package Config::Model::ListId 2.144;
 
 use 5.10.1;
 use Mouse;
@@ -557,7 +557,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.142
+version 2.144
 
 =head1 SYNOPSIS
 

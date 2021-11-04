@@ -1,6 +1,7 @@
 package Form::Tiny::FieldDefinition;
 
 use v5.10;
+use strict;
 use warnings;
 use Moo;
 use Types::Standard qw(Enum Bool HasMethods CodeRef InstanceOf HashRef);
@@ -16,7 +17,7 @@ use Form::Tiny::PathValue;
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 has "name" => (
 	is => "ro",
@@ -130,7 +131,11 @@ sub get_coerced
 
 	my $error = try sub {
 		if (ref $coerce eq "CODE") {
-			$coerced = $coerce->($value);
+			my @params = ($value);
+			unshift @params, $form
+				if $form->form_meta->consistent_api;
+
+			$coerced = $coerce->(@params);
 		}
 		elsif ($coerce) {
 			$coerced = $self->type->coerce($value);
@@ -153,10 +158,14 @@ sub get_coerced
 
 sub get_adjusted
 {
-	my ($self, $value) = @_;
+	my ($self, $form, $value) = @_;
 
 	if ($self->is_adjusted) {
-		return $self->adjust->($value);
+		my @params = ($value);
+		unshift @params, $form
+			if $form->form_meta->consistent_api;
+
+		return $self->adjust->(@params);
 	}
 	return $value;
 }
@@ -189,7 +198,7 @@ sub validate
 	if ($self->has_type) {
 		if ($self->has_message) {
 			push @errors, $self->message
-				if !$self->type->check($value)
+				if !$self->type->check($value);
 		}
 		else {
 			my $error = $self->type->validate($value);
@@ -201,10 +210,14 @@ sub validate
 
 	if (@errors == 0) {
 		my $validators = $self->addons->{validators} // [];
+		my @params = ($value);
+		unshift @params, $form
+			if $form->form_meta->consistent_api;
+
 		for my $validator (@{$validators}) {
 			my ($message, $code) = @{$validator};
 
-			if (!$code->($value)) {
+			if (!$code->(@params)) {
 				push @errors, $message;
 			}
 		}
@@ -219,13 +232,15 @@ sub validate
 						if defined $exception->field;
 
 					$exception->set_field($path->join);
+					$exception = Form::Tiny::Error::NestedFormError->new(
+						field => $self->name,
+						error => $exception,
+					);
 				}
 				else {
 					$exception = Form::Tiny::Error::DoesNotValidate->new(
-						{
-							field => $self->name,
-							error => $exception,
-						}
+						field => $self->name,
+						error => $exception,
 					);
 				}
 

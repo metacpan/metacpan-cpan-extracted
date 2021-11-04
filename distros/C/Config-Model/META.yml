@@ -6,6 +6,7 @@ build_requires:
   Config::Model::Tester: '4.002'
   Config::Model::Tester::Setup: '0'
   File::Copy: '0'
+  File::Spec: '0'
   IO::File: '0'
   Module::Build: '0.34'
   Test::Differences: '0'
@@ -14,10 +15,12 @@ build_requires:
   Test::Log::Log4perl: '0'
   Test::Memory::Cycle: '0'
   Test::More: '0'
+  Test::Perl::Critic: '0'
   Test::Pod: '1.00'
   Test::Warn: '0.11'
   boolean: '0'
   lib: '0'
+  perl: '5.020'
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
@@ -65,10 +68,11 @@ requires:
   Text::Wrap: '0'
   YAML::Tiny: '0'
   base: '0'
+  feature: '0'
   open: '0'
   overload: '0'
   parent: '0'
-  perl: v5.12.0
+  perl: '5.020'
   strict: '0'
   utf8: '0'
   vars: '0'
@@ -77,7 +81,7 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.142'
+version: '2.144'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: LGPL-2.1

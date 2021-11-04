@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::Measure;
-$Shipment::FedEx::WSDL::ShipTypes::Measure::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::Measure::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Quantity
               Units
 
-              )
+            )
         ],
         {   'Quantity' => \%Quantity_of,
             'Units'    => \%Units_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::ShipTypes::Measure
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

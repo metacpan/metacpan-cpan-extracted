@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-29'; # DATE
+our $DATE = '2021-10-05'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.039'; # VERSION
+our $VERSION = '0.040'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl function name which must not be qualified with a package name, e.g. subname',
@@ -45,7 +45,7 @@ Sah::Schema::perl::unqualified_funcname - Perl function name which must not be q
 
 =head1 VERSION
 
-This document describes version 0.039 of Sah::Schema::perl::unqualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2021-09-29.
+This document describes version 0.040 of Sah::Schema::perl::unqualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2021-10-05.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::PickupDetailsType;
-$Shipment::UPS::WSDL::ShipTypes::PickupDetailsType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::PickupDetailsType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Class::Std::initialize();
               Location
               ContactInfo
 
-              )
+            )
         ],
         {   'DistrictCode'      => \%DistrictCode_of,
             'PickupDate'        => \%PickupDate_of,
@@ -91,7 +91,7 @@ Shipment::UPS::WSDL::ShipTypes::PickupDetailsType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

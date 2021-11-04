@@ -3,7 +3,7 @@ package Net::Async::Slack::Message;
 use strict;
 use warnings;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Scalar::Util qw(weaken);
 use JSON::MaybeXS;
@@ -23,7 +23,7 @@ sub thread_ts { shift->{thread_ts} }
 
 sub update {
     my ($self, %args) = @_;
-    die 'You need to pass either text or attachments' unless $args{text} || $args{attachments};
+    die 'You need to pass either text or attachments' unless $args{text} || $args{attachments} || $args{blocks};
 
     $args{text} //= '';
     my @content;
@@ -33,11 +33,12 @@ sub update {
 
     push @content, text => $args{text} if defined $args{text};
     push @content, attachments => $json->encode($args{attachments}) if $args{attachments};
+    push @content, blocks => $json->encode($args{blocks}) if $args{blocks};
     $args{as_user} //= 'true';
     push @content, $_ => $args{$_} for grep exists $args{$_}, qw(parse link_names unfurl_links unfurl_media as_user reply_broadcast);
     $self->slack->http_post(
         $self->slack->endpoint(
-            'chat.update',
+            'chat_update',
         ),
         \@content,
     )

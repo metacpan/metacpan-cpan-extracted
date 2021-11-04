@@ -1,0 +1,138 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Kramerius::V4;
+
+# Version.
+our $VERSION = 0.02;
+
+# Run.
+exit App::Kramerius::V4->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+kramerius4 - Script to fetching document from Kramerius system, version 4.
+
+=head1 SYNOPSIS
+
+ kramerius4 [-h] [-o out_file] [-q] [--version] kramerius_id document_uuid
+
+=head1 DESCRIPTION
+
+Script which fetch document from Kramerius system.
+
+Document on L<http://www.digitalniknihovna.cz/mzk/view/uuid:9ebcb206-24b7-4dc7-b367-3d9ad7179c23?page=uuid:224d66f8-f48e-4a92-b41e-87c88a076dc0>
+we could fetch by C<kramerius4 mzk 224d66f8-f48e-4a92-b41e-87c88a076dc0>
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-o out_file>
+
+Output file.
+
+=item * C<-q>
+
+Quiet mode.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<kramerius_id>
+
+Kramerius system id.
+
+=item * C<document_uuid>
+
+Document UUID in Kramerius system.
+
+=back
+
+=head1 EXAMPLE1
+
+ kramerius4
+
+ # Output:
+ # Usage: /home/skim/perl5/bin/kramerius4 [-h] [-o out_file] [-q] [--version] kramerius_id document_uuid
+ #         -h              Help.
+ #         -o out_file     Output file.
+ #         -q              Quiet mode.
+ #         --version       Print version.
+ #         kramerius_id    Kramerius system id. e.g. mzk
+ #         document_uuid   Document UUID in Kramerius system
+
+=head1 EXAMPLE2
+
+ kramerius4 mzk 224d66f8-f48e-4a92-b41e-87c88a076dc0
+
+ # Output:
+ # Download http://kramerius.mzk.cz/search/api/v5.0/item/uuid:224d66f8-f48e-4a92-b41e-87c88a076dc0/streams
+ # Download http://kramerius.mzk.cz/search/api/v5.0/item/uuid:224d66f8-f48e-4a92-b41e-87c88a076dc0/full
+ # Save 224d66f8-f48e-4a92-b41e-87c88a076dc0.jpg
+
+=head1 EXAMPLE3
+
+ kramerius4 -o foo.jpg mzk 224d66f8-f48e-4a92-b41e-87c88a076dc0
+
+ # Output:
+ # Download http://kramerius.mzk.cz/search/api/v5.0/item/uuid:224d66f8-f48e-4a92-b41e-87c88a076dc0/full
+ # Save foo.jpg
+
+=head1 EXAMPLE4
+
+ kramerius4 ABA001 1033555
+
+ # Output like:
+ # Kramerius system for 'ABA001' isn't version 4 of API.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<kramerius-uri>
+
+Script to get Kramerius URI.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Kramerius-V4>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2021 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

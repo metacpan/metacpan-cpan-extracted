@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4;
+plan tests => 5;
 
 my @module_files = (
     'Mojo/WebSocket/PubSub.pm',
+    'Mojo/WebSocket/PubSub/Shell.pm',
     'Mojo/WebSocket/PubSub/Syntax.pm',
     'Mojolicious/Plugin/PubSub/WebSocket.pm'
 );

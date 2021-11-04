@@ -47,6 +47,7 @@ Form::Tiny::Manual - reference for working with Form::Tiny
 	}
 	else {
 		print Dumper $form->errors;
+		print Dumper $form->errors_hash;
 	}
 
 =head1 DESCRIPTION
@@ -77,6 +78,7 @@ Form::Tiny allows you to define forms much like you would define a Moose class. 
 	use Types::Standard qw(Enum Str);
 
 	form_trim_strings;
+	form_message Required => 'This one is mandatory!';
 
 	form_field 'url' => (
 		type => Str,
@@ -126,6 +128,7 @@ The example below illustrates how a form class could be used to validate data.
 		...
 	} else {
 		my $errors = $form->errors; # an array reference
+		my $errors_hash = $form->errors_hash; # a hash reference
 		...
 	}
 
@@ -179,6 +182,8 @@ Value of C<0> means no coercion will be made. This is the default behavior.
 
 Value that is a coderef will be passed a single scalar, which is the value of the field. It is required to make its own checks and return a scalar which will replace the old value.
 
+B<Upcoming change notice>: This attribute is a subject to an upcoming change in subroutine parameters. See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
+
 =item adjust
 
 	form_field 'adjusted' => (
@@ -189,6 +194,8 @@ Value that is a coderef will be passed a single scalar, which is the value of th
 An adjustment that will be made B<after> the type is validated and the validation is successful. This must be a coderef that gets passed the validated value and returns the new value for the field (just like the coderef version of coercion).
 
 At the point of adjustment, you can be sure that the value passed to the coderef meets the type constraint specified. It's probably a good idea to provide a type along with the adjustment to avoid unnecessary checks in the subroutine - if no type is specified, then any value from the input data will end up in the coderef.
+
+B<Upcoming change notice>: This attribute is a subject to an upcoming change in subroutine parameters. See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
 
 =item required
 
@@ -207,10 +214,13 @@ C<1> or C<"hard"> - The field has to exist in the input, must be defined and non
 =item default
 
 	form_field 'has_default' => (
-		default => sub { 'this is a default value' },
+		default => sub {
+			my $form = shift;
+			return 'this is a default value'
+		},
 	);
 
-A coderef, which should return a scalar value that will be used in place of a non-existent input value. If the field is marked as hard-required as well, the default value will also replace undefined or empty values.
+A coderef, which should return a scalar value that will be used in place of a non-existent input value. If the field is marked as hard-required as well, the default value will also replace undefined or empty values. It gets passed a single parameter, which is the form instance.
 
 The default value needs to be in line with the type check for the field, if it is specified. It also does not support nested arrays, like C<array.*>. An exception will be thrown if these conditions are not met.
 
@@ -308,6 +318,8 @@ Additional validations will take place after the type is validated, and only if 
 =item * you do not have to manually validate the value passed to the subroutines
 
 =back
+
+B<Upcoming change notice>: This keyword is a subject to an upcoming change in subroutine parameters. See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
 
 =head2 Hooks
 
@@ -426,6 +438,8 @@ Strict mode is helpful when you want to make sure you're not getting any extra d
 
 For example, if your form contains many optional fields which change often, you may want to ensure that your users are not sending anything you're not going to handle. This can help debugging and prevent errors.
 
+B<Important note>: Strict mode will cause the system to crawl your entire input data to search for any odd elements. This will cause validation to only run at about half the speed, and more importantly it will not be able to cope with circular references (even weakened). If your input data may contain circular references you should not make use of the strict mode.
+
 =head3 Filters
 
 Turned on with the C<-filtered> flag in L<Form::Tiny>.
@@ -448,6 +462,8 @@ One special keyword exists for string trimming using the filters system:
 	form_trim_strings;
 
 When the field is filtered, the form filters are applied before field filters. Each type of filter is applied in the order they were defined.
+
+B<Upcoming change notice>: These keywords are subjects to an upcoming change in subroutine parameters. See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
 
 =head2 Inline forms
 
@@ -512,69 +528,6 @@ Be aware of a special case, an adjustment will be inserted here automatically li
 
 this will make sure that any coercions and adjustments made in the nested form will be added to the outer form as well. If you want to specify your own adjustment here, make sure to use the data provided by the C<fields> method of the nested form.
 
-=head3 I18N
-
-I<Form::Tiny> has no system for internationalization. That being said, it makes any custom error messages for fields possible with the C<message> argument to C<form_field>. You can translate your messages there:
-
-	form_field 'translated' => (
-		type => SomeType,
-		message => do_translate('That value is no good'),
-	);
-
-For a bit more roboust solution, you can include untranslated strings in C<message> and translate errors in C<after_error> hook:
-
-	form_field 'translated_later' => (
-		type => SomeType,
-		message => 'That value is no good',
-	);
-
-	form_hook after_error => (
-		my ($self, $error) = @_;
-
-		$error->set_error(
-			do_translate($error->error)
-		);
-	);
-
-This will also translate any error you add manually in other hooks.
-
-=head3 Mixing form fields with class fields
-
-It is possible and often very helpful to have both form and class fields inside the same form class:
-
-	use Form::Tiny;
-	use Types::Standard qw(Str);
-
-	has 'user' => (
-		is => 'rw',
-	);
-
-	form_field 'username' => (
-		type => Str,
-		required => 1,
-	);
-
-	form_field 'password' => (
-		type => Str,
-		required => 1,
-	);
-
-	form_cleaner sub {
-		my ($self, $data) = @_;
-
-		# load user from the storage service using $data->{username}
-		my $user = ...;
-		if ($user->validate_password($data->{password})) {
-			# set the user for the class, will be available after validation
-			$self->user($user);
-		}
-		else {
-			$self->add_error(password => 'invalid password');
-		}
-	};
-
-While doing so, make sure not to override any of the Form::Tiny::Form symbols (Moo / Moose should complain about it when it happens).
-
 =head3 Form inheritance
 
 It is possible for Form::Tiny forms to inherit from one another, but the feature is experimental (meaning it does work, but is not tested enough and may not work properly for certain configurations).
@@ -605,36 +558,16 @@ It is possible for Form::Tiny forms to inherit from one another, but the feature
 
 It is required that class parents are specified before any calls to Form::Tiny DSL have been made.
 
-=head3 Corinna compatibility
-
-Future Perl core object orientation system named Corinna, currently implemented in L<Object::Pad>, can also be used together with Form::Tiny:
-
-	use Object::Pad;
-
-	class ParentForm :repr(HASH)
-	{
-		use Form::Tiny -nomoo;
-
-		form_field 'f1';
-	}
-
-	class ChildForm isa ParentForm :repr(HASH)
-	{
-		use Form::Tiny -nomoo;
-
-		form_field 'f2';
-	}
-
-You must use C<:repr(HASH)> on the class for it to be able to store Moo properties, as well as use C<-nomoo> flag in Form::Tiny import. Other than that, it should work the same as with any other OO system.
-
 =head1 SEE ALSO
 
 =over
 
 =item * L<Type::Tiny>, the awesome type system
 
-=item * L<Form::Tiny>, the importer and base class for this distribution
+=item * L<Form::Tiny>, the importer class for this distribution
 
-=item * L<Form::Tiny::Manual::Internals>, the Form::Tiny metamodel
+=item * L<Form::Tiny::Manual::Cookbook>, common tasks performed with Form::Tiny
+
+=item * L<Form::Tiny::Manual::Performance>, how to get the most speed out of the module
 
 =back

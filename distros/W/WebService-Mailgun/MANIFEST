@@ -13,5 +13,7 @@ t/00_compile.t
 t/01_message.t
 t/02_list_and_event.t
 t/03_error.t
+t/04_mime.t
+t/corpus/msg1.mime
 META.yml
 MANIFEST

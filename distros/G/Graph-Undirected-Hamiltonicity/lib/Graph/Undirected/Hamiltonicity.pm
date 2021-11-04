@@ -13,7 +13,7 @@ use Graph::Undirected::Hamiltonicity::Transforms qw(:all);
 
 use Exporter qw(import);
 
-our $VERSION     = '0.012';
+our $VERSION     = '0.013';
 our @EXPORT      = qw(graph_is_hamiltonian);    # exported by default
 our @EXPORT_OK   = qw(graph_is_hamiltonian);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );

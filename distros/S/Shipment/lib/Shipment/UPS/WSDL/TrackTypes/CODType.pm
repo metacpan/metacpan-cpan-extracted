@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::CODType;
-$Shipment::UPS::WSDL::TrackTypes::CODType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::CODType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Status
               ControlNumber
 
-              )
+            )
         ],
         {   'Amount'        => \%Amount_of,
             'Status'        => \%Status_of,
@@ -66,7 +66,7 @@ Shipment::UPS::WSDL::TrackTypes::CODType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

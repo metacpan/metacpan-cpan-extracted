@@ -3,7 +3,7 @@ package Require::Util;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-06-29'; # DATE
 our $DIST = 'Require-Util'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -16,22 +16,22 @@ our $err;
 
 sub require_any {
     return 1 unless @_;
-    my $err;
+
+    my $func_err;
     for my $mod (@_) {
         my $mod_pm = $mod;
         if ($mod =~ /\A\w+(::\w+)*\z/) {
             ($mod_pm = "$mod.pm") =~ s!::!/!g;
         }
-        my $mod_err;
         try {
             require $mod_pm;
-        } catch ($mod_err) {
-            $err = $mod_err;
+        } catch ($e) {
+            $func_err = $e;
             next;
         };
         return $mod;
     }
-    die $err;
+    die $func_err;
 }
 
 sub try_require {
@@ -42,11 +42,10 @@ sub try_require {
         ($mod_pm = "$mod.pm") =~ s!::!/!g;
     }
 
-    my $mod_err;
     try {
         require $mod_pm;
-    } catch ($mod_err) {
-        $Require::Util::err = $mod_err;
+    } catch ($e) {
+        $Require::Util::err = $e;
         return 0;
     };
     1;
@@ -67,11 +66,17 @@ Require::Util - Utilities related to require()
 
 =head1 VERSION
 
-This document describes version 0.001 of Require::Util (from Perl distribution Require-Util), released on 2021-06-29.
+This document describes version 0.002 of Require::Util (from Perl distribution Require-Util), released on 2021-06-29.
 
 =head1 SYNOPSIS
 
  use Require::Util qw(require_any try_require);
+
+ if (try_require "Foo::Bar") {
+     # use Foo::Bar's function
+ }
+
+ my $modname = require_any "Foo::Bar", "Baz/Qux.pm", "Quux";
 
 =head1 DESCRIPTION
 

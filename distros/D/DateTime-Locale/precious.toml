@@ -58,6 +58,7 @@ expect_stderr = true
 [commands.podchecker]
 type = "lint"
 include = [ "**/*.{pl,pm,pod}" ]
+exclude = "tools/templates/*.pod"
 cmd = [ "podchecker", "--warnings", "--warnings" ]
 ok_exit_codes = [ 0, 2 ]
 lint_failure_exit_codes = 1
@@ -66,6 +67,7 @@ expect_stderr = true
 [commands.podtidy]
 type = "tidy"
 include = [ "**/*.{pl,pm,pod}" ]
+exclude = "tools/templates/*.pod"
 cmd = [ "podtidy", "--columns", "80", "--inplace", "--nobackup" ]
 ok_exit_codes = 0
 lint_failure_exit_codes = 1

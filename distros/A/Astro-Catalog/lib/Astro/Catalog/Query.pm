@@ -6,7 +6,7 @@ Astro::Catalog::Query - Base class for Astro::Catalog query objects
 
 =head1 SYNOPSIS
 
-  use base qw/ Astro::Catalog::Query /;
+  use base qw/Astro::Catalog::Query/;
 
 =head1 DESCRIPTION
 
@@ -15,23 +15,18 @@ in the C<Astro::Catalog> distribution (eg C<Astro::Catalog::GSC::Query>).
 
 =cut
 
-# L O A D   M O D U L E S --------------------------------------------------
-
 use strict;
 use warnings;
 use warnings::register;
-use vars qw/ $VERSION /;
 
 use File::Spec;
 use Carp;
 
-# generic catalog objects
 use Astro::Coords;
 use Astro::Catalog;
-use Astro::Catalog::Star;
-$VERSION = "4.35";
+use Astro::Catalog::Item;
 
-# C O N S T R U C T O R ----------------------------------------------------
+our $VERSION = '4.36';
 
 =head1 METHODS
 
@@ -43,12 +38,13 @@ $VERSION = "4.35";
 
 Create a new instance from a hash of options
 
-  $q = new Astro::Catalog::Query( Coords    => new Astro::Coords(),
-                                  Radius    => $radius,
-                                  Bright    => $magbright,
-                                  Faint     => $magfaint,
-                                  Sort      => $sort_type,
-                                  Number    => $number_out );
+    $q = new Astro::Catalog::Query(
+        Coords    => new Astro::Coords(),
+        Radius    => $radius,
+        Bright    => $magbright,
+        Faint     => $magfaint,
+        Sort      => $sort_type,
+        Number    => $number_out);
 
 returns a reference to an query object. Must only called from
 sub-classed constructors.
@@ -60,18 +56,19 @@ sexagesimal format).
 =cut
 
 sub new {
-  my $proto = shift;
-  my $class = ref($proto) || $proto;
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
 
-  # bless the query hash into the class
-  my $block = bless { OPTIONS   => {},
-                      BUFFER    => undef }, $class;
+    # bless the query hash into the class
+    my $block = bless {
+        OPTIONS   => {},
+        BUFFER    => undef,
+    }, $class;
 
-  # Configure the object [even if there are no args]
-  $block->configure( @_ );
+    # Configure the object [even if there are no args]
+    $block->configure(@_);
 
-  return $block;
-
+    return $block;
 }
 
 =back
@@ -88,7 +85,7 @@ keys are not usable by all catalogues.
 
 Returns a copy of the options hash when.
 
-  %options = $q->query_options();
+    %options = $q->query_options();
 
 Note that the hash keys included here are not necessarily the keys
 used to form a remote query.
@@ -96,58 +93,57 @@ used to form a remote query.
 If an argument is supplied, the value for that option is returned
 I<if> the option is supported.
 
-  $ra = $q->query_options( "ra" );
+    $ra = $q->query_options("ra");
 
-Values can not  be set directly. Please use the provided accessor methods.
+Values can not be set directly. Please use the provided accessor methods.
 
 =cut
 
 sub query_options {
-  my $self = shift;
-  if (@_) {
-    my $opt = lc(shift);
-    my %allow = $self->_get_allowed_options;
+    my $self = shift;
+    if (@_) {
+        my $opt = lc(shift);
+        my %allow = $self->_get_allowed_options;
 
-    if (!exists $allow{$opt}) {
-      warnings::warnif("Option $opt not supported by this cataloge");
-      return;
+        unless (exists $allow{$opt}) {
+            warnings::warnif("Option $opt not supported by this cataloge");
+            return;
+        }
+        return $self->{OPTIONS}->{$opt};
     }
-    return $self->{OPTIONS}->{$opt};
-  }
-  return %{ $self->{OPTIONS} };
+    return %{$self->{OPTIONS}};
 }
-
 
 =item B<RA>
 
 Return (or set) the current target R.A. defined for the query
 
-   $ra = $usno->ra();
-   $usno->ra( $ra );
+    $ra = $usno->ra();
+    $usno->ra($ra);
 
 where $ra should be a string of the form "HH MM SS.SS", e.g. 21 42 42.66
 
 =cut
 
 sub ra {
-  my $self = shift;
+    my $self = shift;
 
-  # SETTING R.A.
-  if (@_) {
-    # grab the new R.A.
-    my $ra = shift;
-    $self->_set_query_options( ra => $ra );
-  }
-  # Return it
-  return $self->query_options("ra");
+    # SETTING R.A.
+    if (@_) {
+        # grab the new R.A.
+        my $ra = shift;
+        $self->_set_query_options(ra => $ra);
+    }
+    # Return it
+    return $self->query_options("ra");
 }
 
 =item B<Dec>
 
 Return (or set) the current target Declination defined for the query
 
-   $dec = $q->dec();
-   $q->dec( $dec );
+    $dec = $q->dec();
+    $q->dec($dec);
 
 where $dec should be a string of the form "+-HH MM SS.SS", e.g. +43 35 09.5
 or -40 25 67.89
@@ -155,16 +151,16 @@ or -40 25 67.89
 =cut
 
 sub dec {
-  my $self = shift;
+    my $self = shift;
 
-  # SETTING DEC
-  if (@_) {
-    # grab the new Dec
-    my $dec = shift;
-    $self->_set_query_options( dec => $dec );
-  }
+    # SETTING DEC
+    if (@_) {
+        # grab the new Dec
+        my $dec = shift;
+        $self->_set_query_options(dec => $dec);
+    }
 
-  return $self->query_options("dec");
+    return $self->query_options("dec");
 }
 
 
@@ -174,8 +170,8 @@ Instead of querying by R.A. and Dec., you may also query it
 by object name. Return (or set) the current target object defined for
 the USNO-A2.0 query, will query SIMBAD for object name resolution.
 
-   $ident = $usno->target();
-   $usno->target( "HT Cas" );
+    $ident = $usno->target();
+    $usno->target("HT Cas");
 
 using an object name will override the current R.A. and Dec settings for the
 Query object (if currently set) and the next querydb() method call will query
@@ -184,28 +180,26 @@ using this identifier rather than any currently set co-ordinates.
 =cut
 
 sub target {
-  my $self = shift;
+    my $self = shift;
 
-  # SETTING IDENTIFIER
-  if (@_) {
+    # SETTING IDENTIFIER
+    if (@_) {
+        # grab the new object name
+        my $ident = shift;
 
-    # grab the new object name
-    my $ident = shift;
+        # Need to clear RA and Dec iff they are allowed options
+        my %allow = $self->_get_allowed_options();
 
-    # Need to clear RA and Dec iff they are allowed options
-    my %allow = $self->_get_allowed_options();
+        my %clear;
+        $clear{ra} = undef if exists $allow{ra};
+        $clear{dec} = undef if exists $allow{dec};
 
-    my %clear;
-    $clear{ra} = undef if exists $allow{ra};
-    $clear{dec} = undef if exists $allow{dec};
-
-    # Store it in the options table
-    $self->_set_query_options(
-                              object => $ident,
-                              %clear
-                             );
-  }
-  return $self->query_options("object");
+        # Store it in the options table
+        $self->_set_query_options(
+            object => $ident,
+            %clear);
+    }
+    return $self->query_options("object");
 }
 
 =item B<Radius>
@@ -213,65 +207,65 @@ sub target {
 The radius to be searched for objects around the target R.A. and Dec in
 arc minutes, the radius defaults to 5 arc minutes.
 
-   $radius = $query->radius();
-   $query->radius( 20 );
+    $radius = $query->radius();
+    $query->radius(20);
 
 =cut
 
 sub radius {
-  my $self = shift;
+    my $self = shift;
 
-  if (@_) {
-    $self->_set_query_options( radmax => shift );
-  }
+    if (@_) {
+        $self->_set_query_options(radmax => shift);
+    }
 
-  return $self->query_options("radmax");
+    return $self->query_options("radmax");
 }
 
 =item B<Faint>
 
 Set (or query) the faint magnitude limit for inclusion on the results
 
-   $faint = $query->faint();
-   $query->faint( 50 );
+    $faint = $query->faint();
+    $query->faint(50);
 
 =cut
 
 sub faint {
-  my $self = shift;
+    my $self = shift;
 
-  if (@_) {
-    $self->_set_query_options( magfaint => shift );
-  }
+    if (@_) {
+        $self->_set_query_options(magfaint => shift);
+    }
 
-  return $self->query_options("magfaint");
+    return $self->query_options("magfaint");
 }
 
 =item B<Bright>
 
 Set (or query) the bright magnitude limit for inclusion on the results
 
-   $faint = $query->bright();
-   $query->bright( 2 );
+    $faint = $query->bright();
+    $query->bright(2);
 
 =cut
 
 sub bright {
-  my $self = shift;
+    my $self = shift;
 
-  if (@_) {
-    $self->_set_query_options( magbright => shift );
-  }
+    if (@_) {
+        $self->_set_query_options(magbright => shift);
+    }
 
-  return $self->query_options("magbright");
+    return $self->query_options("magbright");
 }
 
 =item B<Sort>
 
 Set or query the order in which the stars are listed in the catalogue
 
-   $sort = $query->sort();
-   $query->sort( 'RA' );
+    $sort = $query->sort();
+    $query->sort('RA');
 
 valid options are RA, DEC, RMAG, BMAG, DIST (distance to centre of the
 requested field) and POS (the position angle to the centre of the field).
@@ -279,16 +273,15 @@ requested field) and POS (the position angle to the centre of the field).
 =cut
 
 sub sort {
-  my $self = shift;
+    my $self = shift;
 
-  if (@_) {
-    my $sort = shift;
-    $self->_set_query_options( sort => $sort );
-  }
+    if (@_) {
+        my $sort = shift;
+        $self->_set_query_options(sort => $sort);
+    }
 
-  # return the sort option
-  return $self->query_options("sort");
-
+    # return the sort option
+    return $self->query_options("sort");
 }
 
 =item B<Number>
@@ -297,25 +290,25 @@ The number of objects to return, defaults to 2000 which should hopefully
 be sufficent to return all objects of interest. This value should be increased
 if a (very) large sample radius is requested.
 
-   $num = $query->number();
-   $query->nout( 100 );
+    $num = $query->number();
+    $query->nout(100);
 
 =cut
 
 sub number {
-  my $self = shift;
+    my $self = shift;
 
-  if (@_) {
-    $self->_set_query_options( nout => shift );
-  }
+    if (@_) {
+        $self->_set_query_options(nout => shift);
+    }
 
-  return $self->query_options("nout");
+    return $self->query_options("nout");
 }
 
 sub nout {
-  my $self = shift;
-  warnings::warnif("deprecated","The nout() method is deprecated. Please use number()");
-  return $self->number( @_ );
+    my $self = shift;
+    warnings::warnif("deprecated","The nout() method is deprecated. Please use number()");
+    return $self->number(@_);
 }
 
 =back
@@ -328,51 +321,46 @@ sub nout {
 
 Configures the object, takes an options hash as an argument
 
-  $dss->configure( %options );
+    $dss->configure(%options);
 
 Does nothing if the array is not supplied.
 
 =cut
 
 sub configure {
-  my $self = shift;
+    my $self = shift;
 
-  # CONFIGURE DEFAULTS
-  # ------------------
+    # CONFIGURE DEFAULTS
 
-  # configure the default options
-  $self->_set_default_options();
+    $self->_set_default_options();
 
+    # CONFIGURE FROM ARGUMENTS
 
-  # CONFIGURE FROM ARGUMENTS
-  # -------------------------
+    # return unless we have arguments
+    return undef unless @_;
 
-  # return unless we have arguments
-  return undef unless @_;
+    # grab the argument list
+    my %args = Astro::Catalog::_normalize_hash(@_);
 
-  # grab the argument list
-  my %args = Astro::Catalog::_normalize_hash(@_);
+    # Grab the allowed options
+    my %allow = $self->_get_allowed_options();
 
-  # Grab the allowed options
-  my %allow = $self->_get_allowed_options();
-
-  # Loop over the supplied arguments. If they correspond to
-  # a method, run it, if they correspond to an option, set it
-  for my $key (keys %args) {
-    my $lckey = lc($key);
-    if ($self->can($lckey)) {
-      $self->$lckey( $args{$key} );
-    } elsif (exists $allow{$lckey}) {
-      # set the option explcitly
-      $self->_set_query_options( $lckey => $args{$key} );
-    } else {
-      #warnings::warnif("Unrecognized option: $key. Ignoring it.");
+    # Loop over the supplied arguments. If they correspond to
+    # a method, run it, if they correspond to an option, set it
+    for my $key (keys %args) {
+        my $lckey = lc($key);
+        if ($self->can($lckey)) {
+            $self->$lckey( $args{$key} );
+        }
+        elsif (exists $allow{$lckey}) {
+            # set the option explcitly
+            $self->_set_query_options( $lckey => $args{$key} );
+        }
+        else {
+            #warnings::warnif("Unrecognized option: $key. Ignoring it.");
+        }
     }
-  }
-
 }
-
-# T I M E   A T   T H E   B A R  --------------------------------------------
 
 =back
 
@@ -384,12 +372,11 @@ These methods are for internal use only.
 
 =over 4
 
-
 =item B<_set_query_options>
 
 Set the query options.
 
-  $q->_set_query_options( %newopt );
+    $q->_set_query_options(%newopt);
 
 Keys are standardised and are not necessarily those used
 in the query. A warning is issued if an attempt is made to
@@ -399,22 +386,21 @@ subclass.
 =cut
 
 sub _set_query_options {
-  my $self = shift;
-  my %newopt = @_;
+    my $self = shift;
+    my %newopt = @_;
 
-  my %allow = $self->_get_allowed_options();
+    my %allow = $self->_get_allowed_options();
 
-  for my $newkey (keys %newopt) {
-
-    if (!exists $allow{$newkey}) {
-      warnings::warnif("Option $newkey not supported by catalog ".
-                       ref($self)."\n");
-      next;
+    for my $newkey (keys %newopt) {
+        unless (exists $allow{$newkey}) {
+            warnings::warnif("Option $newkey not supported by catalog ".
+                    ref($self)."\n");
+            next;
+        }
+        # set the option
+        $self->{OPTIONS}->{$newkey} = $newopt{$newkey};
     }
-    # set the option
-    $self->{OPTIONS}->{$newkey} = $newopt{$newkey};
-  }
-  return;
+    return;
 }
 
 =item B<_get_allowed_options>
@@ -424,7 +410,7 @@ supported by the query, and values corresponding to the names
 used by the specific query sub-system. Can use the keys
 to work out whether an option is supported.
 
-  %allow = $q->_get_allowed_options();
+    %allow = $q->_get_allowed_options();
 
 Generally, must be over-ridden in subclass. By default returns all
 the internal options, with 1-1 mapping.
@@ -432,19 +418,19 @@ the internal options, with 1-1 mapping.
 =cut
 
 sub _get_allowed_options {
-  return (
-          ra => 'ra',
-          dec => 'dec',
-          object => 'object',
-          radmax => 'radmax',
-          radmin => 'radmin',
-          width => 'width',
-          height => 'height',
-          magbright => 'magbright',
-          magfaint => 'magfaint',
-          sort => 'sort',
-          nout => 'nout',
-         );
+    return (
+        ra => 'ra',
+        dec => 'dec',
+        object => 'object',
+        radmax => 'radmax',
+        radmin => 'radmin',
+        width => 'width',
+        height => 'height',
+        magbright => 'magbright',
+        magfaint => 'magfaint',
+        sort => 'sort',
+        nout => 'nout',
+    );
 }
 
 =item B<_get_supported_accessor_options>
@@ -452,7 +438,7 @@ sub _get_allowed_options {
 Returns a hash with keys corresponding to accessor methods
 and values corresponding to the internal option.
 
- %opt = $q->_get_supported_accessor_options();
+    %opt = $q->_get_supported_accessor_options();
 
 This method should be superfluous if the methods had been named
 correctly!
@@ -464,17 +450,17 @@ then we will just set the option directly.
 =cut
 
 sub _get_supported_accessor_options {
-  return (
-          ra => 'ra',
-          dec => 'dec',
-          faint => 'magfaint',
-          bright => 'magbright',
-          radius => 'radmax',
-          target => 'object',
-          sort => 'sort',
-          number => 'nout',
-          format => 'format',
-  );
+    return (
+        ra => 'ra',
+        dec => 'dec',
+        faint => 'magfaint',
+        bright => 'magbright',
+        radius => 'radmax',
+        target => 'object',
+        sort => 'sort',
+        number => 'nout',
+        format => 'format',
+    );
 }
 
 =item B<_get_default_options>
@@ -482,12 +468,12 @@ sub _get_supported_accessor_options {
 Retrieve the defaults options for this particular catalog query.
 Usually called by C<_set_default_options> during object configure.
 
-  %defs = $q->_get_default_options();
+    %defs = $q->_get_default_options();
 
 =cut
 
 sub _get_default_options {
-  croak "get_default_options must be subclassed";
+    croak "get_default_options must be subclassed";
 }
 
 =item B<_set_default_options>
@@ -498,15 +484,14 @@ URL parameters. They should be specified in a subclass.
 =cut
 
 sub _set_default_options {
-  my $self = shift;
+    my $self = shift;
 
-  # get the defaults
-  my %defaults = $self->_get_default_options();
+    # get the defaults
+    my %defaults = $self->_get_default_options();
 
-  # set them
-  $self->_set_query_options( %defaults );
-  return;
-
+    # set them
+    $self->_set_query_options( %defaults );
+    return;
 }
 
 =item B<_dump_raw>
@@ -514,18 +499,18 @@ sub _set_default_options {
 Private function for debugging and other testing purposes. It will return
 the raw output of the last query made using querydb().
 
-  @lines = $q->_dump_raw();
+    @lines = $q->_dump_raw();
 
 =cut
 
 sub _dump_raw {
-   my $self = shift;
+    my $self = shift;
 
-   # split the BUFFER into an array
-   my @portable = split( /\n/,$self->{BUFFER});
-   chomp @portable;
+    # split the BUFFER into an array
+    my @portable = split(/\n/, $self->{BUFFER});
+    chomp @portable;
 
-   return @portable;
+    return @portable;
 }
 
 =item B<_set_raw>
@@ -534,13 +519,13 @@ Private function to fill the current buffer with a string. This is used
 when deealing with the buffer cannot be encapsulated inside a Transport
 class and must be deal with by child classese.
 
-   $q->_set_raw( $buffer );
+    $q->_set_raw($buffer);
 
 =cut
 
 sub _set_raw {
-   my $self = shift;
-   $self->{BUFFER} = shift;
+    my $self = shift;
+    $self->{BUFFER} = shift;
 }
 
 =item B<_dump_options>
@@ -551,9 +536,9 @@ the current query options as a hash.
 =cut
 
 sub _dump_options {
-   my $self = shift;
+    my $self = shift;
 
-   return $self->query_options;
+    return $self->query_options;
 }
 
 =item B<_parse_query>
@@ -563,7 +548,7 @@ Stub. Needs to be subclassed.
 =cut
 
 sub _parse_query {
-  croak "Query parsing is not generic. Please write one\n";
+    croak "Query parsing is not generic. Please write one\n";
 }
 
 =back
@@ -575,8 +560,8 @@ the form required for a query to a remote server. Methods for converting
 from the internal representation to the external query format are
 provided in the form of _from_$opt. ie:
 
-  ($outkey, $outvalue) = $q->_from_ra();
-  ($outkey, $outvalue) = $q->_from_object();
+    ($outkey, $outvalue) = $q->_from_ra();
+    ($outkey, $outvalue) = $q->_from_object();
 
 Items that have a one-to-one mapping can be declared by the query
 subclass using the C<_translate_one_to_one> method which returns
@@ -592,39 +577,40 @@ issue a warning.
 Translates the options from the default interface into the internal
 options specific for the sub-class
 
-  %options = _translate_options( );
+    %options = _translate_options( );
 
 The keys and values therefore are no longer general.
 
 =cut
 
 sub _translate_options {
-  my $self = shift;
+    my $self = shift;
 
-  my %outhash;
-  my %allow = $self->_get_allowed_options();
-  my %one_one = $self->_translate_one_to_one();
+    my %outhash;
+    my %allow = $self->_get_allowed_options();
+    my %one_one = $self->_translate_one_to_one();
 
-  foreach my $key ( keys %allow ) {
-    # Need to translate them...
-    my $cvtmethod = "_from_" . $key;
-    my ($outkey, $outvalue);
-    if ($self->can($cvtmethod)) {
-      ($outkey, $outvalue) = $self->$cvtmethod();
-    } else {
-      # This is the one-to-one mapping section
-      # issue a warning if the method has not been declared
-      # as supporting that simply mapping
-      warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping.\n")
-          unless exists $one_one{$key};
+    foreach my $key ( keys %allow ) {
+        # Need to translate them...
+        my $cvtmethod = "_from_" . $key;
+        my ($outkey, $outvalue);
+        if ($self->can($cvtmethod)) {
+            ($outkey, $outvalue) = $self->$cvtmethod();
+        }
+        else {
+            # This is the one-to-one mapping section
+            # issue a warning if the method has not been declared
+            # as supporting that simply mapping
+            warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping.\n")
+                unless exists $one_one{$key};
 
-      # Translate the key and copy the value
-      $outkey = $allow{$key};
-      $outvalue = $self->query_options($key);
+            # Translate the key and copy the value
+            $outkey = $allow{$key};
+            $outvalue = $self->query_options($key);
+        }
+        $outhash{$outkey} = $outvalue;
     }
-    $outhash{$outkey} = $outvalue;
-  }
-  return %outhash;
+    return %outhash;
 }
 
 =item B<_translate_one_to_one>
@@ -635,76 +621,81 @@ a one-to-one mapping when forming a URL (etc).
 =cut
 
 sub _translate_one_to_one {
-  # convert to a hash-list
-  return map { $_, undef }(qw/
-                           object radmax radmin magfaint magbright
-                           nout format
-                           /);
+    # convert to a hash-list
+    return map {$_, undef} (qw/
+        object radmax radmin magfaint magbright
+        nout format
+    /);
 }
-
 
 # RA and Dec replace spaces with pluses and + sign with special code
 
 sub _from_ra {
-  my $self = shift;
-  my $ra = $self->query_options("ra");
-  my %allow = $self->_get_allowed_options();
+    my $self = shift;
+    my $ra = $self->query_options("ra");
+    my %allow = $self->_get_allowed_options();
 
-  # Must replace spaces with +
-  $ra =~ s/\s/\+/g if defined $ra;
+    # Must replace spaces with +
+    $ra =~ s/\s/\+/g if defined $ra;
 
-  return ($allow{ra},$ra);
+    return ($allow{ra},$ra);
 }
 
 sub _from_dec {
-  my $self = shift;
-  my $dec = $self->query_options("dec");
-  my %allow = $self->_get_allowed_options();
+    my $self = shift;
+    my $dec = $self->query_options("dec");
+    my %allow = $self->_get_allowed_options();
 
-  if (defined $dec) {
-    # Must replace + with %2B
-    $dec =~ s/\+/%2B/g;
+    if (defined $dec) {
+        # Must replace + with %2B
+        $dec =~ s/\+/%2B/g;
 
-    # Must replace spaces with +
-    $dec =~ s/\s/\+/g;
-  }
+        # Must replace spaces with +
+        $dec =~ s/\s/\+/g;
+    }
 
-  return ($allow{dec},$dec);
+    return ($allow{dec},$dec);
 }
 
 sub _from_sort {
-  my $self = shift;
-  my $key = "sort";
-  # case insensitive conversion
-  my $value = uc($self->query_options($key));
+    my $self = shift;
+    my $key = "sort";
+    # case insensitive conversion
+    my $value = uc($self->query_options($key));
 
-  my $sort;
-  # pick an option
-  if( $value eq "RA" ) {
-    # sort by RA
-    $sort = "ra";
-  } elsif ( $value eq "DEC" ) {
-    # sort by Dec
-    $sort = "dec";
-  } elsif ( $value eq "RMAG" ) {
-    # sort by R magnitude
-    $sort = "mr";
-  } elsif ( $value eq "BMAG" ) {
-    # sort by B magnitude
-    $sort = "mb";
-  } elsif ( $value eq "DIST" ) {
-    # sort by distance from field centre
-    $sort = "d";
-  } elsif ( $value eq "POS" ) {
-    # sort by position angle to field centre
-    $sort = "pos";
-  } else {
-    # in case there are no valid options sort by RA
-    warnings::warnif("Unknown sort type [$value]: using ra");
-    $sort = "ra";
-  }
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $sort);
+    my $sort;
+    # pick an option
+    if ($value eq "RA") {
+        # sort by RA
+        $sort = "ra";
+    }
+    elsif ($value eq "DEC") {
+        # sort by Dec
+        $sort = "dec";
+    }
+    elsif ($value eq "RMAG") {
+        # sort by R magnitude
+        $sort = "mr";
+    }
+    elsif ($value eq "BMAG") {
+        # sort by B magnitude
+        $sort = "mb";
+    }
+    elsif ($value eq "DIST") {
+        # sort by distance from field centre
+        $sort = "d";
+    }
+    elsif ($value eq "POS") {
+        # sort by position angle to field centre
+        $sort = "pos";
+    }
+    else {
+        # in case there are no valid options sort by RA
+        warnings::warnif("Unknown sort type [$value]: using ra");
+        $sort = "ra";
+    }
+    my %allow = $self->_get_allowed_options();
+    return ($allow{$key}, $sort);
 }
 
 # This is a template methdo that can be extended. This one
@@ -718,6 +709,9 @@ sub _from_sort {
 #  return ($allow{$key}, $value);
 #}
 
+1;
+
+__END__
 
 =end __PRIVATE_METHODS__
 
@@ -737,7 +731,3 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 Tim Jenness E<lt>tjenness@cpan.orgE<gt>
 
 =cut
-
-# L A S T  O R D E R S ------------------------------------------------------
-
-1;

@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::BME280 0.02;
+package Device::Chip::BME280 0.03;
 class Device::Chip::BME280
    extends Device::Chip::Base::RegisteredI2C;
 
@@ -304,11 +304,15 @@ async method read_sensor
 
 has $_pending_read_f;
 
+method _next_read
+{
+   return $_pending_read_f //=
+      $self->read_raw->on_ready(sub { undef $_pending_read_f });
+}
+
 declare_sensor pressure =>
    method => async method {
-      $_pending_read_f //= $self->read_raw;
-      my ( $rawP, $rawT, undef ) = await $_pending_read_f;
-      undef $_pending_read_f;
+      my ( $rawP, $rawT, undef ) = await $self->_next_read;
       $self->_compensate_temperature( $rawT );
       return await $self->_compensate_pressure( $rawP );
    },
@@ -317,9 +321,7 @@ declare_sensor pressure =>
 
 declare_sensor temperature =>
    method => async method {
-      $_pending_read_f //= $self->read_raw;
-      my ( undef, $rawT, undef ) = await $_pending_read_f;
-      undef $_pending_read_f;
+      my ( undef, $rawT, undef ) = await $self->_next_read;
       return await $self->_compensate_temperature( $rawT );
    },
    units => "°C",
@@ -327,9 +329,7 @@ declare_sensor temperature =>
 
 declare_sensor humidity =>
    method => async method {
-      $_pending_read_f //= $self->read_raw;
-      my ( undef, $rawT, $rawH ) = await $_pending_read_f;
-      undef $_pending_read_f;
+      my ( undef, $rawT, $rawH ) = await $self->_next_read;
       $self->_compensate_temperature( $rawT );
       return await $self->_compensate_humidity( $rawH );
    },

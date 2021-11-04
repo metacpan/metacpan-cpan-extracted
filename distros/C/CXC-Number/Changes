@@ -1,5 +1,16 @@
 Revision history for CXC-Number
 
+0.06      2021-10-18 22:06:31-04:00 America/New_York
+
+  [BUG FIX]
+
+    * Number::Grid::overlay_n compard range extrema as strings instead
+      of numbers.  Ooops.
+
+  [ENHANCEMENT]
+
+    * The edges argument to Number::Grid->new can take a Number::Sequence object
+
 0.05      2021-05-03 10:13:09-04:00 America/New_York
 
   [BUILD FIXES]

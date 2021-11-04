@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41; # :param
+use Object::Pad 0.43;  # ADJUST
 
-package Test::Device::Chip::Adapter 0.19;
+package Test::Device::Chip::Adapter 0.20;
 class Test::Device::Chip::Adapter
    implements Device::Chip::Adapter;
 
@@ -65,7 +65,7 @@ has $_controller;
 has $_obj;
 has $_txn_helper;
 
-BUILD
+ADJUST
 {
    ( $_controller, $_obj ) = Test::ExpectAndCheck::Future->create;
 }
@@ -192,6 +192,7 @@ BEGIN {
 
       async method write { await $_adapter->write( @_ ) }
       async method read  { return await $_adapter->read( @_ ) }
+      async method write_then_read { return await $_adapter->write_then_read( @_ ) }
    }
 
    async method txn ( $code )

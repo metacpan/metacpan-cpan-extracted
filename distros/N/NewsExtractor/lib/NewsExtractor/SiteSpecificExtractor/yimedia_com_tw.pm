@@ -9,7 +9,6 @@ before 'content_text', sub {
     my ($self) = @_;
     $self->dom->find('figure.fbyt-block')->map('remove');
     if (my $el = $self->dom->at('#penci-post-entry-inner > p:last-of-type')) {
-        print $el->content() ."\n";
         if ($el->content() =~ /\A看更多<br>/) {
             $el->remove();
         }

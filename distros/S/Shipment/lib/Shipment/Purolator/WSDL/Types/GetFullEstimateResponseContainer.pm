@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::GetFullEstimateResponseContainer;
-$Shipment::Purolator::WSDL::Types::GetFullEstimateResponseContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::GetFullEstimateResponseContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               ShipmentEstimates
               ReturnShipmentEstimates
 
-              )
+            )
         ],
         {   'ResponseInformation'     => \%ResponseInformation_of,
             'ShipmentEstimates'       => \%ShipmentEstimates_of,
@@ -73,7 +73,7 @@ Shipment::Purolator::WSDL::Types::GetFullEstimateResponseContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

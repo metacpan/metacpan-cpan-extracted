@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,14 +15,16 @@ name: Test-ConsistentVersion
 provides:
   Test::ConsistentVersion:
     file: lib/Test/ConsistentVersion.pm
-    version: v0.3.0
+    version: v0.3.1
 recommends:
   Test::Pod::Content: '0'
 requires:
   Test::Builder: '0.94'
   autodie: '0'
+  perl: '5.006'
   version: '0'
 resources:
   license: http://dev.perl.org/licenses/
-  repository: http://github.com/cebjyre/Test-ConsistentVersion
-version: v0.3.0
+  repository: https://github.com/cebjyre/Test-ConsistentVersion
+version: v0.3.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

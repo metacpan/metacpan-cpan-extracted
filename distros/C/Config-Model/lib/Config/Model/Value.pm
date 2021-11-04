@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.142;
+package Config::Model::Value 2.144;
 
 use 5.10.1;
 
@@ -742,7 +742,7 @@ sub get_info {
     my $std = $self->fetch(qw/mode standard check no/);
 
     if ( defined $self->upstream_default ) {
-        push @items, "upstream_default value: " . $self->upstream_default;
+        push @items, "upstream_default value: " . $self->map_write_as( $self->upstream_default );
     }
     elsif ( defined $std ) {
         push @items, "default value: $std";
@@ -767,6 +767,11 @@ sub get_info {
         foreach my $k ( keys %$v ) {
             push @items, "$what value: $k";
         }
+    }
+
+    foreach my $what (qw/write_as/) {
+        my $v = $self->$what();
+        push @items, "$what: @$v" if defined $v;
     }
 
     return @items ;
@@ -1996,7 +2001,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.142
+version 2.144
 
 =head1 SYNOPSIS
 

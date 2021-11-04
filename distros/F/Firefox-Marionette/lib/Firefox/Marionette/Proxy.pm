@@ -3,7 +3,7 @@ package Firefox::Marionette::Proxy;
 use strict;
 use warnings;
 
-our $VERSION = '1.12';
+our $VERSION = '1.16';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -16,7 +16,6 @@ sub new {
         if ( $host !~ /:\d+$/smx ) {
             $host .= q[:80];
         }
-        $parameters{ftp}   = $host;
         $parameters{http}  = $host;
         $parameters{https} = $host;
     }
@@ -83,7 +82,7 @@ Firefox::Marionette::Proxy - Represents a Proxy used by Firefox Capabilities usi
 
 =head1 VERSION
 
-Version 1.12
+Version 1.16
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::NaftaCommodityDetail;
-$Shipment::FedEx::WSDL::TrackTypes::NaftaCommodityDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::NaftaCommodityDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               NetCostMethod
               NetCostDateRange
 
-              )
+            )
         ],
         {   'PreferenceCriterion'   => \%PreferenceCriterion_of,
             'ProducerDetermination' => \%ProducerDetermination_of,
@@ -47,7 +47,7 @@ Class::Std::initialize();
               'Shipment::FedEx::WSDL::TrackTypes::NaftaPreferenceCriterionCode',
             'ProducerDetermination' =>
               'Shipment::FedEx::WSDL::TrackTypes::NaftaProducerDeterminationCode',
-            'ProducerId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ProducerId'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'NetCostMethod' =>
               'Shipment::FedEx::WSDL::TrackTypes::NaftaNetCostMethodCode',
             'NetCostDateRange' =>
@@ -80,7 +80,7 @@ Shipment::FedEx::WSDL::TrackTypes::NaftaCommodityDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

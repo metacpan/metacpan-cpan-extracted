@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -1800,7 +1800,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -2127,6 +2127,25 @@ appropriately. See L<LWP::UserAgent/get> for more details.
 B<NOTE:> Because C<:content_file> causes the page contents to be
 stored in a file instead of the response object, some Mech functions
 that expect it to be there won't work as expected. Use with caution.
+
+Here is a non-complete list of methods that do not work as expected with
+C<:content_file>:
+C< L<< forms()|/"$mech->forms()" >> >,
+C< L<< current_form()|/"$mech->current_form()" >> >,
+C< L<< links()|/"$mech->links()" >> >,
+C< L<< title()|/"$mech->title()" >> >,
+C< L<< content(...)|/"$mech->content(...)" >> >,
+C< L<< text()|/"$mech->text()" >> >,
+all L<< content-handling methods|/"CONTENT-HANDLING METHODS" >>,
+all L<< link methods|/"LINK METHODS" >>,
+all L<< image methods|/"IMAGE METHODS" >>,
+all L<< form methods|/"FORM METHODS" >>,
+all L<< field methods|/"FIELD METHODS" >>,
+C< L<< save_content(...)|/"$mech->save_content( $filename, %opts )" >> >,
+C< L<< dump_links(...)|/"$mech->dump_links( [[$fh], $absolute] )" >> >,
+C< L<< dump_images(...)|/"$mech->dump_images( [[$fh], $absolute] )" >> >,
+C< L<< dump_forms(...)|/"$mech->dump_forms( [$fh] )" >> >,
+C< L<< dump_text(...)|/"$mech->dump_text( [$fh] )" >> >
 
 =head2 $mech->post( $uri, content => $content )
 

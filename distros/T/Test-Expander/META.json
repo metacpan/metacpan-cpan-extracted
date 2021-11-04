@@ -1,0 +1,71 @@
+{
+   "abstract" : "Expansion of test functionalities that appear to be frequently used while testing.",
+   "author" : [
+      "Jurij Fajnberg <fajnbergj@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Expander",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Fast" : "0",
+            "Exporter" : "0",
+            "File::Temp" : "0",
+            "File::chdir" : "0",
+            "Importer" : "0",
+            "PadWalker" : "0",
+            "Path::Tiny" : "0",
+            "Scalar::Readonly" : "0",
+            "Test2::Tools::Explain" : "0",
+            "Test2::V0" : "0",
+            "Test::Files" : "0",
+            "Test::Output" : "0",
+            "Test::Warn" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Clone" : "0",
+            "Test::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jsf116/Test-Expander/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jsf116/Test-Expander.git",
+         "web" : "https://github.com/jsf116/Test-Expander"
+      }
+   },
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

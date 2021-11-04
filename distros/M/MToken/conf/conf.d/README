@@ -1,0 +1,3 @@
+This directory holds extra project-specific configuration files;
+any files in this directory which have the ".conf" extension will be
+processed as main configuration file.

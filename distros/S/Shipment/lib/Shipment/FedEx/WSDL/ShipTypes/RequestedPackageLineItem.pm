@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem;
-$Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -50,11 +50,11 @@ Class::Std::initialize();
               SpecialServicesRequested
               ContentRecords
 
-              )
+            )
         ],
-        {   'SequenceNumber'    => \%SequenceNumber_of,
-            'GroupNumber'       => \%GroupNumber_of,
-            'GroupPackageCount' => \%GroupPackageCount_of,
+        {   'SequenceNumber'               => \%SequenceNumber_of,
+            'GroupNumber'                  => \%GroupNumber_of,
+            'GroupPackageCount'            => \%GroupPackageCount_of,
             'VariableHandlingChargeDetail' =>
               \%VariableHandlingChargeDetail_of,
             'InsuredValue'             => \%InsuredValue_of,
@@ -121,7 +121,7 @@ Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

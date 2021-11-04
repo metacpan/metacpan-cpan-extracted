@@ -5,7 +5,7 @@ package CXC::Number;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 #
 # This file is part of CXC-Number
@@ -31,7 +31,7 @@ CXC::Number - A namespace for modules which deal with numbers.
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

@@ -11,42 +11,43 @@ use strict;
 require_ok("Astro::Catalog");
 require_ok("Astro::Catalog::IO::SExtractor");
 
-my $cat = new Astro::Catalog( Format => 'SExtractor', Data => \*DATA );
+my $cat = new Astro::Catalog(Format => 'SExtractor', Data => \*DATA);
 
-isa_ok( $cat, "Astro::Catalog" );
+isa_ok($cat, "Astro::Catalog");
 
 my @stars = $cat->stars();
 my $star = $stars[3];
 my $id = $star->id;
 
-is( $id, "4", "SExtractor Star ID" );
+is($id, "4", "SExtractor Star ID");
 
 my $ra = $star->ra;
 
-is( $ra, "21 03 40.39", "SExtractor Star RA" );
+is($ra, "21 03 40.39", "SExtractor Star RA");
 
 my $dec = $star->dec;
 
-is( $dec, "+30 17 30.02", "SExtractor Star Dec" );
+is($dec, "+30 17 30.02", "SExtractor Star Dec");
 
 my $fluxes = $star->fluxes;
-isa_ok( $fluxes, "Astro::Fluxes" );
-my $mag_isocor = $fluxes->flux( waveband => 'unknown',
-                                type => 'mag_isocor' );
-isa_ok( $mag_isocor, "Astro::Flux" );
+isa_ok($fluxes, "Astro::Fluxes");
+my $mag_isocor = $fluxes->flux(
+        waveband => 'unknown',
+        type => 'mag_isocor');
+isa_ok($mag_isocor, "Astro::Flux");
 my $mag_isocor_quantity = $mag_isocor->quantity('MAG_ISOCOR');
-is( $mag_isocor->quantity('MAG_ISOCOR'), -13.2317, "SExtractor Star magnitude" );
-is( $mag_isocor->error('MAG_ISOCOR'), 0.0073, "SExtractor Star magnitude error" );
+is($mag_isocor->quantity('MAG_ISOCOR'), -13.2317, "SExtractor Star magnitude");
+is($mag_isocor->error('MAG_ISOCOR'), 0.0073, "SExtractor Star magnitude error");
 
 # Write out a file, then read it back in.
 my $fh = new File::Temp;
 my $tempfile = $fh->filename;
-ok( $cat->write_catalog( Format => 'SExtractor', File => $tempfile ),
-    "Writing catalogue to disk" );
+ok($cat->write_catalog(Format => 'SExtractor', File => $tempfile),
+    "Writing catalogue to disk");
 
-my $newcat = new Astro::Catalog( Format => 'SExtractor', File => $tempfile );
+my $newcat = new Astro::Catalog(Format => 'SExtractor', File => $tempfile);
 
-isa_ok( $newcat, "Astro::Catalog" );
+isa_ok($newcat, "Astro::Catalog");
 
 # It's not going to be the same because writing doesn't include
 # magnitudes, so check the RA and Dec of star 4.
@@ -56,13 +57,11 @@ my $newid = $newstar->id;
 my $newra = $newstar->ra;
 my $newdec = $newstar->dec;
 
-is( $newid,  $id,  "SExtractor written catalogue ID" );
-is( $newra,  $ra,  "SExtractor written catalogue RA" );
-is( $newdec, $dec, "SExtractor written catalogue Dec" );
+is($newid,  $id,  "SExtractor written catalogue ID");
+is($newra,  $ra,  "SExtractor written catalogue RA");
+is($newdec, $dec, "SExtractor written catalogue Dec");
 
 exit;
-
-# D A T A   B L O C K ------------------------------------------------------
 
 __DATA__
 #   1 NUMBER          Running object number

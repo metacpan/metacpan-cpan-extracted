@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 10;
 
 use File::Spec;
 
@@ -178,6 +178,29 @@ test_file(
             File::Spec->curdir(), "t",
             "data",               "system-tests-1",
             "expected-docbook",   "perl-begin-page.docbook.xml",
+        ),
+    }
+);
+
+# TEST*$test_file
+test_file(
+    {
+        output_format => 'docbook',
+        input_fn      => File::Spec->catfile(
+            File::Spec->curdir(),
+            "t",
+            "data",
+            "system-tests-1",
+            "input-xml",
+"doc-with-author-info--derived-from--perl-begin-page.xml-grammar-vered.xml",
+        ),
+        output_fn => File::Spec->catfile(
+            File::Spec->curdir(),
+            "t",
+            "data",
+            "system-tests-1",
+            "expected-docbook",
+            "doc-with-author-info--derived-from--perl-begin-page.docbook.xml",
         ),
     }
 );

@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfValidationDetail;
-$Shipment::Purolator::WSDL::Types::ArrayOfValidationDetail::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ArrayOfValidationDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use warnings;
 __PACKAGE__->_set_element_form_qualified(1);
 
 sub get_xmlns {
-    'http://schemas.datacontract.org/2004/07/Microsoft.Practices.EnterpriseLibrary.Validation.Integration.WCF'
+    'http://schemas.datacontract.org/2004/07/Microsoft.Practices.EnterpriseLibrary.Validation.Integration.WCF';
 }
 
 our $XML_ATTRIBUTE_CLASS;
@@ -29,7 +29,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        ValidationDetail
 
-              )
+            )
         ],
         {'ValidationDetail' => \%ValidationDetail_of,},
         {   'ValidationDetail' =>
@@ -58,7 +58,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfValidationDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

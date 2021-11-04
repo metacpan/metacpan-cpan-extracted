@@ -27,9 +27,9 @@ sub _buildPrompt {
 # 具体实现 _buildCommands,设置抓取设备运行配置的脚本
 #------------------------------------------------------------------------------
 sub _buildCommands {
-  my $self = shift;
-  # my $commands = [ "dis current-configuration" ];
-  my $commands = [ "screen-length disable", "dis current-configuration" ];
+  my $self     = shift;
+  my $commands = ["dis current-configuration"];
+  # my $commands = [ "screen-length disable", "dis current-configuration" ];
   return $commands;
 }
 
@@ -53,11 +53,12 @@ sub _buildErrorCode {
 sub _buildBufferCode {
   my $self    = shift;
   my %mapping = (
-    qr/---- More ----/mi                => ' ',
-    qr/Are\s+you\s+sure\?\s*\[Y\/N\]/mi => 'Y',
-    qr/press the enter key\)/mi         => ' ',
-    qr/overwrite\?\s*\[Y\/N\]/mi        => 'Y',
-    qr/^\%.+\z/mi                       => 'Y',
+    more     => qr/---- More ----.*$/i,
+    interact => {
+      qr/Are\s+you\s+sure\?\s*\[Y\/N\]/mi => 'Y',
+      qr/overwrite\?\s*\[Y\/N\]/mi        => 'Y',
+      qr/press the enter key\)/mi         => ' ',
+    }
   );
   # 返回数据字典
   return \%mapping;

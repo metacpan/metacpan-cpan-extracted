@@ -15,7 +15,7 @@ use integer;
 use Test::More;
 use Data::Dumper;
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 
 my ($pos, @moves, @expect);
 
@@ -50,7 +50,7 @@ my @tests = (
 
 foreach my $test (@tests) {
 	my $pos = Chess::Plisco->new($test->{fen});
-	ok cp_pos_in_check($pos), "$test->{name} wrong checkers mask"
+	ok $pos->[CP_POS_IN_CHECK], "$test->{name} wrong checkers mask"
 }
 
 done_testing;

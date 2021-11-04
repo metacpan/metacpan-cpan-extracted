@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfShipmentManifestDocumentCriteria;
-$Shipment::Purolator::WSDL::Types::ArrayOfShipmentManifestDocumentCriteria::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ArrayOfShipmentManifestDocumentCriteria::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        ShipmentManifestDocumentCriteria
 
-              )
+            )
         ],
         {   'ShipmentManifestDocumentCriteria' =>
               \%ShipmentManifestDocumentCriteria_of,
@@ -60,7 +60,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfShipmentManifestDocumentCriteria
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

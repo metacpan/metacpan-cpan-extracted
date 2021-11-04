@@ -6,16 +6,28 @@ extends 'Weather::YR::Base';
 
 use Mojo::URL;
 
-has 'lang' => ( isa => 'Str', is => 'rw', default => 'nb' );
+has 'lang' => (
+    isa     => 'Str',
+    is      => 'rw',
+    default => 'en',
+);
 
-has 'url' => ( isa => 'Mojo::URL', is => 'ro', lazy_build => 1 );
+has 'url' => (
+    isa        => 'Mojo::URL',
+    is         => 'ro',
+    lazy_build => 1,
+);
 
 sub _build_url {
     my $self = shift;
 
-    my $url = $self->service_url;
+    my $url = $self->service_url->clone;
     $url->path ( '/weatherapi/textlocation/1.0/' );
-    $url->query( latitude => $self->lat, longitude => $self->lon, language => $self->lang );
+    $url->query(
+        latitude  => $self->lat,
+        longitude => $self->lon,
+        language  => $self->lang,
+    );
 
     return $url;
 }

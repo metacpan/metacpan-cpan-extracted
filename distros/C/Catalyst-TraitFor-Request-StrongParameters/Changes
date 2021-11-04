@@ -1,0 +1,13 @@
+# This file documents the revision history for Perl extension Catalyst-TraitFor-Request-StrongParameters.
+
+0.003 - 2021-10-15
+  - Renamed to Catalyst-TraitFor-Request-StructuredParameters based on community feedback.
+  This is just a release to say that and to tell you to change you Makefile if you are 
+  using this.   Don't use it for new code!  I will eventually remove it from the index
+
+0.002 - 2021-10-12
+  - fixed issue where an array element was comprised only of disallowed fields
+
+0.001 - 2021-10-12
+  - First Release 
+

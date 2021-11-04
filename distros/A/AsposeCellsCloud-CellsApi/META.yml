@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 21.8
+    version: 21.9
   AsposeCellsCloud::LiteCellsApi:
     file: lib/AsposeCellsCloud/LiteCellsApi.pm
   AsposeCellsCloud::Configuration:
@@ -63,6 +63,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/CellsCloudResponse.pm
   AsposeCellsCloud::Object::CellsColor:
     file: lib/AsposeCellsCloud/Object/CellsColor.pm
+  AsposeCellsCloud::Object::CellsError:
+    file: lib/AsposeCellsCloud/Object/CellsError.pm
   AsposeCellsCloud::Object::CellsDocumentProperties:
     file: lib/AsposeCellsCloud/Object/CellsDocumentProperties.pm
   AsposeCellsCloud::Object::CellsDocumentPropertiesResponse:

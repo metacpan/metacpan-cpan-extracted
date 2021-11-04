@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CompletedShipmentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CompletedShipmentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CompletedShipmentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -61,19 +61,19 @@ Class::Std::initialize();
               ShipmentDocuments
               CompletedPackageDetails
 
-              )
+            )
         ],
-        {   'UsDomestic'             => \%UsDomestic_of,
-            'CarrierCode'            => \%CarrierCode_of,
-            'MasterTrackingId'       => \%MasterTrackingId_of,
-            'ServiceTypeDescription' => \%ServiceTypeDescription_of,
-            'PackagingDescription'   => \%PackagingDescription_of,
-            'RoutingDetail'          => \%RoutingDetail_of,
-            'AccessDetail'           => \%AccessDetail_of,
-            'TagDetail'              => \%TagDetail_of,
-            'SmartPostDetail'        => \%SmartPostDetail_of,
-            'ShipmentRating'         => \%ShipmentRating_of,
-            'CodReturnDetail'        => \%CodReturnDetail_of,
+        {   'UsDomestic'                    => \%UsDomestic_of,
+            'CarrierCode'                   => \%CarrierCode_of,
+            'MasterTrackingId'              => \%MasterTrackingId_of,
+            'ServiceTypeDescription'        => \%ServiceTypeDescription_of,
+            'PackagingDescription'          => \%PackagingDescription_of,
+            'RoutingDetail'                 => \%RoutingDetail_of,
+            'AccessDetail'                  => \%AccessDetail_of,
+            'TagDetail'                     => \%TagDetail_of,
+            'SmartPostDetail'               => \%SmartPostDetail_of,
+            'ShipmentRating'                => \%ShipmentRating_of,
+            'CodReturnDetail'               => \%CodReturnDetail_of,
             'CompletedHoldAtLocationDetail' =>
               \%CompletedHoldAtLocationDetail_of,
             'IneligibleForMoneyBackGuarantee' =>
@@ -83,7 +83,7 @@ Class::Std::initialize();
             'ShipmentDocuments'         => \%ShipmentDocuments_of,
             'CompletedPackageDetails'   => \%CompletedPackageDetails_of,
         },
-        {   'UsDomestic' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        {   'UsDomestic'  => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
             'CarrierCode' =>
               'Shipment::FedEx::WSDL::ShipTypes::CarrierCodeType',
             'MasterTrackingId' =>
@@ -157,7 +157,7 @@ Shipment::FedEx::WSDL::ShipTypes::CompletedShipmentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -246,6 +246,11 @@ sub default_monofont {
     return (__PACKAGE__->mono_fonts)[0]->{name};
 }
 
+has linespacing => (is => 'rw',
+                    isa => StrMatch[ qr{\A[0-9]?(?:\.[0-9])?\z} ],
+                    default => sub { '' }
+                   );
+
 has mainfont   => (is => 'rw',
                    isa => StrMatch[ qr{\A[a-zA-Z0-9 ]+\z} ],
                    default => sub { __PACKAGE__->default_mainfont },
@@ -414,6 +419,10 @@ You can switch to alpha per-page setting this option to 1 (boolean).
 
 Start the PDF with an empty page (not with the title page, which will
 be placed on the next recto page).
+
+=item * linespacing (float, tipically 1.5 or 2)
+
+Set the linespacing instead of the default value.
 
 =item * headings
 
@@ -768,6 +777,7 @@ sub config_setters {
                fussy_last_word
                headings
                ignore_cover
+               linespacing
                cover coverwidth nocoverpage notoc
                nofinalpage
                impressum sansfontsections

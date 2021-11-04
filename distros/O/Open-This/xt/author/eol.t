@@ -21,6 +21,7 @@ my @files = (
     't/lib/HTTP/FakeTestClass.pm',
     't/nano.t',
     't/open-this.t',
+    't/ot.t',
     't/other-lib/Foo/Baz.pm',
     't/require.t',
     't/test-data/file',

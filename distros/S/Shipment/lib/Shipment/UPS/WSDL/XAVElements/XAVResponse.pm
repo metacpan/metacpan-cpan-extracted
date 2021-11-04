@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::XAVElements::XAVResponse;
-$Shipment::UPS::WSDL::XAVElements::XAVResponse::VERSION = '3.05';
+$Shipment::UPS::WSDL::XAVElements::XAVResponse::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ use warnings;
                   AddressClassification
                   Candidate
 
-                  )
+                )
             ],
             {   'Response'                  => \%Response_of,
                 'ValidAddressIndicator'     => \%ValidAddressIndicator_of,
@@ -101,7 +101,7 @@ Shipment::UPS::WSDL::XAVElements::XAVResponse
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

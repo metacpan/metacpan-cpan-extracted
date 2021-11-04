@@ -15,18 +15,18 @@ use Data::Dumper;
 # load modules
 require_ok("Astro::Catalog");
 
-my $cat = new Astro::Catalog( Format => 'STL', Data => \*DATA );
+my $cat = new Astro::Catalog(Format => 'STL', Data => \*DATA);
 
-isa_ok( $cat, "Astro::Catalog" );
+isa_ok($cat, "Astro::Catalog");
 
 my $star = $cat->popstar();
 my $id = $star->id;
 
-is( $id, "4", "STL Star ID" );
+is($id, "4", "STL Star ID");
 
 my $ra = $star->ra;
 
-is( $ra, "05 17 36.30", "STL Star RA" );
+is($ra, "05 17 36.30", "STL Star RA");
 
 exit;
 

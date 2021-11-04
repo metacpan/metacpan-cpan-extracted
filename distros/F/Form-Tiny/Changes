@@ -1,5 +1,18 @@
 Revision history for Perl extension Form::Tiny.
 
+2.03 Sat Oct 23 02:00:00 2021
+	- new import flag: -consistent
+	- subroutine parameters are now consistent across the system with -consistent flag
+	- deprecate forms without -consistent flag (transition period)
+	- deprecate Error::DoesNotExist in favor of Error::Required
+	- improved default built in error messages
+	- new DSL keyword: form_message - configures built in error messages
+	- new method: errors_hash - error messages keyed by field name
+	- minor improvement: keep dynamic field data throughout validation
+	- minor improvement: check whether error field name exists in form
+	- new documentation: Manual::Cookbook
+	- new documentation: Manual::Performance
+
 2.02 Sat Sep 18 16:00:00 2021
 	- new feature: additional field validators
 	- deprecate three parameter field filter

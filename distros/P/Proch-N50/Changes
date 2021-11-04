@@ -1,3 +1,7 @@
+1.4.2	2021-11-02
+	* Fixed perlcritic warnings on 'n50' 
+	* Repository update, documentation update, improved errors in wrong lib version detected
+
 1.4.1	2021-08-06
 	* Documenation updated with links to the correct repository
 	* Skip Windows support test when older FASTX::Reader is in use

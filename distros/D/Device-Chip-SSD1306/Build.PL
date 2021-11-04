@@ -8,7 +8,7 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Future::AsyncAwait' => '0.39', # async method
-      'Object::Pad' => '0.19',
+      'Object::Pad' => '0.51',
 
       'Device::Chip' => 0,
    },

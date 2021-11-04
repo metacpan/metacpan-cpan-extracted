@@ -6,8 +6,12 @@ README.md
 cpanfile
 lib/XML/MyXML.pm
 lib/XML/MyXML/Object.pm
+lib/XML/MyXML/Util.pm
 minil.toml
-t/01.t
+t/01-unit.t
 t/02.t
+t/03.t
+t/04-namespaces.t
+t/05-path.t
 META.yml
 MANIFEST

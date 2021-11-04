@@ -1,12 +1,11 @@
 #!perl
 
+use v5.12;
 use utf8;
 use open qw(:locale);
-use strict;
 use warnings;
 use autodie;
 
-use version;
 use Getopt::Long 2.24 qw(:config gnu_getopt);
 use IO::Interactive qw(is_interactive);
 
@@ -40,11 +39,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.12
+Version v3.2.13
 
 =cut
 
-our $VERSION = version->declare('v3.2.12');
+our $VERSION = 'v3.2.13';
 
 my $progname = path($0)->basename;
 

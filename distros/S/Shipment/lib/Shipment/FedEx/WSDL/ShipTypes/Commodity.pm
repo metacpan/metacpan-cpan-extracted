@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::Commodity;
-$Shipment::FedEx::WSDL::ShipTypes::Commodity::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::Commodity::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -58,7 +58,7 @@ Class::Std::initialize();
               CIMarksAndNumbers
               NaftaDetail
 
-              )
+            )
         ],
         {   'Name'                        => \%Name_of,
             'NumberOfPieces'              => \%NumberOfPieces_of,
@@ -77,7 +77,7 @@ Class::Std::initialize();
             'CIMarksAndNumbers'           => \%CIMarksAndNumbers_of,
             'NaftaDetail'                 => \%NaftaDetail_of,
         },
-        {   'Name' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'Name'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'NumberOfPieces' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
@@ -85,13 +85,13 @@ Class::Std::initialize();
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'HarmonizedCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'Weight'         => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
-            'Quantity' =>
+            'Quantity'       =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'QuantityUnits' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'AdditionalMeasures' =>
               'Shipment::FedEx::WSDL::ShipTypes::Measure',
-            'UnitPrice'    => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-            'CustomsValue' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'UnitPrice'        => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'CustomsValue'     => 'Shipment::FedEx::WSDL::ShipTypes::Money',
             'ExciseConditions' =>
               'Shipment::FedEx::WSDL::ShipTypes::EdtExciseCondition',
             'ExportLicenseNumber' =>
@@ -99,7 +99,7 @@ Class::Std::initialize();
             'ExportLicenseExpirationDate' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::date',
             'CIMarksAndNumbers' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NaftaDetail' =>
+            'NaftaDetail'       =>
               'Shipment::FedEx::WSDL::ShipTypes::NaftaCommodityDetail',
         },
         {
@@ -140,7 +140,7 @@ Shipment::FedEx::WSDL::ShipTypes::Commodity
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

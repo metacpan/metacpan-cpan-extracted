@@ -51,6 +51,8 @@ await $chip->mount(
       [ 97032.6, 21.8, 42.7 ], # 97032.6Pa, 21.8C, 42.7%
       '->read_sensor returns converted values'
    );
+
+   $adapter->check_and_clear( '->read_sensor' );
 }
 
 done_testing;

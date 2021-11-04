@@ -23,6 +23,7 @@
          "requires" : {
             "Data::Bitfield" : "0",
             "Device::Chip" : "0.03",
+            "Device::Chip::Sensor" : "0.19",
             "Future::AsyncAwait" : "0.47",
             "Object::Pad" : "0.19",
             "perl" : "5.026"
@@ -38,7 +39,7 @@
    "provides" : {
       "Device::Chip::AS3935" : {
          "file" : "lib/Device/Chip/AS3935.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -47,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

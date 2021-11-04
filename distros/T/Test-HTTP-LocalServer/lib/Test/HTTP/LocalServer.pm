@@ -12,7 +12,7 @@ use Time::HiRes qw ( time sleep );
 use HTTP::Tiny;
 use HTTP::Daemon 6.05; # Our log server needs this, but we load it here to find its version
 
-our $VERSION = '0.71';
+our $VERSION = '0.74';
 
 =head1 NAME
 
@@ -21,7 +21,9 @@ Test::HTTP::LocalServer - spawn a local HTTP server for testing
 =head1 SYNOPSIS
 
   use HTTP::Tiny;
-  my $server = Test::HTTP::LocalServer->spawn;
+  my $server = Test::HTTP::LocalServer->spawn(
+      request_pause => 1, # wait one second before accepting the next request
+  );
 
   my $res = HTTP::Tiny->new->get( $server->url );
   print $res->{content};
@@ -61,6 +63,17 @@ Valid arguments are :
 =item *
 
 C<< html => >> scalar containing the page to be served
+
+If this is not specified, an informative default page will be used.
+
+=item *
+
+C<< request_pause => >> number of seconds to sleep before accepting the next
+request
+
+If your system is slow or needs to wait some time before a socket connection
+is ready again, use this parameter to make the server wait a bit before
+handling the next connection.
 
 =item *
 
@@ -147,6 +160,9 @@ sub spawn_child { my ( $self, @cmd ) = @_;
 
 sub spawn {
   my ($class,%args) = @_;
+
+  $args{ request_pause } ||= 0;
+
   my $self = { %args };
   bless $self,$class;
 
@@ -180,6 +196,7 @@ sub spawn {
   my @opts = ("-f", $url_file);
   push @opts, "-e" => delete($args{ eval })
       if $args{ eval };
+  push @opts, "-s" => $args{ request_pause };
 
   my @cmd=( $^X, $server_file, $web_page, $logfile, @opts );
   my $pid = $self->spawn_child(@cmd);
@@ -451,7 +468,7 @@ None by default.
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
-Copyright (C) 2003-2020 Max Maischein
+Copyright (C) 2003-2021 Max Maischein
 
 =head1 AUTHOR
 

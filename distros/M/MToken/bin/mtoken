@@ -1,15 +1,27 @@
 #!/usr/bin/perl -w
-use strict; #$Id: mtoken 70 2019-06-09 18:25:29Z minus $
+use strict; #$Id: mtoken 116 2021-10-12 15:17:49Z minus $
 
 =head1 NAME
 
-mtoken - tool for initializing Token Devices
+mtoken - the tool for token management
 
 =head1 SYNOPSIS
 
     mtoken [options] commands [args]
 
-    mtoken [-dv] init [NAME]
+    mtoken [-dv] [-D /path/to/new/token] init [TOKEN_NAME]
+    mtoken [-v] status|st
+    mtoken add|set|import [-D /path/to/token] [-rf] /path/to/token/file.txt
+    mtoken get|export [-D /path/to/token] file.txt [-o /path/to/file.txt]
+    mtoken show|cat|print [-D /path/to/token] file.txt
+    mtoken del|delete|rm|remove [-D /path/to/token] [-f] file.txt
+    mtoken list|ls [-D /path/to/token] [-p PAGE_NUMBER]
+    mtoken info [-D /path/to/token] [file.txt]
+    mtoken genkey [-s size] [/path/to/file.key]
+    mtoken commit|ci|push|backup
+    mtoken update|up|pull|restore [tarball.tkn] [-O /path/to/tarbals/]
+    mtoken revoke|reject|discard [tarball.tkn]
+    mtoken clean
 
 =head1 OPTIONS
 
@@ -17,19 +29,19 @@ mtoken - tool for initializing Token Devices
 
 =item B<-c CONFIG_FILE, --config=CONFIG_FILE>
 
-Use CONFIG_FILE as configuration file
-
-=item B<--datadir=DIR, --workdir=DIR>
-
-Use DIR as DataDir directory
+Use CONFIG_FILE as general configuration file
 
 =item B<-d, --debug>
 
 Print debug information on STDOUT
 
-=item B<-D /foo/bar/baz, --directory=/foo/bar/baz>
+=item B<-D DIR, --directory=DIR, --datadir=DIR>
 
-Sets directory for initializing files structure
+Use DIR as DataDir directory
+
+=item B<-f, --force>
+
+Ignore all users prompts, never prompt
 
 =item B<-h, --help>
 
@@ -38,6 +50,35 @@ Show short help information and quit
 =item B<-H, --longhelp>
 
 Show long help information and quit
+
+=item B<-k, --insecure>
+
+By default, every SSL/TLS connection client makes is verified to be secure.
+This option allows client to proceed and operate even for server connections
+otherwise  considered  insecure.
+
+The server connection is verified by making sure the server's certificate
+contains the right name and verifies successfully using the cert store.
+
+=item B<-o FILE, --output=FILE>
+
+Set output file
+
+=item B<-O DIR, --outdir=DIR>
+
+Set output directory
+
+=item B<-p NUM, --page=NUM>
+
+Set page number
+
+=item B<-r, --remove>
+
+Remove input file after processing. See C<add> command for example
+
+=item B<-R, --raw>
+
+Show encrypted content of file (raw)
 
 =item B<-v, --verbose>
 
@@ -53,18 +94,67 @@ Print the version number of the program and quit
 
 =over 4
 
+=item B<add, set, import>
+
+Add the file to token
+
+=item B<clean>
+
+Remove all temporary files
+
+=item B<commit, ci, push, store, backup>
+
+Send tarball file (snapshot of token) to server
+
+=item B<genkey>
+
+Generate main random key file via openssl
+
+=item B<get, export>
+
+Export file from token to disk
+
+=item B<info>
+
+Get file/database information
+
 =item B<init>
 
-Initialize the Token device. Creates file structure in specifies directory
+Initialize the Token device (MToken). Creates file structure in specifies directory
 See --directory option
+
+=item B<list, ls>
+
+Get file list of token
+
+=item B<del, delete, rm, remove>
+
+Delete file from token
+
+=item B<revoke, reject, discard>
+
+Revoke (delete) tarball file (snapshot of token) from server
+
+=item B<show, print, cat>
+
+Extract and print file from token to STDOUT
+
+=item B<status>
+
+Get status and diagnostic information
+
+=item B<update, up, pull, fetch, restore>
+
+Revert the state of the current token to the state of the token in the past.
+The past state is set by the selected tarbal, which is stored in the remote
+repository (server). If the tarbal is not specified, then the previously (last)
+created tarbal is used
 
 =back
 
 =head1 DESCRIPTION
 
-Tool for initializing Your Token Devices. This tool provides first steps to working with Token Devices.
-
-For next steps see L<MToken>
+This tool provides initializing and management of your Token Devices (MTokens)
 
 =head1 AUTHOR
 
@@ -72,7 +162,7 @@ Serz Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2021 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -86,14 +176,25 @@ See L<https://dev.perl.org/licenses/>
 use Getopt::Long;
 use Pod::Usage;
 
-use CTK::Util qw/preparedir/;
+use Mojo::File qw/tempdir/;
 use MToken;
 use MToken::Const;
 use MToken::Util;
-use Cwd qw/getcwd/;
-use File::Spec;
 
-$| = 1;  # autoflush
+use constant {
+    CMDDEFAULT  => "usage",
+    ALIASES_MAP => {
+            status  => [qw/status st/],
+            add     => [qw/add set import/],
+            list    => [qw/list ls/],
+            del     => [qw/del delete rm remove/],
+            get     => [qw/get export/],
+            show    => [qw/show cat print/],
+            commit  => [qw/commit ci push store backup/],
+            update  => [qw/update up pull fetch restore/],
+            revoke  => [qw/revoke reject discard/],
+       },
+};
 
 my $options = {};
 Getopt::Long::Configure ("bundling");
@@ -101,9 +202,9 @@ GetOptions($options,
     # NoUsed keys map:
     #
     # a A b B   C     e E
-    # f F g G     i I j J
-    # k K l L m M n N o O
-    # p P q Q r R s S t T
+    #   F g G     i I j J
+    #   K l L m M n N    
+    #   P q Q       S t T
     # u U     w W x X y Y
     # z Z
 
@@ -116,43 +217,55 @@ GetOptions($options,
 
     # CTK Application
     "config|c=s",           # Config file
-    "datadir|workdir=s",    # DataDir
-    "directory|dir|D=s",    # Destination directory
+    "datadir|directory|dir|D=s", # DataDir, destination directory
+    "force|f",              # Never prompt
+    "output|outfile|o=s",   # Output file
+    "outdir|O=s",           # Output dir
+    "page|p=i",             # Page number (0...n)
+    "remove|r",             # Remove file after processing
+    "raw|R",                # Show raw of file, content only
+    "size|s=i",             # Size of rand key
+    "insecure|k",           # Insecure connection
 
 ) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
 pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
 pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
-printf("Version: %s\n", MToken->VERSION) && exit(0) if $options->{version};
 
 # VARS
-my $command = shift(@ARGV) || '';
+my $command = _alias2command(shift(@ARGV) || CMDDEFAULT);
+   $command = "version" if $options->{version};
 my @arguments = @ARGV;
 
 # MToken Application instance
-my $mt = new MToken(
+my $mt = MToken->new(
         project => PROJECTNAME,
         prefix  => PREFIX,
-        configfile => ($options->{config} && -e $options->{config})
-            ? $options->{config}
-            : File::Spec->catfile(getcwd(), sprintf("%s.conf", PREFIX)),
-        ($options->{datadir} ? (datadir => $options->{datadir}) : ()),
-        root    => getcwd(),
+        ($options->{config} && -e $options->{config}) ? (configfile => $options->{config}) : (),
+        datadir => $options->{datadir},
+        ($command ne 'server') ? (tempdir => tempdir()) : (),
         options => $options,
         debug   => $options->{debug},
         verbose => $options->{verbose},
     );
 pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*STDERR)
-    unless $command && grep {$_ eq $command} ($mt->list_handlers());
+    unless grep {$_ eq $command} ($mt->list_handlers());
 
-preparedir({
-        datadir => $mt->datadir(),
-        tempdir => $mt->tempdir(),
-    });
-
+# Run
 my $exitval = $mt->run($command, @arguments) ? 0 : 1;
-printf STDERR "%s\n", red($mt->error) if $exitval && $mt->error;
+printf STDERR "%s\n", red($mt->error) if $exitval && !$mt->debugmode && $mt->error;
 
 exit $exitval;
+
+sub _alias2command {
+    my $c = shift;
+    my %rev;
+    while (my ($k, $v) = each %{(ALIASES_MAP)}) {
+        foreach my $a (@$v) {
+            $rev{$a} = $k;
+        }
+    }
+    return $rev{$c} || $c;
+}
 
 1;
 

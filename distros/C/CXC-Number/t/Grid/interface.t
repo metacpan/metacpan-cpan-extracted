@@ -7,6 +7,23 @@ use CXC::Number::Grid;
 
 sub Grid { join( '::', 'CXC::Number::Grid', @_ ) }
 
+subtest sequence => sub {
+
+    require CXC::Number::Sequence;
+
+    my $sequence = CXC::Number::Sequence->build( fixed => elements => [0, 1, 2, 3, 4] );
+    my $grid;
+
+    ok( lives { $grid = Grid->new( edges => $sequence ) } )
+      or diag $@;
+    is( $grid,
+        object {
+            call edges => [ 0, 1, 2, 3, 4, ]
+        },
+      );
+
+};
+
 subtest bignum => sub {
 
     my $grid;

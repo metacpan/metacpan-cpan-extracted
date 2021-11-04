@@ -4,7 +4,7 @@
       "Martin Becker <becker-cpan-mp (at) cozap.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -32,11 +32,16 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Math::BigInt::GMP" : "0",
+            "Math::Prime::Util::GMP" : "0"
+         },
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "Math::Polynomial" : "1.001",
-            "Math::Prime::Util" : "0.36",
+            "Math::BigInt" : "0",
+            "Math::Polynomial" : "1.019",
+            "Math::Prime::Util" : "0.47",
             "perl" : "5.006"
          }
       },
@@ -49,13 +54,13 @@
    "provides" : {
       "Math::Polynomial::Cyclotomic" : {
          "file" : "lib/Math/Polynomial/Cyclotomic.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Polynomial-Cyclotomic"
+         "web" : "https://github.com/mhasch/perl-Math-Polynomial-Cyclotomic/issues"
       },
       "license" : [
          "https://www.perlfoundation.org/artistic-license-20.html"
@@ -66,6 +71,6 @@
          "web" : "https://github.com/mhasch/perl-Math-Polynomial-Cyclotomic"
       }
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

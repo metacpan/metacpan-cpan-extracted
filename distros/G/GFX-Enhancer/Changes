@@ -1,5 +1,21 @@
 Revision history for Perl extension GFX::Enhancer.
 
+0.1.22
+	. fixed PointsInvestigator.pm
+
+0.1.21
+	. finished Vector.pm for start of filtering
+
+0.1.20
+	. added cosine angular momentum vector alteration (e.g. a colour
+	  vector.
+
+0.1.19
+	. added vector classes with alpha and colour values
+
+0.1.18
+	. minor edits, bugfixes
+
 0.1.17
 	. added array function stubs for image sharpen and recognize objects
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.53;
+package Future::AsyncAwait 0.54;
 
 use v5.14;
 use warnings;
@@ -273,6 +273,14 @@ Most cases involving awaiting on still-pending futures should work fine:
    async sub wobble
    {
       foreach my $var ( THINGs ) {
+         await func();
+      }
+   }
+
+   async sub wubble
+   {
+      # on perl 5.35.5 and above
+      foreach my ($k, $v) ( KVTHINGs ) {
          await func();
       }
    }

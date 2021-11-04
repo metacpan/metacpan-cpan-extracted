@@ -20,6 +20,11 @@ while (my $read = $data->getIlluminaRead() ) {
 
   ok( $data->{status} == 1 ,
     "[ILLUMINA] Valid format detected (reader_status=1)");
+
+  ok( length($read->{instrument}) > 0, "Received instrument: $read->{instrument}");
+  ok( length($read->{index}) > 0, "Received index: $read->{index}");
+  ok( length($read->{tile}) > 0, "Received tile: $read->{tile}");
+  ok( length($read->{index}) > 0, "Received index: $read->{index}");
 }
 
 

@@ -2,7 +2,7 @@ NAME
     App::ShellCompleter::cpanm - Shell completion for cpanm
 
 VERSION
-    This document describes version 0.210 of App::ShellCompleter::cpanm
+    This document describes version 0.211 of App::ShellCompleter::cpanm
     (from Perl distribution App-ShellCompleter-cpanm), released on
     2021-05-22.
 

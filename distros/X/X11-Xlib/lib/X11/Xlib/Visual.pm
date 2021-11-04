@@ -21,6 +21,18 @@ X11 functions, or get its L</id> to look up the L<X11::Xlib::XVisualInfo>.
 
 Return the numeric ID of this visual.
 
+=head2 display
+
+See L<X1::Xlib::Opaque/display>
+
+=head2 pointer_bytes
+
+See L<X1::Xlib::Opaque/pointer_bytes>
+
+=head2 pointer_int
+
+See L<X1::Xlib::Opaque/pointer_int>
+
 =head1 AUTHOR
 
 Olivier Thauvin, E<lt>nanardon@nanardon.zarb.orgE<gt>
@@ -31,7 +43,7 @@ Michael Conrad, E<lt>mike@nrdvana.netE<gt>
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2020 by Michael Conrad
+Copyright (C) 2017-2021 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

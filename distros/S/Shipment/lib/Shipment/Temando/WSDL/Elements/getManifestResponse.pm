@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::getManifestResponse;
-$Shipment::Temando::WSDL::Elements::getManifestResponse::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::getManifestResponse::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ use warnings;
                   labelDocumentType
                   labelPrinterType
 
-                  )
+                )
             ],
             {   'requests'             => \%requests_of,
                 'manifestDocument'     => \%manifestDocument_of,
@@ -92,7 +92,7 @@ use warnings;
 
     package Shipment::Temando::WSDL::Elements::getManifestResponse::_requests;
     $Shipment::Temando::WSDL::Elements::getManifestResponse::_requests::VERSION
-      = '3.05';
+      = '3.06';
     use strict;
     use warnings;
     {
@@ -115,7 +115,7 @@ use warnings;
             __PACKAGE__->_factory(
                 [   qw(        request
 
-                      )
+                    )
                 ],
                 {'request' => \%request_of,},
                 {'request' => 'Shipment::Temando::WSDL::Types::Request',},
@@ -148,7 +148,7 @@ Shipment::Temando::WSDL::Elements::getManifestResponse
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

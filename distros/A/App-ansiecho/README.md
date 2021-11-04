@@ -37,14 +37,14 @@ Example:
 
 # VERSION
 
-Version 0.04
+Version 0.06
 
 # DESCRIPTION
 
 ## ECHO
 
 **ansiecho** print arguments with ANSI terminal escape sequence
-according to the given color specification.
+according to a given color specification.
 
 In a simple case, **ansiecho** behave exactly same as [echo](https://metacpan.org/pod/echo) command.
 
@@ -96,7 +96,7 @@ including multibyte Unicode characters.
 
 Formatted result ends up to a single argument, and can be a subject of
 other operation.  In the next example, numbers are formatted, colored,
-and gave to other format.
+and given to other format.
 
     ansiecho -f '\N{ALARM CLOCK} %s' -c KF/544 -f ' %02d:%02d:%02d ' 1 2 3
 
@@ -162,7 +162,7 @@ Then use this variable like:
     Set separator string between each arguments.  Option **-j** is a
     short-cut for **--separate ''**.
 
-- **--**\[**no**\]**rgb24**
+- **--**\[**no-**\]**rgb24**
 
     Produce 24bit full-color sequence for 12bit/24bit specified colors.
     They are converted to 216 colors by default.
@@ -303,7 +303,9 @@ always correspond to the character itself.
 # COLOR SPEC
 
 This is a brief summary.  Read ["COLOR SPEC" in Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap#COLOR-SPEC) for
-complete description.
+complete description.  Try next command to see 256 color table.
+
+    perl -MGetopt::EX::Colormap=:all -E colortable
 
 Color specification is a combination of single uppercase character
 representing 8 colors, and alternative (usually brighter) colors in
@@ -337,15 +339,15 @@ with other special effects :
 
     N    None
     Z  0 Zero (reset)
-    D  1 Double-struck (boldface)
+    D  1 Double strike (boldface)
     P  2 Pale (dark)
     I  3 Italic
     U  4 Underline
     F  5 Flash (blink: slow)
     Q  6 Quick (blink: rapid)
-    S  7 Stand-out (reverse video)
-    V  8 Vanish (concealed)
-    X  9 Crossed out
+    S  7 Stand out (reverse video)
+    H  8 Hide (concealed)
+    X  9 Cross out
 
     E    Erase Line
 
@@ -367,9 +369,10 @@ Samples:
 # 256/24BIT COLORS
 
 12bit/24bit colors are converted to 216 colors because most terminal
-can not display them.  If you are using full-color terminal, such as
-iTerm2 on Mac, use **--rgb24** option or set `GETOPTEX_RGB24`
-environment variable to produce full-color sequence.
+can not display them.  On some terminals which set the environment
+variable `COLORTERM` as `truecolor` (e.g. iTerm), 24bit color mode
+is automatically enabled.  Otherwise, use **--rgb24** option or set
+`GETOPTEX_RGB24` environment variable to produce full-color sequence.
 
 # INSTALL
 

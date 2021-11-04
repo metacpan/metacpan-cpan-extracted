@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use FindApp::Subs;
+use FindApp::Vars qw(:all);
+
+default_origin("script");
+use_no_devperls();
+
+rootdir_has qw{
+    README
+    Changes
+    Makefile.PL
+    bin/
+    lib/
+    t/setup.pm
+};
+
+libdirs_are  qw{ lib t/lib };
+libdirs_have qw{ FindApp.pm FindApp::Utils FindApp::Test::Utils };
+
+bindirs_are  qw{ bin };
+bindirs_have qw{ findapp-shell-settings };
+
+mandirs_are  qw{ t/testroot/sample_man };
+mandirs_have qw{ man1/ man3/ };
+
+my $ctext = constraint_text();
+print("Distribution directory expects to have $ctext.\n");
+
+findapp();
+
+$FINDAPP_DEBUG_SHORTEN = 0;
+
+print old();

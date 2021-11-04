@@ -13,8 +13,8 @@
 package No::Worries::PidFile;
 use strict;
 use warnings;
-our $VERSION  = "1.6";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.20 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "1.7";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.21 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -535,7 +535,7 @@ informative message and an LSB compatible exit code; supported options:
 
 tell the process corresponding to the pid file to quit (setting its I<action>
 to C<quit>), wait a bit to check that it indeed stopped and kill it using
-L<No::Worries::Proc>'s proc_terminate() is everything else fails; supported
+L<No::Worries::Proc>'s proc_terminate() if everything else fails; supported
 options:
 
 =over

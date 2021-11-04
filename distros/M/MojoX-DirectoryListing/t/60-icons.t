@@ -4,6 +4,7 @@ use MojoX::DirectoryListing;
 use MojoX::DirectoryListing::Icons;
 use strict;
 use warnings;
+use lib '.';
 
 my $icon = choose_icon( { name => "foo.gif", type => "gif" } );
 ok($icon eq 'image', 'image type identified' );
@@ -70,9 +71,11 @@ $t6->get_ok("/directory-listing-icons/text")->status_is(200)
 $t6->get_ok("/directory-listing-icons/unknown")->status_is(200)
     ->content_type_is("image/gif");
 my $uk_data = $t6->tx->res->{content}{asset}{content};
-$t6->get_ok("/directory-listing-icons/bogus.arc")->status_is(200);
+$t6->get_ok("/directory-listing-icons/bogus")
+   ->status_is(200);
+$t6->get_ok("/directory-listing-icons/bogus")->status_is(200);
 my $bg_data = $t6->tx->res->{content}{asset}{content};
-ok( $uk_data eq $bg_data , '/directory-listing-icons/XXX.YYY always returns' );
+ok( $uk_data eq $bg_data , '/directory-listing-icons/XXX always returns' );
 $t6->get_ok("/directory-listing-icons/bogus/arc")
     ->status_isnt(200, '/directory-listing-icons/XXX/YYY not ok' );
 

@@ -54,12 +54,16 @@ subtest 'Latin-1 in UTF-8 parsed as UTF-8 returns chars' => sub {
 };
 subtest 'Latin-1 in UTF-8 parsed by default returns mojibake' => sub {
 	run_ok @CMD, qw(-m --copyright t/encoding/copr-utf8.h);
+	my $todo = todo 'String::Copyright documented to accept only strings';
 	is stdout, $basic_utf8_as_latin1, 'Testing stdout';
+	$todo = undef;
 	is stderr, '', 'No stderr';
 };
 subtest 'Latin-1 in UTF-8 parsed by guessing returns chars' => sub {
 	run_ok @CMD, qw(-m --copyright --encoding Guess t/encoding/copr-utf8.h);
+	my $todo = todo 'String::Copyright documented to accept only strings';
 	is stdout, $basic_utf8_as_latin1, 'Testing stdout';
+	$todo = undef;
 	is stderr, '', 'No stderr';
 };
 subtest 'Latin-1 in UTF-8 parsed as ISO 8859-1 returns mojibake' => sub {
@@ -76,13 +80,17 @@ subtest 'Latin-1 in ISO 8859-1 parsed as ISO 8859-1 returns chars' => sub {
 };
 subtest 'Latin-1 in ISO 8859-1 parsed by default returns chars' => sub {
 	run_ok @CMD, qw(-m --copyright t/encoding/copr-iso8859.h);
+	my $todo = todo 'String::Copyright documented to accept only strings';
 	is stdout, $extended, 'Testing stdout';
+	$todo = undef;
 	is stderr, '', 'No stderr';
 };
 subtest 'Latin-1 in ISO 8859-1 parsed by guessing returns chars' => sub {
 	run_ok @CMD,
 		qw(-m --copyright --encoding Guess t/encoding/copr-iso8859.h);
+	my $todo = todo 'String::Copyright documented to accept only strings';
 	is stdout, $extended, 'Testing stdout';
+	$todo = undef;
 	is stderr, '', 'No stderr';
 };
 subtest 'Latin-1 in ISO 8859-1 parsed as UTF-8 returns mojibake and warns' =>
@@ -99,12 +107,16 @@ subtest 'CJK in EUC-JP parsed as EUC-JP returns chars' => sub {
 };
 subtest 'CJK in EUC-JP parsed by default returns mojibake and warns' => sub {
 	run_ok @CMD, qw(-m --copyright t/encoding/README.gs550j);
+	my $todo = todo 'String::Copyright documented to accept only strings';
 	is stdout, $japanese_ujis_as_latin1, 'Testing stdout';
+	$todo = undef;
 	like stderr, qr{|utf8 .* does not map to Unicode at};
 };
 subtest 'CJK in EUC-JP parsed by guessing returns mojibake' => sub {
 	run_ok @CMD, qw(-m --copyright --encoding Guess t/encoding/README.gs550j);
+	my $todo = todo 'String::Copyright documented to accept only strings';
 	is stdout, $japanese_ujis_as_latin1, 'Testing stdout';
+	$todo = undef;
 	is stderr, '', 'No stderr';
 };
 subtest 'CJK in EUC-JP parsed as ISO 8859-1 returns mojibake' => sub {

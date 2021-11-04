@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000027';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -19,13 +19,16 @@ use Module::Runtime qw(
 );
 use Module::Util ();
 use Path::Tiny qw( path );
-use Try::Tiny ();
-use URI       ();
+use URI ();
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
 sub parse_text {
     my $text = join q{ }, @_;
+
+    if ($text) {
+        $text =~ s/^\s+|\s+$//g;
+    }
 
     return undef if !$text;
     my %parsed = ( original_text => $text );
@@ -337,7 +340,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000025
+version 0.000027
 
 =head1 DESCRIPTION
 

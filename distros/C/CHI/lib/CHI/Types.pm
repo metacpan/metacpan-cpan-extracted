@@ -1,5 +1,5 @@
 package CHI::Types;
-$CHI::Types::VERSION = '0.60';
+$CHI::Types::VERSION = '0.61';
 use Carp;
 use CHI::Util qw(can_load parse_duration parse_memory_size);
 use MooX::Types::MooseLike qw(exception_message);

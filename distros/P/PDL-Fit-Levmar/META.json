@@ -4,13 +4,13 @@
       "John Lapeyre <jlapeyre cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-Fit-Levmar",
    "no_index" : {
@@ -22,23 +22,39 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "PDL" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "PDL" : "0"
+            "PDL" : "2.057"
          }
       },
       "runtime" : {
          "requires" : {
+            "File::Temp" : "0",
             "PDL" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.0100",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jlapeyre/PDL-Fit-Levmar/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jlapeyre/PDL-Fit-Levmar.git",
+         "web" : "https://github.com/jlapeyre/PDL-Fit-Levmar"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
+   },
+   "version" : "0.0103",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

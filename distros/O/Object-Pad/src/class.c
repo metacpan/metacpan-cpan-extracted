@@ -1,3 +1,4 @@
+/* vi: set ft=xs : */
 #define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
@@ -145,12 +146,13 @@ static void S_make_instance_slots(pTHX_ const ClassMeta *classmeta, AV *slotsav,
 
   if(classmeta->start_slotix) {
     /* Superclass actually has some slots */
-    assert(classmeta->supermeta->sealed);
+    assert(classmeta->type == METATYPE_CLASS);
+    assert(classmeta->cls.supermeta->sealed);
 
-    make_instance_slots(classmeta->supermeta, slotsav, 0);
+    make_instance_slots(classmeta->cls.supermeta, slotsav, 0);
   }
 
-  AV *slots = classmeta->slots;
+  AV *slots = classmeta->direct_slots;
   I32 nslots = av_count(slots);
 
   av_extend(slotsav, classmeta->next_slotix - 1 + roleoffset);
@@ -180,18 +182,20 @@ static void S_make_instance_slots(pTHX_ const ClassMeta *classmeta, AV *slotsav,
     }
   }
 
-  AV *roles = classmeta->roles;
-  I32 nroles = av_count(roles);
+  if(classmeta->type == METATYPE_CLASS) {
+    U32 nroles;
+    RoleEmbedding **embeddings = mop_class_get_direct_roles(classmeta, &nroles);
 
-  assert(classmeta->type == METATYPE_CLASS || nroles == 0);
+    assert(classmeta->type == METATYPE_CLASS || nroles == 0);
 
-  for(i = 0; i < nroles; i++) {
-    RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
-    ClassMeta *rolemeta = embedding->rolemeta;
+    for(i = 0; i < nroles; i++) {
+      RoleEmbedding *embedding = embeddings[i];
+      ClassMeta *rolemeta = embedding->rolemeta;
 
-    assert(rolemeta->sealed);
+      assert(rolemeta->sealed);
 
-    make_instance_slots(rolemeta, slotsav, embedding->offset);
+      make_instance_slots(rolemeta, slotsav, embedding->offset);
+    }
   }
 }
 
@@ -271,9 +275,25 @@ static CV *S_embed_cv(pTHX_ CV *cv, RoleEmbedding *embedding)
   return embedded_cv;
 }
 
+RoleEmbedding **ObjectPad_mop_class_get_direct_roles(pTHX_ const ClassMeta *meta, U32 *nroles)
+{
+  assert(meta->type == METATYPE_CLASS);
+  AV *roles = meta->cls.direct_roles;
+  *nroles = av_count(roles);
+  return (RoleEmbedding **)AvARRAY(roles);
+}
+
+RoleEmbedding **ObjectPad_mop_class_get_all_roles(pTHX_ const ClassMeta *meta, U32 *nroles)
+{
+  assert(meta->type == METATYPE_CLASS);
+  AV *roles = meta->cls.embedded_roles;
+  *nroles = av_count(roles);
+  return (RoleEmbedding **)AvARRAY(roles);
+}
+
 MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname)
 {
-  AV *methods = meta->methods;
+  AV *methods = meta->direct_methods;
 
   if(meta->sealed)
     croak("Cannot add a new method to an already-sealed class");
@@ -307,7 +327,7 @@ MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname
 
 SlotMeta *ObjectPad_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
 {
-  AV *slots = meta->slots;
+  AV *slots = meta->direct_slots;
 
   if(meta->sealed)
     croak("Cannot add a new slot to an already-sealed class");
@@ -347,6 +367,8 @@ SlotMeta *ObjectPad_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
 
 void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
 {
+  if(meta->sealed)
+    croak("Cannot add a BUILD block to an already-sealed class");
   if(meta->strict_params)
     croak("Cannot add a BUILD block to a class with :strict(params)");
 
@@ -358,6 +380,8 @@ void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
 
 void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
 {
+  if(meta->sealed)
+    croak("Cannot add an ADJUST block to an already-sealed class");
   if(!meta->adjustblocks)
     meta->adjustblocks = newAV();
 
@@ -372,6 +396,8 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
 
 void ObjectPad_mop_class_add_ADJUSTPARAMS(pTHX_ ClassMeta *meta, CV *cv)
 {
+  if(meta->sealed)
+    croak("Cannot add an ADJUSTPARAMS block to an already-sealed class");
   if(!meta->adjustblocks)
     meta->adjustblocks = newAV();
 
@@ -386,22 +412,39 @@ void ObjectPad_mop_class_add_ADJUSTPARAMS(pTHX_ ClassMeta *meta, CV *cv)
   av_push(meta->adjustblocks, (SV *)block);
 }
 
-#define mop_class_implements_role(classmeta, rolemeta)  S_mop_class_implements_role(aTHX_ classmeta, rolemeta)
-static bool S_mop_class_implements_role(pTHX_ ClassMeta *classmeta, ClassMeta *rolemeta)
+#define mop_class_implements_role(meta, rolemeta)  S_mop_class_implements_role(aTHX_ meta, rolemeta)
+static bool S_mop_class_implements_role(pTHX_ ClassMeta *meta, ClassMeta *rolemeta)
 {
-  U32 i, n = av_count(classmeta->roles);
-  RoleEmbedding **arr = (RoleEmbedding **)AvARRAY(classmeta->roles);
-  for(i = 0; i < n; i++)
-    if(arr[i]->rolemeta == rolemeta)
-      return true;
+  U32 i, n;
+  switch(meta->type) {
+    case METATYPE_CLASS: {
+      RoleEmbedding **embeddings = mop_class_get_all_roles(meta, &n);
+      for(i = 0; i < n; i++)
+        if(embeddings[i]->rolemeta == rolemeta)
+          return true;
 
-  if(classmeta->supermeta && mop_class_implements_role(classmeta->supermeta, rolemeta))
-    return true;
+      break;
+    }
+
+    case METATYPE_ROLE: {
+      ClassMeta **roles = (ClassMeta **)AvARRAY(meta->role.superroles);
+      U32 n = av_count(meta->role.superroles);
+      /* TODO: this isn't super-efficient in deep cross-linked heirarchies */
+      for(i = 0; i < n; i++) {
+        if(roles[i] == rolemeta)
+          return true;
+        if(mop_class_implements_role(roles[i], rolemeta))
+          return true;
+      }
+      break;
+    }
+  }
 
   return false;
 }
 
-void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rolemeta)
+#define embed_role(class, role)  S_embed_role(aTHX_ class, role)
+static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *rolemeta)
 {
   U32 i;
 
@@ -409,9 +452,6 @@ void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rol
     croak("Can only apply to a class");
   if(rolemeta->type != METATYPE_ROLE)
     croak("Can only apply a role to a class");
-
-  if(mop_class_implements_role(classmeta, rolemeta))
-    return;
 
   HV *srcstash = rolemeta->stash;
   HV *dststash = classmeta->stash;
@@ -426,7 +466,7 @@ void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rol
   embedding->classmeta   = classmeta;
   embedding->offset      = -1;
 
-  av_push(classmeta->roles, (SV *)embedding);
+  av_push(classmeta->cls.embedded_roles, (SV *)embedding);
   hv_store_ent(rolemeta->role.applied_classes, classmeta->name, (SV *)embedding, 0);
 
   U32 nbuilds = rolemeta->buildblocks ? av_count(rolemeta->buildblocks) : 0;
@@ -456,9 +496,9 @@ void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rol
   if(rolemeta->has_adjustparams)
     classmeta->has_adjustparams = true;
 
-  U32 nmethods = av_count(rolemeta->methods);
+  U32 nmethods = av_count(rolemeta->direct_methods);
   for(i = 0; i < nmethods; i++) {
-    MethodMeta *methodmeta = (MethodMeta *)AvARRAY(rolemeta->methods)[i];
+    MethodMeta *methodmeta = (MethodMeta *)AvARRAY(rolemeta->direct_methods)[i];
     SV *mname = methodmeta->name;
 
     HE *he = hv_fetch_ent(srcstash, mname, 0, 0);
@@ -488,6 +528,55 @@ void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rol
   for(i = 0; i < nmethods; i++) {
     av_push(classmeta->requiremethods, SvREFCNT_inc(AvARRAY(rolemeta->requiremethods)[i]));
   }
+
+  return embedding;
+}
+
+void ObjectPad_mop_class_add_role(pTHX_ ClassMeta *dstmeta, ClassMeta *rolemeta)
+{
+  if(dstmeta->sealed)
+    croak("Cannot add a role to an already-sealed class");
+  /* Can't currently do this as it breaks t/77mop-create-role.t
+  if(!rolemeta->sealed)
+    croak("Cannot add a role that is not yet sealed");
+   */
+
+  if(mop_class_implements_role(dstmeta, rolemeta))
+    return;
+
+  switch(dstmeta->type) {
+    case METATYPE_CLASS: {
+      U32 nroles;
+      if((nroles = av_count(rolemeta->role.superroles)) > 0) {
+        ClassMeta **roles = (ClassMeta **)AvARRAY(rolemeta->role.superroles);
+        U32 i;
+        for(i = 0; i < nroles; i++)
+          mop_class_add_role(dstmeta, roles[i]);
+      }
+
+      RoleEmbedding *embedding = embed_role(dstmeta, rolemeta);
+      av_push(dstmeta->cls.direct_roles, (SV *)embedding);
+      return;
+    }
+
+    case METATYPE_ROLE:
+      av_push(dstmeta->role.superroles, (SV *)rolemeta);
+      return;
+  }
+}
+
+#define embed_slothook(roleh, offset)  S_embed_slothook(aTHX_ roleh, offset)
+static struct SlotHook *S_embed_slothook(pTHX_ struct SlotHook *roleh, SLOTOFFSET offset)
+{
+  struct SlotHook *classh;
+  Newx(classh, 1, struct SlotHook);
+
+  classh->slotix   = roleh->slotix + offset;
+  classh->slotmeta = roleh->slotmeta;
+  classh->funcs    = roleh->funcs;
+  classh->hookdata = roleh->hookdata;
+
+  return classh;
 }
 
 #define mop_class_apply_role(embedding)  S_mop_class_apply_role(aTHX_ embedding)
@@ -501,6 +590,7 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
   if(rolemeta->type != METATYPE_ROLE)
     croak("Can only apply a role to a class");
 
+  assert(embedding->offset == -1);
   embedding->offset = classmeta->next_slotix;
 
   if(rolemeta->parammap) {
@@ -537,20 +627,40 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
     }
   }
 
-  classmeta->next_slotix += av_count(rolemeta->slots);
+  if(rolemeta->slothooks_postslots) {
+    if(!classmeta->slothooks_postslots)
+      classmeta->slothooks_postslots = newAV();
+
+    U32 i;
+    for(i = 0; i < av_count(rolemeta->slothooks_postslots); i++) {
+      struct SlotHook *roleh = (struct SlotHook *)AvARRAY(rolemeta->slothooks_postslots)[i];
+      av_push(classmeta->slothooks_postslots, (SV *)embed_slothook(roleh, embedding->offset));
+    }
+  }
+
+  if(rolemeta->slothooks_construct) {
+    if(!classmeta->slothooks_construct)
+      classmeta->slothooks_construct = newAV();
+
+    U32 i;
+    for(i = 0; i < av_count(rolemeta->slothooks_construct); i++) {
+      struct SlotHook *roleh = (struct SlotHook *)AvARRAY(rolemeta->slothooks_construct)[i];
+      av_push(classmeta->slothooks_construct, (SV *)embed_slothook(roleh, embedding->offset));
+    }
+  }
+
+  classmeta->next_slotix += av_count(rolemeta->direct_slots);
 
   /* TODO: Run an APPLY block if the role has one */
 }
 
-static void S_apply_roles(pTHX_ ClassMeta *dst, ClassMeta *src)
+static void S_apply_roles(pTHX_ ClassMeta *dstmeta, ClassMeta *srcmeta)
 {
-  U32 nroles = av_count(src->roles);
-  RoleEmbedding **arr = (RoleEmbedding **)AvARRAY(src->roles);
+  U32 nroles;
+  RoleEmbedding **arr = mop_class_get_direct_roles(srcmeta, &nroles);
   U32 i;
   for(i = 0; i < nroles; i++) {
     mop_class_apply_role(arr[i]);
-
-    /* TODO: Consider how we recurse into roles */
   }
 }
 
@@ -639,7 +749,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
    * we must be a subclass
    */
   if(meta->start_slotix) {
-    struct ClassMeta *supermeta = meta->supermeta;
+    struct ClassMeta *supermeta = meta->cls.supermeta;
 
     assert(supermeta->sealed);
     assert(supermeta->initslots);
@@ -662,12 +772,10 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
   }
 
-  AV *slots = meta->slots;
+  AV *slots = meta->direct_slots;
   I32 nslots = av_count(slots);
 
   {
-    CopLINE_set(PL_curcop, __LINE__);
-
     for(i = 0; i < nslots; i++) {
       SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
       char sigil = SvPV_nolen(slotmeta->name)[0];
@@ -676,6 +784,8 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       switch(sigil) {
         case '$':
         {
+          CopLINE_set(PL_curcop, __LINE__);
+
           OP *valueop = NULL;
 
           if(slotmeta->defaultexpr) {
@@ -727,6 +837,8 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
         case '@':
         case '%':
         {
+          CopLINE_set(PL_curcop, __LINE__);
+
           OP *valueop = NULL;
           U16 coerceop = (sigil == '%') ? OP_RV2HV : OP_RV2AV;
 
@@ -767,34 +879,36 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
     }
   }
 
-  AV *roles = meta->roles;
-  I32 nroles = av_count(roles);
+  if(meta->type == METATYPE_CLASS) {
+    U32 nroles;
+    RoleEmbedding **embeddings = mop_class_get_direct_roles(meta, &nroles);
 
-  for(i = 0; i < nroles; i++) {
-    RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
-    ClassMeta *rolemeta = embedding->rolemeta;
+    for(i = 0; i < nroles; i++) {
+      RoleEmbedding *embedding = embeddings[i];
+      ClassMeta *rolemeta = embedding->rolemeta;
 
-    if(!rolemeta->sealed)
-      mop_class_seal(rolemeta);
+      if(!rolemeta->sealed)
+        mop_class_seal(rolemeta);
 
-    assert(rolemeta->sealed);
-    assert(rolemeta->initslots);
+      assert(rolemeta->sealed);
+      assert(rolemeta->initslots);
 
-    CopLINE_set(PL_curcop, __LINE__);
+      CopLINE_set(PL_curcop, __LINE__);
 
-    ops = op_append_list(OP_LINESEQ, ops,
-      newSTATEOP(0, NULL, NULL));
+      ops = op_append_list(OP_LINESEQ, ops,
+        newSTATEOP(0, NULL, NULL));
 
-    OP *op = NULL;
-    op = op_append_list(OP_LIST, op,
-      newPADxVOP(OP_PADSV, 0, PADIX_SELF));
-    op = op_append_list(OP_LIST, op,
-      newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS));
-    op = op_append_list(OP_LIST, op,
-      newSVOP(OP_CONST, 0, (SV *)embed_cv(rolemeta->initslots, embedding)));
+      OP *op = NULL;
+      op = op_append_list(OP_LIST, op,
+        newPADxVOP(OP_PADSV, 0, PADIX_SELF));
+      op = op_append_list(OP_LIST, op,
+        newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS));
+      op = op_append_list(OP_LIST, op,
+        newSVOP(OP_CONST, 0, (SV *)embed_cv(rolemeta->initslots, embedding)));
 
-    ops = op_append_list(OP_LINESEQ, ops,
-      op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
+      ops = op_append_list(OP_LINESEQ, ops,
+        op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
+    }
   }
 
   SvREFCNT_inc(PL_compcv);
@@ -817,17 +931,20 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
   if(meta->sealed) /* idempotent */
     return;
 
-  if(meta->supermeta && !meta->supermeta->sealed) {
+  if(meta->type == METATYPE_CLASS &&
+      meta->cls.supermeta && !meta->cls.supermeta->sealed) {
     /* Must defer sealing until superclass is sealed first
      * (RT133190)
      */
-    if(!meta->supermeta->pending_submeta)
-      meta->supermeta->pending_submeta = newAV();
-    av_push(meta->supermeta->pending_submeta, (SV *)meta);
+    ClassMeta *supermeta = meta->cls.supermeta;
+    if(!supermeta->pending_submeta)
+      supermeta->pending_submeta = newAV();
+    av_push(supermeta->pending_submeta, (SV *)meta);
     return;
   }
 
-  S_apply_roles(aTHX_ meta, meta);
+  if(meta->type == METATYPE_CLASS)
+    S_apply_roles(aTHX_ meta, meta);
 
   if(meta->type == METATYPE_CLASS) {
     U32 nmethods = av_count(meta->requiremethods);
@@ -850,8 +967,8 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
 
   {
     U32 slotix;
-    for(slotix = 0; slotix < av_count(meta->slots); slotix++) {
-      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(meta->slots)[slotix];
+    for(slotix = 0; slotix < av_count(meta->direct_slots); slotix++) {
+      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(meta->direct_slots)[slotix];
 
       U32 hooki;
       for(hooki = 0; slotmeta->hooks && hooki < av_count(slotmeta->hooks); hooki++) {
@@ -865,6 +982,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
           Newx(fasth, 1, struct SlotHook);
 
           fasth->slotix   = slotix;
+          fasth->slotmeta = slotmeta;
           fasth->funcs    = h->funcs;
           fasth->hookdata = h->hookdata;
 
@@ -879,6 +997,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
           Newx(fasth, 1, struct SlotHook);
 
           fasth->slotix   = slotix;
+          fasth->slotmeta = slotmeta;
           fasth->funcs    = h->funcs;
           fasth->hookdata = h->hookdata;
 
@@ -916,6 +1035,8 @@ XS_INTERNAL(injected_constructor)
   SV *self = NULL;
 
   assert(meta->type == METATYPE_CLASS);
+  if(!meta->sealed)
+    croak("Cannot yet invoke '%" SVf "' constructor before the class is complete", SVfARG(class));
 
   COP *prevcop = PL_curcop;
   PL_curcop = meta->tmpcop;
@@ -930,10 +1051,10 @@ XS_INTERNAL(injected_constructor)
 
   {
     /* @args = $class->BUILDARGS(@_) */
-    CopLINE_set(PL_curcop, __LINE__);
-
     ENTER;
     SAVETMPS;
+    SAVEVPTR(PL_curcop);
+    PL_curcop = prevcop;
 
     /* Splice in an extra copy of `class` so we get one there for the foreign
      * constructor */
@@ -1088,15 +1209,13 @@ XS_INTERNAL(injected_constructor)
     CopLINE_set(PL_curcop, __LINE__);
 
     AV *slothooks = meta->slothooks_postslots;
-    AV *slots     = meta->slots;
 
     U32 i;
     for(i = 0; i < av_count(slothooks); i++) {
       struct SlotHook *h = (struct SlotHook *)AvARRAY(slothooks)[i];
       SLOTOFFSET slotix = h->slotix;
-      struct SlotMeta *slotmeta = (struct SlotMeta *)AvARRAY(slots)[slotix];
 
-      (*h->funcs->post_initslot)(aTHX_ slotmeta, h->hookdata, slotsv[slotix]);
+      (*h->funcs->post_initslot)(aTHX_ h->slotmeta, h->hookdata, slotsv[slotix]);
     }
   }
 
@@ -1222,15 +1341,13 @@ XS_INTERNAL(injected_constructor)
     CopLINE_set(PL_curcop, __LINE__);
 
     AV *slothooks = meta->slothooks_construct;
-    AV *slots     = meta->slots;
 
     U32 i;
     for(i = 0; i < av_count(slothooks); i++) {
       struct SlotHook *h = (struct SlotHook *)AvARRAY(slothooks)[i];
       SLOTOFFSET slotix = h->slotix;
-      struct SlotMeta *slotmeta = (struct SlotMeta *)AvARRAY(slots)[slotix];
 
-      (*h->funcs->post_construct)(aTHX_ slotmeta, h->hookdata, slotsv[slotix]);
+      (*h->funcs->post_construct)(aTHX_ h->slotmeta, h->hookdata, slotsv[slotix]);
     }
   }
 
@@ -1251,8 +1368,8 @@ XS_INTERNAL(injected_DOES)
   CV *cv_does = NULL;
 
   while(meta != NULL) {
-    AV *roles = meta->roles;
-    I32 nroles = av_count(roles);
+    AV *roles = meta->type == METATYPE_CLASS ? meta->cls.direct_roles : NULL;
+    I32 nroles = roles ? av_count(roles) : 0;
 
     if(!cv_does && meta->cls.foreign_does)
       cv_does = meta->cls.foreign_does;
@@ -1269,7 +1386,7 @@ XS_INTERNAL(injected_DOES)
       }
     }
 
-    meta = meta->supermeta;
+    meta = meta->type == METATYPE_CLASS ? meta->cls.supermeta : NULL;
   }
 
   if (cv_does) {
@@ -1330,14 +1447,12 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   meta->has_adjustparams = false;
   meta->start_slotix = 0;
   meta->hooks   = NULL;
-  meta->slots   = newAV();
-  meta->methods = newAV();
+  meta->direct_slots = newAV();
+  meta->direct_methods = newAV();
   meta->parammap = NULL;
   meta->requiremethods = newAV();
   meta->repr   = REPR_AUTOSELECT;
-  meta->supermeta = NULL;
   meta->pending_submeta = NULL;
-  meta->roles = newAV();
   meta->buildblocks = NULL;
   meta->adjustblocks = NULL;
   meta->initslots = NULL;
@@ -1347,11 +1462,15 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
 
   switch(type) {
     case METATYPE_CLASS:
+      meta->cls.supermeta = NULL;
       meta->cls.foreign_new = NULL;
       meta->cls.foreign_does = NULL;
+      meta->cls.direct_roles = newAV();
+      meta->cls.embedded_roles = newAV();
       break;
 
     case METATYPE_ROLE:
+      meta->role.superroles = newAV();
       meta->role.applied_classes = newHV();
       break;
   }
@@ -1439,25 +1558,31 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
       meta->cls.foreign_new = supermeta->cls.foreign_new;
 
       if(supermeta->buildblocks) {
-        AV *superbuildblocks = supermeta->buildblocks;
-        U32 i;
-
         if(!meta->buildblocks)
           meta->buildblocks = newAV();
 
-        for(i = 0; i < av_count(superbuildblocks); i++)
-          av_push(meta->buildblocks, /* no inc */ AvARRAY(superbuildblocks)[i]);
+        av_push_from_av_noinc(meta->buildblocks, supermeta->buildblocks);
       }
 
       if(supermeta->adjustblocks) {
-        AV *superadjustblocks = supermeta->adjustblocks;
-        U32 i;
-
         if(!meta->adjustblocks)
           meta->adjustblocks = newAV();
 
-        for(i = 0; i < av_count(superadjustblocks); i++)
-          av_push(meta->adjustblocks, /* no inc */ AvARRAY(superadjustblocks)[i]);
+        av_push_from_av_noinc(meta->adjustblocks, supermeta->adjustblocks);
+      }
+
+      if(supermeta->slothooks_postslots) {
+        if(!meta->slothooks_postslots)
+          meta->slothooks_postslots = newAV();
+
+        av_push_from_av_noinc(meta->slothooks_postslots, supermeta->slothooks_postslots);
+      }
+
+      if(supermeta->slothooks_construct) {
+        if(!meta->slothooks_construct)
+          meta->slothooks_construct = newAV();
+
+        av_push_from_av_noinc(meta->slothooks_construct, supermeta->slothooks_construct);
       }
 
       if(supermeta->parammap) {
@@ -1483,16 +1608,15 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
       if(supermeta->has_adjustparams)
         meta->has_adjustparams = true;
 
-      /* Mark that this class is applied to every role our supermetas have */
-      ClassMeta *c;
-      for(c = supermeta; c; c = c->supermeta) {
-        AV *roles = c->roles;
-        U32 nroles = av_count(roles);
+      U32 nroles;
+      RoleEmbedding **embeddings = mop_class_get_all_roles(supermeta, &nroles);
+      if(nroles) {
         U32 i;
         for(i = 0; i < nroles; i++) {
-          RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+          RoleEmbedding *embedding = embeddings[i];
           ClassMeta *rolemeta = embedding->rolemeta;
 
+          av_push(meta->cls.embedded_roles, (SV *)embedding);
           hv_store_ent(rolemeta->role.applied_classes, meta->name, (SV *)embedding, 0);
         }
       }
@@ -1508,14 +1632,15 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
       av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
     }
 
-    meta->supermeta = supermeta;
+    meta->cls.supermeta = supermeta;
   }
   else {
     /* A base class */
     av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
   }
 
-  if(meta->repr == REPR_AUTOSELECT && !meta->cls.foreign_new)
+  if(meta->type == METATYPE_CLASS &&
+      meta->repr == REPR_AUTOSELECT && !meta->cls.foreign_new)
     meta->repr = REPR_NATIVE;
 
   meta->next_slotix = meta->start_slotix;

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort;
-$Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -29,7 +29,7 @@ sub retrieveSignatureProofOfDeliveryLetter {
       "retrieveSignatureProofOfDeliveryLetter must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'retrieveSignatureProofOfDeliveryLetter',
+        {   operation   => 'retrieveSignatureProofOfDeliveryLetter',
             soap_action =>
               'http://fedex.com/ws/track/v9/retrieveSignatureProofOfDeliveryLetter',
             style => 'document',
@@ -70,7 +70,7 @@ sub track {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::FedEx::WSDL::TrackElements::TrackRequest )],
             },
             header => {
@@ -92,7 +92,7 @@ sub sendSignatureProofOfDeliveryFax {
       "sendSignatureProofOfDeliveryFax must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'sendSignatureProofOfDeliveryFax',
+        {   operation   => 'sendSignatureProofOfDeliveryFax',
             soap_action =>
               'http://fedex.com/ws/track/v9/sendSignatureProofOfDeliveryFax',
             style => 'document',
@@ -164,7 +164,7 @@ Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

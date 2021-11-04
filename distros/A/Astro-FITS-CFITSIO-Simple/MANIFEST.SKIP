@@ -1,7 +1,7 @@
 ^.hg
 .old$
 .bak$
-Makefile$
+Build$
 blib/
 ~$
 pm_to_blib
@@ -9,3 +9,6 @@ t/.*.stdout
 t/.*.stderr
 blibdirs
 .gz$
+^MYMETA
+^cover_db/
+^_build_params

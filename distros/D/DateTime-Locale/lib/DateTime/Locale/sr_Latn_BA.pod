@@ -193,10 +193,10 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 Abbreviated (format)
 
-  K1
-  K2
-  K3
-  K4
+  1. kv.
+  2. kv.
+  3. kv.
+  4. kv.
 
 =head3 Narrow (format)
 
@@ -215,10 +215,10 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 Abbreviated (stand-alone)
 
-  K1
-  K2
-  K3
-  K4
+  1. kv.
+  2. kv.
+  3. kv.
+  4. kv.
 
 =head3 Narrow (stand-alone)
 
@@ -248,21 +248,21 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = utorak, 05. februar 2008.
+   2008-02-05T18:30:30 = utorak, 5. februar 2008.
    1995-12-22T09:05:02 = petak, 22. decembar 1995.
   -0010-09-15T04:44:23 = subota, 15. septembar -10.
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 05. februar 2008.
+   2008-02-05T18:30:30 = 5. februar 2008.
    1995-12-22T09:05:02 = 22. decembar 1995.
   -0010-09-15T04:44:23 = 15. septembar -10.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 05.02.2008.
-   1995-12-22T09:05:02 = 22.12.1995.
-  -0010-09-15T04:44:23 = 15.09.-10.
+   2008-02-05T18:30:30 = 5. 2. 2008.
+   1995-12-22T09:05:02 = 22. 12. 1995.
+  -0010-09-15T04:44:23 = 15. 9. -10.
 
 =head3 Short
 
@@ -302,21 +302,21 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = utorak, 05. februar 2008. 18:30:30 UTC
+   2008-02-05T18:30:30 = utorak, 5. februar 2008. 18:30:30 UTC
    1995-12-22T09:05:02 = petak, 22. decembar 1995. 09:05:02 UTC
   -0010-09-15T04:44:23 = subota, 15. septembar -10. 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 05. februar 2008. 18:30:30 UTC
+   2008-02-05T18:30:30 = 5. februar 2008. 18:30:30 UTC
    1995-12-22T09:05:02 = 22. decembar 1995. 09:05:02 UTC
   -0010-09-15T04:44:23 = 15. septembar -10. 04:44:23 UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 05.02.2008. 18:30:30
-   1995-12-22T09:05:02 = 22.12.1995. 09:05:02
-  -0010-09-15T04:44:23 = 15.09.-10. 04:44:23
+   2008-02-05T18:30:30 = 5. 2. 2008. 18:30:30
+   1995-12-22T09:05:02 = 22. 12. 1995. 09:05:02
+  -0010-09-15T04:44:23 = 15. 9. -10. 04:44:23
 
 =head3 Short
 
@@ -416,6 +416,12 @@ Serbian Bosnia & Herzegovina Latin locale.
    2008-02-05T18:30:30 = 5. feb 2008. n. e.
    1995-12-22T09:05:02 = 22. dec 1995. n. e.
   -0010-09-15T04:44:23 = 15. sep -10. p. n. e.
+
+=head3 GyMd (d.MM.y. GGGGG)
+
+   2008-02-05T18:30:30 = 5.02.2008. n.e.
+   1995-12-22T09:05:02 = 22.12.1995. n.e.
+  -0010-09-15T04:44:23 = 15.09.-10. p.n.e.
 
 =head3 H (HH)
 
@@ -629,9 +635,9 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 yQQQ (QQQ y.)
 
-   2008-02-05T18:30:30 = K1 2008.
-   1995-12-22T09:05:02 = K4 1995.
-  -0010-09-15T04:44:23 = K3 -10.
+   2008-02-05T18:30:30 = 1. kv. 2008.
+   1995-12-22T09:05:02 = 4. kv. 1995.
+  -0010-09-15T04:44:23 = 3. kv. -10.
 
 =head3 yQQQQ (QQQQ y.)
 

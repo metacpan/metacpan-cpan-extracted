@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.742';
+our $VERSION = '1.743';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1222,7 +1222,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.742
+Version 1.743
 
 =cut
 
@@ -1386,8 +1386,7 @@ the C<PageUp> key (or C<Ctrl-P>) to go to the previous page, the C<PageDown> key
 
 =item *
 
-the C<Insert> key to go back 10 pages, the C<Delete> key to go forward 10 pages (20 pages if the page-count is greater
-than 10_000),
+the C<Insert> key to go back 10 pages, the C<Delete> key to go forward 10 pages,
 
 =item *
 

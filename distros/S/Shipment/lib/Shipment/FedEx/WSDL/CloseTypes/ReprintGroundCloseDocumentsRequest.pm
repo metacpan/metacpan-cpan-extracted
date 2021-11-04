@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::ReprintGroundCloseDocumentsRequest;
-$Shipment::FedEx::WSDL::CloseTypes::ReprintGroundCloseDocumentsRequest::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::ReprintGroundCloseDocumentsRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Class::Std::initialize();
               TrackingNumber
               CloseDocumentSpecification
 
-              )
+            )
         ],
         {   'WebAuthenticationDetail'    => \%WebAuthenticationDetail_of,
             'ClientDetail'               => \%ClientDetail_of,
@@ -58,7 +58,7 @@ Class::Std::initialize();
               'Shipment::FedEx::WSDL::CloseTypes::ClientDetail',
             'TransactionDetail' =>
               'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
-            'Version' => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
+            'Version'       => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
             'ReprintOption' =>
               'Shipment::FedEx::WSDL::CloseTypes::ReprintGroundCloseDocumentsOptionType',
             'CloseDate'      => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
@@ -96,7 +96,7 @@ Shipment::FedEx::WSDL::CloseTypes::ReprintGroundCloseDocumentsRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

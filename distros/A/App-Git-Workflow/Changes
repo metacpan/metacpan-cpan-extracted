@@ -1,5 +1,14 @@
 Revision history for git-workflow-tools
 
+1.1.16   2021-10-31
+        Updating for release of version 1.1.16
+        Fixing the committers output (Ivan Wills)
+
+1.1.15   2021-10-12
+        Updating for release of version 1.1.15
+        Don't verify when cleaning (Ivan Wills)
+        Fixing limit option (Ivan Wills)
+
 1.1.14   2021-02-05
         Updating for release of version 1.1.14
         Updated date (Ivan Wills)

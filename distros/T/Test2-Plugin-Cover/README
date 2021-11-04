@@ -161,6 +161,34 @@ KNOWING WHAT CALLED WHAT
 
 CLASS METHODS
 
+    $class->touch_source_file($file)
+
+    $class->touch_source_file($file, $sub)
+
+    $class->touch_source_file($file, \@subs)
+
+    $class->touch_source_file($file, $subs, $from)
+
+      This can be used to manually add coverage data. The first argument is
+      the source file to be "touched" by coverage. The second argument is
+      optional, and may be either a subroutine name, or an arrayref of
+      subroutine names. The third argument is optional and can be used to
+      override the default "from" value, which is normally determined for
+      you automatically.
+
+      If no subroutines are specified it will default to using '*', which
+      means the entire file is considered to be touched.
+
+    $class->touch_data_file($file)
+
+    $class->touch_data_file($file, $from)
+
+      This can be used to manually add coverage data. The first argument is
+      the file to be "touched" by coverage data. Optionally you can
+      override the 'from' value which is normally determined automatically.
+
+      This is the same as calling $class->touch_source_file($file, '<>').
+
     $class->enable()
 
     $class->disable()

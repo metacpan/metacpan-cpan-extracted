@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.51;  # ADJUSTPARAMS
 
-package Device::Chip::SSD1306 0.09;
+package Device::Chip::SSD1306 0.10;
 class Device::Chip::SSD1306
-   extends Device::Chip;
+   extends Device::Chip
+   :strict(params);
 
 use Carp;
 use Future::AsyncAwait;
@@ -151,18 +152,17 @@ has $_columns :reader;
 
 has $_column_offset;
 has $_set_com_pins_arg;
-has $_xflip;
-has $_yflip;
+has $_xflip            :param = 0;
+has $_yflip            :param = 0;
 
-BUILD ( %args )
+ADJUSTPARAMS ( $params )
 {
-   my $modelargs = $MODELS{ $args{model} // "SSD1306-128x64" }
-      or croak "Unrecognised model $args{model}";
+   my $model = delete $params->{model};
+   my $modelargs = $MODELS{ $model // "SSD1306-128x64" }
+      or croak "Unrecognised model $model";
 
    ( $_rows, $_columns, $_column_offset, $_set_com_pins_arg ) =
       @{$modelargs}{qw( rows columns column_offset set_com_pins_arg )};
-
-   ( $_xflip, $_yflip ) = @args{qw( xflip yflip )};
 }
 
 =head1 METHODS

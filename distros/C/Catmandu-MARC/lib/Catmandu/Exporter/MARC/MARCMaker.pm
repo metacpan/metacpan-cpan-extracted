@@ -54,13 +54,9 @@ L<Catmandu::Exporter>
 =cut
 package Catmandu::Exporter::MARC::MARCMaker;
 use Catmandu::Sane;
-use Catmandu::Util qw(xml_escape is_different :array :is);
 use Moo;
-use MARC::Record;
-use MARC::Field;
-use MARC::File::MARCMaker;
 
-our $VERSION = '1.254';
+our $VERSION = '1.271';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base';
 
@@ -74,9 +70,42 @@ sub add {
         $data = $self->_json_to_raw($data);
     }
 
-	my $marc = $self->_raw_to_marc_record($data->{$self->record});
+    for my $field (@{$data->{record}}) {
+        my ($field,$ind1,$ind2,@sf) = @$field;
 
-	$self->fh->print(MARC::File::MARCMaker::encode($marc));
+        if (!defined($ind1) || $ind1 =~ /^\s*$/) { $ind1 = '/'}
+        if (!defined($ind2) || $ind2 =~ /^\s*$/) { $ind2 = '/'}
+
+        next unless ($field =~ /^(LDR|\d{3})/);
+
+        my @sf_map = ();
+
+        for (my $i = 0 ; $i < @sf ; $i += 2) {
+            if ($field eq 'LDR' || $field < 10) {
+                push @sf_map , $sf[$i+1] if (defined($sf[$i+1]));
+            }
+            else {
+                push @sf_map 
+                    , "\$" . $sf[$i] 
+                    , $sf[$i+1] if (defined($sf[$i+1]));
+            }
+        }
+
+        my $sf_str = join("",@sf_map);
+
+        my $maker_field;
+
+        if ($field =~ /^\d{3}$/ && $field >= 10) {
+            $maker_field = "=$field  $ind1$ind2$sf_str\n";
+        }
+        else {
+            $maker_field = "=$field  $sf_str\n";
+        }
+
+        $self->fh->print($maker_field);
+    }
+
+    $self->fh->print("\n");
 }
 
 sub commit {

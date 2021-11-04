@@ -1,10 +1,15 @@
 package Test2::Harness::UI::Schema::Result::Coverage;
-our $VERSION = '0.000086';
-@Test2::Harness::UI::Schema::Result::Coverage::ISA = ('DBIx::Class::Core');
-__PACKAGE__->table("coverage");
+use utf8;
+use strict;
+use warnings;
 
-__END__
+use Carp qw/confess/;
+confess "You must first load a Test2::Harness::UI::Schema::NAME module"
+    unless $Test2::Harness::UI::Schema::LOADED;
 
-This package was added to replace the mostly-empty old version. Having the old
-one in place caused the app to fail to start. This table is gone, but this
-class is necessary.
+our $VERSION = '0.000096';
+
+require "Test2/Harness/UI/Schema/${Test2::Harness::UI::Schema::LOADED}/Coverage.pm";
+require "Test2/Harness/UI/Schema/Overlay/Coverage.pm";
+
+1;

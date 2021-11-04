@@ -32,7 +32,7 @@ static bool parts_permit(pTHX_ void *_)
   if(hv_fetchs(GvHV(PL_hintgv), "t::parts/skip-signature", 0))
     parse_parts_hooks.skip_parts |= XS_PARSE_SUBLIKE_PART_SIGNATURE;
 
-  return true;
+  return TRUE;
 }
 
 MODULE = t::parts  PACKAGE = t::parts

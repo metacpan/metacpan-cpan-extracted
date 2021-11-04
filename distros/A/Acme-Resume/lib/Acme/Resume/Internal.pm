@@ -1,7 +1,7 @@
 package Acme::Resume::Internal;
 
 # ABSTRACT: Moops wrapper for internal use
-our $VERSION = '0.0105';
+our $VERSION = '0.0106';
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ Acme::Resume::Internal - Moops wrapper for internal use
 
 =head1 VERSION
 
-Version 0.0105, released 2021-09-29.
+Version 0.0106, released 2021-10-31.
 
 =head1 SOURCE
 

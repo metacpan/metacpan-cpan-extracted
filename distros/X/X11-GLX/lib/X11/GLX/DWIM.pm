@@ -1,5 +1,5 @@
 package X11::GLX::DWIM;
-$X11::GLX::DWIM::VERSION = '0.05';
+$X11::GLX::DWIM::VERSION = '0.06';
 use Moo 2;
 use X11::GLX;
 use Carp;
@@ -337,6 +337,8 @@ sub end_frame {
 	my $self= shift;
 	$log->trace('Calling glXSwapBuffers');
 	X11::GLX::glXSwapBuffers($self->display, $self->target);
+	# export glFlush ourselves to avoid depending on OpenGL module
+	X11::GLX::DWIM::_glFlush();
 	my $e= $self->get_gl_errors;
 	$log->error("OpenGL error bits: ", join(', ', values %$e))
 		if $e;
@@ -366,6 +368,7 @@ my %_gl_err_msg= (
 
 sub get_gl_errors {
 	my $self= shift;
+	$self->display->flush_sync;
 	my (%errors, $e);
 	$errors{$e}= $_gl_err_msg{$e} || "(unrecognized) ".$e
 		# export glGetError ourselves to avoid depending on OpenGL module
@@ -469,7 +472,7 @@ X11::GLX::DWIM - Do What I Mean, with OpenGL on X11
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -711,7 +714,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2021 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,7 +7,7 @@ use warnings;
 use feature ':5.24';
 use experimental 'signatures';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # ABSTRACT: sequence utilities
 
@@ -221,7 +221,7 @@ CXC::Number::Sequence::Utils - Utilities for CXC::Number::Sequence generators
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

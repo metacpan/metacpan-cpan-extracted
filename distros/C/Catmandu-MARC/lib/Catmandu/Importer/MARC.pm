@@ -3,7 +3,7 @@ use Catmandu::Sane;
 use Catmandu::Util;
 use Moo;
 
-our $VERSION = '1.254';
+our $VERSION = '1.271';
 
 has type           => (is => 'ro' , default => sub { 'ISO' });
 has skip_errors    => (is => 'ro');
@@ -163,6 +163,7 @@ The MARC format to parse. The following MARC parsers are available:
   ISO: L<Catmandu::Importer::MARC::ISO> (default) - a strict ISO 2709 parser
   RAW: L<Catmandu::Importer::MARC::RAW> - a loose ISO 2709 parser that skips faulty records
   ALEPHSEQ: L<Catmandu::Importer::MARC::ALEPHSEQ> - a parser for Ex Libris Aleph sequential files
+  Line: L<Catmandu::Importer::MARC::Line> - a parser for Index Data's MARC Line format
   Lint: L<Catmandu::Importer::MARC::Lint> - a MARC syntax checker
   MicroLIF: L<Catmandu::Importer::MARC::MicroLIF> - a parser for the MicroLIF format
   MARCMaker: L<Catmandu::Importer::MARC::MARCMaker> - a parser for MARCMaker/MARCBreaker records

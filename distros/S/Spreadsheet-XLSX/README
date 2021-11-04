@@ -17,6 +17,7 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
   Archive::Zip
+  Spreadsheet::ParseExcel
 
 COPYRIGHT AND LICENCE
 

@@ -1,20 +1,18 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Fit::Levmar::Func;
 
-@EXPORT_OK  = qw(  levmar_func PDL::PP _callf PDL::PP _callj PDL::PP _callj1 );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(levmar_func _callf _callj _callj1 );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::Fit::Levmar::Func::VERSION = '0.0100';
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '0.0103';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Fit::Levmar::Func $VERSION;
 
@@ -165,6 +163,7 @@ $MKOBJ = $Config{cc} . " -c " . $Config{optimize} . " " .
 # string  to compile .o to .so 
 $MKSO = $Config{ld} . " " . $Config{lddlflags} ." %o -o %s ";
 
+use File::Temp qw(tempdir);
 
 
 
@@ -222,7 +221,7 @@ sub new {
       NOSO => undef,
       CSRC => undef,
       CTOP => undef,
-      DIR =>  "./tempcode" , # where the .so is built
+      DIR => tempdir( CLEANUP => !$opts->{NOCLEAN} ), # where the .so is built
       TESTSYNTAX => undef,
       LIBHANDLE => undef,
       FVERBOSE => 0,
@@ -1003,5 +1002,3 @@ the copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

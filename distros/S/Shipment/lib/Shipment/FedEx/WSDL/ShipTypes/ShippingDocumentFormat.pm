@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentFormat;
-$Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentFormat::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentFormat::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               Localization
               CustomDocumentIdentifier
 
-              )
+            )
         ],
         {   'Dispositions'             => \%Dispositions_of,
             'TopOfPageOffset'          => \%TopOfPageOffset_of,
@@ -92,7 +92,7 @@ Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentFormat
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

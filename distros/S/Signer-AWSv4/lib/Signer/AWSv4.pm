@@ -5,7 +5,7 @@ package Signer::AWSv4;
   use Digest::SHA qw//;
   use URI::Escape qw//;
 
-  our $VERSION = '0.06';
+  our $VERSION = '0.07';
 
   has access_key => (is => 'ro', isa => Str, required => 1);
   has secret_key => (is => 'ro', isa => Str, required => 1);
@@ -280,13 +280,6 @@ Implement a generic "sign an HTTP::Request" signer
 
 Pass the same test suite that L<Net::Amazon::Signature::V4> has
 
-=head1 AUTHOR
-
-    Jose Luis Martinez
-    CPAN ID: JLMARTIN
-    CAPSiDE
-    jlmartinez@capside.com
-
 =head1 SEE ALSO
 
 L<AWS::Signature4>
@@ -303,6 +296,8 @@ manwar: specify missing prereqs
 
 mschout: add version support to S3
 
+lucas1: add overriding response headers
+
 =head1 BUGS and SOURCE
 
 The source code is located here: L<https://github.com/pplu/AWSv4Signer>
@@ -312,12 +307,11 @@ Please report bugs to: L<https://github.com/pplu/AWSv4Signer/issues>
 =head1 AUTHOR
 
     Jose Luis Martinez
-    CAPSiDE
-    jlmartinez@capside.com
+    pplusdomain@gmail.com
 
 =head1 COPYRIGHT and LICENSE
 
-Copyright (c) 2018 by CAPSiDE
+Copyright (c) 2018 by Jose Luis Martinez
 
 This code is distributed under the Apache 2 License. The full text of the license can be found in the LICENSE file included with this module.
 

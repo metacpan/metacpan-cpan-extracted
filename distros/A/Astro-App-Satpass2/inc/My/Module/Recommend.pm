@@ -74,6 +74,7 @@ EOD
     # - inc/My/Module/Recommend.pm
     # - inc/My/Module/Test/App.pm
     # These all need to stay the same. Sigh.
+    # Any such should be in xt/author/consistent_module_versions.t
 
     __any( 'DateTime::Calendar::Christian=0.06'	=> <<'EOD' ),
       This module is used to parse (maybe) and format dates that might
@@ -101,6 +102,10 @@ EOD
       so you may get them implicitly if you install some of the other
       optional modules.
 EOD
+    __any( qw{ Term::ReadLine } => <<'EOD' ),
+      This module is required for interactive command recall and
+      editing.
+EOD
 	$is_5_012 ? () : __any( 'Time::y2038' => <<'EOD' .
       This module is not required, but if installed allows you to do
       computations for times outside the usual range of system epoch to
@@ -125,6 +130,18 @@ EOD
       you do not plan to use this method you do not need this module.
 EOD
 );
+
+# Expose the module version so we can test for consistent definition.
+sub __module_version {
+    my $module = $_[-1];
+    foreach my $opt ( @optionals ) {
+	foreach my $m ( $opt->__modules() ) {
+	    $module eq $m->[0]
+		and return $m->[1];
+	}
+    }
+    confess "Bug - Module $module is not optional";
+}
 
 sub optionals {
     return ( map { $_->modules() } @optionals );

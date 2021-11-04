@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::Payor;
-$Shipment::FedEx::WSDL::RateTypes::Payor::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::Payor::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        AccountNumber
               CountryCode
 
-              )
+            )
         ],
         {   'AccountNumber' => \%AccountNumber_of,
             'CountryCode'   => \%CountryCode_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::RateTypes::Payor
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

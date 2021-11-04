@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::PackageInformation;
-$Shipment::Purolator::WSDL::Types::PackageInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::PackageInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ Class::Std::initialize();
               DangerousGoodsDeclarationDocumentIndicator
               OptionsInformation
 
-              )
+            )
         ],
         {   'ServiceID'         => \%ServiceID_of,
             'Description'       => \%Description_of,
@@ -92,7 +92,7 @@ Shipment::Purolator::WSDL::Types::PackageInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

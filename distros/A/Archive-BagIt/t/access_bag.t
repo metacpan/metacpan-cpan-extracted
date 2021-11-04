@@ -4,7 +4,7 @@ BEGIN { chdir 't' if -d 't' }
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 27;
+use Test::More tests => 35;
 use Test::Exception;
 use strict;
 
@@ -130,9 +130,11 @@ BAGINFO
   is_deeply( $got, \@expected, "has all bag-info entries");
 }
 is_deeply ($bag->get_baginfo_values_by_key("Payload-Oxum"), "4.2", "bag_info_by_key, existing");
+ok($bag->exists_baginfo_key("Payload-Oxum"), "exists_baginfo_key, existing");
 is_deeply ($bag->get_baginfo_values_by_key("Bagging-Date"), "2013-04-09", "bag_info_by_key, existing2");
 is_deeply ($bag->get_baginfo_values_by_key("Bag-Software-Agent"), "bagit.py <http://github.com/edsu/bagit>", "bag_info_by_key, existing3");
 is ($bag->get_baginfo_values_by_key("NoKEY"), undef, "bag_info_by_key, not found");
+ok(! $bag->exists_baginfo_key("NoKEY"), "exists_baginfo_key, not found");
 is ($bag->_replace_baginfo_by_first_match("NoKey", "test"), undef, "_replace_bag_info_by_first_match, not found");
 is ($bag->add_or_replace_baginfo_by_key("Key", "Value"), -1, "add a new key-value");
 is ($bag->_replace_baginfo_by_first_match("Key", "0.0"), 3, "_replace_bag_info_by_first_match, index");
@@ -147,7 +149,23 @@ is ($bag->get_baginfo_values_by_key("keY"), undef, "bag_info_by_key, check case 
 my @got = $bag->get_baginfo_values_by_key("key", );
 my @expected = ("Noch ein Eintrag", "Und ein weiterer Eintrag");
 is_deeply( \@got, \@expected, "append_bag_info, check if both entries exist");
-is ($bag->append_baginfo_by_key("payload-oxUm", "Völlig falsch"), undef, "append_bag_info of uniq value");
+my $all_expected = $bag->bag_info();
+ok($bag->delete_baginfo_by_key("NoKey"), "delete_baginfo_by_key(), not found");
+my $all_got = $bag->bag_info();
+is_deeply( $all_got, $all_expected, "delete_baginfo_by_key(), check if no other key is deleted");
+ok($bag->delete_baginfo_by_key("key"), "delete_baginfo_by_key(), delete existing key 'key'");
+{
+  my @got = $bag->get_baginfo_values_by_key("key");
+  my @expected = ("Noch ein Eintrag");
+  is_deeply(\@got, \@expected, "delete_baginfo_by_key(), check if last entry of key 'key' is already deleted");
+}
+ok($bag->delete_baginfo_by_key("key"), "delete_baginfo_by_key(), delete existing key 'key' again");
+{
+  my @got = $bag->get_baginfo_values_by_key("key");
+  my @expected = ();
+  is_deeply(\@got, \@expected, "delete_baginfo_by_key(), check if deleted key 'key' is already deleted");
+}
+ok (! $bag->append_baginfo_by_key("payload-oxUm", "Völlig falsch"), "append_bag_info of uniq value");
 my @got2 = $bag->get_baginfo_values_by_key("paylOAD-oxum", );
 my @expected2 = ("4.2");
 is_deeply( \@got2, \@expected2, "append_bag_info, check that value is not added");
@@ -155,6 +173,4 @@ is_deeply( \@got2, \@expected2, "append_bag_info, check that value is not added"
 throws_ok ( sub {$bag->add_or_replace_baginfo_by_key("Foo:Bar", "Baz")}, qr/key should not contain a colon/, "_add_or_replace_bag_info, invalid key check");
 throws_ok ( sub {$bag->_replace_baginfo_by_first_match("Foo:Bar", "Baz")}, qr/key should not contain a colon/, "_replace_bag_info_by_first_match, invalid key check");
 
-
-#p( $bag );
 __END__

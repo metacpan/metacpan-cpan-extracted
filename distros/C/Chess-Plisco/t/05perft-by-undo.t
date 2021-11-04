@@ -17,7 +17,7 @@ use Data::Dumper;
 use Time::HiRes qw(gettimeofday tv_interval);
 
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 
 my @tests = (
 	{

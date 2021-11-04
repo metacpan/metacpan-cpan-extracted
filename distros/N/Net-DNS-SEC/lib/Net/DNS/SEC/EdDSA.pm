@@ -3,7 +3,7 @@ package Net::DNS::SEC::EdDSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: EdDSA.pm 1807 2020-09-28 11:38:28Z willem $)[2];
+our $VERSION = (qw$Id: EdDSA.pm 1853 2021-10-11 10:40:59Z willem $)[2];
 
 
 =head1 NAME
@@ -111,7 +111,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

@@ -29,7 +29,7 @@ my $val=Business::Tax::VAT::Validation->new();
 
 if ($val->check($vatNumber)) {
     print "VAT Number exists ! ";
-    print "It belongs to ".$val->informations('name')."  ".$val->informations('address')."\n";
+    print "It belongs to ".$val->information('name')."  ".$val->information('address')."\n";
 } else {
     my $msg="Error ".$val->get_last_error_code." : ".$val->get_last_error;
     $msg=~s/[\r\n]/ /g;

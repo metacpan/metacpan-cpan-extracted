@@ -1268,7 +1268,7 @@ sub resolve_requested__no_recommends_ {
 			_handle_conflict($urpm, $state, $pkg, $p, $property, $property, \@properties, \%diff_provides_h, $options{keep} && \@keep);
 		    }
 		}
-	    });
+	    }) if $pkg->arch ne 'src'; # rpm-4.16+ add provides for all subpkgs to srpm which we don't care about for conflicts
 
 	    #- keep existing package and therefore cancel current one.
 	    if (@keep) {
@@ -1307,6 +1307,7 @@ sub _handle_conflicts_with_selected {
 	if (my $n = property2name($_)) {
 	    foreach my $p ($urpm->packages_providing($n)) {
 		$pkg == $p and next;
+		$p->arch eq 'src' and next;
 		$p->provides_overlap($_) or next;
 		if (exists $state->{selected}{$p->id}) {
 		    $urpm->{debug_URPM}($pkg->fullname . " conflicts with already selected package " . $p->fullname) if $urpm->{debug_URPM};

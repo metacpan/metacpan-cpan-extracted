@@ -3,7 +3,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-05-22'; # DATE
 our $DIST = 'App-ShellCompleter-cpanm'; # DIST
-our $VERSION = '0.210'; # VERSION
+our $VERSION = '0.211'; # VERSION
 
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint completer=1 for=cpanm
@@ -30,7 +30,7 @@ _cpanm - Shell completer for cpanm
 
 =head1 VERSION
 
-This document describes version 0.210 of _cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2021-05-22.
+This document describes version 0.211 of _cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2021-05-22.
 
 =head1 SYNOPSIS
 

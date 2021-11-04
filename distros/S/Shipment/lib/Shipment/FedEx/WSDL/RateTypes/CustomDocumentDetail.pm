@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::CustomDocumentDetail;
-$Shipment::FedEx::WSDL::RateTypes::CustomDocumentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::CustomDocumentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               LabelRotation
               SpecificationId
 
-              )
+            )
         ],
         {   'Format'                   => \%Format_of,
             'LabelPrintingOrientation' => \%LabelPrintingOrientation_of,
@@ -74,7 +74,7 @@ Shipment::FedEx::WSDL::RateTypes::CustomDocumentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

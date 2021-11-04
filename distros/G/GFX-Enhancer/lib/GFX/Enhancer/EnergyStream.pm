@@ -11,7 +11,7 @@ sub new {
 ### public methods
 
 sub edit {
-	my ($self, $value, $index) = @_;
+	my ($self, $index, $value) = @_;
 
 	$self->{listoffloats}[$index] = $value;
 }

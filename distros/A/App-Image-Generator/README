@@ -71,17 +71,18 @@ EXAMPLE4
      # Created foo.jpg file in local directory, generated from images in /data/images.
 
 REPOSITORY
-    <https://github.com/tupinek/App-Image-Generator>
+    <https://github.com/michal-josef-spacek/App-Image-Generator>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015-2016 Michal Špaček
-     BSD 2-Clause License
+    © 2015-2021 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

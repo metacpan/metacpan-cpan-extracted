@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::ImageMagickUtils",
   "PREREQ_PM" => {
     "Data::Sah::Compiler::perl::TH::array" => "0.910",
+    "Data::Sah::Compiler::perl::TH::bool" => "0.910",
     "Data::Sah::Compiler::perl::TH::int" => "0.910",
     "Data::Sah::Compiler::perl::TH::str" => "0.910",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -50,7 +51,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,6 +60,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::array" => "0.910",
+  "Data::Sah::Compiler::perl::TH::bool" => "0.910",
   "Data::Sah::Compiler::perl::TH::int" => "0.910",
   "Data::Sah::Compiler::perl::TH::str" => "0.910",
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,

@@ -5,7 +5,7 @@ package CXC::Number::Grid::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Math::BigInt upgrade => 'Math::BigFloat';
 use Math::BigFloat;
@@ -51,6 +51,11 @@ declare BinEdges,
 #   The GNU General Public License, Version 3, June 2007
 #
 
+coerce BinEdges,
+  from InstanceOf[ 'CXC::Number::Sequence' ],
+  via { $_->bignum->elements }
+  ;
+
 1;
 
 __END__
@@ -65,7 +70,7 @@ CXC::Number::Grid::Types - Type::Tiny types for CXC::Number::Grid
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 TYPES
 

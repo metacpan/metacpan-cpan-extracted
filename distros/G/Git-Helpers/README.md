@@ -4,7 +4,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 # VERSION
 
-version 1.000000
+version 1.000001
 
 # SYNOPSIS
 

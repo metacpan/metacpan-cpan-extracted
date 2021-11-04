@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::TrackingId;
-$Shipment::FedEx::WSDL::RateTypes::TrackingId::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::TrackingId::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               FormId
               TrackingNumber
 
-              )
+            )
         ],
         {   'TrackingIdType' => \%TrackingIdType_of,
             'FormId'         => \%FormId_of,
@@ -67,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::TrackingId
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

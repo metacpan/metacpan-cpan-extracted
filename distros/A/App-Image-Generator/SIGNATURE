@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,41 +12,46 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 ce72b9348a55b65344d0fe6bf1806bc97d055e68 Changes
-SHA1 c585e8e73e0c4726baa0ec9236432134b3e402b0 Generator.pm
-SHA1 ecec73beff956fc76e8b8199687ac9bb85103e96 LICENSE
-SHA1 4a8469aae759c8fa24f643e830c72f0c8ba6f59e MANIFEST
-SHA1 c8d9074f12c7ba798e97970cb16211a8a66cab09 META.yml
-SHA1 864b92cfc2bca9aeb4b7d98acce52f5c8bb269f6 Makefile.PL
-SHA1 bbba2328e4cdc4a01cdf85944a201ceb28b46f40 README
-SHA1 0668a0080951ae17f786255d0de125065bb4c7e7 bin/image-generator
-SHA1 fd1fb741d1bf6277db7a1a37da1983c7b9eed9aa examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 01978a56e76a58399af3bd4d022aa990b9669bee inc/Module/Install/Scripts.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 d7a454013e3b25e5f98016e5a24e9392058e5764 t/App-Image-Generator/01-use.t
-SHA1 4cca9c50605c0c1539d58e47b6f577cb1f1c6844 t/App-Image-Generator/02-version.t
-SHA1 ee30d0965503b912f6a65c13bdee94bb14d8523f xt/App-Image-Generator/01-pod_coverage.t
-SHA1 82efecc33032f9d49c450c4d97c1dd7cfc188bbb xt/App-Image-Generator/02-pod.t
+SHA256 d5215559848e70b83ce2564e7802ee9b053f74b749852bd9fa2169b57848bf47 Changes
+SHA256 6f17df3ef9892247c4f064a4e86c7b6284e3dbcacc37df783e1950ea7eb85037 Generator.pm
+SHA256 c2243e443d7ce9cdb60d55bb0c5e22f7774e9b378665661108b5300faebcce0d LICENSE
+SHA256 3c66d0404f5b10ac0c78c414890e5d8b5083fff7f676217a75127d27b4d31654 MANIFEST
+SHA256 f65a4d5afaf3e4c6b233bb95a25f15aeedffa2c27d81cc95d84f59632a7e3804 META.yml
+SHA256 fbcb676c0b2191da421c1aff3215311e0289e8013315d326cebdbb0d3e1dd13e Makefile.PL
+SHA256 90200a831dba25d07640ed0c4e4dc5de3cec788c69f6d2672a36e8bf8428af08 README
+SHA256 5b771ad2cf9ba191bdd8c3bc7dc459cb6fba7e24914ca7cc5af0ae928b174192 bin/image-generator
+SHA256 c80c0e18a5a951bd9d86a08a310b60e535250b2115dd3f8c09fca630941f8e37 examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 4c7f66dca5a3062845a1be78196d148a31960d1b5c04d8ff3f578f9df64a4c22 t/App-Image-Generator/01-use.t
+SHA256 a42b105a344d048ac403209a6b9375e770f29a8f38f0518fabdd2658af351e13 t/App-Image-Generator/02-version.t
+SHA256 5946c07a688260c5b358a8384f28c4383d513811c994c4ffd038ead7190cbf18 t/App-Image-Generator/03-new.t
+SHA256 e55db777ac48a32ff7fccd46668b1b8dc37b749919465ce7316c51e78845d3f1 t/App-Image-Generator/04-run.t
+SHA256 ebf7a4d04390cc432462010ae5f9bb38d3c13a1d3d51e32f54cf5365fd43f018 xt/App-Image-Generator/01-pod_coverage.t
+SHA256 f6003f592f05cae645afedcca7804293f2e24fcae658ab862860fc2007b12d86 xt/App-Image-Generator/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJXAmocAAoJEJe+XXKaIuTlNPkH/iQ+4ofWCZKivRL0L+Ze3hfp
-OZaGa/Gq1OJ5ZA6R94KAGvi/Q1MO0+tgfZ9sjuOAQ2W/5RRkeeGn9YR6GtZXU3hs
-aN6mPalcTS07QGtUJLcf+ssZTLlMmF+7qkW4DDPzEkwPtpfzRDuEmZzjTkDDIKc2
-CU/BBNAHk/mEmj6AX+YPpuEjEkakJd6GMpZ3RpnQj8Ic1hRGxP2lgy6DgqLjakXw
-vPMHvfhUTUHPrNnQRQm/TkRsiMZdUPQj2a0x4j7RnvGPp5fgQ4vl2c7MHGLNmfdZ
-4wtDM/aWHwHhn+IFF5+x+ER5R5V3CBaWot/NQoVfhbhp/2gyegZmnqeYS3hc2ys=
-=ZmCY
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmF+bwoACgkQgmqNLzlX
+aRdFvgv/bfCcGWFgVDPBwEKwS2uNh8NZbME4a06BXve8Xohsf7KHrFA+1EnwPzi7
+MWuhvOaEmVD338R1lOXgdWvLIA7H9GTtijljQEUzgIBbuV5ocZKeBU+XpTAGj2ke
+KG7OnOacQ8NFN+Youpi0plVc/w2kvT88opTwF5WVA8c3bfJVFeChjQSAuhwd9QRU
+hv6E4i1uIAFQsaX9V43ClY8OkyGis6Vb4kmL0wIL+WTIICJhCaUxDPDZFcbDM3Z+
+9uWSbd0PyLWhzNesGFtVm3GJiVrFvyZUosKHpGXnE7EY+MzNBKW75FHSQyY81riy
+TO9O1cuWDGyoUQ0rkNIrnzYzyzaGscdZwpfq7IDU7dXhoHON6zVtesQwo0i/BzB9
+idCDNffqzjgfpxB3z1oPoGVsNIdx3NuOGD36vTC3GRstTcId3ekXP3/zzeF3Rc7g
+iTMb836T5pJdA4icpHBVa0Qe2HYBejeanfMoC9dSEQ5z0Fs/3TTdsheTatnBENfK
+O852PSiP
+=O8e4
 -----END PGP SIGNATURE-----

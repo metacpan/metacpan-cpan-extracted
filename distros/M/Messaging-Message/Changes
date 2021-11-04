@@ -1,5 +1,8 @@
 Revision history for Messaging-Message:
 
+1.7	Wed Oct 13 2021
+	* Fixed POD coverage testing (RT#131350).
+
 1.6	Wed Oct  5 2016
 	* Added a "ZERO" message queue type working like "/dev/zero".
 	* Rewrote the "NULL" message queue to stop using Directory::Queue::Null.

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::BillReceiverType;
-$Shipment::UPS::WSDL::ShipTypes::BillReceiverType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::BillReceiverType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,13 +29,13 @@ Class::Std::initialize();
         [   qw(        AccountNumber
               Address
 
-              )
+            )
         ],
         {   'AccountNumber' => \%AccountNumber_of,
             'Address'       => \%Address_of,
         },
         {   'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Address' =>
+            'Address'       =>
               'Shipment::UPS::WSDL::ShipTypes::BillReceiverAddressType',
         },
         {
@@ -62,7 +62,7 @@ Shipment::UPS::WSDL::ShipTypes::BillReceiverType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

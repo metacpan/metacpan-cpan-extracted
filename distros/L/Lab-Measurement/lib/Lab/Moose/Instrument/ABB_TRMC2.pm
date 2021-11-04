@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument::ABB_TRMC2;
+$Lab::Moose::Instrument::ABB_TRMC2::VERSION = '3.791';
 #ABSTRACT: ABB TRMC2 temperature controller
-$Lab::Moose::Instrument::ABB_TRMC2::VERSION = '3.772';
+
 use v5.20;
 
 use Moose;
@@ -26,26 +27,26 @@ has min_setpoint => (
 );
 
 has read_delay => (
-    is      => 'ro', 
-    isa     => 'Num', 
+    is      => 'ro',
+    isa     => 'Num',
     default => 0.3
 );
 
 has buffin => (
-    is      => 'ro', 
-    isa     => 'Str', 
+    is      => 'ro',
+    isa     => 'Str',
     default => 'C:\Program Files\Trmc2\buffin.txt'
 );
 
 has buffout => (
-    is      => 'ro', 
-    isa     => 'Str', 
+    is      => 'ro',
+    isa     => 'Str',
     default => 'C:\Program Files\Trmc2\buffout.txt'
 );
 
 has initialized => (
-    is      => 'rw', 
-    isa     => 'Bool', 
+    is      => 'rw',
+    isa     => 'Bool',
     default => 0
 );
 
@@ -70,12 +71,12 @@ sub TRMC2init {
     my $self = shift;
     if ( $self->initialized ) { die "TRMC already Initialized\n" }
 
-    if ( !open FHIN, "<", $self->buffin ) {
-        die "could not open command file ".$self->buffin.": $!\n";
+    if ( !open FHIN, "<", $self->buffin ) {    ## no critic
+        die "could not open command file " . $self->buffin . ": $!\n";
     }
     close(FHIN);
-    if ( !open FHOUT, "<", $self->buffout ) {
-        die "could not open reply file ".$self->buffout.": $!\n";
+    if ( !open FHOUT, "<", $self->buffout ) {    ## no critic
+        die "could not open reply file " . $self->buffout . ": $!\n";
     }
     close(FHOUT);
 
@@ -120,7 +121,7 @@ sub TRMC2_get_SetPoint {
 
     my $cmd = "MAIN:SP?";
     my @value = $self->TRMC2_Query( $cmd, 0.1 );
- 
+
     foreach my $val (@value) {
         chomp $val;
         $val = RemoveFrenchComma($val);
@@ -131,14 +132,16 @@ sub TRMC2_get_SetPoint {
 
 
 sub TRMC2_set_SetPoint {
-    my $self = shift;
+    my $self     = shift;
     my $setpoint = shift;
 
     if ( $setpoint > $self->max_setpoint ) {
-        croak "setting temperatures above $self->max_setpoint K is forbidden\n";
+        croak
+            "setting temperatures above $self->max_setpoint K is forbidden\n";
     }
     if ( $setpoint < $self->min_setpoint ) {
-        croak "setting temperatures below $self->max_setpoint K is forbidden\n";
+        croak
+            "setting temperatures below $self->max_setpoint K is forbidden\n";
     }
 
     my $FrSetpoint = MakeFrenchComma( sprintf( "%.6E", $setpoint ) );
@@ -209,8 +212,7 @@ sub TRMC2_get_R {
 }
 
 
-sub TRMC2_get_RT
-{
+sub TRMC2_get_RT {
     my $self   = shift;
     my $sensor = shift;
 
@@ -227,13 +229,12 @@ sub TRMC2_get_RT
 }
 
 
-
 sub TRMC2_Read_Prog {
-    my $self  = shift;
+    my $self = shift;
 
-    my $cmd   = "MAIN:PROG_Table?\0";
+    my $cmd = "MAIN:PROG_Table?\0";
     my @value = $self->TRMC2_Query( $cmd, 0.2 );
-    
+
     foreach my $val (@value) {
         chomp $val;
         $val = RemoveFrenchComma($val);
@@ -256,7 +257,7 @@ sub TRMC2_Set_T_Sweep {
 
     my $cmd = "MAIN:PROG_Table=1\0";
     $self->TRMC2_Write( $cmd, 0.5 );
-    
+
     $cmd = sprintf(
         "PROG_TABLE(%d)=%s;%s;%s\n",
         0, $FrSetpoint, $FrSweeprate, $FrHoldtime
@@ -318,8 +319,8 @@ sub TRMC2_Write {
     my $cmd        = shift;
     my $wait_write = $self->read_delay;
     if ( $arg_cnt == 2 ) { $wait_write = shift }
-    if ( !open FHIN, ">", $self->buffin ) {
-        die "could not open command file ".$self->buffin.": $!\n";
+    if ( !open FHIN, ">", $self->buffin ) {    ## no critic
+        die "could not open command file " . $self->buffin . ": $!\n";
     }
 
     printf FHIN $cmd;
@@ -339,18 +340,19 @@ sub TRMC2_Query {
     if ( $arg_cnt == 2 ) { $wait_query = shift }
 
     #----Open Command File---------
-    if ( !open FHIN, ">", $self->buffin ) {
-        die "could not open command file ".$self->buffin.": $!\n";
+    if ( !open FHIN, ">", $self->buffin ) {    ## no critic
+        die "could not open command file " . $self->buffin . ": $!\n";
     }
 
     printf FHIN $cmd;
     close(FHIN);
+
     #-----------End Of Setting Command-----------
     sleep($wait_query);
 
     #--------Reading Value----------------------
-    if ( !open FHOUT, "<", $self->buffout ) {
-        die "could not open reply file ".$self->buffout.": $!\n";
+    if ( !open FHOUT, "<", $self->buffout ) {    ## no critic
+        die "could not open reply file " . $self->buffout . ": $!\n";
     }
     my @line = <FHOUT>;
     close(FHOUT);
@@ -389,7 +391,7 @@ Lab::Moose::Instrument::ABB_TRMC2 - ABB TRMC2 temperature controller
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 SYNOPSIS
 
@@ -577,7 +579,8 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2013       Alois Dirnaichner
             2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
-            2020-2021  Andreas K. Huettel
+            2020       Andreas K. Huettel
+            2021       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

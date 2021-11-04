@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::VolumeType;
-$Shipment::UPS::WSDL::TrackTypes::VolumeType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::VolumeType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        UnitOfMeasurement
               Value
 
-              )
+            )
         ],
         {   'UnitOfMeasurement' => \%UnitOfMeasurement_of,
             'Value'             => \%Value_of,
@@ -62,7 +62,7 @@ Shipment::UPS::WSDL::TrackTypes::VolumeType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -7,6 +7,23 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.13	2021-10-11
+
+ [ Bug Fixes ]
+ - fix encoding tests flag as TODO tests using undecoded input:
+   String::Copyright documented to accept only strings
+   Adrian Bunk++
+
+ [ Test Suite ]
+ - tighten test to not fail with old String::Copyright
+
+ [ Other ]
+ - relax dependency on perl to v5.12, and explicitly 'use' it, to slightly
+   simplify boilerplate
+ - stop use version (unneeded with modern perl)
+ - tighten runtime-dependency on Encode, to avoid 'Use of uninitialized
+   value' on stderr
+
 v3.2.12	2021-08-30
 
  [ Bug Fixes ]

@@ -3,7 +3,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 96;
+use Test::More;
+
+plan skip_all => 'Need at least Perl v5.10.1' if $] < "5.010001";
+
+plan tests => 96;
 
 note "\nbigint -> bignum -> bigrat\n\n";
 

@@ -5,6 +5,9 @@ use HTTP::Request::FromCurl;
 use lib 't';
 use TestCurlIdentity 'run_curl_tests';
 
+# For testing whether our test suite copes with %20 vs. + well:
+#$URI::Escape::escapes{" "} = '+';
+
 my @tests = (
     { cmd => [ '--verbose', '-g', '-s', '--data', '@$tempfile', '$url' ] },
     { cmd => [ '--verbose', '-g', '-s', '--data-ascii', '@$tempfile', '$url' ] },

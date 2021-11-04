@@ -1,10 +1,8 @@
 #!perl
 # Astro::Catalog::Query::MPC test harness
 
-# strict
 use strict;
 
-#load test
 use Test::More tests => 202;
 use Data::Dumper;
 
@@ -14,21 +12,18 @@ use Number::Uncertainty;
 
 # Catalog modules need to be loaded first
 BEGIN {
-  use_ok( "Astro::Catalog::Star");
-  use_ok( "Astro::Catalog");
-  use_ok( "Astro::Catalog::Query::MPC");
+    use_ok( "Astro::Catalog::Item");
+    use_ok( "Astro::Catalog");
+    use_ok( "Astro::Catalog::Query::MPC");
 }
 
 
 # Load the generic test code
-my $p = ( -d "t" ?  "t/" : "");
+my $p = (-d "t" ? "t/" : "");
 do $p."helper.pl" or die "Error reading test functions: $!";
 
 
-# T E S T   H A R N E S S --------------------------------------------------
-
 # Grab MPC sample from the DATA block
-# -----------------------------------
 my @buffer = <DATA>;
 chomp @buffer;
 
@@ -41,88 +36,83 @@ my $epoch = 2004.16427554485;
 my $star;
 
 # Parse data block
-# ----------------
-foreach my $line ( 0 .. $#buffer ) {
+foreach my $line (0 .. $#buffer) {
+    my ($name, $ra, $dec, $vmag, $raoff, $decoff, $pm_ra, $pm_dec, $orbit,
+            $comment) = unpack("A24A11A10A6A7A7A7A7A6A*", $buffer[$line]);
 
-  my( $name, $ra, $dec, $vmag, $raoff, $decoff, $pm_ra, $pm_dec, $orbit, $comment ) = unpack("A24A11A10A6A7A7A7A7A6A*", $buffer[$line]);
+    if (defined $ra) {
+        $star = new Astro::Catalog::Item();
 
-  if( defined( $ra ) ) {
+        $name =~ s/^\s+//;
+        $star->id( $name );
 
-    $star = new Astro::Catalog::Star();
+        $vmag =~ s/^\s+//;
 
-    $name =~ s/^\s+//;
-    $star->id( $name );
+        $star->fluxes(new Astro::Fluxes(new Astro::Flux(
+            new Number::Uncertainty(Value => $vmag),
+            'mag', "V")));
 
-    $vmag =~ s/^\s+//;
+        $comment =~ s/^\s+//;
+        $star->comment($comment);
 
-    $star->fluxes( new Astro::Fluxes( new Astro::Flux( new Number::Uncertainty( Value => $vmag ),
-                                                       'mag', "V" )));
+        # Deal with the coordinates. RA and Dec are almost in the
+        # right format (need to replace separating spaces with colons).
+        $ra =~ s/^\s+//;
+        $ra =~ s/ /:/g;
+        $dec =~ s/^\s+//;
+        $dec =~ s/ /:/g;
 
-    $comment =~ s/^\s+//;
-    $star->comment( $comment );
+        my $coords = new Astro::Coords(
+                name => $name,
+                ra => $ra,
+                dec => $dec,
+                type => 'J2000',
+                epoch => $epoch,
+            );
 
-    # Deal with the coordinates. RA and Dec are almost in the
-    # right format (need to replace separating spaces with colons).
-    $ra =~ s/^\s+//;
-    $ra =~ s/ /:/g;
-    $dec =~ s/^\s+//;
-    $dec =~ s/ /:/g;
+        $star->coords($coords);
 
-    my $coords = new Astro::Coords( name => $name,
-                                    ra => $ra,
-                                    dec => $dec,
-                                    type => 'J2000',
-                                    epoch => $epoch,
-                                  );
-
-    $star->coords( $coords );
-
-    # Push the star onto the catalog.
-    $catalog_data->pushstar( $star );
-
-  }
-
+        # Push the star onto the catalog.
+        $catalog_data->pushstar( $star );
+    }
 }
 
 # field centre
-$catalog_data->fieldcentre( RA => '07 13 42',
-                            Dec => '-14 02 00',
-                            Radius => '300' );
+$catalog_data->fieldcentre(
+        RA => '07 13 42',
+        Dec => '-14 02 00',
+        Radius => '300');
 
 # Grab comparison from ESO/ST-ECF Archive Site
-# --------------------------------------------
 
-my $mpc_byname = new Astro::Catalog::Query::MPC( RA => "07 13 42",
-                                                 Dec => "-14 02 00",
-                                                 Radmax => '300',
-                                                 Year => 2004,
-                                                 Month => 03,
-                                                 Day => 1.87, );
+my $mpc_byname = new Astro::Catalog::Query::MPC(
+    RA => "07 13 42",
+    Dec => "-14 02 00",
+    Radmax => '300',
+    Year => 2004,
+    Month => 03,
+    Day => 1.87,
+);
 
 print "# Connecting to MPC Minor Planet Checker\n";
 my $catalog_byname;
-eval { $catalog_byname = $mpc_byname->querydb() };
+eval {$catalog_byname = $mpc_byname->querydb()};
 SKIP: {
-  diag($@) if $@;
-  skip "Cannot connect to MPC website", 199 if $@;
-  skip "No asteroids returned from MPC", 199 if ( $catalog_byname->sizeof() == 0 );
-  print "# Continuing tests\n";
+    diag($@) if $@;
+    skip "Cannot connect to MPC website", 199 if $@;
+    skip "No asteroids returned from MPC", 199 if ($catalog_byname->sizeof() == 0);
+    print "# Continuing tests\n";
 
-# C O M P A R I S O N ------------------------------------------------------
+    # check sizes
+    print "# DAT has " . $catalog_data->sizeof() . " stars\n";
+    print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 
-  # check sizes
-  print "# DAT has " . $catalog_data->sizeof() . " stars\n";
-  print "# NET has " . $catalog_byname->sizeof() . " stars\n";
+    # Compare catalogues
+    compare_mpc_catalog($catalog_byname, $catalog_data);
+}
 
-  # Compare catalogues
-  compare_mpc_catalog( $catalog_byname, $catalog_data);
-
-} # End SKIP
-
-# quitting time
 exit;
 
-# D A T A   B L O C K  -----------------------------------------------------
 # Name                   RA         Dec       V_mag raoff  decoff pm_ra pm_dec orbits  comment
 __DATA__
 (32467) 2000 SL174      07 19 09.3 -12 33 33  19.1  79.4E  88.5N     6-    12+   10o  None needed at this time.

@@ -1,5 +1,5 @@
 package CHI::Driver::Metacache;
-$CHI::Driver::Metacache::VERSION = '0.60';
+$CHI::Driver::Metacache::VERSION = '0.61';
 use CHI::Constants qw(CHI_Meta_Namespace);
 use Moo;
 use strict;
@@ -62,7 +62,7 @@ CHI::Driver::Metacache - Metacache for internal CHI use
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,7 @@ Jonathan Swartz <swartz@pobox.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Jonathan Swartz.
+This software is copyright (c) 2021 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

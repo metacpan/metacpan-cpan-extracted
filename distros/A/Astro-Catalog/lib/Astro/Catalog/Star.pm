@@ -4,9 +4,9 @@ use strict;
 
 use Astro::Catalog::Item;
 
-use base qw/ Astro::Catalog::Item /;
-use vars qw/ $VERSION /;
-$VERSION = "4.35";
+use base qw/Astro::Catalog::Item/;
+
+our $VERSION = '4.36';
 
 =head1 NAME
 

@@ -19,7 +19,9 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Class::C3::Componentised' => '0',
                                       'Dancer2::Plugin' => '0',
-                                      'Try::Tiny' => '0',
+                                      'Modern::Perl' => '0',
+                                      'Moo' => '0',
+                                      'curry' => '0',
                                       'perl' => '5.012'
                                     }
                     },
@@ -39,6 +41,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'JSON::MaybeXS' => '0',
                                    'Plack::Test' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::More' => '0'
                                  }
                  }

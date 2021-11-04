@@ -1,0 +1,3 @@
+% layout 'layout.ep', title => 'Homepage';
+
+logged in! See <a href="/profile">Profile</a> or <a href="/logout">Logout</a>

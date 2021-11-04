@@ -159,6 +159,7 @@ GyMMMM
 GyMMMMEd
 GyMMMMd
 GyMMMd
+GyMd
 H'h'mm
 H'h'mm'min'ss
 HH'h
@@ -211,6 +212,7 @@ KH
 KZ
 Kabuverdianu
 Kabyle
+Kaingang
 Kako
 Kalaallisut
 Kalenjin
@@ -340,6 +342,7 @@ Nama
 Ndebele
 Ngiemboon
 Ngomba
+Nheengatu
 Niue
 Njumatatu
 Njumatatũ
@@ -400,6 +403,7 @@ Sango
 Sangu
 Santali
 Sanyo
+Sardinian
 Sayass
 Sena
 Senin
@@ -552,6 +556,7 @@ bas_CM
 bazar
 be
 be_BY
+be_tarask
 bem
 bem_ZM
 bez
@@ -578,7 +583,7 @@ bs_Latn_BA
 ca
 ca_AD
 ca_ES
-ca_ES_VALENCIA
+ca_ES_valencia
 ca_FR
 ca_IT
 ccc
@@ -593,6 +598,7 @@ ceb
 ceb_PH
 cgg
 cgg_UG
+chida
 chr
 chr_US
 cikin
@@ -655,6 +661,7 @@ ek
 el
 el_CY
 el_GR
+emna
 en
 en_001
 en_150
@@ -753,7 +760,6 @@ en_TZ
 en_UG
 en_UM
 en_US
-en_US_POSIX
 en_VC
 en_VG
 en_VI
@@ -949,6 +955,7 @@ hu
 hu_HU
 hy
 hy_AM
+há
 hétfő
 hënë
 ia
@@ -992,6 +999,8 @@ kde_TZ
 ke
 kea
 kea_CV
+kgp
+kgp_BR
 khq
 khq_ML
 ki
@@ -1026,6 +1035,7 @@ ksh_DE
 ku
 ku_TR
 kuni
+kurã
 kvartal
 kw
 kw_GB
@@ -1078,6 +1088,7 @@ lv
 lv_LV
 ly
 lyatatu
+lěta
 maanantai
 maanantaina
 maandag
@@ -1102,6 +1113,7 @@ mi
 mi_NZ
 minggu
 mis
+mituú
 miz
 mjesec
 mk
@@ -1129,6 +1141,7 @@ mt
 mt_MT
 mua
 mua_CM
+murakipí
 mvfò
 mwa
 my
@@ -1177,6 +1190,7 @@ nnh
 nnh_CM
 no
 nt
+numĩggu
 nus
 nus_SS
 nyn
@@ -1200,6 +1214,7 @@ pa_Guru_IN
 pcm
 pcm_NG
 pekan
+pir
 pirmadienis
 pirmdiena
 pl
@@ -1247,7 +1262,6 @@ rof
 rof_TZ
 roka
 roku
-root
 ru
 ru_BY
 ru_KG
@@ -1276,6 +1290,8 @@ satiik
 sav
 sbp
 sbp_TZ
+sc
+sc_IT
 sd
 sd_Arab
 sd_Arab_PK
@@ -1311,6 +1327,7 @@ si
 si_LK
 sigunda
 simana
+simỹnỹ
 sizhun
 sjedmica
 sk
@@ -1358,11 +1375,13 @@ sw_KE
 sw_TZ
 sw_UG
 săptămâna
+sẽmãna
 ta
 ta_IN
 ta_LK
 ta_MY
 ta_SG
+tarask
 te
 te_IN
 teden
@@ -1395,6 +1414,8 @@ tuần
 twq
 twq_NE
 tydz
+tydźeń
+tyźeń
 tzm
 tzm_MA
 týden
@@ -1407,7 +1428,9 @@ uike
 uk
 uk_UA
 uke
+uken
 ukpà
+und
 ur
 ur_IN
 ur_PK
@@ -1426,6 +1449,7 @@ vai_Latn
 vai_Latn_LR
 vai_Vaii
 vai_Vaii_LR
+valencia
 vecka
 veke
 vi
@@ -1480,6 +1504,10 @@ yi_001
 yo
 yo_BJ
 yo_NG
+yrl
+yrl_BR
+yrl_CO
+yrl_VE
 yue
 yue_Hans
 yue_Hans_CN

@@ -1,16 +1,21 @@
-Revision history for Tree-Object
+0.080   2021-10-07  Released-By: PERLANCAR; Urgency: low
 
-0.07    2016-04-14 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Update mentioned module Role{,Bundle}::TinyCommons::Tree.
+
+
+0.07    2016-04-14  Released-By: PERLANCAR
 
 	- Add Tree::Object::InsideOut.
 
 
-0.06    2016-03-30 (PERLANCAR)
+0.06    2016-03-30  Released-By: PERLANCAR
 
 	- Add class: TO:Hash::ChildrenAsList.
 
 
-0.05    2016-03-29 (PERLANCAR)
+0.05    2016-03-29  Released-By: PERLANCAR
 
         - [Incompatible change] Tree::Object::Array now uses
           Class::Accessor::Array instead of Class::Build::Array::Glob (object
@@ -21,12 +26,12 @@ Revision history for Tree-Object
           Tree::Object::Array.
 
 
-0.04    2016-03-29 (PERLANCAR)
+0.04    2016-03-29  Released-By: PERLANCAR
 
 	- [dist] Add missing dep to Class::Build::Array::Glob [RT#113409].
 
 
-0.03    2016-03-26 (PERLANCAR)
+0.03    2016-03-26  Released-By: PERLANCAR
 
         - This distribution now includes more than one implementation of tree
           objects.
@@ -45,13 +50,13 @@ Revision history for Tree-Object
         - Add Tree::Object::Array.
 
 
-0.02    2016-03-24 (PERLANCAR)
+0.02    2016-03-24  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention some other tree modules on CPAN.
 
 
-0.01    2016-03-24 (PERLANCAR)
+0.01    2016-03-24  Released-By: PERLANCAR
 
         - First release.

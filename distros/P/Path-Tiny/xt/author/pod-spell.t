@@ -31,6 +31,7 @@ Efros
 Ellis
 Etheridge
 Fish
+Flavio
 Fuji
 Gabor
 Gabriel
@@ -65,6 +66,7 @@ Ollis
 Pagaltzis
 Path
 Philippe
+Poletti
 Rolsky
 Roy
 SHA
@@ -94,6 +96,7 @@ dsteinbrunner
 ether
 fany
 fatalize
+flavio
 gabiruh
 geraud
 gfuji

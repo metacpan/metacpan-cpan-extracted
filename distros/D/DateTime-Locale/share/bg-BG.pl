@@ -22,6 +22,7 @@
     GyMMMMEd => "E, d MMMM y '\N{U+0433}'. G",
     GyMMMMd => "d MMMM y '\N{U+0433}'. G",
     GyMMMd => "d.MM.y '\N{U+0433}'. G",
+    GyMd => "dd.MM.y '\N{U+0433}'. GGGGG",
     H => "HH '\N{U+0447}'.",
     Hm => "HH:mm '\N{U+0447}'.",
     Hms => "HH:mm:ss '\N{U+0447}'.",
@@ -276,5 +277,5 @@
   time_format_medium => "H:mm:ss '\N{U+0447}'.",
   time_format_short => "H:mm '\N{U+0447}'.",
   variant => undef,
-  version => 39,
+  version => 40,
 }

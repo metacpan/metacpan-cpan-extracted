@@ -1,0 +1,57 @@
+
+# stopwords  -- to please Pod::Spell, Test::PodSpelling and friends
+#
+
+# Author monikers (CPAN-ID, github-ID, etc)
+DAGOLDEN            @DAGOLDEN
+ETHER               @ETHER
+KENTNL              @KENTNL
+TABULO              @TABULO
+TABULON             @TABULON
+
+# Made-up words that show up in POD
+attr    # attributes
+cattr   # class attributes
+pattr   # private attributes
+
+# Pod::Weaver  - plugins, ...
+AllowOverride
+AppendPrepend
+CommentString
+EnsureUniqueSections
+GenerateSection
+ReplaceName
+SeeAlso
+SortSections
+WarrantyDisclaimer
+wikidoc
+
+# Dist::Zilla  - plugins, ...
+dzil dist zilla
+BumpVersionAfterRelease
+ConfirmRelease
+ExecDir
+GatherDir
+ManifestSkip
+MetaJSON
+MetaNoIndex
+MetaYAML
+PodSyntaxTests
+PruneCruft
+Readme
+ReadmeAnyFromPod
+RunExtraTests
+ShareDir
+TestRelease
+UploadToCPAN
+
+# Tech words (general)
+bitbucket
+cpan    CPAN
+github
+gitlab
+Readme
+README
+
+# English words that are somehow not recognized
+merchantability

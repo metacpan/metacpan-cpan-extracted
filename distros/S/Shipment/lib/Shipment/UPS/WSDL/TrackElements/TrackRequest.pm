@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::TrackElements::TrackRequest;
-$Shipment::UPS::WSDL::TrackElements::TrackRequest::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackElements::TrackRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ use warnings;
                   CandidateBookmark
                   ShipperAccountInfo
 
-                  )
+                )
             ],
             {   'Request'            => \%Request_of,
                 'InquiryNumber'      => \%InquiryNumber_of,
@@ -94,7 +94,7 @@ Shipment::UPS::WSDL::TrackElements::TrackRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

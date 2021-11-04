@@ -1,3 +1,4 @@
+/* vi: set ft=xs : */
 #define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"

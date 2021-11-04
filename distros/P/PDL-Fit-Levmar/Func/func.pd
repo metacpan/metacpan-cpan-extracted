@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use Carp;
 
-$PDL::Fit::Levmar::Func::VERSION = '0.0100';
-pp_setversion( "'$PDL::Fit::Levmar::Func::VERSION'");
+our $VERSION = '0.0103';
+pp_setversion( $VERSION );
 
 pp_bless('PDL::Fit::Levmar::Func');  # make the functions generated go into our namespace     
 pp_addpm({At=>'Top'},<<'======EOD_Documentation======');
@@ -151,6 +151,7 @@ $MKOBJ = $Config{cc} . " -c " . $Config{optimize} . " " .
 # string  to compile .o to .so 
 $MKSO = $Config{ld} . " " . $Config{lddlflags} ." %o -o %s ";
 
+use File::Temp qw(tempdir);
 
 ======EOD_Documentation======
 
@@ -228,7 +229,7 @@ sub new {
       NOSO => undef,
       CSRC => undef,
       CTOP => undef,
-      DIR =>  "./tempcode" , # where the .so is built
+      DIR => tempdir( CLEANUP => !$opts->{NOCLEAN} ), # where the .so is built
       TESTSYNTAX => undef,
       LIBHANDLE => undef,
       FVERBOSE => 0,

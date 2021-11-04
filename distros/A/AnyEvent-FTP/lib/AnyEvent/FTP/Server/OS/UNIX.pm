@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: UNIX implementations for AnyEvent::FTP
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 sub BUILDARGS
@@ -84,7 +84,7 @@ AnyEvent::FTP::Server::OS::UNIX - UNIX implementations for AnyEvent::FTP
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

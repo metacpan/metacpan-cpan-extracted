@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::Base::RegisteredI2C 0.19;
+package Device::Chip::Base::RegisteredI2C 0.20;
 class Device::Chip::Base::RegisteredI2C extends Device::Chip;
 
 use utf8;

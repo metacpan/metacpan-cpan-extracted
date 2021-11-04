@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 
 # ABSTRACT: Simple asynchronous FTP client and server
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ AnyEvent::FTP - Simple asynchronous FTP client and server
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

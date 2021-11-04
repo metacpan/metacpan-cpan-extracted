@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipmentResultsType;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentResultsType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentResultsType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -58,12 +58,12 @@ Class::Std::initialize();
               ReceiptURL
               LocalLanguageReceiptURL
 
-              )
+            )
         ],
-        {   'ShipmentCharges'       => \%ShipmentCharges_of,
-            'NegotiatedRateCharges' => \%NegotiatedRateCharges_of,
-            'FRSShipmentData'       => \%FRSShipmentData_of,
-            'BillingWeight'         => \%BillingWeight_of,
+        {   'ShipmentCharges'              => \%ShipmentCharges_of,
+            'NegotiatedRateCharges'        => \%NegotiatedRateCharges_of,
+            'FRSShipmentData'              => \%FRSShipmentData_of,
+            'BillingWeight'                => \%BillingWeight_of,
             'ShipmentIdentificationNumber' =>
               \%ShipmentIdentificationNumber_of,
             'ShipmentDigest'          => \%ShipmentDigest_of,
@@ -143,7 +143,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipmentResultsType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

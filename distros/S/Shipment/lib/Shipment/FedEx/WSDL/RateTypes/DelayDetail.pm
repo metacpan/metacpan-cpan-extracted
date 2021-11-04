@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::DelayDetail;
-$Shipment::FedEx::WSDL::RateTypes::DelayDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::DelayDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               Type
               Description
 
-              )
+            )
         ],
         {   'Date'        => \%Date_of,
             'DayOfWeek'   => \%DayOfWeek_of,
@@ -81,7 +81,7 @@ Shipment::FedEx::WSDL::RateTypes::DelayDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

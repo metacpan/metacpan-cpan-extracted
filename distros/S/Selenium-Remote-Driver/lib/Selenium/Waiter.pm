@@ -1,5 +1,5 @@
 package Selenium::Waiter;
-$Selenium::Waiter::VERSION = '1.44';
+$Selenium::Waiter::VERSION = '1.45';
 use strict;
 use warnings;
 
@@ -48,6 +48,8 @@ sub wait_until (&%) {
         return $try_ret if $try_ret;
     }
 
+    warn 'timeout' if $args->{debug};
+
     # No need to repeat ourselves if we're already debugging.
     warn $exception if $exception && !$args->{debug};
     return '';
@@ -67,7 +69,7 @@ Selenium::Waiter - Provides a utility wait_until function
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 SYNOPSIS
 

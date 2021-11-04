@@ -63,6 +63,16 @@ $titan = encode_utf8 "titan://$punycode:$port";
 
    $page = query_gemini("$base/page/$encoded_name");
    like($page, qr/^20 text\/gemini; charset=UTF-8\r\n# $name\n$text/, "Text saved");
+
+   my $data = read_binary("t/alex.jpg");
+   my $size = length($data);
+   $page = query_gemini("$titan/raw/Alex%E2%80%99s%20Avatar;size=$size;mime=image/jpeg;token=hello", $data);
+   like($page, qr/^30 $base\/file\/Alex%E2%80%99s%20Avatar\r/, "Upload image");
+
+   $page = query_gemini("$base/do/files");
+   like($page, qr/=> $base\/file\/Alex%E2%80%99s%20Avatar Alex’s Avatar/, "Image listed");
+   $page = query_gemini("$base/file/Alex%E2%80%99s%20Avatar");
+   like($page, qr/^20 image\/jpeg\r\n/, "Image download");
 }
 
 done_testing();

@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/jjn1056/Valiant/issues
   homepage: https://github.com/jjn1056/Valiant
   repository: https://github.com/jjn1056/Valiant
-version: '0.001009'
+version: '0.001011'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

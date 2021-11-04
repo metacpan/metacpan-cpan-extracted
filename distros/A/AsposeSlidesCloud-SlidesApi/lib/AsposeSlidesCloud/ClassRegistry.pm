@@ -191,6 +191,7 @@ my %determiners = (
     'SlideExportFormat' => {  },
     'SmartArtNode' => {  },
     'SoftEdgeEffect' => {  },
+    'SpecialSlideType' => {  },
     'StorageExist' => {  },
     'StorageFile' => {  },
     'TableCell' => {  },

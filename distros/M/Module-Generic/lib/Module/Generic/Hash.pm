@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/03/31
+## Modified 2021/09/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,7 +42,7 @@ BEGIN
     use Module::Generic::TieHash;
     use Regexp::Common;
     use Want;
-    our( $VERSION ) = 'v1.0.0';
+    our( $VERSION ) = 'v1.0.1';
 };
 
 sub new
@@ -69,6 +69,17 @@ sub new
     $obj->enable( 1 );
     return( $self );
 }
+
+sub as_hash
+{
+    my $self = CORE::shift( @_ );
+    my $hash = {};
+    my $keys = $self->keys;
+    @$hash{ @$keys } = @$self{ @$keys };
+    return( $hash );
+}
+
+sub as_json { return( shift->json->scalar ); }
 
 sub as_string { return( shift->dump ); }
 

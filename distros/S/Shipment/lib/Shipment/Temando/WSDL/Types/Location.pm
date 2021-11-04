@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Location;
-$Shipment::Temando::WSDL::Types::Location::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Location::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -71,7 +71,7 @@ Class::Std::initialize();
               auspostLodgementFacility
               manifesting
 
-              )
+            )
         ],
         {   'description'               => \%description_of,
             'type'                      => \%type_of,
@@ -163,7 +163,7 @@ Shipment::Temando::WSDL::Types::Location
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

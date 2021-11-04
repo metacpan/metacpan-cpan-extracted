@@ -1,5 +1,5 @@
 package CHI::Test::Class;
-$CHI::Test::Class::VERSION = '0.60';
+$CHI::Test::Class::VERSION = '0.61';
 use Getopt::Long;
 use CHI::Util qw(can_load);
 use strict;

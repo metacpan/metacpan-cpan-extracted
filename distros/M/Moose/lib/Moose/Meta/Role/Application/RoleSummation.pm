@@ -1,5 +1,5 @@
 package Moose::Meta::Role::Application::RoleSummation;
-our $VERSION = '2.2015';
+our $VERSION = '2.2200';
 
 use strict;
 use warnings;
@@ -337,7 +337,7 @@ Moose::Meta::Role::Application::RoleSummation - Combine two or more roles
 
 =head1 VERSION
 
-version 2.2015
+version 2.2200
 
 =head1 DESCRIPTION
 

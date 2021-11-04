@@ -24,7 +24,7 @@ __PACKAGE__->validates(
   )
 );
 
-__PACKAGE__->accept_nested_for('children');
+__PACKAGE__->accept_nested_for('children', {allow_destroy=>1});
 
 1;
 

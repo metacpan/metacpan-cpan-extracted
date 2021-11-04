@@ -4,13 +4,13 @@
       "Kim Ryan <kimryan at cpan org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Locale-SubCountry",
    "prereqs" : {
@@ -38,14 +38,14 @@
    "provides" : {
       "Locale::SubCountry" : {
          "file" : "lib/Locale/SubCountry.pm",
-         "version" : "2.06"
+         "version" : "2.07"
       },
       "Locale::SubCountry::Codes" : {
          "file" : "lib/Locale/SubCountry/Codes.pm"
       },
       "Locale::SubCountry::World" : {
          "file" : "lib/Locale/SubCountry.pm",
-         "version" : "2.06"
+         "version" : "2.07"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "url" : "https://github.com/kimryan/Locale-SubCountry"
       }
    },
-   "version" : "2.06",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.07",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,16 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Property 0.26;
+use v5.26;
+use Object::Pad 0.44;
 
-use v5.14;
-use warnings;
+package Tangence::Meta::Property 0.27;
+class Tangence::Meta::Property :strict(params);
+
+use Syntax::Keyword::Match;
 
 use Tangence::Constants;
-
-use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -60,14 +61,11 @@ Optional. If true, marks that the property is smashed.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
-   my $self = bless \%args, $class;
-   weaken $self->{class};
-   return $self;
-}
+has $class     :param :weak :reader;
+has $name      :param       :reader;
+has $dimension :param       :reader;
+has $type      :param       :reader;
+has $smashed   :param       :reader = 0;
 
 =head1 ACCESSORS
 
@@ -81,12 +79,6 @@ Returns the class the property is a member of
 
 =cut
 
-sub class
-{
-   my $self = shift;
-   return $self->{class};
-}
-
 =head2 name
 
    $name = $property->name
@@ -94,12 +86,6 @@ sub class
 Returns the name of the class
 
 =cut
-
-sub name
-{
-   my $self = shift;
-   return $self->{name};
-}
 
 =head2 dimension
 
@@ -109,12 +95,6 @@ Returns the dimension as one of the C<DIM_*> constants.
 
 =cut
 
-sub dimension
-{
-   my $self = shift;
-   return $self->{dimension};
-}
-
 =head2 type
 
    $type = $property->type
@@ -122,12 +102,6 @@ sub dimension
 Returns the element type as a L<Tangence::Meta::Type> reference.
 
 =cut
-
-sub type
-{
-   my $self = shift;
-   return $self->{type};
-}
 
 =head2 overall_type
 
@@ -140,23 +114,26 @@ a list of the element type.
 
 =cut
 
-sub overall_type
+has $_overall_type;
+
+method overall_type
 {
-   my $self = shift;
-   return $self->{overall_type} ||= do {
+   return $_overall_type ||= do {
       my $type = $self->type;
       my $dim  = $self->dimension;
-      if( $dim == DIM_SCALAR ) {
-         $type;
-      }
-      elsif( $dim == DIM_HASH ) {
-         $self->make_type( dict => $type );
-      }
-      elsif( $dim == DIM_ARRAY or $dim == DIM_QUEUE or $dim == DIM_OBJSET ) {
-         $self->make_type( list => $type );
-      }
-      else {
-         die "Unrecognised dimension $dim for ->overall_type";
+      match( $dim : == ) {
+         case( DIM_SCALAR ) {
+            $type;
+         }
+         case( DIM_HASH ) {
+            $self->make_type( dict => $type );
+         }
+         case( DIM_ARRAY ), case( DIM_QUEUE ), case( DIM_OBJSET ) {
+            $self->make_type( list => $type );
+         }
+         default {
+            die "Unrecognised dimension $dim for ->overall_type";
+         }
       }
    }
 }
@@ -169,17 +146,10 @@ Returns true if the property is smashed.
 
 =cut
 
-sub smashed
-{
-   my $self = shift;
-   return $self->{smashed};
-}
-
 # For subclasses to override if required
-sub make_type
+method make_type
 {
-   shift;
-   return Tangence::Meta::Type->new( @_ );
+   return Tangence::Meta::Type->make( @_ );
 }
 
 =head1 AUTHOR

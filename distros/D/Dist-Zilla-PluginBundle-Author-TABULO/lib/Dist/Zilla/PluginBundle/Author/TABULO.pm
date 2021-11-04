@@ -1,830 +1,958 @@
-use 5.014;  # because we use the 'non-destructive substitution' feature (s///r)
-use strict;
-use warnings;
-package Dist::Zilla::PluginBundle::Author::TABULO; # git description: v0.197-45-g838f7b1
-# vim: set ts=2 sts=2 sw=2 tw=115 et :
-# ABSTRACT: A plugin bundle for distributions built by TABULO
-# BASED_ON: Dist::Zilla::PluginBundle::Author::ETHER
-# KEYWORDS: author bundle distribution tool
+package Dist::Zilla::PluginBundle::Author::TABULO;
+### ex: set ft=perl noai ts=4 sw=4:
 
-our $VERSION = '0.198';
-# AUTHORITY
+our $VERSION = '1.000006';
 
-use Data::Printer;                          # For DEBUG. TODO: Comment this out for a normal release.
-use Scalar::Util                            qw(refaddr reftype);
-use Scalar::Does                              -constants, does => { -as => 'it_does' };
-use List::Util 1.45                         qw(first all any none pairs pairgrep unpairs uniq);
-use List::MoreUtils                         qw(arrayify);
-use Hash::MoreUtils                         qw(slice_grep);
-
-
-
-use Dist::Zilla::PluginBundle::Author::TABULO::Config qw(configuration detect_settings);
-use Dist::Zilla::Util;
+use 5.026; # Indented HEREDOC.
+use Data::Printer qw(p np);
+use Data::Printer qw(p np);
+use List::Util qw(uniq);
 use Module::Runtime qw(require_module use_module);
-use Devel::CheckBin 'can_run';
-use Path::Tiny;
-use CPAN::Meta::Requirements;
-use Term::ANSIColor 'colored';
-eval { +require Win32::Console::ANSI } if $^O eq 'MSWin32';
-use Config;
+use Path::Tiny qw(path);
+use PerlX::Maybe qw(maybe);
 
+# our own modules
+use Pod::Weaver::PluginBundle::Author::TABULO;
+use Pod::Wordlist::Author::TABULO;
+use Zest::Author::TABULO::MungersForHas qw(hm_tabulo);
+use Zest::Author::TABULO::Util::List qw(flat uniq_sort_flat);
+use Zest::Author::TABULO::Util::Mayhap qw(mayhap);
+use Zest::Author::TABULO::Util::Dzil qw(grok_plugins);
 
-# multivalue aliases. name =>  [ @aliases ]
-our %PINFO = (
-  commit_files_from_release   => { multivalue =>1, aka => 'commit_file_from_release',   },
-  copy_files_from_release     => { multivalue =>1, aka => 'copy_file_from_release',     },
-  installers                  => { multivalue =>1, aka => 'installer',                  },
-  never_gather                => { multivalue =>1, aka => 'do_not_gather',              },
-  spellcheck_dirs             => { multivalue =>1, aka => 'spellcheck_dir',             },
-  stopwords                   => { multivalue =>1, aka => 'stopword',                   },
-);
-
-use vars (
-  '%PINFO',         # Will be looked up by mhs_dictionnary() -- which is a general purpose 'has-munger'
-  '%PROPS',         # Will be populated by mhs_dictionnary() -- which is a general purpose 'has-munger'
-  '%mungers',
-);
-
-
-use Banal::Util::Mini           qw( hash_access   inverse_dict  maybe_kv  peek
-                                    tidy_arrayify sanitize_env_var_name   suffixed );
-use Banal::Dist::Util::Pause    qw(pause_config);
-use Banal::Moosy::Mungers       qw(mhs_dictionary mhs_lazy_ro  mhs_fallbacks);
-BEGIN {
-  %mungers = (
-    haz       => [  sub {; mhs_lazy_ro() }             ],
-    haz_bool  => [  sub {; mhs_lazy_ro(isa=>'Bool') }  ],
-    haz_int   => [  sub {; mhs_lazy_ro(isa=>'Int') }   ],
-    haz_str   => [  sub {; mhs_lazy_ro(isa=>'Str') }   ],
-    haz_strs  => [  sub {; mhs_lazy_ro(isa=>'ArrayRef[Str]', traits=>['Array'] ) }  ],
-    haz_hash  => [  sub {; mhs_lazy_ro(isa=>'HashRef',       traits=>['Hash']  ) }  ],
-  );
-  push @{$mungers{$_}},(
-                          sub {; mhs_dictionary( src=> \%PINFO) },
-                          sub {; mhs_fallbacks()                  },
-#                          sub {; mhs_dictionary( dest=>\%PROPS)   },
-                        )  for (sort keys %mungers)
-}
-
-
-
-# satisfy requirements by the consumed banal role : ..::Role::PluginBundle::Easier
-sub _extra_args;
-sub payload;
-
-#use Types::Standard;
-#use Type::Utils qw(enum subtype where class_type);
-use Moose::Util::TypeConstraints qw(enum subtype where class_type);
 use Moose;
-use MooseX::MungeHas { %mungers };
-with  ( 'Banal::Dist::Zilla::Role::PluginBundle::Easier',
-        'Banal::Role::Fallback::Moo',
-);
-use namespace::autoclean;
+with
+  'Dist::Zilla::Role::PluginBundle::Easy',
+  'Dist::Zilla::Role::PluginBundle::Config::Slicer',
+  'Dist::Zilla::Role::PluginBundle::PluginRemover';
+use namespace::clean;
 
-# Forward subroutine declarations (as needed)
-sub _msg;
+#region #=== CONSTANTS ===
 
-
-# plural values (array-ref) expected
-sub kvh_promote_mv(@) {
-  my $fields = ref ($_[0]) eq 'ARRAY' ? shift : [];
-
-  map {;
-    my  ($k, $v)  = ($_->key, $_->value);   # 'pairs' come handy
-    local %_ = (ref($v) eq 'HASH') ? (%$v) : ();
-    my  @nv = tidy_arrayify( @_{@$fields} );  # We flatten a hash slice that gathers any existing values from any of the given fields
-    ($k => [@nv] )
-  } pairs @_
-}
-
-# Scalar values expected
-sub kvh_promote(@) {
-  my $fields = ref ($_[0]) eq 'ARRAY' ? shift : [];
-
-  map {;
-    my  ($k, $v)  = ($_->key, $_->value);   # 'pairs' come handy
-    local %_ = (ref($v) eq 'HASH') ? (%$v) : ();
-    my $nv = first { defined } @_{@$fields};
-    ($_->key, $nv)
-  } pairs @_
-}
-
-
-sub map_name_to_aliases(@) {
-  kvh_promote_mv( [qw(aka alias aliases) ], @_ )
-}
-
-# multivalue aliases. name =>  [ @aliases ]
-our %AKA        =  map_name_to_aliases (%PINFO);
-our %AKA_MV     =  map_name_to_aliases slice_grep { $_{$_}->{multivalue} // 0 } (\%PINFO) ;
-our %MV_ALIASES =  inverse_dict(%AKA);
-
-
-# multivalue aliases
-# our %MV_ALIASES = (
-#   commit_file_from_release  => 'commit_files_from_release',
-#   copy_file_from_release    => 'copy_files_from_release',
-#   installer                 => 'installers',
-#   do_not_gather             => 'never_gather',
-#   spellcheck_dir            => 'spellcheck_dirs',
-#   stopword                  => 'stopwords',
-# );
-
-# TABULO :
-# DZIL wants us to declare multi-value INI parameters like below
-# We declare both singular and plural forms for the same things to reduce hassle.
-sub mvp_multivalue_args {
-  map {;
-    ($_, $_.'_implicit')
-  } (%MV_ALIASES);
-}
-
-
-# our %MV_IMPLICIT  = map {; ($_->key . '_implicit' => $_->value . '_implicit' ) }
-sub mvp_aliases         { +{ %MV_ALIASES } }
-
-
-# plugins that use the network when they run
-sub _network_plugins
-{
-    qw(
-        PromptIfStale
-        Test::Pod::LinkCheck
-        Test::Pod::No404s
-        Git::Remote::Check
-        CheckPrereqsIndexed
-        CheckIssues
-        UploadToCPAN
-        Git::Push
+my %allowed_installers = (
+    MakeMaker                   => 1,
+    'MakeMaker::Awesome'        => 1,
+    ModuleBuild                 => 1,
+    ModuleBuildTiny             => 1,
+    'ModuleBuildTiny::Fallback' => 1,
     );
+my @allowed_installers = grep { $allowed_installers{$_} } sort keys %allowed_installers;
+my @allowed_copy_modes = qw/Regenerate Release Build Build::Filtered None/;
+
+my @allow_dirty = qw(dist.ini Changes);
+my %boilerplate = (
+    distmeta   => [qw(cpanfile Meta.yml META.json)],
+    installer  => [qw(Build.PL Makefile.PL ppport.h)],
+    readme     => [qw(README README.md README.mkdn README.pod)],
+    readme_too => [qw(CODE_OF_CONDUCT CONTRIBUTING LICENCE LICENSE INSTALL)],
+    );
+my @boilerplate = uniq( sort map { @$_ } ( values %boilerplate ) );
+
+my @never_gather = (
+    @boilerplate, qw(
+        TODO
+        inc/ExtUtils/MakeMaker/Dist/Zilla/Develop.pm
+      )
+      );
+
+my @prune_not = map { qr/"$_"/ } qw (
+    \.travis\.yml
+    \.perltidyrc
+    .*/\.gitignore$
+    .*/\.(git)?keep$
+    );
+
+#endregion CONSTANTS
+
+#region: #=== ATTRIBUTES ===
+
+##== DRY mungers for MooseX::MungeHas (see below)
+use MooseX::MungeHas 'is_ro', \&hm_tabulo;
+
+sub mvp_aliases {
+    return +{
+        auto_prereq        => 'auto_prereqs',
+        exclude_filename   => 'exclude_filenames',
+        regenerate         => 'copy',
+        copy_from          => 'copy_mode',
+        git_remote         => 'git_remotes',
+        stopword           => 'stopwords',
+        stopwords_file     => 'stopwords_files',
+        stopwords_provider => 'stopwords_providers',
+        wordlist           => 'stopwords_providers',
+        wordlists          => 'stopwords_providers',
+        };
 }
 
-#
-# NOTE: 'haz' is our shorthand form of 'has' created with the help of 'MooseX::MungeHas' and some of our own craft.
-#
-# It reduces a lot of the noise, which also means you may immediately notice what is going on.
+##== Most of the below options were adapted from various sources,
+##   such as: @DAGOLDEN, @DROLSKY, @ETHER, @KENTNL (MHRIP), @Starter, @Starter::Git
 
-# The specific munger function we are using here 'mhs_lazy_ro_with_fallbacks' implies :
-#   (is=>ro, lazy=1, initargs=>undef)
-#
-# Also, it will automatically create a 'default' subroutine  that will invoke the 'fallback' method (defined below for this class).
-# In this particular case, our 'fallback' method will make use of Config settings, which supports author-specific default values,
-# and falling back to global defaults if necessary. It also supports the notions of :
-#   - a preffered default ('apriori' parameter), which will be tried before going into the fallbak mechanism described above.
-#   - an ultimate default ('def' parameter), which will be used if the Config fallback mechanism could not find an applicable default setting.
-#
-# When present, the 'apriori/mid/def' parameters should be one of:
-#   - a SCALAR value
-#   _ a subroutine reference (which will be invoked to use its return value)
-#   - An reference to an array
-#
-# Also, the fallback method also supports specifying a set of aliases (via 'aka' or 'alias' parameters)
-#
+has archive_dir => (
+    isa     => 'Str',
+    default => 'releases',
+    -doc    => <<~"__EOT__"
+        Passed as the 'directory' option, to [ArchiveRelease] whose docs are quoted below:
+
+        * The 'directory' [name] may begin with ~ (or ~user) to mean your (or some other user's) home directory.
+        * If the directory doesn't exist, it will be created during the BeforeRelease phase.
+        * All files inside this directory will be pruned from the distribution.
+__EOT__
+    );
+
+has authority => (
+    isa     => 'Str',
+    default => 'cpan:TABULO',
+    -doc    => "Specifies the x_authority field for PAUSE.",
+    );
+
+has auto_prereqs => (
+    isa     => 'Bool',
+    default => 1,
+    -doc    => "Indicates whether or not to use [AutoPrereqs].",
+    );
+
+has auto_version => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Indicates whether or not to use [AutoVersion] instead of our standard plugins for version management.",
+    );
+
+has copy => (
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    -doc    =>
+      "Additional files to copy (or regenerate) in addition to those that are already harvested by default. [May be repeated]. Note that the copying may be done from the build or the release, depending on the 'copy_mode' setting. See 'copy_mode'.",
+      );
+
+has copy_mode => (
+    isa     => 'Maybe[Str]',
+    default => 'Release',
+    -doc    => "Determines the 'copy-mode' and hence ultimately the set of plugins used for that purpose. Possible values are  ["
+      . join( ', ', @allowed_copy_modes )
+      . "]. dzil 'regenerate' command will still work. ",
+      );
+
+has copy_not => (
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    -doc    => "Do NOT copy given file(s). [May be repeated].",
+    );
+
+has darkpan => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "For private code; uses [FakeRelease] and fills in dummy repo/bugtracker data.",
+    );
+
+has dist_genre => (
+    isa     => 'Str',
+    default => 'standard',
+    -doc    => <<~"__EOT__"
+        Specifies the 'genre' of the distro. Currently allowed values are: 'standard' (the default) and 'task'.
+
+        This may be used in the future to associate a set behaviours/settings to given genres.
+
+        Currently, the only distinction made is for the 'task' genre, which will result in [TaskWeaver] being used
+        instead of [SurgicalPodWeaver].
+__EOT__
+    );
+
+has exclude_filenames => (
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    -doc    => "Do NOT gather given file(s). [May be repeated].",
+    );
+
+has exclude_match => (
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    -doc    => "Do NOT gather file(s) that match the given pattern(s). [May be repeated].",
+    );
+
+has exec_dir => (
+    isa     => 'Maybe[Str]',
+    default => sub { $_[0]->installer =~ /Module::Build::Tiny/ ? 'script' : undef },
+    -doc    =>
+      "If defined, passed to [ExecDir] as its 'dir' option.  Defaults to 'script' when the installer is [Module::Build::Tiny],undef otherwise, which means the [ExecDir] default will be in effect, and that is 'bin' as of this writing.",
+      );
+
+has fake_release => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    =>
+      "Swaps [FakeRelease] for [UploadToCPAN]. Mostly useful for testing a dist.ini without risking a real release. Note that this can also be achieved by setting the FAKE_RELEASE environment variable (which will have precedence over this option).",
+      );
+
+has has_xs => (
+    isa     => 'Bool',
+    default => sub { glob('*.xs') ? 1 : 0 }, # @ETHER
+    );
+
+has hub => (
+    isa     => 'Maybe[Str]',
+    default => 'github',
+    -doc    =>
+      "The repository 'hub' provider. Currently, other than unsetting to undef, the only supported value, which is also the default, is 'github'. Other providers, such as 'gitlab' or 'bitbucket', may be supported in the future.",
+      );
+
+has git_remotes => (
+    isa     => 'ArrayRef',
+    default => sub { ['origin'] },
+    -doc    => "Where to push after release.",
+    );
+
+has github_issues => (
+    isa     => 'Str',
+    default => 1,
+    -doc    => "Whether or not to use github issue tracker.",
+    );
+
+has installer => (
+    default => 'MakeMaker',
+    -doc    => "The installer to employ. Currently, possible values are: [" . join( ', ', @allowed_installers ) . "].",
+    );
+
+has is_task => ( #DEPRECATED
+    isa     => 'Bool',
+    default => sub { ( $_[0]->dist_genre // '' ) =~ m/^task/i },
+    -doc    => <<~"__EOT__"
+        DEPRECATED. Prefer setting instead, like so:
+
+        [\@Author::TABULO]
+        dist_genre=task
+
+        Identifies this distro as a 'task'.
+
+        Currently, the only distinction is that, for a task, we use [TaskWeaver] instead of [SurgicalPodWeaver].
+__EOT__
+    );
+
+has manage_versions => (
+    isa     => 'Bool',                                                                                                               # adopted from @Starter (also dropping the 'd' in the name)
+    default => 1,
+    -doc    => "Whether or not to manage versioning, which means: providing, rewriting, bumping, munging \$VERSION in sources, ....",
+    );
+
+has no_archive => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Omit the [ArchiveRelease] plugin.",
+    );
+
+has no_copy => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Skip copying files from the build/release : ('Makefile.PL', 'cpanfile',' Meta.json', ...).",
+    );
+
+has no_coverage => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Omit PodCoverage tests -- which are actually done using [Test::Pod::Coverage::Configurable].",
+    );
+
+has no_critic => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Omit [Test::Perl::Critic] tests.",
+
+    );
+
+has no_git => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Bypass all git-dependent plugins.",
+    );
+
+has no_git_commit => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Omit [Git::Commit] and [Git::CommitBuild] and related [Git::Tag] operations.",
+    );
+
+has no_git_commit_build => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Omit [Git::CommitBuild] and related [Git::Tag] operations.",
+    );
 
 
-haz_bool    airplane                      =>( def => 0,     );
-haz_bool    fake_release                  =>( apriori => sub { $ENV{FAKE_RELEASE} }, def => 0, );
-haz_bool    surgical_podweaver            =>( def => 0,     );
-haz_bool    commit_copied                 =>( def => 1, );  # + by TABULO
-haz_bool    verify_phases                 =>( def => 0, );  # + by TABULO
-haz_bool    allow_insecure_operations     =>( def => 0, );  # + by TABULO
-haz_bool    install_release_from_cpan     =>( def => 0, );  # + by TABULO
+has no_git_push => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Omit [Git::Push].",
+    );
+
+has no_git_impact => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => <<~"_EOT_"
+Omit any [Git:*] plugins that may modify the vcs repository state, such as : [Git::Commit], [Git::CommitBuild], [Git::Tag], [Git::Push] and the like.
+Git plugins that are read-only, such as [Git::GatherDir] or [Git::Check] shouldn't be effected by this option.
+_EOT_
+    );
+
+has no_github => (
+    isa     => 'Bool',
+    default => sub { ( $_[0]->hub // '' ) !~ m/^github$/ },
+    -doc    =>
+      "Do not assume that the repository is backed by 'github', which currently means abstaining from using [GithubMeta] and feeding fake values to [MetaResources] and [Bugtracker] -- which you may separately override, by the way, thanks to our[\@Config::Slicer] role.",
+      );
+
+has no_minimum_perl => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Omit [Test::MinimumVersion] tests.",
+    );
+
+has no_pod_coverage => (
+    isa     => 'Bool',
+    default => sub { $_[0]->no_coverage // 0 },
+    -doc    => "Skip [PodCoverage] tests -- Well, [Test::Pod::Coverage::Configurable] tests, actually.",
+    );
+
+has no_pod_spellcheck => (
+    isa     => 'Bool',
+    default => sub { $_[0]->no_spellcheck // 0 },
+    -doc    => "Skip [Test::PodSpelling] tests.",
+    );
+
+has no_portability_check => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Skip [Test::Portability] tests.",
+    );
+
+has no_sanitize_version => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "When set => We won't prefer [RewriteVersion::Sanitized] over [RewriteVersion], which we normally do.",
+    );
+
+has no_spellcheck => (
+    isa     => 'Bool',
+    default => 0,
+    -doc    => "Omit [Test::PodSpelling] tests.",
+    );
+
+has pod_coverage_class => (
+    isa  => 'Maybe[Str]',
+    -doc => "If defined, passed to [Test::Pod::Coverage::Configurable] as its 'class' option.",
+    );
+
+has pod_coverage_skip => (
+    isa  => 'Maybe[ArrayRef]',
+    -doc => "If defined, passed to [Test::Pod::Coverage::Configurable] as its 'skip' option.",
+    );
+
+has pod_coverage_trustme => (
+    isa  => 'Maybe[ArrayRef]',
+    -doc => "If defined, passed to [Test::Pod::Coverage::Configurable] as its 'trustme' option.",
+    );
+
+has pod_coverage_also_private => (
+    isa  => 'Maybe[ArrayRef]',
+    -doc => "If defined, passed to [Test::Pod::Coverage::Configurable] as its 'also_private' option.",
+    );
+
+has tag_format => (
+    isa     => 'Str',
+    default => 'repo-release-v%V%t',
+    -doc    => <<~"__EOT__"
+The tag format passed to [Git::Tag] after committing sources.
+The default is 'repo-release-v%V%t', which may be prefixed by some other string.
+The idea was copied from \@DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
+__EOT__
+    );
+
+has tag_format_dist => (
+    isa     => 'Str',
+    default => 'dist-release-v%V%t',
+    -doc    => <<~"__EOT__"
+The tag format passed to [Git::Tag] after committing the build.
+The default is 'dist-release-v%V%t', which may be prefixed by some other string.
+The idea was copied from \@DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
+__EOT__
+    );
+
+has stopwords => ( ## ALIAS: stopword
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    -doc    =>
+      "Additional stopword(s) for Pod::Spell tests. [May be repeated]. See also: 'stopword_files' and 'wordlists' for alternative mechanisms of adding stopwords.",
+      );
+
+has stopwords_files => ( ## ALIAS: stopwords_file
+    isa     => 'ArrayRef',
+    default => sub { [ grep -e, qw(stopwords) ] },
+    -doc    =>
+      "File(s) that describe additional stopword(s) for Pod::Spell tests. [May be repeated]. See also: 'stopwords' and 'wordlists' for alternative mechanisms of adding stopwords.",
+      );
+
+has stopwords_providers => ( ## ALIAS: wordlist
+    isa     => 'ArrayRef',
+    default => sub { [q/Pod::Wordlist::Author::TABULO/] },
+    -doc    => <<~"__EOT__"
+Perl module(s) for contributing additional stopword(s) for spelling tests. [May be repeated].
+Note that given module(s) would need to expose the same API as L<Pod::Wordlist>.
+See also: 'stopwords' and 'stopword_files' for alternative mechanisms of adding stopwords.
+__EOT__
+    );
+
+has version_regexp => (
+    isa     => 'Str',
+    default => '^(?:[-\w]+)?release-(.+)$',
+    -doc    => "The version regex that corresponds to the 'tag_format'.",
+    );
+
+has weaver_config => (
+    isa     => 'Str',
+    default => '@Author::TABULO',
+    -doc    => "Specifies a Pod::Weaver bundle to be used.",
+    );
 
 
-haz         server                        =>( def => 'github',  isa => enum([qw(github bitbucket gitmo p5sagit catagits none)]),);
-haz_str     licence                       =>( def =>  sub { $_[0]->spelling eq 'GB'  ? 'LICENCE' : 'LICENSE' }, aka=>[qw( license) ], );
-sub         license { shift->licence(@_) }
-haz_str     max_target_perl               =>( def => '5.006',                     aka=>    'Test::MinimumVersion.max_target_perl',  );
-haz_str     portability_options           =>( def => '',                          aka=>[qw( Portability.options   Test::Portability.options )],);
-haz_str     spelling                      =>( def => 'US',  );     # + by TABULO
-haz_str     static_install_mode           =>( def => 'no',                        aka =>   'StaticInstall.mode',  );
-haz_str     weaver_config                 =>( def => sub { $_[0]->_bundle_ini_section_name }, );
-
-
-# Changes file  handling
-haz         nextrelease_entry_columns     =>( def => 10,        isa => subtype('Int', where { $_ > 0 && $_ < 20 }),
-  aka=>[qw( changes_version_columns
-)],);
-
-haz_str     nextrelease_entry_time_zone  =>( def =>'UTC',
-  aka=>[qw( changes_version_time_zone
-            changes_version_timezone
-            nextrelease_entry_timezone
-            NextRelease.time_zone
-)],);
-
-haz_str     nextrelease_entry_format     =>(
-  def=>sub {; '%-' . ($_[0]->nextrelease_entry_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T'     },
-  aka=>[qw( changes_version_format
-            NextRelease.format )], );
-
-# $VERSION management
-haz_bool    bump_version_global           =>( def => 1,
-  aka=>[qw( BumpVersionAfterRelease.global
-            BumpVersionAfterRelease::Transitional.global )],); # + by TABULO
-
-haz_str     fallback_version_provider     =>( def => 'Git::NextVersion',
-  aka=>    'RewriteVersion::Transitional.fallback_version_provider',  );
-
-haz_bool    rewrite_version_global        =>( def => 1,
-  aka=>[qw( RewriteVersion.global
-            RewriteVersion::Transitional.global ) ],);  # + by TABULO
-
-haz_str     version_regexp                =>( def => '^v([\d._]+)(-TRIAL)?$',
-  aka=>[qw( RewriteVersion::Transitional.version_regexp
-            Git::NextVersion.version_regexp )], );
-
-
-# VCS options, added by TABULO [ 2018-01-16 ]
-haz_str     tag_format                    => (  def => 'v%v',           aka => 'Git::Tag.tag_format',     );
-haz_str     tag_message                   => (  def => 'v%v%t',         aka => 'Git::Tag.tag_message',    );
-haz_str     release_snapshot_commit_msg   => (  def => '%N-%v%t%n%n%c', );
-
-# Git information (normally detected automatically).  + by TABULO [ 2018-01-16 ]
-haz_str     git_remote                    => ( def => 'origin',  );
-haz_str     git_branch                    => ( def => 'master',  );
-haz_str     git_remote_branch             => ( def => sub {;  shift->git_branch // 'master' }, );
-
-# Boolean switches for VCS (git, etc) checks,. + by TABULO [ 2018-06-24 ]
-haz_bool    check_vcs                     =>( );
-haz_bool    check_vcs_more                =>( def => sub {;  $_[0]->check_vcs //  !($_[0]->fake_release // 0) },   );
-
-# The below are UNDOCUMENTED for the moment:
-haz_bool    check_vcs_clean               =>( def => sub {;  $_[0]->check_vcs // 1 },                              );
-haz_bool    check_vcs_clean_initial       =>( def => sub {;  $_[0]->check_vcs_clean // 1 },                        );
-haz_bool    check_vcs_clean_after_tests   =>( def => sub {;  $_[0]->check_vcs_clean // 1 },                        );
-
-haz_bool    check_vcs_merge_conflicts     =>( def => sub {;  $_[0]->check_vcs_more // 1 },                         );
-haz_bool    check_vcs_correct_branch      =>( def => sub {;  $_[0]->check_vcs_more // 1 },                         );
-haz_bool    check_vcs_remote_branch       =>( def => sub {;  $_[0]->check_vcs_more // 1 },                         );
-
-# NOTE: no support yet for depending on a specific version of an installer plugin --
-# but [PromptIfStale] generally makes that unnecessary
-haz_strs    commit_file_after_release     =>(
-  sort      =>1,
-  blankers  =>'none',
-  def       => sub { [] },
-  aka       => { commit_files_after_release => 'elements' },
-);
-
-haz_strs    copy_file_from_release        =>(
-  sort      =>1,
-  blankers  =>'none',
-  def       => sub { [] },
-  aka       => { copy_files_from_release => 'elements' },
-);
-
-haz_strs    do_not_gather                 =>(
-  sort      =>1,
-  blankers  =>'none',
-  def       => sub { [] },
-  aka       => { never_gather => 'elements' },
-);  # + by TABULO
-
-haz_strs    installer                     =>(
-  blankers  =>'none',
-  def       => sub { [] },
-  aka       => { installers => 'elements' },
-);
-
-#sub         spellcheck_dir                    { $_[0]->spellcheck_dirs }
-haz_strs    spellcheck_dirs                 =>( def => sub { [ qw(bin examples lib script t xt) ] },
-                                                sort=>1, blankers=>'none',
-  aka =>   'spellcheck_dir',
-);
-
-
-#sub         stopword                          { $_[0]->stopwords }
-haz_strs    stopwords                       =>( def => sub { [qw(irc)] },
-                                                sort=>1, blankers=>'none',
-  aka =>   'stopword',
-); # + by TABULO
-
-
-around commit_files_after_release => sub {
-    my $orig    = shift; my $self = shift;
-    my $cpfr    = $self->copy_files_from_release;
-    my @extras  = arrayify ($self->commit_copied ? $cpfr : [] );
-    my $oresult = $self->$orig(@_);
-
-    [ sort(uniq((grep { defined $_} arrayify( $oresult, @extras)))) ];
-};
-
-
-# Note: no support yet for depending on a specific version of the plugin --
-# but [PromptIfStale] generally makes that unnecessary
-haz_bool  _keen_on_static_install             =>( def => 0,             aka => 'keen_on_static_install',  );
-haz_hash  _extra_args                         =>( def => sub { +{} },   aka => 'extra_args',              );
-
-
-# The following attributes are NOT allowed to have AUTHOR SPECIFIC fallbacks
-# 'author_specific => 0' allows us to avoid an infinte loop...
-#   -- because the usual fallbacks include known_author_prefs which depend on 'authority' ...
-haz_str   authority                           =>( def => 'cpan:TABULO', author_specific => 0, aka => 'Authority.authority', );
-haz_bool  _no_author_specific_prefs           =>( def => 0,             author_specific => 0, aka => 'no_author_specific_preferences',);
-haz_hash  _known_authors                      =>( def => sub { +{} },   author_specific => 0, aka => 'known_authors',        );
-
-
-# The following attributes are NOT allowed to have FALLBACKS at all (because they provide the basis for the fallback mechanism)
-haz_hash  _defaults                           =>( default => sub {  shift->_config('defaults') // {}  },                  );
-haz_hash  _settings_detected                  =>( default => sub { +{ detect_settings(plugin_bundle => shift) } },        );
-haz_hash  _settings                           =>( default => sub { shift->_config() //  +{} },  );
-haz_hash  _author_specific_prefs              => (
-  default => sub {
-    my  $o = $_[0];
-    ( $o->_no_author_specific_prefs ? +{} : hash_access( $o->_known_authors, $o->authority, 'prefs') ) // {}
-  },
-);
-
-# The following attributes currently BYPASS the implicit FALLBACK mechanism (for lack of a simple way)
-# haz_bool static_install_dry_run => (
-#   default => sub {
-#     my  $self = shift;
-#     # only set x_static_install using auto mode for distributions where the authority is known to be 'keen on' static install (e.g. ETHER)
-#     # (for all other distributions, set explicitly to on or off)
-#     # Note that this is just the default; if a dist.ini changed these values, ConfigSlicer will apply it later
-#     my $mode  = $self->static_install_mode;
-#     my $keen  = $self->_keen_on_static_install // 0;
-#     my  $r    = $self->_resolve( 'StaticInstall.dry_run', 'static_install_dry_run' );
-#         $r    = undef    if (defined $r) && ($r eq '');
-#         $r  //= (defined $mode) && ($mode eq 'auto') ? !$keen : undef;
-#         $r  //= 0;
-#     return $r;
-#     },
-# );
-
-# The following attributes currently BYPASS the implicit FALLBACK mechanism (for lack of a simple way)
-haz_bool static_install_dry_run => (
-  def => sub {
-    my  $self = shift;
-    # only set x_static_install using auto mode for distributions where the authority is known to be 'keen on' static install (e.g. ETHER)
-    # (for all other distributions, set explicitly to on or off)
-    # Note that this is just the default; if a dist.ini changed these values, ConfigSlicer will apply it later
-    !($self->_keen_on_static_install // 0);
+##== PRIVATE attributes
+has _fake_release => (
+    isa     => 'Bool',
+    default => sub {
+        exists $ENV{FAKE_RELEASE} ? !!$ENV{FAKE_RELEASE} : $_[0]->fake_release // 0 || $_[0]->darkpan;
     },
-);
+    -access => 'private',
+    -doc    => "->fake_release (effective), also taking into account the \%ENV and other parameters.",
+    );
 
+has _stopwords => (
+    traits  => ['Array'],
+    isa     => 'ArrayRef',
+    builder => '_build__stopwords',
+    handles => {
+        _all_stopwords => 'elements',
+      },
+    -access => 'private',
+    -doc => "->stopwords (effective): also taking into account all valid sources: ->stopwords, ->stopwords_files, ->stopwords_providers, ...",
+    );
 
-around static_install_dry_run => sub {
-  my ($orig, $self) = (shift, shift);
-  my $mode  = $self->static_install_mode // '';
-  my $r     = $self->$orig(@_);
-  $r        = ($mode eq 'auto') ? $r : 0;
-  $r      //= 0;
+has _harvested_files => (
+    traits  => ['Array'],
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    handles => {
+        _all_harvested_files   => 'elements',
+        _add_harvested_files   => 'push',
+        _clear_harvested_files => 'clear',
+      },
+    -access => 'private',
+    -doc    =>
+      "List of files that are effectively 'harvested', i.e. default candidates to be copied from the build/release. This list is dynamically built during bundle configuration.",
+      );
+
+has _installer_files => (
+    traits  => ['Array'],
+    isa     => 'ArrayRef',
+    default => sub { [ $_[0]->installer =~ /MakeMaker/ ? 'Makefile.PL' : 'Build.PL' ] },
+    -access => 'private',
+    -doc    =>
+      "List of files that are expected to be generated for the given installer. (e.g. : Makefile.PL, Build.PL, ...).  TODO: handle 'ppport.h' and equivalent.",
+      );
+
+has _plugins => (
+    traits  => ['Array'],
+    isa     => 'ArrayRef',
+    builder => '_build_plugins',
+    -access => 'private',
+    -doc    => "The roster on which we prepare our plugin configuration.",
+    );
+
+has _target_branches => (
+    traits  => ['Array'],
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    handles => {
+        _all_target_branches   => 'elements',
+        _add_target_branches   => 'push',
+        _clear_target_branches => 'clear',
+      },
+    -access => 'private',
+    -doc    =>
+      "List of branches that will become targets for [Git::Push]",
+      );
+
+#region: BUILDARGS and co: copied/adapted from: @DROLSKY
+
+my @array_params = grep { !/^_/ } map { $_->name }
+  grep {
+      $_->has_type_constraint
+      && ( $_->type_constraint->is_a_type_of('ArrayRef') || $_->type_constraint->is_a_type_of('Maybe[ArrayRef]') )
+  } __PACKAGE__->meta->get_all_attributes;
+
+sub mvp_multivalue_args {
+    return @array_params;
+}
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+
+    my $p = $class->$orig(@_);
+
+    my %args = ( %{ $p->{payload} }, %{$p} );
+
+    for my $key (@array_params) {
+        if ( $args{$key} && !ref $args{$key} ) {
+            $args{$key} = [ delete $args{$key} ];
+        }
+
+        # $args{$key} //= [];
+    }
+
+    return \%args;
 };
 
+#endregion @DROLSKY
 
 
-# "PROTECTED" METHODS (OK to use/override in inherited classes)
-sub _bundle_ini_section_name { $_[0]->_config('bundle', 'ini_section_name')  }
-sub _pause_config { shift; pause_config(@_) } # return username, password from ~/.pause
-sub _config { shift; configuration( @_) }       # Retrieve a setting, to ease sub-classing and such.
+#region #== ATTRIBUTE BUILDERS ==
 
-# Below are computed directly from settings and also possibly depend on state.
-#   $detected : we try to auto-detect some defaults from the environment or the context
-#   such as the repository 'server'
-sub _fallback_settings  { # required by C<Banal::Role::Fallbacks>
+sub _build__stopwords {
+    my $self = shift;
+
+    my @teachers;
+    push @teachers, map { require_module $_ ? $_ : () } @{ $self->stopwords_providers };
+    push @teachers, map { path($_) // () } @{ $self->stopwords_files };
+    push @teachers, join( ' ', @{ $self->stopwords // [] } );
+
+    my $lexicon = Pod::Wordlist::Author::TABULO->new();
+    $lexicon->learn_stopwords_from(@teachers);
+    return [ sort keys %{ $lexicon->wordlist } ];
+}
+
+#endregion
+
+#region #== DYNAMIC ATTRIBUTES (recomputed on each call) ==
+sub _all_git_remotes {
     my $self  = shift;
-    my %opt = %{ (ref($_[0]) eq 'HASH') ? shift : +{} };
-       %opt = (%opt, @_);
-    my (%res, @src);
-
-    # %ENV hash wins over all of the others, unless we are asked not to include it in the bunch.
-    unless ( $opt{'no_env'} ) {
-      my $pfx   = $opt{env_key_prefix} // 'DZIL_';
-      $res{source_opts}{refaddr \%ENV}{map_keys}  ||=  sub { map {; sanitize_env_var_name($pfx  . uc $_)  } @_ };
-      push @src, \%ENV;
-    }
-
-    # Then comes the rest of them... Some of them (like payload) make sense only for OBJECT invocation, while others
-    # may also make sense in a CLASS invocation context.
-    push @src, $self->payload()                 if $opt{payload} && ref $self;
-    push @src, $self->_author_specific_prefs()  if $opt{author_specific}; # depends on state.
-    push @src, $self->_defaults                 if $opt{defaults} // $opt{generic};
-    push @src, $self->_settings_detected()      if $opt{detected} // $opt{generic};
-    push @src, $self->_settings()               if $opt{settings} // $opt{generic};
-
-    $res{sources} = [ grep { defined } arrayify( @src ) ];
-
-    return wantarray ? (%res) : \%res;
+    uniq ( split( ' ', join( ' ',
+        grep { defined $_ && $_ }
+        flat $self->git_remotes
+    )))
 }
 
+sub _files_to_copy { # from build (or release)
+    my $self    = shift;
+    my @include = uniq(
+        sort @{ $self->_harvested_files },
+        @{ $self->copy }, # extras requested via "dist.ini"
+        @_                # extras requested via passed arguments
+        );
+    my @exclude = uniq( sort( @{ $self->copy_not } ) );
+    my @res     = grep {
+        my $item = $_; not grep { $item eq $_ } @exclude
+    } @include;
+    [ uniq( sort(@res) ) ];
+}
+
+sub _allow_dirty_on_release_commit {
+    my @res = uniq_sort_flat(
+        @allow_dirty,
+        $boilerplate{readme}, # Readme.* may be directly harvested under dist-root/ (not copied from build/)
+        $_[0]->_files_to_copy,
+        @_                    # extras requested via passed arguments
+        );
+    [ grep -e, @res ];
+}
+
+sub _files_to_exclude { # files that might be in the repository, but that should not be gathered
+    [ uniq_sort_flat( @never_gather, $_[0]->_files_to_copy, $_[0]->exclude_filenames ) ];
+}
+
+#endregion DYNAMIC ATTRIBUTES
+
+#endregion ATTRIBUTES
+
+#region: #== UTILITY METHODS ==
+
+sub payload_item {
+    my ( $self, $key ) = (@_);
+    exists $self->payload->{$key} ? $self->payload->{$key} : undef;
+}
+
+#endregion (UTILITY METHODS)
 
 
-sub BUILD
-{
+#region: #=== MEAT ===
+
+sub configure {
     my $self = shift;
-
-    # say STDERR 'Here is my humble self : ' . np $self;
-
-    if ($self->airplane)
-    {
-        warn _msg ( colored('building in airplane mode - plugins requiring the network are skipped, and releases are not permitted', 'yellow'));
-        # doing this before running configure means we can be sure we update the removal list before
-        # our _removed_plugins attribute is built.
-        push @{ $self->payload->{ $self->plugin_remover_attribute } }, $self->_network_plugins;
-    }
+    $self->_check;
+    $self->add_plugins( @{ $self->_plugins } );
 }
 
-
-
-sub check
-{
+sub _check {
     my $self = shift;
-    my @installers = tidy_arrayify( $self->installers );
+    my $name = $self->name;
 
-    warn _msg 'no "bash" executable found; skipping Run::AfterBuild command to update .ackrc'
-        if not $INC{'Test/More.pm'} and not $self->_detected_bash;
-
-    # NOTE! since the working directory has not changed to $zilla->root yet,
-    # if running this code via a different mechanism than dzil <command>, file
-    # operations may be looking at the wrong directory! Take this into
-    # consideration when running tests!
-
-    my $has_xs = $self->_detected_xs;
-    warn _msg 'XS-based distribution detected.' if $has_xs;
-    die  _msg 'no Makefile.PL found in the repository root: this is not very nice for contributors!'
-        if $has_xs and not -e 'Makefile.PL';
-
-    # check for a bin/ that should probably be renamed to script/
-    warn _msg colored('bin/ detected - should this be moved to script/, so its contents can be installed into $PATH?', 'bright_red')
-        if -d 'bin' and grep { $_ eq 'ModuleBuildTiny' } $self->installers;
-
-    warn _msg colored('You are using [ModuleBuild] as an installer, WTF?!', 'bright_red')
-        if any { $_->isa('Dist::Zilla::Plugin::ModuleBuild') }
-            map { Dist::Zilla::Util->expand_config_package_name($_) } @installers;
-
-    # this is better than injecting a perl prereq for 5.008, to allow MBT to
-    # become more 5.006-compatible in the future without forcing the distribution to be re-released.
-    die _msg 'Module::Build::Tiny should not be used in distributions that are targeting perl 5.006!'
-        if  any { /ModuleBuildTiny/ } @installers and ($self->max_target_perl // 0) < '5.008';
-
-    warn _msg colored('.git is missing and META.json is present -- this looks like a CPAN download rather than a git repository. You should probably run '
-            . (-f 'Build.PL' ? 'perl Build.PL; ./Build' : 'perl Makefile.PL; make') . ' instead of using dzil commands!', 'yellow')
-        if not -d '.git' and -f 'META.json' and not $self->_plugin_removed('Git::GatherDir');
-
-    my $server = $self->server // '';
-    warn _msg colored(
-      "server = '$server': recommend instead using server = github and GithubMeta.remote = '$server' with a read-only mirror", 'yellow')
-        if $server ne 'github' and $server ne 'none';
-
-    return $self;
+    # check: installer support status
+    my $installer = $self->installer;
+    die "Unsupported installer $installer\n"
+      unless $allowed_installers{$installer};
+    return 1;
 }
 
-sub configure
-{
-    my  $self = shift->check(@_);
+sub _build_plugins {
+    my ($self) = @_;
+    my @plugins;
+    for my $p ( $self->_prepare_plugins ) {
 
-    # some local variables for handier and faster access.
-    my  $server                   = $self->server // '';
-    my  $examples_finder_name     = $self->_bundle_ini_section_name . '/Examples';
-    my  $licence                  = $self->license;
-    my  $surgical                 = $self->surgical_podweaver;
+        # CODE references are OK (though that would rarely be needed)
+        push @plugins, ref $p eq 'CODE' ? $p->($self) : $p;
+    }
+    [@plugins];
+}
 
-    my  @copy_files_from_release  = tidy_arrayify ( $self->copy_files_from_release );
-    my  @installers               = tidy_arrayify ( $self->installers );
-    my  @never_gather             = tidy_arrayify ( $self->never_gather );
-    my  @stopwords                = tidy_arrayify ( $self->stopwords );
+sub _plug__CopyFiles {
+    my ($self) = @_;
 
-    my  $static_install_mode      = $self->static_install_mode    // '';
-    my  $static_install_dry_run   = $self->static_install_dry_run // 0;
-    my  $v; # used in various places below in order to hold temporary values.
+    my @plugins;
+    my sub plugin { push @plugins, grok_plugins(@_) }
 
-    my  $d; # $d is for DEBUGGING
-    my  @d;
+    my @files_to_copy = flat $self->_files_to_copy;
+    my $no_copy       = $self->no_copy;
 
-    # say STDERR 'Here is my humble self AGAIN (during configure) : ' . np $self;
-    # say STDERR 'Stopwords are   : '   . np @stopwords;
-    # say STDERR 'Installers are  : '  . np @installers;
-    # say STDERR 'Server is       : '  . "'$server'";
+    for ( $self->copy_mode // () ) {
+        last unless @files_to_copy;
+        if ( $no_copy || m/Regenerate$/i ) {
+            plugin 'Regenerate' => { filename => [@files_to_copy] }; # Allows `dzil regenerate` (no copying during normal flows)
+            last;
+        }
+        if (m/Release$/i) {
+            plugin 'CopyFilesFromRelease'       => { filename => [@files_to_copy] };
+            plugin 'Regenerate::AfterReleasers' => { plugin   => $self->name . '/CopyFilesFromRelease' };
+        } elsif (m/Build::?Filtered$/i) {
+            plugin 'CopyFilesFromBuild::Filtered' => { copy => [@files_to_copy] };
+        } elsif (m/Build$/i) {
+            plugin 'CopyFilesFromBuild' => { copy => [@files_to_copy] };
+        } elsif (m/(^|none)$/i) {
 
-    my @plugins = (
+            # Noop.
+        } else {
+            die "Illegal file-copy mode: '$_'";
+        }
+    }
+    @plugins;
+}
 
-        # TAU : Just in case the name is not set in 'dist.ini'
-        'NameFromDirectory',
+sub _plug__Weaver {
+    my ($self) = @_;
+    $self->is_task
+      ? 'TaskWeaver'
+      : [
+          'SurgicalPodWeaver' => {
+              maybe
+              config_plugin      => $self->weaver_config,
+              replacer           => 'replace_with_comment',
+              post_code_replacer => 'replace_with_nothing',
+          }
+          ];
+}
 
-        # VersionProvider
-        # see [@Git::VersionManager]
+sub _plug__GitCommit__sourcesAsReleased {
+    # Commit sources and generated files (as released) + tag the release
+    my ($self, $label) = (shift, shift // 'sourcesAsReleased');
+    return if $self->no_git || $self->no_git_impact || $self->no_git_commit;
 
-        # BeforeBuild
-        # [ 'EnsurePrereqsInstalled' ], # FIXME: use options to make this less annoying!
-        [ 'PromptIfStale' => 'stale modules, build' => { phase => 'build', module => [ $self->meta->name ] } ],
-        [ 'PromptIfStale' => 'stale modules, release' => { phase => 'release', check_all_plugins => 1, check_all_prereqs => 1 } ],
-
-        # ExecFiles
-        (-d ($self->payload->{'ExecDir.dir'} // 'script') || any { /^ExecDir\./ } keys %{ $self->payload })
-            ? [ 'ExecDir'       => { dir => 'script' } ] : (),
-
-        # Finders
-        [ 'FileFinder::ByName'  => Examples => { dir => 'examples' } ],
-
-        # Gather Files
-
-        [ 'Git::GatherDir'      => { ':version' => '2.016',
-                                      include_dotfiles => $self->_resolve(qw( Git::GatherDir.include_dot_files include_dot_files) ) // 1 ,
-                                      @never_gather ? ( exclude_filename => \@never_gather) : ()
-                                    } ],
-
-        qw(MetaYAML MetaJSON Readme Manifest),
-        [ 'License'             => { ':version' => '5.038', filename => $self->licence } ],
-        [ 'GenerateFile::FromShareDir' => 'generate CONTRIBUTING' => { -dist => $self->_config('bundle', 'dist_name'), -filename => 'CONTRIBUTING', has_xs => $self->_detected_xs } ],
-        [ 'InstallGuide'        => { ':version' => '1.200005' } ],
-
-        [ 'Test::Compile'       => { ':version' => '2.039', bail_out_on_fail => 1, xt_mode => 1,
-            script_finder => [qw(:PerlExecFiles ), $examples_finder_name   ] } ],
-        [ 'Test::NoTabs'        => { ':version' => '0.08', finder => [qw(:InstallModules :ExecFiles), $examples_finder_name, qw(:TestFiles :ExtraTestFiles)] } ],
-        [ 'Test::EOL'           => { ':version' => '0.17', finder => [qw(:InstallModules :ExecFiles), $examples_finder_name, qw(:TestFiles :ExtraTestFiles)] } ],
-        'MetaTests',
-        [ 'Test::CPAN::Changes' => { ':version' => '0.012' } ],
-        'Test::ChangesHasContent',
-        [ 'Test::MinimumVersion' => { ':version' => '2.000003', maybe_kv(max_target_perl => $self->max_target_perl) } ], # ETHER had 5.006
-        [ 'PodSyntaxTests'      => { ':version' => '5.040' } ],
-        [ 'PodCoverageTests'    => { ':version' => '5.040' } ],
-        [ 'Test::PodSpelling'   => { ':version' => '2.006003',
-                                     ( @stopwords ? ( stopwords => [ @stopwords ] ) : () ),
-                                     directories => [qw(bin examples lib script t xt)] }
-        ],
-
-        #[Test::Pod::LinkCheck]     many outstanding bugs
-        ($ENV{CONTINUOUS_INTEGRATION} ? () : [ 'Test::Pod::No404s' => { ':version' => '1.003' } ] ),
-        [ 'Test::Kwalitee'      => { ':version' => '2.10', filename => 'xt/author/kwalitee.t' } ],
-        [ 'MojibakeTests'       => { ':version' => '0.8' } ],
-        [ 'Test::ReportPrereqs' => { ':version' => '0.022', verify_prereqs => 1,
-            version_extractor => ( ( any { $_ ne 'MakeMaker' } @installers) ? 'Module::Metadata' : 'ExtUtils::MakeMaker' ),
-            include => [ sort ( qw(autodie JSON::PP Sub::Name YAML), $self->_plugin_removed('PodCoverageTests') ? () : 'Pod::Coverage' ) ] } ],
-
-        [ 'Test::Portability'   =>  { ':version' => '2.000007',
-                                      # options => 'test_dos_length = 0, test_one_dot = 0',
-                                      ( ($v = ($self->portability_options // ''))
-                                         ? (options => $v)
-                                         : ()
-                                      )
-                                    }],
-        [ 'Test::CleanNamespaces' => { ':version' => '0.006' } ],
-
-
-        # Munge Files
-        [ 'Git::Describe'       => { ':version' => '0.004', on_package_line => 1 } ],
-        [   # Weave POD ( possibly in a 'surgical' fashion)
-            ($surgical ? 'SurgicalPodWeaver' : 'PodWeaver') => {
-                $surgical ? () : ( ':version' => '4.005' ),
-                -f 'weaver.ini' ? () : ( config_plugin => $self->weaver_config ),
-                replacer => $self->_resolve(      ( $surgical ? qw( SurgicalPodWeaver.replacer ) : () ),
-                                                qw( PodWeaver.replacer ), # checked in any case.
-                                            ) // 'replace_with_comment',
-                post_code_replacer => $self->_resolve(      ( $surgical ? qw( SurgicalPodWeaver.post_code_replacer ) : () ),
-                                                qw( PodWeaver.post_code_replacer ), # checked in any case.
-                                            ) // 'replace_with_nothing',
+    (
+        [ "Git::Commit/$label" => {
+            add_files_in => '/', # add harvested files (README.md, LICENSE, ..) upon initial creation.
+            mayhap
+            allow_dirty => $self->_allow_dirty_on_release_commit,
+            commit_msg => 'v%V%n%n%c', # differs from @DAGOLDEN
             }
         ],
 
-        # Metadata
-        ( $server =~ /^github$/i )  ? [ 'GithubMeta' => { ':version' => '0.54', homepage => 0, issues => 0 } ] : (),
-        [ 'AutoMetaResources'   => { 'bugtracker.rt' => 1,
-              ( $server !~ /^(github|custom|none)$/i )
-            ? ( "repository.${server}" => ( $self->_resolve("server_amr_opts_${server}") // 1 ) )
-            : ()
-        } ],
-
-        [ 'Authority'           => { ':version' => '1.009',
-                                      authority => $self->authority,
-                                      do_munging => ( $self->_resolve('Authority.do_munging') // 0 ),
-                                      locate_comment => ( $self->_resolve('Authority.locate_comment') // 0 ),
-                                    }
-        ],
-        [ 'MetaNoIndex'         =>  { directory =>  [ uniq ( qw(t xt), grep { -d } @{ $self->_resolve_mv('MetaNoIndex.directory') } ) ],
-                                    },
-        ],
-        [ 'MetaProvides::Package' => { ':version' => '1.15000002', finder => ':InstallModules', meta_noindex => 1, inherit_version => 0, inherit_missing => 0 } ],
-        'MetaConfig',
-        [ 'Keywords'            => { ':version' => '0.004' } ],
-        ($Config{default_inc_excludes_dot} ? [ 'UseUnsafeInc' => { dot_in_INC => 0 } ] : ()),
-        # [Git::Contributors]
-        # [StaticInstall]
-
-        # Register Prereqs
-        # (MakeMaker or other installer)
-        [ 'AutoPrereqs'         => { ':version' => '5.038' } ],
-        [ 'Prereqs::AuthorDeps' => { ':version' => '0.006', relation => 'suggests' } ],
-        [ 'MinimumPerl'         => { ':version' => '1.006', configure_finder => ':NoFiles' } ],
-        [ 'Prereqs' => pluginbundle_version => {
-                '-phase' => 'develop', '-relationship' => 'recommends',
-                $self->meta->name => $self->VERSION,
-            } ],
-        ($self->surgical_podweaver ? [ 'Prereqs' => pod_weaving => {
-                '-phase' => 'develop', '-relationship' => 'suggests',
-                'Dist::Zilla::Plugin::SurgicalPodWeaver' => 0
-            } ] : ()),
-
-        # Install Tool (some are also Test Runners)
-        @installers,   # options are set lower down, via %extra_args
-
-        # we prefer this to run after other Register Prereqs plugins
-        [ 'Git::Contributors'   => { ':version' => '0.029', order_by => 'commits' } ],
-
-        # must appear after installers; also note that MBT::*'s static tweak is consequently adjusted, later
-        [ 'StaticInstall'       => { ':version' => '0.005', mode => $static_install_mode, dry_run => $static_install_dry_run } ],
-
-        # Test Runners (load after installers to avoid a rebuild)
-        [ 'RunExtraTests'       => { ':version' => '0.024' } ],
-
-        # After Build
-        'CheckSelfDependency',
-
-          # Update '.ackrc' (TAU: actually, no longer needed since ack v2.16, ... So it defaults to doing nothing)
-        ( $self->_detected_bash &&  ( $self->_resolve('update_ackrc_after_build') // 0 ) && ( $v = $self->_resolve('update_ackrc.cmd') ) ?
-            [ 'Run::AfterBuild' => '.ackrc' => { ':version' => '0.038', quiet => 1, run => $v, } ]
-            : ()
-        ),
-          # Update the '.latest' link
-        ( ( $self->_resolve('update_latest_links_after_build') // 1 ) && ( $v = $self->_resolve('update_latest_links.eval') ) ?
-            [ 'Run::AfterBuild'     => '.latest' => { ':version' => '0.041', quiet => 1, fatal_errors => 0, eval => $v, } ]
-            : ()
-        ),
-
-
-        # Before Release
-        [ 'CheckStrictVersion'  =>  { decimal_only  => ( $self->_resolve('CheckStrictVersion.decimal_only') // 1 ),
-                                      tuple_only    => ( $self->_resolve('CheckStrictVersion.tuple_only')   // 0 ),
-                                    }
-        ],
-        'CheckMetaResources',
-        'EnsureLatestPerl',
-
-        # if in airplane mode, allow our uncommitted dist.ini edit which sets 'airplane = 1'
-
-
-        ( $self->check_vcs_clean_initial ?
-            [ 'Git::Check'          => 'initial check' => { allow_dirty => [ $self->airplane ? 'dist.ini' : '' ] } ]
-            : ()),
-
-
-        ( $self->check_vcs_merge_conflicts  ?
-            'Git::CheckFor::MergeConflicts'
-            : ()),
-
-        ( $self->check_vcs_correct_branch ?
-            [ 'Git::CheckFor::CorrectBranch' => { ':version' => '0.004', release_branch => $self->git_branch } ]
-            : ()),
-
-        ( $self->check_vcs_remote_branch ?
-                [ 'Git::Remote::Check'  => { branch => $self->git_branch, remote_branch => $self->git_remote_branch } ]
-                : ()),
-
-
-        # [ 'Git::CheckFor::CorrectBranch' => { ':version' => '0.004', release_branch => $self->git_branch } ],
-        # [ 'Git::Remote::Check'  => { branch => $self->git_branch, remote_branch => $self->git_remote_branch } ],
-        [ 'CheckPrereqsIndexed' => { ':version' => '0.019' } ],
-
-        'TestRelease',
-
-        ( $self->check_vcs_clean_after_tests ?
-            [ 'Git::Check'          => 'after tests' => { allow_dirty => [''] } ]
-            : ()),
-
-        'CheckIssues',
-        # (ConfirmRelease)
-
-        # Releaser
-        $self->fake_release
-            ? do { warn _msg colored('FAKE_RELEASE set - not uploading to CPAN', 'yellow'); 'FakeRelease' }
-            : 'UploadToCPAN',
-
-        # After Release
-        ( ($v=$self->licence)  && -e "$v" ?
-            [ 'Run::AfterRelease' => "remove old $v" => { ':version' => '0.038', quiet => 1, eval => qq!unlink '$v'! } ]
-            : ()),
-
-        ( -e 'README.md' ?
-            [ 'Run::AfterRelease' => 'remove old READMEs' => { ':version' => '0.038', quiet => 1, eval => q!unlink 'README.md'! } ]
-            : ()),
-
-        ( @copy_files_from_release ?
-            [ 'CopyFilesFromRelease' => 'copy generated files' => { filename => [ @copy_files_from_release ] } ]
-            : ()),
-
-        [ 'ReadmeAnyFromPod'    => { ':version' => '0.142180', type => 'pod', location => 'root', phase => 'release' } ],
-    );
-
-    # method modifier will also apply default configs, compile develop prereqs
-    $self->add_plugins(@plugins);
-
-    # plugins to do with calculating, munging, incrementing versions
-    my $rwt = 'RewriteVersion::Transitional'; # Just to shorten some lines below
-    $self->add_bundle('@Git::VersionManager' => {
-        $self->rewrite_version_global     ? ( "${rwt}.global"  => $self->rewrite_version_global ) : (),
-        $self->fallback_version_provider  ? ( "${rwt}.fallback_version_provider"  => $self->fallback_version_provider ) : (),
-        $self->version_regexp             ? ( "${rwt}.version_regexp"  => $self->version_regexp ) : (),
-
-        # for first Git::Commit
-        commit_files_after_release => [ arrayify($self->commit_files_after_release) ],
-
-        # because of [Git::Check], only files copied from the release would be added -- there is nothing else
-        # hanging around in the current directory
-        'release snapshot.add_files_in' => ['.'],
-        $self->release_snapshot_commit_msg  ? ( 'release snapshot.commit_msg'  => $self->release_snapshot_commit_msg  ) : (),
-
-        $self->tag_format  ? ( 'Git::Tag.tag_format'  => $self->tag_format  ) : (),
-        $self->tag_message ? ( 'Git::Tag.tag_message' => $self->tag_message ) : (),
-
-        # if the caller set bump_only_matching_versions, then this global setting falls on the floor automatically
-        # because the bundle uses the non-Transitional plugin in that case.
-        $self->bump_version_global ? ( 'BumpVersionAfterRelease::Transitional.global' => $self->bump_version_global ) : (),
-
-        'NextRelease.:version' => '5.033',
-        # 'NextRelease.time_zone' => 'UTC',
-        # 'NextRelease.format' => '%-' . ($self->changes_version_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T',
-        'NextRelease.time_zone' => $self->nextrelease_entry_time_zone(),
-        'NextRelease.format'    => $self->nextrelease_entry_format(),
-    });
-
-    $self->add_plugins(
-        'Git::Push',
-        $self->server eq 'github' ? [ 'GitHub::Update' => { ':version' => '0.40', metacpan => 1 } ] : (),
-    );
-
-    if ($self->allow_insecure_operations && $self->install_release_from_cpan) {
-      # TAU : This is protected by an expression checking 'allow_insecure_operations' because what folows is
-      # potentially quite insecure, since it would expose the author's PAUSE credentials
-      # directly on the request URL (which would travel in cleartext even under 'https').
-
-      # install with an author-specific URL from PAUSE, so cpanm-reporter knows where to submit the report
-      # hopefully the file is available at this location soonish after release!
-      my %pause = $self->_pause_config();
-      say STDERR "PAUSE Config : " . np %pause;
-
-      my ($user, $password) = @pause{qw(user password)};
-      $self->add_plugins(
-          [ 'Run::AfterRelease'   => 'install release' => { ':version' => '0.031', fatal_errors => 0, run => 'cpanm http://' . $user . ':' . $password . '@pause.perl.org/pub/PAUSE/authors/id/' . substr($user, 0, 1).'/'.substr($user,0,2).'/'.$user.'/%a' } ],
-      ) if $user and $password;
-    }
-
-    # halt release after pre-release checks, but before ConfirmRelease
-    $self->add_plugins('BlockRelease') if $self->airplane;
-
-    $self->add_plugins(
-        [ 'Run::AfterRelease'   => 'release complete' => { ':version' => '0.038', quiet => 1, eval => [ qq{print "release complete!\\xa"} ] } ],
-        # listed late, to allow all other plugins which do BeforeRelease checks to run first.
-        'ConfirmRelease',
-    );
-
-    # if ModuleBuildTiny(::*) is being used, disable its static option if
-    # [StaticInstall] is being run with mode=off or dry_run=1
-    if (($static_install_mode eq 'off' or $static_install_dry_run)
-        and any { /^ModuleBuildTiny/ } @installers)
-    {
-        my $mbt = Dist::Zilla::Util->expand_config_package_name('ModuleBuildTiny');
-        my $mbt_spec = first { $_->[1] =~ /^$mbt/ } @{ $self->plugins };
-
-        $mbt_spec->[-1]{static} = 'no';
-    }
-
-    # ensure that additional optional plugins are declared in prereqs
-    my $plugin_name = 'prereqs for ' . $self->_bundle_ini_section_name;
-    $self->add_plugins(
-        [ 'Prereqs' => $plugin_name =>
-        { '-phase' => 'develop', '-relationship' => 'suggests',
-          %{ $self->_develop_suggests_as_string_hash } } ]
-    );
-
-    # listed last, to be sure we run at the very end of each phase
-    $self->add_plugins(
-        [ 'VerifyPhases' => 'PHASE VERIFICATION' => { ':version' => '0.016' } ]
-    ) if $self->verify_phases;
+        [ "Git::Tag/$label" => { tag_format => $self->tag_format } ],
+    )
 }
 
+sub _plug__GitCommit__sourcesAfterBump {
+    # Commit the change-log (just stamped) and perl sources (where $VERSION has just been bumped)
+    my ($self, $label) = (shift, shift // 'sourcesAfterBump');
+    return if $self->no_git || $self->no_git_impact || $self->no_git_commit;
 
+    [
+        "Git::Commit/$label" => {
+            commit_msg => "After release: bump \$VERSION and timestamp Changes",
+            ## and also commit files copied from the build/release
+            allow_dirty_match => '^(lib|bin|script)', # Possibly bumped $VERSION in actual perl sources by [BumpVersionAfterRelease]
+            allow_dirty => [
+                qw/Changes/,             # modified by ['NextRelease']
+                $self->_installer_files, # Possibly bumped '$VERSION in 'Makefile.PL' or 'Build.PL'
+            ],
 
-
-
-# PRIVATE UTILITY FUNCTIONS
-
-# Message text builder to be used in error output (warn, die, ...)
-sub _msg {
-  state $pfx = configuration('bundle', 'msg_pfx');
-  join ('', $pfx, @_, "\n")
+        }
+    ]
 }
 
+sub _plug__GitCommitBuild__toBuildBranch {
+    my ($self, $label) = (shift, shift // 'toBuildBranch');
+    return if $self->no_git || $self->no_git_impact || $self->no_git_commit || $self->no_git_commit_build;
 
+    (
+        [ "Git::CommitBuild/$label" => {  branch => 'build/%b', multiple_inheritence => 1 }]
+    )
+}
+
+sub _plug__GitCommitBuild__toReleaseBranch {
+    my ($self, $label) = (shift, shift // 'toReleaseBranch');
+    return if $self->no_git || $self->no_git_impact || $self->no_git_commit || $self->no_git_commit_build;
+
+    my $branch = 'release/cpan';
+    $self->_add_target_branches($branch);
+
+    (
+    ["Git::CommitBuild/$label" => { branch => '', release_branch => $branch,  multiple_inheritence => 1 } ],
+    ["Git::Tag/$label"  => { branch => $branch, tag_format => $self->tag_format_dist } ],
+    )
+}
+
+sub _plug__GitPush {
+    my ($self, $label) = (shift, shift // '');
+    return if $self->no_git || $self->no_git_impact || $self->no_git_push;
+
+    my @targets;
+    my @branches = uniq( $self->_all_target_branches );
+    for my $remote ( $self->_all_git_remotes ) {
+        push @targets, "$remote";
+        for my $branch (@branches) {
+            next unless $branch // '';
+            push @targets, "$remote refs/heads/$branch:refs/heads/$branch",
+        }
+    }
+
+    [ 'Git::Push' => { push_to => \@targets, remotes_must_exist => 0 } ]
+}
+
+sub _prepare_plugins {
+    my ($self) = @_;
+    my @plugins;
+    my sub plugin  { push @plugins, grok_plugins(@_) }
+    my sub harvest { $self->_add_harvested_files(@_) }
+    $self->_clear_harvested_files;
+
+
+    my $auto_version  = $self->auto_version;
+    my $darkpan       = $self->darkpan;
+    my $no_git        = $self->no_git;
+    my $no_github     = $self->no_github || $self->no_git || $self->darkpan;
+    my $no_versioning = !!!$self->manage_versions;
+
+    # decide on some mutually exclusive alternatives
+    my $gatherer = $no_git // 0 ? 'GatherDir' : 'Git::GatherDir';
+    my $versioner =
+        $self->auto_version             ? 'AutoVersion'
+      : $self->no_sanitize_version // 0 ? 'RewriteVersion'
+      :                                   'RewriteVersion::Sanitized';
+
+
+    ##=== EARLY birds
+    plugin 'NameFromDirectory'; # src: @Milla
+    plugin $versioner;          # XXX: I don't know why @DAGOLDEN lists this so early...
+
+    ##=== file gatherers
+    plugin $gatherer => {
+        mayhap
+          exclude_filename => $self->_files_to_exclude,
+        mayhap
+          exclude_match => $self->exclude_match,
+        include_dotfiles => 1, # PruneCruft should take care of pruning dotfiles (w/ possible exceptions)
+        };
+
+    ##=== file pruners
+    plugin 'PruneCruft' => { maybe except => @prune_not ? [@prune_not] : undef, };
+
+    plugin 'PruneFiles' => { filename => ['README.pod'] }; # Otherwise: MakeMaker will try to install it!
+    plugin 'ManifestSkip';
+
+    ###== file mungers
+    plugin 'InsertCopyright';
+    plugin 'PkgVersion' if $self->auto_version // 0;       # [TAU] : XXX: Consider: OurPkgVersion (which doesn't add lines)
+    plugin $self->_plug__Weaver;
+
+    ##=== file generators
+    ## --except Meta* and Manifest which are postponed until the latest possible moment
+    ## XXX: Readme generation needs to come after POD weaving (which munges POD, obviously...)
+    plugin 'Pod2Readme'; #   We don't really need to harvest the plain-text README into dist-root, since we will have README.md
+    plugin 'License'      and harvest 'LICENSE';
+    plugin 'InstallGuide' and harvest 'INSTALL';
+    plugin 'ReadmeAnyFromPod / MarkdownInBuild' => {
+        type     => 'markdown',
+        filename => 'README.md',
+        location => 'build',    # 'root',
+        phase    => 'build',
+      }
+      and harvest 'README.md';
+
+    ##=== author tests
+    plugin 'Test::Compile' => {
+        xt_mode   => 1,
+        fake_home => 1
+        };
+    plugin 'Test::MinimumVersion' => { max_target_perl => '5.026' }
+      unless $self->no_minimum_perl;
+    plugin 'Test::ReportPrereqs';
+
+    ##== harvested xt/ tests
+    plugin 'Test::Perl::Critic'
+      unless $self->no_critic;
+    plugin 'MetaTests';
+    plugin 'PodSyntaxTests';
+    plugin 'Test::PodSpelling' => { mayhap stopwords => $self->_stopwords, }
+      unless $self->no_pod_spellcheck;
+
+    plugin 'Test::Pod::Coverage::Configurable' => {
+        maybe
+          class => $self->pod_coverage_class,
+        mayhap
+          skip => $self->pod_coverage_skip,
+        mayhap
+          trustme => $self->pod_coverage_trustme,
+        mayhap also_private => $self->pod_coverage_also_private,
+      }
+      unless $self->no_pod_coverage;
+
+
+    plugin 'Test::Portability' => { options => "test_one_dot = 0" }
+      unless $self->no_portability_check;
+
+    plugin 'Test::Version';
+    plugin 'Test::Kwalitee';
+    plugin 'MojibakeTests';
+    plugin 'Test::EOL';
+
+    ##=== meta
+    plugin 'Authority' => {
+        authority  => $self->authority,
+        do_munging => 0,
+        };
+    plugin 'CopyrightYearFromGit' => { continuous_year => 1 }
+      unless $no_git;
+
+    plugin 'Keywords';
+    plugin 'MinimumPerl';
+    plugin 'AutoPrereqs' => { skip => "^t::lib" }
+      if $self->auto_prereqs;
+    plugin 'PrereqsFile' if -e 'prereqs.yml' || -e 'prereqs.json';
+    plugin 'MetaNoIndex' => {
+        directory => [ sort( qw(t xt), qw(corpus demo eg examples fatlib local inc perl5 share) ) ],
+        'package' => [qw/DB/],
+        };
+    plugin 'MetaProvides::Package' => { # MUST come AFTER MetaNoIndex
+        meta_noindex => 1,
+
+        # maybe inherit_version => ( $no_versioning ? 0 : undef ),
+        };
+    plugin 'GithubMeta' => {
+        remote       => [qw(origin github)],
+        maybe issues => $self->github_issues || undef,
+      }
+      unless $no_github;
+
+    plugin 'Bugtracker' => {            # fake out Pod::Weaver::Section::Support (if needed)
+        mailto    => '',
+        maybe web => ( $self->darkpan ? "http://localhost/" : undef ),
+      }
+      if $no_github || !$self->github_issues;
+
+    plugin 'MetaResources' => {         # fake out Pod::Weaver::Section::Support (if needed)
+        'repository.url' => "http://localhost/",
+        'repository.web' => "http://localhost/",
+      }
+      if $no_github;
+
+    plugin 'Git::Contributors' unless $no_git;
+    plugin 'Prereqs::AuthorDeps' if $self->auto_prereqs;
+    plugin 'RemovePrereqs::Provided';   # Must come after MetaProvides
+    plugin 'PrereqsClean';
+    plugin 'MetaYAML' and harvest 'Meta.yml';
+    plugin 'MetaJSON' and harvest 'Meta.json';
+    plugin 'CPANFile' and harvest 'cpanfile';
+
+    ##=== build system, INSTALLER, ..., Manifest
+    plugin 'ExecDir' => { maybe dir => $self->exec_dir, };
+    plugin 'ShareDir';                  # core
+    plugin $self->installer and harvest( flat $self->_installer_files );
+    plugin 'PromptIfStale' => {         # are we up to date?
+        modules           => [ qw/Dist::Zilla/, __PACKAGE__ ],
+        check_all_plugins => 1,
+        };
+    plugin 'Manifest';                  # core.  -- must come after all harvested files
+
+    ##=== BEFORE RELEASE: extra tests (src: @Starter, @DAGOLDEN)
+    ## MUST come before test/confirm for before-release verification
+    plugin 'Git::CheckFor::CorrectBranch' unless $no_git;
+    plugin 'Git::Check' => { allow_dirty => [@allow_dirty] } unless $no_git;
+    plugin 'CheckMetaResources';
+    plugin 'CheckPrereqsIndexed';
+    plugin 'CheckChangesHasContent';
+    plugin 'ConsistentVersionTest';
+    plugin 'CheckStrictVersion';
+    plugin 'CheckVersionIncrement'
+      unless $self->_fake_release;
+    plugin 'Test::CheckManifest';
+    plugin 'RunExtraTests' => { default_jobs => 9 };
+
+    ##== test/confirm release (just before releaser)
+    plugin 'TestRelease';
+    plugin 'ConfirmRelease';
+
+    ##=== release
+    plugin( $self->_fake_release ? 'FakeRelease' : 'UploadToCPAN' ); # core
+
+    ##=== AFTER release
+    plugin $self->_plug__CopyFiles; ## Copy files (from the release/build to the repo)
+    plugin $self->_plug__GitCommit__sourcesAsReleased unless $self->no_git || $self->no_git_impact;
+    plugin 'NextRelease' => { ## stamp the change-log and bump $VERSION (in all source files)
+        ## 'NextRelease' marks the release in the change-log (but also does munging earlier).
+        ##  It is placed here to get the ordering right with git actions.
+        time_zone => 'UTC',
+        format    => '%-20{-TRIAL}V    %{yyyy-MM-dd HH:mm:ssZZZZZ VVV}d %P'
+      }
+      unless $no_versioning;
+
+    plugin 'BumpVersionAfterRelease' ## Bump $VERSION (after the release) directly on source files (in lib/)!
+      unless $no_versioning || $auto_version;
+
+    unless ($self->no_git || $self->no_git_impact) {
+        plugin $self->_plug__GitCommit__sourcesAfterBump;
+        plugin $self->_plug__GitCommitBuild__toBuildBranch;
+        plugin $self->_plug__GitCommitBuild__toReleaseBranch;
+        plugin $self->_plug__GitPush;
+    }
+
+    plugin 'ArchiveRelease' => { directory => $self->archive_dir } unless $self->no_archive || !$self->archive_dir;
+
+    @plugins;
+}
+
+#endregion: MEAT
 
 
 __PACKAGE__->meta->make_immutable;
-
 1;
 
 =pod
 
 =encoding UTF-8
 
+=for :stopwords Tabulo[n] cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto
+metadata placeholders metacpan
+
 =head1 NAME
 
-Dist::Zilla::PluginBundle::Author::TABULO - A plugin bundle for distributions built by TABULO
+Dist::Zilla::PluginBundle::Author::TABULO - A Dist::Zilla plugin bundle à la TABULO
 
 =head1 VERSION
 
-version 0.198
+version 1.000006
 
 =head1 SYNOPSIS
 
@@ -834,31 +962,24 @@ In your F<dist.ini>:
 
 =head1 DESCRIPTION
 
-=for stopwords TABULO DAGOLDEN ETHER KENTNL
-=for stopwords GitHub
-=for stopwords optimizations repo
+This is the dzil plug-in bundle that TABULO intends to use for his distributions.
 
-This is the plug-in bundle that TABULO uses for his distributions whose starting
-point was ETHER's.
-
-It exists mostly because TABULO is very lazy and wants others to be using what
-he's using if they want to be doing work on his modules, just like KENTNL
-and many others, I suppose...
+It exists mostly because TABULO is very lazy, like many other folks out there.
 
 But since TABULO is probably even lazier than most folks; instead of starting his
-bundle from scratch, he just shopped around to find a bundle that had the most
-overlap with his taste or whatever; and then just slurped the whole thing,
-even including its documentation which is what you see here and in the
+bundle from scratch, he just shopped around to find a few bundles that had the most
+overlap with his taste or whatever; and then just slurped stuff,
+even including some documentation which is what you will eventually see here and in the
 related modules.:-)
 
 Admittedly, the fact that TABULO was so late in migrating to dzil worked to his
 advantage for this particular task at least, since by that time
 the bold and the brave had already made delicious stuff!
 
-Thank you ETHER!
+As such, it is heavily inspired by (and in some places outright copied from) several others such as:
+@DAGOLDEN, @DBOOK, @DROLSKY, @ETHER, @KENTNL, @RJBS, @Starter, @Starter::Git, @YANICK.
 
-Thank you, too, KENTNL and DAGOLDEN, as your plugin-bundles also seem to be quite
-good sources of inspiration!
+(Thank you, folks!).
 
 =head2 WARNING
 
@@ -869,166 +990,126 @@ expected to be in great flux, at least for the time being.
 Therefore, please do NOT base your own distributions on this one, since anything
 can change at any moment without prior notice, while I get accustomed to dzil
 myself and form those preferences in the first place...
+
 Absolutely nothing in this distribution is guaranteed to remain constant or
 be maintained at this point. Who knows, I may even give up on dzil altogether...
 
 You have been warned.
 
-And now comes the rest of the documentation slurped right in from ETHER's GitHub
-repo ... :-)
+Also note that the early versions of this module had much more in common with that of @ETHER, and tried to keep a compatible interface. This is no longer the case. So some stuff will break, and hence the bump of major version. But you weren't really using this for your distros anyway, right?
 
-=head2 DESCRIPTION (at last)
+And here comes the rest of the documentation -- some of which slurped from the several original sources cited above ... :-)
 
-This L<Dist::Zilla> plugin bundle is I<very approximately> equal to the
-following F<dist.ini> (following the preamble), minus some optimizations:
+=head2 OVERVIEW
 
-    ;;; BeforeBuild
-    [PromptIfStale / stale modules, build]
-    phase = build
-    module = Dist::Zilla::Plugin::Author::TABULO
-    [PromptIfStale / stale modules, release]
-    phase = release
-    check_all_plugins = 1
-    check_all_prereqs = 1
+Using this plugin bundle (with its default options) is roughly equivalent to the following content in C<dist.ini>.
 
+    ...
 
-    ;;; ExecFiles
-    [ExecDir]
-    dir = script    ; only if script dir exists
+    [NameFromDirectory]
 
+    [RewriteVersion::Sanitized]
 
-    ;;; Finders
-    [FileFinder::ByName / Examples]
-    dir = examples
-
-
-    ;;; Gather Files
     [Git::GatherDir]
-    :version = 2.016
+    exclude_filename = Build.PL
+    exclude_filename = CODE_OF_CONDUCT
     exclude_filename = CONTRIBUTING
     exclude_filename = INSTALL
     exclude_filename = LICENCE
     exclude_filename = LICENSE
     exclude_filename = META.json
     exclude_filename = Makefile.PL
+    exclude_filename = Meta.yml
+    exclude_filename = README
     exclude_filename = README.md
+    exclude_filename = README.mkdn
     exclude_filename = README.pod
     exclude_filename = TODO
     exclude_filename = cpanfile
     exclude_filename = inc/ExtUtils/MakeMaker/Dist/Zilla/Develop.pm
     exclude_filename = ppport.h
+    include_dotfiles = 1
 
-    [MetaYAML]
-    [MetaJSON]
-    [Readme]
-    [Manifest]
+    [PruneCruft]
+    except = (?^u:"\.travis\.yml")
+    except = (?^u:"\.perltidyrc")
+    except = (?^u:".*/\.gitignore$")
+    except = (?^u:".*/\.(git)?keep$")
+
+    [PruneFiles]
+    filename = README.pod
+
+    [ManifestSkip]
+
+    [InsertCopyright]
+
+    [SurgicalPodWeaver]
+    config_plugin = @Author::TABULO
+    post_code_replacer = replace_with_nothing
+    replacer = replace_with_comment
+
+    [Pod2Readme]
+
     [License]
-    :version = 5.038
-    filename = LICENCE  ; for distributions where I have authority
 
-    [GenerateFile::FromShareDir / generate CONTRIBUTING]
-    -dist = Dist-Zilla-PluginBundle-Author-TABULO
-    -filename = CONTRIBUTING
-    has_xs = <dynamically-determined flag>
     [InstallGuide]
-    :version = 1.200005
+
+    [ReadmeAnyFromPod / ReadmeAnyFromPod/MarkdownInBuild]
+    filename = README.md
+    location = build
+    phase = build
+    type = markdown
 
     [Test::Compile]
-    :version = 2.039
-    bail_out_on_fail = 1
+    fake_home = 1
     xt_mode = 1
-    script_finder = :PerlExecFiles
-    script_finder = Examples
 
-    [Test::NoTabs]
-    :version = 0.08
-    finder = :InstallModules
-    finder = :ExecFiles
-    finder = Examples
-    finder = :TestFiles
-    finder = :ExtraTestFiles
+    [Test::MinimumVersion]
+    max_target_perl = 5.026
 
-    [Test::EOL]
-    :version = 0.17
-    finder = :InstallModules
-    finder = :ExecFiles
-    finder = Examples
-    finder = :TestFiles
-    finder = :ExtraTestFiles
+    [Test::ReportPrereqs]
+
+    [Test::Perl::Critic]
 
     [MetaTests]
-    [Test::CPAN::Changes]
-    :version = 0.012
-    [Test::ChangesHasContent]
-    [Test::MinimumVersion]
-    :version = 2.000003
-    max_target_perl = 5.006
+
     [PodSyntaxTests]
-    :version = 5.040
-    [PodCoverageTests]
-    :version = 5.040
+
     [Test::PodSpelling]
-    :version = 2.006003
-    stopwords = irc
-    directory = examples
-    directory = lib
-    directory = script
-    directory = t
-    directory = xt
 
-    ;[Test::Pod::LinkCheck]     many outstanding bugs
-    [Test::Pod::No404s]
-    :version = 1.003
-    [Test::Kwalitee]
-    :version = 2.10
-    filename = xt/author/kwalitee.t
-    [MojibakeTests]
-    :version = 0.8
-    [Test::ReportPrereqs]
-    :version = 0.022
-    verify_prereqs = 1
-    version_extractor = Module::Metadata
-    include = JSON::PP
-    include = Pod::Coverage
-    include = Sub::Name
-    include = YAML
-    include = autodie
+    [Test::Pod::Coverage::Configurable]
+
     [Test::Portability]
-    :version = 2.000007
-    [Test::CleanNamespaces]
-    :version = 0.006
+    options = test_one_dot = 0
 
+    [Test::Version]
 
-    ;;; Munge Files
-    [Git::Describe]
-    :version = 0.004
-    on_package_line = 1
+    [Test::Kwalitee]
 
-    [PodWeaver] (or [SurgicalPodWeaver])
-    :version = 4.005
-    config_plugin = @Author::TABULO ; unless weaver.ini is present
-    replacer = replace_with_comment
-    post_code_replacer = replace_with_nothing
+    [MojibakeTests]
 
-
-    ;;; Metadata
-    [GithubMeta]    ; (if server = 'github' or omitted)
-    :version = 0.54
-    homepage = 0
-    issues = 0
-
-    [AutoMetaResources]
-    bugtracker.rt = 1
-    ; (plus repository.* = 1 if server = 'gitmo' or 'p5sagit')
+    [Test::EOL]
 
     [Authority]
-    :version = 1.009
     authority = cpan:TABULO
     do_munging = 0
+
+    [CopyrightYearFromGit]
+    continuous_year = 1
+
+    [Keywords]
+
+    [MinimumPerl]
+
+    [AutoPrereqs]
+    skip = ^t::lib
+
+    [PrereqsFile]
 
     [MetaNoIndex]
     directory = corpus
     directory = demo
+    directory = eg
     directory = examples
     directory = fatlib
     directory = inc
@@ -1037,512 +1118,587 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     directory = share
     directory = t
     directory = xt
+    package = DB
 
     [MetaProvides::Package]
-    :version = 1.15000002
-    finder = :InstallModules
     meta_noindex = 1
-    inherit_version = 0
-    inherit_missing = 0
 
-    [MetaConfig]
-    [Keywords]
-    :version = 0.004
-
-    ; if we are releasing with a new perl with -DDEFAULT_INC_EXCLUDES_DOT set
-    [UseUnsafeInc]
-    dot_in_INC = 0
-
-    ;[Git::Contributors]    ; below
-    ;[StaticInstall]        ; below
-
-
-    ;;; Register Prereqs
-    [AutoPrereqs]
-    :version = 5.038
-    [Prereqs::AuthorDeps]
-    relation = suggests
-    [MinimumPerl]
-    :version = 1.006
-    configure_finder = :NoFiles
-
-    [Prereqs / prereqs for @Author::TABULO]
-    -phase = develop
-    -relationship = suggests
-    ...all the plugins this bundle uses...
-
-    [Prereqs / pluginbundle_version]
-    -phase = develop
-    -relationship = recommends
-    Dist::Zilla::PluginBundle::Author::TABULO = <current installed version>
-
-
-    ;;; Install Tool
-    ; <specified installer(s)>
+    [GithubMeta]
+    issues = 1
+    remote = origin
+    remote = github
 
     [Git::Contributors]
-    :version = 0.029
-    order_by = commits
 
-    [StaticInstall]
-    :version = 0.005
-    mode = auto
-    dry_run = 1  ; only if authority is not ETHER
+    [Prereqs::AuthorDeps]
 
+    [RemovePrereqs::Provided]
 
-    ;;; Test Runner
-    ; <specified installer(s)>
-    [RunExtraTests]
-    :version = 0.024
-    default_jobs = 9
+    [PrereqsClean]
 
+    [MetaYAML]
 
-    ;;; After Build
-    [CheckSelfDependency]
+    [MetaJSON]
 
-    [Run::AfterBuild / .ackrc]
-    :version = 0.038
-    quiet = 1
-    run = bash -c "test -e .ackrc && grep -q -- '--ignore-dir=.latest' .ackrc || echo '--ignore-dir=.latest' >> .ackrc; if [[ `dirname '%d'` != .build ]]; then test -e .ackrc && grep -q -- '--ignore-dir=%d' .ackrc || echo '--ignore-dir=%d' >> .ackrc; fi"
-    [Run::AfterBuild / .latest]
-    :version = 0.041
-    quiet = 1
-    fatal_errors = 0
-    eval = if ('%d' =~ /^%n-[.[:xdigit:]]+$/) { unlink '.latest'; symlink '%d', '.latest'; }
+    [CPANFile]
 
+    [ExecDir]
 
-    ;;; Before Release
-    [CheckStrictVersion]
-    decimal_only = 1
+    [ShareDir]
 
-    [CheckMetaResources]
-    [EnsureLatestPerl]
+    [MakeMaker]
 
-    [Git::Check / initial check]
-    allow_dirty =
+    [PromptIfStale]
+    check_all_plugins = 1
+    modules = Dist::Zilla
+    modules = @Author::TABULO
 
-    [Git::CheckFor::MergeConflicts]
+    [Manifest]
 
     [Git::CheckFor::CorrectBranch]
-    :version = 0.004
-    release_branch = master
 
-    [Git::Remote::Check]
-    branch = master
-    remote_branch = master
+    [Git::Check]
+    allow_dirty = dist.ini
+    allow_dirty = Changes
+
+    [CheckMetaResources]
 
     [CheckPrereqsIndexed]
-    :version = 0.019
+
+    [CheckChangesHasContent]
+
+    [ConsistentVersionTest]
+
+    [CheckStrictVersion]
+
+    [CheckVersionIncrement]
+
+    [Test::CheckManifest]
+
+    [RunExtraTests]
+    default_jobs = 9
+
     [TestRelease]
-    [Git::Check / after tests]
-    allow_dirty =
-    [CheckIssues]
-    ;(ConfirmRelease)
 
-
-    ;;; Releaser
-    [UploadToCPAN]
-
-
-    ;;; AfterRelease
-    [Run::AfterRelease / remove old LICENCE]    ; if switching from LICENCE -> LICENSE
-    :version = 0.038
-    quiet = 1
-    eval = unlink 'LICENCE'
-
-    [Run::AfterRelease / remove old LICENSE]    ; if switching from LICENSE -> LICENCE
-    :version = 0.038
-    quiet = 1
-    eval = unlink 'LICENSE'
-
-    [Run::AfterRelease / remove old READMEs]
-    :version = 0.038
-    quiet = 1
-    eval = unlink 'README.md'
-
-    [CopyFilesFromRelease / copy generated files]
-    filename = CONTRIBUTING
-    filename = INSTALL
-    filename = LICENCE
-    filename = LICENSE
-    filename = ppport.h
-
-    [ReadmeAnyFromPod]
-    :version = 0.142180
-    type = pod
-    location = root
-    phase = release
-
-    ;;;;;; begin [@Git::VersionManager]
-
-    ; this is actually a VersionProvider and FileMunger
-    [RewriteVersion::Transitional]
-    :version = 0.004
-    global = 1
-    fallback_version_provider = Git::NextVersion
-    version_regexp = ^v([\d._]+)(-TRIAL)?$
-
-    [CopyFilesFromRelease / copy Changes]
-    filename = Changes
-
-    [Git::Commit / release snapshot]
-    :version = 2.020
-    add_files_in = .
-    allow_dirty = CONTRIBUTING
-    allow_dirty = Changes
-    allow_dirty = INSTALL
-    allow_dirty = LICENCE
-    allow_dirty = LICENSE
-    allow_dirty = README.md
-    allow_dirty = README.pod
-    allow_dirty = ppport.h
-    commit_msg = %N-%v%t%n%n%c
-
-    [Git::Tag]
-    tag_message = v%v%t
-
-    [BumpVersionAfterRelease::Transitional]
-    :version = 0.004
-    global = 1
-
-    [NextRelease]
-    :version = 5.033
-    time_zone = UTC
-    format = %-8v  %{yyyy-MM-dd HH:mm:ss'Z'}d%{ (TRIAL RELEASE)}T
-
-    [Git::Commit / post-release commit]
-    :version = 2.020
-    allow_dirty = Changes
-    allow_dirty_match = ^lib/.*\.pm$
-    commit_msg = increment $VERSION after %v release
-
-    ;;;;;; end [@Git::VersionManager]
-
-    [Git::Push]
-
-    [GitHub::Update]    ; (if server = 'github' or omitted)
-    :version = 0.40
-    metacpan = 1
-
-    [Run::AfterRelease / install release]
-    :version = 0.031
-    fatal_errors = 0
-    run = cpanm http://URMOM:mysekritpassword@pause.perl.org/pub/PAUSE/authors/id/U/UR/URMOM/%a
-
-    [Run::AfterRelease / release complete]
-    :version = 0.038
-    quiet = 1
-    eval = print "release complete!\xa"
-
-    ; listed late, to allow all other plugins which do BeforeRelease checks to run first.
     [ConfirmRelease]
 
-    ; listed last, to be sure we run at the very end of each phase
-    ; only performed if $ENV{USER} matches /^tabulo$/
-    [VerifyPhases / PHASE VERIFICATION]
-    :version = 0.015
-
-=for Pod::Coverage configure mvp_multivalue_args
-
-=for stopwords metacpan
-
-The distribution's code is assumed to be hosted at L<github|http://github.com>;
-L<RT|http://rt.cpan.org> is used as the issue tracker.
-The home page in the metadata points to L<github|http://github.com>,
-while the home page on L<github|http://github.com> is updated on release to
-point to L<metacpan|http://metacpan.org>.
-The version and other metadata is derived directly from the local git repository.
-
-=head1 OPTIONS / OVERRIDES
-
-=head2 version
-
-Use C<< V=<version> >> in the shell to override the version of the distribution being built;
-otherwise the version is incremented after each release, in the F<*.pm> files.
-
-=head2 pod coverage
-
-Subroutines can be considered "covered" for pod coverage tests by adding a
-directive to pod (as many as you'd like),
-as described in L<Pod::Coverage::TrustPod>:
-
-    =for Pod::Coverage foo bar baz
-
-=head2 spelling stopwords
-
-=for stopwords Stopwords foo bar baz
-
-Stopwords for spelling tests can be added by adding a directive to pod (as
-many as you'd like), as described in L<Pod::Spell/ADDING STOPWORDS>:
-
-    =for stopwords foo bar baz
-
-It is also possible to use the [%PodWeaver] stash in 'dist.ini' to add stopwords, like so :
-    [%PodWeaver]
-    -StopWords.include = foo bar baz
-
-Such words will be recognized by the C<[StopWords]|Pod::Weaver::Plugin::StopWords> plugin for C<Pod::Weaver>,
-which will gather them at the top of your POD (since we set its 'gather' parameter).
-
-See also L<[Test::PodSpelling]|Dist::Zilla::Plugin::Test::PodSpelling/stopwords>.
-
-=head2 installer
-
-=for stopwords ModuleBuildTiny
-
-Available since 0.007.
-
-The installer back-end(s) to use (can be specified more than once); defaults
-to L<C<ModuleBuildTiny::Fallback>|Dist::Zilla::Plugin::ModuleBuildTiny::Fallback>
-and L<C<MakeMaker::Fallback>|Dist::Zilla::Plugin::MakeMaker::Fallback>
-(which generates a F<Build.PL> for normal use with no-configure-requires
-protection, and F<Makefile.PL> as a fallback, containing an upgrade warning).
-For toolchain-grade modules, you should only use F<Makefile.PL>-generating installers.
-
-You can select other backends (by plugin name, without the C<[]>), with the
-C<installer> option, or C<none> if you are supplying your own, as a separate
-plugin(s).
-
-Encouraged choices are:
-
-=over 4
-
-=item *
-
-C<< installer = ModuleBuildTiny >>
-
-=item *
-
-C<< installer = MakeMaker >>
-
-=item *
-
-C<< installer = MakeMaker::Fallback >> (when used in combination with ModuleBuildTiny)
-
-=item *
-
-C<< installer = =inc::Foo >> (if no configs are needed for this plugin; e.g. subclassed from L<[MakeMaker::Awesome]|Dist::Zilla::Plugin::MakeMaker::Awesome>)
-
-=item *
-
-C<< installer = none >> (if you are providing your own elsewhere in the file, with configs)
-
-=back
-
-=head2 server
-
-Available since 0.019.
-
-If provided, must be one of:
-
-=over 4
-
-=item *
-
-C<github>
-
-(default)
-metadata and release plugins are tailored to L<github|http://github.com>.
-
-=item *
-
-C<gitmo>
-
-metadata and release plugins are tailored to
-L<gitmo@git.moose.perl.org|http://git.moose.perl.org>.
-
-=item *
-
-C<p5sagit>
-
-metadata and release plugins are tailored to
-L<p5sagit@git.shadowcat.co.uk|http://git.shadowcat.co.uk>.
-
-=item *
-
-C<catagits>
-
-metadata and release plugins are tailored to
-L<catagits@git.shadowcat.co.uk|http://git.shadowcat.co.uk>.
-
-=item *
-
-C<none>
-
-no special configuration of metadata (relating to repositories etc) is done --
-you'll need to provide this yourself.
-
-=back
-
-=head2 airplane
-
-Available since 0.053.
-
-A boolean option that, when set, removes the use of all plugins that use the
-network (generally for comparing metadata against PAUSE, and querying the
-remote git server), as well as blocking the use of the C<release> command.
-Defaults to false; can also be set with the environment variable C<DZIL_AIRPLANE>.
-
-=head2 copy_file_from_release
-
-Available in this form since 0.076.
-
-A file, to be present in the build, which is copied back to the source
-repository at release time and committed to git. Can be used more than
-once. Defaults to:
-F<LICENCE>, F<LICENSE>, F<CONTRIBUTING>, F<Changes>, F<ppport.h>, F<INSTALL>;
-defaults are appended to, rather than overwritten.
-
-=head2 surgical_podweaver
-
-=for stopwords PodWeaver SurgicalPodWeaver
-
-Available since 0.051.
-
-A boolean option that, when set, uses
-L<[SurgicalPodWeaver]|Dist::Zilla::Plugin::SurgicalPodWeaver> instead of
-L<[PodWeaver]|Dist::Zilla::Plugin::SurgicalPodWeaver>, but with all the same
-options. Defaults to false.
-
-=head2 changes_version_columns
-
-Available since 0.076.
-
-An integer that specifies how many columns (right-padded with whitespace) are
-allocated in F<Changes> entries to the version string. Defaults to 10 in general (and 12 for TABULO).
-
-=head2 licence (or license)
-
-Available since 0.101.
-
-A string that specifies the name to use for the license file.  Defaults to
-C<LICENCE> for distributions where ETHER or any other known authors who prefer
-C<LICENCE> have first-come permissions, or C<LICENSE> otherwise.
-(The pod section for legal information is also adjusted appropriately.)
+    [UploadToCPAN]
+
+    [CopyFilesFromRelease]
+    filename = INSTALL
+    filename = LICENSE
+    filename = Makefile.PL
+    filename = Meta.json
+    filename = Meta.yml
+    filename = README.md
+    filename = cpanfile
+
+    [Regenerate::AfterReleasers]
+    plugin = @Author::TABULO/CopyFilesFromRelease
+
+    [Git::Commit / Git::Commit/sourcesAsReleased]
+    add_files_in = /
+    allow_dirty = Changes
+    allow_dirty = INSTALL
+    allow_dirty = LICENSE
+    allow_dirty = Makefile.PL
+    allow_dirty = Meta.json
+    allow_dirty = Meta.yml
+    allow_dirty = README.md
+    allow_dirty = cpanfile
+    commit_msg = v%V%n%n%c
+
+    [Git::Tag / Git::Tag/sourcesAsReleased]
+    tag_format = release-%v
+
+    [NextRelease]
+    format = %-20{-TRIAL}V    %{yyyy-MM-dd HH:mm:ssZZZZZ VVV}d %P
+    time_zone = UTC
+
+    [BumpVersionAfterRelease]
+
+    [Git::Commit / Git::Commit/sourcesAfterBump]
+    allow_dirty = Changes
+    allow_dirty = ARRAY(0x7fd7767bf1e0)
+    allow_dirty_match = ^(lib|bin|script)
+    commit_msg = After release: bump $VERSION and timestamp Changes
+
+    [Git::CommitBuild / Git::CommitBuild/toBuildBranch]
+    branch = build/%b
+    multiple_inheritence = 1
+
+    [Git::CommitBuild / Git::CommitBuild/toReleaseBranch]
+    branch =
+    multiple_inheritence = 1
+    release_branch = release/cpan
+
+    [Git::Tag / Git::Tag/toReleaseBranch]
+    branch = release/cpan
+    tag_format = release-%v
+
+    [Git::Push]
+    push_to = origin
+    push_to = origin refs/heads/release/cpan:refs/heads/release/cpan
+    remotes_must_exist = 0
+
+    [ArchiveRelease]
+    directory = releases
+
+=head1 ATTRIBUTES
+
+=head2 archive_dir
+
+Reader: archive_dir
+
+Type: Str
+
+Additional documentation: Passed as the 'directory' option, to [ArchiveRelease] whose docs are quoted below:
+
+* The 'directory' [name] may begin with ~ (or ~user) to mean your (or some other user's) home directory.
+* If the directory doesn't exist, it will be created during the BeforeRelease phase.
+* All files inside this directory will be pruned from the distribution.
+ Default: 'releases'
 
 =head2 authority
 
-Available since 0.117.
+Reader: authority
 
-A string of the form C<cpan:PAUSEID> that references the PAUSE ID of the user who has primary ("first-come")
-authority over the distribution and main module namespace. If not provided, it is extracted from the configuration
-passed through to the L<[Authority]|Dist::Zilla::Plugin::Authority> plugin, and finally defaults to C<cpan:TABULO>.
-It is presently used for setting C<x_authority> metadata and deciding which spelling is used for the F<LICENCE>
-file (if the C<licence> configuration is not provided).
+Type: Str
+
+Additional documentation: Specifies the x_authority field for PAUSE. Default: 'cpan:TABULO'
+
+=head2 auto_prereqs
+
+Reader: auto_prereqs
+
+Type: Bool
+
+Additional documentation: Indicates whether or not to use [AutoPrereqs]. Default: '1'
+
+=head2 auto_version
+
+Reader: auto_version
+
+Type: Bool
+
+Additional documentation: Indicates whether or not to use [AutoVersion] instead of our standard plugins for version management. Default: '0'
+
+=head2 copy
+
+Reader: copy
+
+Type: ArrayRef
+
+Additional documentation: Additional files to copy (or regenerate) in addition to those that are already harvested by default. [May be repeated]. Note that the copying may be done from the build or the release, depending on the 'copy_mode' setting. See 'copy_mode'.
+
+=head2 copy_mode
+
+Reader: copy_mode
+
+Type: Maybe[Str]
+
+Additional documentation: Determines the 'copy-mode' and hence ultimately the set of plugins used for that purpose. Possible values are  [Regenerate, Release, Build, Build::Filtered, None]. dzil 'regenerate' command will still work.  Default: 'Release'
+
+=head2 copy_not
+
+Reader: copy_not
+
+Type: ArrayRef
+
+Additional documentation: Do NOT copy given file(s). [May be repeated].
+
+=head2 darkpan
+
+Reader: darkpan
+
+Type: Bool
+
+Additional documentation: For private code; uses [FakeRelease] and fills in dummy repo/bugtracker data. Default: '0'
+
+=head2 dist_genre
+
+Reader: dist_genre
+
+Type: Str
+
+Additional documentation: Specifies the 'genre' of the distro. Currently allowed values are: 'standard' (the default) and 'task'.
+
+This may be used in the future to associate a set behaviours/settings to given genres.
+
+Currently, the only distinction made is for the 'task' genre, which will result in [TaskWeaver] being used
+instead of [SurgicalPodWeaver].
+ Default: 'standard'
+
+=head2 exclude_filenames
+
+Reader: exclude_filenames
+
+Type: ArrayRef
+
+Additional documentation: Do NOT gather given file(s). [May be repeated].
+
+=head2 exclude_match
+
+Reader: exclude_match
+
+Type: ArrayRef
+
+Additional documentation: Do NOT gather file(s) that match the given pattern(s). [May be repeated].
+
+=head2 exec_dir
+
+Reader: exec_dir
+
+Type: Maybe[Str]
+
+Additional documentation: If defined, passed to [ExecDir] as its 'dir' option.  Defaults to 'script' when the installer is [Module::Build::Tiny],undef otherwise, which means the [ExecDir] default will be in effect, and that is 'bin' as of this writing.
 
 =head2 fake_release
 
-=for stopwords UploadToCPAN FakeRelease
+Reader: fake_release
 
-Available since 0.122.
+Type: Bool
 
-A boolean option that, when set, removes L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN> from the plugin list
-and replaces it with L<[FakeRelease]|Dist::Zilla::Plugin::FakeRelease>.
-Defaults to false; can also be set with the environment variable C<FAKE_RELEASE>.
+Additional documentation: Swaps [FakeRelease] for [UploadToCPAN]. Mostly useful for testing a dist.ini without risking a real release. Note that this can also be achieved by setting the FAKE_RELEASE environment variable (which will have precedence over this option). Default: '0'
 
-=for stopwords customization
+=head2 git_remotes
 
-=head2 other customization options
+Reader: git_remotes
 
-This bundle makes use of L<Dist::Zilla::Role::PluginBundle::PluginRemover> and
-L<Dist::Zilla::Role::PluginBundle::Config::Slicer> to allow further customization.
-(Note that even though some overridden values are inspected in this class,
-they are still overlaid on top of whatever this bundle eventually decides to
-pass - so what is in the F<dist.ini> always trumps everything else.)
+Type: ArrayRef
 
-Plugins are not loaded until they are actually needed, so it is possible to
-C<--force>-install this plugin bundle and C<-remove> some plugins that do not
-install or are otherwise problematic.
+Additional documentation: Where to push after release.
 
-If a F<weaver.ini> is present in the distribution, pod is woven using it;
-otherwise, the behaviour is as with a F<weaver.ini> containing the single line
-C<[@Author::TABULO]> (see L<Pod::Weaver::PluginBundle::Author::TABULO>).
+=head2 github_issues
 
-=head1 NAMING SCHEME
+Reader: github_issues
 
-=for stopwords KENTNL
+Type: Str
 
-This distribution follows best practices for author-oriented plugin bundles; for more information,
-see L<KENTNL's distribution|Dist::Zilla::PluginBundle::Author::KENTNL/NAMING-SCHEME>.
+Additional documentation: Whether or not to use github issue tracker. Default: '1'
 
-=head1 ORIGINAL AUTHOR
+=head2 has_xs
 
-This distribution is based on L<Dist::Zilla::PluginBundle::Author::ETHER> by :
+Reader: has_xs
 
-Karen Etheridge L<cpan:ETHER>
+Type: Bool
 
-Thank you ETHER!
+=head2 hub
 
-=head1 SEE ALSO
+Reader: hub
 
-=over 4
+Type: Maybe[Str]
 
-=item *
+Additional documentation: The repository 'hub' provider. Currently, other than unsetting to undef, the only supported value, which is also the default, is 'github'. Other providers, such as 'gitlab' or 'bitbucket', may be supported in the future. Default: 'github'
 
-L<Pod::Weaver::PluginBundle::Author::TABULO>
+=head2 installer
 
-=item *
+Reader: installer
 
-L<Dist::Zilla::MintingProfile::Author::TABULO>
+Additional documentation: The installer to employ. Currently, possible values are: [MakeMaker, MakeMaker::Awesome, ModuleBuild, ModuleBuildTiny, ModuleBuildTiny::Fallback]. Default: 'MakeMaker'
 
-=item *
+=head2 is_task
 
-L<Dist::Zilla::PluginBundle::Git::VersionManager>
+Reader: is_task
 
-=item *
+Type: Bool
 
-L<Dist::Zilla::PluginBundle::Author::ETHER> (original bundle by ETHER)
+Additional documentation: DEPRECATED. Prefer setting instead, like so:
 
-=back
+[@Author::TABULO]
+dist_genre=task
+
+Identifies this distro as a 'task'.
+
+Currently, the only distinction is that, for a task, we use [TaskWeaver] instead of [SurgicalPodWeaver].
+
+=head2 manage_versions
+
+Reader: manage_versions
+
+Type: Bool
+
+Additional documentation: Whether or not to manage versioning, which means: providing, rewriting, bumping, munging $VERSION in sources, .... Default: '1'
+
+=head2 name
+
+Reader: name
+
+Type: Str
+
+This attribute is required.
+
+=head2 no_archive
+
+Reader: no_archive
+
+Type: Bool
+
+Additional documentation: Omit the [ArchiveRelease] plugin. Default: '0'
+
+=head2 no_copy
+
+Reader: no_copy
+
+Type: Bool
+
+Additional documentation: Skip copying files from the build/release : ('Makefile.PL', 'cpanfile',' Meta.json', ...). Default: '0'
+
+=head2 no_coverage
+
+Reader: no_coverage
+
+Type: Bool
+
+Additional documentation: Omit PodCoverage tests -- which are actually done using [Test::Pod::Coverage::Configurable]. Default: '0'
+
+=head2 no_critic
+
+Reader: no_critic
+
+Type: Bool
+
+Additional documentation: Omit [Test::Perl::Critic] tests. Default: '0'
+
+=head2 no_git
+
+Reader: no_git
+
+Type: Bool
+
+Additional documentation: Bypass all git-dependent plugins. Default: '0'
+
+=head2 no_git_commit
+
+Reader: no_git_commit
+
+Type: Bool
+
+Additional documentation: Omit [Git::Commit] and [Git::CommitBuild] and related [Git::Tag] operations. Default: '0'
+
+=head2 no_git_commit_build
+
+Reader: no_git_commit_build
+
+Type: Bool
+
+Additional documentation: Omit [Git::CommitBuild] and related [Git::Tag] operations. Default: '0'
+
+=head2 no_git_impact
+
+Reader: no_git_impact
+
+Type: Bool
+
+Additional documentation: Omit any [Git:*] plugins that may modify the vcs repository state, such as : [Git::Commit], [Git::CommitBuild], [Git::Tag], [Git::Push] and the like.
+Git plugins that are read-only, such as [Git::GatherDir] or [Git::Check] shouldn't be effected by this option.
+ Default: '0'
+
+=head2 no_git_push
+
+Reader: no_git_push
+
+Type: Bool
+
+Additional documentation: Omit [Git::Push]. Default: '0'
+
+=head2 no_github
+
+Reader: no_github
+
+Type: Bool
+
+Additional documentation: Do not assume that the repository is backed by 'github', which currently means abstaining from using [GithubMeta] and feeding fake values to [MetaResources] and [Bugtracker] -- which you may separately override, by the way, thanks to our[@Config::Slicer] role.
+
+=head2 no_minimum_perl
+
+Reader: no_minimum_perl
+
+Type: Bool
+
+Additional documentation: Omit [Test::MinimumVersion] tests. Default: '0'
+
+=head2 no_pod_coverage
+
+Reader: no_pod_coverage
+
+Type: Bool
+
+Additional documentation: Skip [PodCoverage] tests -- Well, [Test::Pod::Coverage::Configurable] tests, actually.
+
+=head2 no_pod_spellcheck
+
+Reader: no_pod_spellcheck
+
+Type: Bool
+
+Additional documentation: Skip [Test::PodSpelling] tests.
+
+=head2 no_portability_check
+
+Reader: no_portability_check
+
+Type: Bool
+
+Additional documentation: Skip [Test::Portability] tests. Default: '0'
+
+=head2 no_sanitize_version
+
+Reader: no_sanitize_version
+
+Type: Bool
+
+Additional documentation: When set => We won't prefer [RewriteVersion::Sanitized] over [RewriteVersion], which we normally do. Default: '0'
+
+=head2 no_spellcheck
+
+Reader: no_spellcheck
+
+Type: Bool
+
+Additional documentation: Omit [Test::PodSpelling] tests. Default: '0'
+
+=head2 payload
+
+Reader: payload
+
+Type: HashRef
+
+This attribute is required.
+
+=head2 plugins
+
+Reader: plugins
+
+Type: ArrayRef
+
+=head2 pod_coverage_also_private
+
+Reader: pod_coverage_also_private
+
+Type: Maybe[ArrayRef]
+
+Additional documentation: If defined, passed to [Test::Pod::Coverage::Configurable] as its 'also_private' option.
+
+=head2 pod_coverage_class
+
+Reader: pod_coverage_class
+
+Type: Maybe[Str]
+
+Additional documentation: If defined, passed to [Test::Pod::Coverage::Configurable] as its 'class' option.
+
+=head2 pod_coverage_skip
+
+Reader: pod_coverage_skip
+
+Type: Maybe[ArrayRef]
+
+Additional documentation: If defined, passed to [Test::Pod::Coverage::Configurable] as its 'skip' option.
+
+=head2 pod_coverage_trustme
+
+Reader: pod_coverage_trustme
+
+Type: Maybe[ArrayRef]
+
+Additional documentation: If defined, passed to [Test::Pod::Coverage::Configurable] as its 'trustme' option.
+
+=head2 stopwords
+
+Reader: stopwords
+
+Type: ArrayRef
+
+Additional documentation: Additional stopword(s) for Pod::Spell tests. [May be repeated]. See also: 'stopword_files' and 'wordlists' for alternative mechanisms of adding stopwords.
+
+=head2 stopwords_files
+
+Reader: stopwords_files
+
+Type: ArrayRef
+
+Additional documentation: File(s) that describe additional stopword(s) for Pod::Spell tests. [May be repeated]. See also: 'stopwords' and 'wordlists' for alternative mechanisms of adding stopwords.
+
+=head2 stopwords_providers
+
+Reader: stopwords_providers
+
+Type: ArrayRef
+
+Additional documentation: Perl module(s) for contributing additional stopword(s) for spelling tests. [May be repeated].
+Note that given module(s) would need to expose the same API as L<Pod::Wordlist>.
+See also: 'stopwords' and 'stopword_files' for alternative mechanisms of adding stopwords.
+
+=head2 tag_format
+
+Reader: tag_format
+
+Type: Str
+
+Additional documentation: The tag format passed to [Git::Tag] after committing sources.
+The default is 'repo-release-v%V%t', which may be prefixed by some other string.
+The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
+ Default: 'repo-release-v%V%t'
+
+=head2 tag_format_dist
+
+Reader: tag_format_dist
+
+Type: Str
+
+Additional documentation: The tag format passed to [Git::Tag] after committing the build.
+The default is 'dist-release-v%V%t', which may be prefixed by some other string.
+The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
+ Default: 'dist-release-v%V%t'
+
+=head2 version_regexp
+
+Reader: version_regexp
+
+Type: Str
+
+Additional documentation: The version regex that corresponds to the 'tag_format'. Default: '^(?:[-\w]+)?release-(.+)$'
+
+=head2 weaver_config
+
+Reader: weaver_config
+
+Type: Str
+
+Additional documentation: Specifies a Pod::Weaver bundle to be used. Default: '@Author::TABULO'
+
+=for Pod::Coverage configure mvp_aliases payload_item
+
+=head1 AUTHORS
+
+Tabulo[n] <dev@tabulo.net>
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-TABULO>
-(or L<bug-Dist-Zilla-PluginBundle-Author-TABULO@rt.cpan.org|mailto:bug-Dist-Zilla-PluginBundle-Author-TABULO@rt.cpan.org>).
+=head2 Bugs / Feature Requests
 
-=head1 AUTHOR
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO/issues>.
 
-Tabulo <tabulo@cpan.org>
+=head2 Source Code
 
-=head1 CONTRIBUTORS
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
 
-=for stopwords Karen Etheridge Edward Betts Graham Knop Randy Stauner Roy Ivy III Сергей Романов Dave Rolsky
+L<https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO>
 
-=over 4
+  git clone https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO.git
 
-=item *
+=head1 CONTRIBUTOR
 
-Karen Etheridge <ether@cpan.org>
+=for stopwords Tabulo
 
-=item *
+Tabulo <dev-git.perl@tabulo.net>
 
-Edward Betts <edward@4angle.com>
+=head1 LEGAL
 
-=item *
-
-Graham Knop <haarg@haarg.org>
-
-=item *
-
-Randy Stauner <rwstauner@cpan.org>
-
-=item *
-
-Roy Ivy III <rivy@cpan.org>
-
-=item *
-
-Сергей Романов <sromanov@cpan.org>
-
-=item *
-
-Dave Rolsky <autarch@urth.org>
-
-=back
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Tabulo.
+This software is copyright (c) 2021 by Tabulo[n].
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -1550,6 +1706,7 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 __END__
+#ABSTRACT: A Dist::Zilla plugin bundle à la TABULO
 
 #region pod
 

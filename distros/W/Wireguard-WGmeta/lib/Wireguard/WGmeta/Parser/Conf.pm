@@ -44,7 +44,7 @@ use constant INTERNAL_KEY_PREFIX => 'int_';
 use base 'Exporter';
 our @EXPORT = qw(parse_raw_wg_config INTERNAL_KEY_PREFIX);
 
-our $VERSION = "0.3.1";
+our $VERSION = "0.3.2";
 
 =head3 parse_raw_wg_config($file_content, $on_every_value, $on_new_section [, $skip, $wg_meta_prefix, $wg_disabled_prefix])
 

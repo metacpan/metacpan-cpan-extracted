@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::PackageRateDetail;
-$Shipment::FedEx::WSDL::RateTypes::PackageRateDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::PackageRateDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ Class::Std::initialize();
               Taxes
               VariableHandlingCharges
 
-              )
+            )
         ],
         {   'RateType'                => \%RateType_of,
             'RatedWeightMethod'       => \%RatedWeightMethod_of,
@@ -96,12 +96,12 @@ Class::Std::initialize();
             'BaseCharge'     => 'Shipment::FedEx::WSDL::RateTypes::Money',
             'TotalFreightDiscounts' =>
               'Shipment::FedEx::WSDL::RateTypes::Money',
-            'NetFreight'      => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'TotalSurcharges' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'NetFedExCharge'  => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'TotalTaxes'      => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'NetCharge'       => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'TotalRebates'    => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'NetFreight'       => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'TotalSurcharges'  => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'NetFedExCharge'   => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'TotalTaxes'       => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'NetCharge'        => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'TotalRebates'     => 'Shipment::FedEx::WSDL::RateTypes::Money',
             'FreightDiscounts' =>
               'Shipment::FedEx::WSDL::RateTypes::RateDiscount',
             'Rebates'    => 'Shipment::FedEx::WSDL::RateTypes::Rebate',
@@ -151,7 +151,7 @@ Shipment::FedEx::WSDL::RateTypes::PackageRateDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

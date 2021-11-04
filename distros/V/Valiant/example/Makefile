@@ -23,7 +23,7 @@ update_db:
 update: update_cpanlib update_db
 
 server:
-	@CATALYST_DEBUG=1 DBIC_TRACE=1 perl -Ilib -I ../lib/ ./lib/Example/Server.pm
+	@CATALYST_DEBUG=1 DBIC_TRACE=1 perl -Ilib -I ../lib/  ./lib/Example/Server.pm
 
 dependencies:
 	@ack '^use ' -h --nobreak | perl -nle'++$lines{$_}; END { print for sort grep $lines{$_}==1, keys %lines; }

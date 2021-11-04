@@ -1,0 +1,138 @@
+Items list for Acme::FishFarm and related modules
+
+Version 0.01
+[v] Acme::FishFarm
+   [v] gist
+   [v] export -> ":all"
+   [v] implementation
+      [v] SYSTEM INSTALLATION
+         [v] install_all_systems - almost done, existing ones working
+      [v] SENSOR READING
+         [v] reduce_precision
+      [] AUTOMATED SYSTEMS
+         [v] consume_oxygen
+         [v] check_DO
+         [v] check_pH
+         [v] check_temperature
+         [v] check_turbidity
+         [v] check_water_filter - has new current reading
+         [v] check_water_level - has new current reading
+         [v] render_leds
+         [v] render_buzzer
+   [v] tests
+
+[v] Acme::FishFarm::Feeder
+   [v] synopsis
+   [v] gist
+   [v] implementation
+      [v] CREATION
+         [v] install
+      [v] TIMER
+         [v] get_timer
+         [v] set_timer
+         [v] timer_is_up
+         [v] time_remaining
+         [v] tick_clock
+      [v] FOOD TANK
+         [v] food_tank_capacity
+         [v] set_food_tank_capacity
+         [v] food_remaining
+      [v] FEEDING
+         [v] feed_fish
+         [v] set_feeding_volume
+         [v] feeding_volume
+         [v] refill
+   [v] tests
+
+[v] Acme::FishFarm::WaterConditionMonitor
+   [v] gist
+   [v] implementation
+      [v] CREATION
+         [v] install
+         [] add_oxygen_maintainer
+      [v] WATER CONDITIONS
+         [v] current_ph - get & set
+         [v] ph_treshold
+         [v] set_ph_threshold
+         [v] ph_is_normal
+
+         [v] current_temperature - get & set
+         [v] temperature_threshold
+         [v] set_temperature_threshold
+         [v] temperature_is_normal
+
+         [v] lacking_oxygen
+
+         [v] current_turbidity - get & set
+         [v] turbidity_threshold
+         [v] set_turbidity_threshold
+         [v] water_dirty
+      [v] BUZZER
+         [v] on_buzzer_short
+         [v] is_on_buzzer_short
+         [v] on_buzzer_long
+         [v] is_on_buzzer_long
+         [v] _tweak_buzzers
+      [v] LED
+         [v] on_LED_pH
+         [v] is_on_LED_pH
+         [v] on_LED_temperature
+         [v] is_on_LED_temperature
+         [v] on_LED_DO
+         [v] is_on_LED_DO
+         [v] on_LED_turbidity
+         [v] is_on_LED_turbidity
+         [v] lighted_LED_count
+   [v] tests
+
+[v] Acme::FishFarm::WaterFiltration
+   [v] gist
+   [] implementation
+      [v] CREATION
+         [v] install
+      [v] WASTE LEVEL DETECTION
+         [v] current_waste_count - get & set
+         [v] waste_count_threshold
+         [v] set_waste_count_threshold
+         [v] filter_layer_is_dirty - alias for cylinder_is_dirty
+         [v] is_cylinder_dirty
+      [v] CLEANING / SPATULA
+         [v] clean_filter_layer         
+         [v] clean_cylinder
+         [v] turn_on_spatulas
+         [v] turn_off_spatulas
+   [v] tests
+
+[v] Acme::FishFarm::WaterLevelMaintainer
+   [v] gist
+   [v] implementation
+      [v] CREATION
+         [v] install
+      [v] WATER LEVEL DETECTION
+         [v] current_water_level - get & set
+         [v] low_water_level_threshold
+         [v] set_low_water_level_threshold
+         [v] is_low_water_level
+      [v] PUMPS
+         [v] water_level_increase_height
+         [v] set_water_level_increase_height
+         [v] pump_water_in
+   [v] tests
+   
+[v] Acme::FishFarm::OxygenMaintainer
+   [v] gist
+   [v] implementation
+      [v] CREATION
+         [v] install
+      [v] DISSOLVED OXYGEN SENSOR
+         [v] current_DO
+         [v] DO_threshold
+         [v] set_DO_threshold
+         [v] is_low_DO
+      [v] OXYGEN GENERATION
+         [v] oxygen_generation_volume
+         [v] set_oxygen_generation_volume
+         [v] generate_oxygen
+   [v] tests
+
+[v] export all modules' documentation to html

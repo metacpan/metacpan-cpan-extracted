@@ -3,16 +3,16 @@
 #
 # Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2021 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 03-util.t 68 2019-06-08 10:59:56Z minus $
+# $Id: 03-util.t 82 2021-03-15 08:28:17Z minus $
 #
 #########################################################################
-use Test::More tests => 3;
-use MToken::Util qw/tcd_load tcd_save/;
+use Test::More tests => 4;
+use MToken::Util qw/tcd_load tcd_save sha1sum/;
 ok(MToken::Util->VERSION,'MToken::Util version');
 
 # TCD test
@@ -24,5 +24,13 @@ ok(MToken::Util->VERSION,'MToken::Util version');
 	is($result, $string, "Load TCD04 file");
 	unlink($tcd_file) if -e $tcd_file;
 }
+
+# SHA1 test
+SKIP: {
+	skip "LICENSE file not exists", 1 unless -e 'LICENSE';
+	my $sha1 = sha1sum('LICENSE');
+	is($sha1, "1a6f4a41ae8eec2da84dbfa48636e02e33575dbd", "SHA1 for LICENSE")
+}
+
 
 1;

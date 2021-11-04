@@ -1,5 +1,5 @@
 package App::Timestamper::WithElapsed;
-$App::Timestamper::WithElapsed::VERSION = '0.6.0';
+$App::Timestamper::WithElapsed::VERSION = '0.6.1';
 use strict;
 use warnings;
 use 5.014;
@@ -200,7 +200,7 @@ seconds since the last received line.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.6.1
 
 =head1 SYNOPSIS
 

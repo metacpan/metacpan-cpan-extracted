@@ -1,0 +1,77 @@
+NAME
+    Data::Kramerius - Information about all Kramerius systems.
+
+SYNOPSIS
+     use Data::Kramerius;
+
+     my $obj = Data::Kramerius->new;
+     my $kramerius_obj = $obj->get($kramerius_id);
+     my @kramerius_objs = $obj->list;
+
+DESCRIPTION
+    Kramerius is an open source software solution for accessing digital
+    documents. Homepage of project is in <https://system-kramerius.cz/>.
+
+METHODS
+  "new"
+     my $obj = Data::Kramerius->new;
+
+    Constructor.
+
+    Returns instance of object.
+
+  "get"
+     my $kramerius_obj = $obj->get($kramerius_id);
+
+    Get Kramerius object defined by id.
+
+    Returns Data::Kramerius::Object instance.
+
+  "list"
+     my @kramerius_objs = $obj->list;
+
+    List all kramerius systems.
+
+    Returns list of Data::Kramerius::Object instances.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Kramerius;
+     use Unicode::UTF8 qw(encode_utf8);
+
+     my $obj = Data::Kramerius->new;
+     my $kramerius_mzk = $obj->get('mzk');
+
+     # Print out.
+     print 'Id: '.$kramerius_mzk->id."\n";
+     print 'Name: '.encode_utf8($kramerius_mzk->name)."\n";
+     print 'URL: '.$kramerius_mzk->url."\n";
+     print 'Version: '.$kramerius_mzk->version."\n";
+
+     # Output:
+     # Id: mzk
+     # Name: Moravská zemská knihovna
+     # URL: http://kramerius.mzk.cz/
+     # Version: 4
+
+DEPENDENCIES
+    Data::Kramerius::Object, Text::DSV, Unicode::UTF8.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Kramerius>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

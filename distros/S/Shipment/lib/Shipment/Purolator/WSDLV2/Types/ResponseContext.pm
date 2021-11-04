@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ResponseContext;
-$Shipment::Purolator::WSDLV2::Types::ResponseContext::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::ResponseContext::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        ResponseReference
 
-              )
+            )
         ],
         {'ResponseReference' => \%ResponseReference_of,},
         {'ResponseReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
@@ -54,7 +54,7 @@ Shipment::Purolator::WSDLV2::Types::ResponseContext
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

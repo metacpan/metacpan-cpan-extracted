@@ -10,7 +10,7 @@ use Pod::Usage;
 use PPI::Document;
 use PPIx::QuoteLike::Utils qw{ __variables };
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 my %opt;
 

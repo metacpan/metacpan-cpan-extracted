@@ -1,7 +1,7 @@
 package Bencher::Scenario::SetOperationModules;
 
-our $DATE = '2017-02-19'; # DATE
-our $VERSION = '0.12'; # VERSION
+our $DATE = '2021-05-15'; # DATE
+our $VERSION = '0.130'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,6 +41,10 @@ our $scenario = {
         {
             tags => ['op:union'],
             fcall_template => 'Array::Set::set_union(<set1>, <set2>)',
+        },
+        {
+            tags => ['op:union'],
+            fcall_template => 'Array::Set::Naive::set_union(<set1>, <set2>)',
         },
         {
             tags => ['op:union'],
@@ -105,6 +109,10 @@ our $scenario = {
         },
         {
             tags => ['op:symdiff'],
+            fcall_template => 'Array::Set::Naive::set_symdiff(<set1>, <set2>)',
+        },
+        {
+            tags => ['op:symdiff'],
             module => 'Set::Array',
             function => 'symmetric_difference',
             code_template => 'my $s1 = Set::Array->new(@{<set1>}); my $s2 = Set::Array->new(@{<set2>}); $s1->symmetric_difference($s2)',
@@ -152,6 +160,10 @@ our $scenario = {
         {
             tags => ['op:diff'],
             fcall_template => 'Array::Set::set_diff(<set1>, <set2>)',
+        },
+        {
+            tags => ['op:diff'],
+            fcall_template => 'Array::Set::Naive::set_diff(<set1>, <set2>)',
         },
         {
             tags => ['op:diff'],
@@ -204,6 +216,10 @@ our $scenario = {
         {
             tags => ['op:intersect'],
             fcall_template => 'Array::Set::set_intersect(<set1>, <set2>)',
+        },
+        {
+            tags => ['op:intersect'],
+            fcall_template => 'Array::Set::Naive::set_intersect(<set1>, <set2>)',
         },
         {
             tags => ['op:intersect'],
@@ -279,7 +295,7 @@ Bencher::Scenario::SetOperationModules - Benchmark Perl set operation (union, in
 
 =head1 VERSION
 
-This document describes version 0.12 of Bencher::Scenario::SetOperationModules (from Perl distribution Bencher-Scenario-SetOperationModules), released on 2017-02-19.
+This document describes version 0.130 of Bencher::Scenario::SetOperationModules (from Perl distribution Bencher-Scenario-SetOperationModules), released on 2021-05-15.
 
 =head1 SYNOPSIS
 
@@ -303,19 +319,21 @@ Version numbers shown below are the versions used when running the sample benchm
 
 L<Array::AsObject> 1.02
 
-L<Array::Set> 0.05
+L<Array::Set> 0.062
+
+L<Array::Set::Naive> 0.001
 
 L<Array::Utils> 0.5
 
 L<List::Collection> 0.0.4
 
-L<List::MoreUtils> 0.416
+L<List::MoreUtils> 0.428
 
-L<List::MoreUtils::PP> 0.416
+L<List::MoreUtils::PP> 0.428
 
 L<Set::Array> 0.30
 
-L<Set::Object> 1.35
+L<Set::Object> 1.40
 
 L<Set::Scalar> 1.29
 
@@ -362,6 +380,14 @@ Function call template:
 Function call template:
 
  Array::Set::set_union(<set1>, <set2>)
+
+
+
+=item * Array::Set::Naive::set_union (perl_code) [op:union]
+
+Function call template:
+
+ Array::Set::Naive::set_union(<set1>, <set2>)
 
 
 
@@ -445,6 +471,14 @@ Function call template:
 
 
 
+=item * Array::Set::Naive::set_symdiff (perl_code) [op:symdiff]
+
+Function call template:
+
+ Array::Set::Naive::set_symdiff(<set1>, <set2>)
+
+
+
 =item * Set::Array::symmetric_difference (perl_code) [op:symdiff]
 
 Code template:
@@ -506,6 +540,14 @@ Code template:
 Function call template:
 
  Array::Set::set_diff(<set1>, <set2>)
+
+
+
+=item * Array::Set::Naive::set_diff (perl_code) [op:diff]
+
+Function call template:
+
+ Array::Set::Naive::set_diff(<set1>, <set2>)
 
 
 
@@ -573,6 +615,14 @@ Function call template:
 
 
 
+=item * Array::Set::Naive::set_intersect (perl_code) [op:intersect]
+
+Function call template:
+
+ Array::Set::Naive::set_intersect(<set1>, <set2>)
+
+
+
 =item * Set::Array::intersection (perl_code) [op:intersect]
 
 Code template:
@@ -623,161 +673,172 @@ Code template:
 
 =item * num100
 
+=item * num1000 (not included by default)
+
 =back
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.5 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
+Run on: perl: I<< v5.30.2 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 5.3.0-68-generic >>.
 
 Benchmark with default options (C<< bencher -m SetOperationModules >>):
 
  #table1#
  {dataset=>"num10",p_tags=>"op:diff"}
- +-----------------------------+-----------+-----------+------------+---------+---------+
- | participant                 | rate (/s) | time (μs) | vs_slowest |  errors | samples |
- +-----------------------------+-----------+-----------+------------+---------+---------+
- | Set::Scalar::difference     |     12000 |   80      |      1     | 1.3e-07 |      20 |
- | Array::AsObject::difference |     24000 |   41.7    |      1.92  | 1.3e-08 |      20 |
- | Set::Array::difference      |     67000 |   15      |      5.3   | 1.9e-08 |      22 |
- | Set::Object::difference     |    114000 |    8.74   |      9.16  | 3.3e-09 |      20 |
- | Set::Tiny::difference       |    141000 |    7.08   |     11.3   |   3e-09 |      24 |
- | List::Collection::subtract  |    190000 |    5.3    |     15     | 6.7e-09 |      20 |
- | Array::Set::set_diff        |    226000 |    4.42   |     18.1   | 1.7e-09 |      20 |
- | Array::Utils::array_minus   |    263070 |    3.8013 |     21.053 | 2.9e-11 |      21 |
- +-----------------------------+-----------+-----------+------------+---------+---------+
+ +-----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                 | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Set::Scalar::difference     |     12000 |  81       |                 0.00% |              2147.13% |   2e-07 |      23 |
+ | Array::AsObject::difference |     26000 |  39       |               107.15% |               984.78% |   4e-08 |      20 |
+ | Set::Array::difference      |     70000 |  14.3     |               467.76% |               295.79% | 6.7e-09 |      20 |
+ | Set::Object::difference     |    120000 |   8.3     |               880.78% |               129.12% | 1.3e-08 |      20 |
+ | Array::Set::Naive::set_diff |    123482 |   8.09832 |               902.09% |               124.24% | 5.7e-12 |      25 |
+ | Set::Tiny::difference       |    150000 |   6.8     |              1100.16% |                87.24% | 1.3e-08 |      20 |
+ | List::Collection::subtract  |    188000 |   5.33    |              1423.25% |                47.52% | 1.7e-09 |      20 |
+ | Array::Set::set_diff        |    240000 |   4.2     |              1831.85% |                16.32% |   5e-09 |      20 |
+ | Array::Utils::array_minus   |    276900 |   3.61141 |              2147.13% |                 0.00% |   0     |      20 |
+ +-----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table2#
  {dataset=>"num100",p_tags=>"op:diff"}
- +-----------------------------+-----------+-----------+------------+---------+---------+
- | participant                 | rate (/s) | time (ms) | vs_slowest |  errors | samples |
- +-----------------------------+-----------+-----------+------------+---------+---------+
- | Array::AsObject::difference |       460 |    2.2    |        1   | 4.2e-06 |      21 |
- | Set::Scalar::difference     |      2200 |    0.46   |        4.7 | 2.4e-06 |      21 |
- | Set::Array::difference      |     13000 |    0.078  |       28   | 4.2e-07 |      21 |
- | Set::Object::difference     |     15000 |    0.068  |       32   |   8e-08 |      20 |
- | Set::Tiny::difference       |     17000 |    0.058  |       37   | 1.1e-07 |      20 |
- | Array::Set::set_diff        |     29000 |    0.035  |       62   | 5.3e-08 |      20 |
- | Array::Utils::array_minus   |     30000 |    0.034  |       64   | 5.3e-08 |      20 |
- | List::Collection::subtract  |     29600 |    0.0338 |       64.5 |   1e-08 |      34 |
- +-----------------------------+-----------+-----------+------------+---------+---------+
+ +-----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                 | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Array::AsObject::difference |       480 |    2.1    |                 0.00% |              6402.49% | 4.1e-06 |      20 |
+ | Set::Scalar::difference     |      2200 |    0.46   |               356.06% |              1325.78% | 6.9e-07 |      20 |
+ | Array::Set::Naive::set_diff |      5400 |    0.19   |              1028.66% |               476.12% | 2.1e-07 |      21 |
+ | Set::Array::difference      |     13000 |    0.074  |              2716.03% |               130.91% | 1.3e-07 |      22 |
+ | Set::Object::difference     |     15000 |    0.065  |              3111.12% |               102.50% | 9.9e-08 |      23 |
+ | Set::Tiny::difference       |     17000 |    0.059  |              3459.65% |                82.67% | 1.3e-07 |      20 |
+ | Array::Set::set_diff        |     30000 |    0.033  |              6194.58% |                 3.30% |   5e-08 |      23 |
+ | List::Collection::subtract  |     30700 |    0.0326 |              6307.72% |                 1.48% | 1.2e-08 |      23 |
+ | Array::Utils::array_minus   |     31100 |    0.0321 |              6402.49% |                 0.00% | 1.1e-08 |      29 |
+ +-----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table3#
  {dataset=>"num10",p_tags=>"op:intersect"}
- +-------------------------------+-----------+-----------+------------+---------+---------+
- | participant                   | rate (/s) | time (μs) | vs_slowest |  errors | samples |
- +-------------------------------+-----------+-----------+------------+---------+---------+
- | Set::Scalar::intersection     |     11000 |  90       |     1      | 1.1e-07 |      30 |
- | Array::AsObject::intersection |     11000 |  90       |     1      |   1e-07 |      22 |
- | List::Collection::intersect   |     18000 |  55       |     1.6    | 9.7e-08 |      24 |
- | Set::Array::intersection      |     36000 |  28       |     3.3    | 3.7e-08 |      24 |
- | Set::Object::intersection     |     91400 |  10.9     |     8.21   | 3.3e-09 |      20 |
- | Set::Tiny::intersection       |    155572 |   6.42789 |    13.9869 |   0     |      38 |
- | Array::Set::set_intersect     |    176000 |   5.69    |    15.8    | 1.6e-09 |      22 |
- | Array::Utils::intersect       |    249390 |   4.0098  |    22.422  | 2.3e-11 |      20 |
- +-------------------------------+-----------+-----------+------------+---------+---------+
+ +----------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                      | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +----------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Set::Scalar::intersection        |   12000   |  86       |                 0.00% |              2247.59% |   1e-07 |      21 |
+ | Array::AsObject::intersection    |   12000   |  82       |                 4.69% |              2142.42% | 1.1e-07 |      20 |
+ | List::Collection::intersect      |   19000   |  53       |                61.78% |              1351.06% |   1e-07 |      22 |
+ | Set::Array::intersection         |   32000   |  32       |               170.88% |               766.64% | 5.1e-08 |      22 |
+ | Set::Object::intersection        |   98244.7 |  10.1787  |               740.40% |               179.34% | 5.8e-12 |      20 |
+ | Array::Set::Naive::set_intersect |  103828   |   9.63133 |               788.16% |               164.32% | 5.8e-12 |      22 |
+ | Set::Tiny::intersection          |  160000   |   6.2     |              1270.32% |                71.32% | 8.1e-09 |      21 |
+ | Array::Set::set_intersect        |  189000   |   5.29    |              1516.38% |                45.24% | 1.6e-09 |      21 |
+ | Array::Utils::intersect          |  274438   |   3.64381 |              2247.59% |                 0.00% |   0     |      20 |
+ +----------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table4#
  {dataset=>"num100",p_tags=>"op:intersect"}
- +-------------------------------+-----------+-----------+------------+---------+---------+
- | participant                   | rate (/s) | time (ms) | vs_slowest |  errors | samples |
- +-------------------------------+-----------+-----------+------------+---------+---------+
- | Array::AsObject::intersection |       223 |    4.48   |       1    | 2.5e-06 |      20 |
- | Set::Array::intersection      |       595 |    1.68   |       2.66 | 1.1e-06 |      20 |
- | List::Collection::intersect   |      1400 |    0.73   |       6.2  | 2.2e-06 |      20 |
- | Set::Scalar::intersection     |      1980 |    0.505  |       8.87 | 2.1e-07 |      20 |
- | Set::Object::intersection     |     11000 |    0.092  |      49    | 1.1e-07 |      27 |
- | Set::Tiny::intersection       |     18000 |    0.056  |      80    |   1e-07 |      21 |
- | Array::Set::set_intersect     |     20800 |    0.0482 |      92.9  | 1.3e-08 |      22 |
- | Array::Utils::intersect       |     27900 |    0.0358 |     125    | 1.1e-08 |      28 |
- +-------------------------------+-----------+-----------+------------+---------+---------+
+ +----------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                      | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +----------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Array::AsObject::intersection    |     240   | 4.3       |                 0.00% |             13169.36% | 5.3e-06 |      21 |
+ | Set::Array::intersection         |     486   | 2.06      |               106.40% |              6328.92% | 1.8e-06 |      20 |
+ | List::Collection::intersect      |    1370   | 0.73      |               482.00% |              2179.97% | 6.9e-07 |      20 |
+ | Set::Scalar::intersection        |    2000   | 0.5       |               742.88% |              1474.29% | 8.3e-07 |      21 |
+ | Array::Set::Naive::set_intersect |    4900   | 0.21      |              1964.66% |               542.69% | 2.1e-07 |      21 |
+ | Set::Object::intersection        |   11000   | 0.089     |              4695.13% |               176.73% | 1.1e-07 |      20 |
+ | Set::Tiny::intersection          |   18000   | 0.056     |              7446.19% |                75.84% | 1.1e-07 |      20 |
+ | Array::Set::set_intersect        |   22500   | 0.0444    |              9473.74% |                38.60% | 1.2e-08 |      23 |
+ | Array::Utils::intersect          |   31216.5 | 0.0320344 |             13169.36% |                 0.00% |   5e-12 |      21 |
+ +----------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table5#
  {dataset=>"num10",p_tags=>"op:symdiff"}
- +---------------------------------------+-----------+-----------+------------+---------+---------+
- | participant                           | rate (/s) | time (μs) | vs_slowest |  errors | samples |
- +---------------------------------------+-----------+-----------+------------+---------+---------+
- | Array::AsObject::symmetric_difference |    5110   |  196      |     1      | 4.9e-08 |      24 |
- | List::Collection::complement          |    7900   |  130      |     1.5    | 6.9e-07 |      20 |
- | Set::Scalar::symmetric_difference     |   19000   |   53      |     3.7    | 1.3e-07 |      21 |
- | Set::Object::symmetric_difference     |   62900   |   15.9    |    12.3    | 6.1e-09 |      24 |
- | Set::Array::symmetric_difference      |   73714.5 |   13.5659 |    14.4262 |   0     |      20 |
- | Set::Tiny::symmetric_difference       |  130000   |    7.6    |    26      | 1.3e-08 |      20 |
- | Array::Set::set_symdiff               |  173400   |    5.767  |    33.93   | 9.8e-11 |      21 |
- | Array::Utils::array_diff              |  216300   |    4.622  |    42.34   | 1.9e-10 |      22 |
- | List::MoreUtils::PP::singleton        |  235000   |    4.25   |    46.1    | 1.5e-09 |      26 |
- | List::MoreUtils::XS::singleton        |  414000   |    2.41   |    81.1    | 7.5e-10 |      25 |
- +---------------------------------------+-----------+-----------+------------+---------+---------+
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                           | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Array::AsObject::symmetric_difference |      5500 | 180       |                 0.00% |              7583.47% | 2.7e-07 |      20 |
+ | List::Collection::complement          |      8400 | 120       |                53.43% |              4907.67% | 6.4e-07 |      20 |
+ | Set::Scalar::symmetric_difference     |     19000 |  53       |               245.04% |              2126.86% |   8e-08 |      20 |
+ | Array::Set::Naive::set_symdiff        |     35357 |  28.283   |               545.81% |              1089.74% | 4.6e-11 |      23 |
+ | Set::Object::symmetric_difference     |     67000 |  15       |              1121.71% |               528.91% | 2.7e-08 |      20 |
+ | Set::Array::symmetric_difference      |     71200 |  14       |              1200.88% |               490.63% | 6.5e-09 |      21 |
+ | Set::Tiny::symmetric_difference       |    130000 |   7.4     |              2357.32% |               212.68% | 1.3e-08 |      20 |
+ | Array::Set::set_symdiff               |    170000 |   5.8     |              3071.71% |               142.25% | 6.7e-09 |      20 |
+ | Array::Utils::array_diff              |    220000 |   4.6     |              3864.59% |                93.80% | 6.7e-09 |      20 |
+ | List::MoreUtils::PP::singleton        |    242000 |   4.14    |              4312.27% |                74.14% | 1.4e-09 |      27 |
+ | List::MoreUtils::XS::singleton        |    420653 |   2.37726 |              7583.47% |                 0.00% |   0     |      20 |
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table6#
  {dataset=>"num100",p_tags=>"op:symdiff"}
- +---------------------------------------+-----------+-----------+------------+---------+---------+
- | participant                           | rate (/s) | time (ms) | vs_slowest |  errors | samples |
- +---------------------------------------+-----------+-----------+------------+---------+---------+
- | Array::AsObject::symmetric_difference |       110 |    9.3    |          1 | 2.8e-05 |      20 |
- | List::Collection::complement          |       530 |    1.9    |          5 | 3.8e-06 |      20 |
- | Set::Scalar::symmetric_difference     |      3000 |    0.34   |         28 | 6.1e-07 |      22 |
- | Set::Object::symmetric_difference     |      9400 |    0.11   |         87 | 1.5e-07 |      24 |
- | Set::Array::symmetric_difference      |     13300 |    0.0752 |        124 | 2.7e-08 |      20 |
- | Set::Tiny::symmetric_difference       |     16000 |    0.063  |        150 | 9.9e-08 |      23 |
- | Array::Set::set_symdiff               |     20800 |    0.0481 |        193 | 1.3e-08 |      20 |
- | List::MoreUtils::PP::singleton        |     26200 |    0.0381 |        244 | 1.2e-08 |      25 |
- | Array::Utils::array_diff              |     26700 |    0.0375 |        249 | 1.3e-08 |      20 |
- | List::MoreUtils::XS::singleton        |     42800 |    0.0234 |        398 |   6e-09 |      25 |
- +---------------------------------------+-----------+-----------+------------+---------+---------+
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                           | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Array::AsObject::symmetric_difference |     116   | 8.62      |                 0.00% |             43587.49% | 1.2e-06 |      20 |
+ | List::Collection::complement          |     550   | 1.8       |               371.84% |              9158.92% | 2.7e-06 |      20 |
+ | Array::Set::Naive::set_symdiff        |    2020   | 0.495     |              1643.33% |              2405.98% | 4.8e-07 |      20 |
+ | Set::Scalar::symmetric_difference     |    2900   | 0.34      |              2410.38% |              1640.27% | 4.2e-07 |      21 |
+ | Set::Object::symmetric_difference     |   10000   | 0.1       |              8492.96% |               408.41% | 1.3e-07 |      20 |
+ | Set::Array::symmetric_difference      |   13000   | 0.076     |             11297.33% |               283.31% | 9.9e-08 |      23 |
+ | Set::Tiny::symmetric_difference       |   15000   | 0.065     |             13191.71% |               228.68% |   1e-07 |      21 |
+ | Array::Set::set_symdiff               |   21600   | 0.0462    |             18545.58% |               134.30% | 1.3e-08 |      20 |
+ | List::MoreUtils::PP::singleton        |   28000   | 0.036     |             23741.01% |                83.25% |   5e-08 |      23 |
+ | Array::Utils::array_diff              |   27797.2 | 0.0359748 |             23864.84% |                82.30% | 2.3e-11 |      20 |
+ | List::MoreUtils::XS::singleton        |   51000   | 0.02      |             43587.49% |                 0.00% |   2e-08 |      20 |
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table7#
  {dataset=>"num10",p_tags=>"op:union"}
- +---------------------------+-----------+-----------+------------+---------+---------+
- | participant               | rate (/s) | time (μs) | vs_slowest |  errors | samples |
- +---------------------------+-----------+-----------+------------+---------+---------+
- | Set::Scalar::union        |     12000 |  85       |     1      | 1.3e-07 |      20 |
- | List::Collection::union   |     17000 |  60       |     1.4    | 2.1e-07 |      21 |
- | Array::AsObject::union    |     75100 |  13.3     |     6.38   | 6.7e-09 |      20 |
- | Set::Array::union         |     97000 |  10       |     8.2    | 1.3e-08 |      20 |
- | Set::Object::union        |    110000 |   8.9     |     9.5    | 1.3e-08 |      20 |
- | Set::Tiny::union          |    150000 |   6.6     |    13      |   1e-08 |      20 |
- | Array::Set::set_union     |    180000 |   5.5     |    16      | 6.7e-09 |      20 |
- | List::MoreUtils::PP::uniq |    320000 |   3.2     |    27      | 6.7e-09 |      20 |
- | List::MoreUtils::XS::uniq |    512740 |   1.95031 |    43.5071 |   0     |      24 |
- | Array::Utils::unique      |    849000 |   1.18    |    72.1    | 4.2e-10 |      20 |
- +---------------------------+-----------+-----------+------------+---------+---------+
+ +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                  | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Set::Scalar::union           |   12000   |  84       |                 0.00% |              7441.85% | 1.1e-07 |      20 |
+ | List::Collection::union      |   17000   |  59       |                42.10% |              5207.39% | 4.4e-07 |      21 |
+ | Array::Set::Naive::set_union |   67752.2 |  14.7597  |               468.02% |              1227.75% | 5.8e-12 |      23 |
+ | Array::AsObject::union       |   80800   |  12.4     |               577.60% |              1013.03% | 3.3e-09 |      21 |
+ | Set::Array::union            |  100000   |   9.7     |               762.18% |               774.74% | 1.3e-08 |      21 |
+ | Set::Object::union           |  116381   |   8.5925  |               875.70% |               672.97% |   0     |      20 |
+ | Set::Tiny::union             |  150000   |   6.6     |              1175.41% |               491.33% | 1.3e-08 |      20 |
+ | Array::Set::set_union        |  182000   |   5.48    |              1429.24% |               393.18% | 1.7e-09 |      20 |
+ | List::MoreUtils::PP::uniq    |  318229   |   3.14239 |              2567.95% |               182.68% |   0     |      20 |
+ | List::MoreUtils::XS::uniq    |  515000   |   1.94    |              4218.96% |                74.62% | 8.3e-10 |      20 |
+ | Array::Utils::unique         |  900000   |   1.11    |              7441.85% |                 0.00% | 4.1e-10 |      21 |
+ +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table8#
  {dataset=>"num100",p_tags=>"op:union"}
- +---------------------------+-----------+-----------+------------+---------+---------+
- | participant               | rate (/s) | time (μs) | vs_slowest |  errors | samples |
- +---------------------------+-----------+-----------+------------+---------+---------+
- | List::Collection::union   |       920 |  1100     |      1     | 2.2e-06 |      20 |
- | Set::Scalar::union        |      2130 |   469     |      2.31  | 4.3e-07 |      20 |
- | Array::AsObject::union    |     11000 |    91     |     12     |   3e-07 |      26 |
- | Set::Object::union        |     14000 |    71     |     15     | 2.1e-07 |      20 |
- | Set::Tiny::union          |     18000 |    57     |     19     | 1.1e-07 |      20 |
- | Set::Array::union         |     18000 |    56     |     19     | 1.1e-07 |      20 |
- | Array::Set::set_union     |     22168 |    45.111 |     24.076 | 5.8e-11 |      25 |
- | List::MoreUtils::PP::uniq |     34600 |    28.9   |     37.6   | 1.2e-08 |      24 |
- | List::MoreUtils::XS::uniq |     55900 |    17.9   |     60.7   | 5.8e-09 |      26 |
- | Array::Utils::unique      |    260000 |     3.9   |    280     | 6.7e-09 |      20 |
- +---------------------------+-----------+-----------+------------+---------+---------+
+ +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                  | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | List::Collection::union      |     920   | 1100      |                 0.00% |             28313.54% | 1.3e-06 |      21 |
+ | Set::Scalar::union           |    2070   |  484      |               124.70% |             12545.09% | 4.8e-07 |      20 |
+ | Array::Set::Naive::set_union |    2900   |  350      |               210.18% |              9060.44% | 4.3e-07 |      20 |
+ | Array::AsObject::union       |   12000   |   87      |              1153.76% |              2166.27% | 2.1e-07 |      20 |
+ | Set::Object::union           |   14000   |   72      |              1418.92% |              1770.64% |   1e-07 |      21 |
+ | Set::Tiny::union             |   17000   |   60      |              1711.03% |              1468.92% | 9.2e-08 |      27 |
+ | Set::Array::union            |   22000   |   46      |              2267.06% |              1100.37% | 5.2e-08 |      21 |
+ | Array::Set::set_union        |   21900   |   45.8    |              2276.42% |              1095.65% |   4e-08 |      20 |
+ | List::MoreUtils::PP::uniq    |   36848.1 |   27.1384 |              3906.17% |               609.24% |   0     |      20 |
+ | List::MoreUtils::XS::uniq    |   65000   |   15      |              6934.26% |               303.93% | 2.7e-08 |      20 |
+ | Array::Utils::unique         |  261000   |    3.83   |             28313.54% |                 0.00% | 1.7e-09 |      20 |
+ +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m SetOperationModules --module-startup >>):
 
  #table9#
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | List::Collection    | 0.93                         | 4.3                | 20             |      14   |                   11.4 |        1   | 3.3e-05 |      20 |
- | Set::Array          | 3                            | 6.5                | 26             |      14   |                   11.4 |        1   | 6.6e-05 |      20 |
- | Array::AsObject     | 2.2                          | 5.6                | 23             |      14   |                   11.4 |        1   | 5.9e-05 |      20 |
- | Set::Object         | 1                            | 4.4                | 20             |      12   |                    9.4 |        1.2 | 2.7e-05 |      20 |
- | Set::Scalar         | 1.2                          | 4.5                | 20             |      11   |                    8.4 |        1.3 | 3.2e-05 |      20 |
- | List::MoreUtils     | 1.1                          | 4.4                | 20             |       8.4 |                    5.8 |        1.7 |   5e-05 |      20 |
- | List::MoreUtils::PP | 1.6                          | 5                  | 23             |       5.7 |                    3.1 |        2.5 | 3.2e-05 |      20 |
- | Array::Set          | 2.7                          | 6.1                | 28             |       5.2 |                    2.6 |        2.8 | 2.7e-05 |      20 |
- | Set::Tiny           | 2.3                          | 5.7                | 27             |       3.8 |                    1.2 |        3.8 | 1.7e-05 |      20 |
- | Array::Utils        | 1.9                          | 5.3                | 23             |       3.7 |                    1.1 |        3.9 | 2.2e-05 |      20 |
- | perl -e1 (baseline) | 0.93                         | 4.3                | 20             |       2.6 |                    0   |        5.6 | 6.5e-06 |      20 |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | Array::AsObject     |      20   |              15   |                 0.00% |               251.58% |   0.00018 |      20 |
+ | Set::Array          |      20   |              15   |                 6.54% |               230.00% |   0.0002  |      21 |
+ | List::Collection    |      16   |              11   |                12.78% |               211.73% |   0.00011 |      20 |
+ | Set::Object         |      10   |               5   |                28.02% |               174.64% |   0.00014 |      20 |
+ | Set::Scalar         |      13   |               8   |                42.28% |               147.11% | 3.4e-05   |      20 |
+ | List::MoreUtils     |      12   |               7   |                53.89% |               128.46% | 3.7e-05   |      20 |
+ | List::MoreUtils::PP |       9.1 |               4.1 |                96.61% |                78.82% | 3.2e-05   |      20 |
+ | Array::Set::Naive   |       9   |               4   |               109.72% |                67.64% |   0.00017 |      21 |
+ | Array::Set          |       8   |               3   |               121.13% |                59.00% |   0.00015 |      20 |
+ | Set::Tiny           |       7   |               2   |               150.59% |                40.30% |   0.00023 |      21 |
+ | Array::Utils        |       6   |               1   |               186.55% |                22.69% |   0.00024 |      20 |
+ | perl -e1 (baseline) |       5   |               0   |               251.58% |                 0.00% |   0.0001  |      20 |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -811,7 +872,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

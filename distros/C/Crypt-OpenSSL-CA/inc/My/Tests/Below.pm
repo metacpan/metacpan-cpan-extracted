@@ -42,11 +42,6 @@ of organizing test code is not unlike L<Test::Inline>, by Adam Kennedy
 et al, in that it keeps code, documentation and tests in the same
 place, encouraging developers to modify all three at once.
 
-I like to use L<Test::Group> for the unit perlmodlib-style unit tests,
-because counting and recounting my tests drives me nuts :-). However
-C<My::Tests::Below> itself is testing-framework agnostic (its own
-self-test suite, for instance, uses only plain old L<Test::More>).
-
 Invoking C<require My::Tests::Below> from anywhere (the idiomatic form
 is shown in L</SYNOPSIS>) results in the block of code after the
 __END__ marker being run at once. Due to the way this construct abuses
@@ -211,8 +206,9 @@ any, will work as normal.
 
 =cut
 
-    local %INC = %INC;
+    my ($mocked_INC_key, $mocked_INC_value);
     if (defined $self->{package} && defined $self->{packfilename}) {
+        my $caller_module_as_INC_key;
         # Heuristics needed here. $self->{packfilename} is a filename,
         # say /path/to/lib/Foo/Bar.pm, and we want to set
         # $INC{"Foo/Bar.pm"} so we must weed out /path/to/lib
@@ -227,11 +223,14 @@ any, will work as normal.
 #warn "Considering $filename against $self->{packfilename}";
             next unless ($self->{packfilename} =~
                          m{(\Q$filename\E(?:/.*|\.pm)$)});
-#warn "Inhibiting load of $1";
-            $INC{$1} = $self->{packfilename}; last;
+            $mocked_INC_key = $1;
+            $mocked_INC_value = $self->{packfilename};
+            last;
         }
     };
-
+#warn "Inhibit load of $mocked_INC_key" if defined($mocked_INC_key);
+    # With permission from https://www.perlmonks.org/?node_id=892986 :
+    (local $INC{$mocked_INC_key} = $mocked_INC_value) if defined($mocked_INC_key);
 
 =item I<%ENV is standardized>
 
@@ -447,7 +446,7 @@ __END__
 ######################## TEST SUITE ###################################
 
 use strict;
-use Test::More tests => 11;
+use Test2::V0;
 use IO::File;
 use IO::Handle;
 use IPC::Open3;
@@ -553,7 +552,9 @@ is($?, 0, "Exited with return code 0\n");
 like($result, qr/ok 1/, "Test result #1");
 like($result, qr/ok 2/, "Test result #2");
 
-write_file($fakemodule, <<'BUGGY_MODULE_WITH_TEST_MORE');
+unlike($result, qr/redefined/,  "no redefined warnings in successful test");
+
+write_file($fakemodule, <<'BUGGY_MODULE_WITH_TEST2_V0');
 #!perl -Tw
 
 package Fake::Module;
@@ -565,15 +566,19 @@ require My::Tests::Below unless (caller());
 
 __END__
 
-use Test::More no_plan => 1;
+use Test2::V0;
 
 ok(1);
 die;
-BUGGY_MODULE_WITH_TEST_MORE
+
+done_testing();
+BUGGY_MODULE_WITH_TEST2_V0
 
 $result = run_perl($fakemodule);
 is($?, 255 << 8, "Exited with return code 255\n");
-like($result, qr/Looks like your test died just after/, "Test died");
+like($result, qr/done_testing\(\) was not seen/, "Test died");
+
+unlike($result, qr/Subroutine.*redefined/, "no redefined warnings in dead test");
 
 ######## POD snippets
 
@@ -602,4 +607,4 @@ LAZY_SHORTCUT
 eval $testsnippet; die $@ if $@; # $testsnippet contains an invocation of
 # is(), so the test counter gets incremented by one here.
 
-1;
+done_testing;

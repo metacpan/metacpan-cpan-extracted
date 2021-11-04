@@ -67,8 +67,9 @@ from inside the repository like this:
 $ perl -Ilib bin/plisco
 ```
 
-The engine needs several seconds to come up because the source code of the
-engine and the library are parsed and the macros contained expanded.
+The engine needs some time to come up because it compiles a number of lookup
+tables.  If you run it from a git checkout, it will also need time to parse
+its own source code and expand the macros contained.
 
 ### Graphical User Interfaces
 

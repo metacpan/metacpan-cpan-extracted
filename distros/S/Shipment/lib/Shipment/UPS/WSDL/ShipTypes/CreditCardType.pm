@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::CreditCardType;
-$Shipment::UPS::WSDL::ShipTypes::CreditCardType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::CreditCardType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               SecurityCode
               Address
 
-              )
+            )
         ],
         {   'Type'           => \%Type_of,
             'Number'         => \%Number_of,
@@ -47,7 +47,7 @@ Class::Std::initialize();
             'Number'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'ExpirationDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'SecurityCode'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Address' =>
+            'Address'        =>
               'Shipment::UPS::WSDL::ShipTypes::CreditCardAddressType',
         },
         {
@@ -77,7 +77,7 @@ Shipment::UPS::WSDL::ShipTypes::CreditCardType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -130,9 +130,8 @@ sub _run_command($self, $interface, $is_dump, $ref_attr_list) {
                 $state = ($interface_is_active and keys %wg_show_section > 1) ? 1 : 0;
                 my $state_marker = ($state == 1) ? BOLD . GREEN . '●' . RESET : BOLD . RED . '●' . RESET;
                 $output .= $state_marker . BOLD . lc($type) . ": " . RESET . $identifier . "\n";
-                $output .= $self->_get_pretty_line(\%config_section, \%wg_show_section, $ref_attr_list) . "\n";
+                $output .= $self->_get_pretty_line(\%config_section, \%wg_show_section, $ref_attr_list) . "\n\n";
             }
-
         }
     }
     print $output;

@@ -1,0 +1,92 @@
+# INSTALL
+
+## libmagic library 
+
+For mime type guessing we need the `libmagic` library.
+
+On Debian/Ubuntu run:
+
+```
+sudo apt-get install libmagic-dev
+```
+
+On Red Hat run:
+
+```
+sudo yum install file-devel file-libs
+```
+
+On Mac you can use homebrew (https://brew.sh/):
+
+```
+brew install libmagic
+```
+
+See also: https://metacpan.org/pod/File::LibMagic
+
+## CPANM
+
+CPANM is the Perl package manager
+
+On Debian/Ubuntu run:
+
+```
+sudo apt-get apt-get install cpanminus
+```
+
+On Red Hat run:
+
+```
+sudo  yum install perl-App-cpanminus 
+```
+
+On Mac you can use homebrew:
+
+```
+brew install cpanminus
+```
+
+## Install this package from the official release
+
+Run
+
+```
+cpanm Web::Solid::Auth
+```
+
+Add your favorite Solid Pod to your `.bashrc` or `.zshrc` (depending on your shell)
+
+```
+# Your WebId
+export SOLID_WEBID=https://hochstenbach.inrupt.net/profile/card#me
+# The baseUrl used for relative urls (without the slash at the end!)
+export SOLID_REMOTE_BASE=https://hochstenbach.inrupt.net
+```
+
+Reread your shell configuratation file:
+
+```
+source ~/.bashrc
+```
+
+## Hello World
+
+Authenticate to your own pod. The program below will ask you to open a link
+in a webbrowser and authenticate at your identity provider (IDP). When you
+are authenticated you can close the program
+
+```
+solid_auth.pl authenticate
+```
+
+Now you can check private data
+
+```
+# List the root container
+solid_auth.pl list /
+```
+
+## PLENV
+
+If you happen to happen to run [plenv](https://github.com/tokuhirom/plenv) , a Perl binary manager, don't forget to run `plenv rehash` after you ran `cpanm`. This
+will put the `solid_auth.pl` script in your path.

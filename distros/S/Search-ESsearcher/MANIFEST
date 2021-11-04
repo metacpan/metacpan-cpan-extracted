@@ -17,6 +17,12 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 bin/essearcher
-logstash/postfix/50-filter-postfix.conf
-logstash/postfix/README.md
-logstash/postfix/postfix.grok
+logstash/patterns.d/postfix.grok
+logstash/conf.d/50-filter-postfix.conf
+logstash/conf.d/syslog.conf
+logstash/conf.d/rsyslog.conf
+logstash/conf.d/beats.conf
+logstash/conf.d/51-filter-postfix-aggregate.conf.off
+logstash/README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

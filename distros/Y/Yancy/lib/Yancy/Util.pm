@@ -1,11 +1,11 @@
 package Yancy::Util;
-our $VERSION = '1.077';
+our $VERSION = '1.084';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Yancy::Util qw( load_backend );
-#pod     my $be = load_backend( 'test://localhost', $schema );
+#pod     my $be = load_backend( 'memory://localhost', $schema );
 #pod
 #pod     use Yancy::Util qw( curry );
 #pod     my $helper = curry( \&_helper_sub, @args );
@@ -67,7 +67,7 @@ our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match derp fill_
 #pod L<Mojo::SQLite>, or a subclass of L<DBIx::Class::Schema>. The
 #pod appropriate backend object will be created.
 #pod
-#pod See L<Yancy::Help::Config/Database Backend> for information about
+#pod See L<Yancy::Guides::Schema/Database Backend> for information about
 #pod backend URLs and L<Yancy::Backend> for more information about backend
 #pod objects.
 #pod
@@ -499,12 +499,7 @@ sub derp(@) {
 
 sub json_validator {
     my ( $schema ) = @_;
-    my $v = JSON::Validator->new(
-        # This fixes HTML forms submitting the string "20" not being
-        # detected as a number, or the number 1 not being detected as
-        # a boolean
-        coerce => { booleans => 1, numbers => 1, strings => 1 },
-    );
+    my $v = JSON::Validator->new( coerce => 'bool,def,num,str' );
     my $formats = $v->formats;
     $formats->{ password } = sub { undef };
     $formats->{ filepath } = sub { undef };
@@ -526,12 +521,12 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.077
+version 1.084
 
 =head1 SYNOPSIS
 
     use Yancy::Util qw( load_backend );
-    my $be = load_backend( 'test://localhost', $schema );
+    my $be = load_backend( 'memory://localhost', $schema );
 
     use Yancy::Util qw( curry );
     my $helper = curry( \&_helper_sub, @args );
@@ -575,7 +570,7 @@ The C<$db_object> can be one of: L<Mojo::Pg>, L<Mojo::mysql>,
 L<Mojo::SQLite>, or a subclass of L<DBIx::Class::Schema>. The
 appropriate backend object will be created.
 
-See L<Yancy::Help::Config/Database Backend> for information about
+See L<Yancy::Guides::Schema/Database Backend> for information about
 backend URLs and L<Yancy::Backend> for more information about backend
 objects.
 

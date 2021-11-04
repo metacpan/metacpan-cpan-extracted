@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::ShipElements::ShipmentRequest;
-$Shipment::UPS::WSDL::ShipElements::ShipmentRequest::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipElements::ShipmentRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ use warnings;
                   Shipment
                   LabelSpecification
 
-                  )
+                )
             ],
             {   'Request'            => \%Request_of,
                 'Shipment'           => \%Shipment_of,
@@ -82,7 +82,7 @@ Shipment::UPS::WSDL::ShipElements::ShipmentRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

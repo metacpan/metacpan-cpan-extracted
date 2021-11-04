@@ -110,7 +110,7 @@ sub fu_printfastq {
 }
 
 
-sub rc ($) {
+sub rc {
     my $self = undef;
     if ( ref($_[0]) eq 'FASTX::ScriptHelper' ) {
       $self = shift @_;
@@ -306,9 +306,9 @@ sub _validate_attributes {
   for my $attr (sort keys %{ $options } ) {
     confess "Invalid attribute '$attr' used calling routine '$title'\n" if (not defined ${ $hash_ref}{ $attr });
   }
-  return undef;
+  return;
 }
-sub _runCmd(@) {
+sub _runCmd {
   if ( ref($_[0]) eq 'FASTX::ScriptHelper' ) {
      shift @_;
   }
@@ -344,7 +344,7 @@ FASTX::ScriptHelper - Shared routines for binaries using FASTX::Reader and FASTX
 
 =head1 VERSION
 
-version 1.1.0
+version 1.3.0
 
 =head2 new()
 

@@ -7,7 +7,7 @@ use urpm::select;
 use urpm::util;
 use base 'Exporter';
 our @EXPORT = qw(need_root_and_prepare need_downloader
-		 are_weak_deps_supported is_mageia
+		 are_weak_deps_supported is_mageia is_rpm_v3_support_broken
 		 start_httpd httpd_port
 		 urpmi_addmedia urpmi_addmedia_should_retry urpmi_removemedia urpmi_update
 		 urpm_cmd run_urpm_cmd urpmi_cmd urpmi urpmi_partial test_urpmi_fail urpme
@@ -216,6 +216,9 @@ sub is_mageia() {
 
 sub are_weak_deps_supported() {
     return urpm::select::_rpm_version() gt 4.12.0;
+}
+sub is_rpm_v3_support_broken() {
+    return member(urpm::select::_rpm_version(), qw(4.15.1.1 4.16.1.3));
 }
 
 END { 

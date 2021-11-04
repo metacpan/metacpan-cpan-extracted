@@ -14,7 +14,7 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.22';
+$VERSION = '1.23';
 my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
@@ -101,6 +101,9 @@ use vars '@Arrays';
 
 use vars '@Hashes';
 @Hashes = qw(
+    %main
+    %CORE
+    %CORE::GLOBAL::
     %OVERLOAD
     %+ %LAST_MATCH_END
     %- %LAST_MATCH_START
@@ -137,10 +140,13 @@ use vars '@Functions';
     # INIT was called RESTART before 5.004_50
   ($] >= 5.006
     ? qw(INIT) : qw(RESTART)),
+   # removed with 855a8c432447
   ($] < 5.007003 ? qw(
     EQ GE GT LE LT NE
-  ) : ()), qw(
+   ) : ()),
+  ($] >= 5.009005 ? qw(
     UNITCHECK
+   ) : ()), qw(
     abs
     accept
     alarm
@@ -237,7 +243,6 @@ use vars '@Functions';
     hex
     index
     int
-    import
     ioctl ),
   ($] >= 5.031007 ? qw(
     isa
@@ -337,7 +342,6 @@ use vars '@Functions';
     sqrt
     srand
     stat
-    state
     study
     substr
     symlink
@@ -359,7 +363,6 @@ use vars '@Functions';
     umask
     undef
     unlink
-    unimport
     unpack
     unshift
     untie
@@ -395,32 +398,30 @@ use vars '@Barewords';
     __PACKAGE__
     __DATA__
     __END__
-    CORE
-    EQ
-    GE
-    GT
-    LE
-    LT
-    NE
     NULL
     and ),
+  #removed with a96df643850d22bc4a94
+  ($] >= 5.000 && $] < 5.019010 ? qw(
+    CORE
+   ) : ()),
   ($CPERL && $] >= 5.027001 ? qw(
     class method role multi has
   ) : ()), qw(
     cmp
     continue
-    default
     do
     else
     elsif
     eq ),
+  # added with dor (c963b151157d), removed with f23102e2d6356
+  # in fact this was never in keywords.h for some reason
   ($] >= 5.008001 && $] < 5.010 ? qw(
     err
-  ) : ()), qw(
+  ) : ()),
+  qw(
     for
     foreach
     ge
-    given
     gt
     if
     le
@@ -446,17 +447,44 @@ use vars '@Barewords';
     tr
     unless
     until
-    when
     while
     x
     xor
     y
   ),
+  # also with default, say
+  ($] >= 5.009003 ? qw(
+     break
+     given
+     when
+   ) : ()
+  ),
+  # removed as useless with 5.27.7, re-added with 7896dde7482a2851
+  ($] >= 5.009003 && ($] < 5.027007 || $] >= 5.027008) ? qw(
+     default
+   ) : ()
+  ),
+  ($] >= 5.009004 ? qw(
+     state
+   ) : ()
+  ),
   ($] >= 5.033007 ? qw(
-    try
-    catch
-  ) : ()
-));
+      try
+      catch
+    ) : ()
+  ),
+  ($] >= 5.035004 ? qw(
+      defer
+    ) : ()
+  ),
+);
+
+# Extra barewords not in keywords.h (import was never in keywords)
+use vars '@BarewordsExtra';
+@BarewordsExtra = qw(
+    import
+    unimport
+);
 
 use vars '@TieIOMethods';
 @TieIOMethods = qw(
@@ -507,14 +535,16 @@ B::Keywords - Lists of reserved barewords and symbol names
 
 C<B::Keywords> supplies several arrays of exportable keywords:
 C<@Scalars>, C<@Arrays>, C<@Hashes>, C<@Filehandles>, C<@Symbols>,
-C<@Functions>, C<@Barewords>, C<@TieIOMethods>, C<@UNIVERSALMethods>
-and C<@ExporterSymbols>.
+C<@Functions>, C<@Barewords>, C<@BarewordsExtra>, C<@TieIOMethods>,
+C<@UNIVERSALMethods> and C<@ExporterSymbols>.
 
 The C<@Symbols> array includes the contents of each
 of C<@Scalars>, C<@Arrays>, C<@Hashes>, C<@Functions> and C<@Filehandles>.
 
 Similarly, C<@Barewords> adds a few non-function keywords and
 operators to the C<@Functions> array.
+
+C<@BarewordsExtra> adds a few barewords which are not in keywords.h.
 
 All additions and modifications are welcome.
 
@@ -550,6 +580,11 @@ handles, and functions.
 
 This is a list of other special keywords in perl including operators
 and all the control structures.
+
+=item C<@BarewordsExtra>
+
+This is a list of barewords which are missing from keywords.h, handled
+extra in the tokenizer.
 
 =item C<@TieIOMethods>
 
@@ -600,6 +635,10 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=B-Keywords>
 
+=item * GIT repository
+
+L<http://github.com/rurban/b-keywords/>
+
 =item * AnnoCPAN: Annotated CPAN documentation
 
 L<http://annocpan.org/dist/B-Keywords>
@@ -622,7 +661,7 @@ for patches and releases.
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2009 Joshua ben Jore, All rights reserved.
-Copyright 2013, 2015, 2017-2019 Reini Urban, All rights reserved.
+Copyright 2013, 2015, 2017-2021 Reini Urban, All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of either:

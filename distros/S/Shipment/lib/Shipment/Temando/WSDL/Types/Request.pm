@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Request;
-$Shipment::Temando::WSDL::Types::Request::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Request::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -51,7 +51,7 @@ Class::Std::initialize();
               comments
               reference
 
-              )
+            )
         ],
         {   'status'       => \%status_of,
             'anythings'    => \%anythings_of,
@@ -100,7 +100,7 @@ Class::Std::initialize();
 
 
 package Shipment::Temando::WSDL::Types::Request::_anythings;
-$Shipment::Temando::WSDL::Types::Request::_anythings::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Request::_anythings::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -123,7 +123,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        anything
 
-                  )
+                )
             ],
             {'anything' => \%anything_of,},
             {'anything' => 'Shipment::Temando::WSDL::Types::Anything',},
@@ -140,7 +140,7 @@ use warnings;
 
 
 package Shipment::Temando::WSDL::Types::Request::_quotes;
-$Shipment::Temando::WSDL::Types::Request::_quotes::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Request::_quotes::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -163,7 +163,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        quote
 
-                  )
+                )
             ],
             {'quote' => \%quote_of,},
             {'quote' => 'Shipment::Temando::WSDL::Types::AvailableQuote',},
@@ -180,17 +180,17 @@ use warnings;
 
 
 package Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr;
-$Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr::VERSION = '3.06';
 use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
-{        # BLOCK to scope variables
+{    # BLOCK to scope variables
 
     my %id_of : ATTR(:get<id>);
 
     __PACKAGE__->_factory(
         [   qw(
               id
-              )
+            )
         ],
         {
 
@@ -216,7 +216,7 @@ Shipment::Temando::WSDL::Types::Request
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

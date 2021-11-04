@@ -1,49 +1,9 @@
-# This script needs cleaning up, particulary
-# by using 'use strict';
-
-
 use PDL;
 use PDL::Fit::Levmar;
 use PDL::Fit::Levmar::Func;
 use PDL::Core ':Internal'; # For topdl()
-#use strict;
-
-
-$ok_count = 0;
-$not_ok_count = 0;
-
-print "1..26\n";
-ok(1, "Levmar and Levmar::Func Modules loaded"); # If we made it this far, we're ok.
-
-# set to 0 or 1, for no/yes commentary
-# 0 is required for 'make test' which uses harness
-$pinfo = 0;
-
-# for quick diagnostic
-sub pinfo { 
-    print STDERR $_[0],"\n" if $pinfo;
-}
-
-sub deb { 
-    print STDERR $_[0],"\n";
-}
-
-
-sub ok {  
-    my ($v, $s) = @_;
-    $testno = 0 unless defined $testno;	
-    $testno++;
-    $s = '' unless defined $s;
-    if ( not $v ) {
-	print "not ";
-	$s = " *** " . $s;
-	$not_ok_count++;
-    }
-    else {
-	$ok_count++;
-    }
-    print "ok - $testno $s\n";   
-}
+use Test::More;
+use strict;
 
 sub tapprox {
         my($a,$b) = @_;
@@ -56,15 +16,6 @@ sub tapprox {
         $d < 0.0001;
 }
 
-# diagnostic lines for harness.
-# compare to pinfo above
-sub pri {
-    my $s = shift;
-    print "\# $s\n";
-}
-
-
-
 # Generate gaussian data.
 # $N = number of data points
 # $p = actual parameters
@@ -73,7 +24,7 @@ sub pri {
 sub make_gaussian {
     my ($N,$parg,$pfac,$noise) = @_; 
     my ($p0, $p1, $p2) = list($parg);  # three model parameters
-    my $t =(sequence($N)-$N/2)/$N; # ordinates
+    my $t = zeroes($N)->xlinvals(-0.5,0.5-1/$N);
     my $x = $p0 *  exp(-($t-$p1)*($t-$p1)*$p2); # co-ordinates
     my $p_actual = $parg->copy;
     my $p = $parg->copy;
@@ -82,31 +33,30 @@ sub make_gaussian {
     if ( $noise > 0 ) {
 	$x += $p0 * $noise * grandom($x);
     }
-
-#    deb "## in make_gaussian";
     return ($t,$x,$p,$ip,$p_actual);
 }    
 
 # disable this normally
 sub prep {
     return ;
+    my ($p, $ip, $p_actual, $x) = @_;
     my @p = list $p;
     my @ip = list $ip;
     my @pact = list $p_actual;
-    deb "ip   [" . join(",",@ip) . "]";
-    deb "p    [" . join(",",@p) . "]";
-    deb "pact [" . join(",",@pact) . "]";
+    note "ip   [" . join(",",@ip) . "]";
+    note "p    [" . join(",",@p) . "]";
+    note "pact [" . join(",",@pact) . "]";
     my $s = "[" . join(",",@p) . "]";
-    deb " tapprox(\$p, $s ), "
+    note " tapprox(\$p, $x ), "
 }
 
 srand(1); # must call this so that sequence of random numbers is reproducible
 #make_gaussian(1000, pdl(1,.1,1), pdl(1.2, .9, 1.3), 0);
-($t,$x,$p,$ip,$p_actual) = make_gaussian(1000, pdl(2.0, 0.1, 1.0), pdl(1.3, .99, 1.002), 0);
-prep();
+my ($t,$x,$p,$ip,$p_actual) = make_gaussian(1000, pdl(2.0, 0.1, 1.0), pdl(1.3, .99, 1.002), 0);
+prep($p, $ip, $p_actual, $x);
 
 # Create a model function from C-like definition
-$func1 = 
+my $func1 =
 '
 function gaussian1
 x = p0 * exp(-(t-p1)*(t-p1)*p2);
@@ -123,7 +73,7 @@ d2 = p0*(-arg*arg)*expf;
 ' ;
 
 # No jacobian
-$func2 = 
+my $func2 =
 '
 function gaussian2
 FLOAT arg;
@@ -134,7 +84,7 @@ end function
 
 ' ;
 
-$func3 = 
+my $func3 =
 '
 function gaussian3
 FLOAT arg;
@@ -157,7 +107,7 @@ end jacobian
 
 
 # no blank line; d2[i] , not d2
-$func4 = 
+my $func4 =
 '
 function gaussian4
 FLOAT arg;
@@ -177,7 +127,7 @@ end jacobian
 
 ' ;
 
-$func5 =  '
+my $func5 =  '
        function gaussian5
        FLOAT arg;	
        loop
@@ -195,7 +145,7 @@ $func5 =  '
 
 ';
 
-$func6 =  '
+my $func6 =  '
        function gaussian5
        x[i] = p[0] * exp(-(t[i]-p[1])*(t[i]-p[1])*p[2]);
 
@@ -211,7 +161,7 @@ $func6 =  '
 ';
 
 
-$cfunc = '
+my $cfunc = '
 #include <math.h>
 #include <stdio.h>
 
@@ -244,7 +194,7 @@ void jacgauss_from_c(FLOAT *p, FLOAT *jac, int m, int n, void *data)
 
 
 # Do the fit.
-$hout = levmar($p,$x,$t, FUNC => $func1 , NOCLEAN=>1);
+my $hout = levmar($p,$x,$t, FUNC => $func1 , NOCLEAN=>1);
 
 # see if all parameters are found correctly
 ok( tapprox( $hout->{P},$p_actual) , "Function def as string");
@@ -259,13 +209,13 @@ ok ( tapprox( $hout->{P} ,$p_actual), "Function def from file");
 # Now use $func1 from above to create the Func object ourselves rather
 # than letting levmar do it so we can manipulate it.
 
-$funch1 = levmar_func( FUNC => $func1 ); # create the function and return handle (pointer or whatever)
+my $funch1 = levmar_func( FUNC => $func1 ); # create the function and return handle (pointer or whatever)
 # Lets look at the commands that compiled and linked the function...'
-pinfo join( "\n" , $funch1->get_cc_str  ), "\n" ;
+note join( "\n" , $funch1->get_cc_str  ), "\n" ;
 
 # Lets look at the filenames
-@filenames = $funch1->get_file_names;
-pinfo join( "\n" , @filenames ), "\n" ;
+my @filenames = $funch1->get_file_names;
+note join( "\n" , @filenames ), "\n" ;
 
 # But these files no longer exist
 ok ( not ( -e $filenames[0] and -e $filenames[1] and -e $filenames[2] ),
@@ -280,7 +230,7 @@ ok ( tapprox( $hout->{P} ,$p_actual), "Fit with Func object");
 
 $funch1 = levmar_func( FUNC => $func3, NOCLEAN => 1 ); 
 @filenames = $funch1->get_file_names;
-pinfo join( "\n" , @filenames ), "\n" ;
+note join( "\n" , @filenames ), "\n" ;
 ok ( -e $filenames[0] and -e $filenames[1] and -e $filenames[2] ,
      "Check that NOCLEAN does not remove files");
 
@@ -390,7 +340,7 @@ prep();
 # Linear constraints determined through A x p = b
 # where $A->dims = ($k,$m);
 # If we have one constraint, ie k=1, we can also use a 1-d piddle
-$A =  [ 1,0,0];
+my $A =  [ 1,0,0];
 $b =  [ $ip->at(0) ];
 $p = $ip->copy;
 $hout = levmar($p,$x,$t, FUNC => $func1, A => $A, B => $b );
@@ -421,29 +371,25 @@ print "# init p " , $p, "\n";
 $hout = levmar($p,$x,$t, FUNC => $func1, FIXB => [1,0,1]);
 ok ( tapprox( $hout->{P}, [2.2, 0.52755091, 1.2] ), "FIXB [1,0,1]");
 prep();
-
-}
-else {
-ok(1);
-ok(1);
-ok(1);
-ok(1);
-ok(1);
-ok(1);
 }
 
 $p = $ip->copy;
 $hout = levmar($p,$x,$t, FUNC => $func1, UB => [2.3, .5, 3 ], LB => [ 0,-.1, .5] );
 ok ( tapprox( $hout->{P}, $p_actual ),
      "UB , LB; Box constraints  ");
-prep();
 
+prep();
 $p = $ip->copy;
-$hout = levmar($p,$x,$t, FUNC => $func1, UB => [2.3, .5, 3 ], LB => [ 0,-.1, .5], 
+$hout = levmar($p,$x,$t, FUNC => $func1, UB => [2.3, .5, 3 ], LB => [ 0,-.1, .5],
    DERIVATIVE => 'numeric' );
 ok ( tapprox( $hout->{P}, $p_actual ),
      "UB , LB ; Box constraints, numeric derivative");
+
 prep();
+$p = $ip->copy;
+$hout = levmar($p,$x,$t, FIXB=> [1,0,1], FUNC => $func1, UB => [2.3, .5, 3 ], LB => [ 0,-.1, .5] );
+my $expected = pdl '[2.2 0.5 1.2]';
+ok ( tapprox( $hout->{P}, $expected ), "UB, LB; Box constraints with FIXB")
+  or diag "got=$hout->{P}\nexpected=$expected";
 
-
-print "# Ok count: $ok_count, Not ok count: $not_ok_count\n";
+done_testing;

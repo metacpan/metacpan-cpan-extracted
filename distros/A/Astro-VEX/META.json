@@ -1,0 +1,97 @@
+{
+   "abstract" : "VEX (VLBI Experiment Definition) file handling module",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Astro-VEX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Parse::RecDescent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Astro::VEX" : {
+         "file" : "lib/Astro/VEX.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Block" : {
+         "file" : "lib/Astro/VEX/Block.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Comment" : {
+         "file" : "lib/Astro/VEX/Comment.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Container" : {
+         "file" : "lib/Astro/VEX/Container.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Def" : {
+         "file" : "lib/Astro/VEX/Def.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Link" : {
+         "file" : "lib/Astro/VEX/Link.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::NamedItem" : {
+         "file" : "lib/Astro/VEX/NamedItem.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Param" : {
+         "file" : "lib/Astro/VEX/Param.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Param::Empty" : {
+         "file" : "lib/Astro/VEX/Param/Empty.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Param::Number" : {
+         "file" : "lib/Astro/VEX/Param/Number.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Param::String" : {
+         "file" : "lib/Astro/VEX/Param/String.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Param::Value" : {
+         "file" : "lib/Astro/VEX/Param/Value.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Parse" : {
+         "file" : "lib/Astro/VEX/Parse.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Ref" : {
+         "file" : "lib/Astro/VEX/Ref.pm",
+         "version" : "0.001"
+      },
+      "Astro::VEX::Scan" : {
+         "file" : "lib/Astro/VEX/Scan.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
+      ]
+   },
+   "version" : "0.001"
+}

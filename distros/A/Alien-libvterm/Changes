@@ -1,5 +1,15 @@
 Revision history for Alien-libvterm
 
+0.01_002 2021-09-21
+        [CHANGES]
+         * Bundle libvterm 0.2-RC2
+         * Fix inc/Alien/make/Module/Build.pm to pass BINDIR to invoked
+           Makefile
+
+0.01_001 2021-09-07
+        [CHANGES]
+         * Bundle libvterm 0.2-RC1
+
 0.01    2021-08-24
         First version, released on an unsuspecting world.
 

@@ -19,6 +19,7 @@
     GyMMM => "MMM G y",
     GyMMMEd => "E, d MMM, G y",
     GyMMMd => "d MMM, G y",
+    GyMd => "d/M/y GGGGG",
     H => "HH",
     Hm => "H:mm",
     Hms => "H:mm:ss",
@@ -270,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 39,
+  version => 40,
 }

@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDLV2::Elements::OptionRule;
-$Shipment::Purolator::WSDLV2::Elements::OptionRule::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Elements::OptionRule::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDLV2::Elements::OptionRule
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

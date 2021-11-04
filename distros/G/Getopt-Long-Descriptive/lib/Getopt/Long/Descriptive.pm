@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive;
+package Getopt::Long::Descriptive 0.110;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
-$Getopt::Long::Descriptive::VERSION = '0.109';
+
 use v5.10.1;
 
 use Carp qw(carp croak);
@@ -731,7 +731,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 SYNOPSIS
 
@@ -769,6 +769,16 @@ think about its huge array of options.
 
 It also provides usage (help) messages, data validation, and a few other useful
 features.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 FUNCTIONS
 
@@ -1015,13 +1025,13 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Arthur Axel 'fREW' Schmidt Dave Rolsky Diab Jerius Hans Dieter Pearcey Harley Pig hdp@cpan.org Karen Etheridge Michael McClimon Niels Thykier Olaf Alders Ricardo Signes Roman Hubacek Smylers Thomas Neumann zhouzhen1
+=for stopwords Arthur Axel 'fREW' Schmidt Dave Rolsky Diab Jerius Hans Dieter Pearcey Harley Pig hdp@cpan.org Karen Etheridge Michael McClimon Niels Thykier Olaf Alders Roman Hubacek Smylers Thomas Neumann zhouzhen1
 
 =over 4
 
@@ -1068,10 +1078,6 @@ Niels Thykier <niels@thykier.net>
 =item *
 
 Olaf Alders <olaf@wundersolutions.com>
-
-=item *
-
-Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

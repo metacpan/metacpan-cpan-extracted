@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::CloseDocument;
-$Shipment::FedEx::WSDL::CloseTypes::CloseDocument::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::CloseDocument::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ Class::Std::initialize();
               CopiesToPrint
               Parts
 
-              )
+            )
         ],
         {   'Type'                        => \%Type_of,
             'ShippingCycle'               => \%ShippingCycle_of,
@@ -55,7 +55,7 @@ Class::Std::initialize();
             'ShippingDocumentDisposition' =>
               'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentDispositionType',
             'AccessReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Resolution' =>
+            'Resolution'      =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'CopiesToPrint' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
@@ -91,7 +91,7 @@ Shipment::FedEx::WSDL::CloseTypes::CloseDocument
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

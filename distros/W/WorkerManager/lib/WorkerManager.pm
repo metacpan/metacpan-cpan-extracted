@@ -10,7 +10,7 @@ use IO::Handle;
 use IO::File;
 our $LOGGER;
 
-our $VERSION = '0.1001';
+our $VERSION = '0.1002';
 
 sub new {
     my $class = shift;

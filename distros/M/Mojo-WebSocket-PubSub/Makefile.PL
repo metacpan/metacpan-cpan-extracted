@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.013002;
 
 use ExtUtils::MakeMaker;
 
@@ -14,10 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojo-WebSocket-PubSub",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.013002",
   "NAME" => "Mojo::WebSocket::PubSub",
   "PREREQ_PM" => {
+    "DDP" => 0,
     "Mojolicious" => "9.00",
+    "Regexp::Pattern" => 0,
+    "Term::ANSIColor" => 0,
+    "Term::Shell" => "0.12",
     "Time::HiRes" => 0
   },
   "TEST_REQUIRES" => {
@@ -27,7 +31,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,9 +39,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "DDP" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Mojolicious" => "9.00",
+  "Regexp::Pattern" => 0,
+  "Term::ANSIColor" => 0,
+  "Term::Shell" => "0.12",
   "Test::More" => 0,
   "Time::HiRes" => 0,
   "strict" => 0,

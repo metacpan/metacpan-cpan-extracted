@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage;
-$Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -38,9 +38,9 @@ Class::Std::initialize();
               Destination
               RecipientDetails
 
-              )
+            )
         ],
-        {   'TrackingNumber' => \%TrackingNumber_of,
+        {   'TrackingNumber'                  => \%TrackingNumber_of,
             'TrackingNumberUniqueIdentifiers' =>
               \%TrackingNumberUniqueIdentifiers_of,
             'CarrierCode'      => \%CarrierCode_of,
@@ -53,14 +53,14 @@ Class::Std::initialize();
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'CarrierCode' =>
               'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
-            'ShipDate'    => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-            'Destination' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'ShipDate'         => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'Destination'      => 'Shipment::FedEx::WSDL::TrackTypes::Address',
             'RecipientDetails' =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail',
         },
         {
 
-            'TrackingNumber' => 'TrackingNumber',
+            'TrackingNumber'                  => 'TrackingNumber',
             'TrackingNumberUniqueIdentifiers' =>
               'TrackingNumberUniqueIdentifiers',
             'CarrierCode'      => 'CarrierCode',
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -128,11 +128,11 @@ I<StreamFinder.pl> and run it from the command line with a supported streaming
 site URL as the argument.  You can then edit it to tailor it to your needs.
 
 The currently-supported websites are:  podcasts.apple.com (L<StreamFinder::Apple>), 
-bitchute.com (L<StreamFinder::Bitchute>, blogger.com (L<StreamFinder::Blogger>), 
+bitchute.com (L<StreamFinder::Bitchute>), blogger.com (L<StreamFinder::Blogger>), 
 brighteon.com (L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
 podcasts.google.com (L<StreamFinder::Google>), 
 iheartradio.com (L<StreamFinder::IHeartRadio>), 
-radio.net (L<StreamFinder::RadioNet>), 
+odysee.com (L<StreamFinder::Odysee>), radio.net (L<StreamFinder::RadioNet>), 
 rumble.com (L<StreamFinder::Rumble>),
 sermonaudio.com (L<StreamFinder::SermonAudio>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
@@ -143,7 +143,7 @@ webpage URL (not supported by any of the other submodules) for streams.
 
 NOTE:  StreamFinder::Reciva has been removed, as that site has now closed down.
 
-NOTE:  For some sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, Google, 
+NOTE:  For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, Google, 
 etc. the "station" object actually refers to a specific video or podcast, but 
 functions the same way.
 
@@ -214,7 +214,11 @@ For example, to NOT handle Youtube videos nor use the fallback
 "Anystream" module, specify:  I<-omit> => I<"Youtube,Anystream">, which 
 will cause StreamFinder::Anystream and StreamFinder::Youtube to not be used 
 for the stream search.  Default is for all installed submodules to be 
-considered.
+considered.  NOTE:  Omitting a module from being considered when seeking 
+to match the correct module by site URL, this does NOT prevent that 
+module from being invoked by a selected module for an embedded link, OR 
+in the case of StreamFinder::Youtube being omitted, will still be invoked, 
+if required or needed by a non-omitted module initially selected!
 
 Another global option (applicable to all submodules) is the I<-secure> 
 option who's argument can be either 0 or 1 (I<false> or I<true>).  If 1,  
@@ -327,7 +331,7 @@ the "icon image" data, if any, will be returned.
 
 Returns the station / podcast / video's type (I<submodule-name>).  
 (one of:  "Anystream", "Apple", "BitChute", "Blogger", "Brighteon", 
-"Castbox", "Google", "IHeartRadio", "RadioNet", "Rumble", 
+"Castbox", "Google", "IHeartRadio", "Odysee", "RadioNet", "Rumble", 
 "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" - 
 depending on the sight that matched the URL).
 
@@ -335,12 +339,21 @@ depending on the sight that matched the URL).
 
 =head1 CONFIGURATION FILES
 
+The default root location directory for StreamFinder configuration files 
+is "~/.config/StreamFinder".  To use an alternate location directory, 
+specify it in the "I<STREAMFINDER>" environment variable, ie.:  
+B<$ENV{STREAMFINDER} = "/etc/StreamFinder">.
+
 =over 4
 
 =item ~/.config/StreamFinder/config
 
 Optional text file for specifying various configuration options.  
-Each option is specified on a separate line in the formats below:
+Each option is specified on a separate line in the formats below:  
+NOTE:  Do not follow the lines with a semicolon, comma, or any other 
+separator.  Non-numeric I<values> should be surrounded with quotes, either 
+single or double.  Blank lines and lines beginning with a "#" sign as 
+their first non-blank character are ignored as comments.
 
 'option' => 'value' [, ...]
 
@@ -350,8 +363,7 @@ Each option is specified on a separate line in the formats below:
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
 =item ~/.config/StreamFinder/I<submodule>/config
 
@@ -368,15 +380,14 @@ line in the formats below:
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 NOTE:  Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
 =back
 
-NOTE:  Options specified in the options parameter list will override 
-any corresponding options specified in either of these files.
+NOTE:  Options specified in the options parameter list of the I<new()> 
+function will override those corresponding options specified in these files.
 
 =head1 DEPENDENCIES
 
@@ -384,7 +395,9 @@ L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
 
-youtube-dl (for Youtube, Brighteon, Tunein, Vimeo)
+youtube-dl, or other compatable program such as yt-dlp, etc. 
+(for Youtube, Bitchute, Blogger, Brighteon, Odysee, Tunein, Vimeo)
+NOTE:  Required for Youtube, Odysee, and Tunein (except for podcasts).
 
 wget
 
@@ -472,7 +485,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.61';
+our $VERSION = '1.72';
 our $DEBUG = 0;
 
 require Exporter;
@@ -480,7 +493,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger Brighteon Castbox Google IHeartRadio
-		RadioNet Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
+		Odysee RadioNet Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
 
 my %haveit;
 
@@ -540,6 +553,8 @@ sub new
 		return new StreamFinder::Google($url, @args);
 	} elsif ($haveit{'SermonAudio'} && $url =~ m#\bsermonaudio\.com\/#) {
 		return new StreamFinder::SermonAudio($url, @args);
+	} elsif ($haveit{'Odysee'} && $url =~ m#\bodysee\.com\/#) {
+		return new StreamFinder::Odysee($url, @args);
 	} elsif ($haveit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		my $yt = new StreamFinder::Youtube($url, @args);
 		return $yt  if (defined($yt) && $yt && $yt->count() > 0);

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ReferenceNumberType;
-$Shipment::UPS::WSDL::ShipTypes::ReferenceNumberType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ReferenceNumberType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Code
               Value
 
-              )
+            )
         ],
         {   'BarCodeIndicator' => \%BarCodeIndicator_of,
             'Code'             => \%Code_of,
@@ -66,7 +66,7 @@ Shipment::UPS::WSDL::ShipTypes::ReferenceNumberType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

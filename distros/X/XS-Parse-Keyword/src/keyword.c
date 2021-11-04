@@ -24,10 +24,6 @@
 
 #include "lexer-additions.c.inc"
 
-#ifndef G_LIST
-#  define G_LIST  G_ARRAY
-#endif
-
 /* yycroak() is a long function and hard to emulate or copy-paste for our
  * purposes; we'll reïmplement a smaller version of it
  *

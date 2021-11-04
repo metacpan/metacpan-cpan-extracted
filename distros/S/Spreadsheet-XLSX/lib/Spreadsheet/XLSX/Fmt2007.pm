@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt);
-our $VERSION = '0.13';    #
+our $VERSION = '0.17';    #
 
 my %hFmtDefault = (
     0x00 => '@',
@@ -52,7 +52,7 @@ my %hFmtDefault = (
 );
 
 #------------------------------------------------------------------------------
-# new (for Spreadsheet::XLSX::FmtDefault)
+# new (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub new {
     my ($sPkg, %hKey) = @_;
@@ -62,7 +62,7 @@ sub new {
 }
 
 #------------------------------------------------------------------------------
-# TextFmt (for Spreadsheet::XLSX::FmtDefault)
+# TextFmt (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub TextFmt {
     my ($oThis, $sTxt, $sCode) = @_;
@@ -71,7 +71,7 @@ sub TextFmt {
 }
 
 #------------------------------------------------------------------------------
-# FmtStringDef (for Spreadsheet::XLSX::FmtDefault)
+# FmtStringDef (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub FmtStringDef {
     my ($oThis, $iFmtIdx, $oBook, $rhFmt) = @_;
@@ -85,7 +85,7 @@ sub FmtStringDef {
 }
 
 #------------------------------------------------------------------------------
-# FmtString (for Spreadsheet::XLSX::FmtDefault)
+# FmtString (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub FmtString {
     my ($oThis, $oCell, $oBook) = @_;
@@ -94,6 +94,9 @@ sub FmtString {
 
     #        $oBook->{Format}[$oCell->{FormatNo}]->{FmtIdx}, $oBook);
 
+    # Check for formula error before evaluating format
+    return '@' if ( $oCell->{Val} =~ m/^#/ );
+    
     unless (defined($sFmtStr)) {
         if ($oCell->{Type} eq 'Numeric') {
             if ($oCell->{Format}) {
@@ -119,7 +122,7 @@ sub FmtString {
 }
 
 #------------------------------------------------------------------------------
-# ValFmt (for Spreadsheet::XLSX::FmtDefault)
+# ValFmt (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub ValFmt {
     my ($oThis, $oCell, $oBook) = @_;
@@ -137,7 +140,7 @@ sub ValFmt {
 }
 
 #------------------------------------------------------------------------------
-# ChkType (for Spreadsheet::XLSX::FmtDefault)
+# ChkType (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub ChkType {
     my ($oPkg, $iNumeric, $iFmtIdx) = @_;

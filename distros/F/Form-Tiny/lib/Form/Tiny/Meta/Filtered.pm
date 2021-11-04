@@ -1,6 +1,7 @@
 package Form::Tiny::Meta::Filtered;
 
 use v5.10;
+use strict;
 use warnings;
 use Types::Standard qw(ArrayRef InstanceOf);
 use Scalar::Util qw(blessed);
@@ -10,7 +11,7 @@ use Form::Tiny::Hook;
 use Form::Tiny::Filter;
 use Moo::Role;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 requires qw(setup);
 
@@ -72,14 +73,18 @@ sub _apply_filters
 {
 	my ($self, $obj, $def, $value) = @_;
 
+	my @params;
+	unshift @params, $obj
+		if $self->consistent_api;
+
 	my $name = $def->name;
 	for my $filter (@{$self->filters}) {
-		$value = $filter->filter($value)
+		$value = $filter->filter($value, @params)
 			if $filter->check_field($name);
 	}
 
 	for my $filter (@{$def->addons->{filters}}) {
-		$value = $filter->filter($value);
+		$value = $filter->filter($value, @params);
 	}
 
 	return $value;

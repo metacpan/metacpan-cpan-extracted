@@ -85,9 +85,6 @@ check_shuffled_array( [0 .. 9], \@list);
 List::Helpers::XS::shuffle(@list);
 is( scalar(@list), 10, "Checking the list size after shuffling" );
 
-random_slice_void(\@list, 3);
-is( scalar(@list), 3, "Checking the list size after slicing in void context" );
-
 @list = ( 0 .. 9 );
 
 my $slice = random_slice(\@list, 3);
@@ -127,9 +124,6 @@ check_shuffled_array( [0 .. 9], \@t_list);
 List::Helpers::XS::shuffle(@t_list);
 is( scalar(@t_list), 10, "Checking the size of tied list after shuffling" );
 
-random_slice_void(\@t_list, 5);
-is( scalar(@t_list), 5, "Checking the size of tied list after slicing in void context" );
-
 push(@t_list, (11 .. 15));
 
 $t_slice = random_slice(\@t_list, 4);
@@ -147,12 +141,8 @@ no_leaks_ok {
     shuffle(\@list);
     List::Helpers::XS::shuffle(@list);
         
-    random_slice_void(\@list, 3);
-
     @list = ( 0 .. 9 );
     
-    $slice = random_slice_void(\@list, 5);
-
     @list2 = (0..4);
     @list3 = (20..27);
     @list4 = (40..45);
@@ -167,8 +157,6 @@ no_leaks_ok {
 
     shuffle(\@t_list);
     List::Helpers::XS::shuffle(@t_list);
-
-    random_slice_void(\@t_list, 1);
 
     undef(@t_list);
 } 'no memory leaks';

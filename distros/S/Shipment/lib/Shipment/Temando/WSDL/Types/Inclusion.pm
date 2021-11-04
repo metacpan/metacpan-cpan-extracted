@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Inclusion;
-$Shipment::Temando::WSDL::Types::Inclusion::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Inclusion::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
         [   qw(        summary
               details
 
-              )
+            )
         ],
         {   'summary' => \%summary_of,
             'details' => \%details_of,
@@ -65,7 +65,7 @@ Shipment::Temando::WSDL::Types::Inclusion
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

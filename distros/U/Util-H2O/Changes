@@ -1,5 +1,9 @@
 Revision history for Perl extension Util::H2O.
 
+0.16	Sun, Oct 17 2021
+	- allowed "-classify" into current package
+	- added "Cookbook" to documentation
+
 0.14	Mon, Aug  2 2021
 	- WARNING: Potentially Incompatible Changes:
 		- limited conditions under which a key DESTROY is allowed

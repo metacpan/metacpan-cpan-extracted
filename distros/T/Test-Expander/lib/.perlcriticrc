@@ -1,0 +1,379 @@
+# You may disable specific policies appending the following annotation
+#
+# ## no critic (..., ...)
+#
+# to the corresponding code line. To direct perlcritic to ignore the
+# "## no critic" annotations, use the --force option.
+
+# Policies shipped with Perl::Critic 1.125 were considered for the below
+# defintion of the new policy theme "knib".
+
+severity = brutal
+theme    = knib
+verbose  = %f: %m at line %l, column %c.  (Policy: %p)\n
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitLvalueSubstr]
+add_themes = knib
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval]
+add_themes     = knib
+allow_includes = 1
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit]
+add_themes = knib
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitUniversalCan]
+add_themes = knib
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitUniversalIsa]
+add_themes = knib
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitUselessTopic]
+# KNOWN BUGS: This policy flags a false positive on reverse() called in list
+# context, since reverse() in list context does not assume $_.
+add_themes = knib
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep]
+add_themes = knib
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidMap]
+add_themes = knib
+
+[Perl::Critic::Policy::BuiltinFunctions::RequireBlockGrep]
+add_themes = knib
+
+[Perl::Critic::Policy::BuiltinFunctions::RequireBlockMap]
+add_themes = knib
+
+# 14.01.2016 policy disabled after a discussion with the team
+#[BuiltinFunctions::RequireGlobFunction]
+#add_themes = knib
+
+[Perl::Critic::Policy::BuiltinFunctions::RequireSimpleSortBlock]
+add_themes = knib
+
+[Perl::Critic::Policy::ClassHierarchies::ProhibitExplicitISA]
+# Note: Some people prefer parent over base.
+add_themes = knib
+
+[Perl::Critic::Policy::CodeLayout::ProhibitHardTabs]
+add_themes         = knib
+allow_leading_tabs = 0
+
+# 14.01.2016 policy disabled after a discussion with the team
+#[Perl::Critic::Policy::CodeLayout::ProhibitQuotedWordLists]
+#add_themes   = knib
+#min_elements = 1
+#strict       = 1
+
+[Perl::Critic::Policy::CodeLayout::ProhibitTrailingWhitespace]
+add_themes = knib
+
+[Perl::Critic::Policy::CodeLayout::RequireConsistentNewlines]
+add_themes = knib
+
+# 14.01.2016 policy disabled after a discussion with the team
+#[Perl::Critic::Policy::CodeLayout::RequireTrailingCommas]
+#add_themes = knib
+
+[Perl::Critic::Policy::ControlStructures::ProhibitCStyleForLoops]
+add_themes = knib
+
+[Perl::Critic::Policy::ControlStructures::ProhibitCascadingIfElse]
+add_themes = knib
+max_elsif  = 1
+
+[Perl::Critic::Policy::ControlStructures::ProhibitDeepNests]
+# Martin Fowler's book "Refactoring: Improving The Design of Existing Code".
+add_themes = knib
+max_nests  = 5
+
+[Perl::Critic::Policy::ControlStructures::ProhibitLabelsWithSpecialBlockNames]
+add_themes = knib
+
+[Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions]
+# Read the LIMITATIONS that this policy has.
+add_themes = knib
+
+[Perl::Critic::Policy::ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+add_themes = knib
+
+[Perl::Critic::Policy::ControlStructures::ProhibitUnreachableCode]
+add_themes = knib
+
+# Available With Perl::Critic v1.126
+#[Perl::Critic::Policy::ControlStructures::ProhibitYadaOperator]
+#add_themes = knib
+
+[Perl::Critic::Policy::Documentation::PodSpelling]
+add_themes =
+# "spell" is the spell checker avalable on our AIX system. The default spell
+# checker "aspell" was not available.
+spell_command = spell
+#stop_words = ...
+stop_words_file = PodSpelling_stop_words.txt
+
+[Perl::Critic::Policy::Documentation::RequirePackageMatchesPodName]
+add_themes = knib
+
+#[Perl::Critic::Policy::Documentation::RequirePodSections]
+#add_themes = knib
+
+# 14.01.2016 policy disabled after a discussion with the team
+#[Perl::Critic::Policy::ErrorHandling::RequireCheckingReturnValueOfEval]
+#add_themes = knib
+
+[Perl::Critic::Policy::InputOutput::ProhibitBacktickOperators]
+add_themes           = knib
+# 14.01.2016 policy configuration changed after a discussion with the team
+only_in_void_context = 1
+
+[Perl::Critic::Policy::InputOutput::ProhibitBarewordFileHandles]
+add_themes = knib
+
+[Perl::Critic::Policy::InputOutput::ProhibitExplicitStdin]
+add_themes = knib
+
+[Perl::Critic::Policy::InputOutput::ProhibitInteractiveTest]
+add_themes = knib
+
+[Perl::Critic::Policy::InputOutput::ProhibitJoinedReadline]
+add_themes = knib
+
+[Perl::Critic::Policy::InputOutput::ProhibitReadlineInForLoop]
+add_themes = knib
+
+[Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen]
+add_themes = knib
+
+[Perl::Critic::Policy::InputOutput::RequireBriefOpen]
+# http://www.perlmonks.org/?node_id=1134785
+add_themes = knib
+lines      = 9
+
+[Perl::Critic::Policy::InputOutput::RequireCheckedSyscalls]
+# Covers the policies
+# Perl::Critic::Policy::InputOutput::RequireCheckedClose and
+# Perl::Critic::Policy::InputOutput::RequireCheckedOpen
+add_themes        = knib
+exclude_functions = print say
+functions         = :builtins
+
+[Perl::Critic::Policy::InputOutput::RequireEncodingWithUTF8Layer]
+add_themes = knib
+
+[Perl::Critic::Policy::Miscellanea::ProhibitUnrestrictedNoCritic]
+add_themes = knib
+
+[Perl::Critic::Policy::Miscellanea::ProhibitUselessNoCritic]
+add_themes = knib
+
+[Perl::Critic::Policy::Modules::ProhibitAutomaticExportation]
+add_themes = knib
+
+[Perl::Critic::Policy::Modules::ProhibitConditionalUseStatements]
+add_themes = knib
+
+[Perl::Critic::Policy::Modules::ProhibitEvilModules]
+add_themes = knib
+modules    = Class::ISA Error Pod::Plainer Shell Switch
+
+[Perl::Critic::Policy::Modules::ProhibitExcessMainComplexity]
+# http://en.wikipedia.org/wiki/Cyclomatic_complexity
+add_themes = knib
+max_mccabe = 20
+
+[Perl::Critic::Policy::Modules::ProhibitMultiplePackages]
+add_themes = knib
+
+[Perl::Critic::Policy::Modules::RequireBarewordIncludes]
+add_themes = knib
+
+[Perl::Critic::Policy::Modules::RequireEndWithOne]
+add_themes = knib
+
+[Perl::Critic::Policy::Modules::RequireExplicitPackage]
+add_themes      = knib
+allow_import_of = utf8
+exempt_scripts  = 0
+
+[Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage]
+add_themes = knib
+
+[Perl::Critic::Policy::Modules::RequireNoMatchVarsWithUseEnglish]
+add_themes = knib
+
+[Perl::Critic::Policy::Modules::RequireVersionVar]
+# Read the TO DO section of this policy and think about its implication.
+add_themes = knib
+
+# Perl::Critic::Policy::NamingConventions::Capitalization
+# It takes some time to configure this policy!
+
+[Perl::Critic::Policy::Objects::ProhibitIndirectSyntax]
+add_themes = knib
+# The new() subroutine is configured by default; any additional forbid values
+# are in addition to new().
+forbid     = create destroy
+
+[Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches]
+add_themes = knib
+
+[Perl::Critic::Policy::RegularExpressions::ProhibitSingleCharAlternation]
+add_themes = knib
+
+[Perl::Critic::Policy::RegularExpressions::ProhibitUnusedCapture]
+add_themes = knib
+
+# 14.01.2016 policy still enabled after a discussion with the team
+[Perl::Critic::Policy::RegularExpressions::ProhibitUnusualDelimiters]
+add_themes         = knib
+allow_all_brackets = 0
+
+[Perl::Critic::Policy::RegularExpressions::ProhibitUselessTopic]
+add_themes = knib
+
+[Perl::Critic::Policy::RegularExpressions::RequireBracesForMultiline]
+add_themes         = knib
+allow_all_brackets = 0
+
+[Perl::Critic::Policy::Subroutines::ProhibitAmpersandSigils]
+add_themes = knib
+
+[Perl::Critic::Policy::Subroutines::ProhibitBuiltinHomonyms]
+# Read the CAVEATS.
+add_themes = knib
+
+[Perl::Critic::Policy::Subroutines::ProhibitExcessComplexity]
+# http://en.wikipedia.org/wiki/Cyclomatic_complexity
+add_themes = knib
+max_mccabe = 20
+
+[Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef]
+# http://perlmonks.org/index.pl?node_id=741847
+add_themes = knib
+
+[Perl::Critic::Policy::Subroutines::ProhibitManyArgs]
+add_themes    = knib
+max_arguments = 5
+
+[Perl::Critic::Policy::Subroutines::ProhibitNestedSubs]
+add_themes = knib
+
+[Perl::Critic::Policy::Subroutines::ProhibitReturnSort]
+# KNOWN BUGS: This Policy is not sensitive to the wantarray() function.
+add_themes = knib
+
+[Perl::Critic::Policy::Subroutines::ProhibitSubroutinePrototypes]
+add_themes = knib
+
+[Perl::Critic::Policy::Subroutines::ProhibitUnusedPrivateSubroutines]
+add_themes = knib
+
+[Perl::Critic::Policy::Subroutines::ProtectPrivateSubs]
+add_themes = knib
+
+#[Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
+#add_themes                  = knib
+#allow_delegation_to         = SUPER:: NEXT::
+#allow_subscripts            = 0
+#short_subroutine_statements = 0
+
+[Perl::Critic::Policy::Subroutines::RequireFinalReturn]
+add_themes     = knib
+terminal_funcs = return carp croak die exec exit goto throw
+
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict]
+add_themes = knib
+allow      = refs
+
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitNoWarnings]
+add_themes                      = knib
+allow_with_category_restriction = 1
+
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitProlongedStrictureOverride]
+add_themes = knib
+statements = 3
+
+# The following policy seems to have a bug for the ok() test.
+#[Perl::Critic::Policy::TestingAndDebugging::RequireTestLabels]
+#add_themes = knib
+#modules    = Test::Exception Test::More
+
+[Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict]
+add_themes = knib
+
+[Perl::Critic::Policy::TestingAndDebugging::RequireUseWarnings]
+add_themes = knib
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+add_themes                            = knib
+allow_if_string_contains_single_quote = 1
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLeadingZeros]
+add_themes = knib
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+add_themes       = knib
+max_chain_length = 3
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers]
+# Not yet configured completely.
+add_themes     = knib
+# 14.01.2016 2 is considered a magic number as well after a discussion with the team
+allowed_values = -1 0 1
+
+# 11.02.2016 policy disabled after a discussion with the team
+#[Perl::Critic::Policy::ValuesAndExpressions::ProhibitMismatchedOperators]
+#add_themes = knib
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitMixedBooleanOperators]
+add_themes = knib
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
+add_themes                     = knib
+back_quote_allowed_operators   =
+double_quote_allowed_operators =
+single_quote_allowed_operators =
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator]
+add_themes = knib
+
+[Perl::Critic::Policy::ValuesAndExpressions::RequireConstantVersion]
+add_themes                             =
+allow_version_without_use_on_same_line = 1
+
+[Perl::Critic::Policy::ValuesAndExpressions::RequireNumberSeparators]
+add_themes = knib
+min_value  = 10000
+
+[Perl::Critic::Policy::ValuesAndExpressions::RequireQuotedHeredocTerminator]
+add_themes = knib
+
+[Perl::Critic::Policy::ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
+add_themes = knib
+
+[Perl::Critic::Policy::Variables::ProhibitConditionalDeclarations]
+add_themes = knib
+
+[Perl::Critic::Policy::Variables::ProhibitLocalVars]
+add_themes = knib
+
+[Perl::Critic::Policy::Variables::ProhibitMatchVars]
+add_themes = knib
+
+[Perl::Critic::Policy::Variables::ProhibitUnusedVariables]
+add_themes = knib
+
+[Perl::Critic::Policy::Variables::RequireInitializationForLocalVars]
+add_themes = knib
+
+[Perl::Critic::Policy::Variables::RequireLexicalLoopIterators]
+add_themes = knib
+
+[Perl::Critic::Policy::Variables::RequireLocalizedPunctuationVars]
+add_themes = knib
+allow      =
+
+[Perl::Critic::Policy::Variables::RequireNegativeIndices]
+add_themes = knib

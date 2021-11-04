@@ -1,0 +1,7 @@
+"invalid\r\n\vfolding1"@example.com
+"invalid\r\nfolding2"@example.com
+"invalid"\r\n\tfolding3@example.com
+"invalid\r\n"@example.com
+"\r\n"@example.com
+"\r \n"@example.com
+"\r\r\n"@example.com

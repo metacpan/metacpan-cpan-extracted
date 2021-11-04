@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::XAVTypes::CodeType;
-$Shipment::UPS::WSDL::XAVTypes::CodeType::VERSION = '3.05';
+$Shipment::UPS::WSDL::XAVTypes::CodeType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Description
               Digest
 
-              )
+            )
         ],
         {   'Code'        => \%Code_of,
             'Description' => \%Description_of,
@@ -66,7 +66,7 @@ Shipment::UPS::WSDL::XAVTypes::CodeType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

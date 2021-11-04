@@ -95,4 +95,9 @@ Revision history for Perl extension B::Keywords.
   - improved t/z_kwalitee.t
 1.22 2021-02-22 09:42:18 rurban
   - add try/catch by Tom Wyant
- 
+1.23 2021-10-30 12:52:43 rurban
+  - relax bogus blead test failures
+  - add reverse test: if @Barewords are covered on keywords.h
+  - move some @Barewords not in keywords.h to @BarewordsExtra
+  - add %main, %CORE, %CORE::GLOBAL:: to @Hashes
+  - fixed versions for EQ, CORE, state, break, given, when, default, UNITCHECK

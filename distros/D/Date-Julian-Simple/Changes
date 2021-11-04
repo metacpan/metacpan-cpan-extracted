@@ -1,5 +1,24 @@
 Revision history for Date::Julian::Simple
 
+0.17  Fri Oct 22 20:25:00 2021
+      - Updated Makefile.PL w.r.t version.
+
+0.16  Fri Oct 22 20:15:00 2021
+      - Updated logic for sub to_modified_julian() and
+        from_modified_julian().
+      - Added unit test for the same.
+
+0.15  Thu Oct 21 23:50:00 2021
+      - Changed is_leap_year to return 0 for non-leap year.
+        Thanks @lancw.
+
+0.14  Thu Oct 21 23:30:00 2021
+      - Added 2 new subroutines to_modified_julian()
+        and from_modified_julian().
+
+0.13  Wed Oct 20 09:00:00 2021
+      - Proposed fix for current JD.
+
 0.12  Thu Jun 25 01:15:00 2020
       - Check feb month days only when leap year.
 

@@ -1,3 +1,37 @@
+0.281   2021-10-24  Released-By: PERLANCAR; Urgency: high
+
+        - Merge changes from 0.277 and 0.277.2.
+
+
+0.280   2021-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Allow extraneous characters in --chars-unordered (2nd
+	  attempt).
+
+
+0.279   2021-10-21  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+	- [bugfix] Allow --chars-ordered & --chars-unordered to contain
+	  extraneous characters. UPDATE: this release does not contain a proper
+	  fix.
+
+
+0.278   2021-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: --chars-ordered, --chars-unordered.
+
+	- [ux] Add -i short option alias for --ignore-case.
+
+
+0.277.2  2021-06-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention arraydata, hashdata, and tabledata.
+
+        - UPDATE: rename version from 0.277 to 0.277.2 due to conflict.
+
+
 0.277   2020-08-23  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

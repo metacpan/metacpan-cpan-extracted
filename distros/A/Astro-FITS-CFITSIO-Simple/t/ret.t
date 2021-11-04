@@ -1,13 +1,13 @@
-use Test::More tests => 45;
+#! perl
 
-use strict;
-use warnings;
+use Test2::V0 '!float';
+use Test::Lib;
 
 use PDL::Lite;
 
 use Astro::FITS::CFITSIO::Simple qw/ :all /;
 
-BEGIN { require 't/common.pl'; }
+use My::Test::common;
 
 my $file = 'data/f001.fits';
 
@@ -21,8 +21,7 @@ my $file = 'data/f001.fits';
 
   ok ( ! $@, $msg ) or diag( $@ );
 
-  ok ( eq_array( [sort keys %data], [ sort @simplebin_cols ] ),
-       "$msg: cols" );
+  is( [sort keys %data], [ sort @simplebin_cols ], "$msg: cols" );
 
   chk_simplebin_piddles( $msg, @data{@simplebin_cols} );
 }
@@ -83,7 +82,7 @@ my $file = 'data/f001.fits';
     $swap[$_] = $idx;
 
     $toggle = 1 - $toggle;
-  } 
+  }
 
   eval { @data = rdfits( $file, @ncols, { ninc => 1 } ) };
   ok( !$@, $msg ) or diag( $@ );
@@ -102,9 +101,11 @@ my $file = 'data/f001.fits';
   eval { %info = rdfits( $file, { retinfo => 1 } ) };
   ok( !$@, $msg ) or diag( $@ );
 
-  ok( eq_array( [ 1..4], [ map { $info{$_}{idx} } @simplebin_cols ]), "$msg: order" );
+  is( [ 1..4], [ map { $info{$_}{idx} } @simplebin_cols ], "$msg: order" );
 
   chk_simplebin_piddles( $msg, map { $info{$_}{data} } @simplebin_cols );
 
   is( $info{rt_x}{hdr}{tunit}, 'mm', "$msg: header values" );
 }
+
+done_testing;

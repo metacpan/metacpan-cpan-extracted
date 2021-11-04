@@ -40,34 +40,34 @@
    "provides" : {
       "MsOffice::Word::Surgeon" : {
          "file" : "lib/MsOffice/Word/Surgeon.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "MsOffice::Word::Surgeon::Change" : {
          "file" : "lib/MsOffice/Word/Surgeon/Change.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "MsOffice::Word::Surgeon::Run" : {
          "file" : "lib/MsOffice/Word/Surgeon/Run.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "MsOffice::Word::Surgeon::Text" : {
          "file" : "lib/MsOffice/Word/Surgeon/Text.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "MsOffice::Word::Surgeon::Utils" : {
          "file" : "lib/MsOffice/Word/Surgeon/Utils.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "https://github.com/damil/MsOffice-Word-Surgeon"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

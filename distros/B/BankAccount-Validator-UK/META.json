@@ -45,11 +45,11 @@
    "provides" : {
       "BankAccount::Validator::UK" : {
          "file" : "lib/BankAccount/Validator/UK.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "BankAccount::Validator::UK::Rule" : {
          "file" : "lib/BankAccount/Validator/UK/Rule.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/manwar/BankAccount-Validator-UK"
       }
    },
-   "version" : "0.60",
+   "version" : "0.61",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

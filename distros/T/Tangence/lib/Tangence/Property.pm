@@ -3,9 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
 
-package Tangence::Property 0.26;
+use v5.26;
+use Object::Pad 0.41;
 
-use v5.14;
+package Tangence::Property 0.27;
+
 use warnings;
 use base qw( Tangence::Meta::Property );
 
@@ -247,58 +249,55 @@ sub _accessor_for_objset
 sub make_type
 {
    shift;
-   return Tangence::Type->new( @_ );
+   return Tangence::Type->make( @_ );
 }
 
-package # hide from CPAN
-   Tangence::Property::_Cursor;
-
-use Carp;
-
-use Tangence::Constants;
-
-sub new
+class # hide from CPAN
+   Tangence::Property::_Cursor
 {
-   my $class = shift;
-   return bless [ @_ ], $class;
-}
+   use Carp;
 
-sub queue { shift->[0] }
-sub prop  { shift->[1] }
-sub idx :lvalue { shift->[2] }
+   use Tangence::Constants;
 
-sub handle_request_CUSR_NEXT
-{
-   my $self = shift;
-   my ( $ctx, $message ) = @_;
+   has $queue :param :reader;
+   has $prop  :param :reader;
+   has $idx   :param :mutator;
 
-   my $direction = $message->unpack_int();
-   my $count     = $message->unpack_int();
-
-   my $queue = $self->queue;
-   my $idx   = $self->idx;
-
-   if( $direction == CUSR_FWD ) {
-      $count = scalar @$queue - $idx if $count > scalar @$queue - $idx;
-
-      $self->idx += $count;
-   }
-   elsif( $direction == CUSR_BACK ) {
-      $count = $idx if $count > $idx;
-      $idx -= $count;
-
-      $self->idx -= $count;
-   }
-   else {
-      return $ctx->responderr( "Unrecognised cursor direction $direction" );
+   sub BUILDARGS ( $class, $queue, $prop, $idx )
+   {
+      return ( queue => $queue, prop => $prop, idx => $idx );
    }
 
-   my @result = @{$queue}[$idx .. $idx + $count - 1];
+   method handle_request_CUSR_NEXT
+   {
+      my ( $ctx, $message ) = @_;
 
-   $ctx->respond( Tangence::Message->new( $ctx->stream, MSG_CUSR_RESULT )
-      ->pack_int( $idx )
-      ->pack_all_sametype( $self->prop->type, @result )
-   );
+      my $direction = $message->unpack_int();
+      my $count     = $message->unpack_int();
+
+      my $start_idx = $idx;
+
+      if( $direction == CUSR_FWD ) {
+         $count = scalar @$queue - $idx if $count > scalar @$queue - $idx;
+
+         $idx += $count;
+      }
+      elsif( $direction == CUSR_BACK ) {
+         $count = $idx if $count > $idx;
+         $idx -= $count;
+         $start_idx = $idx;
+      }
+      else {
+         return $ctx->responderr( "Unrecognised cursor direction $direction" );
+      }
+
+      my @result = @{$queue}[$start_idx .. $start_idx + $count - 1];
+
+      $ctx->respond( Tangence::Message->new( $ctx->stream, MSG_CUSR_RESULT )
+         ->pack_int( $start_idx )
+         ->pack_all_sametype( $prop->type, @result )
+      );
+   }
 }
 
 0x55AA;

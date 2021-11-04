@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               Description
               AuthorizationName
 
-              )
+            )
         ],
         {   'MovementStatus'    => \%MovementStatus_of,
             'LabelType'         => \%LabelType_of,
@@ -73,7 +73,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -23,7 +23,7 @@ phoebe - a Gemini-first wiki server
 =head1 SYNOPSIS
 
 B<phoebe> [B<--host=>I<hostname> ...] [B<--port=>I<port>]
-[B<--cert_file=>I<filename>] [B<--key_file=>I<filename>]
+[B<--cert_file=>I<filename>] [B<--key_file=>I<filename>] [B<--no_cert>]
 [B<--log_level=error>|B<warn>|B<info>|B<debug>] [B<--log_file=>I<filename>]
 [B<--wiki_dir=>I<directory>] [B<--wiki_token=>I<token> ...]
 [B<--wiki_page=>I<pagename> ...] [B<--wiki_main_page=>I<pagename>]
@@ -61,6 +61,22 @@ To take a look for yourself, check out the test wiki via the web or via the web.
 
 =back
 
+=head1 READING THE WIKI
+
+This repository comes with a Perl script called L<gemini> to download Gemini URLs.
+
+Other clients can be found here:
+
+=over
+
+=item * L<Gemini software|https://gemini.circumlunar.space/software/>
+
+=item * L<Gemini clients|https://transjovian.org:1965/gemini/page/Clients>
+
+=back
+
+See L<App::Phoebe::Web> to enable reading via the web.
+
 =head1 GEMTEXT
 
 Pages are written in gemtext, a lightweight hypertext format. You can use your
@@ -79,9 +95,11 @@ and some text; the URL can be absolute or relative.
 
 A line starting with "```" toggles preformatting on and off.
 
-    Example:
+    Here is an example:
     ```
-    ./phoebe
+    The tapping calms me:
+    Constant mindless murmuring
+    Rain drops against glass
     ```
 
 A line starting with "#", "##", or "###", followed by a space and some text is a
@@ -98,43 +116,29 @@ A line starting with "*", followed by a space and some text is a list item.
 A line starting with ">", followed by a space and some text is a quote.
 
     The monologue at the end is fantastic, with the city lights and the rain.
-    > I've seen things you people wouldn't believe.
+    > I have seen things you people would not believe.
 
 =head1 EDITING THE WIKI
 
 How do you edit a Phoebe wiki? You need to use a Titan-enabled client.
 
-Titan is a companion protocol to Gemini: it allows clients to upload files to
-Gemini sites, if servers allow this. On Phoebe, you can edit "raw" pages. That
-is, at the bottom of a page you'll see a link to the "raw" page. If you follow
-it, you'll see the page content as plain text. You can submit a changed version
-of this text to the same URL using Titan. There is more information for
-developers available on Community Wiki. L<https://communitywiki.org/wiki/Titan>
+L<Titan|https://transjovian.org:1965/titan> is a companion protocol to Gemini:
+it allows clients to upload files to Gemini sites, if servers allow this. On
+Phoebe, you can edit "raw" pages. That is, at the bottom of a page you'll see a
+link to the "raw" page. If you follow it, you'll see the page content as plain
+text. You can submit a changed version of this text to the same URL using Titan.
 
 Known clients:
 
-This repository comes with a Perl script called F<titan> to upload files.
-L<https://alexschroeder.ch/cgit/phoebe/plain/script/titan>
+This repository comes with a Perl script called L<titan> to upload files.
 
-I<Gemini Write> is an extension for the Emacs Gopher and Gemini client
-I<Elpher>. L<https://alexschroeder.ch/cgit/gemini-write/>
-L<https://thelambdalab.xyz/elpher/>
+L<Gemini Write|https://alexschroeder.ch/cgit/gemini-write/> is an extension for
+the Emacs Gopher and Gemini client L<Elpher|https://thelambdalab.xyz/elpher/>.
 
-Gemini & Titan for Bash are two shell functions that allow you to download and
-upload files. L<https://alexschroeder.ch/cgit/gemini-titan/about/>
+L<Gemini & Titan for Bash|https://alexschroeder.ch/cgit/gemini-titan/about/> are
+two shell functions that allow you to download and upload files.
 
-=head2 Editing via the web
-
-The Configuration section of the Phoebe space on I<The Transjovian Council> has
-an example config on how to enable editing via the web.
-
-=over
-
-=item * L<https://transjovian.org:1965/phoebe/page/Configuration>
-
-=item * L<gemini://transjovian.org/phoebe/page/Configuration>
-
-=back
+See L<App::Phoebe::WebEdit> to enable editing via the web.
 
 =head1 INSTALLATION
 
@@ -209,13 +213,14 @@ for you. If in doubt, answer C<localhost>. The certificate and a private key are
 stored in the F<cert.pem> and F<key.pem> files, using elliptic curves, valid for
 five years, without password protection.
 
-    perl5/bin/phoebe
+Time to start phoebe, in the foreground:
 
-This starts the server in the foreground. If it aborts, see the
-L</Troubleshooting> section below. If it runs, open a second terminal and test
-it:
+    phoebe
 
-    perl5/bin/gemini gemini://localhost/
+If it aborts, see the L</Troubleshooting> section below. If it runs, open a
+second terminal and test it:
+
+    gemini gemini://localhost/
 
 You should see a Gemini page starting with the following:
 
@@ -228,7 +233,7 @@ Let's create a new page using the Titan protocol, from the command line:
 
     echo "Welcome to the wiki!" > test.txt
     echo "Please be kind." >> test.txt
-    perl5/bin/titan --url=titan://localhost/raw/Welcome --token=hello test.txt
+    titan --url=titan://localhost/raw/Welcome --token=hello test.txt
 
 You should get a nice redirect message, with an appropriate date.
 
@@ -236,7 +241,7 @@ You should get a nice redirect message, with an appropriate date.
 
 You can check the page, now (replacing the appropriate date):
 
-    perl5/bin/gemini gemini://localhost:1965/page/Welcome
+    gemini gemini://localhost:1965/page/Welcome
 
 You should get back a page that starts as follows:
 
@@ -272,11 +277,11 @@ with a list of common MIME types.
 Let's continue using the setup we used for the L</Quickstart> section. Restart
 the server and allow photos:
 
-    perl5/bin/phoebe --wiki_mime_type=image/jpeg
+    phoebe --wiki_mime_type=image/jpeg
 
 Upload the image using the C<titan> script:
 
-    perl5/bin/titan --url=titan://localhost:1965/jupiter.jpg \
+    titan --url=titan://localhost:1965/jupiter.jpg \
       --token=hello Pictures/Planets/Juno.jpg
 
 You should get back a redirect to the uploaded image:
@@ -369,7 +374,22 @@ Check the log output:
 
     sudo journalctl --unit phoebe
 
+=head2 Installing Perl
+
+If you are on GNU/Linx or macOS, I recommend installing from
+L<Perlbrew|https://perlbrew.pl/>. Each Perl installation comes with its own
+library directories, so if you switch Perl version, you need to reinstall Phoebe
+for that Perl version.
+
 =head2 Troubleshooting
+
+🔥 Unknown command phoebe 🔥 If you installed Phoebe using cpan or cpanm and you
+still get this error, then something about your Perl installation isn't working.
+Phoebe probably got installed in some directory, you just need to make sure it's
+in your PATH. If you use zsh and Perlbrew, for example, you need to add the
+following line to your F<~/.zshenv> file:
+
+    source ${HOME}/perl5/perlbrew/etc/bashrc
 
 🔥 B<1408A0C1:SSL routines:ssl3_get_client_hello:no shared cipher> 🔥 If you
 created a new certificate and key using elliptic curves using an older OpenSSL,
@@ -478,6 +498,10 @@ own F<config> file.
 
 =item * C<--key_file> is the private key PEM file to use; the default is
       F<key.pem>
+
+=item * C<--no_cert> indicates that the server should not be using TLS; use this
+      if you have a reverse proxy handling requests (so that front end and back
+      end don't need to use TLS to communicate with each other)
 
 =item * C<--log_level> is the log level to use (C<fatal>, C<error>, C<warn>,
       C<info>, C<debug>); the default is C<warn>
@@ -779,10 +803,9 @@ For example:
 
 =head1 SEE ALSO
 
-As you might have guessed, the system is easy to tinker with, if you know some
-Perl. The Transjovian Council has a wiki space dedicated to Phoebe, and it
-includes a section with more configuration examples.
-See L<gemini://transjovian.org/> or L<https://transjovian.org:1965/>.
+The Transjovian Council has a wiki space dedicated to Phoebe, and it includes a
+section with more configuration examples. See L<gemini://transjovian.org/phoebe>
+or L<https://transjovian.org:1965/phoebe>.
 
 =head1 LICENSE
 
@@ -790,6 +813,8 @@ GNU Affero General Public License
 
 =cut
 
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use App::Phoebe qw($log $server host_regex handle_request get_ip_numbers);
 use Modern::Perl '2018';
 use File::Slurper qw(read_dir);
@@ -808,6 +833,7 @@ GetOptions(
   'help' => \&help,
   'log_level=s' => sub { $log->level($_[1]), },
   'log_file=s' => sub { $log->path($_[1]) },
+  'no_cert' => \&host_setup,
   'cert_file=s' => \&host_setup,
   'key_file=s' => \&host_setup,
   'host=s' => \&host_setup,
@@ -833,7 +859,17 @@ sub utf8_item { my ($key, $value) = @_; $server->{$key} = decode(locale => $valu
     if ($opt eq 'host') {
       push @host, decode(locale => $val);
       return;
-    };
+    } elsif ($opt eq 'no_cert') {
+      if (not @host and not $server->{host}->{'localhost'}) {
+	$server->{host}->{'localhost'} = 1;
+      }
+      for (@host) {
+	$server->{host}->{$_} = 1;
+	# no $server->{cert_file} and $server->{key_file}
+      }
+      @host = ();
+      return;
+    }
     die "$val does not exist\n" unless -f $val;
     if ($opt eq 'cert_file') { $cert_file = $val }
     elsif ($opt eq 'key_file') { $key_file = $val }
@@ -982,14 +1018,15 @@ sub start_servers {
       for my $address (get_ip_numbers($host)) {
 	$server->{address}->{$address} = $host;
 	for my $port (@{$server->{port}}) {
-	  $log->info("$host: listening on $address:$port (Gemini)");
-	  Mojo::IOLoop->server({
-	    address => $address,
-	    port => $port,
-	    tls => 1,
-	    tls_cert => $server->{cert_file},
-	    tls_key  => $server->{key_file},
-	    tls_options => {
+	  my %args = (address => $address, port => $port);
+	  my $msg;
+	  if ($server->{cert_file}->{$host}) {
+	    $msg = "$host: listening on $address:$port (Gemini)";
+	    # only add TLS if we have a cert file!
+	    $args{tls} = 1;
+	    $args{tls_cert} = $server->{cert_file};
+	    $args{tls_key} = $server->{key_file};
+	    $args{tls_options} = {
 	      # request client certificates and accept them
 	      SSL_verify_mode => SSL_VERIFY_PEER,
 	      SSL_verify_callback => \&verify_fingerprint,
@@ -997,15 +1034,23 @@ sub start_servers {
 		my $ctx = shift;
 		Net::SSLeay::CTX_sess_set_cache_size($ctx, 64);
 	      }
-	    }
-	  } => sub {
-	    my ($loop, $stream) = @_;
-	    my $data = { buffer => '', handler => \&handle_request };
-	    $stream->on(read => sub {
-	      my ($stream, $bytes) = @_;
-	      $log->debug("Received " . length($bytes) . " bytes");
-	      $data->{buffer} .= $bytes;
-	      $data->{handler}->($stream, $data)})});
+	    };
+	  } else {
+	    $msg = "$host: listening on $address:$port (Gemini without TLS)";
+	  }
+	  eval {
+	    Mojo::IOLoop->server(\%args => sub {
+	      my ($loop, $stream) = @_;
+	      my $data = { buffer => '', handler => \&handle_request };
+	      $stream->on(read => sub {
+		my ($stream, $bytes) = @_;
+		$log->debug("Received " . length($bytes) . " bytes");
+		$data->{buffer} .= $bytes;
+		$data->{handler}->($stream, $data)})});
+	    # report success after the fact!
+	    $log->info($msg);
+	  };
+	  $log->error("$host: unable to listen on $address:$port: $@") if $@;
 	}
       }
     }

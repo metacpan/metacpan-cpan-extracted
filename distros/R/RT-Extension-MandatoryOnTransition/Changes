@@ -1,3 +1,12 @@
+Revision history for RT-Extension-MandatoryOnTransition
+
+0.21 2021-10-29
+ - Call RT method CustomFieldValueIsEmpty to perform additional custom
+   field checks. This specifically improves checks for date custom fields
+   because if RT can't parse the provided date value, it will mark the CF as
+   "empty" and correctly fail the mandatory check.
+ - Allow rules targeted to when a ticket is first created
+
 0.20 2020-07-20
  - Add RT 5 support
 

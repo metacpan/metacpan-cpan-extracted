@@ -12,7 +12,7 @@ use PPIx::QuoteLike::Constant qw{ @CARP_NOT };
 use PPIx::QuoteLike::Utils qw{ __instance };
 use Scalar::Util ();
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use constant SCALAR_REF	=> ref \0;
 
@@ -51,7 +51,7 @@ use constant SCALAR_REF	=> ref \0;
 		    location	=> [ 1, 1, 1, 1, -f $source ? $source :
 			undef ],
 		),
-		map { $_ => $arg{$_} } qw{ encoding postderef },
+		map { $_ => $arg{$_} } qw{ encoding },
 	    )
 	    or return;
 

@@ -4,7 +4,7 @@ package CXC::Number::Sequence::Fixed;
 
 use Moo;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use namespace::clean;
 
@@ -37,7 +37,7 @@ CXC::Number::Sequence::Fixed - CXC::Number::Sequence with arbitrary values
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

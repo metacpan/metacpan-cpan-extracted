@@ -27,7 +27,7 @@ use experimental 'signatures';
 
 use Wireguard::WGmeta::Validator;
 
-our $VERSION = "0.3.1";
+our $VERSION = "0.3.2";
 
 =head1 ATTRIBUTE TYPES
 
@@ -179,7 +179,7 @@ use constant KNOWN_ATTRIBUTES => {
         'validator'      => \&accept_any
     },
     'persistent-keepalive' => {
-        'in_config_name' => 'PresistentKeepalive',
+        'in_config_name' => 'PersistentKeepalive',
         'type'           => ATTR_TYPE_IS_WG_ORIG_PEER,
         'validator'      => \&accept_any
     },

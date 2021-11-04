@@ -1,3 +1,8 @@
+Changes in 1.8.2 (October 2021)
+- Fixed bug in setqlim(), introduced in 1.8.1: Broken check for truncation
+  of limit value to 32-bit lead to rejecting limits >4TB with error EINVAL.
+  Thanks for Stephen Bee and Nicolas Rochelemagne for reporting the issue.
+
 Changes in 1.8.1 (April 2020)
 - correction to Q_XQUOTASYNC update done in 1.8.0: return value inverted
 - compile-fixes and enhancements for latest versions of the BSDs:

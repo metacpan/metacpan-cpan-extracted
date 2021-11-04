@@ -282,8 +282,22 @@ void JsAppendNode(Node* element, Node* node) {
 
 /* collapses a node to a single whitespace character */
 void JsCollapseNodeToWhitespace(Node* node) {
-    if (node->contents) {
+    if (node->contents && (node->length > 1)) {
+        /* does the node contain endspace? */
+        size_t offset = 0;
+        bool hasEndspace = 0;
+        while (offset < node->length) {
+          if (charIsEndspace(node->contents[offset++])) {
+            hasEndspace = 1;
+            break;
+          }
+        }
+
+        /* collapse node, either to endspace, or to the first whitespace char */
         node->length = 1;
+        if (hasEndspace) {
+          node->contents[0] = '\n';
+        }
         node->contents[1] = '\0';
     }
 }

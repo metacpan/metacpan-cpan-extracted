@@ -19,11 +19,9 @@ await $chip->mount(
 # ->read_lux
 {
    $adapter->expect_txn_start;
-   $adapter->expect_write( "\x03" );
-   $adapter->expect_read( 1 )
+   $adapter->expect_write_then_read( "\x03", 1 )
       ->returns( "\x87" );
-   $adapter->expect_write( "\x04" );
-   $adapter->expect_read( 1 )
+   $adapter->expect_write_then_read( "\x04", 1 )
       ->returns( "\x06" );
    $adapter->expect_txn_stop;
 

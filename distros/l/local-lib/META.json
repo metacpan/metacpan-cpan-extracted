@@ -4,7 +4,7 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -68,6 +68,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#local-lib"
    },
-   "version" : "2.000024",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "2.000028",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityContent;
-$Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityContent::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityContent::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Quantity
               Options
 
-              )
+            )
         ],
         {   'Description' => \%Description_of,
             'Quantity'    => \%Quantity_of,
@@ -69,7 +69,7 @@ Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityContent
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

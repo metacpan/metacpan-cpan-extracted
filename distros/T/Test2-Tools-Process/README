@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 0.06
 
 SYNOPSIS
 
@@ -300,6 +300,9 @@ CAVEATS
     This module installs handlers for exec, exit, system and readpipe, in
     the CORE::GLOBAL namespace, so if your code is also installing handlers
     there then things might not work.
+
+    This module is not apparently compatible with IPC::Run3. Use
+    Capture::Tiny instead, which is better maintained in my opinion.
 
 SEE ALSO
 

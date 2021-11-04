@@ -16,7 +16,7 @@ use CDTest;
 use Import::Into;
 use Path::Class 'file';
 
-use Env qw< ONLINEDDL_TEST_DEBUG CDTEST_MASS_POPULATE CDTEST_DSN CDTEST_DBUSER CDTEST_DBPASS >;
+use Env qw< ONLINEDDL_TEST_DEBUG ONLINEDDL_NO_ACTIVITY_TEST CDTEST_MASS_POPULATE CDTEST_DSN CDTEST_DBUSER CDTEST_DBPASS >;
 
 use parent 'Exporter';
 
@@ -61,7 +61,9 @@ sub import {
         CDTest
     >;
 
-    Env->import::into($target, qw< ONLINEDDL_TEST_DEBUG CDTEST_MASS_POPULATE CDTEST_DSN CDTEST_DBUSER CDTEST_DBPASS >);
+    Env->import::into($target, qw<
+        ONLINEDDL_TEST_DEBUG ONLINEDDL_NO_ACTIVITY_TEST CDTEST_MASS_POPULATE CDTEST_DSN CDTEST_DBUSER CDTEST_DBPASS
+    >);
 
     $class->export_to_level(1, @EXPORT);
 }
@@ -230,7 +232,7 @@ sub onlineddl_test ($$&) {
         # best simulate real-time usage of the table.
         no warnings 'redefine';
         my $orig_dbh_sub = \&DBIx::OnlineDDL::dbh;
-        local *DBIx::OnlineDDL::dbh = sub {
+        local *DBIx::OnlineDDL::dbh = $ONLINEDDL_NO_ACTIVITY_TEST ? $orig_dbh_sub : sub {
             my $dbh = $orig_dbh_sub->(@_);
             return $dbh unless $dbh;
             my $oddl = shift;

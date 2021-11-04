@@ -23,12 +23,111 @@
 #include "PerlXlib.h"
 void PerlXlib_sanity_check_data_structures();
 
+static SV* _cache_atom(HV *cache, Atom val, const char *name) {
+    SV **ent, *sv;
+    ent= hv_fetch(cache, name, strlen(name), 1);
+    if (!ent) return NULL;
+    /* Create a read-only dualvar */
+    sv= *ent;
+    if (SvOK(sv)) {
+        /* If a user supplies the same value twice in the list, this could attempt to try
+          * adding the item to the cache twice. */
+        if (SvIV(sv) == val)
+            return sv;
+        else {
+            sv_2mortal(sv);
+            *ent= sv= newSV(0);
+        }
+    }
+    SvUPGRADE(sv, SVt_PVMG);
+    sv_setpvn(sv, name, strlen(name));
+    SvIV_set(sv, val);
+    SvIOK_on(sv);
+    SvREADONLY_on(sv);
+    /* add it to the hash by both name and value */
+    if (hv_store(cache, (void*) &val, sizeof(val), sv, 0)) {
+        SvREFCNT_inc(sv);
+        return sv;
+    }
+    else
+        return NULL;
+}
+
+/* This provides efficient detection of whether an attribute is being passed as
+ * an integer, or something symbolic. */
+static Bool is_an_integer(SV *sv) {
+    size_t len, i;
+    const char *str;
+
+    if (SvIOK(sv) || SvUOK(sv) || (SvNOK(sv) && ((NV)(IV)SvNV(sv)) == SvNV(sv)))
+        return 1;
+    if (!SvOK(sv))
+        return 0;
+    str= SvPV(sv, len);
+    for (i= 0; i < len; i++)
+        if (!isDIGIT(str[i])) return 0;
+    return len > 0;
+}
+
 MODULE = X11::Xlib                PACKAGE = X11::Xlib
 
 void
 _sanity_check_data_structures()
     PPCODE:
         PerlXlib_sanity_check_data_structures();
+
+Bool
+_is_an_integer(str=NULL)
+    SV *str
+    PROTOTYPE: ;$
+    CODE:
+        dUNDERBAR;
+        if (!str) str= UNDERBAR;
+        RETVAL= is_an_integer(str);
+    OUTPUT:
+        RETVAL
+
+int
+_prop_format_width(fmt)
+    int fmt
+    CODE:
+        RETVAL= fmt == 8? sizeof(char) : fmt == 16? sizeof(short) : fmt == 32? sizeof(long) : 0;
+    OUTPUT:
+        RETVAL
+
+void
+_unpack_prop(fmt, buf, n)
+    int fmt
+    SV *buf
+    size_t n
+    ALIAS:
+        _unpack_prop_signed = 0
+        _unpack_prop_unsigned = 1
+    INIT:
+        const char *p;
+        size_t len, step, i;
+    PPCODE:
+        /* As discovered by eslafgh in #6, X11 uses 32 to mean 'long' not 'whatever is 32 bits'
+         * which is annoying to unpack, as perl unpack requires either 'q' or 'l' and would need
+         * to 'use Config' to find out which.
+         * It's simpler just to implement an unpack for it directly.
+         */
+        step= fmt == 8? sizeof(char) : fmt == 16? sizeof(short) : fmt == 32? sizeof(long) : 0;
+        if (!step || ix < 0 || ix > 1)
+            croak("Format must be 8, 16, or 32, and mode must be signed or unsigned");
+        p= SvPV(buf, len);
+        if (step * n > len)
+            croak("Insufficient buffer (%d) to decode %d * %d bytes", (int) len, (int) n, (int) step);
+        EXTEND(SP, n);
+        switch (fmt+ix) {
+        case  8: for (i= 0; i < n; i++) mPUSHi(((         char *)p)[i]); break;
+        case  9: for (i= 0; i < n; i++) mPUSHu(((unsigned char *)p)[i]); break;
+        case 16: for (i= 0; i < n; i++) mPUSHi(((         short*)p)[i]); break;
+        case 17: for (i= 0; i < n; i++) mPUSHu(((unsigned short*)p)[i]); break;
+        case 32: for (i= 0; i < n; i++) mPUSHi(((         long *)p)[i]); break;
+        case 33: for (i= 0; i < n; i++) mPUSHu(((unsigned long *)p)[i]); break;
+        }
+        XSRETURN(n);
 
 # Threading Functions (fn_thread) --------------------------------------------
 
@@ -65,7 +164,7 @@ XOpenDisplay(connection_string = NULL)
         if (SvTRUE(get_sv("X11::Xlib::_error_fatal_trapped", GV_ADD)))
             croak("Cannot call further Xlib functions after fatal Xlib error");
         dpy= XOpenDisplay(connection_string);
-        self= PerlXlib_obj_for_display(dpy, 1);
+        self= PerlXlib_get_display_objref(dpy, PerlXlib_AUTOCREATE);
         if (SvROK(self)) {
             if (!hv_store((HV*) SvRV(self), "autoclose", 9, (tmp=newSViv(1)), 0)) {
                 sv_2mortal(tmp);
@@ -81,7 +180,7 @@ _pointer_value(obj)
         Display *dpy;
         SV **fp= NULL;
     PPCODE:
-        dpy= PerlXlib_get_magic_dpy(obj, 0);
+        dpy= PerlXlib_display_objref_get_pointer(obj, PerlXlib_OR_NULL);
         if (!dpy && SvROK(obj) && SvTYPE(SvRV(obj)) == SVt_PVHV) {
             /* in the case of a dead connection, the pointer value moves to a hash field */
             fp= hv_fetch((HV*)SvRV(obj), "_pointer_value", 14, 0);
@@ -96,8 +195,8 @@ _set_pointer_value(obj, dpy_val)
     SV *dpy_val
     PPCODE:
         if (SvOK(dpy_val) && (!SvPOK(dpy_val) || SvCUR(dpy_val) != sizeof(Display*)))
-            croak("Invalid pointer value (should be scalar of %d bytes)", sizeof(Display*));
-        PerlXlib_set_magic_dpy(obj, SvOK(dpy_val)? (Display*)(void*)SvPVX(dpy_val) : NULL);
+            croak("Invalid pointer value (should be scalar of %d bytes)", (int) sizeof(Display*));
+        PerlXlib_objref_set_pointer(obj, SvOK(dpy_val)? (Display*)(void*)SvPVX(dpy_val) : NULL, "Display");
 
 char *
 XServerVendor(dpy)
@@ -124,9 +223,9 @@ XCloseDisplay(dpy_sv)
     INIT:
         Display *dpy;
     CODE:
-        dpy= PerlXlib_get_magic_dpy(dpy_sv, 1);
+        dpy= PerlXlib_display_objref_get_pointer(dpy_sv, PerlXlib_OR_DIE);
         XCloseDisplay(dpy);
-        PerlXlib_set_magic_dpy(dpy_sv, NULL); /* mark as closed */
+        PerlXlib_objref_set_pointer(dpy_sv, NULL, NULL); /* mark as closed */
         hv_delete((HV*)SvRV(dpy_sv), "autoclose", 9, G_DISCARD);
 
 # Atom Functions (fn_atom) ---------------------------------------------------
@@ -208,7 +307,103 @@ XGetAtomNames(dpy, atoms)
             av_store(ret_av, i, name_array[i]? newSVpv(name_array[i], 0) : newSV(0));
             if (name_array[i]) XFree(name_array[i]);
         }
-    
+
+void
+_resolve_atoms(dpy_obj, ...)
+    SV *dpy_obj
+    ALIAS:
+        X11::Xlib::Display::atom = 0
+        X11::Xlib::Display::mkatom = 1
+    INIT:
+        Display *dpy= PerlXlib_display_objref_get_pointer(dpy_obj, PerlXlib_OR_DIE);
+        size_t len, item0, n_name_lookup= 0, n_atom_lookup= 0;
+        Atom  *atom_array,   atom_array_on_stack[20], atom;
+        char **name_array,  *name_array_on_stack[20], *name;
+        int   *atom_dest, *name_dest, link_array_on_stack[20], i, n_arg;
+        SV  **ent, *sv;
+        HV *cache= NULL;
+    PPCODE:
+        item0= 1;
+        n_arg= items-item0;
+        if (n_arg <= 20) {
+            atom_array= atom_array_on_stack;
+            atom_dest=  link_array_on_stack;
+            name_array= name_array_on_stack;
+            name_dest=  atom_dest + 20 - 1;
+        } else {
+            Newx(atom_array, n_arg, Atom);
+            SAVEFREEPV(atom_array);
+            Newx(atom_dest,  n_arg, int);
+            SAVEFREEPV(atom_dest);
+            Newx(name_array, n_arg, char*);
+            SAVEFREEPV(name_array);
+            name_dest= atom_dest + n_arg - 1;
+        }
+        if (SvTYPE(SvRV(dpy_obj)) == SVt_PVHV) {
+            if (ent= hv_fetch((HV*) SvRV(dpy_obj), "atom_cache", 10, 1)) {
+                if (SvROK(*ent) && SvTYPE(SvRV(*ent)) == SVt_PVHV)
+                    cache= (HV*) SvRV(*ent);
+                else
+                    sv_setsv(*ent, sv_2mortal(newRV_noinc((SV*) (cache= newHV()))));
+            }
+        }
+        if (!cache)
+            croak("atom_cache is not a hashref");
+        /* Inspect each parameter and decide whether it is an atom (number) or name.
+          * Replace stack items with the value from cache, and put the unresolved ones
+          * into arrays for laters processing. */
+        for (i= item0; i < items; i++) {
+            sv= ST(i);
+            if (is_an_integer(sv)) {
+                atom= SvIV(sv);
+                ent= hv_fetch(cache, (void*) &atom, sizeof(atom), 0);
+                if (ent && *ent && SvOK(*ent))
+                    ST(i)= *ent;                   /* found in cache */
+                else if (!atom)
+                    ST(i)= &PL_sv_undef;           /* can't resolve */
+                else {
+                    atom_dest[n_atom_lookup]= i;   /* store result here after looking it up */
+                    atom_array[n_atom_lookup++]= atom;
+                }
+            }
+            else {
+                name= SvPV(sv, len);
+                ent= hv_fetch(cache, name, len, 0);
+                if (ent && *ent && SvOK(*ent))
+                    ST(i)= *ent;
+                else if (!len)
+                    ST(i)= &PL_sv_undef;
+                else {
+                    name_dest[-n_name_lookup]= i;
+                    name_array[n_name_lookup++]= name;
+                }
+            }
+        }
+        if (n_name_lookup) {
+            XInternAtoms(dpy, name_array, n_name_lookup, ix == 0? 1 : 0, atom_array + n_atom_lookup);
+            for (i= 0; i < n_name_lookup; i++) {
+                if (atom_array[n_atom_lookup + i]) {
+                    sv= _cache_atom(cache, atom_array[n_atom_lookup + i], name_array[i]);
+                    if (sv) ST(name_dest[-i])= sv;
+                }
+            }
+        }
+        if (n_atom_lookup) {
+            XGetAtomNames(dpy, atom_array, n_atom_lookup, name_array + n_name_lookup);
+            for (i= 0; i < n_atom_lookup; i++) {
+                if (name_array[n_name_lookup + i]) {
+                    sv= _cache_atom(cache, atom_array[i], name_array[n_name_lookup + i]);
+                    if (sv) ST(atom_dest[i])= sv;
+                }
+            }
+        }
+        /* First arg was $self, so shift down all parameters by one for the return value */
+        for (i= item0; i < items; i++) {
+            ST(i-item0)= ST(i);
+            ST(i)= &PL_sv_undef;
+        }
+        XSRETURN(items-item0);
+
 # Event Functions (fn_event) -------------------------------------------------
 
 int
@@ -738,11 +933,13 @@ XGetWindowProperty(dpy, wnd, prop_atom, long_offset, long_length, delete, req_ty
             &actual_type, &actual_format, &nitems, &bytes_after, (unsigned char**)&data);
         if (RETVAL == Success) {
             if (actual_format == 8) {
-                sv_setpvn(data_out, data, nitems);
+                sv_setpvn(data_out, data, nitems*sizeof(char));
             } else if (actual_format == 16) {
-                sv_setpvn(data_out, data, nitems*2);
+                sv_setpvn(data_out, data, nitems*sizeof(short));
             } else if (actual_format == 32) {
-                sv_setpvn(data_out, data, nitems*4);
+                sv_setpvn(data_out, data, nitems*sizeof(long));
+            } else if (actual_format == 0) {
+                sv_setpvn(data_out, data, 0);
             } else {
                 XFree(data);
                 croak("Un-handled 'actual_format' value %d returned by XGetWindowProperty", actual_format);
@@ -767,9 +964,9 @@ XChangeProperty(dpy, wnd, prop_atom, type, format, mode, data, nelements)
     SV *data
     int nelements
     INIT:
-        int bytelen= format == 8? nelements
-            : format == 16? nelements * 2
-            : format == 32? nelements * 4
+        int bytelen= format == 8? nelements * sizeof(char)
+            : format == 16? nelements * sizeof(short)
+            : format == 32? nelements * sizeof(long)
             : -1;
         size_t svlen;
         char *buffer;
@@ -778,7 +975,7 @@ XChangeProperty(dpy, wnd, prop_atom, type, format, mode, data, nelements)
             croak("Un-handled 'format' value %d passed to XChangeProperty", format);
         buffer= SvPV(data, svlen);
         if (bytelen > svlen)
-            croak("'nelements' (%d) exceeds length of data (%d)", nelements, svlen);
+            croak("'nelements' (%d) exceeds length of data (%d)", (int) nelements, (int) svlen);
         XChangeProperty(dpy, wnd, prop_atom, type, format, mode, buffer, nelements);
 
 void
@@ -1390,7 +1587,7 @@ load_keymap(dpy, symbolic=2, minkey=0, maxkey=255)
                     sv= PerlXlib_keysym_to_sv(syms[i*nsym+j], symbolic);
                     if (!sv) {
                         XFree(syms);
-                        croak("Your keymap includes KeySym 0x%x that can't be un-ambiguously represented by a string", syms[i*nsym+j]);
+                        croak("Your keymap includes KeySym 0x%x that can't be un-ambiguously represented by a string", (unsigned) syms[i*nsym+j]);
                     }
                     av_store(row, j, sv);
                 }
@@ -1852,20 +2049,18 @@ void
 display(self, dpy_sv= NULL)
     SV *self
     SV *dpy_sv
-    INIT:
-        void *opaque= PerlXlib_sv_to_display_innerptr(self, 1);
     PPCODE:
         if (dpy_sv)
-            PerlXlib_set_displayobj_of_opaque(opaque, dpy_sv);
+            PerlXlib_objref_set_display(self, dpy_sv);
         else
-            dpy_sv= PerlXlib_get_displayobj_of_opaque(opaque);
+            dpy_sv= PerlXlib_objref_get_display(self);
         PUSHs(sv_mortalcopy(dpy_sv));
 
 void
 pointer_int(self)
     SV *self
     INIT:
-        void *opaque= PerlXlib_sv_to_display_innerptr(self, 0);
+        void *opaque= PerlXlib_objref_get_pointer(self, NULL, PerlXlib_OR_NULL);
     PPCODE:
         PUSHs(sv_2mortal(newSVuv(PTR2UV(opaque))));
 
@@ -1873,18 +2068,9 @@ void
 pointer_bytes(self)
     SV *self
     INIT:
-        void *opaque= PerlXlib_sv_to_display_innerptr(self, 0);
+        void *opaque= PerlXlib_objref_get_pointer(self, NULL, PerlXlib_OR_NULL);
     PPCODE:
         PUSHs(sv_2mortal(newSVpvn((void*) &opaque, sizeof(opaque))));
-
-void
-DESTROY(self)
-    SV *self
-    INIT:
-        void *opaque= PerlXlib_sv_to_display_innerptr(self, 0);
-    PPCODE:
-        if (opaque)
-            PerlXlib_set_displayobj_of_opaque(opaque, NULL);
 
 MODULE = X11::Xlib                PACKAGE = X11::Xlib::Visual
 
@@ -1895,31 +2081,6 @@ id(visual)
         RETVAL = XVisualIDFromVisual(visual);
     OUTPUT:
         RETVAL
-
-MODULE = X11::Xlib                PACKAGE = X11::Xlib::Struct
-
-void
-display(self, dpy_sv= NULL)
-    SV *self
-    SV *dpy_sv
-    INIT:
-        SV *inner_ref= NULL;
-    PPCODE:
-        if (!SvROK(self) || !SvRV(self))
-            croak("Not a struct object");
-        inner_ref= SvRV(self);
-        if (dpy_sv)
-            PerlXlib_set_displayobj_of_opaque((void*)inner_ref, dpy_sv);
-        else
-            dpy_sv= PerlXlib_get_displayobj_of_opaque((void*)inner_ref);
-        PUSHs(sv_mortalcopy(dpy_sv? dpy_sv : &PL_sv_undef));
-
-void
-DESTROY(self)
-    SV *self
-    PPCODE:
-        if (SvROK(self) && SvRV(self))
-            PerlXlib_set_displayobj_of_opaque(SvRV(self), NULL);
 
 MODULE = X11::Xlib                PACKAGE = X11::Xlib::XEvent
 
@@ -2118,10 +2279,10 @@ display(event, value=NULL)
   SV *value
   PPCODE:
     if (value) {
-      if (event->type) event->xany.display= PerlXlib_get_magic_dpy(value, 0); else event->xerror.display= PerlXlib_get_magic_dpy(value, 0);
+      if (event->type) event->xany.display= PerlXlib_display_objref_get_pointer(value, PerlXlib_OR_NULL); else event->xerror.display= PerlXlib_display_objref_get_pointer(value, PerlXlib_OR_NULL);
       PUSHs(value);
     } else {
-      PUSHs(sv_2mortal(newSVsv((event->type? event->xany.display : event->xerror.display)? PerlXlib_obj_for_display((event->type? event->xany.display : event->xerror.display), 0) : &PL_sv_undef)));
+      PUSHs(sv_2mortal(newSVsv(PerlXlib_get_display_objref((event->type? event->xany.display : event->xerror.display), PerlXlib_AUTOCREATE))));
     }
 
 void
@@ -3214,14 +3375,14 @@ visual(self, value=NULL)
            self, 0, "X11::Xlib::XVisualInfo", sizeof(XVisualInfo),
            (PerlXlib_struct_pack_fn*) &PerlXlib_XVisualInfo_pack
          );
-         SV *dpy_sv= PerlXlib_get_displayobj_of_opaque(SvRV(self));
-         Display *dpy= PerlXlib_get_magic_dpy(dpy_sv,0);
+         SV *dpy_sv= PerlXlib_objref_get_display(self);
+         Display *dpy= PerlXlib_display_objref_get_pointer(dpy_sv, PerlXlib_OR_NULL);
   PPCODE:
     if (value) {
-      s->visual= (Visual *) PerlXlib_sv_to_display_innerptr(value, 0);
+      s->visual= (Visual *) PerlXlib_objref_get_pointer(value, "Visual", PerlXlib_OR_NULL);
       PUSHs(value);
     } else {
-      PUSHs(sv_2mortal(newSVsv(s->visual? PerlXlib_obj_for_display_innerptr(dpy, s->visual, "X11::Xlib::Visual", SVt_PVMG, 1) : &PL_sv_undef)));
+      PUSHs(sv_mortalcopy(PerlXlib_get_objref(s->visual, PerlXlib_AUTOCREATE, "Visual", SVt_PVMG, "X11::Xlib::Visual", dpy)));
     }
 
 void
@@ -3648,10 +3809,10 @@ screen(self, value=NULL)
     XWindowAttributes *s= self;
   PPCODE:
     if (value) {
-      s->screen= PerlXlib_sv_to_screen(value, 0);
+      s->screen= PerlXlib_screen_objref_get_pointer(value, PerlXlib_OR_NULL);
       PUSHs(value);
     } else {
-      PUSHs(sv_2mortal(newSVsv(s->screen? PerlXlib_obj_for_screen(s->screen) : &PL_sv_undef)));
+      PUSHs(sv_2mortal(newSVsv(PerlXlib_get_screen_objref(s->screen, PerlXlib_OR_UNDEF))));
     }
 
 void
@@ -3663,14 +3824,14 @@ visual(self, value=NULL)
            self, 0, "X11::Xlib::XWindowAttributes", sizeof(XWindowAttributes),
            (PerlXlib_struct_pack_fn*) &PerlXlib_XWindowAttributes_pack
          );
-         SV *dpy_sv= PerlXlib_get_displayobj_of_opaque(SvRV(self));
-         Display *dpy= PerlXlib_get_magic_dpy(dpy_sv,0);
+         SV *dpy_sv= PerlXlib_objref_get_display(self);
+         Display *dpy= PerlXlib_display_objref_get_pointer(dpy_sv, PerlXlib_OR_NULL);
   PPCODE:
     if (value) {
-      s->visual= (Visual *) PerlXlib_sv_to_display_innerptr(value, 0);
+      s->visual= (Visual *) PerlXlib_objref_get_pointer(value, "Visual", PerlXlib_OR_NULL);
       PUSHs(value);
     } else {
-      PUSHs(sv_2mortal(newSVsv(s->visual? PerlXlib_obj_for_display_innerptr(dpy, s->visual, "X11::Xlib::Visual", SVt_PVMG, 1) : &PL_sv_undef)));
+      PUSHs(sv_mortalcopy(PerlXlib_get_objref(s->visual, PerlXlib_AUTOCREATE, "Visual", SVt_PVMG, "X11::Xlib::Visual", dpy)));
     }
 
 void

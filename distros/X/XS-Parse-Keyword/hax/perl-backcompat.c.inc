@@ -11,6 +11,10 @@
 #  define SvTRUE_NN(sv)  SvTRUE(sv)
 #endif
 
+#ifndef G_LIST
+#  define G_LIST  G_ARRAY
+#endif
+
 #if !HAVE_PERL_VERSION(5, 18, 0)
 typedef AV PADNAMELIST;
 #  define PadlistARRAY(pl)        ((PAD **)AvARRAY(pl))
@@ -61,6 +65,19 @@ typedef SV PADNAME;
 #  define OLDSAVEIX(cx)  (PL_scopestack[cx->blk_oldscopesp-1])
 #endif
 
+#ifndef OpSIBLING
+#  define OpSIBLING(op)  ((op)->op_sibling)
+#endif
+
+#ifndef OpMORESIB_set
+#  define OpMORESIB_set(op,sib)  ((op)->op_sibling = (sib))
+#endif
+
+#ifndef OpLASTSIB_set
+   /* older perls don't need to store this at all */
+#  define OpLASTSIB_set(op,parent)
+#endif
+
 #ifndef op_convert_list
 #  define op_convert_list(type, flags, o)  S_op_convert_list(aTHX_ type, flags, o)
 static OP *S_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
@@ -106,7 +123,7 @@ static OP *S_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
 /* On Perl 5.14 this had a different name */
 #ifndef pad_add_name_pvn
 #define pad_add_name_pvn(name, len, flags, typestash, ourstash)  MY_pad_add_name(aTHX_ name, len, flags, typestash, ourstash)
-PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, HV *typestash, HV *ourstash)
+static PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, HV *typestash, HV *ourstash)
 {
   /* perl 5.14's Perl_pad_add_name requires a NUL-terminated name */
   SV *namesv = sv_2mortal(newSVpvn(name, len));

@@ -65,7 +65,7 @@ foreach my $spec (glob("data/SPECS/srpm*.spec")) {
     genhdlist_std($name);
 }
 
-{
+if (!is_rpm_v3_support_broken()) {
     my $name = 'rpm-v3';
     system_("cp -r data/$name media");
     system_("cp -r media/$name media/${name}_nohdlist");

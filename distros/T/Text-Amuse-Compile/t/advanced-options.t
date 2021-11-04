@@ -6,7 +6,7 @@ use warnings;
 use Text::Amuse::Compile;
 use Path::Tiny;
 use Data::Dumper;
-use Test::More tests => 109;
+use Test::More tests => 141;
 
 my $muse = <<"MUSE";
 #title My title
@@ -135,6 +135,12 @@ foreach my $options ({
                       ignore_cover => 1,
                      },
                      {
+                      linespacing => '1.5',
+                     },
+                     {
+                      linespacing => 'asdfasdf',
+                     },
+                     {
                       geometry_top_margin => '2cm',
                       geometry_outer_margin => '2cm',
                       areaset_height => '8cm',
@@ -210,5 +216,11 @@ foreach my $options ({
                       width=\Q$options->{areaset_width}\E,%\s+
                       height=\Q$options->{areaset_height}\E%\s+\]\{geometry\}
                  }sx;
+    }
+    if ($options->{linespacing} and $options->{linespacing} !~ /a/) {
+        like $tex, qr{\\renewcommand\{\\baselinestretch\}\{1\.5\}}, "Found the line stretch"
+    }
+    else {
+        unlike $tex, qr{baselinestretch}, "No line stretching changes";
     }
 }

@@ -3,7 +3,7 @@
 #  by Kawai, Takanori (Hippo2000) 2001.2.2
 # This Program is ALPHA version.
 #==============================================================================
-# Spreadsheet::XLSX::Utility;
+# Spreadsheet::XLSX::Utility2007;
 #==============================================================================
 package Spreadsheet::XLSX::Utility2007;
 use strict;
@@ -13,7 +13,7 @@ require Exporter;
 use vars qw(@ISA @EXPORT_OK);
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(ExcelFmt LocaltimeExcel ExcelLocaltime col2int int2col sheetRef xls2csv);
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 
 my $sNUMEXP = '(^[+-]?\d+(\.\d+)?$)|(^[+-]?\d+\.?(\d*)[eE][+-](\d+))$';
 
@@ -548,7 +548,7 @@ sub ExcelFmt {
 }
 
 #------------------------------------------------------------------------------
-# AddComma (for Spreadsheet::XLSX::Utility)
+# AddComma (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub AddComma {
     my ($sNum) = @_;
@@ -565,7 +565,7 @@ sub AddComma {
 }
 
 #------------------------------------------------------------------------------
-# MakeBun (for Spreadsheet::XLSX::Utility)
+# MakeBun (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub MakeBun {
     my ($sFmt, $iData, $iFlg) = @_;
@@ -610,7 +610,7 @@ sub MakeBun {
 }
 
 #------------------------------------------------------------------------------
-# MakeE (for Spreadsheet::XLSX::Utility)
+# MakeE (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub MakeE {
     my ($sFmt, $iData) = @_;
@@ -629,7 +629,7 @@ sub MakeE {
 }
 
 #------------------------------------------------------------------------------
-# LeapYear (for Spreadsheet::XLSX::Utility)
+# LeapYear (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub LeapYear {
     my ($iYear) = @_;
@@ -638,7 +638,7 @@ sub LeapYear {
 }
 
 #------------------------------------------------------------------------------
-# LocaltimeExcel (for Spreadsheet::XLSX::Utility)
+# LocaltimeExcel (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub LocaltimeExcel {
     my ($iSec, $iMin, $iHour, $iDay, $iMon, $iYear, $iMSec, $flg1904) = @_;
@@ -693,7 +693,7 @@ sub LocaltimeExcel {
 }
 
 #------------------------------------------------------------------------------
-# ExcelLocaltime (for Spreadsheet::XLSX::Utility)
+# ExcelLocaltime (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 sub ExcelLocaltime {
     my ($dObj, $flg1904) = @_;
@@ -759,7 +759,7 @@ sub ExcelLocaltime {
 }
 
 # -----------------------------------------------------------------------------
-# col2int (for Spreadsheet::XLSX::Utility)
+# col2int (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 # converts a excel row letter into an int for use in an array
 sub col2int {
@@ -782,7 +782,7 @@ sub col2int {
 }
 
 # -----------------------------------------------------------------------------
-# int2col (for Spreadsheet::XLSX::Utility)
+# int2col (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 ### int2col
 # convert a column number into column letters
@@ -804,7 +804,7 @@ sub int2col {
 }
 
 # -----------------------------------------------------------------------------
-# sheetRef (for Spreadsheet::XLSX::Utility)
+# sheetRef (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 ### sheetRef
@@ -830,7 +830,7 @@ sub sheetRef {
 }
 
 # -----------------------------------------------------------------------------
-# xls2csv (for Spreadsheet::XLSX::Utility)
+# xls2csv (for Spreadsheet::XLSX::Utility2007)
 #------------------------------------------------------------------------------
 ### xls2csv
 # convert a chunk of an excel file into csv text chunk
@@ -971,7 +971,7 @@ Spreadsheet::XLSX::Utility2007 - Utility function for Spreadsheet::XLSX
 
     use strict;
     #Declare
-    use Spreadsheet::XLSX::Utility qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
+    use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
     
     #Convert localtime ->Excel Time
     my $iBirth = LocaltimeExcel(11, 10, 12, 23, 2, 64);
@@ -992,7 +992,7 @@ Spreadsheet::XLSX::Utility2007 - Utility function for Spreadsheet::XLSX
 
 =head1 DESCRIPTION
 
-Spreadsheet::XLSX::Utility exports utility functions concerned with Excel format setting. 
+Spreadsheet::XLSX::Utility2007 exports utility functions concerned with Excel format setting. 
 
 ExcelFmt is used by Spreadsheet::XLSX::Fmt2007.pm which is used by Spreadsheet::XLSX.
 

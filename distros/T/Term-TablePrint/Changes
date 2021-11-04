@@ -1,6 +1,18 @@
 Revision history for Term::TablePrint
 
 
+0.148   2021-10-21
+        - Refactored 'calc_avail_col_width'.
+
+0.147   2021-10-18
+        - Bugfix in 'cols_to_string'.
+
+0.146   2021-10-18
+        - New option 'trunc_frac_first'.
+        - Search regex without 'qr'.
+        - Code refactoring.
+        - Update documentation.
+
 0.145   2021-10-03
         - Columns with numbers: bugfix column width.
         - Code refactoring.

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackSplitShipmentPart;
-$Shipment::FedEx::WSDL::TrackTypes::TrackSplitShipmentPart::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackSplitShipmentPart::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               StatusCode
               StatusDescription
 
-              )
+            )
         ],
         {   'PieceCount'        => \%PieceCount_of,
             'Timestamp'         => \%Timestamp_of,
@@ -72,7 +72,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackSplitShipmentPart
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

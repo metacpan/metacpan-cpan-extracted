@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2020 by Dominique Dumont.
+# This software is Copyright (c) 2014-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,10 +10,10 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.033';
+$App::Cme::Command::run::VERSION = '1.034';
 use strict;
 use warnings;
-use 5.10.1;
+use v5.20;
 use File::HomeDir;
 use Path::Tiny;
 use Config::Model;
@@ -24,8 +24,12 @@ use Encode qw(decode_utf8);
 use App::Cme -command ;
 
 use base qw/App::Cme::Common/;
+use experimental qw/signatures/;
+no warnings qw(experimental::smartmatch experimental::signatures);
 
 my $__test_home = '';
+# used only by tests
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _set_test_home { $__test_home = shift; return;}
 
 my $home = $__test_home || File::HomeDir->my_home;
@@ -69,16 +73,7 @@ sub description {
     return $self->get_documentation;
 }
 
-sub execute {
-    my ($self, $opt, $app_args) = @_;
-
-    # cannot use logger until Config::Model is initialised
-
-    # see Debian #839593 and perlunicook(1) section X 13
-    @$app_args = map { decode_utf8($_, 1) } @$app_args;
-
-    my $script_name = shift @$app_args;
-
+sub check_script_arguments ($self, $opt, $script_name) {
     if ($opt->{list} or not $script_name) {
         my @scripts;
         foreach my $path ( @script_paths ) {
@@ -87,11 +82,13 @@ sub execute {
         }
         say $opt->{list} ? "Available scripts:" : "Missing script argument. Choose one of:";
         say map {"- ".$_->basename."\n"} @scripts ;
-        return;
+        return 0;
     }
+    return 1;
+}
 
+sub find_script_file ($self, $script_name) {
     my $script;
-
     if ($script_name =~ m!/!) {
         $script = path($script_name);
     }
@@ -106,23 +103,31 @@ sub execute {
 
     die "Error: cannot find script $script_name\n" unless $script->is_file;
 
-    my $content = $script->slurp_utf8;
+    return $script;
+}
 
-    if ($opt->{cat}) {
-        print $content;
-        return;
+# replace variables with command arguments or eval'ed variables or env variables
+## no critic (Subroutines::ProhibitManyArgs)
+sub replace_var_in_value ($user_args, $script_var, $default, $missing, $vars) {
+    my $var_pattern = qr~(?<!\\) \$([a-zA-Z]\w+) (?!\s*{)~x;
+
+    foreach ($vars->@*) {
+        # change $var but not \$var, not $var{} and not $1
+        s~ $var_pattern
+         ~ $user_args->{$1} // $script_var->{$1} // $ENV{$1} // $default->{$1} // '$'.$1 ~xeg;
+
+        # register vars without replacements
+        foreach my $var (m~ $var_pattern ~xg) {
+            $missing->{$var} = 1 ;
+        }
+
+        # now change \$var in $var
+        s!\\\$!\$!g;
     }
+    return;
+}
 
-    # parse variables passed on command line
-    my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
-
-    if ($content =~ m/^#!/ or $content =~ /^use/m) {
-        splice @ARGV, 0,2; # remove 'run script' arguments
-        eval $script->slurp_utf8; ## no critic BuiltinFunctions::ProhibitStringyEval
-        die "Error in script $script_name: $@\n" if $@;
-        return;
-    }
-
+sub parse_script ($script, $content, $user_args, $app_args) {
     my %var;
 
     # find if all variables are accounted for
@@ -134,24 +139,7 @@ sub execute {
     # %args can be used in var section of a script. A new entry in
     # added in %missing if the script tries to read an undefined value
     tie my %args, 'App::Cme::Run::Var', \%missing, \%default;
-    %args = %user_args;
-
-    my $var_pattern = qr~(?<!\\) \$([a-zA-Z]\w+) (?!\s*{)~x;
-
-    # replace variables with command arguments or eval'ed variables or env variables
-    my $replace_var = sub {
-        foreach (@_) {
-            # change $var but not \$var, not $var{} and not $1
-            s~ $var_pattern
-             ~ $user_args{$1} // $var{$1} // $ENV{$1} // $default{$1} // '$'.$1 ~xeg;
-
-            # register vars without replacements
-            map { $missing{$_} = 1 ;} ( m~ $var_pattern ~xg );
-
-            # now change \$var in $var
-            s!\\\$!\$!g;
-        }
-    };
+    %args = $user_args->%*;
 
     my @lines =  split /\n/,$content;
     my @load;
@@ -184,42 +172,85 @@ sub execute {
 
         next unless $key ; # empty line
 
-        $replace_var->(@value) unless $key eq 'var';
+        replace_var_in_value($user_args, \%var, \%default, \%missing, \@value) unless $key eq 'var';
 
-        if ($key =~ /^app/) {
-            unshift @$app_args, @value;
-        }
-        elsif ($key eq 'var') {
-            # value comes from system file, not from user data
-            my $res = eval ("@value") ; ## no critic (ProhibitStringyEval)
-            die "Error in var specification line $line_nb: $@\n" if $@;
-        }
-        elsif ($key eq 'default') {
-            # multi-line default value is not supported
-            my ($dk, $dv) = split /[\s:=]+/, $value[0], 2;
-            $default{$dk} = $dv;
-        }
-        elsif ($key eq 'doc') {
-            push @doc, @value;
-        }
-        elsif ($key eq 'load') {
-            push @load, @value;
-        }
-        elsif ($key eq 'commit') {
-            $commit_msg = join "\n",@value;
-        }
-        else {
-            die "Error in file $script line $line_nb: unexpected '$key' instruction\n";
+        for ($key) {
+            when (/^app/) {
+                unshift @$app_args, @value;
+            }
+            when ('var') {
+                # value comes from system file, not from user data
+                my $res = eval ("@value") ; ## no critic (ProhibitStringyEval)
+                die "Error in var specification line $line_nb: $@\n" if $@;
+            }
+            when ('default') {
+                # multi-line default value is not supported
+                my ($dk, $dv) = split /[\s:=]+/, $value[0], 2;
+                $default{$dk} = $dv;
+            }
+            when ('doc') {
+                push @doc, @value;
+            }
+            when ('load') {
+                push @load, @value;
+            }
+            when ('commit') {
+                $commit_msg = join "\n",@value;
+            }
+            default {
+                die "Error in file $script line $line_nb: unexpected '$key' instruction\n";
+            }
         }
     }
+    return {
+        doc => \@doc,
+        commit_msg => $commit_msg,
+        missing => \%missing,
+        load => \@load,
+    }
+}
+
+sub execute {
+    my ($self, $opt, $app_args) = @_;
+
+    # cannot use logger until Config::Model is initialised
+
+    # see Debian #839593 and perlunicook(1) section X 13
+    @$app_args = map { decode_utf8($_, 1) } @$app_args;
+
+    my $script_name = shift @$app_args;
+
+    return unless $self->check_script_arguments($opt, $script_name);
+
+    my $script = $self->find_script_file($script_name);
+
+    my $content = $script->slurp_utf8;
+
+    if ($opt->{cat}) {
+        print $content;
+        return;
+    }
+
+    # parse variables passed on command line
+    my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
+
+    if ($content =~ m/^#!/ or $content =~ /^use/m) {
+        splice @ARGV, 0,2; # remove 'run script' arguments
+        my $done = eval $script->slurp_utf8."\n1;\n"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+        die "Error in script $script_name: $@\n" unless $done;
+        return;
+    }
+
+    my $script_data = parse_script($script, $content, \%user_args, $app_args);
+    my $commit_msg = $script_data->{commit_msg};
 
     if ($opt->doc) {
-        say join "\n", @doc;
+        say join "\n", $script_data->{doc}->@*;
         say "will commit with message: '$commit_msg'" if $commit_msg;
         return;
     }
 
-    if (my @missing = sort keys %missing) {
+    if (my @missing = sort keys $script_data->{missing}->%*) {
         die "Error: Missing variables '". join("', '",@missing)."' in command arguments for script $script\n"
             ."Please use option '".join(' ', map { "-arg $_=xxx"} @missing)."'\n";
     }
@@ -234,8 +265,9 @@ sub execute {
 
     # check if workspace and index are clean
     if ($commit_msg) {
+        ## no critic(InputOutput::ProhibitBacktickOperators)
         my $r = `git status --porcelain --untracked-files=no`;
-        die "Cannot run commit command in a non clean repo. Please commit or stash pending changes: $r"
+        die "Cannot run commit command in a non clean repo. Please commit or stash pending changes: $r\n"
             if $r;
     }
 
@@ -243,7 +275,7 @@ sub execute {
 
     # call loads
     my ($model, $inst, $root) = $self->init_cme($opt,$app_args);
-    map { $root->load($_) } @load;
+    map { $root->load($_) } $script_data->{load}->@*;
 
     $self->save($inst,$opt) ;
 
@@ -256,9 +288,10 @@ sub execute {
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.033';
+$App::Cme::Run::Var::VERSION = '1.034';
 require Tie::Hash;
 
+## no critic (ClassHierarchies::ProhibitExplicitISA)
 our @ISA = qw(Tie::ExtraHash);
 
 sub FETCH {
@@ -283,7 +316,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 SYNOPSIS
 
@@ -549,7 +582,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2020 by Dominique Dumont.
+This software is Copyright (c) 2014-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

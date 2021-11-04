@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-BashCompleter-cpanm/issues
   homepage: https://metacpan.org/release/App-ShellCompleter-cpanm
   repository: git://github.com/perlancar/perl-App-BashCompleter-cpanm.git
-version: '0.210'
+version: '0.211'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

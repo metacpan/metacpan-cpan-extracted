@@ -7,12 +7,11 @@ my(%param, $emv, $name);
 %param = (
     NAME                   => 'No::Worries',
     AUTHOR                 => 'Lionel Cons <lionel.cons@cern.ch>',
-    VERSION                => '1.6',
+    VERSION                => '1.7',
     ABSTRACT_FROM          => 'lib/No/Worries.pm',
     LICENSE                => 'perl',
     PL_FILES               => {},
     BUILD_REQUIRES => {
-        'Config'           => 0,
         'File::Temp'       => 0,
         'Getopt::Long'     => 0,
         # optional: Pod::Coverage
@@ -22,6 +21,7 @@ my(%param, $emv, $name);
     },
     PREREQ_PM => {
         'Carp'             => 0,
+        'Config'           => 0,
         'Encode'           => 0,
         'Fcntl'            => 0,
         'HTTP::Date'       => 0,

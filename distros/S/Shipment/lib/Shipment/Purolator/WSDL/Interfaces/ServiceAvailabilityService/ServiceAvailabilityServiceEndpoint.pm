@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint;
-$Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -49,7 +49,7 @@ sub GetServicesOptions {
       "GetServicesOptions must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'GetServicesOptions',
+        {   operation   => 'GetServicesOptions',
             soap_action =>
               'http://purolator.com/pws/service/v1/GetServicesOptions',
             style => 'document',
@@ -68,7 +68,7 @@ sub GetServicesOptions {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -109,7 +109,7 @@ sub GetServiceRules {
     die "GetServiceRules must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'GetServiceRules',
+        {   operation   => 'GetServiceRules',
             soap_action =>
               'http://purolator.com/pws/service/v1/GetServiceRules',
             style => 'document',
@@ -128,7 +128,7 @@ sub GetServiceRules {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -170,7 +170,7 @@ sub ValidateCityPostalCodeZip {
       "ValidateCityPostalCodeZip must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ValidateCityPostalCodeZip',
+        {   operation   => 'ValidateCityPostalCodeZip',
             soap_action =>
               'http://purolator.com/pws/service/v1/ValidateCityPostalCodeZip',
             style => 'document',
@@ -189,7 +189,7 @@ sub ValidateCityPostalCodeZip {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -265,7 +265,7 @@ Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvaila
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

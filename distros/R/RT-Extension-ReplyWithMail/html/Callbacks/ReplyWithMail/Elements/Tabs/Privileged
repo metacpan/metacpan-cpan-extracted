@@ -1,0 +1,44 @@
+<%init>
+my $request_path = $HTML::Mason::Commands::r->path_info;
+if ( $request_path =~ m{^/Ticket/} ) {
+    if ( ( $DECODED_ARGS->{'id'} || '' ) =~ /^(\d+)$/ ) {
+        my $id  = $1;
+        my $obj = RT::Ticket->new( $session{'CurrentUser'} );
+        $obj->Load($id);
+        my $cf = RT::CustomField->new($session{CurrentUser});
+        $cf->Load('Original Ticket');
+        return unless $cf->id && ( $cf->can('IsAdded') ? ( $cf->IsAdded(0) || $cf->IsAdded($obj->Queue) ) : ( $cf->IsApplied(0) || $cf->IsApplied($obj->Queue) ));
+ 
+        #Retrieve actions tab from page menu
+        my $tabs = PageMenu->child('actions');
+ 
+        my %can = %{ $obj->CurrentUser->PrincipalObj->HasRights( Object => $obj ) };
+        $can{'_ModifyOwner'} = $can{'OwnTicket'} || $can{'TakeTicket'} || $can{'StealTicket'};
+        my $can = sub {
+            unless ($_[0] eq 'ExecuteCode') {
+                return $can{$_[0]} || $can{'SuperUser'};
+            } else {
+                return !RT->Config->Get('DisallowExecuteCode')
+                    && ( $can{'ExecuteCode'} || $can{'SuperUser'} );
+            }
+        };
+ 		
+        #add item to actions child menu
+        if ( $can->('ModifyTicket') ) {
+        	if($obj->CcAddresses eq "" && $obj->AdminCcAddresses eq "")
+            {
+            	$tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $obj->RequestorAddresses . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress);
+            } elsif ($obj->CcAddresses ne "" && $obj->AdminCcAddresses eq "")
+            {
+            	$tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $obj->RequestorAddresses . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress . ", " . $obj->CcAddresses);
+            } elsif ($obj->CcAddresses ne "" && $obj->AdminCcAddresses ne "")
+            {
+            	$tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $obj->RequestorAddresses . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress . ", " . $obj->CcAddresses . "&bcc=" . $obj->AdminCcAddresses);
+            } elsif ($obj->CcAddresses eq "" && $obj->AdminCcAddresses ne "")
+            {
+            	$tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $obj->RequestorAddresses . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress . "&bcc=" . $obj->AdminCcAddresses);
+            }
+        }
+    }
+}
+</%init>

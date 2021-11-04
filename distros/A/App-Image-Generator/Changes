@@ -1,3 +1,16 @@
+0.03 2021-10-31T11:25:12+01:00
+ - Add test for constructor.
+ - Add test for run with help.
+ - Fix Makefile.PL which fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - In run() don't exit, only return exit code.
+ - Rewrite doc to =head2.
+ - Update Module::Install to 1.19.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.02 2016-04-04T15:20:27+02:00
  - Add LICENSE file.
  - Add support for jpg suffix.

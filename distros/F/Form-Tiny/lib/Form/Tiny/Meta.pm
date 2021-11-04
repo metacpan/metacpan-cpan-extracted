@@ -1,18 +1,24 @@
 package Form::Tiny::Meta;
 
 use v5.10;
+use strict;
 use warnings;
 use Moo;
-use Types::Standard qw(ArrayRef HashRef InstanceOf Bool);
+use Types::Standard qw(Str ArrayRef HashRef InstanceOf Bool);
 use Scalar::Util qw(blessed);
 use Carp qw(croak carp);
 
 use Form::Tiny::FieldDefinitionBuilder;
 use Form::Tiny::Hook;
+use Form::Tiny::Error;
+use Form::Tiny::Utils qw(try);
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
+
+# more clear error messages in some crucial cases
+our @CARP_NOT = qw(Form::Tiny Form::Tiny::Form);
 
 has 'fields' => (
 	is => 'ro',
@@ -38,6 +44,27 @@ has 'complete' => (
 	writer => '_complete',
 	default => sub { 0 },
 );
+
+has 'messages' => (
+	is => 'ro',
+	isa => HashRef [Str],
+	default => sub { {} },
+);
+
+sub consistent_api { 0 }
+
+sub build_error
+{
+	my ($self, $name, %params) = @_;
+	my $class = "Form::Tiny::Error::$name";
+	my $message = $self->messages->{$name};
+
+	if (defined $message) {
+		$params{error} = $message;
+	}
+
+	return $class->new(%params);
+}
 
 sub run_hooks_for
 {
@@ -121,6 +148,22 @@ sub add_hook
 			code => $code
 		);
 	}
+	return $self;
+}
+
+sub add_message
+{
+	my ($self, $name, $message) = @_;
+
+	my $isa;
+	my $err = try sub {
+		$isa = "Form::Tiny::Error::$name"->isa('Form::Tiny::Error')
+	};
+
+	croak "$name is not a valid Form::Tiny error class name"
+		unless !$err && $isa;
+
+	$self->messages->{$name} = $message;
 	return $self;
 }
 

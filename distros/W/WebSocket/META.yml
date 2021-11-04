@@ -1,0 +1,57 @@
+---
+abstract: 'WebSocket Client & Server'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302182'
+  Test::Pod: '1.52'
+  utf8: '0'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebSocket
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config: '0'
+  Digest::MD5: '2.58'
+  Digest::SHA: '6.02'
+  Encode: '3.08'
+  HTTP::Headers: '6.22'
+  HTTP::Request: '6.22'
+  HTTP::Response: '6.22'
+  HTTP::Status: '6.22'
+  IO::Select: '1.41'
+  IO::Socket: '1.42'
+  IO::Socket::INET: '1.41'
+  JSON: '4.03'
+  List::Util: '1.56'
+  MIME::Base64: '3.16'
+  Module::Generic: v0.16.4
+  Nice::Try: v1.1.2
+  POSIX: 1.53_01
+  Scalar::Util: '1.56'
+  Socket: '2.031'
+  URI: '5.09'
+  URI::ws: '0.03'
+  Want: '0.29'
+  constant: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.014000'
+  strict: '0.238'
+  warnings: '1.44'
+resources:
+  bugtracker: https://git.deguest.jp/jack/WebSocket/issues
+  repository: https://git.deguest.jp/jack/WebSocket
+version: v0.1.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

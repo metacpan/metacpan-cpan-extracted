@@ -21,7 +21,7 @@ name: App-Timestamper-WithElapsed
 provides:
   App::Timestamper::WithElapsed:
     file: lib/App/Timestamper/WithElapsed.pm
-    version: v0.6.0
+    version: v0.6.1
 requires:
   Getopt::Long: '2.37'
   IO::Async::Loop: '0'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/shlomif/App-Timestamper/issues
   homepage: http://metacpan.org/release/App-Timestamper-WithElapsed
   repository: git://github.com/shlomif/App-Timestamper.git
-version: 0.6.0
+version: 0.6.1
 x_Dist_Zilla:
   perl:
     version: '5.032001'

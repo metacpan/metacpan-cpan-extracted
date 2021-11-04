@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailDetail;
-$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        EMailRecipients
               Grouping
 
-              )
+            )
         ],
         {   'EMailRecipients' => \%EMailRecipients_of,
             'Grouping'        => \%Grouping_of,
@@ -63,7 +63,7 @@ Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

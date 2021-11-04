@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ImageFormatType;
-$Shipment::UPS::WSDL::ShipTypes::ImageFormatType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ImageFormatType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Code
               Description
 
-              )
+            )
         ],
         {   'Code'        => \%Code_of,
             'Description' => \%Description_of,
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::ImageFormatType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

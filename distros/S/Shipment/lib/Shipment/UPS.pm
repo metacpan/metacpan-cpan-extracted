@@ -1,5 +1,5 @@
 package Shipment::UPS;
-$Shipment::UPS::VERSION = '3.05';
+$Shipment::UPS::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ has 'proxy_domain' => (
         qw(
           wwwcie.ups.com
           onlinetools.ups.com
-          )
+        )
     ],
     default => 'wwwcie.ups.com',
 );
@@ -339,7 +339,7 @@ sub _build_services {
 
         try {
             $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-            $response = $interface->ProcessRate(
+            $response                    = $interface->ProcessRate(
                 {   Request  => {RequestOption => 'Shop',},
                     Shipment => {
                         Shipper => {
@@ -428,7 +428,7 @@ sub _build_services {
                       ->get_PrimaryErrorCode()->get_Description->get_value);
             }
             catch {
-                warn $_ if $self->debug;
+                warn $_                                     if $self->debug;
                 warn "Error: " . $response->get_faultstring if $self->debug;
                 $self->error($response->get_faultstring->get_value);
             };
@@ -495,7 +495,7 @@ sub rate {
         $service_id = $self->services->{$service_id}->id;
     }
     catch {
-        warn $_ if $self->debug;
+        warn $_                                    if $self->debug;
         warn "service ($service_id) not available" if $self->debug;
         $self->error("service ($service_id) not available");
         $service_id = '';
@@ -583,14 +583,14 @@ sub rate {
     my $response;
     try {
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->ProcessRate(
+        $response                    = $interface->ProcessRate(
             {   Request  => {RequestOption => 'Rate',},
                 Shipment => {
                     Shipper => {
                         ShipperNumber => $self->account,
                         Address       => {
-                            AddressLine => \@from_addresslines,
-                            City        => $self->from_address->city,
+                            AddressLine       => \@from_addresslines,
+                            City              => $self->from_address->city,
                             StateProvinceCode =>
                               $self->from_address->province_code,
                             PostalCode  => $self->from_address->postal_code,
@@ -666,7 +666,7 @@ sub rate {
                   ->get_PrimaryErrorCode()->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -682,7 +682,7 @@ sub ship {
         $service_id = $self->services->{$service_id}->id;
     }
     catch {
-        warn $_ if $self->debug;
+        warn $_                                    if $self->debug;
         warn "service ($service_id) not available" if $self->debug;
         $self->error("service ($service_id) not available");
         $service_id = '';
@@ -720,7 +720,7 @@ sub ship {
         my @references;
         if (   $self->references
             && $self->from_address->country_code =~ /(US|PR)/
-            && $self->to_address->country_code =~ /(US|PR)/
+            && $self->to_address->country_code   =~ /(US|PR)/
             && $self->from_address->country_code eq
             $self->to_address->country_code)
         {
@@ -813,7 +813,7 @@ sub ship {
     my $response;
     try {
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->ProcessShipment(
+        $response                    = $interface->ProcessShipment(
             {   Request => {
                     RequestOption => ($self->address_validation)
                     ? 'validate'
@@ -825,8 +825,8 @@ sub ship {
                         AttentionName => $self->from_address->name,
                         ShipperNumber => $self->account,
                         Address       => {
-                            AddressLine => \@from_addresslines,
-                            City        => $self->from_address->city,
+                            AddressLine       => \@from_addresslines,
+                            City              => $self->from_address->city,
                             StateProvinceCode =>
                               $self->from_address->province_code,
                             PostalCode  => $self->from_address->postal_code,
@@ -918,7 +918,7 @@ sub ship {
 
             $self->get_package($package_index)->label(
                 Shipment::Label->new(
-                    {   tracking_id => $_->get_TrackingNumber()->get_value,
+                    {   tracking_id  => $_->get_TrackingNumber()->get_value,
                         content_type =>
                           $self->label_content_type_map->{$self->printer_type},
                         data      => $data,
@@ -977,7 +977,7 @@ sub ship {
                   ->get_PrimaryErrorCode()->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -993,7 +993,7 @@ sub return {
         $service_id = $self->services->{$service_id}->id;
     }
     catch {
-        warn $_ if $self->debug;
+        warn $_                                    if $self->debug;
         warn "service ($service_id) not available" if $self->debug;
         $self->error("service ($service_id) not available");
         $service_id = '';
@@ -1014,7 +1014,7 @@ sub return {
         my @references;
         if (   $self->references
             && $self->from_address->country_code =~ /(US|PR)/
-            && $self->to_address->country_code =~ /(US|PR)/
+            && $self->to_address->country_code   =~ /(US|PR)/
             && $self->from_address->country_code eq
             $self->to_address->country_code)
         {
@@ -1136,7 +1136,7 @@ sub return {
                 },
                 EMailAddress => $self->to_address->email,
             },
-            Service            => {Code           => $service_id,},
+            Service            => {Code => $service_id,},
             Package            => \@pieces,
             PaymentInformation => {ShipmentCharge => $payment_option,},
         },
@@ -1320,7 +1320,7 @@ sub return {
                   ->get_PrimaryErrorCode()->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -1357,7 +1357,7 @@ sub cancel {
 
     try {
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->ProcessVoid(
+        $response                    = $interface->ProcessVoid(
             {   Request      => {RequestOption => '',},
                 VoidShipment => $void,
             },
@@ -1394,7 +1394,7 @@ sub cancel {
                   ->get_PrimaryErrorCode()->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -1565,7 +1565,7 @@ sub track {
     try {
 
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->ProcessTrack(
+        $response                    = $interface->ProcessTrack(
             {   Request => {    # Shipment::UPS::WSDL::TrackTypes::RequestType
                     RequestOption => 0,
                 },
@@ -1639,7 +1639,7 @@ sub track {
                   ->get_PrimaryErrorCode()->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -1662,7 +1662,7 @@ Shipment::UPS
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

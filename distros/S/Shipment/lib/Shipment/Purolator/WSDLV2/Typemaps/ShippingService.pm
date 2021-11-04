@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDLV2::Typemaps::ShippingService;
-$Shipment::Purolator::WSDLV2::Typemaps::ShippingService::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Typemaps::ShippingService::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -1516,6 +1516,7 @@ our $typemap_1 = {
       'SOAP::WSDL::XSD::Typelib::Builtin::string',
 };
 
+
 sub get_class {
     my $name = join '/', @{$_[1]};
     return $typemap_1->{$name};
@@ -1537,7 +1538,7 @@ Shipment::Purolator::WSDLV2::Typemaps::ShippingService
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

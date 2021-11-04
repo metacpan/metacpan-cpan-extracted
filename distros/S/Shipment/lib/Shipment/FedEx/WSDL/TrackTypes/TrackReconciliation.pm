@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation;
-$Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Status
               Description
 
-              )
+            )
         ],
         {   'Status'      => \%Status_of,
             'Description' => \%Description_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

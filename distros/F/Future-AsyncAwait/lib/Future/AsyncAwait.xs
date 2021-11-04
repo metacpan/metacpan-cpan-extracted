@@ -52,9 +52,8 @@
 #  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
 #endif
 
-#include "perl-backcompat.c.inc"
-
 #include "perl-additions.c.inc"
+#include "newOP_CUSTOM.c.inc"
 
 /* Currently no version of perl makes this visible, so we always want it. Maybe
  * one day in the future we can make it version-dependent
@@ -160,77 +159,6 @@ static void S_traceprint(char *fmt, ...)
 #else
 #  define TRACEPRINT(...)
 #endif
-
-static void debug_sv_summary(const SV *sv)
-{
-  const char *type;
-
-  switch(SvTYPE(sv)) {
-    case SVt_NULL: type = "NULL"; break;
-    case SVt_IV:   type = "IV";   break;
-    case SVt_NV:   type = "NV";   break;
-    case SVt_PV:   type = "PV";   break;
-    case SVt_PVGV: type = "PVGV"; break;
-    case SVt_PVAV: type = "PVAV"; break;
-    default: {
-      char buf[16];
-      sprintf(buf, "(%d)", SvTYPE(sv));
-      type = buf;
-      break;
-    }
-  }
-
-  if(SvROK(sv))
-    type = "RV";
-
-  fprintf(stderr, "SV{type=%s,refcnt=%d", type, SvREFCNT(sv));
-
-  if(SvTEMP(sv))
-    fprintf(stderr, ",TEMP");
-
-  if(SvROK(sv))
-    fprintf(stderr, ",ROK");
-  else {
-    if(SvIOK(sv))
-      fprintf(stderr, ",IV=%" IVdf, SvIVX(sv));
-    if(SvUOK(sv))
-      fprintf(stderr, ",UV=%" UVuf, SvUVX(sv));
-    if(SvPOK(sv)) {
-      fprintf(stderr, ",PVX=\"%.10s\"", SvPVX((SV *)sv));
-      if(SvCUR(sv) > 10)
-        fprintf(stderr, "...");
-    }
-  }
-
-  fprintf(stderr, "}");
-}
-
-#define debug_showstack(name)  S_debug_showstack(aTHX_ name)
-static void S_debug_showstack(pTHX_ const char *name)
-{
-  SV **sp;
-
-  fprintf(stderr, "%s:\n", name ? name : "Stack");
-
-  PERL_CONTEXT *cx = CX_CUR();
-
-  I32 floor = cx->blk_oldsp;
-  I32 *mark = PL_markstack + cx->blk_oldmarksp + 1;
-
-  fprintf(stderr, "  marks (TOPMARK=@%d):\n", TOPMARK - floor);
-  for(; mark <= PL_markstack_ptr; mark++)
-    fprintf(stderr,  "    @%d\n", *mark - floor);
-
-  mark = PL_markstack + cx->blk_oldmarksp + 1;
-  for(sp = PL_stack_base + floor + 1; sp <= PL_stack_sp; sp++) {
-    fprintf(stderr, sp == PL_stack_sp ? "-> " : "   ");
-    fprintf(stderr, "%p = ", *sp);
-    debug_sv_summary(*sp);
-    while(mark <= PL_markstack_ptr && PL_stack_base + *mark == sp)
-      fprintf(stderr, " [*M]"), mark++;
-    fprintf(stderr, "\n");
-  }
-}
 
 static void vpanic(char *fmt, va_list args)
 {
@@ -1147,7 +1075,9 @@ static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
       PADNAME *pname = (padix <= fnames) ? pnames[padix] : NULL;
       SV *newval = NULL;
 
-      if(padname_is_normal_lexical(pname)) {
+      if(PadnameIsSTATE(pname))
+        newval = SvREFCNT_inc_NN(origpad[padix]);
+      else if(padname_is_normal_lexical(pname)) {
         /* No point copying a normal lexical slot because the suspend logic is
          * about to capture all the pad slots from the running CV (orig) and
          * they'll be restored into this new one later by resume.
@@ -1250,23 +1180,28 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
       continue;
     }
 
-    /* Don't fiddle refcount */
-    state->padslots[i-1] = padsvs[i];
-    switch(PadnamePV(pname)[0]) {
-      case '@':
-        padsvs[i] = MUTABLE_SV(newAV());
-        break;
-      case '%':
-        padsvs[i] = MUTABLE_SV(newHV());
-        break;
-      case '$':
-        padsvs[i] = newSV(0);
-        break;
-      default:
-        panic("TODO: unsure how to steal and switch pad slot with pname %s\n",
-          PadnamePV(pname));
+    if(PadnameIsSTATE(pname)) {
+      state->padslots[i-1] = SvREFCNT_inc(padsvs[i]);
     }
-    SvPADMY_on(padsvs[i]);
+    else {
+      /* Don't fiddle refcount */
+      state->padslots[i-1] = padsvs[i];
+      switch(PadnamePV(pname)[0]) {
+        case '@':
+          padsvs[i] = MUTABLE_SV(newAV());
+          break;
+        case '%':
+          padsvs[i] = MUTABLE_SV(newHV());
+          break;
+        case '$':
+          padsvs[i] = newSV(0);
+          break;
+        default:
+          panic("TODO: unsure how to steal and switch pad slot with pname %s\n",
+            PadnamePV(pname));
+      }
+      SvPADMY_on(padsvs[i]);
+    }
   }
 
   if(PL_curpm)
@@ -1531,12 +1466,14 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
         break;
 
       /* First item is at [1] oddly, not [0] */
+#ifdef debug_sv_summary
       fprintf(stderr, "F:AA: consistency check resume LOOP_LIST with first=%p:",
         frame->loop_list_first_item);
       debug_sv_summary(frame->loop_list_first_item);
       fprintf(stderr, " stackitem=%p:", PL_stack_base[frame->el.loop.state_u.stack.basesp + 1]);
       debug_sv_summary(PL_stack_base[frame->el.loop.state_u.stack.basesp]);
       fprintf(stderr, "\n");
+#endif
       panic("ARGH CXt_LOOP_LIST consistency check failed\n");
       break;
     }

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::PagingDetail;
-$Shipment::FedEx::WSDL::TrackTypes::PagingDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::PagingDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        PagingToken
               NumberOfResultsPerPage
 
-              )
+            )
         ],
         {   'PagingToken'            => \%PagingToken_of,
             'NumberOfResultsPerPage' => \%NumberOfResultsPerPage_of,
@@ -62,7 +62,7 @@ Shipment::FedEx::WSDL::TrackTypes::PagingDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

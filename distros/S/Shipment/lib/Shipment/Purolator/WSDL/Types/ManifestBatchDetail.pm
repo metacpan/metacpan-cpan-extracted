@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ManifestBatchDetail;
-$Shipment::Purolator::WSDL::Types::ManifestBatchDetail::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ManifestBatchDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,15 +33,15 @@ Class::Std::initialize();
               DocumentStatus
               URL
 
-              )
+            )
         ],
         {   'DocumentType'   => \%DocumentType_of,
             'Description'    => \%Description_of,
             'DocumentStatus' => \%DocumentStatus_of,
             'URL'            => \%URL_of,
         },
-        {   'DocumentType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Description'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'DocumentType'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Description'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'DocumentStatus' =>
               'Shipment::Purolator::WSDL::Types::DocumentStatus',
             'URL' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
@@ -72,7 +72,7 @@ Shipment::Purolator::WSDL::Types::ManifestBatchDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

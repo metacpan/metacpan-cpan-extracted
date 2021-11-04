@@ -1,5 +1,5 @@
 package Yancy::Backend;
-our $VERSION = '1.077';
+our $VERSION = '1.084';
 # ABSTRACT: Interface to a database
 
 #pod =head1 SYNOPSIS
@@ -102,8 +102,8 @@ sub collections {
 #pod
 #pod =head2 new
 #pod
-#pod     my $url = 'test://custom_string';
-#pod     my $be = Yancy::Backend::Test->new( $url, $schema );
+#pod     my $url = 'memory://custom_string';
+#pod     my $be = Yancy::Backend::Memory->new( $url, $schema );
 #pod
 #pod Create a new backend object. C<$url> is a string that begins with the
 #pod backend name followed by a colon. Everything else in the URL is for the
@@ -524,7 +524,7 @@ Yancy::Backend - Interface to a database
 
 =head1 VERSION
 
-version 1.077
+version 1.084
 
 =head1 SYNOPSIS
 
@@ -612,8 +612,8 @@ a static site generator.
 
 =head2 new
 
-    my $url = 'test://custom_string';
-    my $be = Yancy::Backend::Test->new( $url, $schema );
+    my $url = 'memory://custom_string';
+    my $be = Yancy::Backend::Memory->new( $url, $schema );
 
 Create a new backend object. C<$url> is a string that begins with the
 backend name followed by a colon. Everything else in the URL is for the

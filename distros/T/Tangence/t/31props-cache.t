@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.26;
 use warnings;
+
+use Future::AsyncAwait 0.47;
 
 use Test::More;
 use Test::Memory::Cycle;
@@ -33,12 +35,12 @@ my $proxy = $client->rootobj;
 
 my $scalar;
 my $scalar_changed = 0;
-$proxy->watch_property_with_initial( "scalar",
+await $proxy->watch_property_with_initial( "scalar",
    on_set => sub {
       $scalar = shift;
       $scalar_changed = 1
    },
-)->get;
+);
 
 is( $scalar, "123", 'Initial value from watch_property' );
 
@@ -47,18 +49,18 @@ is( $proxy->prop( "scalar" ),
     "scalar property cache" );
 
 my $hash_changed = 0;
-$proxy->watch_property_with_initial( "hash",
+await $proxy->watch_property_with_initial( "hash",
    on_updated => sub { $hash_changed = 1 },
-)->get;
+);
 
 is_deeply( $proxy->prop( "hash" ),
            { one => 1, two => 2, three => 3 },
            'hash property cache' );
 
 my $array_changed = 0;
-$proxy->watch_property_with_initial( "array",
+await $proxy->watch_property_with_initial( "array",
    on_updated => sub { $array_changed = 1 },
-)->get;
+);
 
 is_deeply( $proxy->prop( "array" ),
            [ 1, 2, 3 ],

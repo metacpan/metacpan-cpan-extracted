@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 DESCRIPTION
 
@@ -102,6 +102,7 @@ The available locales are:
  bas-CM           Basaa Cameroon                              Ɓàsàa Kàmɛ̀rûn
  be               Belarusian                                  беларуская
  be-BY            Belarusian Belarus                          беларуская Беларусь
+ be-tarask        Belarusian                                  беларуская
  bem              Bemba                                       Ichibemba
  bem-ZM           Bemba Zambia                                Ichibemba Zambia
  bez              Bena                                        Hibena
@@ -128,7 +129,7 @@ The available locales are:
  ca               Catalan                                     català
  ca-AD            Catalan Andorra                             català Andorra
  ca-ES            Catalan Spain                               català Espanya
- ca-ES-VALENCIA   Catalan Spain Valencian                     català Espanya valencià
+ ca-ES-valencia   Catalan Spain Valencian                     català Espanya valencià
  ca-FR            Catalan France                              català França
  ca-IT            Catalan Italy                               català Itàlia
  ccp              Chakma                                      𑄌𑄋𑄴𑄟𑄳𑄦
@@ -280,7 +281,6 @@ The available locales are:
  en-UG            English Uganda                              English Uganda
  en-UM            English U.S. Outlying Islands               English U.S. Outlying Islands
  en-US            English United States                       English United States
- en-US-POSIX      English United States Computer              English United States Computer
  en-VC            English St. Vincent & Grenadines            English St. Vincent & Grenadines
  en-VG            English British Virgin Islands              English British Virgin Islands
  en-VI            English U.S. Virgin Islands                 English U.S. Virgin Islands
@@ -483,6 +483,8 @@ The available locales are:
  kde-TZ           Makonde Tanzania                            Chimakonde Tanzania
  kea              Kabuverdianu                                kabuverdianu
  kea-CV           Kabuverdianu Cape Verde                     kabuverdianu Kabu Verdi
+ kgp              Kaingang                                    kanhgág
+ kgp-BR           Kaingang Brazil                             kanhgág Mrasir
  khq              Koyra Chiini                                Koyra ciini
  khq-ML           Koyra Chiini Mali                           Koyra ciini Maali
  ki               Kikuyu                                      Gikuyu
@@ -562,8 +564,8 @@ The available locales are:
  mgh-MZ           Makhuwa-Meetto Mozambique                   Makua Umozambiki
  mgo              Metaʼ                                       metaʼ
  mgo-CM           Metaʼ Cameroon                              metaʼ Kamalun
- mi               Maori                                       te reo Māori
- mi-NZ            Maori New Zealand                           te reo Māori Aotearoa
+ mi               Māori                                       te reo Māori
+ mi-NZ            Māori New Zealand                           te reo Māori Aotearoa
  mk               Macedonian                                  македонски
  mk-MK            Macedonian North Macedonia                  македонски Северна Македонија
  ml               Malayalam                                   മലയാളം
@@ -666,7 +668,6 @@ The available locales are:
  ro-RO            Romanian Romania                            română România
  rof              Rombo                                       Kihorombo
  rof-TZ           Rombo Tanzania                              Kihorombo Tanzania
- root
  ru               Russian                                     русский
  ru-BY            Russian Belarus                             русский Беларусь
  ru-KG            Russian Kyrgyzstan                          русский Киргизия
@@ -689,6 +690,8 @@ The available locales are:
  sat-Olck-IN      Santali India Ol Chiki                      ᱥᱟᱱᱛᱟᱲᱤ ᱤᱱᱰᱤᱭᱟ ᱚᱞ ᱪᱤᱠᱤ
  sbp              Sangu                                       Ishisangu
  sbp-TZ           Sangu Tanzania                              Ishisangu Tansaniya
+ sc               Sardinian                                   sardu
+ sc-IT            Sardinian Italy                             sardu Itàlia
  sd               Sindhi                                      سنڌي
  sd-Arab          Sindhi Arabic                               سنڌي عربي
  sd-Arab-PK       Sindhi Pakistan Arabic                      سنڌي پاڪستان عربي
@@ -765,9 +768,9 @@ The available locales are:
  tg-TJ            Tajik Tajikistan                            тоҷикӣ Тоҷикистон
  th               Thai                                        ไทย
  th-TH            Thai Thailand                               ไทย ไทย
- ti               Tigrinya                                    ትግር
- ti-ER            Tigrinya Eritrea                            ትግር ኤርትራ
- ti-ET            Tigrinya Ethiopia                           ትግር ኢትዮጵያ
+ ti               Tigrinya                                    ትግርኛ
+ ti-ER            Tigrinya Eritrea                            ትግርኛ ኤርትራ
+ ti-ET            Tigrinya Ethiopia                           ትግርኛ ኢትዮጵያ
  tk               Turkmen                                     türkmen dili
  tk-TM            Turkmen Turkmenistan                        türkmen dili Türkmenistan
  to               Tongan                                      lea fakatonga
@@ -785,6 +788,7 @@ The available locales are:
  ug-CN            Uyghur China                                ئۇيغۇرچە جۇڭگو
  uk               Ukrainian                                   українська
  uk-UA            Ukrainian Ukraine                           українська Україна
+ und              Unknown language                            und
  ur               Urdu                                        اردو
  ur-IN            Urdu India                                  اردو بھارت
  ur-PK            Urdu Pakistan                               اردو پاکستان
@@ -819,6 +823,10 @@ The available locales are:
  yo               Yoruba                                      Èdè Yorùbá
  yo-BJ            Yoruba Benin                                Èdè Yorùbá Bɛ̀nɛ̀
  yo-NG            Yoruba Nigeria                              Èdè Yorùbá Nàìjíríà
+ yrl              Nheengatu                                   nheẽgatu
+ yrl-BR           Nheengatu Brazil                            nheẽgatu Brasiu
+ yrl-CO           Nheengatu Colombia                          ñengatú Kurũbiya
+ yrl-VE           Nheengatu Venezuela                         ñengatú Wenesuera
  yue              Cantonese                                   粵語
  yue-Hans         Cantonese Simplified                        粤语 简体
  yue-Hans-CN      Cantonese China Simplified                  粤语 中华人民共和国 简体
@@ -845,8 +853,6 @@ Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-Locale/issu
 
 There is a mailing list available for users of this distribution,
 L<mailto:datetime@perl.org>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 

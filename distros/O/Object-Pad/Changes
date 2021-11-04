@@ -1,10 +1,42 @@
 Revision history for Object-Pad
 
+0.56    2021-10-22
+        [CHANGES]
+         * Support roles inheriting from (possibly-multiple) other roles
+           (RT139772)
+         * Recognise `accessor` argument to $classmeta->add_slot
+         * Add some more MOP methods:
+            + $classmeta->direct_roles
+            + $classmeta->all_roles
+            + $slotmeta->sigil
+
+        [BUGFIXES]
+         * Fix an uninitialised memory warning from valgrind to do with class
+           creation
+         * Quiet the compiler warnings about hv_fetch's key argument maybe
+           being NULL
+
+        Development time for this release was sponsored by Perl-Verein Schweiz
+
+0.55    2021-10-11
+        [CHANGES]
+         * Support :reader and :writer on array and hash slots (RT139647)
+
+        [BUGFIXES]
+         * Complain on attempt to invoke constructor of a class that is not
+           yet complete (RT139664)
+         * Ensure that psotslots and construct slothooks still run for
+           superclasses and applied roles (RT139665)
+
+        Development time for this release was sponsored by Deriv
+
 0.54    2021-10-07
         [CHANGES]
          * Support slot initialiser blocks; don't invoke blocks for values
            passed by :param
          * Support slot default values on non-scalars
+
+        Development time for this release was sponsored by Deriv
 
 0.53    2021-09-29
         [CHANGES]

@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.022";
+our $VERSION = "0.025";
 
 use Text::Layout::FontDescriptor;
 
@@ -139,6 +139,30 @@ Text shaping requires module L<HarfBuzz::Shaper>.
 
 C<interline> - If set to a true value, an alternative way to determine
 glyph height is used. This may improve results for some fonts.
+
+=item *
+
+C<underline_thickness>, C<underline_position> - Overrides the font
+specified or calculated values for underline thickness and/or position.
+This may improve results for some fonts.
+
+=item *
+
+C<strikeline_thickness>, C<strikeline_position> - Overrides the font
+specified or calculated values for strikeline thickness and/or position.
+This may improve results for some fonts.
+
+Note that strikeline thickness will default to underline thickness, if set.
+
+=item *
+
+C<overline_thickness>, C<overline_position> - Overrides the font
+specified or calculated values for overline thickness and/or position.
+
+This may improve results for some fonts.
+
+Note that overline thickness will default to underline thickness, if
+set.
 
 =back
 
@@ -322,36 +346,37 @@ sub find_font {
     my ( $family, $style, $weight ) = @_;
 
     my $try = sub {
-      if ( $fonts{$family}
-	 && $fonts{$family}->{$style}
-	 && $fonts{$family}->{$style}->{$weight} ) {
-	my $ff;
-	if ( $ff = $fonts{$family}->{$style}->{$weight}->{font} ) {
-	    return Text::Layout::FontDescriptor->new
-	      ( font   => $ff,
-		family => $family,
-		style  => $style,
-		weight => $weight,
-		shaping => $fonts{$family}->{$style}->{$weight}->{shaping},
-		interline => $fonts{$family}->{$style}->{$weight}->{interline},
-	      );
+	if ( $fonts{$family}
+	     && $fonts{$family}->{$style}
+	     && $fonts{$family}->{$style}->{$weight} ) {
+
+	    my $ff = $fonts{$family}->{$style}->{$weight};
+	    my %i = ( family => $family,
+		      style  => $style,
+		      weight => $weight );
+;
+	    if ( $ff->{font} ) {
+		$i{font} = $ff->{font};
+	    }
+	    elsif ( $ff->{loader_data} ) {
+		$i{loader_data} = $ff->{loader_data};
+		$i{loader}      = $loader;
+		$i{cache}       = $ff;
+	    }
+	    else {
+		return;
+	    }
+
+	    for ( qw( shaping interline
+		      underline_thickness underline_position
+		      strikeline_thickness strikeline_position
+		      overline_thickness overline_position
+		   ) ) {
+		$i{$_} = $ff->{$_};
+	    }
+
+	    return Text::Layout::FontDescriptor->new(%i);
 	}
-	elsif ( $ff = $fonts{$family}->{$style}->{$weight}->{loader_data} ) {
-	    return Text::Layout::FontDescriptor->new
-	      ( loader_data => $ff,
-		loader => $loader,
-		cache  => $fonts{$family}->{$style}->{$weight},
-		family => $family,
-		style  => $style,
-		weight => $weight,
-		shaping => $fonts{$family}->{$style}->{$weight}->{shaping},
-		interline => $fonts{$family}->{$style}->{$weight}->{interline},
-	     );
-	}
-	else {
-	    return;
-	}
-      }
     };
 
     $style  = _norm_style( $style   // "normal" );

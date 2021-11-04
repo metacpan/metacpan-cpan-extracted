@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse;
-$Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -62,7 +62,7 @@ use warnings;
                   manifestNumber
                   articles
 
-                  )
+                )
             ],
             {   'requestId'               => \%requestId_of,
                 'bookingNumber'           => \%bookingNumber_of,
@@ -119,7 +119,7 @@ use warnings;
 
     package Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::_articles;
     $Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::_articles::VERSION
-      = '3.05';
+      = '3.06';
     use strict;
     use warnings;
     {
@@ -142,7 +142,7 @@ use warnings;
             __PACKAGE__->_factory(
                 [   qw(        article
 
-                      )
+                    )
                 ],
                 {'article' => \%article_of,},
                 {'article' => 'Shipment::Temando::WSDL::Types::Article',},
@@ -175,7 +175,7 @@ Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

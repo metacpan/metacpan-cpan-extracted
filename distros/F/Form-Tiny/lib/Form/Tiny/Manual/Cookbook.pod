@@ -1,0 +1,93 @@
+=pod
+
+=head1 NAME
+
+Form::Tiny::Manual::Cookbook - common advanced tasks with Form::Tiny
+
+=head1 RECIPES
+
+=head2 Corinna compatibility
+
+Future Perl core object orientation system named Corinna, currently implemented in L<Object::Pad>, can also be used together with Form::Tiny:
+
+	use Object::Pad;
+
+	class ParentForm :repr(HASH)
+	{
+		use Form::Tiny -nomoo;
+
+		form_field 'f1';
+	}
+
+	class ChildForm isa ParentForm :repr(HASH)
+	{
+		use Form::Tiny -nomoo;
+
+		form_field 'f2';
+	}
+
+You must use C<:repr(HASH)> on the class for it to be able to store Moo properties, as well as use C<-nomoo> flag in Form::Tiny import. Other than that, it should work the same as with any other OO system.
+
+=head2 Mixing form fields with class fields
+
+It is possible and often very helpful to have both form and class fields inside the same form class:
+
+	use Form::Tiny;
+	use Types::Standard qw(Str);
+
+	has 'user' => (
+		is => 'rw',
+	);
+
+	form_field 'username' => (
+		type => Str,
+		required => 1,
+	);
+
+	form_field 'password' => (
+		type => Str,
+		required => 1,
+	);
+
+	form_cleaner sub {
+		my ($self, $data) = @_;
+
+		# load user from the storage service using $data->{username}
+		my $user = ...;
+		if ($user->validate_password($data->{password})) {
+			# set the user for the class, will be available after validation
+			$self->user($user);
+		}
+		else {
+			$self->add_error(password => 'invalid password');
+		}
+	};
+
+While doing so, make sure not to override any of the L<Form::Tiny::Form> symbols (Moo / Moose should complain about it when it happens).
+
+=head2 I18N
+
+I<Form::Tiny> has no system for internationalization. That being said, it makes any custom error messages for fields possible with the C<message> argument to C<form_field>. You can translate your messages there:
+
+	form_field 'translated' => (
+		type => SomeType,
+		message => do_translate('That value is no good'),
+	);
+
+For a bit more roboust solution, you can include untranslated strings in C<message> and translate errors in C<after_error> hook:
+
+	form_field 'translated_later' => (
+		type => SomeType,
+		message => 'That value is no good',
+	);
+
+	form_hook after_error => (
+		my ($self, $error) = @_;
+
+		$error->set_error(
+			do_translate($error->error)
+		);
+	);
+
+This will also translate any error you add manually in other hooks.
+

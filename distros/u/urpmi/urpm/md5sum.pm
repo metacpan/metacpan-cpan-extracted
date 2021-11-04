@@ -37,7 +37,7 @@ sub parse {
 }
 
 
-=item parse($md5sum_file)
+=item check_file($md5sum_file)
 
 Check size and parse a MD5SUM file.
 Returns a hash of file => md5sum 

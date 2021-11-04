@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use 5.006;
-use Test::More tests => 10;
+use Test::More;
 use strict; use warnings;
 use Date::Julian::Simple;
 
@@ -20,5 +20,22 @@ my $jdate = $date->from_julian(2458140.5);
 is($jdate->year, 2018);
 is($jdate->month, 1);
 is($jdate->day, 9);
+
+my $mjd = Date::Julian::Simple->new({ year => 2020, month => 11, day => 12 });
+is($mjd->from_modified_julian(59165), "12, November 2020");
+is($mjd->to_modified_julian, 59165);
+
+is($date->is_leap_year(1800), 1);
+is($date->is_leap_year(2000), 1);
+is($date->is_leap_year(2021), 0);
+
+is($date->days_in_year(1800), 366);
+is($date->days_in_year(2000), 366);
+is($date->days_in_year(2021), 365);
+
+is($date->days_in_month_year(02,1800), 29);
+is($date->days_in_month_year(02,2000), 29);
+is($date->days_in_month_year(02,2021), 28);
+is($date->days_in_month_year(03,2021), 31);
 
 done_testing();

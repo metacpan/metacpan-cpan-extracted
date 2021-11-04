@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::CustomerSpecifiedLabelDetail;
-$Shipment::FedEx::WSDL::RateTypes::CustomerSpecifiedLabelDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::CustomerSpecifiedLabelDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,13 +41,13 @@ Class::Std::initialize();
               AdditionalLabels
               AirWaybillSuppressionCount
 
-              )
+            )
         ],
-        {   'DocTabContent' => \%DocTabContent_of,
-            'CustomContent' => \%CustomContent_of,
+        {   'DocTabContent'                => \%DocTabContent_of,
+            'CustomContent'                => \%CustomContent_of,
             'ConfigurableReferenceEntries' =>
               \%ConfigurableReferenceEntries_of,
-            'MaskedData' => \%MaskedData_of,
+            'MaskedData'                     => \%MaskedData_of,
             'TermsAndConditionsLocalization' =>
               \%TermsAndConditionsLocalization_of,
             'AdditionalLabels'           => \%AdditionalLabels_of,
@@ -70,10 +70,10 @@ Class::Std::initialize();
         },
         {
 
-            'DocTabContent'                => 'DocTabContent',
-            'CustomContent'                => 'CustomContent',
-            'ConfigurableReferenceEntries' => 'ConfigurableReferenceEntries',
-            'MaskedData'                   => 'MaskedData',
+            'DocTabContent'                  => 'DocTabContent',
+            'CustomContent'                  => 'CustomContent',
+            'ConfigurableReferenceEntries'   => 'ConfigurableReferenceEntries',
+            'MaskedData'                     => 'MaskedData',
             'TermsAndConditionsLocalization' =>
               'TermsAndConditionsLocalization',
             'AdditionalLabels'           => 'AdditionalLabels',
@@ -98,7 +98,7 @@ Shipment::FedEx::WSDL::RateTypes::CustomerSpecifiedLabelDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

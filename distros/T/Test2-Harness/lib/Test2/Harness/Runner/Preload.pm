@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Preload;
 use strict;
 use warnings;
 
-our $VERSION = '1.000073';
+our $VERSION = '1.000080';
 
 use Carp qw/croak/;
 
@@ -61,6 +61,18 @@ sub import {
         croak "No current stage" unless @{$instance->stack};
         my $stage = $instance->stack->[-1];
         $stage->add_to_load_sequence(@_);
+    };
+
+    $exports{reload_remove_check} = sub {
+        croak "No current stage" unless @{$instance->stack};
+        my $stage = $instance->stack->[-1];
+        $stage->set_reload_remove_check(@_);
+    };
+
+    $exports{reload_inplace_check} = sub {
+        croak "No current stage" unless @{$instance->stack};
+        my $stage = $instance->stack->[-1];
+        $stage->set_reload_inplace_check(@_);
     };
 
     for my $name (keys %exports) {

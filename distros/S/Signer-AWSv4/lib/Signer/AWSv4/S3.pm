@@ -5,6 +5,11 @@ package Signer::AWSv4::S3;
 
   has bucket => (is => 'ro', isa => Str, required => 1);
   has key => (is => 'ro', isa => Str, required => 1);
+  has content_disposition => (is => 'ro', isa => Str);
+  has content_type => (is => 'ro', isa => Str);
+  has content_encoding => (is => 'ro', isa => Str);
+  has content_language => (is => 'ro', isa => Str);
+  has cache_control => (is => 'ro', isa => Str);  
   has version_id => (is => 'ro', isa => Str);
 
   has '+service' => (default => 's3');
@@ -32,6 +37,11 @@ package Signer::AWSv4::S3;
       'X-Amz-Date' => $self->date_timestamp,
       'X-Amz-Expires' => $self->expires,
       'X-Amz-SignedHeaders' => $self->signed_header_list,
+      ('response-content-disposition' => $self->content_disposition) x!! $self->content_disposition,
+      ('response-content-type' => $self->content_type) x!! $self->content_type,
+      ('response-content-encoding' => $self->content_encoding) x!! $self->content_encoding,
+      ('response-content-language' => $self->content_language) x!! $self->content_language,
+      ('response-cache-control' => $self->cache_control) x!! $self->cache_control,  
       (versionId => $self->version_id) x!! $self->version_id,
     }
   }
@@ -68,6 +78,9 @@ Signer::AWSv4::S3 - Implements the AWS v4 signature algorithm
     bucket => 'examplebucket',
     region => 'us-east-1',
     expires => 86400,
+    version_id => '1234561zOnAAAJKHxVKBxxEyuy_78901j',
+    content_type => 'text/plain',
+    content_disposition => 'inline; filename=New Name.txt',  
   );
   say $s3_sig->signed_url;
 
@@ -88,6 +101,34 @@ The name of the object in S3. This should not start with a slash (/)
 
 The name of the S3 bucket
 
+=head2 versionId
+
+VersionId used to reference a specific version of the object.
+
+=head1 Overriding Response Header Values
+
+There are times when you want to override certain response header values in a GET response.
+
+=head2 cache_control
+
+Sets the Cache-Control header of the response.
+
+=head2 content_disposition
+
+Sets the Content-Disposition header of the response
+
+=head2 content_encoding
+
+Sets the Content-Encoding header of the response.
+
+=head2 content_language
+
+Sets the Content-Language header of the response.
+
+=head2 content_type
+
+Sets the Content-Type header of the response.
+
 =head1 Signature Attributes
 
 Apart from those in L<Signer::AWSv4>, a convenience attribute is added:
@@ -105,12 +146,11 @@ Please report bugs to: L<https://github.com/pplu/AWSv4Signer/issues>
 =head1 AUTHOR
 
     Jose Luis Martinez
-    CAPSiDE
-    jlmartinez@capside.com
+    pplusdomain@gmail.com
 
 =head1 COPYRIGHT and LICENSE
 
-Copyright (c) 2018 by CAPSiDE
+Copyright (c) 2018 by Jose Luis Martinez
 
 This code is distributed under the Apache 2 License. The full text of the license can be found in the LICENSE file included with this module.
 

@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/PhoneNumberUtils/phone_number_is_valid
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
-our $DATE = '2018-11-25'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-03'; # DATE
 our $DIST = 'App-PhoneNumberUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,34 @@ phone-number-is-valid - Check whether phone number is valid
 
 =head1 VERSION
 
-This document describes version 0.001 of phone-number-is-valid (from Perl distribution App-PhoneNumberUtils), released on 2018-11-25.
+This document describes version 0.002 of phone-number-is-valid (from Perl distribution App-PhoneNumberUtils), released on 2021-06-03.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % phone-number-is-valid [options] <phnum>
+ % phone-number-is-valid [--format=name] [--json] [--(no)naked-res]
+     [--page-result[=program]] [-q] [--quiet] [--view-result[=program]]
+     <phnum>
+
+Examples:
+
+ % phone-number-is-valid +442087712924
+ 1
+
+ % phone-number-is-valid +4420877129240
+ 0
+
+ % phone-number-is-valid +6281812345678
+ 1
+
+ % phone-number-is-valid +6281812345
+ 0
+
+=head1 DESCRIPTION
+
+This utility uses L<Number::Phone> to determine whether a phone number is
+valid.
 
 =head1 OPTIONS
 
@@ -54,6 +76,8 @@ C<*> marks required options.
 =over
 
 =item B<--phnum>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--quiet>, B<-q>
 
@@ -95,6 +119,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -168,7 +200,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

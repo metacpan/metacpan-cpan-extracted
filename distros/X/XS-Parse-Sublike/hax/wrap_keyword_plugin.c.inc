@@ -1,4 +1,4 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c : */
 
 #ifndef OP_CHECK_MUTEX_LOCK /* < 5.15.8 */
 #  define OP_CHECK_MUTEX_LOCK ((void)0)

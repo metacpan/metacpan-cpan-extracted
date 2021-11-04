@@ -9,6 +9,10 @@ template.
 
 Search::ESsearcher largely exists for the purpose of that script.
 
+Example logstash configs to help get you started using this are
+included under the directory logstash. Just set the host and port
+variables as desired and you should be good to got.
+
 INSTALLATION
 
 To install this module, run the following commands:
@@ -44,7 +48,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+This software is Copyright (c) 2021 by Zane C. Bowers-Hadley.
 
 This is free software, licensed under:
 

@@ -8,6 +8,8 @@ use Firefox::Marionette::Cookie();
 use Firefox::Marionette::Window::Rect();
 use Firefox::Marionette::Element::Rect();
 use Firefox::Marionette::Timeouts();
+use Firefox::Marionette::Image();
+use Firefox::Marionette::Link();
 use Firefox::Marionette::Login();
 use Firefox::Marionette::Capabilities();
 use Firefox::Marionette::Certificate();
@@ -26,6 +28,7 @@ use IPC::Open3();
 use Socket();
 use English qw( -no_match_vars );
 use POSIX();
+use Scalar::Util();
 use File::Find();
 use File::Path();
 use File::Spec();
@@ -56,7 +59,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.12';
+our $VERSION = '1.16';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -97,6 +100,7 @@ sub _DEFAULT_CERT_TRUST             { return 'C,,' }
 sub _PALEMOON_VERSION_EQUIV         { return 52 }            # very approx guess
 sub _MAX_VERSION_FOR_FTP_PROXY      { return 89 }
 sub _DEFAULT_UPDATE_TIMEOUT         { return 300 }           # 5 minutes
+sub _MIN_VERSION_NO_CHROME_CALLS    { return 94 }
 
 sub _WATERFOX_CURRENT_VERSION_EQUIV {
     return 68;
@@ -525,6 +529,18 @@ sub _ssh {
 sub _adb {
     my ($self) = @_;
     return $self->{_adb};
+}
+
+sub images {
+    my ( $self, $from ) = @_;
+    return grep { $_->url() } map { bless $_, 'Firefox::Marionette::Image' }
+      map { $self->has_tag( $_, $from ) } qw(img input);
+}
+
+sub links {
+    my ( $self, $from ) = @_;
+    return map { bless $_, 'Firefox::Marionette::Link' }
+      map { $self->has_tag( $_, $from ) } qw(a area frame iframe meta);
 }
 
 sub _get_marionette_parameter {
@@ -2147,8 +2163,11 @@ _RDF_
         push @arguments,
           ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
     }
-    if ( $self->{_har} ) {
+    if ( ( $self->{_har} ) || ( $parameters{devtools} ) ) {
         push @arguments, '--devtools';
+    }
+    if ( $parameters{kiosk} ) {
+        push @arguments, '--kiosk';
     }
     return @arguments;
 }
@@ -5247,9 +5266,11 @@ sub _new_session_parameters {
     my $parameters = {};
     $parameters->{capabilities}->{requiredCapabilities} =
       {};    # for Mozilla 50 (and below???)
-    if (   ( defined $capabilities )
-        && ( ref $capabilities )
-        && ( ref $capabilities eq 'Firefox::Marionette::Capabilities' ) )
+    if (
+        $self->_is_marionette_object(
+            $capabilities, 'Firefox::Marionette::Capabilities'
+        )
+      )
     {
         my $actual   = {};
         my %booleans = (
@@ -5780,12 +5801,21 @@ sub _compress_script {
     return $script;
 }
 
+sub _is_marionette_object {
+    my ( $self, $element, $class ) = @_;
+    if ( ( Scalar::Util::blessed($element) && ( $element->isa($class) ) ) ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
 sub is_selected {
     my ( $self, $element ) = @_;
     if (
-        !(
-               ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' )
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
         )
       )
     {
@@ -5813,9 +5843,8 @@ sub _response_result_value {
 sub is_enabled {
     my ( $self, $element ) = @_;
     if (
-        !(
-               ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' )
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
         )
       )
     {
@@ -5838,9 +5867,8 @@ sub is_enabled {
 sub is_displayed {
     my ( $self, $element ) = @_;
     if (
-        !(
-               ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' )
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
         )
       )
     {
@@ -5870,9 +5898,8 @@ sub send_keys {
 sub type {
     my ( $self, $element, $text ) = @_;
     if (
-        !(
-               ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' )
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
         )
       )
     {
@@ -6169,9 +6196,8 @@ sub cookies {
 sub tag_name {
     my ( $self, $element ) = @_;
     if (
-        !(
-               ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' )
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
         )
       )
     {
@@ -6232,9 +6258,8 @@ sub window_rect {
 sub rect {
     my ( $self, $element ) = @_;
     if (
-        !(
-               ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' )
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
         )
       )
     {
@@ -6265,9 +6290,8 @@ sub rect {
 sub text {
     my ( $self, $element ) = @_;
     if (
-        !(
-               ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' )
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
         )
       )
     {
@@ -6289,9 +6313,8 @@ sub text {
 sub clear {
     my ( $self, $element ) = @_;
     if (
-        !(
-               ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' )
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
         )
       )
     {
@@ -6313,9 +6336,8 @@ sub clear {
 sub click {
     my ( $self, $element ) = @_;
     if (
-        !(
-               ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' )
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
         )
       )
     {
@@ -6673,8 +6695,11 @@ sub selfie {
     my $message_id = $self->_new_message_id();
     my $parameters = {};
     my %extra;
-    if (   ( ref $element )
-        && ( ref $element eq 'Firefox::Marionette::Element' ) )
+    if (
+        $self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
+        )
+      )
     {
         $parameters = { id => $element->uuid() };
         %extra      = @remaining;
@@ -6734,33 +6759,65 @@ sub selfie {
 
 sub current_chrome_window_handle {
     my ($self) = @_;
-    my $message_id = $self->_new_message_id();
-    $self->_send_request(
-        [
-            _COMMAND(), $message_id,
-            $self->_command('WebDriver:GetCurrentChromeWindowHandle')
-        ]
-    );
-    my $response = $self->_get_response($message_id);
-    if (   ( defined $response->{result}->{ok} )
-        && ( $response->{result}->{ok} ) )
+    if (
+        $self->_is_firefox_major_version_at_least(
+            _MIN_VERSION_NO_CHROME_CALLS()
+        )
+      )
     {
-        $response = $self->_get_response($message_id);
+        Carp::carp(
+'**** DEPRECATED METHOD - using current_chrome_window_handle() HAS BEEN REPLACED BY window_handle() wrapped with appropriate context() calls ****'
+        );
+        my $old      = $self->context('chrome');
+        my $response = $self->window_handle();
+        $self->context($old);
+        return $response;
     }
-    return $self->_response_result_value($response);
+    else {
+        my $message_id = $self->_new_message_id();
+        $self->_send_request(
+            [
+                _COMMAND(), $message_id,
+                $self->_command('WebDriver:GetCurrentChromeWindowHandle')
+            ]
+        );
+        my $response = $self->_get_response($message_id);
+        if (   ( defined $response->{result}->{ok} )
+            && ( $response->{result}->{ok} ) )
+        {
+            $response = $self->_get_response($message_id);
+        }
+        return $self->_response_result_value($response);
+    }
 }
 
 sub chrome_window_handle {
     my ($self) = @_;
-    my $message_id = $self->_new_message_id();
-    $self->_send_request(
-        [
-            _COMMAND(), $message_id,
-            $self->_command('WebDriver:GetChromeWindowHandle')
-        ]
-    );
-    my $response = $self->_get_response($message_id);
-    return $self->_response_result_value($response);
+    if (
+        $self->_is_firefox_major_version_at_least(
+            _MIN_VERSION_NO_CHROME_CALLS()
+        )
+      )
+    {
+        Carp::carp(
+'**** DEPRECATED METHOD - using chrome_window_handle() HAS BEEN REPLACED BY window_handle() wrapped with appropriate context() calls ****'
+        );
+        my $old      = $self->context('chrome');
+        my $response = $self->window_handle();
+        $self->context($old);
+        return $response;
+    }
+    else {
+        my $message_id = $self->_new_message_id();
+        $self->_send_request(
+            [
+                _COMMAND(), $message_id,
+                $self->_command('WebDriver:GetChromeWindowHandle')
+            ]
+        );
+        my $response = $self->_get_response($message_id);
+        return $self->_response_result_value($response);
+    }
 }
 
 sub key_down {
@@ -6781,7 +6838,12 @@ sub pause {
 sub mouse_move {
     my ( $self, @parameters ) = @_;
     my %arguments;
-    if ( $parameters[0]->isa('Firefox::Marionette::Element') ) {
+    if (
+        $self->_is_marionette_object(
+            $parameters[0], 'Firefox::Marionette::Element'
+        )
+      )
+    {
         my $origin = shift @parameters;
         my $rect   = $origin->rect();
         $arguments{x} = $rect->pos_x() + ( $rect->width() / 2 );
@@ -6899,19 +6961,36 @@ sub release {
 
 sub chrome_window_handles {
     my ( $self, $element ) = @_;
-    my $message_id = $self->_new_message_id();
-    $self->_send_request(
-        [
-            _COMMAND(), $message_id,
-            $self->_command('WebDriver:GetChromeWindowHandles')
-        ]
-    );
-    my $response = $self->_get_response($message_id);
-    if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
-        return @{ $response->result() };
+    if (
+        $self->_is_firefox_major_version_at_least(
+            _MIN_VERSION_NO_CHROME_CALLS()
+        )
+      )
+    {
+        Carp::carp(
+'**** DEPRECATED METHOD - using chrome_window_handles() HAS BEEN REPLACED BY window_handles() wrapped with appropriate context() calls ****'
+        );
+        my $old      = $self->context('chrome');
+        my @response = $self->window_handles();
+        $self->context($old);
+        return @response;
     }
     else {
-        return @{ $response->result()->{value} };
+        my $message_id = $self->_new_message_id();
+        $self->_send_request(
+            [
+                _COMMAND(), $message_id,
+                $self->_command('WebDriver:GetChromeWindowHandles')
+            ]
+        );
+        my $response = $self->_get_response($message_id);
+        if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() )
+        {
+            return @{ $response->result() };
+        }
+        else {
+            return @{ $response->result()->{value} };
+        }
     }
 }
 
@@ -8463,7 +8542,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.12
+Version 1.16
 
 =head1 SYNOPSIS
 
@@ -8754,11 +8833,11 @@ See the L<context|Firefox::Marionette#context> method for an alternative methods
 
 =head2 chrome_window_handle
 
-returns an server-assigned integer identifiers for the current chrome window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point. This corresponds to a window that may itself contain tabs.
+returns an server-assigned integer identifiers for the current chrome window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point. This corresponds to a window that may itself contain tabs.  This method is replaced by L<window_handle|Firefox::Marionette#window_handle> and appropriate L<context|Firefox::Marionette#context> calls for Firefox 94 and after.
 
 =head2 chrome_window_handles
 
-returns identifiers for each open chrome window for tests interested in managing a set of chrome windows and tabs separately.
+returns identifiers for each open chrome window for tests interested in managing a set of chrome windows and tabs separately.  This method is replaced by L<window_handles|Firefox::Marionette#window_handles> and appropriate L<context|Firefox::Marionette#context> calls for Firefox 94 and after.
 
 =head2 clear
 
@@ -9383,6 +9462,31 @@ returns the page source of the content document.  This page source can be wrappe
 
     say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
 
+=head2 images
+
+returns a list of all of the following elements;
+
+=over 4
+
+=item * L<img|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img>
+
+=item * L<image inputs|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/image>
+
+=back
+
+as L<Firefox::Marionette::Image|Firefox::Marionette::Image> objects.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    if (my $link = $firefox->images()) {
+        say "Found a image with width " . $image->width() . "px and height " . $image->height() . "px from " . $image->URL();
+    }
+
+If no elements are found, this method will return undef.
+
 =head2 install
 
 accepts the following as the first parameter;
@@ -9497,6 +9601,39 @@ returns true if C<document.readyState === "complete">
         # redirecting to Test::More page
     }
 
+=head2 links
+
+returns a list of all of the following elements;
+
+=over 4
+
+=item * L<anchor|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a>
+
+=item * L<area|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area>
+
+=item * L<frame|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/frame>
+
+=item * L<iframe|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe>
+
+=item * L<meta|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta>
+
+=back
+
+as L<Firefox::Marionette::Link|Firefox::Marionette::Link> objects.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    if (my $link = $firefox->links()) {
+        if ($link->tag() eq 'a') {
+            warn "Found a hyperlink to " . $link->URL();
+        }
+    }
+
+If no elements are found, this method will return undef.
+
 =head2 macos_binary_paths
 
 returns a list of filesystem paths that this module will check for binaries that it can automate when running on L<MacOS|https://en.wikipedia.org/wiki/MacOS>.  Only of interest when sub-classing.
@@ -9568,6 +9705,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * developer - only allow a L<developer edition|https://www.mozilla.org/en-US/firefox/developer/> to be launched. This defaults to "0" (off).
 
+=item * devtools - begin the session with the L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window opened in a separate window.
+
 =item * height - set the L<height|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> of the initial firefox window
 
 =item * har - begin the session with the L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window opened in a separate window.  The L<HAR Export Trigger|https://addons.mozilla.org/en-US/firefox/addon/har-export-trigger/> addon will be loaded into the new session automatically, which means that -safe-mode will not be activated for this session AND this functionality will only be available for Firefox 61+.
@@ -9575,6 +9714,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 =item * host - use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox on the specified host.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.
 
 =item * implicit - a shortcut to allow directly providing the L<implicit|Firefox::Marionette::Timeout#implicit> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
+
+=item * kiosk - start the browser in L<kiosk|https://support.mozilla.org/en-US/kb/firefox-enterprise-kiosk-mode> mode.
 
 =item * mime_types - any MIME types that Firefox will encounter during this session.  MIME types that are not specified will result in a hung browser (the File Download popup will appear).
 
@@ -9969,6 +10110,16 @@ set the current browsing context for future commands to the parent of the curren
 
 accepts a window handle (either the result of L<window_handles|Firefox::Marionette#window_handles> or a window name as a parameter and switches focus to this window.
 
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+    $firefox->version
+    my $original_window_uuid = $firefox->window_handle();
+    $firefox->new_window( type => 'tab' );
+    $firefox->new_window( type => 'window' );
+    $firefox->switch_to_window($original_window_uuid);
+    $firefox->go('https://metacpan.org');
+
 =head2 tag_name
 
 accepts a L<Firefox::Marionette::Element|Firefox::Marionette::Element> object as the first parameter and returns the relevant tag name.  For example 'L<a|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a>' or 'L<input|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input>'.
@@ -10040,9 +10191,25 @@ returns a hash of known Windows product names (such as 'Mozilla Firefox') with p
 
 returns the current window's handle. On desktop this typically corresponds to the currently selected tab.  returns an opaque server-assigned identifier to this window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point.
 
+    use Firefox::Marionette();
+    use 5.010;
+
+    my $firefox = Firefox::Marionette->new();
+    my $original_window_uuid = $firefox->window_handle();
+
 =head2 window_handles
 
 returns a list of top-level browsing contexts. On desktop this typically corresponds to the set of open tabs for browser windows, or the window itself for non-browser chrome windows.  Each window handle is assigned by the server and is guaranteed unique, however the return array does not have a specified ordering.
+
+    use Firefox::Marionette();
+    use 5.010;
+
+    my $firefox = Firefox::Marionette->new();
+    my $original_window_uuid = $firefox->window_handle();
+    $firefox->new_window( type => 'tab' );
+    $firefox->new_window( type => 'window' );
+    say "There are " . $firefox->window_handles() . " tabs open in total";
+    say "Across " . $firefox->chrome()->window_handles()->content() . " chrome windows";
 
 =head2 window_rect
 
@@ -10334,7 +10501,7 @@ Thanks also to the authors of the documentation in the following sources;
 
 =item * L<Marionette Documentation|https://firefox-source-docs.mozilla.org/testing/marionette/marionette/index.html>
 
-=item * L<Marionette driver.js|https://hg.mozilla.org/mozilla-central/file/tip/testing/marionette/driver.js>
+=item * L<Marionette driver.js|https://hg.mozilla.org/mozilla-central/file/tip/remote/marionette/driver.js>
 
 =item * L<about:config|http://kb.mozillazine.org/About:config_entries>
 

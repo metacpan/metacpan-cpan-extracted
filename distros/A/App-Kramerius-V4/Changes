@@ -1,0 +1,8 @@
+0.02 2021-10-30T12:01:33+02:00
+ - Add examples/ directory.
+ - Add status line to error.
+ - Add test for constructor.
+ - Fix author name.
+
+0.01 2021-10-26T16:44:58+02:00
+ - First version.

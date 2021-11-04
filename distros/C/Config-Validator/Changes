@@ -1,5 +1,8 @@
 Revision history for Config-Validator:
 
+1.4	Fri Oct 15 2021
+	* Fixed POD coverage testing (RT#131350).
+
 1.3	Mon Nov 30 2015
 	* Added support for more string-equivalent types in options().
 

@@ -4,7 +4,9 @@
 requires "Carp" => "0";
 requires "Class::C3::Componentised" => "0";
 requires "Dancer2::Plugin" => "0";
-requires "Try::Tiny" => "0";
+requires "Modern::Perl" => "0";
+requires "Moo" => "0";
+requires "curry" => "0";
 requires "perl" => "5.012";
 
 on 'test' => sub {
@@ -19,6 +21,7 @@ on 'test' => sub {
   requires "IPC::Open3" => "0";
   requires "JSON::MaybeXS" => "0";
   requires "Plack::Test" => "0";
+  requires "Test2::V0" => "0";
   requires "Test::More" => "0";
 };
 

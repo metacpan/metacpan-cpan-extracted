@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::XAVTypes::ClientInformationType;
-$Shipment::UPS::WSDL::XAVTypes::ClientInformationType::VERSION = '3.05';
+$Shipment::UPS::WSDL::XAVTypes::ClientInformationType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        Property
 
-              )
+            )
         ],
         {'Property' => \%Property_of,},
         {
@@ -46,7 +46,7 @@ Class::Std::initialize();
 
 package Shipment::UPS::WSDL::XAVTypes::ClientInformationType::_Property;
 $Shipment::UPS::WSDL::XAVTypes::ClientInformationType::_Property::VERSION =
-  '3.05';
+  '3.06';
 use strict;
 use warnings;
 {
@@ -64,7 +64,7 @@ use warnings;
 
     package Shipment::UPS::WSDL::XAVTypes::ClientInformationType::_Property::XmlAttr;
     $Shipment::UPS::WSDL::XAVTypes::ClientInformationType::_Property::XmlAttr::VERSION
-      = '3.05';
+      = '3.06';
     use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
     {    # BLOCK to scope variables
@@ -74,7 +74,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(
                   Key
-                  )
+                )
             ],
             {
 
@@ -103,7 +103,7 @@ Shipment::UPS::WSDL::XAVTypes::ClientInformationType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

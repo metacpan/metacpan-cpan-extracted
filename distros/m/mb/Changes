@@ -1,5 +1,32 @@
 Revision history for this software.
 
+0.36  2021-10-30 00:00:00
+  - supports /[]/xx, m/[]/xx, qr/[]/xx, s/[]//xx, split /[]/xx, and split m/[]/xx
+  - created by INABA Hitoshi
+
+0.35  2021-10-20 00:00:00
+  - supports signatures
+  - created by INABA Hitoshi
+
+0.34  2021-10-19 00:00:00
+  - supports opendir(my $dir, ...)
+  - created by INABA Hitoshi
+
+0.33  2021-10-15 00:00:00
+  - allow 07, 0o7 and 0O7
+  - allow 0b1 and 0B1
+  - allow 123.4e5,  123.4E5,  123.e5,  123.E5,  .4e5,  and .4E5
+  - allow 123.4e+5, 123.4E+5, 123.e+5, 123.E+5, .4e+5, and .4E+5
+  - allow 123.4e-5, 123.4E-5, 123.e-5, 123.E-5, .4e-5, and .4E-5
+  - allow 0xFF, 0XFF, 0xff, and 0Xff
+  - allow 0xFF.Ep5,  0xFF.EP5,  0xFF.p5,  and 0xFF.P5
+  - allow 0xFF.Ep+5, 0xFF.EP+5, 0xFF.p+5, and 0xFF.P+5
+  - allow 0xFF.Ep-5, 0xFF.EP-5, 0xFF.p-5, and 0xFF.P-5
+  - allow 0Xff.Ep5,  0Xff.EP5,  0Xff.p5,  and 0Xff.P5
+  - allow 0Xff.Ep+5, 0Xff.EP+5, 0Xff.p+5, and 0Xff.P+5
+  - allow 0Xff.Ep-5, 0Xff.EP-5, 0Xff.p-5, and 0Xff.P-5
+  - created by INABA Hitoshi
+
 0.32  2021-10-03 00:00:00
   - expands wildcard arguments of command line on Microsoft Windows
   - created by INABA Hitoshi

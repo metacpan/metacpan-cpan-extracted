@@ -31,6 +31,21 @@ In version I<2.00> a field definition which is built by a subroutine is called a
 
 This behavior is more correct, as class fields which you can access might change between validations, and old field building would not take it into account. However, it also means that subroutines that build form fields B<must not> to contain any form of non-determinism (like random number generation) or (to less degree) something variable in time (like datetime or access to busy database entries).
 
+I<Minor change in 2.03>
+
+As of I<2.03>, the field definitions are still resolved dynamically, but will keep their state until you trigger form reset by changing the input (with C<set_input> method). This allows for some degree of randomness in forms, but it will still change after you set different input. If you really want randomness that will last for the entire lifetime of an object, regular class attribute accessed in a dynamic field is your best bet:
+
+	has 'random_field' => (
+		is => 'ro',
+		default => sub { rand },
+	);
+
+	form_field sub {
+		my $self = shift;
+
+		# access with $self->random_field;
+	};
+
 =head2 Dynamic (sub-based) form fields need to return a name
 
 I<Changed in 2.00>
@@ -139,6 +154,48 @@ Starting from version I<2.00>, any backward incompatible changes will only be in
 		type => Type,
 		code => sub { ... },
 	);
+
+=head3 Form::Tiny::Error::DoesNotExist is deprecated
+
+Use Form::Tiny::Error::Required instead.
+
+=head3 Subroutine call parameters are getting standarized
+
+Many parts of the system can be customized with code references (anonymous subroutines). The problem is they were designed in isolation, per feature and not as a whole.
+
+Because of this, parameters they get passed tend to vary. For example the C<default> sub will get passed a single parameter, which is a form instance, while form validator will not get passed a form instance, making it hard or impossible to make use of instance data in certain places.
+
+To combat this, in the future release all listed places will consistently get passed the form instance as their first parameter, followed by their current parameters:
+
+	form_field -> adjust
+	form_field -> coerce
+	form_validator
+	form_filter
+	field_filter
+
+For example:
+
+	form_field 'field' => (
+		# before
+		adjust => sub { shift() + 1 },
+		# after
+		adjust => sub { $_[1] + 1 },
+	);
+
+Or with signatures:
+
+	form_field 'field' => (
+		# before
+		adjust => sub ($value) { $value + 1 },
+		# after
+		adjust => sub ($self, $value) { $value + 1 },
+	);
+
+Starting with I<2.03>, a new import flag C<-consistent> will be added, which enables the new parameter lists:
+
+	use Form::Tiny -consistent;
+
+A warning will be raised if Form::Tiny is imported without this flag. After the deprecation period and removal of old syntax, the flag will be made redundant.
 
 =head1 SEE ALSO
 

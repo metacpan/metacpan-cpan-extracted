@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.15.8
+## Version v0.16.4
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/08/21
+## Modified 2021/10/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,7 @@ BEGIN
     use Config;
     use Class::Load ();
     use Clone ();
-    use Data::Dump; 
+    use Data::Dump;
     use Devel::StackTrace;
     use Encode ();
     use File::Spec ();
@@ -67,7 +67,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.15.8';
+    $VERSION     = 'v0.16.4';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -154,17 +154,37 @@ sub new
         my $obj   = tie(
         %hash, 
         'Module::Generic::Tie', 
-        'pkg'        => [ __PACKAGE__, $class ],
-        'perms'        => ${ "${class}::OBJECT_PERMS" },
+        'pkg'   => [ __PACKAGE__, $class ],
+        'perms' => ${ "${class}::OBJECT_PERMS" },
         );
         $self  = \%hash;
     }
     bless( $self, $class );
     if( defined( ${ "${class}\::LOG_DEBUG" } ) )
     {
-        $self->{ 'log_debug' } = ${ "${class}::LOG_DEBUG" };
+        $self->{log_debug} = ${ "${class}::LOG_DEBUG" };
     }
-    return( $self->init( @_ ) );
+    
+    if( Want::want( 'OBJECT' ) )
+    {
+        return( $self->init( @_ ) );
+    }
+    my $new = $self->init( @_ );
+    # Returned undef; there was an error potentially
+    if( !defined( $new ) )
+    {
+        # If we are called on an object, we hand it the error so the caller can check it using the object:
+        # my $new = $old->new || die( $old->error );
+        if( $self->_is_object( $that ) && $that->can( 'pass_error' ) )
+        {
+            return( $that->pass_error( $self->error ) );
+        }
+        else
+        {
+            return( $self->pass_error );
+        }
+    };
+    return( $new );
 }
 
 ## This is used to transform package data set into hash reference suitable for api calls
@@ -915,6 +935,20 @@ sub dump
     }
 }
 
+sub dump_hex
+{
+    my $self = shift( @_ );
+    try
+    {
+        require Devel::Hexdump;
+        return( Devel::Hexdump::xd( shift( @_ ) ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Devel::Hexdump is not installed on your system." ) );
+    }
+}
+
 ## For backward compatibility and traceability
 sub dump_print { return( shift->dumpto_printer( @_ ) ); }
 
@@ -1067,7 +1101,8 @@ sub error
         }
         else
         {
-            $o = $this->{error} = ${ $class . '::ERROR' } = Module::Generic::Exception->new( $args );
+            my $ex_class = ( CORE::exists( $this->{_exception_class} ) && CORE::length( $this->{_exception_class} ) ) ? $this->{_exception_class} : 'Module::Generic::Exception';
+            $o = $this->{error} = ${ $class . '::ERROR' } = $ex_class->new( $args );
         }
         
         ## Get the warnings status of the caller. We use caller(1) to skip one frame further, ie our caller's caller
@@ -1199,6 +1234,13 @@ sub error
         }
         return;
     }
+    # To avoid the perl error of 'called on undefined value' and so the user can do
+    # $o->error->message for example without concerning himself/herself whether an exception object is actually set
+    if( !$this->{error} && want( 'OBJECT' ) )
+    {
+        my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, wants => 'object' });
+        rreturn( $null );
+    }
     return( ref( $self ) ? $this->{error} : ${ $class . '::ERROR' } );
 }
 
@@ -1228,6 +1270,7 @@ sub init
     $this->{level}   = 0;
     $this->{colour_open} = COLOUR_OPEN if( !length( $this->{colour_open} ) );
     $this->{colour_close} = COLOUR_CLOSE if( !length( $this->{colour_close} ) );
+    $this->{_exception_class} = 'Module::Generic::Exception';
     $this->{_init_params_order} = [] unless( ref( $this->{_init_params_order} ) );
     ## If no debug level was provided when calling message, this level will be assumed
     ## Example: message( "Hello" );
@@ -1510,13 +1553,13 @@ sub message
         my $prefix = CORE::length( $opts->{prefix} ) ? $opts->{prefix} : '##';
         no overloading;
         $opts->{caller_info} = 1 if( !CORE::exists( $opts->{caller_info} ) || !CORE::length( $opts->{caller_info} ) );
-        my $thread_info = '';
+        my $proc_info = " [PID: $$]";
         if( HAS_THREADS )
         {
             my $tid = threads->tid;
-            $thread_info = ' [thread id ' . $tid . ']' if( $tid );
+            $proc_info .= ' -> [thread id ' . $tid . ']' if( $tid );
         }
-        my $mesg_raw = $opts->{caller_info} ? ( "${pkg}::${sub2}( $self ) [$line]${thread_info}: " . $txt ) : $txt;
+        my $mesg_raw = $opts->{caller_info} ? ( "${pkg}::${sub2}( $self ) [$line]${proc_info}: " . $txt ) : $txt;
         $mesg_raw    =~ s/\n$//gs;
         my $mesg = "${prefix} " . join( "\n${prefix} ", split( /\n/, $mesg_raw ) );
         
@@ -1933,8 +1976,15 @@ sub pass_error
     # set up earlier by another method
     if( !defined( $err ) && !scalar( @_ ) )
     {
-        $self->message( 3, "Reusing previously set error object: $this->{error}" );
-        $err = $this->{error};
+        if( !defined( $this->{error} ) )
+        {
+            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n" );
+        }
+        else
+        {
+            $self->message( 3, "Reusing previously set error object: $this->{error}" );
+            $err = $this->{error};
+        }
     }
     elsif( defined( $err ) && Scalar::Util::blessed( $err ) && scalar( @_ ) == 1 )
     {
@@ -2121,10 +2171,10 @@ sub __instantiate_object
     my $o;
     try
     {
-        ## https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
-        ## require $class unless( defined( *{"${class}::"} ) );
-        my $rc = eval{ Class::Load::load_class( $class ); };
-        return( $self->error( "Unable to load class $class: $@" ) ) if( $@ );
+        # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
+        # require $class unless( defined( *{"${class}::"} ) );
+        # Either it passes and returns the class loaded or it raises an error trapped in catch
+        my $rc = Class::Load::load_class( $class );
         @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
         $o = scalar( @_ ) ? $class->new( @_ ) : $class->new;
         return( $self->pass_error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
@@ -2135,6 +2185,17 @@ sub __instantiate_object
         return( $self->error({ code => 500, message => $e }) );
     }
     return( $o );
+}
+
+sub _can
+{
+    my $self = shift( @_ );
+    no overloading;
+    # Nothing provided
+    return if( !scalar( @_ ) );
+    return if( !defined( $_[0] ) );
+    return if( !Scalar::Util::blessed( $_[0] ) );
+    return( $_[0]->can( $_[1] ) );
 }
 
 sub _get_args_as_array
@@ -2237,10 +2298,27 @@ sub _is_class_loadable
     }
 }
 
-sub _is_class_loaded { shift( @_ ); return( Class::Load::is_class_loaded( @_ ) ); }
+sub _is_class_loaded
+{
+    my $self = shift( @_ );
+    my $class = shift( @_ );
+    if( $ENV{MOD_PERL} )
+    {
+        # https://perl.apache.org/docs/2.0/api/Apache2/Module.html#C_loaded_
+        # $self->message( 3, "Does module $class exists in \%INC using Apache2::Module ? ", Apache2::Module::loaded( $class ) ? 'yes' : 'no' );
+        return( Apache2::Module::loaded( $class ) );
+    }
+    else
+    {
+        ( my $pm = $class ) =~ s{::}{/}gs;
+        $pm .= '.pm';
+        # $self->message( 3, "Does module $class ($pm) exists in \%INC ? ", CORE::exists( $INC{ $pm } ) ? 'yes' : 'no' );
+        return( CORE::exists( $INC{ $pm } ) ); 
+    }
+}
 
-## UNIVERSAL::isa works for both array or array as objects
-## sub _is_array { return( UNIVERSAL::isa( $_[1], 'ARRAY' ) ); }
+# UNIVERSAL::isa works for both array or array as objects
+# sub _is_array { return( UNIVERSAL::isa( $_[1], 'ARRAY' ) ); }
 sub _is_array
 {
     return( 0 ) if( scalar( @_ < 2 ) );
@@ -2248,12 +2326,28 @@ sub _is_array
     return( Scalar::Util::reftype( $_[1] ) eq 'ARRAY' );
 }
 
-## sub _is_hash { return( UNIVERSAL::isa( $_[1], 'HASH' ) ); }
 sub _is_hash
 {
     return( 0 ) if( scalar( @_ < 2 ) );
     return( 0 ) if( !defined( $_[1] ) );
     return( Scalar::Util::reftype( $_[1] ) eq 'HASH' );
+}
+
+sub _is_ip
+{
+    my $self = shift( @_ );
+    my $ip   = shift( @_ );
+    return(0) if( !length( $ip ) );
+    # Already loaded
+    unless( $RE{net}{IPv4} )
+    {
+        $self->_load_class( 'Regexp::Common' ) || return( $self->pass_error );
+        Regexp::Common->import( 'net' );
+    }
+    # We need to return either 1 or 0. By default, perl return undef for false
+    # supports IPv4 and IPv6 in CIDR notation or not
+    my $ip4or6 = qr/($RE{net}{IPv4}(\/(3[0-2]|[1-2][0-9]|[0-9]))?)|($RE{net}{IPv6}(\/(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[0-9]))?)/;
+    return( $ip =~ /^$ip4or6$/ ? 1 : 0 );
 }
 
 sub _is_number
@@ -2278,18 +2372,33 @@ sub _is_scalar
     return( Scalar::Util::reftype( $_[1] ) eq 'SCALAR' );
 }
 
+sub _is_uuid { return( $_[1] =~ /^[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12}$/ ? 1 : 0 ); }
+
 sub _load_class
 {
-    my $self = shift( @_ );
+    my $self  = shift( @_ );
     my $class = shift( @_ ) || return( $self->error( "No package name was provided to load." ) );
-    try
+    my $opts  = {};
+    $opts     = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
+    my $args  = $self->_get_args_as_array( @_ );
+    # Get the caller's package so we load the module in context
+    my $caller_class = $opts->{caller} || CORE::caller;
+    # Return if already loaded
+    if( $self->_is_class_loaded( $class ) )
     {
-        return( Class::Load::load_class( "$class" ) );
+        # $self->message( 3, "Class '$class' is already loaded." );
+        return( $class );
     }
-    catch( $e )
-    {
-        return( $self->error( $e ) );
-    }
+    my $pl = "package ${caller_class}; use $class";
+    $pl .= ' ' . $opts->{version} if( CORE::defined( $opts->{version} ) && CORE::length( $opts->{version} ) );
+    $pl .= ' qw( ' . CORE::join( ' ', @$args ) . ' );' if( scalar( @$args ) );
+    # $self->message( 3, "Evaluating '$pl'" );
+    local $SIG{__DIE__} = sub{};
+    eval( $pl );
+    # $self->message( 3, "Loading package $class triggered error? -> '$@'" );
+    return( $self->error( "Unable to load package ${class}: $@" ) ) if( $@ );
+    # $self->message( 3, "Is package $class loaded now? ", $self->_is_class_loaded( $class ) ? 'yes' : 'no' );
+    return( $self->_is_class_loaded( $class ) ? $class : '' );
 }
 
 sub _obj2h
@@ -2600,6 +2709,29 @@ sub _parse_timestamp
     # 令和3年7月14日
     elsif( $str =~ /^(?<era>\p{Han})?(?<year>\d{1,4})年(?<month>\d{1,2})月(?<day>\d{1,2})日$/ )
     {
+        my $re = { %+ };
+        if( $re->{era} )
+        {
+            try
+            {
+                require DateTime::Format::JP;
+                my $parser = DateTime::Format::JP->new( pattern => '%E%Y年%m月%d日', time_zone => 'local' );
+                my $dt = $parser->parse_datetime( $str );
+                $dt->set_formatter( $parser );
+                return( $dt );
+            }
+            catch( $e )
+            {
+                return( $self->error( "An error occurred while trying to use DateTime::Format::JP: $e" ) );
+            }
+        }
+        else
+        {
+            $opt->{pattern} = '%F';
+            $str = join( '-', @$re{qw( year month day )} );
+            use utf8;
+            $fmt->{pattern} = '%Y年%m月%d日';
+        }
     }
     # <https://en.wikipedia.org/wiki/Date_format_by_country>
     elsif( $str =~ /^\d{10}$/ )
@@ -2997,7 +3129,7 @@ sub _set_get_class_array
             {
                 return( $self->error( "Array offset $i is not a hash reference. I was expecting a hash reference to instantiate an object of class $class." ) );
             }
-            my $o = $self->__instantiate_object( $field, $class, $ref->[$i] ) || return;
+            my $o = $self->__instantiate_object( $field, $class, $ref->[$i] ) || return( $self->pass_error );
             ## If an error occurred, we report it to the caller and do not add it, since even if we did add it, it would be undef, because no object would have been created.
             ## And the caller needs to know there has been some errors
             CORE::push( @$arr, $o );
@@ -3028,17 +3160,12 @@ sub _set_get_datetime
     my $field = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( @_ )
+    local $process = sub
     {
         my $time = shift( @_ );
         # $self->message( 3, "Processing time stamp $time possibly of ref (", ref( $time ), ")." );
         my $now;
-        if( !defined( $time ) )
-        {
-            $data->{ $field } = $time;
-            return( $data->{ $field } );
-        }
-        elsif( Scalar::Util::blessed( $time ) )
+        if( Scalar::Util::blessed( $time ) )
         {
             return( $self->error( "Object provided as value for $field, but this is not a DateTime or a Module::Generic::DateTime object" ) ) if( !$time->isa( 'DateTime' ) && !$time->isa( 'Module::Generic::DateTime' ) );
             $data->{ $field } = $time;
@@ -3048,12 +3175,12 @@ sub _set_get_datetime
         {
             return( $self->error( "DateTime value ($time) provided for field $field does not look like a unix timestamp" ) );
         }
-        ## Parsed successfully and transformed into a DateTime object
+        # Parsed successfully and transformed into a DateTime object
         elsif( $now = $self->_parse_timestamp( $time ) )
         {
-            ## Found a parsed datetime value
-            ## $data->{ $field } = $now;
-            ## return( $now );
+            # Found a parsed datetime value
+            # $data->{ $field } = $now;
+            # return( $now );
         }
         
         # $self->message( 3, "Creating a DateTime object out of $time\n" );
@@ -3067,26 +3194,47 @@ sub _set_get_datetime
                     time_zone => 'local',
                 );
             }
-            require DateTime::Format::Strptime;
-            my $strp = DateTime::Format::Strptime->new(
-                pattern => '%s',
-                locale => 'en_GB',
-                time_zone => 'local',
-            );
-            $now->set_formatter( $strp );
+            # We only set a default formatter if one was not set already
+            unless( $now->formatter )
+            {
+                require DateTime::Format::Strptime;
+                my $strp = DateTime::Format::Strptime->new(
+                    pattern => '%s',
+                    locale => 'en_GB',
+                    time_zone => 'local',
+                );
+                $now->set_formatter( $strp );
+            }
             ## $self->message( 3, "Setting the DateTime object '$now' (", overload::StrVal( $now ), ") for field \"$field\"." );
-            $data->{ $field } = $now;
+            return( $now );
         }
         catch( $e )
         {
             $self->message( "Error while trying to get the DateTime object for field $k with value $time: $e" );
         }
+    };
+    
+    if( @_ )
+    {
+        my $time = shift( @_ );
+        if( !defined( $time ) )
+        {
+            $data->{ $field } = $time;
+            return( $data->{ $field } );
+        }
+        my $now = $process->( $time ) || return( $self->pass_error );
+        $data->{ $field } = $now;
     }
     ## So that a call to this field will not trigger an error: "Can't call method "xxx" on an undefined value"
     if( !$data->{ $field } && want( 'OBJECT' ) )
     {
         my $null = Module::Generic::Null->new( '', { debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
+    }
+    elsif( defined( $data->{ $field } ) && !$self->_is_a( $data->{ $field }, 'DateTime' ) )
+    {
+        my $now = $process->( $data->{ $field } ) || return( $self->pass_error );
+        $data->{ $field } = $now;
     }
     return( $data->{ $field } );
 }
@@ -3251,6 +3399,49 @@ EOT
     return( $data->{ $field } );
 }
 
+sub _set_get_ip
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( @_ )
+    {
+        my $v = shift( @_ );
+        # If the user wants to remove it
+        if( !defined( $v ) )
+        {
+            $data->{ $field } = $v;
+        }
+        # If the user provided a string, let's check it
+        elsif( length( $v ) && !$self->_is_ip( $v ) )
+        {
+            return( $self->error( "Value provided is not a valid ip address." ) );
+        }
+        $data->{ $field } = $self->new_scalar( $v );
+    }
+    my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
+        ? $data->{ $field }
+        : $self->new_scalar( $data->{ $field } );
+    if( !$v->defined )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            # We might have need to specify, because I found a race condition where
+            # even though the context is object, once in Null, the context became 'code'
+            return( Module::Generic::Null->new( wants => 'OBJECT' ) );
+        }
+        else
+        {
+            return;
+        }
+    }
+    else
+    {
+        return( $v );
+    }
+}
+
 sub _set_get_lvalue : lvalue
 {
     my $self  = shift( @_ );
@@ -3348,22 +3539,25 @@ sub _set_get_object
     {
         if( scalar( @_ ) == 1 )
         {
-            ## User removed the value by passing it an undefined value
+            # $self->message( 3, "Object provided is '", overload::StrVal( $_[0] ), "' for class '$class'. Is it a legit object? ", ( $self->_is_a( $_[0], $class ) ? 'yes' : 'no' ) );
+            # User removed the value by passing it an undefined value
             if( !defined( $_[0] ) )
             {
                 $data->{ $field } = undef();
             }
-            ## User pass an object
+            # User pass an object
             elsif( Scalar::Util::blessed( $_[0] ) )
             {
                 my $o = shift( @_ );
+                # $self->message( 3, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
                 return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
-                ## XXX Bad idea:
-                ## $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
+                # XXX Bad idea:
+                # $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
                 $data->{ $field } = $o;
             }
             else
             {
+                # $self->message( 3, "Got here, instantiating object for field '$field' and class '$class'." );
                 my $o = $self->_instantiate_object( $field, $class, @_ ) || do
                 {
                     if( $class->can( 'error' ) )
@@ -3381,6 +3575,13 @@ sub _set_get_object
         }
         else
         {
+            # $self->message( 3, "Argument provideds ('", join( "', '", map( overload::StrVal( $_ ), @_ ) ), "'), instantiating object for field '$field' and class '$class' called from file ", [caller(1)]->[1], " at line ", [caller(1)]->[2], "." );
+            # There is already an object, so we pass any argument to the existing object
+            if( $data->{ $field } && $self->_is_a( $data->{ $field }, $class ) )
+            {
+                warn( "Re-setting existing object '", overload::StrVal( $data->{ $field } ), "' for field '$field' and class '$class'\n" );
+            }
+            
             my $o = $self->_instantiate_object( $field, $class, @_ ) || do
             {
                 if( $class->can( 'error' ) )
@@ -3396,8 +3597,8 @@ sub _set_get_object
             $data->{ $field } = $o;
         }
     }
-    ## If nothing has been set for this field, ie no object, but we are called in chain
-    ## we set a dummy object that will just call itself to avoid perl complaining about undefined value calling a method
+    # If nothing has been set for this field, ie no object, but we are called in chain
+    # we set a dummy object that will just call itself to avoid perl complaining about undefined value calling a method
     if( !$data->{ $field } && want( 'OBJECT' ) )
     {
         my $o = $self->_instantiate_object( $field, $class, @_ ) || do
@@ -3430,18 +3631,18 @@ sub _set_get_object_without_init
     {
         if( scalar( @_ ) == 1 )
         {
-            ## User removed the value by passing it an undefined value
+            # User removed the value by passing it an undefined value
             if( !defined( $_[0] ) )
             {
                 $data->{ $field } = undef();
             }
-            ## User pass an object
+            # User pass an object
             elsif( Scalar::Util::blessed( $_[0] ) )
             {
                 my $o = shift( @_ );
                 return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
-                ## XXX Bad idea:
-                ## $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
+                # XXX Bad idea:
+                # $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
                 $data->{ $field } = $o;
             }
             else
@@ -3544,7 +3745,7 @@ sub _set_get_object_array
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    if( @_ )
+    local $process = sub
     {
         my $ref = shift( @_ );
         return( $self->error( "I was expecting an array ref, but instead got '$ref'. _is_array returned: '", $self->_is_array( $ref ), "'" ) ) if( !$self->_is_array( $ref ) );
@@ -3553,31 +3754,46 @@ sub _set_get_object_array
         {
             if( defined( $ref->[$i] ) )
             {
-                return( $self->error( "Array offset $i is not a reference. I was expecting an object of class $class or an hash reference to instantiate an object." ) ) if( !ref( $ref->[$i] ) );
+#                 return( $self->error( "Array offset $i is not a reference. I was expecting an object of class $class or an hash reference to instantiate an object." ) ) if( !ref( $ref->[$i] ) );
                 if( Scalar::Util::blessed( $ref->[$i] ) )
                 {
                     return( $self->error( "Array offset $i contains an object from class $pack, but was expecting an object of class $class." ) ) if( !$ref->[$i]->isa( $class ) );
                     push( @$arr, $ref->[$i] );
                 }
-                elsif( ref( $ref->[$i] ) eq 'HASH' )
-                {
-                    #$o = $class->new( $h, $ref->[$i] );
-                    $o = $self->_instantiate_object( $field, $class, $ref->[$i] ) || return;
-                    push( @$arr, $o );
-                }
+#                 elsif( ref( $ref->[$i] ) eq 'HASH' )
+#                 {
+#                     #$o = $class->new( $h, $ref->[$i] );
+#                     $o = $self->_instantiate_object( $field, $class, $ref->[$i] ) || return;
+#                     push( @$arr, $o );
+#                 }
+#                 else
+#                 {
+#                     $self->error( "Warning only: data provided to instantiate object of class $class is not a hash reference" );
+#                 }
                 else
                 {
-                    $self->error( "Warning only: data provided to instantiate object of class $class is not a hash reference" );
+                    $o = $self->_instantiate_object( $field, $class, $ref->[$i] ) || return;
+                    push( @$arr, $o );
                 }
             }
             else
             {
                 return( $self->error( "Array offset $i contains an undefined value. I was expecting an object of class $class." ) );
-                $o = $self->_instantiate_object( $field, $class ) || return;
+                $o = $self->_instantiate_object( $field, $class ) || return( $self->pass_error );
                 push( @$arr, $o );
             }
         }
-        $data->{ $field } = $arr;
+        return( $arr );
+    };
+    
+    if( @_ )
+    {
+        $data->{ $field } = $process->( @_ );
+    }
+    # For example, if the object property is set at init, without using a method
+    if( $data->{ $field } && ref( $data->{ $field } ) ne 'ARRAY' )
+    {
+        $data->{ $field } = $process->( $data->{ $field } );
     }
     return( $data->{ $field } );
 }
@@ -3590,18 +3806,22 @@ sub _set_get_object_array_object
     my $this = $self->_obj2h;
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    if( @_ )
+    local $process = sub
     {
         my $that = ( scalar( @_ ) == 1 && UNIVERSAL::isa( $_[0], 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
-        my $ref = $self->_set_get_object_array( $field, $class, $that ) || return;
-        $data->{ $field } = Module::Generic::Array->new( $ref );
+        my $ref = $self->_set_get_object_array( $field, $class, $that ) || return( $self->pass_error );
+        return( Module::Generic::Array->new( $ref ) );
+    };
+    
+    if( @_ )
+    {
+        $data->{ $field } = $process->( @_ );
     }
     ## Default value so that call to the caller's method like my_sub->length will not produce something like "Can't call method "length" on an undefined value"
-    ## Also, this will make i possible to set default value in caller's object and we would turn it into array object.
-    if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
+    ## Also, this will make it possible to set default value in caller's object and we would turn it into array object.
+    if( !$data->{ $field } || !$self->_is_a( $data->{ $field }, 'Module::Generic::Array' ) )
     {
-        my $o = Module::Generic::Array->new( $data->{ $field } );
-        $data->{ $field } = $o;
+        $data->{ $field } = $process->( CORE::defined( $data->{ $field } ) ? $data->{ $field } : () );
     }
     return( $data->{ $field } );
 }
@@ -3614,13 +3834,14 @@ sub _set_get_object_variant
     my $class = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( @_ )
+    local $process = sub
     {
         if( ref( $_[0] ) eq 'HASH' )
         {
             my $o = $self->_instantiate_object( $field, $class, @_ );
+            return( $o );
         }
-        ## AN array of objects hash
+        ## An array of objects hash
         elsif( ref( $_[0] ) eq 'ARRAY' )
         {
             my $arr = shift( @_ );
@@ -3630,8 +3851,13 @@ sub _set_get_object_variant
                 my $o = $self->_instantiate_object( $field, $class, $data ) || return( $self->error( "Unable to create object: ", $self->error ) );
                 push( @$res, $o );
             }
-            $data->{ $field } = $res;
+            return( $res );
         }
+    };
+    
+    if( @_ )
+    {
+        $data->{ $field } = $process->( @_ );
     }
     return( $data->{ $field } );
 }
@@ -3817,7 +4043,57 @@ sub _set_get_uri
             $data->{ $field } = undef();
         }
     }
+    # Data was pre-set or directly set but is not an URI object, so we convert it now
+    if( $data->{ $field } && !$self->_is_a( $data->{ $field }, 'URI' ) )
+    {
+        # Force stringification if this is an overloaded value
+        $data->{ $field } = URI->new( $data->{ $field } . '' );
+    }
     return( $data->{ $field } );
+}
+
+# Universally Unique Identifier
+sub _set_get_uuid
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( @_ )
+    {
+        my $v = shift( @_ );
+        # If the user wants to remove it
+        if( !defined( $v ) )
+        {
+            $data->{ $field } = $v;
+        }
+        # If the user provided a string, let's check it
+        elsif( length( $v ) && !$self->_is_uuid( $v ) )
+        {
+            return( $self->error( "Value provided is not a valid uuid." ) );
+        }
+        $data->{ $field } = $self->new_scalar( $v );
+    }
+    my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
+        ? $data->{ $field }
+        : $self->new_scalar( $data->{ $field } );
+    if( !$v->defined )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            # We might have need to specify, because I found a race condition where
+            # even though the context is object, once in Null, the context became 'code'
+            return( Module::Generic::Null->new( wants => 'OBJECT' ) );
+        }
+        else
+        {
+            return;
+        }
+    }
+    else
+    {
+        return( $v );
+    }
 }
 
 sub _to_array_object
@@ -3971,6 +4247,7 @@ AUTOLOAD
     {
         no strict 'refs';
         *$meth = \&$meth;
+        return( &$meth( $self, @_ ) ) if( $self );
         return( &$meth( @_ ) );
     }
     else
@@ -4132,6 +4409,8 @@ Module::Generic - Generic Module to inherit from
     sub address { return( shift->_set_get_object( 'address', 'My::Address', @_ ) ); }
     sub age { return( shift->_set_get_number( 'age', @_ ) ); }
     sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
+    sub uuid { return( shift->_set_get_uuid( 'uuid', @_ ) ); }
+    sub remote_addr { return( shift->_set_get_ip( 'remote_addr', @_ ) ); }
     sub discount
     {
         return( shift->_set_get_class_array( 'discount',
@@ -4163,7 +4442,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.15.8
+    v0.16.4
 
 =head1 DESCRIPTION
 
@@ -4348,6 +4627,12 @@ If the debug value is switched to 1, the message will be silenced.
 
 Provided with some data, this will return a string representation of the data formatted by L<Data::Printer>
 
+=head2 dump_hex
+
+Returns an hexadecimal dump of the data provided.
+
+This requires the module L<Devel::Hexdump> and will return C<undef> and set an L</error> if not found.
+
 =head2 dump_print
 
 Provided with a file to write to and some data, this will format the string representation of the data using L<Data::Printer> and save it to the given file.
@@ -4531,6 +4816,22 @@ Then, if init is called like this:
 The object would then contain the properties I<products>, I<first_name> and I<last_name> and can be accessed as methods, such as :
 
     my $fname = $object->first_name;
+
+You can also alter the way L</init> process the parameters received using the following properties you can set in your own C<init> method, for example:
+
+    sub init
+    {
+        my $self = shift( @_ );
+        # Set the order in which the parameters are processed, because some methods may rely on other methods' value
+        $self->{_init_params_order} [qw( method1 method2 )];
+        # Enable strict sub, which means the corresponding method must exist for the parameter provided
+        $self->{_init_strict_use_sub} = 1;
+        # Set the class name of the exception to use in error()
+        # Here My::Package::Exception should inherit from Module::Generic::Exception or some other Exception package
+        $self->{_exception_class} = 'My::Package::Exception';
+        $self->SUPER::init( @_ ) || return( $self->pass_error );
+        return( $self );
+    }
 
 =head2 log_handler
 
@@ -4890,6 +5191,24 @@ This is a support method used by L</"_instantiate_object">
 
 This does the same thing as L</"__instantiate_object"> and the purpose is for this method to be potentially superseded in your own module. In your own module, you would call L</"__instantiate_object">
 
+=head2 _can
+
+Provided with a value and a method name, and this will return true if the value provided is an object that L<UNIVERSAL/can> perform the method specified, or false otherwise.
+
+This makes it more convenient to write:
+
+    if( $self->_can( $obj, 'some_method' ) )
+    {
+        # ...
+    }
+
+than to write:
+
+    if( Scalar::Util::bless( $obj ) && $obj->can( 'some_method' )
+    {
+        # ...
+    }
+
 =head2 _get_args_as_array
 
 Provided with arguments and this support method will return the arguments provided as an array reference irrespective of whether they were initially provided as array reference or a simple array.
@@ -4966,6 +5285,8 @@ It returns true if the module can be loaded or false otherwise.
 
 Provided with a class/package name, this returns true if the module is already loaded or false otherwise.
 
+It performs this test by checking if the module is already in C<%INC>.
+
 =head2 _is_array
 
 Provided with some data, this checks if the data is of type array, even if it is an object.
@@ -4995,6 +5316,16 @@ It would rather return the module package name: C<My::Module>
 
 Same as L</"_is_array">, but for hash reference.
 
+=head2 _is_ip
+
+Returns true if the given IP has a syntax compliant with IPv4 or IPv6 including CIDR notation or not, false otherwise.
+
+For this method to work, you need to have installed L<Regexp::Common::net>
+
+=head2 _is_number
+
+Returns true if the provided value looks like a number, false otherwise.
+
 =head2 _is_object
 
 Provided with some data, this checks if the data is an object. It uses L<Scalar::Util/"blessed"> to achieve that purpose.
@@ -5003,9 +5334,41 @@ Provided with some data, this checks if the data is an object. It uses L<Scalar:
 
 Provided with some data, this checks if the data is of type scalar reference, e.g. C<SCALAR(0x7fc0d3b7cea0)>, even if it is an object.
 
+=head2 _is_uuid
+
+Provided with a non-zero length value and this will check if it looks like a valid C<UUID>, i.e. a unique universal ID, and upon successful validation will set the value and return its representation as a L<Module::Generic::Scalar> object.
+
+An empty string or C<undef> can be provided and will not be checked.
+
 =head2 _load_class
 
-Provided with a class/package name and this will attempt to load the module. This uses L<Class::Load/"load_class"> to achieve that purpose and return whatever value L<Class::Load/"load_class"> returns.
+    $self->_load_class( 'My::Module' ) || die( $self->error );
+    $self->_load_class( 'My::Module', qw( :some_tags SOME_CONSTANTS_TO_IMPORT ) ) || die( $self->error );
+    $self->_load_class(
+        'My::Module',
+        qw( :some_tags SOME_CONSTANTS_TO_IMPORT ),
+        { version => 'v1.2.3', caller => 'Its::Me' }
+    ) || die( $self->error );
+
+Provided with a class/package name, some optional list of semantics to import, and, as the last parameter, an optional hash reference of options and this will attempt to load the module. This uses L<perlfunc/use>, no external module.
+
+Upon success, it returns the package name loaded.
+
+It traps any error with an eval and return L<perlfunc/undef> if an error occurred and sets an L</error> accordingly.
+
+Possible options are:
+
+=over 4
+
+=item I<caller>
+
+The package name of the caller. If this is not provided, it will default to the value provided with L<perlfunc/caller>
+
+=item I<version>
+
+The minimum version for this class to load. This value is passed directly to L<perlfunc/use>
+
+=back
 
 =head2 _obj2h
 
@@ -5262,6 +5625,14 @@ Then populating the data :
 
     printf( "Customer name is %s\n", $object->metadata->last_name );
 
+=head2 _set_get_ip
+
+This helper method takes a value and check if it is a valid IP address using L</_is_ip>. If C<undef> or zero-byte value is provided, it will merely accept it, as it can be used to reset the value by the caller.
+
+If a value is successfully set, it returns a L<Module::Generic::Scalar> object representing the string passed.
+
+From there you can pass the result to L<Net::IP> in your own code, assuming you have that module installed.
+
 =head2 _set_get_lvalue
 
 This helper method makes it very easy to implement a L<perlsub/"Lvalue subroutines"> method.
@@ -5385,6 +5756,14 @@ Provided with an object property name, and an uri and this creates a L<URI> obje
 It accepts an L<URI> object, an uri or urn string, or an absolute path, i.e. a string starting with C</>.
 
 It returns the current value, if any, so the return value could be undef, thus it cannot be chained. Maybe it should return a L<Module::Generic::Null> object ?
+
+=head2 _set_get_uuid
+
+Provided with an object property name, and an UUID (Universal Unique Identifier) and this stores it as an object of L<Module::Generic::Scalar>.
+
+If an empty or undefined value is provided, it will be stored as is.
+
+However, if there is no value and this method is called in object context, such as in chaining, this will return a special L<Module::Generic::Null> object that prevents perl error that whatever method follows was called on an undefined value.
 
 =head2 _to_array_object
 

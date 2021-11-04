@@ -19,11 +19,10 @@ subtest( 'basic overall tests', \&basic_tests );
 for my $code (@locale_codes) {
     subtest( "basic tests for $code", sub { test_one_locale($code) } );
 }
-subtest( 'root locale',                    \&check_root );
+subtest( 'und locale',                     \&check_und );
 subtest( 'en locale',                      \&check_en );
 subtest( 'en-GB locale',                   \&check_en_GB );
 subtest( 'en-US locale',                   \&check_en_US );
-subtest( 'en-US-POSIX locale',             \&check_en_US_POSIX );
 subtest( 'es-ES locale',                   \&check_es_ES );
 subtest( 'af locale',                      \&check_af );
 subtest( 'C locales',                      \&check_C_locales );
@@ -47,8 +46,8 @@ sub basic_tests {
     is( $l->code, 'en-US', 'code is en-US when loading en-US.LATIN-1' );
 
     is(
-        DateTime::Locale->load('en_US_POSIX')->code,
-        'en-US-POSIX',
+        DateTime::Locale->load('en_US')->code,
+        'en-US',
         'underscores in code name are turned into dashes'
     );
 }
@@ -65,7 +64,7 @@ sub test_one_locale {
 
     isa_ok( $locale, 'DateTime::Locale::FromData' );
 
-    return if $code eq 'root';
+    return if $code eq 'und';
 
     is(
         $locale->code,
@@ -185,8 +184,8 @@ sub check_formats {
     );
 }
 
-sub check_root {
-    my $locale = DateTime::Locale->load('root');
+sub check_und {
+    my $locale = DateTime::Locale->load('und');
 
     my %tests = (
         day_format_wide             => [qw( Mon Tue Wed Thu Fri Sat Sun )],
@@ -245,6 +244,7 @@ sub check_root {
         GyMMM               => 'G y MMM',
         GyMMMEd             => 'G y MMM d, E',
         GyMMMd              => 'G y MMM d',
+        GyMd                => 'GGGGG y-MM-dd',
         H                   => 'HH',
         Hm                  => 'HH:mm',
         Hms                 => 'HH:mm:ss',
@@ -338,6 +338,7 @@ sub check_en_GB {
         GyMMM               => 'MMM y G',
         GyMMMEd             => 'E, d MMM y G',
         GyMMMd              => 'd MMM y G',
+        GyMd                => 'd/M/y GGGGG',
         H                   => 'HH',
         Hm                  => 'HH:mm',
         Hms                 => 'HH:mm:ss',
@@ -494,22 +495,11 @@ sub check_af {
     );
 }
 
-sub check_en_US_POSIX {
-    my $locale = DateTime::Locale->load('en-US-POSIX');
-
-    is( $locale->variant,        'Computer', 'variant' );
-    is( $locale->native_variant, 'Computer', 'native_variant' );
-
-    is( $locale->language_code,  'en',    'language_code' );
-    is( $locale->territory_code, 'US',    'territory_code' );
-    is( $locale->variant_code,   'POSIX', 'variant_code' );
-}
-
 sub check_C_locales {
     for my $code (qw( C C.ISO-8859-1 C.UTF-8 POSIX )) {
         my $locale = DateTime::Locale->load($code);
         is(
-            $locale->code, 'en-US-POSIX',
+            $locale->code, 'en-US',
             "$code is accepted as a locale code"
         );
     }
@@ -546,4 +536,3 @@ sub check_DT_Lang {
         }
     }
 }
-

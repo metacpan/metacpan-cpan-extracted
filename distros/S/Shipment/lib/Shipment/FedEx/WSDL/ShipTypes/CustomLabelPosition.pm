@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition;
-$Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        X
               Y
 
-              )
+            )
         ],
         {   'X' => \%X_of,
             'Y' => \%Y_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

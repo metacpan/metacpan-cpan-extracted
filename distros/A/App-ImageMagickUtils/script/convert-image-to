@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-05'; # DATE
+our $DATE = '2021-10-12'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/convert_image_to",
@@ -41,13 +41,13 @@ convert-image-to - Convert images using ImageMagick's 'convert' utility, with mu
 
 =head1 VERSION
 
-This document describes version 0.005 of convert-image-to (from Perl distribution App-ImageMagickUtils), released on 2021-10-05.
+This document describes version 0.008 of convert-image-to (from Perl distribution App-ImageMagickUtils), released on 2021-10-12.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<convert-image-to> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--to>=I<str>] [B<--files-json>=I<json>] -- E<lt>I<file>E<gt> ...
+% B<convert-image-to> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--delete-original>|B<-D>|B<--no-delete-original>|B<--nodelete-original>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--to>=I<str>] [B<--files-json>=I<json>] -- E<lt>I<file>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -67,6 +67,8 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--delete-original>, B<-D>
 
 =item B<--file>=I<s@>*
 

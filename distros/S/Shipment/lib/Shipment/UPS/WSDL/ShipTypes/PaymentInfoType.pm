@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::PaymentInfoType;
-$Shipment::UPS::WSDL::ShipTypes::PaymentInfoType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::PaymentInfoType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        ShipmentCharge
               SplitDutyVATIndicator
 
-              )
+            )
         ],
         {   'ShipmentCharge'        => \%ShipmentCharge_of,
             'SplitDutyVATIndicator' => \%SplitDutyVATIndicator_of,
@@ -63,7 +63,7 @@ Shipment::UPS::WSDL::ShipTypes::PaymentInfoType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

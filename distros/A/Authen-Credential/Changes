@@ -1,5 +1,8 @@
 Revision history for Authen-Credential:
 
+1.2	Fri Oct 15 2021
+	* Fixed POD coverage testing (RT#131350).
+
 1.1	Thu Feb 19 2015
 	* Authen::Credential::x509 now has a ca_file attribute.
 

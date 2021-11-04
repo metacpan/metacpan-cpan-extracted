@@ -25,5 +25,5 @@ requires:
   DateTime: '1.12'
   Path::Tiny: '0.055'
   UUID::Tiny: '1.04'
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

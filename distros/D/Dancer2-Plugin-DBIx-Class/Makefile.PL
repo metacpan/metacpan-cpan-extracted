@@ -20,7 +20,9 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Class::C3::Componentised" => 0,
     "Dancer2::Plugin" => 0,
-    "Try::Tiny" => 0
+    "Modern::Perl" => 0,
+    "Moo" => 0,
+    "curry" => 0
   },
   "TEST_REQUIRES" => {
     "DBIx::Class::Core" => 0,
@@ -34,9 +36,10 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "JSON::MaybeXS" => 0,
     "Plack::Test" => 0,
+    "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,9 +60,12 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
+  "Modern::Perl" => 0,
+  "Moo" => 0,
   "Plack::Test" => 0,
+  "Test2::V0" => 0,
   "Test::More" => 0,
-  "Try::Tiny" => 0
+  "curry" => 0
 );
 
 

@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2020 by Dominique Dumont.
+# This software is Copyright (c) 2014-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application
 
 package App::Cme::Command::edit ;
-$App::Cme::Command::edit::VERSION = '1.033';
+$App::Cme::Command::edit::VERSION = '1.034';
 use strict;
 use warnings;
 use 5.10.1;
@@ -53,11 +53,9 @@ sub execute {
 
     my ($model, $inst, $root) = $self->init_cme($opt,$args);
 
-    eval { require Config::Model::TkUI; };
-    my $has_tk = $@ ? 0 : 1;
+    my $has_tk =  eval { require Config::Model::TkUI; 1; };
 
-    eval { require Config::Model::CursesUI; };
-    my $has_curses = $@ ? 0 : 1;
+    my $has_curses = eval { require Config::Model::CursesUI; 1; };
 
     my $ui_type = $opt->{ui};
 
@@ -91,8 +89,8 @@ sub execute {
 
         print "In case of error, check $err_file\n";
 
-        open( my $fh, ">", $err_file ) || die "Can't open $err_file: $!";
-        open(STDERR, ">&", $fh);
+        open( my $fh, ">", $err_file ) || die "Can't open $err_file: $!\n";
+        open(STDERR, ">&", $fh)|| die "Can't open STDERR:$!\n";
 
         my $dialog = Config::Model::CursesUI->new();
 
@@ -107,7 +105,7 @@ sub execute {
         $self ->run_tk_ui ( $inst, $opt);
     }
     else {
-        die "Unsupported user interface: $ui_type";
+        die "Unsupported user interface: $ui_type\n";
     }
     return;
 }
@@ -126,7 +124,7 @@ App::Cme::Command::edit - Edit the configuration of an application
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 SYNOPSIS
 
@@ -193,7 +191,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2020 by Dominique Dumont.
+This software is Copyright (c) 2014-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

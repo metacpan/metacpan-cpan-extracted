@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-# Copyright (c) 2019 by Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -8,28 +8,32 @@
 
 use strict;
 use warnings;
-use Math::Polynomial::Cyclotomic qw(cyclo_poly_iterate cyclo_factors_iterate);
+use Math::Polynomial::Cyclotomic qw(
+    cyclo_poly_iterate cyclo_factors cyclo_plusfactors
+);
 
 local $Math::Polynomial::max_degree;
 
-my $USAGE = "usage: cyclo_poly [-f] {n|min max}\n";
-my $factorize = 0;
+my $USAGE = "usage: cyclo_poly [-f|F] {n|min max}\n";
+my $f_sign  = q[];
 while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
     my $opt = $1;
     shift @ARGV;
-    last if $opt eq '-';
-    $factorize = 1, next if $opt eq 'f';
+    last                 if $opt eq '-';
+    $f_sign  = '-', next if $opt eq 'f';
+    $f_sign  = '+', next if $opt eq 'F';
     die $USAGE;
 }
 die $USAGE if !@ARGV || @ARGV > 2 || grep {!/^[1-9][0-9]*\z/} @ARGV;
 
 my ($min, $max) = sort { $a <=> $b } @ARGV;
 $max ||= $min;
-if ($factorize) {
-    my $it = cyclo_factors_iterate($min);
+if ($f_sign) {
+    my $table = {};
+    my $func  = '+' eq $f_sign? \&cyclo_plusfactors: \&cyclo_factors;
     for (my $n = $min; $n <= $max; ++$n) {
-        my @factors = $it->();
-        print "(x^$n - 1) = ", join(q[ * ], @factors), "\n";
+        my @factors = $func->($n, $table);
+        print "x^$n $f_sign 1 = ", join(q[ * ], @factors), "\n";
     }
 }
 else {

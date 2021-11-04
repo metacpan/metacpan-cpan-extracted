@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -187,11 +187,11 @@ Class::Std::initialize();
               DeliveryOptionEligibilityDetails
               Events
 
-              )
+            )
         ],
-        {   'Notification'   => \%Notification_of,
-            'TrackingNumber' => \%TrackingNumber_of,
-            'Barcode'        => \%Barcode_of,
+        {   'Notification'                   => \%Notification_of,
+            'TrackingNumber'                 => \%TrackingNumber_of,
+            'Barcode'                        => \%Barcode_of,
             'TrackingNumberUniqueIdentifier' =>
               \%TrackingNumberUniqueIdentifier_of,
             'StatusDetail'              => \%StatusDetail_of,
@@ -201,47 +201,47 @@ Class::Std::initialize();
             'DestinationServiceArea'    => \%DestinationServiceArea_of,
             'DestinationServiceAreaDescription' =>
               \%DestinationServiceAreaDescription_of,
-            'CarrierCode'      => \%CarrierCode_of,
-            'OperatingCompany' => \%OperatingCompany_of,
+            'CarrierCode'                          => \%CarrierCode_of,
+            'OperatingCompany'                     => \%OperatingCompany_of,
             'OperatingCompanyOrCarrierDescription' =>
               \%OperatingCompanyOrCarrierDescription_of,
             'CartageAgentCompanyName' => \%CartageAgentCompanyName_of,
             'ProductionLocationContactAndAddress' =>
               \%ProductionLocationContactAndAddress_of,
-            'OtherIdentifiers'          => \%OtherIdentifiers_of,
-            'FormId'                    => \%FormId_of,
-            'Service'                   => \%Service_of,
-            'PackageWeight'             => \%PackageWeight_of,
-            'PackageDimensions'         => \%PackageDimensions_of,
-            'PackageDimensionalWeight'  => \%PackageDimensionalWeight_of,
-            'ShipmentWeight'            => \%ShipmentWeight_of,
-            'Packaging'                 => \%Packaging_of,
-            'PackagingType'             => \%PackagingType_of,
-            'PackageSequenceNumber'     => \%PackageSequenceNumber_of,
-            'PackageCount'              => \%PackageCount_of,
-            'Charges'                   => \%Charges_of,
-            'NickName'                  => \%NickName_of,
-            'Notes'                     => \%Notes_of,
-            'Attributes'                => \%Attributes_of,
-            'ShipmentContents'          => \%ShipmentContents_of,
-            'PackageContents'           => \%PackageContents_of,
-            'ClearanceLocationCode'     => \%ClearanceLocationCode_of,
-            'Commodities'               => \%Commodities_of,
-            'ReturnDetail'              => \%ReturnDetail_of,
-            'CustomsOptionDetails'      => \%CustomsOptionDetails_of,
-            'AdvanceNotificationDetail' => \%AdvanceNotificationDetail_of,
-            'SpecialHandlings'          => \%SpecialHandlings_of,
-            'Shipper'                   => \%Shipper_of,
-            'PossessionStatus'          => \%PossessionStatus_of,
-            'ShipperAddress'            => \%ShipperAddress_of,
-            'OriginLocationAddress'     => \%OriginLocationAddress_of,
-            'OriginStationId'           => \%OriginStationId_of,
-            'EstimatedPickupTimestamp'  => \%EstimatedPickupTimestamp_of,
-            'ShipTimestamp'             => \%ShipTimestamp_of,
-            'TotalTransitDistance'      => \%TotalTransitDistance_of,
-            'DistanceToDestination'     => \%DistanceToDestination_of,
-            'SpecialInstructions'       => \%SpecialInstructions_of,
-            'Recipient'                 => \%Recipient_of,
+            'OtherIdentifiers'              => \%OtherIdentifiers_of,
+            'FormId'                        => \%FormId_of,
+            'Service'                       => \%Service_of,
+            'PackageWeight'                 => \%PackageWeight_of,
+            'PackageDimensions'             => \%PackageDimensions_of,
+            'PackageDimensionalWeight'      => \%PackageDimensionalWeight_of,
+            'ShipmentWeight'                => \%ShipmentWeight_of,
+            'Packaging'                     => \%Packaging_of,
+            'PackagingType'                 => \%PackagingType_of,
+            'PackageSequenceNumber'         => \%PackageSequenceNumber_of,
+            'PackageCount'                  => \%PackageCount_of,
+            'Charges'                       => \%Charges_of,
+            'NickName'                      => \%NickName_of,
+            'Notes'                         => \%Notes_of,
+            'Attributes'                    => \%Attributes_of,
+            'ShipmentContents'              => \%ShipmentContents_of,
+            'PackageContents'               => \%PackageContents_of,
+            'ClearanceLocationCode'         => \%ClearanceLocationCode_of,
+            'Commodities'                   => \%Commodities_of,
+            'ReturnDetail'                  => \%ReturnDetail_of,
+            'CustomsOptionDetails'          => \%CustomsOptionDetails_of,
+            'AdvanceNotificationDetail'     => \%AdvanceNotificationDetail_of,
+            'SpecialHandlings'              => \%SpecialHandlings_of,
+            'Shipper'                       => \%Shipper_of,
+            'PossessionStatus'              => \%PossessionStatus_of,
+            'ShipperAddress'                => \%ShipperAddress_of,
+            'OriginLocationAddress'         => \%OriginLocationAddress_of,
+            'OriginStationId'               => \%OriginStationId_of,
+            'EstimatedPickupTimestamp'      => \%EstimatedPickupTimestamp_of,
+            'ShipTimestamp'                 => \%ShipTimestamp_of,
+            'TotalTransitDistance'          => \%TotalTransitDistance_of,
+            'DistanceToDestination'         => \%DistanceToDestination_of,
+            'SpecialInstructions'           => \%SpecialInstructions_of,
+            'Recipient'                     => \%Recipient_of,
             'LastUpdatedDestinationAddress' =>
               \%LastUpdatedDestinationAddress_of,
             'DestinationAddress'         => \%DestinationAddress_of,
@@ -252,7 +252,7 @@ Class::Std::initialize();
             'DestinationLocationType'    => \%DestinationLocationType_of,
             'DestinationLocationTimeZoneOffset' =>
               \%DestinationLocationTimeZoneOffset_of,
-            'CommitmentTimestamp' => \%CommitmentTimestamp_of,
+            'CommitmentTimestamp'          => \%CommitmentTimestamp_of,
             'AppointmentDeliveryTimestamp' =>
               \%AppointmentDeliveryTimestamp_of,
             'EstimatedDeliveryTimestamp'  => \%EstimatedDeliveryTimestamp_of,
@@ -305,17 +305,17 @@ Class::Std::initialize();
               'Shipment::FedEx::WSDL::TrackTypes::ContactAndAddress',
             'OtherIdentifiers' =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail',
-            'FormId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'FormId'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'Service' =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackServiceDescriptionDetail',
-            'PackageWeight' => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
+            'PackageWeight'     => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
             'PackageDimensions' =>
               'Shipment::FedEx::WSDL::TrackTypes::Dimensions',
             'PackageDimensionalWeight' =>
               'Shipment::FedEx::WSDL::TrackTypes::Weight',
             'ShipmentWeight' => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
             'Packaging'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PackagingType' =>
+            'PackagingType'  =>
               'Shipment::FedEx::WSDL::TrackTypes::PackagingType',
             'PackageSequenceNumber' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
@@ -323,8 +323,8 @@ Class::Std::initialize();
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'Charges' =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail',
-            'NickName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Notes'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'NickName'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Notes'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'Attributes' =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackDetailAttributeType',
             'ShipmentContents' =>
@@ -332,7 +332,7 @@ Class::Std::initialize();
             'PackageContents' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'ClearanceLocationCode' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Commodities' => 'Shipment::FedEx::WSDL::TrackTypes::Commodity',
+            'Commodities'  => 'Shipment::FedEx::WSDL::TrackTypes::Commodity',
             'ReturnDetail' =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail',
             'CustomsOptionDetails' =>
@@ -341,7 +341,7 @@ Class::Std::initialize();
               'Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail',
             'SpecialHandlings' =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling',
-            'Shipper' => 'Shipment::FedEx::WSDL::TrackTypes::Contact',
+            'Shipper'          => 'Shipment::FedEx::WSDL::TrackTypes::Contact',
             'PossessionStatus' =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackPossessionStatusType',
             'ShipperAddress' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
@@ -412,23 +412,23 @@ Class::Std::initialize();
         },
         {
 
-            'Notification'   => 'Notification',
-            'TrackingNumber' => 'TrackingNumber',
-            'Barcode'        => 'Barcode',
+            'Notification'                   => 'Notification',
+            'TrackingNumber'                 => 'TrackingNumber',
+            'Barcode'                        => 'Barcode',
             'TrackingNumberUniqueIdentifier' =>
               'TrackingNumberUniqueIdentifier',
-            'StatusDetail'              => 'StatusDetail',
-            'CustomerExceptionRequests' => 'CustomerExceptionRequests',
-            'Reconciliation'            => 'Reconciliation',
-            'ServiceCommitMessage'      => 'ServiceCommitMessage',
-            'DestinationServiceArea'    => 'DestinationServiceArea',
+            'StatusDetail'                      => 'StatusDetail',
+            'CustomerExceptionRequests'         => 'CustomerExceptionRequests',
+            'Reconciliation'                    => 'Reconciliation',
+            'ServiceCommitMessage'              => 'ServiceCommitMessage',
+            'DestinationServiceArea'            => 'DestinationServiceArea',
             'DestinationServiceAreaDescription' =>
               'DestinationServiceAreaDescription',
-            'CarrierCode'      => 'CarrierCode',
-            'OperatingCompany' => 'OperatingCompany',
+            'CarrierCode'                          => 'CarrierCode',
+            'OperatingCompany'                     => 'OperatingCompany',
             'OperatingCompanyOrCarrierDescription' =>
               'OperatingCompanyOrCarrierDescription',
-            'CartageAgentCompanyName' => 'CartageAgentCompanyName',
+            'CartageAgentCompanyName'             => 'CartageAgentCompanyName',
             'ProductionLocationContactAndAddress' =>
               'ProductionLocationContactAndAddress',
             'OtherIdentifiers'              => 'OtherIdentifiers',
@@ -514,7 +514,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

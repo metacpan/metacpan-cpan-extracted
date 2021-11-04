@@ -1,5 +1,15 @@
 Revision history for Hash::Match
 
+v0.7.1    2021-10-19 16:57:52+01:00 Europe/London
+  [Documentation]
+  - Fixed typo.
+
+  [Other]
+  - Add List::SomeUtils::XS to recommended prereqs.
+
+  [Toolchain]
+  - Removed use of Travis-CI.
+
 v0.7.0    2018-10-19 17:16:55+01:00 Europe/London
   [Enhancements]
   - Uses Ref::Util for improved performance.

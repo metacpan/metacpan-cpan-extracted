@@ -26,26 +26,26 @@ isa_ok( $mercury, 'Lab::Moose::Instrument::OI_Mercury::Magnet' );
 my $catalogue = $mercury->get_catalogue();
 like( $catalogue, qr/DEV:GRP/, "get_catalogue" );
 
-# get_temperature,
-# at our setup it shows 813K ?!
-is_absolute_error( $mercury->get_temperature(), 500, 500, "get_temperature" );
+# # get_temperature,
+# # at our setup it shows 813K ?!
+# is_absolute_error( $mercury->get_temperature(), 500, 500, "get_temperature" );
 
-# get_he_level
-my $level = $mercury->get_he_level();
-ok( $level > 10, "get_he_level" );
+# # get_he_level
+# my $level = $mercury->get_he_level();
+# ok( $level > 10, "get_he_level" );
 
-# get_he_level_resistance
-my $res = $mercury->get_he_level_resistance();
-ok( $res > 0, "get_he_level_resistance" );
+# # get_he_level_resistance
+# my $res = $mercury->get_he_level_resistance();
+# ok( $res > 0, "get_he_level_resistance" );
 
-# get_n2_level
-ok( $mercury->get_n2_level() > 10, "get_n2_level" );
+# # get_n2_level
+# ok( $mercury->get_n2_level() > 10, "get_n2_level" );
 
-# get_n2_level_frequency
-ok( $mercury->get_n2_level_frequency() > 0, "get_n2_level_frequency" );
+# # get_n2_level_frequency
+# ok( $mercury->get_n2_level_frequency() > 0, "get_n2_level_frequency" );
 
-# get_n2_level_counter
-ok( $mercury->get_n2_level_counter() > 0, "get_n2_level_counter" );
+# # get_n2_level_counter
+# ok( $mercury->get_n2_level_counter() > 0, "get_n2_level_counter" );
 
 # oim_get_current
 my $current = $mercury->oim_get_current();
@@ -74,13 +74,13 @@ is_float(
 );
 
 # field sweeprate
-is(
-    $mercury->oim_set_field_sweeprate( value => 0.0015 ), 0.0015,
+is_absolute_error(
+    $mercury->oim_set_field_sweeprate( value => 0.0015 ), 0.0015, 0.0001,
     "oim_set_field_sweeprate"
 );
 
-is_float(
-    $mercury->oim_get_field_sweeprate(), 0.0015,
+is_absolute_error(
+    $mercury->oim_get_field_sweeprate(), 0.0015, 0.0001,
     "oim_get_field_sweeprate"
 );
 
@@ -105,12 +105,12 @@ is_float(
 );
 
 # field setpoint
-is(
-    $mercury->oim_set_field_setpoint( value => 0.0023 ), 0.0023,
+is_absolute_error(
+    $mercury->oim_set_field_setpoint( value => 0.0023 ), 0.0023, 0.0001,
     "oim_set_field_setpoint"
 );
-is_float(
-    $mercury->oim_get_field_setpoint(), 0.0023,
+is_absolute_error(
+    $mercury->oim_get_field_setpoint(), 0.0023, 0.0001,
     "oim_get_field_setpoint"
 );
 

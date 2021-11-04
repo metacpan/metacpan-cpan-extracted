@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Bitcoin::BIP39" : "0.002",
-            "CryptX" : "0.062",
+            "CryptX" : "0.073",
             "Math::BigInt" : "1.999808",
             "Moo" : "2.003004",
             "Type::Tiny" : "1.004000",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/brtastic/perl-bitcoin-crypto"
       }
    },
-   "version" : "1.002",
+   "version" : "1.004",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

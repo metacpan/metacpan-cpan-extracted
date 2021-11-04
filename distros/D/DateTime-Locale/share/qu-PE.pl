@@ -19,6 +19,7 @@
     GyMMM => "MMM y G",
     GyMMMEd => "E, d MMM, y G",
     GyMMMd => "d MMM, y G",
+    GyMd => "d/M/y GGGGG",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -115,16 +116,16 @@
     "Domingo",
   ],
   era_abbreviated => [
-    "BCE",
+    "a.d.",
     "d.C.",
   ],
   era_narrow => [
-    "BCE",
+    "a.d.",
     "dC",
   ],
   era_wide => [
-    "BCE",
-    "d.C.",
+    "\N{U+00f1}awpa cristu",
+    "chanta cristu",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -266,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 39,
+  version => 40,
 }

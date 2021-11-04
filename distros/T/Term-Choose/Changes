@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.743   2021-10-18
+    - Update Documentation.
+    - Search regex: no 'qr'.
+
 1.742   2021-10-02
     - Update ValidateOptions.
     - Update user_input.

@@ -7,8 +7,8 @@ use Importer 'NewsExtractor::TextUtil' => ('html2text', 'normalize_whitespace', 
 
 sub headline {
     my ($self) = @_;
-    my $el = $self->dom->at('.news-detail-box > hgroup:nth-child(1) > h1:nth-child(1)');
-    return normalize_whitespace( $el->all_text );
+    my $el = $self->dom->at('meta[property="og:title"]');
+    return normalize_whitespace( $el->attr("content") );
 }
 
 sub dateline {

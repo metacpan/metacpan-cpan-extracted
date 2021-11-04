@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort;
-$Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort::VERSION = '3.05';
+$Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -30,7 +30,7 @@ sub ProcessXAV {
     die "ProcessXAV must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ProcessXAV',
+        {   operation   => 'ProcessXAV',
             soap_action =>
               'http://onlinetools.ups.com/webservices/XAVBinding/v1.0',
             style => 'document',
@@ -63,7 +63,7 @@ sub ProcessXAV {
                     'use'         => 'literal',
                     namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                     encodingStyle => '',
-                    parts =>
+                    parts         =>
                       [qw( Shipment::UPS::WSDL::XAVElements::XAVResponse )],
                 },
             }
@@ -114,7 +114,7 @@ Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

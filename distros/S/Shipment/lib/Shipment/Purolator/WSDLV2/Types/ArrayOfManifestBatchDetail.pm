@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ArrayOfManifestBatchDetail;
-$Shipment::Purolator::WSDLV2::Types::ArrayOfManifestBatchDetail::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::ArrayOfManifestBatchDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        ManifestBatchDetail
 
-              )
+            )
         ],
         {'ManifestBatchDetail' => \%ManifestBatchDetail_of,},
         {   'ManifestBatchDetail' =>
@@ -56,7 +56,7 @@ Shipment::Purolator::WSDLV2::Types::ArrayOfManifestBatchDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

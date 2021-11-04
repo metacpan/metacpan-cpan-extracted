@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType;
-$Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               ReturnOfDocumentIndicator
               UPScarbonneutralIndicator
 
-              )
+            )
         ],
         {   'SaturdayPickupIndicator'   => \%SaturdayPickupIndicator_of,
             'SaturdayDeliveryIndicator' => \%SaturdayDeliveryIndicator_of,
@@ -92,7 +92,7 @@ Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -30,7 +30,7 @@ provides:
     version: '0'
   urpmi:
     file: urpmi.pm
-    version: v8.126.0
+    version: v8.127.0
 requires:
   Filesys::Df: '0'
   Getopt::Long: '0'
@@ -44,5 +44,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://git.mageia.org/software/rpm/urpmi/
-version: v8.126
+version: v8.127
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

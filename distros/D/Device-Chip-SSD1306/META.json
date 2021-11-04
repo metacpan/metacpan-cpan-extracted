@@ -23,7 +23,7 @@
          "requires" : {
             "Device::Chip" : "0",
             "Future::AsyncAwait" : "0.39",
-            "Object::Pad" : "0.19",
+            "Object::Pad" : "0.51",
             "perl" : "5.026"
          }
       },
@@ -37,15 +37,15 @@
    "provides" : {
       "Device::Chip::SSD1306" : {
          "file" : "lib/Device/Chip/SSD1306.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Device::Chip::SSD1306::I2C" : {
          "file" : "lib/Device/Chip/SSD1306/I2C.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Device::Chip::SSD1306::SPI4" : {
          "file" : "lib/Device/Chip/SSD1306/SPI4.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

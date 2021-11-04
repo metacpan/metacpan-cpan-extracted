@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Math::BigInt;
 
 =head1 NAME
 
@@ -10,11 +11,11 @@ works and produces an RFC3280-valid certificate revocation lists.
 
 =cut
 
-use Test::More "no_plan";
+use Test2::V0;
 
 use Crypt::OpenSSL::CA::Test qw(run_perl_script_ok run_thru_openssl
                                 dumpasn1_available run_dumpasn1
-                                certificate_chain_ok);
+                                like_bigint certificate_chain_ok);
 
 use File::Spec::Functions qw(catfile);
 
@@ -29,12 +30,7 @@ is(scalar(@crls), 2, "make-crls.pl produced 2 CRLs on standard output")
   or die "No point in testing anything else...";
 my ($crlv2, $deltacrl) = @crls;
 
-# For some reason, OpenSSL displays the CRL number in decimal.  The
-# string below is 0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef in
-# decimal:
-my $crlnumber_decimal = "1271270613000041655817448348132275889066893754095";
-# Same number plus one:
-my $next_crlnumber_decimal = "1271270613000041655817448348132275889066893754096";
+my $crl_serial = Math::BigInt->from_hex("deadbeef" x 5);
 
 =head1 DESCRIPTION
 
@@ -51,7 +47,7 @@ for the CRL must show up in C<openssl crl> or C<dumpasn1>.
 
   like($crldump, qr/last update:.*2007/i);
   like($crldump, qr/next update:.*2057/i);
-  like($crldump, qr/$crlnumber_decimal/);
+  like_bigint($crldump, $crl_serial);
   like($crldump, qr/CRL Number.*critical/i);
   # Right now OpenSSL cannot parse freshest CRL indicator:
   like($crldump, qr/deltacrl\.crl/);
@@ -78,8 +74,11 @@ for the CRL must show up in C<openssl crl> or C<dumpasn1>.
 
   like($crldump, qr/last update:.*2007/i);
   like($crldump, qr/next update:.*2057/i);
-  like($crldump, qr/CRL Number:.*critical.*\n.*$next_crlnumber_decimal/i);
-  like($crldump, qr/delta CRL.*critical.*\n.*$crlnumber_decimal/i);
+
+  fail "CRL Number not found" unless $crldump =~ qr/CRL Number:.*critical.*\n\s*([0-9a-fx:]+)/i;
+  like_bigint($1, $crl_serial + 1);
+  fail "delta CRL not found" unless $crldump =~ qr/delta CRL.*critical.*\n\s*([0-9a-fx:]+)/i;
+  like_bigint($1, $crl_serial);
 
   my %crlentries = parse_crl_entries($crldump);
 
@@ -88,6 +87,8 @@ for the CRL must show up in C<openssl crl> or C<dumpasn1>.
   like($crlentries{"42"}, qr/remove|8/i);
   like($crlentries{"DEADBEEFDEAFF00F"}, qr/2007/i);
 }
+
+done_testing;
 
 =head1 HELPER FUNCTIONS
 

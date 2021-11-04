@@ -1,5 +1,9 @@
 Revision history for BankAccount::Validator::UK
 
+0.61  2021-10-14T16:10:00:+01:00
+      - Updated the valacdos.txt (v6.80)
+      - Removed sort code range: 233272-233272.
+
 0.60  2021-10-03T19:45:00:+01:00
       - Improved test, thanks @onefloid.
 

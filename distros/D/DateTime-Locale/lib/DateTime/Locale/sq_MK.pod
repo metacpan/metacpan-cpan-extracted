@@ -417,6 +417,12 @@ Albanian North Macedonia locale.
    1995-12-22T09:05:02 = 22 dhj 1995 mb.K.
   -0010-09-15T04:44:23 = 15 sht -10 p.K.
 
+=head3 GyMd (d.M.y GGGG)
+
+   2008-02-05T18:30:30 = 5.2.2008 mbas Krishtit
+   1995-12-22T09:05:02 = 22.12.1995 mbas Krishtit
+  -0010-09-15T04:44:23 = 15.9.-10 para Krishtit
+
 =head3 H (HH)
 
    2008-02-05T18:30:30 = 18

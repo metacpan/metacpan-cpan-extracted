@@ -1,5 +1,19 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.5.0    2021-10-19 16:55:34+01:00 Europe/London
+  [Enhancements]
+  - Add .yml files to the misc_extensions rule.
+
+  - Add .mv and .mvc to the script_extensions rule.
+
+  - Add ip_address_referer rule.
+
+  [Documentation]
+  - Gave an example of adding an exception to a rule, GH#3.
+
+  [Tests]
+  - Add text cases.
+
 v0.4.4    2021-04-21 16:45:59+01:00 Europe/London
   [Enhancements]
   - Add more file extensions to script_extensions rule.

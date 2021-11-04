@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::getLocations;
-$Shipment::Temando::WSDL::Elements::getLocations::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::getLocations::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -46,13 +46,13 @@ use warnings;
                   description
                   type
 
-                  )
+                )
             ],
             {   'clientId'    => \%clientId_of,
                 'description' => \%description_of,
                 'type'        => \%type_of,
             },
-            {   'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',
+            {   'clientId'    => 'Shipment::Temando::WSDL::Types::ClientId',
                 'description' =>
                   'Shipment::Temando::WSDL::Types::LocationName',
                 'type' => 'Shipment::Temando::WSDL::Types::LocationPosition',
@@ -85,7 +85,7 @@ Shipment::Temando::WSDL::Elements::getLocations
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

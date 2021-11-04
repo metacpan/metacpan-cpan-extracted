@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::BrowserServer;
-$Playwright::BrowserServer::VERSION = '0.016';
+$Playwright::BrowserServer::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,21 +18,15 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
+sub spec {
+    return $Playwright::spec->{'BrowserServer'}{members};
+}
+
 sub kill {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'kill',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub wsEndpoint {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'wsEndpoint',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -53,6 +47,16 @@ sub process {
     return $self->_api_request(
         args    => [@_],
         command => 'process',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub wsEndpoint {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'wsEndpoint',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -102,7 +106,7 @@ Playwright::BrowserServer - Automatically generated class for Playwright::Browse
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 
@@ -119,12 +123,6 @@ Execute the BrowserServer::kill playwright routine.
 
 See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-kill> for more information.
 
-=head2 wsEndpoint(@args)
-
-Execute the BrowserServer::wsEndpoint playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
-
 =head2 close(@args)
 
 Execute the BrowserServer::close playwright routine.
@@ -136,6 +134,12 @@ See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-close> for mo
 Execute the BrowserServer::process playwright routine.
 
 See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-process> for more information.
+
+=head2 wsEndpoint(@args)
+
+Execute the BrowserServer::wsEndpoint playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
 
 =head2 on(@args)
 

@@ -17,8 +17,9 @@ use URI::Escape;
 use Plack::Request;
 use Plack::Response;
 use Web::Solid::Auth::Listener;
+use Web::Solid::Auth::Util;
 
-our $VERSION = "0.3";
+our $VERSION = "0.91";
 
 has webid => (
     is => 'ro' ,
@@ -44,10 +45,12 @@ has listener => (
 has issuer => (
     is => 'lazy'
 );
+has client_id => (
+    is => 'ro',
+);
 
 sub _build_agent {
-    my $ua     = new LWP::UserAgent;
-    my $agent  = "Web::Solid::Auth/$VERSION " . $ua->agent;
+    my $ua = LWP::UserAgent->new(agent => "Web::Solid::Auth/$VERSION");
     $ua;
 }
 
@@ -94,14 +97,6 @@ sub make_clean {
     $self;
 }
 
-sub make_client {
-    my $self = shift;
-    my $client_registration = $self->get_client_configuration;
-    return undef unless $client_registration;
-    $self->{client_id} = $client_registration->{client_id};
-    $self;
-}
-
 sub make_authorization_request {
     my $self = shift;
 
@@ -119,14 +114,14 @@ sub make_authorization_request {
     my $state          = $self->make_random_string;
 
     my $url = $self->make_url(
-      $authorization_endpoint, {
-        code_challenge          => $code_challenge ,
-        code_challenge_method   => 'S256' ,
-        state                   => $state ,
-        scope                   => 'openid profile offline_access' ,
-        client_id               => $client_id ,
-        response_type           => 'code' ,
-        redirect_uri            => $redirect_uri ,
+        $authorization_endpoint, {
+          code_challenge          => $code_challenge ,
+          code_challenge_method   => 'S256' ,
+          state                   => $state ,
+          scope                   => 'openid profile offline_access' ,
+          client_id               => $client_id ,
+          response_type           => 'code' ,
+          redirect_uri            => $redirect_uri ,
     });
 
     $self->{state}         = $state;
@@ -148,21 +143,50 @@ sub make_access_token {
     my $registration_conf = $self->get_client_configuration;
 
     my $token_endpoint    = $openid_conf->{token_endpoint};
+    my $token_endpoint_auth_methods_supported = $openid_conf->{token_endpoint_auth_methods_supported} // [];
+
+    # Make an array out of an string...
+    $token_endpoint_auth_methods_supported = 
+            ref($token_endpoint_auth_methods_supported) eq 'ARRAY' ?
+                $token_endpoint_auth_methods_supported :
+                [$token_endpoint_auth_methods_supported];
+
     my $client_id         = $registration_conf->{client_id};
+    my $client_secret     = $registration_conf->{client_secret};
 
     my $dpop_token = $self->make_token_for($token_endpoint,'POST');
 
     $self->log->info("requesting access token at $token_endpoint");
 
-    my $data = $self->post_json($token_endpoint, {
+    my $token_request  = {
         grant_type    => 'authorization_code' ,
         client_id     => $client_id ,
         redirect_uri  => $redirect_uri ,
         code          => $code ,
         code_verifier => $self->{code_verifier}
-    }, DPoP => $dpop_token);
+    };
+
+    my %headers = (
+        'Content-Type' => 'application/x-www-form-urlencoded' ,
+        DPoP => $dpop_token
+    );
+
+    if (grep(/^client_secret_basic/, @$token_endpoint_auth_methods_supported)) {
+        $self->log->info('using client_secret_basic');
+        $headers{'Authorization'} = 'Basic ' . MIME::Base64::encode_base64url("$client_id:$client_secret");
+    }
+    elsif (grep(/^client_secret_post/, @$token_endpoint_auth_methods_supported)) {
+        $self->log->info('using client_secret_post');
+        $token_request->{client_secret} = $client_secret;
+    }
+
+    my $data = $self->post( $token_endpoint, $token_request , %headers );
 
     return undef unless $data;
+
+    $data = decode_json($data);
+
+    $self->log->infof("received: %s", $data);
 
     my $cache_dir = $self->get_cache_dir;
     path($cache_dir)->mkpath unless -d $cache_dir;
@@ -191,6 +215,9 @@ sub make_authentication_headers {
 sub get_cache_dir {
     my $self = shift;
     my $webid      = $self->webid;
+
+    die "No webid set" unless $webid;
+
     my $webid_sha  = Digest::SHA::sha1_hex($webid);
     my $cache_dir  = sprintf "%s/%s"
                             , $self->cache
@@ -236,6 +263,39 @@ sub get_openid_provider {
       }
     }
 
+    if ($issuer) {
+        return $issuer;
+    }
+    else {
+        # Try the webid to find the issuer
+        return $self->get_webid_openid_provider($webid);
+    }
+}
+
+sub get_webid_openid_provider {
+    my ($self, $webid) = @_;
+    $webid //= $self->webid;
+
+    # Lets try plain JSON parsing for fun..
+    my $res = $self->get($webid, 'Accept' => 'text/turtle');
+
+    return undef unless $res;
+
+    my $util  = Web::Solid::Auth::Util->new;
+    my $model = $util->parse_turtle($res);
+
+    my $sparql =<<EOF;
+SELECT ?oidcIssuer {
+    ?subject <http://www.w3.org/ns/solid/terms#oidcIssuer> ?oidcIssuer .
+}
+EOF
+
+    my $issuer;
+    $util->sparql($model, $sparql, sub {
+        my $res = shift;
+        $issuer = $res->value('oidcIssuer')->as_string;
+    });
+
     return $issuer;
 }
 
@@ -252,25 +312,37 @@ sub get_client_configuration {
     my $cache_file = path($cache_dir)->child("client.json")->stringify;
 
     unless (-f $cache_file) {
-        $self->log->info("registering client at $registration_endpoint");
+        if ($self->client_id) {
+            $self->log->info("using client document at " . $self->client_id);
 
-        # Dynamic register the client. We request the openid and profile
-        # scopes that are default for OpenID. The offline_access is
-        # to be able to request refresh_tokens (not yet implemented).
-        # The only safe response type is 'code' all other options send
-        # sensitive data over the front channel and shouldn't be used.
-        my $data = $self->post_json($registration_endpoint, {
-            grant_types      => ["authorization_code", "refresh_token"],
-            redirect_uris    => [ $redirect_uri ] ,
-            scope            => "openid profile offline_access" ,
-            response_types   => ["code"]
-        });
+            my $data = $self->get_json($self->client_id);
+            $self->log->debug("generating $cache_file");
 
-        return undef unless $data;
+            path("$cache_file")->spew(encode_json($data));
+        }
+        else {
+            $self->log->info("registering client at $registration_endpoint");
 
-        $self->log->debug("generating $cache_file");
+            # Dynamic register the client. We request the openid and profile
+            # scopes that are default for OpenID. The offline_access is
+            # to be able to request refresh_tokens (not yet implemented).
+            # The only safe response type is 'code' all other options send
+            # sensitive data over the front channel and shouldn't be used.
+            my $data = $self->post_json($registration_endpoint, {
+                grant_types      => ["authorization_code", "refresh_token"],
+                redirect_uris    => [ $redirect_uri ] ,
+                scope            => "openid profile offline_access" ,
+                response_types   => ["code"]
+            });
 
-        path("$cache_file")->spew(encode_json($data));
+            return undef unless $data;
+
+            $self->log->infof("received %s", $data);
+
+            $self->log->debug("generating $cache_file");
+
+            path("$cache_file")->spew(encode_json($data));
+        }
     }
 
     $self->log->debug("reading $cache_file");
@@ -286,6 +358,9 @@ sub get_openid_configuration {
     my ($self) = @_;
 
     my $issuer    = $self->issuer;
+    
+    # remove trailing slash (we will add it)
+    $issuer =~ s{\/$}{};
 
     my $cache_dir = $self->get_cache_dir;
     path($cache_dir)->mkpath unless -d $cache_dir;
@@ -301,6 +376,8 @@ sub get_openid_configuration {
         my $data = $self->get_json($url);
 
         return undef unless $data;
+
+        $self->log->infof("received %s", $data);
 
         $self->log->debug("generating $cache_file");
 
@@ -441,7 +518,11 @@ sub make_url {
 
 sub make_random_string {
     my $self = shift;
-    my $str = MIME::Base64::encode_base64url(Data::UUID->new->create());
+    my $str = MIME::Base64::encode_base64url(
+                    Data::UUID->new->create() .
+                    Data::UUID->new->create() .
+                    Data::UUID->new->create() 
+            );
     $str;
 }
 
@@ -505,6 +586,69 @@ Web::Solid::Auth - A Perl Solid Web Client
 
 =head1 SYNOPSIS
 
+    # On the command line
+
+    # Set your default webid
+    export SOLID_WEBID=https://timbl.inrupt.net/profile/card#me
+
+    # Authentication to a pod
+    solid_auth.pl authenticate
+
+    # Get the http headers for a authenticated request
+    solid_auth.pl headers GET https://timbl.inrupt.net/inbox/
+
+    # Act like a curl command and fetch authenticated content
+    solid_auth.pl curl -X GET https://timbl.inrupt.net/inbox/
+
+    # Add some data
+    solid_auth.pl curl -X POST \
+            -H "Content-Type: text/plain" \
+            -d "abc" \
+            https://timbl.inrupt.net/public/
+    
+    # Add a file
+    solid_auth.pl curl -X PUT \
+            -H "Content-Type: application/ld+json" \
+            -d "@myfile.jsonld" \
+            https://timbl.inrupt.net/public/myfile.jsonld 
+
+    # Set a solid base url
+    export SOLID_REMOTE_BASE=https://timbl.inrupt.net
+
+    # List all resources on some Pod path
+    solid_auth.pl list /public/
+
+    # Get some data
+    solid_auth.pl get /inbox/
+
+    # Post some data
+    solid_auth.pl post /inbox/ myfile.jsonld 
+
+    # Put some data
+    solid_auth.pl put /public/myfile.txt myfile.txt 
+
+    # Create a folder
+    solid_auth.pl put /public/mytestfolder/
+
+    # Delete some data
+    solid_auth.pl delete /public/myfile.txt
+
+    # Mirror a resource, container or tree
+    solid_auth.pl mirror /public/ ./my_copy
+
+    # Upload a directory to the pod
+    #  Add the -x option to do it for real (only a test without this option)
+    solid_auth.pl -r upload /data/my_copy /public/
+
+    # Clean all files in a container
+    #  Add the -x option to do it for real (only a test without this option)
+    solid_auth.pl --keep clean /demo/
+
+    # Clean a complete container 
+    #  Add the -x option to do it for real (only a test without this option)
+    solid_auth.pl -r clean /demo/
+
+    # In a perl program
     use Web::Solid::Auth;
     use Web::Solid::Auth::Listener;
 
@@ -547,6 +691,11 @@ Web::Solid::Auth - A Perl Solid Web Client
 
         #..do you curl..lwp::agent..or what ever with the headers
     }
+
+=head1 INSTALLATION
+
+See the L<https://metacpan.org/dist/Web-Solid-Auth/source/INSTALL> file in the 
+distribution.
 
 =head1 DESCRIPTION
 
@@ -608,11 +757,8 @@ L<solid_auth.pl>
 =head1 INSPIRATION
 
 This was very much inspired by the Python solid-flask code by
-Rai L<http://agentydragon.com> at L<https://gitlab.com/agentydragon/solid-flask>
-
-=head1 CONTRIBUTORS
-
-Patrick Hochstenbach, C<< patrick.hochstenbach at ugent.be >>
+Rai L<http://agentydragon.com> at L<https://gitlab.com/agentydragon/solid-flask>,
+and Jeff Zucker's <https://github.com/jeff-zucker> Solid-Shell at L<https://www.npmjs.com/package/solid-shell>.
 
 =head1 COPYRIGHT AND LICENSE
 

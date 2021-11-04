@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::CustomDeliveryWindowDetail;
-$Shipment::FedEx::WSDL::RateTypes::CustomDeliveryWindowDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::CustomDeliveryWindowDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               RequestRange
               RequestDate
 
-              )
+            )
         ],
         {   'Type'         => \%Type_of,
             'RequestTime'  => \%RequestTime_of,
@@ -72,7 +72,7 @@ Shipment::FedEx::WSDL::RateTypes::CustomDeliveryWindowDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

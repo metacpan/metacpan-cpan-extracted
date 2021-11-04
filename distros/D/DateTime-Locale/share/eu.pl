@@ -19,6 +19,7 @@
     GyMMM => "G y. 'urteko' MMM",
     GyMMMEd => "G y. 'urteko' MMM d, E",
     GyMMMd => "G y. 'urteko' MMM d",
+    GyMd => "GGGGG y-MM-dd",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -123,8 +124,8 @@
     "K.o.",
   ],
   era_narrow => [
-    "K.a.",
-    "K.o.",
+    "a",
+    "o",
   ],
   era_wide => [
     "K.a.",
@@ -270,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 39,
+  version => 40,
 }

@@ -7,15 +7,15 @@
 # dovix <dovix2003@yahoo.com>, 2003-2005
 # el-cuco <cuco3001@yahoo.com>, 2003
 # lev polvoi <lev@israsrv.net.il>, 2003
-# Omeritzics Games <omeritzicschwartz@gmail.com>, 2020-2021
-# Omeritzics Games <omeritzicschwartz@gmail.com>, 2020-2021
+# Omer I.S. <omeritzicschwartz@gmail.com>, 2020-2021
+# Omer I.S. <omeritzicschwartz@gmail.com>, 2020-2021
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2020-07-10 17:41+0100\n"
-"PO-Revision-Date: 2021-05-12 18:32+0000\n"
-"Last-Translator: Omeritzics Games <omeritzicschwartz@gmail.com>\n"
+"PO-Revision-Date: 2021-07-19 21:36+0000\n"
+"Last-Translator: Omer I.S. <omeritzicschwartz@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/MageiaLinux/mageia/language/"
 "he/)\n"
 "Language: he\n"
@@ -48,22 +48,22 @@ msgstr "חתימות החבילות נבדקות..."
 #: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:108
 #, c-format
 msgid "Preparing..."
-msgstr "כעת בהכנה..."
+msgstr "בהכנות..."
 
 #: ../gurpm/RPMProgressDialog.pm:313
 #, c-format
 msgid "Removing package `%s' ..."
-msgstr "כעת בהסרת החבילה „%s”..."
+msgstr "החבילה „%s” בהליכי הסרה..."
 
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
 msgid "Installing package `%s' (%s/%s)..."
-msgstr "כעת בהתקנת החבילה „%s”‏ (‏‏%s/%s)..."
+msgstr "החבילה „%s”‏ בהליכי התקנה (‏‏%s/%s)..."
 
 #: ../gurpm/RPMProgressDialog.pm:345
 #, c-format
 msgid "Downloading package `%s'..."
-msgstr "כעת בהורדת החבילה „%s”..."
+msgstr "החבילה „%s” בהליכי הורדה..."
 
 #: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:127
 #, c-format
@@ -253,7 +253,7 @@ msgstr "נדרשות הרשאות משתמש שורש (root)"
 #: ../gurpmi2:77
 #, c-format
 msgid "Preparing packages installation..."
-msgstr "החבילות להתקנה בהכנה..."
+msgstr "החבילות להתקנה בהכנות..."
 
 #: ../gurpmi2:92 ../urpmi:506
 #, c-format
@@ -314,7 +314,7 @@ msgid ""
 msgstr ""
 "החבילות הבאות יוסרו כדי שניתן יהיה לשדרג חבילות אחרות: \n"
 "%s\n"
-"האם להמשיך בכל זאת?"
+"להמשיך בכל זאת?"
 
 #: ../gurpmi2:250 ../urpmi:617
 #, c-format
@@ -404,7 +404,7 @@ msgstr "ההתקנה הסתיימה"
 #: ../gurpmi2:363 ../urpmi:694
 #, c-format
 msgid "restarting urpmi"
-msgstr "כעת בהפעלת urpmi מחדש"
+msgstr "‏urpmi מופעל מחדש"
 
 #: ../gurpmi2:386
 #, c-format
@@ -767,7 +767,7 @@ msgstr "        %s%% הורדו, מהירות = %s"
 #: ../urpm/download.pm:940
 #, c-format
 msgid "retrieving %s"
-msgstr "כעת באחזור %s"
+msgstr "‏%s מתקבל"
 
 #: ../urpm/download.pm:958
 #, c-format
@@ -792,7 +792,7 @@ msgstr "אין אפשרות לטפל בפרוטוקול: %s"
 #: ../urpm/get_pkgs.pm:28
 #, c-format
 msgid "cleaning %s and %s"
-msgstr "כעת בניקוי %s ו־%s"
+msgstr "‏%s ו־%s בהליכי ניקיון"
 
 #: ../urpm/get_pkgs.pm:140
 #, c-format
@@ -802,7 +802,7 @@ msgstr "החבילה %s לא נמצאה."
 #: ../urpm/get_pkgs.pm:268
 #, c-format
 msgid "retrieving rpm files from medium \"%s\"..."
-msgstr "כעת באחזור קובצי rpm ממאגר \"%s\"..."
+msgstr "מתקבלים קובצי rpm ממאגר \"%s\"..."
 
 #: ../urpm/install.pm:116 ../urpme:164
 #, c-format
@@ -822,7 +822,7 @@ msgstr "אין אפשרות להתקין את החבילה %s"
 #: ../urpm/install.pm:248
 #, c-format
 msgid "removing bad rpm (%s) from %s"
-msgstr "כעת בהסרת חבילת RPM פגומה (%s) מתוך %s"
+msgstr "מתבצעת הסרת חבילת RPM פגומה (%s) מתוך %s"
 
 #: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, c-format
@@ -832,7 +832,7 @@ msgstr "הסרת %s נכשלה: %s"
 #: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
-msgstr "כעת בהסרת החבילה %s"
+msgstr "החבילה %s בהליכי הסרה"
 
 #: ../urpm/install.pm:362
 #, c-format
@@ -848,7 +848,7 @@ msgstr "אין אפשרות לבצע את ההעברה"
 #: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
-msgstr "כעת בהסרת חבילות מותקנות (%s) מתוך %s"
+msgstr "מתבצעת הסרת חבילות מותקנות (%s) מתוך %s"
 
 #: ../urpm/install.pm:404
 #, c-format
@@ -898,7 +898,7 @@ msgstr "מסד הנתונים %s נעול. בהמתנה..."
 #: ../urpm/lock.pm:115
 #, c-format
 msgid "aborting"
-msgstr "כעת בביטול"
+msgstr "הביטול מתבצע"
 
 #: ../urpm/main_loop.pm:58
 #, c-format
@@ -940,7 +940,7 @@ msgstr "לחבילות הבאות יש בעיה בחתימות"
 #: ../urpm/main_loop.pm:140
 #, c-format
 msgid "Do you want to continue installation ?"
-msgstr "האם להמשיך בהתקנה ?"
+msgstr "להמשיך בהתקנה ?"
 
 #: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:291
 #: ../urpm/main_loop.pm:299
@@ -951,7 +951,7 @@ msgstr "ההתקנה נכשלה"
 #: ../urpm/main_loop.pm:159
 #, c-format
 msgid "removing installed rpms (%s)"
-msgstr "כעת בהסרת חבילות מותקנות (%s)"
+msgstr "מתבצעת הסרת חבילות מותקנות (%s)"
 
 #: ../urpm/main_loop.pm:185
 #, c-format
@@ -961,7 +961,7 @@ msgstr "לנסות להמשיך בכל זאת?"
 #: ../urpm/main_loop.pm:237
 #, c-format
 msgid "installing %s from %s"
-msgstr "כעת בהתקנת %s מתוך %s"
+msgstr "מתבצעת התקנת %s מתוך %s"
 
 #: ../urpm/main_loop.pm:239
 #, c-format
@@ -1082,7 +1082,7 @@ msgstr "דילוג על החבילה %s"
 #: ../urpm/media.pm:877
 #, c-format
 msgid "would install instead of upgrade package %s"
-msgstr "האם להתקין במקום לשדרג את החבילה %s"
+msgstr "להתקין במקום לשדרג את החבילה %s"
 
 #: ../urpm/media.pm:960
 #, c-format
@@ -1137,7 +1137,7 @@ msgstr ""
 #: ../urpm/media.pm:1242
 #, c-format
 msgid "retrieving media.cfg file..."
-msgstr "כעת באחזור הקובץ media.cfg..."
+msgstr "הקובץ media.cfg מתקבל..."
 
 #: ../urpm/media.pm:1285
 #, c-format
@@ -1152,12 +1152,12 @@ msgstr "בחירת מדיה מרובה:%s"
 #: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
-msgstr "כעת בהסרת מאגר \"%s\""
+msgstr "המאגר \"%s\" בהליכי הסרה"
 
 #: ../urpm/media.pm:1438
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
-msgstr "כעת בהגדרת urpmi מחדש למאגר \"%s\""
+msgstr "‏urpmi מוגדר מחדש למאגר \"%s\""
 
 #: ../urpm/media.pm:1472
 #, c-format
@@ -1182,7 +1182,7 @@ msgstr "המקור \"%s\" עדכני"
 #: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
-msgstr "כעת בבדיקת קובץ synthesis [%s]"
+msgstr "מתבצעת בדיקת קובץ synthesis [%s]"
 
 #: ../urpm/media.pm:1546
 #, c-format
@@ -1192,7 +1192,7 @@ msgstr "בעיה בקריאת קובץ מיזוג של מאגר \"%s\""
 #: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
-msgstr "כעת בהעתקת [%s] עבור מאגר \"%s\"..."
+msgstr "העתקת [%s] מתבצעת עבור מאגר \"%s\"..."
 
 #: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
@@ -1202,7 +1202,7 @@ msgstr "...ההעתקה נכשלה"
 #: ../urpm/media.pm:1627
 #, c-format
 msgid "copying description file of \"%s\"..."
-msgstr "מעתיק תיאור קובץ של \"%s\"..."
+msgstr "מועתק תיאור הקובץ של \"%s\"..."
 
 #: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
@@ -1232,7 +1232,7 @@ msgstr "genhdlist2 כשל על %s"
 #: ../urpm/media.pm:1735
 #, c-format
 msgid "comparing %s and %s"
-msgstr "כעת בחישוב של %s ושל %s"
+msgstr "מתבצע חישוב של %s ושל %s"
 
 #: ../urpm/media.pm:1765
 #, c-format
@@ -1242,7 +1242,7 @@ msgstr "קובץ hdlist %s לא תקף עבור מאגר \"%s\""
 #: ../urpm/media.pm:1791
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
-msgstr "קובץ ה־MD5SUM של \"%s\" מועתק..."
+msgstr "מועתק קובץ MD5SUM של \"%s\"..."
 
 #: ../urpm/media.pm:1831
 #, c-format
@@ -1257,7 +1257,7 @@ msgstr ""
 #: ../urpm/media.pm:1866
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
-msgstr "כעת בהורדת קובץ synthesis של \"%s\"..."
+msgstr "מתקבל קובץ synthesis של \"%s\"..."
 
 #: ../urpm/media.pm:1932
 #, c-format
@@ -1307,7 +1307,7 @@ msgstr ""
 #: ../urpm/mirrors.pm:306
 #, c-format
 msgid "getting mirror list from %s"
-msgstr "כעת בקבלת רשימת אתרי המַּראָה מתוך %s"
+msgstr "רשימת אתרי המַּראָה מתקבלת מתוך %s"
 
 #: ../urpm/msg.pm:74 ../urpmi:492 ../urpmi:510 ../urpmi:628
 #, c-format
@@ -1501,12 +1501,12 @@ msgstr "אין אפשרות לגשת למאגר \"%s\"."
 #: ../urpm/removable.pm:85 ../urpm/removable.pm:100
 #, c-format
 msgid "mounting %s"
-msgstr "כעת בעיגון %s"
+msgstr "‏%s בהליכי עיגון"
 
 #: ../urpm/removable.pm:112
 #, c-format
 msgid "unmounting %s"
-msgstr "כעת בניתוק %s"
+msgstr "‏%s בהליכי ניתוק"
 
 #: ../urpm/select.pm:44
 #, c-format
@@ -1680,7 +1680,7 @@ msgstr ""
 #: ../urpme:45
 #, c-format
 msgid "  --test         - verify if the removal can be achieved correctly.\n"
-msgstr "  --test         - בדיקה האם הסרת החבילה יכולה להסתיים בהצלחה.\n"
+msgstr "  --test         - לבדוק אם הסרת החבילה יכולה להסתיים בהצלחה.\n"
 
 #: ../urpme:47 ../urpmi:106 ../urpmq:66
 #, c-format

@@ -1,9 +1,9 @@
 package Perinci::To::Doc::Role::Section;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-24'; # DATE
+our $DATE = '2021-05-31'; # DATE
 our $DIST = 'Perinci-To-Doc'; # DIST
-our $VERSION = '0.877'; # VERSION
+our $VERSION = '0.878'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -113,7 +113,7 @@ Perinci::To::Doc::Role::Section - Role for class that generates documentation wi
 
 =head1 VERSION
 
-This document describes version 0.877 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2021-05-24.
+This document describes version 0.878 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2021-05-31.
 
 =head1 DESCRIPTION
 
@@ -182,7 +182,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-To-Doc>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-To-Doc/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-To-Doc>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

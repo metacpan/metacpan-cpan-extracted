@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tester 4.006;
+package Config::Model::Tester 4.007;
 # ABSTRACT: Test framework for Config::Model
 
 use warnings;
@@ -61,8 +61,8 @@ sub setup_test {
         $test_suite_data->{conf_dir} = $conf_dir;
     }
 
-    my $wr_dir    = $wr_root->child('test-' . $t_name);
-    my $wr_dir2   = $wr_root->child('test-' . $t_name.'-w');
+    my $wr_dir    = $wr_root->child($test_group)->child('test-' . $t_name);
+    my $wr_dir2   = $wr_root->child($test_group)->child('test-' . $t_name.'-w');
     $wr_dir->mkpath;
     $wr_dir2->mkpath;
 
@@ -70,8 +70,9 @@ sub setup_test {
     $conf_file = $wr_dir->child($conf_dir,$conf_file_name)
         if $conf_dir and $conf_file_name;
 
-    my $ex_dir = path('t')->child('model_tests.d', "$test_group-examples");
-    my $ex_data = $ex_dir->child($t_data->{data_from} // $t_name);
+    my $ex_dir = $t_data->{data_from_group} // $test_group;
+    my $ex_path = path('t')->child('model_tests.d', "$ex_dir-examples");
+    my $ex_data = $ex_path->child($t_data->{data_from} // $t_name);
 
     my @file_list;
 
@@ -759,7 +760,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 4.006
+version 4.007
 
 =head1 SYNOPSIS
 
@@ -871,11 +872,7 @@ on the system (e.g. the OS). For instance, system wide C<ssh_config>
 is stored in C</etc/ssh> on Linux, and directly in C</etc> on MacOS.
 
 These files are copied in a test directory using a C<setup> parameter
-in test case specification:
-
-  setup => {
-    test_file_in_example_dir => 'destination'
-  }
+in test case specification.
 
 Let's consider this example of 2 tests cases for ssh:
 
@@ -1073,6 +1070,16 @@ See
 L<plainfile backend test|https://github.com/dod38fr/config-model/blob/master/t/model_tests.d/backend-plainfile-test-conf.pl>
 for a real life example.
 
+Likewise, it may be useful to re-use test data from another group of
+test. Lets see this example from C<systemd-service-test-conf.pl>:
+
+    {
+        name => 'transmission',
+        data_from_group => 'systemd', # i.e from ../systemd-examples
+    }
+
+C<data_from> and C<data_from_group> can be together.
+
 =head2 Test scenario
 
 Each subtest follow a sequence explained below. Each step of this
@@ -1085,7 +1092,7 @@ C<< <model-to-test>-test-conf.pl >>:
 
 Setup test in C<< wr_root/model_tests/<subtest name>/ >>. If your configuration file layout depend
 on the target system, you will have to specify the path using C<setup> parameter.
-See L</"Test file layout depending on system">.
+See L</"More complex file layout">.
 
 =item *
 
@@ -1095,7 +1102,7 @@ C<< load_check => 'no' >> if your file is not valid.
 =item *
 
 Check for config data warnings. You should pass the list of expected warnings that are
-emitted through L<Log::Log4Perl>. The array ref is passed as is to the C<expect> function
+emitted through L<Log::Log4perl>. The array ref is passed as is to the C<expect> function
 of L<Test::Log::Lo4Perl/expect>. E.g:
 
     log4perl_load_warnings => [
@@ -1112,7 +1119,7 @@ all warnings triggered by the tests are shown.
 
 L<Config::Model> is currently transitioning from traditional "warn" to
 warn logs. To avoid breaking all tests based on this module, the
-warnings are emitted through L<Log::Log4Perl> only when
+warnings are emitted through L<Log::Log4perl> only when
 C<$::_use_log4perl_to_warn> is set. This hack will be removed once all
 warnings checks in tests are ported to log4perl checks.
 
@@ -1129,11 +1136,11 @@ Use an empty array_ref to mask load warnings.
 
 Optionally run L<update|App::Cme::Command::update> command:
 
-    update => {
-         [ returns => 'foo' , ]
-         no_warnings => [ 0 | 1 ], # default 0
-         quiet => [ 0 | 1], # default 0, passed to update method
-         loag4perl_update_warnings => [ ... ] # Test::Log::Log4Perl::expect arguments
+ update => {
+    returns => 'foo' , # optional
+    no_warnings => [ 0 | 1 ], # default 0
+    quiet => [ 0 | 1], # default 0, passed to update method
+    load4perl_update_warnings => [ ... ] # Test::Log::Log4perl::expect arguments
  }
 
 Where:
@@ -1146,7 +1153,7 @@ C<returns> is the expected return value (optional).
 
 =item *
 
-C<no_warnings> to suppress the warnings coming from
+C<no_warnings> can be used to suppress the warnings coming from
 L<Config::Model::Value>. Note that C<< no_warnings => 1 >> may be
 useful for less verbose test.
 
@@ -1158,14 +1165,14 @@ C<quiet> to suppress progress messages during update.
 
 C<log4perl_update_warnings> is used to check the warnings produced
 during update. The argument is passed to C<expect> function of
-L<Test::Log::Log4Perl>. See C<load_warnings> parameter above for more
+L<Test::Log::Log4perl>. See C<load_warnings> parameter above for more
 details.
 
 =item *
 
 DEPRECATED. C<update_warnings> is an array ref of quoted regexp (See qr operator)
-to check the warnings produced during update. use C<< update => [] >>
-to check that no warnings are issued during update.
+to check the warnings produced during update. Please use C<log4perl_update_warnings>
+instead.
 
 =back
 
@@ -1187,7 +1194,7 @@ warning messages:
 
    check_before_fix => {
       dump_errors   => [ ... ] # optional, see below
-      load4perl_dump_warnings => [ ... ] # optional, see below
+      log4perl_dump_warnings => [ ... ] # optional, see below
    }
 
 Use C<dump_errors> if you expect issues:
@@ -1207,7 +1214,7 @@ Likewise, specify any expected warnings:
   }
 
 C<log4perl_dump_warnings> passes the array ref content to C<expect>
-function of L<Test::Log::Log4Perl>.
+function of L<Test::Log::Log4perl>.
 
 Both C<log4perl_dump_warnings> and C<dump_errors> can be specified in C<check_before_fix> hash.
 
@@ -1222,7 +1229,13 @@ Optionally, call L<apply_fixes|Config::Model::Instance/apply_fixes>:
 Call L<dump_tree|Config::Model::Node/dump_tree> to check the validity of the
 data after optional C<apply_fix>. This step is not optional.
 
-As with C<check_before_fix>, both C<dump_errors> or C<dump_warnings> can be used.
+As with C<check_before_fix>, both C<dump_errors> or
+C<log4perl_dump_warnings> can be specified in C<full_dump> parameter:
+
+ full_dump => {
+     log4perl_dump_warnings => [ ... ], # optional
+     dump_errors            => [ ... ], # optional
+ }
 
 =item *
 
@@ -1460,11 +1473,11 @@ and the L<test specification|https://github.com/dod38fr/config-model-lcdproc/blo
 =item *
 
 Dpkg packages are constructed from several files. These files are handled like
-configuration files by L<Config::Model::Dpkg>. The
-L<test layout|http://anonscm.debian.org/gitweb/?p=pkg-perl/packages/libconfig-model-dpkg-perl.git;a=tree;f=t/model_tests.d;hb=HEAD>
+configuration files by L<Config::Model::Dpkg|https://salsa.debian.org/perl-team/modules/packages/libconfig-model-dpkg-perl>. The
+L<test layout|https://salsa.debian.org/perl-team/modules/packages/libconfig-model-dpkg-perl/-/tree/master/t/model_tests.d>
 features test with multiple file in
-L<dpkg-examples|http://anonscm.debian.org/gitweb/?p=pkg-perl/packages/libconfig-model-dpkg-perl.git;a=tree;f=t/model_tests.d/dpkg-examples;hb=HEAD>.
-The test is specified in L<dpkg-test-conf.pl|http://anonscm.debian.org/gitweb/?p=pkg-perl/packages/libconfig-model-dpkg-perl.git;a=blob_plain;f=t/model_tests.d/dpkg-test-conf.pl;hb=HEAD>
+L<dpkg-examples|https://salsa.debian.org/perl-team/modules/packages/libconfig-model-dpkg-perl/-/tree/master/t/model_tests.d/dpkg-examples>.
+The test is specified in L<https://salsa.debian.org/perl-team/modules/packages/libconfig-model-dpkg-perl/-/blob/master/t/model_tests.d/dpkg-test-conf.pl>
 
 =item *
 

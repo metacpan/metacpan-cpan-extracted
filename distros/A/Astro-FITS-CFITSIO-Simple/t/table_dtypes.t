@@ -1,13 +1,13 @@
-use Test::More tests => 15;
+#! perl
 
-use strict;
-use warnings;
+use Test2::V0 '!float';
+use Test::Lib;
 
 use PDL;
 
 use Astro::FITS::CFITSIO::Simple qw/ :all /;
 
-BEGIN { require 't/common.pl'; }
+use My::Test::common;
 
 my $file = 'data/f001.fits';
 
@@ -22,15 +22,6 @@ eval {
 };
 ok ( ! $@, "dtype" ) or diag( $@ );
 
-# success
-eval {
-
-    my %data = rdfits( $file, { ninc => 1, defdtype => byte } );
-
-    ok ( byte == $data{$_}->type, "defdtype: $_" ) for keys %data;
-
-};
-ok ( ! $@, "dtype" ) or diag( $@ );
 
 # failure
 foreach ( 5, 'snack' )
@@ -48,4 +39,5 @@ for ( qw/ rt_snackfood / )
   };
   like ( $@, qr/not in file/, "dtype: bad column name $_" );
 }
- 
+
+done_testing;

@@ -234,7 +234,13 @@ can use things like command history and command line editing.
 
 =head1 KNOWN PROBLEMS
 
-None known at this point.
+When ending a Term::TUI program, you may get:
+
+   Warning: unable to close filehandle properly:
+            Bad file descriptor during global destruction.
+
+This is due to a bug in either the Term::ReadLine or Term::ReadLine::Gnu module.
+Using a recent version of Term::ReadLine::Gnu will get rid of this.
 
 =head1 LICENSE
 

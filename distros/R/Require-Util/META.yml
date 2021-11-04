@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Require-Util
   homepage: https://metacpan.org/release/Require-Util
   repository: git://github.com/perlancar/perl-Require-Util.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

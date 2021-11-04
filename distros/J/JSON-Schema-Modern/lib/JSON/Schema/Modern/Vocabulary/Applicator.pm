@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.521';
+our $VERSION = '0.523';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use strictures 2;
 use List::Util 1.45 qw(any uniqstr);
 use Ref::Util 0.100 'is_plain_arrayref';
@@ -281,7 +282,7 @@ sub _traverse_keyword_items {
 
   if (is_plain_arrayref($schema->{items})) {
     return E($state, 'array form of "items" not supported in %s', $state->{spec_version})
-      if $state->{spec_version} !~ /^draft(7|2019-09)$/;
+      if $state->{spec_version} !~ /^draft(?:7|2019-09)$/;
 
     return $self->traverse_array_schemas($schema, $state);
   }
@@ -423,7 +424,7 @@ sub _eval_keyword_contains {
   }
 
   push @{$state->{annotations}}, @new_annotations;
-  return $state->{spec_version} =~ /^draft(7|2019-09)$/ ? 1
+  return $state->{spec_version} =~ /^draft(?:7|2019-09)$/ ? 1
     : A($state, @valid == @$data ? true : \@valid);
 }
 
@@ -612,7 +613,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.521
+version 0.523
 
 =head1 DESCRIPTION
 

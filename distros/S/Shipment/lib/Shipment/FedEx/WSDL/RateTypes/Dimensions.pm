@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::Dimensions;
-$Shipment::FedEx::WSDL::RateTypes::Dimensions::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::Dimensions::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               Height
               Units
 
-              )
+            )
         ],
         {   'Length' => \%Length_of,
             'Width'  => \%Width_of,
@@ -64,7 +64,7 @@ Class::Std::initialize();
 
 
 package Shipment::FedEx::WSDL::RateTypes::Dimensions::_Height;
-$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Height::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Height::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -77,7 +77,7 @@ use warnings;
 
 
 package Shipment::FedEx::WSDL::RateTypes::Dimensions::_Length;
-$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Length::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Length::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -90,7 +90,7 @@ use warnings;
 
 
 package Shipment::FedEx::WSDL::RateTypes::Dimensions::_Width;
-$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Width::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Width::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -116,7 +116,7 @@ Shipment::FedEx::WSDL::RateTypes::Dimensions
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

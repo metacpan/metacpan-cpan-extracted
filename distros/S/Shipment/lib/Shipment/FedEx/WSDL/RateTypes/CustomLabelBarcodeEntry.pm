@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::CustomLabelBarcodeEntry;
-$Shipment::FedEx::WSDL::RateTypes::CustomLabelBarcodeEntry::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::CustomLabelBarcodeEntry::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               ThinBarWidth
               BarcodeSymbology
 
-              )
+            )
         ],
         {   'Position'         => \%Position_of,
             'Format'           => \%Format_of,
@@ -48,10 +48,10 @@ Class::Std::initialize();
         },
         {   'Position' =>
               'Shipment::FedEx::WSDL::RateTypes::CustomLabelPosition',
-            'Format'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DataFields'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'BarHeight'    => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-            'ThinBarWidth' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+            'Format'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DataFields'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'BarHeight'        => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+            'ThinBarWidth'     => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
             'BarcodeSymbology' =>
               'Shipment::FedEx::WSDL::RateTypes::BarcodeSymbologyType',
         },
@@ -83,7 +83,7 @@ Shipment::FedEx::WSDL::RateTypes::CustomLabelBarcodeEntry
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

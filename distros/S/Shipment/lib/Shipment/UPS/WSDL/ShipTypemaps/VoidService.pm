@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::ShipTypemaps::VoidService;
-$Shipment::UPS::WSDL::ShipTypemaps::VoidService::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypemaps::VoidService::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -98,7 +98,7 @@ our $typemap_1 = {
       'SOAP::WSDL::XSD::Typelib::Builtin::string',
     'VoidShipmentRequest/Request/RequestOption' =>
       'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    'Fault/faultactor' => 'SOAP::WSDL::XSD::Typelib::Builtin::token',
+    'Fault/faultactor'          => 'SOAP::WSDL::XSD::Typelib::Builtin::token',
     'UPSSecurity/UsernameToken' =>
       'Shipment::UPS::WSDL::ShipElements::UPSSecurity::_UsernameToken',
     'Fault/detail/Errors/ErrorDetail/AdditionalInformation/Value/Description'
@@ -123,6 +123,7 @@ our $typemap_1 = {
       'SOAP::WSDL::XSD::Typelib::Builtin::string'
 };
 
+
 sub get_class {
     my $name = join '/', @{$_[1]};
     return $typemap_1->{$name};
@@ -144,7 +145,7 @@ Shipment::UPS::WSDL::ShipTypemaps::VoidService
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

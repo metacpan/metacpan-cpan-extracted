@@ -1,5 +1,5 @@
 package Getopt::EX::Colormap;
-use version; our $VERSION = version->declare("v1.25.1");
+use version; our $VERSION = version->declare("v1.26.0");
 
 use v5.14;
 use warnings;
@@ -126,15 +126,16 @@ my %numbers = (
     N   => undef,	# N : None (NOP)
     E => 'EL',		# E : Erase Line
     Z => 0,		# Z : Zero (Reset)
-    D => 1,		# D : Double-Struck (Bold)
+    D => 1,		# D : Double Strike (Bold)
     P => 2,		# P : Pale (Dark)
     I => 3,		# I : Italic
     U => 4,		# U : Underline
     F => 5,		# F : Flash (Blink: Slow)
     Q => 6,		# Q : Quick (Blink: Rapid)
-    S => 7,		# S : Standout (Reverse)
+    S => 7,		# S : Stand out (Reverse)
+    H => 8,		# H : Hide (Concealed)
     V => 8,		# V : Vanish (Concealed)
-    X => 9,		# X : Crossed out
+    X => 9,		# X : Cross out
     K => 30, k => 90,	# K : Kuro (Black)
     R => 31, r => 91,	# R : Red  
     G => 32, g => 92,	# G : Green
@@ -154,7 +155,7 @@ my $colorspec_re = qr{
     | (?<c256>	 [0-5][0-5][0-5]	 # 216 (6x6x6) colors
 	     | L(?:[01][0-9]|[2][0-5]) ) # 24 grey levels + B/W
     | (?<c16>  [KRGYBMCW] )		 # 16 colors
-    | (?<efct> ~?[;NZDPIUFQSVX] )	 # effects
+    | (?<efct> ~?[;NZDPIUFQSHVX] )	 # effects
     | (?<csi>  { (?<csi_name>[A-Z]+)	 # other CSI
 		 (?<P> \( )?		 # optional (
 		 (?<csi_param>[\d,;]*)	 # 0;1;2
@@ -575,7 +576,7 @@ Getopt::EX::Colormap - ANSI terminal color and option support
 
 =head1 DESCRIPTION
 
-Coloring text capability is not strongly bound to option processing,
+Text coloring capability is not strongly bound to option processing,
 but it may be useful to give a simple uniform way to specify
 complicated color setting from command line.
 
@@ -583,8 +584,8 @@ This module assumes color information is given in two ways: one in
 labeled list, and one in indexed list.
 
 Handler maintains hash and list objects, and labeled colors are stored
-in hash, non-label colors are in list automatically.  User can mix
-both specifications.
+in hash, index colors are in list automatically.  User can mix both
+specifications.
 
 =head2 LABELED COLOR
 
@@ -615,9 +616,9 @@ Indexed list example is like this:
     --cm 555/021,555/201,555/210 \
     --cm 555/012,555/102,555/120
 
-This is the example of RGB 6x6x6 216 colors specification.  Left
-side of slash is foreground color, and right side is for background.
-This color list is accessed by index.
+This is an example of RGB 6x6x6 216 colors specification.  Left side
+of slash is foreground, and right side is for background color.  This
+color list is accessed by index.
 
 =head2 CALLING FUNCTIONS
 
@@ -675,15 +676,15 @@ with other special effects :
 
     N    None
     Z  0 Zero (reset)
-    D  1 Double-struck (boldface)
+    D  1 Double strike (boldface)
     P  2 Pale (dark)
     I  3 Italic
     U  4 Underline
     F  5 Flash (blink: slow)
     Q  6 Quick (blink: rapid)
-    S  7 Stand-out (reverse video)
-    V  8 Vanish (concealed)
-    X  9 Crossed out
+    S  7 Stand out (reverse video)
+    H  8 Hide (conceal)
+    X  9 Cross out
 
     E    Erase Line
 
@@ -691,6 +692,13 @@ with other special effects :
     /    Toggle foreground/background
     ^    Reset to foreground
     ~    Cancel following effect
+
+=over 4
+
+Symbol for concealing used to be B<V> (Vanish) before.  B<V> can still
+be used for backward compatibility, but would be deprecated someday.
+
+=back
 
 At first the color is considered as foreground, and slash (C</>)
 switches foreground and background.  If multiple colors are given in
@@ -1085,10 +1093,12 @@ from colored text.  This is preferable to clear background color set
 by scrolling in the middle of colored text at the bottom line of the
 terminal.
 
-However, some terminal, including Apple_Terminal, clear the text on
-the cursor when I<Erase Line> sequence is received at the rightmost
-column of the screen.  If you do not want this behavior, set module
-variable C<$NO_RESET_EL> or C<GETOPTEX_NO_RESET_EL> environment.
+However, on some terminal, including Apple_Terminal, I<Erase Line>
+sequence clear the text on the cursor position when it is at the
+rightmost column of the screen.  In other words, rightmost character
+sometimes mysteriously disappear when it is the last character in the
+colored region.  If you do not like this behavior, set module variable
+C<$NO_RESET_EL> or C<GETOPTEX_NO_RESET_EL> environment.
 
 
 =head1 ENVIRONMENT

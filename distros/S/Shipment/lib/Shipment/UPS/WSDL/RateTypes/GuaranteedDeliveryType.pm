@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::GuaranteedDeliveryType;
-$Shipment::UPS::WSDL::RateTypes::GuaranteedDeliveryType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::GuaranteedDeliveryType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        BusinessDaysInTransit
               DeliveryByTime
 
-              )
+            )
         ],
         {   'BusinessDaysInTransit' => \%BusinessDaysInTransit_of,
             'DeliveryByTime'        => \%DeliveryByTime_of,
@@ -62,7 +62,7 @@ Shipment::UPS::WSDL::RateTypes::GuaranteedDeliveryType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               CustomDocumentIdentifier
               DocTabContent
 
-              )
+            )
         ],
         {   'Format'                   => \%Format_of,
             'LabelPrintingOrientation' => \%LabelPrintingOrientation_of,
@@ -86,7 +86,7 @@ Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

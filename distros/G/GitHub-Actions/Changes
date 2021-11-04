@@ -1,3 +1,11 @@
+2021-10-09  jmerelo  <jmerelo@princess-carolyn>
+
+	* lib/GitHub/Actions.pm: 0.1.1.1 simply exports the exit function to solve error in previous one. 
+
+2021-10-08  jmerelo  <jmerelo@princess-carolyn>
+
+	* lib/GitHub/Actions.pm: Adds exit function
+
 2021-09-08  jmerelo  <jmerelo@princess-carolyn>
 
 	* lib/GitHub/Actions.pm: This 0.1.0 has a complete set of instructions, including in this last release the group handling commands, which merits a change in minor version.

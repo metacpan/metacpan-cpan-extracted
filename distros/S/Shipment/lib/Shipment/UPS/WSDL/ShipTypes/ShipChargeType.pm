@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipChargeType;
-$Shipment::UPS::WSDL::ShipTypes::ShipChargeType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ShipChargeType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        CurrencyCode
               MonetaryValue
 
-              )
+            )
         ],
         {   'CurrencyCode'  => \%CurrencyCode_of,
             'MonetaryValue' => \%MonetaryValue_of,
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipChargeType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

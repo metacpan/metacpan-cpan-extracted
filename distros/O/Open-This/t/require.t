@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Open::This qw( parse_text );
-use Test::More;
+use Test::More import => [qw( done_testing )];
 use Test::Warnings ();
 
 # Simulate an installed, non-local module

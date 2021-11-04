@@ -19,6 +19,7 @@
     GyMMM => "LLL y '\N{U+0433}'. G",
     GyMMMEd => "E, d MMM y '\N{U+0433}'. G",
     GyMMMd => "d MMM y '\N{U+0433}'. G",
+    GyMd => "dd.MM.y GGGGG",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -61,7 +62,7 @@
   code => "be-BY",
   date_format_full => "EEEE, d MMMM y '\N{U+0433}'.",
   date_format_long => "d MMMM y '\N{U+0433}'.",
-  date_format_medium => "d.MM.y",
+  date_format_medium => "d MMM y '\N{U+0433}'.",
   date_format_short => "d.MM.yy",
   datetime_format_full => "{1} '\N{U+0443}' {0}",
   datetime_format_long => "{1} '\N{U+0443}' {0}",
@@ -273,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 39,
+  version => 40,
 }

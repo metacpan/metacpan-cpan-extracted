@@ -4,6 +4,22 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.791 2021-10-28
+  * SignalRecovery 7265, Keithley 2000 updates + bugfixes
+  * DataFolder: Added boolean copy_script attribute
+  * Documentation improvements (Rigol DG5000, Keysight DSOS604A)
+
+3.790 2021-10-27
+  * Ported Keithley 2000 DMM and SignalRecovery 7265 lock-in to Moose
+  * Added Phase sweep; added sweeps on multiple instruments simultaneously
+  * OI_Mercury/Magnet: Internally set currents not fields for precision
+  * Updated Backends.pod with a new guide on how to use LinuxGPIB on Debian 11
+  * Documentation improvements (Rigol DG5000, Keysight DSOS604A)
+
+3.780 2021-10-09
+  * New driver for the Lakeshore 372 temperature bridge
+  * Socket connection: allow reuse of orphaned connections
+
 3.772 2021-09-16
   * OI_IPS: Fix for device bug
 

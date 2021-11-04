@@ -26,7 +26,7 @@ no_index:
 provides:
   Crypt::OpenSSL::Guess:
     file: lib/Crypt/OpenSSL/Guess.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Config: '0'
   Exporter: '5.57'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/akiym/Crypt-OpenSSL-Guess/issues
   homepage: https://github.com/akiym/Crypt-OpenSSL-Guess
   repository: git://github.com/akiym/Crypt-OpenSSL-Guess.git
-version: '0.13'
+version: '0.14'
 x_authority: cpan:AKIYM
 x_contributors:
   - 'Shoichi Kaji <skaji@cpan.org>'

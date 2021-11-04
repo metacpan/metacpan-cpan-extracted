@@ -2,7 +2,7 @@ NAME
     cpan-get - Script to fetch module from CPAN archive.
 
 SYNOPSIS
-     cpan-get [-h] [--version] module_name
+     cpan-get [-h] [--version] module_name[module_version]
 
 DESCRIPTION
     Vision of this module is:
@@ -25,6 +25,22 @@ ARGUMENTS
 
              Perl module name.
              e.g. App::Pod::Example
+
+    *       "module_version"
+
+            Perl module version. There are some posibilities how to define:
+
+             @module_version (e.g. @1.23)
+             - Define exact module version.
+
+             ~module_version (e.g. ~1.23)
+             - Define version and later.
+
+             ~"== module_version" (e.g. ~"== 1.23")
+             - Define exact module version.
+
+             ~">= module_version_min, < module_version_max" (e.g. ~">= 1.23, < 2.00")
+             - Define limit. (e.g. last version in 1.xx branch)
 
 EXAMPLE
      cpan-get App::Pod::Example
@@ -62,5 +78,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

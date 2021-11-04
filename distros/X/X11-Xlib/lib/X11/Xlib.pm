@@ -8,7 +8,7 @@ use base qw(Exporter DynaLoader);
 use Carp;
 use Try::Tiny;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 sub dl_load_flags { 1 } # Make PerlXLib.c functions available to other XS modules
 
@@ -119,13 +119,15 @@ our @EXPORT= @{ $EXPORT_TAGS{fn_keysym} }; # backward compatibility
 # Used by XS.  In the spirit of letting perl users violate encapsulation
 #  as needed, the XS code exposes its globals to Perl.
 our (
-    %_connections,              # weak-ref set of all connection objects, keyed by *raw pointer*
-    %_display_attr,             # inside-out ->display attribute for any Xlib objects derived from Display*
+    %_obj_cache,                # weak-ref set of all Xlib objects, keyed by *raw pointer*
     $_error_nonfatal_installed, # boolean, whether handler is installed
     $_error_fatal_installed,    # boolean, whether handler is installed
     $_error_fatal_trapped,      # boolean, whether Xlib is dead from fatal error
     $on_error,                  # application-supplied callback
 );
+sub _all_connections {
+    grep defined && $_->isa('X11::Xlib'), values %_obj_cache;
+}
 
 sub new {
     require X11::Xlib::Display;
@@ -142,8 +144,6 @@ sub autoclose {
 sub DESTROY {
     my $self= shift;
     $self->XCloseDisplay() if $self->autoclose;
-    my $ptr= $self->_pointer_value;
-    delete $_connections{$ptr} if $ptr;
 }
 
 sub on_error {
@@ -191,25 +191,28 @@ sub _error_fatal {
         catch { warn $_; };
     }
     # also call a user callback in any Display object
-    for my $dpy (values %_connections) {
-        next unless defined $dpy && defined $dpy->on_error;
+    my @connections= __PACKAGE__->_all_connections;
+    for my $dpy (grep defined $_->on_error, @connections) {
         try { $dpy->on_error->($dpy); }
         catch { warn $_; };
     }
 
-    # Kill all X11 connections, since Xlib internal state might be toast after this
-    $_->_mark_dead for grep { defined } values %_connections;
+    # Kill all X11 connections, since Xlib internal state might be toast after this.
+    $_->_mark_dead for @connections;
 }
 
 sub _mark_dead {
     my $self= shift;
     $self->autoclose(0);
-    my $ptr= $self->_pointer_value;
-    $self->_set_pointer_value(undef);
     $self->{_dead}= 1;
-    $self->{_pointer_value}= $ptr;
-    # above line removed $self from cache.  Put it back.
-    Scalar::Util::weaken( $_connections{$ptr}= $self );
+    my $pointer_value= $self->_pointer_value;
+    # Clearing the pointer of a Display object cascades to all objects whose pointers
+    # depend on the connection (which Xlib has now freed) and sets them all to NULL.
+    # That, in turn, removes them all from the _obj_cache
+    $self->_set_pointer_value(undef);
+    # The Display* still exists, so we should still allow finding this object vy looking up that pointer
+    $self->{_pointer_value}= $pointer_value;
+    Scalar::Util::weaken( $_obj_cache{$pointer_value}= $self );
 }
 
 1;
@@ -1585,20 +1588,50 @@ Pure-perl implementation of the X11 protocol.
 
 =head1 TODO
 
-This module still only covers a fraction of the Xlib API.
+This module still only covers a small fraction of the Xlib API.
 Patches are welcome :)
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Olivier Thauvin, E<lt>nanardon@nanardon.zarb.orgE<gt>
 
+=item *
+
 Michael Conrad, E<lt>mike@nrdvana.netE<gt>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Mark Davies <eslafgh@users.noreply.github.com>
+
+=item *
+
+Paul Seyfert <pseyfert.mathphys@gmail.com>
+
+=item *
+
+Ethan Straffin <ethanstraffin@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2020 by Michael Conrad
+Copyright (C) 2017-2021 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

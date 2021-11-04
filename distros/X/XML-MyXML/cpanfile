@@ -6,7 +6,7 @@ requires 'Scalar::Util';
 requires 'Exporter';
 
 on 'test' => sub {
-    requires 'Test::More', '0.47';
+    requires 'Test::Harness', '3.42';
+    requires 'Test::More', '1.302188';
     requires 'File::Temp';
 };
-

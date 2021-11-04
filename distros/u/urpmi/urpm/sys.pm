@@ -306,25 +306,25 @@ sub migrate_back_rpmdb_db_version {
     clean_rpmdb_shared_regions($root);
 }
 
-=item migrate_rpmdb_to_sqlite($urpm, $root)
+=item migrate_rpmdb_to_sqlite($urpm)
 
 Migrate rpmdb to the new sqlite backend.
 
 =cut
 
 sub migrate_rpmdb_to_sqlite {
-    my ($urpm, $root) = @_;
+    my ($urpm) = @_;
     $urpm->{info}("migrating db from bdb to sqlite (rpm >= 4.16)");
     # Whatever is the default backend:
     URPM::add_macro('_db_backend sqlite');
-    if (system('chroot', $root, 'rpm', '--rebuilddb') == 0) {
+    if (system('rpm', '--rebuilddb', ($urpm->{root} ? ('--dbpath', "$urpm->{root}/var/lib/rpm") : @{[]})) == 0) {
 	$urpm->{log}("rpm db converted to sqlite successfully");
     } else {
 	$urpm->{error}("rpm db conversion failed. You will not be able to run rpm >= 4.17");
     }
 }
 
-=item migrate_forward_rpmdb_db_version($urpm, $root)
+=item migrate_forward_rpmdb_db_version($urpm)
 
 Check if we need to migrate rpmdb to a new backend prior to use it
 and do it if needed.
@@ -332,10 +332,10 @@ and do it if needed.
 =cut
 
 sub migrate_forward_rpmdb_db_version {
-    my ($urpm, $root) = @_;
+    my ($urpm) = @_;
 
     if ($urpm->{need_migrate_rpmdb_now} eq '4.16') {
-	migrate_rpmdb_to_sqlite($urpm, $root);
+	migrate_rpmdb_to_sqlite($urpm);
     }
 }
 

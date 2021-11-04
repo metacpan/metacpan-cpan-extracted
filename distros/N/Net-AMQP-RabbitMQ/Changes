@@ -1,5 +1,14 @@
 Revision history for perl module Net::AMQP::RabbitMQ
 
+2.40009 - 2021-10-23
+    - Fixed a process where subprocess closed the parent process's connection - fixes #202
+    - Changed over to GitHub Actions from TravisCI
+    - Added support for librabbitmq-c's RPC timeout functionality. - fixes #206
+    - Updated to use the latest rabbitmq-c version.
+    - Merged #201, which allows setting `client_properties` in connect.
+    - Merged #200, which fixes minor document typos - fixes #199
+    - Merged #198, which adds minor documentation clarification - fixes #61
+
 2.40008 - 2020-09-30
     - Merged #195, to update Sectigo CA -  fixes #194
 
@@ -235,7 +244,7 @@ v0.2.0 - 2011-04-19
     - add a connect timeout that both times out connect() calls and
         sets SO_{SND.RCV}TIMEO on the socket
     - add a heartbeat method
-    - a hearbeat frame can be received in the internal_recv function
+    - a heartbeat frame can be received in the internal_recv function
         causing an unexpected failure consuming; these are now ignored.
     - make queue_declare return message and consumer counts (additionally)
         when called in array context.

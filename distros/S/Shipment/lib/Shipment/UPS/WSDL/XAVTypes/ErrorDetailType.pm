@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::XAVTypes::ErrorDetailType;
-$Shipment::UPS::WSDL::XAVTypes::ErrorDetailType::VERSION = '3.05';
+$Shipment::UPS::WSDL::XAVTypes::ErrorDetailType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Location
               SubErrorCode
 
-              )
+            )
         ],
         {   'Severity'            => \%Severity_of,
             'PrimaryErrorCode'    => \%PrimaryErrorCode_of,
@@ -77,7 +77,7 @@ Shipment::UPS::WSDL::XAVTypes::ErrorDetailType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

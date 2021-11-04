@@ -25,8 +25,6 @@ $log->path($server->{wiki_dir} . '/log');
 $log->level('debug');
 EOT
 
-plan skip_all => 'Contributions are an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
-
 require './t/test.pl';
 
 # variables set by test.pl

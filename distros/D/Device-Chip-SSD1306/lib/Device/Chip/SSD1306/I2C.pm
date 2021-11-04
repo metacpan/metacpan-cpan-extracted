@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::SSD1306::I2C 0.09;
+package Device::Chip::SSD1306::I2C 0.10;
 class Device::Chip::SSD1306::I2C
    extends Device::Chip::SSD1306;
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep;
-$Lab::Moose::Sweep::VERSION = '3.772';
+$Lab::Moose::Sweep::VERSION = '3.791';
 #ABSTRACT: Base class for high level sweeps
 
 use v5.20;
@@ -30,6 +30,13 @@ has delay_before_loop => ( is => 'ro', isa => 'Num', default => 0 );
 has delay_in_loop     => ( is => 'ro', isa => 'Num', default => 0 );
 has delay_after_loop  => ( is => 'ro', isa => 'Num', default => 0 );
 has before_loop       => (
+    is      => 'ro',
+    isa     => 'CodeRef',
+    default => sub {
+        sub { }
+    }
+);
+has after_loop       => (
     is      => 'ro',
     isa     => 'CodeRef',
     default => sub {
@@ -430,6 +437,8 @@ sub _start {
         }
         countdown( $self->delay_after_loop );
     }
+    my $after_loop_code = $self->after_loop();
+    $self->$after_loop_code();
 
 }
 
@@ -507,7 +516,7 @@ Lab::Moose::Sweep - Base class for high level sweeps
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 DESCRIPTION
 
@@ -520,6 +529,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt
             2020       Andreas K. Huettel
+            2021       Fabian Weinelt
 
 
 This is free software; you can redistribute it and/or modify it under

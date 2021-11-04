@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ProcessShipmentReply;
-$Shipment::FedEx::WSDL::ShipTypes::ProcessShipmentReply::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ProcessShipmentReply::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               CompletedShipmentDetail
               ErrorLabels
 
-              )
+            )
         ],
         {   'HighestSeverity'         => \%HighestSeverity_of,
             'Notifications'           => \%Notifications_of,
@@ -86,7 +86,7 @@ Shipment::FedEx::WSDL::ShipTypes::ProcessShipmentReply
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

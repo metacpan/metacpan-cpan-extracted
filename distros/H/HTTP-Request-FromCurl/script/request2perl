@@ -1,0 +1,120 @@
+#!perl
+use strict;
+use Getopt::Long;
+
+use HTTP::Request::FromCurl;
+use HTTP::Request::FromFetch;
+use HTTP::Request::FromWget;
+
+use Filter::signatures;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
+our $VERSION = '0.35';
+
+my $has_tidy;
+BEGIN { eval { require Perl::Tidy; $has_tidy = 1; } }
+
+Getopt::Long::Configure('pass_through');
+GetOptions(
+    'no-tidy'   => \my $no_tidy,
+    'type|t=s'  => \my $ua_type,
+    'agent|a=s' => \my $ua_input,
+) or pod2usage(2);
+
+$ua_type //= 'Tiny';
+$ua_input //= 'curl';
+
+my %handlers = (
+    wget => 'HTTP::Request::FromWget',
+    curl => 'HTTP::Request::FromCurl',
+);
+
+my %preamble = (
+    Tiny => [
+        'use HTTP::Tiny;'
+    ],
+    LWP  => [
+        'use LWP::UserAgent;'
+    ],
+);
+
+sub as_perl( %options ) {
+    my @errors;
+    local $SIG{__WARN__} = sub { push @errors, @_ };
+
+    if(! $options{ handler }) {
+        $options{ handler } = $handlers{ $options{ ua }}
+            or die "Unknown input UA '$options{ ua_options }'";
+    };
+    my $handler = $options{ handler };
+
+    my @requests =
+        eval {
+            $handler->new(
+                argv => $options{ argv },
+                read_files => 1,
+            );
+        };
+
+    my $code = join( "\n\n",
+                   @{ $preamble{ $ua_type } },
+                   map { s!^    !!gm; $_ }
+                   map { $_->as_snippet( type => $ua_type ) }
+                   @requests
+               );
+
+    my $formatted;
+
+    if( $has_tidy and ! $no_tidy) {
+        Perl::Tidy::perltidy(
+            source      => \$code,
+            destination => \$formatted,
+            argv        => [ '--no-memoize' ],
+        ) or $code = $formatted;
+    }
+
+    return {
+        version => $HTTP::Request::FromCurl::VERSION,
+        #command => $,
+        perl_code => $code,
+        error => join( "\n", grep { defined $_ } $@, @errors, )
+    };
+}
+
+my $res = as_perl(
+    argv    => \@ARGV,
+    ua      => $ua_input,
+    perl_ua => $ua_type,
+);
+if( $res->{error} ) {
+    die $res->{error}
+};
+print $res->{perl_code};
+
+=head1 NAME
+
+request2perl - convert curl/wget arguments to Perl code
+
+=head1 SYNOPSIS
+
+    request2perl [options] [url] [url] ...
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<no-tidy>
+
+Do not run the Perl code through L<HTML::Tidy>
+
+=item B<agent>
+
+The UA to parse, default is curl.
+
+=back
+
+See curl(1) or L<https://curl.haxx.se/docs/manpage.html> and wget(1)
+for the official documentation.
+
+=cut

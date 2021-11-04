@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "pre podne",
-    "po podne",
+    "AM",
+    "PM",
   ],
   available_formats => {
     Bh => "h B",
@@ -19,6 +19,7 @@
     GyMMM => "MMM y. G",
     GyMMMEd => "E, d. MMM y. G",
     GyMMMd => "d. MMM y. G",
+    GyMd => "d.MM.y. GGGGG",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -61,9 +62,9 @@
     "yw-count-other" => "w. 'sedmica' 'u' Y.",
   },
   code => "sr-Latn",
-  date_format_full => "EEEE, dd. MMMM y.",
-  date_format_long => "dd. MMMM y.",
-  date_format_medium => "dd.MM.y.",
+  date_format_full => "EEEE, d. MMMM y.",
+  date_format_long => "d. MMMM y.",
+  date_format_medium => "d. M. y.",
   date_format_short => "d.M.yy.",
   datetime_format_full => "{1} {0}",
   datetime_format_long => "{1} {0}",
@@ -233,10 +234,10 @@
   native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
-    "K1",
-    "K2",
-    "K3",
-    "K4",
+    "1. kv.",
+    "2. kv.",
+    "3. kv.",
+    "4. kv.",
   ],
   quarter_format_narrow => [
     "1.",
@@ -251,10 +252,10 @@
     "\N{U+010d}etvrti kvartal",
   ],
   quarter_stand_alone_abbreviated => [
-    "K1",
-    "K2",
-    "K3",
-    "K4",
+    "1. kv.",
+    "2. kv.",
+    "3. kv.",
+    "4. kv.",
   ],
   quarter_stand_alone_narrow => [
     "1.",
@@ -275,5 +276,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 39,
+  version => 40,
 }

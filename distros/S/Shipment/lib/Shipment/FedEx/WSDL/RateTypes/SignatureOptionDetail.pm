@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::SignatureOptionDetail;
-$Shipment::FedEx::WSDL::RateTypes::SignatureOptionDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::SignatureOptionDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        OptionType
               SignatureReleaseNumber
 
-              )
+            )
         ],
         {   'OptionType'             => \%OptionType_of,
             'SignatureReleaseNumber' => \%SignatureReleaseNumber_of,
@@ -63,7 +63,7 @@ Shipment::FedEx::WSDL::RateTypes::SignatureOptionDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::OptionRule;
-$Shipment::Purolator::WSDL::Types::OptionRule::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::OptionRule::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Exclusions
               Inclusions
 
-              )
+            )
         ],
         {   'OptionIDValuePair' => \%OptionIDValuePair_of,
             'Exclusions'        => \%Exclusions_of,
@@ -69,7 +69,7 @@ Shipment::Purolator::WSDL::Types::OptionRule
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

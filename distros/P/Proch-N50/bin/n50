@@ -254,8 +254,8 @@ foreach my $file (@ARGV) {
         open STDIN, '<', "$file"
           || die " FATAL ERROR:\n Unable to open file for reading ($file).\n";
     }
-
-    my $JSON      = 1 if ( $opt_format =~ /JSON/ );
+    my $JSON = 0;
+    $JSON      = 1 if (defined $opt_format and $opt_format =~ /JSON/ );
     my $FileStats = Proch::N50::getStats( $file, $JSON, $opt_ne ) || 0;
 
 
@@ -271,7 +271,7 @@ foreach my $file (@ARGV) {
     say Dumper $FileStats if ($opt_debug);
     if ( !defined $FileStats->{auN} ) {
         say STDERR
-          "Fatal error: statistics not calculated parsing \"$file\". Proch::N50 > 1.2.0 requiredscre.";
+          "Fatal error:  'auN' statistics not calculated parsing \"$file\". Proch::N50 > 1.2.0 required, ", $Proch::N50::VERSION , " found.";
         say STDERR Dumper $FileStats;
         say STDERR $Proch::N50::VERSION;
         die;
@@ -285,7 +285,8 @@ foreach my $file (@ARGV) {
     my $n75  = $FileStats->{N75} + 0;
     my $n90  = $FileStats->{N90} + 0;
     my $auN  = $FileStats->{auN} + 0;
-    my $Ne   = $FileStats->{Ne}  + 0 if (defined $opt_ne);
+    my $Ne   = defined $opt_ne ? $FileStats->{Ne}  : undef;
+
     say STDERR "[$file]\tTotalSize:$slen;N50:$n50;Sequences:$n" if ($opt_debug);
 
     $file = basename($file)            if ($opt_basename);
@@ -582,7 +583,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 1.4.1
+version 1.4.2
 
 =head1 SYNOPSIS
 

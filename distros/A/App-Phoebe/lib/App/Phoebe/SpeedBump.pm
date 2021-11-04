@@ -152,7 +152,7 @@ sub speed_bump {
   unshift(@{$speed_data->{$ip}->{visits}}, $now);
   # add a warning to the front for the current $ip if the current URL could be a bot
   unshift(@{$speed_data->{$ip}->{warnings}},
-	  scalar $url =~ m!/(raw|html|diff|history|do/(?:comment|do/(?:all/(?:latest/)?)?changes/|rss|(?:all)?atom|new|more|match|search|index|tag))/!);
+	  scalar $url =~ m!/(raw|html|diff|history|do/(?:comment|do/(?:all/(?:latest/)?)?changes/|rss|(?:all)?atom|new|more|match|search|index|tag)|menu$|text$|html$|history$)/!);
   # if there are enough timestamps, pop the last one and see if it falls within
   # the time window; if so, all the requests happened within the time window
   # we're watching
@@ -363,7 +363,8 @@ sub speed_bump_cidr {
   $ip = new Net::IP ($ip) or return;
   my $reverse = $ip->reverse_ip();
   $reverse =~ s/in-addr\.arpa\.$/asn.routeviews.org/;
-  $log->debug("DNS TXT query for $reverse");
+  # Sadly, routeviews does not support IPv6 at the moment!
+  $log->info("DNS TXT query for $reverse");
   for my $rr (rr($reverse, "TXT")) {
     next unless $rr->type eq "TXT";
     my @data = $rr->txtdata;

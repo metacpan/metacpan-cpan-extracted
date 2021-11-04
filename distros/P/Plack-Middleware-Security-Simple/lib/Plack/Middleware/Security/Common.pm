@@ -7,10 +7,13 @@ use warnings;
 
 use parent qw( Plack::Middleware::Security::Simple Exporter::Tiny );
 
+use Regexp::Common qw/ net /;
+
 our @EXPORT = qw(
    archive_extensions
    cgi_bin
    dot_files
+   ip_address_referer
    misc_extensions
    non_printable_chars
    null_or_escape
@@ -22,7 +25,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.4.4';
+our $VERSION = 'v0.5.0';
 
 
 
@@ -52,8 +55,16 @@ sub dot_files {
 }
 
 
+sub ip_address_referer {
+    return (
+        HTTP_REFERER => qr{^https?://$RE{net}{IPv4}/},
+        HTTP_REFERER => qr{^https?://$RE{net}{IPv6}/},
+    );
+}
+
+
 sub misc_extensions {
-    my $re = qr{[.](?:bak|cfg|conf|dat|inc|ini)\b};
+    my $re = qr{[.](?:bak|cfg|conf|dat|inc|ini|yml)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -85,7 +96,7 @@ sub require_content {
 
 
 sub script_extensions {
-    my $re = qr{[.](?:as[hp]x?|axd|bat|cfm|cgi|com|dll|do|exe|jspa?|lua|php5?|p[lm]|ps[dm]?[1h]|sht?|shtml|sql)\b};
+    my $re = qr{[.](?:as[hp]x?|axd|bat|cfm|cgi|com|dll|do|exe|jspa?|lua|mvc?|php5?|p[lm]|ps[dm]?[1h]|sht?|shtml|sql)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -137,7 +148,7 @@ Plack::Middleware::Security::Common - A simple security filter for with common r
 
 =head1 VERSION
 
-version v0.4.4
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -172,6 +183,28 @@ past the PSGI layer.
 
 See L</EXPORTS> for a list of rules.
 
+You can create exceptions to the rules by adding qualifiers, for
+example, you want to block requests for archives, except in a
+F</downloads> folder, you could use something like
+
+  builder {
+
+    enable "Security::Common",
+        rules => [
+           -and => [
+                -notany => [ PATH_INFO => qr{^/downloads/} ],
+                -any    => [ archive_extensions ],
+            ],
+          ...
+        ];
+
+    ...
+
+  };
+
+Note that the rules return an array of matches, so when qualifying
+them you will need to put them in an array reference.
+
 =head1 EXPORTS
 
 =head2 archive_extensions
@@ -188,6 +221,11 @@ or query string, or a C<cgi_wrapper> script.
 
 This blocks all requests that refer to dot-files or C<..>, except for
 the F</.well-known/> path.
+
+=head2 ip_address_referer
+
+This blocks all requests where the HTTP referer is an IP4 or IP6
+address.
 
 =head2 misc_extensions
 

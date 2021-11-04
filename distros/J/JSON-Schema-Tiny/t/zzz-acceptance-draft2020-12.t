@@ -42,6 +42,8 @@ acceptance_tests(
           refRemote.json
           unevaluatedItems.json
           unevaluatedProperties.json
+          vocabulary.json
+          optional/format-assertion.json
         ) ] },
       { file => 'defs.json', group_description => [ 'valid definition', 'validate definition against metaschema' ] },
       { file => 'ref.json', group_description => [
@@ -49,14 +51,18 @@ acceptance_tests(
           'Recursive references between schemas',
           'refs with relative uris and defs',
           'relative refs with absolute uris and defs',
+          '$id must be resolved against nearest parent, not just immediate parent',
         ] },
       { file => 'unknownKeyword.json', group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
       { file => 'optional/bignum.json' },     # TODO: see JSM issue #10
       # various edge cases that are difficult to accomodate
-      { file => 'optional/ecmascript-regex.json', group_description => 'ECMA 262 regex $ does not match trailing newline', test_description => 'matches in Python, but should not in jsonschema' }, # typo - fixed in test suite commit 878b0ad5
+      { file => 'optional/ecmascript-regex.json', group_description => '\w in patterns matches [A-Za-z0-9_], not unicode letters', test_description => [ 'literal unicode character in json string', 'unicode character in hex format in string' ] },
+      { file => 'optional/ecmascript-regex.json', group_description => '\d in pattern matches [0-9], not unicode digits', test_description => 'non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)' },
+      { file => 'optional/ecmascript-regex.json', group_description => '\w in patternProperties matches [A-Za-z0-9_], not unicode letters', test_description => [ 'literal unicode character in json string', 'unicode character in hex format in string' ] },
+      { file => 'optional/ecmascript-regex.json', group_description => '\d in patternProperties matches [0-9], not unicode digits', test_description => 'non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)' },
       { file => 'optional/ecmascript-regex.json', group_description => [ 'ECMA 262 \d matches ascii digits only', 'ECMA 262 \D matches everything but ascii digits', 'ECMA 262 \w matches ascii letters only', 'ECMA 262 \W matches everything but ascii letters' ] }, # TODO, see test suite PR#505
-      { file => 'optional/ecmascript-regex.json', group_description => 'ECMA 262 \s matches whitespace', test_description => 'zero-width whitespace matches' }, # bad test: \ufeff is not a space character - should be \u200b
-      { file => 'optional/ecmascript-regex.json', group_description => 'ECMA 262 \S matches everything but whitespace', test_description => 'zero-width whitespace does not match' }, # ""
+      { file => 'optional/ecmascript-regex.json', group_description => 'ECMA 262 \s matches whitespace', test_description => 'zero-width whitespace matches' },
+      { file => 'optional/ecmascript-regex.json', group_description => 'ECMA 262 \S matches everything but whitespace', test_description => 'zero-width whitespace does not match' },
       "$]" < 5.017001 ? ( # in Unicode 6.2, vertical tab was added to \s
         { file => 'optional/ecmascript-regex.json', group_description => 'ECMA 262 \s matches whitespace', test_description => 'Line tabulation matches' },
         { file => 'optional/ecmascript-regex.json', group_description => 'ECMA 262 \S matches everything but whitespace', test_description => 'Line tabulation does not match' },

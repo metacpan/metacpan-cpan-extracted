@@ -4,7 +4,7 @@ valid.ipv6@[IPv6:2001:0db8:0000:0000:0000:ff00:0042:8329]
 valid.ipv6+ipv4@[IPv6:::ffff:192.0.2.128]
 valid.domain@iana.org
 valid.domain@почта.рф
-valid.domain@大众汽车.大众汽车
+valid.domain@在线.在线
 invalid.ipv4@a[10.0.0.1]
 invalid.ipv4@ [10.0.0.1]
 invalid.ipv4@[0.1.2.3]

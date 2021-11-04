@@ -1,3 +1,13 @@
+remaing todo on DBIC glue stuff
+
+-- delete control
+-- review that we are doing nesting rules right over in set_single_related_from_params
+-- make final descioun about allows lookups via single type relationships (flag or not)
+-- do a review to see where we are doing the same query over and over
+- version 2 of view helpers based on the proposed view metadata code
+-- Make a more complet example application to make sure its all looking good
+
+
 nesting notes
 
 If the request only containers PKs OR unique keys (only one of them) then we ignore nesting

@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ServiceOptionRules;
-$Shipment::Purolator::WSDL::Types::ServiceOptionRules::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ServiceOptionRules::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,13 +31,13 @@ Class::Std::initialize();
               Exclusions
               Inclusions
 
-              )
+            )
         ],
         {   'ServiceID'  => \%ServiceID_of,
             'Exclusions' => \%Exclusions_of,
             'Inclusions' => \%Inclusions_of,
         },
-        {   'ServiceID' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'ServiceID'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'Exclusions' =>
               'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
             'Inclusions' =>
@@ -68,7 +68,7 @@ Shipment::Purolator::WSDL::Types::ServiceOptionRules
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

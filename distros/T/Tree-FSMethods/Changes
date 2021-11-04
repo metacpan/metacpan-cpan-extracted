@@ -1,3 +1,10 @@
+0.004   2021-10-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Update mentioned module Role{,Bundle}::TinyCommons::Tree.
+
+
 0.003   2021-06-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Update prereq (renamed module Tree::{To,To::}TextLines).

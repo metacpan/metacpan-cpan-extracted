@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use parent qw(Pod::Simple);
 
@@ -173,7 +173,7 @@ sub _copyrights_from_text {
     my @copyrights
         = sort { $a->{year} cmp $b->{year} } values %unique_copyrights;
 
-    return wantarray ? @copyrights : \@copyrights;
+    return \@copyrights;
 }
 
 sub copyrights {
@@ -190,7 +190,7 @@ sub copyrights {
         push @copyrights, @{$self->_copyrights_from_text($section)};
     }
 
-    return wantarray ? @copyrights : \@copyrights;
+    return \@copyrights;
 }
 
 sub section {
@@ -302,7 +302,7 @@ CPANPLUS::Dist::Debora::Pod - Parse Pod documents
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -363,7 +363,7 @@ yeah!" will be returned.
 
   =head1 NAME
 
-  Hoo::Boy::Wowza - Stuff B<wow> yeah!
+  Hoo::Boy::Wowza - Stuff wow yeah!
 
 =head2 summary
 
@@ -376,7 +376,7 @@ returned.
 
   =head1 NAME
 
-  Hoo::Boy::Wowza - Stuff B<wow> yeah!
+  Hoo::Boy::Wowza - Stuff wow yeah!
 
 =head2 description
 

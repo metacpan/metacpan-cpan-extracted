@@ -194,60 +194,6 @@ where $formattedstring is the C<sprintf>-formatted version of the
 arguments passed to I<sslcroak>, and the OpenSSL error strings are
 retrieved using B<ERR_get_error(3)> and B<ERR_error_string(3)>.
 
-=head3 parse_RFC3280_time
-
-  static ASN1_TIME* parse_RFC3280_time(char* datetime,
-                   char** errmsg, char* sslerrmsg);
-
-Parses C<datetime>, a date in "Zulu" format (that is, yyyymmddhhmmssZ,
-with a literal Z at the end), and returns a newly-allocated ASN1_TIME*
-structure utilizing a C<utcTime> encoding for dates in the year 2049
-or before and C<generalizedTime> for dates in 2050 and after.  RFC3280
-dictates that this convention should apply to most date-related fields
-in X509 certificates and CRLs (as per sections 4.1.2.5 for certificate
-validity periods, and 5.1.2.4 through 5.1.2.6 for CRL validity periods
-and certificate revocation times).  By contrast, the C<invalidityDate>
-CRL revocation reason extension is always in C<generalizedTime> and
-this function should not be used there.
-
-If there is an error, NULL is returned, and one (and only
-one) of *errmsg and *sslerrmsg is set to an error string, provided
-that they are not NULL.  Caller should thereafter call I<croak> or
-L</sslcroak> respectively.
-
-=head3 parse_RFC3280_time_or_croak
-
-  static ASN1_TIME* parse_RFC3280_time_or_croak(char* datetime);
-
-Like L</parse_RFC3280_time> except that it handles its errors itself and
-will therefore never return NULL.  The caller should not have an
-outstanding temporary variable that must be freed before it returns,
-or a memory leak will be created; if this is the case, use the more
-clunky L</parse_RFC3280_time> form instead.
-
-=head3 parse_serial
-
-  static ASN1_INTEGER* parse_serial
-              (char* hexserial, char** errmsg, char** sslerrmsg);
-
-Parses hexserial, a lowercase, hexadecimal string that starts with
-"0x", and returns it as a newly-allocated C<ASN1_INTEGER> structure
-that must be freed by caller (with C<ASN1_INTEGER_free>) when done
-with it.  If there is an error, NULL is returned, and one (and only
-one) of *errmsg and *sslerrmsg is set to an error string, provided
-that they are not NULL.  Caller should thereafter call I<croak> or
-L</sslcroak> respectively.
-
-=head3 parse_serial_or_croak
-
-  static ASN1_INTEGER* parse_serial_or_croak(char* hexserial);
-
-Like L</parse_serial> except that it handles its errors itself and
-will therefore never return NULL.  The caller should not have an
-outstanding temporary variable that must be freed before it returns,
-or a memory leak will be created; if this is the case, use the more
-clunky L</parse_serial> form instead.
-
 =cut
 
 sub _c_boilerplate { <<'C_BOILERPLATE'; }
@@ -383,91 +329,6 @@ static void sslcroak(char *fmt, ...) {
     }
 }
 
-/* RFC3280, section 4.1.2.5 */
-#define RFC3280_cutoff_date "20500000" "000000"
-static ASN1_TIME* parse_RFC3280_time(char* date,
-                                     char** errmsg, char** sslerrmsg) {
-    int status;
-    int is_generalizedtime;
-    ASN1_TIME* retval;
-
-    if (strlen(date) != strlen(RFC3280_cutoff_date) + 1) {
-         if (errmsg) { *errmsg = "Wrong date length"; }
-         return NULL;
-    }
-    if (date[strlen(RFC3280_cutoff_date)] != 'Z') {
-         if (errmsg) { *errmsg = "Wrong date format"; }
-         return NULL;
-    }
-
-    if (! (retval = ASN1_TIME_new())) {
-         if (errmsg) { *errmsg = "ASN1_TIME_new failed"; }
-         return NULL;
-    }
-
-    is_generalizedtime = (strcmp(date, RFC3280_cutoff_date) > 0);
-    if (! (is_generalizedtime ?
-           ASN1_GENERALIZEDTIME_set_string(retval, date) :
-           ASN1_UTCTIME_set_string(retval, date + 2)) ) {
-        ASN1_TIME_free(retval);
-        if (errmsg) {
-            *errmsg = (is_generalizedtime ?
-               "ASN1_GENERALIZEDTIME_set_string failed (bad date format?)" :
-               "ASN1_UTCTIME_set_string failed (bad date format?)");
-        }
-        return NULL;
-    }
-    return retval;
-}
-
-static ASN1_TIME* parse_RFC3280_time_or_croak(char* date) {
-    char* plainerr = NULL; char* sslerr = NULL;
-    ASN1_INTEGER* retval = NULL;
-    if ((retval = parse_RFC3280_time(date, &plainerr, &sslerr))) {
-        return retval;
-    }
-    if (plainerr) { croak("%s", plainerr); }
-    if (sslerr) { sslcroak("%s", sslerr); }
-    croak("Unknown error in parse_RFC3280_time");
-    return NULL; /* Not reached */
-}
-
-static ASN1_INTEGER* parse_serial(char* hexserial,
-          char** errmsg, char** sslerrmsg) {
-    BIGNUM* serial = NULL;
-    ASN1_INTEGER* retval;
-
-    if (! (hexserial[0] == '0' && hexserial[1] == 'x')) {
-        if (errmsg) {
-            *errmsg = "Bad serial string, should start with 0x";
-        }
-        return NULL;
-    }
-    if (! BN_hex2bn(&serial, hexserial + 2)) {
-        if (sslerrmsg) { *sslerrmsg = "BN_hex2bn failed"; }
-        return NULL;
-    }
-    retval = BN_to_ASN1_INTEGER(serial, NULL);
-    BN_free(serial);
-    if (! retval) {
-        if (sslerrmsg) { *sslerrmsg = "BN_to_ASN1_INTEGER failed"; }
-        return NULL;
-    }
-    return retval;
-}
-
-static ASN1_INTEGER* parse_serial_or_croak(char* hexserial) {
-    char* plainerr = NULL; char* sslerr = NULL;
-    ASN1_INTEGER* retval = NULL;
-    if ((retval = parse_serial(hexserial, &plainerr, &sslerr))) {
-        return retval;
-    }
-    if (plainerr) { croak("%s", plainerr); }
-    if (sslerr) { sslcroak("%s", sslerr); }
-    croak("Unknown error in parse_serial");
-    return NULL; /* Not reached */
-}
-
 C_BOILERPLATE
 
 =head2 BOOT-time effect
@@ -574,18 +435,18 @@ sub compile_into {
     my ($class, $package, $c_code, %opts) = @_;
     my $compile_params = ($class->full_debugging ?
                           <<'COMPILE_PARAMS_DEBUG' :
-    CCFLAGS => "-Wall -Wno-unused -Werror -save-temps",
+    CCFLAGS => "-Wall -Wno-compound-token-split-by-macro -Wno-unused -Werror -save-temps",
     OPTIMIZE => "-g",
     CLEAN_AFTER_BUILD => 0,
 COMPILE_PARAMS_DEBUG
                           <<'COMPILE_PARAMS_OPTIMIZED');
-    OPTIMIZE => "-g -O2",
+    OPTIMIZE => "-g -O2  -Wno-compound-token-split-by-macro",
 COMPILE_PARAMS_OPTIMIZED
 
-      my $openssl_params = sprintf('LIBS => "%s -lcrypto -lssl",',
+      my $openssl_params = sprintf("LIBS => '%s -lcrypto -lssl',",
                                    ($ENV{BUILD_OPENSSL_LDFLAGS} or ""));
     if ($ENV{BUILD_OPENSSL_CFLAGS}) {
-        $openssl_params .= qq' INC => "$ENV{BUILD_OPENSSL_CFLAGS}",';
+        $openssl_params .= " INC => '$ENV{BUILD_OPENSSL_CFLAGS}',";
     }
 
     my $version_params =
@@ -734,14 +595,16 @@ __END__
 
 =cut
 
-use Test::More "no_plan";
-use Test::Group;
+use Test2::V0;
 use Crypt::OpenSSL::CA::Test qw(errstack_empty_ok
                                 cannot_check_SV_leaks leaks_SVs_ok
                                 cannot_check_bytes_leaks leaks_bytes_ok);
 use Data::Dumper;
 
-test "synopsis" => sub {
+# We are going to compile some C code as part of the test suite:
+$ENV{$_} = $main::ENVorig{$_} for qw(BUILD_OPENSSL_CFLAGS BUILD_OPENSSL_LDFLAGS);
+
+subtest "synopsis" => sub {
     my $idiom = My::Tests::Below->pod_code_snippet("synopsis");
 
     my $some_c_code = <<"SOME_C_CODE";
@@ -756,7 +619,7 @@ SOME_C_CODE
     is($result, undef);
 };
 
-test 'perl_wrap() and perl_unwrap()' => sub {
+subtest 'perl_wrap() and perl_unwrap()' => sub {
     # Also doubles as a learning test for Inline
     use Crypt::OpenSSL::CA::Inline::C <<"C_TEST";
 SV* make_bogus_object(int value) {
@@ -799,7 +662,7 @@ C_TEST
     is($object, undef);
 };
 
-test '$c_boilerplate: char0_value()' => sub {
+subtest '$c_boilerplate: char0_value()' => sub {
     { package Char0Test; use Crypt::OpenSSL::CA::Inline::C <<"CHAR0_TEST"; }
 
 static
@@ -814,8 +677,8 @@ CHAR0_TEST
        "", "char0_value shall not SEGV on undef");
 };
 
-skip_next_test "Devel::Leak needed" if cannot_check_SV_leaks;
-test 'OO and reference counting using $c_boilerplate' => sub {
+subtest 'OO and reference counting using $c_boilerplate' => sub {
+    skip_all "Devel::Leak needed" if cannot_check_SV_leaks;
     # This also doubles as a learning test (for OO style)
     { package Foo; use Crypt::OpenSSL::CA::Inline::C <<"C_TEST"; }
 static
@@ -854,45 +717,10 @@ void ulp() {
     sslcroak(buf);
 }
 
-int test_parse_RFC3280_time(char* time) {
-    char* plainerr = NULL; char* sslerr = NULL;
-    ASN1_TIME* asn1time;
-    int retval;
-
-    asn1time = parse_RFC3280_time(time, &plainerr, &sslerr);
-    if (asn1time) {
-        retval = (asn1time->type == V_ASN1_GENERALIZEDTIME ? 1 : 0);
-        ASN1_TIME_free(asn1time);
-        return retval;
-    }
-    if (plainerr) { return -1; }
-    if (sslerr) { return -2; }
-    return -42;
-}
-
-void test_parse_RFC3280_time_or_croak(char* time) {
-    ASN1_TIME_free(parse_RFC3280_time_or_croak(time));
-}
-
-int test_parse_serial(char* serial) {
-    char* plainerr = NULL; char* sslerr = NULL;
-    ASN1_INTEGER* asn1serial;
-
-    asn1serial = parse_serial(serial, &plainerr, &sslerr);
-    if (asn1serial) { ASN1_INTEGER_free(asn1serial); return 0; }
-    if (plainerr) { return 1; }
-    if (sslerr) { return 2; }
-    return 42;
-}
-
-void test_parse_serial_or_croak(char* serial) {
-    ASN1_INTEGER_free(parse_serial_or_croak(serial));
-}
-
 C_TEST
 
 
-test "sslcroak()" => sub {
+subtest "sslcroak()" => sub {
     # Implementation lifted from Crypt::OpenSSL::CA so as
     # to sever the circular dependency in tests:
     sub Crypt::OpenSSL::CA::_sslcroak_callback {
@@ -940,52 +768,7 @@ test "sslcroak()" => sub {
     }
 };
 
-test "parse_RFC3280_time" => sub {
-    is(TestCRoutines::test_parse_RFC3280_time("20510103103442Z"), 1);
-    is(TestCRoutines::test_parse_RFC3280_time("19510103103442Z"), 0);
-    TestCRoutines::test_parse_RFC3280_time_or_croak("19510103103442Z");
-    eval {
-        TestCRoutines::test_parse_RFC3280_time_or_croak("0Z");
-        fail("Should have thrown");
-    };
-};
-
-skip_next_test "Devel::Mallinfo needed" if cannot_check_bytes_leaks;
-test "parse_RFC3280_time_or_croak memory leaks" => sub {
-    leaks_bytes_ok {
-        for(1..10000) {
-            eval {
-                TestCRoutines::test_parse_RFC3280_time_or_croak("portnawak");
-                fail("Should have thrown");
-            };
-            TestCRoutines::test_parse_RFC3280_time_or_croak("20510103103442Z");
-            TestCRoutines::test_parse_RFC3280_time_or_croak("19510103103442Z");
-        }
-    };
-};
-
-test "parse_serial" => sub {
-    TestCRoutines::test_parse_serial_or_croak("0xdeadbeef1234");
-    pass;
-    eval {
-        TestCRoutines::test_parse_serial_or_croak("deadbeef1234");
-        fail("should have thrown");
-    };
-    ok(! ref($@), "Plain error expected");
-    unlike($@, qr/unknown/i, "proper internal error management");
-    is(TestCRoutines::test_parse_serial("0xdeadbeef1234"), 0);
-    is(TestCRoutines::test_parse_serial("deadbeef1234"), 1);
-};
-
-skip_next_test "Devel::Mallinfo needed" if cannot_check_bytes_leaks;
-test "parse_serial memory leaks" => sub {
-    leaks_bytes_ok {
-        for(1..10000) {
-            TestCRoutines::test_parse_serial("0xdeadbeef1234");
-            TestCRoutines::test_parse_serial("deadbeef1234");
-        }
-    };
-};
+done_testing;
 
 =end internals
 

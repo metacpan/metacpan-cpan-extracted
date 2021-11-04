@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::MPL3115A2 0.08;
+package Device::Chip::MPL3115A2 0.09;
 class Device::Chip::MPL3115A2
    extends Device::Chip::Base::RegisteredI2C;
 
@@ -252,22 +252,15 @@ for the conversion to work).
 
 =cut
 
-has $_pending_trigger;
-
-declare_sensor pressure =>
-   method    => "_trigger_and_read_pressure",
-   units     => "pascals",
-   precision => 0;
-
 async method read_pressure () { return await $self->_mplread_p( REG_OUT_P_MSB ) }
 
-async method _trigger_and_read_pressure ()
-{
-   $_pending_trigger //= $self->oneshot;
-   await $_pending_trigger;
-   undef $_pending_trigger;
-   return await $self->read_pressure;
-}
+declare_sensor pressure =>
+   method    => async method () {
+      await $self->_next_trigger;
+      return await $self->read_pressure;
+   },
+   units     => "pascals",
+   precision => 0;
 
 =head2 read_altitude
 
@@ -290,20 +283,15 @@ C. (The chip must I<not> be in C<RAW> mode for the conversion to work).
 
 =cut
 
-declare_sensor temperature =>
-   method    => "_trigger_and_read_temperature",
-   units     => "°C",
-   precision => 2;
-
 async method read_temperature () { return await $self->_mplread_t( REG_OUT_T_MSB ) }
 
-async method _trigger_and_read_temperature ()
-{
-   $_pending_trigger //= $self->oneshot;
-   await $_pending_trigger;
-   undef $_pending_trigger;
-   return await $self->read_temperature;
-}
+declare_sensor temperature =>
+   method    => async method () {
+      await $self->_next_trigger;
+      return await $self->read_temperature;
+   },
+   units     => "°C",
+   precision => 2;
 
 =head2 read_min_pressure
 
@@ -469,6 +457,14 @@ async method oneshot ()
 {
    await $self->start_oneshot;
    await $self->busywait_oneshot;
+}
+
+has $_pending_trigger;
+
+method _next_trigger
+{
+   return $_pending_trigger //=
+      $self->oneshot->on_ready(sub { undef $_pending_trigger; });
 }
 
 =head1 AUTHOR

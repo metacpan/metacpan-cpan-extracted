@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2021/06/29
+## Modified 2021/08/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -102,7 +102,7 @@ EOT
     # be removed in that order
     our $SHEM_REPO = [];
     our $ID2OBJ    = {};
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 sub init
@@ -121,7 +121,7 @@ sub init
     # SHM_BUFSIZ
     $self->{size}       = SHM_BUFSIZ;
     $self->{_init_strict_use_sub} = 1;
-    $self->{_packing_method} = 'json';
+    $self->{_packing_method} = 'storable';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{addr}       = undef();
     $self->{id}         = undef();
@@ -298,8 +298,8 @@ sub lock
     $timeout = 0 if( !defined( $timeout ) || $timeout !~ /^\d+$/ );
     # If the lock is different, release it first
     $self->unlock if( $self->locked );
-    my $semid = $self->semid ||
-        return( $self->error( "No semaphore id set yet." ) );
+    my $semid = $self->semid;
+    return( $self->error( "No semaphore id set yet." ) ) if( !defined( $semid ) );
     # $self->message( 3, "Setting a lock on semaphore id \"$semid\" with type \"$type\" and arguments: ", sub{ $self->dump( $SEMOP_ARGS->{ $type } ) } );
     try
     {
@@ -444,6 +444,7 @@ sub open
         mode    => $self->mode,
         destroy => $self->destroy,
         destroy_semaphore => $self->destroy_semaphore,
+        _packing_method => $self->_packing_method,
     ) || return( $self->error( "Cannot create object with key '", ( $opts->{key} || $self->key ), "': ", $self->error ) );
     $new->key( $self->key );
     $new->serial( $self->serial );
@@ -964,4 +965,3 @@ END
 1;
 
 __END__
-

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-gimpgitbuild",
-  "dist_version" => "0.30.0",
+  "dist_version" => "0.30.2",
   "license" => "apache",
   "module_name" => "App::gimpgitbuild",
   "recursive_test_files" => 1,

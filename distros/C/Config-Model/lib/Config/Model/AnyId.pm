@@ -7,12 +7,13 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.142;
+package Config::Model::AnyId 2.144;
 
-use 5.010;
+use 5.020;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
+with "Config::Model::Role::Utils";
 
 use Config::Model::Exception;
 use Config::Model::Warper;
@@ -23,6 +24,9 @@ use Mouse::Util::TypeConstraints;
 use Scalar::Util qw/weaken/;
 
 extends qw/Config::Model::AnyThing/;
+
+use feature qw/signatures/;
+no warnings qw/experimental::signatures/;
 
 subtype 'KeyArray' => as 'ArrayRef' ;
 coerce 'KeyArray' => from 'Str' => via { [$_] } ;
@@ -84,13 +88,9 @@ has has_fixes => (
         inc_fixes =>   [ add => 1 ],
         dec_fixes =>   [ sub => 1 ],
         add_fixes => 'add',
+        flush_fixes => [ mul => 0 ],
     }
 );
-
-# work-around because 'set' does work with Mouse Number trait
-sub flush_fixes {
-    $_[0]->{has_fixes} = 0;
-}
 
 # Some idea for improvement
 
@@ -148,7 +148,7 @@ has config_model => (
 
 sub _config_model {
     my $self = shift;
-    my $p    = $self->instance->config_model;
+    return $self->instance->config_model;
 }
 
 sub config_class_name {
@@ -186,18 +186,16 @@ sub BUILD {
 
 # this method can be called by the warp mechanism to alter (warp) the
 # feature of the Id object.
-sub set_properties {
-    my $self = shift;
-
+sub set_properties ($self, @args) {
     # mega cleanup
     for ( @allowed_warp_params ) { delete $self->{$_}; }
 
-    my %args = ( %{ $self->{backup} }, @_ );
+    my %args = ( %{ $self->{backup} }, @args );
 
     # these are handled by Node or Warper
     for ( qw/level/ ) { delete $args{$_}; }
 
-    $logger->trace( $self->name, " set_properties called with @_" );
+    $logger->trace( $self->name, " set_properties called with @args" );
 
     for ( @common_params ) {
         $self->{$_} = delete $args{$_} if defined $args{$_};
@@ -275,7 +273,10 @@ sub set_properties {
 
     Config::Model::Exception::Model->throw(
         object => $self,
-        error  => "Unexpected parameters: " . join( ' ', keys %args ) ) if scalar keys %args;
+        error  => "Unexpected parameters: " . join( ' ', keys %args )
+    ) if scalar keys %args;
+
+    return;
 }
 
 sub create_default_with_init {
@@ -288,6 +289,7 @@ sub create_default_with_init {
     foreach my $def_key ( keys %$h ) {
         $self->create_default_content($def_key);
     }
+    return;
 }
 
 sub create_default_content {
@@ -310,18 +312,19 @@ sub create_default_content {
     else {
         $v_obj->load( $def );
     }
+    return;
 }
 
 sub max {
     my $self = shift;
     carp $self->name, ": max param is deprecated, use max_index\n";
-    $self->max_index;
+    return $self->max_index;
 }
 
 sub min {
     my $self = shift;
     carp $self->name, ": min param is deprecated, use min_index\n";
-    $self->min_index;
+    return $self->min_index;
 }
 
 sub cargo_type { goto &get_cargo_type; }
@@ -343,10 +346,8 @@ sub get_cargo_info {
     return $self->{cargo}{$what};
 }
 
-# internal, does a grab with improved error mesage
-sub safe_typed_grab {
-    my $self  = shift;
-    my %args  = @_;
+# internal, does a grab with improved error message
+sub safe_typed_grab ($self, %args) {
     my $param = $args{param} || croak "safe_typed_grab: missing param";
 
     my $res = eval {
@@ -395,16 +396,12 @@ sub name {
 }
 
 # internal. Handle model declaration arguments
-sub handle_args {
-    my $self = shift;
-    my %args = @_;
-
+sub handle_args ($self, %args) {
     my $warp_info = delete $args{warp};
 
-    for ( qw/index_class index_type morph ordered/) {
+    for (qw/index_class index_type morph ordered/) {
         $self->{$_} = delete $args{$_} if defined $args{$_};
     }
-
 
     $self->{backup} = dclone( \%args );
 
@@ -426,7 +423,7 @@ sub apply_fixes {
     $fix_logger->trace( $self->location . ": apply_fixes called" );
 
     $self->deep_check( fix => 1, logger => $fix_logger );
-
+    return;
 }
 
 my %check_idx_dispatch =
@@ -440,10 +437,7 @@ my %mode_move = (
     normal  => {},
 );
 
-sub notify_change {
-    my $self = shift;
-    my %args = @_;
-
+around notify_change => sub ($orig, $self, %args) {
     if ($change_logger->is_trace) {
         my @a = map { ( $_ => $args{$_} // '<undef>' ); } sort keys %args;
         $change_logger->trace( "called for ", $self->name, " from ", join( ' ', caller ),
@@ -463,8 +457,9 @@ sub notify_change {
     return if $self->instance->initial_load and not $args{really};
 
     $self-> needs_content_check(1);
-    $self->SUPER::notify_change(%args);
-}
+    $self->$orig(%args);
+    return;
+};
 
 # the number of checks is becoming confusing. We have
 # - check_idx to check whether an index is fine. This is called when creating
@@ -484,10 +479,7 @@ sub check {
     goto &deep_check; # backward compat
 }
 
-sub deep_check {
-    my $self = shift;
-    my @args = @_;
-
+sub deep_check ($self, @args) {
     $deep_check_logger->trace("called on ".$self->name);
 
     for ( $self->fetch_all_indexes() ) {
@@ -495,13 +487,11 @@ sub deep_check {
     }
 
     $self->check_content(@args, logger => $deep_check_logger);
+    return;
 }
 
 # check globally the list or hash, called by apply_fix or deep_check
-sub check_content {
-    my $self = shift;
-
-    my %args = @_ ;
+sub check_content ($self, %args) {
     my $silent    = $args{silent} || 0;
     my $apply_fix = $args{fix}    || 0;
     my $local_logger = $args{logger} || $logger;
@@ -551,10 +541,8 @@ sub check_content {
 
 # internal function to check the validity of the index. Called when creating a new
 # index or when set_properties is called (init or during warp)
-sub check_idx {
-    my $self = shift;
-
-    my %args      = @_ > 1 ? @_ : ( index => $_[0] );
+sub check_idx ($self, @args) {
+    my %args = _resolve_arg_shortcut(\@args, 'index');
     my $idx       = $args{index};
     my $silent    = $args{silent} || 0;
     my $check     = $args{check} || 'yes';
@@ -628,6 +616,7 @@ sub check_follow_keys_from {
         . $followed->name
         . "'. Expected '"
         . join( "', '", $followed->fetch_all_indexes ) . "'";
+    return;
 }
 
 #internal
@@ -639,6 +628,7 @@ sub check_allow_keys {
     push @$error,
         "Unexpected key '" . $self->shorten_idx($idx) . "'. Expected '" . join( "', '", @{ $self->{allow_keys} } ) . "'"
         unless $ok;
+    return;
 }
 
 #internal
@@ -648,6 +638,7 @@ sub check_allow_keys_matching {
 
     push @$error, "Unexpected key '" . $self->shorten_idx($idx) . "'. Key must match $match"
         unless $idx =~ /$match/;
+    return;
 }
 
 #internal
@@ -664,7 +655,7 @@ sub check_allow_keys_from {
         . $from->name
         . "'. Expected '"
         . join( "', '", $from->fetch_all_indexes ) . "'";
-
+    return;
 }
 
 sub check_warn_if_key_match {
@@ -672,6 +663,7 @@ sub check_warn_if_key_match {
     my $re = $self->{warn_if_key_match};
 
     push @$warn, "key '" . $self->shorten_idx($idx) . "' should not match $re\n" if $idx =~ /$re/;
+    return;
 }
 
 sub check_warn_unless_key_match {
@@ -679,6 +671,7 @@ sub check_warn_unless_key_match {
     my $re = $self->{warn_unless_key_match};
 
     push @$warn, "key '" . $self->shorten_idx($idx) . "' should match $re\n" unless $idx =~ /$re/;
+    return;
 }
 
 sub check_duplicates {
@@ -725,11 +718,11 @@ sub check_duplicates {
     else {
         die "Internal error: duplicates is $dup";
     }
+    return;
 }
 
-sub fetch_with_id {
-    my $self  = shift;
-    my %args  = @_ > 1 ? @_ : ( index => shift );
+sub fetch_with_id ($self, @args) {
+    my %args = _resolve_arg_shortcut(\@args, 'index');
     my $check = $self->_check_check( $args{check} );
     my $idx   = $args{index};
 
@@ -765,9 +758,8 @@ sub fetch_with_id {
     return;
 }
 
-sub get {
-    my $self    = shift;
-    my %args    = @_ > 1 ? @_ : ( path => $_[0] );
+sub get ($self, @args) {
+    my %args = _resolve_arg_shortcut(\@args, 'path');
     my $path    = delete $args{path};
     my $autoadd = 1;
     $autoadd = $args{autoadd} if defined $args{autoadd};
@@ -795,12 +787,10 @@ sub get {
     return $obj->get( path => $new_path, get_obj => $get_obj, %args );
 }
 
-sub set {
-    my $self = shift;
-    my $path = shift;
+sub set ($self, $path, @args) {
     $path =~ s!^/!!;
     my ( $item, $new_path ) = split m!/!, $path, 2;
-    return $self->fetch_with_id($item)->set( $new_path, @_ );
+    return $self->fetch_with_id($item)->set( $new_path, @args );
 }
 
 sub copy {
@@ -811,7 +801,7 @@ sub copy {
 
     if ( $ok && $self->{cargo}{type} eq 'leaf' ) {
         $logger->trace( "AnyId: copy leaf value from " . $self->name . " $from to $to" );
-        $self->fetch_with_id($to)->store( $from_obj->fetch() );
+        return $self->fetch_with_id($to)->store( $from_obj->fetch() );
     }
     elsif ($ok) {
 
@@ -819,7 +809,7 @@ sub copy {
         $logger->trace( "AnyId: deep copy node from " . $self->name );
         my $target = $self->fetch_with_id($to);
         $logger->trace( "AnyId: deep copy node to " . $target->name );
-        $target->copy_from($from_obj);
+        return $target->copy_from($from_obj);
     }
     else {
         Config::Model::Exception::WrongValue->throw(
@@ -827,6 +817,7 @@ sub copy {
             object => $self
         );
     }
+    return;
 }
 
 sub fetch_all {
@@ -835,26 +826,21 @@ sub fetch_all {
     return map { $self->fetch_with_id($_); } @keys;
 }
 
-sub fetch {
-    my $self = shift;
-    return join(',', $self->fetch_all_values(@_) );
+sub fetch ($self, @args) {
+    return join(',', $self->fetch_all_values(@args) );
 }
 
-sub fetch_value {
-    my $self  = shift;
-    my %args  = @_ > 1 ? @_ : ( idx => shift );
+sub fetch_value ($self, @args) {
+    my %args = _resolve_arg_shortcut(\@args, 'idx');
     return $self->_fetch_value(%args, sub => 'fetch');
 }
 
-sub fetch_summary {
-    my $self  = shift;
-    my %args  = @_ > 1 ? @_ : ( idx => shift );
+sub fetch_summary ($self, @args) {
+    my %args = _resolve_arg_shortcut(\@args, 'idx');
     return $self->_fetch_value(%args, sub => 'fetch_summary');
 }
 
-sub _fetch_value {
-    my $self  = shift;
-    my %args  = @_ ;
+sub _fetch_value ($self, %args) {
     my $check = $self->_check_check( $args{check} );
     my $sub = delete $args{sub};
 
@@ -870,29 +856,30 @@ sub _fetch_value {
             info          => "with index $args{idx}",
         );
     }
+    return;
 }
 
-sub fetch_all_values {
-    my $self  = shift;
-    my %args  = @_ > 1 ? @_ : ( mode => shift );
+sub fetch_all_values ($self, @args) {
+    my %args = _resolve_arg_shortcut(\@args, 'mode');
     my $mode  = $args{mode};
     my $check = $self->_check_check( $args{check} );
 
     my @keys = $self->fetch_all_indexes;
 
-        # verify content restrictions applied to List (e.g. no duplicate values)
-        my $ok = $check eq 'no' ? 1 : $self->check_content();
+    # verify content restrictions applied to List (e.g. no duplicate values)
+    my $ok = $check eq 'no' ? 1 : $self->check_content();
 
-        if ( $ok or $check eq 'no' ) {
-            return grep { defined $_ }
-                map { $self->fetch_value(idx => $_, check => $check, mode => $mode ); } @keys;
-        }
-        else {
-            Config::Model::Exception::WrongValue->throw(
-                error  => join( "\n\t", @{ $self->{content_error_list} } ),
-                object => $self
-            );
-        }
+    if ( $ok or $check eq 'no' ) {
+        return grep { defined $_ }
+            map { $self->fetch_value(idx => $_, check => $check, mode => $mode ); } @keys;
+    }
+    else {
+        Config::Model::Exception::WrongValue->throw(
+            error  => join( "\n\t", @{ $self->{content_error_list} } ),
+            object => $self
+        );
+    }
+    return;
 }
 
 sub fetch_all_indexes {
@@ -986,20 +973,24 @@ sub auto_vivify {
     $self->set_data_mode( $idx, $imode );
 
     $self->_store( $idx, $item );
+    return;
 }
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub defined {
     my ( $self, $idx ) = @_;
 
     return $self->_defined($idx);
 }
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub exists {
     my ( $self, $idx ) = @_;
 
     return $self->_exists($idx);
 }
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub delete {
     my ( $self, $idx ) = @_;
 
@@ -1017,11 +1008,12 @@ sub clear {
     $self->_clear;
     $self->clear_data_mode;
     $self->notify_change( note => "cleared all entries" );
+    return;
 }
 
 sub clear_values {
     my ($self) = @_;
-    warn "clear_values deprecated";
+    carp "clear_values deprecated";
 
     my $ct = $self->get_cargo_type;
     Config::Model::Exception::User->throw(
@@ -1034,6 +1026,7 @@ sub clear_values {
         $self->fetch_with_id($_)->store(undef);
     }
     $self->notify_change( note => "cleared all values" );
+    return;
 }
 
 sub warning_msg {
@@ -1083,7 +1076,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.142
+version 2.144
 
 =head1 SYNOPSIS
 

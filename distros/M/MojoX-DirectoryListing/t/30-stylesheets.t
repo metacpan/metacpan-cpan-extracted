@@ -2,6 +2,7 @@ use Test::More;
 use Test::Mojo;
 use MojoX::DirectoryListing;
 use File::Copy;
+use lib '.';
 require t::app1::Server7;
 use strict;
 use warnings;

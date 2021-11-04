@@ -15,7 +15,7 @@ use integer;
 use Test::More;
 use Data::Dumper;
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 use Time::HiRes qw(gettimeofday);
 
 my ($pos, @moves, @expect);

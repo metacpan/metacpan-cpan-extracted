@@ -3,9 +3,9 @@ NAME
     ported from (or inspired by) Ruby libraries
 
 VERSION
-    This document describes version 0.006 of
+    This document describes version 0.007 of
     Acme::CPANModules::PortedFrom::Ruby (from Perl distribution
-    Acme-CPANModules-PortedFrom-Ruby), released on 2021-02-05.
+    Acme-CPANModules-PortedFrom-Ruby), released on 2021-05-29.
 
 DESCRIPTION
   SEE ALSO
@@ -24,9 +24,10 @@ ACME::MODULES ENTRIES
     *   Plack
 
         From Plack's documentation: "Plack is like Ruby's Rack or Python's
-        Paste for WSGI." Plack and PSGI was created by MIYAGAWA in 2009 and
-        is inspired by both Python's WSGI specification (hence the dual
-        specification-implementation split) and Plack (hence the name).
+        Paste for WSGI." Plack and PSGI were created by MIYAGAWA in 2009 and
+        were inspired by both Python's WSGI specification (hence the dual
+        specification-implementation split) and Ruby's Rack (hence the
+        name).
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -37,8 +38,13 @@ FAQ
 
   What are ways to use this Acme::CPANModules module?
     Aside from reading this Acme::CPANModules module's POD documentation,
-    you can install all the listed modules (entries) using cpanmodules CLI
-    (from App::cpanmodules distribution):
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n PortedFrom::Ruby
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries PortedFrom::Ruby | cpanm -n
 
@@ -64,8 +70,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Ruby/issu
-    es>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Port
+    edFrom-Ruby>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

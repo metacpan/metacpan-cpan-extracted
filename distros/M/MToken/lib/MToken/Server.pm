@@ -1,4 +1,4 @@
-package MToken::Server; # $Id: Server.pm 70 2019-06-09 18:25:29Z minus $
+package MToken::Server; # $Id: Server.pm 112 2021-10-11 11:53:20Z minus $
 use strict;
 use warnings FATAL => 'all';
 use utf8;
@@ -7,110 +7,39 @@ use utf8;
 
 =head1 NAME
 
-MToken::Server - mod_perl2 server for storing backups of MToken devices
+MToken::Server - MToken web-server class
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 =head1 SYNOPSIS
 
-    # Apache2 config section
-    <Location /mtoken>
-       SetHandler modperl
-       PerlResponseHandler MToken::Server
-       #PerlSetVar Debug 1
-       PerlSetVar MTokenDir /var/www/mtoken
-    </Location>
+    use MToken::Server;
 
 =head1 DESCRIPTION
 
-To use the functionality of this module, you must edit the virtual-host section of
-the Apache2 WEB server configuration file by specifying the directory for storing
-backup files and authorization data. For example please run
-command: "make serverconfig"
+This module provides MToken web-server functionality
 
-=head2 FUNCTIONS
+=head2 reload
 
-=over 8
+The reload hook
 
-=item B<handler>
+=head2 startup
 
-Handler for Apache2 WEB server
-
-=item B<index_get>
-
-This function returns a list of files on directory in the JSON format
-
-    {
-       "response_object" : "index_get",
-       "data" : {
-          "uri" : "/mtoken",
-          "finished" : 1501500207,
-          "is_index" : 1,
-          "qs" : "",
-          "started" : 1501500206,
-          "method" : "GET",
-          "finishedfmt" : "07/31/17 14:23:27 MSK",
-          "location" : "/mtoken",
-          "startedfmt" : "07/31/17 14:23:26 MSK",
-          "debug" : 0,
-          "filename" : "",
-          "mtokendir" : "/var/www/mtoken/mtoken",
-          "files" : [
-             {
-                "sha1" : "9a7cf5e50477dceab768fdc449eee233e3a9d670",
-                "date_fmt" : "2017/07/26",
-                "file" : "/var/www/mtoken/mtoken/myfooproject.20170726",
-                "size" : 19830,
-                "filename" : "myfooproject.20170726",
-                "md5" : "4b435617553a7a226210b142ccb2cbcc",
-                "date_sfx" : "20170726"
-             }
-          ]
-       },
-       "request_object" : null,
-       "error" : [],
-       "status" : 1
-    }
-
-=item B<index_post>
-
-This function add new backup file to directory
-
-=item B<file_get>
-
-This function provides downloading the backup file from directory
-
-=item B<file_put>
-
-Update the backup file in the directory
-
-=item B<file_delete>
-
-This function provides removing the backup file from directory
-
-=back
+Mojo application startup method
 
 =head1 HISTORY
 
 See C<Changes> file
 
-=head1 DEPENDENCIES
-
-L<LWP>, C<mod_perl2>, L<CTK>
-
 =head1 TO DO
 
 See C<TODO> file
 
-=head1 BUGS
-
-* none noted
-
 =head1 SEE ALSO
 
-L<CTK>, L<mod_perl2>
+L<Mojolicious>, L<MToken>
 
 =head1 AUTHOR
 
@@ -118,7 +47,7 @@ Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2021 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -130,479 +59,114 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = "1.01";
+$VERSION = "1.03";
 
-use Encode;
-use Encode::Locale;
+use Mojo::Base 'Mojolicious';
 
-use mod_perl2;
-use Apache2::RequestIO ();
-use Apache2::RequestRec ();
-use Apache2::RequestUtil ();
-use Apache2::ServerRec ();
-use Apache2::ServerUtil ();
-use Apache2::Connection ();
-use Apache2::Const -compile => qw/ :common :http /;
-use Apache2::Log;
-use Apache2::Util ();
-use APR::Const -compile => qw/ :common /;
-use APR::Table ();
+use Mojo::File qw/path/;
+use Mojo::Util qw/sha1_sum secure_compare/;
 
-use CGI -compile => qw/ :all /;
-use CTK::Serializer;
-use File::Spec;
-use File::Find;
-use File::Basename;
+use CTK::Util qw/preparedir sharedir sharedstatedir/;
+use CTK::ConfGenUtil;
 
-use MToken::Util qw/filesize md5sum sha1sum/;
+use MToken::Const;
 
-use constant {
-        PREFIX              => "MToken",
-        LOCATION            => "/mtoken",
-        DATE_FORMAT         => "%D %H:%M:%S %Z",
-        CONTENT_TYPE        => "application/json; charset=utf-8",
-        SERIALIZE_FORMAT    => 'json',
-        SR_ATTRS            => {
-            json => [
-                { # For serialize
-                    utf8 => 0,
-                    pretty => 1,
-                    allow_nonref => 1,
-                    allow_blessed => 1,
-                },
-                { # For deserialize
-                    utf8 => 0,
-                    allow_nonref => 1,
-                    allow_blessed => 1,
-                },
-            ],
-        },
-        OBJECTS_REQUIRED => [qw/
-                index_post
-            /],
-        ERRORS => {
-            0 => "Internal error",
-            1 => "Can't create directory %s: %s",
-            2 => "Incorrect permissions for directory %s. Required permissions: RWX for owner",
-            3 => "Incorrect uploaded file name",
-            4 => "Can't open file for saving %s: %s",
-            5 => "Can't upload file %s",
-            6 => "File size mismatch: Expected: %s; Got: %s",
-            7 => "File md5sum mismatch: Expected: %s; Got: %s",
-            8 => "File sha1sum mismatch: Expected: %s; Got: %s",
-            9 => "Object mismatch: Expected: %s; Got: %s",
-            10 => "File already exists: %s",
-            11 => "Can't rewrite file, please use PUT command for updating it: %s",
-            12 => "Can't delete file %s: %s",
-            13 => "File not exists: %s",
-            Apache2::Const::HTTP_NO_CONTENT => "No content",
-            Apache2::Const::HTTP_BAD_REQUEST => "Bad request: %s",
-            Apache2::Const::HTTP_METHOD_NOT_ALLOWED => "This method not allowed: %s",
-        },
-    };
-my $DEBUG;
+has 'documentroot';
 
-sub handler {
-    my $r = shift;
-    Apache2::RequestUtil->request($r);
-    $r->handler('modperl');
-    my $q = new CGI if $r->method ne 'PUT';
-    $r->content_type(CONTENT_TYPE);
-    my $uri = $r->uri || ""; $uri =~ s/\/+$//;
-    my $location = $r->location || LOCATION; $location =~ s/\/+$//;
-    my $blank = {
-            status  => 1,
-            error   => [],
-            request_object => scalar($q ? $q->param("object") : ''),
-            data    => {
-                    started     => $r->request_time,
-                    startedfmt  => decode(locale => Apache2::Util::ht_time(
-                            $r->pool, $r->request_time, DATE_FORMAT, 0
-                        )),
-                    method      => $r->method,
-                    location    => $location,
-                    uri         => $uri,
-                    qs          => $r->args || "",
-                },
-        };
-    my %json = %$blank;
+# Mojo Routes (paths)
+sub startup {
+    my $self = shift; # app
+    my $ctk = $self->can('ctk') ? $self->ctk() : $self->{ctk};
 
-    # Debug Mode
-    $DEBUG = $r->dir_config("debug") || 0;
-    $json{data}{debug} = $DEBUG ? 1 : 0;
+    # Set password
+    my $username = value($ctk->conf("username") // "");
+    my $secret = value($ctk->conf("password") // "");
+    $self->secrets([$secret]) if length($secret);
 
-    # Directory
-    my $docroot = $r->document_root();
-    my $mtokendir = $r->dir_config("mtokendir") // $docroot;
-    unless (File::Spec->file_name_is_absolute($mtokendir)) {
-        $mtokendir = File::Spec->catdir($docroot, $mtokendir);
-    }
-    unless (-e $mtokendir) {
-        mkdir($mtokendir) or _set_error(\%json, 1, $mtokendir, $!) && return _output($r => \%json);
-    }
-    unless (-r $mtokendir and -w _ and -x _) {
-        _set_error(\%json, 2, $mtokendir);
-        return _output($r => \%json);
-    }
-    $json{data}{mtokendir} = $mtokendir;
-
-    # Index & File
-    my $is_index = 1;
-    my $file = "";
-    if ($uri =~ /\.[0-9]{8}$/) { # Is File by mask
-        if (index($uri,$location,0) == 0) { # Catched!
-            $file = substr($uri,length($location)+1);
-            if ($file && $file !~ /\//) {
-                $is_index = 0;
-            }
-        } else {
-            $is_index = 1;
-        }
-    }
-    $json{data}{is_index} = $is_index;
-    $json{data}{filename} = $file;
-
-    # Dispatching
-    my $status = 0;
-    my $meth = uc($r->method || "GET");
-    if ($is_index) { # GET and POST for index
-        if ($meth eq "GET" or $meth eq "HEAD") {
-            $status = index_get($r, $q, \%json);
-            _debug(sprintf("%s index: %s", $meth, $status ? 'OK' : 'ERROR'));
-        } elsif ($meth eq "POST") {
-            $status = index_post($r, $q, \%json);
-            _debug(sprintf("%s index: %s", $meth, $status ? 'OK' : 'ERROR'));
-        } else {
-            _set_error(\%json, Apache2::Const::HTTP_METHOD_NOT_ALLOWED, $meth);
-            _error("Error method %s", $meth);
-        }
-    } else { # GET, HEAD, PUT and DELETE for file
-        if ($meth eq "GET" or $meth eq "HEAD") {
-            $status = file_get($r, $q, \%json);
-            _debug(sprintf("%s file: %s", $meth, $status == Apache2::Const::OK ? 'OK' : 'ERROR'));
-            return $status;
-        } elsif ($meth eq "PUT") {
-            $status = file_put($r, $q, \%json);
-            _debug(sprintf("%s file: %s", $meth, $status ? 'OK' : 'ERROR'));
-        } elsif ($meth eq "DELETE") {
-            $status = file_delete($r, $q, \%json);
-            _debug(sprintf("%s file: %s", $meth, $status ? 'OK' : 'ERROR'));
-        } else {
-            _set_error(\%json, Apache2::Const::HTTP_METHOD_NOT_ALLOWED, $meth);
-            _error("Error method %s", $meth);
-        }
-    }
-
-    # Object mismatch
-    my $obj_req = $json{request_object};
-    my $obj_res = $json{response_object};
-    if (grep {$_ eq $obj_res} @{(OBJECTS_REQUIRED())}) {
-        unless ($obj_req) {
-            _set_error(\%json, Apache2::Const::HTTP_BAD_REQUEST, "Object not specified");
-            return _output($r => \%json);
-        }
-    }
-    if ($obj_req && $obj_res) {
-        if ($obj_req ne $obj_res) {
-            _set_error(\%json, 9, $obj_req, $obj_res);
-        }
-    }
-
-    # OUTPUT
-    return _output($r => \%json);
-}
-sub index_get {
-    my ($r, $q, $json) = @_;
-    $json->{response_object} = "index_get";
-    my $filename = $q->param("file") || $q->param("info");
-
-    my @files = _get_file_list($json->{data}{mtokendir});
-    if ($filename) {
-        $json->{data}{info} = _get_file_info($filename, @files);
+    # Logging
+    if ($ctk->debugmode) {
+        $self->log->level("debug")->path($ctk->logfile())
+    } elsif ($ctk->verbosemode()) {
+        $self->log->level("info")->path($ctk->logfile())
     } else {
-        $json->{data}{files} = [@files];
+        $self->log->level("warn")->path($ctk->logfile())
     }
-    return 1;
-}
-sub index_post {
-    my ($r, $q, $json) = @_;
-    $json->{response_object} = "index_post";
-    my $mtokendir = $json->{data}{mtokendir};
-    my $file_k = "file1";
-    my $fileup = defined($q->param($file_k)) ? $q->param($file_k).'' : '';
-    unless (defined($fileup) && length($fileup)) {
-        _set_error($json, 3);
-        return 0;
-    }
-    my $in_sha1 = $q->param("sha1");
-    my $in_md5 = $q->param("md5");
-    my $in_size = $q->param("size");
+    #$self->log->debug("Startup!! =$$"); # $self->ctk->logdir()
 
-    my $exsts = _get_file_info($fileup, _get_file_list($mtokendir));
-    if ($exsts) { # Catched!
-        if (_ieq($exsts->{size}, $in_size) && _ieq($exsts->{md5}, $in_md5) && _ieq($exsts->{sha1}, $in_sha1)) {
-            _set_error($json, 10, $fileup);
-        } else {
-            _set_error($json, 11, $fileup);
+    # Switch to installable home directory
+    $self->home(Mojo::Home->new($ctk->datadir()));
+
+    # Get DocumentRoot and replace as public-path
+    my $documentroot = value($ctk->conf("documentroot")) || path(sharedir(), $ctk->prefix)->to_string();
+    $self->documentroot($documentroot);
+    $self->static->paths()->[0] = $documentroot; #unshift @{$static->paths}, '/home/sri/themes/blue/public';
+    $self->static->paths()->[1] = $ctk->datadir();
+
+    # Hooks
+    $self->hook(before_dispatch => sub {
+        my $c = shift;
+
+        # Set Server header
+        $c->res->headers->server(sprintf("%s/%s", PROJECTNAME, $self->VERSION));
+        $c->app->log->debug("Start request dispatch");
+
+        # Authentication
+        my $need_auth = length($username) ? 1 : 0;
+        if ($need_auth) {
+            my $req_uri = $c->req->url->to_abs();
+            my $ui_username = $req_uri->username() // "";
+            my $ui_secret = sha1_sum($req_uri->password() // time());
+
+            # Check username and password
+            return 1 if length($secret)
+                and secure_compare($username, $ui_username)
+                and secure_compare($secret, $ui_secret);
+
+            # Require authentication
+            $c->res->headers->www_authenticate('Basic realm="MToken Strict Zone"');
+            return $c->render(json => {
+                message => "Authentication required!",
+            }, status => 401);
         }
-        return 0;
-    }
 
-    $json->{data}{in} = {
-        in_file => $fileup,
-        in_sha1 => $in_sha1,
-        in_md5  => $in_md5,
-        in_size => $in_size,
-    };
+        return;
+    });
 
-    my $file;
-    if ($fileup && $fileup =~ /^[0-9a-z.\-_]+$/i) {
-        $file = File::Spec->catfile($mtokendir, $fileup);
-        unless (open(UPLOAD,">",$file)) {
-            _set_error($json, 4, $file, $!);
-            return 0;
-        }
-        binmode(UPLOAD);
-        if ( my $fh = $q->upload($file_k) ) {
-            binmode($fh);
-            my $buffer;
-            while ( my $bytesread = read($fh, $buffer,1024) ) {
-                print UPLOAD $buffer;
-            }
-        } else {
-            _set_error($json, 5, $fileup);
-            close UPLOAD;
-            return 0;
-        }
-        close UPLOAD;
-    } else {
-        _set_error($json, 3);
-        return 0;
-    }
+    # Routes
+    $self->routes->get('/')->to('alpha#root');
+    $self->routes->get('/env')->to('alpha#env') if $ctk->debugmode();
+    $self->routes->get('/mtoken')->to('alpha#info');
+    $self->routes->get('/mtoken/:token' => [token => qr/[a-z][a-z0-9]+/])->to('alpha#list');
+    $self->routes->get('/mtoken/:token/:tarball' =>
+            [
+                token => qr/[a-z][a-z0-9]+/,
+                tarball => qr/C[0-9]{8}T[0-9]{6}\.tkn/,
+            ]
+        )->to('alpha#download_tarball');
+    $self->routes->put('/mtoken/:token/:tarball' =>
+            [
+                token => qr/[a-z][a-z0-9]+/,
+                tarball => qr/C[0-9]{8}T[0-9]{6}\.tkn/,
+            ]
+        )->to('alpha#upload_tarball');
+    $self->routes->delete('/mtoken/:token/:tarball' =>
+            [
+                token => qr/[a-z][a-z0-9]+/,
+                tarball => qr/C[0-9]{8}T[0-9]{6}\.tkn/,
+            ]
+        )->to('alpha#delete_tarball');
 
-    my $out_size = filesize($file);
-    my $out_sha1 = sha1sum($file);
-    my $out_md5 = md5sum($file);
-
-    $json->{data}{out} = {
-        out_file => $file,
-        out_sha1 => $out_sha1,
-        out_md5  => $out_md5,
-        out_size => $out_size,
-    };
-
-    # Mismatch?
-    my $miss = 1;
-    if ($in_size != $out_size) {
-        _set_error($json, 6, $in_size, $out_size);
-        $miss = 0;
-    }
-    if ($in_md5 ne $out_md5) {
-        _set_error($json, 7, $in_md5, $out_md5);
-        $miss = 0;
-    }
-    if ($in_sha1 ne $out_sha1) {
-        _set_error($json, 8, $in_sha1, $out_sha1);
-        $miss = 0;
-    }
-    unless ($miss) {
-        unless (unlink($file)  ) {
-            _set_error($json, 12, $file, $!);
-            return 0;
-        }
-    }
-    return $miss;
-}
-sub file_get {
-    my ($r, $q, $json) = @_;
-    my $notes = $r->notes;
-
-    $json->{response_object} = "file_get";
-    my $mtokendir = $json->{data}{mtokendir};
-    my $filename = $json->{data}{filename};
-    my $file = File::Spec->catfile($mtokendir, $filename);
-
-    return Apache2::Const::NOT_FOUND unless $filename && -e $file;
-    my $len = filesize($file);
-    return Apache2::Const::NOT_FOUND unless $len;
-    $r->set_content_length($len);
-    $r->content_type('application/octet-stream');
-    $r->headers_out->set('Content-Disposition', sprintf("attachment; filename=\"%s\"", $filename));
-    my $rc = $r->sendfile($file,0,$len);
-    unless ($rc == APR::Const::SUCCESS) {
-        my $errmsg = sprintf("Can't send file: %s (%s)", $filename, $file);
-        _error($errmsg);
-        $ENV{REDIRECT_ERROR_NOTES} = $errmsg;
-        $r->subprocess_env(REDIRECT_ERROR_NOTES => $errmsg);
-        $notes->set('error-notes' => $errmsg);
-        return Apache2::Const::SERVER_ERROR;
-    }
-
-    return Apache2::Const::OK;
-}
-sub file_put {
-    my ($r, $q, $json) = @_;
-    $json->{response_object} = "file_put";
-
-    my $mtokendir = $json->{data}{mtokendir};
-    my $filename = $json->{data}{filename};
-    my $file = File::Spec->catfile($mtokendir, $filename);
-
-    unless ($filename && -e $file) {
-        _set_error($json, 13, $file);
-        return 0;
-    }
-
-    unless (open(UPDATE,">",$file)) {
-        _set_error($json, 4, $file, $!);
-        return 0;
-    }
-    binmode(UPDATE);
-    my $buffer;
-    while ( my $bytesread = $r->read($buffer, 1024) ) {
-        print UPDATE $buffer;
-    }
-    close(UPDATE);
-
-    my $size = filesize($file);
-    unless ($size) {
-        unless (unlink($file)  ) {
-            _set_error($json, 12, $file, $!);
-            return 0;
-        }
-        _set_error($json, 5, $file);
-        return 0;
-    }
-
-    $json->{data}{out} = {
-        out_file => $file,
-        out_sha1 => sha1sum($file),
-        out_md5  => md5sum($file),
-        out_size => $size,
-    };
-    return 1;
-}
-sub file_delete {
-    my ($r, $q, $json) = @_;
-    $json->{response_object} = "file_delete";
-
-    my $mtokendir = $json->{data}{mtokendir};
-    my $filename = $json->{data}{filename};
-    my $file = File::Spec->catfile($mtokendir, $filename);
-
-    unless ($filename && -e $file) {
-        _set_error($json, 13, $file);
-        return 0;
-    }
-    unless (unlink($file)  ) {
-        _set_error($json, 12, $file, $!);
-        return 0;
-    }
+    # Delete std favicon file from static
+    delete $self->static->extra->{'favicon.ico'};
 
     return 1;
 }
 
-sub _output {
-    my $r = shift;
-    my $json = shift;
-    my $notes = $r->notes;
-    my $tm = time();
-    $json->{data}{finished} = $tm;
-    $json->{data}{finishedfmt} = decode(locale => Apache2::Util::ht_time($r->pool, $tm, DATE_FORMAT, 0));
-
-    # Serializer
-    my $sr = new CTK::Serializer(SERIALIZE_FORMAT, attrs => SR_ATTRS);
-    unless ($sr->status) {
-        my $errmsg = sprintf("Can't create json serializer: %s", $sr->error);
-        _error($errmsg);
-        $ENV{REDIRECT_ERROR_NOTES} = $errmsg;
-        $r->subprocess_env(REDIRECT_ERROR_NOTES => $errmsg);
-        $notes->set('error-notes' => $errmsg);
-        return Apache2::Const::SERVER_ERROR;
-    }
-
-    my $output = $sr->serialize($json);
-    unless ($sr->status) {
-        my $errmsg = sprintf("Can't serialize structure: %s", $sr->error);
-        _error($errmsg);
-        $ENV{REDIRECT_ERROR_NOTES} = $errmsg;
-        $r->subprocess_env(REDIRECT_ERROR_NOTES => $errmsg);
-        $notes->set('error-notes' => $errmsg);
-        return Apache2::Const::SERVER_ERROR;
-    }
-
-    $r->headers_out->set('Accept-Ranges', 'none');
-    $r->set_content_length(length(Encode::encode_utf8($output)) || 0);
-    return Apache2::Const::OK if uc($r->method) eq "HEAD";
-    $r->print($output);
-    $r->rflush();
-    return Apache2::Const::OK;
-}
-sub _set_error {
-    my $json = shift;
-    my $code = shift || 0;
-    my @data = @_;
-    my $msg = sprintf(ERRORS->{$code}, @data);
-    push @{$json->{error}}, {code => $code, message => $msg};
-    _debug(sprintf("Error: code=%d; message=\"%s\"", $code, $msg));
-    $json->{status} = 0;
-    return 1;
-}
-sub _debug {
-    my $msg = shift;
-    return 1 unless $DEBUG;
-    return 0 unless defined $msg;
-    my $r = Apache2::RequestUtil->request();
-    $r->log->debug(sprintf("%s> %s", PREFIX, $msg)); # ---> Request ok :=)"
-    return 1;
-}
-sub _error { # Log error
-    my $msg = shift;
-    return 0 unless defined $msg;
-    my $r = Apache2::RequestUtil->request();
-    $r->log->error(sprintf("%s> %s", PREFIX, $msg));
-    return 1;
-}
-sub _get_file_list {
-    my $dir = shift || '.';
-    my @files;
-    find({
-      no_chdir => 1,
-      wanted => sub {
-        my $file = $_;
-        my $filename = basename($_);
-        return unless ((-f $file) && $file =~ /\.[0-9]{8}$/);
-        my ($y,$m,$d) = ($1,$2,$3) if $file =~ /([0-9]{4})([0-9]{2})([0-9]{2})$/;
-        push @files, {
-                file        => $file,
-                filename    => $filename,
-                size        => filesize($file),
-                md5         => md5sum($file),
-                sha1        => sha1sum($file),
-                date_sfx    => sprintf("%04d%02d%02d", $y,$m,$d),
-                date_fmt    => sprintf("%04d/%02d/%02d", $y,$m,$d),
-            };
-    }}, $dir);
-    return @files;
-}
-sub _get_file_info {
-    my $filename = shift;
-    foreach (@_) {
-        return $_ if (ref($_) eq 'HASH') && $_->{filename} eq $filename;
-    }
-    return undef;
-}
-sub _ieq {
-    my ($l, $r) = @_;
-    return 0 unless defined $l;
-    return 0 unless defined $r;
-
-    if ($l =~ /^[0-9a-z]+$/i and $r =~ /^[0-9a-z]+$/i) {
-        return ($l eq $r) ? 1 : 0;
-    } elsif (($l =~ /^[0-9]+$/ and $r =~ /^[0-9]+$/)) {
-        return ($l == $r) ? 1 : 0;
-    }
-    return 0;
+# Reload hook
+sub reload {
+    my $self = shift;
+    $self->log->warn("Request for reload $$"); # $self->ctk->logdir()
+    return 1; # 1 - ok; 0 - error :(
 }
 
 1;

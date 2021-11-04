@@ -6,6 +6,8 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.88'
 configure_requires:
+  Alien::PLplot: '0'
+  Devel::CheckLib: '0'
   PDL::Core::Dev: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
@@ -24,5 +26,5 @@ resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/pdl-graphics-plplot/issues
   repository: git://github.com/PDLPorters/pdl-graphics-plplot.git
-version: '0.78'
+version: '0.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

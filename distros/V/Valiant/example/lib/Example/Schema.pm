@@ -15,12 +15,12 @@ __PACKAGE__->load_components(qw/
 __PACKAGE__->load_namespaces(
   default_resultset_class => "DefaultRS");
 
-#use DBIx::Class::Storage::Debug::PrettyPrint;
-#my $pp = DBIx::Class::Storage::Debug::PrettyPrint->new({ profile => 'console' });
+use DBIx::Class::Storage::Debug::PrettyPrint;
+my $pp = DBIx::Class::Storage::Debug::PrettyPrint->new({ profile => 'console' });
 
 sub debug {
   my ($self) = @_;
-  #<D-d>  $self->storage->debugobj($pp);
+  $self->storage->debugobj($pp);
   $self->storage->debug(1);
   return $self;
 }

@@ -1,5 +1,7 @@
 package Astro::FITS::CFITSIO::Simple::PDL;
 
+# ABSTRACT: support routines for using CFITSIO and PDL
+
 use 5.008002;
 use strict;
 use warnings;
@@ -25,7 +27,7 @@ our @ISA = qw(Exporter);
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-# This allows declaration	use Astro::FITS::CFITSIO::PDL ':all';
+# This allows declaration       use Astro::FITS::CFITSIO::PDL ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
@@ -37,10 +39,10 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-	
+
 );
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 our %PDL2CFITSIO =
   (
@@ -114,14 +116,14 @@ our %CFITSIO2PDL_COL =
    TSHORT()     => short,   # I
    TLONG()      => long,    # J
    TINT()       => long,    # J
-   TUINT()	=> long,    # incorrect, but gotta do something!
-   TULONG()	=> long,    # incorrect, but gotta do something!
+   TUINT()      => long,    # incorrect, but gotta do something!
+   TULONG()     => long,    # incorrect, but gotta do something!
    TFLOAT()     => float,   # E
    TDOUBLE()    => double,  # D
    TBIT()       => byte,    # X
    TLOGICAL()   => byte,    # L
    TBYTE()      => byte,    # B
-   TSBYTE()	=> byte,    # S
+   TSBYTE()     => byte,    # S
 #   TLONGLONG()  => longlong #
   );
 
@@ -135,7 +137,7 @@ sub fits2pdl_coltype {
 
   my ( $fits_type ) = @_;
 
-  my $nfits_type = 
+  my $nfits_type =
     exists $FITS2CFITSIO_COL{$fits_type} ?
       $FITS2CFITSIO_COL{$fits_type} : $fits_type;
 
@@ -174,24 +176,36 @@ sub fits2pdl_imgtype {
   $CFITSIO2PDL_IMG{$fits_type};
 }
 
-
-
-
-###################################################################
-
-
+#
+# This file is part of Astro-FITS-CFITSIO-Simple
+#
+# This software is Copyright (c) 2008 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 1;
+
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Pete Ratzlaff Smithsonian Astrophysical Observatory pdl2cfitsio
+TLONG
 
 =head1 NAME
 
-Astro::FITS::CFITSIO::PDL - support routines for using CFITSIO and PDL
+Astro::FITS::CFITSIO::Simple::PDL - support routines for using CFITSIO and PDL
+
+=head1 VERSION
+
+version 0.19
 
 =head1 SYNOPSIS
 
   use Astro::FITS::CFITSIO::PDL;
-
 
 =head1 DESCRIPTION
 
@@ -204,8 +218,8 @@ friendly to each other.
 
 =item pdl2cfitsio
 
-	$cfitsio_type = pdl2fits_type($piddle);
-	$cfitsio_type = pdl2fits_type(long); # or short, or float, etc.
+        $cfitsio_type = pdl2fits_type($piddle);
+        $cfitsio_type = pdl2fits_type(long); # or short, or float, etc.
 
 PDL datatypes are always guaranteed to be the same size on all
 architectures, whereas CFITSIO datatypes (TLONG, for example), will
@@ -219,12 +233,10 @@ passing to routines such as C<fits_read_col()>.
 
 It B<croak()'s> upon error.
 
-
 =item fits2pdl_coltype
 
-	$pdl_type = fits2pdl_type( TLONG );
-	$pdl_type = fits2pdl_type( 'D' );
-
+        $pdl_type = fits2pdl_type( TLONG );
+        $pdl_type = fits2pdl_type( 'D' );
 
 Given a supported FITS or CFITSIO column datatype, return the PDL type
 which is the closest functional match (i.e. C<TDOUBLE> => C<double>).
@@ -232,8 +244,7 @@ It B<croak()'s> if the passed type is not supported.
 
 =item fits2pdl_imgtype
 
-	$pdl_type = fits2pdl_type( FLOAT_IMG );
-
+        $pdl_type = fits2pdl_type( FLOAT_IMG );
 
 Given a supported CFITSIO table datatype, return the PDL type
 which is the closest functional match (i.e. C<DOUBLE_IMG> => C<double>).
@@ -245,21 +256,62 @@ It B<croak()'s> if the passed type is not supported.
 
 None by default.
 
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-astro-fits-cfitsio-simple@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-FITS-CFITSIO-Simple
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/astro-fits-cfitsio-simple
+
+and may be cloned from
+
+  https://gitlab.com/djerius/astro-fits-cfitsio-simple.git
+
 =head1 SEE ALSO
 
-L<Astro::FITS::CFITSIO>, L<PDL>
+Please see those modules/websites for more information related to this module.
 
-=head1 AUTHOR
+=over 4
+
+=item *
+
+L<Astro::FITS::CFITSIO::Simple|Astro::FITS::CFITSIO::Simple>
+
+=item *
+
+L<Astro::FITS::CFITSIO|Astro::FITS::CFITSIO>
+
+=item *
+
+L<PDL|PDL>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Diab Jerius <djerius@cpan.org>
+
+=item *
 
 Pete Ratzlaff
 
-Diab Jerius
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004 by Smithsonian Astrophysical Observatory
+This software is Copyright (c) 2008 by Smithsonian Astrophysical Observatory.
 
-This software is released under the GNU General Public License.
-You may find a copy at L<http://www.fsf.org/copyleft/gpl.html>.
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut

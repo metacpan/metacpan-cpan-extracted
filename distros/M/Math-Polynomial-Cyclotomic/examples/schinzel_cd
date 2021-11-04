@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+# Copyright (c) 2021 by Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
+
+# generate polynomials C, D, satisfying the identity of Beeger and Schinzel:
+# for k > 1, square-free, k1 = k (if k === 1 (mod 4)), k1 = 2*k (else),
+# n = odd multiple of k1: Phi_n(x) = C^2 - k*x*D^2
+
+use strict;
+use warnings;
+use Math::BigInt lib => 'GMP';
+use Math::Polynomial::Cyclotomic qw(cyclo_schinzel_cd);
+
+local $Math::Polynomial::max_degree;
+
+my $USAGE = "usage: schinzel_cd n k\n";
+die $USAGE if @ARGV != 2 || grep {!/^[1-9][0-9]*\z/} @ARGV;
+
+my ($n, $k) = map { Math::BigInt->new($_) } @ARGV;
+my ($C, $D) = cyclo_schinzel_cd($n, $k);
+my ($qc, $qd) = map { join q[,], reverse $_->coeff } $C, $D;
+print "[$n,$k,[$qc],[$qd]]\n";
+
+__END__

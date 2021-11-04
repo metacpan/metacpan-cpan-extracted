@@ -26,6 +26,7 @@ Dubois
 Escape
 Etheridge
 FAT
+Fiegehenn
 Fredric
 Förtsch
 Gisle
@@ -38,6 +39,7 @@ ISBNs
 Ishigaki
 Jan
 John
+Julien
 Kaitlyn
 Kaji
 Kapranoff
@@ -153,6 +155,7 @@ rtsp
 rtspu
 schwern
 sftp
+simbabque
 sip
 sips
 skaji

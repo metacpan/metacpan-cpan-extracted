@@ -19,11 +19,11 @@ ansicolumn \[options\] \[file ...\]
     -D                   document mode
     -C#                  number of panes
     -S#                  pane width
-    -F                   full-width
+    -W                   widen to terminal width
     -p                   paragraph mode
 
-    -B[=#], --border[=#] print border with optiona style
-    -U[=#], --fillup[=#] fill-up unit (pane|page|none)
+    -B, --border[=#]     print border with optiona style
+    -F, --fillup[=#]     fill-up unit (pane|page|none)
 
     --height=#           page height
     --column-unit=#      column unit (default 8)
@@ -44,7 +44,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.14
+Version 1.15
 
 # DESCRIPTION
 
@@ -115,7 +115,7 @@ default, from the standard input.
 
     Document mode.  Set these options.
 
-        --fullwidth
+        --widen
         --linebreak=all
         --linestyle=wrap
         --boundary=word
@@ -130,14 +130,14 @@ default, from the standard input.
 - **-C**#, **--pane**=#
 
     Output is formatted in the specified number of panes.  Setting number
-    of panes implies **--fullwidth** option enabled.
+    of panes implies **--widen** option enabled.
 
 - **-S**#, **--pane-width**=#, **--pw**=#
 
     Specify pane width.  This includes border spaces.  See ["CALCULATION"](#calculation)
     section.
 
-- **-F**, **--fullwidth**
+- **-W**, **--widen**
 
     Use full width of the terminal.  Each panes are expanded to fill
     terminal width, unless **--pane-width** is specified.
@@ -146,7 +146,7 @@ default, from the standard input.
 
     Insert empty line between every successive non-empty lines.
 
-- **--border**\[=_style_\], **-B**\[_style_\]
+- **--border**\[=_style_\], **-B**
 
     Print border.  Enabled by **--page** option automatically.  If the
     optional _style_ is given, it is used as a border style and precedes
@@ -154,12 +154,14 @@ default, from the standard input.
 
     Border style is specified by **--border-style** option.
 
-- **--fillup**\[=`pane`|`page`|`none`\], **-U**\[...\]
+- **--fillup**\[=`pane`|`page`|`none`\], **-F**
 
     Fill up final pane or page by empty lines.  Parameter is optional and
     considered as 'pane' by default.  Set by **--page** option
     automatically.  Use **--fillup=none** if you want to explicitly disable
     it.
+
+    Option **-U** is a shortcut for **--border=pane**.
 
 - **--height**=#
 

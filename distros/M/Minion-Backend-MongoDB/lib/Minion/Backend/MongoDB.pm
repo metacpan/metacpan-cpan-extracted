@@ -1,5 +1,5 @@
 package Minion::Backend::MongoDB;
-$Minion::Backend::MongoDB::VERSION = '1.10';
+$Minion::Backend::MongoDB::VERSION = '1.12';
 # ABSTRACT: MongoDB backend for Minion
 
 use 5.016;    # Minion requires this so we require this.
@@ -9,14 +9,12 @@ use Mojo::Base 'Minion::Backend';
 use boolean;
 use BSON::OID;
 use BSON::Types qw(:all);
-use DateTime;
-use DateTime::Set;
-use DateTime::Span;
 use Mojo::URL;
 use MongoDB;
 use Sys::Hostname qw(hostname);
 use Tie::IxHash;
 use Time::HiRes qw(time);
+use Time::Moment;
 
 has 'dbclient';
 has 'mongodb';
@@ -27,6 +25,9 @@ has prefix  => 'minion';
 has workers => sub { $_[0]->mongodb->coll( $_[0]->prefix . '.workers' ) };
 has locks   => sub { $_[0]->mongodb->coll( $_[0]->prefix . '.locks' ) };
 has admin   => sub { $_[0]->dbclient->db('admin') };
+
+# Friday 31 December 9999 23:59:59
+has never => sub { Time::Moment->from_epoch(253402300799) };
 
 sub broadcast {
     my ( $s, $command, $args, $ids ) =
@@ -79,18 +80,13 @@ sub finish_job { shift->_update( 0, @_ ) }
 sub history {
     my $self = shift;
 
-    my $dt_stop  = DateTime->now;
-    my $dt_start = $dt_stop->clone->add( days => -1 );
-    my $dt_span  = DateTime::Span->from_datetimes(
-        start => $dt_start,
-        end   => $dt_stop
-    );
-    my $dt_set = DateTime::Set->from_recurrence( recurrence =>
-          sub { return $_[0]->truncate( to => 'hour' )->add( hours => 1 ) } );
-    my @dt_set = $dt_set->as_list( span => $dt_span );
-    my %acc    = (
+    my $dt_stop = Time::Moment->now_utc;
+
+    my @dt_set   = reverse( map $dt_stop->minus_hours($_), ( 0 .. 23 ) );
+    my $dt_start = $dt_set[0];
+    my %acc      = (
         map {
-            &_dtkey($_) => {
+            $_->strftime('%Y%j%H') => {
                 epoch         => $_->epoch(),
                 failed_jobs   => 0,
                 finished_jobs => 0
@@ -130,17 +126,11 @@ sub history {
     my $cursor = $self->jobs->aggregate( [ $match, $group ] );
 
     while ( my $doc = $cursor->next ) {
-        my $dt_finished = DateTime->new(
-            year  => $doc->{_id}->{year},
-            month => 1,
-            day   => 1,
-            hour  => $doc->{_id}->{hour},
-        );
-        $dt_finished->add( days => $doc->{_id}->{day} - 1 );
-        my $key = &_dtkey($dt_finished);
+        my $id = $doc->{_id};
+        my $key =
+          sprintf( "%04d%03d%02d", $id->{year}, $id->{day}, $id->{hour} );
         $acc{$key}->{$_} += $doc->{$_} for (qw(finished_jobs failed_jobs));
     }
-
     return { daily => [ @acc{ ( sort keys(%acc) ) } ] };
 }
 
@@ -163,8 +153,7 @@ sub list_jobs {
     }
     $imatch->{'$or'} = [
         { state   => { '$ne' => 'inactive' } },
-        { expires => undef },
-        { expires => { '$gt' => DateTime->now } }
+        { expires => { '$gt' => Time::Moment->now } }
     ];
 
     my $match  = { '$match' => $imatch };
@@ -369,7 +358,7 @@ sub purge {
 
     my %match;
     $match{ $opts->{older_field} } =
-      { '$lt' => DateTime->now->add( seconds => -$opts->{older} ) };
+      { '$lt' => Time::Moment->now->minus_seconds( $opts->{older} ) };
     foreach (qw/queue state task/) {
         $match{$_} = { '$in' => $opts->{ $_ . 's' } }
           if ( $opts->{ $_ . 's' } );
@@ -397,13 +386,15 @@ sub register_worker {
 
     $self->_init_db;
 
+    my $now = Time::Moment->now;
+
     return $id
       if $id
       && $self->workers->find_one_and_update(
         { _id => $self->_oid($id) },
         {
             '$set' => {
-                notified => DateTime->from_epoch( epoch => time ),
+                notified => $now,
                 status   => $options->{status} // {}
             }
         }
@@ -413,8 +404,8 @@ sub register_worker {
         {
             host     => hostname,
             pid      => $$,
-            started  => DateTime->from_epoch( epoch => time ),
-            notified => DateTime->from_epoch( epoch => time ),
+            started  => $now,
+            notified => $now,
             status   => $options->{status} // {},
             inbox    => [],
         }
@@ -436,14 +427,13 @@ sub repair {
     my $self   = shift;
     my $minion = $self->minion;
 
-    my $now = DateTime->now;
+    my $now = Time::Moment->now;
 
     # Workers without heartbeat
     $self->workers->delete_many(
         {
             notified => {
-                '$lt' =>
-                  $now->clone->subtract( seconds => $minion->missing_after )
+                '$lt' => $now->minus_seconds( $minion->missing_after )
             }
         }
     );
@@ -459,9 +449,7 @@ sub repair {
                 '$match' => {
                     state    => 'finished',
                     finished => {
-                        '$lte' => $now->clone->subtract(
-                            seconds => $minion->remove_after
-                        )
+                        '$lte' => $now->minus_seconds( $minion->remove_after )
                     }
                 }
             },
@@ -515,8 +503,7 @@ sub repair {
         {
             state   => 'inactive',
             delayed => {
-                '$lt' =>
-                  $now->clone->subtract( seconds => $minion->stuck_after )
+                '$lt' => $now->minus_seconds( $minion->stuck_after )
             },
         },
         {
@@ -529,7 +516,6 @@ sub repair {
 
 sub reset {
     my ( $s, $options ) = ( shift, shift // {} );
-    $s->_init_db;
     if ( $options->{all} ) {
         $_->drop for $s->workers, $s->jobs, $s->locks;
     }
@@ -539,6 +525,7 @@ sub reset {
     else {
         warn "Starting to v10.0 you must explicit what you want to reset";
     }
+    $s->_init_db;
 }
 
 sub retry_job {
@@ -546,7 +533,7 @@ sub retry_job {
       ( shift, shift, shift, shift || {} );
     $options->{delay} //= 0;
 
-    my $dt_now = DateTime->now();
+    my $dt_now = Time::Moment->now();
 
     my $query  = { _id => $self->_oid($id), retries => $retries };
     my $update = {
@@ -554,12 +541,11 @@ sub retry_job {
         '$set' => {
             retried => $dt_now,
             state   => 'inactive',
-            delayed => $dt_now->clone->add( seconds => $options->{delay} || 0 ),
+            delayed => $dt_now->plus_seconds( $options->{delay} || 0 ),
         },
     };
 
-    $update->{'$set'}->{expires} =
-      $dt_now->clone->add( seconds => $options->{expire} )
+    $update->{'$set'}->{expires} = $dt_now->plus_seconds( $options->{expire} )
       if exists $options->{expire};
 
     foreach (qw(attempts parents priority queue lax)) {
@@ -589,11 +575,8 @@ sub stats {
       { active_workers => $active, inactive_workers => $all - $active };
     $stats->{inactive_jobs} = $jobs->count_documents(
         {
-            state => 'inactive',
-            '$or' => [
-                { expires => undef },
-                { expires => { '$gt' => DateTime->now } },
-            ]
+            state   => 'inactive',
+            expires => { '$gt' => Time::Moment->now }
         }
     );
     $stats->{"${_}_jobs"} = $jobs->count_documents( { state => $_ } )
@@ -644,24 +627,16 @@ sub worker_info {
 }
 
 sub _await {
-    my $self = shift;
+    my $s    = shift;
     my $wait = shift || 0.5;
-    $wait *= 1000;
-    my $last =
-      $self->notifications->find_one( {}, {}, { sort => { _id => -1 } } )
-      ->{_id};
-    my $cursor = $self->notifications->find(
-        {
-            _id   => { '$gt' => $last },
-            '$or' => [ { c => 'created' }, { c => 'update_retries' } ]
-        }
-    )->tailable_await(1)->max_await_time_ms($wait);
-    return undef unless my $doc = $cursor->has_next;
-    return 1;
-}
 
-sub _dtkey {
-    return substr( $_[0]->datetime, 0, -6 );
+    my $last   = BSON::OID->new;
+    my $cursor = $s->notifications->find(
+        {
+            _id => { '$gt' => $last },
+        }
+    )->tailable_await(1)->max_await_time_ms( $wait * 1000 );
+    $cursor->has_next;
 }
 
 sub _enqueue {
@@ -669,12 +644,11 @@ sub _enqueue {
     @{ $options->{parents} } = map $self->_oid($_), @{ $options->{parents} }
       if ( exists $options->{parents} );
 
-    my $now = DateTime->now();
+    my $now = Time::Moment->now();
     my $doc = {
         args    => $args,
         created => $now,
-        delayed => $options->{delay}
-        ? $now->clone->add( seconds => $options->{delay} )
+        delayed => $options->{delay} ? $now->plus_seconds( $options->{delay} )
         : $now,
         priority => $options->{priority} // 0,
         state    => 'inactive',
@@ -685,9 +659,8 @@ sub _enqueue {
         parents  => $options->{parents} || [],
         queue    => $options->{queue} // 'default',
         sequence => $options->{sequence},
-        expires  => $options->{expire} ? $now->clone->add(
-            seconds => $options->{expire}
-        ) : undef,
+        expires => $options->{expire} ? $now->plus_seconds( $options->{expire} )
+        : $self->never,
         lax => $options->{lax} ? 1 : 0,
     };
 
@@ -700,12 +673,23 @@ sub _init_db {
     my $s = shift;
 
     # indexes for jobs
-    $s->jobs->indexes->create_one(
-        Tie::IxHash->new( state => 1, delayed => 1, task => 1, queue => 1 ) );
+
     $s->jobs->indexes->create_one( Tie::IxHash->new( finished => 1 ) );
+
+    # for _try main query
+    $s->jobs->indexes->create_one(
+        Tie::IxHash->new(
+            state    => 1,
+            priority => -1,
+            _id      => 1,
+            delayed  => 1,
+            expires  => -1,
+            task     => 1,
+            queue    => 1
+        )
+    );
     $s->jobs->indexes->create_one(
         Tie::IxHash->new( sequence => 1, next => 1 ) );
-    $s->jobs->indexes->create_one( Tie::IxHash->new( expires => 1 ) );
 
     # indexes for locks
     $s->locks->indexes->create_one( Tie::IxHash->new( name => 1 ),
@@ -724,7 +708,7 @@ sub _job_info {
     $job->{id} = $job->{_id}->hex;
     $job->{retries} //= 0;
     $job->{children} = [ map $_->{_id}->hex, @{ $job->{children} } ];
-    $job->{time}     = DateTime->now->epoch;    # server time
+    $job->{time}     = Time::Moment->now->epoch;    # server time
 
     return $job;
 }
@@ -732,8 +716,8 @@ sub _job_info {
 sub _lock {
     my ( $s, $name, $duration, $count ) = @_;
 
-    my $dt_now = DateTime->now;
-    my $dt_exp = $dt_now->clone->add( seconds => $duration );
+    my $dt_now = Time::Moment->now;
+    my $dt_exp = $dt_now->plus_seconds($duration);
 
     my $match = { name => $name };
 
@@ -835,14 +819,15 @@ sub _total {
 sub _try {
     my ( $self, $id, $options ) = @_;
 
-    my $now = DateTime->now;
+    my $now = Time::Moment->now;
 
+    # find documents inactive
     my $match = Tie::IxHash->new(
         delayed => { '$lte' => $now },
         state   => 'inactive',
         task    => { '$in' => [ keys %{ $self->minion->tasks } ] },
         queue   => { '$in' => $options->{queues} // ['default'] },
-        '$or'   => [ { expires => undef }, { expires => { '$gt' => $now } } ],
+        expires => { '$gt' => $now },
     );
     $match->Push( '_id' => $self->_oid( $options->{id} ) )
       if defined $options->{id};
@@ -852,59 +837,16 @@ sub _try {
     my $docs =
       $self->jobs->find( $match, { sort => [ 'priority', -1, '_id', 1 ] } );
 
+    # find a document inactive with no problems with parents and set as active
     my $find = 0;
     my $doc_matched;
-    while ( ( my $doc = $docs->next ) && !$find ) {
+    my $job;
 
-        $find =
-
-          # parents = '{}'
-          !scalar @{ $doc->{parents} } ||
-
-          # not exist ... where
-          !$self->jobs->count_documents(
-            {
-                '$and' => [
-                    { _id => { '$in' => $doc->{parents} } }
-                    ,    # (id = any parents) and
-                    {
-                        '$or' => [
-                            { state => 'active' },
-                            {
-                                '$and' => [
-                                    { state => 'failed' },
-                                    { _id => { '$exists' => !$doc->{lax} }
-                                    }    # a bad way to say "not doc.lax"
-                                ]
-                            },
-                            {
-                                '$and' => [
-                                    { state => 'inactive' },
-                                    {
-                                        '$or' => [
-                                            { expires => undef },
-                                            {
-                                                expires =>
-                                                  { '$gt' => DateTime->now }
-                                            }
-                                        ]
-                                    },
-                                ]
-                            },
-                        ]
-                    },
-                ]
-            }
-          );
-        $doc_matched = $doc if $find;
-    }
-    return undef unless $doc_matched;
-
-    my $doc = [
-        { _id => $doc_matched->{_id}, state => 'inactive' },
+    my $make_job_active = [
+        { _id => 'template', state => 'inactive' },
         {
             '$set' => {
-                started => DateTime->from_epoch( epoch => time ),
+                started => $now,
                 state   => 'active',
                 worker  => $self->_oid($id)
             }
@@ -915,9 +857,46 @@ sub _try {
             returnDocument => 'after',
         }
     ];
+    while ( ( my $doc = $docs->next ) && !defined $job ) {
+        $make_job_active->[0]->{_id} = $doc->{_id};
 
-    my $job = $self->jobs->find_one_and_update(@$doc);
-    return undef unless ( $job->{_id} );
+        # try if doc has no parent and is still inactive or not exist... where
+        (
+            # parents = '{}'
+            !scalar @{ $doc->{parents} } ||
+
+              # not exist ... where
+              !$self->jobs->count_documents(
+                {
+                    '$and' => [
+                        { _id => { '$in' => $doc->{parents} } }
+                        ,    # (id = any parents) and
+                        {
+                            '$or' => [
+                                { state => 'active' },
+                                {
+                                    '$and' => [
+                                        { state => 'failed' },
+                                        {
+                                            _id => { '$exists' => !$doc->{lax} }
+                                        }    # a bad way to say "not doc.lax"
+                                    ]
+                                },
+                                {
+                                    '$and' => [
+                                        { state   => 'inactive' },
+                                        { expires => { '$gt' => $now } },
+                                    ]
+                                },
+                            ]
+                        }
+                    ]
+                }
+              )
+        ) && ( $job = $self->jobs->find_one_and_update(@$make_job_active) );
+
+    }
+    return undef unless ( $job || $job->{_id} );
     $job->{id} = $job->{_id}->hex;
     return $job;
 }
@@ -926,7 +905,7 @@ sub _update {
     my ( $self, $fail, $id, $retries, $result ) = @_;
 
     my $update = {
-        finished => DateTime->now,
+        finished => Time::Moment->now,
         state    => $fail ? 'failed'     : 'finished',
         result   => $fail ? $result . '' : $result,
     };
@@ -943,7 +922,9 @@ sub _update {
     # return 1 if !$fail || (my $attempts = $doc->{attempts}) == 1;
     # return 1 if $retries >= ($attempts - 1);
     # my $delay = $self->minion->backoff->($retries);
-    return $fail ? $self->auto_retry_job( $id, $retries, $doc->{attempts} ) : 1;
+    return $fail
+      ? $self->auto_retry_job( $id, $retries, $doc->{attempts} )
+      : 1;
 }
 
 sub _worker_info {
@@ -987,7 +968,7 @@ Minion::Backend::MongoDB - MongoDB backend for Minion
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
 =head1 SYNOPSIS
 

@@ -13,4 +13,5 @@ t/02commands.t
 t/10read-int.t
 t/11read-status.t
 t/12read-distance.t
+t/70sensors.t
 t/99pod.t

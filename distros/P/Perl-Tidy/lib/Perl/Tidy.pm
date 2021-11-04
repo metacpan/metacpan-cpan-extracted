@@ -110,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20210717';
+    $VERSION = '20211029';
 }
 
 sub DESTROY {
@@ -1558,7 +1558,7 @@ EOM
                     last;
                 }
             } ## end if ( $iter < $max_iterations)
-        }    # end loop over iterations for one source file
+        } ## end loop over iterations for one source file
 
         # restore objects which have been temporarily undefined
         # for second and higher iterations
@@ -1644,7 +1644,7 @@ EOM
             $source_object->close_input_file();
         }
 
-        # Save names of the input and output files for syntax check
+        # Save names of the input and output files
         my $ifname = $input_file;
         my $ofname = $output_file;
 
@@ -1783,21 +1783,6 @@ EOM
         }
 
         #---------------------------------------------------------------
-        # Do syntax check if requested and possible
-        # This is permanently deactivated but the code remains for reference
-        #---------------------------------------------------------------
-        my $infile_syntax_ok = 0;    # -1 no  0=don't know   1 yes
-        if (   0
-            && $logger_object
-            && $rOpts->{'check-syntax'}
-            && $ifname
-            && $ofname )
-        {
-            $infile_syntax_ok =
-              check_syntax( $ifname, $ofname, $logger_object, $rOpts );
-        }
-
-        #---------------------------------------------------------------
         # remove the original file for in-place modify as follows:
         #   $delete_backup=0 never
         #   $delete_backup=1 only if no errors
@@ -1828,9 +1813,9 @@ EOM
             }
         }
 
-        $logger_object->finish( $infile_syntax_ok, $formatter )
+        $logger_object->finish($formatter)
           if $logger_object;
-    }    # end of main loop to process all files
+    } ## end of main loop to process all files
 
     # Fix for RT #130297: return a true value if anything was written to the
     # standard error output, even non-fatal warning messages, otherwise return
@@ -2007,8 +1992,8 @@ sub get_stream_as_named_file {
     #  $fname = name of file if possible, or undef
     #  $if_tmpfile = true if temp file, undef if not temp file
     #
-    # This routine is needed for passing actual files to Perl for
-    # a syntax check.
+    # NOTE: This routine was previously needed for passing actual files to Perl
+    # for a syntax check. It is not currently used.
     my ($stream) = @_;
     my $is_tmpfile;
     my $fname;
@@ -2125,7 +2110,6 @@ sub generate_options {
     #                                       which is mainly for debugging
     # scl --> short-concatenation-item-length   # helps break at '.'
     # recombine                           # for debugging line breaks
-    # valign                              # for debugging vertical alignment
     # I   --> DIAGNOSTICS                 # for debugging [**DEACTIVATED**]
     ######################################################################
 
@@ -2181,7 +2165,6 @@ sub generate_options {
       no-profile
       npro
       recombine!
-      valign!
       notidy
     );
 
@@ -2220,6 +2203,7 @@ sub generate_options {
                 $expansion{$nshort_name} = [$nolong_name];
             }
         }
+        return;
     };
 
     # Install long option names which have a simple abbreviation.
@@ -2276,21 +2260,22 @@ sub generate_options {
     ########################################
     $category = 2;    # Code indentation control
     ########################################
-    $add_option->( 'continuation-indentation',           'ci',   '=i' );
-    $add_option->( 'extended-continuation-indentation',  'xci',  '!' );
-    $add_option->( 'line-up-parentheses',                'lp',   '!' );
-    $add_option->( 'line-up-parentheses-exclusion-list', 'lpxl', '=s' );
-    $add_option->( 'outdent-keyword-list',               'okwl', '=s' );
-    $add_option->( 'outdent-keywords',                   'okw',  '!' );
-    $add_option->( 'outdent-labels',                     'ola',  '!' );
-    $add_option->( 'outdent-long-quotes',                'olq',  '!' );
-    $add_option->( 'indent-closing-brace',               'icb',  '!' );
-    $add_option->( 'closing-token-indentation',          'cti',  '=i' );
-    $add_option->( 'closing-paren-indentation',          'cpi',  '=i' );
-    $add_option->( 'closing-brace-indentation',          'cbi',  '=i' );
-    $add_option->( 'closing-square-bracket-indentation', 'csbi', '=i' );
-    $add_option->( 'brace-left-and-indent',              'bli',  '!' );
-    $add_option->( 'brace-left-and-indent-list',         'blil', '=s' );
+    $add_option->( 'continuation-indentation',             'ci',    '=i' );
+    $add_option->( 'extended-continuation-indentation',    'xci',   '!' );
+    $add_option->( 'line-up-parentheses',                  'lp',    '!' );
+    $add_option->( 'line-up-parentheses-exclusion-list',   'lpxl',  '=s' );
+    $add_option->( 'outdent-keyword-list',                 'okwl',  '=s' );
+    $add_option->( 'outdent-keywords',                     'okw',   '!' );
+    $add_option->( 'outdent-labels',                       'ola',   '!' );
+    $add_option->( 'outdent-long-quotes',                  'olq',   '!' );
+    $add_option->( 'indent-closing-brace',                 'icb',   '!' );
+    $add_option->( 'closing-token-indentation',            'cti',   '=i' );
+    $add_option->( 'closing-paren-indentation',            'cpi',   '=i' );
+    $add_option->( 'closing-brace-indentation',            'cbi',   '=i' );
+    $add_option->( 'closing-square-bracket-indentation',   'csbi',  '=i' );
+    $add_option->( 'brace-left-and-indent',                'bli',   '!' );
+    $add_option->( 'brace-left-and-indent-list',           'blil',  '=s' );
+    $add_option->( 'brace-left-and-indent-exclusion-list', 'blixl', '=s' );
 
     ########################################
     $category = 3;    # Whitespace control
@@ -2323,6 +2308,9 @@ sub generate_options {
     $add_option->( 'want-left-space',                           'wls',   '=s' );
     $add_option->( 'want-right-space',                          'wrs',   '=s' );
     $add_option->( 'space-prototype-paren',                     'spp',   '=i' );
+    $add_option->( 'valign-code',                               'vc',    '!' );
+    $add_option->( 'valign-block-comments',                     'vbc',   '!' );
+    $add_option->( 'valign-side-comments',                      'vsc',   '!' );
 
     ########################################
     $category = 4;    # Comment controls
@@ -2403,6 +2391,8 @@ sub generate_options {
     $add_option->( 'break-before-square-bracket-and-indent',  'bbsbi', '=i' );
     $add_option->( 'break-before-paren',                      'bbp',   '=i' );
     $add_option->( 'break-before-paren-and-indent',           'bbpi',  '=i' );
+    $add_option->( 'brace-left-list',                         'bll',   '=s' );
+    $add_option->( 'brace-left-exclusion-list',               'blxl',  '=s' );
 
     ########################################
     $category = 6;    # Controlling list formatting
@@ -2565,7 +2555,7 @@ sub generate_options {
     # $option_range{'continuation-indentation'} = [ undef, undef ];
 
     #---------------------------------------------------------------
-    # Assign default values to the above options here, except
+    # DEFAULTS: Assign default values to the above options here, except
     # for 'outfile' and 'help'.
     # These settings should approximate the perlstyle(1) suggestions.
     #---------------------------------------------------------------
@@ -2660,7 +2650,9 @@ sub generate_options {
       noweld-nested-containers
       recombine
       nouse-unicode-gcstring
-      valign
+      valign-code
+      valign-block-comments
+      valign-side-comments
       short-concatenation-item-length=8
       space-for-semicolon
       space-backslash-quote=1
@@ -2721,6 +2713,8 @@ sub generate_options {
         'html'  => [qw(format=html)],
         'nhtml' => [qw(format=tidy)],
         'tidy'  => [qw(format=tidy)],
+
+        'brace-left' => [qw(opening-brace-on-new-line)],
 
         # -cb is now a synonym for -ce
         'cb'             => [qw(cuddled-else)],
@@ -2817,6 +2811,9 @@ sub generate_options {
         'conv'       => [qw(it=4)],
         'nconv'      => [qw(it=1)],
 
+        'valign'   => [qw(vc vsc vbc)],
+        'novalign' => [qw(nvc nvsc nvbc)],
+
         # NOTE: This is a possible future shortcut.  But it will remain
         # deactivated until the -lpxl flag is no longer experimental.
         # 'line-up-function-parentheses' => [ qw(lp), q#lpxl=[ { F(2# ],
@@ -2905,7 +2902,7 @@ q(wbb=% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= 
         \%option_category, \%option_range
     );
 
-}    # end of generate_options
+} ## end of generate_options
 
 # Memoize process_command_line. Given same @ARGV passed in, return same
 # values and same @ARGV back.
@@ -3204,7 +3201,7 @@ EOM
 
     return ( \%Opts, $config_file, \@raw_options, $roption_string,
         $rexpansion, $roption_category, $roption_range );
-}    # end of _process_command_line
+} ## end of _process_command_line
 
 sub check_options {
 
@@ -3273,6 +3270,7 @@ sub check_options {
                 $rOpts->{$key} = 100;
             }
         }
+        return;
     };
 
     # check for reasonable number of blank lines and fix to avoid problems
@@ -3321,20 +3319,9 @@ EOM
         }
     }
 
-    # -bli flag implies -bl
-    if ( $rOpts->{'brace-left-and-indent'} ) {
-        $rOpts->{'opening-brace-on-new-line'} = 1;
-    }
-
     # it simplifies things if -bl is 0 rather than undefined
     if ( !defined( $rOpts->{'opening-brace-on-new-line'} ) ) {
         $rOpts->{'opening-brace-on-new-line'} = 0;
-    }
-
-    # -sbl defaults to -bl if not defined
-    if ( !defined( $rOpts->{'opening-sub-brace-on-new-line'} ) ) {
-        $rOpts->{'opening-sub-brace-on-new-line'} =
-          $rOpts->{'opening-brace-on-new-line'};
     }
 
     if ( $rOpts->{'entab-leading-whitespace'} ) {
@@ -3512,7 +3499,7 @@ sub expand_command_abbreviations {
             else {
                 push( @new_argv, $word );
             }
-        }    # end of this pass
+        } ## end of this pass
 
         # update parameter list @ARGV to the new one
         @ARGV = @new_argv;
@@ -3551,8 +3538,8 @@ Program bug - circular-references in the %expansion hash, probably due to
 a recent program change.
 DIE
             }
-        }    # end of check for circular references
-    }    # end of loop over all passes
+        } ## end of check for circular references
+    } ## end of loop over all passes
     return;
 }
 
@@ -4243,7 +4230,6 @@ I/O control
  -bext=s change default backup extension from 'bak' to s
  -q      deactivate error messages (for running under editor)
  -w      include non-critical warning messages in the .ERR error output
- -syn    run perl -c to check syntax (default under unix systems)
  -log    save .LOG file, which has useful diagnostics
  -f      force perltidy to read a binary file
  -g      like -log but writes more detailed .LOG file, for debugging scripts
@@ -4437,110 +4423,4 @@ sub process_this_file {
 
     return;
 }
-
-sub check_syntax {
-
-    # Use 'perl -c' to make sure that we did not create bad syntax
-    # This is a very good independent check for programming errors
-    #
-    # Given names of the input and output files, ($istream, $ostream),
-    # we do the following:
-    # - check syntax of the input file
-    # - if bad, all done (could be an incomplete code snippet)
-    # - if infile syntax ok, then check syntax of the output file;
-    #   - if outfile syntax bad, issue warning; this implies a code bug!
-    # - set and return flag "infile_syntax_ok" : =-1 bad 0 unknown 1 good
-
-    my ( $istream, $ostream, $logger_object, $rOpts ) = @_;
-    my $infile_syntax_ok = 0;
-    my $line_of_dashes   = '-' x 42 . "\n";
-
-    my $flags = $rOpts->{'perl-syntax-check-flags'};
-
-    # be sure we invoke perl with -c
-    # note: perl will accept repeated flags like '-c -c'.  It is safest
-    # to append another -c than try to find an interior bundled c, as
-    # in -Tc, because such a 'c' might be in a quoted string, for example.
-    if ( $flags !~ /(^-c|\s+-c)/ ) { $flags .= " -c" }
-
-    # be sure we invoke perl with -x if requested
-    # same comments about repeated parameters applies
-    if ( $rOpts->{'look-for-hash-bang'} ) {
-        if ( $flags !~ /(^-x|\s+-x)/ ) { $flags .= " -x" }
-    }
-
-    # this shouldn't happen unless a temporary file couldn't be made
-    if ( $istream eq '-' ) {
-        $logger_object->write_logfile_entry(
-            "Cannot run perl -c on STDIN and STDOUT\n");
-        return $infile_syntax_ok;
-    }
-
-    $logger_object->write_logfile_entry(
-        "checking input file syntax with perl $flags\n");
-
-    # Not all operating systems/shells support redirection of the standard
-    # error output.
-    my $error_redirection = ( $^O eq 'VMS' ) ? "" : '2>&1';
-
-    my ( $istream_filename, $perl_output ) =
-      do_syntax_check( $istream, $flags, $error_redirection );
-    $logger_object->write_logfile_entry(
-        "Input stream passed to Perl as file $istream_filename\n");
-    $logger_object->write_logfile_entry($line_of_dashes);
-    $logger_object->write_logfile_entry("$perl_output\n");
-
-    if ( $perl_output =~ /syntax\s*OK/ ) {
-        $infile_syntax_ok = 1;
-        $logger_object->write_logfile_entry($line_of_dashes);
-        $logger_object->write_logfile_entry(
-            "checking output file syntax with perl $flags ...\n");
-        my ( $ostream_filename, $perl_output ) =
-          do_syntax_check( $ostream, $flags, $error_redirection );
-        $logger_object->write_logfile_entry(
-            "Output stream passed to Perl as file $ostream_filename\n");
-        $logger_object->write_logfile_entry($line_of_dashes);
-        $logger_object->write_logfile_entry("$perl_output\n");
-
-        unless ( $perl_output =~ /syntax\s*OK/ ) {
-            $logger_object->write_logfile_entry($line_of_dashes);
-            $logger_object->warning(
-"The output file has a syntax error when tested with perl $flags $ostream !\n"
-            );
-            $logger_object->warning(
-                "This implies an error in perltidy; the file $ostream is bad\n"
-            );
-            $logger_object->report_definite_bug();
-
-            # the perl version number will be helpful for diagnosing the problem
-            $logger_object->write_logfile_entry( $^V . "\n" );
-        }
-    }
-    else {
-
-        # Only warn of perl -c syntax errors.  Other messages,
-        # such as missing modules, are too common.  They can be
-        # seen by running with perltidy -w
-        $logger_object->complain("A syntax check using perl $flags\n");
-        $logger_object->complain(
-            "for the output in file $istream_filename gives:\n");
-        $logger_object->complain($line_of_dashes);
-        $logger_object->complain("$perl_output\n");
-        $logger_object->complain($line_of_dashes);
-        $infile_syntax_ok = -1;
-        $logger_object->write_logfile_entry($line_of_dashes);
-        $logger_object->write_logfile_entry(
-"The output file will not be checked because of input file problems\n"
-        );
-    }
-    return $infile_syntax_ok;
-}
-
-sub do_syntax_check {
-
-    # This should not be called; the syntax check is deactivated
-    Die("Unexpected call for syntax check-shouldn't happen\n");
-    return;
-}
-
 1;

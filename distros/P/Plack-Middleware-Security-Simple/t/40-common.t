@@ -10,14 +10,19 @@ use HTTP::Request::Common;
 use Plack::Builder;
 use Plack::Test;
 
+use Hash::Match;
 use Plack::Middleware::Security::Common;
 
 my $handler = builder {
     enable "Security::Common",
         rules => [
-            archive_extensions,
+           -and => [
+                -notany => [ PATH_INFO => qr{^/downloads/} ],
+                -any => [ archive_extensions ],
+            ],
             cgi_bin,
             dot_files,
+            ip_address_referer,
             non_printable_chars,
             null_or_escape,
             require_content,
@@ -35,6 +40,22 @@ test_psgi
   app    => $handler,
   client => sub {
     my $cb = shift;
+
+    subtest 'blocked IP4 referer' => sub {
+        my $req = GET "/";
+        $req->header( Referer => 'http://127.0.0.1/' );
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked IP6 referer' => sub {
+        my $req = GET "/";
+        $req->header( Referer => 'https://2001:db8::2:1/' );
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
 
     subtest 'not blocked' => sub {
         my $req = GET "/some/thing.html";
@@ -80,6 +101,13 @@ test_psgi
         is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
     };
 
+    subtest 'not blocked' => sub {
+        my $req = GET "/downloads/files.zip";
+        my $res = $cb->($req);
+        ok is_success( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_OK, "HTTP_OK";
+    };
+
     subtest 'blocked' => sub {
         my $req = GET "/some/thing.php?stuff=1";
         my $res = $cb->($req);
@@ -89,6 +117,20 @@ test_psgi
 
     subtest 'blocked' => sub {
         my $req = POST "/cgi-bin/thing?stuff=1";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
+        my $req = POST "/config.ini";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
+        my $req = POST "/aws.yml";
         my $res = $cb->($req);
         ok is_error( $res->code ), join( " ", $req->method, $req->uri );
         is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";

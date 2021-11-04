@@ -42,6 +42,7 @@ dist.ini
 lib/FASTX/PE.pm
 lib/FASTX/Reader.pm
 lib/FASTX/ScriptHelper.pm
+lib/FASTX/Seq.pm
 scripts/Benchmark.pl
 scripts/CountTwo.pl
 scripts/Counter.pl
@@ -80,10 +81,13 @@ t/17_parse_pe_autopair.t
 t/18_parse_pe_bad_names.t
 t/19_parse_pe_rev.t
 t/20_parse_pe_bad_interleaved.t
+t/21_next.t
 t/30_helper.t
 t/31_helper_fun.t
 t/40_two_fastas.t
 t/40_two_files.t
+t/51_basic_seq.t
+t/52_methods_seq.t
 t/release-00-pod.t
 t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t

@@ -2,7 +2,7 @@
 # PODNAME: TestRail::API
 
 package TestRail::API;
-$TestRail::API::VERSION = '0.049';
+$TestRail::API::VERSION = '0.051';
 
 use 5.010;
 
@@ -333,10 +333,11 @@ sub deleteProject {
 }
 
 sub getProjects {
-    state $check = compile(Object);
-    my ($self) = $check->(@_);
+    state $check = compile( Object, Optional [ Maybe [HashRef] ] );
+    my ( $self, $filters ) = $check->(@_);
 
-    my $result = $self->_doRequest('index.php?/api/v2/get_projects');
+    my $result = $self->_doRequest( 'index.php?/api/v2/get_projects'
+          . _convert_filters_to_string($filters) );
 
     #Save state for future use, if needed
     return -500 if !$result || ( reftype($result) || 'undef' ) ne 'ARRAY';
@@ -602,25 +603,7 @@ sub getCases {
     my ( $self, $project_id, $suite_id, $filters ) = $check->(@_);
 
     my $url = "index.php?/api/v2/get_cases/$project_id&suite_id=$suite_id";
-
-    my @valid_keys =
-      qw{section_id created_after created_before created_by milestone_id priority_id type_id updated_after updated_before updated_by};
-
-    # Add in filters
-    foreach my $filter ( keys(%$filters) ) {
-        confess("Invalid filter key '$filter' passed")
-          unless grep { $_ eq $filter } @valid_keys;
-        if ( ref $filters->{$filter} eq 'ARRAY' ) {
-            confess "$filter cannot be an ARRAYREF"
-              if grep { $_ eq $filter }
-              qw{created_after created_before updated_after updated_before};
-            $url .= "&$filter=" . join( ',', @{ $filters->{$filter} } );
-        }
-        else {
-            $url .= "&$filter=" . $filters->{$filter}
-              if defined( $filters->{$filter} );
-        }
-    }
+    $url .= _convert_filters_to_string($filters);
 
     return $self->_doRequest($url);
 }
@@ -729,11 +712,12 @@ sub deleteRun {
 }
 
 sub getRuns {
-    state $check = compile( Object, Int );
-    my ( $self, $project_id ) = $check->(@_);
+    state $check = compile( Object, Int, Optional [ Maybe [HashRef] ] );
+    my ( $self, $project_id, $filters ) = $check->(@_);
 
     my $initial_runs =
-      $self->getRunsPaginated( $project_id, $self->{'global_limit'}, 0 );
+      $self->getRunsPaginated( $project_id, $self->{'global_limit'},
+        0, $filters );
     return $initial_runs
       unless ( reftype($initial_runs) || 'undef' ) eq 'ARRAY';
     my $runs = [];
@@ -743,7 +727,7 @@ sub getRuns {
         $initial_runs = $self->getRunsPaginated(
             $project_id,
             $self->{'global_limit'},
-            ( $self->{'global_limit'} * $offset )
+            ( $self->{'global_limit'} * $offset ), $filters
         );
         push( @$runs, @$initial_runs );
         $offset++;
@@ -752,9 +736,13 @@ sub getRuns {
 }
 
 sub getRunsPaginated {
-    state $check = compile( Object, Int, Optional [ Maybe [Int] ],
-        Optional [ Maybe [Int] ] );
-    my ( $self, $project_id, $limit, $offset ) = $check->(@_);
+    state $check = compile( Object,
+        Int,
+        Optional [ Maybe [Int] ],
+        Optional [ Maybe [Int] ],
+        Optional [ Maybe [HashRef] ]
+    );
+    my ( $self, $project_id, $limit, $offset, $filters ) = $check->(@_);
 
     confess( "Limit greater than " . $self->{'global_limit'} )
       if $limit > $self->{'global_limit'};
@@ -762,6 +750,7 @@ sub getRunsPaginated {
     $apiurl .= "&offset=$offset" if defined($offset);
     $apiurl .= "&limit=$limit"
       if $limit;    #You have problems if you want 0 results
+    $apiurl .= _convert_filters_to_string($filters);
     return $self->_doRequest($apiurl);
 }
 
@@ -842,11 +831,12 @@ sub getRunSummary {
 }
 
 sub getRunResults {
-    state $check = compile( Object, Int );
-    my ( $self, $run_id ) = $check->(@_);
+    state $check = compile( Object, Int, Optional [ Maybe [HashRef] ] );
+    my ( $self, $run_id, $filters ) = $check->(@_);
 
     my $initial_results =
-      $self->getRunResultsPaginated( $run_id, $self->{'global_limit'}, undef );
+      $self->getRunResultsPaginated( $run_id, $self->{'global_limit'},
+        undef, $filters );
     return $initial_results
       unless ( reftype($initial_results) || 'undef' ) eq 'ARRAY';
     my $results = [];
@@ -856,7 +846,7 @@ sub getRunResults {
         $initial_results = $self->getRunResultsPaginated(
             $run_id,
             $self->{'global_limit'},
-            ( $self->{'global_limit'} * $offset )
+            ( $self->{'global_limit'} * $offset ), $filters
         );
         push( @$results, @$initial_results );
         $offset++;
@@ -865,9 +855,13 @@ sub getRunResults {
 }
 
 sub getRunResultsPaginated {
-    state $check = compile( Object, Int, Optional [ Maybe [Int] ],
-        Optional [ Maybe [Int] ] );
-    my ( $self, $run_id, $limit, $offset ) = $check->(@_);
+    state $check = compile( Object,
+        Int,
+        Optional [ Maybe [Int] ],
+        Optional [ Maybe [Int] ],
+        Optional [ Maybe [HashRef] ]
+    );
+    my ( $self, $run_id, $limit, $offset, $filters ) = $check->(@_);
 
     confess( "Limit greater than " . $self->{'global_limit'} )
       if $limit > $self->{'global_limit'};
@@ -875,6 +869,7 @@ sub getRunResultsPaginated {
     $apiurl .= "&offset=$offset" if defined($offset);
     $apiurl .= "&limit=$limit"
       if $limit;    #You have problems if you want 0 results
+    $apiurl .= _convert_filters_to_string($filters);
     return $self->_doRequest($apiurl);
 }
 
@@ -970,7 +965,8 @@ sub getPlans {
     my ( $self, $project_id, $filters ) = $check->(@_);
 
     my $initial_plans =
-      $self->getPlansPaginated( $project_id, $self->{'global_limit'}, 0 );
+      $self->getPlansPaginated( $project_id, $self->{'global_limit'},
+        0, $filters );
     return $initial_plans
       unless ( reftype($initial_plans) || 'undef' ) eq 'ARRAY';
     my $plans = [];
@@ -996,7 +992,6 @@ sub getPlansPaginated {
         Optional [ Maybe [HashRef] ]
     );
     my ( $self, $project_id, $limit, $offset, $filters ) = $check->(@_);
-    $filters //= {};
 
     confess( "Limit greater than " . $self->{'global_limit'} )
       if $limit > $self->{'global_limit'};
@@ -1004,9 +999,7 @@ sub getPlansPaginated {
     $apiurl .= "&offset=$offset" if defined($offset);
     $apiurl .= "&limit=$limit"
       if $limit;    #You have problems if you want 0 results
-    foreach my $key ( keys(%$filters) ) {
-        $apiurl .= "&$key=$filters->{$key}";
-    }
+    $apiurl .= _convert_filters_to_string($filters);
     return $self->_doRequest($apiurl);
 }
 
@@ -1126,10 +1119,11 @@ sub deleteMilestone {
 }
 
 sub getMilestones {
-    state $check = compile( Object, Int );
-    my ( $self, $project_id ) = $check->(@_);
+    state $check = compile( Object, Int, Optional [ Maybe [HashRef] ] );
+    my ( $self, $project_id, $filters ) = $check->(@_);
 
-    return $self->_doRequest("index.php?/api/v2/get_milestones/$project_id");
+    return $self->_doRequest( "index.php?/api/v2/get_milestones/$project_id"
+          . _convert_filters_to_string($filters) );
 }
 
 sub getMilestoneByName {
@@ -1334,26 +1328,32 @@ sub bulkAddResultsByCase {
 }
 
 sub getTestResults {
-    state $check = compile( Object, Int, Optional [ Maybe [Int] ],
-        Optional [ Maybe [Int] ] );
-    my ( $self, $test_id, $limit, $offset ) = $check->(@_);
+    state $check = compile( Object,
+        Int,
+        Optional [ Maybe [Int] ],
+        Optional [ Maybe [Int] ],
+        Optional [ Maybe [HashRef] ]
+    );
+    my ( $self, $test_id, $limit, $offset, $filters ) = $check->(@_);
 
     my $url = "index.php?/api/v2/get_results/$test_id";
     $url .= "&limit=$limit"   if $limit;
     $url .= "&offset=$offset" if defined($offset);
+    $url .= _convert_filters_to_string($filters);
     return $self->_doRequest($url);
 }
 
 sub getResultsForCase {
-    state $check = compile( Object, Int, Int,
-        Optional [ Maybe [Int] ],
-        Optional [ Maybe [Int] ]
+    state $check = compile( Object, Int,
+        Int,                      Optional [ Maybe [Int] ],
+        Optional [ Maybe [Int] ], Optional [ Maybe [HashRef] ]
     );
-    my ( $self, $run_id, $case_id, $limit, $offset ) = $check->(@_);
+    my ( $self, $run_id, $case_id, $limit, $offset, $filters ) = $check->(@_);
 
     my $url = "index.php?/api/v2/get_results_for_case/$run_id/$case_id";
     $url .= "&limit=$limit"   if $limit;
     $url .= "&offset=$offset" if defined($offset);
+    $url .= _convert_filters_to_string($filters);
     return $self->_doRequest($url);
 }
 
@@ -1471,6 +1471,27 @@ sub buildStepResults {
     };
 }
 
+# Convenience method for building filter string from filters Hashref
+sub _convert_filters_to_string {
+    state $check = compile( Maybe [HashRef] );
+    my ($filters) = $check->(@_);
+
+    $filters //= {};
+
+    my $filter_string = '';
+    foreach my $filter ( keys(%$filters) ) {
+        if ( ref $filters->{$filter} eq 'ARRAY' ) {
+            $filter_string .=
+              "&$filter=" . join( ',', @{ $filters->{$filter} } );
+        }
+        else {
+            $filter_string .= "&$filter=" . $filters->{$filter}
+              if defined( $filters->{$filter} );
+        }
+    }
+    return $filter_string;
+}
+
 1;
 
 __END__
@@ -1485,7 +1506,7 @@ TestRail::API - Provides an interface to TestRail's REST api via HTTP
 
 =head1 VERSION
 
-version 0.049
+version 0.051
 
 =head1 SYNOPSIS
 
@@ -1653,13 +1674,25 @@ Returns BOOLEAN.
 
     $success = $tl->deleteProject(1);
 
-=head2 B<getProjects ()>
+=head2 B<getProjects (filters)>
 
 Get all available projects
+
+=over 4
+
+=item HASHREF C<FILTERS> (optional) - HASHREF describing parameters to filter cases by.
+
+=back
 
 Returns array of project definition HASHREFs, false otherwise.
 
     $projects = $tl->getProjects;
+
+See:
+
+    L<https://www.gurock.com/testrail/docs/api/reference/projects#getprojects>
+
+for details as to the allowable filter keys.
 
 =head2 B<getProjectByName ($project)>
 
@@ -2145,7 +2178,7 @@ Returns BOOLEAN.
 
     $tr->deleteRun(1324);
 
-=head2 B<getRuns (project_id)>
+=head2 B<getRuns (project_id,filters)>
 
 Get all runs for specified project.
 To do this, it must make (no. of runs/250) HTTP requests.
@@ -2155,13 +2188,35 @@ This is due to the maximum result set limit enforced by testrail.
 
 =item INTEGER C<PROJECT_ID> - ID of parent project
 
+=item HASHREF C<FILTERS> - (optional) dictionary of filters, with keys corresponding to the documented filters for get_runs (other than limit/offset).
+
 =back
 
 Returns ARRAYREF of run definition HASHREFs.
 
     $allRuns = $tr->getRuns(6969);
 
-=head2 B<getRunsPaginated (project_id,limit,offset)>
+Possible filters:
+
+=over 4
+
+=item created_after (UNIX timestamp)
+
+=item created_before (UNIX timestamp)
+
+=item created_by (csv of ints) IDs of users plans were created by
+
+=item is_completed (bool)
+
+=item milestone_id (csv of ints) IDs of milestone assigned to plans
+
+=item refs_filter (string) A single Reference ID (e.g. TR-a, 4291, etc.)
+
+=item suite_id (csv of ints) A comma-separated list of test suite IDs to filter by.
+
+=back
+
+=head2 B<getRunsPaginated (project_id,limit,offset,filters)>
 
 Get some runs for specified project.
 
@@ -2172,6 +2227,8 @@ Get some runs for specified project.
 =item INTEGER C<LIMIT> - Number of runs to return.
 
 =item INTEGER C<OFFSET> - Page of runs to return.
+
+=item HASHREF C<FILTERS> - (optional) other filters to apply to the requests other than limit/offset.  See getRuns for more information.
 
 =back
 
@@ -2252,7 +2309,7 @@ you will need to use getTestResults.
 
 =back
 
-=head2 B<getRunResultsPaginated(run_id,limit,offset)>
+=head2 B<getRunResultsPaginated(run_id,limit,offset,filters)>
 
 =head1 RUN AS CHILD OF PLAN METHODS
 
@@ -2379,7 +2436,7 @@ Get some plans for specified project.
 
 =item INTEGER C<OFFSET> - Page of plans to return.
 
-=item HASHREF C<FILTERS> - (optional) other filters to apply to the requests.  See getPlans for more information.
+=item HASHREF C<FILTERS> - (optional) other filters to apply to the requests (other than limit/offset).  See getPlans for more information.
 
 =back
 
@@ -2505,7 +2562,7 @@ Returns BOOLEAN.
 
     $tr->deleteMilestone(86);
 
-=head2 B<getMilestones (project_id)>
+=head2 B<getMilestones (project_id,filters)>
 
 Get milestones for some project.
 
@@ -2513,7 +2570,15 @@ Get milestones for some project.
 
 =item INTEGER C<PROJECT ID> - ID of parent project.
 
+=item HASHREF C<FILTERS> (optional) - HASHREF describing parameters to filter milestones by.
+
 =back
+
+See:
+
+    L<https://www.gurock.com/testrail/docs/api/reference/milestones#getmilestones>
+
+for details as to the allowable filter keys.
 
 Returns ARRAYREF of milestone definition HASHREFs.
 
@@ -2724,7 +2789,7 @@ Returns ARRAYREF of result definition HASHREFs.
 
 Basically the same as bulkAddResults, but instead of a test_id for each entry you use a case_id.
 
-=head2 B<getTestResults(test_id,limit,offset)>
+=head2 B<getTestResults(test_id,limit,offset,filters)>
 
 Get the recorded results for desired test, limiting output to 'limit' entries.
 
@@ -2736,11 +2801,19 @@ Get the recorded results for desired test, limiting output to 'limit' entries.
 
 =item INTEGER C<OFFSET> (OPTIONAL) - Offset to begin viewing result set at.
 
+=item HASHREF C<FILTERS> (optional) - HASHREF describing parameters to filter test results by (other than limit/offset).
+
 =back
+
+See:
+
+    L<https://www.gurock.com/testrail/docs/api/reference/results#getresults>
+
+for details as to the allowable filter keys.
 
 Returns ARRAYREF of result definition HASHREFs.
 
-=head2 B<getResultsForCase(run_id,case_id,limit,offset)>
+=head2 B<getResultsForCase(run_id,case_id,limit,offset,filters)>
 
 Get the recorded results for a test run and case combination., limiting output to 'limit' entries.
 
@@ -2754,7 +2827,15 @@ Get the recorded results for a test run and case combination., limiting output t
 
 =item INTEGER C<OFFSET> (OPTIONAL) - Offset to begin viewing result set at.
 
+=item HASHREF C<FILTERS> (optional) - HASHREF describing parameters to filter by (other than limit/offset).
+
 =back
+
+See:
+
+    L<https://www.gurock.com/testrail/docs/api/reference/results#getresultsforcase>
+
+for details as to the allowable filter keys.
 
 Returns ARRAYREF of result definition HASHREFs.
 

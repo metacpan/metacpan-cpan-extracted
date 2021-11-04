@@ -12,7 +12,7 @@ use MsOffice::Word::Surgeon::Change;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 # constant integers to specify indentation modes -- see L<XML::LibXML>
 use constant XML_NO_INDENT     => 0;
@@ -43,7 +43,6 @@ has 'rev_id'    => (is => 'bare', isa => 'Num', default => 1, init_arg => undef)
 
 # Various regexes for removing uninteresting XML information
 my %noise_reduction_regexes = (
-  goback_bookmark       => qr(<w:bookmarkStart[^>]+?w:name="_GoBack"/><w:bookmarkEnd[^>]+/>),
   proof_checking        => qr(<w:(?:proofErr[^>]+|noProof/)>),
   revision_ids          => qr(\sw:rsid\w+="[^"]+"),
   complex_script_bold   => qr(<w:bCs/>),
@@ -52,9 +51,8 @@ my %noise_reduction_regexes = (
   empty_run_props       => qr(<w:rPr></w:rPr>),
  );
 
-my @noise_reduction_list = qw/goback_bookmark proof_checking revision_ids
+my @noise_reduction_list = qw/proof_checking revision_ids
                               complex_script_bold page_breaks language empty_run_props/;
-
 
 #======================================================================
 # BUILDING
@@ -134,7 +132,7 @@ sub _runs {
     # build internal TEXT objects
   TXT:
     while (my ($xml_before_text, $txt_contents) = splice @txt_fragments, 0, 2) {
-      next TXT if !$xml_before_text && !$txt_contents;
+      next TXT if !$xml_before_text && ( !(defined $txt_contents) || $txt_contents eq '');
       push @texts, MsOffice::Word::Surgeon::Text->new(
         xml_before   => $xml_before_text // '',
         literal_text => $txt_contents    // '',
@@ -192,13 +190,13 @@ sub plain_text {
 #======================================================================
 
 sub cleanup_XML {
-  my ($self) = @_;
+  my ($self, @merge_args) = @_;
 
   $self->reduce_all_noises;
-  $self->unlink_fields;
-  $self->merge_runs;
+  my @names_of_ASK_fields = $self->unlink_fields;
+  $self->suppress_bookmarks(@names_of_ASK_fields);
+  $self->merge_runs(@merge_args);
 }
-
 
 sub noise_reduction_regex {
   my ($self, $regex_name) = @_;
@@ -213,9 +211,10 @@ sub reduce_noise {
   # gather regexes to apply, given either directly as regex refs, or as names of builtin regexes
   my @regexes = map {ref $_ eq 'Regexp' ? $_ : $self->noise_reduction_regex($_)} @noises;
 
-  # get contents, apply all regexes, put back the modified contents
+  # get contents, apply all regexes, put back the modified contents.
   my $contents = $self->contents;
-  $contents =~ s/$_//g foreach @regexes;
+  no warnings 'uninitialized'; # for regexes without capture groups, $1 will be undef
+  $contents =~ s/$_/$1/g foreach @regexes;
   $self->contents($contents);
 }
 
@@ -223,6 +222,36 @@ sub reduce_all_noises {
   my $self = shift;
 
   $self->reduce_noise(@noise_reduction_list);
+}
+
+sub suppress_bookmarks {
+  my ($self, @names_to_erase) = @_;
+
+  # regex to find bookmarks markup
+  state $bookmark_rx = qr{
+     <w:bookmarkStart         # initial tag
+       .+? w:id="(\d+)"       # 'id' attribute, bookmark identifier -- capture 1
+       .+? w:name="([^"]+)"   # 'name' attribute                    -- capture 2
+       .*? />                 # end of this tag
+       (.*?)                  # bookmark contents (may be empty)    -- capture 3
+     <w:bookmarkEnd           # ending tag
+       \s+ w:id="\1"          # same 'id' attribute
+       .*? />                 # end of this tag
+    }sx;
+
+  # closure to decide what to do with bookmark contents
+  my %should_erase_contents = map {($_ => 1)} @names_to_erase;
+  my $deal_with_bookmark_text = sub {
+    my ($bookmark_name, $bookmark_contents) = @_;
+    return $should_erase_contents{$bookmark_name} ? "" : $bookmark_contents;
+  };
+
+  # remove bookmarks markup
+  my $contents = $self->contents;
+  $contents    =~ s{$bookmark_rx}{$deal_with_bookmark_text->($2, $3)}eg;
+
+  # re-inject the modified contents
+  $self->contents($contents);
 }
 
 sub merge_runs {
@@ -257,8 +286,18 @@ sub merge_runs {
   $self->contents(join "", map {$_->as_xml} @new_runs);
 }
 
+
+
+
+
 sub unlink_fields {
   my $self = shift;
+
+  # must find out what are the ASK fields before erasing the markup
+  state $ask_field_rx = qr[<w:instrText[^>]+?>\s+ASK\s+(\w+)];
+  my $contents            = $self->contents;
+  my @names_of_ASK_fields = $contents =~ /$ask_field_rx/g;
+
 
   # regexes to remove field nodes and "field instruction" nodes
   state $field_instruction_txt_rx = qr[<w:instrText.*?</w:instrText>];
@@ -270,7 +309,10 @@ sub unlink_fields {
   state $simple_field_rx          = qr[</?w:fldSimple[^>]*>];
 
   $self->reduce_noise($field_instruction_txt_rx, $field_boundary_rx, $simple_field_rx);
+
+  return @names_of_ASK_fields;
 }
+
 
 sub replace {
   my ($self, $pattern, $replacement_callback, %replacement_args) = @_;
@@ -482,7 +524,8 @@ restores the complete document.
   $surgeon->cleanup_XML;
 
 Apply several other methods for removing unnecessary nodes within the internal
-XML. This method successively calls L</reduce_all_noises>, L</unlink_fields> and L</merge_runs>.
+XML. This method successively calls L</reduce_all_noises>, L</unlink_fields>,
+L</suppress_bookmarks> and L</merge_runs>.
 
 
 =head3 reduce_noise
@@ -504,7 +547,6 @@ are applied to the whole XML contents, not only to run nodes.
 Returns the builtin regex corresponding to the given name.
 Known regexes are :
 
-  goback_bookmark      => qr(<w:bookmarkStart[^>]+?w:name="_GoBack"/><w:bookmarkEnd[^>]+/>),
   proof_checking       => qr(<w:(?:proofErr[^>]+|noProof/)>),
   revision_ids         => qr(\sw:rsid\w+="[^"]+"),
   complex_script_bold  => qr(<w:bCs/>),
@@ -520,9 +562,32 @@ Applies all regexes from the previous method.
 
 =head3 unlink_fields
 
+  my @names_of_ASK_fields = $self->unlink_fields;
+
 Removes all fields from the document, just leaving the current
 value stored in each field. This is the equivalent of performing Ctrl-Shift-F9
 on the whole document.
+
+The return value is a list of names of ASK fields within the document.
+Such names should then be passed to the L</suppress_bookmarks> method
+(see below).
+
+
+=head3 suppress_bookmarks
+
+  $surgeon->suppress_bookmarks(@names_to_erase);
+
+Removes bookmarks markup in the document. This is useful because
+MsWord may silently insert bookmarks in unexpected places; therefore
+some searches within the text may fail because of such bookmarks.
+
+By default, this method only removes the bookmarks markup, leaving
+intact the contents of the bookmark. However, when the name of a
+bookmark belongs to the list C<< @names_to_erase >>, the contents
+is also removed. Currently this is used for suppressing ASK fields,
+because such fields contain a bookmark content that is never displayed by MsWord.
+
+
 
 =head3 merge_runs
 

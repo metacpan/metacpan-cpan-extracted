@@ -36,7 +36,7 @@ use base qw{ PPIx::Regexp::Structure };
 
 use Carp qw{ confess };
 
-our $VERSION = '0.080';
+our $VERSION = '0.081';
 
 use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_ALLOWED

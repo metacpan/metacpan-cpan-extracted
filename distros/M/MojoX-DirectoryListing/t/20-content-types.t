@@ -3,6 +3,7 @@ use Test::Mojo;
 use MojoX::DirectoryListing;
 use strict;
 use warnings;
+use lib '.';
 
 diag 'building test filesystem';
 mkdir "t/app1/private";

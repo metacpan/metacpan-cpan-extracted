@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::updateRequest;
-$Shipment::Temando::WSDL::Elements::updateRequest::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::updateRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -60,7 +60,7 @@ use warnings;
                   labelPrinterType
                   detail
 
-                  )
+                )
             ],
             {   'action'           => \%action_of,
                 'requestId'        => \%requestId_of,
@@ -73,7 +73,7 @@ use warnings;
                 'labelPrinterType' => \%labelPrinterType_of,
                 'detail'           => \%detail_of,
             },
-            {   'action' => 'Shipment::Temando::WSDL::Types::UpdateAction',
+            {   'action'    => 'Shipment::Temando::WSDL::Types::UpdateAction',
                 'requestId' =>
                   'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
                 'reference' =>
@@ -111,7 +111,7 @@ use warnings;
 
     package Shipment::Temando::WSDL::Elements::updateRequest::_anythings;
     $Shipment::Temando::WSDL::Elements::updateRequest::_anythings::VERSION =
-      '3.05';
+      '3.06';
     use strict;
     use warnings;
     {
@@ -134,7 +134,7 @@ use warnings;
             __PACKAGE__->_factory(
                 [   qw(        anything
 
-                      )
+                    )
                 ],
                 {'anything' => \%anything_of,},
                 {'anything' => 'Shipment::Temando::WSDL::Types::Anything',},
@@ -152,7 +152,7 @@ use warnings;
 
     package Shipment::Temando::WSDL::Elements::updateRequest::_articles;
     $Shipment::Temando::WSDL::Elements::updateRequest::_articles::VERSION =
-      '3.05';
+      '3.06';
     use strict;
     use warnings;
     {
@@ -175,7 +175,7 @@ use warnings;
             __PACKAGE__->_factory(
                 [   qw(        article
 
-                      )
+                    )
                 ],
                 {'article' => \%article_of,},
                 {'article' => 'Shipment::Temando::WSDL::Types::Article',},
@@ -208,7 +208,7 @@ Shipment::Temando::WSDL::Elements::updateRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

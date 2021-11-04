@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::KeysightDSOS604A;
-$Lab::Moose::Instrument::KeysightDSOS604A::VERSION = '3.772';
+$Lab::Moose::Instrument::KeysightDSOS604A::VERSION = '3.791';
 #ABSTRACT: Keysight DSOS604A infiniium S-Series Oscilloscope.
 
 use v5.20;
@@ -330,7 +330,7 @@ sub channel_input {
 sub channel_differential {
     my ( $self, $channel, %args ) = validated_channel_getter(
         \@_,
-        mode => { isa => 'Int'}
+        mode => { isa => 'Bool'}
     );
     my $mode = delete $args{'mode'};
 
@@ -378,7 +378,7 @@ Lab::Moose::Instrument::KeysightDSOS604A - Keysight DSOS604A infiniium S-Series 
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 SYNOPSIS
 
@@ -391,13 +391,17 @@ version 3.772
      waveform_format => ...
  );
 
-=over
+=over 4
 
 =item * C<input_impedance> specifies the default input input impedance. See channel_input for more information
+
 =item * C<instrument_nselect> specifies the default input channel
+
 =item * C<waveform_format> specifies the default format for waveform data. See set_waveform_format for more information
 
 =back
+
+Most commands accept a C<channel> argument which can be 1,2,3 or 4.
 
 =head2 save_measurement
 
@@ -407,7 +411,7 @@ Save all current measurements on screen to the specified path.
 
 =head2 measure_vpp
 
- $keysight->measure_vpp(source => 'CHANnel1');
+ $keysight->measure_vpp(channel => 1);
 
 Query the Vpp voltage of a specified source.
 
@@ -421,20 +425,29 @@ C<BIN CSV INTernal TSV TXT H5 H5INt MATlab>.
 
 The following file name extensions are used for the different formats:
 
-=over
+=over 4
 
 =item * BIN = file_name.bin
+
 =item * CSV (comma separated values) = file_name.csv
+
 =item * INTernal = file_name.wfm
+
 =item * TSV (tab separated values) = file_name.tsv
+
 =item * TXT = file_name.txt
+
 =item * H5 (HDF5) = file_name.h5
+
 In the H5 format, data is saved as floats. In this case, the data values are actual
 vertical values and do not need to be multiplied by the Y increment value.
+
 =item * H5INt (HDF5) = file_name.h5
+
 In the H5INt format, data is saved as integers. In this case, data values are
 quantization values and need to be multiplied by the Y increment value and
 added to the Y origin value to get the actual vertical values.
+
 =item * MATlab (MATLAB data format) = file_name.mat
 
 =back
@@ -530,19 +543,28 @@ This command controls how the data is formatted when it is sent from
 the oscilloscope, and pertains to all waveforms. The default format is FLOat.
 The possible formats are:
 
-=over
+=over 4
 
 =item * ASCii
+
 ASCii-formatted data consists of waveform data values converted to the currently
 selected units, such as volts, and are output as a string of ASCII characters with
 each value separated from the next value by a comma.
+
 =item * BYTE
+
 BYTE data is formatted as signed 8-bit integers.
+
 =item * WORD
+
 WORD-formatted data is transferred as signed 16-bit integers in two bytes.
+
 =item * BINary
+
 BINary will return a binary block of (8-byte) uint64 values.
+
 =item * FLOat
+
 FLOat will return a binary block of (4-byte) single-precision floating-point values.
 
 =back
@@ -561,25 +583,28 @@ Select an input channel for the acquired waveform.
 
 C<parameter> can be either
 
-=over
+=over 4
 
-=item * DC — DC coupling, 1 MΩ impedance.
-=item * DC50 | DCFifty — DC coupling, 50Ω impedance.
-=item * AC — AC coupling, 1 MΩ impedance.
-=item * LFR1 | LFR2 — AC 1 MΩ input impedance.
+=item * C<DC> — DC coupling, 1 MΩ impedance.
+
+=item * C<DC50> | DCFifty — DC coupling, 50Ω impedance.
+
+=item * C<AC> — AC coupling, 1 MΩ impedance.
+
+=item * C<LFR1> | LFR2 — AC 1 MΩ input impedance.
 
 =back
 
-When no probe is attached, the coupling for each channel can be AC, DC, DC50, or
-DCFifty. If you have an 1153A probe attached, the valid parameters are DC, LFR1,
-and LFR2 (low-frequency reject). See the programming manual on page 347 for more
+When no probe is attached, the coupling for each channel can be C<AC, DC, DC50> or
+C<DCFifty>. If you have an 1153A probe attached, the valid parameters are C<DC, LFR1>
+and C<LFR2> (low-frequency reject). See the programming manual on page 347 for more
 information.
 
 =head2 channel_differential
 
  $keysight->channel_differential(channel => 1, mode => 1);
 
-Turns on or off differential mode. C<mode> is an integer value, where 0 is
+Turns on or off differential mode. C<mode> is a boolean value, where 0 is
 false and everything else is true.
 
 =head2 channel_range/channel_offset

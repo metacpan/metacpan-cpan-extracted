@@ -112,6 +112,7 @@ lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/table.html.ep
 lib/Yancy.pm
 lib/Yancy/Backend.pm
 lib/Yancy/Backend/Dbic.pm
+lib/Yancy/Backend/Memory.pm
 lib/Yancy/Backend/MojoDB.pm
 lib/Yancy/Backend/Mysql.pm
 lib/Yancy/Backend/Pg.pm
@@ -156,7 +157,7 @@ t/00-report-prereqs.t
 t/api.t
 t/app.t
 t/backend/dbic.t
-t/backend/mock.t
+t/backend/memory.t
 t/backend/mysql.t
 t/backend/pg.t
 t/backend/sqlite.t
@@ -225,7 +226,6 @@ t/lib/Local/Schema/Result/people.pm
 t/lib/Local/Schema/Result/user.pm
 t/lib/Local/Test.pm
 t/lib/Yancy/Backend/Brokentest.pm
-t/lib/Yancy/Backend/Test.pm
 t/lib/Yancy/Plugin/Test.pm
 t/model.t
 t/plugin/auth.t

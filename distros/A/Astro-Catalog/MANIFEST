@@ -1,3 +1,4 @@
+bin/catalog_convert
 Build.PL
 Changes
 demo/widget_demo
@@ -14,7 +15,9 @@ lib/Astro/Catalog/IO/Cluster.pm
 lib/Astro/Catalog/IO/FINDOFF.pm
 lib/Astro/Catalog/IO/FITSTable.pm
 lib/Astro/Catalog/IO/GaiaPick.pm
+lib/Astro/Catalog/IO/Hedwig.pm
 lib/Astro/Catalog/IO/JCMT.pm
+lib/Astro/Catalog/IO/JCMT_OT_SC.pm
 lib/Astro/Catalog/IO/LCOGTFITSTable.pm
 lib/Astro/Catalog/IO/Northstar.pm
 lib/Astro/Catalog/IO/RITMatch.pm
@@ -23,6 +26,7 @@ lib/Astro/Catalog/IO/Simple.pm
 lib/Astro/Catalog/IO/STL.pm
 lib/Astro/Catalog/IO/TST.pm
 lib/Astro/Catalog/IO/UKIRTBS.pm
+lib/Astro/Catalog/IO/VEX.pm
 lib/Astro/Catalog/IO/VOTable.pm
 lib/Astro/Catalog/IO/XY.pm
 lib/Astro/Catalog/Item.pm

@@ -1,5 +1,5 @@
 package Lab::Moose;
-$Lab::Moose::VERSION = '3.772';
+$Lab::Moose::VERSION = '3.791';
 #ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::Sweep>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
 
 use v5.20;
@@ -8,7 +8,7 @@ use warnings;
 use strict;
 
 use MooseX::Params::Validate;
-use Moose::Util::TypeConstraints qw/subtype as where message/;
+use Moose::Util::TypeConstraints qw/subtype as where message coerce from via/;
 use Module::Load;
 use Lab::Moose::Connection;
 use Lab::Moose::DataFolder;
@@ -138,6 +138,12 @@ subtype 'Lab::Moose::PosInt',
     where { $_ >= 0 },
     message {"$_ is not a positive integer number"};
 
+subtype 'ArrayRefOfInstruments',
+        as 'ArrayRef[Lab::Moose::Instrument]';
+
+coerce 'ArrayRefOfInstruments',
+    from 'Lab::Moose::Instrument', via { [ $_ ] };
+
 1;
 
 __END__
@@ -152,7 +158,7 @@ Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, 
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 SYNOPSIS
 
@@ -163,7 +169,7 @@ version 3.772
      connection_type => 'LinuxGPIB',
      connection_options => {timeout => 2}
  );
- 
+
  my $folder = datafolder();
  my $file = datafile(
      type => 'Gnuplot',
@@ -238,7 +244,7 @@ The default type is L<'Gnuplot'|Lab::Moose::DataFile::Gnuplot>.
 
 =head2 linspace
 
- # create array (-1, -0.9, ..., 0.9, 1) 
+ # create array (-1, -0.9, ..., 0.9, 1)
  my @points = linspace(from => -1, to => 1, step => 0.1);
 
  # create array without first point (-0.9, ..., 1)
@@ -256,6 +262,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2017       Andreas K. Huettel, Simon Reinhardt
             2018-2019  Simon Reinhardt
             2020       Andreas K. Huettel
+            2021       Fabian Weinelt
 
 
 This is free software; you can redistribute it and/or modify it under

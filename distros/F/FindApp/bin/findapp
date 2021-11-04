@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(abs_path);
+use FindBin qw($Bin);
+use lib map { abs_path($_) || $_ } "$Bin/../lib";
+
+# Pass import pragmata in @ARGV, so for example:
+#
+#   findapp -LIB t/lib
+#   eval `findapp -LIB t/lib`
+
+use FindApp @ARGV;
+FindApp->default_origin("cwd");
+FindApp->findapp;
+print FindApp->shell_settings;
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+findapp - print the environment variables that correspond to what FindApp would do
+
+=head1 SYNOPSIS
+
+findapp
+
+findapp -LIB t/lib
+
+findapp MyCorp::MyApp
+
+=head1 DESCRIPTION
+
+This prints out the results of the L<FindApp/shell_settings> method after
+importing its program arguments from L<FindApp>.
+
+This output can be eval'd from your shell using your shell's built-in
+C<eval> command:
+
+ eval `findapp`
+
+If called from csh(1) or tcsh(1), the output is in the format desired by 
+those shells; otherwise the normal sh(1) notation is used.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<FindApp>
+
+=item L<FindApp::Object::Behavior::Loader>
+
+=back
+
+=head1 AUTHOR
+
+Tom Christiansen C<< <tchrist@perl.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2016, Tom Christiansen C<< <tchrist@perl.com> >>.
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::AddressRequestType;
-$Shipment::UPS::WSDL::TrackTypes::AddressRequestType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::AddressRequestType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        PostalCode
               CountryCode
 
-              )
+            )
         ],
         {   'PostalCode'  => \%PostalCode_of,
             'CountryCode' => \%CountryCode_of,
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::TrackTypes::AddressRequestType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

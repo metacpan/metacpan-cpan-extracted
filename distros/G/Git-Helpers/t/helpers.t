@@ -16,9 +16,9 @@ use Git::Version ();
 use Git::Sub;
 use Path::Tiny qw( path );
 use Test::Deep qw( cmp_deeply );
-use Test::Fatal;
-use Test::Git 1.313;
-use Test::More;
+use Test::Fatal qw( exception );
+use Test::Git 1.313 qw( test_repository );
+use Test::More import => [qw( diag done_testing is like ok skip subtest )];
 use Test::Requires::Git 1.005;
 
 test_requires_git();

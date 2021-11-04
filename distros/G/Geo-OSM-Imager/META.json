@@ -59,7 +59,7 @@
    "provides" : {
       "Geo::OSM::Imager" : {
          "file" : "lib/Geo/OSM/Imager.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -73,9 +73,9 @@
          "web" : "https://github.com/Firedrake/Geo-OSM-Imager"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "Roger Bell_West <roger@firedrake.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

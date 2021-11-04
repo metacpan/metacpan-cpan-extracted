@@ -1,0 +1,99 @@
+{
+   "abstract" : "find your application home and config your process for it",
+   "author" : [
+      "Tom Christiansen <tchrist@perl.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FindApp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Env" : "0",
+            "Exporter" : "0",
+            "File::Find" : "0",
+            "FindBin" : "0",
+            "Import::Base" : "0",
+            "Package::Stash" : "0",
+            "Pod::Coverage" : "0.18",
+            "Pod::Coverage::Careful" : "1",
+            "Scalar::Util" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Exception" : "0",
+            "Test::Manifest" : "2",
+            "Test::More" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08",
+            "feature" : "0",
+            "lib" : "0",
+            "locale" : "0",
+            "mro" : "0",
+            "open" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Cwd" : "0",
+            "Data::Dump" : "0",
+            "Env" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Glob" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "List::Util" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Name" : "0",
+            "Tie::Array" : "0",
+            "charnames" : "0",
+            "constant" : "0",
+            "feature" : "0",
+            "lib" : "0",
+            "locale" : "0",
+            "mro" : "0",
+            "namespace::clean" : "0",
+            "overload" : "0",
+            "overloading" : "0",
+            "parent" : "0",
+            "perl" : "5.010",
+            "pluskeys" : "2.4",
+            "strict" : "0",
+            "subs" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.6",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

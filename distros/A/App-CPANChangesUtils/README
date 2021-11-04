@@ -1,0 +1,141 @@
+NAME
+    App::CPANChangesUtils - Parse CPAN Changes file
+
+VERSION
+    This document describes version 0.074 of App::CPANChangesUtils (from
+    Perl distribution App-CPANChangesUtils), released on 2021-10-17.
+
+DESCRIPTION
+    This distribution provides some CLI utilities related to CPAN Changes
+
+FUNCTIONS
+  format_cpan_changes
+    Usage:
+
+     format_cpan_changes(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Format CPAN Changes.
+
+    This utility is a simple wrapper to CPAN::Changes. It will parse your
+    CPAN Changes file into data structure, then use "serialize()" to format
+    it back to text form.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   class => *perl::modname* (default: "CPAN::Changes")
+
+    *   file => *filename*
+
+        If not specified, will look for file called Changes/ChangeLog in
+        current directory.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  parse_cpan_changes
+    Usage:
+
+     parse_cpan_changes(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Parse CPAN Changes file.
+
+    This utility is a simple wrapper for CPAN::Changes.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   class => *perl::modname* (default: "CPAN::Changes")
+
+    *   file => *filename*
+
+        If not specified, will look for file called Changes/ChangeLog in
+        current directory.
+
+    *   unbless => *bool* (default: 1)
+
+        Whether to return Perl objects as unblessed refs.
+
+        If you set this to false, you'll need to use an output format that
+        can handle serializing Perl objects, e.g. on the CLI using
+        "--format=perl".
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CPANChangesUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CPANChangesUtils>.
+
+SEE ALSO
+    CPAN::Changes
+
+    CPAN::Changes::Spec
+
+    An alternative way to manage your Changes using INI master format:
+    Module::Metadata::Changes.
+
+    Dist::Zilla plugin to check your Changes before build:
+    Dist::Zilla::Plugin::CheckChangesHasContent,
+    Dist::Zilla::Plugin::CheckChangeLog.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPANChangesUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

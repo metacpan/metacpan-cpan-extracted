@@ -1,6 +1,6 @@
 package App::ansiecho;
 
-our $VERSION = "0.04";
+our $VERSION = "0.06";
 
 use v5.14;
 use warnings;
@@ -20,8 +20,8 @@ use Pod::Usage;
 use Getopt::EX::Hashed; {
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
     has debug      => "      " ;
-    has no_newline => " n !  " ;
-    has join       => " j !  " ;
+    has n          => "      " , action => sub { $_->{terminate} = '' };
+    has join       => " j    " , action => sub { $_->{separate} = '' };
     has escape     => " e !  " , default => 1;
     has rgb24      => "   !  " ;
     has separate   => "   =s " , default => " ";
@@ -52,7 +52,7 @@ use List::Util qw(sum);
 
 sub run {
     my $app = shift;
-    local @ARGV = decode_argv @_;
+    @ARGV = decode_argv @ARGV;
 
     use Getopt::EX::Long qw(GetOptions Configure ExConfigure);
     ExConfigure BASECLASS => [ __PACKAGE__, "Getopt::EX" ];
@@ -65,8 +65,6 @@ sub run {
 
 sub initialize {
     my $app = shift;
-    $app->terminate('') if $app->no_newline;
-    $app->separate('') if $app->join;
     if ($app->separate) {
 	$app->separate(safe_backslash($app->separate));
     }

@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.2904
+Version 2.2906
 
 =head1 SYNOPSIS
 
@@ -281,6 +281,28 @@ practical use.
 
 =back
 
+=head1 JAPANESE
+
+This module is originaly made for Japanese text editing support.
+
+=head2 KATAKANA
+
+Japanese KATAKANA word have a lot of variants to describe same word,
+and unification is important but tiresome.  In the next example,
+
+    イ[エー]ハトー?([ヴブボ]ォ?)  //  イーハトーヴォ
+
+left pattern matches all following words.
+
+    イエハトブ
+    イーハトヴ
+    イーハトーヴ
+    イーハトーヴォ
+    イーハトーボ
+    イーハトーブ
+
+This module helps to detect and correct them.
+
 =head1 INSTALL
 
 =head2 CPANMINUS
@@ -325,7 +347,7 @@ it under the same terms as Perl itself.
 use v5.14;
 package App::Greple::subst;
 
-our $VERSION = '2.2904';
+our $VERSION = '2.2906';
 
 use warnings;
 use utf8;
@@ -571,8 +593,8 @@ sub subst_search {
     my @matched;
     my $index = -1;
     my @effective;
-    my $ng = {ng=>1, any=>1, all=>1, none=>1}->{$opt_check} ;
-    my $ok = {ok=>1, any=>1, all=>1, none=>1}->{$opt_check} ;
+    my $ng = {ng=>1,        any=>1, all=>1, none=>1}->{$opt_check} ;
+    my $ok = {       ok=>1, any=>1, all=>1, none=>1}->{$opt_check} ;
     my $outstand = $opt_check eq 'outstand';
     for my $dict (@dicts) {
 	for my $p ($dict->words) {
@@ -663,9 +685,12 @@ sub subst_search {
 sub subst_diff {
     my $orig = $current_file;
     my $fh;
-    state $fdpath = first { -r "$_/0" } qw( /dev/fd /proc/self/fd );
+    state $fdpath = do {
+	my $fd = DATA->fileno;
+	first { -r "$_/$fd" } qw( /dev/fd /proc/self/fd );
+    };
 
-    if (!-r $orig and $fdpath and $remember_data) {
+    if ($fdpath and $remember_data) {
 	use IO::File;
 	use Fcntl;
 	$fh = new_tmpfile IO::File or die "new_tmpfile: $!\n";

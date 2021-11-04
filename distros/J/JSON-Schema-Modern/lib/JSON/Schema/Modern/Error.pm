@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.521';
+our $VERSION = '0.523';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use strictures 2;
 use Moo;
 use MooX::TypeTiny;
@@ -66,7 +67,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.521
+version 0.523
 
 =head1 SYNOPSIS
 

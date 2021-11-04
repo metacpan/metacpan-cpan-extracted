@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfContentDetail;
-$Shipment::Purolator::WSDL::Types::ArrayOfContentDetail::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ArrayOfContentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        ContentDetail
 
-              )
+            )
         ],
         {'ContentDetail' => \%ContentDetail_of,},
         {   'ContentDetail' =>
@@ -56,7 +56,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfContentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

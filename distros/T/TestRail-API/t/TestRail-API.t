@@ -7,7 +7,7 @@ use lib "$FindBin::Bin/lib";
 use TestRail::API;
 use Test::LWP::UserAgent::TestRailMock;
 
-use Test::More tests => 94;
+use Test::More tests => 96;
 use Test::Fatal;
 use Test::Deep;
 use Scalar::Util ();
@@ -88,6 +88,7 @@ my $new_project = $tr->createProject($project_name,'Robo-Signed Soviet 5 Year Pr
 is($new_project->{'name'},$project_name,"Can create new project");
 
 ok($tr->getProjects(),"Get Projects returns list");
+ok($tr->getProjects({ is_completed => 1 }),"Get Projects returns a filtered list");
 is($tr->getProjectByName($project_name)->{'name'},$project_name,"Can get project by name");
 my $pjid = $tr->getProjectByID($new_project->{'id'});
 is(Scalar::Util::reftype($pjid) eq 'HASH' ? $pjid->{'id'} : $pjid,$new_project->{'id'},"Can get project by id");
@@ -127,19 +128,17 @@ my $case_filters = {
 };
 
 ok($tr->getCases($new_project->{'id'},$new_suite->{'id'},$case_filters),"Can get case listing");
+ok($tr->getCases($new_project->{'id'},$new_suite->{'id'},{'hokum' => 'bogus'}),"Passing bogus filter returns cases");
 is($tr->getCaseByName($new_project->{'id'}, $new_suite->{'id'},  $case_name, $case_filters)->{'title'},$case_name,"Can get case by name");
 is($tr->getCaseByID($new_case->{'id'})->{'id'},$new_case->{'id'},"Can get case by ID");
-
-#Negative case
-$case_filters->{'hokum'} = 'bogus';
-isnt(exception {$tr->getCases($new_project->{'id'},$new_suite->{'id'},$case_filters)},undef,"Passing bogus filter croaks");
 
 #Test RUN methods
 my $run_name = 'SEND T-1000 INFILTRATION UNITS BACK IN TIME';
 my $new_run = $tr->createRun($new_project->{'id'},$new_suite->{'id'},$run_name,"ACQUIRE CLOTHES, BOOTS AND MOTORCYCLE");
 is($new_run->{'name'},$run_name,"Can create new run");
 
-ok($tr->getRuns($new_project->{'id'}),"Can get list of runs");
+ok($tr->getRuns($new_project->{'id'}),"Can get list of all runs in a project");
+ok($tr->getRuns($new_project->{'id'},{is_completed => 1,milestone_id => 3}),"Can get list of runs, filtered by milestone ID & completion status");
 is($tr->getRunByName($new_project->{'id'},$run_name)->{'name'},$run_name,"Can get run by name");
 is($tr->getRunByID($new_run->{'id'})->{'id'},$new_run->{'id'},"Can get run by ID");
 
@@ -157,8 +156,8 @@ my $plan_name = "GosPlan";
 my $new_plan = $tr->createPlan($new_project->{'id'},$plan_name,"Soviet 5-year agriculture plan to liquidate Kulaks",$new_milestone->{'id'},[{ suite_id => $new_suite->{'id'}, name => "Executing the great plan"}]);
 is($new_plan->{'name'},$plan_name,"Can create new plan");
 
-ok($tr->getPlans($new_project->{'id'}),"Can get list of plans");
-ok($tr->getPlans($new_project->{'id'},{ is_completed => 1, milestone_id => 3}),"Can get list of plans, filtered by milestone ID & completion status");
+ok($tr->getPlans($new_project->{'id'}),"Can get list of all plans");
+ok($tr->getPlans($new_project->{'id'},{is_completed => 1,milestone_id => 3}),"Can get list of plans, filtered by milestone ID & completion status");
 my $namePlan = $tr->getPlanByName($new_project->{'id'},$plan_name);
 is($namePlan->{'name'},$plan_name,"Can get plan by name");
 is($tr->getPlanByID($new_plan->{'id'})->{'id'},$new_plan->{'id'},"Can get plan by ID");

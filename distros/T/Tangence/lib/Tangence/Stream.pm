@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tangence::Stream 0.26;
+package Tangence::Stream 0.27;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental 'signatures';
 
 use Carp;
 
@@ -154,8 +155,15 @@ sub tangence_readfrom
 {
    my $self = shift;
 
-   while( my $message = Tangence::Message->try_new_from_bytes( $self, $_[0] ) ) {
-      my $code = $message->code;
+   while( length $_[0] ) {
+      last unless length $_[0] >= 5;
+      my ( $code, $len ) = unpack( "CN", $_[0] );
+      last unless length $_[0] >= 5 + $len;
+
+      substr( $_[0], 0, 5, "" );
+      my $payload = substr( $_[0], 0, $len, "" );
+
+      my $message = Tangence::Message->new( $self, $code, $payload );
 
       if( $code < 0x80 ) {
          push @{ $self->{request_queue} }, undef;
@@ -185,11 +193,8 @@ sub tangence_readfrom
    }
 }
 
-sub object_destroyed
+sub object_destroyed ( $self, $obj, $startsub, $donesub )
 {
-   my $self = shift;
-   my ( $obj, $startsub, $donesub ) = @_;
-
    $startsub->();
 
    my $objid = $obj->id;
@@ -255,11 +260,8 @@ case.
 
 =cut
 
-sub request
+sub request ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my $request = $args{request} or croak "Expected 'request'";
 
    my $f;
@@ -284,7 +286,10 @@ sub request
 
    push @{ $self->{responder_queue} }, $on_response;
 
-   $self->tangence_write( $request->bytes );
+   my $payload = $request->payload;
+   $self->tangence_write(
+      pack "CNa*", $request->code, length($payload), $payload
+   );
 
    return $f;
 }
@@ -300,12 +305,10 @@ with the corresponding request.
 
 =cut
 
-sub respond
+sub respond ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
-   my $response = $message->bytes;
+   my $payload = $message->payload;
+   my $response = pack "CNa*", $message->code, length($payload), $payload;
 
    $$token = $response;
 
@@ -314,11 +317,8 @@ sub respond
    }
 }
 
-sub respondERROR
+sub respondERROR ( $self, $token, $string )
 {
-   my $self = shift;
-   my ( $token, $string ) = @_;
-
    $self->respond( $token, Tangence::Message->new( $self, MSG_ERROR )
       ->pack_str( $string )
    );

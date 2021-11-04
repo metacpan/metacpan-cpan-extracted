@@ -18,7 +18,7 @@ Crypt::OpenSSL::Guess - Guess OpenSSL include path
 
 Crypt::OpenSSL::Guess provides helpers to guess OpenSSL include path on any platforms.
 
-Often MacOS's homebrew OpenSSL cause a problem on installation due to include path is not added.
+Often macOS's homebrew OpenSSL cause a problem on installation due to include path is not added.
 Some CPAN module provides to modify include path with configure-args, but [Carton](https://metacpan.org/pod/Carton) or [Module::CPANfile](https://metacpan.org/pod/Module%3A%3ACPANfile)
 is not supported to pass configure-args to each modules. Crypt::OpenSSL::\* modules should use it on your [Makefile.PL](https://metacpan.org/pod/Makefile.PL).
 
@@ -31,25 +31,25 @@ Original code is taken from `inc/Module/Install/PRIVATE/Net/SSLeay.pm` by [Net::
 
     This functions returns include paths in the format passed to CC. If OpenSSL could not find, then empty string is returned.
 
-        openssl_inc_paths(); # on MacOS: "-I/usr/local/opt/openssl/include"
+        openssl_inc_paths(); # on macOS: "-I/usr/local/opt/openssl/include"
 
 - openssl\_lib\_paths()
 
     This functions returns library paths in the format passed to CC. If OpenSSL could not find, then empty string is returned.
 
-        openssl_lib_paths(); # on MacOS: "-L/usr/local/opt/openssl -L/usr/local/opt/openssl/lib"
+        openssl_lib_paths(); # on macOS: "-L/usr/local/opt/openssl/lib"
 
 - find\_openssl\_prefix(\[$dir\])
 
     This function returns OpenSSL's prefix. If set `OPENSSL_PREFIX` environment variable, you can overwrite the return value.
 
-        find_openssl_prefix(); # on MacOS: "/usr/local/opt/openssl"
+        find_openssl_prefix(); # on macOS: "/usr/local/opt/openssl"
 
 - find\_openssl\_exec($prefix)
 
     This functions returns OpenSSL's executable path.
 
-        find_openssl_exec(); # on MacOS: "/usr/local/opt/openssl/bin/openssl"
+        find_openssl_exec(); # on macOS: "/usr/local/opt/openssl/bin/openssl"
 
 - ($major, $minor, $letter) = openssl\_version()
 

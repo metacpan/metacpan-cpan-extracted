@@ -66,7 +66,7 @@ package CBOR::XS;
 
 use common::sense;
 
-our $VERSION = 1.83;
+our $VERSION = 1.86;
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_cbor decode_cbor);
@@ -123,6 +123,7 @@ data. Currently, this is equivalent to:
 
    my $cbor = CBOR::XS
       ->new
+      ->validate_utf8
       ->forbid_objects
       ->filter (\&CBOR::XS::safe_filter)
       ->max_size (1e8);
@@ -135,6 +136,7 @@ to be exploited in other ways).
 sub new_safe {
    CBOR::XS
       ->new
+      ->validate_utf8
       ->forbid_objects
       ->filter (\&CBOR::XS::safe_filter)
       ->max_size (1e8)
@@ -706,7 +708,7 @@ precision.
 =head2 TYPE CASTS
 
 B<EXPERIMENTAL>: As an experimental extension, C<CBOR::XS> allows you to
-force specific cbor types to be used when encoding. That allows you to
+force specific CBOR types to be used when encoding. That allows you to
 encode types not normally accessible (e.g. half floats) as well as force
 string types even when C<text_strings> is in effect.
 
@@ -714,7 +716,8 @@ Type forcing is done by calling a special "cast" function which keeps a
 copy of the value and returns a new value that can be handed over to any
 CBOR encoder function.
 
-The following casts are currently available (all of which are unary operators):
+The following casts are currently available (all of which are unary
+operators, that is, have a prototype of C<$>):
 
 =over
 
@@ -757,7 +760,7 @@ Forces double-float (IEEE 754 binary64) encoding of the given value.
 
 =item CBOR::XS::as_cbor $cbor_text
 
-Not a type cast per-se, this type cast forces the argument to eb encoded
+Not a type cast per-se, this type cast forces the argument to be encoded
 as-is. This can be used to embed pre-encoded CBOR data.
 
 Note that no checking on the validity of the C<$cbor_text> is done - it's
@@ -767,11 +770,15 @@ the callers responsibility to correctly encode values.
 
 Treat the array reference as key value pairs and output a CBOR map. This
 allows you to generate CBOR maps with arbitrary key types (or, if you
-don't care about semantics, duplicate keys or prairs in a custom order),
+don't care about semantics, duplicate keys or pairs in a custom order),
 which is otherwise hard to do with Perl.
 
 The single argument must be an array reference with an even number of
 elements.
+
+Note that only the reference to the array is copied, the array itself is
+not. Modifications done to the array before calling an encoding function
+will be reflected in the encoded output.
 
 Example: encode a CBOR map with a string and an integer as keys.
 

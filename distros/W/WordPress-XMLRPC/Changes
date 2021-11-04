@@ -1,3 +1,8 @@
+2021-10-14 12:43 git v2.13
+    * [97830] On Windows missing binmode in get_file_bits() destroy binary data
+    * [75493] Triple colons in pod file
+    * Moved some testing pre-reqs into the appropriate place in the  
+
 2017-02-18 11:42 git
         * Large breaking upgrade to make it compatible with current
           WordPress versions. Obselete functions removed, new ones added. 

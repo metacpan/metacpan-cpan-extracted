@@ -19,9 +19,9 @@ sub new {
 sub next {
 	my ($self) = @_;
 
-	$index <= $length or (print "stream ended" and $index = 0);
+	$self->{index} <= $self->{length} or (print "stream ended" and $self->{index} = 0);
 
-	return $self->{bytes} << $index++ * 4;
+	return $self->{bytes} << $self->{index}++ * 4;
 }
 
 1;

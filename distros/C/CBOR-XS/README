@@ -88,6 +88,7 @@ OBJECT-ORIENTED INTERFACE
 
            my $cbor = CBOR::XS
               ->new
+              ->validate_utf8
               ->forbid_objects
               ->filter (\&CBOR::XS::safe_filter)
               ->max_size (1e8);
@@ -618,7 +619,7 @@ MAPPING
 
   TYPE CASTS
     EXPERIMENTAL: As an experimental extension, "CBOR::XS" allows you to
-    force specific cbor types to be used when encoding. That allows you to
+    force specific CBOR types to be used when encoding. That allows you to
     encode types not normally accessible (e.g. half floats) as well as force
     string types even when "text_strings" is in effect.
 
@@ -627,7 +628,7 @@ MAPPING
     CBOR encoder function.
 
     The following casts are currently available (all of which are unary
-    operators):
+    operators, that is, have a prototype of "$"):
 
     CBOR::XS::as_int $value
         Forces the value to be encoded as some form of (basic, not bignum)
@@ -660,7 +661,7 @@ MAPPING
         Forces double-float (IEEE 754 binary64) encoding of the given value.
 
     CBOR::XS::as_cbor $cbor_text
-        Not a type cast per-se, this type cast forces the argument to eb
+        Not a type cast per-se, this type cast forces the argument to be
         encoded as-is. This can be used to embed pre-encoded CBOR data.
 
         Note that no checking on the validity of the $cbor_text is done -
@@ -669,11 +670,15 @@ MAPPING
     CBOR::XS::as_map [key => value...]
         Treat the array reference as key value pairs and output a CBOR map.
         This allows you to generate CBOR maps with arbitrary key types (or,
-        if you don't care about semantics, duplicate keys or prairs in a
+        if you don't care about semantics, duplicate keys or pairs in a
         custom order), which is otherwise hard to do with Perl.
 
         The single argument must be an array reference with an even number
         of elements.
+
+        Note that only the reference to the array is copied, the array
+        itself is not. Modifications done to the array before calling an
+        encoding function will be reflected in the encoded output.
 
         Example: encode a CBOR map with a string and an integer as keys.
 

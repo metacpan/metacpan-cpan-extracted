@@ -1,5 +1,5 @@
 package Yancy::Model;
-our $VERSION = '1.077';
+our $VERSION = '1.084';
 # ABSTRACT: Model layer for Yancy apps
 
 #pod =head1 SYNOPSIS
@@ -46,6 +46,9 @@ use Mojo::Base -base;
 use Scalar::Util qw( blessed );
 use Mojo::Util qw( camelize );
 use Mojo::Loader qw( load_class );
+use Mojo::Log;
+use Yancy::Util qw( derp );
+use Storable qw( dclone );
 
 #pod =attr backend
 #pod
@@ -63,7 +66,55 @@ has backend => sub { die "backend is required" };
 
 has namespaces => sub { [qw( Yancy::Model )] };
 
+#pod =attr log
+#pod
+#pod A L<Mojo::Log> object to log messages to.
+#pod
+#pod =cut
+
+has log => sub { Mojo::Log->new };
+
 has _schema => sub { {} };
+has _config_schema => sub { {} };
+has _auto_read => 1;
+
+#pod =method new
+#pod
+#pod Create a new model with the given backend. In addition to any L</ATTRIBUTES>, these
+#pod options may be given:
+#pod
+#pod =over
+#pod
+#pod =item schema
+#pod
+#pod A JSON schema configuration. By default, the information from
+#pod L</read_schema> will be merged with this information. See
+#pod L<Yancy::Guides::Schema/Documenting Your Schema> for more information.
+#pod
+#pod =item read_schema
+#pod
+#pod Read the backend database information to build the schema information.
+#pod Enabled by default. Set to a false value to disable.
+#pod
+#pod =back
+#pod
+#pod =cut
+
+sub new {
+    my ( $class, @args ) = @_;
+    my %args = @args == 1 ? %{ $args[0] } : @args;
+    my $conf = $args{_config_schema} = delete $args{schema} if $args{schema};
+    my $read = exists $args{read_schema} ? delete $args{read_schema} : 1;
+    $args{ _auto_read } = $read;
+    my $self = $class->SUPER::new(\%args);
+    if ( $read ) {
+        $self->read_schema;
+    }
+    elsif ( my @names = grep { delete $conf->{$_}{read_schema} } keys %$conf ) {
+        $self->read_schema( @names );
+    }
+    return $self;
+}
 
 #pod =method find_class
 #pod
@@ -126,10 +177,35 @@ sub find_class {
 #pod =cut
 
 sub read_schema {
-    my ( $self ) = @_;
-    my $schema = $self->backend->read_schema;
-    for my $name ( keys %$schema ) {
-        $self->schema( $name, $schema->{ $name } );
+    my ( $self, @names ) = @_;
+    my $conf_schema = $self->_config_schema;
+    my $read_schema;
+    # ; use Data::Dumper;
+    # ; say "READ SCHEMA: " . Dumper $read_schema;
+    if ( @names ) {
+        $read_schema = { map { $_ => $self->backend->read_schema( $_ ) } @names };
+    }
+    else {
+        $read_schema = $self->backend->read_schema( @names );
+        my %all_schemas = map { $_ => 1 } keys %$conf_schema, keys %$read_schema;
+        @names = keys %all_schemas;
+    }
+
+    # Make all concrete schemas first, then any views.
+    # XXX: x-view is deprecated. Remove the sort in v2.
+    @names = sort { !!$conf_schema->{$a}{'x-view'} <=> !!$conf_schema->{$b}{'x-view'} } @names;
+
+    for my $name ( @names ) {
+        # ; use Data::Dumper;
+        # ; say "Creating schema $name";
+        # ; say "Has view " . Dumper $conf_schema->{$name}{'x-view'} if $conf_schema->{$name}{'x-view'};
+        my $full_schema = _merge_schema( $conf_schema->{ $name } // {}, $read_schema->{ $name } // {} );
+        if ( $full_schema->{'x-ignore'} ) {
+            # Remember we're ignoring this schema
+            $conf_schema->{ $name }{ 'x-ignore' } = 1;
+            next;
+        }
+        $self->schema( $name, $full_schema );
     }
     return $self;
 }
@@ -143,7 +219,6 @@ sub read_schema {
 #pod
 #pod =cut
 
-# XXX: Preload namespaces' Schema:: and Item:: classes?
 sub schema {
     my ( $self, $name, $data ) = @_;
     if ( !$data ) {
@@ -151,15 +226,73 @@ sub schema {
             return $schema;
         }
         # Create a default schema
-        $self->schema( $name, {} );
-        return $self->_schema->{$name};
+        my $conf = $self->_config_schema->{ $name };
+        die "Schema $name is ignored" if $conf->{'x-ignore'};
+        $self->schema( $name, $conf );
+        return $self->_schema->{ $name };
     }
     if ( !blessed $data || !$data->isa( 'Yancy::Model::Schema' ) ) {
         my $class = $self->find_class( Schema => $name );
-        $data = $class->new( model => $self, name => $name, schema => $data );
+        $data = $class->new( model => $self, name => $name, json_schema => $data );
     }
     $self->_schema->{$name} = $data;
     return $self;
+}
+
+#pod =method json_schema
+#pod
+#pod Get the JSON Schema for every attached schema.
+#pod
+#pod =cut
+
+sub json_schema {
+  my ( $self, @names ) = @_;
+  if ( !@names ) {
+    @names = $self->schema_names;
+  }
+  return {
+    map { $_ => $self->schema( $_ )->json_schema } @names
+  };
+}
+
+#pod =method schema_names
+#pod
+#pod Get a list of all the schema names.
+#pod
+#pod =cut
+
+sub schema_names {
+    my ( $self ) = @_;
+    my $conf = $self->_config_schema;
+    my %all_schemas = map { $_ => 1 } grep !$conf->{$_}{'x-ignore'}, keys %$conf, keys %{ $self->_schema };
+    return keys %all_schemas;
+}
+
+# _merge_schema( $keep, $merge );
+#
+# Merge the two schemas, returning the result.
+sub _merge_schema {
+    my ( $left, $right ) = @_;
+    # ; use Data::Dumper;
+    # ; say "Split schema " . Dumper( $left ) . Dumper( $right );
+    my $keep = dclone $left;
+    if ( my $right_props = $right->{properties} ) {
+        my $keep_props = $keep->{properties} ||= {};
+        for my $p ( keys %{ $right_props } ) {
+            my $keep_prop = $keep_props->{ $p } ||= {};
+            my $right_prop = $right_props->{ $p };
+            for my $k ( keys %$right_prop ) {
+                $keep_prop->{ $k } ||= $right_prop->{ $k };
+            }
+        }
+    }
+    for my $k ( keys %$right ) {
+        next if $k eq 'properties';
+        $keep->{ $k } ||= $right->{ $k };
+    }
+    # ; use Data::Dumper;
+    # ; say "Merged schema " . Dumper $keep;
+    return $keep;
 }
 
 1;
@@ -174,7 +307,7 @@ Yancy::Model - Model layer for Yancy apps
 
 =head1 VERSION
 
-version 1.077
+version 1.084
 
 =head1 SYNOPSIS
 
@@ -220,7 +353,31 @@ A L<Yancy::Backend> object.
 
 An array of namespaces to find Schema and Item classes. Defaults to C<[ 'Yancy::Model' ]>.
 
+=head2 log
+
+A L<Mojo::Log> object to log messages to.
+
 =head1 METHODS
+
+=head2 new
+
+Create a new model with the given backend. In addition to any L</ATTRIBUTES>, these
+options may be given:
+
+=over
+
+=item schema
+
+A JSON schema configuration. By default, the information from
+L</read_schema> will be merged with this information. See
+L<Yancy::Guides::Schema/Documenting Your Schema> for more information.
+
+=item read_schema
+
+Read the backend database information to build the schema information.
+Enabled by default. Set to a false value to disable.
+
+=back
 
 =head2 find_class
 
@@ -251,6 +408,14 @@ Get or set a schema object.
 
     $model = $model->schema( user => MyApp::Model::User->new );
     $schema = $model->schema( 'user' );
+
+=head2 json_schema
+
+Get the JSON Schema for every attached schema.
+
+=head2 schema_names
+
+Get a list of all the schema names.
 
 =head1 SEE ALSO
 

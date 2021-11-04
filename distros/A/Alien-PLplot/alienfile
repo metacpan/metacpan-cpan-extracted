@@ -1,0 +1,109 @@
+use alienfile;
+
+use Env qw(@CMAKE_INCLUDE_PATH @CMAKE_LIBRARY_PATH);
+use DynaLoader ();
+use File::Basename qw(dirname);
+use File::Spec;
+use Config;
+
+plugin PkgConfig => 'plplot';
+
+share {
+	requires 'File::Which';
+	# NOTE currently only pulling PLplot 5.15.0
+	start_url 'https://sourceforge.net/projects/plplot/files/plplot/5.15.0%20Source/';
+	plugin 'Decode::SourceForge';
+
+	plugin Download => (
+		filter  => qr/^plplot-.*\.tar\.gz$/,
+		version => qr/([0-9\.]+)/,
+	);
+
+	plugin Extract => 'tar.gz';
+	plugin 'Build::CMake';
+
+	# Driver: png,jpeg,gif : formats via libgd
+	# NOTE This is currently listed as a deprecated driver in the PLplot
+	# documentation.
+	my $pld_gd_enable = 1;
+	my $pld_gd_gdnames = '';
+
+	# Driver: wingcc : interactive plotting device for MSWin32
+	my $pld_wingcc_enable = $^O eq 'MSWin32';
+
+	if( $^O eq 'MSWin32' && $Config{myuname} =~ /^Win32 strawberry-perl/ ) {
+		# This helps to find the paths under Strawberry Perl.
+		my ($gd_lib_file) = DynaLoader::dl_findfile('-lgd');
+		if( $gd_lib_file ) {
+			# libgd paths (for PLD_{png,jpeg,gif})
+			$pld_gd_gdnames = 'gd';
+			my $c_lib_dir = dirname($gd_lib_file);
+			my $c_dir = dirname($c_lib_dir);
+			my $c_inc_dir = File::Spec->catfile( $c_dir, 'include' );
+
+			# gdi32 paths (for PLD_wingcc)
+			my $arch = 'x86_64-w64-mingw32';
+			my $arch_lib_dir = File::Spec->catfile( $c_dir, $arch, 'lib' );
+			my $arch_inc_dir = File::Spec->catfile( $c_dir, $arch, 'include' );
+
+			push @CMAKE_LIBRARY_PATH, $c_lib_dir, $arch_lib_dir;
+			push @CMAKE_INCLUDE_PATH, $c_inc_dir, $arch_inc_dir;
+		}
+	}
+	build [
+		[ '%{cmake}', qw(
+			-DENABLE_ada=OFF
+			-DENABLE_cxx=OFF
+			-DENABLE_d=OFF
+			-DENABLE_fortran=OFF
+			-DENABLE_java=OFF
+			-DENABLE_lua=OFF
+			-DENABLE_ocaml=OFF
+			-DENABLE_octave=OFF
+			-DENABLE_python=OFF
+			-DENABLE_qt=OFF
+			-DENABLE_pyqt4=OFF
+			-DENABLE_tcl=OFF
+			-DENABLE_itcl=OFF
+			-DENABLE_tk=OFF
+			-DENABLE_itk=OFF
+			-DENABLE_wxwidgets=OFF
+
+			-DPLPLOT_USE_QT5=OFF
+			-DPL_DOUBLE=ON
+			),
+			( $^O eq 'MSWin32'
+				? ( '-DPKG_CONFIG_EXECUTABLE=' . File::Which::which('pkg-config'), )
+				: ()
+			),
+
+			( $pld_wingcc_enable
+				? qw(-DPLD_wingcc=ON)
+				: ()
+			),
+
+			( $pld_gd_enable
+				? (
+					qw(-DPLD_png=ON -DPLD_jpeg=ON -DPLD_gif=ON),
+					( $pld_gd_gdnames
+						? ( "-DGD_NAMES=$pld_gd_gdnames" )
+						: ()
+					)
+				)
+				: ()
+			),
+
+			qw(
+				-DBUILD_SHARED_LIBS=OFF
+			),
+			( grep { $_ !~ /\Q-DCMAKE_INSTALL_LIBDIR:PATH=\E/ }
+				@{ meta->prop->{plugin_build_cmake}->{args} },
+			),
+			'%{.install.extract}'
+		],
+		'%{make}',
+		'%{make} install',
+	];
+
+	plugin 'Gather::IsolateDynamic';
+}

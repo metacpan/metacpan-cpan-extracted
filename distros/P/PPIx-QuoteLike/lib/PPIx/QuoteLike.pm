@@ -40,7 +40,7 @@ use PPIx::QuoteLike::Utils qw{
 use Scalar::Util ();
 use Text::Tabs ();
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use constant CLASS_CONTROL       => 'PPIx::QuoteLike::Token::Control';
 use constant CLASS_DELIMITER     => 'PPIx::QuoteLike::Token::Delimiter';
@@ -334,7 +334,7 @@ sub delimiters {
 
     my %deprecate = (
 	attribute => {
-	    postderef	=> 2,
+	    postderef	=> 3,
 	},
     );
 
@@ -998,8 +998,9 @@ dereferences will always be recognized. This is the default behaviour
 now.
 
 Starting with version 0.012_01, the first use of this argument warned.
-With version 0.016_01, all uses will warn. With the first release after
-October 15 2021, all uses will become fatal.
+With version 0.016_01, all uses will warn. With version 0.017_01 all
+uses will be fatal. With the first release after
+April 15 2022, all mention of this argument will be removed.
 
 =head1 INHERITANCE
 

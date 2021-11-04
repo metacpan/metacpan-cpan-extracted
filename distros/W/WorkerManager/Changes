@@ -1,5 +1,11 @@
 Revision history for Perl extension WorkerManager
 
+0.1002 2021-10-18T09:33:08Z
+
+    - Allow user to customize verbose option of TheSchwartz
+    - Stop using UNIVERSAL::isa
+    - Remove Proc::Daemon from deps (thanks @astj)
+
 0.1001 2019-10-17T10:19:01Z
 
     - Fix child process check using documented method of ForkManager (thanks @itchyny)

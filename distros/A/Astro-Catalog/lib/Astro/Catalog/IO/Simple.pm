@@ -6,39 +6,31 @@ Astro::Catalog::IO::Simple - Simple Input/Output format
 
 =head1 SYNOPSIS
 
-  $catalog = Astro::Catalog::IO::Simple->_read_catalog( \@lines );
-  \@lines = Astro::Catalog::IO::Simple->_write_catalog( $catalog );
-  Astro::Catalog::IO::Cluster->_default_file();
+    $catalog = Astro::Catalog::IO::Simple->_read_catalog(\@lines);
+    $lines = Astro::Catalog::IO::Simple->_write_catalog($catalog);
+    Astro::Catalog::IO::Simple->_default_file();
 
 =head1 DESCRIPTION
 
 Performs simple IO, reading or writing "id_string hh mm ss.s +dd mm ss.s"
-formated strings for each Astro::Catalog::Star object in the catalog.
+formated strings for each Astro::Catalog::Item object in the catalog.
 
 =cut
 
-
-# L O A D   M O D U L E S --------------------------------------------------
-
-use 5.006;
 use strict;
 use warnings;
 use warnings::register;
-use vars qw/ $VERSION /;
 use Carp;
 
 use Astro::Catalog;
-use Astro::Catalog::Star;
+use Astro::Catalog::Item;
 use Astro::Coords;
 
-use base qw/ Astro::Catalog::IO::ASCII /;
+use base qw/Astro::Catalog::IO::ASCII/;
 
 use Data::Dumper;
 
-$VERSION = "4.35";
-
-
-# C O N S T R U C T O R ----------------------------------------------------
+our $VERSION = '4.36';
 
 =begin __PRIVATE_METHODS__
 
@@ -54,211 +46,207 @@ call them from outside that module.
 
 Parses a reference to an array containing a simply formatted catalogue
 
-  $catalog = Astro::Catalog::IO::Simple->_read_catalog( \@lines );
+    $catalog = Astro::Catalog::IO::Simple->_read_catalog(\@lines);
 
 =cut
 
 sub _read_catalog {
-   croak( 'Usage: _read_catalog( \@lines )' ) unless scalar(@_) >= 1;
-   my $class = shift;
-   my $arg = shift;
-   my @lines = @{$arg};
+    croak('Usage: _read_catalog(\@lines)') unless scalar(@_) >= 1;
+    my $class = shift;
+    my $arg = shift;
+    my @lines = @{$arg};
 
-   # create an Astro::Catalog object;
-   my $catalog = new Astro::Catalog();
+    # create an Astro::Catalog object;
+    my $catalog = new Astro::Catalog();
 
-   # loop through lines
- MAINLOOP:
-   foreach my $i ( 0 .. $#lines ) {
+    # loop through lines
+  MAINLOOP:
+    foreach my $i ( 0 .. $#lines ) {
 
-      # Skip commented and blank lines
-      next if ($lines[$i] =~ /^\s*[\#\*\%]/);
-      next if ($lines[$i] =~ /^\s*$/);
+        # Skip commented and blank lines
+        next if ($lines[$i] =~ /^\s*[\#\*\%]/);
+        next if ($lines[$i] =~ /^\s*$/);
 
-      # temporary star object
-      my $star = new Astro::Catalog::Star();
+        # temporary star object
+        my $star = new Astro::Catalog::Item();
 
-      # Use a pattern match parser
-      my @match = ( $lines[$i] =~ m/^(.*?)  # Target name (non greedy)
-                          \s*   # optional trailing space
-                          (\d{1,2}) # 1 or 2 digits [RA:h] [greedy]
-                          [:\s]+       # separator
-                          (\d{1,2}) # 1 or 2 digits [RA:m]
-                          [:\s]+       # separator
-                          (\d{1,2}(?:\.\d*)?) # 1|2 digits opt .fraction [RA:s]
-                                    # no capture on fraction
-                          [:\s]+
-                          ([+-]?\s*\d{1,2}) # 1|2 digit [dec:d] inc sign
-                          [:\s]+
-                          (\d{1,2}) # 1|2 digit [dec:m]
-                          [:\s]+
-                          (\d{1,2}(?:\.\d*)?) # arcsecond (optional fraction)
-                                              # no capture on fraction
-                          \s*
-                          (RB|RJ|AZ|GA|AZEL|J2000|B1950|Galactic)? # coordinate type
+        # Use a pattern match parser
+        my @match = ( $lines[$i] =~ m/
+            ^(.*?)  # Target name (non greedy)
+            \s*   # optional trailing space
+            (\d{1,2}) # 1 or 2 digits [RA:h] [greedy]
+            [:\s]+       # separator
+            (\d{1,2}) # 1 or 2 digits [RA:m]
+            [:\s]+       # separator
+            (\d{1,2}(?:\.\d*)?) # 1|2 digits opt .fraction [RA:s]
+# no capture on fraction
+            [:\s]+
+            ([+-]?\s*\d{1,2}) # 1|2 digit [dec:d] inc sign
+            [:\s]+
+            (\d{1,2}) # 1|2 digit [dec:m]
+            [:\s]+
+            (\d{1,2}(?:\.\d*)?) # arcsecond (optional fraction)
+# no capture on fraction
+            \s*
+            (RB|RJ|AZ|GA|AZEL|J2000|B1950|Galactic)? # coordinate type
 
-                         # most everything else is optional
-                         \s*
-                         (?:\#\s*(.*))?$                    # comment [8]
-                /xi);
+# most everything else is optional
+            \s*
+            (?:\#\s*(.*))?$                    # comment [8]
+        /xi);
 
-      # Abort if we do not have matches for the first 8 fields
-      # type is optional
-      for (0 ... 6) {
-         next MAINLOOP unless defined $match[$_];
-      }
-
-      # Read the values
-      my $target = $match[0];
-      my $ra = join(":",@match[1..3]);
-      my $dec = join(":",@match[4..6]);
-      $dec =~ s/\s//g; # remove  space between the sign and number
-
-      # Type defaults to J2000
-      my $type = $match[7] || "J2000";
-      $type = uc($type);
-
-      # Comment can be undefined
-      my $comment = $match[8];
-
-      # push the target id
-      $star->id( $target );
-
-      # push the comment
-      $star->comment( $comment ) if defined $comment;
-
-      # Allow simple mapping of TYPE from JCMT abbreviations.
-      # This does not hurt things or break simplicity of the format.
-      # The form of the hash depends on the type
-      my %c;
-      if ($type =~ /(RB|RJ|J2000|B1950)/ ) {
-        # Standard RADEC
-        $c{ra} = $ra;
-        $c{dec} = $dec;
-
-        if ($type =~ /B/) {
-          $c{type} = "B1950";
-        } else {
-          $c{type} = "J2000";
+        # Abort if we do not have matches for the first 8 fields
+        # type is optional
+        for (0 ... 6) {
+            next MAINLOOP unless defined $match[$_];
         }
 
-      } elsif ($type =~ /^(GA|SUPERGAL)/) {
+        # Read the values
+        my $target = $match[0];
+        my $ra = join(":", @match[1..3]);
+        my $dec = join(":", @match[4..6]);
+        $dec =~ s/\s//g; # remove  space between the sign and number
 
-        $c{long} = $ra;
-        $c{lat} = $dec;
-        if ($type =~ /S/) {
-          $c{type} = "SUPERGALACTIC";
-        } else {
-          $c{type} = "GALACTIC";
+        # Type defaults to J2000
+        my $type = $match[7] || "J2000";
+        $type = uc($type);
+
+        # Comment can be undefined
+        my $comment = $match[8];
+
+        # push the target id
+        $star->id($target);
+
+        # push the comment
+        $star->comment($comment) if defined $comment;
+
+        # Allow simple mapping of TYPE from JCMT abbreviations.
+        # This does not hurt things or break simplicity of the format.
+        # The form of the hash depends on the type
+        my %c;
+        if ($type =~ /(RB|RJ|J2000|B1950)/) {
+            # Standard RADEC
+            $c{ra} = $ra;
+            $c{dec} = $dec;
+
+            if ($type =~ /B/) {
+                $c{type} = "B1950";
+            }
+            else {
+                $c{type} = "J2000";
+            }
+        }
+        elsif ($type =~ /^(GA|SUPERGAL)/) {
+            $c{long} = $ra;
+            $c{lat} = $dec;
+            if ($type =~ /S/) {
+                $c{type} = "SUPERGALACTIC";
+            }
+            else {
+                $c{type} = "GALACTIC";
+            }
+        }
+        elsif ($type =~ /^AZ/) {
+            $c{az} = $ra;
+            $c{el} = $dec;
+        }
+        else {
+            croak "Unexpected coordinate type: $type\n";
         }
 
-      } elsif ($type =~ /^AZ/) {
+        # Assume J2000 and create an Astro::Coords object
+        my $coords = new Astro::Coords(
+            units => 'sex',
+            name  => $star->id(),
+            %c);
 
-        $c{az} = $ra;
-        $c{el} = $dec;
+        croak "Error creating coordinate object from $ra / $dec "
+            unless defined $coords;
 
-      } else {
-        croak "Unexpected coordinate type: $type\n";
-      }
+        # and push it into the Astro::Catalog::Item object
+        $star->coords($coords);
 
-      # Assume J2000 and create an Astro::Coords object
-      my $coords = new Astro::Coords( units => 'sex',
-                                      name  => $star->id(),
-                                      %c );
+        # push it onto the stack
+        $catalog->pushstar($star);
+    }
 
-      croak "Error creating coordinate object from $ra / $dec "
-        unless defined $coords;
-
-      # and push it into the Astro::Catalog::Star object
-      $star->coords( $coords );
-
-      # push it onto the stack
-      $catalog->pushstar( $star );
-
-   }
-
-   $catalog->origin( 'IO::Simple' );
-   return $catalog;
-
+    $catalog->origin('IO::Simple');
+    return $catalog;
 }
 
 =item B<_write_catalog>
 
 Will write the catalogue object to an simple output format
 
-   \@lines = Astro::Catalog::IO::Simple->_write_catalog( $catalog );
+    $lines = Astro::Catalog::IO::Simple->_write_catalog($catalog);
 
 where $catalog is an Astro::Catalog object.
 
 =cut
 
 sub _write_catalog {
-  croak ( 'Usage: _write_catalog( $catalog )') unless scalar(@_) >= 1;
-  my $class = shift;
-  my $catalog = shift;
+    croak ( 'Usage: _write_catalog( $catalog )') unless scalar(@_) >= 1;
+    my $class = shift;
+    my $catalog = shift;
 
-  # write header
-  # ------------
-  my @output;
-  my $output_line;
+    # write header
+    my @output;
+    my $output_line;
 
-  push (@output, "# Catalog written automatically by class ". __PACKAGE__ ."\n");
-  push (@output, "# on date " . gmtime . "UT\n" );
-  push (@output, "# Origin of catalogue: ". $catalog->origin ."\n");
+    push (@output, "# Catalog written automatically by class ". __PACKAGE__ ."\n");
+    push (@output, "# on date " . gmtime . "UT\n" );
+    push (@output, "# Origin of catalogue: ". $catalog->origin ."\n");
 
+    # write body
 
-  # write body
-  # ----------
+    # Keep track of star count for unnamed stars
+    my $starcnt = 0;
 
-  # Keep track of star count for unnamed stars
-  my $starcnt = 0;
+    # loop through all the stars in the catalogue
+    foreach my $star ($catalog->stars) {
+        # Extract the information into an array for later formatting
+        my @chunks;
+        my $comment; # in case we need to create a whole comment line
 
-  # loop through all the stars in the catalogue
-  foreach my $star ($catalog->stars) {
+        # Star ID
+        push(@chunks, (defined $star->id() ? $star->id : $starcnt));
 
-    # Extract the information into an array for later formatting
-    my @chunks;
-    my $comment; # in case we need to create a whole comment line
+        # Get the coordinate information
+        my $c = $star->coords;
 
-    # Star ID
-    push(@chunks, (defined $star->id() ? $star->id : $starcnt));
+        if (defined $c) {
+            my $type = $c->type;
 
-    # Get the coordinate information
-    my $c = $star->coords;
+            if ($type eq 'RADEC') {
+                # Standard J2000
+                push(@chunks, $c->ra(format => 's'), $c->dec(format => 's'), "J2000");
+            }
+            elsif ($type eq 'FIXED') {
+                push(@chunks, $c->az(format => 's'), $c->el(format => 's'), "AZEL");
+            }
+            else {
+                $comment = "Can not represent star $chunks[0] in catalogue since it is of type $type";
+            }
 
-    if (defined $c) {
-      my $type = $c->type;
+        }
+        else {
+            $comment = "Star $chunks[0] has no coordinates.";
+        }
 
-      if ($type eq 'RADEC') {
-        # Standard J2000
-        push(@chunks, $c->ra(format=>'s'),$c->dec(format=>'s'), "J2000");
-      } elsif ($type eq 'FIXED') {
-        push(@chunks, $c->az(format=>'s'),$c->el(format=>'s'),"AZEL");
-      } else {
-        $comment = "Can not represent star $chunks[0] in catalogue since it is of type $type";
-      }
+        # now the line. If we have comment set this is just a comment line
+        if (defined $comment) {
+            push(@output, "# $comment");
+        }
+        else {
+            my $cmt = '';
+            $cmt = " # " .$star->comment()
+                if $star->comment();
 
-    } else {
-      $comment = "Star $chunks[0] has no coordinates.";
+            push(@output, sprintf("%-15s %s %s %s", @chunks) . $cmt);
+        }
     }
 
-    # now the line. If we have comment set this is just a comment line
-    if (defined $comment) {
-      push(@output, "# $comment");
-    } else {
-      my $cmt = '';
-      $cmt = " # " .$star->comment()
-        if $star->comment();
-
-      push(@output, sprintf("%-15s %s %s %s", @chunks) . $cmt);
-
-    }
-
-  }
-
-  # clean up
-  return \@output;
-
+    return \@output;
 }
 
 =item B<_default_file>
@@ -271,10 +259,13 @@ JAC, but might prive useful elsewhere.
 =cut
 
 sub _default_file {
-
-   # returns an empty list
-   return;
+    # returns an empty list
+    return;
 }
+
+1;
+
+__END__
 
 =back
 
@@ -284,7 +275,7 @@ sub _default_file {
 
 The Simple format is defined as follows: Any line that looks like
 
-ID  HH MM SS.SS +/-DD MM SS.SS TYPE # Comment
+    ID  HH MM SS.SS +/-DD MM SS.SS TYPE # Comment
 
 will be matched. A space is allowed between the sign and the
 declination. The type is optional (as is the comment) and
@@ -309,7 +300,3 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>
 Tim Jenness E<lt>tjenness@cpan.orgE<gt>
 
 =cut
-
-# L A S T  O R D E R S ------------------------------------------------------
-
-1;

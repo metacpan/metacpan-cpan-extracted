@@ -26,9 +26,11 @@ Philippe
 Weyl
 book
 cpan
+cuer2s
 cweyl
 delete
 gh
+kuerbis
 lib
 olaf
 phair

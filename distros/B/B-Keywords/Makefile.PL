@@ -17,8 +17,11 @@ WriteMakefile(
     {
       resources =>
       {
-	repository  => 'http://github.com/rurban/b-keywords',
-	license     => 'http://dev.perl.org/licenses/',
+        repository  => 'http://github.com/rurban/b-keywords',
+        license     => 'http://dev.perl.org/licenses/',
+        bugtracker  => {
+            web    => 'https://github.com/rurban/b-keywords/issues',
+        },
       },
     }
    ) : ()),

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ProductType;
-$Shipment::UPS::WSDL::ShipTypes::ProductType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ProductType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -60,19 +60,19 @@ Class::Std::initialize();
               ExportType
               SEDTotalValue
 
-              )
+            )
         ],
-        {   'Description'              => \%Description_of,
-            'Unit'                     => \%Unit_of,
-            'CommodityCode'            => \%CommodityCode_of,
-            'PartNumber'               => \%PartNumber_of,
-            'OriginCountryCode'        => \%OriginCountryCode_of,
-            'JointProductionIndicator' => \%JointProductionIndicator_of,
-            'NetCostCode'              => \%NetCostCode_of,
-            'NetCostDateRange'         => \%NetCostDateRange_of,
-            'PreferenceCriteria'       => \%PreferenceCriteria_of,
-            'ProducerInfo'             => \%ProducerInfo_of,
-            'MarksAndNumbers'          => \%MarksAndNumbers_of,
+        {   'Description'                  => \%Description_of,
+            'Unit'                         => \%Unit_of,
+            'CommodityCode'                => \%CommodityCode_of,
+            'PartNumber'                   => \%PartNumber_of,
+            'OriginCountryCode'            => \%OriginCountryCode_of,
+            'JointProductionIndicator'     => \%JointProductionIndicator_of,
+            'NetCostCode'                  => \%NetCostCode_of,
+            'NetCostDateRange'             => \%NetCostDateRange_of,
+            'PreferenceCriteria'           => \%PreferenceCriteria_of,
+            'ProducerInfo'                 => \%ProducerInfo_of,
+            'MarksAndNumbers'              => \%MarksAndNumbers_of,
             'NumberOfPackagesPerCommodity' =>
               \%NumberOfPackagesPerCommodity_of,
             'ProductWeight' => \%ProductWeight_of,
@@ -88,7 +88,7 @@ Class::Std::initialize();
             'OriginCountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'JointProductionIndicator' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NetCostCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'NetCostCode'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'NetCostDateRange' =>
               'Shipment::UPS::WSDL::ShipTypes::NetCostDateType',
             'PreferenceCriteria' =>
@@ -143,7 +143,7 @@ Shipment::UPS::WSDL::ShipTypes::ProductType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

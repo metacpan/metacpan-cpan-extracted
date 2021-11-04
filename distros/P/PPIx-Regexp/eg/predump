@@ -21,7 +21,7 @@ use Scalar::Util qw{ refaddr };
 
 use vars qw{ $VERSION };
 
-$VERSION = '0.080';
+$VERSION = '0.081';
 
 my %opt = (
     default_modifiers => [],
@@ -39,7 +39,7 @@ GetOptions( \%opt,
         default_modifiers|default-modifiers=s@
 	encoding=s explain! files!
 	indent=i locations! margin=i objectify! ordinal! perl_version!
-	postderef! ppi! short! significant! strict!
+	ppi! short! significant! strict!
 	test! tokens! trace+ unescape! verbose+
     } )
     and @ARGV
@@ -247,13 +247,6 @@ If true, this option specifies that the dump include the perl version
 applicable to each dumped item. The default is false. This is simply
 passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
-
-=item -postderef
-
-If true, this option specifies that postfix dereferences are recognized
-in code and interpolations. If false (specified as C<-nopostderef>) they
-are not recognized. For the default see the documentation for the
-tokenizer's L<new()|PPIx::Regexp::Tokenizer/new> method.
 
 =item -significant
 

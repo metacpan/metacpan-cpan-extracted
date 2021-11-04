@@ -11,9 +11,9 @@ BEGIN {
    plan skip_all => "Future::AsyncAwait >= 0.31_002 is not available"
       unless eval { require Future::AsyncAwait;
                     Future::AsyncAwait->VERSION( '0.31_002' ) };
-   plan skip_all => "Syntax::Keyword::Dynamically >= 0.01 is not available"
+   plan skip_all => "Syntax::Keyword::Dynamically >= 0.02 is not available"
       unless eval { require Syntax::Keyword::Dynamically;
-                    Syntax::Keyword::Dynamically->VERSION( '0.01' ) };
+                    Syntax::Keyword::Dynamically->VERSION( '0.02' ) };
 
    Future::AsyncAwait->import;
    Syntax::Keyword::Dynamically->import(qw( -async ));
@@ -44,6 +44,45 @@ BEGIN {
 
    $f1->done;
    is( scalar $fret->get, "result", '$fret for dynamically in async sub' );
+   is( $var, 1, '$var is 1 after finish' );
+}
+
+# multiple nested scopes
+{
+   my $var = 1;
+
+   my @f;
+   sub tick { push @f, my $f = Future->new; return $f }
+
+   async sub with_dynamically_nested
+   {
+      dynamically $var = 2;
+
+      {
+         dynamically $var = 3;
+
+         await tick();
+
+         is( $var, 3, '$var is 3 in inner scope' );
+      }
+
+      is( $var, 2, '$var is 2 in outer scope' );
+
+      await tick();
+
+      is( $var, 2, '$var is still 2 in outer scope' );
+   }
+
+   my $fret = with_dynamically_nested();
+
+   is( $var, 1, '$var is 1 while suspended' );
+
+   while( @f ) {
+      ( shift @f )->done;
+      is( $var, 1, '$var is still 1' );
+   }
+
+   $fret->get;
    is( $var, 1, '$var is 1 after finish' );
 }
 

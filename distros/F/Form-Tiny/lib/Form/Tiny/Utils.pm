@@ -1,11 +1,12 @@
 package Form::Tiny::Utils;
 
 use v5.10;
+use strict;
 use warnings;
 use Exporter qw(import);
 use Carp qw(croak);
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 our @EXPORT;
 our @EXPORT_OK = qw(
 	try

@@ -6,8 +6,8 @@ Astro::Catalog::Query::Sesame - Object name resolution via SIMBAD
 
 =head1 SYNOPSIS
 
-  my $sesame = new Astro::Catalog::Query::Sesame( Target => "EX Hya" );
-  my $catalog = $sesame->querydb();
+    my $sesame = new Astro::Catalog::Query::Sesame(Target => "EX Hya");
+    my $catalog = $sesame->querydb();
 
 =head1 DESCRIPTION
 
@@ -16,24 +16,20 @@ http://cdsweb.u-strasbg.fr/cdsws.gml for details of the service.
 
 =cut
 
-# L O A D   M O D U L E S --------------------------------------------------
-
 use strict;
 use warnings;
-use base qw/ Astro::Catalog::Transport::WebService /;
-use vars qw/ $VERSION $DEBUG /;
+use base qw/Astro::Catalog::Transport::WebService/;
 
 use Carp;
 use Data::Dumper;
-use POSIX qw(ceil);
+use POSIX qw/ceil/;
 
-# generic catalog objects
 use Astro::Coords;
 use Astro::Catalog;
-use Astro::Catalog::Star;
+use Astro::Catalog::Item;
 
-$VERSION = "4.35";
-$DEBUG = 0;
+our $VERSION = '4.36';
+our $DEBUG = 0;
 
 =head1 METHODS
 
@@ -45,52 +41,49 @@ $DEBUG = 0;
 
 Create a new instance from a hash of options
 
-  $query = new Astro::Catalog::Query::WebService( Object => $target );
+    $query = new Astro::Catalog::Query::WebService(Object => $target);
 
 returns a reference to an query object.
 =cut
-
-# base class
 
 =item B<querydb>
 
 Returns an Astro::Catalog object resulting from the specific query.
 
-   $catalog = $query->querydb();
+    $catalog = $query->querydb();
 
 =cut
 
 sub querydb {
-  my $self = shift;
+    my $self = shift;
 
-  # clean out buffer
-  $self->_set_raw("");
+    # clean out buffer
+    $self->_set_raw("");
 
-  my $endpoint = $self->endpoint();
-  my %options = $self->_translate_options();
+    my $endpoint = $self->endpoint();
+    my %options = $self->_translate_options();
 
-  # return unless we haev a target, set it otherwise
-  return undef unless $self->query_options("object");
+    # return unless we haev a target, set it otherwise
+    return undef unless $self->query_options("object");
 
-  # make sesame query
-  #print "Endpoint: $endpoint\n";
-  my $service = SOAP::Lite->service( $self->endpoint() );
+    # make sesame query
+    my $service = SOAP::Lite->service($self->endpoint());
 
-  my $ident = $self->query_options("object");
-  $ident =~ s/\+/ /g;
+    my $ident = $self->query_options("object");
+    $ident =~ s/\+/ /g;
 
-  my $buffer;
-  eval { $buffer = $service->sesame( $ident, "u" ); };
-  if ( $@ ) {
-     my $status = $service->transport()->status();
-     croak("Error ($status): $@");
-     return;
-  }
+    my $buffer;
+    eval { $buffer = $service->sesame( $ident, "u" ); };
+    if ($@) {
+        my $status = $service->transport()->status();
+        croak("Error ($status): $@");
+        return;
+    }
 
-  # parse results & return
-  $self->_set_raw( $buffer );
-  my $catalog = $self->_parse_query();
-  return $catalog;
+    # parse results & return
+    $self->_set_raw($buffer);
+    my $catalog = $self->_parse_query();
+    return $catalog;
 }
 
 =back
@@ -108,7 +101,7 @@ These methods are for internal use only.
 =cut
 
 sub _default_endpoint {
-  return "http://cdsws.u-strasbg.fr/axis/services/Sesame?wsdl";
+    return "http://cdsws.u-strasbg.fr/axis/services/Sesame?wsdl";
 }
 
 =item B<_default_urn>
@@ -116,7 +109,7 @@ sub _default_endpoint {
 =cut
 
 sub _default_urn {
-  return undef;
+    return undef;
 }
 
 =item B<_is_service>
@@ -124,7 +117,7 @@ sub _default_urn {
 =cut
 
 sub _is_service {
-  return 1;
+    return 1;
 }
 
 =item B<_get_allowed_options>
@@ -136,10 +129,10 @@ by the remote system (and to be included in the query).
 =cut
 
 sub _get_allowed_options {
-  my $self = shift;
-  return (
-          object => 'object'
-         );
+    my $self = shift;
+    return (
+        object => 'object'
+    );
 }
 
 =item B<_get_supported_init>
@@ -148,8 +141,6 @@ Uses base class options.
 
 =cut
 
-# base class
-
 =item B<_set_default_options>
 
 Set the default query state.
@@ -157,9 +148,9 @@ Set the default query state.
 =cut
 
 sub _set_default_options {
-  return (
-          object => undef,
-         );
+    return (
+        object => undef,
+    );
 }
 
 
@@ -173,7 +164,7 @@ use different names.
 =cut
 
 sub _get_supported_init {
-  return (qw/ Target URN Endpoint Proxy /);
+    return (qw/Target URN Endpoint Proxy/);
 }
 
 =item B<_parse_query>
@@ -185,68 +176,67 @@ make and parse the results.
 =cut
 
 sub _parse_query {
-  my $self = shift;
+    my $self = shift;
 
-  # create an Astro::Catalog object to hold the search results
-  my $catalog = new Astro::Catalog();
+    # create an Astro::Catalog object to hold the search results
+    my $catalog = new Astro::Catalog();
 
-  # create a temporary object to hold stars
-  my $star = new Astro::Catalog::Star();
+    # create a temporary object to hold stars
+    my $star = new Astro::Catalog::Item();
 
-  # get a local copy of the current BUFFER
-  my @result = $self->_dump_raw();
-  chomp @result;
+    # get a local copy of the current BUFFER
+    my @result = $self->_dump_raw();
+    chomp @result;
 
-  print Dumper( @result ) if $DEBUG;
+    print Dumper(@result) if $DEBUG;
 
-  # Grab Coordinates
-  # ----------------
-  #use Data::Dumper;
-  #print Dumper( @result );
+    # Grab Coordinates
 
-  # grab line from return result
-  my $coord_line = undef;
-  foreach my $i ( 0 ... $#result ) {
-     if ( $result[$i] =~ /^%J / ) {
-       $coord_line = $i;
-       last;
-     }
-  }
+    # grab line from return result
+    my $coord_line = undef;
+    foreach my $i (0 ... $#result) {
+        if ($result[$i] =~ /^%J /) {
+            $coord_line = $i;
+            last;
+        }
+    }
 
-  croak "Can not understand response, no co-ordinate line found "
-      unless defined $coord_line;
-  my $line = $result[$coord_line];
+    croak "Can not understand response, no co-ordinate line found "
+        unless defined $coord_line;
+    my $line = $result[$coord_line];
 
-  # split it on \s+
-  my @coords = split( /\s+/,$line);
+    # split it on \s+
+    my @coords = split /\s+/, $line;
 
-  # GRAB DEC
-  # --------
+    # GRAB DEC
 
-  # create an Astro::Coords::Angle for coordinate conversion
-  my $ang = new Astro::Coords::Angle($coords[2], units => 'deg');
-  my $objdec = $ang->string;
+    # create an Astro::Coords::Angle for coordinate conversion
+    my $ang = new Astro::Coords::Angle($coords[2], units => 'deg');
+    my $objdec = $ang->string;
 
-  # GRAB RA
-  # -------
-  $ang = new Astro::Coords::Angle($coords[1]/15.0, units => 'deg');
-  my $objra = $ang->string;
+    # GRAB RA
+    $ang = new Astro::Coords::Angle($coords[1]/15.0, units => 'deg');
+    my $objra = $ang->string;
 
-  $star->coords( new Astro::Coords(ra => $objra,
-                                   dec => $objdec,
-                                   units => 'sex',
-                                   type => 'J2000',
-                                   name => $self->query_options("object"),
-                                   ) );
+    $star->coords(new Astro::Coords(
+            ra => $objra,
+            dec => $objdec,
+            units => 'sex',
+            type => 'J2000',
+            name => $self->query_options("object"),
+        ));
 
 
-  # Push the star into the catalog
-  $catalog->pushstar( $star );
+    # Push the star into the catalog
+    $catalog->pushstar( $star );
 
-  # return
-  return $catalog;
-
+    # return
+    return $catalog;
 }
+
+1;
+
+__END__
 
 =back
 
@@ -263,7 +253,3 @@ License.
 Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 =cut
-
-# L A S T  O R D E R S ------------------------------------------------------
-
-1;

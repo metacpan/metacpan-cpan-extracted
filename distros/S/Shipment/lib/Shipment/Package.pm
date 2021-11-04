@@ -1,5 +1,5 @@
 package Shipment::Package;
-$Shipment::Package::VERSION = '3.05';
+$Shipment::Package::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -102,6 +102,14 @@ has 'cost' => (
 );
 
 
+has 'items' => (
+    handles_via => 'Array',
+    is          => 'rw',
+    isa         => ArrayRef [HashRef],
+    default     => sub { [] }
+);
+
+
 1;
 
 __END__
@@ -116,7 +124,7 @@ Shipment::Package
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 
@@ -212,6 +220,23 @@ The cost to ship this package. Set by a Shipment::Base class
 
 type: Data::Currency
 
+=head2 items
+
+Items in the package. Typically used for commercial invoice.
+
+type: ArrayRef[HashRef]
+
+Example:
+    [
+      {
+        quantity => 2,
+        description => 'Footbeds',
+        customs_value => 40,
+        weight => 0.4,
+        origin_country => 'KR',
+      },
+    ]
+
 =head1 AUTHOR
 
 Andrew Baerg @ <andrew at pullingshots dot ca>
@@ -224,7 +249,7 @@ Issues can be submitted at https://github.com/pullingshots/Shipment/issues
 
 =head1 COPYRIGHT
 
-Copyright (C) 2016 Andrew J Baerg, All Rights Reserved
+Copyright (C) 2021 Andrew J Baerg, All Rights Reserved
 
 =head1 NO WARRANTY
 

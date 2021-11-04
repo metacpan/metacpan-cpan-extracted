@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::EPD;
-$Chess::Plisco::EPD::VERSION = '0.3';
+$Chess::Plisco::EPD::VERSION = '0.4';
 use strict;
 use integer;
 

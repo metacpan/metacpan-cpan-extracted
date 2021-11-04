@@ -28,11 +28,12 @@ requires:
   Mojolicious::Plugin::Qooxdoo: v1.0.13
   Syntax::Keyword::Try: '0'
   Text::CSV: '0'
+  XS::Parse::Keyword: '0.21'
   YAML::XS: '0'
   perl: '5.022000'
 resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.39.1
+version: v0.39.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

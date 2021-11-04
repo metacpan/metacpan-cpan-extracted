@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendMgr 2.142;
+package Config::Model::BackendMgr 2.144;
 
 use Mouse;
 use strict;
@@ -112,9 +112,12 @@ sub get_cfg_file_path {
     # config file override
     my $cfo = $args{config_file};
 
-    if ( defined $cfo ) {
-        my $root_path = $args{root} // path('.');
-        my $override =  $root_path->child($cfo);
+    if ( defined $cfo) {
+        my $override
+            = $args{root}   ? $args{root}->child($cfo)
+            : $cfo =~ m!^/! ? path($cfo)
+            :                 path('.')->child($cfo);
+
         my $mode = $w ? 'write' : 'read';
         $logger->trace("$args{backend} override target file is $override ($mode mode)");
         return ( 1, $override );
@@ -487,7 +490,7 @@ sub close_file_to_write {
     if ($error) {
         # restore backup and display error
         $logger->warn("Error during write, restoring backup data in $file_path" );
-        $file_path->spew_utf8( $self->file_backup );
+        $file_path->append_utf8({ truncate => 1 }, $self->file_backup );
         $error->rethrow if ref($error) and $error->can('rethrow');
         die $error;
     }
@@ -508,7 +511,7 @@ sub is_auto_write_for_type {
 
 __PACKAGE__->meta->make_immutable;
 
-package Config::Model::DeprecatedHandle 2.142;
+package Config::Model::DeprecatedHandle 2.144;
 
 our $AUTOLOAD;
 
@@ -552,7 +555,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.142
+version 2.144
 
 =head1 SYNOPSIS
 

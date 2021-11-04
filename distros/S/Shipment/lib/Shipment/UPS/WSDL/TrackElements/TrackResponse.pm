@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::TrackElements::TrackResponse;
-$Shipment::UPS::WSDL::TrackElements::TrackResponse::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackElements::TrackResponse::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ use warnings;
                   Shipment
                   Disclaimer
 
-                  )
+                )
             ],
             {   'Response'   => \%Response_of,
                 'Shipment'   => \%Shipment_of,
@@ -81,7 +81,7 @@ Shipment::UPS::WSDL::TrackElements::TrackResponse
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

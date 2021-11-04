@@ -5,7 +5,7 @@ use Carp;
 use Data::Dumper;
 use Scalar::Util qw(looks_like_number);
 use vars qw($VERSION $DEBUG);
-$VERSION = sprintf "%d.%02d", q$Revision: 2.12 $ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d", q$Revision: 2.13 $ =~ /(\d+)/g;
 
 # WP XML-RPC API METHOD LIST
 # All the following methods are in the standard API https://codex.wordpress.org/XML-RPC_WordPress_API
@@ -205,6 +205,8 @@ sub abs_path_to_media_object_data {
       require MIME::Base64;
 
       open(FILE, $abs_path) or die($!);
+      binmode FILE; ### fix for Win32 if binary data (GwenDragon)
+      ### see bug https://rt.cpan.org/Public/Bug/Display.html?id=97830
       my $bits;
       my $buffer;
       while( read(FILE, $buffer, (60*57)) ) {

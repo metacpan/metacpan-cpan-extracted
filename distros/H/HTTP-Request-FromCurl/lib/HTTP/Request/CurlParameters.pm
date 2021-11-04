@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.25';
+our $VERSION = '0.35';
 
 =head1 NAME
 
@@ -22,9 +22,18 @@ HTTP::Request::CurlParameters - container for a Curl-like HTTP request
 
 =head1 SYNOPSIS
 
+  my $ua = LWP::UserAgent->new;
+  my $params = HTTP::Request::CurlParameters->new(argv => \@ARGV);
+  my $response = $ua->request($params->as_request);
+
 =head1 DESCRIPTION
 
-Objects of this class are mostly created from L<HTTP::Request::FromCurl>.
+Objects of this class are mostly created from L<HTTP::Request::FromCurl>. Most
+likely you want to use that module instead:
+
+  my $ua = LWP::UserAgent->new;
+  my $params = HTTP::Request::FromCurl->new(command_curl => $cmd);
+  my $response = $ua->request($params->as_request);
 
 =head1 METHODS
 
@@ -621,7 +630,7 @@ our %curl_header_defaults = (
 
 sub as_curl($self,%options) {
     $options{ curl } = 'curl'
-        if ! exists $options{ long_options };
+        if ! exists $options{ curl };
     $options{ long_options } = 1
         if ! exists $options{ long_options };
 
@@ -683,6 +692,97 @@ sub as_curl($self,%options) {
         @request_commands;
 }
 
+# These are what wget uses as defaults, not what Perl should use as default!
+our %wget_header_defaults = (
+    'Accept'          => '*/*',
+    'Accept-Encoding' => 'identity',
+    'User-Agent' => 'Wget/1.21',
+    'Connection' => 'Keep-Alive',
+);
+
+sub as_wget($self,%options) {
+    $options{ wget } = 'wget'
+        if ! exists $options{ wget };
+    $options{ long_options } = 1
+        if ! exists $options{ long_options };
+
+    my @request_commands;
+
+    if( $self->method ne 'GET' ) {
+        if( $self->method eq 'POST' and $self->body ) {
+            # This is implied by '--post-data', below
+        } else {
+            push @request_commands,
+                '--method' => $self->method;
+        };
+    };
+
+    if( scalar keys %{ $self->headers }) {
+        my %h = %{ $self->headers };
+
+        # "--no-cache" implies two headers, Cache-Control and Pragma
+        my $is_cache =    exists $h{ 'Pragma' }
+                       && exists $h{ 'Cache-Control' }
+                       && $h{ 'Cache-Control' } =~ /^no-cache\b/
+                       && $h{ 'Pragma' } eq 'no-cache'
+                       ;
+        if( $is_cache ) {
+            delete $h{ 'Pragma' };
+            delete $h{ 'Cache-Control' };
+            push @request_commands, '--no-cache';
+        };
+
+        for my $name (sort keys %h) {
+            my $v = $h{ $name };
+
+            my $default;
+            if( exists $wget_header_defaults{ $name }) {
+                $default = $wget_header_defaults{ $name };
+            };
+
+            if( ! ref $v ) {
+                $v = [$v];
+            };
+            for my $val (@$v) {
+                if( !defined $default or $val ne $default ) {
+                    # also skip the Host: header if it derives from $uri
+                    if( $name eq 'Host' and ($val eq $self->uri->host_port
+                                          or $val eq $self->uri->host   )) {
+                        # trivial host header, ignore
+                    } elsif( $name eq 'User-Agent' ) {
+                        push @request_commands,
+                            '--user-agent',
+                            $val;
+                    } else {
+                        push @request_commands,
+                            '--header',
+                            "$name: $val";
+                    };
+                };
+            };
+        };
+    };
+
+    if( my $body = $self->body ) {
+        if( $self->method eq 'POST' ) {
+            push @request_commands,
+                '--post-data',
+                $body;
+        } else {
+            push @request_commands,
+                '--body-data',
+                $body;
+        };
+    };
+
+    push @request_commands, $self->uri;
+
+    return
+        #(defined $options{ curl } ? $options{curl} : () ),
+        @request_commands;
+}
+
+
 =head2 C<< $r->clone >>
 
 Returns a shallow copy of the object
@@ -707,9 +807,8 @@ L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
-Please report bugs in this module via the RT CPAN bug queue at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Request-FromCurl>
-or via mail to L<filter-signatures-Bugs@rt.cpan.org>.
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/HTTP-Request-FromCurl/issues>
 
 =head1 AUTHOR
 
@@ -717,7 +816,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2021 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

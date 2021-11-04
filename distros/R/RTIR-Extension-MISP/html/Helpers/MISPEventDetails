@@ -1,0 +1,42 @@
+<&| /Widgets/TitleBox,
+        title      => loc("MISP Event Details"),
+        title_href => $event_link,
+        class      => 'ticket-info-misp',
+&>
+
+% for my $field ( sort keys %info ) {
+<div class="form-row">
+  <div class="col-3 label"><% loc($field) %>:</div>
+  <div class="col-9 value">
+    <span class="current-value">
+      <% $info{$field} // '' %>
+    </span>
+  </div>
+</div>
+% }
+</&>
+
+% $m->abort();
+<%init>
+my $event_link = RTIR::Extension::MISP::GetMISPBaseURL() . "/events/view/$EventID";
+my $misp_json = RTIR::Extension::MISP::FetchEventDetails($EventID);
+
+my %info;
+my %threat_map = ( 1 => 'High', 2 => 'Medium', 3 => 'Low', 4 => 'Undefined' );
+$info{'Threat Level'} = $threat_map{ $misp_json->{Event}{threat_level_id} };
+
+my %analysis_map = ( 0 => 'Initial', 1 => 'Ongoing', 3 => 'Completed' );
+$info{'Analysis'} = $analysis_map{ $misp_json->{Event}{analysis} };
+
+$info{'Creator org'} = $misp_json->{Event}{Orgc}{name};
+$info{'Owner org'} = $misp_json->{Event}{Org}{name};
+$info{'Date'} = $misp_json->{Event}{date};
+$info{'Published'} = $misp_json->{Event}{published} ? 'Yes' : 'No';
+
+my $object_count = scalar @{$misp_json->{Event}{Object}};
+$info{'Number of Attributes'} = "$misp_json->{Event}{attribute_count}, ($object_count Objects)";
+</%init>
+
+<%args>
+$EventID
+</%args>

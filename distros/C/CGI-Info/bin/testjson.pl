@@ -1,6 +1,7 @@
-#!/usr/bin/env perl -wT
+#!/usr/bin/env perl
 
 use strict;
+use warnings;
 use autodie qw(:all);
 use LWP::UserAgent;
 

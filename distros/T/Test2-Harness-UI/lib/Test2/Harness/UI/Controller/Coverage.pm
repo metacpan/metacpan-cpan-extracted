@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Coverage;
 use strict;
 use warnings;
 
-our $VERSION = '0.000086';
+our $VERSION = '0.000096';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -34,29 +34,45 @@ sub handle {
         $username = undef;
     }
 
-    my $field;
+    my $run;
     if (my $project = $schema->resultset('Project')->find({name => $source})) {
-        $field = $project->coverage(user => $username);
+        $run = $project->last_covered_run(user => $username);
     }
-    elsif ($field = $schema->resultset('RunField')->find({name => 'coverage', run_field_id => $source})) {
+    elsif ($run = eval { $schema->resultset('Run')->find({run_id => $source}) } or warn $@) {
     }
     else {
         die error(405);
     }
 
-    my $data;
+    die error(404) unless $run;
 
-    if ($field) {
-        if ($delete) {
-            $field->delete;
-        }
-        else {
-            $data = $field->data;
-        }
+    if ($delete) {
+        $run->coverages->delete;
+        $run->update({has_coverage => 0});
     }
+    else {
+        my $iter = $run->coverage_data(iterator => 1);
 
-    $res->content_type('application/json');
-    $res->raw_body($data ||= {});
+        my $done = 0;
+        $res->stream(
+            env          => $req->env,
+            content_type => 'application/x-jsonl; charset=utf-8',
+            cache        => 0,
+            headers      => ["content-disposition" => 'attachment; filename="coverage.jsonl"'],
+
+            done => sub { $done },
+
+            fetch => sub {
+                if (my $item = $iter->()) {
+                    return encode_json($item) . "\n";
+                }
+                else {
+                    $done = 1;
+                    return;
+                }
+            },
+        );
+    }
 
     return $res;
 }

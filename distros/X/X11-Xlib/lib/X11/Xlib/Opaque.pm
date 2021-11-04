@@ -2,10 +2,12 @@ package X11::Xlib::Opaque;
 use X11::Xlib ();
 
 # All modules in dist share a version
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 @X11::Xlib::Visual::ISA= ( __PACKAGE__ );
+$X11::Xlib::Visual::VERSION= $VERSION;
 @X11::Xlib::GC::ISA= ( __PACKAGE__ );
+$x11::Xlib::GC::VERSION= $VERSION;
 
 1;
 __END__
@@ -29,10 +31,8 @@ opaque object was constructed from a source where the Display was unknown.
 (for example, accessing the L<X11::Xlib::XVisualInfo/visual> when that struct
 itself doesn't have a known Display.
 
-(all display references are stored in a private hashref in X11::Xlib package
- namespace, keyed by L<refaddr|Scalar::Util/refaddr>.
- All objects with a display attached in that
- manner should have a DESTROY that removes the reference.)
+The storage for this attribute is contained in XS, and is a strong reference
+to the Display, which is released during the XS destructor for this object.
 
 =head2 pointer_bytes
 
@@ -52,7 +52,7 @@ Michael Conrad, E<lt>mike@nrdvana.netE<gt>
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2020 by Michael Conrad
+Copyright (C) 2017-2021 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

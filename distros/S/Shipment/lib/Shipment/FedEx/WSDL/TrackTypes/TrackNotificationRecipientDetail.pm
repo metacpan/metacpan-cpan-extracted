@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        NotificationEventsAvailable
 
-              )
+            )
         ],
         {'NotificationEventsAvailable' => \%NotificationEventsAvailable_of,},
         {   'NotificationEventsAvailable' =>
@@ -57,7 +57,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

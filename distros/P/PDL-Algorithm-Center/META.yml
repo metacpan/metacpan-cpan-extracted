@@ -9,10 +9,8 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   PDL::Core: '0'
-  PDL::GSL::RNG: '0'
+  PDL::IO::FITS: '0'
   PDL::Ufunc: '0'
-  Test2::API: '0'
-  Test2::Tools::Compare: '0'
   Test2::V0: '0'
   Test::More: '0'
 configure_requires:
@@ -35,22 +33,19 @@ no_index:
 provides:
   PDL::Algorithm::Center:
     file: lib/PDL/Algorithm/Center.pm
-    version: '0.11'
+    version: '0.12'
   PDL::Algorithm::Center::Failure:
     file: lib/PDL/Algorithm/Center/Failure.pm
-    version: '0.11'
+    version: '0.12'
   PDL::Algorithm::Center::Types:
     file: lib/PDL/Algorithm/Center/Types.pm
-    version: '0.11'
+    version: '0.12'
 requires:
-  Carp: '0'
-  Exporter: '0'
   Hash::Wrap: '0.10'
   PDL: '0'
   PDL::Image2D: '0'
   PDL::Lite: '0'
   PDL::Transform: '0'
-  Package::Stash: '0'
   Ref::Util: '0'
   Safe::Isa: '0'
   Scalar::Util: '0'
@@ -62,18 +57,14 @@ requires:
   Types::Common::Numeric: '0'
   Types::PDL: '0'
   Types::Standard: '0'
-  constant: '0'
-  custom::failures: '0'
   custom::failures::x::alias: '0.02'
-  feature: '0'
-  latest: '0'
   perl: '5.010000'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center
   repository: https://gitlab.com/djerius/pdl-algorithm-center.git
-version: '0.11'
+version: '0.12'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

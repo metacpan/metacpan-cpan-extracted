@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.12
+    Version 1.16
 
 SYNOPSIS
 
@@ -362,12 +362,16 @@ SUBROUTINES/METHODS
     returns an server-assigned integer identifiers for the current chrome
     window that uniquely identifies it within this Marionette instance.
     This can be used to switch to this window at a later point. This
-    corresponds to a window that may itself contain tabs.
+    corresponds to a window that may itself contain tabs. This method is
+    replaced by window_handle and appropriate context calls for Firefox 94
+    and after.
 
  chrome_window_handles
 
     returns identifiers for each open chrome window for tests interested in
-    managing a set of chrome windows and tabs separately.
+    managing a set of chrome windows and tabs separately. This method is
+    replaced by window_handles and appropriate context calls for Firefox 94
+    and after.
 
  clear
 
@@ -1135,6 +1139,29 @@ SUBROUTINES/METHODS
     
         say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
 
+ images
+
+    returns a list of all of the following elements;
+
+      * img <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img>
+
+      * image inputs
+      <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/image>
+
+    as Firefox::Marionette::Image objects.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        if (my $link = $firefox->images()) {
+            say "Found a image with width " . $image->width() . "px and height " . $image->height() . "px from " . $image->URL();
+        }
+
+    If no elements are found, this method will return undef.
+
  install
 
     accepts the following as the first parameter;
@@ -1281,6 +1308,41 @@ SUBROUTINES/METHODS
             # redirecting to Test::More page
         }
 
+ links
+
+    returns a list of all of the following elements;
+
+      * anchor
+      <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a>
+
+      * area
+      <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area>
+
+      * frame
+      <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/frame>
+
+      * iframe
+      <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe>
+
+      * meta
+      <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta>
+
+    as Firefox::Marionette::Link objects.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        if (my $link = $firefox->links()) {
+            if ($link->tag() eq 'a') {
+                warn "Found a hyperlink to " . $link->URL();
+            }
+        }
+
+    If no elements are found, this method will return undef.
+
  macos_binary_paths
 
     returns a list of filesystem paths that this module will check for
@@ -1383,6 +1445,10 @@ SUBROUTINES/METHODS
       <https://www.mozilla.org/en-US/firefox/developer/> to be launched.
       This defaults to "0" (off).
 
+      * devtools - begin the session with the devtools
+      <https://developer.mozilla.org/en-US/docs/Tools> window opened in a
+      separate window.
+
       * height - set the height
       <http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
       of the initial firefox window
@@ -1402,6 +1468,10 @@ SUBROUTINES/METHODS
       * implicit - a shortcut to allow directly providing the implicit
       timeout, instead of needing to use timeouts from the capabilities
       parameter. Overrides all longer ways.
+
+      * kiosk - start the browser in kiosk
+      <https://support.mozilla.org/en-US/kb/firefox-enterprise-kiosk-mode>
+      mode.
 
       * mime_types - any MIME types that Firefox will encounter during this
       session. MIME types that are not specified will result in a hung
@@ -1921,6 +1991,16 @@ SUBROUTINES/METHODS
     accepts a window handle (either the result of window_handles or a
     window name as a parameter and switches focus to this window.
 
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new();
+        $firefox->version
+        my $original_window_uuid = $firefox->window_handle();
+        $firefox->new_window( type => 'tab' );
+        $firefox->new_window( type => 'window' );
+        $firefox->switch_to_window($original_window_uuid);
+        $firefox->go('https://metacpan.org');
+
  tag_name
 
     accepts a Firefox::Marionette::Element object as the first parameter
@@ -2017,6 +2097,12 @@ SUBROUTINES/METHODS
     within this Marionette instance. This can be used to switch to this
     window at a later point.
 
+        use Firefox::Marionette();
+        use 5.010;
+    
+        my $firefox = Firefox::Marionette->new();
+        my $original_window_uuid = $firefox->window_handle();
+
  window_handles
 
     returns a list of top-level browsing contexts. On desktop this
@@ -2024,6 +2110,16 @@ SUBROUTINES/METHODS
     the window itself for non-browser chrome windows. Each window handle is
     assigned by the server and is guaranteed unique, however the return
     array does not have a specified ordering.
+
+        use Firefox::Marionette();
+        use 5.010;
+    
+        my $firefox = Firefox::Marionette->new();
+        my $original_window_uuid = $firefox->window_handle();
+        $firefox->new_window( type => 'tab' );
+        $firefox->new_window( type => 'window' );
+        say "There are " . $firefox->window_handles() . " tabs open in total";
+        say "Across " . $firefox->chrome()->window_handles()->content() . " chrome windows";
 
  window_rect
 
@@ -2380,7 +2476,7 @@ ACKNOWLEDGEMENTS
       <https://firefox-source-docs.mozilla.org/testing/marionette/marionette/index.html>
 
       * Marionette driver.js
-      <https://hg.mozilla.org/mozilla-central/file/tip/testing/marionette/driver.js>
+      <https://hg.mozilla.org/mozilla-central/file/tip/remote/marionette/driver.js>
 
       * about:config <http://kb.mozillazine.org/About:config_entries>
 

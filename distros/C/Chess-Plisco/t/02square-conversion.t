@@ -14,7 +14,7 @@ use integer;
 
 use Test::More tests => 12 * 64;
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 
 # The array elements are:
 #
@@ -116,16 +116,16 @@ foreach my $test (@tests) {
 		"squareToCoordinates $shift";
 	
 	# Macros.
-	is(cp_shift_to_square($shift), $square,
+	is(chr(97 + ($shift & 0x7)) . (1 + ($shift >> 3)), $square,
 		"cp_shift_to_square $square");
-	is(cp_square_to_shift($square), $shift,
+	is((((substr $square, 1) - 1) << 3) + ord($square) - 97, $shift,
 		"cp_square_to_shift $square");
-	is(cp_coordinates_to_square($file, $rank), $square,
+	is(chr(97 + $file) . (1 + $rank), $square,
 		"cp_coordinates_to_square $square");
-	is(cp_coordinates_to_shift($file, $rank), $shift,
+	is((($rank << 3) + $file), $shift,
 		"cp_coordinates_to_shift $square");
-	is_deeply([cp_shift_to_coordinates($shift)], [$file, $rank],
+	is_deeply([($shift & 0x7, $shift >> 3)], [$file, $rank],
 		"cp_shift_to_coordinates $shift");
-	is_deeply([cp_square_to_coordinates($square)], [$file, $rank],
+	is_deeply([(ord($square) - 97, -1 + substr $square, 1)], [$file, $rank],
 		"cp_square_to_coordinates $shift");
 }

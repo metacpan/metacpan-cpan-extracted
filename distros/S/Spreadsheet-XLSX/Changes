@@ -1,5 +1,17 @@
 Revision history for Perl extension Spreadsheet::XLSX.
 
+0.17
+
+	- fix RT #139898: missing file from MANIFEST
+    - fix RT #127829, #80565, #79016: [Warning] Argument "#N/A" isn't numeric in int
+
+0.16
+
+	- added GitHub repository
+	- fix RT #125112: Update module name in comments and POD
+	- improve POD
+	- improve kwalitee test
+
 0.15
 
 	- revert a numeric formatting change which caused isssues with Spreadsheet::Read.

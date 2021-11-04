@@ -24,8 +24,8 @@ requires:
 resources:
   bugtracker: https://github.com/ap/Catalyst-Plugin-Digress/issues
   repository: git://github.com/ap/Catalyst-Plugin-Digress.git
-version: '1.001'
+version: '1.002'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
-  year: 2020
+  year: 2021
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

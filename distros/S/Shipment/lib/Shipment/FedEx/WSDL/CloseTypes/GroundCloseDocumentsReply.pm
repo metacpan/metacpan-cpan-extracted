@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::GroundCloseDocumentsReply;
-$Shipment::FedEx::WSDL::CloseTypes::GroundCloseDocumentsReply::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::GroundCloseDocumentsReply::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Version
               CloseDocuments
 
-              )
+            )
         ],
         {   'HighestSeverity'   => \%HighestSeverity_of,
             'Notifications'     => \%Notifications_of,
@@ -49,7 +49,7 @@ Class::Std::initialize();
               'Shipment::FedEx::WSDL::CloseTypes::Notification',
             'TransactionDetail' =>
               'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
-            'Version' => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
+            'Version'        => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
             'CloseDocuments' =>
               'Shipment::FedEx::WSDL::CloseTypes::CloseDocument',
         },
@@ -80,7 +80,7 @@ Shipment::FedEx::WSDL::CloseTypes::GroundCloseDocumentsReply
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

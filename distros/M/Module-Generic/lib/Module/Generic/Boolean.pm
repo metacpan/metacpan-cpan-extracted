@@ -47,8 +47,8 @@ sub is_false ($) { !$_[0] && UNIVERSAL::isa( $_[0], Module::Generic::Boolean ) }
 
 sub TO_JSON
 {
-    ## JSON does not check that the value is a proper true or false. It stupidly assumes this is a string
-    ## The only way to make it understand is to return a scalar ref of 1 or 0
+    # JSON does not check that the value is a proper true or false. It stupidly assumes this is a string
+    # The only way to make it understand is to return a scalar ref of 1 or 0
     # return( $_[0] ? 'true' : 'false' );
     return( $_[0] ? \1 : \0 );
 }

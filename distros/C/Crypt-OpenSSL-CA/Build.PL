@@ -22,7 +22,7 @@ my $builder = $class->new
       dist_author         => 'Dominique Quatravaux <domq@cpan.org>',
       requires            =>
       {
-       "XSLoader"        => 0,
+       "perl"            => 5.008,
       },
       configure_requires  => {
        My::Module::Build->requires_for_configure(),
@@ -39,21 +39,22 @@ my $builder = $class->new
        # Packages below are needed for the test suite. (And yes,
        # running the test suite *is* a requirement of the build
        # process)
-        "Test::Builder"         => 0,
-        "Test::More"            => 0,
-        "Test::Taint"           => 0,
-        "Test::Group"           => 0,
-        "IPC::Run"              => 0,
-        "File::Find"            => 0,
-        "File::Path"            => 0,
-        "File::Spec"            => 0,
-        "File::Spec::Functions" => 0,
-	"File::Slurp"		=> 0,
-        "Devel::Leak"           => 0,
-        "Devel::Mallinfo"       => 0,
-        "Net::SSLeay"           => 1.25, # For access to ERR_ in tests
-        "MIME::Base64"          => 0,
-        "POSIX"                 => 0,
+       "Test::Taint"           => 0,
+       "Test2::V0"             => 0,
+       "Test2::API"            => 0,
+       "Test2::Tools::Basic"   => 0,
+       "Test2::Tools::Compare" => 0,
+       "IPC::Run"              => 0,
+       "Devel::Leak"           => 0,
+       "Devel::Mallinfo"       => 0,
+       "File::Slurp"           => 0,
+       "File::Which"           => 0,
+       "Net::SSLeay"           => 1.25, # For access to ERR_ in tests
+       # Additional dependencies for tests under t/maintainer:
+       #
+       # Test::Dependencies Test::Kwalitee Test::NoBreakpoints
+       # Test::Pod::Coverage Pod::Checker Pod::Text File::Spec::Functions
+       # File::Find::Rule::Perl CPAN::Meta
       },
     add_to_cleanup      => [ 'Crypt-OpenSSL-CA-*', "_Inline" ],
     add_to_no_index     =>
@@ -97,8 +98,25 @@ use IO::File;
 use FindBin qw($Bin);
 use My::Module::Build;
 
-sub read_cmd {
-  my ($cmd) = @_;
+sub pkgconfig {
+  local $ENV{PKG_CONFIG_PATH} = $ENV{PKG_CONFIG_PATH};
+
+  if (`uname -s` =~ m/Darwin/) {
+
+    my $version_of = sub {
+      my ($v) = shift =~ m|/openssl@([^/]+)/|;
+      $v;
+    };
+
+    return unless my @openssl_pkg_config_paths =
+      sort { $version_of->($b) cmp $version_of->($a) }
+      (glob("/usr/local/opt/openssl*/lib/pkgconfig"));
+
+    $ENV{PKG_CONFIG_PATH} = join(":", $openssl_pkg_config_paths[0],
+                                 ($ENV{PKG_CONFIG_PATH} || ()));
+  }
+
+  my $cmd = join(" ", "pkg-config", @_);
   my $result = `$cmd 2>/dev/null`;
   $result =~ s/\n/ /g;
   $result =~ s/^ *(.*?) *$/$1/;
@@ -116,7 +134,7 @@ to use no particular CFLAGS.
 =cut
 
 sub openssl_cflags : Config_Option(type="string") {
-  (default => read_cmd("pkg-config --cflags openssl"));
+  (default => pkgconfig(qq(--cflags openssl)));
 }
 
 =head2 --openssl-ldflags=I<string>
@@ -128,7 +146,7 @@ use only C<-lcrypto -lssl>.
 =cut
 
 sub openssl_ldflags : Config_Option(type="string") {
-  (default => read_cmd("pkg-config --libs openssl"));
+  (default => pkgconfig(qq(--libs openssl)));
 }
 
 =head2 --full_debugging=1
@@ -325,6 +343,8 @@ sub check_openssl_version_number {
     my $cachekey = "checked_openssl_version_number";
     return if ($self->notes($cachekey));
 
+    system("rm -rf _Inline/lib/auto/Crypt/OpenSSL/CA/ExtractVersionNumber/");
+
     $self->require("Crypt::OpenSSL::CA::Inline::C");
 
     warn <<"MESSAGE";
@@ -451,7 +471,7 @@ Maybe you could try re-running Build.PL with appropriate values for
 --openssl-cflags and --openssl-ldflags, for instance:
 
   perl Build.PL --openssl-cflags=-I/usr/local/lib/openssl/include \\
-        --openssl-libs=-L/usr/local/lib/openssl/lib
+        --openssl-ldflags=-L/usr/local/lib/openssl/lib
 
 Hint: don't sprinkle spaces where not necessary, as they are known to
 confuse the GNU linker!

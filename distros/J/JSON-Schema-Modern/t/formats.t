@@ -4,13 +4,13 @@ use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
 use Test::Fatal;
-use Test::Needs;
 use JSON::Schema::Modern;
 
 use lib 't/lib';
@@ -234,10 +234,8 @@ subtest 'different formats after document creation' => sub {
 };
 
 subtest 'toggle validate_formats after adding schema' => sub {
-  test_needs 'Time::Moment';
-
   my $js = JSON::Schema::Modern->new;
-  my $document = $js->add_schema(my $uri = 'http://localhost:1234/date-time', { format => 'date-time' });
+  my $document = $js->add_schema(my $uri = 'http://localhost:1234/ipv4', { format => 'ipv4' });
 
   cmp_deeply(
     $js->evaluate('hello', $uri)->TO_JSON,
@@ -253,8 +251,8 @@ subtest 'toggle validate_formats after adding schema' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/format',
-          absoluteKeywordLocation => 'http://localhost:1234/date-time#/format',
-          error => 'not a date-time',
+          absoluteKeywordLocation => 'http://localhost:1234/ipv4#/format',
+          error => 'not an ipv4',
         },
       ],
     },
@@ -262,7 +260,7 @@ subtest 'toggle validate_formats after adding schema' => sub {
   );
 
   cmp_deeply(
-    $js->evaluate('2001-01-01T00:00:00Z', $uri, { validate_formats => 1 })->TO_JSON,
+    $js->evaluate('127.0.0.1', $uri, { validate_formats => 1 })->TO_JSON,
     { valid => true },
     'valid assertion behaviour does not die',
   );
@@ -276,8 +274,8 @@ subtest 'toggle validate_formats after adding schema' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/format',
-          absoluteKeywordLocation => 'http://localhost:1234/date-time#/format',
-          error => 'not a date-time',
+          absoluteKeywordLocation => 'http://localhost:1234/ipv4#/format',
+          error => 'not an ipv4',
         },
       ],
     },
@@ -285,7 +283,7 @@ subtest 'toggle validate_formats after adding schema' => sub {
   );
 
   cmp_deeply(
-    $js2->evaluate('2001-01-01T00:00:00Z', $uri)->TO_JSON,
+    $js2->evaluate('127.0.0.1', $uri)->TO_JSON,
     { valid => true },
     'valid assertion behaviour does not die',
   );

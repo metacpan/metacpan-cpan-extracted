@@ -3,15 +3,12 @@
 # Astro::Catalog test harness
 use Test::More tests => 8;
 
-# strict
 use strict;
 
-use File::Temp qw/ tempfile /;
+use File::Temp qw/tempfile/;
 
 # load modules
 require_ok("Astro::Catalog");
-
-# T E S T   H A R N E S S --------------------------------------------------
 
 # In this test, we want to read from the DATA handle, write the
 # catalog to disk, read it in again and then make sure that we
@@ -21,44 +18,38 @@ require_ok("Astro::Catalog");
 my $tempfile = File::Temp->new();
 
 # Read catalog from Simple File from the DATA handle
-# -------------------------------------------------
 
-my $cat = new Astro::Catalog( Format => 'Simple', Data => \*DATA );
+my $cat = new Astro::Catalog(Format => 'Simple', Data => \*DATA);
 
-isa_ok( $cat, "Astro::Catalog" );
+isa_ok($cat, "Astro::Catalog");
 
 # Count the number of stars
-is( $cat->sizeof, 5, "Confirm initial star count");
+is($cat->sizeof, 5, "Confirm initial star count");
 
 # Write it to disk
 
-ok( $cat->write_catalog( Format => 'Simple', File => $tempfile ),
-  "Check catalog write");
+ok($cat->write_catalog(Format => 'Simple', File => $tempfile),
+    "Check catalog write");
 
 # Read it back in using filehandle
 seek($tempfile, 0, 0);
-my $newcat = new Astro::Catalog( Format => 'Simple', Data => $tempfile );
+my $newcat = new Astro::Catalog(Format => 'Simple', Data => $tempfile);
 
-isa_ok( $newcat, "Astro::Catalog" );
+isa_ok($newcat, "Astro::Catalog");
 
 # Count the number of stars
-is( $newcat->sizeof, 5, "Confirm star count");
+is($newcat->sizeof, 5, "Confirm star count");
 
 
 # Read it back in (forcing the file name to be used)
-$newcat = new Astro::Catalog( Format => 'Simple', File => "$tempfile" );
+$newcat = new Astro::Catalog(Format => 'Simple', File => "$tempfile");
 
-isa_ok( $newcat, "Astro::Catalog" );
+isa_ok($newcat, "Astro::Catalog");
 
 # Count the number of stars
-is( $newcat->sizeof, 5, "Confirm star count");
-
-
-# T I M E   A T   T H E   B A R ---------------------------------------------
+is($newcat->sizeof, 5, "Confirm star count");
 
 exit;
-
-# D A T A   B L O C K --------------------------------------------------------
 
 __DATA__
 # Catalog written automatically by class Astro::Catalog::IO::Simple

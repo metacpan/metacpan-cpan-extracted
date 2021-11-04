@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Error;
-$Playwright::Error::VERSION = '0.016';
+$Playwright::Error::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,14 +18,8 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub name {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'name',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
+sub spec {
+    return $Playwright::spec->{'Error'}{members};
 }
 
 sub message {
@@ -33,6 +27,16 @@ sub message {
     return $self->_api_request(
         args    => [@_],
         command => 'message',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub name {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'name',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -92,7 +96,7 @@ Playwright::Error - Automatically generated class for Playwright::Error
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 
@@ -103,17 +107,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 name(@args)
-
-Execute the Error::name playwright routine.
-
-See L<https://playwright.dev/api/class-Error#Error-name> for more information.
-
 =head2 message(@args)
 
 Execute the Error::message playwright routine.
 
 See L<https://playwright.dev/api/class-Error#Error-message> for more information.
+
+=head2 name(@args)
+
+Execute the Error::name playwright routine.
+
+See L<https://playwright.dev/api/class-Error#Error-name> for more information.
 
 =head2 stack(@args)
 

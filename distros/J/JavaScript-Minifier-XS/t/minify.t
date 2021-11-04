@@ -16,7 +16,15 @@ subtest 'leading whitespace can be removed' => sub {
 ###############################################################################
 subtest 'trailing whitespace can be removed' => sub {
   my $given  = qq{var trailing="trailing whitespace gets removed";  \t\n\r  \n};
-  my $expect =qq{var trailing="trailing whitespace gets removed";};
+  my $expect = qq{var trailing="trailing whitespace gets removed";};
+  my $got    = minify($given);
+  is $got, $expect;
+};
+
+###############################################################################
+subtest 'whitespace collapsing preserves newlines' => sub {
+  my $given  = qq{var a=3   \n\rvar a=5};
+  my $expect = qq{var a=3\nvar a=5};
   my $got    = minify($given);
   is $got, $expect;
 };

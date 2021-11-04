@@ -15,11 +15,19 @@ static U32 pragma_hash;
 #define cop_hints_exists_pvn(cop, key, len, hash, flags) cop_hints_fetch_pvn(cop, key, len, hash, flags | 0x02)
 #endif
 
-#ifdef sv_string_from_errnum
-#define sv_caterror(message, errno) sv_catsv(message, sv_string_from_errnum(errno, NULL))
-#else
-#define sv_caterror(message, errno) sv_catpv(message, strerror(errno))
+#ifndef sv_string_from_errnum
+SV* S_sv_string_from_errnum(pTHX_ int error, SV* value) {
+	dSAVEDERRNO;
+	SAVE_ERRNO;
+	errno = error;
+	SV* result = newSVsv(get_sv("!", 0));
+	RESTORE_ERRNO;
+	return result;
+}
+#define sv_string_from_errnum(errno, value) S_sv_string_from_errnum(aTHX_ errno, value)
 #endif
+
+#define sv_caterror(message, errno) sv_catsv(message, sv_string_from_errnum(errno, NULL))
 
 #define autocroak_enabled() cop_hints_exists_pvn(PL_curcop, pragma_name, pragma_name_length, pragma_hash, 0)
 
@@ -196,6 +204,7 @@ static OP* croak_SYSTEM(pTHX) {
 			if (waitstatus < 0) {
 				sv_caterror(message, errno);
 			}
+#ifdef WIFEXITED
 			else if (WIFEXITED(waitstatus)) {
 				sv_catpvf(message, "unexpectedly returned exit value %d", WEXITSTATUS(waitstatus));
 			}
@@ -207,8 +216,10 @@ static OP* croak_SYSTEM(pTHX) {
 					sv_catpvs(message, " and dumped core");
 #endif
 			}
+#else
 			else
-				sv_catpvs(message, "unknown error");
+				sv_catpvf(message, "returned %d", waitstatus);
+#endif
 
 			throw_sv(message);
 		}

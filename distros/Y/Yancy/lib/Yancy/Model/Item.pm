@@ -1,5 +1,5 @@
 package Yancy::Model::Item;
-our $VERSION = '1.077';
+our $VERSION = '1.084';
 # ABSTRACT: Interface to a single item
 
 #pod =head1 SYNOPSIS
@@ -37,6 +37,11 @@ sub _hashref {
         return $self->{data};
     }
     return $self;
+}
+
+sub TO_JSON {
+    my ( $self ) = @_;
+    return $self->{data};
 }
 
 #pod =attr schema
@@ -117,7 +122,7 @@ Yancy::Model::Item - Interface to a single item
 
 =head1 VERSION
 
-version 1.077
+version 1.084
 
 =head1 SYNOPSIS
 

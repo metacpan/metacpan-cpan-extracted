@@ -8,46 +8,40 @@ typedef Display* DisplayOrNull; /* Used by typemap for stricter conversion */
 typedef Visual* VisualOrNull;
 typedef int ScreenNumber; /* used by typemap to coerce X11::Xlib::Screen */
 
-/*--------------------------------------------------------
- * Functions to create/alter the magic Display* attached to X11::Xlib objects
- */
+#define PerlXlib_OR_NULL    0
+#define PerlXlib_OR_UNDEF   1
+#define PerlXlib_OR_DIE     2
+#define PerlXlib_AUTOCREATE 3
 
-/* Get the Display* pointer (or NULL) for the given object. */
-extern Display * PerlXlib_get_magic_dpy(SV *sv, Bool not_null);
-/* Set the Display* pointer on X11::Xlib object and register that object association to that pointer */
-extern SV * PerlXlib_set_magic_dpy(SV *sv, Display *dpy);
-/* Get the X11::Xlib object of a Display*, possibly creating a new perl object for it if not registered.
- * The returned SV* does not need to be released/freed. (already mortal, or ref to hash element) */
-extern SV * PerlXlib_obj_for_display(Display *dpy, int create);
+/* lookup or create a wrapper around a pointer */
+extern SV * PerlXlib_get_objref(void *thing, int create_flag,
+    const char *thing_type, int svtype, const char *thing_class, void *parent);
+/* get the pointer wrapped by an object */
+extern void * PerlXlib_objref_get_pointer(SV *objref, const char *ptr_type, int fail_flag);
+/* set the pointer wrapped by an object */
+extern void PerlXlib_objref_set_pointer(SV *objref, void *pointer, const char *ptr_type);
+
+/* Special cases for wrap/get/set Display* on a X11::Xlib instance */
+extern SV * PerlXlib_get_display_objref(Display *dpy, int create_flag);
+extern Display * PerlXlib_display_objref_get_pointer(SV *displayref, int fail_flag);
 
 /* un-pack an XID from a wrapped X11::Xlib::XID or subclass */
 extern XID PerlXlib_sv_to_xid(SV *sv);
 
 /*---------------------------------------------------------
+ * Accessor for $obj->display attribute
+ */
+extern SV * PerlXlib_objref_get_display(SV *obj);
+extern void PerlXlib_objref_set_display(SV *obj, SV *displayref);
+
+/*---------------------------------------------------------
  * Functions to wrap/unwrap opaque X11 pointers to/from objects
  */
 
-/* Return the "generic xlib pointer" attached (via magic) to the object. */
-extern void * PerlXlib_sv_to_display_innerptr(SV *sv, bool not_null);
-/* Return the inflated object for the given pointer.  Object is cached in X11::Xlib instance for *dpy.
- * Returned SV does not need to be released/freed. (already mortal, or ref to hash element) */
-extern SV * PerlXlib_obj_for_display_innerptr(Display *dpy, void *thing, const char *thing_class, int svtype, bool create);
-/* Same as PerlXlib_sv_to_display_innerptr, for when the object is a hashref and pointer is attached via magic */
-extern void * PerlXlib_get_magic_dpy_innerptr(SV *sv, Bool not_null);
-/* Same as PerlXlib_obj_for_display_innerptr, for when the object is a hashref and pointer is attached via magic */
-extern SV * PerlXlib_set_magic_dpy_innerptr(SV *sv, void *innerptr);
 /* Same as PerlXlib_sv_to_display_innerptr, but Screen* is special */
-extern Screen * PerlXlib_sv_to_screen(SV *sv, bool not_null);
+extern Screen * PerlXlib_screen_objref_get_pointer(SV *sv, int fail_flag);
 /* Same as PerlXlib_obj_for_display_innerptr, but Screen* is special */
-extern SV * PerlXlib_obj_for_screen(Screen *screen);
-
-/*-----------------------------------------------------------
- * Generically add ->display attribute to any pointer-based object.
- * These are tracked inside-out style from a private hash, requiring
- * destructor support to clean up.
- */
-extern SV * PerlXlib_get_displayobj_of_opaque(void *thing);
-extern void PerlXlib_set_displayobj_of_opaque(void *thing, SV *dpy_sv);
+extern SV * PerlXlib_get_screen_objref(Screen *screen, int create_flag);
 
 /*-----------------------------------------------------------
  * Functions to pack/unpack structs into blessed scalars.
@@ -121,3 +115,16 @@ extern SV * PerlXlib_keysym_to_sv(KeySym keysym, int symbolic);
 extern KeySym PerlXlib_sv_to_keysym(SV *sv);
 
 extern void PerlXlib_install_error_handlers(Bool nonfatal, Bool fatal);
+
+/* Back-compat, deprecated */
+extern Display * PerlXlib_get_magic_dpy(SV *sv, Bool not_null);
+extern SV * PerlXlib_set_magic_dpy(SV *sv, Display *dpy);
+extern SV * PerlXlib_obj_for_display(Display *dpy, int create);
+extern void * PerlXlib_sv_to_display_innerptr(SV *sv, bool not_null);
+extern SV * PerlXlib_obj_for_display_innerptr(Display *dpy, void *thing, const char *thing_class, int svtype, bool create);
+extern void * PerlXlib_get_magic_dpy_innerptr(SV *sv, Bool not_null);
+extern SV * PerlXlib_set_magic_dpy_innerptr(SV *sv, void *innerptr);
+extern SV * PerlXlib_get_displayobj_of_opaque(void *thing);
+extern void PerlXlib_set_displayobj_of_opaque(void *thing, SV *dpy_sv);
+extern SV * PerlXlib_obj_for_screen(Screen *screen);
+extern Screen * PerlXlib_sv_to_screen(SV *sv, bool not_null);

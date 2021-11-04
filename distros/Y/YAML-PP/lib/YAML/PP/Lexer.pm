@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Lexer;
 
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.029'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -204,6 +204,11 @@ sub fetch_next_tokens {
     }
     if (not $spaces and $$yaml =~ s/\A(---|\.\.\.)(?=$RE_WS|\z)//) {
         $self->push_tokens([ $TOKEN_NAMES{ $1 } => $1, $self->line ]);
+    }
+    elsif ($$yaml =~ m/\A[ \t]+(#.*)?\z/) {
+        $self->push_tokens([ EOL => join('', @$next_line), $self->line ]);
+        $self->set_next_line(undef);
+        return $next;
     }
     else {
         $self->push_tokens([ SPACE => $spaces, $self->line ]);
@@ -525,7 +530,8 @@ sub fetch_block {
     }
     if ($set_indent) {
         $started = 1;
-        $current_indent = $set_indent;
+        $indent-- if $indent > 0;
+        $current_indent = $indent + $set_indent;
     }
     if (not length $$yaml) {
         push @tokens, ( EOL => $eol, $self->line );

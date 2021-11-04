@@ -46,10 +46,38 @@ struct crypt_smime {
 };
 typedef struct crypt_smime * Crypt_SMIME;
 
-#define OPENSSL_CROAK(description)                              \
-    croak("%s: %s",                                             \
-          description,                                          \
-          ERR_error_string(ERR_get_error(), NULL))
+static inline unsigned long OpenSSL_get_last_error() {
+    unsigned long last_error = ERR_get_error();
+    if (last_error != 0) {
+        while (TRUE) {
+            /* User code might have caused OpenSSL to emit more than a
+             * single error before entering this function. OpenSSL 3.0
+             * appears to push errors to the queue even when no public
+             * functions actually return error, and we have no choice
+             * but to discard them all. This is fine. It's OpenSSL
+             * after all.
+             */
+            unsigned long next_error = ERR_get_error();
+            if (next_error != 0) {
+                last_error = next_error;
+            }
+            else {
+                break;
+            }
+        }
+    }
+    return last_error;
+}
+
+static inline void OPENSSL_CROAK(char const* description) {
+    unsigned long last_error = OpenSSL_get_last_error();
+    if (last_error != 0) {
+        croak("%s: %s", description, ERR_error_string(last_error, NULL));
+    }
+    else {
+        croak("%s", description);
+    }
+}
 
 static inline bool is_string(SV const* sv) {
     /* It's not sufficient to call SvPOK() to see if an SV contains a
@@ -484,7 +512,6 @@ setPrivateKeyPkcs12(Crypt_SMIME this, SV* pkcs12, char* password = "")
     PREINIT:
         BIO *bio;
         PKCS12 *p12;
-        int success = 0;
     CODE:
         if (this->priv_cert) {
             X509_free(this->priv_cert);
@@ -496,17 +523,30 @@ setPrivateKeyPkcs12(Crypt_SMIME this, SV* pkcs12, char* password = "")
         }
 
         if (SvOK(pkcs12)) {
-          if ((bio = BIO_new_mem_buf(SvPV_nolen(pkcs12), SvCUR(pkcs12))) != NULL) {
-            if ((p12 = d2i_PKCS12_bio(bio, NULL)) != NULL) {
-              success = PKCS12_parse(p12, password, &this->priv_key, &this->priv_cert, NULL);
+            if ((bio = BIO_new_mem_buf(SvPV_nolen(pkcs12), SvCUR(pkcs12))) != NULL) {
+                if ((p12 = d2i_PKCS12_bio(bio, NULL)) != NULL) {
+                    BIO_free(bio);
+                    if (PKCS12_parse(p12, password, &this->priv_key, &this->priv_cert, NULL) != 0) {
+                        PKCS12_free(p12);
+                    }
+                    else {
+                        PKCS12_free(p12);
+                        OPENSSL_CROAK("Crypt::SMIME#setPrivateKeyPkcs12: failed to parse a PKCS#12 structure");
+                    }
+                }
+                else {
+                    BIO_free(bio);
+                    OPENSSL_CROAK("Crypt::SMIME#setPrivateKeyPkcs12: failed to decode a PKCS#12 structure");
+                }
             }
-            BIO_free(bio);
-          }
+            else {
+                OPENSSL_CROAK("Crypt::SMIME#setPrivateKeyPkcs12: failed to allocate a buffer");
+            }
+        }
+        else {
+            croak("Crypt::SMIME#setPrivateKeyPkcs12: argument `pkcs12' must be a scalar");
         }
 
-        if (!success || this->priv_key == NULL || this->priv_cert == NULL) {
-          OPENSSL_CROAK("Crypt::SMIME#setPrivateKeyPkcs12: failed");
-        }
         this->priv_key_is_tainted  = SvTAINTED(ST(1));
         this->priv_cert_is_tainted = SvTAINTED(ST(1));
 
@@ -619,7 +659,8 @@ _addPublicKey(Crypt_SMIME this, char* crt)
 
             pub_cert = PEM_read_bio_X509_AUX(buf, NULL, NULL, NULL);
             if (pub_cert == NULL) {
-                if (ERR_GET_REASON(ERR_get_error()) == PEM_R_NO_START_LINE) {
+                if (ERR_GET_REASON(ERR_peek_last_error()) == PEM_R_NO_START_LINE) {
+                    OpenSSL_get_last_error(); // Discard the error.
                     break;
                 }
                 else {

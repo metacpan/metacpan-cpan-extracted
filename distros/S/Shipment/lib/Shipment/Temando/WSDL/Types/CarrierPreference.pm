@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::CarrierPreference;
-$Shipment::Temando::WSDL::Types::CarrierPreference::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::CarrierPreference::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
         [   qw(        carrierId
               deliveryMethods
 
-              )
+            )
         ],
         {   'carrierId'       => \%carrierId_of,
             'deliveryMethods' => \%deliveryMethods_of,
@@ -55,7 +55,7 @@ Class::Std::initialize();
 
 package Shipment::Temando::WSDL::Types::CarrierPreference::_deliveryMethods;
 $Shipment::Temando::WSDL::Types::CarrierPreference::_deliveryMethods::VERSION
-  = '3.05';
+  = '3.06';
 use strict;
 use warnings;
 {
@@ -78,7 +78,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        deliveryMethod
 
-                  )
+                )
             ],
             {'deliveryMethod' => \%deliveryMethod_of,},
             {   'deliveryMethod' =>
@@ -110,7 +110,7 @@ Shipment::Temando::WSDL::Types::CarrierPreference
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

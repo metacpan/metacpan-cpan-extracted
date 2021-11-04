@@ -1,3 +1,8 @@
+0.211   2021-05-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Update list of command-line options (Menlo::CLI::Compat 1.9022).
+
+
 0.210   2021-05-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Refactor main logic into function, allow customizing prefix.

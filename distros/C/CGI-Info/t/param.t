@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 28;
+use Test::Most tests => 30;
 use Test::NoWarnings;
 use lib 't/lib';
 use MyLogger;
@@ -48,6 +48,10 @@ PARAM: {
 	my %p = %{$i->param()};
 	ok(!defined($i->param('foo')));
 	ok($i->as_string() eq 'fred=wilma');
+
+	$ENV{'QUERY_STRING'} = 'foo=bar\u0026fred=wilma';
+	$i = new_ok('CGI::Info');
+	is($i->param('foo'), 'bar', '\u0026 is interpreted as &');
 
 	# Don't pass XSS through
 	$ENV{'QUERY_STRING'} = 'foo=<script>alert(hello)</script>';

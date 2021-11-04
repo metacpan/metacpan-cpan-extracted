@@ -1,9 +1,9 @@
 package Acme::CPANModules::VivaldiUtilities;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-03'; # DATE
+our $DATE = '2021-06-09'; # DATE
 our $DIST = 'Acme-CPANModules-BrowserUtilities'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use Acme::CPANModules::BrowserUtilities;
@@ -31,7 +31,7 @@ Acme::CPANModules::VivaldiUtilities - Utilities for Vivaldi browser
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::VivaldiUtilities (from Perl distribution Acme-CPANModules-BrowserUtilities), released on 2020-06-03.
+This document describes version 0.003 of Acme::CPANModules::VivaldiUtilities (from Perl distribution Acme-CPANModules-BrowserUtilities), released on 2021-06-09.
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ L<App::DumpVivaldiHistory> (comes with CLI: L<dump-vivaldi-history>).
 
 L<Vivaldi::Util::Profile>
 
-=head1 INCLUDED MODULES
+=head1 ACME::MODULES ENTRIES
 
 =over
 
@@ -56,10 +56,22 @@ L<Vivaldi::Util::Profile>
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n VivaldiUtilities
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries VivaldiUtilities | cpanm -n
 
@@ -67,9 +79,13 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=VivaldiUtilities -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::VivaldiUtilities -E'say $_->{module} for @{ $Acme::CPANModules::VivaldiUtilities::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
 
 =head1 HOMEPAGE
 
@@ -101,7 +117,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

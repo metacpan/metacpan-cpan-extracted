@@ -1,5 +1,10 @@
 Revision history for Perl extension JavaScript::Minifier::XS.
 
+0.15      2021-10-15 20:21:23-07:00 America/Vancouver
+    - GH#8 - preserve newlines when collapsing whitespace; if a block of
+      whitespace contains a newline, then when collapsing we collapse to a
+      newline character, not just "the first whitespace char we found"
+
 0.14      2021-02-06 23:36:36-08:00 America/Vancouver
     - rewrote test suite into a single ".t" test
     - optimized memory allocations, by allocating Nodes in bulk, and being

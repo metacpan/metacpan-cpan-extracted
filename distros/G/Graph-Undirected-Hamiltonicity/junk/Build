@@ -1,0 +1,4 @@
+#!/bin/sh
+/home/vagrant/perl5/perlbrew/perls/perl-5.34.0/bin/dzil authordeps | /home/vagrant/perl5/perlbrew/perls/perl-5.34.0/bin/cpanm
+/home/vagrant/perl5/perlbrew/perls/perl-5.34.0/bin/dzil listdeps | /home/vagrant/perl5/perlbrew/perls/perl-5.34.0/bin/cpanm
+/home/vagrant/perl5/perlbrew/perls/perl-5.34.0/bin/dzil install

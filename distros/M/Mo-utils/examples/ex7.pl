@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
-use Mo::utils qw(check_required);
+use Mo::utils qw(check_number);
 
 my $self = {
-        'key' => 'value',
+        'key' => '10',
 };
-check_required($self, 'key');
+check_number($self, 'key');
 
 # Print out.
 print "ok\n";

@@ -6,7 +6,7 @@ use warnings;
 use Test::More 0.88;
 
 use Test::DZil;
-use Path::Class;
+use Path::Tiny;
 
 {
 	my $tzil = Builder->from_config(
@@ -25,10 +25,10 @@ use Path::Class;
 
 	$tzil->build;
 
-	my $dir = dir($tzil->tempdir, 'build');
+	my $dir = path($tzil->tempdir, 'build');
 
-	ok -e $dir->file('ppport.h');
-	ok -s $dir->file('ppport.h');
+	ok -e $dir->child('ppport.h');
+	ok -s $dir->child('ppport.h');
 	diag 'got log messages: ', explain $tzil->log_messages
 		if not Test::Builder->new->is_passing;
 }
@@ -52,10 +52,10 @@ use Path::Class;
 
 	$tzil->build;
 
-	my $dir = dir($tzil->tempdir, 'build');
+	my $dir = path($tzil->tempdir, 'build');
 
-	ok -e $dir->file('lib/Foo/ppport.h');
-	ok -s $dir->file('lib/Foo/ppport.h');
+	ok -e $dir->child('lib/Foo/ppport.h');
+	ok -s $dir->child('lib/Foo/ppport.h');
 
 	diag 'got log messages: ', explain $tzil->log_messages
 		if not Test::Builder->new->is_passing;

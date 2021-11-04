@@ -202,13 +202,13 @@ our %EXPORT_TAGS = (
           TIFFPRINT_JPEGQTABLES
           TIFFPRINT_JPEGACTABLES
           TIFFPRINT_JPEGDCTABLES
-          )
+        )
     ]
 );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = 16;
+our $VERSION = 18;
 
 require XSLoader;
 XSLoader::load( 'Graphics::TIFF', $VERSION );
@@ -246,7 +246,7 @@ Graphics::TIFF - Perl extension for the libtiff library
 
 =head1 VERSION
 
-16
+18
 
 =head1 SYNOPSIS
 
@@ -667,6 +667,11 @@ TIFFPRINT_COLORMAP
 TIFFPRINT_JPEGQTABLES
 TIFFPRINT_JPEGACTABLES
 TIFFPRINT_JPEGDCTABLES
+
+=head2 Graphics::TIFF::ReverseBits(data, size)
+
+Replaces each byte in data with the equivalent bit-reversed value. This
+operation is done with a lookup table.
 
 =for readme continue
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail;
-$Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               AstraHandlingText
               AstraLabelElements
 
-              )
+            )
         ],
         {   'TrackingId'         => \%TrackingId_of,
             'Barcode'            => \%Barcode_of,
@@ -72,7 +72,7 @@ Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

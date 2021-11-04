@@ -3,6 +3,7 @@
 #
 # Translators:
 # Hendrik-Jan Heins <hjh@passys.nl>, 2003-2004
+# Marcel Pol <marcel@timelord.nl>, 2021
 # Marja van Waes <marja@mageia.org>, 2013,2015
 # Niels Gras <niels.gras@wanadoo.nl>, 2000
 # remmy <remco@webconquest.com>, 2012-2013
@@ -11,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2020-07-10 17:41+0100\n"
-"PO-Revision-Date: 2020-07-10 16:45+0000\n"
-"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"PO-Revision-Date: 2021-07-07 18:20+0000\n"
+"Last-Translator: Marcel Pol <marcel@timelord.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/MageiaLinux/mageia/language/"
 "nl/)\n"
 "Language: nl\n"
@@ -635,7 +636,7 @@ msgstr ""
 #: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
-msgstr "Copyright © %s door %s"
+msgstr "Auteursrecht © %s door %s"
 
 #: ../urpm/bug_report.pm:67 ../urpmi:256
 #, c-format
@@ -654,7 +655,7 @@ msgstr ""
 #: ../urpm/cdrom.pm:81
 #, c-format
 msgid "Udisks daemon (udisks-daemon) is not running or not ready"
-msgstr "Udisks-voorziening (udisks-daemon) is niet actief of onklaar"
+msgstr "Udisks-daemon (udisks-daemon) is niet actief of onklaar"
 
 #: ../urpm/cdrom.pm:173 ../urpm/cdrom.pm:178
 #, c-format
@@ -1098,6 +1099,8 @@ msgid ""
 "un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
 "32-bit EFI"
 msgstr ""
+"inschakelen van 32bit medium `%s' want 32-bit pakketten zijn geïnstalleerd "
+"of het systeem is 32-bit EFI"
 
 #: ../urpm/media.pm:844
 #, c-format
@@ -1324,12 +1327,12 @@ msgstr "ophalen van [%s] mislukt"
 #: ../urpm/mirrors.pm:33 ../urpm/mirrors.pm:59
 #, c-format
 msgid "trying again with mirror %s"
-msgstr "opnieuw proberen met mirror %s"
+msgstr "opnieuw proberen met spiegelserver %s"
 
 #: ../urpm/mirrors.pm:111
 #, c-format
 msgid "Could not find a mirror from mirrorlist %s"
-msgstr "Kan geen mirror vinden uit de mirrorlijst %s"
+msgstr "Kan geen spiegelserver vinden uit de spiegelserver-lijst %s"
 
 #: ../urpm/mirrors.pm:259
 #, c-format
@@ -1339,7 +1342,7 @@ msgstr "geolocalisatie %s %.2f %.2f gevonden uit tijdzone %s"
 #: ../urpm/mirrors.pm:306
 #, c-format
 msgid "getting mirror list from %s"
-msgstr "ophalen mirrorlijst van %s"
+msgstr "ophalen spiegelserver-lijst van %s"
 
 #: ../urpm/msg.pm:74 ../urpmi:492 ../urpmi:510 ../urpmi:628
 #, c-format
@@ -1812,7 +1815,7 @@ msgstr "Niets te verwijderen"
 #: ../urpme:140
 #, c-format
 msgid "No orphans to remove"
-msgstr "Geen wezen te verwijderen"
+msgstr "Geen weespakketten te verwijderen"
 
 #: ../urpme:146
 #, c-format
@@ -2502,7 +2505,7 @@ msgstr ""
 #: ../urpmi:251
 #, c-format
 msgid "Unable to create directory [%s] for bug report"
-msgstr "Kon directory [%s] niet aanmaken voor programmafoutrapport"
+msgstr "Kon map [%s] niet aanmaken voor programmafoutrapport"
 
 #: ../urpmi:272
 #, c-format
@@ -3196,7 +3199,7 @@ msgstr "  -m             - gelijkwaardig aan -du\n"
 #: ../urpmq:102
 #, c-format
 msgid "  -r             - print version and release with name also.\n"
-msgstr "  -r             - geeft de versie en release samen met de naam.\n"
+msgstr "  -r             - geeft de versie en uitgave samen met de naam.\n"
 
 #: ../urpmq:103
 #, c-format

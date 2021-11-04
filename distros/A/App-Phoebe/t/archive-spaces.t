@@ -1,4 +1,4 @@
-# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -99,6 +99,7 @@ our $dir;
 		    berta/page/Berta.gmi berta/page/Tanka.gmi)) {
      ok(grep(/$file/, @files), "found $file in the archive");
    }
+   ok(!grep(/data\.tar\.gz/, @files), "did not include data.tar.gz in the archive");
 }
 
 done_testing();

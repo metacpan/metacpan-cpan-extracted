@@ -17,7 +17,7 @@ t/04_errors.t
 t/05_orders.t
 t/06_write.t
 t/07_cistrans.t
-t/08_tetrahedral_chirality.t
+t/08_permutation_order.t
 t/09_tetrahedral_chirality.t
 t/10_validate.t
 t/11_validate_color.t
@@ -25,3 +25,6 @@ t/12_tetrahedral_chirality.t
 t/13_clean_chiral_centers.t
 t/14_write_disconnected.t
 t/15_chirality.t
+t/16_unsupported_chirality.t
+t/17_max_hydrogen_count_digits.t
+t/18_chirality_reference.t

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail;
-$Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,13 +29,13 @@ Class::Std::initialize();
         [   qw(        PersonalMessage
               Recipients
 
-              )
+            )
         ],
         {   'PersonalMessage' => \%PersonalMessage_of,
             'Recipients'      => \%Recipients_of,
         },
         {   'PersonalMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Recipients' =>
+            'Recipients'      =>
               'Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipient',
         },
         {
@@ -62,7 +62,7 @@ Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

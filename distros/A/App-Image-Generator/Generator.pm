@@ -1,10 +1,8 @@
 package App::Image::Generator;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English;
 use Error::Pure qw(err);
 use File::Basename qw(fileparse);
@@ -16,8 +14,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar our $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -53,7 +50,8 @@ sub run {
 			"1920x1080).\n";
 		print STDERR "\t-v\t\tVerbose mode.\n";
 		print STDERR "\t--version\tPrint version.\n";
-		exit 1;
+
+		return 1;
 	}
 	$self->{'_output_file'} = $ARGV[0];
 
@@ -98,6 +96,7 @@ sub run {
 	if ($EVAL_ERROR) {
 		err 'Cannot create image.';
 	}
+
 	return 0;
 }
 
@@ -116,22 +115,27 @@ App::Image::Generator - Perl class for image-generator application.
 =head1 SYNOPSIS
 
  use App::Image::Generator;
+
  my $obj = App::Image::Generator->new;
- $obj->run;
+ my $exit_code = $obj->run;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $obj = App::Image::Generator->new;
 
- Constructor.
+Constructor.
 
-=item C<run()>
+Returns instance of object.
 
- Run.
+=head2 C<run>
 
-=back
+ my $exit_code = $obj->run;
+
+Run.
+
+Returns exit code.
 
 =head1 ERRORS
 
@@ -146,11 +150,9 @@ App::Image::Generator - Perl class for image-generator application.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use App::Image::Generator;
 
  # Run.
@@ -188,21 +190,22 @@ Perl class for video-generator application.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/App-Image-Generator>.
+L<https://github.com/michal-josef-spacek/App-Image-Generator>.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015-2016 Michal Špaček
- BSD 2-Clause License
+© 2015-2021 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

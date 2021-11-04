@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::AvailableQuote;
-$Shipment::Temando::WSDL::Types::AvailableQuote::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::AvailableQuote::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -95,7 +95,7 @@ Class::Std::initialize();
               originatingDepot
               destinationDepot
 
-              )
+            )
         ],
         {   'generated'               => \%generated_of,
             'accepted'                => \%accepted_of,
@@ -229,7 +229,7 @@ Class::Std::initialize();
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments;
 $Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments::VERSION =
-  '3.05';
+  '3.06';
 use strict;
 use warnings;
 {
@@ -252,7 +252,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        adjustment
 
-                  )
+                )
             ],
             {'adjustment' => \%adjustment_of,},
             {'adjustment' => 'Shipment::Temando::WSDL::Types::Adjustment',},
@@ -269,7 +269,7 @@ use warnings;
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_articles;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_articles::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_articles::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -292,7 +292,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        article
 
-                  )
+                )
             ],
             {'article' => \%article_of,},
             {'article' => 'Shipment::Temando::WSDL::Types::Article',},
@@ -309,7 +309,7 @@ use warnings;
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_extras;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_extras::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_extras::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -332,7 +332,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        extra
 
-                  )
+                )
             ],
             {'extra' => \%extra_of,},
             {'extra' => 'Shipment::Temando::WSDL::Types::Extra',},
@@ -349,7 +349,7 @@ use warnings;
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -372,7 +372,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        inclusion
 
-                  )
+                )
             ],
             {'inclusion' => \%inclusion_of,},
             {'inclusion' => 'Shipment::Temando::WSDL::Types::Inclusion',},
@@ -390,17 +390,17 @@ use warnings;
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr;
 $Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr::VERSION
-  = '3.05';
+  = '3.06';
 use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
-{        # BLOCK to scope variables
+{    # BLOCK to scope variables
 
     my %id_of : ATTR(:get<id>);
 
     __PACKAGE__->_factory(
         [   qw(
               id
-              )
+            )
         ],
         {
 
@@ -426,7 +426,7 @@ Shipment::Temando::WSDL::Types::AvailableQuote
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

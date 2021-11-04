@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::getRequest;
-$Shipment::Temando::WSDL::Elements::getRequest::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::getRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -48,7 +48,7 @@ use warnings;
                   reference
                   detail
 
-                  )
+                )
             ],
             {   'requestId'     => \%requestId_of,
                 'bookingNumber' => \%bookingNumber_of,
@@ -92,7 +92,7 @@ Shipment::Temando::WSDL::Elements::getRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::DocumentType;
-$Shipment::UPS::WSDL::TrackTypes::DocumentType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::DocumentType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Content
               Format
 
-              )
+            )
         ],
         {   'Type'    => \%Type_of,
             'Content' => \%Content_of,
@@ -40,7 +40,7 @@ Class::Std::initialize();
         {   'Type' =>
               'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
             'Content' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Format' =>
+            'Format'  =>
               'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
         },
         {
@@ -68,7 +68,7 @@ Shipment::UPS::WSDL::TrackTypes::DocumentType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

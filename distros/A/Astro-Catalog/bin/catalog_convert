@@ -1,0 +1,238 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+catalog_convert - convert astronomical catalogs between different formats
+
+=head1 SYNOPSIS
+
+    catalog_convert [--infmt FORMAT] [--outfmt FORMAT] [--clobber] INFILE OUTFILE
+
+=head1 DESCRIPTION
+
+This program converts catalogs between the various formats which
+the Astro::Catalog library can read and write.  It will attempt to infer
+the format of the input and output files by the pattern of their names.
+If this is not successful or the wrong format is inferred, the C<--infmt>
+and / or C<--outfmt> options should be specified.
+
+The input and / or output files can be given as -, in which case the program
+will read from standard input / write to standard output.  In this case the
+corresponding formats must be specified.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--infmt>
+
+The format of the input catalog.
+
+=item B<--inopt>
+
+Input reading options.  This is a comma-separated list of key=value
+pairs.  E.g.:
+
+    telecope=ARECIBO,tag=SCIENCE
+
+=item B<--outfmt>
+
+The format in which to write the catalog.
+
+=item B<--outopt>
+
+Output writing options, formatted as for input options.
+
+=item B<--clobber>
+
+This option can be specified to allow OUTFILE to overwrite an existing file.
+
+=back
+
+=head1 FORMATS
+
+The following formats may be supported.  Note that not all formats support
+both reading and writing catalogs.
+
+=over 4
+
+=item ASSM
+
+=item Astrom
+
+=item Cluster
+
+=item FINDOFF
+
+=item FITSTable
+
+=item GaiaPick
+
+=item Hedwig
+
+=item JCMT
+
+=item JCMT_OT_SC
+
+=item LCOGTFITSTable
+
+=item Northstar
+
+=item RITMatch
+
+=item SExtractor
+
+=item STL
+
+=item Simple
+
+=item TST
+
+=item UKIRTBS
+
+=item VEX
+
+=item VOTable
+
+=item XY
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Astro::Catalog;
+
+my ($option_help, $option_clobber, $option_infmt, $option_inopt,
+    $option_outfmt, $option_outopt);
+GetOptions(
+    'help' => \$option_help,
+    'clobber' => \$option_clobber,
+    'infmt=s' => \$option_infmt,
+    'inopt=s' => \$option_inopt,
+    'outfmt=s' => \$option_outfmt,
+    'outopt=s' => \$option_outopt,
+) or pod2usage(-verbose => 0);
+
+pod2usage(-verbose => 2) if $option_help;
+
+pod2usage(-verbose => 0) unless 2 == scalar @ARGV;
+
+# Define information for formats, e.g. how to recognize from file name
+# patterns.  Note that we use lower case here since Astro::Catalog will
+# normalize the case anyway and we also want to match user-specified formats.
+our %FORMAT = (
+    fitstable => {
+        patterns => [qr/\.fits?$/i],
+    },
+    hedwig => {
+        patterns => [qr/\.hedwig$/i],
+    },
+    jcmt => {
+        patterns => [qr/\.jcmt$/i],
+        read_options => {incplanets => 0},
+    },
+    jcmt_ot_sc => {
+        patterns => [qr/\.sc$/i],
+    },
+    tst => {
+        patterns => [qr/\.tst$/i],
+    },
+    vex => {
+        patterns => [qr/\.vex$/i],
+    },
+    votable => {
+        patterns => [qr/\.vot$/i],
+    },
+);
+
+
+# Determine input / output files and their formats.
+my ($in_file, $out_file) = @ARGV;
+my $in_format = (defined $option_infmt) ? (lc $option_infmt) : undef;
+my %in_param = ();
+if ($in_file eq '-') {
+    die 'Input format for STDIN must be specified' unless defined $in_format;
+    $in_param{'Data'} = \*STDIN;
+}
+else {
+    die "Input file '$in_file' does not exist" unless -e $in_file;
+    $in_param{'File'} = $in_file;
+    $in_format = _infer_format($in_file) unless defined $in_format;
+}
+
+my $out_format = (defined $option_outfmt) ? (lc $option_outfmt) : undef;
+if ($out_file eq '-') {
+    die 'Output format for STDOUT must be specified' unless defined $out_format;
+    $out_file = \*STDOUT;
+}
+else {
+    die "Output file '$out_file' already exists" unless $option_clobber || ! -e $out_file;
+    $out_format = _infer_format($out_file) unless defined $out_format;
+}
+
+
+# Determine read and write options.
+my %in_opt = (((exists $FORMAT{$in_format} and exists $FORMAT{$in_format}->{'read_options'})
+    ? %{$FORMAT{$in_format}->{'read_options'}} : ()),
+    _parse_options($option_inopt));
+
+my %out_opt = (((exists $FORMAT{$out_format} and exists $FORMAT{$out_format}->{'write_options'})
+    ? %{$FORMAT{$out_format}->{'write_options'}} : ()),
+    _parse_options($option_outopt));
+
+# Read and re-write catalog.
+my $cat = new Astro::Catalog(%in_param, Format => $in_format, ReadOpt => \%in_opt);
+
+$cat->write_catalog(File => $out_file, Format => $out_format, %out_opt)
+    or die $cat->errstr;
+
+exit 0;
+
+
+sub _infer_format {
+    my $filename = shift;
+
+    foreach my $format (keys %FORMAT) {
+        foreach my $pattern (@{$FORMAT{$format}->{'patterns'}}) {
+            return $format if $filename =~ $pattern;
+        }
+    }
+
+    die "Could not infer format of file '$filename'";
+}
+
+sub _parse_options {
+    my $value = shift;
+    return () unless defined $value;
+
+    return map {split '=', $_, 2} split ',', $value;
+}
+
+__END__
+
+=head1 COPYRIGHT
+
+Copyright (C) 2021 East Asian Observatory
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc.,51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA
+
+=cut

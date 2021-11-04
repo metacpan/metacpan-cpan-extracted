@@ -16,6 +16,7 @@ examples/ua.pl
 lib/HTTP/BrowserDetect.pm
 perlcriticrc
 perltidyrc
+precious.toml
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-detect.t

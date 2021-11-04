@@ -1,9 +1,9 @@
 package App::RcloneUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-09'; # DATE
+our $DATE = '2021-05-15'; # DATE
 our $DIST = 'App-RcloneUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,13 +24,15 @@ App::RcloneUtils - Utilities related to rclone
 
 =head1 VERSION
 
-This document describes version 0.001 of App::RcloneUtils (from Perl distribution App-RcloneUtils), released on 2021-05-09.
+This document describes version 0.002 of App::RcloneUtils (from Perl distribution App-RcloneUtils), released on 2021-05-15.
 
 =head1 DESCRIPTION
 
 This distributions provides the following command-line utilities:
 
 =over
+
+=item * L<list-rclone-remotes>
 
 =item * L<parse-rclone-config>
 

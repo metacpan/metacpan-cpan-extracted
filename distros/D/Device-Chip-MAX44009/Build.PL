@@ -15,7 +15,7 @@ my $build = Module::Build->new(
       'Device::Chip::Sensor' => 0,
    },
    test_requires => {
-      'Test::Device::Chip::Adapter' => '0.18',
+      'Test::Device::Chip::Adapter' => '0.20',
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

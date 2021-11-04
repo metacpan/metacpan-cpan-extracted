@@ -1,0 +1,9 @@
+/Makefile
+/MYMETA.yml
+/MYMETA.json
+/blib/
+/pm_to_blib
+*.o
+*.sw*
+*.bs
+Libwebsockets.c

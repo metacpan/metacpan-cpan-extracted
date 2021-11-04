@@ -17,7 +17,7 @@ use App::Git::Workflow::Command qw/get_options/;
 use DateTime::Format::HTTP;
 use Data::Dumper qw/Dumper/;
 
-our $VERSION  = version->new(1.1.14);
+our $VERSION  = version->new(1.1.16);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option = (
@@ -35,6 +35,7 @@ sub run {
         'limit|n=i',
         'format|f=s',
         'files|F!',
+        'quiet|q',
     );
     my $fmt = join "-%09-%09-", qw/
         %(authordate)
@@ -136,12 +137,15 @@ sub run {
 
     my $count = 1;
     my $fmt_out = $option{verbose} ? "%-age\t%-authorname\t%-short"
+        : $option{quiet}       ? '%short'
         : $option{format}      ? $option{format}
         :                        "%age\t%short";
     my ($format, @fields) = formatted($fmt_out, \%max);
 
+    if ($option{limit} && @data > $option{limit}) {
+        @data = splice @data, @data - $option{limit}, $option{limit};
+    }
     for my $branch (@data) {
-        last if $option{limit} && $count++ > $option{limit};
         printf $format, map {$branch->{$_}} @fields;
     }
 }
@@ -188,7 +192,7 @@ git-branch-age - grep tags
 
 =head1 VERSION
 
-This documentation refers to git-branch-age version 1.1.14
+This documentation refers to git-branch-age version 1.1.16
 
 =head1 SYNOPSIS
 

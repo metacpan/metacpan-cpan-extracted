@@ -1,9 +1,9 @@
 package Sah::SchemaR::perl::wordlist::modnames_with_optional_args;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-06-07'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = ["array",[{description=>"\nArray of Perl module names, where each element is of `perl::modname` schema,\ne.g. `Foo`, `Foo::Bar`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::P*\n\nand it will be expanded to e.g.:\n\n    [\"Module::Patch\", \"Module::Path\", \"Module::Pluggable\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.\n\n",of=>["perl::wordlist::modname_with_optional_args",{req=>1},{}],summary=>"Array of Perl WordList::* module names without the prefix, with optional args, e.g. [\"EN::Enable\", \"MetaSyntactic::Any=theme,dangdut\"]","x.element_completion"=>["perl_modname",{ns_prefix=>"WordList"}],"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"WordList"}]]}],["array"]];
+our $rschema = ["array",[{description=>"\nArray of Perl WordList::* module names without the prefix and with optional\nargs. Each element is of `perl::modname` schema, e.g. `EN::Enable`,\n`MetaSyntactic::Any=theme,dangdut`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    ID::*\n\nand it will be expanded to e.g.:\n\n    [\"ID::KBBI\", \"ID::PERLANCAR\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.\n\n",of=>["perl::wordlist::modname_with_optional_args",{req=>1},{}],summary=>"Array of Perl WordList::* module names without the prefix, with optional args, e.g. [\"EN::Enable\", \"MetaSyntactic::Any=theme,dangdut\"]","x.element_completion"=>["perl_modname",{ns_prefix=>"WordList"}],"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"WordList"}]]}],["array"]];
 
 1;
 # ABSTRACT: Array of Perl WordList::* module names without the prefix, with optional args, e.g. ["EN::Enable", "MetaSyntactic::Any=theme,dangdut"]
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::wordlist::modnames_with_optional_args - Array of Perl WordLi
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::perl::wordlist::modnames_with_optional_args (from Perl distribution Sah-Schemas-WordList), released on 2020-05-27.
+This document describes version 0.003 of Sah::SchemaR::perl::wordlist::modnames_with_optional_args (from Perl distribution Sah-Schemas-WordList), released on 2021-06-07.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

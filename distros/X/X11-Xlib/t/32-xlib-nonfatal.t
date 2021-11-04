@@ -19,7 +19,7 @@ isa_ok( $conn, 'X11::Xlib', 'display connection' );
 my $root= RootWindow($conn);
 
 my $conn2= XOpenDisplay();
-is( scalar keys %X11::Xlib::_connections, 2, 'two registered connections' );
+is( scalar X11::Xlib->_all_connections, 2, 'two registered connections' );
 
 ok( !$X11::Xlib::_error_nonfatal_installed,    'handler not installed' );
 

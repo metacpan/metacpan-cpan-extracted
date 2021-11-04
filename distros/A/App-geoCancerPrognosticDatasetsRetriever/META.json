@@ -1,0 +1,57 @@
+{
+   "abstract" : "GEO Cancer Prognostic Datasets Retriever is a bioinformatics tool for cancer prognostic dataset retrieval from the GEO website.",
+   "author" : [
+      "Abbas Alameer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-geoCancerPrognosticDatasetsRetriever",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "Getopt::Std" : "0",
+            "LWP::Simple" : "0",
+            "Term::ANSIColor" : "0",
+            "perl" : "5.008000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/AbbasAlameer/geoCancerPrognosticDatasetsRetriever.git",
+         "web" : "https://github.com/AbbasAlameer/geoCancerPrognosticDatasetsRetriever"
+      }
+   },
+   "version" : 1.01,
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

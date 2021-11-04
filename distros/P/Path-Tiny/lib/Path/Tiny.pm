@@ -5,7 +5,7 @@ use warnings;
 package Path::Tiny;
 # ABSTRACT: File path utility
 
-our $VERSION = '0.118';
+our $VERSION = '0.120';
 
 # Dependencies
 use Config;
@@ -323,6 +323,8 @@ sub rootdir { path( File::Spec->rootdir ) }
 #pod
 #pod     $temp = Path::Tiny->tempfile( @options );
 #pod     $temp = Path::Tiny->tempdir( @options );
+#pod     $temp = $dirpath->tempfile( @options );
+#pod     $temp = $dirpath->tempdir( @options );
 #pod     $temp = tempfile( @options ); # optional export
 #pod     $temp = tempdir( @options );  # optional export
 #pod
@@ -352,6 +354,17 @@ sub rootdir { path( File::Spec->rootdir ) }
 #pod Both C<tempfile> and C<tempdir> may be exported on request and used as
 #pod functions instead of as methods.
 #pod
+#pod The methods can be called on an instances representing a
+#pod directory. In this case, the directory is used as the base to create the
+#pod temporary file/directory, setting the C<DIR> option in File::Temp.
+#pod
+#pod     my $target_dir = path('/to/destination');
+#pod     my $tempfile = $target_dir->tempfile('foobarXXXXXX');
+#pod     $tempfile->spew('A lot of data...');  # not atomic
+#pod     $tempfile->rename($target_dir->child('foobar')); # hopefully atomic
+#pod
+#pod In this case, any value set for option C<DIR> is ignored.
+#pod
 #pod B<Note>: for tempfiles, the filehandles from File::Temp are closed and not
 #pod reused.  This is not as secure as using File::Temp handles directly, but is
 #pod less prone to deadlocks or access problems on some platforms.  Think of what
@@ -372,16 +385,14 @@ sub rootdir { path( File::Spec->rootdir ) }
 #pod Keeping a reference to, or modifying the cached object may break the
 #pod behavior documented above and is not supported.  Use at your own risk.
 #pod
-#pod Current API available since 0.097.
+#pod Current API available since 0.119.
 #pod
 #pod =cut
 
 sub tempfile {
-    shift if @_ && $_[0] eq 'Path::Tiny'; # called as method
-    my $opts = ( @_ && ref $_[0] eq 'HASH' ) ? shift @_ : {};
-    $opts = _get_args( $opts, qw/realpath/ );
+    my ( $opts, $maybe_template, $args )
+        = _parse_file_temp_args(tempfile => @_);
 
-    my ( $maybe_template, $args ) = _parse_file_temp_args(@_);
     # File::Temp->new demands TEMPLATE
     $args->{TEMPLATE} = $maybe_template->[0] if @$maybe_template;
 
@@ -394,13 +405,9 @@ sub tempfile {
 }
 
 sub tempdir {
-    shift if @_ && $_[0] eq 'Path::Tiny'; # called as method
-    my $opts = ( @_ && ref $_[0] eq 'HASH' ) ? shift @_ : {};
-    $opts = _get_args( $opts, qw/realpath/ );
+    my ( $opts, $maybe_template, $args )
+        = _parse_file_temp_args(tempdir => @_);
 
-    my ( $maybe_template, $args ) = _parse_file_temp_args(@_);
-
-    # File::Temp->newdir demands leading template
     require File::Temp;
     my $temp = File::Temp->newdir( @$maybe_template, TMPDIR => 1, %$args );
     my $self = $opts->{realpath} ? path($temp)->realpath : path($temp)->absolute;
@@ -414,6 +421,18 @@ sub tempdir {
 
 # normalize the various ways File::Temp does templates
 sub _parse_file_temp_args {
+    my $called_as = shift;
+    if ( @_ && $_[0] eq 'Path::Tiny' ) { shift } # class method
+    elsif ( @_ && eval{$_[0]->isa('Path::Tiny')} ) {
+        my $dir = shift;
+        if (! $dir->is_dir) {
+            $dir->_throw( $called_as, $dir, "is not a directory object" );
+        }
+        push @_, DIR => $dir->stringify; # no overriding
+    }
+    my $opts = ( @_ && ref $_[0] eq 'HASH' ) ? shift @_ : {};
+    $opts = _get_args( $opts, qw/realpath/ );
+
     my $leading_template = ( scalar(@_) % 2 == 1 ? shift(@_) : '' );
     my %args = @_;
     %args = map { uc($_), $args{$_} } keys %args;
@@ -422,7 +441,8 @@ sub _parse_file_temp_args {
         : $leading_template      ? $leading_template
         :                          ()
     );
-    return ( \@template, \%args );
+
+    return ( $opts, \@template, \%args );
 }
 
 #--------------------------------------------------------------------------#
@@ -2156,7 +2176,7 @@ Path::Tiny - File path utility
 
 =head1 VERSION
 
-version 0.118
+version 0.120
 
 =head1 SYNOPSIS
 
@@ -2309,6 +2329,8 @@ Current API available since 0.018.
 
     $temp = Path::Tiny->tempfile( @options );
     $temp = Path::Tiny->tempdir( @options );
+    $temp = $dirpath->tempfile( @options );
+    $temp = $dirpath->tempdir( @options );
     $temp = tempfile( @options ); # optional export
     $temp = tempdir( @options );  # optional export
 
@@ -2338,6 +2360,17 @@ C<< File::Temp->newdir >> instead.
 Both C<tempfile> and C<tempdir> may be exported on request and used as
 functions instead of as methods.
 
+The methods can be called on an instances representing a
+directory. In this case, the directory is used as the base to create the
+temporary file/directory, setting the C<DIR> option in File::Temp.
+
+    my $target_dir = path('/to/destination');
+    my $tempfile = $target_dir->tempfile('foobarXXXXXX');
+    $tempfile->spew('A lot of data...');  # not atomic
+    $tempfile->rename($target_dir->child('foobar')); # hopefully atomic
+
+In this case, any value set for option C<DIR> is ignored.
+
 B<Note>: for tempfiles, the filehandles from File::Temp are closed and not
 reused.  This is not as secure as using File::Temp handles directly, but is
 less prone to deadlocks or access problems on some platforms.  Think of what
@@ -2358,7 +2391,7 @@ B<Note 4>: The cached object may be accessed with the L</cached_temp> method.
 Keeping a reference to, or modifying the cached object may break the
 behavior documented above and is not supported.  Use at your own risk.
 
-Current API available since 0.097.
+Current API available since 0.119.
 
 =head1 METHODS
 
@@ -3285,13 +3318,32 @@ add a module to the list.
 
 This module was featured in the L<2013 Perl Advent Calendar|http://www.perladvent.org/2013/2013-12-18.html>.
 
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/dagolden/Path-Tiny/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/dagolden/Path-Tiny>
+
+  git clone https://github.com/dagolden/Path-Tiny.git
+
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dan Book Dave Rolsky David Steinbrunner Doug Bell Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) regina-verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
+=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dan Book Dave Rolsky David Steinbrunner Doug Bell Flavio Poletti Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) regina-verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
 
 =over 4
 
@@ -3322,6 +3374,10 @@ David Steinbrunner <dsteinbrunner@pobox.com>
 =item *
 
 Doug Bell <madcityzen@gmail.com>
+
+=item *
+
+Flavio Poletti <flavio@polettix.it>
 
 =item *
 

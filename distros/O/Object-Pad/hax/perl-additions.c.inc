@@ -245,3 +245,20 @@ static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
 
   return sv_derived_from_pvn(sv, hvname, HvNAMELEN(hv), HvNAMEUTF8(hv) ? SVf_UTF8 : 0);
 }
+
+#define av_push_from_av_inc(dst, src)    S_av_push_from_av(aTHX_ dst, src, TRUE)
+#define av_push_from_av_noinc(dst, src)  S_av_push_from_av(aTHX_ dst, src, FALSE)
+static void S_av_push_from_av(pTHX_ AV *dst, AV *src, bool refcnt_inc)
+{
+  SSize_t count = av_count(src);
+  SSize_t i;
+
+  av_extend(dst, av_count(dst) + count - 1);
+
+  SV **vals = AvARRAY(src);
+
+  for(i = 0; i < count; i++) {
+    SV *sv = vals[i];
+    av_push(dst, refcnt_inc ? SvREFCNT_inc(sv) : sv);
+  }
+}

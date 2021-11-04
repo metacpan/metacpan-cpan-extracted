@@ -4,4 +4,7 @@ severity = 4
 [-Subroutines::ProhibitSubroutinePrototypes]
 
 [TestingAndDebugging::ProhibitNoWarnings]
-allow = experimental::postderef experimental::signatures
+allow = experimental::signatures experimental::smartmatch
+
+[-RegularExpressions::RequireExtendedFormatting]
+[-ValuesAndExpressions::ProhibitVersionStrings]

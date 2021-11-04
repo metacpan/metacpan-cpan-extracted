@@ -20,9 +20,10 @@ no_index:
 requires:
   Encode: 0
   IO::Socket::INET: 0
+  IO::Socket::IP: 0
   List::Util: 0
   No::Worries: 1.2
   POSIX: 0
   Params::Validate: 0
   Time::HiRes: 0
-version: 2.3
+version: 2.5

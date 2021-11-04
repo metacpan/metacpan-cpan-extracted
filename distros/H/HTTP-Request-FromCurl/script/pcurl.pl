@@ -6,7 +6,7 @@ use HTTP::Request::FromCurl;
 use LWP::UserAgent;
 use Getopt::Long ':config','pass_through';
 
-our $VERSION = '0.25';
+our $VERSION = '0.35';
 
 # parse output options from @ARGV
 GetOptions(
@@ -27,6 +27,6 @@ my @requests = HTTP::Request::FromCurl->new(
 my $ua = LWP::UserAgent->new();
 
 for my $request (@requests) {
-print 
-    $ua->request( $request->as_request, @output_options )->code;
+    print
+        $ua->request( $request->as_request, @output_options )->decoded_content;
 };

@@ -20,7 +20,7 @@ use File::Slurper qw(write_binary);
 our $base;
 our @use = qw(TokiPona);
 
-plan skip_all => 'Contributions are an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
+plan skip_all => 'This is an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
 
 require './t/test.pl';
 

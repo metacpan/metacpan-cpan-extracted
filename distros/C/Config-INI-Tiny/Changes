@@ -3,6 +3,10 @@ Release history for Config-INI-Tiny
 TODO keep_comments keep_empty keep_errors
 TODO unparse from_hash
 
+0.103 Mon 25 Oct 2021
+	- Copyedited cookbook code examples
+	- No functional changes
+
 0.102 Mon 24 Aug 2020
 	- Correct test plans
 

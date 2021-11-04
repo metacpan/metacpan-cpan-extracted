@@ -480,6 +480,24 @@ ok ($count == 120, "Opening/closing of > 100 streams");
 # comment this out for testing!!!
 unlink glob ("test*.$dev");
 
+subtest "Devices" => sub {
+        {
+                my $all_devices = plgDevs();
+                note "All devices: ", explain $all_devices;
+
+                ok exists $all_devices->{null}, 'has null device';
+                is $all_devices->{null}, 'Null device', 'null device description';
+        }
+
+        {
+                my $file_devices = plgFileDevs();
+                note "File devices: ", explain $file_devices;
+
+                ok exists $file_devices->{ps}, 'has ps device';
+                is $file_devices->{ps}, 'PostScript File (monochrome)', 'ps device description';
+        }
+};
+
 done_testing;
 
 # Local Variables:

@@ -1,0 +1,41 @@
+#!perl
+use strict;
+use warnings;
+
+use utf8;
+
+=encoding utf8
+
+=head1 NAME
+
+log-json - reformat JSON input as text
+
+=head1 DESCRIPTION
+
+Takes JSON log lines and provides text output.
+
+If STDOUT is a terminal, ANSI colours will be applied.
+
+=cut
+
+use JSON::MaybeUTF8 qw(:v1);
+
+require Log::Any::Adapter::DERIV;
+
+binmode STDIN, ':encoding(UTF-8)';
+
+my $opts = {};
+$opts->{colour} = 1 if -t STDOUT;
+
+# Ideally we'd be able to flip between single-line for grep, and multi-line for
+# realtime display, but the log messages already have the JSON formatting applied...
+# $Log::Any::Adapter::DERIV::JSON->pretty($opts->{colour});
+
+while(<>) {
+    chomp;
+    print Log::Any::Adapter::DERIV->format_line(
+        decode_json_text($_),
+        $opts
+    ) . "\n";
+}
+

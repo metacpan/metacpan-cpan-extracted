@@ -1,0 +1,104 @@
+NAME
+    Commons::Link - Object for creating link for Wikimedia Commons.
+
+SYNOPSIS
+     use Commons::Link;
+
+     my $obj = Commons::Link->new(%params);
+     my $link = $obj->link($file);
+
+METHODS
+  "new"
+     my $obj = Commons::Link->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "utf-8"
+
+            UTF-8 mode. In UTF-8 mode input string will be encoded to bytes
+            and compute md5 hash.
+
+            Default value is 1.
+
+  "link"
+     my $link = $obj->link($file);
+
+    Get URL from Wikimedia Commons computed from file name. File name could
+    be with 'Image:' and 'File:' prefix or directly file. Spaces are
+    translated to '_'.
+
+    Returns string with URL.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Commons::Link;
+
+     # Object.
+     my $obj = Commons::Link->new;
+
+     # Input name.
+     my $commons_file = 'Michal from Czechia.jpg';
+
+     # URL to file.
+     my $commons_url = $obj->link($commons_file);
+
+     # Print out.
+     print 'Input file: '.$commons_file."\n";
+     print 'Output link: '.$commons_url."\n";
+
+     # Output:
+     # Input file: Michal from Czechia.jpg
+     # Output link: http://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Commons::Link;
+
+     # Object.
+     my $obj = Commons::Link->new;
+
+     # Input name.
+     my $commons_file = 'File:Michal from Czechia.jpg';
+
+     # URL to file.
+     my $commons_url = $obj->link($commons_file);
+
+     # Print out.
+     print 'Input file: '.$commons_file."\n";
+     print 'Output link: '.$commons_url."\n";
+
+     # Output:
+     # Input file: File:Michal from Czechia.jpg
+     # Output link: http://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg
+
+DEPENDENCIES
+    Class::Utils, File::Spec::Functions, Digest::MD5, Readonly,
+    Unicode::UTF8.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Commons-Link>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2021
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

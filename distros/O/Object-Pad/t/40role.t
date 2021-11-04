@@ -66,4 +66,31 @@ pass( 'CClass compiled OK' );
    is( RecurseClass->new->recurse( 5 ), 5, 'role methods can be reëntrant' );
 }
 
+role DRole does BRole {
+   method four { return 4 }
+}
+
+class DClass does DRole {
+}
+
+{
+   my $obj = DClass->new;
+
+   is( $obj->four, 4, 'DClass has DRole method' );
+   is( $obj->two,  2, 'DClass inherited BRole method' );
+}
+
+role ERole does ARole, BRole {
+}
+
+class EClass does ERole {
+}
+
+{
+   my $obj = EClass->new;
+
+   is( $obj->one, 1, 'EClass has a ->one method' );
+   is( $obj->two, 2, 'EClass has a ->two method' );
+}
+
 done_testing;

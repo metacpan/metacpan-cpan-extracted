@@ -56,4 +56,21 @@ $signer = Signer::AWSv4::S3->new(
 $expected_signed_qstring = 'X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20130524%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20130524T000000Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&versionId=1234561zOnAAAJKHxVKBxxEyuy_78901j&X-Amz-Signature=0b515992717e5e9c6813f66947ca059e80df2331fca5989554e8c8b51c729321';
 cmp_ok($signer->signed_qstring, 'eq', $expected_signed_qstring);
 
+$signer = Signer::AWSv4::S3->new(
+  time => Time::Piece->strptime('20130524T000000Z', '%Y%m%dT%H%M%SZ'),
+  access_key => 'AKIAIOSFODNN7EXAMPLE',
+  secret_key => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+  method => 'GET',
+  key => 'test.txt',
+  bucket => 'examplebucket',
+  region => 'us-east-1',
+  expires => 86400,
+  version_id => '1234561zOnAAAJKHxVKBxxEyuy_78901j',
+  content_type => 'text/plain',
+  content_disposition => 'inline; filename=New Name.txt',
+);
+
+$expected_signed_qstring = 'X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20130524%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20130524T000000Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&response-content-disposition=inline%3B%20filename%3DNew%20Name.txt&response-content-type=text%2Fplain&versionId=1234561zOnAAAJKHxVKBxxEyuy_78901j&X-Amz-Signature=d2f2d969d49edb97b90bf67c652b87eee2449750dd2f14c2e1cbe994f1f5e813';
+cmp_ok($signer->signed_qstring, 'eq', $expected_signed_qstring);
+
 done_testing;

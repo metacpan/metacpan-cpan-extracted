@@ -5,7 +5,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.2904
+Version 2.2906
 
 # SYNOPSIS
 
@@ -265,6 +265,28 @@ directory and accessed by **--exdict** option.
     Customized **--ms-style-guide**.  Original dictionary is automatically
     generated from published data.  This dictionary is customized for
     practical use.
+
+# JAPANESE
+
+This module is originaly made for Japanese text editing support.
+
+## KATAKANA
+
+Japanese KATAKANA word have a lot of variants to describe same word,
+and unification is important but tiresome.  In the next example,
+
+    イ[エー]ハトー?([ヴブボ]ォ?)  //  イーハトーヴォ
+
+left pattern matches all following words.
+
+    イエハトブ
+    イーハトヴ
+    イーハトーヴ
+    イーハトーヴォ
+    イーハトーボ
+    イーハトーブ
+
+This module helps to detect and correct them.
 
 # INSTALL
 

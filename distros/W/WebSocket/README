@@ -1,0 +1,207 @@
+NAME
+    WebSocket - WebSocket Client & Server
+
+SYNOPSIS
+        use WebSocket qw( :ws ); # exports standard codes as constant
+
+VERSION
+        v0.1.1
+
+DESCRIPTION
+    This is the client (WebSocket::Client) and server (WebSocket::Server)
+    implementation of WebSocket api. It provides a comprehensive well
+    documented and hopefully easy-to-use implementation.
+
+    Also, this api, by design, does not die, but rather returns "undef" and
+    set an WebSocket::Exception that can be retrieved with the inherited
+    "error" in Module::Generic method.
+
+    It is important to always check the return value of a method. If it
+    returns "undef" and unless this means something else, by default it
+    means an error has occurred and you can retrieve it with the error
+    method. If you fail to check return values, you are in for some trouble.
+    If you would rather have error be fatal, you can instantiate objects
+    with the option *fatal* set to a true value.
+
+    Most of methods here allows chaining.
+
+    You can also find a JavaScript WebSocket client library in this
+    distribution under the "example" folder. The JavaScript library also has
+    a pod documentation.
+
+CONSTRUCTOR
+  new
+    Create a new WebSocket object acting as an accessor.
+
+    One object should be created per po file, because it stores internally
+    the po data for that file in the Text::PO object instantiated.
+
+    Returns the object.
+
+METHODS
+  client
+    Convenient shortcut to instantiate a new WebSocket::Client object,
+    passing it whatever argument was provided.
+
+  compression_threshold
+    Set or get the threshold in bytes above which the ut8 or binary messages
+    will be compressed if the client and the server support compression and
+    it is activated as an extension.
+
+    See "extensions" in WebSocket::Client and "extensions" in
+    WebSocket::Server.
+
+  server
+    Convenient shortcut to instantiate a new WebSocket::Server object,
+    passing it whatever argument was provided.
+
+CONSTANTS
+    The following constants are available, but not exported by default. You
+    can import them into your namespace using either the tag ":ws" or
+    ":all", such as:
+
+        use WebSocket qw( :ws );
+
+  WS_OK
+    Code 1000.
+
+    The default, normal closure (used if no code supplied),
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1000 indicates a normal closure, meaning that the purpose for
+    which the connection was established has been fulfilled."
+
+  WS_GONE
+    Code 1001
+
+    The party is going away, e.g. server is shutting down, or a browser
+    leaves the page.
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1001 indicates that an endpoint is "going away", such as a
+    server going down or a browser having navigated away from a page."
+
+  WS_PROTOCOL_ERROR
+    Code 1002
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1002 indicates that an endpoint is terminating the connection
+    due to a protocol error."
+
+  WS_NOT_ACCEPTABLE
+    Code 1003
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1003 indicates that an endpoint is terminating the connection
+    because it has received a type of data it cannot accept (e.g., an
+    endpoint that understands only text data MAY send this if it receives a
+    binary message)."
+
+  WS_NO_STATUS
+    Code 1005
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1005 is a reserved value and MUST NOT be set as a status code
+    in a Close control frame by an endpoint. It is designated for use in
+    applications expecting a status code to indicate that no status code was
+    actually present."
+
+  WS_CLOSED_ABNORMALLY
+    Code 1006
+
+    No way to set such code manually, indicates that the connection was lost
+    (no close frame).
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1006 is a reserved value and MUST NOT be set as a status code
+    in a Close control frame by an endpoint. It is designated for use in
+    applications expecting a status code to indicate that the connection was
+    closed abnormally, e.g., without sending or receiving a Close control
+    frame."
+
+  WS_BAD_MESSAGE
+    Code 1007
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1007 indicates that an endpoint is terminating the connection
+    because it has received data within a message that was not consistent
+    with the type of the message (e.g., non-UTF-8 [RFC3629
+    <https://datatracker.ietf.org/doc/html/rfc3629>] data within a text
+    message)."
+
+  WS_FORBIDDEN
+    Code 1008
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1008 indicates that an endpoint is terminating the connection
+    because it has received a message that violates its policy. This is a
+    generic status code that can be returned when there is no other more
+    suitable status code (e.g., 1003 or 1009) or if there is a need to hide
+    specific details about the policy."
+
+  WS_MESSAGE_TOO_LARGE
+    Code 1009
+
+    The message is too big to process.
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1009 indicates that an endpoint is terminating the connection
+    because it has received a message that is too big for it to process."
+
+  WS_EXTENSIONS_NOT_AVAILABLE
+    Code 1010
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1010 indicates that an endpoint (client) is terminating the
+    connection because it has expected the server to negotiate one or more
+    extension, but the server didn't return them in the response message of
+    the WebSocket handshake. The list of extensions that are needed SHOULD
+    appear in the /reason/ part of the Close frame. Note that this status
+    code is not used by the server, because it can fail the WebSocket
+    handshake instead."
+
+  WS_INTERNAL_SERVER_ERROR
+    Code 1011
+
+    Unexpected error on server.
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1011 indicates that a server is terminating the connection
+    because it encountered an unexpected condition that prevented it from
+    fulfilling the request."
+
+  WS_TLS_HANDSHAKE_FAIL
+    Code 1015
+
+    rfc6455 <https://tools.ietf.org/html/rfc6455#section-7.4.1> describes
+    this as: "1015 is a reserved value and MUST NOT be set as a status code
+    in a Close control frame by an endpoint. It is designated for use in
+    applications expecting a status code to indicate that the connection was
+    closed due to a failure to perform a TLS handshake (e.g., the server
+    certificate can't be verified)."
+
+CREDITS
+    Graham Ollis for AnyEvent::WebSocket::Client, Eric Wastl for
+    Net::WebSocket::Server, Vyacheslav Tikhanovsky aka VTI for
+    Protocol::WebSocket
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    Mozilla documentation
+    <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API>
+
+    WebSocket::Client, WebSocket::Common, WebSocket::Connection,
+    WebSocket::Exception, WebSocket::Extension, WebSocket::Frame,
+    WebSocket::Handshake, WebSocket::Handshake::Client,
+    WebSocket::Handshake::Server, WebSocket::Headers,
+    WebSocket::HeaderValue, WebSocket::Request, WebSocket::Response,
+    WebSocket::Server, WebSocket::Version
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2021 DEGUEST Pte. Ltd.
+
+    You can use, copy, modify and redistribute this package and associated
+    files under the same terms as Perl itself.
+

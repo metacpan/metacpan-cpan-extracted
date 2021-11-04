@@ -1,6 +1,6 @@
 # ABSTRACT: Interface to Popular Shipping Services
 package Shipment;
-$Shipment::VERSION = '3.05';
+$Shipment::VERSION = '3.06';
 use Shipment::Address;
 use Shipment::Package;
 
@@ -14,6 +14,12 @@ use Shipment::Temando;
 sub generic {
     shift;
     return Shipment::Generic->new(@_);
+}
+
+
+sub canadapost {
+    shift;
+    return Shipment::CanadaPost->new(@_);
 }
 
 
@@ -67,7 +73,7 @@ Shipment - Interface to Popular Shipping Services
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 
@@ -105,6 +111,10 @@ For code examples, see https://github.com/pullingshots/Shipment/tree/master/eg
 
   The generic method returns a L<Shipment::Generic> object. See L<Shipment::Generic> for
   more details.
+
+=item canadapost
+
+The fedex method returns a L<Shipment::CanadaPost> object. See L<Shipment::CanadaPost> for more details.
 
 =item fedex
 

@@ -5,13 +5,20 @@ MANIFEST
 Makefile.PL
 README
 examples/cyclo_poly
+examples/int_factors
+examples/int_plusfactors
+examples/lucas_cd
+examples/schinzel_cd
 lib/Math/Polynomial/Cyclotomic.pm
 t/01_basics.t
 t/02_memoized.t
+t/03_aurifeuille.t
 t/90_pod.t
 t/91_pod_cover_cp.t
 t/92_consistency.t
+t/95_versions.t
 t/99_signature.t
+t/data/KNOWN_VERSIONS
 t/lib/Test/MyUtils.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

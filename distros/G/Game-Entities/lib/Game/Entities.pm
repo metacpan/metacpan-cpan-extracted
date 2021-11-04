@@ -12,7 +12,7 @@ use Sub::Util    ();
 
 use experimental 'signatures';
 
-our $VERSION = '0.011';
+our $VERSION = '0.100';
 
 # The main entity registry, inspired by https://github.com/skypjack/entt
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintRequest;
-$Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintRequest::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               TrackingNumber
               CloseReportType
 
-              )
+            )
         ],
         {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
             'ClientDetail'            => \%ClientDetail_of,
@@ -90,7 +90,7 @@ Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

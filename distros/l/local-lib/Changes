@@ -1,5 +1,25 @@
 Revision history for local::lib
 
+2.000028 - 2021-10-17
+ - fix skips in shell test when shell has unpredictable startup actions
+
+2.000027 - 2021-10-14
+ - releasing as stable
+
+2.000_026 - 2021-10-11
+ - fix output redirection used in fish shell to work with newer versions
+ - fix optional function used on Win32 for finding the current directory
+
+2.000_025 - 2020-07-30
+ - add documentation for --quiet option
+ - added --always option to always add requested directory to env vars, even
+   if they are already included
+ - improve shell test to be more resiliant against custom init scripts
+ - improved test diagnostics
+ - reorganized documentation for bootstrapping into a non-standard directory
+ - remove mentions of File::HomeDir from documentation, as it is no longer
+   used
+
 2.000024 - 2017-10-08
  - be compatible with CPAN.pm 1.82 to 1.86_51 during bootstrap process
 

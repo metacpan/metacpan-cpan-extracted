@@ -1,5 +1,12 @@
 Revision history for Game-Entities
 
+0.100     2021-10-31 17:01:12+00:00 Europe/London
+
+    New:
+        - Added CI config
+    Changes:
+        - Small documentation tweaks
+
 0.011     2021-08-17 21:33:36+01:00 Europe/London
 
     New:

@@ -3,7 +3,7 @@ NAME
     localtime/gmtime tuple
 
 VERSION
-    This document describes version 0.001 of Time::Local::More (from Perl
+    This document describes version 0.002 of Time::Local::More (from Perl
     distribution Time-Local-More), released on 2021-06-17.
 
 SYNOPSIS
@@ -447,7 +447,12 @@ BUGS
 SEE ALSO
     Time::Local
 
-    "localtime()" and "gmtime()" in perlfunc
+    "localtime()" and "gmtime()" in perlfunc.
+
+    You can also use DateTime to calculate these "start of period" epochs.
+    For example, to get start of month epoch: "DateTime->now->set(day =>
+    1)->epoch". Note that DateTime has a significantly larger footprint than
+    Time::Local.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

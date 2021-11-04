@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.029'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -130,6 +130,7 @@ sub parse_file {
 my %nodetypes = (
     MAPVALUE     => 'NODETYPE_COMPLEX',
     MAP          => 'NODETYPE_MAP',
+#    IMAP         => 'NODETYPE_SEQ',
     SEQ          => 'NODETYPE_SEQ',
     SEQ0         => 'NODETYPE_SEQ',
     FLOWMAP      => 'NODETYPE_FLOWMAP',
@@ -242,7 +243,9 @@ sub lex_next_tokens {
 
 my %next_event = (
     MAP => 'MAPVALUE',
+    IMAP => 'IMAPVALUE',
     MAPVALUE => 'MAP',
+    IMAPVALUE => 'IMAP',
     SEQ => 'SEQ',
     SEQ0 => 'SEQ0',
     DOC => 'DOC_END',
@@ -255,6 +258,7 @@ my %next_event = (
 
 my %event_to_method = (
     MAP => 'mapping',
+    IMAP => 'mapping',
     FLOWMAP => 'mapping',
     SEQ => 'sequence',
     SEQ0 => 'sequence',
@@ -264,6 +268,7 @@ my %event_to_method = (
     VAL => 'scalar',
     ALI => 'alias',
     MAPVALUE => 'mapping',
+    IMAPVALUE => 'mapping',
 );
 
 #sub process_events {
@@ -587,9 +592,9 @@ sub end_flow_mapping {
 }
 
 sub start_mapping {
-    my ($self, $offset) = @_;
+    my ($self, $offset, $implicit_flowseq_map) = @_;
     my $offsets = $self->offset;
-    push @{ $self->events }, 'MAP';
+    push @{ $self->events }, $implicit_flowseq_map ? 'IMAP' : 'MAP';
     push @{ $offsets }, $offset;
     my $event_stack = $self->event_stack;
     my $info = { name => 'mapping_start_event' };
@@ -1013,7 +1018,12 @@ sub cb_send_mapkey {
 sub cb_send_scalar {
     my ($self, $res) = @_;
     my $last = pop @{ $self->event_stack };
+    return unless $last;
     $self->scalar_event($last->[1]);
+    my $e = $self->events;
+    if ($e->[-1] eq 'IMAP') {
+        $self->end_flow_mapping;
+    }
 }
 
 sub cb_empty_mapkey {
@@ -1176,6 +1186,7 @@ sub cb_start_flowmap {
 
 sub cb_end_flowseq {
     my ($self, $res) = @_;
+    $self->cb_send_scalar;
     $self->end_flow_sequence;
     $self->set_new_node(0);
 }
@@ -1185,6 +1196,7 @@ sub cb_flow_comma {
     my $event_types = $self->events;
     $self->set_new_node(0);
     if ($event_types->[-1] =~ m/^FLOWSEQ/) {
+        $self->cb_send_scalar;
         $event_types->[-1] = $next_event{ $event_types->[-1] };
     }
 }
@@ -1266,6 +1278,21 @@ sub cb_flowkey_quoted {
     $self->scalar_event($info);
 }
 
+sub cb_empty_flowmap_key_value {
+    my ($self, $token) = @_;
+    $self->cb_empty_flow_mapkey($token);
+    $self->cb_empty_flowmap_value;
+    $self->cb_flow_comma;
+}
+
+sub cb_end_empty_flowmap_key_value {
+    my ($self, $token) = @_;
+    $self->cb_empty_flow_mapkey($token);
+    $self->cb_empty_flowmap_value;
+    $self->cb_flow_comma;
+    $self->cb_end_flowmap;
+}
+
 sub cb_empty_flowmap_value {
     my ($self, $token) = @_;
     my $stack = $self->event_stack;
@@ -1278,6 +1305,18 @@ sub cb_empty_flowmap_value {
         $self->fetch_inline_properties($stack, $info);
     }
     $self->scalar_event($info);
+}
+
+sub cb_empty_flowseq_comma {
+    my ($self, $token) = @_;
+    $self->cb_empty_flowmap_value($token);
+    $self->cb_flow_comma;
+}
+
+sub cb_empty_flowseq_end {
+    my ($self, $token) = @_;
+    $self->cb_empty_flowmap_value($token);
+    $self->cb_end_flowseq;
 }
 
 sub cb_insert_map_alias {
@@ -1298,6 +1337,26 @@ sub cb_insert_map {
     $self->start_mapping($info->{offset});
     $self->scalar_event($info);
     $self->set_new_node(1);
+}
+
+sub cb_insert_implicit_flowseq_map {
+    my ($self, $res) = @_;
+    my $stack = $self->event_stack;
+    my $scalar = pop @$stack;
+    my $info = $scalar->[1];
+    $self->start_mapping($info->{offset}, 1);
+    $self->scalar_event($info);
+    $self->set_new_node(1);
+}
+
+sub cb_insert_empty_implicit_flowseq_map {
+    my ($self, $res) = @_;
+    my $stack = $self->event_stack;
+    my $scalar = pop @$stack;
+    my $info = $scalar->[1];
+    $self->start_mapping($info->{offset}, 1);
+    $self->cb_empty_flowmap_value;
+    $self->set_new_node(2);
 }
 
 sub cb_insert_empty_map {

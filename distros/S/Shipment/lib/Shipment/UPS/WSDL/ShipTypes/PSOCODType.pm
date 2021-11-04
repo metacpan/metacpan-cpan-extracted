@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::PSOCODType;
-$Shipment::UPS::WSDL::ShipTypes::PSOCODType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::PSOCODType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,13 +29,13 @@ Class::Std::initialize();
         [   qw(        CODFundsCode
               CODAmount
 
-              )
+            )
         ],
         {   'CODFundsCode' => \%CODFundsCode_of,
             'CODAmount'    => \%CODAmount_of,
         },
         {   'CODFundsCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CODAmount' =>
+            'CODAmount'    =>
               'Shipment::UPS::WSDL::ShipTypes::CurrencyMonetaryType',
         },
         {
@@ -62,7 +62,7 @@ Shipment::UPS::WSDL::ShipTypes::PSOCODType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

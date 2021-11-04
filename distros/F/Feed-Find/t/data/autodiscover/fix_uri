@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use feature 'say';
+
+use File::Slurp;
+
+sub fix_one {
+  my ($file) = @_;
+
+  my $html = read_file $file;
+
+  $html =~ s|https://web.archive.org/web/\d+/http://www.ragingplatypus.com|http://example.com|g;
+
+  write_file($file, $html);
+}
+
+for (@ARGV) {
+  say $_;
+  fix_one($_);
+}

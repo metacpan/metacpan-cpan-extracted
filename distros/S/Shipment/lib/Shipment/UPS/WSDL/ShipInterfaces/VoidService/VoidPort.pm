@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipInterfaces::VoidService::VoidPort;
-$Shipment::UPS::WSDL::ShipInterfaces::VoidService::VoidPort::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipInterfaces::VoidService::VoidPort::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -30,7 +30,7 @@ sub ProcessVoid {
     die "ProcessVoid must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ProcessVoid',
+        {   operation   => 'ProcessVoid',
             soap_action =>
               'http://onlinetools.ups.com/webservices/VoidBinding/v1.1',
             style => 'document',
@@ -49,7 +49,7 @@ sub ProcessVoid {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
 
             },
@@ -118,7 +118,7 @@ Shipment::UPS::WSDL::ShipInterfaces::VoidService::VoidPort
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

@@ -13,7 +13,7 @@
 # ABSTRACT: Analyze chess games in PGN format
 
 package Chess::Plisco::Engine::TimeControl;
-$Chess::Plisco::Engine::TimeControl::VERSION = '0.3';
+$Chess::Plisco::Engine::TimeControl::VERSION = '0.4';
 use strict;
 
 use Time::HiRes qw(gettimeofday);
@@ -57,6 +57,7 @@ sub new {
 
 	if ($params{movetime}) {
 		$tree->{allocated_time} = $params{movetime};
+		$tree->{fixed_time} = 1;
 	} elsif ($params{infinite}) {
 		$tree->{max_depth} = Plisco::Engine::Tree->MAX_PLY;
 	} elsif ($params{nodes}) {

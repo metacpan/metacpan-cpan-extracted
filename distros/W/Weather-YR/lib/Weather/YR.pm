@@ -13,29 +13,35 @@ Weather::YR - Object-oriented interface to Yr.no's weather service.
 
 =head1 VERSION
 
-Version 0.38.
+Version 0.45.
 
 =cut
 
-our $VERSION = '0.38';
+our $VERSION = '0.45';
 
 =head1 SYNOPSIS
 
     use Weather::YR;
     use DateTime::TimeZone;
+    use LWP::UserAgent;
+    use feature 'say';
 
     my $yr = Weather::YR->new(
-        lat => 63.590833,
-        lon => 10.741389,
-        tz  => DateTime::TimeZone->new( name => 'Europe/Oslo' ),
+        lang => 'en',
+        lat  => 63.5908,
+        lon  => 10.7414,
+        tz   => DateTime::TimeZone->new( name => 'Europe/Oslo' ),
+        ua   => LWP::UserAgent->new(
+            agent => 'AcmeWeatherApp/0.9 support@example.com',
+        ),
     );
 
     foreach my $day ( @{$yr->location_forecast->days} ) {
-        say $day->date . ':';
-        say ' ' x 4 . 'Temperature = ' . $day->temperature->celsius;
+        say 'Weather data for ' . $day->date->ymd . ':';
+        say ' ' x 4 . 'Temperature @ ' . $day->temperature->from->hms . ': ' . $day->temperature->celsius;
 
         foreach my $dp ( @{$day->datapoints} ) {
-            say ' ' x 4 . 'Wind direction: ' . $dp->wind_direction->name;
+            say ' ' x 4 . 'Wind direction @ ' . $dp->wind_direction->from->hms . ': ' . $dp->wind_direction->name;
         }
     }
 
@@ -106,8 +112,6 @@ __PACKAGE__->meta->make_immutable;
 
 =item * Add support for more of Yr.no's APIs.
 
-=item * Translate wind speed names/descriptions.
-
 =back
 
 =head1 BUGS
@@ -120,15 +124,23 @@ the github interface at L<https://github.com/toreau/Weather-YR/issues>.
 
 =over 4
 
-=item * Tore Aursand, 2014-2016, C<< toreau@gmail.com >>
+=item * Tore Aursand, 2014-2021, C<< toreau@gmail.com >>
 
-=item * Knut-Olav Hoven, 2008-2014, C<< knut-olav@hoven.ws >>
+=item * Knut-Olav Hoven, 2008-2013, C<< knut-olav@hoven.ws >>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item * Andreas Vögele
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2016, ABC Startsiden.
+Copyright 2014-2021, Tore Aursand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

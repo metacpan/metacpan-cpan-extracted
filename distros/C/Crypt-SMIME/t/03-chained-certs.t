@@ -216,9 +216,8 @@ sub smime_check_ok {
         my $time = time + $opts{'add_time'};
         lives_ok { $SMIME->setAtTime($time) } "set verify timestamp to ".localtime($time);
     }
-    if( defined $opts{'fail_with'} ) {
-        my $pattern = $opts{'fail_with'};
-        throws_ok { $checked = $SMIME->check($signed) } qr/$pattern/i, 'check must fail with exception';
+    if ($opts{'expect_failure'}) {
+        dies_ok { $checked = $SMIME->check($signed) }, 'check must fail with exception';
     } else {
         lives_ok { $checked = $SMIME->check($signed) } 'check';
         is($checked, $verified, '$verified eq check(sign($plain))');
@@ -230,5 +229,4 @@ smime_check_ok('with timestamp of tomorrow',
   'add_time' => 60*60*24 );
 smime_check_ok('with timestamp of in one year',
   'add_time' => 60*60*24*365,
-  'fail_with' => 'CMS_SIGNERINFO_VERIFY_CERT' );
-
+  'expect_failure' => 1);

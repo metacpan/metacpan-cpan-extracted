@@ -38,15 +38,15 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Polynomial-Cyclotomic
+    GitHub, the home of this distribution's repository
+        https://github.com/mhasch/perl-Math-Polynomial-Cyclotomic
 
-    Search CPAN
+    metacpan, a CPAN search engine
         https://metacpan.org/release/Math-Polynomial-Cyclotomic
 
 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2019 by Martin Becker.
+This software is Copyright (c) 2019-2021 by Martin Becker.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

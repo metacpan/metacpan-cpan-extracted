@@ -18,20 +18,20 @@ filters {
 
 our %NOT_BEFORE = (
     year      => 2020,
-    month     =>  4,
-    day       => 19,
-    hour      => 12,
-    minute    => 10,
-    second    => 14,
+    month     =>  3,
+    day       => 23,
+    hour      => 00,
+    minute    => 00,
+    second    => 00,
     time_zone => 'UTC'
 );
 our %NOT_AFTER  = (
-    year      => 2020,
-    month     =>  7,
-    day       => 18,
+    year      => 2022,
+    month     =>  5,
+    day       => 17,
     hour      => 12,
-    minute    => 10,
-    second    => 14,
+    minute    => 00,
+    second    => 00,
     time_zone => 'UTC'
 );
 
@@ -63,8 +63,8 @@ run {
 }
 
 __END__
-=== rt.cpan.org
---- input: rt.cpan.org
+=== badssl.com
+--- input: badssl.com
 --- expire_date
 DateTime->new(%main::NOT_AFTER);
 --- begin_date

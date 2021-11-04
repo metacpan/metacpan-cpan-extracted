@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::confirmManifest;
-$Shipment::Temando::WSDL::Elements::confirmManifest::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::confirmManifest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ use warnings;
                   listRequests
                   labelPrinterType
 
-                  )
+                )
             ],
             {   'carrierId'          => \%carrierId_of,
                 'clientId'           => \%clientId_of,
@@ -73,7 +73,7 @@ use warnings;
                 'startReadyDate'     => 'Shipment::Temando::WSDL::Types::Date',
                 'endReadyDate'       => 'Shipment::Temando::WSDL::Types::Date',
                 'confirmedReadyDate' => 'Shipment::Temando::WSDL::Types::Date',
-                'listRequests' =>
+                'listRequests'       =>
                   'Shipment::Temando::WSDL::Types::YesNoOption',
                 'labelPrinterType' =>
                   'Shipment::Temando::WSDL::Types::LabelPrinterType',
@@ -111,7 +111,7 @@ Shipment::Temando::WSDL::Elements::confirmManifest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

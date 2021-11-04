@@ -20,17 +20,17 @@ has base => (
     is  => 'rw',
     isa => 'Str',
     required => 1,
-    );
+);
 
 has binddn => (
     is  => 'rw',
     isa => 'Str',
-    );
+);
 
 has password => (
     is  => 'rw',
     isa => 'Str',
-    );
+);
 
 has filter => (
     is  => 'rw',
@@ -38,56 +38,138 @@ has filter => (
 #    isa => 'Str|Net::LDAP::Filter',
     isa => 'Str',
     required => 1,
-    );
+);
 
 has attrs => (
     is  => 'rw',
     isa => 'ArrayRef|Str',
     trigger => \&_convert_attrs
-    );
+);
 
 has scope => (
     is  => 'rw',
     isa => 'Str',
-    );
+);
 
 has timeout => (
     is  => 'rw',
     isa => 'Int',
-    );
+);
 
 has keepalive => (
     is  => 'rw',
     isa => 'Int',
-    );
+);
 
 has timelimit => (
     is  => 'rw',
     isa => 'Int',
-    );
+);
 
 has sizelimit => (
     is  => 'rw',
     isa => 'Int',
-    );
+);
+
+has multihomed => (
+    is => 'rw',
+    isa => 'Int',
+);
+
+has localaddr => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+has raw => (
+    is  => 'rw',
+    isa => 'RegexpRef|Undef',
+    default => sub { return qr/(?i:;binary)/; },
+);
 
 has debug => (
     is  => 'rw',
     isa => 'Int',
     default => 0,
-    );
+);
 
-# ssl options
+# ssl certificate options in SSLUserAgent format
+has certificate_file => (
+    is => 'rw',
+    isa => 'Str',
+);
+
+has certificate_key_file => (
+    is => 'rw',
+    isa => 'Str',
+);
+
+has ca_certificate_path => (
+    is => 'rw',
+    isa => 'Str',
+);
+
+has ca_certificate_file => (
+    is => 'rw',
+    isa => 'Str',
+);
+
+has ssl_ignore_mode => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
+# ssl options in Net::LDAP format
 has verify => (
     is  => 'rw',
-    isa => 'Str',
-    );
+    isa => 'Str|Undef',
+    lazy => 1,
+    default => sub { shift->ssl_ignore_mode() ? 'none' : undef }
+);
 
 has capath => (
     is  => 'rw',
-    isa => 'Str',
-    );
+    isa => 'Str|Undef',
+    lazy => 1,
+    default => sub { shift->ca_certificate_path(); }
+);
 
+has cafile => (
+    is  => 'rw',
+    isa => 'Str|Undef',
+    lazy => 1,
+    default => sub { shift->ca_certificate_file(); }
+);
+
+has sslversion => (
+    is => 'rw',
+    isa => 'Str',
+);
+
+has ciphers => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+has clientcert => (
+    is  => 'rw',
+    isa => 'Str|Undef',
+    lazy => 1,
+    default => sub { shift->certificate_file(); }
+);
+
+has clientkey => (
+    is  => 'rw',
+    isa => 'Str|Undef',
+    lazy => 1,
+    default => sub { shift->certificate_key_file(); }
+);
+
+has checkcrl => (
+    is  => 'rw',
+    isa => 'Int',
+);
 
 has bind => (
     is  => 'ro',
@@ -126,16 +208,19 @@ sub _build_options {
 
     my %options;
     foreach my $key (@_) {
-    if (defined $self->$key()) {
-        $options{$key} = $self->$key();
-    }
+        if (defined $self->$key()) {
+            $options{$key} = $self->$key();
+        }
     }
     return %options;
 }
 
 sub _build_new_options {
     my $self = shift;
-    return $self->_build_options(qw( timeout verify capath keepalive debug ));
+    return $self->_build_options(qw(
+        timeout verify  keepalive debug raw multihomed localaddr
+        verify sslversion ciphers capath cafile capath clientcert clientkey checkcrl
+    ));
 }
 
 sub _build_bind_options {
@@ -205,6 +290,7 @@ sub _init_bind {
 
     my $mesg;
     if (defined $self->binddn()) {
+        $self->log()->debug('Binding with ' . $self->binddn());
         my %options = $self->_build_bind_options();
         $self->log()->warn('Binding with DN but without password') if (!defined $options{password});
         $mesg = $ldap->bind(
@@ -213,6 +299,7 @@ sub _init_bind {
         );
     } else {
         # anonymous bind
+        $self->log()->debug('Binding anonymously');
         $mesg = $ldap->bind(
             $self->_build_bind_options(),
         );
@@ -252,13 +339,19 @@ sub _getbyDN {
 
     my $ldap = $self->ldap();
 
-    my $mesg = $ldap->search( base => $dn, scope  => 'base', filter => '(objectclass=*)');
+    my %options = $self->_build_options(qw( sizelimit timelimit ));
+    $options{attrs} = $params->{attrs} if ($params->{attrs});
+
+    my $mesg = $ldap->search( base => $dn, scope  => 'base', filter => '(objectclass=*)', %options );
 
     if ($self->_is_transient_error($mesg)) {
-        $mesg = $ldap->search( base => $dn, scope  => 'base', filter => '(objectclass=*)');
+        $mesg = $ldap->search( base => $dn, scope  => 'base', filter => '(objectclass=*)', %options );
     }
 
-    return if ($mesg->is_error());
+    if ($mesg->is_error()) {
+        $self->log()->debug("LDAP getByDN failed with error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
+        return;
+    }
 
     if ( $mesg->count() == 1) {
 
@@ -581,11 +674,47 @@ with the same name, see Net::LDAP for details.
 
 =item keepalive
 
+=item multihomed
+
+=item localaddr
+
 =item debug
 
-=item verify
+=item raw
 
-=item capath
+Enables utf8 for returned attribute values. The default value is
+qr/;binary/, set this to a Regex reference to change the attribute
+pattern for utf8 conversion or set I<undef> to disable it.
+
+=back
+
+=head3 SSL connection options
+
+SSl related options are passed to Net::LDAP->new, see Net::LDAP for
+details. The attribute names in brackets are identical to the ones
+used in the HTTP based connectors and mapped to their equivalents.
+
+Note that mapping takes place at first init, so modifications to those
+values after the first connection will not be visibile. The native
+parameter names are superior.
+
+=over
+
+=item verify (ssl_ignore_mode - 'reqiured' if true)
+
+=item sslversion
+
+=item ciphers
+
+=item capath (ca_certificate_path)
+
+=item cafile (ca_certificate_file)
+
+=item clientcert (certificate_file)
+
+=item clientkey (certificate_key_file)
+
+=item checkcrl
 
 =back
 

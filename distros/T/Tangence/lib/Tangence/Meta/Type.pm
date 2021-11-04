@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Type 0.26;
+use v5.26;
+use Object::Pad 0.41;
 
-use v5.14;
-use warnings;
+package Tangence::Meta::Type 0.27;
+class Tangence::Meta::Type :strict(params);
 
 use Carp;
 
@@ -20,7 +21,8 @@ This data structure object represents information about a type, such as a
 method or event argument, a method return value, or a property element type.
 
 Due to their simple contents and immutable nature, these objects may be
-implemented as singletons.
+implemented as singletons. Repeated calls to the constructor method for the
+same type name will yield the same instance.
 
 =cut
 
@@ -28,13 +30,13 @@ implemented as singletons.
 
 =cut
 
-=head2 new
+=head2 make
 
-   $type = Tangence::Meta::Type->new( $primitive )
+   $type = Tangence::Meta::Type->make( $primitive )
 
 Returns an instance to represent the given primitive type signature.
 
-   $type = Tangence::Meta::Type->new( $aggregate => $member_type )
+   $type = Tangence::Meta::Type->make( $aggregate => $member_type )
 
 Returns an instance to represent the given aggregation of the given type
 instance.
@@ -45,48 +47,51 @@ our %PRIMITIVES;
 our %LISTS;
 our %DICTS;
 
-sub new
+sub make
 {
    my $class = shift;
 
    if( @_ == 1 ) {
       my ( $sig ) = @_;
-      return $PRIMITIVES{$sig} ||= bless [ prim => $sig ], $class;
+      return $PRIMITIVES{$sig} //=
+         $class->new( member_type => $sig );
    }
    elsif( @_ == 2 and $_[0] eq "list" ) {
       my ( undef, $membertype ) = @_;
-      return $LISTS{$membertype->sig} ||= bless [ list => $membertype ], $class;
+      return $LISTS{$membertype->sig} //=
+         $class->new( aggregate => "list", member_type => $membertype );
    }
    elsif( @_ == 2 and $_[0] eq "dict" ) {
       my ( undef, $membertype ) = @_;
-      return $DICTS{$membertype->sig} ||= bless [ dict => $membertype ], $class;
+      return $DICTS{$membertype->sig} //=
+         $class->new( aggregate => "dict", member_type => $membertype );
    }
 
    die "TODO: @_";
 }
 
-=head2 new_from_sig
+=head2 make _from_sig
 
-   $type = Tangence::Meta::Type->new_from_sig( $sig )
+   $type = Tangence::Meta::Type->make_from_sig( $sig )
 
 Parses the given full Tangence type signature and returns an instance to
 represent it.
 
 =cut
 
-sub new_from_sig
+sub make_from_sig ( $class, $sig )
 {
-   my $class = shift;
-   my ( $sig ) = @_;
-
    $sig =~ m/^list\((.*)\)$/ and
-      return $class->new( list => $class->new_from_sig( $1 ) );
+      return $class->make( list => $class->make_from_sig( $1 ) );
 
    $sig =~ m/^dict\((.*)\)$/ and
-      return $class->new( dict => $class->new_from_sig( $1 ) );
+      return $class->make( dict => $class->make_from_sig( $1 ) );
 
-   return $class->new( $sig );
+   return $class->make( $sig );
 }
+
+has $aggregate   :param :reader = "prim";
+has $member_type :param;
 
 =head1 ACCESSORS
 
@@ -101,12 +106,6 @@ dict aggregate types.
 
 =cut
 
-sub aggregate
-{
-   my $self = shift;
-   return $self->[0];
-}
-
 =head2 member_type
 
    $member_type = $type->member_type
@@ -116,11 +115,10 @@ primitive types.
 
 =cut
 
-sub member_type
+method member_type
 {
-   my $self = shift;
-   die "Cannot return the member type for primitive types" if $self->[0] eq "prim";
-   return $self->[1];
+   die "Cannot return the member type for primitive types" if $aggregate eq "prim";
+   return $member_type;
 }
 
 =head2 sig
@@ -131,28 +129,24 @@ Returns the Tangence type signature for the type.
 
 =cut
 
-sub sig
+method sig
 {
-   my $self = shift;
-   $self->${\"_sig_for_$self->[0]"}();
+   return $self->${\"_sig_for_$aggregate"}();
 }
 
-sub _sig_for_prim
+method _sig_for_prim
 {
-   my $self = shift;
-   return $self->[1];
+   return $member_type;
 }
 
-sub _sig_for_list
+method _sig_for_list
 {
-   my $self = shift;
-   return "list(" . $self->[1]->sig . ")";
+   return "list(" . $member_type->sig . ")";
 }
 
-sub _sig_for_dict
+method _sig_for_dict
 {
-   my $self = shift;
-   return "dict(" . $self->[1]->sig . ")";
+   return "dict(" . $member_type->sig . ")";
 }
 
 =head1 AUTHOR

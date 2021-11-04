@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::CommodityType;
-$Shipment::UPS::WSDL::ShipTypes::CommodityType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::CommodityType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        FreightClass
               NMFC
 
-              )
+            )
         ],
         {   'FreightClass' => \%FreightClass_of,
             'NMFC'         => \%NMFC_of,
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::CommodityType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

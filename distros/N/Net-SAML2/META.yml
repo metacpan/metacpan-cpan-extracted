@@ -1,54 +1,133 @@
 ---
 abstract: 'SAML bindings and protocol implementation'
 author:
-  - 'Chris Andrews <chrisandrews@venda.com>'
+  - 'Chris Andrews  <chrisa@cpan.org>'
 build_requires:
-  Dancer: 1.2000
-  ExtUtils::MakeMaker: 6.56
-  Test::More: 0.88
-  WWW::Mechanize: 1.66
-  YAML: 0
+  Import::Into: '0'
+  Path::Tiny: '0'
+  Sub::Override: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::Fatal: '0'
+  Test::Lib: '0'
+  Test::More: '0'
+  Test::NoTabs: '0'
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+  URI::URL: '0'
+  XML::LibXML::XPathContext: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.56
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.04'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-SAML2
-no_index:
-  directory:
-    - inc
-    - t
+provides:
+  Net::SAML2:
+    file: lib/Net/SAML2.pm
+    version: '0.44'
+  Net::SAML2::Binding::POST:
+    file: lib/Net/SAML2/Binding/POST.pm
+    version: '0.44'
+  Net::SAML2::Binding::Redirect:
+    file: lib/Net/SAML2/Binding/Redirect.pm
+    version: '0.44'
+  Net::SAML2::Binding::SOAP:
+    file: lib/Net/SAML2/Binding/SOAP.pm
+    version: '0.44'
+  Net::SAML2::IdP:
+    file: lib/Net/SAML2/IdP.pm
+    version: '0.44'
+  Net::SAML2::Protocol::ArtifactResolve:
+    file: lib/Net/SAML2/Protocol/ArtifactResolve.pm
+    version: '0.44'
+  Net::SAML2::Protocol::Assertion:
+    file: lib/Net/SAML2/Protocol/Assertion.pm
+    version: '0.44'
+  Net::SAML2::Protocol::AuthnRequest:
+    file: lib/Net/SAML2/Protocol/AuthnRequest.pm
+    version: '0.44'
+  Net::SAML2::Protocol::LogoutRequest:
+    file: lib/Net/SAML2/Protocol/LogoutRequest.pm
+    version: '0.44'
+  Net::SAML2::Protocol::LogoutResponse:
+    file: lib/Net/SAML2/Protocol/LogoutResponse.pm
+    version: '0.44'
+  Net::SAML2::Role::ProtocolMessage:
+    file: lib/Net/SAML2/Role/ProtocolMessage.pm
+    version: '0.44'
+  Net::SAML2::SP:
+    file: lib/Net/SAML2/SP.pm
+    version: '0.44'
+  Net::SAML2::Util:
+    file: lib/Net/SAML2/Util.pm
+    version: '0.44'
+  Net::SAML2::XML::Sig:
+    file: lib/Net/SAML2/XML/Sig.pm
+    version: '0.44'
+  Net::SAML2::XML::Util:
+    file: lib/Net/SAML2/XML/Util.pm
+    version: '0.44'
 requires:
-  Class::Accessor: 0
-  Crypt::OpenSSL::Bignum: 0
-  Crypt::OpenSSL::DSA: 0
-  Crypt::OpenSSL::RSA: 0
-  Crypt::OpenSSL::Random: 0
-  Crypt::OpenSSL::VerifyX509: 0
-  Crypt::OpenSSL::X509: 0
-  DateTime::Format::XSD: 0
-  Digest::SHA1: 0
-  File::Slurp: 0
-  IO::Compress::RawDeflate: 0
-  IO::Uncompress::RawInflate: 0
-  LWP::UserAgent: 0
-  MIME::Base64: 0
-  Moose: 0
-  MooseX::Types: 0
-  MooseX::Types::Common: 0
-  MooseX::Types::DateTime: 0
-  MooseX::Types::URI: 0
-  URI: 0
-  XML::CanonicalizeXML: 0
-  XML::Generator: 0
-  XML::XPath: 0
-  perl: 5.8.1
+  Carp: '0'
+  Class::Accessor: '0'
+  Crypt::OpenSSL::Bignum: '0'
+  Crypt::OpenSSL::DSA: '0'
+  Crypt::OpenSSL::RSA: '0'
+  Crypt::OpenSSL::Random: '0'
+  Crypt::OpenSSL::Verify: '0'
+  Crypt::OpenSSL::X509: '0'
+  Crypt::PK::ECC: '0'
+  DateTime: '0'
+  DateTime::Format::XSD: '0'
+  DateTime::HiRes: '0'
+  Digest::SHA: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  HTTP::Request::Common: '0'
+  IO::Compress::RawDeflate: '0'
+  IO::Uncompress::RawInflate: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  MIME::Base64: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  MooseX::Types::Common::String: '0'
+  MooseX::Types::DateTime: '0'
+  MooseX::Types::URI: '0'
+  URI: '0'
+  URI::Encode: '0'
+  URI::QueryParam: '0'
+  XML::Generator: '0'
+  XML::LibXML: '0'
+  XML::Writer: '0.625'
+  base: '0'
+  constant: '0'
+  namespace::autoclean: '0'
+  perl: 5.008_001
+  strict: '0'
+  vars: '0'
+  warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SAML2
-  license: http://dev.perl.org/licenses
-  repository: http://github.com/chrisa/perl-Net-SAML2
-version: 0.17
+  bugtracker: https://github.com/perl-net-saml2/perl-Net-SAML2/issues
+  repository: git://github.com/perl-net-saml2/perl-Net-SAML2.git
+version: '0.44'
+x_contributors:
+  - 'Chris Andrews <chris@nodnol.org>'
+  - 'Oskari Okko Ojala <okko@frantic.com>'
+  - 'Peter Marschall <peter@adpm.de>'
+  - 'Mike Wisener <xmikew@cpan.org>'
+  - 'Jeff Fearn <jfearn@redhat.com>'
+  - 'Alessandro Ranellucci <aar@cpan.org>'
+  - 'Mike Wisener <mwisener@secureworks.com>, xmikew <github@32ths.com>'
+  - 'xmikew <github@32ths.com>'
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_generated_by_perl: v5.32.1
+x_maintainers:
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

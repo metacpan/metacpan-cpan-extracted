@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::Notification;
-$Shipment::FedEx::WSDL::RateTypes::Notification::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::Notification::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               LocalizedMessage
               MessageParameters
 
-              )
+            )
         ],
         {   'Severity'          => \%Severity_of,
             'Source'            => \%Source_of,
@@ -48,10 +48,10 @@ Class::Std::initialize();
         },
         {   'Severity' =>
               'Shipment::FedEx::WSDL::RateTypes::NotificationSeverityType',
-            'Source'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Code'             => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Message'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'LocalizedMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Source'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Code'              => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Message'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'LocalizedMessage'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'MessageParameters' =>
               'Shipment::FedEx::WSDL::RateTypes::NotificationParameter',
         },
@@ -83,7 +83,7 @@ Shipment::FedEx::WSDL::RateTypes::Notification
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

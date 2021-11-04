@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.077';
+our $VERSION = '1.084';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -18,7 +18,7 @@ our $VERSION = '1.077';
 #pod =head1 CONFIGURATION
 #pod
 #pod For getting started with a configuration for Yancy, see
-#pod L<Yancy::Help::Config>.
+#pod the L<"Yancy Guides"|Yancy::Guides>.
 #pod
 #pod Additional configuration keys accepted by the plugin are:
 #pod
@@ -27,7 +27,7 @@ our $VERSION = '1.077';
 #pod =item backend
 #pod
 #pod In addition to specifying the backend as a single URL (see L<"Database
-#pod Backend"|Yancy::Help::Config/Database Backend>), you can specify it as
+#pod Backend"|Yancy::Guides::Schema/Database Backend>), you can specify it as
 #pod a hashref of C<< class => $db >>. This allows you to share database
 #pod connections.
 #pod
@@ -35,6 +35,11 @@ our $VERSION = '1.077';
 #pod     use Mojo::Pg;
 #pod     helper pg => sub { state $pg = Mojo::Pg->new( 'postgres:///myapp' ) };
 #pod     plugin Yancy => { backend => { Pg => app->pg } };
+#pod
+#pod =item model
+#pod
+#pod (optional) Specify a model class or object that extends L<Yancy::Model>.
+#pod By default, will create a basic L<Yancy::Model> object.
 #pod
 #pod =item route
 #pod
@@ -58,6 +63,9 @@ our $VERSION = '1.077';
 #pod
 #pod A hash of C<< name => subref >> pairs of filters to make available.
 #pod See L</yancy.filter.add> for how to create a filter subroutine.
+#pod
+#pod B<NOTE:> Filters are deprecated and will be removed in Yancy v2. See
+#pod L<Yancy::Guides::Model> for a way to replace them.
 #pod
 #pod =back
 #pod
@@ -110,6 +118,13 @@ our $VERSION = '1.077';
 #pod     }
 #pod
 #pod Yancy does not do this for you to avoid namespace collisions.
+#pod
+#pod =head2 yancy.model
+#pod
+#pod   my $model = $c->yancy->model;
+#pod   my $schema = $c->yancy->model( $schema_name );
+#pod
+#pod Return the L<Yancy::Model> or a L<Yancy::Model::Schema> by name.
 #pod
 #pod =head2 yancy.list
 #pod
@@ -246,6 +261,9 @@ our $VERSION = '1.077';
 #pod plugin. See L<Yancy::Plugin::File> for more information.
 #pod
 #pod =head2 yancy.filter.add
+#pod
+#pod B<NOTE:> Filters are deprecated and will be removed in Yancy v2. See
+#pod L<Yancy::Guides::Model> for a way to replace them.
 #pod
 #pod     my $filter_sub = sub { my ( $field_name, $field_value, $field_conf, @params ) = @_; ... }
 #pod     $c->yancy->filter->add( $name => $filter_sub );
@@ -519,6 +537,9 @@ our $VERSION = '1.077';
 #pod
 #pod =head2 yancy.filter.apply
 #pod
+#pod B<NOTE:> Filters are deprecated and will be removed in Yancy v2. See
+#pod L<Yancy::Guides::Model> for a way to replace them.
+#pod
 #pod     my $filtered_data = $c->yancy->filter->apply( $schema, $item_data );
 #pod
 #pod Run the configured filters on the given C<$item_data>. C<$schema> is
@@ -529,6 +550,9 @@ our $VERSION = '1.077';
 #pod the inner filters.
 #pod
 #pod =head2 yancy.filters
+#pod
+#pod B<NOTE:> Filters are deprecated and will be removed in Yancy v2. See
+#pod L<Yancy::Guides::Model> for a way to replace them.
 #pod
 #pod Returns a hash-ref of all configured helpers, mapping the names to
 #pod the code-refs.
@@ -586,10 +610,18 @@ use Mojo::JSON qw( true false decode_json );
 use Mojo::File qw( path );
 use Mojo::Loader qw( load_class );
 use Yancy::Util qw( load_backend curry copy_inline_refs derp is_type json_validator );
+use Yancy::Model;
 use Storable qw( dclone );
 use Scalar::Util qw( blessed );
 
 has _filters => sub { {} };
+
+# NOTE: This class should largely be setup of paths and helpers. Special
+# handling of route stashes should be in the controller object. Special
+# handling of data should be in the model.
+#
+# Code in here is difficult to override for customizations, and should
+# be avoided.
 
 sub register {
     my ( $self, $app, $config ) = @_;
@@ -623,62 +655,32 @@ sub register {
         }
         return $default_backend;
     } );
-    # XXX: Move this to Yancy::Schema
-    if ( $config->{schema} || $config->{read_schema} ) {
-        $config->{schema} = $config->{schema} ? dclone( $config->{schema} ) : {};
 
-        if ( $config->{read_schema} ) {
-            my $schema = $app->yancy->backend->read_schema;
-            # ; use Data::Dumper;
-            # ; say 'Read schema: ' . Dumper $schema;
-            for my $c ( keys %$schema ) {
-                _merge_schema( $config->{schema}{ $c } ||= {}, $schema->{ $c } );
-            }
-        }
-        # read_schema on schema
-        for my $schema_name ( keys %{ $config->{schema} } ) {
-            my $schema = $config->{schema}{ $schema_name };
-            if ( delete $schema->{read_schema} ) {
-                _merge_schema( $schema, $app->yancy->backend->read_schema( $schema_name ) );
-            }
-        }
-
-        # ; warn 'Merged Schema';
-        # ; use Data::Dumper;
-        # ; warn Dumper $config->{schema};
-
-        # Sanity check for the schema.
-        for my $schema_name ( keys %{ $config->{schema} } ) {
-            my $schema = $config->{schema}{ $schema_name };
-            next if $schema->{ 'x-ignore' }; # XXX Should we just delete x-ignore schema?
-
-            # Deprecate x-view. Yancy::Model is a much better
-            # solution to that.
-            derp q{x-view is deprecated and will be removed in v2. }
-                . q{Use Yancy::Model or your database's CREATE VIEW instead}
-                if $schema->{'x-view'};
-
-            $schema->{ type } //= 'object';
-            my $real_schema_name = ( $schema->{'x-view'} || {} )->{schema} // $schema_name;
-            my $props = $schema->{properties}
-                || $config->{schema}{ $real_schema_name }{properties};
-            my $id_field = $schema->{ 'x-id-field' } // 'id';
-            my @id_fields = ref $id_field eq 'ARRAY' ? @$id_field : ( $id_field );
-
-            for my $field ( @id_fields ) {
-                if ( !$props->{ $field } ) {
-                    die sprintf "ID field missing in properties for schema '%s', field '%s'."
-                        . " Add x-id-field to configure the correct ID field name, or"
-                        . " add x-ignore to ignore this schema.",
-                            $schema_name, $field;
-                }
-            }
-        }
-    }
-    elsif ( $config->{openapi} ) {
+    if ( $config->{openapi} ) {
         $config->{openapi} = _ensure_json_data( $app, $config->{openapi} );
         $config->{schema} = dclone( $config->{openapi}{definitions} );
     }
+
+    my $model = $config->{model} // Yancy::Model->new(
+      backend => $app->yancy->backend,
+      log => $app->log,
+      ( read_schema => $config->{read_schema} )x!!exists $config->{read_schema},
+      schema => $config->{schema},
+    );
+    $app->helper( 'yancy.model' => sub {
+        my ( $c, $schema ) = @_;
+        return $schema ? $model->schema( $schema ) : $model;
+    } );
+
+    # XXX: Add the fully-read schema back to the configuration hash.
+    # This will be removed in v2.
+    my @schema_names = $config->{read_schema} ? $model->schema_names : grep { !$config->{schema}{$_}{'x-ignore'} } keys %{ $config->{schema} };
+    for my $schema_name ( @schema_names ) {
+        my $schema = $model->schema( $schema_name );
+        $schema->_check_json_schema; # In case we haven't already
+        $config->{schema}{ $schema_name } = dclone( $schema->json_schema );
+    }
+
 
     # Resources and templates
     my $share = path( __FILE__ )->sibling( 'Yancy' )->child( 'resources' );
@@ -762,7 +764,7 @@ sub register {
             (
                 map { $_ => $config->{ $_ } }
                 grep { defined $config->{ $_ } }
-                qw( openapi schema route ),
+                qw( openapi schema route read_schema ),
                 @_moved_to_editor_keys,
             ),
             %{ $config->{editor} // {} },
@@ -791,6 +793,8 @@ sub _helper_plugin {
 
 sub _helper_schema {
     my ( $c, $name, $schema ) = @_;
+    # XXX: This helper must be deprecated in favor of using the Model,
+    # because it'd just be better to have a smaller API.
     if ( !$name ) {
         return $c->yancy->backend->schema;
     }
@@ -798,12 +802,13 @@ sub _helper_schema {
         $c->yancy->backend->schema->{ $name } = $schema;
         return;
     }
-    return copy_inline_refs( $c->yancy->backend->schema, "/$name" );
+    my $info = copy_inline_refs( $c->yancy->backend->schema, "/$name" ) || return undef;
+    return keys %$info ? $info : undef;
 }
 
 sub _helper_list {
     my ( $c, $schema_name, @args ) = @_;
-    my @items = @{ $c->yancy->backend->list( $schema_name, @args )->{items} };
+    my @items = @{ $c->yancy->model( $schema_name )->list( @args )->{items} };
     my $schema = $c->yancy->schema( $schema_name );
     for my $prop_name ( keys %{ $schema->{properties} } ) {
         my $prop = $schema->{properties}{ $prop_name };
@@ -816,7 +821,7 @@ sub _helper_list {
 
 sub _helper_get {
     my ( $c, $schema_name, $id, @args ) = @_;
-    my $item = $c->yancy->backend->get( $schema_name, $id, @args );
+    my $item = $c->yancy->model( $schema_name )->get( $id, @args );
     my $schema = $c->yancy->schema( $schema_name );
     for my $prop_name ( keys %{ $schema->{properties} } ) {
         my $prop = $schema->{properties}{ $prop_name };
@@ -829,139 +834,33 @@ sub _helper_get {
 }
 
 sub _helper_delete {
-    my ( $c, @args ) = @_;
-    return $c->yancy->backend->delete( @args );
+    my ( $c, $schema_name, @args ) = @_;
+    return $c->yancy->model( $schema_name )->delete( @args );
 }
 
 sub _helper_set {
     my ( $c, $schema, $id, $item, %opt ) = @_;
-    my %validate_opt =
-        map { $_ => $opt{ $_ } }
-        grep { exists $opt{ $_ } }
-        qw( properties );
-    if ( my @errors = $c->yancy->validate( $schema, $item, %validate_opt ) ) {
-        $c->app->log->error(
-            sprintf 'Error validating item with ID "%s" in schema "%s": %s',
-            $id, $schema,
-            join ', ', @errors
-        );
-        die \@errors;
-    }
     $item = $c->yancy->filter->apply( $schema, $item );
-    my $ret = eval { $c->yancy->backend->set( $schema, $id, $item ) };
-    if ( $@ ) {
-        $c->app->log->error(
-            sprintf 'Error setting item with ID "%s" in schema "%s": %s',
-            $id, $schema, $@,
-        );
-        die $@;
-    }
-    return $ret;
+    return $c->yancy->model( $schema )->set( $id, $item );
 }
 
 sub _helper_create {
     my ( $c, $schema, $item ) = @_;
 
     my $props = $c->yancy->schema( $schema )->{properties};
+    # XXX: We need to fix the way defaults get set: Defaults that are
+    # set by the database must not be set here. See Github #124
     $item->{ $_ } = $props->{ $_ }{default}
         for grep !exists $item->{ $_ } && exists $props->{ $_ }{default},
         keys %$props;
 
-    if ( my @errors = $c->yancy->validate( $schema, $item ) ) {
-        $c->app->log->error(
-            sprintf 'Error validating new item in schema "%s": %s',
-            $schema,
-            join ', ', @errors
-        );
-        die \@errors;
-    }
-
     $item = $c->yancy->filter->apply( $schema, $item );
-    my $ret = eval { $c->yancy->backend->create( $schema, $item ) };
-    if ( $@ ) {
-        $c->app->log->error(
-            sprintf 'Error creating item in schema "%s": %s',
-            $schema, $@,
-        );
-        die $@;
-    }
-    return $ret;
+    return $c->yancy->model( $schema )->create( $item );
 }
 
 sub _helper_validate {
     my ( $c, $schema_name, $input_item, %opt ) = @_;
-    my $schema = $c->yancy->schema( $schema_name );
-    my $v = json_validator();
-
-    if ( $opt{ properties } ) {
-        # Only validate these properties
-        $schema = {
-            type => 'object',
-            required => [
-                grep { my $f = $_; grep { $_ eq $f } @{ $schema->{required} || [] } }
-                @{ $opt{ properties } }
-            ],
-            properties => {
-                map { $_ => $schema->{properties}{$_} }
-                grep { exists $schema->{properties}{$_} }
-                @{ $opt{ properties } }
-            },
-            additionalProperties => 0, # Disallow any other properties
-        };
-    }
-    $v->schema( $schema );
-
-    my @errors;
-    my %check_item = %$input_item;
-    for my $prop_name ( keys %{ $schema->{properties} } ) {
-        my $prop = $schema->{properties}{ $prop_name };
-
-        # These blocks fix problems with validation only. If the
-        # problem is the database understanding the value, it must be
-        # fixed in the backend class.
-
-        # Pre-filter booleans
-        if ( is_type( $prop->{type}, 'boolean' ) && defined $check_item{ $prop_name } ) {
-            my $value = $check_item{ $prop_name };
-            if ( $value eq 'false' or !$value ) {
-                $value = false;
-            } else {
-                $value = true;
-            }
-            $check_item{ $prop_name } = $value;
-        }
-        # An empty date-time, date, or time must become undef: The empty
-        # string will never pass the format check, but properties that
-        # are allowed to be null can be validated.
-        if ( is_type( $prop->{type}, 'string' ) && $prop->{format} && $prop->{format} =~ /^(?:date-time|date|time)$/ ) {
-            if ( exists $check_item{ $prop_name } && !$check_item{ $prop_name } ) {
-                $check_item{ $prop_name } = undef;
-            }
-            # The "now" special value will not validate yet, but will be
-            # replaced by the Backend with something useful
-            elsif ( ($check_item{ $prop_name }//'') eq 'now' ) {
-                delete $check_item{ $prop_name };
-            }
-        }
-        # Always add dummy passwords to pass required checks
-        if ( $prop->{format} && $prop->{format} eq 'password' && !$check_item{ $prop_name } ) {
-            # Add to a new copy of the item so we don't actually change
-            # the item
-            %check_item = ( %check_item, $prop_name => '<PASSWORD>' );
-        }
-
-        # XXX: JSON::Validator 4 moved support for readOnly/writeOnly to
-        # the OpenAPI schema classes, but we use JSON Schema internally,
-        # so we need to make support ourselves for now...
-        if ( $prop->{readOnly} && exists $check_item{ $prop_name } ) {
-            push @errors, JSON::Validator::Error->new(
-                "/$prop_name", "Read-only.",
-            );
-        }
-    }
-
-    push @errors, $v->validate( \%check_item );
-    return @errors;
+    return $c->yancy->model( $schema_name )->validate( $input_item, %opt );
 }
 
 sub _helper_filter_apply {
@@ -996,27 +895,6 @@ sub _helper_filter_apply {
 sub _helper_filter_add {
     my ( $self, $c, $name, $sub ) = @_;
     $self->_filters->{ $name } = $sub;
-}
-
-# _merge_schema( $keep, $merge );
-#
-# Merge the given $merge schema into the given $keep schema. $keep is
-# modified in-place (but also returned)
-sub _merge_schema {
-    my ( $keep, $merge ) = @_;
-    my $keep_props = $keep->{properties} ||= {};
-    my $merge_props = delete $merge->{properties};
-    for my $k ( keys %$merge ) {
-        $keep->{ $k } ||= $merge->{ $k };
-    }
-    for my $p ( keys %{ $merge_props } ) {
-        my $keep_prop = $keep_props->{ $p } ||= {};
-        my $merge_prop = $merge_props->{ $p };
-        for my $k ( keys %$merge_prop ) {
-            $keep_prop->{ $k } ||= $merge_prop->{ $k };
-        }
-    }
-    return $keep;
 }
 
 sub _helper_routify {
@@ -1057,7 +935,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.077
+version 1.084
 
 =head1 SYNOPSIS
 
@@ -1075,7 +953,7 @@ quickly build your own application.
 =head1 CONFIGURATION
 
 For getting started with a configuration for Yancy, see
-L<Yancy::Help::Config>.
+the L<"Yancy Guides"|Yancy::Guides>.
 
 Additional configuration keys accepted by the plugin are:
 
@@ -1084,7 +962,7 @@ Additional configuration keys accepted by the plugin are:
 =item backend
 
 In addition to specifying the backend as a single URL (see L<"Database
-Backend"|Yancy::Help::Config/Database Backend>), you can specify it as
+Backend"|Yancy::Guides::Schema/Database Backend>), you can specify it as
 a hashref of C<< class => $db >>. This allows you to share database
 connections.
 
@@ -1092,6 +970,11 @@ connections.
     use Mojo::Pg;
     helper pg => sub { state $pg = Mojo::Pg->new( 'postgres:///myapp' ) };
     plugin Yancy => { backend => { Pg => app->pg } };
+
+=item model
+
+(optional) Specify a model class or object that extends L<Yancy::Model>.
+By default, will create a basic L<Yancy::Model> object.
 
 =item route
 
@@ -1115,6 +998,9 @@ The URL to use for the "Back to Application" link. Defaults to C</>.
 
 A hash of C<< name => subref >> pairs of filters to make available.
 See L</yancy.filter.add> for how to create a filter subroutine.
+
+B<NOTE:> Filters are deprecated and will be removed in Yancy v2. See
+L<Yancy::Guides::Model> for a way to replace them.
 
 =back
 
@@ -1167,6 +1053,13 @@ Mojolicious plugin.
     }
 
 Yancy does not do this for you to avoid namespace collisions.
+
+=head2 yancy.model
+
+  my $model = $c->yancy->model;
+  my $schema = $c->yancy->model( $schema_name );
+
+Return the L<Yancy::Model> or a L<Yancy::Model::Schema> by name.
 
 =head2 yancy.list
 
@@ -1303,6 +1196,9 @@ C<$MOJO_HOME/public/uploads>. You can override this with your own file
 plugin. See L<Yancy::Plugin::File> for more information.
 
 =head2 yancy.filter.add
+
+B<NOTE:> Filters are deprecated and will be removed in Yancy v2. See
+L<Yancy::Guides::Model> for a way to replace them.
 
     my $filter_sub = sub { my ( $field_name, $field_value, $field_conf, @params ) = @_; ... }
     $c->yancy->filter->add( $name => $filter_sub );
@@ -1576,6 +1472,9 @@ character with.
 
 =head2 yancy.filter.apply
 
+B<NOTE:> Filters are deprecated and will be removed in Yancy v2. See
+L<Yancy::Guides::Model> for a way to replace them.
+
     my $filtered_data = $c->yancy->filter->apply( $schema, $item_data );
 
 Run the configured filters on the given C<$item_data>. C<$schema> is
@@ -1586,6 +1485,9 @@ so that schema-level filters can take advantage of any values set by
 the inner filters.
 
 =head2 yancy.filters
+
+B<NOTE:> Filters are deprecated and will be removed in Yancy v2. See
+L<Yancy::Guides::Model> for a way to replace them.
 
 Returns a hash-ref of all configured helpers, mapping the names to
 the code-refs.

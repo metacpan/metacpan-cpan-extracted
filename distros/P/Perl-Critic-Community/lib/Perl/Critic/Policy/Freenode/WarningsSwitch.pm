@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Perl::Critic::Policy::Community::WarningsSwitch';
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 sub default_themes { 'freenode' }
 
@@ -18,7 +18,11 @@ switch on the shebang line
 
 =head1 DESCRIPTION
 
-Legacy C<freenode> theme alias of
+Legacy C<freenode> theme policy alias.
+
+=head1 POLICY MOVED
+
+This policy has been moved to the C<community> theme and renamed to
 L<Perl::Critic::Policy::Community::WarningsSwitch>.
 
 =head1 AFFILIATION

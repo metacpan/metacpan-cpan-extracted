@@ -1,0 +1,38 @@
+# Avoid version control files.
+\.gitignore$
+\.git$
+
+# Avoid Makemaker generated and utility files.
+\bMakefile$
+\bblib
+\bMakeMaker-\d
+\bpm_to_blib$
+\bblibdirs$
+^MYMETA\.yml$
+^MYMETA\.json$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+.tar.gz$
+
+# Avoid tars and their unpacked directory trees
+^Net-RFC3161-Timestamp
+
+# Avoid temp and backup files.
+~$
+\.tmp$
+\.old$
+\.bak$
+\#$
+\b\.#
+
+# NYTProf profiling output
+nytprof
+
+# Devel::Cover output
+^cover_db
+
+# coding documentation not for distribution
+\bdoc\b

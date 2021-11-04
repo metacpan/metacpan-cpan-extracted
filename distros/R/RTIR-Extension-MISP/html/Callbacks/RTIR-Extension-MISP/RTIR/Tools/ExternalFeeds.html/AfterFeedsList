@@ -1,0 +1,34 @@
+<&|/Widgets/TitleBox,
+    title => loc("MISP"),
+    class => "fullwidth",
+    bodyclass => "",
+&>
+% $$FoundFeedRef = 1;
+% my $i = 1;
+<div class="table-responsive">
+    <table cellspacing="0" class="table collection collection-as-table">
+      <tr class="collection-as-table">
+        <th class="collection-as-table"><&|/l&>Name</&></th>
+        <th class="collection-as-table"><&|/l&>Description</&></th>
+      </tr>
+%       foreach my $feed ($FeedsObj->misp_feeds) {
+      <tr class="<% $i%2 ? 'oddline' : 'evenline'%>" >
+        <td class="collection-as-table"><a href="<% RT->Config->Get('WebPath') %>/RTIR/Tools/ExternalFeeds.html?FeedName=<% $feed->{Name} |u %>"><%$feed->{Name}%></a></td>
+        <td class="collection-as-table"><%$feed->{Description}%></td>
+      </tr>
+%         $i++;
+%       }
+    </table>
+</div>
+
+</&>
+<%init>
+my ($ok, $msg) = $FeedsObj->InitMISP();
+
+return unless $ok and $FeedsObj->have_misp_feeds();
+
+</%init>
+<%args>
+$FeedsObj
+$FoundFeedRef
+</%args>

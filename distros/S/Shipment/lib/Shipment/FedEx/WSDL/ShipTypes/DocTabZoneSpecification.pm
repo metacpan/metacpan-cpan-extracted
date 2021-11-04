@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification;
-$Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               LiteralValue
               Justification
 
-              )
+            )
         ],
         {   'ZoneNumber'    => \%ZoneNumber_of,
             'Header'        => \%Header_of,
@@ -45,9 +45,9 @@ Class::Std::initialize();
         },
         {   'ZoneNumber' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-            'Header'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DataField'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'LiteralValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Header'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DataField'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'LiteralValue'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'Justification' =>
               'Shipment::FedEx::WSDL::ShipTypes::DocTabZoneJustificationType',
         },
@@ -78,7 +78,7 @@ Shipment::FedEx::WSDL::ShipTypes::DocTabZoneSpecification
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

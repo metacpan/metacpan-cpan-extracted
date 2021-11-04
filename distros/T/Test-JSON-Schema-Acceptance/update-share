@@ -1,4 +1,7 @@
 #!/usr/bin/env perl
+use strict;
+use warnings;
+use Path::Tiny;
 
 chomp(my $dirty = `git status --untracked --porcelain share`);
 !length($dirty) and die 'Cannot proceed: share/ is not dirty. Run "git submodule update --remote"';
@@ -6,15 +9,20 @@ chomp(my $dirty = `git status --untracked --porcelain share`);
 chomp($dirty = `git status --untracked --porcelain Changes`);
 length($dirty) and die 'Cannot proceed: Changes is already dirty';
 
-use Path::Tiny;
-chomp(my $str = `git submodule status`);
-my ($sha) = split(' ', $str, 2);
-$sha =~ s/^\+//;
+chomp(my $ls_tree = `git ls-tree HEAD share`);
+my (undef, undef, $old_sha) = split(/\s/, $ls_tree);
+
+chomp(my $status = `git submodule status`);
+my ($new_sha) = split(' ', $status, 2);
+$new_sha =~ s/^\+//;
+
+my ($remote_spec) = path('.gitmodules')->slurp_utf8 =~ m{url\s+=\s+git://(.+)\.git$}m;
+my $diff_link = 'https://'.$remote_spec.'/compare/'.$old_sha.'...'.$new_sha;
 
 my ($seen_next, $seen_blank);
 path('Changes')->edit_lines_utf8(sub {
   if ($seen_next ||= /^\{\{\$NEXT\}\}/ and not $seen_blank and /^$/) {
-    s/^$/        - updated test suite to commit $sha\n/;
+    s/^$/        - updated test suite:\n          $diff_link\n/;
     $seen_blank = 1;
   }
 });

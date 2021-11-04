@@ -14,9 +14,10 @@ the CPAN.
 ## pod.t. Oh well.
 
 use strict;
-use Test::More;
 use File::Spec::Functions;
 use File::Find;
+use Test2::V0;
+use Pod::Checker;
 
 plan(skip_all => "Test::Pod 1.14 required for testing POD"), exit unless
     eval "use Test::Pod 1.14; 1";
@@ -25,7 +26,7 @@ plan(skip_all => "Pod::Checker required for testing POD"), exit unless
 plan(skip_all => "Pod::Text required for testing POD"), exit unless
     eval "use Pod::Text; 1";
 
-my @files = Test::Pod::all_pod_files(glob("*.pm"), "lib");
+my @files = grep { ! m/[#~]/ } Test::Pod::all_pod_files(glob("*.pm"), "lib");
 plan(skip_all => "no POD (yet?)"), exit if ! @files;
 
 plan( tests => 3 * scalar (@files) );
@@ -43,18 +44,6 @@ sub podcheck_ok {
         &pod_file_ok($file, @testcomment);
     }
     return;
-
-    { package My::Pod::Checker; use base "Pod::Checker"; }
-
-    sub My::Pod::Checker::poderror {
-        my $self = shift;
-        my %opts = %{$_[0]};
-        diag(sprintf("%s: %s (file %s, line %d)",
-                     @opts{qw(-severity -msg -file -line)}))
-            unless ($opts{-msg} =~ m/empty section/);
-        local $self->{-quiet} = 1;
-        return $self->Pod::Checker::poderror(@_);
-    }
 }
 
 foreach my $file ( @files ) {
@@ -89,4 +78,27 @@ sub read_file {
     local *FILE;
     open FILE, $path or die $!;
     return wantarray ? <FILE> : join("", <FILE>);
+}
+
+package My::Pod::Checker;
+use strict;
+
+use base "Pod::Checker";
+use Test2::API qw/context/;
+
+sub parse_from_file {
+    my $self = shift;
+    my ($file) = @_;
+    $self->{file} = $file;
+    return $self->SUPER::parse_from_file(@_);
+}
+
+sub poderror {
+    my $self = shift;
+    my %opts = %{$_[0]};
+    warn(sprintf("%s: %s (file %s, line %d)",
+                 @opts{qw(-severity -msg)}, $self->{file}, $opts{-line}))
+      unless ($opts{-msg} =~ m/empty section/);
+    local $self->{-quiet} = 1;
+    return $self->Pod::Checker::poderror(@_);
 }

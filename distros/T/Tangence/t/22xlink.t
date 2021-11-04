@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.26;
 use warnings;
+
+use Future::AsyncAwait 0.47;
 
 use Test::More;
 use Test::Fatal;
@@ -44,9 +46,9 @@ my $objproxy = $client->rootobj;
    my $f = $objproxy->call_method( method => 10, "hello" );
 
    ok( $f->is_ready, '$f ready after MSG_RESULT' );
-   is( scalar $f->get, "10/hello", 'result of call_method()' );
+   is( scalar await $f, "10/hello", 'result of call_method()' );
 
-   ok( exception { $objproxy->call_method( no_such_method => 123 ) },
+   ok( exception { $objproxy->call_method( no_such_method => 123 )->get },
       'Calling no_such_method fails in proxy'
    );
 }
@@ -77,7 +79,7 @@ my $objproxy = $client->rootobj;
 
    ok( exception { $objproxy->subscribe_event( "no_such_event",
                     on_fire => sub {},
-                  ); },
+                  )->get; },
       'Subscribing to no_such_event fails in proxy'
    );
 }
@@ -95,15 +97,15 @@ my $objproxy = $client->rootobj;
 
    my $f = $objproxy->get_property( "scalar" );
 
-   is( scalar $f->get, 123, '$f->get after get_property' );
+   is( scalar await $f, 123, 'await $f after get_property' );
 
    $f = $objproxy->get_property_element( "hash", "two" );
 
-   is( scalar $f->get, 2, '$f->get after get_property_element hash key' );
+   is( scalar await $f, 2, 'await $f after get_property_element hash key' );
 
    $f = $objproxy->get_property_element( "array", 1 );
 
-   is( scalar $f->get, 2, '$f->get after get_property_element array index' );
+   is( scalar await $f, 2, 'await $f after get_property_element array index' );
 
    $f = $objproxy->set_property( "scalar", 135 );
 
@@ -140,7 +142,7 @@ my $objproxy = $client->rootobj;
 
    $objproxy->unwatch_property( "scalar" );
 
-   ok( exception { $objproxy->get_property( "no_such_property" ) },
+   ok( exception { $objproxy->get_property( "no_such_property" )->get },
       'Getting no_such_property fails in proxy'
    );
 }
@@ -156,22 +158,22 @@ my $objproxy = $client->rootobj;
 
    ok( $f->is_ready, '$f is ready after MSG_WATCHING_ITER' );
 
-   my ( $cursor, $first_idx, $last_idx ) = $f->get;
+   my ( $cursor, $first_idx, $last_idx ) = await $f;
 
    is( $first_idx, 0, '$first_idx after MSG_WATCHING_ITER' );
    is( $last_idx,  2, '$last_idx after MSG_WATCHING_ITER' );
 
-   my ( $idx, @more ) = $cursor->next_forward->get;
+   my ( $idx, @more ) = await $cursor->next_forward;
 
    is( $idx, 0, 'next_forward starts at element 0' );
    is_deeply( \@more, [ 1 ], 'next_forward yielded 1 element' );
 
-   ( $idx, @more ) = $cursor->next_forward( 5 )->get;
+   ( $idx, @more ) = await $cursor->next_forward( 5 );
 
    is( $idx, 1, 'next_forward starts at element 1' );
    is_deeply( \@more, [ 2, 3 ], 'next_forward yielded 2 elements' );
 
-   ( $idx, @more ) = $cursor->next_backward->get;
+   ( $idx, @more ) = await $cursor->next_backward;
 
    is( $idx, 2, 'next_backward starts at element 2' );
    is_deeply( \@more, [ 3 ], 'next_forward yielded 1 element' );
@@ -197,9 +199,9 @@ my $objproxy = $client->rootobj;
 # Test object destruction
 {
    my $proxy_destroyed = 0;
-   $objproxy->subscribe_event( "destroy",
+   await $objproxy->subscribe_event( "destroy",
       on_fire => sub { $proxy_destroyed = 1 },
-   )->get;
+   );
 
    my $obj_destroyed = 0;
 

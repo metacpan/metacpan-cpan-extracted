@@ -2,8 +2,13 @@ NAME
     BorderStyles::Test - A collection of border styles, mainly for testing
 
 VERSION
-    This document describes version 0.002 of BorderStyles::Test (from Perl
-    distribution BorderStyles-Test), released on 2020-06-11.
+    This document describes version 0.003 of BorderStyles::Test (from Perl
+    distribution BorderStyles-Test), released on 2021-05-12.
+
+BORDER STYLES
+    *   BorderStyle::Test::Random
+
+        A border style that uses random characters.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -32,7 +37,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

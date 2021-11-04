@@ -1,9 +1,9 @@
 package Sah::SchemaR::perl::wordlist::modname;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-06-07'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = ["str",[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"EN::Enable",value=>"EN/Enable"},{valid=>0,value=>"Foo bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl WordList::* module name without the prefix, e.g. EN::Enable","x.completion"=>["perl_modname",{ns_prefix=>"WordList"}],"x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["perl::modname","str"]];
+our $rschema = ["str",[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*)\\z",summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"EN::Enable",value=>"EN/Enable"},{valid=>0,value=>"Foo bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl WordList::* module name without the prefix, e.g. EN::Enable","x.completion"=>["perl_modname",{ns_prefix=>"WordList"}],"x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["perl::modname","str"]];
 
 1;
 # ABSTRACT: Perl WordList::* module name without the prefix, e.g. EN::Enable
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::wordlist::modname - Perl WordList::* module name without the
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::perl::wordlist::modname (from Perl distribution Sah-Schemas-WordList), released on 2020-05-27.
+This document describes version 0.003 of Sah::SchemaR::perl::wordlist::modname (from Perl distribution Sah-Schemas-WordList), released on 2021-06-07.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

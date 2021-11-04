@@ -6,8 +6,8 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,14 @@ no_index:
 requires:
   Applify: '0.12'
   File::umask: '0.01'
+  IO::Socket::IP: '0.38'
   Path::Tiny: '0.05'
 resources:
   bugtracker: https://github.com/jhthorsen/app-sslmaker/issues
   homepage: https://github.com/jhthorsen/app-sslmaker
   repository: https://github.com/jhthorsen/app-sslmaker.git
-version: '0.13'
+version: '0.16'
+x_contributors:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+  - __DATA__
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

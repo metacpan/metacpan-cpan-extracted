@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Perl::Critic::Policy::Community::LoopOnHash';
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 sub default_themes { 'freenode' }
 
@@ -17,7 +17,11 @@ Perl::Critic::Policy::Freenode::LoopOnHash - Don't loop over hashes
 
 =head1 DESCRIPTION
 
-Legacy C<freenode> theme alias of
+Legacy C<freenode> theme policy alias.
+
+=head1 POLICY MOVED
+
+This policy has been moved to the C<community> theme and renamed to
 L<Perl::Critic::Policy::Community::LoopOnHash>.
 
 =head1 AFFILIATION

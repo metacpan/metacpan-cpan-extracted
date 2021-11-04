@@ -8,9 +8,9 @@ package Connector;
 
 # This is the earliest version we've tested on and we need at least 5.10
 # because of the '//' operator in one of the sub-modules.
-use 5.10.1;
+use 5.010001;
 
-our $VERSION = '1.41';
+our $VERSION = '1.43';
 
 use strict;
 use warnings;
@@ -310,7 +310,7 @@ sub exists {
         }
     };
 
-    $self->log()->debug('Got eval error ($EVAL_ERROR) for exist on path ' . join ".", @path ) if ($EVAL_ERROR);
+    $self->log()->debug("Got eval error ($EVAL_ERROR) for exist on path " . join ".", @path ) if ($EVAL_ERROR);
 
     return $result;
 }
@@ -322,6 +322,8 @@ sub get_hash { shift; die "No get_hash() method defined";  };
 sub get_meta { shift; die "No get_meta() method defined";  };
 sub get_reference { shift; die "No get_hash() method defined";  };
 sub set { shift;  die "No set() method defined";  };
+sub cleanup {};
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
@@ -474,6 +476,12 @@ When you call a proxy connector without sufficient arguments to perform the
 query, you will receive a value of I<connector> for type. Running a get_*
 method against such a node will cause the connector to die!
 
+=head2 cleanup
+
+Advise connectors to close, release or flush any open handle or sessions.
+Should be called directly before the program terminates. Connectors might
+be stale and not respond any longer after this was called.
+
 =head1 IMPLEMENTATION GUIDELINES
 
 You SHOULD use the _node_not_exists method if the requested path does not exist
@@ -510,6 +518,13 @@ You MUST also implement the get_meta method. If you have a connector with a
 fixed type, you MAY check if the particular path exists and return
 the result of I<_node_not_exists>.
 
+=head2 cleanup
+
+Connectors that keep locks or use long-lived sessions that are not
+bound to the lifetime of the perl process should implement this method
+and cleanup their mess. While it would be nice, that connectors can be
+revived after cleanup was called, this is not a strict requirement.
+
 =head1 AUTHORS
 
 Scott Hardin <mrscotty@cpan.org>
@@ -520,6 +535,6 @@ Oliver Welter
 
 =head1 COPYRIGHT
 
-Copyright 2013 OpenXPKI Foundation
+Copyright 2013/2021 White Rabbit Security Gmbh
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

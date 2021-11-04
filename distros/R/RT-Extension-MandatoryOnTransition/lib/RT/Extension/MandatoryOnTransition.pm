@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 NAME
 
@@ -10,9 +10,10 @@ RT-Extension-MandatoryOnTransition - Require core fields and ticket custom field
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2, 4.4, 5.0
+Works with RT 4.4, 5.0
 
-See below for some restrictions on RT 4.0.
+RT 4.0 and 4.2 are now end-of-life, so compatibility with
+newer versions of this extension is unknown.
 
 =head1 DESCRIPTION
 
@@ -128,7 +129,19 @@ config option.  This option takes the generic form of:
 
 C<from> and C<to> are expected to be valid status names.  C<from> may also be
 C<*> which will apply to any status and also tickets about to be created with
-status C<to>.
+status C<to>. If you need to express rules that apply only on ticket creation
+and not on updates, you can use the special C<from> value of C<'__CREATE__'>.
+For example,
+
+    Set( %MandatoryOnTransition,
+        'MyQueue' => {
+            '__CREATE__ -> open' => [ 'CF.MyField1' ],
+            '* -> open' => [ 'CF.MyField2', 'CF.MyField3' ],
+        },
+    );
+
+would require C<CF.MyField1> on ticket creation and C<CF.MyField2> and
+C<CF.MyField3> on any other transition to C<open>.
 
 The fallback for queues without specific rules is specified with C<'*'> where
 the queue name would normally be.
@@ -445,7 +458,8 @@ Accepts a paramhash of values:
 Works for both create, where no ticket exists yet, and update on an
 existing ticket. ARGSRef is required for both.
 
-For create, you must also pass Queue, From, and To.
+For create, you must also pass Queue, From, and To. In this case, the
+From status should be the special flag value of '__CREATE__'.
 
 Update requires only Ticket and To since From can be fetched from the
 ticket object.
@@ -839,6 +853,10 @@ sub CheckMandatoryFields {
                 $_;
                 }
                 grep defined, $value;
+        }
+
+        if ( $cf->can('CustomFieldValueIsEmpty') && $cf->CustomFieldValueIsEmpty( Field => $cf, Value => $value ) ) {
+            undef $value;
         }
 
         # Check for specific values

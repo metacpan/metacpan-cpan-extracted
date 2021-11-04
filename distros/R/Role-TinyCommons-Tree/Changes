@@ -1,3 +1,11 @@
+0.128   2021-10-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Visualize the other examples in
+	  Role::TinyCommons::Tree::FromObjArray.
+
+
 0.127   2021-07-02  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.126, 0.126.1, 0.126.2.

@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2019 Martin Becker, Blaubeuren.
+# Copyright (c) 2008-2021 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -127,7 +127,7 @@ my %ignore_whitespace = map {($_ => 1)} qw(
 );
 
 my %pattern = (
-    'binary_file'      => qr{\.(?i:png|jpg|gif)\z},
+    'binary_file'      => qr{\.(?i:png|jpg|gif|db)\z},
     'perl_code'        => qr{\.(?i:pm|pl|t|pod)\z},
     'library_module'   => qr{^lib/.*\.pm\z},
     'copyright_info'   => qr{\bCopyright \(c\) (?:\d{4}-)?(\d{4})?\b},
@@ -159,7 +159,11 @@ my %pattern = (
     'changes_version_headlines' =>
         qr{^\s*\Q$modname\E\s+(?:[Vv]ersion\s+)?(\d\S*)\s*$},
     'authormail_code' =>
-        qr[\QE<lt>$ambox\E(?:\@|E<64>|\s*\(at\)\s*)\Q${amhost}E<gt>\E],
+        qr[
+            \QE<lt>$ambox\E
+            (?:\@|E<64>|\s*\(at\)\s*|\s*I<at>\s*)
+            \Q${amhost}E<gt>\E
+        ]x,
     'package_line' => qr/^\s*package\s+(\w+(?:\:\:\w+)*)\s*;/,
     'version_line' => qr/^\s*(?:our\s*)\$VERSION\s*=\s*(.*?)\s*\z/,
     'version' => qr/^'([\d._]+)';\z/,
@@ -376,6 +380,7 @@ if ($manifest_open) {
             my $is_perlcode = $file =~ /$pattern{'perl_code'}/o;
             my $is_module   = $file =~ /$pattern{'library_module'}/o;
             my $has_pod = 0;
+            my $has_provider = 0;
             if ($file !~ /$pattern{'binary_file'}/o) {
                 my $seen_copyright   = 0;
                 my $seen_revision_id = 0;
@@ -430,6 +435,11 @@ if ($manifest_open) {
                         $in_author = 1;
                         $has_pod = 1;
                     }
+                    elsif (/^=head1 PROVIDER/) {
+                        $in_author = 1;
+                        $has_pod = 1;
+                        $has_provider = 1;
+                    }
                     elsif (/^=head1/) {
                         $in_author = 0;
                         $has_pod = 1;
@@ -462,7 +472,11 @@ if ($manifest_open) {
                         }
                     }
                 }
-                if (!$seen_copyright && !exists $ignore_copyright{$file}) {
+                if (
+                    !$seen_copyright &&
+                    !$has_provider &&
+                    !exists $ignore_copyright{$file}
+                ) {
                     push @lacking_copyright, $file;
                 }
                 if (!$seen_revision_id && $is_perlcode) {

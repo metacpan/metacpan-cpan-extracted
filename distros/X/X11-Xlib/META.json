@@ -5,13 +5,13 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "X11-Xlib",
    "no_index" : {
@@ -57,6 +57,6 @@
          "url" : "https://github.com/nanardon/X11-Xlib.git"
       }
    },
-   "version" : "0.20",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::FormType;
-$Shipment::UPS::WSDL::ShipTypes::FormType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::FormType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               FormGroupId
               FormGroupIdName
 
-              )
+            )
         ],
         {   'Code'            => \%Code_of,
             'Description'     => \%Description_of,
@@ -76,7 +76,7 @@ Shipment::UPS::WSDL::ShipTypes::FormType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,6 @@
+Version 0.86  - 30 October 2021
+                Recognise Pi Zero 2
+
 Version 0.85  - 28 November 2020
                 Recognise Pi 400
                 HiPi::Interface::Seesaw added for Adafruit ATSAMD09 breakout

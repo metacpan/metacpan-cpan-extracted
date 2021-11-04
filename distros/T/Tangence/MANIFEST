@@ -3,7 +3,6 @@ Build.PL
 Changes
 contrib/vim/ftdetect/tangence.vim
 contrib/vim/syntax/tangence.vim
-doc/Tangence.txt
 lib/Tangence.pm
 lib/Tangence/Class.pm
 lib/Tangence/Client.pm
@@ -27,7 +26,6 @@ lib/Tangence/Server/Context.pm
 lib/Tangence/Stream.pm
 lib/Tangence/Struct.pm
 lib/Tangence/Type.pm
-lib/Tangence/Type/Primitive.pm
 lib/Tangence/Types.pm
 LICENSE
 MANIFEST			This list of files

@@ -1,7 +1,9 @@
 package App::PhoneNumberUtils;
 
-our $DATE = '2018-11-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-03'; # DATE
+our $DIST = 'App-PhoneNumberUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -19,9 +21,22 @@ our %arg0_phnum = (
 $SPEC{phone_number_info} = {
     v => 1.1,
     summary => 'Show information about a phone number',
+    description => <<'_',
+
+This utility uses <pm:Number::Phone> to get information for a phone number. For
+certain countries, the information provided can be pretty detailed including
+coordinate, whether the number is an adult line, and the operator name. For
+other countries, the information provided is more basic including whether a
+number is a mobile number.
+
+_
     args => {
         %arg0_phnum,
     },
+    examples => [
+        {args=>{phnum=>'+442087712924'}},
+        {args=>{phnum=>'+6281812345678'}},
+    ],
 };
 sub phone_number_info {
     require Number::Phone;
@@ -65,9 +80,19 @@ sub phone_number_info {
 $SPEC{normalize_phone_number} = {
     v => 1.1,
     summary => 'Normalize phone number',
+    description => <<'_',
+
+This utility uses <pm:Number::Phone> to format the phone number, which supports
+country-specific formatting rules.
+
+_
     args => {
         %arg0_phnum,
     },
+    examples => [
+        {args=>{phnum=>'+442087712924'}},
+        {args=>{phnum=>'+6281812345678'}},
+    ],
 };
 sub normalize_phone_number {
     require Number::Phone;
@@ -82,6 +107,12 @@ sub normalize_phone_number {
 $SPEC{phone_number_is_valid} = {
     v => 1.1,
     summary => 'Check whether phone number is valid',
+    description => <<'_',
+
+This utility uses <pm:Number::Phone> to determine whether a phone number is
+valid.
+
+_
     args => {
         %arg0_phnum,
         quiet => {
@@ -89,6 +120,12 @@ $SPEC{phone_number_is_valid} = {
             cmdline_aliases => {q=>{}},
         },
     },
+    examples => [
+        {args=>{phnum=>'+442087712924'}},
+        {args=>{phnum=>'+4420877129240'}},
+        {args=>{phnum=>'+6281812345678'}},
+        {args=>{phnum=>'+6281812345'}},
+    ],
 };
 sub phone_number_is_valid {
     require Number::Phone;
@@ -122,7 +159,7 @@ App::PhoneNumberUtils - Utilities related to phone numbers
 
 =head1 VERSION
 
-This document describes version 0.001 of App::PhoneNumberUtils (from Perl distribution App-PhoneNumberUtils), released on 2018-11-25.
+This document describes version 0.002 of App::PhoneNumberUtils (from Perl distribution App-PhoneNumberUtils), released on 2021-06-03.
 
 =head1 DESCRIPTION
 
@@ -145,9 +182,26 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- normalize_phone_number(%args) -> [status, msg, result, meta]
+ normalize_phone_number(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Normalize phone number.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ normalize_phone_number(phnum => "+442087712924"); # -> [200, "OK", "+44 20 8771 2924", {}]
+
+=item * Example #2:
+
+ normalize_phone_number(phnum => "+6281812345678"); # -> [200, "OK", "+62 818 1234 5678", {}]
+
+=back
+
+This utility uses L<Number::Phone> to format the phone number, which supports
+country-specific formatting rules.
 
 This function is not exported.
 
@@ -157,27 +211,121 @@ Arguments ('*' denotes required arguments):
 
 =item * B<phnum>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 phone_number_info
 
 Usage:
 
- phone_number_info(%args) -> [status, msg, result, meta]
+ phone_number_info(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show information about a phone number.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ phone_number_info(phnum => "+442087712924");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     areacode           => 20,
+     areaname           => "London",
+     country_code       => 44,
+     format             => "+44 20 8771 2924",
+     format_for_country => "+44 20 8771 2924",
+     is_adult           => 0,
+     is_allocated       => 1,
+     is_corporate       => 0,
+     is_drama           => 0,
+     is_fixed_line      => undef,
+     is_geographic      => 1,
+     is_government      => undef,
+     is_in_use          => undef,
+     is_international   => undef,
+     is_ipphone         => 0,
+     is_isdn            => undef,
+     is_mobile          => 0,
+     is_network_service => 0,
+     is_pager           => 0,
+     is_personal        => 0,
+     is_valid           => 1,
+     location           => [51.38309, -0.336079],
+     operator           => "BT",
+     operator_ported    => undef,
+     regulator          => "OFCOM, http://www.ofcom.org.uk/",
+     subscriber         => 87712924,
+   },
+   {},
+ ]
+
+=item * Example #2:
+
+ phone_number_info(phnum => "+6281812345678");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     areacode           => undef,
+     areaname           => undef,
+     country_code       => 62,
+     format             => "+62 818 1234 5678",
+     format_for_country => "+62 818-1234-5678",
+     is_adult           => undef,
+     is_allocated       => undef,
+     is_corporate       => undef,
+     is_drama           => undef,
+     is_fixed_line      => 0,
+     is_geographic      => 0,
+     is_government      => undef,
+     is_in_use          => undef,
+     is_international   => undef,
+     is_ipphone         => undef,
+     is_isdn            => undef,
+     is_mobile          => 1,
+     is_network_service => undef,
+     is_pager           => undef,
+     is_personal        => undef,
+     is_valid           => 1,
+     location           => undef,
+     operator           => undef,
+     operator_ported    => undef,
+     regulator          => undef,
+     subscriber         => undef,
+   },
+   {},
+ ]
+
+=back
+
+This utility uses L<Number::Phone> to get information for a phone number. For
+certain countries, the information provided can be pretty detailed including
+coordinate, whether the number is an adult line, and the operator name. For
+other countries, the information provided is more basic including whether a
+number is a mobile number.
 
 This function is not exported.
 
@@ -187,27 +335,54 @@ Arguments ('*' denotes required arguments):
 
 =item * B<phnum>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 phone_number_is_valid
 
 Usage:
 
- phone_number_is_valid(%args) -> [status, msg, result, meta]
+ phone_number_is_valid(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether phone number is valid.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ phone_number_is_valid(phnum => "+442087712924"); # -> [200, "OK", 1, { "cmdline.exit_code" => 0 }]
+
+=item * Example #2:
+
+ phone_number_is_valid(phnum => "+4420877129240"); # -> [200, "OK", 0, { "cmdline.exit_code" => 1 }]
+
+=item * Example #3:
+
+ phone_number_is_valid(phnum => "+6281812345678"); # -> [200, "OK", 1, { "cmdline.exit_code" => 0 }]
+
+=item * Example #4:
+
+ phone_number_is_valid(phnum => "+6281812345"); # -> [200, "OK", 0, { "cmdline.exit_code" => 1 }]
+
+=back
+
+This utility uses L<Number::Phone> to determine whether a phone number is
+valid.
 
 This function is not exported.
 
@@ -219,16 +394,17 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -258,7 +434,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

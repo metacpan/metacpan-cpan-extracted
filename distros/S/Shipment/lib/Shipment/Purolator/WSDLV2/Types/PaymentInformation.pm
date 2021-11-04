@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::PaymentInformation;
-$Shipment::Purolator::WSDLV2::Types::PaymentInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::PaymentInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               BillingAccountNumber
               CreditCardInformation
 
-              )
+            )
         ],
         {   'PaymentType'             => \%PaymentType_of,
             'RegisteredAccountNumber' => \%RegisteredAccountNumber_of,
@@ -74,7 +74,7 @@ Shipment::Purolator::WSDLV2::Types::PaymentInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

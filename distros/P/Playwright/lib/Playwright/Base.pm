@@ -1,5 +1,5 @@
 package Playwright::Base;
-$Playwright::Base::VERSION = '0.016';
+$Playwright::Base::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -19,7 +19,6 @@ sub new ( $class, %options ) {
 
     my $self = bless(
         {
-            spec   => $Playwright::spec->{ $options{type} }{members},
             type   => $options{type},
             guid   => $options{id},
             ua     => $options{handle}{ua},
@@ -64,7 +63,7 @@ sub _coerce ( $spec, %args ) {
 
 sub _api_request ( $self, %args ) {
 
-    %args = Playwright::Base::_coerce( $self->{spec}, %args );
+    %args = Playwright::Base::_coerce( $self->spec(), %args );
 
     return Playwright::Util::async(
         sub { &Playwright::Base::_do( $self, %args ) } )
@@ -94,6 +93,10 @@ sub _do ( $self, %args ) {
         $self->{ua}, %args );
 }
 
+sub spec {
+    return $Playwright::spec;
+}
+
 1;
 
 __END__
@@ -108,18 +111,18 @@ Playwright::Base - Object representing Playwright pages
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head2 DESCRIPTION
 
 Base class for each Playwright class magic'd up by Sub::Install in Playwright's BEGIN block.
 You probably shouldn't use this.
 
-The specification for each class can be inspected with the 'spec' property:
+The specification for each class can be inspected with the 'spec' method:
 
     use Data::Dumper;
     my $object = Playwright::Base->new(...);
-    print Dumper($object->{spec});
+    print Dumper($object->spec());
 
 =head1 CONSTRUCTOR
 

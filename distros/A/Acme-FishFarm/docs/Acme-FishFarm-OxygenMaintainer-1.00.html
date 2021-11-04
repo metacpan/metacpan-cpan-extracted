@@ -1,0 +1,185 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Acme::FishFarm::OxygenMaintainer - Oxygen Maintainer for Acme::FishFarm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORT">EXPORT</a></li>
+  <li><a href="#CREATION-RELATED-SUBROUTINES-METHODS">CREATION RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#install-options">install ( %options )</a></li>
+    </ul>
+  </li>
+  <li><a href="#DISSOLVED-OXYGEN-SENSOR-RELATED-METHODS">DISSOLVED OXYGEN SENSOR RELATED METHODS</a>
+    <ul>
+      <li><a href="#current_DO-new_DO">current_DO ( $new_DO )</a></li>
+      <li><a href="#DO_threshold1">DO_threshold</a></li>
+      <li><a href="#set_DO_threshold-new_DO_threshold">set_DO_threshold ( $new_DO_threshold )</a></li>
+      <li><a href="#is_low_DO">is_low_DO</a></li>
+    </ul>
+  </li>
+  <li><a href="#OXYGEN-GENERATING-RELATED-METHODS">OXYGEN GENERATING RELATED METHODS</a>
+    <ul>
+      <li><a href="#oxygen_generation_volume">oxygen_generation_volume</a></li>
+      <li><a href="#set_oxygen_generation_volume-new_rate">set_oxygen_generation_volume ( $new_rate )</a></li>
+      <li><a href="#generate_oxygen">generate_oxygen</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Acme::FishFarm::OxygenMaintainer - Oxygen Maintainer for Acme::FishFarm</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 1.00</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    use Acme::FishFarm::OxygenMaintainer;
+    # missing stuff will be added in the next release</code></pre>
+
+<h1 id="EXPORT">EXPORT</h1>
+
+<p>None</p>
+
+<h1 id="CREATION-RELATED-SUBROUTINES-METHODS">CREATION RELATED SUBROUTINES/METHODS</h1>
+
+<h2 id="install-options">install ( %options )</h2>
+
+<p>Installs an oxygen maintainer system.</p>
+
+<p>The supported <code>%options</code> are:</p>
+
+<dl>
+
+<dt id="current_DO">current_DO</dt>
+<dd>
+
+<p>The default DO is to <code>8 mg/L</code>.</p>
+
+</dd>
+<dt id="DO_threshold">DO_threshold</dt>
+<dd>
+
+<p>The default threshold is <code>5 mg/L</code>.</p>
+
+<p>If the current DO level is lower than this threshold, then your fish is lacking oxygen.</p>
+
+</dd>
+<dt id="DO_generation_volume">DO_generation_volume</dt>
+<dd>
+
+<p>This is the rate of oxygen generation.</p>
+
+<p>The default value is <code>0.2 mg/L per unit time</code></p>
+
+</dd>
+</dl>
+
+<h1 id="DISSOLVED-OXYGEN-SENSOR-RELATED-METHODS">DISSOLVED OXYGEN SENSOR RELATED METHODS</h1>
+
+<h2 id="current_DO-new_DO">current_DO ( $new_DO )</h2>
+
+<p>Sets / returns the current DO level of the water.</p>
+
+<p><code>$new_DO</code> is optional. If present, the current DO will be set to <code>$new_DO</code>. Otherwise, returns the current DO reading.</p>
+
+<h2 id="DO_threshold1">DO_threshold</h2>
+
+<p>Returns the DO threshold.</p>
+
+<h2 id="set_DO_threshold-new_DO_threshold">set_DO_threshold ( $new_DO_threshold )</h2>
+
+<p>Sets the DO threshold.</p>
+
+<h2 id="is_low_DO">is_low_DO</h2>
+
+<p>Returns <code>1</code> if the DO level is less than the threshold value. Otherwise, returns <code>0</code>.</p>
+
+<h1 id="OXYGEN-GENERATING-RELATED-METHODS">OXYGEN GENERATING RELATED METHODS</h1>
+
+<h2 id="oxygen_generation_volume">oxygen_generation_volume</h2>
+
+<p>Returns the oxygen generation rate.</p>
+
+<h2 id="set_oxygen_generation_volume-new_rate">set_oxygen_generation_volume ( $new_rate )</h2>
+
+<p>Sets the new oxygen generation rate to <code>$new_rate</code>.</p>
+
+<h2 id="generate_oxygen">generate_oxygen</h2>
+
+<p>Pumps oxygen into the water based on the diffusion rate. The current DO value will increase every time this action is invoked.</p>
+
+<p>Take note that this will generate oxygen no matter what. Make sure you check the DO content before pumping oxygen into your tank. See <code>is_low_DO</code> for more info.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Raphael Jong Jun Jie, <code>&lt;ellednera at cpan.org&gt;</code></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-. at rt.cpan.org</code>, or through the web interface at <a href="https://rt.cpan.org/NoAuth/ReportBug.html?Queue=.">https://rt.cpan.org/NoAuth/ReportBug.html?Queue=.</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc Acme::FishFarm::OxygenMaintainer</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
+
+<p><a href="https://rt.cpan.org/NoAuth/Bugs.html?Dist=.">https://rt.cpan.org/NoAuth/Bugs.html?Dist=.</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="https://cpanratings.perl.org/d/.">https://cpanratings.perl.org/d/.</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="https://metacpan.org/release/.">https://metacpan.org/release/.</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Besiyata d&#39;shmaya</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>This software is Copyright (c) 2021 by Raphael Jong Jun Jie.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

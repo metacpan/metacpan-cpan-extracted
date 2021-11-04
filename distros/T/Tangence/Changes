@@ -1,5 +1,16 @@
 Revision history for Tangence
 
+0.27    2021-10-18:
+        [CHANGES]
+         * General code modernisation:
+            + Use signatures from perl v5.26
+            + Use Object::Pad in most classes
+            + Use Future::AsyncAwait
+            + Use Syntax::Keyword::Dynamically
+            + Use Syntax::Keyword::Match in more places
+         * Rename the memoizing constructors to `->make` to avoid clashing
+           with the generated ones from Object::Pad
+
 0.26    2021-09-12
         [CHANGES]
          * General code modernisation:

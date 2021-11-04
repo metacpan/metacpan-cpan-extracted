@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.18';
-our $SVNVERSION = (qw$Id: SEC.pm 1810 2020-10-02 12:44:37Z willem $)[2];
+$VERSION = '1.19';
+our $SVNVERSION = (qw$Id: SEC.pm 1854 2021-10-11 10:43:36Z willem $)[2];
 
 
 =head1 NAME
@@ -86,21 +86,14 @@ Fills @result with all keys in array @a that are not in array @b.
 sub key_difference {
 	my $a = shift;
 	my $b = shift;
-	my $r = shift || [];		## 0.17 interface
+	my $r = shift || [];		## 0.17 API
 
-	eval {
-		local $SIG{__DIE__};
-		my ($x) = grep { !$_->isa('Net::DNS::RR::DNSKEY') } @$a, @$b;
-		die sprintf 'unexpected %s object in key list', ref($x) if $x;
+	local $SIG{__DIE__};
+	my ($x) = grep { !$_->isa('Net::DNS::RR::DNSKEY') } @$a, @$b;
+	croak sprintf( 'unexpected %s object in key list', ref $x ) if $x;
 
-		my %index = map { ( $_->privatekeyname => 1 ) } @$b;
-		@$r = grep { !$index{$_->privatekeyname} } @$a;
-		1;
-	} || do {
-		croak($@) if wantarray;
-	};
-
-	return wantarray ? (@$r) : $@;
+	my %index = map { ( $_->privatekeyname => 1 ) } @$b;
+	return @$r = grep { !$index{$_->privatekeyname} } @$a;
 }
 
 
@@ -120,7 +113,7 @@ __END__
 
 =head1 COPYRIGHT
 
-Copyright (c)2014-2018 Dick Franks
+Copyright (c)2014-2021 Dick Franks
 
 Copyright (c)2001-2005 RIPE NCC. Author Olaf M. Kolkman
 
@@ -131,7 +124,7 @@ All Rights Reserved
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

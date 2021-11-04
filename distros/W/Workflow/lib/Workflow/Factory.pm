@@ -8,7 +8,7 @@ use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error workflow_error );
 use Carp qw(croak);
 use English qw( -no_match_vars );
-$Workflow::Factory::VERSION = '1.56';
+$Workflow::Factory::VERSION = '1.57';
 
 # Extra action attribute validation is off by default for compatibility.
 our $VALIDATE_ACTION_CONFIG = 0;
@@ -22,15 +22,12 @@ sub import {
     my $package = caller;
     my $log = get_logger(__PACKAGE__);
     if ( defined $_[0] && $_[0] eq 'FACTORY' ) {
-        $log->debug( "Trying to import 'FACTORY' of type '$class' to '$package'" );
         shift;
         my $instance = _initialize_instance($class);
 
         my $import_target = $package . '::FACTORY';
         no strict 'refs';
         unless ( defined &{$import_target} ) {
-            $log->debug( "Target '$import_target' not yet defined, ",
-                         "creating subroutine on the fly" );
             *{$import_target} = sub { return $instance };
         }
         return $instance;
@@ -363,7 +360,7 @@ sub create_workflow {
 
     my $state = $wf->_get_workflow_state();
     if ( $state->autorun ) {
-        my $state_name = $state->name;
+        my $state_name = $state->state;
         $self->log->info( "State '$state_name' marked to be run ",
                           "automatically; executing that state/action..." );
         $wf->_auto_execute_state($state);
@@ -812,7 +809,7 @@ Workflow::Factory - Generates new workflow and supporting objects
 
 =head1 VERSION
 
-This documentation describes version 1.56 of this package
+This documentation describes version 1.57 of this package
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,16 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.19 Oct 11, 2021
+
+	Use new EVP_PKEY construction API for OpenSSL post 3.x.x.
+
+	Remove support for obsolete ECC-GOST.
+
+	Add LICENSE file to comply with Fedora/RedHat announcement
+	and WARNING of restrictions on use of strong cryptography.
+
+
 **** 1.18 Oct 2, 2020
 
 	Eliminate bareword filehandle usage.
@@ -650,4 +660,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1810 2020-10-02 12:44:37Z willem $
+$Id: Changes 1854 2021-10-11 10:43:36Z willem $

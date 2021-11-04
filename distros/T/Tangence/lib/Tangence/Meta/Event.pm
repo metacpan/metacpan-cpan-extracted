@@ -1,14 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Event 0.26;
+use v5.26;
+use Object::Pad 0.51;
 
-use v5.14;
-use warnings;
-
-use Scalar::Util qw( weaken );
+package Tangence::Meta::Event 0.27;
+class Tangence::Meta::Event :strict(params);
 
 =head1 NAME
 
@@ -50,14 +49,14 @@ L<Tangence::Meta::Argument> references.
 
 =cut
 
-sub new
+has $class :param :weak :reader;
+has $name  :param       :reader;
+has @arguments;
+
+ADJUSTPARAMS ( $params )
 {
-   my $class = shift;
-   my %args = @_;
-   $args{arguments} ||= [];
-   my $self = bless \%args, $class;
-   weaken $self->{class};
-   return $self;
+   exists $params->{arguments} and
+      @arguments = @{ delete $params->{arguments} };
 }
 
 =head1 ACCESSORS
@@ -72,12 +71,6 @@ Returns the class the event is a member of
 
 =cut
 
-sub class
-{
-   my $self = shift;
-   return $self->{class};
-}
-
 =head2 name
 
    $name = $event->name
@@ -85,12 +78,6 @@ sub class
 Returns the name of the class
 
 =cut
-
-sub name
-{
-   my $self = shift;
-   return $self->{name};
-}
 
 =head2 arguments
 
@@ -100,11 +87,7 @@ Return the arguments in a list of L<Tangence::Meta::Argument> references.
 
 =cut
 
-sub arguments
-{
-   my $self = shift;
-   return @{ $self->{arguments} };
-}
+method arguments { @arguments }
 
 =head2 argtypes
 
@@ -114,10 +97,9 @@ Return the argument types in a list of strings.
 
 =cut
 
-sub argtypes
+method argtypes
 {
-   my $self = shift;
-   return map { $_->type } $self->arguments;
+   return map { $_->type } @arguments;
 }
 
 =head1 AUTHOR

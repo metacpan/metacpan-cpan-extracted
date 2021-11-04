@@ -3,6 +3,7 @@
 #
 # Translators:
 # Danny Zeng <danny@zeng.com.cn>, 2000
+# Dmitry <dmitrydmitry761@gmail.com>, 2021
 # 7rack <vimxiang@gmail.com>, 2014
 # zhangmin <zm1990s@gmail.com>, 2014
 # zwpwjwtz <zwpwjwtz@126.com>, 2016
@@ -11,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2020-07-10 17:41+0100\n"
-"PO-Revision-Date: 2020-07-10 16:45+0000\n"
-"Last-Translator: zwpwjwtz <zwpwjwtz@126.com>\n"
+"PO-Revision-Date: 2021-08-22 18:54+0000\n"
+"Last-Translator: Dmitry <dmitrydmitry761@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/MageiaLinux/mageia/"
 "language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -1061,7 +1062,7 @@ msgstr "取消忽略 tainted 介质“%s”，因为已安装 tainted 软件包"
 msgid ""
 "un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
 "32-bit EFI"
-msgstr ""
+msgstr "un-ignoring 32bit medium `%s' b/c 32 位 安装了软件包或系统是 32 位 EFI"
 
 #: ../urpm/media.pm:844
 #, c-format

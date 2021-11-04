@@ -1,5 +1,32 @@
 Revision history for Text::Layout
 
+0.025	2021-10-22
+
+	Add font config properties underline_thickness,
+	strikeline_position, strikeline_thickness, overline_position,
+	overline_thickness, and strikeline_position. Overriding the
+	font specified/calculated values may improve results for some
+	fonts. Note that strikeline_thickness and overline_thickness
+	will default to underline_thickness if set.
+
+	Withdraw a and link aliases for href. They may serve a
+	different purpose in the future.
+
+0.024	2021-10-21
+
+	Retain case sensitivity for links.
+
+	Remove debugging info.
+
+0.023	2021-10-21
+
+	Add support for underline, overline and strike, and their
+	colours.
+
+	Add support for hyperlinks (span attributes a, href and link).
+	Note that this is not part of the official Pango Markup
+	specification.
+	
 0.022	2021-10-04
 
 	Fix some reentrancy problems.

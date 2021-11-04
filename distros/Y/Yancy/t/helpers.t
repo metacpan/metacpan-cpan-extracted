@@ -6,7 +6,7 @@ work correctly.
 
 =head1 SEE ALSO
 
-L<Yancy::Backend::Test>
+L<Yancy::Backend::Memory>
 
 =cut
 
@@ -20,7 +20,7 @@ use Scalar::Util qw( blessed );
 use lib "".path( $Bin, 'lib' );
 use Local::Test qw( init_backend load_fixtures );
 
-my $schema = \%Yancy::Backend::Test::SCHEMA;
+my $schema = \%Local::Test::SCHEMA;
 $schema->{people}{properties}{name}{'x-filter'} = [ 'foobar' ];
 
 my %fixtures = load_fixtures( 'basic', 'filters' );
@@ -68,7 +68,8 @@ $t->app->log->level( $ENV{MOJO_LOG_LEVEL} = 'error' );
 open my $logfh, '>', \my $logbuf;
 $t->app->log->handle( $logfh );
 
-$t->app->yancy->filter->add( foobar => sub { 'foobar' } );
+my $disable_foobar = 0;
+$t->app->yancy->filter->add( foobar => sub { $disable_foobar ? undef : 'foobar' } );
 $t->app->yancy->filter->add( 'test.format_phone' => sub {
     $_[1] =~ s/\D//gr =~ s/(\d{3})(\d{3})(\d{4})/($1) $2-$3/r;
 } );
@@ -78,6 +79,14 @@ subtest 'yancy.filters' => sub {
     my $filters = $t->app->yancy->filters;
     isa_ok $filters, 'HASH';
     isa_ok $filters->{foobar}, 'CODE';
+};
+
+subtest 'model' => sub {
+    my $model = $t->app->yancy->model;
+    isa_ok $model, 'Yancy::Model';
+    my $schema = $t->app->yancy->model( 'people' );
+    isa_ok $schema, 'Yancy::Model::Schema';
+    is $schema->name, 'people', 'correct schema object returned';
 };
 
 subtest 'list' => sub {
@@ -122,22 +131,6 @@ subtest 'set' => sub {
     $new_person->{name} = 'foobar'; # filters are executed
     is_deeply $backend->get( people => $set_id ), $new_person;
 
-    subtest 'set dies with missing fields' => sub {
-        eval { $t->app->yancy->set( people => $set_id => {} ) };
-        ok $@, 'set() dies';
-        is blessed $@->[0], 'JSON::Validator::Error' or diag explain $@;
-        my $message = $@->[0]{message};
-        my $path = $@->[0]{path};
-        #; print explain $t->app->log->history;
-        is $t->app->log->history->[-1][1], 'error',
-            'error message is logged at error level';
-        like $t->app->log->history->[-1][2], qr{Error validating item with ID "$set_id" in schema "people": $path: $message},
-            'error message is logged with JSON validation error';
-
-        is_deeply $backend->get( people => $set_id ), $new_person,
-            'person is not saved';
-    };
-
     subtest 'set numeric field with string containing number' => sub {
         eval {
             $t->app->yancy->set( people =>
@@ -172,18 +165,6 @@ subtest 'set' => sub {
             %$new_email,
         };
         is_deeply $backend->get( people => $set_id ), $new_person;
-
-        subtest 'required fields are still required' => sub {
-            eval {
-                $t->app->yancy->set(
-                    people => $set_id => {},
-                    properties => [qw( name )],
-                );
-            };
-            ok $@, 'set() dies';
-            like $@->[0]{path}, qr{/name}, 'name is missing';
-            like $@->[0]{message}, qr{Missing}, 'missing error correct';
-        };
     };
 
     subtest 'set boolean field' => sub {
@@ -261,10 +242,11 @@ subtest 'set' => sub {
                 password => 'ignore',
             } )
         };
-        ok !$@, 'create() does not die' or diag $@;
+        ok !$@, 'create() does not die' or diag explain $@;
         my $got = $t->app->yancy->get( user => 'newusername' );
         ok $got, 'newusername exists';
         like $got->{created}, qr{^\d{4}-\d{2}-\d{2}}, 'created is set by database';
+        isnt $got->{created}, '2021-01-01 00:00:00', 'created is not set to a default (to pass validation)';
     };
 
     subtest 'set datetime field with empty string to null' => sub {
@@ -332,6 +314,7 @@ subtest 'create' => sub {
 
     my $count = $backend->list( 'people' )->{total};
     subtest 'create dies with missing fields' => sub {
+        $disable_foobar = 1;
         eval { $t->app->yancy->create( people => {} ) };
         ok $@, 'create() dies';
         is blessed $@->[0], 'JSON::Validator::Error' or diag explain $@;
@@ -344,6 +327,7 @@ subtest 'create' => sub {
 
         is $backend->list( 'people' )->{total},
             $count, 'no new person was added';
+        $disable_foobar = 0;
     };
 
     subtest 'backend method dies' => sub {

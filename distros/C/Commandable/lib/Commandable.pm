@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
 
-package Commandable;
+package Commandable 0.05;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.04';
 
 =head1 NAME
 

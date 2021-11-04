@@ -45,7 +45,7 @@ share {
   # - macOS has its own native SSL implementation which is supported by curl
   elsif($^O eq 'darwin')
   {
-    unshift @acflags, '--with-darwinssl', '--without-ssl';
+    unshift @acflags, '--with-secure-transport';
     undef $alien_ssl;
   }
   # - elsewhere OpenSSL is probably a reasonable option

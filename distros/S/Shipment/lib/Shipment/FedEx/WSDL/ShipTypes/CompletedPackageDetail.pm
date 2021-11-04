@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ Class::Std::initialize();
               SignatureOption
               HazardousCommodities
 
-              )
+            )
         ],
         {   'SequenceNumber'       => \%SequenceNumber_of,
             'TrackingIds'          => \%TrackingIds_of,
@@ -130,7 +130,7 @@ Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

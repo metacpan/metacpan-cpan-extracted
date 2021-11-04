@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.26;
 use warnings;
+
+use Future::AsyncAwait 0.47;
 
 use Test::More;
 
@@ -32,13 +34,13 @@ my ( $conn1, $conn2 ) = map {
       objproxy => $objproxy,
    };
 
-   $objproxy->watch_property( "scalar",
+   await $objproxy->watch_property( "scalar",
       on_set => sub { $conn->{scalar} = shift; },
-   )->get;
+   );
 
-   my ( $cursor ) = $objproxy->watch_property_with_cursor( "queue", "first",
+   my ( $cursor ) = await $objproxy->watch_property_with_cursor( "queue", "first",
       on_updated => sub {},
-   )->get;
+   );
 
    $conn
 } 1 .. 2;

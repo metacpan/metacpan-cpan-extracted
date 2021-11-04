@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -32,9 +32,9 @@ Class::Std::initialize();
               TrackingNumberUniqueIdentifier
               CarrierCode
 
-              )
+            )
         ],
-        {   'PackageIdentifier' => \%PackageIdentifier_of,
+        {   'PackageIdentifier'              => \%PackageIdentifier_of,
             'TrackingNumberUniqueIdentifier' =>
               \%TrackingNumberUniqueIdentifier_of,
             'CarrierCode' => \%CarrierCode_of,
@@ -48,7 +48,7 @@ Class::Std::initialize();
         },
         {
 
-            'PackageIdentifier' => 'PackageIdentifier',
+            'PackageIdentifier'              => 'PackageIdentifier',
             'TrackingNumberUniqueIdentifier' =>
               'TrackingNumberUniqueIdentifier',
             'CarrierCode' => 'CarrierCode',
@@ -72,7 +72,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

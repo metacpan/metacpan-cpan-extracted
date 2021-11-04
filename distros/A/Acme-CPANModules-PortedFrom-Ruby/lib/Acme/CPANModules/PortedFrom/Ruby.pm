@@ -1,9 +1,9 @@
 package Acme::CPANModules::PortedFrom::Ruby;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-05'; # DATE
+our $DATE = '2021-05-29'; # DATE
 our $DIST = 'Acme-CPANModules-PortedFrom-Ruby'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $LIST = {
     summary => "Modules/applications that are ported from (or inspired by) ".
@@ -36,9 +36,9 @@ _
             description => <<'_',
 
 From Plack's documentation: "Plack is like Ruby's Rack or Python's Paste for
-WSGI." Plack and PSGI was created by MIYAGAWA in 2009 and is inspired by both
+WSGI." Plack and PSGI were created by MIYAGAWA in 2009 and were inspired by both
 Python's WSGI specification (hence the dual specification-implementation split)
-and Plack (hence the name).
+and Ruby's Rack (hence the name).
 
 _
         },
@@ -60,7 +60,7 @@ Acme::CPANModules::PortedFrom::Ruby - Modules/applications that are ported from 
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::CPANModules::PortedFrom::Ruby (from Perl distribution Acme-CPANModules-PortedFrom-Ruby), released on 2021-02-05.
+This document describes version 0.007 of Acme::CPANModules::PortedFrom::Ruby (from Perl distribution Acme-CPANModules-PortedFrom-Ruby), released on 2021-05-29.
 
 =head1 DESCRIPTION
 
@@ -84,9 +84,9 @@ If you know of others, please drop me a message.
 =item * L<Plack>
 
 From Plack's documentation: "Plack is like Ruby's Rack or Python's Paste for
-WSGI." Plack and PSGI was created by MIYAGAWA in 2009 and is inspired by both
+WSGI." Plack and PSGI were created by MIYAGAWA in 2009 and were inspired by both
 Python's WSGI specification (hence the dual specification-implementation split)
-and Plack (hence the name).
+and Ruby's Rack (hence the name).
 
 
 =back
@@ -102,8 +102,13 @@ document CPAN. See L<Acme::CPANModules> for more details.
 =head2 What are ways to use this Acme::CPANModules module?
 
 Aside from reading this Acme::CPANModules module's POD documentation, you can
-install all the listed modules (entries) using L<cpanmodules> CLI (from
-L<App::cpanmodules> distribution):
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n PortedFrom::Ruby
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries PortedFrom::Ruby | cpanm -n
 
@@ -129,7 +134,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Por
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Ruby/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-PortedFrom-Ruby>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

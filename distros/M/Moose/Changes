@@ -1,6 +1,17 @@
 Also see Moose::Manual::Delta for more details of, and workarounds
 for, noteworthy changes.
 
+2.2200   2021-10-31
+
+  - no changes since 2.2100
+
+2.2100   2021-04-13 (TRIAL RELEASE)
+
+  [OTHER]
+
+  - Replaced all uses of Sub::Name with Sub::Util, since the latter is part of
+    core as of Perl 5.22.
+
 2.2015   2021-03-31
 
   [TESTS]

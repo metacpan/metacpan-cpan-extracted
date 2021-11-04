@@ -2,8 +2,22 @@ NAME
     App::ImageMagickUtils - Utilities related to ImageMagick
 
 VERSION
-    This document describes version 0.005 of App::ImageMagickUtils (from
-    Perl distribution App-ImageMagickUtils), released on 2021-10-05.
+    This document describes version 0.008 of App::ImageMagickUtils (from
+    Perl distribution App-ImageMagickUtils), released on 2021-10-12.
+
+DESCRIPTION
+    This distribution includes the following CLI utilities related to
+    ImageMagick:
+
+    *   calc-image-resized-size
+
+    *   convert-image-to
+
+    *   convert-image-to-pdf
+
+    *   downsize-image
+
+    *   image-resize-notation-to-human
 
 FUNCTIONS
   convert_image_to
@@ -26,6 +40,8 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   delete_original => *bool*
 
     *   files* => *array[filename]*
 
@@ -68,6 +84,8 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   delete_original => *bool*
+
     *   files* => *array[filename]*
 
     Returns an enveloped result (an array).
@@ -108,6 +126,8 @@ FUNCTIONS
     This function supports dry-run operation.
 
     Arguments ('*' denotes required arguments):
+
+    *   delete_original => *bool*
 
     *   downsize_to => *str* (default: 1024)
 

@@ -21,11 +21,16 @@ my $normalize_args = sub {
   return %args;
 };
 
+sub generate_error_template_name {
+  my ($c, $code, %args) = @_;
+  return 'http_error';
+}
+
 sub finalize_error_args {
   my ($c, $code, %args) = @_;
   return (
     code => $code,
-    template => $code,
+    template => $c->generate_error_template_name($code, %args),
     uri => "@{[ $c->req->uri ]}",
     %args );
 }
@@ -154,11 +159,13 @@ First if the View has a method C<http_${code}> (where C<$code> is the HTTP statu
 using for the error) we call that method with args C<$c, %args> and expect that method to setup
 a valid error response.
 
-Second, when call the method C<http_default> with args C<$c, $code, %args> if that exists.
+Second, call the method C<http_default> with args C<$c, $code, %args> if that exists.
 
 If neither method exists we call C<$c->forward($view)> and C<%args> are added to the stash, along
-with a stash field 'template' which is set to the error $code.   This should work with most
-standard L<Catalyst> views that look at the stash field 'template' to find a template name.
+with a stash field 'template' which is set to the value 'http_error'.   This should work with most
+standard L<Catalyst> views that look at the stash field 'template' to find a template name.  If you
+prefer a differnt template name you can override the method 'generate_error_template_name' to make
+it whatever you wish.
 
 =head2 detach_error
 

@@ -14,7 +14,7 @@ use integer;
 
 use Test::More;
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 use Chess::Plisco::Engine::Position;
 
 use lib 't/lib';

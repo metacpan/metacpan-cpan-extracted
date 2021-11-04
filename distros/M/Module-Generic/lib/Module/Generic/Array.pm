@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.0.2
+## Version v1.1.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/08/21
+## Modified 2021/08/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -35,18 +35,29 @@ BEGIN
         fallback => 1,
     );
     our $RETURN = {};
-    our( $VERSION ) = 'v1.0.2';
+    our( $VERSION ) = 'v1.1.0';
 };
 
 sub new
 {
     my $this = CORE::shift( @_ );
     my $init = [];
-    $init = CORE::shift( @_ ) if( @_ && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) );
+    if( @_ )
+    {
+        if( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || 
+            ref( $_[0] ) eq 'ARRAY' )
+        {
+            $init = CORE::shift( @_ );
+        }
+        else
+        {
+            $init = [@_];
+        }
+    }
     CORE::return( bless( $init => ( ref( $this ) || $this ) ) );
 }
 
-sub as_array { return( $_[0] ); }
+sub as_array { CORE::return( $_[0] ); }
 
 sub as_hash
 {
@@ -80,12 +91,12 @@ sub chomp
 {
     my $self = CORE::shift( @_ );
     CORE::chomp( @$self );
-    return( $self );
+    CORE::return( $self );
 }
 
 sub clone { CORE::return( $_[0]->new( [ @{$_[0]} ] ) ); }
 
-sub contains { return( shift->exists( @_ ) ); }
+sub contains { CORE::return( CORE::shift->exists( @_ ) ); }
 
 sub delete
 {
@@ -140,7 +151,9 @@ sub each
     CORE::return( $self );
 }
 
-sub empty { return( shift->reset( @_ ) ); }
+sub eighth { CORE::return( CORE::shift->get_null(7) ); }
+
+sub empty { CORE::return( CORE::shift->reset( @_ ) ); }
 
 # Credits: <https://www.perlmonks.org/?node_id=871696>
 sub even
@@ -157,29 +170,9 @@ sub exists
     CORE::return( $self->_number( CORE::scalar( CORE::grep( /^$this$/, @$self ) ) ) );
 }
 
-sub first
-{
-    my $self = CORE::shift( @_ );
-    if( CORE::length( $self->[0] ) )
-    {
-        if( Want::want( 'OBJECT' ) && !ref( $self->[0] ) )
-        {
-            rreturn( Module::Generic::Scalar->new( $self->[0] ) );
-        }
-        else
-        {
-            CORE::return( $self->[0] );
-        }
-    }
-    else
-    {
-        if( Want::want( 'OBJECT' ) )
-        {
-            rreturn( Module::Generic::Null->new );
-        }
-        CORE::return( $self->[0] );
-    }
-}
+sub fifth { CORE::return( CORE::shift->get_null(4) ); }
+
+sub first { CORE::return( CORE::shift->get_null(0) ); }
 
 sub for
 {
@@ -225,7 +218,7 @@ sub foreach
         local $_ = $v;
         my $rv = $code->( $v );
         CORE::defined( $rv ) || CORE::last;
-        if( defined( my $ret = $self->return ) )
+        if( CORE::defined( my $ret = $self->return ) )
         {
             $rv = $ret;
             $self->return_reset;
@@ -246,19 +239,50 @@ sub foreach
     CORE::return( $self );
 }
 
+sub fourth { CORE::return( CORE::shift->get_null(3) ); }
+
 sub get
 {
     my $self = CORE::shift( @_ );
-    my $offset = CORE::shift( @_ );
-    if( want( 'OBJECT' ) && !ref( $self->[ CORE::int( $offset ) ] ) )
+    my $offset = CORE::int( CORE::shift( @_ ) );
+    # offset may be out of bound, which will lead Module::Generic::Scalar to hold an undefined value or the offset exists but contains an undef value which will lead to the same
+    if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || Scalar::Util::reftype( $self->[ $offset ] ) eq 'SCALAR' ) )
     {
-        rreturn( Module::Generic::Scalar->new( $self->[ CORE::int( $offset ) ] ) );
+        rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
+    }
+    # If the enclosed value is a regular ref like array or hash and user wants an object, this will trigger an error, but that is the user's fault. I think it would be bad design to prevent the error from happening and second guess what the user is trying to do.
+    else
+    {
+        CORE::return( $self->[ $offset ] );
+    }
+}
+
+sub get_null
+{
+    my $self = CORE::shift( @_ );
+    my $offset = CORE::int( CORE::shift( @_ ) );
+    if( CORE::defined( $self->[ $offset ] ) && CORE::length( $self->[ $offset ] ) )
+    {
+        if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || Scalar::Util::reftype( $self->[ $offset ] ) eq 'SCALAR' ) )
+        {
+            rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
+        }
+        # If the enclosed value is a regular ref like array or hash and user wants an object, this will trigger an error, but that is the user's fault. I think it would be bad design to prevent the error from happening and second guess what the user is trying to do.
+        else
+        {
+            CORE::return( $self->[ $offset ] );
+        }
     }
     else
     {
-        CORE::return( $self->[ CORE::int( $offset ) ] );
+        if( Want::want( 'OBJECT' ) )
+        {
+            rreturn( Module::Generic::Null->new( wants => 'object' ) );
+        }
+        CORE::return( $self->[ $offset ] );
     }
 }
+
 
 sub grep
 {
@@ -288,12 +312,12 @@ sub grep
 
 sub has { CORE::return( CORE::shift->exists( @_ ) ); }
 
+# Same as get. Maybe I should alias it
 sub index
 {
     my $self = CORE::shift( @_ );
-    my $pos  = CORE::shift( @_ );
-    $pos = CORE::int( $pos );
-    if( want( 'OBJECT' ) && !ref( $self->[ $pos ] ) )
+    my $pos  = CORE::int( CORE::shift( @_ ) );
+    if( want( 'OBJECT' ) && ( !ref( $self->[ $pos ] ) || Scalar::Util::reftype( $self->[ $pos ] ) eq 'SCALAR' ) )
     {
         rreturn( Module::Generic::Scalar->new( $self->[ $pos ] ) );
     }
@@ -303,12 +327,21 @@ sub index
     }
 }
 
+sub intersection
+{
+    my $self  = CORE::shift( @_ );
+    my $other = $self->new( @_ );
+    my $hash  = $self->as_hash;
+    my $new   = $other->grep(sub{ CORE::exists( $hash->{ $_ } ) });
+    CORE::return( $new );
+}
+
 sub iterator { CORE::return( Module::Generic::Iterator->new( $self ) ); }
 
 sub join
 {
     my $self = CORE::shift( @_ );
-    CORE::return( $self->_scalar( CORE::join( $_[0], @$self ) ) );
+    CORE::return( $self->_scalar( CORE::join( shift( @_ ), @$self, @_ ) ) );
 }
 
 sub keys
@@ -317,29 +350,7 @@ sub keys
     CORE::return( $self->new( [ CORE::keys( @$self ) ] ) );
 }
 
-sub last
-{
-    my $self = CORE::shift( @_ );
-    if( CORE::length( $self->[-1] ) )
-    {
-        if( Want::want( 'OBJECT' ) && !ref( $self->[-1] ) )
-        {
-            rreturn( Module::Generic::Scalar->new( $self->[-1] ) );
-        }
-        else
-        {
-            CORE::return( $self->[-1] );
-        }
-    }
-    else
-    {
-        if( Want::want( 'OBJECT' ) )
-        {
-            rreturn( Module::Generic::Null->new );
-        }
-        CORE::return( $self->[-1] );
-    }
-}
+sub last { CORE::return( CORE::shift->get_null(-1) ); }
 
 sub length { CORE::return( $_[0]->_number( scalar( @{$_[0]} ) ) ); }
 
@@ -365,6 +376,12 @@ sub map
     }
 }
 
+sub max
+{
+    my $self = CORE::shift( @_ );
+    return( Module::Generic::Scalar->new( List::Util::max( @$self ) ) );
+}
+
 sub merge
 {
     my $self = CORE::shift( @_ );
@@ -380,6 +397,16 @@ sub merge
     }
     CORE::return( $self );
 }
+
+sub min
+{
+    my $self = CORE::shift( @_ );
+    return( Module::Generic::Scalar->new( List::Util::min( @$self ) ) );
+}
+
+sub ninth { CORE::return( CORE::shift->get_null(8) ); }
+
+sub object { return( $_[0] ); }
 
 # Credits: <https://www.perlmonks.org/?node_id=871696>
 sub odd
@@ -407,10 +434,16 @@ sub offset
     }
 }
 
+sub pack
+{
+    my $self = CORE::shift( @_ );
+    CORE::return( $self->_scalar( CORE::pack( $_[0], @$self ) ) );
+}
+
 sub pop
 {
     my $self = CORE::shift( @_ );
-    if( Want::want( 'OBJECT' ) && !ref( $self->[-1] ) )
+    if( Want::want( 'OBJECT' ) && ( !ref( $self->[-1] ) || Scalar::Util::reftype( $self->[-1] ) eq 'SCALAR' ) )
     {
         rreturn( Module::Generic::Scalar->new( CORE::pop( @$self ) ) );
     }
@@ -462,12 +495,12 @@ sub remove
         Scalar::Util::blessed( $_[0] ) && 
         $_[0]->isa( 'Module::Generic::Array' ) )
     {
-        $ref = shift( @_ );
+        $ref = CORE::shift( @_ );
     }
     elsif( scalar( @_ ) == 1 &&
            Scalar::Util::reftype( $_[0] ) eq 'ARRAY' )
     {
-        $ref = $self->new( shift( @_ ) );
+        $ref = $self->new( CORE::shift( @_ ) );
     }
     else
     {
@@ -476,7 +509,7 @@ sub remove
     my $hash = $ref->as_hash;
     my @res = grep{ !CORE::exists( $hash->{ $_ } ) } @$self;
     @$self = @res;
-    return( $self );
+    CORE::return( $self );
 }
 
 sub reset
@@ -492,7 +525,7 @@ sub return
     my $id   = Scalar::Util::refaddr( $self );
     if( @_ )
     {
-        $RETURN->{ $id } = \( shift( @_ ) );
+        $RETURN->{ $id } = \( CORE::shift( @_ ) );
         CORE::return( undef() ) if( !CORE::defined( ${$RETURN->{ $id }} ) );
     }
     CORE::return( $RETURN->{ $id } );
@@ -521,6 +554,8 @@ sub reverse
 
 sub scalar { CORE::return( CORE::shift->length ); }
 
+sub second { CORE::return( CORE::shift->get_null(1) ); }
+
 sub set
 {
     my $self = CORE::shift( @_ );
@@ -529,10 +564,12 @@ sub set
     CORE::return( $self );
 }
 
+sub seventh { CORE::return( CORE::shift->get_null(6) ); }
+
 sub shift
 {
     my $self = CORE::shift( @_ );
-    if( Want::want( 'OBJECT' ) && !ref( $self->[0] ) )
+    if( Want::want( 'OBJECT' ) && ( !ref( $self->[0] ) || Scalar::Util::reftype( $self->[0] ) eq 'SCALAR' ) )
     {
         rreturn( Module::Generic::Scalar->new( CORE::shift( @$self ) ) );
     }
@@ -541,6 +578,8 @@ sub shift
         CORE::return( CORE::shift( @$self ) );
     }
 }
+
+sub sixth { CORE::return( CORE::shift->get_null(5) ); }
 
 sub size { CORE::return( $_[0]->_number( $#{$_[0]} ) ); }
 
@@ -626,7 +665,12 @@ sub splice
     }
 }
 
-sub split { return( CORE::shift->_scalar( CORE::shift( @_ ) )->split( @_ ) ); }
+# my $a = $ar->split( qr/[[:blank:]\h]+/, "I disapprove of what you say, but I will defend to the death your right to say it" );
+sub split { CORE::return( CORE::shift->_scalar( CORE::splice( @_, 1, 1 ) )->split( @_ ) ); }
+
+sub tenth { CORE::return( CORE::shift->get_null(9) ); }
+
+sub third { CORE::return( CORE::shift->get_null(2) ); }
 
 sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
 
@@ -707,7 +751,7 @@ sub _scalar
     my $self = CORE::shift( @_ );
     my $str  = CORE::shift( @_ );
     CORE::return if( !defined( $str ) );
-    ## Whether empty or not, return an object
+    # Whether empty or not, return an object
     CORE::return( Module::Generic::Scalar->new( $str ) );
 }
 

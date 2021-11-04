@@ -1,9 +1,9 @@
 package Sah::Schema::perl::wordlist::modname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-27'; # DATE
+our $DATE = '2021-06-07'; # DATE
 our $DIST = 'Sah-Schemas-WordList'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $schema = ['perl::modname' => {
     summary => 'Perl WordList::* module name without the prefix, e.g. EN::Enable',
@@ -45,7 +45,7 @@ Sah::Schema::perl::wordlist::modname - Perl WordList::* module name without the 
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::perl::wordlist::modname (from Perl distribution Sah-Schemas-WordList), released on 2020-05-27.
+This document describes version 0.003 of Sah::Schema::perl::wordlist::modname (from Perl distribution Sah-Schemas-WordList), released on 2021-06-07.
 
 =head1 SYNOPSIS
 
@@ -143,7 +143,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

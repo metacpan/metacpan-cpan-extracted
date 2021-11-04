@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ShippingDocument;
-$Shipment::FedEx::WSDL::ShipTypes::ShippingDocument::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ShippingDocument::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ Class::Std::initialize();
               CopiesToPrint
               Parts
 
-              )
+            )
         ],
         {   'Type'                        => \%Type_of,
             'Grouping'                    => \%Grouping_of,
@@ -57,7 +57,7 @@ Class::Std::initialize();
             'ShippingDocumentDisposition' =>
               'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentDispositionType',
             'AccessReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Resolution' =>
+            'Resolution'      =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'CopiesToPrint' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
@@ -93,7 +93,7 @@ Shipment::FedEx::WSDL::ShipTypes::ShippingDocument
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

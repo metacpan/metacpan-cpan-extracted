@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::HoldAtLocationDetail;
-$Shipment::FedEx::WSDL::ShipTypes::HoldAtLocationDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::HoldAtLocationDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               LocationContactAndAddress
               LocationType
 
-              )
+            )
         ],
         {   'PhoneNumber'               => \%PhoneNumber_of,
             'LocationContactAndAddress' => \%LocationContactAndAddress_of,
@@ -68,7 +68,7 @@ Shipment::FedEx::WSDL::ShipTypes::HoldAtLocationDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges;
-$Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        VariableHandlingCharge
               TotalCustomerCharge
 
-              )
+            )
         ],
         {   'VariableHandlingCharge' => \%VariableHandlingCharge_of,
             'TotalCustomerCharge'    => \%TotalCustomerCharge_of,
@@ -62,7 +62,7 @@ Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

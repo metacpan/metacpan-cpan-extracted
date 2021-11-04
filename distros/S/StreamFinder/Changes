@@ -309,4 +309,74 @@ Revision history for StreamFinder
         - Small doc. touchups.
 1.61    2021/10/03
         - Add 'artist' icon option (see v1.60 changes) to StreamFinder::Rumble, 
-        StreamFinder::Castbox, and StreamFinder::Spreaker.
+        StreamFinder::Castbox, StreamFinder::Spreaker and StreamFinder::Vimeo.
+1.62    2021/10/08
+        - Fix getImageData() returning icon instead of image if wget used to 
+        fetch.
+        - getImageUrl() and getImageData() can now also accept the 'artist' 
+        argument and return a separate artist / channel image, if one larger / 
+        different from the corresponding icon exists.  Currenty, only 
+        StreamFinder::Odysee provides these.
+        - Add StreamFinder::Odysee to handle odysee.com videos 
+        (requires youtube-dl).
+1.63    2021/10/27 - NOT RELEASED -
+        *** Youtube seems to now throttle video download/playback making most 
+        videos virtually unplayable through third-party players, ie. 
+        youtube-dl.  The currently-suggested workaround is to use a forked 
+        version called yt-dlp, which seems to have figured out a workaround!
+        - Update the default -agent (browser user-agent version) string to: 
+        "Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0".
+        - StreamFinder::Anystream:  Properly handle the base-url for relative 
+        links, and add first word of url following the domain-name for the 
+        "ID" to make it more unique.
+        - StreamFinder::Youtube:  Add several new config options:
+          -youtube-dl:  Allow specifying youtube-dl alternative program, such 
+          as yt-dlp (See headline above).
+          -format, -userid, -userpw (added to new() parameter list).
+          -formatonly, -user-agent, -youtube-dl-args, -youtube-dl-add-args: 
+          (See pod docs for descriptions and values).
+          - Remove conversion of www.youtube.com to youtube.be (no longer seems 
+          to be needed).
+          - Misc code and doc. cleanups.
+1.70    2021/10/28
+        - Includes all changes made in unreleased v1.63 (rc) above.
+        - Add ability to specify alternate location of config. files - via new 
+        environment variable:  STREAMFINDER (see docs).
+        - Refactor all youtube-dl calls to eliminate redundant code and make 
+        use of StreamFinder::Youtube configurations (primarily to allow for 
+        specifying alternate youtube-dl program) by forcing all youtube-dl 
+        usage to go through StreamFinder::Youtube.  This change affects 
+        StreamFinder::Bitchute, ::Blogger, ::Brighteon, ::Odysee, ::Tunein, 
+        and ::Vimeo.  This also now allows configuring individual modules 
+        to override the default Youtube module's youtube-dl parameters, of 
+        which "-format" will likely be the most overridden.  This should be 
+        done in module's config files, adding "-youtube" in front of them, 
+        ie. "-youtube-format" for the above example.
+        - StreamFinder::Odysee:  Add "-youtube" option similar to some other 
+        video modules (values:  yes|no|first|last|only) to enable usage of 
+        the Youtube link at the bottom of the description for (most) 
+        Odysee videos instead of the embedded info in the Odysee page.
+        - StreamFinder::_Class:  Fix bug handling option parameters,  
+        particularly ones containing a dash between words.
+        - StreamFinder::Blogger & ::Brighteon:  Change -youtube option 
+        default from "yes" to "no" to match other modules using this option.
+1.71    2021/10/30
+        - StreamFinder::Youtube:  Add ability to scrape additional metadata 
+        from Youtube pages referenced by initial non-Youtube page URLs via 
+        youtube-dl & friends' "--get-id" option, if one is returned.
+1.72    2021/11/03
+        - StreamFinder::Youtube:  Fix bug that prevented access to some videos 
+        (namely ones with non-alphanumeric characters in the youtube-id 
+        introduced in previous release.
+        Also fix issue with failure to fetch Youtube metadata for Youtube 
+        videos embedded in iframes in non-Youtube sites (also broke by v1.71).
+        - Also add a -youtubeonly option to tell ::Youtube to NOT return 
+        embedded Rumble.com or other videos found in non-Youtube pages.  
+        Modified docs to more clearly explain this.
+        - StreamFinder::IHeartRadio:  Add ability to return first (latest) 
+        episode if only a podcast channel page (without episode) URL is used.
+        Also add proper channel metadata (name, channel artist's icon) to 
+        metadata returned for podcasts.
+        - StreamFinder::IHeartRadio:  Fix Perl character-encoding issue.  Also 
+        try harder to ensure podcast channel pages return the first (latest) 
+        episode, instead of the oldest.

@@ -7,7 +7,7 @@ use 5.012;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Create resultset accessors from table names",
+  "ABSTRACT" => "Create resultset accessors from schema result class names",
   "AUTHOR" => "D Ruth Holloway <ruth\@hiruthie.me>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,8 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "DBIx::Class::Schema::ResultSetNames",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "DBIx::Class::Schema" => 0,
-    "Lingua::EN::Inflect::Phrase" => 0
+    "Lingua::EN::Inflect::Phrase" => 0,
+    "Modern::Perl" => 0
   },
   "TEST_REQUIRES" => {
     "DBD::SQLite" => 0,
@@ -27,10 +29,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test2::V0" => 0,
     "Test::More" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +41,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "DBD::SQLite" => 0,
   "DBIx::Class::Core" => 0,
   "DBIx::Class::Schema" => 0,
@@ -46,6 +50,8 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Lingua::EN::Inflect::Phrase" => 0,
+  "Modern::Perl" => 0,
+  "Test2::V0" => 0,
   "Test::More" => 0,
   "Try::Tiny" => 0
 );

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
 
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -89,6 +89,37 @@ will be written without the F<.html> extension. This should also work for local
 browsing, although it does look strange, all those pages with the F<.html>
 extension.
 
+B<phoebe-ctl log hits>
+
+B<phoebe-ctl log requests [IP number]>
+
+If you are logging IP numbers, this command will offer a little summary. In your
+config file, you need the following (or start C<phoebe> with
+C<--log_level=debug>):
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our ($log);
+    $log->level('debug');
+
+And you need L<App::Phoebe::DebugIpNumbers>, of course:
+
+    use App::Phoebe::DebugIpNumbers;
+
+Example basic usage, feeding it the journal kept by C<systemd>, giving you the
+most active IP numbers:
+
+    journalctl --unit phoebe | phoebe-ctl log hits | head
+
+Giving you a summary of the 20 most popular requests (Gopher selectors, Gemini
+URLs, or web requests):
+
+    journalctl --unit phoebe | phoebe-ctl log requests
+
+The same, but limited to a particular IP number:
+
+    journalctl --unit phoebe | phoebe-ctl log requests 201.159.58.193
+
 =cut
 
 package Gemini::Wiki::Control;
@@ -119,7 +150,8 @@ my $subcommands = {
   "help" => 0,
   "update-changes" => \&update_changes,
   "erase-page" => \&erase_page,
-  "html-export" => \&html_export, };
+  "html-export" => \&html_export,
+  "log" => \&log, };
 
 my $subcommand;
 $subcommand = shift(@ARGV) if @ARGV;
@@ -306,4 +338,36 @@ sub to_html {
   push @lines, "</pre>" if $code;
   push @lines, "</ul>" if $list;
   return join("\n", @lines);
+}
+
+sub log {
+  my ($type, $filter) = @ARGV;
+  if (not $type or $type ne "hits" and $type ne "requests") {
+    die "No known log type (one of: hits, requests)\n";
+  }
+  my ($ip, %ip, %block, $n, %request);
+  while (<STDIN>) {
+    if (/\[debug\] Visitor: (\S+)$/) {
+      $ip = $1;
+      $ip{$ip}++;
+      $n++;
+    } elsif ((not $filter or $ip and $filter eq $ip) and /\[debug\] Looking at (.*)/) {
+      $request{$1}++;
+    } elsif ($ip and (not $filter or $filter eq $ip) and /\[info\] (Net range (\S+) is blocked|IP is blocked)/) {
+      $block{$ip}++;
+    }
+  }
+  say("Total hits: $n");
+  say("-" x length("Total hits: $n"));
+  if ($type eq "hits") {
+    printf("%5s %4s%% %5s %s\n", "Hits", "Hits", "Block", "IP Number");
+    for (sort { $ip{$b} <=> $ip{$a} } keys %ip) {
+      printf("%5d %4d%% %4d%% %s\n", $ip{$_}, int(100*$ip{$_}/$n), exists $block{$_} ? int(100*$block{$_}/$n) : 0, $_);
+    }
+  } elsif ($type eq "requests") {
+    printf("%5s %4s%% %s\n", "Hits", "Hits", "Request");
+    for (sort { $request{$b} <=> $request{$a} } keys %request) {
+      printf("%5d %4d%% %s\n", $request{$_}, int(100*$request{$_}/$n), $_);
+    }
+  }
 }

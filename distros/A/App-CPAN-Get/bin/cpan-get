@@ -5,7 +5,7 @@ use warnings;
 
 use App::CPAN::Get;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Run.
 exit App::CPAN::Get->new->run;
@@ -28,7 +28,7 @@ cpan-get - Script to fetch module from CPAN archive.
 
 =head1 SYNOPSIS
 
- cpan-get [-h] [--version] module_name
+ cpan-get [-h] [--version] module_name[module_version]
 
 =head1 DESCRIPTION
 
@@ -55,6 +55,23 @@ Vision of this module is:
 
  Perl module name.
  e.g. App::Pod::Example
+
+=item * C<module_version>
+
+Perl module version.
+There are some posibilities how to define:
+
+ @module_version (e.g. @1.23)
+ - Define exact module version.
+
+ ~module_version (e.g. ~1.23)
+ - Define version and later.
+
+ ~"== module_version" (e.g. ~"== 1.23")
+ - Define exact module version.
+
+ ~">= module_version_min, < module_version_max" (e.g. ~">= 1.23, < 2.00")
+ - Define limit. (e.g. last version in 1.xx branch)
 
 =back
 
@@ -108,6 +125,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

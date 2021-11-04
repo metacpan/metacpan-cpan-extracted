@@ -242,7 +242,7 @@ Bosnian Bosnia & Herzegovina Latin locale.
 =head3 Narrow (format)
 
   p.n.e.
-  n.e.
+  n. e.
 
 =head2 Date Formats
 
@@ -416,6 +416,12 @@ Bosnian Bosnia & Herzegovina Latin locale.
    2008-02-05T18:30:30 = 5. feb 2008. n. e.
    1995-12-22T09:05:02 = 22. dec 1995. n. e.
   -0010-09-15T04:44:23 = 15. sep -10. p. n. e.
+
+=head3 GyMd (GGGGG y-MM-dd)
+
+   2008-02-05T18:30:30 = n. e. 2008-02-05
+   1995-12-22T09:05:02 = n. e. 1995-12-22
+  -0010-09-15T04:44:23 = p.n.e. -10-09-15
 
 =head3 H (HH)
 

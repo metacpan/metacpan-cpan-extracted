@@ -26,6 +26,7 @@ my $coverage = decode_json($json);
 is(
     $coverage,
     {
+        'aggregator' => 'Test2::Harness::Log::CoverageAggregator::ByRun',
         'testmeta' => {
             't/integration/coverage/a.tx'    => {'manager' => 'Manager', 'type' => 'split'},
             't/integration/coverage/b.tx'    => {'type'    => 'flat'},
@@ -91,7 +92,7 @@ is(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'Ax'},
     test    => sub {
@@ -111,7 +112,7 @@ yath(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'Bx'},
     test    => sub {
@@ -136,7 +137,7 @@ yath(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'Cx'},
     test    => sub {
@@ -156,7 +157,7 @@ yath(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'Bxb'},
     test    => sub {
@@ -179,7 +180,7 @@ yath(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'Cxc'},
     test    => sub {
@@ -199,7 +200,7 @@ yath(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'Ax*'},
     test    => sub {
@@ -219,7 +220,7 @@ yath(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'Axa'},
     test    => sub {
@@ -239,7 +240,7 @@ yath(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'Axaa'},
     test    => sub {
@@ -259,7 +260,7 @@ yath(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'Axaaa'},
     test    => sub {
@@ -279,7 +280,7 @@ yath(
 
 yath(
     command => 'test',
-    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--coverage-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
+    args    => ["-D$dir/lib", "-I$dir/lib", '--ext=tx', "--cover-from=$cfile", '--plugin' => '+Plugin', '--changed-only', '-v'],
     exit    => 0,
     env     => {TEST_CASE => 'AxCx'},
     test    => sub {

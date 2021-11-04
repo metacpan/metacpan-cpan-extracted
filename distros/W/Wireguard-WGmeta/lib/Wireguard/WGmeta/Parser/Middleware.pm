@@ -36,7 +36,7 @@ use Wireguard::WGmeta::Utils;
 use base 'Exporter';
 our @EXPORT = qw(parse_wg_config2 create_wg_config2);
 
-our $VERSION = "0.3.1";
+our $VERSION = "0.3.2";
 
 =head3 parse_wg_config2($config_file_content, $interface_name [, $wg_meta_prefix, $disabled_prefix, $use_checksum])
 

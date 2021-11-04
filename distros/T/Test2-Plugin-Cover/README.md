@@ -157,6 +157,29 @@ Please see the `set_from()` documentation for details on values.
 
 # CLASS METHODS
 
+- $class->touch\_source\_file($file)
+- $class->touch\_source\_file($file, $sub)
+- $class->touch\_source\_file($file, \\@subs)
+- $class->touch\_source\_file($file, $subs, $from)
+
+    This can be used to manually add coverage data. The first argument is the
+    source file to be "touched" by coverage. The second argument is optional, and
+    may be either a subroutine name, or an arrayref of subroutine names. The third
+    argument is optional and can be used to override the default "from" value,
+    which is normally determined for you automatically.
+
+    If no subroutines are specified it will default to using '\*', which means the
+    entire file is considered to be touched.
+
+- $class->touch\_data\_file($file)
+- $class->touch\_data\_file($file, $from)
+
+    This can be used to manually add coverage data. The first argument is the file
+    to be "touched" by coverage data. Optionally you can override the 'from' value
+    which is normally determined automatically.
+
+    This is the same as calling `$class->touch_source_file($file, '<>')`.
+
 - $class->enable()
 - $class->disable()
 - $bool = $class->enabled()

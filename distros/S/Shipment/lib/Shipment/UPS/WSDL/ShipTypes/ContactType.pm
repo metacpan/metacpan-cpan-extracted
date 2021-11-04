@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ContactType;
-$Shipment::UPS::WSDL::ShipTypes::ContactType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ContactType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Producer
               SoldTo
 
-              )
+            )
         ],
         {   'ForwardAgent'          => \%ForwardAgent_of,
             'UltimateConsignee'     => \%UltimateConsignee_of,
@@ -79,7 +79,7 @@ Shipment::UPS::WSDL::ShipTypes::ContactType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

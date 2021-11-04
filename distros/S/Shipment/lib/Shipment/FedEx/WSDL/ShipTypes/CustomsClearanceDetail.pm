@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CustomsClearanceDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CustomsClearanceDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CustomsClearanceDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -54,17 +54,17 @@ Class::Std::initialize();
               ExportDetail
               RegulatoryControls
 
-              )
+            )
         ],
-        {   'Broker'             => \%Broker_of,
-            'ClearanceBrokerage' => \%ClearanceBrokerage_of,
-            'ImporterOfRecord'   => \%ImporterOfRecord_of,
-            'RecipientCustomsId' => \%RecipientCustomsId_of,
-            'DutiesPayment'      => \%DutiesPayment_of,
-            'DocumentContent'    => \%DocumentContent_of,
-            'CustomsValue'       => \%CustomsValue_of,
-            'FreightOnValue'     => \%FreightOnValue_of,
-            'InsuranceCharges'   => \%InsuranceCharges_of,
+        {   'Broker'                         => \%Broker_of,
+            'ClearanceBrokerage'             => \%ClearanceBrokerage_of,
+            'ImporterOfRecord'               => \%ImporterOfRecord_of,
+            'RecipientCustomsId'             => \%RecipientCustomsId_of,
+            'DutiesPayment'                  => \%DutiesPayment_of,
+            'DocumentContent'                => \%DocumentContent_of,
+            'CustomsValue'                   => \%CustomsValue_of,
+            'FreightOnValue'                 => \%FreightOnValue_of,
+            'InsuranceCharges'               => \%InsuranceCharges_of,
             'PartiesToTransactionAreRelated' =>
               \%PartiesToTransactionAreRelated_of,
             'CommercialInvoice'  => \%CommercialInvoice_of,
@@ -72,16 +72,16 @@ Class::Std::initialize();
             'ExportDetail'       => \%ExportDetail_of,
             'RegulatoryControls' => \%RegulatoryControls_of,
         },
-        {   'Broker' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
+        {   'Broker'             => 'Shipment::FedEx::WSDL::ShipTypes::Party',
             'ClearanceBrokerage' =>
               'Shipment::FedEx::WSDL::ShipTypes::ClearanceBrokerageType',
-            'ImporterOfRecord' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
+            'ImporterOfRecord'   => 'Shipment::FedEx::WSDL::ShipTypes::Party',
             'RecipientCustomsId' =>
               'Shipment::FedEx::WSDL::ShipTypes::RecipientCustomsId',
-            'DutiesPayment' => 'Shipment::FedEx::WSDL::ShipTypes::Payment',
+            'DutiesPayment'   => 'Shipment::FedEx::WSDL::ShipTypes::Payment',
             'DocumentContent' =>
               'Shipment::FedEx::WSDL::ShipTypes::InternationalDocumentContentType',
-            'CustomsValue' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'CustomsValue'   => 'Shipment::FedEx::WSDL::ShipTypes::Money',
             'FreightOnValue' =>
               'Shipment::FedEx::WSDL::ShipTypes::FreightOnValueType',
             'InsuranceCharges' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
@@ -96,15 +96,15 @@ Class::Std::initialize();
         },
         {
 
-            'Broker'             => 'Broker',
-            'ClearanceBrokerage' => 'ClearanceBrokerage',
-            'ImporterOfRecord'   => 'ImporterOfRecord',
-            'RecipientCustomsId' => 'RecipientCustomsId',
-            'DutiesPayment'      => 'DutiesPayment',
-            'DocumentContent'    => 'DocumentContent',
-            'CustomsValue'       => 'CustomsValue',
-            'FreightOnValue'     => 'FreightOnValue',
-            'InsuranceCharges'   => 'InsuranceCharges',
+            'Broker'                         => 'Broker',
+            'ClearanceBrokerage'             => 'ClearanceBrokerage',
+            'ImporterOfRecord'               => 'ImporterOfRecord',
+            'RecipientCustomsId'             => 'RecipientCustomsId',
+            'DutiesPayment'                  => 'DutiesPayment',
+            'DocumentContent'                => 'DocumentContent',
+            'CustomsValue'                   => 'CustomsValue',
+            'FreightOnValue'                 => 'FreightOnValue',
+            'InsuranceCharges'               => 'InsuranceCharges',
             'PartiesToTransactionAreRelated' =>
               'PartiesToTransactionAreRelated',
             'CommercialInvoice'  => 'CommercialInvoice',
@@ -131,7 +131,7 @@ Shipment::FedEx::WSDL::ShipTypes::CustomsClearanceDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::QuoteFilter;
-$Shipment::Temando::WSDL::Types::QuoteFilter::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::QuoteFilter::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               carriers
               extras
 
-              )
+            )
         ],
         {   'preference' => \%preference_of,
             'carriers'   => \%carriers_of,
@@ -60,7 +60,7 @@ Class::Std::initialize();
 
 
 package Shipment::Temando::WSDL::Types::QuoteFilter::_carriers;
-$Shipment::Temando::WSDL::Types::QuoteFilter::_carriers::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::QuoteFilter::_carriers::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -83,7 +83,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        carrier
 
-                  )
+                )
             ],
             {'carrier' => \%carrier_of,},
             {   'carrier' =>
@@ -102,7 +102,7 @@ use warnings;
 
 
 package Shipment::Temando::WSDL::Types::QuoteFilter::_extras;
-$Shipment::Temando::WSDL::Types::QuoteFilter::_extras::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::QuoteFilter::_extras::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -125,7 +125,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        summary
 
-                  )
+                )
             ],
             {'summary' => \%summary_of,},
             {'summary' => 'Shipment::Temando::WSDL::Types::ExtraSummary',},
@@ -155,7 +155,7 @@ Shipment::Temando::WSDL::Types::QuoteFilter
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

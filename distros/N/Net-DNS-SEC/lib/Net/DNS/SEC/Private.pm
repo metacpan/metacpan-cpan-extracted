@@ -3,7 +3,7 @@ package Net::DNS::SEC::Private;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Private.pm 1807 2020-09-28 11:38:28Z willem $)[2];
+our $VERSION = (qw$Id: Private.pm 1853 2021-10-11 10:40:59Z willem $)[2];
 
 
 =head1 NAME
@@ -36,6 +36,7 @@ with any other system.
 
 
 use integer;
+use Carp;
 use File::Spec;
 use IO::File;
 
@@ -51,11 +52,11 @@ sub _new_keyfile {
 	my ( $vol, $dir, $name ) = File::Spec->splitpath($keypath);
 
 	# Format something like: 'Kbla.foo.+001+12345.private' as created by BIND dnssec-keygen.
-	die "$file does not appear to be a BIND private key"
+	croak "$file does not appear to be a BIND private key"
 			unless $name =~ /^K([^+]+)\+(\d+)\+(\d+)\.private$/;
 	my @identifier = ( signame => $1, algorithm => 0 + $2, keytag => 0 + $3 );
 
-	my $handle = IO::File->new( $file, '<' ) or die qq("$file": $!);
+	my $handle = IO::File->new( $file, '<' ) or croak qq("$file": $!);
 
 	my @content;
 	local $_;
@@ -82,8 +83,8 @@ sub _new_params {
 	}
 
 	my $self = bless sub { $hashref->{shift()} }, $class;
-	die 'no algorithm specified' unless $self->algorithm;
-	die 'no signame specified'   unless $self->signame;
+	croak 'no algorithm specified' unless $self->algorithm;
+	croak 'no signame specified'   unless $self->signame;
 	return $self;
 }
 
@@ -181,7 +182,7 @@ All Rights Reserved
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

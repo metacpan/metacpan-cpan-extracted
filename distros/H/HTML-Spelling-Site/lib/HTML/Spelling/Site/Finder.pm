@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Finder;
-$HTML::Spelling::Site::Finder::VERSION = '0.6.0';
+$HTML::Spelling::Site::Finder::VERSION = '0.8.0';
 use strict;
 use warnings;
 
@@ -7,10 +7,10 @@ use 5.014;
 
 use MooX (qw( late ));
 
-use File::Find::Object;
+use File::Find::Object ();
 
 has 'prune_cb' => ( is => 'ro', isa => 'CodeRef', default => sub { return; } );
-has 'root_dir' => ( is => 'ro', isa => 'Str', 'required' => 1, );
+has 'root_dir' => ( is => 'ro', isa => 'Str',     'required' => 1, );
 
 sub list_all_htmls
 {
@@ -53,7 +53,7 @@ a directory tree.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 SYNOPSIS
 

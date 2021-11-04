@@ -1,33 +1,34 @@
 package PDL::DSP::Windows;
 
-our $VERSION = '0.008';
+our $VERSION = '0.100';
 
 use strict;
 use warnings;
 
-use Carp qw( croak carp );
-use PDL::LiteF;
-use PDL::FFT;
-use PDL::Math qw( acos cosh acosh );
-use PDL::Core qw( topdl );
-use PDL::MatrixOps qw( eigens_sym );
-use PDL::Options qw( iparse ifhref );
-use Variable::Magic qw( wizard cast );
+use PDL::Bad ();
+use PDL::Basic ();
+use PDL::Core ();
+use PDL::FFT ();
+use PDL::Math ();
+use PDL::MatrixOps ();
+use PDL::Ops ();
+use PDL::Options ();
+use PDL::Primitive ();
+use PDL::Ufunc ();
 
+# These constants are deleted at the end of this package
 use constant {
-    HAVE_LinearAlgebra => eval { require PDL::LinearAlgebra::Special; 1 } || 0,
-    HAVE_BESSEL        => eval { require PDL::GSLSF::BESSEL; 1 }          || 0,
-    HAVE_GNUPLOT       => eval { require PDL::Graphics::Gnuplot; 1 }      || 0,
-    USE_FFTW_DIRECTION => do {
-        use version;
-        version->parse($PDL::VERSION) <= version->parse('2.007');
+    HAVE_LinearAlgebra => eval { require PDL::LinearAlgebra::Special } || 0,
+    HAVE_BESSEL        => eval { require PDL::GSLSF::BESSEL }          || 0,
+    HAVE_GNUPLOT       => eval { require PDL::Graphics::Gnuplot }      || 0,
+    USE_FFTW_DIRECTION => version->parse($PDL::VERSION) <= v2.007,
+    I => version->parse($PDL::VERSION) > v2.054 ? PDL::Core::pdl('i') : do {
+        require PDL::Complex; # Deprecated in 2.055
+        PDL::Complex::i();
     },
 };
 
-use namespace::clean;
-
-# These constants defined after cleaning our namespace to avoid
-# breaking existing code that might use them.
+# These constants are left in our namespace for historical reasons
 use constant PI  => 4 * atan2(1, 1);
 use constant TPI => 2 * PI;
 
@@ -186,10 +187,6 @@ our @EXPORT_OK = (
 
 $PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
-our %winsubs;
-our %winpersubs;
-our %window_definitions;
-
 =encoding utf8
 
 =head1 NAME
@@ -199,14 +196,21 @@ PDL::DSP::Windows - Window functions for signal processing
 =head1 SYNOPSIS
 
     use PDL;
-    use PDL::DSP::Windows('window');
-    my $samples = window( 10, 'tukey', { params => .5 });
+    use PDL::DSP::Windows 'window';
 
-    use PDL;
-    use PDL::DSP::Windows;
-    my $win = PDL::DSP::Windows->new( 10, 'tukey', { params => .5 });
-    print $win->coherent_gain, "\n";
-    $win->plot;
+    # Get a piddle with a window's samples with the helper
+    my $samples = window( 10, tukey => { params => .5 });
+
+    # Or construct a window object with the same parameters
+    my $window = PDL::DSP::Windows->new( 10, tukey => { params => .5 });
+
+    # These two are equivalent
+    $samples = $window->samples;
+
+    # The window object gives access to additional methods
+    print $window->coherent_gain, "\n";
+
+    $window->plot; # Requires PDL::Graphics::Gnuplot
 
 =head1 DESCRIPTION
 
@@ -338,10 +342,9 @@ sub list_windows {
                 next;
             }
 
-            for my $alias ( grep /$expr/i, @{ $window_aliases{$name} // [] } ) {
-                push @match, "$name (alias $alias)";
-                next;
-            }
+            push @match,
+                map "$name (alias $_)",
+                grep /$expr/i, @{ $window_aliases{$name} // [] };
         }
     }
     else {
@@ -361,9 +364,9 @@ sub list_windows {
 
 =for ref
 
-Create an instance of a Windows object. If C<ARGS> are given, the instance
+Create an instance of a window object. If C<ARGS> are given, the instance
 is initialized. C<ARGS> are interpreted in exactly the same way as arguments
-the subroutine L</window>.
+for the L</window> subroutine.
 
 =for example
 
@@ -389,8 +392,8 @@ sub new {
 
 =for ref
 
-Initialize (or reinitialize) a Windows object. C<ARGS> are interpreted in
-exactly the same way as arguments the subroutine L</window>.
+Initialize (or reinitialize) a window object. C<ARGS> are interpreted in
+exactly the same way as arguments for the L</window> subroutine.
 
 =for example
 
@@ -429,7 +432,7 @@ sub init {
     my $windows = $periodic ? \%periodic_windows : \%symmetric_windows;
     unless ( $windows->{$name}) {
         my $type = $periodic ? 'periodic' : 'symmetric';
-        barf "window: Unknown $type window '$name'.";
+        PDL::Core::barf "window: Unknown $type window '$name'.";
     }
 
     $self->{name}     = $name;
@@ -493,7 +496,7 @@ C<modfreqs> is invoked. See the method L</get_modfreqs> below.
 =item min_bins => MIN
 
 This sets the minimum number of frequency bins. Defaults to 1000. If necessary,
-the piddle of window samples are padded with zeros before the fourier transform
+the piddle of window samples are padded with zeroes before the fourier transform
 is performed.
 
 =back
@@ -502,7 +505,7 @@ is performed.
 
 sub modfreqs {
     my $self = shift;
-    my %opts = iparse( { min_bins => 1000 }, ifhref(shift) );
+    my %opts = PDL::Options::iparse( { min_bins => 1000 }, PDL::Options::ifhref(shift) );
 
     my $data = $self->get_samples;
 
@@ -511,13 +514,13 @@ sub modfreqs {
 
     $n--;
 
-    my $freq = zeroes($fn);
+    my $freq = PDL::Core::zeroes($fn);
     $freq->slice("0:$n") .= $data;
 
     PDL::FFT::realfft($freq);
 
-    my $real = zeros($freq);
-    my $img  = zeros($freq);
+    my $real = PDL::Core::zeroes($freq);
+    my $img  = PDL::Core::zeroes($freq);
     my $mid  = ( $freq->nelem ) / 2 - 1;
     my $mid1 = $mid + 1;
 
@@ -716,7 +719,7 @@ default display type is used.
 
 sub plot {
     my $self = shift;
-    barf 'PDL::DSP::Windows::plot Gnuplot not available!' unless HAVE_GNUPLOT;
+    PDL::Core::barf 'PDL::DSP::Windows::plot Gnuplot not available!' unless HAVE_GNUPLOT;
 
     PDL::Graphics::Gnuplot::plot(
         title  => $self->get_name . $self->format_plot_param_vals,
@@ -771,7 +774,7 @@ Defaults to 1000.
 sub plot_freq {
     my $self = shift;
 
-    barf 'PDL::DSP::Windows::plot Gnuplot not available!' unless HAVE_GNUPLOT;
+    PDL::Core::barf 'PDL::DSP::Windows::plot Gnuplot not available!' unless HAVE_GNUPLOT;
 
     my $opts = new PDL::Options({
         coord    => 'nyquist',
@@ -801,11 +804,11 @@ sub plot_freq {
         $xlab = 'bin';
     }
     else {
-        barf "plot_freq: Unknown ordinate unit specification $coord";
+        PDL::Core::barf "plot_freq: Unknown ordinate unit specification $coord";
     }
 
     my $ylab = 'frequency response (dB)';
-    my $coordinates = zeroes($mf)
+    my $coordinates = PDL::Core::zeroes($mf)
         ->xlinvals( -$coordinate_range, $coordinate_range );
 
     PDL::Graphics::Gnuplot::plot(
@@ -816,7 +819,7 @@ sub plot_freq {
         ylabel => $ylab,
         with => 'line',
         $coordinates,
-        20 * log10($mf),
+        20 * PDL::Ops::log10($mf),
     );
 
     return $self;
@@ -885,15 +888,17 @@ sub process_gain { 1 / shift->enbw }
 
 =for ref
 
-**BROKEN**.
 Compute and return the scalloping loss of the window.
 
 =cut
 
 sub scallop_loss {
-    my ($w) = @_;
-    my $x = sequence($w) * ( PI / $w->nelem );
-    sqrt( ( $w * cos($x) )->sum ** 2 + ( $w * sin($x) )->sum ** 2 ) / $w->sum;
+    my $w = shift->samples;
+
+    # Adapted from https://stackoverflow.com/a/40912607
+    my $num = $w * exp( -( I()->im * PDL::sequence($w) * PI / $w->nelem ) );
+
+    20 * PDL::Ops::log10( abs( $num->sum ) / abs($w)->sum );
 }
 
 =head1 WINDOW FUNCTIONS
@@ -911,213 +916,213 @@ The term 'Blackman-Harris family' is meant to include the Hamming family and
 the Blackman family. These are functions of sums of cosines.
 
 Unless otherwise noted, the arguments in the cosines of all symmetric window
-functions are multiples of C<$N> numbers uniformly spaced from C<0> through
-C<2 pi>.
+functions are multiples of C<$N> numbers uniformly spaced from 0 through
+2π.
 
 =cut
 
 sub bartlett {
-    barf 'bartlett: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'bartlett: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    1 - abs( zeroes($N)->xlinvals( -1, 1 ) );
+    1 - abs( PDL::Core::zeroes($N)->xlinvals( -1, 1 ) );
 }
 
 sub bartlett_per {
-    barf 'bartlett: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'bartlett: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    1 - abs( zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) );
+    1 - abs( PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) );
 }
 
 sub bartlett_hann {
-    barf 'bartlett_hann: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'bartlett_hann: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    0.62 - 0.48 * abs( zeroes($N)->xlinvals( -0.5, 0.5 ) )
-        + 0.38 * cos( zeroes($N)->xlinvals( - PI, PI ) );
+    0.62 - 0.48 * abs( PDL::Core::zeroes($N)->xlinvals( -0.5, 0.5 ) )
+        + 0.38 * cos( PDL::Core::zeroes($N)->xlinvals( - PI, PI ) );
 }
 
 sub bartlett_hann_per {
-    barf 'bartlett_hann: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'bartlett_hann: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    0.62 - 0.48 * abs( zeroes($N)->xlinvals( -0.5, ( -0.5 + 0.5 * ( $N - 1 ) ) / $N ) )
-        + 0.38 * cos( zeroes($N)->xlinvals( - PI, ( - PI + PI * ( $N - 1 ) ) / $N ) );
+    0.62 - 0.48 * abs( PDL::Core::zeroes($N)->xlinvals( -0.5, ( -0.5 + 0.5 * ( $N - 1 ) ) / $N ) )
+        + 0.38 * cos( PDL::Core::zeroes($N)->xlinvals( - PI, ( - PI + PI * ( $N - 1 ) ) / $N ) );
 }
 
 sub blackman {
-    barf 'blackman: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     0.34 + $cx * ( -0.5 + $cx * 0.16 );
 }
 
 sub blackman_per {
-    barf 'blackman: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     0.34 + $cx * ( -0.5 + $cx * 0.16 );
 }
 
 sub blackman_bnh {
-    barf 'blackman_bnh: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_bnh: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     0.3461008 + $cx * ( -0.4973406 + $cx * 0.1565586 );
 }
 
 sub blackman_bnh_per {
-    barf 'blackman_bnh: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_bnh: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     0.3461008 + $cx * ( -0.4973406 + $cx * 0.1565586 );
 }
 
 sub blackman_ex {
-    barf 'blackman_ex: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_ex: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     0.349742046431642 + $cx * ( -0.496560619088564 + $cx * 0.153697334479794 );
 }
 
 sub blackman_ex_per {
-    barf 'blackman_ex: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_ex: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     0.349742046431642 + $cx * ( -0.496560619088564 + $cx * 0.153697334479794 );
 }
 
 sub blackman_gen {
-    barf 'blackman_gen: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'blackman_gen: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     0.5 - $alpha + $cx * ( -0.5 + $cx * $alpha );
 }
 
 sub blackman_gen_per {
-    barf 'blackman_gen: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'blackman_gen: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ($N,$alpha) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     0.5 - $alpha + $cx * ( -0.5 + $cx * $alpha );
 }
 
 sub blackman_gen3 {
-    barf 'blackman_gen3: 4 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 4;
+    PDL::Core::barf 'blackman_gen3: 4 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 4;
     my ($N,$a0,$a1,$a2) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     $a0 - $a2 + ( $cx * ( -$a1 + $cx * 2 * $a2 ) );
 }
 
 sub blackman_gen3_per {
-    barf 'blackman_gen3: 4 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 4;
+    PDL::Core::barf 'blackman_gen3: 4 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 4;
     my ( $N, $a0, $a1, $a2 ) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     $a0 - $a2 + ( $cx * ( -$a1 + $cx * 2 * $a2 ) );
 }
 
 sub blackman_gen4 {
-    barf 'blackman_gen4: 5 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 5;
+    PDL::Core::barf 'blackman_gen4: 5 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 5;
     my ( $N, $a0, $a1, $a2, $a3 ) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     $a0 - $a2 + $cx * ( ( -$a1 + 3 * $a3 ) + $cx * ( 2 * $a2 + $cx * -4 * $a3 ) );
 }
 
 sub blackman_gen4_per {
-    barf 'blackman_gen4: 5 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 5;
+    PDL::Core::barf 'blackman_gen4: 5 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 5;
     my ( $N, $a0, $a1, $a2, $a3 ) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     $a0 - $a2 + $cx * ( ( -$a1 + 3 * $a3 ) + $cx * ( 2 * $a2 + $cx * -4 * $a3 ) );
 }
 
 sub blackman_gen5 {
-    barf 'blackman_gen5: 6 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 6;
+    PDL::Core::barf 'blackman_gen5: 6 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 6;
     my ( $N, $a0, $a1, $a2, $a3, $a4 ) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     $a0 - $a2 + $a4 + $cx * ( ( -$a1 + 3 * $a3 )
         + $cx * ( 2 * $a2 - 8 * $a4 + $cx * ( -4 * $a3 + $cx * 8 * $a4 ) ) );
 }
 
 sub blackman_gen5_per {
-    barf 'blackman_gen5: 6 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 6;
+    PDL::Core::barf 'blackman_gen5: 6 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 6;
     my ( $N, $a0, $a1, $a2, $a3, $a4 ) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     $a0 - $a2 + $a4 + $cx * ( ( -$a1 + 3 * $a3 )
         + $cx * ( 2 * $a2 - 8 * $a4 + $cx * ( -4 * $a3 + $cx * 8 * $a4 ) ) );
 }
 
 sub blackman_harris {
-    barf 'blackman_harris: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_harris: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     0.343103 + $cx * ( -0.49755 + $cx * 0.15844 );
 }
 
 sub blackman_harris_per {
-    barf 'blackman_harris: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_harris: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     0.343103 + $cx * ( -0.49755 + $cx * 0.15844 );
 }
 
 sub blackman_harris4 {
-    barf 'blackman_harris4: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_harris4: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     0.21747 + $cx * ( -0.45325 + $cx * ( 0.28256 + $cx * -0.04672 ) );
 }
 
 sub blackman_harris4_per {
-    barf 'blackman_harris4: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_harris4: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     0.21747 + $cx * ( -0.45325 + $cx * ( 0.28256 + $cx * -0.04672 ) );
 }
 
 sub blackman_nuttall {
-    barf 'blackman_nuttall: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_nuttall: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     0.2269824 + $cx * ( -0.4572542 + $cx * ( 0.273199 + $cx * -0.0425644 ) );
 }
 
 sub blackman_nuttall_per {
-    barf 'blackman_nuttall: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'blackman_nuttall: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     0.2269824 + $cx * ( -0.4572542 + $cx * ( 0.273199 + $cx * -0.0425644 ) );
 }
 
 sub bohman {
-    barf 'bohman: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'bohman: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $x = abs( zeroes($N)->xlinvals( -1, 1 ) );
+    my $x = abs( PDL::Core::zeroes($N)->xlinvals( -1, 1 ) );
     ( 1 - $x ) * cos( PI * $x ) + ( 1 / PI ) * sin( PI * $x );
 }
 
 sub bohman_per {
-    barf 'bohman: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'bohman: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $x = abs( zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) );
+    my $x = abs( PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) );
     ( 1 - $x ) * cos( PI * $x ) + ( 1 / PI ) * sin( PI * $x );
 }
 
 sub cauchy {
-    barf 'cauchy: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'cauchy: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
-    1 / ( 1 + ( zeroes($N)->xlinvals( -1, 1 ) * $alpha ) ** 2 );
+    1 / ( 1 + ( PDL::Core::zeroes($N)->xlinvals( -1, 1 ) * $alpha ) ** 2 );
 }
 
 sub cauchy_per {
-    barf 'cauchy: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'cauchy: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
-    1 / ( 1 + ( zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) * $alpha ) ** 2 );
+    1 / ( 1 + ( PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) * $alpha ) ** 2 );
 }
 
 sub chebyshev {
-    barf 'chebyshev: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'chebyshev: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $at ) = @_;
 
     my ( $M, $M1, $pos, $pos1 );
 
-    my $beta = cosh( 1 / ( $N - 1 ) * acosh( 1 / ( 10 ** ( -$at / 20 ) ) ) );
-    my $x    = $beta * cos( PI * sequence($N) / $N );
+    my $beta = PDL::Math::cosh( 1 / ( $N - 1 ) * PDL::Math::acosh( 1 / ( 10 ** ( -$at / 20 ) ) ) );
+    my $x    = $beta * cos( PI * PDL::Basic::sequence($N) / $N );
 
     my $cw = chebpoly( $N - 1, $x );
 
@@ -1130,7 +1135,7 @@ sub chebyshev {
         PDL::FFT::realfft($cw);
     }
     else { # half-sample delay (even order)
-        my $arg   = PI / $N * sequence($N);
+        my $arg   = PI / $N * PDL::Basic::sequence($N);
         my $cw_im = $cw * sin($arg);
         $cw *= cos($arg);
 
@@ -1149,197 +1154,197 @@ sub chebyshev {
 
     $cw /= $cw->at($pos);
 
-    my $cwout = zeroes($N);
+    my $cwout = PDL::Core::zeroes($N);
 
     $cwout->slice("0:$M")   .= $cw->slice("$M:0:-1");
     $cwout->slice("$M1:-1") .= $cw->slice("$pos1:$M");
-    $cwout /= max($cwout);
+    $cwout /= PDL::Ufunc::max($cwout);
 
     $cwout;
 }
 
 sub cos_alpha {
-    barf 'cos_alpha: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'cos_alpha: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
-    ( sin( zeroes($N)->xlinvals( 0, PI ) ) ) ** $alpha ;
+    ( sin( PDL::Core::zeroes($N)->xlinvals( 0, PI ) ) ) ** $alpha ;
 }
 
 sub cos_alpha_per {
-    barf 'cos_alpha: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'cos_alpha: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
-    sin( zeroes($N)->xlinvals( 0, PI * ( $N - 1 ) / $N ) ) ** $alpha ;
+    sin( PDL::Core::zeroes($N)->xlinvals( 0, PI * ( $N - 1 ) / $N ) ) ** $alpha ;
 }
 
 sub cosine {
-    barf 'cosine: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'cosine: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    sin( zeroes($N)->xlinvals( 0, PI ) );
+    sin( PDL::Core::zeroes($N)->xlinvals( 0, PI ) );
 }
 
 sub cosine_per {
-    barf 'cosine: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'cosine: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    sin( zeroes($N)->xlinvals( 0, PI * ( $N - 1 ) / $N ) );
+    sin( PDL::Core::zeroes($N)->xlinvals( 0, PI * ( $N - 1 ) / $N ) );
 }
 
 sub dpss {
-    barf 'dpss: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'dpss: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $beta ) = @_;
 
-    barf 'dpss: PDL::LinearAlgebra not installed.' unless HAVE_LinearAlgebra;
-    barf "dpss: $beta not between 0 and $N." unless $beta >= 0 and $beta <= $N;
+    PDL::Core::barf 'dpss: PDL::LinearAlgebra not installed.' unless HAVE_LinearAlgebra;
+    PDL::Core::barf "dpss: $beta not between 0 and $N." unless $beta >= 0 and $beta <= $N;
 
     $beta /= $N / 2;
 
-    my $k = sequence($N);
+    my $k = PDL::Basic::sequence($N);
     my $s = sin( PI * $beta * $k ) / $k;
 
     $s->slice('0') .= $beta;
 
-    my ( $ev, $e ) = eigens_sym(PDL::LinearAlgebra::Special::mtoeplitz($s));
+    my ( $ev, $e ) = PDL::MatrixOps::eigens_sym( PDL::LinearAlgebra::Special::mtoeplitz($s) );
     my $i = $e->maximum_ind;
 
     $ev->slice("($i)")->copy;
 }
 
 sub dpss_per {
-    barf 'dpss: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'dpss: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $beta ) = @_;
     $N++;
 
-    barf 'dpss: PDL::LinearAlgebra not installed.' unless HAVE_LinearAlgebra;
-    barf "dpss: $beta not between 0 and $N." unless $beta >= 0 and $beta <= $N;
+    PDL::Core::barf 'dpss: PDL::LinearAlgebra not installed.' unless HAVE_LinearAlgebra;
+    PDL::Core::barf "dpss: $beta not between 0 and $N." unless $beta >= 0 and $beta <= $N;
 
     $beta /= $N / 2;
 
-    my $k = sequence($N);
+    my $k = PDL::Basic::sequence($N);
     my $s = sin( PI * $beta * $k ) / $k;
 
     $s->slice('0') .= $beta;
 
-    my ( $ev, $e ) = eigens_sym(PDL::LinearAlgebra::Special::mtoeplitz($s));
+    my ( $ev, $e ) = PDL::MatrixOps::eigens_sym( PDL::LinearAlgebra::Special::mtoeplitz($s) );
     my $i = $e->maximum_ind;
 
     $ev->slice("($i),0:-2")->copy;
 }
 
 sub exponential {
-    barf 'exponential: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'exponential: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    2 ** ( 1 - abs( zeroes($N)->xlinvals( -1, 1 ) ) ) - 1;
+    2 ** ( 1 - abs( PDL::Core::zeroes($N)->xlinvals( -1, 1 ) ) ) - 1;
 }
 
 sub exponential_per {
-    barf 'exponential: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'exponential: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    2 ** ( 1 - abs( zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ) ) - 1;
+    2 ** ( 1 - abs( PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ) ) - 1;
 }
 
 sub flattop {
-    barf 'flattop: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'flattop: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     -0.05473684 + $cx * ( -0.165894739 + $cx * ( 0.498947372 + $cx * ( -0.334315788 + $cx * 0.055578944 ) ) );
 }
 
 sub flattop_per {
-    barf 'flattop: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'flattop: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     -0.05473684 + $cx * ( -0.165894739 + $cx * ( 0.498947372 + $cx * ( -0.334315788 + $cx * 0.055578944 ) ) );
 }
 
 sub gaussian {
-    barf 'gaussian: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'gaussian: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $beta ) = @_;
-    exp( -0.5 * ( $beta * zeroes($N)->xlinvals( -1, 1 ) ) ** 2);
+    exp( -0.5 * ( $beta * PDL::Core::zeroes($N)->xlinvals( -1, 1 ) ) ** 2);
 }
 
 sub gaussian_per {
-    barf 'gaussian: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'gaussian: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $beta ) = @_;
-    exp( -0.5 * ( $beta * zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ) ** 2 );
+    exp( -0.5 * ( $beta * PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ) ** 2 );
 }
 
 sub hamming {
-    barf 'hamming: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'hamming: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    0.54 + -0.46 * cos( zeroes($N)->xlinvals( 0, TPI ) );
+    0.54 + -0.46 * cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
 }
 
 sub hamming_per {
-    barf 'hamming: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'hamming: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    0.54 + -0.46 * cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    0.54 + -0.46 * cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
 }
 
 sub hamming_ex {
-    barf 'hamming_ex: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'hamming_ex: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    0.53836 + -0.46164 * cos( zeroes($N)->xlinvals( 0, TPI ) );
+    0.53836 + -0.46164 * cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
 }
 
 sub hamming_ex_per {
-    barf 'hamming_ex: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'hamming_ex: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    0.53836 + -0.46164 * cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    0.53836 + -0.46164 * cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
 }
 
 sub hamming_gen {
-    barf 'hamming_gen: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'hamming_gen: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $a ) = @_;
-    $a - ( 1 - $a ) * cos( zeroes($N)->xlinvals( 0, TPI ) );
+    $a - ( 1 - $a ) * cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
 }
 
 sub hamming_gen_per {
-    barf 'hamming_gen: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'hamming_gen: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $a ) = @_;
-    $a - ( 1 - $a ) * cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    $a - ( 1 - $a ) * cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
 }
 
 sub hann {
-    barf 'hann: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'hann: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    0.5 + -0.5 * cos( zeroes($N)->xlinvals( 0, TPI ) );
+    0.5 + -0.5 * cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
 }
 
 sub hann_per {
-    barf 'hann: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'hann: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    0.5 + -0.5 * cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    0.5 + -0.5 * cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
 }
 
 sub hann_matlab {
-    barf 'hann_matlab: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'hann_matlab: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    0.5 - 0.5 * cos( zeroes($N)->xlinvals( TPI / ( $N + 1 ), TPI * $N / ( $N + 1 ) ) );
+    0.5 - 0.5 * cos( PDL::Core::zeroes($N)->xlinvals( TPI / ( $N + 1 ), TPI * $N / ( $N + 1 ) ) );
 }
 
 sub hann_poisson {
-    barf 'hann_poisson: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'hann_poisson: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
-    0.5 * ( 1 + cos( zeroes($N)->xlinvals( - PI, PI ) ) )
-        * exp( -$alpha * abs( zeroes($N)->xlinvals( -1, 1 ) ) );
+    0.5 * ( 1 + cos( PDL::Core::zeroes($N)->xlinvals( - PI, PI ) ) )
+        * exp( -$alpha * abs( PDL::Core::zeroes($N)->xlinvals( -1, 1 ) ) );
 
 }
 
 sub hann_poisson_per {
-    barf 'hann_poisson: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'hann_poisson: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
-    0.5 * ( 1 + cos( zeroes($N)->xlinvals( - PI, ( - PI + PI * ( $N - 1 ) ) / $N ) ) )
-        * exp( -$alpha * abs( zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ) );
+    0.5 * ( 1 + cos( PDL::Core::zeroes($N)->xlinvals( - PI, ( - PI + PI * ( $N - 1 ) ) / $N ) ) )
+        * exp( -$alpha * abs( PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ) );
 }
 
 sub kaiser {
-    barf 'kaiser: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'kaiser: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $beta ) = @_;
 
-    barf 'kaiser: PDL::GSLSF not installed' unless HAVE_BESSEL;
+    PDL::Core::barf 'kaiser: PDL::GSLSF not installed' unless HAVE_BESSEL;
 
     $beta *= PI;
 
     my ($n) = PDL::GSLSF::BESSEL::gsl_sf_bessel_In(
-        $beta * sqrt( 1 - zeroes($N)->xlinvals( -1, 1 ) ** 2 ), 0 );
+        $beta * sqrt( 1 - PDL::Core::zeroes($N)->xlinvals( -1, 1 ) ** 2 ), 0 );
 
     my ($d) = PDL::GSLSF::BESSEL::gsl_sf_bessel_In( $beta, 0 );
 
@@ -1347,15 +1352,15 @@ sub kaiser {
 }
 
 sub kaiser_per {
-    barf 'kaiser: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'kaiser: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ($N,$beta) = @_;
 
-    barf 'kaiser: PDL::GSLSF not installed' unless HAVE_BESSEL;
+    PDL::Core::barf 'kaiser: PDL::GSLSF not installed' unless HAVE_BESSEL;
 
     $beta *= PI;
 
     my ($n) = PDL::GSLSF::BESSEL::gsl_sf_bessel_In(
-        $beta * sqrt( 1 - zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ** 2 ), 0);
+        $beta * sqrt( 1 - PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ** 2 ), 0);
 
     my ($d) = PDL::GSLSF::BESSEL::gsl_sf_bessel_In( $beta, 0 );
 
@@ -1363,10 +1368,10 @@ sub kaiser_per {
 }
 
 sub lanczos {
-    barf 'lanczos: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'lanczos: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
 
-    my $x   = PI * zeroes($N)->xlinvals( -1, 1 );
+    my $x   = PI * PDL::Core::zeroes($N)->xlinvals( -1, 1 );
     my $res = sin($x) / $x;
 
     $res->slice( int( $N / 2 ) ) .= 1 if $N % 2;
@@ -1375,10 +1380,10 @@ sub lanczos {
 }
 
 sub lanczos_per {
-    barf 'lanczos: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'lanczos: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
 
-    my $x   = PI * zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N );
+    my $x   = PI * PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N );
     my $res = sin($x) / $x;
 
     $res->slice( int( $N / 2 ) ) .= 1 unless $N % 2;
@@ -1387,39 +1392,39 @@ sub lanczos_per {
 }
 
 sub nuttall {
-    barf 'nuttall: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'nuttall: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI ) );
     0.2269824 + $cx * ( -0.4572542 + $cx * ( 0.273199 + $cx * -0.0425644 ) );
 }
 
 sub nuttall_per {
-    barf 'nuttall: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'nuttall: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     0.2269824 + $cx * ( -0.4572542 + $cx * ( 0.273199 + $cx * -0.0425644 ) );
 }
 
 sub nuttall1 {
-    barf 'nuttall1: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'nuttall1: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = (cos(zeroes($N)->xlinvals(0,TPI)));
+    my $cx = (cos(PDL::Core::zeroes($N)->xlinvals(0,TPI)));
 
     (0.211536) +  ($cx * ((-0.449584) +  ($cx * (0.288464 + $cx * (-0.050416)  ))));
 }
 
 sub nuttall1_per {
-    barf 'nuttall1: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'nuttall1: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    my $cx = cos( zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
+    my $cx = cos( PDL::Core::zeroes($N)->xlinvals( 0, TPI * ( $N - 1 ) / $N ) );
     0.211536 + $cx * ( -0.449584 + $cx * ( 0.288464 + $cx * -0.050416 ) );
 }
 
 sub parzen {
-    barf 'parzen: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'parzen: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
 
-    my $x = zeroes($N)->xlinvals( -1, 1 );
+    my $x = PDL::Core::zeroes($N)->xlinvals( -1, 1 );
 
     my $x1 = $x->where( $x <= -0.5 );
     my $x2 = $x->where( ( $x < 0.5 ) & ( $x > -0.5 ) );
@@ -1433,10 +1438,10 @@ sub parzen {
 }
 
 sub parzen_per {
-    barf 'parzen: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'parzen: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
 
-    my $x = zeroes($N)->xlinvals( -1, ( -1 + ( $N - 1 ) ) / $N);
+    my $x = PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + ( $N - 1 ) ) / $N);
 
     my $x1 = $x->where( $x <= -0.5 );
     my $x2 = $x->where( ( $x < 0.5 ) & ( $x > -0.5 ) );
@@ -1450,13 +1455,13 @@ sub parzen_per {
 }
 
 sub parzen_octave {
-    barf 'parzen_octave: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'parzen_octave: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
 
     my $r  = ( $N - 1 ) / 2;
     my $N2 = $N / 2;
     my $r4 = $r / 2;
-    my $n  = sequence( 2 * $r + 1 ) - $r;
+    my $n  = PDL::Basic::sequence( 2 * $r + 1 ) - $r;
 
     my $n1 = $n->where( abs($n) <= $r4 );
     my $n2 = $n->where( $n > $r4 );
@@ -1470,50 +1475,50 @@ sub parzen_octave {
 }
 
 sub poisson {
-    barf 'poisson: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'poisson: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
-    exp( -$alpha * abs( zeroes($N)->xlinvals( -1, 1 ) ) );
+    exp( -$alpha * abs( PDL::Core::zeroes($N)->xlinvals( -1, 1 ) ) );
 }
 
 sub poisson_per {
-    barf 'poisson: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'poisson: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
-    exp( -$alpha * abs( zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ) );
+    exp( -$alpha * abs( PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ) );
 }
 
 sub rectangular {
-    barf 'rectangular: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'rectangular: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    ones($N);
+    PDL::Core::ones($N);
 }
 
 sub rectangular_per {
-    barf 'rectangular: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'rectangular: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    ones($N);
+    PDL::Core::ones($N);
 }
 
 sub triangular {
-    barf 'triangular: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'triangular: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    1 - abs( zeroes($N)->xlinvals( -( $N - 1 ) / $N, ( $N - 1 ) / $N ) );
+    1 - abs( PDL::Core::zeroes($N)->xlinvals( -( $N - 1 ) / $N, ( $N - 1 ) / $N ) );
 }
 
 sub triangular_per {
-    barf 'triangular: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'triangular: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    1 - abs( zeroes($N)->xlinvals( -$N / ( $N + 1 ), -1 / ( $N + 1 ) + ( $N - 1 ) / ( $N + 1 ) ) );
+    1 - abs( PDL::Core::zeroes($N)->xlinvals( -$N / ( $N + 1 ), -1 / ( $N + 1 ) + ( $N - 1 ) / ( $N + 1 ) ) );
 }
 
 sub tukey {
-    barf 'tukey: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'tukey: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
 
-    barf('tukey: alpha must be between 0 and 1') unless $alpha >= 0 and $alpha <= 1;
+    PDL::Core::barf('tukey: alpha must be between 0 and 1') unless $alpha >= 0 and $alpha <= 1;
 
-    return ones($N) if $alpha == 0;
+    return PDL::Core::ones($N) if $alpha == 0;
 
-    my $x = zeroes($N)->xlinvals( 0, 1 );
+    my $x = PDL::Core::zeroes($N)->xlinvals( 0, 1 );
 
     my $x1 = $x->where( $x < $alpha / 2 );
     my $x2 = $x->where( ( $x <= 1 - $alpha / 2 ) & ( $x >= $alpha / 2 ) );
@@ -1527,14 +1532,14 @@ sub tukey {
 }
 
 sub tukey_per {
-    barf 'tukey: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
+    PDL::Core::barf 'tukey: 2 arguments expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 2;
     my ( $N, $alpha ) = @_;
 
-    barf('tukey: alpha must be between 0 and 1') unless $alpha >= 0 and $alpha <= 1;
+    PDL::Core::barf 'tukey: alpha must be between 0 and 1' unless $alpha >= 0 && $alpha <= 1;
 
-    return ones($N) if $alpha == 0;
+    return PDL::Core::ones($N) if $alpha == 0;
 
-    my $x = zeroes($N)->xlinvals( 0, ( $N - 1 ) / $N );
+    my $x = PDL::Core::zeroes($N)->xlinvals( 0, ( $N - 1 ) / $N );
 
     my $x1 = $x->where( $x < $alpha / 2 );
     my $x2 = $x->where( ( $x <= 1 - $alpha / 2 ) & ( $x >= $alpha / 2 ) );
@@ -1548,59 +1553,16 @@ sub tukey_per {
 }
 
 sub welch {
-    barf 'welch: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'welch: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    1 - zeroes($N)->xlinvals( -1, 1 ) ** 2;
+    1 - PDL::Core::zeroes($N)->xlinvals( -1, 1 ) ** 2;
 }
 
 sub welch_per {
-    barf 'welch: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
+    PDL::Core::barf 'welch: 1 argument expected. Got ' . scalar(@_) . ' arguments.' unless @_ == 1;
     my ($N) = @_;
-    1 - zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ** 2;
+    1 - PDL::Core::zeroes($N)->xlinvals( -1, ( -1 + 1 * ( $N - 1 ) ) / $N ) ** 2;
 }
-
-# Deprecated static data
-# These package variables will be removed entirely sometime in 2021
-
-$window_definitions{$_} = {} for keys %symmetric_windows;
-
-$window_definitions{$_}{alias} = [ @{ $window_aliases{$_} } ]
-    for keys %window_aliases;
-
-$window_definitions{$_}{params} = [ @{ $window_parameters{$_} } ]
-    for keys %window_parameters;
-
-$window_definitions{$_}{fn} = $window_names{$_}
-    for keys %window_names;
-
-$window_definitions{$_}{pfn} = $window_print_names{$_}
-    for keys %window_print_names;
-
-%winpersubs = map { $_ => __PACKAGE__->can("${_}_per") } keys %periodic_windows;
-%winsubs    = map { $_ => __PACKAGE__->can($_) } keys %symmetric_windows;
-
-my $wizard = do {
-    my $msg = 'Package variables from PDL::DSP::Windows are deprecated and will be removed in the future.';
-
-    my $read = sub {
-        carp $msg . ' This attempt to read from them will soon stop working';
-    };
-
-    my $write = sub {
-        carp $msg . ' This attempt to write to them no longer has an effect';
-    };
-
-    wizard(
-        fetch  => $read,
-        exists => $read,
-        store  => $write,
-        delete => $write,
-    );
-};
-
-cast %winsubs,            $wizard;
-cast %winpersubs,         $wizard;
-cast %window_definitions, $wizard;
 
 =head1 Symmetric window functions
 
@@ -1995,7 +1957,7 @@ To the cofficients of this
 
 sub cos_pow_to_mult {
     my @cin = @_;
-    barf 'cos_pow_to_mult: number of args not less than 8.' if @cin > 7;
+    PDL::Core::barf 'cos_pow_to_mult: number of args not less than 8.' if @cin > 7;
 
     my $ex = 7 - @cin;
 
@@ -2042,32 +2004,32 @@ C/Fortran compiler.
 =cut
 
 sub chebpoly {
-    barf 'chebpoly: Two arguments expected. Got ' .scalar(@_) . "\n" unless @_ == 2;
+    PDL::Core::barf 'chebpoly: Two arguments expected. Got ' .scalar(@_) . "\n" unless @_ == 2;
 
     my ( $n, $x ) = @_;
 
     if ( ref $x ) {
-        barf "chebpoly: neither $n nor $x is a scalar number" if ref($n);
-        $x = topdl($x);
+        PDL::Core::barf "chebpoly: neither $n nor $x is a scalar number" if ref($n);
+        $x = PDL::Core::topdl($x);
 
-        my $tn = zeroes($x);
+        my $tn = PDL::Core::zeroes($x);
 
-        my ( $ind1, $ind2 ) = which_both( abs($x) <= 1 );
+        my ( $ind1, $ind2 ) = PDL::Primitive::which_both( abs($x) <= 1 );
 
-        $tn->index($ind1) .= cos( $n * acos( $x->index($ind1) ) );
-        $tn->index($ind2) .= cosh( $n * acosh( $x->index($ind2) ) );
+        $tn->index($ind1) .= cos(  $n * PDL::Math::acos(  $x->index($ind1) ) );
+        $tn->index($ind2) .= PDL::Math::cosh( $n * PDL::Math::acosh( $x->index($ind2) ) );
 
         return $tn;
     }
 
-    $n = topdl($n) if ref $n;
-    return abs($x) <= 1 ? cos( $n * acos($x) ) : cosh( $n * acosh($x) );
+    $n = PDL::Core::topdl($n) if ref $n;
+    return abs($x) <= 1 ? PDL::Math::cos( $n * PDL::Math::acos($x) ) : PDL::Math::cosh( $n * PDL::Math::acosh($x) );
 }
 
 
 sub cos_mult_to_pow {
     my( @ain )  = @_;
-    barf('cos_mult_to_pow: number of args not less than 8.') if @ain > 7;
+    PDL::Core::barf 'cos_mult_to_pow: number of args not less than 8.' if @ain > 7;
 
     my $ex = 7 - @ain;
 
@@ -2087,6 +2049,15 @@ sub cos_mult_to_pow {
 
     @cs;
 }
+
+# Delete internal constants from namespace
+delete @PDL::DSP::Windows::{qw(
+    HAVE_LinearAlgebra
+    HAVE_BESSEL
+    HAVE_GNUPLOT
+    USE_FFTW_DIRECTION
+    I
+)};
 
 1;
 
@@ -2126,7 +2097,7 @@ in the Octave signal package.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2019 John Lapeyre.
+Copyright 2012-2021 John Lapeyre.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

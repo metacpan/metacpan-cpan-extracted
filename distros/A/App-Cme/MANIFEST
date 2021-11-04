@@ -9,6 +9,7 @@ META.json
 META.yml
 README.install.pod
 README.pod
+SIGNATURE
 bin/cme
 build-from-git.md
 contrib/bash_completion.cme

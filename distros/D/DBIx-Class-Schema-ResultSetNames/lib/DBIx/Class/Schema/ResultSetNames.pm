@@ -1,7 +1,7 @@
-package DBIx::Class::Schema::ResultSetNames 1.02;
-use strict;
-use warnings;
+package DBIx::Class::Schema::ResultSetNames 1.03;
+use Modern::Perl;
 use base qw(DBIx::Class::Schema);
+use Carp;
 use Lingua::EN::Inflect::Phrase;
 
 __PACKAGE__->mk_group_accessors( inherited => 'resultset_name_methods' );
@@ -29,8 +29,23 @@ sub _ensure_resultset_name_method {
 
 sub _register_resultset_name_methods {
     my ( $class, $source_name ) = @_;
-    my $method_name = $class->_source_name_to_method_name($source_name);
-    my $plural_name = $class->_source_name_to_plural_name($source_name);
+    my $rsname_overrides = {};
+    if ( $class->can('override_rsnames') ) {
+        $rsname_overrides = $class->override_rsnames;
+    }
+    my $method_name = $rsname_overrides->{$source_name}->{singular}
+        || $class->_source_name_to_method_name($source_name);
+    my $plural_name = $rsname_overrides->{$source_name}->{plural}
+        || $class->_source_name_to_plural_name($source_name);
+    if ( $method_name eq $plural_name ) {
+        croak << "END_MESSAGE";
+The ResultSet $source_name is the same word in both singular and
+plural forms. Use an override to choose different words for one
+or the other, or both.  Consult the documentation for assistance
+in doing this.
+
+END_MESSAGE
+    }
     $class->_ensure_resultset_name_method(
         $method_name => sub {
             my ( $self, @args ) = @_;
@@ -51,8 +66,9 @@ sub _register_resultset_name_methods {
 
 sub _source_name_to_method_name {
     my ( $class, $source_name ) = @_;
-    my $phrase = $class->_source_name_to_phrase($source_name);
-    return join '_', split q{ }, $phrase;
+    my $phrase       = $class->_source_name_to_phrase($source_name);
+    my $singularised = Lingua::EN::Inflect::Phrase::to_S($phrase);
+    return join '_', split q{ }, $singularised;
 }
 
 sub _source_name_to_phrase {
@@ -77,16 +93,25 @@ sub _source_name_to_plural_name {
 
 =head1 NAME
 
-DBIx::Class::Schema::ResultSetNames - Create resultset accessors from table names
+DBIx::Class::Schema::ResultSetNames - Create resultset accessors from schema result class names
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
     # in MyApp::Schema
     __PACKAGE__->load_components('Schema::ResultSetNames');
+
+   sub override_rsnames {
+      return {
+         'Widget' => {               # Your schema's result class name
+            singular => 'block',     # singular word you wish to use
+            plural => 'clocks'       # plural word
+         }
+      };
+   }
 
 =head1 DESCRIPTION
 
@@ -118,6 +143,30 @@ If you call the plural form of the resultset (e.g. `authors`), you will get a L<
 which may be empty, if no rows satisfy whatever criteria you've chained behind it.
 
 For the singular form (`author`), you'll get a L<DBIx::Class::Row>, or `undef`, if the selected row does not exist.
+
+Don't worry if your ResultSet schema class name is already plural (e.g. 'Authors'). This module will
+Do The Right Thing, according to the behavior of L<Lingua::EN::Inflect::Phrase>
+
+=head2 Optional overriding of terms
+
+If your schema set name is a word that is the same term in both singular and plural forms (in English), then
+the module will C<croak>.  You can create an otherwise-optional subroutine named C<override_rsnames> to give
+the terms you wish to use to the module.  You do not need to define both, as was done in the Synopsis above;
+if one is missing, the default behavior will be used.  So in the case of, for instance, a 
+L<DBIx::Class::ResultSet> named "Moose" (no, not *that* L<Moose>!), the module will C<croak>; you can do
+something like this to overcome the problem:
+
+   package MyApp::Schema;
+   __PACKAGE__->load_components('Schema::ResultSetNames');
+
+   sub override_rsnames {
+      return {
+         'Moose' => { 
+            plural => 'm00ses'   # singular will be 'moose'
+         },
+         # other RSes that you want to override ... 
+      };
+   }
 
 =head2 A note about `find`.
 
@@ -174,5 +223,5 @@ the same terms as the Perl 5 programming language system itself.
 
 __END__
 
-# ABSTRACT: Create resultset accessors from table names
+# ABSTRACT: Create resultset accessors from schema result class names
 

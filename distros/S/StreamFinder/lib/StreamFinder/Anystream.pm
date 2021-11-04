@@ -150,7 +150,8 @@ Returns the number of streams found for the station.
 Returns the station's ID (alphanumeric).
 NOTE:  Since this module only looks for any streams found on any 
 specifed website, this function always returns the base name of 
-the website being searched.
+the website being searched, plus the first word (subdirectory name) 
+following it (if any).
 
 =item $station->B<getTitle>(['desc'])
 
@@ -197,6 +198,11 @@ Returns the station's type ("Anystream").
 
 =head1 CONFIGURATION FILES
 
+The default root location directory for StreamFinder configuration files 
+is "~/.config/StreamFinder".  To use an alternate location directory, 
+specify it in the "I<STREAMFINDER>" environment variable, ie.:  
+B<$ENV{STREAMFINDER} = "/etc/StreamFinder">.
+
 =over 4
 
 =item ~/.config/StreamFinder/Anystream/config
@@ -204,13 +210,16 @@ Returns the station's type ("Anystream").
 Optional text file for specifying various configuration options 
 for a specific site (submodule).  Each option is specified on a 
 separate line in the format below:
+NOTE:  Do not follow the lines with a semicolon, comma, or any other 
+separator.  Non-numeric I<values> should be surrounded with quotes, either 
+single or double.  Blank lines and lines beginning with a "#" sign as 
+their first non-blank character are ignored as comments.
 
 'option' => 'value' [,]
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
@@ -226,12 +235,12 @@ Each option is specified on a separate line in the format below:
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 =back
 
-NOTE:  Options specified in the options parameter list will override 
-those corresponding options specified in these files.
+NOTE:  Options specified in the options parameter list of the I<new()> 
+function will override those corresponding options specified in these files.
 
 =head1 KEYWORDS
 
@@ -360,9 +369,26 @@ sub new
 	@okStreams = (qw(mp3 ogg flac mp4 m4a mpd m3u8 m3u pls))  unless (defined $okStreams[0]);
 
 	my $url2fetch = $url;
+	my $urlPrefix = '';
+	my $domainName = '';
+	my $baseURL = '';
 	$url2fetch = 'https://' . $url  unless ($url =~ m#^https?\:\/\/#);
-	$self->{'id'} = ($url2fetch =~ m#\/\/([^\/\?\&\#]+)#) ? $1 : 'no_id';
+#x	$self->{'id'} = ($url2fetch =~ m#\/\/([^\/\?\&\#]+)#) ? $1 : 'no_id';
+	my $t = $url2fetch;
+	if ($t =~ s#(https?\:\/\/)([^\/\?\&\#]+).?##) {
+		$urlPrefix = $1;
+		$domainName = $2;
+		$baseURL = $urlPrefix . $domainName;
+		$self->{'id'} = $domainName;
+		$self->{'id'} .= "/$1"  if ($t =~ s#^([^\/\?\&\#\.\=]+)##);
+	} else {
+		print STDERR "u:Anystream - Invalid URL ($url2fetch) t=$t=\n"  if ($DEBUG);
+		#---PUNT!---
+		return undef;
+	}
+	$self->{'id'} =~ s#[^a-z0-9\-\_\.\/]##gi;
 	$url2fetch =~ s#\/$##;
+	print STDERR "-url2fetch=$url2fetch= ID=".$self->{'id'}."= PFX=$urlPrefix= DN=$domainName= BASE=$baseURL=\n"  if ($DEBUG);
 
 	$self->{'albumartist'} = $url2fetch;
 	my $html = '';
@@ -389,34 +415,33 @@ sub new
 		print STDERR $response->status_line  if ($DEBUG);
 	}
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
+
+	$baseURL = $1  if ($html =~ m#\<BASE\s+HREF\=\"([^\"]+)#si);
 	$self->{'title'} = $self->{'id'} || $url;
-	$self->{'title'} = $1  if ($html =~ /\<TITLE>([^\<]+)/i);
-	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-	$self->{'title'} = uri_unescape($self->{'title'});
 	$self->{'description'} = $url2fetch;
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'albumartist'} = $url;
+	$self->{'title'} = $1  if ($html =~ /\<TITLE>([^\<]+)/is);
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
+	$self->{'title'} =~ s/^\s+//s;
+	$self->{'title'} =~ s/\s+$//s;
 	print STDERR "-2: title=".$self->{'title'}."=\n"  if ($DEBUG);
 	$self->{'cnt'} = 0;
 	my $streams = '';
 	my $streamExts = join('|',@okStreams);
 	print STDERR "--EXTS=$streamExts=\n"  if ($DEBUG);
-	(my $desc_prefix = $self->{'description'}) =~ s#\:\/\/#\x02#;  #PROTECT PROTOCOL PREFIX SLASHES.
-	$desc_prefix =~ s#[\&\?\=\/].*$##;
-	$desc_prefix =~ s#\x02#\:\/\/#;  #UNPROTECT PROTOCOL PREFIX SLASHES.
-	while ($html =~ s#((?:https?\:\/)?\/?[^\s\'\"\:\<\>\[\]\{\}]+?)\.($streamExts)##s) {
+	while ($html =~ s#((?:https?\:\/)?\/[^\s\'\"\:\<\>\[\]\{\}]+)\.($streamExts)##s) {
 		(my $one = $1) =~ s#\\\/#\/#gs;
 		my $ext = $2;
 		my $streamURL = $one.'.'.$ext;
-		print STDERR "--1: streamURL=$streamURL=\n"  if ($DEBUG);
+		print STDERR "--1: streamURL=$streamURL= baseURL=$baseURL=\n"  if ($DEBUG);
 		if ($streamURL =~ m#^\/#o) {  #STREAM URL STARTS WITH "/", ASSUME ABSOLUTE TO BASE PAGE URL ("TITLE"):
-			my $prefix = ($url2fetch =~ m#^(https?)#o) ? $1 : 'http';
-			$streamURL = $prefix . '://' . $self->{'title'} . $streamURL;
-			print STDERR "--2a: title=".$self->{'title'}."= stream=$streamURL=\n"  if ($DEBUG);
+			$streamURL = $baseURL . $streamURL;
+			print STDERR "--2a: baseURL=$baseURL= stream=$streamURL=\n"  if ($DEBUG);
 		} elsif ($streamURL !~ /^http/o) {  #NO PREFIX, ASSUME RELATIVE TO THE FETCHED URL ("LONG DESC."):
-			print STDERR "--2b: desc=$desc_prefix= stream=$streamURL=\n"  if ($DEBUG);
-			$streamURL = $desc_prefix . '/' . $streamURL;
+			$streamURL = $url2fetch . '/' . $streamURL;
+			print STDERR "--2b: fetchURL=$url2fetch= stream=$streamURL=\n"  if ($DEBUG);
 		} #OTHERWISE STREAM URL IS A FULL URL (NO CHANGE).
 		$streams .= "$ext=$streamURL|"  unless ($self->{'secure'} && $streamURL !~ /^https/o);
 	}
@@ -447,6 +472,7 @@ sub new
 					. "\n" . ${$self->{'streams'}}[$i] . "\n";
 		}
 	}
+	print STDERR "-9: title=".$self->{'title'}."=\n---id=".$self->{'id'}."=\n---desc=".$self->{'description'}."=\n---artist=".$self->{'artist'}."=\n---albumartist=".$self->{'albumartist'}."=\n"  if ($DEBUG);
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

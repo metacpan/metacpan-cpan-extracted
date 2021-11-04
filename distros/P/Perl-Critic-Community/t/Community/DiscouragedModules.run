@@ -3,6 +3,7 @@
 ## cut
 
 use lib::relative;
+use CGI::Tiny;
 use Cpanel::JSON::XS;
 use Dancer2;
 use DBIx::Class;
@@ -28,6 +29,7 @@ use Path::Tiny;
 use Plack;
 use POE;
 use Switch::Plain;
+use Syntax::Keyword::Match;
 use Syntax::Keyword::Try;
 use Template;
 use Text::Xslate;
@@ -58,3 +60,21 @@ use JSON::XS;
 use Net::IRC;
 use Switch;
 use XML::Simple;
+
+## name Allowed BadModules
+## parms { allowed_modules => 'AnyEvent FindBin JSON::XS' };
+## failures 0
+## cut
+
+use AnyEvent;
+use FindBin;
+use JSON::XS;
+
+## name Allowed BadModules failing
+## parms { allowed_modules => 'AnyEvent FindBin JSON::XS' };
+## failures 3
+## cut
+
+use Any::Moose;
+use CGI;
+use IO::Socket::INET6;

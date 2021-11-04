@@ -9,9 +9,9 @@ use PDL::Lite;
 
 #<<< notidy
 
-subtest 'PiddleFromAny' => sub {
+subtest 'NDArrayFromAny' => sub {
 
-    my $t = Piddle->plus_coercions( PiddleFromAny );
+    my $t = NDArray->plus_coercions( NDArrayFromAny );
 
     for my $test (
                   [ '4           ',            4, 1 ],
@@ -24,7 +24,7 @@ subtest 'PiddleFromAny' => sub {
 
         subtest qq[value => $label] => sub {
 
-            ok( !$t->check( $value ), 'value before coercion is not a piddle' );
+            ok( !$t->check( $value ), 'value before coercion is not a NDArray' );
 
             my $pdl;
             ok(
@@ -32,7 +32,7 @@ subtest 'PiddleFromAny' => sub {
                 "coercion didn't throw",
             );
 
-            ok( !$pass ^ $t->check( $pdl ),
+            ok( !$pass ^ !!$t->check( $pdl ),
                 ("value could not be coerced",
                  "value could be coerced"
                 )[$pass]

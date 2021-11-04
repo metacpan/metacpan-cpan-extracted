@@ -714,8 +714,8 @@ setqlim(dev,uid,bs,bh,fs,fh,timelimflag=0,kind=0)
 	    dqblk.QS_FHARD = fh;
 	    dqblk.QS_FTIME = timelimflag;
 
-            // check for truncation during assignment
-            if ((sizeof(dqblk.QS_BSOFT) <= sizeof(uint64_t)) &&
+            // check for truncation of 64-bit value during assignment to 32-bit variable
+            if ((sizeof(dqblk.QS_BSOFT) < sizeof(uint64_t)) &&
                 (((uint64_t)bs|(uint64_t)bh|(uint64_t)fs|(uint64_t)fh) & 0xFFFFFFFF00000000ULL))
             {
               errno = EINVAL;

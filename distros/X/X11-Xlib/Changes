@@ -1,5 +1,19 @@
 Revision history for Perl extension X11::Xlib.
 
+0.23 - 2021-10-21
+    - Fix bugs when compiled for threaded perl
+
+0.22 - 2021-10-09
+    - New Atom API $conn->atom(@list), $conn->mkatom(@list) returns dualvars
+      that are both the number and the atom name.
+    - Fix bug in XGetWindowProperty/XChangeProperty on 64-bit platforms
+      (thanks to Mark Davies)
+    - Enhanced window property API can now encode and decode common property
+      types, and uses duavar Atoms.
+    - New PerlXlib C-level API with better support for managing lifecycle of
+      Xlib objects and dependencies.
+    - Numerous documentation improvements
+
 0.20 - 2020-05-25
     - Fix XS double-free in unpacking ::Screen objects from Screen*
       (affected XWindowAttributes->unpack)

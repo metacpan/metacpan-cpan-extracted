@@ -15,6 +15,7 @@ git/setup.sh
 lib/Open/This.pm
 perlcriticrc
 perltidyrc
+precious.toml
 script/ot
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -28,6 +29,7 @@ t/lib/Foo/Require.pm
 t/lib/HTTP/FakeTestClass.pm
 t/nano.t
 t/open-this.t
+t/ot.t
 t/other-lib/Foo/Baz.pm
 t/require.t
 t/test-data/file

@@ -9,6 +9,7 @@ my $build = Module::Build->new(
    module_name => 'App::Device::Chip::sensor',
    requires => {
       'perl' => '5.026',
+      'Feature::Compat::Defer' => 0,
       'Object::Pad' => '0.32',
 
       'Device::Chip::Adapter' => 0,
@@ -18,6 +19,7 @@ my $build = Module::Build->new(
    test_requires => {
       'Test::More' => '0.88', # done_testing
       'Test::Deep' => 0,
+      'Test::Future::Deferred' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

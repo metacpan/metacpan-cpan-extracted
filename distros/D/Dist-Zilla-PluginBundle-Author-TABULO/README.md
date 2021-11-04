@@ -1,0 +1,752 @@
+# NAME
+
+Dist::Zilla::PluginBundle::Author::TABULO - A Dist::Zilla plugin bundle à la TABULO
+
+# VERSION
+
+version 1.000006
+
+# SYNOPSIS
+
+In your `dist.ini`:
+
+    [@Author::TABULO]
+
+# DESCRIPTION
+
+This is the dzil plug-in bundle that TABULO intends to use for his distributions.
+
+It exists mostly because TABULO is very lazy, like many other folks out there.
+
+But since TABULO is probably even lazier than most folks; instead of starting his
+bundle from scratch, he just shopped around to find a few bundles that had the most
+overlap with his taste or whatever; and then just slurped stuff,
+even including some documentation which is what you will eventually see here and in the
+related modules.:-)
+
+Admittedly, the fact that TABULO was so late in migrating to dzil worked to his
+advantage for this particular task at least, since by that time
+the bold and the brave had already made delicious stuff!
+
+As such, it is heavily inspired by (and in some places outright copied from) several others such as:
+@DAGOLDEN, @DBOOK, @DROLSKY, @ETHER, @KENTNL, @RJBS, @Starter, @Starter::Git, @YANICK.
+
+(Thank you, folks!).
+
+## WARNING
+
+Please note that, although this module needs to be on CPAN for obvious reasons,
+it is really intended to be a collection of personal preferences, which are
+expected to be in great flux, at least for the time being.
+
+Therefore, please do NOT base your own distributions on this one, since anything
+can change at any moment without prior notice, while I get accustomed to dzil
+myself and form those preferences in the first place...
+
+Absolutely nothing in this distribution is guaranteed to remain constant or
+be maintained at this point. Who knows, I may even give up on dzil altogether...
+
+You have been warned.
+
+Also note that the early versions of this module had much more in common with that of @ETHER, and tried to keep a compatible interface. This is no longer the case. So some stuff will break, and hence the bump of major version. But you weren't really using this for your distros anyway, right?
+
+And here comes the rest of the documentation -- some of which slurped from the several original sources cited above ... :-)
+
+## OVERVIEW
+
+Using this plugin bundle (with its default options) is roughly equivalent to the following content in `dist.ini`.
+
+    ...
+
+    [NameFromDirectory]
+
+    [RewriteVersion::Sanitized]
+
+    [Git::GatherDir]
+    exclude_filename = Build.PL
+    exclude_filename = CODE_OF_CONDUCT
+    exclude_filename = CONTRIBUTING
+    exclude_filename = INSTALL
+    exclude_filename = LICENCE
+    exclude_filename = LICENSE
+    exclude_filename = META.json
+    exclude_filename = Makefile.PL
+    exclude_filename = Meta.yml
+    exclude_filename = README
+    exclude_filename = README.md
+    exclude_filename = README.mkdn
+    exclude_filename = README.pod
+    exclude_filename = TODO
+    exclude_filename = cpanfile
+    exclude_filename = inc/ExtUtils/MakeMaker/Dist/Zilla/Develop.pm
+    exclude_filename = ppport.h
+    include_dotfiles = 1
+
+    [PruneCruft]
+    except = (?^u:"\.travis\.yml")
+    except = (?^u:"\.perltidyrc")
+    except = (?^u:".*/\.gitignore$")
+    except = (?^u:".*/\.(git)?keep$")
+
+    [PruneFiles]
+    filename = README.pod
+
+    [ManifestSkip]
+
+    [InsertCopyright]
+
+    [SurgicalPodWeaver]
+    config_plugin = @Author::TABULO
+    post_code_replacer = replace_with_nothing
+    replacer = replace_with_comment
+
+    [Pod2Readme]
+
+    [License]
+
+    [InstallGuide]
+
+    [ReadmeAnyFromPod / ReadmeAnyFromPod/MarkdownInBuild]
+    filename = README.md
+    location = build
+    phase = build
+    type = markdown
+
+    [Test::Compile]
+    fake_home = 1
+    xt_mode = 1
+
+    [Test::MinimumVersion]
+    max_target_perl = 5.026
+
+    [Test::ReportPrereqs]
+
+    [Test::Perl::Critic]
+
+    [MetaTests]
+
+    [PodSyntaxTests]
+
+    [Test::PodSpelling]
+
+    [Test::Pod::Coverage::Configurable]
+
+    [Test::Portability]
+    options = test_one_dot = 0
+
+    [Test::Version]
+
+    [Test::Kwalitee]
+
+    [MojibakeTests]
+
+    [Test::EOL]
+
+    [Authority]
+    authority = cpan:TABULO
+    do_munging = 0
+
+    [CopyrightYearFromGit]
+    continuous_year = 1
+
+    [Keywords]
+
+    [MinimumPerl]
+
+    [AutoPrereqs]
+    skip = ^t::lib
+
+    [PrereqsFile]
+
+    [MetaNoIndex]
+    directory = corpus
+    directory = demo
+    directory = eg
+    directory = examples
+    directory = fatlib
+    directory = inc
+    directory = local
+    directory = perl5
+    directory = share
+    directory = t
+    directory = xt
+    package = DB
+
+    [MetaProvides::Package]
+    meta_noindex = 1
+
+    [GithubMeta]
+    issues = 1
+    remote = origin
+    remote = github
+
+    [Git::Contributors]
+
+    [Prereqs::AuthorDeps]
+
+    [RemovePrereqs::Provided]
+
+    [PrereqsClean]
+
+    [MetaYAML]
+
+    [MetaJSON]
+
+    [CPANFile]
+
+    [ExecDir]
+
+    [ShareDir]
+
+    [MakeMaker]
+
+    [PromptIfStale]
+    check_all_plugins = 1
+    modules = Dist::Zilla
+    modules = @Author::TABULO
+
+    [Manifest]
+
+    [Git::CheckFor::CorrectBranch]
+
+    [Git::Check]
+    allow_dirty = dist.ini
+    allow_dirty = Changes
+
+    [CheckMetaResources]
+
+    [CheckPrereqsIndexed]
+
+    [CheckChangesHasContent]
+
+    [ConsistentVersionTest]
+
+    [CheckStrictVersion]
+
+    [CheckVersionIncrement]
+
+    [Test::CheckManifest]
+
+    [RunExtraTests]
+    default_jobs = 9
+
+    [TestRelease]
+
+    [ConfirmRelease]
+
+    [UploadToCPAN]
+
+    [CopyFilesFromRelease]
+    filename = INSTALL
+    filename = LICENSE
+    filename = Makefile.PL
+    filename = Meta.json
+    filename = Meta.yml
+    filename = README.md
+    filename = cpanfile
+
+    [Regenerate::AfterReleasers]
+    plugin = @Author::TABULO/CopyFilesFromRelease
+
+    [Git::Commit / Git::Commit/sourcesAsReleased]
+    add_files_in = /
+    allow_dirty = Changes
+    allow_dirty = INSTALL
+    allow_dirty = LICENSE
+    allow_dirty = Makefile.PL
+    allow_dirty = Meta.json
+    allow_dirty = Meta.yml
+    allow_dirty = README.md
+    allow_dirty = cpanfile
+    commit_msg = v%V%n%n%c
+
+    [Git::Tag / Git::Tag/sourcesAsReleased]
+    tag_format = release-%v
+
+    [NextRelease]
+    format = %-20{-TRIAL}V    %{yyyy-MM-dd HH:mm:ssZZZZZ VVV}d %P
+    time_zone = UTC
+
+    [BumpVersionAfterRelease]
+
+    [Git::Commit / Git::Commit/sourcesAfterBump]
+    allow_dirty = Changes
+    allow_dirty = ARRAY(0x7fd7767bf1e0)
+    allow_dirty_match = ^(lib|bin|script)
+    commit_msg = After release: bump $VERSION and timestamp Changes
+
+    [Git::CommitBuild / Git::CommitBuild/toBuildBranch]
+    branch = build/%b
+    multiple_inheritence = 1
+
+    [Git::CommitBuild / Git::CommitBuild/toReleaseBranch]
+    branch =
+    multiple_inheritence = 1
+    release_branch = release/cpan
+
+    [Git::Tag / Git::Tag/toReleaseBranch]
+    branch = release/cpan
+    tag_format = release-%v
+
+    [Git::Push]
+    push_to = origin
+    push_to = origin refs/heads/release/cpan:refs/heads/release/cpan
+    remotes_must_exist = 0
+
+    [ArchiveRelease]
+    directory = releases
+
+# ATTRIBUTES
+
+## archive\_dir
+
+Reader: archive\_dir
+
+Type: Str
+
+Additional documentation: Passed as the 'directory' option, to \[ArchiveRelease\] whose docs are quoted below:
+
+\* The 'directory' \[name\] may begin with ~ (or ~user) to mean your (or some other user's) home directory.
+\* If the directory doesn't exist, it will be created during the BeforeRelease phase.
+\* All files inside this directory will be pruned from the distribution.
+ Default: 'releases'
+
+## authority
+
+Reader: authority
+
+Type: Str
+
+Additional documentation: Specifies the x\_authority field for PAUSE. Default: 'cpan:TABULO'
+
+## auto\_prereqs
+
+Reader: auto\_prereqs
+
+Type: Bool
+
+Additional documentation: Indicates whether or not to use \[AutoPrereqs\]. Default: '1'
+
+## auto\_version
+
+Reader: auto\_version
+
+Type: Bool
+
+Additional documentation: Indicates whether or not to use \[AutoVersion\] instead of our standard plugins for version management. Default: '0'
+
+## copy
+
+Reader: copy
+
+Type: ArrayRef
+
+Additional documentation: Additional files to copy (or regenerate) in addition to those that are already harvested by default. \[May be repeated\]. Note that the copying may be done from the build or the release, depending on the 'copy\_mode' setting. See 'copy\_mode'.
+
+## copy\_mode
+
+Reader: copy\_mode
+
+Type: Maybe\[Str\]
+
+Additional documentation: Determines the 'copy-mode' and hence ultimately the set of plugins used for that purpose. Possible values are  \[Regenerate, Release, Build, Build::Filtered, None\]. dzil 'regenerate' command will still work.  Default: 'Release'
+
+## copy\_not
+
+Reader: copy\_not
+
+Type: ArrayRef
+
+Additional documentation: Do NOT copy given file(s). \[May be repeated\].
+
+## darkpan
+
+Reader: darkpan
+
+Type: Bool
+
+Additional documentation: For private code; uses \[FakeRelease\] and fills in dummy repo/bugtracker data. Default: '0'
+
+## dist\_genre
+
+Reader: dist\_genre
+
+Type: Str
+
+Additional documentation: Specifies the 'genre' of the distro. Currently allowed values are: 'standard' (the default) and 'task'.
+
+This may be used in the future to associate a set behaviours/settings to given genres.
+
+Currently, the only distinction made is for the 'task' genre, which will result in \[TaskWeaver\] being used
+instead of \[SurgicalPodWeaver\].
+ Default: 'standard'
+
+## exclude\_filenames
+
+Reader: exclude\_filenames
+
+Type: ArrayRef
+
+Additional documentation: Do NOT gather given file(s). \[May be repeated\].
+
+## exclude\_match
+
+Reader: exclude\_match
+
+Type: ArrayRef
+
+Additional documentation: Do NOT gather file(s) that match the given pattern(s). \[May be repeated\].
+
+## exec\_dir
+
+Reader: exec\_dir
+
+Type: Maybe\[Str\]
+
+Additional documentation: If defined, passed to \[ExecDir\] as its 'dir' option.  Defaults to 'script' when the installer is \[Module::Build::Tiny\],undef otherwise, which means the \[ExecDir\] default will be in effect, and that is 'bin' as of this writing.
+
+## fake\_release
+
+Reader: fake\_release
+
+Type: Bool
+
+Additional documentation: Swaps \[FakeRelease\] for \[UploadToCPAN\]. Mostly useful for testing a dist.ini without risking a real release. Note that this can also be achieved by setting the FAKE\_RELEASE environment variable (which will have precedence over this option). Default: '0'
+
+## git\_remotes
+
+Reader: git\_remotes
+
+Type: ArrayRef
+
+Additional documentation: Where to push after release.
+
+## github\_issues
+
+Reader: github\_issues
+
+Type: Str
+
+Additional documentation: Whether or not to use github issue tracker. Default: '1'
+
+## has\_xs
+
+Reader: has\_xs
+
+Type: Bool
+
+## hub
+
+Reader: hub
+
+Type: Maybe\[Str\]
+
+Additional documentation: The repository 'hub' provider. Currently, other than unsetting to undef, the only supported value, which is also the default, is 'github'. Other providers, such as 'gitlab' or 'bitbucket', may be supported in the future. Default: 'github'
+
+## installer
+
+Reader: installer
+
+Additional documentation: The installer to employ. Currently, possible values are: \[MakeMaker, MakeMaker::Awesome, ModuleBuild, ModuleBuildTiny, ModuleBuildTiny::Fallback\]. Default: 'MakeMaker'
+
+## is\_task
+
+Reader: is\_task
+
+Type: Bool
+
+Additional documentation: DEPRECATED. Prefer setting instead, like so:
+
+\[@Author::TABULO\]
+dist\_genre=task
+
+Identifies this distro as a 'task'.
+
+Currently, the only distinction is that, for a task, we use \[TaskWeaver\] instead of \[SurgicalPodWeaver\].
+
+## manage\_versions
+
+Reader: manage\_versions
+
+Type: Bool
+
+Additional documentation: Whether or not to manage versioning, which means: providing, rewriting, bumping, munging $VERSION in sources, .... Default: '1'
+
+## name
+
+Reader: name
+
+Type: Str
+
+This attribute is required.
+
+## no\_archive
+
+Reader: no\_archive
+
+Type: Bool
+
+Additional documentation: Omit the \[ArchiveRelease\] plugin. Default: '0'
+
+## no\_copy
+
+Reader: no\_copy
+
+Type: Bool
+
+Additional documentation: Skip copying files from the build/release : ('Makefile.PL', 'cpanfile',' Meta.json', ...). Default: '0'
+
+## no\_coverage
+
+Reader: no\_coverage
+
+Type: Bool
+
+Additional documentation: Omit PodCoverage tests -- which are actually done using \[Test::Pod::Coverage::Configurable\]. Default: '0'
+
+## no\_critic
+
+Reader: no\_critic
+
+Type: Bool
+
+Additional documentation: Omit \[Test::Perl::Critic\] tests. Default: '0'
+
+## no\_git
+
+Reader: no\_git
+
+Type: Bool
+
+Additional documentation: Bypass all git-dependent plugins. Default: '0'
+
+## no\_git\_commit
+
+Reader: no\_git\_commit
+
+Type: Bool
+
+Additional documentation: Omit \[Git::Commit\] and \[Git::CommitBuild\] and related \[Git::Tag\] operations. Default: '0'
+
+## no\_git\_commit\_build
+
+Reader: no\_git\_commit\_build
+
+Type: Bool
+
+Additional documentation: Omit \[Git::CommitBuild\] and related \[Git::Tag\] operations. Default: '0'
+
+## no\_git\_impact
+
+Reader: no\_git\_impact
+
+Type: Bool
+
+Additional documentation: Omit any \[Git:\*\] plugins that may modify the vcs repository state, such as : \[Git::Commit\], \[Git::CommitBuild\], \[Git::Tag\], \[Git::Push\] and the like.
+Git plugins that are read-only, such as \[Git::GatherDir\] or \[Git::Check\] shouldn't be effected by this option.
+ Default: '0'
+
+## no\_git\_push
+
+Reader: no\_git\_push
+
+Type: Bool
+
+Additional documentation: Omit \[Git::Push\]. Default: '0'
+
+## no\_github
+
+Reader: no\_github
+
+Type: Bool
+
+Additional documentation: Do not assume that the repository is backed by 'github', which currently means abstaining from using \[GithubMeta\] and feeding fake values to \[MetaResources\] and \[Bugtracker\] -- which you may separately override, by the way, thanks to our\[@Config::Slicer\] role.
+
+## no\_minimum\_perl
+
+Reader: no\_minimum\_perl
+
+Type: Bool
+
+Additional documentation: Omit \[Test::MinimumVersion\] tests. Default: '0'
+
+## no\_pod\_coverage
+
+Reader: no\_pod\_coverage
+
+Type: Bool
+
+Additional documentation: Skip \[PodCoverage\] tests -- Well, \[Test::Pod::Coverage::Configurable\] tests, actually.
+
+## no\_pod\_spellcheck
+
+Reader: no\_pod\_spellcheck
+
+Type: Bool
+
+Additional documentation: Skip \[Test::PodSpelling\] tests.
+
+## no\_portability\_check
+
+Reader: no\_portability\_check
+
+Type: Bool
+
+Additional documentation: Skip \[Test::Portability\] tests. Default: '0'
+
+## no\_sanitize\_version
+
+Reader: no\_sanitize\_version
+
+Type: Bool
+
+Additional documentation: When set => We won't prefer \[RewriteVersion::Sanitized\] over \[RewriteVersion\], which we normally do. Default: '0'
+
+## no\_spellcheck
+
+Reader: no\_spellcheck
+
+Type: Bool
+
+Additional documentation: Omit \[Test::PodSpelling\] tests. Default: '0'
+
+## payload
+
+Reader: payload
+
+Type: HashRef
+
+This attribute is required.
+
+## plugins
+
+Reader: plugins
+
+Type: ArrayRef
+
+## pod\_coverage\_also\_private
+
+Reader: pod\_coverage\_also\_private
+
+Type: Maybe\[ArrayRef\]
+
+Additional documentation: If defined, passed to \[Test::Pod::Coverage::Configurable\] as its 'also\_private' option.
+
+## pod\_coverage\_class
+
+Reader: pod\_coverage\_class
+
+Type: Maybe\[Str\]
+
+Additional documentation: If defined, passed to \[Test::Pod::Coverage::Configurable\] as its 'class' option.
+
+## pod\_coverage\_skip
+
+Reader: pod\_coverage\_skip
+
+Type: Maybe\[ArrayRef\]
+
+Additional documentation: If defined, passed to \[Test::Pod::Coverage::Configurable\] as its 'skip' option.
+
+## pod\_coverage\_trustme
+
+Reader: pod\_coverage\_trustme
+
+Type: Maybe\[ArrayRef\]
+
+Additional documentation: If defined, passed to \[Test::Pod::Coverage::Configurable\] as its 'trustme' option.
+
+## stopwords
+
+Reader: stopwords
+
+Type: ArrayRef
+
+Additional documentation: Additional stopword(s) for Pod::Spell tests. \[May be repeated\]. See also: 'stopword\_files' and 'wordlists' for alternative mechanisms of adding stopwords.
+
+## stopwords\_files
+
+Reader: stopwords\_files
+
+Type: ArrayRef
+
+Additional documentation: File(s) that describe additional stopword(s) for Pod::Spell tests. \[May be repeated\]. See also: 'stopwords' and 'wordlists' for alternative mechanisms of adding stopwords.
+
+## stopwords\_providers
+
+Reader: stopwords\_providers
+
+Type: ArrayRef
+
+Additional documentation: Perl module(s) for contributing additional stopword(s) for spelling tests. \[May be repeated\].
+Note that given module(s) would need to expose the same API as [Pod::Wordlist](https://metacpan.org/pod/Pod%3A%3AWordlist).
+See also: 'stopwords' and 'stopword\_files' for alternative mechanisms of adding stopwords.
+
+## tag\_format
+
+Reader: tag\_format
+
+Type: Str
+
+Additional documentation: The tag format passed to \[Git::Tag\] after committing sources.
+The default is 'repo-release-v%V%t', which may be prefixed by some other string.
+The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
+ Default: 'repo-release-v%V%t'
+
+## tag\_format\_dist
+
+Reader: tag\_format\_dist
+
+Type: Str
+
+Additional documentation: The tag format passed to \[Git::Tag\] after committing the build.
+The default is 'dist-release-v%V%t', which may be prefixed by some other string.
+The idea was copied from @DAGOLDEN who chose something more robust than just the version number when parsing versions with a regex.
+ Default: 'dist-release-v%V%t'
+
+## version\_regexp
+
+Reader: version\_regexp
+
+Type: Str
+
+Additional documentation: The version regex that corresponds to the 'tag\_format'. Default: '^(?:\[-\\w\]+)?release-(.+)$'
+
+## weaver\_config
+
+Reader: weaver\_config
+
+Type: Str
+
+Additional documentation: Specifies a Pod::Weaver bundle to be used. Default: '@Author::TABULO'
+
+# AUTHORS
+
+Tabulo\[n\] <dev@tabulo.net>
+
+# SUPPORT
+
+## Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at [https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO/issues](https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO/issues).
+
+## Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+[https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO](https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO)
+
+    git clone https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO.git
+
+# CONTRIBUTOR
+
+Tabulo <dev-git.perl@tabulo.net>
+
+# LEGAL
+
+This software is copyright (c) 2021 by Tabulo\[n\].
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

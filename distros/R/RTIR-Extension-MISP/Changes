@@ -1,0 +1,13 @@
+Revision history for RTIR-Extension-MISP
+
+0.02 2021-10-27
+ - Support putting MISP ID custom fields in custom field groupings
+ - Document optional custom field grouping configuration
+ - Add UUID::Tiny dependency to Makefile.PL
+ - Add more fields to the MISP Event Details portlet
+ - Link MISP custom fields to the corresponding event in the configured MISP instance
+ - Use the MISP blue color for the MISP portlet
+ - Ajaxify the MISP portlet for faster page load time
+
+0.01 2021-10-08
+ - Initial version

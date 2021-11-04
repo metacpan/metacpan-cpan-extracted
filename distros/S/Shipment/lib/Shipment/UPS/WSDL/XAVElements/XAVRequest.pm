@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::XAVElements::XAVRequest;
-$Shipment::UPS::WSDL::XAVElements::XAVRequest::VERSION = '3.05';
+$Shipment::UPS::WSDL::XAVElements::XAVRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ use warnings;
                   MaximumCandidateListSize
                   AddressKeyFormat
 
-                  )
+                )
             ],
             {   'Request'                  => \%Request_of,
                 'RegionalRequestIndicator' => \%RegionalRequestIndicator_of,
@@ -89,7 +89,7 @@ Shipment::UPS::WSDL::XAVElements::XAVRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -5,6 +5,7 @@ requires 'Catalyst::Utils';
 requires 'Text::Template';
 requires 'JSON::MaybeXS';
 requires 'Scalar::Util';
+requires 'Carp';
 
 on test => sub {
   requires 'Test::Most' => '0.34';

@@ -1,5 +1,11 @@
 Revision history for Perl module TestRail::API
 
+0.051 2021-10-26 TEODESIAN
+    - Fix broken testsuite due to use of Test::MockModule::redefine on old perls
+
+0.050 2021-10-26 TEODESIAN
+    - Add filtering mechanisms to various API methods, contributed by Matt Spahr
+
 0.049 2021-08-22 TEODESIAN
     - Add getPriorities, getPriorityByName and priorityNamesToIds, contributed by Matt Spahr
 

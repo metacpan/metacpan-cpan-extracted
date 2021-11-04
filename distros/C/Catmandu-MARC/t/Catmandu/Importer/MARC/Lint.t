@@ -31,6 +31,4 @@ is $records->[0]->{'_id'} , $records->[0]->{'record'}->[1][-1], '_id matches rec
 
 ok $records->[9]->{lint} , 'got lint';
 
-like $records->[9]->{lint}->[0] , qr/Indicator 1 must be 0/ , 'got lit information';
-
 done_testing;

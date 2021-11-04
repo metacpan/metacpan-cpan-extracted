@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               StatusDescription
               StatusTime
 
-              )
+            )
         ],
         {   'EstimatedTimeOfArrival' => \%EstimatedTimeOfArrival_of,
             'Reason'                 => \%Reason_of,
@@ -78,7 +78,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -12,6 +12,7 @@ my $build = Module::Build->new(
 
       'Data::Bitfield' => 0,
       'Device::Chip' => '0.03',
+      'Device::Chip::Sensor' => '0.19',
    },
    test_requires => {
       'Test::Device::Chip::Adapter' => 0,

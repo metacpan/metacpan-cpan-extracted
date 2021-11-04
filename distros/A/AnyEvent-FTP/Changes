@@ -1,5 +1,9 @@
 Revision history for AnyEvent-FTP
 
+0.18      2021-10-28 09:18:40 -0600
+  - Fix test that could fail on some platforms because
+    regexp wasn't correctly escaped (gh#31)
+
 0.17      2021-07-12 08:43:17 -0600
   - Fix bug related to space being in %PATH% on Windows
   - Another fix on Perl where test suite could fail if

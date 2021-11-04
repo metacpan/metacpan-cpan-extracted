@@ -1,5 +1,14 @@
 Revision history for Perl extension List::Helpers::XS.
 
+0.18 2021 Oct 12
+    - POD Fixes
+
+0.17  2021 Oct 1
+    - getting rid of "random_slice_void" in favor of void context in "random_slice"
+    - fix a bug when "random_slice" could return the same result for multiple calls with the same input data
+    - updating POD (thanks for justincase@)
+    - some refactoring
+
 0.16  2021 Jun 4
     - use std::move to swap elements
 

@@ -1,3 +1,8 @@
+0.003   2021-06-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Note that WWW::Mechanize::Firefox, MozRepl at al no longer work.
+
+
 0.002   2020-06-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Add per-browser lists: ChromeUtilities, FirefoxUtilities,

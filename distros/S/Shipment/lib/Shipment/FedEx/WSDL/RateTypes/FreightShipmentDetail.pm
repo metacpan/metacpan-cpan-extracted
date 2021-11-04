@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightShipmentDetail;
-$Shipment::FedEx::WSDL::RateTypes::FreightShipmentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::FreightShipmentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -62,7 +62,7 @@ Class::Std::initialize();
               SpecialServicePayments
               LineItems
 
-              )
+            )
         ],
         {   'FedExFreightAccountNumber' => \%FedExFreightAccountNumber_of,
             'FedExFreightBillingContactAndAddress' =>
@@ -108,7 +108,7 @@ Class::Std::initialize();
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'ClientDiscountPercent' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-            'PalletWeight' => 'Shipment::FedEx::WSDL::RateTypes::Weight',
+            'PalletWeight'       => 'Shipment::FedEx::WSDL::RateTypes::Weight',
             'ShipmentDimensions' =>
               'Shipment::FedEx::WSDL::RateTypes::Dimensions',
             'Comment' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
@@ -159,7 +159,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightShipmentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

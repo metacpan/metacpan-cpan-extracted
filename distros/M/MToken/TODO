@@ -1,5 +1,15 @@
 # TODO Fri Jun 23 08:46:53 MSK 2017
-# $Id: TODO 74 2019-06-13 08:45:12Z minus $
+# $Id: TODO 117 2021-10-13 07:15:48Z minus $
+
+# PLAN
+
+    * Make release for Centos 7 and Centos 8 (Rocky ?)
+
+    * Make release for Ubuntu 20+ (see norfc)
+
+# NOTES
+
+    * See NOTES file
 
 # GENERAL
 
@@ -15,7 +25,9 @@
 
 # DOCUMENTATION
 
-    * none
+    * Write INSTALL file
+
+    * Write RELEASE file
 
 # DIAGNOSTICS
 

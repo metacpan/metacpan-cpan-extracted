@@ -1,0 +1,38 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '7.1101'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla::PluginBundle::Author::GSG' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'HealthCheck::Diagnostic::WebRequest' => '0',
+                                      'JSON' => '0',
+                                      'parent' => '0',
+                                      'perl' => 'v5.10.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'LWP::Protocol::http' => '0',
+                                   'Test2::V0' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

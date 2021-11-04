@@ -88,6 +88,8 @@ sub available_languages {
 sub finalize_message_info {
   my ($self, $c, $code, $lang, %args) = @_;
   my $message_info = $self->get_message_info($c, $lang, $code);
+  $message_info = $self->get_message_info($c, 'en_US', $code) unless $message_info; # Fallback to US English
+  $c->log->info("Generated error response: $code $message_info->{title}: $message_info->{message}");
   return +{
     %$message_info,
     lang => $lang,

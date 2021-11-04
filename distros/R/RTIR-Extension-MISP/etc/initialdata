@@ -1,0 +1,24 @@
+use strict;
+use warnings;
+
+our @CustomFields = (
+    {   Name        => 'MISP Event ID',
+        Type        => 'FreeformSingle',
+        Disabled    => 0,
+        Queue       => 'Incidents',
+        LinkValueTo => '__MISPURL__/events/view/__CustomField__',
+    },
+    {   Name        => 'MISP Event UUID',
+        Type        => 'FreeformSingle',
+        Disabled    => 0,
+        Queue       => 'Incidents',
+        LinkValueTo => '__MISPURL__/events/view/__CustomField__',
+    },
+    {   Name        => 'MISP RTIR Object ID',
+        Type        => 'FreeformSingle',
+        Disabled    => 0,
+        Queue       => 'Incidents',
+    },
+);
+
+1;

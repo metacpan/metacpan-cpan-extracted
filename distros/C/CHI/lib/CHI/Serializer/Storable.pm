@@ -2,7 +2,7 @@
 # Recommend Data::Serializer for other serializers, rather than reinventing the wheel.
 #
 package CHI::Serializer::Storable;
-$CHI::Serializer::Storable::VERSION = '0.60';
+$CHI::Serializer::Storable::VERSION = '0.61';
 use Moo;
 use Storable;
 use strict;

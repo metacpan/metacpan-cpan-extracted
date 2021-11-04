@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive::Usage;
+package Getopt::Long::Descriptive::Usage 0.110;
 # ABSTRACT: the usage description for GLD
-$Getopt::Long::Descriptive::Usage::VERSION = '0.109';
+
 use List::Util qw(max);
 
 #pod =head1 SYNOPSIS
@@ -280,7 +280,7 @@ Getopt::Long::Descriptive::Usage - the usage description for GLD
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 SYNOPSIS
 
@@ -295,6 +295,16 @@ version 0.109
 
 This document only describes the methods of the Usage object.  For information
 on how to use L<Getopt::Long::Descriptive>, consult its documentation.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -349,7 +359,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

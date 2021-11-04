@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::ShipTypemaps::ShipService;
-$Shipment::UPS::WSDL::ShipTypemaps::ShipService::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypemaps::ShipService::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -2103,6 +2103,7 @@ our $typemap_1 = {
       'SOAP::WSDL::XSD::Typelib::Builtin::string'
 };
 
+
 sub get_class {
     my $name = join '/', @{$_[1]};
     return $typemap_1->{$name};
@@ -2124,7 +2125,7 @@ Shipment::UPS::WSDL::ShipTypemaps::ShipService
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

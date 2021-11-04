@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::GetDocumentsRequestContainer;
-$Shipment::Purolator::WSDLV2::Types::GetDocumentsRequestContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::GetDocumentsRequestContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        DocumentCriterium
 
-              )
+            )
         ],
         {'DocumentCriterium' => \%DocumentCriterium_of,},
         {   'DocumentCriterium' =>
@@ -60,7 +60,7 @@ Shipment::Purolator::WSDLV2::Types::GetDocumentsRequestContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

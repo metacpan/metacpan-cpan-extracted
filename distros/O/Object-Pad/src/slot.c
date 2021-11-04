@@ -1,3 +1,4 @@
+/* vi: set ft=xs : */
 #define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
@@ -12,6 +13,7 @@
 
 #include "perl-backcompat.c.inc"
 #include "perl-additions.c.inc"
+#include "force_list_keeping_pushmark.c.inc"
 #include "optree-additions.c.inc"
 #include "make_argcheck_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"
@@ -275,10 +277,6 @@ static struct SlotHookFuncs slothooks_param = {
 
 static SV *make_accessor_mnamesv(pTHX_ SlotMeta *slotmeta, SV *mname, const char *fmt)
 {
-  if(SvPVX(slotmeta->name)[0] != '$')
-    /* TODO: A reader for an array or hash slot should also be fine */
-    croak("Can only generate accessors for scalar slots");
-
   /* if(mname && !is_valid_ident_utf8((U8 *)mname))
     croak("Invalid accessor method name");
     */
@@ -303,6 +301,7 @@ static void S_generate_slot_accessor_method(pTHX_ SlotMeta *slotmeta, SV *mname,
   ENTER;
 
   ClassMeta *classmeta = slotmeta->class;
+  char sigil = SvPVX(slotmeta->name)[0];
 
   SV *mname_fq = newSVpvf("%" SVf "::%" SVf, classmeta->name, mname);
 
@@ -327,17 +326,33 @@ static void S_generate_slot_accessor_method(pTHX_ SlotMeta *slotmeta, SV *mname,
 
   int req_args = 0;
   int opt_args = 0;
+  int slurpy_arg = 0;
 
   switch(type) {
-    case ACCESSOR_WRITER:   req_args = 1; break;
-    case ACCESSOR_COMBINED: opt_args = 1; break;
+    case ACCESSOR_WRITER:
+      if(sigil == '$')
+        req_args = 1;
+      else
+        slurpy_arg = sigil;
+      break;
+    case ACCESSOR_COMBINED:
+      opt_args = 1;
+      break;
   }
 
   ops = op_append_list(OP_LINESEQ, ops,
-    make_argcheck_ops(req_args, opt_args, 0, mname_fq));
+    make_argcheck_ops(req_args, opt_args, slurpy_arg, mname_fq));
+
+  U32 flags = 0;
+
+  switch(sigil) {
+    case '$': flags = OPpSLOTPAD_SV << 8; break;
+    case '@': flags = OPpSLOTPAD_AV << 8; break;
+    case '%': flags = OPpSLOTPAD_HV << 8; break;
+  }
 
   ops = op_append_list(OP_LINESEQ, ops,
-    newSLOTPADOP(OPpSLOTPAD_SV << 8, ctx.padix, slotmeta->slotix));
+    newSLOTPADOP(flags, ctx.padix, slotmeta->slotix));
 
   MOP_SLOT_RUN_HOOKS(slotmeta, gen_accessor_ops, type, &ctx);
 
@@ -378,9 +393,17 @@ static void slothook_gen_reader_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum
   if(type != ACCESSOR_READER)
     return;
 
+  OPCODE optype = 0;
+
+  switch(SvPVX(slotmeta->name)[0]) {
+    case '$': optype = OP_PADSV; break;
+    case '@': optype = OP_PADAV; break;
+    case '%': optype = OP_PADHV; break;
+  }
+
   ctx->retop = newLISTOP(OP_RETURN, 0,
     newOP(OP_PUSHMARK, 0),
-    newPADxVOP(OP_PADSV, 0, ctx->padix));
+    newPADxVOP(optype, 0, ctx->padix));
 }
 
 static struct SlotHookFuncs slothooks_reader = {
@@ -408,9 +431,25 @@ static void slothook_gen_writer_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum
   if(type != ACCESSOR_WRITER)
     return;
 
-  ctx->bodyop = newBINOP(OP_SASSIGN, 0,
-    newOP(OP_SHIFT, 0),
-    newPADxVOP(OP_PADSV, 0, ctx->padix));
+  switch(SvPVX(slotmeta->name)[0]) {
+    case '$':
+      ctx->bodyop = newBINOP(OP_SASSIGN, 0,
+        newOP(OP_SHIFT, 0),
+        newPADxVOP(OP_PADSV, 0, ctx->padix));
+      break;
+
+    case '@':
+      ctx->bodyop = newBINOP(OP_AASSIGN, 0,
+        force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv))),
+        force_list_keeping_pushmark(newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, ctx->padix)));
+      break;
+
+    case '%':
+      ctx->bodyop = newBINOP(OP_AASSIGN, 0,
+        force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv))),
+        force_list_keeping_pushmark(newPADxVOP(OP_PADHV, OPf_MOD|OPf_REF, ctx->padix)));
+      break;
+  }
 
   ctx->retop = newLISTOP(OP_RETURN, 0,
     newOP(OP_PUSHMARK, 0),
@@ -425,6 +464,16 @@ static struct SlotHookFuncs slothooks_writer = {
 };
 
 /* :mutator */
+
+static bool slothook_mutator_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
+{
+  if(SvPVX(slotmeta->name)[0] != '$')
+    /* TODO: A reader for an array or hash slot should also be fine */
+    croak("Can only generate accessors for scalar slots");
+
+  *hookdata_ptr = make_accessor_mnamesv(aTHX_ slotmeta, value, "%s");
+  return TRUE;
+}
 
 static void slothook_mutator_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
 {
@@ -445,7 +494,7 @@ static void slothook_gen_mutator_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enu
 
 static struct SlotHookFuncs slothooks_mutator = {
   .ver              = OBJECTPAD_ABIVERSION,
-  .apply            = &slothook_reader_apply, /* generate method name the same as :reader */
+  .apply            = &slothook_mutator_apply,
   .seal_slot        = &slothook_mutator_seal,
   .gen_accessor_ops = &slothook_gen_mutator_ops,
 };
@@ -478,7 +527,7 @@ static void slothook_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, en
 
 static struct SlotHookFuncs slothooks_accessor = {
   .ver              = OBJECTPAD_ABIVERSION,
-  .apply            = &slothook_reader_apply, /* generate method name the same as :reader */
+  .apply            = &slothook_mutator_apply, /* generate method name the same as :mutator */
   .seal_slot        = &slothook_accessor_seal,
   .gen_accessor_ops = &slothook_gen_accessor_ops,
 };

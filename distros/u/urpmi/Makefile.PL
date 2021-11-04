@@ -193,14 +193,14 @@ WriteMakefile(
 		},
 		'urpmi' => {
 		    file => 'urpmi.pm',
-		    version => 'v8.126',
+		    version => 'v8.127',
 		},
             },
             resources => {
                 repository  => {
 		    type => 'git',
 		    url => 'git://git.mageia.org/software/rpm/urpmi/',
-		    web =>  'http://gitweb.mageia.org/software/rpm/urpmi/',
+		    web =>  'https://gitweb.mageia.org/software/rpm/urpmi/',
 		},
             },
 	    release_status => 'stable',

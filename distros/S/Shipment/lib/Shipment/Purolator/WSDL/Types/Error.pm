@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::Error;
-$Shipment::Purolator::WSDL::Types::Error::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::Error::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Description
               AdditionalInformation
 
-              )
+            )
         ],
         {   'Code'                  => \%Code_of,
             'Description'           => \%Description_of,
@@ -67,7 +67,7 @@ Shipment::Purolator::WSDL::Types::Error
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -225,7 +225,7 @@ sub _build_wind_speed {
         }
     }
 
-    return $self->wind_speed->[0];
+    return $self->wind_speeds->[0];
 }
 
 =head2 humidities

@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
+our $VERSION = '3.017'; # VERSION
 
 =head1 NAME
 
@@ -924,6 +924,25 @@ L<https://redis.io/commands/client-list>
 sub client_list : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(CLIENT LIST) => @args)
+}
+
+=head2 client_no_evict
+
+Set client eviction mode for the current connection.
+
+=over 4
+
+=item * ON|OFF
+
+=back
+
+L<https://redis.io/commands/client-no-evict>
+
+=cut
+
+sub client_no_evict : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLIENT NO-EVICT) => @args)
 }
 
 =head2 client_pause

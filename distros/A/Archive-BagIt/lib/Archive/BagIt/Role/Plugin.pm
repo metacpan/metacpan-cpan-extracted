@@ -2,14 +2,22 @@ package Archive::BagIt::Role::Plugin;
 use strict;
 use warnings;
 use Moo::Role;
+use IO::Async::Loop;
 use namespace::autoclean;
 # ABSTRACT: A role that handles plugin loading
-our $VERSION = '0.081'; # VERSION
+our $VERSION = '0.083'; # VERSION
 
 has plugin_name => (
   is  => 'ro',
   #isa => 'Str',
   default => __PACKAGE__,
+);
+
+has '_ioloop' => (
+    is      => 'ro',
+    default => sub {
+        IO::Async::Loop->new();
+    }
 );
 
 has bagit => (
@@ -40,7 +48,7 @@ Archive::BagIt::Role::Plugin - A role that handles plugin loading
 
 =head1 VERSION
 
-version 0.081
+version 0.083
 
 =head1 AVAILABILITY
 

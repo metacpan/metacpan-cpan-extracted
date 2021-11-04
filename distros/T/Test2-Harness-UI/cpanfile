@@ -15,6 +15,8 @@ requires "DBIx::Class::UUIDColumns" => "0";
 requires "DBIx::QuickDB" => "0.000020";
 requires "Data::GUID" => "0";
 requires "DateTime" => "0";
+requires "DateTime::Format::MySQL" => "0";
+requires "DateTime::Format::Pg" => "0";
 requires "Email::Sender::Simple" => "0";
 requires "Email::Simple" => "0";
 requires "Email::Simple::Creator" => "0";
@@ -40,7 +42,7 @@ requires "Statistics::Basic" => "0";
 requires "Test2" => "1.302164";
 requires "Test2::API" => "1.302166";
 requires "Test2::Formatter::Test2::Composer" => "0";
-requires "Test2::Harness" => "1.000065";
+requires "Test2::Harness" => "1.000076";
 requires "Test2::Harness::Util::HashBase" => "0";
 requires "Test2::Harness::Util::JSON" => "0";
 requires "Test2::Harness::Util::UUID" => "0";
@@ -60,8 +62,10 @@ requires "perl" => "5.008009";
 suggests "Cpanel::JSON::XS" => "0";
 suggests "DBD::Pg" => "0";
 suggests "DBD::mysql" => "0";
-suggests "DateTime::Format::MySQL" => "0";
-suggests "DateTime::Format::Pg" => "0";
+
+on 'test' => sub {
+  requires "HTTP::Tiny::UNIX" => "0";
+};
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";

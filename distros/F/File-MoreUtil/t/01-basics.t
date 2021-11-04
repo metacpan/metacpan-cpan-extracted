@@ -13,6 +13,8 @@ use File::MoreUtil qw(
                          file_exists
                          l_abs_path
                          dir_empty
+                         dir_not_empty
+                         dir_has_entries
                          dir_has_files
                          dir_has_dot_files
                          dir_has_non_dot_files
@@ -79,7 +81,7 @@ subtest l_abs_path => sub {
     is(l_abs_path("tmp/symnep" ), "$dir/tmp/symnep" , "l_abs_path symnep");
 };
 
-subtest "dir_empty, dir_has_*files, dir_has_*subdirs" => sub {
+subtest "dir_empty, dir_not_empty, dir_has_*files, dir_has_*subdirs" => sub {
     my $dir = tempdir(CLEANUP=>1);
     local $CWD = $dir;
 
@@ -108,6 +110,20 @@ subtest "dir_empty, dir_has_*files, dir_has_*subdirs" => sub {
     ok(!dir_empty("hasdotfiles"));
     ok(!dir_empty("hasdotdirs"));
     ok(!dir_empty("unreadable")) if $>;
+
+    ok(!dir_not_empty("empty"));
+    ok(!dir_not_empty("doesntexist"));
+    ok( dir_not_empty("hasfiles"));
+    ok( dir_not_empty("hasdotfiles"));
+    ok( dir_not_empty("hasdotdirs"));
+    ok(!dir_not_empty("unreadable")) if $>;
+
+    ok(!dir_has_entries("empty"));
+    ok(!dir_has_entries("doesntexist"));
+    ok( dir_has_entries("hasfiles"));
+    ok( dir_has_entries("hasdotfiles"));
+    ok( dir_has_entries("hasdotdirs"));
+    ok(!dir_has_entries("unreadable")) if $>;
 
     ok(!dir_has_files("empty"));
     ok(!dir_has_files("doesntexist"));

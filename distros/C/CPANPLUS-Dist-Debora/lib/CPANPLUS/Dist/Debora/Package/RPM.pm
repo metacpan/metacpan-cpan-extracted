@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -30,6 +30,7 @@ my %OBSOLETES_FOR = (
     'App-Licensecheck'    => [qw(perl-App-Licensecheck)],
     'App-perlbrew'        => [qw(perl-App-perlbrew)],
     'Mojolicious'         => [qw(perl-Test-Mojo)],
+    'Perl-Critic'         => [qw(perl-Test-Perl-Critic-Policy)],
     'perl-ldap'           => [qw(perl-LDAP)],
     'Perl-Tidy'           => [qw(perltidy)],
     'TermReadKey'         => [qw(perl-TermReadKey)],
@@ -229,7 +230,7 @@ sub provides {
         push @provides, @{$PROVIDES_FOR{$dist_name}};
     }
 
-    return wantarray ? @provides : \@provides;
+    return \@provides;
 }
 
 sub obsoletes {
@@ -242,7 +243,7 @@ sub obsoletes {
         push @obsoletes, @{$OBSOLETES_FOR{$dist_name}};
     }
 
-    return wantarray ? @obsoletes : \@obsoletes;
+    return \@obsoletes;
 }
 
 sub _escape {
@@ -531,7 +532,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -620,15 +621,20 @@ RPM macro C<%distribution> or the F</etc/os-release> file.
 
 =head2 provides
 
-  my @provides = $package->provides;
+  for my $capability (@{$package->provides}) {
+    say $capability;
+  }
 
-Returns an array of capabilities that are provided by this package.
+Returns additional capabilities, i.e. package and module names, that are
+provided by this package.
 
 =head2 obsoletes
 
-  my @obsoletes = $package->obsoletes;
+  for my $package_name (@{$package->obsoletes}) {
+    say $package_name;
+  }
 
-Returns an array of packages that are obsoleted by this package.
+Returns packages that are obsoleted by this package.
 
 =head2 spec
 

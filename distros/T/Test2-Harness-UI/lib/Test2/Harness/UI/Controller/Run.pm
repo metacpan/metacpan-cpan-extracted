@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.000086';
+our $VERSION = '0.000096';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -40,11 +40,19 @@ sub handle {
         if ($act eq 'pin_toggle') {
             $run->update({pinned => $run->pinned ? 0 : 1});
         }
+        elsif ($act eq 'parameters') {
+            $res->content_type('application/json');
+            $res->raw_body($run->parameters);
+            return $res;
+        }
         elsif ($act eq 'cancel') {
             $run->update({status => 'canceled'});
         }
         elsif ($act eq 'delete') {
             die error(400 => "Cannot delete a pinned run") if $run->pinned;
+
+            $run->coverages->delete;
+
             my $jobs = $run->jobs;
 
             while (my $job = $jobs->next()) {

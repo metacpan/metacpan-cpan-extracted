@@ -8,7 +8,7 @@ See also pod-source.t
 =cut
 
 use strict;
-use Test::More;
+use Test2::V0;
 use File::Spec::Functions;
 
 plan(skip_all => "Test::Pod 1.14 required for testing POD"), exit unless

@@ -1,0 +1,7 @@
+-I. 
+-It/lib
+--blib
+--lib
+--recurse
+--timer
+--trap

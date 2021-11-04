@@ -1,0 +1,40 @@
+---
+abstract: 'Get results from an HTTP HealthCheck'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  LWP::Protocol::http: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HealthCheck-Diagnostic-RemoteHealth
+provides:
+  HealthCheck::Diagnostic::RemoteHealth:
+    file: lib/HealthCheck/Diagnostic/RemoteHealth.pm
+    version: v0.1.0
+requires:
+  HealthCheck::Diagnostic::WebRequest: '0'
+  JSON: '0'
+  parent: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/p5-healthcheck-diagnostic-remotehealth/issues
+  repository: git://github.com/GrantStreetGroup/p5-healthcheck-diagnostic-remotehealth.git
+version: v0.1.0
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
+x_static_install: 1

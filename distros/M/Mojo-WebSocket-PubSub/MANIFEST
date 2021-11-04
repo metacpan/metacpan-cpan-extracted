@@ -6,7 +6,9 @@ META.json
 META.yml
 Makefile.PL
 README
+examples/shell.pl
 lib/Mojo/WebSocket/PubSub.pm
+lib/Mojo/WebSocket/PubSub/Shell.pm
 lib/Mojo/WebSocket/PubSub/Syntax.pm
 lib/Mojolicious/Plugin/PubSub/WebSocket.pm
 t/00-report-prereqs.dd

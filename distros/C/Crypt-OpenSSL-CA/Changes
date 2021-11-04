@@ -1,5 +1,17 @@
 Revision history for Crypt-OpenSSL-CA
 
+0.91    26 Oct 2021
+      - Support for Math::BigInt certificate and CRL serials (fixes RT #83507)
+      - Fix documentation error: there is no such thing as `--openssl-libs` (fixes RT #109232)
+      - Support for parsing CRLs (patches adapted from RT #122133). Credits to Oleg Borodin
+      - Fix `leaks_bytes_ok` false negative causing the test suite to fail
+
+0.90    26 Oct 2021
+      - Port to OpenSSL API version 1.1.0
+      - Port from Test::Group to Test2::Suite
+      - Stop relying on OpenSSL's private _CONF_* API (fixes Ubuntu bug 1393752)
+      - Fix a number of long-standing issues in tests and maintainer support packages
+
 0.24    22 May 2014
       - Fix RT #83507, #95385 and #95437
       - Fix compile-time and test-time warnings
@@ -38,14 +50,6 @@ Revision history for Crypt-OpenSSL-CA
 0.16    14 Feb 2008
       - YACTBOR.  Can now detect OpenSSL version before attempting the
         whole compile despite CPAN.pm's quirks.
-=======
-      - YACTBOR.  Fixes
-        spurious test failures with FreeBSD 6.2's backward OpenSSL.
-
-0.16    14 Feb 2008
-      - YACTBOR. Hopefully will now be able to detect OpenSSL version before
-        attempting the whole compile despite CPAN.pm's quirks.
->>>>>>> Prepare version 0.20 in $VERSION and Changes file
 
 0.15    13 Feb 2008
       - Added ->supported_digests(). Now the OpenSSL version is validated

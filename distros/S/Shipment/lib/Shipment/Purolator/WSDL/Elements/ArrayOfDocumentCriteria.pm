@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDL::Elements::ArrayOfDocumentCriteria;
-$Shipment::Purolator::WSDL::Elements::ArrayOfDocumentCriteria::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Elements::ArrayOfDocumentCriteria::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDL::Elements::ArrayOfDocumentCriteria
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

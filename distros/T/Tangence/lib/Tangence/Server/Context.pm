@@ -1,62 +1,50 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Server::Context 0.26;
+use v5.26;
+use Object::Pad 0.41;
 
-use v5.14;
-use warnings;
+package Tangence::Server::Context 0.27;
+class Tangence::Server::Context;
 
 use Carp;
 
 use Tangence::Constants;
 
-sub new
-{
-   my $class = shift;
-   my ( $stream, $token ) = @_;
+has $stream :param :reader;
+has $token  :param;
 
-   return bless {
-      stream => $stream,
-      token  => $token,
-   }, $class;
+sub BUILDARGS ( $class, $stream, $token )
+{
+   return ( stream => $stream, token => $token );
 }
 
-sub DESTROY
+has $responded;
+
+# TODO: Object::Pad probably should do this bit
+method DESTROY
 {
-   my $self = shift;
-   $self->{responded} or croak "$self never responded";
+   $responded or croak "$self never responded";
 }
 
-sub stream
+method respond ( $message )
 {
-   my $self = shift;
-   return $self->{stream};
-}
+   $responded and croak "$self has responded once already";
 
-sub respond
-{
-   my $self = shift;
-   my ( $message ) = @_;
+   $stream->respond( $token, $message );
 
-   $self->{responded} and croak "$self has responded once already";
-
-   $self->stream->respond( $self->{token}, $message );
-
-   $self->{responded} = 1;
+   $responded = 1;
 
    return;
 }
 
-sub responderr
+method responderr ( $msg )
 {
-   my $self = shift;
-   my ( $msg ) = @_;
-
    chomp $msg; # In case of simple  ->responderr( $@ );
 
-   $self->respond( Tangence::Message->new( $self->stream, MSG_ERROR )
+   $self->respond( Tangence::Message->new( $stream, MSG_ERROR )
       ->pack_str( $msg )
    );
 }

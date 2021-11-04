@@ -1,0 +1,373 @@
+=pod
+
+=head1 NAME
+
+B<Test::Expander> - Expansion of test functionalities that appear to be frequently used while testing.
+
+=head1 SYNOPSIS
+
+  # Tries to automatically determine, which class and method are to be tested,
+  # does not create a temporary directory:
+  use Test::Expander;
+
+  # Tries to automatically determine, which class and method are to be tested,
+  # does not create a temporary directory,
+  # passes the option '-srand' to Test::V0 changing the random seed to the current time in seconds:
+  use Test::Expander -srand => time;
+
+  # Tries to automatically determine method, class is supplied explicitly,
+  # a temporary directory is created with a name corresponing to the supplied template:
+  use Test::Expander -target => 'My::Class', -tempdir => { TEMPLATE => 'my_dir.XXXXXXXX' };
+
+=head1 DESCRIPTION
+
+B<Test::Expander> combines all advanced possibilities provided by L<Test2::V0|https://metacpan.org/pod/Test2::V0>
+with some specific functions only available in the older module L<Test::More|https://metacpan.org/pod/Test::More>
+(which allows a smooth migration from L<Test::More|https://metacpan.org/pod/Test::More>-based tests to
+L<Test2::V0|https://metacpan.org/pod/Test2::V0>-based ones) and handy functions from some other modules
+often used in test suites.
+
+Furthermore, this module provides a recognition of the class to be tested (see variable B<$CLASS> below) so that
+in contrast to L<Test2::V0|https://metacpan.org/pod/Test2::V0> you do not need to specify this explicitly
+if the path to the test file is in accordance with the name of class to be tested i.e.
+file B<t/Foo/Bar/baz.t> -E<gt> class B<Foo::Bar>.
+
+A similar recognition is provided in regard to the method / subroutine to be tested
+(see variables B<$METHOD> and B<METHOD_REF> below) if the base name (without extension) of test file is
+identical with the name of this method / subroutine i.e. file B<t/Foo/Bar/baz.t> -E<gt> method B<Foo::Bar::bar>.
+
+Finally, a configurable setting of specific environment variables is provided so that
+there is no need to hard-code this in the test itself.
+
+For the time being the following options are accepted by B<Test::Expander>:
+
+=over 2
+
+=item
+
+Options specific for this module only:
+
+=over 2
+
+=item
+
+B<-target> - identical to the same-named option of L<Test2::V0|https://metacpan.org/pod/Test2::V0> and
+has the same purpose namely the explicit definition of the class to be tested as the value;
+
+=item
+
+B<-tempdir> - activates creation of a temporary directory. The value has to be a hash reference with content
+as explained in L<File::Temp::tempdir|https://metacpan.org/pod/File::Temp>. This means, you can control the creation of
+temporary directory by passing of necessary parameters in form of a hash reference or, if the default behavior is
+required, simply pass the empty hash reference as the option value.
+
+=item
+
+B<-tempfile> - activates creation of a temporary file. The value has to be a hash reference with content as explained in
+L<File::Temp::tempfile|https://metacpan.org/pod/File::Temp>. This means, you can control the creation of
+temporary file by passing of necessary parameters in form of a hash reference or, if the default behavior is
+required, simply pass the empty hash reference as the option value.
+
+=back
+
+=item
+
+All other valid options (i.e. arguments starting with the dash sign B<->) are forwarded to
+L<Test2::V0|https://metacpan.org/pod/Test2::V0> along with their values.
+
+=item
+
+If an argument cannot be recognized as an option, an exception is raised.
+
+=back
+
+B<Test::Expander> needs to be the very first module in your test file.
+
+The only exception currently known is the case, when some actions performed on the module level
+(e.g. determination of constants) rely upon results of other actions (e.g. mocking of built-ins).
+
+To explain this let us assume that your test file should mock the built-in B<close>
+to verify if the testee properly reacts both on its success and failure.
+For this purpose a reasonable implementation might look as follows:
+
+  my $closeSuccess = 1;
+  BEGIN {
+    *CORE::GLOBAL::close = sub (*) { return $closeSuccess ? CORE::close($_[0]) : 0 }
+  }
+
+  use Test::Expander;
+
+The automated recognition of name of class to be tested can only work if the test file is located in the corresponding
+subdirectory. For instance, if the class to be tested is I<Foo::Bar::Baz>, then the folder with test files
+related to this class should be B<t/>I<Foo>B</>I<Bar>B</>I<Baz> or B<xt/>I<Foo>B</>I<Bar>B</>I<Baz>
+(the name of the top-level directory in this relative name - B<t>, or B<xt>, or B<my_test> is not important) -
+otherwise the module name cannot be put into the exported variable B<$CLASS> and, if you want to use this variable,
+should be supplied as the value of B<-target>:
+
+  use Test::Expander -target => 'Foo::Bar::Baz';
+
+Furthermore, the automated recognition of the name of the method / subroutine to be tested only works if the file
+containing the class mentioned above exists and if this class has the method / subroutine with the same name as the test
+file base name without the extension.
+If this is the case, the exported variables B<$METHOD> and B<$METHOD_REF> contain the name of method / subroutine
+to be tested and its reference, correspondingly, otherwise both variables are undefined.
+
+Finally, B<Test::Expander> supports testing inside of a clean environment containing only some clearly
+specified environment variables required for the particular test.
+Names and values of these environment variables should be configured in files,
+the names of which are identical with paths to single class levels or the method to be tested,
+and the extension is always B<.env>.
+For instance, if the test file name is B<t/Foo/Bar/Baz/myMethod.t>, the following approach is applied:
+
+=over 2
+
+=item
+
+if the file B<t/Foo.env> exists, its content is used for the initialization of the test environment,
+
+=item
+
+if the file B<t/Foo/Bar.env> exists, its content is used either to extend the test environment
+initialized in the previous step or for its initialization if B<t/Foo.env> does not exist,
+
+=item
+
+if the file B<t/Foo/Bar/Baz.env> exists, its content is used either to extend the test
+environment initialized in one of the previous steps or for its initialization if neither B<t/Foo.env> nor
+B<t/Foo/Bar.env> exist,
+
+=item
+
+if the file B<t/Foo/Bar/Baz/myMethod.env> exists, its content is used either to extend the test environment
+initialized in one of the previous steps or for its initialization if none of B<.env> files mentioned above exist.
+
+=back
+
+If the B<.env> files existing on different levels have identical names of environment variables,
+the priority is the higher the later they have been detected.
+I.e. B<VAR = 'VALUE0'> in B<t/Foo/Bar/Baz/myMethod.env> overwrites B<VAR = 'VALUE1'> in B<t/Foo/Bar/Baz.env>.
+
+If none of these B<.env> files exist, the environment isn't changed by B<Test::Expander>
+during the execution of B<t/Foo/Bar/Baz/myMethod.t>.
+
+An environment configuration file (B<.env> file) is a line-based text file.
+Its content is interpreted as follows:
+
+=over 2
+
+=item
+
+if such files don't exist, the B<%ENV> hash remains unchanged;
+
+=item
+
+otherwise, if at least one of such files exists, the B<%ENV> gets emptied (without localization) and
+
+=over 2
+
+=item
+
+lines not matching the RegEx B</^\w+\s*=\s*\S/> (some alphanumeric characters representing a name of
+environment variable, optional blanks, the equal sign, again optional blanks, and at least one non-blank
+character representing the first character of environment variable value) are skipped;
+
+=item
+
+in all other lines the value of the environment variable is everything from the first non-blank
+character after the equal sign until end of the line;
+
+=item
+
+the value of the environment variable is evaluated by the L<string eval|https://perldoc.perl.org/functions/eval>
+so that
+
+=over 2
+
+=item
+
+constant values must be quoted;
+
+=item
+
+variables and subroutines must not be quoted:
+
+  NAME_CONST = 'VALUE'
+  NAME_VAR   = $KNIB::App::MyApp::Constants::ABC
+  NAME_FUNC  = join(' ', $KNIB::App::MyApp::Constants::DEF)
+
+=back
+
+=back
+
+=back
+
+Another common feature within test suites is the creation of a temporary directory / file used as an
+isolated container for some testing actions.
+The module options B<-tempdir> and B<-tempfile> are fully syntactically compatible with
+L<File::Temp::tempdir|https://metacpan.org/pod/File::Temp#FUNCTIONS> /
+L<File::Temp::tempfile|https://metacpan.org/pod/File::Temp#FUNCTIONS>. They make sure that such temporary
+directory / file are created after B<use Test::Expander> and that their names are stored in the variables
+B<$TEMP_DIR> / B<$TEMP_FILE>, correspondingly.
+Both temporary directory and file are removed by default after execution.
+
+All functions provided by this module are exported by default. These and the exported variables are:
+
+=over 2
+
+=item
+
+all functions exported by default from L<Test2::V0|https://metacpan.org/pod/Test2::V0>,
+
+=item
+
+all functions exported by default from L<Test::Files|https://metacpan.org/pod/Test::Files>,
+
+=item
+
+all functions exported by default from L<Test::Output|https://metacpan.org/pod/Test::Output>,
+
+=item
+
+all functions exported by default from L<Test::Warn|https://metacpan.org/pod/Test::Warn>,
+
+=item
+
+some functions exported by default from L<Test::More|https://metacpan.org/pod/Test::More>
+and often used in older tests but not supported by L<Test2::V0|https://metacpan.org/pod/Test2::V0>:
+
+=over 2
+
+=item
+
+BAIL_OUT,
+
+=item
+
+is_deeply,
+
+=item
+
+new_ok,
+
+=item
+
+require_ok,
+
+=item
+
+use_ok,
+
+=back
+
+=item
+
+some functions exported by default from L<Test::Exception|https://metacpan.org/pod/Test::Exception>
+and often used in older tests but not supported by L<Test2::V0|https://metacpan.org/pod/Test2::V0>:
+
+=over 2
+
+=item
+
+dies_ok,
+
+=item
+
+explain,
+
+=item
+
+lives_ok,
+
+=item
+
+throws_ok,
+
+=back
+
+=item
+
+function exported by default from L<Const::Fast|https://metacpan.org/pod/Const::Fast>:
+
+=over 2
+
+=item
+
+const,
+
+=back
+
+=item
+
+some functions exported by request from L<File::Temp|https://metacpan.org/pod/File::Temp>:
+
+=over 2
+
+=item
+
+tempdir,
+
+=item
+
+tempfile,
+
+=back
+
+=item
+
+some functions exported by request from L<Path::Tiny|https://metacpan.org/pod/Path::Tiny>:
+
+=over 2
+
+=item
+
+cwd,
+
+=item
+
+path,
+
+=back
+
+=item
+
+variable B<$CLASS> containing the name of the class to be tested,
+
+=item
+
+variable B<$METHOD> containing the name of the method to be tested,
+
+=item
+
+variable B<$METHOD_REF> containing the reference to the subroutine to be tested.
+
+=item
+
+variable B<$TEMP_DIR> containing the name of a temporary directory created at compile time
+if the option B<-tempdir> was supplied.
+
+=item
+
+variable B<$TEMP_FILE> containing the name of a temporary file created at compile time
+if the option B<-tempfile> was supplied.
+
+=back
+
+All variables mentioned above are read-only if they are defined after B<use Test::Expander ...>.
+
+=head1 AUTHOR
+
+Jurij Fajnberg, <fajnbergj at gmail.com>
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/jsf116/Test-Expander/issues>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2021 Jurij Fajnberg
+
+This program is free software; you can redistribute it and/or modify it under the same terms
+as the Perl 5 programming language system itself.
+
+=cut

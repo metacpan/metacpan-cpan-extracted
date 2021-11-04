@@ -19,6 +19,7 @@
     GyMMM => "MMM y G",
     GyMMMEd => "E, d MMM y G",
     GyMMMd => "d MMM y G",
+    GyMd => "GGGGG y-MM-dd",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -132,7 +133,7 @@
   glibc_datetime_format => "Te %A, te %d o %B, %Y %T",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%T",
-  language => "Maori",
+  language => "M\N{U+0101}ori",
   month_format_abbreviated => [
     "Kohi",
     "Hui",
@@ -217,7 +218,7 @@
     "Whiringa-\N{U+0101}-rangi",
     "Hakihea",
   ],
-  name => "Maori New Zealand",
+  name => "M\N{U+0101}ori New Zealand",
   native_language => "te reo M\N{U+0101}ori",
   native_name => "te reo M\N{U+0101}ori Aotearoa",
   native_script => undef,
@@ -266,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 39,
+  version => 40,
 }

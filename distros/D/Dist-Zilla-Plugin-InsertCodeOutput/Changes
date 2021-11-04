@@ -1,3 +1,8 @@
+0.045   2021-06-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Tweak regex to avoid overeager removal of newline.
+
+
 0.044   2021-05-21  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Don't add extraneous newline to output.

@@ -2,9 +2,10 @@ use strict;
 use warnings;
 
 package Git::Helpers;
-our $VERSION = '1.000000';
+our $VERSION = '1.000001';
+
 use Carp qw( croak );
-use Capture::Tiny 'capture_stderr';
+use Capture::Tiny qw( capture_stderr );
 use File::pushd qw( pushd );
 use Git::Sub;
 use Sub::Exporter -setup => {
@@ -19,8 +20,7 @@ use Sub::Exporter -setup => {
 };
 use Try::Tiny qw( catch try );
 use URI ();
-use URI::FromHash qw( uri );
-use URI::Heuristic qw(uf_uristr);
+use URI::Heuristic qw( uf_uristr );
 use URI::git ();
 
 sub checkout_root {
@@ -135,7 +135,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 =head1 VERSION
 
-version 1.000000
+version 1.000001
 
 =head1 SYNOPSIS
 

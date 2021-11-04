@@ -8,9 +8,9 @@ use Error::Pure qw(err);
 use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_array_object check_isa
-	check_number check_number_of_items check_required);
+	check_length check_number check_number_of_items check_required);
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 sub check_array_object {
 	my ($self, $key, $class, $class_name) = @_;
@@ -37,6 +37,24 @@ sub check_isa {
 
 	if (! $self->{$key}->isa($class)) {
 		err "Parameter '$key' must be a '$class' object.";
+	}
+
+	return;
+}
+
+sub check_length {
+	my ($self, $key, $max_length) = @_;
+
+	if (! exists $self->{$key}) {
+		return;
+	}
+
+	if (! defined $self->{$key}) {
+		return;
+	}
+
+	if (length $self->{$key} > $max_length) {
+		err "Parameter '$key' has length greater than '$max_length'.";
 	}
 
 	return;
@@ -97,10 +115,11 @@ Mo::utils - Mo utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils qw(check_array_object check_isa check_number check_number_of_items check_required);
+ use Mo::utils qw(check_array_object check_isa check_length check_number check_number_of_items check_required);
 
  check_array_object($self, $key, $class, $class_name);
  check_isa($self, $key, $class);
+ check_length($self, $key, $max_length);
  check_number($self, $key);
  check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
  check_required($self, $key);
@@ -132,6 +151,17 @@ Put error if check isn't ok.
 
 Returns undef.
 
+=head2 C<check_length>
+
+ check_length($self, $key, $max_length);
+
+Check length of value for parameter defined by C<$key>. Maximum length is
+defined by C<$max_length>.
+
+Put error if check isn't ok.
+
+Returns undef.
+
 =head2 C<check_number>
 
  check_number($self, $key);
@@ -146,9 +176,9 @@ Returns undef.
 
  check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
 
-Check number of items. Must be 0 or 1. List items via C<$list_method> and get
-value via C<$item_method> method. C<$object_name> and C<$item_name> are
-variables for error output.
+Check amount of unique items defined by C<$item_method> method value.
+List items via C<$list_method> and get value via C<$item_method> method.
+C<$object_name> and C<$item_name> are variables for error output.
 
 Put error if check isn't ok.
 
@@ -172,6 +202,9 @@ Returns undef.
 
  check_isa():
          Parameter '%s' must be a '%s' object.
+
+ check_length():
+         Parameter '%s' has length greater than '%s'.
 
  check_number():
          Parameter '%s' must a number.
@@ -270,6 +303,46 @@ Returns undef.
  use strict;
  use warnings;
 
+ $Error::Pure::TYPE = 'Error';
+
+ use Mo::utils qw(check_length);
+
+ my $self = {
+         'key' => 'foo',
+ };
+ check_length($self, 'key', 3);
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # ok
+
+=head1 EXAMPLE6
+
+ use strict;
+ use warnings;
+
+ $Error::Pure::TYPE = 'Error';
+
+ use Mo::utils qw(check_length);
+
+ my $self = {
+         'key' => 'foo',
+ };
+ check_length($self, 'key', 2);
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' has length greater than '2'.
+
+=head1 EXAMPLE7
+
+ use strict;
+ use warnings;
+
  use Mo::utils qw(check_number);
 
  my $self = {
@@ -283,7 +356,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE6
+=head1 EXAMPLE8
 
  use strict;
  use warnings;
@@ -303,7 +376,93 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a number.
 
-=head1 EXAMPLE7
+=head1 EXAMPLE9
+
+ use strict;
+ use warnings;
+
+ use Test::MockObject;
+
+ $Error::Pure::TYPE = 'Error';
+
+ use Mo::utils qw(check_number_of_items);
+
+ # Item object #1.
+ my $item1 = Test::MockObject->new;
+ $item1->mock('value', sub {
+ 	return 'value1',
+ });
+
+ # Item object #1.
+ my $item2 = Test::MockObject->new;
+ $item2->mock('value', sub {
+ 	return 'value2',
+ });
+
+ # Tested object.
+ my $self = Test::MockObject->new({
+ 	'key' => [],
+ });
+ $self->mock('list', sub {
+ 	return [
+ 		$item1,
+ 		$item2,
+ 	];
+ });
+
+ # Check number of items.
+ check_number_of_items($self, 'list', 'value', 'Test', 'Item');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # ok
+
+=head1 EXAMPLE10
+
+ use strict;
+ use warnings;
+
+ use Test::MockObject;
+
+ $Error::Pure::TYPE = 'Error';
+
+ use Mo::utils qw(check_number_of_items);
+
+ # Item object #1.
+ my $item1 = Test::MockObject->new;
+ $item1->mock('value', sub {
+ 	return 'value1',
+ });
+
+ # Item object #2.
+ my $item2 = Test::MockObject->new;
+ $item2->mock('value', sub {
+ 	return 'value1',
+ });
+
+ # Tested object.
+ my $self = Test::MockObject->new({
+ 	'key' => [],
+ });
+ $self->mock('list', sub {
+ 	return [
+ 		$item1,
+ 		$item2,
+ 	];
+ });
+
+ # Check number of items.
+ check_number_of_items($self, 'list', 'value', 'Test', 'Item');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
+
+=head1 EXAMPLE11
 
  use strict;
  use warnings;
@@ -321,7 +480,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE8
+=head1 EXAMPLE12
 
  use strict;
  use warnings;
@@ -376,6 +535,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

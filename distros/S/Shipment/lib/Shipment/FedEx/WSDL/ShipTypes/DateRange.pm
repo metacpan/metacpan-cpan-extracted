@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::DateRange;
-$Shipment::FedEx::WSDL::ShipTypes::DateRange::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::DateRange::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Begins
               Ends
 
-              )
+            )
         ],
         {   'Begins' => \%Begins_of,
             'Ends'   => \%Ends_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::ShipTypes::DateRange
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

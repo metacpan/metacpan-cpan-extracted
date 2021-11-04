@@ -10,7 +10,7 @@ use Path::Class::Dir;
 extends 'AnyEvent::FTP::Server::Context';
 
 # ABSTRACT: FTP Server client context class with full read/write access
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::Auth';
@@ -462,7 +462,7 @@ AnyEvent::FTP::Server::Context::Memory - FTP Server client context class with fu
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

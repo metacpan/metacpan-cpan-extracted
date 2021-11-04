@@ -5,6 +5,8 @@ lib/Device/RAID/Poller/Backends/FBSD_graid.pm
 lib/Device/RAID/Poller/Backends/FBSD_graid3.pm
 lib/Device/RAID/Poller/Backends/ZFS.pm
 lib/Device/RAID/Poller/Backends/Linux_mdadm.pm
+lib/Device/RAID/Poller/Backends/Avago_tw_cli.pm
+lib/Device/RAID/Poller/Backends/Adaptec_arcconf.pm
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -15,6 +17,7 @@ t/03-load.t
 t/04-load.t
 t/05-load.t
 t/06-load.t
+t/07-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

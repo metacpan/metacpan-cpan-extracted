@@ -8,7 +8,7 @@ WordPress::XMLRPC - api to wordpress xml rpc calls
 
    use WordPress::XMLRPC;
       
-   my $o = WordPress:::XMLRPC->new({
+   my $o = WordPress::XMLRPC->new({
      username => 'author1',
      password => 'superpass',
      proxy => 'http://mysite.com/xmlrpc.php',
@@ -45,7 +45,7 @@ Before we open a connection with xmlrpc, we need to have
 username, password, and proxy in the object's data.
 You can provide this in the following ways..
 
-   my $o = WordPress:::XMLRPC->new({
+   my $o = WordPress::XMLRPC->new({
      username => 'author1',
      password => 'superpass',
      proxy => 'http://mysite.com/xmlrpc.php',
@@ -53,7 +53,7 @@ You can provide this in the following ways..
 
 Or..
 
-   my $o = WordPress:::XMLRPC->new;  
+   my $o = WordPress::XMLRPC->new;  
    
    $o->username('author1');
    $o->password('superpass');
@@ -69,7 +69,7 @@ Or..
 
 Uploading a file..
 
-   my $data = WordPress:::XMLRPC::abs_path_to_media_object_data('./file.jpg');
+   my $data = WordPress::XMLRPC::abs_path_to_media_object_data('./file.jpg');
    my $r = $o->newMediaObject($data);
    print $r->{url};
   

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStorageDetail;
-$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStorageDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStorageDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,13 +31,13 @@ Class::Std::initialize();
               FileNaming
               FileSuffix
 
-              )
+            )
         ],
         {   'FilePath'   => \%FilePath_of,
             'FileNaming' => \%FileNaming_of,
             'FileSuffix' => \%FileSuffix_of,
         },
-        {   'FilePath' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'FilePath'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'FileNaming' =>
               'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentNamingType',
             'FileSuffix' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
@@ -67,7 +67,7 @@ Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStorageDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

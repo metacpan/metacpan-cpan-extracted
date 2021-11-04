@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::PickupDetail;
-$Shipment::FedEx::WSDL::RateTypes::PickupDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::PickupDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               RequestType
               RequestSource
 
-              )
+            )
         ],
         {   'ReadyDateTime'        => \%ReadyDateTime_of,
             'LatestPickupDateTime' => \%LatestPickupDateTime_of,
@@ -80,7 +80,7 @@ Shipment::FedEx::WSDL::RateTypes::PickupDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

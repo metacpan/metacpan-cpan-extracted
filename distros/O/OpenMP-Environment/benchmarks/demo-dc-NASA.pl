@@ -9,6 +9,9 @@ my $oenv = OpenMP::Environment->new;
 
 # go there
 chdir q{./NPB3.4.1/NPB3.4-OMP};
+if ( not -d q{./bin} ) {
+  mkdir q{./bin};
+}
 
 # build 'DC' (purely C)
 my $exit_error = system(qw/make dc/);

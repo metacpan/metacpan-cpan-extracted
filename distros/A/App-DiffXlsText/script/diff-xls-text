@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-07'; # DATE
+our $DATE = '2021-07-12'; # DATE
 our $DIST = 'App-DiffXlsText'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -89,6 +89,7 @@ exit 1 if $fail;
 require File::Which;
 my $diff_cmd =
     $ENV{DIFF_XLS_TEXT_DIFF_CMD} //
+    $ENV{DIFF_CMD} //
     (File::Which::which("diffwc") ? "diffwc" : undef) // "diff";
 
 require IPC::System::Options;
@@ -112,7 +113,7 @@ diff-xls-text - Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) as 
 
 =head1 VERSION
 
-This document describes version 0.007 of diff-xls-text (from Perl distribution App-DiffXlsText), released on 2021-07-07.
+This document describes version 0.008 of diff-xls-text (from Perl distribution App-DiffXlsText), released on 2021-07-12.
 
 =head1 SYNOPSIS
 
@@ -127,6 +128,16 @@ is an Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to
 a directory of CSV files (where each CSV file is converted from a single
 worksheet) using L<xls2csv>. It then passes the converted directories to C<<
 diff -ruN >> command.
+
+=head1 DIFF_CMD
+
+String. Can be used to set path to diff command. See also
+L</DIFF_XLS_TEXT_DIFF_CMD> which takes precedence.
+
+=head2 DIFF_XLS_TEXT_DIFF_CMD
+
+String. Can be used to set path to diff command. The defaultl is L<diffwc> if
+available in PATH, or C<diff>. Takes precedence over L</DIFF_CMD>.
 
 =head1 OPTIONS
 
@@ -149,11 +160,6 @@ you to do column-based instead of row-based diff.
 =head2 DEBUG
 
 If set to true, do not cleanup temporary directories.
-
-=head2 DIFF_XLS_TEXT_DIFF_CMD
-
-String. Can be used to set path to diff command. The defaultl is L<diffwc> if
-available in PATH, or C<diff>.
 
 =head1 HOMEPAGE
 
@@ -186,7 +192,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,13 @@
 Revision history for Syntax-Keyword-Try
 
+0.26    2021-10-12
+        [CHANGES]
+         * Many internal updates to hax/ support files
+
+        [BUGFIXES]
+         * Fix try { return } to work correctly in all contexts without
+           upsetting -DDEBUGGING perls
+
 0.25    2021-06-01
         [CHANGES]
          * Rewrite parsing logic to use XS::Parse::Keyword 0.06

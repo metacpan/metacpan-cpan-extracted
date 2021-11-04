@@ -115,6 +115,12 @@ we're able to extract here.  This may or may NOT work for a given station
 and perhaps some stations, we're able to extract a stream without 
 calling youtube-dl.
 
+Depends:  
+
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
+and the separate application program:  youtube-dl, or a compatable program 
+such as yt-dlp.
+
 =head1 SUBROUTINES/METHODS
 
 =over 4
@@ -146,6 +152,14 @@ then only secure ("https://") streams will be returned.
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 Additional options:
+
+Certain youtube-dl (L<StreamFinder::Youtube>) configuration options, 
+namely I<-format>, I<-formatonly>, I<-youtube-dl-args>, 
+and I<-youtube-dl-add-args> can be overridden here by specifying 
+I<-youtube-format>, I<-youtube-formatonly>, I<-youtube-dl-args>, 
+and I<-youtube-dl-add-args> arguments respectively.  It is however, 
+recommended to specify these in the Tunein-specific configuration file 
+(see B<CONFIGURATION FILES> below.
 
 I<-log> => "I<logfile>"
 
@@ -224,6 +238,11 @@ Returns the station's type ("Tunein").
 
 =head1 CONFIGURATION FILES
 
+The default root location directory for StreamFinder configuration files 
+is "~/.config/StreamFinder".  To use an alternate location directory, 
+specify it in the "I<STREAMFINDER>" environment variable, ie.:  
+B<$ENV{STREAMFINDER} = "/etc/StreamFinder">.
+
 =over 4
 
 =item ~/.config/StreamFinder/Tunein/config
@@ -231,15 +250,25 @@ Returns the station's type ("Tunein").
 Optional text file for specifying various configuration options 
 for a specific site (submodule).  Each option is specified on a 
 separate line in the format below:
+NOTE:  Do not follow the lines with a semicolon, comma, or any other 
+separator.  Non-numeric I<values> should be surrounded with quotes, either 
+single or double.  Blank lines and lines beginning with a "#" sign as 
+their first non-blank character are ignored as comments.
 
 'option' => 'value' [,]
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
+
+Among options valid for Tunein streams is the I<-notrim> and 
+I<-youtube> options described in the B<new()> function.  Also, 
+various youtube-dl (L<StreamFinder::Youtube>) configuration options, 
+namely I<format>, I<formatonly>, I<youtube-dl-args>, and I<youtube-dl-add-args> 
+can be overridden here by specifying I<youtube-format>, I<youtube-formatonly>, 
+I<youtube-dl-args>, and I<youtube-dl-add-args> arguments respectively.  
 
 =item ~/.config/StreamFinder/config
 
@@ -250,13 +279,12 @@ Each option is specified on a separate line in the format below:
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 =back
 
-NOTE:  Options specified in the options parameter list will override 
-those corresponding options specified in these files.
+NOTE:  Options specified in the options parameter list of the I<new()> 
+function will override those corresponding options specified in these files.
 
 =head1 KEYWORDS
 
@@ -265,6 +293,8 @@ tunein
 =head1 DEPENDENCIES
 
 L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
+
+youtube-dl (or yt-dlp, or other compatable program)
 
 =head1 RECCOMENDS
 
@@ -346,9 +376,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-my $haveYoutube = 0;
-eval "use StreamFinder::Youtube; \$haveYoutube = 1; 1";
-
 package StreamFinder::Tunein;
 
 use strict;
@@ -426,9 +453,6 @@ sub new
 			$self->{'description'} = $1;
 		}
 		$self->{'description'} ||= $1  if ($html =~ m#name\=\"twitter\:description\"\s+content\=\"([^\"]+)\"#i);
-		$self->{'description'} ||= $self->{'title'};
-		$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
-		$self->{'description'} = uri_unescape($self->{'description'});
 		$self->{'iconurl'} = ($html =~ m#\"twitter\:image\:src\"\s+content\=\"([^\"]+)\"#) ? $1 : '';
 		$self->{'iconurl'} ||= ($html =~ m#\"image\"\:\"([^\"]+)\"#) ? $1 : '';
 		$self->{'iconurl'} =~ s#\\u002F#\/#g;
@@ -475,29 +499,32 @@ sub new
 		$self->{'year'} = (defined($self->{'created'}) && $self->{'created'} =~ /(\d\d\d\d)/) ? $1 : '';
 		print STDERR "i:Podcast found, ID changed to (".$self->{'id'}."), year (".$self->{'year'}.").\n"  if ($DEBUG);
 	} else {  #(USUALLY) NO STREAMS FOUND, TRY youtube-dl! (PBLY A STATION):
-		my $tryStream = "http://opml.radiotime.com/Tune.ashx?id=$stationID";
+		my $haveYoutube = 0;
+		eval { require 'StreamFinder/Youtube.pm'; $haveYoutube = 1; };
 		if ($haveYoutube) {
-			$_ = `youtube-dl --get-url  "$tryStream"`;
-			print STDERR "-2 TRYING($tryStream): YT returned ($_)!\n"  if ($DEBUG);
-			my @urls = split(/\r?\n/);
-			if ($self->{'secure'}) {
-				while (@urls && $urls[0] !~ m#^https\:\/\/#o) {
-					shift @urls;
-				}
-			} else {
-				while (@urls && $urls[0] !~ m#^https?\:\/\/#o) {
-					shift @urls;
-				}
+			my $tryStream = "http://opml.radiotime.com/Tune.ashx?id=$stationID";
+			my %globalArgs = ('-noiframes' => 1, '-fast' => 1, '-format' => 'any',
+					-debug => $DEBUG
+			);
+			foreach my $arg (qw(secure log logfmt youtube-format youtube-formatonly
+					youtube-dl-args youtube-dl-add-args)) {
+				(my $arg0 = $arg) =~ s/^youtube\-(?!dl)//o;
+				$globalArgs{$arg0} = $self->{$arg}  if (defined $self->{$arg});
 			}
-			if (scalar(@urls) > 0) {
+			my $yt = new StreamFinder::Youtube($tryStream, %globalArgs);
+			if ($yt && $yt->count() > 0) {
+				my @ytStreams = $yt->get();
 				unless ($self->{'notrim'}) {
-					for (my $i=0;$i<=$#urls;$i++) {
-						$urls[$i] =~ s/\.(mp3|pls)\?.*$/\.$1/;  #CLEAN UP TUNEIN PLS PLAYLISTS.
+					for (my $i=0;$i<=$#ytStreams;$i++) {
+						$ytStreams[$i] =~ s/\.(mp3|pls)\?.*$/\.$1/;  #CLEAN UP TUNEIN PLS PLAYLISTS.
 					}
 				}
-				print STDERR "i:Found stream(s) (".join('|',@urls).") via youtube-dl.\n"  if ($DEBUG);
-				@{$self->{'streams'}} = @urls;
-				$self->{'cnt'} = scalar @urls;
+				foreach my $field (qw(title description)) {
+					$self->{$field} ||= $yt->{$field}  if (defined($yt->{$field}) && $yt->{$field});
+				}
+				print STDERR "i:Found stream(s) (".join('|',@ytStreams).") via youtube-dl.\n"  if ($DEBUG);
+				@{$self->{'streams'}} = @ytStreams;
+				$self->{'cnt'} = scalar @ytStreams;
 			}
 		}
 		$self->{'album'} = $self->{'artist'};
@@ -506,6 +533,9 @@ sub new
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 	$self->{'title'} = uri_unescape($self->{'title'});
+	$self->{'description'} ||= $self->{'title'};
+	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+	$self->{'description'} = uri_unescape($self->{'description'});
 	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
 			if ($DEBUG && $self->{'cnt'} > 0);

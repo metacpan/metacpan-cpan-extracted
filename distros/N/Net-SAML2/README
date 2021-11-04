@@ -1,19 +1,122 @@
-Net::SAML2 - module implementing SAML2 bindings and protocol.
+NAME
+    Net::SAML2 - SAML2 bindings and protocol implementation
 
-This module implements enough of SAML2 to be a Service Provider
-supporting the Web Browser SSO profile. 
+VERSION
+    version 0.44
 
-Major dependencies:
+SYNOPSIS
+      See TUTORIAL.md for implementation documentation and
+      t/12-full-client.t for a pseudo implementation following the tutorial
 
- * XML::XPath
- * Crypt::OpenSSL::RSA
- * Crypt::OpenSSL::X509
- * Crypt::OpenSSL::VerifyX509
+      # generate a redirect off to the IdP:
 
-This distribution is currently shipping a modified version of
-XML::Sig, (c) Byrne Reese <byrne@majordojo.com>, as
-Net::SAML2::XML::Sig.
+            my $idp = Net::SAML2::IdP->new($IDP);
+            my $sso_url = $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect');
 
-Those modifications are available here:
+            my $authnreq = Net::SAML2::Protocol::AuthnRequest->new(
+                    issuer        => 'http://localhost:3000/metadata.xml',
+                    destination   => $sso_url,
+                    nameid_format => $idp->format('persistent'),
+            )->as_xml;
 
-  https://github.com/chrisa/perl-XML-Sig
+            my $authnreq = Net::SAML2::Protocol::AuthnRequest->new(
+              id            => 'NETSAML2_Crypt::OpenSSL::Random::random_pseudo_bytes(16),
+              issuer        => $self->{id},         # Service Provider (SP) Entity ID
+              destination   => $sso_url,            # Identity Provider (IdP) SSO URL
+              provider_name => $provider_name,      # Service Provider (SP) Human Readable Name
+              issue_instant => DateTime->now,       # Defaults to Current Time
+            );
+
+            my $request_id = $authnreq->id; # Store and Compare to InResponseTo
+
+            # or
+
+            my $request_id = 'NETSAML2_' . unpack 'H*', Crypt::OpenSSL::Random::random_pseudo_bytes(16);
+
+            my $authnreq = Net::SAML2::Protocol::AuthnRequest->as_xml(
+              id            => $request_id,         # Unique Request ID will be returned in response
+              issuer        => $self->{id},         # Service Provider (SP) Entity ID
+              destination   => $sso_url,            # Identity Provider (IdP) SSO URL
+              provider_name => $provider_name,      # Service Provider (SP) Human Readable Name
+              issue_instant => DateTime->now,       # Defaults to Current Time
+            );
+
+            my $redirect = Net::SAML2::Binding::Redirect->new(
+                    key => '/path/to/SPsign-nopw-key.pem',
+                    url => $sso_url,
+                    param => 'SAMLRequest' OR 'SAMLResponse',
+                    cert => '/path/to/IdP-cert.pem'
+            );
+
+            my $url = $redirect->sign($authnreq);
+
+            my $ret = $redirect->verify($url);
+
+      # handle the POST back from the IdP, via the browser:
+
+            my $post = Net::SAML2::Binding::POST->new;
+            my $ret = $post->handle_response(
+                    $saml_response
+            );
+
+            if ($ret) {
+                    my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+                            xml => decode_base64($saml_response)
+                    );
+
+                    # ...
+            }
+
+DESCRIPTION
+    Support for the Web Browser SSO profile of SAML2.
+
+    Net::SAML2 correctly perform the SSO process against numerous SAML
+    Identity Providers (IdPs). It has been tested against:
+
+    GSuite (Google)
+    Azure (Microsoft Office 365)
+    OneLogin
+    Jump
+    Mircosoft ADFS
+    Keycloak
+    Auth0 (requires Net::SAML2 >=0.39)
+    PingIdentity
+
+NAME
+    Net::SAML2 - SAML bindings and protocol implementation
+
+MAJOR CAVEATS
+    SP-side protocol only
+    Requires XML metadata from the IdP
+
+CONTRIBUTORS
+    Chris Andrews <chris@nodnol.org>
+    Oskari Okko Ojala <okko@frantic.com>
+    Peter Marschall <peter@adpm.de>
+    Mike Wisener <xmikew@cpan.org>
+    Jeff Fearn <jfearn@redhat.com>
+    Alessandro Ranellucci <aar@cpan.org>
+    Mike Wisener <mwisener@secureworks.com>, xmikew <github@32ths.com>
+    xmikew <github@32ths.com>
+    Timothy Legge <timlegge@gmail.com>
+
+COPYRIGHT
+    The following copyright notice applies to all the files provided in this
+    distribution, including binary files, unless explicitly noted otherwise.
+
+    Copyright 2010, 2011 Venda Ltd.
+
+LICENCE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Chris Andrews <chrisa@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Chris Andrews and Others, see the
+    git log.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

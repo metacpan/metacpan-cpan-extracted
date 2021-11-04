@@ -6,12 +6,13 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use parent qw(CPANPLUS::Dist::Base);
 
 use Config;
 use English qw(-no_match_vars);
+use File::Spec;
 use Module::Pluggable
     search_path => 'CPANPLUS::Dist::Debora::Package',
     sub_name    => '_formats',
@@ -116,7 +117,7 @@ sub create {
 
         # Required by Term::ReadLine::Gnu if the history-size is set in
         # ~/.inputrc.
-        local $ENV{INPUTRC} = '/dev/null';
+        local $ENV{INPUTRC} = File::Spec->devnull;
 
         # Dist::Zilla and Pinto require Perl 5.20.
         if ($PERL_VERSION < 5.020) {
@@ -213,7 +214,7 @@ CPANPLUS::Dist::Debora - Create Debian or RPM packages from Perl modules
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -284,6 +285,13 @@ Append the version to the distribution name.
 
   cpanp i Some-Module-0.9
 
+=head2 How can I install a Perl distribution from the local filesystem?
+
+Use a file URI.
+
+  cpanp i file:///tmp/Some-Module-1.0.tar.gz
+  rm ~/.cpanplus/authors/id/UNKNOWN-ORIGIN/Some-Module-1.0.tar.gz
+
 =head2 How can I list packages installed with CPANPLUS?
 
   dpkg-query -W -f '${Package} ${Version}\n' | \
@@ -291,6 +299,10 @@ Append the version to the distribution name.
 
   rpm -qa --qf '%{NAME} %{VENDOR}\n' | \
   perl -anE 'say $F[0] if $F[1] =~ /CPANPLUS/' | sort
+
+=head2 How can I force a manual update of the CPAN indices?
+
+  cpanp x --update_source
 
 =head1 SUBROUTINES/METHODS
 

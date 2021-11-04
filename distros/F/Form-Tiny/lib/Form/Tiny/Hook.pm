@@ -1,13 +1,14 @@
 package Form::Tiny::Hook;
 
 use v5.10;
+use strict;
 use warnings;
 use Moo;
 use Types::Standard qw(Enum CodeRef Bool);
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use constant {
 	HOOK_REFORMAT => 'reformat',

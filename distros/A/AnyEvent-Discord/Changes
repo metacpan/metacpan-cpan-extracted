@@ -1,5 +1,13 @@
 Revision history for perl module AnyEvent::Discord
 
+0.7 2021-10-25
+
+ - Update to AnyEvent::WebSocket::Client 0.54
+ - Change initial delay for reconnect to 1 second from 4 seconds
+ - Fire an AnyEvent->condvar->send on timer end
+ - Add timestamp to debug messages when debug is true
+ - Randomize heartbeat interval to Discord spec
+
 0.4 2021-01-28
 
  - Back to Moops

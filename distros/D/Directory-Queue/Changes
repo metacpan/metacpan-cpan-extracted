@@ -1,5 +1,8 @@
 Revision history for Directory-Queue:
 
+2.1	Wed Oct 13 2021
+	* Fixed maxlock option handling (RT#129557).
+
 2.0	Tue Apr 10 2018
 	* Added link to the C implementation.
 	* Now using No::Worries::File for all file read/write operations.

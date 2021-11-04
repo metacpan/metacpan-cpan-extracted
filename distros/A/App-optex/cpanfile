@@ -6,7 +6,7 @@ requires 'List::Util', '1.45';
 requires 'Hash::Util';
 requires 'TOML', '0.95';
 requires 'Text::VisualWidth::PP', '0.05';
-requires 'Text::Tabs', '0.07';
+requires 'Text::ANSI::Tabs', '0.07';
 requires 'Time::Piece';
 
 on 'test' => sub {

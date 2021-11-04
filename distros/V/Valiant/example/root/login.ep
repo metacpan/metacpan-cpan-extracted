@@ -1,16 +1,12 @@
-% layout 'layout.ep';
-% content title => 'Sign In';
-% content css => begin
-<style></style>
-% end
+% layout 'layout.ep', title => 'Sign In';
 
-%= form_tag { method_attr 'POST', style_attr 'width:20em; margin:auto' }, begin
+%= form_for $person => +{ method=>'POST', style=>'width:20em; margin:auto'  }, begin
   <fieldset>
     <legend>
       Sign In
     </legend>
     <div class='form-group'>
-      %= errors_box $error, class=>'alert alert-danger', style=>'margin: 16px 0 0 0', role=>'alert';
+      %= model_errors  +{class=>'alert alert-danger', role=>'alert'};
     </div>
     <div class='form-group'>
       %= label_tag { for=>'username' }, 'User Name'

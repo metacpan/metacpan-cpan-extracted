@@ -23,6 +23,7 @@ docs/CellsDocumentPropertiesResponse.md
 docs/CellsDocumentProperty.md
 docs/CellsDocumentPropertyResponse.md
 docs/CellsObjectOperateTaskParameter.md
+docs/CellsError.md
 docs/CellsResponse.md
 docs/CellValue.md
 docs/Chart.md
@@ -94,6 +95,7 @@ docs/ImportDataTaskParameter.md
 docs/ImportDoubleArrayOption.md
 docs/ImportIntArrayOption.md
 docs/ImportOption.md
+docs/ImportPictureOption.md
 docs/ImportStringArrayOption.md
 docs/Legend.md
 docs/LegendResponse.md
@@ -271,6 +273,7 @@ lib/AsposeCellsCloud/Object/CellsDocumentProperties.pm
 lib/AsposeCellsCloud/Object/CellsDocumentPropertiesResponse.pm
 lib/AsposeCellsCloud/Object/CellsDocumentProperty.pm
 lib/AsposeCellsCloud/Object/CellsDocumentPropertyResponse.pm
+lib/AsposeCellsCloud/Object/CellsError.pm
 lib/AsposeCellsCloud/Object/CellsObjectOperateTaskParameter.pm
 lib/AsposeCellsCloud/Object/CellsResponse.pm
 lib/AsposeCellsCloud/Object/CellValue.pm

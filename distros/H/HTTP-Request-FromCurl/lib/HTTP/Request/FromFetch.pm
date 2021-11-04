@@ -9,13 +9,13 @@ use JSON;
 use PerlX::Maybe;
 use HTTP::Request::CurlParameters;
 
-our $VERSION = '0.25';
+our $VERSION = '0.35';
 
 =head1 NAME
 
 HTTP::Request::FromFetch - turn a Javascript fetch() statement into HTTP::Request
 
-=head1 SYNPSIS
+=head1 SYNOPSIS
 
   my $ua = LWP::UserAgent->new();
   my $req = HTTP::Request::FromFetch->new(<<'JS')->as_request;
@@ -53,9 +53,17 @@ This is mostly a factory class for L<HTTP::Request::CurlParameters> objects.
 
 =cut
 
-sub new( $class, $fetch ) {
+sub new( $class, $fetch, @rest ) {
+    my %options;
 
-#use Regexp::Debugger;
+    if( @rest ) {
+        %options = ($fetch, @rest);
+    } else {
+        $options{ fetch } = $fetch;
+    };
+
+    $fetch = delete $options{ fetch };
+
     $fetch =~ m!\A\s*(await\s+)?
                   fetch\s*\(\s*"(?<uri>(?:[^[\\"]+|\\.)+)"\s*(?:,\s*
                   (?<options>\{.*\}))?\s*

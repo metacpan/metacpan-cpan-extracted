@@ -13,18 +13,10 @@
 typedef PDL_Long PDL_Indx;
 #endif
 
-#include <stdio.h>
+typedef void (*DelMagic)(pdl *, Size_t param);
+static void delete_levmar_pdls(pdl* p, Size_t param);
 
-static Core* PDL; /* Structure holds core C functions */
-static SV* CoreSV;       /* Gets pointer to perl var holding core structure */
-
-// following line useless, i guess
-// typedef void (*levmarfunc)( double *, double *, int, int, void * ) ;
-
-typedef void (*DelMagic)(pdl *, int param);
-static void delete_levmar_pdls(pdl* p, int param);
-
-static void default_magic(pdl *p, int pa) { p->data = 0; }
+static void default_magic(pdl *p, Size_t pa) { p->data = 0; }
 static pdl* pdl_wrap(void *data, int datatype, PDL_Indx dims[],
 		     int ndims, DelMagic delete_magic, int delparam);
 static SV *getref_pdl(pdl *it);
@@ -61,39 +53,6 @@ typedef struct {
   int datatype;
 } DFP;
 
-/*  moved to xs
-// called from  sub levmar
-DFP * _DFP_create () {
-  DFP * dat;
-  dat = (DFP *)malloc(sizeof( DFP ));
-  if ( NULL == dat ) {
-    fprintf(stderr, "Can't allocate storage for dat in DFP_create\n");
-    exit(1);
-  }
-  return dat;
-}
-*/
-
-/*
-// called from sub levmar
-int _DFP_free (DFP *dat) {
-  if ( dat ) {
-    free(dat);
-  }
-}
-*/
-
-/* moved into xs
-void DFP_set_perl_funcs ( DFP *dat, SV* perl_fit_func, SV* perl_jac_func ) {
-  if ( dat == NULL ) {
-    fprintf(stderr, "DFP_set_perl_funcs got null struct\n");
-    exit(1);
-  }
-  dat->perl_fit_func = perl_fit_func;
-  dat->perl_jac_func = perl_jac_func;
-}
-*/
-
 void DFP_create_pdls( DFP *dat, int data_type, int m, int n, int nt) {
 
   pdl *p_pdl, *x_pdl, *d_pdl, *t_pdl;
@@ -111,23 +70,22 @@ void DFP_create_pdls( DFP *dat, int data_type, int m, int n, int nt) {
   PDL_Indx nt_dims[] = {nt};
   int num_nt_dims = 1;
 
-
   // create pdls, but with no data;
   p_pdl = pdl_wrap(NULL, data_type, mf_dims, num_mf_dims, delete_levmar_pdls, 0);
   d_pdl = pdl_wrap(NULL, data_type, mjac_dims, num_mjac_dims, delete_levmar_pdls, 0);
   x_pdl = pdl_wrap(NULL, data_type, n_dims, num_n_dims, delete_levmar_pdls, 0);
   t_pdl = pdl_wrap(NULL, data_type, nt_dims, num_nt_dims, delete_levmar_pdls, 0);
-  
-  p_sv = getref_pdl(p_pdl);
-  d_sv = getref_pdl(d_pdl);
-  x_sv = getref_pdl(x_pdl);
-  t_sv = getref_pdl(t_pdl);
 
   // otherwise we get a memory leak
-  sv_2mortal(p_sv);
-  sv_2mortal(d_sv);
-  sv_2mortal(x_sv);
-  sv_2mortal(t_sv);
+  p_sv = sv_newmortal();
+  d_sv = sv_newmortal();
+  x_sv = sv_newmortal();
+  t_sv = sv_newmortal();
+
+  PDL->SetSV_PDL(p_sv, p_pdl);
+  PDL->SetSV_PDL(d_sv, d_pdl);
+  PDL->SetSV_PDL(x_sv, x_pdl);
+  PDL->SetSV_PDL(t_sv, t_pdl);
 
   dat->p_pdl = p_pdl;
   dat->d_pdl = d_pdl;
@@ -178,7 +136,7 @@ static pdl* pdl_wrap(void *data, int datatype, PDL_Indx dims[],
 }
 
 // Don't free data, it is allocated inside liblevmar
-static void delete_levmar_pdls(pdl* p, int param)
+static void delete_levmar_pdls(pdl* p, Size_t param)
 {
   if (p->data) {
     // free(p->data); 
@@ -187,28 +145,6 @@ static void delete_levmar_pdls(pdl* p, int param)
      }
   p->data = 0;
 }
-
-/* Had to cut and paste from pdlcore.c
- * Is this routine somehow otherwise available ?
- * This returns  SV *ref, giving access to the
- * pdl *it as a perl scalar. 
- */
-static SV *getref_pdl(pdl *it) {
-	SV *newref;
-	if(!it->sv) {
-		SV *ref;
-		HV *stash = gv_stashpv("PDL",TRUE);
-		SV *psv = newSViv(PTR2IV(it));
-		it->sv = psv;
-		newref = newRV_noinc(it->sv);
-		(void)sv_bless(newref,stash);
-	} else {
-		newref = newRV_inc(it->sv);
-		SvAMAGIC_on(newref);
-	}
-	return newref;
-}
-
 
 //-----------------------------------------------------
 // Modified Function from pdl gsl interp code

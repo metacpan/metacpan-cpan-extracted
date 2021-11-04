@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use parent qw(Exporter);
 
@@ -51,14 +51,20 @@ sub parse_version {
 sub module_is_distributed_with_perl {
     my ($module_name, $version) = @_;
 
+    my $ok = 0;
+
     # cpan2dist is run with -w, which triggers a warning in Module::CoreList.
     local $WARNING = 0;
 
     my $upper = Module::CoreList->removed_from($module_name);
-    return if defined $upper && $perl_version >= parse_version($upper);
+    if (!defined $upper || $perl_version < parse_version($upper)) {
+        my $lower = Module::CoreList->first_release($module_name, $version);
+        if (defined $lower && $perl_version >= parse_version($lower)) {
+            $ok = 1;
+        }
+    }
 
-    my $lower = Module::CoreList->first_release($module_name, $version);
-    return defined $lower && $perl_version >= parse_version($lower);
+    return $ok;
 }
 
 sub decode_utf8 {
@@ -97,10 +103,12 @@ sub spew_utf8 {
 sub run {
     my (%options) = @_;
 
+    my $ok = 0;
+
     my $command = $options{command};
     if (!$command) {
         error('No command');
-        return;
+        return $ok;
     }
 
     my $dir = $options{dir};
@@ -119,11 +127,11 @@ sub run {
     if ($dir) {
         $origdir = cwd;
         if (!chdir $dir) {
-            return;
+            return $ok;
         }
     }
 
-    my $ok = IPC::Cmd::run(%options);
+    $ok = IPC::Cmd::run(%options);
     if (!$ok) {
         my $cmdline = join q{ }, @{$command};
         my $output  = ${$options{buffer}} // q{};
@@ -222,7 +230,10 @@ sub find_most_recent_mtime {
             # Skip symbolic links.
             next ENTRY if -l $path;
 
-            if (-f $path) {
+            if (-d $path) {
+                __SUB__->($path);
+            }
+            else {
                 my @stat = stat $path;
                 if (@stat) {
                     my $mtime = $stat[9];
@@ -230,9 +241,6 @@ sub find_most_recent_mtime {
                         $most_recent_mtime = $mtime;
                     }
                 }
-            }
-            elsif (-d $path) {
-                __SUB__->($path);
             }
         }
         closedir $dh;
@@ -263,13 +271,13 @@ sub find_shared_objects {
             # Skip symbolic links.
             next ENTRY if -l $path;
 
-            if (-f $path) {
+            if (-d $path) {
+                __SUB__->($path);
+            }
+            else {
                 if (filetype($path) eq 'executable') {
                     push @shared_objects, $path;
                 }
-            }
-            elsif (-d $path) {
-                __SUB__->($path);
             }
         }
         closedir $dh;
@@ -278,7 +286,7 @@ sub find_shared_objects {
     };
     $find->($stagingdir);
 
-    return wantarray ? @shared_objects : \@shared_objects;
+    return \@shared_objects;
 }
 
 sub is_testing {
@@ -296,7 +304,7 @@ CPANPLUS::Dist::Debora::Util - Utility functions
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -329,7 +337,9 @@ version 0.003
   }
 
   my $last_modification = find_most_recent_mtime($sourcedir);
-  my @shared_objects = find_shared_objects($stagingdir);
+  for my $filename (@{find_shared_objects($stagingdir)}) {
+    say $filename;
+  }
 
 =head1 DESCRIPTION
 
@@ -408,10 +418,10 @@ Returns the modification time.
 
 =head2 find_shared_objects
 
-  my @shared_objects = find_shared_objects($stagindir);
+  my @filenames = @{find_shared_objects($stagingdir)};
 
 Searches the specified directory recursively for shared objects and executable
-programs.  Returns an array of filenames.
+programs.
 
 =head2 is_testing
 

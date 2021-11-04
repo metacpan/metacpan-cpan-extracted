@@ -1,9 +1,8 @@
 package Lab::Moose::Connection::Socket;
-$Lab::Moose::Connection::Socket::VERSION = '3.772';
+$Lab::Moose::Connection::Socket::VERSION = '3.791';
 #ABSTRACT: Transfer IEEE 488.2 / SCPI messages over TCP
 
 use v5.20;
-
 
 use Moose;
 use MooseX::Params::Validate;
@@ -58,6 +57,9 @@ sub BUILD {
         PeerPort => $port,
         Proto    => 'tcp',
         Timeout  => $timeout,
+
+        # enable use of orphaned connection after a script was killed by user
+        ReuseAddr => 1,
     ) or croak "cannot open connection with $host on port $port: $!";
 
     $client->setsockopt( IPPROTO_TCP, TCP_NODELAY, 1 )
@@ -161,7 +163,7 @@ Lab::Moose::Connection::Socket - Transfer IEEE 488.2 / SCPI messages over TCP
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 SYNOPSIS
 
@@ -226,6 +228,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
             2020       Andreas K. Huettel
+            2021       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

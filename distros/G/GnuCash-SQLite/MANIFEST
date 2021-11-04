@@ -5,6 +5,8 @@ MANIFEST
 README
 lib/GnuCash/SQLite.pm
 t/GnuCash-SQLite.t
+t/10_foreign_currencies.t
 t/sample.db
+t/sample2.db
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

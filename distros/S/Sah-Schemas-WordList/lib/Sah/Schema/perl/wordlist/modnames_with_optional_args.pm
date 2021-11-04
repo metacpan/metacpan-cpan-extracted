@@ -1,24 +1,25 @@
 package Sah::Schema::perl::wordlist::modnames_with_optional_args;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-27'; # DATE
+our $DATE = '2021-06-07'; # DATE
 our $DIST = 'Sah-Schemas-WordList'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [array => {
     summary => 'Array of Perl WordList::* module names without the prefix, with optional args, e.g. ["EN::Enable", "MetaSyntactic::Any=theme,dangdut"]',
     description => <<'_',
 
-Array of Perl module names, where each element is of `perl::modname` schema,
-e.g. `Foo`, `Foo::Bar`.
+Array of Perl WordList::* module names without the prefix and with optional
+args. Each element is of `perl::modname` schema, e.g. `EN::Enable`,
+`MetaSyntactic::Any=theme,dangdut`.
 
 Contains coercion rule that expands wildcard, so you can specify:
 
-    Module::P*
+    ID::*
 
 and it will be expanded to e.g.:
 
-    ["Module::Patch", "Module::Path", "Module::Pluggable"]
+    ["ID::KBBI", "ID::PERLANCAR"]
 
 The wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and
 braces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.
@@ -50,7 +51,7 @@ Sah::Schema::perl::wordlist::modnames_with_optional_args - Array of Perl WordLis
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::perl::wordlist::modnames_with_optional_args (from Perl distribution Sah-Schemas-WordList), released on 2020-05-27.
+This document describes version 0.003 of Sah::Schema::perl::wordlist::modnames_with_optional_args (from Perl distribution Sah-Schemas-WordList), released on 2021-06-07.
 
 =head1 SYNOPSIS
 
@@ -115,16 +116,17 @@ L<Perinci::CmdLine> to create a CLI:
 
 =head1 DESCRIPTION
 
-Array of Perl module names, where each element is of C<perl::modname> schema,
-e.g. C<Foo>, C<Foo::Bar>.
+Array of Perl WordList::* module names without the prefix and with optional
+args. Each element is of C<perl::modname> schema, e.g. C<EN::Enable>,
+C<MetaSyntactic::Any=theme,dangdut>.
 
 Contains coercion rule that expands wildcard, so you can specify:
 
- Module::P*
+ ID::*
 
 and it will be expanded to e.g.:
 
- ["Module::Patch", "Module::Path", "Module::Pluggable"]
+ ["ID::KBBI", "ID::PERLANCAR"]
 
 The wildcard syntax supports jokers (C<?>, C<*>, C<**>), brackets (C<[abc]>), and
 braces (C<{one,two}>). See L<Module::List::Wildcard> for more details.
@@ -151,7 +153,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

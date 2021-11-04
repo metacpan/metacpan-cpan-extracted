@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ScheduleBType;
-$Shipment::UPS::WSDL::ShipTypes::ScheduleBType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ScheduleBType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,14 +31,14 @@ Class::Std::initialize();
               Quantity
               UnitOfMeasurement
 
-              )
+            )
         ],
         {   'Number'            => \%Number_of,
             'Quantity'          => \%Quantity_of,
             'UnitOfMeasurement' => \%UnitOfMeasurement_of,
         },
-        {   'Number'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Quantity' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'Number'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Quantity'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'UnitOfMeasurement' =>
               'Shipment::UPS::WSDL::ShipTypes::UnitOfMeasurementType',
         },
@@ -67,7 +67,7 @@ Shipment::UPS::WSDL::ShipTypes::ScheduleBType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

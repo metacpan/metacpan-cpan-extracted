@@ -214,6 +214,39 @@ discovered checks does not have a negative impact.
 
 Future versions of this library may include discovered checks.
 
+=item B<moveNumbers>
+
+Class method that returns an array of all theoretically possible moves in
+standard chess.  These move numbers have the following structure:
+
+=over 8
+
+=item B<color (1 bit)>: Either L</CP_BLACK> or L</CP_WHITE>.
+
+=item B<capture (3 bits)>: The captured piece if any, one of L</CP_NONE>,
+L</CP_PAWN>, L</CP_KNIGHT>, L</CP_BISHOP>, L</CP_ROOK>, L</CP_QUEEN>,
+or (!) L</CP_KING>, see below.
+
+=item B<mover (3 bits)>: The piece that move, one of L</CP_PAWN>, L</CP_KNIGHT>,
+L</CP_BISHOP>, L</CP_ROOK>, L</CP_QUEEN>, or <L/CP_KING>.
+
+=item B<promote (3 bits)>: The piece that is promoted to if any, one of
+L</CP_KNIGHT>, L</CP_BISHOP>, L</CP_ROOK>, or L</CP_QUEEN>.
+
+=item B<from (6 bits)>: The starting square of the piece as a bit shift.
+In case of castling, this is the king's starting square.
+
+=item B<to (6 bits)>: The destination square of the piece as a bit shift.
+In case of castling, this is the king's destination square.
+
+=back
+
+If the captured piece is encoded as a king, it is really a pawn that gets
+captured en passant.
+
+The size of this array is 45356, see
+L<this document at the chess programming wiki|https://www.chessprogramming.org/Encoding_Moves#Over_All_Pieces_and_Squares>.
+
 =item B<equals(POSITION)>
 
 Returns true if the current position is equivalent to B<POSITION>.

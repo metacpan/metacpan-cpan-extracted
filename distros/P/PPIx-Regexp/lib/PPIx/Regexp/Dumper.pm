@@ -48,7 +48,7 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.080';
+our $VERSION = '0.081';
 
 use constant LOCATION_WIDTH	=> 19;
 
@@ -221,7 +221,7 @@ ignored.
 	    strict => $args{strict},
 	};
 
-	foreach my $key ( qw{ default_modifiers parse postderef } ) {
+	foreach my $key ( qw{ default_modifiers parse } ) {
 	    exists $args{$key}
 		and $self->{$key} = $args{$key};
 	}
@@ -424,7 +424,7 @@ sub _tokens_dump {
 sub _format_default_modifiers {
     my ( $self, $subr, $elem ) = @_;
     my @arg = $self->_safe( $elem );
-    foreach my $attr ( qw{ default_modifiers parse postderef strict } ) {
+    foreach my $attr ( qw{ default_modifiers parse strict } ) {
 	defined ( my $val = $self->{$attr} )
 	    or next;
 	ARRAY_REF eq ref $val

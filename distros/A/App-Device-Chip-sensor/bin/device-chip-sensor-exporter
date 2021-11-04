@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+use v5.26;
+use warnings;
+use experimental 'signatures';
+
+use utf8;
+
+use Object::Pad 0.19;
+
+use Future::AsyncAwait;
+use Future::IO::Impl::IOAsync;
+
+use Net::Prometheus;
+use Metrics::Any::Adapter "Prometheus";
+
+STDOUT->autoflush(1);
+STDOUT->binmode( ":encoding(UTF-8)" );
+
+my $PORT;
+my $VERBOSE;
+
+class MyApp extends App::Device::Chip::sensor
+{
+   use Metrics::Any '$metrics';
+
+   method OPTSPEC
+   {
+      return $self->SUPER::OPTSPEC, (
+         'port=i'   => \$PORT,
+         'verbose+' => \$VERBOSE,
+      );
+   }
+
+   async method after_sensors :override ( @sensors )
+   {
+      my %got;
+
+      foreach my $sensor ( @sensors ) {
+         my $name = $sensor->name;
+         my $units = $sensor->units;
+
+         my $chip = $sensor->chip;
+
+         # Convert some common characters that Prometheus will get upset by
+         if( defined $units ) {
+            $units =~ s/%/percentage/g;
+            $units =~ s/°/degrees/g;
+         }
+
+         $got{$name}++ and next;
+
+         my $m = "make_" . $sensor->type;
+         $metrics->$m( $name,
+            name        => join( "_", "sensor", $name, grep { defined } $units ),
+            description => "Sensor $name",
+            labels      => [qw( chip )],
+         );
+      }
+   }
+
+   method output_readings ( $now, $sensors, $values )
+   {
+      $self->print_readings( $sensors, $values ) if $VERBOSE;
+
+      foreach my $i ( 0 .. $#$sensors ) {
+         my $sensor = $sensors->[$i];
+         my $value  = $values->[$i];
+
+         my $chip = $sensor->chip;
+         my $chipname = ( ref $chip ) =~ s/^Device::Chip:://r;
+
+         my $m = ( $sensor->type eq "gauge" )   ? "set_gauge_to" :
+                 ( $sensor->type eq "counter" ) ? "inc_counter_by" :
+                                                  die "Unrecognised sensor type";
+         $metrics->$m( $sensor->name,
+            $sensor->format( $value ), [ chip => $chipname ] );
+      }
+   }
+}
+
+my $client = Net::Prometheus->new;
+
+my $app = MyApp->new->parse_argv;
+
+$client->export_to_IO_Async( undef, port => $PORT );
+
+await $app->run;

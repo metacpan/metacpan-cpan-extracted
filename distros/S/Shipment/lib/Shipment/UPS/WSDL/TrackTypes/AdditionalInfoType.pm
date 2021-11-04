@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::AdditionalInfoType;
-$Shipment::UPS::WSDL::TrackTypes::AdditionalInfoType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::AdditionalInfoType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,12 +29,12 @@ Class::Std::initialize();
         [   qw(        Type
               Value
 
-              )
+            )
         ],
         {   'Type'  => \%Type_of,
             'Value' => \%Value_of,
         },
-        {   'Type' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'Type'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'Value' =>
               'Shipment::UPS::WSDL::TrackTypes::AdditionalCodeDescType',
         },
@@ -62,7 +62,7 @@ Shipment::UPS::WSDL::TrackTypes::AdditionalInfoType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

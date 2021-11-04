@@ -954,6 +954,10 @@ sub latex {
 \let\bfseries\normalfont
 [% END %]
 
+[% IF safe_options.linespacing %]
+\renewcommand{\baselinestretch}{[% safe_options.linespacing %]}
+[% END %]
+
 [% IF tex_metadata %]
 % https://groups.google.com/d/topic/comp.text.tex/6fYmcVMbSbQ/discussion
 \hypersetup{%

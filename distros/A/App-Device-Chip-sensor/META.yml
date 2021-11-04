@@ -4,6 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   Test::Deep: '0'
+  Test::Future::Deferred: '0'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
@@ -17,14 +18,15 @@ name: App-Device-Chip-sensor
 provides:
   App::Device::Chip::sensor:
     file: lib/App/Device/Chip/sensor.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Device::Chip::Adapter: '0'
+  Feature::Compat::Defer: '0'
   Future::IO: '0.08'
   Future::IO::Impl::IOAsync: '0'
   Object::Pad: '0.32'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

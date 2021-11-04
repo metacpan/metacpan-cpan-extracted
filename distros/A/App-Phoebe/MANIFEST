@@ -23,7 +23,9 @@ lib/App/Phoebe/StaticFiles.pm
 lib/App/Phoebe/TokiPona.pm
 lib/App/Phoebe/Web.pm
 lib/App/Phoebe/WebComments.pm
+lib/App/Phoebe/WebDAV.pm
 lib/App/Phoebe/WebEdit.pm
+lib/App/Phoebe/WebStaticFiles.pm
 lib/App/Phoebe/Wikipedia.pm
 LICENSE
 Makefile.PL
@@ -71,7 +73,6 @@ t/oddmuse-server.pl
 t/oddmuse-wiki.pl
 t/Oddmuse.t
 t/PageHeadings.t
-t/prerequisites.t
 t/RegisteredEditorsOnly.t
 t/spaces.t
 t/Spartan.t
@@ -82,7 +83,9 @@ t/TokiPona.t
 t/virtual-hosting.t
 t/Web.t
 t/WebComments.t
+t/WebDAV.t
 t/WebEdit.t
+t/WebStaticFiles.t
 t/Wikipedia.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-Timestamper-WithElapsed",
-  "dist_version" => "0.6.0",
+  "dist_version" => "0.6.1",
   "license" => "mit",
   "module_name" => "App::Timestamper::WithElapsed",
   "recursive_test_files" => 1,

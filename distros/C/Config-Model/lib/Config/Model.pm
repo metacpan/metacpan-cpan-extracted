@@ -7,11 +7,11 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.142;
+package Config::Model 2.144;
 
+use 5.20.0;
 use strict ;
 use warnings;
-use 5.12.0;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -29,11 +29,20 @@ use File::HomeDir;
 use Cwd;
 use Config::Model::Lister;
 
+with "Config::Model::Role::Constants";
+
 use parent qw/Exporter/;
 our @EXPORT_OK = qw/cme initialize_log4perl/;
 
-# this class holds the version number of the package
-use vars qw(@status @level %default_property $force_default_log);
+use feature qw/signatures/;
+no warnings qw/experimental::signatures/;
+
+# used in some tests where we don't want to load
+# ~/.log4config-model config
+my $force_default_log;
+sub force_usage_of_default_log_config () {
+    $force_default_log = 1;
+}
 
 my $legacy_logger = get_logger("Model::Legacy") ;
 my $loader_logger = get_logger("Model::Loader") ;
@@ -42,13 +51,6 @@ my $logger = get_logger("Model") ;
 # used to keep one Config::Model object to simplify programs based on
 # cme function
 my $model_storage;
-
-%default_property = (
-    status      => 'standard',
-    level       => 'normal',
-    summary     => '',
-    description => '',
-);
 
 enum LegacyTreament => qw/die warn ignore/;
 
@@ -159,6 +161,7 @@ has skip_inheritance => (
         $self->skip_include = $self->skip_inheritance;
     } );
 
+# remove this hack mid 2022
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
@@ -170,9 +173,8 @@ around BUILDARGS => sub {
             $new{$k} = $args{$k};
         }
         else {
-            # this warning should be changed to an error end of 2017
             # cannot use logger, it's not initialised yet
-            warn("Config::Model new: passing undefined constructor argument is deprecated ($k argument)\n");
+            croak("Config::Model new: passing undefined constructor argument is deprecated ($k argument)\n");
         }
     }
 
@@ -327,10 +329,6 @@ sub instance_names {
     return @all;
 }
 
-@level = qw/hidden normal important/;
-
-@status = qw/obsolete deprecated standard/;
-
 # unpacked model is:
 # {
 #   element_list  => [ ... ],
@@ -460,25 +458,6 @@ sub normalize_class_parameters {
 
         # store the order of element as declared in 'element'
         push @element_list, ref($item) ? @$item : ($item);
-    }
-
-    # optional parameter to force element order. Useful when parameters declarations
-    # are grouped. Although interaction with include may be tricky. Let's not advertise it.
-    # yet.
-
-    if ( defined $normalized_model->{force_element_order} ) {
-        my @forced_list = @{ delete $normalized_model->{force_element_order} };
-        my %forced = map { ( $_ => 1 ) } @forced_list;
-        foreach (@element_list) {
-            next if delete $forced{$_};
-            Config::Model::Exception::ModelDeclaration->throw( error =>
-                    "class $config_class_name: element $_ is not in force_element_order list" );
-        }
-        if (%forced) {
-            Config::Model::Exception::ModelDeclaration->throw(
-                error => "class $config_class_name: force_element_order list has unknown elements "
-                    . join( ' ', keys %forced ) );
-        }
     }
 
     if ( defined $normalized_model->{inherit_after} ) {
@@ -1287,44 +1266,67 @@ sub include_one_class {
     get_logger('Model')->debug("class $class_name include $include_class done");
 }
 
-# load a model from file. See comments around raw_models attribute for explanations
-sub load {
-    my $self       = shift;
-    my $model_name = shift;    # model name like Foo::Bar
-    my $load_file  = shift;    # model file (override model name), used for tests
-
-    $loader_logger->debug("called on model $model_name");
-
-    my $load_path = $model_name;
-    $load_path =~ s/::/\//g;
-
-    $load_file ||= $self->model_dir . '/' . $load_path . '.pl';
-
-    $loader_logger->debug("model $model_name from file $load_file");
-
-    my %models_by_name;
-
-    # Searches $load_file in @INC and returns an array containing the
-    # names of the loaded clases
-    my @loaded_classes = $self->_load_model_in_hash( \%models_by_name, $load_file );
-
-    $self->store_raw_model( $model_name, dclone( \%models_by_name ) );
-
-    foreach my $name ( keys %models_by_name ) {
-        my $data = $self->normalize_class_parameters( $name, $models_by_name{$name} );
-        $loader_logger->debug("Store normalized model $name");
-        $self->store_normalized_model( $name, $data );
+sub find_model_file_in_dir ($model_name, $model_path) {
+    foreach my $ext (qw/yml yaml pl/) {
+        my $sub_path = $model_name =~ s!::!/!rg;
+        my $path_load_file = $model_path->child($sub_path . '.' . $ext);
+        return $path_load_file if $path_load_file->exists;
     }
+    return;
+}
+
+sub find_model_file_in_inc {
+    my ($self, $model_name, $load_file) = @_;
+
+    my $path_load_file ;
+
+    if ($self->model_dir and $self->model_dir =~ m!^/!) {
+        # model_dir is absolute, do not search in @INC
+        my $model_path = path($self->model_dir);
+        $path_load_file = find_model_file_in_dir ($model_name, $model_path);
+        Config::Model::Exception::ModelDeclaration->throw(
+            error => "Cannot find $model_name file in $model_path"
+        ) unless $path_load_file;
+    }
+    else {
+        foreach my $inc_str (@INC) {
+            my $inc_path = path($inc_str);
+            if ($load_file) {
+                $path_load_file = $inc_path->child($load_file);
+            }
+            else {
+                my $sub_path = $model_name =~ s!::!/!rg;
+                my $model_path = $inc_path->child($self->model_dir);
+                foreach my $ext (qw/yml yaml pl/) {
+                    $path_load_file = $model_path->child($sub_path . '.' . $ext);
+                    last if $path_load_file->exists;
+                }
+            }
+            last if $path_load_file->exists;
+        }
+    }
+
+    Config::Model::Exception::ModelDeclaration->throw(
+        error => "Cannot find $model_name file in \@INC"
+    ) unless $path_load_file;
+
+    $loader_logger->debug("model $model_name from file $path_load_file");
+
+    return $path_load_file;
+}
+
+sub load_model_plugins {
+    my ($self, @model_names) = @_;
 
     # look for additional model information
     my %model_graft_by_name;
     my %done;  # avoid loading twice the same snippet (where system version may clobber dev version)
 
     foreach my $inc_str (@INC) {
-        foreach my $name ( keys %models_by_name ) {
+        foreach my $name ( @model_names ) {
             my $snippet_path = $name;
             $snippet_path =~ s/::/\//g;
-            my $snippet_dir = path($inc_str)->child($self->model_dir)->child($snippet_path . '.d');
+            my $snippet_dir = path($inc_str)->absolute->child($self->model_dir)->child($snippet_path . '.d');
             $loader_logger->trace("looking for snippet in $snippet_dir");
             if ( $snippet_dir->is_dir ) {
                 my $iter = $snippet_dir->iterator({ recurse => 1 });
@@ -1343,13 +1345,43 @@ sub load {
 
                     my $done_key = $name . ':' . $snippet_file_rel;
                     next if $done{$done_key};
-                    $loader_logger->info("Found snippet $snippet_file_rel in $inc_str dir");
-                    $self->_load_model_in_hash( \%model_graft_by_name, $snippet_file_rel);
+                    $loader_logger->info("Found snippet $snippet_file in $inc_str dir");
+                    my $snippet_model = $self->_load_model_file($snippet_file);
+
+                    $self->_merge_model_in_hash( \%model_graft_by_name, $snippet_model, $snippet_file_rel);
                     $done{$done_key} = 1;
                 }
             }
         }
     }
+    return %model_graft_by_name;
+}
+
+# load a model from file. See comments around raw_models attribute for explanations
+sub load {
+    my $self       = shift;
+    my $model_name = shift;    # model name like Foo::Bar
+    my $load_file  = shift;    # model file (override model name), used for tests
+
+    $loader_logger->debug("called on model $model_name");
+    my $path_load_file = $self->find_model_file_in_inc($model_name, $load_file);
+
+    my %models_by_name;
+
+    # Searches $load_file in @INC and returns an array containing the
+    # names of the loaded classes
+    my $model = $self->_load_model_file($path_load_file->absolute);
+    my @loaded_classes = $self->_merge_model_in_hash( \%models_by_name, $model, $path_load_file );
+
+    $self->store_raw_model( $model_name, dclone( \%models_by_name ) );
+
+    foreach my $name ( keys %models_by_name ) {
+        my $data = $self->normalize_class_parameters( $name, $models_by_name{$name} );
+        $loader_logger->debug("Store normalized model $name");
+        $self->store_normalized_model( $name, $data );
+    }
+
+    my %model_graft_by_name = $self->load_model_plugins(sort keys %models_by_name);
 
     # store snippet. May be used later
     foreach my $name (keys %model_graft_by_name) {
@@ -1373,10 +1405,8 @@ sub load {
 
 # New subroutine "_load_model_in_hash" extracted - Fri Apr 12 17:29:56 2013.
 #
-sub _load_model_in_hash {
-    my ( $self, $hash_ref, $load_file ) = @_;
-
-    my $model = $self->_do_model_file($load_file);
+sub _merge_model_in_hash {
+    my ( $self, $hash_ref, $model, $load_file ) = @_;
 
     my @names;
     foreach my $config_class_info (@$model) {
@@ -1395,10 +1425,7 @@ sub _load_model_in_hash {
     return @names;
 }
 
-#
-# New subroutine "_do_model_file" extracted - Sun Nov 28 17:25:35 2010.
-#
-sub _do_model_file {
+sub _load_model_file {
     my ( $self, $load_file ) = @_;
 
     $loader_logger->info("load model $load_file");
@@ -1786,7 +1813,7 @@ sub get_element_name {
     # the user
     foreach my $elt ( @{ $model->{element_list} } ) {
         my $elt_data = $model->{element}{$elt};
-        my $l = $elt_data->{level} || $default_property{level};
+        my $l = $elt_data->{level} || get_default_property('level');
         push @result, $elt if $l ne 'hidden' ;
     }
 
@@ -1810,13 +1837,13 @@ sub get_element_property {
     if ( not defined $model->{element}{$elt} ) {
         $logger->debug("test accept for class $class elt $elt prop $prop");
         foreach my $acc_re ( @{ $model->{accept_list} } ) {
-            return $model->{accept}{$acc_re}{$prop} || $default_property{$prop}
+            return $model->{accept}{$acc_re}{$prop} || get_default_property($prop)
                 if $elt =~ /^$acc_re$/;
         }
     }
 
     return $self->model($class)->{element}{$elt}{$prop}
-        || $default_property{$prop};
+        || get_default_property($prop);
 }
 
 sub list_class_element {
@@ -1866,7 +1893,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.142
+version 2.144
 
 =head1 SYNOPSIS
 

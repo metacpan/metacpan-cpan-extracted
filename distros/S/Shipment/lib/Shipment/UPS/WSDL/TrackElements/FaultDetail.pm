@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::TrackElements::FaultDetail;
-$Shipment::UPS::WSDL::TrackElements::FaultDetail::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackElements::FaultDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        Errors
 
-                  )
+                )
             ],
             {'Errors' => \%Errors_of,},
             {'Errors' => 'Shipment::UPS::WSDL::TrackElements::Errors',},
@@ -68,7 +68,7 @@ Shipment::UPS::WSDL::TrackElements::FaultDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

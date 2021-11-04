@@ -1,13 +1,13 @@
 
 package Shipment::Purolator::WSDL::Elements::ArrayOfValidationDetail;
-$Shipment::Purolator::WSDL::Elements::ArrayOfValidationDetail::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Elements::ArrayOfValidationDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
 {    # BLOCK to scope variables
 
     sub get_xmlns {
-        'http://schemas.datacontract.org/2004/07/Microsoft.Practices.EnterpriseLibrary.Validation.Integration.WCF'
+        'http://schemas.datacontract.org/2004/07/Microsoft.Practices.EnterpriseLibrary.Validation.Integration.WCF';
     }
 
     __PACKAGE__->__set_name('ArrayOfValidationDetail');
@@ -36,7 +36,7 @@ Shipment::Purolator::WSDL::Elements::ArrayOfValidationDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

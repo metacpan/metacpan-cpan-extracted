@@ -9,13 +9,17 @@ use strict;
 use warnings;
 
 package Playwright::Video;
-$Playwright::Video::VERSION = '0.016';
+$Playwright::Video::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
     my ( $self, %options ) = @_;
     $options{type} = 'Video';
     return $self->SUPER::new(%options);
+}
+
+sub spec {
+    return $Playwright::spec->{'Video'}{members};
 }
 
 sub path {
@@ -28,21 +32,21 @@ sub path {
     );
 }
 
-sub delete {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'delete',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub saveAs {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'saveAs',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub delete {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'delete',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -92,7 +96,7 @@ Playwright::Video - Automatically generated class for Playwright::Video
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 
@@ -109,17 +113,17 @@ Execute the Video::path playwright routine.
 
 See L<https://playwright.dev/api/class-Video#Video-path> for more information.
 
-=head2 delete(@args)
-
-Execute the Video::delete playwright routine.
-
-See L<https://playwright.dev/api/class-Video#Video-delete> for more information.
-
 =head2 saveAs(@args)
 
 Execute the Video::saveAs playwright routine.
 
 See L<https://playwright.dev/api/class-Video#Video-saveAs> for more information.
+
+=head2 delete(@args)
+
+Execute the Video::delete playwright routine.
+
+See L<https://playwright.dev/api/class-Video#Video-delete> for more information.
 
 =head2 on(@args)
 

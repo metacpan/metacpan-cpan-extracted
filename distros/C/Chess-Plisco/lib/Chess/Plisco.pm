@@ -39,7 +39,7 @@
 # more extensive use of Chess::Plisco::Macro.
 
 package Chess::Plisco;
-$Chess::Plisco::VERSION = '0.3';
+$Chess::Plisco::VERSION = '0.4';
 use strict;
 use integer;
 no warnings qw(portable);
@@ -66,8 +66,8 @@ use constant CP_ROOK => 4;
 use constant CP_QUEEN => 5;
 use constant CP_KING => 6;
 use constant CP_PAWN_VALUE => 100;
-use constant CP_KNIGHT_VALUE => 300;
-use constant CP_BISHOP_VALUE => 300;
+use constant CP_KNIGHT_VALUE => 320;
+use constant CP_BISHOP_VALUE => 330;
 use constant CP_ROOK_VALUE => 500;
 use constant CP_QUEEN_VALUE => 900;
 
@@ -90,7 +90,8 @@ use constant CP_POS_INFO => 10;
 use constant CP_POS_EVASION_SQUARES => 11;
 use constant CP_POS_SIGNATURE => 12;
 use constant CP_POS_REVERSIBLE_CLOCK => 13;
-use constant CP_POS_IN_CHECK => 14;
+# 3 reserved slots.
+use constant CP_POS_IN_CHECK => 17;
 
 # How to evade a check?
 use constant CP_EVASION_ALL => 0;
@@ -295,9 +296,13 @@ my @common_lines;
 # move mask of the rook and the negative mask for the castling rights.
 my @castling_rook_move_masks;
 
-# Information for castlings, part 1. For a1, h1, a8, and h8 remove these
+# Information for castlings, part 2. For a1, h1, a8, and h8 remove these
 # castling rights.
 my @castling_rights_rook_masks;
+
+# Information for castlings, part 3. For the king destination squares c1, g1,
+# c8, and g8, where does the rook move? Needed for moveGivesCheck().
+my @castling_rook_to_mask;
 
 # Change in material.  Looked up via a combined mask of color to move,
 # captured and promotion piece.
@@ -321,6 +326,8 @@ my @zk_ep_files;
 my $zk_color;
 
 my @zk_move_masks;
+
+my @move_numbers;
 
 my @magicmovesbdb;
 my @magicmovesrdb;
@@ -775,6 +782,7 @@ sub pseudoLegalAttacks {
 	my $my_pieces = $self->[CP_POS_WHITE_PIECES + $to_move];
 	my $her_pieces = $self->[CP_POS_WHITE_PIECES + !$to_move];
 	my $occupancy = $my_pieces | $her_pieces;
+	my $empty = ~$occupancy;
 
 	my (@moves, $target_mask, $base_move);
 
@@ -881,7 +889,7 @@ sub pseudoLegalAttacks {
 		my $from = (do {	my $B = $pawn_mask & -$pawn_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_PAWN << 15);
-		$target_mask = ($pawn_single_masks->[$from] & ~$her_pieces)
+		$target_mask = ($pawn_single_masks->[$from] & $empty)
 			| ($pawn_capture_masks->[$from] & ($her_pieces | $ep_target_mask));
 		while ($target_mask) {	my $base_move = $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	push @moves,		$base_move | (CP_QUEEN << 12),		$base_move | (CP_ROOK << 12),		$base_move | (CP_BISHOP << 12),		$base_move | (CP_KNIGHT << 12);	$target_mask = (($target_mask) & (($target_mask) - 1));};
 		$pawn_mask = (($pawn_mask) & (($pawn_mask) - 1));
@@ -915,6 +923,62 @@ sub moveAttacked {
 
 	my ($from, $to) = ((($move >> 6) & 0x3f), (($move) & 0x3f));
 	return (do {	my $my_color = ((($self->[CP_POS_INFO] & (1 << 4)) >> 4));	my $her_pieces = $self->[CP_POS_WHITE_PIECES + !$my_color];	my $occupancy = ($self->[CP_POS_WHITE_PIECES + $my_color] | $her_pieces) & ~(1 << $from);	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$my_color]->[2]->[$to] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$to] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$to] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$to][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$to]) * CP_MAGICMOVES_B_MAGICS->[$to]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$to][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$to]) * CP_MAGICMOVES_R_MAGICS->[$to]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});
+}
+
+sub moveGivesCheck {
+	my ($self, $move) = @_;
+
+	# FIXME! Check that all of these variables are really needed at least twice!
+	my $pos_info = $self->[CP_POS_INFO];
+	my $from = (($move >> 6) & 0x3f);
+	my $from_mask = 1 << $from;
+	my $to = (($move) & 0x3f);
+	my $to_mask = 1 << $to;
+
+	my $piece = (($move >> 15) & 0x7);
+	my $to_move = (($pos_info & (1 << 4)) >> 4);
+	my $my_pieces = $self->[CP_POS_WHITE_PIECES + $to_move];
+	my $her_pieces = $self->[CP_POS_WHITE_PIECES + !$to_move];
+	my $her_king_mask = $self->[CP_POS_KINGS] & $her_pieces;
+	my $her_king_shift = (do {	my $A = $her_king_mask - 1 - ((($her_king_mask - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+	my $occupancy = $self->[CP_POS_WHITE_PIECES] | $self->[CP_POS_BLACK_PIECES];
+	my $bsliders = $my_pieces
+			& ($self->[CP_POS_BISHOPS] | $self->[CP_POS_QUEENS]);
+	my $rsliders = $my_pieces
+			& ($self->[CP_POS_ROOKS] | $self->[CP_POS_QUEENS]);
+	my $ep_shift = (($pos_info & (0x3f << 5)) >> 5);
+	if ($piece == CP_PAWN && $ep_shift && $to == $ep_shift) {
+		# Remove the captured piece, as well.
+		$from_mask |= $ep_pawn_masks[$ep_shift];
+	}
+
+	if (($piece == CP_PAWN)
+	         && ($to_mask & $pawn_masks[!$to_move]->[2]->[$her_king_shift])) {
+		return 1;
+	} elsif (($piece == CP_KNIGHT)
+	         && ($to_mask & $knight_attack_masks[$her_king_shift])) {
+		# Direct knight check.
+		return 1;
+	} elsif (($piece == CP_BISHOP || $piece == CP_QUEEN)
+	         && (CP_MAGICMOVESBDB->[$her_king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$her_king_shift]) * CP_MAGICMOVES_B_MAGICS->[$her_king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & $to_mask)) {
+		# Direct bishop/queen check.
+		return 1;
+	} elsif (($piece == CP_ROOK || $piece == CP_QUEEN)
+	         && (CP_MAGICMOVESRDB->[$her_king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$her_king_shift]) * CP_MAGICMOVES_R_MAGICS->[$her_king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & $to_mask)) {
+		# Direct rook/queen check.
+		return 1;
+	} elsif ($piece == CP_KING && ((($from - $to) & 0x3) == 0x2)
+		&& (CP_MAGICMOVESRDB->[$her_king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$her_king_shift]) * CP_MAGICMOVES_R_MAGICS->[$her_king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & $castling_rook_to_mask[$to])) {
+		return 1;
+	} elsif (CP_MAGICMOVESBDB->[$her_king_shift][(((($occupancy ^ $from_mask) & CP_MAGICMOVES_B_MASK->[$her_king_shift]) * CP_MAGICMOVES_B_MAGICS->[$her_king_shift]) >> 55) & ((1 << (64 - 55)) - 1)]
+		& (($my_pieces & ($self->[CP_POS_BISHOPS] | $self->[CP_POS_QUEENS]) & ~$from_mask))) {
+		return 1;
+	} elsif (CP_MAGICMOVESRDB->[$her_king_shift][(((($occupancy ^ $from_mask) & CP_MAGICMOVES_R_MASK->[$her_king_shift]) * CP_MAGICMOVES_R_MAGICS->[$her_king_shift]) >> 52) & ((1 << (64 - 52)) - 1)]
+		& (($my_pieces & ($self->[CP_POS_ROOKS] | $self->[CP_POS_QUEENS]) & ~$from_mask))) {
+		return 1;
+	}
+
+	return;
 }
 
 sub movePinned {
@@ -2379,6 +2443,98 @@ sub toFEN {
 	return $fen;
 }
 
+sub board {
+	my ($self) = @_;
+
+	my $w_pieces = $self->[CP_POS_WHITE_PIECES];
+	my $b_pieces = $self->[CP_POS_BLACK_PIECES];
+	my $pieces = $w_pieces | $b_pieces;
+	my $pawns = $self->[CP_POS_PAWNS];
+	my $bishops = $self->[CP_POS_BISHOPS];
+	my $knights = $self->[CP_POS_KNIGHTS];
+	my $rooks = $self->[CP_POS_ROOKS];
+	my $queens = $self->[CP_POS_QUEENS];
+
+	my $ep_shift = $self->enPassantShift;
+	my $board = "  a b c d e f g h\n";
+	if ($self->blackQueenSideCastlingRight) {
+		$board .= " +-+-<-<-<-";
+	} else {
+		$board .= " +-+-+-+-+-";
+	}
+	if ($self->blackKingSideCastlingRight) {
+		$board .= ">->-+-+\n";
+	} else {
+		$board .= "+-+-+-+\n";
+	}
+
+	for (my $rank = CP_RANK_8; $rank >= CP_RANK_1; --$rank) {
+		$board .= ($rank + 1) . '|';
+		for (my $file = CP_FILE_A; $file <= CP_FILE_H; ++$file) {
+			my $shift = $self->coordinatesToShift($file, $rank);
+			my $mask = 1 << $shift;
+
+			$board .= ' ' if $file != CP_FILE_A;
+			if ($mask & $pieces) {
+				if ($mask & $w_pieces) {
+					if ($mask & $pawns) {
+						$board .= 'P';
+					} elsif ($mask & $knights) {
+						$board .= 'N';
+					} elsif ($mask & $bishops) {
+						$board .= 'B';
+					} elsif ($mask & $rooks) {
+						$board .= 'R';
+					} elsif ($mask & $queens) {
+						$board .= 'Q';
+					} else {
+						$board .= 'K';
+					}
+				} elsif ($mask & $b_pieces) {
+					if ($mask & $pawns) {
+						$board .= 'p';
+					} elsif ($mask & $knights) {
+						$board .= 'n';
+					} elsif ($mask & $bishops) {
+						$board .= 'b';
+					} elsif ($mask & $rooks) {
+						$board .= 'r';
+					} elsif ($mask & $queens) {
+						$board .= 'q';
+					} else {
+						$board .= 'k';
+					}
+				}
+			} elsif ($ep_shift && $shift == $ep_shift) {
+				if ($self->toMove == CP_WHITE) {
+					$board .= 'v';
+				} else {
+					$board .= '^';
+				}
+			} else {
+				$board .= '.';
+			}
+
+			if ($file == CP_FILE_H) {
+			}
+		}
+		$board .= '|' . ($rank + 1) . "\n";
+	}
+
+	if ($self->whiteQueenSideCastlingRight) {
+		$board .= " +-+-<-<-<-";
+	} else {
+		$board .= " +-+-+-+-+-";
+	}
+	if ($self->whiteKingSideCastlingRight) {
+		$board .= ">->-+-+\n";
+	} else {
+		$board .= "+-+-+-+\n";
+	}
+
+	return $board;
+}
+
 sub legalMoves {
 	my ($self) = @_;
 
@@ -3169,6 +3325,12 @@ sub movesCoordinateNotation {
 	return @moves;
 }
 
+sub moveNumbers {
+	my ($class);
+
+	return @move_numbers;
+}
+
 ###########################################################################
 # Generate lookup tables.
 ###########################################################################
@@ -3383,6 +3545,11 @@ $castling_rook_move_masks[CP_C1] = CP_1_MASK & (CP_A_MASK | CP_D_MASK);
 $castling_rook_move_masks[CP_G1] = CP_1_MASK & (CP_H_MASK | CP_F_MASK);
 $castling_rook_move_masks[CP_C8] = CP_8_MASK & (CP_A_MASK | CP_D_MASK);
 $castling_rook_move_masks[CP_G8] = CP_8_MASK & (CP_H_MASK | CP_F_MASK);
+
+$castling_rook_to_mask[CP_C1] = 1 << CP_D1;
+$castling_rook_to_mask[CP_G1] = 1 << CP_F1;
+$castling_rook_to_mask[CP_C8] = 1 << CP_D8;
+$castling_rook_to_mask[CP_G8] = 1 << CP_F8;
 
 # The indices are the original squares of the rooks.
 @castling_rights_rook_masks = (-1) x 64;
@@ -3662,6 +3829,8 @@ foreach my $file (CP_FILE_A .. CP_FILE_H) {
 			push @moves, ((CP_KING << 15) | (CP_E8 << 6) | CP_G8) | $mb;
 			push @moves, ((CP_KING << 15) | (CP_E8 << 6) | CP_C8) | $mb;
 		}
+
+		push @move_numbers, @moves;
 
 		foreach my $move (@moves) {
 			my $is_ep;

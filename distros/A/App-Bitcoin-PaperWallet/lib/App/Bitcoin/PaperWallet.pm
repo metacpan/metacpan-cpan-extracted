@@ -1,6 +1,6 @@
 package App::Bitcoin::PaperWallet;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use v5.12;
 use warnings;
@@ -14,12 +14,12 @@ sub get_addresses
 	$count //= 4;
 
 	my @addrs;
-	my $priv = $key->derive_key_bip44(index => 0)->get_basic_key;
+	my $priv = $key->derive_key_bip44(purpose => 49, index => 0)->get_basic_key;
 	my $addr = $priv->get_public_key->get_compat_address;
 	push @addrs, $addr;
 
 	for my $ind (1 .. $count - 1) {
-		my $priv = $key->derive_key_bip44(index => $ind)->get_basic_key;
+		my $priv = $key->derive_key_bip44(purpose => 84, index => $ind)->get_basic_key;
 		my $addr = $priv->get_public_key->get_segwit_address;
 		push @addrs, $addr;
 	}
@@ -63,7 +63,7 @@ App::Bitcoin::PaperWallet - Generate printable cold storage of bitcoins
 
 =head1 DESCRIPTION
 
-This module allows you to generate a Hierarchical Deterministic BIP44 compilant Bitcoin wallet.
+This module allows you to generate a Hierarchical Deterministic BIP49/84 compilant Bitcoin wallet.
 
 This package contains high level cryptographic operations for doing that. See L<paper-wallet> for the main script of this distribution.
 
@@ -80,6 +80,10 @@ C<$entropy> is meant to be user-defined entropy (string) that will be passed thr
 C<$password> is a password that will be used to secure the generated mnemonic. Passing empty string will disable the password protection. Note that password does not have to be strong, since it will only secure the mnemonic in case someone obtained physical access to your mnemonic. Using a hard, long password increases the possibility you will not be able to claim your bitcoins in the future.
 
 Optional C<$address_count> is the number of addresses that will be generated (default 4). The first address is always SegWit compat address, while the rest are SegWit native addresses.
+
+=head1 CAVEATS
+
+Versions 1.01 and older generated addresses with invalid derivation paths. Funds in these wallets won't be visible in most HD wallets, and have to be swept by revealing their private keys in tools like L<https://iancoleman.io/bip39/>. Use derivation path C<m/44'/0'/0'/0> and indexes C<0> throughout C<3> - sweeping these private keys will recover your funds.
 
 =head1 SEE ALSO
 

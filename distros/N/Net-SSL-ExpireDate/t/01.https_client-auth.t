@@ -17,21 +17,21 @@ filters {
 };
 
 our %NOT_BEFORE = (
-    year      => 2019,
-    month     => 10,
-    day       => 29,
-    hour      => 13,
-    minute    => 17,
-    second    => 37,
+    year      => 2020,
+    month     =>  3,
+    day       => 23,
+    hour      => 00,
+    minute    => 00,
+    second    => 00,
     time_zone => 'UTC'
 );
 our %NOT_AFTER  = (
     year      => 2022,
-    month     =>  1,
-    day       => 29,
-    hour      => 13,
-    minute    => 17,
-    second    => 37,
+    month     =>  5,
+    day       => 17,
+    hour      => 12,
+    minute    => 00,
+    second    => 00,
     time_zone => 'UTC'
 );
 
@@ -63,8 +63,8 @@ run {
 }
 
 __END__
-=== auth.startssl.com
---- input: auth.startssl.com
+=== client.badssl.com
+--- input: client.badssl.com
 --- expire_date
 DateTime->new(%main::NOT_AFTER);
 --- begin_date

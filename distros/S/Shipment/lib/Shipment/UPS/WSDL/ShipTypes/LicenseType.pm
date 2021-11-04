@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::LicenseType;
-$Shipment::UPS::WSDL::ShipTypes::LicenseType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::LicenseType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Date
               ExceptionCode
 
-              )
+            )
         ],
         {   'Number'        => \%Number_of,
             'Date'          => \%Date_of,
@@ -66,7 +66,7 @@ Shipment::UPS::WSDL::ShipTypes::LicenseType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

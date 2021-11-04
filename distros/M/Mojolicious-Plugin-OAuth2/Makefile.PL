@@ -17,12 +17,21 @@ my %WriteMakefileArgs = (
 ,
   PREREQ_PM      => {
   'IO::Socket::SSL' => '1.94',
-  'Mojolicious' => '7.53'
+  'Mojolicious' => '8.25'
 }
 ,
   META_MERGE     => {
     'dynamic_config' => 0,
     'meta-spec'      => {version => 2},
+    'prereqs'        => {
+      'runtime' =>
+        {'recommends' => {
+  'Crypt::OpenSSL::Bignum' => '0.09',
+  'Crypt::OpenSSL::RSA' => '0.31',
+  'Mojo::JWT' => '0.09'
+}
+}
+    },
     'resources'      => {
       bugtracker => {web => 'https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2/issues'},
       homepage   => 'https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2',

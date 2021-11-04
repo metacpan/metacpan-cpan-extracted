@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail;
-$Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               Packaging
               EmergencyContactNumber
 
-              )
+            )
         ],
         {   'Accessibility'          => \%Accessibility_of,
             'CargoAircraftOnly'      => \%CargoAircraftOnly_of,
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

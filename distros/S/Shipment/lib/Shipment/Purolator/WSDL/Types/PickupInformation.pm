@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::PickupInformation;
-$Shipment::Purolator::WSDL::Types::PickupInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::PickupInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        PickupType
 
-              )
+            )
         ],
         {'PickupType' => \%PickupType_of,},
         {'PickupType' => 'Shipment::Purolator::WSDL::Types::PickupType',},
@@ -54,7 +54,7 @@ Shipment::Purolator::WSDL::Types::PickupInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

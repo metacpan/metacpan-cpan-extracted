@@ -88,6 +88,8 @@ sub render {
     # $text->save;		# doesn't do anything
     foreach my $fragment ( @{ $self->{_content} } ) {
 	next unless length($fragment->{text});
+	my $x0 = $x;
+	my $y0 = $y;
 	my $f = $fragment->{font};
 	my $font = $f->get_font($self);
 	unless ( $font ) {
@@ -122,22 +124,87 @@ sub render {
 			$fragment->{font}->{weight},
 			$fragment->{size} || $self->{_currentsize},
 			$fragment->{color},
+			$fragment->{underline}||'""', $fragment->{ulcolor}||'""',
+			$fragment->{strike}||'""', $fragment->{strcol}||'""',
 		       ),
 		  ) if 0;
 	    my $t = $fragment->{text};
-	    my $maxw = 0;
-	    my $y = $y-$fragment->{base}-$bl;
-	    while ( $t ne "" ) {
-		( $t, my $rest ) = split( /\n/, $t, 2 );
+	    if ( $t ne "" ) {
+		my $y = $y-$fragment->{base}-$bl;
 		my $sz = $fragment->{size} || $self->{_currentsize};
 		$text->translate( $x, $y );
 		$text->text($t);
-		$maxw = max($font->width($t) * $sz, $maxw);
-		$y -= $sz;
-		$t = $rest // "";
+		$x += $font->width($t) * $sz;
 	    }
-	    $x += $maxw;
 	}
+
+	next unless $x > $x0;
+
+	my $gfx = $text->{' apipage'}->gfx;
+	$gfx->save;
+	my $dw = 1000;
+	my $xh = $font->xheight;
+
+	my @strikes;
+	if ( $fragment->{underline} && $fragment->{underline} ne 'none' ) {
+	    my $sz = $fragment->{size} || $self->{_currentsize};
+	    my $d = -( $f->{underline_position}
+		       || $font->underlineposition ) * $sz/$dw;
+	    my $h = ( $f->{underline_thickness}
+		      || $font->underlinethickness ) * $sz/$dw;
+	    my $col = $fragment->{ulcolor} // $fragment->{color};
+	    if ( $fragment->{underline} eq 'double' ) {
+		push( @strikes, [ $d-0.125*$h, $h * 0.75, $col ],
+		                [ $d+1.125*$h, $h * 0.75, $col ] );
+	    }
+	    else {
+		push( @strikes, [ $d+$h/2, $h, $col ] );
+	    }
+	}
+
+	if ( $fragment->{strike} ) {
+	    my $sz = $fragment->{size} || $self->{_currentsize};
+	    my $d = -( $f->{strikeline_position}
+		       ? $f->{strikeline_position}
+		       : 0.6*$xh ) * $sz/$dw;
+	    my $h = ( $f->{strikeline_thickness}
+		      || $f->{underline_thickness}
+		      || $font->underlinethickness ) * $sz/$dw;
+	    my $col = $fragment->{ulcolor} // $fragment->{color};
+	    push( @strikes, [ $d+$h/2, $h, $col ] );
+	}
+
+	if ( $fragment->{overline} && $fragment->{overline} ne 'none' ) {
+	    my $sz = $fragment->{size} || $self->{_currentsize};
+	    my $h = ( $f->{overline_thickness}
+		      || $f->{underline_thickness}
+		      || $font->underlinethickness ) * $sz/$dw;
+	    my $d = -( $f->{overline_position}
+		       ? $f->{overline_position} * $sz/$dw
+		       : $xh*$sz/$dw + 2*$h );
+	    my $col = $fragment->{ovrcol} // $fragment->{color};
+	    if ( $fragment->{overline} eq 'double' ) {
+		push( @strikes, [ $d-0.125*$h, $h * 0.75, $col ],
+		                [ $d+1.125*$h, $h * 0.75, $col ] );
+	    }
+	    else {
+		push( @strikes, [ $d+$h/2, $h, $col ] );
+	    }
+	}
+	for ( @strikes ) {
+	    _line( $gfx, $x0, $y0-$fragment->{base}-$bl-$_->[0],
+		   $x-$x0, 0, $_->[2], $_->[1] );
+	}
+	if ( $fragment->{href} ) {
+	    my $sz = $fragment->{size} || $self->{_currentsize};
+	    my $ann = $text->{' apipage'}->annotation;
+	    $ann->url( $fragment->{href},
+		     #  -border => [ 0, 0, 1 ],
+		       -rect => [ $x0, $y0, #-$fragment->{base}-$bl,
+		     		  $x, $y0 - $sz ]
+		     );
+	}
+	$gfx->restore;
     }
     # $text->restore;		# doesn't do anything
 }
@@ -231,6 +298,10 @@ sub load_font {
     return $ff;
 }
 
+sub xheight {
+    $_[0]->data->{xheight};
+}
+
 ################ Extensions to PDF::API2 ################
 
 sub PDF::API2::Content::glyph_by_CId {
@@ -306,13 +377,14 @@ sub _showloc {
 }
 
 sub _line {
-    my ( $gfx, $x, $y, $w, $h, $col ) = @_;
+    my ( $gfx, $x, $y, $w, $h, $col, $lw ) = @_;
     $col ||= "black";
+    $lw ||= 0.5;
 
     $gfx->save;
     $gfx->move( $x, $y );
     $gfx->line( $x+$w, $y+$h );
-    $gfx->linewidth(0.5);
+    $gfx->linewidth($lw);
     $gfx->strokecolor($col);
     $gfx->stroke;
     $gfx->restore;

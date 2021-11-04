@@ -5,11 +5,11 @@ use warnings;
 use 5.010;
 use Test2::API qw( context );
 use Test2::Tools::Process ();
-use Test2::Tools::Process::ReturnMultiLevel qw( with_return );
+use Return::MultiLevel qw( with_return );
 use base 'Exporter';
 
 # ABSTRACT: Test that some code calls exec without terminating testing
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 our @EXPORT = qw( exec_arrayref never_exec_ok );
@@ -70,7 +70,7 @@ Test::Exec - Test that some code calls exec without terminating testing
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

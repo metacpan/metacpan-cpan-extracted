@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use App::ansiecho;
 
-App::ansiecho->new->run(splice @ARGV);
+App::ansiecho->new->run();
 
 exit;
 
@@ -50,14 +50,14 @@ Example:
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =head1 DESCRIPTION
 
 =head2 ECHO
 
 B<ansiecho> print arguments with ANSI terminal escape sequence
-according to the given color specification.
+according to a given color specification.
 
 In a simple case, B<ansiecho> behave exactly same as L<echo> command.
 
@@ -109,7 +109,7 @@ including multibyte Unicode characters.
 
 Formatted result ends up to a single argument, and can be a subject of
 other operation.  In the next example, numbers are formatted, colored,
-and gave to other format.
+and given to other format.
 
     ansiecho -f '\N{ALARM CLOCK} %s' -c KF/544 -f ' %02d:%02d:%02d ' 1 2 3
 
@@ -177,7 +177,7 @@ C<--separate ''>.
 Set separator string between each arguments.  Option B<-j> is a
 short-cut for B<--separate ''>.
 
-=item B<-->[B<no>]B<rgb24>
+=item B<-->[B<no->]B<rgb24>
 
 Produce 24bit full-color sequence for 12bit/24bit specified colors.
 They are converted to 216 colors by default.
@@ -325,7 +325,9 @@ always correspond to the character itself.
 =head1 COLOR SPEC
 
 This is a brief summary.  Read L<Getopt::EX::Colormap/COLOR SPEC> for
-complete description.
+complete description.  Try next command to see 256 color table.
+
+    perl -MGetopt::EX::Colormap=:all -E colortable
 
 Color specification is a combination of single uppercase character
 representing 8 colors, and alternative (usually brighter) colors in
@@ -359,15 +361,15 @@ with other special effects :
 
     N    None
     Z  0 Zero (reset)
-    D  1 Double-struck (boldface)
+    D  1 Double strike (boldface)
     P  2 Pale (dark)
     I  3 Italic
     U  4 Underline
     F  5 Flash (blink: slow)
     Q  6 Quick (blink: rapid)
-    S  7 Stand-out (reverse video)
-    V  8 Vanish (concealed)
-    X  9 Crossed out
+    S  7 Stand out (reverse video)
+    H  8 Hide (concealed)
+    X  9 Cross out
 
     E    Erase Line
 
@@ -389,9 +391,10 @@ Samples:
 =head1 256/24BIT COLORS
 
 12bit/24bit colors are converted to 216 colors because most terminal
-can not display them.  If you are using full-color terminal, such as
-iTerm2 on Mac, use B<--rgb24> option or set C<GETOPTEX_RGB24>
-environment variable to produce full-color sequence.
+can not display them.  On some terminals which set the environment
+variable C<COLORTERM> as C<truecolor> (e.g. iTerm), 24bit color mode
+is automatically enabled.  Otherwise, use B<--rgb24> option or set
+C<GETOPTEX_RGB24> environment variable to produce full-color sequence.
 
 =head1 INSTALL
 

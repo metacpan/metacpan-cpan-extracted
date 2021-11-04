@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -193,41 +193,40 @@ sub _tar_create {
     my $builddir   = $self->builddir;
     my $stagingdir = $self->stagingdir;
 
+    my $tar;
+
     my $origdir = cwd;
+    if (chdir $stagingdir) {
+        $tar = Archive::Tar->new;
 
-    if (!chdir $stagingdir) {
-        return;
-    }
+        my %is_doc = map { $_ => 1 } qw(changelog doc license);
 
-    my $tar = Archive::Tar->new;
+        my $is_first = 1;
+        for my $file (@{$self->files}) {
+            my $name = $file->{name};
+            my $type = $file->{type};
 
-    my %is_doc = map { $_ => 1 } qw(changelog doc license);
+            if ($is_doc{$type}) {
+                if ($is_first) {
+                    $self->_add_dir($tar, $self->_docdir);
+                    $is_first = 0;
+                }
 
-    my $is_first = 1;
-    for my $file (@{$self->files}) {
-        my $name = $file->{name};
-        my $type = $file->{type};
+                my $path    = catfile($builddir, $name);
+                my $tarfile = $self->_add_doc($tar, $path);
 
-        if ($is_doc{$type}) {
-            if ($is_first) {
-                $self->_add_dir($tar, $self->_docdir);
-                $is_first = 0;
+                if (-d $path) {
+                    $self->_add_docdir($tar, $path);
+                }
             }
-
-            my $path    = catfile($builddir, $name);
-            my $tarfile = $self->_add_doc($tar, $path);
-
-            if (-d $path) {
-                $self->_add_docdir($tar, $path);
+            else {
+                $self->_add_file($tar, $name);
             }
         }
-        else {
-            $self->_add_file($tar, $name);
-        }
-    }
 
-    if (!chdir $origdir) {
-        return;
+        if (!chdir $origdir) {
+            undef $tar;
+        }
     }
 
     return $tar;
@@ -257,7 +256,7 @@ CPANPLUS::Dist::Debora::Package::Tar - Create tar archives
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

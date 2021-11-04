@@ -1,7 +1,9 @@
 package Module::Installed::Tiny;
 
-our $DATE = '2020-01-04'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-19'; # DATE
+our $DIST = 'Module-Installed-Tiny'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -128,7 +130,7 @@ Module::Installed::Tiny - Check if a module is installed, with as little code as
 
 =head1 VERSION
 
-This document describes version 0.004 of Module::Installed::Tiny (from Perl distribution Module-Installed-Tiny), released on 2020-01-04.
+This document describes version 0.005 of Module::Installed::Tiny (from Perl distribution Module-Installed-Tiny), released on 2021-05-19.
 
 =head1 SYNOPSIS
 
@@ -194,6 +196,18 @@ will return the list:
 where C<str> is the module source code and C<source_name> is source information
 (file path, or the @INC ref entry when entry is a ref).
 
+=head1 FAQ
+
+=head2 How to get module source without dying? I want to just get undef if module source is not available.
+
+Wrap in C<eval()> or C<try/catch> (Perl 5.34+):
+
+ my $src;
+ eval { $src = module_source $name };
+ # $src contains the module source or undef if not available
+
+This is what C<module_installed()> does.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Module-Installed-Tiny>.
@@ -204,7 +218,7 @@ Source repository is at L<https://github.com/perlancar/perl-Module-Installed-Tin
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Installed-Tiny>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-Installed-Tiny/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -227,7 +241,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

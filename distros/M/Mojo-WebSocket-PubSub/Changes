@@ -1,5 +1,15 @@
 Revision history for perl module Mojo::WebSocket::PubSub
 
+0.06 2021-10-20T15:19:00
+    - Add a colored shell library and example script
+    - Add tests for client changing channels
+    - PubSub client now emits events when received some messages
+    - Add debug code to plugin
+    - Solved some problems in plugin for clients position in channels
+
+0.05 2021-10-18T16:08:00
+    - Optimization while sending messages over websocket
+
 0.04 2021-10-05T15:38:00
     - Activate keepalive
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.13;
+package XS::Parse::Sublike 0.14;
 
 use v5.14;
 use warnings;
@@ -103,6 +103,9 @@ first for all stages, except C<pre_blockend> which runs them inside-out.
 I<hookdata> is an opaque pointer which is passed through to each of the hook
 stage functions when they are invoked.
 
+Note that this function is now vaguely discouraged, in favour of using a
+prefixing keyword instead, by using the C<XS_PARSE_SUBLIKE_FLAG_PREFIX> flag.
+
 =head1 PARSE CONTEXT
 
 The various hook stages all share state about the ongoing parse process using
@@ -129,6 +132,19 @@ operation. The following flags are defined.
 
 If set, the optional C<filter_attr> stage will be invoked.
 
+=item XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL
+
+If B<not> set, the I<require_parts> field will imply the
+C<XS_PARSE_SUBLIKE_PART_BODY> flag, making the body part required. By setting
+this flag this will no longer happen. If all hooks agree, then the body will
+become optional.
+
+=item XS_PARSE_SUBLIKE_FLAG_PREFIX
+
+If set, the keyword is considered to be a prefix that can be placed in front
+of C<sub> or another sub-like keyword, to add its set of hooks in addition to
+those of the following keyword. These prefices may be further stacked.
+
 =back
 
 In addition there are two C<U8> fields named I<require_parts> and
@@ -137,10 +153,10 @@ are usually optional. Any parts with bits set in I<require_parts> become
 non-optional, and an error if they are missing. Any parts with bits set in
 I<skip_parts> will skip the relevant part of the parsing process.
 
-When two sets of hooks are combined by the C<xs_parse_sublike_any> function,
-these bitmasks are accumulated together with inclusive or. Any part required
-by either set of hooks will still be required; any step skipped by either will
-be skipped entirely.
+When multiple sets of hooks are combined by the C<xs_parse_sublike_any>
+function, or as part of parsing prefixing keywords, these bitmasks are
+accumulated together with inclusive or. Any part required by any set of hooks
+will still be required; any step skipped by either will be skipped entirely.
 
 If the same bit is set in both fields then the relevant parsing step will not
 be performed but it will still be an error for that section to be missing.
@@ -172,6 +188,22 @@ This part can be skipped, but the bit is ignored when in I<require_parts>. It
 is always permitted not to provide a signature for a function definition,
 because such syntax only applies when C<use feature 'signatures'> is in
 effect, and only on supporting perl versions.
+
+=item XS_PARSE_SUBLIKE_PART_BODY
+
+The actual body of the function, expressed as a brace-delimited block.
+
+This part cannot be skipped, but it can be made optional by omitting it from
+the I<require_parts> field. Instead of the block, it is permitted to place a
+single semicolon (C<;>) to act as a statement terminator; thus giving the same
+syntax as a subroutine forward declaration.
+
+In this case, the C<body> and C<cv> fields of the context structure will
+remain C<NULL>.
+
+This flag is currently implied on the I<require_parts> field if the hook does
+not supply the C<XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL> flag; meaning that most
+use-cases will make it a required part.
 
 =back
 

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ShipmentType;
-$Shipment::UPS::WSDL::TrackTypes::ShipmentType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::ShipmentType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -85,7 +85,7 @@ Class::Std::initialize();
               Package
               AdditionalAttribute
 
-              )
+            )
         ],
         {   'InquiryNumber'              => \%InquiryNumber_of,
             'ShipmentType'               => \%ShipmentType_of,
@@ -124,7 +124,7 @@ Class::Std::initialize();
               'Shipment::UPS::WSDL::TrackTypes::RefShipmentType',
             'CandidateBookmark' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'ShipperNumber'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ShipmentAddress' =>
+            'ShipmentAddress'   =>
               'Shipment::UPS::WSDL::TrackTypes::ShipmentAddressType',
             'ShipmentWeight' => 'Shipment::UPS::WSDL::TrackTypes::WeightType',
             'Service'        => 'Shipment::UPS::WSDL::TrackTypes::ServiceType',
@@ -132,7 +132,7 @@ Class::Std::initialize();
               'Shipment::UPS::WSDL::TrackTypes::ShipmentReferenceNumberType',
             'CurrentStatus' =>
               'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
-            'PickupDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PickupDate'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'ServiceCenter' =>
               'Shipment::UPS::WSDL::TrackTypes::ServiceCenterType',
             'DeliveryDetail' =>
@@ -145,7 +145,7 @@ Class::Std::initialize();
               'Shipment::UPS::WSDL::TrackTypes::ServiceOptionType',
             'COD'             => 'Shipment::UPS::WSDL::TrackTypes::CODType',
             'SignedForByName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Activity' =>
+            'Activity'        =>
               'Shipment::UPS::WSDL::TrackTypes::ShipmentActivityType',
             'OriginPortDetail' =>
               'Shipment::UPS::WSDL::TrackTypes::OriginPortDetailType',
@@ -157,8 +157,8 @@ Class::Std::initialize();
             'Manifest'   => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
             'CarrierActivityInformation' =>
               'Shipment::UPS::WSDL::TrackTypes::CarrierActivityInformationType',
-            'Document'   => 'Shipment::UPS::WSDL::TrackTypes::DocumentType',
-            'FileNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Document'    => 'Shipment::UPS::WSDL::TrackTypes::DocumentType',
+            'FileNumber'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'Appointment' =>
               'Shipment::UPS::WSDL::TrackTypes::AppointmentType',
             'Package' => 'Shipment::UPS::WSDL::TrackTypes::PackageType',
@@ -217,7 +217,7 @@ Shipment::UPS::WSDL::TrackTypes::ShipmentType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

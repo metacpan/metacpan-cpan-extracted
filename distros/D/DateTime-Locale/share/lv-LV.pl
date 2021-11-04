@@ -19,6 +19,7 @@
     GyMMM => "G y. 'g'. MMM",
     GyMMMEd => "E, G y. 'g'. d. MMM",
     GyMMMd => "G y. 'g'. d. MMM",
+    GyMd => "GGGGG dd-MM-y",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -50,7 +51,7 @@
     yMMMEd => "E, y. 'g'. d. MMM",
     yMMMM => "y. 'g'. MMMM",
     yMMMd => "y. 'g'. d. MMM",
-    yMd => "y.MM.d.",
+    yMd => "d.MM.y.",
     yQQQ => "y. 'g'. QQQ",
     yQQQQ => "y. 'g'. QQQQ",
     "yw-count-one" => "Y. 'g'. w. 'ned\N{U+0113}\N{U+013c}a'",
@@ -272,5 +273,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 39,
+  version => 40,
 }

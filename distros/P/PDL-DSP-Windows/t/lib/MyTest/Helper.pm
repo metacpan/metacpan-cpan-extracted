@@ -5,7 +5,7 @@ use PDL;
 use Exporter 'import';
 use Try::Tiny;
 
-our @EXPORT_OK = qw( is_approx dies warnings );
+our @EXPORT_OK = qw( is_approx dies );
 
 sub dies (&$$) {
     my ( $code, $check, $message ) = @_;
@@ -16,17 +16,6 @@ sub dies (&$$) {
         $error //= '';
         like $error, $check, $message;
     };
-}
-
-sub warnings (&) {
-    my ($code) = @_;
-
-    my @warnings;
-    local $SIG{__WARN__} = sub { push @warnings, @_ };
-
-    $code->();
-
-    return @warnings;
 }
 
 sub is_approx ($$;$$) {

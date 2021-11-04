@@ -42,6 +42,8 @@ my %WriteMakefileArgs = (
     "DBIx::QuickDB" => "0.000020",
     "Data::GUID" => 0,
     "DateTime" => 0,
+    "DateTime::Format::MySQL" => 0,
+    "DateTime::Format::Pg" => 0,
     "Email::Sender::Simple" => 0,
     "Email::Simple" => 0,
     "Email::Simple::Creator" => 0,
@@ -67,7 +69,7 @@ my %WriteMakefileArgs = (
     "Test2" => "1.302164",
     "Test2::API" => "1.302166",
     "Test2::Formatter::Test2::Composer" => 0,
-    "Test2::Harness" => "1.000065",
+    "Test2::Harness" => "1.000076",
     "Test2::Harness::Util::HashBase" => 0,
     "Test2::Harness::Util::JSON" => 0,
     "Test2::Harness::Util::UUID" => 0,
@@ -84,9 +86,12 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.000086",
+  "TEST_REQUIRES" => {
+    "HTTP::Tiny::UNIX" => 0
+  },
+  "VERSION" => "0.000096",
   "test" => {
-    "TESTS" => "t/*.t t/UI/*.t"
+    "TESTS" => "t/*.t t/UI/*.t t/integration/*.t"
   }
 );
 
@@ -106,12 +111,15 @@ my %FallbackPrereqs = (
   "DBIx::QuickDB" => "0.000020",
   "Data::GUID" => 0,
   "DateTime" => 0,
+  "DateTime::Format::MySQL" => 0,
+  "DateTime::Format::Pg" => 0,
   "Email::Sender::Simple" => 0,
   "Email::Simple" => 0,
   "Email::Simple::Creator" => 0,
   "File::ShareDir" => 0,
   "File::Temp" => 0,
   "HTTP::Tiny" => 0,
+  "HTTP::Tiny::UNIX" => 0,
   "IO::Compress::Bzip2" => 0,
   "IO::Uncompress::Bunzip2" => 0,
   "IO::Uncompress::Gunzip" => 0,
@@ -131,7 +139,7 @@ my %FallbackPrereqs = (
   "Test2" => "1.302164",
   "Test2::API" => "1.302166",
   "Test2::Formatter::Test2::Composer" => 0,
-  "Test2::Harness" => "1.000065",
+  "Test2::Harness" => "1.000076",
   "Test2::Harness::Util::HashBase" => 0,
   "Test2::Harness::Util::JSON" => 0,
   "Test2::Harness::Util::UUID" => 0,

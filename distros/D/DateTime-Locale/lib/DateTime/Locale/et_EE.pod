@@ -30,13 +30,13 @@ Estonian Estonia locale.
 
 =head3 Wide (format)
 
-  esmaspäev
-  teisipäev
-  kolmapäev
-  neljapäev
-  reede
-  laupäev
-  pühapäev
+  Esmaspäev
+  Teisipäev
+  Kolmapäev
+  Neljapäev
+  Reede
+  Laupäev
+  Pühapäev
 
 =head3 Abbreviated (format)
 
@@ -61,13 +61,13 @@ Estonian Estonia locale.
 
 =head3 Wide (stand-alone)
 
-  esmaspäev
-  teisipäev
-  kolmapäev
-  neljapäev
-  reede
-  laupäev
-  pühapäev
+  Esmaspäev
+  Teisipäev
+  Kolmapäev
+  Neljapäev
+  Reede
+  Laupäev
+  Pühapäev
 
 =head3 Abbreviated (stand-alone)
 
@@ -248,9 +248,9 @@ Estonian Estonia locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = teisipäev, 5. veebruar 2008
-   1995-12-22T09:05:02 = reede, 22. detsember 1995
-  -0010-09-15T04:44:23 = laupäev, 15. september -10
+   2008-02-05T18:30:30 = Teisipäev, 5. veebruar 2008
+   1995-12-22T09:05:02 = Reede, 22. detsember 1995
+  -0010-09-15T04:44:23 = Laupäev, 15. september -10
 
 =head3 Long
 
@@ -302,9 +302,9 @@ Estonian Estonia locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = teisipäev, 5. veebruar 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = reede, 22. detsember 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = laupäev, 15. september -10 04:44:23 UTC
+   2008-02-05T18:30:30 = Teisipäev, 5. veebruar 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = Reede, 22. detsember 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = Laupäev, 15. september -10 04:44:23 UTC
 
 =head3 Long
 
@@ -416,6 +416,12 @@ Estonian Estonia locale.
    2008-02-05T18:30:30 = 5. veebr 2008 pKr
    1995-12-22T09:05:02 = 22. dets 1995 pKr
   -0010-09-15T04:44:23 = 15. sept -10 eKr
+
+=head3 GyMd (d.MM.y GGGGG)
+
+   2008-02-05T18:30:30 = 5.02.2008 pKr
+   1995-12-22T09:05:02 = 22.12.1995 pKr
+  -0010-09-15T04:44:23 = 15.09.-10 eKr
 
 =head3 H (HH)
 
@@ -636,7 +642,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (esmaspäev)
+1 (Esmaspäev)
 
 =head2 Strftime Patterns
 

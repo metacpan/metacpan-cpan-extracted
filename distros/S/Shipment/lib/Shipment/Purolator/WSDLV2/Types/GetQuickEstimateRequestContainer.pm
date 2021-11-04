@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::GetQuickEstimateRequestContainer;
-$Shipment::Purolator::WSDLV2::Types::GetQuickEstimateRequestContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::GetQuickEstimateRequestContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               PackageType
               TotalWeight
 
-              )
+            )
         ],
         {   'BillingAccountNumber' => \%BillingAccountNumber_of,
             'SenderPostalCode'     => \%SenderPostalCode_of,
@@ -50,7 +50,7 @@ Class::Std::initialize();
         {   'BillingAccountNumber' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'SenderPostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ReceiverAddress' =>
+            'ReceiverAddress'  =>
               'Shipment::Purolator::WSDLV2::Types::ShortAddress',
             'PackageType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'TotalWeight' => 'Shipment::Purolator::WSDLV2::Types::TotalWeight',
@@ -82,7 +82,7 @@ Shipment::Purolator::WSDLV2::Types::GetQuickEstimateRequestContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

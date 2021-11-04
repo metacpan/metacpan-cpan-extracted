@@ -11,8 +11,8 @@ urpmi.addmedia - adds a new rpm media to be used by urpmi
 urpmi.addmedia is used to add a new media to be used by urpmi, so it can
 find new rpms at the specified location. Currently supported media types
 are: local drives, removable drives (such as CDs), and networked media via
-different protocols (http, ftp, ssh and rsync). One of the following modes
-must be chosen:
+different protocols (http, https, ftp, ssh and rsync). One of the following
+modes must be chosen:
 
 =over
 
@@ -40,6 +40,10 @@ used if B<curl> is not installed or if or B<--wget> is given in
 I<options>. Example:
 
     urpmi.addmedia http http://jpackage.sf.net/rpm/free
+
+=item B<urpmi.addmedia> [I<options>] <I<name>> https://<I<login>>:<I<pass>>@<I<host>>/<I<path>>
+
+The same as for http but using the encrypted https protocol.
 
 =item B<urpmi.addmedia> [I<options>] <I<name>> ftp://<I<login>>:<I<pass>>@<I<host>>/<I<path>>
 

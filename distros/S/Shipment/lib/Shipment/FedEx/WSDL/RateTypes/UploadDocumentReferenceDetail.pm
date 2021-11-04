@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::UploadDocumentReferenceDetail;
-$Shipment::FedEx::WSDL::RateTypes::UploadDocumentReferenceDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::UploadDocumentReferenceDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               DocumentId
               DocumentIdProducer
 
-              )
+            )
         ],
         {   'LineNumber'         => \%LineNumber_of,
             'CustomerReference'  => \%CustomerReference_of,
@@ -49,7 +49,7 @@ Class::Std::initialize();
         {   'LineNumber' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'CustomerReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DocumentProducer' =>
+            'DocumentProducer'  =>
               'Shipment::FedEx::WSDL::RateTypes::UploadDocumentProducerType',
             'DocumentType' =>
               'Shipment::FedEx::WSDL::RateTypes::UploadDocumentType',
@@ -85,7 +85,7 @@ Shipment::FedEx::WSDL::RateTypes::UploadDocumentReferenceDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

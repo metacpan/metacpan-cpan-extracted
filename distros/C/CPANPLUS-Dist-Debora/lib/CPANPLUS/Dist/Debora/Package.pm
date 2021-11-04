@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Carp qw(croak);
 use Config;
@@ -296,7 +296,7 @@ sub dependencies {
     my $dependencies
         = $self->_read('dependencies', sub { $self->_get_dependencies });
 
-    return wantarray ? @{$dependencies} : $dependencies;
+    return $dependencies;
 }
 
 sub copyrights {
@@ -304,7 +304,7 @@ sub copyrights {
 
     my $copyrights = $self->_read('copyrights', sub { $self->_get_copyrights });
 
-    return wantarray ? @{$copyrights} : $copyrights;
+    return $copyrights;
 }
 
 sub licenses {
@@ -312,7 +312,7 @@ sub licenses {
 
     my $licenses = $self->_read('licenses', sub { $self->_get_licenses });
 
-    return wantarray ? @{$licenses} : $licenses;
+    return $licenses;
 }
 
 sub license {
@@ -329,7 +329,7 @@ sub files {
     my $files = $self->_read('files',
         sub { [@{$self->_get_docfiles}, @{$self->_get_stagingfiles}] });
 
-    return wantarray ? @{$files} : $files;
+    return $files;
 }
 
 sub files_by_type {
@@ -337,7 +337,7 @@ sub files_by_type {
 
     my @files = map { $_->{name} } grep { $_->{type} eq $type } @{$self->files};
 
-    return wantarray ? @files : \@files;
+    return \@files;
 }
 
 sub mb_opt {
@@ -404,7 +404,7 @@ sub sanitize_stagingdir {
             if (-d $path) {
                 rmdir $path;
             }
-            elsif (-f $path) {
+            else {
                 if (   $entry eq 'perllocal.pod'
                     || $entry eq '.packlist'
                     || ($entry =~ m{[.]bs \z}xms && -z $path))
@@ -771,7 +771,7 @@ sub _get_requires {
         %requires = %{$prereqs};
     }
 
-    return wantarray ? %requires : \%requires;
+    return \%requires;
 }
 
 sub _get_dependencies {
@@ -837,7 +837,7 @@ sub _get_dependencies {
         is_core      => $dependency{$_}->{is_core},
     } } sort { uc $a cmp uc $b } keys %dependency;
 
-    return wantarray ? @dependencies : \@dependencies;
+    return \@dependencies;
 }
 
 sub _get_copyrights {
@@ -847,7 +847,7 @@ sub _get_copyrights {
 
     my $pod = $self->_pod;
     if (defined $pod) {
-        push @copyrights, $pod->copyrights;
+        push @copyrights, @{$pod->copyrights};
     }
 
     if (!@copyrights) {
@@ -859,7 +859,7 @@ sub _get_copyrights {
         push @copyrights, {year => $year, holder => $holder};
     }
 
-    return wantarray ? @copyrights : \@copyrights;
+    return \@copyrights;
 }
 
 sub _get_licenses_from_meta {
@@ -886,7 +886,7 @@ sub _get_licenses_from_meta {
         }
     }
 
-    return wantarray ? @licenses : \@licenses;
+    return \@licenses;
 }
 
 sub _get_licenses_from_pod {
@@ -903,13 +903,13 @@ sub _get_licenses_from_pod {
         }
     }
 
-    return wantarray ? @licenses : \@licenses;
+    return \@licenses;
 }
 
 sub _get_licenses {
     my $self = shift;
 
-    my %copyright = %{($self->copyrights)[-1]};
+    my %copyright = %{$self->copyrights->[-1]};
 
     my $get_license = sub {
         my $spdx_expression = shift;
@@ -944,7 +944,7 @@ sub _get_licenses {
     my @sorted_licenses
         = sort { $a->spdx_expression cmp $b->spdx_expression } @licenses;
 
-    return wantarray ? @sorted_licenses : \@sorted_licenses;
+    return \@sorted_licenses;
 }
 
 sub _get_license {
@@ -1009,11 +1009,11 @@ sub _get_docfiles {
             # Skip symbolic links.
             next ENTRY if -l $path;
 
-            if (-f $path) {
-                chmod oct '0644', $path;
-            }
-            elsif (-d $path) {
+            if (-d $path) {
                 __SUB__->($path);
+            }
+            else {
+                chmod oct '0644', $path;
             }
         }
         closedir $dh;
@@ -1035,7 +1035,14 @@ sub _get_docfiles {
             # Skip symbolic links.
             next ENTRY if -l $path;
 
-            if (-f $path && -s $path) {
+            if (-d $path) {
+                if ($entry eq 'examples') {
+                    $fix_permissions->($path);
+                    my $file = {name => $entry, type => 'doc'};
+                    push @files, $file;
+                }
+            }
+            elsif (-s $path) {
                 TYPE:
                 for my $type (keys %regex_for) {
                     if ($entry =~ $regex_for{$type}) {
@@ -1044,13 +1051,6 @@ sub _get_docfiles {
                         push @files, $file;
                         last TYPE;
                     }
-                }
-            }
-            elsif (-d $path) {
-                if ($entry eq 'examples') {
-                    $fix_permissions->($path);
-                    my $file = {name => $entry, type => 'doc'};
-                    push @files, $file;
                 }
             }
         }
@@ -1062,7 +1062,7 @@ sub _get_docfiles {
 
     my @sorted_files = sort { $a->{name} cmp $b->{name} } @files;
 
-    return wantarray ? @sorted_files : \@sorted_files;
+    return \@sorted_files;
 }
 
 sub _get_excludedirs {
@@ -1102,7 +1102,7 @@ sub _get_excludedirs {
         }
     }
 
-    return wantarray ? %excludedirs : \%excludedirs;
+    return \%excludedirs;
 }
 
 sub _get_stagingfiles {
@@ -1158,7 +1158,7 @@ sub _get_stagingfiles {
 
     my @sorted_files = sort { $a->{name} cmp $b->{name} } @files;
 
-    return wantarray ? @sorted_files : \@sorted_files;
+    return \@sorted_files;
 }
 
 1;
@@ -1172,7 +1172,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -1182,9 +1182,9 @@ version 0.003
   my $version      = $package->version;
   my $summary      = $package->summary;
   my $description  = $package->description;
-  my @licenses     = $package->licenses;
-  my @dependencies = $package->dependencies;
-  my @files        = $package->files;
+  my @licenses     = @{$package->licenses};
+  my @dependencies = @{$package->dependencies};
+  my @files        = @{$package->files};
 
 =head1 DESCRIPTION
 
@@ -1386,17 +1386,16 @@ Returns the Perl distribution's description.
       my $is_module    = $dependency->{is_module};
   }
 
-Builds a list of Perl modules that the package depends on.  Returns an array
-of hashes with names and versions.
+Builds a list of Perl modules that the package depends on.
 
 =head2 copyrights
 
-  for my $copyright (@{package->copyrights}) {
+  for my $copyright (@{$package->copyrights}) {
       my $year   = $copyright->{year};
       my $holder = $copyright->{holder};
   }
 
-Returns an array of hashes with copyright years and holders.
+Returns the copyright years and holders.
 
 =head2 licenses
 
@@ -1404,7 +1403,7 @@ Returns an array of hashes with copyright years and holders.
       my $full_text = $license->license;
   }
 
-Returns an array of Software::License objects.
+Returns Software::License objects.
 
 =head2 license
 
@@ -1422,7 +1421,7 @@ Returns "Unknown" if no license information was found.
 
 Builds a list of files that CPANPLUS installed in the staging directory.
 Searches the build directory for README, LICENSE and other documentation
-files.  Returns an array of hashes with filenames and types.
+files.
 
 Possible types are "changelog", "config", "dir", "doc", "file", "license",
 "link" and "man".

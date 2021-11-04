@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxReply;
-$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxReply::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxReply::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Version
               FaxConfirmationNumber
 
-              )
+            )
         ],
         {   'HighestSeverity'       => \%HighestSeverity_of,
             'Notifications'         => \%Notifications_of,
@@ -80,7 +80,7 @@ Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxReply
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

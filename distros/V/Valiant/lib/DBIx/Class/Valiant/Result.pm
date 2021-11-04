@@ -10,6 +10,9 @@ use Valiant::Util 'debug';
 use Scalar::Util 'blessed';
 use Carp;
 use namespace::autoclean -also => ['debug'];
+use DBIx::Class::Valiant::Util::Exception::TooManyRows;
+use DBIx::Class::Valiant::Util::Exception::BadParameterFK;
+use DBIx::Class::Valiant::Util::Exception::BadParameters;
 
 with 'DBIx::Class::Valiant::Validates';
 with 'Valiant::Filterable';
@@ -20,6 +23,8 @@ export_methods ['filters', 'validates', 'filters_with', 'validates_with', 'accep
 __PACKAGE__->mk_classdata( _m2m_metadata => {} );
 __PACKAGE__->mk_classdata( auto_validation => 1 );
 __PACKAGE__->mk_classdata( _nested => [] );
+__PACKAGE__->mk_classdata( _src_info => '' );
+
 
 sub many_to_many {
   my $class = shift;
@@ -72,7 +77,8 @@ sub new { # also support for the filter role
     }
   }
   my %filtered = (%$attrs, %{$class->_process_filters(\%columns)});
-  return $class->next::method(\%filtered);
+  my $self = $class->next::method(\%filtered);
+  return $self;
 }
 
 sub accept_nested_for {
@@ -119,9 +125,42 @@ sub insert {
   if($self->errors->size) {
     debug 2, "Skipping insert for @{[$self]} because its invalid";
     return $self;
+  } else {
+    debug 2, "proceeding to insert  @{[$self]} because its valid";
   }
-  ## delete $self->{__VALIANT_CREATE_ARGS};  We might need this at some point
+
+  if($self->{__valiant_donot_insert}) {
+    debug 2, "Skipping insert for @{[$self]} because its probably and _add";
+    return $self;
+  }
   return $self->next::method(@args);
+}
+
+sub _nested_info_for_related {
+  my ($self, $related) = @_;
+  my %nested = $self->result_class->accept_nested_for;
+  my %info = %{ $nested{$related}||+{} };  
+  return %info;
+}
+
+sub _related_allow_destroy {
+  my ($self, $related) = @_;
+  my %info = $self->_nested_info_for_related($related);
+  if(my $proto = $info{allow_destroy}) {
+    my $allow_or_not = (ref($proto)||'' eq 'CODE') ? $proto->($self) : $proto;
+    return $allow_or_not;
+  }
+  return 0;
+}
+
+sub _related_limit {
+  my ($self, $related) = @_;
+  my %info = $self->_nested_info_for_related($related);
+  if(my $limit_proto = $info{limit}) {
+    my $limit = (ref($limit_proto)||'' eq 'CODE') ? $limit_proto->($self) : $limit_proto;
+    return 1, $limit;
+  }
+  return 0, undef;
 }
 
 sub update {
@@ -141,7 +180,7 @@ sub update {
   # Remove any relationed keys we didn't find with the allows nested
   my @rel_names = $self->result_source->relationships();
   my @m2m_names = keys  %{ $self->result_class->_m2m_metadata ||+{} };
-  debug 1, "Found related for @{[ $self ]} of @{[ join ',', @rel_names ]}";
+  debug 1, "Found related for @{[ ref $self ]} of @{[ join ',', @rel_names ]}";
 
   my %found = map { $_ => delete($upd->{$_})  } @rel_names, @m2m_names; # backcompat with old perl
 
@@ -159,13 +198,19 @@ sub update {
     if(my $cb = $nested{$related}->{reject_if}) {
       next if $cb->($self, $related{$related});
     }
-    if(my $limit_proto = $nested{$related}->{limit}) {
-      my $limit = (ref($limit_proto)||'' eq 'CODE') ?
-        $limit_proto->($self) :
-        $limit_proto;
+
+    my ($has_limit, $limit) = $self->_related_limit($related);
+    if($has_limit) {
       my $num = scalar @{$related{$related}};
-      confess "Relationship $related can't create more than $limit rows at once" if $num > $limit;      
+      DBIx::Class::Valiant::Util::Exception::TooManyRows
+        ->throw(
+          limit=>$limit,
+          attempted=>$num,
+          related=>$related,
+          me=>$self->result_source->name,
+        ) if $num > $limit;
     }
+
     debug 2, "Setting related '$related' for @{[ ref $self ]} ";
 
     #$self->update_or_create_related($related, $related{$related});
@@ -178,7 +223,11 @@ sub update {
   debug 2, "About to run validations for @{[$self]} on update";
   $self->validate(%validate_args) if $self->auto_validation;
 
-  return $self if $self->errors->size;
+
+  if($self->has_errors) {
+    debug 2, "Validation errors found, skipping mutate for @{[ ref $self ]} ";
+    return $self;
+  }
   debug 2, "No validation issues found, proceeding to mutate @{[ ref $self ]} ";
 
   # wrap it all in a transaction to undo if issues.
@@ -220,13 +269,10 @@ sub register_column {
 # namespace
 
 sub namespace {
-  my $self = shift;  
-  return '' unless ref $self;
-
+  my $self = shift;
   my $class = ref($self) ? ref($self) : $self; 
-  my $source_name = $self->result_source->source_name;
-  $class =~s/::${source_name}$//;
-  return $class;
+  my ($ns) = ($class =~m/^(.+)::.+$/);
+  return $ns;
 }
 
 # Trouble here is you can only inject one attribute per model.  Will be an
@@ -300,6 +346,7 @@ sub is_unique {
 
 sub mark_for_deletion {
   my ($self) = @_;
+  return unless $self->{__valiant_allow_destroy};
   $self->{__valiant_kiss_of_death} = 1;
 }
 
@@ -322,7 +369,7 @@ sub delete_if_in_storage {
 
 sub build_related {
   my ($self, $related, $attrs) = @_;
-  debug 2, "Building related entity '$related' for @{[ $self->model_name->human ]}";
+  debug 2, "Building related entity '$related' for @{[ ref $self ]}";
 
   my $related_obj = $attrs ? $self->find_or_new_related($related, $attrs) : $self->new_related($related, +{});
   return if $related_obj->in_storage;  #I think we can skip if its found
@@ -400,6 +447,11 @@ sub set_from_params_recursively {
           $self->mark_for_deletion;
         }
       }
+    } elsif( $param eq '_nop') {
+        if($params{$param}) {
+          debug 3, "Found _nop";
+          delete $params{$param};
+        }
     } elsif($param eq '_restore' && $params{$param}) {
       if($self->in_storage) {
         debug 3, "Unmarking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
@@ -411,6 +463,7 @@ sub set_from_params_recursively {
     } elsif($param eq '_action') {
       my $action = $params{$param};
       $action = ref($action)||'' ? $action->[-1] : $action; # If action is a ref always use the last one
+      debug 3, "Found _action param with value $action";
       if($action eq 'delete') {
         if($self->in_storage) {
           debug 2, "Marking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
@@ -510,13 +563,19 @@ sub set_multi_related_from_params {
     die "We expect '$params' to be some sort of reference but its not!";
   }
 
+  my $allow_destroy = $self->_related_allow_destroy($related);
+
   # Queue up some meta data here just once.  We get existing rows ans
   # uniqiue key info (including PK info)
   debug 2, "looking for $related cached or existing rows";
   my @existing_rows = @{ $self->$related->get_cache||[] };
   unless(@existing_rows) {
-    debug 2, "cache was empty so going to check DB"; ## TODO this is to support ->discard_changes but maybe not needed
-    @existing_rows = $self->$related->all;
+    debug 3, "cache was empty so going to check DB"; ## TODO this is to support ->discard_changes but maybe not need
+    if($self->in_storage) {
+      @existing_rows = $self->$related->all;
+    } else {
+      debug 3, "record not in storage, so no point in looking for related rows";
+    }
   }
   debug 2, "Found @{[ scalar @existing_rows ]} existing rows for $related";
   
@@ -525,6 +584,12 @@ sub set_multi_related_from_params {
   my %uniques = $self->$related->result_source->unique_constraints;
   my @search_sets = ('primary');
   my %nested = $self->result_class->accept_nested_for;
+
+  # Gather the list of fields which are single type rels
+  my @single_rels =  grep {
+    my $rel_data = $self->$related->result_source->relationship_info($_);
+    ($rel_data && ($rel_data->{attrs}{accessor} eq 'single')) ? 1:0;
+  }  $self->$related->result_source->relationships;
 
   # Generally we alow finding the row via the PK only but the user can allow finding
   # by any unique if that's what they really want.
@@ -537,7 +602,53 @@ sub set_multi_related_from_params {
   debug 2, "starting loop to update/create related $related (total @{[ scalar @param_rows ]} rows in loop)";
   foreach my $param_row (@param_rows) {
     debug 3, "top of new loop on param_rows";
-    delete $param_row->{_add};
+    if($param_row->{_nop}) {
+      debug 3, "Is a NOP row, so skipping";
+      next;
+    }
+
+    # Ok so if $self is in storage we expect any $related FKs to match whatever is $self $PK.  If that
+    # FK is empty we add it.   If its there but has an unexpected value, that's an error (and probably
+    # a hacking attempt
+    if($self->in_storage) {
+      my %cond = %{$self->result_source->relationship_info($related)->{cond}};
+      foreach my $fk_proto (keys %cond) {
+        my $pk_proto = $cond{$fk_proto};
+        my ($pk) = ($pk_proto=~m/^self\.(.+)$/); 
+        my ($fk) = ($fk_proto=~m/^foreign\.(.+)$/);
+
+        if(exists $param_row->{$fk}) {
+          unless($param_row->{$fk} eq $self->get_column($pk)) {
+            DBIx::Class::Valiant::Util::Exception::BadParameterFK->throw(
+              fk_field=>$fk, fk_value=>$param_row->{$fk}, 
+              pk_field=>$pk, pk_value=>$self->get_column($pk), 
+              related=>$related, me=>$self);
+          }
+        } else {
+          $param_row->{$fk} = $self->get_column($pk); # set it since that should help with the lookups
+        }
+      }
+    } else {
+      # Now if $self is not in storage we expect the related FK to be empty.  If not throw error since
+      # its possible a hacking attempt
+      my %cond = %{$self->result_source->relationship_info($related)->{cond}};
+      foreach my $fk_proto (keys %cond) {
+        my $pk_proto = $cond{$fk_proto};
+        my ($pk) = ($pk_proto=~m/^self\.(.+)$/); 
+        my ($fk) = ($fk_proto=~m/^foreign\.(.+)$/);
+
+        if(exists $param_row->{$fk}) {
+          unless(!defined($param_row->{$fk})) {
+            DBIx::Class::Valiant::Util::Exception::BadParameterFK->throw(
+              fk_field=>$fk, fk_value=>$param_row->{$fk}, 
+              pk_field=>$pk, pk_value=>'undef', 
+              related=>$related, me=>$self);
+          }
+        }
+      }
+    }
+
+    my $was_add = delete $param_row->{_add};
     my $related_model;
     if(blessed $param_row) {
       debug 1, "params are an object";
@@ -553,6 +664,7 @@ sub set_multi_related_from_params {
         my @key_columns = @{$uniques{$key}};
         my %matching = map { $_ => $param_row->{$_} } grep { exists $param_row->{$_} } @key_columns;
 
+
         next unless scalar(@key_columns) == scalar(keys(%matching)); # only match when its a full key match
         debug 2, "key $key exists in params";
 
@@ -565,33 +677,35 @@ sub set_multi_related_from_params {
             $related_model = $row;
             if($related_model) {
               debug 2, "found related model for $related with $key in cache";
-              %keys_used_to_find = %matching;
+              %keys_used_to_find = (%keys_used_to_find, %matching);
               last SEARCH_UNIQUE_KEYS
             }
           }
         }
 
-        # If it doesn't match in the cache then we have to find it in the DB
+        # If it doesn't match in the cache then we have to find it in the DB. TODO I'm skipping this
+        # lookup for now since I don't think we need it unless the user failed to properly prefetch.
+        # Its pointless to do this unless $self is in storage anyway
         unless($related_model) {
-          debug 2, "Trying to find $related in DB with key $key";
-          $related_model = $self->find_related($related, \%matching, +{key=>$key});
+          debug 2, "Trying to find $related in DB with key $key (SKIPPING)";
+          #$related_model = $self->find_related($related, \%matching, +{key=>$key}) if $self->in_storage;
           if($related_model) {
             debug 2, "found related model for $related with $key in DB";
-            %keys_used_to_find = %matching;
+            %keys_used_to_find = (%keys_used_to_find, %matching);
             last SEARCH_UNIQUE_KEYS
           }
         }
       }
 
-      # Ok so if we get here and there's no $related model that means the user did not give us
-      # enough info in $param_rows to find it either in the cache or in the DB (they didn't give us
-      # any uniques or PKs. But its now impossible they gave us enough info to find the row anyway.
-      # Sometimes you can find it if they gave you a relationship that was identifying or some combo
-      # of a relationship and when $self is in storage and has a PK that is FK to $related and part of
-      # a unique key.  Mostly we see this in m2m bridge style relationships.  For now we have this hack
+      # If we get here its possible there's a single type relation we can use to complete 
+      # the lookup.  TODO: Not sure if this should be a param setting in the nested_for data 
+      # (it probably should be).  Also not sure if we should limit the ->find_related to 
+      # just the FK rel.
 
-      debug 2, "Falling back to default find_related for $related using full param_row";
-      $related_model = $self->find_related($related, $param_row) unless $related_model || !%{$param_row};
+      if(grep {$param_row->{$_}} @single_rels) {
+        debug 2, "Falling back to default find_related for $related using full param_row";
+        $related_model = $self->find_related($related, $param_row) unless $related_model || !%{$param_row};
+      }
 
       # OK so we didnt find it via keys either in the cache or in the DB so that means
       # we need to just create it.
@@ -600,6 +714,16 @@ sub set_multi_related_from_params {
         $related_model = $self->new_related($related, +{});
       }
       debug 2, "About to set_from_params_recursively for @{[ ref $related_model ]}";
+
+      if($was_add) {
+        debug 3, "Since @{[ ref $related_model]} was an _add we won't validate since its empty";
+        $related_model->skip_validate;
+        $related_model->{__valiant_donot_insert} = 1;
+      }
+
+      if($allow_destroy) {
+          $related_model->{__valiant_allow_destroy} = 1;
+      }
       
       # Don't set params for the found keys (waste of time, no change)
       my %params_for_recursive = %$param_row;
@@ -607,10 +731,19 @@ sub set_multi_related_from_params {
       $related_model->set_from_params_recursively(%params_for_recursive);
 
       # Ok, so after set_from_params_recursively if the $related_model is not in storage
-      # we 'might' have enough info to actually load it.
-      if(!$related_model->in_storage) {
-        my $copy = $related_model->get_from_storage(); # If we now have the full PK we can find it
-        $related_model = $copy if $copy;
+      # we 'might' have enough info to actually load it now.
+      if(!$related_model->in_storage && !$related_model->is_marked_for_deletion) {
+        # TODO: We should skip this if we've already tried a full PK
+        my %ident = %{ $related_model->_storage_ident_condition ||+{} };
+        my $fully_id = 1;
+        foreach my $ident(keys %ident) {
+          next if defined($related_model->get_column($ident)); # can't try to load from DB if the PK isn't fully found
+          $fully_id = 0;
+        }
+        if($fully_id) {
+          my $copy = $related_model->get_from_storage(); # If we now have the full PK we can find it
+          $related_model = $copy if $copy;
+        }
       }
     } else {
       die "Not sure what to do with $param_row";
@@ -641,13 +774,14 @@ sub set_multi_related_from_params {
     # Only mark for deletion if its actually in store.
     if($current->in_storage) {
       debug 2, "Marking $current for deletion";
+      $current->{__valiant_allow_destroy} = 1 if $allow_destroy;
       $current->mark_for_deletion;
 
       # Mark its children as pruned, recursively
       my $cb; $cb = sub {
         my $row = shift;
-        debug 3, "marking $row to be pruned";
-        $row->{__valiant_is_pruned} = 1;
+        debug 3, "marking $row to be pruned" unless $row->is_marked_for_deletion;
+        $row->{__valiant_is_pruned} = 1; # unless $row->is_marked_for_deletion;
         my @related = keys %{$row->{_relationship_data}||+{}};
         # TODO only do this for has_one, might_have, has_many
         debug 3, "$row has related data to prune @{[ join ',', @related ]}";
@@ -660,14 +794,8 @@ sub set_multi_related_from_params {
           }
         }
       };
-      $cb->($current);
+      $cb->($current) if $current->is_marked_for_deletion; # We check because 'mark_for_deletion' will skip unless 'allow_destroy' is set
     }
-
-    ## TODO to solve the 'is in a deleted branch' issue either when we mark for deletion
-    # we immediately recursively look into its related caches and mark all children as 'in a deleted branch
-    # OR we have the code 'is_in_deleted_branch' follow up all belongs to rels looking for 'marked_for_deletion
-    # OR we have some sort of index/map (not sure how tod this)
-    # Option one at first look seems the least painful / most performant
 
     push @related_models, $current if $current->in_storage; # don't preserve unsaved previous
   }
@@ -681,6 +809,8 @@ sub set_multi_related_from_params {
 
 sub set_single_related_from_params {
   my ($self, $related, $params) = @_;
+  my %nested = $self->result_class->accept_nested_for;
+  my $allow_destroy = $nested{allow_destroy};
 
   # Is there an existing related object in the cache?  If so then we
   # will merge params with existing rather than create a new one or
@@ -696,6 +826,7 @@ sub set_single_related_from_params {
     ## TODO this is probably wrong if $params has different FKs or unique fields
 
     debug 2, "Found cached related_result $related for @{[ ref $self ]} ";
+    $related_result->{__valiant_allow_destroy} = 1 if $allow_destroy;
     $related_result->set_from_params_recursively(%$params);
   } else {
     debug 2, "No cached related_result $related for @{[ ref $self ]} ";
@@ -710,8 +841,28 @@ sub set_single_related_from_params {
       # rel with a new one (find_or_new).
 
       if($self->in_storage) {
-        debug 2, "Updating related result '$related' for @{[ ref $self ]} ";
         my %local_params = %$params;
+        my %cond = %{$self->result_source->relationship_info($related)->{cond}};
+        my @pks = $self->result_source->primary_columns;
+        foreach my $fk_proto (keys %cond) {
+          my $pk_proto = $cond{$fk_proto};
+          my ($pk) = ($pk_proto=~m/^self\.(.+)$/); 
+          my ($fk) = ($fk_proto=~m/^foreign\.(.+)$/);
+          next unless grep { $_ eq $pk } @pks;;
+
+          if(exists $local_params{$fk}) {
+            unless($local_params{$fk} eq $self->get_column($pk)) {
+              DBIx::Class::Valiant::Util::Exception::BadParameterFK->throw(
+                fk_field=>$fk, fk_value=>$local_params{$fk}, 
+                pk_field=>$pk, pk_value=>$self->get_column($pk), 
+                related=>$related, me=>$self);
+            }
+          } else {
+            #$local_params{$fk} = $self->get_column($pk); # set it since that should help with the lookups
+          }
+        }
+
+        debug 2, "Updating related result '$related' for @{[ ref $self ]} ";
         my %pk = map { $_ => delete $local_params{$_} }
           grep { exists $local_params{$_} }
           $self->related_resultset($related)->result_source->primary_columns;
@@ -720,15 +871,17 @@ sub set_single_related_from_params {
         # also apply any updates to that record as indicated.
         if(%pk) {
           debug 3, "Updating with exact record matching pk";
+
           $related_result = $self->result_source->related_source($related)->resultset->find($params); ## TODO shouldnt this be \%pk??
+          $related_result = $self->result_source->related_source($related)->resultset->find(\%pk); ## TODO shouldnt this be \%pk??
+
           $self->set_from_related($related, $related_result);
 
           #my $rev_data = $self->result_source->reverse_relationship_info($related);
           #my ($reverse_related) = keys %$rev_data;
           #$related_result->set_from_related($reverse_related, $self) if $reverse_related; # Don't have this for might_have
-
+          $related_result->{__valiant_allow_destroy} = 1 if $allow_destroy;
           $related_result->set_from_params_recursively(%$params);
-
         } else {
           debug 3, "Updating with record from params (no matching PK)";
 
@@ -740,7 +893,9 @@ sub set_single_related_from_params {
             debug 3, 'update_only true';
             $related_result = $self->related_resultset($related)->single;
             unless($related_result) {
-              $related_result = $self->find_or_new_related($related, $params); # TODO should find from any unique keys only
+              #$related_result = $self->find_or_new_related($related, $params); # TODO should find from any unique keys on
+              # If one doesn't already exist that means 'make a new one'
+              $related_result = $self->new_related($related, $params);
             }
           } else {
             debug 3, "update_only false for rel $related on @{[ $self]}";
@@ -775,6 +930,7 @@ sub set_single_related_from_params {
             # my ($key) = keys(%$rev_data);
             #$related_result->set_from_related($key, $self) if $key; # Don't have this for might_hav
           }
+          $related_result->{__valiant_allow_destroy} = 1 if $allow_destroy;
           $related_result->set_from_params_recursively(%$params);
         }
       } else {
@@ -784,8 +940,25 @@ sub set_single_related_from_params {
         # there's nothing in the DB to find.
         #$related_result = $self->find_or_new_related($related, $params);
         #$related_result->set_from_params_recursively(%$params);
-
         my %local_params = %$params;
+
+        my %cond = %{$self->result_source->relationship_info($related)->{cond}};
+        my @pks = $self->result_source->primary_columns;
+
+        my $flag = 0;
+        foreach my $fk_proto (keys %cond) {
+          my $pk_proto = $cond{$fk_proto};
+          my ($pk) = ($pk_proto=~m/^self\.(.+)$/); 
+          my ($fk) = ($fk_proto=~m/^foreign\.(.+)$/);
+          next unless grep { $_ eq $pk } @pks; 
+          next unless exists $local_params{$fk};
+          $flag++ if defined($local_params{$fk});
+        }
+
+        if($flag == scalar(@pks)) {
+          DBIx::Class::Valiant::Util::Exception::BadParameters->throw(related=>$related, me=>$self);
+        }
+
         my %pk = map { $_ => delete $local_params{$_} }
           grep { exists $local_params{$_} }
           $self->related_resultset($related)->result_source->primary_columns;
@@ -796,15 +969,34 @@ sub set_single_related_from_params {
           debug 3, "setting with exact record matching pk %pk";
           $related_result = $self->result_source->related_source($related)->resultset->find(\%pk);
           #   $self->set_from_related($related, $related_result);
+          $related_result->{__valiant_allow_destroy} = 1 if $allow_destroy;
           $related_result->set_from_params_recursively(%$params);
         } else {
-          debug 3, "finding with params matching";
-          $related_result = $self->result_source->related_source($related)->resultset->find($params);  # TODO problably shoulld search on unique keys only
+          debug 3, "No PK for $related, lets see if there's other ways to find it";
+          if($nested{$related}{find_with_uniques}) {
+            debug 3, "finding $related for $self with find_with_uniques matching";
+            my %uniques = $self->result_source->related_source($related)->unique_constraints;
+            foreach my $unique (keys %uniques) {
+              next if $unique eq 'primary'; # already done
+              my @key_columns = @{$uniques{$unique}};
+              my %matching = map { $_ => $params->{$_} } grep { exists $params->{$_} } @key_columns;
+
+              next unless scalar(@key_columns) == scalar(keys(%matching)); # only match when its a full key match
+              debug 2, "key $unique exists in params";
+              $related_result = $self->result_source->related_source($related)->resultset->find(\%matching);
+              if($related_result) {
+                debug 3, "Found result via unique keys";
+                last;  
+              }
+            }
+          }
+
           unless($related_result) {
             debug 3, "Did not find result for $related so creating new result";
             $related_result = $self->new_related($related, $params);
           }
           $self->set_from_related($related, $related_result) unless $self->in_storage;
+          $related_result->{__valiant_allow_destroy} = 1 if $allow_destroy;
           $related_result->set_from_params_recursively(%$params);
         }
       }
@@ -1028,6 +1220,11 @@ greater than the scalar.
 For C<has_one> or C<might_have> relationships will force update the existing nested result (if
 any exists) even if you fail to set the primary key.  Otherwise the current record will be
 deleted and a new one inserted.  Default is false.
+
+=item find_with_uniques
+
+Generally we only try to find a matching row in the DB if a primary key is given.   If you set 
+this to true then we also try to match using and unique keys establish for the related row.
 
 =head1 METHODS
 

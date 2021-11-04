@@ -13,7 +13,7 @@ calls etc. This used to not be the case, see RT ticket 95385.
 =cut
 
 use strict;
-use Test::More "no_plan";
+use Test2::V0;
 
 use Test::Taint;
 taint_checking_ok();
@@ -62,3 +62,5 @@ taint(my $tainted_uri = "http://www.example.com/");
 $cert->set_extension(authorityInfoAccess => '@aia_section',
                      aia_section => {'caIssuers;URI' => $tainted_uri});
 pass("tainted extension");  # Used to simply crash as of version 0.19
+
+done_testing;

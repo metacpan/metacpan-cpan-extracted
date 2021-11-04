@@ -1,0 +1,32 @@
+Changes
+devel/create-event-misp.py
+etc/initialdata
+etc/MISP_Config.pm
+html/Callbacks/RTIR-Extension-MISP/Elements/Tabs/Privileged
+html/Callbacks/RTIR-Extension-MISP/RTIR/Incident/Display.html/ProcessArguments
+html/Callbacks/RTIR-Extension-MISP/RTIR/Incident/Display.html/RightColumnEnd
+html/Callbacks/RTIR-Extension-MISP/RTIR/Tools/ExternalFeeds.html/AfterFeedsList
+html/Callbacks/RTIR-Extension-MISP/RTIR/Tools/ExternalFeeds.html/DisplayFeedContent
+html/Helpers/MISPEventDetails
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/RTx/Runtime.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/YAML/Tiny.pm
+lib/RT/IR/ExternalFeeds_Vendor.pm
+lib/RTIR/Extension/MISP.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+patches/Add-callbacks-to-the-feed-listing-and-display-pages.patch
+README
+static/css/rtir-extension-misp.css
+SIGNATURE                                Public-key signature (added by MakeMaker)

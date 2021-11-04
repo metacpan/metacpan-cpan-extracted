@@ -11,7 +11,7 @@ $QueueObj->Load($Queue);
 
 my $errors_ref = RT::Extension::MandatoryOnTransition->CheckMandatoryFields(
     ARGSRef => $ARGSRef,
-    From    => "*",
+    From    => "__CREATE__",
     To      => $ARGSRef->{'Status'},
     Queue   => $QueueObj,
 );

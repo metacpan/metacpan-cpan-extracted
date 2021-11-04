@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ServiceCenterType;
-$Shipment::UPS::WSDL::TrackTypes::ServiceCenterType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::ServiceCenterType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Name
               Address
 
-              )
+            )
         ],
         {   'Type'    => \%Type_of,
             'Name'    => \%Name_of,
@@ -67,7 +67,7 @@ Shipment::UPS::WSDL::TrackTypes::ServiceCenterType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

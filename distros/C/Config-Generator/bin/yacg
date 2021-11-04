@@ -34,7 +34,7 @@ use Config::Generator::Schema qw(/validate/);
 # constants
 #
 
-use constant VERSION => "1.0";
+use constant VERSION => "1.1";
 use constant REVISION =>
     sprintf("%d.%02d", q$Revision: 1.38 $ =~ /(\d+)\.(\d+)/);
 

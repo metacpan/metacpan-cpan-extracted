@@ -50,7 +50,7 @@ sub reform_imagerepr_to_this {
 	my ($self, $repr) = @_;
 
 	for (my $i = 0; $i < $repr->{width} * $repr->{height}; $i++) {
-		$self->{energystream}->edit(${$repr}->{points}[$i]->{rgba}, $i);
+		$self->{energystream}->edit($i, ${$repr}->{points}[$i]->{rgba});
 	}
 
 	### FIXME read something into the bytestream	

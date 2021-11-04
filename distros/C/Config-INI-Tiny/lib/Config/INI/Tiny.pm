@@ -3,7 +3,7 @@ use Carp ();
 
 package Config::INI::Tiny;
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 sub new { my $class = shift; bless { section0 => '', line0 => 0, pairs => 0, @_ }, $class }
 
@@ -160,9 +160,9 @@ The name of the property cannot be empty, but the value can.
 =head2 Emulating L<Config::Tiny::Ordered>
 
  my $config;
- for ( Config::INI::Tiny->new( section0 => '_', pairs => 1 )->parse( $content ) ) {
-     my $section = shift @$_;
-     push @{ $config->{ $section } }, map +{ key => $_->[0], value => $_->[1] }, @$_;
+ for my $s_kv ( Config::INI::Tiny->new( section0 => '_', pairs => 1 )->parse( $content ) ) {
+     my $section_name = shift @$s_kv;
+     push @{ $config->{ $section_name } }, map +{ key => $_->[0], value => $_->[1] }, @$s_kv;
  };
 
 The resulting data structure is a hash of arrays instead of the hash of hashes
@@ -172,10 +172,13 @@ where each pair is represented by a hash with two keys named C<key> and C<value>
 
 =head2 Multi-value (and order-preserving) properties
 
+ use Hash::MultiValue;
+ 
  my $config;
- for ( Config::INI::Tiny->new->parse( $content ) ) {
-     my $section = $config->{ shift @$_ } ||= Hash::MultiValue->new;
-     $section->merge_flat( @$_ );
+ for my $s_kv ( Config::INI::Tiny->new->parse( $content ) ) {
+     my $section_name = shift @$s_kv;
+     my $section = $config->{ $section_name } ||= Hash::MultiValue->new;
+     $section->merge_flat( @$s_kv );
  }
 
 Consider the following configuration:
@@ -184,7 +187,7 @@ Consider the following configuration:
  ip = 192.168.0.17
  ip = 10.0.1.253
 
-When using L</read_config>, this would simply store C<10.0.1.253> as the IP for
+When using L</to_hash>, this would simply store C<10.0.1.253> as the IP for
 C<eth0>, with the C<192.168.0.17> value irretrievably lost. L<Hash::MultiValue>
 defaults to the same behaviour, but optionally allows you to still retrieve all
 other values:
@@ -195,17 +198,17 @@ other values:
 
 =head2 Flexibly nestable sections and properties
 
- sub hash_path_ref (%;@) {
+ sub hash_path_ref (\%;@) {
      my $hash = shift;
      $hash = $hash->{ $_ } ||= {} for @_[ -@_ .. -2 ];
      \$hash->{ $_[-1] };
  }
  
  my $config = {};
- for ( Config::INI::Tiny->new( pairs => 1 )->parse( $content ) ) {
-     my ( $section_name, @kv ) = @$_;
+ for my $s_kv ( Config::INI::Tiny->new( pairs => 1 )->parse( $content ) ) {
+     my $section_name = shift @$s_kv;
      my $section = ${ hash_path_ref %$config, split ' ', $section_name } ||= {};
-     ${ hash_path_ref %$section, split ' ', $_->[0] } = $_->[1] for @kv;
+     ${ hash_path_ref %$section, split ' ', $_->[0] } = $_->[1] for @$s_kv;
  }
 
 This interprets spaces in section and property names as path separators,

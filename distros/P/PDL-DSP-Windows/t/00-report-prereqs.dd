@@ -17,8 +17,6 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'PDL' => '0',
-                                      'Variable::Magic' => '0',
-                                      'namespace::clean' => '0',
                                       'perl' => '5.010'
                                     }
                     },

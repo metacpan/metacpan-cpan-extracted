@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::PackageServiceOptionsType;
-$Shipment::UPS::WSDL::RateTypes::PackageServiceOptionsType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::PackageServiceOptionsType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Class::Std::initialize();
               DeclaredValue
               VerbalConfirmationIndicator
 
-              )
+            )
         ],
         {   'DeliveryConfirmation'        => \%DeliveryConfirmation_of,
             'COD'                         => \%COD_of,
@@ -43,7 +43,7 @@ Class::Std::initialize();
         },
         {   'DeliveryConfirmation' =>
               'Shipment::UPS::WSDL::RateTypes::DeliveryConfirmationType',
-            'COD' => 'Shipment::UPS::WSDL::RateTypes::CODType',
+            'COD'           => 'Shipment::UPS::WSDL::RateTypes::CODType',
             'DeclaredValue' =>
               'Shipment::UPS::WSDL::RateTypes::InsuredValueType',
             'VerbalConfirmationIndicator' =>
@@ -75,7 +75,7 @@ Shipment::UPS::WSDL::RateTypes::PackageServiceOptionsType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

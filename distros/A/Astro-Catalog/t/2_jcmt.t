@@ -10,158 +10,159 @@ use strict;
 use warnings;
 use Test::More tests => 1772;
 
-require_ok( 'Astro::Catalog::Star' );
-require_ok( 'Astro::Catalog' );
+require_ok('Astro::Catalog::Item');
+require_ok('Astro::Catalog');
 
 # Create a new catalogue from the DATA handle
-my $cat = new Astro::Catalog(Format => 'JCMT', Data => \*DATA );
+my $cat = new Astro::Catalog(Format => 'JCMT', Data => \*DATA);
 
-isa_ok( $cat, "Astro::Catalog");
+isa_ok($cat, "Astro::Catalog");
 
 my $total = 353;
-is( $cat->sizeof, $total, "count number of sources [inc planets]");
+is($cat->sizeof, $total, "count number of sources [inc planets]");
 
-# check that we are using Astro::Coords and Astro::Catalog::Star
+# check that we are using Astro::Coords and Astro::Catalog::Item
 
-isa_ok( $cat->allstars->[0], "Astro::Catalog::Star");
-isa_ok( $cat->allstars->[0]->coords, "Astro::Coords");
+isa_ok($cat->allstars->[0], "Astro::Catalog::Item");
+isa_ok($cat->allstars->[0]->coords, "Astro::Coords");
 
 # The remaining tests actually test the catalog filtering
 # search by substring
 my @results = $cat->filter_by_id("3C");
-is( scalar(@results), 6, "search by ID - \"3C\"");
+is(scalar(@results), 6, "search by ID - \"3C\"");
 
 for (@results) {
-  print "# Name: " . $_->id . "\n";
+    print "# Name: " . $_->id . "\n";
 }
 
 # search by radius
-my $refcoords = new Astro::Coords( ra => "23:14:00",
-                                   dec => "61:27:00",
-                                   type => "J2000");
+my $refcoords = new Astro::Coords(
+        ra => "23:14:00",
+        dec => "61:27:00",
+        type => "J2000");
 
 # 10 arcmin
 $cat->reset_list;
-my $limit = Astro::Coords::Angle->new( 10.0, units => "arcmin" );
-@results = $cat->filter_by_distance( $limit->radians, $refcoords);
-is( scalar(@results), 4, "search by radius");
+my $limit = Astro::Coords::Angle->new(10.0, units => "arcmin");
+@results = $cat->filter_by_distance($limit->radians, $refcoords);
+is(scalar(@results), 4, "search by radius");
 
 # search for string
-@results = $cat->filter_by_id( qr/^N7538IRS1$/i );
-is( scalar(@results), 3, "search by full name");
+@results = $cat->filter_by_id(qr/^N7538IRS1$/i);
+is(scalar(@results), 3, "search by full name");
 
 # Check a specific velocity
 $cat->reset_list;
-my ($gl) = $cat->popstarbyid( "GL490" );
-is( $gl->coords->rv(), -12.5,"GL490 velocity");
+my ($gl) = $cat->popstarbyid("GL490");
+is($gl->coords->rv(), -12.5,"GL490 velocity");
 
 # Check to see if line velocity range is defined.
 my $misc = $gl->misc;
-ok( ! defined( $misc->{'velocity_range'} ), "GL490 line velocity range");
+ok(! defined($misc->{'velocity_range'}), "GL490 line velocity range");
 
 # Retrieve an object whose velocity range is defined.
 $cat->reset_list;
-my ($gl2477) = $cat->popstarbyid( "GL2477" );
+my ($gl2477) = $cat->popstarbyid("GL2477");
 
-is( $gl2477->misc->{'velocity_range'}, '50.0', "GL2477 line velocity range" );
+is($gl2477->misc->{'velocity_range'}, '50.0', "GL2477 line velocity range");
 
 # search for coords
 $cat->reset_list;
-@results = $cat->filter_by_cb( sub { substr($_[0]->ra,0,8) eq "02 22 39" });
-is( scalar(@results), 1, "search by exact ra match");
-
-#use Data::Dumper;
-#print Dumper(@results);
+@results = $cat->filter_by_cb(sub {substr($_[0]->ra,0,8) eq "02 22 39"});
+is(scalar(@results), 1, "search by exact ra match");
 
 # Write catalog
 my $outcat = "catalog$$.dat";
 $cat->reset_list;
-$cat->write_catalog( Format => 'JCMT', File => "catalog$$.dat" );
-ok( -e $outcat, "Check catalog file was created");
+$cat->write_catalog(Format => 'JCMT', File => "catalog$$.dat");
+ok(-e $outcat, "Check catalog file was created");
 
 # re-read it for comparison
-my $cat3 = new Astro::Catalog( Format => 'JCMT', File => $outcat);
+my $cat3 = new Astro::Catalog(Format => 'JCMT', File => $outcat);
 
 # Because of duplicates, we first go through and create a hash indexed by ID
-my %hash1 = form_hash( $cat );
-my %hash2 = form_hash( $cat3 );
-is( scalar keys %hash2, scalar keys %hash1, "Compare count");
+my %hash1 = form_hash($cat);
+my %hash2 = form_hash($cat3);
+is(scalar keys %hash2, scalar keys %hash1, "Compare count");
 
 for my $id (keys %hash1) {
-  my $s1 = $hash1{$id};
-  my $s2 = $hash2{$id};
+    my $s1 = $hash1{$id};
+    my $s2 = $hash2{$id};
 
-  if (defined $s1 && defined $s2) {
-  SKIP: {
-    skip "HOLO source moves on the sky", 1 if ($id eq 'HOLO');
-    my $d = $s1->coords->distance( $s2->coords);
-    ok( $d->arcsec < 0.1, "Check coordinates $id");
-  }
-  SKIP: {
-      skip "Only Equatorial coordinates have velocity", 3
-        unless $s1->coords->type eq 'RADEC';
-      is( sprintf("%.1f",$s2->coords->rv), sprintf("%.1f",$s1->coords->rv), "Compare velocity");
-      is( $s2->coords->vdefn, $s1->coords->vdefn, "Compare vel definition");
-      is( $s2->coords->vframe, $s1->coords->vframe, "Compare vel frame");
-
-      my $s1misc = $s1->misc;
-      my $s2misc = $s2->misc;
-      if( defined( $s1misc ) && defined( $s2misc ) ) {
-        if( defined( $s1misc->{'velocity_range'} ) && defined( $s2misc->{'velocity_range'} ) ) {
-          is( sprintf( "%.2f", $s1misc->{'velocity_range'} ), sprintf( "%.2f", $s2misc->{'velocity_range'} ), "Compare line velocity range" );
+    if (defined $s1 && defined $s2) {
+        SKIP: {
+            skip "HOLO source moves on the sky", 1 if ($id eq 'HOLO');
+            my $d = $s1->coords->distance($s2->coords);
+            ok($d->arcsec < 0.1, "Check coordinates $id");
         }
-        if( defined( $s1misc->{'flux850'} ) && defined( $s2misc->{'flux850'} ) ) {
-          is( sprintf( "%.2f", $s1misc->{'flux850'} ), sprintf( "%.2f", $s2misc->{'flux850'} ), "Compare 850-micron flux" );
+        SKIP: {
+            skip "Only Equatorial coordinates have velocity", 3
+                unless $s1->coords->type eq 'RADEC';
+            is(sprintf("%.1f", $s2->coords->rv), sprintf("%.1f", $s1->coords->rv), "Compare velocity");
+            is($s2->coords->vdefn, $s1->coords->vdefn, "Compare vel definition");
+            is($s2->coords->vframe, $s1->coords->vframe, "Compare vel frame");
+
+            my $s1misc = $s1->misc;
+            my $s2misc = $s2->misc;
+            if (defined($s1misc) && defined($s2misc)) {
+                if (defined($s1misc->{'velocity_range'}) && defined($s2misc->{'velocity_range'})) {
+                    is(sprintf( "%.2f", $s1misc->{'velocity_range'} ), sprintf( "%.2f", $s2misc->{'velocity_range'} ), "Compare line velocity range");
+                }
+                if (defined($s1misc->{'flux850'}) && defined($s2misc->{'flux850'})) {
+                    is(sprintf( "%.2f", $s1misc->{'flux850'} ), sprintf( "%.2f", $s2misc->{'flux850'} ), "Compare 850-micron flux");
+                }
+            }
         }
-      }
     }
-  } else {
-    # one of them is not defined
-    if (!defined $s1 && !defined $s2) {
-      ok( 0, "ID $id exists in neither catalog");
-    } elsif (!defined $s1) {
-      ok( 0, "ID $id does not exist in original catalog");
-    } else {
-      ok( 0, "ID $id does not exist in new catalog");
+    else {
+        # one of them is not defined
+        if (!defined $s1 && !defined $s2) {
+            ok(0, "ID $id exists in neither catalog");
+        }
+        elsif (!defined $s1) {
+            ok(0, "ID $id does not exist in original catalog");
+        }
+        else {
+            ok(0, "ID $id does not exist in new catalog");
+        }
+
+        SKIP: {
+            skip "One of the coordinates is not defined", 3;
+        }
     }
-
-  SKIP: {
-      skip "One of the coordinates is not defined", 3;
-    }
-
-  }
-
 }
 
 # and remove it
 unlink $outcat;
 
 # Test object constructor fails (should be in Astro::Catalog tests)
-eval { my $cat2 = new Astro::Catalog( Format => 'JCMT', Data => { } ); };
-ok( $@, "Explicit object constructor failure - hash ref");
+eval {my $cat2 = new Astro::Catalog(Format => 'JCMT', Data => {});};
+ok($@, "Explicit object constructor failure - hash ref");
 
 exit;
 
-# my %hash = form_hash( $cat );
+# my %hash = form_hash($cat);
 sub form_hash {
-  my $cat = shift;
+    my $cat = shift;
 
-  my %hash;
-  for my $s ($cat->allstars) {
-    my $id = $s->id;
-    if (exists $hash{$id}) {
-      my $c1 = $s->coords;
-      my $c2 = $hash{$id}->coords;
-      if ($c1->distance( $c2 ) == 0) {
-        # fine. The same coordinate
-      } else {
-        warn "ID matches $id but coords differ\n";
-      }
-    } else {
-      $hash{$id} = $s;
+    my %hash;
+    for my $s ($cat->allstars) {
+        my $id = $s->id;
+        if (exists $hash{$id}) {
+            my $c1 = $s->coords;
+            my $c2 = $hash{$id}->coords;
+            if ($c1->distance($c2) == 0) {
+                # fine. The same coordinate
+            }
+            else {
+                warn "ID matches $id but coords differ\n";
+            }
+        }
+        else {
+            $hash{$id} = $s;
+        }
     }
-  }
-  return %hash;
+    return %hash;
 }
 
 __DATA__

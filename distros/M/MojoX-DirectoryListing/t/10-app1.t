@@ -4,6 +4,7 @@ use MojoX::DirectoryListing;
 use strict;
 use warnings;
 use Data::Dumper; $Data::Dumper::Sortkeys=$Data::Dumper::Indent=1;
+use lib '.';
 
 sub can_test_forbidden {
     $< != 0 && $^O ne 'MSWin32' && $^O ne 'cygwin';

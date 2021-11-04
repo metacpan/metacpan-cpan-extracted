@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CommercialInvoice;
-$Shipment::FedEx::WSDL::ShipTypes::CommercialInvoice::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CommercialInvoice::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ Class::Std::initialize();
               OriginatorName
               TermsOfSale
 
-              )
+            )
         ],
         {   'Comments'                   => \%Comments_of,
             'FreightCharge'              => \%FreightCharge_of,
@@ -68,19 +68,19 @@ Class::Std::initialize();
             'FreightCharge' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
             'TaxesOrMiscellaneousCharge' =>
               'Shipment::FedEx::WSDL::ShipTypes::Money',
-            'PackingCosts'  => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-            'HandlingCosts' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'PackingCosts'        => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'HandlingCosts'       => 'Shipment::FedEx::WSDL::ShipTypes::Money',
             'SpecialInstructions' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'DeclarationStatment' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'PaymentTerms' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Purpose' =>
+            'Purpose'      =>
               'Shipment::FedEx::WSDL::ShipTypes::PurposeOfShipmentType',
             'CustomerInvoiceNumber' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'OriginatorName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TermsOfSale' =>
+            'TermsOfSale'    =>
               'Shipment::FedEx::WSDL::ShipTypes::TermsOfSaleType',
         },
         {
@@ -117,7 +117,7 @@ Shipment::FedEx::WSDL::ShipTypes::CommercialInvoice
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

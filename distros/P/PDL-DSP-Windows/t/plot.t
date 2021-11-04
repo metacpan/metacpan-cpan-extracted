@@ -3,9 +3,19 @@ use Test::More;
 use strict;
 use warnings;
 
-unless ( eval { require PDL::Graphics::Gnuplot; 1 } ) {
-    plan skip_all => 'Need PDL::Graphics::Gnuplot to run plot tests';
+my $skip;
+if ( eval { require PDL::Graphics::Gnuplot } ) {
+    unless ( grep /^svg$/, @Alien::Gnuplot::terms ) {
+        diag 'No supported gnuplot terminal. Available terminals are:';
+        diag "* $_" for @Alien::Gnuplot::terms;
+        $skip = 1;
+    }
 }
+else {
+    $skip = 1;
+}
+
+plan skip_all => 'Need PDL::Graphics::Gnuplot with svg support to run plot tests' if $skip;
 
 use PDL::DSP::Windows;
 use File::Temp;
@@ -23,7 +33,7 @@ sub do_test {
 
     my $sub = PDL::Graphics::Gnuplot->can('plot');
     local *{'PDL::Graphics::Gnuplot::plot'} = sub {
-        $sub->( @_, { device => $temp->filename . '/latex' } );
+        $sub->( @_, { device => $temp->filename . '/svg' } );
     };
 
     $win->$method($args);

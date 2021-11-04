@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ShipmentEstimate;
-$Shipment::Purolator::WSDL::Types::ShipmentEstimate::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ShipmentEstimate::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -43,7 +43,7 @@ Class::Std::initialize();
               OptionPrices
               TotalPrice
 
-              )
+            )
         ],
         {   'ServiceID'            => \%ServiceID_of,
             'ShipmentDate'         => \%ShipmentDate_of,
@@ -60,10 +60,10 @@ Class::Std::initialize();
             'ExpectedDeliveryDate' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'EstimatedTransitDays' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-            'BasePrice' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+            'BasePrice'  => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
             'Surcharges' =>
               'Shipment::Purolator::WSDL::Types::ArrayOfSurcharge',
-            'Taxes' => 'Shipment::Purolator::WSDL::Types::ArrayOfTax',
+            'Taxes'        => 'Shipment::Purolator::WSDL::Types::ArrayOfTax',
             'OptionPrices' =>
               'Shipment::Purolator::WSDL::Types::ArrayOfOptionPrice',
             'TotalPrice' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
@@ -99,7 +99,7 @@ Shipment::Purolator::WSDL::Types::ShipmentEstimate
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

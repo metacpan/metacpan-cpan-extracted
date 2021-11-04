@@ -1,7 +1,7 @@
 # $Id: $
 #
 package CHI::Test;
-$CHI::Test::VERSION = '0.60';
+$CHI::Test::VERSION = '0.61';
 use Log::Any::Test;    # as early as possible
 use List::MoreUtils qw(uniq);
 use Module::Runtime qw(require_module);

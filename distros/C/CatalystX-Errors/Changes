@@ -12,3 +12,13 @@ The following logs changes for the CPAN distribution Valiant
 
 0.001004  2021-03-06
           - update dependencies
+
+0.001005  2021-10-15
+          - Change exception class to do the expected Catalyst Interface
+          - Added a few more allowed error type statuses
+          - Some additional logging
+          - breaking change: changed the default HTML template name to 'http_error'
+          - breaking change: changed all instances of 'meta' to 'info' (better Moose compatibility).
+
+0.001006 2021-10-15
+          - Tweaked the exception class so it plays nicer with subclassers

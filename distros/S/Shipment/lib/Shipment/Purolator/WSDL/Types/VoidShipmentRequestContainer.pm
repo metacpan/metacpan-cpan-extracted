@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::VoidShipmentRequestContainer;
-$Shipment::Purolator::WSDL::Types::VoidShipmentRequestContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::VoidShipmentRequestContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        PIN
 
-              )
+            )
         ],
         {'PIN' => \%PIN_of,},
         {'PIN' => 'Shipment::Purolator::WSDL::Types::PIN',},
@@ -58,7 +58,7 @@ Shipment::Purolator::WSDL::Types::VoidShipmentRequestContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

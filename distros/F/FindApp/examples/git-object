@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use v5.10;
+use strict;
+use warnings;
+
+require FindApp::Git;
+
+my $ob = new FindApp::Git(
+   add_rootdir_wanted  => [ qw( t/ conf/ ) ],
+   add_libdirs_wanted  => [ qw( PDQ::Bach CPE::Bach ) ],
+);
+
+$ob->export_git_dir(1);
+$ob->prefer_dot(1);
+
+print $ob;

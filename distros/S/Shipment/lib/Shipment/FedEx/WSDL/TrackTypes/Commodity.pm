@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::Commodity;
-$Shipment::FedEx::WSDL::TrackTypes::Commodity::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::Commodity::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -62,7 +62,7 @@ Class::Std::initialize();
               PartNumber
               NaftaDetail
 
-              )
+            )
         ],
         {   'CommodityId'                 => \%CommodityId_of,
             'Name'                        => \%Name_of,
@@ -83,8 +83,8 @@ Class::Std::initialize();
             'PartNumber'                  => \%PartNumber_of,
             'NaftaDetail'                 => \%NaftaDetail_of,
         },
-        {   'CommodityId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Name'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'CommodityId'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Name'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'NumberOfPieces' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
@@ -96,8 +96,8 @@ Class::Std::initialize();
             'QuantityUnits'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'AdditionalMeasures' =>
               'Shipment::FedEx::WSDL::TrackTypes::Measure',
-            'UnitPrice'    => 'Shipment::FedEx::WSDL::TrackTypes::Money',
-            'CustomsValue' => 'Shipment::FedEx::WSDL::TrackTypes::Money',
+            'UnitPrice'        => 'Shipment::FedEx::WSDL::TrackTypes::Money',
+            'CustomsValue'     => 'Shipment::FedEx::WSDL::TrackTypes::Money',
             'ExciseConditions' =>
               'Shipment::FedEx::WSDL::TrackTypes::EdtExciseCondition',
             'ExportLicenseNumber' =>
@@ -106,7 +106,7 @@ Class::Std::initialize();
               'SOAP::WSDL::XSD::Typelib::Builtin::date',
             'CIMarksAndNumbers' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'PartNumber'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NaftaDetail' =>
+            'NaftaDetail'       =>
               'Shipment::FedEx::WSDL::TrackTypes::NaftaCommodityDetail',
         },
         {
@@ -149,7 +149,7 @@ Shipment::FedEx::WSDL::TrackTypes::Commodity
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

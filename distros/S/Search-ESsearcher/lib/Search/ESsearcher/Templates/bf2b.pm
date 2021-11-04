@@ -10,11 +10,11 @@ Search::ESsearcher::Templates::sfail2ban - Provicdes support for fail2ban logs s
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 LOGSTASH
 
@@ -37,9 +37,6 @@ This uses a logstash configuration like below.
                 }
                 geoip {
                         source => "clientip"
-                }
-                mutate {
-                        convert => [ "[geoip][coordinates]", "float" ]
                 }
         }
     }

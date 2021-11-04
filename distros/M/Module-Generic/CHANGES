@@ -1,7 +1,52 @@
 Revision history for Perl module Module::Generic
 
+v0.16.4 2021-10-22T15:51:20+0900
+    - Correcting an oversight in Module::Generic (module Devel::Confess was required for debugging but not removed later)
+
+v0.16.3 2021-10-21T12:17:58+0900
+    - Improved mmap method in Module::Generif::File
+
+v0.16.2 2021-10-15T16:10:14+0900
+    - Improved mmap method in Module::Generif::File
+
+v0.16.1 2021-10-12T22:46:58+0900
+    - Added methods blocking, eof, fcntl, fdopen, flush, format_write, getc, getline, getlines, ioctl, printflush, sync, sysread, sysseek, syswrite, ungetc and content_objects in Module::Generic::File
+    - Corrected test units for Module::Generif::File
+
+v0.16.0 2021-10-11T13:51:57+0900
+    - Tuned _set_get_datetime method to only set a default DateTime formatter when none were already set yet
+    - Added support method _set_get_uuid to store universal unique identifier with data validation
+    - Added method as_json in Module::Generic::Hash to return a json string representation of the hash object
+    - Added method _can in Module::Generic to quickly check if a given object has support for a given method
+    - Corrected an error check in Module::Generic::SharedMem for method lock()
+    - Added methods get_null in Module::Generic::Array to get a Module::Generic::Null object when offset value is undef
+    - Added methods second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth
+    - Made a slight adjustment in Module::Generic::Null so that the parameter value for 'wants' can be specified in lowercase and updated the documentation
+    - Added method _is_ip to check IPv4 and IPv6 syntax, including with CIDR notation in Module::Generic
+    - Added method _set_get_ip and _is_uuid to check syntax of UUID
+    - Improved Module::Generic::Dynamic
+    - Added method as_hash in Module::Generic::Hash to get the hash object as a regular hash reference
+    - Improved method _is_class_loaded to more simply check at the %INC rather than rely on external module
+    - Improved method _load_class to allow for passing semantics to import and provided an hash reference of options such as package version and caller's package to import the module into.
+    - Added missing TO_JSON method in Module::Generic::Exception and Module::Generic::Number
+    - Updated _set_get_uri in Module::Generic to initiate a URI object if value is available and not yet an object.
+    - Added method aliases lower and upper in Module::Generic::Scalar
+    - Added methods pack and unpack in Module::Generic::Scalar
+    - Added method pack in Module::Generic::Array
+    - Modified Module::Generic::Array new method to accept also a list of elements.
+    - Updated the method join in Module::Generic::Array to allow passing additional arguments on top of the current array object: $a->join( ',', $more_data );
+    - Updated method replace in Module::Generic::Scalar to return a special Module::Generic::RegexpCapture object
+    - Added method dump_hex() which uses Devel::Hexdump if it is installed
+    - Updated the method new() in Module::Generic so that a possible error be propagated to its calling object when called from object like my $new = $old->new || die( $old->error );
+    - Updated AUTOLOAD to pass $self as first argument if defined
+    - Updated _set_get_object_array in Module::Generic to allow any non-blessed value to be passed for object instantiation, instead of hash reference previously.
+    - Added the methods intersection, max, min in Module::Generic::Array
+    - Added a destruction mechanism in the END block in Module::Generic::File for file or directory set to be auto removed
+    - Updated method autoflush in Module::Generic::File to affect the underlying file handle with the value provided. Before, it was just storing the boolean value.
+    - Added methods mmap and unmap in Module::Generic::File to use file-based variable that can be shared across processes
+
 v0.15.8 2021-08-21T14:13:52+0900
-    - Corrected a overlooked warning in Module::Generic::Array->split
+    - Corrected an overlooked warning in Module::Generic::Array->split
 
 v0.15.7 2021-08-20T18:14:07+0900
     - Added support method _get_stack_trace in Module::Generic

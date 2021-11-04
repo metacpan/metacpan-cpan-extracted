@@ -1,6 +1,7 @@
 Revision history for Perl extension Chess-Plisco
 
-0.3  2021-09-29
+0.4  2021-10-12
+	- Faster engine start-up because macros are expanded for release
 	- EPD parser
 	- check for insufficient material
 	- detect draw by repetition
@@ -12,6 +13,7 @@ Revision history for Perl extension Chess-Plisco
 	- new command "fen"
 	- new command "evaluate"
 	- new command "see MOVE"
+	- use PeSTO evaluation function
 
 0.2  2021-09-21
 	- fixed exception in quiescence search

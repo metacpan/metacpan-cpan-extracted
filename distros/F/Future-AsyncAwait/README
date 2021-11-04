@@ -262,6 +262,14 @@ SUPPORTED USES
           }
        }
     
+       async sub wubble
+       {
+          # on perl 5.35.5 and above
+          foreach my ($k, $v) ( KVTHINGs ) {
+             await func();
+          }
+       }
+    
        async sub quux
        {
           my $x = do {

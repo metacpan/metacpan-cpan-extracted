@@ -1,0 +1,5 @@
+"valid\r\n folding1"@example.com
+"valid\r\n\tfolding2"@example.com
+"valid\r\n "@example.com
+"valid\r\n\t"@example.com
+"\r\n valid?"@example.com

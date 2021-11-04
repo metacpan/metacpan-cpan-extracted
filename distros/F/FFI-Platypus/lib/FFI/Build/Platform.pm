@@ -11,7 +11,7 @@ use File::Spec;
 use FFI::Platypus::ShareConfig;
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '1.55'; # VERSION
+our $VERSION = '1.56'; # VERSION
 
 
 sub new
@@ -155,6 +155,27 @@ sub cxx
 }
 
 
+sub cxxld
+{
+  my $self = _self(shift);
+
+  $DB::single = 1;
+
+  # This is definitely not exhaustive or complete or even
+  # particularlly good.  Patches welcome.
+
+  if($self->osname eq 'darwin')
+  {
+    my @cxx = @{ $self->cxx };
+    return [map { /^(cc|clang|gcc)$/ ? @cxx : $_ } @{ $self->ld }];
+  }
+  else
+  {
+    return $self->cxx;
+  }
+}
+
+
 sub for
 {
   my $self = _self(shift);
@@ -248,7 +269,7 @@ sub ldflags
   elsif($self->osname eq 'darwin')
   {
     # we want to build a .dylib instead of a .bundle
-    @ldflags = map { $_ eq '-bundle' ? '-shared' : $_ } @ldflags;
+    @ldflags = map { $_ eq '-bundle' ? '-dynamiclib' : $_ } @ldflags;
   }
   \@ldflags;
 }
@@ -395,6 +416,7 @@ sub diag
   push @diag, "osname            : ". _c($self->osname);
   push @diag, "cc                : ". _l($self->cc);
   push @diag, "cxx               : ". (eval { _l($self->cxx) } || '---' );
+  push @diag, "cxxld             : ". (eval { _l($self->cxxld) } || '---' );
   push @diag, "for               : ". (eval { _l($self->for) } || '---' );
   push @diag, "ld                : ". _l($self->ld);
   push @diag, "ccflags           : ". _l($self->ccflags);
@@ -421,7 +443,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 1.55
+version 1.56
 
 =head1 SYNOPSIS
 
@@ -497,6 +519,12 @@ The C pre-processor
  my @cxx = @{ $platform->cxx };
 
 The C++ compiler that naturally goes with the C compiler.
+
+=head2 cxxld
+
+ my @cxxld = @{ $platform->cxxld };
+
+The C++ linker that naturally goes with the C compiler.
 
 =head2 for
 

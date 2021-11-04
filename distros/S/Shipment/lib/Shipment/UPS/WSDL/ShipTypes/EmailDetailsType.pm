@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::EmailDetailsType;
-$Shipment::UPS::WSDL::ShipTypes::EmailDetailsType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::EmailDetailsType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               Subject
               SubjectCode
 
-              )
+            )
         ],
         {   'EMailAddress'              => \%EMailAddress_of,
             'UndeliverableEMailAddress' => \%UndeliverableEMailAddress_of,
@@ -87,7 +87,7 @@ Shipment::UPS::WSDL::ShipTypes::EmailDetailsType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

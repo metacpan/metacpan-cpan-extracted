@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Interfaces::EstimatingService::EstimatingServiceEndpoint;
-$Shipment::Purolator::WSDL::Interfaces::EstimatingService::EstimatingServiceEndpoint::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Interfaces::EstimatingService::EstimatingServiceEndpoint::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -47,7 +47,7 @@ sub GetQuickEstimate {
     die "GetQuickEstimate must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'GetQuickEstimate',
+        {   operation   => 'GetQuickEstimate',
             soap_action =>
               'http://purolator.com/pws/service/v1/GetQuickEstimate',
             style => 'document',
@@ -66,7 +66,7 @@ sub GetQuickEstimate {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -107,7 +107,7 @@ sub GetFullEstimate {
     die "GetFullEstimate must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'GetFullEstimate',
+        {   operation   => 'GetFullEstimate',
             soap_action =>
               'http://purolator.com/pws/service/v1/GetFullEstimate',
             style => 'document',
@@ -126,7 +126,7 @@ sub GetFullEstimate {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -202,7 +202,7 @@ Shipment::Purolator::WSDL::Interfaces::EstimatingService::EstimatingServiceEndpo
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

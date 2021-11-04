@@ -1,4 +1,4 @@
-package Netstack::Connector::Role;
+package Firewall::Connector::Role;
 
 #------------------------------------------------------------------------------
 # 加载扩展模块
@@ -9,9 +9,10 @@ use Try::Tiny;
 use Expect;
 use Moose::Role;
 use namespace::autoclean;
+use Mojo::Util qw/dumper/;
 
 #------------------------------------------------------------------------------
-# 继承 Netstack::Config::Connector::Role 必须实现的方法
+# 继承 Netstack::Connector::Role 必须实现的方法
 #------------------------------------------------------------------------------
 requires '_buildPrompt';
 requires '_buildCommands';
@@ -20,7 +21,7 @@ requires '_buildBufferCode';
 requires 'runCommands';
 
 #------------------------------------------------------------------------------
-# 定义设备联结 Netstack::Config::Connector::Role 方法属性
+# 定义设备联结 Netstack::Connector::Role 方法属性
 #------------------------------------------------------------------------------
 has exp => (
   is      => 'ro',
@@ -197,7 +198,7 @@ sub login {
 #------------------------------------------------------------------------------
 sub _spawn_command {
   my ( $self, $args ) = @_;
-  $args //= '';
+  $args //= '-o PreferredAuthentications=password';
   # 初始化变量
   my $command;
 
@@ -313,9 +314,19 @@ sub waitfor {
 
   # 初始化缓存代码
   my $codeARef = [];
-  my $mapping  = $self->bufferCode;
-  # 遍历字典
-  while ( my ( $wait, $action ) = each $mapping->%* ) {
+  my $mapping  = $self->bufferCode();
+
+  # 捕捉 more 交互式 code
+  push $codeARef->@*, [
+    $mapping->{more} => sub {
+      $buff .= $exp->before;
+      $exp->send(' ');
+      exp_continue;
+    }
+  ] if exists $mapping->{more};
+
+  # 遍历其他交互式字典映射
+  while ( my ( $wait, $action ) = each $mapping->{interact}->%* ) {
     push $codeARef->@*, [
       $wait => sub {
         $buff .= $exp->before . $exp->match;
@@ -408,7 +419,7 @@ sub execCommands {
   # 初始化 commands 属性
   $self->setCommands( \@commands );
   # 遍历接受到的命令行
-  while ( my $cmd = pop $self->commands->@* ) {
+  while ( my $cmd = shift $self->commands->@* ) {
     # 自动跳过空白行
     next if $cmd =~ /^\s*$/;
     # 执行具体的脚本

@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::Piece;
-$Shipment::Purolator::WSDL::Types::Piece::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::Piece::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Height
               Options
 
-              )
+            )
         ],
         {   'Weight'  => \%Weight_of,
             'Length'  => \%Length_of,
@@ -43,10 +43,10 @@ Class::Std::initialize();
             'Height'  => \%Height_of,
             'Options' => \%Options_of,
         },
-        {   'Weight' => 'Shipment::Purolator::WSDL::Types::Weight',
-            'Length' => 'Shipment::Purolator::WSDL::Types::Dimension',
-            'Width'  => 'Shipment::Purolator::WSDL::Types::Dimension',
-            'Height' => 'Shipment::Purolator::WSDL::Types::Dimension',
+        {   'Weight'  => 'Shipment::Purolator::WSDL::Types::Weight',
+            'Length'  => 'Shipment::Purolator::WSDL::Types::Dimension',
+            'Width'   => 'Shipment::Purolator::WSDL::Types::Dimension',
+            'Height'  => 'Shipment::Purolator::WSDL::Types::Dimension',
             'Options' =>
               'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
         },
@@ -77,7 +77,7 @@ Shipment::Purolator::WSDL::Types::Piece
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

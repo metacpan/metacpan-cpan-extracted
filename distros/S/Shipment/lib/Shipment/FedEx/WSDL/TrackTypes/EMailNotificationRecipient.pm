@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipient;
-$Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipient::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipient::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               Format
               Localization
 
-              )
+            )
         ],
         {   'EMailNotificationRecipientType' =>
               \%EMailNotificationRecipientType_of,
@@ -84,7 +84,7 @@ Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipient
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,8 @@ name(self)
     SV *self
   ALIAS:
     name  = 0
-    class = 1
+    sigil = 1
+    class = 2
   CODE:
   {
     SlotMeta *meta = NUM2PTR(SlotMeta *, SvUV(SvRV(self)));
@@ -13,6 +14,9 @@ name(self)
         RETVAL = SvREFCNT_inc(meta->name);
         break;
       case 1:
+        RETVAL = newSVpvn(SvPVX(meta->name), 1);
+        break;
+      case 2:
         RETVAL = newSV(0);
         sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
         break;
@@ -41,11 +45,13 @@ value(self, obj)
 
     if(classmeta->type == METATYPE_ROLE) {
       HV *objstash = SvSTASH(objrv);
+      const char *key = HvNAME(objstash);
       STRLEN klen = HvNAMELEN(objstash);
       if(HvNAMEUTF8(objstash))
         klen = -klen;
 
-      SV **svp = hv_fetch(classmeta->role.applied_classes, HvNAME(objstash), klen, 0);
+      assert(key);
+      SV **svp = hv_fetch(classmeta->role.applied_classes, key, klen, 0);
       if(!svp)
         croak("Cannot fetch role slot value from a non-applied instance");
 

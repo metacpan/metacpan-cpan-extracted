@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ValidateCityPostalCodeZipRequestContainer;
-$Shipment::Purolator::WSDLV2::Types::ValidateCityPostalCodeZipRequestContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::ValidateCityPostalCodeZipRequestContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        Addresses
 
-              )
+            )
         ],
         {'Addresses' => \%Addresses_of,},
         {   'Addresses' =>
@@ -60,7 +60,7 @@ Shipment::Purolator::WSDLV2::Types::ValidateCityPostalCodeZipRequestContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

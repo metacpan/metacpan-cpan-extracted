@@ -18,8 +18,9 @@ postfix dereferences will always be recognized. This is the default
 behaviour now.
 
 Starting with version 0.074_01, the first use of this argument warned.
-warn. With version 0.079_01, all uses will warn. With the first release
-after October 15 2021, all uses will become fatal.
+warn. With version 0.079_01, all uses will warn. With version 0.080_01,
+all uses will become fatal. With the first release on or after April 15
+2022 all mention of this argument will be removed.
 
 =head1 INHERITANCE
 
@@ -197,7 +198,7 @@ use PPIx::Regexp::Util qw{
 use Scalar::Util qw{ refaddr };
 use Text::Tabs ();
 
-our $VERSION = '0.080';
+our $VERSION = '0.081';
 
 =head2 new
 
@@ -926,6 +927,14 @@ L<Regexp::Parser|Regexp::Parser>, which parses a bare regular expression
 (without enclosing C<qr{}>, C<m//>, or whatever) and uses a different
 navigation model. After a long hiatus, this module has been adopted, and
 is again supported.
+
+L<YAPE::Regex|YAPE::Regex>, which provides the parse tree, and has a
+mechanism to subclass the various element classes for customization. The
+most-recent release is 2011, but the CPAN testers results are still all
+green. Companion module L<YAPE::Regex::Explain|YAPE::Regex::Explain>
+says what the various pieces of a regex do, though constructs added in
+perl 5.10 and later are not supported. I have no idea how I missed this
+when I originally went looking for C<Regexp> parsers.
 
 =head1 SUPPORT
 

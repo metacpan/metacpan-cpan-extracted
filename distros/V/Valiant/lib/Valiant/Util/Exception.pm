@@ -75,7 +75,13 @@ sub as_string {
   $message .= join q{}, map { $_->as_string( 0, {} ) . "\n" } @frames;
 
   return $message;
-} 
+}
+
+sub throw {
+  my ($class, @args) = @_;
+  die $class->new(@args);
+}
+
 sub rethrow { die shift }
 
 1;

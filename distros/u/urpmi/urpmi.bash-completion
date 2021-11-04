@@ -292,7 +292,7 @@ _urpmi_addmedia()
 	    2)
 		# return list of available protocols
 		COMPREPLY=( $( compgen -W 'file:// http:// \
-		    ftp:// removable:// ssh:// \
+		    https:// ftp:// removable:// ssh:// \
 		    rsync://' -- $cur ) )
 		;;
 	    3)

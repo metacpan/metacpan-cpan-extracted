@@ -19,7 +19,6 @@ sub BUILD {
   }
 }
 
-
 sub normalize_shortcut {
   my ($class, $arg) = @_;
   if($arg eq '1') {
@@ -38,7 +37,7 @@ sub validate_each {
   my $confirmation_value = $confirmation->($record);
 
   # If confirmation is not defined then skip this validation.   If the user wants to have
-  # this defined they can use presense.
+  # this defined they can use the presence validator.
 
   return unless defined($confirmation_value) || defined($value);
 

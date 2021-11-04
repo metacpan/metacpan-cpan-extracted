@@ -1,9 +1,9 @@
 package BorderStyles::Test;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2021-05-12'; # DATE
 our $DIST = 'BorderStyles-Test'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: A collection of border styles, mainly for testing
@@ -20,7 +20,17 @@ BorderStyles::Test - A collection of border styles, mainly for testing
 
 =head1 VERSION
 
-This document describes version 0.002 of BorderStyles::Test (from Perl distribution BorderStyles-Test), released on 2020-06-11.
+This document describes version 0.003 of BorderStyles::Test (from Perl distribution BorderStyles-Test), released on 2021-05-12.
+
+=head1 BORDER STYLES
+
+=over
+
+=item * L<BorderStyle::Test::Random>
+
+A border style that uses random characters.
+
+=back
 
 =head1 HOMEPAGE
 
@@ -52,7 +62,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

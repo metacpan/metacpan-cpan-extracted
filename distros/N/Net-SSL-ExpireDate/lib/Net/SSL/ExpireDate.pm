@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 use base qw(Class::Accessor);
 use Crypt::OpenSSL::X509 qw(FORMAT_ASN1);
@@ -551,9 +551,10 @@ returns it. %option is to specify certificate.
 
   KEY    VALUE
   ----------------------------
-  ssl    "hostname[:port]"
-  https  (same as above ssl)
-  file   "path/to/certificate"
+  ssl     "hostname[:port]"
+  https   (same as above ssl)
+  file    "path/to/certificate"
+  timeout "Timeout in seconds"
 
 =head2 expire_date
 

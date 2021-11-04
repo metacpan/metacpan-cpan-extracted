@@ -40,7 +40,7 @@ use App::Regather::Plugin;
 use constant SYNST => [ qw( LDAP_SYNC_PRESENT LDAP_SYNC_ADD LDAP_SYNC_MODIFY LDAP_SYNC_DELETE ) ];
 
 # my @DAEMONARGS = ($0, @ARGV);
-our $VERSION   = '0.81.03';
+our $VERSION   = '0.81.04';
 
 sub new {
   my $class = shift;
@@ -543,7 +543,7 @@ sub ldap_search_callback {
 	      $entry = pop @entries;
 	      if ( defined $entry ) {
 		$rdn_re = qr/^$rdn: .*$/;
-		###### !!! NEDD FIX
+		###### !!! NEED FIX
 		### slapd.log-20210510-regather-fails-on-rdn
 		###
 		### here we're searching master db log, and the record is absent there, while
@@ -557,7 +557,7 @@ sub ldap_search_callback {
 		###         Can't use an undefined value as an ARRAY reference at /usr/local/lib/perl5/site_perl/App/Regather.pm line 546.
 		###         BEGIN failed--compilation aborted at /usr/local/bin/regather line 10.
 		###### !!! NEED FIX
-		if ( $entry->exists('reqOld') {
+		if ( $entry->exists('reqOld') ) {
 		  foreach ( @{$entry->get_value('reqOld', asref => 1)} ) {
 		    $rdn_old = (split(/: /, $_))[1] if /$rdn_re/;
 		  }
@@ -604,7 +604,8 @@ sub ldap_search_callback {
 
       ### picking up a service, the $obj relates to
       my $is_ctrl_attr;
-      my $ctrl_srv_re;
+	my $ctrl_srv_re;
+	my $s;
       foreach ( @{$self->{_opt}{svc}} ) {
 	$is_ctrl_attr = 0;
 	foreach my $ctrl_attr ( @{$self->cf->get('service', $_, 'ctrl_attr')} ) {

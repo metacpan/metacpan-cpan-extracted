@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/xslate/p5-Text-Xslate.svg?branch=master)](https://travis-ci.org/xslate/p5-Text-Xslate)
+[![Actions Status](https://github.com/xslate/p5-Text-Xslate/workflows/test/badge.svg)](https://github.com/xslate/p5-Text-Xslate/actions)
 # NAME
 
 Text::Xslate - Scalable template engine for Perl5
 
 # VERSION
 
-This document describes Text::Xslate version v3.5.8.
+This document describes Text::Xslate version v3.5.9.
 
 # SYNOPSIS
 

@@ -2,11 +2,13 @@ NAME
     App::RcloneUtils - Utilities related to rclone
 
 VERSION
-    This document describes version 0.001 of App::RcloneUtils (from Perl
-    distribution App-RcloneUtils), released on 2021-05-09.
+    This document describes version 0.002 of App::RcloneUtils (from Perl
+    distribution App-RcloneUtils), released on 2021-05-15.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
+
+    *   list-rclone-remotes
 
     *   parse-rclone-config
 

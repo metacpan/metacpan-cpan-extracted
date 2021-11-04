@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Scalar::Util 1.26 qw{ blessed looks_like_number };
 use Text::ParseWords ();
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 our @CARP_NOT = qw{
     Astro::App::Satpass2
@@ -56,6 +56,7 @@ our @EXPORT_OK = qw{
     expand_tilde find_package_pod
     has_method instance load_package merge_hashes my_dist_config quoter
     __date_manip_backend
+    __legal_options
     __parse_class_and_args
     ARRAY_REF CODE_REF HASH_REF REGEXP_REF SCALAR_REF
     @CARP_NOT
@@ -93,6 +94,8 @@ use constant SCALAR_REF	=> ref \1;
 	    return( $self, $opt, @args );
 	}
 
+=begin comment
+
 	my @data = caller(1);
 	my $code = \&{$data[3]};
 
@@ -106,6 +109,16 @@ use constant SCALAR_REF	=> ref \1;
 	    }
 	    $lgl = $self->$method( \%opt, $lgl );
 	}
+
+=end comment
+
+=cut
+
+
+	my ( $err, %opt );
+	my $code = \&{ ( caller 1 )[3] };
+	my $lgl = $self->__legal_options( $code, \%opt );
+
 	local $SIG{__WARN__} = sub {$err = $_[0]};
 	my $config =
 	    $self->__get_attr($code, 'Configure') || \@default_config;
@@ -119,6 +132,21 @@ use constant SCALAR_REF	=> ref \1;
 
 	return ( $self, \%opt, @args );
     }
+}
+
+sub __legal_options {
+    my ( $self, $code, $opt ) = @_;
+    $code ||= \&{ ( caller 1 )[3] };
+    CODE_REF eq ref $code
+	or __error_out( $self, weep => "$code not a CODE ref" );
+    $opt ||= {};
+    my $lgl = $self->__get_attr( $code, Verb => [] );
+    if ( @{ $lgl } && ':compute' eq $lgl->[0] ) {
+	my $method = $lgl->[1]
+	    or __error_out( $self, weep => ':compute did not specify method' );
+	$lgl = $self->$method( $opt, $lgl );
+    }
+    return $lgl;
 }
 
 sub _apply_default {
@@ -346,10 +374,21 @@ sub _get_my_lib {
     # - inc/My/Module/Recommend.pm
     # - inc/My/Module/Test/App.pm
     # These all need to stay the same. Sigh.
+    # Any such should be in xt/author/consistent_module_versions.t
 
     my %version = (
 	'DateTime::Calendar::Christian'	=> 0.06,
     );
+
+    # Expose the module version so we can test for consistent definition.
+    # IM(NS)HO the following annotation silences a false positive.
+    sub __module_version {	## no critic (RequireArgUnpacking)
+	my $module = $_[-1];
+	require Carp;
+	exists $version{$module}
+	    or Carp::confess( "Bug - Module $module has no defined version" );
+	return $version{$module};
+    }
 
 #    my %valid_complaint = map { $_ => 1 } qw{ whinge wail weep };
 
@@ -603,6 +642,17 @@ This exportable subroutine returns a true value if C<$object> is an
 instance of C<$class>, and false otherwise. The C<$object> argument need
 not be a reference, nor need it be blessed, though in these cases the
 return is false.
+
+=head2 __legal_options
+
+ my $lgl = $self->__legal_options( $code, $opt );
+
+This method takes as its arguments a code reference and an optional hash
+reference. It returns a reference to an array of
+L<Getopt::Long|Getopt::Long> option specifications derived from the
+code's C<Verb()> attribute. If the attributes are computed and the
+C<$opt> hash reference is supplied, it may be modified by the
+computation.
 
 =head2 load_package
 

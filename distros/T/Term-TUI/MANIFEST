@@ -1,6 +1,5 @@
-Build.PL
 examples/sample.pl
-HISTORY
+Changes
 lib/Term/TUI.pm
 lib/Term/TUI.pod
 LICENSE

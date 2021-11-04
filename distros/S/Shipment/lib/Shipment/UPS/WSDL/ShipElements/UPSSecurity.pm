@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::ShipElements::UPSSecurity;
-$Shipment::UPS::WSDL::ShipElements::UPSSecurity::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipElements::UPSSecurity::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ use warnings;
             [   qw(        UsernameToken
                   ServiceAccessToken
 
-                  )
+                )
             ],
             {   'UsernameToken'      => \%UsernameToken_of,
                 'ServiceAccessToken' => \%ServiceAccessToken_of,
@@ -65,7 +65,7 @@ use warnings;
 
     package Shipment::UPS::WSDL::ShipElements::UPSSecurity::_ServiceAccessToken;
     $Shipment::UPS::WSDL::ShipElements::UPSSecurity::_ServiceAccessToken::VERSION
-      = '3.05';
+      = '3.06';
     use strict;
     use warnings;
     {
@@ -90,7 +90,7 @@ use warnings;
             __PACKAGE__->_factory(
                 [   qw(        AccessLicenseNumber
 
-                      )
+                    )
                 ],
                 {'AccessLicenseNumber' => \%AccessLicenseNumber_of,},
                 {   'AccessLicenseNumber' =>
@@ -110,7 +110,7 @@ use warnings;
 
     package Shipment::UPS::WSDL::ShipElements::UPSSecurity::_UsernameToken;
     $Shipment::UPS::WSDL::ShipElements::UPSSecurity::_UsernameToken::VERSION =
-      '3.05';
+      '3.06';
     use strict;
     use warnings;
     {
@@ -137,7 +137,7 @@ use warnings;
                 [   qw(        Username
                       Password
 
-                      )
+                    )
                 ],
                 {   'Username' => \%Username_of,
                     'Password' => \%Password_of,
@@ -175,7 +175,7 @@ Shipment::UPS::WSDL::ShipElements::UPSSecurity
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

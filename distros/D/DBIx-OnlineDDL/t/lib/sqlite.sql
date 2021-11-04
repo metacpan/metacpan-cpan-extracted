@@ -65,7 +65,8 @@ CREATE TABLE "lyrics" (
   FOREIGN KEY ("track_id") REFERENCES "track"("trackid") ON DELETE CASCADE
 );
 
-CREATE INDEX "lyrics_idx_track_id" ON "lyrics" ("track_id");
+-- Purposely leave out the index to let MySQL auto-generate a FK-bound one
+-- CREATE INDEX "lyrics_idx_track_id" ON "lyrics" ("track_id");
 
 CREATE TABLE "cd_artwork" (
   "cd_id" INTEGER PRIMARY KEY NOT NULL,

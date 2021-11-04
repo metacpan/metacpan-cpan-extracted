@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Carrier;
-$Shipment::Temando::WSDL::Types::Carrier::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Carrier::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -69,7 +69,7 @@ Class::Std::initialize();
               website
               conditions
 
-              )
+            )
         ],
         {   'id'             => \%id_of,
             'companyName'    => \%companyName_of,
@@ -111,7 +111,7 @@ Class::Std::initialize();
             'phone2'         => 'Shipment::Temando::WSDL::Types::Phone',
             'email'          => 'Shipment::Temando::WSDL::Types::Email',
             'website'        => 'Shipment::Temando::WSDL::Types::Website',
-            'conditions' =>
+            'conditions'     =>
               'Shipment::Temando::WSDL::Types::CarrierConditions',
         },
         {
@@ -156,7 +156,7 @@ Shipment::Temando::WSDL::Types::Carrier
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

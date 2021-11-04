@@ -2,8 +2,8 @@ NAME
     File::MoreUtil - File-related utilities
 
 VERSION
-    This document describes version 0.624 of File::MoreUtil (from Perl
-    distribution File-MoreUtil), released on 2020-05-30.
+    This document describes version 0.625 of File::MoreUtil (from Perl
+    distribution File-MoreUtil), released on 2021-10-13.
 
 SYNOPSIS
      use File::MoreUtil qw(
@@ -90,6 +90,22 @@ FUNCTIONS
 
     This should be trivial but alas it is not. "-s" always returns true (in
     other words, "-z" always returns false) for a directory.
+
+    To test that a directory is "not" empty, use "dir_not_empty" (or its
+    alias "dir_has_entries").
+
+  dir_not_empty
+    Usage:
+
+     dir_not_empty($dir) => BOOL
+
+    Will return true if $dir exists and is not empty (has entries other than
+    "." and "..").
+
+    To test that a directory is empty, use "dir_empty".
+
+  dir_has_entries
+    Alias for "dir_not_empty".
 
   dir_has_files
     Usage:
@@ -278,7 +294,7 @@ FUNCTIONS
 FAQ
   Where is file_empty()?
     For checking if some path exists, is a plain file, and is empty (content
-    is zero-length), you can simply use the "-z" filetest operator.
+    is zero-length), you can simply use the "-s" or "-z" filetest operator.
 
   Where is get_dir_non_dot_entries()?
     That would be a regular glob("*").
@@ -289,14 +305,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-SHARYANTO-File-Util>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-MoreUtil>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
+    <https://github.com/perlancar/perl-File-MoreUtil>.
 
 SEE ALSO
     App::FileTestUtils includes CLI's for functions like "dir_empty", etc.
@@ -304,10 +313,36 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2017, 2015, 2014, 2013 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2017, 2015, 2014, 2013
+    by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-MoreUtil>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

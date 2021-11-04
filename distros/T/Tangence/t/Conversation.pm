@@ -1,6 +1,6 @@
 package t::Conversation;
 
-use v5.14;
+use v5.26;
 use warnings;
 
 use Exporter 'import';

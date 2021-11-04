@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::GetQuickEstimateResponseContainer;
-$Shipment::Purolator::WSDL::Types::GetQuickEstimateResponseContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::GetQuickEstimateResponseContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
         [   qw(        ResponseInformation
               ShipmentEstimates
 
-              )
+            )
         ],
         {   'ResponseInformation' => \%ResponseInformation_of,
             'ShipmentEstimates'   => \%ShipmentEstimates_of,
@@ -67,7 +67,7 @@ Shipment::Purolator::WSDL::Types::GetQuickEstimateResponseContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -3,16 +3,17 @@ BEGIN
 {
     use strict;
     use warnings;
-    use utf8;
     use lib './lib';
+    use open ':std' => ':utf8';
     use Config;
     use JSON;
     use Test::More qw( no_plan );
     use_ok( 'Module::Generic::Scalar' ) || BAIL_OUT( "Unable to load Module::Generic::Scalar" );
     use Nice::Try;
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
+use utf8;
 my $str = "Hello world";
 my $s = Module::Generic::Scalar->new( $str ) || BAIL_OUT( "Unable to instantiate an object." );
 isa_ok( $s, 'Module::Generic::Scalar', 'Scalar object' );
@@ -86,8 +87,50 @@ is( $s->pad( 3, 'x' ), 'xxxHello worl', 'pad at start' );
 is( $s->pad( -3, 'z' ), 'xxxHello worlzzz', 'pad at end' );
 $s->replace( 'xxx', '' );
 is( $s, 'Hello worlzzz', 'Replace' );
-$s->replace( qr/z{3}/, '' );
+my $rv = $s->replace( qr/(z{3})/, '' );
 is( $s, 'Hello worl', 'Replace2' );
+isa_ok( $rv, 'Module::Generic::RegexpCapture', 'replace returns a Module::Generic::RegexpCapture object' );
+is( "$rv", 1, 'replaced 1 occurrence' );
+diag( "Capture contains: '", $rv->capture->join( "', '" ), "'." ) if( $DEBUG );
+is( $rv->capture->first, 'zzz', 'get capture value No 1' );
+my $test_str = Module::Generic::Scalar->new( 'I am John' );
+my $re_false;
+if( $re_false = $test_str->replace( qr/(Jean)/, 'Paul' ) )
+{
+    fail( "replace produced false positive. Result object is '$re_false'" );
+}
+else
+{
+    pass( "replace with no match returned false" );
+}
+
+# $rv = $test_str->replace( qr/(Jean)/, 'Paul' )->matched;
+# diag( "Result is $rv (", overload::StrVal( $rv ), ")" ) if( $DEBUG );
+if( !$test_str->replace( qr/(Jean)/, 'Paul' )->matched )
+{
+    pass( "replace return result object in object context" );
+}
+else
+{
+    fail( "replace failed to return object in object context" );
+}
+
+# Now trying with named captures
+my $test_named = Module::Generic::Scalar->new(q{GET /some/where HTTP/1.1});
+diag( "Testing named regexp: ", $test_named =~ /^(?<method>\w+)[[:blank:]\h]+(?<uri>\S+)[[:blank:]\h]+(?<proto>HTTP\/\d+\.\d+)/ ? 'ok' : 'nope' ) if( $DEBUG );
+my $re_named;
+if( $re_named = $test_named->match( qr/^(?<method>\w+)[[:blank:]\h]+(?<uri>\S+)[[:blank:]\h]+(?<proto>HTTP\/\d+\.\d+)/ ) )
+{
+    diag( "method is '", $re_named->name->method, "', uri is '", $re_named->name->uri, "' and proto is '", $re_named->name->proto, "'" ) if( $DEBUG );
+    ok( $re_named->name->method eq 'GET' && $re_named->name->uri eq '/some/where' && $re_named->name->proto eq 'HTTP/1.1', 'named capture' );
+}
+else
+{
+    diag( "Named regular expression failed. Object is '$re_named' (", overload::StrVal( $re_named ), ")" ) if( $DEBUG );
+    diag( "method is '", $re_named->name->method, "', uri is '", $re_named->name->uri, "' and proto is '", $re_named->name->proto, "'" ) if( $DEBUG );
+    fail( 'named capture' );
+}
+
 is( $s->quotemeta, 'Hello\ worl', 'quotemeta' );
 is( $s->reset->length, 0, 'reset' );
 $s .= 'I disapprove of what you say, but I will defend to the death your right to say it';
@@ -235,6 +278,30 @@ EOT
     ok( $io->close, 'close' );
     ok( !tied( $io ), 'untied' );
     ok( !$io->opened, 'opened' );
+};
+
+# From perlpacktut
+subtest 'unpack and pack' => sub
+{
+    my $unpack_data = Module::Generic::Scalar->new( q{2021/09/19 Camel rides to tourists      €235.00} );
+    my( $date, $desc, $income, $expense ) = $unpack_data->unpack( "A10xA28xA8A*" );
+    is( $date, '2021/09/19', 'unpack -> date' );
+    is( $desc, 'Camel rides to tourists', 'unpack -> description' );
+    is( $income, '€235.00', 'unpack -> income' );
+    is( $expense, '', 'unpack -> expense' );
+    # Need to set the object context by calling ->object, or else unpack will return its first element
+    my $unpack = $unpack_data->unpack( "A10xA28xA8A*" )->object;
+    isa_ok( $unpack, 'Module::Generic::Array', 'unpack returns Module::Generic::Array in scalar context' );
+    is( $unpack->length, 4, 'has 4 elements' );
+    is( $unpack->first, '2021/09/19', 'unpack -> date' );
+    is( $unpack->second, 'Camel rides to tourists', 'unpack -> description' );
+    is( $unpack->third, '€235.00', 'unpack -> income' );
+    is( $unpack->fourth, '', 'unpack -> expense' );
+    # In object context
+    is( $unpack_data->unpack( "A10xA28xA8A*" )->third, '€235.00', 'object context' );
+    my $str2pack = Module::Generic::Scalar->new( 0x20AC );
+    my $pack_data = $str2pack->pack( 'U' );
+    is( $pack_data, '€', 'pack' );
 };
 
 done_testing();

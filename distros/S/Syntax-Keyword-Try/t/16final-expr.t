@@ -35,6 +35,12 @@ use Syntax::Keyword::Try;
       catch ($e) { 4, 5, 6 }
    };
    is_deeply(\@list, [4, 5, 6], 'do { try/catch } in list context');
+
+   $scalar = do {
+      try { die "Oops" }
+      catch ($e) { my $x = 123; 456 }
+   };
+   is($scalar, 456, 'do { try/catch } with multiple statements');
 }
 
 done_testing;

@@ -2,14 +2,14 @@ NAME
     App::td - Manipulate table data
 
 VERSION
-    This document describes version 0.102 of App::td (from Perl distribution
-    App-td), released on 2021-04-10.
+    This document describes version 0.103 of App::td (from Perl distribution
+    App-td), released on 2021-05-29.
 
 FUNCTIONS
   td
     Usage:
 
-     td(%args) -> [status, msg, payload, meta]
+     td(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Manipulate table data.
 
@@ -45,124 +45,125 @@ FUNCTIONS
 
      # List available actions
      % td actions
-
+ 
      # Convert table data (which might be hash, aos, or aohos) to aoaos form
      % list-files -l --json | td as-aoaos
-
+ 
      # Convert table data (which might be hash, aos, or aoaos) to aohos form
      % list-files -l --json | td as-aohos
-
+ 
      # Display table data on the browser using datatables (to allow interactive sorting and filtering)
      % osnames -l | td cat --format html+datatables
-
+ 
      # Convert table data to CSV
      % list-files -l --json | td as-csv
-
+ 
      # Calculate arithmetic average of numeric columns
      % list-files -l --json | td avg
-
+ 
      # Append a row at the end containing arithmetic average of number columns
      % list-files -l --json | td avg-row
-
+ 
      # Count number of columns
      % osnames -l --json | td colcount
-
+ 
      # Append a single-column row at the end containing number of columns
      % osnames -l --json | td colcount-row
-
+ 
      # Return the column names only
      % lcpan related-mods Perinci::CmdLine | td colnames
-
+ 
      # append a row containing column names
      % lcpan related-mods Perinci::CmdLine | td colnames-row
-
+ 
      # Only show first 5 rows
      % osnames -l --json | td head -n5
-
+ 
      # Show all but the last 5 rows
      % osnames -l --json | td head -n -5
-
+ 
      # Check if input is table data and show information about the table
      % osnames -l --json | td info
-
+ 
      # Count number of rows
      % osnames -l --json | td rowcount
      % osnames -l --json | td wc            ;# shorter alias
-
+ 
      # Append a single-column row containing row count
      % osnames -l --json | td rowcount-row
      % osnames -l --json | td wc-row        ;# shorter alias
-
+ 
      # Add a row number column (1, 2, 3, ...)
      % list-files -l --json | td rownum-col
-
+ 
      # Select some columns
      % osnames -l --json | td select value description
-
+ 
      # Select all columns but some
      % osnames -l --json | td select '*' -e value -e description
-
+ 
      # Return the rows in a random order
      % osnames -l --json | td shuf
-
+ 
      # Pick 5 random rows from input
      % osnames -l --json | td shuf -n5
-
+ 
      # Sort by column(s) (add "-" prefix to for descending order)
      % osnames -l --json | td sort value tags
      % osnames -l --json | td sort -- -value
-
+ 
      # Return sum of all numeric columns
      % list-files -l --json | td sum
-
+ 
      # Append a sum row
      % list-files -l --json | td sum-row
-
+ 
      # Only show last 5 rows
      % osnames -l --json | td tail -n5
-
+ 
      # Show rows from the row 5 onwards
      % osnames -l --json | td tail -n +5
-
-     # Transpose table (make first column of rows as column names in the transposed
-     # table)
-
+ 
+     # Transpose table (make first column of rows as column names in the
+     # transposed table)
+ 
      % osnames -l --json | td transpose
-
+ 
      # Transpose table (make columns named 'row1', 'row2', 'row3', ... in the
      # transposed table)
-
+ 
      % osnames -l --json | td transpose --no-header-column
-
+ 
      # Use Perl code to filter rows. Perl code gets row in $row or $_
-     # (scalar/aos/hos) or $rowhash (always a hos) or $rowarray (always aos). There
-     # are also $rownum (integer, starts at 0) and $td (table data object). Perl
-     # code is eval'ed in the 'main' package with strict/warnings turned off. The
-     # example below selects videos that are larger than 480p.
-
-     % media-info *.mp4 | td grep 'use List::Util qw(min); min($I<< ->{video >>height}, $I<< ->{video >>width}) > 480'
-
+     # (scalar/aos/hos) or $rowhash (always a hos) or $rowarray (always aos).
+     # There are also $rownum (integer, starts at 0) and $td (table data object).
+     # Perl code is eval'ed in the 'main' package with strict/warnings turned
+     # off. The example below selects videos that are larger than 480p.
+ 
+     % media-info *.mp4 | td grep 'use List::Util qw(min); min($_->{video_height}, $_->{video_width}) > 480'
+ 
      # Use Perl code to filter columns. Perl code gets column name in $colname or
-     # $_. There's also $colidx (column index, from 1) and $td (table data object).
-     # If table data form is 'hash' or 'aos', it will be transformed into 'aoaos'.
-     # The example below only select even columns that match /col/i. Note that most
-     # of the time, 'td select' is better. But when you have a lot of columns and
-     # want to select them programmatically, you have grep-col.
-
+     # $_. There's also $colidx (column index, from 1) and $td (table data
+     # object). If table data form is 'hash' or 'aos', it will be transformed
+     # into 'aoaos'. The example below only select even columns that match
+     # /col/i. Note that most of the time, 'td select' is better. But when you
+     # have a lot of columns and want to select them programmatically, you have
+     # grep-col.
+ 
      % somecd --json | td grep-col '$colidx % 2 == 0 && /col/i'
-
+ 
      # Use Perl code to transform row. Perl code gets row in $row or $_
      # (scalar/hash/array) and is supposed to return the new row. As in 'grep',
-     # $rowhash, $rowarray, $rownum, $td are also available as helper. The example
-     # below adds a field called 'is_landscape'.
-
-     % media-info *.jpg | td map '$I<< ->{is >>landscape} = $I<< ->{video >>height} < $I<< ->{video >>width} ? 1:0; $_'
-
-     # Use perl code to sort rows. Perl sorter code gets row in $a & $b or $I<[0] &
-     # $>[1] (hash/array). Sorter code, like in Perl's standard sort(), is expected
-     # to return -1/0/1. The example belows sort videos by height, descendingly then
-     # by width, descendingly.
-
+     # $rowhash, $rowarray, $rownum, $td are also available as helper. The
+     # example below adds a field called 'is_landscape'.
+ 
+     % media-info *.jpg | td map '$_->{is_landscape} = $_->{video_height} < $_->{video_width} ? 1:0; $_'
+ 
+     # Use perl code to sort rows. Perl sorter code gets row in $a & $b or $_[0]
+     # & $_[1] (hash/array). Sorter code, like in Perl's standard sort(), is
+     # expected to return -1/0/1. The example belows sort videos by height,
+     # descendingly then by width, descendingly.
+ 
      % media-info *.mp4 | td psort '$b->{video_height} <=> $a->{video_height} || $b->{video_width} <=> $b->{video_width}'
 
     This function is not exported.
@@ -194,12 +195,12 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 

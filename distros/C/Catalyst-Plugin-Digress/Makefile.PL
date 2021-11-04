@@ -7,7 +7,7 @@ my %META = (
 	name        => 'Catalyst-Plugin-Digress',
 	author      => 'Aristotle Pagaltzis <pagaltzis@gmx.de>',
 	license     => 'perl_5',
-	x_copyright => { holder => 'Aristotle Pagaltzis', year => 2020 },
+	x_copyright => { holder => 'Aristotle Pagaltzis', year => 2021 },
 	prereqs     => {
 		runtime => { requires => {qw(
 			perl             5.008001

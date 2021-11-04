@@ -231,17 +231,17 @@ Quechua Peru locale.
 
 =head3 Wide (format)
 
-  BCE
-  d.C.
+  ñawpa cristu
+  chanta cristu
 
 =head3 Abbreviated (format)
 
-  BCE
+  a.d.
   d.C.
 
 =head3 Narrow (format)
 
-  BCE
+  a.d.
   dC
 
 =head2 Date Formats
@@ -397,25 +397,31 @@ Quechua Peru locale.
 
    2008-02-05T18:30:30 = d.C. 2008
    1995-12-22T09:05:02 = d.C. 1995
-  -0010-09-15T04:44:23 = BCE -10
+  -0010-09-15T04:44:23 = a.d. -10
 
 =head3 GyMMM (MMM y G)
 
    2008-02-05T18:30:30 = Feb 2008 d.C.
    1995-12-22T09:05:02 = Dic 1995 d.C.
-  -0010-09-15T04:44:23 = Set -10 BCE
+  -0010-09-15T04:44:23 = Set -10 a.d.
 
 =head3 GyMMMEd (E, d MMM, y G)
 
    2008-02-05T18:30:30 = Mar, 5 Feb, 2008 d.C.
    1995-12-22T09:05:02 = Vie, 22 Dic, 1995 d.C.
-  -0010-09-15T04:44:23 = Sab, 15 Set, -10 BCE
+  -0010-09-15T04:44:23 = Sab, 15 Set, -10 a.d.
 
 =head3 GyMMMd (d MMM, y G)
 
    2008-02-05T18:30:30 = 5 Feb, 2008 d.C.
    1995-12-22T09:05:02 = 22 Dic, 1995 d.C.
-  -0010-09-15T04:44:23 = 15 Set, -10 BCE
+  -0010-09-15T04:44:23 = 15 Set, -10 a.d.
+
+=head3 GyMd (d/M/y GGGGG)
+
+   2008-02-05T18:30:30 = 5/2/2008 dC
+   1995-12-22T09:05:02 = 22/12/1995 dC
+  -0010-09-15T04:44:23 = 15/9/-10 a.d.
 
 =head3 H (HH)
 

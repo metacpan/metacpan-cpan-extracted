@@ -9,7 +9,7 @@ use Carp qw(confess);
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.78'
+$VERSION = '0.80'
 };
 
 =head1 NAME
@@ -2306,6 +2306,11 @@ pp_addhdr(<<'EOH');
 #include <plplotP.h>
 #include <plevent.h>
 #include <stdio.h>
+
+#ifndef PDL /* this is needed for PDL pre-2.058 */
+#define PDL PDL_Graphics_PLplot
+Core* PDL = NULL; PDL_COMMENT("Structure hold core C functions")
+#endif
 EOH
 
 # The create_low_level_constants function is used to make the #define'd
@@ -3087,6 +3092,56 @@ CODE:
 
 EOC
 pp_add_exported('plsdev');
+
+# key:   function name
+# value: description of group of devices returned
+my %plgDevsFuncs = (
+	plgFileDevs => 'file-oriented',
+	plgDevs     => 'all',
+);
+for my $func (sort keys %plgDevsFuncs) {
+  pp_addpm (<<EOPM);
+=head2 $func
+
+=for sig
+
+  \$devices = $func ()
+
+=for ref
+
+Returns a HashRef of $plgDevsFuncs{$func} device names (key)
+and their menu strings (value).
+
+=cut
+EOPM
+
+  pp_addxs (<<"EOC");
+SV*
+$func ()
+INIT:
+	const int ndev_alloc = 100; /* per docs, "20 or so is plenty" */
+	const char **menustr = (const char**) malloc(ndev_alloc * sizeof(char*));
+	const char **devname = (const char**) malloc(ndev_alloc * sizeof(char*));
+	int ndev = ndev_alloc;
+CODE:
+	$func (&menustr, &devname, &ndev);
+	HV* hv = newHV();
+	for( int i = 0; i < ndev; i++ ) {
+		SV* menustr_sv = newSVpvn(menustr[i], strlen(menustr[i]));
+		if( NULL == hv_store(hv, devname[i], strlen(devname[i]), menustr_sv, 0) ) {
+			sv_free(menustr_sv);
+			croak("Could not return devices");
+		}
+	}
+	RETVAL = newRV_noinc((SV*) hv);
+OUTPUT:
+	RETVAL
+CLEANUP:
+	free(menustr);
+	free(devname);
+EOC
+  pp_add_exported($func);
+}
 
 pp_def ('plsdidev',
         NoPthread => 1,
@@ -3904,244 +3959,19 @@ pp_add_exported (plFree2dGrid);
 
 pp_addhdr (<<'EOH');
 
-#define check_sub_pointer(subptr, errmsg) \
-  if (SvTRUE (subptr) \
-      && (! SvROK (subptr) || SvTYPE (SvRV (subptr)) != SVt_PVCV)) \
-    croak (errmsg);
-
-static SV* pltr_subroutine;
-
-static IV pltr0_iv;
-static IV pltr1_iv;
-static IV pltr2_iv;
-
-static void
-pltr_callback (PLFLT x, PLFLT y, PLFLT* tx, PLFLT* ty, PLPointer pltr_data)
-{
-  I32 count;
-  dSP;
-
-  ENTER;
-  SAVETMPS;
-
-  PUSHMARK (SP);
-  XPUSHs (sv_2mortal (newSVnv ((double) x)));
-  XPUSHs (sv_2mortal (newSVnv ((double) y)));
-  XPUSHs ((SV*) pltr_data);
-  PUTBACK;
-
-  count = call_sv (pltr_subroutine, G_ARRAY);
-
-  SPAGAIN;
-
-  if (count != 2)
-    croak ("pltr: must return two scalars");
-
-  *ty = (PLFLT) POPn;
-  *tx = (PLFLT) POPn;
-
-  PUTBACK;
-  FREETMPS;
-  LEAVE;
-}
-
-static void*
-get_standard_pltrcb (SV* cb)
-{
-  if ( !SvROK(cb) ) return NULL; /* Added to prevent bug in plshades for 0 input. D. Hunt 12/18/2008 */
-  IV sub = (IV) SvRV (cb);
-
-  if (sub == pltr0_iv)
-    return (void*) pltr0;
-  else if (sub == pltr1_iv)
-    return (void*) pltr1;
-  else if (sub == pltr2_iv)
-    return (void*) pltr2;
-  else
-    return SvTRUE (cb) ? (void*) pltr_callback : NULL;
-}
-
-static SV* defined_subroutine;
-
-static PLINT
-defined_callback (PLFLT x, PLFLT y)
-{
-  I32 count, retval;
-  dSP;
-
-  ENTER;
-  SAVETMPS;
-
-  PUSHMARK (SP);
-  XPUSHs (sv_2mortal (newSVnv ((double) x)));
-  XPUSHs (sv_2mortal (newSVnv ((double) y)));
-  PUTBACK;
-
-  count = call_sv (defined_subroutine, G_SCALAR);
-
-  SPAGAIN;
-
-  if (count != 1)
-    croak ("defined: must return one scalar");
-
-  retval = POPi;
-
-  PUTBACK;
-  FREETMPS;
-  LEAVE;
-
-  return retval;
-}
-
-static SV* mapform_subroutine;
-
-static void default_magic (pdl *p, size_t pa) { p->data = 0; }
-
-static void
-mapform_callback (PLINT n, PLFLT* x, PLFLT* y)
-{
-  pdl *x_pdl, *y_pdl;
-  PLFLT *tx, *ty;
-  SV *x_sv, *y_sv;
-#if defined(PDL_CORE_VERSION) && PDL_CORE_VERSION >= 10
-  PDL_Indx dims, i;
-#else
-  int dims, i;
-#endif
-  I32 count, ax;
-  dSP;
-
-  ENTER;
-  SAVETMPS;
-
-  dims = n;
-
-  x_pdl = PDL->pdlnew ();
-  PDL->add_deletedata_magic(x_pdl, default_magic, 0);
-  PDL->setdims (x_pdl, &dims, 1);
-  x_pdl->datatype = PDL_D;
-  x_pdl->data = x;
-  x_pdl->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-  x_sv = sv_newmortal ();
-  PDL->SetSV_PDL (x_sv, x_pdl);
-
-  y_pdl = PDL->pdlnew ();
-  PDL->add_deletedata_magic(y_pdl, default_magic, 0);
-  PDL->setdims (y_pdl, &dims, 1);
-  y_pdl->datatype = PDL_D;
-  y_pdl->data = y;
-  y_pdl->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-  y_sv = sv_newmortal ();
-  PDL->SetSV_PDL (y_sv, y_pdl);
-
-  PUSHMARK (SP);
-  XPUSHs (x_sv);
-  XPUSHs (y_sv);
-  PUTBACK;
-
-  count = call_sv (mapform_subroutine, G_ARRAY);
-
-  SPAGAIN;
-  SP -= count ;
-  ax = (SP - PL_stack_base) + 1;
-
-  if (count != 2)
-    croak ("mapform: must return two ndarrays");
-
-  tx = (PLFLT*) ((PDL->SvPDLV(ST(0)))->data);
-  ty = (PLFLT*) ((PDL->SvPDLV(ST(1)))->data);
-
-  for (i = 0; i < n; i++) {
-    *(x + i) = *(tx + i);
-    *(y + i) = *(ty + i);
-  }
-
-  PUTBACK;
-  FREETMPS;
-  LEAVE;
-}
-EOH
-
-pp_addhdr (<<'EOH');
-
-// Subroutines for adding transforms via plstransform
-static SV* xform_subroutine;
-
-static void
-xform_callback ( PLFLT x, PLFLT y, PLFLT *xt, PLFLT *yt, PLPointer data )
-{
-  SV *x_sv, *y_sv; // Perl scalars for the input x and y
-  I32 count, ax;
-  dSP;
-
-  ENTER;
-  SAVETMPS;
-
-  x_sv = newSVnv((double)x);
-  y_sv = newSVnv((double)y);
-
-  PUSHMARK (SP);
-  XPUSHs (x_sv);
-  XPUSHs (y_sv);
-  XPUSHs (data);
-  PUTBACK;
-
-  count = call_sv (xform_subroutine, G_ARRAY);
-
-  SPAGAIN;
-  SP -= count ;
-  ax = (SP - PL_stack_base) + 1;
-
-  if (count != 2)
-    croak ("xform: must return two perl scalars");
-
-  *xt = (PLFLT) SvNV(ST(0));
-  *yt = (PLFLT) SvNV(ST(1));
-
-  PUTBACK;
-  FREETMPS;
-  LEAVE;
-}
-
-// Subroutines for adding label formatting via plslabelfunc
-static SV* labelfunc_subroutine;
-
-void labelfunc_callback (PLINT axis, PLFLT value, char *label_text, PLINT length, void *data )
-{
-  SV *axis_sv, *value_sv, *length_sv; // Perl scalars for inputs
-  I32 count, ax;
-  dSP;
-
-  ENTER;
-  SAVETMPS;
-
-  axis_sv   = newSViv((IV)axis);
-  value_sv  = newSVnv((double)value);
-  length_sv = newSViv((IV)length);
-
-  PUSHMARK (SP);
-  XPUSHs (axis_sv);
-  XPUSHs (value_sv);
-  XPUSHs (length_sv);
-  PUTBACK;
-
-  count = call_sv (labelfunc_subroutine, G_ARRAY);
-
-  SPAGAIN;
-  SP -= count ;
-  ax = (SP - PL_stack_base) + 1;
-
-  if (count != 1)
-    croak ("labelfunc: must return one perl scalar");
-
-  // Copy label into output string
-  snprintf( label_text, length, (char *)SvPV_nolen(ST(0)) );
-
-  PUTBACK;
-  FREETMPS;
-  LEAVE;
-}
-
+void pltr_iv_set(IV iv0, IV iv1, IV iv2);
+void pltr_callback_set(SV *sv, char *msg);
+void pltr_callback(PLFLT x, PLFLT y, PLFLT* tx, PLFLT* ty, PLPointer pltr_data);
+void* get_standard_pltrcb(SV* cb);
+void defined_callback_set(SV *sv, char *msg);
+PLINT defined_callback(PLFLT x, PLFLT y);
+void default_magic(pdl *p, size_t pa);
+void mapform_callback_set(SV *sv, char *msg);
+void mapform_callback(PLINT n, PLFLT* x, PLFLT* y);
+void xform_callback_set(SV *sv, char *msg);
+void xform_callback(PLFLT x, PLFLT y, PLFLT *xt, PLFLT *yt, PLPointer data);
+void labelfunc_callback_set(SV *sv, char *msg);
+void labelfunc_callback(PLINT axis, PLFLT value, char *label_text, PLINT length, void *data);
 EOH
 
 pp_def ('init_pltr',
@@ -4157,9 +3987,10 @@ This accelerates functions like plcont and plshades when those standard
 transformation functions are used.
 EOF
          Code => '
-           pltr0_iv = (IV) SvRV ($COMP(p0));
-           pltr1_iv = (IV) SvRV ($COMP(p1));
-           pltr2_iv = (IV) SvRV ($COMP(p2));');
+           pltr_iv_set(
+            (IV) SvRV ($COMP(p0)),
+            (IV) SvRV ($COMP(p1)),
+            (IV) SvRV ($COMP(p2)));');
 
 pp_addpm (<<'EOPM');
 init_pltr (\&pltr0, \&pltr1, \&pltr2);
@@ -4174,8 +4005,7 @@ pp_def ('plmap',
         GenericTypes => [D],
         Code => '
            int use_xform;
-           mapform_subroutine = $COMP(mapform);
-	   check_sub_pointer (mapform_subroutine,
+           mapform_callback_set($COMP(mapform),
 	     "plmap: mapform must be either 0 or a subroutine pointer");
 
            use_xform = SvTRUE ($COMP(mapform));
@@ -4209,8 +4039,7 @@ pp_def ('plmeridians',
         GenericTypes => [D],
         Doc => 'Plot the latitudes and longitudes on the background',
         Code => '
-           mapform_subroutine = $COMP(mapform);
-	   check_sub_pointer (mapform_subroutine,
+           mapform_callback_set($COMP(mapform),
 	     "plmeridians: mapform must be either 0 or a subroutine pointer");
            plmeridians (SvTRUE ($COMP(mapform)) ? mapform_callback : NULL,
 	     $dlong(), $dlat(), $minlong(), $maxlong(), $minlat(), $maxlat());'
@@ -4240,12 +4069,10 @@ pp_def ('plshades',
              for (j = 0; j < ny; j++)
                z[i][j] = (PLFLT) $z(x => i, y => j);
 
-           defined_subroutine = $COMP(defined);
-	   check_sub_pointer (defined_subroutine,
+           defined_callback_set($COMP(defined),
 	     "plshades: defined must be either 0 or a subroutine pointer");
 
-           pltr_subroutine = $COMP(pltr);
-	   check_sub_pointer (pltr_subroutine,
+           pltr_callback_set($COMP(pltr),
 	     "plshades: pltr must be either 0 or a subroutine pointer");
 
 	   pltrcb = get_standard_pltrcb ($COMP(pltr));
@@ -4285,8 +4112,7 @@ pp_def ('plcont',
              for (j = 0; j < size_y; j++)
                ff[i][j] = $f(nx => i, ny => j);
 
-           pltr_subroutine = $COMP(pltr);
-	   check_sub_pointer (pltr_subroutine,
+           pltr_callback_set($COMP(pltr),
 	     "plcont: pltr must be either 0 or a subroutine pointer");
 
 	   pltrcb = get_standard_pltrcb ($COMP(pltr));
@@ -4442,12 +4268,10 @@ pp_def ('plshade1',
              for (j = 0; j < size_y; j++)
                a[i][j] = $a(nx => i, ny => j);
 
-           defined_subroutine = $COMP(defined);
-	   check_sub_pointer (defined_subroutine,
+           defined_callback_set($COMP(defined),
 	     "plshade1: defined must be either 0 or a subroutine pointer");
 
-           pltr_subroutine = $COMP(pltr);
-	   check_sub_pointer (pltr_subroutine,
+           pltr_callback_set($COMP(pltr),
 	     "plshade1: pltr must be either 0 or a subroutine pointer");
 
 	   pltrcb = get_standard_pltrcb ($COMP(pltr));
@@ -4511,8 +4335,8 @@ pp_def ('plimagefr',
          size_x = $SIZE(nx);
          size_y = $SIZE(ny);
 
-         pltr_subroutine = $COMP(pltr);
-         check_sub_pointer (pltr_subroutine, "plimagefr: pltr must be either 0 or a subroutine pointer");
+         pltr_callback_set($COMP(pltr),
+           "plimagefr: pltr must be either 0 or a subroutine pointer");
 
          pltrcb = get_standard_pltrcb ($COMP(pltr));
          if (pltrcb != pltr_callback)
@@ -4896,8 +4720,8 @@ plstransform (xform, data)
  SV* xform
  SV* data
 CODE:
-  check_sub_pointer (xform_subroutine, "plstransform: xform must be either 0 or a subroutine pointer");
-  if (SvTRUE(xform)) xform_subroutine = SvRV(xform);
+  if (SvTRUE(xform)) xform_callback_set(SvRV(xform),
+    "plstransform: xform must be either 0 or a subroutine pointer");
   plstransform (SvTRUE(xform) ? xform_callback : NULL, data);
 EOC
 pp_add_exported ('plstransform');
@@ -4951,9 +4775,9 @@ int
 plslabelfunc (labelfunc)
  SV* labelfunc
 CODE:
-  if (SvTRUE(labelfunc)) labelfunc_subroutine = SvRV(labelfunc);
-  check_sub_pointer (labelfunc_subroutine, "plslabelfunc: labelfunc must be either 0 or a subroutine pointer");
-  plslabelfunc (SvTRUE(labelfunc_subroutine) ? labelfunc_callback : NULL, NULL);
+  if (SvTRUE(labelfunc)) labelfunc_callback_set(SvRV(labelfunc),
+    "plslabelfunc: labelfunc must be either 0 or a subroutine pointer");
+  plslabelfunc (SvTRUE(labelfunc) ? labelfunc_callback : NULL, NULL);
 EOC
 pp_add_exported ('plslabelfunc');
 
@@ -5367,8 +5191,7 @@ pp_def ('plvect',
              v[i][j] = $v(nx => i, ny => j);
            }
 
-         pltr_subroutine = $COMP(pltr);
-         check_sub_pointer (pltr_subroutine,
+         pltr_callback_set($COMP(pltr),
            "plvect: pltr must be either 0 or a subroutine pointer");
 
          pltrcb = get_standard_pltrcb ($COMP(pltr));
@@ -5510,17 +5333,12 @@ if (!$noalpha) {
          );
 
 pp_addxs (<<"EOC");
-unsigned int plgfci ()
-    CODE:
-    {
-	unsigned int	RETVAL;
-        unsigned int    fci;
-	c_plgfci(&fci);
-        RETVAL = fci;
-
-	XSprePUSH; PUSHu((UV)RETVAL);
-    }
-    XSRETURN(1);
+unsigned int
+plgfci ()
+CODE:
+	c_plgfci(&RETVAL);
+OUTPUT:
+	RETVAL
 EOC
 pp_add_exported('', 'plgfci');
 

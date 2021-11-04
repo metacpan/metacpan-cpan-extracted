@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort;
-$Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -31,7 +31,7 @@ sub ProcessTrack {
     die "ProcessTrack must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ProcessTrack',
+        {   operation   => 'ProcessTrack',
             soap_action =>
               'http://onlinetools.ups.com/webservices/TrackBinding/v2.0',
             style => 'document',
@@ -41,7 +41,7 @@ sub ProcessTrack {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::TrackElements::TrackRequest )],
             },
             header => {
@@ -49,7 +49,7 @@ sub ProcessTrack {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::TrackElements::UPSSecurity )],
 
             },
@@ -92,7 +92,7 @@ Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

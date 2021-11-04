@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::NotificationInformation;
-$Shipment::Purolator::WSDL::Types::NotificationInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::NotificationInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -36,7 +36,7 @@ Class::Std::initialize();
               AdvancedShippingNotificationEmailAddress2
               AdvancedShippingNotificationMessage
 
-              )
+            )
         ],
         {   'ConfirmationEmailAddress' => \%ConfirmationEmailAddress_of,
             'AdvancedShippingNotificationEmailAddress1' =>
@@ -84,7 +84,7 @@ Shipment::Purolator::WSDL::Types::NotificationInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

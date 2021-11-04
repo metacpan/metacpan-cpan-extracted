@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail;
-$Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -47,7 +47,7 @@ Class::Std::initialize();
               Location
               ContactAndAddress
 
-              )
+            )
         ],
         {   'InterlineCarrierCode'   => \%InterlineCarrierCode_of,
             'InterlineCarrierName'   => \%InterlineCarrierName_of,
@@ -111,7 +111,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType;
-$Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,12 +29,12 @@ Class::Std::initialize();
         [   qw(        DestinationPort
               EstimatedArrival
 
-              )
+            )
         ],
         {   'DestinationPort'  => \%DestinationPort_of,
             'EstimatedArrival' => \%EstimatedArrival_of,
         },
-        {   'DestinationPort' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'DestinationPort'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'EstimatedArrival' =>
               'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
         },
@@ -62,7 +62,7 @@ Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

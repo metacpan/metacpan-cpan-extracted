@@ -1,5 +1,8 @@
 Revision history for Alien-curl
 
+0.09      2021-10-09 20:07:07 -0600
+  - Fix for macOS source build
+
 0.08      2020-09-02 04:52:20 -0600
   - Install curl-config into /dynamic directory for share install
     (gh#10, gh#11, gh#13, shawnlaffan++)

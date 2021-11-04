@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ValidateShipmentRequest;
-$Shipment::FedEx::WSDL::ShipTypes::ValidateShipmentRequest::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ValidateShipmentRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Version
               RequestedShipment
 
-              )
+            )
         ],
         {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
             'ClientDetail'            => \%ClientDetail_of,
@@ -79,7 +79,7 @@ Shipment::FedEx::WSDL::ShipTypes::ValidateShipmentRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

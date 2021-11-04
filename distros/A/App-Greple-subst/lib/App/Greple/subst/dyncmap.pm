@@ -6,11 +6,11 @@
 
 =head1 SYNOPSIS
 
-option --subst-color-light \
-  -Msubst::dyncmap \
-  --colormap \
-  --dyncmap \
-  range=0-2,except=000:111:222,shift=3,even="555D/%s",odd="I;000/%s"
+  option --subst-color-light \
+    -Msubst::dyncmap \
+    --colormap \
+    --dyncmap \
+    range=0-2,except=000:111:222,shift=3,even="555D/%s",odd="I;000/%s"
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright (C) 2020 Kazumasa Utashiro.
+Copyright 2020-2021 Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.

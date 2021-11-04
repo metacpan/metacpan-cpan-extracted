@@ -10,7 +10,7 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000026';
 
 # Directly modifying this is a bad idea, but for the XS to work it needs to be
 # a package var, not a lexical.
@@ -94,6 +94,31 @@ sub set_from   { $FROM_MODIFIED++; $FROM = pop }
 sub clear_from { $FROM = '*' }
 sub was_from_modified { $FROM_MODIFIED ? 1 : 0 }
 sub set_from_manager  { $FROM_MODIFIED++; $FROM_MANAGER = pop }
+
+sub touch_data_file {
+    my $class = shift;
+    my ($file, $from) = @_;
+    croak "A file is required" unless $file;
+    $from //= $FROM;
+
+    $REPORT{$file}{'<>'}{$from} = $from;
+    return;
+}
+
+sub touch_source_file {
+    my $class = shift;
+    my ($file, $subs, $from) = @_;
+    croak "A file is required" unless $file;
+
+    $subs //= ['*'];
+    $subs = [$subs] unless 'ARRAY' eq ref($subs);
+
+    $from //= $FROM;
+
+    $REPORT{$file}{$_}{$from} = $from for @$subs;
+
+    return;
+}
 
 sub filter {
     my $class = shift;
@@ -439,6 +464,33 @@ Please see the C<set_from()> documentation for details on values.
 =head1 CLASS METHODS
 
 =over 4
+
+=item $class->touch_source_file($file)
+
+=item $class->touch_source_file($file, $sub)
+
+=item $class->touch_source_file($file, \@subs)
+
+=item $class->touch_source_file($file, $subs, $from)
+
+This can be used to manually add coverage data. The first argument is the
+source file to be "touched" by coverage. The second argument is optional, and
+may be either a subroutine name, or an arrayref of subroutine names. The third
+argument is optional and can be used to override the default "from" value,
+which is normally determined for you automatically.
+
+If no subroutines are specified it will default to using '*', which means the
+entire file is considered to be touched.
+
+=item $class->touch_data_file($file)
+
+=item $class->touch_data_file($file, $from)
+
+This can be used to manually add coverage data. The first argument is the file
+to be "touched" by coverage data. Optionally you can override the 'from' value
+which is normally determined automatically.
+
+This is the same as calling C<< $class->touch_source_file($file, '<>') >>.
 
 =item $class->enable()
 

@@ -170,7 +170,9 @@ sub prepare_model_name_args {
   my ($self) = @_;
   my $class = ref($self) || $self;
   my %args = (class => $class);
-  $args{namespace} = $self->namespace if $self->can('namespace');
+  if($self->can('namespace')) {
+    $args{namespace} = $self->namespace;
+  }
 
   return %args;
 }

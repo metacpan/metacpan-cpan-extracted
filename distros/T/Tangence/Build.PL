@@ -7,16 +7,21 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Tangence',
    requires => {
+      'perl' => '5.026',
+
       'Encode' => 0,
       'Exporter' => '5.57',
+      'experimental' => 0,
       'Feature::Compat::Try' => 0,
       'Future' => '0.36',
+      'Future::AsyncAwait' => '0.47',
       'List::Util' => '1.29',
-      'perl' => '5.014',
+      'Object::Pad' => '0.51',
       'Parser::MGC' => '0.04',
       'Struct::Dumb' => 0,
       'Sub::Util' => '1.40',
-      'Syntax::Keyword::Match' => 0,
+      'Syntax::Keyword::Dynamically' => 0,
+      'Syntax::Keyword::Match' => '0.06',
    },
    test_requires => {
       'Struct::Dumb' => '0.09',

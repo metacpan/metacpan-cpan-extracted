@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Preload::Stage;
 use strict;
 use warnings;
 
-our $VERSION = '1.000073';
+our $VERSION = '1.000080';
 
 use Carp qw/croak/;
 
@@ -15,6 +15,8 @@ use Test2::Harness::Util::HashBase qw{
     <pre_launch_callbacks
     <load_sequence
     eager
+    reload_remove_check
+    reload_inplace_check
 };
 
 sub init {

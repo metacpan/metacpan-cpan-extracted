@@ -1,13 +1,13 @@
-use Test::More tests => 6;
+#! perl
 
-use strict;
-use warnings;
+use Test2::V0 '!float';
+use Test::Lib;
 
 use PDL;
 
 use Astro::FITS::CFITSIO::Simple qw/ :all /;
 
-BEGIN { require 't/common.pl'; }
+use My::Test::common;
 
 my $file = 'data/f001.fits';
 
@@ -32,3 +32,5 @@ eval {
   ok ( ( $data{rt_x}{data} == pdl( 0..9 ))->all, "rfilter/retinfo" );
 };
 ok ( ! $@, "rfilter/retinfo" ) or diag( $@ );
+
+done_testing;

@@ -1,5 +1,10 @@
 Revision history for Net-Async-Redis
 
+3.017     2021-10-18 00:15:14+08:00 Asia/Kuala_Lumpur
+    [New features]
+
+    - Added ->client_no_evict from latest Redis
+
 3.016     2021-09-26 02:23:34+08:00 Asia/Kuala_Lumpur
     [New features]
     - Added readonly methods from latest Redis, e.g. `->sort_ro` and `->bitfield_ro`

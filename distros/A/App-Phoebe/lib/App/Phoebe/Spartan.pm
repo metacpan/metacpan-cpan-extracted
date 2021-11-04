@@ -70,7 +70,6 @@ use App::Phoebe qw($server $log @main_menu get_ip_numbers space host_regex space
 use Modern::Perl;
 use URI::Escape;
 use Encode qw(encode_utf8 decode_utf8 decode);
-use Text::Wrapper;
 use utf8;
 no warnings 'redefine';
 

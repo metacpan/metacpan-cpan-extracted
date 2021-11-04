@@ -17,7 +17,7 @@ urpmi gets the list of available RPMs, and the RPMs themselves, from a
 B<media>. Roughly speaking, a media is described by a name and by a
 location, specified by an URL. Currently supported media types are: local
 drives, removable drives (such as CDs), ISO images, and networked media
-via different protocols (http, ftp, ssh and rsync). NFS mounted
+via different protocols (http, https, ftp, ssh and rsync). NFS mounted
 directories are treated like local drives.
 
 =head2 Installing and updating RPMs
@@ -105,7 +105,7 @@ follows:
 In this synopsis, C<< <name> >> is the name of the new media,
 C<< <url> >> the URL where the RPMs are to be found.
 
-Supported URLs can be C<http://>, C<ftp://>, C<rsync://>, C<ssh://> (this
+Supported URLs can be C<http://>, C<https://>, C<ftp://>, C<rsync://>, C<ssh://> (this
 will use rsync over ssh), C<file://>, and C<cdrom://>. If the media requires
 authentication, you can use the usual URL syntax:
 

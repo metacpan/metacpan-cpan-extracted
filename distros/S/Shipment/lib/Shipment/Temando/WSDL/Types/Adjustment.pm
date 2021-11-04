@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Adjustment;
-$Shipment::Temando::WSDL::Types::Adjustment::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Adjustment::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               amount
               tax
 
-              )
+            )
         ],
         {   'description' => \%description_of,
             'amount'      => \%amount_of,
@@ -71,7 +71,7 @@ Shipment::Temando::WSDL::Types::Adjustment
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

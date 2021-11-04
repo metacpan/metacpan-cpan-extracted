@@ -1098,6 +1098,8 @@ sub tan { return( shift->_func( 'tan', { posix => 1 } ) ); }
 
 sub thousand { return( shift->_set_get_prop( 'thousand', @_ ) ); }
 
+sub TO_JSON { return( shift->as_string ); }
+
 sub unformat
 {
     my $self = shift( @_ );

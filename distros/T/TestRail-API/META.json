@@ -104,35 +104,35 @@
    "provides" : {
       "App::Prove::Plugin::TestRail" : {
          "file" : "lib/App/Prove/Plugin/TestRail.pm",
-         "version" : "0.049"
+         "version" : "0.051"
       },
       "Test::Rail::Harness" : {
          "file" : "lib/Test/Rail/Harness.pm",
-         "version" : "0.049"
+         "version" : "0.051"
       },
       "Test::Rail::Parser" : {
          "file" : "lib/Test/Rail/Parser.pm",
-         "version" : "0.049"
+         "version" : "0.051"
       },
       "TestRail::API" : {
          "file" : "lib/TestRail/API.pm",
-         "version" : "0.049"
+         "version" : "0.051"
       },
       "TestRail::Utils" : {
          "file" : "lib/TestRail/Utils.pm",
-         "version" : "0.049"
+         "version" : "0.051"
       },
       "TestRail::Utils::Find" : {
          "file" : "lib/TestRail/Utils/Find.pm",
-         "version" : "0.049"
+         "version" : "0.051"
       },
       "TestRail::Utils::Lock" : {
          "file" : "lib/TestRail/Utils/Lock.pm",
-         "version" : "0.049"
+         "version" : "0.051"
       },
       "TestRail::Utils::Results" : {
          "file" : "lib/TestRail/Utils/Results.pm",
-         "version" : "0.049"
+         "version" : "0.051"
       }
    },
    "release_status" : "stable",
@@ -147,7 +147,7 @@
          "web" : "https://github.com/teodesian/TestRail-Perl"
       }
    },
-   "version" : "0.049",
+   "version" : "0.051",
    "x_contributors" : [
       "Andy Baugh <thomas.baugh@cpanel.net>",
       "George S. Baugh <doge@teodesian.net>",

@@ -2,7 +2,7 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.118
+    version 0.120
 
 SYNOPSIS
       use Path::Tiny;
@@ -147,6 +147,8 @@ CONSTRUCTORS
   tempfile, tempdir
         $temp = Path::Tiny->tempfile( @options );
         $temp = Path::Tiny->tempdir( @options );
+        $temp = $dirpath->tempfile( @options );
+        $temp = $dirpath->tempdir( @options );
         $temp = tempfile( @options ); # optional export
         $temp = tempdir( @options );  # optional export
 
@@ -177,6 +179,17 @@ CONSTRUCTORS
     Both "tempfile" and "tempdir" may be exported on request and used as
     functions instead of as methods.
 
+    The methods can be called on an instances representing a directory. In
+    this case, the directory is used as the base to create the temporary
+    file/directory, setting the "DIR" option in File::Temp.
+
+        my $target_dir = path('/to/destination');
+        my $tempfile = $target_dir->tempfile('foobarXXXXXX');
+        $tempfile->spew('A lot of data...');  # not atomic
+        $tempfile->rename($target_dir->child('foobar')); # hopefully atomic
+
+    In this case, any value set for option "DIR" is ignored.
+
     Note: for tempfiles, the filehandles from File::Temp are closed and not
     reused. This is not as secure as using File::Temp handles directly, but
     is less prone to deadlocks or access problems on some platforms. Think
@@ -196,7 +209,7 @@ CONSTRUCTORS
     Keeping a reference to, or modifying the cached object may break the
     behavior documented above and is not supported. Use at your own risk.
 
-    Current API available since 0.097.
+    Current API available since 0.119.
 
 METHODS
   absolute
@@ -1036,6 +1049,20 @@ SEE ALSO
     This module was featured in the 2013 Perl Advent Calendar
     <http://www.perladvent.org/2013/2013-12-18.html>.
 
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Path-Tiny/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Path-Tiny>
+
+      git clone https://github.com/dagolden/Path-Tiny.git
+
 AUTHOR
     David Golden <dagolden@cpan.org>
 
@@ -1053,6 +1080,8 @@ CONTRIBUTORS
     *   David Steinbrunner <dsteinbrunner@pobox.com>
 
     *   Doug Bell <madcityzen@gmail.com>
+
+    *   Flavio Poletti <flavio@polettix.it>
 
     *   Gabor Szabo <szabgab@cpan.org>
 

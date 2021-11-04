@@ -23,11 +23,13 @@ my @files = (
     't/10-test_without_vm_pure_pp.t',
     't/11-direct_xs.t',
     't/12-direct_pp.t',
+    't/lib/Exploder.pm',
+    't/lib/ExploderLoader.pm',
     't/lib/OtherClass.pm',
     't/lib/YetAnotherClass.pm',
     'xt/author/00-compile.t',
-    'xt/author/changes_has_content.t',
     'xt/author/check-inc.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
     'xt/author/mojibake.t',
@@ -37,8 +39,7 @@ my @files = (
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
     'xt/release/changes_has_content.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 notabs_ok($_) foreach @files;

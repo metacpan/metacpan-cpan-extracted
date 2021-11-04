@@ -2,9 +2,9 @@ NAME
     Acme::CPANModules::BrowserUtilities - Utilities for web browsers
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Acme::CPANModules::BrowserUtilities (from Perl distribution
-    Acme-CPANModules-BrowserUtilities), released on 2020-06-03.
+    Acme-CPANModules-BrowserUtilities), released on 2021-06-09.
 
 DESCRIPTION
     General
@@ -30,15 +30,14 @@ DESCRIPTION
 
     *Automating Firefox*
 
-    TODO: Comparison between these
-
-    WWW::Mechanize::Firefox, WWW::Mechanize::Firefox::Extended.
-
-    Firefox::Application
-
     Firefox::Marionette
 
     Selenium::Firefox
+
+    WWW::Mechanize::Firefox and MozRepl used to be an alternative but no
+    longer work on current Firefox version (they require Firefox 54 or
+    earlier). Included in this group are: Firefox::Application,
+    WWW::Mechanize::Firefox::Extended.
 
     Google Chrome
 
@@ -67,7 +66,7 @@ DESCRIPTION
 
     Vivaldi::Util::Profile
 
-INCLUDED MODULES
+ACME::MODULES ENTRIES
     *   App::FirefoxUtils
 
     *   App::DumpFirefoxHistory
@@ -84,15 +83,17 @@ INCLUDED MODULES
 
     *   WordList::HTTP::UserAgentString::Browser::Firefox
 
-    *   WWW::Mechanize::Firefox
-
-    *   WWW::Mechanize::Firefox::Extended
-
-    *   Firefox::Application
-
     *   Firefox::Marionette
 
     *   Selenium::Firefox
+
+    *   WWW::Mechanize::Firefox
+
+    *   MozRepl
+
+    *   Firefox::Application
+
+    *   WWW::Mechanize::Firefox::Extended
 
     *   App::ChromeUtils
 
@@ -113,9 +114,21 @@ INCLUDED MODULES
     *   Vivaldi::Util::Profile
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n BrowserUtilities
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries BrowserUtilities | cpanm -n
 
@@ -123,9 +136,13 @@ FAQ
 
         % perl -MAcme::CM::Get=BrowserUtilities -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::BrowserUtilities -E'say $_->{module} for @{ $Acme::CPANModules::BrowserUtilities::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -152,7 +169,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

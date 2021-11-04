@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.54;
+package Object::Pad 0.56;
 
 use v5.14;
 use warnings;
@@ -328,6 +328,15 @@ I<Since version 0.33.>
       method slot { return $slot }
    }
 
+I<Since version 0.56> a role can declare that it provides another role:
+
+   role Name does OTHERROLE { ... }
+   role Name does OTHERROLE OTHERVER { ... }
+
+This will include all of the methods from the included role. Effectively this
+means that applying the "outer" role to a class will imply applying the other
+role as well.
+
 The following role attributes are supported:
 
 =head3 :compat(invokable)
@@ -418,23 +427,34 @@ The following slot attributes are supported:
 
 I<Since version 0.27.>
 
-Generates a reader method to return the current value of the slot. Currently
-these are only permitted for scalar slots. If no name is given, the name of
-the slot is used. A single prefix character C<_> will be removed if present.
+Generates a reader method to return the current value of the slot. If no name
+is given, the name of the slot is used. A single prefix character C<_> will be
+removed if present.
 
    has $slot :reader;
 
    # equivalent to
    has $slot;  method slot { return $slot }
 
+I<Since version 0.55> these are permitted on any slot type, but prior versions
+only allowed them on scalar slots. The reader method behaves identically to
+how a lexical variable would behave in the same context; namely returning a
+list of values from an array or key/value pairs from a hash when in list
+context, or the number of items or keys when in scalar context.
+
+   has @items :reader;
+
+   foreach my $item ( $obj->items ) { ... }   # iterates the list of items
+
+   my $count = $obj->items;                   # yields count of items
+
 =head3 :writer, :writer(NAME)
 
 I<Since version 0.27.>
 
-Generates a writer method to set a new value of the slot from its first
-argument. Currently these are only permitted for scalar slots. If no name is
-given, the name of the slot is used prefixed by C<set_>. A single prefix
-character C<_> will be removed if present.
+Generates a writer method to set a new value of the slot from its arguments.
+If no name is given, the name of the slot is used prefixed by C<set_>. A
+single prefix character C<_> will be removed if present.
 
    has $slot :writer;
 
@@ -447,6 +467,11 @@ invocant itself, allowing a chaining style.
    $obj->set_x("x")
       ->set_y("y")
       ->set_z("z");
+
+I<Since version 0.55> these are permitted on any slot type, but prior versions
+only allowed them on scalar slots. On arrays or hashes, the writer method takes
+a list of values to be assigned into the slot, completely replacing any values
+previously there.
 
 =head3 :mutator, :mutator(NAME)
 

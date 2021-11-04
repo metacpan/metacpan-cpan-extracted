@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2021-06-19 11:53:04 */
+/* this file was auto-generated at 2021-11-01 19:41:04 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -873,6 +873,7 @@ const tld_t tld_list[] = {
     { "mtr", 4, TLD_TYPE_GENERIC },
     { "mu", 3, TLD_TYPE_COUNTRY_CODE },
     { "museum", 7, TLD_TYPE_SPONSORED },
+    { "music", 6, TLD_TYPE_GENERIC },
     { "mutual", 7, TLD_TYPE_GENERIC },
     { "mutuelle", 9, TLD_TYPE_RETIRED },
     { "mv", 3, TLD_TYPE_COUNTRY_CODE },
@@ -1037,7 +1038,7 @@ const tld_t tld_list[] = {
     { "qpon", 5, TLD_TYPE_GENERIC },
     { "quebec", 7, TLD_TYPE_GENERIC },
     { "quest", 6, TLD_TYPE_GENERIC },
-    { "qvc", 4, TLD_TYPE_GENERIC },
+    { "qvc", 4, TLD_TYPE_NOT_ASSIGNED },
     { "racing", 7, TLD_TYPE_GENERIC },
     { "radio", 6, TLD_TYPE_GENERIC },
     { "raid", 5, TLD_TYPE_GENERIC },
@@ -1073,7 +1074,7 @@ const tld_t tld_list[] = {
     { "ril", 4, TLD_TYPE_GENERIC },
     { "rio", 4, TLD_TYPE_GENERIC },
     { "rip", 4, TLD_TYPE_GENERIC },
-    { "rmit", 5, TLD_TYPE_GENERIC },
+    { "rmit", 5, TLD_TYPE_NOT_ASSIGNED },
     { "ro", 3, TLD_TYPE_COUNTRY_CODE },
     { "rocher", 7, TLD_TYPE_GENERIC },
     { "rocks", 6, TLD_TYPE_GENERIC },
@@ -1220,7 +1221,7 @@ const tld_t tld_list[] = {
     { "suzuki", 7, TLD_TYPE_GENERIC },
     { "sv", 3, TLD_TYPE_COUNTRY_CODE },
     { "swatch", 7, TLD_TYPE_GENERIC },
-    { "swiftcover", 11, TLD_TYPE_GENERIC },
+    { "swiftcover", 11, TLD_TYPE_NOT_ASSIGNED },
     { "swiss", 6, TLD_TYPE_GENERIC },
     { "sx", 3, TLD_TYPE_COUNTRY_CODE },
     { "sy", 3, TLD_TYPE_COUNTRY_CODE },
@@ -1410,7 +1411,7 @@ const tld_t tld_list[] = {
     { "xn--3ds443g", 12, TLD_TYPE_GENERIC },
     { "xn--3e0b707e", 13, TLD_TYPE_COUNTRY_CODE },
     { "xn--3hcrj9c", 12, TLD_TYPE_COUNTRY_CODE },
-    { "xn--3oq18vl8pn36a", 18, TLD_TYPE_GENERIC },
+    { "xn--3oq18vl8pn36a", 18, TLD_TYPE_NOT_ASSIGNED },
     { "xn--3pxu8k", 11, TLD_TYPE_GENERIC },
     { "xn--42c2d9a", 12, TLD_TYPE_GENERIC },
     { "xn--45br5cyl", 13, TLD_TYPE_COUNTRY_CODE },

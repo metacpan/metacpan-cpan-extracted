@@ -7,12 +7,12 @@ use warnings FATAL => 'all';
 use Test::More;
 
 use DateTime::TimeZone;
-use File::Slurp;
+use Mojo::File qw(path);
 use FindBin;
 
 use Weather::YR;
 
-my $xml = File::Slurp::read_file( $FindBin::Bin . '/data/locationForecast.xml' );
+my $xml = path( $FindBin::Bin . '/data/locationForecast.xml' )->slurp;
 
 my $yr = Weather::YR->new(
     xml => $xml,

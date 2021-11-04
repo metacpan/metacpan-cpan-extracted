@@ -4,7 +4,7 @@
       "Matthias Bloch <matthias.bloch@puffin.ch>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -58,15 +58,17 @@
          "web" : "https://github.com/maettu/Data-Processor"
       }
    },
-   "version" : "1.0.6",
+   "version" : "1.0.7",
    "x_contributors" : [
       "Dominik Hassler <hadfl@cpan.org>",
       "Dominik Hassler <hadfl@omniosce.org>",
+      "Dominik Hassler <hadfl@omnios.org>",
       "joe <draxil@gmail.com>",
       "Tobias Oetiker <tobi@oetiker.ch>"
    ],
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }
 

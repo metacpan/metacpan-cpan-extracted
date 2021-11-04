@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::ReturnShipmentDetail;
-$Shipment::FedEx::WSDL::RateTypes::ReturnShipmentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::ReturnShipmentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Rma
               ReturnEMailDetail
 
-              )
+            )
         ],
         {   'ReturnType'        => \%ReturnType_of,
             'Rma'               => \%Rma_of,
@@ -67,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::ReturnShipmentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

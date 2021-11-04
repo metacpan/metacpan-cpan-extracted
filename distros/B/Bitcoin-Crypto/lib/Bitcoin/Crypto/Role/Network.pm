@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Role::Network;
 
-our $VERSION = "1.002";
+our $VERSION = "1.004";
 
 use v5.10;
 use strict;
@@ -20,7 +20,14 @@ has "network" => (
 		return Bitcoin::Crypto::Network->get;
 	},
 	coerce => 1,
-	writer => "set_network"
+	writer => "_set_network"
 );
+
+sub set_network
+{
+	my ($self, $network) = @_;
+	$self->_set_network($network);
+	return $self;
+}
 
 1;

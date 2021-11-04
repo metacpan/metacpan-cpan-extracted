@@ -4,19 +4,14 @@ use PDL::Fit::Levmar;
 use PDL::Fit::Levmar::Func;
 use PDL::NiceSlice;
 use PDL::Core ':Internal'; # For topdl()
+use Test::More;
 
 use strict;
 
 # Checks doing a multidimensional fit.
 
-use vars ( '$testno', '$ok_count', '$not_ok_count', '@g', '$Gf',
-	   '$Gh', '$Type');
-
 #  @g is global options to levmar
-@g = ( NOCOVAR => undef );
-
-$ok_count = 0;
-$not_ok_count = 0;
+my @g = ( NOCOVAR => undef );
 
 sub tapprox {
         my($a,$b,$eps) = @_;
@@ -28,38 +23,10 @@ sub tapprox {
         $d < $eps;
 }
 
-sub ok {  
-    my ($v, $s) = @_;
-    $testno = 0 unless defined $testno;	
-    $testno++;
-    $s = '' unless defined $s;
-    if ( not $v ) {
-	print "not ";
-	$s = " *** " . $s;
-	$not_ok_count++;
-    }
-    else {
-	$ok_count++;
-    }
-    print "ok - $testno $s\n";   
-}
-
-sub check_type {
-    my (@d) = @_;
-    my $i=0;
-    foreach ( @d )  {
-	die "$i: not $Type" unless $Type == $_->type;
-	$i++;
-    }   
-}
-
 sub dimst {
     my $x = shift;
     return  "(" . join(',',$x->dims) . ")";
 }
-
-#sub deb  { print STDERR $_[0],"\n" }
-#sub cpr  { print $_[0],"\n" }
 
 sub gauss2d {
     my ($p,$xin,$t) = @_;
@@ -72,27 +39,19 @@ sub gauss2d {
 }
 
 sub fit_gauss2d {
+    my ($Type) = @_;
     my $n = 101;
     my $scale = 3;
-    my $t = sequence($Type,$n);
-    $t *= $scale/($n-1);
-    $t  -= $scale/2;
-    my $x = zeroes($Type,$n,$n);
+    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -1.5,1.5);
+    my $xlin = zeroes($Type,$n*$n);
     my $p = pdl $Type, [ .5,2,3];
     my $p1 = pdl $Type, [ 1,1,1];
-    my $xlin = $x->clump(-1);
     gauss2d( $p, $xlin, $t->copy);
     my $h = levmar($p1,$xlin,$t,\&gauss2d);
     ok ( (tapprox($p,$h->{P}) and not  tapprox($p1,$h->{P}) ) , "-- 2-d gaussian");
 }
 
+fit_gauss2d(double);
+fit_gauss2d(float);
 
-print "1..2\n";
-
-print "# double tests\n";
-$Type = double;
-fit_gauss2d();
-
-print "# float tests\n";
-$Type = float;
-fit_gauss2d();
+done_testing;

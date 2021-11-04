@@ -6,7 +6,7 @@ use namespace::autoclean 0.19 -except => ['import'];
 
 use Exporter qw( import );
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 our @EXPORT_OK = 'parse_locale_code';
 
@@ -66,7 +66,7 @@ DateTime::Locale::Util - Utility code for DateTime::Locale
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 DESCRIPTION
 
@@ -78,8 +78,6 @@ Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-Locale/issu
 
 There is a mailing list available for users of this distribution,
 L<mailto:datetime@perl.org>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 

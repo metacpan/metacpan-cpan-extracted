@@ -18,9 +18,9 @@ sub new {
 sub next {
 	my ($self) = @_;
 
-	$index <= $length or (print "float stream ended" and $index = 0);
+	$self->{index} <= $length or (print "float stream ended" and $self->{index} = 0);
 
-	return $self->{listoffloats}[$index++];
+	return $self->{listoffloats}[$self->{index}++];
 }
 
 1;

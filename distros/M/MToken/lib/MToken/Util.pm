@@ -1,4 +1,4 @@
-package MToken::Util; # $Id: Util.pm 69 2019-06-09 16:17:44Z minus $
+package MToken::Util; # $Id: Util.pm 92 2021-10-05 16:43:59Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ MToken::Util - Exported utility functions
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ Returns file size
 
 Returns specified URL but without password
 
-=item B<blue>, B<cyan>, B<green>, B<red>, B<yellow>
+=item B<blue>, B<cyan>, B<green>, B<red>, B<yellow>, B<magenta>
 
     print cyan("Format %s", "text");
 
@@ -125,7 +125,7 @@ Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2021 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -137,7 +137,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION @EXPORT_OK @EXPORT /;
-$VERSION = "1.01";
+$VERSION = "1.03";
 
 use Carp;
 use CTK::Util qw/bload bsave/;
@@ -145,14 +145,16 @@ use CTK::Crypt::TCD04;
 use URI;
 use URI::Escape qw/uri_unescape/;
 use Digest::MD5;
-use Digest::SHA1;
+use Digest::SHA;
 use Data::Dumper; #$Data::Dumper::Deparse = 1;
 use Term::ANSIColor qw/colored/;
+
+use MToken::Const qw/IS_TTY/;
 
 use base qw/Exporter/;
 @EXPORT = qw(
         yep nope skip wow
-        blue green red yellow cyan
+        blue green red yellow cyan magenta
     );
 @EXPORT_OK = (qw(
         cleanServerName cleanFileName
@@ -174,7 +176,7 @@ sub cleanFileName {
 }
 sub sha1sum {
     my $f = shift;
-    my $sha1 = new Digest::SHA1;
+    my $sha1 = Digest::SHA->new;
     my $sum = '';
     return $sum unless -e $f;
     open( my $sha1_fh, '<', $f) or (carp("Can't open '$f': $!") && return $sum);
@@ -188,7 +190,7 @@ sub sha1sum {
 }
 sub md5sum {
     my $f = shift;
-    my $md5 = new Digest::MD5;
+    my $md5 = Digest::MD5->new;
     my $sum = '';
     return $sum unless -e $f;
     open( my $md5_fh, '<', $f) or (carp("Can't open '$f': $!") && return $sum);
@@ -219,7 +221,7 @@ sub parse_credentials {
 sub hide_pasword {
     my $url = shift || return "";
 	my $full = shift || 0;
-	my $uri = new URI($url);
+	my $uri = URI->new($url);
 	my ($u,$p) = parse_credentials($uri);
 	return $url unless defined($p) && length($p);
 	$uri->userinfo($full ? undef : sprintf("%s:*****", $u));
@@ -241,7 +243,7 @@ sub tcd_load {
 	return CTK::Crypt::TCD04->new()->decrypt(bload($fn) // '');
 }
 sub explain {
-    my $dumper = new Data::Dumper( [shift] );
+    my $dumper = Data::Dumper->new( [shift] );
     $dumper->Indent(1)->Terse(1);
     $dumper->Sortkeys(1) if $dumper->can("Sortkeys");
     return $dumper->Dump;
@@ -251,26 +253,28 @@ sub explain {
 # Colored says
 ################
 sub yep {
-    print(green('[  OK  ]'), ' ', sprintf(shift, @_), "\n");
+    print(green(sprintf(shift, @_)), "\n");
     return 1;
 }
 sub nope {
-    print(red('[ FAIL ]'), ' ', sprintf(shift, @_), "\n");
+    print(red(sprintf(shift, @_)), "\n");
     return 0;
 }
 sub skip {
-    print(yellow('[ SKIP ]'), ' ', sprintf(shift, @_), "\n");
+    print(yellow(sprintf(shift, @_)), "\n");
     return 1;
 }
 sub wow {
-    print(blue('[ INFO ]'), ' ', sprintf(shift, @_), "\n");
+    print(blue(sprintf(shift, @_)), "\n");
     return 1;
 }
+
 # Colored helper functions
-sub green {  colored(['bright_green'],  sprintf(shift, @_)) }
-sub red {    colored(['bright_red'],    sprintf(shift, @_)) }
-sub yellow { colored(['bright_yellow'], sprintf(shift, @_)) }
-sub cyan {   colored(['bright_cyan'],   sprintf(shift, @_)) }
-sub blue {   colored(['bright_blue'],   sprintf(shift, @_)) }
+sub green {  IS_TTY ? colored(['bright_green'],  sprintf(shift, @_)) : sprintf(shift, @_) }
+sub red {    IS_TTY ? colored(['bright_red'],    sprintf(shift, @_)) : sprintf(shift, @_) }
+sub yellow { IS_TTY ? colored(['bright_yellow'], sprintf(shift, @_)) : sprintf(shift, @_) }
+sub cyan {   IS_TTY ? colored(['bright_cyan'],   sprintf(shift, @_)) : sprintf(shift, @_) }
+sub blue {   IS_TTY ? colored(['bright_blue'],   sprintf(shift, @_)) : sprintf(shift, @_) }
+sub magenta {IS_TTY ? colored(['bright_magenta'],sprintf(shift, @_)) : sprintf(shift, @_) }
 
 1;

@@ -81,18 +81,18 @@ be used repeatedly:
 Entities are represented by an opaque global unique identifier: a GUID. GUIDs
 used by Game::Entities are opaque to the user, and represent a particular
 version of an entity which will remain valid as long as that entity is not
-deleted (with `delete` or `clear`).
+deleted (with [delete](#delete) or [clear](#clear)).
 
 Each Game::Entities registry supports up to 1,048,575 (2^20 - 1) simultaneous
-valid entity GUIDs. They will never be 0, so they should always be truthy
+valid entity GUIDs. As of version 0.005 they are guaranteed to always be truthy
 values.
 
 ## Valid entities
 
-An entity's GUID is valid from the time it is created with `create` until the
-time it is deleted. An entity's GUID can be stored and used as an identifier
-anywhere in the program at any point during this time, but must not be used
-outside it.
+An entity's GUID is valid from the time it is created with [create](#create)
+until the time it is deleted. An entity's GUID can be stored and used as an
+identifier anywhere in the program at any point during this time, but must not
+be used outside it.
 
 ## Components
 
@@ -101,14 +101,15 @@ as a component and added to an entity. This includes blessed and non-blessed
 references.
 
 Entities can have any number of components attached to them, but they will
-only ever have one component of any one type (as identified by `ref`).
+only ever have one component of any one type (as identified by
+[ref](https://perldoc.perl.org/functions/ref)).
 
 ## Views
 
-A group of components defines a view, which is composed of all entities that
-have all of that view's components. This means that all the entities for the
-view for components `A`, `B`, and `C` will have _at least_ all those
-components, but could of course have any others as well.
+A group of components defines a view, which includes all the entities that
+have all of that view's components. Given a view for components `A`, `B`,
+and `C`, all components in it will have _at least_ those three components,
+but could of course have any others as well.
 
 The main purpose of views is to make it possible to iterate as fast as
 possible over any group of entities that have a set of common components.
@@ -141,7 +142,7 @@ they were provided.
 
 ## get
 
-    $component  = $ECS->get( $guid, $component_name  );
+    $component  = $ECS->get( $guid, $component_name );
     @components = $ECS->get( $guid, @component_names );
 
 Takes an entity's GUID and the name of a component as a string, and retrieves
@@ -185,7 +186,7 @@ and not yet deleted.
 
     $count = $ECS->created;
 
-Returns the number of entities that have been created. Calling `clear`
+Returns the number of entities that have been created. Calling [clear](#clear)
 resets this number.
 
 ## alive
@@ -246,15 +247,14 @@ components of this type are added or removed.
     $view = $ECS->view(@component_names);
 
 Takes a set of one or more component names, and returns an internal object
-representing a _view_ for that specific set of components. Entities in the
-view are in no specific order, and this order is not guaranteed to remain the
-same.
+representing a _view_ for that specific set of components. The order of
+entities in a view can be set with [sort](#sort) (see above for details). If
+no order has been set, then entities in the view are in no specific order.
 
-As a special case, calling this method with no arguments will generate a
-view which is guaranteed have all entities that were valid at the moment the
-view was created.
+A view generated with no components will include all entities that were valid
+at the moment it was created.
 
-Once a view has been created, it should remain valid as long as none of the
+Once a view has been created, it will remain valid as long as none of the
 components in the view's set are added or deleted from any entity. Once this
 is done, the data returned by the view object is no longer guaranteed to be
 accurate. For this reason, it is not recommended to keep hold of view objects
@@ -335,9 +335,9 @@ Useful for iterating like
 
 # PERFORMANCE
 
-Game::Entities aims to implement a simple entity that is as fast as possible.
-Specifically, this means that it needs to be fast enough to be used in game
-development, which is the natural use case for ECS designs.
+Game::Entities aims to implement a simple entity registry that is as fast as
+possible. Specifically, this means that it needs to be fast enough to be used
+in game development, which is the natural use case for ECS designs.
 
 To this end, the library caches component iterators which are invalidated
 every time one of the components relevant to that iterator is either added

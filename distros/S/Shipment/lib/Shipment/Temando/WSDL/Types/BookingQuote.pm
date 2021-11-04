@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::BookingQuote;
-$Shipment::Temando::WSDL::Types::BookingQuote::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::BookingQuote::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ Class::Std::initialize();
               carrierId
               extras
 
-              )
+            )
         ],
         {   'totalPrice'     => \%totalPrice_of,
             'basePrice'      => \%basePrice_of,
@@ -95,7 +95,7 @@ Class::Std::initialize();
 
 
 package Shipment::Temando::WSDL::Types::BookingQuote::_extras;
-$Shipment::Temando::WSDL::Types::BookingQuote::_extras::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::BookingQuote::_extras::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -118,7 +118,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        extra
 
-                  )
+                )
             ],
             {'extra' => \%extra_of,},
             {'extra' => 'Shipment::Temando::WSDL::Types::Extra',},
@@ -148,7 +148,7 @@ Shipment::Temando::WSDL::Types::BookingQuote
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

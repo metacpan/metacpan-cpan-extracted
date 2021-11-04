@@ -10,7 +10,7 @@ my %WriteMakefileArgs =
    'NAME'               => 'bignum',
    'VERSION_FROM'       => 'lib/bignum.pm',
    'AUTHOR'             => 'Peter John Acklam <pjacklam@gmail.com>',
-   'MIN_PERL_VERSION'   => 5.010,
+   'MIN_PERL_VERSION'   => 5.006,
 
    # A hash of modules that are required to run Makefile.PL itself, but not to
    # run the distribution.
@@ -35,7 +35,7 @@ my %WriteMakefileArgs =
    # it.
 
    'TEST_REQUIRES'      => {
-                            'Test::More'          => 0.88,
+                            'Test::More'          => 0.94,
                            },
 
    'LICENSE'            => 'perl_5',

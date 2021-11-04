@@ -22,7 +22,7 @@ no_index:
 provides:
   HiPi:
     file: lib/HiPi.pm
-    version: '0.85'
+    version: '0.86'
   HiPi::Class:
     file: lib/HiPi/Class.pm
     version: '0.81'
@@ -482,7 +482,7 @@ provides:
     file: lib/HiPi/RF/OpenThings/Message.pm
   HiPi::RaspberryPi:
     file: lib/HiPi/RaspberryPi.pm
-    version: '0.83'
+    version: '0.86'
   HiPi::Utils:
     file: lib/HiPi/Utils.pm
     version: '0.81'
@@ -515,5 +515,5 @@ requires:
 resources:
   homepage: http://raspberry.znix.com/
   license: http://dev.perl.org/licenses/
-version: '0.85'
+version: '0.86'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

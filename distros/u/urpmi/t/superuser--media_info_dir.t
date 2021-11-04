@@ -11,7 +11,7 @@ need_root_and_prepare();
 various();
 urpmq_various();
 urpmi_force_skip_unknown();
-rpm_v3();
+rpm_v3() if !is_rpm_v3_support_broken();
 
 sub various {
     my $name = 'various';

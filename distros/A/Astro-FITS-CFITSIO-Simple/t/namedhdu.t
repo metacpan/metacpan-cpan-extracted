@@ -1,13 +1,13 @@
-use Test::More tests => 20;
+#! perl
 
-use strict;
-use warnings;
+use Test2::V0 '!float';
+use Test::Lib;
 
 use PDL::Lite;
 
 use Astro::FITS::CFITSIO::Simple qw/ :all /;
 
-BEGIN { require 't/common.pl'; }
+use My::Test::common;
 
 my $file = 'data/f001.fits';
 
@@ -55,3 +55,5 @@ my $file = 'data/f001.fits';
 
   ok ( $@, $msg );
 }
+
+done_testing;

@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.32';
+$VERSION = '0.36';
 $VERSION = $VERSION;
 
 # internal use
@@ -126,6 +126,8 @@ perl mb.pm -e sjis      MBCS_Perl_script.pl
 perl mb.pm -e uhc       MBCS_Perl_script.pl
 perl mb.pm -e utf8      MBCS_Perl_script.pl
 perl mb.pm -e wtf8      MBCS_Perl_script.pl
+
+perl mb.pm script.pl ??-DOS-like *wildcard* available
 
 END
     }
@@ -1210,13 +1212,13 @@ sub mb::_s_passed () {
 }
 
 #---------------------------------------------------------------------
-# ignore case of m//i, qr//i, s///i
-sub mb::_ignorecase ($) {
-    local($_) = @_;
-    my $regexp = '';
+# ignore space of m/[here]/xx, qr/[here]/xx, s/[here]//xx
+sub mb::_ignore_space ($) {
+    my($has_space) = @_;
+    my $has_no_space = '';
 
     # parse into elements
-    while (/\G (
+    while ($has_space =~ /\G (
         \(\? \^? [a-z]*        [:\)] | # cloister (?^x) (?^x: ...
         \(\? \^? [a-z]*-[a-z]+ [:\)] | # cloister (?^x-y) (?^x-y: ...
         \[ ((?: \\@{mb::_dot} | @{mb::_dot} )+?) \] |
@@ -1231,7 +1233,7 @@ sub mb::_ignorecase ($) {
 
         # in codepoint class
         if (defined $classmate) {
-            $regexp .= '[';
+            $has_no_space .= '[';
             while ($classmate =~ /\G (
                 \\x\{ [0-9A-Fa-f]{2} \} |
                 \\o\{ [0-7]{3}       \} |
@@ -1241,7 +1243,54 @@ sub mb::_ignorecase ($) {
                 @{mb::_dot}
             ) /xmsgc) {
                 my $element = $1;
-                $regexp .= {qw(
+                if ($element !~ /\A[$bare_s]\z/) {
+                    $has_no_space .= $element;
+                }
+            }
+            $has_no_space .= ']';
+        }
+
+        # out of codepoint class
+        else {
+            $has_no_space .= $element;
+        }
+    }
+    return $has_no_space;
+}
+
+#---------------------------------------------------------------------
+# ignore case of m//i, qr//i, s///i
+sub mb::_ignorecase ($) {
+    my($has_case) = @_;
+    my $has_no_case = '';
+
+    # parse into elements
+    while ($has_case =~ /\G (
+        \(\? \^? [a-z]*        [:\)] | # cloister (?^x) (?^x: ...
+        \(\? \^? [a-z]*-[a-z]+ [:\)] | # cloister (?^x-y) (?^x-y: ...
+        \[ ((?: \\@{mb::_dot} | @{mb::_dot} )+?) \] |
+        \\x\{ [0-9A-Fa-f]{2} \}      |
+        \\o\{ [0-7]{3}       \}      |
+        \\x   [0-9A-Fa-f]{2}         |
+        \\    [0-7]{3}               |
+        \\@{mb::_dot}                |
+        @{mb::_dot}
+    ) /xmsgc) {
+        my($element, $classmate) = ($1, $2);
+
+        # in codepoint class
+        if (defined $classmate) {
+            $has_no_case .= '[';
+            while ($classmate =~ /\G (
+                \\x\{ [0-9A-Fa-f]{2} \} |
+                \\o\{ [0-7]{3}       \} |
+                \\x   [0-9A-Fa-f]{2}    |
+                \\    [0-7]{3}          |
+                \\@{mb::_dot}           |
+                @{mb::_dot}
+            ) /xmsgc) {
+                my $element = $1;
+                $has_no_case .= {qw(
                     A Aa a Aa
                     B Bb b Bb
                     C Cc c Cc
@@ -1270,12 +1319,12 @@ sub mb::_ignorecase ($) {
                     Z Zz z Zz
                 )}->{$element} || $element;
             }
-            $regexp .= ']';
+            $has_no_case .= ']';
         }
 
         # out of codepoint class
         else {
-            $regexp .= {qw(
+            $has_no_case .= {qw(
                 A [Aa] a [Aa]
                 B [Bb] b [Bb]
                 C [Cc] c [Cc]
@@ -1305,7 +1354,7 @@ sub mb::_ignorecase ($) {
             )}->{$element} || $element;
         }
     }
-    return qr{$regexp};
+    return qr{$has_no_case};
 }
 
 #---------------------------------------------------------------------
@@ -1900,6 +1949,7 @@ sub parse_expr {
     }
 
     # numbers
+    # "\x2E" [.] [0-9]
     # "\x30" [0] DIGIT ZERO (U+0030)
     # "\x31" [1] DIGIT ONE (U+0031)
     # "\x32" [2] DIGIT TWO (U+0032)
@@ -1910,13 +1960,36 @@ sub parse_expr {
     # "\x37" [7] DIGIT SEVEN (U+0037)
     # "\x38" [8] DIGIT EIGHT (U+0038)
     # "\x39" [9] DIGIT NINE (U+0039)
-    elsif (/\G ( 
-        0x    [0-9A-Fa-f_]+ |
-        0o    [0-7_]+       | # since perl v5.33.5 Core Enhancements New octal syntax 0oddddd
-        0b    [01_]+        |
-        0     [0-7_]*       |
-        [1-9] [0-9_]* (?: \.[0-9_]* )? (?: [Ee] [0-9_]+ )?
-    ) /xmsgc) {
+    elsif (m{\G (
+
+# since Perl v5.22 adds hexadecimal floating point literals
+# https://perldoc.perl.org/perl5220delta#Floating-point-parsing-has-been-improved
+# https://perldoc.perl.org/5.32.0/perldata#Scalar-value-constructors
+
+# https://qiita.com/mod_poppo/items/3fa4cdc35f9bfb352ad5
+# https://qiita.com/mod_poppo/items/3fa4cdc35f9bfb352ad5#perl
+#
+# $ perl -l -e 'print(0x1.23); print(0x1.23p0)'
+# makes ==> 123
+# makes ==> 1.13671875
+
+        0[Xx] [0-9A-Fa-f_]+ \. [0-9A-Fa-f_]* [Pp] [+-]? [0-9_]+ |
+        0[Xx]               \. [0-9A-Fa-f_]+ [Pp] [+-]? [0-9_]+ |
+        0[Xx] [0-9A-Fa-f_]+                                     |
+
+# since perl v5.33.5 Core Enhancements New octal syntax 0oddddd
+
+        0[Oo] [0-7_]+ |
+        0     [0-7_]* |
+
+        0[Bb] [01_]+  |
+
+        [1-9] [0-9_]* \. [0-9_]* [Ee] [+-]? [0-9_]+ |
+        [1-9] [0-9_]*                               |
+                      \. [0-9_]+ [Ee] [+-]? [0-9_]+ |
+                      \. [0-9_]+
+
+    ) }xmsgc) {
         $parsed .= $1;
         $parsed .= parse_ambiguous_char();
     }
@@ -2164,6 +2237,13 @@ sub parse_expr {
     elsif (m{\G ( [/] ) }xmsgc) {
         my $regexp = parse_re_endswith('m',$1);
         my($modifier_i, $modifier_not_cegir, $modifier_cegr) = parse_re_modifier();
+
+        # /xx modifier
+        if (($modifier_not_cegir =~ tr/x//) >= 2) {
+            $regexp = mb::_ignore_space($regexp);
+        }
+
+        # /i modifier
         if ($modifier_i) {
             $parsed .= sprintf('m{\\G${mb::_anchor}@{[mb::_ignorecase(qr%s%s)]}@{[mb::_m_passed()]}}%s', $regexp, $modifier_not_cegir, $modifier_cegr);
         }
@@ -2177,6 +2257,13 @@ sub parse_expr {
     elsif (m{\G ( [?] ) }xmsgc) {
         my $regexp = parse_re_endswith('m',$1);
         my($modifier_i, $modifier_not_cegir, $modifier_cegr) = parse_re_modifier();
+
+        # /xx modifier
+        if (($modifier_not_cegir =~ tr/x//) >= 2) {
+            $regexp = mb::_ignore_space($regexp);
+        }
+
+        # /i modifier
         if ($modifier_i) {
             $parsed .= sprintf('m{\\G${mb::_anchor}@{[mb::_ignorecase(qr%s%s)]}@{[mb::_m_passed()]}}%s', $regexp, $modifier_not_cegir, $modifier_cegr);
         }
@@ -2299,8 +2386,14 @@ sub parse_expr {
         }
         else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
 
-        # /i modifier
         my($modifier_i, $modifier_not_cegir, $modifier_cegr) = parse_re_modifier();
+
+        # /xx modifier
+        if (($modifier_not_cegir =~ tr/x//) >= 2) {
+            $regexp = mb::_ignore_space($regexp);
+        }
+
+        # /i modifier
         if ($modifier_i) {
             $parsed .= sprintf('{\\G${mb::_anchor}@{[mb::_ignorecase(qr%s%s)]}@{[mb::_m_passed()]}}%s', $regexp, $modifier_not_cegir, $modifier_cegr);
         }
@@ -2399,6 +2492,11 @@ sub parse_expr {
         # s//qq-quotee/
         else {
             $replacement = 'qq ' . $replacement[0]; # qq-type quotee
+        }
+
+        # /xx modifier
+        if (($modifier_not_cegir =~ tr/x//) >= 2) {
+            $regexp = mb::_ignore_space($regexp);
         }
 
         # /i modifier
@@ -2712,6 +2810,11 @@ sub parse_expr {
                 $modifier_not_cegir .= 'm';
             }
 
+            # /xx modifier
+            if (($modifier_not_cegir =~ tr/x//) >= 2) {
+                $regexp = mb::_ignore_space($regexp);
+            }
+
             # /i modifier
             if ($modifier_i) {
                 $parsed .= sprintf('{@{[mb::_ignorecase(qr%s%s)]}}%s', $regexp, $modifier_not_cegir, $modifier_cegr);
@@ -2750,6 +2853,11 @@ sub parse_expr {
 
             if ($modifier_not_cegir !~ /m/xms) {
                 $modifier_not_cegir .= 'm';
+            }
+
+            # /xx modifier
+            if (($modifier_not_cegir =~ tr/x//) >= 2) {
+                $regexp = mb::_ignore_space($regexp);
             }
 
             # /i modifier
@@ -2925,13 +3033,21 @@ sub parse_expr {
 
     # lstat(FILE)  --> mb::_lstat(\*FILE)
     # lstat FILE   --> mb::_lstat \*FILE
-    # opendir(DIR) --> mb::_opendir(\*DIR)
-    # opendir DIR  --> mb::_opendir \*DIR
     # stat(FILE)   --> mb::_stat(\*FILE)
     # stat FILE    --> mb::_stat \*FILE
-    #                                        vvvvvvvvvvvvvvvvvvvvv
-    #                                          vvvvvvvvvvvv        vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    elsif (/\G ( lstat | opendir | stat ) \b ( (?: \s* \( )* \s* ) (?= [A-Za-z_][A-Za-z0-9_]* \b ) /xmsgc) {
+    #                              vvvvvvvvvvvvvvvvvvvvv
+    #                                vvvvvvvvvvvv        vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( lstat | stat ) \b ( (?: \s* \( )* \s* ) (?= [A-Za-z_][A-Za-z0-9_]* \b ) /xmsgc) {
+        $parsed .= "mb::_$1";
+        $parsed .= $2;
+        $parsed .= '\\*';
+    }
+
+    # opendir(DIR, ...) --> mb::_opendir(\*DIR, ...)
+    # opendir DIR, ...  --> mb::_opendir \*DIR, ...
+    #                         vvvvvvvvvvvvvvvvvvvvv
+    #                           vvvvvvvvvvvv        vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( opendir ) \b ( (?: \s* \( )* \s* ) (?= [A-Za-z_][A-Za-z0-9_]* \s* , ) /xmsgc) {
         $parsed .= "mb::_$1";
         $parsed .= $2;
         $parsed .= '\\*';
@@ -5791,6 +5907,12 @@ To install this software without make, type the following:
   split qr#^#                                mb::_split qr{@{[qr#^#m ]}}
   split qr#MBCS-quotee#cgimosx               mb::_split qr{@{[mb::_ignorecase(qr#OO-quotee#mosx)]}}cg
   split qr#MBCS-quotee#cgmosx                mb::_split qr{@{[qr#OO-quotee#mosx ]}}cg
+  /[abc 123]/xx                              m{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[abc123])]})/xx ]}@{[mb::_m_passed()]}}
+  m/[abc 123]/xx                             m{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[abc123])]})/xx ]}@{[mb::_m_passed()]}}
+  qr/[abc 123]/xx                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[abc123])]})/xx ]}@{[mb::_m_passed()]}}
+  s/[abc 123]//xx                            s{(\G${mb::_anchor})@{[qr/(?:@{[mb::_cc(qq[abc123])]})/xx ]}@{[mb::_s_passed()]}}{$1 . qq //}e
+  split /[abc 123]/xx                        mb::_split qr{@{[qr/(?:@{[mb::_cc(qq[abc123])]})/xxm ]}}
+  split m/[abc 123]/xx                       mb::_split qr{@{[qr/(?:@{[mb::_cc(qq[abc123])]})/xxm ]}}
   $`                                         mb::_PREMATCH()
   ${`}                                       mb::_PREMATCH()
   $PREMATCH                                  mb::_PREMATCH()
@@ -5876,6 +5998,8 @@ To install this software without make, type the following:
   opendir DIR,'dir'                          mb::_opendir \*DIR,'dir'
   opendir($dh,'dir')                         mb::_opendir($dh,'dir')
   opendir $dh,'dir'                          mb::_opendir $dh,'dir'
+  opendir(my $dh,'dir')                      mb::_opendir(my $dh,'dir')
+  opendir my $dh,'dir'                       mb::_opendir my $dh,'dir'
   unlink                                     mb::_unlink
   lstat()                                    mb::_lstat()
   lstat('a')                                 mb::_lstat('a')
@@ -6726,13 +6850,13 @@ programming environment like at that time.
   fit their mindset, to smush your patterns of thought into some sort of
   Hyperdimensional Flatland. It's a joyless existence, being smushed.
   --- Learning Perl on Win32 Systems
-
+ 
   If you think this is a big headache, you're right. No one likes
   this situation, but Perl does the best it can with the input and
   encodings it has to deal with. If only we could reset history and
   not make so many mistakes next time.
   --- Learning Perl 6th Edition
-
+ 
    The most important thing for most people to know about handling
   Unicode data in Perl, however, is that if you don't ever use any Uni-
   code data -- if none of your files are marked as UTF-8 and you don't
@@ -6743,6 +6867,11 @@ programming environment like at that time.
   scripts has led to compromise and confusion, but it's the Perl way to
   silently do the right thing, which is what Perl ends up doing.
   --- Advanced Perl Programming, 2nd Edition
+ 
+   However, the ability to have any character in a string means you can
+  create, scan, and manipulate raw binary data as string -- something with
+  which many other utilities would have great difficulty.
+  --- Learning Perl 8th Edition
 
 =head1 Combinations of mb.pm Modulino and Other Modules
 
@@ -6916,6 +7045,13 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  Pages: 390
  ISBN-10: 1449303587 | ISBN-13: 978-1449303587
  http://shop.oreilly.com/product/0636920018452.do
+
+ Learning Perl, 8th Edition
+ by Randal L. Schwartz, brian d foy, Tom Phoenix
+ Released August 2021
+ Publisher(s): O'Reilly Media, Inc.
+ ISBN: 9781492094951
+ https://www.oreilly.com/library/view/learning-perl-8th/9781492094944/
 
  Advanced Perl Programming, 2nd Edition
  By Simon Cozens

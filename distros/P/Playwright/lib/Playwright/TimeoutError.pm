@@ -9,13 +9,17 @@ use strict;
 use warnings;
 
 package Playwright::TimeoutError;
-$Playwright::TimeoutError::VERSION = '0.016';
+$Playwright::TimeoutError::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
     my ( $self, %options ) = @_;
     $options{type} = 'TimeoutError';
     return $self->SUPER::new(%options);
+}
+
+sub spec {
+    return $Playwright::spec->{'TimeoutError'}{members};
 }
 
 sub on {
@@ -62,7 +66,7 @@ Playwright::TimeoutError - Automatically generated class for Playwright::Timeout
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 

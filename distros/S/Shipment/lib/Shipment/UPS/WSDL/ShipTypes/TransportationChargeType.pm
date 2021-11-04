@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::TransportationChargeType;
-$Shipment::UPS::WSDL::ShipTypes::TransportationChargeType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::TransportationChargeType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               DiscountPercentage
               NetCharge
 
-              )
+            )
         ],
         {   'GrossCharge'        => \%GrossCharge_of,
             'DiscountAmount'     => \%DiscountAmount_of,
@@ -73,7 +73,7 @@ Shipment::UPS::WSDL::ShipTypes::TransportationChargeType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

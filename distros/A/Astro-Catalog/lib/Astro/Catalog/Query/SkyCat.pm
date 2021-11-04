@@ -15,25 +15,22 @@ server and parse the results.
 
 =cut
 
-use 5.006;
 use strict;
 use warnings;
 use warnings::register;
-use vars qw/ $VERSION $FOLLOW_DIRS $DEBUG /;
 
 use Data::Dumper;
 use Carp;
 use File::Spec;
 
-use base qw/ Astro::Catalog::Transport::REST /;
+use base qw/Astro::Catalog::Transport::REST/;
 
-
-$VERSION = '4.35';
-$DEBUG = 0;
+our $VERSION = '4.36';
+our $DEBUG = 0;
 
 # Controls whether we follow 'directory' config entries and recursively
 # expand those. Default to false at the moment.
-$FOLLOW_DIRS = 0;
+our $FOLLOW_DIRS = 0;
 
 # This is the name of the config file that was used to generate
 # the content in %CONFIG. Can be different to the contents ofg_file
@@ -58,8 +55,8 @@ the config has not been read previously. If no config file can be located
 the query object can not be instantiated since it will not know the
 location of any servers.
 
- $q = new Astro::Catalog::Query::SkyCat( catalog => 'gsc', %options );
- $q = new Astro::Catalog::Query::SkyCat( catalog => 'gsc@eso', %options );
+    $q = new Astro::Catalog::Query::SkyCat(catalog => 'gsc', %options);
+    $q = new Astro::Catalog::Query::SkyCat(catalog => 'gsc@eso', %options);
 
 The C<catalog> field must be present, otherwise the new object will
 not know which remote server to use and which options are mandatory
@@ -83,13 +80,13 @@ is high.
 =cut
 
 sub new {
-  my $proto = shift;
-  my $class = ref($proto) || $proto;
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
 
-  # Instantiate via base class
-  my $block = $class->SUPER::new( @_ );
+    # Instantiate via base class
+    my $block = $class->SUPER::new(@_);
 
-  return $block;
+    return $block;
 }
 
 =back
@@ -106,12 +103,12 @@ this object. Not to be used outside this class..
 =cut
 
 sub _selected_catalog {
-  my $self = shift;
-  if (@_) {
-    # The class has to be configured as a hash!!!
-    $self->{SKYCAT_CATALOG} = shift;
-  }
-  return $self->{SKYCAT_CATALOG};
+    my $self = shift;
+    if (@_) {
+        # The class has to be configured as a hash!!!
+        $self->{SKYCAT_CATALOG} = shift;
+    }
+    return $self->{SKYCAT_CATALOG};
 }
 
 =back
@@ -129,100 +126,98 @@ not be able to vet the incoming arguments.
 =cut
 
 sub configure {
-  my $self = shift;
+    my $self = shift;
 
-  # load a config if we do not have one read yet
-  # Note that this may force a remote URL read via directory
-  # directives even though we do not have a user agent configured...
-  $self->_load_config() unless %CONFIG;
+    # load a config if we do not have one read yet
+    # Note that this may force a remote URL read via directory
+    # directives even though we do not have a user agent configured...
+    $self->_load_config() unless %CONFIG;
 
-  # Error if we have no config yet
-  croak "Error instantiating SkyCat object since no config was located"
+    # Error if we have no config yet
+    croak "Error instantiating SkyCat object since no config was located"
     unless %CONFIG;
 
-  # Now we need to configure this object based on the
-  # supplied catalog name. This is not really a public interface
-  # let's call it a protected interface available to subclases
-  # even though we are not technically a subclass...
-  my %args = Astro::Catalog::_normalize_hash(@_);
+    # Now we need to configure this object based on the
+    # supplied catalog name. This is not really a public interface
+    # let's call it a protected interface available to subclases
+    # even though we are not technically a subclass...
+    my %args = Astro::Catalog::_normalize_hash(@_);
 
-  croak "A remote service catalog name must be provided using a 'catalog' key"
-    unless exists $args{catalog};
+    croak "A remote service catalog name must be provided using a 'catalog' key"
+        unless exists $args{catalog};
 
-  # case-insensitive
-  my $cat = lc($args{catalog});
+    # case-insensitive
+    my $cat = lc($args{catalog});
 
-  # if we have an entry in %CONFIG then we can use it directly
-  # else we may have a root name without a remote server
-  if (! exists $CONFIG{$cat}) {
-    my $name = $cat;
-    # clear it and look for another
-    $cat = undef;
+    # if we have an entry in %CONFIG then we can use it directly
+    # else we may have a root name without a remote server
+    if (! exists $CONFIG{$cat}) {
+        my $name = $cat;
+        # clear it and look for another
+        $cat = undef;
 
-    # if name does not include an @ we probably have a generic catalog
-    # and just need to choose a random specific version
-    if ($name !~ /\@/) {
-
-      # look through the catalog
-      for my $rmt (keys %CONFIG) {
-        if ($rmt =~ /^$name\@/) {
-          # a match
-          $cat = $rmt;
+        # if name does not include an @ we probably have a generic catalog
+        # and just need to choose a random specific version
+        if ($name !~ /\@/) {
+            # look through the catalog
+            for my $rmt (keys %CONFIG) {
+                if ($rmt =~ /^$name\@/) {
+                    # a match
+                    $cat = $rmt;
+                }
+            }
         }
-      }
+        # No luck finding catalog name
+        croak "unable to find a remote service named $name"
+            unless defined $cat;
     }
-    # No luck finding catalog name
-    croak "unable to find a remote service named $name"
-      unless defined $cat;
-  }
 
-  # Now we know the details we need to store this somewhere in
-  # the object so that it won't get clobbered. Otherwise the
-  # super class configure will not be able to get the information
-  # it needs. We can not simply store this in options since configure
-  # does not know it is an allowed option...
-  $self->_selected_catalog( $cat );
+    # Now we know the details we need to store this somewhere in
+    # the object so that it won't get clobbered. Otherwise the
+    # super class configure will not be able to get the information
+    # it needs. We can not simply store this in options since configure
+    # does not know it is an allowed option...
+    $self->_selected_catalog( $cat );
 
-  # delete catalog from list
-  delete $args{catalog};
+    # delete catalog from list
+    delete $args{catalog};
 
-  # Configure
-  $self->SUPER::configure( %args );
-
+    # Configure
+    $self->SUPER::configure(%args);
 }
 
 =item B<_build_query>
 
 Construct a query URL based on the options.
 
-  $url = $q->_build_query();
+    $url = $q->_build_query();
 
 =cut
 
 sub _build_query {
-  my $self = shift;
+    my $self = shift;
 
-  my $cat = $self->_selected_catalog();
+    my $cat = $self->_selected_catalog();
 
-  # Get the URL
-  my $url = $CONFIG{$cat}->{url};
+    # Get the URL
+    my $url = $CONFIG{$cat}->{url};
 
-  # Translate all the options to the internal skycat format
-  my %translated = $self->_translate_options();
+    # Translate all the options to the internal skycat format
+    my %translated = $self->_translate_options();
 
-  print "Translated query: ".Dumper(\%translated,$url) if $DEBUG;
+    print "Translated query: ".Dumper(\%translated,$url) if $DEBUG;
 
-  # Now for each token replace it in the URL
-  for my $key (keys %translated) {
-    my $tok = "%". $key;
-    croak "Token $tok is mandatory but was not specified"
-      unless defined $translated{$key};
-    $url =~ s/$tok/$translated{$key}/;
-  }
+    # Now for each token replace it in the URL
+    for my $key (keys %translated) {
+        my $tok = "%". $key;
+        croak "Token $tok is mandatory but was not specified"
+            unless defined $translated{$key};
+        $url =~ s/$tok/$translated{$key}/;
+    }
 
-  print "Final URL: $url\n" if $DEBUG;
+    print "Final URL: $url\n" if $DEBUG;
 
-  return $url;
+    return $url;
 }
 
 
@@ -235,43 +230,44 @@ into the TST parser.
 =cut
 
 sub _parse_query {
-  my $self = shift;
+    my $self = shift;
 
-  # Get the catalog info
-  my $cat = $self->_selected_catalog();
+    # Get the catalog info
+    my $cat = $self->_selected_catalog();
 
-  # and extract formatting information needed by the TST parser
-  my %params;
-  for my $key (keys %{ $CONFIG{$cat} }) {
-    if ($key =~ /_col$/) {
-      print "FOUND column specified $key\n" if $DEBUG;
-      $params{$key} = $CONFIG{$cat}->{$key};
+    # and extract formatting information needed by the TST parser
+    my %params;
+    for my $key (keys %{ $CONFIG{$cat} }) {
+        if ($key =~ /_col$/) {
+            print "FOUND column specified $key\n" if $DEBUG;
+            $params{$key} = $CONFIG{$cat}->{$key};
+        }
     }
-  }
 
-  # If this catalogue is a GSC, pass in a GSC parameter
-  $params{gsc} = 1 if $cat =~ /^gsc/i;
+    # If this catalogue is a GSC, pass in a GSC parameter
+    $params{gsc} = 1 if $cat =~ /^gsc/i;
 
-  print $self->{BUFFER} ."\n" if $DEBUG;
+    print $self->{BUFFER} ."\n" if $DEBUG;
 
-  # Make sure we set origin and field centre if we know it
-  my $newcat = new Astro::Catalog(
-                                  Format => 'TST', Data => $self->{BUFFER},
-                                  ReadOpt => \%params,
-                                  Origin => $CONFIG{$cat}->{long_name},
-                                 );
+    # Make sure we set origin and field centre if we know it
+    my $newcat = new Astro::Catalog(
+            Format => 'TST',
+            Data => $self->{BUFFER},
+            ReadOpt => \%params,
+            Origin => $CONFIG{$cat}->{long_name},
+        );
 
-  # set the field centre
-  my %allow = $self->_get_allowed_options();
-  my %field;
-  for my $key ("ra","dec","radius") {
-    if (exists $allow{$key}) {
-      $field{$key} = $self->query_options($key);
+    # set the field centre
+    my %allow = $self->_get_allowed_options();
+    my %field;
+    for my $key ("ra","dec","radius") {
+        if (exists $allow{$key}) {
+            $field{$key} = $self->query_options($key);
+        }
     }
-  }
-  $newcat->fieldcentre( %field );
+    $newcat->fieldcentre(%field);
 
-  return $newcat;
+    return $newcat;
 }
 
 =item B<_get_allowed_options>
@@ -283,11 +279,10 @@ file and keyed to the requested catalog.
 =cut
 
 sub _get_allowed_options {
-  my $self = shift;
-  my $cat = $self->_selected_catalog();
+    my $self = shift;
+    my $cat = $self->_selected_catalog();
 
-  return %{ $CONFIG{$cat}->{allow} };
-
+    return %{ $CONFIG{$cat}->{allow} };
 }
 
 =item B<_get_default_options>
@@ -295,50 +290,48 @@ sub _get_allowed_options {
 Get the default options that are relevant for the selected
 catalog.
 
-  %defaults = $q->_get_default_options();
+    %defaults = $q->_get_default_options();
 
 =cut
 
 sub _get_default_options {
-  my $self = shift;
+    my $self = shift;
 
-  # Global skycat defaults
-  my %defaults = (
-                  # Target information
-                  ra => undef,
-                  dec => undef,
-                  id => undef,
+    # Global skycat defaults
+    my %defaults = (
+        # Target information
+        ra => undef,
+        dec => undef,
+        id => undef,
 
-                  # Limits
-                  radmin => 0,
-                  radmax => 5,
-                  width => 10,
-                  height => 10,
+        # Limits
+        radmin => 0,
+        radmax => 5,
+        width => 10,
+        height => 10,
 
-                  magfaint => 100,
-                  magbright => 0,
+        magfaint => 100,
+        magbright => 0,
 
-                  nout => 20000,
-                  cond => '',
-                 );
+        nout => 20000,
+        cond => '',
+    );
 
-  # Get allowed options
-  my %allow = $self->_get_allowed_options();
+    # Get allowed options
+    my %allow = $self->_get_allowed_options();
 
-  # Trim the defaults (could do with hash slice?)
-  my %trim = map { $_ => $defaults{$_} } keys %allow;
+    # Trim the defaults (could do with hash slice?)
+    my %trim = map {$_ => $defaults{$_}} keys %allow;
 
-  return %trim;
+    return %trim;
 }
 
 =item B<_get_supported_init>
 
-
-
 =cut
 
 sub _get_supported_init {
-  croak "xxx - get supported init";
+    croak "xxx - get supported init";
 }
 
 =back
@@ -363,55 +356,55 @@ contents into the query object itself.
 =cut
 
 sub _set_cfg_file {
-  my $cfg_file;
+    my $cfg_file;
 
-  if( exists $ENV{SKYCAT_CFG} ) {
-     $cfg_file = $ENV{SKYCAT_CFG};
-  } elsif ( -f File::Spec->catfile( $ENV{HOME}, ".skycat", "skycat.cfg") ){
-     $cfg_file = File::Spec->catfile( $ENV{HOME}, ".skycat", "skycat.cfg");
-  } else {
-    # generate the default path to the $PERLPRFIX/etc/skycat.cfg file,
-    # this is a horrible hack, there is probably an elegant way to do
-    # this but I can't be bothered looking it up right now.
-    my $perlbin = $^X;
-    my ($volume, $dir, $file) = File::Spec->splitpath( $perlbin );
-    my @dirs = File::Spec->splitdir( $dir );
-    my @path;
-    foreach my $i ( 0 .. $#dirs-2 ) {
-      push @path, $dirs[$i];
+    if (exists $ENV{SKYCAT_CFG}) {
+        $cfg_file = $ENV{SKYCAT_CFG};
     }
-    my $directory = File::Spec->catdir( @path, 'etc' );
-
-    # reset to the default
-    $cfg_file = File::Spec->catfile( $directory, "skycat.cfg" );
-
-    # debugging and testing purposes
-    unless ( -f $cfg_file ) {
-      # use blib version!
-      $cfg_file = File::Spec->catfile( '.', 'etc', 'skycat.cfg' );
+    elsif (-f File::Spec->catfile($ENV{HOME}, ".skycat", "skycat.cfg")) {
+        $cfg_file = File::Spec->catfile($ENV{HOME}, ".skycat", "skycat.cfg");
     }
-  }
-  return $cfg_file;
+    else {
+        # generate the default path to the $PERLPRFIX/etc/skycat.cfg file,
+        # this is a horrible hack, there is probably an elegant way to do
+        # this but I can't be bothered looking it up right now.
+        my $perlbin = $^X;
+        my ($volume, $dir, $file) = File::Spec->splitpath($perlbin);
+        my @dirs = File::Spec->splitdir($dir);
+        my @path;
+        foreach my $i (0 .. $#dirs-2) {
+            push @path, $dirs[$i];
+        }
+        my $directory = File::Spec->catdir(@path, 'etc');
+
+        # reset to the default
+        $cfg_file = File::Spec->catfile($directory, "skycat.cfg");
+
+        # debugging and testing purposes
+        unless (-f $cfg_file) {
+            # use blib version!
+            $cfg_file = File::Spec->catfile('.', 'etc', 'skycat.cfg');
+        }
+    }
+    return $cfg_file;
 }
 
 sub cfg_file {
-  my $class = shift;
-  my $cfg_file;
-  if (@_) {
-    $cfg_file = shift;
-    if( ( defined( $CFG_FILE ) &&
-          $cfg_file ne $CFG_FILE ) ||
-        ! defined( $CFG_FILE ) ) {
-
-      # We were given a new config file, so load it.
-      $class->_load_config($cfg_file);
-      $CFG_FILE = $cfg_file;
+    my $class = shift;
+    my $cfg_file;
+    if (@_) {
+        $cfg_file = shift;
+        if (((defined $CFG_FILE) && $cfg_file ne $CFG_FILE)
+                || ! (defined $CFG_FILE)) {
+            # We were given a new config file, so load it.
+            $class->_load_config($cfg_file);
+            $CFG_FILE = $cfg_file;
+        }
     }
-  }
-  if( ! defined( $CFG_FILE ) ) {
-    $CFG_FILE = _set_cfg_file;
-  }
-  return $CFG_FILE;
+    unless (defined $CFG_FILE) {
+        $CFG_FILE = _set_cfg_file;
+    }
+    return $CFG_FILE;
 }
 
 =back
@@ -427,7 +420,7 @@ sub cfg_file {
 Method to load the skycat config information into
 the class and configure the modules.
 
-  $q->_load_config() or die "Error loading config";
+    $q->_load_config() or die "Error loading config";
 
 The config file name is obtained from the C<cfg_file> method.
 Returns true if the file was read successfully and contained at
@@ -443,147 +436,145 @@ has not previously been read.
 =cut
 
 sub _load_config {
-  my $self = shift;
-  my $cfg = shift;
+    my $self = shift;
+    my $cfg = shift;
 
-  print "SkyCat.pm: \$cfg = $cfg\n" if $DEBUG;
+    print "SkyCat.pm: \$cfg = $cfg\n" if $DEBUG;
 
-  if (!defined $cfg) {
-    $cfg = _set_cfg_file;
-    $self->cfg_file( $cfg );
-  }
-
-  unless (-e $cfg) {
-    my $xcfg = (defined $cfg ? $cfg : "<undefined>" );
-    return;
-  }
-
-  my $fh;
-  unless (open $fh, "<$cfg") {
-    warnings::warnif( "Specified config file, $cfg, could not be opened: $!");
-    return;
-  }
-
-  # Need to read the contents into an array
-  my @lines = <$fh>;
-
-  # Process the config file and extract the raw content
-  my @configs = $self->_extract_raw_info( \@lines );
-
-  print "Pre-filtering has \@configs " . @configs . " entries\n" if $DEBUG;
-
-  # Close file
-  close( $fh ) or do {
-    warnings::warnif("Error closing config file, $cfg: $!");
-    return;
-  };
-
-  # Get the token mapping for validation
-  my %map = $self->_token_mapping;
-
-  # Currently we are only interested in catalog, namesvr and archive
-  # so throw everything else away
-  @configs = grep { $_->{serv_type} =~ /(namesvr|catalog|archive)/  } @configs;
-
-  print "Post-filtering has \@configs " . @configs . " entries\n" if $DEBUG;
-
-  # Process each entry. Mainly URL processing
-  for my $entry ( @configs ) {
-    # Skip if we have already analysed this server
-    if (exists $CONFIG{lc($entry->{short_name})}) {
-      print "Already know about " . $entry->{short_name} . "\n"
-        if $DEBUG;
-      next;
+    unless (defined $cfg) {
+        $cfg = _set_cfg_file;
+        $self->cfg_file( $cfg );
     }
 
-    print "  Processing " . $entry->{short_name} . "\n" if $DEBUG;
-    print Dumper( $entry ) if( $DEBUG );
+    unless (-e $cfg) {
+        my $xcfg = (defined $cfg ? $cfg : "<undefined>" );
+        return;
+    }
 
-    # Extract info from the 'url'. We need to extract the following info:
-    #  - Host name and port
-    #  - remaining url path
-    #  - all the CGI options including the static options
-    # Note that at the moment we do not do token replacement (the
-    # rest of the REST architecture expects to get the above
-    # information separately). This might well prove to be silly
-    # since we can trivially replace the tokens without having to
-    # reconstruct the url. Of course, this does allow us to provide
-    # mandatory keywords. $url =~ s/\%ra/$ra/;
-    if ($entry->{url} =~ m|^http://  # Standard http:// prefix
-                          ([\w\.\-]+    # remote host
-                           (?::\d+)?) # Optional port number
-                           /          # path separator
-                          ([\w\/\-\.]+\?) # remaining URL path and ?
-                          (.*)       # CGI options without trailing space
-        |x) {
-      $entry->{remote_host} = $1;
-      $entry->{url_path} = $2;
-      my $options = $3;
+    my $fh;
+    unless (open $fh, "<$cfg") {
+        warnings::warnif( "Specified config file, $cfg, could not be opened: $!");
+        return;
+    }
 
-      # if first character is & we append that to url_path since it
-      # is an empty argument
-      $entry->{url_path} .= "&" if $options =~ s/^\&//;
+    # Need to read the contents into an array
+    my @lines = <$fh>;
 
-      # In general the options from skycat files are a real pain
-      # Most of them have nice blah=%blah format but there are some cases
-      # that do ?%ra%dec or coords=%ra %dec that just cause more trouble
-      # than they are worth given the standard URL constructor that we
-      # are attempting to inherit from REST
-      # Best idea is not to fight against it. Extract the host, path
-      # and options separately but simply use token replacement when it
-      # comes time to build the URL. This will require that the url
-      # is moved into its own method in REST.pm for subclassing.
-      # We still need to extract the tokens themselves so that we
-      # can generate an allowed options list.
+    # Process the config file and extract the raw content
+    my @configs = $self->_extract_raw_info(\@lines);
 
-      # tokens have the form %xxx but we have to make sure we allow
-      # %mime-type. Use the /g modifier to get all the matches
-      my @tokens = ( $options =~ /(\%[\w\-]+)/g);
+    print "Pre-filtering has \@configs " . @configs . " entries\n" if $DEBUG;
 
-      # there should always be tokens. No obvious way to reomve the anomaly
-      warnings::warnif( "No tokens found in $options!!!" )
-          unless @tokens;
+    # Close file
+    close( $fh ) or do {
+        warnings::warnif("Error closing config file, $cfg: $!");
+        return;
+    };
 
-      # Just need to make sure that these are acceptable tokens
-      # Get the lookup table and store that as the allowed options
-      my %allow;
-      for my $tok (@tokens) {
-        # only one token. See if we recognize it
-        my $strip = $tok;
-        $strip =~ s/%//;
+    # Get the token mapping for validation
+    my %map = $self->_token_mapping;
 
-        if (exists $map{$strip}) {
-          if (!defined $map{$strip}) {
-            warnings::warnif("Do not know how to process token $tok" );
-          } else {
-            $allow{ $map{$strip} } = $strip;
-          }
-        } else {
+    # Currently we are only interested in catalog, namesvr and archive
+    # so throw everything else away
+    @configs = grep {$_->{serv_type} =~ /(namesvr|catalog|archive)/ } @configs;
 
-          warnings::warnif("Token $tok not currently recognized")
-              unless exists $map{$strip};
+    print "Post-filtering has \@configs " . @configs . " entries\n" if $DEBUG;
+
+    # Process each entry. Mainly URL processing
+    for my $entry ( @configs ) {
+        # Skip if we have already analysed this server
+        if (exists $CONFIG{lc($entry->{short_name})}) {
+            print "Already know about " . $entry->{short_name} . "\n"
+                if $DEBUG;
+            next;
         }
 
-      }
+        print "  Processing " . $entry->{short_name} . "\n" if $DEBUG;
+        print Dumper( $entry ) if( $DEBUG );
 
-      # Store them
-      $entry->{tokens} = \@tokens;
-      $entry->{allow}  = \%allow;
+        # Extract info from the 'url'. We need to extract the following info:
+        #  - Host name and port
+        #  - remaining url path
+        #  - all the CGI options including the static options
+        # Note that at the moment we do not do token replacement (the
+        # rest of the REST architecture expects to get the above
+        # information separately). This might well prove to be silly
+        # since we can trivially replace the tokens without having to
+        # reconstruct the url. Of course, this does allow us to provide
+        # mandatory keywords. $url =~ s/\%ra/$ra/;
+        if ($entry->{url} =~ m|^http://  # Standard http:// prefix
+                ([\w\.\-]+    # remote host
+                 (?::\d+)?) # Optional port number
+                /          # path separator
+                ([\w\/\-\.]+\?) # remaining URL path and ?
+                (.*)       # CGI options without trailing space
+                |x) {
+            $entry->{remote_host} = $1;
+            $entry->{url_path} = $2;
+            my $options = $3;
 
-      print Dumper( $entry ) if( $DEBUG );
+            # if first character is & we append that to url_path since it
+            # is an empty argument
+            $entry->{url_path} .= "&" if $options =~ s/^\&//;
 
-      # And store this in the config. Only store it if we have
-      # tokens
-      $CONFIG{lc($entry->{short_name})} = $entry;
+            # In general the options from skycat files are a real pain
+            # Most of them have nice blah=%blah format but there are some cases
+            # that do ?%ra%dec or coords=%ra %dec that just cause more trouble
+            # than they are worth given the standard URL constructor that we
+            # are attempting to inherit from REST
+            # Best idea is not to fight against it. Extract the host, path
+            # and options separately but simply use token replacement when it
+            # comes time to build the URL. This will require that the url
+            # is moved into its own method in REST.pm for subclassing.
+            # We still need to extract the tokens themselves so that we
+            # can generate an allowed options list.
 
-    } # if entry
+            # tokens have the form %xxx but we have to make sure we allow
+            # %mime-type. Use the /g modifier to get all the matches
+            my @tokens = ( $options =~ /(\%[\w\-]+)/g);
 
-  } # for loop
+            # there should always be tokens. No obvious way to reomve the anomaly
+            warnings::warnif("No tokens found in $options!!!")
+                unless @tokens;
 
-  # Debug
-  print Dumper(\%CONFIG) if $DEBUG;
+            # Just need to make sure that these are acceptable tokens
+            # Get the lookup table and store that as the allowed options
+            my %allow;
+            for my $tok (@tokens) {
+                # only one token. See if we recognize it
+                my $strip = $tok;
+                $strip =~ s/%//;
 
-  return;
+                if (exists $map{$strip}) {
+                    unless (defined $map{$strip}) {
+                        warnings::warnif("Do not know how to process token $tok" );
+                    }
+                    else {
+                        $allow{ $map{$strip} } = $strip;
+                    }
+                }
+                else {
+                    warnings::warnif("Token $tok not currently recognized")
+                        unless exists $map{$strip};
+                }
+            }
+
+            # Store them
+            $entry->{tokens} = \@tokens;
+            $entry->{allow}  = \%allow;
+
+            print Dumper($entry) if $DEBUG;
+
+            # And store this in the config. Only store it if we have
+            # tokens
+            $CONFIG{lc($entry->{short_name})} = $entry;
+        }
+    }
+
+    # Debug
+    print Dumper(\%CONFIG) if $DEBUG;
+
+    return;
 }
 
 =item B<_extract_raw_info>
@@ -592,7 +583,7 @@ Go through a skycat.cfg file and extract the raw unprocessed entries
 into an array of hashes. The actual content of the file is passed
 in as a reference to an array of lines.
 
-  @entries = $q->_extract_raw_info( \@lines );
+    @entries = $q->_extract_raw_info(\@lines);
 
 This routine is separate from the main load routine to allow recursive
 calls to remote directory entries.
@@ -600,54 +591,51 @@ calls to remote directory entries.
 =cut
 
 sub _extract_raw_info {
-  my $self = shift;
-  my $lines = shift;
+    my $self = shift;
+    my $lines = shift;
 
-  # Now read in the contents
-  my $current; # Current server spec
-  my @configs; # Somewhere temporary to store the entries
+    # Now read in the contents
+    my $current; # Current server spec
+    my @configs; # Somewhere temporary to store the entries
 
-  for my $line (@$lines) {
+    for my $line (@$lines) {
+        # Skip comment lines and blank lines
+        next if $line =~ /^\s*\#/;
+        next if $line =~ /^\s*$/;
 
+        if ($line =~ /^(\w+):\s*(.*?)\s*$/) {
+            # This is content
+            my $key = $1;
+            my $value = $2;
+            # Assume that serv_type is always first
+            if ($key eq 'serv_type') {
+                # Store previous config if it contains something
+                # If it actually contains information on a serv_type of
+                # directory we can follow the URL and recursively expand
+                # the content
+                push(@configs, $self->_dir_check($current));
 
-    # Skip comment lines and blank lines
-    next if $line =~ /^\s*\#/;
-    next if $line =~ /^\s*$/;
-
-    if ($line =~ /^(\w+):\s*(.*?)\s*$/) {
-      # This is content
-      my $key = $1;
-      my $value = $2;
-      # Assume that serv_type is always first
-      if ($key eq 'serv_type') {
-        # Store previous config if it contains something
-        # If it actually contains information on a serv_type of
-        # directory we can follow the URL and recursively expand
-        # the content
-        push(@configs, $self->_dir_check( $current ));
-
-        # Clear the config and store the serv_type
-        $current = { $key => $value  };
-
-      } else {
-        # Just store the key value pair
-        $current->{$key} = $value;
-      }
-
-    } else {
-      # do not know what this line signifies since it is
-      # not a comment and not a content line
-      warnings::warnif("Unexpected line in config file: $line\n");
+                # Clear the config and store the serv_type
+                $current = {$key => $value};
+            }
+            else {
+                # Just store the key value pair
+                $current->{$key} = $value;
+            }
+        }
+        else {
+            # do not know what this line signifies since it is
+            # not a comment and not a content line
+            warnings::warnif("Unexpected line in config file: $line\n");
+        }
     }
 
-  }
+    # Last entry will still be in %$current so store it if it contains
+    # something.
+    push(@configs, $self->_dir_check( $current ));
 
-  # Last entry will still be in %$current so store it if it contains
-  # something.
-  push(@configs, $self->_dir_check( $current ));
-
-  # Return the entries
-  return @configs;
+    # Return the entries
+    return @configs;
 }
 
 =item B<_dir_check>
@@ -658,7 +646,7 @@ follow up directory specifications by doing a remote URL call
 and expanding that directory specification to many more remote
 catalogue server configs.
 
- @configs = $q->_dir_check( \%current );
+    @configs = $q->_dir_check(\%current);
 
 Returns the supplied argument, additional configs derived from
 that argument or nothing at all.
@@ -671,36 +659,37 @@ pointed to by 'catalogs@eso' itself contains a reference to 'catalogs@eso'.
 
 my %followed_dirs;
 sub _dir_check {
-  my $self = shift;
-  my $current = shift;
+    my $self = shift;
+    my $current = shift;
 
-  if (defined $current && %$current) {
-    if ($current->{serv_type} eq 'directory') {
-      # Get the content of the URL unless we are not
-      # reading directories
-      if ($FOLLOW_DIRS && defined $current->{url} &&
-          !exists $followed_dirs{$current->{short_name}}) {
-        print "Following directory link to ". $current->{short_name}.
-          "[".$current->{url}."]\n"
-          if $DEBUG;
+    if (defined $current && %$current) {
+        if ($current->{serv_type} eq 'directory') {
+            # Get the content of the URL unless we are not
+            # reading directories
+            if ($FOLLOW_DIRS && defined $current->{url} &&
+                    !exists $followed_dirs{$current->{short_name}}) {
+                print "Following directory link to ". $current->{short_name}.
+                    "[".$current->{url}."]\n"
+                    if $DEBUG;
 
-        # Indicate that we have followed this link
-        $followed_dirs{$current->{short_name}} = $current->{url};
+                # Indicate that we have followed this link
+                $followed_dirs{$current->{short_name}} = $current->{url};
 
-        # Retrieve the url, pass that array to the raw parser and then
-        # return any new configs to our caller
-        # Must force scalar context to get array ref
-        # back rather than a simple list.
-        return $self->_extract_raw_info(scalar $self->_get_directory_url( $current->{url} ));
-      }
-    } else {
-      # Not a 'directory' so this is a simple config entry. Simply return it.
-      return ($current);
+                # Retrieve the url, pass that array to the raw parser and then
+                # return any new configs to our caller
+                # Must force scalar context to get array ref
+                # back rather than a simple list.
+                return $self->_extract_raw_info(scalar $self->_get_directory_url( $current->{url} ));
+            }
+        }
+        else {
+            # Not a 'directory' so this is a simple config entry. Simply return it.
+            return ($current);
+        }
     }
-  }
 
-  # return empty list since we have no value
-  return ();
+    # return empty list since we have no value
+    return ();
 }
 
 
@@ -710,8 +699,8 @@ Returns the content of the remote directory URL supplied as
 argument. In scalar context returns reference to array of lines. In
 list context returns the lines in a list.
 
- \@lines = $q->_get_directory_url( $url );
- @lines = $q->_get_directory__url( $url );
+    $lines = $q->_get_directory_url($url);
+    @lines = $q->_get_directory__url($url);
 
 If we have an error retrieving the file, just return an empty
 array (ie skip it).
@@ -719,24 +708,25 @@ array (ie skip it).
 =cut
 
 sub _get_directory_url {
-  my $self = shift;
-  my $url = shift;
+    my $self = shift;
+    my $url = shift;
 
-  # Call the base class to get the actual content
-  my $content = '';
-  eval {
-    $content = $self->_fetch_url( $url );
-  };
+    # Call the base class to get the actual content
+    my $content = '';
+    eval {
+        $content = $self->_fetch_url( $url );
+    };
 
-  # Need an array
-  my @lines;
-  @lines = split("\n", $content) if defined $content;
+    # Need an array
+    my @lines;
+    @lines = split("\n", $content) if defined $content;
 
-  if (wantarray) {
-    return @lines;
-  } else {
-    return \@lines;
-  }
+    if (wantarray) {
+        return @lines;
+    }
+    else {
+        return \@lines;
+    }
 }
 
 =item B<_token_mapping>
@@ -744,39 +734,39 @@ sub _get_directory_url {
 Provide a mapping of tokens found in SkyCat config files to the
 internal values used generically by Astro::Catalog::Query classes.
 
- %map = $class->_token_mappings;
+    %map = $class->_token_mappings;
 
 Keys are skycat tokens.
 
 =cut
 
 sub _token_mapping {
-  return (
-          id => 'id',
+    return (
+        id => 'id',
 
-          ra => 'ra',
-          dec => 'dec',
+        ra => 'ra',
+        dec => 'dec',
 
-          # Arcminutes
-          r1 => 'radmin',
-          r2 => 'radmax',
-          w  => 'width',
-          h  => 'height',
+        # Arcminutes
+        r1 => 'radmin',
+        r2 => 'radmax',
+        w  => 'width',
+        h  => 'height',
 
-          n => 'nout',
+        n => 'nout',
 
-          # which filter???
-          m1 => 'magfaint',
-          m2 => 'magbright',
+        # which filter???
+        m1 => 'magfaint',
+        m2 => 'magbright',
 
-          # Is this a conditional?
-          cond => 'cond',
+        # Is this a conditional?
+        cond => 'cond',
 
-          # Not Yet Supported
-          cols => undef,
-          'mime-type' => undef,
-          ws => undef,
-         );
+        # Not Yet Supported
+        cols => undef,
+        'mime-type' => undef,
+        ws => undef,
+    );
 }
 
 =back
@@ -796,28 +786,28 @@ or decimal degrees.
 =cut
 
 sub _from_dec {
-  my $self = shift;
-  my $dec = $self->query_options("dec");
-  my %allow = $self->_get_allowed_options();
+    my $self = shift;
+    my $dec = $self->query_options("dec");
+    my %allow = $self->_get_allowed_options();
 
-  # Need colons
-  $dec =~ s/\s+/:/g;
+    # Need colons
+    $dec =~ s/\s+/:/g;
 
-  # Need a + preprended
-  $dec = "+" . $dec if $dec !~ /^[\+\-]/;
+    # Need a + preprended
+    $dec = "+" . $dec if $dec !~ /^[\+\-]/;
 
-  return ($allow{dec},$dec);
+    return ($allow{dec}, $dec);
 }
 
 sub _from_ra {
-  my $self = shift;
-  my $ra = $self->query_options("ra");
-  my %allow = $self->_get_allowed_options();
+    my $self = shift;
+    my $ra = $self->query_options("ra");
+    my %allow = $self->_get_allowed_options();
 
-  # need colons
-  $ra =~ s/\s+/:/g;
+    # need colons
+    $ra =~ s/\s+/:/g;
 
-  return ($allow{ra},$ra);
+    return ($allow{ra}, $ra);
 }
 
 =item B<_translate_one_to_one>
@@ -826,7 +816,7 @@ Return a list of internal options (as defined in C<_get_allowed_options>)
 that are known to support a one-to-one mapping of the internal value
 to the external value.
 
-  %one = $q->_translate_one_to_one();
+    %one = $q->_translate_one_to_one();
 
 Returns a hash with keys and no values (this makes it easy to
 check for the option).
@@ -836,14 +826,18 @@ This method also returns, the values from the parent class.
 =cut
 
 sub _translate_one_to_one {
-  my $self = shift;
-  # convert to a hash-list
-  return ($self->SUPER::_translate_one_to_one,
-          map { $_, undef }(qw/
-                            cond
-                            /)
-         );
+    my $self = shift;
+    # convert to a hash-list
+    return ($self->SUPER::_translate_one_to_one,
+            map { $_, undef }(qw/
+                cond
+                /)
+           );
 }
+
+1;
+
+__END__
 
 =back
 
@@ -854,7 +848,7 @@ sub _translate_one_to_one {
 'directory' entries are not followed by default although the class
 can be configured to do so by setting
 
- $Astro::Catalog::Query::SkyCat::FOLLOW_DIRS = 1;
+    $Astro::Catalog::Query::SkyCat::FOLLOW_DIRS = 1;
 
 to true.
 
@@ -864,14 +858,16 @@ auto-generating a class per server. This has the advantage of allowing
 a user to request USNO data from different servers rather than generating
 a single USNO class. ie
 
-  my $q = new Astro::Catalog::Query::SkyCat( catalog => 'usnoa@eso',
-                                             target => 'HL Tau',
-                                             radius => 5 );
+    my $q = new Astro::Catalog::Query::SkyCat(
+            catalog => 'usnoa@eso',
+            target => 'HL Tau',
+            radius => 5);
 
 as opposed to
 
-    my $q = new Astro::Catalog::Query::USNOA( target => 'HL Tau',
-                                              radius => 5 );
+    my $q = new Astro::Catalog::Query::USNOA(
+            target => 'HL Tau',
+            radius => 5 );
 
 What to do with catalogue mirrors is an open question. Of course,
 convenience wrapper classes could be made available that simply delegate
@@ -906,5 +902,3 @@ Tim Jenness E<lt>tjenness@cpan.orgE<gt>,
 Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>
 
 =cut
-
-1;

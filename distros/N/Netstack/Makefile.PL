@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "Digest::MD5" => 0,
     "Expect" => 0,
     "Mail::Sender" => 0,
+    "Mojo::Util" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
     "POSIX" => 0,
@@ -34,10 +35,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Mojo::Util" => 0,
+    "DDP" => 0,
     "Test::Simple" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.019",
   "test" => {
     "TESTS" => "t/utils/*.t"
   }
@@ -47,6 +48,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "DBIx::Custom" => 0,
+  "DDP" => 0,
   "Digest::MD5" => 0,
   "Expect" => 0,
   "Mail::Sender" => 0,

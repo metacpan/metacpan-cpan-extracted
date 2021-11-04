@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::SuggestedAddress;
-$Shipment::Purolator::WSDLV2::Types::SuggestedAddress::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::SuggestedAddress::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Address
               ResponseInformation
 
-              )
+            )
         ],
         {   'Address'             => \%Address_of,
             'ResponseInformation' => \%ResponseInformation_of,
@@ -62,7 +62,7 @@ Shipment::Purolator::WSDLV2::Types::SuggestedAddress
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

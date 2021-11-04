@@ -50,7 +50,7 @@ use Wireguard::WGmeta::ValidAttributes;
 use Wireguard::WGmeta::Utils;
 use Wireguard::WGmeta::Parser::Conf qw(INTERNAL_KEY_PREFIX);
 
-our $VERSION = "0.3.1"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.3.2"; # do not change manually, this variable is updated when calling make
 
 use constant FALSE => 0;
 use constant TRUE => 1;
@@ -216,7 +216,7 @@ sub set($self, $interface, $identifier, $attribute, $value, $unknown_callback = 
         die "Attribute `$attribute` it not valid for the interface section" if $attr_type == ATTR_TYPE_IS_WG_ORIG_PEER;
     }
     else {
-        die "Attribute `$attribute` is not valid for an peer section" if $attr_type == ATTR_TYPE_IS_WG_ORIG_INTERFACE or $attr_type == ATTR_TYPE_IS_WG_QUICK;
+        die "Attribute `$attribute` is not valid for a peer section" if $attr_type == ATTR_TYPE_IS_WG_ORIG_INTERFACE or $attr_type == ATTR_TYPE_IS_WG_QUICK;
     }
 
     # skip if same value

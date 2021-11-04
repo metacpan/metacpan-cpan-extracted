@@ -2,7 +2,7 @@ package Test2::Harness::UI::Sweeper;
 use strict;
 use warnings;
 
-our $VERSION = '0.000086';
+our $VERSION = '0.000096';
 
 use Test2::Harness::UI::Util::HashBase qw{
     <config
@@ -71,14 +71,13 @@ sub sweep {
         }
 
         if ($params{run_fields}) {
-            if ($params{coverage}) {
-                $run->run_fields->delete;
-            }
-            else {
-                $run->run_fields->search({name => {'!=' => 'coverage'}})->delete;
-            }
+            $run->run_fields->delete;
         }
 
+        if ($params{coverage}) {
+            $run->coverages->delete;
+            $run->update({has_coverage => 0}) unless $params{runs};
+        }
         $run->delete if $params{runs};
     }
 

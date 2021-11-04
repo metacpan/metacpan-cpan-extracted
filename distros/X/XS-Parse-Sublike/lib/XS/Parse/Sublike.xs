@@ -13,10 +13,13 @@
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
-#if HAVE_PERL_VERSION(5, 31, 3)
-#  define HAVE_PARSE_SUBSIGNATURE
-#elif HAVE_PERL_VERSION(5, 26, 0)
-#  include "parse_subsignature.c.inc"
+#if HAVE_PERL_VERSION(5, 26, 0)
+#  if !HAVE_PERL_VERSION(5, 31, 3)
+#    include "parse_subsignature.c.inc"
+#  endif
+
+#  include "make_argcheck_aux.c.inc"
+
 #  define HAVE_PARSE_SUBSIGNATURE
 #endif
 
@@ -63,25 +66,39 @@ static void hooks_from_v3(struct XSParseSublikeHooks *hooks, const struct XSPars
     hooks->filter_attr = NULL;
 }
 
-/* Support two sets of hooks so we can handle xs_parse_sublike_any() with one
- * set which then finds a custom keyword which provides a second
- * Either or both may be NULL
- */
-static int parse2(pTHX_
-  const struct XSParseSublikeHooks *hooksA, void *hookdataA,
-  const struct XSParseSublikeHooks *hooksB, void *hookdataB,
+struct HooksAndData {
+  const struct XSParseSublikeHooks *hooks;
+  void *data;
+};
+
+#define FOREACH_HOOKS_FORWARD \
+  for(hooki = 0; \
+    (hooki < nhooks) && (hooks = hooksanddata[hooki].hooks, hookdata = hooksanddata[hooki].data), (hooki < nhooks); \
+    hooki++)
+
+#define FOREACH_HOOKS_REVERSE \
+  for(hooki = nhooks - 1; \
+    (hooki >= 0) && (hooks = hooksanddata[hooki].hooks, hookdata = hooksanddata[hooki].data), (hooki >= 0); \
+    hooki--)
+
+static int parse(pTHX_
+  struct HooksAndData hooksanddata[],
+  size_t nhooks,
   OP **op_ptr)
 {
   struct XSParseSublikeContext ctx = { 0 };
 
+  IV hooki;
+  const struct XSParseSublikeHooks *hooks;
+  void *hookdata;
+
   U8 require_parts = 0, skip_parts = 0;
-  if(hooksA) {
-    require_parts |= hooksA->require_parts;
-    skip_parts    |= hooksA->skip_parts;
-  }
-  if(hooksB) {
-    require_parts |= hooksB->require_parts;
-    skip_parts    |= hooksB->skip_parts;
+
+  FOREACH_HOOKS_FORWARD {
+    require_parts |= hooks->require_parts;
+    skip_parts    |= hooks->skip_parts;
+    if(!(hooks->flags & XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL))
+      require_parts |= XS_PARSE_SUBLIKE_PART_BODY;
   }
 
   if(!(skip_parts & XS_PARSE_SUBLIKE_PART_NAME)) {
@@ -95,10 +112,10 @@ static int parse2(pTHX_
   /* From here onwards any `return` must be prefixed by LEAVE_with_name() */
   U32 was_scopestack_ix = PL_scopestack_ix;
 
-  if(hooksA && hooksA->pre_subparse)
-    (*hooksA->pre_subparse)(aTHX_ &ctx, hookdataA);
-  if(hooksB && hooksB->pre_subparse)
-    (*hooksB->pre_subparse)(aTHX_ &ctx, hookdataB);
+  FOREACH_HOOKS_FORWARD {
+    if(hooks->pre_subparse)
+      (*hooks->pre_subparse)(aTHX_ &ctx, hookdata);
+  }
 
 #ifdef DEBUGGING
   if(PL_scopestack_ix != was_scopestack_ix)
@@ -126,12 +143,12 @@ static int parse2(pTHX_
         lex_read_space(0);
       }
 
-      bool handled = false;
+      bool handled = FALSE;
 
-      if(hooksA && (hooksA->flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS) && (hooksA->filter_attr))
-        handled |= (*hooksA->filter_attr)(aTHX_ &ctx, attr, val, hookdataA);
-      if(hooksB && (hooksB->flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS) && (hooksB->filter_attr))
-        handled |= (*hooksB->filter_attr)(aTHX_ &ctx, attr, val, hookdataB);
+      FOREACH_HOOKS_FORWARD {
+        if((hooks->flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS) && (hooks->filter_attr))
+          handled |= (*hooks->filter_attr)(aTHX_ &ctx, attr, val, hookdata);
+      }
 
       if(handled) {
         SvREFCNT_dec(attr);
@@ -155,10 +172,10 @@ static int parse2(pTHX_
   PL_hints |= HINT_LOCALIZE_HH;
   I32 save_ix = block_start(TRUE);
 
-  if(hooksA && hooksA->post_blockstart)
-    (*hooksA->post_blockstart)(aTHX_ &ctx, hookdataA);
-  if(hooksB && hooksB->post_blockstart)
-    (*hooksB->post_blockstart)(aTHX_ &ctx, hookdataB);
+  FOREACH_HOOKS_FORWARD {
+    if(hooks->post_blockstart)
+      (*hooks->post_blockstart)(aTHX_ &ctx, hookdata);
+  }
 
 #ifdef DEBUGGING
   if(PL_scopestack_ix != was_scopestack_ix)
@@ -180,10 +197,7 @@ static int parse2(pTHX_
     if(lex_peek_unichar(0) == ')') {
       /* Inject an empty OP_ARGCHECK much as core would do if it encountered
        * an empty signature */
-      UNOP_AUX_item *aux = (UNOP_AUX_item *)PerlMemShared_malloc(sizeof(UNOP_AUX_item) * 3);
-      aux[0].iv = 0;
-      aux[1].iv = 0;
-      aux[2].iv = 0;
+      UNOP_AUX_item *aux = make_argcheck_aux(0, 0, 0);
 
       sigop = op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
         newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux));
@@ -222,8 +236,18 @@ static int parse2(pTHX_
   }
 #endif
 
-  ctx.body = parse_block(0);
-  SvREFCNT_inc(PL_compcv);
+  if(lex_peek_unichar(0) == '{') {
+    /* TODO: technically possible to have skip body flag */
+    ctx.body = parse_block(0);
+    SvREFCNT_inc(PL_compcv);
+  }
+  else if(require_parts & XS_PARSE_SUBLIKE_PART_BODY)
+    croak("Expected '{' for block body");
+  else if(lex_peek_unichar(0) == ';') {
+    /* nothing to be done */
+  }
+  else
+    croak("Expected '{' for block body or ';'");
 
 #ifdef HAVE_PARSE_SUBSIGNATURE
   if(ctx.body && sigop) {
@@ -269,10 +293,10 @@ static int parse2(pTHX_
     }
   }
 
-  if(hooksB && hooksB->pre_blockend)
-    (*hooksB->pre_blockend)(aTHX_ &ctx, hookdataB);
-  if(hooksA && hooksA->pre_blockend)
-    (*hooksA->pre_blockend)(aTHX_ &ctx, hookdataA);
+  FOREACH_HOOKS_REVERSE {
+    if(hooks->pre_blockend)
+      (*hooks->pre_blockend)(aTHX_ &ctx, hookdata);
+  }
 
 #ifdef DEBUGGING
   if(PL_scopestack_ix != was_scopestack_ix)
@@ -280,18 +304,20 @@ static int parse2(pTHX_
       was_scopestack_ix, PL_scopestack_ix);
 #endif
 
-  ctx.body = block_end(save_ix, ctx.body);
+  if(ctx.body) {
+    ctx.body = block_end(save_ix, ctx.body);
 
-  ctx.cv = newATTRSUB(floor_ix,
-    ctx.name ? newSVOP(OP_CONST, 0, SvREFCNT_inc(ctx.name)) : NULL,
-    NULL,
-    ctx.attrs,
-    ctx.body);
+    ctx.cv = newATTRSUB(floor_ix,
+      ctx.name ? newSVOP(OP_CONST, 0, SvREFCNT_inc(ctx.name)) : NULL,
+      NULL,
+      ctx.attrs,
+      ctx.body);
+  }
 
-  if(hooksA && hooksA->post_newcv)
-    (*hooksA->post_newcv)(aTHX_ &ctx, hookdataA);
-  if(hooksB && hooksB->post_newcv)
-    (*hooksB->post_newcv)(aTHX_ &ctx, hookdataB);
+  FOREACH_HOOKS_FORWARD {
+    if(hooks->post_newcv)
+      (*hooks->post_newcv)(aTHX_ &ctx, hookdata);
+  }
 
   assert(PL_scopestack_ix == was_scopestack_ix);
   LEAVE_with_name("parse_sublike");
@@ -312,11 +338,14 @@ static int parse2(pTHX_
 
 static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, void *hookdata, OP **op_ptr)
 {
-  return parse2(aTHX_ hooks, hookdata, NULL, NULL, op_ptr);
+  struct HooksAndData hd = { .hooks = hooks, .data = hookdata };
+  return parse(aTHX_ &hd, 1, op_ptr);
 }
 
 static int IMPL_xs_parse_sublike_v3(pTHX_ const struct XSParseSublikeHooks_v3 *hooks_v3, void *hookdata, OP **op_ptr)
 {
+  warn("XS::Parse::Sublike ABI v3 is now deprecated; the caller should be rebuilt to use v4");
+
   struct XSParseSublikeHooks hooks;
   hooks_from_v3(&hooks, hooks_v3);
 
@@ -377,6 +406,8 @@ static void IMPL_register_xs_parse_sublike(pTHX_ const char *kw, const struct XS
 
 static void IMPL_register_xs_parse_sublike_v3(pTHX_ const char *kw, const struct XSParseSublikeHooks_v3 *hooks_v3, void *hookdata)
 {
+  warn("XS::Parse::Sublike ABI v3 is now deprecated; the caller should be rebuilt to use v4");
+
   register_sublike(aTHX_ kw, hooks_v3, hookdata, 3);
 }
 
@@ -433,20 +464,29 @@ static int IMPL_xs_parse_sublike_any(pTHX_ const struct XSParseSublikeHooks *hoo
 
   SvREFCNT_dec(kwsv);
 
-  if(!reg)
-    return parse2(aTHX_ hooksA, hookdataA, NULL, NULL, op_ptr);
-
-  if(reg->ver >= 4)
-    return parse2(aTHX_ hooksA, hookdataA, reg->hooks, reg->hookdata, op_ptr);
-
+  struct HooksAndData hd[] = {
+    { .hooks = hooksA, .data = hookdataA },
+    { 0 }
+  };
   struct XSParseSublikeHooks hooks;
-  hooks_from_v3(&hooks, reg->hooks_v3);
 
-  return parse2(aTHX_ hooksA, hookdataA, &hooks, reg->hookdata, op_ptr);
+  if(reg) {
+    hd[1].hooks = reg->hooks;
+    hd[1].data  = reg->hookdata;
+
+    if(reg->ver < 4) {
+      hooks_from_v3(&hooks, reg->hooks_v3);
+      hd[1].hooks = &hooks;
+    }
+  }
+
+  return parse(aTHX_ hd, 1 + !!reg, op_ptr);
 }
 
 static int IMPL_xs_parse_sublike_any_v3(pTHX_ const struct XSParseSublikeHooks_v3 *hooksA_v3, void *hookdataA, OP **op_ptr)
 {
+  warn("XS::Parse::Sublike ABI v3 is now deprecated; the caller should be rebuilt to use v4");
+
   struct XSParseSublikeHooks hooksA;
   hooks_from_v3(&hooksA, hooksA_v3);
 
@@ -464,13 +504,67 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 
   lex_read_space(0);
 
+  /* We'll abuse the SvPVX storage of an SV to keep an array of HooksAndData
+   * structures
+   */
+  SV *hdlsv = newSV(4 * sizeof(struct HooksAndData));
+  SAVEFREESV(hdlsv);
+  struct HooksAndData *hd = (struct HooksAndData *)SvPVX(hdlsv);
+  size_t nhooks = 1;
+
+  struct XSParseSublikeHooks *hooks;
   if(reg->ver >= 4)
-    return parse2(aTHX_ NULL, NULL, reg->hooks, reg->hookdata, op_ptr);
+    hooks = (struct XSParseSublikeHooks *)reg->hooks;
+  else {
+    Newx(hooks, 1, struct XSParseSublikeHooks);
+    SAVEFREEPV(hooks);
 
-  struct XSParseSublikeHooks hooks;
-  hooks_from_v3(&hooks, reg->hooks_v3);
+    hooks_from_v3(hooks, reg->hooks_v3);
+  }
+  hd[0].hooks = hooks;
+  hd[0].data  = reg->hookdata;
 
-  return parse2(aTHX_ NULL, NULL, &hooks, reg->hookdata, op_ptr);
+  while(hooks->flags & XS_PARSE_SUBLIKE_FLAG_PREFIX) {
+    /* After a prefixing keyword, expect another one */
+    SV *kwsv = lex_scan_ident();
+    SAVEFREESV(kwsv);
+
+    if(!kwsv || !SvCUR(kwsv))
+      croak("Expected a keyword to introduce a sub or sub-like construction");
+
+    kw = SvPV_nolen(kwsv);
+    kwlen = SvCUR(kwsv);
+
+    lex_read_space(0);
+
+    /* We permit 'sub' as a NULL set of hooks; anything else should be a registered keyword */
+    if(kwlen == 3 && strEQ(kw, "sub"))
+      break;
+
+    reg = find_permitted(aTHX_ kw, kwlen);
+    if(!reg)
+      croak("Expected a keyword to introduce a sub or sub-like construction, found \"%.*s\"",
+          kwlen, kw);
+
+    if(reg->ver >= 4)
+      hooks = (struct XSParseSublikeHooks *)reg->hooks;
+    else {
+      Newx(hooks, 1, struct XSParseSublikeHooks);
+      SAVEFREEPV(hooks);
+
+      hooks_from_v3(hooks, reg->hooks_v3);
+    }
+
+    if(SvLEN(hdlsv) < (nhooks + 1) * sizeof(struct HooksAndData)) {
+      SvGROW(hdlsv, SvLEN(hdlsv) * 2);
+      hd = (struct HooksAndData *)SvPVX(hdlsv);
+    }
+    hd[nhooks].hooks = hooks;
+    hd[nhooks].data  = reg->hookdata;
+    nhooks++;
+  }
+
+  return parse(aTHX_ hd, nhooks, op_ptr);
 }
 
 MODULE = XS::Parse::Sublike    PACKAGE = XS::Parse::Sublike

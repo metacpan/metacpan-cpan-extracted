@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::AdditionalLabelsDetail;
-$Shipment::FedEx::WSDL::ShipTypes::AdditionalLabelsDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::AdditionalLabelsDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Type
               Count
 
-              )
+            )
         ],
         {   'Type'  => \%Type_of,
             'Count' => \%Count_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::ShipTypes::AdditionalLabelsDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

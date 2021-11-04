@@ -1,0 +1,8 @@
+Net-RFC3161-Timestamp
+
+Objective: make it easy to obtain RFC 3161 compliant timestamps
+from a server
+
+
+Initially based on code released under the MIT License by 
+Mantas Mikulėnas <grawity@gmail.com>.

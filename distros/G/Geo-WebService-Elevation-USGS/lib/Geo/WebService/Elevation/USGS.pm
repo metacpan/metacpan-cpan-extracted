@@ -76,7 +76,7 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.119';
+our $VERSION = '0.120';
 
 # use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
 use constant USGS_URL => 'https://nationalmap.gov/epqs/pqs.php';

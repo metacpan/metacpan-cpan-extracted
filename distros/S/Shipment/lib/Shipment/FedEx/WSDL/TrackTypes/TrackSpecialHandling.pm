@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling;
-$Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Description
               PaymentType
 
-              )
+            )
         ],
         {   'Type'        => \%Type_of,
             'Description' => \%Description_of,
@@ -68,7 +68,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

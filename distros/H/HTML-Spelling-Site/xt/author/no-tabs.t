@@ -16,6 +16,7 @@ my @files = (
     't/data/sites/fully-correct-timestamp/PLACEHOLDER',
     't/data/sites/fully-correct-whitelist/whitelist.txt',
     't/data/sites/fully-correct/index.html',
+    't/data/whitelist-with-dup-records.txt',
     't/data/whitelist-with-duplicates.txt',
     't/whitelist.t'
 );

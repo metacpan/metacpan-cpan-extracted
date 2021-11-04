@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::wordlist::modname_with_optional_args;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-06-07'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $rschema = ["str",[{description=>"\nPerl WordList::* module name without the prefix, with optional arguments which\nwill be used as import arguments, just like the `-MMODULE=ARGS` shortcut that\n`perl` provides. Examples:\n\n    EN::Enable\n    MetaSyntactic::Any=theme,dangdut\n\nSee also: `perl::wordlist::modname`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar=a,1,b,2",value=>"Foo/Bar=a,1,b,2"},{valid=>0,value=>"Foo bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?\\z",summary=>"Perl WordList::* module name without the prefix (e.g. EN::Enable) with optional arguments (e.g. MetaSyntactic::Any=theme,dangdut)","x.completion"=>["perl_modname",{ns_prefix=>"WordList"}],"x.perl.coerce_rules"=>[["From_str::normalize_perl_modname",{ns_prefix=>"WordList"}]]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::wordlist::modname_with_optional_args - Perl WordList::* modu
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::perl::wordlist::modname_with_optional_args (from Perl distribution Sah-Schemas-WordList), released on 2020-05-27.
+This document describes version 0.003 of Sah::SchemaR::perl::wordlist::modname_with_optional_args (from Perl distribution Sah-Schemas-WordList), released on 2021-06-07.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

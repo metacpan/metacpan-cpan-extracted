@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::Dimension;
-$Shipment::Purolator::WSDL::Types::Dimension::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::Dimension::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,12 +29,12 @@ Class::Std::initialize();
         [   qw(        Value
               DimensionUnit
 
-              )
+            )
         ],
         {   'Value'         => \%Value_of,
             'DimensionUnit' => \%DimensionUnit_of,
         },
-        {   'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+        {   'Value'         => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
             'DimensionUnit' =>
               'Shipment::Purolator::WSDL::Types::DimensionUnit',
         },
@@ -62,7 +62,7 @@ Shipment::Purolator::WSDL::Types::Dimension
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

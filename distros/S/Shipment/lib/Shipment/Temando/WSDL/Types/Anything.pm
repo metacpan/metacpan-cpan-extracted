@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Anything;
-$Shipment::Temando::WSDL::Types::Anything::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Anything::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -116,7 +116,7 @@ Class::Std::initialize();
               quantity
               description
 
-              )
+            )
         ],
         {   'class'               => \%class_of,
             'subclass'            => \%subclass_of,
@@ -134,12 +134,12 @@ Class::Std::initialize();
               \%qualifierFreightGeneralFragile_of,
             'qualifierFreightGeneralRefrigerated' =>
               \%qualifierFreightGeneralRefrigerated_of,
-            'qualifierVehicleMake'        => \%qualifierVehicleMake_of,
-            'qualifierVehicleModel'       => \%qualifierVehicleModel_of,
-            'qualifierVehicleDescription' => \%qualifierVehicleDescription_of,
-            'qualifierVehicleRunning'     => \%qualifierVehicleRunning_of,
-            'qualifierVehicleRegistered'  => \%qualifierVehicleRegistered_of,
-            'qualifierVehicleYear'        => \%qualifierVehicleYear_of,
+            'qualifierVehicleMake'         => \%qualifierVehicleMake_of,
+            'qualifierVehicleModel'        => \%qualifierVehicleModel_of,
+            'qualifierVehicleDescription'  => \%qualifierVehicleDescription_of,
+            'qualifierVehicleRunning'      => \%qualifierVehicleRunning_of,
+            'qualifierVehicleRegistered'   => \%qualifierVehicleRegistered_of,
+            'qualifierVehicleYear'         => \%qualifierVehicleYear_of,
             'qualifierVehicleRegistration' =>
               \%qualifierVehicleRegistration_of,
             'qualifierBoatMake'         => \%qualifierBoatMake_of,
@@ -197,7 +197,7 @@ Class::Std::initialize();
               'Shipment::Temando::WSDL::Types::VehicleYear',
             'qualifierVehicleRegistration' =>
               'Shipment::Temando::WSDL::Types::VehicleRegistration',
-            'qualifierBoatMake' => 'Shipment::Temando::WSDL::Types::BoatMake',
+            'qualifierBoatMake'  => 'Shipment::Temando::WSDL::Types::BoatMake',
             'qualifierBoatModel' =>
               'Shipment::Temando::WSDL::Types::BoatModel',
             'qualifierBoatSeaworthy' =>
@@ -234,16 +234,16 @@ Class::Std::initialize();
         },
         {
 
-            'class'               => 'class',
-            'subclass'            => 'subclass',
-            'mode'                => 'mode',
-            'tlSubclass'          => 'tlSubclass',
-            'packaging'           => 'packaging',
-            'palletType'          => 'palletType',
-            'palletNature'        => 'palletNature',
-            'containerDimensions' => 'containerDimensions',
-            'containerNature'     => 'containerNature',
-            'containerRegistered' => 'containerRegistered',
+            'class'                                 => 'class',
+            'subclass'                              => 'subclass',
+            'mode'                                  => 'mode',
+            'tlSubclass'                            => 'tlSubclass',
+            'packaging'                             => 'packaging',
+            'palletType'                            => 'palletType',
+            'palletNature'                          => 'palletNature',
+            'containerDimensions'                   => 'containerDimensions',
+            'containerNature'                       => 'containerNature',
+            'containerRegistered'                   => 'containerRegistered',
             'qualifierFreightGeneralDangerousGoods' =>
               'qualifierFreightGeneralDangerousGoods',
             'qualifierFreightGeneralFragile' =>
@@ -298,7 +298,7 @@ Shipment::Temando::WSDL::Types::Anything
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

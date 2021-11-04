@@ -13,7 +13,7 @@
 package Authen::Credential;
 use strict;
 use warnings;
-our $VERSION  = "1.1";
+our $VERSION  = "1.2";
 our $REVISION = sprintf("%d.%02d", q$Revision: 1.12 $ =~ /(\d+)\.(\d+)/);
 
 #

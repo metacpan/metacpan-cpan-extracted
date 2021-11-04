@@ -33,4 +33,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/hirose31/Net-SSL-ExpireDate.git
-version: '1.21'
+version: '1.22'

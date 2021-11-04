@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::BillReceiverAddressType;
-$Shipment::UPS::WSDL::ShipTypes::BillReceiverAddressType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::BillReceiverAddressType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        PostalCode
 
-              )
+            )
         ],
         {'PostalCode' => \%PostalCode_of,},
         {'PostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
@@ -54,7 +54,7 @@ Shipment::UPS::WSDL::ShipTypes::BillReceiverAddressType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

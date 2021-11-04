@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDLV2::Typemaps::ShippingDocumentsService;
-$Shipment::Purolator::WSDLV2::Typemaps::ShippingDocumentsService::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Typemaps::ShippingDocumentsService::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -112,10 +112,10 @@ our $typemap_1 = {
       'SOAP::WSDL::XSD::Typelib::Builtin::string',
     'GetShipmentManifestDocumentResponse/ResponseInformation/Errors' =>
       'Shipment::Purolator::WSDLV2::Types::ArrayOfError',
-    'Fault' => 'SOAP::WSDL::SOAP::Typelib::Fault11',
+    'Fault'           => 'SOAP::WSDL::SOAP::Typelib::Fault11',
     'ValidationFault' =>
       'Shipment::Purolator::WSDLV2::Elements::ValidationFault',
-    'Fault/faultactor' => 'SOAP::WSDL::XSD::Typelib::Builtin::token',
+    'Fault/faultactor'    => 'SOAP::WSDL::XSD::Typelib::Builtin::token',
     'GetDocumentsRequest' =>
       'Shipment::Purolator::WSDLV2::Elements::GetDocumentsRequest',
     'GetDocumentsResponse/ResponseInformation/InformationalMessages' =>
@@ -134,6 +134,7 @@ our $typemap_1 = {
     'ResponseContext/ResponseReference' =>
       'SOAP::WSDL::XSD::Typelib::Builtin::string',
 };
+
 
 sub get_class {
     my $name = join '/', @{$_[1]};
@@ -156,7 +157,7 @@ Shipment::Purolator::WSDLV2::Typemaps::ShippingDocumentsService
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

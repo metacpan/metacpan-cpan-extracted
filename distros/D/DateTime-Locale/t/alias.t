@@ -6,7 +6,7 @@ use Test::File::ShareDir::Dist { 'DateTime-Locale' => 'share' };
 
 use DateTime::Locale;
 
-DateTime::Locale->add_aliases( foo => 'root' );
+DateTime::Locale->add_aliases( foo => 'und' );
 DateTime::Locale->add_aliases( bar => 'foo' );
 DateTime::Locale->add_aliases( baz => 'bar' );
 like(
@@ -23,7 +23,7 @@ like(
 
 my $l = DateTime::Locale->load('baz');
 isa_ok( $l, 'DateTime::Locale::FromData' );
-is( $l->id, 'root', 'id is root' );
+is( $l->id, 'und', 'id is und' );
 
 ok(
     DateTime::Locale->remove_alias('baz'),

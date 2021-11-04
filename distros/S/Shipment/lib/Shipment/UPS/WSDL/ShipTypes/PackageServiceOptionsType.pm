@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::PackageServiceOptionsType;
-$Shipment::UPS::WSDL::ShipTypes::PackageServiceOptionsType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::PackageServiceOptionsType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,14 +40,14 @@ Class::Std::initialize();
               Notification
               ReturnsFlexibleAccessIndicator
 
-              )
+            )
         ],
-        {   'DeliveryConfirmation'    => \%DeliveryConfirmation_of,
-            'DeclaredValue'           => \%DeclaredValue_of,
-            'COD'                     => \%COD_of,
-            'VerbalConfirmation'      => \%VerbalConfirmation_of,
-            'ShipperReleaseIndicator' => \%ShipperReleaseIndicator_of,
-            'Notification'            => \%Notification_of,
+        {   'DeliveryConfirmation'           => \%DeliveryConfirmation_of,
+            'DeclaredValue'                  => \%DeclaredValue_of,
+            'COD'                            => \%COD_of,
+            'VerbalConfirmation'             => \%VerbalConfirmation_of,
+            'ShipperReleaseIndicator'        => \%ShipperReleaseIndicator_of,
+            'Notification'                   => \%Notification_of,
             'ReturnsFlexibleAccessIndicator' =>
               \%ReturnsFlexibleAccessIndicator_of,
         },
@@ -67,12 +67,12 @@ Class::Std::initialize();
         },
         {
 
-            'DeliveryConfirmation'    => 'DeliveryConfirmation',
-            'DeclaredValue'           => 'DeclaredValue',
-            'COD'                     => 'COD',
-            'VerbalConfirmation'      => 'VerbalConfirmation',
-            'ShipperReleaseIndicator' => 'ShipperReleaseIndicator',
-            'Notification'            => 'Notification',
+            'DeliveryConfirmation'           => 'DeliveryConfirmation',
+            'DeclaredValue'                  => 'DeclaredValue',
+            'COD'                            => 'COD',
+            'VerbalConfirmation'             => 'VerbalConfirmation',
+            'ShipperReleaseIndicator'        => 'ShipperReleaseIndicator',
+            'Notification'                   => 'Notification',
             'ReturnsFlexibleAccessIndicator' =>
               'ReturnsFlexibleAccessIndicator',
         }
@@ -95,7 +95,7 @@ Shipment::UPS::WSDL::ShipTypes::PackageServiceOptionsType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

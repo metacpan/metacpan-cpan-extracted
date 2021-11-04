@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::Op900Detail;
-$Shipment::FedEx::WSDL::RateTypes::Op900Detail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::Op900Detail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               CustomerImageUsages
               SignatureName
 
-              )
+            )
         ],
         {   'Format'              => \%Format_of,
             'Reference'           => \%Reference_of,
@@ -74,7 +74,7 @@ Shipment::FedEx::WSDL::RateTypes::Op900Detail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail;
-$Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        UserCredential
 
-              )
+            )
         ],
         {'UserCredential' => \%UserCredential_of,},
         {   'UserCredential' =>
@@ -56,7 +56,7 @@ Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

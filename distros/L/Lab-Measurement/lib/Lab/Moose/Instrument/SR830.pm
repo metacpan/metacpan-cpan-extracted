@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SR830;
-$Lab::Moose::Instrument::SR830::VERSION = '3.772';
+$Lab::Moose::Instrument::SR830::VERSION = '3.791';
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
 
 use v5.20;
@@ -469,14 +469,18 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 SYNOPSIS
 
  use Lab::Moose;
 
  # Constructor
- my $lia = instrument(type => 'SR830', %connection_options);
+ my $lia = instrument(
+     type => 'SR830',
+     connection_type => 'VISA::GPIB',
+     connection_options => {'gpib_address' => 10}
+ );
  
  # Set reference frequency to 10 kHz
  $lia->set_frq(value => 10000);
@@ -484,7 +488,7 @@ version 3.772
  # Set time constant to 10 sec
  $lia->set_tc(value => 10);
 
- # Set sensitivity to 10 mV
+ # Set sensitivity to 1 mV
  $lia->set_sens(value => 0.001);
  
  # Get X and Y values

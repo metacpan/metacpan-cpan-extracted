@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::PackageType;
-$Shipment::UPS::WSDL::ShipTypes::PackageType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::PackageType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ Class::Std::initialize();
               PackageServiceOptions
               Commodity
 
-              )
+            )
         ],
         {   'Description'                 => \%Description_of,
             'Packaging'                   => \%Packaging_of,
@@ -102,7 +102,7 @@ Shipment::UPS::WSDL::ShipTypes::PackageType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

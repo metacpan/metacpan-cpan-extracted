@@ -71,13 +71,13 @@ Spanish Argentina locale.
 
 =head3 Abbreviated (stand-alone)
 
-  lun.
-  mar.
-  mié.
-  jue.
-  vie.
-  sáb.
-  dom.
+  lun
+  mar
+  mié
+  jue
+  vie
+  sáb
+  dom
 
 =head3 Narrow (stand-alone)
 
@@ -108,18 +108,18 @@ Spanish Argentina locale.
 
 =head3 Abbreviated (format)
 
-  ene.
-  feb.
-  mar.
-  abr.
-  may.
-  jun.
-  jul.
-  ago.
-  sep.
-  oct.
-  nov.
-  dic.
+  ene
+  feb
+  mar
+  abr
+  may
+  jun
+  jul
+  ago
+  sept
+  oct
+  nov
+  dic
 
 =head3 Narrow (format)
 
@@ -154,18 +154,18 @@ Spanish Argentina locale.
 
 =head3 Abbreviated (stand-alone)
 
-  ene.
-  feb.
-  mar.
-  abr.
-  may.
-  jun.
-  jul.
-  ago.
-  sep.
-  oct.
-  nov.
-  dic.
+  ene
+  feb
+  mar
+  abr
+  may
+  jun
+  jul
+  ago
+  sept
+  oct
+  nov
+  dic
 
 =head3 Narrow (stand-alone)
 
@@ -260,9 +260,9 @@ Spanish Argentina locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5 feb. 2008
-   1995-12-22T09:05:02 = 22 dic. 1995
-  -0010-09-15T04:44:23 = 15 sep. -10
+   2008-02-05T18:30:30 = 5 feb 2008
+   1995-12-22T09:05:02 = 22 dic 1995
+  -0010-09-15T04:44:23 = 15 sept -10
 
 =head3 Short
 
@@ -314,15 +314,15 @@ Spanish Argentina locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5 feb. 2008 18:30:30
-   1995-12-22T09:05:02 = 22 dic. 1995 09:05:02
-  -0010-09-15T04:44:23 = 15 sep. -10 04:44:23
+   2008-02-05T18:30:30 = 5 feb 2008 18:30:30
+   1995-12-22T09:05:02 = 22 dic 1995 09:05:02
+  -0010-09-15T04:44:23 = 15 sept -10 04:44:23
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 5/2/08 18:30
-   1995-12-22T09:05:02 = 22/12/95 09:05
-  -0010-09-15T04:44:23 = 15/9/-10 04:44
+   2008-02-05T18:30:30 = 5/2/08, 18:30
+   1995-12-22T09:05:02 = 22/12/95, 09:05
+  -0010-09-15T04:44:23 = 15/9/-10, 04:44
 
 
 =head2 Available Formats
@@ -347,9 +347,9 @@ Spanish Argentina locale.
 
 =head3 E (ccc)
 
-   2008-02-05T18:30:30 = mar.
-   1995-12-22T09:05:02 = vie.
-  -0010-09-15T04:44:23 = sáb.
+   2008-02-05T18:30:30 = mar
+   1995-12-22T09:05:02 = vie
+  -0010-09-15T04:44:23 = sáb
 
 =head3 EBhm (E h:mm B)
 
@@ -401,15 +401,15 @@ Spanish Argentina locale.
 
 =head3 GyMMM (MMM y G)
 
-   2008-02-05T18:30:30 = feb. 2008 d. C.
-   1995-12-22T09:05:02 = dic. 1995 d. C.
-  -0010-09-15T04:44:23 = sep. -10 a. C.
+   2008-02-05T18:30:30 = feb 2008 d. C.
+   1995-12-22T09:05:02 = dic 1995 d. C.
+  -0010-09-15T04:44:23 = sept -10 a. C.
 
 =head3 GyMMMEd (E, d 'de' MMM 'de' y G)
 
-   2008-02-05T18:30:30 = mar, 5 de feb. de 2008 d. C.
-   1995-12-22T09:05:02 = vie, 22 de dic. de 1995 d. C.
-  -0010-09-15T04:44:23 = sáb, 15 de sep. de -10 a. C.
+   2008-02-05T18:30:30 = mar, 5 de feb de 2008 d. C.
+   1995-12-22T09:05:02 = vie, 22 de dic de 1995 d. C.
+  -0010-09-15T04:44:23 = sáb, 15 de sept de -10 a. C.
 
 =head3 GyMMMM (MMMM 'de' y G)
 
@@ -431,9 +431,15 @@ Spanish Argentina locale.
 
 =head3 GyMMMd (d MMM y G)
 
-   2008-02-05T18:30:30 = 5 feb. 2008 d. C.
-   1995-12-22T09:05:02 = 22 dic. 1995 d. C.
-  -0010-09-15T04:44:23 = 15 sep. -10 a. C.
+   2008-02-05T18:30:30 = 5 feb 2008 d. C.
+   1995-12-22T09:05:02 = 22 dic 1995 d. C.
+  -0010-09-15T04:44:23 = 15 sept -10 a. C.
+
+=head3 GyMd (d/M/y GGGGG)
+
+   2008-02-05T18:30:30 = 5/2/2008 d. C.
+   1995-12-22T09:05:02 = 22/12/1995 d. C.
+  -0010-09-15T04:44:23 = 15/9/-10 a. C.
 
 =head3 H (HH)
 
@@ -485,15 +491,15 @@ Spanish Argentina locale.
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = feb.
-   1995-12-22T09:05:02 = dic.
-  -0010-09-15T04:44:23 = sep.
+   2008-02-05T18:30:30 = feb
+   1995-12-22T09:05:02 = dic
+  -0010-09-15T04:44:23 = sept
 
 =head3 MMMEd (E, d MMM)
 
-   2008-02-05T18:30:30 = mar, 5 feb.
-   1995-12-22T09:05:02 = vie, 22 dic.
-  -0010-09-15T04:44:23 = sáb, 15 sep.
+   2008-02-05T18:30:30 = mar, 5 feb
+   1995-12-22T09:05:02 = vie, 22 dic
+  -0010-09-15T04:44:23 = sáb, 15 sept
 
 =head3 MMMMEd (E, d 'de' MMMM)
 
@@ -521,15 +527,15 @@ Spanish Argentina locale.
 
 =head3 MMMd (d MMM)
 
-   2008-02-05T18:30:30 = 5 feb.
-   1995-12-22T09:05:02 = 22 dic.
-  -0010-09-15T04:44:23 = 15 sep.
+   2008-02-05T18:30:30 = 5 feb
+   1995-12-22T09:05:02 = 22 dic
+  -0010-09-15T04:44:23 = 15 sept
 
 =head3 MMMdd (dd-MMM)
 
-   2008-02-05T18:30:30 = 05-feb.
-   1995-12-22T09:05:02 = 22-dic.
-  -0010-09-15T04:44:23 = 15-sep.
+   2008-02-05T18:30:30 = 05-feb
+   1995-12-22T09:05:02 = 22-dic
+  -0010-09-15T04:44:23 = 15-sept
 
 =head3 MMd (d/M)
 
@@ -623,15 +629,15 @@ Spanish Argentina locale.
 
 =head3 yMMM (MMM y)
 
-   2008-02-05T18:30:30 = feb. 2008
-   1995-12-22T09:05:02 = dic. 1995
-  -0010-09-15T04:44:23 = sep. -10
+   2008-02-05T18:30:30 = feb 2008
+   1995-12-22T09:05:02 = dic 1995
+  -0010-09-15T04:44:23 = sept -10
 
 =head3 yMMMEd (E, d MMM y)
 
-   2008-02-05T18:30:30 = mar, 5 feb. 2008
-   1995-12-22T09:05:02 = vie, 22 dic. 1995
-  -0010-09-15T04:44:23 = sáb, 15 sep. -10
+   2008-02-05T18:30:30 = mar, 5 feb 2008
+   1995-12-22T09:05:02 = vie, 22 dic 1995
+  -0010-09-15T04:44:23 = sáb, 15 sept -10
 
 =head3 yMMMM (MMMM 'de' y)
 
@@ -653,9 +659,9 @@ Spanish Argentina locale.
 
 =head3 yMMMd (d 'de' MMM 'de' y)
 
-   2008-02-05T18:30:30 = 5 de feb. de 2008
-   1995-12-22T09:05:02 = 22 de dic. de 1995
-  -0010-09-15T04:44:23 = 15 de sep. de -10
+   2008-02-05T18:30:30 = 5 de feb de 2008
+   1995-12-22T09:05:02 = 22 de dic de 1995
+  -0010-09-15T04:44:23 = 15 de sept de -10
 
 =head3 yMd (d/M/y)
 
@@ -702,9 +708,9 @@ Yes
 
 =head3 %c (%a %d %b %Y %T) - date time format
 
-   2008-02-05T18:30:30 = mar 05 feb. 2008 18:30:30
-   1995-12-22T09:05:02 = vie 22 dic. 1995 09:05:02
-  -0010-09-15T04:44:23 = sáb 15 sep. -10 04:44:23
+   2008-02-05T18:30:30 = mar 05 feb 2008 18:30:30
+   1995-12-22T09:05:02 = vie 22 dic 1995 09:05:02
+  -0010-09-15T04:44:23 = sáb 15 sept -10 04:44:23
 
 =head3 %x (%d/%m/%y) - date format
 

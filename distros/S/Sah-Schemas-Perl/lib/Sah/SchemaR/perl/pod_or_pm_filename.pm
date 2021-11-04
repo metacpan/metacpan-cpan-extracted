@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::pod_or_pm_filename;
 
-our $DATE = '2021-09-29'; # DATE
-our $VERSION = '0.039'; # VERSION
+our $DATE = '2021-10-05'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nString containing filename of a Perl POD or module. For convenience, when value\nis in the form of:\n\n    Foo\n    Foo.pod\n    Foo.pm\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pod\n    Foo/Bar.pm\n\nand a matching .pod or .pm file is found in `\@INC`, then it will be coerced\n(converted) into the path of that .pod/.pm file, e.g.:\n\n    /home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Foo/Bar.pm\n    lib/Foo/Bar.pod\n\nTo prevent such coercion, you can use prefixing path, e.g.:\n\n    ./Foo::Bar\n    ../Foo/Bar\n    /path/to/Foo/Bar\n\nThis schema comes with convenience completion too.\n\nThis schema is like another schema `perl::filename` except that .pod is\nprioritized over .pm. If both `Foo.pm` and `Foo.pod` are found in `\@INC`, the\npath to `Foo.pod` will be returned.\n\n",summary=>"A .pod or .pm filename, e.g. /path/Foo.pm or /path/Bar/Baz.pod","x.completion"=>sub{package Sah::Schema::perl::pod_or_pm_filename;use warnings;use strict;require Complete::File;require Complete::Module;require Complete::Util;my(%args) = @_;my $word = $args{'word'};my @answers;push @answers, Complete::File::complete_file('word', $word);if ($word =~ m[\A\w*((?:::|/)\w+)*\z]) {push @answers, Complete::Module::complete_module('word', $word);}Complete::Util::combine_answers(@answers)},"x.perl.coerce_rules"=>["From_str::convert_perl_pod_or_pm_to_path"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::perl::pod_or_pm_filename - A .pod or .pm filename, e.g. /path/Foo.
 
 =head1 VERSION
 
-This document describes version 0.039 of Sah::SchemaR::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2021-09-29.
+This document describes version 0.040 of Sah::SchemaR::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2021-10-05.
 
 =head1 DESCRIPTION
 

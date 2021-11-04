@@ -213,4 +213,4 @@ L<Messaging::Message::Queue>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2011-2016
+Copyright (C) CERN 2011-2021

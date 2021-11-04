@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::Party;
-$Shipment::FedEx::WSDL::ShipTypes::Party::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::Party::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               Contact
               Address
 
-              )
+            )
         ],
         {   'AccountNumber' => \%AccountNumber_of,
             'Tins'          => \%Tins_of,
@@ -41,7 +41,7 @@ Class::Std::initialize();
             'Address'       => \%Address_of,
         },
         {   'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Tins' =>
+            'Tins'          =>
               'Shipment::FedEx::WSDL::ShipTypes::TaxpayerIdentification',
             'Contact' => 'Shipment::FedEx::WSDL::ShipTypes::Contact',
             'Address' => 'Shipment::FedEx::WSDL::ShipTypes::Address',
@@ -72,7 +72,7 @@ Shipment::FedEx::WSDL::ShipTypes::Party
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

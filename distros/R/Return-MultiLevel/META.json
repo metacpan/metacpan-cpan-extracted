@@ -4,7 +4,7 @@
       "Lukas Mai <l.mai@web.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -65,10 +65,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mauke/Return-MultiLevel",
-         "web" : "https://github.com/mauke/Return-MultiLevel"
+         "url" : "git://github.com/uperl/Return-MultiLevel",
+         "web" : "https://github.com/uperl/Return-MultiLevel"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

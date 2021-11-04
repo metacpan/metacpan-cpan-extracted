@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41;  # :param
+use Object::Pad 0.43;  # ADJUST
 
-package Device::Chip::Sensor 0.19;
+package Device::Chip::Sensor 0.20;
 
 use strict;
 use warnings;
@@ -199,16 +199,16 @@ has $_name      :reader :param;
 has $_units     :reader :param = undef;
 has $_precision :reader :param = 0;
 
-has $_method;
+has $_method :param = undef;
 
 has $_chip :reader :param = undef;
 
-BUILD ( %params )
+ADJUST
 {
    $TYPES{$_type} or
       croak "Unrecognised sensor type '$_type'";
 
-   $_method = $params{method} // "read_$_name";
+   $_method //= "read_$_name";
 }
 
 method bind ( $chip )

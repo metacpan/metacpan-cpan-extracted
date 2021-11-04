@@ -530,7 +530,8 @@ See C<P>
 =item DIR
 
 The directory containing files created when compiling C<lpp>
-and C fit functions.  This defaults to './tempcode'; The .c,
+and C fit functions.  This defaults to being created by
+L<File::Temp/tempdir>. The .c,
 .o, and .so files will be written to this directory. This
 option actually falls through to levmar_func.  Such options
 should be in separate section, or otherwise noted.
@@ -1124,7 +1125,7 @@ Need to put the description from the C code in here.
 =for ref
 
 Make a human readable report from the hash ref returned
-by lemvar().
+by levmar().
 
 =for usage
 

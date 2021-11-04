@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -30,9 +30,9 @@ Class::Std::initialize();
         [   qw(        FolderId
               UploadDocumentReferenceDetails
 
-              )
+            )
         ],
-        {   'FolderId' => \%FolderId_of,
+        {   'FolderId'                       => \%FolderId_of,
             'UploadDocumentReferenceDetails' =>
               \%UploadDocumentReferenceDetails_of,
         },
@@ -42,7 +42,7 @@ Class::Std::initialize();
         },
         {
 
-            'FolderId' => 'FolderId',
+            'FolderId'                       => 'FolderId',
             'UploadDocumentReferenceDetails' =>
               'UploadDocumentReferenceDetails',
         }
@@ -65,7 +65,7 @@ Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

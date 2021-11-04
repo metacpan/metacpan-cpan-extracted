@@ -1,4 +1,5 @@
 use v5.10;
+use strict;
 use warnings;
 use Test::More;
 
@@ -14,11 +15,11 @@ use Test::More;
 	);
 
 	field_validator 'not_even' => sub {
-		shift() % 2 == 0
+		shift() % 2 == 0;
 	};
 
 	field_validator 'not_positive' => sub {
-		shift() > 0
+		shift() > 0;
 	};
 }
 

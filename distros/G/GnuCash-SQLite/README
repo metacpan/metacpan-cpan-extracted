@@ -2,7 +2,7 @@ NAME
       GnuCash::SQLite - A module to access GnuCash SQLite files
 
 VERSION
-      version 0.08
+      version 0.09
 
 SYNOPSIS
       use GnuCash::SQLite;

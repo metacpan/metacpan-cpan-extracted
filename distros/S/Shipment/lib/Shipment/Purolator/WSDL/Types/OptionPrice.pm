@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::OptionPrice;
-$Shipment::Purolator::WSDL::Types::OptionPrice::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::OptionPrice::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               ID
               Description
 
-              )
+            )
         ],
         {   'Amount'      => \%Amount_of,
             'ID'          => \%ID_of,
@@ -66,7 +66,7 @@ Shipment::Purolator::WSDL::Types::OptionPrice
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

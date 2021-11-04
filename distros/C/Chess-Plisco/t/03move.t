@@ -14,48 +14,48 @@ use integer;
 
 use Test::More tests => 13;
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 
 my ($pos, $move, $from, $to);
 
 $pos = Chess::Plisco->new;
 
 $move = 0;
-$from = cp_square_to_shift 'e2';
-$to = cp_square_to_shift 'e4';
-cp_move_set_from $move, $from;
-cp_move_set_to $move, $to;
-cp_move_set_piece $move, CP_PAWN;
-is(cp_move_from($move), $from, 'e2e4 from');
-is(cp_move_to($move), $to, 'e2e4 to');
-is(cp_move_promote($move), CP_NO_PIECE, 'e2e4 promote');
-is(cp_move_coordinate_notation($move), 'e2e4', 'e2e4');
+$from = (((substr 'e2', 1) - 1) << 3) + ord('e2') - 97;
+$to = (((substr 'e4', 1) - 1) << 3) + ord('e4') - 97;
+(($move) = (($move) & ~0xfc0) | (($from) & 0x3f) << 6);
+(($move) = (($move) & ~0x3f) | (($to) & 0x3f));
+(($move) = (($move) & ~0x38000) | ((CP_PAWN) & 0x7) << 15);
+is((($move >> 6) & 0x3f), $from, 'e2e4 from');
+is((($move) & 0x3f), $to, 'e2e4 to');
+is((($move >> 12) & 0x7), CP_NO_PIECE, 'e2e4 promote');
+is(chr(97 + ((($move >> 6) & 0x3f) & 0x7)) . (1 + ((($move >> 6) & 0x3f) >> 3)) . chr(97 + ((($move) & 0x3f) & 0x7)) . (1 + ((($move) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[(($move >> 12) & 0x7)], 'e2e4', 'e2e4');
 
 $pos = Chess::Plisco->new('k7/8/8/8/8/8/3p1K2/4N3 b - - 0 1');
 
 $move = 0;
-$from = cp_square_to_shift 'd2';
-$to = cp_square_to_shift 'e1';
-cp_move_set_from $move, $from;
-cp_move_set_to $move, $to;
-cp_move_set_piece $move, CP_PAWN;
-cp_move_set_promote $move, CP_QUEEN;
-is(cp_move_from($move), $from, 'd2e1q from');
-is(cp_move_to($move), $to, 'd2e1q to');
-is(cp_move_promote($move), CP_QUEEN, 'd2e1q promote');
+$from = (((substr 'd2', 1) - 1) << 3) + ord('d2') - 97;
+$to = (((substr 'e1', 1) - 1) << 3) + ord('e1') - 97;
+(($move) = (($move) & ~0xfc0) | (($from) & 0x3f) << 6);
+(($move) = (($move) & ~0x3f) | (($to) & 0x3f));
+(($move) = (($move) & ~0x38000) | ((CP_PAWN) & 0x7) << 15);
+(($move) = (($move) & ~0x7000) | ((CP_QUEEN) & 0x7) << 12);
+is((($move >> 6) & 0x3f), $from, 'd2e1q from');
+is((($move) & 0x3f), $to, 'd2e1q to');
+is((($move >> 12) & 0x7), CP_QUEEN, 'd2e1q promote');
 
 # Full move.
 $from = CP_D5;
 $to = CP_E4;
-cp_move_set_from $move, $from;
-cp_move_set_to $move, $to;
-cp_move_set_promote $move, CP_NO_PIECE;
-cp_move_set_piece $move, CP_PAWN;
-cp_move_set_captured $move, CP_KNIGHT;
-cp_move_set_color $move, CP_BLACK;
-is(cp_move_from($move), CP_D5);
-is(cp_move_to($move), CP_E4);
-is(cp_move_promote($move), CP_NO_PIECE);
-is(cp_move_piece($move), CP_PAWN);
-is(cp_move_captured($move), CP_KNIGHT);
-is(cp_move_color($move), CP_BLACK);
+(($move) = (($move) & ~0xfc0) | (($from) & 0x3f) << 6);
+(($move) = (($move) & ~0x3f) | (($to) & 0x3f));
+(($move) = (($move) & ~0x7000) | ((CP_NO_PIECE) & 0x7) << 12);
+(($move) = (($move) & ~0x38000) | ((CP_PAWN) & 0x7) << 15);
+(($move) = (($move) & ~0x1c0000) | ((CP_KNIGHT) & 0x7) << 18);
+(($move) = (($move) & ~0x20_0000) | ((CP_BLACK) & 0x1) << 21);
+is((($move >> 6) & 0x3f), CP_D5);
+is((($move) & 0x3f), CP_E4);
+is((($move >> 12) & 0x7), CP_NO_PIECE);
+is((($move >> 15) & 0x7), CP_PAWN);
+is((($move >> 18) & 0x7), CP_KNIGHT);
+is((($move >> 21) & 0x1), CP_BLACK);

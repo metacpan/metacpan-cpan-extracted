@@ -6,12 +6,17 @@ BEGIN
     use warnings;
     use lib './lib';
     use_ok( 'Module::Generic::File', qw( file cwd tempfile tempdir ) );
+    use Config;
     use Cwd ();
     use Digest::SHA;
     use Encode ();
     use File::Spec ();
     use Nice::Try;
-    our $DEBUG = 0;
+    use POSIX ();
+    use Storable ();
+    # Or using Sereal
+    # use Sereal ();
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 CORE::chdir( File::Spec->tmpdir );
@@ -27,7 +32,7 @@ is( $cwd, Cwd::cwd(), 'cwd' );
 my $tmpdir = tempdir;
 ok( ( -e( $tmpdir ) && -d( $tmpdir ) ), 'tempdir' );
 ok( $tmpdir->chdir, 'chdir' );
-is( cwd(), $tmpdir, 'chdir -> cwd' );
+is( cwd(), $tmpdir->resolve, 'chdir -> cwd' );
 $tmpdir->debug( $DEBUG );
 my $rv = $tmpdir->chmod( 0700 );
 $rv or diag( $tmpdir->error );
@@ -45,7 +50,7 @@ my $f2 = $f->move( $tmpdir ) || do
     diag( $f->error ) if( $DEBUG );
 };
 isa_ok( $f2, 'Module::Generic::File', 'moved object class' );
-my $expected_location = File::Spec->catpath( $f->volume, $tmpdir, $f->basename );
+my $expected_location = Cwd::abs_path( File::Spec->catpath( $f->volume, $tmpdir, $f->basename ) );
 is( "$f2", $expected_location, 'moved file new path' );
 if( $expected_location eq "$f2" )
 {
@@ -62,11 +67,11 @@ if( $expected_location eq "$f2" )
     my $lines = $f2->content;
     isa_ok( $lines, 'Module::Generic::Array', 'content as array object' );
     is( $lines->length, 2, 'content lines' );
-    my $files = $tmpdir->content;
+    my $files = $tmpdir->content_objects;
     diag( $tmpdir->error ) if( !defined( $files ) && $DEBUG );
     is( $files->length, 1, 'directory files total' );
     is( $files->first, "$f2", 'directory content as absolute files path' );
-    ok( $tmpdir->contains( $f2 ), 'contains' );
+    ok( $tmpdir->resolve->contains( $f2 ), 'contains' );
 }
 
 my $mydir = tempdir({debug => $DEBUG, cleanup => 1});
@@ -137,7 +142,8 @@ subtest 'children' => sub
     my $tmpdir = tempdir({cleanup => 1});
     diag( "Temporary directory is set to '$tmpdir'" ) if( $DEBUG );;
     diag( "Creating object for \"$tmpdir\" with debug set to $DEBUG" ) if( $DEBUG );
-    my $d = file( $tmpdir, debug => $DEBUG )->mkpath->first;
+    $tmpdir->debug( $DEBUG );
+    my $d = $tmpdir->mkpath->first;
     diag( "Error creating object for \"$tmpdir\": ", Module::Generic::File->error ) if( $DEBUG && !defined( $d ) );
     isa_ok( $d, 'Module::Generic::File', 'mkpath resulting object' );
     ok( ( -e( $d ) && -d( $d ) ), 'temporary directory created' );
@@ -228,7 +234,7 @@ $f3->debug( $DEBUG );
 diag( "$tmpname is $f3" ) if( $DEBUG );
 my $sys_tmpdir = $f->sys_tmpdir;
 my $f4 = $f3->move( $sys_tmpdir )->touch;
-is( $f4, File::Spec->catfile( File::Spec->tmpdir, $f3->basename ), 'move' );
+is( $f4, Cwd::abs_path( File::Spec->catfile( File::Spec->tmpdir, $f3->basename ) ), 'move' );
 my $io = $f4->open;
 ok( $io, 'open file in read mode' );
 $f4->debug( $DEBUG );
@@ -358,7 +364,7 @@ diag( "Temporary file is $f6" ) if( $DEBUG );
 $f6->auto_remove(1);
 $f6->open( 'w+', { binmode => 'utf8' } );
 ok( $f6, 'file opened with w+' );
-my $rv = $f6->write( $data );
+$rv = $f6->write( $data );
 ok( $rv, 'write' );
 my $lines = $f6->lines;
 isa_ok( $lines, 'Module::Generic::Array', 'lines returned as array object' );
@@ -466,20 +472,20 @@ diag( "Temporary directory created is: $tmpdir9" ) if( $DEBUG );
 
 my $f7 = file( '/some/where/my/file.txt', debug => $DEBUG );
 isa_ok( $f7, 'Module::Generic::File' );
-my $frags = $f7->split;
+$frags = $f7->split;
 isa_ok( $frags, 'Module::Generic::Array', 'split returns Module::Generic::Array object' );
 # diag( "Fragments are: '", join( "', '", @$frags ), "'" );
 is( $frags->length, 5, 'total fragments' );
 is( $frags->last, 'file.txt', 'last fragment' );
 
-my $cwd = cwd();
+$cwd = cwd();
 my $cwd_n = file( $cwd )->split->length;
 my $f8 = file( './here/we/go/again.txt', debug => $DEBUG );
 $frags = $f8->split;
 # diag( "Fragments are: '", join( "', '", @$frags ), "'" );
 is( $frags->length, $cwd_n + 4, 'total fragments for relative path' );
 
-my $f8 = $cwd->join( $cwd, qw( here we go once more.txt ) );
+$f8 = $cwd->join( $cwd, qw( here we go once more.txt ) );
 my $f8_dirs = File::Spec->catdir( $cwd, qw( here we go once ) );
 my $f8_check = File::Spec->catpath( $f8->volume, $f8_dirs, 'more.txt' );
 is( "$f8", $f8_check, 'join' );
@@ -491,13 +497,173 @@ is( "$f10", '/some/where/file.pl', 'changing extension' );
 my $f11 = $f9->extension( undef() );
 is( "$f11", '/some/where/file', 'removing extension' );
 
-my $frags = $f9->fragments;
+$frags = $f9->fragments;
 isa_ok( $frags, 'Module::Generic::Array', 'fragments() returns an array object' );
 is( $frags->length, 3, 'fragments() returned array length' );
 is( $frags->first, 'some', 'fragments() value' );
 my $f12 = $f9->parent;
 my $f13 = $f9->join( $f12, qw( in time ) );
 is( "$f13", File::Spec->catfile( $f9->volume, File::Spec->catdir( @{$f12->fragments}, 'in' ), 'time' ), 'join with object in array' );
+
+subtest 'mmap' => sub
+{
+    SKIP:
+    {
+        if( $] < version->parse( 'v5.16.0' ) && !eval( 'require File::Map' ) )
+        {
+            skip( "perl version $] is lower than v5.16.0 and you do not have File::Map", 10 );
+        }
+        my $mapfile = tempfile({ unlink => 1 });
+        my $rv = $mapfile->mmap( my $var, 8196, '+<' );
+        ok( defined( $rv ), 'mmap created' );
+        if( !defined( $rv ) )
+        {
+            diag( "Failed to create mmap: ", $mapfile->error ) if( $DEBUG );
+            skip( 'failed to create mmap', 9 );
+        }
+        $var = 'Hello Jack';
+        substr( $var, 0, 5 ) = 'Good bye';
+        $var =~ s/Jack/John/;
+        my $content = $mapfile->load;
+        is( $var, $content, 'mmap variable value' );
+        # diag( "\$var is: '", $mapfile->dump_hex( $var ), "' and file content is '", $mapfile->dump_hex( $content ), "'." ) if( $DEBUG );
+        # Now try pre-filled variable and see if the size is picked up
+        undef( $var );
+        $mapfile->close;
+    
+        use utf8;
+        my $var2 = <<EOT;
+Mignonne, allons voir si la rose
+Qui ce matin avoit desclose
+Sa robe de pourpre au Soleil,
+A point perdu cette vesprée
+Les plis de sa robe pourprée,
+Et son teint au vostre pareil.
+EOT
+        # diag( "\$var2 is ", length( $var2 ), " bytes big." ) if( $DEBUG );
+        my $mapfile2 = tempfile({ unlink => 0, debug => $DEBUG });
+        $rv = $mapfile2->mmap( $var2 );
+        ok( defined( $rv ), 'mmap created (2)' );
+        if( !defined( $rv ) )
+        {
+            diag( "Failed to create mmap: ", $mapfile->error ) if( $DEBUG );
+            skip( 'failed to create mmap', 7 );
+        }
+        my $fsize = $mapfile2->size;
+        my $ct = $mapfile2->load;
+        # diag( "mmap file size is $fsize and content is '", length( $ct ), "' versus original size of '", length( $var2 ), "' -> '$ct'" ) if( $DEBUG );
+        # diag( "Original data:\n", $mapfile2->dump_hex( $var2 ), "\nData loaded from file:\n", $mapfile2->dump_hex( $ct ) ) if( $DEBUG );
+        ok( length( $var2 ) == $fsize, 'size set to variable length' );
+    
+        # Now, try using File::Map, unless of course the perl version is already below 5.16.0
+        # in which case we would have already performed such test earlier above
+        if( $] < version->parse( 'v5.16.0' ) )
+        {
+            skip( 'perl version below 5.1.6.0', 3 );
+        }
+        elsif( !eval( "require File::Map" ) )
+        {
+            skip( "You do not have File::Map installed", 3 );
+        }
+        my $filemap = tempfile({ unlink => 1, use_file_map => 1 });
+        ok( $filemap->use_file_map, 'file map enabled' );
+        $rv = $filemap->mmap( my $var3, 8196, '+<' );
+        ok( defined( $rv ), 'mmap created with File::Map' );
+        if( !defined( $rv ) )
+        {
+            diag( "Failed to create mmap: ", $mapfile->error ) if( $DEBUG );
+            skip( 'failed to create mmap', 4 );
+        }
+        $var3 = 'Hello Jack';
+        substr( $var3, 0, 5 ) = 'Good bye';
+        $var3 =~ s/Jack/John/;
+        my $content3 = $filemap->load;
+        is( $var3, $content3, 'mmap variable value with File::Map' );
+        $filemap->close;
+
+        
+        # Now trying with fork if available
+        if( $^O eq 'amigaos' || $^O eq 'riscos' || $^O eq 'VMS' )
+        {
+            skip( "perl fork unsupported on this platform $^O", 3 );
+        }
+        my $forkfile = tempfile({ unlink => 0, use_file_map => 0, debug => $DEBUG });
+        diag( "Using temp file for fork test '$forkfile'" ) if( $DEBUG );
+        my $result;
+        $rv = $forkfile->mmap( $result, 10240, '+<' );
+        ok( defined( $rv ), 'fork: mmap created' );
+        if( !defined( $rv ) )
+        {
+            diag( "Failed to create mmap: ", $mapfile->error ) if( $DEBUG );
+            skip( 'failed to create mmap', 2 );
+        }
+        
+        diag( "Starting to fork" ) if( $DEBUG );
+        # Block signal for fork
+        my $sigset = POSIX::SigSet->new( POSIX::SIGINT );
+        POSIX::sigprocmask( POSIX::SIG_BLOCK, $sigset ) || 
+            die( "Cannot block SIGINT for fork: $!\n" );
+        my $pid = fork();
+        # Parent
+        if( $pid )
+        {
+            POSIX::sigprocmask( POSIX::SIG_UNBLOCK, $sigset ) || 
+                die( "Cannot unblock SIGINT for fork: $!\n" );
+            if( kill( 0 => $pid ) || $!{EPERM} )
+            {
+                # Blocking wait; use POSIX::WNOHANG for non-blocking wait
+                waitpid( $pid, 0 );
+                diag( "Exit value: ", ( $? >> 8 ) ) if( $DEBUG );
+                diag( "Signal: ", ( $? & 127 ) ) if( $DEBUG );
+                diag( "Has core dump? ", ( $? & 128 ) ) if( $DEBUG );
+            }
+            else
+            {
+                diag( "Child $pid already gone" ) if( $DEBUG );
+            }
+            my $object = defined( $result ) ? Storable::thaw( $result ) : $result;
+            # Or using Sereal
+            # my $dec = Sereal::get_sereal_decoder();
+            # $dec->decode( $result, my $object );
+            # my $object = Storable::thaw( $result );
+            isa_ok( $object, 'Module::Generic::Exception', 'fork: object restored' );
+            if( defined( $object ) )
+            {
+                is( $object->code, 500, 'fork: object code property' );
+            }
+            else
+            {
+                fail( 'fork: object code property (undefined value)' );
+            }
+        }
+        elsif( $pid == 0 )
+        {
+            # Do some work
+            my $object = Module::Generic::Exception->new({ code => 500, message => 'Testing shared object' });
+            diag( "Storing object (", overload::StrVal( $object ), ")." ) if( $DEBUG );
+            $result = Storable::freeze( $object );
+            # Or using Sereal
+            # my $enc = Sereal::get_sereal_encoder();
+            # $result = $enc->encode( $object );
+            exit(0);
+        }
+        else
+        {
+            if( $! == POSIX::EAGAIN() )
+            {
+                die( "fork cannot allocate sufficient memory to copy the parent's page tables and allocate a task structure for the child.\n" );
+            }
+            elsif( $! == POSIX::ENOMEM() )
+            {
+                die( "fork failed to allocate the necessary kernel structures because memory is tight.\n" );
+            }
+            else
+            {
+                die( "Unable to fork a new process: $!\n" );
+            }
+        }
+    };
+};
 
 done_testing();
 

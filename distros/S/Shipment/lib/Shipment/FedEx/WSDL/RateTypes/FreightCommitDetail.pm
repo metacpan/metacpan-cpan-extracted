@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail;
-$Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               DestinationDetail
               TotalDistance
 
-              )
+            )
         ],
         {   'OriginDetail'      => \%OriginDetail_of,
             'DestinationDetail' => \%DestinationDetail_of,
@@ -68,7 +68,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

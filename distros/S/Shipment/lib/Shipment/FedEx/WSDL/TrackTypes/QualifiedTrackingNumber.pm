@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber;
-$Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Carrier
               Destination
 
-              )
+            )
         ],
         {   'TrackingNumber' => \%TrackingNumber_of,
             'ShipDate'       => \%ShipDate_of,
@@ -76,7 +76,7 @@ Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

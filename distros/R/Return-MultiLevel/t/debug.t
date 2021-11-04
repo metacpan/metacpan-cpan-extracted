@@ -25,7 +25,7 @@ sub baz {
 }
 
 my $ret = bar;
-my $exc = exception { baz $ret, 'ducks'; };
+my $exc = exception { local $Carp::MaxArgNums = 8; baz $ret, 'ducks'; };
 
 like $exc, qr{
     .* \bwith_return\b .* \Q${\__FILE__}\E .* \b 14 \b .* \n

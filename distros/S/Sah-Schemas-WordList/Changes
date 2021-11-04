@@ -1,3 +1,11 @@
+0.003   2021-06-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix description for
+	  perl::wordlist::modnames_with_optional_args schema.
+
+
 0.002   2020-05-27  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

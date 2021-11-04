@@ -1,0 +1,10 @@
+0.002   2021-10-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename dist/module
+	  Bencher::Scenario::{ArraySamplePartition,Array::Sample::Partition
+	  }.
+
+
+0.001   2017-07-23  Released-By: PERLANCAR
+
+        - First release.

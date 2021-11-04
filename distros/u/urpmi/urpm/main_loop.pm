@@ -497,7 +497,7 @@ sub run {
     my (@errors, @formatted_errors);
     $exit_code = 0;
 
-    urpm::select::migrate_forward_rpmdb_db_if_needed($urpm, $state);
+    urpm::select::migrate_forward_rpmdb_db_if_needed($urpm);
 
     my $migrate_back_rpmdb_db_version = 
       $urpm->{root} && urpm::select::should_we_migrate_back_rpmdb_db_version($urpm, $state);

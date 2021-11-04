@@ -212,6 +212,8 @@ sub crypt { return( __PACKAGE__->_new( CORE::crypt( ${$_[0]}, $_[1] ) ) ); }
 
 sub defined { return( CORE::defined( ${$_[0]} ) ); }
 
+sub empty { return( shift->reset( @_ ) ); }
+
 sub fc { return( CORE::fc( ${$_[0]} ) eq CORE::fc( $_[1] ) ); }
 
 sub hex { return( $_[0]->_number( CORE::hex( ${$_[0]} ) ) ); }
@@ -250,13 +252,31 @@ sub like
 {
     my $self = shift( @_ );
     my $str = shift( @_ );
+    local @matches = ();
+    local @rv = ();
     $str = CORE::defined( $str ) 
         ? ref( $str ) eq 'Regexp'
             ? $str
             : qr/(?:\Q$str\E)+/
         : qr/[[:blank:]\r\n]*/;
-    return( $$self =~ /$str/ );
+    @rv = $$self =~ /$str/;
+    if( scalar( @{^CAPTURE} ) )
+    {
+        for( my $i = 0; $i < scalar( @{^CAPTURE} ); $i++ )
+        {
+            push( @matches, ${^CAPTURE}[$i] );
+        }
+    }
+    # For named captures
+    my $names = { %+ };
+    unless( want( 'OBJECT' ) || want( 'SCALAR' ) || want( 'LIST' ) || scalar( @matches ) )
+    {
+        return(0);
+    }
+    return( Module::Generic::RegexpCapture->new( result => \@rv, capture => \@matches, name => $names ) );
 }
+
+sub lower { return( shift->lc ); }
 
 sub ltrim
 {
@@ -274,13 +294,32 @@ sub ltrim
 sub match
 {
     my( $self, $re ) = @_;
+    local @matches = ();
+    local @rv = ();
     $re = CORE::defined( $re ) 
         ? ref( $re ) eq 'Regexp'
             ? $re
             : qr/(?:\Q$re\E)+/
         : $re;
-    return( $$self =~ /$re/ );
+    @rv = $$self =~ /$re/;
+    # print( STDERR ref( $self ), "::match: \@rv is: @rv, has ", scalar( @rv ), " element(s): ", Module::Generic->dump( \@rv ), "\n" );
+    if( scalar( @{^CAPTURE} ) )
+    {
+        for( my $i = 0; $i < scalar( @{^CAPTURE} ); $i++ )
+        {
+            push( @matches, ${^CAPTURE}[$i] );
+        }
+    }
+    # For named captures
+    my $names = { %+ };
+    unless( want( 'OBJECT' ) || want( 'SCALAR' ) || want( 'LIST' ) || scalar( @matches ) )
+    {
+        return(0);
+    }
+    return( Module::Generic::RegexpCapture->new( result => \@rv, capture => \@matches, name => $names ) );
 }
+
+sub object { return( $_[0] ); }
 
 sub open
 {
@@ -291,6 +330,8 @@ sub open
 }
 
 sub ord { return( $_[0]->_number( CORE::ord( ${$_[0]} ) ) ); }
+
+sub pack { return( __PACKAGE__->_new( CORE::pack( $_[1], ${$_[0]} ) ) ); }
 
 sub pad
 {
@@ -328,12 +369,33 @@ sub right { return( $_[0]->_new( CORE::substr( ${$_[0]}, ( CORE::int( $_[1] ) * 
 sub replace
 {
     my( $self, $re, $replacement ) = @_;
+    ## Only to test if this was a regular expression. If it was the array will contain successful match, other it will be empty
+    ## @rv will contain the regexp matches or the result of the eval
+    local @matches = ();
+    local @rv = ();
     $re = CORE::defined( $re ) 
         ? ref( $re ) eq 'Regexp'
             ? $re
             : qr/(?:\Q$re\E)+/
         : $re;
-    return( $$self =~ s/$re/$replacement/gs );
+    # return( $$self =~ s/$re/$replacement/gs );
+    @rv = $$self =~ s/$re/$replacement/gs;
+    if( scalar( @{^CAPTURE} ) )
+    {
+        for( my $i = 0; $i < scalar( @{^CAPTURE} ); $i++ )
+        {
+            push( @matches, ${^CAPTURE}[$i] );
+        }
+    }
+    # For named captures
+    my $names = { %+ };
+    # print( STDERR ref( $self ), "::replace: \@rv contains ", scalar( @rv ), " element(s) and is ", Module::Generic->dump( \@rv ), " and \@matches is ", Module::Generic->dump( \@matches ), "\n" );
+    # print( STDERR ref( $self ), "::replace: Does caller want an object? ", want('OBJECT') ? 'yes' : 'no', "\n" );
+    unless( want( 'OBJECT' ) || want( 'SCALAR' ) || want( 'LIST' ) || scalar( @matches ) )
+    {
+        return(0);
+    }
+    return( Module::Generic::RegexpCapture->new( result => \@rv, capture => \@matches, name => $names ) );
 }
 
 sub reset { ${$_[0]} = ''; return( $_[0] ); }
@@ -457,6 +519,28 @@ sub undef
     return( $self );
 }
 
+sub unpack
+{
+    my( $self, $tmpl ) = @_;
+    my $ref = [CORE::unpack( $tmpl, $$self )];
+    # In scalar context, return the first element, as per the original unpack behaviour
+    if( Want::want( 'OBJECT' ) )
+    {
+        rreturn( $self->_array( $ref ) );
+    }
+    elsif( Want::want( 'LIST' ) )
+    {
+        rreturn( @$ref );
+    }
+    elsif( Want::want( 'SCALAR' ) )
+    {
+        rreturn( $ref->[0] );
+    }
+    return;
+}
+
+sub upper { return( shift->uc ); }
+
 sub _array
 {
     my $self = shift( @_ );
@@ -576,6 +660,48 @@ sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
         my $removed = CORE::substr( ${*$self->{SR}}, *$self->{Pos}, CORE::length( ${*$self->{SR}} ) - *$self->{Pos}, '' );
         return( CORE::length( $removed ) );
     }
+}
+
+{
+    package
+        Module::Generic::RegexpCapture;
+    BEGIN
+    {
+        use strict;
+        use warnings;
+        use parent qw( Module::Generic );
+        use overload (
+            '""' => sub{ $_[0]->matched },
+            '0+' => sub{ $_[0]->matched },
+            fallback => 1,
+        );
+        our $ERROR = '';
+        our $VERSION = 'v0.1.0';
+    };
+    
+    sub init
+    {
+        my $self = shift( @_ );
+        $self->{capture}    = [];
+        $self->{name}       = {};
+        $self->{result}     = 0;
+        $self->{_init_strict_use_sub} = 1;
+        return( $self->SUPER::init( @_ ) );
+    }
+    
+    sub capture { return( shift->_set_get_array_as_object( 'capture', @_ ) ); }
+    
+    sub matched
+    {
+        my $res = shift->result;
+        # There may be one entry of empty value when there is no match, so we check for length
+        return( $res->length->scalar ) if( $res->length && length( $res->get(0) ) );
+        return(0);
+    }
+    
+    sub name { return( shift->_set_get_hash_as_object( 'name', @_ ) ); }
+    
+    sub result { return( shift->_set_get_array_as_object( 'result', @_ ) ); }
 }
 
 1;

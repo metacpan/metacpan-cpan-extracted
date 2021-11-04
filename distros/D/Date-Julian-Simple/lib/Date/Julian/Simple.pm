@@ -1,6 +1,6 @@
 package Date::Julian::Simple;
 
-$Date::Julian::Simple::VERSION   = '0.12';
+$Date::Julian::Simple::VERSION   = '0.17';
 $Date::Julian::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,14 +9,14 @@ Date::Julian::Simple - Represents Julian date.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.17
 
 =cut
 
 use 5.006;
 use Data::Dumper;
-use POSIX qw/floor/;
 use Time::localtime;
+use POSIX qw/ceil floor/;
 use Date::Exception::InvalidDay;
 
 use Moo;
@@ -29,6 +29,8 @@ use overload q{""} => 'as_string', fallback => 1;
 Represents the Julian date.
 
 =cut
+
+our $MJD_CONST = 2400000.5;
 
 our $JULIAN_MONTHS = [
     undef,
@@ -84,10 +86,9 @@ sub BUILD {
         my $year  = $today->year + 1900;
         my $month = $today->mon + 1;
         my $day   = $today->mday;
-        my $date  = $self->from_gregorian($year, $month, $day);
-        $self->year($date->year);
-        $self->month($date->month);
-        $self->day($date->day);
+        $self->year($year);
+        $self->month($month);
+        $self->day($day);
     }
 }
 
@@ -128,6 +129,31 @@ sub to_julian {
     return ((floor((365.25 * ($year + 4716))) + floor((30.6001 * ($month + 1))) + $day) - 1524.5);
 }
 
+=head2 to_modified_julian()
+
+Returns modified julian day equivalent of the Julian date.
+
+=cut
+
+sub to_modified_julian {
+    my ($self, $year, $month, $day) = @_;
+
+    $day    = $self->day   unless defined $day;
+    $month  = $self->month unless defined $month;
+    $year   = $self->year  unless defined $year;
+
+    $year  = floor($year);
+    $month = floor($month);
+    $day   = floor($day);
+
+    my $L  = ceil(($month - 14) / 12);
+    my $p1 = $day - 32075 + floor(1461 * ($year + 4800 + $L) / 4);
+    my $p2 = floor (367 * ($month - 2 - $L * 12) / 12);
+    my $p3 = 3 * floor(floor(($year + 4900 + $L) / 100) / 4);
+
+    return ($p1 + $p2 - $p3 - 0.5) - $MJD_CONST;
+}
+
 =head2 from_julian($julian_day)
 
 Returns Julian date as an object of type L<Date::Julian::Simple> equivalent of the
@@ -155,6 +181,45 @@ sub from_julian {
     if ($year < 1) {
         $year--;
     }
+
+    return Date::Julian::Simple->new({ year => $year, month => $month, day => $day });
+}
+
+=head2 from_modified_julian($modified_julian_day)
+
+Returns Julian date as an object of type L<Date::Julian::Simple> equivalent of the
+C<$modified_julian_day>.
+
+=cut
+
+sub from_modified_julian {
+    my ($self, $modified_julian_day) = @_;
+
+    my $jd  = floor($modified_julian_day) + $MJD_CONST;
+    my $jdi = floor($jd);
+    my $jdf = $jd - $jdi + 0.5;
+
+    if ($jdf >= 1.0) {
+       $jdf = $jdf - 1.0;
+       $jdi = $jdi + 1;
+    }
+
+    my $hour = $jdf * 24.0;
+    my $l = $jdi + 68569;
+    my $n = floor(4 * $l / 146097);
+
+    $l = floor($l) - floor((146097 * $n + 3) / 4);
+    my $year = floor(4000 * ($l + 1) / 1461001);
+
+    $l = $l - (floor(1461 * $year / 4)) + 31;
+    my $month = floor(80 * $l / 2447);
+
+    my $day = $l - floor(2447 * $month / 80);
+
+    $l = floor($month / 11);
+
+    $month = floor($month + 2 - 12 * $l);
+    $year  = floor(100 * ($n - 49) + $year + $l);
 
     return Date::Julian::Simple->new({ year => $year, month => $month, day => $day });
 }
@@ -218,7 +283,7 @@ Returns 0 or 1 if the given Julian year C<$year> is a leap year or not.
 sub is_leap_year {
     my ($self, $year) = @_;
 
-    return (($year % 4) == (($year > 0) ? 0 : 3));
+    return (($year % 4) == (($year > 0) ? 0 : 3)) || 0;
 }
 
 sub days_in_year {

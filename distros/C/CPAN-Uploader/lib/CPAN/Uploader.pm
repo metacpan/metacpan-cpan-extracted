@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package CPAN::Uploader;
+package CPAN::Uploader 0.103016;
 # ABSTRACT: upload things to the CPAN
-$CPAN::Uploader::VERSION = '0.103015';
+
 #pod =head1 ORIGIN
 #pod
 #pod This code is mostly derived from C<cpan-upload-http> by Brad Fitzpatrick, which
@@ -18,7 +18,6 @@ use File::Spec;
 use HTTP::Request::Common qw(POST);
 use HTTP::Status;
 use LWP::UserAgent;
-use File::HomeDir;
 
 my $UPLOAD_URI = $ENV{CPAN_UPLOADER_UPLOAD_URI}
               || 'https://pause.perl.org/pause/authenquery?ACTION=add_uri';
@@ -41,7 +40,8 @@ my $UPLOAD_URI = $ENV{CPAN_UPLOADER_UPLOAD_URI}
 #pod   retry_delay - number of seconds to wait between retries
 #pod
 #pod This method attempts to actually upload the named file to the CPAN.  It will
-#pod raise an exception on error.
+#pod raise an exception on error. c<upload_uri> can also be set through the ENV
+#pod variable c<CPAN_UPLOADER_UPLOAD_URI>.
 #pod
 #pod =cut
 
@@ -74,9 +74,17 @@ sub upload_file {
     TRY: for my $try (1 .. $tries) {
       last TRY if eval { $self->_upload($file); 1 };
       die $@ unless $@ !~ /request failed with error code 5/;
+
       if ($try <= $tries) {
-        $self->log("Upload failed ($@), will make attempt #$try ...");
+        $self->log("Upload failed ($@)");
+        if ($tries and ($try < $tries)) {
+          my $next_try = $try + 1;
+          $self->log("Will make attempt #$next_try ...");
+        }
         sleep $self->{retry_delay} if $self->{retry_delay};
+      }
+      if ($try >= $tries) {
+        die "Failed to upload and reached maximum retry count!\n";
       }
     }
   }
@@ -218,7 +226,9 @@ sub read_config_file {
   my ($class, $filename) = @_;
 
   unless (defined $filename) {
-    my $home  = File::HomeDir->my_home || '.';
+    my $home = $^O eq 'MSWin32' && "$]" < 5.016
+      ? $ENV{HOME} || $ENV{USERPROFILE}
+      : (<~>)[0];
     $filename = File::Spec->catfile($home, '.pause');
 
     return {} unless -e $filename and -r _;
@@ -243,7 +253,7 @@ sub read_config_file {
       next unless $_ and $_ !~ /^\s*#/;
 
       my ($k, $v) = /^\s*(\w+)\s+(.+)$/;
-      Carp::croak "multiple enties for $k" if $conf{$k};
+      Carp::croak "multiple entries for $k" if $conf{$k};
       $conf{$k} = $v;
     }
   }
@@ -299,7 +309,17 @@ CPAN::Uploader - upload things to the CPAN
 
 =head1 VERSION
 
-version 0.103015
+version 0.103016
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -321,7 +341,8 @@ Valid arguments are:
   retry_delay - number of seconds to wait between retries
 
 This method attempts to actually upload the named file to the CPAN.  It will
-raise an exception on error.
+raise an exception on error. c<upload_uri> can also be set through the ENV
+variable c<CPAN_UPLOADER_UPLOAD_URI>.
 
 =head2 new
 
@@ -366,11 +387,11 @@ into this module.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Barbie Christian Walde David Caldwell Golden fREW Schmidt Gabor Szabo Graham Knop Kent Fredric Mark Fowler Mike Doherty perlancar (@netbook-zenbook-ux305) Ricardo Signes Steven Haryanto (on Asus Zenbook) sungo Torsten Raudssus Vincent Pit
+=for stopwords Barbie Christian Walde David Caldwell Golden fREW Schmidt Gabor Szabo Graham Knop Karen Etheridge Kent Fredric Marcus Ramberg Mark Fowler Mike Doherty perlancar Steven Haryanto (on Asus Zenbook) sungo Thibault DUPONCHELLE Torsten Raudssus Vincent Pit
 
 =over 4
 
@@ -404,7 +425,15 @@ Graham Knop <haarg@haarg.org>
 
 =item *
 
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
 Kent Fredric <kentfredric@gmail.com>
+
+=item *
+
+Marcus Ramberg <marcus.ramberg@gmail.com>
 
 =item *
 
@@ -416,11 +445,7 @@ Mike Doherty <doherty@cs.dal.ca>
 
 =item *
 
-perlancar (@netbook-zenbook-ux305) <perlancar@gmail.com>
-
-=item *
-
-Ricardo Signes <rjbs@semiotic.systems>
+perlancar <perlancar@gmail.com>
 
 =item *
 
@@ -429,6 +454,10 @@ Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
 =item *
 
 sungo <sungo@sungo.us>
+
+=item *
+
+Thibault DUPONCHELLE <thibault.duponchelle@amadeus.com>
 
 =item *
 
@@ -442,7 +471,7 @@ Vincent Pit <perl@profvince.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

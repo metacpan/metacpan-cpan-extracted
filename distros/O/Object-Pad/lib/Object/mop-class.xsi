@@ -75,9 +75,9 @@ superclasses(self)
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    if(meta->supermeta) {
+    if(meta->type == METATYPE_CLASS && meta->cls.supermeta) {
       PUSHs(sv_newmortal());
-      sv_setref_uv(ST(0), "Object::Pad::MOP::Class", PTR2UV(meta->supermeta));
+      sv_setref_uv(ST(0), "Object::Pad::MOP::Class", PTR2UV(meta->cls.supermeta));
       XSRETURN(1);
     }
 
@@ -85,8 +85,11 @@ superclasses(self)
   }
 
 void
-roles(self)
+direct_roles(self)
     SV *self
+  ALIAS:
+    direct_roles = 0
+    all_roles    = 1
   PPCODE:
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
@@ -94,25 +97,43 @@ roles(self)
 
     /* TODO Consider recursion */
     U32 i;
-    RoleEmbedding **arr = (RoleEmbedding **)AvARRAY(meta->roles);
-    for(i = 0; i < av_count(meta->roles); i++) {
-      SV *sv = sv_newmortal();
-      sv_setref_uv(sv, "Object::Pad::MOP::Class", PTR2UV(arr[i]->rolemeta));
-      XPUSHs(sv);
-      count++;
+    switch(meta->type) {
+      case METATYPE_CLASS: {
+        U32 nroles;
+        RoleEmbedding **embeddings = NULL;
+        switch(ix) {
+          case 0: embeddings = mop_class_get_direct_roles(meta, &nroles); break;
+          case 1: embeddings = mop_class_get_all_roles(meta, &nroles); break;
+        }
+
+        for(i = 0; i < nroles; i++) {
+          SV *sv = sv_newmortal();
+          sv_setref_uv(sv, "Object::Pad::MOP::Class", PTR2UV(embeddings[i]->rolemeta));
+          XPUSHs(sv);
+          count++;
+        }
+        break;
+      }
+
+      case METATYPE_ROLE:
+        break;
     }
 
     XSRETURN(count);
   }
 
 void
-compose_role(self, role)
+add_role(self, role)
     SV *self
     SV *role
+  ALIAS:
+    compose_role = 0
   CODE:
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
     ClassMeta *rolemeta = NULL;
+
+    PERL_UNUSED_VAR(ix);
 
     if(SvROK(role)) {
       if(!sv_derived_from(role, "Object::Pad::MOP::Class"))
@@ -134,7 +155,7 @@ compose_role(self, role)
     if(!rolemeta || rolemeta->type != METATYPE_ROLE)
       croak("%" SVf " is not a role", SVfARG(role));
 
-    mop_class_compose_role(meta, rolemeta);
+    mop_class_add_role(meta, rolemeta);
   }
 
 void
@@ -191,7 +212,7 @@ get_own_method(self, methodname)
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    AV *methods = meta->methods;
+    AV *methods = meta->direct_methods;
     U32 nmethods = av_count(methods);
 
     U32 i;
@@ -228,6 +249,7 @@ add_slot(self, slotname, ...)
       "reader",
       "writer",
       "mutator",
+      "accessor",
       "weak",
       NULL,
     };
@@ -255,7 +277,11 @@ add_slot(self, slotname, ...)
           mop_slot_apply_attribute(slotmeta, "mutator", kwval);
           break;
 
-        case 5: /* weak */
+        case 5: /* accessor */
+          mop_slot_apply_attribute(slotmeta, "accessor", kwval);
+          break;
+
+        case 6: /* weak */
           mop_slot_apply_attribute(slotmeta, "weak", NULL);
           break;
       }
@@ -277,7 +303,7 @@ get_slot(self, slotname)
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    AV *slots = meta->slots;
+    AV *slots = meta->direct_slots;
     U32 nslots = av_count(slots);
 
     SLOTOFFSET i;
@@ -302,7 +328,7 @@ slots(self)
   PPCODE:
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    AV *slots = meta->slots;
+    AV *slots = meta->direct_slots;
     U32 nslots = av_count(slots);
 
     EXTEND(SP, nslots);

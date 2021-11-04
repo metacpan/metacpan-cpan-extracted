@@ -8,34 +8,32 @@ use Test::More tests => 10;
 # strict
 use strict;
 
-#load test
 use File::Spec;
 use File::Temp;
 
-# load modules
 require_ok("Astro::Catalog");
 
-my $cat = new Astro::Catalog( Format => 'TST', Data => \*DATA );
+my $cat = new Astro::Catalog(Format => 'TST', Data => \*DATA);
 
-isa_ok( $cat, "Astro::Catalog" );
+isa_ok($cat, "Astro::Catalog");
 
 # Test out the fourth object.
 my @stars = $cat->stars;
 my $star = $stars[3];
 
-is( $star->id, "Obj. 4", "TST Star ID" );
-is( $star->ra, "05 17 36.30", "TST Star RA" );
-is( $star->dec, "-06 50 40.00", "TST Star Dec" );
+is($star->id, "Obj. 4", "TST Star ID");
+is($star->ra, "05 17 36.30", "TST Star RA");
+is($star->dec, "-06 50 40.00", "TST Star Dec");
 
 # Write out a file, then read it back in.
 my $fh = new File::Temp;
 my $tempfile = $fh->filename;
-ok( $cat->write_catalog( Format => 'TST', File => $tempfile ),
+ok($cat->write_catalog(Format => 'TST', File => $tempfile),
     "Writing catalogue to disk" );
 
-my $newcat = new Astro::Catalog( Format => 'TST', File => $tempfile );
+my $newcat = new Astro::Catalog(Format => 'TST', File => $tempfile);
 
-isa_ok( $newcat, "Astro::Catalog" );
+isa_ok($newcat, "Astro::Catalog");
 
 my @newstars = $newcat->stars;
 my $newstar = $newstars[3];
@@ -43,14 +41,11 @@ my $newid = $newstar->id;
 my $newra = $newstar->ra;
 my $newdec = $newstar->dec;
 
-is( $newid,  $star->id,  "TST written catalogue ID" );
-is( $newra,  $star->ra,  "TST written catalogue RA" );
-is( $newdec, $star->dec, "TST written catalogue Dec" );
-
+is($newid,  $star->id,  "TST written catalogue ID");
+is($newra,  $star->ra,  "TST written catalogue RA");
+is($newdec, $star->dec, "TST written catalogue Dec");
 
 exit;
-
-# D A T A   B L O C K --------------------------------------------------------
 
 __DATA__
 Simple TST example; stellar photometry catalogue.

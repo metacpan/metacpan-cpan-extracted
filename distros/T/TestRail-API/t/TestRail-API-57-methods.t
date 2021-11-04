@@ -7,7 +7,7 @@ use Test::MockModule;
 use TestRail::API;
 
 my $mock = Test::MockModule->new('TestRail::API');
-$mock->redefine('_doRequest', sub { shift; return shift; } );
+$mock->mock('_doRequest', sub { shift; return shift; } );
 
 my $obj = bless ({},'TestRail::API');
 

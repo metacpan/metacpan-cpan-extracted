@@ -3,7 +3,7 @@ package App::perlimports::Sandbox;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000025';
 
 use Data::UUID ();
 
@@ -59,7 +59,7 @@ App::perlimports::Sandbox - Internal Tools for perlimports
 
 =head1 VERSION
 
-version 0.000023
+version 0.000025
 
 =head2 pkg_for( $string )
 

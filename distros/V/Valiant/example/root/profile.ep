@@ -1,10 +1,6 @@
-% layout 'layout.ep';
-% content title => 'Update Profile';
-% content css => begin
-  <style></style>
-% end
+% layout 'layout.ep', title => 'Update Profile';
 
-%= form_for $person => +{ style=>'width:27em; margin:auto' }, begin
+%= form_for $person => +{ style=>'width:27em; margin:auto'  }, begin
   % if($person->validated && !$person->has_errors) {
     <div class='alert alert-success' role='alert'>Successfully Updated</div>
   % }
@@ -17,7 +13,6 @@
       %= errors_for 'first_name', +{ class=>'invalid-feedback' }
     </div>
     <div class='form-group'>
-      
       %= label 'last_name'
       %= input 'last_name', +{ class=>'form-control', errors_classes=>'is-invalid'  }
       %= errors_for 'last_name', +{ class=>'invalid-feedback' }
@@ -74,7 +69,7 @@
     <legend><%= $person->human_attribute_name('roles')  %></legend>
     %= model_errors_for 'person_roles', max_errors=>1, class=>'alert alert-danger', role=>'alert';
     <div class='form-group'>
-      %= checkboxes_from_collection 'person_roles', +{role_id => 'id'}, $c->model('Schema::Role'), +{value_field=>'id', label_field=>'label'}
+      %= checkbox_list_from_collection 'person_roles', +{role_id => 'id'}, $roles, +{value_field=>'id', label_field=>'label'}
     </div>
   </fieldset>
 
@@ -95,15 +90,14 @@
           %= errors_for 'expiration', +{ class=>'invalid-feedback' }
         </div>
         <div class='col form-group col-2'>
-          % if(model->in_storage || model->is_marked_for_deletion) {
             %= label '_delete' 
             <br>
-            %= input '_delete', +{ type=>'checkbox', value=>1,  checked=>model->is_marked_for_deletion }
-          % }     
+            %= checkbox '_delete', +{ value=>1,  checked=>model->is_marked_for_deletion }
         </div>
       </div>
+    %= end, begin
+        %= button '_add', +{ class=>'btn btn-lg btn-primary btn-block', value=>1 }, 'Add Credit Card'
     %= end
-    %= button_tag { class=>'btn btn-lg btn-primary btn-block', name=>'add.credit_cards', value=>1 }, 'Add Credit Card'
   </fieldset>
 
   <fieldset>

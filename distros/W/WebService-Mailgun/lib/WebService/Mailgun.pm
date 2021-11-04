@@ -1,4 +1,6 @@
 package WebService::Mailgun;
+
+
 use 5.008001;
 use strict;
 use warnings;
@@ -9,8 +11,10 @@ use URI;
 use Try::Tiny;
 use Carp;
 use HTTP::Request::Common;
+use File::Temp;
 
-our $VERSION = "0.11";
+
+our $VERSION = "0.12";
 our $API_BASE = 'api.mailgun.net/v3';
 
 use Class::Accessor::Lite (
@@ -105,14 +109,73 @@ sub message {
         @content = @$args;
     }
     else {
-        die 'unsupport argument. message() need HashRef or ArrayRef.';
-    }
+        die 'unsupport argument. message() need HashRef or ArrayRef.';    
+	}
 
     my $req = POST $self->domain_api_url('messages'), Content_type => 'form-data', Content => \@content;
 
     my $res = $self->client->request($req);
     $self->decode_response($res);
 }
+
+
+
+sub mime { 
+		
+    my ($self, $args) = @_;
+
+    if (ref($args) eq 'HASH') {
+        # Well, good!
+    }
+    else {
+        die 'unsupport argument. mime() needs a hash ref.';
+    }
+	
+	
+	my $tmp = undef; 
+
+	if(exists($args->{message})){
+		$tmp = File::Temp->new();
+		
+		if(ref $args->{message} eq 'SCALAR'){ 
+			# save from a ref
+			print $tmp ${$args->{message}};
+			seek $tmp, 0, 0;
+		}
+		else {
+			# Save from a string
+			print $tmp $args->{message};
+			seek $tmp, 0, 0;
+		}
+		$args->{message} = [$tmp->filename];
+	}
+	elsif(exists($args->{file})){ 
+		if(-f $args->{file}){ 
+			$args->{message} =  [$args->{file}];
+			delete $args->{file}; 
+		}
+		else { 
+			die "cannot find file, " . $args->{file}; 
+		}
+	}
+	
+	# Put it back together: 
+	my @content = %$args;
+
+    my $req = POST $self->domain_api_url('messages.mime'), 
+		Content_Type => 'form-data', 
+		Content => \@content;
+		
+    my $res = $self->client->request($req);
+	
+	undef $tmp; 
+	
+    $self->decode_response($res);
+
+}
+
+
+
 
 sub lists {
     my $self = shift;
@@ -275,6 +338,43 @@ Send email message.
     });
 
 L<https://documentation.mailgun.com/en/latest/api-sending.html#sending>
+
+=head2 mime($args)
+
+Send a MIME message you build yourself, usually by using a library to create that MIME message. 
+The C<to> parameter needs to be passed as one of the arguments. 
+Either the C<file> or C<message> parameter will also need to be passed. 
+
+The C<file> parameter should contain the path to the filename that holds the MIME message. 
+The C<message> parameter should contain either a string or a reference to a string that holds the MIME message: 
+
+    # send MIME message via a filename: 
+    my $res = $mailgun->message({
+    	to      => 'bar@example.com',
+		file    => '/path/to/filename.mime',	
+    });
+
+    # send MIME message via a string:
+	use MIME::Entity; 
+	my $str = MIME::Entity->build(
+		From    => 'justin@dadamailproject.com',
+        To      => 'justin@dadamailproject.com',
+        Subject => "Subject",
+        Data    => 'Messag4')->as_string;
+	
+    my $res = $mailgun->message({
+    	to       => 'bar@example.com',
+		message  => $str,
+    });
+
+    # or send MIME message via a string ref:	
+    my $res = $mailgun->message({
+    	to       => 'bar@example.com',
+		message  => \$str,
+    });
+
+L<https://documentation.mailgun.com/en/latest/api-sending.html#sending>
+
 
 =head2 lists()
 

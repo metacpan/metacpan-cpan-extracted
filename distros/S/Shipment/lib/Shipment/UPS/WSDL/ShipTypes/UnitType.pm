@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::UnitType;
-$Shipment::UPS::WSDL::ShipTypes::UnitType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::UnitType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,13 +31,13 @@ Class::Std::initialize();
               UnitOfMeasurement
               Value
 
-              )
+            )
         ],
         {   'Number'            => \%Number_of,
             'UnitOfMeasurement' => \%UnitOfMeasurement_of,
             'Value'             => \%Value_of,
         },
-        {   'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'Number'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'UnitOfMeasurement' =>
               'Shipment::UPS::WSDL::ShipTypes::UnitOfMeasurementType',
             'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
@@ -67,7 +67,7 @@ Shipment::UPS::WSDL::ShipTypes::UnitType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

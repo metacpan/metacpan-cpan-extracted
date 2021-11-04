@@ -1,3 +1,10 @@
+0.003   2021-10-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add grep mode (-g) and invert match mode (-v).
+
+	- Add CLI: dir-not-empty.
+
+
 0.002   2019-09-29  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

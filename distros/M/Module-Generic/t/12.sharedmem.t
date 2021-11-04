@@ -12,7 +12,7 @@ BEGIN
         # plan skip_all => 'IPC::SysV not supported on this system';
         $IS_SUPPORTED = 0;
     }
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 SKIP:
@@ -96,9 +96,8 @@ SKIP:
     $s->read( $data2 );
     ok( ref( $data2 ) eq 'HASH', 'different read usage' );
     ok( $data2->{year} == 2021, 'different read data check' );
-    my $rv = $s->lock || 
-    diag( "Unable to lock: ", $s->error );
-    ok( defined( $s->lock ), 'lock' );
+    my $rv = $s->lock || diag( "Unable to lock: ", $s->error );
+    ok( $rv, 'lock' );
     ok( $s->locked, 'locked' );
     $data->{test} = 'ok';
     ok( defined( $s->write( $data ) ), 'updated data with lock' );

@@ -1,21 +1,22 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
 
 use Commandable::Finder::Packages;
 
-{
-   package MyTest::Command::one;
+package MyTest::Command::one {
    use constant COMMAND_DESC => "the one command";
+}
 
-   package MyTest::Command::two;
+package MyTest::Command::two {
    use constant COMMAND_DESC => "the two command";
+}
 
-   package MyTest::Command::nothing;
-   sub foo {}; # not a command
+package MyTest::Command::nothing {
+   sub foo {} # not a command
 }
 
 {
@@ -25,7 +26,7 @@ use Commandable::Finder::Packages;
    );
 
    is_deeply( [ sort map { $_->name } $finder->find_commands ],
-      [qw( one two )],
+      [qw( help one two )],
       '$finder->find_commands' );
 
    my $one = $finder->find_command( "one" );

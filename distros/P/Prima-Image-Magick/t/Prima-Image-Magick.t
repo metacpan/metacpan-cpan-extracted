@@ -61,9 +61,12 @@ try( $i, im::BW,     '1-bit');
 
 $i-> type(im::Double);
 $i-> resample( $i-> rangeLo, $i-> rangeHi, 0.0, 255.0);
+$i-> type(im::Byte);
 
 try( $i, im::Double, 'double', im::Double);
 try( $i, im::Float, 'float', im::Float);
+
+$i-> type(im::Double);
 
 my $k = $i-> dup;
 $i-> Emboss;

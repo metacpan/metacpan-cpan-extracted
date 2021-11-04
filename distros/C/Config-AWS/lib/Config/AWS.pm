@@ -4,11 +4,9 @@ package Config::AWS;
 use strict;
 use warnings;
 
-use File::Glob qw( bsd_glob );
-use Ref::Util qw( is_ref is_arrayref is_scalarref is_blessed_ref );
-use Carp qw( carp croak );
-use Scalar::Util qw();
-
+use Carp ();
+use Ref::Util;
+use Scalar::Util;
 use Exporter::Shiny qw(
     read
     read_all
@@ -21,7 +19,7 @@ use Exporter::Shiny qw(
     default_profile
 );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our %EXPORT_TAGS = (
     ini  => [qw( read_file read_string read_handle )],
     aws  => [qw( config_file default_profile credentials_file )],
@@ -29,28 +27,92 @@ our %EXPORT_TAGS = (
     all  => [qw( :ini :aws :read )],
 );
 
+# Internal methods for parsing and validation
+
+my $prepare = sub {
+    # Input is given argument or credentials file (if exists) or config file.
+    my $input = shift // do {
+        my $cred_file = credentials_file();
+        -r $cred_file ? $cred_file : config_file();
+    };
+
+    unless ( Ref::Util::is_ref $input ) {
+        require Path::Tiny;
+        my @lines = eval { Path::Tiny::path( $input )->lines };
+        if ($@) {
+            Carp::croak "Cannot read from $input: $@->{err}"
+                if ref $@ && $@->isa('Path::Tiny::Error');
+            Carp::croak $@;
+        }
+        return \@lines;
+    }
+
+    return [ $input->getlines ] if Scalar::Util::openhandle $input;
+
+    if ( Ref::Util::is_blessed_ref $input ) {
+        return [ $input->slurp ] if $input->isa('Path::Class::File');
+        return [ $input->lines ] if $input->isa('Path::Tiny');
+
+        Carp::croak 'Cannot read from objects of type ', ref $input;
+    }
+
+    return [ split /\R/, $$input ] if Ref::Util::is_scalarref $input;
+    return $input                  if Ref::Util::is_arrayref  $input;
+
+    Carp::croak "Could not use $input as source for ", (caller 1)[3];
+};
+
+my $read = sub {
+    my ($lines, $target_profile) = @_;
+
+    Carp::carp 'Reading config with only one line or less. Faulty input?'
+        if @$lines <= 1;
+
+    my $hash    = {};
+    my $nested  = {};
+    my $profile = '';
+
+    for my $i (0 .. $#$lines) {
+        my $line = $lines->[$i];
+        $line =~ s/\R$//;
+
+        if ($line =~ /^\[(?:profile )?([\w-]+)\]/) {
+            $profile = $1;
+            next;
+        }
+
+        next if $target_profile && $profile ne $target_profile;
+
+        next unless my ($indent, $key, $value) = $line =~ /^(\s*)(\w+)\s*=\s*(.*)/;
+
+        if (length $indent) {
+            $nested->{$key} = $value;
+        }
+        else {
+            # Add nested hash if the value is empty and next line is indented.
+            $hash->{$profile}{$key}
+                = !length $value && $i < $#$lines && $lines->[$i + 1] =~ /^\s+/
+                ? $nested : $value;
+
+            $nested = {} if keys %$nested;
+        }
+    }
+
+    return $target_profile ? ( $hash->{$target_profile} // {} ) : $hash;
+};
+
 # Config parsing interface
 
 sub read {
-    my $input = _prepare( shift );
-    _read( $input, shift // default_profile() );
+    $read->( $prepare->(shift), shift // default_profile() );
 }
 
 sub read_all {
-    my $input = _prepare( shift );
-    _read( $input );
+    $read->( &$prepare );
 }
 
 sub list_profiles {
-    my $lines = _prepare( shift );
-
-    my @profiles;
-
-    for (@{$lines}) {
-        push @profiles, $1 if /^\[(?:profile )?([\w-]+)\]/;
-    }
-
-    return @profiles;
+    map /^\[(?:profile )?([\w-]+)\]/, @{ &$prepare };
 }
 
 # AWS information methods
@@ -60,123 +122,31 @@ sub default_profile {
 }
 
 sub credentials_file {
-    $ENV{AWS_SHARED_CREDENTIALS_FILE} // bsd_glob( '~/.aws/credentials' );
+    $ENV{AWS_SHARED_CREDENTIALS_FILE} // ( glob '~/.aws/credentials' )[0];
 }
 
 sub config_file {
-    $ENV{AWS_CONFIG_FILE} // bsd_glob( '~/.aws/config' );
+    $ENV{AWS_CONFIG_FILE} // ( glob '~/.aws/config' )[0];
 }
 
 # Methods for compatibility with Config::INI interface
 
 sub read_file {
-    croak 'Filename is missing' unless @_ >= 1;
-    croak 'Argument was not a string' if is_ref $_[0];
-    _read( _prepare(shift), @_ );
+    Carp::croak 'Filename is missing' unless @_;
+    Carp::croak 'Argument was not a string' if Ref::Util::is_ref $_[0];
+    $read->( $prepare->(shift), @_ );
 }
 
 sub read_string {
-    croak 'String is missing' unless @_ >= 1;
-    croak 'Argument was not a string' if is_ref $_[0];
-    _read( [ split /\n/, shift // '' ], @_ );
+    Carp::croak 'String is missing' unless @_;
+    Carp::croak 'Argument was not a string' if Ref::Util::is_ref $_[0];
+    $read->( [ split /\R/, shift // '' ], @_ );
 }
 
 sub read_handle {
-    require Scalar::Util;
-    croak 'Handle is missing' unless @_ >= 1;
-    croak 'Argument was not a handle'
-        unless Scalar::Util::openhandle( $_[0] );
-    _read( [ map { s/\015?\012/\n/; chomp; $_ } shift->getlines ], @_ );
-}
-
-# Internal methods for parsing and validation
-
-sub _prepare {
-    my ($input) = @_;
-
-    unless (defined $input) {
-        my $file = credentials_file();
-        $input = $file if -r $file;
-    }
-
-    $input = config_file() unless defined $input;
-
-    unless (is_ref $input) {
-        require Path::Tiny;
-        my @lines = eval { Path::Tiny::path( $input )->lines({ chomp => 1 }) };
-        if ($@) {
-            croak "Cannot read from $input: $@->{err}"
-                if ref $@ && $@->isa('Path::Tiny::Error');
-            croak $@;
-        }
-        return \@lines;
-    }
-
-    return [ map { chomp } $input->getlines ]
-        if Scalar::Util::openhandle( $input );
-
-    if (is_blessed_ref $input) {
-        return [ $input->slurp( chomp => 1 ) ]
-            if $input->isa('Path::Class::File');
-
-        return [ $input->lines({ chomp => 1 }) ]
-            if $input->isa('Path::Tiny');
-
-        croak 'Cannot read from objects of type ' . ref $input;
-    }
-
-    return [ split /\n/, ${ $input } ] if is_scalarref $input;
-    return $input                      if is_arrayref $input;
-
-    croak "Could not use $input as source for " . (caller(1))[3];
-}
-
-sub _read {
-    my ($lines, $target_profile) = @_;
-
-    carp 'Reading config with only one line or less. Faulty input?'
-        if scalar @{$lines} <= 1;
-
-    my $hash = {};
-    my $nested = {};
-
-    my $profile = q{};
-    for my $i (0 .. $#{$lines}) {
-        my $line = $lines->[$i];
-        chomp $line;
-
-        if ($line =~ /^\[(?:profile )?([\w-]+)\]/) {
-            $profile = $1;
-            next;
-        }
-
-        next if $target_profile && $profile ne $target_profile;
-
-        my ($indent, $key, $value) = $line =~ /^(\s*)([\w]+)\s*=\s*(.*)/;
-
-        next unless defined $key;
-
-        if (length $indent) {
-            $nested->{$key} = $value;
-        }
-        else {
-            if ($value) {
-                $hash->{$profile}{$key} = $value;
-            }
-            else {
-                my ($next_indent) = $lines->[$i + 1] =~ /^(\s*)/;
-                if (length $next_indent) {
-                    $hash->{$profile}{$key} = $nested;
-                }
-                else {
-                    $hash->{$profile}{$key} = $value;
-                }
-            }
-            $nested = {} if keys %{$nested};
-        }
-    }
-
-    return $target_profile ? ( $hash->{$target_profile} // {} ) : $hash;
+    Carp::croak 'Handle is missing' unless @_;
+    Carp::croak 'Argument was not a handle' unless Scalar::Util::openhandle $_[0];
+    $read->( [ shift->getlines ], @_ );
 }
 
 1;
@@ -357,9 +327,7 @@ José Joaquín Atria <jjatria@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by José Joaquín Atria.
+This software is copyright (c) 2018-2021 by José Joaquín Atria.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-=cut

@@ -15,10 +15,12 @@ libeav/data/domain-length.txt
 libeav/data/email-reg.ru.txt
 libeav/data/email-result-check.txt
 libeav/data/email-utf8.txt
+libeav/data/fail-email-ascii-slurp.txt
 libeav/data/fail-email-ascii.txt
 libeav/data/localpart-ascii.txt
 libeav/data/localpart-utf8-rfc20.txt
 libeav/data/localpart-utf8.txt
+libeav/data/pass-email-ascii-slurp.txt
 libeav/data/pass-email-ascii.txt
 libeav/data/punycode.csv
 libeav/data/raw.csv

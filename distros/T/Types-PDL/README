@@ -6,11 +6,11 @@ This module provides Type::Tiny compatible types for PDL.
 
 Types which accept parameters (see "Parameters") will list them.
 
-   "Piddle"
+   "NDArray" | "Piddle" (*deprecated*)
 
 Allows an object blessed into the class "PDL", e.g.
 
-  validate( [pdl], Piddle );
+  validate( [pdl], NDarray );
 
 It accepts the following parameters:
 
@@ -22,7 +22,7 @@ It accepts the following parameters:
   shape
   type
 
-   "Piddle0D"
+   "NDArray0D" | "Piddle0D" (*deprecated*)
 
 Allows an object blessed into the class "PDL" with "ndims" = 0. It
 accepts the following parameters:
@@ -30,7 +30,7 @@ accepts the following parameters:
   null
   type
 
-   "Piddle1D"
+   "NDArray1D" | "Piddle1D" (*deprecated*)
 
 Allows an object blessed into the class "PDL" with "ndims" = 1. It
 accepts the following parameters:
@@ -40,7 +40,7 @@ accepts the following parameters:
   shape
   type
 
-   "Piddle2D"
+   "NDArray2D" | "Piddle2D" (*deprecated*)
 
 Allows an object blessed into the class "PDL" with "ndims" = 2. It
 accepts the following parameters:
@@ -50,7 +50,7 @@ accepts the following parameters:
   shape
   type
 
-   "Piddle3D"
+   "NDArray3D" | "Piddle3D" (*deprecated*)
 
 Allows an object blessed into the class "PDL" with "ndims" = 3. It
 accepts the following parameters:
@@ -66,50 +66,50 @@ The following coercions are provided, and may be applied via a type
 object's "plus_coercions" in Type::Tiny or "plus_fallback_coercions" in
 Type::Tiny methods, e.g.
 
-  Piddle->plus_coercions( PiddleFromAny );
+  NDArray->plus_coercions( NDArrayFromAny );
 
-   "PiddleFromAny"
+   "NDArrayFromAny" | "PiddleFromAny" (*deprecated*)
 
-Uses "topdl" in PDL::Core to coerce the value into a piddle.
+Uses "topdl" in PDL::Core to coerce the value into a PDL object.
 
   Parameters
 
 Some types take optional parameters which add additional constraints on
-the object. For example, to indicate that only empty piddles are
+the object. For example, to indicate that only empty PDL objects are
 accepted:
 
-  validate( [pdl], Piddle[ empty => 1 ] );
+  validate( [pdl], NDArray[ empty => 1 ] );
 
 The available parameters are:
 
    "empty"
 
-This accepts a boolean value; if true the piddle must be empty (i.e. the
-"isempty" method returns true), if false, it must not be empty.
+This accepts a boolean value; if true the PDL object must be empty (i.e.
+the "isempty" method returns true), if false, it must not be empty.
 
    "null"
 
-This accepts a boolean value; if true the piddle must be a null piddle,
-if false, it must not be null.
+This accepts a boolean value; if true the PDL object must be a null PDL
+object, if false, it must not be null.
 
    "ndims"
 
-This specifies a fixed number of dimensions which the piddle must have.
-Don't mix use this with "ndims_min" or "ndims_max".
+This specifies a fixed number of dimensions which the PDL object must
+have. Don't mix use this with "ndims_min" or "ndims_max".
 
    "ndims_min"
 
-The minimum number of dimensions the piddle may have. Don't specify this
-with "ndims".
+The minimum number of dimensions the PDL object may have. Don't specify
+this with "ndims".
 
    "ndims_max"
 
-The maximum number of dimensions the piddle may have. Don't specify this
-with "ndims".
+The maximum number of dimensions the PDL object may have. Don't specify
+this with "ndims".
 
    "shape"
 
-The shape of the piddle.
+The shape of the PDL object.
 
 The value is a list of specifications for dimensions, expressed either
 as elements in a Perl array or as comma-delimited fields in a string.
@@ -151,9 +151,9 @@ the match, "X" means any extent):
 
    "type"
 
-The type of the piddle. The value may be a PDL::Type object or a string
-containing the name of a type (e.g., "double"). For a complete list of
-types, run this command:
+The type of the PDL object. The value may be a PDL::Type object or a
+string containing the name of a type (e.g., "double"). For a complete
+list of types, run this command:
 
   perl -MPDL::Types=mapfld,ppdefs \
     -E 'say mapfld( $_ => 'ppsym' => 'ioname' )  for ppdefs'

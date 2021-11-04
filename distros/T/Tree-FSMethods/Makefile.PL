@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Tree::FSMethods",
   "PREREQ_PM" => {
-    "Code::Includable::Tree::NodeMethods" => "0.124",
+    "Code::Includable::Tree::NodeMethods" => "0.126",
     "Org::Parser::Tiny" => "0.005",
     "Path::Naive" => "0.043",
     "Scalar::Util" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Code::Includable::Tree::NodeMethods" => "0.124",
+  "Code::Includable::Tree::NodeMethods" => "0.126",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

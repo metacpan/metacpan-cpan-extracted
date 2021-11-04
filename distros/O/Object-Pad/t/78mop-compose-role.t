@@ -21,8 +21,8 @@ role TheRole
 
    my $ameta = Object::Pad::MOP::Class->for_class( "AClass" );
 
-   is_deeply( [ map { $_->name } $ameta->roles ], [qw( TheRole )],
-      'AClass meta ->roles' );
+   is_deeply( [ map { $_->name } $ameta->direct_roles ], [qw( TheRole )],
+      'AClass meta ->direct_roles' );
    can_ok( AClass->new, qw( m ) );
 }
 
@@ -37,8 +37,8 @@ role TheRole
 
    my $bmeta = Object::Pad::MOP::Class->for_class( "BClass" );
 
-   is_deeply( [ map { $_->name } $bmeta->roles ], [qw( TheRole )],
-      'BClass meta ->roles' );
+   is_deeply( [ map { $_->name } $bmeta->direct_roles ], [qw( TheRole )],
+      'BClass meta ->direct_roles' );
    can_ok( BClass->new, qw( m ) );
 }
 

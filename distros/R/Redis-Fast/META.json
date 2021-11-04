@@ -47,7 +47,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Time::HiRes" : "0",
+            "Time::HiRes" : "1.77",
             "Try::Tiny" : "0",
             "perl" : "5.008001"
          }
@@ -70,7 +70,7 @@
    "provides" : {
       "Redis::Fast" : {
          "file" : "lib/Redis/Fast.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Redis::Fast::Hash" : {
          "file" : "lib/Redis/Fast/Hash.pm"
@@ -93,7 +93,7 @@
          "web" : "https://github.com/shogo82148/Redis-Fast"
       }
    },
-   "version" : "0.31",
+   "version" : "0.33",
    "x_contributors" : [
       "Aaron Crane <arc@aaroncrane.co.uk>",
       "Aaron Crane <arc@cpan.org>",
@@ -113,6 +113,7 @@
       "João Bolila <joao@bolila.com>",
       "Masayuki Matsuki <y.songmu@gmail.com>",
       "Michael Klishin <michaelklishin@me.com>",
+      "Michael Kröll <michael.kroell@geizhals.at>",
       "Michiel Beijen <michiel.beijen@otrs.com>",
       "Mikio Fujita <mikio.fjt@gmail.com>",
       "Pedro Melo <melo@simplicidade.org>",

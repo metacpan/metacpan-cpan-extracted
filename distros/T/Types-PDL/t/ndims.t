@@ -27,7 +27,7 @@ subtest 'validate fiducials' => sub {
 
 subtest 'ndims = 0' => sub {
 
-    my $t = Piddle [ ndims => 0 ];
+    my $t = NDArray [ ndims => 0 ];
 
     ok( !$t->check( $null ), 'null' );
     ok(  $t->check( $d0 ),   '0D' );
@@ -39,7 +39,7 @@ subtest 'ndims = 0' => sub {
 
 subtest 'ndims = 1' => sub {
 
-    my $t = Piddle [ ndims => 1 ];
+    my $t = NDArray [ ndims => 1 ];
 
     ok(  $t->check( $null ), 'null' );
     ok( !$t->check( $d0 ),   '0D' );
@@ -52,7 +52,7 @@ subtest 'ndims = 1' => sub {
 
 subtest 'ndims_min = 1' => sub {
 
-    my $t = Piddle [ ndims_min => 1 ];
+    my $t = NDArray [ ndims_min => 1 ];
 
     ok(  $t->check( $null ), 'null' );
     ok( !$t->check( $d0 ),   '0D' );
@@ -64,7 +64,7 @@ subtest 'ndims_min = 1' => sub {
 
 subtest 'ndims_min = 2' => sub {
 
-    my $t = Piddle [ ndims_min => 2 ];
+    my $t = NDArray [ ndims_min => 2 ];
 
     ok( !$t->check( $null ), 'null' );
     ok( !$t->check( $d0 ),   '0D' );
@@ -76,7 +76,7 @@ subtest 'ndims_min = 2' => sub {
 
 subtest 'ndims_max = 1' => sub {
 
-    my $t = Piddle [ ndims_max => 1 ];
+    my $t = NDArray [ ndims_max => 1 ];
 
     ok(  $t->check( $null ), 'null' );
     ok(  $t->check( $d0 ),   '0D' );
@@ -87,7 +87,7 @@ subtest 'ndims_max = 1' => sub {
 
 subtest 'ndims_max = 2' => sub {
 
-    my $t = Piddle [ ndims_max => 2 ];
+    my $t = NDArray [ ndims_max => 2 ];
 
     ok(  $t->check( $null ), 'null' );
     ok(  $t->check( $d0 ),   '0D' );
@@ -100,7 +100,7 @@ subtest 'ndims_max = 2' => sub {
 
 subtest 'ndims_max = 3' => sub {
 
-    my $t = Piddle [ ndims_max => 3 ];
+    my $t = NDArray [ ndims_max => 3 ];
 
     ok(  $t->check( $null ), 'null' );
     ok(  $t->check( $d0 ),   '0D' );
@@ -112,7 +112,7 @@ subtest 'ndims_max = 3' => sub {
 
 subtest 'ndims_min = 1 && ndims_max = 2' => sub {
 
-    my $t = Piddle [ ndims_min => 1, ndims_max => 2 ];
+    my $t = NDArray [ ndims_min => 1, ndims_max => 2 ];
 
     ok(  $t->check( $null ), 'null' );
     ok( !$t->check( $d0 ),   '0D' );
@@ -124,7 +124,7 @@ subtest 'ndims_min = 1 && ndims_max = 2' => sub {
 
 subtest 'ndims_min = 1 && ndims_max = 1' => sub {
 
-    my $t = Piddle [ ndims_min => 1, ndims_max => 1 ];
+    my $t = NDArray [ ndims_min => 1, ndims_max => 1 ];
 
     ok(  $t->check( $null ), 'null' );
     ok( !$t->check( $d0 ),   '0D' );
@@ -138,61 +138,61 @@ subtest 'ndims_min = 1 && ndims_max = 1' => sub {
 subtest 'illegal constraint specifications' => sub {
 
     like(
-        dies { Piddle [ ndims_min => 2, ndims_max => 0 ] },
+        dies { NDArray [ ndims_min => 2, ndims_max => 0 ] },
          qr/must be <=/,
          'ndims_min > ndims_max',
     );
 
     like(
-        dies { Piddle [ ndims_min => 0, ndims_max => 2, ndims => 3 ] },
+        dies { NDArray [ ndims_min => 0, ndims_max => 2, ndims => 3 ] },
          qr/cannot mix/,
          'ndims_min, ndims_max, ndims',
     );
 
     like(
-        dies { Piddle [ ndims_min => 2, ndims => 3 ] },
+        dies { NDArray [ ndims_min => 2, ndims => 3 ] },
          qr/cannot mix/,
          'ndims_min, ndims',
     );
 
     like(
-        dies { Piddle [ ndims_max => 0, ndims => 3 ] },
+        dies { NDArray [ ndims_max => 0, ndims => 3 ] },
          qr/cannot mix/,
          'ndims_max, ndims',
     );
 
     like(
-        dies { Piddle [ ndims_max => 1.1 ] },
+        dies { NDArray [ ndims_max => 1.1 ] },
          qr/must be an integer/,
          'ndims_max float',
     );
 
     like(
-        dies { Piddle [ ndims_min => 1.1 ] },
+        dies { NDArray [ ndims_min => 1.1 ] },
          qr/must be an integer/,
          'ndims_min float',
     );
 
     like(
-        dies { Piddle [ ndims => 1.1 ] },
+        dies { NDArray [ ndims => 1.1 ] },
          qr/must be an integer/,
          'ndims float',
     );
 
     like(
-        dies { Piddle [ ndims_max => 'a' ] },
+        dies { NDArray [ ndims_max => 'a' ] },
          qr/must be an integer/,
          'ndims_max string',
     );
 
     like(
-        dies { Piddle [ ndims_min => 'a' ] },
+        dies { NDArray [ ndims_min => 'a' ] },
          qr/must be an integer/,
          'ndims_min string',
     );
 
     like(
-        dies { Piddle [ ndims => 'a' ] },
+        dies { NDArray [ ndims => 'a' ] },
          qr/must be an integer/,
          'ndims string',
     );

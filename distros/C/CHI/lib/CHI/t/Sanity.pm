@@ -1,5 +1,5 @@
 package CHI::t::Sanity;
-$CHI::t::Sanity::VERSION = '0.60';
+$CHI::t::Sanity::VERSION = '0.61';
 use strict;
 use warnings;
 use CHI::Test;

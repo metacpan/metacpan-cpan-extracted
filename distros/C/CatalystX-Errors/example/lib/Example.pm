@@ -4,6 +4,7 @@ use Catalyst;
 
 __PACKAGE__->setup_plugins([qw/Errors/]);
 __PACKAGE__->config(
+  default_view => 'HTML',
   'View::Errors::JSON' => {extra_encoder_args=>{pretty=>1}},
 );
 __PACKAGE__->setup();

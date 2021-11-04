@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::FreightBaseCharge;
-$Shipment::FedEx::WSDL::ShipTypes::FreightBaseCharge::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::FreightBaseCharge::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Class::Std::initialize();
               ChargeBasis
               ExtendedAmount
 
-              )
+            )
         ],
         {   'FreightClass'   => \%FreightClass_of,
             'RatedAsClass'   => \%RatedAsClass_of,
@@ -94,7 +94,7 @@ Shipment::FedEx::WSDL::ShipTypes::FreightBaseCharge
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

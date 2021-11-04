@@ -8,7 +8,7 @@
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: 00-pod-coverage.t 54 2019-06-03 16:37:49Z minus $
+# $Id: 00-pod-coverage.t 103 2021-10-10 11:04:34Z minus $
 #
 #########################################################################
 use strict;
@@ -30,6 +30,7 @@ plan skip_all => "Currently a developer-only test" unless -d '.svn' || -d ".git"
 my %skip = (
     trustme => [
         qr/^sec_[a-z]+$/,
+        qr/^again$/,
         qr/^[A-Z_]+$/,
     ],
   );

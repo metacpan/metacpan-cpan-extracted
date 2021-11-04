@@ -1,5 +1,8 @@
 Revision history for JavaScript-Packer
 
+2.07       2021-11-01
+    - Allow use of //# sourceMappingURL=url in comments without stripping (GH #9)
+
 2.06       2020-04-03
     - Fix regex when when character ord matches 65 (GH #8, thanks to @r3hp1c)
 

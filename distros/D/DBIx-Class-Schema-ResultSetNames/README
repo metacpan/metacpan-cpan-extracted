@@ -1,7 +1,7 @@
 This archive contains the distribution DBIx-Class-Schema-ResultSetNames,
-version 1.02:
+version 1.03:
 
-  Create resultset accessors from table names
+  Create resultset accessors from schema result class names
 
 This software is copyright (c) 2021 by D Ruth Holloway.
 

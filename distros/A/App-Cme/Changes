@@ -1,3 +1,13 @@
+1.034 2021-10-30
+
+  New feature:
+    * add use_backend_argument_as_config_file param to app files
+
+  Misc changes:
+    * require perl 5.20
+    * update copyright year
+    * refactored following perlcritic advices
+
 1.033 2021-09-19
 
   Bug fix:

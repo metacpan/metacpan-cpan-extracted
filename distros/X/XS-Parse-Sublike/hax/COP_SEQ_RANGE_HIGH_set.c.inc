@@ -1,4 +1,4 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c : */
 
 #ifndef COP_SEQ_RANGE_HIGH_set
 

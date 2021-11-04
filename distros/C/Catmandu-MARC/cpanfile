@@ -22,7 +22,7 @@ requires 'MARC::File::XML', '>=1.0.5';
 requires 'MARC::File::MARCMaker', '0.05';
 requires 'MARC::File::MiJ' , '0.04';
 requires 'MARC::Record', '2.0.6';
-requires 'MARC::Lint', '0';
+requires 'MARC::Lint', '==1.52';
 requires 'MARC::Parser::RAW', '0';
 requires 'MARC::Schema', '>=0.07';
 requires 'MARC::Spec', '2.0.3';

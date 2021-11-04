@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 88f9a855922ba8e4c5cb0b081953b5e1b1dc42361c67d291b6b1b09604e95ae3 Changes
+SHA256 ff3b6cb798166a28eed199610fdda1c3a899ad753b155c0413e815c8777cd256 Kramerius.pm
+SHA256 aede5ec813243379ceef7a052c4c42b962293348f9cfc072741de017550fbb95 Kramerius/Object.pm
+SHA256 3d8aa7a1fd6fcaa5ffa6aa05c58d97639061d0ba5450bc73add5c0dd50136450 LICENSE
+SHA256 2a571105804668d12a9cef97cb633e6b280cd6937d21e3036ebbf0c36c85f89a MANIFEST
+SHA256 6ddaa8cf10c2681d8ba432f9157f0efa0bf6b634a39e8a8d5a897065dbda1f0f META.yml
+SHA256 5c891cdda6973e106cf8184076743033a2fd8e37a1e926881c09e557630f6adf Makefile.PL
+SHA256 f35ecaa2980e00b5cab78a292d5d84dae2b913df46e758836a564d9837b32789 README
+SHA256 d8891e35fcae89134c2395dd0d500c1a091b8408277af74002b8ddf8c2d96169 examples/ex1.pl
+SHA256 e3219ec520e151fe91880bda9c05187107f08032c852fee4e0ca8a5936559d20 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 b95ae6a80e319c489703db245765a780f9cccf818972bb48f597b6b7f5a0b66d t/Data-Kramerius-Object/01-use.t
+SHA256 22117852036cc0445fdc27c2442fe28e772695381d9ed2a85868df65dcba6c2a t/Data-Kramerius-Object/02-version.t
+SHA256 1ea3e771da73530d67102f60592f892c1212f08a9a49188a845ba8beed1c8676 t/Data-Kramerius-Object/03-new.t
+SHA256 1be0748186ba942f08f8fb5ab62c0512d3dfe31f619482e6706b14cfdfd14966 t/Data-Kramerius/01-use.t
+SHA256 edd7dcf81a3c08eff8766b54ac1833c91acaf7f0f2dc9e22d9ab759403e328ee t/Data-Kramerius/02-version.t
+SHA256 fe90b5f116ed9d3b2b4a98c739cda10874bf9fb86b130cb2d25d2d0e53b983a0 t/Data-Kramerius/03-new.t
+SHA256 d0e0b493b1d800386c8d9c7a6d8ea90a41b65ccf1db7cb6271b6231da40caec5 t/Data-Kramerius/04-get.t
+SHA256 c043ecd2b1036e47cbfd0e99c287f3467982c2dcb6e60f8677691ed0ba5ae6e5 t/Data-Kramerius/05-list.t
+SHA256 588fa18af1b525977e60374e91009a07152ed0bd1a78783cb806a8f893657a08 xt/Data-Kramerius-Object/01-pod_coverage.t
+SHA256 c3f511b0f2518343afc1fac3a0ed80fa7348e19274a66e017309d95cde9bd606 xt/Data-Kramerius-Object/02-pod.t
+SHA256 e7a5a7f0fe28eee5bf043d0c3b8053ddad1b9c90637fb1c821a3cd15c52d6a28 xt/Data-Kramerius/01-pod_coverage.t
+SHA256 1d25f71e265f3a88b9192faee780182496202dfc9b2c2c6249ff7f89df3d6f9a xt/Data-Kramerius/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmF+ZCEACgkQgmqNLzlX
+aRfOMwwAogNcbhfSFeHv4wdPn3UGM0+ajlyhssJZI1zBeXiLWmtlypF9eNmRLFPN
+BKCVRrmQ0HBu8O9IMbRtuIMQbdCmuo7PR3xs22wWGH6hmGHe1cNTX0+sR4087xc9
+nzzHrx6KoaP/KyGW7QgxGlaYeTEEwR5pvvO3iFrG3tKZvjsbXiySQKaF2PQHMwoR
+EaV0Ph/LwlbQz9UD5pp+yNeY5idTCBNSHsbqyJkkis3elqUMKhAd/Kq/+AZo/HWn
+rpP5WEQYhi/fTsDKNDubSSsNJBRg+AL8vt9YoMW13JHTdV+zlhtZPXS8zP/ZWfpu
+JbnirGl4Lg5bJzuwuO1PT8VzPa7sijoeSx/8CF2hrAmn3J+ZX3QaG+RGWd+OYqer
+h5m0X3pD+vxk4zm5KeCrB/evJM/v9hg4UdI0mDkDDQe9h8QiPauJBYARTD2WiiIE
+ebeCpI2vwVPrg8ttqBc0v26G1d5rQkRfDcbW6VsAVD8t2tnNOl2AnRvHUcJWku7J
+vXe4HLsC
+=SzUn
+-----END PGP SIGNATURE-----

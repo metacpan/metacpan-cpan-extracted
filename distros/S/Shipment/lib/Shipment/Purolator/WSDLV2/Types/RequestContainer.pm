@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::RequestContainer;
-$Shipment::Purolator::WSDLV2::Types::RequestContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::RequestContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Class::Std::initialize();
 
     __PACKAGE__->_factory(
         [   qw(
-              )
+            )
         ],
         {},
         {},
@@ -51,7 +51,7 @@ Shipment::Purolator::WSDLV2::Types::RequestContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

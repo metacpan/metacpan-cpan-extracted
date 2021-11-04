@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::RequestedShipment;
-$Shipment::FedEx::WSDL::ShipTypes::RequestedShipment::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::RequestedShipment::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -92,35 +92,35 @@ Class::Std::initialize();
               PackageDetail
               RequestedPackageLineItems
 
-              )
+            )
         ],
-        {   'ShipTimestamp'            => \%ShipTimestamp_of,
-            'DropoffType'              => \%DropoffType_of,
-            'ServiceType'              => \%ServiceType_of,
-            'PackagingType'            => \%PackagingType_of,
-            'TotalWeight'              => \%TotalWeight_of,
-            'TotalInsuredValue'        => \%TotalInsuredValue_of,
-            'TotalDimensions'          => \%TotalDimensions_of,
-            'Shipper'                  => \%Shipper_of,
-            'Recipient'                => \%Recipient_of,
-            'RecipientLocationNumber'  => \%RecipientLocationNumber_of,
-            'Origin'                   => \%Origin_of,
-            'ShippingChargesPayment'   => \%ShippingChargesPayment_of,
-            'SpecialServicesRequested' => \%SpecialServicesRequested_of,
-            'ExpressFreightDetail'     => \%ExpressFreightDetail_of,
-            'FreightShipmentDetail'    => \%FreightShipmentDetail_of,
-            'DeliveryInstructions'     => \%DeliveryInstructions_of,
+        {   'ShipTimestamp'                => \%ShipTimestamp_of,
+            'DropoffType'                  => \%DropoffType_of,
+            'ServiceType'                  => \%ServiceType_of,
+            'PackagingType'                => \%PackagingType_of,
+            'TotalWeight'                  => \%TotalWeight_of,
+            'TotalInsuredValue'            => \%TotalInsuredValue_of,
+            'TotalDimensions'              => \%TotalDimensions_of,
+            'Shipper'                      => \%Shipper_of,
+            'Recipient'                    => \%Recipient_of,
+            'RecipientLocationNumber'      => \%RecipientLocationNumber_of,
+            'Origin'                       => \%Origin_of,
+            'ShippingChargesPayment'       => \%ShippingChargesPayment_of,
+            'SpecialServicesRequested'     => \%SpecialServicesRequested_of,
+            'ExpressFreightDetail'         => \%ExpressFreightDetail_of,
+            'FreightShipmentDetail'        => \%FreightShipmentDetail_of,
+            'DeliveryInstructions'         => \%DeliveryInstructions_of,
             'VariableHandlingChargeDetail' =>
               \%VariableHandlingChargeDetail_of,
-            'CustomsClearanceDetail' => \%CustomsClearanceDetail_of,
-            'PickupDetail'           => \%PickupDetail_of,
-            'SmartPostDetail'        => \%SmartPostDetail_of,
-            'BlockInsightVisibility' => \%BlockInsightVisibility_of,
-            'ErrorLabelBehavior'     => \%ErrorLabelBehavior_of,
-            'LabelSpecification'     => \%LabelSpecification_of,
+            'CustomsClearanceDetail'        => \%CustomsClearanceDetail_of,
+            'PickupDetail'                  => \%PickupDetail_of,
+            'SmartPostDetail'               => \%SmartPostDetail_of,
+            'BlockInsightVisibility'        => \%BlockInsightVisibility_of,
+            'ErrorLabelBehavior'            => \%ErrorLabelBehavior_of,
+            'LabelSpecification'            => \%LabelSpecification_of,
             'ShippingDocumentSpecification' =>
               \%ShippingDocumentSpecification_of,
-            'RateRequestTypes' => \%RateRequestTypes_of,
+            'RateRequestTypes'               => \%RateRequestTypes_of,
             'CustomerSelectedActualRateType' =>
               \%CustomerSelectedActualRateType_of,
             'EdtRequestType'            => \%EdtRequestType_of,
@@ -137,7 +137,7 @@ Class::Std::initialize();
               'Shipment::FedEx::WSDL::ShipTypes::PackagingType',
             'TotalWeight'       => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
             'TotalInsuredValue' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-            'TotalDimensions' =>
+            'TotalDimensions'   =>
               'Shipment::FedEx::WSDL::ShipTypes::Dimensions',
             'Shipper'   => 'Shipment::FedEx::WSDL::ShipTypes::Party',
             'Recipient' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
@@ -241,7 +241,7 @@ Shipment::FedEx::WSDL::ShipTypes::RequestedShipment
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

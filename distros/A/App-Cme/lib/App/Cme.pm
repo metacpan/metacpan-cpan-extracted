@@ -1,14 +1,14 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2020 by Dominique Dumont.
+# This software is Copyright (c) 2014-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package App::Cme ;
-$App::Cme::VERSION = '1.033';
+$App::Cme::VERSION = '1.034';
 use strict;
 use warnings;
 use 5.10.1;
@@ -33,7 +33,7 @@ App::Cme - Configuration data checker or editor based on Config::Model
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 AUTHOR
 
@@ -41,7 +41,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2020 by Dominique Dumont.
+This software is Copyright (c) 2014-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

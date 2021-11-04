@@ -10,7 +10,7 @@ use File::Spec;
 #########################
 
 if ( can_run('tiff2pdf') ) {
-    plan tests => 4;
+    plan tests => 5;
 }
 else {
     plan skip_all => 'tiff2pdf not installed';
@@ -84,3 +84,13 @@ SKIP: {
 
 #########################
 
+system("convert -depth 1 -size 6x2 pattern:gray50 -alpha off -define tiff:fill-order=lsb -compress group4 $compressed_tif");
+system("tiff2pdf -d -o $pdf $compressed_tif");
+
+$expected = `cat $pdf | $make_reproducible | hexdump`;
+@expected = split "\n", $expected;
+@output = split "\n", `$cmd -d $compressed_tif | $make_reproducible | hexdump`;
+
+is_deeply( \@output, \@expected, 'reverse lsb2msb' );
+
+#########################

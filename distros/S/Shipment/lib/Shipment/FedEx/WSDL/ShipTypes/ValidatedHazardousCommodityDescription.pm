@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityDescription;
-$Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityDescription::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityDescription::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -44,11 +44,11 @@ Class::Std::initialize();
               Symbols
               LabelText
 
-              )
+            )
         ],
-        {   'Id'                 => \%Id_of,
-            'PackingGroup'       => \%PackingGroup_of,
-            'ProperShippingName' => \%ProperShippingName_of,
+        {   'Id'                               => \%Id_of,
+            'PackingGroup'                     => \%PackingGroup_of,
+            'ProperShippingName'               => \%ProperShippingName_of,
             'ProperShippingNameAndDescription' =>
               \%ProperShippingNameAndDescription_of,
             'TechnicalName'     => \%TechnicalName_of,
@@ -57,7 +57,7 @@ Class::Std::initialize();
             'Symbols'           => \%Symbols_of,
             'LabelText'         => \%LabelText_of,
         },
-        {   'Id' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        {   'Id'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'PackingGroup' =>
               'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityPackingGroupType',
             'ProperShippingName' =>
@@ -72,9 +72,9 @@ Class::Std::initialize();
         },
         {
 
-            'Id'                 => 'Id',
-            'PackingGroup'       => 'PackingGroup',
-            'ProperShippingName' => 'ProperShippingName',
+            'Id'                               => 'Id',
+            'PackingGroup'                     => 'PackingGroup',
+            'ProperShippingName'               => 'ProperShippingName',
             'ProperShippingNameAndDescription' =>
               'ProperShippingNameAndDescription',
             'TechnicalName'     => 'TechnicalName',
@@ -102,7 +102,7 @@ Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityDescription
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -13,14 +13,14 @@
 package Net::STOMP::Client::Connection;
 use strict;
 use warnings;
-our $VERSION  = "2.3";
-our $REVISION = sprintf("%d.%02d", q$Revision: 2.6 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "2.5";
+our $REVISION = sprintf("%d.%02d", q$Revision: 2.8 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
 #
 
-use IO::Socket::INET qw();
+use IO::Socket::IP qw();
 use List::Util qw(shuffle);
 use Net::STOMP::Client::Peer qw();
 use No::Worries::Die qw(dief);
@@ -43,7 +43,7 @@ sub _uri2peer ($) {
     my($uri) = @_;
 
     if ($uri =~ m{ ^ (tcp|ssl|stomp|stomp\+ssl)
-                     \:\/\/ ([_a-z0-9\.\-]+) \: (\d+) \/? $ }ix) {
+                     \:\/\/ \[? ([_a-z0-9\.\-\:]+?) \]? \: (\d+) \/? $ }ix) {
         return(Net::STOMP::Client::Peer->new(
             proto => $1,
             host  => $2,
@@ -168,13 +168,13 @@ sub _attempt ($%) {
         $socket = IO::Socket::SSL->new(%sockopt);
         return(sprintf("cannot SSL connect to %s:%d: %s", $peer->host(),
                        $peer->port(), IO::Socket::SSL::errstr()))
-            unless $socket;
+            unless $socket and $socket->connected();
     } else {
         # with plain TCP
-        $socket = IO::Socket::INET->new(%sockopt);
+        $socket = IO::Socket::IP->new(%sockopt);
         return(sprintf("cannot connect to %s:%d: %s", $peer->host(),
                        $peer->port(), $!))
-            unless $socket;
+            unless $socket and $socket->connected();
         return(sprintf("cannot binmode(socket): %s", $!))
             unless binmode($socket);
     }
@@ -240,7 +240,7 @@ my %new_options = (
     "host" => {
         optional => 1,
         type     => SCALAR,
-        regex    => qr/^[a-z0-9\.\-]+$/,
+        regex    => qr/^[a-z0-9\.\-\:]+$/,
     },
     "port" => {
         optional => 1,
@@ -325,7 +325,7 @@ When creating an object with L<Net::STOMP::Client>'s new() method, if you
 supply some socket options (via C<sockopts>) with a name starting with
 C<SSL_> or if you supply a URI (via C<uri>) with a scheme containg C<ssl>
 then L<IO::Socket::SSL> will be used to create the socket instead of
-L<IO::Socket::INET> and the communication with the server will then go
+L<IO::Socket::IP> and the communication with the server will then go
 through SSL.
 
 Here are the most commonly used SSL socket options:
@@ -374,7 +374,7 @@ and eventually reconnect, using again the new() method.
 
 =head1 SEE ALSO
 
-L<IO::Socket::INET>,
+L<IO::Socket::IP>,
 L<IO::Socket::SSL>,
 L<Net::STOMP::Client>.
 
@@ -382,4 +382,4 @@ L<Net::STOMP::Client>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2017
+Copyright (C) CERN 2010-2021

@@ -12,7 +12,7 @@ my @cases = (
     [ 'N[C@@](Br)(O)C',   1, 1, 'N([C@](Br)(O)(C))'    ],
     [ 'N(C)(Br)(O)C',     0, 0, 'N(C)(Br)(O)(C)'       ],
     [ 'N(C)(Br)(O)C',     0, 0, 'N(C)(Br)(O)(C)'       ],
-    [ 'N[C@AL1](Br)(O)C', 1, 0, 'N([C@AL1](Br)(O)(C))' ],
+    [ 'N[C@AL1](Br)(O)C', 1, 0, 'N(C(Br)(O)(C))' ],
 );
 
 plan tests => 3 * scalar @cases;

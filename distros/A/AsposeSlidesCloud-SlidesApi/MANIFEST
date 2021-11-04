@@ -142,6 +142,7 @@ lib/AsposeSlidesCloud/Object/SmartArtNode.pm
 lib/AsposeSlidesCloud/Object/SmartArtShape.pm
 lib/AsposeSlidesCloud/Object/SoftEdgeEffect.pm
 lib/AsposeSlidesCloud/Object/SolidFill.pm
+lib/AsposeSlidesCloud/Object/SpecialSlideType.pm
 lib/AsposeSlidesCloud/Object/SplitDocumentResult.pm
 lib/AsposeSlidesCloud/Object/StorageExist.pm
 lib/AsposeSlidesCloud/Object/StorageFile.pm

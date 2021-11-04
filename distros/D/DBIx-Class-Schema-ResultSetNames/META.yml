@@ -1,5 +1,5 @@
 ---
-abstract: 'Create resultset accessors from table names'
+abstract: 'Create resultset accessors from schema result class names'
 author:
   - 'D Ruth Holloway <ruth@hiruthie.me>'
 build_requires:
@@ -9,6 +9,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V0: '0'
   Test::More: '0'
   Try::Tiny: '0'
 configure_requires:
@@ -23,15 +24,17 @@ name: DBIx-Class-Schema-ResultSetNames
 provides:
   DBIx::Class::Schema::ResultSetNames:
     file: lib/DBIx/Class/Schema/ResultSetNames.pm
-    version: '1.02'
+    version: '1.03'
 requires:
+  Carp: '0'
   DBIx::Class::Schema: '0'
   Lingua::EN::Inflect::Phrase: '0'
+  Modern::Perl: '0'
   perl: '5.012'
 resources:
   bugtracker: https://gitlab.com/GeekRuthie/DBIx-Class-Schema-ResultSetNames/-/issues
   repository: https://gitlab.com/GeekRuthie/DBIx-Class-Schema-ResultSetNames.git
-version: '1.02'
+version: '1.03'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

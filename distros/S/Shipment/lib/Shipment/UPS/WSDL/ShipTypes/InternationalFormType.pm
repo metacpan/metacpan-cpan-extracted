@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::InternationalFormType;
-$Shipment::UPS::WSDL::ShipTypes::InternationalFormType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::InternationalFormType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -95,7 +95,7 @@ Class::Std::initialize();
               License
               ECCNNumber
 
-              )
+            )
         ],
         {   'FormType'                    => \%FormType_of,
             'AdditionalDocumentIndicator' => \%AdditionalDocumentIndicator_of,
@@ -156,7 +156,7 @@ Class::Std::initialize();
               'Shipment::UPS::WSDL::ShipTypes::IFChargesType',
             'OtherCharges' =>
               'Shipment::UPS::WSDL::ShipTypes::OtherChargesType',
-            'CurrencyCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CurrencyCode'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'BlanketPeriod' =>
               'Shipment::UPS::WSDL::ShipTypes::BlanketPeriodType',
             'ExportDate'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
@@ -235,7 +235,7 @@ Shipment::UPS::WSDL::ShipTypes::InternationalFormType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

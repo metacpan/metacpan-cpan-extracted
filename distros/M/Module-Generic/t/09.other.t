@@ -6,10 +6,10 @@ BEGIN
     use warnings;
     use lib './lib';
     use Module::Generic;
-    our $DEBUG = exists( $ENV{AUTHOR_TESTING} );
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
-my $o = Module::Generic->new;
+my $o = Module::Generic->new( debug => $DEBUG );
 my $a = $o->_get_args_as_array;
 is( ref( $a ), 'ARRAY', '_get_args_as_array => array ref' );
 $a = $o->_get_args_as_array(qw( Hello there ));
@@ -29,6 +29,11 @@ ok( $o->_is_class_loadable( 'lib' ), '_is_class_loadable' );
 ok( !$o->_is_class_loadable( 'lib', 99 ), '_is_class_loadable with version' );
 ok( !$o->_is_class_loadable( 'NotExist' ), '_is_class_loadable for non-existing module' );
 ok( $o->_is_class_loadable( 'Module::Generic::Exception' ), '_is_class_loadable' );
+ok( $o->_is_class_loaded( 'Module::Generic::File' ), '_is_loaded Module::Generic::File' );
+ok( !$o->_is_class_loaded( 'My::Module' ), '_is_loaded My::Module' );
+my $rv = $o->_load_class( 'Module::Generic::File', qw( file cwd ), { caller => 'main' } );
+diag( "Unable to load Module::Generic::File: ", $o->error ) if( $DEBUG && !defined( $rv ) );
+ok( $rv, '_load_class Module::Generic::File' );
 
 # DateTime
 my $dates = [
@@ -118,7 +123,7 @@ my $dates = [
     },
 ];
 
-$o->debug(3);
+# $o->debug(3);
 for( my $i = 0; $i < scalar( @$dates ); $i++ )
 {
     my $def = $dates->[$i];
@@ -127,6 +132,78 @@ for( my $i = 0; $i < scalar( @$dates ); $i++ )
     isa_ok( $dt, 'DateTime', "DateTime object for $def->{test}" );
     is( "$dt", $def->{expect}, "stringification for $def->{test}" );
 }
+
+my $ip4 = [qw(
+    10.0.2.1 192.168.0.31/32 128.0.0.0/1 0.0.0.0/0 192.168.0.1 192.168.0.0/24
+    255.0.128.23
+    1.1.1.1
+    255.255.255.255
+    255.0.128.23
+)];
+
+my $ip4_fail = [qw(
+    256.0.128.23
+    255.0.1287.23
+    255.a.127.23
+    255 0 127 23
+    255,0,127,23
+    255012723
+)];
+
+my $ip6 = [qw(
+    2001:db8:2::1
+    fe80:0:120::/44
+    1:1:000f:01:65:e:1111:eeee
+    2001:0db8:85a3:0000:0000:8a2e:0370:7334
+    2001:db8:85a3:0:0:8a2e:370:7334
+    2001:DB8:85A3:0:0:8A2E:370:7334
+    2001:Db8:85A3:0:0:8a2E:370:7334
+    2001:db8:85a3::8a2e:370:7334
+    2001:db8::8a2e:370:7334
+    ::8a2e:370:7334
+    ::370:7334
+    ::7334
+    ::
+)];
+
+my $ip6_fail = [qw(
+    ::ffff:192.168.0.0/120
+    ::ffff:192.168.0.1
+    2001:0db8:85a3:0000:0000:8a2e:0370:7334:1234
+    2001:0db8:85a3:0000:0000:8a2e:0370
+    20013:db8:85a3:0:0:8a2e:370:7334
+    2001:0db8:85a3:0000:0000:8a2e:0370:7334:
+    :2001:0db8:85a3:0000:0000:8a2e:0370:7334
+    2001:db8:85a3:0::8a2e:370:7334
+    2001::8a2e:370::7334
+    2001:::8a2e:370:7334
+    2001.db8.85a3.0.0.8a2e.370.7334
+)];
+
+diag( "Testing good IPv4 address" ) if( $DEBUG );
+for( @$ip4 )
+{
+    ok( $o->_is_ip( $_ ), "good ip -> $_" );
+}
+
+diag( "Testing bad IPv4 address" ) if( $DEBUG );
+for( @$ip4_fail )
+{
+    ok( !$o->_is_ip( $_ ), "bad ip -> $_" );
+}
+
+diag( "Testing good IPv6 address" ) if( $DEBUG );
+for( @$ip6 )
+{
+    ok( $o->_is_ip( $_ ), "good ip -> $_" );
+}
+
+diag( "Testing bad IPv6 address" ) if( $DEBUG );
+for( @$ip6_fail )
+{
+    ok( !$o->_is_ip( $_ ), "bad ip -> $_" );
+}
+
 
 sub get_frames_stack
 {

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackEvent;
-$Shipment::FedEx::WSDL::TrackTypes::TrackEvent::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackEvent::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Class::Std::initialize();
               StationId
               ArrivalLocation
 
-              )
+            )
         ],
         {   'Timestamp'                  => \%Timestamp_of,
             'EventType'                  => \%EventType_of,
@@ -59,8 +59,8 @@ Class::Std::initialize();
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'StatusExceptionDescription' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Address'   => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-            'StationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Address'         => 'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'StationId'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'ArrivalLocation' =>
               'Shipment::FedEx::WSDL::TrackTypes::ArrivalLocationType',
         },
@@ -94,7 +94,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackEvent
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

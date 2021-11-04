@@ -10,20 +10,14 @@
 
 #include "XSParseSublike.h"
 
-/* grumble... */
-static void sv_setrv(SV *sv, SV *rv)
-{
-  SV *tmp = newRV_noinc(rv);
-  sv_setsv(sv, tmp);
-  SvREFCNT_dec(tmp);
-}
+#include "sv_setrv.c.inc"
 
 static bool stage_permit(pTHX_ void *_)
 {
   if(!hv_fetchs(GvHV(PL_hintgv), "t::stages/permit", 0))
-    return false;
+    return FALSE;
 
-  return true;
+  return TRUE;
 }
 
 static void stage_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *_)
@@ -50,21 +44,21 @@ static void stage_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 static void stage_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 {
   if(hv_fetchs(GvHV(PL_hintgv), "t::stages/post_newcv-capture-cv", 0)) {
-    sv_setrv(get_sv("t::stages::captured", GV_ADD), SvREFCNT_inc(ctx->cv));
+    sv_setrv_inc(get_sv("t::stages::captured", GV_ADD), (SV *)ctx->cv);
   }
 }
 
 static bool stage_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *value, void *_)
 {
   if(!hv_fetchs(GvHV(PL_hintgv), "t::stages/filter_attr-capture", 0))
-    return false;
+    return FALSE;
 
   AV *av = newAV();
   av_push(av, SvREFCNT_inc(attr));
   av_push(av, SvREFCNT_inc(value));
 
-  sv_setrv(get_sv("t::stages::captured", GV_ADD), (SV *)av);
-  return true;
+  sv_setrv_noinc(get_sv("t::stages::captured", GV_ADD), (SV *)av);
+  return TRUE;
 }
 
 static const struct XSParseSublikeHooks parse_stages_hooks = {

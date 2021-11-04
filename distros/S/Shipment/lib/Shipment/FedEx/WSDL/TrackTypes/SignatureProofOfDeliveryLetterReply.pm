@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryLetterReply;
-$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryLetterReply::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryLetterReply::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               Version
               Letter
 
-              )
+            )
         ],
         {   'HighestSeverity'   => \%HighestSeverity_of,
             'Notifications'     => \%Notifications_of,
@@ -79,7 +79,7 @@ Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryLetterReply
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

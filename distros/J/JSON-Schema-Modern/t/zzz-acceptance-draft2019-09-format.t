@@ -5,6 +5,7 @@ use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More;
@@ -22,6 +23,7 @@ BEGIN {
 
 if (-d '.git' or $ENV{AUTHOR_TESTING} or $ENV{EXTENDED_TESTING}) {
   eval { +require Time::Moment; 1 } or fail $@;
+  eval { +require DateTime::Format::RFC3339; 1 } or fail $@;
   eval { +require Email::Address::XS; Email::Address::XS->VERSION(1.04); 1 } or fail $@;
   eval { +require Data::Validate::Domain; 1 } or fail $@;
   eval { +require Net::IDN::Encode; 1 } or fail $@;
@@ -46,6 +48,7 @@ acceptance_tests(
           'uri-template.json',                        # not yet implemented
           # these all depend on optional prereqs
           $ENV{AUTOMATED_TESTING} && !eval { +require Time::Moment; 1 } ? qw(date-time.json date.json time.json) : (),
+          $ENV{AUTOMATED_TESTING} && !eval { +require DateTime::Format::RFC3339; 1 } ? 'date-time.json' : (),
           $ENV{AUTOMATED_TESTING} && !eval { +require Email::Address::XS; Email::Address::XS->VERSION(1.04); 1 } ? qw(email.json idn-email.json) : (),
           $ENV{AUTOMATED_TESTING} && !eval { +require Data::Validate::Domain; 1 } ? 'hostname.json' : (),
           $ENV{AUTOMATED_TESTING} && !eval { +require Net::IDN::Encode; 1 } ? 'idn-hostname.json' : (),

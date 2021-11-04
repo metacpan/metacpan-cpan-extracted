@@ -1,0 +1,10 @@
+Revision history for Pod-Coverage-Careful
+
+1.1.0   2021-11-01 07:29:57 -0600 (MDT)
+
+    No changes beyond quoting the $VERSION v-string so it can 
+    be indexed properly by the toolchain and placed on metacpan &c.
+
+1.0.0   2016-03-20 09:16:20 -0700 (MST)      
+
+    Initial release.

@@ -1,6 +1,6 @@
 package Archive::BagIt::Plugin::Manifest::SHA512;
 # ABSTRACT: The role to load the sha512 plugin (default for v1.0)
-our $VERSION = '0.081'; # VERSION
+our $VERSION = '0.083'; # VERSION
 
 use strict;
 use warnings;
@@ -31,16 +31,6 @@ sub BUILD {
     return 1;
 }
 
-sub verify_file {
-    my ($self, $fh) = @_;
-    return;
-}
-
-sub verify {
-    my ($self) =@_;
-    return;
-}
-
 
 1;
 
@@ -56,7 +46,7 @@ Archive::BagIt::Plugin::Manifest::SHA512 - The role to load the sha512 plugin (d
 
 =head1 VERSION
 
-version 0.081
+version 0.083
 
 =head1 AVAILABILITY
 

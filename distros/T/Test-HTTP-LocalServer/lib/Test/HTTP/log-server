@@ -6,14 +6,20 @@ use CGI;
 use HTTP::Request::AsCGI;
 use Getopt::Long;
 use Socket();
-our $VERSION = '0.68';
+use Time::HiRes 'sleep';
+our $VERSION = '0.74';
 
 $|++;
 
 GetOptions(
     'e=s' => \my $expression,
     'f=s' => \my $url_filename,
+    's=s' => \my $request_pause,
 );
+
+if( ! defined $request_pause ) {
+    $request_pause = 1;
+}
 
 # HTTP::Daemon(IO::Socket::IP) sets $@ in case of error
 my $d = HTTP::Daemon->new or die "Couldn't create HTTP::Daemon: $@";
@@ -252,7 +258,7 @@ SERVERLOOP: {
       };
       last if $quitserver;
     }
-    sleep 1;
+    sleep $request_pause;
     undef($c);
     last SERVERLOOP
       if $quitserver;

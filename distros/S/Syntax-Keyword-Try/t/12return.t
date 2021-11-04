@@ -10,18 +10,25 @@ use Syntax::Keyword::Try;
 # return from try
 {
    my $after;
+   ( sub {
+      try { return }
+      catch ($e) {}
+      $after++;
+   } )->();
+   ok( !$after, 'code after try{return} in void context is not invoked' );
+}
 
+# return SCALAR from try
+{
    is(
-      ( sub {
+      scalar ( sub {
          try { return "result" }
          catch ($e) {}
-         $after++;
          return "nope";
       } )->(),
       "result",
-      'return in try leaves containing function'
+      'return SCALAR in try yields correct value'
    );
-   ok( !$after, 'code after try{return} is not invoked' );
 }
 
 # return LIST from try

@@ -14,7 +14,7 @@ Lab::Measurement::Backends - Back end packages (hardware drivers) for Lab::Measu
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 National Instruments NI-VISA back-end
 
@@ -27,9 +27,9 @@ is no support for USB-GPIB adaptors under Linux. A lot of tips and tricks can
 be found at the
 L<NI Linux User Forum|http://decibel.ni.com/content/groups/linux-users>. In general,
 L<National Instruments|http://sine.ni.com/psp/app/doc/p/id/psp-411"> offers
-excellent documentation. We especially recommend the 
+excellent documentation. We especially recommend the
 L<NI-VISA User Manual|http://www.ni.com/pdf/manuals/370423a.pdf>, the
-L<NI-VISA Programmer Reference Manual|http://www.ni.com/pdf/manuals/370132c.pdf> these references of 
+L<NI-VISA Programmer Reference Manual|http://www.ni.com/pdf/manuals/370132c.pdf> these references of
 L<VISA resource names|http://zone.ni.com/reference/en-XX/help/371361B-01/lvinstio/visa_resource_name_generic/>
 and L<VISA error codes|http://zone.ni.com/reference/en-XX/help/371361B-01/lverror/visa_error_codes/>.
 
@@ -44,26 +44,30 @@ The L<Linux-GPIB project|http://linux-gpib.sourceforge.net/>  aims at
 providing free and open-source hardware drivers and a GPIB library with an API
 compatible to the NI drivers (without VISA). The package code is considered
 stable and feature-complete; new releases occur mainly as response to changes
-in the kernel driver interface. 
+in the kernel driver interface.
 
 =head2 Installing Linux-GPIB
 
 Note that on Gentoo Linux-GPIB is packaged. On distros where this is not the
 case, you can use the following steps. For more details, consult Linux-GPIB's
-F<INSTALL> file. This guide was tested on Debian 8 with Linux-GPIB versions 4.0.2 and 4.0.3 .
+F<INSTALL> file. This guide was tested on Debian 11 with Linux-GPIB versions 4.3.4.
 
 =over
 
 =item * Install the kernel headers, cpanm, gcc and make. On Debian you can run
 this command:
 
- root # apt-get install linux-headers-`uname -r` build-essential cpanminus 
+ root # apt-get install linux-headers-`uname -r` build-essential cpanminus
 
 =item * Download the
 L<Linux-GPIB sources|http://sourceforge.net/projects/linux-gpib/files/>
  and build with the usual procedure:
 
- user $ tar -xf linux-gpib-4.0.2.tar.gz && cd linux-gpib-4.0.2
+ user $ tar -xf linux-gpib-4.3.4.tar.gz
+
+Inside of this download folder you will find two more archives, the kernel drivers as well as the user drivers. Untar those as well and navigate inside of the kernel forlder first.
+
+ user $ tar -xf linux-gpib-kernel-4.3.4.tar.gz && tar -xf linux-gpib-user-4.3.4.tar.gz && cd linux-gpib-kernel-4.3.4
  user $ ./configure
  user $ make
 
@@ -71,20 +75,51 @@ install the library and kernel drivers:
 
  root # make install
 
-=item * Add your user to the gpib group.
+now navigate to the linux-gpib-user-4.3.4 directory and repeat:
 
- root # adduser user gpib 
+ user $ cd .. && cd linux-gpib-user-4.3.4
+ user $ ./configure
+ user $ make
+ root # make install
 
-=item * Install the Perl bindings:
+=item * Stay inside of the linux-gpib-user-4.3.4 directory and install the Perl bindings:
 
  root # cpanm ./language/perl
+
+if you are using plenv or don't use the standard Perl installation be sure to execute the cpanm command with the user profile and NOT as the root user:
+
+ user $ cpanm ./language/perl
+
+=item * Add your user to the gpib group.
+
+ root # adduser user gpib
+
+to create a new user group use
+
+ root # groupadd gpib
+
+=item * Troubleshooting
+
+In case you are getting an error message like
+
+ user $ libgpib.so.0: cannot open shared object file: No such file or directory
+
+check if the kernel headers are installed properly. Try running
+
+ user $ sudo apt-get install linux-headers-$(uname -r)
+
+again, consider adding your kernel version manually. The latest kernel can be found under F</lib/modules>. Furthermore, running
+
+ user $ sudo ldconfig
+
+and a reboot can work some magic.
 
 =back
 
 =head2 Example Configuration for the GPIB-USB-HS controller
 
 NI's L<GPIB-USB-HS|http://sine.ni.com/nips/cds/view/p/lang/de/nid/201586> is supported out of the box by Linux-GPIB without any
-additional proprietary firmware. 
+additional proprietary firmware.
 
 You need a configuration file F</etc/gpib.conf>:
 
@@ -111,7 +146,7 @@ You need a configuration file F</etc/gpib.conf>:
  }
 
 To load the kernel driver during boot, add C<ni_usb_gpib> to
-F</etc/modules>. 
+F</etc/modules>.
 
 After connecting the controller via usb, you will still have to run
 C<gpib_config> as root. To automate this, create an udev rule
@@ -136,6 +171,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2021       Fabian Weinelt
 
 
 This is free software; you can redistribute it and/or modify it under

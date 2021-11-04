@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::Base;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for RDBMS-specific code
 use version;
-our $VERSION = 'v0.930.1'; # VERSION
+our $VERSION = 'v0.940.0'; # VERSION
 
 use v5.10;
 use Moo;
@@ -12,6 +12,7 @@ use Types::Standard qw( InstanceOf );
 
 use DBI::Const::GetInfoType;
 use Sub::Util qw( set_subname );
+use version 0.77 ();
 
 use namespace::clean;  # don't export the above
 
@@ -52,6 +53,7 @@ has online_ddl => (
         dbh_runner          => 'dbh_runner',
         dbh_runner_do       => 'dbh_runner_do',
         find_new_identifier => '_find_new_identifier',
+        get_idx_hash        => '_get_idx_hash',
         fk_to_sql           => '_fk_to_sql',
     },
 );
@@ -95,6 +97,20 @@ sub child_fks_need_adjusting { 0 }
 #pod =cut
 
 sub null_safe_equals_op { 'IS NOT DISTINCT FROM' }
+
+#pod =head2 mmver
+#pod
+#pod The major/minor version of the currently connected server, converted to "numified" form
+#pod via L<version>, after parsing out the dotted notation (ie: C<5.7.33> instead of
+#pod C<5.7.33-36-log>). This allows for version comparisons.
+#pod
+#pod =cut
+
+sub mmver {
+    my $self = shift;
+    my ($mmver) = ($self->dbh->get_info($GetInfoType{SQL_DBMS_VER}) =~ /(\d+\.\d+(?:\.\d+)?)/);
+    return version->parse("v$mmver")->numify;
+}
 
 #pod =head1 PRIVATE HELPER METHODS
 #pod
@@ -224,16 +240,15 @@ sub rename_fks_in_table_sql {
     return $table_sql;
 }
 
-#pod =head2 has_triggers_on_table
+#pod =head2 has_conflicting_triggers_on_table
 #pod
-#pod     die if $helper->has_triggers_on_table($table_name);
+#pod     die if $helper->has_conflicting_triggers_on_table($table_name);
 #pod
-#pod Return true if triggers exist on the given table.  This is a fail-safe to make sure the
-#pod table is trigger-free prior to the operation.
+#pod Return true if triggers exist on the given table that would conflict with the operation.
 #pod
 #pod =cut
 
-sub has_triggers_on_table {
+sub has_conflicting_triggers_on_table {
     die sprintf "Not sure how to check for table triggers for %s systems!", shift->dbms_name;
 }
 
@@ -450,6 +465,19 @@ sub add_fks_back_to_child_tables_stmts {
     return @stmts;
 }
 
+#pod =head2 post_fk_add_cleanup_stmts
+#pod
+#pod     @stmts = $helper->post_fk_add_cleanup_stmts if $helper->child_fks_need_adjusting;
+#pod
+#pod Return a list of clean up statements to run after the FKs are re-added back to the child
+#pod tables.  These will be run through L<DBIx::OnlineDDL/dbh_runner_do>.
+#pod
+#pod Only used if L</child_fks_need_adjusting> is true.  The base method does nothing.
+#pod
+#pod =cut
+
+sub post_fk_add_cleanup_stmts { return () }
+
 1;
 
 __END__
@@ -464,7 +492,7 @@ DBIx::OnlineDDL::Helper::Base - Private OnlineDDL helper for RDBMS-specific code
 
 =head1 VERSION
 
-version v0.930.1
+version v0.940.0
 
 =head1 DESCRIPTION
 
@@ -505,6 +533,12 @@ this truth table:
 
 The ANSI SQL version is C<IS NOT DISTINCT FROM>, but others RDBMS typically use something
 less bulky.
+
+=head2 mmver
+
+The major/minor version of the currently connected server, converted to "numified" form
+via L<version>, after parsing out the dotted notation (ie: C<5.7.33> instead of
+C<5.7.33-36-log>). This allows for version comparisons.
 
 =head1 PRIVATE HELPER METHODS
 
@@ -560,12 +594,11 @@ use C<find_new_identifier> to find a valid name.
 
 Only used if L</dbms_uses_global_fk_namespace> is true.
 
-=head2 has_triggers_on_table
+=head2 has_conflicting_triggers_on_table
 
-    die if $helper->has_triggers_on_table($table_name);
+    die if $helper->has_conflicting_triggers_on_table($table_name);
 
-Return true if triggers exist on the given table.  This is a fail-safe to make sure the
-table is trigger-free prior to the operation.
+Return true if triggers exist on the given table that would conflict with the operation.
 
 =head2 find_new_trigger_identifier
 
@@ -638,6 +671,15 @@ Return a list of statements needed to add FKs back to the child tables.  These w
 run through L<DBIx::OnlineDDL/dbh_runner_do>.
 
 Only used if L</child_fks_need_adjusting> is true.
+
+=head2 post_fk_add_cleanup_stmts
+
+    @stmts = $helper->post_fk_add_cleanup_stmts if $helper->child_fks_need_adjusting;
+
+Return a list of clean up statements to run after the FKs are re-added back to the child
+tables.  These will be run through L<DBIx::OnlineDDL/dbh_runner_do>.
+
+Only used if L</child_fks_need_adjusting> is true.  The base method does nothing.
 
 =head1 AUTHOR
 

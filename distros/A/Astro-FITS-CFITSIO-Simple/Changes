@@ -1,64 +1,108 @@
-Revision history for Perl extension Astro::FITS::CFITSIO::Simple.
+Revision history for Astro-FITS-CFITSIO-Simple
 
-0.18 Mon Feb 14 14:35:32 EST 2011
-        - add defdtype option
+0.19      2021-10-21 14:07:04-04:00 America/New_York
 
-0.17 Wed Dec 29 11:36:35 EST 2010
-	- fix bareword warnings
+  [BUILD]
 
-0.16 Mon Apr 14 15:24:09 EDT 2008
-        - incorrect handling of FITS null values if PDL did not have
-	  bad value support.
-        - added nullval option to rdfits() to allow user control over
-	  null value processing.
+    * distzillify
+    * no longer requires '.' to be in @INC.
 
-0.15 Tue Jan  9 11:52:54 EST 2007
-	- attempting to read zero-row binary tables resulted in PDL errors.
+0.18 : 2011-02-14T14:35:32-05:00
 
-0.14 Mon Aug 22 13:02:02 EDT 2005
-        - forgot to update the README to reflect the patches.
+  [ENHANCEMENTS]
 
-0.13 Mon Aug 22 12:40:59 EDT 2005
-        - It turns out that this module was developed against a
-	  patched, non-distributed version of Astro::FITS::Header 2.8.1
-	  Unfortunately, that version is required for this module
-	  to work.  The patches are available here:
+    * add defdtype option
 
-	     https://rt.cpan.org/NoAuth/Bug.html?id=4816
-	     https://rt.cpan.org/NoAuth/Bug.html?id=11722
+0.17 :   2010-12-29T11:39:33-05:00
+
+  [BUG FIX]
+
+    * fix bareword warnings
+
+0.16 :   2008-04-14T15:34:47-04:00
+
+  [BUG FIX]
+
+    * incorrect handling of FITS null values if PDL did not have
+      badvalue support.
+
+    * added nullval option to rdfits() to allow user control over null
+      value processing.
+
+0.15 :   2007-01-09T11:57:38-05:00
+
+  [BUG FIX]
+
+    * attempting to read zero-row binary tables resulted in PDL
+      errors.
+
+0.14 :  2005-08-22T17:01:50+00:00
+
+  [BUILD]
+
+    * forgot to update the README to reflect the patches.
+
+0.13 :  2005-08-22T16:42:53+00:00
+
+  [OOPS]
+
+    * It turns out that this module was developed against a patched,
+      non-distributed version of Astro::FITS::Header 2.8.1
+      Unfortunately, that version is required for this module to work.
+      The patches are available here:
+
+             https://rt.cpan.org/NoAuth/Bug.html?id=4816
+             https://rt.cpan.org/NoAuth/Bug.html?id=11722
+
+  [BUILD]
+
+    * minor error formatting output fixes.
 
 
-	- minor error formatting output fixes.
+0.12 :  2005-05-12T15:54:12+00:00
 
+  [BUG FIX]
 
-0.12 Thu May 12 11:45:13 EDT 2005
+    * test for inappropriate call in scalar context when reading
+      multiple columns was broken
 
-	- test for inappropriate call in scalar context when reading
-	  multiple columns was broken
+0.11 :  2005-05-11T19:37:27+00:00
 
-0.11 Wed May 11 15:34:55 EDT 2005
+  [BUG FIX]
 
-	- when processing bit fields as bits (not logicals), the
-	  ENTIRE destination piddle was set to zero, for each chunk, not
-	  just the destination for the current chunk.  this resulted not
-	  only in bogus data, but also slowed things down TREMENDOUSLY.
+    * when processing bit fields as bits (not logicals), the ENTIRE
+      destination piddle was set to zero, for each chunk, not just the
+      destination for the current chunk.  this resulted not only in
+      bogus data, but also slowed things down TREMENDOUSLY.
 
-0.1  Wed May 11 09:26:24 EDT 2005
-	- much improved support for bit fields; now can either
-	  map bit for bit or as logicals
-	- status output
-	- can specify columns to *not* read
+0.1 :   2005-05-11T13:58:59+00:00
 
-0.03  Tue Oct 19 12:33:05 EDT 2004
-        - retinfo=1 resulted in the original, unfiltered data, being
-	  returned 
+  [ENHANCEMENTS]
 
-0.02  Mon Apr 12 18:13:54 EDT 2004
-        - "supports" TULONG and TUINT.  not really. it just points
-	  them at long(), which is wrong.  But, PDL has no uint or
-	  ulong types.
+    * much improved support for bit fields; now can either map bit for
+      bit or as logicals
 
-0.01  Mon Mar 22 18:46:21 2004
-	- original version; created by h2xs 1.23 with options
-		-AX -n Astro::FITS::CFITSIO::Simple
+    * status output
 
+    * can specify columns to *not* read
+
+0.03 :  2004-10-19T17:22:42+00:00
+
+  [BUG FIX]
+
+    * retinfo=1 resulted in the original, unfiltered data, being
+      returned
+
+0.02 :  2004-04-12T22:22:51+00:00
+
+  [ENHANCEMENTS]
+
+  * "supports" TULONG and TUINT.  not really. it just points them at
+    long(), which is wrong.  But, PDL has no uint or ulong types.
+
+0.01 :  2004-04-07T21:22:43+00:00
+
+  [ENHANCEMENTS]
+
+  * original version; created by h2xs 1.23 with options
+                -AX -n Astro::FITS::CFITSIO::Simple

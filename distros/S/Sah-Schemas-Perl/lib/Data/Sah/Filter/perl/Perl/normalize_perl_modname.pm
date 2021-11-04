@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-29'; # DATE
+our $DATE = '2021-10-05'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.039'; # VERSION
+our $VERSION = '0.040'; # VERSION
 
 sub meta {
     +{
@@ -29,10 +29,11 @@ sub filter {
         "do { my \$tmp = $dt; ",
         "if (ref \$tmp) { [\"Must be a string and not a reference\", \$tmp] } ",
         "else { ", (
+            "my \$argssuffix = ''; \$argssuffix = \$1 if \$tmp =~ s/(=.*)\\z//;",                                   # extract args suffix (=arg1,arg2) first
             "my \$versuffix = ''; \$versuffix = \$1 if \$tmp =~ s/(\@[0-9][0-9A-Za-z]*(\\.[0-9A-Za-z_]+)*)\\z//; ", # extract version suffix part first
             "\$tmp = \$1 if \$tmp =~ m!\\A(\\w+(?:/\\w+)*)\.pm\\z!; ",
             "\$tmp =~ s!::?|/|\\.|-!::!g; ",
-            "[undef, \$tmp . \$versuffix]; "),
+            "[undef, \$tmp . \$versuffix . \$argssuffix]; "),
         "} }",
     );
 
@@ -54,7 +55,7 @@ Data::Sah::Filter::perl::Perl::normalize_perl_modname
 
 =head1 VERSION
 
-This document describes version 0.039 of Data::Sah::Filter::perl::Perl::normalize_perl_modname (from Perl distribution Sah-Schemas-Perl), released on 2021-09-29.
+This document describes version 0.040 of Data::Sah::Filter::perl::Perl::normalize_perl_modname (from Perl distribution Sah-Schemas-Perl), released on 2021-10-05.
 
 =head1 DESCRIPTION
 

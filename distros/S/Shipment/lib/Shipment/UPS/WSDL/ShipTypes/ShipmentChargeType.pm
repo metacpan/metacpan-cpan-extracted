@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ Class::Std::initialize();
               BillThirdParty
               ConsigneeBilledIndicator
 
-              )
+            )
         ],
         {   'Type'                     => \%Type_of,
             'BillShipper'              => \%BillShipper_of,
@@ -79,7 +79,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

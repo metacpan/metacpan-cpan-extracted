@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType;
-$Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               CurrencyCode
               MonetaryValue
 
-              )
+            )
         ],
         {   'Type'          => \%Type_of,
             'CurrencyCode'  => \%CurrencyCode_of,
@@ -66,7 +66,7 @@ Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

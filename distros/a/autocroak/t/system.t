@@ -24,7 +24,8 @@ subtest return0 => sub {
 subtest return1 => sub {
 	use autocroak;
 	my $ex = exception { system $perl, qw/-e exit(1)/ };
-	like($ex, qr/^Could not call system ".+": unexpectedly returned exit value 1/);
+	my $error = $^O ne 'MSWin32' ? qr/unexpectedly returned exit value 1/ : qr/returned \d+/;
+	like($ex, qr/^Could not call system ".+": $error/);
 };
 
 subtest signal6 => sub {

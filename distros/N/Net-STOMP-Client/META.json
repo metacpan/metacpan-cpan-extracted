@@ -34,6 +34,7 @@
          "requires" : {
             "Encode" : "0",
             "IO::Socket::INET" : "0",
+            "IO::Socket::IP" : "0",
             "List::Util" : "0",
             "No::Worries" : "1.2",
             "POSIX" : "0",
@@ -43,5 +44,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.3"
+   "version" : "2.5"
 }

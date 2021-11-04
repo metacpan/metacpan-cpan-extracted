@@ -22,5 +22,7 @@ README
 SIGNATURE
 t/App-Image-Generator/01-use.t
 t/App-Image-Generator/02-version.t
+t/App-Image-Generator/03-new.t
+t/App-Image-Generator/04-run.t
 xt/App-Image-Generator/01-pod_coverage.t
 xt/App-Image-Generator/02-pod.t

@@ -40,7 +40,8 @@ sub _groups {
     my $groups = [
         { name => 'group_help',     text => "  HELP"        },
         { name => 'group_path',     text => "  Path"        },
-        { name => 'group_database', text => "- DB Options"  },
+        { name => 'group_plugins',  text => "- DB Plugins"  },
+        { name => 'group_database', text => "- DB Settings"  },
         { name => 'group_behavior', text => "- Behavior"    },
         { name => 'group_enable',   text => "- Extensions"  },
         { name => 'group_sql',      text => "- SQL",        },
@@ -61,8 +62,10 @@ sub _options {
         group_path => [
             { name => 'path', text => '', section => '' }
         ],
+        group_plugins => [
+            { name => 'plugins', text => "- DB Plugins",  section => 'G' },
+        ],
         group_database => [
-            { name => 'plugins',      text => "- DB Plugins",  section => 'G' },
             { name => '_db_defaults', text => "- DB Settings", section => ''  },
         ],
         group_behavior => [
@@ -90,15 +93,16 @@ sub _options {
             { name => 'max_rows',                text => "- Max rows",         section => 'G'      },
         ],
         group_output => [
-            { name => 'min_col_width',       text => "- Col width",       section => 'table' },
-            { name => 'progress_bar',        text => "- Progress bar",    section => 'table' },
-            { name => 'tab_width',           text => "- Tab width",       section => 'table' },
-            { name => '_color',              text => "- Color",           section => 'table' },
-            { name => '_binary_filter',      text => "- Binary filter",   section => 'table' },
-            { name => '_squash_spaces',      text => "- Squash spaces",   section => 'table' },
-            { name => '_base_indent',        text => "- Indentation",     section => 'G'     },
-            { name => '_set_string',         text => "- Set string",      section => 'table' },
-            { name => '_file_find_warnings', text => "- Warnings",        section => 'G'     },
+            { name => 'min_col_width',       text => "- Trunc col threshold", section => 'table' },
+            { name => 'trunc_fract_first',   text => "- Trunc fract first",   section => 'table' },
+            { name => 'progress_bar',        text => "- Progress bar",        section => 'table' },
+            { name => 'tab_width',           text => "- Tab width",           section => 'table' },
+            { name => '_color',              text => "- Color",               section => 'table' },
+            { name => '_binary_filter',      text => "- Binary filter",       section => 'table' },
+            { name => '_squash_spaces',      text => "- Squash spaces",       section => 'table' },
+            { name => '_base_indent',        text => "- Indentation",         section => 'G'     },
+            { name => '_set_string',         text => "- Set string",          section => 'table' },
+            { name => '_file_find_warnings', text => "- Warnings",            section => 'G'     },
         ],
         group_insert => [
             { name => '_data_source_type',  text => "- Source type of input data",     section => 'insert' },
@@ -394,6 +398,13 @@ sub set_options {
                 my $sub_menu = [
                     [ 'data_source_Create_table', "- Data source \"Create table\"", [ 'plain', 'file', 'menu' ], ],
                     [ 'data_source_Insert',       "- Data source \"Insert into\"",  [ 'plain', 'file', 'menu' ], ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq 'trunc_fract_first' ) {
+                my $prompt = 'Terminal not wide enough"';
+                my $sub_menu = [
+                    [ 'trunc_fract_first', "- First step: truncate fraction of numbers", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

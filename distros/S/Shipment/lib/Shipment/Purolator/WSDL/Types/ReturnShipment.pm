@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ReturnShipment;
-$Shipment::Purolator::WSDL::Types::ReturnShipment::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ReturnShipment::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -42,14 +42,14 @@ Class::Std::initialize();
               TrackingReferenceInformation
               OtherInformation
 
-              )
+            )
         ],
-        {   'SenderInformation'       => \%SenderInformation_of,
-            'ReceiverInformation'     => \%ReceiverInformation_of,
-            'PackageInformation'      => \%PackageInformation_of,
-            'PaymentInformation'      => \%PaymentInformation_of,
-            'PickupInformation'       => \%PickupInformation_of,
-            'NotificationInformation' => \%NotificationInformation_of,
+        {   'SenderInformation'            => \%SenderInformation_of,
+            'ReceiverInformation'          => \%ReceiverInformation_of,
+            'PackageInformation'           => \%PackageInformation_of,
+            'PaymentInformation'           => \%PaymentInformation_of,
+            'PickupInformation'            => \%PickupInformation_of,
+            'NotificationInformation'      => \%NotificationInformation_of,
             'TrackingReferenceInformation' =>
               \%TrackingReferenceInformation_of,
             'OtherInformation' => \%OtherInformation_of,
@@ -101,7 +101,7 @@ Shipment::Purolator::WSDL::Types::ReturnShipment
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::ShipToAddressType;
-$Shipment::UPS::WSDL::RateTypes::ShipToAddressType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::ShipToAddressType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ Class::Std::initialize();
               CountryCode
               ResidentialAddressIndicator
 
-              )
+            )
         ],
         {   'AddressLine'                 => \%AddressLine_of,
             'City'                        => \%City_of,
@@ -87,7 +87,7 @@ Shipment::UPS::WSDL::RateTypes::ShipToAddressType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

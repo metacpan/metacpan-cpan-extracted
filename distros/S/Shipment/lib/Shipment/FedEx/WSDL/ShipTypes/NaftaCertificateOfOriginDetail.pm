@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::NaftaCertificateOfOriginDetail;
-$Shipment::FedEx::WSDL::ShipTypes::NaftaCertificateOfOriginDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::NaftaCertificateOfOriginDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               Producers
               CustomerImageUsages
 
-              )
+            )
         ],
         {   'Format'                => \%Format_of,
             'BlanketPeriod'         => \%BlanketPeriod_of,
@@ -90,7 +90,7 @@ Shipment::FedEx::WSDL::ShipTypes::NaftaCertificateOfOriginDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

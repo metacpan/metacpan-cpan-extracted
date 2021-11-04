@@ -588,7 +588,7 @@ tiff_ReadEncodedStrip (tif, strip, size)
                 tmsize_t        stripsize, bufsize;
         PPCODE:
                 stripsize = TIFFStripSize(tif);
-                buf = (unsigned char *)_TIFFmalloc(stripsize);
+                buf = _TIFFmalloc(stripsize);
                 bufsize = TIFFReadEncodedStrip(tif, strip, buf, size);
                 if (bufsize > 0) {
                     XPUSHs(sv_2mortal(newSVpvn(buf, bufsize)));
@@ -617,7 +617,7 @@ tiff_ReadRawStrip (tif, strip, size)
                 tmsize_t        stripsize, bufsize;
         PPCODE:
                 stripsize = TIFFStripSize(tif);
-                buf = (unsigned char *)_TIFFmalloc(stripsize);
+                buf = _TIFFmalloc(stripsize);
                 bufsize = TIFFReadRawStrip(tif, strip, buf, size);
                 if (bufsize > 0) {
                     XPUSHs(sv_2mortal(newSVpvn(buf, bufsize)));
@@ -636,7 +636,7 @@ tiff_ReadTile (tif, x, y, z, s)
                 tmsize_t        tilesize, bufsize;
         PPCODE:
                 tilesize = TIFFTileSize(tif);
-                buf = (unsigned char *)_TIFFmalloc(tilesize);
+                buf = _TIFFmalloc(tilesize);
                 bufsize = TIFFReadTile(tif, buf, x, y, z, s);
                 if (bufsize > 0) {
                     XPUSHs(sv_2mortal(newSVpvn(buf, bufsize)));
@@ -650,3 +650,10 @@ tiff_PrintDirectory (tif, file, flags)
                 long            flags
         CODE:
                 TIFFPrintDirectory(tif, file, flags);
+
+void
+tiff_ReverseBits (data, size)
+                void*           data
+                tmsize_t        size
+        CODE:
+                TIFFReverseBits((uint8_t*) data, size);

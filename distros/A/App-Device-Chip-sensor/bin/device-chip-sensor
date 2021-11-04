@@ -8,6 +8,7 @@ use Object::Pad 0.19;
 use Future::AsyncAwait;
 use Future::IO::Impl::IOAsync;
 
+STDOUT->autoflush(1);
 STDOUT->binmode( ":encoding(UTF-8)" );
 
 =head1 NAME
@@ -68,16 +69,7 @@ C<read_config> method) on startup.
 
    method output_readings ( $now, $sensors, $values )
    {
-      foreach my $i ( 0 .. $#$sensors ) {
-         my $sensor = $sensors->[$i];
-         my $value  = $values->[$i];
-
-         my $chip = $sensor->chip;
-         my $chipname = ( ref $chip ) =~ s/^Device::Chip:://r;
-
-         printf "%s %s: %s %s\n", $chipname, $sensor->name,
-            $sensor->format( $value ), $sensor->units;
-      }
+      $self->print_readings( $sensors, $values );
    }
 }
 

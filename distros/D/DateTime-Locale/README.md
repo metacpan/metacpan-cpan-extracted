@@ -4,7 +4,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 # VERSION
 
-version 1.32
+version 1.33
 
 # SYNOPSIS
 
@@ -185,11 +185,7 @@ to extract the CLDR data.
 
 # SEE ALSO
 
-[DateTime::Locale::Base](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3ABase)
-
 datetime@perl.org mailing list
-
-http://datetime.perl.org/
 
 # SUPPORT
 
@@ -197,8 +193,6 @@ Bugs may be submitted at [https://github.com/houseabsolute/DateTime-Locale/issue
 
 There is a mailing list available for users of this distribution,
 [mailto:datetime@perl.org](mailto:datetime@perl.org).
-
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
 # SOURCE
 

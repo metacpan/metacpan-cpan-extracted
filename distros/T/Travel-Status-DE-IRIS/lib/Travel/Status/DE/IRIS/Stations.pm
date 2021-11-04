@@ -10,19 +10,15 @@ use warnings;
 use 5.014;
 use utf8;
 
-use Geo::Distance;
+use GIS::Distance;
 use List::Util qw(min);
 use List::UtilsBy qw(uniq_by);
 use List::MoreUtils qw(firstval pairwise);
 use Text::LevenshteinXS qw(distance);
 
-# TODO Geo::Distance is kinda deprecated, it is recommended to use GIS::Distance
-# instead. However, since GIS::Distance is not packaged for Debian, I'll stick
-# with Geo::Distance for now (which works fine enough here)
-
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.60';
+our $VERSION = '1.61';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -8893,7 +8889,7 @@ sub get_station_by_location {
 
 	$num_matches //= 10;
 
-	my $geo = Geo::Distance->new();
+	my $dist = GIS::Distance->new();
 
 	# we only use geolocations inside germany.
 	# For these, this fast preprocessing step will let through all
@@ -8905,8 +8901,7 @@ sub get_station_by_location {
 		  < 1
 	} @stations;
 	my @distances
-	  = map { $geo->distance( 'kilometer', $lon, $lat, $_->[3], $_->[4] ) }
-	  @candidates;
+= map { $dist->distance_metal( $lat, $lon, $_->[4], $_->[3] ) }	  @candidates;
 	my @station_map = pairwise { [ $a, $b ] } @candidates, @distances;
 
 	@station_map = sort { $a->[1] <=> $b->[1] } @station_map;
@@ -8980,7 +8975,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 DESCRIPTION
 
@@ -9061,7 +9056,7 @@ None.
 
 =over
 
-=item * Geo::Distance(3pm)
+=item * GIS::Distance(3pm)
 
 =item * List::MoreUtils(3pm)
 

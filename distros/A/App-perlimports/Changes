@@ -1,5 +1,12 @@
 Revision history for App-perlimports
 
+0.000025  2021-10-13 21:42:40Z
+    - Add another minimum version to t/with-version.t (GH#43) (Olaf Alders)
+
+0.000024  2021-10-12 15:58:08Z
+    - Fix t/with-version.t on some machines by requiring the correct minimum
+      needed module version via Test::Needs (GH#42) (Olaf Alders)
+
 0.000023  2021-09-29 18:50:41Z
     - Eval import() statements before changing them (GH#40) (Olaf Alders)
     - Don't consider "my @Foo" to be a use of an imported "@Foo" (GH#40) (Olaf

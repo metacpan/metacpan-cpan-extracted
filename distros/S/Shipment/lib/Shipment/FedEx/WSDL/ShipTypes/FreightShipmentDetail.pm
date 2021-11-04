@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::FreightShipmentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::FreightShipmentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::FreightShipmentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ Class::Std::initialize();
               HazardousMaterialsEmergencyContactNumber
               LineItems
 
-              )
+            )
         ],
         {   'FedExFreightAccountNumber' => \%FedExFreightAccountNumber_of,
             'FedExFreightBillingContactAndAddress' =>
@@ -109,7 +109,7 @@ Class::Std::initialize();
               'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
             'ClientDiscountPercent' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-            'PalletWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
+            'PalletWeight'       => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
             'ShipmentDimensions' =>
               'Shipment::FedEx::WSDL::ShipTypes::Dimensions',
             'Comment' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
@@ -162,7 +162,7 @@ Shipment::FedEx::WSDL::ShipTypes::FreightShipmentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

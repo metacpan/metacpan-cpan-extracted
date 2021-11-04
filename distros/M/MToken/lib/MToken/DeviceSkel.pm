@@ -1,4 +1,4 @@
-package MToken::DeviceSkel; # $Id: DeviceSkel.pm 72 2019-06-11 07:28:00Z minus $
+package MToken::DeviceSkel; # $Id: DeviceSkel.pm 101 2021-10-09 18:57:43Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ MToken::DeviceSkel - Internal helper's methods for MToken
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2021 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -50,7 +50,9 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 use constant SIGNATURE => "device";
 
 use vars qw/ $VERSION /;
-$VERSION = '1.00';
+$VERSION = '1.01';
+
+use MToken::Const qw/DIR_PRIVATE DEVICE_CONF_FILE DEVICE_MANIFEST_FILE DB_FILE/;
 
 sub build { # Building
     my $self = shift;
@@ -58,6 +60,10 @@ sub build { # Building
     my $rplc = $self->{rplc};
     $rplc->{TODO} = "TODO";
     $rplc->{ENDSIGN} = "__END__"; # END signature
+    $rplc->{DIR_PRIVATE} = DIR_PRIVATE;
+    $rplc->{DEVICE_CONF_FILE} = DEVICE_CONF_FILE;
+    $rplc->{DEVICE_MANIFEST_FILE} = DEVICE_MANIFEST_FILE;
+    $rplc->{DB_FILE} = DB_FILE;
 
     $self->maybe::next::method();
     return 1;
@@ -66,27 +72,7 @@ sub dirs { # Directories and permissions as array of hashs
     my $self = shift;
     $self->{subdirs}{(SIGNATURE)} = [
         {
-            path => 'keys',
-            mode => 0755,
-        },
-
-        {
-            path => 'certs',
-            mode => 0755,
-        },
-
-        {
-            path => 'backup',
-            mode => 0755,
-        },
-
-        {
-            path => 'restore',
-            mode => 0755,
-        },
-
-        {
-            path => 'etc',
+            path => DIR_PRIVATE,
             mode => 0755,
         },
     ];
@@ -108,132 +94,21 @@ sub pool { # Multipart pool of files
 __DATA__
 
 -----BEGIN FILE-----
-Name: Makefile.PL
-File: Makefile.PL
-Mode: 711
-
-#!/usr/bin/perl -w
-use strict;
-use ExtUtils::MakeMaker;
-use ExtUtils::Manifest qw/manicheck/;
-use CTK::Util qw/ dformat dtf /;
-use MToken::MM;
-use MToken::Const qw/ :GENERAL :MATH /;
-use MToken::Util;
-
-@ExtUtils::MakeMaker::MM_Sections = qw(
-    post_initialize
-    const_config constants
-    tools_other
-    dist macro
-    post_constants
-    postamble
-);
-
-if (my @missed = manicheck()) {
-    print STDERR red("Found files missing in your kit"), "\n";
-    print STDERR red($_), "\n" for @missed;
-}
-
-my $mm = new MToken::MM;
-WriteMakefile(
-    'NAME'                  => '%NAME%',
-    'DISTNAME'              => '%DISTNAME%',
-    'MIN_PERL_VERSION'      => 5.016001,
-    'VERSION'               => $mm->VERSION,
-    'ABSTRACT'              => "This device is MToken project %PROJECT%",
-    'PREREQ_PM'             => { 'MToken' => %MTOKEN_VERSION% },
-    'AUTHOR'                => 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>',
-    'LICENSE'               => 'GPL',
-    'NO_META'               => TRUE,
-    'NO_MYMETA'             => TRUE,
-    'macro'                 => $mm->macro,
-);
-print blue("For help, run:\n  make usage\n");
-
-# Constants
-sub MY::post_initialize {
-return <<'MAKE_FRAG';
-PROJECT     = %PROJECT%
-MAKE_FRAG
-}
-
-# Calculated constants
-sub MY::post_constants {
-my $section = <<'MAKE_FRAG';
-DATE_SFX    = [DATE_SFX]
-DATE_FMT    = [DATE_FMT]
-BACKUP      = $(DISTNAME).$(DATE_SFX)
-PERLMTOKEN  = $(PERLRUN) -MMToken::Command
-CONFIGURE   = $(PERLMTOKEN) -e config --
-MAKE_FRAG
-my $dt = time();
-return dformat($section, {
-        DATE_SFX => dtf("%YYYY%MM%DD", $dt),
-        DATE_FMT => dtf("%YYYY/%MM/%DD", $dt),
-    });
-}
-
-# SubSections (postamble)
-sub MY::postamble {
-my $section = <<'MAKE_FRAG';
-
-.PHONY: [PHONY]
-[USESHELL]
-MAKE_FRAG
-return dformat(sprintf("%s\n%s", $section, $mm->proc()), {
-        PHONY     => join(" ", @{(MToken::MM::PHONY())}),
-        USESHELL  => (MSWIN ? "\n.USESHELL:\n" : ""),
-        TAB       => "\t",
-        CMD       => "\t",
-    });
-}
-
-1;
-
-%ENDSIGN%
------END FILE-----
-
------BEGIN FILE-----
 Name: DESCRIPTION
 File: DESCRIPTION
 Mode: 666
 
 ################################################################################
 ##
-## MTOKEN      : %PROJECT% (%NAME%)
+## MTOKEN      : %TOKEN_NAME%
 ## GENERATED   : %GMT%
 ## PACKAGE     : %PACKAGE% %VERSION%
-## REVISION    : $Id: DeviceSkel.pm 72 2019-06-11 07:28:00Z minus $
 ##
 ################################################################################
 
-This storage contains keys and tokens for access to internal and external systems
+This token device (folder or storage) holds keys and tokens for access to
+various systems, web-sites, programs and etc.
 
------END FILE-----
-
------BEGIN FILE-----
-Name: MANIFEST
-File: MANIFEST
-Mode: 666
-
-# Default file.
-# Please add file descriptions into this file via command:
-#   make init
------END FILE-----
-
------BEGIN FILE-----
-Name: MANIFEST.SKIP
-File: MANIFEST.SKIP
-Mode: 666
-
-\B\.tmp\b
-\btmp\b
-\betc\b
-\bbackup\b
-\brestore\b
-
-#!include_default
 -----END FILE-----
 
 -----BEGIN FILE-----
@@ -241,76 +116,40 @@ Name: README
 File: README
 Mode: 666
 
-perl Makefile.PL
-
-make check
-
-...
+This token device (folder or storage) holds keys and tokens for access to
+various systems, web-sites, programs and etc.
 
 -----END FILE-----
 
 -----BEGIN FILE-----
-Name: TODO
-File: TODO
-Mode: 666
-
-# TO-DO %GMT%
-# $Id: DeviceSkel.pm 72 2019-06-11 07:28:00Z minus $
-
-# GENERAL
-
-    * none
-
-# BUGS
-
-    * none
-
-# REFACTORING
-
-    * none
-
-# DOCUMENTATION
-
-    * none
-
-# DIAGNOSTICS
-
-    * none
-
-# SUPPORT
-
-    * none
-
------END FILE-----
-
------BEGIN FILE-----
-Name: gpg.conf
-File: etc/gpg.conf
-Mode: 644
-
-# Do not edit this file
-verbose
-yes
------END FILE-----
-
------BEGIN FILE-----
-Name: %CONFFILEONLY%
-File: etc/%CONFFILEONLY%
+Name: %DEVICE_CONF_FILE%
+File: %DIR_PRIVATE%/%DEVICE_CONF_FILE%
 Mode: 666
 
 #
-# This file contains data for global configuration (gconfig)
-# Local configuration located in ".mtoken" file of
+# This file contains data for device configuration (dconfig)
+# Local configuration holda in "%DIR_PRIVATE%" directory of
 # your home directory (lconfig)
+# See also the global config file (gconfig) that is located in the
+# system config directory (/etc/mtoken)
 #
 
 ## General
-NAME		%NAME%
-DISTNAME	%DISTNAME%
-PROJECT		%PROJECT%
-GPGBIN		%GPGBIN%
-OPENSSLBIN	%OPENSSLBIN%
+TOKEN       %TOKEN_NAME%
+SERVER_URL  %SERVER_URL%
 
+-----END FILE-----
+
+-----BEGIN FILE-----
+Name: %DEVICE_CONF_FILE%
+File: %DIR_PRIVATE%/%DEVICE_MANIFEST_FILE%
+Mode: 666
+
+%DIR_PRIVATE%/%DEVICE_MANIFEST_FILE%
+%DIR_PRIVATE%/%DEVICE_CONF_FILE%
+%DIR_PRIVATE%/%DB_FILE%
+README
+DESCRIPTION
 -----END FILE-----
 
 -----BEGIN FILE-----

@@ -1,0 +1,36 @@
+=pod
+
+=head1 NAME
+
+Form::Tiny::Manual::Performance - validation performance tips
+
+=head1 DESCRIPTION
+
+Form::Tiny is a pretty fast validation framework (L<benchmark|https://brtastic.xyz/blog/article/validation-frameworks-benchmark>), but when the need arise, certain steps can be taken to improve it even further.
+
+=head1 THINGS THAT SLOW THE MODULE DOWN
+
+=head2 Inline forms
+
+The module gives you an option to create inline forms - without the need to set up a dedicated form class. While the inline style does not give you full capabilities of the regular form, it also is slow to instantiate, because it has to re-create its metamodel object everytime form constructor is called. Creating a dedicated package for a form will ensure that metamodel object will only be created one time in script runtime.
+
+=head2 Strict mode
+
+Strict mode is a nice addition that causes the module to identify any extra data in the input (not mentioned in the form definition) as an error. It is enabled with an import flag:
+
+	use Form::Tiny -strict;
+
+While it may come useful, it is often unnecessary. The module already does not copy any extra data from input to output fields, so you don't have to worry about it at all - it will simply get ignored. Enabling strict mode reduces the performance of the module by about 50%:
+
+
+	Parsing 100 hash references in an array
+
+	                  Rate form_tiny_strict        form_tiny
+	form_tiny_strict 156/s               --             -57%
+	form_tiny        359/s             131%               --
+
+=head1 THINGS THAT SPEED THE MODULE UP
+
+=head2 Type::Tiny::XS
+
+Form::Tiny uses a lot of Type::Tiny type constraints, both internally and in its form classes. Installing L<Type::Tiny::XS> should give them some XS boost, although it may be hard to measure exactly what kind of performance boost it gives.

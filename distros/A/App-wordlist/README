@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from WordList::*
 
 VERSION
-    This document describes version 0.277 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2020-08-23.
+    This document describes version 0.281 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2021-10-24.
 
 SYNOPSIS
     See the included script wordlist.
@@ -12,7 +12,7 @@ FUNCTIONS
   wordlist
     Usage:
 
-     wordlist(%args) -> [status, msg, payload, meta]
+     wordlist(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Grep words from WordList::*.
 
@@ -24,43 +24,65 @@ FUNCTIONS
 
     *   Print all words matching /foo/ and /bar/:
 
-         wordlist( arg => ["foo", "bar"]);
+         wordlist(arg => ["foo", "bar"]);
 
     *   Print all words matching /foo/ or /bar/:
 
-         wordlist( arg => ["foo", "bar"], or => 1);
+         wordlist(arg => ["foo", "bar"], or => 1);
 
     *   Print wordlist name for each matching words:
 
-         wordlist( arg => ["foo"], detail => 1);
+         wordlist(arg => ["foo"], detail => 1);
 
     *   Select a specific wordlist (multiple -w allowed):
 
-         wordlist( arg => ["foo"], wordlists => ["ID::KBBI"]);
+         wordlist(arg => ["foo"], wordlists => ["ID::KBBI"]);
 
     *   Select all ID::* wordlists (wildcard will be expanded):
 
-         wordlist( arg => ["foo"], wordlists => ["ID::**"]);
+         wordlist(arg => ["foo"], wordlists => ["ID::**"]);
+
+    *   Print all words from EN::Enable wordlist that are 6 characters long
+        and have the letters BOBLEG (in no particular order); great for
+        cheats in word forming games:
+
+         wordlist(
+             chars_unordered => "bobleg",
+           ignore_case => 1,
+           len => 6,
+           wordlists => ["EN::Enable"]
+         );
+
+    *   Print all words from EN::Enable wordlist that are 6 characters long
+        and have the letters B,G,L (in that order); great for finding
+        crossword puzzle answers:
+
+         wordlist(
+             chars_ordered => "BGL",
+           ignore_case => 1,
+           len => 6,
+           wordlists => ["EN::Enable"]
+         );
 
     *   Select French wordlists (multiple --lang allowed):
 
-         wordlist( arg => ["foo"], langs => ["FR"]);
+         wordlist(arg => ["foo"], langs => ["FR"]);
 
     *   Filter by regex:
 
-         wordlist( arg => ["/fof[aeiou]/"]);
+         wordlist(arg => ["/fof[aeiou]/"]);
 
     *   Select a wordlist with parameters:
 
-         wordlist( wordlists => ["MetaSyntactic=theme,dangdut"]);
+         wordlist(wordlists => ["MetaSyntactic=theme,dangdut"]);
 
     *   List installed wordlist modules:
 
-         wordlist( action => "list_installed");
+         wordlist(action => "list_installed");
 
     *   List wordlist modules available on CPAN:
 
-         wordlist( action => "list_cpan");
+         wordlist(action => "list_cpan");
 
     This function is not exported.
 
@@ -69,6 +91,14 @@ FUNCTIONS
     *   action => *str* (default: "grep")
 
     *   arg => *array[str]*
+
+    *   chars_ordered => *str*
+
+        Specify possible characters for the word (ordered).
+
+    *   chars_unordered => *str*
+
+        Specify possible characters for the word (unordered).
 
     *   color => *str* (default: "auto")
 
@@ -127,12 +157,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -149,26 +182,51 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-wordlist>.
 
+SEE ALSO
+    App::WordListUtils
+
+    App::GamesWordlist (games-wordlist) which greps from
+    "Games::Word::Wordlist::*" instead.
+
+    WordList and "WordList::*" modules.
+
+    arraydata from App::arraydata, hashdata from App::hashdata, and
+    tabledata from App::tabledata. These are newer projects that will
+    supersede WordList one day.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Ryo <roysharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014
+    by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=App-wordlist>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    App::GamesWordlist (games-wordlist) which greps from
-    "Games::Word::Wordlist::*" instead.
-
-    WordList and "WordList::*" modules.
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014 by
-    perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

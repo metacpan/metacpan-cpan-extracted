@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipInterfaces::ShipService::ShipPort;
-$Shipment::UPS::WSDL::ShipInterfaces::ShipService::ShipPort::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipInterfaces::ShipService::ShipPort::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -30,7 +30,7 @@ sub ProcessShipment {
     die "ProcessShipment must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ProcessShipment',
+        {   operation   => 'ProcessShipment',
             soap_action =>
               'http://onlinetools.ups.com/webservices/ShipBinding/v1.0',
             style => 'document',
@@ -40,7 +40,7 @@ sub ProcessShipment {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::ShipElements::ShipmentRequest )],
             },
             header => {
@@ -48,7 +48,7 @@ sub ProcessShipment {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
 
             },
@@ -83,7 +83,7 @@ sub ProcessShipConfirm {
       "ProcessShipConfirm must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ProcessShipConfirm',
+        {   operation   => 'ProcessShipConfirm',
             soap_action =>
               'http://onlinetools.ups.com/webservices/ShipBinding/v1.0',
             style => 'document',
@@ -102,7 +102,7 @@ sub ProcessShipConfirm {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
 
             },
@@ -136,7 +136,7 @@ sub ProcessShipAccept {
     die "ProcessShipAccept must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ProcessShipAccept',
+        {   operation   => 'ProcessShipAccept',
             soap_action =>
               'http://onlinetools.ups.com/webservices/ShipBinding/v1.0',
             style => 'document',
@@ -146,7 +146,7 @@ sub ProcessShipAccept {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest )],
             },
             header => {
@@ -154,7 +154,7 @@ sub ProcessShipAccept {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
 
             },
@@ -223,7 +223,7 @@ Shipment::UPS::WSDL::ShipInterfaces::ShipService::ShipPort
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

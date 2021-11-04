@@ -45,4 +45,3 @@ sub shout {
 	my $self = shift;
 	push @messages, "# FIXME: $self->{text} at $self->{file} line $self->{line}.\n";
 }
-

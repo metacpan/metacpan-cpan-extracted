@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::RatedPackageDetail;
-$Shipment::FedEx::WSDL::RateTypes::RatedPackageDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::RatedPackageDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ Class::Std::initialize();
               OversizeClass
               PackageRateDetail
 
-              )
+            )
         ],
         {   'TrackingIds'                 => \%TrackingIds_of,
             'GroupNumber'                 => \%GroupNumber_of,
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::RateTypes::RatedPackageDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

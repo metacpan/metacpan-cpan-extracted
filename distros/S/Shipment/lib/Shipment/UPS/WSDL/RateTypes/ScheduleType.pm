@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::ScheduleType;
-$Shipment::UPS::WSDL::RateTypes::ScheduleType::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateTypes::ScheduleType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        PickupDay
               Method
 
-              )
+            )
         ],
         {   'PickupDay' => \%PickupDay_of,
             'Method'    => \%Method_of,
@@ -61,7 +61,7 @@ Shipment::UPS::WSDL::RateTypes::ScheduleType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

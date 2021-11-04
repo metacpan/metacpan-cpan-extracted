@@ -161,24 +161,55 @@ qx.Class.define("callbackery.ui.Card", {
                         event = 'changeSelection';
                     }
                     if (event) {
-                        field.addListener(event, (e) => {
-                            let data = e.getData();
-                            let value;
-                            if (Array.isArray(data)) {
-                                value = data[0].getModel();
-                            }
-                            else {
-                                value = data;
-                            }
-                            var rpc = callbackery.data.Server.getInstance();
-                            this.__parentForm.setSelection({ data : this.__dataCache, key : fieldCfg.key, value : value });
-                            if (this.__buttonMap[this._updateAction]) {
-                                this.__buttonMap[this._updateAction].execute();
-                            }
-                            else {
-                                console.warn('No method for updateCard:', this._updateAction);
-                            }
-                        });
+                        if (event == 'changeSelection') {
+                            field.addListener(event, (e) => {
+                                let value = e.getData()[0].getModel();
+                                console.log('key=', key, ', event=', event, ', value=', e.getData());
+                                this.__parentForm.setSelection({ data : this.__dataCache, key : fieldCfg.key, value : value });
+                                if (this.__buttonMap[this._updateAction]) {
+                                    this.__buttonMap[this._updateAction].execute();
+                                }
+                                else {
+                                    console.warn('No method for updateCard:', this._updateAction);
+                                }
+                            });
+                        }
+                        else {
+                            // For input fields we collect multiple fast inputs and only store
+                            // if no new input events occur for a certain time
+                            let delay = 500; // msec
+                            let updateTimer, lastValue;
+
+                            // store input callback for updateTimer
+                            let storeInput = () => {
+                                updateTimer.stop();
+                                let value = field.getValue();
+                                if (value === lastValue) {
+                                    return;
+                                }
+                                lastValue = value;
+                                this.__parentForm.setSelection({ data : this.__dataCache, key : fieldCfg.key, value : value });
+                                if (this.__buttonMap[this._updateAction]) {
+                                    this.__buttonMap[this._updateAction].execute();
+                                }
+                                else {
+                                    console.warn('No method for updateCard:', this._updateAction);
+                                }
+                            };
+
+                            // called on inputs into the field
+                            field.addListener(event, (e) => {
+                                if (updateTimer) {
+                                    // delay storing on repeated inputs while timer is running
+                                    updateTimer.restart();
+                                }
+                                else {
+                                    // create and start timer on first input
+                                    updateTimer = new qx.event.Timer(delay);
+                                    updateTimer.addListener("interval", storeInput, this);
+                                }
+                            });
+                        }
                     }
                     this._add(field, fieldCfg.addSet);
                     fld[fieldCfg.key] = field;

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::RequestTransactionReferenceType;
-$Shipment::UPS::WSDL::TrackTypes::RequestTransactionReferenceType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::RequestTransactionReferenceType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -30,9 +30,9 @@ Class::Std::initialize();
         [   qw(        CustomerContext
               TransactionIdentifierPlayback
 
-              )
+            )
         ],
-        {   'CustomerContext' => \%CustomerContext_of,
+        {   'CustomerContext'               => \%CustomerContext_of,
             'TransactionIdentifierPlayback' =>
               \%TransactionIdentifierPlayback_of,
         },
@@ -64,7 +64,7 @@ Shipment::UPS::WSDL::TrackTypes::RequestTransactionReferenceType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

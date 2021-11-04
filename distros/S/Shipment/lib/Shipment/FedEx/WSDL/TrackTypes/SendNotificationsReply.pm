@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::SendNotificationsReply;
-$Shipment::FedEx::WSDL::TrackTypes::SendNotificationsReply::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::SendNotificationsReply::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Class::Std::initialize();
               PagingToken
               Packages
 
-              )
+            )
         ],
         {   'HighestSeverity'   => \%HighestSeverity_of,
             'Notifications'     => \%Notifications_of,
@@ -63,7 +63,7 @@ Class::Std::initialize();
             'MoreDataAvailable' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
             'PagingToken' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Packages' =>
+            'Packages'    =>
               'Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage',
         },
         {
@@ -96,7 +96,7 @@ Shipment::FedEx::WSDL::TrackTypes::SendNotificationsReply
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

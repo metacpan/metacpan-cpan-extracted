@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::ConsoleMessage;
-$Playwright::ConsoleMessage::VERSION = '0.016';
+$Playwright::ConsoleMessage::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,11 +18,15 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub args {
+sub spec {
+    return $Playwright::spec->{'ConsoleMessage'}{members};
+}
+
+sub type {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'args',
+        command => 'type',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -38,21 +42,21 @@ sub location {
     );
 }
 
-sub text {
+sub args {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'text',
+        command => 'args',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub type {
+sub text {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'type',
+        command => 'text',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -102,7 +106,7 @@ Playwright::ConsoleMessage - Automatically generated class for Playwright::Conso
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 
@@ -113,11 +117,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 args(@args)
+=head2 type(@args)
 
-Execute the ConsoleMessage::args playwright routine.
+Execute the ConsoleMessage::type playwright routine.
 
-See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-args> for more information.
+See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-type> for more information.
 
 =head2 location(@args)
 
@@ -125,17 +129,17 @@ Execute the ConsoleMessage::location playwright routine.
 
 See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-location> for more information.
 
+=head2 args(@args)
+
+Execute the ConsoleMessage::args playwright routine.
+
+See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-args> for more information.
+
 =head2 text(@args)
 
 Execute the ConsoleMessage::text playwright routine.
 
 See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-text> for more information.
-
-=head2 type(@args)
-
-Execute the ConsoleMessage::type playwright routine.
-
-See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-type> for more information.
 
 =head2 on(@args)
 

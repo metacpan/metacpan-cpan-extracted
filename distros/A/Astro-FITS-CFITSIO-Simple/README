@@ -1,50 +1,352 @@
-Astro-FITS-CFITSIO-Simple version 0.13
-======================================
+Astro::FITS::CFITSIO::Simple
 
 This module presents an uncomplicated interface to reading (and
-eventually writing) FITS files with the CFITSIO library.  It attempts
-to perform the intuitive action when left to its own devices, but much
-of its behavior can be controlled by an application.
+eventually writing) FITS files with the CFITSIO library. It attempts to
+perform the intuitive action when left to its own devices, but much of
+its behavior can be controlled by an application.
 
+  Reading FITS files
+
+rdfits reads numeric FITS data into PDL objects (piddles). String data
+(from tables) are stored in ordinary Perl arrays; references to those
+are returned. It recognizes image (primary or extension) and binary or
+ASCII tables.
+
+rdfits pays attention to what it is asked to read as well as the context
+in which it was called (i.e., whether an array or a scalar was
+requested). The default behavior when reading data from a single HDU
+(the default) is as follows:
+
+*       An image is always returned as a single piddle, regardless of
+        the calling context.
+
+          $img = rdfits( 'image.fits' );
+
+*       Table data are returned as a hash if no column names are
+        specified.
+
+          %table = rdfits( 'table.fits' );
+
+        In this case all columns are returned. However, if a list of
+        column names prefixed by the "-" character is given, these
+        columns will *not* be returned. For example:
+
+          %table = rdfits( 'table.fits', qw/ -status -boring / );
+
+        "Subtractive" column designations may not be mixed with
+        "additive" column designations.
+
+*       Table data are returned as a list if column names are specified
+        and rdfits was called in an array (list) context.
+
+          @coldata = rdfits( 'table.fits', 'col1', 'col2' );
+
+*       If a single column is read and rdfits is called in a scalar
+        context, the data are returned as a scalar (piddle or arrayref,
+        depending upon data type).
+
+          $coldata = rdfits( 'table.fits', 'col1' );
+
+Some of this behavior may be changed using the "rethash" option.
+
+Normally rdfits maps the FITS column type (double, long, etc) to the
+best matched PDL type. This may be overridden (for instance to promote
+floats to doubles) using the "dtypes" or "defdtype" options. Bit columns
+are a bit different. (See "Reading Bit Data").
+
+rdfits can optionally return the full FITS header. If an image is read,
+the resultant piddle's header is set to a hash tied to a
+Astro::FITS::Header object. For most intents and purposes, this is just
+like an ordinary piddle header.
+
+  $pdl = rdfits( 'image.fits' );
+  print $pdl->gethdr->{HDUNAME};
+
+Retrieving the header for table data is a little more complicated. See
+the rethdr option below for more information.
+
+See Astro::FITS::Header for more information on its representation of
+FITS headers.
+
+   Reading Bit Data
+
+Table data with type BIT are by default mapped onto a PDL type which
+best matches the FITS element size, with the packing of the bits
+preserved. The user may override this type using the "dtypes" or
+"defdtype" options (see the description under "Table Options" below).
+
+Another option is to treat each bit as an independent quantity, with
+each bit stored in its own piddle element. This may be accomplished by
+specifying the PDL type (via "dtypes" or "defdtype") as the string
+"logical". Bits will then be stored as bytes, with each byte
+representing a bit.
+
+  Functions
+
+rdfits
+    rdfits takes a single mandatory parameter which is either a file
+    name or a CFITSIO file pointer. With no other information provided,
+    it reads data from the first available (and recognizable) HDU. If
+    additional scalar values are provided, they are assumed to be column
+    names, and rdfits will search only for tables. The data are stored
+    as described in "Reading FITS files".
+
+    rdfits "croak()'s" upon error.
+
+    rdfits's behavior can be controlled via a hashref passed in as the
+    last argument:
+
+      rdfits($file, [...], \%opts );
+
+    There are three categories of options: those which affect how rdfits
+    finds an HDU to read; those which affect reading tables; and those
+    which affect reading of columns.
+
+    HDU options
+
+        extname This may be set to the exact name of the HDU to read.
+
+        extver  This may be set to the version of the HDU to read. It
+                requires that "extname" be set as well.
+
+        hdunum  The index of the HDU in the file. This may also be
+                appended to the file name in brackets, i.e. "file[1]".
+
+        hdutype The type of HDU to read. This may be one of the
+                following strings:
+
+                    img image      - read an image
+                    binary bintbl  - read a binary table
+                    ascii          - read an ascii table
+                    table          - read any type of table
+                    any            - read any type of data
+
+                If a particular HDU is requested and the HDU type
+                doesn't match, rdfits will croak.
+
+        resethdu
+                This takes a boolean value. If true, and rdfits was
+                passed a CFITSIO file pointer, the HDU pointer is stored
+                and reset just before rdfits returns. Defaults to false.
+
+    Table Options
+        These options are accepted only when reading tables. They will
+        cause an error otherwise.
+
+        dtypes
+        defdtype
+                Normally, rdfits will create the best fit PDL type for
+                each column read. A default datatype for all columns can
+                be set with "defdtype". Individual columns' datatypes
+                can be set with "dtypes".
+
+                "defdtype" takes a single value, a PDL::Type object.
+
+                   %data = rdfits( $file, { defdtype => double } );
+
+                "dtypes" takes a reference to a hash whose keys are the
+                column names and whose values are "PDL::Type" objects of
+                the type wanted. For example:
+
+                  ($a,$b,$c) =
+                    rdfits( $file, qw/ a b c /,
+                             { dtypes=>{ a=>float, c=>short } } );
+
+                This will force the PDL type of $a to float, and $c to
+                short, while choosing the best match datatype for $b. It
+                is not possible for the user to specify dtypes for
+                "LOGICAL" and "ASCII" type columns. "BIT" columns are
+                special; see "Reading Bit Data" above.
+
+        ninc    The number of rows to read incrementally. By default,
+                this number is set according to "fits_get_rowsize()" for
+                the table being read. This is best left unset.
+
+        nullval The value with which to fill in null data values. If PDL
+                has been built with bad value support, it defaults to
+                the bad value for the data type. If not, it defaults to
+                0, which signals CFITSIO to ignore null pixels.
+
+        rethash
+                  %data = rdfits('foo.fits', @cols, { rethash=>1 });
+
+                Normally when rdfits is invoked with a list of columns
+                to read, it returns a list of piddles. This Boolean
+                option indicates that it should return a hash (not a
+                hashref) whose keys are the lower-cased column names
+                with the corresponding piddles for values. This is the
+                default mode if no columns are specified.
+
+        rethdr  This Boolean option indicates that the HDU's header
+                should be returned as well as the data.
+
+                *   If the data are returned in a list, the header will
+                    be the first element of the list:
+
+                      ($hdr, @data ) =
+                        rdfits( 'foo.fits', @cols, { rethdr => 1 } );
+
+                    The header is returned as an Astro::FITS::Header
+                    object.
+
+                *   If the data are returned as a hash, an additional
+                    element in the hash is added, with a key of "_hdr".
+
+                      # return the HDU header
+                      %hash = rdfits( 'foo.fits', @cols,
+                                      { rethash => 1, rethdr => 1 } );
+                      $hdr = $hash{_hdr};
+
+                    The header is returned as an Astro::FITS::Header
+                    object.
+
+                *   If a single column is requested, and it is returned
+                    in a scalar, the returned piddle's header is set to
+                    a hash tied to a Astro::FITS::Header object. For
+                    most intents and purposes, this is just like an
+                    ordinary piddle header.
+
+                      $pdl = rdfits( 'foo.fits', $col,
+                                     { rethdr => 1 } );
+                      print $pdl->gethdr->{HDUNAME};
+
+                    See Astro::FITS::Header for more information on
+                    tieing to that class.
+
+        retinfo
+                  %data = rdfits('foo.fits', @cols, { retinfo=>1 });
+
+                This option specifies that the data will be returned as
+                a hash, keyed off of the lowercased column names. The
+                values in the hash are themselves hashes, with these
+                elements:
+
+                data
+                    The data read from the file
+
+                idx The index of the column in the file (unary based)
+
+                hdr A hashref containing the FITS keywords which are
+                    specific to the column (e.g., "TTYPE", "TLMAX",
+                    "TUNIT", etc.). The keys for these are the keyword
+                    names without the trailing column index.
+
+                For example,
+
+                  %data = rdfitsTable('foo.fits', 'x', { retinfo => 1 });
+
+                might result in the equivalent hash of
+
+                  $data{'x'} = {
+                            idx  => 11,
+                            data => PDL...,
+                            hdr => {
+                                ttype => 'x',
+                                cuni  => 'deg',
+                                tlmax => '8.1925000E+03',
+                                tcdlt => '-1.3666666666667E-04',
+                                tunit => 'pixel',
+                                tform => '1E',
+                                tlmin => '5.0000000E-01',
+                                tcrvl => '3.2972102733253E+02',
+                                tcrpx => '4.0965000000000E+03',
+                                tctyp => 'RA---TAN',
+                            },
+                          };
+
+        rfilter
+                  %data = rdfitsTable('foo.fits', 'x',
+                                      { rfilter => 'X < 3' } });
+
+                This specifies a CFITSIO-style row filtering
+                specification. Only the rows matching this filter will
+                be in the output variables. The filter has access to
+                *all* of the columns in the HDU, not just the ones being
+                read out. This can radically reduce memory requirements
+                if a complicated row selection is made.
+
+        status  This option indicates that progress status should be
+                output. status can take one of the following values:
+
+                a scalar
+                    If true, a progress bar is written to the standard
+                    error stream. If the Term::ProgressBar module is
+                    available, a fairly nice one is emitted. (The more
+                    primitive style may be forced by setting the value
+                    to -1).
+
+                a file glob
+                    In this case output is sent to the specified file
+                    handle.
+
+                an object reference
+                    If the object supports the print() and flush()
+                    methods, these are called to output the progress
+                    status. (Nice objects are, for example IO::File
+                    objects).
+
+                a code reference
+                    The code reference is called with two parameters:
+                    the number of rows read, and the total number to be
+                    read.
+
+                Typically output is produced approximately at 1%
+                increment steps.
+
+    Image Options
+        These options are accepted only when reading images. They will
+        cause an error otherwise.
+
+        dtype   Normally, rdfits will create the best fit PDL type for
+                the image data. The application can override the output
+                datatype with this option. The argument should be a
+                "PDL::Type" object. For example:
+
+                  $float_img = rdfits( $file, { dtype => float } );
+
+        nullval The value with which to fill in null data values. If PDL
+                has been built with bad value support, it defaults to
+                the bad value for the data type. If not, it defaults to
+                0, which signals CFITSIO to ignore null pixels.
+
+rdfitstbl
+    This is a thin wrapper around rdfits which forces a single table to
+    be read. It is equivalent to invoking rdfits with the options.
+
+      { hdutype => 'table' }
+
+    It has the same calling convention as rdfits.
+
+rdfitsimg
+    This is a thin wrapper around rdfits which forces a single table to
+    be read. It is equivalent to invoking rdfits with the options
+
+      { hdutype => 'image' }
+
+    It has the same calling convention as rdfits.
 
 INSTALLATION
 
-To install this module type the following:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-DEPENDENCIES
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-This module requires these other modules and libraries:
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
-  Params::Validate
-  Astro::FITS::Header
-  Astro::FITS::Header::CFITSIO
-  Astro::FITS::CFITSIO
-  Astro::FITS::CFITSIO::CheckStatus
+COPYRIGHT AND LICENSE
 
-This module was developed against version 2.8.1 of
-Astro::FITS::Header, which has bugs in it which must be patched in
-order for Astro::FITS::CFITSIO::Simple to operate.  Patches which fix
-the problems on the following web sites.
+This software is Copyright (c) 2008 by Smithsonian Astrophysical
+Observatory.
 
-        https://rt.cpan.org/NoAuth/Bug.html?id=4816
-        https://rt.cpan.org/NoAuth/Bug.html?id=11722
+This is free software, licensed under:
 
-Asgtro::FITS::Header version 3.000 does not suffer from these bugs, and
-does not require the patches.
-
-COPYRIGHT AND LICENCE
-
-Put the correct copyright and licence information here.
-
-Copyright (C) 2004,2005 by the Smithsonian Astrophysical Observatory
-
-This software is released under the GNU General Public License. You
-may find a copy at http://www.fsf.org/copyleft/gpl.html.
-
-
-
+  The GNU General Public License, Version 3, June 2007

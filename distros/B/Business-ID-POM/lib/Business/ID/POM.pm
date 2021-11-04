@@ -1,16 +1,17 @@
 package Business::ID::POM;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-04'; # DATE
-our $DIST = 'Business-ID-POM'; # DIST
-our $VERSION = '0.003'; # VERSION
-
 use 5.010001;
 use warnings;
 use strict;
 use Log::ger;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-21'; # DATE
+our $DIST = 'Business-ID-POM'; # DIST
+our $VERSION = '0.004'; # VERSION
+
 our @EXPORT_OK = qw(parse_pom_reg_code);
 
 our %SPEC;
@@ -43,6 +44,9 @@ _
         {args=>{code=>'NC14191300159'}},
         {args=>{code=>'POM TR092699241'}},
         {args=>{code=>'FF182600791'}},
+        {args=>{code=>'SD181353251'}},
+        {args=>{code=>'SI184509731'}},
+        {args=>{code=>'SL091300431'}},
     ],
 };
 sub parse_pom_reg_code {
@@ -141,6 +145,16 @@ sub parse_pom_reg_code {
         elsif ($res->{drug_dosage_form_code} eq '81') { $res->{drug_dosage_form_id} = "tablet dispersi (81)" }
         else { log_warn "Unknown drug dosage form code ($res->{drug_dosage_form_code}), known codes include 01/02/04/10/etc" }
 
+    } elsif ($res->{category_code} =~ /\AS[DIL]\z/) {
+
+        $res->{category_id} =
+            $res->{category_code} eq 'SD' ? 'Suplemen kesehatan (S), dalam negeri (D)' :
+            $res->{category_code} eq 'SI' ? 'Suplemen kesehatan (S), impor (I)' :
+            'Suplemen kesehatan (S), lisensi (L)';
+
+        $res->{number} =~ /\A([0-9]{9})\z/
+            or return [400, "S number needs to be 9-digit number"];
+
     } elsif ($res->{category_code} =~ /\AN(.?)\z/) {
 
         $res->{cosmetic_category_code} = $1;
@@ -208,6 +222,12 @@ sub parse_pom_reg_code {
         $res->{number} =~ /\A([0-9]{9})\z/
             or return [400, "FF number needs to be 9-digit number"];
 
+    } elsif ($res->{category_code} =~ /\AHT\z/) {
+
+        $res->{category_id} = 'Herbal terstandar (HT)';
+        $res->{number} =~ /\A([0-9]{9})\z/
+            or return [400, "HT number needs to be 9-digit number"];
+
     } else {
 
         return [400, "Unknown category code ($res->{category_code}), known category codes include MD/ML/TR/TI/SD/SI/etc"];
@@ -232,7 +252,7 @@ Business::ID::POM - Parse food/drug registration code published by the Indonesia
 
 =head1 VERSION
 
-This document describes version 0.003 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2021-06-04.
+This document describes version 0.004 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2021-10-21.
 
 =head1 DESCRIPTION
 
@@ -241,16 +261,14 @@ the Indonesian National Agency of Drug and Food Control (BPOM, Badan Pengawas
 Obat dan Makanan). These codes include:
 
  MD, ML - food
- SI, SD - health supplements
+ SI, SD, SL - health supplements
  NA, NB, NC, ND, NE - cosmetics
- TR, TI - traditional medicine
+ TR, TI, HT, FF - traditional, herbal medicine, & phytopharmaceutical products
  D, G - pharmaceutical products
- FF - phytopharmaceutical products
 
 Not yet included BPOM codes:
 
  CA, CD, CL - cosmetics?
- HT - standardized herbal (herbal terstandar)
 
 Related codes:
 
@@ -386,6 +404,57 @@ Result:
    {},
  ]
 
+=item * Example #6:
+
+ parse_pom_reg_code(code => "SD181353251");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     category_code => "SD",
+     category_id => "Suplemen kesehatan (S), dalam negeri (D)",
+     number => 181353251,
+   },
+   {},
+ ]
+
+=item * Example #7:
+
+ parse_pom_reg_code(code => "SI184509731");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     category_code => "SI",
+     category_id => "Suplemen kesehatan (S), impor (I)",
+     number => 184509731,
+   },
+   {},
+ ]
+
+=item * Example #8:
+
+ parse_pom_reg_code(code => "SL091300431");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     category_code => "SL",
+     category_id => "Suplemen kesehatan (S), lisensi (L)",
+     number => "091300431",
+   },
+   {},
+ ]
+
 =back
 
 This routine does not check whether the specified code is actually registered.
@@ -423,14 +492,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Business-I
 
 Source repository is at L<https://github.com/perlancar/perl-Business-ID-POM>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-POM>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Business::ID::PIRT>
@@ -439,11 +500,36 @@ L<Business::ID::PIRT>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-POM>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

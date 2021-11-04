@@ -1,0 +1,103 @@
+use Modern::Perl;
+
+use Term::ANSIColor;
+
+no warnings 'redefine';
+
+my @plugins = (
+    'ReadLineHistory', # history saved across sessions
+    'Colors', # colorize return value and errors
+    'Refresh', # refresh before every eval
+    'Interrupt', # improve handling of ^C
+    'OutputCache', # access previous results
+    'Nopaste', # paste session with #nopaste
+    'DDS', # format output with Data::Dumper::Concise
+    'PPI', # PPI dumping of Perl code
+    'MultiLine::PPI', # allow multiple lines
+    'Completion',
+    'CompletionDriver::Keywords', # substr, while, etc
+    'CompletionDriver::LexEnv', # current environment
+    'CompletionDriver::Globals', # global variables
+    'CompletionDriver::INC', # loading new modules
+    'CompletionDriver::Methods', # class method completion
+    'CompletionDriver::Turtles', # turtle command completion
+);
+$_REPL->load_plugin($_) for @plugins;
+$_REPL->normal_color('blue');
+$Devel::REPL::Plugin::Packages::PKG_SAVE = 'main';
+
+{
+ use lib './lib';
+
+my ($username, $password, $contract_id, $customer_number);
+
+$username      ||= $ENV{'CANADA_POST_USERNAME'};
+$password ||= $ENV{'CANADA_POST_PASSWORD'};
+$contract_id  ||= $ENV{'CANADA_POST_CONTRACT_ID'};
+$customer_number  ||= $ENV{'CANADA_POST_CUSTOMER_NUMBER'};
+
+use Shipment::CanadaPost;
+use Shipment::Address;
+use Shipment::Package;
+
+my $from = Shipment::Address->new( 
+  name => 'Andrew Baerg',
+  company => 'Foo Bar',
+  address1 => '67 Coventry View NE #14',
+  city => 'Calgary',
+  province => 'Alberta',
+  country => 'Canada',
+  postal_code => 'T2A6T8',
+  phone => '14032261851',
+);
+
+my $to = Shipment::Address->new(
+  name => 'Foo Bar',
+  company => 'Com\'pany',
+  address1 => '123 Any Street NW',
+  address2 => '#2',
+  city => 'Los Angeles',
+  province => 'CA',
+  country => 'US',
+  postal_code => '90210',
+  phone => '(403)669-8017 x123',
+  email => 'baerg@yoursole.com',
+);
+
+my @packages = (
+  Shipment::Package->new(
+    weight => 4.4,
+    length => 12,
+    width => 12,
+    height => 2,
+    items => [
+      {
+        quantity => 5,
+        customs_description => 'Footbeds',
+        customs_value => 40,
+        weight => 0.4,
+        origin_country => 'KR',
+      },
+    ],
+  ),
+);
+
+my $shipment = Shipment::CanadaPost->new(
+  username => $username,
+  password => $password,
+  customer_number => $customer_number,
+  contract_id => $contract_id,
+  from_address => $from,
+  to_address => $to,
+  packages => \@packages,
+  printer_type => 'thermal',
+  references => [ 'foo', undef, 'bar' ],
+);
+
+}
+
+END {
+ print "\n";
+}
+
+

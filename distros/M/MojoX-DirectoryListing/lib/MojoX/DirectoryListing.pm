@@ -8,7 +8,7 @@ use base 'Exporter';
 use Cwd;
 
 our @EXPORT = ('serve_directory_listing');
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 use constant TEXT_403 => 'Forbidden';
 use constant TEXT_404 => 'File not found';
@@ -417,7 +417,7 @@ sub _serve_icon {
     my $icon = $self->param('icon');
     my $bytes = MojoX::DirectoryListing::Icons::get_icon( $icon );
     $self->render( format => 'gif',
-		   data => $bytes );	
+		   data => $bytes );
 }
 
 1;
@@ -430,7 +430,7 @@ MojoX::DirectoryListing - show Apache-style directory listings in your Mojolicio
 
 =head1 VERSION
 
-0.09
+0.11
 
 =head1 SYNOPSIS
 
@@ -462,7 +462,7 @@ C<public/data-files>), you would call
 
     serve_directory_listings( '/data-files' );
 
-Now a request to your app for C</dara-files> will display a listing
+Now a request to your app for C</data-files> will display a listing
 of all the files under C<public/data-files> .
 
 To serve a directory listing for a directory that is B<not> under
@@ -720,7 +720,7 @@ L<Plack::App::Directory>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2017 Marty O'Brien.
+Copyright 2013-2021 Marty O'Brien.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

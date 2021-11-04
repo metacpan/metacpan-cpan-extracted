@@ -1,5 +1,5 @@
 package Shipment::Purolator;
-$Shipment::Purolator::VERSION = '3.05';
+$Shipment::Purolator::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ has 'proxy_domain' => (
         qw(
           devwebservices.purolator.com
           webservices.purolator.com
-          )
+        )
     ],
     default => 'devwebservices.purolator.com',
 );
@@ -96,7 +96,7 @@ sub _build_services {
         my %services;
 
         $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-        $response = $interface->GetServicesOptions(
+        $response                    = $interface->GetServicesOptions(
             {   BillingAccountNumber => $self->account,
                 SenderAddress        => {
                     City       => $self->from_address()->city,
@@ -168,7 +168,7 @@ sub _build_services {
                       ->get_Error()->[0]->get_Description->get_value);
             }
             catch {
-                warn $_ if $self->debug;
+                warn $_                         if $self->debug;
                 warn $response->get_faultstring if $self->debug;
                 $self->error($response->get_faultstring->get_value);
             };
@@ -193,7 +193,7 @@ sub rate {
         $service_id = $self->services->{$service_id}->id;
     }
     catch {
-        warn $_ if $self->debug;
+        warn $_                                    if $self->debug;
         warn "service ($service_id) not available" if $self->debug;
         $self->error("service ($service_id) not available");
         $service_id = '';
@@ -229,7 +229,7 @@ sub rate {
         if ($self->package_type eq 'custom') {
             push @pieces,
               { Weight => {
-                    Value => sprintf("%.0f", $_->weight) || 1,
+                    Value      => sprintf("%.0f", $_->weight) || 1,
                     WeightUnit => $self->weight_unit,
                 },
                 Length => {
@@ -249,7 +249,7 @@ sub rate {
         else {
             push @pieces,
               { Weight => {
-                    Value => sprintf("%.0f", $_->weight) || 1,
+                    Value      => sprintf("%.0f", $_->weight) || 1,
                     WeightUnit => $self->weight_unit,
                 },
               };
@@ -272,8 +272,8 @@ sub rate {
         {   Shipment => {
                 SenderInformation => {
                     Address => {
-                        Name    => $self->from_address->name,
-                        Company => $self->from_address->company,
+                        Name         => $self->from_address->name,
+                        Company      => $self->from_address->company,
                         StreetNumber =>
                           $self->from_address->address_components->{number},
                         StreetName =>
@@ -298,8 +298,8 @@ sub rate {
                 },
                 ReceiverInformation => {
                     Address => {
-                        Name    => $self->to_address->name,
-                        Company => $self->to_address->company,
+                        Name         => $self->to_address->name,
+                        Company      => $self->to_address->company,
                         StreetNumber =>
                           $self->to_address->address_components->{number},
                         StreetName =>
@@ -323,11 +323,11 @@ sub rate {
                 PackageInformation => {
                     ServiceID   => $service_id,
                     TotalWeight => {
-                        Value => sprintf("%.0f", $total_weight) || 1,
+                        Value      => sprintf("%.0f", $total_weight) || 1,
                         WeightUnit => $self->weight_unit,
                     },
-                    TotalPieces       => scalar @{$self->packages},
-                    PiecesInformation => {Piece => \@pieces,},
+                    TotalPieces        => scalar @{$self->packages},
+                    PiecesInformation  => {Piece => \@pieces,},
                     OptionsInformation =>
                       {Options => {OptionIDValuePair => \@options,},},
                 },
@@ -396,7 +396,7 @@ sub rate {
                   ->get_Error()->[0]->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -412,7 +412,7 @@ sub ship {
         $service_id = $self->services->{$service_id}->id;
     }
     catch {
-        warn $_ if $self->debug;
+        warn $_                                    if $self->debug;
         warn "service ($service_id) not available" if $self->debug;
         $self->error("service ($service_id) not available");
         $service_id = '';
@@ -456,7 +456,7 @@ sub ship {
         if ($self->package_type eq 'custom') {
             push @pieces,
               { Weight => {
-                    Value => sprintf("%.0f", $_->weight) || 1,
+                    Value      => sprintf("%.0f", $_->weight) || 1,
                     WeightUnit => $self->weight_unit,
                 },
                 Length => {
@@ -476,7 +476,7 @@ sub ship {
         else {
             push @pieces,
               { Weight => {
-                    Value => sprintf("%.0f", $_->weight) || 1,
+                    Value      => sprintf("%.0f", $_->weight) || 1,
                     WeightUnit => $self->weight_unit,
                 },
               };
@@ -499,8 +499,8 @@ sub ship {
         {   Shipment => {
                 SenderInformation => {
                     Address => {
-                        Name    => $self->from_address->name,
-                        Company => $self->from_address->company,
+                        Name         => $self->from_address->name,
+                        Company      => $self->from_address->company,
                         StreetNumber =>
                           $self->from_address->address_components->{number},
                         StreetName =>
@@ -525,8 +525,8 @@ sub ship {
                 },
                 ReceiverInformation => {
                     Address => {
-                        Name    => $self->to_address->name,
-                        Company => $self->to_address->company,
+                        Name         => $self->to_address->name,
+                        Company      => $self->to_address->company,
                         StreetNumber =>
                           $self->to_address->address_components->{number},
                         StreetName =>
@@ -550,11 +550,11 @@ sub ship {
                 PackageInformation => {
                     ServiceID   => $service_id,
                     TotalWeight => {
-                        Value => sprintf("%.0f", $total_weight) || 1,
+                        Value      => sprintf("%.0f", $total_weight) || 1,
                         WeightUnit => $self->weight_unit,
                     },
-                    TotalPieces       => scalar @{$self->packages},
-                    PiecesInformation => {Piece => \@pieces,},
+                    TotalPieces        => scalar @{$self->packages},
+                    PiecesInformation  => {Piece => \@pieces,},
                     OptionsInformation =>
                       {Options => {OptionIDValuePair => \@options,},},
                 },
@@ -575,7 +575,7 @@ sub ship {
                     Reference4 => $self->get_reference(3),
                 },
                 NotificationInformation => $notification_information,
-                OtherInformation =>
+                OtherInformation        =>
                   {SpecialInstructions => $self->special_instructions,},
             },
             PrinterType => $printer_type_map{$self->printer_type}
@@ -616,7 +616,7 @@ sub ship {
                   ->get_Error()->[0]->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -673,7 +673,7 @@ sub fetch_documents {
                   ->get_Error()->[0]->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -681,7 +681,7 @@ sub fetch_documents {
 
     use LWP::UserAgent;
     use Shipment::Label;
-    my $ua = LWP::UserAgent->new('Shipping::Purolator');
+    my $ua  = LWP::UserAgent->new('Shipping::Purolator');
     my $req = HTTP::Request->new(GET => $document_url);
 
     ## for multi-piece shipments, the labels are not always ready immediately after generating the shipment... try 10 times, sleeping for a second in between each try.
@@ -770,7 +770,7 @@ sub cancel {
                   ->get_Error()->[0]->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -815,9 +815,8 @@ sub end_of_day {
 
     try {
         use LWP::UserAgent;
-        my $ua = LWP::UserAgent->new('Shipping::Purolator');
-        my $req =
-          HTTP::Request->new(
+        my $ua  = LWP::UserAgent->new('Shipping::Purolator');
+        my $req = HTTP::Request->new(
             GET => $response->get_ManifestBatches()->[0]->get_ManifestBatch()
               ->get_ManifestBatchDetails->get_ManifestBatchDetail->get_URL()
               ->get_value);
@@ -840,7 +839,7 @@ sub end_of_day {
                   ->get_Error()->[0]->get_Description->get_value);
         }
         catch {
-            warn $_ if $self->debug;
+            warn $_                         if $self->debug;
             warn $response->get_faultstring if $self->debug;
             $self->error($response->get_faultstring->get_value);
         };
@@ -863,7 +862,7 @@ Shipment::Purolator
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

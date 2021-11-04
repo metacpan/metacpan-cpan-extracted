@@ -32,12 +32,12 @@ optional_features: {}
 provides:
   App::Licensecheck:
     file: lib/App/Licensecheck.pm
-    version: v3.2.12
+    version: v3.2.13
 recommends:
   re::engine::RE2: '0'
 requires:
   Array::IntSpan: '0'
-  Encode: '0'
+  Encode: '2.93'
   Fcntl: '0'
   Getopt::Long: '2.24'
   IO::Interactive: '0'
@@ -58,14 +58,14 @@ requires:
   autodie: '0'
   experimental: '0'
   namespace::clean: '0'
-  perl: '5.014000'
+  perl: '5.012000'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project
   bugtracker: https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck
   homepage: https://metacpan.org/pod/App::Licensecheck
   license: http://www.gnu.org/licenses/agpl-3.0.txt
   repository: https://salsa.debian.org/build-common-team/licensecheck.git
-version: v3.2.12
+version: v3.2.13
 x_contributors:
   - 'Paul Wise <pabs@debian.org>'
 x_help_wanted:

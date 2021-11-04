@@ -417,6 +417,12 @@ Danish locale.
    1995-12-22T09:05:02 = 22. dec. 1995 e.Kr.
   -0010-09-15T04:44:23 = 15. sep. -10 f.Kr.
 
+=head3 GyMd (d.M.y GGGGG)
+
+   2008-02-05T18:30:30 = 5.2.2008 eKr
+   1995-12-22T09:05:02 = 22.12.1995 eKr
+  -0010-09-15T04:44:23 = 15.9.-10 fKr
+
 =head3 H (HH)
 
    2008-02-05T18:30:30 = 18
@@ -477,17 +483,17 @@ Danish locale.
    1995-12-22T09:05:02 = fre. 22. december
   -0010-09-15T04:44:23 = lør. 15. september
 
-=head3 MMMMW-count-one ('uge' W 'i' MMMM)
+=head3 MMMMW-count-one (W. 'uge' 'i' MMMM)
 
-   2008-02-05T18:30:30 = uge 1 i februar
-   1995-12-22T09:05:02 = uge 3 i december
-  -0010-09-15T04:44:23 = uge 2 i september
+   2008-02-05T18:30:30 = 1. uge i februar
+   1995-12-22T09:05:02 = 3. uge i december
+  -0010-09-15T04:44:23 = 2. uge i september
 
-=head3 MMMMW-count-other ('uge' W 'i' MMMM)
+=head3 MMMMW-count-other (W. 'uge' 'i' MMMM)
 
-   2008-02-05T18:30:30 = uge 1 i februar
-   1995-12-22T09:05:02 = uge 3 i december
-  -0010-09-15T04:44:23 = uge 2 i september
+   2008-02-05T18:30:30 = 1. uge i februar
+   1995-12-22T09:05:02 = 3. uge i december
+  -0010-09-15T04:44:23 = 2. uge i september
 
 =head3 MMMMd (d. MMMM)
 

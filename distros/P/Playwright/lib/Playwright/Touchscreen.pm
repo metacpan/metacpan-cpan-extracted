@@ -9,13 +9,17 @@ use strict;
 use warnings;
 
 package Playwright::Touchscreen;
-$Playwright::Touchscreen::VERSION = '0.016';
+$Playwright::Touchscreen::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
     my ( $self, %options ) = @_;
     $options{type} = 'Touchscreen';
     return $self->SUPER::new(%options);
+}
+
+sub spec {
+    return $Playwright::spec->{'Touchscreen'}{members};
 }
 
 sub tap {
@@ -72,7 +76,7 @@ Playwright::Touchscreen - Automatically generated class for Playwright::Touchscr
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 

@@ -1,5 +1,5 @@
 package CHI::CacheObject;
-$CHI::CacheObject::VERSION = '0.60';
+$CHI::CacheObject::VERSION = '0.61';
 use CHI::Constants qw(CHI_Max_Time);
 use Encode;
 use strict;
@@ -178,7 +178,7 @@ CHI::CacheObject - Contains information about cache entries
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -243,7 +243,7 @@ Jonathan Swartz <swartz@pobox.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Jonathan Swartz.
+This software is copyright (c) 2021 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

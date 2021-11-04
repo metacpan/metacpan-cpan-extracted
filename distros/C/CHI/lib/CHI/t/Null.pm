@@ -1,5 +1,5 @@
 package CHI::t::Null;
-$CHI::t::Null::VERSION = '0.60';
+$CHI::t::Null::VERSION = '0.61';
 use strict;
 use warnings;
 use CHI::Test;

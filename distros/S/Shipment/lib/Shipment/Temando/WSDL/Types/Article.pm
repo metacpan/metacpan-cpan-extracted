@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Article;
-$Shipment::Temando::WSDL::Types::Article::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Article::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               labelDocument
               labelDocumentType
 
-              )
+            )
         ],
         {   'anythingIndex'     => \%anythingIndex_of,
             'articleNumber'     => \%articleNumber_of,
@@ -76,7 +76,7 @@ Shipment::Temando::WSDL::Types::Article
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

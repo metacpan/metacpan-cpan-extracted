@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::InsertCodeOutput;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-21'; # DATE
+our $DATE = '2021-06-07'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-InsertCodeOutput'; # DIST
-our $VERSION = '0.044'; # VERSION
+our $VERSION = '0.045'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,8 +33,8 @@ sub munge_file {
     my ($self, $file) = @_;
     my $content_as_bytes = $file->encoded_content;
     if ($content_as_bytes =~ s{
-                                  ^\#\s*CODE:\s*(.*)\s*(?:\R|\z) |
-                                  ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE\s*(?:\R|\z)
+                                  ^\#\s*CODE:\s*(.*)[ \t]*(?:\R|\z) |
+                                  ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE[ \t]*(?:\R|\z)
                           }{
                               my $output = $self->_code_output($1 // $2);
                               $output .= "\n" unless $output =~ /\R\z/;
@@ -79,7 +79,7 @@ Dist::Zilla::Plugin::InsertCodeOutput - Insert the output of Perl code into your
 
 =head1 VERSION
 
-This document describes version 0.044 of Dist::Zilla::Plugin::InsertCodeOutput (from Perl distribution Dist-Zilla-Plugin-InsertCodeOutput), released on 2021-05-21.
+This document describes version 0.045 of Dist::Zilla::Plugin::InsertCodeOutput (from Perl distribution Dist-Zilla-Plugin-InsertCodeOutput), released on 2021-06-07.
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,7 @@ Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-In
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCodeOutput/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCodeOutput>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -143,6 +143,22 @@ L<Dist::Zilla::Plugin::InsertExample>
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords perlancar (@netbook-zenbook) Steven Haryanto (on Asus Zenbook)
+
+=over 4
+
+=item *
+
+perlancar (@netbook-zenbook) <perlancar@gmail.com>
+
+=item *
+
+Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

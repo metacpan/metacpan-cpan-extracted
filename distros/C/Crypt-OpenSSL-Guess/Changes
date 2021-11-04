@@ -1,5 +1,10 @@
 Revision history for Perl extension Crypt-OpenSSL-Guess
 
+0.14 2021-10-28T15:35:02Z
+
+    - macOS: check dylib exists in library paths (PR#11)
+    - backport from Net::SSLeay 1.91_01 (PR#10)
+
 0.13 2021-05-03T15:37:39Z
 
     - use --installed option while executing brew --prefix (PR#9 @skaji++)

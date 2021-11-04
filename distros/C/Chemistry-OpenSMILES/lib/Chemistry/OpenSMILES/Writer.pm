@@ -6,9 +6,10 @@ use warnings;
 use Chemistry::OpenSMILES qw( is_aromatic is_chiral );
 use Chemistry::OpenSMILES::Parser;
 use Graph::Traversal::DFS;
+use List::Util qw(all uniq);
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.5.1'; # VERSION
+our $VERSION = '0.7.0'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -37,24 +38,27 @@ sub write_SMILES
         my $nrings = 0;
         my %seen_rings;
         my @chiral;
+        my %discovered_from;
 
         my $rings = {};
 
         my $operations = {
-            tree_edge     => sub { if( $vertex_symbols{$_[1]} ) {
-                                       @_ = ( $_[1], $_[0], $_[2] );
+            tree_edge     => sub { my( $seen, $unseen, $self ) = @_;
+                                   if( $vertex_symbols{$unseen} ) {
+                                       ( $seen, $unseen ) = ( $unseen, $seen );
                                    }
-                                   push @symbols, _tree_edge( @_ ) },
+                                   push @symbols, _tree_edge( $seen, $unseen, $self, $order_sub );
+                                   $discovered_from{$unseen} = $seen },
 
             non_tree_edge => sub { my @sorted = sort { $vertex_symbols{$a} <=>
                                                        $vertex_symbols{$b} }
                                                      @_[0..1];
                                    $rings->{$vertex_symbols{$sorted[0]}}
                                            {$vertex_symbols{$sorted[1]}} =
-                                        _depict_bond( @sorted, $graph ); },
+                                        _depict_bond( @sorted, $graph ) },
 
             pre  => sub { my( $vertex, $dfs ) = @_;
-                          push @chiral, $vertex if is_chiral( $vertex );
+                          push @chiral, $vertex if is_chiral $vertex;
                           push @symbols,
                           _pre_vertex( { map { $_ => $vertex->{$_} }
                                          grep { $_ ne 'chirality' }
@@ -85,16 +89,48 @@ sub write_SMILES
 
         # Dealing with chirality
         for my $atom (@chiral) {
-            next unless $atom->{chirality} =~ /^@@?/;
+            next unless $atom->{chirality} =~ /^@@?$/;
 
-            my @neighbours = map { $_->{number} }
-                             sort { $vertex_symbols{$a} <=>
-                                    $vertex_symbols{$b} }
-                             $graph->neighbours($atom);
-            next unless scalar @neighbours == 4;
+            my @neighbours = $graph->neighbours($atom);
+            if( scalar @neighbours != 4 ) {
+                # TODO: process also configurations other than tetrahedral
+                warn "chirality '$atom->{chirality}' observed for atom " .
+                     'with ' . scalar @neighbours . ' neighbours, can only ' .
+                     'process tetrahedral chiral centers' . "\n";
+                next;
+            }
 
-            my $chirality_now = _tetrahedral_chirality( $atom->{chirality},
-                                                        @neighbours );
+            my $chirality_now = $atom->{chirality};
+            if( $atom->{chirality_neighbours} ) {
+                my %indices;
+                for (0..$#{$atom->{chirality_neighbours}}) {
+                    $indices{$vertex_symbols{$atom->{chirality_neighbours}[$_]}} = $_;
+                }
+
+                my @order_new;
+                # In newly established order, the atom from which this one
+                # is discovered (left hand side) will be the first, if any
+                if( $discovered_from{$atom} ) {
+                    push @order_new, $vertex_symbols{$discovered_from{$atom}};
+                }
+                # Second, there will be ring bonds as they are added the
+                # first of all the neighbours
+                if( $rings->{$vertex_symbols{$atom}} ) {
+                    push @order_new, sort { $a <=> $b }
+                                     keys %{$rings->{$vertex_symbols{$atom}}};
+                }
+                # Finally, all neighbours are added, uniq will remove duplicates
+                push @order_new, sort { $a <=> $b }
+                                 map  { $vertex_symbols{$_} }
+                                      @neighbours;
+                @order_new = uniq @order_new;
+
+                if( join( '', _permutation_order( map { $indices{$_} } @order_new ) ) ne
+                    '0123' ) {
+                    $chirality_now = $chirality_now eq '@' ? '@@' : '@';
+                }
+            }
+
             my $parser = Chemistry::OpenSMILES::Parser->new;
             my( $graph_reparsed ) = $parser->parse( $symbols[$vertex_symbols{$atom}],
                                                     { raw => 1 } );
@@ -166,7 +202,7 @@ sub _pre_vertex
         $is_simple = 0;
     }
 
-    if( is_chiral( $vertex ) ) {
+    if( is_chiral $vertex ) {
         $atom .= $vertex->{chirality};
         $is_simple = 0;
     }
@@ -204,36 +240,26 @@ sub _depict_bond
     return $bond eq '/' ? '\\' : '/';
 }
 
-# Invert the tetrahedral chirality sign if the order of attachments
-# has changed from clockwise to counter-clockwise and vice versa.
-sub _tetrahedral_chirality
+# Reorder a permutation of elements 0, 1, 2 and 3 by taking an element
+# and moving it two places either forward or backward in the line. This
+# subroutine is used to check whether a sign change of tetragonal
+# chirality is required or not.
+sub _permutation_order
 {
-    my( $chirality, @numbers ) = @_;
+    # Safeguard against endless cycles due to undefined values
+    return unless scalar @_ == 4;
+    return unless all { defined } @_;
 
-    # Translating the numbers to range of 0..3
-    my @indices = sort { $numbers[$a] <=> $numbers[$b] } 0..3;
-    foreach (0..3) {
-        $numbers[$indices[$_]] = $_;
+    while( $_[2] == 0 || $_[3] == 0 ) {
+        @_ = ( $_[0], @_[2..3], $_[1] );
     }
-
-    # First attachment is written on left hand side of the chiral
-    # center, here it is called $direction
-    my $direction = shift @numbers;
-
-    # Cyclically sorting the rest of the attachments
-    while( $numbers[0] > $numbers[1] || $numbers[0] > $numbers[2] ) {
-        push @numbers, shift @numbers;
+    if( $_[0] != 0 ) {
+        @_ = ( @_[1..2], $_[0], $_[3] );
     }
-
-    # Checking whether the direction has been changed
-    if( ($direction == 0 && $numbers[1] == 2) ||
-        ($direction == 1 && $numbers[1] == 3) ||
-        ($direction == 2 && $numbers[1] == 1) ||
-        ($direction == 3 && $numbers[1] == 2) ) {
-        return $chirality;
-    } else {
-        return $chirality eq '@' ? '@@' : '@';
+    while( $_[1] != 1 ) {
+        @_[1..3] = ( @_[2..3], $_[1] );
     }
+    return @_;
 }
 
 sub _order

@@ -1,5 +1,8 @@
 Revision history for perl distribution App-proxyforurl
 
+0.11 2021-10-20T13:27:26+0900
+ - Skip test for CPAN smokers
+
 0.10 2021-10-06T08:11:17+0900
  - Need to check $? instead of $! if gethostbyname fails #5
 

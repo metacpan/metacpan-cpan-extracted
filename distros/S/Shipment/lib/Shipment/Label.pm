@@ -1,5 +1,5 @@
 package Shipment::Label;
-$Shipment::Label::VERSION = '3.05';
+$Shipment::Label::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -73,7 +73,7 @@ Shipment::Label
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

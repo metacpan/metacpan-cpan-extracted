@@ -1,5 +1,8 @@
 Build.PL
 Changes
+hax/newOP_CUSTOM.c.inc
+hax/op_sibling_splice.c.inc
+hax/optree-additions.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
 lib/Syntax/Keyword/Try.pm

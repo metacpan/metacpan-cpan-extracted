@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.40;
 
-package Device::Chip::MAX44009 0.02;
+package Device::Chip::MAX44009 0.03;
 class Device::Chip::MAX44009
    extends Device::Chip::Base::RegisteredI2C;
 
@@ -134,11 +134,9 @@ async method read_lux ()
    # Ugh.
    my $raw = await $self->protocol->txn(async sub {
       my ( $helper ) = @_;
-      await $helper->write( pack "C", REG_LUXH );
-      my $byteh = await $helper->read( 1 );
-      await $helper->write( pack "C", REG_LUXL );
-      my $bytel = await $helper->read( 1 );
-      return unpack "S>", $byteh . $bytel;
+      return unpack "S>", join "",
+         await $helper->write_then_read( ( pack "C", REG_LUXH ), 1 ),
+         await $helper->write_then_read( ( pack "C", REG_LUXL ), 1 );
    });
 
    # Unpack the weird 16bit EEEEMMMM....MMMM format

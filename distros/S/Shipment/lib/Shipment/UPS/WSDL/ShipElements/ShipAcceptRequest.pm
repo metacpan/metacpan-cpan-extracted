@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest;
-$Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ use warnings;
             [   qw(        Request
                   ShipmentDigest
 
-                  )
+                )
             ],
             {   'Request'        => \%Request_of,
                 'ShipmentDigest' => \%ShipmentDigest_of,
@@ -77,7 +77,7 @@ Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

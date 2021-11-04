@@ -4,20 +4,15 @@ use PDL::Fit::Levmar;
 use PDL::Fit::Levmar::Func;
 use PDL::NiceSlice;
 use PDL::Core ':Internal'; # For topdl()
+use Test::More;
 
 use strict;
 
 # Check pdl 'threading'. That is, automatically looping over
 # extra dimensions in pdls
 
-use vars ( '$testno', '$ok_count', '$not_ok_count', '@g', '$Gf',
-	   '$Gh', '$Type');
-
 #  @g is global options to levmar
-@g = ( NOCOVAR => undef );
-
-$ok_count = 0;
-$not_ok_count = 0;
+my @g = ( NOCOVAR => undef );
 
 sub tapprox {
         my($a,$b) = @_;
@@ -27,7 +22,6 @@ sub tapprox {
         $d < 0.0001;
 }
 
-
 sub tapprox_cruder {
         my($a,$b) = @_;
         my $c = abs(topdl($a)-topdl($b));
@@ -36,24 +30,8 @@ sub tapprox_cruder {
         $d < 0.001;
 }
 
-sub ok {  
-    my ($v, $s) = @_;
-    $testno = 0 unless defined $testno;	
-    $testno++;
-    $s = '' unless defined $s;
-    if ( not $v ) {
-	print "not ";
-	$s = " *** " . $s;
-	$not_ok_count++;
-    }
-    else {
-	$ok_count++;
-    }
-    print "ok - $testno $s\n";   
-}
-
 sub check_type {
-    my (@d) = @_;
+    my ($Type, @d) = @_;
     my $i=0;
     foreach ( @d )  {
 	die "$i: not $Type" unless $Type == $_->type;
@@ -69,11 +47,11 @@ sub dimst {
 sub deb  { print STDERR $_[0],"\n" }
 sub cpr  { print $_[0],"\n" }
 
-cpr "# Test implicit threading over lemvar()";
+cpr "# Test implicit threading over levmar()";
 cpr "# Compiling fit function...";
 
 # Need to use jacobian so fitting is more robust
-$Gf = '
+my $Gf = '
        function
        x = p0 * exp( -t*t * p1);
        jacobian
@@ -97,30 +75,28 @@ $Gf = '
 
 # there is a big difference in speed here!
 
-$Gh = levmar_func(FUNC=>$Gf);
+my $Gh = levmar_func(FUNC=>$Gf);
 
 cpr "# Done compiling fit function.";
 
 # Thread x. Try the same parameters on different sets of data.
 # Also test workspace allocation.
 sub thread1 {
+    my ($Type) = @_;
     my $n = 10000;
-    my $r = 10;
-    my $t = sequence $Type, $n;
-    $t *= $r / $n;
-    $t += -$r/2;
-    my $x = zeroes($Type,$n,4);
-    my $params =  [ [3,.2], [ 28, .1] , [2,.01], [3,.3] ];
+    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
+    my $params =  [ [3,.2], [ 9, .1] , [2,.01], [3,.3] ];
+    my $x = zeroes($Type,$n,scalar @$params);
     my $i = 0;
     map {  $x(:,$i++)  .= $_->[0] * exp(-$t*$t * $_->[1]  ) }  @$params;
-
     my $p = pdl $Type, [ 5, 1]; # starting guess 
-    check_type($p,$x,$t);
+    check_type($Type, $p,$x,$t);
     my $w = PDL->null;
     my $h = levmar(  $p, $x, $t, $Gh, @g, WORK => $w, DERIVATIVE => 'numeric');
-    check_type($h->{INFO});
-    ok( tapprox($h->{P}, pdl($Type, $params)) , 
-	"Thread x, 1 thread dim " . $h->{P} .  "  " . pdl($Type, $params) );
+    check_type($Type, $h->{INFO});
+    ok(tapprox($h->{P}, pdl($Type, $params)), "Thread x, 1 thread dim ($Type)")
+        or diag "got=", $h->{P}, "expected=", pdl($Type, $params),
+            "report=", levmar_report($h);
     my $m = 2;
     my $s = 4*$n+4*$m + $n*$m + $m*$m;
     ok($s == $w->nelem, " Workspace, numeric,  allocated correctly in pp_def");
@@ -130,7 +106,7 @@ sub thread1 {
     $h = levmar(  $p, $x, $t, $Gh, @g, WORK => $w);
     $s = 2*$n+4*$m + $n*$m + $m*$m;
     ok($s == $w->nelem, " Workspace, analytic, allocated correctly in pp_def");
-    check_type($w);
+    check_type($Type, $w);
 }
 
 # Change the following routines to use map the same way
@@ -138,51 +114,44 @@ sub thread1 {
 # Thread p. Not the right expression, I think.
 # ie, try multiple parameters a single data set.
 sub thread2 {
+    my ($Type) = @_;
     my $n = 10000;
-    my $t = sequence $Type, $n;
-    $t *= 10 / $n;
-    $t += -10/2;
+    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
     my $x = zeroes($Type, $n);
     my $params =   [[0,3,.2]]; # only 1 dimension
     map {  $x(:,$_->[0])  .= $_->[1] * exp(-$t*$t * $_->[2]  ) }  @$params;
     my $p = pdl $Type, [ [ 5, 1], [ 2,4] ]; # starting guess 
     my $outp = pdl ($Type, $params);
     my $correct =  pdl $Type, [$outp(1:2,(0)), $outp(1:2,(0))]; #x Ugly
-    check_type($p,$x,$t);
+    check_type($Type, $p,$x,$t);
     my $h = levmar($p, $x, $t, $Gh, @g);
-    check_type($h->{INFO});
-
+    check_type($Type, $h->{INFO});
 # Disabled for levmar-2.5 , not working 
     ok( tapprox($h->{P}, $correct ), "Thread p, 1 thread dim");
-
 }
 
 # This one threads over both p and x, with one
 # extra dimension
 sub thread3 {
+    my ($Type) = @_;
     my $n = 10000;
-    my $r = 10;
-    my $t = sequence $Type, $n;
-    $t *= $r / $n;
-    $t += -$r/2;
+    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
     my $params =  [ [0,3,.2], [1, 2, .1] ];
     my $x = zeroes($Type, $n,scalar(@$params));
     my $res =  pdl $Type, $params;
     map {  $x(:,$_->[0])  .= $_->[1] * exp(-$t*$t * $_->[2]  ) }  @$params;
     my $p = pdl $Type, [ [ 5, 1], [2,4]] ; # starting guess 
-    check_type($p,$x,$t);
+    check_type($Type, $p,$x,$t);
     my $h = levmar($Gh , $p,$x,$t,  @g );
-    check_type($h->{INFO});
+    check_type($Type, $h->{INFO});
     ok( tapprox($h->{P}, $res(1:2,:)) ,
 	"Thread both x and p, 1 thread dim");
 }
 
 sub thread4 {
+    my ($Type) = @_;
     my $n = 1000;
-    my $r = 10;
-    my $t = sequence $Type, $n;
-    $t *= $r / $n;
-    $t += -$r/2;
+    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
 # Put any number of triples of actual parameters here.
     my $params =  [ [0,3,.2], [1, 28, .1] , [2,2,.01], [3,3,.3] ];
     my $nx = scalar(@$params);
@@ -194,7 +163,7 @@ sub thread4 {
     my $np = $p->dim(1);
     cpr "# Trying x" . dimst $x->dummy(-1,$np);
     cpr "# input  p" . dimst $p->dummy(1,$nx);
-    check_type($p,$x,$t);
+    check_type($Type, $p,$x,$t);
     my $h = levmar($p->dummy(1,$nx), $x->dummy(-1,$np), $t, $Gh , @g );
     cpr "# check that output p has correct shape and values";
 
@@ -207,36 +176,33 @@ sub thread4 {
 
     my $covar = PDL->null;
     my $save_covar = $covar;
-    check_type($p,$x,$t);
+    check_type($Type, $p,$x,$t);
     $h = levmar($p->dummy(1,$nx), $x->dummy(-1,$np), $t, $Gh , @g,
 		   COVAR => $covar);
-    check_type($h->{INFO});
+    check_type($Type, $h->{INFO});
     my $count = $h->{COVAR}->nelem;
     $h = levmar($p->dummy(1,$nx), $x->dummy(-1,$np), $t, $Gh , @g,
 		   COVAR => $covar);
-    check_type($h->{INFO});
+    check_type($Type, $h->{INFO});
     $save_covar .= 1;
     my $sum = $h->{COVAR}->sum;
     ok( $sum == $count, "Test passing null COVAR pdl");
 }
 
 sub thread5 {
+    my ($Type) = @_;
     my $n = 10000;
-    my $r = 10;
-    my $t = sequence $Type, $n;
-    $t *= $r / $n;
-    $t += -$r/2;
+    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
     my $x = zeroes($Type, $n,4);
     my $params =  [ [3,.2], [ 28, .1] , [2,.01], [3,.3] ];
     my $i = 0;
     map {  $x(:,$i++)  .= $_->[0] * exp(-$t*$t * $_->[1]  ) }  @$params;
     my $p = pdl $Type, [ 5, 1]; # starting guess 
-    check_type($p,$x,$t);
+    check_type($Type, $p,$x,$t);
     my $h = levmar(  $p, $x, $t, $Gh, FIX=> [1,0], @g);
-    check_type($h->{INFO});
+    check_type($Type, $h->{INFO});
     my $outp = pdl $Type, [[ 5, 0.4730849], [5, 1 ],
 		   [5, 0.16286478],  [5, 0.70962698], ];
-
 
     ok( tapprox_cruder($h->{P}, $outp) , 
 	"Thread x, 1 thread dim, FIX=>[1,0] (linear constr.)" );
@@ -249,8 +215,9 @@ sub thread5 {
 
 # same but easier to read
 sub thread6 {
+    my ($Type) = @_;
     my $n = 1000;
-    my $t = 10 * (sequence($n)/$n -1/2);
+    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
 # Put any number of pairs of actual parameters here.
     my $params =  [ [500,.01], [3, .1] , [2,.01], [50,.3] ];
     my $nx = scalar(@$params);
@@ -286,34 +253,20 @@ sub thread6 {
 #    deb $h->{RET};
 }
 
-#print "1..14\n";
-print "1..8\n";
-
-print "# type double\n";
-$Type = double;
-
-
-#thread6();
-thread1();
-thread2();
-thread3();
-thread4();
+#thread6(double);
+thread1(double);
+thread2(double);
+thread3(double);
+thread4(double);
 
 if ($PDL::Fit::Levmar::HAVE_LAPACK) {
- thread5();
-}
-else {
- ok(1);
+ thread5(double);
 }
 
-print "# type float\n";
-$Type = float;
+#thread1(float);
+#thread2(float);
+#thread3(float);
+#thread4(float);
+#thread5(float);
 
-#thread1();
-#thread2();
-#thread3();
-#thread4();
-#thread5();
-
-
-print "# Ok count: $ok_count, Not ok count: $not_ok_count\n";
+done_testing;

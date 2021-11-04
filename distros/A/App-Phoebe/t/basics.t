@@ -121,6 +121,16 @@ $page = query_gemini("$base/diff/Haiku/1/colour");
 like($page, qr/^> \e\[31m\e\[1mQuiet disk ratling\e\[22m\e\[0m/m, "Removed content, per line");
 like($page, qr/^> \e\[32m\e\[1mMuffled honking cars\e\[22m\e\[0m\n$/sm, "Added content");
 
+# colour changes leads to colour history and colour diffs
+$page = query_gemini("$base/do/changes/10/fancy");
+like($page, qr/\e\[38;/, "Fancy changes");
+like($page, qr/^=> $base\/history\/Haiku\/10\/fancy History/m, "Fancy history link");
+$page = query_gemini("$base/history/Haiku/10/fancy");
+like($page, qr/\e\[38;/, "Fancy history");
+like($page, qr/^=> $base\/diff\/Haiku\/1\/colour Differences/m, "Fancy diff link");
+$page = query_gemini("$base/diff/Haiku/1/colour"); # there is no fancy diff, just colour diff
+like($page, qr/\e\[32m/, "Fancy diff");
+
 $haiku = <<EOT;
 Muffled spinning disk
 random clicking, then it stops.

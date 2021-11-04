@@ -1,3 +1,10 @@
+0.103   2021-05-29  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Fix Markdown formatting.
+
+
 0.102   2021-04-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Update dependency's new name {,Data::}TableData::Object.

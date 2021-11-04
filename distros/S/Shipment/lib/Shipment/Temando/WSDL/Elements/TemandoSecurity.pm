@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Elements::TemandoSecurity;
-$Shipment::Temando::WSDL::Elements::TemandoSecurity::VERSION = '3.05';
+$Shipment::Temando::WSDL::Elements::TemandoSecurity::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        UsernameToken
 
-                  )
+                )
             ],
             {'UsernameToken' => \%UsernameToken_of,},
             {
@@ -58,7 +58,7 @@ use warnings;
 
     package Shipment::Temando::WSDL::Elements::TemandoSecurity::_UsernameToken;
     $Shipment::Temando::WSDL::Elements::TemandoSecurity::_UsernameToken::VERSION
-      = '3.05';
+      = '3.06';
     use strict;
     use warnings;
     {
@@ -85,7 +85,7 @@ use warnings;
                 [   qw(        Username
                       Password
 
-                      )
+                    )
                 ],
                 {   'Username' => \%Username_of,
                     'Password' => \%Password_of,
@@ -123,7 +123,7 @@ Shipment::Temando::WSDL::Elements::TemandoSecurity
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

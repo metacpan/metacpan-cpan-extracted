@@ -8,7 +8,7 @@ use constant default_suffix => '.cxx';
 use constant default_encoding => ':utf8';
 
 # ABSTRACT: Class to track C source file in FFI::Build
-our $VERSION = '1.55'; # VERSION
+our $VERSION = '1.56'; # VERSION
 
 
 sub accept_suffix
@@ -25,7 +25,7 @@ sub cc
 sub ld
 {
   my($self) = @_;
-  $self->platform->cxx;
+  $self->platform->cxxld;
 }
 
 1;
@@ -42,7 +42,7 @@ FFI::Build::File::CXX - Class to track C source file in FFI::Build
 
 =head1 VERSION
 
-version 1.55
+version 1.56
 
 =head1 SYNOPSIS
 

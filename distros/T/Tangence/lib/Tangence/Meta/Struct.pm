@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Struct 0.26;
+use v5.26;
+use Object::Pad 0.43;
 
-use v5.14;
-use warnings;
+package Tangence::Meta::Struct 0.27;
+class Tangence::Meta::Struct :strict(params);
 
 use Carp;
 
@@ -34,13 +35,10 @@ Returns a new instance representing the given name.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
-   my $self = bless { name => delete $args{name} }, $class;
-   return $self;
-}
+has $name    :param :reader;
+has $defined        :reader = 0;
+
+has @fields;
 
 =head2 define
 
@@ -59,14 +57,12 @@ of L<Tangence::Meta::Field>.
 
 =cut
 
-sub define
+method define ( %args )
 {
-   my $self = shift;
-   my %args = @_;
+   $defined and croak "Cannot define $name twice";
 
-   $self->defined and croak "Cannot define ".$self->name." twice";
-
-   $self->{fields} = $args{fields};
+   $defined++;
+   @fields = @{ $args{fields} };
 }
 
 =head1 ACCESSORS
@@ -82,12 +78,6 @@ C<define>.
 
 =cut
 
-sub defined
-{
-   my $self = shift;
-   return exists $self->{fields};
-}
-
 =head2 name
 
    $name = $struct->name
@@ -95,12 +85,6 @@ sub defined
 Returns the name of the structure
 
 =cut
-
-sub name
-{
-   my $self = shift;
-   return $self->{name};
-}
 
 =head2 fields
 
@@ -111,11 +95,10 @@ definition.
 
 =cut
 
-sub fields
+method fields
 {
-   my $self = shift;
    $self->defined or croak $self->name . " is not yet defined";
-   return @{ $self->{fields} };
+   return @fields;
 }
 
 =head1 AUTHOR

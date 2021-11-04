@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ShipmentActivityType;
-$Shipment::UPS::WSDL::TrackTypes::ShipmentActivityType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::ShipmentActivityType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Class::Std::initialize();
               Document
               AdditionalAttribute
 
-              )
+            )
         ],
         {   'ActivityLocation'    => \%ActivityLocation_of,
             'Code'                => \%Code_of,
@@ -93,7 +93,7 @@ Shipment::UPS::WSDL::TrackTypes::ShipmentActivityType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

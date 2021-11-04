@@ -1,16 +1,17 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.520-4-gf020794
+package JSON::Schema::Modern; # git description: v0.522-7-g205a42ce
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.521';
+our $VERSION = '0.523';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use strictures 2;
 use JSON::MaybeXS;
 use Carp qw(croak carp);
@@ -204,8 +205,9 @@ sub evaluate_json_string {
 }
 
 # this is called whenever we need to walk a document for something.
-# for now it is just called when a ::Document object is created, to identify
-# $id and $anchor keywords within.
+# for now it is just called when a ::Document object is created, to verify the integrity of the
+# schema structure, to identify the metaschema (via the $schema keyword), and to extract all
+# embedded resources via $id and $anchor keywords within.
 # Returns the internal $state object accumulated during the traversal.
 sub traverse {
   croak 'insufficient arguments' if @_ < 2;
@@ -221,7 +223,7 @@ sub traverse {
     initial_schema_uri => $base_uri,    # the canonical URI as of the start, or last $id
     schema_path => '',                  # the rest of the path, since the last $id
     errors => [],
-    spec_version => $spec_version,      # can change, iff nothing explicitly requested
+    spec_version => $spec_version,
     vocabularies => [ use_module('JSON::Schema::Modern::Vocabulary::Core') ], # will be filled in later
     identifiers => [],
     configs => {},
@@ -254,6 +256,7 @@ sub traverse {
   return $state;
 }
 
+# the actual runtime evaluation of the schema against input data.
 sub evaluate {
   croak 'evaluate called in void context' if not defined wantarray;
   croak 'insufficient arguments' if @_ < 3;
@@ -779,7 +782,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.521
+version 0.523
 
 =head1 SYNOPSIS
 
@@ -799,6 +802,8 @@ L<Draft 2020-12|https://json-schema.org/specification-links.html#2020-12>
 version of the specification.
 
 =head1 CONFIGURATION OPTIONS
+
+These values are all passed as arguments to the constructor.
 
 =head2 specification_version
 
@@ -1119,7 +1124,7 @@ validation will always succeed):
 
 =item *
 
-C<date-time>, C<date>, and C<time> require L<Time::Moment>
+C<date-time>, C<date>, and C<time> require L<Time::Moment>, L<DateTime::Format::RFC3339>
 
 =item *
 
@@ -1137,9 +1142,8 @@ C<idn-hostname> requires L<Net::IDN::Encode>
 
 =head2 Specification Compliance
 
-Until version 1.000 is released, this implementation is not fully specification-compliant.
-
-To date, missing features (some of which are optional, but still quite useful) include:
+This implementation is now fully specification-compliant, but until version 1.000 is released, it is
+still deemed to be missing some optional but quite useful features, such as:
 
 =over 4
 
@@ -1192,7 +1196,7 @@ L<Test::JSON::Schema::Acceptance>: contains the official JSON Schema test suite
 
 =item *
 
-L<JSON::Schema::Tiny>: a more minimal implementation of the specification, with fewer dependencies
+L<JSON::Schema::Tiny>: a more stripped-down implementation of the specification, with fewer dependencies and faster evaluation
 
 =item *
 
@@ -1202,7 +1206,9 @@ L<https://json-schema.org/draft/2020-12/release-notes.html>
 
 L<https://json-schema.org/draft/2019-09/release-notes.html>
 
-# L<https://json-schema.org/draft-07/json-schema-release-notes.html>
+=item *
+
+L<https://json-schema.org/draft-07/json-schema-release-notes.html>
 
 =item *
 

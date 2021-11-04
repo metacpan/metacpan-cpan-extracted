@@ -28,6 +28,14 @@ is_oneref( $arr, '$arr has one reference before we start' );
    is_oneref( $arr, '$arr has one reference after WithWeak mutator' );
 }
 
+# RT139665
+{
+   class subWithWeak isa WithWeak {}
+
+   my $obj = subWithWeak->new( slot => $arr );
+   is_oneref( $arr, '$arr has one reference after subWithWeak construction' );
+}
+
 is_oneref( $arr, '$arr has one reference before EOF' );
 
 done_testing;

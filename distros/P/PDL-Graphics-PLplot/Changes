@@ -1,3 +1,11 @@
+0.80 2021-11-01
+- zap spurious long-double-related test differences
+
+0.79 2021-10-24
+- use Alien::PLplot probe for build configuration
+- add functions to get list of available devices
+- opt in to PDL 2.058 multi-C
+
 0.78 2021-09-20
 - doc improvement for dates in XBOX - thanks @mvgrimes
 - relax required PLplot version to 5.13.0+ - thanks @zmughal

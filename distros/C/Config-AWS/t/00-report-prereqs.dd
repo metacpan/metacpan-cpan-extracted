@@ -17,7 +17,6 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Exporter::Tiny' => '1',
-                                      'File::Glob' => '0',
                                       'Path::Tiny' => '0.076',
                                       'Ref::Util' => '0',
                                       'perl' => '5.010'
@@ -29,7 +28,6 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
-                                   'File::Share' => '0.03',
                                    'File::Spec' => '0',
                                    'Test2::Tools::Spec' => '0',
                                    'Test2::V0' => '0',

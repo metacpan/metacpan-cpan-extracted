@@ -41,6 +41,11 @@ static void S_debug_sv_summary(pTHX_ const SV *sv)
 {
   const char *type;
 
+  if(!sv) {
+    fprintf(stderr, "NULL");
+    return;
+  }
+
   if(sv == &PL_sv_undef) {
     fprintf(stderr, "SV=undef");
     return;
@@ -80,6 +85,8 @@ static void S_debug_sv_summary(pTHX_ const SV *sv)
 
   if(SvTEMP(sv))
     fprintf(stderr, ",TEMP");
+  if(SvOBJECT(sv))
+    fprintf(stderr, ",blessed=%s", HvNAME(SvSTASH(sv)));
 
   switch(SvTYPE(sv)) {
     case SVt_PVAV:
@@ -222,7 +229,8 @@ static void S_savestack_dump(pTHX)
     if(!argspec[0]) { croak("ARG argspec"); }
 
     switch(*(argspec++)) {
-      case ' ': break;
+      case ' ':
+        break;
       case '@':
         /* the UV explains how many additional stack slots are consumed as a
          * temporary buffer */
@@ -231,15 +239,18 @@ static void S_savestack_dump(pTHX)
         ix -= (UV)(uv >> SAVE_TIGHT_SHIFT);
         continue;
       case 'b':
-        fprintf(stderr, " bool=%s", (uv >> 8) ? "true" : "false"); break;
+        fprintf(stderr, " bool=%s", (uv >> 8) ? "true" : "false");
+        break;
       case 'r':
         fprintf(stderr, " padix=%ld count=%ld",
             (UV)(uv >> (OPpPADRANGE_COUNTSHIFT + SAVE_TIGHT_SHIFT)), (uv >> SAVE_TIGHT_SHIFT) & OPpPADRANGE_COUNTMASK);
         break;
       case 'i':
-        fprintf(stderr, " i=%d", (I32)(uv >> SAVE_TIGHT_SHIFT)); break;
+        fprintf(stderr, " i=%d", (I32)(uv >> SAVE_TIGHT_SHIFT));
+        break;
       case 'x':
-        fprintf(stderr, " padix=%ld", (UV)(uv >> SAVE_TIGHT_SHIFT)); break;
+        fprintf(stderr, " padix=%ld", (UV)(uv >> SAVE_TIGHT_SHIFT));
+        break;
     }
 
     int args = strlen(argspec);
@@ -302,3 +313,34 @@ static void S_savestack_dump(pTHX)
   }
 }
 #endif
+
+#define debug_print_cxstack()  S_debug_print_cxstack(aTHX)
+static void S_debug_print_cxstack(pTHX)
+{
+  int cxix;
+  for(cxix = cxstack_ix; cxix; cxix--) {
+    char *name = "?";
+    PERL_CONTEXT *cx = &cxstack[cxix];
+
+    switch(CxTYPE(cx)) {
+      case CXt_SUB:        name = "CXt_SUB";        break;
+      case CXt_BLOCK:      name = "CXt_BLOCK";      break;
+      case CXt_EVAL:       name = "CXt_EVAL";       break;
+      case CXt_LOOP_PLAIN: name = "CXt_LOOP_PLAIN"; break;
+      case CXt_LOOP_ARY:   name = "CXt_LOOP_ARY";   break;
+      default: fprintf(stderr, "[type=%d]", CxTYPE(cx)); break;
+    }
+    fprintf(stderr, "  *-[%d] %s", cxix, name);
+    switch(CxTYPE(cx)) {
+      case CXt_SUB: {
+        CV *cv = cx->blk_sub.cv;
+        fprintf(stderr, "(&%s ret=%p)", SvPV_nolen(cv_name(cv, 0, 0)), cx->blk_sub.retop);
+      }
+      break;
+      case CXt_EVAL:
+        fprintf(stderr, "(%s)", cx->blk_eval.cur_top_env == PL_top_env ? "top" : "!TOP");
+        break;
+    }
+    fprintf(stderr, "\n");
+  }
+}

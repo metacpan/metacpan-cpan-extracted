@@ -34,6 +34,7 @@ do { my $x = {
                                       'Plack::Response' => '0',
                                       'Plack::Util::Accessor' => '0',
                                       'Ref::Util' => '0',
+                                      'Regexp::Common' => '0',
                                       'parent' => '0',
                                       'perl' => 'v5.10.0',
                                       'strict' => '0',

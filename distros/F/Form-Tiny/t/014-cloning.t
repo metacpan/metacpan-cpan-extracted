@@ -1,4 +1,5 @@
 use v5.10;
+use strict;
 use warnings;
 use Test::More;
 use Storable qw(dclone);
@@ -21,7 +22,11 @@ for (qw(regular dcloned)) {
 		[{testA => [1, 2]}, sub { push @{shift->{testA}}, 3 }, {testA => [1, 2]}],
 		[{testA => [[1]]}, sub { push @{shift->{testA}[0]}, 2 }, {testA => [[1, 2]]}],
 		[{testH => {test => 'yes'}}, sub { shift->{testH}{test} = 'no' }, {testH => {test => 'yes'}}],
-		[{testH => {test => {key => 'yes'}}}, sub { shift->{testH}{test}{key} = 'no' }, {testH => {test => {key => 'no'}}}],
+		[
+			{testH => {test => {key => 'yes'}}},
+			sub { shift->{testH}{test}{key} = 'no' },
+			{testH => {test => {key => 'no'}}}
+		],
 	);
 
 	my $form = TestForm->new;

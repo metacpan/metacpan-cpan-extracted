@@ -1,5 +1,9 @@
 Release history for Catalyst-Plugin-Digress
 
+1.002 Mon 25 Oct 2021
+	- Correct SYNOPSIS
+	- No functional changes
+
 1.001 Thu 15 Oct 2020
 	- Tidier README and documentation
 

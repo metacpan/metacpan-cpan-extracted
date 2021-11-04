@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1777 2020-05-07 08:24:01Z willem $"
+#define XS_Id "$Id: SEC.xs 1853 2021-10-11 10:40:59Z willem $"
 
 
 =head1 NAME
@@ -13,7 +13,7 @@ upon which the Net::DNS::SEC cryptographic components are built.
 
 =head1 COPYRIGHT
 
-Copyright (c)2018-2020 Dick Franks
+Copyright (c)2018-2021 Dick Franks
 
 All Rights Reserved
 
@@ -21,7 +21,7 @@ All Rights Reserved
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific
@@ -43,18 +43,35 @@ extern "C" {
 #endif
 
 #define PERL_NO_GET_CONTEXT
+#define PERL_REENTRANT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
-#define OPENSSL_SUPPRESS_DEPRECATED
 #include <openssl/opensslv.h>
-#include <openssl/evp.h>
 #include <openssl/bn.h>
+#include <openssl/err.h>
+
+#ifndef OPENSSL_VERSION_NUMBER		/* 0xMNN00PP0L	retain backward compatibility */
+#define OPENSSL_VERSION_NUMBER	\
+	( (OPENSSL_VERSION_MAJOR<<28) | (OPENSSL_VERSION_MINOR<<20) | (OPENSSL_VERSION_PATCH<<4) | 0x0L )
+#endif
+
+#if (OPENSSL_VERSION_NUMBER < 0x40000000)
+#define OBSOLETE_API
+#undef  OSSL_DEPRECATED
+#define OSSL_DEPRECATED(since)	extern
+#include <openssl/evp.h>
 #include <openssl/dsa.h>
 #include <openssl/ec.h>
 #include <openssl/ecdsa.h>
 #include <openssl/rsa.h>
+#else
+#include <openssl/evp.h>
+#include <openssl/core_names.h>
+#include <openssl/param_build.h>
+static OSSL_LIB_CTX *libctx = NULL;
+#endif
 
 #ifdef __cplusplus
 }
@@ -70,17 +87,13 @@ extern "C" {
 #endif
 
 #ifdef OPENSSL_NO_EC
-#define NO_ECCGOST
 #define NO_ECDSA
 #define NO_EdDSA
 #endif
 
-
-#ifndef OPENSSL_VERSION_NUMBER		/* 0xMNN00PP0L	retain backward compatibility */
-#define OPENSSL_VERSION_NUMBER  \
-	( (OPENSSL_VERSION_MAJOR<<28) | (OPENSSL_VERSION_MINOR<<20) | (OPENSSL_VERSION_PATCH<<4) | 0x0L )
+#ifdef OPENSSL_IS_BORINGSSL
+#define NO_SHA3
 #endif
-
 
 #ifdef LIBRESSL_VERSION_NUMBER
 #undef OPENSSL_VERSION_NUMBER
@@ -88,26 +101,9 @@ extern "C" {
 #endif
 
 
-#if (OPENSSL_VERSION_NUMBER < 0x10101000)
-#define NO_ECCGOST
-#define NO_EdDSA
-#define NO_SHA3
-
-int EVP_DigestSign(EVP_MD_CTX *ctx,
-		unsigned char *sig, size_t *sig_len,
-		const unsigned char *data, size_t data_len)
-{
-	EVP_DigestUpdate( ctx, data, data_len );
-	return EVP_DigestSignFinal( ctx, sig, sig_len );
-}
-
-int EVP_DigestVerify(EVP_MD_CTX *ctx,
-		const unsigned char *sig, size_t sig_len,
-		const unsigned char *data, size_t data_len)
-{
-	EVP_DigestUpdate( ctx, data, data_len );
-	return EVP_DigestVerifyFinal( ctx, sig, sig_len );
-}
+#if (OPENSSL_VERSION_NUMBER < 0x10001000)
+#error	unsupported libcrypto version
+#include OPENSSL_VERSION_TEXT /* in error log; by any means, however reprehensible! */
 #endif
 
 
@@ -148,30 +144,46 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 #endif
 
 
-#if (OPENSSL_VERSION_NUMBER < 0x10001000)
-#define NO_ECDSA
-#error	unsupported libcrypto version
-#include OPENSSL_VERSION_TEXT /* in error log; by any means, however reprehensible! */
-#endif
+#if (OPENSSL_VERSION_NUMBER < 0x10101000)
+#define NO_EdDSA
+#define NO_SHA3
 
-
-#ifndef NO_ECCGOST
-BIGNUM *bn_new_hex(const char *hex)
+int EVP_DigestSign(EVP_MD_CTX *ctx,
+		unsigned char *sig, size_t *sig_len,
+		const unsigned char *data, size_t data_len)
 {
-	BIGNUM *bn = BN_new();
-	BN_hex2bn( &bn, hex );
-	return bn;
+	EVP_DigestUpdate( ctx, data, data_len );
+	return EVP_DigestSignFinal( ctx, sig, sig_len );
+}
+
+int EVP_DigestVerify(EVP_MD_CTX *ctx,
+		const unsigned char *sig, size_t sig_len,
+		const unsigned char *data, size_t data_len)
+{
+	EVP_DigestUpdate( ctx, data, data_len );
+	return EVP_DigestVerifyFinal( ctx, sig, sig_len );
 }
 #endif
 
-
-void checkret(const int ret, int line)
-{
-	if ( ret != 1 ) croak("libcrypto error (%s line %d)", __FILE__, line);
-}
 
 #define checkerr(arg)	checkret( (arg), __LINE__ )
-#define nocheckerr(arg)	/* NOOP */
+void checkret(const int ret, int line)
+{
+	if ( ret <= 0 ) croak( "libcrypto error (%s line %d)", __FILE__, line );
+}
+
+
+#ifndef OBSOLETE_API
+int EVP_PKEY_fromparams(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey, int selection, OSSL_PARAM_BLD *bld)
+{
+	OSSL_PARAM *params = OSSL_PARAM_BLD_to_param(bld);
+	int retval;
+	checkerr( EVP_PKEY_fromdata_init(ctx) );
+	retval = EVP_PKEY_fromdata( ctx, ppkey, selection, params );
+	OSSL_PARAM_free(params);
+	return retval;
+}
+#endif
 
 
 MODULE = Net::DNS::SEC	PACKAGE = Net::DNS::SEC::libcrypto
@@ -244,7 +256,7 @@ void
 EVP_DigestUpdate(EVP_MD_CTX *ctx, SV *message)
     INIT:
 	unsigned char *m = (unsigned char*) SvPVX(message);
-	unsigned int mlen = SvCUR(message);
+	STRLEN mlen = SvCUR(message);
     CODE:
 	checkerr( EVP_DigestUpdate( ctx, m, mlen ) );
 
@@ -253,10 +265,8 @@ EVP_DigestFinal(EVP_MD_CTX *ctx)
     INIT:
 	unsigned char digest[EVP_MAX_MD_SIZE];
 	unsigned int size = sizeof(digest);
-	const EVP_MD *type = EVP_MD_CTX_md( ctx );
     CODE:
 	checkerr( EVP_DigestFinal( ctx, digest, &size ) );
-	checkerr( EVP_DigestInit( ctx, type ) );	/* reinitialise; behave like Digest::SHA */
 	RETVAL = newSVpvn( (char*)digest, size );
     OUTPUT:
 	RETVAL
@@ -301,30 +311,45 @@ EVP_sha3_512()
 
 #ifndef NO_DSA
 
-void
-EVP_PKEY_assign_DSA(EVP_PKEY *pkey, DSA *key)
-    CODE:
-	checkerr( EVP_PKEY_assign( pkey, EVP_PKEY_DSA, (char*)key ) );
-
-DSA*
-DSA_new()
-
-void
-DSA_set0_pqg(DSA *d, SV *p_SV, SV *q_SV, SV *g_SV)
+EVP_PKEY*
+EVP_PKEY_new_DSA(SV *p_SV, SV *q_SV, SV *g_SV, SV *y_SV, SV *x_SV)
     INIT:
 	BIGNUM *p = BN_bin2bn( (unsigned char*) SvPVX(p_SV), SvCUR(p_SV), NULL );
 	BIGNUM *q = BN_bin2bn( (unsigned char*) SvPVX(q_SV), SvCUR(q_SV), NULL );
 	BIGNUM *g = BN_bin2bn( (unsigned char*) SvPVX(g_SV), SvCUR(g_SV), NULL );
-    CODE:
-	checkerr( DSA_set0_pqg( d, p, q, g ) );
-
-void
-DSA_set0_key(DSA *dsa, SV *y_SV, SV *x_SV)
-    INIT:
 	BIGNUM *x = BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
 	BIGNUM *y = BN_bin2bn( (unsigned char*) SvPVX(y_SV), SvCUR(y_SV), NULL );
     CODE:
-	checkerr( DSA_set0_key( dsa, y, x ) );
+#ifdef OBSOLETE_API
+	DSA *dsa = DSA_new();
+	DSA_set0_pqg( dsa, p, q, g );
+	DSA_set0_key( dsa, y, x );
+	RETVAL = EVP_PKEY_new();
+	EVP_PKEY_assign( RETVAL, EVP_PKEY_DSA, (char*)dsa );
+#else
+	EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name( libctx, "DSA", NULL );
+	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
+	checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_FFC_P, p ) );
+	checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_FFC_Q, q ) );
+	checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_FFC_G, g ) );
+	checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_PUB_KEY, y ) );
+	RETVAL = NULL;
+	if ( SvCUR(x_SV) > 0 ) {
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_PRIV_KEY, x ) );
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_KEYPAIR, bld ) );
+	} else {
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_PUBLIC_KEY, bld ) );
+	}
+	OSSL_PARAM_BLD_free(bld);
+	EVP_PKEY_CTX_free(ctx);
+	BN_free(p);
+	BN_free(q);
+	BN_free(g);
+	BN_free(x);
+	BN_free(y);
+#endif
+    OUTPUT:
+	RETVAL
 
 #endif
 
@@ -333,30 +358,45 @@ DSA_set0_key(DSA *dsa, SV *y_SV, SV *x_SV)
 
 #ifndef NO_RSA
 
-void
-EVP_PKEY_assign_RSA(EVP_PKEY *pkey, RSA *key)
-    CODE:
-	checkerr( EVP_PKEY_assign( pkey, EVP_PKEY_RSA, (char*)key ) );
-
-RSA*
-RSA_new()
-
-void
-RSA_set0_factors(RSA *r, SV *p_SV, SV *q_SV)
+EVP_PKEY*
+EVP_PKEY_new_RSA(SV *n_SV, SV *e_SV, SV *d_SV, SV *p_SV, SV *q_SV)
     INIT:
+	BIGNUM *n = BN_bin2bn( (unsigned char*) SvPVX(n_SV), SvCUR(n_SV), NULL );
+	BIGNUM *e = BN_bin2bn( (unsigned char*) SvPVX(e_SV), SvCUR(e_SV), NULL );
+	BIGNUM *d = BN_bin2bn( (unsigned char*) SvPVX(d_SV), SvCUR(d_SV), NULL );
 	BIGNUM *p = BN_bin2bn( (unsigned char*) SvPVX(p_SV), SvCUR(p_SV), NULL );
 	BIGNUM *q = BN_bin2bn( (unsigned char*) SvPVX(q_SV), SvCUR(q_SV), NULL );
     CODE:
-	checkerr( RSA_set0_factors( r, p, q ) );
-
-void
-RSA_set0_key(RSA *r, SV *n_SV, SV *e_SV, SV *d_SV)
-    INIT:
-	BIGNUM *d = BN_bin2bn( (unsigned char*) SvPVX(d_SV), SvCUR(d_SV), NULL );
-	BIGNUM *e = BN_bin2bn( (unsigned char*) SvPVX(e_SV), SvCUR(e_SV), NULL );
-	BIGNUM *n = BN_bin2bn( (unsigned char*) SvPVX(n_SV), SvCUR(n_SV), NULL );
-    CODE:
-	checkerr( RSA_set0_key( r, n, e, d ) );
+#ifdef OBSOLETE_API
+	RSA *rsa = RSA_new();
+	RSA_set0_factors( rsa, p, q );
+	RSA_set0_key( rsa, n, e, d );
+	RETVAL = EVP_PKEY_new();
+	EVP_PKEY_assign( RETVAL, EVP_PKEY_RSA, (char*)rsa );
+#else
+	EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name( libctx, "RSA", NULL );
+	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
+	checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_N, n ) );
+	checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_E, e ) );
+	checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_D, d ) );
+	RETVAL = NULL;
+	if ( SvCUR(p_SV) > 0 ) {
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_FACTOR, p ) );
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_RSA_FACTOR, q ) );
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_KEYPAIR, bld ) );
+	} else {
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_PUBLIC_KEY, bld ) );
+	}
+	OSSL_PARAM_BLD_free(bld);
+	EVP_PKEY_CTX_free(ctx);
+	BN_free(n);
+	BN_free(e);
+	BN_free(d);
+	BN_free(p);
+	BN_free(q);
+#endif
+    OUTPUT:
+	RETVAL
 
 #endif
 
@@ -365,36 +405,45 @@ RSA_set0_key(RSA *r, SV *n_SV, SV *e_SV, SV *d_SV)
 
 #ifndef NO_ECDSA
 
-void
-EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
-    CODE:
-	checkerr( EVP_PKEY_assign( pkey, EVP_PKEY_EC, (char*)key ) );
-
-# Creates new EC_KEY object using prescribed curve
-EC_KEY*
-EC_KEY_new_by_curve_name(int nid)
-
-void
-EC_KEY_set_private_key(EC_KEY *key, SV *prv_SV)
+EVP_PKEY*
+EVP_PKEY_new_ECDSA(int nid, SV *qx_SV, SV *qy_SV)
     INIT:
-	BIGNUM *prv = BN_bin2bn( (unsigned char*) SvPVX(prv_SV), SvCUR(prv_SV), NULL );
-	int status;
+	BIGNUM *qx = BN_bin2bn( (unsigned char*) SvPVX(qx_SV), SvCUR(qx_SV), NULL );
+	BIGNUM *qy = BN_bin2bn( (unsigned char*) SvPVX(qy_SV), SvCUR(qy_SV), NULL );
+#ifdef OBSOLETE_API
+	EC_KEY *eckey = EC_KEY_new_by_curve_name(nid);
+#else
+	EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name( libctx, "EC", NULL );
+	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
+#endif
     CODE:
-	status = EC_KEY_set_private_key( key, prv );
-	BN_clear_free(prv);
-	checkerr(status);
-
-void
-EC_KEY_set_public_key_affine_coordinates(EC_KEY *key, SV *x_SV, SV *y_SV)
-    INIT:
-	BIGNUM *x = BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
-	BIGNUM *y = BN_bin2bn( (unsigned char*) SvPVX(y_SV), SvCUR(y_SV), NULL );
-	int status;
-    CODE:
-	status = EC_KEY_set_public_key_affine_coordinates( key, x, y );
-	BN_free(x);
-	BN_free(y);
-	checkerr(status);
+#ifdef OBSOLETE_API
+	if ( SvCUR(qy_SV) > 0 ) {
+		checkerr( EC_KEY_set_public_key_affine_coordinates( eckey, qx, qy ) );
+	} else {
+		checkerr( EC_KEY_set_private_key( eckey, qx ) );
+	}
+	RETVAL = EVP_PKEY_new();
+	checkerr( EVP_PKEY_assign( RETVAL, EVP_PKEY_EC, (char*)eckey ) );
+#else
+	if ( nid == 415 ) checkerr( OSSL_PARAM_BLD_push_utf8_string( bld, OSSL_PKEY_PARAM_GROUP_NAME, "P-256", 0 ) );
+	if ( nid == 715 ) checkerr( OSSL_PARAM_BLD_push_utf8_string( bld, OSSL_PKEY_PARAM_GROUP_NAME, "P-384", 0 ) );
+	RETVAL = NULL;
+	if ( SvCUR(qy_SV) > 0 ) {
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_EC_PUB_X, qx ) );
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_EC_PUB_Y, qy ) );
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_PUBLIC_KEY, bld ) );
+	} else {
+		checkerr( OSSL_PARAM_BLD_push_BN( bld, OSSL_PKEY_PARAM_PRIV_KEY, qx ) );
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_KEYPAIR, bld ) );
+	}
+	OSSL_PARAM_BLD_free(bld);
+	EVP_PKEY_CTX_free(ctx);
+#endif
+	BN_clear_free(qx);
+	BN_clear_free(qy);
+    OUTPUT:
+	RETVAL
 
 #endif
 
@@ -404,110 +453,63 @@ EC_KEY_set_public_key_affine_coordinates(EC_KEY *key, SV *x_SV, SV *y_SV)
 #ifndef NO_EdDSA
 
 EVP_PKEY*
-EVP_PKEY_new_raw_private_key(int nid, SV *key)
-    CODE:
-	RETVAL = EVP_PKEY_new_raw_private_key( nid, NULL, (unsigned char*) SvPVX(key) , SvCUR(key) );
-    OUTPUT:
-	RETVAL
-
-EVP_PKEY*
 EVP_PKEY_new_raw_public_key(int nid, SV *key)
-    CODE:
-	RETVAL = EVP_PKEY_new_raw_public_key( nid, NULL, (unsigned char*) SvPVX(key) , SvCUR(key) );
-    OUTPUT:
-	RETVAL
-
-#endif
-
-
-####################
-
-####	Verify-only support for obsolete ECC-GOST	####
-
-#ifndef NO_ECCGOST
-
-EC_KEY*
-EC_KEY_new_ECCGOST()
-    PREINIT:					# GOST_R_34_10_2001_CryptoPro_A
-	BIGNUM *a = bn_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD94");
-	BIGNUM *b = bn_new_hex("00A6");
-	BIGNUM *p = bn_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD97");
-	BIGNUM *q = bn_new_hex("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6C611070995AD10045841B09B761B893");
-	BIGNUM *x = bn_new_hex("01");
-	BIGNUM *y = bn_new_hex("8D91E471E0989CDA27DF505A453F2B7635294F2DDF23E3B122ACC99C9E9F1E14");
-	BIGNUM *h = bn_new_hex("01");
-	BN_CTX *ctx = BN_CTX_new();
-	EC_GROUP *group = EC_GROUP_new_curve_GFp(p, a, b, ctx);
-	EC_POINT *G = EC_POINT_new(group);
-    CODE:
-	checkerr( EC_POINT_set_affine_coordinates(group, G, x, y, ctx) );
-	checkerr( EC_GROUP_set_generator(group, G, q, h) );
-	EC_POINT_free(G);
-	BN_free(a);
-	BN_free(b);
-	BN_free(p);
-	BN_free(q);
-	BN_free(x);
-	BN_free(y);
-	BN_free(h);
-	nocheckerr( EC_GROUP_check(group, ctx) );
-	BN_CTX_free(ctx);
-	RETVAL = EC_KEY_new();
-	checkerr( EC_KEY_set_group(RETVAL, group) );
-	EC_GROUP_free(group);
-    OUTPUT:
-	RETVAL
-
-int
-ECCGOST_verify(SV *H, SV *r_SV, SV *s_SV, EC_KEY *eckey)
+    ALIAS:
+	EVP_PKEY_new_raw_private_key = 1
     INIT:
-	STRLEN len = SvCUR(H);
-	unsigned char *bin = (unsigned char*) SvPVX(H);
-	BIGNUM *alpha = BN_bin2bn( bin, len, NULL );
-	BIGNUM *r = BN_bin2bn( (unsigned char*) SvPVX(r_SV), SvCUR(r_SV), NULL );
-	BIGNUM *s = BN_bin2bn( (unsigned char*) SvPVX(s_SV), SvCUR(s_SV), NULL );
-	const EC_GROUP *group = EC_KEY_get0_group(eckey);
-	BN_CTX *ctx = BN_CTX_new();
-	BIGNUM *e = BN_new();
-	BIGNUM *m = BN_new();
-	BIGNUM *q = BN_new();
-	ECDSA_SIG *ecsig = ECDSA_SIG_new();
+	unsigned char *rawkey = (unsigned char*) SvPVX(key);
+	STRLEN keylen = SvCUR(key);
+#ifndef OBSOLETE_API
+	EVP_PKEY_CTX *ctx = NULL;
+	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
+#endif
     CODE:
-	checkerr( EC_GROUP_get_order(group, q, ctx) );
-	checkerr( BN_mod(e, alpha, q, ctx) );
-	if ( BN_is_zero(e) ) BN_set_word(e, 1);
-	BN_free(alpha);
-
-	/* algebraic transformation of ECC-GOST into equivalent ECDSA problem */
-	checkerr( BN_mod_sub(m, q, s, q, ctx) );
-	checkerr( BN_mod_sub(s, q, e, q, ctx) );
-	BN_free(e);
-	BN_free(q);
-
-	checkerr( ECDSA_SIG_set0(ecsig, r, s) );
-
-	BN_bn2binpad(m, bin, len);
-	BN_free(m);
-	RETVAL = ECDSA_do_verify( bin, len, ecsig, eckey );
-	BN_CTX_free(ctx);
-	EC_KEY_free(eckey);
-	ECDSA_SIG_free(ecsig);
+#ifdef OBSOLETE_API
+	if ( ix > 0 ) {
+		RETVAL = EVP_PKEY_new_raw_private_key( nid, NULL, rawkey , keylen );
+	} else {
+		RETVAL = EVP_PKEY_new_raw_public_key( nid, NULL, rawkey , keylen );
+	}
+#else
+	if ( nid == 1087 ) ctx = EVP_PKEY_CTX_new_from_name( libctx, "ED25519", NULL );
+	if ( nid == 1088 ) ctx = EVP_PKEY_CTX_new_from_name( libctx, "ED448", NULL );
+	RETVAL = NULL;
+	if ( ix > 0 ) {
+		checkerr( OSSL_PARAM_BLD_push_octet_string( bld, OSSL_PKEY_PARAM_PRIV_KEY, rawkey, keylen ) );
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_KEYPAIR, bld ) );
+	} else {
+		checkerr( OSSL_PARAM_BLD_push_octet_string( bld, OSSL_PKEY_PARAM_PUB_KEY, rawkey, keylen ) );
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_PUBLIC_KEY, bld ) );
+	}
+	OSSL_PARAM_BLD_free(bld);
+	EVP_PKEY_CTX_free(ctx);
+#endif
     OUTPUT:
 	RETVAL
 
 #endif
+
 
 ####################
 
 void
 checkerr(int ret)
-    CODE:
-	checkerr(ret);
 
 
 #ifdef croak_memory_wrap
 void
 croak_memory_wrap()
+
+#endif
+
+
+#ifdef DEBUG
+void
+ERR_print_errors(SV *filename)
+    CODE:
+	BIO *bio = BIO_new_file( SvPVX(filename), "w" );
+	ERR_print_errors(bio);
+	BIO_free(bio);
 
 #endif
 

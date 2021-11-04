@@ -84,10 +84,10 @@ METHODS
           $ok=$hvatn->local_check($VAT, [$member_state]);
           
 
-    informations - Returns informations related to the last validated VAT
+    information - Returns information related to the last validated VAT
     number
 
-          %infos=$hvatn->informations();
+          %infos=$hvatn->information();
           
 
     get_last_error_code - Returns the last recorded error code

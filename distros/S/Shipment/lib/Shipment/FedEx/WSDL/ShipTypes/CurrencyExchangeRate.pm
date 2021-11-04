@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CurrencyExchangeRate;
-$Shipment::FedEx::WSDL::ShipTypes::CurrencyExchangeRate::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CurrencyExchangeRate::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               IntoCurrency
               Rate
 
-              )
+            )
         ],
         {   'FromCurrency' => \%FromCurrency_of,
             'IntoCurrency' => \%IntoCurrency_of,
@@ -66,7 +66,7 @@ Shipment::FedEx::WSDL::ShipTypes::CurrencyExchangeRate
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

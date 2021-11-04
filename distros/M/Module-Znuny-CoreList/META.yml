@@ -1,0 +1,34 @@
+---
+abstract: 'what modules shipped with versions of Znuny (>= 2.3.x)'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  File::Copy: '0'
+  File::Path: '0'
+  FindBin: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Znuny-CoreList
+provides:
+  Module::Znuny::CoreList:
+    file: lib/Module/Znuny/CoreList.pm
+    version: '1.00'
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: http://github.com/reneeb/Module-Znuny-CoreList/issues
+  homepage: http://github.com/reneeb/Module-Znuny-CoreList
+  repository: http://github.com/reneeb/Module-Znuny-CoreList.git
+version: '1.00'
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

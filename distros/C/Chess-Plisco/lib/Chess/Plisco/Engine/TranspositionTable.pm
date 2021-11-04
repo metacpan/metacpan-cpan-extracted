@@ -10,9 +10,11 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::TranspositionTable;
-$Chess::Plisco::Engine::TranspositionTable::VERSION = '0.3';
+$Chess::Plisco::Engine::TranspositionTable::VERSION = '0.4';
 use strict;
 use integer;
+
+use Chess::Plisco::Engine::Tree;
 
 use constant TT_ENTRY_SIZE => 16;
 
@@ -66,6 +68,14 @@ sub probe {
 
 	if ($edepth >= $depth) {
 		if ($flags == TT_SCORE_EXACT) {
+			if ($value <= Chess::Plisco::Engine::Tree::MATE
+					+ Chess::Plisco::Engine::Tree::MAX_PLY) {
+					$value += ($edepth - $depth);
+			} elsif ($value >= -Chess::Plisco::Engine::Tree::MATE
+					- Chess::Plisco::Engine::Tree::MAX_PLY) {
+					$value -= ($edepth - $depth);
+			}
+
 			return $value;
 		}
 
@@ -76,8 +86,6 @@ sub probe {
 		if (($flags == TT_SCORE_BETA) && ($value >= $beta)) {
 			return $beta;
 		}
-
-		# FIXME! Pass at least best move to caller.
 	}
 
 	return;

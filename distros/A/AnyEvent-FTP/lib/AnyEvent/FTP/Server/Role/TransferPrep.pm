@@ -9,7 +9,7 @@ use AnyEvent::Socket qw( tcp_server tcp_connect );
 use AnyEvent::Handle;
 
 # ABSTRACT: Interface for PASV, PORT and REST commands
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 has data => (
@@ -161,7 +161,7 @@ AnyEvent::FTP::Server::Role::TransferPrep - Interface for PASV, PORT and REST co
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

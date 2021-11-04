@@ -15,8 +15,6 @@ use File::Spec;
 use Data::Printer;
 use File::Path;
 use File::Copy;
-use File::Temp qw(tempdir);
-use File::Slurp qw( read_file write_file);
 
 use_ok('Archive::BagIt::Role::Portability');
 is(Archive::BagIt::Role::Portability::normalize_payload_filepath(''), '', 'normalize_payload_filepath, empty');
@@ -71,4 +69,5 @@ my $obj = new_ok('Archive::BagIt');
 is($obj->__file_find(qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag)), 13, '__file_find');
 is($obj->__file_find(qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag/data)), 9, '__file_find');
 is($obj->__file_find(qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag), qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag/data)), 4, '__file_find');
+
 1;

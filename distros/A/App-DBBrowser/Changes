@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.287    2021-10-21
+        - Term::TablePrint minimum version is '0.148'.
+
+2.286    2021-10-18
+        - New option 'truncate fractions first'.
+        - Update options menu.
+
 2.285    2021-10-03
         - Term::TablePrint minimum version is '0.145'.
 

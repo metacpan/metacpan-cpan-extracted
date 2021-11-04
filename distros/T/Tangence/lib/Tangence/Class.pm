@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Class 0.26;
+use v5.26;
+use Object::Pad 0.41;
 
-use v5.14;
-use warnings;
-use base qw( Tangence::Meta::Class );
+package Tangence::Class 0.27;
+class Tangence::Class isa Tangence::Meta::Class;
 
 use Tangence::Constants;
 
@@ -21,73 +21,66 @@ use Carp;
 
 use Sub::Util 1.40 qw( set_subname );
 
-our %metas; # cache one per class, keyed by _Tangence_ class name
+our %CLASSES; # cache one per class, keyed by _Tangence_ class name
 
-sub new
+sub make ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
    my $name = $args{name};
 
-   return $metas{$name} ||= $class->SUPER::new( @_ );
+   return $CLASSES{$name} //= $class->new( %args );
 }
 
-sub _new_type
+sub _new_type ( $sig )
 {
-   my ( $sig ) = @_;
-   return Tangence::Type->new_from_sig( $sig );
+   return Tangence::Type->make_from_sig( $sig );
 }
 
-sub declare
+sub declare ( $class, $perlname, %args )
 {
-   my $class = shift;
-   my ( $perlname, %args ) = @_;
-
    ( my $name = $perlname ) =~ s{::}{.}g;
 
-   my $self;
-   if( exists $metas{$name} ) {
-      $self = $metas{$name};
-      local $metas{$name};
-
-      my $newself = $class->new( name => $name );
-
-      %$self = %$newself;
+   if( exists $CLASSES{$name} ) {
+      croak "Cannot re-declare $name";
    }
-   else {
-      $self = $class->new( name => $name );
-   }
+
+   my $self = $class->make( name => $name );
 
    my %methods;
    foreach ( keys %{ $args{methods} } ) {
+      my %params = %{ $args{methods}{$_} };
       $methods{$_} = Tangence::Meta::Method->new(
+         class => $self,
          name => $_,
-         %{ $args{methods}{$_} },
          arguments => [ map {
             Tangence::Meta::Argument->new( name => $_->[0], type => _new_type( $_->[1] ) )
-         } @{ $args{methods}{$_}{args} } ],
-         ret => _new_type( $args{methods}{$_}{ret} ),
+         } @{ delete $params{args} } ],
+         ret => _new_type( delete $params{ret} ),
+         %params,
       );
    }
 
    my %events;
    foreach ( keys %{ $args{events} } ) {
+      my %params = %{ $args{events}{$_} };
       $events{$_} = Tangence::Meta::Event->new(
+         class => $self,
          name => $_,
-         %{ $args{events}{$_} },
          arguments => [ map {
             Tangence::Meta::Argument->new( name => $_->[0], type => _new_type( $_->[1] ) )
-         } @{ $args{events}{$_}{args} } ],
+         } @{ delete $params{args} } ],
+         %params,
       );
    }
 
    my %properties;
    foreach ( keys %{ $args{props} } ) {
+      my %params = %{ $args{props}{$_} };
       $properties{$_} = Tangence::Property->new(
+         class => $self,
          name => $_,
-         %{ $args{props}{$_} },
-         dimension => $args{props}{$_}{dim} || DIM_SCALAR,
-         type => _new_type( $args{props}{$_}{type} ),
+         dimension => ( delete $params{dim} ) || DIM_SCALAR,
+         type => _new_type( delete $params{type} ),
+         %params,
       );
    }
 
@@ -104,9 +97,8 @@ sub declare
    );
 }
 
-sub define
+method define
 {
-   my $self = shift;
    $self->SUPER::define( @_ );
 
    my $class = $self->perlname;
@@ -124,21 +116,15 @@ sub define
    }
 }
 
-sub for_name
+sub for_name ( $class, $name )
 {
-   my $class = shift;
-   my ( $name ) = @_;
-
-   return $metas{$name} || croak "Unknown Tangence::Class for '$name'";
+   return $CLASSES{$name} // croak "Unknown Tangence::Class for '$name'";
 }
 
-sub for_perlname
+sub for_perlname ( $class, $perlname )
 {
-   my $class = shift;
-   my ( $perlname ) = @_;
-
    ( my $name = $perlname ) =~ s{::}{.}g;
-   return $metas{$name} || croak "Unknown Tangence::Class for '$perlname'";
+   return $CLASSES{$name} // croak "Unknown Tangence::Class for '$perlname'";
 }
 
 sub superclasses
@@ -154,31 +140,26 @@ sub superclasses
    return @supers;
 }
 
-sub method
+method method ( $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
    return $self->methods->{$name};
 }
 
-sub event
+method event ( $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
    return $self->events->{$name};
 }
 
-sub property
+method property ( $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
    return $self->properties->{$name};
 }
 
-sub smashkeys
+has $smashkeys;
+
+method smashkeys
 {
-   my $self = shift;
-   return $self->{smashkeys} ||= do {
+   return $smashkeys //= do {
       my %smash;
       $smash{$_->name} = 1 for grep { $_->smashed } values %{ $self->properties };
       $Tangence::Message::SORT_HASH_KEYS ? [ sort keys %smash ] : [ keys %smash ];

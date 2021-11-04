@@ -14,7 +14,7 @@ $modules{$_} = $_ for qw(
   Class::Tiny
   ExtUtils::MakeMaker
   Ref::Util
-  Scope::Upper
+  Return::MultiLevel
   Test2::API
   Test2::Compare
   Test2::Compare::Array

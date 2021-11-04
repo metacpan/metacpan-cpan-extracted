@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::CreateShipmentResponseContainer;
-$Shipment::Purolator::WSDLV2::Types::CreateShipmentResponseContainer::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::CreateShipmentResponseContainer::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ Class::Std::initialize();
               ReturnShipmentPINs
               ExpressChequePIN
 
-              )
+            )
         ],
         {   'ResponseInformation' => \%ResponseInformation_of,
             'ShipmentPIN'         => \%ShipmentPIN_of,
@@ -82,7 +82,7 @@ Shipment::Purolator::WSDLV2::Types::CreateShipmentResponseContainer
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

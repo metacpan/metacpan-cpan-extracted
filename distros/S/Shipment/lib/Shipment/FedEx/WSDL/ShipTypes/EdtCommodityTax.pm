@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::EdtCommodityTax;
-$Shipment::FedEx::WSDL::ShipTypes::EdtCommodityTax::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::EdtCommodityTax::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        HarmonizedCode
               Taxes
 
-              )
+            )
         ],
         {   'HarmonizedCode' => \%HarmonizedCode_of,
             'Taxes'          => \%Taxes_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::ShipTypes::EdtCommodityTax
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,14 @@
+0.081		2021-10-22	T. R. Wyant
+    Any use of the postderef argument is now fatal.
+
+    Correct generation of 'provides' metadata.  Thanks to Favio Poletti
+    for blogging
+    https://github.polettix.it/ETOOBUSY/2021/06/15/the-real-pause-workaround/,
+    and ultimately to Joel Berger for the pointer to
+    https://metacpan.org/pod/CPAN::Meta::Spec#no_index
+
+    Add YAPE::Regex to SEE ALSO
+
 0.080		2021-04-16	T. R. Wyant
     All uses of the postderef argument to new() now warn.
 

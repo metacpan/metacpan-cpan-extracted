@@ -1,4 +1,4 @@
-# Copyright (c) 2019 by Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -38,8 +38,9 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp'              => '0',
         'Exporter'          => '0',
-        'Math::Polynomial'  => '1.001',
-        'Math::Prime::Util' => '0.36',
+        'Math::BigInt'      => '0',
+        'Math::Polynomial'  => '1.019',
+        'Math::Prime::Util' => '0.47',
     },
     SIGN => 1,
     META_MERGE => {
@@ -48,7 +49,7 @@ WriteMakefile(
         dynamic_config => 0,
         resources      => {
             bugtracker => {
-                web => "https://rt.cpan.org/Public/Dist/Display.html?Name=$DN",
+                web => "https://github.com/mhasch/perl-$DN/issues",
             },
             license => [
                 'https://www.perlfoundation.org/artistic-license-20.html'
@@ -57,6 +58,14 @@ WriteMakefile(
                 url  => "git://github.com/mhasch/perl-$DN.git",
                 web  => "https://github.com/mhasch/perl-$DN",
                 type => 'git',
+            },
+        },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Math::BigInt::GMP'      => 0,
+                    'Math::Prime::Util::GMP' => 0,
+                },
             },
         },
     },

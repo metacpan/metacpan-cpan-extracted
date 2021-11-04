@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Client;
-$Shipment::Temando::WSDL::Types::Client::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Client::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -75,7 +75,7 @@ Class::Std::initialize();
               phone2
               email
 
-              )
+            )
         ],
         {   'id'                    => \%id_of,
             'individualCompany'     => \%individualCompany_of,
@@ -101,14 +101,14 @@ Class::Std::initialize();
             'phone2'                => \%phone2_of,
             'email'                 => \%email_of,
         },
-        {   'id' => 'Shipment::Temando::WSDL::Types::ClientId',
+        {   'id'                => 'Shipment::Temando::WSDL::Types::ClientId',
             'individualCompany' =>
               'Shipment::Temando::WSDL::Types::IndividualCompany',
             'companyName' => 'Shipment::Temando::WSDL::Types::CompanyName',
             'companyContactPerson' =>
               'Shipment::Temando::WSDL::Types::ContactName',
             'companyNo' => 'Shipment::Temando::WSDL::Types::CompanyNumber',
-            'individualSurname' => 'Shipment::Temando::WSDL::Types::Surname',
+            'individualSurname'   => 'Shipment::Temando::WSDL::Types::Surname',
             'individualFirstname' =>
               'Shipment::Temando::WSDL::Types::Firstname',
             'individualDateOfBirth' => 'Shipment::Temando::WSDL::Types::Date',
@@ -173,7 +173,7 @@ Shipment::Temando::WSDL::Types::Client
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

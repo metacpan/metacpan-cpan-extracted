@@ -1,0 +1,175 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use Getopt::Long    qw(GetOptions);
+use Cwd qw(abs_path);
+use FindBin qw($Bin);
+use Pod::Usage qw(pod2usage);
+
+use lib map { abs_path($_) || $_ } "$Bin/../lib";
+
+our $VERSION = v1.0.0;
+
+use FindApp::Utils::Package qw(
+    sort_packages_lexically
+    sort_packages_numerically
+);
+
+our %Opt;
+get_options();
+process_input();
+exit;
+
+sub get_options {
+    Getopt::Long::Configure "bundling_override";
+    GetOptions(\%Opt,
+      # Standard options:
+        qw(
+            help|h|?
+            manpage|m
+            version|v
+        ),
+      # Program-specific options:
+        qw(
+            numerically|n
+            reverse|r
+        ),
+    ) || pod2usage(1);
+
+    # This turns things like "fail-safe" into "fail_safe"
+    # for easier unquoted access via $Opt{fail_safe}:
+    for my $ugly_opt (keys %Opt) {
+        my $pretty_opt = $ugly_opt;
+        if ($pretty_opt =~ s/-/_/g) {
+            $Opt{$pretty_opt} = $Opt{$ugly_opt};
+        }
+    }
+
+    pod2usage(0)                                if $Opt{help};
+    pod2usage(-exitstatus => 0, -verbose => 2)  if $Opt{manpage};
+    show_version_and_exit()                     if $Opt{version};
+}
+
+sub show_version_and_exit {
+    printf "%s v%vd\n", $0, $VERSION;
+    my $package = "FindApp::Utils::Package";
+    my $lib_version = $package->VERSION;
+    printf "%s %s\n", $package, $lib_version;
+    require FindApp;
+    $package = "FindApp";
+    $lib_version = $package->VERSION;
+    printf "%s %s\n", $package, $lib_version;
+    print "perl $^V via $^X\n";
+    exit 0;
+}
+
+sub process_input { 
+    my @packages;
+
+    if (! @ARGV && -t STDIN) {
+        print STDERR "$0: reading package names from stdin\n"
+    }
+
+    if (grep /::/, @ARGV) {
+        if (grep m(/), @ARGV) {
+            die "$0: cannot mix package names and path names in argument list\n";
+        }
+        @packages = @ARGV;
+    }
+    else {
+        @packages = <>;
+        chomp @packages;
+    }
+
+    my $sorter = \(
+        $Opt{numerically} 
+            ? &sort_packages_numerically 
+            : &sort_packages_lexically 
+    );
+
+    my @sorted = &$sorter(@packages);
+    @sorted = reverse @sorted if $Opt{reverse};
+    say for @sorted;
+}
+
+__END__
+
+=head1 NAME
+
+pmsort - sort perl module names by package component
+
+=head1 SYNOPSIS
+
+pmsort [-hmv | --help | --manpage | --version] 
+
+pmsort [-nv] [file | package] ...
+
+pmsort [--numerically] [--reverse] [file | package] ...
+
+=head1 DESCRIPTION
+
+This program is thin wrapper around 
+L<FindApp::Utils::Package/sort_packages_lexically>
+and L<FindApp::Utils::Package/sort_packages_numerically>.
+
+The default is to sort package names lexically, but the B<--numerically> or
+B<-n> option will sort them numerically.
+
+Package names are read from the normal input arguments via C<ARGV>, which
+are interpreted as filenames containing packages one per line unless at
+least one of them has a double-colon in it.  If no arguments are given,
+then C<STDIN> is read from.
+
+Sorting packages is a type of field sort, where the field separator is 
+a double-colon or the legacy single-quote equivalent.  So you first sort
+on the first field and only if there's a tie do you go on to the second field.
+
+=head2 Options
+
+=over
+
+=item --help, -h, -?
+
+Get short help.
+
+=item --manpage, -m
+
+Display this man page.
+
+=item --numerically, -n
+
+Sort module names first by the number of package elements and only second
+by the names themselves.
+
+=item --reverse, -r
+
+Reverse the output order.
+
+=item --version, -v
+
+Print program version information, then exit.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<FindApp::Utils::Package>
+
+=back
+
+=head1 AUTHOR
+
+Tom Christiansen C<< <tchrist@perl.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2016, Tom Christiansen C<< <tchrist@perl.com> >>.
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.

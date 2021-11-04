@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::CloseTypes::LinearMeasure;
-$Shipment::FedEx::WSDL::CloseTypes::LinearMeasure::VERSION = '3.05';
+$Shipment::FedEx::WSDL::CloseTypes::LinearMeasure::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Value
               Units
 
-              )
+            )
         ],
         {   'Value' => \%Value_of,
             'Units' => \%Units_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::CloseTypes::LinearMeasure
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

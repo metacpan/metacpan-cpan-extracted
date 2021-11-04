@@ -40,7 +40,7 @@ Util::H2O - Hash to Object: turns hashrefs into objects with accessors for keys
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.16';
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
 our @EXPORT = qw/ h2o /;  ## no critic (ProhibitAutomaticExportation)
@@ -121,9 +121,31 @@ name, you will get "redefined" warnings. Therefore, if you want to
 create multiple objects in the same package, you should probably use
 C<-new>.
 
-=item C<< -classify => I<classname> >>
+=item C<< -classify => I<classname_string or $hashref> >>
 
-Short form of the options C<< -new, -meth, -class => I<classname> >>.
+In the form C<< -classify => I<classname_string> >>, this is simply the short
+form of the options C<< -new, -meth, -class => I<classname_string> >>.
+
+As of v0.16, in the special form C<< -classify => I<$hashref> >>, where the
+C<-classify> B<must> be the B<last> option in C<@opts> before the
+L<C<$hashref>|/"$hashref">, it is the same as
+C<< -new, -meth, -class => __PACKAGE__, I<$hashref> >> - that is, the current
+package's name is used as the custom class name. It does not make sense to use
+this outside of an explicit package, since your class will be named C<main>.
+With this option, the C<Point> example in the L</Synopsis> can be written like
+the following, which can be useful if you want to add more things to the
+C<package>, or perhaps if you want to write your methods as regular C<sub>s:
+
+ {
+     package Point;
+     use Util::H2O;
+     h2o -classify, {
+          angle => sub { my $self = shift; atan2($self->y, $self->x) }
+     }, qw/ x y /;
+ }
+
+Note C<h2o> will remain in the package's namespace, one possibility is that you
+could load L<namespace::clean> after you load this module.
 
 =item C<< -isa => I<arrayref or scalar> >>
 
@@ -137,8 +159,8 @@ Generates a constructor named C<new> in the package. The constructor
 works as a class and instance method, and dies if it is given any
 arguments that it doesn't know about. If you want more advanced
 features, like required arguments, validation, or other
-initialization, you should probably switch to something like L<Moo>
-instead.
+initialization, you should probably L<switch|/"Upgrading to Moo">
+to something like L<Moo> instead.
 
 =item C<< -destroy => I<coderef> >>
 
@@ -154,6 +176,9 @@ Whether or not to clean up the generated package when the object is
 destroyed. Defaults to I<false> when C<-class> is specified, I<true>
 otherwise. If this is I<false>, be aware that the packages will stay
 in Perl's symbol table and use memory accordingly.
+
+As of v0.16, this module will refuse to delete the package if it
+is named C<main>.
 
 =item C<< -lock => I<bool> >>
 
@@ -251,8 +276,8 @@ and L<perlobj/AUTOLOAD>. Without the C<-meth> option, you will get a
 "catch-all" accessor to which all method calls to unknown method names will go,
 and with C<-meth> enabled (which is implied by C<-classify>), you can install
 your own custom C<AUTOLOAD> handler by passing a coderef as the value for this
-key. However, it is important to note that enabling autoloading removes any
-typo protection on method names.
+key - see L</An Autoloading Example>. However, it is important to note that
+enabling autoloading removes any typo protection on method names!
 
 =back
 
@@ -267,6 +292,8 @@ Please see the list of keys that are treated specially above.
 The (now blessed and optionally locked) C<$hashref>.
 
 =cut
+
+our $_PACKAGE_REGEX = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
 
 sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 	my ($recurse,$meth,$class,$isa,$destroy,$new,$clean,$lock,$ro);
@@ -285,6 +312,7 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 		}
 		elsif ($_[0] eq '-classify') {
 			$class = (shift, shift);
+			if ( ref $class eq 'HASH' ) { unshift @_, $class; $class = caller; }
 			croak "invalid -classify option value"
 				if !defined $class || ref $class || !length $class;
 			$meth = 1; $new = 1;
@@ -325,7 +353,11 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 	if ( $destroy || $clean ) {
 		my $sub = sub {
 			$destroy and ( eval { $destroy->($_[0]); 1 } or carp $@ );  ## no critic (ProhibitMixedBooleanOperators)
-			$clean and delete_package($pack) };
+			if ( $clean ) {
+				if ( $pack eq 'main' ) { carp "h2o refusing to delete package \"main\"" }
+				else { delete_package($pack) }
+			}
+		};
 		{ no strict 'refs'; *{$pack.'::DESTROY'} = $sub }  ## no critic (ProhibitNoStrict)
 	}
 	if ( $new ) {
@@ -352,6 +384,101 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 1;
 __END__
 
+=head1 Cookbook
+
+=head2 Using with Config::Tiny
+
+One common use case for this module is to make accessing hashes nicer, like for
+example those you get from L<Config::Tiny>. Here's how you can create a new
+C<h2o> object from a configuration file, and if you have L<Config::Tiny> v2.27
+or newer, the second part of the example for writing the configuration file
+back out will work too:
+
+ use Util::H2O;
+ use Config::Tiny;
+ 
+ my $config = h2o -recurse, {%{ Config::Tiny->read($config_filename) }};
+ 
+ say $config->foo->bar;  # prints the value of "bar" in section "[foo]"
+ $config->foo->bar("Hello, World!");  # change value
+ 
+ # write file back out, requires Config::Tiny v2.27 or newer
+ Config::Tiny->new({%$config})->write($config_filename);
+
+Please be aware that since the above code only uses shallow copies, the nested
+hashes are actually not copied, and the second L<Config::Tiny> object's nested
+hashes will still be C<h2o> objects - but L<Config::Tiny> doesn't mind this.
+
+=head2 Debugging
+
+Because the packages generated by C<h2o> are dynamic, note that any debugging
+dumps of these objects will be somewhat incomplete because they won't show the
+methods. However, if you'd like somewhat nicer looking dumps of the I<data>
+contained in the objects, one way you can do that is with L<Data::Dump::Filtered>:
+
+ use Util::H2O;
+ use Data::Dump qw/dd/;
+ use Data::Dump::Filtered qw/add_dump_filter/;
+ add_dump_filter( sub {
+     my ($ctx, $obj) = @_;
+     return { bless=>'', comment=>'Util::H2O::h2o()' }
+         if $ctx->class=~/^Util::H2O::/;
+     return undef; # normal Data::Dump processing for all other objects
+ });
+ 
+ my $x = h2o -recurse, { foo => "bar", quz => { abc => 123 } };
+ dd $x;
+
+Outputs:
+
+ # Util::H2O::h2o()
+ {
+   foo => "bar",
+   quz => # Util::H2O::h2o()
+          { abc => 123 },
+ }
+
+=head2 An Autoloading Example
+
+If you wanted to create a class where (almost!) every method call is
+automatically translated to a hash access of the corresponding key, here's how
+you could do that:
+
+ h2o -classify=>'HashLikeObj', -nolock, {
+     AUTOLOAD => sub {
+         my $self = shift;
+         our $AUTOLOAD;
+         ( my $key = $AUTOLOAD ) =~ s/.*:://;
+         $self->{$key} = shift if @_;
+         return $self->{$key};
+     } };
+
+=head2 Upgrading to Moo
+
+Let's say you've used this module to whip up two simple classes:
+
+ h2o -classify => 'My::Class', {}, qw/ foo bar details /;
+ h2o -classify => 'My::Class::Details', {}, qw/ a b /;
+
+But now you need more features and would like to upgrade to a better OO system
+like L<Moo>. Here's how you'd write the above code using that, with some
+L<Type::Tiny> thrown in:
+
+ package My::Class2 {
+     use Moo;
+     use Types::Standard qw/ InstanceOf /;
+     use namespace::clean; # optional but recommended
+     has foo     => (is=>'rw');
+     has bar     => (is=>'rw');
+     has details => (is=>'rw', isa=>InstanceOf['My::Class2::Details']);
+ }
+ package My::Class2::Details {
+     use Moo;
+     use namespace::clean;
+     has a => (is=>'rw');
+     has b => (is=>'rw');
+ }
+
 =head1 See Also
 
 Inspired in part by C<lock_keys> from L<Hash::Util>.
@@ -365,7 +492,7 @@ L<Object::Result|Object::Result>, and L<Hash::Wrap|Hash::Wrap>,
 the latter of which also contains a comprehensive list of similar
 modules.
 
-For real OO work, I like L<Moo> and L<Type::Tiny>.
+For real OO work, I like L<Moo> and L<Type::Tiny> (see L</"Upgrading to Moo">).
 
 =head1 Author, Copyright, and License
 

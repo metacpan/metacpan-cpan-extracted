@@ -9,6 +9,7 @@ use feature qw( postderef signatures );
 use namespace::autoclean;
 use autodie;
 
+use Carp qw( confess );
 use Data::Dumper::Concise qw( Dumper );
 use JSON::MaybeXS qw( decode_json );
 use List::AllUtils qw( max uniq );
@@ -102,7 +103,7 @@ has _locales => (
 
 sub run ($self) {
     binmode STDOUT, ':encoding(UTF-8)'
-        or die $!;
+        or confess $!;
 
     $self->_clean_old_data;
     $self->_locales;
@@ -266,7 +267,7 @@ sub _write_catalog_pm ($self) {
     $locale_list =~ s/ +$//mg;
 
     $catalog_pm =~ s/(^=for :locales\n\n).+^(?==)/$1$locale_list/ms
-        or die 'locale list subst failed';
+        or confess 'locale list subst failed';
 
     $catalog_pm_file->spew_utf8($catalog_pm);
 }
@@ -295,7 +296,7 @@ sub _insert_var_in_code ( $self, $name, $value, $public, $code ) {
         (\#\#\#\Q :end $name:\E\n
          \#>>>\n)
     /$1$declarator $sigil$name = $safe;\n$2/xs
-        or die "inserting $name failed";
+        or confess "inserting $name failed";
 
     return;
 }
@@ -314,7 +315,7 @@ sub _dump_with_unicode ( $self, $val ) {
 sub _unicode_char_for ( $, $hex ) {
     ## no critic (BuiltinFunctions::ProhibitStringyEval)
     my $num = eval '0x' . $hex;
-    die $@ if $@;
+    confess $@ if $@;
     return '\N{U+' . sprintf( '%04x', $num ) . '}';
 }
 
@@ -349,7 +350,7 @@ sub _write_pod_files ($self) {
     my $template = Text::Template->new(
         TYPE   => 'FILE',
         SOURCE => path(qw( tools templates locale.pod ))->stringify,
-    ) or die $Text::Template::ERROR;
+    ) or confess $Text::Template::ERROR;
 
     use lib 'lib';
     require Test::File::ShareDir::Dist;
@@ -397,7 +398,7 @@ sub _write_pod_files ($self) {
         ## use critic
 
         my $locale = DateTime::Locale->load($code)
-            or die "Cannot load $code";
+            or confess "Cannot load $code";
         $_->set_locale($locale) for @example_dts;
 
         my $name   = $locale->name;
@@ -410,7 +411,7 @@ sub _write_pod_files ($self) {
                 example_dts => \@example_dts,
                 locale      => \$locale,
             },
-        ) or die $Text::Template::ERROR;
+        ) or confess $Text::Template::ERROR;
 
         $pod_file->spew_utf8($filled);
     }

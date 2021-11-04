@@ -3,7 +3,7 @@ abstract: 'chip driver for F<MAX44009>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::Device::Chip::Adapter: '0.18'
+  Test::Device::Chip::Adapter: '0.20'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
@@ -17,7 +17,7 @@ name: Device-Chip-MAX44009
 provides:
   Device::Chip::MAX44009:
     file: lib/Device/Chip/MAX44009.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Data::Bitfield: '0'
   Device::Chip::Base::RegisteredI2C: '0'
@@ -27,5 +27,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

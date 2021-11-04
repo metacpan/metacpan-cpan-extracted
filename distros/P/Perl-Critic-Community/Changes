@@ -1,3 +1,7 @@
+v1.0.1    2021-10-21 14:17:55 EDT
+  - Support configuring allowed_modules for DiscouragedModules and
+    PreferredAlternatives policies (Amorymeltzer #43)
+
 v1.0.0    2021-05-27 02:44:33 EDT
   - Rename to Perl::Critic::Community and move policies to the 'community'
     theme (Freenode modules and theme remain as legacy aliases)

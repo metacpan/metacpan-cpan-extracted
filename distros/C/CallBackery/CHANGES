@@ -1,3 +1,19 @@
+0.39.5 2021-10-21 14:06:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - improve live updates for card form fields
+
+0.39.4 2021-10-12 13:13:42 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix XS-Parse-Keyword dependency to 0.21
+
+0.39.3 2021-10-12 08:36:17 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - shun XS-Parse-Keyword 0.20 (it won't compile)
+
+0.39.2 2021-10-12 07:57:12 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - allow localized string in MsgBox
+
 0.39.1 2021-08-30 16:10:03 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - callbackery.ui.HtmlBox was missing from the release archive
@@ -23,10 +39,6 @@
  - Update card only if not in focus
 
 0.38.16 2021-08-05 17:26:44 +0200 Tobias Oetiker <tobi@oetiker.ch>
-
- -
-
-0.38.16 2021-08-05 17:23:17 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - ignore fields that are not returned from the backend
 

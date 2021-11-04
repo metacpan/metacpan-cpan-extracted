@@ -188,6 +188,10 @@ Set or get the subroutine where the error originated. It returns the current val
 
 Provided with a message string, this will create a new L<Module::Generic::Exception> object and call L<perlfunc/"die"> with it.
 
+=head2 TO_JSON
+
+Special method called by L<JSON> to transform this object into a string suitable to be added in a json data.
+
 =head2 trace
 
 Set or get the L<Devel::StackTrace> object used to provide a full stack trace of the error. It returns the current value.

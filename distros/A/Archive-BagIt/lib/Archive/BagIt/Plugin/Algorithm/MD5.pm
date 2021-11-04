@@ -1,18 +1,12 @@
 package Archive::BagIt::Plugin::Algorithm::MD5;
-
 use strict;
 use warnings;
 use Carp qw( croak );
 use Moo;
-use Net::SSLeay ();
 use namespace::autoclean;
-with 'Archive::BagIt::Role::Algorithm';
-our $VERSION = '0.081'; # VERSION
+with 'Archive::BagIt::Role::Algorithm', 'Archive::BagIt::Role::OpenSSL';
+our $VERSION = '0.083'; # VERSION
 # ABSTRACT: The MD5 algorithm plugin (default for v0.97)
-
-sub BEGIN {
-    Net::SSLeay::OpenSSL_add_all_digests();
-}
 
 has '+plugin_name' => (
     is => 'ro',
@@ -34,32 +28,7 @@ has '_digest' => (
 
 sub _build_digest_md5 {
     my ($self) = @_;
-    my $md  = Net::SSLeay::EVP_get_digestbyname($self->name);
-    my $digest = Net::SSLeay::EVP_MD_CTX_create();
-    Net::SSLeay::EVP_DigestInit($digest, $md);
-    return $digest;
-}
-
-sub get_hash_string {
-    my ($self, $fh) = @_;
-    my $blksize = $self->get_optimal_bufsize($fh);
-    my $buffer;
-    while (read($fh, $buffer, $blksize)) {
-        Net::SSLeay::EVP_DigestUpdate($self->_digest, $buffer);
-    }
-    my $result = Net::SSLeay::EVP_DigestFinal($self->_digest);
-    Net::SSLeay::EVP_MD_CTX_destroy($self->_digest);
-    delete $self->{_digest};
-    return unpack('H*', $result);
-}
-
-sub verify_file {
-    my ($self, $filename) = @_;
-    open(my $fh, '<:raw', $filename) || croak ("Can't open '$filename', $!");
-    binmode($fh);
-    my $digest = $self->get_hash_string($fh);
-    close $fh || croak("could not close file '$filename', $!");
-    return $digest;
+    return $self->_init_digest();
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -77,7 +46,7 @@ Archive::BagIt::Plugin::Algorithm::MD5 - The MD5 algorithm plugin (default for v
 
 =head1 VERSION
 
-version 0.081
+version 0.083
 
 =head1 AVAILABILITY
 

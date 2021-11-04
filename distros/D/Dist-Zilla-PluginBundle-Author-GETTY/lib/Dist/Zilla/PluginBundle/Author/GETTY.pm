@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.111';
+$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.112';
 use Moose;
 use Moose::Autobox;
 use Dist::Zilla;
@@ -153,7 +153,7 @@ for my $attr (@run_attributes) {
   );
 }
 
-my @alien_options = qw( msys repo name bins pattern_prefix pattern_suffix pattern_version pattern autoconf_with_pic isolate_dynamic );
+my @alien_options = qw( msys repo name bins pattern_prefix pattern_suffix pattern_version pattern autoconf_with_pic isolate_dynamic version_check );
 
 my @alien_attributes = map { 'alien_'.$_ } @alien_options;
 
@@ -392,7 +392,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.111
+version 0.112
 
 =head1 SYNOPSIS
 

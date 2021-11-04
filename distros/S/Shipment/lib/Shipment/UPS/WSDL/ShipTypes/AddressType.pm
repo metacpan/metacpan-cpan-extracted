@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::AddressType;
-$Shipment::UPS::WSDL::ShipTypes::AddressType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::AddressType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               PostalCode
               CountryCode
 
-              )
+            )
         ],
         {   'AddressLine'       => \%AddressLine_of,
             'City'              => \%City_of,
@@ -81,7 +81,7 @@ Shipment::UPS::WSDL::ShipTypes::AddressType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.26;
 use warnings;
 
 use Test::More;
@@ -11,7 +11,7 @@ use Tangence::Message;
 $Tangence::Message::SORT_HASH_KEYS = 1;
 
 use Tangence::Type;
-sub _make_type { Tangence::Type->new_from_sig( shift ) }
+sub _make_type { Tangence::Type->make_from_sig( shift ) }
 
 use lib ".";
 use t::Colourable;
@@ -49,15 +49,15 @@ sub test_specific
    my $name = shift;
    my %args = @_;
 
-   my $m = Tangence::Message->new( TestStream->new );
+   my $m = Tangence::Message->new( TestStream->new, undef );
    my $pack_method = "pack_$args{type}";
    is( $m->$pack_method( $args{data} ), $m, "$pack_method returns \$m for $name" );
 
-   is_hexstr( $m->{record}, $args{stream}, "$pack_method $name" );
+   is_hexstr( $m->payload, $args{stream}, "$pack_method $name" );
 
    my $unpack_method = "unpack_$args{type}";
    is_deeply( $m->$unpack_method(), exists $args{retdata} ? $args{retdata} : $args{data}, "$unpack_method $name" );
-   is( length $m->{record}, 0, "eats all stream for $name" );
+   is( length $m->payload, 0, "eats all stream for $name" );
 }
 
 sub test_specific_dies
@@ -66,7 +66,7 @@ sub test_specific_dies
    my %args = @_;
 
    ok( exception {
-      my $m = Tangence::Message->new( TestStream->new );
+      my $m = Tangence::Message->new( TestStream->new, undef );
       my $pack_method = "pack_$args{type}";
 
       $m->$pack_method( $args{data} );
@@ -202,10 +202,10 @@ sub test_typed
 
    my $type = _make_type $args{sig};
 
-   my $m = Tangence::Message->new( TestStream->new );
+   my $m = Tangence::Message->new( TestStream->new, undef );
    $type->pack_value( $m, $args{data} );
 
-   is_hexstr( $m->{record}, $args{stream}, "pack typed $name" );
+   is_hexstr( $m->payload, $args{stream}, "pack typed $name" );
 
    my $value = $type->unpack_value( $m );
    my $expect = exists $args{retdata} ? $args{retdata} : $args{data};
@@ -221,7 +221,7 @@ sub test_typed
    }
 
    is_deeply( $value, $expect, "\$type->unpack_value $name" );
-   is( length $m->{record}, 0, "eats all stream for $name" );
+   is( length $m->payload, 0, "eats all stream for $name" );
 }
 
 sub test_typed_dies
@@ -233,7 +233,7 @@ sub test_typed_dies
    my $type = _make_type $sig;
 
    ok( exception {
-      my $m = Tangence::Message->new( TestStream->new );
+      my $m = Tangence::Message->new( TestStream->new, undef );
 
       $type->pack_value( $m, $args{data} );
    }, "\$type->pack_value for ($sig) $name dies" ) if exists $args{data};
@@ -581,12 +581,12 @@ test_typed "any (record)",
 
 my $m;
 
-$m = Tangence::Message->new( 0 );
+$m = Tangence::Message->new( 0, undef );
 $m->pack_all_sametype( _make_type('int'), 10, 20, 30 );
 
-is_hexstr( $m->{record}, "\x02\x0a\x02\x14\x02\x1e", 'pack_all_sametype' );
+is_hexstr( $m->payload, "\x02\x0a\x02\x14\x02\x1e", 'pack_all_sametype' );
 
 is_deeply( [ $m->unpack_all_sametype( _make_type('int') ) ], [ 10, 20, 30 ], 'unpack_all_sametype' );
-is( length $m->{record}, 0, "eats all stream for all_sametype" );
+is( length $m->payload, 0, "eats all stream for all_sametype" );
 
 done_testing;

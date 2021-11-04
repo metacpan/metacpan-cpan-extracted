@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail;
-$Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,12 +29,12 @@ Class::Std::initialize();
         [   qw(        Date
               WindowDetails
 
-              )
+            )
         ],
         {   'Date'          => \%Date_of,
             'WindowDetails' => \%WindowDetails_of,
         },
-        {   'Date' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+        {   'Date'          => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
             'WindowDetails' =>
               'Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail',
         },
@@ -62,7 +62,7 @@ Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

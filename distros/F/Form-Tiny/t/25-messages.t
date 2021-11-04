@@ -1,4 +1,5 @@
 use v5.10;
+use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
@@ -26,11 +27,13 @@ use Form::Tiny::Inline;
 }
 
 my $form = TestForm->new;
-$form->set_input({
-	no_message => 0.5,
-	plain_message => 0.5,
-	stringified_message => 0.5,
-});
+$form->set_input(
+	{
+		no_message => 0.5,
+		plain_message => 0.5,
+		stringified_message => 0.5,
+	}
+);
 
 ok !$form->valid, 'validation failed ok';
 for my $error (@{$form->errors}) {
@@ -53,10 +56,12 @@ for my $error (@{$form->errors}) {
 
 dies_ok {
 	Form::Tiny::Inline->new(
-		field_defs => [{
-			name => 'that_doesnt_stringify',
-			message => Form::Tiny::Inline->new(),
-		}],
+		field_defs => [
+			{
+				name => 'that_doesnt_stringify',
+				message => Form::Tiny::Inline->new(),
+			}
+		],
 	);
 };
 

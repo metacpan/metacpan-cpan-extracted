@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 use DateTime::Locale::Data;
 use DateTime::Locale::FromData;
@@ -184,8 +184,8 @@ my %DateTimeLanguageAliases = (
 );
 
 my %POSIXAliases = (
-    C     => 'en-US-POSIX',
-    POSIX => 'en-US-POSIX',
+    C     => 'en-US',
+    POSIX => 'en-US',
 );
 
 {
@@ -380,7 +380,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 
@@ -566,11 +566,7 @@ to extract the CLDR data.
 
 =head1 SEE ALSO
 
-L<DateTime::Locale::Base>
-
 datetime@perl.org mailing list
-
-http://datetime.perl.org/
 
 =head1 SUPPORT
 
@@ -578,8 +574,6 @@ Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-Locale/issu
 
 There is a mailing list available for users of this distribution,
 L<mailto:datetime@perl.org>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 

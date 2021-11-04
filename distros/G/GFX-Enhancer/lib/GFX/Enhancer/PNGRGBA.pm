@@ -9,20 +9,39 @@ sub new {
 	my $self = { index => $index, rgba => $fourbytes, };
 
 	$class = ref($class) || $class;
-
 	bless $self, $class;
 }
 
 ### public methods
 
-sub higher_colour {
-	my ($self, $rgba2) = @_;
+sub threshold_colour {
+  my ($self, $pngrgba2, $t) = @_;
 
-	if ($rgba2->{rgba} > $self->{rgba}) {
-		return 1;
-	} else {
-		return 0;
-	}
+  if (abs($self->{rgba} - $pngrgba2->{rgba}) < $t) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+sub higher_colour {
+  my ($self, $rgba2) = @_;
+  
+  if ($rgba2->{rgba} > $self->{rgba}) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+sub lower_colour {
+  my ($self, $rgba2) = @_;
+  
+  if ($rgba2->{rgba} < $self->{rgba}) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 sub red {

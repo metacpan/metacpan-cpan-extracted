@@ -14,7 +14,7 @@ use integer;
 
 use Test::More;
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 
 my @tests = (
 	{
@@ -81,5 +81,5 @@ foreach my $test (@tests) {
 		$pos->doMove($move)
 			or die "$test->{name}: illegal move $test->{move}";
 	}
-	is(cp_pos_material($pos), $test->{material}, "$test->{name}");
+	is((($pos->[CP_POS_INFO] >> 19)), $test->{material}, "$test->{name}");
 }

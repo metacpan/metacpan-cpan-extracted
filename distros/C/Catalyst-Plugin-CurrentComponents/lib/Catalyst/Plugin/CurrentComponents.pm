@@ -5,7 +5,7 @@ use Scalar::Util ();
 
 requires 'model', 'view', 'stash';
 
-our $VERSION = '0.007';
+our $VERSION = '0.009';
 
 has 'model_instance_from_return' => (is=>'lazy');
 

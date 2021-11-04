@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Payment;
-$Shipment::Temando::WSDL::Types::Payment::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Payment::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -43,7 +43,7 @@ Class::Std::initialize();
               paypalPayerId
               paypalToken
 
-              )
+            )
         ],
         {   'paymentType'    => \%paymentType_of,
             'cardType'       => \%cardType_of,
@@ -91,7 +91,7 @@ Shipment::Temando::WSDL::Types::Payment
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

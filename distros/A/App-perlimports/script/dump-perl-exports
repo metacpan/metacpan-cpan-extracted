@@ -185,7 +185,7 @@ dump-perl-exports - A command line utility for describing what a class exports
 
 =head1 VERSION
 
-version 0.000023
+version 0.000025
 
 =head1 SYNOPSIS
 

@@ -7,6 +7,20 @@ use Exporter;
 use URPM;
 use urpm::util 'append_to_file';
 
+=head1 NAME
+
+urpm::msg - routines to prompt messages from the urpm* tools
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=over
+
+=cut
+
 my $encoding;
 BEGIN {
     eval { require encoding; $encoding = encoding::_get_locale_encoding() };
@@ -40,6 +54,13 @@ sub from_locale_encoding {
     } || $s;
 }
 
+
+=item translate($s, $o_plural, $o_nb)
+
+Actually translate a string using gettext.
+
+=cut
+
 sub translate {
     my ($s, $o_plural, $o_nb) = @_;
     my $res;
@@ -60,15 +81,36 @@ sub translate {
     }
 }
 
+=item P($s_singular, $s_plural, $nb, @para)
+
+Like N(), translate a string but with different singular/plural strings according to $nb
+
+=cut
+
 sub P {
     my ($s_singular, $s_plural, $nb, @para) = @_; 
     sprintf(translate($s_singular, $s_plural, $nb), @para);
 }
 
+=item N($format, @params)
+
+Translate the $format string (a la printf using @params)
+
+=cut
+
 sub N {
     my ($format, @params) = @_;
     sprintf(translate($format), @params);
 }
+
+=item N_($string)
+
+Unlike N(), it doesn't actually translate $string but serves to tag a string as translatable for extracting into pod catalog.
+
+The string will actually be translated later using translate().
+
+=cut
+
 sub N_ { $_[0] }
 
 my $noexpr = N("Nn");
@@ -88,9 +130,20 @@ eval {
     END { defined &closelog and closelog() }
 };
 
+=item sys_log(...)
+
+Log through syslog if Sys::Syslog is installed.
+
+=cut
+
 sub sys_log { defined &syslog and eval { syslog("info", @_) } }
 
-#- writes only to logfile, not to screen
+=item bug_log(...)
+
+Writes only to logfile, not to screen
+
+=cut
+
 sub bug_log {
     append_to_file($::logfile, @_) if $::logfile;
 }
@@ -130,6 +183,13 @@ sub _message_input {
     }
     return $input;
 }
+
+
+=item toMb($nb)
+
+Convert a number of bytes into Mb
+
+=cut
 
 sub toMb {
     my $nb = $_[0] / 1024 / 1024;
@@ -185,7 +245,22 @@ sub _format_line_selected_packages {
      map { sprintf($format_line_format, @$_) } @l);
 }
 
-# duplicated from svn+ssh://svn.mandriva.com/svn/soft/drakx/trunk/perl-install/common.pm
+
+=item formatXiB($number [, $o_newbase])
+
+Returns a nicely human size. eg:
+
+  2097152 => "2MB"
+
+The optional parameter enables to provide the unit size (default is one).
+eg for a 2000 512 sized sectors:
+
+  formatXiB(2000, 512)
+
+Duplicated from L<common> (drakx/perl-install/common.pm)
+
+=cut
+
 sub formatXiB {
     my ($newnb, $o_newbase) = @_;
     my $newbase = $o_newbase || 1;
@@ -211,14 +286,7 @@ sub localtime2changelog { scalar(localtime($_[0])) =~ /(.*) \S+ (\d{4})$/ && "$1
 
 1;
 
-
-=head1 NAME
-
-urpm::msg - routines to prompt messages from the urpm* tools
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
+=back
 
 =head1 COPYRIGHT
 

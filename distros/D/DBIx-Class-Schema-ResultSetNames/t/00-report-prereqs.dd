@@ -17,8 +17,10 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Carp' => '0',
                                       'DBIx::Class::Schema' => '0',
                                       'Lingua::EN::Inflect::Phrase' => '0',
+                                      'Modern::Perl' => '0',
                                       'perl' => '5.012'
                                     }
                     },
@@ -33,6 +35,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'Try::Tiny' => '0'
                                  }

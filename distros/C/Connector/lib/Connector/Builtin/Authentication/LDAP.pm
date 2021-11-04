@@ -1,10 +1,7 @@
 # Connector::Builtin::Authentication::LDAP
 #
 # Authenticate users against LDAP directory.
-#
-# NOTE: This module shoud (in theory) use the Connetor::Proxy::Net::LDAP,
-# but it didn't fit well. Reusing the proxy connector would require too much of
-# hacking.
+
 package Connector::Builtin::Authentication::LDAP;
 
 use strict;
@@ -15,119 +12,15 @@ use Data::Dumper;
 use Net::LDAP;
 
 use Moose;
-extends 'Connector::Builtin';
+extends 'Connector::Proxy::Net::LDAP';
 
-#
-# Options used by Net::LDAP::new()
-#
-has keepalive => (
-    is => 'rw',
-    isa => 'Int',
+# if we use direct bind we dont need base or filter
+has '+base' => (
+    required => 0
 );
 
-has timeout => (
-    is => 'rw',
-    isa => 'Int',
-);
-
-has multihomed => (
-    is => 'rw',
-    isa => 'Int',
-);
-
-has localaddr => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-has debug => (
-    is  => 'rw',
-    isa => 'Int',
-);
-
-# SSL options for Net::LDAP::new()
-has verify => (
-    is  => 'rw',
-    isa => 'Int',
-);
-
-has sslversion => (
-    is => 'rw',
-    isa => 'Str',
-);
-
-has ciphers => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-has cafile => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-has capath => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-has clientcert => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-has clientkey => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-has checkcrl => (
-    is  => 'rw',
-    isa => 'Int',
-);
-
-#
-# Options used by _bind()
-#
-has binddn => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-has password => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-
-#
-# Options used by Net::LDAP::search()
-#
-has timelimit => (
-    is  => 'rw',
-    isa => 'Int',
-);
-
-has sizelimit => (
-    is  => 'rw',
-    isa => 'Int',
-);
-
-has base => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-has filter => (
-    is  => 'rw',
-    # TODO: this does not work (currently); NB: do we need that?
-    #    isa => 'Str|Net::LDAP::Filter',
-    isa => 'Str',
-);
-
-has scope => (
-    is  => 'rw',
-    isa => 'Str',
+has '+filter' => (
+    required => 0
 );
 
 #
@@ -162,132 +55,17 @@ has ambiguous => (
     default => 0,
 );
 
-#
-# Lazy method to initiate LDAP connection once
-#
-has ldap => (
-    is => 'ro',
-    isa => 'Net::LDAP',
-    builder => '_new_ldap',
-    reader => '_ldap',
-    lazy => 1,
-);
-
-sub _build_options {
-    my $self = shift;
-
-    my %options;
-    foreach my $key (@_) {
-        if (defined $self->$key()) {
-            $options{$key} = $self->$key();
-        }
-    }
-    return %options;
-}
-
-sub _build_new_options {
-    my $self = shift;
-    my %options = $self->_build_options(qw( keepalive timeout multihomed localaddr
-                                     debug verify sslversion ciphers cafile
-                                     capath clientcert clientkey checkcrl ));
-    $self->log()->debug('LDAP connection ' . Data::Dumper->Dump([\%options],[qw(*options)]));
-    return %options;
-}
-
-sub _build_bind_options {
-    my $self = shift;
-    return $self->_build_options(qw( password ));
-}
-
-# NOTE: it requires $arg->{LOGIN} to be defined and well formed!!
-sub _build_search_options {
-    my $self = shift;
-    my $arg = shift;
-
-    my %options = $self->_build_options(qw( base scope sizelimit timelimit ));
-
-    my $filter = $self->filter();
-    if(!defined $filter) {
-        $filter = '('.$self->userattr().'=[% LOGIN %])';
-    }
-
-    # template expansion is performed on filter strings only, not
-    # on Net::LDAP::Filter objects
-    my $value;
-    if (ref $filter eq '') {
-        my $template = Template->new({ });
-        $template->process(\$filter, $arg, \$value) || die "Error processing argument template.";
-        $options{filter} = $value;
-    } else {
-        $options{filter} = $filter;
-    }
-
-    # We don't retrieve any attributes!!! Just search for user's DN.
-    #$options{attrs} = ['dn'];
-
-    $self->log()->debug('LDAP search ' . Data::Dumper->Dump([\%options],[qw(*options)]));
-
-    return %options;
-}
-
-# dies in case of error
-sub _new_ldap {
-    my $self = shift;
-    my $ldapuri = $self->LOCATION();
-    $self->log()->debug('Connecting to "' . $ldapuri .'"');
-    my $ldap = Net::LDAP->new(
-        $ldapuri,
-        onerror => 'undef',
-        $self->_build_new_options(),
-    );
-
-    if (!$ldap) {
-       $self->_log_and_die("Could not instantiate ldap object ($@)");
-    }
-
-    $self->log()->debug('Connection established');
-    return $ldap;
-}
-
-# calls log_and_die if bind is not successful
-sub _bind {
-    my $self = shift;
-    my $mesg;
-    my $ldap = $self->_ldap;
-    if(defined $self->binddn()) {
-        $self->log()->debug('Binding to "'.$self->binddn().'"');
-        my %options = $self->_build_bind_options();
-        $self->log()->warn('Binding with DN but without password') if (!defined $options{password});
-        $mesg = $ldap->bind(
-            $self->binddn(),
-            %options,
-        );
-    } else {
-        # anonymous bind
-        $self->log()->debug('Binding anonymously');
-        $mesg = $ldap->bind(
-            $self->_build_bind_options(),
-        );
-    }
-    if($mesg->is_error()) {
-        $self->_log_and_die('LDAP bind returned error code '.$mesg->code.' (error: '.$mesg->error_desc.')');
-    } else {
-        $self->log()->debug('LDAP bind successfull');
-        return $mesg;
-    }
-}
-
 # NOTE: it returns undef in case of error, or ref to an array of user DNs
 #       it MAY return an empty array if user is not found
 sub _search_user {
     my $self = shift;
     my $user = shift;
 
-    my $ldap = $self->_ldap();
+    my $ldap = $self->ldap();
 
     $self->log()->debug('Searching LDAP databse for user "'.$user. '"');
     my $result = $ldap->search(
-        $self->_build_search_options({ LOGIN => $user })
+        $self->_build_search_options({ LOGIN => $user }, { noattrs => 1 } )
     );
     if($result->is_error()) {
         $self->log()->error('LDAP search returned error code '.$result->code.' (error: '.$result->error_desc().')');
@@ -298,7 +76,8 @@ sub _search_user {
     if($self->groupdn()) {
         $self->log()->debug('Group check requested, groupdn: "'.$self->groupdn().'", groupattr: "'.$self->groupattr().'"');
     }
-    my $dns;
+
+    my @entries;
     for my $entry ($result->entries()) {
         my $dn = $entry->dn();
         if(defined $self->groupdn()) {
@@ -306,21 +85,31 @@ sub _search_user {
                 next;
             }
         }
-        push(@$dns, $dn);
+        push @entries, $dn;
     }
-    return $dns;
+
+    return unless(@entries);
+
+    $self->log()->debug('Found '.scalar @entries.' LDAP entries matching the user "'.$user.'"');
+
+    if (@entries > 1 && !$self->ambiguous()) {
+        $self->log()->error('Ambiguous search result');
+        return $self->_node_not_exists($user);
+    }
+
+    return \@entries;
 }
 
 sub _check_user_group {
     my $self = shift;
     my $dn = shift;
-    my $ldap = $self->_ldap();
+    my $ldap = $self->ldap();
 
     $self->log()->debug('Checking if "'.$dn.'" belongs to group "'.$self->groupdn().'"');
     my $result = $ldap->compare($self->groupdn(), attr => $self->groupattr(), value => $dn);
     if($result->is_error()) {
-      $self->log()->error('LDAP compare returned error code '.$result->code.' (error: '.$result->error_desc().')');
-      return 0;
+        $self->log()->error('LDAP compare returned error code '.$result->code.' (error: '.$result->error_desc().')');
+        return 0;
     }
     if($result->code != 6) { # !compareTrue
       $self->log()->debug('User "'.$dn.'" does not belong to group "'.$self->groupdn().'"');
@@ -334,32 +123,33 @@ sub _check_user_password {
     my $self = shift;
     my $userdns = shift;
     my $password = shift;
-    my $ldap = $self->_ldap;
+    my $ldap = $self->ldap;
 
     my $userdn;
     foreach my $dn (@$userdns) {
-      # Try to bind to $dn
-      $self->log()->debug('Trying to bind to dn: '.$dn);
-      my $mesg = $ldap->bind($dn, password => $password);
-      if($mesg->is_error()) {
-        $self->log()->debug('LDAP bind to '.$dn.' returned error code '.$mesg->code.' (error: '.$mesg->error_desc().')');
-      } else {
-        $self->log()->debug('LDAP bind to '.$dn.' succeeded');
-        $userdn = $dn;
-        last;
-      }
+        # Try to bind to $dn
+        $self->log()->debug('Trying to bind to dn: '.$dn);
+        my $mesg = $ldap->bind($dn, password => $password);
+        if($mesg->is_error()) {
+            $self->log()->debug('LDAP bind to '.$dn.' returned error code '.$mesg->code.' (error: '.$mesg->error_desc().')');
+        } else {
+            $self->log()->debug('LDAP bind to '.$dn.' succeeded');
+            $userdn = $dn;
+            last;
+        }
     }
 
     if(!defined $userdn) {
-      $self->log()->error('Authentication failed');
+      $self->log()->warn('Authentication failed');
       return 0;
     } else {
       $self->log()->info('User successfuly authenticated: (dn: '.$userdn.')');
-      return 1;
+      return $userdn;
     }
 }
 
 sub get {
+
     my $self = shift;
     my $arg = shift;
     my $params = shift;
@@ -370,49 +160,54 @@ sub get {
     my $password = $params->{password};
 
     if(!$user) {
-        $self->log()->error('Missing user name');
+        $self->log()->warn('Missing user name');
         return undef;
     }
     # enforce valueencoding, see RFC4515, note that we allow non-ascii (utf-8) characters
     # I assume that Net::LDAP->search() escapes them internally as needed
     if (!($user =~ /^([\x01-\x27\x2B-\x5B\x5D-\x7F]|[^[:ascii:]]|\\[0-9a-fA-F][0-9a-fA-F])*$/)) {
-        $self->log()->error('Invalid chars in username ("'.$user.'")');
+        $self->log()->warn('Invalid chars in username ("'.$user.'")');
         return undef;
     }
 
-    #
+
     # let's check if we were instructed to search for the auth user
-    #
-    my @userdns;
     if($self->indirect()) {
-        $self->_bind();
-        my $result = $self->_search_user($user);
+        my $result = $self->_search_user( $user );
         if(!defined $result) {
+            $self->log()->warn('User not found in LDAP database');
             return $self->_node_not_exists($user);
         }
-        @userdns = @$result;
-        my $count = @userdns;
-        if($count == 0) {
-            $self->log()->error('User not found in LDAP database');
-            return $self->_node_not_exists($user);
-        } elsif($count > 1) {
-            $self->log()->debug('Found '.$count.' LDAP entries matching the user "'.$user.'"');
-            if(!$self->ambiguous()) {
-                $self->log()->error('Ambiguous search result');
-                return $self->_node_not_exists($user);
-            }
-        }
-    } else {
-        if($self->groupdn()) {
-            $self->_bind();
-            if(!$self->_check_user_group($user)) {
-                return $self->_node_not_exists($user);
-            }
-        }
-        @userdns = ($user);
+        return $self->_check_user_password($result, $password);
     }
 
-    return $self->_check_user_password(\@userdns, $password);
+    # direct bind = username is the DN to bind
+    my $res = $self->_check_user_password([$user], $password);
+    # we can not check if the user or the password is wrong
+    return unless($res);
+
+    # if we are here we have a successful direct bind, we now check
+    # for the group using the bound connection, this requires that the
+    # user himself has access permissions on the group objects
+    if($self->groupdn()) {
+        if(!$self->_check_user_group($user)) {
+            $self->log()->warn('User was authenticated but is not member of this group');
+            return $self->_node_not_exists($user);
+        }
+    }
+    return $res;
+}
+
+sub get_meta {
+    my $self = shift;
+
+    # If we have no path, we tell the caller that we are a connector
+    my @path = $self->_build_path( shift );
+    if (scalar @path == 0) {
+        return { TYPE  => "connector" };
+    }
+
+    return {TYPE  => "scalar" };
 }
 
 no Moose;
@@ -446,7 +241,7 @@ I<uniqueMember>).
 
 When requesting indirect bind, the internal user search may return multiple
 DNs. By default this is treated as an error (because of ambiguity) and results
-with authentication failuer. This may be changed by setting a parameter named
+with authentication failure. This may be changed by setting a parameter named
 I<ambiguous>, in which case the module will try to consecutively bind to each
 DN from the search result.
 
@@ -545,32 +340,7 @@ Below is the full list of configuration options.
 
 =head3 Connection options
 
-=over 8
-
-=item B<keepalive> => 1
-
-If given, set the socket's SO_KEEPALIVE option depending on the Boolean value
-of the option. (Default: use system default).
-
-=item B<timeout> => N
-
-Timeout passed to IO::Socket when connecting the remote server. (Default: 120)
-
-=item B<multihomed> => N
-
-Will be passed to IO::Socket as the MultiHomed parameter when connecting to the
-remote server
-
-=item B<localaddr> => HOST
-
-Will be passed to IO::Socket as the LocalAddr parameter, which sets the
-client's IP address (as opposed to the server's IP address.)
-
-=item B<debug> => N
-
-Set the LDAP debug level.
-
-=back
+See Connector::Proxy::Net::LDAP
 
 =head3 SSL Connection options
 
@@ -726,9 +496,9 @@ default, this option is disabled.
 
 =head2 Return values
 
-1 if the password matches, 0 if the user is found but the password does not
-match and undef if the user is not found (or it's found but group check
-failed).
+Returns the DN of the matched entry, 0 if the user is found but the
+password does not match and undef if the user is not found (or it's found
+but group check failed).
 
 =head2 Limitations
 

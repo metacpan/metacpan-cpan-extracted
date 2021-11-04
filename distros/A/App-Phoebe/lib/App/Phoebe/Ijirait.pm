@@ -62,8 +62,7 @@ use Encode qw(encode_utf8 decode_utf8);
 use File::Slurper qw(read_binary write_binary read_text);
 use Mojo::JSON qw(decode_json encode_json);
 use Mojo::Util qw(gzip);
-use List::Util qw(first);
-use Graph::Easy;
+use List::Util qw(first none any);
 use URI::Escape;
 use utf8;
 
@@ -97,12 +96,14 @@ our $commands = {
   delete   => \&delete,
   rooms    => \&rooms,
   connect  => \&connect,
-  map      => \&map,
   emote    => \&emote,
   hide     => \&hide,
   reveal   => \&reveal,
   secrets  => \&secrets,
   home     => \&home,
+  find     => \&find,
+  id       => \&id,
+  forget   => \&forget,
 };
 
 our $ijrait_commands_without_cert = {
@@ -129,6 +130,7 @@ sub init {
 	description => "A shape-shifter with red eyes.",
 	fingerprint => "",
 	location => $next, # 2
+	seen => [],
 	ts => time,
       } ],
     rooms => [
@@ -294,6 +296,7 @@ sub new_person {
     description => "A shape-shifter with red eyes.",
     fingerprint => $fingerprint,
     location => 2, # The Tent
+    seen => [],
     ts => time,
   };
   push(@{$data->{people}}, $p);
@@ -318,13 +321,19 @@ sub look {
   my $room = first { $_->{id} == $p->{location} } @{$data->{rooms}};
   $stream->write(encode_utf8 "# " . $room->{name} . "\n");
   $stream->write(encode_utf8 $room->{description} . "\n") if $room->{description};
-  my @things = grep { not $_->{hidden} } @{$room->{things}};
+  my @things = grep { my $thing = $_;
+		      not $thing->{hidden}
+		      or $thing->{seen}
+		      and any { $_ eq $thing->{seen} } @{$p->{seen}}} @{$room->{things}};
   $stream->write("## Things\n") if @things > 0;
   for my $thing (@things) {
     my $name = uri_escape_utf8 $thing->{short};
     $stream->write(encode_utf8 "=> /play/ijirait/examine?$name $thing->{name} ($thing->{short})\n");
   }
-  my @exits = grep { not $_->{hidden} } @{$room->{exits}};
+  my @exits = grep { my $exit = $_;
+		     not $exit->{hidden}
+		     or $exit->{seen}
+		     and any { $_ eq $exit->{seen} } @{$p->{seen}} } @{$room->{exits}};
   $stream->write("## Exits\n") if @exits > 0;
   for my $exit (@exits) {
     my $direction = uri_escape_utf8 $exit->{direction};
@@ -409,6 +418,7 @@ sub type {
   $p->{ts} = $room->{ts} = time;
   # parse commands
   my ($command, $arg) = split(/\s+/, $str, 2);
+  $arg =~ s/\s+$// if defined $arg; # trim
   my $routine = $commands->{$command};
   if ($routine) {
     $log->debug("Running $command");
@@ -451,6 +461,7 @@ sub go {
     notify($p, "$p->{name} leaves ($direction).");
     $exit->{ts} = time;
     $p->{location} = $exit->{destination};
+    push(@{$p->{seen}}, $p->{location}) if none { $_ == $p->{location} } @{$p->{seen}};
     notify($p, "$p->{name} arrives.");
     result($stream, "30", "/play/ijirait/look");
   } else {
@@ -480,6 +491,7 @@ sub examine {
     $log->debug("Looking at $name");
     notify($p, "$p->{name} examines $thing->{name}.");
     $thing->{ts} = time;
+    push(@{$p->{seen}}, $thing->{id}) if none { $_ == $thing->{id} } @{$p->{seen}};
     $stream->write(encode_utf8 "# $thing->{name}\n");
     $stream->write(encode_utf8 "$thing->{description}\n");
     $stream->write("=> /play/ijirait Back\n");
@@ -493,10 +505,12 @@ sub examine {
 
 sub speak {
   my ($stream, $p, $text) = @_;
-  $text =~ s/^["“„«]//;
-  $text =~ s/["”“»]$//;
-  $text =~ s/^\s+//;
-  $text =~ s/\s+$//;
+  if ($text) {
+    $text =~ s/^["“„«]//;
+    $text =~ s/["”“»]$//;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+$//;
+  }
   if (not $text) {
     result($stream, "10", "You say");
     return;
@@ -664,7 +678,7 @@ sub create {
   } elsif ($obj eq "thing") {
     $log->debug("Create thing");
     my $room = first { $_->{id} == $p->{location} } @{$data->{rooms}};
-    new_thing($room, $p->{id});
+    new_thing($room, $p);
     notify($p, "$p->{name} creates a new thing.");
     result($stream, "30", "/play/ijirait");
   } else {
@@ -698,7 +712,7 @@ sub new_exit {
     name => "A tunnel",
     direction => "tunnel",
     destination => $to->{id},
-    owner => $owner,
+    owner => $owner->{id},
     ts => time,
   };
   push(@{$from->{exits}}, $e);
@@ -712,7 +726,7 @@ sub new_thing {
     short => "stone",
     name => "A small stone",
     description => "It’s round.",
-    owner => $owner,
+    owner => $owner->{id},
     ts => time,
   };
   push(@{$room->{things}}, $t);
@@ -791,32 +805,6 @@ sub connect {
   $stream->write("=> /play/ijirait Back\n");
 }
 
-sub map {
-  my ($stream, $p) = @_;
-  success($stream);
-  $log->debug("Drawing a map");
-  my $graph = Graph::Easy->new();
-  my %rooms;
-  for (@{$data->{rooms}}) {
-    my $name = "$_->{name} ($_->{id})";
-    $rooms{$_->{id}} = $name;
-    $graph->add_node($name);
-  }
-  for my $room (@{$data->{rooms}}) {
-    my $from = $rooms{$room->{id}};
-    for my $exit (@{$room->{exits}}) {
-      my $to = $rooms{$exit->{destination}};
-      my $edge = $graph->add_edge($from, $to);
-      $edge->set_attribute("label", $exit->{direction});
-    }
-  }
-  $stream->write("# Map\n");
-  $stream->write("```\n");
-  $stream->write(encode_utf8 $graph->as_boxart());
-  $stream->write("```\n");
-  $stream->write("=> /play/ijirait Back\n");
-}
-
 sub emote {
   my ($stream, $p, $text) = @_;
   if (not $text) {
@@ -863,15 +851,42 @@ sub hide {
 }
 
 sub reveal {
-  my ($stream, $p, $obj) = @_;
+  my ($stream, $p, $str) = @_;
+  my ($obj, $cond, $id) = split(/\s+/, $str);
+  if ($cond and $cond ne "for") {
+    success($stream);
+    $log->debug("Revealing object with unknown condition");
+    $stream->write(encode_utf8 "# I don’t know how to reveal “$cond” something\n");
+    $stream->write(encode_utf8 "The command needs to use the shortcut of a hidden thing, e.g. “reveal bird”.\n");
+    $stream->write(encode_utf8 "You can add an option to that, by using “for” and a number."
+		   . " The number must be the id of a thing or a room, e.g. “reveal bird for 123”."
+		   . " Then the thing or exit you’re naming is revelead only if the character has"
+		   . " examined the thing or been to the room with that id."
+		   . " Use the “id” to show the id of things and of the room you’re in.\n");
+    $stream->write("=> /play/ijirait Back\n");
+    return;
+  }
+  if ($id and none { $_->{id} == $id } map { $_, @{$_->{things}} } @{$data->{rooms}}) {
+    success($stream);
+    $log->debug("Revealing object with impossible condition");
+    $stream->write(encode_utf8 "# I don’t know how to reveal that\n");
+    $stream->write(encode_utf8 "$id does not refer to a known room or thing.\n");
+    $stream->write("=> /play/ijirait Back\n");
+    return;
+  }
   if ($obj) {
     my $room = first { $_->{id} == $p->{location} } @{$data->{rooms}};
     my $thing = first { $_->{short} eq $obj } @{$room->{things}};
     if ($thing) {
       if ($thing->{hidden}) {
-	$log->debug("Reveal '$obj'");
-	notify($p, "$p->{name} reveals $thing->{name}.");
-	delete $thing->{hidden};
+	$log->debug("Reveal '$obj'" . ($id ? " for $id" : ""));
+	notify($p, "$p->{name} reveals $thing->{name}." . ($id ? " Maybe." : ""));
+	if ($id) {
+	  $thing->{seen} = $id;
+	} else {
+	  delete $thing->{hidden};
+	  delete $thing->{seen};
+	}
       }
       result($stream, "30", "/play/ijirait/look");
       return;
@@ -879,9 +894,14 @@ sub reveal {
     my $exit = first { $_->{direction} eq $obj } @{$room->{exits}};
     if ($exit) {
       if ($exit->{hidden}) {
-	$log->debug("Reveal '$obj'");
-	notify($p, "$p->{name} reveals $exit->{name}.");
-	delete $exit->{hidden};
+	$log->debug("Reveal '$obj'" . ($id ? " for $id" : ""));
+	notify($p, "$p->{name} reveals $exit->{name}." . ($id ? " Maybe." : ""));
+	if ($id) {
+	  $exit->{seen} = $id;
+	} else {
+	  delete $exit->{hidden};
+	  delete $exit->{seen};
+	}
       }
       result($stream, "30", "/play/ijirait");
       return;
@@ -927,6 +947,120 @@ sub secrets {
   $log->debug("Secrets without a passphrase");
   $stream->write(encode_utf8 "# Secrets\n");
   $stream->write(encode_utf8 "Are you sure you want all the secrets to be revealed? If you are, please use the full command: “secrets are something I do not care for!”\n");
+  $stream->write("=> /play/ijirait Back\n");
+}
+
+sub find {
+  my ($stream, $p, $name) = @_;
+  if (not $name) {
+    success($stream);
+    $log->debug("Missing a name in route finding");
+    $stream->write(encode_utf8 "# Missing a name\n");
+    $stream->write(encode_utf8 "You need to provide the name of an existing person: “find <name>”.\n");
+    $stream->write(encode_utf8 "You can get a list of all existing persons using “who”.\n");
+    $stream->write("=> /play/ijirait/who Who\n");
+    $stream->write("=> /play/ijirait Back\n");
+    return;
+  }
+  my $to;
+  my $o = first { $_->{name} eq $name } @{$data->{people}};
+  if ($o) {
+    $to = $o->{location};
+  } else {
+    my $room = first { $_->{name} eq $name } @{$data->{rooms}};
+    $to = $room->{id} if $room;
+  }
+  if (not $to) {
+    success($stream);
+    $log->debug("Cannot find '$name'");
+    $stream->write(encode_utf8 "# Cannot find “$name”\n");
+    $stream->write(encode_utf8 "You need to provide the name of an existing room or person: “find <name>”.\n");
+    $stream->write(encode_utf8 "You can get a list of all existing rooms using “rooms”.\n");
+    $stream->write(encode_utf8 "You can get a list of all existing persons using “who”.\n");
+    $stream->write("=> /play/ijirait/rooms Rooms\n");
+    $stream->write("=> /play/ijirait/who Who\n");
+    $stream->write("=> /play/ijirait Back\n");
+    return;
+  }
+  my $route = find_route($p->{location}, $to);
+  if (not @$route) {
+    success($stream);
+    $log->debug("Cannot find a route to '$name'");
+    $stream->write(encode_utf8 "# Cannot find a way\n");
+    $stream->write(encode_utf8 "There seems to be no way to get from here to $name.\n");
+    $stream->write(encode_utf8 "One of you must use the “connect” command to connect back to the rest of the game.\n");
+    $stream->write("=> /play/ijirait Back\n");
+    return;
+  }
+  success($stream);
+  $log->debug("Find '$name'");
+  $stream->write(encode_utf8 "# How to find $name\n");
+  my $room = uri_escape_utf8 $route->[0]->{direction};
+  $stream->write(encode_utf8 "=> /play/ijirait/$room $route->[0]->{name} ($route->[0]->{direction})\n");
+  for (1 .. $#$route) {
+    $stream->write(encode_utf8 "* $route->[$_]->{name} ($route->[$_]->{direction})\n");
+  }
+  $stream->write("=> /play/ijirait Back\n");
+}
+
+sub find_route {
+  my ($from, $to) = @_;
+  my %rooms = map { $_->{id} => $_ } @{$data->{rooms}};
+  # breadth first!
+  my @routes = map { [ $_ ] } @{$rooms{$from}->{exits}};
+  my $route;
+  while ($route = shift(@routes)) {
+    my $last = $route->[$#$route];
+    return $route if $last->{destination} == $to;
+    for my $exit (@{$rooms{$last->{destination}}->{exits}}) {
+      push(@routes, [@$route, $exit]) if none { $exit == $_ } @$route;
+    }
+  }
+  return [];
+}
+
+sub id {
+  my ($stream, $p, $obj) = @_;
+  success($stream);
+  if ($obj) {
+    my $room = first { $_->{id} == $p->{location} } @{$data->{rooms}};
+    if ($obj eq "room") {
+      $log->debug("Id $obj");
+      $stream->write($room->{id} . "\n");
+      return;
+    }
+    my $thing = first { $_->{short} eq $obj } @{$room->{things}};
+    if ($thing) {
+      $log->debug("Id '$obj'");
+      $stream->write($thing->{id} . "\n");
+      return;
+    }
+  }
+  $log->debug("Id unknown thing");
+  $stream->write(encode_utf8 "# I don’t know what to id\n");
+  $stream->write(encode_utf8 "The command needs to use the shortcut of a thing, e.g. “id bird”, or just “id room”.\n");
+  $stream->write("=> /play/ijirait Back\n");
+}
+
+sub forget {
+  my ($stream, $p, $id) = @_;
+  $log->debug("Forget");
+  success($stream);
+  my %seen = map { $_->{id} => $_->{name}, map { $_->{id} => $_->{name} } @{$_->{things}} } @{$data->{rooms}};
+  if ($id and $seen{$id}) {
+    $stream->write("# Forgetting\n");
+    $stream->write(encode_utf8 "You forget ever having seen: $seen{$id} ($id)\n");
+    $p->{seen} = [grep { $_ != $id } @{$p->{seen}}];
+    $stream->write("=> /play/ijirait/forget List all the other things you could forget\n");
+  } elsif ($id) {
+    $stream->write("# Forgetting the impossible\n");
+    $stream->write(encode_utf8 "You can’t forget what you haven’t seen ($id).\n");
+  } else {
+    $stream->write(encode_utf8 "# Things you might want to forget:\n");
+    for my $id (@{$p->{seen}}) {
+      $stream->write(encode_utf8 "=> /play/ijirait/forget?$id $seen{$id} ($id)\n");
+    }
+  }
   $stream->write("=> /play/ijirait Back\n");
 }
 

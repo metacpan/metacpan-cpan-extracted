@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::GeneralAgencyAgreementDetail;
-$Shipment::FedEx::WSDL::RateTypes::GeneralAgencyAgreementDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::GeneralAgencyAgreementDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        Format
 
-              )
+            )
         ],
         {'Format' => \%Format_of,},
         {   'Format' =>
@@ -56,7 +56,7 @@ Shipment::FedEx::WSDL::RateTypes::GeneralAgencyAgreementDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

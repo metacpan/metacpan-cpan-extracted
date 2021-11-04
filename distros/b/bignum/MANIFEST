@@ -33,7 +33,6 @@ t/in_effect.t
 t/infnan-bigint.t
 t/infnan-bignum.t
 t/infnan-bigrat.t
-t/infnan.inc
 t/option_a.t
 t/option_l.t
 t/option_p.t

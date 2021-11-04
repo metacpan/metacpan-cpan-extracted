@@ -60,10 +60,6 @@ first few are:
 
 =over
 
-=item * C<white_pieces> - one bitboard for the white pieces
-
-=item * C<black_pieces> - one bitboard for the black pieces
-
 =item * C<pawns> - one bitboard for the pawns (of both colors)
 
 =item * C<knights> - one bitboard for the knights (of both colors)
@@ -75,6 +71,10 @@ first few are:
 =item * C<queens> - one bitboard for the queens (of both colors)
 
 =item * C<kings> - one bitboard for the kings (of both colors)
+
+=item * C<white_pieces> - one bitboard for the white pieces
+
+=item * C<black_pieces> - one bitboard for the black pieces
 
 =item * C<in_check> - one bitboard for all pieces giving check (of the color
 not to move)
@@ -184,7 +184,7 @@ piece? You create a bitboard (64-bit integer) where only the 28th bit is
 set and AND that with the bitboard of the white pieces. And you create a
 bitboard where only the 28th bit is set with a shift operation:
 
-    $e4_square = (1 << 28) | $w_pieces
+    $e4_square = (1 << 28) & $w_pieces
 
 You "shift" the one 28 places to the left. And this is why the indexes
 or bit numbers are called "shifts" here. And a shift mask is a bitboard
@@ -193,7 +193,7 @@ with exactly one bit set.
 The code will be better understandable if you replace the literal 28 with a
 constant:
 
-    $e4_square = (1 << CP_E4) | $w_pieces
+    $e4_square = (1 << CP_E4) & $w_pieces
 
 =head3 C<Chess::Plisco> Instances
 
@@ -204,16 +204,16 @@ there is no need to remember the exact ordering of the array. You can
 either use dedicated macros that operate directly on
 C<Chess::Plisco> instances or use constants for the indexes:
 
- use Chess::Plisco (:all);
- use Chess::Plisco::Macro;
+    use Chess::Plisco (:all);
+    use Chess::Plisco::Macro;
  
- $pos = Chess::Plisco->new;
+     $pos = Chess::Plisco->new;
  
- # Equivalent!
- $w_pieces = $pos[CP_POS_WHITE_PIECES];
- $pos[CP_POS_WHITE_PIECES] = $_pieces;
- $w_pieces = cp_pos_white_pieces $pos;
- cp_pos_white_pieces $pos = $w_pieces;
+     # Equivalent!
+     $w_pieces = $pos->[CP_POS_WHITE_PIECES];
+     $pos->[CP_POS_WHITE_PIECES] = $_pieces;
+     $w_pieces = cp_pos_white_pieces $pos;
+     cp_pos_white_pieces $pos = $w_pieces;
 
 =head3 Pieces
 
@@ -244,9 +244,9 @@ C<Chess::Plisco>:
 
 =item * C<CP_PAWN_VALUE> 100
 
-=item * C<CP_KNIGHT_VALUE> 300
+=item * C<CP_KNIGHT_VALUE> 320
 
-=item * C<CP_BISHOP_VALUE> 300
+=item * C<CP_BISHOP_VALUE> 330
 
 =item * C<CP_ROOK_VALUE> 500
 
@@ -254,9 +254,11 @@ C<Chess::Plisco>:
 
 =back
 
-These constants can be overridden in derived classes. This is not
-recommended for the constants specifiying the pieces (see above), as the
-data values will not fit into the other structures.
+Unfortunately, these constants cannot be overridden in derived classes in an
+easy manner.  While C<$class->CP_KNIGHT_VALUE()> would produce the
+overridden value for the caller it would now for just C<CP_KNIGHT_VALUE>.
+Unfortunately, the latter is faster by orders of magnitude and therere the
+former version is not used.
 
 =head3 Moves
 
@@ -416,7 +418,9 @@ scope of a block:
 
 =head3 Do Not Use Here Documents
 
-The translation currently chokes on here documents (E<lt>E<lt>EOF ...).
+The translation currently chokes on here documents (E<lt>E<lt>EOF ...).  So
+sorry, I have to check out once again how to make L<PPI::Document> round-trip
+safe.
 
 =head3 Do not Create References to Macros
 
@@ -441,6 +445,18 @@ board like two-dimensional arrays or hashes.
 
 Task: Count the number of white pawns on the board.
 
+Without macros, it is pretty straight-forward.
+
+ use Chess::Plisco;
+ 
+ my $pos = Chess::Plisco->new;
+ my $white_pawns = $pos->[CP_POS_WHITE_PIECES] & $self->[CP_POS_PAWNS];
+ my $count = $pos->bitboardPopcount($white_pawns);
+ print "There are $count white pawns on the board.\n";
+
+Using macros looks a little bit strange at first glance but that strangeness
+is unavoidable:
+
  use Chess::Plisco;
  use Chess::Plisco::Macro;
  
@@ -452,7 +468,8 @@ Task: Count the number of white pawns on the board.
 
 The important line is the last but one. The macro C<cp_bitboard_popcount>
 counts the number of bits set in an integer, and this is exactly what
-you need here.
+you need here.  But you have to give the variable that should hold the
+result as a regular scalar C<$count> and not as a reference C<\$count>.
 
 =head3 Iterating Bitboards
 
@@ -460,7 +477,7 @@ Task: Print the square for every white pawn on the board.
 
 =head4 Conventional and Slow Approach
 
-Iterating over a bitboard can be done in an intuitive and straightforward way:
+Iterating over a bitboard can be done in an intuitive and straight-forward way:
 
     use integer;
     use Chess::Plisco qw(:all);

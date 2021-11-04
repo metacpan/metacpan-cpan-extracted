@@ -21,7 +21,7 @@ use lib "".path( $Bin, '..', 'lib' );
 use Local::Test qw( init_backend load_fixtures );
 use Yancy::Controller::Yancy;
 
-my $schema = \%Yancy::Backend::Test::SCHEMA;
+my $schema = \%Local::Test::SCHEMA;
 
 my %fixtures = load_fixtures( 'basic', 'composite-key' );
 $schema->{ $_ } = $fixtures{ $_ } for keys %fixtures;
@@ -295,7 +295,7 @@ subtest 'get' => sub {
           ->content_like( qr{Schema name not defined in stash} );
         $t->get_ok( '/error/get/noid' )
           ->status_is( 500 )
-          ->content_like( qr{ID field &quot;id&quot; not defined in stash} );
+          ->content_like( qr{ID field\(s\) &quot;id&quot; not defined in stash} );
         $t->get_ok( '/error/get/id404' )
           ->status_is( 404 );
     };
@@ -645,39 +645,6 @@ subtest 'set' => sub {
             ],
         } );
 
-        my $form_no_fields = {
-            csrf_token => $csrf_token,
-        };
-        $t->post_ok( "/blog/edit/$items{blog}[0]{id}" => form => $form_no_fields )
-          ->status_is( 400, 'invalid form input gives 400 status' )
-          ->text_is( '.errors > li:nth-child(1)', 'Missing property. (/markdown)' )
-          ->text_is( '.errors > li:nth-child(2)', 'Missing property. (/title)' )
-          ->text_is( 'h1', 'Editing first-post', 'item stash is set' )
-          ->element_exists( 'form input[name=title]', 'title field exists' )
-          ->attr_is( 'form input[name=title]', value => '', 'title field value correct' )
-          ->element_exists( 'form input[name=slug]', 'slug field exists' )
-          ->attr_is( 'form input[name=slug]', value => '', 'slug field value correct' )
-          ->element_exists( 'form textarea[name=markdown]', 'markdown field exists' )
-          ->text_is( 'form textarea[name=markdown]', '', 'markdown field value correct' )
-          ->element_exists( 'form textarea[name=html]', 'html field exists' )
-          ->text_is( 'form textarea[name=html]', '', 'html field value correct' )
-          ;
-
-        $t->post_ok( '/blog/edit' => form => $form_no_fields )
-          ->status_is( 400, 'invalid form input gives 400 status' )
-          ->text_is( '.errors > li:nth-child(1)', 'Missing property. (/markdown)' )
-          ->text_is( '.errors > li:nth-child(2)', 'Missing property. (/title)' )
-          ->element_exists( 'h1', 'item stash is set' )
-          ->element_exists( 'form input[name=title]', 'title field exists' )
-          ->attr_is( 'form input[name=title]', value => '', 'title field value correct' )
-          ->element_exists( 'form input[name=slug]', 'slug field exists' )
-          ->attr_is( 'form input[name=slug]', value => '', 'slug field value correct' )
-          ->element_exists( 'form textarea[name=markdown]', 'markdown field exists' )
-          ->text_is( 'form textarea[name=markdown]', '', 'markdown field value correct' )
-          ->element_exists( 'form textarea[name=html]', 'html field exists' )
-          ->text_is( 'form textarea[name=html]', '', 'html field value correct' )
-          ;
-
         subtest 'failed CSRF validation' => sub {
             $t->post_ok( "/blog/edit/$items{blog}[0]{id}" => form => $items{blog}[0] )
               ->status_is( 400, 'CSRF validation failed gives 400 status' )
@@ -744,7 +711,6 @@ subtest 'set' => sub {
             my %form_data = (
                 email => 'doug@example.org',
                 username => 'preaction',
-                name => 'Doug Bell',
                 password => '123qwe',
                 csrf_token => $csrf_token,
             );
@@ -814,7 +780,7 @@ subtest 'delete' => sub {
           ->content_like( qr{Schema name not defined in stash} );
         $t->get_ok( '/error/delete/noid' )
           ->status_is( 500 )
-          ->content_like( qr{ID field &quot;id&quot; not defined in stash} );
+          ->content_like( qr{ID field\(s\) &quot;id&quot; not defined in stash} );
         $t->get_ok( "/blog/delete/$items{blog}[0]{id}" => { Accept => 'application/json' } )
           ->status_is( 400 )
           ->json_is( {

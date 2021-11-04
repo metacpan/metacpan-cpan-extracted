@@ -1,3 +1,12 @@
+0.049		2021-11-04	T. R. Wyant
+    Add command completion if Term::ReadLine::Perl is available. This
+    adds command, macro, and option completion to Term::ReadLine::Perl's
+    file name completion. The macro() and sky() commands also do
+    subcommand name completion.
+
+    The macro() command no longer does a 'list' if it does not recognize
+    the given subcommand, unless in 'satpass' compatibility mode.
+
 0.048		2021-07-24	T. R. Wyant
     Fix sloppy ParseTime::Date::Manip back-end implementation where the
     back end may (or may not) have a 'location' configuration.  Thanks

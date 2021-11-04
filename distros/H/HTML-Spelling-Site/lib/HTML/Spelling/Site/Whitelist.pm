@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Whitelist;
-$HTML::Spelling::Site::Whitelist::VERSION = '0.6.0';
+$HTML::Spelling::Site::Whitelist::VERSION = '0.8.0';
 use strict;
 use warnings;
 use autodie;
@@ -143,7 +143,7 @@ sub _rec_sorter
     my ( $a_aref, $b_aref, $idx ) = @_;
 
     return (
-          ( @$a_aref == $idx ) ? -1
+          ( @$a_aref == $idx ) ? ( ( @$a_aref == @$b_aref ) ? 0 : -1 )
         : ( @$b_aref == $idx ) ? 1
         : ( ( $a_aref->[$idx] cmp $b_aref->[$idx] )
                 || _rec_sorter( $a_aref, $b_aref, $idx + 1 ) )
@@ -157,6 +157,12 @@ sub _sort_words
     return [ sort { $a cmp $b } @$words_aref ];
 }
 
+sub _rec_cmp
+{
+    my ( $aa, $bb ) = @_;
+    return _rec_sorter( $aa->{files}, $bb->{files}, 0 );
+}
+
 sub get_sorted_text
 {
     my ($self) = @_;
@@ -164,6 +170,43 @@ sub get_sorted_text
     $self->parse;
 
     my %_gen = map { $_ => 1 } @{ $self->_general_whitelist };
+
+    my @sorted_records =
+        sort { _rec_cmp( $a, $b ) } @{ $self->_records };
+
+    my @merged_records;
+    {
+        my $i = 0;
+        while ( $i < @sorted_records )
+        {
+            my $final_i = $i;
+            while (
+                $final_i < $#sorted_records
+                and _rec_cmp(
+                    $sorted_records[$i], $sorted_records[ $final_i + 1 ]
+                ) == 0
+                )
+            {
+                ++$final_i;
+            }
+            if ( $i == $final_i )
+            {
+                push @merged_records, $sorted_records[$i];
+            }
+            else
+            {
+                my $rec = {
+                    files => $sorted_records[$i]->{files},
+                    words => [
+                        map { @{ $_->{words} } }
+                            @sorted_records[ $i .. $final_i ]
+                    ],
+                };
+                push @merged_records, $rec;
+            }
+            $i = $final_i + 1;
+        }
+    }
 
     return join '', map { "$_\n" } (
         "==== GLOBAL:",
@@ -189,9 +232,7 @@ sub get_sorted_text
                         }
                     )
                 )
-                }
-                sort { _rec_sorter( $a->{files}, $b->{files}, 0 ) }
-                @{ $self->_records }
+            } @merged_records
         )
     );
 }
@@ -237,7 +278,7 @@ HTML::Spelling::Site::Whitelist - handles the whitelist file.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 SYNOPSIS
 

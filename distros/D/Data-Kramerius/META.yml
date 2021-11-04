@@ -1,0 +1,35 @@
+---
+abstract: 'Information about all Kramerius systems.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Kramerius
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Mo: 0
+  Text::DSV: 0
+  Unicode::UTF8: 0
+  perl: 5.6.0
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/Data-Kramerius/issues
+  homepage: https://github.com/michal-josef-spacek/Data-Kramerius
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/Data-Kramerius
+version: '0.03'

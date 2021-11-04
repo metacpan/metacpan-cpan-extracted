@@ -1,6 +1,7 @@
 package Form::Tiny::Error;
 
 use v5.10;
+use strict;
 use warnings;
 use Moo;
 use Types::Standard qw(Maybe Str);
@@ -9,7 +10,7 @@ use Carp qw(confess);
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use overload
 	q{""} => "as_string",
@@ -26,10 +27,10 @@ has "error" => (
 	is => "ro",
 	isa => StringLike,
 	writer => 'set_error',
-	builder => "_default_error",
+	builder => "default_error",
 );
 
-sub _default_error
+sub default_error
 {
 	confess "no error message supplied";
 	return "Unknown error";
@@ -45,48 +46,61 @@ sub as_string
 }
 
 # in-place subclasses
+{
+
+	# Internal use only
+	package Form::Tiny::Error::NestedFormError;
+	use parent -norequire, "Form::Tiny::Error";
+
+}
 
 {
 
 	package Form::Tiny::Error::InvalidFormat;
-	use parent "Form::Tiny::Error";
+	use parent -norequire, "Form::Tiny::Error";
 
-	sub _default_error
+	sub default_error
 	{
-		return "input data has invalid format";
+		return "input data format is invalid";
 	}
 }
 
 {
 
 	package Form::Tiny::Error::DoesNotExist;
-	use parent "Form::Tiny::Error";
+	use parent -norequire, "Form::Tiny::Error";
 
-	sub _default_error
+	sub default_error
 	{
-		return "does not exist";
+		return "field is required";
 	}
 }
 
 {
 
-	package Form::Tiny::Error::IsntStrict;
-	use parent "Form::Tiny::Error";
+	package Form::Tiny::Error::Required;
+	use parent -norequire, "Form::Tiny::Error::DoesNotExist";
+}
 
-	sub _default_error
+{
+
+	package Form::Tiny::Error::IsntStrict;
+	use parent -norequire, "Form::Tiny::Error";
+
+	sub default_error
 	{
-		return "does not meet the strictness criteria";
+		return "input data has unexpected fields";
 	}
 }
 
 {
 
 	package Form::Tiny::Error::DoesNotValidate;
-	use parent "Form::Tiny::Error";
+	use parent -norequire, "Form::Tiny::Error";
 
-	sub _default_error
+	sub default_error
 	{
-		return "validation fails";
+		return "data validation failed";
 	}
 }
 
@@ -126,7 +140,9 @@ A couple of in-place subclasses are provided to differentiate the type of error 
 
 =item * Form::Tiny::Error::InvalidFormat
 
-=item * Form::Tiny::Error::DoesNotExist
+=item * Form::Tiny::Error::Required
+
+=item * Form::Tiny::Error::DoesNotExist (DEPRECATED, use Form::Tiny::Error::Required)
 
 =item * Form::Tiny::Error::IsntStrict
 

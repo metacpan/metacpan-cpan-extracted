@@ -40,6 +40,10 @@ sub before_release {
 
   die $error if $error;
 
+  # skip old share/tests/draft-future -- not officially supported by any implementation
+  # (now known as draft-next)
+  $diff =~ s{^-share/tests/draft-future/.+\n}{}gm;
+
   if (my @missing = map s/^-//r, grep m{^-share/}, split /\n/, $diff) {
     $self->log_fatal(join "\n", '',
       'These files were removed from the test suite and must be added to the config for [=inc::OldShareDirFiles]:',

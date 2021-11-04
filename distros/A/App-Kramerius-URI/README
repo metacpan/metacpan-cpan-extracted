@@ -1,0 +1,59 @@
+NAME
+    kramerius-uri - Script to get Kramerius URI.
+
+SYNOPSIS
+     kramerius-uri [-h] [-v] [--version] kramerius_id
+
+DESCRIPTION
+    Script which get URI and versioon for Kramerius system defined by id.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "kramerius_id"
+
+            Kramerius system id.
+
+EXAMPLE1
+     kramerius-uri
+
+     # Output:
+     # Usage: kramerius-uri [-h] [--version] kramerius_id
+     #         -h              Help.
+     #         --version       Print version.
+     #         kramerius_id    Kramerius system id. e.g. mzk
+
+EXAMPLE2
+     kramerius-uri mzk
+
+     # Output:
+     # http://kramerius.mzk.cz/ 4
+
+EXAMPLE3
+     kramerius-uri ABA001
+
+     # Output:
+     # http://kramerius.nkp.cz/ 3
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Kramerius-URI>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

@@ -8,7 +8,7 @@ sub new {
 
 }
 
-### public methods
+### public methods, use Vectors of colours e.g. RedVector, AlphaVector
 
 sub focus_objects {
 	my ($self) = @_;

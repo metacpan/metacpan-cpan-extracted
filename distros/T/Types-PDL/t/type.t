@@ -21,15 +21,15 @@ for my $pdl_type ( @pdl_types ) {
     subtest $ioname => sub {
 
         for my $ttype (
-            [ Piddle   => \&Piddle,   sub { PDL->new( $pdl_type, 1 ) } ],
-            [ Piddle0  => \&Piddle0D, sub { PDL->new( $pdl_type ) } ],
-            [ Piddle1D => \&Piddle1D, sub { PDL->new( $pdl_type, [ 1, 2 ] ) } ],
+            [ NDArray   => \&NDArray,   sub { PDL->new( $pdl_type, 1 ) } ],
+            [ NDArray0  => \&NDArray0D, sub { PDL->new( $pdl_type ) } ],
+            [ NDArray1D => \&NDArray1D, sub { PDL->new( $pdl_type, [ 1, 2 ] ) } ],
             [
-                Piddle2D => \&Piddle2D,
+                NDArray2D => \&NDArray2D,
                 sub { PDL->new( $pdl_type, [ [ 1, 2 ] ] ) }
             ],
             [
-                Piddle3D => \&Piddle3D,
+                NDArray3D => \&NDArray3D,
                 sub { PDL->new( $pdl_type, [ [ [ 1, 2 ] ] ] ) }
             ],
           )

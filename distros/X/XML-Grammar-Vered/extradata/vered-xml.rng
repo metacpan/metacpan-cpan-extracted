@@ -237,6 +237,47 @@
     <define name="info">
         <element name="vrd:info">
             <ref name="title" />
+            <optional>
+                <element name="vrd:author">
+                <element name="vrd:personname">
+                <element name="vrd:firstname">
+                    <text/>
+                </element>
+                <element name="vrd:surname">
+                    <text/>
+                </element>
+                </element>
+                <element name="vrd:email">
+                    <text/>
+                </element>
+                <optional>
+                <element name="vrd:uri">
+                    <attribute name="type">
+                    <text/>
+                    </attribute>
+                    <attribute name="xlink:href">
+                    <text/>
+                    </attribute>
+                    <text/>
+                </element>
+                </optional>
+                </element>
+            </optional>
+            <optional>
+                <element name="vrd:copyright">
+                <element name="vrd:year">
+                    <text/>
+                </element>
+                <element name="vrd:holder">
+                    <text/>
+                </element>
+                </element>
+            </optional>
+            <optional>
+            <element name="vrd:legalnotice">
+            <ref name="several_paras" />
+            </element>
+            </optional>
         </element>
     </define>
 </grammar>

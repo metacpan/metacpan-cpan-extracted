@@ -1,0 +1,86 @@
+NAME
+    kramerius2images - Script which fetch Kramerius object to local storage.
+
+SYNOPSIS
+     kramerius2images [-h] [-q] [-v] [--version] [kramerius_id object_id]
+
+DESCRIPTION
+    Script which fetch Kramerius object to local storage. Object could be
+    page, serial, edition.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "kramerius_id"
+
+            Kramerius system id. List of supported Kramerius systems is
+            handled via Data::Kramerius.
+
+    *       "object_id"
+
+            Kramerius object id. For Kramerius V4 is uuid, for Kramerius V3
+            integer id.
+
+EXAMPLE1
+     kramerius2images
+
+     # Output:
+     # Usage: kramerius2images [-h] [-q] [-v] [--version] [kramerius_id object_id]
+     #         -h              Help.
+     #         -q              Quiet mode.
+     #         -v              Verbose mode.
+     #         --version       Print version.
+     #         kramerius_id    Kramerius system id. e.g. mzk
+     #         object_id       Kramerius object id (could be page, series or book edition).
+
+EXAMPLE2
+     # Kalendář Čechů vídeňských na rok
+     # front cover (1 page)
+     # Kramerius v4
+     kramerius2images mzk 87299a2c-e22e-469d-94fa-deac12e52ad7
+
+     # Output:
+     # 87299a2c-e22e-469d-94fa-deac12e52ad7: ?
+
+EXAMPLE3
+     # Alfabetski popis imena, navedenih u popisima gubitaka - 1914
+     # issue of serial (multiple pages)
+     # Kramerius v3
+     kramerius2images ABA001 24665811
+
+     # Output:
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700001.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700002.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700003.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700004.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700005.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700006.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700007.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700008.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700009.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700010.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700011.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700012.djvu
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Kramerius-To-Images>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

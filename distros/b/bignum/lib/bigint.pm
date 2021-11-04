@@ -1,12 +1,11 @@
 package bigint;
 
-use 5.010;
 use strict;
 use warnings;
 
 use Carp qw< carp croak >;
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 use Exporter;
 our @ISA            = qw( Exporter );

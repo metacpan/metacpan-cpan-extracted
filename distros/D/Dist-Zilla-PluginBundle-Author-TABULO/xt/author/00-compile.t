@@ -4,22 +4,30 @@ use warnings;
 
 # this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
-use Test::More 0.94;
+use Test::More;
 
-plan tests => 7;
+plan tests => 12;
 
 my @module_files = (
-    'Banal/Dist/Zilla/Role/PluginBundle/Easier.pm',
-    'Banal/Dist/Zilla/Role/Text/Template/Selfish.pm',
     'Dist/Zilla/MintingProfile/Author/TABULO.pm',
     'Dist/Zilla/PluginBundle/Author/TABULO.pm',
-    'Dist/Zilla/PluginBundle/Author/TABULO/Config.pm',
-    'Pod/Weaver/PluginBundle/Author/TABULO.pm'
+    'Pod/Weaver/PluginBundle/Author/TABULO.pm',
+    'Pod/Wordlist/Author/TABULO.pm',
+    'Zest/Author/TABULO/MungersForHas.pm',
+    'Zest/Author/TABULO/Util.pm',
+    'Zest/Author/TABULO/Util/Dzil.pm',
+    'Zest/Author/TABULO/Util/List.pm',
+    'Zest/Author/TABULO/Util/Mayhap.pm',
+    'Zest/Author/TABULO/Util/ShareDir.pm',
+    'Zest/Author/TABULO/Util/Text.pm'
 );
 
 
 
-# no fake home requested
+# fake home for cpan-testers
+use File::Temp;
+local $ENV{HOME} = File::Temp::tempdir( CLEANUP => 1 );
+
 
 my @switches = (
     -d 'blib' ? '-Mblib' : '-Ilib',
@@ -60,6 +68,6 @@ for my $lib (@module_files)
 
 
 is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', explain(\@warnings);
+    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) );
 
-BAIL_OUT("Compilation problems") if !Test::More->builder->is_passing;
+

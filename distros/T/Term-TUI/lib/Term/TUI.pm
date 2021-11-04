@@ -1,5 +1,5 @@
 package Term::TUI;
-# Copyright (c) 1999-2008 Sullivan Beck. All rights reserved.
+# Copyright (c) 1999-2021 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -30,7 +30,7 @@ package Term::TUI;
 
 use warnings;
 use vars qw($VERSION);
-$VERSION="1.23";
+$VERSION="1.24";
 
 require 5.000;
 require Exporter;
@@ -44,6 +44,8 @@ use Text::ParseWords;
 @EXPORT_OK = qw(TUI_Script TUI_Out TUI_Version);
 %EXPORT_TAGS = (all => [ @EXPORT, @EXPORT_OK ]);
 
+$| = 1;
+
 use strict "vars";
 
 sub TUI_Version {
@@ -51,7 +53,7 @@ sub TUI_Version {
 }
 
 BEGIN {
-  my($term,$out);
+  our($term,$out);
 
   #
   # Takes a program name (to be used in the prompt) and an interface
@@ -89,7 +91,7 @@ BEGIN {
       @completions = _GetStrings(\@mode,$hashref);
       $term->Attribs->{'completion_word'} = \@completions;
 
-      if ($err =~ /^exit\[(\d+)\]$/) {
+      if ($err  &&  $err =~ /^exit\[(\d+)\]$/) {
         $ret=$1;
         last;
       }

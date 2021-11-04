@@ -1,36 +1,15 @@
-use strict;
-use warnings;
 package Dist::Zilla::MintingProfile::Author::TABULO;
-# vim: set ts=2 sts=2 sw=2 tw=115 et :
-# ABSTRACT: Mint distributions like TABULO does
-# BASED_ON: Dist::Zilla::MintingProfile::Author::ETHER
-
-our $VERSION = '0.198';
-# AUTHORITY
 
 use Moose;
-with 'Dist::Zilla::Role::MintingProfile' => { -version => '5.047' };
-use File::ShareDir;
-use Path::Tiny;
-use Carp;
-use namespace::autoclean;
+with 'Dist::Zilla::Role::MintingProfile::ShareDir';
+use namespace::clean;
 
-sub profile_dir
-{
-    my ($self, $profile_name) = @_;
-
-    die 'minting requires perl 5.014' unless "$]" >= 5.013002;
-
-    my $dist_name = 'Dist-Zilla-PluginBundle-Author-TABULO';
-
-    my $profile_dir = path(File::ShareDir::dist_dir($dist_name))->child('profiles', $profile_name);
-
-    return $profile_dir if -d $profile_dir;
-
-    confess "Can't find profile $profile_name via $self: it should be in $profile_dir";
-}
+our $VERSION = '1.000006';
 
 __PACKAGE__->meta->make_immutable;
+1;
+
+#ABSTRACT: A minimal Dist::Zilla minting profile for TABULO
 
 __END__
 
@@ -38,39 +17,23 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Tabulo[n]
+
 =head1 NAME
 
-Dist::Zilla::MintingProfile::Author::TABULO - Mint distributions like TABULO does
+Dist::Zilla::MintingProfile::Author::TABULO - A minimal Dist::Zilla minting profile for TABULO
 
 =head1 VERSION
 
-version 0.198
+version 1.000006
 
-=head1 SYNOPSIS
-
-    dzil new -P Author::TABULO -p github Foo::Bar
-
-or:
-
-    #!/bin/bash
-    newdist() {
-        local dist=$1
-        local module=`perl -we"print q{$dist} =~ s/-/::/r"`
-        pushd ~/git
-        dzil new -P Author::TABULO -p github $module
-        cd $dist
-    }
-    newdist Foo-Bar
-
-=head1 DESCRIPTION
+=head1 FOREWORD
 
 This is a minting profile used for TABULO's distributions.
-Like his dzil plugin-bundle, the starting point of this profile was ETHER's.
 
-Since TABULO initially forked the whole thing from ETHER's,
-most of the documentation you see here actually come from her originally, ...
+Like his dzil plugin-bundle, it was heavily inspired/copied from several other sources, and here, especially from: L<Dist::Zilla::MintingProfile::Starter>,  L<Dist::Zilla::MintingProfile::Starter::Git>
 
-Thank you ETHER!
+Thank you @DBOOK!
 
 =head2 WARNING
 
@@ -86,72 +49,43 @@ be maintained at this point. Who knows, I may even give up on dzil altogether...
 
 You have been warned.
 
-=head2 DESCRIPTION (at last)
+=head1 SYNOPSIS
 
-The new distribution is packaged with L<Dist::Zilla> using
-L<Dist::Zilla::PluginBundle::Author::TABULO>.
+  # setup only needs to be run once to set up your dzil config
+  $ dzil setup
+  $ dzil new -P Author::TABULO My::New::Dist
 
-Profiles available are:
+=head1 DESCRIPTION
 
-=over 4
+This minting profile for L<< C<dzil new>|Dist::Zilla::App::Command::new >>
+creates a minimal new distribution consisting of a basic C<dist.ini> using the
+L<[@Author::TABULO]|Dist::Zilla::PluginBundle::Author::TABULO> plugin bundle, and a skeleton
+for the main module and its documentation.
 
-=item *
+The author, license, and copyright
+will be populated in the C<dist.ini> and documentation from the current dzil
+C<config.ini>, which can be initialized using
+L<< C<dzil setup>|Dist::Zilla::App::Command::setup >>. The version is
+initialized statically as C<0.001>.
 
-C<github>
+=head1 CUSTOMIZING
 
-Creates a distribution hosted on L<github|http://github.com>, with hooks to determine the
-module version and other metadata from git. Issue tracking is disabled, as RT
-is selected as the bugtracker in the distribution's metadata (via the plugin
-bundle).
+It's easy to create your own local version of this (or any other) minting
+profile which you can customize as you choose.
 
-You will be prompted to create a repository on github immediately; if you
-decline, you must create one manually before you do your first C<push>.
-
-=item *
-
-C<default>
-
-Presently the same as C<github>. Available since version 0.087.
-
-=back
+See L<Dist::Zilla::MintingProfile::Starter> for recipes on customization.
 
 =head1 SEE ALSO
 
-=over 4
+L<Dist::Zilla>, L<Dist::Zilla::MintingProfile::Starter>,  L<Dist::Zilla::MintingProfile::Starter::Git>, L<Dist::Zilla::PluginBundle::Starter>
 
-=item *
+=head1 AUTHORS
 
-L<Dist::Zilla::PluginBundle::Author::TABULO>
+Tabulo[n] <dev@tabulo.net>
 
-=item *
+=head1 LEGAL
 
-L<Pod::Weaver::PluginBundle::Author::TABULO>
-
-=item *
-
-L<Dist::Zilla::MintingProfile::Author::ETHER> (ETHER's original bundle)
-
-=back
-
-=head1 BASED ON
-
-This distribution is based on L<Dist::Zilla::MintingProfile::Author::ETHER> by
-Karen Etheridge L<cpan:ETHER>.
-
-Thank you ETHER!
-
-=head1 SUPPORT
-
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-TABULO>
-(or L<bug-Dist-Zilla-PluginBundle-Author-TABULO@rt.cpan.org|mailto:bug-Dist-Zilla-PluginBundle-Author-TABULO@rt.cpan.org>).
-
-=head1 AUTHOR
-
-Tabulo <tabulo@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Tabulo.
+This software is copyright (c) 2021 by Tabulo[n].
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::PackageResultsType;
-$Shipment::UPS::WSDL::ShipTypes::PackageResultsType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::PackageResultsType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               ShippingReceipt
               USPSPICNumber
 
-              )
+            )
         ],
         {   'TrackingNumber'        => \%TrackingNumber_of,
             'ServiceOptionsCharges' => \%ServiceOptionsCharges_of,
@@ -83,7 +83,7 @@ Shipment::UPS::WSDL::ShipTypes::PackageResultsType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -32,6 +32,7 @@ onlineddl_test 'No-op copy' => 'Track' => sub {
     is $online_ddl->new_table_name, '_track_new', 'Figured out new_table_name';
 
     my $helper = $online_ddl->_helper;
+    my $mmver  = $helper->mmver;
 
     my $orig_table_track_sql  = $helper->create_table_sql('track');
     my $orig_table_lyrics_sql = $helper->create_table_sql('lyrics');  # has FK pointing to track
@@ -50,7 +51,71 @@ onlineddl_test 'No-op copy' => 'Track' => sub {
     $new_table_lyrics_sql  =~ s/ AUTO_INCREMENT=\K\d+/###/;
 
     is $new_table_track_sql,  $orig_table_track_sql,  'New table SQL for `track` matches the old one';
-    is $new_table_lyrics_sql, $orig_table_lyrics_sql, 'New table SQL for `lyrics` matches the old one';
+    SKIP: {
+        skip "MySQL versions below 5.7 cannot fix the index problem", 1 if $dbms_name eq 'MySQL' && $mmver < 5.007;
+        is $new_table_lyrics_sql, $orig_table_lyrics_sql, 'New table SQL for `lyrics` matches the old one';
+    };
+};
+
+onlineddl_test 'Existing triggers' => 'Track' => sub {
+    my $cd_schema  = shift;
+    my $track_rsrc = $cd_schema->source('Track');
+    my $dbh        = $cd_schema->storage->dbh;
+
+    # Constructor (another no-op)
+    my $online_ddl = DBIx::OnlineDDL->new(
+        rsrc => $track_rsrc,
+        copy_opts => {
+            chunk_size => $CHUNK_SIZE,
+        },
+    );
+
+    my $helper = $online_ddl->_helper;
+    my $mmver  = $helper->mmver;
+
+    # Add a few new triggers
+    my (@trigger_sql, @trigger_qnames);
+    foreach my $trigger_type (qw< INSERT UPDATE DELETE >) {
+        my $trigger_name = $helper->find_new_trigger_identifier(
+            "track_oddltest_".lc($trigger_type)
+        );
+        my $trigger_qname = $dbh->quote_identifier($trigger_name);
+        my $table_qname   = $dbh->quote_identifier('track');
+
+        push @trigger_sql, join("\n",
+            "CREATE TRIGGER $trigger_qname BEFORE $trigger_type ON $table_qname FOR EACH ROW",
+            'BEGIN',
+
+            # SQLite doesn't like empty procedures in its triggers.  MySQL is fine with them, but doesn't like
+            # returning a result set from a trigger.
+            ($dbms_name eq 'SQLite' ? 'SELECT 1;' : ''),
+
+            'END'
+        );
+        push @trigger_qnames, $trigger_qname;
+    }
+
+    try_ok {
+        $online_ddl->dbh_runner_do(@trigger_sql);
+    } 'Triggers created';
+
+    my $should_execute = $dbms_name eq 'MySQL' && $mmver >= 5.007;
+
+    if ($should_execute) {
+        try_ok { $online_ddl->execute } 'Execute works';
+    }
+    else {
+        like(
+            dies { $online_ddl->execute },
+            qr<Found conflicting triggers>,
+            'Execute dies due to triggers',
+        );
+    }
+
+    # Get rid of the triggers
+    try_ok {
+        $online_ddl->dbh_runner_do( map { "DROP TRIGGER IF EXISTS $_" } @trigger_qnames );
+    } 'Triggers dropped';
 };
 
 onlineddl_test 'Add column' => 'Track' => sub {

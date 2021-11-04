@@ -1,0 +1,71 @@
+---
+abstract: "one company's example of a standardised logging setup"
+author:
+  - 'Deriv Services Ltd <DERIV@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Future: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Log::Any::Adapter: '0'
+  Log::Any::Test: '0'
+  Sys::Hostname: '0'
+  Test::CheckDeps: '0.010'
+  Test::Deep: '1.130'
+  Test::Exception: '0'
+  Test::Fatal: '0.014'
+  Test::MockModule: '0'
+  Test::MockTime::HiRes: '0'
+  Test::More: '0.98'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Adapter-DERIV
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Log::Any::Adapter::DERIV:
+    file: lib/Log/Any/Adapter/DERIV.pm
+    version: '0.001'
+requires:
+  Clone: '0'
+  Fcntl: '0'
+  File::HomeDir: '0'
+  JSON::MaybeUTF8: '1.002'
+  Log::Any: '1.709'
+  Log::Any::Adapter::Coderef: '0.002'
+  Log::Any::Adapter::Util: '0'
+  Log::Any::Proxy: '0'
+  Path::Tiny: '0.118'
+  PerlIO: '0'
+  Term::ANSIColor: '5.01'
+  Time::Moment: '0.44'
+  curry: '1.001000'
+  feature: '0'
+  parent: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Log-Any-Adapter-DERIV/issues
+  homepage: https://github.com/binary-com/perl-Log-Any-Adapter-DERIV
+  repository: https://github.com/binary-com/perl-Log-Any-Adapter-DERIV.git
+version: '0.001'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Tom Molesworth <tom@deriv.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

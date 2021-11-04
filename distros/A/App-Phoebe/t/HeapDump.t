@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More;
 use utf8;
 
-plan skip_all => 'Contributions are an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
+plan skip_all => 'This is an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
 
 our @use = qw(HeapDump);
 

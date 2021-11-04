@@ -1,5 +1,17 @@
 Revision history for App-Device-Chip-sensor
 
+0.03    2021-10-22
+        [CHANGES]
+         * Added a --best-effort mode where failures are presumed temporary
+         * Added optional middle-of-3 filtering to reduce spurious sensor
+           noise
+         * Added a prometheus exporter script using Metrics::Any and
+           Net::Prometheus
+
+        [BUGFIXES]
+         * Correct handling of undef unit names
+         * Correct handling of undef reading values
+
 0.02    2021-06-26
         [CHANGES]
          * Support chip arguments supplying chip params

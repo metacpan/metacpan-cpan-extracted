@@ -1,5 +1,5 @@
 package NewsExtractor;
-our $VERSION = v0.43.0;
+our $VERSION = v0.44.0;
 use Moo;
 
 use Mojo::UserAgent;
@@ -20,7 +20,7 @@ has user_agent_string => (
     is => 'ro',
     isa => Str,
     default => sub {
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:75.0) Gecko/20100101 Firefox/75.0'
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:93.0) Gecko/20100101 Firefox/93.0'
     }
 );
 

@@ -4,7 +4,7 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -19,7 +19,7 @@
             "Devel::CheckLib" : "1.03",
             "ExtUtils::Depends" : "0.405",
             "ExtUtils::MakeMaker" : "0",
-            "X11::Xlib" : "0.15"
+            "X11::Xlib" : "0.22"
          }
       },
       "develop" : {
@@ -70,6 +70,9 @@
          "web" : "https://github.com/nrdvana/perl-X11-GLX"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

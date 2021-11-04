@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint;
-$Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -46,7 +46,7 @@ sub CreateShipment {
     die "CreateShipment must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'CreateShipment',
+        {   operation   => 'CreateShipment',
             soap_action =>
               'http://purolator.com/pws/service/v2/CreateShipment',
             style => 'document',
@@ -167,7 +167,7 @@ sub ValidateShipment {
     die "ValidateShipment must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'ValidateShipment',
+        {   operation   => 'ValidateShipment',
             soap_action =>
               'http://purolator.com/pws/service/v2/ValidateShipment',
             style => 'document',
@@ -323,7 +323,7 @@ Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoin
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

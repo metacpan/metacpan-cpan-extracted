@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use X11::Xlib;
+use POSIX;
 use X11::GLX ':all';
 use Try::Tiny;
 
@@ -27,9 +28,16 @@ plan skip_all => 'GLX_EXT_import_context is not supported'
 my ($vis, $cx);
 try {
 	# Need to trap errors, else program exits
-	$dpy->on_error(sub { my ($d, $e)= @_; diag "X11 error: $e"; $cx= undef; });
+	$dpy->on_error(sub {
+		my ($d, $e)= @_;
+		diag "X11 error: $e during ".(!defined $vis? 'glXChooseVisual':'glXCreateContext');
+		print STDOUT "1..0 # SKIP Import context testing requires X Server that allows indirect contexts\n";
+		POSIX::_exit(0);
+	});
 	$vis= glXChooseVisual($dpy);
+	note "Visual=$vis";
 	$cx= glXCreateContext($dpy, $vis, undef, 0);
+	note "Context=$cx";
 	$dpy->flush_sync; # make sure we get any errors from the above
 };
 plan skip_all => "Import context testing requires X Server that allows indirect contexts"

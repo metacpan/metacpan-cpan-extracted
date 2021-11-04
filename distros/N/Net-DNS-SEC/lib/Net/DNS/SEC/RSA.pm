@@ -3,7 +3,7 @@ package Net::DNS::SEC::RSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RSA.pm 1807 2020-09-28 11:38:28Z willem $)[2];
+our $VERSION = (qw$Id: RSA.pm 1853 2021-10-11 10:40:59Z willem $)[2];
 
 
 =head1 NAME
@@ -44,7 +44,7 @@ public key resource record.
 use integer;
 use MIME::Base64;
 
-use constant RSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_RSA');
+use constant RSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_RSA');
 
 BEGIN { die 'RSA disabled or application has no "use Net::DNS::SEC"' unless RSA_configured }
 
@@ -66,15 +66,10 @@ sub sign {
 	my $index = $private->algorithm;
 	my $evpmd = $parameters{$index} || die 'private key not RSA';
 
-	my ( $n, $e, $d, $p, $q ) = map { decode_base64( $private->$_ ) }
-			qw(Modulus PublicExponent PrivateExponent Prime1 Prime2);
+	my ( $n, $e, $d, $p, $q ) =
+			map { decode_base64( $private->$_ ) } qw(Modulus PublicExponent PrivateExponent Prime1 Prime2);
 
-	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
-	Net::DNS::SEC::libcrypto::RSA_set0_factors( $rsa, $p, $q );
-	Net::DNS::SEC::libcrypto::RSA_set0_key( $rsa, $n, $e, $d );
-
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
-	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_RSA( $evpkey, $rsa );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_RSA( $n, $e, $d, $p, $q );
 
 	return Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, $evpmd );
 }
@@ -93,11 +88,7 @@ sub verify {
 	my $keyfmt = $short ? "x a$short a*" : "x3 a$long a*";
 	my ( $exponent, $modulus ) = unpack( $keyfmt, $keybin );
 
-	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
-	Net::DNS::SEC::libcrypto::RSA_set0_key( $rsa, $modulus, $exponent, '' );
-
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
-	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_RSA( $evpkey, $rsa );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_RSA( $modulus, $exponent, '', '', '' );
 
 	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $sigbin, $evpkey, $evpmd );
 }
@@ -126,7 +117,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

@@ -4,12 +4,13 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.521';
+our $VERSION = '0.523';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use strictures 2;
 use JSON::Schema::Modern::Utilities qw(is_type E A assert_keyword_type);
 use Moo;
@@ -45,7 +46,7 @@ sub keywords {
   };
   my $is_ipv4 = sub {
     my @o = split(/\./, $_[0], 5);
-    @o == 4 && (grep /^(0|[1-9][0-9]{0,2})$/, @o) == 4 && (grep $_ < 256, @o) == 4;
+    @o == 4 && (grep /^(?:0|[1-9][0-9]{0,2})$/, @o) == 4 && (grep $_ < 256, @o) == 4;
   };
   # https://tools.ietf.org/html/rfc3339#appendix-A with some additions for the 2000 version
   # as defined in https://en.wikipedia.org/wiki/ISO_8601#Durations
@@ -64,8 +65,16 @@ sub keywords {
   };
 
   my $formats = +{
-    'date-time' => $is_datetime,
-    date => sub { $_[0] =~ /^\d{4}-(\d\d)-(\d\d)$/a && $is_datetime->($_[0].'T00:00:00Z') },
+    'date-time' => sub {
+      $is_datetime->($_[0]) || (
+        $_[0] =~ m/^(?:\d{4}-\d\d-\d\dT\d\d:\d\d):(\d\d)(?:\.\d+)?(?:[Zz]|[+-]\d\d:\d\d)$/a
+          && $1 eq '60'
+          && do {
+            +require DateTime::Format::RFC3339;
+            eval { DateTime::Format::RFC3339->parse_datetime($_[0]) };
+          });
+    },
+    date => sub { $_[0] =~ /^\d{4}-(?:\d\d)-(?:\d\d)$/a && $is_datetime->($_[0].'T00:00:00Z') },
     time => sub {
       return if $_[0] !~ /^(\d\d):(\d\d):(\d\d)(?:\.\d+)?([Zz]|([+-])(\d\d):(\d\d))$/a
         or $1 > 23
@@ -193,7 +202,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.521
+version 0.523
 
 =head1 DESCRIPTION
 

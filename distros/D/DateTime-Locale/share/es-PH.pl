@@ -22,6 +22,7 @@
     GyMMMMEd => "E, d 'de' MMMM 'de' y G",
     GyMMMMd => "d 'de' MMMM 'de' y G",
     GyMMMd => "d MMM y G",
+    GyMd => "d/M/y GGGGG",
     H => "H",
     Hm => "H:mm",
     Hms => "H:mm:ss",
@@ -71,8 +72,8 @@
   date_format_short => "d/M/yy",
   datetime_format_full => "{1}, {0}",
   datetime_format_long => "{1}, {0}",
-  datetime_format_medium => "{1} {0}",
-  datetime_format_short => "{1} {0}",
+  datetime_format_medium => "{1}, {0}",
+  datetime_format_short => "{1}, {0}",
   day_format_abbreviated => [
     "lun",
     "mar",
@@ -279,5 +280,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 39,
+  version => 40,
 }

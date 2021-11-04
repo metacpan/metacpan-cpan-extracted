@@ -10,13 +10,15 @@ MANIFEST.SKIP
 README
 README.md
 t/00-load.t
-t/10-new.t
+t/10-compile.t
+t/20-new.t
 t/allow.t
 t/apoc.t
 t/bin.t
 t/boiler.t
 t/carp.t
 t/changes.t
+t/comment-spelling.t
 t/cookies.t
 t/coverage.t
 t/critic.t
@@ -46,6 +48,7 @@ t/noplan.t
 t/param.t
 t/params.t
 t/pod-cm.t
+t/pod-spelling.t
 t/pod.t
 t/port.t
 t/prereq.t
@@ -54,7 +57,6 @@ t/rootdir.t
 t/script.t
 t/site.t
 t/snippets.t
-t/spelling.t
 t/status.t
 t/strict.t
 t/taint.t

@@ -6,11 +6,8 @@ use warnings;
 use PDL;
 use PDL::DSP::Windows qw( window chebpoly ) ;
 
-eval { require PDL::LinearAlgebra::Special };
-my $HAVE_LinearAlgebra = 1 if !$@;
-
-eval { require PDL::GSLSF::BESSEL; };
-my $HAVE_BESSEL = 1 if !$@;
+my $HAVE_LinearAlgebra = eval { require PDL::LinearAlgebra::Special };
+my $HAVE_BESSEL        = eval { require PDL::GSLSF::BESSEL };
 
 use lib 't/lib';
 use MyTest::Helper qw( dies is_approx );
@@ -160,6 +157,63 @@ subtest 'enbw of windows.' => sub {
             1.72147863,
             'kaiser',
             5;
+    }
+};
+
+subtest 'scalloping loss of windows.' => sub {
+    my $win = PDL::DSP::Windows->new;
+
+    # Test data taken from https://www.recordingblogs.com/wiki/scalloping-loss
+    for (
+        [ bartlett_hann             => -1.51 ],
+        [ blackman                  => -1.09 ],
+        [ blackman_ex               => -1.15 ],
+        [ blackman_gen      => 0.05 => -1.33 ],
+        [ blackman_gen      => 0.20 => -1.00 ],
+        [ blackman_gen      => 0.35 => -0.53 ],
+        [ blackman_harris           => -0.82 ],
+        [ blackman_nuttall          => -0.85 ],
+        [ bohman                    => -1.02 ],
+        [ chebyshev         =>  0.1 => -1.44 ],
+        [ chebyshev         =>  0.2 => -1.28 ],
+        [ chebyshev         =>  0.3 => -1.23 ],
+        [ flattop                   => -0.01 ],
+        [ gaussian          =>  0.3 => -0.95 ],
+        [ gaussian          =>  0.5 => -2.12 ],
+        [ gaussian          =>  0.7 => -2.84 ],
+        [ hamming                   => -1.75 ],
+        [ hann                      => -1.42 ],
+        [ hann_poisson      =>  0.3 => -1.32 ],
+        [ hann_poisson      =>  0.5 => -1.25 ],
+        [ hann_poisson      =>  0.7 => -1.19 ],
+        [ lanczos                   => -1.88 ],
+        [ nuttall                   => -0.81 ],
+        [ parzen                    => -2.57 ],
+        [ poisson           =>  0.2 => -3.69 ],
+        [ poisson           =>  0.5 => -3.36 ],
+        [ poisson           =>  0.8 => -3.05 ],
+        [ cos_alpha         =>  1.0 => -2.09 ],
+        [ cos_alpha         =>  2.0 => -1.42 ],
+        [ cos_alpha         =>  3.0 => -1,07 ],
+        [ rectangular               =>  3.92 ],
+        [ cosine                    => -2.09 ],
+        [ triangular                => -1.82 ],
+        [ tukey             =>  0.3 => -1.81 ],
+        [ tukey             =>  0.5 => -2.23 ],
+        [ tukey             =>  0.7 => -2.79 ],
+        [ welch                     => -2.23 ],
+    ) {
+        my @args     = @{$_};
+        my $expected = pop @args;
+
+        is_approx $win->init( 1000, @args )->scallop_loss, $expected, join(' ', @args), 3;
+    }
+
+    SKIP: {
+        skip 'PDL::GSLSF::BESSEL not installed', 3 unless $HAVE_BESSEL;
+        is_approx $win->init( 1000, 'kaiser', 0.5 )->scallop_loss, -3.31, 'kaiser 0.5', 3;
+        is_approx $win->init( 1000, 'kaiser', 1.0 )->scallop_loss, -2.42, 'kaiser 1.0', 3;
+        is_approx $win->init( 1000, 'kaiser', 5.0 )->scallop_loss, -1.05, 'kaiser 5.0', 3;
     }
 };
 

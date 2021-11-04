@@ -11,7 +11,7 @@ use v5.14;
 our %github;
 our $EXIT_CODE = 0;
 
-our @EXPORT = qw( %github set_output set_env debug error warning set_failed command_on_file error_on_file warning_on_file start_group end_group);
+our @EXPORT = qw( %github set_output set_env debug error warning set_failed command_on_file error_on_file warning_on_file start_group end_group exit_action);
 
 BEGIN {
   for my $k ( keys(%ENV) ) {
@@ -22,7 +22,7 @@ BEGIN {
   }
 }
 
-use version; our $VERSION = qv('0.1.1');
+use version; our $VERSION = qv('0.1.1.1');
 
 sub set_output {
   carp "Need name and value" unless @_;
@@ -103,7 +103,7 @@ GitHub::Actions - Work in GitHub Actions using Perl
 
 =head1 VERSION
 
-This document describes GitHub::Actions version 0.0.3
+This document describes GitHub::Actions version 0.1.1.1
 
 
 =head1 SYNOPSIS
@@ -143,10 +143,13 @@ You can use this as a C<step>
           use GitHub::Actions;
           set_env( 'FOO', 'BAR');
 
+In most cases, you'll want to just have it installed locally and fatpack it to
+upload it to the repository.
+
 =head1 DESCRIPTION
 
-GitHub Actions include, by default, at least in its linux runners, a
-system Perl which you can use directly in your GitHub actions. This is
+GitHub Actions include by default, at least in its Linux runners, a
+system Perl which you can use directly in your GitHub actions. This here is
 a (for the time being) minimalistic module that tries to help a bit
 with that, by defining a few functions that will be useful when
 performing GitHub actions. Besides the system Perl, you can use any of
@@ -157,11 +160,12 @@ Ubuntu package (or equivalent)
 
 Check out an example of using it in the L<repository|https://github.com/JJ/perl-GitHub-Actions/blob/main/.github/workflows/self-test.yml>
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 =head2 set_env( $env_var_name, $env_var_value)
 
-This is equivalent to L<setting an environment variable|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable>
+This is equivalent to
+L<setting an environment variable|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable>
 
 =head2 set_output( $output_name, $output_value)
 
@@ -173,7 +177,10 @@ Equivalent to L<C<debug>|https://docs.github.com/en/free-pro-team@latest/actions
 
 =head2 error( $error_message )
 
-Equivalent to L<C<error>|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-error-message>, prints an error message.
+Equivalent to
+L<C<error>|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-error-message>,
+prints an error message. Remember to call L<exit_action()> to make the step fail
+if there's been some error.
 
 =head2 warning( $warning_message )
 
@@ -206,7 +213,8 @@ Ends current log grouping.
 
 =head2 exit_action
 
-Exits with the exit code generated during run
+Exits with the exit code generated during run, that is, 1 if there's been any
+error reported.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 

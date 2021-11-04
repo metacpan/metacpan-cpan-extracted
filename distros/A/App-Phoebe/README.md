@@ -3,14 +3,15 @@
 **Table of Contents**
 
 - [phoebe](#phoebe)
+- [Reading the wiki](#reading-the-wiki)
 - [Gemtext](#gemtext)
 - [Editing the wiki](#editing-the-wiki)
-- [Editing via the web](#editing-via-the-web)
 - [Installation](#installation)
 - [Dependencies](#dependencies)
 - [Quickstart](#quickstart)
 - [Image uploads](#image-uploads)
 - [Using systemd](#using-systemd)
+- [Installing Perl](#installing-perl)
 - [Troubleshooting](#troubleshooting)
 - [Files](#files)
 - [Options](#options)
@@ -59,13 +60,16 @@
 - [App::Phoebe::TokiPona](#appphoebetokipona)
 - [App::Phoebe::Web](#appphoebeweb)
 - [App::Phoebe::WebComments](#appphoebewebcomments)
+- [App::Phoebe::WebDAV](#appphoebewebdav)
+- [See also](#see-also)
 - [App::Phoebe::WebEdit](#appphoebewebedit)
+- [App::Phoebe::WebStaticFiles](#appphoebewebstaticfiles)
 - [App::Phoebe::Wikipedia](#appphoebewikipedia)
 
 # phoebe
 
 **phoebe** \[**--host=**_hostname_ ...\] \[**--port=**_port_\]
-\[**--cert\_file=**_filename_\] \[**--key\_file=**_filename_\]
+\[**--cert\_file=**_filename_\] \[**--key\_file=**_filename_\] \[**--no\_cert**\]
 \[**--log\_level=error**|**warn**|**info**|**debug**\] \[**--log\_file=**_filename_\]
 \[**--wiki\_dir=**_directory_\] \[**--wiki\_token=**_token_ ...\]
 \[**--wiki\_page=**_pagename_ ...\] \[**--wiki\_main\_page=**_pagename_\]
@@ -94,6 +98,17 @@ To take a look for yourself, check out the test wiki via the web or via the web.
 - [Test site, via the web](https://transjovian.org:1965/test)
 - [Test site, via Gemini](gemini://transjovian.org/test)
 
+# Reading the wiki
+
+This repository comes with a Perl script called [gemini](https://metacpan.org/pod/gemini) to download Gemini URLs.
+
+Other clients can be found here:
+
+- [Gemini software](https://gemini.circumlunar.space/software/)
+- [Gemini clients](https://transjovian.org:1965/gemini/page/Clients)
+
+See [App::Phoebe::Web](https://metacpan.org/pod/App%3A%3APhoebe%3A%3AWeb) to enable reading via the web.
+
 # Gemtext
 
 Pages are written in gemtext, a lightweight hypertext format. You can use your
@@ -112,9 +127,11 @@ and some text; the URL can be absolute or relative.
 
 A line starting with "\`\`\`" toggles preformatting on and off.
 
-    Example:
+    Here is an example:
     ```
-    ./phoebe
+    The tapping calms me:
+    Constant mindless murmuring
+    Rain drops against glass
     ```
 
 A line starting with "#", "##", or "###", followed by a space and some text is a
@@ -131,38 +148,29 @@ A line starting with "\*", followed by a space and some text is a list item.
 A line starting with ">", followed by a space and some text is a quote.
 
     The monologue at the end is fantastic, with the city lights and the rain.
-    > I've seen things you people wouldn't believe.
+    > I have seen things you people would not believe.
 
 # Editing the wiki
 
 How do you edit a Phoebe wiki? You need to use a Titan-enabled client.
 
-Titan is a companion protocol to Gemini: it allows clients to upload files to
-Gemini sites, if servers allow this. On Phoebe, you can edit "raw" pages. That
-is, at the bottom of a page you'll see a link to the "raw" page. If you follow
-it, you'll see the page content as plain text. You can submit a changed version
-of this text to the same URL using Titan. There is more information for
-developers available on Community Wiki. [https://communitywiki.org/wiki/Titan](https://communitywiki.org/wiki/Titan)
+[Titan](https://transjovian.org:1965/titan) is a companion protocol to Gemini:
+it allows clients to upload files to Gemini sites, if servers allow this. On
+Phoebe, you can edit "raw" pages. That is, at the bottom of a page you'll see a
+link to the "raw" page. If you follow it, you'll see the page content as plain
+text. You can submit a changed version of this text to the same URL using Titan.
 
 Known clients:
 
-This repository comes with a Perl script called `titan` to upload files.
-[https://alexschroeder.ch/cgit/phoebe/plain/script/titan](https://alexschroeder.ch/cgit/phoebe/plain/script/titan)
+This repository comes with a Perl script called [titan](https://metacpan.org/pod/titan) to upload files.
 
-_Gemini Write_ is an extension for the Emacs Gopher and Gemini client
-_Elpher_. [https://alexschroeder.ch/cgit/gemini-write/](https://alexschroeder.ch/cgit/gemini-write/)
-[https://thelambdalab.xyz/elpher/](https://thelambdalab.xyz/elpher/)
+[Gemini Write](https://alexschroeder.ch/cgit/gemini-write/) is an extension for
+the Emacs Gopher and Gemini client [Elpher](https://thelambdalab.xyz/elpher/).
 
-Gemini & Titan for Bash are two shell functions that allow you to download and
-upload files. [https://alexschroeder.ch/cgit/gemini-titan/about/](https://alexschroeder.ch/cgit/gemini-titan/about/)
+[Gemini & Titan for Bash](https://alexschroeder.ch/cgit/gemini-titan/about/) are
+two shell functions that allow you to download and upload files.
 
-## Editing via the web
-
-The Configuration section of the Phoebe space on _The Transjovian Council_ has
-an example config on how to enable editing via the web.
-
-- [https://transjovian.org:1965/phoebe/page/Configuration](https://transjovian.org:1965/phoebe/page/Configuration)
-- [gemini://transjovian.org/phoebe/page/Configuration](gemini://transjovian.org/phoebe/page/Configuration)
+See [App::Phoebe::WebEdit](https://metacpan.org/pod/App%3A%3APhoebe%3A%3AWebEdit) to enable editing via the web.
 
 # Installation
 
@@ -220,13 +228,14 @@ for you. If in doubt, answer `localhost`. The certificate and a private key are
 stored in the `cert.pem` and `key.pem` files, using elliptic curves, valid for
 five years, without password protection.
 
-    perl5/bin/phoebe
+Time to start phoebe, in the foreground:
 
-This starts the server in the foreground. If it aborts, see the
-["Troubleshooting"](#troubleshooting) section below. If it runs, open a second terminal and test
-it:
+    phoebe
 
-    perl5/bin/gemini gemini://localhost/
+If it aborts, see the ["Troubleshooting"](#troubleshooting) section below. If it runs, open a
+second terminal and test it:
+
+    gemini gemini://localhost/
 
 You should see a Gemini page starting with the following:
 
@@ -239,7 +248,7 @@ Let's create a new page using the Titan protocol, from the command line:
 
     echo "Welcome to the wiki!" > test.txt
     echo "Please be kind." >> test.txt
-    perl5/bin/titan --url=titan://localhost/raw/Welcome --token=hello test.txt
+    titan --url=titan://localhost/raw/Welcome --token=hello test.txt
 
 You should get a nice redirect message, with an appropriate date.
 
@@ -247,7 +256,7 @@ You should get a nice redirect message, with an appropriate date.
 
 You can check the page, now (replacing the appropriate date):
 
-    perl5/bin/gemini gemini://localhost:1965/page/Welcome
+    gemini gemini://localhost:1965/page/Welcome
 
 You should get back a page that starts as follows:
 
@@ -277,11 +286,11 @@ with a list of common MIME types.
 Let's continue using the setup we used for the ["Quickstart"](#quickstart) section. Restart
 the server and allow photos:
 
-    perl5/bin/phoebe --wiki_mime_type=image/jpeg
+    phoebe --wiki_mime_type=image/jpeg
 
 Upload the image using the `titan` script:
 
-    perl5/bin/titan --url=titan://localhost:1965/jupiter.jpg \
+    titan --url=titan://localhost:1965/jupiter.jpg \
       --token=hello Pictures/Planets/Juno.jpg
 
 You should get back a redirect to the uploaded image:
@@ -374,7 +383,22 @@ Check the log output:
 
     sudo journalctl --unit phoebe
 
+## Installing Perl
+
+If you are on GNU/Linx or macOS, I recommend installing from
+[Perlbrew](https://perlbrew.pl/). Each Perl installation comes with its own
+library directories, so if you switch Perl version, you need to reinstall Phoebe
+for that Perl version.
+
 ## Troubleshooting
+
+🔥 Unknown command phoebe 🔥 If you installed Phoebe using cpan or cpanm and you
+still get this error, then something about your Perl installation isn't working.
+Phoebe probably got installed in some directory, you just need to make sure it's
+in your PATH. If you use zsh and Perlbrew, for example, you need to add the
+following line to your `~/.zshenv` file:
+
+    source ${HOME}/perl5/perlbrew/etc/bashrc
 
 🔥 **1408A0C1:SSL routines:ssl3\_get\_client\_hello:no shared cipher** 🔥 If you
 created a new certificate and key using elliptic curves using an older OpenSSL,
@@ -471,6 +495,9 @@ own `config` file.
       `cert.pem`
 - `--key_file` is the private key PEM file to use; the default is
       `key.pem`
+- `--no_cert` indicates that the server should not be using TLS; use this
+      if you have a reverse proxy handling requests (so that front end and back
+      end don't need to use TLS to communicate with each other)
 - `--log_level` is the log level to use (`fatal`, `error`, `warn`,
       `info`, `debug`); the default is `warn`
 - `--log_file` is the log file to use; the default is undefined, which
@@ -762,10 +789,9 @@ For example:
 
 # See also
 
-As you might have guessed, the system is easy to tinker with, if you know some
-Perl. The Transjovian Council has a wiki space dedicated to Phoebe, and it
-includes a section with more configuration examples.
-See [gemini://transjovian.org/](gemini://transjovian.org/) or [https://transjovian.org:1965/](https://transjovian.org:1965/).
+The Transjovian Council has a wiki space dedicated to Phoebe, and it includes a
+section with more configuration examples. See [gemini://transjovian.org/phoebe](gemini://transjovian.org/phoebe)
+or [https://transjovian.org:1965/phoebe](https://transjovian.org:1965/phoebe).
 
 # License
 
@@ -773,7 +799,7 @@ GNU Affero General Public License
 
 # gemini
 
-**gemini** \[**--help**\] \[**--verbose**\] \[**--cert\_file=**_filename_
+**gemini** \[**--help**\] \[**--force**\] \[**--verbose**\] \[**--cert\_file=**_filename_
 **--key\_file=**_filename_\] _URL_
 
 This is a very simple client. All it does is print the response. The header is
@@ -800,6 +826,13 @@ In the shell script above, the first call to gemini gets the page with all the
 links, grep then filters for the links to thumbnails, extract the URL using cut
 (assuming a space between "=>" and the URL), and download each URL, and save the
 output in the filename indicated by the URL.
+
+When the script downloads binary data, then it won't print it to a terminal
+unless you use `--force`; redirecting binary data to a file or piping it to
+some other script is fine, though.
+
+Use `--verbose` to see what URL the script is requesting. This is useful when
+debugging issues around decoding and encoding.
 
 ## Client Certificates
 
@@ -934,6 +967,37 @@ doesn't work, perhaps using `--no-extension` is your best bet: the HTML files
 will be written without the `.html` extension. This should also work for local
 browsing, although it does look strange, all those pages with the `.html`
 extension.
+
+**phoebe-ctl log hits**
+
+**phoebe-ctl log requests \[IP number\]**
+
+If you are logging IP numbers, this command will offer a little summary. In your
+config file, you need the following (or start `phoebe` with
+`--log_level=debug`):
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our ($log);
+    $log->level('debug');
+
+And you need [App::Phoebe::DebugIpNumbers](https://metacpan.org/pod/App%3A%3APhoebe%3A%3ADebugIpNumbers), of course:
+
+    use App::Phoebe::DebugIpNumbers;
+
+Example basic usage, feeding it the journal kept by `systemd`, giving you the
+most active IP numbers:
+
+    journalctl --unit phoebe | phoebe-ctl log hits | head
+
+Giving you a summary of the 20 most popular requests (Gopher selectors, Gemini
+URLs, or web requests):
+
+    journalctl --unit phoebe | phoebe-ctl log requests
+
+The same, but limited to a particular IP number:
+
+    journalctl --unit phoebe | phoebe-ctl log requests 201.159.58.193
 
 # spartan
 
@@ -1585,16 +1649,14 @@ Provide no password when you run the command.
 
     openssl pkcs12 -export -inkey key.pem -in cert.pem -out cert.p12
 
-In Firefox, go to Preferences → Privacy & Security → Certificates, click on the
-View Certificates button, switch the Your Certificates tab, click on Import… and
-pick the `cert.p12` file you just created.
+In Firefox, go to “Preferences” → “Privacy & Security” → “Certificates”; under
+“When a server requests your personal certificate” check the option “Select one
+automatically”; click on the “View Certificates” button, switch to the “Your
+Certificates” tab, click on “Import…” and pick the `cert.p12` file you just
+created.
 
-Once you have done this and you visit the site, it’ll ask you what client
-certificate to use. Sadly, at this point Firefox will ask you for a certificate
-whenever you visit a Phoebe wiki, even if you don’t intend to identify yourself
-because Phoebe always tries to read the client’s client certificate. You can
-always cancel, but there’s that uncomfortable moment when you visit a new Phoebe
-wiki…
+Once you have done this and you visit the Phoebe site, it’ll use the client
+certificate you provided or it’ll ask you what client certificate to use.
 
 # App::Phoebe::Spartan
 
@@ -1720,7 +1782,7 @@ Phoebe doesn’t have to live behind another web server like Apache or nginx. It
 can be a (simple) web server, too!
 
 This package gives web visitors read-only access to Phoebe. HTML is served via
-HTTP on the same port as everything else, i.e. 1965 by default.
+HTTPS on the same port as everything else, i.e. 1965 by default.
 
 There is no configuration. Simply add it to your `config` file:
 
@@ -1832,6 +1894,36 @@ There is no configuration. Simply add it to your `config` file:
 
     use App::Phoebe::WebComments;
 
+# App::Phoebe::WebDAV
+
+This allows users to mount the wiki as a remote server using WebDAV. If you
+start it locally, for example, you should be able to mount
+[davs://localhost:1965/](davs://localhost:1965/) as a remote server using your file manager (i.e.
+Files, Finder, Windows Explorer, whatever it is called). Alternatively, you can
+use a dedicated WebDAV client such as `cadaver`.
+
+If you want to have write access, you need to provide a username and password if
+Phoebe requires a token. By default, the token required by Phoebe is "hello".
+The username you provide is ignored. The password must match one of the tokens.
+
+If you use a client such as `cadaver`, it'll ask you for a username and
+password when you use the "put" command for the first time. If you use the Gnome
+Text Editor to edit the file, this fails. The fix is to mount
+[davs://localhost:1965/](davs://localhost:1965/) instead. This forces Gnome Files to ask you for a
+username and password, and once you provide it, Gnome Text Editor can save
+files.
+
+# See also
+
+[RFC 4918](https://datatracker.ietf.org/doc/html/rfc4918) defines WebDAV
+including the PROPFIND method.
+
+[RFC 2616](https://datatracker.ietf.org/doc/html/rfc2616) defines HTTP/1.1
+including the OPTION and PUT methods.
+
+[RFC 2617](https://datatracker.ietf.org/doc/html/rfc2617) defines Basic
+Authentication.
+
 # App::Phoebe::WebEdit
 
 This package allows visitors on the web to edit your pages.
@@ -1839,6 +1931,26 @@ This package allows visitors on the web to edit your pages.
 There is no configuration. Simply add it to your `config` file:
 
     use App::Phoebe::WebEdit;
+
+# App::Phoebe::WebStaticFiles
+
+Serving static files, via the web. This is an add-on to [App::Phoebe::Web](https://metacpan.org/pod/App%3A%3APhoebe%3A%3AWeb) and
+[App::Phoebe::StaticFiles](https://metacpan.org/pod/App%3A%3APhoebe%3A%3AStaticFiles).
+
+Here is an example setup where we assume that the route contains an UTF-8
+encoded characters, and the directory name used also contains UTF-8 encoded
+characters.
+
+    package App::Phoebe::StaticFiles;
+    use utf8;
+    our %routes = (
+      "zürich" => "/home/alex/Pictures/2020/Zürich",
+      "amaryllis" => "/home/alex/Pictures/2021/Amaryllis", );
+    use App::Phoebe::WebStaticFiles;
+
+The setup does not allow recursive traversal of the file system.
+
+You still need to add a link to `/do/static` somewhere in your wiki.
 
 # App::Phoebe::Wikipedia
 

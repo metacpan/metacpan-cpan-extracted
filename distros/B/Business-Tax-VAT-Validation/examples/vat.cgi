@@ -39,7 +39,7 @@ if (param()) {
     print   h2("Results"), $vat, ': ';
     
     if ($hvatn->check($vat)) {
-        print 'This number exists in the VIES database. It belongs to '.$hvatn->informations('name')."  ".$hvatn->informations('address');
+        print 'This number exists in the VIES database. It belongs to '.$hvatn->information('name')."  ".$hvatn->information('address');
     } else {
         print $hvatn->get_last_error_code.' '.$hvatn->get_last_error;
     }

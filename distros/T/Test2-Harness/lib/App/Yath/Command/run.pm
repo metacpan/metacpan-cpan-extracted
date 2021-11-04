@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000073';
+our $VERSION = '1.000080';
 
 use App::Yath::Options;
 
@@ -249,13 +249,21 @@ Can be specified multiple times
 
 =over 4
 
-=item --cover-aggregator ARG
+=item --cover-aggregator ByTest
 
-=item --cover-aggregator=ARG
+=item --cover-aggregator ByRun
+
+=item --cover-aggregator +Custom::Aggregator
+
+=item --cover-agg ByTest
+
+=item --cover-agg ByRun
+
+=item --cover-agg +Custom::Aggregator
 
 =item --no-cover-aggregator
 
-Choose an aggregator (default Test2::Harness::Log::CoverageAggregator)
+Choose a custom aggregator subclass
 
 
 =item --cover-class ARG
@@ -296,6 +304,57 @@ Can be specified multiple times
 Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
 
 
+=item --cover-from path/to/log.jsonl
+
+=item --cover-from http://example.com/coverage
+
+=item --cover-from path/to/coverage.jsonl
+
+=item --no-cover-from
+
+This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will not be run if the file/url is invalid.
+
+
+=item --cover-from-type json
+
+=item --cover-from-type jsonl
+
+=item --cover-from-type log
+
+=item --no-cover-from-type
+
+File type for coverage source. Usually it can be detected, but when it cannot be you should specify. "json" is old style single-blob coverage data, "jsonl" is the new by-test style, "log" is a logfile from a previous run.
+
+
+=item --cover-manager My::Coverage::Manager
+
+=item --no-cover-manager
+
+Coverage 'from' manager to use when coverage data does not provide one
+
+
+=item --cover-maybe-from path/to/log.jsonl
+
+=item --cover-maybe-from http://example.com/coverage
+
+=item --cover-maybe-from path/to/coverage.jsonl
+
+=item --no-cover-maybe-from
+
+This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will coninue if even if the coverage file/url is invalid.
+
+
+=item --cover-maybe-from-type json
+
+=item --cover-maybe-from-type jsonl
+
+=item --cover-maybe-from-type log
+
+=item --no-cover-maybe-from-type
+
+Same as "from_type" but for "maybe_from". Defaults to "from_type" if that is specified, otherwise auto-detect
+
+
 =item --cover-metrics
 
 =item --no-cover-metrics
@@ -320,11 +379,13 @@ Can be specified multiple times
 
 =item --cover-write
 
+=item --cover-write=coverage.jsonl
+
 =item --cover-write=coverage.json
 
 =item --no-cover-write
 
-Create a json file of all coverage data seen during the run (This implies --cover-files).
+Create a json or jsonl file of all coverage data seen during the run (This implies --cover-files).
 
 
 =back
@@ -432,7 +493,7 @@ Can be specified multiple times
 
 =item --no-changed-only
 
-Only search for tests for changed files (Requires --coverage-from, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())
+Only search for tests for changed files (Requires a coverage data source, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())
 
 
 =item --changes-diff path/to/diff.diff
@@ -467,24 +528,6 @@ Can be specified multiple times
 =item --no-changes-plugin
 
 What plugin should be used to detect changed files.
-
-
-=item --coverage-from path/to/log.jsonl
-
-=item --coverage-from http://example.com/coverage
-
-=item --coverage-from path/to/coverage.json
-
-=item --no-coverage-from
-
-Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
-
-
-=item --coverage-manager My::Coverage::Manager
-
-=item --no-coverage-manager
-
-Coverage 'from' manager to use when coverage data does not provide one
 
 
 =item --default-at-search ARG
@@ -560,17 +603,6 @@ Can be specified multiple times
 Specify valid test filename extensions, default: t and t2
 
 Can be specified multiple times
-
-
-=item --maybe-coverage-from path/to/log.jsonl
-
-=item --maybe-coverage-from http://example.com/coverage
-
-=item --maybe-coverage-from path/to/coverage.json
-
-=item --no-maybe-coverage-from
-
-Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
 
 
 =item --maybe-durations file.json

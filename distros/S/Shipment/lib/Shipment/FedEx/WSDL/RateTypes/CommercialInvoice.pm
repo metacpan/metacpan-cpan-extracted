@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::CommercialInvoice;
-$Shipment::FedEx::WSDL::RateTypes::CommercialInvoice::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::CommercialInvoice::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -52,17 +52,17 @@ Class::Std::initialize();
               OriginatorName
               TermsOfSale
 
-              )
+            )
         ],
-        {   'Comments'                   => \%Comments_of,
-            'FreightCharge'              => \%FreightCharge_of,
-            'TaxesOrMiscellaneousCharge' => \%TaxesOrMiscellaneousCharge_of,
-            'PackingCosts'               => \%PackingCosts_of,
-            'HandlingCosts'              => \%HandlingCosts_of,
-            'SpecialInstructions'        => \%SpecialInstructions_of,
-            'DeclarationStatment'        => \%DeclarationStatment_of,
-            'PaymentTerms'               => \%PaymentTerms_of,
-            'Purpose'                    => \%Purpose_of,
+        {   'Comments'                     => \%Comments_of,
+            'FreightCharge'                => \%FreightCharge_of,
+            'TaxesOrMiscellaneousCharge'   => \%TaxesOrMiscellaneousCharge_of,
+            'PackingCosts'                 => \%PackingCosts_of,
+            'HandlingCosts'                => \%HandlingCosts_of,
+            'SpecialInstructions'          => \%SpecialInstructions_of,
+            'DeclarationStatment'          => \%DeclarationStatment_of,
+            'PaymentTerms'                 => \%PaymentTerms_of,
+            'Purpose'                      => \%Purpose_of,
             'PurposeOfShipmentDescription' =>
               \%PurposeOfShipmentDescription_of,
             'CustomerInvoiceNumber' => \%CustomerInvoiceNumber_of,
@@ -73,21 +73,21 @@ Class::Std::initialize();
             'FreightCharge' => 'Shipment::FedEx::WSDL::RateTypes::Money',
             'TaxesOrMiscellaneousCharge' =>
               'Shipment::FedEx::WSDL::RateTypes::Money',
-            'PackingCosts'  => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'HandlingCosts' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'PackingCosts'        => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'HandlingCosts'       => 'Shipment::FedEx::WSDL::RateTypes::Money',
             'SpecialInstructions' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'DeclarationStatment' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'PaymentTerms' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Purpose' =>
+            'Purpose'      =>
               'Shipment::FedEx::WSDL::RateTypes::PurposeOfShipmentType',
             'PurposeOfShipmentDescription' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'CustomerInvoiceNumber' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'OriginatorName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TermsOfSale' =>
+            'TermsOfSale'    =>
               'Shipment::FedEx::WSDL::RateTypes::TermsOfSaleType',
         },
         {
@@ -125,7 +125,7 @@ Shipment::FedEx::WSDL::RateTypes::CommercialInvoice
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

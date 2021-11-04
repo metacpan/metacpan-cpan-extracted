@@ -13,7 +13,7 @@
 package Messaging::Message::Queue::DQS;
 use strict;
 use warnings;
-our $VERSION  = "1.6.1";
+our $VERSION  = "1.7";
 our $REVISION = sprintf("%d.%02d", q$Revision: 1.11 $ =~ /(\d+)\.(\d+)/);
 
 #
@@ -156,4 +156,4 @@ L<Messaging::Message::Queue>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2011-2016
+Copyright (C) CERN 2011-2021

@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::General;
-$Shipment::Temando::WSDL::Types::General::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::General::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        goodsValue
 
-              )
+            )
         ],
         {'goodsValue' => \%goodsValue_of,},
         {'goodsValue' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',},
@@ -58,7 +58,7 @@ Shipment::Temando::WSDL::Types::General
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

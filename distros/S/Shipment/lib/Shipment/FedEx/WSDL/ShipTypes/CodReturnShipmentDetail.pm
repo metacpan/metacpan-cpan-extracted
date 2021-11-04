@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ Class::Std::initialize();
               Barcodes
               Label
 
-              )
+            )
         ],
         {   'CollectionAmount'       => \%CollectionAmount_of,
             'Handling'               => \%Handling_of,
@@ -66,8 +66,8 @@ Class::Std::initialize();
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'SecuredDescription' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Remitter'     => 'Shipment::FedEx::WSDL::ShipTypes::Party',
-            'CodRecipient' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
+            'Remitter'         => 'Shipment::FedEx::WSDL::ShipTypes::Party',
+            'CodRecipient'     => 'Shipment::FedEx::WSDL::ShipTypes::Party',
             'CodRoutingDetail' =>
               'Shipment::FedEx::WSDL::ShipTypes::RoutingDetail',
             'Barcodes' => 'Shipment::FedEx::WSDL::ShipTypes::PackageBarcodes',
@@ -105,7 +105,7 @@ Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

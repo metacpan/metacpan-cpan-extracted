@@ -1,4 +1,7 @@
 Revision history for RT-Extension-TemplateTickets
 
-0.01 Sun Sep 12 2021
+0.02 - Tue Oct 12 2021
+ - Patch from Andrew Ruthven to correct error in RT 5.x (RT#139676)
+
+0.01 - Sun Sep 12 2021
  - Initial version

@@ -17,7 +17,8 @@ ok( !$meta->is_role, '$meta->is_role false' );
 
 is_deeply( [ $meta->superclasses ], [], '$meta->superclasses' );
 
-is_deeply( [ $meta->roles ], [], '$meta->roles' );
+is_deeply( [ $meta->direct_roles ], [], '$meta->direct_roles' );
+is_deeply( [ $meta->all_roles    ], [], '$meta->all_roles' );
 
 class Example2 isa Example {}
 

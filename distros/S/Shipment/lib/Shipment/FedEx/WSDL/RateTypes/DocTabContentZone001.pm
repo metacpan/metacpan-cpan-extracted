@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::DocTabContentZone001;
-$Shipment::FedEx::WSDL::RateTypes::DocTabContentZone001::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::DocTabContentZone001::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        DocTabZoneSpecifications
 
-              )
+            )
         ],
         {'DocTabZoneSpecifications' => \%DocTabZoneSpecifications_of,},
         {   'DocTabZoneSpecifications' =>
@@ -56,7 +56,7 @@ Shipment::FedEx::WSDL::RateTypes::DocTabContentZone001
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

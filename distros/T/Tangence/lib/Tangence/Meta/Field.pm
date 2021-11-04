@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Field 0.26;
+use v5.26;
+use Object::Pad 0.41;
 
-use v5.14;
-use warnings;
+package Tangence::Meta::Field 0.27;
+class Tangence::Meta::Field :strict(params);
 
 =head1 NAME
 
@@ -44,12 +45,8 @@ Type of the field as a L<Tangence::Meta::Type> reference
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
-   bless \%args, $class;
-}
+has $name :param :reader;
+has $type :param :reader;
 
 =head1 ACCESSORS
 
@@ -63,12 +60,6 @@ Returns the name of the field
 
 =cut
 
-sub name
-{
-   my $self = shift;
-   return $self->{name};
-}
-
 =head2 type
 
    $type = $field->type
@@ -76,12 +67,6 @@ sub name
 Return the type as a L<Tangence::Meta::Type> reference.
 
 =cut
-
-sub type
-{
-   my $self = shift;
-   return $self->{type};
-}
 
 =head1 AUTHOR
 

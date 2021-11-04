@@ -8,11 +8,13 @@ misleading (as it used to be)
 
 =cut
 
-use Test::More "no_plan";
+use Test2::V0;
 
-use_ok "Crypt::OpenSSL::CA";
+use Crypt::OpenSSL::CA;
 
 eval {
     Crypt::OpenSSL::CA::X509->barf_me_harder;
 };
 like($@, qr/^Can't locate/);
+
+done_testing;

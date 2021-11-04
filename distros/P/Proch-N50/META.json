@@ -38,7 +38,7 @@
    "provides" : {
       "Proch::N50" : {
          "file" : "lib/Proch/N50.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.2"
       }
    },
    "release_status" : "stable",
@@ -48,7 +48,7 @@
          "url" : "https://github.com/quadram-institute-bioscience/seqfu.git"
       }
    },
-   "version" : "1.4.1",
+   "version" : "1.4.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

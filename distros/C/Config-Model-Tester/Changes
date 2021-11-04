@@ -1,3 +1,14 @@
+4.007 2021-10-26
+
+New feature:
+    * add "data_from_group" test parameter to avoid duplicating
+      fixtures between test groups
+
+Doc fixes:
+    * remove misleading example
+    * clarify full_dump doc
+    * fix broken links and typos
+
 4.006 2020-07-29
 
 Bug fixes:

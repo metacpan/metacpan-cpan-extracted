@@ -7,7 +7,6 @@ META.json
 META.yml
 Makefile.PL
 README
-TestRail-API-0.048/.travis.yml
 bin/testrail-bulk-mark-results
 bin/testrail-cases
 bin/testrail-lock

@@ -1,9 +1,10 @@
+## no critic: Subroutines::ProhibitExplicitReturnUndef
 package File::MoreUtil;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-30'; # DATE
+our $DATE = '2021-10-13'; # DATE
 our $DIST = 'File-MoreUtil'; # DIST
-our $VERSION = '0.624'; # VERSION
+our $VERSION = '0.625'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,6 +18,8 @@ our @EXPORT_OK = qw(
                        file_exists
                        l_abs_path
                        dir_empty
+                       dir_not_empty
+                       dir_has_entries
                        dir_has_files
                        dir_has_dot_files
                        dir_has_non_dot_files
@@ -71,6 +74,19 @@ sub dir_empty {
     }
     1;
 }
+
+sub dir_not_empty {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return 1;
+    }
+    0;
+}
+
+sub dir_has_entries { goto \&dir_not_empty }
 
 sub dir_has_files {
     my ($dir) = @_;
@@ -259,7 +275,7 @@ File::MoreUtil - File-related utilities
 
 =head1 VERSION
 
-This document describes version 0.624 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2020-05-30.
+This document describes version 0.625 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2021-10-13.
 
 =head1 SYNOPSIS
 
@@ -352,6 +368,24 @@ Will return true if C<$dir> exists and is empty.
 
 This should be trivial but alas it is not. C<-s> always returns true (in other
 words, C<-z> always returns false) for a directory.
+
+To test that a directory is C<not> empty, use L</dir_not_empty> (or its alias
+L</dir_has_entries>).
+
+=head2 dir_not_empty
+
+Usage:
+
+ dir_not_empty($dir) => BOOL
+
+Will return true if C<$dir> exists and is not empty (has entries other than C<.>
+and C<..>).
+
+To test that a directory is empty, use L</dir_empty>.
+
+=head2 dir_has_entries
+
+Alias for L</dir_not_empty>.
 
 =head2 dir_has_files
 
@@ -555,7 +589,7 @@ Basically a shortcut for something like:
 =head2 Where is file_empty()?
 
 For checking if some path exists, is a plain file, and is empty (content is
-zero-length), you can simply use the C<-z> filetest operator.
+zero-length), you can simply use the C<-s> or C<-z> filetest operator.
 
 =head2 Where is get_dir_non_dot_entries()?
 
@@ -567,15 +601,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-MoreU
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-File-Util>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-MoreUtil>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Source repository is at L<https://github.com/perlancar/perl-File-MoreUtil>.
 
 =head1 SEE ALSO
 
@@ -585,11 +611,42 @@ L<App::FileTestUtils> includes CLI's for functions like L</dir_empty>, etc.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-MoreUtil>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

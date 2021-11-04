@@ -1,4 +1,28 @@
-Fri July 9 07:33:00 JST 2021
+Wed Oct 20 15:38:00 JST 2021
+
+  Version 1.30
+
+  * New options 'command','exe' dis-ambiguate the problems around
+    determining how to parse the command line and determine the
+    executable name.  It also allows faking argv[0].  They can be
+    inspected after program launch via same-named attributes.
+  * New options 'stdin','stdout','stderr' allow initializing handles
+    of the child process.
+  * New option 'cwd' sets initial current directory of the child
+  * Renamed '->die' to '->terminate' and options 'die_upon_destroy'
+    to 'autoterminate' (but preserved back-compat)
+  * Option 'autoterminate' now has an attribute accessor and can be
+    toggled on the fly.
+  * New option 'autodie' throws exceptions from constructor instead
+    of returning undef.
+  * On Unix, use a pipe to capture error messages all the way through
+    to the exec() call.  Reap exec() failures without exposing the
+    forked process to the user.
+  * Add methods ->suspend and ->resume
+  * Mitigate bug in timeout_system where a system clock change could
+    increase the wait-time indefinitely.
+
+Fri Jul  9 07:33:00 JST 2021
 
   Version 1.22
 

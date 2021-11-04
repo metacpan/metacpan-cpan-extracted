@@ -1,5 +1,5 @@
 package Shipment::Base;
-$Shipment::Base::VERSION = '3.05';
+$Shipment::Base::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -92,8 +92,8 @@ has 'packages' => (
     handles_via => 'Array',
     is          => 'rw',
     isa         => ArrayRef [InstanceOf ['Shipment::Package']],
-    default => sub { [] },
-    handles => {
+    default     => sub { [] },
+    handles     => {
         all_packages   => 'elements',
         get_package    => 'get',
         add_package    => 'push',
@@ -164,7 +164,7 @@ has 'services' => (
     handles_via => 'Hash',
     is          => 'lazy',
     isa         => HashRef [InstanceOf ['Shipment::Service']],
-    handles => {all_services => 'values',},
+    handles     => {all_services => 'values',},
 );
 
 
@@ -184,8 +184,8 @@ has 'activities' => (
     handles_via => 'Array',
     is          => 'rw',
     isa         => ArrayRef [InstanceOf ['Shipment::Activity']],
-    default => sub { [] },
-    handles => {
+    default     => sub { [] },
+    handles     => {
         all_activities   => 'elements',
         get_activity     => 'get',
         add_activity     => 'push',
@@ -388,7 +388,7 @@ Shipment::Base
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

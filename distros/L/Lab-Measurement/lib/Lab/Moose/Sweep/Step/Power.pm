@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Power;
-$Lab::Moose::Sweep::Step::Power::VERSION = '3.772';
+$Lab::Moose::Sweep::Step::Power::VERSION = '3.791';
 #ABSTRACT: Power sweep.
 
 use v5.20;
@@ -15,7 +15,7 @@ has filename_extension =>
 has setter => ( is => 'ro', isa => 'CodeRef', builder => '_build_setter' );
 
 has instrument =>
-    ( is => 'ro', isa => 'Lab::Moose::Instrument', required => 1 );
+    ( is => 'ro', isa => 'ArrayRefOfInstruments', coerce => 1, required => 1 );
 
 sub _build_setter {
     return \&_power_setter;
@@ -24,7 +24,9 @@ sub _build_setter {
 sub _power_setter {
     my $self  = shift;
     my $value = shift;
-    $self->instrument->set_power( value => $value );
+    foreach (@{$self->instrument}) {
+        $_->set_power( value => $value );
+    }
 }
 
 __PACKAGE__->meta->make_immutable();
@@ -42,7 +44,7 @@ Lab::Moose::Sweep::Step::Power - Power sweep.
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 Description
 

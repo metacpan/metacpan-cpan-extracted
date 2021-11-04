@@ -12,7 +12,7 @@ has answer => spec => '=i',
     must => sub { $_[1] == 42 };
 
 has answer_is => spec => '=i',
-    must   => sub { $_[1] == 42 },
+    must   => [ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ],
     action => sub {
 	$_->{$_[0]} = "Answer is $_[1]";
     };

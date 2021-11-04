@@ -20,7 +20,7 @@ git-reset-to - Help reset-to many commits
 
 =head1 VERSION
 
-This documentation refers to git-reset-to version 1.1.14
+This documentation refers to git-reset-to version 1.1.16
 
 =head1 SYNOPSIS
 

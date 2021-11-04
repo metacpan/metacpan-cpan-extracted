@@ -68,12 +68,14 @@ and plot individual line segments.
 
     The base URL for downloading files. If you are using a local
     tileserver, or a public tileserver other than OpenStreetMap, set it
-    here.
+    here. (A slash will be added, so don't end with one - usually this
+    shouldn't matter but tile.openstreetmap.org at least cares about the
+    difference.)
 
         ua - user-agent
 
     Tileserver usage policy requires a "Valid HTTP User-Agent identifying
-    application".
+    application". As a matter of policy you must set this yourself.
 
 - init()
 

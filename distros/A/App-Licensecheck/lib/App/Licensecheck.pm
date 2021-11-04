@@ -1,18 +1,17 @@
 package App::Licensecheck;
 
+use v5.12;
 use utf8;
-use strict;
 use warnings;
 use autodie;
 
-use version;
 use Log::Any qw($log);
 use List::SomeUtils qw(nsort_by uniq);
 use Path::Iterator::Rule;
 use Path::Tiny;
 use Try::Tiny;
 use Fcntl qw(:seek);
-use Encode;
+use Encode 2.93;
 use Array::IntSpan;
 use Regexp::Pattern::License 3.4.0;
 use Regexp::Pattern 0.2.12;
@@ -119,11 +118,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.12
+Version v3.2.13
 
 =cut
 
-our $VERSION = version->declare('v3.2.12');
+our $VERSION = 'v3.2.13';
 
 =head1 SYNOPSIS
 

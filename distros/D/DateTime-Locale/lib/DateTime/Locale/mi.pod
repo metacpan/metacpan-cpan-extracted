@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::mi - Locale data examples for the Maori (mi) locale
+DateTime::Locale::mi - Locale data examples for the Māori (mi) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Maori locale.
+Māori locale.
 
 =head2 Days
 
@@ -416,6 +416,12 @@ Maori locale.
    2008-02-05T18:30:30 = 5 Hui 2008 CE
    1995-12-22T09:05:02 = 22 Haki 1995 CE
   -0010-09-15T04:44:23 = 15 Mahu -10 BCE
+
+=head3 GyMd (GGGGG y-MM-dd)
+
+   2008-02-05T18:30:30 = CE 2008-02-05
+   1995-12-22T09:05:02 = CE 1995-12-22
+  -0010-09-15T04:44:23 = BCE -10-09-15
 
 =head3 H (HH)
 

@@ -103,7 +103,7 @@ qx.Class.define("callbackery.ui.MsgBox", {
                 width  : width,
                 height : height
             });
-            let label = String(text);
+            let label = text.toString();
 
             if (!html) {
                 /* we are always rich to get line breaking, but we do NOT

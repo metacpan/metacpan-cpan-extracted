@@ -1,5 +1,19 @@
 Revision history for PDL-Algorithm-Center
 
+0.12      2021-10-22 01:12:21-04:00 America/New_York
+
+  [BUG FIX]
+
+    * sigma_clip iteration 0 result object did not include all of the
+      documented fields.
+
+  [BUILD]
+
+    * PDL >= 2.056 changed the return type of dsum, which
+      caused issues with testing
+
+    * No longer requires PDL::GSL::RNG for testing.
+
 0.11      2021-06-25 19:23:20-04:00 America/New_York
 
   [BUG FIX]

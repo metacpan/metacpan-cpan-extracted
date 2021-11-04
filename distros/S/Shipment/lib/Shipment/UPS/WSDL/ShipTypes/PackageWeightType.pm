@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::PackageWeightType;
-$Shipment::UPS::WSDL::ShipTypes::PackageWeightType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::PackageWeightType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        UnitOfMeasurement
               Weight
 
-              )
+            )
         ],
         {   'UnitOfMeasurement' => \%UnitOfMeasurement_of,
             'Weight'            => \%Weight_of,
@@ -62,7 +62,7 @@ Shipment::UPS::WSDL::ShipTypes::PackageWeightType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

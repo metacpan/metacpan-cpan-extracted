@@ -1,4 +1,4 @@
-/* vi: set ft=c */
+/* vi: set ft=c : */
 
 /* Perls before 5.18 lack isIDCONT_uni, but baring minor differences of weird
  * Unicode characters, isALNUM_uni is close enough

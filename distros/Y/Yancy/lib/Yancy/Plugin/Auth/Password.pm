@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.077';
+our $VERSION = '1.084';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -472,8 +472,10 @@ sub init {
 
     # Update the schema to digest the password correctly
     my $field = $schema->{properties}{ $self->password_field };
-    push @{ $field->{ 'x-filter' } ||= [] },
-        'yancy.plugin.auth.password';
+    if ( !grep { $_ eq 'yancy.plugin.auth.password' } @{ $field->{'x-filter'} || [] } ) {
+        push @{ $field->{ 'x-filter' } ||= [] },
+            'yancy.plugin.auth.password';
+    }
     $field->{ format } = 'password';
     $app->yancy->schema( $schema_name, $schema );
 
@@ -798,7 +800,7 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.077
+version 1.084
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use feature 'say';
+
+use File::Slurp;
+
+sub strip_one {
+  my ($file) = @_;
+
+  my $html = read_file $file;
+
+  $html =~ s/<head><script.+<!-- End Wayback Rewrite JS Include -->/<head>/s;
+  $html =~ s/<!-- BEGIN WAYBACK TOOLBAR INSERT -->.+<!-- END WAYBACK TOOLBAR INSERT -->//s;
+  $html =~ s/<!--.+//s;
+
+  write_file($file, $html);
+}
+
+for (@ARGV) {
+  say $_;
+  strip_one($_);
+}

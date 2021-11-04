@@ -179,6 +179,12 @@ Use a subroutine reference or the name of a method on your class to provide vali
 
 See L<Valiant::Validator::With> for details.
 
+=head2 Scalar
+
+Verifies that the value is a string or number, basically a Perl scalar.
+
+See L<Valiant::Validator::Scalar> for details.
+
 =head2 Special Validators
 
 The following validators are not considered for end users but have documentation you might

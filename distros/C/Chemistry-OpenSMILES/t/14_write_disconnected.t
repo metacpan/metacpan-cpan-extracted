@@ -8,7 +8,7 @@ use Test::More;
 
 plan tests => 2;
 
-my $graph = Graph::Undirected->new;
+my $graph = Graph::Undirected->new( refvertexed => 1 );
 $graph->add_vertex( { symbol => 'C', number => 1 } );
 $graph->add_vertex( { symbol => 'O', number => 2 } );
 

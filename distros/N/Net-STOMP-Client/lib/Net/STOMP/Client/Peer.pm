@@ -13,8 +13,8 @@
 package Net::STOMP::Client::Peer;
 use strict;
 use warnings;
-our $VERSION  = "2.3";
-our $REVISION = sprintf("%d.%02d", q$Revision: 2.1 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "2.5";
+our $REVISION = sprintf("%d.%02d", q$Revision: 2.2 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -44,7 +44,7 @@ my %new_options = (
     },
     "host" => {
         type     => SCALAR,
-        regex    => qr/^[a-z0-9\.\-]+$/,
+        regex    => qr/^[a-z0-9\.\-\:]+$/,
     },
     "port" => {
         type     => SCALAR,
@@ -167,4 +167,4 @@ L<Net::STOMP::Client>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2017
+Copyright (C) CERN 2010-2021

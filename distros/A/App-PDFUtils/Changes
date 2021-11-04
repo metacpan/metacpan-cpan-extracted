@@ -1,3 +1,13 @@
+0.009   2021-10-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: compress-pdf.
+
+
+0.008   2021-10-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: pdf-has-password.
+
+
 0.007   2021-07-17  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli convert-pdf-to-text] Add option --pages to only convert a

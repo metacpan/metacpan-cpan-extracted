@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::Contact;
-$Shipment::FedEx::WSDL::TrackTypes::Contact::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::Contact::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -43,7 +43,7 @@ Class::Std::initialize();
               FaxNumber
               EMailAddress
 
-              )
+            )
         ],
         {   'PersonName'          => \%PersonName_of,
             'Title'               => \%Title_of,
@@ -97,7 +97,7 @@ Shipment::FedEx::WSDL::TrackTypes::Contact
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

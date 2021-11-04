@@ -1,5 +1,8 @@
 Revision history for Feed::Find
 
+0.12  2021.10.22
+    - Add GitHub info to Makefile.PL
+
 0.11  2021.06.14
     - Add test for "file://" URLs (RT 12242)
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Slot 0.54;
+package Object::Pad::MOP::Slot 0.56;
 
 use v5.14;
 use warnings;
@@ -35,6 +35,14 @@ which C<Object::Pad> is expermental.
 
 Returns the name of the slot, as a plain string including the leading sigil
 character.
+
+=head2 sigil
+
+   $sigil = $metaslot->sigil
+
+I<Since version 0.56.>
+
+Returns the first character of the slot name, giving just its leading sigil.
 
 =head2 class
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::FaultDetail;
-$Shipment::FedEx::WSDL::ShipTypes::FaultDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::FaultDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ Class::Std::initialize();
         [   qw(
               fault
 
-              )
+            )
         ],
         {'fault' => \%fault_of,},
         {'fault' => 'Shipment::FedEx::WSDL::ShipTypes::Fault',},
@@ -55,7 +55,7 @@ Shipment::FedEx::WSDL::ShipTypes::FaultDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

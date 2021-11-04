@@ -90,7 +90,7 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::Youtube accepts a valid full YouTube video ID or URL on 
+StreamFinder::Youtube accepts a valid full YouTube video ID, or page URL on 
 youtube, et. al. that the "youtube-dl" program supports, 
 and returns the actual stream URL, title, and cover art icon for that video.  
 The purpose is that one needs this URL in order to have the option to 
@@ -103,18 +103,34 @@ open-source "audacious" audio player).  "fauxdacious" incorporates this
 module to decode and play youtube.com videos.  This is a submodule of the 
 general StreamFinder module.
 
+NOTE:  This module may return either Youtube or non-Youtube videos and streams 
+for non-Youtube sites, including videos embedded in IFRAME tags and even 
+Rumble.com videos found in some non-Youtube sites (L<StreamFinder::Rumble> 
+required).  See the I<-noiframes> and I<-youtubeonly> flags below for limiting 
+this feature.  Also note:  these videos, etc. are handled here and not 
+by L<StreamFinder::Anystream>.
+
 Depends:  
 
 L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
-and the separate application program:  youtube-dl.
+and the separate application program:  youtube-dl, or a compatable program 
+such as yt-dlp.
 
 =head1 SUBROUTINES/METHODS
 
 =over 4
 
 =item B<new>(I<ID>|I<url> [, I<-debug> [ => 0|1|2 ]] 
-[, <-fast> [ => 0|1 ]] [, I<-secure> [ => 0|1 ]] 
-[, I<-noiframes> [ => 0|1 ]])
+[, I<-secure> [ => 0|1 ]] 
+[, I<-fast> [ => 0|1 ]] 
+[, I<-format> => "youtube-dl format specification" ] 
+[, I<-formatonly> [ => 0|1 ]] [, I<-noiframes> [ => 0|1 ]] 
+[, I<-youtubeonly> [ => 0|1 ]] 
+[, I<-user-agent> => "user-agent string"] 
+[, I<-userid> => "youtube-user-id", I<-userpw> => "password"] 
+[, I<-youtube-dl> => "youtube-dl program"] 
+[, I<-youtube-dl-args> => "youtube-dl arguments"] 
+[, I<-youtube-dl-add-args> => "youtube-dl additional arguments"])
 
 Accepts a youtube.com video ID, or any full URL that youtube-dl supports 
 and creates and returns a new video object, or I<undef> if the URL is 
@@ -123,31 +139,93 @@ be the full URL,
 ie. https://www.youtube.com/watch?v=B<video-id>, or just I<video-id> 
 (if the site is www.youtube.com, since YouTube has multiple sites).
 
+If I<-format> is specified, it should be a valid "I<youtube-dl -f>" format 
+string (see the youtube-dl manpage for details).  Examples:  
+"I<mp4[height<=720]/best[height<=720]>" which limits videos to 720p, or 
+"bestaudio" to download only audio streams.
+Default is "I<mp4>", but if no streams are found, it then tries all, 
+unless I<-formatonly> is specified.
+
+If I<-formatonly> is specified (set to 1 (true)), then if no streams match 
+the specified I<-format> argument (default "I<mp4>"), then no streams will 
+be returned.  Otherwise, youtube-dl is called again with no format (I<-f>) 
+argument.  Default is 0 (false / unset).
+
 If I<-fast> is specified (set to 1 (true)), a separate probe of the 
 page to fetch the video's title and artist is skipped.  This is useful 
 if you know the video is NOT a YouTube video or you don't care about 
-the artist (youtube channel's owner), artist icon, fields, etc.
+the artist (youtube channel's owner), artist icon, fields, etc.  
+Default is 0 (false / unset).
 
-The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
-If 1 then only secure ("https://") streams will be returned.  Default for 
-I<-secure> is 0 (false) - return all streams (http and https).
-
-The optional argument I<-noiframes>, if set to 1 (I<true>) means only 
+If I<-noiframes> is specified (set to 1 (true)), then only 
 process actual video URLs, not search the page for an iframe containing 
 a video URL (a new feature with v0.47).  This is used primarily internally 
 to prevent possible recursion when StreamFinder::YouTube finds an iframe 
 containing a potential video stream URL and creates a new StreamFinder object 
 to find any streams in that URL (which can then call StreamFinder::Youtube 
-again on that URL to find the stream).  Default is 0 (false) - search for 
-StreamFinder-searchable URLs in an iframe, if the page is HTML and not an 
+again on that URL to find the stream).  Default is 0 (false / unset) - search 
+for StreamFinder-searchable URLs in an iframe, if the page is HTML and not an 
 actual video URL.
 
-Additional options:
+If I<-youtubeonly> Some non-Youtube pages have embedded Rumble (Rumble.com) 
+videos embedded in them and since StreamFinder::Youtube is somewhat of a 
+"catchall" (for videos), and we (the Author) prefer the less-woke Rumble to 
+Youtube (whish has major censorship issues), we search for embedded Rumble 
+videos here, as opposed to L<StreamFinder::Rumble> or 
+L<StreamFinder::AnyStream>, and, upon finding one, we return that rather than 
+continuing the search for Youtube videos.  To NOT do this (consider only 
+embedded Youtube videos), specify this / set it to 1 (true).  
+Default 0 (false) - accept Rumble (or other non-Youtube) videos, if found 
+first.  NOTE:  This option is effectively set (true) if I<-noiframes> is set!
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
+If 1 then only secure ("https://") streams will be returned.  Default for 
+I<-secure> is 0 (false) - return all streams (http and https).
+
+The optional I<-user-agent> argument can specify a specific user-agent string 
+to send to youtube-dl's optional "I<--user-agent>" argument.  NOTE:  This is 
+completely separate from the I<-agent> option used by some other StreamFinder 
+modules for fetching pages and streams from their respective sites, as that 
+argument is used by LWP::UserAgent (along with some other options), and is NOT 
+passed to youtube-dl, though they represent the same kind of user-agent string! 
+Default is I<-none-> (youtube-dl or the alternate program may use it's 
+own default).
+
+The optional I<-userid> and I<-userpw> arguments allow specifying a Youtube 
+login (for fetching videos, ie. paid ones that require one).  
+Defaults are I<-none-> (no userid or password specified).
+
+The optional I<-youtube-dl> argument allows specifying an alternate stream-
+parser program in lieu of "youtube-dl" (Default:  "I<youtube-dl>").  A current 
+such alternate program is "yt-dlp".  If the program is not in the user's 
+executable I<PATH>, the full path can be included with the program name here.
+
+The optional I<-youtube-dl-args> argument allows you to change the arguments 
+to be passed to the external youtube-dl (or yt-dlp, etc.) program.  NOTE:  
+Unless this program changes it's valid arguments or you select an alternate 
+program that requires slightly different arguments, you should NOT use this 
+argument, as the DEFAULT is:  
+"I<--get-url --get-format --get-thumbnail --get-title --get-description --get-id>", 
+which are the I<currently> required arguments for this module to function 
+properly!  Instead, if you wish to include additional arguments, you should 
+use the I<-youtube-dl-add-args> option to append them to this required list, 
+see below:  Also note that the I<-f format> argument should NOT be specified 
+either here or below as the I<-format> option provides this argument!
+
+The optional I<-youtube-dl-add-args> argument allows you to add additional 
+arguments to be passed to the external youtube-dl (or yt-dlp, etc.) program.  
+See both the I<-youtube-dl-args> argument description and the manpage for 
+youtube-dl or whatever alternative external program you use to extract 
+video streams for valid arguments for possible inclusion here.  
+Default is I<-none-> (no additional arguments).
+
+Additional (general StreamFinder) options:
 
 I<-log> => "I<logfile>"
 
-Specify path to a log file.  If a valid and writable file is specified, A line will be 
-appended to this file every time one or more streams is successfully fetched for a url.
+Specify path to a log file.  If a valid and writable file is specified, A 
+line will be appended to this file every time one or more streams is 
+successfully fetched for a url.
 
 DEFAULT I<-none-> (no logging).
 
@@ -155,12 +233,13 @@ I<-logfmt> specifies a format string for lines written to the log file.
 
 DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
 
-The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
-[site]:  The site name (Youtube - OR the site name of the embedded URL in the first 
-iframe, if found - see I<-noiframes> option above to prevent this feature).  
-[url]:  The url searched for streams.  [time]: Perl timestamp when the line was logged.  
-[title], [artist], [album], [description], [year], [genre], [total], [albumartist]:  
-The corresponding field data returned (or "I<-na->", if no value).
+The valid field I<[variables]> are:  [stream]: The url of the first/best 
+stream found.  [site]:  The site name (Youtube - OR the site name of the 
+embedded URL in the first iframe, if found - see I<-noiframes> option above 
+to prevent this feature).  [url]:  The url searched for streams.  [time]: Perl 
+timestamp when the line was logged.  [title], [artist], [album], 
+[description], [year], [genre], [total], [albumartist]:  The corresponding 
+field data returned (or "I<-na->", if no value).
 
 =item $video->B<get>()
 
@@ -228,6 +307,11 @@ Returns the video's type ("Youtube").
 
 =head1 CONFIGURATION FILES
 
+The default root location directory for StreamFinder configuration files 
+is "~/.config/StreamFinder".  To use an alternate location directory, 
+specify it in the "I<STREAMFINDER>" environment variable, ie.:  
+B<$ENV{STREAMFINDER} = "/etc/StreamFinder">.
+
 =over 4
 
 =item ~/.config/StreamFinder/Youtube/config
@@ -235,13 +319,16 @@ Returns the video's type ("Youtube").
 Optional text file for specifying various configuration options 
 for a specific site (submodule).  Each option is specified on a 
 separate line in the format below:
+NOTE:  Do not follow the lines with a semicolon, comma, or any other 
+separator.  Non-numeric I<values> should be surrounded with quotes, either 
+single or double.  Blank lines and lines beginning with a "#" sign as 
+their first non-blank character are ignored as comments.
 
 'option' => 'value' [,]
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
@@ -254,12 +341,12 @@ Each option is specified on a separate line in the format below:
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 =back
 
-NOTE:  Options specified in the options parameter list will override 
-those corresponding options specified in these files.
+NOTE:  Options specified in the options parameter list of the I<new()> 
+function will override those corresponding options specified in these files.
 
 =head1 KEYWORDS
 
@@ -267,7 +354,7 @@ youtube
 
 =head1 DEPENDENCIES
 
-youtube-dl
+youtube-dl (or yt-dlp, or other compatable program)
 
 L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, youtube-dl
 
@@ -370,9 +457,17 @@ sub new
 	return undef  unless ($url);
 
 	my $self = $class->SUPER::new('Youtube', @_);
-	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
-	$self->{'noiframes'} = 0  unless (defined $self->{'noiframes'});
 
+	#SET DEFAULTS FOR FLAGS:
+	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
+	$self->{'formatonly'} = 0  unless (defined $self->{'formatonly'});
+	$self->{'noiframes'} = 0  unless (defined $self->{'noiframes'});
+	$self->{'youtubeonly'} = 0  unless (defined $self->{'youtubeonly'});
+	#DEFAULT YOUTUBE-DL ARGUMENTS:
+	$self->{'youtube-dl-args'} = '--get-url --get-format --get-thumbnail --get-title --get-description --get-id'
+			unless (defined $self->{'youtube-dl-args'});
+
+	#FETCH ANY PARAMETERS PASSED TO THE new() FUNCTION (OVERRIDE ANY SET IN _class (GENERAL OR CONFIG FILES)):
 	while (@_) {
 		if ($_[0] =~ /^\-?fast$/o) {
 			shift;
@@ -380,84 +475,77 @@ sub new
 		} elsif ($_[0] =~ /^\-?noiframes$/o) {
 			shift;
 			$self->{'noiframes'} = (defined $_[0]) ? shift : 1;
-		} else {
+		} elsif ($_[0] =~ /^\-?youtubeonly$/o) {
 			shift;
+			$self->{'youtubeonly'} = (defined $_[0]) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?formatonly$/o) {
+			shift;
+			$self->{'formatonly'} = (defined $_[0]) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?format$/o) {
+			shift;
+			$self->{'format'} = shift  if (defined $_[0]);
+		} elsif ($_[0] =~ /^\-?user-agent$/o) {
+			shift;
+			$self->{'user-agent'} = shift  if (defined $_[0]);
+		} elsif ($_[0] =~ /^\-?youtube-dl$/o) {
+			shift;
+			$self->{'youtube-dl'} = shift  if (defined $_[0]);
+		} elsif ($_[0] =~ /^\-?youtube-dl-args$/o) {
+			shift;
+			$self->{'youtube-dl-args'} = shift  if (defined $_[0]);
+		} elsif ($_[0] =~ /^\-?youtube-dl-add-args$/o) {
+			shift;
+			$self->{'youtube-dl-add-args'} = shift  if (defined $_[0]);
+		} else {
+			shift;  #DISCARD ANY OTHERS.
 		}
 	}
+	$self->{'youtubeonly'} = 1  if ($self->{'noiframes'});  #NO EMBEDDED RUMBLE-SEARCH IF NO IFRAMES ALLOWED!
+
+	$self->{'youtube-dl'} = 'youtube-dl'  unless (defined $self->{'youtube-dl'});
 
 	print STDERR "-0(Youtube): URL=$url=\n"  if ($DEBUG);
 	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
 	(my $url2fetch = $url);
+	$self->{'_isaYtPage'} = 1;
 	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
 	if ($url2fetch =~ m#^https?\:#) {
-$url2fetch =~ s/www\.youtube\.com/youtube\.be/;  #WWW.YOUTUBE.COM SEEMS TO NOW BE BLOCKING youtube-dl?! :/
+		$self->{'_isaYtPage'} = 0  unless ($url2fetch =~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/);
+#$url2fetch =~ s/www\.youtube\.com/youtube\.be/;  #WWW.YOUTUBE.COM SEEMS TO NOW BE BLOCKING youtube-dl?! :/
 		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
 		$self->{'id'} =~ s/^watch\?v\=//;
 		$self->{'id'} =~ s/[\?\&].*$//;
+		$self->{'id'} = $1  if (!$self->{'_isaYtPage'} && $url2fetch =~ m#id[\=\:\#]?([^\/\s\=\:\#]+)#);
 	} else {
 		$self->{'id'} = $url;
 		$url2fetch = 'https://youtube.be/watch?v=' . $url;
 	}
-	print STDERR "-1 FETCHING URL=$url= VIA youtube-dl: ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	print STDERR "-1 (isYT=".$self->{'_isaYtPage'}.") FETCHING URL=$url= VIA youtube-dl: ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$self->{'genre'} = 'Video';
 	$self->{'albumartist'} = $url2fetch;
 
-	#FIRST:  GET STREAMS, THUMBNAIL, ETC. FROM youtube-dl:
+	#FIRST:  IF NON-YOUTUBE PAGE, LOOK FOR ANYTHING EMBEDDED IN AN IFRAME:
 
-	my $ytdlArgs = '--get-url --get-thumbnail --get-title --get-description -f "'
-			. ((defined $self->{'format'}) ? $self->{'format'} : 'mp4')
-			. '" ' . ((defined $self->{'youtube-dl-args'}) ? $self->{'youtube-dl-args'} : '');
-	my $try = 0;
-	my ($more, @ytdldata, @ytStreams);
-
-RETRYIT:
-	$_ = '';
-	if (defined($self->{'userid'}) && defined($self->{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
-		my $uid = $self->{'userid'};
-		my $upw = $self->{'userpw'};
-		$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url"`;
-	} else {
-		$_ = `youtube-dl $ytdlArgs "$url"`;
-	}
-	print STDERR "--TRY($try of 1): youtube-dl: ARGS=$ytdlArgs= RETURNED DATA===>$_<===\n"  if ($DEBUG);
-	@ytdldata = split /\r?\n/s;
-	unless ($try || scalar(@ytdldata) > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
-		unless ($self->{'noiframes'}) {
-			print STDERR "..1a:See if we have a StreamFinder-supported URL in 1st iframe?...\n"  if ($DEBUG);
-			my $embedded_video;
-			my $html = '';
-			my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
-			$ua->timeout($self->{'timeout'});
-			$ua->max_size(1024);  #LIMIT FETCH-SIZE TO AVOID INFINITELY DOWNLOADING A STREAM!
-			$ua->cookie_jar({});
-			$ua->env_proxy;
+	unless ($self->{'_isaYtPage'} || $self->{'noiframes'}) {
+		print STDERR "..1a:See if we have a StreamFinder-supported URL in 1st iframe?...\n"  if ($DEBUG);
+		my $embedded_video;
+		my $html = '';
+		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+		$ua->timeout($self->{'timeout'});
+		$ua->max_size(1024);  #LIMIT FETCH-SIZE TO AVOID INFINITELY DOWNLOADING A STREAM!
+		$ua->cookie_jar({});
+		$ua->env_proxy;
+	 	my $response = $ua->get($url);
+	 	$html = $response->decoded_content  if ($response->is_success);
+	 	if ($html =~ /\<\!DOCTYPE\s+(?:html|text)/i) {  #IF WE'RE AN HTML DOC. (NOT A STREAM!), THEN FETCH THE WHOLE THING:
+			$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
 		 	my $response = $ua->get($url);
 		 	$html = $response->decoded_content  if ($response->is_success);
-		 	if ($html =~ /\<\!DOCTYPE\s+(?:html|text)/i) {  #IF WE'RE AN HTML DOC. (NOT A STREAM!), THEN FETCH THE WHOLE THING:
-				$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
-			 	my $response = $ua->get($url);
-			 	$html = $response->decoded_content  if ($response->is_success);
-				while ($html && $html =~ s#\<iframe([^\>]+)\>##s) {
-					my $one = $1;
-					my $embeddedURL = ($one =~ m#\"(https?\:\/\/[^\"]+)#s) ? $1 : '';
-					print STDERR "--embedded IFRAME url=$embeddedURL=\n"  if ($DEBUG);
-					if ($embeddedURL) {
-						my $haveStreamFinder = 0;
-						eval { require 'StreamFinder.pm'; $haveStreamFinder = 1; };
-						if ($haveStreamFinder) {
-							my %globalArgs = (-noiframes => 1, -debug => $DEBUG);
-							foreach my $arg (qw(log logfmt)) {
-								$globalArgs{$arg} = $self->{$arg}  if (defined($self->{$arg}) && $self->{$arg});
-							}
-							$embedded_video = new StreamFinder($embeddedURL, %globalArgs);
-						}
-						last;
-					}
-				}
-				return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
-				if ($html =~ /\bRumble\s*\(\"play\"\,\s+\{\"video\"\:\"([a-z0-9\-\_]+)\"/si) {
-					#EXTRACT CERTAIN EMBEDDED RUMBLE VIDEOS NOT NECESSARILY IN AN IFRAME:
-					my $embeddedURL = 'https://rumble.com/embed/' . $1;
+			while ($html && $html =~ s#\<iframe([^\>]+)\>##s) {
+				my $one = $1;
+				my $embeddedURL = ($one =~ m#\"(https?\:\/\/[^\"]+)#s) ? $1 : '';
+				print STDERR "--embedded IFRAME url=$embeddedURL=\n"  if ($DEBUG);
+				if ($embeddedURL) {
 					my $haveStreamFinder = 0;
 					eval { require 'StreamFinder.pm'; $haveStreamFinder = 1; };
 					if ($haveStreamFinder) {
@@ -466,88 +554,161 @@ RETRYIT:
 							$globalArgs{$arg} = $self->{$arg}  if (defined($self->{$arg}) && $self->{$arg});
 						}
 						$embedded_video = new StreamFinder($embeddedURL, %globalArgs);
+					}
+					last;
+				}
+			}
+			return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
+
+			unless ($self->{'youtubeonly'}) {
+				if ($html =~ /\bRumble\s*\(\"play\"\,\s+\{\"video\"\:\"([a-z0-9\-\_]+)\"/si) {
+					#EXTRACT CERTAIN EMBEDDED RUMBLE VIDEOS NOT NECESSARILY IN AN IFRAME:
+					my $embeddedURL = 'https://rumble.com/embed/' . $1;
+					my $haveRumble = 0;
+					print STDERR "---FOUND AN EMBEDDED RUMBLE VIDEO ($embeddedURL), SEE IF WE CAN GO WITH THAT!\n"  if ($DEBUG);
+					eval { require 'StreamFinder/Rumble.pm'; $haveRumble = 1; };
+					if ($haveRumble) {
+						my %globalArgs = (-debug => $DEBUG);
+						foreach my $arg (qw(log logfmt)) {
+							$globalArgs{$arg} = $self->{$arg}  if (defined($self->{$arg}) && $self->{$arg});
+						}
+						$embedded_video = new StreamFinder::Rumble($embeddedURL, %globalArgs);
 						return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
 					}
 				}
 			}
 		}
-		print STDERR "..1:No MP4 streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
+	}
+
+	#NEXT:  GET STREAMS, THUMBNAIL, ETC. FROM youtube-dl:
+
+	my $ytformat = (defined $self->{'format'}) ? $self->{'format'} : 'mp4';
+	my $ua = (defined $self->{'user-agent'}) ? (' --user-agent "'.$self->{'user-agent'}.'"') : '';
+	my $ytdlArgs = $self->{'youtube-dl-args'};
+	$ytdlArgs .= $self->{'youtube-dl-add-args'}  if (defined $self->{'youtube-dl-add-args'});
+	$ytdlArgs .= $ua;
+	$ytdlArgs .= ' -f "' . $ytformat . '" '  unless ($ytformat =~ /^a(?:ny|ll)$/i);
+	my $try = 0;
+	my (@ytdldata, @ytStreams);
+
+RETRYIT:
+	$_ = '';
+	my $cmd = '';
+	if (defined($self->{'userid'}) && defined($self->{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
+		my $uid = $self->{'userid'};
+		my $upw = $self->{'userpw'};
+		$cmd = $self->{'youtube-dl'} . '--username "' . $uid . '" --password "' . $upw . '" '
+				. $ytdlArgs. ' "' . $url .'"';
+	} else {
+		$cmd = $self->{'youtube-dl'} . " $ytdlArgs " . '"' . $url . '"';
+	}
+	print STDERR "--TRY($try of 1): youtube-dl: ARGS=$ytdlArgs= FMT=$ytformat= YT COMMAND==>$cmd<==\n"  if ($DEBUG);
+	$_ = `$cmd`;
+	print STDERR "--YT RETURNED DATA===>$_<===\n"  if ($DEBUG);
+	@ytdldata = split /\r?\n/s;
+	unless ($try || scalar(@ytdldata) > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 		$try++;
-		goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//);
+		unless ($self->{'formatonly'}) {
+			print STDERR "..1:No ($ytformat) streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
+			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"//);
+		}
 	}
 	return undef unless (scalar(@ytdldata) > 0);
 
-	#NOTE:  ytdldata is ORDERED:  TITLE?, STREAM-URLS, THEN THE ICON URL, THEN DESCRIPTION!:
+	#NOTE:  ytdldata is ORDERED:  TITLE?, ID, STREAM-URLS, THEN THE ICON URL, THEN DESCRIPTION, LASTLY FORMATS!:
 	unless ($ytdldata[0] =~ m#^https?\:\/\/#) {
 		$_ = shift(@ytdldata);
 		$self->{'title'} ||= $_;
 	}
+	$self->{'_ytID'} = '';
+	if ($ytdlArgs =~ /\-\-get\-id\b/ && $ytdldata[0] !~ /^https?\:/) {  #SHOULD HAVE AN "ID":
+		my $get_id = shift(@ytdldata);
+		$self->{'_ytID'} = $get_id  if ($get_id =~ /^[a-z0-9\-\_]{11}$/i);
+	}
+	my $fmtline = ($ytdldata[$#ytdldata] =~ m#^https?\:\/\/#) ? '-none' : pop(@ytdldata);  #LAST LINE IS (USUALLY) THE LIST OF FORMATS RETURNED.
+	my @fmtsfound = split(/\+/, $fmtline);
 	$self->{'description'} = '';
-	$more = 1;
 	@ytStreams = ();
+	my $urlcount = 0;
 	while (@ytdldata) {
 		$_ = shift @ytdldata;
-		$more = 0  unless (m#^https?\:\/\/#o);
-		if ($more) {
+		if ($urlcount <= $#fmtsfound) {
 			push @ytStreams, $_  unless ($self->{'secure'} && $_ !~ /^https/o);
+		} elsif (m#^https?\:\/\/#o && $ytdlArgs =~ /get-thumbnail/o) {
+			$self->{'iconurl'} = $_;  #WILL ALWAYS BE THE LAST URL!
 		} else {
 			$self->{'description'} .= $_ . ' ';
 		}
+		$urlcount++;
 	}
-	$self->{'iconurl'} = pop(@ytStreams)  if ($#ytStreams > 0);
 	push @{$self->{'streams'}}, @ytStreams;
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
+	print STDERR "-STREAM COUNT=".$self->{'cnt'}."= FMTS=".join('|',@fmtsfound)."= ICON=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 	unless ($try || $self->{'cnt'} > 0) {  #IF NO STREAMS FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
-		print STDERR "..2:No MP4 streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
 		$try++;
-		$ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//;
-		goto RETRYIT  if ($1);
+		unless (defined($self->{'formatonly'}) && $self->{'formatonly'}) {
+			print STDERR "..2:No ($ytformat) streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
+			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"//);
+		}
 	}
 
-	#NOW MANUALLY SCAN PAGE TO TRY TO GET artist, description, year, ETC. DIRECTLY FROM PAGE (IF A YOUTUBE SITE):
+	#NOW MANUALLY SCRAPE YOUTUBE PAGE TO TRY TO GET artist, description, year, ETC. DIRECTLY FROM PAGE (IF A YOUTUBE SITE):
 
-	unless ($self->{'fast'} || $url2fetch !~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/) {
-		print STDERR "-2 FETCHING SCREEN URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
-		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
-		$ua->timeout($self->{'timeout'});
-		$ua->cookie_jar({});
-		$ua->env_proxy;
-		my $html = '';
-		my $response = $ua->get($url2fetch);
-		if ($response->is_success) {
-			$html = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line  if ($DEBUG);
-			my $no_wget = system('wget','-V');
-			unless ($no_wget) {
-				print STDERR "\n..trying wget...\n"  if ($DEBUG);
-				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+	unless ($self->{'fast'}) {  #(FAST MEANS SKIP SCRAPING YOUTUBE PAGE FOR ADDTL. METADATA)
+		$try = 0;
+RETRYPAGE:
+		print STDERR "----(try2=$try= FETCHURL=$url2fetch=\n"  if ($DEBUG);
+		if ($self->{'_isaYtPage'}) {  #WE'RE A YOUTUBE PAGE, FETCH METADATA:
+			#CONVERT "embedded" YT PAGES TO ACTUAL PAGE (EMBEDDED PAGES DON'T HAVE THE METADATA WE'RE SEEKING!:
+			$url2fetch = 'https://youtube.be/watch?v=' .$1  if ($url2fetch =~ m#\/embed\/([a-z0-9\-\_]{11})#i);
+			print STDERR "-2 (TRY=$try) FETCHING SCREEN URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+			my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+			$ua->timeout($self->{'timeout'});
+			$ua->cookie_jar({});
+			$ua->env_proxy;
+			my $html = '';
+			my $response = $ua->get($url2fetch);
+			if ($response->is_success) {
+				$html = $response->decoded_content;
+			} else {
+				print STDERR $response->status_line  if ($DEBUG);
+				my $no_wget = system('wget','-V');
+				unless ($no_wget) {
+					print STDERR "\n..trying wget...\n"  if ($DEBUG);
+					$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+				}
 			}
+			$html =~ s/\\\"/\&quot\;/gs;
+			if ($html =~ s#\]\}\,\"title\"\:\{\"runs\"\:\[\{\"text\"\:\"([^\"]+)\"\,\"navigationEndpoint\"\:([^\}]+)##s) {
+				my $two = $2;
+				$self->{'artist'} = $1;
+				$self->{'albumartist'} = 'https://youtube.be' . $1  if ($two =~ m#\"url\"\:\"([^\"]+)#);
+			}
+			if ($html =~ s#\"videoDetails\"\:\{\"videoId\"\:\"([^\"]+)\"([^\}]+)##s) {
+				my $two = $2;
+				$self->{'id'} = $1;
+				$self->{'title'} = $1  if ($two =~ m#\"title\"\:\"([^\"]+)#);
+				$self->{'iconurl'} = $1  if ($two =~ m#\"thumbnails\"\:\[\{\"url\"\:\"([^\"]+)#);
+				$self->{'iconurl'} =~ s/\?.*$//;
+			}
+			if ($html =~ m#\"dateText\"\:\{([^\}]+)\}#s) {
+				my $one = $1;
+				$self->{'year'} = $1  if ($one =~ /(\d\d\d\d)/);
+			}
+			$self->{'articonurl'} = $1  if ($html =~ m#(?:\"CHANNEL\"\,\"image\"|\"videoOwnerRenderer\")\:\{\"thumbnails"\:\[\{\"url\"\:\"([^\"]+)#s);
+			print  "--YT:2 CHANNEL ICON URL1=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+			unless ($self->{'articonurl'}) {
+				my $ownerstuff = ($html =~ m#\"videoOwnerRenderer\"\:\{([^\}]+)#s) ? $1 : '';
+				$self->{'articonurl'} = $1  if ($ownerstuff =~ /\"url\"\:\"([^\"]+)/);
+			}
+			print  "--YT:2 CHANNEL ICON URL2=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+		} elsif (!$try && $self->{'_ytID'}) { #WE'RE NOT A YOUTUBE PAGE, BUT WE HAVE THE YT ID, SO TRY TO FETCH IT FOR METADATA:
+			print STDERR "--WE ARE NOT A YT PAGE, BUT ytID=".$self->{'_ytID'}."= SO WE WILL TRY AGAIN!\n"  if ($DEBUG);
+			++$try;
+			++$self->{'_isaYtPage'};
+			$url2fetch = 'https://youtube.be/watch?v=' . $self->{'_ytID'};
+			goto RETRYPAGE;
 		}
-		$html =~ s/\\\"/\&quot\;/gs;
-		if ($html =~ s#\]\}\,\"title\"\:\{\"runs\"\:\[\{\"text\"\:\"([^\"]+)\"\,\"navigationEndpoint\"\:([^\}]+)##s) {
-			my $two = $2;
-			$self->{'artist'} = $1;
-			$self->{'albumartist'} = 'https://www.youtube.com' . $1  if ($two =~ m#\"url\"\:\"([^\"]+)#);
-		}
-		if ($html =~ s#\"videoDetails\"\:\{\"videoId\"\:\"([^\"]+)\"([^\}]+)##s) {
-			my $two = $2;
-			$self->{'id'} = $1;
-			$self->{'title'} = $1  if ($two =~ m#\"title\"\:\"([^\"]+)#);
-			$self->{'iconurl'} = $1  if ($two =~ m#\"thumbnails\"\:\[\{\"url\"\:\"([^\"]+)#);
-			$self->{'iconurl'} =~ s/\?.*$//;
-		}
-		if ($html =~ m#\"dateText\"\:\{([^\}]+)\}#s) {
-			my $one = $1;
-			$self->{'year'} = $1  if ($one =~ /(\d\d\d\d)/);
-		}
-		$self->{'articonurl'} = $1  if ($html =~ m#(?:\"CHANNEL\"\,\"image\"|\"videoOwnerRenderer\")\:\{\"thumbnails"\:\[\{\"url\"\:\"([^\"]+)#s);
-		print  "--YT:2 CHANNEL ICON URL1=".$self->{'articonurl'}."=\n"  if ($DEBUG);
-		unless ($self->{'articonurl'}) {
-			my $ownerstuff = $1  if ($html =~ m#\"videoOwnerRenderer\"\:\{([^\}]+)#s);
-			$self->{'articonurl'} = $1  if ($ownerstuff =~ /\"url\"\:\"([^\"]+)/);
-		}
-		print  "--YT:2 CHANNEL ICON URL2=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 	}
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'imageurl'} = $self->{'iconurl'};
@@ -566,7 +727,6 @@ RETRYIT:
 		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
 	}
 	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."= artist=".$self->{'artist'}."= year(Published)=".$self->{'year'}."=\n"  if ($DEBUG);
-#print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n"  if ($DEBUG);
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

@@ -5,8 +5,8 @@ Thank you for your interest in contributing to this Perl 5
 library.  Currently, it is in active development and maintained
 by its original author.  Bug reports (with or without patch),
 suggestions, feature requests, and comments are welcome.  You may
-submit them through this distribution's bug tracker on CPAN RT:
-https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Polynomial-Cyclotomic
+submit them through this distribution's bug tracker on github:
+https://github.com/mhasch/perl-Math-Polynomial-Cyclotomic/issues
 
 You can also reach the author by e-mail:
 Martin Becker, <becker-cpan-mp (at) cozap.com>
@@ -49,4 +49,4 @@ Author's Note
 Thanks again for your interest.
 I am looking forward to your report or e-mail.
 
-Martin Becker, December 31, 2019
+Martin Becker, October 4, 2021

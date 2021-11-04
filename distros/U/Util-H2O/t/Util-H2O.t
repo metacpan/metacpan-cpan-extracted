@@ -20,7 +20,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 =cut
 
-use Test::More tests => 234;
+use Test::More tests => 238;
 use Scalar::Util qw/blessed/;
 
 sub exception (&) { eval { shift->(); 1 } ? undef : ($@ || die) }  ## no critic (ProhibitSubroutinePrototypes, RequireFinalReturn, RequireCarping)
@@ -30,12 +30,12 @@ sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->(
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Util::H2O' }
-is $Util::H2O::VERSION, '0.14';
+is $Util::H2O::VERSION, '0.16';
 
 diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
 	if $] lt '5.008009';
 
-my $PACKRE = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
+my $PACKRE = $Util::H2O::_PACKAGE_REGEX;  ## no critic (ProtectPrivateVars)
 
 {
 	my $hash = { foo => "bar", x => "y" };
@@ -278,6 +278,27 @@ sub checksym {
 	is $n2->def, 456;
 	is $n2->abc, 789;
 }
+# -classify into current package
+{
+	{
+		package Yet::Another;  ## no critic (ProhibitMultiplePackages)
+		use Util::H2O;
+		h2o -classify, { hello=>sub{"World!"} }, qw/abc/;
+		sub test { return "<".shift->abc.">" }
+	}
+	my $o = new_ok 'Yet::Another', [ abc=>"def" ];
+	is $o->hello, "World!";
+	is $o->test, "<def>";
+	ok exists &Yet::Another::h2o;
+}
+SKIP: {
+	skip "Won't work on really old Perls", 2 if $] lt '5.008';
+	my @w = warns {
+		my $x = h2o -clean=>1, -classify, {};
+		isa_ok $x, 'main';
+	};
+	is grep({/\brefusing to delete package\b/i} @w), 1;
+}
 
 # -lock / -nolock
 {
@@ -422,19 +443,9 @@ SKIP: {
 	is $dest, 3;
 	$o3=undef;
 	is $dest, 4;
-	
-	# For a reason I can't explain yet, Perls before 5.26 don't capture the warning here.
-	# perlbrew exec perl -e 'sub Foo::DESTROY{warn"x"}my$x=bless{},"Foo";local$SIG{__WARN__}=sub{print"<<".shift().">>"};$x=undef'
-	# Both the "local" and the "$x=undef" appear to be significant in the above.
-	is grep({/foobar/} warns {
-		my $exp;
-		my $od = h2o -destroy=>sub {
-			is ref $_[0], $exp or diag explain $_[0];
-			die "this warning is expected: foobar" }, {};  ## no critic (RequireCarping)
-		$exp = ref $od;
-		$od = undef;
-	}), $] ge '5.026' ? 1 : 0; # Possible To-Do for Later: I'm not too happy with this
-
+	# This is here just for code coverage, the test for destructor errors being converted
+	# to warnings that used to be here was buggy and moved to the author tests for now.
+	my $od = h2o -destroy=>sub { die "You can safely ignore this warning during testing,\neven if it is followed by another \" at t/Util-H2O.t line ...\"." }, {}; ## no critic (RequireCarping)
 }
 
 # DESTROY
@@ -525,5 +536,8 @@ ok exception { h2o(-classify=>[]) };
 ok exception { h2o(-destroy=>'') };
 ok exception { h2o(-destroy=>undef) };
 ok exception { h2o(-isa=>{}) };
+
+diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
+	if $] lt '5.008009';
 
 done_testing;

@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ManifestBatch;
-$Shipment::Purolator::WSDLV2::Types::ManifestBatch::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::ManifestBatch::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               ManifestCloseDateTime
               ManifestBatchDetails
 
-              )
+            )
         ],
         {   'ShipmentManifestDate'  => \%ShipmentManifestDate_of,
             'ManifestCloseDateTime' => \%ManifestCloseDateTime_of,
@@ -69,7 +69,7 @@ Shipment::Purolator::WSDLV2::Types::ManifestBatch
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

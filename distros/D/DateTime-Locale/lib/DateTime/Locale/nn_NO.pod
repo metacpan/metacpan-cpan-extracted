@@ -231,8 +231,8 @@ Norwegian Nynorsk Norway locale.
 
 =head3 Wide (format)
 
-  f.Kr.
-  e.Kr.
+  før Kristus
+  etter Kristus
 
 =head3 Abbreviated (format)
 
@@ -416,6 +416,12 @@ Norwegian Nynorsk Norway locale.
    2008-02-05T18:30:30 = 5. feb. 2008 e.Kr.
    1995-12-22T09:05:02 = 22. des. 1995 e.Kr.
   -0010-09-15T04:44:23 = 15. sep. -10 f.Kr.
+
+=head3 GyMd (dd.MM.y GGGGG)
+
+   2008-02-05T18:30:30 = 05.02.2008 e.Kr.
+   1995-12-22T09:05:02 = 22.12.1995 e.Kr.
+  -0010-09-15T04:44:23 = 15.09.-10 f.Kr.
 
 =head3 H (HH)
 

@@ -72,6 +72,8 @@ PLplot.o
 PLplot.pm
 PLplot.xs
 temp
+callback.o
+pp-.*\.[co].*$
 
 ^xt/
 

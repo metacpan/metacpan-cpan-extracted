@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Event interface for AnyEvent::FTP objects
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 sub define_events
@@ -51,7 +51,7 @@ AnyEvent::FTP::Role::Event - Event interface for AnyEvent::FTP objects
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Shipment::Temando;
-$Shipment::Temando::VERSION = '3.05';
+$Shipment::Temando::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -129,7 +129,7 @@ my %units_type_map = (
 
 
 has '+package_type' => (
-    isa => Enum [keys %package_type_map],
+    isa     => Enum [keys %package_type_map],
     default => 'custom',
 );
 
@@ -173,14 +173,14 @@ sub _build_services {
             ? $package_type_map{$_->type}
             : $package_type_map{$self->package_type},
             qualifierFreightGeneralFragile => ($_->fragile) ? 'Y' : 'N',
-            distanceMeasurementType => $units_type_map{$self->dim_unit},
-            weightMeasurementType   => $units_type_map{$self->weight_unit},
-            length                  => $_->length,
-            width                   => $_->width,
-            height                  => $_->height,
-            weight                  => $_->weight,
-            quantity                => 1,
-            description             => $_->notes,
+            distanceMeasurementType        => $units_type_map{$self->dim_unit},
+            weightMeasurementType => $units_type_map{$self->weight_unit},
+            length                => $_->length,
+            width                 => $_->width,
+            height                => $_->height,
+            weight                => $_->weight,
+            quantity              => 1,
+            description           => $_->notes,
           };
         $goods_value   += $_->goods_value->value;
         $insured_value += $_->insured_value->value;
@@ -212,7 +212,7 @@ sub _build_services {
                     destinationCountry => $self->to_address->country_code,
                     destinationCode    => $self->to_address->postal_code,
                     destinationSuburb  => $self->to_address->city,
-                    destinationIs =>
+                    destinationIs      =>
                       ($self->from_address->address_type eq 'residential')
                     ? 'Residence'
                     : 'Business',
@@ -257,7 +257,7 @@ sub _build_services {
                     $quote->get_tax->get_value,
                     $quote->get_currency->get_value
                 ),
-                carrier_id => $quote->get_carrier->get_id->get_value,
+                carrier_id   => $quote->get_carrier->get_id->get_value,
                 carrier_name =>
                   $quote->get_carrier->get_companyName->get_value,
                 service_name => $quote->get_deliveryMethod->get_value,
@@ -436,14 +436,14 @@ sub ship {
             ? $package_type_map{$_->type}
             : $package_type_map{$self->package_type},
             qualifierFreightGeneralFragile => ($_->fragile) ? 'Y' : 'N',
-            distanceMeasurementType => $units_type_map{$self->dim_unit},
-            weightMeasurementType   => $units_type_map{$self->weight_unit},
-            length                  => $_->length,
-            width                   => $_->width,
-            height                  => $_->height,
-            weight                  => $_->weight,
-            quantity                => 1,
-            description             => $_->notes,
+            distanceMeasurementType        => $units_type_map{$self->dim_unit},
+            weightMeasurementType => $units_type_map{$self->weight_unit},
+            length                => $_->length,
+            width                 => $_->width,
+            height                => $_->height,
+            weight                => $_->weight,
+            quantity              => 1,
+            description           => $_->notes,
           };
         $goods_value   += $_->goods_value->value;
         $insured_value += $_->insured_value->value;
@@ -507,7 +507,7 @@ sub ship {
                     destinationCountry => $self->to_address->country_code,
                     destinationCode    => $self->to_address->postal_code,
                     destinationSuburb  => $self->to_address->city,
-                    destinationIs =>
+                    destinationIs      =>
                       ($self->from_address->address_type eq 'residential')
                     ? 'Residence'
                     : 'Business',
@@ -552,7 +552,7 @@ sub ship {
                     etaTo          => $self->service->etd,
                     guaranteedEta  => ($self->service->guaranteed) ? 'Y' : 'N',
                     carrierId      => $self->service->carrier_id,
-                    extras => {extra => \@extras,},
+                    extras         => {extra => \@extras,},
                 },
                 payment          => $payment,
                 instructions     => $self->special_instructions,
@@ -583,7 +583,7 @@ sub ship {
         my $data = decode_base64($response->get_labelDocument->get_value);
         $self->documents(
             Shipment::Label->new(
-                {   tracking_id => $tracking_id,
+                {   tracking_id  => $tracking_id,
                     content_type =>
                       $response->get_labelDocumentType->get_value,
                     data      => $data,
@@ -616,7 +616,7 @@ sub ship {
 
             $_->label(
                 Shipment::Label->new(
-                    {   tracking_id => $tracking_id,
+                    {   tracking_id  => $tracking_id,
                         content_type =>
                           $response->get_labelDocumentType->get_value,
                         data      => $data,
@@ -697,7 +697,7 @@ Shipment::Temando
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

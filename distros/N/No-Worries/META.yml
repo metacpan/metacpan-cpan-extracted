@@ -3,7 +3,6 @@ abstract: 'coding without worries'
 author:
   - 'Lionel Cons <lionel.cons@cern.ch>'
 build_requires:
-  Config: 0
   File::Temp: 0
   Getopt::Long: 0
   Test::More: 0
@@ -22,6 +21,7 @@ no_index:
     - inc
 requires:
   Carp: 0
+  Config: 0
   Encode: 0
   Fcntl: 0
   HTTP::Date: 0
@@ -33,4 +33,4 @@ requires:
   Sys::Syslog: 0
   Time::HiRes: 0
   URI::Escape: 0
-version: 1.6
+version: 1.7

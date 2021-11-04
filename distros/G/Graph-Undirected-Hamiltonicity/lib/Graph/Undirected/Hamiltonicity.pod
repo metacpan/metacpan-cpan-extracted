@@ -6,7 +6,7 @@ Graph::Undirected::Hamiltonicity - decide whether a given Graph::Undirected
 
 =head1 VERSION
 
-Version 0.012
+Version 0.013
 
 
 =head1 SYNOPSIS

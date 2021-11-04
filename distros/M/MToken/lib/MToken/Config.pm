@@ -1,4 +1,4 @@
-package MToken::Config; # $Id: Config.pm 57 2019-06-06 13:46:47Z minus $
+package MToken::Config; # $Id: Config.pm 103 2021-10-10 11:04:34Z minus $
 use strict;
 use utf8;
 
@@ -6,20 +6,19 @@ use utf8;
 
 =head1 NAME
 
-MToken::Config - MToken global and local configuration
+MToken::Config - MToken local configuration
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 =head1 SYNOPSIS
 
     use MToken::Config;
 
-    my $config = new MToken::Config(
-        global_file => '/foo/bar/global.conf',
-        local_file => '/foo/bar/local.conf',
-        name => 'foo', # Optional
+    my $config = MToken::Config->new(
+        file => '/my/device/mtoken.conf',
+        name => 'foo', # Optional. See device config file first
     );
 
     my $foo = $config->get('foo');
@@ -30,7 +29,7 @@ Version 1.01
 
 =head1 DESCRIPTION
 
-The module works with the configuration data
+The module works with the local configuration data
 
 =head1 METHODS
 
@@ -38,10 +37,9 @@ The module works with the configuration data
 
 =item B<new>
 
-    my $config = new WWW::MLite::Config(
-        global_file => '/foo/bar/global.conf',
-        local_file => '/foo/bar/local.conf',
-        name => 'foo', # Optional
+    my $config = WWW::MLite::Config->new(
+        file => '/my/device/mtoken.conf',
+        name => 'foo', # Optional. See device config file first
     );
 
 Returns configuration object
@@ -56,7 +54,13 @@ Returns value by keyname
 
     my %config = $config->getall;
 
-Returns all allowed pairs - key and value
+Returns all configuration pairs - key and value
+
+=item B<is_loaded>
+
+    print $self->is_loaded ? 'loaded' : 'not loaded';
+
+Returns status of local config
 
 =item B<set>
 
@@ -82,7 +86,7 @@ Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2021 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -99,54 +103,58 @@ use Config::General;
 use Try::Tiny;
 use Cwd;
 use File::Spec;
+use CTK::Util qw/preparedir/;
 use MToken::Const qw/ :GENERAL :MATH /;
 
 use vars qw/$VERSION/;
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 use constant {
     ALLOWED_KEYS        => [qw/
-            name distname project
+            token
             server_url
             gpgbin opensslbin
+            fingerprint
         /],
 };
 
 sub new {
     my $class   = shift;
     my %args    = (@_);
+    my $is_loaded = 0;
 
-    my $global_file = $args{global_file};
-    my $local_file = $args{local_file};
-    my $project = $args{project};
+    my $config_file = $args{file} || $args{config_file} || $args{device_file}
+       || File::Spec->catfile(cwd(), DIR_PRIVATE, DEVICE_CONF_FILE);
 
-    # global_file
-    unless (defined $global_file) {
-        $global_file = File::Spec->catfile(cwd(), DIR_ETC, GLOBAL_CONF_FILE);
+    # Load device config
+    my %dev = _loadconfig($config_file);
+    my $name = $dev{token} || $dev{token_name} || $dev{name};
+    $is_loaded = 1 if $name;
+
+
+    # Get path of local config
+    $name ||= $args{name} || "noname";
+    $name =~ s/\s+//g;
+    $name =~ s/[^a-z0-9]//g;
+    $name ||= "noname";
+    my $local_dir = File::Spec->catdir(File::HomeDir->my_data(), PROJECTNAMEL);
+    my $local_file = File::Spec->catfile($local_dir, sprintf("%s.conf", $name));
+    my %lkl = ();
+    if (-f $local_file) { # Ok! File exists, try load local config
+        %lkl = _loadconfig($local_file);
+        while (my ($k,$v) = each %lkl) {
+            $dev{$k} //= $v if defined $v;
+        }
     }
 
-    # local_file
-    my $locex = (defined($project) && $project ne PROJECT) ? TRUE : FALSE;
-    if (defined $local_file) {
-        $locex = TRUE;
-    } else {
-        my $lcf = $locex
-            ? sprintf("%s_%s", LOCAL_CONF_FILE, $project)
-            : LOCAL_CONF_FILE;
-        $local_file = File::Spec->catfile(home(), $lcf);
-    }
-
-    unless ($locex) {
-        my %tmp = _loadconfig($global_file);
-        my $project = $tmp{project};
-        croak("Can't get PROJECT param from $global_file file. Please reinitialize this project") unless $project;
-        $local_file = File::Spec->catfile(home(), sprintf("%s_%s", LOCAL_CONF_FILE, $project));
-    }
-
+    # Set data
     my %cfg = (
-        global_conf_file => $global_file,
-        local_conf_file  => $local_file,
-        _loadconfig($global_file, $local_file)
+        name                => $name,
+        is_loaded           => $is_loaded,
+        device_config_file  => $config_file,
+        local_config_dir    => $local_dir,
+        local_config_file   => $local_file,
+        _config             => {%dev},
     );
 
     my $self = bless { %cfg }, $class;
@@ -154,27 +162,33 @@ sub new {
 }
 sub save {
     my $self = shift;
-    return _saveconfig($self->get("local_conf_file"), {($self->getall)});
-}
-sub get {
-    my $self = shift;
-    my $key  = shift;
-    unless ($self) {
-        carp("Object not specified");
-        return undef;
+    if (!$self->{name} || $self->{name} eq "noname") {
+        carp("Can't use nonamed devices");
+        return FALSE;
     }
-    return undef unless $key;
-    return $self->{$key};
-}
-sub getall {
-    my $self = shift;
 
     my %svh = ();
     foreach my $k (@{(ALLOWED_KEYS)}) {
         my $v = $self->get($k);
         $svh{$k} = $v if defined $v;
     }
-    return (%svh);
+    preparedir($self->{local_config_dir}, 0755) or do {
+        carp(sprintf("Can't prepare directory %s", $self->{local_config_dir}));
+        return FALSE;
+    };
+
+    return _saveconfig($self->{local_config_file}, {%svh});
+}
+sub get {
+    my $self = shift;
+    my $key  = shift;
+    return undef unless $key;
+    return $self->{_config}{$key};
+}
+sub getall {
+    my $self = shift;
+    my $lh = $self->{_config};
+    return (%$lh);
 }
 sub conf { goto &getall };
 sub config { goto &getall };
@@ -182,35 +196,32 @@ sub set {
     my $self = shift;
     my $key  = shift;
     my $val  = shift;
-    unless ($self) {
-        carp("Object not specified");
-        return FALSE;
-    }
     unless ($key) {
         carp("Key not specified");
         return FALSE;
     }
-    $self->{$key} = $val;
+    $self->{_config}{$key} = $val;
     return TRUE;
+}
+sub is_loaded {
+    my $self = shift;
+    $self->{is_loaded};
 }
 
 sub _loadconfig {
-    my $gfile = shift;
-    my $lfile = shift;
+    my $file = shift;
+    unless ($file) {
+        carp("Filename not specified!");
+        return ();
+    }
+    my %config = ();
 
-    my %config = (
-        loadstatus_global   => FALSE,
-        loadstatus_local    => FALSE,
-        configfiles         => [],
-    );
-
-    # Global
-    if ($gfile && -e $gfile) {
+    # Load
+    if ($file && -f $file) {
         my $gconf;
         try {
-            $gconf = new Config::General(
-                -ConfigFile         => $gfile,
-                #-ConfigPath         => $cdirs,
+            $gconf = Config::General->new(
+                -ConfigFile         => $file,
                 -ApacheCompatible   => TRUE,
                 -LowerCaseNames     => TRUE,
                 -AutoTrue           => TRUE,
@@ -219,34 +230,8 @@ sub _loadconfig {
             carp($_);
         };
         if ($gconf && $gconf->can('getall')) {
-            %config = (%config, $gconf->getall);
-            $config{loadstatus_global} = 1;
+            %config = ($gconf->getall);
         }
-        $config{configfiles} = [$gconf->files] if $gconf && $gconf->can('files');
-    }
-
-    # Local
-    if ($lfile && -e $lfile) {
-        my $lconf;
-        try {
-            $lconf = new Config::General(
-                -ConfigFile         => $lfile,
-                -ApacheCompatible   => TRUE,
-                -LowerCaseNames     => TRUE,
-                -AutoTrue           => TRUE,
-            );
-        } catch {
-            carp($_);
-        };
-        if ($lconf && $lconf->can('getall')) {
-            my %rplc = $lconf->getall;
-            while (my ($k,$v) = each %rplc) {
-                $config{$k} = $v if defined $v;
-            }
-            $config{loadstatus_local} = 1;
-        }
-        my $cfs = $config{configfiles};
-        push(@$cfs, ($lconf->files)) if $lconf && $lconf->can('files');
     }
 
     return %config;
@@ -263,7 +248,7 @@ sub _saveconfig {
         return 0;
     }
 
-    my $conf = new Config::General(
+    my $conf = Config::General->new(
                 -ConfigHash         => $config,
                 -ApacheCompatible   => TRUE,
                 -LowerCaseNames     => TRUE,
@@ -274,3 +259,5 @@ sub _saveconfig {
 }
 
 1;
+
+__END__

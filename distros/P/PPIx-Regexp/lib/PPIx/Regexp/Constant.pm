@@ -8,7 +8,7 @@ use base qw{ Exporter };
 # CAVEAT: do not include any other PPIx-Regexp modules in this one, or
 # you will end up with a circular dependency.
 
-our $VERSION = '0.080';
+our $VERSION = '0.081';
 
 our @EXPORT_OK = qw{
     ARRAY_REF

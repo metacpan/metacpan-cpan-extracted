@@ -17,7 +17,7 @@ BEGIN
     use constant FINFO_CTIME => 10;
 #     use constant FINFO_BLOCK_SIZE => 11;
 #     use constant FINFO_BLOCKS => 12;
-    our $DEBUG = 0 || $ENV{AUTHOR_TESTING};
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     our $IS_WINDOWS_OS = ( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i );
 };
 

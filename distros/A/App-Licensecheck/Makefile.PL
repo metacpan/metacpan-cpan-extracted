@@ -23,7 +23,7 @@ my $meta = {
                               requires   => {
                                               "Array::IntSpan"            => 0,
                                               "autodie"                   => 0,
-                                              "Encode"                    => 0,
+                                              "Encode"                    => 2.93,
                                               "experimental"              => 0,
                                               "Fcntl"                     => 0,
                                               "Getopt::Long"              => 2.24,
@@ -36,7 +36,7 @@ my $meta = {
                                               "namespace::clean"          => 0,
                                               "Path::Iterator::Rule"      => 0,
                                               "Path::Tiny"                => 0.062,
-                                              "perl"                      => "5.014000",
+                                              "perl"                      => "5.012000",
                                               "Pod::Constants"            => 0,
                                               "Pod::Usage"                => 0,
                                               "Regexp::Pattern"           => "v0.2.12",
@@ -64,7 +64,7 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.2.12" },
+                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.2.13" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -79,7 +79,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.2.12",
+  "version"            => "v3.2.13",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
   "x_help_wanted"      => ["documenter", "tester"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },

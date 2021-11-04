@@ -1,3 +1,14 @@
+0.003005  2021-10-31 21:46:06+01:00 Europe/London
+- Got a nice dist.ini and test update; no functional
+  changes but dist.ini is now proper - thanks, @Grinnz!
+
+0.003004  2021-10-30 21:46:06+01:00 Europe/London
+- Replaced static Makefile.PL with one generated
+  using [AlienBuild] and [MakeMaker::Awesome].
+
+0.003003  2021-10-10 21:46:06+01:00 Europe/London
+- support clang, use Alien::Build - thanks @kiwiroy
+
 0.003002 2021-05-20
 - fixed Makefile.PL (again)..
   made sure Devel::CheckLib is added

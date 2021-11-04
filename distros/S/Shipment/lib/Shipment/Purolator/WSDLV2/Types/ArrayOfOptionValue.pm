@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::ArrayOfOptionValue;
-$Shipment::Purolator::WSDLV2::Types::ArrayOfOptionValue::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::ArrayOfOptionValue::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Class::Std::initialize();
     __PACKAGE__->_factory(
         [   qw(        OptionValue
 
-              )
+            )
         ],
         {'OptionValue' => \%OptionValue_of,},
         {'OptionValue' => 'Shipment::Purolator::WSDLV2::Types::OptionValue',},
@@ -54,7 +54,7 @@ Shipment::Purolator::WSDLV2::Types::ArrayOfOptionValue
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

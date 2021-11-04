@@ -8,7 +8,7 @@ use Config;
 use if $^O eq 'MSWin32', 'Win32';
 
 # ABSTRACT: Basic implementation of the XDG base directory specification
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 
@@ -20,7 +20,7 @@ sub new {
     my $name = delete $args{name};
     croak('application name required') unless defined $name;
 
-    corak("unknown arguments: @{[ sort keys %args ]}") if %args;
+    croak("unknown arguments: @{[ sort keys %args ]}") if %args;
 
     my $self = bless {
         name => $name,
@@ -132,7 +132,7 @@ File::XDG - Basic implementation of the XDG base directory specification
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

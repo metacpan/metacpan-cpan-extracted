@@ -9,7 +9,7 @@ Types::Core - Core types defined as tests and literals (ease of use)
 
 =head1 VERSION
 
-Version "0.3.0";
+Version "0.3.2";
 
 =cut
 
@@ -17,10 +17,23 @@ Version "0.3.0";
 ################################################################################
 { package Types::Core;
 	use strict; use warnings;
-  our $VERSION='0.3.0';
+  our $VERSION='0.3.2';
   use mem;
   use constant Self => __PACKAGE__;
-
+;
+# 0.3.2		-	EhV now same code as ErV (uses goto &ErV)
+#					- add TEST method:Exist-method-Value: EmV. Mostly same as
+#						ErV, but first test if blessed (class) ref. If so,
+#						test for field as a class method to be called. If not class
+#						method, try HASH+ARRAY ref.  Since call to method may result
+#						in unpredictable execution time as it is calling a
+#						method function (if blessed ptr+method)
+#						only in EXPORT_OK at this point, not default EXPORT
+#				... Need tests for this 
+#				  - in Cmp made sure numeric arg tst tested full field with '$' at end
+#				  - some refactoring for Cmp around using pkgvars "$a" + "$b"
+#				  - some doc changes around Cmp functionality
+# 0.3.1		- store number constant regex in var before using
 # 0.3.0		- NOTE: change in false value of blessed + type from
 #						"undef" to "" (0 length string)
 #						This was done to provide compatibility with "ref" when
@@ -102,23 +115,31 @@ Version "0.3.0";
   BEGIN {
     @CORETYPES  = qw(ARRAY CODE GLOB HASH IO REF SCALAR);
     %type_lens  = map { ($_,  length $_ ) } @CORETYPES;
-    @EXPORT     = (@CORETYPES, qw(EhV ErV));  
-    @EXPORT_OK  = ( qw( typ   type  blessed 
+    @EXPORT     = (@CORETYPES, qw(ErV EhV));  
+    @EXPORT_OK  = ( qw( typ					type  
+												blessed			EmV
                         LongSub     ShortSub 
                         isnum       Cmp
-                        InClass IsClass
-                        Obj
+                        InClass			IsClass
+                        Obj					EhV
 												mk_array		mkARRAY
 											 	mk_hash			mkHASH
                         )  );
 		use Xporter;
 
-		sub InClass($;$) {
+		sub InClass(*;$) {
 			my $class = shift;
-			if (!@_) { return sub ($) { ref $_[0] eq $class } }
-			else { return ref $_[0] eq $class }
-		}
-		sub IsClass($;$) { goto &InClass }
+			@_ ? ref $_[0] eq $class
+				 : sub (;*) { 
+											@_	? $class eq ref $_[0]
+													: $class } }
+#		sub InClass(*;$) {
+#			my $class = shift;
+#			if (!@_) { return sub (;*) { ref $_[0] eq $class } }
+#			else { return ref $_[0] eq $class }
+#		}
+#
+		sub IsClass(*;$) { goto &InClass }
 										
 		use constant shortest_type    => 'REF';
 		use constant last_let_offset  => length(shortest_type)-1;
@@ -214,9 +235,17 @@ named strings to be used as Literals w/o quotes.
 
     ...
     my $ref_arg = ref $arg;
-    return  ARRAY $ref_arg              ? statAR_2_Ino_t($path,$arg)  :
-            InClass('stat_t', $ref_arg) ? stat_t_2_Ino_t($path, $arg) :
+    return  ARRAY $ref_arg            ? StatAR_2_Ino_t($path,$arg)  :
+            InClass(Stat_t, $ref_arg) ? Stat_t_2_Ino_t($path, $arg) :
             _path_2_Ino_t($path); }
+
+=head4 Create Class function as constant and  to test membership
+
+    ...
+		sub Stat(;*);			# needed for prototype
+		local * Stat = InClass Stat;
+		my $p=bless [], Task;
+		P "p isa %s", Task if Task $p;
 
 =head4 Data Verification
 
@@ -362,41 +391,66 @@ Multiple levels of hashes or arrays may be tested in one usage. Example:
   ---
   val=7
 
-  The current ErV handles around thirty levels of nested hashing.
+  The current ErV handles around thirty levels of nested references
       
 =cut
 
   BEGIN {
     sub ErV ($*;******************************) { 
-      my ($arg, $field) = (shift, shift);
-			return undef unless $field && $arg;
+      my ($argp, $field) = (shift, shift);
+			return undef unless defined($field) && defined($argp);
 			my $offset;
 			$field = substr $field,$offset+2 if 1 + ($offset = rindex $field,'::');
       my $h;
-      while (defined $field and
-            (($h=HASH $arg) && exists $arg->{$field} or
-            ARRAY $arg && $field =~ /^[-\d]+$/ && exists $arg->[$field])) {
-        $arg = $h ? $arg->{$field} : $arg->[$field];
+#      while (defined $field and
+#            (($h=HASH $argp) && exists $h->{$field} or
+#            ARRAY $argp && $field =~ /^[-\d]+$/ && exists $argp->[$field])) {
+			while (1) {
+				last unless defined $field;
+				if ($h = HASH $argp) {
+					last unless exists $h->{$field};
+					$argp = $h->{$field};
+				} elsif ($h = ARRAY $argp) {
+					last unless $field =~ /^[-\d]+$/ &&
+						exists $argp->[$field];
+					$argp = $h->[$field];
+				}
         $field = shift, next if @_;
-        return $arg;
+        return $argp;
       }
       return undef;
     }
 
-    sub EhV ($*;******************************) {
-      my ($arg, $field) = (shift, shift); 
-			return undef unless $field && $arg;
+		{	my %msgs;
+    sub EhV ($*;******************************) { 
+			my ($pkg,$fn, $ln) = caller(1);
+			my $loc=$fn.':'.$ln;
+			unless ($msgs{$loc}++) {
+				printf STDERR "Warning: Deprecated EhV works now, but please switch ".
+											"to ErV at %s\n", $loc;
+			}
+			goto &ErV; }
+		}
+
+		# doesn't work with CODE ref
+		sub EmV ($*;******************************) {
+			my ($argp, $field) = (shift, shift);
+			return undef unless defined $argp;
 			my $offset;
 			$field = substr $field,$offset+2 if 1 + ($offset = rindex $field,'::');
-      while (defined($arg) && typ($arg) eq 'HASH' and 
-							defined($field) && exists $arg->{$field}) {
-				return $arg->{$field} unless @_ > 0;
-				$arg		= $arg->{$field};
-				$field	= shift;
+      my ($c, $h);
+      while (defined $field && defined $argp and (
+						($c	= blessed $argp) && $argp->can($field) or
+            ($h	= HASH $argp) && exists $argp->{$field} or
+            ARRAY $argp && $field =~ /^[-\d]+$/ && exists $argp->[$field])) {
+        $argp = $c	? $argp->$field
+										: $h	? $argp->{$field}
+													: $argp->[$field];
+        $field = shift, next if @_;
+        return $argp;
       }
       return undef;
-    }
-
+		}
 
     sub LongSub(;$) { ((caller (@_ ? 1+$_[0] : 1))[3]) || __PACKAGE__."::" }
     sub ShortSub(;$) { 
@@ -460,14 +514,13 @@ S< >
                             # builtin debug to see where compare fails
 #
 
-C<isnum> checks for a number (int, float, or with exponent) at the 
-beginning of the string passed in.  With no argument uses C<$_>
-as the parameter.  Returns the number with any non-number suffix
-stripped off or C<undef> if no num is found at the beginning
-of the string.  C<isnum> is an optional import that must be included
-via C<@EXPORTS_OK>.  Note: to determine if false, you must use
-C<defined(isnum)> since numeric '0' can be returned and would also
-evaluate to false.
+C<isnum> checks for a number (int, float, or with exponent) as the 
+value of the string passed in.  With no argument uses C<$_>
+as the parameter.  Returns the number  or C<undef> if the field
+does not evaluate to a number.  C<isnum> is an optional import that 
+must be mentioned in the modules arguments.
+Note: to determine if false, you must use C<defined(isnum)> 
+since numeric '0' can be returned and also evaluates to false.
 
 The existence of C<Cmp> is a B<side effect of testing> needs.  To compare
 validity of released functions, it was necessary to recursively 
@@ -489,12 +542,12 @@ use a two element list or an array to catch the status, like
 
 If the compare was successful, it will return -1, 0 or 1 as 'cmp'
 does. If it fails, C<$result> will contain C<undef> and C<$err> will
-contain a number indicating what test failed.
+contain a number indicating what test failed (for debugging purposes).
 
 Failures can occur if Cmp is asked to compare different object with
 different refs ('blessed' refname), or same blessed class and different
-underlying types.  Unbless values and those in the same classes can
-be compared.
+underlying types.  Unblessed values and those of the same class can
+be compared. 
 
 
 
@@ -503,20 +556,20 @@ be compared.
 use constant numRE => qr{^ ( 
 														[-+]? (?: (?: \d* \.? \d+ ) | 
 																			(?: \d+ \.? \d* ) ) 
-																			(?: [eE] [-+]? \d+)? ) }x;
+																			(?: [eE] [-+]? \d+)? ) $ }x;
 
 sub isnum(;$) { 
 	local $_ = @_ ? $_[0] : $_;
 	return undef unless defined $_;
-	#my $numRE = numRE;
-	m{&numRE} ? 1 : 0;
+	my $numRE = numRE;
+	m{$numRE} ? 1 : 0;
 }
 
 
 sub Cmp($$;$);
 sub Cmp ($$;$) { my $r=0;
-   my ($a, $b) = @_;
-    my $dbg = @_==3 ? $_[2] : undef;
+		local ($a, $b) = @_ >= 2 ? (shift, shift) : ($a, $b);
+    my $dbg = @_ ? $_[0] : undef;
   require P if $dbg;
 	return undef unless defined $a && defined $b;
   my ($ra, $rb)   = (ref $a, ref $b);
@@ -595,16 +648,6 @@ sub Cmp ($$;$) { my $r=0;
 
   
 1}
-
-=head1 NOTE on INCLUDING OPTIONAL (EXPORT_OK) FUNCTIONS
-
-Importing optional functions B<does not> cancel default imports 
-as this module uses L<Xporter>. To dselect default exports, add
-'C<->' (I<minus> or I<dash>) at the beginning of argument list to 
-C<Types::Core> as in C<use Types::Core qw(- blessed);>.
-See L<Xporter> for more details.
-
-=back
 
 =head3 COMPATIBILITY NOTE: with Perl 5.12.5 and earlier
 

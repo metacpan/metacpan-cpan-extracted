@@ -15,11 +15,11 @@ use Path::Tiny;
 
 =head1 VERSION
 
-  version 0.08
+  version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub new {
     my $class = shift;
@@ -133,8 +133,11 @@ sub _node_bal {
     my $self = shift;
     my $guid = shift;
 
-    my $sql = "SELECT printf('%.2f',SUM(value_num/(value_denom*1.0))) FROM splits "
-            . "WHERE account_guid = ?";
+    # Use quantity_num instead of value_num to handle foreign currency
+    # transactions
+    my $sql = "SELECT printf('%.2f',SUM(quantity_num/(quantity_denom*1.0)))"
+            . "  FROM splits"
+            . " WHERE account_guid = ?";
     return $self->_runsql($sql,$guid)->[0][0] || 0;
 }
 

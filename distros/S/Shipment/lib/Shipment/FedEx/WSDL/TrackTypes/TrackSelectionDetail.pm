@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -49,11 +49,11 @@ Class::Std::initialize();
               PagingDetail
               CustomerSpecifiedTimeOutValueInMilliseconds
 
-              )
+            )
         ],
-        {   'CarrierCode'       => \%CarrierCode_of,
-            'OperatingCompany'  => \%OperatingCompany_of,
-            'PackageIdentifier' => \%PackageIdentifier_of,
+        {   'CarrierCode'                    => \%CarrierCode_of,
+            'OperatingCompany'               => \%OperatingCompany_of,
+            'PackageIdentifier'              => \%PackageIdentifier_of,
             'TrackingNumberUniqueIdentifier' =>
               \%TrackingNumberUniqueIdentifier_of,
             'ShipDateRangeBegin'    => \%ShipDateRangeBegin_of,
@@ -78,7 +78,7 @@ Class::Std::initialize();
             'ShipmentAccountNumber' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'SecureSpodAccount' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Destination' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'Destination'  => 'Shipment::FedEx::WSDL::TrackTypes::Address',
             'PagingDetail' =>
               'Shipment::FedEx::WSDL::TrackTypes::PagingDetail',
             'CustomerSpecifiedTimeOutValueInMilliseconds' =>
@@ -86,9 +86,9 @@ Class::Std::initialize();
         },
         {
 
-            'CarrierCode'       => 'CarrierCode',
-            'OperatingCompany'  => 'OperatingCompany',
-            'PackageIdentifier' => 'PackageIdentifier',
+            'CarrierCode'                    => 'CarrierCode',
+            'OperatingCompany'               => 'OperatingCompany',
+            'PackageIdentifier'              => 'PackageIdentifier',
             'TrackingNumberUniqueIdentifier' =>
               'TrackingNumberUniqueIdentifier',
             'ShipDateRangeBegin'    => 'ShipDateRangeBegin',
@@ -119,7 +119,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package CHI::Util;
-$CHI::Util::VERSION = '0.60';
+$CHI::Util::VERSION = '0.61';
 use Carp qw( croak longmess );
 use Module::Runtime qw(require_module);
 use Data::Dumper;

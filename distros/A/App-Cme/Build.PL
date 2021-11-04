@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2020 by Dominique Dumont.
+# This software is Copyright (c) 2014-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -27,7 +27,7 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "App-Cme",
-  "dist_version" => "1.033",
+  "dist_version" => "1.034",
   "license" => "lgpl",
   "module_name" => "App::Cme",
   "recommends" => {
@@ -54,7 +54,7 @@ my %module_build_args = (
     "Scalar::Util" => 0,
     "Tie::Hash" => 0,
     "YAML" => 0,
-    "perl" => "5.010"
+    "perl" => "5.020"
   },
   "script_files" => [
     "bin/cme"

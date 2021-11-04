@@ -23,6 +23,7 @@ our $VERSION = '0.25';
 $Data::Dumper::Useqq = 1;
 
 our $server = Test::HTTP::LocalServer->spawn(
+    request_pause => 0,
 #debug => 1,
 );
 END { undef $server }
@@ -172,6 +173,21 @@ sub identical_headers_ok( $code, $expected_request, $name,
         push @ignore_headers, 'Content-Length';
     };
 
+    # Content-Length gets a special treatment for Content-Type application/x-www-form-urlencoded
+    # because %20 and + are used to encode space between different versions of curl
+    # 7.74.0 and prior use %20 , 7.78 seems to use +
+    my $force_percent_encoding;
+    if(     $expected_request =~ m!^Content-Type: application/x-www-form-urlencoded$!ms
+        and $expected_request =~ /^Content-Length: (\d+)$/ms
+    ) {
+        my $len = $1;
+        if( $log !~ /^Content-Length: $len$/ms ) {
+            diag "Content-Length differs, likely due to different encoding for space (% vs. +)";
+            push @ignore_headers, 'Content-Length';
+            $force_percent_encoding = 1;
+        };
+    };
+
     for my $h (@ignore_headers) {
         $log              =~ s!^$h: .*?\r?\n!!ms;
         $expected_request =~ s!^$h: .*?\r?\n!!ms;
@@ -179,6 +195,17 @@ sub identical_headers_ok( $code, $expected_request, $name,
 
     my @log = split /\n/, $log;
     my @exp = split /\n/, $expected_request;
+
+    # Fix the bodies to use percent encoding if necessary:
+    if( $force_percent_encoding ) {
+        for my $res (\@log, \@exp) {
+            # Find the start of the body:
+            my $start = 1;
+            $start++ while $res->[$start] !~ /^\s*$/;
+
+            $res->[$start++] =~ s!\+!%20!g while $start < @$res;
+        };
+    };
 
     my $res = is_deeply \@log, \@exp, $name;
     if(! $res) {
@@ -247,11 +274,30 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
         };
 
         my %got = %{ $r->headers };
+        my @ignore_headers;
         if( my $h = $test->{ignore_headers} ) {
             $h = [$h] if ! ref $h;
-            delete @got{ @{ $h }};
-            delete @{$res->{headers}}{ @{ $h }};
+            @ignore_headers = @{ $h };
         };
+
+        # Content-Length gets a special treatment for Content-Type application/x-www-form-urlencoded
+        # because %20 and + are used to encode space between different versions of curl
+        # 7.74.0 and prior use %20 , 7.78 seems to use +
+        my $force_percent_encoding;
+        if(     exists $got{ 'Content-Type'}
+            and $got{'Content-Type'} =~ m!^application/x-www-form-urlencoded\b! ) {
+                # Our Content-Length might be somewhat different
+            if( exists $res->{headers}
+                and $res->{headers}->{'Content-Type'} =~ m!^application/x-www-form-urlencoded\b! ) {
+                # Force "%20" encoding on both parts if necessary:
+                $force_percent_encoding = ($got{'Content-Length'} != $res->{headers}->{'Content-Length'});
+
+                push @ignore_headers, 'Content-Length';
+            };
+        };
+
+        delete @got{ @ignore_headers };
+        delete @{$res->{headers}}{ @ignore_headers };
 
         # Fix weirdo CentOS6 build of Curl which has a weirdo User-Agent header:
         if( exists $res->{headers}->{ 'User-Agent' }) {
@@ -264,8 +310,14 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
         # Now, also check that our HTTP::Request looks similar
         my $http_request = $r->as_request;
         my $payload = $http_request->content;
+        my $body = $r->body;
 
-        is $payload, $r->body || '', "We don't munge the request body";
+        if( $force_percent_encoding ) {
+            s!\+!%20!g
+                for $payload, $body;
+        };
+
+        is $payload, $body || '', "We don't munge the request body";
     };
 }
 
@@ -320,7 +372,7 @@ sub request_identical_ok( $test ) {
     my $org_accept_encoding = $1;
 
     my @curl_log = split /^(?=Request:)/m, $log;
-    diag sprintf "Received %d curl requests", 0+@curl_log;
+    note sprintf "Received %d curl requests", 0+@curl_log;
 
     my @r = HTTP::Request::FromCurl->new(
         argv => $cmd,
@@ -328,6 +380,7 @@ sub request_identical_ok( $test ) {
     );
 
     my @reconstructed_commandline = ('--verbose', '--silent', map {"$_"} $r[0]->as_curl(curl => undef));
+    note "Reconstructed as @reconstructed_commandline";
 
     for( @reconstructed_commandline ) {
         # fudge --data-* into --data if version is below (whatever)
@@ -398,6 +451,21 @@ sub request_identical_ok( $test ) {
                     $copy->{headers}->{'Content-Length'} = 0;
                     $reconstructed[$i]->{headers}->{'Content-Length'} = 0;
                     $reconstructed[$i]->{headers}->{'Content-Type'} = $copy->{headers}->{'Content-Type'};
+                };
+            };
+
+            # Content-Length gets a special treatment for Content-Type application/x-www-form-urlencoded
+            # because %20 and + are used to encode space between different versions of curl
+            # 7.74.0 and prior use %20 , 7.78 seems to use +
+            if(     exists $copy->{headers}->{'Content-Type'}
+                and $copy->{headers}->{'Content-Type'} =~ m!^application/x-www-form-urlencoded\b! ) {
+                    # Our Content-Length might be somewhat different
+                if( $reconstructed[$i]->{headers}->{'Content-Type'} =~ m!^application/x-www-form-urlencoded\b! ) {
+                    $copy->{headers}->{'Content-Length'} = 0;
+                    $reconstructed[$i]->{headers}->{'Content-Length'} = 0;
+                    #$reconstructed[$i]->{headers}->{'Content-Type'} = $copy->{headers}->{'Content-Type'};
+
+                    # Force "%20" encoding on both parts:
                 };
             };
 

@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 94e21302cb1ba4fe8ba6498c4f34dcf090cdbeed49872cfa2c6caffe2994480d Changes
+SHA256 3d8aa7a1fd6fcaa5ffa6aa05c58d97639061d0ba5450bc73add5c0dd50136450 LICENSE
+SHA256 80555b1666f1f75a9f8275ab712b3e59685f29191ddfef6222e58674ee00f6ac MANIFEST
+SHA256 e98ab1630dff5af8c35377044a6199e02849c5f468067313930fef2a19c62b01 META.yml
+SHA256 bf629cdf7cdf6ba12d784cca41c0f106de454d6aa99c48cc9e58de1a3ea5fabb Makefile.PL
+SHA256 da57effc7c234ab5b2013c42970fe3a89f1346eee2527a389c62a189fbe1bfec README
+SHA256 5b6331611f703b54b3d53fb4d9747333a6eea2ca8243b9965bd106223b414b78 V4.pm
+SHA256 aa9b109da5fbdc69ff0b2565795ac15c6c74afcfed204d950a39bf4c1df77caf bin/kramerius4
+SHA256 07da290c05884ceafa0b57f0ce2fb5486c0e3b71ba3f39998b7150f4f0630b6a examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 1bcb43bcdb5f19b0f21c36a74e1af1c36ee9557f4a2bf216c0e7057d43e4dbd3 t/App-Kramerius-V4/01-use.t
+SHA256 4dc58f5b658c41d189f9070e8a139c31af5c1bf1b66bccd915f46c419e7d44e3 t/App-Kramerius-V4/02-version.t
+SHA256 2c179c7f3a95082174bf6224227357d8e2f9ca95dd58ebe696f40d692206b274 t/App-Kramerius-V4/03-new.t
+SHA256 2078f3457a40a01d2127e35f812731d056dbf39265d918f40803e1cbfa3555e5 xt/App-Kramerius-V4/01-pod_coverage.t
+SHA256 bd5f4a186877bf8eb525deff9bc76ce3fda7613107663d0aebddb882ec53abb4 xt/App-Kramerius-V4/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmF9GAQACgkQgmqNLzlX
+aRfN9Av/SwRJxgJ3+1mlv062Gr4HIT4S+DIE8olRVN2cXZpJYkGfWHkERKuPPgdo
+hSfBZn+2Agc6HZI1tqO6VQdCewRA+H7kt2eUXyMDDL0s+r9Al6MW0bBaXbuN7Vxm
+YHeciGtugFSlxSxeDcbv7hHuVOt6hONTPvgClV1Wg2fW14/blDU6pl6alh/1G1OZ
+HLnmZi1HvQbF2SSBlCHlEGdte3wANUgWcJnWUbgm+2Kk9Qh8y1wRMgdgj6zU53XB
+Y/VaaEkmb47+uW4tSHJ22pcQOibuQyfrDhV6uc2st9BM6uUcs4Q/Lg2/jXxalpmM
+8M4Jcy9ktyukbrN+gSvKdLbQDwqC8bC3E4qE5s7PdgJ4U4RY1nVrRtYKgNY9KbCG
+eVfxp/xmUNnTYSCntrqjbPYu/I0mbFRXYw/N98VhImI6360KTkkrs4C6Ie6J6d83
+VzoDvgY1w3Gp3dO+szxyIvKJFVsSy51u06hK2OrSzyK2RAuwFIB0GPxYsmkdUW8D
+nj12Z7jP
+=mTwj
+-----END PGP SIGNATURE-----

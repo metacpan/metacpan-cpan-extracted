@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ResponseInformation;
-$Shipment::Purolator::WSDL::Types::ResponseInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Types::ResponseInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Errors
               InformationalMessages
 
-              )
+            )
         ],
         {   'Errors'                => \%Errors_of,
             'InformationalMessages' => \%InformationalMessages_of,
@@ -62,7 +62,7 @@ Shipment::Purolator::WSDL::Types::ResponseInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

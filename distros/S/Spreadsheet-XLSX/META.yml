@@ -5,10 +5,13 @@ author:
   - 'Mike Blackwell <mike.blackwell@rrd.com'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  Test::Warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,5 +24,7 @@ no_index:
 requires:
   Archive::Zip: '1.18'
   Spreadsheet::ParseExcel: '0'
-  Test::NoWarnings: '0'
-version: '0.15'
+resources:
+  repository: https://github.com/asb-capfan/Spreadsheet-XLSX
+version: '0.17'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

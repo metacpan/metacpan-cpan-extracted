@@ -17,7 +17,7 @@ our %EXPORT_TAGS = (
    );
 Exporter::export_ok_tags('constants');
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -184,6 +184,31 @@ sub prepareSmimeMessage {
 	}
 	($rest,$move);
 }
+use Carp qw(croak);
+sub AUTOLOAD {
+    # This AUTOLOAD is used to 'autoload' constants from the constant()
+    # XS function.
+
+    my $constname;
+    our $AUTOLOAD;
+    ($constname = $AUTOLOAD) =~ s/.*:://;
+    croak "&Crypt::SMIME::constant not defined" if $constname eq 'constant';
+    my ($error, $val) = constant($constname);
+    if ($error) { croak $error; }
+    {
+	no strict 'refs';
+	# Fixed between 5.005_53 and 5.005_61
+#XXX	if ($] >= 5.00561) {
+#XXX	    *$AUTOLOAD = sub () { $val };
+#XXX	}
+#XXX	else {
+	    *$AUTOLOAD = sub { $val };
+#XXX	}
+    }
+    goto &$AUTOLOAD;
+}
+
+
 __END__
 =encoding utf-8
 

@@ -1,5 +1,5 @@
 package CHI::Driver::Role::IsSizeAware;
-$CHI::Driver::Role::IsSizeAware::VERSION = '0.60';
+$CHI::Driver::Role::IsSizeAware::VERSION = '0.61';
 use Carp::Assert;
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(:all);

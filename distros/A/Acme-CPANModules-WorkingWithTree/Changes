@@ -1,3 +1,8 @@
+0.006   2021-10-07  Released-By: PERLANCAR; Urgency: low
+
+	- Update mentioned module Role{,Bundle}::TinyCommons::Tree.
+
+
 0.005   2021-05-06  Released-By: PERLANCAR; Urgency: medium
 
 	- Mention Tree::From::ObjArray, Text::Tree::Indented.

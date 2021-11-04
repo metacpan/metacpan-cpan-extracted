@@ -3,7 +3,7 @@ use 5.008;
 use warnings;
 use strict;
 
-our $VERSION = '1.71';
+our $VERSION = '1.74';
 
 use Carp;
 use Data::Compare;
@@ -38,7 +38,7 @@ BEGIN {
 #
 
 sub new {
-   
+
     # set up for tracing
 
     if ($ENV{DES_TRACE}){
@@ -63,14 +63,14 @@ sub new {
     return $self;
 }
 sub all {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
     my $p = $self->_params(@_);
 
     $self->{params}{engine} = 'all';
-    
+
     $self->run($p);
 }
 sub has {
@@ -82,29 +82,29 @@ sub has {
 
     $self->{params}{post_proc} = 'file_lines_contain';
     $self->{params}{engine} = 'has';
-    
+
     $self->run($p);
 }
 sub missing {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
     my $p = $self->_params(@_);
 
     $self->{params}{engine} = 'missing';
-    
+
     $self->run($p);
 }
 sub lines {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
     my $p = $self->_params(@_);
 
     $self->{params}{engine} = 'lines';
-    
+
     if ($self->{params}{search} || $p->{search}){
         $self->{params}{post_proc} = 'file_lines_contain';
     }
@@ -112,7 +112,7 @@ sub lines {
     $self->run($p);
 }
 sub module {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -141,7 +141,7 @@ sub module {
     $self->run($p);
 }
 sub objects {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -153,7 +153,7 @@ sub objects {
     $self->run($p);
 }
 sub search_replace {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -179,7 +179,7 @@ sub replace {
     $self->run($p);
 }
 sub inject_after {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -252,12 +252,12 @@ sub backup {
 sub add_functionality {
 
     trace() if $ENV{TRACE};
-    
+
     my $self = shift;
     my $p = $self->_params(@_);
 
     $self->_config($p);
-    
+
     my $to_add = $self->{params}{add_functionality};
     my $in_prod = $self->{params}{add_functionality_prod};
 
@@ -275,7 +275,7 @@ sub add_functionality {
             last;
         }
     }
-    
+
     if (! $is_allowed){
         confess "Adding a non-allowed piece of functionality...\n";
     }
@@ -331,7 +331,7 @@ sub add_functionality {
     }
 
     my $sub_name;
-    
+
     if ($code[0] =~ /sub\s+(\w+)/){
         $sub_name = $1;
     }
@@ -354,7 +354,7 @@ sub add_functionality {
     );
 
     $p = {
-        engine => 'objects', 
+        engine => 'objects',
         post_proc => [qw(subs end_of_last_sub)],
         post_proc_return => 1,
     };
@@ -370,7 +370,7 @@ sub add_functionality {
     my @insert = ("        $sub_name => \\&$sub_name,");
 
     $rw->splice(
-        file => $file, 
+        file => $file,
         find => 'my\s+\$dt\s+=\s+\{',
         insert => \@insert,
     );
@@ -378,13 +378,13 @@ sub add_functionality {
     return 1;
 }
 sub engines {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
     my $module = $self->{namespace} . "::Engine";
     my $engine = $module->new;
- 
+
     my @engines;
 
     for (keys %{$engine->_dt}){
@@ -393,7 +393,7 @@ sub engines {
     return @engines;
 }
 sub pre_procs {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -408,7 +408,7 @@ sub pre_procs {
     return @pre_procs;
 }
 sub post_procs {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -477,7 +477,7 @@ sub valid_params {
 #
 
 sub _cache {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -501,14 +501,14 @@ sub _cache {
     }
 }
 sub _cache_enabled {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
     return $self->{params}{cache};
 }
 sub _cache_safe {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -519,7 +519,7 @@ sub _cache_safe {
     return $self->{cache_safe};
 }
 sub _clean_config {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -527,7 +527,7 @@ sub _clean_config {
     my $p = shift;           # href of params passed in
 
     for my $var (keys %$config_vars){
-       
+
         last if ! $self->_run_end;
 
         # skip if it's a persistent var
@@ -547,7 +547,7 @@ sub _clean_config {
     }
 }
 sub _clean_core_config {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -568,7 +568,7 @@ sub _clean_core_config {
     }
 }
 sub _config {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -673,7 +673,7 @@ sub _config {
     }
 }
 sub _file {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -690,7 +690,7 @@ sub _file {
         my $module = $self->{params}{file};
         (my $file = $module) =~ s|::|/|g;
         $file .= '.pm';
-       
+
         my $module_is_loaded;
 
         if (! $INC{$file}){
@@ -725,7 +725,7 @@ sub _file {
 
     if (-d $self->{params}{file}){
         $self->{params}{directory} = 1;
-        $self->{params}{extensions} 
+        $self->{params}{extensions}
           = defined $p->{extensions} ? $p->{extensions} : [qw(*.pm *.pl)];
     }
     else {
@@ -803,7 +803,7 @@ sub _read_file {
     }
 }
 sub _run_directory {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -823,7 +823,7 @@ sub _run_directory {
     my %struct;
 
     for my $file (@files){
-        
+
         $self->{params}{file} = $file;
         my $data = $self->_core($p);
 
@@ -837,7 +837,7 @@ sub _run_directory {
     return \%struct;
 }
 sub _run_end {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -858,7 +858,7 @@ sub _write_file {
     my $self = shift;
 
     my $copy = $self->{params}{copy};
-    
+
     my $file = $self->{params}{file};
     my $contents = $self->{write_file_contents};
 
@@ -902,7 +902,7 @@ sub _write_file {
 sub _core {
 
     trace() if $ENV{TRACE};
-    
+
     my $self = shift;
     my $p = $self->{params};
 
@@ -948,7 +948,7 @@ sub _core {
     }
     else {
         $subs = $self->_proc($p);
-    } 
+    }
 
     return if ! $subs;
 
@@ -965,7 +965,7 @@ sub _core {
             $subs = $post_proc->($p, $subs);
             $self->{write_file_contents} = $p->{write_file_contents};
         }
-    }  
+    }
 
     if ($self->{params}{post_proc_return}){
         return $subs;
@@ -996,7 +996,7 @@ sub _core {
     return $subs;
 }
 sub _pre_proc {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -1008,8 +1008,8 @@ sub _pre_proc {
     if (not $pre_proc or $pre_proc eq ''){
         return $subs;
     }
-   
-    # tell _core() to return directly from the pre_processor 
+
+    # tell _core() to return directly from the pre_processor
     # if necessary, and bypass post_proc and engine
 
     if ($pre_proc eq 'module'){
@@ -1017,7 +1017,7 @@ sub _pre_proc {
     }
 
     my $cref;
-    
+
     if (not ref($pre_proc) eq 'CODE'){
         my $pre_proc_module = $self->{namespace} . "::Preprocessor";
         my $compiler = $pre_proc_module->new;
@@ -1031,7 +1031,7 @@ sub _pre_proc {
             $cref = $compiler->{pre_procs}{$pre_proc}->();
             1;
         };
-        
+
         if (! $compiled_ok){
             $@ = "\n[Devel::Examine::Subs speaking] " .
                   "dispatch table in Devel::Examine::Subs::Preprocessor " .
@@ -1045,31 +1045,31 @@ sub _pre_proc {
     if (ref($pre_proc) eq 'CODE'){
         $cref = $pre_proc;
     }
-    
+
     return $cref;
 }
 sub _proc {
-   
+
     # this method is the core data collection/manipulation
     # routine (aka the 'Processor phase') for all of DES
 
     # make sure all unit tests are successful after any change
     # to this subroutine
 
-    # if you want the data structure to look differently before 
-    # reaching here, use a pre_proc. If you want it different 
+    # if you want the data structure to look differently before
+    # reaching here, use a pre_proc. If you want it different
     # afterwards, use a post_proc or an engine
 
     trace() if $ENV{TRACE};
-    
+
     my $self = shift;
     my $p = shift;
-   
+
     my $file = $self->{params}{file};
 
     return {} if ! $file;
 
-    my $PPI_doc = PPI::Document->new($file);   
+    my $PPI_doc = PPI::Document->new($file);
     my $PPI_subs = $PPI_doc->find('PPI::Statement::Sub');
 
     return if ! $PPI_subs;
@@ -1079,8 +1079,8 @@ sub _proc {
     my @sub_order;
 
     for my $PPI_sub (@{$PPI_subs}){
-        
-        my $include 
+
+        my $include
           = defined $self->{params}{include} ? $self->{params}{include} : [];
         my $exclude
           = defined $self->{params}{exclude} ? $self->{params}{exclude} : [];
@@ -1088,7 +1088,7 @@ sub _proc {
         delete $self->{params}{include} if $exclude->[0];
 
         my $name = $PPI_sub->name;
-        
+
         push @sub_order, $name;
 
         # skip over excluded (or not included) subs
@@ -1119,14 +1119,14 @@ sub _proc {
 
         @{ $subs{$file}{subs}{$name}{code} } = split /\n/, $PPI_sub->content;
     }
-  
-    @{ $p->{order} } = @sub_order; 
+
+    @{ $p->{order} } = @sub_order;
     @{ $self->{order} } = @sub_order;
 
     return \%subs;
 }
 sub _post_proc {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
@@ -1166,12 +1166,12 @@ sub _post_proc {
                           "speaking...\n\npost_proc '$pf' is not " .
                           "implemented. '$post_proc' was sent in.\n";
                 }
-                
+
                 my $compiled_ok = eval {
                     $cref = $compiler->{post_procs}{$pf}->();
                     1;
                 };
-        
+
                 if (! $compiled_ok){
                     $@ = "\n[Devel::Examine::Subs speaking] " .
                           "dispatch table in " .
@@ -1180,7 +1180,7 @@ sub _post_proc {
                     . $@;
                     confess $@;
                 }
-            } 
+            }
             if (ref($pf) eq 'CODE'){
                 $cref = $pf;
             }
@@ -1204,14 +1204,14 @@ sub _post_proc {
     return @post_procs;
 }
 sub _engine {
-    
+
     trace() if $ENV{TRACE};
 
     my $self = shift;
     my $p = shift;
     my $struct = shift;
 
-    my $engine 
+    my $engine
       = defined $p->{engine} ? $p->{engine} : $self->{params}{engine};
 
     if (not $engine or $engine eq ''){
@@ -1267,17 +1267,17 @@ sub _engine {
 #
 
 sub _pod{1;} #vim placeholder
-1; 
+1;
 __END__
 
 =head1 NAME
 
-Devel::Examine::Subs - Get info about, search/replace and inject code into
-Perl files and subs.
+Devel::Examine::Subs - Get info about, search/replace and inject code into Perl files and subs.
 
 =for html
-<a href="http://travis-ci.org/stevieb9/devel-examine-subs"><img src="https://secure.travis-ci.org/stevieb9/devel-examine-subs.png"/>
+<a href="https://github.com/stevieb9/devel-examine-subs/actions"><img src="https://github.com/stevieb9/devel-examine-subs/workflows/CI/badge.svg"/></a>
 <a href='https://coveralls.io/github/stevieb9/devel-examine-subs?branch=master'><img src='https://coveralls.io/repos/stevieb9/devel-examine-subs/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
 
 =head1 DESCRIPTION
 
@@ -1303,11 +1303,11 @@ coderefs.
 
     my $des = Devel::Examine::Subs->new( file => 'Some::Module::Name' );
 
-Get all sub names in a file
+=head3 Get all sub names in a file
 
     my $aref = $des->all;
 
-Get all the subs as objects
+=head3 Get all the subs as objects
 
     $subs = $des->objects;
 
@@ -1320,7 +1320,7 @@ Get all the subs as objects
         $sub->lines;      # lines that match search term
     }
 
-Get the sub objects within a hash
+=head3 Get all subs as objects within a hash
 
     my $subs = $des->objects( objects_in_hash => 1 );
 
@@ -1335,16 +1335,16 @@ Get the sub objects within a hash
               ...
     }
 
-Get all subs containing "string" in the body
+=head3 Get all subs containing a search term in the code
 
     my $search = 'string';
     my $aref = $des->has( search => $search );
 
-Search and replace code in subs
+=head3 Search and replace code in subs
 
     $des->search_replace( exec => sub { $_[0] =~ s/this/that/g; } );
 
-Inject code into sub after a search term (preserves previous line's indenting)
+=head3 Inject code into sub after a search term
 
     my @code = <DATA>;
 
@@ -1361,7 +1361,7 @@ Inject code into sub after a search term (preserves previous line's indenting)
         confess 'big bad error';
     }
 
-Print out all lines in all subs that contain a search term
+=head3 Print out all lines in all subs that contain a search term
 
     my $subs = $des->lines(search => 'this');
 
@@ -1376,8 +1376,7 @@ Print out all lines in all subs that contain a search term
         }
     }
 
-The structures look a bit differently when 'file' is a directory.
-You need to add one more layer of extraction.
+=head3 Locate subs in a directory recursively
 
     my $files = $des->objects;
 
@@ -1387,7 +1386,7 @@ You need to add one more layer of extraction.
         }
     }
 
-Print all subs within each Perl file under a directory
+=head3 Print all subs within each Perl file under a directory
 
     my $files = $des->all( file => 'lib/Devel/Examine' );
 
@@ -1396,7 +1395,7 @@ Print all subs within each Perl file under a directory
         print join('\t', @{$files->{$file}});
     }
 
-Most methods can include or exclude specific subs
+=head3 Include or exclude specific subs
 
     my $has = $des->has( include => ['dump', 'private'] );
 
@@ -1408,8 +1407,6 @@ Most methods can include or exclude specific subs
 
 See the L</PARAMETERS> for the full list of params, and which ones
 are persistent across runs using the same object.
-
-
 
 =head2 C<new>
 
@@ -1732,7 +1729,7 @@ Optional parameters:
 
 =over 4
 
-=item C<copy> 
+=item C<copy>
 
 Set it to a new file name which will be a copy of the specified file, and only
 change the copy. Useful for verifying the changes took properly.
@@ -1855,7 +1852,7 @@ the new code at the beginning column of the file.
 
 State: Persistent
 
-Not yet implemented. 
+Not yet implemented.
 
 Compiles a diff after each edit using the methods that edit files.
 

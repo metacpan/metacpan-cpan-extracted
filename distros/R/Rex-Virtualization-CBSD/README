@@ -1,0 +1,80 @@
+Rex-Virtualization-CBSD
+
+This provides interface to CBSD for controlling bhyve via Rex.
+
+    use Rex::Commands::Virtualization;
+
+    set virtualization => "CBSD";
+    
+    vm 'create', name=>'foo',
+                 'vm_os_type'=>'freebsd',
+                 'vm_os_profile'=>'FreeBSD-x64-13.0',
+                 'vm_ram'=>'1g',
+                 'vm_cpus'=>'1',
+                 'imgsize'=>'10g';
+    
+    vm 'start' => 'foo';
+    
+    # list the basic settings for the VM foo from the VM list
+    my %vm_list = vm 'list';
+    print Dumper \%{ $vm_list{foo} };
+    
+    # get all the config info for the VM foo and display it
+    %vm_info=vm 'info' => 'foo';
+    foreach my $vm_info_key (@{keys(%vm_info)}){
+        print $vm_info_key.": ".$vm_info{$vm_info_key}."\n";
+    }
+
+    # stop the VM foo
+    vm 'stop' => 'foo';
+    
+    # remove the VM foo
+    vm 'remove' => 'foo';
+    
+    # show all VM
+    my %vm_list = vm 'list';
+    print Dumper \%vm_list;
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Rex::Virtualization::CBSD
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Rex-Virtualization-CBSD
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Rex-Virtualization-CBSD
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Rex-Virtualization-CBSD
+
+    Search CPAN
+        https://metacpan.org/release/Rex-Virtualization-CBSD
+
+	Repository
+		https://github.com/VVelox/Rex-Virtualization-CBSD
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2020 by Zane C. Bowers-HAdley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

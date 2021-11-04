@@ -39,7 +39,7 @@ no_index:
 provides:
   Connector:
     file: lib/Connector.pm
-    version: '1.41'
+    version: '1.43'
   Connector::Builtin:
     file: lib/Connector/Builtin.pm
   Connector::Builtin::Authentication::LDAP:
@@ -102,6 +102,8 @@ provides:
     file: lib/Connector/Role/LocalPath.pm
   Connector::Role::SSLUserAgent:
     file: lib/Connector/Role/SSLUserAgent.pm
+  Connector::Role::SessionCache:
+    file: lib/Connector/Role/SessionCache.pm
   Connector::Tee:
     file: lib/Connector/Tee.pm
   Connector::Types:
@@ -124,12 +126,12 @@ recommends:
 requires:
   Log::Log4perl: '0'
   Moose: '0'
-  perl: v5.10.1
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/mrscotty/connector/issues
   homepage: https://github.com/mrscotty/connector
   repository: git://github.com/mrscotty/connector.git
-version: '1.41'
+version: '1.43'
 x_contributors:
   - 'Martin Bartosch <m.bartosch@cynops.de>'
   - 'Martin Bartosch <mbartosch@whiterabbitsecurity.com>'

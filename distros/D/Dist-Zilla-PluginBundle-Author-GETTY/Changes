@@ -1,9 +1,45 @@
 ==================================================
-Changes from 1745-11-10 00:00:00 +0000 to present.
+Changes from 1748-01-09 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.111 at 2019-08-25 16:33:58 +0000
+version 0.112 at 2021-10-23 14:45:04 +0000
+------------------------------------------
+
+  Change: e4c54ce07b6d26626a5c0790a2eddee98f7f2725
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2021-10-23 14:44:59 +0000
+
+    Updated .travis.yml 
+
+  Change: 66c506b3e08161e87951ba042f88554a560249ff
+  Author: Torsten Raudssus <torsten@raudssus.de>
+  Date : 2021-10-23 15:14:40 +0000
+
+    Merge pull request #5 from yoe/master
+
+    Alien: also support the version_check attribute 
+
+  Change: 78dddbe3143f491bb4e55c4697cd1e66f8c79375
+  Author: Wouter Verhelst <wouter.verhelst@zetes.com>
+  Date : 2021-09-17 10:32:33 +0000
+
+    Alien: also support the version_check attribute 
+
+  Change: ab7635f3756d3b3a09ebf3aabfcd5591c01dc937
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 20:17:48 +0000
+
+    Updated .travis.yml with newest version of TravisCI plugin 
+
+  Change: 34f9073e6996e50165717c921724fa8bdbe947ab
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 19:33:40 +0000
+
+    New travis configuration 
+
+------------------------------------------
+version 0.111 at 2019-08-25 16:33:10 +0000
 ------------------------------------------
 
   Change: 3b24c3f7d735c431a12e14043f9a58217076f448

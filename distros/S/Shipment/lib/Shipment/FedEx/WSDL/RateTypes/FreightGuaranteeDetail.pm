@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail;
-$Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Date
               Time
 
-              )
+            )
         ],
         {   'Type' => \%Type_of,
             'Date' => \%Date_of,
@@ -66,7 +66,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,21 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001011 2021 November 03
+          - Improved documentation for DBIx::Class::Valiant
+          - supported deletion of nested results in DBIx::Class::Valiant
+          - lots of security related test cases for nested data and DBIx::Class::Valiant
+          - Some code optimization for DBIx::Class::Valiant (sensing a theme?)
+          - DBIx::Class::Valiant is getting pretty close to the point where I want to pull
+            it into its own distribution.  The core Valiant code is starting to look like
+            its rather stable adn DBIx::Class::Valiant has enough basic docs and test cases
+            that its starting to seem not scary.  If you're using DBIx::Class::Valiant you should
+            keep an eye out for this pending separation.
+
+0.001010 2021 October 26
+          - New Validator: "Scalar".
+          - lots of improvements to the example application
+          - lots and lots of bugfixs to the DBIC glue code, mostly around nested validations
+
 0.001009 2021 October 01
           - A lot of little bugfixes to the DBIC glue code, expecially when using nested
           validations.  If you are using nested DBIC validations its not impossible stuff
@@ -55,16 +71,14 @@ The following logs changes for the CPAN distribution Valiant
           - lots of updates to nested DBIC support and improved example application
 
 0.001003  2021 March 04
-          - Allow one to disable auto validation on DBIC classes.  This allows
-          you to insert or update rows that are invalid.
-          - Added some test cases for strict mode validations and allowed one a
-          bit more control over strict mode messaging.
+          - Allow one to disable auto validation on DBIC classes.  This allows you to insert or
+          update rows that are invalid.
+          - Added some test cases for strict mode validations and allowed one a bit more control
+          over strict mode messaging.
 
 0.001002  2021 February 25
-          - quick followup that just fixes POD issues
+          - quick followup that just fixes POD issues.
 
 0.001001  2021 February 25
-          - First Post!  Please only use this if you are ready to help
-          file bug reports and read all the docs carefully.
-          - This release is dedicated to my dog Tornado who we lost to
-          cancer on 18 August 2020.
+          - This initial release is dedicated to my dog 'Tornado', who we lost to cancer on 
+          18 August 2020.  Please see 'DEDICATIONS' in the main POD for more.

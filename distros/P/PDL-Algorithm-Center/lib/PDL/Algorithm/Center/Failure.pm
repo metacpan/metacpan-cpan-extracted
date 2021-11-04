@@ -5,7 +5,7 @@ package PDL::Algorithm::Center::Failure;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use custom::failures::x::alias -suffix => '_failure', qw[
   parameter
@@ -27,7 +27,7 @@ PDL::Algorithm::Center::Failure - Exception classes for PDL::Algorithm::Center
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SUPPORT
 

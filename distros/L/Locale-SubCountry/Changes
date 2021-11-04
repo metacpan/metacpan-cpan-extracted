@@ -1,5 +1,9 @@
 Revision history for Perl CPAN module Locale::SubCountry
 
+2.07 23 Oct 2021
+    Added Kosovo https://laendercode.net/en/2-letter-code/xk, RT bug #139734
+    Updated to latest codes from: https://salsa.debian.org/iso-codes-team/
+
 2.06 12 Jul 2019
     Used latest iso-codes package from Debian Salsa
 2.05 6 Apr 2019

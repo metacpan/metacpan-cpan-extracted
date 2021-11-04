@@ -1,5 +1,5 @@
 package Lab::Moose::DataFolder;
-$Lab::Moose::DataFolder::VERSION = '3.772';
+$Lab::Moose::DataFolder::VERSION = '3.791';
 #ABSTRACT: Create a data directory with meta data
 
 use v5.20;
@@ -62,6 +62,12 @@ has meta_file => (
     writer   => '_meta_file'
 );
 
+has copy_script => (
+    is  => 'ro',
+    isa => 'Bool',
+    default => 1
+);
+
 has script_name => (
     is  => 'ro',
     isa => 'Str',
@@ -102,7 +108,9 @@ sub BUILD {
 
     $self->_create_meta_file();
 
-    $self->_copy_user_script();
+    if ( $self->copy_script ) {
+        $self->_copy_user_script();
+    }
 
 }
 
@@ -203,7 +211,7 @@ Lab::Moose::DataFolder - Create a data directory with meta data
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 DESCRIPTION
 
@@ -234,7 +242,8 @@ This method will create the following files in the folder:
 =item F<< <SCRIPT> .pl >>
 
 A copy of the user script. You can change the name of this script by setting
-the C<script_name> attribute in the constructor.
+the C<script_name> attribute in the constructor. In case you don't want the
+script to be copied, just set C<copy_script> to 0 when creating your DataFolder.
 
 =item F<META.yml>
 
@@ -253,6 +262,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017-2018  Andreas K. Huettel, Simon Reinhardt
             2020       Andreas K. Huettel
+            2021       Fabian Weinelt
 
 
 This is free software; you can redistribute it and/or modify it under

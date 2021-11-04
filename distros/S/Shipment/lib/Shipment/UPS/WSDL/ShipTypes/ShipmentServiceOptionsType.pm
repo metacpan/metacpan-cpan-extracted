@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ Class::Std::initialize();
               CommercialInvoiceRemovalIndicator
               UPScarbonneutralIndicator
 
-              )
+            )
         ],
         {   'SaturdayDeliveryIndicator' => \%SaturdayDeliveryIndicator_of,
             'OnCall'                    => \%OnCall_of,
@@ -68,8 +68,8 @@ Class::Std::initialize();
         },
         {   'SaturdayDeliveryIndicator' =>
               'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'OnCall' => 'Shipment::UPS::WSDL::ShipTypes::OnCallType',
-            'COD'    => 'Shipment::UPS::WSDL::ShipTypes::CODType',
+            'OnCall'       => 'Shipment::UPS::WSDL::ShipTypes::OnCallType',
+            'COD'          => 'Shipment::UPS::WSDL::ShipTypes::CODType',
             'Notification' =>
               'Shipment::UPS::WSDL::ShipTypes::NotificationType',
             'LabelDelivery' =>
@@ -90,16 +90,16 @@ Class::Std::initialize();
         },
         {
 
-            'SaturdayDeliveryIndicator' => 'SaturdayDeliveryIndicator',
-            'OnCall'                    => 'OnCall',
-            'COD'                       => 'COD',
-            'Notification'              => 'Notification',
-            'LabelDelivery'             => 'LabelDelivery',
-            'InternationalForms'        => 'InternationalForms',
-            'DeliveryConfirmation'      => 'DeliveryConfirmation',
-            'ReturnOfDocumentIndicator' => 'ReturnOfDocumentIndicator',
-            'ImportControlIndicator'    => 'ImportControlIndicator',
-            'LabelMethod'               => 'LabelMethod',
+            'SaturdayDeliveryIndicator'         => 'SaturdayDeliveryIndicator',
+            'OnCall'                            => 'OnCall',
+            'COD'                               => 'COD',
+            'Notification'                      => 'Notification',
+            'LabelDelivery'                     => 'LabelDelivery',
+            'InternationalForms'                => 'InternationalForms',
+            'DeliveryConfirmation'              => 'DeliveryConfirmation',
+            'ReturnOfDocumentIndicator'         => 'ReturnOfDocumentIndicator',
+            'ImportControlIndicator'            => 'ImportControlIndicator',
+            'LabelMethod'                       => 'LabelMethod',
             'CommercialInvoiceRemovalIndicator' =>
               'CommercialInvoiceRemovalIndicator',
             'UPScarbonneutralIndicator' => 'UPScarbonneutralIndicator',
@@ -123,7 +123,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

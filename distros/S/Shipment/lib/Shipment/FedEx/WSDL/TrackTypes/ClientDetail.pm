@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::ClientDetail;
-$Shipment::FedEx::WSDL::TrackTypes::ClientDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::TrackTypes::ClientDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               IntegratorId
               Localization
 
-              )
+            )
         ],
         {   'AccountNumber' => \%AccountNumber_of,
             'MeterNumber'   => \%MeterNumber_of,
@@ -43,7 +43,7 @@ Class::Std::initialize();
         {   'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'MeterNumber'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'IntegratorId'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Localization' =>
+            'Localization'  =>
               'Shipment::FedEx::WSDL::TrackTypes::Localization',
         },
         {
@@ -72,7 +72,7 @@ Shipment::FedEx::WSDL::TrackTypes::ClientDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

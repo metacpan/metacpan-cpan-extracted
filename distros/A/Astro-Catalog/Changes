@@ -6,6 +6,13 @@ For more detail please see the commit log at
 
   https://github.com/timj/perl-Astro-Catalog
 
+v4.36
+
+  + Added IO modules for VEX, Hedwig and JCMT_OT_SC formats.
+  + For Vizier query, generate combined c.rm parameter.
+  + Use Astro::Catalog::Item internally instead of Astro::Catalog::Star.
+  + Added catalog_convert script to convert catalogs between formats.
+
 v4.35
 
   + Changed the Astro::Catalog::IO::TST pattern match used to identify

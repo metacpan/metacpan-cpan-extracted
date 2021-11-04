@@ -6,7 +6,7 @@ use Scalar::Util;
 use Carp;
 
 # All modules in dist share a version
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 require X11::Xlib::Screen;
 require X11::Xlib::Colormap;
@@ -254,6 +254,34 @@ Generate a fake key press or release.  See L<X11::Xlib::Keymap/EXAMPLES>.
 sub fake_motion { shift->XTestFakeMotionEvent(@_) }
 sub fake_button { shift->XTestFakeButtonEvent(@_) }
 sub fake_key    { shift->XTestFakeKeyEvent(@_) }
+
+=head2 ATOM
+
+=head3 atom
+
+  my $atom= $display->atom('UTF8_STRING');
+  my @list= $display->atom(@names);
+  say $_ for $display->atom(1..50);
+
+This is a wrapper around L<XInternAtom|X11::Xlib/XInternAtom> and
+L<XGetAtomName|X11::Xlib/XGetAtomName> which operates on lits and returns
+L<dualvar values|Scalar::Util/dualvar> that show a helpful string for debugging but still
+work in numeric contexts.  It only finds existing atoms, returning C<undef> for each element
+that was not found.
+
+Note that the direction of the lookup (name to number, or number to name) depends on whether
+the item is declared as an integer and/or matches C<< /^[0-9]+\z/ >>.
+
+=head3 mkatom
+
+Like C<atom>, but creates any atoms that didn't exist.  However, it still expects that strings
+matching C<< /^[0-9]+\z/ >> are intended for reverse lookup, and cannot be used to create atoms
+whose names are digits.  (X server allows names that are numbers, but it seems like a bad idea)
+
+=cut
+
+# atom - see Xlib.xs
+# mkatom - see Xlib.xs
 
 =head2 SCREEN
 
@@ -754,7 +782,7 @@ Michael Conrad, E<lt>mike@nrdvana.netE<gt>
 
 Copyright (C) 2009-2010 by Olivier Thauvin
 
-Copyright (C) 2017-2020 by Michael Conrad
+Copyright (C) 2017-2021 by Michael Conrad
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

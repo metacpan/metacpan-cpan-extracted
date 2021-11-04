@@ -1,0 +1,93 @@
+NAME
+    kramerius4 - Script to fetching document from Kramerius system, version
+    4.
+
+SYNOPSIS
+     kramerius4 [-h] [-o out_file] [-q] [--version] kramerius_id document_uuid
+
+DESCRIPTION
+    Script which fetch document from Kramerius system.
+
+    Document on
+    <http://www.digitalniknihovna.cz/mzk/view/uuid:9ebcb206-24b7-4dc7-b367-3
+    d9ad7179c23?page=uuid:224d66f8-f48e-4a92-b41e-87c88a076dc0> we could
+    fetch by "kramerius4 mzk 224d66f8-f48e-4a92-b41e-87c88a076dc0"
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "-o out_file"
+
+            Output file.
+
+    *       "-q"
+
+            Quiet mode.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "kramerius_id"
+
+            Kramerius system id.
+
+    *       "document_uuid"
+
+            Document UUID in Kramerius system.
+
+EXAMPLE1
+     kramerius4
+
+     # Output:
+     # Usage: /home/skim/perl5/bin/kramerius4 [-h] [-o out_file] [-q] [--version] kramerius_id document_uuid
+     #         -h              Help.
+     #         -o out_file     Output file.
+     #         -q              Quiet mode.
+     #         --version       Print version.
+     #         kramerius_id    Kramerius system id. e.g. mzk
+     #         document_uuid   Document UUID in Kramerius system
+
+EXAMPLE2
+     kramerius4 mzk 224d66f8-f48e-4a92-b41e-87c88a076dc0
+
+     # Output:
+     # Download http://kramerius.mzk.cz/search/api/v5.0/item/uuid:224d66f8-f48e-4a92-b41e-87c88a076dc0/streams
+     # Download http://kramerius.mzk.cz/search/api/v5.0/item/uuid:224d66f8-f48e-4a92-b41e-87c88a076dc0/full
+     # Save 224d66f8-f48e-4a92-b41e-87c88a076dc0.jpg
+
+EXAMPLE3
+     kramerius4 -o foo.jpg mzk 224d66f8-f48e-4a92-b41e-87c88a076dc0
+
+     # Output:
+     # Download http://kramerius.mzk.cz/search/api/v5.0/item/uuid:224d66f8-f48e-4a92-b41e-87c88a076dc0/full
+     # Save foo.jpg
+
+EXAMPLE4
+     kramerius4 ABA001 1033555
+
+     # Output like:
+     # Kramerius system for 'ABA001' isn't version 4 of API.
+
+SEE ALSO
+    kramerius-uri
+        Script to get Kramerius URI.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Kramerius-V4>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

@@ -1,0 +1,30 @@
+<%init>
+my $args = $DECODED_ARGS;
+my $request_path = $HTML::Mason::Commands::r->path_info;
+$request_path =~ s!/{2,}!/!g;
+return unless $request_path =~ m{^/RTIR/};
+
+if ( $request_path =~ m{RTIR/Incident/Display\.html$} ) {
+    my $id = $args->{'id'};
+
+    # we'll never get here unless ticket is there and it's rtir's type
+    my $ticket = RT::Ticket->new( $session{'CurrentUser'} );
+    $ticket->Load($id);
+    $id = $ticket->id;
+
+    # my $actions_tab = PageMenu()->child( actions => title => loc('Actions'), sort_order  => 95 );
+
+    if ( $ticket->FirstCustomFieldValue('MISP Event ID') ) {
+        PageMenu()->child('actions')->child(
+            update_misp_event => title => loc('Update MISP Event'),
+            path  => RT::IR->HREFTo("Incident/Display.html?id=$id&UpdateMISPEvent=1", IncludeWebPath => 0),
+        );
+    }
+    else {
+        PageMenu()->child('actions')->child(
+            create_misp_event => title => loc('Create MISP Event'),
+            path  => RT::IR->HREFTo("Incident/Display.html?id=$id&CreateMISPEvent=1", IncludeWebPath => 0),
+        );
+    }
+}
+</%init>

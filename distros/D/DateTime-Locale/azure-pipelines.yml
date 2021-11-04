@@ -26,7 +26,7 @@ stages:
             sudo locale-gen en_US.UTF-8
             echo "##vso[task.setvariable variable=LANG]en_US.UTF-8"
             echo "##vso[task.setvariable variable=LANGUAGE]en"
-            echo "##vso[task.setvariable variable=LC_ALL]en"_US.UTF-8
+            echo "##vso[task.setvariable variable=LC_ALL]en_US.UTF-8"
           displayName: Set locale env vars
 
   - template: templates/helpers/macos.yml@ci-perl-helpers

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.54;
+package Object::Pad::MOP::Class 0.56;
 
 use v5.14;
 use warnings;
@@ -132,22 +132,38 @@ Returns a list of superclasses, as L<Object::Pad::MOP::Class> instances.
 Because C<Object::Pad> does not support multiple superclasses, this list will
 contain at most one item.
 
-=head2 roles
+=head2 direct_roles
 
-   @roles = $metaclass->roles
+   @roles = $metaclass->direct_roles
 
-Returns a list of roles implemented by this class, as
+Returns a list of the roles introduced by this class (i.e. added by `does`
+declarations but not inherited from the superclass), as
 L<Object::Pad::MOP::Class> instances.
 
-=head2 compose_role
+This method is also aliased as C<roles>.
 
-   $metaclass->compose_role( $rolename )
-   $metaclass->compose_role( $rolemeta )
+=head2 all_roles
+
+   @roles = $metaclass->all_roles
+
+I<Since version 0.56.>
+
+Returns a list of all the roles implemented by this class (i.e. including
+those inherited from the superclass), as L<Object::Pad::MOP::Class> instances.
+
+=head2 add_role
+
+   $metaclass->add_role( $rolename )
+   $metaclass->add_role( $rolemeta )
+
+I<Since verison 0.56.>
 
 Adds a new role to the list of those implemented by the class.
 
 The new role can be specified either as a plain string giving its name, or as
 an C<Object::Pad::MOP::Class> meta instance directly.
+
+Before version 0.56 this was called C<compose_role>.
 
 =head2 add_BUILD
 
@@ -213,9 +229,13 @@ set (such value may still be C<undef>).
 
 I<Since version 0.46.>
 
-Provides method names for generated reader, writer or lvalue-mutator accessor
-methods, similar to setting them via the C<:reader>, C<:writer> or C<:mutator>
-attributes.
+=item accessor => STRING
+
+I<Since version 0.56.>
+
+Provides method names for generated reader, writer, lvalue-mutator or
+reader+writer accessor methods, similar to setting them via the C<:reader>,
+C<:writer>, C<:mutator> or C<:accessor> attributes.
 
 =item weak => BOOL
 
@@ -245,6 +265,8 @@ Returns a list of L<Object::Pad::MOP::Slot> instances to represent all the
 slots of the class. This list may be empty.
 
 =cut
+
+*roles = \&direct_roles;
 
 =head1 AUTHOR
 

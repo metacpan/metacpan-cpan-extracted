@@ -11,6 +11,7 @@ do { my $x = {
                                       'Capture::Tiny' => '0',
                                       'Cwd' => '0',
                                       'Data::Dumper::Concise' => '0',
+                                      'Encode' => '0',
                                       'File::Spec' => '0',
                                       'FindBin' => '0',
                                       'IO::Handle' => '0',

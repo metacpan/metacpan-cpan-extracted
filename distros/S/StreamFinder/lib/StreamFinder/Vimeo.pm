@@ -104,8 +104,7 @@ submodule of the general StreamFinder module.
 
 Depends:  
 
-L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
-and the separate application program:  youtube-dl.
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 SUBROUTINES/METHODS
 
@@ -132,6 +131,15 @@ then only secure ("https://") streams will be returned.
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 Additional options:
+
+Certain youtube-dl (L<StreamFinder::Youtube>) configuration options, 
+namely I<format>, I<formatonly>, I<youtube-dl-args>, and I<youtube-dl-add-args> 
+can be overridden here by specifying I<youtube-format>, I<youtube-formatonly>, 
+I<youtube-dl-args>, and I<youtube-dl-add-args> arguments respectively.  It is 
+however, recommended to specify these in the Vimeo-specific 
+configuration file (see B<CONFIGURATION FILES> below.  NOTE:  These are only 
+applicable when no streams are found the normal way and the user has youtube-dl 
+or a compatable program, such as yt-dlp installed.
 
 I<-log> => "I<logfile>"
 
@@ -213,6 +221,11 @@ Returns the video's type ("Vimeo").
 
 =head1 CONFIGURATION FILES
 
+The default root location directory for StreamFinder configuration files 
+is "~/.config/StreamFinder".  To use an alternate location directory, 
+specify it in the "I<STREAMFINDER>" environment variable, ie.:  
+B<$ENV{STREAMFINDER} = "/etc/StreamFinder">.
+
 =over 4
 
 =item ~/.config/StreamFinder/Vimeo/config
@@ -220,13 +233,16 @@ Returns the video's type ("Vimeo").
 Optional text file for specifying various configuration options 
 for a specific site (submodule).  Each option is specified on a 
 separate line in the format below:
+NOTE:  Do not follow the lines with a semicolon, comma, or any other 
+separator.  Non-numeric I<values> should be surrounded with quotes, either 
+single or double.  Blank lines and lines beginning with a "#" sign as 
+their first non-blank character are ignored as comments.
 
 'option' => 'value' [,]
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
-Blank lines and lines starting with a "#" sign are ignored.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
@@ -236,7 +252,13 @@ a relational operator ("<", ">", "=") - default: "<".  This limits
 the video quality.. For example:  "720" would mean select a stream 
 "<= 720p", ">720" would mean ">= 720p", and "=1080" would mean "only 
 "1080p".  This can be overridden with the I<-quality> argument to 
-the new() function.
+the new() function.  Also, various youtube-dl (L<StreamFinder::Youtube>) 
+configuration options, namely I<format>, I<formatonly>, I<youtube-dl-args>, 
+and I<youtube-dl-add-args> can be overridden here by specifying 
+I<youtube-format>, I<youtube-formatonly>, I<youtube-dl-args>, and 
+I<youtube-dl-add-args> arguments respectively.  
+NOTE:  These are only applicable when no streams are found the normal way and 
+the user has youtube-dl or a compatable program, such as yt-dlp installed.
 
 =item ~/.config/StreamFinder/config
 
@@ -247,12 +269,12 @@ Each option is specified on a separate line in the format below:
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
-I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 =back
 
-NOTE:  Options specified in the options parameter list will override 
-those corresponding options specified in these files.
+NOTE:  Options specified in the options parameter list of the I<new()> 
+function will override those corresponding options specified in these files.
 
 =head1 KEYWORDS
 
@@ -260,11 +282,11 @@ vimeo
 
 =head1 DEPENDENCIES
 
-youtube-dl
-
-L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, youtube-dl
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
+
+youtube-dl (or yt-dlp, or other compatable program)
 
 wget
 
@@ -447,48 +469,29 @@ sub new
 		my $url2fetch = $url;
 		#DEPRECIATED (VIDEO-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
 		$url2fetch = 'https://www.vimeo.com/' . $url  unless ($url2fetch =~ m#^https?\:#);
-		print STDERR "\n-2 NO STREAMS FOUND IN PLAYER PAGE, TRYING youtube-dl...\n"  if ($DEBUG);
-		my $ytdlArgs = '--get-url --get-thumbnail --get-title --get-description -f "'
-				. ((defined $self->{'format'}) ? $self->{'format'} : 'mp4')
-				. '" ' . ((defined $self->{'youtube-dl-args'}) ? $self->{'youtube-dl-args'} : '');
-		my $try = 0;
-		my ($more, @ytdldata, @ytStreams);
-
-RETRYIT:
-		if (defined($self->{'userid'}) && defined($self->{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
-			my $uid = $self->{'userid'};
-			my $upw = $self->{'userpw'};
-			$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url2fetch"`;
-		} else {
-			$_ = `youtube-dl $ytdlArgs "$url2fetch"`;
-		}
-		print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
-		@ytdldata = split /\r?\n/s;
-		return undef unless (scalar(@ytdldata) > 0);
-
-		#NOTE:  ytdldata is ORDERED:  TITLE?, STREAM-URLS, THEN THE ICON URL, THEN DESCRIPTION!:
-		unless ($ytdldata[0] =~ m#^https?\:\/\/#) {
-			$_ = shift(@ytdldata);
-			$self->{'title'} ||= $_;
-		}
-		$more = 1;
-		@ytStreams = ();
-		while (@ytdldata) {
-			$_ = shift @ytdldata;
-			$more = 0  unless (m#^https?\:\/\/#o);
-			if ($more) {
-				push @ytStreams, $_  unless ($self->{'secure'} && $_ !~ /^https/o);
-			} else {
-				$self->{'description'} .= $_ . ' ';
+		my $haveYoutube = 0;
+		eval { require 'StreamFinder/Youtube.pm'; $haveYoutube = 1; };
+		print STDERR "\n-2 NO STREAMS FOUND IN PAGE (haveYoutube=$haveYoutube)\n"  if ($DEBUG && $self->{'cnt'} <= 0);
+		if ($haveYoutube) {
+			print STDERR "\n-2 TRYING youtube-dl...\n"  if ($DEBUG);
+			my %globalArgs = (
+					'-noiframes' => 1, '-fast' => 1, '-debug' => $DEBUG
+			);
+			foreach my $arg (qw(secure log logfmt youtube-format youtube-formatonly
+					youtube-dl-args youtube-dl-add-args)) {
+				(my $arg0 = $arg) =~ s/^youtube\-(?!dl)//o;
+				$globalArgs{$arg0} = $self->{$arg}  if (defined $self->{$arg});
 			}
-		}
-		$self->{'iconurl'} = pop(@ytStreams)  if ($#ytStreams > 0);
-		push @{$self->{'streams'}}, @ytStreams;
-		$self->{'cnt'} = scalar @{$self->{'streams'}};
-		unless ($try || $self->{'cnt'} > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
-			$try++;
-			$ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//;
-			goto RETRYIT  if ($1);
+			my $yt = new StreamFinder::Youtube($url2fetch, %globalArgs);
+			if ($yt && $yt->count() > 0) {
+				my @ytStreams = $yt->get();
+				push @{$self->{'streams'}}, @ytStreams;
+				foreach my $field (qw(title description iconurl)) {
+					$self->{$field} ||= $yt->{$field}  if (defined($yt->{$field}) && $yt->{$field});
+				}
+				$self->{'cnt'} = scalar @{$self->{'streams'}};
+				print STDERR "i:Found stream(s) (".join('|',@ytStreams).") via youtube-dl.\n"  if ($DEBUG);
+			}
 		}
 		$self->{'imageurl'} ||= $self->{'iconurl'};
 		print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);

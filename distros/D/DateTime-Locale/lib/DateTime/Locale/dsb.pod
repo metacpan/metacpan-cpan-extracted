@@ -417,6 +417,12 @@ Lower Sorbian locale.
    1995-12-22T09:05:02 = 22. dec. 1995 pó Chr.n.
   -0010-09-15T04:44:23 = 15. sep. -10 pś.Chr.n.
 
+=head3 GyMd (d.M.y GGGGG)
+
+   2008-02-05T18:30:30 = 5.2.2008 pó Chr.n.
+   1995-12-22T09:05:02 = 22.12.1995 pó Chr.n.
+  -0010-09-15T04:44:23 = 15.9.-10 pś.Chr.n.
+
 =head3 H ('zeg'. H)
 
    2008-02-05T18:30:30 = zeg. 18
@@ -435,17 +441,17 @@ Lower Sorbian locale.
    1995-12-22T09:05:02 = 9:05:02
   -0010-09-15T04:44:23 = 4:44:23
 
-=head3 Hmsv (HH:mm:ss v)
+=head3 Hmsv (H:mm:ss v)
 
    2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   1995-12-22T09:05:02 = 9:05:02 UTC
+  -0010-09-15T04:44:23 = 4:44:23 UTC
 
-=head3 Hmv (HH:mm v)
+=head3 Hmv (H:mm v)
 
    2008-02-05T18:30:30 = 18:30 UTC
-   1995-12-22T09:05:02 = 09:05 UTC
-  -0010-09-15T04:44:23 = 04:44 UTC
+   1995-12-22T09:05:02 = 9:05 UTC
+  -0010-09-15T04:44:23 = 4:44 UTC
 
 =head3 M (L)
 
@@ -471,11 +477,29 @@ Lower Sorbian locale.
    1995-12-22T09:05:02 = pět, 22. dec.
   -0010-09-15T04:44:23 = sob, 15. sep.
 
-=head3 MMMMW-count-other ('week' W 'of' MMMM)
+=head3 MMMMW-count-few ('tyźeń' W MMMM)
 
-   2008-02-05T18:30:30 = week 1 of februara
-   1995-12-22T09:05:02 = week 3 of decembra
-  -0010-09-15T04:44:23 = week 2 of septembra
+   2008-02-05T18:30:30 = tyźeń 1 februara
+   1995-12-22T09:05:02 = tyźeń 3 decembra
+  -0010-09-15T04:44:23 = tyźeń 2 septembra
+
+=head3 MMMMW-count-one ('tyźeń' W MMMM)
+
+   2008-02-05T18:30:30 = tyźeń 1 februara
+   1995-12-22T09:05:02 = tyźeń 3 decembra
+  -0010-09-15T04:44:23 = tyźeń 2 septembra
+
+=head3 MMMMW-count-other ('tyźeń' W MMMM)
+
+   2008-02-05T18:30:30 = tyźeń 1 februara
+   1995-12-22T09:05:02 = tyźeń 3 decembra
+  -0010-09-15T04:44:23 = tyźeń 2 septembra
+
+=head3 MMMMW-count-two ('tyźeń' W MMMM)
+
+   2008-02-05T18:30:30 = tyźeń 1 februara
+   1995-12-22T09:05:02 = tyźeń 3 decembra
+  -0010-09-15T04:44:23 = tyźeń 2 septembra
 
 =head3 MMMMd (d MMMM)
 
@@ -597,11 +621,29 @@ Lower Sorbian locale.
    1995-12-22T09:05:02 = 4. kwartal 1995
   -0010-09-15T04:44:23 = 3. kwartal -10
 
-=head3 yw-count-other ('week' w 'of' Y)
+=head3 yw-count-few ('tyźeń' w 'lěta' Y)
 
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
+   2008-02-05T18:30:30 = tyźeń 6 lěta 2008
+   1995-12-22T09:05:02 = tyźeń 51 lěta 1995
+  -0010-09-15T04:44:23 = tyźeń 37 lěta -10
+
+=head3 yw-count-one ('tyźeń' w 'lěta' Y)
+
+   2008-02-05T18:30:30 = tyźeń 6 lěta 2008
+   1995-12-22T09:05:02 = tyźeń 51 lěta 1995
+  -0010-09-15T04:44:23 = tyźeń 37 lěta -10
+
+=head3 yw-count-other ('tyźeń' w 'lěta' Y)
+
+   2008-02-05T18:30:30 = tyźeń 6 lěta 2008
+   1995-12-22T09:05:02 = tyźeń 51 lěta 1995
+  -0010-09-15T04:44:23 = tyźeń 37 lěta -10
+
+=head3 yw-count-two ('tyźeń' w 'lěta' Y)
+
+   2008-02-05T18:30:30 = tyźeń 6 lěta 2008
+   1995-12-22T09:05:02 = tyźeń 51 lěta 1995
+  -0010-09-15T04:44:23 = tyźeń 37 lěta -10
 
 
 =head2 Miscellaneous

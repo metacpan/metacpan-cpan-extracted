@@ -15,7 +15,7 @@ name: Proch-N50
 provides:
   Proch::N50:
     file: lib/Proch/N50.pm
-    version: v1.4.1
+    version: v1.4.2
 requires:
   FASTX::Reader: '0.7'
   Getopt::Long: '2.39'
@@ -26,5 +26,5 @@ requires:
 resources:
   homepage: https://metacpan.org/release/Proch-N50
   repository: https://github.com/quadram-institute-bioscience/seqfu.git
-version: 1.4.1
+version: 1.4.2
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,3 +1,11 @@
-0.001   2018-11-25 (PERLANCAR)
+0.002   2021-06-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] Add description, mention Number::Phone in the CLIs, add
+	  examples.
+
+
+0.001   2018-11-25  Released-By: PERLANCAR
 
         - First release.

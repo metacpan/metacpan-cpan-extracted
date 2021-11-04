@@ -1,13 +1,12 @@
-use Test::More tests => 9;
+#! perl
 
-use strict;
-use warnings;
+use Test2::V0 '!float';
+use Test::Lib;
 
 use PDL;
-
 use Astro::FITS::CFITSIO::Simple qw/ :all /;
 
-BEGIN { require 't/common.pl'; }
+use My::Test::common;
 
 my $file = 'data/image.fits';
 
@@ -31,3 +30,5 @@ foreach ( 5, 'snack' )
   };
   like ( $@, qr/not a 'PDL::Type'/, "dtype: bad type $_" );
 }
+
+done_testing;

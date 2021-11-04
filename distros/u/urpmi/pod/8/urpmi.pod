@@ -587,7 +587,7 @@ think is wrong.
 
 One can find the git repository / version-control repository (VCS) here:
 
-L<http://gitweb.mageia.org/software/rpm/urpmi/> .
+L<https://gitweb.mageia.org/software/rpm/urpmi/> .
 
 =head1 AUTHOR
 

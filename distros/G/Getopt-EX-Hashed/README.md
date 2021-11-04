@@ -1,11 +1,11 @@
 [![Actions Status](https://github.com/kaz-utashiro/Getopt-EX-Hashed/workflows/test/badge.svg)](https://github.com/kaz-utashiro/Getopt-EX-Hashed/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Getopt-EX-Hashed.svg)](https://metacpan.org/release/Getopt-EX-Hashed)
 # NAME
 
-Getopt::EX::Hashed - Hash store object automation
+Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 # VERSION
 
-Version 0.9920
+Version 1.00
 
 # SYNOPSIS
 
@@ -14,15 +14,15 @@ Version 0.9920
 
     package App::foo;
 
-    use Getopt::EX::Hashed;
-    has start    => ( spec => "=i s begin", default => 1 );
-    has end      => ( spec => "=i e" );
-    has file     => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
-    has score    => ( spec => '=i', min => 0, max => 100 );
-    has answer   => ( spec => '=i', must => sub { $_[1] == 42 } );
-    has mouse    => ( spec => '=s', any => [ 'Frankie', 'Benjy' ] );
-    has question => ( spec => '=s', re => qr/^(life|universe|everything)$/i);
-    no  Getopt::EX::Hashed;
+    use Getopt::EX::Hashed; {
+        has start    => ' =i  s begin ' , default => 1;
+        has end      => ' =i  e       ' ;
+        has file     => ' =s@ f       ' , is => 'rw', any => qr/^(?!\.)/;
+        has score    => ' =i          ' , min => 0, max => 100;
+        has answer   => ' =i          ' , must => sub { $_[1] == 42 };
+        has mouse    => ' =s          ' , any => [ 'Frankie', 'Benjy' ];
+        has question => ' =s          ' , any => qr/^(life|universe|everything)$/i;
+    } no Getopt::EX::Hashed;
 
     sub run {
         my $app = shift;
@@ -34,155 +34,167 @@ Version 0.9920
 # DESCRIPTION
 
 **Getopt::EX::Hashed** is a module to automate a hash object to store
-command line option values.  Major objective of this module is
-integrating initialization and specification into single place.
-Module name shares **Getopt::EX**, but it works independently from
-other modules included in **Getopt::EX**, so far.
+command line option values for **Getopt::Long** and compatible modules
+including **Getopt::EX::Long**.
 
-In the current implementation, using **Getopt::Long**, or compatible
-module such as **Getopt::EX::Long** is assumed.  It is configurable,
-but no other module is supported now.
+Major objective of this module is integrating initialization and
+specification into single place.
+
+Module name shares **Getopt::EX**, but it works independently from
+other modules in **Getopt::EX**, so far.
 
 Accessor methods are automatically generated when appropriate parameter
 is given.
 
 # FUNCTION
 
-## **has**
+- **has**
 
-Declare option parameters in a form of:
+    Declare option parameters in a form of:
 
-    has option_name => ( param => value, ... );
+        has option_name => ( param => value, ... );
 
-If array reference is given, multiple names can be declared at once.
+    If array reference is given, multiple names can be declared at once.
 
-    has [ 'left', 'right' ] => ( spec => "=i" );
+        has [ 'left', 'right' ] => ( spec => "=i" );
 
-If the number of parameter is not even, first parameter is taken as
-`spec`.  So the above example can be written as this:
+    If the name start with plus (`+`), given parameter updates values.
 
-    has [ 'left', 'right' ] => "=i";
+        has '+left' => ( default => 1 );
 
-If the name start with plus (`+`), given parameters are added to
-current value.
+    As for `spec` parameter, label can be omitted if it is the first
+    parameter.
 
-    has '+left' => ( default => 1 );
+        has left => "=i", default => 1;
 
-Following parameters are available.
+    Following parameters are available.
 
-- **is** => `ro` | `rw`
+    - \[ **spec** => \] _string_
 
-    To produce accessor method, `is` parameter is necessary.  Set the
-    value `ro` for read-only, `rw` for read-write.
+        Give option specification.  `spec =>` label can be omitted if and
+        only if it is the first parameter.
 
-    If you want to make accessor for all following members, use
-    `configure` and set `DEFAULT` parameter.
+        In _string_, option spec and alias names are separated by white
+        space, and can show up in any order.  Declaration
 
-        Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
+            has start => "=i s begin";
 
-- **spec** => _string_
+        will be compiled into string:
 
-    Give option specification.  Option spec and alias names are separated
-    by white space, and can show up in any order.
+            start|s|begin=i
 
-    Declaration
+        which conform to `Getopt::Long` definition.  Of course, you can write
+        as this:
 
-        has start => ( spec => "=i s begin" );
+            has start => "s|begin=i";
 
-    will be compiled into string:
+        If the name and aliases contain underscore (`_`), another alias name
+        is defined with dash (`-`) in place of underscores.  So
 
-        start|s|begin=i
+            has a_to_z => "=s";
 
-    which conform to `Getopt::Long` definition.  Of course, you can write
-    as this:
+        will be compiled into:
 
-        has start => ( spec => "s|begin=i" );
+            a_to_z|a-to-z:s
 
-    If the name and aliases contain underscore (`_`), another alias name
-    is defined with dash (`-`) in place of underscores.  So
+        If nothing special is necessary, give empty (or white space only)
+        string as a value.  Otherwise, it is not considered as an option.
 
-        has a_to_z => ( spec => "=s" );
+    - **alias** => _string_
 
-    will be compiled into:
+        Additional alias names can be specified by **alias** parameter too.
+        There is no difference with ones in `spec` parameter.
 
-        a_to_z|a-to-z:s
+            has start => "=i", alias => "s begin";
 
-    If nothing special is necessary, give empty (or white space only)
-    string as a value.  Otherwise, it is not considered as an option.
+    - **is** => `ro` | `rw`
 
-- **alias** => _string_
+        To produce accessor method, `is` parameter is necessary.  Set the
+        value `ro` for read-only, `rw` for read-write.
 
-    Additional alias names can be specified by **alias** parameter too.
-    There is no difference with ones in `spec` parameter.
+        If you want to make accessor for all following members, use
+        `configure` and set `DEFAULT` parameter.
 
-- **default** => _value_
+            Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
-    Set default value.  If no default is given, the member is initialized
-    as `undef`.
+    - **default** => _value_
 
-- **action** => _coderef_
+        Set default value.  If no default is given, the member is initialized
+        as `undef`.
 
-    Parameter `action` takes code reference which is called to process
-    the option.  When called, hash object is passed as `$_`.
+        If the value is a reference for ARRAY or HASH, new reference with same
+        member is assigned.  This means that member data is shared across
+        multiple `new` calls.  Please be careful if you call `new` multiple
+        times and alter the member data.
 
-        has [ qw(left right both) ] => spec => '=i';
-        has "+both" => action => sub {
-            $_->{left} = $_->{right} = $_[1];
-        };
+    - **action** => _coderef_
 
-    You can use this for `"<>"` to catch everything.  In that case,
-    spec parameter does not matter and not required.
+        Parameter `action` takes code reference which is called to process
+        the option.  When called, hash object is passed as `$_`.
 
-        has ARGV => default => [];
-        has "<>" => action => sub {
-            push @{$_->{ARGV}}, $_[0];
-        };
+            has [ qw(left right both) ] => '=i';
+            has "+both" => action => sub {
+                $_->{left} = $_->{right} = $_[1];
+            };
 
-    In fact, `default` parameter takes code reference too.  It is stored
-    in the hash object and the code works almost same.  But the hash value
-    can not be used for option storage.
+        You can use this for `"<>"` to catch everything.  In that case,
+        spec parameter does not matter and not required.
 
-Following parameters are all for data validation.  First `must` is a
-generic validator and can implement anything.  Others are shorthand
-for common rules.
+            has ARGV => default => [];
+            has "<>" => action => sub {
+                push @{$_->{ARGV}}, $_[0];
+            };
 
-- **must** => _coderef_
+        In fact, `default` parameter takes code reference too.  It is stored
+        in the hash object and the code works almost same.  But the hash value
+        can not be used for option storage.
 
-    Parameter `must` takes a code reference to validate option values.
-    It takes same arguments as `action` and returns boolean.  With next
-    example, option **--answer** takes only 42 as a valid value.
+    Following parameters are all for data validation.  First `must` is a
+    generic validator and can implement anything.  Others are shorthand
+    for common rules.
 
-        has answer =>
-            spec => '=i',
-            must => sub { $_[1] == 42 };
+    - **must** => _coderef_ | \[ _codoref_ ... \]
 
-- **min** => _number_
-- **max** => _number_
+        Parameter `must` takes a code reference to validate option values.
+        It takes same arguments as `action` and returns boolean.  With next
+        example, option **--answer** takes only 42 as a valid value.
 
-    Set the minimum and maximum limit for the argument.
+            has answer =>
+                spec => '=i',
+                must => sub { $_[1] == 42 };
 
-- **any** => _arrayref_ | qr/_regex_/
+        If multiple code reference is given, all code have to return true.
 
-    Set the valid string parameter list.  Each item is string or regex
-    reference.  The argument is valid when it is same as, or match to any
-    item of the given list.  If the value is not a arrayref, it is taken
-    as a single item list (regexpref usually).
+            has answer =>
+                spec => '=i',
+                must =>[ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
 
-    Following declarations are almost equivalent, except second one is
-    case insensitive.
+    - **min** => _number_
+    - **max** => _number_
 
-        has question => '=s',
-            any => [ 'life', 'universe', 'everything ];
+        Set the minimum and maximum limit for the argument.
 
-        has question => '=s',
-            any => qr/^(life|universe|everything)$/i;
+    - **any** => _arrayref_ | qr/_regex_/
 
-- **re** => qr/_regex_/
+        Set the valid string parameter list.  Each item is a string or a regex
+        reference.  The argument is valid when it is same as, or match to any
+        item of the given list.  If the value is not an arrayref, it is taken
+        as a single item list (regexpref usually).
 
-    This parameter will be deprecated soon, because **any** works same.
-    Don't use.
+        Following declarations are almost equivalent, except second one is
+        case insensitive.
 
-    Set the required regular expression pattern for the argument.
+            has question => '=s',
+                any => [ 'life', 'universe', 'everything' ];
+
+            has question => '=s',
+                any => qr/^(life|universe|everything)$/i;
+
+        If you are using optional argument, don't forget to include default
+        value in the list.  Otherwise it causes validation error.
+
+            has question => ':s',
+                any => [ 'life', 'universe', 'everything', '' ];
 
 # METHOD
 

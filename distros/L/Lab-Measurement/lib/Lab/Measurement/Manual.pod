@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 OVERVIEW
 
@@ -100,6 +100,8 @@ instruments and the high-level Lab::XPRESS interface
 
 =item * L<Lab::Moose::Sweep::Step::Repeat>
 
+=item * L<Lab::Moose::Sweep::Step::Phase>
+
 =item * L<Lab::Moose::Sweep::Step::Pulsewidth>
 
 =item * L<Lab::Moose::Sweep::Step::Pulsedelay>
@@ -141,6 +143,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 =item * L<Lab::Moose::Instrument::Keysight34470A>
 
 =item * L<Lab::Moose::Instrument::HP34420A>
+
+=item * L<Lab::Moose::Instrument::Keithley2000>
 
 =back
 
@@ -245,6 +249,8 @@ contains support for temperature sensor and He/N2 level meters.
 =item * L<Lab::Moose::Instrument::OI_Triton>
 
 =item * L<Lab::Moose::Instrument::Lakeshore340>
+
+=item * L<Lab::Moose::Instrument::Lakeshore372>
 
 =item * L<Lab::Moose::Instrument::OI_ITC503>
 

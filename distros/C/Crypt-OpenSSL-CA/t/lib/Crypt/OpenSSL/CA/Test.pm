@@ -4,6 +4,9 @@ package Crypt::OpenSSL::CA::Test;
 
 use warnings;
 use strict;
+use Test2::API qw/context/;
+use Test2::Tools::Compare;
+use Test2::Tools::Basic;
 
 =head1 NAME
 
@@ -14,7 +17,7 @@ B<Crypt::OpenSSL::CA::Test> - Testing L<Crypt::OpenSSL::CA>
 =for My::Tests::Below "synopsis" begin
 
   use Crypt::OpenSSL::CA::Test qw(:default %test_der_DNs);
-  use Test::Group;
+  use Test2::V0;
 
   my $utf8 = Crypt::OpenSSL::CA::Test->test_simple_utf8();
 
@@ -23,18 +26,18 @@ B<Crypt::OpenSSL::CA::Test> - Testing L<Crypt::OpenSSL::CA>
   warn "Hello world";
   SCRIPT
 
-  skip_next_test "Devel::Leak needed" if cannot_check_SV_leaks;
-  test "leaky code" => sub {
+  subtest "leaky code" => sub {
+     skip_all "Devel::Leak needed" if cannot_check_SV_leaks;
      leaks_SVs_ok {
         # Do stuff
      }, -max => 6;
   };
 
-  skip_next_test "Devel::Mallinfo needed" if cannot_check_bytes_leaks;
-  test "even leakier code" => sub {
+  subtest "even leakier code" => sub {
+     skip_all "Devel::Mallinfo needed" if cannot_check_bytes_leaks;
      leaks_bytes_ok {
        # Do stuff
-     }, -max => 51200;
+     }, -max => 65536;
   };
 
 =for My::Tests::Below "synopsis" end
@@ -61,9 +64,6 @@ be exported upon request.
 
 =cut
 
-use Test::Builder;
-use Test::More;
-use Test::Group;
 use File::Path ();
 use File::Spec ();
 use File::Slurp ();
@@ -74,6 +74,7 @@ BEGIN {
     our @EXPORT =
         qw(openssl_path run_thru_openssl
            dumpasn1_available run_dumpasn1
+           like_bigint
            run_perl run_perl_ok run_perl_script run_perl_script_ok
            errstack_empty_ok
            certificate_looks_ok
@@ -90,6 +91,7 @@ BEGIN {
                          %test_keys_plaintext %test_keys_password
                          %test_self_signed_certs %test_rootca_certs
                          %test_entity_certs
+                         %test_crls
                          ));
     our %EXPORT_TAGS = ("default" => \@EXPORT);
 }
@@ -170,6 +172,33 @@ sub run_dumpasn1 {
     return $out;
  }
 
+=head2 like_bigint ($text, $bigint)
+
+=head2 like_bigint ($text, $bigint, $testname)
+
+Like L<Test2::Tools::Compare/like>, but find a L<bigint> instead of a
+regex.
+
+Checks whether the bigint C<$bigint> can be found in C<$text> in a
+variety of formats (e.g. decimal or hex, with or without byte
+separators). Reports to the test system like C<like()> would.
+
+=cut
+
+sub like_bigint {
+    my ($text, $bigint, $testname) = @_;
+    $testname ||= "like_bigint";
+
+    my $context = context();
+
+    my $dec = $bigint->bstr;
+    my $hex = $bigint->to_hex;
+    my $hex_sep = join("[:.]", $bigint->to_hex =~ m/../g);
+    my $retval = like($text, qr/(?:$dec|$hex|$hex_sep)/i, $testname);
+
+    $context->release();
+    return $retval;
+}
 
 =head2 run_perl ($scripttext)
 
@@ -234,18 +263,22 @@ sub run_perl_script {
 }
 
 BEGIN { foreach my $functionname (qw(run_perl run_perl_script)) {
-  my $ok_wrapper = sub {
-    my ($code, $outref, $testname) = @_;
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    $testname ||= $functionname;
-    my $out = __PACKAGE__->can($functionname)->($code);
-    $$outref = $out if ref($outref) eq "SCALAR";
-    my $retval = is($?, 0, $testname);
-    diag($out) if ! $retval;
-    return $retval;
-  };
-  no strict "refs";
-  *{"${functionname}_ok"} = $ok_wrapper;
+    my $ok_wrapper = sub {
+        my ($script_or_file, $outref, $testname) = @_;
+        $testname ||= $functionname;
+
+        my $context = context();
+        my $out = __PACKAGE__->can($functionname)->($script_or_file);
+        $$outref = $out if ref($outref) eq "SCALAR";
+        if ($?) {
+            return $context->fail_and_release($testname, "exited with code $?", $out);
+        } else {
+            return $context->pass_and_release($testname);
+        }
+    };
+
+    no strict "refs";
+    *{"${functionname}_ok"} = $ok_wrapper;
 }}
 
 =head2 _perl_cmdline ()
@@ -298,17 +331,19 @@ be run at the end of every test.
 =cut
 
 sub errstack_empty_ok {
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    # Net::SSLeay provides an undocumented access to OpenSSL's ERR_
-    # API.  Fortunately, thanks to my newly acquired XS-Fu, reading
-    # the source was a piece of cake!
+    my $context = context();
+
+    my @ssleay_errors;
     require Net::SSLeay;
-    my $errcount = 0;
     while(my $error = Net::SSLeay::ERR_get_error()) {
-        diag(Net::SSLeay::ERR_error_string($error));
-        $errcount++;
+        push(@ssleay_errors, $error);
     }
-    return is($errcount, 0, "number of errors found on OpenSSL's stack");
+    if (@ssleay_errors) {
+        return $context->fail_and_release("Errors found on OpenSSL's stack",
+                                          @ssleay_errors);
+    } else {
+        return $context->pass_and_release("No errors found on OpenSSL's stack");
+    }
 }
 
 =head2 cannot_check_SV_leaks ()
@@ -344,7 +379,7 @@ Available named arguments are:
 
 =item I<< -name => $testname >>
 
-The name of the test, as in the second argument to L<Test::Builder/ok>.
+The name of the test, as in the second argument to L<Test2::V0/ok>.
 
 =item I<< -max => $threshold >>
 
@@ -358,12 +393,24 @@ needs a couple of SVs of its own.
 
 sub leaks_SVs_ok (&@) {
     my ($coderef, %args) = @_;
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $testname = $args{-name} || "leaks_SVs_ok";
+
+    my $context = context();
+
     require Devel::Leak;
     my $handle; my $count = Devel::Leak::NoteSV($handle);
     $coderef->();
-    my $consumed_SVs = Devel::Leak::CheckSV($handle) - $count;
-    cmp_ok($consumed_SVs, "<=", ($args{-max} || 6), ($args{-name} || "leaks_SVs_ok"));
+
+    my $leaked = Devel::Leak::CheckSV($handle) - $count;
+    my $tolerated = $args{-max} || 6;
+
+    if ($leaked > $tolerated) {
+        return $context->fail_and_release(
+          $testname,
+          "Too many scalars leaked ($leaked, max $tolerated)");
+    }
+
+    return $context->pass_and_release($testname);
 }
 
 
@@ -382,11 +429,11 @@ Available named arguments are:
 
 =item I<< -name => $testname >>
 
-The name of the test, as in the second argument to L<Test::Builder/ok>.
+The name of the test, as in the second argument to L<Test2::V0/ok>.
 
 =item I<< -max => $threshold >>
 
-The minimum number of leaked bytes to look for.  The default is 51200.
+The minimum number of leaked bytes to look for.  The default is 65536.
 Setting this too low will trigger false positives, as Perl does some
 funky memory management eg in hash tables and that may cause jitter in
 the memory consumption as measured from malloc's point of view.
@@ -395,20 +442,33 @@ the memory consumption as measured from malloc's point of view.
 
 =cut
 
+sub _total_heap_size() {
+    require Devel::Mallinfo;
+    my $mallinfo = Devel::Mallinfo::mallinfo();
+    # From the perldoc of Devel::Mallinfo:
+    return $mallinfo->{uordblks}+$mallinfo->{usmblks}+$mallinfo->{hblkhd};
+}
+
 sub leaks_bytes_ok (&@) {
     my ($coderef, %args) = @_;
-    require Devel::Mallinfo;
+    my $testname = $args{-name} || "leaks_bytes_ok";
 
-    my $size_before = Devel::Mallinfo::mallinfo()->{uordblks} || 0;
+    my $context = context();
 
+    my $size_before = _total_heap_size;
     $coderef->();
+    my $size_after = _total_heap_size;
 
-    my $size_after = Devel::Mallinfo::mallinfo()->{uordblks} || 0;
+    my $leaked = $size_after - $size_before;
+    my $tolerated = $args{-max} || 65536;
 
-    my $consumption = $size_after - $size_before;
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    cmp_ok($consumption, "<", ($args{-max} || 51200),
-          $args{-name} || "leaks_bytes_ok");
+    if ($leaked > $tolerated) {
+        return $context->fail_and_release(
+          $testname,
+          "Too many bytes leaked ($leaked, max $tolerated)");
+    }
+
+    return $context->pass_and_release($testname);
 }
 
 =head2 certificate_looks_ok ($pem_certificate)
@@ -425,19 +485,28 @@ sub certificate_looks_ok {
     my ($pem_certificate, $test_name) = @_;
 
     $test_name ||= "certificate_looks_ok";
-    test $test_name => sub {
-        my ($out, $err);
-        ($out, $err) =
-            run_thru_openssl($pem_certificate, qw(x509 -noout -text));
-        unless (is($?, 0, "openssl execution failed with code $?")) {
-            diag $err;
-            return;
-        }
-        unlike($out, qr/error/,
-             "openssl seemed to dislike the certificate");
-        like($out, qr/Certificate:/,
-             "openssl seemed not to be able to parse the certificate");
-    };
+
+    my $context = context();
+    my ($out, $err) =
+      run_thru_openssl($pem_certificate, qw(x509 -noout -text));
+    if ($? != 0) {
+        return $context->fail_and_release($test_name,
+                                          "openssl execution failed with code $?");
+    }
+    if ($out =~ m/error/) {
+        return $context->fail_and_release(
+            $test_name,
+            "openssl appears to have shown an error",
+           $out, $err);
+
+    } elsif ($out !~ m/Certificate:/) {
+        return $context->fail_and_release(
+            $test_name,
+            "openssl could not seem to parse the certificate",
+           $out, $err);
+    } else {
+        return $context->pass_and_release($test_name);
+    }
 }
 
 =head2 certificate_chain_ok ($pem_certificate, \@certchain )
@@ -453,21 +522,28 @@ passed as a reference.
 sub certificate_chain_ok {
     my ($cert, $certchain, $testname) = @_;
 
-    test (($testname || "certificate_chain_ok") => sub {
-        my $out = _run_openssl_verify($cert, $certchain, $testname);
-        return if ! defined $out; # Already failed
-        like($out, qr/OK/, "verify successful");
-        unlike($out, qr/error/, "no errors");
-    });
+    my $context = context();
+
+    my $out = _run_openssl_verify($cert, $certchain, $testname);
+    do { $context->release; return } if (! defined $out);  # Failed on previous line
+
+    if ($out =~ m/error/) {
+        return $context->fail_and_release($testname, "openssl found errors", $out);
+    } elsif ($out !~ m/OK/) {
+        return $context->fail_and_release($testname, "openssl did not verify OK", $out);
+    } else {
+        return $context->pass_and_release($testname);
+    }
 }
 
 sub _run_openssl_verify {
     my ($cert, $certchain, $testname) = @_;
 
-    # This is mostly a hack to get the test suite to
-    # work, but CA:FALSE certificates *really* should
-    # not be made part of a certification chain.
+    my $context = context();
 
+    # Filter out CA:FALSE certificates - mostly a hack to get the test
+    # suite to work; but such certs *really* should not be used in an
+    # actual certification chain.
     my @certchain = grep {
         my $out = run_thru_openssl($_, qw(x509 -noout -text));
         ( $out =~ m/CA:TRUE/ ) ? 1 : (warn(<<"WARNING"), 0);
@@ -475,14 +551,20 @@ ${$testname ? \"$testname: " : \""}Ignoring a non-CA certificate that was
 passed as part of the chain.
 WARNING
     } @$certchain;
-    fail("no remaining certificates in chain"), return undef
-        if ! @certchain;
+
+    do {
+        $context->fail_and_release(
+            $testname,
+            "no remaining certificates in chain");
+        return
+     } if ! @certchain;
 
     my $bundlefile = File::Spec->catfile
         (_tempdir(), sprintf("ca-bundle-%d-%d.crt", $$,
                              _unique_number()));
     File::Slurp::write_file($bundlefile,
                             join("\n", @certchain));
+    $context->release();
     return scalar run_thru_openssl($cert, qw(verify),
                                    -CAfile => $bundlefile);
 }
@@ -500,11 +582,17 @@ doesn't contain any B<valid> CA certificate.
 sub certificate_chain_invalid_ok {
     my ($cert, $certchain, $testname) = @_;
 
-    test (($testname || "certificate_chain_ok") => sub {
-        my $out = _run_openssl_verify($cert, $certchain, $testname);
-        return if ! defined $out; # Already failed
-        like($out, qr/error/, "verify failed as expected");
-    });
+    my $context = context();
+    my $out = _run_openssl_verify($cert, $certchain, $testname);
+    do { $context->release;  return } if ! defined $out; # Failed on previous line
+
+    if ($out =~ m/error/) {
+        return $context->pass_and_release($testname);
+    } else {
+        return $context->fail_and_release($testname,
+                                          'unexpected success of `openssl verify`',
+                                         $out);
+    }
 }
 
 =head2 x509_schema ()
@@ -1157,15 +1245,23 @@ if using the following C<openssl> command:
     -extensions usr_cert
 
 where 10958 stands for a validity period of 30 years, so that these
-self-signed certificates seldom actually expire.  Because the default
-configuration is used, the world-famous yet Belgian I<Internet Widgits
-Pty Ltd> company is put in charge as issuer and subject of these
-certificates.
+self-signed certificates seldom actually expire.
+
+The valus in this hash are actually objects, where the certificate in
+pem format is e.g. C<< $test_self_signed_certs{rsa1024}->{pem} >>.
+Other keys are available to tests, such as
+C<<$test_self_signed_certs{rsa1024}->{serial} >> (in the format that
+L<Crypt::OpenSSL::CA/get_serial> outputs).
+
+Because OpenSSL's default configuration was used, the world-famous yet
+Belgian I<Internet Widgits Pty Ltd> company is put in charge as issuer
+and subject of these certificates.
 
 =cut
 
 our %test_self_signed_certs =
-    (rsa1024 => <<"RSA1024",
+    (rsa1024 => {
+        pem => <<"RSA1024",
 -----BEGIN CERTIFICATE-----
 MIICgzCCAeygAwIBAgIJAPecvJ1g5yDDMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
 BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
@@ -1183,7 +1279,10 @@ e9WIdiVrEIk9kvp4cgnwCF0O/K02/BIpq5MlqSXwGQhQ/o29J4/A4/LobcLDYr11
 mGZJJpjA9oDx7sZF6FbTTa5E+tXZRls=
 -----END CERTIFICATE-----
 RSA1024
-     rsa2048 => <<"RSA2048",
+        serial => "0xf79cbc9d60e720c3",
+    },
+     rsa2048 => {
+         pem => <<"RSA2048",
 -----BEGIN CERTIFICATE-----
 MIIDiDCCAnCgAwIBAgIJAL6sAb2vcVpUMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
 BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
@@ -1206,6 +1305,8 @@ abDMwiOqndnPFfSNFTWue9PcgpMoT3V+eq6VN0Q6AyPZxkfzVg+VUISli0sXNMKB
 KjI6FX0+FXEYyhmsnkAq83kVYop/ietw/mvJkF1xxpkv/urU2AagNVmaxuo=
 -----END CERTIFICATE-----
 RSA2048
+         serial => "0xbeac01bdaf715a54",
+     },
 );
 
 =head2 %test_rootca_certs
@@ -1222,7 +1323,8 @@ valid certification chain as per RFC3280 section 6.1.4, item k.
 =cut
 
 our %test_rootca_certs =
-    (rsa1024 => <<RSA1024,
+    (rsa1024 => {
+        pem => <<RSA1024,
 -----BEGIN CERTIFICATE-----
 MIICsDCCAhmgAwIBAgIJANdqtXzdPS/1MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
 BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
@@ -1241,7 +1343,10 @@ yP4YeUHO6FIHd0RyGEnM3cqcoqg8TewXlUwOkHphCrZ5eFbxxEarVz1wwkZqd5z0
 3IInE3EJ7D8rxfbC1c1fdeh8akI=
 -----END CERTIFICATE-----
 RSA1024
-     rsa2048 => <<RSA2048,
+        serial => "0xd76ab57cdd3d2ff",
+    },
+     rsa2048 => {
+         pem => <<RSA2048,
 -----BEGIN CERTIFICATE-----
 MIIDtTCCAp2gAwIBAgIJAJcq/w5w2Nr3MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
 BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
@@ -1265,6 +1370,8 @@ V1K1Plj27fEC57i71qygF+UogYd802DM/5F76OHKN4CAq54UFSzfzpcjOsYZLCG7
 tKVO4zFWPkXPhdh7brNIn19ayoyESq59WuZhPwZkzOZgaFrHeQA2Dks=
 -----END CERTIFICATE-----
 RSA2048
+         serial => "0x972aff0e70d8daf7"
+     },
 );
 
 =head2 %test_entity_certs
@@ -1279,14 +1386,15 @@ precise C<openssl> commands used are
     -key test.key | \
   openssl ca -batch -days 10958 -in /dev/stdin
 
+The structure of keys in C<%test_entity_certs> is the same as above, i.e. C<< ->{pem} >>
 In particular this means that entries keyed off the same identifier in
 %test_entity_certs and %test_rootca_certs form a valid RFC3280
 certification path: that is,
 
 =for My::Tests::Below "certificate_chain_ok" begin
 
-  certificate_chain_ok($test_entity_certs{$id},
-                       [ $test_rootca_certs{$id} ]);     # Works
+  certificate_chain_ok($test_entity_certs{$id}->{pem},
+                       [ $test_rootca_certs{$id}->{pem} ]);     # Works
 
 =for My::Tests::Below "certificate_chain_ok" end
 
@@ -1294,8 +1402,8 @@ holds for every valid $id.  But conversely,
 
 =for My::Tests::Below "certificate_chain_notok" begin
 
-  certificate_chain_ok($test_entity_certs{$id},
-                       [ $test_self_signed_certs{$id} ]);     # NOT OK!
+  certificate_chain_ok($test_entity_certs{$id}->{pem},
+                       [ $test_self_signed_certs{$id}->{pem} ]);     # NOT OK!
 
 =for My::Tests::Below "certificate_chain_notok" end
 
@@ -1312,7 +1420,8 @@ have the same private key.
 =cut
 
 our %test_entity_certs =
-    (rsa1024 => <<RSA1024,
+    (rsa1024 => {
+        pem => <<RSA1024,
 -----BEGIN CERTIFICATE-----
 MIICjjCCAfegAwIBAgIBCTANBgkqhkiG9w0BAQUFADBFMQswCQYDVQQGEwJBVTET
 MBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50ZXJuZXQgV2lkZ2l0cyBQ
@@ -1330,7 +1439,10 @@ isSmjCE7Z9D+9i2SQxzcvrG05gLQRAqS1bRAIHfcoBuGS5B+PvbNhzPTly24NvVp
 HSsnQD5qXQq4V/p1hq9OoeCpiQBgOa5wODkpNubGe7k3wQ==
 -----END CERTIFICATE-----
 RSA1024
-     rsa2048 => <<RSA2048,
+        serial => "0x9",
+    },
+     rsa2048 => {
+         pem => <<RSA2048,
 -----BEGIN CERTIFICATE-----
 MIIDkzCCAnugAwIBAgIBCjANBgkqhkiG9w0BAQUFADBFMQswCQYDVQQGEwJBVTET
 MBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50ZXJuZXQgV2lkZ2l0cyBQ
@@ -1354,7 +1466,256 @@ JjghMlFGnm/wZG5zD1adjIvw66GqKsxPWml2Tc3azZMpobKYCS91h6WT19kZIC5Y
 valACunSZw==
 -----END CERTIFICATE-----
 RSA2048
-     );
+         serial => "0xa",
+     }
+    );
+
+=head2 %test_crls
+
+A CRL in PEM form, obtained from
+
+   curl http://www.pki.admin.ch/crl/QualifiedCA01.crl | \
+      openssl crl -inform der -outform pem
+
+=cut
+
+use Math::BigInt;
+
+our %test_crls = (
+    "admin.ch" => {
+        version => 2,
+        serial => Math::BigInt->new("127846341100834570311323984495921677294"),
+        issuer_DN => "/C=CH/O=Admin/OU=Services/OU=Certification Authorities/CN=Swiss Government Qualified CA 01",
+        lastUpdate => "20200526074124Z",
+        nextUpdate => "20200602074124Z",
+        num_revoked => 224,
+        revoked_ext_count_rle => [
+            # i.e. 153 entries with 0 CRL extensions, followed by 2
+            # with one extension, followed by another 17 with 0
+            # extensions, etc:
+            { ext_count => 0, count => 153 },
+            { ext_count => 1, count => 2 },
+            { ext_count => 0, count => 17 },
+            { ext_count => 1, count => 52 }
+           ],
+        pem => <<TEST_CRL,
+-----BEGIN X509 CRL-----
+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
+MTEwMjAyWjA9AhBpY54tWdNHi87LvhX9gFhYFw0xOTEyMzExMTAyMDRaMBowGAYD
+VR0YBBEYDzIwMTkxMjMxMTEwMjA0WjA9AhBIEsSd9qmU78CcFDAfPbh5Fw0xOTEy
+MzExMTAyMDRaMBowGAYDVR0YBBEYDzIwMTkxMjMxMTEwMjA0WjA9AhAq3Fewxmkq
+ov/2Akfcm8SXFw0xOTEyMzExMTAyMDVaMBowGAYDVR0YBBEYDzIwMTkxMjMxMTEw
+MjA1WjA9AhAuLd5GdCBh96qbsIbXfFhTFw0xOTEyMzExMTAyMDZaMBowGAYDVR0Y
+BBEYDzIwMTkxMjMxMTEwMjA2WjA9AhAWKGLPI4zRKBbjXg47eV97Fw0xOTEyMzEx
+MTAyMDZaMBowGAYDVR0YBBEYDzIwMTkxMjMxMTEwMjA2WjA9AhAlF2LOaIjeHd8V
++7w0iBEhFw0xOTEyMzExMTAyMDdaMBowGAYDVR0YBBEYDzIwMTkxMjMxMTEwMjA3
+WjA9AhALvxPFDBcBgMuSSUWXrIpAFw0xOTEyMzExMTAyMDhaMBowGAYDVR0YBBEY
+DzIwMTkxMjMxMTEwMjA4WjA9AhAP62aqupeXLIMs2Ut06NIIFw0xOTEyMzExMTAy
+MDlaMBowGAYDVR0YBBEYDzIwMTkxMjMxMTEwMjA5WjA9AhBD2fLpVRwOyv/VhaF+
+1PxVFw0xOTEyMzExMTAyMDlaMBowGAYDVR0YBBEYDzIwMTkxMjMxMTEwMjA5WjA9
+AhB+Jt5NhBsZJWk8A1IVzZJaFw0xOTEyMzExMTAyMTBaMBowGAYDVR0YBBEYDzIw
+MTkxMjMxMTEwMjEwWjA9AhB2S1AUJb05UIcwzNTRxg2OFw0xOTEyMzExMTAyMTFa
+MBowGAYDVR0YBBEYDzIwMTkxMjMxMTEwMjExWjA9AhAmAe2Iv99Ye8kW4T8ZLOj3
+Fw0xOTEyMzExMTAyMTJaMBowGAYDVR0YBBEYDzIwMTkxMjMxMTEwMjEyWjA9AhA5
+kVy0r7BmKGUKpYgB/JdDFw0xOTEyMzExMTAyMTJaMBowGAYDVR0YBBEYDzIwMTkx
+MjMxMTEwMjEyWjA9AhABLIDfRmLwiVu+rKgiAvrsFw0xOTEyMzExMTAyMTNaMBow
+GAYDVR0YBBEYDzIwMTkxMjMxMTEwMjEzWjA9AhBOYf2YqO0ksLMaiujAwxWSFw0x
+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
+lpwuC4tM2KFN
+-----END X509 CRL-----
+TEST_CRL
+    }
+);
 
 =head1 INTERNAL METHODS
 
@@ -1403,8 +1764,7 @@ __END__
 
 =cut
 
-use Test::More "no_plan";
-use Test::Group;
+use Test2::V0;
 use Crypt::OpenSSL::CA::Test;
 
 =head2 Fixture Tests
@@ -1413,10 +1773,10 @@ use Crypt::OpenSSL::CA::Test;
 
 =cut
 
-test "run_thru_openssl" => sub {
+subtest "run_thru_openssl" => sub {
 	my $version = run_thru_openssl(undef, "version");
     is($?, 0);
-    like($version, qr/openssl/i);
+    like($version, qr/(open|libre)ssl/i);
     unlike($version, qr/uninitialized/); # In case there is some barfage
     # going on in the forked Perls...
 
@@ -1435,7 +1795,7 @@ test "run_thru_openssl" => sub {
     isnt($?, 0);
 };
 
-test "run_perl and run_perl_ok" => sub {
+subtest "run_perl and run_perl_ok" => sub {
     my $out;
     run_perl_ok(<<"SCRIPT_OK", \$out);
 print "hello"; # STDOUT
@@ -1446,7 +1806,7 @@ SCRIPT_OK
     my $tempdir = My::Tests::Below->tempdir;
 
     $out = run_perl(<<"SCRIPT_WRAPPER");
-use Test::More no_plan => 1;
+use Test2::V0;
 use Crypt::OpenSSL::CA::Test qw(run_perl_ok);
 
 run_perl_ok <<'SCRIPT_OK';
@@ -1458,7 +1818,8 @@ run_perl_ok <<'SCRIPT_NOT_OK';
 die "argl";
 SCRIPT_NOT_OK
 
-exit(1);
+done_testing;
+
 SCRIPT_WRAPPER
     isnt($?, 0, "run_perl: that script shall exit with nonzero status");
     like($out, qr/not ok 2/m);
@@ -1471,15 +1832,17 @@ SCRIPT_WRAPPER
 
 };
 
-test "errstack_empty_ok" => sub {
+subtest "errstack_empty_ok" => sub {
     errstack_empty_ok();
     my $out = run_perl(<<"SCRIPT_NOT_OK");
-use Test::More no_plan => 1;
+use Test2::V0;
 use Crypt::OpenSSL::CA::Test qw(errstack_empty_ok);
 use Net::SSLeay;
 
 is(Net::SSLeay::BIO_new_file("/no/such/file_", "r"), 0); # OK
 errstack_empty_ok(); # not OK
+
+done_testing;
 
 SCRIPT_NOT_OK
 
@@ -1492,7 +1855,7 @@ SCRIPT_NOT_OK
            "errors are reported at the proper stack depth");
 };
 
-test "certificate_looks_ok" => sub {
+subtest "certificate_looks_ok" => sub {
     my $ok_cert = <<'OK_CERT';
 -----BEGIN CERTIFICATE-----
 MIICsDCCAhmgAwIBAgIJAPV18QziY9UvMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
@@ -1519,7 +1882,7 @@ OK_CERT
     my $out = run_perl(<<"SCRIPT");
 use strict;
 use warnings;
-use Test::More no_plan => 1;
+use Test2::V0;
 use Crypt::OpenSSL::CA::Test qw(certificate_looks_ok);
 
 my \$certificate = <<'OK_CERT';
@@ -1544,6 +1907,9 @@ certificate_looks_ok(\$certificate, "REGRESSION: dud cert");
          # expecting not OK, lest REGRESSION
 
 certificate_looks_ok({}, "Should have thrown (bad input)"); # Should throw
+
+done_testing;
+
 SCRIPT
 
     like($out, qr/^ok 1/m);
@@ -1558,16 +1924,16 @@ SCRIPT
 
 =cut
 
-begin_skipping_tests unless
-    eval { require Devel::Leak; require Devel::Mallinfo; };
-test "no leak" => sub {
+subtest "no leak" => sub {
+    skip_all "Cannot check leaks" unless
+      eval { require Devel::Leak; require Devel::Mallinfo; };
     leaks_SVs_ok { };
     leaks_bytes_ok { };
 };
 
-test "leaking scalars" => sub {
+subtest "leaking scalars" => sub {
     my $leakyscript = <<'LEAKYSCRIPT';
-use Test::More no_plan => 1;
+use Test2::V0;
 use Crypt::OpenSSL::CA::Test;
 sub leak {
    for (1..20) {
@@ -1579,6 +1945,8 @@ sub leak {
 
 leaks_bytes_ok { leak };
 leaks_SVs_ok { leak };
+
+done_testing;
 LEAKYSCRIPT
 
     my $out = run_perl($leakyscript);
@@ -1590,19 +1958,34 @@ LEAKYSCRIPT
            "errors are reported at the proper stack depth");
 };
 
-skip_next_test if cannot_check_bytes_leaks; # Eg MacOS
-test "leaking bytes" => sub {
+subtest "leaking bytes" => sub {
+    skip_all "Cannot check bytes leaks" if cannot_check_bytes_leaks; # Eg MacOS
     my $leakyscript = <<'LEAKYSCRIPT';
-use Test::More no_plan => 1;
+
+use Test2::V0;
 use Crypt::OpenSSL::CA::Test;
-sub leak {
-    # Perl is getting smarter and smarter in memory mgmt, and we need
-    # to ward off constant folding for that test to fail as expected:
-    push(our @a, "abcde" x (10000 + scalar @a));
+
+leaks_bytes_ok (sub { leak() });
+leaks_SVs_ok (sub { leak() });
+
+done_testing;
+
+use Inline "C";
+
+__END__
+__C__
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void leak() {
+  fprintf(stderr, "Leaking...");
+  for(int i = 0; i < 10000; i++) {
+     fmemopen(NULL, 256, "w");
+  }
+  fprintf(stderr, "Leaked.");
 }
 
-leaks_bytes_ok { leak() };
-leaks_SVs_ok { leak() };
 LEAKYSCRIPT
 
     my $out = run_perl($leakyscript);
@@ -1613,7 +1996,7 @@ LEAKYSCRIPT
            "errors are reported at the proper stack depth");
 };
 
-my $cert_pem = $Crypt::OpenSSL::CA::Test::test_self_signed_certs{"rsa1024"};
+my $cert_pem = $Crypt::OpenSSL::CA::Test::test_self_signed_certs{"rsa1024"}->{pem};
 
 # REFACTORME into Crypt::OpenSSL::CA::Test::pem2der or something
 my $cert_der = do {
@@ -1624,7 +2007,7 @@ my $cert_der = do {
     MIME::Base64::decode_base64($_);
 };
 
-test "x509_decoder" => sub {
+subtest "x509_decoder" => sub {
     use MIME::Base64;
     my $decoder = Crypt::OpenSSL::CA::Test::x509_decoder('Certificate');
     ok($decoder->can("decode"));
@@ -1639,14 +2022,13 @@ test "x509_decoder" => sub {
 
 =cut
 
-test "synopsis" => sub {
-    # Thank you Test::Group for being fully reflexive!
+subtest "synopsis" => sub {
     eval My::Tests::Below->pod_code_snippet("synopsis");
     die $@ if $@;
 };
 
 
-test "synopsis asn1" => sub {
+subtest "synopsis asn1" => sub {
     my $synopsis = My::Tests::Below->pod_code_snippet("synopsis-asn1");
     ok(defined(my $dn_der =
        $Crypt::OpenSSL::CA::Test::test_der_DNs{"CN=Zoinx,C=fr"}),
@@ -1659,7 +2041,7 @@ test "synopsis asn1" => sub {
 
 =cut
 
-test "test_simple_utf8 and test_bmp_utf8" => sub {
+subtest "test_simple_utf8 and test_bmp_utf8" => sub {
     is(length(Crypt::OpenSSL::CA::Test->test_simple_utf8()), 6);
     ok(utf8::is_utf8(Crypt::OpenSSL::CA::Test->test_simple_utf8()));
 
@@ -1667,11 +2049,10 @@ test "test_simple_utf8 and test_bmp_utf8" => sub {
     ok(utf8::is_utf8(Crypt::OpenSSL::CA::Test->test_bmp_utf8()));
 };
 
-test "%test_keys_plaintext and %test_keys_password" => sub {
-    is_deeply
-        ([sort keys %Crypt::OpenSSL::CA::Test::test_keys_plaintext],
-         [sort keys %Crypt::OpenSSL::CA::Test::test_keys_password],
-         "same keys in both");
+subtest "%test_keys_plaintext and %test_keys_password" => sub {
+    is([sort keys %Crypt::OpenSSL::CA::Test::test_keys_plaintext],
+       [sort keys %Crypt::OpenSSL::CA::Test::test_keys_password],
+       "same keys in both");
     if (defined(my $openssl_bin = openssl_path)) {
         while(my ($k, $v) =
               each %Crypt::OpenSSL::CA::Test::test_keys_password) {
@@ -1683,25 +2064,27 @@ test "%test_keys_plaintext and %test_keys_password" => sub {
     }
 };
 
-test "certificate_chain_ok and test certificates" => sub {
+subtest "certificate_chain_ok and test certificates" => sub {
     my @keyids = keys %Crypt::OpenSSL::CA::Test::test_rootca_certs;
     foreach my $id (@keyids) {
         certificate_chain_ok
-            ($Crypt::OpenSSL::CA::Test::test_entity_certs{$id},
-           [ $Crypt::OpenSSL::CA::Test::test_rootca_certs{$id} ]);
+            ($Crypt::OpenSSL::CA::Test::test_entity_certs{$id}->{pem},
+           [ $Crypt::OpenSSL::CA::Test::test_rootca_certs{$id}->{pem} ]);
     }
 
     my ($snippet_ok, $snippet_not_ok) =
         map { My::Tests::Below->pod_code_snippet($_) }
             (qw(certificate_chain_ok certificate_chain_notok));
     my $out = run_perl(<<"SCRIPT");
-use Test::More no_plan => 1;
+use Test2::V0;
 use Crypt::OpenSSL::CA::Test qw(certificate_chain_ok
        %test_rootca_certs %test_self_signed_certs %test_entity_certs);
 foreach my \$id (qw(${\join(" ", @keyids)})) {
     $snippet_ok
     $snippet_not_ok
 }
+
+done_testing;
 SCRIPT
     for my $i (0..$#keyids) {
         my $success = 2 * $i + 1;
@@ -1710,3 +2093,5 @@ SCRIPT
         like($out, qr/^not ok $failure/m);
     }
 };
+
+done_testing;

@@ -1,0 +1,75 @@
+NAME
+
+    Syntax::Keyword::MultiSub - multiple dispatch on subroutines
+
+SYNOPSIS
+
+       use v5.26;
+       use Syntax::Keyword::MultiSub;
+       use experimental 'signatures';
+    
+       multi sub max()          { return undef; }
+       multi sub max($x)        { return $x; }
+       multi sub max($x, @more) { my $y = max(@more);
+                                  return $x > $y ? $x : $y; }
+    
+       say max(1, 2, 15, 3, 4);  # prints 15
+
+DESCRIPTION
+
+    This module provides a new keyword, multi, to put before subroutine
+    declarations, which permits multiple distinct function bodies to be
+    provided, which take different parameters. A call to a multi sub will
+    invoke whichever function body best fits the arguments passed.
+
+    Currently this module can only make dispatching decisions based on the
+    number of arguments as compared to the number of signature parameters
+    each body was expecting. It requires perl version 5.26 or above, in
+    order to get enough support from signatures. Note also enabling this
+    module does not enable the signatures feature; you must do that
+    independently.
+
+KEYWORDS
+
+ multi
+
+       multi sub NAME (SIGNATURE) { BODY... }
+
+    Declares an alternative for the multi sub of the given name. Each
+    alternative will be distinguished by the number of parameters its
+    signature declares. If the signature includes optional parameters, this
+    alternative is considered to cover the entire range from none to all of
+    the optional ones being present. The ranges of parameter count covered
+    by every alternative to a given function name must be non-overlapping;
+    it is a compiletime error for two function bodies to claim the same
+    number of parameters.
+
+    Each of the non-final alternatives for any given name must use only
+    scalar parameters (though some may be optional); but as a special-case,
+    the final alternative may end in a slurpy parameter (either an array or
+    a hash). If this is the case then it will be considered for dispatch if
+    none of the previous alternatives match, as long as it has at least the
+    minimum number of required parameters present.
+
+TODO
+
+      * Much better error checking and diagnostics for function bodies that
+      don't use signatures.
+
+      * Cross-module testing with Future::AsyncAwait (for async multi sub)
+      and Object::Pad (for multi method).
+
+      * An eventual consideration of type assertions or value testing, as
+      well as simple argument count.
+
+      This particular task is likely to be a large undertaking as it spans
+      several other areas of language. As well as types on parameters, it
+      would be nice to put them on lexical variables, object slots,
+      match/case comparisons, and so on. It would be a shame to invent a
+      special mechanism for one of these areas that could not be reüsed by
+      the others.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

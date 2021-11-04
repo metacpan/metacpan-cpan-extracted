@@ -1,5 +1,13 @@
 Revision history for CGI-Info
 
+0.73	Fri Oct 29 07:32:37 EDT 2021
+	Attempt to fix https://www.cpantesters.org/cpan/report/6db47260-389e-11ec-bc66-57723b537541
+
+0.72	Thu Oct 28 09:08:43 EDT 2021
+	More sensible default statuses when params() has yet to be called
+	Ensure \u0026 is interpreted as &
+	Use JSON::MaybeXS instead of JSON
+
 0.71	Wed Feb  3 15:14:13 EST 2021
 	Added t/fixme.t
 	Use JSON module instead of JSON::Parse as the latter has dropped support for Solaris

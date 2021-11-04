@@ -7,7 +7,7 @@ my(%param, $emv, $name);
 %param = (
     NAME                   => 'Config::Validator',
     AUTHOR                 => 'Lionel Cons <lionel.cons@cern.ch>',
-    VERSION                => '1.3',
+    VERSION                => '1.4',
     ABSTRACT_FROM          => 'lib/Config/Validator.pm',
     LICENSE                => 'perl',
     PL_FILES               => {},

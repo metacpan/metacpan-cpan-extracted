@@ -8,7 +8,7 @@ use warnings;
 
 use lib qw(lib t);
 
-use Test::More tests => 36;
+use Test::More;
 
 use MIME::Types;
 my $a = MIME::Types->new;
@@ -48,6 +48,12 @@ else
 {   is($q->type, 'application/msword');
 }
 is($a->mimeTypeOf('my.lzh')->type, 'application/x-lzh');
+
+# Generated output may not be stable.
+is($a->mimeTypeOf('webm')->type,   'video/x-webm');
+is($a->mimeTypeOf('b.webm')->type, 'video/x-webm');
+is($a->mimeTypeOf('b.weba')->type, 'audio/x-webm');
+is($a->mimeTypeOf('b.webp')->type, 'image/x-webp');
 
 my $warn;
 my $r2 = MIME::Type->new(type => 'text/x-fake2');
@@ -98,3 +104,5 @@ my $r7 = $a->type('application/vnd.openxmlformats-officedocument.spreadsheetml.s
 ok($r7, 'type sheet');
 ok($r7->isBinary);
 ok(!$r7->isText);
+
+done_testing;

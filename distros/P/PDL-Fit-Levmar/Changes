@@ -1,3 +1,26 @@
+0.0103 2021-10-23
+- even smaller value as 27 still fails on Windows
+
+0.0102 2021-10-23
+- change t/thread.t input value from 28 to 27 to avoid levmar-2.6 giving "singular matrix" failure
+
+0.0101 2021-10-14
+- fix for PDL >2.057
+- build fixes
+- use Test::More
+- fix compile warnings
+- use File::Temp not hardcoded "tempcode" dir
+- use SetSV_PDL not copy-paste from pdlcore.c
+- upgrade upstream source to levmar 2.6 (with HAVE_LAPACK commented out)
+- fix RT#107986: FIXB with array-ref UB/LB were broken
+
+0.0100 2018-03-24
+- CPAN indexing fixes
+- fix func.pd with pp_done() - thanks @shawnlaffan
+
+0.0098 2015-11-29
+- use PDL_Indx
+
 0.0096
     Mon Dec 17 20:54:48 CET 2012
   - fix bug reported by Edward Baudrez. Comment is in

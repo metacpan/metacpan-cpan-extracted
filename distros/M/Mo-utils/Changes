@@ -1,3 +1,13 @@
+0.05 2021-10-19T13:07:37+02:00
+ - Fix existing of key in check_length().
+ - Fix undefined value in check_length().
+
+0.04 2021-10-19T12:59:57+02:00
+ - Add check_length().
+ - Add example for check_number_of_items().
+ - Add test for check_isa(). Testing of another object.
+ - Improve description for check_number_of_items().
+
 0.03 2020-12-11T14:10:51+01:00
  - Add support for '+10' syntax of number to check_number().
  - Add support for floating numbers to check_number().

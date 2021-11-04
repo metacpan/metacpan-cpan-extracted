@@ -45,6 +45,6 @@
          "url" : "http://github.com/rurban/b-keywords"
       }
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

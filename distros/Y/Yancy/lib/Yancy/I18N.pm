@@ -1,5 +1,5 @@
 package Yancy::I18N;
-our $VERSION = '1.077';
+our $VERSION = '1.084';
 # ABSTRACT: Internationalization (i18n) for Yancy
 
 #pod =head1 SYNOPSIS
@@ -62,7 +62,7 @@ Yancy::I18N - Internationalization (i18n) for Yancy
 
 =head1 VERSION
 
-version 1.077
+version 1.084
 
 =head1 SYNOPSIS
 

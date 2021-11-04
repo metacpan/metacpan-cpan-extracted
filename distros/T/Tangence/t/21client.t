@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.26;
 use warnings;
+
+use Future::AsyncAwait 0.47;
 
 use Test::More;
 use Test::Fatal;
@@ -90,7 +92,7 @@ my $bagproxy;
    $client->send_message( $S2C{CALL} );
 
    ok( $f->is_ready, '$f ready after MSG_RESULT' );
-   is( scalar $f->get, "10/hello", 'result of call_method()' );
+   is( scalar await $f, "10/hello", 'result of call_method()' );
 
    $f = $objproxy->call_method( noreturn => );
 
@@ -98,7 +100,7 @@ my $bagproxy;
 
    $client->send_message( $S2C{CALL_NORETURN} );
 
-   ok( exception { $objproxy->call_method( no_such_method => 123 ) },
+   ok( exception { $objproxy->call_method( no_such_method => 123 )->get },
       'Calling no_such_method fails in proxy'
    );
 }
@@ -139,7 +141,7 @@ my $bagproxy;
 
    ok( exception { $objproxy->subscribe_event( "no_such_event",
                       on_fire => sub {},
-                   ); },
+                   )->get; },
       'Subscribing to no_such_event fails in proxy'
    );
 }
@@ -162,7 +164,7 @@ my $bagproxy;
    $client->send_message( $S2C{GETPROP_123} );
 
    ok( $f->is_ready, '$f is ready after MSG_RESULT' );
-   is( scalar $f->get, 123, '$f->get after get_property' );
+   is( scalar await $f, 123, 'await $f after get_property' );
 
    $f = $objproxy->get_property_element( "hash", "two" );
 
@@ -171,7 +173,7 @@ my $bagproxy;
    $client->send_message( $S2C{GETPROPELEM_HASH} );
 
    ok( $f->is_ready, '$f is ready after MSG_RESULT' );
-   is( scalar $f->get, 2, '$f->get after get_property_element hash key' );
+   is( scalar await $f, 2, 'await $f after get_property_element hash key' );
 
    $f = $objproxy->get_property_element( "array", 1 );
 
@@ -180,7 +182,7 @@ my $bagproxy;
    $client->send_message( $S2C{GETPROPELEM_ARRAY} );
 
    ok( $f->is_ready, '$f is ready after MSG_RESULT' );
-   is( scalar $f->get, 2, '$f->get after get_property_element array index' );
+   is( scalar await $f, 2, 'await $f after get_property_element array index' );
 
    $f = $objproxy->set_property( "scalar", 135 );
 
@@ -238,7 +240,7 @@ my $bagproxy;
 
    $client->send_message( $MSG_OK );
 
-   ok( exception { $objproxy->get_property( "no_such_property" ) },
+   ok( exception { $objproxy->get_property( "no_such_property" )->get },
       'Getting no_such_property fails in proxy'
    );
 }
@@ -258,7 +260,7 @@ my $bagproxy;
 
    ok( $f->is_ready, '$f is ready after MSG_WATCHING_ITER' );
 
-   my ( $cursor, $first_idx, $last_idx ) = $f->get;
+   my ( $cursor, $first_idx, $last_idx ) = await $f;
 
    is( $first_idx, 0, '$first_idx after MSG_WATCHING_ITER' );
    is( $last_idx,  2, '$last_idx after MSG_WATCHING_ITER' );
@@ -269,7 +271,7 @@ my $bagproxy;
 
    $client->send_message( $S2C{ITER_NEXT_1} );
 
-   my ( $idx, @more ) = $f->get;
+   my ( $idx, @more ) = await $f;
 
    is( $idx, 0, 'next_forward starts at element 0' );
    is_deeply( \@more, [ 1 ], 'next_forward yielded 1 element' );
@@ -281,7 +283,7 @@ my $bagproxy;
 
    $client->send_message( $S2C{ITER_NEXT_5} );
 
-   ( $idx, @more ) = $f->get;
+   ( $idx, @more ) = await $f;
 
    is( $idx, 1, 'next_forward starts at element 1' );
    is_deeply( \@more, [ 2, 3 ], 'next_forward yielded 2 elements' );
@@ -293,7 +295,7 @@ my $bagproxy;
 
    $client->send_message( $S2C{ITER_NEXT_BACK} );
 
-   ( $idx, @more ) = $f->get;
+   ( $idx, @more ) = await $f;
 
    is( $idx, 2, 'next_backward starts at element 2' );
    is_deeply( \@more, [ 3 ], 'next_forward yielded 1 element' );
@@ -328,9 +330,9 @@ my $bagproxy;
 # Test object destruction
 {
    my $proxy_destroyed = 0;
-   $objproxy->subscribe_event( "destroy",
+   await $objproxy->subscribe_event( "destroy",
       on_fire => sub { $proxy_destroyed = 1 },
-   )->get;
+   );
 
    $client->send_message( $S2C{DESTROY} );
 

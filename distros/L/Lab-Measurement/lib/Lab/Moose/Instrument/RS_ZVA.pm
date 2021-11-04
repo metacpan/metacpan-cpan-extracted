@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVA;
-$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.772';
+$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.791';
 #ABSTRACT: Rohde & Schwarz ZVA Vector Network Analyzer
 
 use v5.20;
@@ -107,7 +107,7 @@ Lab::Moose::Instrument::RS_ZVA - Rohde & Schwarz ZVA Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 SYNOPSIS
 

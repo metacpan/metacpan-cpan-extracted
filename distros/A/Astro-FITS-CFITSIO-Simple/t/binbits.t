@@ -1,7 +1,6 @@
-use Test::More tests => 6;
+#! perl
 
-use strict;
-use warnings;
+use Test2::V0 '!float';
 
 use Astro::FITS::CFITSIO::CheckStatus;
 use Astro::FITS::CFITSIO qw/ :longnames :constants /;
@@ -14,8 +13,6 @@ use Data::Dumper;
 tie my $status, 'Astro::FITS::CFITSIO::CheckStatus';
 
 my $filename = 'data/foo4.fits';
-
-
 
 my @tform;
 my @ttype;
@@ -31,11 +28,11 @@ my %cols = create_data();
 # files are small, there's but one chunk, and this wasn't caught.
 
 my %data = rdfits( $filename, { retinfo => 1,
-				ninc => 1,
-				dtypes => { c1 => 'logical',
-					    c2 => 'logical',
-					   },
-			      } );
+                                ninc => 1,
+                                dtypes => { c1 => 'logical',
+                                            c2 => 'logical',
+                                           },
+                              } );
 
 # modify c6 outgoing data as it's in bytes and rdfits should have read
 # it back as long
@@ -59,11 +56,11 @@ sub write_file
   my $fptr = Astro::FITS::CFITSIO::create_file('!'.$filename, $status);
 
   $fptr->create_tbl( BINARY_TBL, 0, scalar keys %cols,
-		     \@ttype,
-		     \@tform,
-		     undef,
-		     'events',
-		     $status );
+                     \@ttype,
+                     \@tform,
+                     undef,
+                     'events',
+                     $status );
 
   my $coln = 0;
   for my $col ( values %cols )
@@ -129,7 +126,7 @@ sub create_data
   };
 
   # 7x10 bytes (packed bits)
-  # the tdim is set up to force rdfits to search 
+  # the tdim is set up to force rdfits to search
   # for a matching type; it should fail and fall back to byte
   $data = zeroes(byte,7,10);
   $data .= pdl( 1, 3, 7, 15, 31, 63, 127);
@@ -164,3 +161,5 @@ sub create_data
   }
   %cols;
 }
+
+done_testing;

@@ -24,7 +24,7 @@ __PACKAGE__->config(
     option_tag => \&option_tag,
     select_tag => \&select_tag,
     options_for_select => \&options_for_select,
-    checkboxes_from_collection => \&checkboxes_from_collection,
+    checkbox_list_from_collection => \&checkbox_list_from_collection,
     model_errors_for => \&model_errors_for,
     namespace => \&namespace,
     namespace_id_with => \&namespace_id_with,
@@ -35,13 +35,15 @@ __PACKAGE__->config(
     form_for => \&form_for,
     label => \&label,
     input => \&input,
+    button => \&button,
     hidden => \&hidden,
+    password => \&password,
+    checkbox => \&checkbox,
     errors_for => \&errors_for,
     model_errors => \&model_errors,
     human_model_name => \&human_model_name,
     model => \&model,
     fields_for => \&fields_for,
-    zelect => \&zelect,
     select_from_collection => \&select_from_collection,
   },
 );
@@ -54,16 +56,24 @@ sub _stringify_attrs {
 
 sub _parse_proto {
   my @proto = @_;
-  my $content = undef;
-  if(@proto && (ref($proto[-1]) eq 'CODE')) {
-    $content = pop @proto;
-  } elsif(@proto && (ref(\$proto[-1] ||'') eq 'SCALAR')) {
-    my $text = pop @proto;
-    $content = sub { $text };
+  my @content_blocks = ();
+  while(@proto) {
+    if(ref($proto[-1]) eq 'CODE') {
+      unshift @content_blocks, pop @proto;
+    } elsif( ref(\$proto[-1] ||'') eq 'SCALAR') {
+      my $text = pop @proto;
+      unshift @content_blocks, sub { $text };
+    } else {
+      last;
+    }
   }
+
+  my $content = scalar(@content_blocks) > 1 ? \@content_blocks : $content_blocks[0];
+
   return ($content) unless @proto;
   my %attrs = ref($proto[0])||'' eq 'HASH' ? %{$proto[0]}:  @proto;
   return ($content, %attrs);
+
 }
 
 sub attr {
@@ -164,9 +174,35 @@ sub options_from_collection_for_select {
   return $self->options_for_select($c, \@options, $global_attrs);
 }
 
+# %= select_from_collection 'state_id', $states,  +{ class=>'form-control' }
+# %= select_from_collection 'state_id', [$states, id=>'name'], +{ class=>'form-control' }
+sub select_from_collection {
+  my ($self, $c, $field, $options, $attrs) = @_;
+  my $model = $c->stash->{'valiant.view.form.model'};
+  my @namespace = @{$c->stash->{'valiant.view.form.namespace'}||[]};
+
+  if(ref($options) eq 'ARRAY') {
+    $attrs->{option_value} = $options->[1];
+    $attrs->{option_label} = $options->[2];
+    $options = $options->[0];
+  }
+
+  if(my @errors = $model->errors->messages_for($field)) {
+    my @errors_classes = ();
+    if(my $errors_classes_proto = delete($attrs->{errors_classes})) {
+      push @errors_classes, ref($errors_classes_proto) ? @$errors_classes_proto : ($errors_classes_proto);
+    }
+    $attrs->{class} .= " @{[ join ' ', @errors_classes ]}" if @errors;
+  }
+  
+  $attrs->{id} ||= join '_', (@namespace, $field);
+  $attrs->{name} ||= join '.', (@namespace, $field);
+
+  return $self->select_tag($c, $attrs, $self->options_from_collection_for_select($c, $options, +{%$attrs, selected=>$model->read_attribute_for_validation($field)}));
+}
 
 # %= checkboxes_from_collection 'person_roles.role', $roles, +{value_field=>'id', label_field=>'name', ... }
-sub checkboxes_from_collection {
+sub checkbox_list_from_collection {
   my ($self, $c, $field_proto, $bridge, $collection, @proto) = @_;
   my ($content, %attrs) = _parse_proto(@proto);
   my $model = $c->stash->{'valiant.view.form.model'};
@@ -184,7 +220,7 @@ sub checkboxes_from_collection {
   my @primary_columns = $field_model_rs->result_source->primary_columns;
 
   foreach my $item($collection->all) {
-    local $c->stash->{'valiant.view.form.namespace'} = [@namespace, $field_proto, $idx];
+    local $c->stash->{'valiant.view.form.namespace'} = [@namespace, "${field_proto}[${idx}]"];
     local $c->stash->{'valiant.view.form.model'} = $item;
 
     my ($checked) = grep { $_ }
@@ -210,56 +246,23 @@ sub checkboxes_from_collection {
 
     $idx++;
   }
+  # push @tags,  $self->hidden($c, "_nop", +{value=>'1', namespace=>[@namespace, $field_proto, $idx] });
   return b @tags;
-}
-
-# %= select_from_collection 'state_id', $states,  +{ class=>'form-control' }
-# %= select_from_collection 'state_id', [$states, id=>'name'], +{ class=>'form-control' }
-#
-sub select_from_collection {
-  my ($self, $c, $field, $options, $attrs) = @_;
-  my $model = $c->stash->{'valiant.view.form.model'};
-  my @namespace = @{$c->stash->{'valiant.view.form.namespace'}||[]};
-
-  $attrs->{class} .= ' is-invalid' if $model->errors->messages_for($field) ;
-
-  if(ref($options) eq 'ARRAY') {
-    $attrs->{option_value} = $options->[1];
-    $attrs->{option_label} = $options->[2];
-    $options = $options->[0];
-  }
-
-  $attrs->{id} ||= join '_', (@namespace, $field);
-  $attrs->{name} ||= join '.', (@namespace, $field);
-
-  return $self->select_tag($c, $attrs, $self->options_from_collection_for_select($c, $options, +{%$attrs, selected=>$model->read_attribute_for_validation($field)}));
-}
-
-# %= zelect 'state_id', [map {[ $_->name, $_->id ]} $states->all], +{ class=>'form-control' }
-sub zelect {
-  my ($self, $c, $field, $options, $attrs) = @_;
-  my $model = $c->stash->{'valiant.view.form.model'};
-  my @namespace = @{$c->stash->{'valiant.view.form.namespace'}||[]};
-
-  $attrs->{id} ||= join '_', (@namespace, $field);
-  $attrs->{name} ||= join '.', (@namespace, $field);
-
-  return $self->select_tag($c, $attrs, $self->options_for_select($c, $options, +{selected=>$model->read_attribute_for_validation($field)}));
 }
 
 sub form_for {
   my ($self, $c, $model, @proto) = @_;
   my ($content, %attrs) = _parse_proto(@proto);
 
-  $attrs{id} ||= $model->model_name->param_key;
+  $attrs{id} ||= $model->model_name->param_key;  # This seems to be trouble when the Schema is under Catalyst...
   $attrs{method} ||= 'POST';
 
   if($model->can('in_storage') && $model->in_storage) {
-    my $value = $model->model_name->param_key . '_edit';
+    my $value = $attrs{id} . '_edit';
     $attrs{id} ||= $value;
     $attrs{class} ||= $value;
   } else {
-    my $value = $model->model_name->param_key . '_new';
+    my $value = $attrs{id} . '_new';
     $attrs{id} ||= $value;
     $attrs{class} ||= $value;
   }
@@ -267,7 +270,17 @@ sub form_for {
   local $c->stash->{'valiant.view.form.model'} = $model;
   local $c->stash->{'valiant.view.form.namespace'}[0] = $attrs{id};
 
-  return $self->form_tag($c, \%attrs, $content);
+  my $content_expanded .= $content->($self, $model);
+
+  if($model->in_storage) {
+    my @primary_columns = $model->result_source->primary_columns;
+    foreach my $primary_column (@primary_columns) {
+      next unless my $value = $model->get_column($primary_column);
+      $content_expanded .= $self->hidden($c, $primary_column);
+    }
+  }
+
+  return $self->form_tag($c, \%attrs, $content_expanded);
 }
 
 sub label {
@@ -286,7 +299,7 @@ sub input {
   my ($self, $c, $field, @proto) = @_;
   my ($content, %attrs) = _parse_proto(@proto);
   my $model = $c->stash->{'valiant.view.form.model'};
-  my @namespace = @{$c->stash->{'valiant.view.form.namespace'}||[]};
+  my @namespace = $attrs{namespace} ? @{delete $attrs{namespace}} : @{$c->stash->{'valiant.view.form.namespace'}||[]};
   my @errors = $model->errors->messages_for($field);
 
   my @errors_classes = ();
@@ -305,10 +318,35 @@ sub input {
   return $self->input_tag($c, \%attrs, $content);
 }
 
+sub button {
+  my ($self, $c, $field, @proto) = @_;
+  my ($content, %attrs) = _parse_proto(@proto);
+  my $model = $c->stash->{'valiant.view.form.model'};
+  my @namespace = $attrs{namespace} ? @{delete $attrs{namespace}} : @{$c->stash->{'valiant.view.form.namespace'}||[]};
+
+  $attrs{id} ||= join '_', (@namespace, $field);
+  $attrs{name} ||= join '.', (@namespace, $field);
+  $attrs{value} = ($model->read_attribute_for_validation($field) || '') unless defined($attrs{value});
+
+  return $self->button_tag($c, \%attrs, $content);
+}
+
 sub hidden {
   my ($self, $c, $field , @proto) = @_;
   my ($content, %attrs) = _parse_proto(@proto);
   return $self->input($c, $field, +{%attrs, type=>'hidden'}, $content);
+}
+
+sub password {
+  my ($self, $c, $field , @proto) = @_;
+  my ($content, %attrs) = _parse_proto(@proto);
+  return $self->input($c, $field, +{%attrs, type=>'password', value=>''}, $content);
+}
+
+sub checkbox {
+  my ($self, $c, $field , @proto) = @_;
+  my ($content, %attrs) = _parse_proto(@proto);
+  return $self->input($c, $field, +{%attrs, type=>'checkbox'}, $content);
 }
 
 sub errors_for {
@@ -353,7 +391,7 @@ sub model_errors {
   my ($self, $c, @proto) = @_;
   my ($content, %attrs) = _parse_proto(@proto);
   my $model = $c->stash->{'valiant.view.form.model'};
-  my @errors = $model->errors->model_errors;
+  my @errors = $model->errors->model_messages;
 
   if($model->has_errors && !@errors) {
     push @errors, delete $attrs{default_msg} if exists $attrs{default_msg};
@@ -374,6 +412,9 @@ sub fields_for {
   my $model = $c->stash->{'valiant.view.form.model'};
   my @namespace = @{$c->stash->{'valiant.view.form.namespace'}||[]};
 
+  my $item_block = ((ref($content)||'') eq 'ARRAY') ? $content->[0] : $content;
+  my $finally_block = ((ref($content)||'') eq 'ARRAY') ? $content->[1] : undef;
+
   die "No relation '$related' for model $model" unless $model->has_relationship($related);
 
   my $idx = 0;
@@ -381,13 +422,15 @@ sub fields_for {
   my $resultset = $model->related_resultset($related);
   my $namespace = $model->relationship_info($related)->{attrs}{accessor} eq 'single' ?
     sub { [@namespace, $related] }
-    : sub { [@namespace, $related, $idx] };
+    : sub { [@namespace, "${related}[${idx}]" ] };
 
-  while(my $result = $resultset->next) {
+  my @results = $resultset->all;
+  my $last_index =$#results;
+  foreach my $result (@results) {
     local $c->stash->{'valiant.view.form.model'} = $result;
     local $c->stash->{'valiant.view.form.namespace'} = $namespace->();
 
-    $content_expanded .= $content->();
+    $content_expanded .= $item_block->($idx, $last_index);
 
     if($result->in_storage) {
       my @primary_columns = $result->result_source->primary_columns;
@@ -398,6 +441,12 @@ sub fields_for {
     }
     $idx++
   }
+
+  if($finally_block) {
+    local $c->stash->{'valiant.view.form.namespace'} = $namespace->();
+    $content_expanded .= $finally_block->($idx, $last_index);
+  }
+
   return b $content_expanded;
 }
 

@@ -10,7 +10,7 @@ use Moo::Role;
 use experimental 'signatures';
 use namespace::clean;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub _convert ( $self, $bignum ) {
     require Ref::Util;
@@ -44,7 +44,7 @@ CXC::Number::Grid::Role::PDL - Role to return PDL objects
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

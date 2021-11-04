@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Server 0.26;
+package Tangence::Server 0.27;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental 'signatures';
 
 use base qw( Tangence::Stream );
 
@@ -137,11 +138,8 @@ sub tangence_closed
    }
 }
 
-sub get_by_id
+sub get_by_id ( $self, $id )
 {
-   my $self = shift;
-   my ( $id ) = @_;
-
    # Only permit the client to interact with objects they've already been
    # sent, so they cannot gain access by inventing object IDs
    $self->peer_hasobj->{$id} or
@@ -153,11 +151,8 @@ sub get_by_id
    return $obj;
 }
 
-sub handle_request_CALL
+sub handle_request_CALL ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
    my $response;
@@ -175,11 +170,8 @@ sub handle_request_CALL
    $ctx->respond( $response );
 }
 
-sub handle_request_SUBSCRIBE
+sub handle_request_SUBSCRIBE ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
    my $response;
@@ -215,11 +207,8 @@ sub handle_request_SUBSCRIBE
    $ctx->respond( $response );
 }
 
-sub handle_request_UNSUBSCRIBE
+sub handle_request_UNSUBSCRIBE ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
    my $response;
@@ -250,11 +239,8 @@ sub handle_request_UNSUBSCRIBE
    $ctx->respond( $response );
 }
 
-sub handle_request_GETPROP
+sub handle_request_GETPROP ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
    my $response;
@@ -272,11 +258,8 @@ sub handle_request_GETPROP
    $ctx->respond( $response );
 }
 
-sub handle_request_GETPROPELEM
+sub handle_request_GETPROPELEM ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
    my $response;
@@ -294,11 +277,8 @@ sub handle_request_GETPROPELEM
    $ctx->respond( $response );
 }
 
-sub handle_request_SETPROP
+sub handle_request_SETPROP ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
    my $response;
@@ -318,11 +298,8 @@ sub handle_request_SETPROP
 
 *handle_request_WATCH      = \&_handle_request_WATCHany;
 *handle_request_WATCH_CUSR = \&_handle_request_WATCHany;
-sub _handle_request_WATCHany
+sub _handle_request_WATCHany ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
    my ( $want_initial, $object, $prop );
@@ -367,11 +344,8 @@ sub _handle_request_WATCHany
    $self->_send_initial( $object, $prop ) if $want_initial;
 }
 
-sub _send_initial
+sub _send_initial ( $self, $object, $prop )
 {
-   my $self = shift;
-   my ( $object, $prop ) = @_;
-
    my $m = "get_prop_$prop";
    return unless( $object->can( $m ) );
 
@@ -388,11 +362,8 @@ sub _send_initial
    }
 }
 
-sub handle_request_UNWATCH
+sub handle_request_UNWATCH ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
    my $response;
@@ -423,11 +394,8 @@ sub handle_request_UNWATCH
    $ctx->respond( $response );
 }
 
-sub handle_request_CUSR_NEXT
+sub handle_request_CUSR_NEXT ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $cursor_id = $message->unpack_int();
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
@@ -438,11 +406,8 @@ sub handle_request_CUSR_NEXT
    $cursorobj->cursor->handle_request_CUSR_NEXT( $ctx, $message );
 }
 
-sub handle_request_CUSR_DESTROY
+sub handle_request_CUSR_DESTROY ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $cursor_id = $message->unpack_int();
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
@@ -453,20 +418,14 @@ sub handle_request_CUSR_DESTROY
    $ctx->respond( Tangence::Message->new( $self, MSG_OK ) );
 }
 
-sub drop_cursorobj
+sub drop_cursorobj ( $self, $cursorobj )
 {
-   my $self = shift;
-   my ( $cursorobj ) = @_;
-
    my $m = "uncursor_prop_" . $cursorobj->cursor->prop->name;
    $cursorobj->obj->$m( $cursorobj->cursor );
 }
 
-sub handle_request_INIT
+sub handle_request_INIT ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $major = $message->unpack_int();
    my $minor_max = $message->unpack_int();
    my $minor_min = $message->unpack_int();
@@ -497,11 +456,8 @@ sub handle_request_INIT
    $ctx->respond( $response );
 }
 
-sub handle_request_GETROOT
+sub handle_request_GETROOT ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
    my $identity = TYPE_ANY->unpack_value( $message );
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
@@ -516,11 +472,8 @@ sub handle_request_GETROOT
    $ctx->respond( $response );
 }
 
-sub handle_request_GETREGISTRY
+sub handle_request_GETREGISTRY ( $self, $token, $message )
 {
-   my $self = shift;
-   my ( $token ) = @_;
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
    $self->permit_registry or
@@ -542,11 +495,8 @@ my %change_values = (
    on_move   => CHANGE_MOVE,
 );
 
-sub _install_watch
+sub _install_watch ( $self, $object, $prop )
 {
-   my $self = shift;
-   my ( $object, $prop ) = @_;
-
    my $pdef = $object->can_property( $prop );
    my $dim = $pdef->dimension;
 
@@ -572,11 +522,8 @@ sub _install_watch
    push @{ $self->watches }, [ $object, $prop, $id ];
 }
 
-sub object_destroyed
+sub object_destroyed ( $self, $obj, @rest )
 {
-   my $self = shift;
-   my ( $obj ) = @_;
-
    if( my $subs = $self->subscriptions ) {
       my $i = 0;
       while( $i < @$subs ) {
@@ -607,7 +554,7 @@ sub object_destroyed
       }
    }
 
-   $self->SUPER::object_destroyed( @_ );
+   $self->SUPER::object_destroyed( $obj, @rest );
 }
 
 =head1 OVERRIDEABLE METHODS

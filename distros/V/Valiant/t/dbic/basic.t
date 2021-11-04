@@ -114,7 +114,6 @@ ok $state->id;
 
   ok $person->invalid, 'attempted record invalid multi context';
   ok !$person->in_storage, 'record was not saved';
-
   is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
     credit_cards => [
       "Credit Cards has too few rows (minimum is 2)",
@@ -297,6 +296,7 @@ ok $state->id;
   ok ! $person_invalid->in_storage, 'record has not been saved 4';
   is_deeply +{$person_invalid->errors->to_hash(full_messages=>1)}, +{
     credit_cards => [
+      "Credit Cards has too few rows (minimum is 2)",
       "Credit Cards Is Invalid",
     ],
     "credit_cards.1.expiration" => [
@@ -541,6 +541,7 @@ ok $state->id;
 
   is_deeply +{ $person->errors->to_hash }, +{
     credit_cards => [
+      'has too few rows (minimum is 2)',
       "Is Invalid",
     ],
     "credit_cards.0.card_number" => [
@@ -757,13 +758,12 @@ ok $state->id;
 
       ],
     });
-  } || do {
-    ok $@=~/Relationship credit_cards can't create more than 2 rows at once/, 'expected error';
+    ok $@->isa('DBIx::Class::Valiant::Util::Exception::TooManyRows');
+    ok $@=~/Relationship credit_cards on person can't create more that 2 rows; attempted 3/, 'expected error';
   };
-
 }
 
-#skip validat
+#skip validation 
 {
   # Basic update test.
   ok my $person = Schema
@@ -828,14 +828,32 @@ ok $state->id;
   };
 }
 
+{
+  # This test makes sure we don't get a regression on the bug whree we accidentally
+  # matched a related row via non unique parameters
+  ok my $person = Schema
+    ->resultset('Person')
+    ->create({
+      __context => ['registration','profile'],
+      username => 'jsjn212',
+      first_name => 'john',
+      last_name => 'napiorkowski',
+      password => 'abc123xxx',
+      password_confirmation => 'abc123xxx',
+      profile => {
+        zip => "78621",
+        city => 'Elgin',
+        address => "12345 Main Street",
+        birthday => '2000-01-01',
+        state_id => 1,
+        phone_number => '21238979509',
+      },
+      credit_cards => [
+        {card_number=>'11111222223333344444', expiration=>'2100-01-01'},
+        {card_number=>'11111222223333555555', expiration=>'2101-01-01'},
+      ],
+    }), 'created fixture';
+
+  ok $person->valid;
+}
 done_testing;
-
-__END__
-
-Deleting
-proper control over nested with
-deal with many to many.....
-docs :(
-
-step back and write out ll the test cases
-

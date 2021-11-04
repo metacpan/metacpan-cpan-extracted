@@ -1,0 +1,24 @@
+==== GLOBAL:
+
+Shlomi
+Shlomi
+Yonathan
+
+==== In: dest/a.html , dest/b.html , dest/c.html
+
+worda
+wordb
+
+==== In: dest/c.html , dest/b.html , dest/a.html
+
+wordc
+wordb
+
+==== In: dest/c.html , dest/a.html , dest/b.html
+
+wordd
+wordb
+
+==== In: dest/a.html , dest/b.html
+
+worde

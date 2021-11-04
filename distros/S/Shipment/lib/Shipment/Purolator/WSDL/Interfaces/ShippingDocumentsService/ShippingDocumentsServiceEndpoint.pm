@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint;
-$Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint::VERSION = '3.06';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -65,7 +65,7 @@ sub GetDocuments {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -107,7 +107,7 @@ sub GetShipmentManifestDocument {
       "GetShipmentManifestDocument must be called as object method (\$self is <$self>)"
       if not blessed($self);
     return $self->SUPER::call(
-        {   operation => 'GetShipmentManifestDocument',
+        {   operation   => 'GetShipmentManifestDocument',
             soap_action =>
               'http://purolator.com/pws/service/v1/GetShipmentManifestDocument',
             style => 'document',
@@ -126,7 +126,7 @@ sub GetShipmentManifestDocument {
                 'use'         => 'literal',
                 namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
                 encodingStyle => '',
-                parts =>
+                parts         =>
                   [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
 
             },
@@ -202,7 +202,7 @@ Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumen
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 SYNOPSIS
 

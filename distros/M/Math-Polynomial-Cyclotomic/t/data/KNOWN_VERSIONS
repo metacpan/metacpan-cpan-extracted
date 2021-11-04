@@ -1,0 +1,5 @@
+0.002  SHA256 c48319e8f8760158ec4ef482124909c4b22702f18f8367f45c645f71ca2ea9c1  lib/Math/Polynomial/Cyclotomic.pm
+0.003  SHA256 b2f385e5a8323e5af0eb82c5e987d0acb234ac0199506d08f48fcc1babdc2861  lib/Math/Polynomial/Cyclotomic.pm
+0.004  SHA256 352cc6c7ab4b4fc85afa2e8f4803777692c12b514b1fcdfeee883b92a3c75187  lib/Math/Polynomial/Cyclotomic.pm
+0.011  SHA256 b4cb87c87368800758e1408832ff5d4ebde403661cd0ae9d6b068dac55be9aa3  t/lib/Test/MyUtils.pm
+0.012  SHA256 baa165da58a53effdfdc743be006ef4ef610cc6000be1bda43fadc7fe7fb9e3f  t/lib/Test/MyUtils.pm

@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ErrorDetailType;
-$Shipment::UPS::WSDL::TrackTypes::ErrorDetailType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::ErrorDetailType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               SubErrorCode
               AdditionalInformation
 
-              )
+            )
         ],
         {   'Severity'              => \%Severity_of,
             'PrimaryErrorCode'      => \%PrimaryErrorCode_of,
@@ -83,7 +83,7 @@ Shipment::UPS::WSDL::TrackTypes::ErrorDetailType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

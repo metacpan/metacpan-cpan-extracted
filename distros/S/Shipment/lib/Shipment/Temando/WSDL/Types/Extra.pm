@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Extra;
-$Shipment::Temando::WSDL::Types::Extra::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Extra::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Class::Std::initialize();
               tax
               adjustments
 
-              )
+            )
         ],
         {   'summary'     => \%summary_of,
             'details'     => \%details_of,
@@ -74,7 +74,7 @@ Class::Std::initialize();
 
 
 package Shipment::Temando::WSDL::Types::Extra::_adjustments;
-$Shipment::Temando::WSDL::Types::Extra::_adjustments::VERSION = '3.05';
+$Shipment::Temando::WSDL::Types::Extra::_adjustments::VERSION = '3.06';
 use strict;
 use warnings;
 {
@@ -97,7 +97,7 @@ use warnings;
         __PACKAGE__->_factory(
             [   qw(        adjustment
 
-                  )
+                )
             ],
             {'adjustment' => \%adjustment_of,},
             {'adjustment' => 'Shipment::Temando::WSDL::Types::Adjustment',},
@@ -127,7 +127,7 @@ Shipment::Temando::WSDL::Types::Extra
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package CHI::Constants;
-$CHI::Constants::VERSION = '0.60';
+$CHI::Constants::VERSION = '0.61';
 use strict;
 use warnings;
 use base qw(Exporter);
@@ -26,7 +26,7 @@ CHI::Constants - Internal constants
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Jonathan Swartz <swartz@pobox.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Jonathan Swartz.
+This software is copyright (c) 2021 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

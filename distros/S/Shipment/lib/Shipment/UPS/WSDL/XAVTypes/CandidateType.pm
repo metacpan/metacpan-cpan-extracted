@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::XAVTypes::CandidateType;
-$Shipment::UPS::WSDL::XAVTypes::CandidateType::VERSION = '3.05';
+$Shipment::UPS::WSDL::XAVTypes::CandidateType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        AddressClassification
               AddressKeyFormat
 
-              )
+            )
         ],
         {   'AddressClassification' => \%AddressClassification_of,
             'AddressKeyFormat'      => \%AddressKeyFormat_of,
@@ -63,7 +63,7 @@ Shipment::UPS::WSDL::XAVTypes::CandidateType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

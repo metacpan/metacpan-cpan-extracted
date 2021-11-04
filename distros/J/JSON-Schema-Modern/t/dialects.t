@@ -4,6 +4,7 @@ use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use if "$]" >= 5.022, 'experimental', 're_strict';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -13,6 +14,7 @@ use Test::Fatal;
 use JSON::Schema::Modern;
 use lib 't/lib';
 use Helper;
+use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern' => 'share' } };
 
 my $js = JSON::Schema::Modern->new(short_circuit => 0, validate_formats => 1);
 

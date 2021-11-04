@@ -4,7 +4,7 @@ use warnings;
 package Acme::Resume::MoopsParserTrait;
 
 # ABSTRACT: Trait for the Moops parser
-our $VERSION = '0.0105';
+our $VERSION = '0.0106';
 
 use Moo::Role;
 use Module::Runtime qw($module_name_rx);
@@ -68,7 +68,7 @@ Acme::Resume::MoopsParserTrait - Trait for the Moops parser
 
 =head1 VERSION
 
-Version 0.0105, released 2021-09-29.
+Version 0.0106, released 2021-10-31.
 
 =head1 SOURCE
 

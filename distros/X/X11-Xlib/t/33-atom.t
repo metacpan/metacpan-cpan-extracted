@@ -8,7 +8,6 @@ sub err(&) { my $code= shift; my $ret; { local $@= ''; eval { $code->() }; $ret=
 
 plan skip_all => "No X11 Server available"
     unless $ENV{DISPLAY};
-plan tests => 14;
 
 my $dpy= new_ok( 'X11::Xlib', [], 'connect to X11' );
 $dpy->on_error(sub { my ($dpy, $err)= @_; note $err->summarize; }); # ignore non-fatal errors
@@ -34,3 +33,15 @@ is_deeply( $atoms, [ $a_utf8, 0 ], 'got one atom' );
 ok( ($names= $dpy->XGetAtomNames([ 0x12345678, $a_netwmname ])), 'XGetAtomNames (half known)' );
 is_deeply( $names, [ undef, '_NET_WM_NAME' ], 'got one name' );
 
+my @dualvars= $dpy->atom('UTF8_STRING','_NET_WM_NAME',$a_utf8,0,'',"$a_utf8");
+is( $dualvars[0]+0, $a_utf8, '->atom UTF8_STRING as number' );
+is( "$dualvars[0]", "UTF8_STRING", "->atom UTF8_STRING as string" );
+is( $dualvars[1]+0, $a_netwmname, '->atom _NET_WM_NAME as number' );
+is( "$dualvars[1]", "_NET_WM_NAME", "->atom _NET_WM_NAME as string" );
+is( $dualvars[2]+0, $a_utf8, "->atom $a_utf8 as number" );
+is( "$dualvars[2]", "UTF8_STRING", "->atom $a_utf8 as string" );
+is( $dualvars[3], undef, "0 doesn't resolve" );
+is( $dualvars[4], undef, "'' doesn't resolve" );
+is( $dualvars[5]+0, $a_utf8, 'number passed as string still resolves as number' );
+
+done_testing;

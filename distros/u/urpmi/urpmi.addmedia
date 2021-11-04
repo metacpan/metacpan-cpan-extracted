@@ -31,7 +31,7 @@ use urpm::util 'member';
 sub usage {
     my $m = shift;
     my $usage =
-      #-PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
+      #-PO: The URI types strings 'file:', 'ftp:', 'http:', 'https:', and 'cdrom:' must not be translated!
       #-PO: neither the ``with''.  Only what is between <brackets> can be translated.
       N("usage: urpmi.addmedia [options] <name> <url>
 where <url> is one of
@@ -39,6 +39,7 @@ where <url> is one of
        ftp://<login>:<password>\@<host>/<path>
        ftp://<host>/<path>
        http://<host>/<path>
+       https://<host>/<path>
        cdrom://<path>
 
 usage: urpmi.addmedia [options] --distrib --mirrorlist <url>

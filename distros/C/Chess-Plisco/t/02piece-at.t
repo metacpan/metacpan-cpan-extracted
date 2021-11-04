@@ -14,7 +14,7 @@ use integer;
 
 use Test::More tests => 6 * 64;
 use Chess::Plisco qw(:all);
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 
 # The array elements are:
 #

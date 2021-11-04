@@ -1,6 +1,7 @@
 package Form::Tiny::Form;
 
 use v5.10;
+use strict;
 use warnings;
 use Types::Standard qw(Maybe ArrayRef InstanceOf HashRef Bool);
 use Carp qw(croak);
@@ -11,19 +12,42 @@ use Form::Tiny::Error;
 use Form::Tiny::Utils qw(try get_package_form_meta);
 use Moo::Role;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
+
+has 'field_defs' => (
+	is => 'ro',
+	isa => ArrayRef [InstanceOf ['Form::Tiny::FieldDefinition']],
+	clearer => '_ft_clear_field_defs',
+	default => sub {
+		my ($self) = shift;
+		return $self->form_meta->resolved_fields($self);
+	},
+	lazy => 1,
+	init_arg => undef,
+);
+
+has '_ft_field_cache' => (
+	is => 'ro',
+	isa => HashRef [InstanceOf ['Form::Tiny::FieldDefinition']],
+	clearer => '_ft_clear_field_cache',
+	default => sub {
+		return {map { $_->name => $_ } @{shift()->field_defs}};
+	},
+	lazy => 1,
+	init_arg => undef,
+);
 
 has "input" => (
 	is => "ro",
 	writer => "set_input",
-	trigger => \&_clear_form,
+	trigger => \&_ft_clear_form,
 );
 
 has "fields" => (
 	is => "ro",
 	isa => Maybe [HashRef],
-	writer => "_set_fields",
-	clearer => "_clear_fields",
+	writer => "_ft_set_fields",
+	clearer => "_ft_clear_fields",
 	init_arg => undef,
 );
 
@@ -31,7 +55,7 @@ has "valid" => (
 	is => "ro",
 	isa => Bool,
 	lazy => 1,
-	builder => "_validate",
+	builder => "_ft_validate",
 	clearer => 1,
 	predicate => "is_validated",
 	init_arg => undef,
@@ -45,16 +69,18 @@ has "errors" => (
 	init_arg => undef,
 );
 
-sub _clear_form
+sub _ft_clear_form
 {
 	my ($self) = @_;
 
-	$self->_clear_fields;
+	$self->_ft_clear_field_defs;
+	$self->_ft_clear_field_cache;
+	$self->_ft_clear_fields;
 	$self->clear_valid;
-	$self->_clear_errors;
+	$self->_ft_clear_errors;
 }
 
-sub _mangle_field
+sub _ft_mangle_field
 {
 	my ($self, $def, $path_value) = @_;
 
@@ -66,7 +92,7 @@ sub _mangle_field
 		# coerce, validate, adjust
 		$current = $def->get_coerced($self, $current);
 		if ($def->validate($self, $current)) {
-			$current = $def->get_adjusted($current);
+			$current = $def->get_adjusted($self, $current);
 		}
 
 		$path_value->set_value($current);
@@ -76,7 +102,7 @@ sub _mangle_field
 	return;
 }
 
-sub _find_field
+sub _ft_find_field
 {
 	my ($self, $fields, $field_def) = @_;
 
@@ -135,7 +161,7 @@ sub _find_field
 	return;
 }
 
-sub _assign_field
+sub _ft_assign_field
 {
 	my ($self, $fields, $field_def, $path_value) = @_;
 
@@ -156,12 +182,12 @@ sub _assign_field
 	$$current = $path_value->value;
 }
 
-sub _validate
+sub _ft_validate
 {
 	my ($self) = @_;
 	my $dirty = {};
 	my $meta = $self->form_meta;
-	$self->_clear_errors;
+	$self->_ft_clear_errors;
 
 	my $fields = $self->input;
 	my $err = try sub {
@@ -173,7 +199,7 @@ sub _validate
 		foreach my $validator (@{$self->field_defs}) {
 			my $curr_f = $validator->name;
 
-			my $current_data = $self->_find_field($fields, $validator);
+			my $current_data = $self->_ft_find_field($fields, $validator);
 			if (defined $current_data) {
 				my $all_ok = 1;
 
@@ -182,9 +208,9 @@ sub _validate
 					unless ($path_value->structure) {
 						my $value = $meta->run_hooks_for('before_mangle', $self, $validator, $path_value->value);
 						$path_value->set_value($value);
-						$all_ok = $self->_mangle_field($validator, $path_value) && $all_ok;
+						$all_ok = $self->_ft_mangle_field($validator, $path_value) && $all_ok;
 					}
-					$self->_assign_field($dirty, $validator, $path_value);
+					$self->_ft_assign_field($dirty, $validator, $path_value);
 				}
 
 				# found and valid, go to the next field
@@ -193,15 +219,15 @@ sub _validate
 
 			# for when it didn't pass the existence test
 			if ($validator->has_default) {
-				$self->_assign_field($dirty, $validator, $validator->get_default($self));
+				$self->_ft_assign_field($dirty, $validator, $validator->get_default($self));
 			}
 			elsif ($validator->required) {
-				$self->add_error(Form::Tiny::Error::DoesNotExist->new(field => $curr_f));
+				$self->add_error($self->form_meta->build_error(Required => field => $curr_f));
 			}
 		}
 	}
 	else {
-		$self->add_error(Form::Tiny::Error::InvalidFormat->new);
+		$self->add_error($self->form_meta->build_error(InvalidFormat =>));
 	}
 
 	$meta->run_hooks_for('after_validate', $self, $dirty);
@@ -210,7 +236,7 @@ sub _validate
 		if !$self->has_errors;
 
 	my $form_valid = !$self->has_errors;
-	$self->_set_fields($form_valid ? $dirty : undef);
+	$self->_ft_set_fields($form_valid ? $dirty : undef);
 
 	return $form_valid;
 }
@@ -256,9 +282,31 @@ sub add_error
 		croak 'invalid arguments passed to $form->add_error';
 	}
 
+	# check if the field exists
+	for ($error->field) {
+		croak "form does not contain a field definition for $_"
+			if defined $_ && !exists $self->_ft_field_cache->{$_};
+	}
+
+	# unwrap nested form errors
+	$error = $error->error
+		if $error->isa('Form::Tiny::Error::NestedFormError');
+
 	push @{$self->errors}, $error;
 	$self->form_meta->run_hooks_for('after_error', $self, $error);
 	return $self;
+}
+
+sub errors_hash
+{
+	my ($self) = @_;
+
+	my %ret;
+	for my $error (@{$self->errors}) {
+		push @{$ret{$error->field // ''}}, $error->error;
+	}
+
+	return \%ret;
 }
 
 sub has_errors
@@ -267,22 +315,12 @@ sub has_errors
 	return @{$self->errors} > 0;
 }
 
-sub _clear_errors
+sub _ft_clear_errors
 {
 	my ($self) = @_;
 
 	@{$self->errors} = ();
 	return;
-}
-
-sub field_defs
-{
-	my ($self) = @_;
-
-	croak 'field_defs can only be called in object context'
-		unless defined blessed $self;
-
-	return $self->form_meta->resolved_fields($self);
 }
 
 sub form_meta
@@ -335,6 +373,10 @@ B<writer:> I<set_input>
 
 Contains the validated and cleaned fields set after the validation is complete. Cannot be specified in the constructor.
 
+=head3 field_defs
+
+Contains an array reference of L<Form::Tiny::FieldDefinition> instances fetched from the metaclass with context of current instance. Rebuilds everytime new input data is set.
+
 =head3 valid
 
 Contains the result of the validation - a boolean value. Gets produced lazily upon accessing it, so calling C<< $form->valid; >> validates the form automatically.
@@ -361,12 +403,6 @@ Returns the form metaobject, an instance of L<Form::Tiny::Meta>.
 
 This is a Moose-flavored constructor for the class. It accepts a hash or hash reference of parameters, which are the attributes specified above.
 
-=head3 field_defs
-
-Returns an array reference of L<Form::Tiny::FieldDefinition> instances. Can only be called in object context.
-
-No arguments.
-
 =head3 check
 
 =head3 validate
@@ -379,12 +415,29 @@ I<validate> does the same thing, but instead of returning a boolean it returns a
 
 Both methods take input data as the only argument.
 
+=head3 errors_hash
+
+Helper method which returns errors much like the C<errors> form attribute, but in a hash reference with form field names as keys. Errors not assigned to any specific field end up in empty string key. The values are array references of error messages (strings).
+
+Each field will only be present in the hash if it has an error assigned to it. If no errors are present, the hash will be empty.
+
+It allows you to get errors in format which is easier to navigate:
+
+	{
+		'' => [
+			# global form errors
+		],
+		# specific field errors
+		'field1' => [
+			'something went wrong'
+		],
+
+	}
+
 =head3 add_error
 
 	$form->add_error($error_string);
 	$form->add_error($field_name => $error_string);
 	$form->add_error($error_object);
 
-Adds an error to the form. This should only be done during validation with customization methods listed below.
-
-If C<$error_object> style is used, it must be an instance of L<Form::Tiny::Error>.
+Adds an error to the form. If C<$error_object> style is used, it must be an instance of L<Form::Tiny::Error>.

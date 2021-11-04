@@ -20,7 +20,7 @@ use IO::Socket::IP;
 use Mojo::IOLoop::Server;
 use utf8; # tests contain UTF-8 characters and it matters
 
-plan skip_all => 'Contributions are an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
+plan skip_all => 'This is an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
 
 our $host;
 our @hosts = qw(localhost 127.0.0.1); # localhost must come first

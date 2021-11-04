@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ResponseType;
-$Shipment::UPS::WSDL::TrackTypes::ResponseType::VERSION = '3.05';
+$Shipment::UPS::WSDL::TrackTypes::ResponseType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Class::Std::initialize();
               Alert
               TransactionReference
 
-              )
+            )
         ],
         {   'ResponseStatus'       => \%ResponseStatus_of,
             'Alert'                => \%Alert_of,
@@ -68,7 +68,7 @@ Shipment::UPS::WSDL::TrackTypes::ResponseType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

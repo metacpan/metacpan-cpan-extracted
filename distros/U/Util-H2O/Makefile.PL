@@ -12,7 +12,7 @@ WriteMakefile(
 		provides => {
 			'Util::H2O' => {
 				file => 'lib/Util/H2O.pm',
-				version => '0.14',
+				version => '0.16',
 			},
 		},
 		resources => {

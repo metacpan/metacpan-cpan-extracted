@@ -1,6 +1,6 @@
 
 package Shipment::Temando::WSDL::Typemaps::quoting_Service;
-$Shipment::Temando::WSDL::Typemaps::quoting_Service::VERSION = '3.05';
+$Shipment::Temando::WSDL::Typemaps::quoting_Service::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -2348,7 +2348,7 @@ our $typemap_1 = {
       => 'Shipment::Temando::WSDL::Types::VehicleDescription',
     'makeBookingByRequest/origin/auspostLodgementFacility' =>
       'Shipment::Temando::WSDL::Types::AuspostLodgementFacility',
-    'updateClient/client/phone2' => 'Shipment::Temando::WSDL::Types::Phone',
+    'updateClient/client/phone2'    => 'Shipment::Temando::WSDL::Types::Phone',
     'makeBookingByRequest/comments' =>
       'Shipment::Temando::WSDL::Types::Comments',
     'confirmManifestResponse/requests/request/quotes/quote/accepted' =>
@@ -2769,7 +2769,7 @@ our $typemap_1 = {
     'lodgeDispatch/dispatchDetails/originFax' =>
       'Shipment::Temando::WSDL::Types::Fax',
     'getRequestResponse/request' => 'Shipment::Temando::WSDL::Types::Request',
-    'getLocations/description' =>
+    'getLocations/description'   =>
       'Shipment::Temando::WSDL::Types::LocationName',
     'lodgeDispatch/dispatchDetails/deliveryMethod' =>
       'Shipment::Temando::WSDL::Types::DeliveryMethod',
@@ -3257,7 +3257,7 @@ our $typemap_1 = {
     'confirmManifestResponse/requests' =>
       'Shipment::Temando::WSDL::Elements::confirmManifestResponse::_requests',
     'confirmManifest/endReadyDate' => 'Shipment::Temando::WSDL::Types::Date',
-    'makeBookingByRequest/quote' =>
+    'makeBookingByRequest/quote'   =>
       'Shipment::Temando::WSDL::Types::BookingQuote',
     'getRequestResponse/request/quotes/quote/carrier/phone2' =>
       'Shipment::Temando::WSDL::Types::Phone',
@@ -3570,6 +3570,7 @@ our $typemap_1 = {
       'Shipment::Temando::WSDL::Types::Eta'
 };
 
+
 sub get_class {
     my $name = join '/', @{$_[1]};
     return $typemap_1->{$name};
@@ -3591,7 +3592,7 @@ Shipment::Temando::WSDL::Typemaps::quoting_Service
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

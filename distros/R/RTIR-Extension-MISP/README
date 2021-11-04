@@ -1,0 +1,114 @@
+NAME
+    RTIR-Extension-MISP - Integrate RTIR with MISP
+
+DESCRIPTION
+    MISP <https://www.misp-project.org/> is a platform for sharing threat
+    intelligence among security teams, and this extension provides
+    integration from "https://bestpractical.com/rtir" in RTIR.
+
+RTIR VERSION
+    Works with RTIR 5.0
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Patch RTIR for versions prior to 5.0.2
+            patch -p1 -d /opt/rt5/local/plugins/RT-IR < patches/Add-callbacks-to-the-feed-listing-and-display-pages.patch
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RTIR::Extension::MISP');
+
+    make initdb
+        Only run this the first time you install this module.
+
+        If you run this twice, you will end up with duplicate data in your
+        database.
+
+        If you are upgrading this module, check for upgrading instructions
+        in case changes need to be made to your database.
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+  Base MISP Configuration
+    Set the following in your RT_SiteConfig.pm with details for the MISP
+    instance you want RTIR to integrate with.
+
+        Set(%ExternalFeeds,
+            'MISP' => [
+                {   Name        => 'MISP',
+                    URI         => 'https://mymisp.example.com',  # Change to your MISP
+                    Description => 'My MISP Feed',
+                    DaysToFetch => 5,  # For the feed page, how many days back to fetch
+                    ApiKeyAuth  => 'API SECRET KEY',  # Change to your real key
+                },
+            ],
+        );
+
+  MISP Custom Fields
+    If you want to display the MISP ID custom fields in a separate portlet
+    on the incident page, you can customize your custom field portlets with
+    something like this:
+
+        Set(%CustomFieldGroupings,
+            'RTIR::Ticket' => [
+                'Networking'     => ['IP', 'Domain'],
+                'Details' => ['How Reported','Reporter Type','Customer',
+                              'Description', 'Resolution', 'Function', 'Classification',
+                              'Customer',
+                              'Netmask','Port','Where Blocked'],
+                'MISP IDs'     => ['MISP Event ID', 'MISP Event UUID'],  # Add/remove CFs as needed
+            ],
+        );
+
+DETAILS
+    This integration adds several different ways to work between the MISP
+    and RTIR systems as described below.
+
+  Consume Feed from MISP
+    After adding the MISP configuration described above, the Feeds page in
+    RTIR at RTIR > Tools > External Feeds will have a new MISP option
+    listed. This feed pulls in events for the past X number of days based on
+    the DaysToFetch configuration. From the feed display page, you can click
+    the "Create new ticket" button to create a ticket with information from
+    the MISP event.
+
+  MISP Portlet on Incident Display
+    On the Incident Display page, if the custom field MISP Event ID has a
+    value, a portlet MISP Event Details will be displayed, showing details
+    pulled in from the event via the MISP REST API.
+
+  Update MISP Event
+    On an incident with a MISP Event ID, the Actions menu will have an
+    option "Update MISP Event". If you select this action, RTIR will update
+    the existing MISP event with an RTIR object, including data from the
+    incident ticket.
+
+  Create MISP Event
+    If MISP Event ID has no value, the Actions menu on incidents shows an
+    option to "Create MISP Event". Select this to create an event in MISP
+    with details from the incident ticket.
+
+  
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+    All bugs should be reported via email to
+        bug-RTIR-Extension-MISP@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name=RTIR-Extension-MISP
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2021 by Best Practical Solutions, LLC
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

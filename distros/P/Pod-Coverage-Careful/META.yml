@@ -1,0 +1,29 @@
+---
+abstract: 'more careful subclass of Pod::Coverage'
+author:
+  - 'Tom Christiansen <tchrist@perl.com>'
+build_requires:
+  FindBin: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Coverage-Careful
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B: '0'
+  Devel::Symdump: '0'
+  Pod::Coverage: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '1.08'
+  perl: '5.005'
+version: v1.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

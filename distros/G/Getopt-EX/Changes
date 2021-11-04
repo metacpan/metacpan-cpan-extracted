@@ -1,5 +1,12 @@
 Revision history for Perl extension Getopt-EX
 
+v1.26.0 2021-10-29T16:17:14Z
+
+    - Change concealing effect mark V to H in Colormap.pm.
+
+      This is significant change but probably there is no intensive user.
+      V can be used for backward compatibility.
+
 v1.25.1 2021-09-29T16:50:11Z
 
     - NO_COLOR is effective even the value is 0 or empty.

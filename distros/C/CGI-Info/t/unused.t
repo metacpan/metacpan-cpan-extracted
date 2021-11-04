@@ -22,7 +22,8 @@ if($can_test) {
 	BEGIN {
 		if($ENV{AUTHOR_TESTING}) {
 			use_ok('CGI::Info');
-			use warnings::unused -global;
+			# eval 'use warnings::unused -global';
+			eval 'use warnings::unused';
 		}
 	}
 

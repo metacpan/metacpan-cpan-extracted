@@ -3,8 +3,8 @@ use strict;
 use warnings;
 use Carp;
 
-$PDL::Fit::Levmar::VERSION = '0.0100';
-pp_setversion( "'$PDL::Fit::Levmar::VERSION'");
+our $VERSION = '0.0103';
+pp_setversion( $VERSION );
 
 
 our $HAVE_LAPACK;
@@ -539,7 +539,8 @@ See C<P>
 =item DIR
 
 The directory containing files created when compiling C<lpp>
-and C fit functions.  This defaults to './tempcode'; The .c,
+and C fit functions.  This defaults to being created by
+L<File::Temp/tempdir>. The .c,
 .o, and .so files will be written to this directory. This
 option actually falls through to levmar_func.  Such options
 should be in separate section, or otherwise noted.
@@ -1133,7 +1134,7 @@ Need to put the description from the C code in here.
 =for ref
 
 Make a human readable report from the hash ref returned
-by lemvar().
+by levmar().
 
 =for usage
 
@@ -1205,7 +1206,7 @@ pp_addhdr('
 #include <math.h>
 #include <float.h>
 #include "pdlperlfunc.c"
-#include "lm.h"
+#include "levmar.h"
 ');
 
 
@@ -1568,14 +1569,9 @@ pp_addpm(<<'===EOD===pm_code===two');
 	if ( chk_eq_dims($f,$p) < 0 ) {
 	    croak "p and FIX must have the same dimensions";
 	}
-	if ( not defined  $h->{UB} ) {
-	    $h->{UB} = ones($p);
-	    $h->{UB} *= $DBLMAX;
-	}
-	if (not defined  $h->{LB} ) {
-	    $h->{LB} = ones($p);
-	    $h->{LB} *= -$DBLMAX;
-	}
+	$h->{UB} = ones($p) * $DBLMAX if not defined $h->{UB};
+	$h->{LB} = ones($p) * -$DBLMAX if not defined $h->{LB};
+	$_ = topdl($_) for @$h{qw(UB LB)};
 	my $fi = PDL::Primitive::which($f == 1); # indices in p that we want to fix.
 	$h->{UB}->flat->index($fi) .= $p->flat->index($fi);
 	$h->{LB}->flat->index($fi) .= $p->flat->index($fi);
@@ -2026,7 +2022,7 @@ sub write_pp_defs {
 	    if ($der eq 'analytic') { # analytic derivative
 		$h->{OPAR} = ' IV jacn; IV sjacn; ';
 		$h->{CALL} = 'der';
-		$h->{ARG} = '$TFD(tsjacn, tjacn),';
+		$h->{ARG} = 't$TFD(s,)jacn,';
                 $h->{DUMI}= 'void * tjacn = (void *) $COMP(jacn);
                              void * tsjacn = (void *) $COMP(sjacn);';
                 $h->{WORKFAC} = 2;    # needs less workspace than numeric
@@ -2050,6 +2046,7 @@ sub write_pp_defs {
                  $h->{SIG} .= 'wghts(m); ';
                  $h->{ARG2} .= '$P(wghts), ';    
             }
+            $h->{ARG2} .= 'NULL, ' if @{$arg_anal->{ARG_COMB}}; # as of levmar-2.6, a dscl arg
             my $pdl_func_name;
             $pdl_func_name = $arg_anal->{PDL_FUNC_NAME_DER} if $der eq 'analytic';
             $pdl_func_name = $arg_anal->{PDL_FUNC_NAME_DIFF} if $der eq 'numeric';
@@ -2076,7 +2073,7 @@ sub write_pp_defs {
                      \$GENERIC(work) * pwork;
                      $h->{DUMI};
                      DFP *dat = (void *) \$COMP(indat);
-                     DFP_check( &dat, \$TFD(PDL_F,PDL_D), \$SIZE(m), \$SIZE(n),
+                     DFP_check( &dat, PDL_\$TFD(F,D), \$SIZE(m), \$SIZE(n),
 		                      \$SIZE(nt), \$P(t) );
                      threadloop %{    
                          loop(m) %{
@@ -2088,8 +2085,8 @@ sub write_pp_defs {
                          if ( $h->{NOWORK} == 1 )  pwork = NULL;
                          else pwork =  \$P(work);
                          maxits = iopts[0]; /* for clarity. we hope optimized away  */
-         	   \$returnval() = \$TFD(slevmar_$h->{CALL},dlevmar_$h->{CALL}) (
-                      \$TFD(tsfuncn,tfuncn) , $h->{ARG}
+		   \$returnval() = \$TFD(s,d)levmar_$h->{CALL} (
+                      t\$TFD(s,)funcn , $h->{ARG}
                       \$P(pout), \$P(x),  \$SIZE(m), \$SIZE(n), $h->{ARG2}
          	      maxits, \$P(opts), \$P(info), pwork, pcovar, dat);
            /*     maxits, \$P(opts), \$P(info), \$P(work), pcovar , dat);     */
@@ -2173,9 +2170,9 @@ write_pp_defs($a);
                 void * j = (void *) $COMP(jac);
                 void * sj = (void *) $COMP(sjac);
                 DFP *dat = (void *) $COMP(indat);
-                DFP_check( &dat, $TFD(PDL_F,PDL_D), $SIZE(m), $SIZE(n), $SIZE(n), $P(t) );
-                $TFD(slevmar_chkjac,dlevmar_chkjac) (
-    	           $TFD(sf,f), $TFD(sj,j),$P(p),$SIZE(m),$SIZE(n),dat,$P(err)
+                DFP_check( &dat, PDL_$TFD(F,D), $SIZE(m), $SIZE(n), $SIZE(n), $P(t) );
+                $TFD(s,d)levmar_chkjac (
+	           $TFD(s,)f, $TFD(s,)j,$P(p),$SIZE(m),$SIZE(n),dat,$P(err)
 						      );
                 '
            );
@@ -2200,9 +2197,9 @@ write_pp_defs($a);
                 void * j = (void *) $COMP(jac);
                 void * sj =(void *)  $COMP(sjac);
                 DFP *dat = (void *) $COMP(indat);
-                DFP_check( &dat, $TFD(PDL_F,PDL_D), $SIZE(m), $SIZE(n), $SIZE(n), NULL );
-                $TFD(slevmar_chkjac,dlevmar_chkjac) (
-    	           $TFD(sf,f), $TFD(sj,j),$P(p),$SIZE(m),$SIZE(n),dat,$P(err)
+                DFP_check( &dat, PDL_$TFD(F,D), $SIZE(m), $SIZE(n), $SIZE(n), NULL );
+                $TFD(s,d)levmar_chkjac (
+	           $TFD(s,)f, $TFD(s,)j,$P(p),$SIZE(m),$SIZE(n),dat,$P(err)
 						      );
                 '
            );

@@ -1,5 +1,11 @@
 Revision history for MsOffice-Word-Surgeon
 
+1.07     27.10.2021
+  - new method suppress_bookmarks()
+  - fix bug : runs containing '0' should not be treated as empty
+  - unlink_fields() must suppress the content of ASK fields
+  - to_uppercase() must not change HTML entities like &amp;
+
 1.06     16.01.2021
   - fix bug in ->plain_text() : translation of soft line breaks into newlines did not work
 

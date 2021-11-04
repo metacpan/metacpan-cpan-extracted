@@ -44,23 +44,23 @@ ok(blessed $a, "blessed a test");
 my $h={one=>1, two=>2, three=>3};
 
 my $v;
-ok($v=EhV($h, two), "EhV test h->{two}, existing?: true");
-ok($v==2, "EhV test, returns value of two?");
+ok($v=ErV($h, two), "ErV test h->{two}, existing?: true");
+ok($v==2, "ErV test, returns value of two?");
 
-ok(! EhV($h, four), "EhV test not exist(false)");
+ok(! ErV($h, four), "ErV test not exist(false)");
 
-ok(! exists $h->{four}, "EhV testing last false didn't autovivify");
+ok(! exists $h->{four}, "ErV testing last false didn't autovivify");
 
 #test 15:
-ok( ! (EhV($h, undef)), "EhV testing undef keyname(isfalse)");
+ok( ! (ErV($h, undef)), "ErV testing undef keyname(isfalse)");
 
-ok( !defined( EhV ($h, undef)), "EhV testing undef is !defined");
+ok( !defined( ErV ($h, undef)), "ErV testing undef is !defined");
 
 
 my $h2;
-ok (!defined (EhV ($h2, two)), "EhV test w/undef ref is !defined?");
+ok (!defined (ErV ($h2, two)), "ErV test w/undef ref is !defined?");
 
-ok(3 == (EhV ($h, three)), "EhV test that true = val of key");
+ok(3 == (ErV ($h, three)), "ErV test that true = val of key");
 
 ## same tests with ErV
 
@@ -83,16 +83,16 @@ ok(3 == (ErV ($h, three)), "ErV test that true = val of key");
 
 
 my $bh = bless $h, "myClass";
-ok($v=EhV($bh, two), "EhV test bh->{two}, existing?: true");
-ok($v==2, "EhV test, returns value of two?");
+ok($v=ErV($bh, two), "ErV test bh->{two}, existing?: true");
+ok($v==2, "ErV test, returns value of two?");
 
-ok(! EhV($bh, four), "EhV test not exist(false)");
+ok(! ErV($bh, four), "ErV test not exist(false)");
 
-ok(! exists $bh->{four}, "EhV testing last false didn't autovivify");
+ok(! exists $bh->{four}, "ErV testing last false didn't autovivify");
 
-ok( ! (EhV($bh, undef)), "EhV testing undef keyname(isfalse)");
+ok( ! (ErV($bh, undef)), "ErV testing undef keyname(isfalse)");
 
-ok( !defined( EhV ($bh, undef)), "EhV testing undef is !defined");
+ok( !defined( ErV ($bh, undef)), "ErV testing undef is !defined");
 
 
 ok($v=ErV($bh, two), "ErV test bh->{two}, existing?: true");

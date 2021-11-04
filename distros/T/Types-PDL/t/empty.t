@@ -10,7 +10,7 @@ use PDL::Lite;
 #<<< notidy
 
 subtest 'empty = 1' => sub {
-    my $t = Piddle [ empty => 1 ];
+    my $t = NDArray [ empty => 1 ];
 
     ok(  $t->check( PDL->null ), 'PDL->null' );
     ok(  $t->check( PDL->new( [] ) ), 'PDL->new( [] )' );
@@ -20,7 +20,7 @@ subtest 'empty = 1' => sub {
 
 subtest 'empty = 0' => sub {
 
-    my $t = Piddle [ empty => 0 ];
+    my $t = NDArray [ empty => 0 ];
 
     ok( !$t->check( PDL->null ), 'PDL->null' );
     ok( !$t->check( PDL->new( [] ) ), 'PDL->new( [] )' );

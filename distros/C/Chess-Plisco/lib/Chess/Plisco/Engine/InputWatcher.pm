@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::InputWatcher;
-$Chess::Plisco::Engine::InputWatcher::VERSION = '0.3';
+$Chess::Plisco::Engine::InputWatcher::VERSION = '0.4';
 use strict;
 
 use IO::Select;
@@ -28,10 +28,12 @@ sub new {
 	}, $class;
 }
 
-sub handle {
-	my ($self) = @_;
+sub setBatchMode {
+	my ($self, $mode) = @_;
 
-	return $self->{__fh};
+	$self->{__batch_mode} = $mode;
+
+	return $self;
 }
 
 sub onInput {
@@ -51,12 +53,15 @@ sub onEof {
 sub check {
 	my ($self) = @_;
 
+	return if $self->{__batch_mode};
+
 	while (my @ready = $self->{__sel}->can_read(0)) {
 		foreach my $fh (@ready) {
 			my $offset = length $self->{__input};
 			my $bytes = $fh->sysread($self->{__input}, 1, $offset);
 			if (!$bytes) {
 				$self->{__on_eof}->() if $self->{__on_eof};
+				return;
 			} elsif ($self->{__input} =~ s/^(.*?)\n//) {
 				$self->{__on_input}->($1) if $self->{__on_input};
 			}

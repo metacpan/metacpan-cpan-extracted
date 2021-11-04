@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tester::Setup 4.006;
+package Config::Model::Tester::Setup 4.007;
 # ABSTRACT: Common test setup functions for Config::Model
 
 use warnings;
@@ -91,7 +91,7 @@ Config::Model::Tester::Setup - Common test setup functions for Config::Model
 
 =head1 VERSION
 
-version 4.006
+version 4.007
 
 =head1 SYNOPSIS
 

@@ -26,7 +26,7 @@ Phoebe doesn’t have to live behind another web server like Apache or nginx. It
 can be a (simple) web server, too!
 
 This package gives web visitors read-only access to Phoebe. HTML is served via
-HTTP on the same port as everything else, i.e. 1965 by default.
+HTTPS on the same port as everything else, i.e. 1965 by default.
 
 There is no configuration. Simply add it to your F<config> file:
 

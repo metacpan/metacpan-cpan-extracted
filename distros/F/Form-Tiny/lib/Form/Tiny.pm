@@ -1,6 +1,7 @@
 package Form::Tiny;
 
 use v5.10;
+use strict;
 use warnings;
 use Carp qw(croak carp);
 use Types::Standard qw(Str);
@@ -10,14 +11,14 @@ use Form::Tiny::Form;
 use Form::Tiny::Utils qw(trim :meta_handlers);
 require Moo;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 sub import
 {
 	my ($package, $caller) = (shift, scalar caller);
 
 	my @wanted = @_;
-	my @wanted_subs = qw(form_field form_cleaner form_hook field_validator);
+	my @wanted_subs = qw(form_field form_cleaner form_hook field_validator form_message);
 	my @wanted_roles;
 
 	my %subs = %{$package->_generate_helpers($caller)};
@@ -39,7 +40,10 @@ sub import
 		push @wanted_roles, @{$behaviors{$type}->{roles}};
 	}
 
-	create_form_meta($caller, @wanted_roles);
+	my $meta = create_form_meta($caller, @wanted_roles);
+
+	carp "Form $caller created without -consistent flag is deprecated. See compatibility docs"
+		unless $meta->consistent_api;
 
 	{
 		no strict 'refs';
@@ -89,7 +93,19 @@ sub _generate_helpers
 		},
 		form_trim_strings => sub {
 			$field_context = undef;
-			$caller->form_meta->add_filter(Str, \&trim);
+			if ($caller->form_meta->consistent_api) {
+				$caller->form_meta->add_filter(Str, sub { trim $_[1] });
+			}
+			else {
+				$caller->form_meta->add_filter(Str, \&trim);
+			}
+		},
+		form_message => sub {
+			$field_context = undef;
+			my %params = @_;
+			for my $key (keys %params) {
+				$caller->form_meta->add_message($key, $params{$key});
+			}
 		},
 	};
 }
@@ -112,6 +128,10 @@ sub _get_behaviors
 			subs => [qw(form_filter field_filter form_trim_strings)],
 			roles => [qw(Form::Tiny::Meta::Filtered)],
 		},
+		-consistent => {
+			subs => [],
+			roles => [qw(Form::Tiny::Meta::Consistent)],
+		},
 	};
 }
 
@@ -127,7 +147,7 @@ Form::Tiny - Input validator implementation centered around Type::Tiny
 
 	package MyForm;
 
-	use Form::Tiny -base;
+	use Form::Tiny -consistent;
 	use Types::Standard qw(Int);
 
 	form_field 'my_field' => (
@@ -148,6 +168,10 @@ Form::Tiny is a customizable hashref validator with DSL for form building.
 =over
 
 =item * L<Form::Tiny::Manual> - Main reference
+
+=item * L<Form::Tiny::Manual::Cookbook> - Common tasks performed with Form::Tiny
+
+=item * L<Form::Tiny::Manual::Performance> - How to get the most speed out of the module
 
 =item * L<Form::Tiny::Manual::Compatibility> - See backwards compatibility notice
 
@@ -207,6 +231,11 @@ This flag makes your form check for strictness before the validation.
 
 Installed functions: same as C<-base>
 
+=item * C<-consistent>
+
+Turns on consistent subroutine API in the form package. This will become a default in the future, after the deprecation period.
+See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
+
 =back
 
 =head2 Form domain-specific language
@@ -224,6 +253,14 @@ In the first (hash) version, C<%arguments> need to be a plain hash (not a hashre
 In the second (coderef) version, C<$coderef> gets passed the form instance as its only argument and should return a hashref or a constructed object of L<Form::Tiny::FieldDefinition>. A hashref must contain a C<name>. Note that this creates I<dynamic field>, which will be resolved repeatedly during form validation. As such, it should not contain any randomness.
 
 If you need a subclass of the default implementation, and you don't need a dynamic field, you can use the third style of the call, which takes a constructed object of L<Form::Tiny::FieldDefinition> or its subclass.
+
+=head3 form_message
+
+	form_message
+		$type1 => $message1,
+		$type2 => $message2;
+
+Override form default error messages, possibly multiple at a time. Types can be any of C<Required> (when a mandatory field is missing), C<IsntStrict> (when form is strict and the check for it fails) and C<InvalidFormat> (when passed input format is not a hash reference) - currently only those types have their own dedicated error message.
 
 =head3 form_hook
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::FlatbedTrailerOption;
-$Shipment::FedEx::WSDL::RateTypes::FlatbedTrailerOption::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::FlatbedTrailerOption::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Shipment::FedEx::WSDL::RateTypes::FlatbedTrailerOption
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

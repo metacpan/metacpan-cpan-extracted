@@ -1,15 +1,16 @@
 package Math::Image::CalcResized;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-24'; # DATE
-our $DIST = 'Math-Image-CalcResized'; # DIST
-our $VERSION = '0.004'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-12'; # DATE
+our $DIST = 'Math-Image-CalcResized'; # DIST
+our $VERSION = '0.005'; # VERSION
+
 our @EXPORT_OK = qw(calc_image_resized_size);
 our %SPEC;
 
@@ -295,6 +296,13 @@ sub calc_image_resized_size {
 $SPEC{image_resize_notation_to_human} = {
     v => 1.1,
     summary => 'Translate ImageMagick-like resize notation (e.g. "720^>") to human-friendly text (e.g. "shrink shortest side to 720px")',
+    description => <<'_',
+
+Resize notation supports most syntax from ImageMagick geometry. See
+<pm:Math::Image::CalcResized> and ImageMagick documentation on geometry for more
+details.
+
+_
     args => {
         resize => {
             schema => 'str*',
@@ -383,7 +391,7 @@ Math::Image::CalcResized - Calculate dimensions of image/video resized by ImageM
 
 =head1 VERSION
 
-This document describes version 0.004 of Math::Image::CalcResized (from Perl distribution Math-Image-CalcResized), released on 2020-12-24.
+This document describes version 0.005 of Math::Image::CalcResized (from Perl distribution Math-Image-CalcResized), released on 2021-10-12.
 
 =head1 FUNCTIONS
 
@@ -392,7 +400,7 @@ This document describes version 0.004 of Math::Image::CalcResized (from Perl dis
 
 Usage:
 
- calc_image_resized_size(%args) -> [status, msg, payload, meta]
+ calc_image_resized_size(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Given size of an image (in WxH, e.g. "2592x1944") and ImageMagick-like resize instruction (e.g. "1024pE<gt>"), calculate new resized image.
 
@@ -764,12 +772,12 @@ ImageE<sol>video size, in <widthE<gt>x<heightE<gt> format, e.g. 2592x1944.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -779,7 +787,7 @@ Return value:  (any)
 
 Usage:
 
- image_resize_notation_to_human(%args) -> [status, msg, payload, meta]
+ image_resize_notation_to_human(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Translate ImageMagick-like resize notation (e.g. "720^E<gt>") to human-friendly text (e.g. "shrink shortest side to 720px").
 
@@ -925,6 +933,10 @@ Result:
 
 =back
 
+Resize notation supports most syntax from ImageMagick geometry. See
+L<Math::Image::CalcResized> and ImageMagick documentation on geometry for more
+details.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -938,12 +950,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -955,25 +967,42 @@ Please visit the project's homepage at L<https://metacpan.org/release/Math-Image
 
 Source repository is at L<https://github.com/perlancar/perl-Math-Image-CalcResized>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Math-Image-CalcResized/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Image-CalcResized>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

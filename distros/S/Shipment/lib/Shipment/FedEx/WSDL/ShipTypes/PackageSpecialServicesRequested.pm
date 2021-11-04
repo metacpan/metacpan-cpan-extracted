@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested;
-$Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Class::Std::initialize();
               SignatureOptionDetail
               PriorityAlertDetail
 
-              )
+            )
         ],
         {   'SpecialServiceTypes'   => \%SpecialServiceTypes_of,
             'CodDetail'             => \%CodDetail_of,
@@ -85,7 +85,7 @@ Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

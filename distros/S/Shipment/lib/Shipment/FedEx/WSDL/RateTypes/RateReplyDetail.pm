@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::RateReplyDetail;
-$Shipment::FedEx::WSDL::RateTypes::RateReplyDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::RateReplyDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -60,17 +60,17 @@ Class::Std::initialize();
               ActualRateType
               RatedShipmentDetails
 
-              )
+            )
         ],
-        {   'ServiceType'          => \%ServiceType_of,
-            'PackagingType'        => \%PackagingType_of,
-            'AppliedOptions'       => \%AppliedOptions_of,
-            'AppliedSubOptions'    => \%AppliedSubOptions_of,
-            'DeliveryStation'      => \%DeliveryStation_of,
-            'DeliveryDayOfWeek'    => \%DeliveryDayOfWeek_of,
-            'DeliveryTimestamp'    => \%DeliveryTimestamp_of,
-            'CommitDetails'        => \%CommitDetails_of,
-            'DestinationAirportId' => \%DestinationAirportId_of,
+        {   'ServiceType'                     => \%ServiceType_of,
+            'PackagingType'                   => \%PackagingType_of,
+            'AppliedOptions'                  => \%AppliedOptions_of,
+            'AppliedSubOptions'               => \%AppliedSubOptions_of,
+            'DeliveryStation'                 => \%DeliveryStation_of,
+            'DeliveryDayOfWeek'               => \%DeliveryDayOfWeek_of,
+            'DeliveryTimestamp'               => \%DeliveryTimestamp_of,
+            'CommitDetails'                   => \%CommitDetails_of,
+            'DestinationAirportId'            => \%DestinationAirportId_of,
             'IneligibleForMoneyBackGuarantee' =>
               \%IneligibleForMoneyBackGuarantee_of,
             'OriginServiceArea'      => \%OriginServiceArea_of,
@@ -81,14 +81,14 @@ Class::Std::initialize();
             'ActualRateType'         => \%ActualRateType_of,
             'RatedShipmentDetails'   => \%RatedShipmentDetails_of,
         },
-        {   'ServiceType' => 'Shipment::FedEx::WSDL::RateTypes::ServiceType',
+        {   'ServiceType'   => 'Shipment::FedEx::WSDL::RateTypes::ServiceType',
             'PackagingType' =>
               'Shipment::FedEx::WSDL::RateTypes::PackagingType',
             'AppliedOptions' =>
               'Shipment::FedEx::WSDL::RateTypes::ServiceOptionType',
             'AppliedSubOptions' =>
               'Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail',
-            'DeliveryStation' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DeliveryStation'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
             'DeliveryDayOfWeek' =>
               'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
             'DeliveryTimestamp' =>
@@ -115,15 +115,15 @@ Class::Std::initialize();
         },
         {
 
-            'ServiceType'          => 'ServiceType',
-            'PackagingType'        => 'PackagingType',
-            'AppliedOptions'       => 'AppliedOptions',
-            'AppliedSubOptions'    => 'AppliedSubOptions',
-            'DeliveryStation'      => 'DeliveryStation',
-            'DeliveryDayOfWeek'    => 'DeliveryDayOfWeek',
-            'DeliveryTimestamp'    => 'DeliveryTimestamp',
-            'CommitDetails'        => 'CommitDetails',
-            'DestinationAirportId' => 'DestinationAirportId',
+            'ServiceType'                     => 'ServiceType',
+            'PackagingType'                   => 'PackagingType',
+            'AppliedOptions'                  => 'AppliedOptions',
+            'AppliedSubOptions'               => 'AppliedSubOptions',
+            'DeliveryStation'                 => 'DeliveryStation',
+            'DeliveryDayOfWeek'               => 'DeliveryDayOfWeek',
+            'DeliveryTimestamp'               => 'DeliveryTimestamp',
+            'CommitDetails'                   => 'CommitDetails',
+            'DestinationAirportId'            => 'DestinationAirportId',
             'IneligibleForMoneyBackGuarantee' =>
               'IneligibleForMoneyBackGuarantee',
             'OriginServiceArea'      => 'OriginServiceArea',
@@ -153,7 +153,7 @@ Shipment::FedEx::WSDL::RateTypes::RateReplyDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

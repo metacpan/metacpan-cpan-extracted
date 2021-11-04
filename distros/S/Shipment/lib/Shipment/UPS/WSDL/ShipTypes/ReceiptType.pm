@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::ShipTypes::ReceiptType;
-$Shipment::UPS::WSDL::ShipTypes::ReceiptType::VERSION = '3.05';
+$Shipment::UPS::WSDL::ShipTypes::ReceiptType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
         [   qw(        ImageFormat
               GraphicImage
 
-              )
+            )
         ],
         {   'ImageFormat'  => \%ImageFormat_of,
             'GraphicImage' => \%GraphicImage_of,
@@ -65,7 +65,7 @@ Shipment::UPS::WSDL::ShipTypes::ReceiptType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

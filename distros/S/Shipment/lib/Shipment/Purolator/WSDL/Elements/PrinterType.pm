@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDL::Elements::PrinterType;
-$Shipment::Purolator::WSDL::Elements::PrinterType::VERSION = '3.05';
+$Shipment::Purolator::WSDL::Elements::PrinterType::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDL::Elements::PrinterType
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

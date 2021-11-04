@@ -86,8 +86,7 @@ done_testing;
 
 sub _dump {
     my ( @arg ) = @_;
-    package
-    My::Module::Test;	# Cargo cult to hide from CPAN indexer
+    package My::Module::Test;
     return scalar PPIx::QuoteLike::Dumper->dump( @arg );
 }
 

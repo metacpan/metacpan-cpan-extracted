@@ -19,7 +19,7 @@ use constant hipi_export_constants();
 use Scalar::Util qw( weaken isweak refaddr );
 use Carp;
 
-our $VERSION ='0.85';
+our $VERSION ='0.86';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();

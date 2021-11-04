@@ -72,6 +72,7 @@ struct SlotHookFuncs {
 
 struct SlotHook {
   SLOTOFFSET slotix; /* unused when in SlotMeta->hooks; used by ClassMeta->slothooks_* */
+  SlotMeta *slotmeta;
   const struct SlotHookFuncs *funcs;
   SV *hookdata;
 };
@@ -129,6 +130,9 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
 #define mop_class_seal(meta)  ObjectPad_mop_class_seal(aTHX_ meta)
 void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta);
 
+#define mop_class_add_role(class, role)  ObjectPad_mop_class_add_role(aTHX_ class, role)
+void ObjectPad_mop_class_add_role(pTHX_ ClassMeta *class, ClassMeta *role);
+
 #define mop_class_add_method(class, methodname)  ObjectPad_mop_class_add_method(aTHX_ class, methodname)
 MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname);
 
@@ -143,9 +147,6 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv);
 
 #define mop_class_add_ADJUSTPARAMS(class, cv)  ObjectPad_mop_class_add_ADJUSTPARAMS(aTHX_ class, cv)
 void ObjectPad_mop_class_add_ADJUSTPARAMS(pTHX_ ClassMeta *meta, CV *cv);
-
-#define mop_class_compose_role(class, role)  ObjectPad_mop_class_compose_role(aTHX_ class, role)
-void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rolemeta);
 
 #define mop_class_apply_attribute(classmeta, name, value)  ObjectPad_mop_class_apply_attribute(aTHX_ classmeta, name, value)
 void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char *name, SV *value);

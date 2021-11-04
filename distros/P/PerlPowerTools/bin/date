@@ -1,172 +1,119 @@
 #!/usr/bin/perl
+use strict;
 
 =begin metadata
 
 Name: date
 Description: display or set date and time
+Author: brian d foy, brian.d.foy@gmail.com
 Author: Joshua Gross
-License:
+License: artistic2
 
 =end metadata
 
 =cut
 
+use POSIX;
 
-use strict;
+my $VERSION = '1.0.3';
 
-my ($format, $time, $hr_diff, $let, $date_str);
-my ($sec, $min, $hour, $m_day, $mon, $year, $w_day, $y_day, $isdst);
+my $format = "%a %b %e %T %Z %Y";
 
-$time = time();
-$format = "%a %b %e %T %Z %Y";
-($sec, $min, $hour, $m_day, $mon, $year, $w_day, $y_day, $isdst) =
-	localtime($time);
+BEGIN {
+my @times = CORE::localtime;
+sub core_time { @times }
+}
 
-if (@ARGV) {
-	for my $arg (@ARGV) {
-	if ($arg =~ /^\-u/) {
-		($sec, $min, $hour, $m_day, $mon, $year, $w_day, $y_day, $isdst)
-			= gmtime($time);
-	} elsif ($arg =~ /^\-/ || $arg !~ /^\+/) {
-		usage("Option $arg not support in this version.\n");
-	} elsif ($arg =~ s/(^\+)//){
-			$format = $arg;
-			last;
-		}
-	} #end foreach $arg
-}# end else
+foreach (@ARGV) {
+    chomp;
+       if( /^\-u/ ) { $ENV{'TZ'} = 'UTC'; my @times = CORE::gmtime; *core_time = sub { @times } }
+    elsif( /^\+/  ) { ($format = $_) =~ s/(^\+)// }
+    else {
+        usage("$_ is not supported in this version.\n");
+        }
+    }
 
-my $s = " ";
-my $c = ":";
-my $l = "/";
-
-my $wk_offset = 7 - (($y_day - $w_day) % 7);
-
-my $mon_name = (qw(January February March April May June July August
-	September October November December))[$mon];
-my $wk_name = (qw(Sunday Monday Tuesday Wednesday Thursday Friday
-	Saturday))[$w_day];
-
-my %format_hash = (
-	'%' => '%',
-	'a' => substr($wk_name,0,3),
-	'A' => $wk_name,
-	'B' => $mon_name,
-	'b' => substr($mon_name,0,3),
-	'C' => zpad(int($year/100 + 19)),
-	'd' => zpad($m_day),
-	'D' => zpad($mon+1).$l.zpad($m_day).$l.substr($year, -2, 2),
-	'e' => spad($m_day),
-	'h' => substr($mon_name,0,3),
-	'H' => zpad($hour),
-	'I' => zpad(hour12($hour)),
-	'j' => zpad3($y_day + 1),
-	'k' => spad($hour),
-	'l' => spad(hour12($hour)),
-	'm' => zpad($mon+1),
-	'M' => zpad($min),
-	'n' => "\n",
-	'p' => ampm($hour),
-	'r' => zpad(hour12($hour)).$c.zpad($min).$c.zpad($sec).$s.ampm($hour),
-	'R' => zpad($hour).$c.zpad($min),
-	's' => $time,
-	'S' => zpad($sec),
-	't' => "\t",
-	'T' => zpad($hour).$c.zpad($min).$c.zpad($sec),
-	'u' => $w_day ? $w_day : 7,
-	'U' => zpad(int(($y_day + $wk_offset)/7)),
-	'w' => $w_day,
-	'W' => zpad(int(($y_day + $wk_offset - 1)/7)),
-	'y' => substr($year, -2, 2),
-	'Y' => $year + 1900,
-	'Z' => gettz((gmtime())[2] - $hour, $isdst),
+my %formats = (
+	'e' => sprintf( '% 2d', (core_time)[3] ),
+    'P' => lc( ( core_time() )[2] >= 12 ? "PM" : "AM" ),
+    'q' => quarter(),
+    'T' => sprintf( '%02d:%02d:%02d', (core_time)[2,1,0] ),
+    'Z' => munge_tz(),
 );
 
-while($format ne '') {
-	$let = lpop(\$format);
-	if($let eq "%") {
-		$let = lpop(\$format);
-		$date_str .= $format_hash{$let} || "%".$let;
-	} else {
-		$date_str .= $let;
-	}
-}
-print $date_str."\n";
+my @POSIX = qw(
+    a A b B c C d D F g G h H I j k l m M
+    n p r R s S t u U V w W x X y Y z
+    );
+@formats{ @POSIX } = map { POSIX::strftime( "%$_", core_time() ) } @POSIX;
 
-#################################################################################
-#####             Formatting Functions and Date Functions Below              ####
-#################################################################################
+$format =~ s/%(.)/ exists $formats{$1} ? $formats{$1} : "%$1" /eg;
+print $format, "\n";
 
-sub gettz {
-	my ($offset, $isdst) = @_;
-	if($isdst) {
-		return (undef,undef,undef,undef,'EDT','CDT','MDT','PDT')[$offset];
-	} else {
-		return ('GMT',undef,undef,undef,undef,'EST','CST','MST','PST')[$offset];
+sub munge_tz {
+	return 'UTC' if $ENV{TZ} eq 'UTC';
+	my $from_posix = POSIX::strftime( '%Z', core_time() );
+	my $from_windows = windows_time_zones();
+	return $from_posix if $from_posix =~ m/\A[A-Z]{3,4}\z/;
+	return $from_windows->{$from_posix} if exists $from_windows->{$from_posix};
 	}
-} # determine time zone
-sub lpop { ${$_[0]} =~ s/(^.)(.*)/$2/; return $1 } # pop a letter off
-sub zpad {
-	my $num = shift || 0;
-	$num =~ /^\d{2}/ ? return $num : return "0$num";
-} # pad number to two digits w/ spaces
-sub zpad3 {
-	my $num = shift || 0;
-	$num ="00".$num;
-	return substr($num, -3, 3);
-} # pad number to three digits w/ zeros
-sub spad  {
-	my $num = shift || 0;
-	$num =~ /^\d{2}/ ? return $num : return " $num";
-} # pad number to two chars w/ space
-sub hour12 { $_[0]==12 || $_[0]==0 ? return 12 : return($_[0] % 12); }
-# convert 24 hour to 12 hour
-sub ampm { $_[0] >= 12 ? return "PM" : return "AM" }
-# determine am or pm
+
+sub quarter {
+    my $mon = ( core_time() )[4] + 1;
+
+       if( $mon <= 3 ) { 1 }
+    elsif( $mon <= 6 ) { 2 }
+    elsif( $mon <= 9 ) { 3 }
+    else               { 4 }
+    }
 
 sub usage {
-	my $usage =$_[0]."usage: $0".' [-u] [+format]
+    die <<"USAGE";
+$_[0]."usage: $0".' [-u] [+format]
+
 formats
-%% - The character %.
-%a - Three-letter weekday name.
-%A - Full weekday name.
-%b - Three-letter month name.
-%B - Full month name.
-%C - Century (00-99).
-%d - Day of month (padded w/ zero).
-%D - Date in MM/DD/YY format.
-%e - Day of month (padded w/ space).
-%g - ISO 8601 year (not implemented).
-%G - ISO 8601 year (not implemented).
-%h - Three-letter month name.
-%H - Hour HH.
-%I - Hour HH (12 hour).
-%j - Three-digit Julian day.
-%k - Hour - space padded.
-%l - Hour - space padded (12 hour).
-%m - Month number 01-12.
-%M - Minute MM.
-%n - Newline.
-%p - AM or PM.
-%r - Time in HH(12 hour):MM:SS (AM|PM) format.
-%R - Time in HH:MM format.
-%s - Absolute seconds (since epoch).
-%S - Seconds SS.
-%t - Tab.
+%% - The character %
+%a - Three-letter weekday name
+%A - Full weekday name
+%b - Three-letter month name
+%B - Full month name
+%c - locale version of the date-time string
+%C - Century (00-99)
+%d - Day of month (padded w/ zero)
+%D - Date in MM/DD/YY format
+%e - Day of month (padded w/ space)
+%F - %Y-%m-%d
+%g - ISO 8601 year
+%G - ISO 8601 year
+%h - Three-letter month name
+%H - Hour HH
+%I - Hour HH (12 hour)
+%j - Three-digit Julian day
+%k - Hour - space padded
+%l - Hour - space padded (12 hour)
+%m - Month number 01-12
+%M - Minute MM
+%n - Newline
+%p - AM or PM
+%r - Time in HH(12 hour):MM:SS (AM|PM) format
+%R - Time in HH:MM format
+%s - Absolute seconds (since epoch)
+%S - Seconds SS
+%t - Tab
 %T - Time in HH:MM:SS format.
 %u - Day of week, 1=Monday, 7=Sunday.
 %U - Two digit week number, start Sunday.
+%V - ISO week number, with Monday as the first day of week
 %w - Day of week, 0=Sunday, 6=Saturday.
 %W - Two digit week number, start Monday.
+%x - locale's date representation
+%X - locale's time representation
 %y - Two-digit year.
 %Y - Four-digit year.
-%Z - Time zone code.';
-	 die $usage."\n";
+%z - Time zone offset in hours.
+%Z - Time zone code.
+USAGE
 }
-# This program is copyright (c) Joshua Gross 1999.
-# You may distribute, alter, duplicate, copy or use this program in any legal
-# manner, so long as you don't restrict the ability of other to do likewise.
-# This program is offered with no guarantees, warranties, or vague promises.
 
 =encoding utf8
 
@@ -174,4 +121,128 @@ formats
 
 date - display or set date and time
 
+=cut
 
+=begin comment
+
+#!perl
+use v5.10;
+
+use Mojo::UserAgent;
+use Mojo::Util qw(dumper);
+
+my $ua = Mojo::UserAgent->new;
+my $url = 'https://ss64.com/nt/timezones.html';
+
+my %hash = Mojo::UserAgent
+	->new
+	->get( $url )
+	->result
+	->dom
+	->find( 'table#rowhover > tr' )
+	->map( sub { ($_->find( 'td' )->map( 'all_text' )->each)[2,4] } )
+	->each;
+
+say dumper( \%hash );
+
+=end comment
+
+=cut
+
+sub windows_time_zones {
+	my %hash = (
+	  "AUS Central Standard Time" => "ACST",
+	  "AUS Eastern Standard Time" => "AEST",
+	  "Afghanistan Standard Time" => "AFT",
+	  "Alaskan Standard Time" => "AKST",
+	  "Arab Standard Time" => "ABST",
+	  "Arabian Standard Time" => "AST",
+	  "Arabic Standard Time" => "ARST",
+	  "Argentina Standard Time" => "ART",
+	  "Atlantic Standard Time" => "\x{a0}",
+	  "Azerbaijan Standard Time" => "AZT",
+	  "Azores Standard Time" => "AZOT",
+	  "Cabo Verde Standard Time" => "CVT",
+	  "Canada Central Standard Time" => "CT",
+	  "Caucasus Standard Time" => "AMT",
+	  "Cen. Australia Standard Time" => "ACST",
+	  "Central America Standard Time" => "CST",
+	  "Central Asia Standard Time" => "BTT",
+	  "Central Europe Standard Time" => "CET",
+	  "Central European Standard Time" => "CET",
+	  "Central Pacific Standard Time" => "SBT",
+	  "Central Standard Time" => "CT/CCST",
+	  "Central Standard Time (Mexico)" => "CST",
+	  "China Standard Time" => "CST",
+	  "Dateline Standard Time" => "BIT",
+	  "E. Africa Standard Time" => "EAT",
+	  "E. Australia Standard Time" => "AEST",
+	  "E. Europe Standard Time" => "EET",
+	  "E. South America Standard Time" => "EST",
+	  "Eastern Standard Time" => "EST",
+	  "Egypt Standard Time" => "EGST",
+	  "Ekaterinburg Standard Time" => "YEKT",
+	  "FLE Standard Time" => "EET",
+	  "Fiji Standard Time" => "FJT",
+	  "Further-Eastern European Time" => "FET",
+	  "GMT Standard Time" => "GMT",
+	  "GTB Standard Time" => "GTBST",
+	  "Georgian Standard Time" => "GET",
+	  "Greenland Standard Time" => "GNST",
+	  "Greenwich Standard Time" => "GMT",
+	  "Hawaiian Standard Time" => "HST",
+	  "India Standard Time" => "IST",
+	  "Iran Standard Time" => "IRST",
+	  "Israel Standard Time" => "IST",
+	  "Jordan Standard Time" => "JST",
+	  "Korea Standard Time" => "KST",
+	  "Libya Standard Time" => "CET",
+	  "Mauritius Standard Time" => "MUT",
+	  "Mexico Standard Time" => "CST",
+	  "Mexico Standard Time 2" => "",
+	  "Mid-Atlantic Standard Time" => "GST",
+	  "Middle East Standard Time" => "MEST",
+	  "Morocco Standard Time" => "MOST",
+	  "Mountain Standard Time" => "MT/MST",
+	  "Mountain Standard Time (Mexico)" => "MSTM",
+	  "Myanmar Standard Time" => "MYST",
+	  "N. Central Asia Standard Time" => "NCAST",
+	  "Namibia Standard Time" => "NMST",
+	  "Nepal Standard Time" => "NPT",
+	  "New Zealand Standard Time" => "NZST",
+	  "Newfoundland and Labrador Standard Time" => "NST",
+	  "North Asia East Standard Time" => "IRKT",
+	  "North Asia Standard Time" => "KRAT",
+	  "Pacific SA Standard Time" => "PSAST",
+	  "Pacific Standard Time" => "PST",
+	  "Pacific Standard Time (Mexico)" => "PST",
+	  "Pakistan Standard Time" => "PKT",
+	  "Romance Standard Time" => "RST",
+	  "Russian Standard Time" => "MSK",
+	  "SA Eastern Standard Time" => "UYT/SAEST",
+	  "SA Pacific Standard Time" => "SAPST",
+	  "SA Western Standard Time" => "SAWST",
+	  "SE Asia Standard Time" => "THA",
+	  "Samoa Standard Time" => "SMST",
+	  "Singapore Standard Time" => "SST",
+	  "South Africa Standard Time" => "SAST",
+	  "Sri Lanka Standard Time" => "SLST",
+	  "Taipei Standard Time" => "TIST",
+	  "Tasmania Standard Time" => "TAST",
+	  "Tokyo Standard Time" => "TST",
+	  "Tonga Standard Time" => "TOT",
+	  "Turkey Standard Time" => "EET",
+	  "U.S. Eastern Standard Time" => "EST",
+	  "US Mountain Standard Time" => "MST",
+	  "Venezuela Standard Time" => "VET",
+	  "Vladivostok Standard Time" => "VLAT",
+	  "W. Australia Standard Time" => "AWST",
+	  "W. Central Africa Standard Time" => "ECT",
+	  "W. Europe Standard Time" => "WET",
+	  "West Asia Standard Time" => "WAST",
+	  "West Pacific Standard Time" => "WPST",
+	  "Yakutsk Standard Time" => "YAKT",
+	  );
+
+	  \%hash;
+}

@@ -6,7 +6,7 @@ Astro::Catalog::Item::Morphology - Information about a star's morphology.
 
 =head1 SYNOPSIS
 
-  $morphology = new Astro::Catalog::Item::Morphology( );
+    $morphology = new Astro::Catalog::Item::Morphology();
 
 =head1 DESCRIPTION
 
@@ -14,17 +14,15 @@ Stores information about an astronomical object's morphology.
 
 =cut
 
-use 5.006;
 use strict;
 use warnings;
-use vars qw/ $VERSION /;
 use Carp;
 
 use Number::Uncertainty;
 
 use warnings::register;
 
-$VERSION = "4.35";
+our $VERSION = '4.36';
 
 =head1 METHODS
 
@@ -36,7 +34,7 @@ $VERSION = "4.35";
 
 Create a new instance of an C<Astro::Catalog::Item::Morphology> object.
 
-$morphology = new Astro::Catalog::Item::Morphology( );
+    $morphology = new Astro::Catalog::Item::Morphology();
 
 This method returns a reference to an C<Astro::Catalog::Item::Morphology>
 object.
@@ -44,20 +42,20 @@ object.
 =cut
 
 sub new {
-  my $proto = shift;
-  my $class = ref( $proto ) || $proto;
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
 
-  # Retrieve the arguments.
-  my %args = @_;
+    # Retrieve the arguments.
+    my %args = @_;
 
-  # Create the object.
-  my $obj = bless {}, $class;
+    # Create the object.
+    my $obj = bless {}, $class;
 
-  # Configure the object.
-  $obj->_configure( %args );
+    # Configure the object.
+    $obj->_configure(%args);
 
-  # And return it.
-  return $obj;
+    # And return it.
+    return $obj;
 }
 
 =back
@@ -73,16 +71,16 @@ The ellipticity of the object.
 =cut
 
 sub ellipticity {
-  my $self = shift;
-  if( @_ ) {
-    my $ell = shift;
-    if( defined( $ell ) &&
-        ! UNIVERSAL::isa( $ell, "Number::Uncertainty" ) ) {
-      $ell = new Number::Uncertainty( Value => $ell );
+    my $self = shift;
+    if (@_) {
+        my $ell = shift;
+        if (defined($ell) &&
+                ! UNIVERSAL::isa($ell, "Number::Uncertainty")) {
+            $ell = new Number::Uncertainty(Value => $ell);
+        }
+        $self->{ELLIPTICITY} = $ell;
     }
-    $self->{ELLIPTICITY} = $ell;
-  }
-  return $self->{ELLIPTICITY};
+    return $self->{ELLIPTICITY};
 }
 
 =item B<position_angle_pixel>
@@ -93,16 +91,16 @@ clockwise from the positive x axis.
 =cut
 
 sub position_angle_pixel {
-  my $self = shift;
-  if( @_ ) {
-    my $ang = shift;
-    if( defined( $ang ) &&
-        ! UNIVERSAL::isa( $ang, "Number::Uncertainty" ) ) {
-      $ang = new Number::Uncertainty( Value => $ang );
+    my $self = shift;
+    if (@_) {
+        my $ang = shift;
+        if (defined($ang) &&
+                ! UNIVERSAL::isa($ang, "Number::Uncertainty")) {
+            $ang = new Number::Uncertainty(Value => $ang);
+        }
+        $self->{POSITION_ANGLE_PIXEL} = $ang;
     }
-    $self->{POSITION_ANGLE_PIXEL} = $ang;
-  }
-  return $self->{POSITION_ANGLE_PIXEL};
+    return $self->{POSITION_ANGLE_PIXEL};
 }
 
 =item B<position_angle_world>
@@ -113,16 +111,16 @@ east of north.
 =cut
 
 sub position_angle_world {
-  my $self = shift;
-  if( @_ ) {
-    my $ang = shift;
-    if( defined( $ang ) &&
-        ! UNIVERSAL::isa( $ang, "Number::Uncertainty" ) ) {
-      $ang = new Number::Uncertainty( Value => $ang );
+    my $self = shift;
+    if (@_) {
+        my $ang = shift;
+        if (defined($ang) &&
+                ! UNIVERSAL::isa( $ang, "Number::Uncertainty")) {
+            $ang = new Number::Uncertainty(Value => $ang);
+        }
+        $self->{POSITION_ANGLE_WORLD} = $ang;
     }
-    $self->{POSITION_ANGLE_WORLD} = $ang;
-  }
-  return $self->{POSITION_ANGLE_WORLD};
+    return $self->{POSITION_ANGLE_WORLD};
 }
 
 =item B<major_axis_pixel>
@@ -132,16 +130,16 @@ Length of the semi-major axis in units of pixels.
 =cut
 
 sub major_axis_pixel {
-  my $self = shift;
-  if( @_ ) {
-    my $axis = shift;
-    if( defined( $axis ) &&
-        ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
-      $axis = new Number::Uncertainty( Value => $axis );
+    my $self = shift;
+    if (@_) {
+        my $axis = shift;
+        if (defined($axis) &&
+                ! UNIVERSAL::isa($axis, "Number::Uncertainty")) {
+            $axis = new Number::Uncertainty(Value => $axis);
+        }
+        $self->{MAJOR_AXIS_PIXEL} = $axis;
     }
-    $self->{MAJOR_AXIS_PIXEL} = $axis;
-  }
-  return $self->{MAJOR_AXIS_PIXEL};
+    return $self->{MAJOR_AXIS_PIXEL};
 }
 
 =item B<minor_axis_pixel>
@@ -151,16 +149,16 @@ Length of the semi-minor axis in units of pixels.
 =cut
 
 sub minor_axis_pixel {
-  my $self = shift;
-  if( @_ ) {
-    my $axis = shift;
-    if( defined( $axis ) &&
-        ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
-      $axis = new Number::Uncertainty( Value => $axis );
+    my $self = shift;
+    if (@_) {
+        my $axis = shift;
+        if (defined($axis) &&
+                ! UNIVERSAL::isa( $axis, "Number::Uncertainty")) {
+            $axis = new Number::Uncertainty(Value => $axis);
+        }
+        $self->{MINOR_AXIS_PIXEL} = $axis;
     }
-    $self->{MINOR_AXIS_PIXEL} = $axis;
-  }
-  return $self->{MINOR_AXIS_PIXEL};
+    return $self->{MINOR_AXIS_PIXEL};
 }
 
 =item B<major_axis_world>
@@ -170,16 +168,16 @@ Length of the semi-major axis in units of degrees.
 =cut
 
 sub major_axis_world {
-  my $self = shift;
-  if( @_ ) {
-    my $axis = shift;
-    if( defined( $axis ) &&
-        ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
-      $axis = new Number::Uncertainty( Value => $axis );
+    my $self = shift;
+    if (@_) {
+        my $axis = shift;
+        if (defined($axis) &&
+                ! UNIVERSAL::isa($axis, "Number::Uncertainty")) {
+            $axis = new Number::Uncertainty(Value => $axis);
+        }
+        $self->{MAJOR_AXIS_WORLD} = $axis;
     }
-    $self->{MAJOR_AXIS_WORLD} = $axis;
-  }
-  return $self->{MAJOR_AXIS_WORLD};
+    return $self->{MAJOR_AXIS_WORLD};
 }
 
 =item B<minor_axis_world>
@@ -189,16 +187,16 @@ Length of the semi-minor axis in units of degrees.
 =cut
 
 sub minor_axis_world {
-  my $self = shift;
-  if( @_ ) {
-    my $axis = shift;
-    if( defined( $axis ) &&
-        ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
-      $axis = new Number::Uncertainty( Value => $axis );
+    my $self = shift;
+    if (@_) {
+        my $axis = shift;
+        if (defined($axis) &&
+                ! UNIVERSAL::isa( $axis, "Number::Uncertainty")) {
+            $axis = new Number::Uncertainty(Value => $axis);
+        }
+        $self->{MINOR_AXIS_WORLD} = $axis;
     }
-    $self->{MINOR_AXIS_WORLD} = $axis;
-  }
-  return $self->{MINOR_AXIS_WORLD};
+    return $self->{MINOR_AXIS_WORLD};
 }
 
 =item B<area>
@@ -209,16 +207,16 @@ pixels.
 =cut
 
 sub area {
-  my $self = shift;
-  if( @_ ) {
-    my $area = shift;
-    if( defined( $area ) &&
-        ! UNIVERSAL::isa( $area, "Number::Uncertainty" ) ) {
-      $area = new Number::Uncertainty( Value => $area );
+    my $self = shift;
+    if (@_) {
+        my $area = shift;
+        if (defined($area) &&
+                ! UNIVERSAL::isa($area, "Number::Uncertainty")) {
+            $area = new Number::Uncertainty(Value => $area);
+        }
+        $self->{AREA} = $area;
     }
-    $self->{AREA} = $area;
-  }
-  return $self->{AREA};
+    return $self->{AREA};
 }
 
 =item B<fwhm_pixel>
@@ -228,16 +226,16 @@ FWHM of the object in pixels.
 =cut
 
 sub fwhm_pixel {
-  my $self = shift;
-  if( @_ ) {
-    my $fwhm = shift;
-    if( defined( $fwhm ) &&
-        ! UNIVERSAL::isa( $fwhm, "Number::Uncertainty" ) ) {
-      $fwhm = new Number::Uncertainty( Value => $fwhm );
+    my $self = shift;
+    if (@_) {
+        my $fwhm = shift;
+        if (defined($fwhm) &&
+                ! UNIVERSAL::isa($fwhm, "Number::Uncertainty")) {
+            $fwhm = new Number::Uncertainty(Value => $fwhm);
+        }
+        $self->{FWHM_PIXEL} = $fwhm;
     }
-    $self->{FWHM_PIXEL} = $fwhm;
-  }
-  return $self->{FWHM_PIXEL};
+    return $self->{FWHM_PIXEL};
 }
 
 =item B<fwhm_world>
@@ -247,16 +245,16 @@ FWHM of the object in arcseconds.
 =cut
 
 sub fwhm_world {
-  my $self = shift;
-  if( @_ ) {
-    my $fwhm = shift;
-    if( defined( $fwhm ) &&
-        ! UNIVERSAL::isa( $fwhm, "Number::Uncertainty" ) ) {
-      $fwhm = new Number::Uncertainty( Value => $fwhm );
+    my $self = shift;
+    if (@_) {
+        my $fwhm = shift;
+        if (defined($fwhm) &&
+                ! UNIVERSAL::isa($fwhm, "Number::Uncertainty")) {
+            $fwhm = new Number::Uncertainty(Value => $fwhm);
+        }
+        $self->{FWHM_WORLD} = $fwhm;
     }
-    $self->{FWHM_WORLD} = $fwhm;
-  }
-  return $self->{FWHM_WORLD};
+    return $self->{FWHM_WORLD};
 }
 
 =back
@@ -272,16 +270,20 @@ Configure the object.
 =cut
 
 sub _configure {
-  my $self = shift;
+    my $self = shift;
 
-  my %args = @_;
-  foreach my $key ( keys %args ) {
-    if( $self->can( lc( $key ) ) ) {
-      my $method = lc $key;
-      $self->$method( $args{$key} );
+    my %args = @_;
+    foreach my $key (keys %args) {
+        if ($self->can(lc($key))) {
+            my $method = lc $key;
+            $self->$method($args{$key});
+        }
     }
-  }
 }
+
+1;
+
+__END__
 
 =back
 
@@ -295,5 +297,3 @@ Council.  All Rights Reserved.
 Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
 
 =cut
-
-1;

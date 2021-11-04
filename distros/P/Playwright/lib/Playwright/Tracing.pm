@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Tracing;
-$Playwright::Tracing::VERSION = '0.016';
+$Playwright::Tracing::VERSION = '0.017';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,21 +18,15 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
+sub spec {
+    return $Playwright::spec->{'Tracing'}{members};
+}
+
 sub stop {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'stop',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub stopChunk {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'stopChunk',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -53,6 +47,16 @@ sub start {
     return $self->_api_request(
         args    => [@_],
         command => 'start',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub stopChunk {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'stopChunk',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -102,7 +106,7 @@ Playwright::Tracing - Automatically generated class for Playwright::Tracing
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 CONSTRUCTOR
 
@@ -119,12 +123,6 @@ Execute the Tracing::stop playwright routine.
 
 See L<https://playwright.dev/api/class-Tracing#Tracing-stop> for more information.
 
-=head2 stopChunk(@args)
-
-Execute the Tracing::stopChunk playwright routine.
-
-See L<https://playwright.dev/api/class-Tracing#Tracing-stopChunk> for more information.
-
 =head2 startChunk(@args)
 
 Execute the Tracing::startChunk playwright routine.
@@ -136,6 +134,12 @@ See L<https://playwright.dev/api/class-Tracing#Tracing-startChunk> for more info
 Execute the Tracing::start playwright routine.
 
 See L<https://playwright.dev/api/class-Tracing#Tracing-start> for more information.
+
+=head2 stopChunk(@args)
+
+Execute the Tracing::stopChunk playwright routine.
+
+See L<https://playwright.dev/api/class-Tracing#Tracing-stopChunk> for more information.
 
 =head2 on(@args)
 

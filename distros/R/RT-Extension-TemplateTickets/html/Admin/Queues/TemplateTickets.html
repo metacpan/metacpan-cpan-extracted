@@ -233,7 +233,7 @@ if ($TicketObj) {
     # elements and ticket creation links to render it inert.
     #
     $TemplateSummary = $m->scomp( '/Ticket/Elements/ShowSummary',
-        'Ticket' => $ReadonlyTicketObj );
+        'Ticket' => $ReadonlyTicketObj, 'InlineEdit' => 0);
 
     $TemplateSummary =~ s/<form.*?<\/form>//sig;
     $TemplateSummary =~ s/<span\b[^>]*?\bclass=[^>]*?create.*?<\/span>//sig;

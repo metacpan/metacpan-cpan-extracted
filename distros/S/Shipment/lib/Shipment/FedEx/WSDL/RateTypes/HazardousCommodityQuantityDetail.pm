@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::HazardousCommodityQuantityDetail;
-$Shipment::FedEx::WSDL::RateTypes::HazardousCommodityQuantityDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::RateTypes::HazardousCommodityQuantityDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Amount
               Units
 
-              )
+            )
         ],
         {   'Amount' => \%Amount_of,
             'Units'  => \%Units_of,
@@ -61,7 +61,7 @@ Shipment::FedEx::WSDL::RateTypes::HazardousCommodityQuantityDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

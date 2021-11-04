@@ -6,7 +6,7 @@ sub new {
 	my ($class, $pngfilename) = @_;
 
 	my $self = { energysys => GFX::Enhancer::SystemOnEnergy->new($pngfilename),
-			energyfunctions => GFX::Enhancer::SystemOnEnergyFunctions->new(),
+			energyfunctions => GFX::Enhancer::SystemOnEnergyFunctionsArray->new(),
 			};
 
 	$class = ref($class) || $class;
@@ -22,13 +22,14 @@ sub antialias_filter {
 
 	{
 
-		$self->{energyfunctions}->sharpen_array($self->{energysys});	
-
-		$pngwriter->write_byte_array($pngoutputfilename);
+	  ### FIXME
+	  ### $self->{energyfunctions}->sharpen_array($self->{energysys});	
+	  
+	  $pngwriter->write_byte_array($pngoutputfilename);
 		
 	} unless (not $pngoutputfilename);
 
-	### FIXME
+
 }
 
 sub from_bits_to_smooth_colours {
@@ -36,13 +37,13 @@ sub from_bits_to_smooth_colours {
 	my $pngwriter = GFX::Enhancer::PNGWriter->new;
 
 	{
-	
-		$pngwriter->write_byte_array($pngoutputfilename);
+	  ### FIXME
+	  ### $self->{energyfunctions}->from_bits_to_smooth_colours($self->{energysys});	
+	  
+	  $pngwriter->write_byte_array($pngoutputfilename);
 	
 	} unless (not $pngoutputfilename);
 
-
-	### FIXME		
 }
 
 1;

@@ -1,0 +1,81 @@
+{
+   "abstract" : "A library for parsing and evaluating cucumber tag expressions (filters)",
+   "author" : [
+      "Erik Huelsmann <ehuels@gmail.com>",
+      "Cucumber Ltd"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Cucumber-TagExpressions",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Cucumber::TagExpressions" : {
+         "file" : "lib/Cucumber/TagExpressions.pm",
+         "version" : "v4.1.0"
+      },
+      "Cucumber::TagExpressions::AndNode" : {
+         "file" : "lib/Cucumber/TagExpressions/Node.pm",
+         "version" : "v4.1.0"
+      },
+      "Cucumber::TagExpressions::ExpressionNode" : {
+         "file" : "lib/Cucumber/TagExpressions/Node.pm",
+         "version" : "v4.1.0"
+      },
+      "Cucumber::TagExpressions::LiteralNode" : {
+         "file" : "lib/Cucumber/TagExpressions/Node.pm",
+         "version" : "v4.1.0"
+      },
+      "Cucumber::TagExpressions::Node" : {
+         "file" : "lib/Cucumber/TagExpressions/Node.pm",
+         "version" : "v4.1.0"
+      },
+      "Cucumber::TagExpressions::NotNode" : {
+         "file" : "lib/Cucumber/TagExpressions/Node.pm",
+         "version" : "v4.1.0"
+      },
+      "Cucumber::TagExpressions::OrNode" : {
+         "file" : "lib/Cucumber/TagExpressions/Node.pm",
+         "version" : "v4.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cucumber/common/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cucumber/common.git",
+         "web" : "https://github.com/cucumber/common/messages/perl"
+      }
+   },
+   "version" : "4.1.0",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "MIT"
+}
+

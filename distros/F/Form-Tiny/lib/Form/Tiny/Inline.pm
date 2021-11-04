@@ -1,6 +1,7 @@
 package Form::Tiny::Inline;
 
 use v5.10;
+use strict;
 use warnings;
 use Types::Standard qw(Str ArrayRef InstanceOf);
 use Moo;
@@ -11,7 +12,7 @@ use Form::Tiny::Utils qw(trim create_anon_form_meta);
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 with 'Form::Tiny::Form';
 
@@ -127,7 +128,7 @@ Form::Tiny::Inline - Form::Tiny without hassle
 
 =head1 DESCRIPTION
 
-Inline forms are designed to cover all the basic use cases, but they are not as customizable. Currently, they lack the ability to specify custom hooks.
+Inline forms are designed to cover all the basic use cases, but they are not as customizable and performant. Currently, they lack the ability to specify custom hooks.
 
 =head1 METHODS
 

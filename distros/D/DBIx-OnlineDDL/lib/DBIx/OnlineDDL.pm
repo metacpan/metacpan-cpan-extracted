@@ -3,7 +3,7 @@ package DBIx::OnlineDDL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run DDL on online databases safely
 use version;
-our $VERSION = 'v0.930.1'; # VERSION
+our $VERSION = 'v0.940.0'; # VERSION
 
 use v5.10;
 use Moo;
@@ -16,7 +16,7 @@ use Class::Load;
 use DBI::Const::GetInfoType;
 use DBIx::BatchChunker 0.92;  # with stmt attrs
 use Eval::Reversible;
-use List::Util        1.44 (qw( uniq any all ));  # 1.44 has uniq
+use List::Util        1.44 (qw( uniq any all first ));  # 1.44 has uniq
 use Sub::Util               qw( subname set_subname );
 use Term::ProgressBar 2.14;   # with silent option
 
@@ -1105,53 +1105,33 @@ sub create_triggers {
     # We need to find a proper PK or unique constraint for UPDATE/DELETE triggers.
     # Unlike BatchChunker, we can't just rely on part of a PK.
     my @unique_ids;
-    $self->dbh_runner(run => set_subname '_unique_id_finder', sub {
-        $dbh = $_;
+    my $indexes = $self->_get_idx_hash($orig_table_name);
 
-        my %potential_unique_ids = (
-            PRIMARY => [ $dbh->primary_key($catalog, $schema, $orig_table_name) ],
-        );
+    my %potential_unique_ids;
+    $potential_unique_ids{ $_->{name} } = $_ for grep { $_->{unique} } values %$indexes;
 
-        my $unique_stats = [];
-        if ($dbh->can('statistics_info')) {
-            # Sometimes, this still dies, even with the 'can' check (eg: older DBD::mysql drivers)
-            $unique_stats = eval { $dbh->statistics_info( $catalog, $schema, $orig_table_name, 1, 1 )->fetchall_arrayref({}) };
-            $unique_stats = [] if $@;
-        }
+    my %column_set = map { $_ => 1 } @column_list;
+    foreach my $index_name ('PRIMARY',
+        # sort by the number of columns (asc), though PRIMARY still has top priority
+        sort { scalar(@{ $potential_unique_ids{$a}{columns} }) <=> scalar(@{ $potential_unique_ids{$b}{columns} }) }
+        grep { $_ ne 'PRIMARY' }
+        keys %potential_unique_ids
+    ) {
+        my @unique_cols = @{ $potential_unique_ids{$index_name}{columns} };
+        next unless @unique_cols;
 
-        foreach my $index_name (uniq map { $_->{INDEX_NAME} } @$unique_stats) {
-            my @unique_cols =
-                map  { $_->{COLUMN_NAME} }
-                sort { $a->{ORDINAL_POSITION} <=> $b->{ORDINAL_POSITION} }
-                grep { $_->{INDEX_NAME} eq $index_name && !$_->{NON_UNIQUE} }  # some DBDs might not honor the $unique_only param
-                @$unique_stats
-            ;
-            $potential_unique_ids{$index_name} = \@unique_cols;
-        }
+        # Only use this set if all of the columns exist in both tables
+        next unless all { $column_set{$_} } @unique_cols;
 
-        my %column_set = map { $_ => 1 } @column_list;
-        foreach my $index_name ('PRIMARY',
-            # sort by the number of columns (asc), though PRIMARY still has top priority
-            sort { scalar(@{$potential_unique_ids{$a}}) <=> scalar(@{$potential_unique_ids{$b}}) }
-            grep { $_ ne 'PRIMARY' }
-            keys %potential_unique_ids
-        ) {
-            my @unique_cols = @{ $potential_unique_ids{$index_name} };
-            next unless @unique_cols;
-
-            # Only use this set if all of the columns exist in both tables
-            next unless all { $column_set{$_} } @unique_cols;
-
-            @unique_ids = @unique_cols;
-        }
-    });
+        @unique_ids = @unique_cols;
+    }
 
     die "Cannot find an appropriate unique index for $orig_table_name!" unless @unique_ids;
 
     ### Check to make sure existing triggers aren't on the table
 
-    die "Found triggers on $orig_table_name!  Please remove them first, so that our INSERT/UPDATE/DELETE triggers can be applied."
-        if $helper->has_triggers_on_table($orig_table_name);
+    die "Found conflicting triggers on $orig_table_name!  Please remove them first, so that our INSERT/UPDATE/DELETE triggers can be applied."
+        if $helper->has_conflicting_triggers_on_table($orig_table_name);
 
     ### Find a good set of trigger names
 
@@ -1320,11 +1300,26 @@ sub swap_tables {
         # use that as reference.  They have *not* been re-created on the child tables, so
         # the original table is used as reference.
         my $fk_hash = $vars->{foreign_keys}{definitions} //= {};
-        $self->dbh_runner(run => set_subname '_fk_info_query', sub {
-            $dbh = $_;
+        $self->dbh_runner(run => set_subname '_fk_parent_info_query', sub {
             $fk_hash->{parent} = $self->_fk_info_to_hash( $helper->foreign_key_info(undef, undef, undef, $catalog, $schema, $new_table_name)  );
+        });
+        $self->dbh_runner(run => set_subname '_fk_child_info_query', sub {
             $fk_hash->{child}  = $self->_fk_info_to_hash( $helper->foreign_key_info($catalog, $schema, $orig_table_name, undef, undef, undef) );
         });
+
+        # Furthermore, we should capture the indexes from parent/child tables in case the data
+        # is needed for FK cleanup
+        my $idx_hash = $vars->{indexes}{definitions} //= {};
+        if ($dbh->can('statistics_info') && %$fk_hash) {
+            foreach my $fk_table_name (
+                uniq sort
+                grep { defined && $_ ne $orig_table_name && $_ ne $new_table_name }
+                map  { ($_->{pk_table_name}, $_->{fk_table_name}) }
+                (values %{$fk_hash->{parent}}, values %{$fk_hash->{child}})
+            ) {
+                $idx_hash->{$fk_table_name} = $self->_get_idx_hash($fk_table_name);
+            }
+        }
     }
 
     # Find an "_old" table name first
@@ -1443,6 +1438,13 @@ sub cleanup_foreign_keys {
         $self->dbh_runner_do(
             $helper->add_fks_back_to_child_tables_stmts
         );
+
+        # The RDBMS may need some post-FK cleanup
+        $progress->message("Post-FK cleanup");
+
+        $self->dbh_runner_do(
+            $helper->post_fk_add_cleanup_stmts
+        );
     }
 
     $progress->update;
@@ -1516,6 +1518,53 @@ sub _column_list {
     # don't care about keeping it.
     my %new_column_set = map { $_ => 1 } @new_column_list;
     return grep { $new_column_set{$_} } @old_column_list;
+}
+
+sub _get_idx_hash {
+    my ($self, $table_name) = @_;
+
+    my $vars    = $self->_vars;
+    my $catalog = $vars->{catalog};
+    my $schema  = $vars->{schema};
+
+    my %idxs = (
+        PRIMARY => {
+            name    => 'PRIMARY',
+            columns => [ $self->dbh_runner(run => set_subname '_pk_info_query', sub {
+                $_->primary_key($catalog, $schema, $table_name)
+            }) ],
+            unique  => 1,
+        },
+    );
+    delete $idxs{PRIMARY} unless @{ $idxs{PRIMARY}{columns} };
+
+    return \%idxs unless $self->dbh->can('statistics_info');
+
+    # Sometimes, this still dies, even with the 'can' check (eg: older DBD::mysql drivers)
+    my $index_stats = [];
+    eval {
+        $index_stats = $self->dbh_runner(run => set_subname '_idx_info_query', sub {
+            $_->statistics_info($catalog, $schema, $table_name, 0, 1)->fetchall_arrayref({});
+        });
+    };
+    $index_stats = [] if $@;
+
+    foreach my $index_name (uniq map { $_->{INDEX_NAME} } @$index_stats) {
+        my $index_stat = first { $_->{INDEX_NAME} eq $index_name } @$index_stats;
+        my @cols =
+            map  { $_->{COLUMN_NAME} }
+            sort { $a->{ORDINAL_POSITION} <=> $b->{ORDINAL_POSITION} }
+            grep { $_->{INDEX_NAME} eq $index_name }
+            @$index_stats
+        ;
+        $idxs{$index_name} = {
+            name    => $index_name,
+            columns => \@cols,
+            unique  => !$index_stat->{NON_UNIQUE},
+        };
+    }
+
+    return \%idxs;
 }
 
 sub _fk_info_to_hash {
@@ -1680,7 +1729,7 @@ DBIx::OnlineDDL - Run DDL on online databases safely
 
 =head1 VERSION
 
-version v0.930.1
+version v0.940.0
 
 =head1 SYNOPSIS
 

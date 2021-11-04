@@ -1,0 +1,36 @@
+.gitignore
+Changes
+Libwebsockets.xs
+MANIFEST
+Makefile.PL
+README.md
+examples/wscat.pl
+examples/wscat_ioasync.pl
+lib/Net/Libwebsockets.pm
+lib/Net/Libwebsockets/Logger.pm
+lib/Net/Libwebsockets/Loop.pm
+lib/Net/Libwebsockets/Loop/AnyEvent.pm
+lib/Net/Libwebsockets/Loop/IOAsync.pm
+lib/Net/Libwebsockets/WebSocket/Client.pm
+lib/Net/Libwebsockets/WebSocket/Courier.pm
+lib/Net/Libwebsockets/X.pm
+lib/Net/Libwebsockets/X/Base.pm
+lib/Net/Libwebsockets/X/ConnectionFailed.pm
+lib/Net/Libwebsockets/X/General.pm
+lib/Net/Libwebsockets/X/WebSocketClose.pm
+nlws.h
+nlws_context.h
+nlws_courier.c
+nlws_courier.h
+nlws_frame.c
+nlws_frame.h
+nlws_logger.c
+nlws_logger.h
+nlws_perl_loop.c
+nlws_perl_loop.h
+ppport.h
+xshelper/README.md
+xshelper/xshelper.c
+xshelper/xshelper.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

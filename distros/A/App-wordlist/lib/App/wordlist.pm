@@ -1,9 +1,5 @@
+## no critic: InputOutput::ProhibitInteractiveTest
 package App::wordlist;
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-23'; # DATE
-our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.277'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +7,11 @@ use warnings;
 use Log::ger;
 
 use List::Util qw(shuffle);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-24'; # DATE
+our $DIST = 'App-wordlist'; # DIST
+our $VERSION = '0.281'; # VERSION
 
 our %SPEC;
 
@@ -69,6 +70,42 @@ sub _list_installed {
     \@res;
 }
 
+sub _word_has_chars_unordered {
+    my ($word, $chars, $ci) = @_;
+
+    if ($ci) {
+        $word = lc $word;
+        $chars = lc $chars;
+    }
+
+    for my $i (0..length($chars)-1) {
+        my $char = substr($chars, $i, 1);
+        $word =~ s/\Q$char\E//;
+    }
+
+    return length $word ? 0:1;
+}
+
+sub _word_has_chars_ordered {
+    my ($word, $chars, $ci) = @_;
+
+    if ($ci) {
+        $word = lc $word;
+        $chars = lc $chars;
+    }
+
+    my $last_index;
+    for my $i (0..length($chars)-1) {
+        my $char = substr($chars, $i, 1);
+        my $index = index($word, $char);
+        return 0 if $index < 0;
+        return 0 if defined $last_index && $index < $last_index;
+        $last_index = $index;
+        $word =~ s/\Q$char\E//;
+    }
+    1;
+}
+
 $SPEC{wordlist} = {
     v => 1.1,
     summary => 'Grep words from WordList::*',
@@ -81,6 +118,7 @@ $SPEC{wordlist} = {
         ignore_case => {
             schema  => 'bool',
             default => 1,
+            cmdline_aliases => {i=>{}},
         },
         len => {
             schema  => 'int*',
@@ -154,6 +192,14 @@ When returning grep result, this means also returning wordlist name.
 _
             schema  => 'bool',
         },
+        chars_unordered => {
+            summary => 'Specify possible characters for the word (unordered)',
+            schema => 'str*',
+        },
+        chars_ordered => {
+            summary => 'Specify possible characters for the word (ordered)',
+            schema => 'str*',
+        },
         langs => {
             'x.name.is_plural' => 1,
             summary => 'Only include wordlists of certain language(s)',
@@ -219,6 +265,18 @@ _
         {
             argv => [qw/-w ID::** foo/],
             summary => 'Select all ID::* wordlists (wildcard will be expanded)',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            argv => [qw/-w EN::Enable --len 6 -i --chars-unordered bobleg/],
+            summary => 'Print all words from EN::Enable wordlist that are 6 characters long and have the letters BOBLEG (in no particular order); great for cheats in word forming games',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            argv => [qw/-w EN::Enable --len 6 -i --chars-ordered BGL/],
+            summary => 'Print all words from EN::Enable wordlist that are 6 characters long and have the letters B,G,L (in that order); great for finding crossword puzzle answers',
             test => 0,
             'x.doc.show_result' => 0,
         },
@@ -381,6 +439,11 @@ sub wordlist {
             goto REDO if defined($args{max_len}) &&
                 _length_in_graphemes($word) > $args{max_len};
 
+            goto REDO if defined $args{chars_unordered} &&
+                !_word_has_chars_unordered($word, $args{chars_unordered}, $ci);
+            goto REDO if defined $args{chars_ordered} &&
+                !_word_has_chars_ordered($word, $args{chars_ordered}, $ci);
+
             my $cmpword = $ci ? lc($word) : $word;
             my $match_arg;
             for (@$arg) {
@@ -505,7 +568,7 @@ App::wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.277 of App::wordlist (from Perl distribution App-wordlist), released on 2020-08-23.
+This document describes version 0.281 of App::wordlist (from Perl distribution App-wordlist), released on 2021-10-24.
 
 =head1 SYNOPSIS
 
@@ -518,7 +581,7 @@ See the included script L<wordlist>.
 
 Usage:
 
- wordlist(%args) -> [status, msg, payload, meta]
+ wordlist(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Grep words from WordList::*.
 
@@ -532,43 +595,61 @@ Examples:
 
 =item * Print all words matching E<sol>fooE<sol> and E<sol>barE<sol>:
 
- wordlist( arg => ["foo", "bar"]);
+ wordlist(arg => ["foo", "bar"]);
 
 =item * Print all words matching E<sol>fooE<sol> or E<sol>barE<sol>:
 
- wordlist( arg => ["foo", "bar"], or => 1);
+ wordlist(arg => ["foo", "bar"], or => 1);
 
 =item * Print wordlist name for each matching words:
 
- wordlist( arg => ["foo"], detail => 1);
+ wordlist(arg => ["foo"], detail => 1);
 
 =item * Select a specific wordlist (multiple -w allowed):
 
- wordlist( arg => ["foo"], wordlists => ["ID::KBBI"]);
+ wordlist(arg => ["foo"], wordlists => ["ID::KBBI"]);
 
 =item * Select all ID::* wordlists (wildcard will be expanded):
 
- wordlist( arg => ["foo"], wordlists => ["ID::**"]);
+ wordlist(arg => ["foo"], wordlists => ["ID::**"]);
+
+=item * Print all words from EN::Enable wordlist that are 6 characters long and have the letters BOBLEG (in no particular order); great for cheats in word forming games:
+
+ wordlist(
+     chars_unordered => "bobleg",
+   ignore_case => 1,
+   len => 6,
+   wordlists => ["EN::Enable"]
+ );
+
+=item * Print all words from EN::Enable wordlist that are 6 characters long and have the letters B,G,L (in that order); great for finding crossword puzzle answers:
+
+ wordlist(
+     chars_ordered => "BGL",
+   ignore_case => 1,
+   len => 6,
+   wordlists => ["EN::Enable"]
+ );
 
 =item * Select French wordlists (multiple --lang allowed):
 
- wordlist( arg => ["foo"], langs => ["FR"]);
+ wordlist(arg => ["foo"], langs => ["FR"]);
 
 =item * Filter by regex:
 
- wordlist( arg => ["/fof[aeiou]/"]);
+ wordlist(arg => ["/fof[aeiou]/"]);
 
 =item * Select a wordlist with parameters:
 
- wordlist( wordlists => ["MetaSyntactic=theme,dangdut"]);
+ wordlist(wordlists => ["MetaSyntactic=theme,dangdut"]);
 
 =item * List installed wordlist modules:
 
- wordlist( action => "list_installed");
+ wordlist(action => "list_installed");
 
 =item * List wordlist modules available on CPAN:
 
- wordlist( action => "list_cpan");
+ wordlist(action => "list_cpan");
 
 =back
 
@@ -581,6 +662,14 @@ Arguments ('*' denotes required arguments):
 =item * B<action> => I<str> (default: "grep")
 
 =item * B<arg> => I<array[str]>
+
+=item * B<chars_ordered> => I<str>
+
+Specify possible characters for the word (ordered).
+
+=item * B<chars_unordered> => I<str>
+
+Specify possible characters for the word (unordered).
 
 =item * B<color> => I<str> (default: "auto")
 
@@ -640,12 +729,12 @@ Select one or more wordlist modules.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -665,6 +754,53 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-wordli
 
 Source repository is at L<https://github.com/perlancar/perl-App-wordlist>.
 
+=head1 SEE ALSO
+
+L<App::WordListUtils>
+
+L<App::GamesWordlist> (L<games-wordlist>) which greps from
+C<Games::Word::Wordlist::*> instead.
+
+L<WordList> and C<WordList::*> modules.
+
+L<arraydata> from L<App::arraydata>, L<hashdata> from L<App::hashdata>, and
+L<tabledata> from L<App::tabledata>. These are newer projects that will
+supersede WordList one day.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ryo
+
+Ryo <roysharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-wordlist>
@@ -672,23 +808,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<App::GamesWordlist> (L<games-wordlist>) which greps from
-C<Games::Word::Wordlist::*> instead.
-
-L<WordList> and C<WordList::*> modules.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

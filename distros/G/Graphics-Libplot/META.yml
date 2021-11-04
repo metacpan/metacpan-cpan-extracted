@@ -1,10 +1,25 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Graphics-Libplot
-version:      2.2.2
-version_from: Libplot.pm
-installdirs:  site
-requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+---
+abstract: unknown
+author:
+  - 'John Lapeyre <jlapeyre cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Devel::CheckLib: '1.14'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graphics-Libplot
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/mohawk2/Graphics-Libplot/issues
+  repository: git://github.com/mohawk2/Graphics-Libplot.git
+version: v2.2.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

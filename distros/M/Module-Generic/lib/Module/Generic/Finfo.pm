@@ -144,7 +144,7 @@ sub filetype
 {
     my $self = shift( @_ );
     my $file = $self->{filepath};
-    $self->message( 3, "Stating file '$file'" );
+    # $self->message( 3, "Stating file '$file'" );
     CORE::stat( $file );
     if( !-e( _ ) )
     {

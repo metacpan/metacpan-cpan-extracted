@@ -6,7 +6,7 @@ use Mojo::ByteStream qw(b);
 
 extends 'Catalyst::View';
 
-our $VERSION = 0.002;
+our $VERSION = 0.004;
 
 has app => (is=>'ro');
 has auto_escape => (is=>'ro', required=>1, default=>1);
@@ -141,7 +141,7 @@ sub apply_layout {
   my ($self, $c, $output) = @_;
   if(my $layout = $self->find_layout($c)) {
     $c->log->debug(qq/Applying layout "$layout"/) if $c->debug;
-    $c->stash->{'view.content'}->{main} = sub { b($output) };
+    $c->stash->{'view.content'}->{main} = b $output;
     $output = $self->render($c, $layout, +{ $self->template_vars($c) });
   }
   return $output;
@@ -231,16 +231,52 @@ sub default_helpers {
     },
     content => sub {
       my ($self, $c, $name, $proto) = @_;
+
       $name ||= 'main';
-      $c->stash->{'view.content'}->{$name} = $proto if $proto;
+      $c->stash->{'view.content'}->{$name} = _block($proto) if $proto && !exists($c->stash->{'view.content'}->{$name});
 
-      my $value = $c->stash->{'view.content'}->{$name}
-        || die "No content key named '$name'";
+      my $value = $c->stash->{'view.content'}->{$name};
+      $value = '' unless defined($value);
 
-      return (ref($value)||'') eq 'CODE' ? $value->() : $value;
+      return b $value;
     },
+    content_with => sub {
+      my ($self, $c, $name, $proto) = @_;
+
+      $name ||= 'main';
+      $c->stash->{'view.content'}->{$name} = _block($proto) if $proto;
+
+      my $value = $c->stash->{'view.content'}->{$name};
+      $value = '' unless defined($value);
+
+      return b $value;
+    },
+    content_for => sub {
+      my ($self, $c, $name, $proto) = @_;
+
+      $name ||= 'main';
+      $c->stash->{'view.content'}->{$name} .= _block($proto) if $proto;
+
+      my $value = $c->stash->{'view.content'}->{$name};
+      $value = '' unless defined($value);
+
+      return b $value;
+    },
+    stash => sub {
+      my ($self, $c, $name, $proto) = @_;
+
+      $c->stash->{$name} = _$proto if $proto;
+
+      my $value = $c->stash->{$name};
+      $value = '' unless defined($value);
+
+      return b $value;
+    },
+
   );
 }
+
+sub _block { ref $_[0] eq 'CODE' ? $_[0]() : $_[0] }
 
 sub get_helpers {
   my ($self, $helper) = @_;

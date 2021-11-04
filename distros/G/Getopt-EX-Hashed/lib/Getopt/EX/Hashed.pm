@@ -1,14 +1,14 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9920';
+our $VERSION = '1.00';
 
 =head1 NAME
 
-Getopt::EX::Hashed - Hash store object automation
+Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 0.9920
+Version 1.00
 
 =head1 SYNOPSIS
 
@@ -17,15 +17,15 @@ Version 0.9920
 
   package App::foo;
 
-  use Getopt::EX::Hashed;
-  has start    => ( spec => "=i s begin", default => 1 );
-  has end      => ( spec => "=i e" );
-  has file     => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
-  has score    => ( spec => '=i', min => 0, max => 100 );
-  has answer   => ( spec => '=i', must => sub { $_[1] == 42 } );
-  has mouse    => ( spec => '=s', any => [ 'Frankie', 'Benjy' ] );
-  has question => ( spec => '=s', re => qr/^(life|universe|everything)$/i);
-  no  Getopt::EX::Hashed;
+  use Getopt::EX::Hashed; {
+      has start    => ' =i  s begin ' , default => 1;
+      has end      => ' =i  e       ' ;
+      has file     => ' =s@ f       ' , is => 'rw', any => qr/^(?!\.)/;
+      has score    => ' =i          ' , min => 0, max => 100;
+      has answer   => ' =i          ' , must => sub { $_[1] == 42 };
+      has mouse    => ' =s          ' , any => [ 'Frankie', 'Benjy' ];
+      has question => ' =s          ' , any => qr/^(life|universe|everything)$/i;
+  } no Getopt::EX::Hashed;
 
   sub run {
       my $app = shift;
@@ -42,7 +42,6 @@ use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Carp;
 use Data::Dumper;
 use List::Util qw(first);
-use Clone qw(clone);
 
 # store metadata in caller context
 my  %__DB__;
@@ -63,7 +62,7 @@ my %DefaultConfig = (
     REMOVE_UNDERSCORE  => 0,
     GETOPT             => 'GetOptions',
     ACCESSOR_PREFIX    => '',
-    DEFAULT            => undef,
+    DEFAULT            => [],
     INVALID_MSG        => \&_invalid_msg,
     );
 lock_keys %DefaultConfig;
@@ -83,6 +82,12 @@ sub import {
     }
 }
 
+sub unimport {
+    my $caller = caller;
+    no strict 'refs';
+    delete ${"$caller\::"}{$_} for @EXPORT;
+}
+
 sub configure {
     my $class = shift;
     my $config = do {
@@ -94,15 +99,13 @@ sub configure {
 	}
     };
     while (my($key, $value) = splice @_, 0, 2) {
+	if ($key eq 'DEFAULT') {
+	    ref($value) eq 'ARRAY' or die "DEFAULT must be arrayref";
+	    @$value % 2 == 0       or die "DEFAULT have wrong member";
+	}
 	$config->{$key} = $value;
     }
     return $class;
-}
-
-sub unimport {
-    no strict 'refs';
-    my $caller = caller;
-    delete ${"$caller\::"}{$_} for @EXPORT;
 }
 
 sub reset {
@@ -122,20 +125,14 @@ sub has {
     my $member = __Member__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
-	my $i = first { $member->[$_]->[0] eq $name } 0 .. $#{$member};
+	my $i = first { $member->[$_][0] eq $name } 0 .. $#{$member};
 	if ($append) {
 	    defined $i or die "$name: Not found\n";
 	    push @{$member->[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
 	    my $config = __Config__($caller);
-	    if (exists $config->{DEFAULT} and
-		my $default = $config->{DEFAULT}) {
-		if (ref $default eq 'ARRAY') {
-		    unshift @param, @$default;
-		}
-	    }
-	    push @$member, [ $name, @param ];
+	    push @$member, [ $name, @{$config->{DEFAULT}}, @param ];
 	}
     }
 }
@@ -156,7 +153,10 @@ sub new {
 	    *{"$class\::$access"} = _accessor($is, $name)
 		unless ${"$class\::"}{$access};
 	}
-	$obj->{$name} = clone $param{default};
+	$obj->{$name} = do {
+	    local $_ = $param{default};
+	    (ref eq 'ARRAY') ? [ @$_ ] : (ref eq 'HASH') ? { %$_ } : $_;
+	};
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
     $obj;
@@ -266,15 +266,22 @@ sub _opt_dest {
 my %tester = (
     min  => sub { $_[-1] >= $_->{min} },
     max  => sub { $_[-1] <= $_->{max} },
-    re   => sub { $_[-1] =~ $_->{re} },
-    must => sub { &{$_->{must}} },
-    any  => sub {
+    must => sub {
+	my $must = $_->{must};
+	for $_ (ref($must) eq 'ARRAY' ? @$must : $must) {
+	    return 0 if not &$_;
+	}
+	return 1;
+    },
+    any => sub {
 	my $any = $_->{any};
 	for (ref($any) eq 'ARRAY' ? @$any : $any) {
-	    if (ref($_) eq 'Regexp') {
-		$_[-1] =~ $_ and return 1;
+	    if (ref eq 'Regexp') {
+		return 1 if $_[-1] =~ $_;
+	    } elsif (ref eq 'CODE') {
+		return 1 if &$_;
 	    } else {
-		$_[-1] eq $_ and return 1;
+		return 1 if $_[-1] eq $_;
 	    }
 	}
 	return 0;
@@ -292,7 +299,7 @@ sub _validator {
     sub {
 	local $_ = $m;
 	for my $test (@test) {
-	    &$test or return 0;
+	    return 0 if not &$test;
 	}
 	return 1;
     }
@@ -324,21 +331,23 @@ __END__
 =head1 DESCRIPTION
 
 B<Getopt::EX::Hashed> is a module to automate a hash object to store
-command line option values.  Major objective of this module is
-integrating initialization and specification into single place.
-Module name shares B<Getopt::EX>, but it works independently from
-other modules included in B<Getopt::EX>, so far.
+command line option values for B<Getopt::Long> and compatible modules
+including B<Getopt::EX::Long>.
 
-In the current implementation, using B<Getopt::Long>, or compatible
-module such as B<Getopt::EX::Long> is assumed.  It is configurable,
-but no other module is supported now.
+Major objective of this module is integrating initialization and
+specification into single place.
+
+Module name shares B<Getopt::EX>, but it works independently from
+other modules in B<Getopt::EX>, so far.
 
 Accessor methods are automatically generated when appropriate parameter
 is given.
 
 =head1 FUNCTION
 
-=head2 B<has>
+=over 7
+
+=item B<has>
 
 Declare option parameters in a form of:
 
@@ -348,38 +357,28 @@ If array reference is given, multiple names can be declared at once.
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
-If the number of parameter is not even, first parameter is taken as
-C<spec>.  So the above example can be written as this:
-
-    has [ 'left', 'right' ] => "=i";
-
-If the name start with plus (C<+>), given parameters are added to
-current value.
+If the name start with plus (C<+>), given parameter updates values.
 
     has '+left' => ( default => 1 );
+
+As for C<spec> parameter, label can be omitted if it is the first
+parameter.
+
+    has left => "=i", default => 1;
 
 Following parameters are available.
 
 =over 7
 
-=item B<is> => C<ro> | C<rw>
+=item [ B<spec> => ] I<string>
 
-To produce accessor method, C<is> parameter is necessary.  Set the
-value C<ro> for read-only, C<rw> for read-write.
+Give option specification.  C<< spec => >> label can be omitted if and
+only if it is the first parameter.
 
-If you want to make accessor for all following members, use
-C<configure> and set C<DEFAULT> parameter.
+In I<string>, option spec and alias names are separated by white
+space, and can show up in any order.  Declaration
 
-    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
-
-=item B<spec> => I<string>
-
-Give option specification.  Option spec and alias names are separated
-by white space, and can show up in any order.
-
-Declaration
-
-    has start => ( spec => "=i s begin" );
+    has start => "=i s begin";
 
 will be compiled into string:
 
@@ -388,12 +387,12 @@ will be compiled into string:
 which conform to C<Getopt::Long> definition.  Of course, you can write
 as this:
 
-    has start => ( spec => "s|begin=i" );
+    has start => "s|begin=i";
 
 If the name and aliases contain underscore (C<_>), another alias name
 is defined with dash (C<->) in place of underscores.  So
 
-    has a_to_z => ( spec => "=s" );
+    has a_to_z => "=s";
 
 will be compiled into:
 
@@ -407,17 +406,34 @@ string as a value.  Otherwise, it is not considered as an option.
 Additional alias names can be specified by B<alias> parameter too.
 There is no difference with ones in C<spec> parameter.
 
+    has start => "=i", alias => "s begin";
+
+=item B<is> => C<ro> | C<rw>
+
+To produce accessor method, C<is> parameter is necessary.  Set the
+value C<ro> for read-only, C<rw> for read-write.
+
+If you want to make accessor for all following members, use
+C<configure> and set C<DEFAULT> parameter.
+
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
+
 =item B<default> => I<value>
 
 Set default value.  If no default is given, the member is initialized
 as C<undef>.
+
+If the value is a reference for ARRAY or HASH, new reference with same
+member is assigned.  This means that member data is shared across
+multiple C<new> calls.  Please be careful if you call C<new> multiple
+times and alter the member data.
 
 =item B<action> => I<coderef>
 
 Parameter C<action> takes code reference which is called to process
 the option.  When called, hash object is passed as C<$_>.
 
-    has [ qw(left right both) ] => spec => '=i';
+    has [ qw(left right both) ] => '=i';
     has "+both" => action => sub {
         $_->{left} = $_->{right} = $_[1];
     };
@@ -442,7 +458,7 @@ for common rules.
 
 =over 7
 
-=item B<must> => I<coderef>
+=item B<must> => I<coderef> | [ I<codoref> ... ]
 
 Parameter C<must> takes a code reference to validate option values.
 It takes same arguments as C<action> and returns boolean.  With next
@@ -452,6 +468,12 @@ example, option B<--answer> takes only 42 as a valid value.
         spec => '=i',
         must => sub { $_[1] == 42 };
 
+If multiple code reference is given, all code have to return true.
+
+    has answer =>
+        spec => '=i',
+        must =>[ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
+
 =item B<min> => I<number>
 
 =item B<max> => I<number>
@@ -460,26 +482,27 @@ Set the minimum and maximum limit for the argument.
 
 =item B<any> => I<arrayref> | qr/I<regex>/
 
-Set the valid string parameter list.  Each item is string or regex
+Set the valid string parameter list.  Each item is a string or a regex
 reference.  The argument is valid when it is same as, or match to any
-item of the given list.  If the value is not a arrayref, it is taken
+item of the given list.  If the value is not an arrayref, it is taken
 as a single item list (regexpref usually).
 
 Following declarations are almost equivalent, except second one is
 case insensitive.
 
     has question => '=s',
-        any => [ 'life', 'universe', 'everything ];
+        any => [ 'life', 'universe', 'everything' ];
 
     has question => '=s',
         any => qr/^(life|universe|everything)$/i;
 
-=item B<re> => qr/I<regex>/
+If you are using optional argument, don't forget to include default
+value in the list.  Otherwise it causes validation error.
 
-This parameter will be deprecated soon, because B<any> works same.
-Don't use.
+    has question => ':s',
+        any => [ 'life', 'universe', 'everything', '' ];
 
-Set the required regular expression pattern for the argument.
+=back
 
 =back
 

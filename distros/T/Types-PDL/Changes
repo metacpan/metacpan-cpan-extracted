@@ -1,5 +1,12 @@
 Revision history for Types-PDL
 
+0.04      2021-10-21 22:03:39-04:00 America/New_York
+
+  [API CHANGE]
+
+    * Piddles are now called NDArrays, so the types have to change
+      with the times. The old names are still around for the nonce.
+
 0.03      2019-05-30 15:41:57-04:00 America/New_York
 
   [BUG FIX]

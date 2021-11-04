@@ -26,79 +26,12 @@ typedef I32 array_ix_t;
 #endif /* <5.19.4 */
 
 #include "perl-additions.c.inc"
+#include "optree-additions.c.inc"
+#include "op_sibling_splice.c.inc"
+#include "newOP_CUSTOM.c.inc"
 
 static OP *pp_entertrycatch(pTHX);
 static OP *pp_catch(pTHX);
-
-/*
- * A variant of dounwind() which preserves the topmost scalar or list value on
- * the stack in non-void context
- */
-#define dounwind_keeping_stack(cxix)  MY_dounwind_keeping_stack(aTHX_ cxix)
-static void MY_dounwind_keeping_stack(pTHX_ I32 cxix)
-{
-  I32 gimme;
-  SV *retval;
-
-  /* chunks of this code inspired by
-   *   ZEFRAM/Scope-Escape-0.005/lib/Scope/Escape.xs
-   */
-  switch(gimme = cxstack[cxix].blk_gimme) {
-    case G_VOID:
-      break;
-
-    case G_SCALAR: {
-      dSP;
-      retval = TOPs;
-      SvREFCNT_inc(retval);
-      sv_2mortal(retval);
-      break;
-    }
-
-    case G_ARRAY: {
-      dSP;
-      dMARK;
-      SV **retvals = MARK+1;
-      array_ix_t retcount = SP-MARK;
-      array_ix_t i;
-      AV *retav = newAV();
-      retval = (SV *)retav;
-      sv_2mortal(retval);
-      av_fill(retav, retcount-1);
-      Copy(retvals, AvARRAY(retav), retcount, SV *);
-      for(i = 0; i < retcount; i++)
-        SvREFCNT_inc(retvals[i]);
-      break;
-    }
-  }
-
-  dounwind(cxix);
-
-  /* Now put the value back */
-  switch(gimme) {
-    case G_VOID:
-      break;
-
-    case G_SCALAR: {
-      dSP;
-      XPUSHs(retval);
-      PUTBACK;
-      break;
-    }
-
-    case G_ARRAY: {
-      dSP;
-      PUSHMARK(SP);
-      AV *retav = (AV *)retval;
-      array_ix_t retcount = av_len(retav) + 1; /* because av_len means top index */
-      EXTEND(SP, retcount);
-      Copy(AvARRAY(retav), SP+1, retcount, SV *);
-      SP += retcount;
-      PUTBACK;
-      break;
-    }
-  }
-}
 
 /*
  * A modified version of pp_return for returning from inside a try block.
@@ -134,7 +67,73 @@ static OP *pp_returnintry(pTHX)
   if(!cxix)
     croak("Unable to find an CXt_SUB to pop back to");
 
-  dounwind_keeping_stack(cxix);
+  I32 gimme = cxstack[cxix].blk_gimme;
+  SV *retval;
+
+  /* chunks of this code inspired by
+   *   ZEFRAM/Scope-Escape-0.005/lib/Scope/Escape.xs
+   */
+  switch(gimme) {
+    case G_VOID:
+      (void)POPMARK;
+      break;
+
+    case G_SCALAR: {
+      dSP;
+      dMARK;
+      retval = (MARK == SP) ? &PL_sv_undef : TOPs;
+      SvREFCNT_inc(retval);
+      sv_2mortal(retval);
+      break;
+    }
+
+    case G_LIST: {
+      dSP;
+      dMARK;
+      SV **retvals = MARK+1;
+      array_ix_t retcount = SP-MARK;
+      array_ix_t i;
+      AV *retav = newAV();
+      retval = (SV *)retav;
+      sv_2mortal(retval);
+      av_fill(retav, retcount-1);
+      Copy(retvals, AvARRAY(retav), retcount, SV *);
+      for(i = 0; i < retcount; i++)
+        SvREFCNT_inc(retvals[i]);
+      break;
+    }
+  }
+
+  dounwind(cxix);
+
+  /* Now put the value back */
+  switch(gimme) {
+    case G_VOID: {
+      dSP;
+      PUSHMARK(SP);
+      break;
+    }
+
+    case G_SCALAR: {
+      dSP;
+      PUSHMARK(SP);
+      XPUSHs(retval);
+      PUTBACK;
+      break;
+    }
+
+    case G_LIST: {
+      dSP;
+      PUSHMARK(SP);
+      AV *retav = (AV *)retval;
+      array_ix_t retcount = av_len(retav) + 1; /* because av_len means top index */
+      EXTEND(SP, retcount);
+      Copy(AvARRAY(retav), SP+1, retcount, SV *);
+      SP += retcount;
+      PUTBACK;
+      break;
+    }
+  }
 
   return PL_ppaddr[OP_RETURN](aTHX);
 }
@@ -319,13 +318,6 @@ static OP *pp_catch(pTHX)
     return cLOGOP->op_other;
   else
     return cLOGOP->op_next;
-}
-
-/* A variant of OP_LEAVE which keeps the values on the stack */
-static OP *pp_leave_keeping_stack(pTHX)
-{
-  dounwind_keeping_stack(cxstack_ix - 1);
-  return cUNOP->op_next;
 }
 
 #define newENTERTRYCATCHOP(flags, try, catch)  MY_newENTERTRYCATCHOP(aTHX_ flags, try, catch)

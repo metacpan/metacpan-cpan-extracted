@@ -1,5 +1,4 @@
 requires 'List::Util';
-requires 'Clone';
 requires 'perl', 'v5.14.0';
 
 on configure => sub {

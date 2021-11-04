@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::DeleteTagRequest;
-$Shipment::FedEx::WSDL::ShipTypes::DeleteTagRequest::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::DeleteTagRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Class::Std::initialize();
               Payment
               ConfirmationNumber
 
-              )
+            )
         ],
         {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
             'ClientDetail'            => \%ClientDetail_of,
@@ -95,7 +95,7 @@ Shipment::FedEx::WSDL::ShipTypes::DeleteTagRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail;
-$Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail::VERSION = '3.05';
+$Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Class::Std::initialize();
               Password
               ExpirationTimestamp
 
-              )
+            )
         ],
         {   'EmailLabelUrl'       => \%EmailLabelUrl_of,
             'UserId'              => \%UserId_of,
@@ -72,7 +72,7 @@ Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

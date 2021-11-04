@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.26;
 use warnings;
+
+use Future::AsyncAwait 0.47;
 
 use Test::More;
 use Test::HexString;
@@ -76,7 +78,7 @@ isa_ok( $stream, "Tangence::Stream", '$stream isa Tangence::Stream' );
 
    ok( $f->is_ready, '$f is ready after response' );
 
-   my $response = $f->get;
+   my $response = await $f;
 
    is( $response->code, MSG_RESULT, '$response->code to initial call' );
    is( $response->unpack_str, "response", '$response->unpack_str to initial call' );

@@ -7,13 +7,13 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.142;
+package Config::Model::Node 2.144;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
 use Carp;
-use 5.010;
+use 5.020;
 
 use Config::Model::TypeConstraints;
 use Config::Model::Instance;
@@ -34,12 +34,11 @@ extends qw/Config::Model::AnyThing/;
 with "Config::Model::Role::Grab";
 with "Config::Model::Role::HelpAsText";
 with "Config::Model::Role::ComputeFunction";
+with "Config::Model::Role::Constants";
+with "Config::Model::Role::Utils";
 
-use vars qw(@status @level %default_property);
-
-*status           = *Config::Model::status;
-*level            = *Config::Model::level;
-*default_property = *Config::Model::default_property;
+use feature qw/signatures/;
+no warnings qw/experimental::signatures/;
 
 my %legal_properties = (
     status     => {qw/obsolete 1 deprecated 1 standard 1/},
@@ -118,7 +117,7 @@ has config_model => (
 
 sub _config_model {
     my $self = shift;
-    my $p    = $self->instance->config_model;
+    return $self->instance->config_model;
 }
 
 has model      => ( is => 'rw', isa => 'HashRef' );
@@ -164,9 +163,8 @@ sub BUILD {
 
 ## Create_* methods are all internal and should not be used directly
 
-sub create_element {
-    my $self         = shift;
-    my %args         = @_ > 1 ? @_ : ( name => shift );
+sub create_element ($self, @args) {
+    my %args         = _resolve_arg_shortcut(\@args, 'name');
     my $element_name = $args{name};
     my $check        = $args{check} || 'yes';
 
@@ -202,7 +200,7 @@ sub create_element {
         join(' ', sort keys %create_sub_for)
         unless defined $method;
 
-    $self->$method( $element_name, $check );
+    return $self->$method( $element_name, $check );
 }
 
 sub create_node {
@@ -224,7 +222,7 @@ sub create_node {
         container         => $self,
     );
 
-    $self->{element}{$element_name} = $self->load_node(@args);
+    return $self->{element}{$element_name} = $self->load_node(@args);
 }
 
 sub create_warped_node {
@@ -242,7 +240,7 @@ sub create_warped_node {
 
     require Config::Model::WarpedNode;
 
-    $self->{element}{$element_name} =
+    return $self->{element}{$element_name} =
         Config::Model::WarpedNode->new( %$element_info, @args );
 }
 
@@ -264,7 +262,7 @@ sub create_leaf {
     $element_info->{element_name} = $element_name;
     $element_info->{instance}     = $self->{instance};
 
-    $self->{element}{$element_name} = $leaf_class->new(%$element_info);
+    return $self->{element}{$element_name} = $leaf_class->new(%$element_info);
 }
 
 my %id_class_hash = (
@@ -300,7 +298,7 @@ sub create_id {
     $element_info->{element_name} = $element_name;
     $element_info->{instance}     = $self->{instance};
 
-    $self->{element}{$element_name} = $id_class->new(%$element_info);
+    return $self->{element}{$element_name} = $id_class->new(%$element_info);
 }
 
 # check validity of level and status declaration.
@@ -312,7 +310,7 @@ sub check_properties {
     # because Node needs them as hash or lists
     foreach my $bad (qw/description summary level status/) {
         die $self->config_class_name, ": illegal '$bad' parameter in model ",
-            "(Should be handled by Config::Model directly)"
+            "(Should be handled by Config::Model directly)\n"
             if defined $self->{model}{$bad};
     }
 
@@ -327,7 +325,7 @@ sub check_properties {
         foreach my $prop ( keys %legal_properties ) {
             my $prop_v
                 = delete $self->{model}{element}{$elt_name}{$prop}
-                //  $Config::Model::default_property{$prop} ;
+                //  get_default_property($prop) ;
             $self->{$prop}{$elt_name} = $prop_v;
 
             croak "Config class $self->{config_class_name} error: ",
@@ -335,12 +333,10 @@ sub check_properties {
                 unless defined $legal_properties{$prop}{$prop_v};
         }
     }
+    return;
 }
 
-sub init {
-    my $self = shift;
-    my %args = @_;
-
+sub init ($self, @args) {
     return if $self->{initialized};
     $self->{initialized} = 1;    # avoid recursions
 
@@ -363,6 +359,7 @@ sub init {
     $self->backend_mgr->auto_write_init();
 
     $self->instance->initial_load($initial_load_backup);
+    return;
 }
 
 sub read_config_data {
@@ -377,17 +374,14 @@ sub read_config_data {
 
     # setup auto_read
     # may use an overridden config file
-    $self->backend_mgr->read_config_data(
+    return $self->backend_mgr->read_config_data(
         check           => $args{check},
         config_file     => $args{config_file} || $self->{config_file},
         auto_create     => $args{auto_create} || $self->instance->auto_create,
     );
 }
 
-sub notify_change {
-    my $self = shift;
-    my %args = @_;
-
+around notify_change => sub ($orig, $self, %args) {
     if ($change_logger->is_trace) {
         my @with = map { "'$_' -> '". ($args{$_} // '<undef>') ."'"  } sort keys %args;
         $change_logger->trace("called for ", $self->name, " from ", join( ' ', caller ), " with ", join( ' ', @with ));
@@ -399,18 +393,18 @@ sub notify_change {
 
     if ( defined $self->backend_mgr ) {
         $self->needs_save(1);    # will trigger a save in config_file
-        $self->SUPER::notify_change( %args, needs_save => 0 );
+        $self->$orig( %args, needs_save => 0 );
     }
     else {
         # save config_file will be done by a node above
-        $self->SUPER::notify_change( %args, needs_save => 1 );
+        $self->$orig( %args, needs_save => 1 );
     }
-}
+    return;
+};
 
-sub is_auto_write_for_type {
-    my $self = shift;
+sub is_auto_write_for_type ($self, @args) {
     return 0 unless defined $self->backend_mgr;
-    return $self->backend_mgr->is_auto_write_for_type(@_);
+    return $self->backend_mgr->is_auto_write_for_type(@args);
 }
 
 sub name {
@@ -433,9 +427,8 @@ sub is_accessible {
 }
 
 # should I autovivify this element: NO
-sub has_element {
-    my $self = shift;
-    my %args = ( @_ > 1 ) ? @_ : ( name => shift );
+sub has_element ($self, @args) {
+    my %args         = _resolve_arg_shortcut(\@args, 'name');
     my $name = $args{name};
     my $type = $args{type};
     my $autoadd = $args{autoadd} // 1;
@@ -475,10 +468,8 @@ sub find_element {
     return;
 }
 
-sub element_model {
-    my $self = shift;
-    croak "element_model: missing element name" unless @_;
-    return $self->{model}{element}{ $_[0] };
+sub element_model ($self, $elt_name) {
+    return $self->{model}{element}{ $elt_name };
 }
 
 sub element_type {
@@ -501,10 +492,7 @@ sub get_element_name {
     goto &get_element_names;
 }
 
-sub get_element_names {
-    my $self = shift;
-    my %args = @_;
-
+sub get_element_names ($self, %args) {
     if (delete $args{for}) {
         carp "get_element_names arg 'for' is deprecated";
     }
@@ -536,7 +524,7 @@ sub get_element_names {
 
         next if $self->{level}{$elt} eq 'hidden';
 
-        my $status = $self->{status}{$elt} || $default_property{status};
+        my $status = $self->{status}{$elt} || get_default_property('status');
         next if ( $status eq 'deprecated' or $status eq 'obsolete' );
 
         my $elt_type   = $self->{element}{$elt}->get_type;
@@ -557,9 +545,7 @@ sub children {
     return $self->get_element_names;
 }
 
-sub next_element {
-    my $self    = shift;
-    my %args    = @_;
+sub next_element ($self, %args) {
     my $element = $args{name};
 
     my @elements = @{ $self->{model}{element_list} };
@@ -583,24 +569,17 @@ sub next_element {
     return;
 }
 
-sub previous_element {
-    my $self = shift;
-    $self->next_element( @_, reverse => 1 );
+sub previous_element ($self, @args) {
+    return $self->next_element( @args, reverse => 1 );
 }
 
-sub get_element_property {
-    my $self = shift;
-    my %args = @_;
-
+sub get_element_property ($self, %args) {
     my ( $prop, $elt ) = $self->check_property_args( 'get_element_property', %args );
 
-    return $self->{$prop}{$elt} || $default_property{$prop};
+    return $self->{$prop}{$elt} || get_default_property($prop);
 }
 
-sub set_element_property {
-    my $self = shift;
-    my %args = @_;
-
+sub set_element_property ($self, %args) {
     my ( $prop, $elt ) = $self->check_property_args( 'set_element_property', %args );
 
     my $new_value = $args{value}
@@ -611,10 +590,7 @@ sub set_element_property {
     return $self->{$prop}{$elt} = $new_value;
 }
 
-sub reset_element_property {
-    my $self = shift;
-    my %args = @_;
-
+sub reset_element_property ($self, %args) {
     my ( $prop, $elt ) = $self->check_property_args( 'reset_element_property', %args );
 
     my $original_value = $self->{config_model}->get_element_property(
@@ -628,11 +604,7 @@ sub reset_element_property {
 }
 
 # internal: called by the property methods to check their arguments
-sub check_property_args {
-    my $self        = shift;
-    my $method_name = shift;
-    my %args        = @_;
-
+sub check_property_args ($self, $method_name, %args){
     my $elt = $args{element}
         || croak "$method_name: missing 'element' parameter";
     my $prop = $args{property}
@@ -645,9 +617,8 @@ sub check_property_args {
     return ( $prop, $elt );
 }
 
-sub fetch_element {
-    my $self         = shift;
-    my %args         = @_ > 1 ? @_ : ( name => shift );
+sub fetch_element ($self, @args) {
+    my %args         = _resolve_arg_shortcut(\@args, 'name');
     my $element_name = $args{name};
 
     Config::Model::Exception::Internal->throw( error => "fetch_element: missing name" )
@@ -723,9 +694,8 @@ sub fetch_element_no_check {
     return $self->{element}{$element_name};
 }
 
-sub fetch_element_value {
-    my $self         = shift;
-    my %args         = @_ > 1 ? @_ : ( name => $_[0] );
+sub fetch_element_value ($self, @args) {
+    my %args         = @args > 1 ? @args : ( name => $args[0] );
     my $element_name = $args{name};
     my $check        = $self->_check_check( $args{check} );
 
@@ -741,21 +711,19 @@ sub fetch_element_value {
     return $self->fetch_element(%args)->fetch( check => $check );
 }
 
-sub store_element_value {
-    my $self = shift;
-    my %args = @_ > 2 ? @_ : ( name => $_[0], value => $_[1] );
+sub store_element_value ($self, @args) {
+    my %args         = _resolve_arg_shortcut(\@args, 'name', 'value');
 
     return $self->fetch_element(%args)->store(%args);
 }
 
-sub is_element_available {
-    my $self = shift;
+sub is_element_available ($self, @args) {
     my ( $elt_name, $status ) = ( undef, 'deprecated' );
-    if ( @_ == 1 ) {
-        $elt_name = shift;
+    if ( @args == 1 ) {
+        $elt_name = $args[0];
     }
     else {
-        my %args = @_;
+        my %args = @args;
         $elt_name        = $args{name};
         $status          = $args{status} if defined $args{status};
     }
@@ -898,14 +866,12 @@ sub element_exists {
     return defined $self->{model}{element}{$element_name} ? 1 : 0;
 }
 
-sub is_element_defined {
-    my $self = shift;
-    return defined $self->{element}{ $_[0] };
+sub is_element_defined ($self, $elt_name) {
+    return defined $self->{element}{ $elt_name };
 }
 
-sub get {
-    my $self    = shift;
-    my %args    = @_ > 1 ? @_ : ( path => $_[0] );
+sub get ($self, @args) {
+    my %args         = _resolve_arg_shortcut(\@args, 'path');
     my $path    = delete $args{path};
     my $get_obj = delete $args{get_obj} || 0;
     $path =~ s!^/!!;
@@ -919,39 +885,33 @@ sub get {
     return $elt->get( path => $new_path, get_obj => $get_obj, %args );
 }
 
-sub set {
-    my $self = shift;
-    my $path = shift;
+sub set ($self, $path, @args) {
     $path =~ s!^/!!;
     my ( $item, $new_path ) = split m!/!, $path, 2;
     if ( $item =~ /([\w\-]+)\[(\d+)\]/ ) {
-        return $self->fetch_element($1)->fetch_with_id($2)->set( $new_path, @_ );
+        return $self->fetch_element($1)->fetch_with_id($2)->set( $new_path, @args );
     }
     else {
-        return $self->fetch_element($item)->set( $new_path, @_ );
+        return $self->fetch_element($item)->set( $new_path, @args );
     }
 }
 
-sub load {
-    my $self   = shift;
+sub load ($self, @args) {
     my $loader = Config::Model::Loader->new( start_node => $self );
 
-    my %args = @_ eq 1 ? ( steps => $_[0] ) : @_;
+    my %args = _resolve_arg_shortcut(\@args, 'steps');
     if ( defined $args{step} || defined $args{steps}) {
-        $loader->load( %args );
+        return $loader->load( %args );
     }
-    else {
-        Config::Model::Exception::Load->throw(
-            object  => $self,
-            message => "load called with no 'steps' parameter",
-        );
-    }
+    Config::Model::Exception::Load->throw(
+        object  => $self,
+        message => "load called with no 'steps' parameter",
+    );
+    return;
 }
 
-sub load_data {
-    my $self = shift;
-
-    my %args = @_ > 1 ? @_ : ( data => shift );
+sub load_data ($self, @args) {
+    my %args         = _resolve_arg_shortcut(\@args, 'data');
 
     my $raw_perl_data = delete $args{data};
     my $check         = $self->_check_check( $args{check} );
@@ -1048,9 +1008,7 @@ sub load_data {
     return !! $has_stored;
 }
 
-sub dump_tree {
-    my $self = shift;
-    my %args = @_;
+sub dump_tree ($self, %args) {
     $self->init();
     my $full = delete $args{full_dump} || 0;
     if ($full) {
@@ -1058,84 +1016,64 @@ sub dump_tree {
         $args{mode} //= 'user';
     }
     my $dumper = Config::Model::Dumper->new;
-    $dumper->dump_tree( node => $self, %args );
+    return $dumper->dump_tree( node => $self, %args );
 }
 
-sub migrate {
-    my $self = shift;
-    my %args = @_;
+sub migrate ($self, @args) {
     $self->init();
-    Config::Model::Dumper->new->dump_tree( node => $self, mode => 'full', @_ );
+    Config::Model::Dumper->new->dump_tree( node => $self, mode => 'full', @args );
 
     return $self->needs_save;
 }
 
-sub dump_annotations_as_pod {
-    my $self = shift;
-    my %args = @_;
+sub dump_annotations_as_pod ($self, @args) {
     $self->init();
     my $dumper = Config::Model::DumpAsData->new;
-    $dumper->dump_annotations_as_pod( node => $self, @_ );
+    return $dumper->dump_annotations_as_pod( node => $self, @args );
 }
 
-sub describe {
-    my $self = shift;
-    my %args = @_;
+sub describe ($self, @args) {
     $self->init();
 
     my $descriptor = Config::Model::Describe->new;
-    $descriptor->describe( node => $self, @_ );
+    return $descriptor->describe( node => $self, @args );
 }
 
-sub report {
-    my $self = shift;
-    my %args = @_;
+sub report ($self, @args) {
     $self->init();
     my $reporter = Config::Model::Report->new;
-    $reporter->report( node => $self );
+    return $reporter->report( node => $self );
 }
 
-sub audit {
-    my $self = shift;
-    my %args = @_;
+sub audit ($self, @args) {
     $self->init();
     my $reporter = Config::Model::Report->new;
-    $reporter->report( node => $self, audit => 1 );
+    return $reporter->report( node => $self, audit => 1 );
 }
 
-sub copy_from {
-    my $self  = shift;
-    my %args  = @_ > 1 ? @_ : ( from => shift );
+sub copy_from ($self, @args) {
+    my %args         = _resolve_arg_shortcut(\@args, 'from');
     my $from  = $args{from} || croak "copy_from: missing from argument";
     my $check = $args{check} || 'yes';
     $logger->debug( "node " . $self->location . " copy from " . $from->location );
     my $dump = $from->dump_tree( check => 'no' );
-    $self->load( step => $dump, check => $check );
+    return $self->load( step => $dump, check => $check );
 }
 
 # TODO: need Pod::Text attribute -> move that to a role ?
 # to translate Pod description to plain text when help is displayed
-sub get_help {
-    my $self = shift;
-
-    my $help;
-    if ( scalar @_ > 1 ) {
-        my ( $tag, $elt_name ) = @_;
-
-        if ( $tag !~ /summary|description/ ) {
+sub get_help ($self, $tag = '', $elt_name = ''){
+    if ($elt_name) {
+        if ( $tag !~ /^(summary|description)$/ ) {
             croak "get_help: wrong argument $tag, expected ", "'description' or 'summary'";
         }
 
-        $help = $self->{$tag}{$elt_name};
+        return $self->{$tag}{$elt_name} // '';
     }
-    elsif (@_) {
-        $help = $self->{description}{ $_[0] };
+    if ($tag) {
+        return $self->{description}{ $tag } // '';
     }
-    else {
-        $help = $self->{model}{class_description};
-    }
-
-    return defined $help ? $help : '';
+    return $self->{model}{class_description} // '';
 }
 
 sub get_info {
@@ -1151,16 +1089,11 @@ sub get_info {
     return @items;
 }
 
-sub tree_searcher {
-    my $self = shift;
-
-    return Config::Model::TreeSearcher->new( node => $self, @_ );
+sub tree_searcher ($self, @args){
+    return Config::Model::TreeSearcher->new( node => $self, @args );
 }
 
-sub apply_fixes {
-    my $self = shift;
-    my $filter = shift || '.';
-
+sub apply_fixes ($self, $filter = '.') {
     # define leaf call back
     my $fix_leaf = sub {
         my ( $scanner, $data_ref, $node, $element_name, $index, $leaf_object ) = @_;
@@ -1198,12 +1131,10 @@ sub apply_fixes {
     $fix_logger->debug( "apply fix started from ", $self->name );
     $scan->scan_node( undef, $self );
     $fix_logger->trace("apply fix done");
+    return;
 }
 
-sub deep_check {
-    my $self = shift;
-    my %args = @_;
-
+sub deep_check ($self, %args){
     $deep_check_logger->trace("called on ".$self->name);
 
     # no deep_check defined (yet). Note that value check is done when
@@ -1231,6 +1162,7 @@ sub deep_check {
     $deep_check_logger->debug( "deep check started from ", $self->name );
     $scan->scan_node( undef, $self );
     $deep_check_logger->trace("deep check done");
+    return;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -1251,7 +1183,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.142
+version 2.144
 
 =head1 SYNOPSIS
 

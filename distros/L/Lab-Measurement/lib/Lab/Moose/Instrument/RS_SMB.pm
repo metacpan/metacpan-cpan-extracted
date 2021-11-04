@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_SMB;
-$Lab::Moose::Instrument::RS_SMB::VERSION = '3.772';
+$Lab::Moose::Instrument::RS_SMB::VERSION = '3.791';
 #ABSTRACT: Rohde & Schwarz SMB Signal Generator
 
 use v5.20;
@@ -180,7 +180,7 @@ Lab::Moose::Instrument::RS_SMB - Rohde & Schwarz SMB Signal Generator
 
 =head1 VERSION
 
-version 3.772
+version 3.791
 
 =head1 SYNOPSIS
 

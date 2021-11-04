@@ -1,5 +1,5 @@
 package CHI::t::Config;
-$CHI::t::Config::VERSION = '0.60';
+$CHI::t::Config::VERSION = '0.61';
 use CHI::Util qw(dump_one_line);
 use CHI::Test;
 use File::Temp qw(tempdir);
@@ -23,22 +23,21 @@ my %config = (
 
 {
     package My::CHI;
-$My::CHI::VERSION = '0.60';
+$My::CHI::VERSION = '0.61';
 use base qw(CHI);
     My::CHI->config( {%config} );
 }
 
 {
     package My::CHI::Subclass;
-$My::CHI::Subclass::VERSION = '0.60';
+$My::CHI::Subclass::VERSION = '0.61';
 use base qw(My::CHI);
 }
 
 {
     package My::CHI::Memo;
-$My::CHI::Memo::VERSION = '0.60';
-
-    use base qw(CHI);
+$My::CHI::Memo::VERSION = '0.61';
+use base qw(CHI);
     My::CHI::Memo->config( { %config, memoize_cache_objects => 1 } );
 }
 

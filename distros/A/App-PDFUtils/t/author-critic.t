@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/PDFUtils.pm','lib/App/pdfgrep.pm','script/add-pdf-password','script/grep-from-pdf','script/pdfgrep','script/remove-pdf-password'];
+my $filenames = ['lib/App/PDFUtils.pm','lib/App/pdfgrep.pm','script/add-pdf-password','script/compress-pdf','script/grep-from-pdf','script/pdf-has-password','script/pdfgrep','script/remove-pdf-password'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

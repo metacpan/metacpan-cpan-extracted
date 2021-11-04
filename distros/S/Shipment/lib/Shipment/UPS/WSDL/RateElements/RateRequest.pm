@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::RateElements::RateRequest;
-$Shipment::UPS::WSDL::RateElements::RateRequest::VERSION = '3.05';
+$Shipment::UPS::WSDL::RateElements::RateRequest::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ use warnings;
                   CustomerClassification
                   Shipment
 
-                  )
+                )
             ],
             {   'Request'                => \%Request_of,
                 'PickupType'             => \%PickupType_of,
@@ -88,7 +88,7 @@ Shipment::UPS::WSDL::RateElements::RateRequest
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 

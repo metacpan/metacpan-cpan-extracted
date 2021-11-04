@@ -1,5 +1,42 @@
 Revision history for Config::AWS
 
+0.10      2021-10-26 20:46:00 BST
+
+  No changes from 0.090003.
+
+0.090003  2021-10-26 14:12:19 BST (TRIAL RELEASE)
+
+  Changes:
+    * Streamline parsing code to remove unnecessary work (JRaspass++)
+  Fixes:
+    * Removed a warning raised when parsing config files with trailing
+      parent keys with no nested hashes (JRaspass++)
+
+0.090002  2021-10-25 23:10:49 BST (TRIAL RELEASE)
+
+  Changes:
+    * Simplified nested hash parsing logic (JRaspass++)
+  Fixes:
+    * Improve cross-platform support
+    * Simplified nested hash parsing logic (JRaspass++)
+    * Nested hashes are now ignored if following a "parent" that is set to a
+      false values (instead of missing a value; JRaspass++)
+
+0.090001  2021-10-24 14:21:25 BST (TRIAL RELEASE)
+
+  New:
+    * Added CI configuration (JRaspass++)
+    * Distribution is now marked as suitable for static installs, which should
+      mean it can be installed much faster with compatible tools
+  Changes:
+    * Dropped dependencies on File::Share and File::Glob (JRaspass++)
+    * Removed `share` directory, which was no longer being used
+    * Internal methods are now private
+    * Other minor tweaks to distribution packaging
+  Fixes:
+    * Fixed a test that was broken because of improper use of chomp (JRaspass++)
+    * Reduced the number of methods in our namespace
+
 0.09      2021-08-04 21:10:32+01:00 Europe/London
 
   No changes from 0.080001.

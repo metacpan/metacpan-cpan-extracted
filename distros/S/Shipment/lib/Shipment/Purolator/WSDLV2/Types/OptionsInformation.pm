@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::OptionsInformation;
-$Shipment::Purolator::WSDLV2::Types::OptionsInformation::VERSION = '3.05';
+$Shipment::Purolator::WSDLV2::Types::OptionsInformation::VERSION = '3.06';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ Class::Std::initialize();
         [   qw(        Options
               ExpressChequeAddress
 
-              )
+            )
         ],
         {   'Options'              => \%Options_of,
             'ExpressChequeAddress' => \%ExpressChequeAddress_of,
@@ -63,7 +63,7 @@ Shipment::Purolator::WSDLV2::Types::OptionsInformation
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 
