@@ -1,0 +1,183 @@
+#!/usr/bin/env perl
+# PODNAME: mergeabi - Merge forward and reverse ABI files into a single sequence
+use 5.012;
+use warnings;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use FASTX::Abi;
+use File::Basename;
+use Data::Dumper;
+use Getopt::Long;
+
+my $PROG = basename($0);
+my $for;
+my $rev;
+my $min_qual = 44;
+my $bad_bases = 3;
+my $wnd = 4;
+my $min_score = 0.4;
+my $help = 0;
+my $info = 0;
+my $seqname = undef;
+GetOptions(
+    '1|f|for=s'    => \$for,
+    '2|r|rev=s'    => \$rev,
+    'n|name=s'     => \$seqname,
+    'q|min-qual=f' => \$min_qual,
+    'b|bad-bases=i'=> \$bad_bases,
+    'w|wnd=i'      => \$wnd,
+    's|min-score=f'=> \$min_score,
+    'h|help'       => \$help,
+    'i|info'       => \$info,
+);
+
+usage() if $help;
+
+# Try getting files without parameters
+if (not $for and not $rev and $ARGV[0] and $ARGV[1]) {
+    say STDERR "[WARNING] Using non conventional arguments: $ARGV[0] and $ARGV[1]";
+    $for = shift;
+    $rev = shift;
+}
+
+if (not $for or not $rev) {
+    die "Usage: $PROG [opts] --for <forward.fastq> --rev <reverse.fastq>\n";
+} 
+if ( ! -f $for or ! -f $rev ) {
+    say STDERR "Input files not found.\n";
+    die "Usage: $PROG [opts] --for <forward.fastq> --rev <reverse.fastq>\n";
+}
+
+my $F = FASTX::Abi->new({
+    filename => $for,
+    trim_ends => 1,
+    min_qual  => $min_qual,
+    bad_bases => $bad_bases,
+    wnd       => $wnd,
+});
+
+my $R = FASTX::Abi->new({
+    filename => $rev,
+    trim_ends => 1,
+    min_qual  => $min_qual,
+    bad_bases => $bad_bases,
+    wnd       => $wnd,
+});
+
+my $consensus = $F->merge($R);
+
+
+if (length($consensus) > length($F->{seq1}) and  length($consensus) > length($R->{seq1}) ) {
+
+    my $score = (
+         sprintf("%.4f", $F->{merge}->{score} / ( length($consensus) - length($R->{seq1})  ) )
+         );
+
+    if ( $F->{sequence_name} ne $R->{sequence_name} ) {
+        say STDERR "[WARNING] Sample name differs in the two chromatograms: ", 
+        $F->{sequence_name}, " and ", $R->{sequence_name}, " respectively.";
+    }
+    if ($score < $min_score) {
+        die "Merge score too low: $score\n";
+    }
+
+    my $name =  defined $seqname  ? $seqname : $F->{sequence_name};
+    my $comm = $info ? 'for=' . length($F->{seq1}) . ';rev=' . length($R->{seq1}) . ';cons=' . length($consensus) .
+     ';score=' . $F->{merge}->{score} : '';
+    print '>', $name, " ", $comm,"\n", $consensus, "\n";
+
+} else {
+    say STDERR "Unable to merge: consensus is ", length($consensus), "bp, while forward read is ", length($F->{seq1}), "bp and reverse read is ", length($R->{seq1}), "bp.";
+}
+
+sub usage {
+    say STDERR<<EOF;
+  Merge forward and reverse ABI files into a single sequence
+
+  Usage: merge [options] --for <forward.fastq> --rev <reverse.fastq>
+
+    Options:
+        -1, --for <forward.fastq>       Forward read in .ab1 format
+        -2, --rev <reverse.fastq>       Reverse read in .ab1 format
+        -n, --name <name>               Name of sequence (otherwise taken from forward filename)
+        -q, --min-qual <min_qual>       Minimum quality score to keep a base [default: $min_qual]
+        -b, --bad-bases <bad_bases>     Maximum number of bad bases to keep a base [default: $bad_bases]
+        -w, --wnd <wnd>                 Window size to use for quality score calculation [default: $wnd]
+        -s, --min-score <min_score>     Minimum alignment score to keep a base [default: $min_score]
+EOF
+    exit();
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mergeabi - Merge forward and reverse ABI files into a single sequence
+
+=head1 VERSION
+
+version 1.0.1
+
+=head2 Description
+
+Merge forward and reverse ABI files into a single sequence
+
+=head2 Usage
+
+  mergeabi [options] --for <forward.fastq> --rev <reverse.fastq>
+
+=head2 Parameters
+
+=over 4
+
+=item C<-1>, C<--for> <forward.fastq>
+
+Forward read in .ab1 format
+
+=item C<-r>, C<--rev> <reverse.fastq>
+
+Reverse read in .ab1 format
+
+=item C<-n>, C<--name> <name>
+
+Output sequence name (otherwise sample name from forward chromatogram)
+
+=item C<-q>, C<--min-qual> <min_qual>
+
+Minimum quality score to keep a base  
+
+=item C<-b>, C<--bad-bases> <bad_bases>
+
+Maximum number of bad bases to keep a base 
+
+=item C<-w>, C<--wnd> <wnd>
+
+Window size to use for quality score calculation 
+
+=item C<-s>, C<--min-score> <min_score>
+
+Minimum alignment score to keep a base 
+
+=item C<-i>, C<--info>
+
+Add information about the merge to the header
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

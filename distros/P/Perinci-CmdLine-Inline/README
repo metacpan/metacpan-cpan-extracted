@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.552 of Perinci::CmdLine::Inline (from
-    Perl distribution Perinci-CmdLine-Inline), released on 2021-08-29.
+    This document describes version 0.553 of Perinci::CmdLine::Inline (from
+    Perl distribution Perinci-CmdLine-Inline), released on 2021-10-21.
 
 SYNOPSIS
      % gen-inline-pericmd-script /Perinci/Examples/gen_array -o gen-array
@@ -104,9 +104,9 @@ FUNCTIONS
         A list of modules that can be depended upon.
 
         By default, Perinci::CmdLine::Inline will strive to make the script
-        freestanding and require core modules. A dependency to a non-core
-        module will cause failure (unless "pack_deps" option is set to
-        false). However, you can pass a list of modules that is allowed
+        freestanding and require only core Perl modules. A dependency to a
+        non-core module will cause failure (unless "pack_deps" option is set
+        to false). However, you can pass a list of modules that is allowed
         here.
 
     *   code_add_extra_log_outputs => *str*

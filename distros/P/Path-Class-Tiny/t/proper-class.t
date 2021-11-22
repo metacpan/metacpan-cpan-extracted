@@ -2,12 +2,10 @@ use Test::Most 0.25;
 
 use Path::Class::Tiny;
 
-use Path::Tiny ();
-
 
 my $CLASS = 'Path::Class::Tiny';
 
-my $dir = path(Path::Tiny->tempdir)->child('sub');
+my $dir = tempdir->child('sub');
 $dir->mkpath or die("can't make dir: $dir");
 my $file = $dir->child('f');
 $file->touch;

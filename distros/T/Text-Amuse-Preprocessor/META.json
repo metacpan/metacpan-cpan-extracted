@@ -4,7 +4,7 @@
       "Marco Pessotto <melmothx@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,6 +46,6 @@
          "url" : "https://github.com/melmothx/text-amuse-preprocessor"
       }
    },
-   "version" : "0.64",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.65",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

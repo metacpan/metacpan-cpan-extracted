@@ -85,8 +85,8 @@
     so          =>  soes
     soe         =>  soes
 
+   *stave       => *staves
    *staff       => *staffs  |  *staves
-   *stave       =>             *staves
 
     syringe     =>              syringes
     syrinx      => syrinxes  |  syringes
@@ -106,7 +106,7 @@
 
 # Singular words ending in "-s" with irregular inflexions...
 
-    Atlas            =>              |  Atlantes
+    Atlas            =>  Atlantes    |
     atlas            =>  atlases     |  atlantes
     editio princeps  =>              |  editiones principes
     eros             =>  eroses      |  erotes
@@ -324,6 +324,7 @@
     ricercar        =>  ricercars        |  ricercari
     ritardando      =>  ritardandos      |  ritardandi
     Rom             =>  Roma             |
+    rom             =>  roms             | 
     Romany          =>  Romanies         |
     rubashka        =>  rubashkas        |  rubashki
     scirrhus        =>  scirrhusses      |  scirrhi
@@ -2497,10 +2498,11 @@
         ethos       =>  ethoses
         eyas        =>  eyases
         flatus      =>  flatuses
-        gas         =>  gases
-        glottis     =>  glottises
+       *gas         => *gases
+       *glottis     => *glottises
         hubris      =>  hubrises
         ibis        =>  ibises
+        judas       =>  judases
         lens        =>  lenses
         linctus     =>  linctuses
         mantis      =>  mantises
@@ -2717,12 +2719,13 @@
 # Pronouns in the reflexive...
 # (note: the order is important here!)
 
-        myself    => ourselves
-        yourself  => yourselves
-        itself    => themselves
-        herself   => themselves
-        himself   => themselves
-        themself  => themselves
+        themselves  =>  themselves
+        herself     =>  themselves
+        himself     =>  themselves
+        itself      =>  themselves
+        myself      =>  ourselves
+        themself    =>  themselves
+        yourself    =>  yourselves
 
 
 # Pronouns in the possessive...

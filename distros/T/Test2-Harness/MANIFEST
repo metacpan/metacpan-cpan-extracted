@@ -36,6 +36,7 @@ lib/App/Yath/Command/which.pm
 lib/App/Yath/Converting.pm
 lib/App/Yath/Option.pm
 lib/App/Yath/Options.pm
+lib/App/Yath/Options/Collector.pm
 lib/App/Yath/Options/Debug.pm
 lib/App/Yath/Options/Display.pm
 lib/App/Yath/Options/Finder.pm

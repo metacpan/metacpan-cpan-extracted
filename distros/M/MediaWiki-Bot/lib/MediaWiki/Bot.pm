@@ -2,7 +2,7 @@ package MediaWiki::Bot;
 use strict;
 use warnings;
 # ABSTRACT: a high-level bot framework for interacting with MediaWiki wikis
-our $VERSION = '5.006004'; # VERSION
+our $VERSION = '5.007000'; # VERSION
 
 use HTML::Entities 3.28;
 use Carp;
@@ -92,6 +92,7 @@ sub new {
         use_http_get    => 1,  # use HTTP GET to make certain requests cacheable
     });
     $self->{api}->{ua}->agent($agent) if defined $agent;
+    $self->{mw_version} = undef; # will be set in get_mw_version
 
     # Set wiki (handles setting $self->{host} etc)
     $self->set_wiki({
@@ -473,28 +474,59 @@ sub move {
 sub get_history {
     my $self      = shift;
     my $pagename  = shift;
-    my $limit     = shift || 'max';
-    my $rvstartid = shift;
-    my $direction = shift;
+    my $additional_params = shift;
+    # for backward-compatibility check for textual params
+    if(ref $additional_params eq '' ){
+        if(@_ > 0 || defined $additional_params){
+            warnings::warnif('deprecated', 'Please pass a hashref; this method of calling '
+                . 'get_history is deprecated and will be removed in a future release');
+            my $rvlimit = $additional_params;
+            my $rvstartid = shift;
+            my $rvdir = shift;
+            $additional_params = {};
+            $additional_params->{'rvlimit'} = $rvlimit if $rvlimit;
+            $additional_params->{'rvstartid'} = $rvstartid if $rvstartid;
+            $additional_params->{'rvdir'} = $rvdir if $rvdir;
+        }else{
+            $additional_params = {};
+        }
+    }
+    my $ready;
+    my $filter_params = {%$additional_params};
+    my @full_hist;
+    while(!$ready){
+        my @hist = $self->get_history_step_by_step($pagename, $filter_params);
+        if(@hist == 0 || !defined($filter_params->{'continue'})){
+            $ready = 1;
+        }
+        push @full_hist, @hist;
+    }
+    return @full_hist;
+}
 
-    my $hash = {
+
+sub get_history_step_by_step {
+    my $self      = shift;
+    my $pagename  = shift;
+    my $additional_params = shift // {};
+    my $query = {
         action  => 'query',
         prop    => 'revisions',
         titles  => $pagename,
         rvprop  => 'ids|timestamp|user|comment|flags',
-        rvlimit => $limit
     };
+    while(my ($key, $value) = each %$additional_params){
+      $query->{$key} = $value;
+    }
+    $query->{'rvlimit'} = 'max' unless defined $query->{'rvlimit'};
 
-    $hash->{rvstartid} = $rvstartid if ($rvstartid);
-    $hash->{rvdir}     = $direction if ($direction);
-
-    my $res = $self->{api}->api($hash);
+    my $res = $self->{api}->api($query);
     return $self->_handle_api_error() unless $res;
     my ($id) = keys %{ $res->{query}->{pages} };
     my $array = $res->{query}->{pages}->{$id}->{revisions};
 
     my @return;
-    foreach my $hash (@{$array}) {
+    for my $hash (@{$array}) {
         my $revid = $hash->{revid};
         my $user  = $hash->{user};
         my ($timestamp_date, $timestamp_time) = split(/T/, $hash->{timestamp});
@@ -511,6 +543,8 @@ sub get_history {
                 minor          => exists $hash->{minor},
             });
     }
+    $additional_params->{'continue'} = $res->{'continue'}{'continue'};
+    $additional_params->{'rvcontinue'} = $res->{'continue'}{'rvcontinue'};
     return @return;
 }
 
@@ -518,8 +552,26 @@ sub get_history {
 sub get_text {
     my $self     = shift;
     my $pagename = shift;
-    my $revid    = shift;
-    my $section  = shift;
+    unless(defined $pagename){
+        warn "get_text(): param \$pagename is not defined.\n" if $self->{'debug'} > 1;
+        return;
+    }
+    my $options  = shift;
+    # for backward-compatibility: try to read scalars
+    if(ref $options eq ''){
+        if(@_ > 0 || defined $options){
+            warnings::warnif('deprecated', 'Please pass a hashref; this method of calling '
+                . 'get_text is deprecated and will be removed in a future release');
+            $options = {
+                'rvstartid' => $options,
+                'rvsection' => shift,
+            };
+            delete $options->{'rvstartid'} unless defined $options->{'rvstartid'};
+            delete $options->{'rvsection'} unless defined $options->{'rvsection'};
+        }else{
+            $options = {};
+        }
+    }
 
     my $hash = {
         action => 'query',
@@ -527,14 +579,16 @@ sub get_text {
         prop   => 'revisions',
         rvprop => 'content',
     };
-    $hash->{rvstartid} = $revid   if ($revid);
-    $hash->{rvsection} = $section if ($section);
-
+    for my $key(keys %$options){
+        if(substr($key, 0, 2) eq 'rv'){
+            $hash->{$key} = $options->{$key};
+        }
+    }
     my $res = $self->{api}->api($hash);
     return $self->_handle_api_error() unless $res;
-    my ($id, $data) = %{ $res->{query}->{pages} };
+    ($options->{'pageid'}, my $data) = %{ $res->{query}->{pages} };
 
-    return if $id == PAGE_NONEXISTENT;
+    return if $options->{'pageid'} == PAGE_NONEXISTENT;
     return $data->{revisions}[0]->{'*'}; # the wikitext
 }
 
@@ -1309,7 +1363,6 @@ sub timed_count_contributions {
 sub last_active {
     my $self     = shift;
     my $username = shift;
-    $username = "User:$username" unless $username =~ /User:/i;
     my $res = $self->{api}->list({
             action  => 'query',
             list    => 'usercontribs',
@@ -1975,7 +2028,6 @@ sub upload_from_url {
 }
 
 
-
 sub usergroups {
     my $self = shift;
     my $user = shift;
@@ -2005,6 +2057,31 @@ sub usergroups {
     }
 
     return $self->_handle_api_error({ code => ERR_API, details => qq{Results for $user weren't returned by the API} });
+}
+
+
+sub get_mw_version {
+    my $self = shift;
+    my $hash = {
+        'action' => 'query',
+        'meta'   => 'siteinfo',
+        'siprop' => 'general',
+    };
+    my $res = $self->{api}->api($hash);
+    return $self->_handle_api_error() unless $res;
+    my $version = $res->{'query'}{'general'}{'generator'};
+    if(defined $version && $version =~ /^MediaWiki (([0-9]+)\.([0-9]+)(?:\.([0-9]+))?+)/){
+        $self->{'mw_version'} = {
+            major => $2,
+            minor => $3,
+            patch => $4,
+            string => $1,
+        };
+    }else{
+        warn "could not fetch MediaWiki version.\n" if $self->{debug} > 1;
+        return;
+    }
+    return {%{$self->{'mw_version'}}}; # don't return ref to member
 }
 
 
@@ -2242,7 +2319,7 @@ MediaWiki::Bot - a high-level bot framework for interacting with MediaWiki wikis
 
 =head1 VERSION
 
-version 5.006004
+version 5.007000
 
 =head1 SYNOPSIS
 
@@ -2637,33 +2714,112 @@ B<References:> L<API:Move|https://www.mediawiki.org/wiki/API:Move>
 
 =head2 get_history
 
-    my @hist = $bot->get_history($title, $limit, $revid, $direction);
+    my @hist = $bot->get_history($title);
+    my @hist = $bot->get_history($title, $additional_params);
 
-Returns an array containing the history of the specified $page_title, with
-$limit number of revisions (default is as many as possible).
+Returns an array containing the history of the specified page $title.
+
+The optional hash ref $additional_params can be used to tune the
+query by API parameters,
+such as 'rvlimit' to return only 'rvlimit' number of revisions (default is as many
+as possible, but may be limited per query) or 'rvdir' to set the chronological
+direction.
+
+Example:
+
+    my @hist = $bot->get_history('Main Page', {'rvlimit' => 10, 'rvdir' => 'older'})
 
 The array returned contains hashrefs with keys: revid, user, comment, minor,
 timestamp_date, and timestamp_time.
+
+For backward compatibility, you can specify up to four parameters:
+
+    my @hist = $bot->get_history($title, $limit, $revid, $direction);
+
+B<References>: L<Getting page history|https://github.com/MediaWiki-Bot/MediaWiki-Bot/wiki/Getting-page-history>,
+L<API:Properties#revisions|https://www.mediawiki.org/wiki/API:Properties#revisions_.2F_rv>
+
+=head2 get_history_step_by_step
+
+    my @hist = $bot->get_history_step_by_step($title);
+    my @hist = $bot->get_history_step_by_step($title, $additional_params);
+
+Same as get_history(), but does not return the full history at once, but let's you
+loop through it.
+
+The optional call-by-reference hash ref $additional_params can be used to loop
+through a page's full history by using the 'continue' param returned by the API.
+
+Example:
+
+    my $ready;
+    my $filter_params = {};
+    while(!$ready){
+        my @hist = $bot->get_history_step_by_step($page, $filter_params);
+        if(@hist == 0 || !defined($filter_params->{'continue'})){
+            $ready = 1;
+        }
+        # do something with @hist
+    }
 
 B<References>: L<Getting page history|https://github.com/MediaWiki-Bot/MediaWiki-Bot/wiki/Getting-page-history>,
 L<API:Properties#revisions|https://www.mediawiki.org/wiki/API:Properties#revisions_.2F_rv>
 
 =head2 get_text
 
-Returns an the wikitext of the specified $page_title. The second parameter is
-$revid - if defined, returns the text of that revision; the third is
-$section_number - if defined, returns the text of that section.
+Returns the wikitext of the specified $page_title.
+The first parameter $page_title is the only required one.
+
+The second parameter is a hashref with the following independent optional keys:
+
+=over 4
+
+=item *
+
+C<rvstartid> - if defined, this function returns the text of that revision, otherwise
+the newest revision will be used.
+
+=item *
+
+C<rvsection> - if defined, returns the text of that section. Otherwise the
+whole page text will be returned.
+
+=item *
+
+C<pageid> - this is an output parameter and can be used to fetch the id of a page
+without the need of calling L</get_id> additionally. Note that the value of this
+param is ignored and it will be overwritten by this function.
+
+=item *
+
+C<rv...> - any param starting with 'rv' will be forwarded to the api call.
+
+=back
 
 A blank page will return wikitext of "" (which evaluates to false in Perl,
 but is defined); a nonexistent page will return undef (which also evaluates
 to false in Perl, but is obviously undefined). You can distinguish between
 blank and nonexistent pages by using L<defined|perlfunc/defined>:
 
+    # simple example
     my $wikitext = $bot->get_text('Page title');
+    print "Wikitext: $wikitext\n" if defined $wikitext;
+
+    # advanced example
+    my $options = {'revid'=>123456, 'section_number'=>2};
+    $wikitext = $bot->get_text('Page title', $options);
+    die "error, see API error message\n" unless defined $options->{'pageid'};
+    warn "page doesn't exist\n" if $options->{'pageid'} == MediaWiki::Bot::PAGE_NONEXISTENT;
     print "Wikitext: $wikitext\n" if defined $wikitext;
 
 B<References:> L<Fetching page text|https://github.com/MediaWiki-Bot/MediaWiki-Bot/wiki/Fetching-page-text>,
 L<API:Properties#revisions|https://www.mediawiki.org/wiki/API:Properties#revisions_.2F_rv>
+
+For backward-compatibility the params C<revid> and C<section_number> may also be
+given as scalar parameters:
+
+    my $wikitext = $bot->get_text('Page title', 123456, 2);
+    print "Wikitext: $wikitext\n" if defined $wikitext;
 
 =head2 get_id
 
@@ -3663,6 +3819,25 @@ Returns a list of the usergroups a user is in:
     my @usergroups = $bot->usergroups('Mike.lifeguard');
 
 B<References:> L<API:Users|https://www.mediawiki.org/wiki/API:Users>
+
+=head2 get_mw_version
+
+Returns a hash ref with the MediaWiki version. The hash ref contains the keys
+I<major>, I<minor>, I<patch>, and I<string>.
+Returns undef on errors.
+
+    my $mw_version = $bot->get_mw_version;
+
+    # get version as string
+    my $mw_ver_as_string = $mw_version->{'major'} . '.' . $mw_version->{'minor'};
+    if(defined $mw_version->{'patch'}){
+        $mw_ver_as_string .= '.' . $mw_version->{'patch'};
+    }
+
+    # or simply
+    my $mw_ver_as_string = $mw_version->{'string'};
+
+B<References:> L<API:Siteinfo|https://www.mediawiki.org/wiki/API:Siteinfo>
 
 =head2 Options hashref
 

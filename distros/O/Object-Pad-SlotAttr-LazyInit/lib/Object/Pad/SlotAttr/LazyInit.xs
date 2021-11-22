@@ -11,6 +11,8 @@
 
 #include "object_pad.h"
 
+static SV *unassigned_val;
+
 #ifndef mg_freeext
 #  define mg_freeext(sv, how, vtbl)  S_mg_freeext(aTHX_ sv, how, vtbl)
 static void S_mg_freeext(pTHX_ SV *sv, int how, const MGVTBL *vtbl)
@@ -86,13 +88,26 @@ static int magic_get(pTHX_ SV *sv, MAGIC *mg)
 
 static int magic_set(pTHX_ SV *sv, MAGIC *mg)
 {
+  if(SvROK(sv) && SvRV(sv) == unassigned_val)
+    /* This is just the constructor applying the default unassigned value;
+     * don't disarm the magic yet
+     */
+    return 1;
+
   /* Now disarm the magic so it won't run again */
   mg_freeext(sv, PERL_MAGIC_ext, &vtbl);
 
   return 1;
 }
 
-static void lazyinit_post_initslot(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *slot)
+static bool lazyinit_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+{
+  mop_slot_set_default_sv(slotmeta, newRV_inc(unassigned_val));
+
+  return TRUE;
+}
+
+static void lazyinit_post_initslot(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, SV *slot)
 {
   SV *weakself = newSVsv(PAD_SVl(PADIX_SELF));
   sv_rvweaken(weakself);
@@ -106,10 +121,13 @@ static const struct SlotHookFuncs lazyinit_hooks = {
   .ver   = OBJECTPAD_ABIVERSION,
   .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
   .permit_hintkey = "Object::Pad::SlotAttr::LazyInit/LazyInit",
+  .apply         = &lazyinit_apply,
   .post_initslot = &lazyinit_post_initslot,
 };
 
 MODULE = Object::Pad::SlotAttr::LazyInit    PACKAGE = Object::Pad::SlotAttr::LazyInit
 
 BOOT:
-  register_slot_attribute("LazyInit", &lazyinit_hooks);
+  register_slot_attribute("LazyInit", &lazyinit_hooks, NULL);
+
+  unassigned_val = newSV(0);

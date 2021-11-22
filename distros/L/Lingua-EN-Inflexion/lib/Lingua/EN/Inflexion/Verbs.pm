@@ -7,7 +7,7 @@ package Lingua::EN::Inflexion::Verbs;
 use 5.010; use strict; use warnings;
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = 20190312.121005;
+our $VERSION = 20211117.031833;
 
 my $plural_of = {
   abides         => "abide",
@@ -2943,11 +2943,13 @@ my $is_past_part = {}; @{$is_past_part}{values %{$past_part_of} } = ();
 
 my $is_pres_part = {}; @{$is_pres_part}{values %{$pres_part_of} } = ();
 
+sub tc {my($text)=@_; $text=~s{(\A|\s)(\S)|(\S)}{defined($3)?lc($3):$1.uc($2)}egxms; $text; };
 sub convert_to_plural {
     my ($word) = @_;
-    return $plural_of->{$word}    if exists $plural_of->{$word};
-    return $plural_of->{lc $word} if exists $plural_of->{lc $word};
-    return $word                    if is_plural($word);
+    return $plural_of->{$word}     if exists $plural_of->{$word};
+    return $plural_of->{lc $word}  if exists $plural_of->{lc $word};
+    return $plural_of->{tc $word}  if exists $plural_of->{ucfirst lc $word};
+    return $word                     if is_plural($word);
     given ($word) {
         when (m{(.*)bears$}i) { return "${1}bear"; }
         when (m{(.*)bids$}i) { return "${1}bid"; }
@@ -3055,9 +3057,10 @@ sub convert_to_plural {
 
 sub convert_to_singular {
     my ($word) = @_;
-    return $singular_of->{$word}    if exists $singular_of->{$word};
-    return $singular_of->{lc $word} if exists $singular_of->{lc $word};
-    return $word                    if is_singular($word);
+    return $singular_of->{$word}     if exists $singular_of->{$word};
+    return $singular_of->{lc $word}  if exists $singular_of->{lc $word};
+    return $singular_of->{tc $word}  if exists $singular_of->{ucfirst lc $word};
+    return $word                     if is_singular($word);
     given ($word) {
         when (m{(.*)bear$}i) { return "${1}bears"; }
         when (m{(.*)bid$}i) { return "${1}bids"; }
@@ -3165,9 +3168,10 @@ sub convert_to_singular {
 
 sub convert_to_past {
     my ($word) = @_;
-    return $past_of->{$word}    if exists $past_of->{$word};
-    return $past_of->{lc $word} if exists $past_of->{lc $word};
-    return $word                    if is_past($word);
+    return $past_of->{$word}     if exists $past_of->{$word};
+    return $past_of->{lc $word}  if exists $past_of->{lc $word};
+    return $past_of->{tc $word}  if exists $past_of->{ucfirst lc $word};
+    return $word                     if is_past($word);
     given ($word) {
         when (m{(.*)bears$}i) { return "${1}bore"; }
         when (m{(.*)bear$}i) { return "${1}bore"; }
@@ -3373,9 +3377,10 @@ sub convert_to_past {
 
 sub convert_to_pres_part {
     my ($word) = @_;
-    return $pres_part_of->{$word}    if exists $pres_part_of->{$word};
-    return $pres_part_of->{lc $word} if exists $pres_part_of->{lc $word};
-    return $word                    if is_pres_part($word);
+    return $pres_part_of->{$word}     if exists $pres_part_of->{$word};
+    return $pres_part_of->{lc $word}  if exists $pres_part_of->{lc $word};
+    return $pres_part_of->{tc $word}  if exists $pres_part_of->{ucfirst lc $word};
+    return $word                     if is_pres_part($word);
     given ($word) {
         when (m{(.*)bears$}i) { return "${1}bearing"; }
         when (m{(.*)bear$}i) { return "${1}bearing"; }
@@ -3579,9 +3584,10 @@ sub convert_to_pres_part {
 
 sub convert_to_past_part {
     my ($word) = @_;
-    return $past_part_of->{$word}    if exists $past_part_of->{$word};
-    return $past_part_of->{lc $word} if exists $past_part_of->{lc $word};
-    return $word                    if is_past_part($word);
+    return $past_part_of->{$word}     if exists $past_part_of->{$word};
+    return $past_part_of->{lc $word}  if exists $past_part_of->{lc $word};
+    return $past_part_of->{tc $word}  if exists $past_part_of->{ucfirst lc $word};
+    return $word                     if is_past_part($word);
     given ($word) {
         when (m{(.*)bears$}i) { return "${1}borne"; }
         when (m{(.*)bear$}i) { return "${1}borne"; }
@@ -3787,8 +3793,10 @@ sub is_plural {
     my ($word) = @_;
     return 1 if exists $is_plural->{$word};
     return 1 if exists $is_plural->{lc $word};
+    return 1 if exists $is_plural->{ucfirst lc $word};
     return 0 if exists $is_singular->{$word};
     return 0 if exists $is_singular->{lc $word};
+    return 0 if exists $is_singular->{ucfirst lc $word};
     given ($word) {
         when (m{\A(.*)bear$}i) { return 1 }
         when (m{\A(.*)bid$}i) { return 1 }
@@ -3898,8 +3906,10 @@ sub is_singular {
     my ($word) = @_;
     return 1 if exists $is_singular->{$word};
     return 1 if exists $is_singular->{lc $word};
+    return 1 if exists $is_singular->{ucfirst lc $word};
     return 0 if exists $is_plural->{$word};
     return 0 if exists $is_plural->{lc $word};
+    return 0 if exists $is_plural->{ucfirst lc $word};
     given ($word) {
         when (m{\A(.*)bears$}i) { return 1 }
         when (m{\A(.*)bids$}i) { return 1 }
@@ -4009,6 +4019,7 @@ sub is_past {
     my ($word) = @_;
     return 1 if exists $is_past->{$word};
     return 1 if exists $is_past->{lc $word};
+    return 1 if exists $is_past->{ucfirst lc $word};
     given ($word) {
         when (m{\A(.*)bore$}i) { return 1 }
         when (m{\A(.*)bade$}i) { return 1 }
@@ -4117,6 +4128,7 @@ sub is_pres_part {
     my ($word) = @_;
     return 1 if exists $is_pres_part->{$word};
     return 1 if exists $is_pres_part->{lc $word};
+    return 1 if exists $is_pres_part->{ucfirst lc $word};
     given ($word) {
         when (m{\A(.*)bearing$}i) { return 1 }
         when (m{\A(.*)bidding$}i) { return 1 }
@@ -4224,6 +4236,7 @@ sub is_past_part {
     my ($word) = @_;
     return 1 if exists $is_past_part->{$word};
     return 1 if exists $is_past_part->{lc $word};
+    return 1 if exists $is_past_part->{ucfirst lc $word};
     given ($word) {
         when (m{\A(.*)borne$}i) { return 1 }
         when (m{\A(.*)bidden$}i) { return 1 }

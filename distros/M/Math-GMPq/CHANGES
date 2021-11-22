@@ -1,3 +1,11 @@
+0.48
+ - Fix Rmpq_cmp_NV for doubledouble NVs.
+ - Fix overloading of comparison operators for doubledouble NVs
+ - Add Rmpq_set_IV and Rmpq_cmp_IV functions.
+ - Add POK_flag(), IOK_flag(), NOK_flag (@EXPORT_OK only)
+ - 2nd and 3rd args to Rmpq_cmp_IV and Rmpq_set_IV must have its IOK flag set.
+ - 2nd arg to Rmpq_cmp_NV and Rmpq_set_NV must have its NOK flag set.
+
 0.47
  - Add "use warnings;" to GMPq.pm.
  - Refactor IV/UV/NV/PV handling inside overload subs.
@@ -6,6 +14,9 @@
  - Add Rmpq_get_NV function.
  - Fix Rmpq_set_NV for doubledouble NVs.
  - Add '0+' overloading.
+ - Simplify Makefile.PL and README
+ - Replace XS defines NV_IS_FLOAT128 and NV_IS_LONG_DOUBLE with
+   USE_QUADMATH and USE_LONG_DOUBLE (which are already defined by perl headers).
 
 0.46
  - Fix bug in t/divby0.t.

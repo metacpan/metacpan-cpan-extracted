@@ -418,7 +418,7 @@ pp_addhdr(<<'+==EOD_map_auxiliary==');
  *
  */
 
-void pdl_xform_svd(PDL_Double *W, PDL_Double *Z, int nRow, int nCol)
+static inline void pdl_xform_svd(PDL_Double *W, PDL_Double *Z, int nRow, int nCol)
 {
   int i, j, k, EstColRank, RotCount, SweepCount, slimit;
   PDL_Double eps, e2, tol, vt, p, h2, x0, y0, q, r, c0, s0, c2, d1, d2;
@@ -506,7 +506,7 @@ void pdl_xform_svd(PDL_Double *W, PDL_Double *Z, int nRow, int nCol)
  *
  */
 
-PDL_Double PDL_xform_aux ( pdl *map, PDL_Indx *coords, PDL_Double *tmp, PDL_Double sv_min) {
+static inline PDL_Double PDL_xform_aux ( pdl *map, PDL_Indx *coords, PDL_Double *tmp, PDL_Double sv_min) {
   short ndims;
   PDL_Long i, j, k;
   PDL_Long offset;
@@ -610,8 +610,8 @@ PDL_Double PDL_xform_aux ( pdl *map, PDL_Indx *coords, PDL_Double *tmp, PDL_Doub
 pp_add_exported('map');
 pp_def('map',
         Pars=>'k0()',  # Dummy to set type (should match the type of "in").
-        OtherPars=>'SV *in; SV *out; SV *map; SV *boundary; SV *method;
-                    SV *big; SV *blur; SV *sv_min; SV *flux; SV *bv',
+        OtherPars=>'pdl *in; pdl *out; pdl *map; SV *boundary; SV *method;
+                    long big; double blur; double sv_min; char flux; SV *bv',
         Code => <<'+==EOD_map_c_code==',
 
 /*
@@ -627,18 +627,22 @@ pp_def('map',
  *
  */
 
- short ndims;           /* Number of dimensions we're working in    */
- PDL_Double *tmp;           /* Workspace for prefrobnication            */
- PDL_Indx  *ovec;           /* output pixel loop vector                 */
- PDL_Indx  *ivec;           /* input pixel loop vector                  */
- PDL_Indx  *ibvec;          /* input pixel base offset vector           */
- PDL_Double *dvec;          /* Residual vector for linearization        */
- PDL_Double *tvec;          /* Temporary floating-point vector          */
- PDL_Double *acc;           /* Threaded accumulator                     */
- PDL_Double *wgt;           /* Threaded weight accumulator              */
- PDL_Double *wgt2;          /* Threaded weight accumulator for badval finding   */
- char   *bounds;            /* Boundary condition packed string         */
- PDL_Indx  *index_stash;    /* Stash to store the opening index of dim sample scans */
+ pdl *in  = $COMP(in);
+ pdl *out = $COMP(out);
+ pdl *map = $COMP(map);
+
+ PDL_Indx ndims = map->ndims -1; /* Number of dimensions we're working in */
+ PDL_Double tmp[3*ndims*ndims+ndims]; /* Workspace for prefrobnication */
+ PDL_Indx ovec[ndims];      /* output pixel loop vector                 */
+ PDL_Indx ivec[ndims];      /* input pixel loop vector                  */
+ PDL_Indx ibvec[ndims];     /* input pixel base offset vector           */
+ PDL_Double dvec[ndims];    /* Residual vector for linearization        */
+ PDL_Double tvec[ndims];    /* Temporary floating-point vector          */
+ PDL_Double acc[in->dims[ndims]]; /* Threaded accumulator */
+ PDL_Double wgt[in->dims[ndims]]; /* Threaded weight accumulator */
+ PDL_Double wgt2[in->dims[ndims]]; /* Threaded weight accumulator for badval finding */
+ char bounds[ndims];        /* Boundary condition packed string */
+ PDL_Indx  index_stash[ndims]; /* Stash to store the opening index of dim sample scans */
  char   method;             /* Method identifier (gets one of 'h','g')  */
  PDL_Long   big;            /* Max size of input footprint for each pix */
  PDL_Double blur;           /* Scaling of filter                        */
@@ -658,42 +662,9 @@ pp_def('map',
  static PDL_Double gaussian_lookup[GAUSSIAN_LOOKUP_SIZE + 2];
  static int needs_gaussian_calc = 1;
 
- pdl *in  = PDL->SvPDLV($COMP(in));
- pdl *out = PDL->SvPDLV($COMP(out));
- pdl *map = PDL->SvPDLV($COMP(map));
-
  PDL->make_physical(in);
  PDL->make_physical(out);
  PDL->make_physical(map);
-
- ndims = map->ndims -1;
-
- /*
-  * Allocate all our dynamic workspaces at once
-  * */
- ovec = (PDL_Indx *)(PDL->smalloc( (STRLEN)
-                                   ( + sizeof(PDL_Indx)    * 3 * ndims               // ovec, ivec, ibvec
-                                     + sizeof(PDL_Double) * (3*ndims)                // dvec, tvec
-                                     + sizeof(PDL_Double) * in->dims[ndims]          // acc
-                                     + sizeof(PDL_Double) * in->dims[ndims]          // wgt
-                                     + sizeof(PDL_Double) * in->dims[ndims]          // wgt2
-                                     + sizeof(PDL_Double) * 3 * ndims*ndims + ndims  // tmp (for PDL_xform_aux)
-                                     + sizeof(char) * ndims                          // bounds
-                                     + sizeof(PDL_Indx)   * ndims                    // index_stash
-                                     )
-                                   )
-                );
- ivec   =                   &(ovec[ndims]);
- ibvec  =                   &(ivec[ndims]);
- dvec   =    (PDL_Double *)(&(ibvec[ndims]));
- tvec   =                   &(dvec[ndims]);
- acc    =                   &(tvec[ndims]);
- wgt    =                   &(acc[in->dims[ndims]]);  // weighting for accumulation
- wgt2   =                   &(wgt[in->dims[ndims]]);  // weighting for acc, if no bad values were found
- tmp    =                   &(wgt2[in->dims[ndims]]);
- bounds =          (char *)(&(tmp [3*ndims*ndims+ndims]));
- index_stash = (PDL_Indx *) &(bounds[ndims]);
-
 
 /***
  * Fill in the boundary condition array
@@ -742,19 +713,19 @@ pp_def('map',
 /***
  * Parse out the 'method', 'big', 'blur', and 'sv_min' arguments
  */
- big    = labs((PDL_Long)   (SvNV($COMP(big))));
+ big    = labs($COMP(big));
  if(big <= 0)
    barf("%s","map: 'big' parameter must be >0");
 
- blur   = fabs((PDL_Double) (SvNV($COMP(blur))));
+ blur   = fabs($COMP(blur));
  if(blur < 0)
    barf("%s","map: 'blur' parameter must be >= 0");
 
- sv_min = fabs((PDL_Double) (SvNV($COMP(sv_min))));
+ sv_min = fabs($COMP(sv_min));
  if(sv_min < 0)
    barf("%s","map: 'sv_min' parameter must be >= 0");
 
- flux   = (SvNV($COMP(flux)) != 0);
+ flux   = $COMP(flux) != 0;
 
  {
   char *mstr;
@@ -1602,9 +1573,9 @@ sub PDL::match {
   if( ref($_[$#_]) ne 'HASH' ) {
       push(@_,{})
   }
-  my @k = grep(m/^r(e(c(t)?)?)?/,keys %{$_[$#_]});
+  my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
   unless(@k) {
-      $_[$#_]->{rectify} = 0;
+      $_[-1]->{rectify} = 0;
   }
   t_identity()->map(@_);
 }
@@ -3112,7 +3083,7 @@ sub t_fits {
 
   my(@hgrab);
 
-  if(@hgrab = grep(m/^CD\d{1,3}_\d{1,3}$/,keys %$hdr)) {   # assignment
+  if(@hgrab = grep(m/^CD\d{1,3}_\d{1,3}$/,sort keys %$hdr)) {   # assignment
     #
     # CDi_j formalism
     #
@@ -3141,7 +3112,7 @@ sub t_fits {
     $cd .= 1;
 
 
-    if( @hgrab = grep(m/^PC\d{1,3}_\d{1,3}$/,keys %$hdr) ) {  # assignment
+    if( @hgrab = grep(m/^PC\d{1,3}_\d{1,3}$/,sort keys %$hdr) ) {  # assignment
 
       for my $h(@hgrab) {
         $h =~ m/PC(\d{1,3})_(\d{1,3})$/ || die "t_fits - match failed! This should never happen!";

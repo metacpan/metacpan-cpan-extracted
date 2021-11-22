@@ -1,0 +1,166 @@
+0.129   2021-10-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [reorganize] Rename dist Role{,Bundle}-TinyCommons-Tree since
+	  Role::TinyCommons::Tree is not actually a role.
+
+
+0.128   2021-10-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Visualize the other examples in
+	  Role::TinyCommons::Tree::FromObjArray.
+
+
+0.127   2021-07-02  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.126, 0.126.1, 0.126.2.
+
+
+0.126.2 2021-07-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add node methods has_min_children(), has_max_children(),
+	  has_children_between().
+
+        - UPDATE: rename release 0.126 -> 0.126.2 due to conflict.
+
+
+0.126.1 2021-07-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add node methods: is_root(), retrieve_parent().
+
+        - UPDATE: rename release 0.125 -> 0.126.1 due to conflict.
+
+
+0.126   2021-05-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Wording.
+
+
+0.125   2021-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add modules:
+	  {Code::Includable,Role::TinyCommons}::Tree::FromObjArray.
+
+
+0.124   2020-04-14  Released-By: PERLANCAR; Urgency: medium
+
+	- NodeMethods: add descendants_depth_first().
+
+
+0.123   2020-04-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Code::Includable::Tree::NodeMethods::_children_as_list: add
+	  option $IGNORE_NO_CHILDREN_METHOD (and enable it by default) to
+	  ignore instead of die when a node does not support method to get
+	  children.
+
+
+0.122   2020-02-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Downgrade requirements Class::InsideOut, Moo, Moose,
+	  Tree::Object::Array::Glob from TestRequires to TestSuggests to
+	  avoid circular dependency [RT#131944].
+
+	- [test] Replace Test::Requires with Test::Needs (familiarity).
+
+
+0.121   2020-02-07  Released-By: PERLANCAR; Urgency: medium
+
+	- NodeMethods: add check().
+
+
+0.120   2020-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- NodeMethods: add remove().
+
+
+0.11    2016-11-23  Released-By: PERLANCAR
+
+	- Allow customizing get/set parent/children method names. This will add
+	  some overhead for the indirection (i.e. from $node->parent or
+	  $node->children(@foo) to $node->$GET_PARENT_METHOD or
+	  $node->$SET_CHILDREN_METHOD(@foo)). The overhead is around 40ns on my
+	  computer. Which should be worth it for the flexibility. In real-world
+	  use (e.g. in Data::CSel) the overall overhead will be around 1% or
+	  less.
+
+
+0.10    2016-04-14  Released-By: PERLANCAR
+
+	- Add test with Class::InsideOut-based nodes.
+
+
+0.09    2016-04-02  Released-By: PERLANCAR
+
+        - Add ancestors().
+
+
+0.08    2016-03-29  Released-By: PERLANCAR
+
+	- Adjust tests for tree objects that do not accept setting
+	  attributes in constructor, like Tree::Object::Array* (because
+	  Class::Accessor::Array & Class::XSAccessor::Array do not).
+
+	- Switch from Class::Build::Array::Glob to
+	  Tree::Object::Array::Glob.
+
+
+0.07    2016-03-26  Released-By: PERLANCAR
+
+        - Make Tree::FromStruct role more generic (introduce _instantiate, work
+          with non-hash-based objects).
+
+        - Reorganize tests into a single test suite
+          (Test::Role::TinyCommons::Tree).
+
+        - Test the roles against hash-based class, Moose class, Moo class, and
+          array-based class.
+
+
+0.06    2016-03-23  Released-By: PERLANCAR
+
+	- Handle case when children() returns (undef).
+
+
+0.05    2016-03-23  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Add mentions in See Also.
+
+
+0.04    2016-03-23  Released-By: PERLANCAR
+
+        - [Refactoring] Split routines in Role::TinyCommons::Tree::FromStruct to
+          Code::Includable::Tree::NodeMethods so they can be used as normal sub
+          call, like Code::Includable::Tree::NodeMethods.
+
+        - Add tests for Code::Includable::Tree::{NodeMethods,FromStruct}.
+
+
+0.03    2016-03-22  Released-By: PERLANCAR
+
+        - [Refactoring] Split node methods in to
+          Code::Includable::Tree::NodeMethods for users that want to avoid
+          loading Role::Tiny.
+
+        - [doc] Add some more docs, including for the main module.
+
+
+0.02    2016-03-21  Released-By: PERLANCAR
+
+        - [Incompatible change] Rename dist from Role-TinyCommons-TreeNode to
+          Role-TinyCommons-Tree. Rename role from Role::TinyCommons::TreeNode to
+          Role::TinyCommons::Tree::Node.
+
+        - Add role: Role::TinyCommons::Tree::NodeMethods.
+
+        - Add role: Role::TinyCommons::Tree::FromStruct.
+
+
+0.01    2016-03-19  Released-By: PERLANCAR
+
+        - First release.

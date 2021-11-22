@@ -18,35 +18,17 @@ use failures qw{
 use Hash::Ordered;
 use PDL::Basic qw(sequence);
 use PDL::Core qw(pdl null);
-use List::AllUtils qw(
-  each_arrayref pairgrep pairkeys pairmap pairwise reduce
+use List::AllUtils 0.19 qw(
+  each_arrayref pairgrep pairkeys pairmap pairwise reduce zip
 );
-use List::MoreUtils 0.423;
 
 use PDL::DateTime  ();
-# FIXME: remove this once the issue is fixed in PDL::DateTime
-# https://github.com/kmx/pdl-datetime/issues/3
-BEGIN {
-    use PDL::Core ();
-    use Scalar::Util ();
-    no strict 'refs';
-    no warnings 'redefine';
-    *{"PDL::DateTime::dt_at"} = sub {
-          my $self = shift;
-          my $fmt = Scalar::Util::looks_like_number($_[-1]) ? 'auto' : pop;
-          my $v = PDL::Core::at_bad_c($self, [@_]);
-          $fmt = $self->_autodetect_strftime_format if !$fmt || $fmt eq 'auto';
-          return PDL::DateTime::_jumboepoch_to_datetime($v, $fmt);
-    };
-}
-
 use PDL::Primitive ();
 use PDL::Factor    ();
 use PDL::SV        ();
 use PDL::StringfiableExtension;
 use Ref::Util qw(is_plain_arrayref is_plain_hashref);
 use Scalar::Util qw(blessed looks_like_number);
-use Sereal::Decoder 4.005;
 use Sereal::Encoder 4.005;
 use Text::Table::Tiny;
 use Type::Params;
@@ -395,7 +377,10 @@ method column_names(@rest) {
         # rename column names
         my @values = $self->_columns->values;
         $self->_columns->clear;
-        $self->_columns->push( List::MoreUtils::zip( @colnames, @values ) );
+
+        # List::AllUtils and List::Util 's zip func are different.
+        # See also https://github.com/houseabsolute/List-AllUtils/issues/12
+        $self->_columns->push( zip( @colnames, @values ) );
 	}
 	return [ $self->_columns->keys ];
 }
@@ -663,7 +648,8 @@ method sample ($n) {
         die "sample size is larger than nrow";
     }
 
-    my $indices = [ List::MoreUtils::samples($n, (0 .. $self->nrow-1)) ];
+    my @indices = (0 .. $self->nrow-1);
+    my $indices = [ List::AllUtils::sample($n, @indices) ];
     return $self->select_rows($indices);
 }
 
@@ -1110,7 +1096,7 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 STATUS
 
@@ -1140,7 +1126,20 @@ This library is currently experimental.
 
     say $df->at(0);         # [1 2 3 4]
     say $df->at(0)->length; # 4
-    say $df->at('x');       # [1 2 3 4]
+
+    say $df->at('x');       # [foo bar baz quux]
+    say $df->{x};           # same as above
+
+    say $df->select_columns([qw(x y)]);
+    # -----------
+    #     x    y
+    # -----------
+    #  0  foo  0
+    #  1  bar  0
+    #  2  baz  1
+    #  3  quux 1
+    # -----------
+    say $df->{[qw(x y)]};   # same as above
 
     say $df->select_rows( 3,1 );
     # ---------------
@@ -1150,6 +1149,7 @@ This library is currently experimental.
     #  1  2  0  bar
     # ---------------
 
+    # update data
     $df->slice( [0,1], ['z', 'y'] ) .= pdl( 4,3,2,1 );
     say $df;
     # ---------------

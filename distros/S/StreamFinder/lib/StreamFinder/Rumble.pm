@@ -112,25 +112,33 @@ L<URI::Escape>, L<HTML::Entities>, and L<LWP::UserAgent>.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-keep> => I<streamtypes>] [, I<-secure> [ => 0|1 ]] 
+=item B<new>(I<ID>|I<url> [, I<-keep> => I<streamtypes>] 
+[, "-quality" => I<quality>] [, I<-secure> [ => 0|1 ]] 
 [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a rumble.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Rumble video or no streams are found.  
 The URL can be the full URL, ie. https://rumble.com/B<video-id>.html, 
-https://rumble.com/embed/B<video-id>
-or just B<video-id>.
+https://rumble.com/c/B<channel-id>, https://rumble.com/embed/B<video-id>
+or just B<video-id> or B<channel-id>.  If a I<channel-id> or channel URL is 
+given, then the first (latest) video of that channel will be returned.
 
-I<-keep> specifies a list of one or more I<streamtypes> to include.  The list can be 
-either a comma-separated string or an array reference ([...]) of stream types, in 
-the order they should be returned.  Each stream type in the list can be one of:  
-I<any>, I<mp4>, or I<webm>.
+The optional I<-keep> argument specifies a list of one or more I<streamtypes> 
+to include.  The list can be either a comma-separated string or an array 
+reference ([...]) of stream types, in the order they should be returned.  
+Each stream type in the list can be one of:  I<any>, I<mp4>, or I<webm>.
 
-DEFAULT I<-keep> list is 'mp4, webm, any', meaning that all mp4 streams followed by all 
-webm streams, then all of any others found.
+DEFAULT I<-keep> list is 'mp4, webm, any', meaning that all mp4 streams 
+followed by all webm streams, then all of any others found.
 
-The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
-then only secure ("https://") streams will be returned.
+The optional I<-quality> argument, which can be set to a "p number".  
+This limits the video quality.. For example:  "720" would mean select 
+a stream "<= 720p".  
+
+DEFAULT I<-quality> is accept streams without resolution limit.
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
+If 1 then only secure ("https://") streams will be returned.
 
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
@@ -138,8 +146,9 @@ Additional options:
 
 I<-log> => "I<logfile>"
 
-Specify path to a log file.  If a valid and writable file is specified, A line will be 
-appended to this file every time one or more streams is successfully fetched for a url.
+Specify path to a log file.  If a valid and writable file is specified, A line 
+will be appended to this file every time one or more streams is successfully 
+fetched for a url.
 
 DEFAULT I<-none-> (no logging).
 
@@ -147,11 +156,11 @@ I<-logfmt> specifies a format string for lines written to the log file.
 
 DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
 
-The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
-[site]:  The site name (Rumble).  [url]:  The url searched for streams.  
-[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
-[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "I<-na->", if no value).
+The valid field I<[variables]> are:  [stream]: The url of the first/best 
+stream found.  [site]:  The site name (Rumble).  [url]:  The url searched for 
+streams.  [time]: Perl timestamp when the line was logged.  [title], [artist], 
+[album], [description], [year], [genre], [total], [albumartist]:  
+The corresponding field data returned (or "I<-na->", if no value).
 
 =item $video->B<get>()
 
@@ -240,7 +249,8 @@ and the options are loaded into a hash used only by the specific
 (submodule) specified.  Valid options include 
 I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
-Options specified here override any specified in I<~/.config/StreamFinder/config>.
+Options specified here override any specified in 
+I<~/.config/StreamFinder/config>.
 
 Among options valid for IHeartRadio streams are the I<-keep> option 
 described in the B<new()> function.
@@ -378,6 +388,9 @@ sub new
 				my $keeporder = shift;
 				@okStreams = (ref($keeporder) =~ /ARRAY/) ? @{$keeporder} : split(/\,\s*/, $keeporder);
 			}
+		} elsif ($_[0] =~ /^\-?quality$/o) {
+			shift;
+			$self->{'quality'} = (defined $_[0]) ? shift : 0;
 		} else {
 			shift;
 		}
@@ -386,6 +399,7 @@ sub new
 		@okStreams = (ref($self->{'keep'}) =~ /ARRAY/) ? @{$self->{'keep'}} : split(/\,\s*/, $self->{'keep'});
 	}
 	@okStreams = (qw(mp4 webm any))  unless (defined $okStreams[0]);
+	$self->{'quality'} = 32767  unless (defined($self->{'quality'}) && $self->{'quality'} =~ /^[0-9]+$/);
 
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 	$ua->timeout($self->{'timeout'});
@@ -393,6 +407,31 @@ sub new
 	$ua->env_proxy;
 	my $response;
 	$self->{'genre'} = 'Video';
+
+	local *getChannelPage = sub {
+		my $url2fetch = shift;
+		my $url2 = '';
+		my $html = '';
+		print STDERR "-FETCHING CHANNEL URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+		$response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+			my $no_wget = system('wget','-V');
+			unless ($no_wget) {
+				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+			}
+		}
+		if ($html && $html =~ m#(?:class\=video\-item\-\-a\b|\<\/h3\>\s*\<a)([^\>]+)#s) {
+			my $urldata = $1;
+			($url2 = $1) =~ s#^\/##  if ($urldata =~ m#href\=\"?([^\"\>\s]+)#);
+			print STDERR "---FOUND 1ST EPISODE URL=$url2= IN CHANNEL PAGE, RUN WITH THAT!\n"  if ($DEBUG);
+			return "from-channel:$url2"  if ($url2);
+		}
+		return $url2;
+	};
 
 	local *getHtmlPage = sub {
 		my $url = shift;
@@ -403,6 +442,10 @@ sub new
 		if ($url2fetch =~ m#^https?\:#) {
 #			$url2fetch .= '.html'  unless ($url2fetch =~ /\.html?$/);  #NEEDED FOR Fauxdacious!
 			$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\.html?#);
+			unless (defined($self->{'id'}) && $self->{'id'}) {   #PERHAPS WE HAVE A CHANNEL PAGE?
+				print STDERR "---HTML PAGE: NO ID, TRY CHANNEL PAGE ($url2fetch)!...\n"  if ($DEBUG);
+				return &getChannelPage($url2fetch);
+			}
 			$self->{'id'} =~ s#^\-?([^\-\.]+).*$#$1#;
 		} else {
 			$self->{'id'} = $url;
@@ -456,7 +499,7 @@ sub new
 			#STEP 2:  FETCH THE STREAMS FROM THE "embedUrl":
 			return $url2;
 		}
-		return undef;
+		return '';
 	};
 
 	local *getEmbedPage = sub {
@@ -483,19 +526,22 @@ sub new
 			my %streamsets;
 			#PARSE OUT ALL STREAMS (CLASS IS EITHER "mp4", "webm", "###" (RESOLUTION) OR OTHER.
 			#SINCE THE STREAMS OF EACH RESOLUTION ARE OFTEN REPEATED UNDER "mp4", "webm", or "<other>"
-			#BASED ON THEIR EXTENSION, WE CONVERT THE NON-RESOLUTION ONES TO VERY LOW NUMBERS
+			#BASED ON THEIR EXTENSION, WE CONVERT THE NON-RESOLUTION ONES TO VERY LOW NUMBERS (<=30)
 			#IN ORDER FOR THEM TO BE SORTED LAST (FOR GIVEN CLASS, WE WANT HIGHEST RESOLUTIONS FIRST!:
+			my $lowclass;
 			while ($html =~ s#\"(\w+)\"\:\{\"url\"\:\"([^\"]+)\"##s) {
+				$lowclass = 30;
 				my ($class, $stream) = ($1, $2);
-				if ($class =~ /mp4/io) {
-					$class = 30;
-				} elsif ($class =~ /webm/io) {
-					$class = 20;
-				} elsif ($class =~ /\D/io) {
-					$class = 10;
+				for (my $i=0;$i<=$#okStreams;$i++) {
+					if ($class =~ /$okStreams[$i]/) {
+						$class = $lowclass;
+						$lowclass -= 1;
+					}
 				}
+				$class = 1  if ($lowclass == 30 && $class =~ /\D/io);
 				push @{$streamsets{$class}}, $stream;
 			}
+			print STDERR "--Max resolution=".$self->{'quality'}."=\n";
 			my %streamHash;  #USE THIS HASH TO PREVENT ANY DUPLICATE STREAM URLS:
 			foreach my $streamtype (@okStreams) {
 				print STDERR "\n--keep type=$streamtype:\n"  if ($DEBUG);
@@ -505,7 +551,8 @@ sub new
 						if ($streamtype =~ /^any/io || $stream =~ /${streamtype}$/i) {
 							print STDERR "------found stream=$stream=\n"  if ($DEBUG);
 							unless (defined $streamHash{$stream}
-									|| ($self->{'secure'} && $stream !~ /^https/o)) {
+									|| ($self->{'secure'} && $stream !~ /^https/o)
+									|| $class > $self->{'quality'}) {
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}
@@ -518,18 +565,38 @@ sub new
 				$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
 			}
 			return $url2;
+		} else {
+			$url2fetch =~ s#\/embed\/#\/#;
+			print STDERR "---EMBED PAGE: NO HTML, TRY CHANNEL PAGE ($url2fetch)!...\n"  if ($DEBUG);
+			return &getChannelPage($url2fetch);
 		}
-		return undef;
+		return '';
 	};
 
 	$url = "https://rumble.com/embed/${url}/"  if ($url !~ m#http# && $url !~ m#\-#);
-	print STDERR "-0(Rumble): URL=$url=\n"  if ($DEBUG);
+	my $tried = 0;
+TRYIT:
+	print STDERR "-${tried}(Rumble): URL=$url=\n"  if ($DEBUG);
 	if ($url =~ m#\/embed\/#i) {
 		my $url2 = &getEmbedPage($url);
-		&getHtmlPage($url2)  if (defined $url2);
+		if ($url2) {
+			if (!$tried && $url2 =~ s/^from-channel\://) {
+				$url = $url2;
+				$tried++;
+				goto TRYIT;
+			}
+			&getHtmlPage($url2);
+		}
 	} else {
 		my $url2 = &getHtmlPage($url);
-		&getEmbedPage($url2)  if (defined $url2);
+		if ($url2) {
+			if (!$tried && $url2 =~ s/^from-channel\://) {
+				$url = $url2;
+				$tried++;
+				goto TRYIT;
+			}
+			&getEmbedPage($url2);
+		}
 	}
 
 	$self->{'cnt'} = scalar @{$self->{'streams'}};

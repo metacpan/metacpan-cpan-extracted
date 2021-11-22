@@ -2,9 +2,9 @@ package Term::Choose::Util;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.10.0;
 
-our $VERSION = '0.132';
+our $VERSION = '0.133';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -997,7 +997,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.132
+Version 0.133
 
 =cut
 
@@ -1646,7 +1646,7 @@ Setting the option I<cs_label> to a defined value adds an info output line.
 
 =head2 Perl version
 
-Requires Perl version 5.8.3 or greater.
+Requires Perl version 5.10.0 or greater.
 
 =head2 Encoding layer
 

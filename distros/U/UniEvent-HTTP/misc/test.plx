@@ -1,27 +1,41 @@
 #!/usr/bin/env perl
-use 5.012;
-use lib 't/lib';
-use MyTest;
-use Benchmark 'timethis';
+use 5.020;
+use warnings;
+use UniEvent::HTTP;
+use XLog;
+use Socket;
 
-my $pool = UniEvent::HTTP::Pool->new;
-my $retr = 0;
+XLog::set_logger(sub { say $_[0] });
+XLog::set_level(XLog::VERBOSE_DEBUG());
 
-my $req = UniEvent::HTTP::Request->new({
-    uri => 'http://dev.crazypanda.ru:305/',
-    timeout => 1,
-    redirection_limit => 1,
-    response_callback => sub {
-        my ($request, $response, $err) = @_;
-        say "err=$err";
-        if ($err && ++$retr < 5) {
-            $pool->request($request);
-        }
-        #$client1->request($request);
-        #$request->cancel;
-    },
+#my $t = UE::Tcp->new;
+#$t->open($sock);
+#$t->listen(128);
+#
+#$t->connection_callback(sub {
+#    my (undef, $cli, $err) = @_;
+#    die $err if $err;
+#    $cli->read_callback(sub {
+#        my (undef, $data, $err) = @_;
+#        say "READ: $data";
+#        $cli;
+#    });
+#});
+#
+#UE::Loop->default_loop->run;
+#
+#exit();
+
+my $server = UniEvent::HTTP::Server->new({
+    locations => [{path => "tmpsock"}],
 });
 
-$pool->request($req);
+$server->request_callback(sub {
+    my $req = shift;
+    say "REQUEST. URI = ".$req->uri;
+    $req->respond({code => 200, body => "fuck you"});
+});
+
+$server->run;
 
 UE::Loop->default_loop->run;

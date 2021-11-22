@@ -13,7 +13,7 @@ role ARole {
    method one { $one }
 }
 
-class AClass does ARole {
+class AClass :does(ARole) {
    has $two = 2;
    method two { $two }
 }
@@ -26,7 +26,7 @@ class AClass does ARole {
    is( $obj->two, 2, 'AClass has a ->two method' );
 }
 
-class BClass isa AClass {
+class BClass :isa(AClass) {
    has $three = 3;
    method three { $three }
 }
@@ -39,13 +39,12 @@ class BClass isa AClass {
    is( $obj->three, 3, 'BClass has a ->three method' );
 }
 
-role CRole does ARole
-{
+role CRole :does(ARole) {
    has $three = 3;
    method three { $three }
 }
 
-class CClass does CRole {}
+class CClass :does(CRole) {}
 
 # role slots via composition
 {
@@ -63,17 +62,17 @@ class CClass does CRole {}
       method slot { $slot }
    }
 
-   role D1Role does DRole {}
-   role D2Role does DRole {}
+   role D1Role :does(DRole) {}
+   role D2Role :does(DRole) {}
 
-   role DxRole does D1Role, D2Role {}
+   role DxRole :does(D1Role) :does(D2Role) {}
 
-   class DClass does D1Role, D2Role {}
+   class DClass :does(D1Role) :does(D2Role) {}
 
    my $obj1 = DClass->new;
    is( $obj1->slot, 2, 'DClass->slot is 2 via diamond' );
 
-   class DxClass does DxRole {}
+   class DxClass :does(DxRole) {}
 
    my $obj2 = DxClass->new;
    is( $obj2->slot, 2, 'DxClass->slot is 2 via diamond' );
@@ -87,7 +86,7 @@ class CClass does CRole {}
       has $slot :param :weak;
    }
 
-   class implWithWeak does WithWeakRole {}
+   class implWithWeak :does(WithWeakRole) {}
 
    my $obj = implWithWeak->new( slot => $arr );
    is_oneref( $arr, '$arr has one reference after implWithWeak constructor' );

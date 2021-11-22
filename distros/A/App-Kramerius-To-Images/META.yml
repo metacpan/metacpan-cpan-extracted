@@ -3,6 +3,8 @@ abstract: 'Base class and script for creating Kramerius downloader.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
   Test::More: 0
   Test::NoWarnings: 0
@@ -41,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Kramerius-To-Images
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Kramerius-To-Images
-version: '0.01'
+version: '0.03'

@@ -1,5 +1,9 @@
 Revision history for Text::Guess::Script
 
+0.07  2021-11-10 18:53:30 CET
+        - added script name in result
+        - improved documentation       
+
 0.06  2021-08-27 22:17:33 CEST
         - improved speed using Unicode::UCD
         - new method guesses

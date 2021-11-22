@@ -4,9 +4,9 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS;
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 sub new {
     my ($class, %args) = @_;
@@ -142,11 +142,11 @@ DNS::LDNS::Packet - DNS packet
 
 =head1 SYNOPSIS
 
-  use DNS::LDNS ':all'
+  use DNS::LDNS ();
 
-  my pkt = new DNS::LDNS::Packet(name => rdata, type => LDNS_RR_TYPE_...,
+  my pkt = DNS::LDNS::Packet->new(name => rdata, type => LDNS_RR_TYPE_...,
     class => LDNS_RR_CLASS_..., flags => ...)
-  my pkt = new DNS::LDNS::Packet
+  my pkt = DNS::LDNS::Packet->new
 
   pkt2 = pkt->clone
 

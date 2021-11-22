@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.0.2
+## Version v1.0.3
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/08/18
+## Modified 2021/11/13
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,7 @@ BEGIN
         },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.0.2';
+    our( $VERSION ) = 'v1.0.3';
 };
 
 ## sub new { return( shift->_new( @_ ) ); }
@@ -324,8 +324,11 @@ sub object { return( $_[0] ); }
 sub open
 {
     my $self = shift( @_ );
-    my $io = Module::Generic::Scalar::IO->new( $self ) ||
-    return( $self->pass_error( Module::Generic::Scalar::IO->error ) );
+    my $io = Module::Generic::Scalar::IO->new( $self ) || do
+    {
+        $! = Module::Generic::Scalar::IO->error;
+        return;
+    };
     return( $io );
 }
 
@@ -455,6 +458,15 @@ sub split
     my $self = CORE::shift( @_ );
     my( $expr, $limit ) = @_;
     CORE::warn( "No argument was provided to split string in Module::Generic::Scalar::split\n" ) if( !scalar( @_ ) );
+    unless( ref( $expr ) eq 'Regexp' )
+    {
+        if( ref( $expr ) )
+        {
+            CORE::warn( "Expression provided is a reference of type '", ref( $expr ), "', but I was expecting either a regular expression or a simple string.\n" );
+            return;
+        }
+        $expr = qr/\Q$expr\E/;
+    }
     my $ref;
     $limit = "$limit";
     if( CORE::defined( $limit ) && $limit =~ /^\d+$/ )
@@ -622,6 +634,28 @@ sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
     {
         my $self = CORE::shift( @_ );
         return( CORE::length( ${ *$self->{SR} } ) );
+    }
+    
+    sub line
+    {
+        my $self = shift( @_ );
+        my $code = shift( @_ );
+        return( $self->error( "No callback code was provided for line()" ) ) if( !defined( $code ) || ref( $code ) ne 'CODE' );
+        my $opts = ref( $_[0] ) eq 'HASH' ? shift( @_ ) : { @_ };
+        $opts->{chomp} //= 0;
+        $opts->{auto_next} //= 0;
+        my $l;
+        while( defined( $l = $self->getline ) )
+        {
+            chomp( $l ) if( $opts->{chomp} );
+            local $_ = $l;
+            my $rv = $code->( $l );
+            if( !defined( $rv ) && !$opts->{auto_next} )
+            {
+                last;
+            }
+        }
+        return( $self );
     }
     
     sub object { return( *{ $_[0] }->{SR} ) }

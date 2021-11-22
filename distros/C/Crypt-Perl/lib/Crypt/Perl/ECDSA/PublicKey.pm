@@ -72,7 +72,7 @@ use constant ASN1_PUBLIC => Crypt::Perl::ECDSA::KeyBase->ASN1_Params() . q<
     }
 >;
 
-use constant _PEM_HEADER => 'EC PUBLIC KEY';
+use constant _PEM_HEADER => 'PUBLIC KEY';
 
 #There’s no new_by_curve_name() method here because
 #that logic in PrivateKey is only really useful for when we

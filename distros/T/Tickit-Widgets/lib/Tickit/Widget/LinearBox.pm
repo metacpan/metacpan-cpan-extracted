@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.51;
+use Object::Pad 0.57;
 
-package Tickit::Widget::LinearBox 0.50;
+package Tickit::Widget::LinearBox 0.51;
 class Tickit::Widget::LinearBox
-   extends Tickit::ContainerWidget;
+   :isa(Tickit::ContainerWidget);
 
 use experimental 'postderef';
 

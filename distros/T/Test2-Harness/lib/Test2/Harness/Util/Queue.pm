@@ -2,7 +2,7 @@ package Test2::Harness::Util::Queue;
 use strict;
 use warnings;
 
-our $VERSION = '1.000080';
+our $VERSION = '1.000082';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
@@ -43,11 +43,12 @@ sub reset {
 
 sub poll {
     my $self = shift;
+    my $max = shift;
 
     return $self->{+ENDED} if $self->{+ENDED};
 
     $self->{+QH} ||= Test2::Harness::Util::File::JSONL->new(name => $self->{+FILE});
-    my @out = $self->{+QH}->poll_with_index();
+    my @out = $self->{+QH}->poll_with_index( $max ? (max => $max) : () );
 
     $self->{+ENDED} = $out[-1] if @out && !defined($out[-1]->[-1]);
 

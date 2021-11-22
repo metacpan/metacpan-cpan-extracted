@@ -1,0 +1,61 @@
+{
+   "abstract" : "An Apache2 MogileFS Dispatcher",
+   "author" : [
+      "Nick Gerakines <nick@socklabs.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Apache2-Mogile-Dispatch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "English" : "0",
+            "MogileFS" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cache::Memcached" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::Group" : "0",
+            "Test::More" : "0",
+            "YAML::Syck" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Apache2-Mogile-Dispatch"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://git.deguest.jp/jack/Apache2-Mogile-Dispatch"
+      }
+   },
+   "version" : "0.3",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

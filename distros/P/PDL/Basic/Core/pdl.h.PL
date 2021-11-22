@@ -13,6 +13,7 @@ print "Extracting $file\n";
 open OUT,">$file" or die "Can't create $file: $!";
 chmod 0644, $file;
 
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<"!GROK!THIS!";
 
 /*
@@ -36,6 +37,12 @@ extern int pdl_debugging;
 #define ANYVAL_ISBAD(inany,pdl,badval) \\
   (ANYVAL_ISNAN(badval) ? ANYVAL_ISNAN(inany) : ANYVAL_EQ_ANYVAL(inany, badval))
 
+typedef struct pdl pdl;
+
+$PDL_DATATYPES
+
+#include "pdlthread.h"
+
 /* Auto-PThreading (i.e. multi-threading) settings for PDL functions */
 /*  Target number of pthreads: Actual will be this number or less.
     A 0 here means no pthreading */
@@ -49,10 +56,7 @@ extern int pdl_autopthread_actual;
     For small PDLs, it probably isn't worth starting multiple pthreads, so this variable
     is used to define that threshold (in M-elements, or 2^20 elements ) */
 extern int pdl_autopthread_size;
-
-typedef struct pdl pdl;
-
-$PDL_DATATYPES
+extern PDL_Indx pdl_autopthread_dim;
 
 $mymalloc
 
@@ -60,6 +64,7 @@ $mymalloc
 
 !GROK!THIS!
 
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'EOF';
 static inline int _anyval_eq_anyval(PDL_Anyval x, PDL_Anyval y) {
   switch (x.type) {
@@ -78,6 +83,7 @@ print OUT <<'EOF';
 }
 EOF
 
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'EOF';
 #define ANYVAL_FROM_CTYPE(outany,avtype,inval) do { switch (avtype) { \
 EOF
@@ -89,6 +95,7 @@ print OUT <<'EOF';
  } while (0)
 EOF
 
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'EOF';
 #define ANYVAL_TO_CTYPE(outval,ctype,inany) do { switch (inany.type) { \
 EOF
@@ -98,6 +105,25 @@ print OUT <<'EOF';
 default:      outval = 0; \
             } \
         } while (0)
+EOF
+
+print OUT <<'EOF';
+#define ANYVAL_FROM_CTYPE_OFFSET(outany,avtype,indata,ioff) do { switch (avtype) { \
+EOF
+print OUT "case @{[$_->sym]}: outany.type = avtype; outany.value.@{[$_->ppsym]} = (@{[$_->ctype]})((@{[$_->ctype]} *)indata)[ioff]; break; \\\n"
+  for PDL::Types::types();
+print OUT <<'EOF';
+   default:      outany.type = -1;     outany.value.B = 0; \
+  } \
+ } while (0)
+EOF
+
+print OUT <<'EOF';
+/* input vars have to be called exactly these as not expanded */
+#define ANYVAL_TO_CTYPE_OFFSET_X(datatype, generic, generic_ppsym, shortctype, defbval) \
+    ANYVAL_TO_CTYPE(((generic *)x)[ioff], generic, value);
+#define ANYVAL_TO_CTYPE_OFFSET(x,ioff,datatype,value) \
+    PDL_GENERICSWITCH(datatype, ANYVAL_TO_CTYPE_OFFSET_X)
 EOF
 
 my $isnan = join " \\\n  ",
@@ -111,16 +137,51 @@ print OUT <<EOF;
 )
 EOF
 
-# set up the badvalues structure
-# - for binary compatability, this is created whatever the
-#   value of $bvalflag and $usenan
-print OUT "typedef struct badvals {\n";
-foreach my $type ( reverse PDL::Types::types() ) {
-    my ($realctype, $cname) = map $type->$_, qw(realctype shortctype);
-    printf OUT "   %18s   %s;\n",$realctype,$cname;
-    printf OUT "   %18s   default_%s;\n",$realctype,$cname;
+for my $type (PDL::Types::types()) {
+  my ($ppsym) = map $type->$_, qw(ppsym);
+  my $expr = !$type->usenan ? 'FALSE' : $type->isnan('x');
+  print OUT "#define PDL_ISNAN_$ppsym(x) ($expr)\n";
+  my $expr2 = !$type->usenan ? 'TRUE' : $type->isfinite('x');
+  print OUT "#define PDL_ISFINITE_$ppsym(x) ($expr2)\n";
 }
-print OUT "} badvals;\n";
+
+my @methods = qw(symbol ctype ppsym shortctype defbval);
+my @generics = map { my $t = $_; [map $t->$_, @methods] } PDL::Types::types();
+print OUT "#define PDL_GENERICLIST(X) \\\n";
+print OUT (map ' X('.join(',', @$_).")\\\n", @generics), "\n\n";
+print OUT "#define PDL_GENERICLIST2(X, X2) \\\n";
+print OUT (map ' X(X2, '.join(',', @$_).")\\\n", @generics), "\n\n";
+# extra as macro gets expanded twice, gets painted blue
+print OUT "#define PDL_GENERICLIST2_(X, X2) \\\n";
+print OUT (map ' X(X2, '.join(',', @$_).")\\\n", @generics), "\n\n";
+my @generics_real = map { my $t = $_; [map $t->$_, @methods] } grep $_->real, PDL::Types::types();
+print OUT "#define PDL_GENERICLIST_REAL(X) \\\n";
+print OUT (map ' X('.join(',', @$_).")\\\n", @generics_real), "\n\n";
+
+print OUT <<'EOF';
+typedef struct badvals {
+#define X(symbol, ctype, ppsym, shortctype, defbval) ctype shortctype;
+PDL_GENERICLIST(X)
+#undef X
+} badvals;
+
+#define PDL_GENERICSWITCH_CASE(X, symbol, ...) \
+  case symbol: { X(symbol, __VA_ARGS__) } break;
+#define PDL_GENERICSWITCH(typevar, X2) \
+  switch (typevar) { \
+    PDL_GENERICLIST2(PDL_GENERICSWITCH_CASE, X2) \
+    default: croak("Not a known data type code=%d", typevar); \
+  }
+/* extra as first one gets painted blue */
+#define PDL_GENERICSWITCH_CASE2(X, symbol, ...) \
+  case symbol: { X(symbol, __VA_ARGS__) } break;
+/* for use in inner loops avoiding extreme lambda-calculus stuff */
+#define PDL_GENERICSWITCH2(typevar, X2) \
+  switch (typevar) { \
+    PDL_GENERICLIST2_(PDL_GENERICSWITCH_CASE2, X2) \
+    default: croak("Not a known data type code=%d", typevar); \
+  }
+EOF
 
 print OUT <<'!NO!SUBS!';
 
@@ -181,9 +242,26 @@ print OUT <<'!NO!SUBS!';
   /* free this ndarray nor use datasv (which should be null).                */
   /* This means e.g. that the ndarray is mmapped from a file                 */
 #define         PDL_DONTTOUCHDATA       0x4000
-  /* Not sure what this does, but PP uses it a lot. -- CED                  */
-#define PDL_CR_SETDIMSCOND(wtrans,pdl) (((pdl)->state & PDL_MYDIMS_TRANS) \
-                && (pdl)->trans == (pdl_trans *)(wtrans))
+  /* whether the given pdl is getting its dims from the given trans */
+#define PDL_DIMS_FROM_TRANS(wtrans,pdl) (((pdl)->state & PDL_MYDIMS_TRANS) \
+                && (pdl)->trans_parent == (pdl_trans *)(wtrans))
+
+#define PDL_LIST_FLAGS_PDLSTATE(X) \
+ X(PDL_ALLOCATED) \
+ X(PDL_PARENTDATACHANGED) \
+ X(PDL_PARENTDIMSCHANGED) \
+ X(PDL_PARENTREPRCHANGED) \
+ X(PDL_DATAFLOW_F) \
+ X(PDL_DATAFLOW_B) \
+ X(PDL_NOMYDIMS) \
+ X(PDL_MYDIMS_TRANS) \
+ X(PDL_OPT_VAFFTRANSOK) \
+ X(PDL_HDRCPY) \
+ X(PDL_BADVAL) \
+ X(PDL_TRACEDEBUG) \
+ X(PDL_INPLACE) \
+ X(PDL_DESTROYING) \
+ X(PDL_DONTTOUCHDATA)
 
 /**************************************************
  *
@@ -195,11 +273,17 @@ print OUT <<'!NO!SUBS!';
  *
  */
 
-typedef enum pdl_transtype { PDL_SLICE, PDL_RETYPE }
-        pdl_transtype;
-
 /* Transformation flags */
-#define         PDL_TRANS_AFFINE        0x0001
+#define         PDL_TRANS_DO_THREAD        0x0001
+#define         PDL_TRANS_BADPROCESS       0x0002
+#define         PDL_TRANS_BADIGNORE        0x0004
+#define         PDL_TRANS_NO_PARALLEL      0x0008
+
+#define PDL_LIST_FLAGS_PDLVTABLE(X) \
+  X(PDL_TRANS_DO_THREAD) \
+  X(PDL_TRANS_BADPROCESS) \
+  X(PDL_TRANS_BADIGNORE) \
+  X(PDL_TRANS_NO_PARALLEL)
 
 /* Transpdl flags */
 #define         PDL_TPDL_VAFFINE_OK     0x01
@@ -207,23 +291,61 @@ typedef enum pdl_transtype { PDL_SLICE, PDL_RETYPE }
 typedef struct pdl_trans pdl_trans;
 
 typedef struct pdl_transvtable {
-        pdl_transtype transtype;
         int flags;
+        int iflags; /* flags that are starting point for pdl_trans.flags */
+        pdl_datatypes *gentypes; /* ordered list of types handled, ending -1 */
         PDL_Indx nparents;
         PDL_Indx npdls;
         char *per_pdl_flags;
+        PDL_Indx *par_realdims; /* quantity of dimensions each par has */
+        char **par_names;
+        short *par_flags;
+        pdl_datatypes *par_types;
+        PDL_Indx *par_realdim_ind_start; /* each par, where do its inds start in array above */
+        PDL_Indx *par_realdim_ind_ids; /* each realdim, which ind is source */
+        PDL_Indx nind_ids;
+        PDL_Indx ninds;
+        char **ind_names; /* sorted names of "indices", eg for a(m), the "m" */
         void (*redodims)(pdl_trans *tr);      /* Only dims and internal trans (makes phys) */
         void (*readdata)(pdl_trans *tr);      /* Only data, to "data" ptr  */
         void (*writebackdata)(pdl_trans *tr); /* "data" ptr to parent or granny */
         void (*freetrans)(pdl_trans *tr);     /* Free both the contents and it of
-                                                 the trans member */
-        void (*dump)(pdl_trans *tr);          /* Dump this transformation */
-        void (*findvparent)(pdl_trans *tr);   /* Find a virtual parent and make ready for
-                                                 readdata etc. */
-        pdl_trans *(*copy)(pdl_trans *tr);    /* Full copy */
+                                                 the trans_parent member */
         int structsize;
         char *name;                           /* For debuggers, mostly */
 } pdl_transvtable;
+
+/* offset into either par_realdim_ind_ids or inc_sizes */
+#define PDL_INC_ID(vtable, i, j) \
+  ((vtable)->par_realdim_ind_start[i] + j)
+/* which ind_id (named dim) for the i-th pdl (aka param) in a vtable, the j-th dim on that param */
+#define PDL_IND_ID(vtable, i, j) \
+  ((vtable)->par_realdim_ind_ids[PDL_INC_ID(vtable, i, j)])
+
+#define PDL_PARAM_ISREAL             0x0001
+#define PDL_PARAM_ISCOMPLEX          0x0002
+#define PDL_PARAM_ISTYPED            0x0004
+#define PDL_PARAM_ISTPLUS            0x0008
+#define PDL_PARAM_ISCREAT            0x0010
+#define PDL_PARAM_ISCREATEALWAYS     0x0020
+#define PDL_PARAM_ISOUT              0x0040
+#define PDL_PARAM_ISTEMP             0x0080
+#define PDL_PARAM_ISWRITE            0x0100
+#define PDL_PARAM_ISPHYS             0x0200
+#define PDL_PARAM_ISIGNORE           0x0400
+
+#define PDL_LIST_FLAGS_PARAMS(X) \
+ X(PDL_PARAM_ISREAL) \
+ X(PDL_PARAM_ISCOMPLEX) \
+ X(PDL_PARAM_ISTYPED) \
+ X(PDL_PARAM_ISTPLUS) \
+ X(PDL_PARAM_ISCREAT) \
+ X(PDL_PARAM_ISCREATEALWAYS) \
+ X(PDL_PARAM_ISOUT) \
+ X(PDL_PARAM_ISTEMP) \
+ X(PDL_PARAM_ISWRITE) \
+ X(PDL_PARAM_ISPHYS) \
+ X(PDL_PARAM_ISIGNORE)
 
 /* All trans must start with this */
 
@@ -231,9 +353,9 @@ typedef struct pdl_transvtable {
 
         /* Reversible transform -- flag indicates data can flow both ways.  */
         /* This is critical in routines that both input from and output to  */
-        /* a non-single-valued pdl: updating must occur.  (Note that the    */         
+        /* a non-single-valued pdl: updating must occur.  (Note that the    */
         /* transform is not necessarily mathematically reversible)          */
-#define  PDL_ITRANS_REVERSIBLE        0x0001
+#define  PDL_ITRANS_TWOWAY        0x0001
         /* Whether, if a child is changed, this trans should be destroyed or not */
         /* (flow if set; sever if clear) */
 #define  PDL_ITRANS_DO_DATAFLOW_F     0x0002
@@ -244,6 +366,17 @@ typedef struct pdl_transvtable {
 #define  PDL_ITRANS_VAFFINEVALID      0x2000
 #define  PDL_ITRANS_NONMUTUAL         0x4000  /* flag for destruction */
 
+#define PDL_LIST_FLAGS_PDLTRANS(X) \
+ X(PDL_ITRANS_TWOWAY) \
+ X(PDL_ITRANS_DO_DATAFLOW_F) \
+ X(PDL_ITRANS_DO_DATAFLOW_B) \
+ X(PDL_ITRANS_ISAFFINE) \
+ X(PDL_ITRANS_VAFFINEVALID) \
+ X(PDL_ITRANS_NONMUTUAL)
+
+#define PDL_MAXSPACE 256 /* maximal number of prefix spaces in dump routines */
+#define PDL_MAXLIN 60
+
 // These define struct pdl_trans and all derived structures. There are many
 // structures that defined in other parts of the code that can be referenced
 // like a pdl_trans* because all of these structures have the same pdl_trans
@@ -252,20 +385,19 @@ typedef struct pdl_transvtable {
 // reference any number of pdl objects. As a result pdl_trans itself can NOT be
 // instantiated
 
-// vparent is the "virtual parent" which is either
-// the parent or grandparent or whatever. The trans -structure must store
-// both the relationship with our current parent and, if necessary, the
-// virtual parent.
-
 #define PDL_TRANS_START_COMMON                                          \
   unsigned int magicno;                                                 \
   short flags;                                                          \
   pdl_transvtable *vtable;                                              \
-  void (*freeproc)(struct pdl_trans *);  /* Call to free this           \
-                                          (means whether malloced or not) */ \
   int bvalflag;                                                         \
   int has_badvalue;                                                     \
   PDL_Anyval badvalue;                                                  \
+  pdl_thread pdlthread;                                                 \
+  PDL_Indx *ind_sizes;                                                  \
+  PDL_Indx *inc_sizes;                                                  \
+  char dims_redone;                                                     \
+  PDL_Indx *incs; PDL_Indx offs; /* only used for affine */             \
+  void *params;                                                         \
   int __datatype
 
 #define PDL_TRANS_START(np) \
@@ -278,15 +410,11 @@ typedef struct pdl_transvtable {
   /* The pdls involved in the transformation */ \
   pdl *pdls[]
 
-#ifdef PDL_DEBUGGING
-#define PDL_CHKMAGIC_GENERAL(it,this_magic,type) if((it)->magicno != this_magic) croak("INVALID " #type "MAGIC NO 0x%p %d\n",it,(int)((it)->magicno)); else (void)0
-#else
-#define PDL_CHKMAGIC_GENERAL(it,this_magic,type)
-#endif
+#define PDL_CHKMAGIC_GENERAL(it,this_magic,type) if((it)->magicno != this_magic) croak("INVALID " #type "MAGIC NO 0x%p %d%s\n",it,(int)((it)->magicno), ((it)->magicno) == PDL_CLEARED_MAGICNO ? " (cleared)" : ""); else (void)0
 
 #define PDL_TR_MAGICNO      0x91827364
 #define PDL_TR_SETMAGIC(it) it->magicno = PDL_TR_MAGICNO
-#define PDL_TR_CLRMAGIC(it) it->magicno = 0x99876134
+#define PDL_TR_CLRMAGIC(it) it->magicno = PDL_CLEARED_MAGICNO
 #define PDL_TR_CHKMAGIC(it) PDL_CHKMAGIC_GENERAL(it, PDL_TR_MAGICNO, "TRANS ")
 
 // This is a generic parent of all the trans structures. It is a flexible array
@@ -296,16 +424,8 @@ struct pdl_trans {
   PDL_TRANS_START_FLEXIBLE();
 } ;
 
-typedef struct pdl_trans_affine {
-        PDL_TRANS_START(2);
-/* affine relation to parent */
-	PDL_Indx *incs; PDL_Indx offs;
-} pdl_trans_affine;
-
-/* Need to make compatible with pdl_trans_affine */
 typedef struct pdl_vaffine {
 	PDL_TRANS_START(2);
-	PDL_Indx *incs; PDL_Indx offs;
 	PDL_Indx ndims;
 	PDL_Indx def_incs[PDL_NDIMS];
 	pdl *from;
@@ -326,7 +446,7 @@ typedef struct pdl_vaffine {
                                   PDL_TPDL_VAFFINE_OK))
 
 typedef struct pdl_children {
-        pdl_trans *trans[PDL_NCHILDREN];
+        pdl_trans *trans_parent[PDL_NCHILDREN];
         struct pdl_children *next;
 } pdl_children;
 
@@ -336,6 +456,9 @@ struct pdl_magic;
  * PDL structure
  * Should be kept under 250 bytes if at all possible, for
  * easier segmentation...
+ * See current size (360 bytes at time of writing) with:
+      perl -Mblib -MInline=with,PDL \
+        -MInline=C,'size_t f() { return sizeof(struct pdl); }' -e 'die f()'
  *
  * The 'sv', 'datasv', and 'hdrsv' fields are all void * to avoid having to
  * load perl.h for C codes that only use PDLs and not the Perl API.
@@ -345,6 +468,7 @@ struct pdl_magic;
  */
 
 #define PDL_MAGICNO 0x24645399
+#define PDL_CLEARED_MAGICNO 0x99876134 /* value once "cleared" */
 #define PDL_CHKMAGIC(it) PDL_CHKMAGIC_GENERAL(it,PDL_MAGICNO,"")
 
 struct pdl {
@@ -352,7 +476,7 @@ struct pdl {
      /* This is first so most pointer accesses to wrong type are caught */
    int state;        /* What's in this pdl */
 
-   pdl_trans *trans; /* Opaque pointer to internals of transformation from
+   pdl_trans *trans_parent; /* Opaque pointer to internals of transformation from
                         parent */
 
    pdl_vaffine *vafftrans; /* pointer to vaffine transformation
@@ -390,6 +514,13 @@ struct pdl {
    void *hdrsv; /* "header", settable from Perl */
 };
 
+typedef struct pdl_slice_args {
+  PDL_Indx start; /* maps to start index of slice range (inclusive) */
+  PDL_Indx end; /* maps to end index of slice range (inclusive) */
+  PDL_Indx inc; /* maps to increment of slice range */
+  char dummy, squish; /* boolean */
+  struct pdl_slice_args *next; /* NULL is last */
+} pdl_slice_args;
 
 /*************
  * Some macros for looping over the children of a given PDL
@@ -400,8 +531,8 @@ struct pdl {
                 p##__c = &p->children; \
                 do { \
                         for(p##__i=0; p##__i<PDL_NCHILDREN; p##__i++) { \
-                                if(p##__c->trans[p##__i]) {
-#define PDL_CHILDLOOP_THISCHILD(p) p##__c->trans[p##__i]
+                                if(p##__c->trans_parent[p##__i]) {
+#define PDL_CHILDLOOP_THISCHILD(p) p##__c->trans_parent[p##__i]
 #define PDL_END_CHILDLOOP(p) \
                                 } \
                         } \
@@ -426,6 +557,29 @@ struct pdl {
 #define PDL_ENSURE_VAFFTRANS(it) \
   ( ((!it->vafftrans) || (it->vafftrans->ndims < it->ndims)) && \
     (pdl_vafftrans_alloc(it),1) )
+
+/* for use with PDL_GENERICLIST_REAL */
+#define PDL_QSORT(symbol, ctype, ppsym, shortctype, defbval) \
+  static inline void qsort_ ## ppsym(ctype* xx, PDL_Indx a, PDL_Indx b) { \
+     PDL_Indx i,j; \
+     ctype t, median; \
+     i = a; j = b; \
+     median = xx[(i+j) / 2]; \
+     do { \
+        while (xx[i] < median) \
+           i++; \
+        while (median < xx[j]) \
+           j--; \
+        if (i <= j) { \
+           t = xx[i]; xx[i] = xx[j]; xx[j] = t; \
+           i++; j--; \
+        } \
+     } while (i <= j); \
+     if (a < j) \
+        qsort_ ## ppsym(xx,a,j); \
+     if (i < b) \
+        qsort_ ## ppsym(xx,i,b); \
+  }
 
 /* __PDL_H */
 #endif

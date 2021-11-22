@@ -1,0 +1,4 @@
+sub test_requires {
+  my ($module, $version_or_range) = @_;
+  _add_prereq(TEST_REQUIRES => $module, $version_or_range);
+}

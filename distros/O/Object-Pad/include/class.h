@@ -17,6 +17,7 @@ struct ClassMeta {
   unsigned int role_is_invokable : 1;
   unsigned int strict_params : 1;
   unsigned int has_adjustparams : 1; /* has at least one ADJUSTPARAMS block */
+  unsigned int has_superclass : 1;
 
   SLOTOFFSET start_slotix; /* first slot index of this partial within its instance */
   SLOTOFFSET next_slotix;  /* 1 + final slot index of this partial within its instance; includes slots in roles */
@@ -91,7 +92,7 @@ typedef struct ParamMeta {
     for(hooki = 0; classmeta->hooks && hooki < av_count(classmeta->hooks); hooki++) {     \
       struct ClassHook *h = (struct ClassHook *)AvARRAY(classmeta->hooks)[hooki];         \
       if(*h->funcs->func)                                                                 \
-        (*h->funcs->func)(aTHX_ classmeta, h->hookdata, __VA_ARGS__);                     \
+        (*h->funcs->func)(aTHX_ classmeta, h->hookdata, h->funcdata, __VA_ARGS__);        \
     }                                                                                     \
   }
 

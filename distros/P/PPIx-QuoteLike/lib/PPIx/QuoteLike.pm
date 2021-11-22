@@ -40,7 +40,7 @@ use PPIx::QuoteLike::Utils qw{
 use Scalar::Util ();
 use Text::Tabs ();
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use constant CLASS_CONTROL       => 'PPIx::QuoteLike::Token::Control';
 use constant CLASS_DELIMITER     => 'PPIx::QuoteLike::Token::Delimiter';
@@ -192,6 +192,7 @@ use constant NO_INDENTATION	=>
 
 	$self->{interpolates} = $self->{interpolates} ? 1 : 0;
 
+	defined or $_ = '' for $indented, $gap2;
 	$self->{type} = [
 	    $self->_make_token( CLASS_STRUCTURE, $type ),
 	    length $gap ?

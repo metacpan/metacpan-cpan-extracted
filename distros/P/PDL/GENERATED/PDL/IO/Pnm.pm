@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::IO::Pnm;
 
-our @EXPORT_OK = qw( rpnm wpnm PDL::PP pnminraw PDL::PP pnminascii PDL::PP pnmout );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(rpnm wpnm pnminraw pnminascii pnmout );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::Pnm ;
+
 
 
 
@@ -92,10 +91,7 @@ sub rcarp {
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -106,7 +102,7 @@ sub rcarp {
 =for sig
 
   Signature: (type(); byte+ [o] im(m,n); int ms => m; int ns => n;
-			int isbin; char* fd)
+			int isbin; PerlIO *fp)
 
 
 
@@ -145,7 +141,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (type(); byte+ [o] im(m,n); int ms => m; int ns => n;
-			int format; char* fd)
+			int format; PerlIO *fp)
 
 
 =for ref
@@ -177,7 +173,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(m); int israw; int isbin; char *fd)
+  Signature: (a(m); int israw; int isbin; PerlIO *fp)
 
 
 =for ref
@@ -206,7 +202,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head2 rpnm
 
@@ -263,14 +259,14 @@ sub PDL::rpnm {
     # catch STDERR
     open(SAVEERR, ">&STDERR");
     open(STDERR, ">$efile") || barf "Can't redirect stderr";
-    my $succeed = open(PNM, $file);
+    my $succeed = open(my $fh, $file);
     # redirection now in effect for child
     # close(STDERR);
     open(STDERR, ">&PDL::IO::Pnm::SAVEERR");
     rbarf $efile,"Can't open pnm file '$file'" unless $succeed;
-    binmode PNM;
+    binmode $fh;
 
-    read(PNM,(my $magic),2);
+    read($fh,(my $magic),2);
     rbarf $efile, "Oops, this is not a PNM file" unless $magic =~ /P[1-6]/;
     print "reading pnm file with magic $magic\n" if $PDL::debug>1;
 
@@ -283,7 +279,7 @@ sub PDL::rpnm {
 
     # get the header information
     my ($line, $pgot, @dims) = ("",0,0,0,0);
-    while (($pgot<$params) && ($line=<PNM>)) {
+    while (($pgot<$params) && ($line=<$fh>)) {
        $line =~ s/#.*$//;
 	next if $line =~ /^\s*$/;    # just white space
 	while ($line !~ /^\s*$/ && $pgot < $params) {
@@ -321,11 +317,11 @@ TYPES:	{  my $pdlt;
     my $npdl = $isrgb ? $pdl->clump(2) : $pdl;
     if ($israw) {
        pnminraw (convert(pdl(0),$type), $npdl, $Dims[0], $Dims[1],
-	 $magic eq "P4", 'PDL::IO::Pnm::PNM');
+	 $magic eq "P4", $fh);
     } else {
        my $form = $1 if $magic =~ /P([1-3])/;
        pnminascii (convert(pdl(0),$type), $npdl, $Dims[0], $Dims[1],
-	$form, 'PDL::IO::Pnm::PNM');
+	$form, $fh);
     }
     print("loaded pnm file, $dims[0]x$dims[1], gmax: $dims[2]",
 	   $isrgb ? ", RGB data":"", $israw ? ", raw" : " ASCII"," data\n")
@@ -412,18 +408,18 @@ sub PDL::wpnm {
     my $pref = ($file !~ /^\s*[|>]/) ? ">" : "";  # test for plain file name
     open(SAVEERR, ">&STDERR");
     open(STDERR, ">$efile") || barf "Can't redirect stderr";
-    my $succeed = open(PNM, $pref . $file);
+    my $succeed = open(my $fh, $pref . $file);
     # close(STDERR);
     open(STDERR, ">&PDL::IO::Pnm::SAVEERR");
     rbarf $efile, "Can't open pnm file" unless $succeed;
-    binmode PNM;
+    binmode $fh;
 
     $max =$pdl->max;
     print "writing ". ($israw ? "raw" : "ascii") .
       "format with magic $magic, max=$max\n" if $PDL::debug;
     # write header
-    print PNM "$magic\n";
-    print PNM "$Dims[-2] $Dims[-1]\n";
+    print $fh "$magic\n";
+    print $fh "$Dims[-2] $Dims[-1]\n";
     if ($type !~ /PBM/) {	# fix maxval for raw output formats
        my $outmax = 0;
 
@@ -435,7 +431,7 @@ sub PDL::wpnm {
           $outmax = $max;
        };
 
-       print PNM "$outmax\n" unless $type =~ /PBM/;
+       print $fh "$outmax\n" unless $type =~ /PBM/;
     };
 
     # if rgb clump first two dims together
@@ -454,10 +450,10 @@ sub PDL::wpnm {
           }
        }
     }
-    pnmout($out,$israw,$type eq "PBM",'PDL::IO::Pnm::PNM');
+    pnmout($out,$israw,$type eq "PBM",$fh);
 
     # check if our child returned an error (in case of a pipe)
-    if (!(close PNM)) {
+    if (!(close $fh)) {
       my $err = show_err($efile,0);
       barf "wpnm: pbmconverter error: $err";
     }
@@ -503,5 +499,3 @@ the copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

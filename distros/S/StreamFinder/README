@@ -130,8 +130,9 @@ DESCRIPTION
     (StreamFinder::Brighteon), castbox.fm (StreamFinder::Castbox),
     podcasts.google.com (StreamFinder::Google), iheartradio.com
     (StreamFinder::IHeartRadio), odysee.com (StreamFinder::Odysee),
-    radio.net (StreamFinder::RadioNet), rumble.com (StreamFinder::Rumble),
-    sermonaudio.com (StreamFinder::SermonAudio), spreaker.com podcasts
+    podbean.com (StreamFinder::Podbean), radio.net (StreamFinder::RadioNet),
+    rumble.com (StreamFinder::Rumble), sermonaudio.com
+    (StreamFinder::SermonAudio), spreaker.com podcasts
     (StreamFinder::Spreaker), tunein.com (StreamFinder::Tunein), vimeo.com
     (StreamFinder::Vimeo), (youtube.com, et. al and other sites that
     youtube-dl supports) (StreamFinder::Youtube), and
@@ -262,12 +263,13 @@ SUBROUTINES/METHODS
     $station->get(['playlist'])
         Returns an array of strings representing all stream URLs found. If
         *"playlist"* is specified, then an extended m3u playlist is returned
-        instead of stream url(s). NOTE: For Apple, Castbox, and Google
-        podcasts, if an author / channel page url is given, rather than an
-        individual podcast episode's url, get() returns the first (latest?)
-        podcast episode found, and get("playlist") returns an extended m3u
-        playlist containing the urls, titles, etc. for all the podcast
-        episodes found on that page url.
+        instead of stream url(s). NOTE: For Apple, Castbox, Google,
+        Spreaker, and SermonAudio podcasts, if an author / channel page url
+        is given, rather than an individual podcast episode's url, get()
+        returns the first (latest?) podcast episode found, and
+        get("playlist") returns an extended m3u playlist containing the
+        urls, titles, etc. for all the podcast episodes found on that page
+        url from latest to oldest.
 
     $station->getURL([*options*])
         Similar to get() except it only returns a single stream representing
@@ -325,9 +327,9 @@ SUBROUTINES/METHODS
     $station->getType()
         Returns the station / podcast / video's type (*submodule-name*).
         (one of: "Anystream", "Apple", "BitChute", "Blogger", "Brighteon",
-        "Castbox", "Google", "IHeartRadio", "Odysee", "RadioNet", "Rumble",
-        "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" -
-        depending on the sight that matched the URL).
+        "Castbox", "Google", "IHeartRadio", "Odysee", "Podbean", "RadioNet",
+        "Rumble", "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo"
+        - depending on the sight that matched the URL).
 
 CONFIGURATION FILES
     The default root location directory for StreamFinder configuration files

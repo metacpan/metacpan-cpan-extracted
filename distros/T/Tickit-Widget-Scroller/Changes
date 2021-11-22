@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-Scroller
 
+0.27    2021-11-20
+        [CHANGES]
+         * Updates for Object::Pad 0.57
+            + Use :isa instead of legacy `extends`
+            + Use BUILDARGS and ADJUSTPARAMS instead of BUILD
+
 0.26    2021-07-03
         [CHANGES]
          * Updates for Object::Pad 0.41:

@@ -1,9 +1,9 @@
 package App::RegexpPatternUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-27'; # DATE
+our $DATE = '2021-07-02'; # DATE
 our $DIST = 'App-RegexpPatternUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -180,7 +180,7 @@ App::RegexpPatternUtils - CLI utilities related to Regexp::Pattern
 
 =head1 VERSION
 
-This document describes version 0.006 of App::RegexpPatternUtils (from Perl distribution App-RegexpPatternUtils), released on 2021-06-27.
+This document describes version 0.007 of App::RegexpPatternUtils (from Perl distribution App-RegexpPatternUtils), released on 2021-07-02.
 
 =head1 SYNOPSIS
 
@@ -197,8 +197,6 @@ This distribution includes several utilities related to L<Regexp::Pattern>:
 =item * L<list-regexp-pattern-patterns>
 
 =item * L<match-with-regexp-pattern>
-
-=item * L<rpgrep>
 
 =item * L<show-regexp-pattern-module>
 

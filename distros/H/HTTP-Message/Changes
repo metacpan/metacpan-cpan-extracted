@@ -1,5 +1,11 @@
 Revision history for HTTP-Message
 
+6.35      2021-11-11 22:10:31Z
+    - Clarify documentation for decoded_content (GH#166) (Eric Wastl)
+
+6.34      2021-11-08 14:27:36Z
+    - Catch case of empty name/value in header words split. (GH#168) (Galen Huntington)
+
 6.33      2021-06-28 16:51:58Z
     - Allow `can` method to respond to delegated methods (GH#159) (nanto_vi,
       TOYAMA Nao)

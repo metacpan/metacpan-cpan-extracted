@@ -151,10 +151,10 @@ sub _array_set {
 around qw(slice dice) => sub : lvalue {
     my $orig = shift;
     my $self = shift;
+    my $class = ref($self);
 
-    my $new = $self->$orig(@_);
-    $new->_internal( $self->_internal );
-    return $new;
+    my $pdl = $self->{PDL}->$orig(@_);
+    return bless( { PDL => $pdl, _internal => $self->_internal }, $class );
 };
 
 
@@ -444,7 +444,7 @@ PDL::SV - PDL subclass for keeping scalar data (like strings)
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 SYNOPSIS
 

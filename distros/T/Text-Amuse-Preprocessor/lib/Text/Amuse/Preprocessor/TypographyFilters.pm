@@ -67,7 +67,17 @@ sub characters {
                    endash => "\x{2013}",
                    dash =>    "\x{2014}",
                   },
-
+            # esperanto same as english, for the moment
+            eo => {
+                   ldouble => "\x{201c}",
+                   rdouble => "\x{201d}",
+                   lsingle => "\x{2018}",
+                   rsingle => "\x{2019}",
+                   apos => "\x{2019}",
+                   emdash => "\x{2014}",
+                   endash => "\x{2013}",
+                   dash =>    "\x{2014}",
+                  },
             # „…”
             pl => {
                    ldouble => "\x{201e}",

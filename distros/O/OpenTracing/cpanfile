@@ -8,6 +8,8 @@ requires 'JSON::MaybeXS';
 requires 'Module::Pluggable';
 requires 'Module::Load';
 requires 'Net::Address::IP::Local';
+requires 'indirect';
+requires 'Syntax::Keyword::Try';
 
 recommends 'Math::Random::ISAAC::XS';
 

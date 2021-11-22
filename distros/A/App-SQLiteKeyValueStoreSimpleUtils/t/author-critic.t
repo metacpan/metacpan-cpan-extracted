@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/SQLiteKeyValueStoreSimpleUtils.pm','script/check-sqlite-kvstore-key-exists','script/get-sqlite-kvstore-value','script/list-sqlite-kvstore-keys','script/set-sqlite-kvstore-value'];
+my $filenames = ['lib/App/SQLiteKeyValueStoreSimpleUtils.pm','script/check-sqlite-kvstore-key-exists','script/dump-sqlite-kvstore','script/get-sqlite-kvstore-value','script/list-sqlite-kvstore-keys','script/set-sqlite-kvstore-value'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -1,9 +1,10 @@
 use strict;
 use warnings;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -674,7 +675,7 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
   );
 
   is(
-    $js->add_schema('https://uri4.com', +{ %{ $document->schema } }),
+    $js->add_schema('https://uri4.com', +{ $document->schema->%* }),
     $document,
     'adding the same schema *content* again does not fail, and returns the original document object',
   );

@@ -10,6 +10,7 @@ lib/StreamFinder/Castbox.pm
 lib/StreamFinder/Google.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/Odysee.pm
+lib/StreamFinder/Podbean.pm
 lib/StreamFinder/RadioNet.pm
 lib/StreamFinder/Rumble.pm
 lib/StreamFinder/SermonAudio.pm

@@ -33,8 +33,6 @@ BOOT {
     xs::exp::create_constants(s, {
         {"WORKER_PREFORK",  Simple(int(Manager::WorkerModel::PreFork))},
         {"WORKER_THREAD",   Simple(int(Manager::WorkerModel::Thread))},
-        {"BIND_DUPLICATE",  Simple(int(Manager::BindModel::Duplicate))},
-        {"BIND_REUSE_PORT", Simple(int(Manager::BindModel::ReusePort))},
     });
 }
 
@@ -49,6 +47,8 @@ void Manager::run ()
 void Manager::stop ()
 
 void Manager::restart_workers ()
+
+Manager::Config Manager::config ()
 
 void Manager::reconfigure (Hash newhv) {
     Manager::Config newcfg = THIS->config();

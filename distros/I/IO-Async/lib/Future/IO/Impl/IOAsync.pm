@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
 package Future::IO::Impl::IOAsync;
 
@@ -112,6 +112,22 @@ sub ready_for_write
          delete $watching_write_by_fileno{ $fh->fileno };
       },
    );
+
+   return $f;
+}
+
+sub waitpid
+{
+   shift;
+   my ( $pid ) = @_;
+
+   my $f = ( $loop //= IO::Async::Loop->new )->new_future;
+
+   $loop->watch_process( $pid, sub {
+      my ( undef, $wstatus ) = @_;
+      $f->done( $wstatus );
+   } );
+   $f->on_cancel( sub { $loop->unwatch_process( $pid ) } );
 
    return $f;
 }

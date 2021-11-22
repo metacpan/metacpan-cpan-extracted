@@ -2,7 +2,7 @@ package Test2::Tools::Compare;
 use strict;
 use warnings;
 
-our $VERSION = '0.000141';
+our $VERSION = '0.000142';
 
 use Carp qw/croak/;
 use Scalar::Util qw/reftype/;
@@ -108,7 +108,7 @@ sub is($$;$@) {
                 "The old behavior was a bug.",
                 "The new behavior is to default to end().",
                 "This test will soon start to fail with the following diagnostics:",
-                $delta->diag,
+                $delta->diag->as_string,
                 "",
             );
         }

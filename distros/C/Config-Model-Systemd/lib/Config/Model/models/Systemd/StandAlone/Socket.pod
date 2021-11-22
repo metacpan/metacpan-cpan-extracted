@@ -1,0 +1,51 @@
+# PODNAME: Config::Model::models::Systemd::StandAlone::Socket
+# ABSTRACT:  Configuration class Systemd::StandAlone::Socket
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Systemd::StandAlone::Socket - Configuration class Systemd::StandAlone::Socket
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 Socket
+
+I< Optional. Type node of class L<Systemd::Section::Socket|Config::Model::models::Systemd::Section::Socket> .  > 
+
+=head2 Unit
+
+I< Optional. Type node of class L<Systemd::Section::SocketUnit|Config::Model::models::Systemd::Section::SocketUnit> .  > 
+
+=head2 Install
+
+I< Optional. Type node of class L<Systemd::Section::Install|Config::Model::models::Systemd::Section::Install> .  > 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::Install>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::Socket>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::SocketUnit>
+
+=back
+
+=cut
+

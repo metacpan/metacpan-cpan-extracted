@@ -9,14 +9,13 @@ build_requires:
   File::Which: '0'
   Test::Class: '0.4'
   Test::Deep: '0'
-  Test::Exception: '0.4'
+  Test::Exception: '0.40'
   Test::FailWarnings: '0'
-  Test::More: '1'
-  Test::NoWarnings: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,22 +25,23 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Math::BigInt::GMP: '0'
 requires:
   Bytes::Random::Secure::Tiny: '1.008'
   Class::Accessor::Fast: '0.34'
   Convert::ASN1: '0.27'
-  Crypt::Format: '0.06'
+  Crypt::Format: '0.12'
   Digest::SHA: '0'
   MIME::Base64: '3.11'
-  Math::BigInt: '1.999805'
+  Math::BigInt: '1.999818'
   Math::ProvablePrime: '0.043'
   Symbol::Get: '0.02'
   Try::Tiny: '0'
   autodie: '0'
-  constant: '1.23'
   parent: '0.225'
   perl: '5.008000'
 resources:
   repository: https://github.com/FGasper/p5-Crypt-Perl.git
-version: '0.34'
+version: '0.36'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

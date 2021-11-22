@@ -5,7 +5,7 @@ use 5.010;
 
 # ABSTRACT: Yet another xkcd style password generator
 
-our $VERSION = '1.010'; # VERSION
+our $VERSION = '1.011'; # VERSION
 
 use Carp qw(croak);
 use Crypt::Rijndael;
@@ -48,28 +48,13 @@ sub new {
         $object{_list} = \@list;
     }
     elsif ( $object{wordlist} =~ /::/ ) {
-        eval { use_module( $object{wordlist} ); };
-        if ($@) {
-            croak( "Cannot load word list module " . $object{wordlist} );
-        }
-        my $pkg = $object{wordlist};
-        no strict 'refs';
-
-        # do we have a __DATA__ section, indication a subclass of https://metacpan.org/release/WordList
-        my $handle = eval { Data::Handle->new($pkg) };
-        if ($handle) {
-            $object{_list} = [ map { s/\n//g; chomp; $_ } $handle->getlines ];
-        }
-
-        # do we have @Words, indication Crypt::Diceware
-        elsif ( @{"${pkg}::Words"} ) {
-            $object{_list} = \@{"${pkg}::Words"};
-        }
-        else {
-            croak("Cannot find word list in $pkg");
-        }
+        _load_wordlist_from_package( \%object );
     }
-    else {
+    elsif ( $object{wordlist} =~ /^\w+$/i ) {
+        $object{wordlist} = 'CtrlO::Crypt::XkcdPassword::Wordlist::' . $object{wordlist};
+        _load_wordlist_from_package( \%object );
+    }
+     else {
         croak(    'Invalid word list: >'
                 . $object{wordlist}
                 . '<. Has to be either a Perl module or a file' );
@@ -80,6 +65,29 @@ sub new {
     $object{_pid} = $$;
 
     return bless \%object, $class;
+}
+
+sub _load_wordlist_from_package {
+    my ( $object ) = @_;
+    eval { use_module( $object->{wordlist} ); };
+    if ($@) {
+        croak( "Cannot load word list module " . $object->{wordlist} );
+    }
+    my $pkg = $object->{wordlist};
+    no strict 'refs';
+
+    # do we have a __DATA__ section, indication a subclass of https://metacpan.org/release/WordList
+    my $handle = eval { Data::Handle->new($pkg) };
+    if ($handle) {
+        $object->{_list} = [ map { s/\n//g; chomp; $_ } $handle->getlines ];
+    }
+    # do we have @Words, indication Crypt::Diceware
+    elsif ( @{"${pkg}::Words"} ) {
+        $object->{_list} = \@{"${pkg}::Words"};
+    }
+    else {
+        croak("Cannot find word list in Perl module $pkg");
+    }
 }
 
 sub _build_entropy {
@@ -151,7 +159,7 @@ CtrlO::Crypt::XkcdPassword - Yet another xkcd style password generator
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 
@@ -272,7 +280,7 @@ C<digits> digits to the password:
 
 =head1 DEFINING CUSTOM WORD LISTS
 
-Please note that C<language> is only supported for the word lists
+Please note that C<language> is only supported for the default word list
 included in this distribution.
 
 =head2 in a plain file
@@ -317,6 +325,16 @@ wordlist module and try to figure out what kind of API you're using)
 To create a module using the L<Crypt::Diceware> wordlist API, just
 create a package containing a public array C<@Words> containing your
 word list.
+
+=head1 INCLUDED WORD LISTS
+
+This distribution comes with a hand-crafted word list
+L<CtrlO::Crypt::XkcdPassword::Wordlist::en_gb> and three word lists
+provided by
+L<EFF|https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases>:
+L<CtrlO::Crypt::XkcdPassword::Wordlist::eff_large>,
+L<CtrlO::Crypt::XkcdPassword::Wordlist::eff_short_1> and
+L<CtrlO::Crypt::XkcdPassword::Wordlist::eff_short_2_0>.
 
 =head1 WRAPPER SCRIPT
 

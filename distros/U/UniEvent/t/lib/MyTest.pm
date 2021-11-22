@@ -1,5 +1,6 @@
 package MyTest;
 use 5.012;
+use Cwd;
 use warnings;
 use UniEvent;
 use Test::More;
@@ -42,9 +43,10 @@ sub init {
 }
 
 sub test_catch {
+    my $old = Cwd::cwd();
     chdir 'clib';
     catch_run(@_);
-    chdir '../';
+    chdir $old;
 }
 
 sub import {

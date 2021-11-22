@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.41;
+use Object::Pad 0.57;
 
-package Tickit::Widget::FloatBox 0.09;
+package Tickit::Widget::FloatBox 0.10;
 class Tickit::Widget::FloatBox
-   extends Tickit::ContainerWidget;
+   :isa(Tickit::ContainerWidget);
 
 use Carp;
 
@@ -68,8 +68,7 @@ has @_floats;
 BUILD ( %args )
 {
    if( $args{base_child} ) {
-      Carp::carp( "The 'base_child' constructor argument to ${\ref $self} is discouraged; use ->set_base_child instead" );
-      $self->set_base_child( $args{base_child} );
+      croak "The 'base_child' constructor argument to ${\ref $self} is no longer supported; use ->set_base_child instead";
    }
 }
 
@@ -246,9 +245,10 @@ class # hide
    has $_child  :param;
    has $_hidden :param = 0;
 
-   BUILD ( %args )
+   ADJUSTPARAMS ( $params )
    {
-      $self->move( %args{qw( top bottom left right )} );
+      $self->move( %{$params}{qw( top bottom left right )} );
+      delete @{$params}{qw( top bottom left right )};
    }
 
 =head2 child

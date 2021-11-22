@@ -1,0 +1,98 @@
+NAME
+    images2djvu - Script which compose DjVu file from images.
+
+SYNOPSIS
+     images2djvu [-e encoder] [-h] [-o out_file] [-q] [--version] images_list_file
+
+DESCRIPTION
+    Script which compose DjVu file from images. Image could be djvu, png,
+    jpg file.
+
+    Main intent was compose DjVu file from files which were fetched from
+    Kramerius system by kramerius2images script.
+
+ARGUMENTS
+    *       "-e encoder"
+
+            DjVu encoder. Default value is 'c44' (command from DjVuLibre).
+
+    *       "-h"
+
+            Print help.
+
+    *       "-o out_file"
+
+            Output file. Default value is 'output.djvu'.
+
+    *       "-q"
+
+            Quiet mode.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "images_list_file"
+
+            Text file with images list.
+
+EXAMPLE1
+     images2djvu
+
+     # Output:
+     # Usage: ./ex1.pl [-e encoder] [-h] [-o out_file] [-q] [--version] images_list_file
+     #         -e encoder              Encoder (default value is 'c44').
+     #         -h                      Help.
+     #         -o out_file             Output file (default value is 'output.djvu').
+     #         -q                      Quiet mode.
+     #         --version               Print version.
+     #         images_list_file        Text file with images list.
+
+EXAMPLE3
+     # Alfabetski popis imena, navedenih u popisima gubitaka - 1914
+     # issue of serial (multiple pages)
+     # Kramerius v3
+     kramerius2images ABA001 24665811
+
+     # Output:
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700001.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700002.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700003.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700004.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700005.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700006.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700007.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700008.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700009.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700010.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700011.djvu
+     # http://kramerius.nkp.cz/kramerius/document/ABA001_3050700012.djvu
+
+     # Exists file LIST with list of djvu files.
+
+     # Compose djvu file output.djvu 
+     images2djvu LIST
+
+     # Output:
+     # output.djvu
+
+SEE ALSO
+    kramerius2images
+        Script which fetch Kramerius object to local storage.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Images-To-DjVu>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

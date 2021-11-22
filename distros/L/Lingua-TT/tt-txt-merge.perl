@@ -20,7 +20,7 @@ our $vl_trace = 4;
 
 our $prog         = basename($0);
 our $verbose      = $vl_info;
-our $VERSION	  = 0.12;
+our $VERSION	  = 0.13;
 
 our $outfile      = '-';
 our $outfmt       = 'DEFAULT';

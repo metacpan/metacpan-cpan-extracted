@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '1.00';
+our $VERSION = '1.03';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 1.00
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -61,6 +61,7 @@ my %DefaultConfig = (
     REPLACE_UNDERSCORE => 1,
     REMOVE_UNDERSCORE  => 0,
     GETOPT             => 'GetOptions',
+    GETOPT_FROM_ARRAY  => 'GetOptionsFromArray',
     ACCESSOR_PREFIX    => '',
     DEFAULT            => [],
     INVALID_MSG        => \&_invalid_msg,
@@ -119,7 +120,10 @@ sub reset {
 
 sub has {
     my($key, @param) = @_;
-    @param % 2 and unshift @param, 'spec';
+    if (@param % 2) {
+	my $default = ref $param[0] eq 'CODE' ? 'action' : 'spec';
+	unshift @param, $default;
+    }
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
     my $caller = caller;
     my $member = __Member__($caller);
@@ -155,7 +159,10 @@ sub new {
 	}
 	$obj->{$name} = do {
 	    local $_ = $param{default};
-	    (ref eq 'ARRAY') ? [ @$_ ] : (ref eq 'HASH') ? { %$_ } : $_;
+	    if    (ref eq 'ARRAY') {  [ @$_ ]  }
+	    elsif (ref eq 'HASH' ) { ({ %$_ }) }
+	    elsif (ref eq 'CODE' ) {  $_->()   }
+	    else                   {  $_       }
 	};
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
@@ -169,9 +176,19 @@ sub optspec {
 
 sub getopt {
     my $obj = shift;
-    my $getopt = caller . "::" . $obj->_conf->{GETOPT};
-    no strict 'refs';
-    $getopt->($obj->optspec());
+    if (@_ == 0) {
+	my $getopt = caller . "::" . $obj->_conf->{GETOPT};
+	no strict 'refs';
+	$getopt->($obj->optspec());
+    }
+    elsif (@_ == 1 and ref $_[0] eq 'ARRAY') {
+	my $getopt = caller . "::" . $obj->_conf->{GETOPT_FROM_ARRAY};
+	no strict 'refs';
+	$getopt->($_[0], $obj->optspec());
+    }
+    else {
+	die "getopt: wrong parameter.";
+    }
 }
 
 sub use_keys {
@@ -366,6 +383,10 @@ parameter.
 
     has left => "=i", default => 1;
 
+If the number of parameter is not even, default label is assumed to be
+exist at the head: C<action> if the first parameter is code reference,
+C<spec> otherwise.
+
 Following parameters are available.
 
 =over 7
@@ -418,7 +439,7 @@ C<configure> and set C<DEFAULT> parameter.
 
     Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
-=item B<default> => I<value>
+=item B<default> => I<value> | I<coderef>
 
 Set default value.  If no default is given, the member is initialized
 as C<undef>.
@@ -428,10 +449,18 @@ member is assigned.  This means that member data is shared across
 multiple C<new> calls.  Please be careful if you call C<new> multiple
 times and alter the member data.
 
-=item B<action> => I<coderef>
+If a code reference is given, it is called at the time of B<new> to
+get default value.  This is effective when you want to evaluate the
+value at the time of execution, rather than declaration.  Use
+B<action> parameter to define a default action.
+
+=item [ B<action> => ] I<coderef>
 
 Parameter C<action> takes code reference which is called to process
-the option.  When called, hash object is passed as C<$_>.
+the option.  C<< action => >> label can be omitted if and only if it
+is the first parameter.
+
+When called, hash object is passed as C<$_>.
 
     has [ qw(left right both) ] => '=i';
     has "+both" => action => sub {
@@ -446,10 +475,6 @@ spec parameter does not matter and not required.
         push @{$_->{ARGV}}, $_[0];
     };
 
-In fact, C<default> parameter takes code reference too.  It is stored
-in the hash object and the code works almost same.  But the hash value
-can not be used for option storage.
-
 =back
 
 Following parameters are all for data validation.  First C<must> is a
@@ -458,7 +483,7 @@ for common rules.
 
 =over 7
 
-=item B<must> => I<coderef> | [ I<codoref> ... ]
+=item B<must> => I<coderef> | [ I<coderef> ... ]
 
 Parameter C<must> takes a code reference to validate option values.
 It takes same arguments as C<action> and returns boolean.  With next
@@ -524,18 +549,22 @@ function.
 C<GetOptions> has a capability of storing values in a hash, by giving
 the hash reference as a first argument, but it is not necessary.
 
-=item B<getopt>
+=item B<getopt> [ I<arrayref> ]
 
-Call C<GetOptions> function defined in caller's context with
-appropriate parameters.
+Call appropiate function defined in caller's context to process
+options.
 
     $obj->getopt
 
-is just a shortcut for:
+    $obj->getopt(\@argv);
+
+are shortcut for:
 
     GetOptions($obj->optspec)
 
-=item B<use_keys>
+    GetOptionsFromArray(\@argv, $obj->optspec)
+
+=item B<use_keys> I<keys>
 
 Because hash keys are protected by C<Hash::Util::lock_keys>, accessing
 non-existent member causes an error.  Use this function to declare new
@@ -577,6 +606,8 @@ Produce alias with underscores replaced by dash.
 Produce alias with underscores removed.
 
 =item B<GETOPT> (default: 'GetOptions')
+
+=item B<GETOPT_FROM_ARRAY> (default: 'GetOptionsFromArray')
 
 Set function name called from C<getopt> method.
 

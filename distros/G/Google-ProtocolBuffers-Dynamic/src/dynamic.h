@@ -79,6 +79,10 @@ public:
         return GOOGLE_PROTOBUF_VERSION >= 3000000;
     }
 
+    static bool has_proto3_optional() {
+        return GOOGLE_PROTOBUF_VERSION >= 3012000;
+    }
+
 private:
     void map_package_or_prefix(pTHX_ const std::string &pb_package, bool is_prefix, const std::string &perl_package_prefix, const MappingOptions &options);
     void map_message_recursive(pTHX_ const google::protobuf::Descriptor *descriptor, const std::string &perl_package, const MappingOptions &options);
@@ -105,6 +109,17 @@ private:
     std::vector<Mapper *> pending;
     std::vector<MethodMapper *> pending_methods;
 };
+
+// equivalent to FieldDescriptor::has_presence() in src/google/protobuf/descriptor.h
+inline bool has_presence(const upb::FieldDef* field_def) {
+    if (field_def->IsSequence())
+        return false;
+    if (field_def->IsSubMessage() || field_def->containing_oneof())
+        return true;
+    if (field_def->containing_type() && field_def->containing_type()->syntax() == UPB_SYNTAX_PROTO2)
+        return true;
+    return false;
+}
 
 };
 

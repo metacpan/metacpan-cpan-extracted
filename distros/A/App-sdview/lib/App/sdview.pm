@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview 0.04;
+package App::sdview 0.05;
 class App::sdview :strict(params);
 
 use List::Keywords qw( first );
@@ -43,6 +43,7 @@ require ( "$_.pm" =~ s{::}{/}gr ) for @PARSER_CLASSES;
 
 my @OUTPUT_CLASSES = qw(
    App::sdview::Output::Terminal
+   App::sdview::Output::Plain
    App::sdview::Output::Pod
    App::sdview::Output::Markdown
 );

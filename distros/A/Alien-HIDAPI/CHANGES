@@ -1,10 +1,19 @@
 ==================================================
-Changes from 2016-09-12 00:00:00 +0000 to present.
+Changes from 2020-11-16 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.08 at 2017-09-12 09:33:39 +0000
+version 0.09 at 2021-11-16 06:39:51 +0000
 -----------------------------------------
+
+  Change: 7da14e019b4dee853c2b6a7cc8d92d4ee2c5932e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2021-11-16 07:39:51 +0000
+
+    alienfile: use libusb HIDAPI instead of unmaintained signal11 repo
+
+    Latter hasn't seen an update since 2016, while former is actively
+    maintained and has e.g. a fix for newer autoconf versions. 
 
   Change: 229b83457fd4a74b23319e2677fe1799c8a25304
   Author: Ahmad Fatoum <ahmad@a3f.at>
@@ -12,89 +21,6 @@ version 0.08 at 2017-09-12 09:33:39 +0000
 
     Test for minimum Perl version 
 
------------------------------------------
-version 0.07 at 2017-07-31 20:09:50 +0000
------------------------------------------
-
-  Change: 46454b1aba5ea8a0e301ce9cd74d578f02dde130
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-31 22:09:50 +0000
-
-    Replace broken Alien::LibUSBx prereq with Alien::LibUSB
-
-    See https://github.com/henrikbrixandersen/Alien-LibUSBx/issues/2 as
-    to why. Also bumped Alien::libudev. 
-
------------------------------------------
-version 0.06 at 2017-07-30 16:45:07 +0000
------------------------------------------
-
-  Change: a1db52ca6892b6bef090930fff252c49f66ebe1b
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-30 18:45:07 +0000
-
-    Remove out-of-sync cpanfile and fix version 
-
-------------------------------------------
-version 0.004 at 2017-07-30 11:34:06 +0000
-------------------------------------------
-
-  Change: 571a874686a3cc0db73c0bbb9322f0ae0f15ac9f
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-30 13:34:06 +0000
-
-    Bump dependency to newest Alien::libudev 
-
-  Change: 4bbdf90ed53b1903f5008e2aca02b7bedb52ea13
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-30 12:25:40 +0000
-
-    Fix build on macOS 
-
-  Change: 66fef12b8de07b883ecf30072856ecc472db7c5b
-  Author: Graham Ollis <plicease@cpan.org>
-  Date : 2017-07-29 21:09:37 +0000
-
-    work around borked .pc files 
-
-  Change: 79dbc861e2cd9843c19acc9fb59b72678434538e
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-08 12:26:27 +0000
-
-    Switch to Dist::Zilla and alienfile 
-
-  Change: 0f5a9e19854eed1c7fcb64dfff964b8031ede604
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-07 12:24:04 +0000
-
-    Remove errornous ./conifgure --with-sysroot option 
-
-  Change: f511505965e7ecfeaa9179606f5cbc8a32fc854f
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-07 11:40:58 +0000
-
-    Linux: Fetch Alien:: packages for libusb1/libudev 
-
-  Change: 81da3ce3e315e710e0bc880893e531ec24e20bdd
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-04 06:05:12 +0000
-
-    Install Alien:Autotools if not available 
-
-  Change: e33b61800aefe03e5d5715401bc3e6ca7558b858
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-02 01:02:21 +0000
-
-    Require IO::Socket::SSL, so Github download suceeds
-
-    There should be a HTTP fallback instead, but this is easier 
-
-  Change: 31ae276e629dbcbbae62fd227f4e413c96edbb5d
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-06-25 15:32:49 +0000
-
-    Initial commit 
-
-================
-End of releases.
-================
+================================================
+Plus 3 releases after 2020-11-16 00:00:00 +0000.
+================================================

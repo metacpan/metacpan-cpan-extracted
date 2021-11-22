@@ -31,17 +31,19 @@ struct ClassAttributeRegistration {
   STRLEN permit_hintkeylen;
 
   const struct ClassHookFuncs *funcs;
+  void *funcdata;
 };
 
 static ClassAttributeRegistration *classattrs = NULL;
 
-static void register_class_attribute(const char *name, const struct ClassHookFuncs *funcs)
+static void register_class_attribute(const char *name, const struct ClassHookFuncs *funcs, void *funcdata)
 {
   ClassAttributeRegistration *reg;
   Newx(reg, 1, struct ClassAttributeRegistration);
 
   reg->name = name;
   reg->funcs = funcs;
+  reg->funcdata = funcdata;
 
   if(funcs->permit_hintkey)
     reg->permit_hintkeylen = strlen(funcs->permit_hintkey);
@@ -52,10 +54,32 @@ static void register_class_attribute(const char *name, const struct ClassHookFun
   classattrs = reg;
 }
 
-void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs)
+struct ClassHookFuncs_v51 {
+  U32 ver;
+  U32 flags;
+  const char *permit_hintkey;
+
+  /* At ABIVERSION 51, callback funcs did not take a 'funcdata' parameter */
+  bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr);
+  void (*post_add_slot)(pTHX_ ClassMeta *classmeta, SV *hookdata, SlotMeta *slotmeta);
+};
+
+static bool classhook_compat_apply_v51(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
-  if(funcs->ver < 50)
-    croak("Mismatch in third-party class attribute ABI version field: module wants %d, we require >= 50\n",
+  struct ClassHookFuncs_v51 *funcdata = _funcdata;
+  return (*funcdata->apply)(aTHX_ classmeta, value, hookdata_ptr);
+}
+
+static void classhook_compat_post_add_slot_v51(pTHX_ ClassMeta *classmeta, SV *hookdata, void *_funcdata, SlotMeta *slotmeta)
+{
+  struct ClassHookFuncs_v51 *funcdata = _funcdata;
+  (*funcdata->post_add_slot)(aTHX_ classmeta, hookdata, slotmeta);
+}
+
+void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs, void *funcdata)
+{
+  if(funcs->ver < 51)
+    croak("Mismatch in third-party class attribute ABI version field: module wants %d, we require >= 51\n",
         funcs->ver);
   if(funcs->ver > OBJECTPAD_ABIVERSION)
     croak("Mismatch in third-party class attribute ABI version field: attribute supplies %d, module wants %d\n",
@@ -67,7 +91,25 @@ void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct Cla
   if(!funcs->permit_hintkey)
     croak("Third-party class attributes require a permit hinthash key");
 
-  register_class_attribute(name, funcs);
+  if(funcs->ver < 57) {
+    funcdata = (void *)funcs;
+
+    struct ClassHookFuncs *compatfuncs;
+    Newxz(compatfuncs, 1, struct ClassHookFuncs);
+
+    compatfuncs->ver            = OBJECTPAD_ABIVERSION;
+    compatfuncs->flags          = funcs->flags;
+    compatfuncs->permit_hintkey = funcs->permit_hintkey;
+
+    if(funcs->apply)
+      compatfuncs->apply = &classhook_compat_apply_v51;
+    if(funcs->post_add_slot)
+      compatfuncs->post_add_slot = &classhook_compat_post_add_slot_v51;
+
+    funcs = (const struct ClassHookFuncs *)compatfuncs;
+  }
+
+  register_class_attribute(name, funcs, funcdata);
 }
 
 void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char *name, SV *value)
@@ -94,16 +136,8 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
     SV *hookdata = value;
 
     if(reg->funcs->apply) {
-      if(reg->funcs->ver >= 51) {
-        if(!(*reg->funcs->apply)(aTHX_ classmeta, value, &hookdata))
-          return;
-      }
-      else {
-        /* ABIVERSION_MINOR 50 apply did not have hookdata_ptr */
-        bool (*apply)(pTHX_ ClassMeta *, SV *) = (void *)(reg->funcs->apply);
-        if(!(*apply)(aTHX_ classmeta, value))
-          return;
-      }
+      if(!(*reg->funcs->apply)(aTHX_ classmeta, value, &hookdata, reg->funcdata))
+        return;
     }
 
     if(!classmeta->hooks)
@@ -113,6 +147,7 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
     Newx(hook, 1, struct ClassHook);
 
     hook->funcs = reg->funcs;
+    hook->funcdata = reg->funcdata;
     hook->hookdata = hookdata;
 
     av_push(classmeta->hooks, (SV *)hook);
@@ -329,6 +364,8 @@ SlotMeta *ObjectPad_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
 {
   AV *slots = meta->direct_slots;
 
+  if(meta->next_slotix == -1)
+    croak("Cannot add a new slot to a class that is not yet begun");
   if(meta->sealed)
     croak("Cannot add a new slot to an already-sealed class");
 
@@ -565,6 +602,32 @@ void ObjectPad_mop_class_add_role(pTHX_ ClassMeta *dstmeta, ClassMeta *rolemeta)
   }
 }
 
+void ObjectPad_mop_class_load_and_add_role(pTHX_ ClassMeta *meta, SV *rolename, SV *rolever)
+{
+  HV *rolestash = gv_stashsv(rolename, 0);
+  if(!rolestash || !hv_fetchs(rolestash, "META", 0)) {
+    /* Try to`require` the module then attempt a second time */
+    load_module(PERL_LOADMOD_NOIMPORT, newSVsv(rolename), NULL, NULL);
+    rolestash = gv_stashsv(rolename, 0);
+  }
+
+  if(!rolestash)
+    croak("Role %" SVf " does not exist", SVfARG(rolename));
+
+  if(rolever && SvOK(rolever))
+    ensure_module_version(rolename, rolever);
+
+  GV **metagvp = (GV **)hv_fetchs(rolestash, "META", 0);
+  ClassMeta *rolemeta = NULL;
+  if(metagvp)
+    rolemeta = NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*metagvp))));
+
+  if(!rolemeta || rolemeta->type != METATYPE_ROLE)
+    croak("%" SVf " is not a role", SVfARG(rolename));
+
+  mop_class_add_role(meta, rolemeta);
+}
+
 #define embed_slothook(roleh, offset)  S_embed_slothook(aTHX_ roleh, offset)
 static struct SlotHook *S_embed_slothook(pTHX_ struct SlotHook *roleh, SLOTOFFSET offset)
 {
@@ -780,6 +843,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
       char sigil = SvPV_nolen(slotmeta->name)[0];
       OP *op = NULL;
+      SV *defaultsv;
 
       switch(sigil) {
         case '$':
@@ -791,12 +855,12 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
           if(slotmeta->defaultexpr) {
             valueop = slotmeta->defaultexpr;
           }
-          else if(slotmeta->defaultsv) {
+          else if((defaultsv = mop_slot_get_default_sv(slotmeta))) {
             /* An OP_CONST whose op_type is OP_CUSTOM.
              * This way we avoid the opchecker and finalizer doing bad things
              * to our defaultsv SV by setting it SvREADONLY_on()
              */
-            valueop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, slotmeta->defaultsv);
+            valueop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, defaultsv);
           }
 
           if(slotmeta->paramname) {
@@ -829,7 +893,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
             op = newBINOP(OP_SASSIGN, 0,
               valueop,
               /* $slots[$idx] */
-              newAELEMOP(0,
+              newAELEMOP(OPf_MOD,
                 newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
                 slotmeta->slotix));
           break;
@@ -845,9 +909,9 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
           if(slotmeta->defaultexpr) {
             valueop = slotmeta->defaultexpr;
           }
-          else if(slotmeta->defaultsv) {
+          else if((defaultsv = mop_slot_get_default_sv(slotmeta))) {
             valueop = newUNOP(coerceop, 0,
-                newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, slotmeta->defaultsv));
+                newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, defaultsv));
           }
 
           if(valueop) {
@@ -984,6 +1048,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
           fasth->slotix   = slotix;
           fasth->slotmeta = slotmeta;
           fasth->funcs    = h->funcs;
+          fasth->funcdata = h->funcdata;
           fasth->hookdata = h->hookdata;
 
           av_push(meta->slothooks_postslots, (SV *)fasth);
@@ -999,6 +1064,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
           fasth->slotix   = slotix;
           fasth->slotmeta = slotmeta;
           fasth->funcs    = h->funcs;
+          fasth->funcdata = h->funcdata;
           fasth->hookdata = h->hookdata;
 
           av_push(meta->slothooks_construct, (SV *)fasth);
@@ -1215,7 +1281,7 @@ XS_INTERNAL(injected_constructor)
       struct SlotHook *h = (struct SlotHook *)AvARRAY(slothooks)[i];
       SLOTOFFSET slotix = h->slotix;
 
-      (*h->funcs->post_initslot)(aTHX_ h->slotmeta, h->hookdata, slotsv[slotix]);
+      (*h->funcs->post_initslot)(aTHX_ h->slotmeta, h->hookdata, h->funcdata, slotsv[slotix]);
     }
   }
 
@@ -1347,7 +1413,7 @@ XS_INTERNAL(injected_constructor)
       struct SlotHook *h = (struct SlotHook *)AvARRAY(slothooks)[i];
       SLOTOFFSET slotix = h->slotix;
 
-      (*h->funcs->post_construct)(aTHX_ h->slotmeta, h->hookdata, slotsv[slotix]);
+      (*h->funcs->post_construct)(aTHX_ h->slotmeta, h->hookdata, h->funcdata, slotsv[slotix]);
     }
   }
 
@@ -1426,12 +1492,9 @@ XS_INTERNAL(injected_DOES)
   XSRETURN_NO;
 }
 
-ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *superclassname)
+ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
 {
-  assert(
-      type == METATYPE_CLASS ||
-      (type == METATYPE_ROLE && !superclassname)
-  );
+  assert(type == METATYPE_CLASS || type == METATYPE_ROLE);
 
   ClassMeta *meta;
   Newx(meta, 1, ClassMeta);
@@ -1445,7 +1508,9 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   meta->role_is_invokable = false;
   meta->strict_params = false;
   meta->has_adjustparams = false;
+  meta->has_superclass = false;
   meta->start_slotix = 0;
+  meta->next_slotix = -1;
   meta->hooks   = NULL;
   meta->direct_slots = newAV();
   meta->direct_methods = newAV();
@@ -1528,123 +1593,6 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
 
   meta->methodscope = NULL;
 
-  AV *isa;
-  {
-    SV *isaname = newSVpvf("%" SVf "::ISA", name);
-    SAVEFREESV(isaname);
-
-    isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvFLAGS(isaname) & SVf_UTF8));
-  }
-
-  if(superclassname && SvOK(superclassname)) {
-    assert(type == METATYPE_CLASS);
-
-    av_push(isa, SvREFCNT_inc(superclassname));
-
-    ClassMeta *supermeta = NULL;
-
-    HV *superstash = gv_stashsv(superclassname, 0);
-    GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
-    if(metagvp)
-      supermeta = NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*metagvp))));
-
-    if(supermeta) {
-      /* A subclass of an Object::Pad class */
-      if(supermeta->type != METATYPE_CLASS)
-        croak("%" SVf " is not a class", SVfARG(superclassname));
-
-      meta->start_slotix = supermeta->next_slotix;
-      meta->repr = supermeta->repr;
-      meta->cls.foreign_new = supermeta->cls.foreign_new;
-
-      if(supermeta->buildblocks) {
-        if(!meta->buildblocks)
-          meta->buildblocks = newAV();
-
-        av_push_from_av_noinc(meta->buildblocks, supermeta->buildblocks);
-      }
-
-      if(supermeta->adjustblocks) {
-        if(!meta->adjustblocks)
-          meta->adjustblocks = newAV();
-
-        av_push_from_av_noinc(meta->adjustblocks, supermeta->adjustblocks);
-      }
-
-      if(supermeta->slothooks_postslots) {
-        if(!meta->slothooks_postslots)
-          meta->slothooks_postslots = newAV();
-
-        av_push_from_av_noinc(meta->slothooks_postslots, supermeta->slothooks_postslots);
-      }
-
-      if(supermeta->slothooks_construct) {
-        if(!meta->slothooks_construct)
-          meta->slothooks_construct = newAV();
-
-        av_push_from_av_noinc(meta->slothooks_construct, supermeta->slothooks_construct);
-      }
-
-      if(supermeta->parammap) {
-        HV *old = supermeta->parammap;
-        HV *new = meta->parammap = newHV();
-
-        hv_iterinit(old);
-
-        HE *iter;
-        while((iter = hv_iternext(old))) {
-          STRLEN klen = HeKLEN(iter);
-          /* Don't SvREFCNT_inc() the values because they aren't really SV *s */
-          /* Subclasses *DIRECTLY SHARE* their param metas because the
-           * information in them is directly compatible
-           */
-          if(klen < 0)
-            hv_store_ent(new, HeSVKEY(iter), HeVAL(iter), HeHASH(iter));
-          else
-            hv_store(new, HeKEY(iter), klen, HeVAL(iter), HeHASH(iter));
-        }
-      }
-
-      if(supermeta->has_adjustparams)
-        meta->has_adjustparams = true;
-
-      U32 nroles;
-      RoleEmbedding **embeddings = mop_class_get_all_roles(supermeta, &nroles);
-      if(nroles) {
-        U32 i;
-        for(i = 0; i < nroles; i++) {
-          RoleEmbedding *embedding = embeddings[i];
-          ClassMeta *rolemeta = embedding->rolemeta;
-
-          av_push(meta->cls.embedded_roles, (SV *)embedding);
-          hv_store_ent(rolemeta->role.applied_classes, meta->name, (SV *)embedding, 0);
-        }
-      }
-    }
-    else {
-      /* A subclass of a foreign class */
-      meta->cls.foreign_new = fetch_superclass_method_pv(meta->stash, "new", 3, -1);
-      if(!meta->cls.foreign_new)
-        croak("Unable to find SUPER::new for %" SVf, superclassname);
-
-      meta->cls.foreign_does = fetch_superclass_method_pv(meta->stash, "DOES", 4, -1);
-
-      av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
-    }
-
-    meta->cls.supermeta = supermeta;
-  }
-  else {
-    /* A base class */
-    av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
-  }
-
-  if(meta->type == METATYPE_CLASS &&
-      meta->repr == REPR_AUTOSELECT && !meta->cls.foreign_new)
-    meta->repr = REPR_NATIVE;
-
-  meta->next_slotix = meta->start_slotix;
-
   {
     /* Inject the constructor */
     SV *newname = newSVpvf("%" SVf "::new", name);
@@ -1676,13 +1624,247 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   return meta;
 }
 
+void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassname)
+{
+  assert(meta->type == METATYPE_CLASS);
+
+  if(meta->has_superclass)
+    croak("Class already has a superclass, cannot add another");
+
+  AV *isa;
+  {
+    SV *isaname = newSVpvf("%" SVf "::ISA", meta->name);
+    SAVEFREESV(isaname);
+
+    isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvFLAGS(isaname) & SVf_UTF8));
+  }
+
+  av_push(isa, SvREFCNT_inc(superclassname));
+
+  ClassMeta *supermeta = NULL;
+
+  HV *superstash = gv_stashsv(superclassname, 0);
+  GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
+  if(metagvp)
+    supermeta = NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*metagvp))));
+
+  if(supermeta) {
+    /* A subclass of an Object::Pad class */
+    if(supermeta->type != METATYPE_CLASS)
+      croak("%" SVf " is not a class", SVfARG(superclassname));
+
+    meta->start_slotix = supermeta->next_slotix;
+    meta->repr = supermeta->repr;
+    meta->cls.foreign_new = supermeta->cls.foreign_new;
+
+    if(supermeta->buildblocks) {
+      if(!meta->buildblocks)
+        meta->buildblocks = newAV();
+
+      av_push_from_av_noinc(meta->buildblocks, supermeta->buildblocks);
+    }
+
+    if(supermeta->adjustblocks) {
+      if(!meta->adjustblocks)
+        meta->adjustblocks = newAV();
+
+      av_push_from_av_noinc(meta->adjustblocks, supermeta->adjustblocks);
+    }
+
+    if(supermeta->slothooks_postslots) {
+      if(!meta->slothooks_postslots)
+        meta->slothooks_postslots = newAV();
+
+      av_push_from_av_noinc(meta->slothooks_postslots, supermeta->slothooks_postslots);
+    }
+
+    if(supermeta->slothooks_construct) {
+      if(!meta->slothooks_construct)
+        meta->slothooks_construct = newAV();
+
+      av_push_from_av_noinc(meta->slothooks_construct, supermeta->slothooks_construct);
+    }
+
+    if(supermeta->parammap) {
+      HV *old = supermeta->parammap;
+      HV *new = meta->parammap = newHV();
+
+      hv_iterinit(old);
+
+      HE *iter;
+      while((iter = hv_iternext(old))) {
+        STRLEN klen = HeKLEN(iter);
+        /* Don't SvREFCNT_inc() the values because they aren't really SV *s */
+        /* Subclasses *DIRECTLY SHARE* their param metas because the
+         * information in them is directly compatible
+         */
+        if(klen < 0)
+          hv_store_ent(new, HeSVKEY(iter), HeVAL(iter), HeHASH(iter));
+        else
+          hv_store(new, HeKEY(iter), klen, HeVAL(iter), HeHASH(iter));
+      }
+    }
+
+    if(supermeta->has_adjustparams)
+      meta->has_adjustparams = true;
+
+    U32 nroles;
+    RoleEmbedding **embeddings = mop_class_get_all_roles(supermeta, &nroles);
+    if(nroles) {
+      U32 i;
+      for(i = 0; i < nroles; i++) {
+        RoleEmbedding *embedding = embeddings[i];
+        ClassMeta *rolemeta = embedding->rolemeta;
+
+        av_push(meta->cls.embedded_roles, (SV *)embedding);
+        hv_store_ent(rolemeta->role.applied_classes, meta->name, (SV *)embedding, 0);
+      }
+    }
+  }
+  else {
+    /* A subclass of a foreign class */
+    meta->cls.foreign_new = fetch_superclass_method_pv(meta->stash, "new", 3, -1);
+    if(!meta->cls.foreign_new)
+      croak("Unable to find SUPER::new for %" SVf, superclassname);
+
+    meta->cls.foreign_does = fetch_superclass_method_pv(meta->stash, "DOES", 4, -1);
+
+    av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
+  }
+
+  meta->has_superclass = true;
+  meta->cls.supermeta = supermeta;
+}
+
+void ObjectPad_mop_class_begin(pTHX_ ClassMeta *meta)
+{
+  SV *isaname = newSVpvf("%" SVf "::ISA", meta->name);
+  SAVEFREESV(isaname);
+
+  AV *isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvFLAGS(isaname) & SVf_UTF8));
+  if(!av_count(isa))
+    av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
+
+  if(meta->type == METATYPE_CLASS &&
+      meta->repr == REPR_AUTOSELECT && !meta->cls.foreign_new)
+    meta->repr = REPR_NATIVE;
+
+  meta->next_slotix = meta->start_slotix;
+}
+
 /*******************
  * Attribute hooks *
  *******************/
 
+#ifndef isSPACE_utf8_safe
+   /* this isn't really safe but it's the best we can do */
+#  define isSPACE_utf8_safe(p, e)  (PERL_UNUSED_ARG(e), isSPACE_utf8(p))
+#endif
+
+#define split_package_ver(value, pkgname, pkgversion)  S_split_package_ver(aTHX_ value, pkgname, pkgversion)
+static const char *S_split_package_ver(pTHX_ SV *value, SV *pkgname, SV *pkgversion)
+{
+  const char *start = SvPVX(value), *p = start, *end = start + SvCUR(value);
+
+  while(*p && !isSPACE_utf8_safe(p, end))
+    p += UTF8SKIP(p);
+
+  sv_setpvn(pkgname, start, p - start);
+  if(SvUTF8(value))
+    SvUTF8_on(pkgname);
+
+  while(*p && isSPACE_utf8_safe(p, end))
+    p += UTF8SKIP(p);
+
+  if(*p) {
+    /* scan_version() gets upset about trailing content. We need to extract
+     * exactly what it wants
+     */
+    start = p;
+    if(*p == 'v')
+      p++;
+    while(*p && strchr("0123456789._", *p))
+      p++;
+    SV *tmpsv = newSVpvn(start, p - start);
+    SAVEFREESV(tmpsv);
+
+    scan_version(SvPVX(tmpsv), pkgversion, FALSE);
+  }
+
+  while(*p && isSPACE_utf8_safe(p, end))
+    p += UTF8SKIP(p);
+
+  return p;
+}
+
+/* :isa */
+
+static bool classhook_isa_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+{
+  SV *superclassname = newSV(0), *superclassver = newSV(0);
+  SAVEFREESV(superclassname);
+  SAVEFREESV(superclassver);
+
+  const char *end = split_package_ver(value, superclassname, superclassver);
+
+  if(*end)
+    croak("Unexpected characters while parsing :isa() attribute: %s", end);
+
+  if(classmeta->type != METATYPE_CLASS)
+    croak("Only a class may extend another");
+
+  HV *superstash = gv_stashsv(superclassname, 0);
+  if(!superstash || !hv_fetchs(superstash, "new", 0)) {
+    /* Try to `require` the module then attempt a second time */
+    /* load_module() will modify the name argument and take ownership of it */
+    load_module(PERL_LOADMOD_NOIMPORT, newSVsv(superclassname), NULL, NULL);
+    superstash = gv_stashsv(superclassname, 0);
+  }
+
+  if(!superstash)
+    croak("Superclass %" SVf " does not exist", superclassname);
+
+  if(superclassver && SvOK(superclassver))
+    ensure_module_version(superclassname, superclassver);
+
+  mop_class_set_superclass(classmeta, superclassname);
+
+  return FALSE;
+}
+
+static const struct ClassHookFuncs classhooks_isa = {
+  .ver   = OBJECTPAD_ABIVERSION,
+  .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
+  .apply = &classhook_isa_apply,
+};
+
+/* :does */
+
+static bool classhook_does_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+{
+  SV *rolename = newSV(0), *rolever = newSV(0);
+  SAVEFREESV(rolename);
+  SAVEFREESV(rolever);
+
+  const char *end = split_package_ver(value, rolename, rolever);
+
+  if(*end)
+    croak("Unexpected characters while parsing :does() attribute: %s", end);
+
+  mop_class_load_and_add_role(classmeta, rolename, rolever);
+
+  return FALSE;
+}
+
+static const struct ClassHookFuncs classhooks_does = {
+  .ver   = OBJECTPAD_ABIVERSION,
+  .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
+  .apply = &classhook_does_apply,
+};
+
 /* :repr */
 
-static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr)
+static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
   char *val = SvPV_nolen(value); /* all comparisons are ASCII */
 
@@ -1714,7 +1896,7 @@ static const struct ClassHookFuncs classhooks_repr = {
 
 /* :compat */
 
-static bool classhook_compat_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr)
+static bool classhook_compat_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
   if(strEQ(SvPV_nolen(value), "invokable")) {
     if(classmeta->type != METATYPE_ROLE)
@@ -1736,7 +1918,7 @@ static const struct ClassHookFuncs classhooks_compat = {
 
 /* :strict */
 
-static bool classhook_strict_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr)
+static bool classhook_strict_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
   if(strEQ(SvPV_nolen(value), "params"))
     classmeta->strict_params = TRUE;
@@ -1754,7 +1936,9 @@ static const struct ClassHookFuncs classhooks_strict = {
 
 void ObjectPad__boot_classes(void)
 {
-  register_class_attribute("repr", &classhooks_repr);
-  register_class_attribute("compat", &classhooks_compat);
-  register_class_attribute("strict", &classhooks_strict);
+  register_class_attribute("isa",    &classhooks_isa,    NULL);
+  register_class_attribute("does",   &classhooks_does,   NULL);
+  register_class_attribute("repr",   &classhooks_repr,   NULL);
+  register_class_attribute("compat", &classhooks_compat, NULL);
+  register_class_attribute("strict", &classhooks_strict, NULL);
 }

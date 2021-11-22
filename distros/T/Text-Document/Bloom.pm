@@ -23,7 +23,7 @@ use FileHandle;
 );
 
 BEGIN {
-	$Text::Bloom::VERSION = '1.3';
+	$Text::Bloom::VERSION = '1.08';
 
 	%Text::Bloom::Radix = ();
 	@Text::Bloom::RadixDomain = ();

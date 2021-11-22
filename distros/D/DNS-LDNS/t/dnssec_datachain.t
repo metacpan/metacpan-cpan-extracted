@@ -10,12 +10,12 @@ BEGIN { use_ok('DNS::LDNS') };
 # Note: This test makes queries on real internet dns data, and assumes
 # that the iis.se domain is signed.
 
-my $r = new DNS::LDNS::Resolver(filename => "/etc/resolv.conf");
+my $r = DNS::LDNS::Resolver->new(filename => "/etc/resolv.conf");
 $r->set_dnssec(1);
 $r->set_random(0);
 
 my $p = $r->query(
-    new DNS::LDNS::RData(LDNS_RDF_TYPE_DNAME, 'iis.se.'),
+    DNS::LDNS::RData->new(LDNS_RDF_TYPE_DNAME, 'iis.se.'),
     LDNS_RR_TYPE_SOA, LDNS_RR_CLASS_IN, LDNS_RD);
 
 SKIP: {
@@ -34,7 +34,7 @@ SKIP: {
     isa_ok($chain->parent, 'DNS::LDNS::DNSSecDataChain');
 
     dies_ok { 
-        my $new_rr = new DNS::LDNS::RR(str => 'test.test. 1234 IN A 10.0.0.1');
+        my $new_rr = DNS::LDNS::RR->new(str => 'test.test. 1234 IN A 10.0.0.1');
         my $t = $chain->derive_trust_tree($new_rr); 
     } 'Making a trust tree with foreign rr fails.';
 
@@ -46,7 +46,7 @@ SKIP: {
 
     # Get root keys.
     my $root_keys_pk = $r->query(
-        new DNS::LDNS::RData(LDNS_RDF_TYPE_DNAME, '.'),
+        DNS::LDNS::RData->new(LDNS_RDF_TYPE_DNAME, '.'),
         LDNS_RR_TYPE_DNSKEY, LDNS_RR_CLASS_IN, LDNS_RD);
     my $root_keys = $root_keys_pk->rr_list_by_type(
         LDNS_RR_TYPE_DNSKEY, LDNS_SECTION_ANSWER);

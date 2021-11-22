@@ -32,27 +32,11 @@ If your perl's Config reports that 'ivsize' is greater than or
 equal to 8 && 'ivtype' is not 'long', then Math::GMPz will, by
 default, be built to enable you to use the 64-bit long long int
 values with the new() function and the overloaded operators.
-Else attempts to use long long int values with Math::GMPz will
-probably fail.
-If necessary, you can override the default by opening up the
-Makefile.PL and uncommenting the appropriate line (just a few
-lines down from the top of the file ... the comments in that file
-should make it clear).
 
 Similarly, if your perl's Config reports that 'nvsize' > 8,
 then Math::GMPz will, by default, be built to enable you to use the
 larger precision values (be they either 'long double' or '__float128'
 with the new() function and the overloaded operators.
-Else, attempts to use long doubles will probably fail.
-If you need, you can override the default by opening up the
-Makefile.PL and uncommenting the appropriate line (just a few lines
-down from the top of the file ... the comments in that file should
-make it clear).
-
-I believe it to be both unnecessary and inadvisable to override the
-default - but if you do find that you need to override the default,
-please let me know. That you have found it necessary to override the
-default is something I probably ought to know about.
 
 I am contactable by email at sisyphus at(@) cpan dot (.) org.
 

@@ -16,10 +16,10 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 SUPPORT AND DOCUMENTATION
 
@@ -31,16 +31,10 @@ perldoc command.
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=PGObject
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=PGObject
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/PGObject
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/PGObject
-
-    Search CPAN
-        http://search.cpan.org/dist/PGObject/
+    MetaCPAN
+        https://metacpan.org/dist/PGObject
 
 
 WRITING PGOBJECT-AWARE PERL CLASSES
@@ -87,7 +81,8 @@ function mapping APIs here.
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 Chris Travers
+  COPYRIGHT (C) 2013-2014 Chris Travers
+  COPYRIGHT (C) 2014-2021 The LedgerSMB Core Team
 
 Redistribution and use in source and compiled forms with or without 
 modification, are permitted provided that the following conditions are met:

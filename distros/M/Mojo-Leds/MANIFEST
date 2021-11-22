@@ -31,6 +31,7 @@ t/60-leds_app.t
 t/70-common_routes.t
 t/site/cfg/app.cfg
 t/site/lib/Skel.pm
+t/site/www/controller_with_no_template/index.pm
 t/site/www/public/static.html
 t/site/www/welcome/index.css
 t/site/www/welcome/index.html.ep

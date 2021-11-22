@@ -1,5 +1,9 @@
 History for Dist-Zilla-Plugin-AuthorsFromGit
 
+0.007 2021-11-16
+  * Suppress warning about uninitialized string. Empty is fine.
+  * Add rudimentary tests.
+
 0.006 2017-07-07
 
   * Tell git to require at least 75% similarity in a file rename.

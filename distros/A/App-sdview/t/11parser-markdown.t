@@ -149,6 +149,7 @@ EOMARKDOWN
 
    is( $p[0]->type, "list-number", 'p[0] type' );
    is( $p[0]->indent, 4, 'p[0] indent' );
+   is( $p[0]->initial, 1, 'p[0] initial' );
 
    my @items = $p[0]->items;
 
@@ -162,6 +163,63 @@ EOMARKDOWN
 
    is( $items[2]->type, "item",  'items[2] type' );
    is( $items[2]->text, "Third", 'items[2] text' );
+
+   @p = App::sdview::Parser::Markdown->new->parse_string( <<"EOMARKDOWN" );
+4. Fourth
+4. Fifth
+EOMARKDOWN
+
+   is( scalar @p, 1, 'Received 1 paragraph' );
+
+   is( $p[0]->type, "list-number", 'p[0] type' );
+   is( $p[0]->indent, 4, 'p[0] indent' );
+   is( $p[0]->initial, 4, 'p[0] initial' );
+};
+
+subtest "Table" => sub {
+   my @p = App::sdview::Parser::Markdown->new->parse_string( <<"EOMARKDOWN" );
+| Heading | Here |
+|---------|------|
+|Data in  |Columns|
+
+| Left | Centre | Right |
+| :--- |  :---: |  ---: |
+EOMARKDOWN
+
+   is( scalar @p, 2, 'Received 2 paragraphs' );
+
+   is( $p[0]->type, "table", 'p[0] type' );
+
+   my @rows = $p[0]->rows;
+
+   is( scalar @rows, 2, 'table contains 2 rows' );
+
+   my @cols = $rows[0]->@*;
+
+   is( $cols[0]->type,  "table-cell", 'cells[0][0] type' );
+   is( $cols[0]->text,  "Heading",    'cells[0][0] text' );
+   is( $cols[0]->align, "left",       'cells[0][0] align' );
+
+   is( $cols[1]->type, "table-cell", 'cells[0][1] type' );
+   is( $cols[1]->text, "Here",       'cells[0][1] text' );
+
+   @cols = $rows[1]->@*;
+
+   is( $cols[0]->type, "table-cell", 'cells[1][0] type' );
+   is( $cols[0]->text, "Data in",    'cells[1][0] text' );
+
+   is( $cols[1]->type, "table-cell", 'cells[1][1] type' );
+   is( $cols[1]->text, "Columns",    'cells[1][1] text' );
+
+   @rows = $p[1]->rows;
+   @cols = $rows[0]->@*;
+
+   is( $cols[0]->text,  "Left",   'col[0] text' );
+   is( $cols[0]->align, "left",   'col[0] align' );
+   is( $cols[1]->text,  "Centre", 'col[1] text' );
+   is( $cols[1]->align, "centre", 'col[1] align' );
+   is( $cols[2]->text,  "Right",  'col[2] text' );
+   is( $cols[2]->align, "right",  'col[2] align' );
 };
 
 done_testing;

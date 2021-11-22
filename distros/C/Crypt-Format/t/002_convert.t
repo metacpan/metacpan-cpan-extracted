@@ -1,10 +1,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;                      # last test to print
+use Test::More tests => 9;                      # last test to print
+use Test::FailWarnings;
 use Test::Exception;
 
 use Crypt::Format;
+use Digest::MD5;
 
 my $csr = <<END;
 -----BEGIN CERTIFICATE REQUEST-----
@@ -58,7 +60,7 @@ my $pem2 = Crypt::Format::der2pem($der, 'SOMETHING');
 
 like(
     $pem2,
-    qr<\A-----BEGIN SOMETHING-----.+-----END SOMETHING-----\z>s,
+    qr<\A-----BEGIN SOMETHING-----.+\s-----END SOMETHING-----\z>s,
     "PEM conversion looks as expected",
 );
 
@@ -71,4 +73,30 @@ is(
 dies_ok(
     sub { Crypt::Format::der2pem($der) },
     'die() without a WHATSIT',
+);
+
+#----------------------------------------------------------------------
+
+my $rsa1024 = "-----BEGIN RSA PRIVATE KEY-----\r\nMIICXAIBAAKBgQDp+UdhCANyOWzHYFFeONAzIvAG4MLLsjk2WuzU4gUUSkjlei/R\r\nWGC0HE2uyw1WpAau4DPD4As1b8NwGXgA2i7r5Fzn8kOqUoMbrMaamtMACVbGAqhE\r\n/5Tx1Hpg2169eyTtl5pV6vamn+zxZzcKmj3SKO4z1MrqUUnXudlMAXy9pwIDAQAB\r\nAoGAeEJFWu04gDxd2fh6uhgvgykhABgEZ5haacLAWgc2HyCzaSetbkejpM+raf06\r\nBN9YBAh+8t20RSoF5RdiI+YBGQho/IJZ8/9V6ke1LNrzN8YkkOne0FneQCncUO+H\r\nSENFz9tylBVJFORA4qn5IiQ9TJ4wWn4qPaVkKatzXDd6fukCQQD6DkClMYLa7J8t\r\nOoIb00tKVEG31miln1aCwMBAgLyTvXvwORPCzspnRHN44JrAyUOEeqv2fztNppa1\r\nUgDUnMFVAkEA74koVftj2mbBN/venWmsJeLTOH+ozeHsRY3cjbPhGh/tu/EUvcmP\r\ncBH2fuNGo+8a/A3972uJM0ZcYzjX3UqzCwJAPo4QOANB1Bi73Wm0oNdkD20yn5Xg\r\nygYpcz5bGgfapS8S8U6mFeb7lYf3RzcRH8d5v4uct2au5EcXjra8BHROnQJBAJuq\r\nSNpHusaODHczaaJmsAcW9yk6XRse/QrefDxib6Eoqrh+nXoQ6PRt2ADx9lBG7QRs\r\nm1/iRJFb4mJg6HfZOa0CQA6zENKU6dd2KrWWeZLGNK8psbbRDpWao664GzFjZVjV\r\nbyO9XjrtBDbKgXo1PfQWGoj6wGAJtqn/BtWsKqqJh4A=\r\n-----END RSA PRIVATE KEY-----\r\n";
+
+is(
+    Digest::MD5::md5_hex( Crypt::Format::pem2der($rsa1024) ),
+    '3f933039e47608686c60e9bf658f9944',
+    'expected parse of a 1,024-bit RSA key',
+);
+
+my $rsa2048 = "-----BEGIN RSA PRIVATE KEY-----\r\nMIIEowIBAAKCAQEA75fIJY1my1tAGs6eKhjBBPZtTe5b9d0TByVR1RcZjaqpXJ8W\r\nlTEEieHWPt4AFUp0rKvFBoDEwmP8o2/EYQZBfBITWLoVzp1isKE/o+Dm3Y77dQgd\r\nMLBZby8Ohx7kPJPTJMghymV4xZPL8ZI4T8n/Xbd8cPyKW81XaYh0GLk5iF77w3/q\r\npPEcy/fkiIXmkausIJ9CQK9S4oTgpp4fhO13/M8bXPhfNv1j2IvxkB2RsfrvnUfq\r\n2GRrKENmG0PAh51J2ixyy+xSbK12Z1lW8QdPvuayzQnj2ru6+GG0UqQOD0IRA83b\r\n1aBtafzsay4lcwCkB/DKO008SKhFI3wQxw98YQIDAQABAoIBAHsh5UGvXwHp3pMo\r\nVs7JtAEp6FjhxC8iM9I7UsgRvBc7exjXxdJcw7lc8C+VBjPq9PV8vaAu82/31PHl\r\n0eYPQf5Sh9DUqbpq1jpyVHOTdPKutfqade3846mpZGz66k9bpWrE0+Dhr2TTJT/8\r\nZqZS6MOwNesXTsAJUwAwmYHPR4sWTvea6Gm8e9GQ/DOFaYhve50dsFwUsIobQ2oW\r\nEU0xZeq++CYpwWfgojsTCG1eGOCOaojyVNvBW19AprSO+qS+mhHU2mvq5zqeaq55\r\nSAcXt3BY6acSlUdEMCtLVqI/aEBnrQ1SKhzTuMWyxfzIS/NNcX7lHe5FYkE3H2Cd\r\nVsgQsbECgYEA+nOtdEvtx3xsNq7nl8xpJoFSqgNDqC2zian+9Pwmi3OgaUClH1eP\r\n2ebvyNsoHBzssk7nRQ3L6gH7AjIIsRbghEejplq6dFQSMAUTMNfqOGvF0drrsimq\r\ngHw877Cx02hksjFBT/jU5+hOvbp2kI50hu+sUdELoRgh38eVzCB3SQUCgYEA9OaF\r\nyyyr0mcvdCQ648qgNzlNgsEiFkvOwGf8ZMjFE37/kH/N4BGEMCyBiZcbVuaYDhxK\r\nLm3P4eT//mL3X9Pm9QsRNuhB9vwJwbyjqhEPDl7ebuOwonUIgdJY4RPheStQxMs2\r\ncSlEZCql4I7oLNGv2pIYRgL/f6udqEFEyar/1K0CgYA+v+ThknSM2puyR7g2zDw8\r\nLYKsngzBglHNWA5NCzANGHdEZ7H3XFTqX3YMePxfrs+PDT3ci0xf4Qcm0apj1DuE\r\naP6Tm3/DzZyQ83SPdEl2wWna3mLXTKEvd/E8jKTBNxKjoruecdXGFOpFlwZFyatg\r\nc4RVK28ieY1jJ/pcHnZEkQKBgDvYZVOL/ATzgC4ieF2X82TrVNyh84F9Tu3Hu26p\r\nfTdRboRSJu4dea8IATOtQFoRCZFRKnOEFCvAeSoh5w98ydCRvsgrI4uGdZ/pSBlU\r\nB9jcKADzFQPuE4Ed9OgzooKoqhkdC5XFntfXcCea5HOnXhDMaLAbJXJ+bo1iPbwG\r\nVHQVAoGBANux7Zl/liG+TBOmnhld7e8OUiAZ7XNd3JZvWZHqR+qAYLd9wUDyW0/Z\r\n6JCBUwR/lNnE6X6rE0jxqIKZP9LZ+a/wfy0Ar9rW7Dv+85TmXH0aeVdJEIC0E5UO\r\nU54MPiltDD0l1hZCfa2IqBdn6hC8gWYc5S6eEwec97HHHGVmwTFF\r\n-----END RSA PRIVATE KEY-----\r\n";
+
+is(
+    Digest::MD5::md5_hex( Crypt::Format::pem2der($rsa2048) ),
+    '8b83970f208e8bba1ca43139e8a7f4a8',
+    'expected parse of a 2,048-bit RSA key',
+);
+
+my $dec = Crypt::Format::pem2der("-----BEGIN WHATEVER-----\nAAAA\n----END WHATEVER-----");
+
+is(
+    $dec,
+    "\0\0\0",
+    'decode without trailing whitespace',
 );

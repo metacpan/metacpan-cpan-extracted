@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSL::DIFF;
 
-our @EXPORT_OK = qw(gsldiff PDL::PP diff_central PDL::PP diff_backward PDL::PP diff_forward );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsldiff diff_central diff_backward diff_forward );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSL::DIFF ;
+
 
 
 
@@ -59,10 +58,7 @@ GNU Scientific Library.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -185,7 +181,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head2 gsldiff
 
@@ -259,5 +255,3 @@ The GSL differentiation routines were written by David Morrison.
 # Exit with OK status
 
 1;
-
-		   

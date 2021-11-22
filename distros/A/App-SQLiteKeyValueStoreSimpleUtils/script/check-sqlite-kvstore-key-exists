@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /SQLite/KeyValueStore/Simple/check_sqlite_kvstore_key_exists
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-18'; # DATE
+our $DATE = '2021-07-01'; # DATE
 our $DIST = 'App-SQLiteKeyValueStoreSimpleUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ check-sqlite-kvstore-key-exists - Check whether a key exists
 
 =head1 VERSION
 
-This document describes version 0.001 of check-sqlite-kvstore-key-exists (from Perl distribution App-SQLiteKeyValueStoreSimpleUtils), released on 2021-06-18.
+This document describes version 0.002 of check-sqlite-kvstore-key-exists (from Perl distribution App-SQLiteKeyValueStoreSimpleUtils), released on 2021-07-01.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ Usage:
      [--config-profile=profile | -P] [--format=name] [--json]
      [--(no)naked-res] [--no-config | -C] [--no-env] [--no-quiet]
      [--noquiet] [--page-result[=program]] [--path=s] [-q] [--quiet]
-     [--view-result[=program]] <key>
+     [--view-result[=program]] -- <key>
 
 =head1 OPTIONS
 

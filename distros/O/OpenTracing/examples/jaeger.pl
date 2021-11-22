@@ -11,7 +11,7 @@ use Net::Address::IP::Local;
 use OpenTracing::Protocol::Jaeger;
 use OpenTracing::Batch;
 use OpenTracing::Span;
-use OpenTracing::Integration qw(HTTP::Tiny);
+use OpenTracing::Integration qw(HTTP::Tiny System);
 use OpenTracing::DSL qw(:v1);
 use OpenTracing::Any qw($tracer);
 
@@ -76,6 +76,19 @@ trace {
 
 $log->infof('Create span via HTTP::Tiny integration');
 HTTP::Tiny->new->get('http://localhost');
+
+$log->infof('Create span via System integration');
+system('echo Created span via System integration');
+
+$log->infof('Inject span for Context Propagation');
+my $span_for_context = $tracer->span(operation_name => "span_context");
+my $payload = $tracer->inject($span_for_context);
+
+$log->infof('Extract span for Context Propagation');
+my $span_context = $tracer->extract($payload);
+my $span_with_context = $tracer->span(operation_name => "span_with_context", references => [$tracer->child_of($span_context)]);
+$span_with_context->finish;
+$span_for_context->finish;
 
 $log->infof('Populating batch');
 my $batch = OpenTracing::Batch->new;

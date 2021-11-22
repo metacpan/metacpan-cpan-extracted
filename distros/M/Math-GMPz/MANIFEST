@@ -18,6 +18,7 @@ demos/dec2rat.p
 demos/solitaire.p
 t/_1aaa_v.t
 t/_1basic.t
+t/_itsa.t
 t/aliases.t
 t/alloc.t
 t/arith.t
@@ -27,6 +28,7 @@ t/cmp.t
 t/cmp_q.t
 t/constants.t
 t/fac.t
+t/get_set_cmp_NV.t
 t/imp_exp.t
 t/imp_warnings.t
 t/index_bug.t
@@ -51,6 +53,7 @@ t/out_str.t
 t/overload.t
 t/overload_cross_class.t
 t/printf.t
+t/set_uj_sj.t
 t/use64bitint.t
 t/new.t
 t/not_zero.t

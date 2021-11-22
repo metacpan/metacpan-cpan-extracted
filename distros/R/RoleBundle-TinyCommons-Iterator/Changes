@@ -1,0 +1,22 @@
+0.004   2021-10-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename dist Role{,Bundle}-TinyCommons-Iterator because
+	  Role::TinyCommons::Iterator is not actually a role.
+
+
+0.003   2021-06-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [role Iterator::Basic] Provide get_coderef_iterator().
+
+
+0.002   2021-04-19  Released-By: PERLANCAR; Urgency: medium; Bacward-Incompatible: yes
+
+	- [incompatible change] Move Role::TinyCommons::Iterator to
+	  Role::TinyCommons::Iterator::Basic. Make Role::TinyCommon::Iterator an
+	  empty module that's used for distribution Abstract only.
+
+
+0.001   2021-04-18  Released-By: PERLANCAR
+
+        - First, early release. Circular and bidirectional iterators are not
+          tested yet.

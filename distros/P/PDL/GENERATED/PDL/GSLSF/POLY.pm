@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::POLY;
 
-our @EXPORT_OK = qw(PDL::PP gsl_poly_eval );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_poly_eval );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::POLY ;
+
 
 
 
@@ -45,10 +44,7 @@ changing the directory structure at this time.  These fixes should allow things 
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -81,7 +77,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -104,5 +100,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

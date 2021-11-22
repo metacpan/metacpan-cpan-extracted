@@ -20,7 +20,7 @@
 pm_to_blib$
 .git/
 .debug$
-^\.github/
+.github/
 .gitignore$
 ^\w+.pl$
 .ignore.txt$

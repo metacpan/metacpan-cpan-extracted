@@ -1,0 +1,10 @@
+
+## INSTALL
+
+cpanm App::timeput 
+
+
+## UNINSTALL 
+
+cpanm -U App::timeput
+

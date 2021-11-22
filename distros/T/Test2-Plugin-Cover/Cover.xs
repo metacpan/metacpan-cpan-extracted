@@ -13,14 +13,18 @@ Perl_ppaddr_t orig_openhandler;
 // if we can.
 #ifdef USE_ITHREADS
 #define fetch_report HV *report = get_hv("Test2::Plugin::Cover::REPORT", GV_ADDMULTI);
+#define fetch_opens AV *opens = get_av("Test2::Plugin::Cover::OPENS", GV_ADDMULTI);
 #else
 HV *report;
+AV *opens;
 #define fetch_report NOOP
+#define fetch_opens NOOP
 #endif
 
 #define fetch_from SV *from = get_sv("Test2::Plugin::Cover::FROM", 0);
 #define fetch_root SV *root = get_sv("Test2::Plugin::Cover::ROOT", 0);
 #define fetch_enabled SV *enabled = get_sv("Test2::Plugin::Cover::ENABLED", 0);
+#define fetch_trace_opens SV *trace_opens = get_sv("Test2::Plugin::Cover::TRACE_OPENS", 0);
 
 void add_entry(char *fname, STRLEN fnamelen, char *sname, STRLEN snamelen) {
     fetch_report;
@@ -197,6 +201,22 @@ void _sv_file_handler(SV *filename) {
     char *fname = SvPV(filename, namelen);
 
     add_entry(fname, namelen, "<>", 2);
+
+    fetch_trace_opens;
+    if (!SvTRUE(trace_opens)) return;
+
+    const PERL_CONTEXT* cx = cxstack;
+    AV* row  = newAV();
+
+    av_push(row, newSVpvn(fname, namelen));
+    av_push(row, newSVpv(OutCopFILE(PL_curcop), 0));
+    av_push(row, newSViv(CopLINE(PL_curcop)));
+
+    SV* package = newSVpv(CopSTASHPV(PL_curcop), 0);
+    av_push(row, package);
+
+    fetch_opens;
+    av_push(opens, newRV_inc((SV *)row));
 }
 
 static OP* my_openhandler(pTHX) {
@@ -243,6 +263,8 @@ BOOT:
 #ifndef USE_ITHREADS
         report = get_hv("Test2::Plugin::Cover::REPORT", GV_ADDMULTI);
         SvREFCNT_inc(report);
+        opens = get_av("Test2::Plugin::Cover::OPENS", GV_ADDMULTI);
+        SvREFCNT_inc(opens);
 #endif
 
         orig_subhandler = PL_ppaddr[OP_ENTERSUB];

@@ -12,7 +12,6 @@ script/get-regexp-pattern-pattern
 script/list-regexp-pattern-modules
 script/list-regexp-pattern-patterns
 script/match-with-regexp-pattern
-script/rpgrep
 script/show-regexp-pattern-module
 t/00-compile.t
 t/author-critic.t

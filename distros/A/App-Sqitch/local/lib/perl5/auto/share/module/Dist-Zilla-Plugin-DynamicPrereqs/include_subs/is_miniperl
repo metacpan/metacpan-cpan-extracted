@@ -1,0 +1,3 @@
+sub is_miniperl {
+    return !defined &DynaLoader::boot_DynaLoader;
+}

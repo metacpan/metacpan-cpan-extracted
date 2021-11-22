@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.43;  # :strict(params)
+use Object::Pad 0.57;
 
-package Tickit::Style::Parser 0.52;
+package Tickit::Style::Parser 0.53;
 class Tickit::Style::Parser
-   extends Parser::MGC
+   :isa(Parser::MGC)
    :strict(params);
 
 # Identifiers can include hyphens

@@ -18,7 +18,7 @@ Command line arguments (in addition to plack's default arguments) have the same 
 
 Value for "--worker_model" should be either "prefork" or "thread"
 
-Value for "--bind_model" should be either "reuse_port" or "duplicate"
+C<--reuse_port> can also be specified and will be set to all locations
 
 
 

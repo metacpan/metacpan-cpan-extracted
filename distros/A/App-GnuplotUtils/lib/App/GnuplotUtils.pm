@@ -1,9 +1,9 @@
 package App::GnuplotUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-10'; # DATE
+our $DATE = '2021-07-02'; # DATE
 our $DIST = 'App-GnuplotUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,32 +17,39 @@ $SPEC{xyplot} = {
     summary => "Plot XY dataset(s) using gnuplot",
     description => <<'_',
 
-Example `input1.txt`, each line contains whitespace-separated values of X data
-(number), Y data (number):
+This utility is a wrapper for gnuplot to quickly generate a graph from the
+command-line and view it using a browser or an image viewer program. You can
+specify the dataset to plot directly from the command-line or specify filename
+to read the dataset from.
 
-    1 1
-    2 3
-    3 5.5
-    4 7.9
-    6 11.5
+To plot directly from the command-line:
 
-Example using `xyplot` (one data-set):
+    % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' ; # whitespaces are optional
 
-    % xyplot < input1.txt
+To add more datasets, specify more `--dataset-data` options:
 
-Example `input2.txt`:
+    % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
+             --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
 
-    1 8
-    2 12
-    3 5
-    4 4
-    6 8
+To add a title to your chart and every dataset:
 
-Using two datasets:
+    % xyplot --chart-title "my chart" \
+             --dataset-title "foo" --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
+             --dataset-title "bar" --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
 
-    % xyplot --dataset-file  input1.txt  --dataset-file  input2.txt \
-             --dataset-color red         --dataset-color blue \
-             --dataset-style linespoints --dataset-style points
+To specify dataset from a file, use `--dataset-file` option (or specify as
+arguments):
+
+    % xyplot --dataset-file ds1.txt --dataset-file ds2.txt
+    % xyplot ds1.txt ds2.txt
+
+`ds1.txt` contains these lines:
+
+ 1 1
+ 2 3
+ 3 5.5
+ 4 7.9
+ 6 11.5
 
 Keywords: xychart, XY chart, XY plot
 
@@ -51,22 +58,35 @@ _
         chart_title => {
             schema => 'str*',
         },
+        output_file => {
+            schema => 'filename*',
+            cmdline_aliases => {o=>{}},
+            tags => ['category:output'],
+        },
+        overwrite => {
+            schema => 'bool*',
+            cmdline_aliases => {O=>{}},
+            tags => ['category:output'],
+        },
+
         field_delimiter => {
-            summary => 'Supply field delimiter character in dataset file instead of the default whitespace(s)',
+            summary => 'Supply field delimiter character in dataset file instead of the default whitespace(s) or comma(s)',
             schema => 'str*',
             cmdline_aliases => {d=>{}},
         },
-        datasets => {
+        dataset_datas => {
             summary => 'Dataset(s)',
             'x.name.is_plural' => 1,
-            'x.name.singular' => 'dataset',
-            'schema' => ['array*', of=>'array*'],
+            'x.name.singular' => 'dataset_data',
+            'schema' => ['array*', of=>'str*'],
         },
         dataset_files => {
             summary => 'Dataset(s) from file(s)',
             'x.name.is_plural' => 1,
             'x.name.singular' => 'dataset_file',
             'schema' => ['array*', of=>'filename*'],
+            pos => 0,
+            slurpy => 1,
         },
         dataset_titles => {
             summary => 'Dataset title(s)',
@@ -88,7 +108,7 @@ _
         },
     },
     args_rels => {
-        req_one => [qw/datasets dataset_files/],
+        req_one => [qw/dataset_datas dataset_files/],
     },
     deps => {
         prog => 'gnuplot',
@@ -101,25 +121,47 @@ sub xyplot {
 
     my %args = @_;
 
-    my $fieldsep_re = qr/\s+/;
+    my $fieldsep_re = qr/\s+|\s*,\s*/;
     if (defined $args{delimited}) {
         $fieldsep_re = qr/\Q$args{delimited}\E/;
     }
 
-    my $chart;
-    my ($tempfh, $tempfilename);
+    my ($outputfilename);
+    if (defined $args{output_file}) {
+        $outputfilename = $args{output_file};
+        if (-f $outputfilename && !$args{overwrite}) {
+            return [412, "Not overwriting existing file '$outputfilename', use --overwrite (-O) to overwrite"];
+        }
+    } else {
+        my $tempfh;
+        ($tempfh, $outputfilename) = File::Temp::tempfile();
+        $outputfilename .= ".png";
+    }
+    log_trace "Output filename: %s", $outputfilename;
+
+    my $chart = Chart::Gnuplot->new(
+        output => $outputfilename,
+        title => $args{chart_title} // "(chart created by xyplot on ".scalar(localtime).")",
+        xlabel => "x",
+        ylabel => "y",
+    );
+
     my $n;
-    if ($args{datasets}) {
-        $n = $#{ $args{datasets} };
+    if ($args{dataset_datas}) {
+        $n = $#{ $args{dataset_datas} };
     } else {
         $n = $#{ $args{dataset_files} };
     }
+
+    my @datasets;
     for my $i (0..$n) {
         my (@x, @y);
-        if ($args{datasets}) {
-            my $dataset = $args{datasets}[$i];
-            @x          = map { $_->{x} }      @$dataset;
-            @y          = map { $_->{y} }      @$dataset;
+        if ($args{dataset_datas}) {
+            my $dataset = [split $fieldsep_re, $args{dataset_datas}[$i]];
+            while (@$dataset) {
+                push @x, shift @$dataset;
+                push @y, shift @$dataset;
+            }
         } else {
             my $filename = $args{dataset_files}[$i];
             my $content = File::Slurper::Dash::read_text($filename);
@@ -132,31 +174,27 @@ sub xyplot {
             }
         }
 
-        unless ($tempfh) {
-            ($tempfh, $tempfilename) = File::Temp::tempfile();
-            $tempfilename .= ".png";
-            log_trace "Output filename: %s", $tempfilename;
-            $chart = Chart::Gnuplot->new(
-                output => $tempfilename,
-                title => $args{chart_title} // "(No title)",
-                xlabel => "x",
-                ylabel => "y",
-            );
-        }
-
         my $dataset = Chart::Gnuplot::DataSet->new(
             xdata => \@x,
             ydata => \@y,
-            title => $args{dataset_titles}[$i] // "(Untitled dataset #$i)",
-            style => $args{dataset_styles}[$i] // 'points',
+            title => $args{dataset_titles}[$i] // "(dataset #$i)",
+            style => $args{dataset_styles}[$i] // 'linespoints',
         );
-        $chart->plot2d($dataset);
+        push @datasets, $dataset;
     }
+    $chart->plot2d(@datasets);
 
-    require Browser::Open;
-    Browser::Open::open_browser("file:$tempfilename");
-
-    [200];
+    if (defined $args{output_file}) {
+        return [200];
+    } else {
+        require Desktop::Open;
+        my $res = Desktop::Open::open_desktop("file:$outputfilename");
+        if (defined $res && $res == 0) {
+            return [200];
+        } else {
+            return [500, "Can't open $outputfilename"];
+        }
+    }
 }
 
 1;
@@ -174,7 +212,7 @@ App::GnuplotUtils - Utilities related to plotting data using gnuplot
 
 =head1 VERSION
 
-This document describes version 0.002 of App::GnuplotUtils (from Perl distribution App-GnuplotUtils), released on 2020-12-10.
+This document describes version 0.003 of App::GnuplotUtils (from Perl distribution App-GnuplotUtils), released on 2021-07-02.
 
 =head1 DESCRIPTION
 
@@ -194,36 +232,43 @@ mostly simple/convenience wrappers for gnuplot:
 
 Usage:
 
- xyplot(%args) -> [status, msg, payload, meta]
+ xyplot(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Plot XY dataset(s) using gnuplot.
 
-Example C<input1.txt>, each line contains whitespace-separated values of X data
-(number), Y data (number):
+This utility is a wrapper for gnuplot to quickly generate a graph from the
+command-line and view it using a browser or an image viewer program. You can
+specify the dataset to plot directly from the command-line or specify filename
+to read the dataset from.
+
+To plot directly from the command-line:
+
+ % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' ; # whitespaces are optional
+
+To add more datasets, specify more C<--dataset-data> options:
+
+ % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
+          --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
+
+To add a title to your chart and every dataset:
+
+ % xyplot --chart-title "my chart" \
+          --dataset-title "foo" --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
+          --dataset-title "bar" --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
+
+To specify dataset from a file, use C<--dataset-file> option (or specify as
+arguments):
+
+ % xyplot --dataset-file ds1.txt --dataset-file ds2.txt
+ % xyplot ds1.txt ds2.txt
+
+C<ds1.txt> contains these lines:
 
  1 1
  2 3
  3 5.5
  4 7.9
  6 11.5
-
-Example using C<xyplot> (one data-set):
-
- % xyplot < input1.txt
-
-Example C<input2.txt>:
-
- 1 8
- 2 12
- 3 5
- 4 4
- 6 8
-
-Using two datasets:
-
- % xyplot --dataset-file  input1.txt  --dataset-file  input2.txt \
-          --dataset-color red         --dataset-color blue \
-          --dataset-style linespoints --dataset-style points
 
 Keywords: xychart, XY chart, XY plot
 
@@ -234,6 +279,10 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<chart_title> => I<str>
+
+=item * B<dataset_datas> => I<array[str]>
+
+Dataset(s).
 
 =item * B<dataset_files> => I<array[filename]>
 
@@ -247,25 +296,25 @@ Dataset plot style(s).
 
 Dataset title(s).
 
-=item * B<datasets> => I<array[array]>
-
-Dataset(s).
-
 =item * B<field_delimiter> => I<str>
 
-Supply field delimiter character in dataset file instead of the default whitespace(s).
+Supply field delimiter character in dataset file instead of the default whitespace(s) or comma(s).
+
+=item * B<output_file> => I<filename>
+
+=item * B<overwrite> => I<bool>
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -279,7 +328,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-GnuplotUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-GnuplotUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GnuplotUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -293,7 +342,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

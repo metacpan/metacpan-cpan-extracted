@@ -11,13 +11,13 @@ if(Math::MPFR::_has_longlong()) {
 
   cmp_ok(Rmpfr_cmp   ( $fr1, $uv ), '==', 0, "Math::MPFR->new(2 ** 64) == Math::MPFR->new(~0)");
   cmp_ok(Rmpfr_cmp_uj( $fr1, ~0  ), '>',  0, "Math::MPFR->new(2 ** 64) > ~0");
-  cmp_ok(Rmpfr_cmp_UV( $fr1, ~0  ), '>',  0, "Rmpf_cmp_UV and Rmpfr_cmp_uj are the same");
+  cmp_ok(Rmpfr_cmp_IV( $fr1, ~0  ), '>',  0, "Rmpfr_cmp_IV and Rmpfr_cmp_uj are the same");
 
   my $iv = Math::MPFR->new(~0 >> 1);
 
   cmp_ok(Rmpfr_cmp   ( $fr2, $iv      ), '==', 0, "Math::MPFR->new(2 ** 63) == Math::MPFR->new(~0 >> 1)");
   cmp_ok(Rmpfr_cmp_sj( $fr2, ~0 >> 1  ), '>',  0, "Math::MPFR->new(2 ** 63) > ~0 >> 1");
-  cmp_ok(Rmpfr_cmp_IV( $fr2, ~0 >> 1  ), '>',  0, "Rmpf_cmp_IV and Rmpfr_cmp_sj are the same");
+  cmp_ok(Rmpfr_cmp_IV( $fr2, ~0 >> 1  ), '>',  0, "Rmpfr_cmp_IV and Rmpfr_cmp_sj are the same");
 
 }
 else {
@@ -35,13 +35,13 @@ else {
 
     cmp_ok(Rmpfr_cmp   ( $fr1, $uv ), '==', 0, "Math::MPFR->new(2 ** 64) == Math::MPFR->new(~0)");
     cmp_ok(Rmpfr_cmp_ui( $fr1, ~0  ), '>',  0, "Math::MPFR->new(2 ** 64) > ~0");
-    cmp_ok(Rmpfr_cmp_UV( $fr1, ~0  ), '>',  0, "Rmpf_cmp_UV and Rmpfr_cmp_ui are the same");
+    cmp_ok(Rmpfr_cmp_IV( $fr1, ~0  ), '>',  0, "Rmpfr_cmp_IV and Rmpfr_cmp_ui are the same");
 
     my $iv = Math::MPFR->new(~0 >> 1);
 
     cmp_ok(Rmpfr_cmp   ( $fr2, $iv      ), '==', 0, "Math::MPFR->new(2 ** 63) == Math::MPFR->new(~0 >> 1)");
     cmp_ok(Rmpfr_cmp_si( $fr2, ~0 >> 1  ), '>',  0, "Math::MPFR->new(2 ** 63) > ~0 >> 1");
-    cmp_ok(Rmpfr_cmp_IV( $fr2, ~0 >> 1  ), '>',  0, "Rmpf_cmp_IV and Rmpfr_cmp_si are the same");
+    cmp_ok(Rmpfr_cmp_IV( $fr2, ~0 >> 1  ), '>',  0, "Rmpfr_cmp_IV and Rmpfr_cmp_si are the same");
   }
   else {
     my $fr1 = Math::MPFR->new(2 ** 32);
@@ -50,13 +50,13 @@ else {
 
     cmp_ok(Rmpfr_cmp   ( $fr1, $uv ), '>', 0, "Math::MPFR->new(2 ** 32) > Math::MPFR->new(~0)");
     cmp_ok(Rmpfr_cmp_ui( $fr1, ~0  ), '>', 0, "Math::MPFR->new(2 ** 32) > ~0");
-    cmp_ok(Rmpfr_cmp_UV( $fr1, ~0  ), '>', 0, "Rmpf_cmp_UV and Rmpfr_cmp_ui are the same");
+    cmp_ok(Rmpfr_cmp_IV( $fr1, ~0  ), '>', 0, "Rmpfr_cmp_IV and Rmpfr_cmp_ui are the same");
 
     my $iv = Math::MPFR->new(~0 >> 1);
 
     cmp_ok(Rmpfr_cmp   ( $fr2, $iv      ), '>', 0, "Math::MPFR->new(2 ** 31) > Math::MPFR->new(~0 >> 1)");
     cmp_ok(Rmpfr_cmp_si( $fr2, ~0 >> 1  ), '>', 0, "Math::MPFR->new(2 ** 31) > ~0 >> 1");
-    cmp_ok(Rmpfr_cmp_IV( $fr2, ~0 >> 1  ), '>', 0, "Rmpf_cmp_IV and Rmpfr_cmp_si are the same");
+    cmp_ok(Rmpfr_cmp_IV( $fr2, ~0 >> 1  ), '>', 0, "Rmpfr_cmp_IV and Rmpfr_cmp_si are the same");
   }
 }
 

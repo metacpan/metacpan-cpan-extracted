@@ -1,0 +1,10 @@
+Revision history for Perl extension App-ansiexpand
+
+0.9901 2021-11-21T05:33:02Z
+
+    - Require Text::ANSI::Tabs 0.07.
+
+0.99 2021-11-19T12:02:05Z
+
+    - original version
+

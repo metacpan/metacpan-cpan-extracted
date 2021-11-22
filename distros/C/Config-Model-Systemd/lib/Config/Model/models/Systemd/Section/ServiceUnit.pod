@@ -15,20 +15,19 @@ Configuration classes used by L<Config::Model>
 
 =head2 Description
 
-A human readable name for the unit. This is used by
-systemd (and other UIs) as the label for the unit, so this string should
-identify the unit rather than describe it, despite the name. C<Apache2 Web
-Server> is a good example. Bad examples are C<high-performance light-weight
-HTTP server> (too generic) or C<Apache2> (too specific and
-meaningless for people who do not know Apache). systemd will use this
-string as a noun in status messages (C<Starting
+A short human readable title of the unit. This may be used by
+systemd (and other UIs) as a user-visible label for the unit, so this string
+should identify the unit rather than describe it, despite the name. This string also shouldn't just
+repeat the unit name. C<Apache2 Web Server> is a good example. Bad examples are
+C<high-performance light-weight HTTP server> (too generic) or
+C<Apache2> (meaningless for people who do not know Apache, duplicates the unit
+name). systemd may use this string as a noun in status messages (C<Starting
 description...>, C<Started
 description.>, C<Reached target
 description.>, C<Failed to start
-description.>), so it should be capitalized, and should
-not be a full sentence or a phrase with a continuous verb. Bad examples include
-C<exiting the container> or C<updating the database once per
-day.>. I< Optional. Type uniline.  > 
+description.>), so it should be capitalized, and should not be a
+full sentence, or a phrase with a continuous verb. Bad examples include C<exiting the
+container> or C<updating the database once per day.>. I< Optional. Type uniline.  > 
 
 =head2 Documentation
 
@@ -50,11 +49,11 @@ effect. I< Optional. Type list of uniline.  >
 
 =head2 Wants
 
-Configures requirement dependencies on other units. This option may be specified more
-than once or multiple space-separated units may be specified in one option in which case dependencies
-for all listed names will be created. Dependencies of this type may also be configured outside of the
-unit configuration file by adding a symlink to a C<.wants/> directory accompanying
-the unit file. For details, see above.
+Configures (weak) requirement dependencies on other units. This option may be
+specified more than once or multiple space-separated units may be specified in one option in which
+case dependencies for all listed names will be created. Dependencies of this type may also be
+configured outside of the unit configuration file by adding a symlink to a
+C<.wants/> directory accompanying the unit file. For details, see above.
 
 Units listed in this option will be started if the configuring unit is. However, if the listed
 units fail to start or cannot be added to the transaction, this has no impact on the validity of the
@@ -71,7 +70,7 @@ activated. I< Optional. Type list of uniline.  >
 
 =head2 Requires
 
-Similar to C<Wants>, but declares a stronger
+Similar to C<Wants>, but declares a stronger requirement
 dependency. Dependencies of this type may also be configured by adding a symlink to a
 C<.requires/> directory accompanying the unit file.
 
@@ -147,6 +146,21 @@ C<a.service>, this dependency will show as
 C<ConsistsOf=a.service> in property listing of
 C<b.service>. C<ConsistsOf>
 dependency cannot be specified directly. I< Optional. Type list of uniline.  > 
+
+=head2 Upholds
+
+Configures dependencies similar to C<Wants>, but as long a this unit
+is up, all units listed in C<Upholds> are started whenever found to be inactive or
+failed, and no job is queued for them. While a C<Wants> dependency on another unit
+has a one-time effect when this units started, a C<Upholds> dependency on it has a
+continuous effect, constantly restarting the unit if necessary. This is an alternative to the
+C<Restart> setting of service units, to ensure they are kept running whatever
+happens.
+
+When C<Upholds=b.service> is used on C<a.service>, this
+dependency will show as C<UpheldBy=a.service> in the property listing of
+C<b.service>. The C<UpheldBy> dependency cannot be specified
+directly. I< Optional. Type uniline.  > 
 
 =head2 Conflicts
 
@@ -248,44 +262,57 @@ creates the corresponding device unit without delay. I< Optional. Type list of u
 
 =head2 OnFailure
 
-A space-separated list of one or more units
-that are activated when this unit enters the
-C<failed> state.  A service unit using
-C<Restart> enters the failed state only after
-the start limits are reached. I< Optional. Type uniline.  > 
+A space-separated list of one or more units that are activated when this unit enters
+the C<failed> state.  A service unit using C<Restart> enters the
+failed state only after the start limits are reached. I< Optional. Type uniline.  > 
+
+=head2 OnSuccess
+
+A space-separated list of one or more units that are activated when this unit enters
+the C<inactive> state. I< Optional. Type uniline.  > 
 
 =head2 PropagatesReloadTo
 
-A space-separated list of one or more units
-where reload requests on this unit will be propagated to, or
-reload requests on the other unit will be propagated to this
-unit, respectively. Issuing a reload request on a unit will
-automatically also enqueue a reload request on all units that
-the reload request shall be propagated to via these two
-settings. I< Optional. Type uniline.  > 
+A space-separated list of one or more units to which reload requests from this unit
+shall be propagated to, or units from which reload requests shall be propagated to this unit,
+respectively. Issuing a reload request on a unit will automatically also enqueue reload requests on
+all units that are linked to it using these two settings. I< Optional. Type uniline.  > 
 
 =head2 ReloadPropagatedFrom
 
-A space-separated list of one or more units
-where reload requests on this unit will be propagated to, or
-reload requests on the other unit will be propagated to this
-unit, respectively. Issuing a reload request on a unit will
-automatically also enqueue a reload request on all units that
-the reload request shall be propagated to via these two
-settings. I< Optional. Type uniline.  > 
+A space-separated list of one or more units to which reload requests from this unit
+shall be propagated to, or units from which reload requests shall be propagated to this unit,
+respectively. Issuing a reload request on a unit will automatically also enqueue reload requests on
+all units that are linked to it using these two settings. I< Optional. Type uniline.  > 
+
+=head2 PropagatesStopTo
+
+A space-separated list of one or more units to which stop requests from this unit
+shall be propagated to, or units from which stop requests shall be propagated to this unit,
+respectively. Issuing a stop request on a unit will automatically also enqueue stop requests on all
+units that are linked to it using these two settings. I< Optional. Type uniline.  > 
+
+=head2 StopPropagatedFrom
+
+A space-separated list of one or more units to which stop requests from this unit
+shall be propagated to, or units from which stop requests shall be propagated to this unit,
+respectively. Issuing a stop request on a unit will automatically also enqueue stop requests on all
+units that are linked to it using these two settings. I< Optional. Type uniline.  > 
 
 =head2 JoinsNamespaceOf
 
 For units that start processes (such as service units), lists one or more other units
 whose network and/or temporary file namespace to join. This only applies to unit types which support
-the C<PrivateNetwork>, C<NetworkNamespacePath> and
+the C<PrivateNetwork>, C<NetworkNamespacePath>,
+C<PrivateIPC>, C<IPCNamespacePath>, and
 C<PrivateTmp> directives (see
 L<systemd.exec(5)> for
 details). If a unit that has this setting set is started, its processes will see the same
-C</tmp/>, C</var/tmp/> and network namespace as one listed unit
-that is started. If multiple listed units are already started, it is not defined which namespace is
-joined. Note that this setting only has an effect if
-C<PrivateNetwork>/C<NetworkNamespacePath> and/or
+C</tmp/>, C</var/tmp/>, IPC namespace and network namespace as
+one listed unit that is started. If multiple listed units are already started, it is not defined
+which namespace is joined. Note that this setting only has an effect if
+C<PrivateNetwork>/C<NetworkNamespacePath>,
+C<PrivateIPC>/C<IPCNamespacePath> and/or
 C<PrivateTmp> is enabled for both the unit that joins the namespace and the unit
 whose namespace is joined. I< Optional. Type uniline.  > 
 
@@ -439,49 +466,63 @@ request default behaviour. I< Optional. Type uniline.  >
 
 =head2 JobTimeoutSec
 
-When a job for this unit is queued, a timeout C<JobTimeoutSec> may be
-configured. Similarly, C<JobRunningTimeoutSec> starts counting when the queued job is actually
-started. If either time limit is reached, the job will be cancelled, the unit however will not change state or
-even enter the C<failed> mode. This value defaults to C<infinity> (job timeouts
-disabled), except for device units (C<JobRunningTimeoutSec> defaults to
-C<DefaultTimeoutStartSec>). NB: this timeout is independent from any unit-specific timeout
-(for example, the timeout set with C<TimeoutStartSec> in service units) as the job timeout has
-no effect on the unit itself, only on the job that might be pending for it. Or in other words: unit-specific
-timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
-is useful to abort only the job waiting for the unit state to change. I< Optional. Type uniline.  > 
+C<JobTimeoutSec> specifies a timeout for the whole job that starts
+running when the job is queued. C<JobRunningTimeoutSec> specifies a timeout that
+starts running when the queued job is actually started. If either limit is reached, the job will be
+cancelled, the unit however will not change state or even enter the C<failed> mode.
+
+Both settings take a time span with the default unit of seconds, but other units may be
+specified, see
+L<systemd.time(5)>.
+The default is C<infinity> (job timeouts disabled), except for device units where
+C<JobRunningTimeoutSec> defaults to C<DefaultTimeoutStartSec>.
+
+Note: these timeouts are independent from any unit-specific timeouts (for example, the timeout
+set with C<TimeoutStartSec> in service units). The job timeout has no effect on the
+unit itself. Or in other words: unit-specific timeouts are useful to abort unit state changes, and
+revert them. The job timeout set with this option however is useful to abort only the job waiting for
+the unit state to change. I< Optional. Type uniline.  > 
 
 =head2 JobRunningTimeoutSec
 
-When a job for this unit is queued, a timeout C<JobTimeoutSec> may be
-configured. Similarly, C<JobRunningTimeoutSec> starts counting when the queued job is actually
-started. If either time limit is reached, the job will be cancelled, the unit however will not change state or
-even enter the C<failed> mode. This value defaults to C<infinity> (job timeouts
-disabled), except for device units (C<JobRunningTimeoutSec> defaults to
-C<DefaultTimeoutStartSec>). NB: this timeout is independent from any unit-specific timeout
-(for example, the timeout set with C<TimeoutStartSec> in service units) as the job timeout has
-no effect on the unit itself, only on the job that might be pending for it. Or in other words: unit-specific
-timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
-is useful to abort only the job waiting for the unit state to change. I< Optional. Type uniline.  > 
+C<JobTimeoutSec> specifies a timeout for the whole job that starts
+running when the job is queued. C<JobRunningTimeoutSec> specifies a timeout that
+starts running when the queued job is actually started. If either limit is reached, the job will be
+cancelled, the unit however will not change state or even enter the C<failed> mode.
+
+Both settings take a time span with the default unit of seconds, but other units may be
+specified, see
+L<systemd.time(5)>.
+The default is C<infinity> (job timeouts disabled), except for device units where
+C<JobRunningTimeoutSec> defaults to C<DefaultTimeoutStartSec>.
+
+Note: these timeouts are independent from any unit-specific timeouts (for example, the timeout
+set with C<TimeoutStartSec> in service units). The job timeout has no effect on the
+unit itself. Or in other words: unit-specific timeouts are useful to abort unit state changes, and
+revert them. The job timeout set with this option however is useful to abort only the job waiting for
+the unit state to change. I< Optional. Type uniline.  > 
 
 =head2 JobTimeoutAction
 
-C<JobTimeoutAction> optionally configures an additional action to take when
-the timeout is hit, see description of C<JobTimeoutSec> and
+C<JobTimeoutAction> optionally configures an additional action to
+take when the timeout is hit, see description of C<JobTimeoutSec> and
 C<JobRunningTimeoutSec> above. It takes the same values as
 C<StartLimitAction>. Defaults to C<none>.
-C<JobTimeoutRebootArgument> configures an optional reboot string to pass to the
-L<reboot(2)> system call.
-I< Optional. Type uniline.  > 
+
+C<JobTimeoutRebootArgument> configures an optional reboot string to pass to
+the L<reboot(2)> system
+call. I< Optional. Type uniline.  > 
 
 =head2 JobTimeoutRebootArgument
 
-C<JobTimeoutAction> optionally configures an additional action to take when
-the timeout is hit, see description of C<JobTimeoutSec> and
+C<JobTimeoutAction> optionally configures an additional action to
+take when the timeout is hit, see description of C<JobTimeoutSec> and
 C<JobRunningTimeoutSec> above. It takes the same values as
 C<StartLimitAction>. Defaults to C<none>.
-C<JobTimeoutRebootArgument> configures an optional reboot string to pass to the
-L<reboot(2)> system call.
-I< Optional. Type uniline.  > 
+
+C<JobTimeoutRebootArgument> configures an optional reboot string to pass to
+the L<reboot(2)> system
+call. I< Optional. Type uniline.  > 
 
 =head2 StartLimitAction
 
@@ -543,6 +584,13 @@ condition. A special architecture name C<native> is mapped to the architecture t
 system manager itself is compiled for. The test may be negated by prepending an exclamation
 mark. I< Optional. Type list of enum.  > 
 
+=head2 ConditionFirmware
+
+Check whether the system's firmware is of a certain type. Possible values are:
+C<uefi> (for systems with EFI),
+C<device-tree> (for systems with a device tree) and
+C<device-tree-compatible(xyz)> (for systems with a device tree that is compatible to C<xyz>). I< Optional. Type list of uniline.  > 
+
 =head2 ConditionVirtualization
 
 Check whether the system is executed in a virtualized environment and optionally
@@ -552,6 +600,7 @@ C<vm> and
 C<container> to test against a generic type of virtualization solution, or one of
 C<qemu>,
 C<kvm>,
+C<amazon>,
 C<zvm>,
 C<vmware>,
 C<microsoft>,
@@ -637,9 +686,9 @@ check for variables passed in by the enclosing container manager or PAM. I< Opti
 C<ConditionSecurity> may be used to check whether the given
 security technology is enabled on the system. Currently, the recognized values are
 C<selinux>, C<apparmor>, C<tomoyo>,
-C<ima>, C<smack>, C<audit> and
-C<uefi-secureboot>. The test may be negated by prepending an exclamation
-mark. I< Optional. Type list of uniline.  > 
+C<ima>, C<smack>, C<audit>,
+C<uefi-secureboot> and C<tpm2>. The test may be negated by prepending
+an exclamation mark. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionCapability
 
@@ -675,10 +724,23 @@ update.
 
 If the C<systemd.condition-needs-update=> option is specified on the kernel
 command line (taking a boolean), it will override the result of this condition check, taking
-precedence over any file modification time checks. If it is used
+precedence over any file modification time checks. If the kernel command line option is used,
 C<systemd-update-done.service> will not have immediate effect on any following
 C<ConditionNeedsUpdate> checks, until the system is rebooted where the kernel
-command line option is not specified anymore. I< Optional. Type list of enum.  > 
+command line option is not specified anymore.
+
+Note that to make this scheme effective, the timestamp of C</usr/> should
+be explicitly updated after its contents are modified. The kernel will automatically update
+modification timestamp on a directory only when immediate children of a directory are modified; an
+modification of nested files will not automatically result in mtime of C</usr/>
+being updated.
+
+Also note that if the update method includes a call to execute appropriate post-update steps
+itself, it should not touch the timestamp of C</usr/>. In a typical distribution
+packaging scheme, packages will do any required update steps as part of the installation or
+upgrade, to make package contents immediately usable. C<ConditionNeedsUpdate>
+should be used with other update mechanisms where such an immediate update does not
+happen. I< Optional. Type list of enum.  > 
 
 =head2 ConditionFirstBoot
 
@@ -700,7 +762,7 @@ precedence over C</etc/machine-id> existence checks. I< Optional. Type list of b
 
 =head2 ConditionPathExists
 
-Check for the exists of a file. If the specified absolute path name does not exist,
+Check for the existence of a file. If the specified absolute path name does not exist,
 the condition will fail. If the absolute path name passed to
 C<ConditionPathExists> is prefixed with an exclamation mark
 (C<!>), the test is negated, and the unit is only started if the path does not
@@ -781,14 +843,24 @@ C<@system>. I< Optional. Type list of uniline.  >
 
 =head2 ConditionControlGroupController
 
-Verify that the given cgroup controller (eg. C<cpu>) is available
-for use on the system. For example, a particular controller may not be available if it was disabled
-on the kernel command line with C<cgroup_disable=controller>. Multiple controllers
-may be passed with a space separating them; in this case the condition will only pass if all listed
-controllers are available for use. Controllers unknown to systemd are ignored. Valid controllers
-are C<cpu>, C<cpuacct>, C<io>,
-C<blkio>, C<memory>, C<devices>, and
-C<pids>. I< Optional. Type list of uniline.  > 
+Check whether given cgroup controllers (e.g. C<cpu>) are available
+for use on the system or whether the legacy v1 cgroup or the modern v2 cgroup hierarchy is used.
+
+Multiple controllers may be passed with a space separating them; in this case the condition
+will only pass if all listed controllers are available for use. Controllers unknown to systemd are
+ignored. Valid controllers are C<cpu>, C<cpuacct>,
+C<io>, C<blkio>, C<memory>,
+C<devices>, and C<pids>. Even if available in the kernel, a
+particular controller may not be available if it was disabled on the kernel command line with
+C<cgroup_disable=controller>.
+
+Alternatively, two special strings C<v1> and C<v2> may be
+specified (without any controller names). C<v2> will pass if the unified v2 cgroup
+hierarchy is used, and C<v1> will pass if the legacy v1 hierarchy or the hybrid
+hierarchy are used (see the discussion of C<systemd.unified_cgroup_hierarchy> and
+C<systemd.legacy_systemd_cgroup_controller> in
+L<systemd.service(5)>
+for more information). I< Optional. Type list of uniline.  > 
 
 =head2 ConditionMemory
 
@@ -810,6 +882,75 @@ comparison operator. On physical systems the number of CPUs in the affinity mask
 manager usually matches the number of physical CPUs, but in special and virtual environments might
 differ. In particular, in containers the affinity mask usually matches the number of CPUs assigned
 to the container and not the physically available ones. I< Optional. Type list of uniline.  > 
+
+=head2 ConditionCPUFeature
+
+Verify that a given CPU feature is available via the C<CPUID>
+instruction. This condition only does something on i386 and x86-64 processors. On other
+processors it is assumed that the CPU does not support the given feature. It checks the leaves
+C<1>, C<7>, C<0x80000001>, and
+C<0x80000007>. Valid values are:
+C<fpu>,
+C<vme>,
+C<de>,
+C<pse>,
+C<tsc>,
+C<msr>,
+C<pae>,
+C<mce>,
+C<cx8>,
+C<apic>,
+C<sep>,
+C<mtrr>,
+C<pge>,
+C<mca>,
+C<cmov>,
+C<pat>,
+C<pse36>,
+C<clflush>,
+C<mmx>,
+C<fxsr>,
+C<sse>,
+C<sse2>,
+C<ht>,
+C<pni>,
+C<pclmul>,
+C<monitor>,
+C<ssse3>,
+C<fma3>,
+C<cx16>,
+C<sse4_1>,
+C<sse4_2>,
+C<movbe>,
+C<popcnt>,
+C<aes>,
+C<xsave>,
+C<osxsave>,
+C<avx>,
+C<f16c>,
+C<rdrand>,
+C<bmi1>,
+C<avx2>,
+C<bmi2>,
+C<rdseed>,
+C<adx>,
+C<sha_ni>,
+C<syscall>,
+C<rdtscp>,
+C<lm>,
+C<lahf_lm>,
+C<abm>,
+C<constant_tsc>. I< Optional. Type list of uniline.  > 
+
+=head2 ConditionOSRelease
+
+Verify that a specific C<key=value> pair is set in the host's
+L<os-release(5)>.
+
+Other than exact matching with C<=>, and C<!=>, relative
+comparisons are supported for versioned parameters (e.g. C<VERSION_ID>). The
+comparator can be one of C<<>, C<<=>, C<=>,
+C<!=>, C<>=> and C<>>. I< Optional. Type list of uniline.  > 
 
 =head2 AssertArchitecture
 
@@ -860,6 +1001,18 @@ requirements are not met, and when this is something the administrator or user s
 into. I< Optional. Type uniline.  > 
 
 =head2 AssertKernelVersion
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertEnvironment
 
 Similar to the C<ConditionArchitecture>,
 C<ConditionVirtualization>, …, condition settings described above, these settings
@@ -1003,6 +1156,18 @@ only the job queued for it. Use assertion expressions for units that cannot oper
 requirements are not met, and when this is something the administrator or user should look
 into. I< Optional. Type uniline.  > 
 
+=head2 AssertPathIsEncrypted
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
 =head2 AssertDirectoryNotEmpty
 
 Similar to the C<ConditionArchitecture>,
@@ -1064,6 +1229,42 @@ requirements are not met, and when this is something the administrator or user s
 into. I< Optional. Type uniline.  > 
 
 =head2 AssertControlGroupController
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertMemory
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertCPUs
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertOSRelease
 
 Similar to the C<ConditionArchitecture>,
 C<ConditionVirtualization>, …, condition settings described above, these settings
@@ -1158,28 +1359,39 @@ C<$service> => C<- - Service SuccessAction>
 =head2 StartLimitBurst
 
 Configure unit start rate limiting. Units which are started more than
-burst times within an interval time interval are not
-permitted to start any more. Use C<StartLimitIntervalSec> to configure the checking interval
-(defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, set it to 0 to
-disable any kind of rate limiting). Use C<StartLimitBurst> to configure how many starts per
-interval are allowed (defaults to C<DefaultStartLimitBurst> in manager configuration
-file). These configuration options are particularly useful in conjunction with the service setting
-C<Restart> (see
-L<systemd.service(5)>); however,
-they apply to all kinds of starts (including manual), not just those triggered by the
-C<Restart> logic. Note that units which are configured for C<Restart> and
-which reach the start limit are not attempted to be restarted anymore; however, they may still be restarted
-manually at a later point, after the interval has passed.  From this point on, the
-restart logic is activated again. Note that systemctl reset-failed will cause the restart
-rate counter for a service to be flushed, which is useful if the administrator wants to manually start a unit
-and the start limit interferes with that. Note that this rate-limiting is enforced after any unit condition
-checks are executed, and hence unit activations with failing conditions do not count towards this rate
-limit. This setting does not apply to slice, target, device, and scope units, since they are unit types whose
-activation may either never fail, or may succeed only a single time.
+burst times within an interval time span are
+not permitted to start any more. Use C<StartLimitIntervalSec> to configure the
+checking interval and C<StartLimitBurst> to configure how many starts per interval
+are allowed.
 
-When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are
-flushed out too. This means that configuring start rate limiting for a unit that is not referenced continuously
-has no effect. I< Optional. Type uniline.  > 
+interval is a time span with the default unit of seconds, but other
+units may be specified, see
+L<systemd.time(5)>.
+Defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, and may
+be set to 0 to disable any kind of rate limiting. burst is a number and
+defaults to C<DefaultStartLimitBurst> in manager configuration file.
+
+These configuration options are particularly useful in conjunction with the service setting
+C<Restart> (see
+L<systemd.service(5)>);
+however, they apply to all kinds of starts (including manual), not just those triggered by the
+C<Restart> logic.
+
+Note that units which are configured for C<Restart>, and which reach the start
+limit are not attempted to be restarted anymore; however, they may still be restarted manually or
+from a timer or socket at a later point, after the interval has passed.
+From that point on, the restart logic is activated again. systemctl reset-failed
+will cause the restart rate counter for a service to be flushed, which is useful if the administrator
+wants to manually start a unit and the start limit interferes with that. Rate-limiting is enforced
+after any unit condition checks are executed, and hence unit activations with failing conditions do
+not count towards the rate limit.
+
+When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters
+are flushed out too. This means that configuring start rate limiting for a unit that is not
+referenced continuously has no effect.
+
+This setting does not apply to slice, target, device, and scope units, since they are unit
+types whose activation may either never fail, or may succeed only a single time. I< Optional. Type uniline.  > 
 
 Note: StartLimitBurst is migrated with 'C<$service>' and with: 
 
@@ -1196,28 +1408,39 @@ C<$service> => C<- - Service StartLimitBurst>
 =head2 StartLimitIntervalSec
 
 Configure unit start rate limiting. Units which are started more than
-burst times within an interval time interval are not
-permitted to start any more. Use C<StartLimitIntervalSec> to configure the checking interval
-(defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, set it to 0 to
-disable any kind of rate limiting). Use C<StartLimitBurst> to configure how many starts per
-interval are allowed (defaults to C<DefaultStartLimitBurst> in manager configuration
-file). These configuration options are particularly useful in conjunction with the service setting
-C<Restart> (see
-L<systemd.service(5)>); however,
-they apply to all kinds of starts (including manual), not just those triggered by the
-C<Restart> logic. Note that units which are configured for C<Restart> and
-which reach the start limit are not attempted to be restarted anymore; however, they may still be restarted
-manually at a later point, after the interval has passed.  From this point on, the
-restart logic is activated again. Note that systemctl reset-failed will cause the restart
-rate counter for a service to be flushed, which is useful if the administrator wants to manually start a unit
-and the start limit interferes with that. Note that this rate-limiting is enforced after any unit condition
-checks are executed, and hence unit activations with failing conditions do not count towards this rate
-limit. This setting does not apply to slice, target, device, and scope units, since they are unit types whose
-activation may either never fail, or may succeed only a single time.
+burst times within an interval time span are
+not permitted to start any more. Use C<StartLimitIntervalSec> to configure the
+checking interval and C<StartLimitBurst> to configure how many starts per interval
+are allowed.
 
-When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are
-flushed out too. This means that configuring start rate limiting for a unit that is not referenced continuously
-has no effect. I< Optional. Type uniline.  > 
+interval is a time span with the default unit of seconds, but other
+units may be specified, see
+L<systemd.time(5)>.
+Defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, and may
+be set to 0 to disable any kind of rate limiting. burst is a number and
+defaults to C<DefaultStartLimitBurst> in manager configuration file.
+
+These configuration options are particularly useful in conjunction with the service setting
+C<Restart> (see
+L<systemd.service(5)>);
+however, they apply to all kinds of starts (including manual), not just those triggered by the
+C<Restart> logic.
+
+Note that units which are configured for C<Restart>, and which reach the start
+limit are not attempted to be restarted anymore; however, they may still be restarted manually or
+from a timer or socket at a later point, after the interval has passed.
+From that point on, the restart logic is activated again. systemctl reset-failed
+will cause the restart rate counter for a service to be flushed, which is useful if the administrator
+wants to manually start a unit and the start limit interferes with that. Rate-limiting is enforced
+after any unit condition checks are executed, and hence unit activations with failing conditions do
+not count towards the rate limit.
+
+When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters
+are flushed out too. This means that configuring start rate limiting for a unit that is not
+referenced continuously has no effect.
+
+This setting does not apply to slice, target, device, and scope units, since they are unit
+types whose activation may either never fail, or may succeed only a single time. I< Optional. Type uniline.  > 
 
 Note: StartLimitIntervalSec is migrated with 'C<$unit || $service>' and with: 
 

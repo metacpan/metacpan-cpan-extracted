@@ -40,7 +40,7 @@
             "PerlX::Maybe" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
-            "XML::Twig" : "0",
+            "XML::Twig" : "3.50",
             "XML::Twig::XPath" : "0",
             "XML::XPath" : "0",
             "XML::XPathEngine" : "0",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/Corion/Spreadsheet-ReadSXC"
       }
    },
-   "version" : "0.35",
+   "version" : "0.37",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

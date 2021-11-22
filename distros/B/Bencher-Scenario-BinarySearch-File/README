@@ -1,0 +1,130 @@
+NAME
+    Bencher::Scenario::BinarySearch::File - Benchmark binary searching
+    sorted lines from a file
+
+VERSION
+    This document describes version 0.001 of
+    Bencher::Scenario::BinarySearch::File (from Perl distribution
+    Bencher-Scenario-BinarySearch-File), released on 2021-04-21.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m BinarySearch::File
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m BinarySearch::File
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    File::SortedSeek 0.015
+
+BENCHMARK PARTICIPANTS
+    *   File::SortedSeek-1k-num (perl_code)
+
+        Code template:
+
+         File::SortedSeek::numeric($Bencher::Scenario::BinarySearch::File::fh_1k_num  , int (     1_000*rand()))
+
+    *   File::SortedSeek-10k-num (perl_code)
+
+        Code template:
+
+         File::SortedSeek::numeric($Bencher::Scenario::BinarySearch::File::fh_10k_num , int(     10_000*rand()))
+
+    *   File::SortedSeek-100k-num (perl_code)
+
+        Code template:
+
+         File::SortedSeek::numeric($Bencher::Scenario::BinarySearch::File::fh_100k_num, int(    100_000*rand()))
+
+    *   File::SortedSeek-1m-num (perl_code)
+
+        Code template:
+
+         File::SortedSeek::numeric($Bencher::Scenario::BinarySearch::File::fh_1m_num  , int(  1_000_000*rand()))
+
+    *   File::SortedSeek-10m-num (perl_code)
+
+        Code template:
+
+         File::SortedSeek::numeric($Bencher::Scenario::BinarySearch::File::fh_10m_num , int( 10_000_000*rand()))
+
+    *   File::SortedSeek-100m-num (perl_code)
+
+        Code template:
+
+         File::SortedSeek::numeric($Bencher::Scenario::BinarySearch::File::fh_100m_num, int(100_000_000*rand()))
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.30.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 20.04*, OS kernel: *Linux
+    version 5.3.0-64-generic*.
+
+    Benchmark with default options ("bencher -m BinarySearch::File"):
+
+     #table1#
+     +---------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant               | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +---------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | File::SortedSeek-1k-num   |      3000 |       400 |                 0.00% |                68.79% | 1.8e-05 |      20 |
+     | File::SortedSeek-10k-num  |      3000 |       300 |                21.42% |                39.01% | 1.4e-05 |      30 |
+     | File::SortedSeek-10m-num  |      4000 |       300 |                33.04% |                26.87% | 8.7e-06 |      20 |
+     | File::SortedSeek-100m-num |      4000 |       300 |                44.59% |                16.74% | 1.1e-05 |      29 |
+     | File::SortedSeek-100k-num |      4000 |       200 |                60.71% |                 5.03% |   1e-05 |      22 |
+     | File::SortedSeek-1m-num   |      5000 |       200 |                68.79% |                 0.00% |   1e-05 |      26 |
+     +---------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m BinarySearch::File
+    --module-startup"):
+
+     #table2#
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+----------+---------+
+     | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors  | samples |
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+----------+---------+
+     | File::SortedSeek    |      21   |              11.3 |                 0.00% |               117.71% |   0.0002 |      20 |
+     | perl -e1 (baseline) |       9.7 |               0   |               117.71% |                 0.00% | 3.6e-05  |      20 |
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+----------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+BENCHMARK NOTES
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-BinarySearch-File>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-BinarySearch-File>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Bencher-Scenario-BinarySearch-File/is
+    sues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

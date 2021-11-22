@@ -21,9 +21,22 @@ my $mod = 'Github::Backup';
     is $ok, undef, "we die if no 'dir' param sent in";
     like $@, qr/mandatory/, "...and error is sane";
 
+    my $token_present = 0;
+    my $token;
+
+    if (exists $ENV{GITHUB_TOKEN}) {
+        $token_present = 1;
+        $token = $ENV{GITHUB_TOKEN};
+        $ENV{GITHUB_TOKEN} = '';
+    }
+
     $ok = eval { my $o = $mod->new(api_user => 1, dir => 1); 1; };
     is $ok, undef, "we die if no 'token' param sent in";
     like $@, qr/mandatory/, "...and error is sane";
+
+    if (exists $ENV{GITHUB_TOKEN}) {
+        $ENV{GITHUB_TOKEN} = $token;
+    }
 }
 { # params
 

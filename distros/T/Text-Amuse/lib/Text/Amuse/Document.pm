@@ -216,6 +216,7 @@ sub _language_mapping {
             de => 'german',
             el => 'greek',
             en => 'english',
+            eo => 'esperanto',
             es => 'spanish',
             et => 'estonian',
             fa => 'farsi', # R2L

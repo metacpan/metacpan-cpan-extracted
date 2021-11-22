@@ -11,7 +11,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
 # Based on XML::Sig VERSION = '0.47';
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use base qw(Class::Accessor);
 Net::SAML2::XML::Sig->mk_accessors(qw(key));
@@ -1491,7 +1491,7 @@ Net::SAML2::XML::Sig - Net::SAML2::XML::Sig - A toolkit to help sign and verify 
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

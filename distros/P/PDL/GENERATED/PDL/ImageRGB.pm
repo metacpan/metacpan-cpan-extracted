@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::ImageRGB;
 
-our @EXPORT_OK = qw( interlrgb rgbtogr bytescl cquant  PDL::PP cquant_c );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(interlrgb rgbtogr bytescl cquant  cquant_c );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::ImageRGB ;
+
 
 
 
@@ -270,12 +269,10 @@ the copyright notice should be included in the file.
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

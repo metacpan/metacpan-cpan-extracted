@@ -59,7 +59,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.15.9
+        v0.17.1
 
 DESCRIPTION
 ===========
@@ -105,9 +105,10 @@ content of an object. If *OBJECT\_PERMS* is not defined, permissions
 system is not activated and hence anyone may access and possibly modify
 the content of your object.
 
-If the module runs under mod\_perl, it is recognised and a clean up
-registered routine is declared to Apache to clean up the content of the
-object.
+If the module runs under mod\_perl, and assuming you have set the
+variable `GlobalRequest` in your Apache configuration, it is recognised
+and a clean up registered routine is declared to Apache to clean up the
+content of the object.
 
 as\_hash
 --------
@@ -300,6 +301,16 @@ Provided with some data, this will return a string representation of the
 data formatted by
 [Data::Printer](https://metacpan.org/pod/Data::Printer){.perl-module}
 
+dump\_hex
+---------
+
+Returns an hexadecimal dump of the data provided.
+
+This requires the module
+[Devel::Hexdump](https://metacpan.org/pod/Devel::Hexdump){.perl-module}
+and will return `undef` and set an [\"error\"](#error){.perl-module} if
+not found.
+
 dump\_print
 -----------
 
@@ -451,6 +462,28 @@ errstr
 Set/get the error string, period. It does not produce any warning like
 **error** would do.
 
+fatal
+-----
+
+Boolean. If enabled, any error will call [\"die\" in
+perlfunc](https://metacpan.org/pod/perlfunc#die){.perl-module} instead
+of returning [\"undef\" in
+perlfunc](https://metacpan.org/pod/perlfunc#undef){.perl-module} and
+setting an
+[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}.
+
+Defaults to false.
+
+You can enable it in your own package by initialising it in your own
+`init` method like this:
+
+        sub init
+        {
+            my $self = shift( @_ );
+            $self->{fatal} = 1;
+            return( $self->SUPER::init( @_ ) );
+        }
+
 get
 ---
 
@@ -561,6 +594,24 @@ The object would then contain the properties *products*, *first\_name*
 and *last\_name* and can be accessed as methods, such as :
 
         my $fname = $object->first_name;
+
+You can also alter the way [\"init\"](#init){.perl-module} process the
+parameters received using the following properties you can set in your
+own `init` method, for example:
+
+        sub init
+        {
+            my $self = shift( @_ );
+            # Set the order in which the parameters are processed, because some methods may rely on other methods' value
+            $self->{_init_params_order} [qw( method1 method2 )];
+            # Enable strict sub, which means the corresponding method must exist for the parameter provided
+            $self->{_init_strict_use_sub} = 1;
+            # Set the class name of the exception to use in error()
+            # Here My::Package::Exception should inherit from Module::Generic::Exception or some other Exception package
+            $self->{_exception_class} = 'My::Package::Exception';
+            $self->SUPER::init( @_ ) || return( $self->pass_error );
+            return( $self );
+        }
 
 log\_handler
 ------------
@@ -1188,6 +1239,8 @@ It returns true if the module can be loaded or false otherwise.
 Provided with a class/package name, this returns true if the module is
 already loaded or false otherwise.
 
+It performs this test by checking if the module is already in `%INC`.
+
 \_is\_array
 -----------
 
@@ -1266,12 +1319,40 @@ An empty string or `undef` can be provided and will not be checked.
 \_load\_class
 -------------
 
-Provided with a class/package name and this will attempt to load the
-module. This uses [\"load\_class\" in
-Class::Load](https://metacpan.org/pod/Class::Load#load_class){.perl-module}
-to achieve that purpose and return whatever value [\"load\_class\" in
-Class::Load](https://metacpan.org/pod/Class::Load#load_class){.perl-module}
-returns.
+        $self->_load_class( 'My::Module' ) || die( $self->error );
+        $self->_load_class( 'My::Module', qw( :some_tags SOME_CONSTANTS_TO_IMPORT ) ) || die( $self->error );
+        $self->_load_class(
+            'My::Module',
+            qw( :some_tags SOME_CONSTANTS_TO_IMPORT ),
+            { version => 'v1.2.3', caller => 'Its::Me' }
+        ) || die( $self->error );
+
+Provided with a class/package name, some optional list of semantics to
+import, and, as the last parameter, an optional hash reference of
+options and this will attempt to load the module. This uses [\"use\" in
+perlfunc](https://metacpan.org/pod/perlfunc#use){.perl-module}, no
+external module.
+
+Upon success, it returns the package name loaded.
+
+It traps any error with an eval and return [\"undef\" in
+perlfunc](https://metacpan.org/pod/perlfunc#undef){.perl-module} if an
+error occurred and sets an [\"error\"](#error){.perl-module}
+accordingly.
+
+Possible options are:
+
+*caller*
+
+:   The package name of the caller. If this is not provided, it will
+    default to the value provided with [\"caller\" in
+    perlfunc](https://metacpan.org/pod/perlfunc#caller){.perl-module}
+
+*version*
+
+:   The minimum version for this class to load. This value is passed
+    directly to [\"use\" in
+    perlfunc](https://metacpan.org/pod/perlfunc#use){.perl-module}
 
 \_obj2h
 -------
@@ -1938,7 +2019,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x563220691c88)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x561d57cb5268)"}\>
 
 COPYRIGHT & LICENSE
 ===================

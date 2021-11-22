@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.43;
+use Object::Pad 0.57;
 
-package Tickit::ContainerWidget 0.54;
+package Tickit::ContainerWidget 0.55;
 class Tickit::ContainerWidget
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 use Carp;
 

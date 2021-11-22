@@ -105,7 +105,7 @@ Module::Generic::Hash - Hash Manipulation Object Class
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 
@@ -327,6 +327,10 @@ This simply empty the hash. See also L</"undef"> for the same result.
 Provided with a key and a value, and this adds it to the hash, possibly overwriting any previous entry.
 
 See L</get> for the opposite method, i.e. to get the key value.
+
+=head2 size
+
+Alias method for L</length>
 
 =head2 undef
 

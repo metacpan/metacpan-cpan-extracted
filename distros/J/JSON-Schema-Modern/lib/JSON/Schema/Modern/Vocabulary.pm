@@ -4,17 +4,19 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use Moo::Role;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
-use JSON::Schema::Modern::Utilities qw(jsonp assert_keyword_type);
+use Ref::Util 0.100 'is_plain_arrayref';
+use JSON::Schema::Modern::Utilities qw(jsonp assert_keyword_type abort);
 use Carp ();
-use Moo::Role;
 use namespace::clean;
 
 our @CARP_NOT = qw(JSON::Schema::Modern);
@@ -23,57 +25,68 @@ requires qw(vocabulary keywords);
 
 sub evaluation_order { 999 }  # override, if needed
 
-sub traverse {
-  my ($self, $schema, $state) = @_;
+sub traverse ($self, $schema, $state) {
   $state->{evaluator}->_traverse_subschema($schema, $state);
 }
 
-sub traverse_subschema {
-  my ($self, $schema, $state) = @_;
-
+sub traverse_subschema ($self, $schema, $state) {
   $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}},
     +{ %$state, schema_path => $state->{schema_path}.'/'.$state->{keyword} });
 }
 
-sub traverse_array_schemas {
-  my ($self, $schema, $state) = @_;
-
+sub traverse_array_schemas ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'array');
-  return E($state, '%s array is empty', $state->{keyword}) if not @{$schema->{$state->{keyword}}};
+  return E($state, '%s array is empty', $state->{keyword}) if not $schema->{$state->{keyword}}->@*;
 
   my $valid = 1;
-  foreach my $idx (0 .. $#{$schema->{$state->{keyword}}}) {
+  foreach my $idx (0 .. $schema->{$state->{keyword}}->$#*) {
     $valid = 0 if not $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}}[$idx],
       +{ %$state, schema_path => $state->{schema_path}.'/'.$state->{keyword}.'/'.$idx });
   }
   return $valid;
 }
 
-sub traverse_object_schemas {
-  my ($self, $schema, $state) = @_;
-
+sub traverse_object_schemas ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'object');
 
   my $valid = 1;
-  foreach my $property (sort keys %{$schema->{$state->{keyword}}}) {
+  foreach my $property (sort keys $schema->{$state->{keyword}}->%*) {
     $valid = 0 if not $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}}{$property},
       +{ %$state, schema_path => jsonp($state->{schema_path}, $state->{keyword}, $property) });
   }
   return $valid;
 }
 
-sub traverse_property_schema {
-  my ($self, $schema, $state, $property) = @_;
-
+sub traverse_property_schema ($self, $schema, $state, $property) {
   return if not assert_keyword_type($state, $schema, 'object');
 
   $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}}{$property},
     +{ %$state, schema_path => jsonp($state->{schema_path}, $state->{keyword}, $property) });
 }
 
-sub eval {
-  my ($self, $data, $schema, $state) = @_;
+sub eval ($self, $data, $schema, $state) {
   $state->{evaluator}->_eval_subschema($data, $schema, $state);
+}
+
+sub eval_subschema_at_uri ($self, $data, $schema, $state, $uri) {
+  my $schema_info = $state->{evaluator}->_fetch_from_uri($uri);
+  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not $schema_info;
+
+  return $state->{evaluator}->_eval_subschema($data, $schema_info->{schema},
+    +{
+      $schema_info->{document}->evaluation_configs->%*,
+      %$state,
+      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}
+        .jsonp('', $state->{keyword}, exists $state->{_schema_path_suffix}
+          ? (is_plain_arrayref($state->{_schema_path_suffix}) ? $state->{_schema_path_suffix}->@* : $state->{_schema_path_suffix})
+          : ()),
+      initial_schema_uri => $schema_info->{canonical_uri},
+      document => $schema_info->{document},
+      document_path => $schema_info->{document_path},
+      spec_version => $schema_info->{specification_version},
+      schema_path => '',
+      vocabularies => $schema_info->{vocabularies}, # reference, not copy
+    });
 }
 
 1;
@@ -90,7 +103,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 SYNOPSIS
 
@@ -148,6 +161,10 @@ Recursively traverses the subschema under one property of the object at the curr
 =head2 eval
 
 Evaluates a subschema. Callers are expected to establish a new C<$state> scope.
+
+=head2 eval_subschema_at_uri
+
+Resolves a URI to a subschema, then evaluates that subschema (essentially the `$ref` keyword).
 
 =head1 SUPPORT
 

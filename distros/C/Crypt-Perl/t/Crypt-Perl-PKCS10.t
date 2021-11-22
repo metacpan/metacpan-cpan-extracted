@@ -13,7 +13,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Test::More;
-use Test::NoWarnings;
+use Test::FailWarnings;
 use Test::Deep;
 use Test::Exception;
 
@@ -24,8 +24,8 @@ use lib "$FindBin::Bin/lib";
 use OpenSSL_Control ();
 
 use parent qw(
-    TestClass
     NeedsOpenSSL
+    TestClass
 );
 
 use Crypt::Perl::ECDSA::Generate ();
@@ -35,11 +35,7 @@ use Crypt::Perl::X509::Name ();
 
 use Crypt::Perl::PKCS10 ();
 
-if ( !caller ) {
-    my $test_obj = __PACKAGE__->new();
-    plan tests => $test_obj->expected_tests(+1);
-    $test_obj->runtests();
-}
+__PACKAGE__->new()->runtests() if !caller;
 
 #----------------------------------------------------------------------
 
@@ -86,7 +82,8 @@ sub _KEY_TYPES_TO_TEST {
 sub test_new : Tests() {
     my ($self) = @_;
 
-    my $ossl_bin = OpenSSL_Control::openssl_bin ();
+warn if !eval {
+    my $ossl_bin = OpenSSL_Control::openssl_bin();
 
     for my $type ( $self->_KEY_TYPES_TO_TEST() ) {
         my $key;
@@ -94,7 +91,10 @@ sub test_new : Tests() {
         my $print_type;
 
         if ($type =~ m<\A[0-9]>) {
-            $key = Crypt::Perl::PK::parse_key( scalar qx<$ossl_bin genrsa $type> );
+            my $pem = OpenSSL_Control::run('genrsa', $type);
+            $pem =~ tr<\r><>d;
+
+            $key = Crypt::Perl::PK::parse_key($pem);
             $print_type = "RSA ($type-bit)";
         }
         elsif ($type eq 'ed25519') {
@@ -126,7 +126,7 @@ sub test_new : Tests() {
         print {$fh} $pkcs10->to_pem() or die $!;
         close $fh;
 
-        my $text = qx<$ossl_bin req -text -noout -in $fpath>;
+        my $text = OpenSSL_Control::run(qw(req -text -noout -in), $fpath);
 
         SKIP: {
             if ( $key->isa('Crypt::Perl::ECDSA::PrivateKey') ) {
@@ -151,9 +151,11 @@ sub test_new : Tests() {
 
         #Some OpenSSL versions hide the challengePassword on CSR parse,
         #so pass it through a generic ASN.1 parse instead.
-        $text = qx<$ossl_bin asn1parse -dump -in $fpath>;
+        $text = OpenSSL_Control::run( qw(asn1parse -dump -in), $fpath);
         like( $text, qr/challengePassword.*iNsEcUrE/s, "$print_type: challengePassword" );
     }
+1;
+};
 
     return;
 }

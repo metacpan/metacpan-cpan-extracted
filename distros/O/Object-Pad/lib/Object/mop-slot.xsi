@@ -87,3 +87,34 @@ value(self, obj)
     ST(0) = value;
     XSRETURN(1);
   }
+
+bool
+has_attribute(self, name)
+    SV *self
+    SV *name
+  CODE:
+  {
+    SlotMeta *meta = NUM2PTR(SlotMeta *, SvUV(SvRV(self)));
+
+    const struct SlotHook *hook = mop_slot_get_attribute(meta, SvPV_nolen(name));
+    RETVAL = !!hook;
+  }
+  OUTPUT:
+    RETVAL
+
+SV *
+get_attribute_value(self, name)
+    SV *self
+    SV *name
+  CODE:
+  {
+    SlotMeta *meta = NUM2PTR(SlotMeta *, SvUV(SvRV(self)));
+
+    const struct SlotHook *hook = mop_slot_get_attribute(meta, SvPV_nolen(name));
+    if(!hook)
+      croak("Slot does not have an attribute called %" SVf, SVfARG(name));
+
+    RETVAL = newSVsv(hook->hookdata);
+  }
+  OUTPUT:
+    RETVAL

@@ -1,20 +1,18 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::VectorValued::Utils;
 
-@EXPORT_OK  = qw( PDL::PP rlevec PDL::PP rldvec PDL::PP enumvec PDL::PP enumvecg PDL::PP rleseq PDL::PP rldseq PDL::PP vsearchvec PDL::PP cmpvec vv_qsortvec vv_qsortveci PDL::PP vv_union PDL::PP vv_intersect PDL::PP vv_setdiff PDL::PP v_union PDL::PP v_intersect PDL::PP v_setdiff PDL::PP vv_vcos );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(rlevec rldvec enumvec enumvecg rleseq rldseq vsearchvec cmpvec vv_qsortvec vv_qsortveci vv_union vv_intersect vv_setdiff v_union v_intersect v_setdiff vv_vcos );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::VectorValued::Utils::VERSION = 1.0.13;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '1.0.14';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::VectorValued::Utils $VERSION;
 
@@ -48,10 +46,7 @@ PDL::VectorValued::Utils - Low-level utilities for vector-valued PDLs
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -92,7 +87,7 @@ See also: PDL::Slices::rle, PDL::Ufunc::qsortvec, PDL::Primitive::uniqvec
 =for bad
 
 rlevec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -128,7 +123,7 @@ See also: PDL::Slices::rld.
 =for bad
 
 rldvec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -177,7 +172,7 @@ If you need global keys, see enumvecg().
 =for bad
 
 enumvec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -214,7 +209,7 @@ Basically does the same thing as:
 =for bad
 
 enumvecg does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -250,7 +245,7 @@ See also PDL::Slices::rle.
 =for bad
 
 rleseq does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -289,7 +284,7 @@ See also: PDL::Slices::rld.
 =for bad
 
 rldseq does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -346,7 +341,7 @@ See also: PDL::Primitive::vsearch().
 =for bad
 
 vsearchvec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -383,8 +378,6 @@ for a bug in PDL-2.4.3, which has long since been fixed.
 
   Signature: (a(N); b(N); int [o]cmp())
 
-=for ref
-
 Lexicographically compare a pair of vectors.
 
 
@@ -392,7 +385,7 @@ Lexicographically compare a pair of vectors.
 =for bad
 
 cmpvec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -474,7 +467,7 @@ and returns the sliced PDL.
 =for bad
 
 vv_union does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -523,7 +516,7 @@ and returns the sliced PDL.
 =for bad
 
 vv_intersect does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -574,7 +567,7 @@ and returns the sliced PDL.
 =for bad
 
 vv_setdiff does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -637,7 +630,7 @@ In scalar context, reshapes $c() to the actual number of elements in the union a
 =for bad
 
 v_union does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -684,7 +677,7 @@ In scalar context, reshapes $c() to the actual number of elements in the interse
 =for bad
 
 v_intersect does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -733,7 +726,7 @@ In scalar context, reshapes $c() to the actual number of elements in the differe
 =for bad
 
 v_setdiff does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -898,5 +891,3 @@ perl(1), PDL(3perl)
 # Exit with OK status
 
 1;
-
-		   

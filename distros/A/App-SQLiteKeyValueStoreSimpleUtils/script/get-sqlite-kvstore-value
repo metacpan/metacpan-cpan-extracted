@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /SQLite/KeyValueStore/Simple/get_sqlite_kvstore_value
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-18'; # DATE
+our $DATE = '2021-07-01'; # DATE
 our $DIST = 'App-SQLiteKeyValueStoreSimpleUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ get-sqlite-kvstore-value - Get the current value of a key, will return undef if 
 
 =head1 VERSION
 
-This document describes version 0.001 of get-sqlite-kvstore-value (from Perl distribution App-SQLiteKeyValueStoreSimpleUtils), released on 2021-06-18.
+This document describes version 0.002 of get-sqlite-kvstore-value (from Perl distribution App-SQLiteKeyValueStoreSimpleUtils), released on 2021-07-01.
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,8 @@ Usage:
  % get-sqlite-kvstore-value [-E=s] [--config-path=path | -c]
      [--config-profile=profile | -P] [--format=name] [--json]
      [--(no)naked-res] [--no-config | -C] [--no-env] [--output-encoding=s]
-     [--page-result[=program]] [--path=s] [--view-result[=program]] <key>
+     [--page-result[=program]] [--path=s] [--view-result[=program]] --
+     <key>
 
 =head1 DESCRIPTION
 

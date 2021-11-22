@@ -2,9 +2,9 @@ package Term::TablePrint;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.10.0;
 
-our $VERSION = '0.148';
+our $VERSION = '0.149';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -447,7 +447,7 @@ sub __copy_table {
                 $str = $self->{binary_string};
             }
             $str =~ s/\t/ /g;
-            $str =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
+            $str =~ s/\v+/\ \ /g;
             $str =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
             push @$tmp_row, $str;
         }
@@ -720,7 +720,7 @@ sub __print_single_row {
             $key =~ s/\e\[[\d;]*m//g;
         }
         $key =~ s/\t/ /g;
-        $key =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
+        $key =~ s/\v+/\ \ /g;
         $key =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
         $key = cut_to_printwidth( $key, $len_key );
         my $copy_sep = $separator;
@@ -884,7 +884,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.148
+Version 0.149
 
 =cut
 
@@ -1235,7 +1235,7 @@ if an invalid option value is passed.
 
 =head2 Perl version
 
-Requires Perl version 5.8.3 or greater.
+Requires Perl version 5.10.0 or greater.
 
 =head2 Decoded strings
 

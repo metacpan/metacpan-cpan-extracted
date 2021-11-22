@@ -5,7 +5,7 @@ use Math::MPFR qw(:mpfr);
 print "1..6\n";
 
 my $prec = 100009;
-my $fh;
+my ($fh, $RD);
 my $file = 'p_spec.txt';
 my $ok = '';
 my $bytes = 7;
@@ -47,10 +47,11 @@ if($o) {
   if($@ =~ /You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_fprintf/) {$ok = 'a'}
   else {warn "2a: \$\@: $@\n"}
   close $fh;
-  if(open(RD, '<', $file)) {
-    my $num = <RD>;
+  if(open($RD, '<', $file)) {
+    my $num = <$RD>;
     chomp $num;
     if($num == $prec) {$ok .= 'b'}
+    close($RD);
   }
   else { warn "Failed to open $file for reading: $!";}
 

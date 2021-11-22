@@ -9,11 +9,11 @@ README
 cpanfile
 cpanfile.macos
 cpanfile.win
-foo/20/changes
-foo/20/macos/rakubrew
-foo/20/perl/rakubrew
-foo/20/win/rakubrew.exe
-foo/rakubrew-20.tgz
+foo/21/changes
+foo/21/macos/rakubrew
+foo/21/perl/rakubrew
+foo/21/win/rakubrew.exe
+foo/rakubrew-21.tgz
 lib/App/Rakubrew.pm
 lib/App/Rakubrew/Build.pm
 lib/App/Rakubrew/Config.pm

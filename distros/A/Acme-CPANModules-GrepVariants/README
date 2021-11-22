@@ -3,27 +3,44 @@ NAME
     CPAN
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::GrepVariants
+    This document describes version 0.008 of Acme::CPANModules::GrepVariants
     (from Perl distribution Acme-CPANModules-GrepVariants), released on
-    2020-04-16.
+    2021-11-14.
 
 DESCRIPTION
-    Grep-like CLI utilities available on CPAN.
+    This list catalogs various grep-like tools.
 
-    Improvements
+    1. Reimplementations
 
-    Created in 2005 by Andy Lester, ack is the granddaddy of grep-like
+    grep (from PerlPowerTools) simply tries to reimplement grep in Perl, as
+    part of the project to reimplement many Unix utilities in Perl. It has
+    few practical uses; mainly educational. The portability advantage of
+    Perl is probably minor as grep and many Unix utilities are now available
+    on other platforms including Windows.
+
+    2a. Improvements in recursive searching against files
+
+    ack. Created in 2005 by Andy Lester, ack is the granddaddy of grep-like
     programs that try to improve the experience of using grep to search for
     text in source code. ack skips VCS directories like ".git" or ".svn",
     and understands file types so it doesn't look into giant ".mp4"s and
-    other binaries by default. ack has spurred the development of other ack
-    improvements (mostly in speed aspect) like The Silver Searcher ("ag") or
-    "ripgrep". "git" also now includes a "git-grep" utility. ack has a
-    website: <https://beyondgrep.com>. See also <https://betterthanack.com>.
+    other binaries by default. ack has spurred the development of its
+    improvements (mostly in speed aspect) like The Silver Searcher ("ag")
+    (implemented in C) or "ripgrep" (implemented in Rust). "git" also now
+    includes a "git-grep" utility (implemented in C). ack has a website:
+    <https://beyondgrep.com>. See also <https://betterthanack.com>.
 
-    App::Greple and App::abgrep try to make searching for multiple patterns
-    in grep easier. To search for all 'foo' and 'bar' in grep in no
-    particular order, you either have to do something like:
+    gre (from App::Gre) is a "grep clone using Perl regexp's with better
+    file filtering, defaults, speed, and presentation". It seems to focus on
+    providing many options to filter files (from including/excluding by file
+    extension, by matching against filename, by first line, by maximum
+    directory depth, and so on). It also offers some alternative output
+    styles.
+
+    2b. Improvements in specifying multiple patterns
+
+    Normally with the regular grep, to search for all 'foo' and 'bar', you
+    either have to do something like:
 
      % grep --color=always foo FILES | grep bar
 
@@ -36,64 +53,229 @@ DESCRIPTION
 
      % grep -P '(?=.*foo)(?=.*bar)' FILES
 
-    but this does not capture (thus highlight) the patterns.
+    but this does not capture (thus highlight) the patterns. To do that, you
+    can pipe to grep once more:
+
+     % grep -P '(?=.*foo)(?=.*bar)' FILES | grep -P '(foo|bar)'
+
+    but you introduce the complications of double filtering (e.g. filenames
+    in FILES is now the subject of the second grep).
 
     Note that searching for multiple patterns in particular order
     ('foo.*bar'), or searching for aternates from multiple patterns
     ('foo|bar') is no problem in grep.
 
-    greple also has a few other tricks up its sleeve, like configuration
-    file to define complex regexes, matching across lines, and Japanese text
-    support.
+    Some tools have been written to make it easier to specify multiple
+    patterns:
 
-    Instead of specifying a pattern, with App::rpgrep you can specify a
-    pattern name in a Regexp::Pattern::* module instead.
+    abgrep (from App::abgrep) sports a "--all" option to require all
+    patterns to appear in a line (in no particular order). Normally, when
+    multiple patterns are given (via multiple "-e" or "--regexp" options),
+    grep will include lines that just contain at least one of the patterns.
 
-    Reimplementations
+    greple (from App::Greple). By default, greple only display lines that
+    contain all patterns, instead of just one. greple also has a few other
+    tricks up its sleeve, like configuration file to define complex regexes,
+    matching across lines, and Japanese text support.
 
-    grep for PerlPowerTools simply tries to reimplement grep in Perl, as
-    part of the project to reimplement many Unix utilities in Perl. It has
-    few practical uses.
+    grep-terms (from App::GrepUtils) is a grep wrapper to convert multiple
+    terms into a chain of look-ahead patterns like described above. This
+    allows you to use the standard grep.
 
-    Searching Perl source code
+    3. Variants: alternate ways of specifying regex
 
-    App::pmgrep lets you grep over locally installed Perl modules. It's
-    basically a shortcut for something like this:
+    Instead of specifying a pattern, with Crpgrep (from App::rpgrep) you can
+    specify a pattern name in a Regexp::Pattern::* module instead.
 
-     % pmlist -Rx | grep PAT
-     % grep PAT C<pmlist -Rx>
+    4a. Variants: alternate source: repository (version control system)
+    content and history
 
-    App::Grepl uses PPI to let you grep over Perl *documents*; it allows you
-    to do things like: search only in Perl code comments or inside string
-    literals.
+    For git, the abovementioned "git-grep" can search for files in the work
+    tree as well as commit content. For Mercurial, "hg grep" accomplishes
+    the same. Alternatively you can dump the history then use the standard
+    "grep" to go through it.
 
-    **Searching other than files: **
+    4b. Variants: alternate source: Perl source code
 
-    TODO
+    pmgrep (from App::pmgrep) lets you grep over locally installed Perl
+    modules. It's basically a shortcut for something like this:
 
-INCLUDED MODULES
+     % pmlist -Rx | xargs grep PAT
+     % grep PAT $(pmlist -Rx)
+
+    cpangrep (from App::cpangrep) is a CLI for web service
+    <https://cpan.grep.me>, which is no longer operating. To grep from files
+    on CPAN, use <https://metacpan.org>.
+
+    grepl (from App::Grepl) uses PPI to let you grep over Perl *documents*;
+    it allows you to do things like: search only in Perl code comments or
+    inside string literals.
+
+    podgrep (from pmtools) greps from POD sections of Perl source.
+
+    4b. Variants: alternate source: CSV
+
+    csvgrep (from csvgrep)
+
+    csv-grep (from App::CSVUtils) allows you to apply Perl code against rows
+    of CSV.
+
+    4c. Variants: alternate source: word lists
+
+    wordlist (from App::wordlist) greps words from wordlist modules (modules
+    that contains word lists, see WordList).
+
+    4d. Variants: other alternate sources
+
+    grep-from-bash-history (from App::BashHistoryUtils).
+
+    grep-from-iod (from App::IODUtils).
+
+    grep-from-ini (from App::INIUtils).
+
+    grep-from-coin (from App::CryptoCurrencyUtils).
+
+    grep-from-exchange (from App::CryptoCurrencyUtils).
+
+    jgrep (from App::JsonLogUtils).
+
+    pdfgrep (alias: grep-from-pdf) (from App::PDFUtils) searches against
+    text in PDF files (it's a wrapper for "pdftotext" utility and grep).
+
+    ptargrep (from Archive::Tar) searches against table of contents of tar
+    files.
+
+    5a. Variants: searching URLs
+
+    grep-url (from App::grep::url) greps URLs from lines of input. You don't
+    have to manually specify regex that matches URLs yourself; you can just
+    add additional criteria for the URLs, e.g. whether the host part must
+    contain some text, or whether a certain query parameter must match some
+    pattern.
+
+    5b. Variants: searching dates
+
+    grep-date (from App::grep::date) greps for dates in lines of text.
+
+    dategrep (from App::dategrep) prints lines matching a date range.
+
+ACME::CPANMODULES ENTRIES
+    *   PerlPowerTools - BSD utilities written in pure Perl
+
+        Author: BDFOY <https://metacpan.org/author/BDFOY>
+
     *   ack
 
-    *   App::Greple
+    *   App::Gre - A grep clone using Perl regexp's with better file
+        filtering, defaults, speed, and presentation
 
-    *   App::abgrep
+        Author: JACOBG <https://metacpan.org/author/JACOBG>
 
-    *   App::rpgrep
+    *   App::abgrep - Print lines matching a pattern
 
-    *   Regexp::Pattern
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   PerlPowerTools
+    *   App::Greple - extensible grep with lexical expression and region
+        handling
 
-    *   App::pmgrep
+        Author: UTASHIRO <https://metacpan.org/author/UTASHIRO>
 
-    *   App::Grepl
+    *   App::GrepUtils - CLI utilities related to the Unix command 'grep'
 
-    *   PPI
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::rpgrep - Print lines matching a Regexp::Pattern pattern
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Regexp::Pattern - Convention/framework for modules that contain
+        collection of regexes
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::pmgrep - Print lines from installed Perl module sources
+        matching a pattern
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::cpangrep - Grep CPAN from the command-line using grep.cpan.me
+
+        Author: TSIBLEY <https://metacpan.org/author/TSIBLEY>
+
+    *   App::Grepl - PPI-powered grep
+
+        Author: OVID <https://metacpan.org/author/OVID>
+
+    *   PPI - Parse, Analyze and Manipulate Perl (without perl)
+
+        Author: MITHALDU <https://metacpan.org/author/MITHALDU>
+
+    *   pmtools - Perl Module Tools
+
+        Author: MLFISHER <https://metacpan.org/author/MLFISHER>
+
+    *   csvgrep
+
+        Author: NEILB <https://metacpan.org/author/NEILB>
+
+    *   App::CSVUtils - CLI utilities related to CSV
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::wordlist - Grep words from WordList::*
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::BashHistoryUtils - CLI utilities related to bash history file
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::IODUtils - IOD utilities
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::INIUtils - INI utilities
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::CryptoCurrencyUtils - CLI utilities related to cryptocurrencies
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::JsonLogUtils - Command line utilities for dealing with
+        JSON-formatted log files
+
+        Author: JEFFOBER <https://metacpan.org/author/JEFFOBER>
+
+    *   App::PDFUtils - Command-line utilities related to PDF files
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Archive::Tar - module for manipulations of tar archives
+
+        Author: BINGOS <https://metacpan.org/author/BINGOS>
+
+    *   App::grep::url - Print lines having URL(s) (optionally of certain
+        criteria) in them
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n GrepVariants
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries GrepVariants | cpanm -n
 
@@ -101,9 +283,15 @@ FAQ
 
         % perl -MAcme::CM::Get=GrepVariants -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::GrepVariants -E'say $_->{module} for @{ $Acme::CPANModules::GrepVariants::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -112,14 +300,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-GrepVariants>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Grep
-    Variants>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
@@ -131,9 +311,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Grep
+    Variants>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

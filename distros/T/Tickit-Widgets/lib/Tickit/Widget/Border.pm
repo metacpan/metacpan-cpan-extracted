@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.51;
+use Object::Pad 0.57;
 
-package Tickit::Widget::Border 0.33;
+package Tickit::Widget::Border 0.34;
 class Tickit::Widget::Border
-   extends Tickit::SingleChildWidget;
+   :isa(Tickit::SingleChildWidget);
 
 use Tickit::Style;
 

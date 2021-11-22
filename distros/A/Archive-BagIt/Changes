@@ -1,10 +1,160 @@
 ==================================================
-Changes from 2020-10-25 00:00:00 +0000 to present.
+Changes from 2020-11-09 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.083 at 2021-10-25 09:27:31 +0000
+version 0.085 at 2021-11-09 10:48:29 +0000
 ------------------------------------------
+
+  Change: f790e97b93861b4a3ecb975370e7e3416cdf7be7
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-09 11:44:31 +0000
+
+    Merge branch 'dev' 
+
+  Change: 9e6351fad9aca0cf0100c94d85f8a867316cf990
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-09 11:44:13 +0000
+
+    - fixed warning under Windows if IO::AIO is installed, but mmap not
+    available 
+
+------------------------------------------
+version 0.084 at 2021-11-08 17:46:29 +0000
+------------------------------------------
+
+  Change: f0bc0f9a7d1f61641a4f8d47f3f9e66952e4b3cf
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-08 18:46:29 +0000
+
+    Released 0.084-TRIAL 
+
+  Change: 99c7076cd80ea8de191037f7756e6706ae4784a2
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-08 18:45:08 +0000
+
+    - updated changed repo url 
+
+  Change: cb0abbd1bb9c479c65b5f88c11a108fb5791869e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-08 18:24:48 +0000
+
+    - fixed pod 
+
+  Change: d2658fe58a01d81028f1161bf5045cc6c6297c49
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-04 19:29:08 +0000
+
+    - updated author to reflect changes 
+
+  Change: 46f74f65e2d6d3e87396ad22d7141f93c088b9b8
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-04 19:28:34 +0000
+
+    - added THANKS section in POD 
+
+  Change: 0002ff4248baf9b47fa213cf62b673676a2d18aa
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-04 19:15:14 +0000
+
+    - added BUGS section 
+
+  Change: aa9881e4ca23332f5a8dbf07008073fbf23efd65
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-04 16:56:02 +0000
+
+    - reordered tests and added skip of parallel if under MS Windows 
+
+  Change: 601831ed19b37ba876aa4026d2fc07ef6031dc26
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-04 16:55:22 +0000
+
+    - reordered tests and added skip if IO::AIO not available 
+
+  Change: 828ada5505efff4ec75e12e2c2f67198932bee1a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-04 16:54:46 +0000
+
+    - added skip if IO::AIO not available 
+
+  Change: b538c8ad17b1089614a7d6a120e0459d51a0757e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-04 11:01:50 +0000
+
+    - fixed manifest_entries() and tagmanifest_entries(),
+
+    a subhash with key 'algorithm' is superflous,
+
+    thanks to Patrick Hochstenbach (Catmandu) for this hint - added PODs
+    for manifest_entries() and tagmanifest_entries() 
+
+  Change: 1b601d24698bcd7cbafb3845ee64a590e88c7377
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-03 19:21:31 +0000
+
+    - updated dependency 
+
+  Change: 9655af8ba22694d24caf719d1f197baced5ae602
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-03 19:21:17 +0000
+
+    - fixed async loop 
+
+  Change: 865e340b7da9fd3fd691225ada4d808c8e990cf4
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-03 18:49:25 +0000
+
+    - fixed _fill_digest_hashref() if used in parallel with partially
+    read errors - replaced IO::Async solution for parallel processig with
+    Parallel::parallel_map() call 
+
+  Change: 51746b80598fa88d28131c0481bfaf4ed8b2df86
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-03 18:47:39 +0000
+
+    - added use_parallel() - added use_async() - minor fix 
+
+  Change: 7a3ae7e4e1cdbb4a38d4f30d85733e148f36fd55
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-03 18:46:32 +0000
+
+    - minor (to be in sync with SHA) 
+
+  Change: 0daf1320a38ba50326a30b4907da8dbb25166b83
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-03 18:46:03 +0000
+
+    - uses IO::Async::Loop->really_new() - added sync variant of
+    get_hash_string() 
+
+  Change: d6e48a29a5a2d0f9fcd3a8a8d55d08fed7f8c9f1
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-03 18:44:41 +0000
+
+    - minor 
+
+  Change: 4f5524c4f952d0171d030b7c46465de6835c5fd2
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-03 18:44:29 +0000
+
+    - added testsuite to check combinations of sync/async and
+    serial/parallel 
+
+  Change: 24c4b6f9390ee802086d704f9f70d4beecf7808f
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-10-26 11:16:42 +0000
+
+    - minor, improved testcase output 
+
+------------------------------------------
+version 0.083 at 2021-10-25 09:27:54 +0000
+------------------------------------------
+
+  Change: 42dc101c717521ca65aa7875c22c24ffa449eda2
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-10-25 11:27:54 +0000
+
+    Released 0.083 
 
   Change: 2716d659fb769fe1f44e4702d61c177ea4af4e7d
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -357,5 +507,5 @@ version 0.071 at 2021-01-14 14:10:38 +0000
     - enhanced tests for Archive::BagIt::Fast 
 
 =================================================
-Plus 24 releases after 2020-10-25 00:00:00 +0000.
+Plus 24 releases after 2020-11-09 00:00:00 +0000.
 =================================================

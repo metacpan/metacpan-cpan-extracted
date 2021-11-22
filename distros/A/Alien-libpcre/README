@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
@@ -50,7 +50,13 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This distribution provides pcre so that it can be used by other Perl
+    Note that this Alien is for PCRE1, the deprecated older version of the
+    Perl (in)Compatible Regular Expression (PCRE) library. It exists for
+    projects that require the older version of PCRE. Currently the author
+    uses it for source builds of Alien::libnewrelic and NewFangle. If you
+    need the newer currently supported version of PCRE see Alien::PCRE2.
+
+    This distribution provides PCRE1 so that it can be used by other Perl
     distributions that are on CPAN. It does this by first trying to detect
     an existing install of pcre on your system. If found it will use that.
     If it cannot be found, the source code will be downloaded from the
@@ -65,6 +71,11 @@ CAVEATS
 
     The pcre, is not, as the name might suggest, actually compatible with
     modern Perl regular expressions.
+
+    On Debian based systems (including Ubuntu), the development package for
+    PCRE1 is libpcre3-dev, which is quite confusing, but I am sure there
+    was a good reason for it. If you want to do a system install use that
+    package not the confusingly newer libpcre2-dev.
 
 AUTHOR
 

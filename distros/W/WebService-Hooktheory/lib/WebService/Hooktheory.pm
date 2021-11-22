@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the Hooktheory API
 
-our $VERSION = '0.0407';
+our $VERSION = '0.0600';
 
 use Moo;
 use strictures 2;
@@ -11,7 +11,6 @@ use namespace::clean;
 
 use Carp;
 use Mojo::UserAgent;
-use Mojo::JSON::MaybeXS;
 use Mojo::JSON qw( decode_json );
 use Mojo::URL;
 use Try::Tiny;
@@ -34,7 +33,7 @@ has activkey => (
 
 has base => (
     is      => 'rw',
-    default => sub { Mojo::URL->new('https://api.hooktheory.com/v1') },
+    default => sub { 'https://api.hooktheory.com' },
 );
 
 
@@ -67,15 +66,11 @@ sub fetch {
 
     croak 'No activkey provided' unless $self->activkey;
     croak 'No endpoint provided' unless $args{endpoint};
+    croak 'No query provided' unless $args{query};
 
-    my $query;
-    if ( $args{query} ) {
-        $query = join '&', map { "$_=$args{query}->{$_}" } keys %{ $args{query} };
-    }
-
-    my $url = $self->base . $args{endpoint};
-    $url .= '?' . $query
-        if $query;
+    my $url = Mojo::URL->new($self->base)
+        ->path('v1' . $args{endpoint})
+        ->query(%{ $args{query} });
 
     my $tx = $self->ua->get( $url, { Authorization => 'Bearer ' . $self->activkey } );
 
@@ -121,7 +116,7 @@ WebService::Hooktheory - Access to the Hooktheory API
 
 =head1 VERSION
 
-version 0.0407
+version 0.0600
 
 =head1 SYNOPSIS
 
@@ -152,7 +147,7 @@ Your authorized access key.
 
 =head2 base
 
-The base URL.  Default: https://api.hooktheory.com/v1/
+The base URL.  Default: https://api.hooktheory.com
 
 =head2 ua
 
@@ -190,11 +185,11 @@ L<Moo>
 
 L<Mojo::JSON>
 
-L<Mojo::JSON::MaybeXS>
-
 L<Mojo::UserAgent>
 
 L<Mojo::URL>
+
+L<Try::Tiny>
 
 =head1 AUTHOR
 
@@ -202,7 +197,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

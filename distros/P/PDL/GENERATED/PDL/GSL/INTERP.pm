@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSL::INTERP;
 
 our @EXPORT_OK = qw( );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSL::INTERP ;
+
 
 
 
@@ -56,9 +55,23 @@ as C<$pa> and C<$pb>, respectively, and Limits (of domain or
 integration) as C<$la> and C<$lb>.
 
 
+
+
+
+
 =head1 FUNCTIONS
 
-=head2 init()
+=cut
+
+
+
+
+
+=head2 init
+
+=for sig
+
+  Signature: (double x(n); double y(n); gsl_spline *spl)
 
 =for ref
 
@@ -108,13 +121,56 @@ Example:
     # no sorting done on x, user is certain that x is monotonically increasing
     $spl = PDL::GSL::INTERP->init('cspline',$x,$y,{Sort => 0});
 
-=head2 eval()
+
+=for bad
+
+init does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+sub init {
+  my $opt;
+  if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
+  else{ $opt = {Sort => 1}; }
+  my ($class,$type,$x,$y) = @_;
+  if( (ref($x) ne 'PDL') || (ref($y) ne 'PDL') ){
+    barf("Have to pass ndarrays as arguments to init method\n");
+  }
+  if($$opt{Sort} != 0){
+    my $idx = PDL::Ufunc::qsorti($x);
+    $x = $x->index($idx);
+    $y = $y->index($idx);
+  }
+  my $ene = nelem($x);
+  my $obj1 = new_spline($type,$ene);
+  my $obj2 = new_accel();
+  _init_int($x,$y,$$obj1);
+  my @ret_a = ($obj1,$obj2);
+  return bless(\@ret_a, $class);
+}
+
+
+*init = \&PDL::GSL::INTERP::init;
+
+
+
+
+
+=head2 eval
+
+=for sig
+
+  Signature: (double x(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
 
 =for ref
 
 The function eval returns the interpolating function at a given point.
 It will barf with an "input domain error" if you try to extrapolate.
-
 
 =for usage
 
@@ -128,14 +184,46 @@ Example:
 
     my $res = $spl->eval($x)
 
-=head2 deriv()
+
+
+=for bad
+
+eval processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+sub eval {
+  my $opt;
+  my ($obj,$x) = @_;
+  my $s_obj = $$obj[0];
+  my $a_obj = $$obj[1];
+  _eval_int($x,my $o=PDL->null,$$s_obj,$$a_obj);
+  $o;
+}
+
+
+*eval = \&PDL::GSL::INTERP::eval;
+
+
+
+
+
+=head2 deriv
+
+=for sig
+
+  Signature: (double x(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
 
 =for ref
 
 The deriv function returns the derivative of the
 interpolating function at a given point.
 It will barf with an "input domain error" if you try to extrapolate.
-
 
 =for usage
 
@@ -149,15 +237,45 @@ Example:
 
     my $res = $spl->deriv($x)
 
-=head2 deriv2()
+
+
+=for bad
+
+deriv does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+sub deriv {
+  my ($obj,$x) = @_;
+  my $s_obj = $$obj[0];
+  my $a_obj = $$obj[1];
+  _deriv_int($x,my $o=PDL->null,$$s_obj,$$a_obj);
+  $o;
+}
+
+
+*deriv = \&PDL::GSL::INTERP::deriv;
+
+
+
+
+
+=head2 deriv2
+
+=for sig
+
+  Signature: (double x(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
 
 =for ref
 
 The deriv2 function returns the second derivative
 of the interpolating function at a given point.
 It will barf with an "input domain error" if you try to extrapolate.
-
-
 
 =for usage
 
@@ -171,14 +289,45 @@ Example:
 
     my $res = $spl->deriv2($x)
 
-=head2 integ()
+
+
+=for bad
+
+deriv2 does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+sub deriv2 {
+  my ($obj,$x) = @_;
+  my $s_obj = $$obj[0];
+  my $a_obj = $$obj[1];
+  _deriv2_int($x,my $o=PDL->null,$$s_obj,$$a_obj);
+  $o;
+}
+
+
+*deriv2 = \&PDL::GSL::INTERP::deriv2;
+
+
+
+
+
+=head2 integ
+
+=for sig
+
+  Signature: (double a(); double b(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
 
 =for ref
 
 The integ function returns the integral
 of the interpolating function between two points.
 It will barf with an "input domain error" if you try to extrapolate.
-
 
 =for usage
 
@@ -191,6 +340,34 @@ Usage:
 Example:
 
     my $res = $spl->integ($la,$lb)
+
+
+
+=for bad
+
+integ does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+sub integ {
+  my ($obj,$la,$lb) = @_;
+  my $s_obj = $$obj[0];
+  my $a_obj = $$obj[1];
+  _integ_int($la,$lb,my $o=PDL->null,$$s_obj,$$a_obj);
+  $o;
+}
+
+
+*integ = \&PDL::GSL::INTERP::integ;
+
+
+
+
 
 =head1 BUGS
 
@@ -218,106 +395,6 @@ The GSL interpolation module was written by Gerard Jungman.
 
 
 
-
-
-
-
-
-sub init{
-  my $opt;
-  if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
-  else{ $opt = {Sort => 1}; }
-  my ($class,$type,$x,$y) = @_;
-  if( (ref($x) ne 'PDL') || (ref($y) ne 'PDL') ){
-    barf("Have to pass ndarrays as arguments to init method\n");
-  }
-  if($$opt{Sort} != 0){
-    my $idx = PDL::Ufunc::qsorti($x);
-    $x = $x->index($idx);
-    $y = $y->index($idx);
-  }
-  my $ene = nelem($x);
-  my $obj1 = new_spline($type,$ene);
-  my $obj2 = new_accel();
-  init_meat($x,$y,$$obj1);
-  my @ret_a = ($obj1,$obj2);
-  return bless(\@ret_a, $class);
-}
-
-
-
-
-*init_meat = \&PDL::GSL::INTERP::init_meat;
-
-
-
-
-sub eval{
-  my $opt;
-  my ($obj,$x) = @_;
-  my $s_obj = $$obj[0];
-  my $a_obj = $$obj[1];
-  return eval_meat($x,$$s_obj,$$a_obj);
-}
-
-
-
-
-*eval_meat = \&PDL::GSL::INTERP::eval_meat;
-
-
-
-
-sub deriv{
-  my ($obj,$x) = @_;
-  my $s_obj = $$obj[0];
-  my $a_obj = $$obj[1];
-  return  eval_deriv_meat($x,$$s_obj,$$a_obj);
-}
-
-
-
-
-*eval_deriv_meat = \&PDL::GSL::INTERP::eval_deriv_meat;
-
-
-
-
-sub deriv2{
-  my ($obj,$x) = @_;
-  my $s_obj = $$obj[0];
-  my $a_obj = $$obj[1];
-  return  eval_deriv2_meat($x,$$s_obj,$$a_obj);
-}
-
-
-
-
-*eval_deriv2_meat = \&PDL::GSL::INTERP::eval_deriv2_meat;
-
-
-
-
-sub integ{
-  my ($obj,$la,$lb) = @_;
-  my $s_obj = $$obj[0];
-  my $a_obj = $$obj[1];
-  return eval_integ_meat($la,$lb,$$s_obj,$$a_obj);
-}
-
-
-
-
-*eval_integ_meat = \&PDL::GSL::INTERP::eval_integ_meat;
-
-
-
-;
-
-
-
 # Exit with OK status
 
 1;
-
-		   

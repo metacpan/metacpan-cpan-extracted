@@ -4,10 +4,10 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 use Exporter;
-our @EXPORT = qw< cwd path file tempfile >;			# dir() handled by `import`
+our @EXPORT = qw< cwd path file tempfile tempdir >;						# dir() handled by `import`
 
 sub import
 {
@@ -66,6 +66,7 @@ sub realpath	{ path( &Path::Tiny::realpath )            }
 sub copy_to		{ path( &Path::Tiny::copy     )            }
 sub children	{ map { path($_) } &Path::Tiny::children   }
 sub tempfile    { bless &Path::Tiny::tempfile, __PACKAGE__ }
+sub tempdir     { bless &Path::Tiny::tempdir,  __PACKAGE__ }
 
 # simple correspondences
 *dir		=	\&parent;
@@ -213,7 +214,7 @@ Path::Class::Tiny - a Path::Tiny wrapper for Path::Class compatibility
 
 =head1 VERSION
 
-This document describes version 0.05 of Path::Class::Tiny.
+This document describes version 0.06 of Path::Class::Tiny.
 
 =head1 SYNOPSIS
 
@@ -481,6 +482,13 @@ returns a Path::Class::Tiny instead of a Path::Tiny (obviously).
 Other than that, it retains all the coolness of C<Path::Tiny::tempfile>, including the normalization
 of arguments, the handling of template as either named or positional argument, and the addition of
 C<< TMPDIR => 1 >> as a default (which you can override).
+
+=head2 tempdir
+
+Everything discussed re L</tempfile> applies to L</tempdir> as well.  Don't forget that if you want
+to keep a C<tempfile>, you have to pass C<< UNLINK => 0 >>, whereas if you want to keep a
+C<tempdir>, you have to pass C<< CLEANUP => 0 >>.  That's not our fault (nor Path::Tiny's neither):
+talk to L<File::Temp> about it.
 
 =head1 NEW METHODS
 

@@ -10,11 +10,11 @@ use Tickit::Test;
 
 use Tickit::Widget;
 
-use Object::Pad 0.09;
+use Object::Pad;
 
 my $win = mk_window;
 
-class StyledWidget extends Tickit::Widget;
+class StyledWidget :isa(Tickit::Widget);
 use Tickit::Style;
 
 # Needs declarative code
@@ -51,10 +51,10 @@ method on_style_changed_values
    %style_changed_values = @_;
 }
 
-class StyledWidget::Subclass extends StyledWidget {
+class StyledWidget::Subclass :isa(StyledWidget) {
 }
 
-class StyledWidget::StyledSubclass extends StyledWidget {
+class StyledWidget::StyledSubclass :isa(StyledWidget) {
    use Tickit::Style -blank;
 
    BEGIN {
@@ -63,7 +63,7 @@ class StyledWidget::StyledSubclass extends StyledWidget {
    }
 }
 
-class StyledWidget::CopiedSubclass extends StyledWidget {
+class StyledWidget::CopiedSubclass :isa(StyledWidget) {
    use Tickit::Style -copy;
 
    BEGIN {

@@ -132,8 +132,8 @@ bitchute.com (L<StreamFinder::Bitchute>), blogger.com (L<StreamFinder::Blogger>)
 brighteon.com (L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
 podcasts.google.com (L<StreamFinder::Google>), 
 iheartradio.com (L<StreamFinder::IHeartRadio>), 
-odysee.com (L<StreamFinder::Odysee>), radio.net (L<StreamFinder::RadioNet>), 
-rumble.com (L<StreamFinder::Rumble>),
+odysee.com (L<StreamFinder::Odysee>), podbean.com (L<StreamFinder::Podbean>), 
+radio.net (L<StreamFinder::RadioNet>), rumble.com (L<StreamFinder::Rumble>),
 sermonaudio.com (L<StreamFinder::SermonAudio>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>), 
@@ -260,12 +260,12 @@ corresponding field data returned (or "I<-na->", if no value).
 
 Returns an array of strings representing all stream URLs found.
 If I<"playlist"> is specified, then an extended m3u playlist is returned 
-instead of stream url(s).  NOTE:  For Apple, Castbox, and Google 
-podcasts, if an author / channel page url is given, rather than an 
-individual podcast episode's url, get() returns the first (latest?) 
-podcast episode found, and get("playlist") returns an extended m3u 
-playlist containing the urls, titles, etc. for all the podcast 
-episodes found on that page url.
+instead of stream url(s).  NOTE:  For Apple, Castbox, Google, Spreaker, 
+and SermonAudio podcasts, if an author / channel page url is given, 
+rather than an individual podcast episode's url, get() returns the 
+first (latest?) podcast episode found, and get("playlist") returns an 
+extended m3u playlist containing the urls, titles, etc. for all the podcast 
+episodes found on that page url from latest to oldest.
 
 =item $station->B<getURL>([I<options>])
 
@@ -331,8 +331,8 @@ the "icon image" data, if any, will be returned.
 
 Returns the station / podcast / video's type (I<submodule-name>).  
 (one of:  "Anystream", "Apple", "BitChute", "Blogger", "Brighteon", 
-"Castbox", "Google", "IHeartRadio", "Odysee", "RadioNet", "Rumble", 
-"SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" - 
+"Castbox", "Google", "IHeartRadio", "Odysee", "Podbean", "RadioNet", 
+"Rumble", "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" - 
 depending on the sight that matched the URL).
 
 =back
@@ -485,7 +485,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.72';
+our $VERSION = '1.82';
 our $DEBUG = 0;
 
 require Exporter;
@@ -493,7 +493,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger Brighteon Castbox Google IHeartRadio
-		Odysee RadioNet Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
+		Odysee Podbean RadioNet Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
 
 my %haveit;
 
@@ -555,6 +555,8 @@ sub new
 		return new StreamFinder::SermonAudio($url, @args);
 	} elsif ($haveit{'Odysee'} && $url =~ m#\bodysee\.com\/#) {
 		return new StreamFinder::Odysee($url, @args);
+	} elsif ($haveit{'Podbean'} && $url =~ m#\bpodbean\.com\/#) {
+		return new StreamFinder::Podbean($url, @args);
 	} elsif ($haveit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		my $yt = new StreamFinder::Youtube($url, @args);
 		return $yt  if (defined($yt) && $yt && $yt->count() > 0);

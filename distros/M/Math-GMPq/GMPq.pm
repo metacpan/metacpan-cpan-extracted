@@ -50,6 +50,7 @@ use overload
     @Math::GMPq::EXPORT_OK = qw(
 __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
 __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS
+IOK_flag NOK_flag POK_flag
 Rmpq_abs Rmpq_add Rmpq_canonicalize Rmpq_clear Rmpq_cmp Rmpq_cmp_si Rmpq_cmp_ui
 Rmpq_cmp_z Rmpq_add_z Rmpq_sub_z Rmpq_z_sub Rmpq_mul_z Rmpq_div_z Rmpq_z_div
 Rmpq_pow_ui
@@ -60,6 +61,7 @@ Rmpq_get_den Rmpq_get_num Rmpq_get_str Rmpq_init Rmpq_init_nobless Rmpq_inp_str
 Rmpq_inv Rmpq_mul Rmpq_mul_2exp Rmpq_neg Rmpq_numref Rmpq_out_str Rmpq_printf
 Rmpq_set Rmpq_set_d Rmpq_set_den Rmpq_set_f Rmpq_set_num Rmpq_set_si Rmpq_set_str
 Rmpq_set_NV Rmpq_get_NV Rmpq_cmp_NV
+Rmpq_set_IV Rmpq_cmp_IV
 Rmpq_set_ui Rmpq_set_z Rmpq_sgn
 Rmpq_sprintf Rmpq_snprintf
 Rmpq_sub Rmpq_swap
@@ -71,7 +73,7 @@ qgmp_randinit_set qgmp_randinit_default_nobless qgmp_randinit_mt_nobless
 qgmp_randinit_lc_2exp_nobless qgmp_randinit_lc_2exp_size_nobless qgmp_randinit_set_nobless
 qgmp_urandomb_ui qgmp_urandomm_ui
     );
-    our $VERSION = '0.47';
+    our $VERSION = '0.48';
     #$VERSION = eval $VERSION;
 
     Math::GMPq->DynaLoader::bootstrap($VERSION);
@@ -87,6 +89,7 @@ Rmpq_get_den Rmpq_get_num Rmpq_get_str Rmpq_init Rmpq_init_nobless Rmpq_inp_str
 Rmpq_inv Rmpq_mul Rmpq_mul_2exp Rmpq_neg Rmpq_numref Rmpq_out_str Rmpq_printf
 Rmpq_set Rmpq_set_d Rmpq_set_den Rmpq_set_f Rmpq_set_num Rmpq_set_si Rmpq_set_str
 Rmpq_set_NV Rmpq_get_NV Rmpq_cmp_NV
+Rmpq_set_IV Rmpq_cmp_IV
 Rmpq_set_ui Rmpq_set_z Rmpq_sgn
 Rmpq_sprintf Rmpq_snprintf
 Rmpq_sub Rmpq_swap

@@ -1,0 +1,10 @@
+Archive-Peek-*
+
+Makefile$
+Makefile\.old
+MYMETA\.(json|yml)
+
+^\.git
+^\.github/
+\.swp$
+^\.vscode

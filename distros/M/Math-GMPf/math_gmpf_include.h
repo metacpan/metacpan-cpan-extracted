@@ -1,17 +1,6 @@
 /*************************************************
 Documentation of symbols defined by Math::GMPf
 
-NV_IS_DOUBLE             : Automatically defined by Makefile.PL iff
-                           $Config{nvtype} is 'double'.
-
-NV_IS_LONG_DOUBLE        : Automatically defined by Makefile.PL iff
-                           $Config{nvtype} is 'long double'.
-
-NV_IS_FLOAT128           : Automatically defined by Makefile.PL iff
-                           $Config{nvtype} is '__float128'
-                           If NV_IS_FLOAT128 is defined we include the
-                           quadmath.h header.
-
 REQUIRED_LDBL_MANT_DIG   : Defined to float.h's LDBL_MANT_DIG unless
                            LDBL_MANT_DIG is 106 (ie long double is
                            double-double) - in which case it is defined to
@@ -24,7 +13,8 @@ _WIN32_BIZARRE_INFNAN    : Defined (on Windows only) when the perl version
                            These earlier perl versions generally stringified
                            NaNs as (-)1.#IND and Infs as (-)1.#INF.
 
-The following are all used by _Rmpf_get_ld/ld_rndn/float128/float128_rndn:
+The following can be used by the (internal)  _Rmpf_get_* functions, which
+could be called by Rmpf_get_NV:
 
 #################################################
 
@@ -40,7 +30,7 @@ LOW_SUBNORMAL_EXP        : Lowest subnormal exponent value for perl's NV type.
 
 HIGH_SUBNORMAL_EXP       : Highest subnormal exponent value for perl's NV type.
                            If the exponent is higher than this value, then it
-                           will convert to a normal NV.
+                           will convert to a normalized NV.
 
 #################################################
 
@@ -61,7 +51,7 @@ HIGH_SUBNORMAL_EXP       : Highest subnormal exponent value for perl's NV type.
 #include <gmp.h>
 #include<float.h>
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 #include <quadmath.h>
 typedef __float128 float128;
 #endif
@@ -72,11 +62,11 @@ typedef __float128 float128;
 #define REQUIRED_LDBL_MANT_DIG LDBL_MANT_DIG
 #endif
 
-#if defined(NV_IS_DOUBLE) || (defined(NV_IS_LONG_DOUBLE) && (REQUIRED_LDBL_MANT_DIG == 2098 || REQUIRED_LDBL_MANT_DIG == 53))
+#if NVSIZE == 8 || (defined(USE_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098)
 #define ULP_INDEX			52
 #define LOW_SUBNORMAL_EXP		-1074
 #define HIGH_SUBNORMAL_EXP		-1021
-#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
+#elif defined(USE_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
 #define ULP_INDEX			63
 #define LOW_SUBNORMAL_EXP		-16445
 #define HIGH_SUBNORMAL_EXP		-16381
@@ -111,9 +101,18 @@ typedef __float128 float128;
 #  define Newxz(v,n,t) Newz(0,v,n,t)
 #endif
 
+#define SV_IS_IOK(x) \
+     SvIOK(x)
+
+#define SV_IS_POK(x) \
+     SvPOK(x)
+
+#define SV_IS_NOK(x) \
+     SvNOK(x)
+
 #define NOK_POK_DUALVAR_CHECK \
         if(SvNOK(b)) { \
          nok_pok++; \
-         if(SvIV(get_sv("Math::GMPf::NOK_POK", 0))) \
+         if(SvIVX(get_sv("Math::GMPf::NOK_POK", 0))) \
            warn("Scalar passed to %s is both NV and PV. Using PV (string) value"
 

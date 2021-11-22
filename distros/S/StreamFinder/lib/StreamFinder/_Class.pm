@@ -104,6 +104,7 @@ sub new
 	$self->{'artimageurl'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;
+	$self->{'playlist_cnt'} = 0;
 	$self->{'total'} = 0;
 	$self->{'Url'} = '';
 	$self->{'playlist'} = '';
@@ -194,6 +195,7 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 sub count
 {
 	my $self = shift;
+	return $self->{'playlist_cnt'}  if (defined($_[0]) && $_[0] =~ /playlist/i);
 	return $self->{'total'};  #TOTAL NUMBER OF PLAYABLE STREAM URLS FOUND.
 }
 

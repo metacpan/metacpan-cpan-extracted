@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::LEGENDRE;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_legendre_Pl PDL::PP gsl_sf_legendre_Pl_array PDL::PP gsl_sf_legendre_Ql PDL::PP gsl_sf_legendre_Plm PDL::PP gsl_sf_legendre_array PDL::PP gsl_sf_legendre_array_index PDL::PP gsl_sf_legendre_sphPlm PDL::PP gsl_sf_conicalP_half PDL::PP gsl_sf_conicalP_mhalf PDL::PP gsl_sf_conicalP_0 PDL::PP gsl_sf_conicalP_1 PDL::PP gsl_sf_conicalP_sph_reg PDL::PP gsl_sf_conicalP_cyl_reg_e PDL::PP gsl_sf_legendre_H3d PDL::PP gsl_sf_legendre_H3d_array );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_legendre_Pl gsl_sf_legendre_Pl_array gsl_sf_legendre_Ql gsl_sf_legendre_Plm gsl_sf_legendre_array gsl_sf_legendre_array_index gsl_sf_legendre_sphPlm gsl_sf_conicalP_half gsl_sf_conicalP_mhalf gsl_sf_conicalP_0 gsl_sf_conicalP_1 gsl_sf_conicalP_sph_reg gsl_sf_conicalP_cyl_reg_e gsl_sf_legendre_H3d gsl_sf_legendre_H3d_array );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::LEGENDRE ;
+
 
 
 
@@ -42,10 +41,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -516,7 +512,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -540,5 +536,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

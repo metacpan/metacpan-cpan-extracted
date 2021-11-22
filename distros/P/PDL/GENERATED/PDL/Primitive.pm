@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Primitive;
 
-our @EXPORT_OK = qw(PDL::PP inner PDL::PP outer  matmult PDL::PP matmult PDL::PP innerwt PDL::PP inner2 PDL::PP inner2d PDL::PP inner2t PDL::PP crossp PDL::PP norm PDL::PP indadd PDL::PP conv1d PDL::PP in  uniq  uniqind  uniqvec PDL::PP hclip PDL::PP lclip  clip PDL::PP clip PDL::PP wtstat PDL::PP statsover  stats PDL::PP histogram PDL::PP whistogram PDL::PP histogram2d PDL::PP whistogram2d PDL::PP fibonacci PDL::PP append PDL::PP axisvalues PDL::PP random PDL::PP randsym  grandom  vsearch PDL::PP vsearch_sample PDL::PP vsearch_insert_leftmost PDL::PP vsearch_insert_rightmost PDL::PP vsearch_match PDL::PP vsearch_bin_inclusive PDL::PP vsearch_bin_exclusive PDL::PP interpolate  interpol  interpND  one2nd PDL::PP which PDL::PP which_both  where  whereND  whichND  setops  intersect );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(inner outer matmult matmult innerwt inner2 inner2d inner2t crossp norm indadd conv1d in uniq uniqind uniqvec hclip lclip clip clip wtstat statsover stats histogram whistogram histogram2d whistogram2d fibonacci append axisvalues srand random randsym grandom vsearch vsearch_sample vsearch_insert_leftmost vsearch_insert_rightmost vsearch_match vsearch_bin_inclusive vsearch_bin_exclusive interpolate interpol interpND one2nd which which_both where whereND whichND setops intersect );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Primitive ;
+
 
 
 
@@ -64,10 +63,7 @@ For explanation of the signature format, see L<PDL::PP>.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -895,7 +891,7 @@ sub PDL::uniqvec {
    my $nanvec = null;
    $nanvec = $pdl2d->mv(0,-1)->dice($numnan->which)->mv(0,-1);           # the vectors with any NaN values
 
-   # use dice instead of nslice since qsortvec might be packing
+   # use dice instead of slice since qsortvec might be packing
    # the badvals to the front of the array instead of the end like
    # the docs say. If that is the case and it gets fixed, it won't
    # bust uniqvec. DAL 14-March 2006
@@ -1676,9 +1672,6 @@ sub PDL::glue{
 
 
 
-
-
-
 =head2 axisvalues
 
 =for sig
@@ -1715,7 +1708,52 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+
+=head2 srand
+
+=for sig
+
+  Signature: (a())
+
+=for ref
+
+Seed random-number generator with a 64-bit int. Will generate seed data
+for a number of threads equal to the return-value of
+L<PDL::Core/online_cpus>.
+
+=for usage
+
+ srand(); # uses current time
+ srand(5); # fixed number e.g. for testing
+
+
+
+=for bad
+
+srand does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+*srand = \&PDL::srand;
+sub PDL::srand { PDL::_srand_int($_[0] // PDL::Core::seed()) }
+
+
+*srand = \&PDL::srand;
+
+
+
+
+
 =head2 random
+
+=for sig
+
+  Signature: (a())
 
 =for ref
 
@@ -1733,11 +1771,40 @@ excluding 1 itself). The arguments are the same as C<zeroes>
 (q.v.) - i.e. one can specify dimensions, types or give
 a template.
 
-You can use the perl function L<srand|perlfunc/srand> to seed the random
-generator. For further details consult Perl's  L<srand|perlfunc/srand>
-documentation.
+You can use the PDL function L</srand> to seed the random generator.
+If it has not been called yet, it will be with the current time.
+
+
+=for bad
+
+random does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+sub random { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->random : PDL->random(@_) }
+sub PDL::random {
+   my $class = shift;
+   my $x = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
+   &PDL::_random_int($x);
+   return $x;
+}
+
+
+
+
+
+
 
 =head2 randsym
+
+=for sig
+
+  Signature: (a())
 
 =for ref
 
@@ -1754,22 +1821,17 @@ This is the uniform distribution between 0 and 1 (excluding both 0 and
 1, cf L</random>). The arguments are the same as C<zeroes> (q.v.) -
 i.e. one can specify dimensions, types or give a template.
 
-You can use the perl function L<srand|perlfunc/srand> to seed the random
-generator. For further details consult Perl's  L<srand|perlfunc/srand>
-documentation.
+You can use the PDL function L</srand> to seed the random generator.
+If it has not been called yet, it will be with the current time.
+
+
+=for bad
+
+randsym does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 
 =cut
-
-
-
-sub random { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->random : PDL->random(@_) }
-sub PDL::random {
-   my $class = shift;
-   my $x = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
-   &PDL::_random_int($x);
-   return $x;
-}
-
 
 
 
@@ -1804,10 +1866,8 @@ This is generated using the math library routine C<ndtri>.
 
 Mean = 0, Stddev = 1
 
-
-You can use the perl function L<srand|perlfunc/srand> to seed the random
-generator. For further details consult Perl's  L<srand|perlfunc/srand>
-documentation.
+You can use the PDL function L</srand> to seed the random generator.
+If it has not been called yet, it will be with the current time.
 
 =cut
 
@@ -3059,7 +3119,6 @@ WARNING: The first argument
 the exact same dimensions (or horrible things happen). You *cannot*
 thread over a smaller mask, for example.
 
-
 =cut
 
 sub PDL::where {
@@ -3133,6 +3192,10 @@ assignment. That means that both of these examples are valid:
   # Used in lvalue context:
   $data->whereND($mask4) .= 0;
 
+SEE ALSO:
+
+L</whichND> returns N-D indices into a multidimensional PDL, from a mask.
+
 =cut
 
 sub PDL::whereND :lvalue {
@@ -3186,7 +3249,7 @@ L<indexND|PDL::Slices/indexND> or L<range|PDL::Slices/range>.
  $coords = whichND($mask);
 
 returns a PDL containing the coordinates of the elements that are non-zero
-in C<$mask>, suitable for use in indexND.  The 0th dimension contains the
+in C<$mask>, suitable for use in L<PDL::Slices/indexND>. The 0th dimension contains the
 full coordinate listing of each point; the 1st dimension lists all the points.
 For example, if $mask has rank 4 and 100 matching elements, then $coords has
 dimension 4x100.
@@ -3218,6 +3281,8 @@ L</which> finds coordinates of nonzero values in a 1-D mask.
 
 L</where> extracts values from a data PDL that are associated
 with nonzero values in a mask PDL.
+
+L<PDL::Slices/indexND> can be fed the coordinates to return the values.
 
 =for example
 
@@ -3501,7 +3566,7 @@ sub PDL::intersect {
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -3527,5 +3592,3 @@ Updated for CPAN viewing compatibility by David Mertens.
 # Exit with OK status
 
 1;
-
-		   

@@ -2,7 +2,7 @@ package Hades::Macro::FH;
 use strict;
 use warnings;
 use base qw/Hades::Macro/;
-our $VERSION = 0.19;
+our $VERSION = 0.21;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );

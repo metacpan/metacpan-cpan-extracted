@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.030'; # VERSION
 use Data::Dumper;
 
 use YAML::PP::Common qw/

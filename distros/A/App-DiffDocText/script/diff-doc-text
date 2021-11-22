@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-01'; # DATE
+our $DATE = '2021-07-12'; # DATE
 our $DIST = 'App-DiffDocText'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,6 +54,7 @@ exit 1 if $fail;
 require File::Which;
 my $diff_cmd =
     $ENV{DIFF_DOC_TEXT_DIFF_CMD} //
+    $ENV{DIFF_CMD} //
     (File::Which::which("diffwc") ? "diffwc" : undef) // "diff";
 
 require IPC::System::Options;
@@ -77,7 +78,7 @@ diff-doc-text - Diff the text of two Office word-processor documents (.doc, .doc
 
 =head1 VERSION
 
-This document describes version 0.002 of diff-doc-text (from Perl distribution App-DiffDocText), released on 2020-12-01.
+This document describes version 0.003 of diff-doc-text (from Perl distribution App-DiffDocText), released on 2021-07-12.
 
 =head1 SYNOPSIS
 
@@ -91,10 +92,15 @@ This is a wrapper for the Unix command B<diff>. It assumes that each file is an
 Office word-processor documents (.doc, .docx, .odt, etc) and tries to convert
 the file to plaintext first. It then passes the converted files to C<diff>.
 
+=head1 DIFF_CMD
+
+String. Can be used to set path to diff command. See also
+L</DIFF_XLS_TEXT_DIFF_CMD> which takes precedence.
+
 =head1 DIFF_DOC_TEXT_DIFF_CMD
 
 String. Can be used to set path to diff command. The defaultl is L<diffwc> if
-available in PATH, or C<diff>.
+available in PATH, or C<diff>. Takes precedence over L</DIFF_CMD>.
 
 =head1 ENVIRONMENT
 
@@ -126,7 +132,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

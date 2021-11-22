@@ -159,13 +159,47 @@ KEYWORDS
           ...
        }
 
-    (prior to version 0.41 this was called extends, which is currently
-    recognised as a compatibility synonym).
+    Prior to version 0.41 this was called extends, which is currently
+    recognised as a compatibility synonym. Both extends and isa keywords
+    are now discouraged, in favour of the ":isa" attribute which is
+    preferred because it follows a more standard grammar without this
+    special-case.
 
-    If a package providing the superclass does not exist, an attempt is
+    One or more roles can be composed into the class by the keyword does
+
+    Since version 0.41.
+
+       class Name does ROLE, ROLE,... {
+          ...
+       }
+
+    Prior to version 0.41 this was called implements, which is currently
+    recognised as a compatibility synonym. Both implements and does
+    keywords are now discouraged, in favour of the ":does" attribute which
+    is preferred because it follows a more standard grammar without this
+    special-case.
+
+    An optional list of attributes may be supplied in similar syntax as for
+    subs or lexical variables. (These are annotations about the class
+    itself; the concept should not be confused with per-object-instance
+    data, which here is called "slots"). The following class attributes are
+    supported:
+
+  :isa
+
+       :isa(CLASS)
+    
+       :isa(CLASS CLASSVER)
+
+    Since version 0.57.
+
+    Declares a superclass that this class extends. At most one superclass
+    is supported.
+
+    If the package providing the superclass does not exist, an attempt is
     made to load it by code equivalent to
 
-       require Animal ();
+       require CLASS ();
 
     and thus it must either already exist, or be locatable via the usual
     @INC mechanisms.
@@ -179,22 +213,20 @@ KEYWORDS
 
        BaseClass->VERSION( $ver )
 
-    One or more roles can be composed into the class by the keyword does
+  :does
 
-    Since version 0.41.
+       :does(ROLE)
+    
+       :does(ROLE ROLEVER)
 
-       class Name does ROLE, ROLE,... {
-          ...
-       }
+    Since version 0.57.
 
-    (prior to version 0.41 this was called implements, which is currently
-    recognised as a compatibility synonym).
+    Composes a role into the class; optionally requiring a version check on
+    the role package. This is a newer form of the implements and does
+    keywords and should be preferred for new code.
 
-    An optional list of attributes may be supplied in similar syntax as for
-    subs or lexical variables. (These are annotations about the class
-    itself; the concept should not be confused with per-object-instance
-    data, which here is called "slots"). The following class attributes are
-    supported:
+    The package will be loaded in a similar way to how the ":isa" attribute
+    is handled.
 
   :repr(TYPE)
 

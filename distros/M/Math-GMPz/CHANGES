@@ -1,3 +1,20 @@
+Revision history for Perl module Math::GMPz
+
+0.52
+ - Add "use warnings;" to GMPz.pm.
+ - Refactor IV/UV/NV/PV handling inside overload subs.
+ - Simplify Makefile.PL.
+ - Replace XS defines NV_IS_FLOAT128 with USE_QUADMATH (which is already defined by perl headers).
+ - Export Rmpz_get_d() by default. (It was an oversight that this was not already the case.)
+ - Add Rmpz_get_NV().
+ - Add Rmpz_cmp_IV and make use of it in the overloaded comparison XSubs.
+ - Add Rmpz_init_set_NV_nobless and Rmpz_init_set_IV_nobless (just to complete the set).
+ - Remove Rmpz_fits_UV_p. UVs are now also handled by Rmpz_fits_IV_p - which is how things
+   should have been done in the first place.
+ - Add IOK_flag(), NOK_flag(), POK_flag() functions.
+ - Add Rmpz_set_sj and Rmpz_set_sj (despite that the gmp library provides neither mpz_set_sj
+   nor mpz_set_uj).
+
 0.51
  - Add Test::Warn to PREREQ_PM in Makefile.PL. (Overlooked in previous release.)
  - In the Makefile.PL, place all 'make test' prerequisite modules in TEST_REQUIRES
@@ -5,7 +22,7 @@
 
 0.50
  - Rework Rmpz_import to better handle UTF8 strings.
- - Add Rmpz_import_UV and Rmpz_export_UV
+ - Add Rmpz_import_UV and Rmpz_export_UV.
 
 0.49
  - skip tests 37 & 38 in t/divby0.t if Math::GMPq version is less than 0.45.

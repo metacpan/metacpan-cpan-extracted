@@ -1,3 +1,4 @@
+use utf8;
 use ExtUtils::MakeMaker;
 use Config;
 
@@ -16,11 +17,14 @@ else {
 
 my ($pl, @plvars);
 
+DUMP_RUNTIME_VARIABLES:
 for (@pl) {
     $pl = $_;
-    print "  running '$pl -dump-runtime-variables'\n";
-    @plvars=`$pl -dump-runtime-variables`;
-    $? or last;
+    for my $arg ( '--dump-runtime-variables', '-dump-runtime-variables' ) {
+        print "  running '$pl $arg'\n";
+        @plvars=`$pl $arg`;
+        $? or last DUMP_RUNTIME_VARIABLES;
+    }
 }
 if ($?) {
     print "unable to run swi-prolog: $?\nAborting...\n";
@@ -132,7 +136,7 @@ WriteMakefile( 'NAME' => 'Language::Prolog::Yaswi::Low',
                'VERSION_FROM' => 'Low.pm',
                'PREREQ_PM' => {},
                'ABSTRACT_FROM' => 'Low.pm',
-               'AUTHOR' => 'Salvador Fandiño <sfandino@yahoo.com>',
+               'AUTHOR' => 'Salvador FandiÃ±o <sfandino@yahoo.com>',
                'LIBS' => [$plvar{PLLIBS}],
                'DEFINE' => '',
                'INC' => "-I. $plvar{PLINC}",

@@ -3,14 +3,14 @@
 #
 package PDL::LinearAlgebra::Trans;
 
-our @EXPORT_OK = qw(  mexp mexpts mlog msqrt mpow 
+our @EXPORT_OK = qw( mexp mexpts mlog msqrt mpow 
 			mcos msin mtan	msec mcsc mcot
 			mcosh  msinh  mtanh  msech  mcsch  mcoth
 			macos masin matan masec macsc macot 
 			macosh masinh matanh masech macsch macoth
 			sec asec sech asech 
 			cot acot acoth coth mfun
-			csc acsc csch acsch toreal pi PDL::PP geexp PDL::PP cgeexp PDL::PP ctrsqrt PDL::PP ctrfun );
+			csc acsc csch acsch toreal pi geexp cgeexp ctrsqrt ctrfun );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;

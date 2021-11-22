@@ -1,11 +1,40 @@
 use alienfile;
 
+use constant {
+	BUILD_CONF_PREF_AUTOCONF => 'autoconf',
+	BUILD_CONF_PREF_CMAKE => 'cmake',
+};
+
 plugin 'PkgConfig' => 'libzmq';
 
 # http://zeromq.org/
 share {
-	my $prefer_cmake = 0;
-	if( $prefer_cmake ) {
+	requires 'File::Which';
+
+	my $default_build_conf_pref =
+		$^O ne 'MSWin32'
+		? BUILD_CONF_PREF_AUTOCONF
+		: BUILD_CONF_PREF_CMAKE;
+	my $build_conf_pref =
+		exists $ENV{ALIEN_ZMQ_LATEST_BUILD_CONFIG} && $ENV{ALIEN_ZMQ_LATEST_BUILD_CONFIG}
+		? $ENV{ALIEN_ZMQ_LATEST_BUILD_CONFIG}
+		: $default_build_conf_pref;
+
+	# $ENV{ALIEN_ZMQ_LATEST_BUILD_CONFIG} = (autoconf|cmake)
+	my $build_conf_re_alt = join "|", (BUILD_CONF_PREF_AUTOCONF, BUILD_CONF_PREF_CMAKE);
+	my $build_conf_re = qr/^($build_conf_re_alt)$/;
+	die <<EOF unless $build_conf_pref =~ $build_conf_re;
+Unknown ALIEN_ZMQ_LATEST_BUILD_CONFIG = '$build_conf_pref'. Must
+be '@{[ BUILD_CONF_PREF_AUTOCONF ]}' or '@{[ BUILD_CONF_PREF_CMAKE ]}'.
+EOF
+
+	my $make = '%{make}';
+	if( $build_conf_pref eq BUILD_CONF_PREF_AUTOCONF ) {
+		if( $^O eq 'freebsd' ) {
+			requires 'Alien::gmake' => 0.14;
+			$make = '%{gmake}';
+		}
+	} elsif( $build_conf_pref eq BUILD_CONF_PREF_CMAKE ) {
 		requires 'Alien::cmake3';
 	}
 
@@ -18,20 +47,7 @@ share {
 
 	my $enable_static = $^O ne 'MSWin32';
 	my $enable_tests = 0;
-	if( $prefer_cmake ) {
-		plugin 'Build::CMake';
-		build [
-			[ '%{cmake}', -G => '%{cmake_generator}',
-				'-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
-				"-DBUILD_STATIC=@{[ $enable_static ? 'ON' : 'OFF' ]}",
-				"-DZMQ_BUILD_TESTS=@{[ $enable_tests ? 'ON' : 'OFF' ]}",
-				qw(-S .),
-				qw(-B build),
-			],
-			[ '%{make}', qw( -C build ) ],
-			[ '%{make}', qw( -C build ), 'install' ],
-		];
-	} else {
+	if( $build_conf_pref eq BUILD_CONF_PREF_AUTOCONF ) {
 		plugin 'Build::Autoconf';
 		my $should_stub_tests = $^O eq 'MSWin32';
 		my @make_stub_tests = $should_stub_tests
@@ -43,8 +59,29 @@ share {
 				( $enable_static ? '--enable-static' : '--disable-static' ),
 				'--enable-shared',
 			),
-			[ '%{make}', @make_stub_tests ],
-			[ '%{make}', 'install', @make_stub_tests ],
+			[ $make, @make_stub_tests ],
+			[ $make, 'install', @make_stub_tests ],
+		];
+	} elsif( $build_conf_pref eq BUILD_CONF_PREF_CMAKE ) {
+		plugin 'Build::CMake';
+		build [
+			[ '%{cmake}', -G => '%{cmake_generator}',
+				'-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+				"-DBUILD_STATIC=@{[ $enable_static ? 'ON' : 'OFF' ]}",
+				"-DZMQ_BUILD_TESTS=@{[ $enable_tests ? 'ON' : 'OFF' ]}",
+				( $^O eq 'MSWin32'
+					? ( '-DPKG_CONFIG_EXECUTABLE=' . File::Which::which('pkg-config'), )
+					: ()
+				),
+				( meta->prop->{platform}->{system_type} eq 'windows-mingw'
+				? ( '-DZMQ_HAVE_IPC=OFF' )
+				: ()
+				),
+				qw(-S .),
+				qw(-B build),
+			],
+			[ $make, qw( -C build ) ],
+			[ $make, qw( -C build ), 'install' ],
 		];
 	}
 

@@ -1,6 +1,6 @@
 package App::optex::textconv::pandoc;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use v5.14;
 use warnings;
@@ -9,9 +9,9 @@ use Carp;
 use App::optex::textconv::Converter 'import';
 
 our @CONVERTER = (
-    [ qr/\.docx$/ => \&to_text ],
-    [ qr/\.pptx$/ => \&to_text ],
-    [ qr/\.xlsx$/ => \&to_text ],
+    [ qr/\.doc[xm]$/ => \&to_text ],
+    [ qr/\.ppt[xm]$/ => \&to_text ],
+    [ qr/\.xls[xm]$/ => \&to_text ],
     );
 
 sub to_text {

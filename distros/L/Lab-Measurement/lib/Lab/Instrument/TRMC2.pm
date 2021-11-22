@@ -1,6 +1,6 @@
 package Lab::Instrument::TRMC2;
 #ABSTRACT: ABB TRMC2 temperature controller
-$Lab::Instrument::TRMC2::VERSION = '3.791';
+$Lab::Instrument::TRMC2::VERSION = '3.792';
 use v5.20;
 
 use strict;
@@ -419,7 +419,7 @@ Lab::Instrument::TRMC2 - ABB TRMC2 temperature controller
 
 =head1 VERSION
 
-version 3.791
+version 3.792
 
 =head1 SYNOPSIS
 

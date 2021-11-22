@@ -2,7 +2,7 @@ package Mojo::IOLoop::Stream::Role::LineBuffer;
 
 use Mojo::Base -role;
 
-our $VERSION = '0.006';
+our $VERSION = '0.009';
 
 has 'read_line_separator' => sub { qr/\x0D?\x0A/ };
 has 'write_line_separator' => "\x0D\x0A";
@@ -16,29 +16,25 @@ sub watch_lines {
     my ($self, $bytes) = @_;
     $self->{_read_line_buffer} .= $bytes;
     my $sep = $self->read_line_separator;
-    my $pos;
-    while ($self->{_read_line_buffer} =~ m/\G(.*?)($sep)/gs) {
-      $pos = pos $self->{_read_line_buffer};
+    while ($self->{_read_line_buffer} =~ s/^(.*?)($sep)//s) {
       $self->emit(read_line => "$1", "$2");
     } continue {
       $sep = $self->read_line_separator;
     }
-    $self->{_read_line_buffer} = substr($self->{_read_line_buffer}, $pos)
-      if $pos;
   });
   $self->{_read_line_close_cb} = $self->on(close => sub {
     my $self = shift;
-    if (length(my $buffer = delete $self->{_read_line_buffer} // '')) {
+    if (length($self->{_read_line_buffer} // '')) {
       my $sep = $self->read_line_separator;
-      my $pos = 0;
-      while ($buffer =~ m/\G(.*?)($sep)/gs) {
-        $pos = pos $buffer;
+      while ($self->{_read_line_buffer} =~ s/^(.*?)($sep)//s) {
         $self->emit(read_line => "$1", "$2");
       } continue {
         $sep = $self->read_line_separator;
       }
-      $self->emit(read_line => $pos ? substr($buffer, $pos) : $buffer)
-        if $pos < length $buffer;
+      if (length(my $buffer = $self->{_read_line_buffer})) {
+        $self->{_read_line_buffer} = '';
+        $self->emit(read_line => $buffer);
+      }
     }
   });
   return $self;
@@ -59,14 +55,12 @@ Mojo::IOLoop::Stream::Role::LineBuffer - Read and write streams by lines
 =head1 SYNOPSIS
 
   use Mojo::IOLoop;
-  use Mojo::IOLoop::Stream;
-  my $output_stream = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($handle);
   Mojo::IOLoop->client({port => 3000} => sub {
     my ($loop, $err, $stream) = @_;
     $stream->with_roles('+LineBuffer')->watch_lines->on(read_line => sub {
       my ($stream, $line) = @_;
       say "Received line: $line";
-      $output_stream->write_line('Got it!');
+      $stream->write_line('Line received');
     });
   });
 

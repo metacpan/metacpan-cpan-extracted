@@ -1,0 +1,7 @@
+Revision history for Perl distribution WWW-KeePassHttp
+
+v0.020 2021-Nov-21
+    - Add Entry objects for easier access to get_logins's results (issue #1)
+
+v0.010 2021-Nov-16
+    - Initial Release

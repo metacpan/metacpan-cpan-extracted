@@ -1,15 +1,15 @@
 package Data::TableData::Object::aos;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-10'; # DATE
-our $DIST = 'Data-TableData-Object'; # DIST
-our $VERSION = '0.112'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use parent 'Data::TableData::Object::Base';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-11-17'; # DATE
+our $DIST = 'Data-TableData-Object'; # DIST
+our $VERSION = '0.114'; # VERSION
 
 sub new {
     my ($class, $data) = @_;
@@ -23,6 +23,23 @@ sub new {
 sub row_count {
     my $self = shift;
     scalar @{ $self->{data} };
+}
+
+sub row {
+    my ($self, $idx) = @_;
+    $self->{data}[$idx];
+}
+
+sub row_as_aos {
+    my ($self, $idx) = @_;
+    return undef if $idx < 0 || $idx >= @{ $self->{data} }; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+    [$self->{data}[$idx]];
+}
+
+sub row_as_hos {
+    my ($self, $idx) = @_;
+    return undef if $idx < 0 || $idx >= @{ $self->{data} }; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+    {elem=>$self->{data}[$idx]};
 }
 
 sub rows {
@@ -124,7 +141,7 @@ Data::TableData::Object::aos - Manipulate array of scalars via table object
 
 =head1 VERSION
 
-This document describes version 0.112 of Data::TableData::Object::aos (from Perl distribution Data-TableData-Object), released on 2021-04-10.
+This document describes version 0.114 of Data::TableData::Object::aos (from Perl distribution Data-TableData-Object), released on 2021-11-17.
 
 =head1 SYNOPSIS
 
@@ -157,7 +174,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Table
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Data-TableData-Object>.
+Source repository is at L<https://github.com/perlancar/perl-TableData-Object>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 BUGS
 
@@ -166,16 +211,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

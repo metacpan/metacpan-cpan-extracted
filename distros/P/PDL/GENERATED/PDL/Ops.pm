@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Ops;
 
-our @EXPORT_OK = qw( PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP czip PDL::PP ipow PDL::PP r2C PDL::PP i2C );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw( log10 assgn carg conj czip ipow r2C i2C );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Ops ;
+
 
 
 
@@ -57,10 +56,7 @@ none
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -1896,7 +1892,7 @@ sub warn_non_numeric_op_wrapper {
 }
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -1917,5 +1913,3 @@ and Craig DeForest (deforest@boulder.swri.edu).
 # Exit with OK status
 
 1;
-
-		   

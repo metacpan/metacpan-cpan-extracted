@@ -1,0 +1,56 @@
+Version 0.05 - 2021-11-20
+
+  - Implement hseek
+  - Fix more bugs in utf8 comparisons (should be really fixed this time)
+  - Fix compilation on 32-bit platforms
+  - util/benchmark.pl compares performance with other similar modules
+
+Version 0.03 - 2021-11-18
+
+  - New XS iterators, with lots of new methods: clone, key, value, index,
+     tree, next_kv, next_keys, next_values, step, delete.
+  - Iterators now automatically move to the next item if the current node
+     gets removed from the tree.
+  - Iterators now hold a strong reference to the tree.
+  - TIEHASH interface, for those who want it.
+  - More unit tests, more documentation.
+  - Fixed compilation on 5.12, 5.10, 5.8 at the cost of correct UTF-8 cmp.
+
+Version 0.02 - 2021-11-15
+
+  - New CMP_NUMSPLIT comparison function
+  - New get_node shortcuts: get_node_last, get_node_le, get_node_le_last,
+     get_node_lt, get_node_ge, get_node_gt.
+  - Code cleanup
+  - Minor documentation fixes
+
+Version 0.01 - 2021-11-15
+
+  - Finished implementing almost all methods of Tree::RB
+  - Renamed option 'compat_list_context' to 'compat_list_get'
+    since it only affected the 'get' method.
+  - Add tree methods: root, iter, rev_iter
+  - Add node methods: tree, left_leaf, right_leaf, strip, as_lol
+    min, max, successor, predecessor
+
+Version 0.00_03 - 2021-11-14
+
+  - KEY_TYPE_USTR now uses a correct unicode comparison function.
+  - Added option 'compat_array_context'
+  - Comparison functions can now be specified by enum constants
+  - Added api methods get_all, iter, rev_iter
+  - Delete now takes a second optional param to delete a range
+  - Renamed exported constants LU_* to GET_*, and added GET_LE_LAST
+    and GET_EQ_LAST to handle common cases for duplicate keys.
+  - More unit tests
+  - Much more documentation
+
+Version 0.00_02 - 2021-11-13
+
+  - Enhanced string-key performance using KEY_TYPE_BSTR and
+    KEY_TYPE_USTR.  KEY_TYPE_STR is removed.
+  - Various distribution fixes, documentation, etc.
+
+Version 0.00_01 - 2021-11-12
+
+  - Initial release, with partial compatibility to Tree::RB

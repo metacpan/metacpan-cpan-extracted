@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -140,6 +140,7 @@ my %nodetypes = (
     DOC          => 'FULLNODE',
     DOC_END      => 'DOCUMENT_END',
     STR          => 'STREAM',
+    END_FLOW     => 'END_FLOW',
 );
 
 sub parse {
@@ -420,6 +421,9 @@ sub parse_tokens {
         }
         if ($eol) {
             unless ($self->lex_next_tokens) {
+                if ($rule_name eq 'DIRECTIVE') {
+                    $self->exception("Directive needs document start");
+                }
                 $self->end_document(1);
                 return 0;
             }
@@ -548,7 +552,7 @@ sub start_flow_sequence {
 }
 
 sub start_flow_mapping {
-    my ($self, $offset) = @_;
+    my ($self, $offset, $implicit_flowseq_map) = @_;
     my $offsets = $self->offset;
     my $new_offset = $offsets->[-1];
     my $event_types = $self->events;
@@ -560,7 +564,7 @@ sub start_flow_mapping {
             $new_offset++;
         }
     }
-    push @{ $self->events }, 'FLOWMAP';
+    push @{ $self->events }, $implicit_flowseq_map ? 'IMAP' : 'FLOWMAP';
     push @{ $offsets }, $new_offset;
 
     my $event_stack = $self->event_stack;
@@ -578,7 +582,12 @@ sub end_flow_sequence {
     pop @{ $self->offset };
     my $info = { name => 'sequence_end_event' };
     $self->callback->($self, $info->{name}, $info);
-    $event_types->[-1] = $next_event{ $event_types->[-1] };
+    if ($event_types->[-1] =~ m/^FLOW|^IMAP/) {
+        $event_types->[-1] = $next_event{ $event_types->[-1] };
+    }
+    else {
+        push @$event_types, 'END_FLOW';
+    }
 }
 
 sub end_flow_mapping {
@@ -588,13 +597,25 @@ sub end_flow_mapping {
     pop @{ $self->offset };
     my $info = { name => 'mapping_end_event' };
     $self->callback->($self, $info->{name}, $info);
+    if ($event_types->[-1] =~ m/^FLOW|^IMAP/) {
+        $event_types->[-1] = $next_event{ $event_types->[-1] };
+    }
+    else {
+        push @$event_types, 'END_FLOW';
+    }
+}
+
+sub cb_end_outer_flow {
+    my ($self) = @_;
+    my $event_types = $self->events;
+    pop @$event_types;
     $event_types->[-1] = $next_event{ $event_types->[-1] };
 }
 
 sub start_mapping {
-    my ($self, $offset, $implicit_flowseq_map) = @_;
+    my ($self, $offset) = @_;
     my $offsets = $self->offset;
-    push @{ $self->events }, $implicit_flowseq_map ? 'IMAP' : 'MAP';
+    push @{ $self->events }, 'MAP';
     push @{ $offsets }, $offset;
     my $event_stack = $self->event_stack;
     my $info = { name => 'mapping_start_event' };
@@ -754,38 +775,47 @@ sub _remaining_tokens {
     return \@tokens;
 }
 
+# deprecated
 sub event_to_test_suite {
-    my ($self, $event) = @_;
-    if (ref $event eq 'ARRAY') {
-        return YAML::PP::Common::event_to_test_suite($event->[1]);
+    # uncoverable subroutine
+    my ($self, $event) = @_; # uncoverable statement
+    if (ref $event eq 'ARRAY') { # uncoverable statement
+        return YAML::PP::Common::event_to_test_suite($event->[1]); # uncoverable statement
     }
-    return YAML::PP::Common::event_to_test_suite($event);
+    return YAML::PP::Common::event_to_test_suite($event); # uncoverable statement
 }
 
 sub debug_events {
-    my ($self) = @_;
-    $self->note("EVENTS: ("
-        . join (' | ', @{ $_[0]->events }) . ')'
+    # uncoverable subroutine
+    my ($self) = @_; # uncoverable statement
+    $self->note("EVENTS: (" # uncoverable statement
+        . join (' | ', @{ $_[0]->events }) . ')' # uncoverable statement
     );
-    $self->debug_offset;
+    $self->debug_offset; # uncoverable statement
 }
 
 sub debug_offset {
-    my ($self) = @_;
+    # uncoverable subroutine
+    my ($self) = @_; # uncoverable statement
     $self->note(
         qq{OFFSET: (}
+        # uncoverable statement count:1
+        # uncoverable statement count:2
+        # uncoverable statement count:3
         . join (' | ', map { defined $_ ? sprintf "%-3d", $_ : '?' } @{ $_[0]->offset })
+        # uncoverable statement
         . qq/) level=@{[ $_[0]->level ]}]}/
     );
 }
 
 sub debug_yaml {
-    my ($self) = @_;
-    my $line = $self->lexer->line;
-    $self->note("LINE NUMBER: $line");
-    my $next_tokens = $self->lexer->next_tokens;
-    if (@$next_tokens) {
-        $self->debug_tokens($next_tokens);
+    # uncoverable subroutine
+    my ($self) = @_; # uncoverable statement
+    my $line = $self->lexer->line; # uncoverable statement
+    $self->note("LINE NUMBER: $line"); # uncoverable statement
+    my $next_tokens = $self->lexer->next_tokens; # uncoverable statement
+    if (@$next_tokens) { # uncoverable statement
+        $self->debug_tokens($next_tokens); # uncoverable statement
     }
 }
 
@@ -815,60 +845,64 @@ sub got {
 }
 
 sub _colorize_warn {
-    my ($self, $colors, $text) = @_;
-    require Term::ANSIColor;
-    warn Term::ANSIColor::colored($colors, $text), "\n";
+    # uncoverable subroutine
+    my ($self, $colors, $text) = @_; # uncoverable statement
+    require Term::ANSIColor; # uncoverable statement
+    warn Term::ANSIColor::colored($colors, $text), "\n"; # uncoverable statement
 }
 
 sub debug_event {
-    my ($self, $event) = @_;
-    my $str = YAML::PP::Common::event_to_test_suite($event);
-    require Term::ANSIColor;
-    warn Term::ANSIColor::colored(["magenta"], "============ $str"), "\n";
+    # uncoverable subroutine
+    my ($self, $event) = @_; # uncoverable statement
+    my $str = YAML::PP::Common::event_to_test_suite($event); # uncoverable statement
+    require Term::ANSIColor; # uncoverable statement
+    warn Term::ANSIColor::colored(["magenta"], "============ $str"), "\n"; # uncoverable statement
 }
 
 sub debug_rules {
-    my ($self, $rules) = @_;
-    local $Data::Dumper::Maxdepth = 2;
-    $self->note("RULES:");
-    for my $rule ($rules) {
-        if (ref $rule eq 'ARRAY') {
-            my $first = $rule->[0];
-            if (ref $first eq 'SCALAR') {
-                $self->info("-> $$first");
+    # uncoverable subroutine
+    my ($self, $rules) = @_; # uncoverable statement
+    local $Data::Dumper::Maxdepth = 2; # uncoverable statement
+    $self->note("RULES:"); # uncoverable statement
+    for my $rule ($rules) { # uncoverable statement
+        if (ref $rule eq 'ARRAY') { # uncoverable statement
+            my $first = $rule->[0]; # uncoverable statement
+            if (ref $first eq 'SCALAR') { # uncoverable statement
+                $self->info("-> $$first"); # uncoverable statement
             }
-            else {
-                if (ref $first eq 'ARRAY') {
-                    $first = $first->[0];
+            else { # uncoverable statement
+                if (ref $first eq 'ARRAY') { # uncoverable statement
+                    $first = $first->[0]; # uncoverable statement
                 }
-                $self->info("TYPE $first");
+                $self->info("TYPE $first"); # uncoverable statement
             }
         }
-        else {
-            eval {
-                my @keys = sort keys %$rule;
-                $self->info("@keys");
+        else { # uncoverable statement
+            eval { # uncoverable statement
+                my @keys = sort keys %$rule; # uncoverable statement
+                $self->info("@keys"); # uncoverable statement
             };
         }
     }
 }
 
 sub debug_tokens {
-    my ($self, $tokens) = @_;
-    $tokens ||= $self->tokens;
-    require Term::ANSIColor;
-    for my $token (@$tokens) {
-        my $type = Term::ANSIColor::colored(["green"],
-            sprintf "%-22s L %2d C %2d ",
-                $token->{name}, $token->{line}, $token->{column} + 1
+    # uncoverable subroutine
+    my ($self, $tokens) = @_; # uncoverable statement
+    $tokens ||= $self->tokens; # uncoverable statement
+    require Term::ANSIColor; # uncoverable statement
+    for my $token (@$tokens) { # uncoverable statement
+        my $type = Term::ANSIColor::colored(["green"], # uncoverable statement
+            sprintf "%-22s L %2d C %2d ", # uncoverable statement
+                $token->{name}, $token->{line}, $token->{column} + 1 # uncoverable statement
         );
-        local $Data::Dumper::Useqq = 1;
-        local $Data::Dumper::Terse = 1;
-        require Data::Dumper;
-        my $str = Data::Dumper->Dump([$token->{value}], ['str']);
-        chomp $str;
-        $str =~ s/(^.|.$)/Term::ANSIColor::colored(['blue'], $1)/ge;
-        warn "$type$str\n";
+        local $Data::Dumper::Useqq = 1; # uncoverable statement
+        local $Data::Dumper::Terse = 1; # uncoverable statement
+        require Data::Dumper; # uncoverable statement
+        my $str = Data::Dumper->Dump([$token->{value}], ['str']); # uncoverable statement
+        chomp $str; # uncoverable statement
+        $str =~ s/(^.|.$)/Term::ANSIColor::colored(['blue'], $1)/ge; # uncoverable statement
+        warn "$type$str\n"; # uncoverable statement
     }
 
 }
@@ -1075,6 +1109,7 @@ sub cb_question {
 
 sub cb_flow_question {
     my ($self, $res) = @_;
+    $self->set_new_node(2);
 }
 
 sub cb_empty_complexvalue {
@@ -1233,20 +1268,6 @@ sub cb_end_flowmap_empty {
     $self->set_new_node(0);
 }
 
-sub cb_flow_plain {
-    my ($self, $token) = @_;
-    my $stack = $self->event_stack;
-    my $info = {
-        style => YAML_PLAIN_SCALAR_STYLE,
-        value => $token->{value},
-        offset => $token->{column},
-    };
-    if (@$stack and $stack->[-1]->[0] eq 'properties') {
-        $self->fetch_inline_properties($stack, $info);
-    }
-    $self->scalar_event($info);
-}
-
 sub cb_flowkey_plain {
     my ($self, $token) = @_;
     my $stack = $self->event_stack;
@@ -1344,7 +1365,7 @@ sub cb_insert_implicit_flowseq_map {
     my $stack = $self->event_stack;
     my $scalar = pop @$stack;
     my $info = $scalar->[1];
-    $self->start_mapping($info->{offset}, 1);
+    $self->start_flow_mapping($info->{offset}, 1);
     $self->scalar_event($info);
     $self->set_new_node(1);
 }
@@ -1354,7 +1375,7 @@ sub cb_insert_empty_implicit_flowseq_map {
     my $stack = $self->event_stack;
     my $scalar = pop @$stack;
     my $info = $scalar->[1];
-    $self->start_mapping($info->{offset}, 1);
+    $self->start_flow_mapping($info->{offset}, 1);
     $self->cb_empty_flowmap_value;
     $self->set_new_node(2);
 }

@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.09;
+use Object::Pad 0.57;
 
-package Tickit::Widget::LinearSplit 0.33;
+package Tickit::Widget::LinearSplit 0.34;
 class Tickit::Widget::LinearSplit
-   extends Tickit::ContainerWidget;
+   :isa(Tickit::ContainerWidget);
 
 use Tickit::Window 0.32; # needs drag_start
 

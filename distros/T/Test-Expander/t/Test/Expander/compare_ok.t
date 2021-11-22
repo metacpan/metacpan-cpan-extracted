@@ -9,6 +9,7 @@ use Test::Builder::Tester tests => 1;
 
 use Test::Expander;
 
+$METHOD //= 'compare_ok';
 my $dir   = path(__FILE__)->parent->child($METHOD);
 my $title = 'execution';
 test_out("ok 1 - $title");

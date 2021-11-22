@@ -40,16 +40,20 @@ else {
   }
 }
 
-my $float = Math::MPFR->new(0.1);
+my $float = Rmpfr_init2(2500);
+Rmpfr_set_NV($float, 0.1, MPFR_RNDN);
+$float /= 117;
 
-my $write = open WR, '>', 'fpif.txt';
+my($wr, $rd); # filehandles
+
+my $write = open $wr, '>', 'fpif.txt';
 
 warn "Couldn't open export file for writing: $!"
   unless $write;
 
 if($write) {
-  binmode(WR);
-  eval {$ret = Rmpfr_fpif_export(\*WR, $float);};
+  binmode($wr);
+  eval {$ret = Rmpfr_fpif_export($wr, $float);};
   if($@) {
     if($@ =~ /^Rmpfr_fpif_export not implemented \- need at least mpfr\-4\.0\.0/) {print "ok 2\n"}
     else {
@@ -65,23 +69,23 @@ else {
   }
 }
 
- close WR or warn "Could not close export file: $!";
+ close $wr or warn "Could not close export file: $!";
 }
 else {
   warn "\n Skipping test 2: export file not created\n";
   print "ok 2\n";
 }
 
-my $retrieve = Math::MPFR->new();
+my $retrieve = Rmpfr_init2(2500);
 
-my $read = open RD, '<', 'fpif.txt';
+my $read = open $rd, '<', 'fpif.txt';
 
 warn "Couldn't open export file for reading: $!"
   unless $read;
 
 if($read) {
-  binmode(RD);
-  eval {$ret = Rmpfr_fpif_import($retrieve, \*RD);};
+  binmode($rd);
+  eval {$ret = Rmpfr_fpif_import($retrieve, $rd);};
   if($@) {
     if($@ =~ /^Rmpfr_fpif_import not implemented \- need at least mpfr\-4\.0\.0/) {print "ok 3\n"}
     else {
@@ -97,7 +101,7 @@ else {
   }
 }
 
- close RD or warn "Could not close export file: $!";
+ close $rd or warn "Could not close export file: $!";
 }
 else {
   warn "\n Skipping test 3: import file not readable\n";

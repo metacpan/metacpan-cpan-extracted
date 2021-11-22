@@ -8,7 +8,7 @@ package IO::Async::Internals::FunctionWorker;
 use strict;
 use warnings;
 
-our $VERSION = '0.79';
+our $VERSION = '0.800';
 
 # Called directly by IO::Async::Function::Worker when used in "code" mode,
 # or by run_worker() below.

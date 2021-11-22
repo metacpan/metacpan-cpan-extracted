@@ -7,12 +7,17 @@ $Data::Dumper::Sortkeys = 1;
 
 use Getopt::EX::Hashed 'has';
 
-has string    => '=s';
-has say       => '=s', default => "Hello";
-has number    => '=i';
-has thank_you => '';
-has for_all   => '';
-has the_fish  => '';
+has string     => '=s';
+has say        => '=s', default => "Hello";
+has number     => '=i';
+has thank_you  => '';
+has for_all    => '';
+has the_fish   => '';
+has restaurant => '=s';
+
+has '+restaurant' => sub {
+    $_->{"$_[0]"} = "$_[1] at the end of universe.";
+};
 
 @ARGV = qw(
     --string Alice
@@ -20,6 +25,7 @@ has the_fish  => '';
     --thank_you
     --for-all
     --thefish
+    --restaurant Milliways
     );
 
 use Getopt::Long;
@@ -38,5 +44,8 @@ is($app->{number},         42, "Number");
 is($app->{thank_you},       1, "underscore");
 is($app->{for_all},         1, "replace underscore");
 is($app->{the_fish},        1, "remove underscore");
+is($app->{restaurant},
+   "Milliways at the end of universe.",
+   "default (action)");
 
 done_testing;

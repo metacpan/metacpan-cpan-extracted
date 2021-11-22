@@ -61,8 +61,8 @@ $c = $x->slice('*3,');
 sumover($c->clump(-1),($sum=null));
 
 ok(tapprox($y,$c));
-is($sum->at, 9);
-is(join(',',$c->dims), "3,2");
+is($sum->at, 9, 'sum of dummy=3 slice gives right value');
+is(join(',',$c->dims), "3,2", 'right dims with dummy slice');
 
 # test stringify
 $x = zeroes(3,3);
@@ -72,14 +72,14 @@ $x++;
 # $line += 0; # that's how to force an update before interpolation
 my $linepr = "$line";
 
-is($linepr, '[1 1 1]');
+is($linepr, '[1 1 1]', 'right value after collapsing slice (0)');
 
 # Test whether error is properly returned:
 
 $y = zeroes(5,3,3);
 $c = $y->slice(":,:,1");
 
-is(join(',',$c->dims), "5,3,1");
+is(join(',',$c->dims), "5,3,1", 'single-coord slice dims right');
 
 eval { my $d = $c->slice(":,:,2"); "$d" };
 
@@ -194,7 +194,8 @@ $y = $x->reorder(@newDimOrder);
 # since doing floating-point arithmetic here, should probably
 # use a better test than "eq" here
 #
-is($y->average->average->sum , 72.5, "Test of reorder");
+my $got = [$y->dims];
+is_deeply($got, [2,3,5], "Test of reorder") or diag explain $got;
 
 $x = zeroes(3,4);
 $y = $x->dummy(-1,2);
@@ -444,5 +445,26 @@ my $y = $x->slice('10:90,10:90');
 $y++;
 ok( (not $y->allocated) ) ;
 }
+
+my $indices = pdl([]);
+$got = eval { my $s = pdl([1,2])->slice(pdl(1)); $s.''; $s->nelem };
+is $@, '', 'slice 2-elt ndarray with one-length ndarray';
+is $got, 1, 'right dim from 2-elt with one index';
+$got = eval { my $s = pdl([1,2])->slice($indices); $s.''; $s->nelem };
+is $@, '', 'slice 2-elt ndarray with zero-length ndarray';
+is $got, 0, 'zero dim from 2-elt';
+$got = eval { my $s = pdl([1])->slice($indices); $s.''; $s->nelem };
+is $@, '', 'slice 1-elt ndarray with zero-length ndarray';
+is $got, 0, 'zero dim from 1-elt';
+
+my $pa = sequence 10;
+my $c = PDL->pdl(7,6);
+$got = $pa->slice([$c->slice(1),0,0]);
+is "".$got, 6, 'slice did "at" automatically' or diag "got:$got";
+
+my $cmp = pdl(2,4,6);
+my $rg = pdl(2,7,2);
+$got = $pa->slice([$rg->slice(0),$rg->slice(1),$rg->slice(2)]);
+ok all($got == $cmp), 'slice did "at"' or diag "got:$got";
 
 done_testing;

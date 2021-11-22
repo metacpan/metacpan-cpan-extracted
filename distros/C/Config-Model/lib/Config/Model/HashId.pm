@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::HashId 2.144;
+package Config::Model::HashId 2.145;
 
 use Mouse;
 use 5.10.1;
@@ -588,7 +588,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.144
+version 2.145
 
 =head1 SYNOPSIS
 

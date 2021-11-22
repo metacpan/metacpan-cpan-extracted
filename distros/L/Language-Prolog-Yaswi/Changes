@@ -1,5 +1,14 @@
 Revision history for Perl extension Language::Prolog::Yaswi.
 
+0.22 2021-11-13 02:35:40-0500
+        - Fix typos in SYNOPSIS (thanks to Dmitri Tikhonov @dtikhonov).
+        - Update build configuration to try to use two hyphens (Zakariyya
+          Mughal @zmughal).
+        - Adjust list parsing to SWI Prolog 7. CPAN RT#105114 (thanks to Petr
+          Písař @ppisar).
+        - Add support for PL_NIL term type for SWI Prolog 7 (Zakariyya Mughal
+          @zmughal).
+
 0.21  Jul 5, 2012
         - search for swi-prolog as swipl, swi-prolog and pl
         - include PLLDFLAGS in compilation

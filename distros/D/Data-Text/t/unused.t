@@ -21,14 +21,14 @@ if($ENV{AUTHOR_TESTING}) {
 if($can_test) {
 	BEGIN {
 		if($ENV{AUTHOR_TESTING}) {
-			use_ok('CGI::Info');
+			use_ok('Data::Text');
 			# eval 'use warnings::unused -global';
 			eval 'use warnings::unused';
 		}
 	}
 
 	if($ENV{AUTHOR_TESTING}) {
-		new_ok('CGI::Info');
+		new_ok('Data::Text');
 		plan(tests => 2);
 	} else {
 		plan(skip_all => 'Author tests not required for installation');

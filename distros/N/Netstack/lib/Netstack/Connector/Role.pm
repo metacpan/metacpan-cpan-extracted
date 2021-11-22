@@ -1,10 +1,11 @@
-package Firewall::Connector::Role;
+package Netstack::Connector::Role;
 
 #------------------------------------------------------------------------------
 # 加载扩展模块
 #------------------------------------------------------------------------------
 use 5.016;
 use utf8;
+use Encode;
 use Try::Tiny;
 use Expect;
 use Moose::Role;
@@ -416,6 +417,7 @@ sub execCommands {
 
   # 初始化 result 变量，并开始执行命令
   my $result = "";
+
   # 初始化 commands 属性
   $self->setCommands( \@commands );
   # 遍历接受到的命令行
@@ -439,7 +441,25 @@ sub execCommands {
     }
     # 脚本执行正常,则拼接字符串
     $result .= $buff;
+
+    # 通过 NOTEPAD++ 可以观察数据 015(CR)
+    # H3C 部分交换机乱码
+    $result =~ s/\s{15}\015//g;
+    # PA防火墙部分字串乱码 | 010(空格) (033) ESC
+    $result =~ s/\s\010//g;
+    $result =~ s/\033\[\?1.*=\015//g;
+    $result =~ s/\033\[7m\033\[27m\033\[K(\015)?//g;
+    $result =~ s/\033\[K//g;
+    $result =~ s/\033\[\?1l\033\>//g;
+
+    # 通用字串修正
+    $result =~ s/\r?\n$//g;
+    $result =~ s/\s\^H//g;
+    $result =~ s/(\015)+//g;
   }
+
+  # 将字串转换为 utf8
+  $result = decode_utf8 $result;
 
   # 输出计算结果
   return {

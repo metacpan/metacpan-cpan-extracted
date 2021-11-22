@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-Mailgun
 
+0.13 2021-11-22T13:21:38Z
+    - use JSON (thanks justingit)
+
 0.12 2021-10-19T00:39:54Z
     - Add MIME support (thanks justingit)
 

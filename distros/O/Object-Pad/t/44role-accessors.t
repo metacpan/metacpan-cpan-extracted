@@ -11,7 +11,7 @@ role ARole {
    has $one :reader = 1;
 }
 
-class AClass does ARole {
+class AClass :does(ARole) {
 }
 
 # RT136507
@@ -24,7 +24,7 @@ role BRole {
    has $data :reader :param;
 }
 
-class BClass does BRole {
+class BClass :does(BRole) {
 }
 
 {

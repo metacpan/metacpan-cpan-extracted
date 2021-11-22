@@ -5,12 +5,19 @@ use 5.020;
 
 use exact;
 use exact::class;
-use Template;
-use Bible::OBML;
 
-our $VERSION = '1.16'; # VERSION
+BEGIN {
+    local $SIG{__WARN__} = sub {};
+    require Template;
+    Template->import;
+}
 
-has obml => sub { Bible::OBML->new };
+our $VERSION = '1.17'; # VERSION
+
+has obml => sub {
+    require Bible::OBML;
+    Bible::OBML->new;
+};
 
 has settings => sub { +{
     FILTERS => {
@@ -225,7 +232,7 @@ Bible::OBML::HTML - Render OBML as HTML
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =for test_synopsis my( $obml, $filename, $data, $skip_smartify );
 

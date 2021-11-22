@@ -368,7 +368,7 @@ foreach my $model (qw( fork thread spawn )) {
       skip "This Perl does not support threads", 9
          if $model eq "thread" and not IO::Async::OS->HAVE_THREADS;
       skip "This Perl does not support fork()", 9
-         if $model eq "fork" and not IO::Async::OS->HAVE_POSIX_FORK;
+         if $model =~ m/fork|spawn/ and not IO::Async::OS->HAVE_POSIX_FORK;
 
       my $function = IO::Async::Function->new(
          model  => $model,

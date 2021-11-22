@@ -2,20 +2,26 @@ package App::SpamcupNG;
 use warnings;
 use strict;
 use LWP::UserAgent 6.05;
-use HTML::Form 6.03;
+use HTML::Form 6.07;
 use HTTP::Cookies 6.01;
 use Getopt::Std;
-use HTML::Entities 3.69;
 use YAML::XS 0.62 qw(LoadFile);
 use File::Spec;
 use Hash::Util qw(lock_hash);
 use Exporter 'import';
 use Log::Log4perl 1.48 qw(get_logger :levels);
 use Carp;
-use HTML::TreeBuilder::XPath 0.14;
+
+use App::SpamcupNG::HTMLParse (
+    'find_next_id',       'find_errors',
+    'find_warnings',      'find_spam_header',
+    'find_best_contacts', 'find_receivers'
+);
+
+use constant TARGET_HTML_FORM => 'sendreport';
 
 our @EXPORT_OK
-    = qw(read_config main_loop get_browser %OPTIONS_MAP config_logger);
+    = qw(read_config main_loop get_browser %OPTIONS_MAP config_logger TARGET_HTML_FORM);
 our %OPTIONS_MAP = (
     'check_only' => 'n',
     'all'        => 'a',
@@ -38,7 +44,7 @@ my %regexes = (
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =head1 NAME
 
@@ -106,6 +112,19 @@ sub read_config {
     }
 
     return $data->{Accounts};
+}
+
+sub _report_form {
+    my ( $html_doc, $base_uri ) = @_;
+    my @forms = HTML::Form->parse( $html_doc, $base_uri );
+
+    foreach my $form (@forms) {
+        my $name = $form->attr('name');
+        next unless defined($name);
+        return $form if ( $name eq TARGET_HTML_FORM );
+    }
+
+    return undef;
 }
 
 =pod
@@ -342,54 +361,10 @@ sub _self_auth {
 
 }
 
-sub _check_next_id {
-    my $content_ref = shift;
-    my $next_id;
-    my $logger = get_logger('SpamcupNG');
-
-    if ( $$content_ref =~ $regexes{next_id} ) {
-        $next_id = $1;
-        $logger->info("ID of the next SPAM is '$next_id'");
-    }
-    else {
-        # userid ok, no new spam
-        $logger->info('No unreported SPAM found.');
-    }
-
-    return $next_id;
-}
-
-sub _check_warning {
-    my $content_ref = shift;
-    my $tree        = HTML::TreeBuilder::XPath->new;
-    $tree->parse_content($$content_ref);
-    my @errors = $tree->findnodes('//div[@id="content"]/div[@class="warn"]');
-
-    if ( scalar(@errors) > 0 ) {
-        return $errors[0]->as_trimmed_text;
-    }
-    else {
-        return;
-    }
-}
-
-sub _check_error {
-    my $content_ref = shift;
-    my $tree        = HTML::TreeBuilder::XPath->new;
-    $tree->parse_content($$content_ref);
-    my @errors = $tree->findnodes('//div[@id="content"]/div[@class="error"]');
-
-    if ( scalar(@errors) > 0 ) {
-        return $errors[0]->as_trimmed_text;
-    }
-    else {
-        return;
-    }
-}
-
 sub main_loop {
     my ( $ua, $opts_ref ) = @_;
     my $logger = get_logger('SpamcupNG');
+    binmode( STDOUT, ":utf8" );
 
     # last seen SPAM id
     my $last_seen;
@@ -405,7 +380,7 @@ sub main_loop {
     my $next_id;
 
     if ($response) {
-        $next_id = _check_next_id( \$response );
+        $next_id = find_next_id( \$response );
         return -1 unless ( defined($next_id) );
     }
     else {
@@ -447,35 +422,41 @@ sub main_loop {
         return 0;
     }
 
-    if ( my $warn_msg = _check_warning( \( $res->content ) ) ) {
-        $logger->warn($warn_msg);
+    if ( my $warns_ref = find_warnings( \( $res->content ) ) ) {
+        foreach my $warning ( @{$warns_ref} ) {
+            $logger->warn($warning);
+        }
     }
 
-    if ( my $error_msg = _check_error( \( $res->content ) ) ) {
+    if ( my $errors_ref = find_errors( \( $res->content ) ) ) {
 
-        my $is_fatal = 0;
+        foreach my $error ( @{$errors_ref} ) {
+            my $is_fatal = 0;
 
-        for my $fatal_error ( keys(%fatal_errors) ) {
+            foreach my $fatal_error ( keys(%fatal_errors) ) {
 
-            if ( $error_msg =~ $fatal_errors{$fatal_error} ) {
-                $is_fatal = 1;
-                last;
+                if ( $error =~ $fatal_errors{$fatal_error} ) {
+                    $is_fatal = 1;
+                    last;
+                }
+
+            }
+
+            if ($is_fatal) {
+                $logger->fatal($error);
+
+              # must stop processing the HTML for this report and move to next
+                return 0;
+            }
+            else {
+                $logger->error($error);
             }
 
         }
 
-        if ($is_fatal) {
-            $logger->fatal($error_msg);
-
-            # must stop processing the HTML for this report and move to next
-            return 0;
-        }
-        else {
-            $logger->error($error_msg);
-        }
     }
 
-    # parse the spam
+    # parsing the SPAM
     my $_cancel  = 0;
     my $base_uri = $res->base();
 
@@ -485,23 +466,17 @@ sub main_loop {
         );
     }
 
-# :TODO:07/02/2018 10:17:30:ARFREITAS: too many regexes being compiled repeated times, compile than once and reuse them later!
-    $res->content
-        =~ /(\<form action[^>]+name=\"sendreport\"\>.*?\<\/form\>)/sgi;
-    my $form_data = $1;
-
-    if ( defined($form_data) ) {
-        $form_data = "<html><body>$1</body></html>";
-    }
-    else {
-        $logger->error('Could not parse form data from HTTP response');
-
-        # :WORKAROUND:18/02/2018 14:20:17:ARFREITAS: to avoid warnings
-        $form_data = '';
+    if ( $logger->is_debug ) {
+        $logger->debug("Base URI is $base_uri");
     }
 
-    # :TODO:18/02/2018 14:19:49:ARFREITAS: refactor to make form parsing a sub
-    my $form = HTML::Form->parse( $form_data, $base_uri );
+    if ( $logger->is_info ) {
+        my $best_ref     = find_best_contacts( $res->content );
+        my $best_as_text = join( ', ', @$best_ref );
+        $logger->info("Best contacts for SPAM reporting: $best_as_text");
+    }
+
+    my $form = _report_form( $res->content, $base_uri );
 
     if ( $res->content
         =~ /Please make sure this email IS spam.*?size=2\>\n(.*?)\<a href\=\"\/sc\?id\=$next_id/sgi
@@ -509,13 +484,9 @@ sub main_loop {
     {
 
         if ( $logger->is_info ) {
-            my $spamhead = decode_entities($1);
-            $spamhead =~ s/\n/\t/igs;    # prepend a tab to each line
-            $spamhead =~ s/<\/?strong>//gi;
-            $spamhead =~ s/<br>/\n/gsi;
-            $spamhead =~ s/<\/?font>//gi;
-            binmode( STDOUT, ":utf8" );
-            $logger->info("Head of the SPAM follows:\n$spamhead");
+            my $spam_header_ref = find_spam_header($1);
+            my $as_string       = join( "\n", @$spam_header_ref );
+            $logger->info("Head of the SPAM follows:\n$as_string");
         }
 
         # parse form fields
@@ -611,9 +582,10 @@ sub main_loop {
         }
 
     }
-    elsif ( $res->content =~ /Send Spam Report\(S\) Now/gi ) {
 
 # this happens rarely, but I've seen this; spamcop does not show preview headers for some reason
+    elsif ( $res->content =~ /Send Spam Report\(S\) Now/gi ) {
+
         unless ( $opts_ref->{stupid} ) {
             print
                 "* Preview headers not available, but you can still report this. Are you sure this is spam? [y/N] ";
@@ -688,12 +660,12 @@ sub main_loop {
         }
         sleep $opts_ref->{delay};
         $res = LWP::UserAgent->new->request( $form->click() )
-            ;              # click default button, submit
+            ;    # click default button, submit
     }
-    else {                 # CANCEL SPAM
+    else {       # CANCEL SPAM
         $logger->debug('About to cancel report.');
         $res = LWP::UserAgent->new->request( $form->click('cancel') )
-            ;              # click cancel button
+            ;    # click cancel button
     }
 
     if ( $logger->is_debug ) {
@@ -708,41 +680,35 @@ sub main_loop {
     }
 
     if ($_cancel) {
-        return 1;    # user decided this mail is not spam
+        return 1;    # user decided this mail is not SPAM
     }
 
-    # parse respond
-    my $report;
+    # parse response
+    my $receivers_ref = find_receivers( $res->content );
 
-    if ( $res->content =~ /(Spam report id .*?)\<p\>/gsi ) {
-        $report = $1 || "-none-\n";
-        $report =~ s/\<br\>//gi;
-    }
-    elsif ( $res->content =~ /report for mole\@devnull.spamcop.net/ ) {
-        $report = 'Mole report(s)';
-    }
-    elsif ( $res->content =~ /\/dev\/null/ ) {
-        my $tree = HTML::TreeBuilder::XPath->new;
-        $tree->parse_content( $res->content );
-        my @dev_nulling = $tree->findnodes('//*[@id="content"]');
-        $report = $dev_nulling[0]->as_trimmed_text;
-    }
-    else {
-        $logger->warn(
-            'Spamcop.net returned unexpected content (no SPAM report id). If this does not happen very often you can ignore this. Otherwise check if there new version available. Continuing.'
-        );
-    }
+    if ( scalar( @{$receivers_ref} ) > 0 ) {
 
-    # print the report
-    if ( $logger->is_info ) {
+        # print the report
+        if ( $logger->is_info ) {
 
-        if ($report) {
+            my $report = join( "\n", @{$receivers_ref} );
             $logger->info(
                 "Spamcop.net sent following SPAM reports:\n$report");
+
+            $logger->info('Finished processing.');
         }
 
-        $logger->info('Finished processing.');
-
+    }
+    else {
+        my $msg = <<'EOM';
+Spamcop.net returned unexpected content (no SPAM report id, no receiver).
+Please make check if there new version of App-SpamcupNG available and upgrade it.
+If you already have the latest version, please open a bug report in the
+App-SpamcupNG homepage and provide the next lines with the HTML response
+provided by Spamcop.
+EOM
+        $logger->warn($msg);
+        $logger->warn( $res->content );
     }
 
     return 1;

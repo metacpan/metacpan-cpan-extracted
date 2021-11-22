@@ -3,10 +3,11 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'		=> 'Text::Document',
-    'VERSION'		=> '1.07',
+    'VERSION'		=> '1.08',
     'PREREQ_PM'		=> {
-    	Bit::Vector => 6.0,
-	FileHandle => 2.00,
+    	Bit::Vector => 7.4,
+	    FileHandle => 2.00,
+	    DB_File => 1.843
     }, 
     'LIBS'		=> [''], # e.g., '-lm'
     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'

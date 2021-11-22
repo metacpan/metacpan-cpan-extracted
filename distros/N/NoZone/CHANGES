@@ -1,5 +1,20 @@
 Revision history for perl module NoZone
 
+1.3 2021-11-12
+
+ - Add support for DMARC records
+
+1.2 2021-11-09
+
+ - Switch config file to YAML format
+ - Add support for DKIM records
+ - Add support for TXT records
+ - Remove support for SPF type for SPF records
+
+1.1 2015-11-22
+
+ - Add support for generating SPF records
+
 1.0 2013-03-16
 
  - Initial release

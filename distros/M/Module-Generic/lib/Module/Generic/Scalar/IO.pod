@@ -112,7 +112,27 @@ This will fetch all 6 lines, except the first one will only contain:
 
 i.e. without the leading "M", since L</getc> positioned us after.
 
-SO, be careful about your position in the string.
+So, be careful about your position in the string.
+
+=head2 line
+
+Provided with a callback as a subroutine reference or anonymous subroutine, and this will call the callback passing it each line of the scalar.
+
+If the callback returns C<undef>, this will terminate the browsing of each line, unless the option I<auto_next> is set. See below.
+
+It takes some optional arguments as follow:
+
+=over 4
+
+=item I<chomp> boolean
+
+If true, each line will be L<perlfunc/chomp>'ed before being passed to the callback.
+
+=item I<auto_next> boolean
+
+If true, this will ignore the return value from the callback and will move on to the next line.
+
+=back
 
 =head2 object
 

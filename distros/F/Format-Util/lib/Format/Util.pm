@@ -10,7 +10,7 @@ Format::Util - Miscellaneous routines to do with manipulating with strings and n
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 

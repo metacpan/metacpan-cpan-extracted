@@ -43,7 +43,6 @@ I<Options>:
     -e | --email     Mandatory: The email address of the author
     -u | --user      Optional:  The Github username (eg. stevieb9)
     -r | --repo      Optional:  The Github repository name (eg. test-module)
-    -w | --wait      Optional:  Wait for CI test results (--nowait to disable)
     -V | --verbose   Optional:  Display verbose output for each process
 
 I<Note>: For Git integration, create an empty repository on Github, then supply
@@ -83,6 +82,7 @@ All of the below options are flags, and don't take any arguments.
     -b | --bugtracker   Insert bugtracker information into Makefile.PL
     -R | --repository   Insert repository information into Makefile.PL
     -A | --all          Insert/Install all above options
+    -V | --verbose  Optional:  (Flag) Display verbose output for each process
 
 I<Note>: For badges, bugtracker and repository, the C<--user> (Github username)
 and C<--repo> (Github repository) arguments must be supplied.
@@ -97,6 +97,8 @@ I<Options>:
     -i | --cpanid   Optional:  Your PAUSE userid
     -p | --cpanpw   Optional:  Your PAUSE userid's password
     -d | --dryrun   Optional:  (Flag) Don't actually upload to the CPAN
+    -w | --wait     Optional:  (Flag) Wait for confirmation of CI before uploading to CPAN (--nowait to disable)
+    -V | --verbose  Optional:  (Flag) Display verbose output for each process
 
 I<Note>: No Git operations will be performed without C<--repo> and C<--user>. If
 the C<--cpanid> or C<--cpanpw> aren't available or the C<CPAN_USERNAME> or

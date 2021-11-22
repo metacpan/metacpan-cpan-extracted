@@ -6,12 +6,12 @@ use open ':std', ':encoding(UTF-8)';
 use Encode qw( decode );
 use File::Spec ();
 use Class::Load qw( load_class );
-use Carp qw( carp croak );
+use Carp qw( carp croak confess);
 use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.083'; # VERSION
+our $VERSION = '0.085'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -32,6 +32,24 @@ sub BUILD {
     my ($self, $args) = @_;
     return $self->load_plugins(("Archive::BagIt::Plugin::Manifest::MD5", "Archive::BagIt::Plugin::Manifest::SHA512"));
 }
+
+###############################################
+
+
+has 'use_parallel' => (
+    is => 'rw',
+    lazy => 1,
+    default => 0,
+);
+
+###############################################
+
+
+has 'use_async' => (
+    is => 'rw',
+    lazy => 1,
+    default => 0,
+);
 
 ###############################################
 
@@ -191,11 +209,11 @@ has 'digest_callback' => (
     builder => sub {
         my $sub = sub {
             my ($digestobj, $filename) = @_;
-            open(my $fh, "<:raw", "$filename") or croak ("Cannot open $filename, $!");
+            open(my $fh, '<:raw', $filename) or confess("Cannot open '$filename', $!");
             binmode($fh);
             my $digest = $digestobj->get_hash_string($fh);
-            close $fh || croak("could not close file '$filename', $!");
-            return $digest;
+            close $fh or confess ("could not close file '$filename', $!");
+            $digest;
         };
         return $sub;
     }
@@ -939,6 +957,8 @@ sub make_bag {
 
 
 
+
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -955,7 +975,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.083
+version 0.085
 
 =head1 NAME
 
@@ -966,7 +986,7 @@ Achive::BagIt - The main module to handle Bags
 The original development version was on github at L<http://github.com/rjeschmi/Archive-BagIt>
 and may be cloned from there.
 
-The actual development version is available at L<https://art1pirat.spdns.org/art1/Archive-BagIt>
+The actual development version is available at L<https://git.fsfe.org/art1pirat/Archive-BagIt>
 
 =head1 Conformance to RFC8493
 
@@ -1018,8 +1038,10 @@ Try this:
 
    foreach my $algorithm ( keys %{ $self->manifests }) {
        my $entries_ref = $self->manifests->{$algorithm}->manifest_entries();
-       # $entries_ref returns a hashref of form:
-       # $entries_ref->{$algorithm}->{$file} = $digest;
+       # $entries_ref returns a hashref like:
+       # {
+       #     data/hello.txt   "e7c22b994c59d9cf2b48e549b1e24666636045930d3da7c1acb299d1c3b7f931f94aae41edda2c2b207a36e10f8bcb8d45223e54878f5b316e7ce3b6bc019629"
+       # }
    }
 
 Similar for tagmanifests
@@ -1080,6 +1102,19 @@ you have to enable UTF-8 support via 'System Administration' -> 'Region' -> 'Adm
 -> 'Region Settings' -> Flag 'Use Unicode UTF-8 for worldwide language support'
 
 Hint: The better way is to use only portable filenames. See L<perlport> for details.
+
+=head1 BUGS
+
+There are problems related to Parallel::parallel_map and IO::AIO under MS Windows. The tests are skipped there. Use the
+ parallel feature or the L<Archive::BagIt::Fast> at your own risks on a MS Window System.
+ If you are a MS Windows developer, feel free to send me patches or hints to fix the issues.
+
+=head1 THANKS
+
+Thanks to Rob Schmidt <rjeschmi@gmail.com> for the trustful handover of the project and thanks for your initial work!
+I would also like to thank Patrick Hochstenbach and Rusell McOrmond for their valuable and especially detailed advice!
+And without the helpful, sometimes rude help of the IRC channel #perl I would have been stuck in a lot of problems.
+Without the support of my colleagues at SLUB Dresden, the project would never have made it this far.
 
 =head1 SYNOPSIS
 
@@ -1153,11 +1188,24 @@ The arguments are:
 
 =item C<force_utf8> - if set the warnings about non portable filenames are disabled (default: enabled)
 
+=item C<use_async> - if set it uses IO::Async to read payload files asynchronly, only useful under Linux.
+
+=item C<use_parallel> - if set it uses Parallel::parallel_map to calculate digests of payload files in parallel,
+      only useful if underlying filesystem supports parallel read and if multiple CPU cores available.
+
 =back
 
 The bag object will use $bag_dir, BUT an existing $bag_dir is not read. If you use C<store()> an existing bag will be overwritten!
 
 See C<load()> if you want to parse/modify an existing bag.
+
+=head2 use_parallel()
+
+if set it uses parallel digest processing, default: false
+
+=head2 use_async()
+
+if set it uses async IO, default: false
 
 =head2 has_force_utf8()
 
@@ -1356,11 +1404,11 @@ web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Rob Schmidt <rjeschmi@gmail.com>
+Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

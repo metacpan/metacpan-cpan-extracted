@@ -4,9 +4,9 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS ':all';
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 sub new {
     my $class = shift;
@@ -44,9 +44,9 @@ DNS::LDNS::KeyList - Linked list of dnssec keys
 
 =head1 SYNOPSIS
 
-  use DNS::LDNS ':all'
+  use DNS::LDNS ();
 
-  my l = new DNS::LDNS::KeyList
+  my l = DNS::LDNS::KeyList->new
   l->set_use(bool)
   l->push(@keys)
   key = l->pop

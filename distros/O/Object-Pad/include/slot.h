@@ -17,7 +17,7 @@ struct SlotMeta {
     for(hooki = 0; slotmeta->hooks && hooki < av_count(slotmeta->hooks); hooki++) {       \
       struct SlotHook *h = (struct SlotHook *)AvARRAY(slotmeta->hooks)[hooki];            \
       if(*h->funcs->func)                                                                 \
-        (*h->funcs->func)(aTHX_ slotmeta, h->hookdata);                                   \
+        (*h->funcs->func)(aTHX_ slotmeta, h->hookdata, h->funcdata);                      \
     }                                                                                     \
   }
 
@@ -27,7 +27,7 @@ struct SlotMeta {
     for(hooki = 0; slotmeta->hooks && hooki < av_count(slotmeta->hooks); hooki++) {       \
       struct SlotHook *h = (struct SlotHook *)AvARRAY(slotmeta->hooks)[hooki];            \
       if(*h->funcs->func)                                                                 \
-        (*h->funcs->func)(aTHX_ slotmeta, h->hookdata, __VA_ARGS__);                      \
+        (*h->funcs->func)(aTHX_ slotmeta, h->hookdata, h->funcdata, __VA_ARGS__);         \
     }                                                                                     \
   }
 

@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.288    2021-11-17
+       - Fixed unmet dependency on App::DBBrowser::DropTable [RT #140081 - Igor Yu. Vlasenko].
+
 2.287    2021-10-21
         - Term::TablePrint minimum version is '0.148'.
 

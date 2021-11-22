@@ -29,6 +29,11 @@ use Data::Frame::Autobox ();
 use Role::Tiny ();
 Role::Tiny->apply_roles_to_package( 'PDL', 'Data::Frame::PDL' );
 
+# PDL versions between 2.040 and 2.054 has not PDL::Core::at_c
+unless (defined &PDL::Core::at_c) {
+    *PDL::Core::at_c = \&{"PDL::Core::at_bad_c"};
+}
+
 sub import {
     my ( $class, @tags ) = @_;
 
@@ -100,7 +105,7 @@ Data::Frame::Setup - Import stuffs into Data::Frame classes
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 SYNOPSIS
 

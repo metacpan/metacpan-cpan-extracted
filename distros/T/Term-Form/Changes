@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.540   2021-11-11
+    - Raised Perl minimum version to 5.10.0.
+    - Use '\v'.
+
 0.539   2021-10-02
         - Update 'validate_options'.
 

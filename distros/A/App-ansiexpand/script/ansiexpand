@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our $VERSION = "0.9901";
+
+BEGIN {
+    if ($0 =~ /unexpand$/) {
+	$App::ansiexpand::DEFAULT_UNEXPAND = 1;
+    }
+}
+
+use  App::ansiexpand;
+exit App::ansiexpand->new->run(splice @ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+ansiexpand, ansiunexpand - ANSI sequences aware tab expand/unexpand command
+
+=head1 SYNOPSIS
+
+ansiexpand [ option ] file ...
+
+ansiunexpand [ option ] file ...
+
+    -t# --tabstop=#              tab stop width
+        --tabhead=char           tab head character
+        --tabspace=char          tab space character
+        --tabstyle=style         tab style
+        --ambiguous=wide|narrow  width of Unicode ambiguous character
+
+=head1 VERSION
+
+Version 0.9901
+
+=head1 DESCRIPTION
+
+B<ansiexpand> is an L<expand(1)> compatible command utilizing
+L<Text::ANSI::Tabs> module, which enables to handle ANSI terminal
+sequences and Unicode wide characters.
+
+This is a command line interface for L<Text::ANSI::Tabs> module, which
+uses L<Text::ANSI::Fold> module as a backend.  Consult them for
+implementation detail.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--unexpand>, B<-u>
+
+Behave as unexpand command.
+
+=item B<--tabstop>=#, B<-t>#
+
+Set tab stop width.  Unlike L<expand(1)>, takes only single value.
+
+=item B<--tabhead>=I<char>
+
+=item B<--tabspace>=I<char>
+
+Set tab head and following space character.  If longer than single
+character, it is considered as a Unicode name.
+
+=item B<--tabstyle>=I<style>, B<--ts>=I<style>
+
+Set tab style.  Try C<--tabstyle=shade> for example.  See
+L<Text::ANSI::Fold> for detail.
+
+=item B<--ambiguous>=C<wide>|C<narrow>
+
+Set the width of Unicode ambiguous characters.  Default is C<narrow>.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F<~/.ansiexpandrc>, F<~/.ansiunexpandrc>
+
+Start-up file.
+See L<Getopt::EX::Module> for format.
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::ansiexpand
+    or
+    $ curl -sL http://cpanmin.us | perl - App::ansiexpand
+
+=head1 SEE ALSO
+
+L<App::ansiexpand>, L<https://github.com/kaz-utashiro/App-ansiexpand>
+
+L<Text::ANSI::Tabs|https://github.com/kaz-utashiro/Text-ANSI-Tabs>
+
+L<Text::ANSI::Fold|https://github.com/kaz-utashiro/Text-ANSI-Fold>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2021 Kazumasa Utashiro
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+#  LocalWords:  perl unexpand utf ansiexpand ansiunexpand tabstop
+#  LocalWords:  tabhead tabspace tabstyle Unicode ansiexpandrc cpanm
+#  LocalWords:  ansiunexpandrc CPANMINUS Kazumasa Utashiro

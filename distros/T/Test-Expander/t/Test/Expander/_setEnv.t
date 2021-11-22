@@ -10,6 +10,8 @@ use File::chdir;
 
 use Test::Expander -tempdir => {}, -srand => time;
 
+$METHOD     //= '_setEnv';
+$METHOD_REF //= $CLASS->can($METHOD);
 can_ok($CLASS, $METHOD);
 
 ok(-d $TEMP_DIR, "temporary directory '$TEMP_DIR' created");

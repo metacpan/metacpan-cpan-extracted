@@ -58,7 +58,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.15.9
+        v0.17.1
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -94,9 +94,10 @@ METHODS
     system is not activated and hence anyone may access and possibly modify
     the content of your object.
 
-    If the module runs under mod_perl, it is recognised and a clean up
-    registered routine is declared to Apache to clean up the content of the
-    object.
+    If the module runs under mod_perl, and assuming you have set the
+    variable "GlobalRequest" in your Apache configuration, it is recognised
+    and a clean up registered routine is declared to Apache to clean up the
+    content of the object.
 
   as_hash
     This will recursively transform the object into an hash suitable to be
@@ -258,6 +259,12 @@ METHODS
     Provided with some data, this will return a string representation of the
     data formatted by Data::Printer
 
+  dump_hex
+    Returns an hexadecimal dump of the data provided.
+
+    This requires the module Devel::Hexdump and will return "undef" and set
+    an "error" if not found.
+
   dump_print
     Provided with a file to write to and some data, this will format the
     string representation of the data using Data::Printer and save it to the
@@ -369,6 +376,22 @@ METHODS
     Set/get the error string, period. It does not produce any warning like
     error would do.
 
+  fatal
+    Boolean. If enabled, any error will call "die" in perlfunc instead of
+    returning "undef" in perlfunc and setting an error.
+
+    Defaults to false.
+
+    You can enable it in your own package by initialising it in your own
+    "init" method like this:
+
+        sub init
+        {
+            my $self = shift( @_ );
+            $self->{fatal} = 1;
+            return( $self->SUPER::init( @_ ) );
+        }
+
   get
     Uset to get an object data key value:
 
@@ -469,6 +492,24 @@ METHODS
     and *last_name* and can be accessed as methods, such as :
 
         my $fname = $object->first_name;
+
+    You can also alter the way "init" process the parameters received using
+    the following properties you can set in your own "init" method, for
+    example:
+
+        sub init
+        {
+            my $self = shift( @_ );
+            # Set the order in which the parameters are processed, because some methods may rely on other methods' value
+            $self->{_init_params_order} [qw( method1 method2 )];
+            # Enable strict sub, which means the corresponding method must exist for the parameter provided
+            $self->{_init_strict_use_sub} = 1;
+            # Set the class name of the exception to use in error()
+            # Here My::Package::Exception should inherit from Module::Generic::Exception or some other Exception package
+            $self->{_exception_class} = 'My::Package::Exception';
+            $self->SUPER::init( @_ ) || return( $self->pass_error );
+            return( $self );
+        }
 
   log_handler
     Provided a reference to a sub routine or an anonymous sub routine, this
@@ -971,6 +1012,8 @@ SPECIAL METHODS
     Provided with a class/package name, this returns true if the module is
     already loaded or false otherwise.
 
+    It performs this test by checking if the module is already in %INC.
+
   _is_array
     Provided with some data, this checks if the data is of type array, even
     if it is an object.
@@ -1027,9 +1070,33 @@ SPECIAL METHODS
     An empty string or "undef" can be provided and will not be checked.
 
   _load_class
-    Provided with a class/package name and this will attempt to load the
-    module. This uses "load_class" in Class::Load to achieve that purpose
-    and return whatever value "load_class" in Class::Load returns.
+        $self->_load_class( 'My::Module' ) || die( $self->error );
+        $self->_load_class( 'My::Module', qw( :some_tags SOME_CONSTANTS_TO_IMPORT ) ) || die( $self->error );
+        $self->_load_class(
+            'My::Module',
+            qw( :some_tags SOME_CONSTANTS_TO_IMPORT ),
+            { version => 'v1.2.3', caller => 'Its::Me' }
+        ) || die( $self->error );
+
+    Provided with a class/package name, some optional list of semantics to
+    import, and, as the last parameter, an optional hash reference of
+    options and this will attempt to load the module. This uses "use" in
+    perlfunc, no external module.
+
+    Upon success, it returns the package name loaded.
+
+    It traps any error with an eval and return "undef" in perlfunc if an
+    error occurred and sets an "error" accordingly.
+
+    Possible options are:
+
+    *caller*
+        The package name of the caller. If this is not provided, it will
+        default to the value provided with "caller" in perlfunc
+
+    *version*
+        The minimum version for this class to load. This value is passed
+        directly to "use" in perlfunc
 
   _obj2h
     This ensures the module object is an hash reference, such as when the

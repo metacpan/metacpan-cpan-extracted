@@ -2,7 +2,7 @@
 #
 # NoZone::Zone - record information for a bind zone
 #
-# Copyright (C) 2013  Daniel P. Berrange <dan@berrange.com>
+# Copyright (C) 2013-2021  Daniel P. Berrange <dan@berrange.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -61,6 +61,28 @@ Nozone::Zone - record information for a bind zone
       },
     },
     default => "platinum",
+    spf => {
+      policy => "reject",
+      machines => [
+         "gold",
+         "silver"
+      ]
+    },
+    dkim => {
+      "default" => {
+        version => "DKIM1",
+        keytype => "rsa",
+        pubkey => "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC1TaNgLlSyQMNWVLNLvyY/neDgaL2oqQE8T5illKqCgDtFHc8eHVAU+nlcaGmrKmDMw9dbgiGk1ocgZ56NR4ycfUHwQhvQPMUZw0cveel/8EAGoi/UyPmqfcPibytH81NFtTMAxUeM4Op8A6iHkvAMj5qLf4YRNsTkKAV"
+      },
+    },
+    dmarc => {
+      version => "DMARC1",
+      policy => "none",
+      subdomain_policy => "none",
+      percent => "20",
+      forensic_report => "mailto:dmarcfail@example.com",
+      aggregate_report => "mailto:dmarcagg@example.com",
+    },
     mail => {
       mx0 => {
         priority => 10,
@@ -81,6 +103,9 @@ Nozone::Zone - record information for a bind zone
     aliases => {
       db => "gold",
       backup => "silver",
+    },
+    txt => {
+      challenge1 => "9e428dae-b677-49b6-9eb9-a5754cbbfc2c",
     },
     wildcard => "platinum",
     inherits => $parentzone,
@@ -179,7 +204,7 @@ The C<mail> parameter is a hash reference whose keys are the
 names to setup as mail servers. The values are an further has
 reference whose elements specify the priority of the mail
 server and the name of the machine defined in the C<machines>
-parameter. 
+parameter.
 
     mail => {
       mx0 => {
@@ -217,7 +242,7 @@ used to define the corresponding IP addresses
 
 =item aliases
 
-The C<aliases> parameter is a has reference whose keys reflect
+The C<aliases> parameter is a hash reference whose keys reflect
 additional names to be defiend as CNAME records for the zone.
 The values refer to keys in the C<machines> or C<names>
 parameter and are used to the define the CNAME target.
@@ -234,6 +259,44 @@ defined in the C<machines> parameter. If set this parameter
 is used to defined a wildcard DNS entry in the zone.
 
     wildcard => "platinum"
+
+=item spf
+
+The C<spf> parameter is a hash reference setting up the
+SPF records. The C<policy> key takes one of the values
+B<reject>, B<accept>, or B<mark>, to specify what happens
+when an IP doesn't match the SPF. The C<machines> key
+is an array reference that specifies the list of machine
+names that are permitted to send email.
+
+=item dkim
+
+The C<dkim> parameter is a hash of hash references setting
+up the DKIM records. The key for the first level hash is
+the DKIM selector. The second level hashes contain the
+following keys.
+
+The C<version> key must always be C<DKIM1>. The C<keytype>
+key must be a public key algorithm name, typically 'rsa'.
+The C<service> key is a string restricting the usage.
+The C<pubkey> key is the public key.
+
+=item dmarc
+
+The C<dkim> parameter is a hash reference setting up the
+DMARC records.
+
+The C<version> key must always be C<DMARC1>. The C<policy>
+key is one of C<none>, C<quarantine> or C<reject>. The
+C<subdomain_policy> key takes the same values. The
+C<percent> key indicates how often to filter messages.
+The C<forensic_report> and C<aggregate_report> keys
+give a URI for sending reports.
+
+=item txt
+
+The C<txt> parameter is a has of arbitrary key and value
+strings, which will be added as TXT records.
 
 =back
 
@@ -268,7 +331,11 @@ sub new {
     $self->{dns} = $params{dns} ? $params{dns} : [];
     $self->{names} = $params{names} ? $params{names} : {};
     $self->{aliases} = $params{aliases} ? $params{aliases} : {};
+    $self->{txt} = $params{txt} ? $params{txt} : {};
     $self->{wildcard} = $params{wildcard} ? $params{wildcard} : undef;
+    $self->{spf} = $params{spf} ? $params{spf} : undef;
+    $self->{dkim} = $params{dkim} ? $params{dkim} : {};
+    $self->{dmarc} = $params{dmarc} ? $params{dmarc} : undef;
     $self->{inherits} = $params{inherits} ? $params{inherits} : undef;
 
     bless $self, $class;
@@ -530,6 +597,56 @@ sub get_aliases {
 }
 
 
+=item %names = $zone->get_txt();
+
+Return a hash containing the union of all the TXT
+records defined in this zone and its parent(s)
+recursively.
+
+=cut
+
+sub get_txt {
+    my $self = shift;
+
+    my %txt;
+
+    if ($self->{inherits}) {
+	%txt = $self->{inherits}->get_txt();
+    }
+
+    foreach my $name (keys %{$self->{txt}}) {
+	$txt{$name} = $self->{txt}->{$name};
+    }
+
+    return %txt;
+}
+
+
+=item %selectors = $zone->get_dkim_selectors();
+
+Return a hash containing the union of all the dkim
+records defined in this zone and its parent(s)
+recursively.
+
+=cut
+
+sub get_dkim_selectors {
+    my $self = shift;
+
+    my %selectors;
+
+    if ($self->{inherits}) {
+	%selectors = $self->{inherits}->get_dkim_selectors()
+    }
+
+    foreach my $selector (keys %{$self->{dkim}}) {
+	$selectors{$selector} = $self->{dkim}->{$selector};
+    }
+
+    return %selectors;
+}
+
+
 =item my $name = $zone->get_wildcard();
 
 Return the name of the machine which will handle
@@ -554,6 +671,85 @@ sub get_wildcard {
 
     return undef;
 }
+
+=item my $policy = $zone->get_spf_policy();
+
+Returns the policy for SPF records for the domain.
+The policy is one of the string B<accept>, B<reject>
+or B<mark>. If no SPF policy is defined gainst the
+zone, returns the SPF policy of the parent zone.
+if there is no parent zone an undefined value is
+returned indicating that no SPF entry will be
+created.
+
+=cut
+
+sub get_spf_policy {
+    my $self = shift;
+
+    if (defined $self->{spf}) {
+	return $self->{spf}->{policy};
+    }
+
+    if ($self->{inherits}) {
+	return $self->{inherits}->get_spf_policy();
+    }
+
+    return undef;
+}
+
+
+=item my @machines = $zone->get_spf_machines();
+
+Returns the list of machines that are permitted to
+send mail to record as SPF records. If no machines
+are defined against the zone, returns the machines
+of teh parent zone. If there is no parent zone an
+empty list if returned
+
+=cut
+
+sub get_spf_machines {
+    my $self = shift;
+
+    if (defined $self->{spf}) {
+	return @{$self->{spf}->{machines}};
+    }
+
+    if ($self->{inherits}) {
+	return $self->{inherits}->get_spf_machines();
+    }
+
+    return ();
+}
+
+
+=item my $config = $zone->get_dmarc_config();
+
+Returns the config for the DMARC records for the domain.
+If no DMARC config is defined gainst the
+zone, returns the DMAWRC config of the parent zone.
+if there is no parent zone undefined values are
+returned indicating that no DMARC entry will be
+created.
+
+=cut
+
+sub get_dmarc_config {
+    my $self = shift;
+
+    if (defined $self->{dmarc}) {
+	return $self->{dmarc};
+    }
+
+    if ($self->{inherits}) {
+	return $self->{inherits}->get_dmarc_config();
+    }
+
+    return undef;
+}
+
+
 
 =item $zone->generate_conffile($fh, $domain, $datafile, \@masters, $verbose=0);
 
@@ -621,6 +817,9 @@ sub generate_datafile {
     $self->_generate_machines($fh, $verbose);
     $self->_generate_names($fh, $verbose);
     $self->_generate_aliases($fh, $verbose);
+    $self->_generate_dkim($fh, $verbose);
+    $self->_generate_dmarc($fh, $verbose);
+    $self->_generate_txt($fh, $verbose);
     $self->_generate_wildcard($fh, $verbose);
 }
 
@@ -678,6 +877,69 @@ sub _generate_record {
     printf $fh "%-20s IN    %-8s %-6s %s%s\n", $name, $type, $detail, $value, $suffix;
 }
 
+
+sub _generate_spf {
+    my $self = shift;
+    my $fh = shift;
+    my $name = shift;
+    my $machine = shift;
+    my $verbose = shift;
+
+    my $policy = $self->get_spf_policy();
+    return unless defined $policy;
+
+    my $sentinel;
+    if ($policy eq "accept") {
+	$sentinel = "+all";
+    } elsif ($policy eq "reject") {
+	$sentinel = "-all";
+    } elsif ($policy eq "mark") {
+	$sentinel = "~all";
+    } else {
+	$sentinel = "?all";
+    }
+
+    my $spf;
+    my $comment;
+    if ($name eq "\@" || $name eq "*") {
+	my @machines = $self->get_spf_machines();
+
+	my @ips;
+	foreach my $machine (@machines) {
+	    my $addrs = $self->get_machine($machine);
+	    die "cannot find machine $machine" unless defined $addrs;
+	    if (exists $addrs->{ipv4}) {
+		push @ips, "ip4:" . $addrs->{ipv4};
+	    }
+	    if (exists $addrs->{ipv6}) {
+		push @ips, "ip6:" . $addrs->{ipv6};
+	    }
+	}
+
+	$comment = "Machine(s) " . join(", ", @machines);
+	$spf = "v=spf1 " . join(" ", @ips, $sentinel);
+    } else {
+	my @machines = $self->get_spf_machines();
+
+	$comment = "Machine $machine";
+	if (grep { $_ eq $machine } @machines) {
+	    my $addrs = $self->get_machine($machine);
+	    die "cannot find machine $machine" unless defined $addrs;
+	    my @ips;
+	    if (exists $addrs->{ipv4}) {
+		push @ips, "ip4:" . $addrs->{ipv4};
+	    }
+	    if (exists $addrs->{ipv6}) {
+		push @ips, "ip6:" . $addrs->{ipv6};
+	    }
+	    $spf = "v=spf1 " . join(" ", @ips, $sentinel);
+	} else {
+	    $spf = "v=spf1 " . $sentinel;
+	}
+    }
+    $self->_generate_record($fh, $name, "TXT", "", '"' . $spf . '"', $comment);
+}
+
 sub _generate_machine {
     my $self = shift;
     my $fh = shift;
@@ -698,6 +960,9 @@ sub _generate_machine {
 
     $self->_generate_record($fh, $name, "A", "", $addrs->{ipv4}, $comment) if exists $addrs->{ipv4};
     $self->_generate_record($fh, $name, "AAAA", "", $addrs->{ipv6}, $comment) if exists $addrs->{ipv6};
+    if (exists $addrs->{ipv4} || exists $addrs->{ipv6}) {
+	$self->_generate_spf($fh, $name, $machine, $verbose);
+    }
 }
 
 
@@ -828,6 +1093,93 @@ sub _generate_aliases {
 }
 
 
+sub _generate_txt {
+    my $self = shift;
+    my $fh = shift;
+    my $verbose = shift;
+
+    print "    - Generate txt\n" if $verbose;
+
+    my %txt = $self->get_txt();
+
+    if (%txt) {
+	print $fh "; Extra TXT\n";
+
+	foreach my $alias (sort { $a cmp $b } keys %txt) {
+	    $self->_generate_record($fh, $alias, "TXT", "", $txt{$alias});
+	}
+	print $fh "\n";
+    }
+}
+
+
+sub _generate_dkim {
+    my $self = shift;
+    my $fh = shift;
+    my $verbose = shift;
+
+    print "    - Generate dkim\n" if $verbose;
+
+    my %selectors = $self->get_dkim_selectors();
+
+    if (%selectors) {
+	print $fh "; DKIM selectors\n";
+
+	foreach my $selector (sort { $a cmp $b } keys %selectors) {
+	    my $dkim = $selectors{$selector};
+	    my $version = exists $dkim->{"version"} ? $dkim->{"version"} : "DKIM1";
+	    my $keytype = exists $dkim->{"keytype"} ? $dkim->{"keytype"} : "rsa";
+	    my $service = $dkim->{"service"};
+	    my $pubkey = $dkim->{"pubkey"};
+	    my $value = "v=$version; k=$keytype;";
+	    if (defined $service) {
+		$value .= " s=$service;";
+	    }
+	    $value .= " p=$pubkey";
+	    $self->_generate_record($fh, $selector . "._domainkey", "TXT", "", '"' . $value . '"');
+	}
+	print $fh "\n";
+    }
+}
+
+
+sub _generate_dmarc {
+    my $self = shift;
+    my $fh = shift;
+    my $verbose = shift;
+
+    print "    - Generate dmarc\n" if $verbose;
+
+    my $config = $self->get_dmarc_config();
+
+    return unless defined $config;
+
+    my $version = exists $config->{version} ? $config->{version} : "DMARC1";
+    my $policy = exists $config->{policy} ? $config->{policy} : "none";
+    my $subpolicy = $config->{subdomain_policy};
+    my $percent = $config->{percent};
+    my $rua = $config->{aggregate_report};
+    my $ruf = $config->{forensic_report};
+
+    my $value = "v=$version; p=$policy;";
+    if (defined $subpolicy) {
+	$value .= " sp=$subpolicy;";
+    }
+    if (defined $percent) {
+	$value .= " pct=$percent;";
+    }
+    if (defined $rua) {
+	$value .= " rua=$rua;";
+    }
+    if (defined $ruf) {
+	$value .= " ruf=$ruf;";
+    }
+    print $fh "; DMARC policy\n";
+    $self->_generate_record($fh, "_dmarc", "TXT", "", '"' . $value . '"');
+    print $fh "\n";
+}
+
+
 sub _generate_wildcard {
     my $self = shift;
     my $fh = shift;
@@ -845,3 +1197,20 @@ sub _generate_wildcard {
 
 
 1;
+
+=back
+
+=head1 AUTHORS
+
+C<nozone> was written by Daniel P. Berrange <dan@berrange.com>
+
+=head1 LICENSE
+
+C<nozone> is distributed under the terms of the GNU GPL version 3
+or any later version. You should have received a copy of the GNU
+General Public License along with this program.  If not, see
+C<http://www.gnu.org/licenses/>.
+
+=head1 SEE ALSO
+
+L<NoZone>, C<nozone(1)>

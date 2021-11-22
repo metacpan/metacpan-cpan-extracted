@@ -2,9 +2,9 @@ NAME
     Acme::CPANModules::BloomFilters - Bloom filter modules on CPAN
 
 VERSION
-    This document describes version 0.002 of Acme::CPANModules::BloomFilters
+    This document describes version 0.003 of Acme::CPANModules::BloomFilters
     (from Perl distribution Acme-CPANModules-BloomFilters), released on
-    2021-05-28.
+    2021-10-19.
 
 DESCRIPTION
     Bloom filter is a data structure that allows you to quickly check
@@ -17,7 +17,13 @@ DESCRIPTION
     application of bloom filter include: 1) checking whether a password is
     in a dictionary of millions of common/compromised passwords; 2) checking
     an email address against leak database; 3) virus pattern checking; 4)
-    IP/domain blacklisting/whitelisting.
+    IP/domain blacklisting/whitelisting. Due to its properties, it is
+    sometimes combined with other data structures. For example, a small
+    bloom filter can be distributed with a software to check against a
+    database. When the answer from bloom filter is "possibly in set", the
+    software can further consult on online database to make sure if it is
+    indeed in set. Thus, bloom filter can be used to reduce the number of
+    direct queries to database.
 
     In Perl, my default go-to choice is Algorithm::BloomFilter, unless
     there's a specific feature I need from other implementations.
@@ -93,7 +99,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -103,14 +111,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-BloomFilters>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Bloo
-    mFilters>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -119,9 +119,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Bloo
+    mFilters>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

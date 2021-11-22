@@ -5,6 +5,7 @@
 namespace xs { namespace unievent { namespace http {
 
 void fill (Manager::Config&, const Hash&);
+void fill (Hash&, const Manager::Config&);
 
 }}}
 
@@ -14,6 +15,12 @@ namespace xs {
             T cfg;
             xs::unievent::http::fill(cfg, h);
             return cfg;
+        }
+        static Scalar out(const panda::unievent::http::Manager::Config& cfg, const Sv& proto = {}) {
+            (void)proto;
+            auto h = Hash::create();
+            xs::unievent::http::fill(h, cfg);
+            return Ref::create(h);
         }
     };
 

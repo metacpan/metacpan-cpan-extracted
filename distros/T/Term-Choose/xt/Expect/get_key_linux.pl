@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
-use 5.010000;
+use 5.10.0;
 use Term::Choose::Linux;
 
 my $linux = Term::Choose::Linux->new();

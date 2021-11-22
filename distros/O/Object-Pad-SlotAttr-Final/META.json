@@ -22,12 +22,12 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "Object::Pad::ExtensionBuilder" : "0.50"
+            "Object::Pad::ExtensionBuilder" : "0.57"
          }
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.50"
+            "Object::Pad" : "0.57"
          }
       },
       "test" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Object::Pad::SlotAttr::Final" : {
          "file" : "lib/Object/Pad/SlotAttr/Final.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

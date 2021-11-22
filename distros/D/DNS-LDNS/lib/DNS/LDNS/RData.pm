@@ -4,9 +4,9 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS;
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 sub new {
     my ($class, $type, $str) = @_;
@@ -40,9 +40,9 @@ DNS::LDNS::RData - Rdata field or a dname in an rr
 
 =head1 SYNOPSIS
 
-  use DNS::LDNS ':all'
+  use DNS::LDNS ();
 
-  my rd = new DNS::LDNS::RData(rdf_type, str)
+  my rd = DNS::LDNS::RData->new(rdf_type, str)
   rd2 = rd->clone
 
   rdf_type = rd->type

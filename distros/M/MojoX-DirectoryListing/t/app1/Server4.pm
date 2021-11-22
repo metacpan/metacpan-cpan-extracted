@@ -2,6 +2,8 @@ package t::app1::Server4;
 use Mojolicious::Lite;
 use MojoX::DirectoryListing;
 
+# an app that serves different directories in different default orders
+
 get '/test' => sub { $_[0]->render( text => "Server4" ) };
 MojoX::DirectoryListing::set_public_app_dir( 't/app1/public' );
 serve_directory_listing( '/', "show-file-time" => 0, "sort-column" => 'N' );

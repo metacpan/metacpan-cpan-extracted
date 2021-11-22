@@ -1,0 +1,9 @@
+name = "App-ansiexpand"
+script_files = [ "script/ansiexpand", "script/ansiunexpand" ]
+readme_from = "script/ansiexpand"
+badges = ['github-actions/test', 'metacpan']
+authority="cpan:UTASHIRO"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

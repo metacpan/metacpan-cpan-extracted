@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.144;
+package Config::Model::AnyId 2.145;
 
 use 5.020;
 
@@ -25,8 +25,8 @@ use Scalar::Util qw/weaken/;
 
 extends qw/Config::Model::AnyThing/;
 
-use feature qw/signatures/;
-no warnings qw/experimental::signatures/;
+use feature qw/signatures postderef/;
+no warnings qw/experimental::signatures experimental::postderef/;
 
 subtype 'KeyArray' => as 'ArrayRef' ;
 coerce 'KeyArray' => from 'Str' => via { [$_] } ;
@@ -1076,7 +1076,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.144
+version 2.145
 
 =head1 SYNOPSIS
 

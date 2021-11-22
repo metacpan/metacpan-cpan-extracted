@@ -3,14 +3,16 @@ NAME
     SQLite::KeyValueStore::Simple
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     App::SQLiteKeyValueStoreSimpleUtils (from Perl distribution
-    App-SQLiteKeyValueStoreSimpleUtils), released on 2021-06-18.
+    App-SQLiteKeyValueStoreSimpleUtils), released on 2021-07-01.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
 
     *   check-sqlite-kvstore-key-exists
+
+    *   dump-sqlite-kvstore
 
     *   get-sqlite-kvstore-value
 

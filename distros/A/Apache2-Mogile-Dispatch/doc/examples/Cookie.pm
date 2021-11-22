@@ -1,4 +1,4 @@
-package Cookie;
+package My::Cookie;
 
 use strict;
 use warnings;

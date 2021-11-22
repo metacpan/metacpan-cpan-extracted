@@ -157,7 +157,7 @@ public:
 
         const CharT* ptr = traits_type::find(_str + pos, _length - pos, *s);
         const CharT* end = _str + _length;
-        while (ptr && end - ptr >= count) {
+        while (ptr && size_t(end - ptr) >= count) {
             if (traits_type::compare(ptr, s, count) == 0) return ptr - _str;
             ptr = traits_type::find(ptr+1, end - ptr - 1, *s);
         }

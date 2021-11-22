@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::Simple tests => 7;
+use Test::Simple tests => 8;
 
 # chdir to t/
 $_ = $0;
@@ -62,5 +62,6 @@ s/.*b\n//s;
 pl '-E', 'N 3', '%N = qw(a 1 b 2 c 1 d 3)';
 
 
+pl_e 'a%b 1b:11011                          33' x 2, 'Form $_ = q!a%%b %x:%1$b %1$*1$o!, 27; tr/$/:/; F $_, 27';
 
 pl_e '15241578753238836750495351562536198787501905199875019052100', '-Mbignum', 'Echo 123456789012345678901234567890 * 123456789012345678901234567890';

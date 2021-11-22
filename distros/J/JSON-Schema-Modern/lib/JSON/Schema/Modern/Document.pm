@@ -4,25 +4,27 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
 use Mojo::URL;
 use Carp 'croak';
 use List::Util 1.29 'pairs';
+use Ref::Util 0.100 'is_plain_hashref';
 use Safe::Isa;
-use Moo;
 use MooX::TypeTiny;
 use MooX::HandlesVia;
 use Types::Standard qw(InstanceOf HashRef Str Dict ArrayRef Enum ClassName Undef slurpy);
 use namespace::clean;
 
-extends 'Mojo::JSON::Pointer', 'Moo::Object';
+extends 'Mojo::JSON::Pointer';
 
 has schema => (
   is => 'ro',
@@ -35,7 +37,18 @@ has canonical_uri => (
   lazy => 1,
   default => sub { Mojo::URL->new },
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
-  clearer => '_clear_canonical_uri',
+);
+
+has metaschema_uri => (
+  is => 'rwp',
+  isa => InstanceOf['Mojo::URL'],
+  coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
+);
+
+has evaluator => (
+  is => 'rwp',
+  isa => InstanceOf['JSON::Schema::Modern'],
+  weak_ref => 1,
 );
 
 # "A JSON Schema resource is a schema which is canonically identified by an absolute URI."
@@ -132,33 +145,16 @@ sub FOREIGNBUILDARGS { () }
 # for JSON serializers
 sub TO_JSON { goto \&schema }
 
-around BUILDARGS => sub {
-  my ($orig, $class, @args) = @_;
-
-  my $args = $class->$orig(@args);
-
-  # evaluator is only needed for traversal in BUILD; a different evaluator may be used for
-  # the actual evaluation.
-  croak '_evaluator is not a JSON::Schema::Modern'
-    if exists $args->{_evaluator} and not $args->{_evaluator}->$_isa('JSON::Schema::Modern');
-
-  $args->{_evaluator} //= JSON::Schema::Modern->new;
-  return $args;
-};
-
-sub BUILD {
-  my ($self, $args) = @_;
-
+sub BUILD ($self, $args) {
   croak 'canonical_uri cannot contain a fragment' if defined $self->canonical_uri->fragment;
 
   my $original_uri = $self->canonical_uri->clone;
-  my $state = $args->{_evaluator}->traverse($self->schema,
-    { initial_schema_uri => $self->canonical_uri->clone });
+  my $state = $self->traverse($self->evaluator // JSON::Schema::Modern->new);
 
   # if the schema identified a canonical uri for itself, it overrides the initial value
-  $self->_set_canonical_uri($state->{initial_schema_uri});
+  $self->_set_canonical_uri($state->{initial_schema_uri}) if $state->{initial_schema_uri} ne $original_uri;
 
-  if (@{$state->{errors}}) {
+  if ($state->{errors}->@*) {
     $self->_set_errors($state->{errors});
     return;
   }
@@ -173,10 +169,34 @@ sub BUILD {
     if (not "$original_uri" and $original_uri eq $self->canonical_uri)
       or "$original_uri";
 
-  $self->_add_resources(@{$state->{identifiers}});
+  $self->_add_resources($state->{identifiers}->@*);
 
   # overlay the resulting configs with those that were provided by the caller
-  $self->_set_evaluation_configs(+{ %{$state->{configs}}, %{$self->evaluation_configs} });
+  $self->_set_evaluation_configs(+{ $state->{configs}->%*, $self->evaluation_configs->%* });
+}
+
+sub traverse ($self, $evaluator) {
+  my $state = $evaluator->traverse($self->schema,
+    {
+      initial_schema_uri => $self->canonical_uri->clone,
+      $self->metaschema_uri ? ( metaschema_uri => $self->metaschema_uri) : (),
+    }
+  );
+
+  # we don't store the metaschema_uri in $state nor in resource_index, but we can figure it out
+  # easily enough.
+  my $metaschema_uri = (is_plain_hashref($self->schema) ? $self->schema->{'$schema'} : undef)
+    // $self->metaschema_uri // $evaluator->METASCHEMA_URIS->{$state->{spec_version}};
+
+  $self->_set_metaschema_uri($metaschema_uri) if $metaschema_uri ne ($self->metaschema_uri//'');
+
+  return $state;
+}
+
+sub validate ($self) {
+  my $js = $self->$_call_if_can('evaluator') // JSON::Schema::Modern->new;
+
+  return $js->evaluate($self->schema, $self->metaschema_uri);
 }
 
 1;
@@ -195,7 +215,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 SYNOPSIS
 
@@ -203,10 +223,13 @@ version 0.523
 
     my $document = JSON::Schema::Modern::Document->new(
       canonical_uri => 'https://example.com/v1/schema',
+      metaschema_uri => 'https://example.com/my/custom/metaschema',
       schema => $schema,
     );
     my $foo_definition = $document->get('/$defs/foo');
     my %resource_index = $document->resource_index;
+
+    my sanity_check = $document->validate;
 
 =head1 DESCRIPTION
 
@@ -223,6 +246,19 @@ The actual raw data representing the schema.
 When passed in during construction, this represents the initial URI by which the document should
 be known. It is overwritten with the root schema's C<$id> property when one exists, and as such
 can be considered the canonical URI for the document as a whole.
+
+=head2 metaschema_uri
+
+=for stopwords metaschema schemas
+
+Sets the metaschema that is used to describe the document (or more specifically, any JSON Schemas
+contained within the document), which determines the
+specification version and vocabularies used during evaluation. Does not override any
+C<$schema> keyword actually present in the schema document.
+
+=head2 evaluator
+
+A L<JSON::Schema::Modern> object. Optional, unless custom metaschemas are used.
 
 =head2 resource_index
 
@@ -257,7 +293,7 @@ override anything you have already explicitly set.
 
 =head1 METHODS
 
-=for Pod::Coverage FOREIGNBUILDARGS BUILDARGS BUILD
+=for Pod::Coverage FOREIGNBUILDARGS BUILDARGS BUILD traverse
 
 =head2 path_to_canonical_uri
 
@@ -276,6 +312,13 @@ See L<Mojo::JSON::Pointer/contains>.
 
 Extract value from L</"schema"> identified by the given JSON Pointer.
 See L<Mojo::JSON::Pointer/get>.
+
+=head2 validate
+
+Evaluates the document against its metaschema. See L<JSON::Schema::Modern/evaluate>.
+For regular JSON Schemas this is redundant with creating the document in the first place (which also
+includes a validation check), but for some subclasses of this class, additional things might be
+checked that are not caught by document creation.
 
 =head2 TO_JSON
 

@@ -18,8 +18,9 @@ namespace panda {
         template <typename C, typename TR, typename A>
         static inline std::true_type  _is_base_string (panda::basic_string<C,TR,A> const volatile) { return std::true_type(); }
         static inline std::false_type _is_base_string (...) { return std::false_type(); }
+        using is_base_string_t = decltype(_is_base_string(Key()));
 
-        static_assert(decltype(_is_base_string(Key()))::value, "Key must be based on panda::basic_string");
+        static_assert(is_base_string_t::value, "Key must be based on panda::basic_string");
 
         using Base  = std::unordered_map<Key, T, Hash, KeyEqual, Allocator>;
         using SVKey = basic_string_view<typename Key::value_type, typename Key::traits_type>;
@@ -87,8 +88,9 @@ namespace panda {
         template <typename C, typename TR, typename A>
         static inline std::true_type  _is_base_string (panda::basic_string<C,TR,A> const volatile) { return std::true_type(); }
         static inline std::false_type _is_base_string (...) { return std::false_type(); }
+        using is_base_string_t = decltype(_is_base_string(Key()));
 
-        static_assert(decltype(_is_base_string(Key()))::value, "Key must be based on panda::basic_string");
+        static_assert(is_base_string_t::value, "Key must be based on panda::basic_string");
 
         using Base  = std::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>;
         using SVKey = basic_string_view<typename Key::value_type, typename Key::traits_type>;

@@ -41,4 +41,14 @@ $t->get_ok('/welcome/index.model.js')->status_is(200)
   ->content_like(qr/MyModel/i)
   ->content_type_like( qr|^application/javascript|, 'right content type' );
 
+# get .json
+$t->get_ok('/welcome/index.json')->status_is(200)
+  ->json_is( '' => { welcome => 1 } );
+
+# get non existing url
+$t->get_ok('/non_existing_url')->status_is(404);
+
+# get controller with no template
+$t->get_ok('/controller_with_no_template/')->status_is(404);
+
 done_testing();

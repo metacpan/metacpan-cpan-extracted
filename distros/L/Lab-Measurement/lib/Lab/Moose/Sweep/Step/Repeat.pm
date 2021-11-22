@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Repeat;
-$Lab::Moose::Sweep::Step::Repeat::VERSION = '3.791';
+$Lab::Moose::Sweep::Step::Repeat::VERSION = '3.792';
 #ABSTRACT: Repeat something (e.g. some sweep) N times
 
 use v5.20;
@@ -42,7 +42,7 @@ Lab::Moose::Sweep::Step::Repeat - Repeat something (e.g. some sweep) N times
 
 =head1 VERSION
 
-version 3.791
+version 3.792
 
 =head1 SYNOPSIS
 

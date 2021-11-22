@@ -4,8 +4,9 @@ use strict;
 use warnings;
 
 use Carp qw(croak);
+use Config;
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.2.0';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -62,7 +63,7 @@ For Reasons, C<:is_*> is equivalent.
 =cut
 
 our @EXPORT_OK = qw(
-    type is_integer is_number
+    type sizeof is_integer is_number
 );
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
@@ -96,6 +97,25 @@ sub type {
            ref($arg)      ? 'REF_TO_'.ref($arg) :
            !defined($arg) ? 'UNDEF'             :
                             _scalar_type($arg);
+}
+
+=head2 sizeof
+
+Returns the size, in bytes, of the underlying storage for numeric types, and die()s for any other type.
+
+=cut
+
+sub sizeof {
+    croak(__PACKAGE__."::sizeof requires an argument") if($#_ == -1);
+    my $arg = shift;
+    my $type = type($arg);
+    if($type eq 'INTEGER') {
+        return $Config{ivsize};
+    } elsif($type eq 'NUMBER') {
+        return $Config{nvsize};
+    } else {
+        croak(__PACKAGE__."::sizeof: '$arg' isn't numeric: ".type($arg)."\n");
+    }
 }
 
 =head2 is_integer

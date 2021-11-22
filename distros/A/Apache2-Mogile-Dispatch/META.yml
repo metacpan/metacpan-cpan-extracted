@@ -1,8 +1,32 @@
---- #YAML:1.0
-name: Apache2-Mogile-Dispatch
-version: 0.2
+---
+abstract: 'An Apache2 MogileFS Dispatcher'
 author:
-  - Nick Gerakines <nick@socklabs.com>
-abstract: An Apache2 MogileFS Dispatcher
-license: perl
-generated_by: Module::Build version 0.2612, without YAML.pm
+  - 'Nick Gerakines <nick@socklabs.com>'
+build_requires:
+  Cache::Memcached: '0'
+  ExtUtils::MakeMaker: '0'
+  LWP::UserAgent: '0'
+  Test::Group: '0'
+  Test::More: '0'
+  YAML::Syck: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache2-Mogile-Dispatch
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  English: '0'
+  MogileFS: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Apache2-Mogile-Dispatch
+  repository: https://git.deguest.jp/jack/Apache2-Mogile-Dispatch
+version: '0.3'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

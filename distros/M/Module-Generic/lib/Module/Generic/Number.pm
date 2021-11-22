@@ -739,6 +739,7 @@ sub compute
     my( $self, $other, $swap, $opts ) = @_;
     my $other_val = Scalar::Util::blessed( $other ) ? $other : "\"$other\"";
     my $operation = $swap ? "${other_val} $opts->{op} \$self->{_number}" : "\$self->{_number} $opts->{op} ${other_val}";
+    no warnings 'uninitialized';
     if( $opts->{return_object} )
     {
         my $res = eval( $operation );

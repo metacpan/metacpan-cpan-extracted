@@ -1,3 +1,6 @@
+0.005 2021-11-15 03:05:37-0500
+  - Add MetaNoIndex to ::Basic bundle.
+
 0.004 2017-03-19 00:06:25-0500
   - List all the PluginBundle's dependencies.
 

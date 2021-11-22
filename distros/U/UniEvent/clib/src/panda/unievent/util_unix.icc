@@ -24,8 +24,27 @@ std::error_code last_sys_sock_error () {
 }
 
 fd_t file_dup (fd_t src) {
+    auto src_flags = fcntl(src, F_GETFD, 0);
+    if (src_flags == -1) throw last_sys_error();
+    
     auto ret = ::dup(src);
     if (ret == -1) throw last_sys_error();
+    
+    if (src_flags & FD_CLOEXEC) {
+        auto flags = fcntl(ret, F_GETFD, 0);
+        if (flags == -1) {
+            auto err = last_sys_error();
+            close(ret).nevermind();
+            throw err;
+        }
+        auto res = fcntl(ret, F_SETFD, flags | FD_CLOEXEC);
+        if (res == -1) {
+            auto err = last_sys_error();
+            close(ret).nevermind();
+            throw err;
+        }
+    }
+    
     return ret;
 }
 

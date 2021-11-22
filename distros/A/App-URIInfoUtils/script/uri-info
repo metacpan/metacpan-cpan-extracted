@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-10-17'; # DATE
 our $DIST = 'App-URIInfoUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/URIInfoUtils/uri_info",
@@ -40,7 +40,7 @@ uri-info - Extract information from one or more URIs
 
 =head1 VERSION
 
-This document describes version 0.001 of uri-info (from Perl distribution App-URIInfoUtils), released on 2021-10-17.
+This document describes version 0.002 of uri-info (from Perl distribution App-URIInfoUtils), released on 2021-10-17.
 
 =head1 SYNOPSIS
 

@@ -11,17 +11,43 @@ Acme::FishFarm::OxygenMaintainer - Oxygen Maintainer for Acme::FishFarm
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 
 =head1 SYNOPSIS
 
+    use 5.010;
+
+    use Acme::FishFarm qw(consume_oxygen reduce_precision);
     use Acme::FishFarm::OxygenMaintainer;
-    # missing stuff will be added in the next release
+
+    my $oxygen = Acme::FishFarm::OxygenMaintainer->install( DO_generation_volume => 3 );
+    say "Oxygen maintainer installed!\n";
+
+
+    while ( "fish are using up oxygen" ) {
+        say "Current Oxygen Level: ", $oxygen->current_DO, " mg/L",
+            " (low: < ", $oxygen->DO_threshold, ")";
+        #say "Low Oxygen Level: ", $oxygen->DO_threshold, " mg/L";
+
+        if ( $oxygen->is_low_DO ) {
+            say "Fish status: Suffocating";
+            say "  !! Low oxygen level!";
+            say "Pumping ", $oxygen->oxygen_generation_volume, " mg/L of oxygen into the water..." ;
+            $oxygen->generate_oxygen;
+        } else {
+            say "Fish status: Happy";
+        }
+        
+        consume_oxygen( $oxygen, rand(2.5) );
+        
+        sleep(3);
+        say "";
+    }
 
 =head1 EXPORT
 
@@ -54,6 +80,8 @@ This is the rate of oxygen generation.
 The default value is C<0.2 mg/L per unit time>
 
 =back
+
+The unit C<mg/L> is just a unit, it doesn't show up if you call any of it's related getters.
 
 =cut
 
@@ -166,7 +194,7 @@ sub set_oxygen_generation_volume {
 
 Pumps oxygen into the water based on the diffusion rate. The current DO value will increase every time this action is invoked.
 
-Take note that this will generate oxygen no matter what. Make sure you check the DO content before pumping oxygen into your tank. See C<is_low_DO> for more info.
+Take note that this will generate oxygen no matter what. Make sure you check the DO content before pumping oxygen into your tank. See C<is_low_DO> method above for more info.
 
 =cut
 

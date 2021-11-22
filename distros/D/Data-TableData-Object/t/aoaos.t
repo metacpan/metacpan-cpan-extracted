@@ -42,6 +42,42 @@ subtest col_idx => sub {
     is_deeply($td->col_idx("column2"), undef);
 };
 
+subtest col_content => sub {
+    is_deeply($td ->col_content(0), [1,5,3]);
+    is_deeply($td ->col_content('column0'), [1,5,3]);
+    is_deeply($tds->col_content('satu'), [1,5,3]);
+    is_deeply($td ->col_content(1), [2,6,4]);
+    is_deeply($td ->col_content('column1'), [2,6,4]);
+    is_deeply($tds->col_content('dua'), [2,6,4]);
+    is_deeply($td ->col_content(2), undef);
+    is_deeply($tds->col_content('tiga'), undef);
+};
+
+subtest row => sub {
+    is_deeply($td ->row(0), [1,2]);
+    is_deeply($td ->row(1), [5,6]);
+    is_deeply($td ->row(2), [3,4]);
+    is_deeply($td ->row(3), undef);
+};
+
+subtest row_as_aos => sub {
+    is_deeply($td ->row_as_aos(0), [1,2]);
+    is_deeply($td ->row_as_aos(1), [5,6]);
+    is_deeply($td ->row_as_aos(2), [3,4]);
+    is_deeply($td ->row_as_aos(3), undef);
+};
+
+subtest row_as_hos => sub {
+    is_deeply($td ->row_as_hos(0), {column0=>1,column1=>2});
+    is_deeply($td ->row_as_hos(1), {column0=>5,column1=>6});
+    is_deeply($td ->row_as_hos(2), {column0=>3,column1=>4});
+    is_deeply($td ->row_as_hos(3), undef);
+};
+
+subtest rows => sub {
+    is_deeply($td->rows, [[1,2],[5,6],[3,4]]);
+};
+
 subtest rows_as_aoaos => sub {
     is_deeply($td->rows_as_aoaos, [[1,2],[5,6],[3,4]]);
 };
@@ -217,6 +253,13 @@ subtest add_col => sub {
     is_deeply($td->{cols_by_idx} , ["column0", "foo", "column1", "column2", "bar"]);
     is_deeply($td->{cols_by_name}, {column0=>0, foo=>1, column1=>2, column2=>3, bar=>4});
     is_deeply($td->{data}[1], [4,undef,5,6,undef]);
+
+    $td->add_col('baz', undef, undef, [11,12,13]);
+    is_deeply($td->{data}, [
+        [1,undef,2,3,undef,11],
+        [4,undef,5,6,undef,12],
+        [7,undef,8,9,undef,13],
+    ]);
 };
 
 subtest set_col_val => sub {

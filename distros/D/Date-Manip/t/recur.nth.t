@@ -222,6 +222,18 @@ end   2007-12-31-23:59:59 => 0
 
 prev                      => 2007123112:00:00
 
+# next/prev when there are no dates
+
+freq 0:0:0:1*17:00:00     => 0
+
+start 2020101000:00:00    => 0
+
+end 2020101000:00:00      => 0
+
+next                      => 'Not found'
+
+prev                      => 'Not found'
+
 ";
 
 $::ti->tests(func  => \&test,

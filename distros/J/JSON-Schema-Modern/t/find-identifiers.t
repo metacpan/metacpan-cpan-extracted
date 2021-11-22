@@ -1,10 +1,11 @@
 use strict;
 use warnings;
-use 5.016;
+use 5.020;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
@@ -70,8 +71,7 @@ subtest '$id sets canonical uri' => sub {
   my $doc2 = $js->{_resource_index}{'http://localhost:4242/my_foo'}{document};
   ok($doc1 == $doc2, 'the same document object is indexed under both URIs');
 
-  sub _find_all_values {
-      my $data = shift;
+  sub _find_all_values ($data) {
       if (ref $data eq 'ARRAY') {
           return map __SUB__->($_), @$data;
       }

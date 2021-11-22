@@ -1,3 +1,8 @@
+0.553   2021-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Re-pass standard perlcritic tests (2nd attempt).
+
+
 0.552   2021-08-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Switch from Text::Table::Tiny to Text::Table::Sprintf.

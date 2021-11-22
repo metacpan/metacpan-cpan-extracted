@@ -22,7 +22,6 @@ do { my $x = {
                                       'Test::MinimumVersion' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
-                                      'blib' => '1.01',
                                       'perl' => '5.006'
                                     }
                     },
@@ -46,7 +45,6 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::Alien' => '0.05',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.008'
                                  }
                  }

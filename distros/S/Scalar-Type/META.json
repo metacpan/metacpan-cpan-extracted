@@ -51,6 +51,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Scalar-Type"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

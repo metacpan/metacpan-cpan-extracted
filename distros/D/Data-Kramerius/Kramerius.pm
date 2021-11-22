@@ -7,7 +7,7 @@ use Data::Kramerius::Object;
 use Text::DSV;
 use Unicode::UTF8 qw(decode_utf8);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -160,7 +160,7 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut
 
@@ -212,3 +212,6 @@ version:code:name:url
 4:kkvhb:Krajská knihovna Vysočiny v Havlíčkově Brodě:http\://kramerius.kkvysociny.cz/
 4:cdk:Česká Digitální knihovna:http\://cdk.lib.cas.cz/
 4:nmzv:Národní muzeum - Zvuk:http\://kramerius.nm.cz/
+4:npmk:Národní pedagogické muzeum J. A. Komenského:https\://kramerius.npmk.cz/
+4:nulk:Národní ústav lidové kultury:https\://kramerius.nulk.cz/
+4:hmt:Husitské muzeum v Táboře:http\://kramerius.husitskemuzeum.cz/

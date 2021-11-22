@@ -2,7 +2,7 @@
 #
 # NoZone: a Bind DNS zone file generator
 #
-# Copyright (C) 2013  Daniel P. Berrange <dan@berrange.com>
+# Copyright (C) 2013-2021  Daniel P. Berrange <dan@berrange.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ use File::Spec::Functions qw(catfile);
 
 use NoZone::Zone;
 
-our $VERSION = '1.0';
+our $VERSION = '1.3';
 
 =head1 NAME
 
@@ -36,9 +36,9 @@ NoZone - a Bind DNS zone file generator
 =head1 SYNOPSIS
 
   use NoZone;
+  use YAML qw();
 
-  my $cfg = Config::Record->new();
-  $cfg->load("/etc/nozone.cfg");
+  my $cfg = YAML::LoadFile("/etc/nozone.yml");
 
   my $nozone = NoZone->new();
   $nozone->load_config($cfg);
@@ -86,9 +86,10 @@ sub new {
 =item $nozone->load_config($cfg);
 
 Load details for the DNS zones from the configuration
-data in C<$cfg>, which is an instance of the C<Config::Record>
-class. See L<nozone.cfg> for a description of the required
-configuration file format.
+data in C<$cfg>, which is a hash reference, typically
+resulting from loading a YAML file. See L<nozone.yml>
+for a description of the required configuration file
+format.
 
 =cut
 
@@ -96,27 +97,31 @@ sub load_config {
     my $self = shift;
     my $cfg = shift;
 
-    my $zones = $cfg->get("zones", {});
+    my $zones = exists $cfg->{"zones"} ? $cfg->{"zones"} : {};
     foreach my $name (keys %{$zones}) {
-	my $subcfg = $cfg->view("zones/$name");
+	my $subcfg = $zones->{$name};
 	my $zone = NoZone::Zone->new(
-	    default => $subcfg->get("default", undef),
-	    domains => $subcfg->get("domains", []),
-	    lifetimes => $subcfg->get("lifetimes", undef),
-	    hostmaster => $subcfg->get("hostmaster", undef),
-	    machines => $subcfg->get("machines", {}),
-	    dns => $subcfg->get("dns", {}),
-	    mail => $subcfg->get("mail", {}),
-	    names => $subcfg->get("names", {}),
-	    aliases => $subcfg->get("aliases", {}),
-	    wildcard => $subcfg->get("wildcard", undef),
+	    default => exists $subcfg->{"default"} ? $subcfg->{"default"} : undef,
+	    domains => exists $subcfg->{"domains"} ? $subcfg->{"domains"} : [],
+	    lifetimes => exists $subcfg->{"lifetimes"} ? $subcfg->{"lifetimes"} : undef,
+	    hostmaster => exists $subcfg->{"hostmaster"} ? $subcfg->{"hostmaster"} :  undef,
+	    machines => exists $subcfg->{"machines"} ? $subcfg->{"machines"} :  {},
+	    dns => exists $subcfg->{"dns"} ? $subcfg->{"dns"} :  {},
+	    mail => exists $subcfg->{"mail"} ? $subcfg->{"mail"} :  {},
+	    names => exists $subcfg->{"names"} ? $subcfg->{"names"} :  {},
+	    aliases => exists $subcfg->{"aliases"} ? $subcfg->{"aliases"} :  {},
+	    wildcard => exists $subcfg->{"wildcard"} ? $subcfg->{"wildcard"} :  undef,
+	    spf => exists $subcfg->{"spf"} ? $subcfg->{"spf"} :  undef,
+	    dkim => exists $subcfg->{"dkim"} ? $subcfg->{"dkim"} :  {},
+	    dmarc => exists $subcfg->{"dmarc"} ? $subcfg->{"dmarc"} :  undef,
+	    txt => exists $subcfg->{"txt"} ? $subcfg->{"txt"} :  {},
 	    );
 	$self->{zones}->{$name} = $zone;
     }
 
     foreach my $name (keys %{$zones}) {
-	my $subcfg = $cfg->view("zones/$name");
-	my $inherits = $subcfg->get("inherits", undef);
+	my $subcfg = $zones->{$name};
+	my $inherits = exists $subcfg->{"inherits"} ? $subcfg->{"inherits"} : undef;
 	if ($inherits) {
 	    my $parentzone = $self->{zones}->{$inherits};
 	    my $zone = $self->{zones}->{$name};

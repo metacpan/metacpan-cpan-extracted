@@ -11,7 +11,7 @@ use App::Sqitch::X qw(hurl);
 use Locale::TextDomain qw(App-Sqitch);
 use namespace::autoclean;
 
-our $VERSION = 'v1.1.0'; # VERSION
+our $VERSION = 'v1.2.0'; # VERSION
 
 requires 'dbh';
 requires 'sqitch';
@@ -22,6 +22,10 @@ requires '_char2ts';
 requires '_listagg_format';
 requires '_no_table_error';
 requires '_handle_lookup_index';
+
+after use_driver => sub {
+    DBI->trace(1) if $_[0]->sqitch->verbosity > 2;
+};
 
 sub _dt($) {
     require App::Sqitch::DateTime;
@@ -112,7 +116,7 @@ sub _select_state {
     my $cdtcol = sprintf $self->_ts2char_format, 'c.committed_at';
     my $pdtcol = sprintf $self->_ts2char_format, 'c.planned_at';
     my $tagcol = sprintf $self->_listagg_format, 't.tag';
-    my $hshcol = $with_hash ? "c.script_hash\n                 , " : '';
+    my $hshcol = $with_hash ? "c.script_hash\n             , " : '';
     my $dbh    = $self->dbh;
     $dbh->selectrow_hashref(qq{
         SELECT c.change_id
@@ -1109,7 +1113,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2020 iovation Inc.
+Copyright (c) 2012-2021 iovation Inc., David E. Wheeler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

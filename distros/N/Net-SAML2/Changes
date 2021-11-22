@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::SAML2.
 
+0.45 -- Wed Nov 17 17:33:34 AST 2021
+
+  - 594d135 add missing use statement (ziali088)
+
 0.44 -- Sun Oct 31 14:33:03 ADT 2021
 
   - Packaging issue reissuing 0.43 without changes

@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.51;
+use Object::Pad 0.57;
 
-package Tickit::Widget::Spinner 0.33;
+package Tickit::Widget::Spinner 0.34;
 class Tickit::Widget::Spinner
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 use experimental 'postderef';
 

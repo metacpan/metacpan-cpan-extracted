@@ -35,6 +35,7 @@ ansicolumn \[options\] \[file ...\]
     --[no-]pagebreak     allow page break
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
+    --[no-]white-space   allow white spaces at the top of each panes
     --[no-]isolation     page-end line isolation
     --tabstop=#          tab-stop character
     --tabhead=#          tab-head character
@@ -44,7 +45,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.15
+Version 1.16
 
 # DESCRIPTION
 
@@ -130,7 +131,8 @@ default, from the standard input.
 - **-C**#, **--pane**=#
 
     Output is formatted in the specified number of panes.  Setting number
-    of panes implies **--widen** option enabled.
+    of panes implies **--widen** option enabled.  See ["CALCULATION"](#calculation)
+    section.
 
 - **-S**#, **--pane-width**=#, **--pw**=#
 
@@ -208,15 +210,26 @@ default, from the standard input.
 
     Sample styles:
     none,
-    vbar, fence,
-    line, heavy-line,
-    ascii-frame, ascii-box,
+    vbar,          heavy-vbar,       fat-vbar,
+    line,          heavy-line,
+    stick,         heavy-stick,
+    ascii-frame,
+    ascii-box,
     c-box,
-    box, frame, page-frame,
-    shadow, shadow-box,
-    comb, rake, mesh,
-    dumbbell, heavy-dumbbell,
-    ribbon, round-ribbon, double-ribbon, double-double-ribbon, heavy-ribbon
+    box,           heavy-box,        fat-box,   very-fat-box,
+    round-box,     heavy-round-box,
+    frame,         heavy-frame,      fat-frame, very-fat-frame,
+    page-frame,    heavy-page-frame,
+    shadow,
+    shadow-box,    heavy-shadow-box,
+    comb,          heavy-comb,
+    rake,          heavy-rake,
+    mesh,          heavy-mesh,
+    dumbbell,      heavy-dumbbell,
+    ribbon,        heavy-ribbon,
+    round-ribbon,
+    double-ribbon,
+    etc.
 
     These are experimental and subject to change, and this document is not
     always up-to-date.  See \`perldoc -m App::ansicolumn::Border\` for
@@ -274,11 +287,12 @@ default, from the standard input.
 
 # CALCULATION
 
-As for **--height**, **--width** and **--pane-width** options, besides
-giving numeric digits, you can calculate the number using terminal
-size.  If the expression contains non-digit character, it is evaluated
-as a Reverse Polish Notation with the terminal size pushed on the
-stack.
+As for **--height**, **--width**, **--pane** and **--pane-width** options,
+besides giving numeric digits, you can calculate the number using
+terminal size.  If the expression contains non-digit character, it is
+evaluated as a Reverse Polish Notation with the terminal size pushed
+on the stack.  Initial value for **--height** options is terminal
+height, and terminal width for others.
 
     OPTION              VALUE
     =================   =========================
@@ -288,8 +302,16 @@ stack.
     --height dup2%-2/   (height - height % 2) / 2
 
 Space and comma characters are ignored in the expression.  So `1-2/`
-and `1 - 2 /` and `1,-,2,/` are all same.  See \`perldoc Math::RPN\`
-for the expression detail.
+and `1&nbsp;-&nbsp;2&nbsp;/` and `1,-,2,/` are all same.  See \`perldoc
+Math::RPN\` for the expression detail.
+
+Next example select number of panes by dividing terminal width by 85:
+
+    ansicolumn --pane 85/
+
+If you consider the case the terminal width is less than 85:
+
+    ansicolumn --pane 85/,DUP,1>,EXCH,1,IF
 
 # STARTUP
 

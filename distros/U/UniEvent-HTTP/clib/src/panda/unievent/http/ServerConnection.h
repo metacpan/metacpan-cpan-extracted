@@ -1,14 +1,17 @@
 #pragma once
 #include <deque>
 #include "ServerRequest.h"
-#include <panda/unievent/Tcp.h>
+#include <panda/unievent/Stream.h>
 #include <panda/protocol/http/RequestParser.h>
 
 namespace panda { namespace unievent { namespace http {
 
 struct Server;
 
-struct ServerConnection : Tcp, private ITcpSelfListener, private protocol::http::RequestParser::IFactory {
+excepted<net::SockAddr, ErrorCode> get_sockaddr (const Stream*);
+excepted<net::SockAddr, ErrorCode> get_peeraddr (const Stream*);
+
+struct ServerConnection : Refcnt, private IStreamSelfListener, private protocol::http::RequestParser::IFactory {
     struct IFactory {
         virtual ServerRequestSP new_request (ServerConnection*) = 0;
     };
@@ -21,7 +24,7 @@ struct ServerConnection : Tcp, private ITcpSelfListener, private protocol::http:
         IFactory* factory;
     };
 
-    ServerConnection (Server*, uint64_t id, const Config&);
+    ServerConnection (Server*, uint64_t id, const Config&, const StreamSP&);
 
     ~ServerConnection () {}
 
@@ -31,6 +34,11 @@ struct ServerConnection : Tcp, private ITcpSelfListener, private protocol::http:
     void close (const ErrorCode&, bool soft = false);
     void graceful_stop ();
 
+    bool is_secure () const { return stream->is_secure(); }
+
+    excepted<net::SockAddr, ErrorCode> sockaddr () const { return get_sockaddr(stream); }
+    excepted<net::SockAddr, ErrorCode> peeraddr () const { return get_peeraddr(stream); }
+
 private:
     friend ServerRequest; friend ServerResponse;
 
@@ -39,6 +47,7 @@ private:
 
     Server*       server;
     uint64_t      _id;
+    StreamSP      stream;
     IFactory*     factory;
     RequestParser parser;
     Requests      requests;

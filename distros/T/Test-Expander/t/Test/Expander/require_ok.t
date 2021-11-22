@@ -9,7 +9,7 @@ use Test::Builder::Tester tests => 1;
 
 use Test::Expander;
 
-use constant CLASS => 't::Test::Expander::Boilerplate';
+use constant CLASS => 'IO::Select';
 
 my $title = "require @{[CLASS]}";
 test_out("ok 1 - $title;");

@@ -4,7 +4,7 @@ package OpenTracing;
 use strict;
 use warnings;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 no indirect;
@@ -196,8 +196,10 @@ use OpenTracing::Tag;
 use OpenTracing::Log;
 use OpenTracing::Span;
 use OpenTracing::SpanProxy;
+use OpenTracing::SpanContext;
 use OpenTracing::Process;
 use OpenTracing::Tracer;
+use OpenTracing::Reference;
 
 our $TRACER = OpenTracing::Tracer->new;
 
@@ -269,9 +271,10 @@ still in flux
 
 =head1 AUTHOR
 
-Tom Molesworth C<< TEAM@cpan.org >>
+Original implementation by Tom Molesworth C<< TEAM@cpan.org >>. Additional patches, bugfixes and features
+contributed by L<VTI> and C<chp9-u>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2021. Licensed under the same terms as Perl itself.
 

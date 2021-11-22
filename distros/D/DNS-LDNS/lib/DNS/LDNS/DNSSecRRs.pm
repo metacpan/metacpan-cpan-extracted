@@ -4,9 +4,9 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS;
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 # Note: This class does not have a constructor. Thus, it can not be created
 # as an individual object. The data structure of the node is owned 
@@ -56,7 +56,7 @@ DNS::LDNS::DNSSecRRs - Linked list of rrs in a dnssec zone
 
 =head1 SYNOPSIS
 
-  use DNS::LDNS ':all'
+  use DNS::LDNS ()
 
   rrs->to_string
   rrs->add_rr(rr)

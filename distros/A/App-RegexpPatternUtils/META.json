@@ -33,19 +33,16 @@
       },
       "runtime" : {
          "requires" : {
-            "AppBase::Grep" : "0.007",
             "Complete::Module" : "0.262",
             "Data::Dump::Color" : "0.246",
             "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0.907",
             "Data::Sah::Compiler::perl::TH::hash" : "0.907",
             "Data::Sah::Compiler::perl::TH::str" : "0.907",
-            "Log::ger" : "0.038",
             "Module::List::Tiny" : "0",
             "Perinci::CmdLine::Any" : "0.152",
             "Perinci::CmdLine::Lite" : "1.905",
             "Perinci::Sub::Gen::AccessTable" : "0.586",
-            "Perinci::Sub::Util" : "0.470",
             "Regexp::Pattern" : "v0.2.7",
             "Sah::Schema::regexppattern::name" : "0",
             "perl" : "5.010001",
@@ -74,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-App-RegexpPatternUtils"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -13,7 +13,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Test::More;
-use Test::NoWarnings;
+use Test::FailWarnings;
 use Test::Deep;
 use Test::Exception;
 
@@ -32,16 +32,12 @@ use Crypt::Perl::BigInt ();
 
 use Crypt::Perl::RSA::Generate ();
 
-if ( !caller ) {
-    my $test_obj = __PACKAGE__->new();
-    plan tests => $test_obj->expected_tests(+1);
-    $test_obj->runtests();
-}
+__PACKAGE__->new()->runtests() if !caller;
 
 #----------------------------------------------------------------------
 
-sub _ACCEPT_BIGINT_LIBS {
-    return qw( Math::BigInt::GMP  Math::BigInt::Pari );
+sub _REJECT_BIGINT_LIBS {
+    return qw( Math::BigInt::Calc );
 }
 
 sub SKIP_CLASS {
@@ -56,8 +52,8 @@ sub SKIP_CLASS {
     }
 
 
-    if ( !grep { $_ eq $bigint_lib } _ACCEPT_BIGINT_LIBS() ) {
-        return "“$bigint_lib” isn’t recognized as a C-based Math::BigInt backend. RSA key generation in pure Perl is probably too slow for now. Skipping …";
+    if ( grep { $_ eq $bigint_lib } _REJECT_BIGINT_LIBS() ) {
+        return "RSA key generation with “$bigint_lib” is probably too slow for now. Skipping …";
     }
 
     return;
@@ -86,7 +82,7 @@ sub test_generate : Tests(1) {
                 print {$fh} $pem or die $!;
                 close $fh;
 
-                my $ossl_out = `$ossl_bin rsa -check -in $path 2>&1`;
+                my $ossl_out = OpenSSL_Control::run( qw(rsa -check -in), $path );
                 die $ossl_out if $ossl_out !~ m<RSA key ok>;
                 note "OK";
             }

@@ -23,7 +23,7 @@ use Getopt::Long 2.33;
 use Pod::Usage;
 use POSIX qw{strftime};
 
-our $VERSION = '0.121';
+our $VERSION = '0.122';
 
 my %opt;
 

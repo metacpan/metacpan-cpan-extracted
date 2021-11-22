@@ -25,16 +25,12 @@ lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm
 lib/JSON/Schema/Modern/Vocabulary/MetaData.pm
 lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm
 lib/JSON/Schema/Modern/Vocabulary/Validation.pm
-share/draft2019-09/hyper-schema.json
-share/draft2019-09/links.json
 share/draft2019-09/meta/applicator.json
 share/draft2019-09/meta/content.json
 share/draft2019-09/meta/core.json
 share/draft2019-09/meta/format.json
-share/draft2019-09/meta/hyper-schema.json
 share/draft2019-09/meta/meta-data.json
 share/draft2019-09/meta/validation.json
-share/draft2019-09/output/hyper-schema.json
 share/draft2019-09/output/schema.json
 share/draft2019-09/schema.json
 share/draft2020-12/meta/applicator.json
@@ -45,6 +41,7 @@ share/draft2020-12/meta/format-assertion.json
 share/draft2020-12/meta/meta-data.json
 share/draft2020-12/meta/unevaluated.json
 share/draft2020-12/meta/validation.json
+share/draft2020-12/output/schema.json
 share/draft2020-12/schema.json
 share/draft7/schema.json
 t/00-report-prereqs.dd
@@ -115,6 +112,7 @@ t/annotations.t
 t/boolean-data.t
 t/boolean-schemas.t
 t/cached-metaschemas.t
+t/callbacks.t
 t/dialects.t
 t/document.t
 t/equality.t
@@ -125,6 +123,7 @@ t/formats.t
 t/invalid-schemas-draft2019-09.t
 t/invalid-schemas-draft2019-09/invalid-input.json
 t/invalid-schemas-draft2019-09/ref.json
+t/invalid-schemas-draft2019-09/vocabulary.json
 t/lib/Acceptance.pm
 t/lib/Helper.pm
 t/lib/MyVocabulary/BadEvaluationOrder.pm

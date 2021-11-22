@@ -10,6 +10,7 @@ requires 'Future::AsyncAwait', '>= 0.49';
 requires 'HTTP::Request', 0;
 requires 'indirect', 0;
 requires 'IO::Async::SSL', '>= 0.22';
+requires 'JSON::MaybeUTF8', '>= 2.000';
 requires 'JSON::MaybeXS', '>= 1.004003';
 requires 'Log::Any', '>= 1.709';
 requires 'namespace::clean', 0;

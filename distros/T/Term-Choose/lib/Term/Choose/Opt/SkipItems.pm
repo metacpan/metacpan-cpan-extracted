@@ -2,9 +2,9 @@ package Term::Choose::Opt::SkipItems;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.10.0;
 
-our $VERSION = '1.743';
+our $VERSION = '1.745';
 
 use Term::Choose::Constants qw( :all );
 

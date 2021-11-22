@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::TRANSPORT;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_transport_2 PDL::PP gsl_sf_transport_3 PDL::PP gsl_sf_transport_4 PDL::PP gsl_sf_transport_5 );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_transport_2 gsl_sf_transport_3 gsl_sf_transport_4 gsl_sf_transport_5 );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::TRANSPORT ;
+
 
 
 
@@ -46,10 +45,7 @@ Transport function:
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -169,7 +165,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -192,5 +188,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

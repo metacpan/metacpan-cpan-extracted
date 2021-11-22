@@ -1,4 +1,8 @@
-1.2.6     xx.xx.2021
+1.2.8     xx.xx.2021
+           - internal misc junk
+1.2.7     09.11.2021
+           - inherit cloexec on file/sock dup
+1.2.6     06.09.2021
            - protection from recursive loop run
 1.2.5     13.07.2021
            - fix typo in logs, internal stuff

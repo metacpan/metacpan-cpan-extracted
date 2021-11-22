@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use Math::GMPz qw(:mpz);
+use Math::GMPz qw(:mpz IOK_flag NOK_flag POK_flag);
 use Config;
 
-print "1..45\n";
+print "1..52\n";
 
 #####################################
 
@@ -18,21 +18,21 @@ my $t4 = Rmpz_init_set_si(MATH_GMPz_IV_MAX());
 my $t5 = Rmpz_init_set_IV(MATH_GMPz_IV_MIN());
 my $t6 = Rmpz_init_set_si(MATH_GMPz_IV_MIN());
 
-if(Rmpz_fits_UV_p($big_uv_mpz)) { print "ok 1\n"}
+if(Rmpz_fits_IV_p($big_uv_mpz)) { print "ok 1\n"}
 else {
   warn "$big_uv_mpz does not fit into a UV";
   print "not ok 1\n";
 }
 
-if(!Rmpz_fits_IV_p($big_uv_mpz)) { print "ok 2\n"}
+if(Rmpz_fits_IV_p($big_uv_mpz)) { print "ok 2\n"}
 else {
-  warn "$big_uv_mpz fits into an IV";
+  warn "$big_uv_mpz does not fit into an IV";
   print "not ok 2\n";
 }
 
 Rmpz_set($mpz1, $big_uv_mpz + 1);
 
-if(!Rmpz_fits_UV_p($mpz1)) { print "ok 3\n"}
+if(!Rmpz_fits_IV_p($mpz1)) { print "ok 3\n"}
 else {
   warn "$mpz1 fits into a UV";
   print "not ok 3\n";
@@ -62,17 +62,17 @@ else {
   print "not ok 6\n";
 }
 
-if(!Rmpz_fits_IV_p($big_iv_mpz * 2)) { print "ok 7\n"}
+if(Rmpz_fits_IV_p($big_iv_mpz * 2)) { print "ok 7\n"}
 else {
-  warn "$big_iv_mpz fits into an IV";
+  warn "$big_iv_mpz does not into an IV";
   print "not ok 7\n";
 }
 
 Rmpz_set($mpz1, $big_iv_mpz + 1);
 
-if(!Rmpz_fits_IV_p($mpz1)) { print "ok 8\n"}
+if(Rmpz_fits_IV_p($mpz1)) { print "ok 8\n"}
 else {
-  warn "$mpz1 fits into a IV";
+  warn "$mpz1 does not fit into an IV";
   print "not ok 8\n";
 }
 
@@ -170,7 +170,7 @@ else {
 
 my $ok = '';
 
-if(!Math::GMPz::_has_longlong()) { # _IV/_UV matches _si/_ui
+if(!Math::GMPz::_has_longlong()) { # _IV matches _si/_ui
 
   if($t1 == $t2) {$ok .= 'a'}
   else {warn "\n22a: $t1 != $t2\n"}
@@ -469,8 +469,57 @@ else {
   if(!Math::GMPz::_has_longdouble() && !Math::GMPz::_has_float128()) {print "ok 45\n"}
   else {
     warn "\n double:\n Math::GMPz::_has_longdouble(): ", Math::GMPz::_has_longdouble(),
-         "\n Math::GMPzV_has_float128(): ", Math::GMPzV_has_float128(), "\n";
+         "\n Math::GMPzV_has_float128(): ", Math::GMPz_has_float128(), "\n";
     print "not ok 45\n";
   }
 }
 
+eval{Rmpz_set_IV($mpz1, 2.3)};
+
+if($@ =~ /Arg provided to Rmpz_set_IV is not an IV/) {print "ok 46\n"}
+else {
+  warn "\n\$\@: $@";
+  print "not ok 46\n";
+}
+
+eval{Rmpz_cmp_IV($mpz1, 2.3)};
+
+if($@ =~ /Arg provided to Rmpz_cmp_IV is not an IV/) {print "ok 47\n"}
+else {
+  warn "\n\$\@: $@";
+  print "not ok 47\n";
+}
+
+eval{Rmpz_set_NV($mpz1, "2.3")};
+
+if($@ =~ /In Rmpz_set_NV, 2nd argument is not an NV/) {print "ok 48\n"}
+else {
+  warn "\n\$\@: $@";
+  print "not ok 48\n";
+}
+
+eval{Rmpz_cmp_NV($mpz1, "2.3")};
+
+if($@ =~ /In Rmpz_cmp_NV, 2nd argument is not an NV/) {print "ok 49\n"}
+else {
+  warn "\n\$\@: $@";
+  print "not ok 49\n";
+}
+
+if(!IOK_flag(2.3)) { print "ok 50\n" }
+else {
+  warn "IOK_flag(2.3) == ", IOK_flag(2.3), "\n";
+  print "not ok 50\n";
+}
+
+if(!NOK_flag("2.3")) { print "ok 51\n" }
+else {
+  warn "IOK_flag('2.3') == ", IOK_flag('2.3'), "\n";
+  print "not ok 51\n";
+}
+
+if(POK_flag("2.3")) { print "ok 52\n" }
+else {
+  warn "POK_flag('2.3') == ", POK_flag('2.3'), "\n";
+  print "not ok 52\n";
+}

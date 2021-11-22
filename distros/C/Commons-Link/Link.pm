@@ -4,14 +4,17 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
-use File::Spec::Functions qw(catfile);
 use Digest::MD5 qw(md5_hex);
 use Readonly;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+use URI;
 
-Readonly::Scalar our $BASE_URI => q{http://upload.wikimedia.org/wikipedia/commons/};
+Readonly::Scalar our $UPLOAD_URI => q{http://upload.wikimedia.org};
+Readonly::Scalar our $COMMONS_URI => q{https://commons.wikimedia.org};
+Readonly::Array our @UPLOAD_SEGS => qw(wikipedia commons);
+Readonly::Array our @COMMONS_SEGS => qw(wiki);
 
-our $VERSION = 0.02;
+our $VERSION = 0.05;
 
 sub new {
 	my ($class, @params) = @_;
@@ -36,9 +39,54 @@ sub link {
 	# Digest characters.
 	my ($a, $b) = $self->_compute_ab($file);
 
-	my $url = $BASE_URI.catfile($a, $b, $file);
+	my $u = URI->new($UPLOAD_URI);
+	$u->path_segments(@UPLOAD_SEGS, $a, $b, $file);
 
-	return $url;
+	return $u->as_string;
+}
+
+sub mw_file_link {
+	my ($self, $file) = @_;
+
+	if ($file !~ m/^(File|Image):/ms) {
+		$file = 'File:'.$file;
+	}
+
+	return $self->mw_link($file);
+}
+
+sub mw_link {
+	my ($self, $file) = @_;
+
+	my $u = URI->new($COMMONS_URI);
+	$u->path_segments(@COMMONS_SEGS, $file);
+
+	return $u->as_string;
+}
+
+sub mw_user_link {
+	my ($self, $user) = @_;
+
+	if ($user !~ m/^User:/ms) {
+		$user = 'User:'.$user;
+	}
+
+	return $self->mw_link($user);
+}
+
+sub thumb_link {
+	my ($self, $file, $width) = @_;
+
+	$self->_cleanup(\$file);
+
+	# Digest characters.
+	my ($a, $b) = $self->_compute_ab($file);
+
+	my $u = URI->new($UPLOAD_URI);
+	$u->path_segments(@UPLOAD_SEGS, 'thumb', $a, $b, $file,
+		$width.'px-'.$file);
+
+	return $u->as_string;
 }
 
 sub _cleanup {
@@ -92,6 +140,10 @@ Commons::Link - Object for creating link for Wikimedia Commons.
 
  my $obj = Commons::Link->new(%params);
  my $link = $obj->link($file);
+ my $mw_file_link = $obj->mw_file_link($file);
+ my $mw_link = $obj->mw_link($object);
+ my $mw_user_link = $obj->mw_user_link($user);
+ my $thumb_link = $obj->thumb_link($file, $width_in_pixels);
 
 =head1 METHODS
 
@@ -119,6 +171,43 @@ Default value is 1.
  my $link = $obj->link($file);
 
 Get URL from Wikimedia Commons computed from file name.
+File name could be with 'Image:' and 'File:' prefix or directly file.
+Spaces are translated to '_'.
+
+Returns string with URL.
+
+=head2 C<mw_file_link>
+
+ my $mw_file_link = $obj->mw_file_link($file);
+
+Get URL from Wikimedia Commons MediaWiki view page defined by file name.
+File name could be with 'Image:' and 'File:' prefix or directly file.
+
+Returns string with URL.
+
+=head2 C<mw_link>
+
+ my $mw_link = $obj->mw_link($object);
+
+Get URL from Wikimedia Commons MediaWiki view page defined by object name.
+e.g. File:__FILENAME__, User:__USERNAME__, Category:__CATEGORY__
+
+Returns string with URL.
+
+=head2 C<mw_user_link>
+
+ my $mw_user_link = $obj->mw_user_link($user);
+
+Get URL from Wikimedia Commons MediaWiki view page defined by user name.
+File name could be with 'User:' prefix or directly file.
+
+Returns string with URL.
+
+=head2 C<thumb_link>
+
+ my $thumb_link = $obj->thumb_link($file, $width_in_pixels);
+
+Get URL from Wikimedia Commons computed from file name and image width in pixels.
 File name could be with 'Image:' and 'File:' prefix or directly file.
 Spaces are translated to '_'.
 
@@ -178,13 +267,37 @@ Returns string with URL.
  # Input file: File:Michal from Czechia.jpg
  # Output link: http://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg
 
+=head1 EXAMPLE3
+
+ use strict;
+ use warnings;
+
+ use Commons::Link;
+
+ # Object.
+ my $obj = Commons::Link->new;
+
+ # Input name.
+ my $commons_file = 'File:Michal from Czechia.jpg';
+
+ # URL to thumbnail file.
+ my $commons_url = $obj->thumb_link($commons_file, 200);
+
+ # Print out.
+ print 'Input file: '.$commons_file."\n";
+ print 'Output thumbnail link: '.$commons_url."\n";
+
+ # Output:
+ # Input file: File:Michal from Czechia.jpg
+ # Output thumbnail link: http://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Michal_from_Czechia.jpg/200px-Michal_from_Czechia.jpg
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
-L<File::Spec::Functions>,
 L<Digest::MD5>,
 L<Readonly>,
-L<Unicode::UTF8>.
+L<Unicode::UTF8>,
+L<URI>.
 
 =head1 REPOSITORY
 
@@ -204,6 +317,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.05
 
 =cut

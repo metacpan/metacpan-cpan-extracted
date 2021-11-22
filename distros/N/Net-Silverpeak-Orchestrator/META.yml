@@ -29,7 +29,7 @@ requires:
 resources:
   bugtracker: https://github.com/abraxxa/Net-Silverpeak-Orchestrator/issues
   repository: https://github.com/abraxxa/Net-Silverpeak-Orchestrator.git
-version: '0.003000'
+version: '0.004000'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -197,6 +197,87 @@ x_Dist_Zilla:
       name: MetaResources
       version: '6.024'
     -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@TestingMania/Test::Version'
+      version: '1.09'
+    -
+      class: Dist::Zilla::Plugin::Test::NoTabs
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          filename: xt/author/no-tabs.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+      name: '@TestingMania/Test::NoTabs'
+      version: '0.15'
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+          trailing_whitespace: 1
+      name: '@TestingMania/Test::EOL'
+      version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@TestingMania/Test::UnusedVars'
+      version: '2.000007'
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      config:
+        Dist::Zilla::Plugin::Test::MinimumVersion:
+          max_target_perl: ~
+      name: '@TestingMania/Test::MinimumVersion'
+      version: '2.000010'
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
+      name: '@TestingMania/Test::Pod::LinkCheck'
+      version: '1.004'
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@TestingMania/Test::DistManifest'
+      version: '2.000005'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: ''
+      name: '@TestingMania/Test::Portability'
+      version: '2.001000'
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@TestingMania/Test::Synopsis'
+      version: '2.000007'
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@TestingMania/MetaTests'
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@TestingMania/Test::Perl::Critic'
+      version: '3.001'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@TestingMania/PodSyntaxTests'
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee
+      config:
+        Dist::Zilla::Plugin::Test::Kwalitee:
+          filename: xt/release/kwalitee.t
+          skiptest: []
+      name: '@TestingMania/Test::Kwalitee'
+      version: '2.12'
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@TestingMania/Test::CPAN::Meta::JSON'
+      version: '0.004'
+    -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
@@ -215,59 +296,9 @@ x_Dist_Zilla:
       name: '@TestingMania/Test::Compile'
       version: '2.058'
     -
-      class: Dist::Zilla::Plugin::Test::UnusedVars
-      name: '@TestingMania/Test::UnusedVars'
-      version: '2.000007'
-    -
-      class: Dist::Zilla::Plugin::Test::Version
-      name: '@TestingMania/Test::Version'
-      version: '1.09'
-    -
-      class: Dist::Zilla::Plugin::MetaTests
-      name: '@TestingMania/MetaTests'
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@TestingMania/PodCoverageTests'
       version: '6.024'
-    -
-      class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
-      name: '@TestingMania/Test::Pod::LinkCheck'
-      version: '1.004'
-    -
-      class: Dist::Zilla::Plugin::Test::MinimumVersion
-      config:
-        Dist::Zilla::Plugin::Test::MinimumVersion:
-          max_target_perl: ~
-      name: '@TestingMania/Test::MinimumVersion'
-      version: '2.000010'
-    -
-      class: Dist::Zilla::Plugin::Test::EOL
-      config:
-        Dist::Zilla::Plugin::Test::EOL:
-          filename: xt/author/eol.t
-          finder:
-            - ':ExecFiles'
-            - ':InstallModules'
-            - ':TestFiles'
-          trailing_whitespace: 1
-      name: '@TestingMania/Test::EOL'
-      version: '0.19'
-    -
-      class: Dist::Zilla::Plugin::PodSyntaxTests
-      name: '@TestingMania/PodSyntaxTests'
-      version: '6.024'
-    -
-      class: Dist::Zilla::Plugin::Test::NoTabs
-      config:
-        Dist::Zilla::Plugin::Test::NoTabs:
-          filename: xt/author/no-tabs.t
-          finder:
-            - ':InstallModules'
-            - ':ExecFiles'
-            - ':TestFiles'
-      name: '@TestingMania/Test::NoTabs'
-      version: '0.15'
-    -
-      class: Dist::Zilla::Plugin::Test::DistManifest
-      name: '@TestingMania/Test::DistManifest'
-      version: '2.000005'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
       config:
@@ -280,37 +311,6 @@ x_Dist_Zilla:
       name: '@TestingMania/MojibakeTests'
       version: '0.8'
     -
-      class: Dist::Zilla::Plugin::Test::Kwalitee
-      config:
-        Dist::Zilla::Plugin::Test::Kwalitee:
-          filename: xt/release/kwalitee.t
-          skiptest: []
-      name: '@TestingMania/Test::Kwalitee'
-      version: '2.12'
-    -
-      class: Dist::Zilla::Plugin::Test::Synopsis
-      name: '@TestingMania/Test::Synopsis'
-      version: '2.000007'
-    -
-      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
-      name: '@TestingMania/Test::CPAN::Meta::JSON'
-      version: '0.004'
-    -
-      class: Dist::Zilla::Plugin::Test::Perl::Critic
-      name: '@TestingMania/Test::Perl::Critic'
-      version: '3.001'
-    -
-      class: Dist::Zilla::Plugin::Test::Portability
-      config:
-        Dist::Zilla::Plugin::Test::Portability:
-          options: ''
-      name: '@TestingMania/Test::Portability'
-      version: '2.001000'
-    -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@TestingMania/PodCoverageTests'
-      version: '6.024'
-    -
       class: Dist::Zilla::Plugin::Git::Check
       config:
         Dist::Zilla::Plugin::Git::Check:
@@ -322,7 +322,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.32.0
           repo_root: .
       name: '@Git/Check'
       version: '2.048'
@@ -340,7 +340,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.32.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -353,11 +353,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003000'
+          tag: '0.004000'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.32.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -371,7 +371,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.32.0
           repo_root: .
       name: '@Git/Push'
       version: '2.048'

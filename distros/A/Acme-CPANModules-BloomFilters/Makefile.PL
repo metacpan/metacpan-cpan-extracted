@@ -15,14 +15,16 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Acme-CPANModules-BloomFilters",
   "LICENSE" => "perl",
   "NAME" => "Acme::CPANModules::BloomFilters",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "strict" => 0
+  },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +35,8 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "strict" => 0
 );
 
 

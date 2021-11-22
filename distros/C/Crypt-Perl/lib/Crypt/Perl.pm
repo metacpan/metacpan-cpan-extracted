@@ -3,7 +3,7 @@ package Crypt::Perl;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.36';
 
 =encoding utf-8
 
@@ -12,6 +12,12 @@ our $VERSION = '0.34';
 Crypt::Perl - Cryptography in pure Perl
 
 =head1 DESCRIPTION
+
+=begin html
+
+<a href='https://coveralls.io/github/FGasper/p5-Crypt-Perl?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Crypt-Perl/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=end html
 
 Just as it sounds: cryptography with no non-core XS dependencies!
 This is useful if you don’t have access to

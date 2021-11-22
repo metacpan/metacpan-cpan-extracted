@@ -92,9 +92,9 @@ is( $changed, 3, '$changed is 3' );
 
 done_testing;
 
-use Object::Pad 0.09;
+use Object::Pad;
 
-class TestWidget extends Tickit::Widget {
+class TestWidget :isa(Tickit::Widget) {
    use constant WIDGET_PEN_FROM_STYLE => 1;
 
    method render_to_rb {}
@@ -103,7 +103,7 @@ class TestWidget extends Tickit::Widget {
    method cols  { $cols  }
 }
 
-class TestContainer extends Tickit::ContainerWidget {
+class TestContainer :isa(Tickit::ContainerWidget) {
    use constant WIDGET_PEN_FROM_STYLE => 1;
 
    has @_children;

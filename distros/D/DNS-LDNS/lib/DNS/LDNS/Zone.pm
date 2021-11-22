@@ -4,21 +4,21 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS ':all';
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 sub new {
     my ($class, %args) = @_;
 
     my $line_nr = 0;
-    my $status = &LDNS_STATUS_OK;
+    my $status = &DNS::LDNS::LDNS_STATUS_OK;
     my $zone;
     my $file;
 
     if ($args{filename}) {
 	unless (open FILE, $args{filename}) {
-	    $DNS::LDNS::last_status = &LDNS_STATUS_FILE_ERR;
+	    $DNS::LDNS::last_status = &DNS::LDNS::LDNS_STATUS_FILE_ERR;
 	    $DNS::LDNS::line_nr = 0;
 	    return;
 	}
@@ -96,19 +96,19 @@ DNS::LDNS::Zone - Parsed zonefile
 
 =head1 SYNOPSIS
 
-  use DNS::LDNS ':all'
+  use DNS::LDNS ();
 
-  my z = new DNS::LDNS::Zone(
+  my z = DNS::LDNS::Zone->new(
     filename => '/path/to/myzone',
-    origin => new DNS::LDNS::RData(LDNS_RDF_TYPE_DNAME, 'myzone'), #optional
+    origin => DNS::LDNS::RData->new(LDNS_RDF_TYPE_DNAME, 'myzone'), #optional
     default_ttl => 3600, #optional
     class => LDNS_RR_CLASS_IN, #optional
   )
-  my z = new DNS::LDNS::Zone(
+  my z = DNS::LDNS::Zone->new(
     file => \*FILE,
     origin => ..., default_ttl => ..., class => ...
   )
-  my z = new DNS::LDNS::Zone
+  my z = DNS::LDNS::Zone->new
 
   z->to_string
   z->print(\*FILE)

@@ -1,6 +1,7 @@
 package MyTest;
 use 5.012;
 use warnings;
+use Cwd;
 use Test::More;
 use Time::HiRes();
 use Test::Catch;
@@ -32,9 +33,10 @@ sub import {
 }
 
 sub test_catch {
+    my $old = Cwd::cwd();
     chdir 'clib';
     catch_run(@_);
-    chdir '../';
+    chdir $old;
 }
 
 sub get_time {

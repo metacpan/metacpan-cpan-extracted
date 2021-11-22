@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 # shortcuts
 #  os and distros
@@ -3351,7 +3351,7 @@ sub mapping {
       [os_darwin,
        [package => 'libstatgrab']]],
 
-     [cpanmod => ['URPM::Resolve', 'urpmi'],
+     [cpanmod => ['URPM', 'URPM::Resolve', 'urpmi'],
       [os_freebsd,
        [package => 'rpm4']],
       [like_debian,

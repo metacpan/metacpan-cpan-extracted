@@ -9,8 +9,9 @@ use Test::More;
 use Test::Metrics::Any;
 
 use Socket 1.93 qw( 
-   AF_INET SOCK_STREAM SOCK_RAW INADDR_LOOPBACK AI_PASSIVE
-   pack_sockaddr_in inet_aton getaddrinfo getnameinfo
+   AF_INET SOCK_STREAM SOCK_DGRAM SOCK_RAW INADDR_LOOPBACK INADDR_ANY
+   AI_NUMERICHOST AI_PASSIVE NI_NUMERICHOST NI_NUMERICSERV
+   pack_sockaddr_in unpack_sockaddr_in sockaddr_family inet_aton inet_ntoa
 );
 
 use IO::Async::Loop;
@@ -131,36 +132,108 @@ SKIP: {
    is_deeply( $result, \@proto, 'getprotobynumber' );
 }
 
-# Some systems seem to mangle the order of results between PF_INET and
-# PF_INET6 depending on who asks. We'll hint AF_INET + SOCK_STREAM to minimise
-# the risk of a spurious test failure because of ordering issues
+BEGIN {
+   # Rather than suffer various test failures because system resolver behaves
+   # in a weird way when testing, lets just mock it out and replace it with a
+   # virtual one so we can control the results
+   no warnings 'redefine';
 
-my ( $localhost_err, @localhost_addrs ) = getaddrinfo( "localhost", "www", { family => AF_INET, socktype => SOCK_STREAM } );
+   *Socket::getaddrinfo = sub {
+      my ( $host, $service, $hints ) = @_;
+
+      my $hint_flags    = $hints->{flags} // 0;
+      my $hint_family   = $hints->{family};
+      my $hint_socktype = $hints->{socktype};
+
+      die "TODO: fake getaddrinfo on unrecognised family" if $hint_family and $hint_family != AF_INET;
+
+      my $flag_numerichost = $hint_flags & AI_NUMERICHOST;
+
+      return ( Socket::EAI_FAIL ) if $host =~ m/\.FAIL$/;
+
+      my $inaddr;
+      $inaddr = inet_aton( "1.2.3.4" ) if !$flag_numerichost and $host eq "one.FAKE";
+      $inaddr = INADDR_LOOPBACK        if                        $host eq "127.0.0.1";
+      $inaddr = INADDR_ANY             if $hint_flags & AI_PASSIVE and !$host;
+
+      defined $inaddr or
+         die "TODO: Unsure how to fake getaddrinfo on host=$host";
+
+      my $port = 0;
+      $port = $service+0 if $service =~ m/^\d+$/;
+      $port = 80 if $service eq "www";
+
+      my $addr = pack_sockaddr_in( $port, $inaddr );
+
+      my @res = map {
+         { family => AF_INET, socktype => $_, protocol => 0, addr => $addr }
+      } grep { !$hint_socktype or $_ == $hint_socktype } ( SOCK_STREAM, SOCK_DGRAM, SOCK_RAW );
+
+      return ( "", @res );
+   };
+
+   *Socket::getnameinfo = sub {
+      my ( $addr, $flags ) = @_;
+
+      my $family = sockaddr_family $addr;
+      $family == AF_INET or
+         die "TODO: Unsure how to fake getnameinfo on family=$family";
+
+      my ( $port, $inaddr ) = unpack_sockaddr_in $addr;
+      $inaddr eq INADDR_LOOPBACK or
+         die "TODO: Unsure how to fake getnameinfo on inaddr!=INADDR_LOOPBACK";
+
+      my $host;
+      if( $flags & NI_NUMERICHOST ) {
+         $host = inet_ntoa( $inaddr );
+      }
+      else {
+         $host = "localhost";
+      }
+
+      my $service;
+      if( $flags & NI_NUMERICSERV ) {
+         $service = $port;
+      }
+      elsif( $port == 80 ) {
+         $service = "www";
+      }
+      else {
+         die "TODO: convert port=$port to service name";
+      }
+
+      return ( "", $host, $service );
+   };
+}
+
+my @expect_one_www = (
+   { family => AF_INET, socktype => SOCK_STREAM, protocol => 0, addr => pack_sockaddr_in(80, inet_aton("1.2.3.4")) },
+);
+my @expect_lo_80 = (
+   { family => AF_INET, socktype => SOCK_STREAM, protocol => 0, addr => pack_sockaddr_in(80, INADDR_LOOPBACK) },
+);
+my @expect_passive_3000 = (
+   { family => AF_INET, socktype => 1, protocol => 0, addr => pack_sockaddr_in(3000, INADDR_ANY) },
+);
 
 {
    my $result;
 
    $resolver->resolve(
       type => 'getaddrinfo_array',
-      data => [ "localhost", "www", "inet", "stream" ],
+      data => [ "one.FAKE", "www", "inet", "stream" ],
       on_resolved => sub { $result = [ 'resolved', @_ ] },
       on_error    => sub { $result = [ 'error',    @_ ] },
    );
 
    wait_for { $result };
 
-   if( $localhost_err ) {
-      is( $result->[0], "error", 'getaddrinfo_array - error' );
-      is_deeply( $result->[1], "$localhost_err", 'getaddrinfo_array - error message' );
-   }
-   else {
-      is( $result->[0], "resolved", 'getaddrinfo_array - resolved' );
+   is( $result->[0], "resolved", 'getaddrinfo_array - resolved' );
 
-      my @got = @{$result}[1..$#$result];
-      my @expect = map { [ @{$_}{qw( family socktype protocol addr canonname )} ] } @localhost_addrs;
+   my @got = @{$result}[1..$#$result];
+   my @expect = map { [ @{$_}{qw( family socktype protocol addr canonname )} ] } @expect_one_www;
 
-      is_deeply( \@got, \@expect, 'getaddrinfo_array - resolved addresses' );
-   }
+   is_deeply( \@got, \@expect, 'getaddrinfo_array - resolved addresses' );
 }
 
 {
@@ -168,31 +241,25 @@ my ( $localhost_err, @localhost_addrs ) = getaddrinfo( "localhost", "www", { fam
 
    $resolver->resolve(
       type => 'getaddrinfo_hash',
-      data => [ host => "localhost", service => "www", family => "inet", socktype => "stream" ],
+      data => [ host => "one.FAKE", service => "www", family => "inet", socktype => "stream" ],
       on_resolved => sub { $result = [ 'resolved', @_ ] },
       on_error    => sub { $result = [ 'error',    @_ ] },
    );
 
    wait_for { $result };
 
-   if( $localhost_err ) {
-      is( $result->[0], "error", 'getaddrinfo_hash - error' );
-      is_deeply( $result->[1], "$localhost_err", 'getaddrinfo_hash - error message' );
-   }
-   else {
-      is( $result->[0], "resolved", 'getaddrinfo_hash - resolved' );
+   is( $result->[0], "resolved", 'getaddrinfo_hash - resolved' );
 
-      my @got = @{$result}[1..$#$result];
+   my @got = @{$result}[1..$#$result];
 
-      is_deeply( \@got, \@localhost_addrs, 'getaddrinfo_hash - resolved addresses' );
-   }
+   is_deeply( \@got, \@expect_one_www, 'getaddrinfo_hash - resolved addresses' );
 }
 
 {
    my $result;
 
    $resolver->getaddrinfo(
-      host     => "localhost",
+      host     => "one.FAKE",
       service  => "www",
       family   => "inet",
       socktype => "stream",
@@ -202,22 +269,16 @@ my ( $localhost_err, @localhost_addrs ) = getaddrinfo( "localhost", "www", { fam
 
    wait_for { $result };
 
-   if( $localhost_err ) {
-      is( $result->[0], "error", '$resolver->getaddrinfo - error' );
-      is_deeply( $result->[1], "$localhost_err", '$resolver->getaddrinfo - error message' );
-   }
-   else {
-      is( $result->[0], "resolved", '$resolver->getaddrinfo - resolved' );
+   is( $result->[0], "resolved", '$resolver->getaddrinfo - resolved' );
 
-      my @got = @{$result}[1..$#$result];
+   my @got = @{$result}[1..$#$result];
 
-      is_deeply( \@got, \@localhost_addrs, '$resolver->getaddrinfo - resolved addresses' );
-   }
+   is_deeply( \@got, \@expect_one_www, '$resolver->getaddrinfo - resolved addresses' );
 }
 
 {
    my $future = $resolver->getaddrinfo(
-      host     => "localhost",
+      host     => "one.FAKE",
       service  => "www",
       family   => "inet",
       socktype => "stream",
@@ -227,21 +288,12 @@ my ( $localhost_err, @localhost_addrs ) = getaddrinfo( "localhost", "www", { fam
 
    wait_for { $future->is_ready };
 
-   if( $localhost_err ) {
-      is( scalar $future->failure, "$localhost_err", '$resolver->getaddrinfo - error message' );
-      is( ( $future->failure )[1], "resolve", '->failure [1]' );
-      is( ( $future->failure )[2], "getaddrinfo", '->failure [2]' );
-   }
-   else {
-      my @got = $future->get;
+   my @got = $future->get;
 
-      is_deeply( \@got, \@localhost_addrs, '$resolver->getaddrinfo - resolved addresses' );
-   }
+   is_deeply( \@got, \@expect_one_www, '$resolver->getaddrinfo - resolved addresses' );
 }
 
 {
-   my ( $lo_err, @lo_addrs ) = getaddrinfo( "127.0.0.1", "80", { socktype => SOCK_STREAM } );
-
    my $result;
 
    $resolver->getaddrinfo(
@@ -256,7 +308,9 @@ my ( $localhost_err, @localhost_addrs ) = getaddrinfo( "localhost", "www", { fam
 
    my @got = @{$result}[1..$#$result];
 
-   is_deeply( \@got, \@lo_addrs, '$resolver->getaddrinfo resolved addresses synchronously' );
+   use Data::Dump 'pp';
+
+   is_deeply( \@got, \@expect_lo_80, '$resolver->getaddrinfo resolved addresses synchronously' );
 
    undef $result;
    $resolver->getaddrinfo(
@@ -275,8 +329,6 @@ my ( $localhost_err, @localhost_addrs ) = getaddrinfo( "localhost", "www", { fam
 }
 
 {
-   my ( $passive_err, @passive_addrs ) = getaddrinfo( "", "3000", { socktype => SOCK_STREAM, family => AF_INET, flags => AI_PASSIVE } );
-
    my $result;
 
    $resolver->getaddrinfo(
@@ -288,22 +340,15 @@ my ( $localhost_err, @localhost_addrs ) = getaddrinfo( "localhost", "www", { fam
       on_error    => sub { $result = [ 'error',    @_ ] },
    );
 
-   if( $passive_err ) {
-      is( $result->[0], "error", '$resolver->getaddrinfo passive - error synchronously' );
-      is_deeply( $result->[1], "$passive_err", '$resolver->getaddrinfo passive - error message' );
-   }
-   else {
-      is( $result->[0], "resolved", '$resolver->getaddrinfo passive - resolved synchronously' );
+   is( $result->[0], "resolved", '$resolver->getaddrinfo passive - resolved synchronously' );
 
-      my @got = @{$result}[1..$#$result];
+   my @got = @{$result}[1..$#$result];
 
-      is_deeply( \@got, \@passive_addrs, '$resolver->getaddrinfo passive - resolved addresses' );
-   }
+   is_deeply( \@got, \@expect_passive_3000, '$resolver->getaddrinfo passive - resolved addresses' ) or
+      diag( "Got=", pp(\@got), "; expected=", pp(\@expect_passive_3000) );
 }
 
 {
-   my ( $lo_err, @lo_addrs ) = getaddrinfo( "127.0.0.1", "80", { socktype => SOCK_STREAM } );
-
    my $future = $resolver->getaddrinfo(
       host     => "127.0.0.1",
       service  => "80",
@@ -316,20 +361,12 @@ my ( $localhost_err, @localhost_addrs ) = getaddrinfo( "localhost", "www", { fam
 
    my @got = $future->get;
 
-   is_deeply( \@got, \@lo_addrs, '$resolver->getaddrinfo resolved addresses synchronously' );
+   is_deeply( \@got, \@expect_lo_80, '$resolver->getaddrinfo resolved addresses synchronously' );
 }
 
-# Now something I hope doesn't exist - we put it in a known-missing TLD
-my $missinghost = "TbK4jM2M0OS.lm57DWIyu4i";
-
-# Some CPAN testing machines seem to have wildcard DNS servers that reply to
-# any request. We'd better check for them
-
-SKIP: {
-    skip "Resolver has an answer for $missinghost", 1 if gethostbyname( $missinghost );
-
+{
     my $future = wait_for_future $resolver->getaddrinfo(
-       host     => $missinghost,
+       host     => "a-name-to.FAIL",
        service  => "80",
        socktype => SOCK_STREAM,
     );
@@ -339,58 +376,41 @@ SKIP: {
     is( ( $future->failure )[2], "getaddrinfo", '->failure [2] gives getaddrinfo' );
 
     my $errno = ( $future->failure )[3];
-    ok( $errno == Socket::EAI_FAIL || $errno == Socket::EAI_AGAIN || # no server available
-        $errno == Socket::EAI_NONAME || $errno == Socket::EAI_NODATA, # server confirmed no DNS entry
-        '->failure [3] gives EAI_FAIL or EAI_AGAIN or EAI_NONAME or EAI_NODATA' ) or
-      diag( '$errno is ' . $errno );
+    is( $errno, Socket::EAI_FAIL, '->failure [3] gives EAI_FAIL' );
 }
 
-my $testaddr = pack_sockaddr_in( 80, INADDR_LOOPBACK );
-my ( $testerr, $testhost, $testserv ) = getnameinfo( $testaddr );
+my $sinaddr_lo_www = pack_sockaddr_in( 80, INADDR_LOOPBACK );
 
 {
    my $result;
 
    $resolver->getnameinfo(
-      addr => $testaddr,
+      addr => $sinaddr_lo_www,
       on_resolved => sub { $result = [ 'resolved', @_ ] },
       on_error    => sub { $result = [ 'error',    @_ ] },
    );
 
    wait_for { $result };
 
-   if( $testerr ) {
-      is( $result->[0], "error", '$resolver->getnameinfo - error' );
-      is_deeply( $result->[1], "$testerr", '$resolver->getnameinfo - error message' );
-   }
-   else {
-      is( $result->[0], "resolved", '$resolver->getnameinfo - resolved' );
-      is_deeply( [ @{$result}[1..2] ], [ $testhost, $testserv ], '$resolver->getnameinfo - resolved names' );
-   }
+   is( $result->[0], "resolved", '$resolver->getnameinfo - resolved' );
+   is_deeply( [ @{$result}[1..2] ], [ "localhost", "www" ], '$resolver->getnameinfo - resolved names' );
 }
 
 {
    my $future = wait_for_future $resolver->getnameinfo(
-      addr => $testaddr,
+      addr => $sinaddr_lo_www,
    );
 
-   if( $testerr ) {
-      is( scalar $future->failure, "$testerr", '$resolver->getnameinfo - error message from future' );
-      is( ( $future->failure )[1], "resolve", '->failure [1]' );
-      is( ( $future->failure )[2], "getnameinfo", '->failure [2]' );
-   }
-   else {
-      my @got = $future->get;
+   my @got = $future->get;
 
-      is_deeply( \@got, [ $testhost, $testserv ], '$resolver->getnameinfo - resolved names from future' );
-   }
+   is_deeply( \@got, [ "localhost", "www" ], '$resolver->getnameinfo - resolved names from future' );
 }
 
 {
    my $result;
 
    $resolver->getnameinfo(
-      addr    => $testaddr,
+      addr    => $sinaddr_lo_www,
       numeric => 1,
       on_resolved => sub { $result = [ 'resolved', @_ ] },
       on_error    => sub { $result = [ 'error',    @_ ] },
@@ -401,7 +421,7 @@ my ( $testerr, $testhost, $testserv ) = getnameinfo( $testaddr );
 
 {
    my $future = $resolver->getnameinfo(
-      addr    => $testaddr,
+      addr    => $sinaddr_lo_www,
       numeric => 1,
    );
 
@@ -414,7 +434,7 @@ SKIP: {
 
    is_metrics_from(
       sub {
-         $resolver->getnameinfo( addr => $testaddr )->get;
+         $resolver->getnameinfo( addr => $sinaddr_lo_www )->get;
       },
       { "io_async_resolver_lookups type:getnameinfo" => 1 },
       'Resolver increments metrics'

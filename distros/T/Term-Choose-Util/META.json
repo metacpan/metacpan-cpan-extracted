@@ -42,7 +42,7 @@
             "File::Spec::Functions" : "0",
             "List::Util" : "1.33",
             "Term::Choose" : "1.742",
-            "perl" : "5.008003",
+            "perl" : "5.010000",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -59,6 +59,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose-Util"
       }
    },
-   "version" : "0.132",
+   "version" : "0.133",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

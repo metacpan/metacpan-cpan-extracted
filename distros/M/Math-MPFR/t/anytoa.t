@@ -67,6 +67,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "1: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "1: emin was reset correctly");
   cmp_ok($res, 'eq', $expected{$bits}->[0], "$res eq $expected{$bits}->[0]");
+  cmp_ok(anytoa($op), 'eq', $res, "1: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -76,6 +77,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "2: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "2: emin was reset correctly");
   cmp_ok($res, 'eq', $nexpected{$bits}->[0], "$res eq $nexpected{$bits}->[0]");
+  cmp_ok(anytoa($op), 'eq', $res, "2: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -86,6 +88,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "3: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "3: emin was reset correctly");
   cmp_ok($res, 'eq', $expected{$bits}->[1], "$res eq $expected{$bits}->[1]");
+  cmp_ok(anytoa($op), 'eq', $res, "3: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -95,6 +98,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "4: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "4: emin was reset correctly");
   cmp_ok($res, 'eq', $nexpected{$bits}->[1], "$res eq $nexpected{$bits}->[1]");
+  cmp_ok(anytoa($op), 'eq', $res, "4: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -104,6 +108,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "5: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "5: emin was reset correctly");
   cmp_ok($res, 'eq', $expected{$bits}->[2], "$res eq $expected{$bits}->[2]");
+  cmp_ok(anytoa($op), 'eq', $res, "5: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -113,6 +118,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "6: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "6: emin was reset correctly");
   cmp_ok($res, 'eq', $nexpected{$bits}->[2], "$res eq $nexpected{$bits}->[2]");
+  cmp_ok(anytoa($op), 'eq', $res, "6: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -126,12 +132,14 @@ for my $bits(53, 64, 113, 2098) {
     cmp_ok(Rmpfr_get_emax(), '==', $emax, "7: emax was reset correctly");
     cmp_ok(Rmpfr_get_emin(), '==', $emin, "7: emin was reset correctly");
     cmp_ok($res, 'eq', $expected{$bits}->[3], "$res eq $expected{$bits}->[3]");
+  cmp_ok(anytoa($op), 'eq', $res, "7: re-run preceding test minus 2nd arg");
 
     Rmpfr_neg($op, $op, MPFR_RNDN);
     $res = anytoa($op, $bits);
     cmp_ok(Rmpfr_get_emax(), '==', $emax, "8: emax was reset correctly");
     cmp_ok(Rmpfr_get_emin(), '==', $emin, "8: emin was reset correctly");
     cmp_ok($res, 'eq', $nexpected{$bits}->[3], "$res eq $nexpected{$bits}->[3]");
+    cmp_ok(anytoa($op), 'eq', $res, "8: re-run preceding test minus 2nd arg");
   }
 
   # Deal with 2 more subnormals that might be mis-assigned by older perls
@@ -140,6 +148,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "9: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "9: emin was reset correctly");
   cmp_ok($res, 'eq', $expected{$bits}->[4], "$res eq $expected{$bits}->[4]");
+  cmp_ok(anytoa($op), 'eq', $res, "9: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless ($bits == 2098 || $bits == 53);
@@ -149,6 +158,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "10: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "10: emin was reset correctly");
   cmp_ok($res, 'eq', $nexpected{$bits}->[4], "$res eq $nexpected{$bits}->[4]");
+  cmp_ok(anytoa($op), 'eq', $res, "10: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless ($bits == 2098 || $bits == 53);
@@ -161,6 +171,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "11: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "11: emin was reset correctly");
   cmp_ok($res, 'eq', $expected{$bits}->[5], "$res eq $expected{$bits}->[5]");
+  cmp_ok(anytoa($op), 'eq', $res, "11: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -170,6 +181,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "12: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "12: emin was reset correctly");
   cmp_ok($res, 'eq', $nexpected{$bits}->[5], "$res eq $nexpected{$bits}->[5]");
+  cmp_ok(anytoa($op), 'eq', $res, "12: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -180,6 +192,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "13: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "13: emin was reset correctly");
   cmp_ok($res, 'eq', $expected{$bits}->[6], "$res eq $expected{$bits}->[6]");
+  cmp_ok(anytoa($op), 'eq', $res, "13: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -189,6 +202,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "14: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "14: emin was reset correctly");
   cmp_ok($res, 'eq', $nexpected{$bits}->[6], "$res eq $nexpected{$bits}->[6]");
+  cmp_ok(anytoa($op), 'eq', $res, "14: re-run preceding test minus 2nd arg");
 
   cmp_ok($res, 'eq', mpfrtoa($op), "$res eq mpfrtoa($op)")
     unless $bits == 2098;
@@ -199,12 +213,14 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "15: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "15: emin was reset correctly");
   cmp_ok($res, 'eq', $expected{$bits}->[7], "$res eq $expected{$bits}->[7]");
+  cmp_ok(anytoa($op), 'eq', $res, "15: re-run preceding test minus 2nd arg");
 
   Rmpfr_neg($op, $op, MPFR_RNDN);
   $res = anytoa($op, $bits);
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "16: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "16: emin was reset correctly");
   cmp_ok($res, 'eq', $nexpected{$bits}->[7], "$res eq $nexpected{$bits}->[7]");
+  cmp_ok(anytoa($op), 'eq', $res, "16: re-run preceding test minus 2nd arg");
 
   Rmpfr_neg($op, $op, MPFR_RNDN); # Revert to +ve value.
 
@@ -215,12 +231,14 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "17: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "17: emin was reset correctly");
   cmp_ok($res, 'eq', $expected{$bits}->[8], "$res eq $expected{$bits}->[8]");
+  cmp_ok(anytoa($op), 'eq', $res, "17: re-run preceding test minus 2nd arg");
 
   Rmpfr_neg($op, $op, MPFR_RNDN);
   $res = anytoa($op, $bits);
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "18: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "18: emin was reset correctly");
   cmp_ok($res, 'eq', $nexpected{$bits}->[8], "$res eq $nexpected{$bits}->[8]");
+  cmp_ok(anytoa($op), 'eq', $res, "18: re-run preceding test minus 2nd arg");
 
   Rmpfr_set_ui($op, 2, MPFR_RNDN);
   $op **= -16420;
@@ -228,12 +246,14 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "19: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "19: emin was reset correctly");
   cmp_ok($res, 'eq', $expected{$bits}->[7], "$res eq $expected{$bits}->[7]");
+  cmp_ok(anytoa($op), 'eq', $res, "19: re-run preceding test minus 2nd arg");
 
   Rmpfr_neg($op, $op, MPFR_RNDN);
   $res = anytoa($op, $bits);
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "20: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "20: emin was reset correctly");
   cmp_ok($res, 'eq', $nexpected{$bits}->[7], "$res eq $nexpected{$bits}->[7]");
+  cmp_ok(anytoa($op), 'eq', $res, "20: re-run preceding test minus 2nd arg");
 
   Rmpfr_set_ui($op, 2, MPFR_RNDN);
   $op **= ($bounds{$bits}->[0]) - 1;
@@ -245,6 +265,7 @@ for my $bits(53, 64, 113, 2098) {
   # evaluating Math::MPFR->new($res), which should be finite and positive.
   cmp_ok(Math::MPFR->new($res), '>', 0, "$res > 0");
   cmp_ok(Math::MPFR->new($res), '<', $inf, "$res < Inf");
+  cmp_ok(anytoa($op), 'eq', $res, "21: re-run preceding test minus 2nd arg");
 
   Rmpfr_neg($op, $op, MPFR_RNDN);
   $res = anytoa($op, $bits);
@@ -255,12 +276,14 @@ for my $bits(53, 64, 113, 2098) {
   # evaluating Math::MPFR->new($res), which should be finite and negative.
   cmp_ok(Math::MPFR->new($res), '<', 0, "$res < 0");
   cmp_ok(Math::MPFR->new($res), '>', -$inf, "$res > -Inf");
+  cmp_ok(anytoa($op), 'eq', $res, "22: re-run preceding test minus 2nd arg");
 
   Rmpfr_set_ui($op, 2, MPFR_RNDN);
   $op **= $bounds{$bits}->[0];
   $res = anytoa($op, $bits);
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "23: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "23: emin was reset correctly");
+  cmp_ok(anytoa($op), 'eq', $res, "23: re-run preceding test minus 2nd arg");
 
   # Evaluate Math::MPFR->new($res) to ensure that $res really is '+Inf'.
   cmp_ok(Math::MPFR->new($res), '==', $inf, "$res is positive and infinite");
@@ -270,6 +293,7 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "24: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "24: emin was reset correctly");
   cmp_ok(Math::MPFR->new($res), '==', -$inf, "$res is negative and infinite");
+  cmp_ok(anytoa($op), 'eq', $res, "24: re-run preceding test minus 2nd arg");
 
   Rmpfr_set_nan($op);
   $res = anytoa($op, $bits);
@@ -292,6 +316,21 @@ for my $bits(53, 64, 113, 2098) {
   cmp_ok(Rmpfr_get_emax(), '==', $emax, "28: emax was reset correctly");
   cmp_ok(Rmpfr_get_emin(), '==', $emin, "28: emin was reset correctly");
   like($@, qr/^2nd argument given to anytoa/, "dies if 2nd arg is invalid value");
+
+  my $current_prec = Rmpfr_get_default_prec();
+  Rmpfr_set_default_prec(60);
+
+  eval { anytoa(Math::MPFR->new(0), 0); };
+  cmp_ok(Rmpfr_get_emax(), '==', $emax, "28: emax was reset correctly");
+  cmp_ok(Rmpfr_get_emin(), '==', $emin, "28: emin was reset correctly");
+  like($@, qr/^Precision of arg given to anytoa/, "dies on invalid prec if 2nd arg is 0");
+
+  eval { anytoa(Math::MPFR->new(0)); };
+  cmp_ok(Rmpfr_get_emax(), '==', $emax, "28: emax was reset correctly");
+  cmp_ok(Rmpfr_get_emin(), '==', $emin, "28: emin was reset correctly");
+  like($@, qr/^Precision of arg given to anytoa/, "dies on invalid prec if 2nd arg is not provided");
+
+  Rmpfr_set_default_prec($current_prec);
 }
 
 done_testing();

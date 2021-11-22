@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 3c68117b1aa8600a41fdbdb42445ad2cd04878730441cdc1035decc83833c301 Changes
+SHA256 02a18949e5881882ff7e8113599a74a6b54da59c215cf94f61e306b5b37d49e6 DjVu.pm
+SHA256 3d8aa7a1fd6fcaa5ffa6aa05c58d97639061d0ba5450bc73add5c0dd50136450 LICENSE
+SHA256 a74fe6160cec1752ef0c9ba38219d0c13be3ca6f20b1611681d3fa0fae8a9272 MANIFEST
+SHA256 74cf5c1ca8f0fb441c275177efaff8bb9f1c2645bf2cb2c02284fb42bc0d7504 META.yml
+SHA256 d41ed3866652a0caa4532328e62034d81607d794b31b63bab3ade397948f5afe Makefile.PL
+SHA256 a43b05f46ac72ec3721a5d0a2c898c663f0e5fd10f2344e97860b7e4b86f0ca8 README
+SHA256 4bfbdcfb33335e5ea241c485f804e970b987da336c33bf02dc3a3570e044b16b examples/ex1.pl
+SHA256 980ab9d4d7430e25a296a0bf35f9d3def85fded00479af504087ed2b5d48ebe6 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 5b4136cd8c06c83a27923fe96ccdcd830ffa549227fad8769aea9de6f8feeaae t/File-Find-Rule-DjVu/01-use.t
+SHA256 08dd1f4477434076a093c66f6073d7a0cddf4e49ba861c97053ed29f6afe7a34 t/File-Find-Rule-DjVu/02-version.t
+SHA256 6159d4eae3614a8860d78eea11c499225ba490439c6aa0ddb3c51811d1b9807d t/File-Find-Rule-DjVu/03-djvu.t
+SHA256 26081d075b9bc9e85e27bd46cbb1194350c271d8e9c200f21f48adf1ff693019 t/File-Find-Rule-DjVu/04-djvu_chunk.t
+SHA256 9ff02507b5f113738e37bf527e7dd418c2b1da632a61625de742a1fa02e8c3ca t/data/11a7ffc0-c61e-11e6-ac1c-001018b5eb5c.djvu
+SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 t/data/bad_djvu.djvu
+SHA256 b81961135128cae2c598e650220908a57fc5e79674eece68f42ae094d043207f xt/File-Find-Rule-DjVu/01-pod_coverage.t
+SHA256 ef0e7df4eb65fdcaca4e347560d23d94eab4f490948f9bd4b77e1befc36ea80b xt/File-Find-Rule-DjVu/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmGPol0ACgkQgmqNLzlX
+aRfO1gwAjEuG1pDn2dJeibaIwqnbeEc3VL5pnRJx6MoUauF8iAYuR/X6Oxfr0p+y
+fSqcNSo3GRZN2tcZPxZ/RQRyeNFc2zPXCXz/a61kOINJgzrpiaUsZkffFQMmig4N
+nD/eOIBsmGyNlISHXzUBOjDyyB7z5DVZz9TProMaUGcXqfsbl3OqFKO+V2Wio40J
+RIJf+6F5WQJQ5aJap4BkWrpuAofKZaKkQ1hjsv38XJ4AMeZIUlbYu7n0p+131P2X
+glVOmBDlWIS28vHkgv52U5HtrSr0xFOsWjVB6YLsAK2kctzLUDkhw7cL/dH/2rLL
+uxjY9u2SuZ9axihAGnJJ0qN+ZJAByv6iEGm23fV2MJ/CKvmp2J8qwZuUfwoThaaJ
+o4kpnsE5EvwlhnIUxvW1drW+sDUAA9eozdnfkQRr7w0EKK+GxpZpUJ4UUjqW8mu3
+BKeASJj+6DJjI+1CXb9fU7p6IEWSE2mvMxxuO+zQNBBTvBglOdX0yyFu9msAUMHZ
+NYtLS6VC
+=iDLX
+-----END PGP SIGNATURE-----

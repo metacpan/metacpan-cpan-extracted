@@ -6,7 +6,7 @@ set -x
 set -e
 
 mkdir -p scripts
-export PERL5LIB="$PWD/lib"
+export PERL5LIB="$PERL5LIB:$PWD/lib"
 fatpack trace scripts.bare/dex
 fatpack packlists-for $(cat fatpacker.trace) > packlists
 fatpack tree $(cat packlists)

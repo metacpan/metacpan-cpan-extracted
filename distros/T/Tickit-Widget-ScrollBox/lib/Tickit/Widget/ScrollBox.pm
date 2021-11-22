@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.27;
+use Object::Pad 0.57;
 
-package Tickit::Widget::ScrollBox 0.10;
+package Tickit::Widget::ScrollBox 0.11;
 class Tickit::Widget::ScrollBox
-   extends Tickit::SingleChildWidget 0.53;
+   :isa(Tickit::SingleChildWidget 0.53);
 
 Tickit::Window->VERSION( '0.39' ); # ->scroll_with_children, default expose_after_scroll
 use Tickit::Style;
@@ -181,10 +181,10 @@ has $_child_is_scrollable;
 
 has $_viewport;
 
-BUILD ( %args )
+ADJUSTPARAMS ( $params )
 {
-   my $vertical   = $args{vertical} // 1;
-   my $horizontal = $args{horizontal};
+   my $vertical   = ( delete $params->{vertical} ) // 1;
+   my $horizontal = ( delete $params->{horizontal} );
 
    $vertical and
       $_vextent = Tickit::Widget::ScrollBox::Extent->new(

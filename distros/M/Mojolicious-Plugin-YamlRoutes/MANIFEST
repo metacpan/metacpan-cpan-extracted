@@ -1,0 +1,12 @@
+Changes
+lib/Mojolicious/Plugin/YamlRoutes.pm
+Makefile.PL
+MANIFEST
+README
+t/basic.t
+t/tester/config/routes/test.yaml
+t/tester/lib/Tester.pm
+t/tester/lib/Tester/Controller/Example.pm
+t/tester/lib/Tester/Controller/Tester/Example.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

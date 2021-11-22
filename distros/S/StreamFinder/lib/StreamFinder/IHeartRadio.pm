@@ -118,7 +118,7 @@ ie. https://www.iheart.com/live/B<station-id>,
 https://B<station-id>.iheart.com, 
 https://www.iheart.com/podcast/B<podcast-id>/episode/B<episode-id>, 
 https://www.iheart.com/podcast/B<podcast-id>, or just 
-B<station-id>, or I<podcast-id/episode-id>.  NOTE:  For podcasts, you must 
+B<station-id>, or B<podcast-id/episode-id>.  NOTE:  For podcasts, you must 
 include the I<episode-id> if not specifying a full URL, otherwise, the 
 I<podcast-id> will be interpreted as a I<station-id> (and you likely won't get 
 any streams), but if specifying a full URL and no I<episode-id> is specified, 
@@ -187,7 +187,7 @@ is returned.
 
 =item $station->B<count>()
 
-Returns the number of streams found for the station.
+Returns the number of streams found for the station / podcast episode.
 
 =item $station->B<getID>(['fccid'])
 
@@ -201,14 +201,14 @@ Returns the station's title, or (long description).  Podcasts
 on IHeartRadio can have separate descriptions, but for stations, 
 it is always the station's title.
 
-=item $station->B<getIconURL>()
+=item $station->B<getIconURL>(['artist'])
 
 Returns the URL for the station's "cover art" icon image, if any.
 If B<'artist'> is specified, the podcast channel artist's icon url 
 is returned, if any.  NOTE:  The B<'artist'> option will return an 
 empty string unless the station is a podcast.
 
-=item $station->B<getIconData>()
+=item $station->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
@@ -216,7 +216,7 @@ If B<'artist'> is specified, the podcast channel artist's icon data
 is returned, if any.  NOTE:  The B<'artist'> option will return an 
 empty string unless the station is a podcast.
 
-=item $station->B<getImageURL>()
+=item $station->B<getImageURL>(['artist'])
 
 Returns the URL for the station's "cover art" (usually larger) 
 banner image.  NOTE:  For IHeart podcasts, this will be the same as the 
@@ -225,7 +225,7 @@ If B<'artist'> is specified, the podcast channel artist's image url
 is returned, if any.  NOTE:  The B<'artist'> option will return an 
 empty string unless the station is a podcast.
 
-=item $station->B<getImageData>()
+=item $station->B<getImageData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual station's banner image (binary data).

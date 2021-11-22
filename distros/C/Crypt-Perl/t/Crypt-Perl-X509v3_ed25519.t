@@ -49,13 +49,14 @@ lives_ok(
 SKIP: {
     my $bin = OpenSSL_Control::openssl_bin();
 
+    skip "OpenSSL not found", 2 if !$bin;
     skip "$bin can’t handle ed25519 keys.", 2 if !OpenSSL_Control::can_ed25519();
 
     my ($tfh, $temppath) = File::Temp::tempfile( CLEANUP => 1 );
     print { $tfh } $cert_pem;
     close $tfh;
 
-    my $parse = `$bin x509 -noout -text -in $temppath`;
+    my $parse = OpenSSL_Control::run( qw(x509 -noout -text -in ), $temppath );
     die 'Failed parse?' if $?;
 
     like( $parse, qr<ed25519>i, 'parse gives expected output' );

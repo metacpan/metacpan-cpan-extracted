@@ -41,9 +41,9 @@ Usage:
 
 Some important warnings before starting using it:
 
-- The script does NOT know where the spam report will be sent so IT'S YOUR RESPONSIBILITY!
-- If the script asks Spamcop to send reports to wrong places IT'S YOUR FAULT!
-- If the script has a bug that causes same report being sent thousand times IT'S YOUR MAIL ADDRESSES!
+- The script does **NOT** know where the SPAM report will be sent so ***IT'S YOUR RESPONSIBILITY***!
+- If the script asks Spamcop to send reports to wrong places **IT'S YOUR FAULT**!
+- If the script has a bug that causes same report being sent thousand times **IT'S YOUR MAIL ADDRESSES**!
 - DO NOT USE THIS SCRIPT IF YOU DON'T UNDERSTAND WHAT IT DOES! IT'S YOUR SHAME!
 
 # SETUP

@@ -1,5 +1,5 @@
 use Test2::V0;
-use Test2::Tools::Compare qw( array bag hash );
+use Test2::Tools::Compare qw( array bag hash all_items all_values );
 use Test2::Tools::Subtest qw( subtest_buffered );
 use Net::Silverpeak::Orchestrator;
 
@@ -622,6 +622,77 @@ subtest_buffered 'applications' => sub {
 
     ok($orchestrator->delete_domain_application('acme.example.net'),
         'delete_domain_application ok');
+};
+
+subtest_buffered 'application groups' => sub {
+    is($orchestrator->list_application_groups,
+        hash {
+            all_values hash {
+                field apps => bag {
+                    all_items match qr/^[a-zA-Z0-9\-\.]+$/;
+
+                    end();
+                };
+
+                end();
+            };
+
+            etc();
+        },
+        'list_application_groups ok');
+
+    $orchestrator->create_or_update_domain_application('api.example.net', {
+            name        => 'api.example.net',
+            priority    => 100,
+        });
+
+    ok($orchestrator->create_or_update_application_group('cloud_services', {
+            apps => [
+                'api.example.net',
+            ],
+        }),
+        'create using create_or_update_application_group ok');
+
+    $orchestrator->create_or_update_domain_application('api.example2.net', {
+            name        => 'api.example2.net',
+            priority    => 100,
+        });
+
+    ok($orchestrator->create_or_update_application_group('cloud_services', {
+            apps => [
+                'api.example.net',
+                'api.example2.net',
+            ],
+        }),
+        'update using create_or_update_application_group ok');
+
+    is($orchestrator->list_application_groups,
+        hash {
+            field 'cloud_services' => hash {
+                field apps => bag {
+                    item 'api.example.net';
+                    item 'api.example2.net';
+
+                    end();
+                };
+
+                end();
+            };
+
+            etc();
+        },
+        'updated application group correct');
+
+    ok($orchestrator->delete_application_group('cloud_services'),
+        'delete_application_group ok');
+
+    is($orchestrator->list_application_groups,
+        hash {
+            field 'cloud_services' => DNE();
+
+            etc();
+        },
+        'deleted application group not in listing');
 };
 
 done_testing();

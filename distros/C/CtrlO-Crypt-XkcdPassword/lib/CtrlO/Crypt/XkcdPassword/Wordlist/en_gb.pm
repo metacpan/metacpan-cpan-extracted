@@ -8,7 +8,7 @@ use base 'WordList';
 
 # ABSTRACT: default word list for CtrlO::Crypt::XkcdPassword
 
-our $VERSION = '1.010'; # VERSION
+our $VERSION = '1.011'; # VERSION
 
 
 'correct horse battery staple';
@@ -23,7 +23,7 @@ CtrlO::Crypt::XkcdPassword::Wordlist::en_gb - default word list for CtrlO::Crypt
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 DESCRIPTION
 

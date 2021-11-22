@@ -10,7 +10,7 @@ use Carp qw( carp longmess );
 use File::Basename ();
 
 # ABSTRACT: Interface for manipulating ar archives with libarchive
-our $VERSION = '2.08'; # VERSION
+our $VERSION = '2.09'; # VERSION
 
 require XSLoader;
 XSLoader::load('Archive::Ar::Libarchive', $VERSION);
@@ -102,7 +102,7 @@ sub remove
 sub list_files
 {
   my $list = shift->_list_files;
-  wantarray ? @$list : $list; ## no critic (Freenode::Wantarray)
+  wantarray ? @$list : $list; ## no critic (Community::Wantarray)
 }
 
 
@@ -254,7 +254,7 @@ Archive::Ar::Libarchive - Interface for manipulating ar archives with libarchive
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =head1 SYNOPSIS
 

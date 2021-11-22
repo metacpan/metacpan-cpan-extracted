@@ -69,7 +69,7 @@ gmp and mpfr libraries can be found when needed.
 This check can be skipped by:
 a) providing CHECK=0 as a Makefile.PL commmand line argument
 or
-b) by uncommenting the line (about line 20) that begins with:
+b) by uncommenting the line (about line 19) that begins with:
 #$checklib = 0;
 
 ==================================
@@ -79,21 +79,10 @@ b) by uncommenting the line (about line 20) that begins with:
 If your perl's Config reports that 'ivsize' is greater than or
 equal to 8 && 'ivtype' is not 'long', then Math::MPFR will, by default,
 be built with access to the Rmpfr_*_uj and Rmpfr_*_sj functions. Else,
-access to those functions is, by default, denied. You can override the
-default by opening up the Makefile.PL and uncommenting the appropriate
-line (just a few lines down from the top of the file ... the comments
-in that file should make it clear).
+access to those functions is, by default, denied.
 
 Similarly, if your perl's Config reports that 'nvsize' is greater than
 8 then Math::MPFR will be built with access to the Rmpfr_*_ld functions.
-Else, access to those functions is, by default, denied. Again, you can
-override the default by opening up the Makefile.PL and uncommenting the
-appropriate line.
-
-I believe it to be both unnecessary and inadvisable to override the
-default - but if you do find that you need to override the default,
-please let me know. That you have found it necessary to override the
-default is something I probably ought to know about.
 
 I am contactable by email at sisyphus at(@) cpan dot (.) org.
 
@@ -116,15 +105,9 @@ conditions are met.
 To utilise mpfr's _Decimal64 functionality you also need to install
 Math::Decimal64.
 
-If you wish to override the automated procedure you can:
-1) avoid _Decimal64 support by providing D64=0 as an argument to the
-   Makefile.PL - ie run 'perl Makefile.PL D64=0';
-2) ensure _Decimal64 support by providing the argument D64=1.
-
-You can aternatively override the automated procedure by
-uncommenting one of a number of lines of code near the start of the
-Makefile.PL. (The comments in the Makefile.PL are a clear statement
-of what's required for this.)
+If you wish you can avoid _Decimal64 support by providing D64=0 as an
+argument to the Makefile.PL - ie run 'perl Makefile.PL D64=0';
+You can ensure _Decimal64 support by providing the argument D64=1.
 
 Note that forcing 'D64=1' will not work unless the conditions
 mentioned earlier in this section are met.
@@ -157,17 +140,16 @@ conditions are met.
 To utilise mpfr's __float128 functionality in this way you also need
 to install Math::Float128.
 
-If you wish to override the automated detection you can:
-1) avoid __float128 support by providing F128=0 as an argument to the
-   Makefile.PL - ie run 'perl Makefile.PL F128=0';
-2) ensure __float128 support by providing the argument F128=1.
+If you wish you can avoid Math::Float128 support by providing F128=0
+as an argument to the Makefile.PL - ie run 'perl Makefile.PL F128=0';
+You can ensure Math::Float128 support by providing the argument F128=1.
 
 You can aternatively override the automated procedure by
 uncommenting one of a number of lines of code near the start of the
 Makefile.PL. (The comments in the Makefile.PL are a clear statement
 of what's required for this.)
 
-Note that forcing inclusion of __float128 support will not work
+Note that forcing inclusion of Math::Float128 support will not work
 unless the conditions mentioned earlier in this section are met.
 
 ==========================================================
@@ -212,15 +194,9 @@ NOTE: Even if the mpfr library was not built with __float128 support
       using the functions Rmpfr_get_NV and Rmpfr_set_NV - but that
       happens only if your nvtype is __float128.
 
-If you need/wish to override the automated procedure you can:
-1) avoid __float128 support by providing F128=0 as an argument to the
-   Makefile.PL - ie run 'perl Makefile.PL F128=0';
-2) ensure __float128 support by providing the argument F128=1.
-
-You can aternatively override the automated procedure by
-uncommenting one of a number of lines of code near the start of the
-Makefile.PL. (The comments in the Makefile.PL are a clear statement
-of what's required for this.)
+If you wish  you can avoid __float128 support by providing F128=0 as
+an argument to the Makefile.PL - ie run 'perl Makefile.PL F128=0';
+You can ensure __float128 support by providing the argument F128=1.
 
 Note that forcing inclusion of __float128 support will not work
 unless the conditions mentioned earlier in this section are met.

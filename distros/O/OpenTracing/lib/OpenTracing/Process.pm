@@ -3,7 +3,7 @@ package OpenTracing::Process;
 use strict;
 use warnings;
 
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(OpenTracing::Common);
@@ -25,6 +25,14 @@ concept.
 =cut
 
 =head1 METHODS
+
+=head2 pid
+
+The process pid.
+
+=cut
+
+sub pid { shift->{pid} //= $$ }
 
 =head2 name
 
@@ -68,5 +76,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2021. Licensed under the same terms as Perl itself.
 

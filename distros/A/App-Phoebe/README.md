@@ -40,6 +40,8 @@
 - [titan](#titan)
 - [App::Phoebe](#appphoebe)
 - [App::Phoebe::BlockFediverse](#appphoebeblockfediverse)
+- [App::Phoebe::Capsules](#appphoebecapsules)
+- [Troubleshooting](#troubleshooting)
 - [App::Phoebe::Chat](#appphoebechat)
 - [App::Phoebe::Comments](#appphoebecomments)
 - [App::Phoebe::Css](#appphoebecss)
@@ -970,6 +972,21 @@ extension.
 
 **phoebe-ctl log hits**
 
+If you are using [App::Phoebe::SpeedBump](https://metacpan.org/pod/App%3A%3APhoebe%3A%3ASpeedBump), you can find the number of blocked
+requests. First, make you you are using the module in your config file:
+
+    use App::Phoebe::DebugIpNumbers;
+
+Make sure you start or start `phoebe` with `--log_level=info` or
+`--log_level=debug`. First generate a log file. Better to zip it up and analyse
+it elsewhere. This can be pretty big!
+
+    journalctl --unit=phoebe | gzip > phoebe.log.gz
+
+Here's how to see how many requests are blocked:
+
+    zcat phoebe.log.gz | script/phoebe-ctl log hits | head
+
 **phoebe-ctl log requests \[IP number\]**
 
 If you are logging IP numbers, this command will offer a little summary. In your
@@ -1024,8 +1041,8 @@ Send some text:
 
 This is a script to upload content to a Titan-enabled site like Phoebe.
 
-**--url=URL** specifies the Titan URL to use; this should be really similar to
-the Gemini URL you used to read the page.
+**URL** specifies the Titan URL to use; this should be really similar to the
+Gemini URL you used to read the page.
 
 **--token=TOKEN** specifies the token to use; this is optional but spammers and
 vandals basically ensured that any site out on the Internet needs some sort of
@@ -1081,9 +1098,9 @@ Here are the ways you can hook into Phoebe code:
 `@extensions` is a list of code references allowing you to handle additional
 URLs; return 1 if you handle a URL; each code reference gets called with $stream
 ([Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AStream)), the first line of the request (a Gemini URL, a Gopher
-selector, a finger user, a HTTP request line), a hash reference for the headers
-(in the case of HTTP requests), and a buffer of bytes (e.g. for Titan or HTTP
-PUT or POST requests).
+selector, a finger user, a HTTP request line), a hash reference (with the
+headers of HTTP requests or the parameters of Titan requests), a buffer of bytes
+(e.g. for Titan or HTTP PUT or POST requests), and (sometimes) size.
 
 `@main_menu` adds more lines to the main menu, possibly links that aren't
 simply links to existing pages.
@@ -1207,6 +1224,33 @@ Yeah, we could respond with a error, but fediverse developers aren’t intereste
 in a new architecture for this problem. They think the issue has been solved.
 See [#4486](https://github.com/tootsuite/mastodon/issues/4486), “Mastodon can be
 used as a DDOS tool.”
+
+# App::Phoebe::Capsules
+
+By default, Phoebe creates a wiki editable by all. With this extension, the
+`/capsule` space turns into a special site: if you have a client certificate,
+you automatically get an editable capsule with an assigned fantasy name.
+
+Simply add it to your `config` file. If you are virtual hosting, name the host
+or hosts for your capsules.
+
+    package App::Phoebe::Capsules;
+    use Modern::Perl;
+    our @capsule_hosts = qw(transjovian.org);
+    use App::Phoebe::Capsules;
+
+Every client certificate gets assigned a capsule name.
+
+# Troubleshooting
+
+🔥 In the wiki directory, you can have a file called `fingerprint_equivalents`.
+Its main use is to allow people to add more fingerprints for their site, such as
+from other devices or friends. The file format is line oriented, each line
+containing two fingerprints, `FROM` and `TO`.
+
+🔥 The capsule name _login_ is reserved.
+
+🔥 The file names _archive_, _backup_, and _upload_ are reserved.
 
 # App::Phoebe::Chat
 

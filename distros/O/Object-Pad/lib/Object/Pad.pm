@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.56;
+package Object::Pad 0.57;
 
 use v5.14;
 use warnings;
@@ -183,13 +183,44 @@ I<Since version 0.41.>
       ...
    }
 
-(prior to version 0.41 this was called C<extends>, which is currently
-recognised as a compatibility synonym).
+Prior to version 0.41 this was called C<extends>, which is currently
+recognised as a compatibility synonym. Both C<extends> and C<isa> keywords are
+now discouraged, in favour of the L</:isa> attribute which is preferred
+because it follows a more standard grammar without this special-case.
 
-If a package providing the superclass does not exist, an attempt is made to
+One or more roles can be composed into the class by the keyword C<does>
+
+I<Since version 0.41.>
+
+   class Name does ROLE, ROLE,... {
+      ...
+   }
+
+Prior to version 0.41 this was called C<implements>, which is currently
+recognised as a compatibility synonym. Both C<implements> and C<does> keywords
+are now discouraged, in favour of the L</:does> attribute which is preferred
+because it follows a more standard grammar without this special-case.
+
+An optional list of attributes may be supplied in similar syntax as for subs
+or lexical variables. (These are annotations about the class itself; the
+concept should not be confused with per-object-instance data, which here is
+called "slots"). The following class attributes are supported:
+
+=head3 :isa
+
+   :isa(CLASS)
+
+   :isa(CLASS CLASSVER)
+
+I<Since version 0.57.>
+
+Declares a superclass that this class extends. At most one superclass is
+supported.
+
+If the package providing the superclass does not exist, an attempt is made to
 load it by code equivalent to
 
-   require Animal ();
+   require CLASS ();
 
 and thus it must either already exist, or be locatable via the usual C<@INC>
 mechanisms.
@@ -202,21 +233,20 @@ An optional version check can also be supplied; it performs the equivalent of
 
    BaseClass->VERSION( $ver )
 
-One or more roles can be composed into the class by the keyword C<does>
+=head3 :does
 
-I<Since version 0.41.>
+   :does(ROLE)
 
-   class Name does ROLE, ROLE,... {
-      ...
-   }
+   :does(ROLE ROLEVER)
 
-(prior to version 0.41 this was called C<implements>, which is currently
-recognised as a compatibility synonym).
+I<Since version 0.57.>
 
-An optional list of attributes may be supplied in similar syntax as for subs
-or lexical variables. (These are annotations about the class itself; the
-concept should not be confused with per-object-instance data, which here is
-called "slots"). The following class attributes are supported:
+Composes a role into the class; optionally requiring a version check on the
+role package. This is a newer form of the C<implements> and C<does>
+keywords and should be preferred for new code.
+
+The package will be loaded in a similar way to how the L</:isa> attribute is
+handled.
 
 =head3 :repr(TYPE)
 

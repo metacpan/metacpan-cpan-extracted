@@ -1,10 +1,5 @@
 package Data::Sah::Coerce;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
-our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.049'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -14,6 +9,12 @@ use Log::ger;
 use Data::Sah::CoerceCommon;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-18'; # DATE
+our $DIST = 'Data-Sah-Coerce'; # DIST
+our $VERSION = '0.051'; # VERSION
+
 our @EXPORT_OK = qw(gen_coercer);
 
 our %SPEC;
@@ -127,7 +128,7 @@ sub gen_coercer {
 
     return $code if $args{source};
 
-    my $coercer = eval $code;
+    my $coercer = eval $code; ## no critic: BuiltinFunctions::ProhibitStringyEval
     die if $@;
     $coercer;
 }
@@ -147,7 +148,7 @@ Data::Sah::Coerce - Coercion rules for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.049 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2020-05-24.
+This document describes version 0.051 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2021-10-18.
 
 =head1 SYNOPSIS
 
@@ -157,7 +158,7 @@ This document describes version 0.049 of Data::Sah::Coerce (from Perl distributi
  my $c = gen_coercer(
      type               => 'date',
      coerce_to          => 'DateTime',
-     coerce_rules       => ['From_str::natural'],  # explicitly enable a rule, etc
+     coerce_rules       => ['From_str::natural'],  # explicitly enable a rule, etc. See Data::Sah::CoerceCommon's get_coerce_rules() for detailed syntax
      # return_type      => 'str+val',              # default is 'val'
  );
 
@@ -360,15 +361,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah-C
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Sah-Coerce>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
+
+L<Data::Sah::CoerceCommon> for detailed syntax of coerce rules (explicitly
+including/excluding rules etc).
 
 L<Data::Sah>
 
@@ -381,11 +377,36 @@ from the command-line.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

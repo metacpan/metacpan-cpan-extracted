@@ -84,7 +84,7 @@ my $build = $class->new(
     'Test::Warn' => '0.11',
     'boolean' => '0',
     'lib' => '0',
-    'perl' => '5.020'
+    'perl' => 'v5.20.0'
   },
   'configure_requires' => {
     'Module::Build' => '0.34'
@@ -132,7 +132,7 @@ my $build = $class->new(
     'open' => '0',
     'overload' => '0',
     'parent' => '0',
-    'perl' => '5.020',
+    'perl' => 'v5.20.0',
     'strict' => '0',
     'utf8' => '0',
     'vars' => '0',

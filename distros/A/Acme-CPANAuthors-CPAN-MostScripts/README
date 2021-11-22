@@ -3,9 +3,9 @@ NAME
     CPAN
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Acme::CPANAuthors::CPAN::MostScripts (from Perl distribution
-    Acme-CPANAuthors-CPAN-MostScripts), released on 2021-06-07.
+    Acme-CPANAuthors-CPAN-MostScripts), released on 2021-11-17.
 
 SYNOPSIS
        use Acme::CPANAuthors;
@@ -33,8 +33,8 @@ DESCRIPTION
      +---------------------+--------------------------------+
      | cpan                | /home/u1/cpan                  |
      | index_name          | /media/minicpan-index/index.db |
-     | last_index_time     | 2021-06-06T16:59:14Z           |
-     | raw_last_index_time | 1622998754                     |
+     | last_index_time     | 2021-11-16T19:50:46Z           |
+     | raw_last_index_time | 1637092246                     |
      +---------------------+--------------------------------+
 
     Current ranking:
@@ -42,16 +42,16 @@ DESCRIPTION
      +------+-----------+--------------+
      | rank | id        | script_count |
      +------+-----------+--------------+
-     | 1    | PERLANCAR | 1400         |
+     | 1    | PERLANCAR | 1436         |
      | 2    | RSAVAGE   | 302          |
-     | 3    | TULAMILI  | 226          |
-     | 4    | BDFOY     | 175          |
+     | 3    | TULAMILI  | 224          |
+     | 4    | BDFOY     | 176          |
      | 5    | TRIZEN    | 173          |
      | 6    | JWB       | 166          |
-     | 7    | MRDVT     | 157          |
-     | 8    | SANTEX    | 140          |
-     | 9    | VVELOX    | 137          |
-     | 10   | SHLOMIF   | 137          |
+     | =7   | SANTEX    | 140          |
+     | =7   | MRDVT     | 140          |
+     | 9    | SHLOMIF   | 138          |
+     | 10   | VVELOX    | 137          |
      | 11   | OLIVER    | 103          |
      | 12   | LDS       | 101          |
      | 13   | TSIBLEY   | 95           |
@@ -66,36 +66,33 @@ DESCRIPTION
      | 22   | IVANWILLS | 58           |
      | 23   | TBONE     | 57           |
      | 24   | TIEDEMANN | 56           |
-     | 25   | MOOCOW    | 53           |
-     | 26   | BRYCE     | 53           |
-     | 27   | WOLDRICH  | 50           |
-     | 28   | NKH       | 50           |
-     | 29   | KESTEB    | 50           |
-     | 30   | GROUSSE   | 48           |
-     | 31   | CORION    | 47           |
-     | 32   | PLICEASE  | 46           |
-     | 33   | DHARD     | 46           |
-     | 34   | YSAS      | 44           |
-     | 35   | PERRAD    | 44           |
-     | 36   | BEATNIK   | 44           |
-     | 37   | MTW       | 43           |
-     | 38   | MSIMERSON | 43           |
-     | 39   | AJPAGE    | 43           |
-     | 40   | DBAURAIN  | 42           |
-     | 41   | GWILLIAMS | 41           |
-     | 42   | CJFIELDS  | 41           |
-     | 43   | VOJ       | 40           |
-     | 44   | JILLROWE  | 40           |
-     | 45   | TAPPER    | 39           |
-     | 46   | JASONS    | 39           |
-     | 47   | ADAMK     | 39           |
-     | 48   | JMACFARLA | 38           |
-     | 49   | GETTY     | 38           |
-     | 50   | CDOLAN    | 38           |
+     | =25  | MOOCOW    | 53           |
+     | =25  | BRYCE     | 53           |
+     | 27   | WOLDRICH  | 52           |
+     | =28  | NKH       | 50           |
+     | =28  | KESTEB    | 50           |
+     | 30   | CORION    | 49           |
+     | =31  | PLICEASE  | 48           |
+     | =31  | GROUSSE   | 48           |
+     | =33  | DHARD     | 46           |
+     | =33  | DBAURAIN  | 46           |
+     | =35  | YSAS      | 44           |
+     | =35  | PERRAD    | 44           |
+     | =35  | BEATNIK   | 44           |
+     | =38  | MTW       | 43           |
+     | =38  | MSIMERSON | 43           |
+     | =38  | AJPAGE    | 43           |
+     | =41  | GWILLIAMS | 41           |
+     | =41  | CJFIELDS  | 41           |
+     | =43  | VOJ       | 40           |
+     | =43  | JILLROWE  | 40           |
+     | =45  | TAPPER    | 39           |
+     | =45  | JASONS    | 39           |
+     | =45  | ADAMK     | 39           |
+     | =48  | JMACFARLA | 38           |
+     | =48  | GETTY     | 38           |
+     | =48  | CDOLAN    | 38           |
      +------+-----------+--------------+
-
-CONTRIBUTOR
-    perlancar (@netbook-zenbook-ux305) <perlancar@gmail.com>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -105,6 +102,35 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANAuthors-CPAN-MostScripts>.
 
+SEE ALSO
+    Acme::CPANAuthors
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2019, 2016 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-CPAN
@@ -112,16 +138,4 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    Acme::CPANAuthors
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2019, 2016 by perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

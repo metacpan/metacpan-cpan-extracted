@@ -10,7 +10,7 @@ use Object::Pad;
 role ARole {
 }
 
-class AClass does ARole {
+class AClass :does(ARole) {
 }
 
 {
@@ -23,7 +23,7 @@ class AClass does ARole {
 role BRole {
 }
 
-class BClass does ARole, BRole {
+class BClass :does(ARole) :does(BRole) {
 }
 
 {
@@ -35,7 +35,7 @@ class BClass does ARole, BRole {
 role CRole {
 }
 
-class CClass does CRole {
+class CClass :does(CRole) {
 }
 
 {
@@ -45,10 +45,10 @@ class CClass does CRole {
   ok( !$obj->DOES( "BRole" ), 'CClass::DOES NOT BRole' );
 }
 
-class ABase does ARole {
+class ABase :does(ARole) {
 }
 
-class ADerived isa ABase {
+class ADerived :isa(ABase) {
 }
 
 {
@@ -62,7 +62,7 @@ package FBaseOne {
    sub new { return bless {}, shift; }
 }
 
-class FClassOne isa FBaseOne does CRole {
+class FClassOne :isa(FBaseOne) :does(CRole) {
 }
 
 {
@@ -80,7 +80,7 @@ package FBaseTwo {
    }
 }
 
-class FClassTwo isa FBaseTwo does ARole {
+class FClassTwo :isa(FBaseTwo) :does(ARole) {
 }
 
 {
@@ -88,10 +88,10 @@ class FClassTwo isa FBaseTwo does ARole {
    ok( FClassTwo->DOES( "FakeRole42" ), 'Foreign base class DOES method' );
 }
 
-role DRole does ARole {
+role DRole :does(ARole) {
 }
 
-class DClass does DRole {
+class DClass :does(DRole) {
 }
 
 {

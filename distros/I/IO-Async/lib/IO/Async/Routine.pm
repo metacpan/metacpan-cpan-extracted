@@ -8,7 +8,7 @@ package IO::Async::Routine;
 use strict;
 use warnings;
 
-our $VERSION = '0.79';
+our $VERSION = '0.800';
 
 use base qw( IO::Async::Notifier );
 
@@ -109,6 +109,8 @@ This model is only available on perls built to support threading.
 
 =head3 The C<spawn> model
 
+I<Since version 0.79.>
+
 The code in this model runs within its own freshly-created process running
 another copy of the perl interpreter. Similar to the C<fork> model it
 therefore has its own memory, CPU time, and other resources. However, since it
@@ -122,9 +124,6 @@ instead use only the C<module> and C<func> arguments.
 In the current implementation this model requires exactly one input channel
 and exactly one output channel; both must be present, and there cannot be more
 than one of either.
-
-This model performs well on both UNIX and Windows-like operating systems,
-because it does not need full fork semantics.
 
 =cut
 
@@ -189,6 +188,8 @@ and C<func> instead.
 =head2 module => STRING
 
 =head2 func => STRING
+
+I<Since version 0.79.>
 
 An alternative to the C<code> argument, which names a module to load and a
 function to call within it. C<module> should give a perl module name (i.e.
@@ -413,7 +414,7 @@ sub _setup_thread
       code => sub {
          foreach ( @channels_in, @channels_out ) {
             $_->chan->setup_sync_mode( $_->otherfd );
-            $_->myfd->close;
+            defined and $_->close for $_->myfd;
          }
 
          if( defined $func ) {

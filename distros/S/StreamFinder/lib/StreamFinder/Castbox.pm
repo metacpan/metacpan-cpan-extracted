@@ -153,9 +153,12 @@ episodes found on that page url.
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  There currently are no valid I<options>.
 
-=item $podcast->B<count>()
+=item $podcast->B<count>(['playlist'])
 
 Returns the number of streams found for the podcast.
+If I<"playlist"> is specified, the number of episodes returned in the 
+playlist is returned (the playlist can have more than one item if a 
+podcast page URL is specified).
 
 =item $podcast->B<getID>()
 
@@ -357,8 +360,9 @@ sub new
 		$urlroot = $1;
 		$self->{'id'} = ($url =~ m#\-id(\d+)\-id(\d+)#) ? "${1}/$2" : '';
 		$self->{'id'} ||= $1  if ($url =~ m#id(\d+)#);   #NO EPISODE SPECIFIED
-	} else {  #MUST PROVIDE URL, NO KNOWN WAY TO LOOK UP WITH JUST ID#?!
-		print STDERR "w:Url ($url) is NOT a valid Castbox podcast url!\n"  if ($DEBUG);
+	}
+	unless ($self->{'id'}) {  #MUST PROVIDE URL, NO KNOWN WAY TO LOOK UP WITH JUST ID#?!
+		print STDERR "w:No ID found - url ($url) is NOT a valid Castbox podcast url!\n"  if ($DEBUG);
 		return undef;
 	}
 
@@ -373,15 +377,19 @@ sub new
 	$self->{'albumartist'} = $url2fetch;
 	my @epiTitles = ();
 	my @epiStreams = ();
-	if ($self->{'id'} !~ m#\/#) {  #NO SPECIFIC EPISODE GIVEN, TRY TO FIND 1ST (LATEST) ONE:
+	if ($self->{'id'} !~ m#^\d+\/\d+$#) {  #NO SPECIFIC EPISODE GIVEN, TRY TO FIND 1ST (LATEST) ONE:
+
+		#FETCH PODCAST PAGE:
+
 		$response = $ua->get($url2fetch);
 		if ($response->is_success) {
 			$html = $response->decoded_content;
 		} else {
 			print STDERR $response->status_line  if ($DEBUG);
 		}
-
 		print STDERR "-1a: html=$html=\n"  if ($DEBUG > 1);
+		return undef  unless ($html);  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
+
 		if ($html =~ m#\<div\s+class\=\"ep\-item\-cover\"\>\s*\<a\s+href\=\"([^\"]+)#s) {
 			$url2fetch = $1;
 			$url2fetch = "https://castbox.fm$url2fetch"  if ($url2fetch !~ /^http/);
@@ -389,11 +397,11 @@ sub new
 			$self->{'description'} = $1  if ($html =~ s#\<div\s+class\=\"des\-con\"\>(?:\<div\>)?([^\<]+)##s);
 			$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"\s*\/?\>##s);
 			$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:description\"\s+content\=\"([^\"]+)\"\s*\/"\>##s);
-			$self->{'iconurl'} = ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:image\"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
-			$self->{'iconurl'} ||= $1  if ($html =~ s#\"\,\"image\"\:\"([^\"]+)\"\}\}\]\}##s);
-			$self->{'imageurl'} = $self->{'iconurl'};
+			$self->{'articonurl'} = ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:image\"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
+			$self->{'articonurl'} ||= $1  if ($html =~ s#\"\,\"image\"\:\"([^\"]+)\"\}\}\]\}##s);
 			$html =~ s#^.+?\_\_INITIAL\_STATE\_\_##s;
 			$html = uri_unescape($html);
+			$self->{'genre'} = $1  if ($html =~ m#\"keywords\"\:\[?\"([^\"]+)#);
 			$html =~ s#^.+?\"eps\"\:\[##s;
 			$html =~ s#\]\,\"epStatusCid\".+$##s;
 			while ($html =~ s#\{([^\}]+)\}##s) {
@@ -413,14 +421,18 @@ sub new
 					}
 				}
 			}
-			$html = '';
 		}
+		print STDERR "-1b: no episode specified, found first ep=".$self->{'id'}."=\n"  if ($DEBUG);
 		return undef  unless ($self->{'id'} =~ m#\/#);  #MUST HAVE AN EPISODE BY NOW!
-
-		print STDERR "-1a: no episode specified, found first ep=".$self->{'id'}."=\n"  if ($DEBUG);
-		print STDERR "-1(Castbox): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+		$html = '';
 	}
 
+	#NOW FETCH (FIRST OR THE) EPISODE:
+
+	$url2fetch = HTML::Entities::decode_entities($url2fetch);
+	$url2fetch = uri_unescape($url2fetch);
+	$url2fetch =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+	print STDERR "-1(Castbox): FETCHING EPISODE URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
@@ -431,6 +443,7 @@ sub new
 	return undef  unless ($html && $self->{'id'});  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
 
 	my %dups = ();
+	$html = uri_unescape($html);
 	if ($html =~ s#\<audio[^\>]*\>(.+?)\<\/audio\>##s) {
 		my $audiostuff = $1;
 		while ($audiostuff =~ s#\s+src\=\"([^\"]+)\"##s) {
@@ -454,26 +467,29 @@ sub new
 	$self->{'title'} ||= $1  if ($html =~ s#\<meta\s+name\=\"title\"\s+content\=\"([^\"]+)\"\s*\/?\>##s);
 	$self->{'title'} ||= $1  if ($html =~ s#\<TITLE\>\s*([^\|\<]+)##s);
 	$self->{'title'} ||= $epiTitles[0]  if ($#epiTitles >= 0);
-	if (!$self->{'description'} && $html =~ m#class\=\"trackinfo\-des\"\>(.+?)\<\/div\>#s) {
+	my $podcast_description = $self->{'description'};
+	if ($html =~ m#class\=\"trackinfo\-des\"\>(.+?)\<\/div\>#s) {
 		my $desc = $1;
 		$desc = $1  if ($desc =~ m#\<div[^\>]*\>(.+)$#s);
 		$self->{'description'} = $desc;
 	}
 	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"\s*\/?\>##s);
 	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:description\"\s+content\=\"([^\"]+)\"\s*\/"\>##s);
+	$self->{'description'} ||= $podcast_description;
 	if ($html =~ s#\>\s*Update\:\s+([^\<]+)\<##s) {
 		my $datestuff = $1;
 		$self->{'year'} = $1  if ($datestuff =~ /(\d\d\d\d)\s*$/);
 		$self->{'created'} = $1  if ($datestuff =~ /(\d\d\d\d\-\d\d\-\d\d)\s*$/);
 	}
-	$self->{'year'} ||= $1  if ($html =~ s#\<span\s+class\=\"item\s+icon\s+date\"\>(\d\d\d\d)##s);
+	$self->{'year'} = $1  if ($html =~ s#\<span\s+class\=\"item\s+icon\s+date\"\>(\d\d\d\d)##s);
+	$self->{'genre'} = $1  if ($html =~ m#\"keywords\"\:\[?\"([^\"]+)#s);
 	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 	$self->{'title'} = uri_unescape($self->{'title'});
 	$self->{'title'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 	$self->{'description'} = uri_unescape($self->{'description'});
 	$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-	$self->{'iconurl'} ||= ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:image\"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
+	$self->{'iconurl'} = ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:image\"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
 	$self->{'iconurl'} ||= $1  if ($html =~ s#\"\,\"image\"\:\"([^\"]+)\"\}\}\]\}##s);
 	if ($html =~ m#\{\"\@context\"\:\"http\:\/\/schema\.org\"\,\"(.+?)</script>#s) {
 		(my $stuff = $1) =~ s#^.*?\"Channels\"\,\"image\"\:\"##s;
@@ -481,28 +497,41 @@ sub new
 	}
 	print STDERR "--articon=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 	$self->{'iconurl'} ||= $self->{'articonurl'}  if ($self->{'articonurl'});
-	$self->{'imageurl'} ||= $self->{'iconurl'};
-
-	$self->{'album'} = $1  if ($html =~ m#\<h1\s+class\=\"author ellipsis\"\>([^\<]+)#);
+	$self->{'imageurl'} = $self->{'iconurl'};
+	$self->{'artist'} = $1  if ($html =~ m#\<h1\s+class\=\"author ellipsis\"\>([^\<]+)#);
 	if ($html =~ s#\"\s+class\=\"breadcrumb\-text\"\>\s*\<a\s+href\=\"(\/channel\/[^\"]+)\"\>([^\<]+)##s) {
 		$self->{'albumartist'} = $urlroot . $1;
-		$self->{'artist'} = $2;
+		$self->{'album'} = $2;
 	}
 	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."= artist=".$self->{'artist'}."= albart=".$self->{'albumartist'}."=\n"  if ($DEBUG);
-	if ($self->{'total'} > 0) {
-		$self->{'Url'} = $self->{'streams'}->[0];
-		print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
-				if ($DEBUG);
-		$self->{'playlist'} = "#EXTM3U\n";
-		if ($#epiTitles >= 0) {
-			for (my $i=0;$i<=$#epiTitles;$i++) {
-				$self->{'playlist'} .= "#EXTINF:-1, " . $epiTitles[$i]
-						. "\n#EXTART:" . $self->{'artist'} . "\n" . $epiStreams[$i] . "\n";
-			}
-		} else {
-			$self->{'playlist'} .= "#EXTINF:-1, " . $self->{'title'}
-					. "\n#EXTART:" . $self->{'artist'} . "\n" . ${$self->{'streams'}}[0] . "\n";
+	return undef  unless ($self->{'total'} > 0);
+
+	$self->{'Url'} = $self->{'streams'}->[0];
+	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"  if ($DEBUG);
+	$self->{'playlist'} = "#EXTM3U\n";
+	if ($#epiStreams >= 0) {
+		$self->{'playlist_cnt'} = scalar @epiStreams;
+		for (my $i=0;$i<=$#epiStreams;$i++) {
+			last  if ($i > $#epiTitles);
+			$self->{'playlist'} .= "#EXTINF:-1, " . $epiTitles[$i] . "\n";
+			$self->{'playlist'} .= "#EXTART:" . $self->{'artist'} . "\n"
+					if ($self->{'artist'});
+			$self->{'playlist'} .= "#EXTALB:" . $self->{'album'} . "\n"
+					if ($self->{'album'});
+			$self->{'playlist'} .= "#EXTGENRE:" . $self->{'genre'} . "\n"
+					if ($self->{'genre'});
+			$self->{'playlist'} .= $epiStreams[$i] . "\n";
 		}
+	} else {
+		$self->{'playlist_cnt'} = 1;
+		$self->{'playlist'} .= "#EXTINF:-1, " . $self->{'title'} . "\n";
+		$self->{'playlist'} .= "#EXTART:" . $self->{'artist'} . "\n"
+				if ($self->{'artist'});
+		$self->{'playlist'} .= "#EXTALB:" . $self->{'album'} . "\n"
+				if ($self->{'album'});
+		$self->{'playlist'} .= "#EXTGENRE:" . $self->{'genre'} . "\n"
+				if ($self->{'genre'});
+		$self->{'playlist'} .= ${$self->{'streams'}}[0] . "\n";
 	}
 	$self->_log($url);
 

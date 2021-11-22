@@ -5,27 +5,16 @@ use warnings;
 use Carp;
 use PDL::Types ':All';
 
-our $macros = <<'EOF';
-#define PDL_REDODIMS(declini, cast, type, flag, name, pdlname) \
-  declini name ## _datap = (cast(PDL_REPRP_TRANS(pdlname, flag))); \
-  declini name ## _physdatap = (cast(pdlname->data)); \
-  (void)name ## _datap; \
-  (void)name ## _physdatap;
-
-#define PDL_REDODIMS_BADVAL(declini, cast, type, flag, name, pdlname) \
-  PDL_REDODIMS(declini, cast, type, flag, name, pdlname) \
-  type name ## _badval = 0; \
-  PDL_Anyval name ## _anyval_badval = PDL->get_pdl_badvalue(pdlname); \
-  (void)name ## _badval; \
-  (void)name ## _anyval_badval; \
-  ANYVAL_TO_CTYPE(name ## _badval, type, name ## _anyval_badval);
-EOF
+our %INVALID_PAR = map +($_=>1), qw(
+  I
+);
 
 # split regex $re separated arglist
 # but ignore bracket-protected bits
 # (i.e. text that is within matched brackets)
 my $prebrackreg = qr/^([^\(\{\[]*)/;
 sub splitprotected ($$) {
+  require Text::Balanced;
   my ($re,$txt) = @_;
   return () if !defined $txt || $txt =~ /^\s*$/;
   my ($got,$pre) = (1,'');
@@ -53,13 +42,37 @@ sub splitprotected ($$) {
 my $typeregex = join '|', map $_->ppforcetype, types;
 my $complex_regex = join '|', qw(real complex);
 our $pars_re = qr/^
-	\s*((?:$complex_regex|$typeregex)\b[+]*|)\s*	# $1: first option
+	\s*(?:($complex_regex|$typeregex)\b([+]*)|)\s*	# $1,2: first option then plus
 	(?:
-	\[([^]]*)\]   	# $2: The initial [option] part
+	\[([^]]*)\]	# $3: The initial [option] part
 	)?\s*
-	(\w+)          	# $3: The name
-	\(([^)]*)\)  		# $4: The indices
+	(\w+)	  	# $4: The name
+	\(([^)]*)\)	# $5: The indices
 /x;
+my %flag2info = (
+  io => [[qw(FlagW)]],
+  nc => [[qw(FlagNCreat)]],
+  o => [[qw(FlagOut FlagCreat FlagW)]],
+  oca => [[qw(FlagOut FlagCreat FlagW FlagCreateAlways)]],
+  t => [[qw(FlagTemp FlagCreat FlagW)]],
+  phys => [[qw(FlagPhys)]],
+  real => [[qw(FlagReal)]],
+  complex => [[qw(FlagComplex)]],
+  (map +($_->ppforcetype => [[qw(FlagTyped)], 'Type']), types),
+);
+my %flag2c = qw(
+  FlagReal PDL_PARAM_ISREAL
+  FlagComplex PDL_PARAM_ISCOMPLEX
+  FlagTyped PDL_PARAM_ISTYPED
+  FlagTplus PDL_PARAM_ISTPLUS
+  FlagCreat PDL_PARAM_ISCREAT
+  FlagCreateAlways PDL_PARAM_ISCREATEALWAYS
+  FlagOut PDL_PARAM_ISOUT
+  FlagTemp PDL_PARAM_ISTEMP
+  FlagW PDL_PARAM_ISWRITE
+  FlagPhys PDL_PARAM_ISPHYS
+  FlagIgnore PDL_PARAM_ISIGNORE
+);
 sub new {
 	my($type,$string,$badflag,$sig) = @_;
 	$badflag ||= 0;
@@ -68,26 +81,21 @@ sub new {
 	# originally defined here, but were moved to PDL::PP for FullDoc parsing.
 	$string =~ $pars_re
 		 or confess "Invalid pdl def $string (regex $pars_re)\n";
-	my($opt1,$opt2,$name,$inds) = ($1,$2,$3,$4);
-	map {$_ = '' unless defined($_)} ($opt1,$opt2,$inds); # shut up -w
-	print "PDL: '$opt1', '$opt2', '$name', '$inds'\n"
+	my($opt1,$opt_plus,$opt2,$name,$inds) = map $_ // '', ($1,$2,$3,$4,$5);
+	print "PDL: '$opt1$opt_plus', '$opt2', '$name', '$inds'\n"
 		  if $::PP_VERBOSE;
+	croak "Invalid Pars name: $name"
+	  if $INVALID_PAR{$name};
 # Set my internal variables
 	$this->{Name} = $name;
 	$this->{Flags} = [(split ',',$opt2),($opt1?$opt1:())];
 	for(@{$this->{Flags}}) {
-		/^io$/ and $this->{FlagW}=1 or
-		/^nc$/ and $this->{FlagNCreat}=1 or
-		/^o$/ and $this->{FlagOut}=$this->{FlagCreat}=$this->{FlagW}=1 or
-		/^oca$/ and $this->{FlagOut}=$this->{FlagCreat}=$this->{FlagW}=$this->{FlagCreateAlways}=1 or
-		/^t$/ and $this->{FlagTemp}=$this->{FlagCreat}=$this->{FlagW}=1 or
-		/^phys$/ and $this->{FlagPhys} = 1 or
-		/^real$/ and $this->{FlagReal} = 1 or
-		/^complex$/ and $this->{FlagComplex} = 1 or
-		/^((?:$typeregex)[+]*)$/ and $this->{Type} = $1 and $this->{FlagTyped} = 1 or
-		confess("Invalid flag $_ given for $string\n");
+		confess("Invalid flag $_ given for $string\n")
+			unless my ($set, $store) = @{ $flag2info{$_} || [] };
+		$this->{$store} = $_ if $store;
+		$this->{$_} = 1 for @$set;
 	}
-	if ($this->{FlagTyped} && $this->{Type} =~ s/[+]$// ) {
+	if ($this->{FlagTyped} && $opt_plus) {
 	  $this->{FlagTplus} = 1;
 	}
 	$this->{Type} &&= PDL::Type->new($this->{Type});
@@ -95,12 +103,16 @@ sub new {
 		delete $this->{FlagCreat};
 		delete $this->{FlagCreateAlways};
 	}
-	my @inds = map{
+	$this->{RawInds} = [map{
 		s/\s//g; 		# Remove spaces
 		$_;
-	} split ',', $inds;
-	$this->{RawInds} = [@inds];
+	} split ',', $inds];
 	return $this;
+}
+
+sub cflags {
+  my ($this) = @_;
+  map $flag2c{$_}, grep $this->{$_}, sort keys %flag2c;
 }
 
 sub name {return (shift)->{Name}}
@@ -182,74 +194,9 @@ sub get_nnflag { my($this) = @_;
 	"(\$PRIV(vtable->per_pdl_flags[$this->{Number}]))";
 }
 
-
-# XXX There might be weird backprop-of-changed stuff for [phys].
-sub get_xsnormdimchecks {
-    my($this) = @_;
-    my $pdl   = $this->get_nname;
-    my $iref  = $this->{IndObjs};
-    my $ninds = 0+scalar(@$iref);
-    my @sizevars = map $_->get_size(), @$iref;
-    my $str = PDL::PP::pp_line_numbers(__LINE__, "");
-    $str .= "if(!__creating[$this->{Number}]) {\n" if $this->{FlagCreat};
-    # Dimensional Promotion when number of dims is less than required:
-    if ( $ninds > 0 ) {
-	$str .= "   if(($pdl)->ndims < $ninds) {\n" .
-	    join('', map
-		"      if (($pdl)->ndims < $_ && $sizevars[$_-1] <= 1) $sizevars[$_-1] = 1;\n",
-		1..$ninds)
-	    . "   }\n";
-    }
-    # Now, the real check.
-    for( 0..$#$iref ) {
-	my $dim = "($pdl)->dims[$_]";
-	my $ndims = "($pdl)->ndims";
-	$str .= <<EOF;
-    if($sizevars[$_] == -1 || ($ndims > $_ && $sizevars[$_] == 1)) {
-      $sizevars[$_] = $dim;
-    } else if($ndims > $_ && $sizevars[$_] != $dim) {
-      if($dim != 1) {
-         \$CROAK("Wrong dimensions for parameter '@{[ $this->name ]}'\\n");
-      }
-    }
-EOF
-    }
-    $str .= "PDL->make_physical(($pdl));\n" if $this->{FlagPhys};
-    if ( $this->{FlagCreat} ) {
-	$str .= "} else {\n";
-	$str .= " PDL_Indx dims[".($ninds+1)."]; PDL_COMMENT(\"Use ninds+1 to avoid smart (stupid) compilers\")";
-	$str .= join "", map "dims[$_] = $sizevars[$_];", 0..$#$iref;
-	my $istemp = $this->{FlagTemp} ? 1 : 0;
-	$str .="\n PDL->thread_create_parameter(&\$PRIV(__pdlthread),$this->{Number},dims,$istemp);\n";
-	$str .= "}";
-    }
-    return $str;
-}
-
-sub get_xsphysdimchecks {
-    my($this) = @_;
-    return '' if !$this->{FlagPhys};
-    my $iref = $this->{IndObjs};
-    return '' unless my $ninds = 0+scalar(@$iref);
-    my @sizevars = map $_->get_size, @$iref;
-    my $pdl = $this->get_nname;
-    my $str = PDL::PP::pp_line_numbers(__LINE__, "");
-    for( 0..$#$iref ) {
-        my $iname = $iref->[$_]->name;
-        next if @{ $this->{Sig}->ind_used($iname) } == 1;
-	my $dim = "($pdl)->dims[$_]";
-	$str .= <<EOF;
-    if($sizevars[$_] > 1 && $sizevars[$_] != $dim) {
-        PDL_Indx d = $dim;
-        \$CROAK("Parameter '@{[ $this->name ]}' index '$iname' size %d, but ndarray dim has size %d\\n", $sizevars[$_], d);
-    }
-EOF
-    }
-    $str;
-}
-
 sub get_incname {
-	my($this,$ind) = @_;
+	my($this,$ind,$for_local) = @_;
+	return "inc_sizes[PDL_INC_ID(__privtrans->vtable,$this->{Number},$ind)]" if !$for_local;
 	if($this->{IndTotCounts}[$ind] > 1) {
 	    "__inc_".$this->{Name}."_".($this->{IndObjs}[$ind]->name).$this->{IndCounts}[$ind];
 	} else {
@@ -257,42 +204,13 @@ sub get_incname {
 	}
 }
 
-sub get_incdecls {
-	my($this) = @_;
-	if(scalar(@{$this->{IndObjs}}) == 0) {return "";}
-	(join '',map {
-		my $name = $this->get_incname($_);
-		"PDL_Indx $name; (void)$name;";
-	} (0..$#{$this->{IndObjs}}) ) . ";"
-}
-
 sub get_incregisters {
 	my($this) = @_;
 	if(scalar(@{$this->{IndObjs}}) == 0) {return "";}
 	(join '',map {
-		my $name = $this->get_incname($_);
-		"register PDL_Indx $name = \$PRIV($name); (void)$name;\n";
-	} (0..$#{$this->{IndObjs}}) )
-}
-
-sub get_incdecl_copy {
-	my($this,$fromsub,$tosub) = @_;
-	PDL::PP::pp_line_numbers(__LINE__, join '',map {
-		my $iname = $this->get_incname($_);
-		&$fromsub($iname)."=".&$tosub($iname).";";
-	} (0..$#{$this->{IndObjs}}))
-}
-
-sub get_incsets {
-	my($this,$str) = @_;
-	my $no=0;
-	PDL::PP::pp_line_numbers(__LINE__, join '',map {
-               my $name = $this->get_incname($_);
-               "if($str->ndims <= $_ || $str->dims[$_] <= 1)
-		  \$PRIV($name) = 0; else
-		 \$PRIV($name) = ".($this->{FlagPhys}?
-				   "$str->dimincs[$_];" :
-				   "PDL_REPRINC($str,$_);");
+		my $x = $_;
+		my ($name, $for_local) = map $this->get_incname($x, $_), 0, 1;
+		"register PDL_Indx $for_local = __privtrans->$name; (void)$for_local;\n";
 	} (0..$#{$this->{IndObjs}}) )
 }
 
@@ -314,36 +232,14 @@ sub do_access {
 # If not all substitutions made, the user probably made a spelling
 # error. Barf.
 	if(scalar(keys %subst) != 0) {
-		confess("Substitutions left: ".(join ',',keys %subst)."\n");
+		confess("Substitutions left: ".(join ',',sort keys %subst)."\n");
 	}
        $text;
 }
 
-sub has_dim {
-	my($this,$ind) = @_;
-	my $h = 0;
-	for(@{$this->{IndObjs}}) {
-		$h++ if $_->name eq $ind;
-	}
-	return $h;
-}
-
-sub do_resize {
-	my($this,$ind,$size) = @_;
-	my @c;my $index = 0;
-	for(@{$this->{IndObjs}}) {
-		push @c,$index if $_->name eq $ind; $index ++;
-	}
-	my $pdl = $this->get_nname;
-	return PDL::PP::pp_line_numbers(__LINE__, (join '',map {"$pdl->dims[$_] = $size;\n"} @c).
-		"PDL->resize_defaultincs($pdl);PDL->allocdata($pdl);".
-		$this->get_xsdatapdecl(undef,1));
-}
-
 sub do_pdlaccess {
 	my($this) = @_;
-	PDL::PP::pp_line_numbers(__LINE__, '$PRIV(pdls['.$this->{Number}.'])');
-
+	PDL::PP::pp_line_numbers(__LINE__-1, '$PRIV(pdls['.$this->{Number}.'])');
 }
 
 sub do_pointeraccess {
@@ -374,21 +270,17 @@ sub do_indterm { my($this,$pdl,$ind,$subst,$context) = @_;
 	}
 	if(!defined $index) {confess "Access Index not found: $pdl, $ind, $indname
 		On stack:".(join ' ',map {"($_->[0],$_->[1])"} @$context)."\n" ;}
-       return "(".($this->get_incname($ind))."*".
+       return "(".($this->get_incname($ind,1))."*".
                "PP_INDTERM(".$this->{IndObjs}[$ind]->get_size().", $index))";
 }
 
 sub get_xsdatapdecl { 
-    my($this,$genlooptype,$asgnonly) = @_;
-    my $ptype = $this->adjusted_type($genlooptype);
-    my $type = $ptype->ctype;
+    my($this,$ctype) = @_;
     my $pdl = $this->get_nname;
     my $flag = $this->get_nnflag;
     my $name = $this->{Name};
-    my $declini = ($asgnonly ? "" : "$type *");
-    my $cast = ($type ? "($type *)" : "");
-    my $macro = ($this->{BadFlag} && $ptype) ? "PDL_REDODIMS_BADVAL" : "PDL_REDODIMS";
-    PDL::PP::pp_line_numbers(__LINE__, "$macro($declini, $cast, $type, $flag, $name, $pdl)");
+    my $macro = "PDL_DECLARE_PARAMETER".($this->{BadFlag} ? "_BADVAL" : "");
+    "$macro($ctype, $flag, $name, $pdl)";
 }
 
 1;

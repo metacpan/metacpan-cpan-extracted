@@ -18,14 +18,14 @@ This module provides an interface to any image display 'device' which support th
 old SunView imtool program and presumably even the original IIS CRT itself
 if they aren't all in museums!
 
-These programs should be familiar to astronomer's - they are used by
+These programs should be familiar to astronomers - they are used by
 the common IRAF system. The programs and their HTML documentation
 can be obtained from the following URLs:
 
  SAOimage: http://tdc-www.harvard.edu/software/saoimage.html
  Ximtool:  http://iraf.noao.edu/iraf/web/projects/x11iraf/x11iraf.html
 
-Non-astronomer's may find they quite nifty for displaying 2D data.
+Non-astronomers may find they quite nifty for displaying 2D data.
 
 The Perl variable C<$stdimage> is exported from the module and controls
 the frame buffer configuration currently in use. The default value
@@ -73,8 +73,6 @@ using the module this will guarantee correct file names!
 
 
 EOD
-
-use Config;
 
 pp_add_exported('','iis iiscur iiscirc $stdimage $iisframe saoimage ximtool');
 
@@ -413,16 +411,6 @@ pp_addhdr(<<"EOD");
 #include "libiis.h"
 EOD
 
-# Non-blocking I/O
-
-pp_addhdr(<<"EOD") if defined $Config{'o_nonblock'} && $Config{'o_nonblock'} ne 'O_NONBLOCK';
-#define O_NONBLOCK $Config{'o_nonblock'}
-EOD
-
-pp_addhdr(<<"EOD");
-#include "pdliisdisp.c"
-EOD
-
 pp_addxs('',<<'EOD');
 
 MODULE = PDL::Graphics::IIS PACKAGE = PDL::Graphics::IIS
@@ -487,8 +475,8 @@ pp_def('_iis',
 
    /* Convenience variables */
 
-   nx = $PRIV(__m_size);
-   ny = $PRIV(__n_size);
+   nx = $SIZE(m);
+   ny = $SIZE(n);
    fmin = (float) $min();
    fmax = (float) $max();
 

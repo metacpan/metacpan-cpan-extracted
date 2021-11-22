@@ -32,7 +32,7 @@ my $builder = Module::Build->new(
 
     requires => {
                  'perl'         => '5.16.0',
-                 'Sidef'        => '3.97',
+                 'Sidef'        => '3.99',
                  'Math::AnyNum' => '0.36',
                  'Exporter'     => '0',
                 },

@@ -1,0 +1,67 @@
+---
+abstract: 'dyncall Backed FFI'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Archive::Tar: '0'
+  CPAN::Meta: '0'
+  Devel::CheckBin: '0'
+  ExtUtils::Config: '0.003'
+  ExtUtils::Helpers: '0.02'
+  ExtUtils::Install: '0'
+  ExtUtils::InstallPaths: '0.002'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long: '2.36'
+  HTTP::Tiny: '0'
+  IO::Uncompress::Unzip: '0'
+  JSON::PP: '2'
+  Module::Build::Tiny: '0.035'
+  Path::Tiny: '0'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dyn
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Dyn:
+    file: lib/Dyn.pm
+    version: '0.02'
+  Dyn::Call:
+    file: lib/Dyn/Call.pm
+    version: '0.02'
+  Dyn::Callback:
+    file: lib/Dyn/Callback.pm
+    version: '0.02'
+  Dyn::Load:
+    file: lib/Dyn/Load.pm
+    version: '0.02'
+  Dyn::Sugar:
+    file: lib/Dyn/Sugar.pm
+    version: '0.02'
+requires:
+  perl: '5.030'
+resources:
+  bugtracker: https://github.com/sanko/Dyn.pm/issues
+  homepage: https://github.com/sanko/Dyn.pm
+  repository: git://github.com/sanko/Dyn.pm.git
+version: '0.02'
+x_authority: cpan:SANKO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-print "1..8\n";
+print "1..7\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -184,44 +184,6 @@ $ok = 0;
 
 for my $r(@rnds) {
   for my $v(@vals) {
-
-    if($r == MPFR_RNDN) {
-      if($v >= -0.5) {
-        if(Rmpfr_fits_UV_p($v, $r)) {$ok++}
-        else { warn "$r : $v : ", Rmpfr_fits_UV_p($v, $r), "\n"}
-      }
-      else {
-        if(!Rmpfr_fits_UV_p($v, $r)) {$ok++}
-        else { warn "$r : $v : ", Rmpfr_fits_UV_p($v, $r), "\n"}
-      }
-    }
-    elsif($r == MPFR_RNDZ || $r == MPFR_RNDU) {
-      if(Rmpfr_fits_UV_p($v, $r)) {$ok++}
-      else { warn "$r : $v : ", Rmpfr_fits_UV_p($v, $r), "\n"}
-    }
-    else {
-      if($v == 0) {
-        if(Rmpfr_fits_UV_p($v, $r)) {$ok++}
-        else { warn "$r : $v : ", Rmpfr_fits_UV_p($v, $r), "\n"}
-      }
-      else {
-        if(!Rmpfr_fits_UV_p($v, $r)) {$ok++}
-        else { warn "$r : $v : ", Rmpfr_fits_UV_p($v, $r), "\n"}
-      }
-    }
-  }
-}
-
-if($ok == $count) {print "ok 5\n"}
-else {
-  warn "\n\$ok: $ok\n\$count: $count\n";
-  print "not ok 5\n";
-}
-
-$ok = 0;
-
-for my $r(@rnds) {
-  for my $v(@vals) {
     if(Rmpfr_fits_sshort_p($v, $r)) {$ok++}
     else { warn "sshort: $r : $v : ", Rmpfr_fits_sshort_p($v, $r), "\n"}
 
@@ -239,10 +201,10 @@ for my $r(@rnds) {
   }
 }
 
-if($ok == $count * 5) {print "ok 6\n"}
+if($ok == $count * 5) {print "ok 5\n"}
 else {
   warn "\n\$ok: $ok\n\$count: $count\n";
-  print "not ok 6\n";
+  print "not ok 5\n";
 }
 
 my $fr1 = Math::MPFR->new(-1.0);
@@ -270,14 +232,10 @@ for my $r(@rnds) {
     $ok = 0;
   }
 
-  if(Rmpfr_fits_UV_p($fr1, $r)) {
-    warn "UV: $fr1: $r: ", Rmpfr_fits_UV_p($fr1, $r), "\n";
-    $ok = 0;
-  }
 }
 
-if($ok){print "ok 7\n"}
-else {print "not ok 7\n"}
+if($ok){print "ok 6\n"}
+else {print "not ok 6\n"}
 
 $ok = 1;
 
@@ -302,11 +260,11 @@ for my $r(@rnds) {
     $ok = 0;
   }
 
-  if(!Rmpfr_fits_UV_p($fr2, $r)) {
-    warn "UV: $fr2: $r: ", Rmpfr_fits_UV_p($fr2, $r), "\n";
+  if(!Rmpfr_fits_IV_p($fr2, $r)) {
+    warn "IV: $fr2: $r: ", Rmpfr_fits_UV_p($fr2, $r), "\n";
     $ok = 0;
   }
 }
 
-if($ok){print "ok 8\n"}
-else {print "not ok 8\n"}
+if($ok){print "ok 7\n"}
+else {print "not ok 7\n"}

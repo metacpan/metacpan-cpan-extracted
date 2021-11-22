@@ -32,14 +32,13 @@ sub make_config {
         $config->{worker_model} = UniEvent::HTTP::Manager::WORKER_THREAD  if lc($worker_model) eq 'thread'; 
     }
 
-    if (defined(my $bind_model = $p->{bind_model})) {
-        $config->{bind_model} = UniEvent::HTTP::Manager::BIND_DUPLICATE  if lc($bind_model) eq 'duplicate'; 
-        $config->{bind_model} = UniEvent::HTTP::Manager::BIND_REUSE_PORT if lc($bind_model) eq 'reuse_port'; 
+    if (defined(my $reuse_port = $p->{reuse_port})) {
+        $_->{reuse_port} = $reuse_port for @{$config->{server}{locations}};
     }    
     
     foreach my $name (qw/
         min_servers max_servers min_spare_servers max_spare_servers min_load max_load load_average_period max_requests
-        min_worker_ttl check_interval activity_timeout termination_timeout worker_model bind_model
+        min_worker_ttl check_interval activity_timeout termination_timeout worker_model
     /)
     {
         $config->{$name} = $p->{$name} if defined $p->{$name};

@@ -86,7 +86,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 if (s.set){
                     header.set(s.set);
                 }
-                form.addGroupHeader(s.label != null ? this.xtr(s.label) : null,options);
+                form.addGroupHeader(s.label != null ? this.xtr(s.label) : '', options);
                 return;
             }
 

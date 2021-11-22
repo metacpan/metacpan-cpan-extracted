@@ -4,7 +4,7 @@ package Net::Async::OpenTracing;
 use strict;
 use warnings;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
@@ -281,7 +281,9 @@ Gathers and sends a single L<OpenTracing::Batch>.
 
 async sub send_next_batch {
     my ($self) = @_;
-    my $batch = OpenTracing::Batch->new;
+    my $batch = OpenTracing::Batch->new(
+        process => $self->tracer->process
+    );
     my @spans = $self->tracer->extract_finished_spans($self->items_per_batch)
         or return 0;
     $batch->add_span($_) for @spans;
@@ -340,9 +342,9 @@ sub sync {
 
 =head1 AUTHOR
 
-Tom Molesworth <TEAM@cpan.org>
+Tom Molesworth <TEAM@cpan.org> with contributions from C<chp9-u>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2021. Licensed under the same terms as Perl itself.
 

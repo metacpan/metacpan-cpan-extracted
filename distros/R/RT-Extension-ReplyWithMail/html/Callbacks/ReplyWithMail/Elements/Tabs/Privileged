@@ -22,21 +22,40 @@ if ( $request_path =~ m{^/Ticket/} ) {
                     && ( $can{'ExecuteCode'} || $can{'SuperUser'} );
             }
         };
- 		
+ 		my $cc = "";
+        my $requestorEmails = "";
         #add item to actions child menu
         if ( $can->('ModifyTicket') ) {
         	if($obj->CcAddresses eq "" && $obj->AdminCcAddresses eq "")
             {
-            	$tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $obj->RequestorAddresses . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress);
+            	$requestorEmails=$obj->RequestorAddresses;
+                #replace commas with semicolons
+                $requestorEmails=~ s/,/;/g;
+                $tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $requestorEmails . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress);
             } elsif ($obj->CcAddresses ne "" && $obj->AdminCcAddresses eq "")
             {
-            	$tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $obj->RequestorAddresses . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress . ", " . $obj->CcAddresses);
+            	$cc=$obj->CcAddresses;
+                #replace commas with semicolons
+                $cc=~ s/,/;/g;
+                $requestorEmails=$obj->RequestorAddresses;
+                #replace commas with semicolons
+                $requestorEmails=~ s/,/;/g;
+                $tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $requestorEmails . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress . "; " . $cc);
             } elsif ($obj->CcAddresses ne "" && $obj->AdminCcAddresses ne "")
             {
-            	$tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $obj->RequestorAddresses . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress . ", " . $obj->CcAddresses . "&bcc=" . $obj->AdminCcAddresses);
+                $cc=$obj->CcAddresses;
+                #replace commas with semicolons
+                $cc=~ s/,/;/g;
+                $requestorEmails=$obj->RequestorAddresses;
+                #replace commas with semicolons
+                $requestorEmails=~ s/,/;/g;
+                $tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $requestorEmails . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress . "; " . $cc . "&bcc=" . $obj->AdminCcAddresses);
             } elsif ($obj->CcAddresses eq "" && $obj->AdminCcAddresses ne "")
             {
-            	$tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $obj->RequestorAddresses . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress . "&bcc=" . $obj->AdminCcAddresses);
+            	$requestorEmails=$obj->RequestorAddresses;
+                #replace commas with semicolons
+                $requestorEmails=~ s/,/;/g;
+                $tabs->child( replywithmail => title => loc('Reply with mail'), path => "mailto:" . $requestorEmails . "?subject=" . $obj->SubjectTag . " " . $obj->Subject . "&cc=" . $obj->QueueObj->CorrespondAddress . "&bcc=" . $obj->AdminCcAddresses);
             }
         }
     }

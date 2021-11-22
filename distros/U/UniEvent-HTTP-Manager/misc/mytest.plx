@@ -11,22 +11,25 @@ $SIG{PIPE} = 'IGNORE';
 use Data::Dumper;
 
 XLog::set_level(XLog::DEBUG, "UniEvent::HTTP::Manager");
+#XLog::set_level(XLog::DEBUG, "UniEvent::HTTP");
 XLog::set_logger(sub { say $_[0] });
 XLog::set_format("%4.6t =%p/%T= %c[%L/%1M]%C %f:%l,%F(): %m");
 
 say "START $$";
 
 my $min_servers = 1;
-my $max_servers = 1;
+my $max_servers = 10;
 my $check_interval = 1;
 
 my $mgr = UniEvent::HTTP::Manager->new({
     server => {
         locations => [
-            {host => 'localhost', port => 4555},
+            {host => 'localhost', port => 4555, reuse_port => 1},
+            {host => 'localhost', port => 4556, reuse_port => 0},
+            {path => "mysock"},
             #{host => 'dev.crazypanda.ru', port => 4555},
         ],
-        max_keepalive_requests => 10000,
+        max_keepalive_requests => 200000,
     },
     min_servers    => $min_servers,
     max_servers    => $max_servers,
@@ -35,8 +38,6 @@ my $mgr = UniEvent::HTTP::Manager->new({
     max_load       => 0.5,
     #min_spare_servers => 1,
     #max_spare_servers => 2,
-    bind_model => UniEvent::HTTP::Manager::BIND_REUSE_PORT,
-    #bind_model => UniEvent::HTTP::Manager::BIND_DUPLICATE,
     #activity_timeout => 5,
     termination_timeout => 5,
     min_worker_ttl => 10,
@@ -78,12 +79,12 @@ $ttyin->read_callback(sub {
     $check_interval += 0.1 if $str eq 'ci+';
     $check_interval -= 0.1 if $str eq 'ci-';
 
-    my $err = $mgr->reconfigure({
+    my ($ok, $err) = $mgr->reconfigure({
         min_servers    => $min_servers,
         max_servers    => $max_servers,
         check_interval => $check_interval,
     });
-    say "RECONFIGURE ERROR: $err" if $err;
+    say "RECONFIGURE ERROR: $err" unless $ok;
 });
 
 $mgr->spawn_callback(sub {
@@ -91,15 +92,14 @@ $mgr->spawn_callback(sub {
     my $server = shift;
     
     $server->request_callback(sub {
-    my $req = shift;
-    #select undef, undef, undef, 0.001;
-    #sleep 10;
-    $req->respond({
-        code => 200,
-        body => "epta",
+        my $req = shift;
+        #select undef, undef, undef, 0.001;
+        #sleep 10;
+        $req->respond({
+            code => 200,
+            body => "epta",
+        });
     });
-});
-    
 });
 
 $mgr->run;

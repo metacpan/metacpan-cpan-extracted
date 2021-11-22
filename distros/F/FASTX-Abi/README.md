@@ -1,8 +1,6 @@
 # FASTX-Abi
 
- - [![Master Build Status](https://travis-ci.org/telatin/FASTX-Abi.svg?branch=master)](https://travis-ci.org/telatin/FASTX-Abi) Master branch
-
- - [![Test Build Status](https://travis-ci.org/telatin/FASTX-Abi.svg?branch=test)](https://travis-ci.org/telatin/FASTX-Abi) Test branch (if any)
+[![Dzil Test](https://github.com/telatin/FASTX-Abi/actions/workflows/cpan.yaml/badge.svg)](https://github.com/telatin/FASTX-Abi/actions/workflows/cpan.yaml)
 
 OOP Perl module to convert Sanger trace files (.ab1) to FASTQ sequences. Ambiguities (hetero bases) are managed.
 

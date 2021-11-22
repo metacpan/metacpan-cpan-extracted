@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-SQLiteKeyValueStoreSimpleUtils",
   "EXE_FILES" => [
     "script/check-sqlite-kvstore-key-exists",
+    "script/dump-sqlite-kvstore",
     "script/get-sqlite-kvstore-value",
     "script/list-sqlite-kvstore-keys",
     "script/set-sqlite-kvstore-value"
@@ -26,9 +27,9 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => "0.907",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
-    "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.827",
-    "SQLite::KeyValueStore::Simple" => 0,
+    "Perinci::CmdLine::Any" => "0.152",
+    "Perinci::CmdLine::Lite" => "1.905",
+    "SQLite::KeyValueStore::Simple" => "0.002",
     "Sah::Schema::filename" => 0
   },
   "TEST_REQUIRES" => {
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,9 +53,9 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.827",
-  "SQLite::KeyValueStore::Simple" => 0,
+  "Perinci::CmdLine::Any" => "0.152",
+  "Perinci::CmdLine::Lite" => "1.905",
+  "SQLite::KeyValueStore::Simple" => "0.002",
   "Sah::Schema::filename" => 0,
   "Test::More" => 0
 );

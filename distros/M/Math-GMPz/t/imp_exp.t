@@ -66,7 +66,7 @@ $Math::GMPz::utf8_no_warn = 1; # Disable warning.
 # Next we check that this is so.
 
 eval{ Rmpz_import($z, length($ws), $order, $size, $endian, $nails, $ws); };
-like($@, qr/^Wide character in subroutine/, '$@ set as exected');
+like($@, qr/^Wide character in subroutine/, '$@ set as expected');
 
 $Math::GMPz::utf8_no_croak = 1;
 $Math::GMPz::utf8_no_fail = 1;

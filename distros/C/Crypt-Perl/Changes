@@ -1,5 +1,19 @@
 Revision history for Perl module Crypt::Perl
 
+0.36 Wed Nov 17 2021
+- Report test coverage in POD. (No code changes.)
+
+0.35 Wed Nov 17 2021
+- BUG FIX: Export of ECDSA public keys now uses the proper PEM header.
+- BUG FIX: A few syntax errors in oddball error cases are fixed.
+- BUG FIX: Typo on unknown “kty” in JWK parse.
+- Bump minimum Math::BigInt version to avoid (apparent?) recent breakages.
+- Allow Math::BigInt::LTM, Math::BigInt::BitVect, and Math::BigInt::GMPz.
+- Fix tests when there is no usable OpenSSL binary.
+- Fix tests on win32 when OpenSSL’s path includes a space.
+- Fix PKCS10.t to accommodate Crypt::Format bug on win32
+- CI moved to GitHub; Cygwin is now checked as well as Linux, macOS, & Windows.
+
 0.34 Mon Sep 28 2020
 - Deterministic ECDSA support added. sign_jwa() now always uses it,
   and new sign_sha256() et al. methods encourage it for plain signatures.

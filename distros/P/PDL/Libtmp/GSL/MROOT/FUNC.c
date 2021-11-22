@@ -6,19 +6,24 @@
 // is separated from the PDL distribution, the copyright notice should be 
 // included in the file.
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multiroots.h>
+#include "EXTERN.h"
+#include "perl.h"
+#include "pdl.h"
+#include "pdlcore.h"
+
+#define PDL PDL_GSL_MROOT
+extern Core *PDL;
 
 static SV* ext_funname1;
+static PDL_Indx ene;
+void set_funname(SV *fn, PDL_Indx n) {
+  ext_funname1 = fn;
+  ene = n;
+}
 
-static int ene;
-
-void DFF(int* n, double* x, double* vector);
-int my_f (const gsl_vector * v, void * params, gsl_vector * df);
-
-void DFF(int* n, double* xval, double* vector){
+void DFF(double* xval, double* vector){
    //this version tries just to get the output
   SV* funname;
 
@@ -33,14 +38,13 @@ void DFF(int* n, double* xval, double* vector){
   SV* pvectorsv;
 
   int ndims;
-  PDL_Indx *pdims;
 
   dSP;
   ENTER;
   SAVETMPS;
 
   ndims = 1;
-  pdims = (PDL_Indx *)  PDL->smalloc((STRLEN) ((ndims) * sizeof(*pdims)) );
+  PDL_Indx pdims[ndims];
   
   pdims[0] = (PDL_Indx) ene;
 
@@ -53,10 +57,9 @@ void DFF(int* n, double* xval, double* vector){
   PUTBACK;
   px = PDL->SvPDLV(pxsv);
   
-  PDL->converttype( &px, PDL_D, PDL_PERM );
+  PDL->converttype( px, PDL_D );
   PDL->children_changesoon(px,PDL_PARENTDIMSCHANGED|PDL_PARENTDATACHANGED);
   PDL->setdims (px,pdims,ndims);
-  px->state &= ~PDL_NOMYDIMS;
   px->state |= PDL_ALLOCATED | PDL_DONTTOUCHDATA;
   PDL->changed(px,PDL_PARENTDIMSCHANGED|PDL_PARENTDATACHANGED,0);
 
@@ -105,38 +108,19 @@ void DFF(int* n, double* xval, double* vector){
 
 int my_f (const gsl_vector * v, void * params, gsl_vector * df)
 {
-  double *dp = (double *)params;
-  int* nelem; int i;
-  double* xfree;
-  double* vector;
-
+  double dp = *((double *)params);
+  int nelem = (int) dp;
+  double xfree[nelem], vector[nelem];
   int iloop;
-
-  nelem = (int *) malloc(sizeof(int));
-  *nelem = (int) dp[0];
-
-  xfree = (double *) malloc(*nelem * sizeof(double));
-  
-  vector = (double *) malloc(*nelem * sizeof(double));
-    
-  for (iloop=0;iloop< *nelem;iloop++) {
+  for (iloop=0;iloop< nelem;iloop++) {
     xfree[iloop] = gsl_vector_get(v, iloop);
     vector[iloop] = gsl_vector_get(v, iloop) * gsl_vector_get(v, iloop);
   }
-
-
-  DFF(nelem, xfree, vector);
-
-  for (iloop=0;iloop< *nelem;iloop++) {
+  DFF(xfree, vector);
+  for (iloop=0;iloop< nelem;iloop++) {
     gsl_vector_set(df, iloop, vector[iloop]);
-   }
-  
-
-  free(nelem);
-  free(xfree);
-  free(vector);
-  return  GSL_SUCCESS ; 
-  
+  }
+  return GSL_SUCCESS;
 }
 
 int

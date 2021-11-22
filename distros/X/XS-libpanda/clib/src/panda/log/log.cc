@@ -123,8 +123,7 @@ namespace details {
         if (module_data.effective_logger) {
             string_view program_name = lib_data.program_name ? lib_data.program_name : default_program_name;
             Info info(level, module, cp.file, cp.line, cp.func, program_name);
-            int status = clock_gettime(CLOCK_REALTIME, &info.time);
-            if (status != 0) info.time.tv_sec = info.time.tv_nsec = 0;
+            info.time = std::chrono::system_clock::now();
             module_data.effective_logger->log_format(s, info, *(module_data.effective_formatter));
 
             if (module->passthrough()) {
@@ -174,7 +173,9 @@ namespace details {
     #ifdef __MACH__
     __attribute__((section("_DATA,.init_array"))) void (* p_my_cool_main)(int,char*[],char*[]) = spy_$0;
     #else
-    __attribute__((section(".init_array"))) void (* p_my_cool_main)(int,char*[],char*[]) = spy_$0;
+        #ifndef _MSC_VER
+        __attribute__((section(".init_array"))) void (* p_my_cool_main)(int,char*[],char*[]) = spy_$0;
+        #endif
     #endif
 }
 using namespace details;

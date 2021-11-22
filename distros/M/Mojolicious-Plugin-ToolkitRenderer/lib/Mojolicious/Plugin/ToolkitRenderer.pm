@@ -7,9 +7,14 @@ use warnings;
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Exception;
-use Template ();
 
-our $VERSION = '1.10'; # VERSION
+BEGIN {
+    local $SIG{__WARN__} = sub {};
+    require Template;
+    Template->import;
+}
+
+our $VERSION = '1.11'; # VERSION
 
 sub register {
     my ( $self, $app, $settings ) = @_;
@@ -82,7 +87,7 @@ Mojolicious::Plugin::ToolkitRenderer - Template Toolkit Renderer Mojolicious Plu
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =for markdown [![test](https://github.com/gryphonshafer/Mojo-Plugin-Toolkit/workflows/test/badge.svg)](https://github.com/gryphonshafer/Mojo-Plugin-Toolkit/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-Toolkit/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-Toolkit)

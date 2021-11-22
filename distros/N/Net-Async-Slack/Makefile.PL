@@ -33,6 +33,7 @@ my %WriteMakefileArgs = (
     "Future::AsyncAwait" => "0.49",
     "HTTP::Request" => 0,
     "IO::Async::SSL" => "0.22",
+    "JSON::MaybeUTF8" => "2.000",
     "JSON::MaybeXS" => "1.004003",
     "Log::Any" => "1.709",
     "Net::Async::HTTP" => "0.48",
@@ -59,7 +60,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -81,6 +82,7 @@ my %FallbackPrereqs = (
   "IO::Async::SSL" => "0.22",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "JSON::MaybeUTF8" => "2.000",
   "JSON::MaybeXS" => "1.004003",
   "Log::Any" => "1.709",
   "Net::Async::HTTP" => "0.48",

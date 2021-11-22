@@ -219,4 +219,22 @@ struct AllocatedObject<TARGET, false> {
     }
 };
 
+template <class T>
+struct DynamicInstanceAllocator {
+    using value_type = T;
+
+    DynamicInstanceAllocator() : pool(*DynamicMemoryPool::instance()) {}
+
+    T* allocate(std::size_t n) {
+        return (T*)pool.allocate(n * sizeof(T));
+    }
+
+    void deallocate(T* p, std::size_t n) {
+        pool.deallocate(p, n * sizeof(T));
+    }
+
+private:
+    DynamicMemoryPool& pool;
+};
+
 }

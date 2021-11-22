@@ -7,7 +7,7 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 # VERSION
 
-version 0.0058
+version 0.0060
 
 # STATUS
 
@@ -38,7 +38,20 @@ say $df;
 
 say $df->at(0);         # [1 2 3 4]
 say $df->at(0)->length; # 4
-say $df->at('x');       # [1 2 3 4]
+
+say $df->at('x');       # [foo bar baz quux]
+say $df->{x};           # same as above
+
+say $df->select_columns([qw(x y)]);
+# -----------
+#     x    y
+# -----------
+#  0  foo  0
+#  1  bar  0
+#  2  baz  1
+#  3  quux 1
+# -----------
+say $df->{[qw(x y)]};   # same as above
 
 say $df->select_rows( 3,1 );
 # ---------------
@@ -48,6 +61,7 @@ say $df->select_rows( 3,1 );
 #  1  2  0  bar
 # ---------------
 
+# update data
 $df->slice( [0,1], ['z', 'y'] ) .= pdl( 4,3,2,1 );
 say $df;
 # ---------------

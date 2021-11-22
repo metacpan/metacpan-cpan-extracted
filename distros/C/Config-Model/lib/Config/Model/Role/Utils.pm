@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::Utils 2.144;
+package Config::Model::Role::Utils 2.145;
 
 # ABSTRACT: Provide some utilities
 
@@ -16,8 +16,8 @@ use strict;
 use warnings;
 use 5.020;
 
-use feature qw/signatures/;
-no warnings qw/experimental::signatures/;
+use feature qw/signatures postderef/;
+no warnings qw/experimental::signatures experimental::postderef/;
 
 sub _resolve_arg_shortcut ($args, @param_list) {
     return $args->@* > @param_list ? $args->@*
@@ -38,7 +38,7 @@ Config::Model::Role::Utils - Provide some utilities
 
 =head1 VERSION
 
-version 2.144
+version 2.145
 
 =head1 AUTHOR
 

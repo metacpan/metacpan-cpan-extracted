@@ -7,16 +7,18 @@ use exact;
 use exact::class;
 use Text::Balanced qw( extract_delimited extract_bracketed );
 use Text::Wrap 'wrap';
-use Bible::OBML::HTML;
 use Bible::Reference 1.05;
 use Clone 'clone';
 
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 has bible    => 'Protestant';
 has acronyms => 1;
 has refs     => 'as_books';
-has html     => sub { Bible::OBML::HTML->new( obml => shift ) };
+has html     => sub {
+    require Bible::OBML::HTML;
+    Bible::OBML::HTML->new( obml => shift );
+};
 
 has _reference => sub { Bible::Reference->new( acronyms => 1 ) };
 
@@ -479,7 +481,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML)

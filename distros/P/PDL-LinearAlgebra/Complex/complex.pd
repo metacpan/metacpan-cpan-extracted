@@ -5229,7 +5229,7 @@ pp_bless('PDL');
 pp_def(
 	'cmstack',
 	DefaultFlow => 1,
-	Reversible => 1,
+	TwoWay => 1,
 	Pars => 'x(c,n,m);y(c,n,p);[o]out(c,n,q);',
 	RedoDimsCode => '$SIZE(q) = $PDL(x)->dims[2] + $PDL(y)->dims[2];',
 	Code => '

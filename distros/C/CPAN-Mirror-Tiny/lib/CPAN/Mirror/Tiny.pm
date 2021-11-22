@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 use CPAN::Meta;
 use CPAN::Mirror::Tiny::Archive;

@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'CtrlO/Crypt/XkcdPassword.pm',
+    'CtrlO/Crypt/XkcdPassword/Wordlist/eff_large.pm',
+    'CtrlO/Crypt/XkcdPassword/Wordlist/eff_short_1.pm',
+    'CtrlO/Crypt/XkcdPassword/Wordlist/eff_short_2_0.pm',
     'CtrlO/Crypt/XkcdPassword/Wordlist/en_gb.pm'
 );
 

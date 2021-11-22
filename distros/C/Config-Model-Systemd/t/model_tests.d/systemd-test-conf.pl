@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -34,6 +34,23 @@ my @tests = (
     },
 
     {
+        name => 'transmission',
+        backend_arg => 'transmission-daemon',
+        setup => {
+            'transmission-daemon.service' => '/lib/systemd/system/transmission-daemon.service'
+        },
+        load => 'service:transmission-daemon Unit After:<you',
+        check => {
+            'service:transmission-daemon Unit After:0' => { mode => 'user', value => "network.target"},
+            'service:transmission-daemon Unit After:1' => "you",
+        },
+        file_check_sub => sub {
+            my $list_ref = shift ;
+            push @$list_ref , '/etc/systemd/system/transmission-daemon.service.d/override.conf';
+        },
+    },
+
+    {
         name => 'disable-service',
         backend_arg => 'sshd',
         setup => {
@@ -58,6 +75,13 @@ my @tests = (
             'default-alsa-state' => '/lib/systemd/system/alsa-state.service'
         },
         load => "service:sshd Unit Description~",
+
+        # when loading sshd, no service or socker is found, so the backend create
+        # and empty socket and empty service to cme edit shows both to users.
+        # since they are not filled with data, no file is written
+        # but dump tree test shows the difference, so we remove the empty socket.
+        load2 => "socket:.rm(sshd)",
+
         # file is removed because the load instruction above removes the only setting in there
         file_check_sub => sub {
             my $list_ref = shift ;

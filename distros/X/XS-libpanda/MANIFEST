@@ -1,8 +1,12 @@
 .gitattributes
 Changes
 clib/CMakeLists.txt
+clib/doc/CallbackDispatcher.md
+clib/doc/function.md
+clib/doc/refcnt.md
 clib/LICENSE
 clib/panda-lib-config.cmake
+clib/README.md
 clib/src/panda/basic_string.h
 clib/src/panda/basic_string_view.h
 clib/src/panda/CallbackDispatcher.h
@@ -71,6 +75,7 @@ clib/tests/log/logtest.h
 clib/tests/log/module.cc
 clib/tests/log/multi.cc
 clib/tests/main.cc
+clib/tests/optional.cc
 clib/tests/owning_list.cc
 clib/tests/string_char.cc
 clib/tests/string_char16.cc

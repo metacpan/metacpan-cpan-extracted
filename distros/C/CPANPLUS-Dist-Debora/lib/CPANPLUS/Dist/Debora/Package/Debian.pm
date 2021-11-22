@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -918,7 +918,7 @@ CPANPLUS::Dist::Debora::Package::Debian - Create Debian packages
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

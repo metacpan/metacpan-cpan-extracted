@@ -21,11 +21,11 @@ PGObject
 
 =head1 VERSION
 
-version 1.5.0
+version 1.6.1
 
 =cut
 
-our $VERSION = '1.5.0';
+our $VERSION = '1.6.1';
 
 
 =head1 SYNOPSIS
@@ -234,6 +234,7 @@ our %helpers =
      backup_globals => [ qw/pg_dumpall/ ],
      restore => [ qw/pg_restore psql/ ],
      drop => [ qw/dropdb/ ],
+     is_ready => [ qw/pg_isready/ ],
     );
 
 =head1 GLOBAL VARIABLES
@@ -261,6 +262,7 @@ our %helper_paths =
      pg_dump => 'pg_dump',
      pg_dumpall => 'pg_dumpall',
      pg_restore => 'pg_restore',
+     pg_isready => 'pg_isready',
     );
 
 sub _run_with_env {
@@ -298,7 +300,7 @@ sub _run_command {
     $self->logger->debugf(
         sub {
             return 'Running with environment: '
-                . join(' ', map { qq|$_="$env{$_}"| } keys %env );
+                . join(' ', map { qq|$_="$env{$_}"| } sort keys %env );
         });
 
     # Any files created should be accessible only by the current user
@@ -633,6 +635,20 @@ Recognized arguments are:
 
 Path to file to be run. This is a mandatory argument.
 
+=item vars
+
+A hash reference containing C<psql>-variables to be passed to the script
+being executed. Running:
+
+   $dbadmin->run_file(file => '/tmp/pg.sql', vars => { schema => 'xyz' });
+
+Is equivalent to starting the file C</tmp/pg.sql> with the command
+
+   \set schema xyz
+
+To undefine a variable, associate the variable name (hash key) with the
+value C<undef>.
+
 =item stdout_log
 
 Provided for legacy compatibility. Optional argument. The full path of
@@ -649,6 +665,7 @@ a file to which STDERR from the external psql utility will be appended.
 
 sub run_file {
     my ($self, %args) = @_;
+    my $vars = $args{vars} // {};
     $self->{stderr} = undef;
     $self->{stdout} = undef;
 
@@ -657,7 +674,11 @@ sub run_file {
 
     # Build command
     my @command =
-        ($helper_paths{psql}, '--set=ON_ERROR_STOP=on', '-f', $args{file});
+        ($helper_paths{psql}, '--set=ON_ERROR_STOP=on',
+         (map { ('-v',
+                 defined $vars->{$_} ? "$_=$vars->{$_}" : $_ ) }
+          keys %$vars),
+         '-f', $args{file});
 
     my $result = $self->_run_command(
         command    => [@command],
@@ -851,6 +872,31 @@ sub drop {
 
     return 1;
 }
+
+
+=head2 is_ready
+
+Drops the database.  This is not recoverable. Croaks on error, returns
+true on success.
+
+=cut
+
+sub is_ready {
+    my ($self) = @_;
+
+    croak 'No db name of this object' unless $self->dbname;
+
+    my @command = ($helper_paths{pg_isready});
+    push(@command, $self->connect_data->{dbname});
+
+    $self->_run_command(command => [@command],
+                        error   => 'error dropping database');
+
+    return 1;
+}
+
+
+
 
 
 =head1 CAPTURING

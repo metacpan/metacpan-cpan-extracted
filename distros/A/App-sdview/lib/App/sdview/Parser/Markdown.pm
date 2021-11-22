@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad 0.43;  # :strict(params)
 
-package App::sdview::Parser::Markdown 0.04;
+package App::sdview::Parser::Markdown 0.05;
 class App::sdview::Parser::Markdown
    does App::sdview::Parser
    :strict(params);
@@ -20,7 +20,7 @@ sub find_file ( $class, $name ) { return undef }
 
 sub can_parse_file ( $class, $file )
 {
-   return $file =~ m/\.md$/;
+   return $file =~ m/\.(?:md|markdown)$/;
 }
 
 method parse_file ( $fh )
@@ -29,6 +29,19 @@ method parse_file ( $fh )
 }
 
 has @_paragraphs;
+
+sub _split_table_row ( $str )
+{
+   $str =~ m/^\s*\|/ or return undef;
+   $str =~ m/\|\s*$/ or return undef;
+
+   my @cols = split m/\|/, $str, -1;
+   shift @cols; pop @cols;
+
+   s/^\s+//, s/\s+$// for @cols;
+
+   return \@cols;
+}
 
 method parse_string ( $str )
 {
@@ -69,7 +82,10 @@ method parse_string ( $str )
       }
 
       while( @lines ) {
-         if( $lines[0] =~ m/^    / ) {
+         if( $lines[0] =~ m/^<!--/ ) { # comment
+            ;
+         }
+         elsif( $lines[0] =~ m/^    / ) { # verbatim
             my $raw = join "\n", @lines;
             $raw =~ s/^    //mg;
 
@@ -77,7 +93,7 @@ method parse_string ( $str )
                text => String::Tagged->new( $raw ),
             );
          }
-         elsif( $lines[0] =~ s/^(#+)\s+// ) {
+         elsif( $lines[0] =~ s/^(#+)\s+// ) { # heading
             my $level = length $1;
             push @_paragraphs, App::sdview::Para::Heading->new(
                level => $level,
@@ -86,7 +102,7 @@ method parse_string ( $str )
 
             next;
          }
-         elsif( @lines >= 2 and $lines[1] =~ m/^([=-])\1*$/ ) {
+         elsif( @lines >= 2 and $lines[1] =~ m/^([=-])\1*$/ ) { # heading
             my $level = ( $1 eq "=" ) ? 1 : 2;
             push @_paragraphs, App::sdview::Para::Heading->new(
                level => $level,
@@ -97,7 +113,7 @@ method parse_string ( $str )
 
             next;
          }
-         elsif( $lines[0] =~ s/^[*+-]\s+// ) {
+         elsif( $lines[0] =~ s/^[*+-]\s+// ) { # bullet list
             my $raw = shift @lines;
             while( @lines and $lines[0] !~ m/^[*+-]/ ) {
                $raw .= " " . ( shift(@lines) =~ m/^\s*(.*)$/ )[0];
@@ -121,9 +137,12 @@ method parse_string ( $str )
 
             next;
          }
-         elsif( $lines[0] =~ s/^\d+\.\s+// ) {
+         elsif( $lines[0] =~ s/^(\d+)([\.\)])\s+// ) { # numbered list
+            # parens aren't strictly Markdown format, but we'll accept them
+            # anyway because so many other parsers do, and people use them
+            my ( $num, $sep ) = ( $1, $2 );
             my $raw = shift @lines;
-            while( @lines and $lines[0] !~ m/^\d+\./ ) {
+            while( @lines and $lines[0] !~ m/^\d+\Q$sep/ ) {
                $raw .= " " . ( shift(@lines) =~ m/^\s*(.*)$/ )[0];
             }
 
@@ -135,6 +154,7 @@ method parse_string ( $str )
                push @_paragraphs, $list = App::sdview::Para::List->new(
                   listtype => "number",
                   indent   => 4,
+                  initial  => $num,
                );
             }
 
@@ -144,6 +164,34 @@ method parse_string ( $str )
             ) );
 
             next;
+         }
+         elsif( @lines >= 2 and 
+               my $cells = _split_table_row( $lines[0] ) and
+               my $aligns = _split_table_row( $lines[1] ) ) { # table
+            shift @lines;
+
+            my @colalign = map {
+               m/^(:?)-{3,}(:?)$/ or warn "Unexpected table heading separator text: $_\n";
+               ( $1 and $2 ) ? "centre" :
+               ( $2        ) ? "right" :
+                               "left";
+            } @$aligns;
+
+            my @rows;
+
+            do {
+               shift @lines;
+
+               push @rows, [ map {
+                  my $s = $cells->[$_];
+                  App::sdview::Para::TableCell->new(
+                     align => $colalign[$_],
+                     text => $self->_handle_spans( $cells->[$_] ),
+                  );
+               } 0 .. $#colalign ];
+            } while( @lines and $cells = _split_table_row( $lines[0] ) );
+
+            push @_paragraphs, my $p = App::sdview::Para::Table->new( rows => \@rows );
          }
          else {
             push @_paragraphs, App::sdview::Para::Plain->new(

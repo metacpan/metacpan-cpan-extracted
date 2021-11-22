@@ -1,6 +1,6 @@
 package Net::Async::ZMQ;
 # ABSTRACT: IO::Async support for ZeroMQ
-$Net::Async::ZMQ::VERSION = '0.001';
+$Net::Async::ZMQ::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ Net::Async::ZMQ - IO::Async support for ZeroMQ
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,11 @@ version 0.001
   use Net::Async::ZMQ::Socket;
 
   use ZMQ::LibZMQ3;  # or ZMQ::LibZMQ4
-  use ZMQ::Constants qw(ZMQ_REQ ZMQ_NOBLOCK);
+  use ZMQ::Constants qw(
+    ZMQ_REQ
+    ZMQ_NOBLOCK
+    ZMQ_EVENTS ZMQ_POLLIN
+  );
 
   my $loop = IO::Async::Loop->new;
 
@@ -41,11 +45,14 @@ version 0.001
 
   my $zmq = Net::Async::ZMQ->new;
 
+  zmq_sendmsg( $client_socket, "initial message" );
+
   $zmq->add_child(
     Net::Async::ZMQ::Socket->new(
       socket => $client_socket,
       on_read_ready => sub {
-        while ( my $recvmsg = zmq_recvmsg( $client_socket, ZMQ_NOBLOCK ) ) {
+        while ( zmq_getsockopt( $client_socket, ZMQ_EVENTS ) & ZMQ_POLLIN ) {
+          my $recvmsg = zmq_recvmsg( $client_socket, ZMQ_NOBLOCK );
           my $msg = zmq_msg_data($recvmsg);
           zmq_sendmsg( $client_socket, "hello @{[ $counter++ ]}" );
         }
@@ -61,6 +68,46 @@ version 0.001
 
 A subclass of L<IO::Async::Notifier> that can hold ZMQ sockets
 that are provided by L<Net::Async::ZMQ::Socket>.
+
+Supports sockets from the following libraries:
+
+=over 4
+
+=item *
+
+L<ZMQ::LibZMQ3>
+
+=item *
+
+L<ZMQ::LibZMQ4>
+
+=item *
+
+L<ZMQ::FFI>
+
+=back
+
+=head1 EXTENDS
+
+=over 4
+
+=item * L<IO::Async::Notifier>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<C<ZMQ_FD> in C<zmq_getsockopt>|http://api.zeromq.org/master:zmq-getsockopt>
+
+=item *
+
+L<ZeroMQ - Edge Triggered Notification|https://funcptr.net/2012/09/10/zeromq---edge-triggered-notification/>
+
+=back
 
 =head1 AUTHOR
 

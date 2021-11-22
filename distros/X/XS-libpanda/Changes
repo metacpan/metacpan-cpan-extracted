@@ -1,4 +1,13 @@
-1.5.4    xx.xx.2021
+1.5.7    xx.xx.2021
+            - add C++20's features to panda::optional
+1.5.6    15.11.2021
+            - compilation fix for windows
+1.5.5    09.11.2021
+            - Add docs, describing system dependecies
+            - panda-log: using std::chrono
+            - multiple fixes for MSVC
+            - add DynamicInstanceAllocator
+1.5.4    13.07.2021
             - add logger multiline message decorator support
 1.5.3    02.07.2021
             - improve platform-dependent code, remove clang warnings

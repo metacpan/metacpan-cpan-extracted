@@ -197,7 +197,7 @@ my $res = $mailgun->add_list_member('ml@example.com' => {
 Adds multiple members for mailing list.
 
 ```perl
-use JSON::XS; # auto export 'encode_json'
+use JSON; # auto export 'encode_json'
 
 # add members
 my $res = $mailgun->add_list_members('ml@example.com' => {

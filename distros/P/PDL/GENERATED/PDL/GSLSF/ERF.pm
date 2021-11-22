@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::ERF;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_erfc PDL::PP gsl_sf_log_erfc PDL::PP gsl_sf_erf PDL::PP gsl_sf_erf_Z PDL::PP gsl_sf_erf_Q );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_erfc gsl_sf_log_erfc gsl_sf_erf gsl_sf_erf_Z gsl_sf_erf_Q );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::ERF ;
+
 
 
 
@@ -42,10 +41,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -194,7 +190,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -217,5 +213,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

@@ -540,13 +540,29 @@ sub classical { return shift }
 sub plural {
     my $self   = shift;
     my $person = shift // 0;
+
     my $term = $term_of{$self};
 
-    return $encase->(
-                $term,
-                $noun_inflexion_of{lc $term}{plural}[$person]
-                // Lingua::EN::Inflexion::Nouns::convert_to_classical_plural($term, $person)
-           );
+    # Prepositions imply objective or possessive (or dative)...
+    my $preposition = $term =~ s{ \A ( \s* $PREP_PAT \s+ ) }{}xi ? $1 : q{};
+
+
+    return
+        $preposition ? $preposition
+                       . $encase->( $term,
+                              $noun_inflexion_of{objective }{lc $term}{plural}[$person]
+                           // $noun_inflexion_of{possessive}{lc $term}{plural}[$person]
+                           // $noun_inflexion_of{reflexive }{lc $term}{plural}[$person]
+                           // $noun_inflexion_of{nominative}{lc $term}{plural}[$person]
+                           // Lingua::EN::Inflexion::Nouns::convert_to_classical_plural($term,$person)
+                         )
+                     :   $encase->( $term,
+                              $noun_inflexion_of{nominative}{lc $term}{plural}[$person]
+                           // $noun_inflexion_of{objective }{lc $term}{plural}[$person]
+                           // $noun_inflexion_of{possessive}{lc $term}{plural}[$person]
+                           // $noun_inflexion_of{reflexive }{lc $term}{plural}[$person]
+                           // Lingua::EN::Inflexion::Nouns::convert_to_classical_plural($term,$person)
+                         );
 }
 
 package Lingua::EN::Inflexion::Verb;
@@ -817,10 +833,12 @@ sub singular {
 
     my $term = $term_of{$self};
 
-    # Is it a composite possessive form???
     my $singular;
+
+    # Is it a composite possessive form???
     if ($term =~ m{ \A (.*) 's? \Z }ixms) {
-        $singular = Lingua::EN::Inflexion::Noun->new($1)->singular . q{'s};
+        my $word = Lingua::EN::Inflexion::Noun->new($1);
+        $singular = $word->is_singular ? $term : $word->singular . q{'s};
     }
 
     # Otherwise, it's either a known inflexion, or uninflected...
@@ -840,9 +858,14 @@ sub plural {
     my $term = $term_of{$self};
     my $plural = $term;
 
-    # Is it a possessive form???
-    if ($term =~ m{ \A (.*) 's? \Z }ixms) {
-        $plural = Lingua::EN::Inflexion::Noun->new($1)->plural . q{'s};
+    # Is it an unequivocally plural possessive form???
+    if ($term =~ m{ ' \Z }ixms) {
+        return $term;
+    }
+    # Is it general possessive form???
+    elsif ($term =~ m{ \A (.*) 's \Z }ixms) {
+        my $word = Lingua::EN::Inflexion::Noun->new($1);
+        $plural = $word->is_plural() ? $term : $word->plural . q{'s};
         $plural =~ s{ s's \Z }{s'}xms
     }
 

@@ -4,7 +4,7 @@ package OpenTracing::Integration::DBI;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 no indirect;
@@ -133,7 +133,13 @@ sub load {
             selectall_arrayref
             selectall_hashref
             selectall_array
+            selectrow_arrayref
+            selectrow_hashref
+            selectrow_array
+            selectcol_arrayref
         )) {
+            my ($operation) = split /_/, $op;
+
             install_modifier q{DBI::db}, around => $op => sub {
                 my ($code, $dbh, $sql, @rest) = @_;
                 my $type = $class->type_from_sql($sql);
@@ -143,7 +149,7 @@ sub load {
                         $span->tag(
                             'component'       => 'DBI',
                             'span.kind'       => 'client',
-                            'db.operation'    => 'selectall',
+                            'db.operation'    => $operation,
                             'db.statement'    => $sql,
                             'db.type'         => 'sql',
                             (defined $dbh->{Name} ? ('db.instance'         => $dbh->{Name}) : ()),
@@ -157,7 +163,7 @@ sub load {
                         );
                         die $@;
                     }
-                } operation_name => 'sql selectall: ' . ($type // 'unknown');
+                } operation_name => "sql $operation: " . ($type // 'unknown');
             };
         }
     }
@@ -169,7 +175,7 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth C<< TEAM@cpan.org >>
+Original implementation by Tom Molesworth C<< TEAM@cpan.org >> with contributions from C<VTI>.
 
 =head1 LICENSE
 

@@ -1,3 +1,14 @@
+1.000082  2021-11-18 09:04:17-08:00 America/Los_Angeles
+
+    - Make collector options configurable
+    - Add collector option for max poll events
+    - Add collector option for max open jobs
+    - Turn warnings about too many open files into proper events
+
+1.000081  2021-11-15 13:27:48-08:00 America/Los_Angeles
+
+    - Retry opening files later when "too many files open" errors occur
+
 1.000080  2021-11-04 11:13:07-07:00 America/Los_Angeles
 
     - Add sort_files_2 for plugins to add settings and future-proof it

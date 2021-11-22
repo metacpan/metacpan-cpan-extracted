@@ -15,9 +15,9 @@ BEGIN
 {
     use common::sense;
     use overload
-      "0+"     => sub { ${$_[0]} },
-      "++"     => sub { $_[0] = ${$_[0]} + 1 },
-      "--"     => sub { $_[0] = ${$_[0]} - 1 },
+      "0+"     => sub{ ${$_[0]} },
+      "++"     => sub{ $_[0] = ${$_[0]} + 1 },
+      "--"     => sub{ $_[0] = ${$_[0]} - 1 },
       fallback => 1;
     use Module::Generic::Array;
     use Module::Generic::Number;

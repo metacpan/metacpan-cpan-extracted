@@ -1,14 +1,15 @@
 ## no critic (ProhibitStringyEval ProhibitSubroutinePrototypes RequireLocalizedPunctuationVars)
 package Test::Expander;
 
-our $VERSION = '1.0.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '1.0.5';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use v5.14;
 use warnings
   FATAL    => qw(all),
   NONFATAL => qw(deprecated exec internal malloc newline portable recursion);
-no  warnings  qw(experimental);
+no if ($] >= 5.018), warnings => 'experimental';
 
+use B                qw(svref_2object);
 use Const::Fast;
 use File::chdir;
 use File::Temp       qw(tempdir tempfile);
@@ -18,6 +19,7 @@ use Scalar::Readonly qw(readonly_on);
 use Test::Files;
 use Test::Output;
 use Test::Warn;
+use Test2::Tools::Basic;
 use Test2::Tools::Explain;
 use Test2::V0        ();
 
@@ -105,14 +107,30 @@ sub import {
   _setEnv($METHOD, $options{-target}, $testFile);
 
   Test2::V0->import(%options);
-  $METHOD_REF = '-target' ~~ %options ? $CLASS->can($METHOD) : undef;
-  $METHOD     = undef unless($METHOD_REF);
 
-  readonly_on($CLASS)      if $CLASS;
-  readonly_on($METHOD)     if $METHOD;
-  readonly_on($METHOD_REF) if $METHOD_REF;
-  readonly_on($TEMP_DIR)   if $TEMP_DIR;
-  readonly_on($TEMP_FILE)  if $TEMP_FILE;
+  if ($CLASS) {
+    readonly_on($CLASS);
+    note(q(Set $CLASS to '),      $CLASS,                                                                   q('));
+
+    $METHOD_REF = $CLASS->can($METHOD);
+    $METHOD     = undef unless($METHOD_REF);
+  }
+  if ($METHOD) {
+    readonly_on($METHOD);
+    note(q(Set $METHOD to '),     $METHOD,                                                                  q('));
+  }
+  if ($METHOD_REF) {
+    readonly_on($METHOD_REF);
+    note(q(Set $METHOD_REF to '), $METHOD_REF, ' -> &', $CLASS, '::', svref_2object($METHOD_REF)->GV->NAME, q('));
+  }
+  if ($TEMP_DIR) {
+    readonly_on($TEMP_DIR);
+    note(q(Set $TEMP_DIR to '),   $TEMP_DIR,                                                                q('));
+  }
+  if ($TEMP_FILE) {
+    readonly_on($TEMP_FILE);
+    note(q(Set $TEMP_FILE to '),  $TEMP_FILE,                                                               q('));
+  }
 
   Importer->import_into($class, scalar(caller), ());
 
@@ -201,6 +219,7 @@ sub _readEnvFile {
     next unless $line =~ /^ (?<name> \w+) \s* = \s* (?<value> \S .*)/x;
     $env{$+{name}} = eval($+{value});
     die(sprintf($INVALID_ENV_ENTRY, $index, $envFile, $line, $@)) if $@;
+    note(q(Set environment variable '), $+{name}, q(' to '), $env{$+{name}}, q(' from file '), $envFile, q('));
   }
 
   return \%env;
@@ -221,7 +240,7 @@ sub _setEnv {
   if (path($envFile)->is_file) {
     $envFound                   = $TRUE unless $envFound;
     my $methodEnv               = _readEnvFile($envFile);
-    @$newEnv{keys(%$methodEnv)} = values(%$methodEnv)
+    @$newEnv{keys(%$methodEnv)} = values(%$methodEnv);
   }
 
   %ENV = %$newEnv if $envFound;

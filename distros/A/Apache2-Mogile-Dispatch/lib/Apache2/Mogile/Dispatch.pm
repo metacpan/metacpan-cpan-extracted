@@ -23,7 +23,7 @@ use Apache2::Const -compile => qw(DECLINED OK DONE NOT_FOUND);
 
 use MogileFS;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 sub handler {
     my ($r) = @_;

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use 5.026;  # signatures
-use Object::Pad 0.27;
+use v5.26;  # signatures
+use Object::Pad 0.57;
 
-package Tickit::Widget::SegmentDisplay 0.07;
+package Tickit::Widget::SegmentDisplay 0.08;
 class Tickit::Widget::SegmentDisplay
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_THICK );
@@ -158,17 +158,17 @@ my %types = (
 has $_reshape_method;
 has $_render_to_rb;
 
-has $_use_halfline;
+has $_use_halfline :param = 0;
 has $_linestyle;
-has $_hthickness;
+has $_hthickness   :param(thickness) = 2;
 has $_vthickness;
 has $_margin;
 
-has $_value;
+has $_value        :param = "";
 
-BUILD ( %args )
+ADJUSTPARAMS ( $params )
 {
-   my $type = $args{type} // "seven";
+   my $type = ( delete $params->{type} ) // "seven";
    my $method;
    foreach my $typename ( keys %types ) {
       $type eq $typename and $method = $typename, last;
@@ -178,24 +178,21 @@ BUILD ( %args )
 
    $_reshape_method = $self->can( "reshape_${method}" );
 
-   my $use_halfline = $args{use_halfline};
-   $_use_halfline = $use_halfline;
-
-   my $use_linedraw = $args{use_linedraw};
+   my $use_linedraw = delete $params->{use_linedraw};
 
    if( $use_linedraw and my $code = $self->can( "render_${method}_as_linedraw" ) ) {
-      $_linestyle = ( $args{thickness} // 1 ) > 1 ? LINE_THICK : LINE_SINGLE;
+      $_linestyle = ( delete $params->{thickness} // 1 ) > 1 ? LINE_THICK : LINE_SINGLE;
       $_render_to_rb = $code;
    }
    else {
       my $render = $self->can( "render_${method}" );
 
-      my $use_unicode  = $args{use_unicode};
+      my $use_unicode = delete $params->{use_unicode};
 
       my $flush = $self->can(
-         $use_halfline ? "flush_halfline" :
-         $use_unicode  ? "flush_unicode"  :
-                         "flush" );
+         $_use_halfline ? "flush_halfline" :
+         $use_unicode   ? "flush_unicode"  :
+                          "flush" );
 
       $_render_to_rb = method {
          my ( $rb, $rect ) = @_;
@@ -210,8 +207,6 @@ BUILD ( %args )
       };
    }
 
-   $_hthickness = $args{thickness} // 2;
-
    $_vthickness = $_hthickness;
    $_vthickness /= 2 unless $_use_halfline;
 
@@ -221,8 +216,6 @@ BUILD ( %args )
    }
 
    $_margin = $use_linedraw ? 0 : 1;
-
-   $_value = $args{value} // "";
 
    $self->on_style_changed_values(
       lit   => [ undef, $self->get_style_values( "lit" ) ],

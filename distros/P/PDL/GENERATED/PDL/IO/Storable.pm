@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::IO::Storable;
 
 our @EXPORT_OK = qw();
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::Storable ;
+
 
 
 
@@ -281,7 +280,7 @@ sub STORABLE_thaw {
   if (defined $hashref) {
     croak "serial data with hashref!" unless !defined $serial ||
       $serial eq "";
-    for (keys %$hashref) { $pdl->{$_} = $hashref->{$_} }
+    @$pdl{keys %$hashref} = values %$hashref;
   } else {
     # all the magic is happening in pdlunpack
     $pdl->pdlunpack($serial); # unpack our serial into this sv
@@ -335,12 +334,10 @@ the copyright notice should be included in the file.
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

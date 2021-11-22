@@ -1,2 +1,14 @@
+0.03 2021-11-20T12:29:01+01:00
+ - Add test for constructor.
+ - Better error message (object -> instance).
+ - Fix error (bad kramerius system id value).
+
+0.02 2021-11-13T12:51:06+01:00
+ - Add ERRORS section to doc.
+ - Add detection for bad JSON content type.
+ - Fix author name.
+ - Improve error messages.
+ - Improve JSON decoding error.
+
 0.01 2021-10-30T16:12:55+02:00
  - First version.

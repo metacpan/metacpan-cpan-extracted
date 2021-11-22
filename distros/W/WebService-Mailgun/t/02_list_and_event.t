@@ -2,7 +2,7 @@ use strict;
 use Test::More 0.98;
 use Test::Exception;
 use WebService::Mailgun;
-use JSON::XS;
+use JSON;
 use String::Random;
 
 my $mailgun = WebService::Mailgun->new(

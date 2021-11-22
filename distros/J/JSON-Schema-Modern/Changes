@@ -1,5 +1,22 @@
 Revision history for JSON-Schema-Modern
 
+0.525     2021-11-17 05:35:24Z
+          - minimum Perl version raised to 5.20
+          - dropped bundling hyper-schema files, as they are not validatable
+            without vocabulary support (see issue #44)
+          - & overload added to JSON::Schema::Modern::Result, for combining
+            results
+          - add callbacks to evaluate(), to enable finding certain positions
+            of interest in a document or schema
+
+0.524     2021-11-10 04:36:49Z
+          - some refactoring of vocabulary and document methods, to faciliate
+            re-use
+          - new utility functions: is_uri_reference, assert_keyword_exists
+          - allow specifying the metaschema_uri for a schema document
+          - add "validate" method to Document object
+          - updated draft2019-09 and added draft2020-12 hyperschema schemas
+
 0.523     2021-10-24 05:58:27Z
           - fix tests that were relying on an optional prereq
           - properly gate experimental features by version

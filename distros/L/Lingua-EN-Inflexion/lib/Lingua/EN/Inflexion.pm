@@ -2,7 +2,7 @@ package Lingua::EN::Inflexion;
 use 5.010; use warnings;
 use Carp;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.002006';
 
 # Import noun, verb, and adj classes...
 use Lingua::EN::Inflexion::Term;
@@ -204,6 +204,8 @@ sub inflect($) {
 1; # Magic true value required at end of module
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Lingua::EN::Inflexion - Inflect English nouns, verbs, adjectives, and articles
@@ -211,7 +213,7 @@ Lingua::EN::Inflexion - Inflect English nouns, verbs, adjectives, and articles
 
 =head1 VERSION
 
-This document describes Lingua::EN::Inflexion version 0.002000
+This document describes Lingua::EN::Inflexion version 0.002006
 
 
 =head1 SYNOPSIS
@@ -394,6 +396,23 @@ singular forms, the method always prefers the gender neutral form:
     say adj("our")->singular(3);    # "its" (not "hers" or "his")
 
 
+Note that these methods all all attempt to preserve the original
+typographical casing of the initial word:
+
+    say noun("dog")->plural;        # "dogs"
+    say noun("Dog")->plural;        # "Dogs"
+    say noun("DOG")->plural;        # "DOGS"
+
+    say verb("sits")->plural;       # "sit"
+    say verb("Sits")->plural;       # "Sit"
+    say verb("SITS")->plural;       # "SIT"
+
+This can occasionally lead to anomalous (or unintentionally humorous) results:
+
+    "I got a B on my test"  --> "We got some BS on our tests"
+
+
+
 =item  C<< classical() >> or C<< unassimilated() >>
 
 This is a single method with two alternative names. It returns an
@@ -429,8 +448,8 @@ expected. So the previous example could also have been written as:
 
     $word =~ noun('cherub')             # qr/cherubs|cherubim|cherub/i
 
-If an inflexion object is used as a string, it is coerced back the
-original string from which the object was built:
+If an inflexion object is used as a string, it is coerced back
+to the original string from which the object was built:
 
     say noun("indices");                # prints: "indices"
     say verb("explains");               # prints: "explains"
@@ -747,7 +766,7 @@ a basic markup language to simplify the task:
     my @results = search_for( noun($word)->as_regex );
 
     # Report the results...
-    say inflect "<#i:$#results> <N:$word)> <V:was> found";
+    say inflect "<#i:$#results> <N:$word> <V:was> found";
 
 The C<inflect()> subroutine takes a single string argument and
 replaces any nested markups (in angle brackets) with the appropriate
@@ -1269,11 +1288,11 @@ Eventually it may garner the same general acceptance as singular "they",
 "them", and "their"...but not yet. Although one may encounter such
 gender-nonspecific constructions as:
 
-V<    >"Anyone might find B<themself> contemplating their own mortality."
+S<  >"Anyone might find B<themself> contemplating their own mortality."
 
 the correct formulation is still:
 
-V<    >"Anyone might find B<themselves> contemplating their own mortality."
+S<  >"Anyone might find B<themselves> contemplating their own mortality."
 
 The module does recognize "themself" as a reflexive pronoun, but
 converts it to the currently accepted form ("themselves") for both

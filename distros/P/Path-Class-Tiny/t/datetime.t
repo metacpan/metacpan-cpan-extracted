@@ -9,10 +9,8 @@ use Test::PathClassTiny::Utils;
 
 use Path::Class::Tiny;
 
-use Path::Tiny ();
 
-
-my $dir = path(Path::Tiny->tempdir)->child('dates');
+my $dir = tempdir->child('dates');
 $dir->mkpath or die("can't make dir: $dir");
 
 my $a = $dir->child('a');

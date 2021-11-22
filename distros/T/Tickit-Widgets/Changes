@@ -1,5 +1,12 @@
 Revision history for Tickit-Widgets
 
+0.34    2021-11-20
+        [CHANGES]
+         * Updates for Object::Pad 0.57
+            + Use :isa and :does instead of legacy `extends` and `implements`
+            + Use slot initialisation blocks instead of ADJUST
+            + Default values for non-scalar slots
+
 0.33    2021-08-28
         [CHANGES]
          * Updates for Object::Pad 0.52

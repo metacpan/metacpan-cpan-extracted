@@ -4,9 +4,9 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS ':all';
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 sub new {
     my $class = shift;
@@ -76,9 +76,9 @@ DNS::LDNS::DNSSecName - Dname with rrsets in a dnssec zone
 
 =head1 SYNOPSIS
 
-  use LDNS ':all'
+  use LDNS ();
 
-  my name = new DNS::LDNS::DNSSecName
+  my name = DNS::LDNS::DNSSecName->new
 
   rdata = name->name
   name->set_name(rdata)

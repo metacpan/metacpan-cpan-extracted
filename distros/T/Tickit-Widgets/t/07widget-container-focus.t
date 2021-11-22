@@ -178,9 +178,9 @@ my @n_widgets = map { TestWidget->new } 0 .. 3;
 
 done_testing;
 
-use Object::Pad 0.41;  # :param
+use Object::Pad;
 
-class TestWidget extends Tickit::Widget {
+class TestWidget :isa(Tickit::Widget) {
    use constant WIDGET_PEN_FROM_STYLE => 1;
 
    use constant KEYPRESSES_FROM_STYLE => 1;
@@ -193,7 +193,7 @@ class TestWidget extends Tickit::Widget {
    has $_CAN_FOCUS :reader :param = 0;
 }
 
-class TestContainer extends Tickit::Widget::HBox {
+class TestContainer :isa(Tickit::Widget::HBox) {
    use constant WIDGET_PEN_FROM_STYLE => 1;
 
    use Tickit::Style -copy;

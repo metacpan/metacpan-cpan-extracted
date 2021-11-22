@@ -1,3 +1,8 @@
+0.021   2021-11-15
+  [ENHANCEMENTS]
+  - 优化 Connector 执行脚本字串自动修正
+  - 优化 Huawei、Cisco、H3C等网络厂商的SSH处理逻辑
+
 0.015   2021-10-07
   [ENHANCEMENTS]
   - 调整 Netstack::Uitls::Ip::getRangeFromIpMask 代码，兼容3种样式ipaddr

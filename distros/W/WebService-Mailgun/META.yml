@@ -24,14 +24,14 @@ no_index:
 provides:
   WebService::Mailgun:
     file: lib/WebService/Mailgun.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Class::Accessor::Lite: '0'
   File::Temp: '0'
   Furl: '0'
   HTTP::Request::Common: '0'
   IO::Socket::SSL: '0'
-  JSON::XS: '0'
+  JSON: '0'
   Try::Tiny: '0'
   URI: '0'
   perl: '5.010000'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/kan/p5-web-service-mailgun/issues
   homepage: https://github.com/kan/p5-web-service-mailgun
   repository: git://github.com/kan/p5-web-service-mailgun.git
-version: '0.12'
+version: '0.13'
 x_contributors:
   - 'Josh Rabinowitz <joshr@joshr.com>'
   - 'justingit <perl@justinsimoni.com>'

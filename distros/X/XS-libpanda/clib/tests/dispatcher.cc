@@ -13,6 +13,36 @@ TEST("empty") {
     REQUIRE(true);
 }
 
+TEST("synopsis") {
+    CallbackDispatcher<void()> d1;
+    string output;
+    function<void()> hello = [&]() { output += "Hello,"; };
+    function<void()> world = [&]() { output += " World!"; };
+    d1.add(hello);
+    d1.add(world);
+    d1(); // both callback are called in the same order they were added
+    assert(output == "Hello, World!");
+
+    d1.remove(world);
+    d1(); // only hello remains
+    assert(output == "Hello, World!Hello,");
+
+    using IntInt = CallbackDispatcher<int(int)>;
+    IntInt d2;
+    d2.add_event_listener([](IntInt::Event& event, int val) {
+        return event.next(val).value_or(val) * 2; // do what you want with other listeners result
+    });
+    d2.add_event_listener([](IntInt::Event& /*event*/, int val) {
+        return val + 1; // or event skip calling others
+    });
+    d2.add_event_listener([](IntInt::Event& /*event*/, int /*val*/) -> int {
+        throw std::exception(); // never called
+    });
+
+    optional<int> result = d2(42); // 2 * (42 + 1) == 86
+    assert(result.value() == 86);
+}
+
 TEST("dispatcher void()") {
     CallbackDispatcher<void()> d;
     bool called = false;

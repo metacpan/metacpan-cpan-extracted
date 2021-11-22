@@ -42,7 +42,7 @@
    "provides" : {
       "Test::UnixCmdWrap" : {
          "file" : "lib/Test/UnixCmdWrap.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "https://github.com/thrig/Test-UnixCmdWrap"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

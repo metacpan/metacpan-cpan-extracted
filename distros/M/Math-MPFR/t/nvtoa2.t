@@ -112,7 +112,7 @@ if(
          " absolute value is in the range:\n",
          "  0x1p-16414 .. 0x1.ffffffffffffffffffffp-16414\n",
          "  or\n",
-         "  0x1.00000318p-16446 to 0x1.ffffffffffffp-16446\n",
+         "  0x1.00000318p-16446 .. 0x1.ffffffffffffp-16446\n",
          " See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94756\n";
   }
   else {

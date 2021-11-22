@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::IO::Browser;
 
-our @EXPORT_OK = qw(PDL::PP browse );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(browse );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::Browser ;
+
 
 
 
@@ -45,10 +44,7 @@ cursor terminal browser for ndarrays.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -94,7 +90,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -117,5 +113,3 @@ the copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

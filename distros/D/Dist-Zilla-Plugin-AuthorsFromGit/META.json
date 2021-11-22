@@ -4,7 +4,7 @@
       "Andreas K. Huettel <dilfridge@gentoo.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,6 +33,20 @@
             "strict" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "Module::Load" : "0",
+            "Test::More" : "0",
+            "perl" : "5.010"
+         }
       }
    },
    "release_status" : "stable",
@@ -47,7 +61,9 @@
          "web" : "https://github.com/akhuettel/Dist-Zilla-Plugin-AuthorsFromGit"
       }
    },
-   "version" : "0.006",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "0.007",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "JSON::XS version 4.03",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

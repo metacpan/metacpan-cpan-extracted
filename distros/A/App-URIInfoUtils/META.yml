@@ -19,7 +19,7 @@ name: App-URIInfoUtils
 provides:
   App::URIInfoUtils:
     file: lib/App/URIInfoUtils.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Data::Sah::Compiler::perl::TH::array: '0.910'
   Data::Sah::Compiler::perl::TH::str: '0.910'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-URIInfoUtils
   homepage: https://metacpan.org/release/App-URIInfoUtils
   repository: git://github.com/perlancar/perl-App-URIInfoUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

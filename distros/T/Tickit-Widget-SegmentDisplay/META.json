@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.27",
+            "Object::Pad" : "0.57",
             "Tickit::Test" : "0.12",
             "Tickit::Widget" : "0.36",
             "perl" : "5.026"
@@ -36,7 +36,7 @@
    "provides" : {
       "Tickit::Widget::SegmentDisplay" : {
          "file" : "lib/Tickit/Widget/SegmentDisplay.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -45,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GIS::Proj;
 
-our @EXPORT_OK = qw(  fwd_transform inv_transform get_proj_info  PDL::PP _fwd_trans  fwd_trans_inplace PDL::PP _fwd_trans_inplace PDL::PP _inv_trans  inv_trans_inplace PDL::PP _inv_trans_inplace   load_projection_descriptions    load_projection_information  );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw( fwd_transform inv_transform get_proj_info  _fwd_trans fwd_trans_inplace _fwd_trans_inplace _inv_trans inv_trans_inplace _inv_trans_inplace  load_projection_descriptions   load_projection_information  );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GIS::Proj ;
+
 
 
 
@@ -223,7 +222,7 @@ sub load_projection_information
     
     my $info = {};
     
-    foreach my $projection ( keys %$descriptions )
+    foreach my $projection ( sort keys %$descriptions )
     {
         my $description = $descriptions->{$projection};
     
@@ -304,12 +303,10 @@ sub load_projection_information
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

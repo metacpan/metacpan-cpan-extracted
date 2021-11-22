@@ -101,7 +101,7 @@
    "provides" : {
       "Perinci::CmdLine::Inline" : {
          "file" : "lib/Perinci/CmdLine/Inline.pm",
-         "version" : "0.552"
+         "version" : "0.553"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Inline"
       }
    },
-   "version" : "0.552",
+   "version" : "0.553",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

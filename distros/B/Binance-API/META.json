@@ -58,6 +58,6 @@
          "web" : "https://github.com/taskula/binance-perl-api"
       }
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

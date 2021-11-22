@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.43;  # ADJUST
+use Object::Pad 0.57;
 
-package Tickit::Widget::RadioButton 0.33;
+package Tickit::Widget::RadioButton 0.34;
 class Tickit::Widget::RadioButton
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 use Tickit::Style;
 
@@ -153,12 +153,7 @@ is passed to the group's C<on_changed> callback.
 has $_label     :reader         :param;
 has $_on_toggle :reader :writer :param = undef;
 has $_value     :reader :writer :param = undef;
-has $_group     :reader         :param = undef;
-
-ADJUST
-{
-   $_group //= Tickit::Widget::RadioButton::Group->new;
-}
+has $_group     :reader         :param { Tickit::Widget::RadioButton::Group->new };
 
 method lines
 {

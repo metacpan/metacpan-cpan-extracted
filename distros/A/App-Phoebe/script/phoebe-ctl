@@ -91,6 +91,21 @@ extension.
 
 B<phoebe-ctl log hits>
 
+If you are using L<App::Phoebe::SpeedBump>, you can find the number of blocked
+requests. First, make you you are using the module in your config file:
+
+    use App::Phoebe::DebugIpNumbers;
+
+Make sure you start or start C<phoebe> with C<--log_level=info> or
+C<--log_level=debug>. First generate a log file. Better to zip it up and analyse
+it elsewhere. This can be pretty big!
+
+    journalctl --unit=phoebe | gzip > phoebe.log.gz
+
+Here's how to see how many requests are blocked:
+
+    zcat phoebe.log.gz | script/phoebe-ctl log hits | head
+
 B<phoebe-ctl log requests [IP number]>
 
 If you are logging IP numbers, this command will offer a little summary. In your
@@ -129,6 +144,7 @@ use Encode qw(encode_utf8 decode_utf8);
 use Getopt::Long;
 use Pod::Text;
 use File::Path qw(remove_tree);
+use POSIX qw(round);
 use utf8;
 
 binmode(STDOUT, ":utf8");
@@ -345,20 +361,25 @@ sub log {
   if (not $type or $type ne "hits" and $type ne "requests") {
     die "No known log type (one of: hits, requests)\n";
   }
-  my ($ip, %ip, %block, $n, %request);
+  my ($ip, %ip, %block, $n, $blocks, %request);
   while (<STDIN>) {
     if (/\[debug\] Visitor: (\S+)$/) {
       $ip = $1;
       $ip{$ip}++;
-      $n++;
-    } elsif ((not $filter or $ip and $filter eq $ip) and /\[debug\] Looking at (.*)/) {
+    } elsif ((not $filter or $ip and $filter eq $ip) and /\[info\] Looking at (.*)/) {
       $request{$1}++;
+      $n++;
+      $ip //= "anon";
     } elsif ($ip and (not $filter or $filter eq $ip) and /\[info\] (Net range (\S+) is blocked|IP is blocked)/) {
       $block{$ip}++;
+      $blocks++;
     }
   }
-  say("Total hits: $n");
-  say("-" x length("Total hits: $n"));
+  die("No hits (you must run the server on --log_level=info or --log_level=debug\n") unless $n;
+  say("Total hits:   $n");
+  say("Total blocks: $blocks");
+  say("Bot level:    " . round($blocks / $n * 100) . "%") if $blocks;
+  say("-" x length("Total blocks: $blocks"));
   if ($type eq "hits") {
     printf("%5s %4s%% %5s %s\n", "Hits", "Hits", "Block", "IP Number");
     for (sort { $ip{$b} <=> $ip{$a} } keys %ip) {

@@ -1,0 +1,130 @@
+#!/usr/bin/env perl
+# PODNAME: ab2fq - A script to convert traces to FASTQ
+
+use 5.012;
+use warnings;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use FASTX::Abi;
+use File::Basename;
+use Data::Dumper;
+use Getopt::Long;
+
+my $force_single = 0;
+my $opt_verbose = 0;
+my $opt_quality	= undef;
+my $opt_min_quality = 40;
+my $help;
+GetOptions(
+	'force' => \$force_single,
+	'verbose' => \$opt_verbose,
+	'q|min-qual=f' => \$opt_min_quality,
+	'out-quality=f' => \$opt_quality,
+    'help' =>  \$help,
+);
+
+help() if $help;
+
+unless (defined $ARGV[0]) {
+  die "Usage: ", basename($0),
+   " [FixedQuality] FILE1.ab1 FILE2.ab1 .. > reads.fq\n\n";
+}
+
+
+foreach my $file (@ARGV) {
+	if (! -e "$file") {
+		say STDERR " * Skipping '$file': not found";
+		next;
+	}
+	my $trace = FASTX::Abi->new({ 
+		filename => $file,
+		trim_ends => 1,
+		min_qual => $opt_min_quality,
+
+	});
+
+    if ( $force_single) {
+        print '@', $trace->{sequence_name}, "\n", $trace->{seq1}, "\n+\n", $trace->{quality}, "\n";
+    } else {
+        print $trace->get_fastq(undef, $opt_quality);
+    }
+ 	
+    
+	say Dumper $trace if ($opt_verbose);
+}
+
+sub help {
+    say STDERR<<HELP;
+  Convert traces to FASTQ.
+
+  abi2fq [options] <abi_file>...
+  
+    -q, --min-qual QUAL
+        Minimum quality score to output.
+        Default: 40
+    --out-quality QUAL
+        Force a fixed quality in the FASTQ
+        output 
+    --force       
+        Print a single sequence per chromatogram
+        even if ambiguous bases are present
+    --verbose
+        Print extra information
+HELP
+    exit()
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ab2fq - A script to convert traces to FASTQ
+
+=head1 VERSION
+
+version 1.0.1
+
+=head2 Description
+
+Convert one or multiple traces to FASTQ.
+
+=head2 Usage
+
+    abi2fq [options] <abi_file>...
+
+=head2 Options
+
+=over 4
+
+=item C<-q>, C<--min-qual> QUAL
+
+Minimum quality score to output. Default: 40
+
+=item C<--out-quality> QUAL
+
+Force a fixed quality in the FASTQ output
+
+=item C<--force>
+
+Print a single sequence per chromatogram
+even if ambiguous bases are present
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

@@ -1,4 +1,20 @@
 Revision history for RT-Extension-ReplyWithMail
 
-0.01 [Release Date]
+0.014 2021-11-09
+ - Fixed a bug that was not replacing commas with semicolons if the ticket has multiple requestors
+ - Updated the Changes file
+
+0.013 2021-11-05
+ - Replaced commas between email address in mail fields with semicolons
+
+0.012 2021-11-05
+ - Readme info correction
+
+0.011 2021-11-04
+ - Readme info correction
+
+0.01-correctedInfo 2021-11-04
+ - Readme info correction
+
+0.01 2021-11-04
  - Initial version

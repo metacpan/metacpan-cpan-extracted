@@ -8,7 +8,6 @@ use Math::Complex ();
 sub tapprox ($$) {
     my ( $x, $y ) = @_;
     my $d = abs( $x - $y );
-    print "diff = [$d]\n";
     return $d <= 0.0001;
 }
 
@@ -347,41 +346,28 @@ $x = pdl([Math::Complex::cplx(2, 0), Math::Complex::i()]);
 is $x.'', '[2 i]', 'pdl defaults to cdouble if Math::Complex values in arrayref';
 }
 
+sub hdr_test {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ($pb, $hdr, $method) = @_;
+    $method ||= 'gethdr';
+    note "pb: ", explain my $pbh=$pb->$method;
+    is_deeply($pbh,$hdr);
+}
+
 {
 my $pa = zeroes(20);
 $pa->hdrcpy(1);
-$pa->dump;
-$pa->sethdr( {Field1=>'arg1',
-	     Field2=>'arg2'});
+my $hdr = {Field1=>'arg1', Field2=>'arg2'};
+$pa->sethdr($hdr);
 note "pa: ", explain $pa->gethdr();
 ok($pa->hdrcpy);
-{
-	my $pb = $pa+1;
-	note "pb: ", explain $pb->gethdr();
-	ok( defined($pb->gethdr));
-	is_deeply($pa->gethdr,$pb->gethdr);
-}
-{
-	my $pb = ones(20) + $pa;
-	note "pb: ", explain $pb->gethdr();
-	ok( defined($pb->gethdr));
-	is_deeply($pa->gethdr,$pb->gethdr);
-}
-{
-	my $pc = $pa->slice('0:5');
-	note "pc: ", explain $pc->gethdr();
-	is_deeply($pa->gethdr,$pc->gethdr);
-}
-{
-	my $pd = $pa->copy;
-	note "pd: ", explain $pd->gethdr();
-	is_deeply($pa->gethdr,$pd->gethdr);
-}
-{
-	$pa->hdrcpy(0);
-	ok(defined($pa->slice('3')->hdr) && !( keys (%{$pa->slice('3')->hdr})));
-	ok(!defined($pa->slice('3')->gethdr));
-}
+hdr_test($pa+1, $hdr);
+hdr_test(ones(20) + $pa, $hdr);
+hdr_test($pa->slice('0:5'), $hdr);
+hdr_test($pa->copy, $hdr);
+$pa->hdrcpy(0);
+hdr_test($pa->slice('3'), {}, 'hdr');
+hdr_test($pa->slice('3'), undef);
 }
 
 {
@@ -430,15 +416,40 @@ for my $type (@types) {
 }
 }
 
-for (['ones', 1], ['zeroes', 0], ['nan', 'NaN'], ['inf', 'Inf'], ['i', 'i']) {
-  my ($name, $val) = @$_;
+for (['ones', 1], ['zeroes', 0], ['nan', 'NaN'], ['inf', 'Inf'], ['i', 'i', 'cdouble']) {
+  my ($name, $val, $type) = @$_;
   no strict 'refs';
   my $g = eval { $name->() };
   is $@, '', "$name works with no args";
+  is_deeply [$g->dims], [], 'no args -> no dims';
+  ok !$g->isnull, 'no args -> not null';
+  ok !$g->isempty, 'no args -> not empty';
   like $g.'', qr/^$val/i, "$name() gives back right value";
   my $g1 = eval { $name->(2) };
   is $@, '', "$name works with 1 args";
   is_deeply [$g1->dims], [2], 'right dims';
+
+  # from PDL::Core docs of zeroes
+  my (@dims, $w) = (1..3);
+  $w = $name->(byte, @dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'byte';
+  $w = $name->(@dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'double';
+  $w = PDL->$name(byte, @dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'byte';
+  $w = PDL->$name(@dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'double';
+  my $pdl = ones(float, 4, 5);
+  $w = $pdl->$name(byte, @dims); is_deeply [$w->dims], \@dims; is $w->type, $type || 'byte';
+  # usage type (ii):
+  my $y = ones(@dims);
+  $w = $name->($y); is_deeply [$w->dims], \@dims;
+  $w = $y->$name; is_deeply [$w->dims], \@dims;
+  next if $val =~ /\D/;
+  $w = $y->copy; $name->(inplace $w); ok all tapprox $w, pdl($val) or diag "$name got:$w";
+  $w = $y->copy; $w->inplace->$name; ok all tapprox $w, pdl($val);
 }
+
+eval { PDL->is_inplace }; # shouldn't infinite-loop
+isnt $@, '', 'is_inplace as class method throws exception';
+
+is sequence(3)->get_trans, undef, 'get_trans without trans undef';
+isnt sequence(3)->slice()->get_trans, undef, 'get_trans with trans defined';
 
 done_testing;

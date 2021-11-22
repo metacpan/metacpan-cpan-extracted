@@ -2,8 +2,9 @@ package Alien::OpenMP;
 
 use parent 'Alien::Base';
 use Config ();
+use Alien::OpenMP::configure ();
 
-our $VERSION = '0.003005';
+our $VERSION = '0.003006';
 
 # "public" Alien::Base method implementations
 
@@ -15,9 +16,12 @@ sub lddlflags { shift->libs }
 
 sub Inline {
   my ($self, $lang) = @_;
+  my $params = $self->SUPER::Inline($lang);
+  $params->{CCFLAGSEX} = delete $params->{INC};
   return {
-    CCFLAGS     => $self->cflags(),
-    LDDLFLAGS   => join( q{ }, $Config::Config{lddlflags}, $self->lddlflags() ),
+    %$params,
+    LDDLFLAGS     => join( q{ }, $Config::Config{lddlflags}, $self->lddlflags() ),
+    AUTO_INCLUDE  => $self->runtime_prop->{auto_include},
   };
 }
 
@@ -32,8 +36,9 @@ Alien::OpenMP - Encapsulate system info for OpenMP
 =head1 SYNOPSIS
 
     use Alien::OpenMP;
-    say Alien::OpenMP->cflags;    # e.g. -fopenmp if gcc 
-    say Alien::OpenMP->lddlflags; # e.g. -fopenmp if gcc 
+    say Alien::OpenMP->cflags;       # e.g. '-fopenmp' if gcc
+    say Alien::OpenMP->lddlflags;    # e.g. '-fopenmp' if gcc
+    say Alien::OpenMP->auto_include; # e.g. '#include <omp.h>' if gcc
 
 =head1 DESCRIPTION
 
@@ -136,10 +141,14 @@ OpenMP programs with C<Inline::C>:
 The nice, compact form above replaces this mess:
 
     use Alien::OpenMP; use Inline (
-        C           => 'DATA', ccflagsex   => Alien::OpenMP::cflags(),
-        lddlflags   => join( q{ }, $Config::Config{lddlflags},
-        Alien::OpenMP::lddlflags() ),
+        C             => 'DATA',
+        ccflagsex     => Alien::OpenMP->cflags(),
+        lddlflags     => join( q{ }, $Config::Config{lddlflags}, Alien::OpenMP::lddlflags() ),
+        auto_include => Alien::OpenMP->auto_include(),
     );
+
+It also means that the standard I<include> for OpenMP is not required in
+the C<C> code, i.e., C<< #include <omp.h> >>.
 
 =back
 

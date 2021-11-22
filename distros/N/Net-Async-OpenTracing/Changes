@@ -1,5 +1,10 @@
 Revision history for Net-Async-OpenTracing
 
+1.001     2021-11-21 22:53:05+08:00 Asia/Kuala_Lumpur
+    [Bugs fixed]
+
+    - tracer process is now propagated to batches, github issue #3 (thanks chp9-u)
+
 1.000     2020-08-26 09:06:58+08:00 Asia/Kuala_Lumpur
     Updated for the stable OpenTracing 1.003 release. Please see documentation there for getting started.
 

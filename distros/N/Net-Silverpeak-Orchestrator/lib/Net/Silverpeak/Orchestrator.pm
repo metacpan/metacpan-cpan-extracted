@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.003000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.004000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -327,6 +327,41 @@ sub delete_domain_application($self, $domain) {
     return 1;
 }
 
+
+sub list_application_groups($self, $resource_key='userDefined') {
+    my $res = $self->get('/gms/rest/applicationDefinition/applicationTags',
+        { resourceKey => $resource_key });
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub create_or_update_application_group($self, $name, $data) {
+    my $application_groups = $self->list_application_groups;
+    # set or overwrite existing application group
+    $application_groups->{$name} = $data;
+    my $res = $self->post('/gms/rest/applicationDefinition/applicationTags',
+        $application_groups);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return 1;
+}
+
+
+sub delete_application_group($self, $name) {
+    my $application_groups = $self->list_application_groups;
+    # set or overwrite existing application group
+    croak("application '$name' doesn't exist")
+        unless exists $application_groups->{$name};
+    delete $application_groups->{$name};
+    my $res = $self->post('/gms/rest/applicationDefinition/applicationTags',
+        $application_groups);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return 1;
+}
+
 1;
 
 __END__
@@ -341,7 +376,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.003000
+version 0.004000
 
 =head1 SYNOPSIS
 
@@ -535,6 +570,36 @@ Takes a domain name, not application name.
 Returns true on success.
 
 Throws an exception on error.
+
+=head2 list_application_groups
+
+Returns a hashref of application groups indexed by their name for a resource
+key which defaults to 'userDefined'.
+
+=head2 create_or_update_application_group
+
+Takes a application group name, and a hashref of its config.
+
+Returns true on success.
+
+Throws an exception on error.
+
+Because there is no API endpoint for creating or editing a single application
+group, this method has to load all application groups using
+L<list_application_groups>, modify and then save them.
+
+=head2 delete_application_group
+
+Takes an application group name.
+
+Returns true on success.
+
+Throws an exception on error.
+
+Because there is no API endpoint for deleting a single application group,
+this method has to load all application groups using
+L<list_application_groups>, remove the requested application group and then
+save them.
 
 =head1 KNOWN SILVERPEAK ORCHESTRATOR BUGS
 

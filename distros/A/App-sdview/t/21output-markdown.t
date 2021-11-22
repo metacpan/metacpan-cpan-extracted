@@ -58,4 +58,13 @@ dotest "Bullet lists", <<"EOMARKDOWN";
 3. Third
 EOMARKDOWN
 
+dotest "Table", <<"EOMARKDOWN";
+| Heading | Here |
+| ------- | ---- |
+| Data in | Columns |
+
+| Left | Centre | Right |
+| ---- | :----: | ----: |
+EOMARKDOWN
+
 done_testing;

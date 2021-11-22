@@ -1,0 +1,43 @@
+NAME
+    Task::Kramerius - Install modules for Kramerius system.
+
+SYNOPSIS
+     cpanm Task::Kramerius
+
+DESCRIPTION
+    Kramerius is an open source software solution for accessing digital
+    documents. Homepage of project is in <https://system-kramerius.cz/>.
+
+SEE ALSO
+    App::Kramerius::To::Images
+        Base class for kramerius2images script.
+
+    App::Kramerius::URI
+        Base class for kramerius-uri script.
+
+    App::Kramerius::V4
+        Base class for kramerius4 script.
+
+    Data::Kramerius
+        Information about all Kramerius systems.Information about all
+        Kramerius systems.
+
+    WebService::Kramerius::API4
+        Class to Kramerius v4+ API.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Task-Kramerius>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

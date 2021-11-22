@@ -30,10 +30,6 @@ print $fh_PNG "\274\244\242J\302HR)\345[lk\200=O_\340\362(\245<`\001\344";
 print $fh_PNG "\264\r\033H\343\"\264\0\0\0\0IEND\256B`\202";
 close $fh_PNG;
 
-# sometimes njh at bardsman can create the files above but not the
-# next three?
-# cf. www.cpantesters.org/cpan/report/75a287c4-b913-11e6-886b-73ce95f05882
-
 my ($fh_XYZ, $fh_ABC, $fh_NONE);
 
 ok(open($fh_XYZ, '>:raw', 't/app1/private/img.xyz'), 'created img.xyz') && do {

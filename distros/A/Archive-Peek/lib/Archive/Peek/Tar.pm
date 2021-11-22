@@ -1,5 +1,6 @@
 package Archive::Peek::Tar;
-use Moose;
+use Moo;
+use Carp qw(confess);
 use Archive::Tar;
 extends 'Archive::Peek';
 

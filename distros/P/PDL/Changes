@@ -1,3 +1,81 @@
+2.063 2021-11-19
+- PDL::Core::seed - thanks @zmughal
+
+2.062 2021-11-19
+- Primitive::srand() added, random() calls if not done yet - thanks @whumann for report
+- Primitive::random() et al to use xoroshiro256plus instead of Perl's rand()
+- Primitive::random() et al able to pthread
+
+2.061 2021-11-11
+- native-complex ->re and ->im methods do two-way dataflow
+- fix pp_line_numbers change not being done right for .pm
+
+2.060 2021-11-08
+- work around more recent GCC not tgmath-ing log10 for complex
+
+2.059 2021-11-08
+- removed supplied Cephes functions that C99 mandates
+- Ops,Math to use tgmath.h not own $T() stuff
+- MatrixOps switch from bespoke SSLib complex to C99 native complex
+- Core::online_cpus, used to set_autopthread_targ if no env var set
+
+2.058 2021-11-06
+- no changes from 2.057_05
+
+2.057_05 2021-11-06
+- (DO{COMP,PRIV})DIMS -> more-accurate ${1}ALLOC
+- stop Pars or OtherPars called "I" - thanks Judd Taylor for report
+- pp_line_numbers restores line numbering after end of given text
+- allow "CTYPE var[]" as OtherPars, add T_PDL_DIMLIST to typemap
+- pnminraw etc to take $filehandle not just name of glob
+
+2.057_04 2021-10-12
+- remove legacy pdl_create
+- remove long-deprecated nslice
+- multi-C only updates files that have changed, for faster rebuilds
+- because OtherPars are now in a separate struct, no restriction on names
+- mslice is just an alias to Slices::slice
+- allow any pointer including pdl * as OtherPars
+
+2.057_03 2021-10-02
+- remove IO::Misc::rdsa, untested since PDL 1.9 and needing non-CPAN "DSA" module
+- throw error when XS called with inplace input but also explicit output
+- OtherPars to separate struct; pdl_transvtable.structsize of that
+- allow external .pd to opt-in to one-C-file-per-function
+
+2.057_02 2021-09-26
+- split internal .pd into one C file per pp_def function allowing parallel build
+- tidy various modules so they don't get symbol clashes from that
+
+2.057_01 2021-09-24
+- fix pp_add_boot to remove any blank lines (such as added by pp_line_numbers)
+- GSL::CDF now uses barf() on error, not GSL default of core-dump
+- propagate_badflag only recurses with children that had different value
+- Example/doc-pp script to use GraphViz2 to show pp_def key dependencies
+- affineinternal only read/write when both parent & child physical
+- allow zero-length ndarray as slice index even for length-1 dim - thanks @trevcs for report (SF#443, GH#229)
+- replace some malloc/free with smalloc to not leak on exception
+- replace whole genpp infrastructure with generated C macro
+- remove Core.twod, requires recompile
+- remove PDL::iscontig
+- move all non-SV-using C out of Core.xs to C files
+- remove unused pdl_{copy,unpackdims} including from Core struct
+- move extra checks and functionality from Core.xs setdims into pdl_setdims, call that
+- fix off-by-one error in nthreadids
+- pthreading can be over non-divisible number of threads
+- remove Core.qsort_*
+- zeroes now quicker as only does memset, not assgn operation
+- add $PPSYM()
+- change API of PDL->converttype to remove obsolete flag
+- remove unused "copy" mechanism for pdl_trans
+- rename (struct pdl).trans -> trans_parent for comprehensibility
+- now an error if CopyBadStatusCode uses $PRIV(bvalflag)
+- fix setnantobad doc to match behaviour fixed in 2.040, add setnonfinitetobad
+- Inplace now throws error for >2 elements in array-ref
+- remove oslice (after 8 years) and never-used Slices::{s_,}identity
+- all PDL operations now have a C function interface called pdl_(name)_run
+- add setinftobad - thanks @alex-prusevich for suggestion
+
 2.057 2021-08-13
 - restore PDL_MAGIC_DELETEDATA mechanism
 
@@ -104,6 +182,7 @@
 - switch from List::MoreUtils to List::Util to reduce deps
 - bad value per-PDL support now always present, not configurable
 - use C99 isnan() to check for NaN, not isfinite(); complex if either are NaN
+- the above (this note added post facto) changes setnantobad's behaviour to match function name
 - can use NaN as badvalue for all floating-point types
 - BADVAL_USENAN configuration option removed
 - remove checks for _MSC_VER < 1400 as native complex req renders irrelevant
@@ -208,7 +287,7 @@
 
 2.022 2020-09-06
 - Fix wfits so that explicitly setting BITPIX works. - thanks @d-lamb
-- add PDL::IO::Pic::imageformat - thanks @wmlb
+- add PDL::IO::Pic::imageformat - thanks @wlmb
 
 2.021 2020-03-01
 - fix pdlpp_postamble - thanks @sebastic

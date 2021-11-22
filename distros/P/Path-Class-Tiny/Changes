@@ -1,5 +1,10 @@
 Revision history for Path-Class-Tiny
 
+0.06      2021-11-05 00:00:55-07:00 America/Los_Angeles
+
+    [New Features]
+    * `tempdir` works and is exported
+
 0.05      2021-01-22 18:45:17-08:00 America/Los_Angeles
 
     [New Features]

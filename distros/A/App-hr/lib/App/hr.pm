@@ -1,9 +1,9 @@
 package App::hr;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-09'; # DATE
+our $DATE = '2021-07-10'; # DATE
 our $DIST = 'App-hr'; # DIST
-our $VERSION = '0.266'; # VERSION
+our $VERSION = '0.267'; # VERSION
 
 use feature 'say';
 use strict 'subs', 'vars';
@@ -253,7 +253,7 @@ App::hr - Print horizontal bar on the terminal
 
 =head1 VERSION
 
-This document describes version 0.266 of App::hr (from Perl distribution App-hr), released on 2021-07-09.
+This document describes version 0.267 of App::hr (from Perl distribution App-hr), released on 2021-07-10.
 
 =head1 SYNOPSIS
 
@@ -282,7 +282,7 @@ You can also use the provided CLI L<hr>.
 
 A demo screencast:
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-hr-0.266/share/images/screencast1.gif" />
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-hr-0.267/share/images/screencast1.gif" />
 
 
 =head1 CONTRIBUTOR

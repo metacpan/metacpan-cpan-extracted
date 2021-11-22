@@ -11,7 +11,7 @@ requires 'Time::HiRes';
 requires 'Math::Random::Secure';
 requires 'IO::Async::Socket';
 
-requires 'OpenTracing', '>= 0.001';
+requires 'OpenTracing', '>= 1.004';
 
 on 'test' => sub {
 	requires 'Test::More', '>= 0.98';

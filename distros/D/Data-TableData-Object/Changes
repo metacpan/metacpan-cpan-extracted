@@ -1,8 +1,28 @@
-0.112   2021-04-10  Released-By: PERLANCAR; Urgency: high
+0.114   2021-11-17  Released-By: PERLANCAR; Urgency: medium
+
+	- add_col(): Allow specifying data for new column.
+
+
+0.113   2021-11-17  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.112 and 0.112.2.
+
+	- [ux] If table data object is passed to new(), the original object
+	  will be returned instead.
+
+
+0.112.2 2021-04-10  Released-By: PERLANCAR; Urgency: high
 
         - Rename module/dist from TableData-Object to Data-TableData-Object
           because the namespace TableData::* will be used for module that
           contains table data (formerly Tables).
+
+        - UPDATE 2021-11-17: Rename release from 0.112 to 0.112.2.
+
+
+0.112   2020-05-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add col_content(), row(), row_as_aos(), row_as_aohos().
 
 
 0.111   2019-09-15  Released-By: PERLANCAR; Urgency: medium

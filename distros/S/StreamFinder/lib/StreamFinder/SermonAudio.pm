@@ -108,8 +108,9 @@ One or more stream URLs can be returned for each podcast.
 Accepts a www.sermonaudio.com podcast (sermon) ID or URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no streams 
 are found.  The URL can be the full URL, ie. 
-https://www.sermonaudio.com/sermoninfo.asp?SID=B<podcast-id>, or just 
-I<podcast-id>.
+https://www.sermonaudio.com/sermoninfo.asp?SID=B<sermon-id>, 
+https://www.sermonaudio.com/source_detail.asp?sourceid=B<source-id>, 
+or just I<sermon-id>.
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
 then only secure ("https://") streams will be returned.
@@ -349,92 +350,160 @@ sub new
 		}
 	}
 
+	my $isEpisode = 1;
 	$url =~ s#\\##g;
 	(my $url2fetch = $url);
-	if ($url =~ /^https?\:/) {
+	if ($url =~ /^https?\:/) {  #FULL URL:
 		$self->{'id'} = $1  if ($url2fetch =~ m#\?SID\=([\d]+)#);
 		unless ($self->{'id'}) {  #WE'RE ONE OF SERMONAUDIO'S ALTERNATE URLS:
 			$self->{'id'} = $1  if ($url2fetch =~ /sermonaudio/i && $url2fetch =~ m#([\d]+)\/?$#);
-			$url2fetch = 'https://www.sermonaudio.com/sermoninfo.asp?SID='.$self->{'id'};
+			if ($self->{'id'}) {
+				$url2fetch = 'https://www.sermonaudio.com/sermoninfo.asp?SID='.$self->{'id'};
+			} elsif ($url2fetch =~ m#\bsourceid\=([^\?\&]+)$#) {
+				$self->{'id'} = $1;
+				$isEpisode = 0;  #ASSUME WE'RE A AUTHOR/PREACHER PAGE.
+			} elsif ($url2fetch =~ m#https://www.sermonaudio.com\/[a-z]+\/([^\?\&]+)$#) {
+				$self->{'id'} = $1;
+				$isEpisode = 0;  #ASSUME WE'RE A AUTHOR/PREACHER PAGE.
+			} else {
+				$self->{'id'} = 'sermonaudio';
+				$isEpisode = 0;  #ASSUME WE'RE A SEARCH/FOUND PAGE.
+			}
 		}
-	} else {
+	} elsif ($url =~ /^\d+$/) {     #(URL=###########)
 		$self->{'id'} = $url;
 		$url2fetch = "https://www.sermonaudio.com/sermoninfo.asp?SID=$url";
+	} elsif ($url =~ /^[a-z]+$/i) {  #(URL=alphanumeric)
+		$self->{'id'} = $url;
+		$url2fetch = "https://www.sermonaudio.com/source_detail.asp?sourceid=$url";
+		$isEpisode = 0;  #ASSUME WE'RE A BROCASTER/CHURCH ID.
+	} elsif ($url =~ m#\/#) {       #(URL=keyword/id)
+		$self->{'id'} = $url;
+		$url2fetch = "https://www.sermonaudio.com/$url";
+		$isEpisode = 0;  #ASSUME WE'RE AN AUTHOR/PREACHER ID.
+	} else {
+		$self->{'id'} = $url;
+		$url2fetch = "https://www.sermonaudio.com/speaker/$url";
+		$isEpisode = 0;  #ASSUME WE'RE AN AUTHOR/PREACHER ID.
 	}
 	return undef  unless ($self->{'id'});
 
 	my $html = '';
-	print STDERR "-0(SermonAudio): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
-	my $response = $ua->get($url2fetch);
+	my $response;
+	my $tried = 0;
+
+TRYIT:
+	print STDERR "-${tried}(SermonAudio): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+
+	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
-	return undef  unless ($html && $self->{'id'});  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
+	print STDERR "---ID=".$self->{'id'}."= isEpisode=$isEpisode=\n"  if ($DEBUG);
+	return undef  unless ($self->{'id'} && $html);
 
-	$self->{'genre'} = 'Sermon';
-	$self->{'albumartist'} = $url2fetch;
-	my %dups = ();
-	foreach my $tag ('og:video:secure_url', 'og:video:url', 'og:audio:secure_url', 'og:audio:url', 'og:audio') {
-		if ($html =~ s#\"$tag\"\s+content\=\"([^\"]+)\"##gso) {
-			my $mediaurl = $1;
-			unless (defined($dups{$mediaurl}) || ($self->{'secure'} && $mediaurl !~ /^https/o)) {
-				push @{$self->{'streams'}}, $mediaurl;
-				$self->{'cnt'}++;
-				$dups{$mediaurl} = 1;
+	if ($isEpisode) {
+		print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
+		return undef  unless ($html && $self->{'id'});  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
+
+		$self->{'genre'} = 'Sermon';
+		$self->{'albumartist'} = $url2fetch;
+		my %dups = ();
+		foreach my $tag ('og:video:secure_url', 'og:video:url', 'og:audio:secure_url', 'og:audio:url', 'og:audio') {
+			if ($html =~ s#\"$tag\"\s+content\=\"([^\"]+)\"##s) {
+				my $mediaurl = $1;
+				unless (defined($dups{$mediaurl}) || ($self->{'secure'} && $mediaurl !~ /^https/o)) {
+					push @{$self->{'streams'}}, $mediaurl;
+					$self->{'cnt'}++;
+					$dups{$mediaurl} = 1;
+				}
 			}
 		}
-	}
-	while ($html =~ s#\<a\s+rel\=\"nofollow\"\s+href\=\"(https?\:\/\/\S+?$self->{'id'}\.mp3)\"\>##s) {
-		my $audiourl = $1;
-		unless (defined($dups{$audiourl}) || ($self->{'secure'} && $audiourl !~ /^https/o)) {
-			push @{$self->{'streams'}}, $audiourl;
-			$self->{'cnt'}++;
-			$dups{$audiourl} = 1;
+		while ($html =~ s#\<a\s+rel\=\"nofollow\"\s+href\=\"(https?\:\/\/\S+?$self->{'id'}\.mp3)\"\>##s) {
+			my $audiourl = $1;
+			unless (defined($dups{$audiourl}) || ($self->{'secure'} && $audiourl !~ /^https/o)) {
+				push @{$self->{'streams'}}, $audiourl;
+				$self->{'cnt'}++;
+				$dups{$audiourl} = 1;
+			}
 		}
-	}
-	$self->{'total'} = $self->{'cnt'};
-	%dups = ();
-	return undef  unless ($self->{'cnt'} > 0);
+		$self->{'total'} = $self->{'cnt'};
+		%dups = ();
+		return undef  unless ($self->{'cnt'} > 0);
 
-	$self->{'title'}   = $1  if ($html =~ s#\<meta\s+name\=\"title\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
-	$self->{'title'} ||= $1  if ($html =~ s#\<TITLE\>\s*([^\|\<]+)##s);
-	$self->{'title'} ||= $1  if ($html =~ s#\<meta\s+property\=\"og\:title\"\s+content\=\"([^\"]+)##s);
-	$self->{'description'}   = $1  if ($html =~ s#\<font\s+style\=line\-height\:140\%\s+class\=ar5\>(.+?)\<\/font\>\<\/div\>##s);
-	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
-	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
-	if ($html =~ s#\?DateOnly\=[^\>]+\>([^\<]+)##s) {
-		my $mmddyy = $1;
-		$self->{'year'} = $1  if ($mmddyy =~ /(\d\d\d\d)\s*$/);
+		$self->{'title'}   = $1  if ($html =~ m#\<meta\s+name\=\"title\"\s+content\=\"([^\"]+)\"\s*\/\>#s);
+		$self->{'title'} ||= $1  if ($html =~ m#\<TITLE\>\s*([^\|\<]+)#s);
+		$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:title\"\s+content\=\"([^\"]+)#s);
+		$self->{'description'}   = $1  if ($html =~ m#\<font\s+style\=line\-height\:140\%\s+class\=ar5\>(.+?)\<\/font\>\<\/div\>#s);
+		$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"\s*\/\>#s);
+		$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)\"\s*\/\>#s);
+		if ($html =~ m#\?DateOnly\=[^\>]+\>([^\<]+)#s) {
+			my $mmddyy = $1;
+			$self->{'year'} = $1  if ($mmddyy =~ /(\d\d\d\d)\s*$/);
+		}
+		$self->{'year'} ||= $1  if ($html =~ m#\d\, (\d\d\d\d)\<\/I\>\<\/font\>\<BR\>#s);
+		foreach my $field (qw(title description)) {
+			$self->{$field} = HTML::Entities::decode_entities($self->{$field});
+			$self->{$field} = uri_unescape($self->{$field});
+			$self->{$field} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+		}
+		$self->{'iconurl'}   = $1  if ($html =~ m#\<meta\s+property\=\"og\:image\:secure\_url\"\s+content\=\"([^\"]+)\"\s*\/\>#s);
+		$self->{'iconurl'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:image\"\s+content\=\"([^\"]+)\"\s*\/\>#s);
+		$self->{'iconurl'} ||= $1  if ($html =~ m#\<font\s+class\=ar3\>\<img\s+src\=\"([^\"]+)#s);
+		$self->{'imageurl'} = $self->{'iconurl'};
+		my $articonurl = ($html =~ m#\<img\s+.*?src\=\"([^\"]+)\"\s+width\=\"?60\"?\s+height\=\"?40\"?\s+border\=\"?0#s)
+				? $1 : '';
+		$self->{'articonurl'} = $articonurl  if ($articonurl);
+		if ($html =~ s#Speaker\:\<\/font\>\<BR\>\<B\>\<a\s+class\=\S+\shref\=\"([^\"]+)\"\>([^\<]*)##s) {
+			$self->{'albumartist'} = $1;
+			$self->{'artist'} = $2;
+		}
+		if (!$self->{'artist'} && $html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)"#s) {
+			($self->{'artist'} = $1) =~ s/\s+\|.*$//;
+		}
+		$self->{'album'} = $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)#s);
+		$self->{'album'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)#s);
+		$self->{'album'} =~ s#$self->{'artist'}\s*\|\s*##  if ($self->{'artist'});
+		$self->{'albumartist'} ||= $1  if ($html =~ m#href\=\"([^\"]+)\"\>Web\<\/a\>#s);
+		$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
+		print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
+		print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
+				if ($DEBUG && $self->{'cnt'} > 0);
+	} else {
+		print STDERR "--NOT EPISODE, tried=$tried=\n"  if ($DEBUG);
+		if (!$tried) {   #WE'RE A PODCAST PAGE!:
+			#NOTE:  SERMONAUDIO PODCAST PAGES DO NOT HAVE STREAMS, ONLY EPISODE-IDS+TITLES, SO
+			#WE CAN'T CONSTRUCT A PLAYLIST, BUT ONLY GRAB THE 1ST EPISODE AND TRY AND FETCH THAT: :(
+			++$tried;
+			print STDERR "---- WE'RE A PODCAST PAGE!\n"  if ($DEBUG);
+			$self->{'album'} = $1  if ($html =~ m#\<TITLE\>([^\<]+)#);
+			if ($html =~ m#\<img\s+id\=\"logopic\"([^\>]+)#is) {
+				my $icondata = $1;
+				$self->{'articonurl'} = $1  if ($icondata =~ m#\bsrc\=\"([^\"]+)#);
+			}
+			$self->{'articonurl'} ||= $1  if ($html =~ s#^.+?\<div\s+style\=\"margin\-bottom##s
+					&& $html =~ m#\<img[^\>]+?src\=\"?([^\"\s]+)#);
+			if ($html =~ s#^.+?\<a\s+class\=sermonlink##s) {
+				if ($html =~ m#\?SID\=(\d+).*?\>([^\<]+)#) {
+					$self->{'id'} = $1;
+					$self->{'title'} = $2;
+					$isEpisode = 1;
+					$url2fetch = 'https://www.sermonaudio.com/sermoninfo.asp?SID=' . $self->{'id'};
+					print STDERR "-!!!!- RETRY w/1ST EPISODE ID2=$url2fetch= TITLE=".$self->{'title'}."=\n"  if ($DEBUG);
+					goto TRYIT;
+				}
+			}
+		}
+		return undef  unless ($self->{'total'} > 0);  #NO VALID PAGE FOUND!
 	}
-	$self->{'year'} ||= $1  if ($html =~ s#\d\, (\d\d\d\d)\<\/I\>\<\/font\>\<BR\>##s);
-	foreach my $field (qw(title description)) {
-		$self->{$field} = HTML::Entities::decode_entities($self->{$field});
-		$self->{$field} = uri_unescape($self->{$field});
-		$self->{$field} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
-	}
-	$self->{'iconurl'}   = $1  if ($html =~ s#\<meta\s+property\=\"og\:image\:secure\_url\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
-	$self->{'iconurl'} ||= $1  if ($html =~ s#\<meta\s+property\=\"og\:image\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
-	$self->{'iconurl'} ||= $1  if ($html =~ s#\<font\s+class\=ar3\>\<img\s+src\=\"([^\"]+)##s);
-	$self->{'imageurl'} = $self->{'iconurl'};
-	if ($html =~ s#Speaker\:\<\/font\>\<BR\>\<B\>\<a\s+class\=\S+\shref\=\"([^\"]+)\"\>([^\<]*)##s) {
-		$self->{'albumartist'} = $1;
-		$self->{'artist'} = $2;
-	}
-	if (!$self->{'artist'} && $html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)"#s) {
-		($self->{'artist'} = $1) =~ s/\s+\|.*$//;
-	}
-	$self->{'albumartist'} ||= $1  if ($html =~ m#href\=\"([^\"]+)\"\>Web\<\/a\>#s);
-	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
-	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
-	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
-			if ($DEBUG && $self->{'cnt'} > 0);
+
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

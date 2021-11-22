@@ -20,6 +20,7 @@ my %params = (
     LINK               => $libs{$^O} // $libs{default},
     BIN_SHARE          => 1,
     CONFIGURE_REQUIRES => {'Alien::cmake3' => 0},
+    CCFLAGS            => '-Wall -Wextra',
     CLIB               => {
         DIR          => 'clib',
         CMAKE_TARGET => $cmake_project,

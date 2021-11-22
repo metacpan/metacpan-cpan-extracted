@@ -140,7 +140,7 @@ my @names = (qw(MAX_EVENT_SIZE MAX_NAME_LEN MAX_PATH_LEN),
              {name=>"ZI_FILE", macro=>"1"},
              {name=>"ZI_HOSTNAME", macro=>"1"},
              {name=>"ZI_IMP_FLAGS_AUTORANGE_GATING", macro=>"1"},
-             {name=>"ZI_IMP_FLAGS_BWC_BIT0", macro=>"1"},
+             # {name=>"ZI_IMP_FLAGS_BWC_BIT0", macro=>"1"}, removed in LabOne 20.07 ...
              {name=>"ZI_IMP_FLAGS_BWC_BIT1", macro=>"1"},
              {name=>"ZI_IMP_FLAGS_BWC_BIT2", macro=>"1"},
              {name=>"ZI_IMP_FLAGS_BWC_BIT3", macro=>"1"},

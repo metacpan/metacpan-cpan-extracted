@@ -50,8 +50,9 @@ use overload
     @Math::GMPf::EXPORT_OK = qw(
 __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
 __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS
+IOK_flag NOK_flag POK_flag
 Rmpf_abs Rmpf_add Rmpf_add_ui Rmpf_ceil Rmpf_clear Rmpf_clear_mpf Rmpf_clear_ptr
-Rmpf_cmp Rmpf_cmp_d Rmpf_cmp_si Rmpf_cmp_ui
+Rmpf_cmp Rmpf_cmp_d Rmpf_cmp_si Rmpf_cmp_ui Rmpf_cmp_NV Rmpf_cmp_IV
 Rmpf_deref2 Rmpf_div Rmpf_div_2exp Rmpf_div_ui
 Rmpf_eq Rmpf_fits_sint_p Rmpf_fits_slong_p Rmpf_fits_sshort_p Rmpf_fits_uint_p
 Rmpf_fits_ulong_p Rmpf_fits_ushort_p Rmpf_floor Rmpf_fprintf
@@ -61,6 +62,7 @@ Rmpf_init Rmpf_init2 Rmpf_init2_nobless Rmpf_init_nobless Rmpf_init_set
 Rmpf_init_set_d Rmpf_init_set_d_nobless Rmpf_init_set_nobless Rmpf_init_set_si
 Rmpf_init_set_si_nobless Rmpf_init_set_str Rmpf_init_set_str_nobless
 Rmpf_init_set_ui Rmpf_init_set_ui_nobless Rmpf_inp_str
+Rmpf_init_set_NV Rmpf_init_set_IV Rmpf_init_set_NV_nobless Rmpf_init_set_IV_nobless
 TRmpf_inp_str
 Rmpf_integer_p Rmpf_mul
 Rmpf_mul_2exp Rmpf_mul_ui Rmpf_neg Rmpf_out_str
@@ -77,16 +79,16 @@ fgmp_randinit_set fgmp_randinit_default_nobless fgmp_randinit_mt_nobless
 fgmp_randinit_lc_2exp_nobless fgmp_randinit_lc_2exp_size_nobless fgmp_randinit_set_nobless
 fgmp_urandomb_ui fgmp_urandomm_ui
 Rmpf_get_NV Rmpf_set_NV Rmpf_get_NV_rndn Rmpf_get_d_rndn
-Rmpf_get_IV Rmpf_set_IV Rmpf_fits_UV_p Rmpf_fits_IV_p
+Rmpf_get_IV Rmpf_set_IV Rmpf_fits_IV_p
     );
-    our $VERSION = '0.44';
+    our $VERSION = '0.45';
     #$VERSION = eval $VERSION;
 
     Math::GMPf->DynaLoader::bootstrap($VERSION);
 
     %Math::GMPf::EXPORT_TAGS =(mpf => [qw(
 Rmpf_abs Rmpf_add Rmpf_add_ui Rmpf_ceil Rmpf_clear Rmpf_clear_mpf Rmpf_clear_ptr
-Rmpf_cmp Rmpf_cmp_d Rmpf_cmp_si Rmpf_cmp_ui
+Rmpf_cmp Rmpf_cmp_d Rmpf_cmp_si Rmpf_cmp_ui Rmpf_cmp_NV Rmpf_cmp_IV
 Rmpf_deref2 Rmpf_div Rmpf_div_2exp Rmpf_div_ui
 Rmpf_eq Rmpf_fits_sint_p Rmpf_fits_slong_p Rmpf_fits_sshort_p Rmpf_fits_uint_p
 Rmpf_fits_ulong_p Rmpf_fits_ushort_p Rmpf_floor Rmpf_fprintf
@@ -96,6 +98,7 @@ Rmpf_init Rmpf_init2 Rmpf_init2_nobless Rmpf_init_nobless Rmpf_init_set
 Rmpf_init_set_d Rmpf_init_set_d_nobless Rmpf_init_set_nobless Rmpf_init_set_si
 Rmpf_init_set_si_nobless Rmpf_init_set_str Rmpf_init_set_str_nobless
 Rmpf_init_set_ui Rmpf_init_set_ui_nobless Rmpf_inp_str
+Rmpf_init_set_NV Rmpf_init_set_IV Rmpf_init_set_NV_nobless Rmpf_init_set_IV_nobless
 TRmpf_inp_str
 Rmpf_integer_p Rmpf_mul
 Rmpf_mul_2exp Rmpf_mul_ui Rmpf_neg Rmpf_out_str
@@ -112,7 +115,7 @@ fgmp_randinit_set fgmp_randinit_default_nobless fgmp_randinit_mt_nobless
 fgmp_randinit_lc_2exp_nobless fgmp_randinit_lc_2exp_size_nobless fgmp_randinit_set_nobless
 fgmp_urandomb_ui fgmp_urandomm_ui
 Rmpf_get_NV Rmpf_set_NV Rmpf_get_NV_rndn Rmpf_get_d_rndn
-Rmpf_get_IV Rmpf_set_IV Rmpf_fits_UV_p Rmpf_fits_IV_p
+Rmpf_get_IV Rmpf_set_IV  Rmpf_fits_IV_p
 )]);
 
 $Math::GMPf::NOK_POK = 0; # Set to 1 to allow warnings in new() and overloaded operations when
@@ -162,7 +165,7 @@ sub new {
     # Die if there are any additional args (unless $type == 4)
     if($type == _UOK_T || $type == _IOK_T) {
       if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
-      return Rmpf_init_set_str($arg1, 10);
+      return Rmpf_init_set_IV($arg1);
     }
 
     if($type == _POK_T) {
@@ -180,12 +183,7 @@ sub new {
 
     if($type == _NOK_T) {
       if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
-      if(Math::GMPf::_has_longdouble()) {
-        my $ret = Rmpf_init();
-        _Rmpf_set_ld($ret, $arg1);
-        return $ret;
-      }
-      return Rmpf_init_set_d($arg1);
+      return Rmpf_init_set_NV($arg1);
     }
 
     if($type == _MATH_GMPf_T) {

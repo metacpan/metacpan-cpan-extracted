@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSL::RNG;
 
 our @EXPORT_OK = qw( );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core qw/ zeroes long barf  /;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSL::RNG ;
+
 
 
 
@@ -2660,12 +2659,10 @@ return @out;
        }
        
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

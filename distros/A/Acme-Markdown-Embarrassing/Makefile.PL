@@ -22,6 +22,21 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Acme-Markdown-Embarrassing-*' },
+    META_MERGE          => {
+        'meta-spec' => {
+            version => '2',
+            url     => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
+        },
+
+        homepage    => 'https://github.com/thibaultduponchelle/Acme-Markdown-Embarrassing',
+        resources   => {
+            repository => {
+                type => 'git',
+                url  => 'git@github.com:thibaultduponchelle/Acme-Markdown-Embarrassing.git',
+                web  => 'https://github.com/thibaultduponchelle/Acme-Markdown-Embarrassing',
+            },
+        },
+    },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

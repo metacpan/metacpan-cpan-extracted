@@ -4,20 +4,21 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
 use List::Util 1.45 qw(any uniqstr);
 use Ref::Util 0.100 'is_plain_arrayref';
 use Sub::Install;
 use JSON::Schema::Modern::Utilities qw(is_type jsonp E A assert_keyword_type assert_pattern true is_elements_unique);
 use JSON::Schema::Modern::Vocabulary::Unevaluated;
-use Moo;
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -38,8 +39,7 @@ sub evaluation_order { 1 }
 # - in-place applicators and properties, patternProperties, additionalProperties must be evaluated
 #   before unevaluatedProperties (in the Unevaluated vocabulary)
 # - contains must be evaluated before maxContains, minContains (in the Validator vocabulary)
-sub keywords {
-  my ($self, $spec_version) = @_;
+sub keywords ($self, $spec_version) {
   return (
     qw(allOf anyOf oneOf not if then else),
     $spec_version eq 'draft7' ? 'dependencies' : 'dependentSchemas',
@@ -67,13 +67,11 @@ foreach my $phase (qw(traverse eval)) {
 
 sub _traverse_keyword_allOf { shift->traverse_array_schemas(@_) }
 
-sub _eval_keyword_allOf {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_allOf ($self, $data, $schema, $state) {
   my @invalid;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my @new_annotations;
-  foreach my $idx (0 .. $#{$schema->{allOf}}) {
+  foreach my $idx (0 .. $schema->{allOf}->$#*) {
     my @annotations = @orig_annotations;
     if ($self->eval($data, $schema->{allOf}[$idx], +{ %$state,
         schema_path => $state->{schema_path}.'/allOf/'.$idx, annotations => \@annotations })) {
@@ -86,7 +84,7 @@ sub _eval_keyword_allOf {
   }
 
   if (@invalid == 0) {
-    push @{$state->{annotations}}, @new_annotations;
+    push $state->{annotations}->@*, @new_annotations;
     return 1;
   }
 
@@ -96,12 +94,10 @@ sub _eval_keyword_allOf {
 
 sub _traverse_keyword_anyOf { shift->traverse_array_schemas(@_) }
 
-sub _eval_keyword_anyOf {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_anyOf ($self, $data, $schema, $state) {
   my $valid = 0;
   my @errors;
-  foreach my $idx (0 .. $#{$schema->{anyOf}}) {
+  foreach my $idx (0 .. $schema->{anyOf}->$#*) {
     next if not $self->eval($data, $schema->{anyOf}[$idx],
       +{ %$state, errors => \@errors, schema_path => $state->{schema_path}.'/anyOf/'.$idx });
     ++$valid;
@@ -109,19 +105,17 @@ sub _eval_keyword_anyOf {
   }
 
   return 1 if $valid;
-  push @{$state->{errors}}, @errors;
+  push $state->{errors}->@*, @errors;
   return E($state, 'no subschemas are valid');
 }
 
 sub _traverse_keyword_oneOf { shift->traverse_array_schemas(@_) }
 
-sub _eval_keyword_oneOf {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_oneOf ($self, $data, $schema, $state) {
   my (@valid, @errors);
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my @new_annotations;
-  foreach my $idx (0 .. $#{$schema->{oneOf}}) {
+  foreach my $idx (0 .. $schema->{oneOf}->$#*) {
     my @annotations = @orig_annotations;
     next if not $self->eval($data, $schema->{oneOf}[$idx],
       +{ %$state, errors => \@errors, annotations => \@annotations,
@@ -132,11 +126,11 @@ sub _eval_keyword_oneOf {
   }
 
   if (@valid == 1) {
-    push @{$state->{annotations}}, @new_annotations;
+    push $state->{annotations}->@*, @new_annotations;
     return 1;
   }
   if (not @valid) {
-    push @{$state->{errors}}, @errors;
+    push $state->{errors}->@*, @errors;
     return E($state, 'no subschemas are valid');
   }
   else {
@@ -146,13 +140,11 @@ sub _eval_keyword_oneOf {
 
 sub _traverse_keyword_not { shift->traverse_subschema(@_) }
 
-sub _eval_keyword_not {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_not ($self, $data, $schema, $state) {
   return 1 if not $self->eval($data, $schema->{not},
     +{ %$state, schema_path => $state->{schema_path}.'/not',
       short_circuit => $state->{short_circuit} || !$state->{collect_annotations},
-      errors => [], annotations => [ @{$state->{annotations}} ] });
+      errors => [], annotations => [ $state->{annotations}->@* ] });
 
   return E($state, 'subschema is valid');
 }
@@ -161,9 +153,7 @@ sub _traverse_keyword_if { shift->traverse_subschema(@_) }
 sub _traverse_keyword_then { shift->traverse_subschema(@_) }
 sub _traverse_keyword_else { shift->traverse_subschema(@_) }
 
-sub _eval_keyword_if {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_if ($self, $data, $schema, $state) {
   return 1 if not exists $schema->{then} and not exists $schema->{else}
     and not $state->{collect_annotations};
   my $keyword = $self->eval($data, $schema->{if},
@@ -181,15 +171,13 @@ sub _eval_keyword_if {
 
 sub _traverse_keyword_dependentSchemas { shift->traverse_object_schemas(@_) }
 
-sub _eval_keyword_dependentSchemas {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_dependentSchemas ($self, $data, $schema, $state) {
   return 1 if not is_type('object', $data);
 
   my $valid = 1;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my @new_annotations;
-  foreach my $property (sort keys %{$schema->{dependentSchemas}}) {
+  foreach my $property (sort keys $schema->{dependentSchemas}->%*) {
     next if not exists $data->{$property};
 
     my @annotations = @orig_annotations;
@@ -205,21 +193,19 @@ sub _eval_keyword_dependentSchemas {
   }
 
   return E($state, 'not all dependencies are satisfied') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return 1;
 }
 
-sub _traverse_keyword_dependencies {
-  my ($self, $schema, $state) = @_;
-
+sub _traverse_keyword_dependencies ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'object');
 
   my $valid = 1;
-  foreach my $property (sort keys %{$schema->{dependencies}}) {
+  foreach my $property (sort keys $schema->{dependencies}->%*) {
     if (is_type('array', $schema->{dependencies}{$property})) {
       # as in dependentRequired
 
-      foreach my $index (0..$#{$schema->{dependencies}{$property}}) {
+      foreach my $index (0..$schema->{dependencies}{$property}->$#*) {
         $valid = E({ %$state, _schema_path_suffix => [ $property, $index ] }, 'element #%d is not a string', $index)
           if not is_type('string', $schema->{dependencies}{$property}[$index]);
       }
@@ -235,20 +221,18 @@ sub _traverse_keyword_dependencies {
   return $valid;
 }
 
-sub _eval_keyword_dependencies {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_dependencies ($self, $data, $schema, $state) {
   return 1 if not is_type('object', $data);
 
   my $valid = 1;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my @new_annotations;
-  foreach my $property (sort keys %{$schema->{dependencies}}) {
+  foreach my $property (sort keys $schema->{dependencies}->%*) {
     next if not exists $data->{$property};
 
     if (is_type('array', $schema->{dependencies}{$property})) {
       # as in dependentRequired
-      if (my @missing = grep !exists($data->{$_}), @{$schema->{dependencies}{$property}}) {
+      if (my @missing = grep !exists($data->{$_}), $schema->{dependencies}{$property}->@*) {
         $valid = E({ %$state, _schema_path_suffix => $property },
           'missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', @missing));
       }
@@ -269,7 +253,7 @@ sub _eval_keyword_dependencies {
   }
 
   return E($state, 'not all dependencies are satisfied') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return 1;
 }
 
@@ -277,9 +261,7 @@ sub _traverse_keyword_prefixItems { shift->traverse_array_schemas(@_) }
 
 sub _eval_keyword_prefixItems { goto \&_eval_keyword__items_array_schemas }
 
-sub _traverse_keyword_items {
-  my ($self, $schema, $state) = @_;
-
+sub _traverse_keyword_items ($self, $schema, $state) {
   if (is_plain_arrayref($schema->{items})) {
     return E($state, 'array form of "items" not supported in %s', $state->{spec_version})
       if $state->{spec_version} !~ /^draft(?:7|2019-09)$/;
@@ -290,9 +272,7 @@ sub _traverse_keyword_items {
   $self->traverse_subschema($schema, $state);
 }
 
-sub _eval_keyword_items {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_items ($self, $data, $schema, $state) {
   goto \&_eval_keyword__items_array_schemas if is_plain_arrayref($schema->{items});
 
   $state->{_last_items_index} //= -1;
@@ -301,25 +281,21 @@ sub _eval_keyword_items {
 
 sub _traverse_keyword_additionalItems { shift->traverse_subschema(@_) }
 
-sub _eval_keyword_additionalItems {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_additionalItems ($self, $data, $schema, $state) {
   return 1 if not exists $state->{_last_items_index};
   goto \&_eval_keyword__items_schema;
 }
 
 # prefixItems (draft 2020-12), array-based items (all drafts)
-sub _eval_keyword__items_array_schemas {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword__items_array_schemas ($self, $data, $schema, $state) {
   return 1 if not is_type('array', $data);
 
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my @new_annotations;
   my $valid = 1;
 
-  foreach my $idx (0 .. $#{$data}) {
-    last if $idx > $#{$schema->{$state->{keyword}}};
+  foreach my $idx (0 .. $data->$#*) {
+    last if $idx > $schema->{$state->{keyword}}->$#*;
     $state->{_last_items_index} = $idx;
 
     my @annotations = @orig_annotations;
@@ -344,23 +320,21 @@ sub _eval_keyword__items_array_schemas {
   }
 
   return E($state, 'not all items are valid') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return A($state,
-    ($state->{_last_items_index}//-1) == $#{$data} ? true : $state->{_last_items_index});
+    ($state->{_last_items_index}//-1) == $data->$#* ? true : $state->{_last_items_index});
 }
 
 # schema-based items (all drafts), and additionalItems (up to and including draft2019-09)
-sub _eval_keyword__items_schema {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword__items_schema ($self, $data, $schema, $state) {
   return 1 if not is_type('array', $data);
-  return 1 if $state->{_last_items_index} == $#{$data};
+  return 1 if $state->{_last_items_index} == $data->$#*;
 
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my @new_annotations;
   my $valid = 1;
 
-  foreach my $idx ($state->{_last_items_index}+1 .. $#{$data}) {
+  foreach my $idx ($state->{_last_items_index}+1 .. $data->$#*) {
     if (is_type('boolean', $schema->{$state->{keyword}})) {
       next if $schema->{$state->{keyword}};
       $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx },
@@ -382,25 +356,23 @@ sub _eval_keyword__items_schema {
     last if $state->{short_circuit};
   }
 
-  $state->{_last_items_index} = $#{$data};
+  $state->{_last_items_index} = $data->$#*;
 
   return E($state, 'subschema is not valid against all %sitems',
     $state->{keyword} eq 'additionalItems' ? 'additional ' : '') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return A($state, true);
 }
 
 sub _traverse_keyword_contains { shift->traverse_subschema(@_) }
 
-sub _eval_keyword_contains {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_contains ($self, $data, $schema, $state) {
   return 1 if not is_type('array', $data);
 
   $state->{_num_contains} = 0;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my (@errors, @new_annotations, @valid);
-  foreach my $idx (0 .. $#{$data}) {
+  foreach my $idx (0 .. $data->$#*) {
     my @annotations = @orig_annotations;
     if ($self->eval($data->[$idx], $schema->{contains},
         +{ %$state, errors => \@errors, annotations => \@annotations,
@@ -419,26 +391,24 @@ sub _eval_keyword_contains {
   # note: no items contained is only valid when minContains is explicitly 0
   if (not $state->{_num_contains}
       and (($schema->{minContains}//1) > 0 or $state->{spec_version} eq 'draft7')) {
-    push @{$state->{errors}}, @errors;
+    push $state->{errors}->@*, @errors;
     return E($state, 'subschema is not valid against any item');
   }
 
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return $state->{spec_version} =~ /^draft(?:7|2019-09)$/ ? 1
     : A($state, @valid == @$data ? true : \@valid);
 }
 
 sub _traverse_keyword_properties { shift->traverse_object_schemas(@_) }
 
-sub _eval_keyword_properties {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_properties ($self, $data, $schema, $state) {
   return 1 if not is_type('object', $data);
 
   my $valid = 1;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my (@valid_properties, @new_annotations);
-  foreach my $property (sort keys %{$schema->{properties}}) {
+  foreach my $property (sort keys $schema->{properties}->%*) {
     next if not exists $data->{$property};
 
     if (is_type('boolean', $schema->{properties}{$property})) {
@@ -467,32 +437,28 @@ sub _eval_keyword_properties {
   }
 
   return E($state, 'not all properties are valid') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return A($state, \@valid_properties);
 }
 
-sub _traverse_keyword_patternProperties {
-  my ($self, $schema, $state) = @_;
-
+sub _traverse_keyword_patternProperties ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'object');
 
   my $valid = 1;
-  foreach my $property (sort keys %{$schema->{patternProperties}}) {
+  foreach my $property (sort keys $schema->{patternProperties}->%*) {
     $valid = 0 if not assert_pattern({ %$state, _schema_path_suffix => $property }, $property);
     $valid = 0 if not $self->traverse_property_schema($schema, $state, $property);
   }
   return $valid;
 }
 
-sub _eval_keyword_patternProperties {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_patternProperties ($self, $data, $schema, $state) {
   return 1 if not is_type('object', $data);
 
   my $valid = 1;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my (@valid_properties, @new_annotations);
-  foreach my $property_pattern (sort keys %{$schema->{patternProperties}}) {
+  foreach my $property_pattern (sort keys $schema->{patternProperties}->%*) {
     foreach my $property (sort grep m/$property_pattern/, keys %$data) {
       if (is_type('boolean', $schema->{patternProperties}{$property_pattern})) {
         if ($schema->{patternProperties}{$property_pattern}) {
@@ -521,24 +487,22 @@ sub _eval_keyword_patternProperties {
   }
 
   return E($state, 'not all properties are valid') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return A($state, [ uniqstr @valid_properties ]);
 }
 
 sub _traverse_keyword_additionalProperties { shift->traverse_subschema(@_) }
 
-sub _eval_keyword_additionalProperties {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_additionalProperties ($self, $data, $schema, $state) {
   return 1 if not is_type('object', $data);
 
   my $valid = 1;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my (@valid_properties, @new_annotations);
   foreach my $property (sort keys %$data) {
     next if exists $schema->{properties} and exists $schema->{properties}{$property};
     next if exists $schema->{patternProperties}
-      and any { $property =~ /$_/ } keys %{$schema->{patternProperties}};
+      and any { $property =~ /$_/ } keys $schema->{patternProperties}->%*;
 
     if (is_type('boolean', $schema->{additionalProperties})) {
       if ($schema->{additionalProperties}) {
@@ -566,19 +530,17 @@ sub _eval_keyword_additionalProperties {
   }
 
   return E($state, 'not all additional properties are valid') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return A($state, \@valid_properties);
 }
 
 sub _traverse_keyword_propertyNames { shift->traverse_subschema(@_) }
 
-sub _eval_keyword_propertyNames {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_propertyNames ($self, $data, $schema, $state) {
   return 1 if not is_type('object', $data);
 
   my $valid = 1;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my @new_annotations;
   foreach my $property (sort keys %$data) {
     my @annotations = @orig_annotations;
@@ -595,7 +557,7 @@ sub _eval_keyword_propertyNames {
   }
 
   return E($state, 'not all property names are valid') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return 1;
 }
 
@@ -613,7 +575,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 DESCRIPTION
 

@@ -13,8 +13,7 @@ UniEvent::HTTP::Manager - extremely fast asynchronous preforking / threading eve
         max_load     => 0.7,
         max_requests => 10000,
         worker_model => UniEvent::HTTP::Manager::WORKER_PREFORK,
-        bind_model   => UniEvent::HTTP::Manager::BIND_REUSE_PORT,
-        server       => { locations => [{host => 'localhost', port => 8080}], },
+        server       => { locations => [{host => 'localhost', port => 8080, reuse_port => 1}], },
     });
     
     # called in different processes/threads, simple API
@@ -255,6 +254,32 @@ Creates web server instance. Config is a hashref with the following supported pa
 
 Config for L<UniEvent::HTTP::Server> object which is created in each worker when it is spawned. See L<UniEvent::HTTP::Server> docs for description.
 
+NOTE: C<UniEvent::HTTP::Manager> keeps an eye on L<UniEvent::HTTP::Server>'s C<server.locations[].reuse_port> parameter.
+
+This controls how manager will create listening sockets.
+
+If C<reuse_port> is false, manager will create listening socket for this location in master process once and use the same
+sockets in each worker. So that they will be accepting the same socket.
+The advantage of this method is that it allows to start web server with some advanced privileges, bind socket to ports like 80, 443, etc... 
+in master process and then drop privileges, for example, in manager's C<start_callback> (see docs below).
+The disadvantage is that it may impact performance significantly in case of many running workers and very high number of new connections per second
+(i.e. when keep-alive is not utilized much and your requests handlers are small and fast). This is not a technical disadvantage of this library, but
+the OS itself.
+
+If C<reuse_port> is true, manager will not create any sockets for this location, instead each worker will create listening socket by itself
+and bind it to the same addresses and ports making use of C<REUSE_PORT> feature. This way each worker will accept its own socket and the OS will
+distribute the load between them. This method has a WAY LESS performance penalties when a lot of processes/threads are accepting a lot of new
+connections per second on the same addresses/ports.
+
+Alternatively, you can create sockets by yourself and pass it in C<sock> property of a location.
+In this case C<reuse_port> is ignored (set to false). You can even create sockets in worker
+processes (in C<spawn_callback>) and reconfigure worker's http server there. Keep in mind that in these cases sockets you create must be bound to
+an address/port but not listening yet (C<listen()> must not be called). See L<UniEvent::HTTP::Server> docs for more info.
+
+C<reuse_port> is only meaningful with C<host> and C<port> combination and has no effect with C<path> (unix sockets / named pipes) and custom C<sock>
+parameter (the effect is as it was false). Also C<reuse_port> is always false on windows as it is not supported there. For non-windows systems it is
+enabled by default.
+
 
 =item min_servers [1]
 
@@ -355,30 +380,6 @@ be any endless and strong (non-weak) event handle (for example, a non-weak timer
 C<termination_timeout> (or never if C<termination_timeout> is 0).
 
 
-=item bind_model [BIND_REUSE_PORT on Unix, BIND_DUPLICATE on Windows]
-
-Controls how manager will create listening sockets.
-Should be either C<UniEvent::HTTP::Manager::BIND_REUSE_PORT> or C<UniEvent::HTTP::Manager::BIND_DUPLICATE>.
-
-If C<UniEvent::HTTP::Manager::BIND_DUPLICATE> is set, manager will create listening sockets for all locations in master process once and use the same
-sockets in each worker. So that they will be accepting the same sockets.
-The advantage of this method is that it allows to start web server with some advanced privileges, bind sockets to ports like 80, 443, etc... 
-in master process and then drop privileges, for example, in manager's C<start_callback> (see docs below).
-The disadvantage is that it may impact performance significantly in case of many running workers and very high number of new connections per second
-(i.e. when keep-alive is not utilized much and your requests handlers are small and fast). This is not a technical disadvantage of this library, but
-the OS itself.
-
-If C<UniEvent::HTTP::Manager::BIND_REUSE_PORT> is set, manager will not create any sockets, instead each worker will create listening sockets by itself
-and bind it to the same addresses and ports making use of C<REUSE_PORT> feature. This way each worker will accept its own sockets and the OS will
-distribute the load between them. This method has a WAY LESS performance penalties when a lot of processes/threads are accepting a lot of new
-connections per second on the same addresses/ports.
-
-Alternatively, you can create sockets by yourself and pass it in C<sock> property of an item in L<UniEvent::HTTP::Server>'s C<locations> part of config.
-In this case C<bind_model> is ignored (or applied only to those locations for which you didn't pass C<sock>). You can even create sockets in worker
-processes (in C<spawn_callback>) and reconfigure worker's http server there. Keep in mind that in these cases sockets you create must be bound to
-an address/port but not listening yet (C<listen()> must not be called). See L<UniEvent::HTTP::Server> docs for more info.
-
-
 =item worker_model [WORKER_PREFORK on Unix, WORKER_THREAD on Windows]
 
 MPM (multiprocessing module). Should be either C<UniEvent::HTTP::Manager::WORKER_PREFORK> or C<UniEvent::HTTP::Manager::WORKER_THREAD>.
@@ -410,8 +411,9 @@ the number of workers that was before the first call to C<restart_workers()>.
 
 =head2 reconfigure(\%config)
 
-Reconfigures the web server. Supported parameters are the same as in C<new()>, except for C<bind_model> and C<worker_model> which can't be
-changed. All other parameters can be changed on-the-fly. Manager may gracefully restart all workers during this process (or may not, if significant
+Reconfigures the web server. Supported parameters are the same as in C<new()>, except for C<worker_model> and C<server.locations[].reuse_port> which
+can't be changed.
+All other parameters can be changed on-the-fly. Manager may gracefully restart all workers during this process (or may not, if significant
 parameters hasn't been changed).
 
 L<This method may return error|UniEvent/"OPTIONAL ERRORS">

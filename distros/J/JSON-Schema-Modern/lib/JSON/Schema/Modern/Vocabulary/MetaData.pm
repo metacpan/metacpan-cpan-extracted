@@ -4,16 +4,17 @@ package JSON::Schema::Modern::Vocabulary::MetaData;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Meta-Data vocabulary
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
 use JSON::Schema::Modern::Utilities qw(assert_keyword_type annotate_self);
-use Moo;
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -25,8 +26,7 @@ sub vocabulary {
 
 sub evaluation_order { 5 }
 
-sub keywords {
-  my ($self, $spec_version) = @_;
+sub keywords ($self, $spec_version) {
   return (
     qw(title description default),
     $spec_version ne 'draft7' ? 'deprecated' : (),
@@ -34,14 +34,12 @@ sub keywords {
   );
 }
 
-sub _traverse_keyword_title {
-  my ($self, $schema, $state) = @_;
+sub _traverse_keyword_title ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'string');
   return 1;
 }
 
-sub _eval_keyword_title {
-  my ($self, $data, $schema, $state) = @_;
+sub _eval_keyword_title ($self, $data, $schema, $state) {
   annotate_self($state, $schema);
 }
 
@@ -53,8 +51,7 @@ sub _traverse_keyword_default { 1 }
 
 sub _eval_keyword_default { goto \&_eval_keyword_title }
 
-sub _traverse_keyword_deprecated {
-  my ($self, $schema, $state) = @_;
+sub _traverse_keyword_deprecated ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'boolean');
   return 1;
 }
@@ -69,8 +66,7 @@ sub _traverse_keyword_writeOnly { goto \&_traverse_keyword_deprecated }
 
 sub _eval_keyword_writeOnly { goto \&_eval_keyword_title }
 
-sub _traverse_keyword_examples {
-  my ($self, $schema, $state) = @_;
+sub _traverse_keyword_examples ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'array');
   return 1;
 }
@@ -91,7 +87,7 @@ JSON::Schema::Modern::Vocabulary::MetaData - Implementation of the JSON Schema M
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 DESCRIPTION
 

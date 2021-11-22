@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyThing 2.144;
+package Config::Model::AnyThing 2.145;
 
 use Mouse;
 
@@ -333,7 +333,7 @@ Config::Model::AnyThing - Base class for configuration tree item
 
 =head1 VERSION
 
-version 2.144
+version 2.145
 
 =head1 SYNOPSIS
 

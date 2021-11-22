@@ -1,16 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.25;
+use Object::Pad 0.57;
 
-package Tickit::Widget::Menu 0.13;
+package Tickit::Widget::Menu 0.14;
 class Tickit::Widget::Menu
 # Much of this code actually lives in a class called T:W:Menu::base, which is
 # the base class used by T:W:Menu and T:W:MenuBar
-   extends Tickit::Widget::Menu::base;
+   :isa(Tickit::Widget::Menu::base);
 
 use Tickit::Window 0.49; # hierarchy changes are asynchronous
 

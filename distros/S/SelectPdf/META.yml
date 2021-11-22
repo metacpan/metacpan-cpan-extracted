@@ -1,0 +1,51 @@
+---
+abstract: 'SelectPdf Online REST API Perl Client (HTML to PDF, PDF merge, PDF to text, search PDF)'
+author:
+  - 'SelectPdf <support@selectpdf.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SelectPdf
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  SelectPdf:
+    file: lib/SelectPdf.pm
+    version: v1.4.0
+  SelectPdf::ApiClient:
+    file: lib/SelectPdf/ApiClient.pm
+    version: v1.4.0
+  SelectPdf::AsyncJobClient:
+    file: lib/SelectPdf/AsyncJobClient.pm
+    version: v1.4.0
+  SelectPdf::HtmlToPdfClient:
+    file: lib/SelectPdf/HtmlToPdfClient.pm
+    version: v1.4.0
+  SelectPdf::PdfMergeClient:
+    file: lib/SelectPdf/PdfMergeClient.pm
+    version: v1.4.0
+  SelectPdf::PdfToTextClient:
+    file: lib/SelectPdf/PdfToTextClient.pm
+    version: v1.4.0
+  SelectPdf::UsageClient:
+    file: lib/SelectPdf/UsageClient.pm
+    version: v1.4.0
+  SelectPdf::WebElementsClient:
+    file: lib/SelectPdf/WebElementsClient.pm
+    version: v1.4.0
+requires:
+  HTTP::Request::Common: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+version: v1.4.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -6,7 +6,7 @@ use Moo;
 use namespace::autoclean;
 with 'Archive::BagIt::Role::Algorithm';
 with 'Archive::BagIt::Role::OpenSSL';
-our $VERSION = '0.083'; # VERSION
+our $VERSION = '0.085'; # VERSION
 # ABSTRACT: The default SHA algorithms plugin (default for v1.0)
 
 has '+plugin_name' => (
@@ -48,7 +48,7 @@ Archive::BagIt::Plugin::Algorithm::SHA512 - The default SHA algorithms plugin (d
 
 =head1 VERSION
 
-version 0.083
+version 0.085
 
 =head1 AVAILABILITY
 
@@ -63,11 +63,11 @@ web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Rob Schmidt <rjeschmi@gmail.com>
+Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,14 +2,6 @@ use strict;
 use PDL::Types qw(ppdefs_all types);
 my $F = [map $_->ppsym, grep $_->real && !$_->integer, types()];
 
-pp_addhdr(<<'EOD');
-
-#ifndef RAND_MAX
-#error "You must have a working RAND_MAX! Something's wrong with your include files"
-#endif
-
-EOD
-
 pp_addpm({At=>'Top'},<<'EOD');
 
 use PDL::Slices;
@@ -278,17 +270,15 @@ EOPM
 	atdi = &($a(t=>1, h=>0)) - &($a(t=>0,h=>0));
 	btdi = &($b(t=>1, w=>0)) - &($b(t=>0,w=>0));
 
-
 	// Loop over tiles
 	for(   oh=0;   oh < $SIZE(h);   oh += tsiz   ) {
-	   hlim = ( oh + tsiz > $SIZE(h) )  ?  $SIZE(h)  :  oh + tsiz;
+	   hlim = PDLMIN(oh + tsiz, $SIZE(h));
 
 	   for(   ow=0;   ow < $SIZE(w);   ow += tsiz   ) {
-	      wlim = ( ow + tsiz > $SIZE(w) )  ?  $SIZE(w)  :  ow + tsiz;
+	      wlim = PDLMIN(ow + tsiz, $SIZE(w));
 
 	      for(   ot=0;   ot < $SIZE(t);  ot += tsiz   ) {
-	         tlim = (ot + tsiz > $SIZE(t) )  ?  $SIZE(t)  :  ot + tsiz;
-
+	         tlim = PDLMIN(ot + tsiz, $SIZE(t));
 
 	         for(  ih=oh; ih<hlim; ih++  ) {
 		    for(  iw=ow; iw<wlim; iw++  ) {
@@ -811,8 +801,8 @@ sub PDL::conv1d {
            int i,i1,i2,poff,pflip;
            double tmp;
            int reflect = $COMP(reflect);
-           int m_size = $COMP(__m_size);
-           int p_size = $COMP(__p_size);
+           int m_size = $SIZE(m);
+           int p_size = $SIZE(p);
 
            poff = (p_size-1)/2;
            for(i=0; i<m_size; i++) {
@@ -1070,7 +1060,7 @@ sub PDL::uniqvec {
    my $nanvec = null;
    $nanvec = $pdl2d->mv(0,-1)->dice($numnan->which)->mv(0,-1);           # the vectors with any NaN values
 
-   # use dice instead of nslice since qsortvec might be packing
+   # use dice instead of slice since qsortvec might be packing
    # the badvals to the front of the array instead of the end like
    # the docs say. If that is the case and it gets fixed, it won't
    # bust uniqvec. DAL 14-March 2006
@@ -1127,23 +1117,21 @@ clip (threshold) C<$a> by C<$b> (C<$b> is lower bound)
 =cut
 
 for my $opt (
-	     ['hclip','>'],
-	     ['lclip','<']
+	     ['hclip','PDLMIN'],
+	     ['lclip','PDLMAX']
 	     ) {
     my $name = $opt->[0];
     my $op   = $opt->[1];
+    my $code = '$c() = '.$op.'($b(), $a());';
     pp_def(
 	   $name,
 	   HandleBad => 1,
 	   Pars => 'a(); b(); [o] c()',
-	   Code =>
-	   '$c() = ($a() '.$op.' $b()) ? $b() : $a();',
+	   Code => $code,
 	   BadCode =>
 	   'if ( $ISBAD(a()) || $ISBAD(b()) ) {
                $SETBAD(c());
-            } else {
-	       $c() = ($a() '.$op.' $b()) ? $b() : $a();
-            }',
+            } else { '.$code.' }',
 	   Doc =>  'clip (threshold) C<$a> by C<$b> (C<$b> is '.
 	   ($name eq 'hclip' ? 'upper' : 'lower').' bound)',
           PMCode=><<"EOD",
@@ -1191,12 +1179,12 @@ pp_def(
 	HandleBad => 1,
 	Pars => 'a(); l(); h(); [o] c()',
 	Code =>
-	'$c() = ( $a() > $h() )   ?   $h()   :  ( $a() < $l()   ?   $l()   :   $a()   );',
+	'$c() = PDLMIN($h(), PDLMAX($l(), $a()));',
 	BadCode => <<'EOBC',
 	 if( $ISBAD(a()) || $ISBAD(l()) || $ISBAD(h()) ) {
 	   $SETBAD(c());
          } else {
-           $c() = ( $a() > $h() )   ?   $h()   :  ( $a() < $l()   ?   $l()   :   $a()   );
+           $c() = PDLMIN($h(), PDLMAX($l(), $a()));
          }
 EOBC
        PMCode => <<'EOPM',
@@ -1636,46 +1624,31 @@ for(
      }
     )
 {
+my $p1 = 'register int j;
+	register int maxj = $SIZE(m)-1;
+	register double min  = $COMP(min);
+	register double step = $COMP(step);
+	threadloop %{
+	   loop(m) %{ $hist() = 0; %}
+	%}
+	threadloop %{
+	   loop(n) %{';
+my $p2 = '
+	      j = (int) (($in()-min)/step);
+	      if (j<0) j=0;
+	      if (j > maxj) j = maxj;
+	      ($hist(m => j))'.$_->{HistOp}.';';
+my $p3 = '
+	   %}
+	%}';
 pp_def($_->{Name},
        Pars => 'in(n); '.$_->{WeightPar}.$_->{HistType}.  '[o] hist(m)',
        GenericTypes => [ppdefs_all],
        # set outdim by Par!
        OtherPars => 'double step; double min; int msize => m',
        HandleBad => 1,
-       Code =>
-       'register int j;
-	register int maxj = $SIZE(m)-1;
-	register double min  = $COMP(min);
-	register double step = $COMP(step);
-	threadloop %{
-	   loop(m) %{ $hist() = 0; %}
-	%}
-	threadloop %{
-	   loop(n) %{
-	      j = (int) (($in()-min)/step);
-	      if (j<0) j=0;
-	      if (j > maxj) j = maxj;
-	      ($hist(m => j))'.$_->{HistOp}.';
-	   %}
-	%}',
-       BadCode =>
-       'register int j;
-	register int maxj = $SIZE(m)-1;
-	register double min  = $COMP(min);
-	register double step = $COMP(step);
-	threadloop %{
-	   loop(m) %{ $hist() = 0; %}
-	%}
-	threadloop %{
-	   loop(n) %{
-              if ( $ISGOOD(in()) ) {
-	         j = (int) (($in()-min)/step);
-	         if (j<0) j=0;
-	         if (j > maxj) j = maxj;
-	         ($hist(m => j))'.$_->{HistOp}.';
-              }
-	   %}
-	%}',
+       Code => $p1.$p2.$p3,
+       BadCode => $p1.'if ( $ISGOOD(in()) ) {'.$p2.'}'.$p3,
 	Doc=>$_->{Doc});
 }
 
@@ -1786,6 +1759,29 @@ for(
 	}
     )
 {
+       my $p1 = 'register int ja,jb;
+	register int maxja = $SIZE(ma)-1;
+	register int maxjb = $SIZE(mb)-1;
+	register double mina = $COMP(mina);
+	register double minb = $COMP(minb);
+	register double stepa = $COMP(stepa);
+	register double stepb = $COMP(stepb);
+	threadloop %{
+	   loop(ma,mb) %{ $hist() = 0; %}
+	%}
+	threadloop %{
+	   loop(n) %{';
+       my $p2 = '
+	      ja = (int) (($ina()-mina)/stepa);
+	      jb = (int) (($inb()-minb)/stepb);
+	      if (ja<0) ja=0;
+	      if (ja > maxja) ja = maxja;
+	      if (jb<0) jb=0;
+	      if (jb > maxjb) jb = maxjb;
+	      ($hist(ma => ja,mb => jb))'.$_->{HistOp}.';';
+       my $p3 = '
+	   %}
+	%}';
 pp_def($_->{Name},
        Pars => 'ina(n); inb(n); '.$_->{WeightPar}.$_->{HistType}.  '[o] hist(ma,mb)',
        GenericTypes => [ppdefs_all],
@@ -1793,54 +1789,8 @@ pp_def($_->{Name},
        OtherPars => 'double stepa; double mina; int masize => ma;
 	             double stepb; double minb; int mbsize => mb;',
        HandleBad => 1,
-       Code =>
-       'register int ja,jb;
-	register int maxja = $SIZE(ma)-1;
-	register int maxjb = $SIZE(mb)-1;
-	register double mina = $COMP(mina);
-	register double minb = $COMP(minb);
-	register double stepa = $COMP(stepa);
-	register double stepb = $COMP(stepb);
-	threadloop %{
-	   loop(ma,mb) %{ $hist() = 0; %}
-	%}
-	threadloop %{
-	   loop(n) %{
-	      ja = (int) (($ina()-mina)/stepa);
-	      jb = (int) (($inb()-minb)/stepb);
-	      if (ja<0) ja=0;
-	      if (ja > maxja) ja = maxja;
-	      if (jb<0) jb=0;
-	      if (jb > maxjb) jb = maxjb;
-	      ($hist(ma => ja,mb => jb))'.$_->{HistOp}.';
-	   %}
-	%}
-	',
-       BadCode =>
-       'register int ja,jb;
-	register int maxja = $SIZE(ma)-1;
-	register int maxjb = $SIZE(mb)-1;
-	register double mina = $COMP(mina);
-	register double minb = $COMP(minb);
-	register double stepa = $COMP(stepa);
-	register double stepb = $COMP(stepb);
-	threadloop %{
-	   loop(ma,mb) %{ $hist() = 0; %}
-	%}
-	threadloop %{
-	   loop(n) %{
-              if ( $ISGOOD(ina()) && $ISGOOD(inb()) ) {
-	         ja = (int) (($ina()-mina)/stepa);
-	         jb = (int) (($inb()-minb)/stepb);
-	         if (ja<0) ja=0;
-	         if (ja > maxja) ja = maxja;
-	         if (jb<0) jb=0;
-	         if (jb > maxjb) jb = maxjb;
-	         ($hist(ma => ja,mb => jb))'.$_->{HistOp}.';
-              }
-	   %}
-	%}
-	',
+       Code => $p1.$p2.$p3,
+       BadCode => $p1.'if ( $ISGOOD(ina()) && $ISGOOD(inb()) ) {'.$p2.'}'.$p3,
 	Doc=> $_->{Doc});
 }
 
@@ -1942,7 +1892,7 @@ have the same sized dimensions.
 '
    );
 
-pp_addpm(<<'EOD')
+pp_addpm(<<'EOD');
 
 =head2 glue
 
@@ -2020,11 +1970,7 @@ sub PDL::glue{
     $x->xchg(0,$dim);
 }
 
-
-
-
 EOD
-;
 
 =head2 axisvalues
 
@@ -2036,7 +1982,6 @@ EOD
 
 pp_def( 'axisvalues',
 	Pars => '[o,nc]a(n)',
-        GenericTypes => [ppdefs_all],
 	Code => 'loop(n) %{ $a() = n; %}',
 	GenericTypes => [ppdefs_all],
 	Doc => '
@@ -2054,11 +1999,63 @@ and alters its argument.
 '
        ); # pp_def: axisvalues
 
+pp_addhdr(<<'EOH');
+#include <time.h>
 
-pp_addpm(<<'EOD');
+extern int pdl_srand_threads;
+extern uint64_t *pdl_rand_state;
+void pdl_srand(uint64_t **s, uint64_t seed, int n);
+double pdl_drand(uint64_t *s);
+#define PDL_MAYBE_SRAND \
+  if (pdl_srand_threads < 0) \
+    pdl_srand(&pdl_rand_state, PDL->pdl_seed(), PDL->online_cpus());
+#define PDL_RAND_SET_OFFSET(v, thr, pdl) \
+  if (v < 0) \
+    v = thr.mag_nthr >= 0 ? PDL->magic_get_thread(pdl) % PDL->online_cpus() : 0
+EOH
 
-=head2 random
+pp_def(
+	'srand',
+	Pars=>'a();',
+	GenericTypes => ['Q'],
+	Code => <<'EOF',
+pdl_srand(&pdl_rand_state, (uint64_t)$a(), PDL->online_cpus());
+EOF
+	NoPthread => 1,
+	HaveThreading => 0,
+	Doc=> <<'EOF',
+=for ref
 
+Seed random-number generator with a 64-bit int. Will generate seed data
+for a number of threads equal to the return-value of
+L<PDL::Core/online_cpus>.
+
+=for usage
+
+ srand(); # uses current time
+ srand(5); # fixed number e.g. for testing
+
+EOF
+	PMCode=><<'EOD',
+*srand = \&PDL::srand;
+sub PDL::srand { PDL::_srand_int($_[0] // PDL::Core::seed()) }
+EOD
+);
+
+pp_def(
+	'random',
+	Pars=>'a();',
+        GenericTypes => [ppdefs_all],
+	PMFunc => '',
+	Code => <<'EOF',
+PDL_MAYBE_SRAND
+int rand_offset = -1;
+threadloop %{
+  PDL_RAND_SET_OFFSET(rand_offset, $PRIV(pdlthread), $PDL(a));
+  $a() = pdl_drand(pdl_rand_state + 4*rand_offset);
+%}
+EOF
+	Doc=> <<'EOF',
 =for ref
 
 Constructor which returns ndarray of random numbers
@@ -2075,12 +2072,36 @@ excluding 1 itself). The arguments are the same as C<zeroes>
 (q.v.) - i.e. one can specify dimensions, types or give
 a template.
 
-You can use the perl function L<srand|perlfunc/srand> to seed the random
-generator. For further details consult Perl's  L<srand|perlfunc/srand>
-documentation.
+You can use the PDL function L</srand> to seed the random generator.
+If it has not been called yet, it will be with the current time.
+EOF
+	PMCode=><<'EOD',
+sub random { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->random : PDL->random(@_) }
+sub PDL::random {
+   my $class = shift;
+   my $x = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
+   &PDL::_random_int($x);
+   return $x;
+}
+EOD
+);
 
-=head2 randsym
-
+pp_def(
+	'randsym',
+	Pars=>'a();',
+        GenericTypes => [ppdefs_all],
+	PMFunc => '',
+	Code => <<'EOF',
+PDL_MAYBE_SRAND
+int rand_offset = -1;
+threadloop %{
+  PDL_RAND_SET_OFFSET(rand_offset, $PRIV(pdlthread), $PDL(a));
+  double tmp;
+  do tmp = pdl_drand(pdl_rand_state + 4*rand_offset); while (tmp == 0.0); /* 0 < tmp < 1 */
+  $a() = tmp;
+%}
+EOF
+	Doc=> <<'EOF',
 =for ref
 
 Constructor which returns ndarray of random numbers
@@ -2096,53 +2117,9 @@ This is the uniform distribution between 0 and 1 (excluding both 0 and
 1, cf L</random>). The arguments are the same as C<zeroes> (q.v.) -
 i.e. one can specify dimensions, types or give a template.
 
-You can use the perl function L<srand|perlfunc/srand> to seed the random
-generator. For further details consult Perl's  L<srand|perlfunc/srand>
-documentation.
-
-=cut
-
-EOD
-
-pp_addhdr(<<'EOH');
-
-#ifndef Drand01
-#define Drand01() (((double)rand()) / (RAND_MAX+1.0))
-#endif
-
-EOH
-
-pp_def(
-	'random',
-	Pars=>'a();',
-        GenericTypes => [ppdefs_all],
-	PMFunc => '',
-	Code =>
-	'$a() = Drand01();',
-	'NoPthread' => 1, # random isn't threadsafe
-	Doc=>undef,
-	PMCode=><<'EOD',
-sub random { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->random : PDL->random(@_) }
-sub PDL::random {
-   my $class = shift;
-   my $x = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
-   &PDL::_random_int($x);
-   return $x;
-}
-EOD
-);
-
-pp_def(
-	'randsym',
-	'NoPthread' => 1, # random isn't threadsafe
-	Pars=>'a();',
-        GenericTypes => [ppdefs_all],
-	PMFunc => '',
-	Code =>
-	'double tmp;
-	 do tmp = Drand01(); while (tmp == 0.0); /* 0 < tmp < 1 */
-         $a() = tmp;',
-	Doc=>undef,
+You can use the PDL function L</srand> to seed the random generator.
+If it has not been called yet, it will be with the current time.
+EOF
 	PMCode=><<'EOD',
 sub randsym { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->randsym : PDL->randsym(@_) }
 sub PDL::randsym {
@@ -2173,10 +2150,8 @@ This is generated using the math library routine C<ndtri>.
 
 Mean = 0, Stddev = 1
 
-
-You can use the perl function L<srand|perlfunc/srand> to seed the random
-generator. For further details consult Perl's  L<srand|perlfunc/srand>
-documentation.
+You can use the PDL function L</srand> to seed the random generator.
+If it has not been called yet, it will be with the current time.
 
 =cut
 
@@ -2374,8 +2349,7 @@ for my $func ( [
                    }
                    $idx() = low >= n1 ? n1
                          : up        ? low + 1
-                         : low < 0   ? 0
-                         :           low ;
+                         : PDLMAX(low, 0);
                    ----
            ],
             ref =>
@@ -3359,27 +3333,23 @@ EOD
 	  }
 	 )
 {
+    my $p1 = $_->{Variables} .'
+                 loop(n) %{
+			if ( $mask() ';
+    my $p2 = '
+			) {
+				$inds(m => dm) = n;
+				dm++;
+			}'.$_->{Elseclause} . "\n".
+		' %}';
     pp_def($_->{Name},
 	   HandleBad => 1,
 	   Doc => $_->{Doc},
 	   Pars => $_->{Pars},
 	   GenericTypes => [ppdefs_all],
 	   PMCode => $_->{PMCode},
-	   Code => $_->{Variables} .
-                 'loop(n) %{
-		       if($mask()) {
-				$inds(m => dm) = n;
-				dm++;
-			}'.$_->{Elseclause} . "\n".
-		' %}',
-	   BadCode => $_->{Variables} .
-                 'loop(n) %{
-			if ( $mask() && $ISGOOD($mask()) ) {
-				$inds(m => dm) = n;
-				dm++;
-			}'.$_->{Elseclause} . "\n".
-		' %}',
-
+	   Code => $p1.$p2,
+	   BadCode => $p1.' && $ISGOOD($mask())'.$p2,
 #		the next one is currently a dirty hack
 #               this will probably break once dataflow is enabled again
 #               *unless* we have made sure that mask is physical by now!!!
@@ -3411,7 +3381,7 @@ EOD
 	   );
 }
 
-pp_addpm(<<'EOD'
+pp_addpm(<<'EOD');
 
 =head2 where
 
@@ -3456,7 +3426,6 @@ WARNING: The first argument
 the exact same dimensions (or horrible things happen). You *cannot*
 thread over a smaller mask, for example.
 
-
 =cut
 
 sub PDL::where {
@@ -3480,11 +3449,10 @@ sub PDL::where {
 *where = \&PDL::where;
 
 EOD
-);
 
 pp_add_exported("", 'where');
 
-pp_addpm(<<'EOD'
+pp_addpm(<<'EOD');
 
 =head2 whereND
 
@@ -3534,6 +3502,10 @@ assignment. That means that both of these examples are valid:
   # Used in lvalue context:
   $data->whereND($mask4) .= 0;
 
+SEE ALSO:
+
+L</whichND> returns N-D indices into a multidimensional PDL, from a mask.
+
 =cut
 
 sub PDL::whereND :lvalue {
@@ -3569,11 +3541,10 @@ sub PDL::whereND :lvalue {
 *whereND = \&PDL::whereND;
 
 EOD
-);
 
 pp_add_exported("", 'whereND');
 
-pp_addpm(<<'EOD'
+pp_addpm(<<'EOD');
 
 =head2 whichND
 
@@ -3591,7 +3562,7 @@ L<indexND|PDL::Slices/indexND> or L<range|PDL::Slices/range>.
  $coords = whichND($mask);
 
 returns a PDL containing the coordinates of the elements that are non-zero
-in C<$mask>, suitable for use in indexND.  The 0th dimension contains the
+in C<$mask>, suitable for use in L<PDL::Slices/indexND>. The 0th dimension contains the
 full coordinate listing of each point; the 1st dimension lists all the points.
 For example, if $mask has rank 4 and 100 matching elements, then $coords has
 dimension 4x100.
@@ -3623,6 +3594,8 @@ L</which> finds coordinates of nonzero values in a 1-D mask.
 
 L</where> extracts values from a data PDL that are associated
 with nonzero values in a mask PDL.
+
+L<PDL::Slices/indexND> can be fed the coordinates to return the values.
 
 =for example
 
@@ -3686,7 +3659,6 @@ sub PDL::whichND {
 }
 
 EOD
-);
 
 pp_add_exported("", 'whichND');
 
@@ -3695,7 +3667,7 @@ pp_add_exported("", 'whichND');
 #
 
 
-pp_addpm(<<'EOD'
+pp_addpm(<<'EOD');
 
 =head2 setops
 
@@ -3877,14 +3849,10 @@ sub PDL::setops {
 
 }
 EOD
-);
-
 
 pp_add_exported("", 'setops');
 
-
-
-pp_addpm(<<'EOD'
+pp_addpm(<<'EOD');
 
 =head2 intersect
 
@@ -3921,11 +3889,8 @@ sub PDL::intersect {
 }
 
 EOD
-);
 
 pp_add_exported("", 'intersect');
-
-
 
 pp_addpm({At=>'Bot'},<<'EOD');
 
@@ -3946,6 +3911,5 @@ Updated for CPAN viewing compatibility by David Mertens.
 =cut
 
 EOD
-
 
 pp_done();

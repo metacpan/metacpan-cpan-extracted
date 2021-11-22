@@ -28,6 +28,7 @@ BEGIN {
 }
 
 use App::Foo;
+$App::Foo::DEFAULT = 42;
 @argv = (my $app = App::Foo->new)->run(@argv);
 
 is_deeply($app->{string}, "Alice", "String");
@@ -48,5 +49,7 @@ if ($App::Foo::TAKE_IT_ALL) {
 } else {
     is_deeply(\@argv, [ qw(Life Universe and Everything) ], '@argv');
 }
+is_deeply($app->{default}, 99, "normal default");
+is_deeply($app->{lazy}, 42, "lazy default");
 
 done_testing;

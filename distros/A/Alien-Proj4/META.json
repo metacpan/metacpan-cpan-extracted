@@ -31,8 +31,7 @@
             "File::Find::Rule" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Zlib" : "0",
-            "Mojo::DOM" : "0",
-            "Mojolicious" : "7.00",
+            "Mojo::DOM58" : "1.00",
             "PkgConfig" : "0.19026",
             "Sort::Versions" : "0",
             "URI" : "0",
@@ -77,7 +76,7 @@
          "url" : "https://github.com/PDLPorters/Alien-Proj4"
       }
    },
-   "version" : "2.019111",
+   "version" : "2.019113",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.38",
       "requires" : {
@@ -86,8 +85,7 @@
             "Config" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Zlib" : "0",
-            "Mojo::DOM" : "0",
-            "Mojolicious" : "7.00",
+            "Mojo::DOM58" : "1.00",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"

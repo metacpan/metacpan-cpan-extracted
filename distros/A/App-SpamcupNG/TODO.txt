@@ -1,0 +1,4 @@
+- Capture all e-mail address will be used to received the SPAM report.
+- Capture how old is the SPAM.
+- Capture TRACKING URL info.
+- Capture X-Mailer info.

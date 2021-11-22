@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "DBIx::Custom" => 0,
     "Digest::MD5" => 0,
+    "Encode" => 0,
     "Expect" => 0,
     "Mail::Sender" => 0,
     "Mojo::Util" => 0,
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "DDP" => 0,
     "Test::Simple" => 0
   },
-  "VERSION" => "0.019",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/utils/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "DBIx::Custom" => 0,
   "DDP" => 0,
   "Digest::MD5" => 0,
+  "Encode" => 0,
   "Expect" => 0,
   "Mail::Sender" => 0,
   "Mojo::Util" => 0,

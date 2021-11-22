@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'ht?:E:ic:f:m~=/:x' , \my%o ; 
+
+my $outStr ; ## 出力の仕方を表す、"無名関数" 
+my %M   ; # 変換テーブル
+my $fn  ; # 入力のファイル名。逐次処理される。
+my $noinput ; # 入力そのものが無かったことを表す文字列
+my $notfound ; # 変換先が見つからなかったことを示す文字列
+my $result0 ; # ヘッダ行の変換結果 
+my $osep = $o{'/'} // "\t" ; #出力の区切り文字 
+my $isep = quotemeta $osep ; #入力の区切り文字 splitに使うので、 quotemeta で変換。
+
+& choreArgs ; 
+& readMapFile ; 
+& procMain ; 
+exit 0 ; 
+
+sub choreArgs {
+  $notfound = ( $o{'?'} //= 'notfound' ) ;
+  $noinput = ( $o{E} //= 'noinput' ) ; 
+  $o{c} = ( $o{c} //= 1 ) > 0 ? $o{c} - 1 : $o{c} ; # -c 指定列番号
+  $o{f} //= 1 ;
+  $o{'~'} = $o{'~'} ? 1 : 0 ; 
+  $fn = shift @ARGV ; 
+  &HELP_MESSAGE unless defined $fn ; 
+  $outStr = $o{t} ? \&out_A : $o{h} ? \&out_a : $o{i} ? \&out_i : \&out_n ; 
+}
+
+sub out_n ($@) { shift @_ } ; # 変換結果だけを出力する。
+sub out_i ($@) { my $r=shift @_ ; splice @_,$o{c},0,$r ; join $osep , @_ } ; # 元にあった場所に置き換えて出力
+sub out_a ($@) { my $r=shift @_ ; join $osep , $r, $_ } ; # 変換結果を、元の入力行の先頭に付加。 
+sub out_A ($@) { my $r=shift @_ ; join $osep , $_, $r } ; # 変換結果を、元の入力行の末尾に付加。
+
+# 参照表ファイルの読取り
+sub readMapFile { 
+  open my $mh , "<" , $fn or die "File `$fn' does not open. " , $! ; 
+  my ($from,$to) = $o{'~'} ? (1,0) : (0,1) ; # 変換方向の指定。
+  while ( <$mh> ) { 
+    chomp ;
+    my @F = split /$isep/ , $_ , -1 ; # 2を指定では無いようにした。
+    next if @F < $o{f} ; # 列の数が足りないならば読み飛ばす。 
+    my $key = join $osep , splice @F , -$o{'~'} * $o{f} , $o{f}   ; # -r 指定なら末尾の1列、未指定なら、先頭から1列をキーとする。 
+    my $value = join $osep , @F ; 
+    $M{ $key } = $o{m} ? $M{ $key } + 1 : $value ; # -m 指定であれば、変換時の多重度のチェックになる。 
+    $result0 = $value unless defined $result0 ; # 無駄に分岐をした可能性がある。 
+  }
+  close $mh ;
+}
+
+# 変換対象の入力を読取り、処理をする。
+sub procMain { 
+  if ( $o{'='} ) { 
+    $_ = <> ; 
+    chomp  ;
+    my @F = split /$isep/ , $_ , -1 ; # 
+    print $outStr -> ( $result0 , @F ) , "\n"   ;
+  }
+  while ( <> ) { 
+    chomp ;
+    my @F = split /$isep/ , $_ , -1 ; # 高速化のために -1 の値は工夫した方が良いかも知れない。 
+        my $ikey = join $osep , splice @F , $o{c} , $o{f} ;
+        next if $o{x} and ! defined $ikey || ! defined $M{$ikey} ; # -0 指定がある場合は、読み飛ばす。 
+        my $result = defined $ikey ? $M{$ikey} // $notfound : $noinput  ;
+    print $outStr -> ( $result , @F ) , "\n"   ;
+  }
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE{
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ $0 table < data
+ $0 table data
+ cat data | $0 -c1 -f1 table 
+
+  data の指定列(c列目もしくはc列目からf個の列)を、table に従って変換したものを出力する。
+  
+  tableのファイルの中身は、タブ区切り(変更可)で1〜f列目とそれ以降が
+  それぞれ、変換前の文字列、変換後の文字列で構成されているとする。
+  c は -c のオプションで指定される。未指定なら1である。
+  f は -f のオプションで指定される。未指定なら1である。
+ 
+
+ オプション :   
+ 
+  -c num : (小文字のk) 1始まりもしくは-1終わりで列の番号を指定する。未指定なら1。
+  -f num : (大文字のK) 指定位置から何列をキーにするかを指定。未指定なら1。
+  -~  : 変換の仕方を逆方向にする。-fで指定された数をKとすると、tableの末尾のK列をキーと見なす。
+  
+  -h  : 変換前のデータの最初列の前に変換した値を付ける。 (head)
+  -i  : 入力データに対して、変換対象データを置換をする。 (insert)
+  -t  : 変換前のデータの最終列の後ろに変換した値をつける。 (tail)
+  -x  : 変換対象が無い場合と変換対象のキーの列が無い場合は、出力をしない。
+  -m  : 変換すべきdata の変換方法が、参照表 table によって何通り指定されているかを出力。
+  
+  -=  : data の最初の行をヘッダ行と見なし、適切に結合した結果の表示をするようにする。(!要推敲)
+  -, str : dataもtableも各列は、文字列strで区切られているとする。
+  -? str : 変換値が未定義の場合の出力文字列の指定。デフォルトは "notfound" の8文字。
+  -E str : 入力が未定義の場合の出力文字列の指定。デフォルトは "noinput" の7文字。<-- 必要なのか?
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも optionsの先頭から一致すれば良い。
+ 
+ 開発上のメモ: 
+   * -E が必要なのか要検討
+=cut
+

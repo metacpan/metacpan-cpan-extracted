@@ -3,12 +3,12 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::ClassAttr::Struct 0.01;
+package Object::Pad::ClassAttr::Struct 0.02;
 
 use v5.14;
 use warnings;
 
-use Object::Pad 0.50;
+use Object::Pad 0.56;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
@@ -49,7 +49,13 @@ the class, as a convenient shortcut for making structure-like classes.
    class Name :Struct ... { ... }
 
 Automatically applies the C<:param> and C<:mutator> attributes to every slot
-defined on the class.
+defined on the class, meaning the constructor will accept parameters for each
+slot to initialise the value, and each slot will have an lvalue mutator
+method.
+
+In addition, the class itself gains the C<:strict(params)> attribute, meaning
+the constructor will check parameter names and throw an exception for
+unrecognised names.
 
 =cut
 

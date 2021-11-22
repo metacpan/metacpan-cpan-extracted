@@ -1,0 +1,39 @@
+Revision history for WebService-YTSearch
+
+0.0302 2021-11-18 07:52:41
+    - Improve the eg/harvest program lsightly.
+
+0.0301 2021-11-17 17:10:14
+    - Improve documentation.
+    - Fix-up test file.
+
+0.0300 2021-11-17 11:08:49
+    - Fix Mojo::URL in the module code.
+
+0.0204 2021-11-17 09:29:42
+    - Improve the eg/harvest program.
+    - Use more Mojo::URL! :D
+
+0.0203 2021-11-16 21:20:02
+    - Improve the eg/ code again.
+
+0.0202 2021-11-16 20:16:39
+    - Fix the eg/ code more...
+
+0.0201 2021-11-16 17:02:55
+    - Fix-up the eg/harvest-drybar code.
+    - Improve documentation.
+    - Fix tests.
+
+0.0200 2021-11-16 14:42:21
+    - Simplify the search method arguments.
+    - Improve documentation.
+
+0.0102 2021-11-16 14:23:39
+    - Remove dzil artifact.
+
+0.0101 2021-11-16 14:06:27
+    - Fix-up the eg code.
+
+0.0100 2021-11-16 13:49:35
+    - Copy from WebService-Hooktheory

@@ -60,7 +60,7 @@
    "provides" : {
       "Path::Class::Tiny" : {
          "file" : "lib/Path/Class/Tiny.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/barefootcoder/path-class-tiny"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_generated_by_perl" : "v5.14.4",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }

@@ -1,3 +1,4 @@
+Build
 Build.PL
 CONTRIBUTING.md
 Changes
@@ -7,6 +8,7 @@ META.json
 META.yml
 README
 cpanfile
+lib/App/Perlbrew/HTTP.pm
 lib/App/Perlbrew/Path.pm
 lib/App/Perlbrew/Path/Installation.pm
 lib/App/Perlbrew/Path/Installations.pm
@@ -74,6 +76,7 @@ t/installation-perlbrew.t
 t/installation.t
 t/installation2.t
 t/installation3.t
+t/list_modules.t
 t/test.tar.gz
 t/test_helpers.pl
 t/unit-files-are-the-same.t

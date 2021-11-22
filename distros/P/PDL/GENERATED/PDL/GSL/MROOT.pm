@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSL::MROOT;
 
-our @EXPORT_OK = qw( gslmroot_fsolver PDL::PP fsolver_meat );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gslmroot_fsolver fsolver_meat );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSL::MROOT ;
+
 
 
 
@@ -71,10 +70,7 @@ to the algorithms in the GSL library that do not use derivatives.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -124,7 +120,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head2 gslmroot_fsolver
 
@@ -181,5 +177,3 @@ PDL distribution, the copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

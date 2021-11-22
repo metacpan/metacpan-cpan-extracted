@@ -1,0 +1,51 @@
+# PODNAME: Config::Model::models::Systemd::StandAlone::Service
+# ABSTRACT:  Configuration class Systemd::StandAlone::Service
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Systemd::StandAlone::Service - Configuration class Systemd::StandAlone::Service
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 Service
+
+I< Optional. Type node of class L<Systemd::Section::Service|Config::Model::models::Systemd::Section::Service> .  > 
+
+=head2 Unit
+
+I< Optional. Type node of class L<Systemd::Section::ServiceUnit|Config::Model::models::Systemd::Section::ServiceUnit> .  > 
+
+=head2 Install
+
+I< Optional. Type node of class L<Systemd::Section::Install|Config::Model::models::Systemd::Section::Install> .  > 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::Install>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::Service>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::ServiceUnit>
+
+=back
+
+=cut
+

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.144;
+package Config::Model 2.145;
 
 use 5.20.0;
 use strict ;
@@ -34,8 +34,8 @@ with "Config::Model::Role::Constants";
 use parent qw/Exporter/;
 our @EXPORT_OK = qw/cme initialize_log4perl/;
 
-use feature qw/signatures/;
-no warnings qw/experimental::signatures/;
+use feature qw/signatures postderef/;
+no warnings qw/experimental::signatures experimental::postderef/;
 
 # used in some tests where we don't want to load
 # ~/.log4config-model config
@@ -1280,7 +1280,10 @@ sub find_model_file_in_inc {
 
     my $path_load_file ;
 
-    if ($self->model_dir and $self->model_dir =~ m!^/!) {
+    if ($load_file and $load_file =~ m!^/! ) {
+        # load_file is absolute, do not search in @INC
+        $path_load_file = $load_file;
+    } elsif ($self->model_dir and $self->model_dir =~ m!^/!) {
         # model_dir is absolute, do not search in @INC
         my $model_path = path($self->model_dir);
         $path_load_file = find_model_file_in_dir ($model_name, $model_path);
@@ -1893,7 +1896,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.144
+version 2.145
 
 =head1 SYNOPSIS
 

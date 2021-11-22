@@ -1,10 +1,19 @@
-SYNOPSIS
+NAME
+    Acme::CPANAuthors::CPAN::TopDepended::ByOthers - Authors with the
+    largest number of other authors' distributions depending on one of
+    his/her modules
 
+VERSION
+    This document describes version 0.004 of
+    Acme::CPANAuthors::CPAN::TopDepended::ByOthers (from Perl distribution
+    Acme-CPANAuthors-CPAN-TopDepended-ByOthers), released on 2021-11-17.
+
+SYNOPSIS
        use Acme::CPANAuthors;
-       use Acme::CPANAuthors::TopDepended::ByOthers;
-    
+       use Acme::CPANAuthors::CPAN::TopDepended::ByOthers;
+
        my $authors = Acme::CPANAuthors->new('CPAN::TopDepended::ByOthers');
-    
+
        my $number   = $authors->count;
        my @ids      = $authors->id;
        my @distros  = $authors->distributions('RJBS');
@@ -12,7 +21,6 @@ SYNOPSIS
        my $kwalitee = $authors->kwalitee('RJBS');
 
 DESCRIPTION
-
     This module, like Acme::CPANAuthors::CPAN::TopDepended, lists 50 CPAN
     authors with the largest number of distributions directly depending to
     one of his/her modules. The difference is, only distributions by other
@@ -27,16 +35,118 @@ DESCRIPTION
 
     Statistics of the CPAN mirror:
 
-    # COMMAND: lcpan stats-last-index-time --format text-pretty
+     +---------------------+--------------------------------+
+     | key                 | value                          |
+     +---------------------+--------------------------------+
+     | cpan                | /home/u1/cpan                  |
+     | index_name          | /media/minicpan-index/index.db |
+     | last_index_time     | 2021-11-16T19:50:46Z           |
+     | raw_last_index_time | 1637092246                     |
+     +---------------------+--------------------------------+
 
     Current ranking:
 
-    # CODE: require Perinci::Result::Format::Lite; print
-    Perinci::Result::Format::Lite::format($main::res, 'text-pretty');
+     +-----------+----------------------------------------+------------+------+
+     | id        | name                                   | rdep_count | rank |
+     +-----------+----------------------------------------+------------+------+
+     | EXODIST   | Chad Granum                            | 23489      | 1    |
+     | BINGOS    | Chris Williams                         | 21476      | 2    |
+     | XSAWYERX  | Sawyer X                               | 13998      | 3    |
+     | ETHER     | Karen Etheridge                        | 13938      | 4    |
+     | TODDR     | Todd Rinaldo                           | 9492       | 5    |
+     | RJBS      | Ricardo SIGNES                         | 9053       | 6    |
+     | LEONT     | Leon Timmermans                        | 7833       | 7    |
+     | NEILB     | Neil Bowers                            | 6642       | 8    |
+     | HAARG     | Graham Knop                            | 5143       | 9    |
+     | OALDERS   | Olaf Alders                            | 4634       | 10   |
+     | PEVANS    | Paul Evans                             | 4398       | 11   |
+     | DAGOLDEN  | David Golden                           | 4184       | 12   |
+     | PETDANCE  | Andy Lester                            | 2967       | 13   |
+     | ISHIGAKI  | Kenichi Ishigaki                       | 2868       | 14   |
+     | DROLSKY   | Dave Rolsky                            | 2824       | 15   |
+     | ATOOMIC   | icolas .                               | 2698       | 16   |
+     | CAPOEIRAB | Chase Whitener                         | 2631       | 17   |
+     | BARBIE    | Barbie                                 | 2603       | 18   |
+     | NWCLARK   | Nicholas Clark                         | 2316       | 19   |
+     | CORION    | Max Maischein                          | 1988       | 20   |
+     | REHSACK   | Jens Rehsack                           | 1905       | 21   |
+     | MIYAGAWA  | Tatsuhiko Miyagawa                     | 1819       | 22   |
+     | TOKUHIROM | Tokuhiro Matsuno''<xmp>                | 1711       | 23   |
+     | PLICEASE  | Graham Ollis                           | 1635       | 24   |
+     | SMUELLER  | Steffen Mueller                        | 1488       | 25   |
+     | DANKOGAI  | Dan Kogai                              | 1411       | 26   |
+     | SKAJI     | Shoichi Kaji                           | 1337       | 27   |
+     | JV        | Johan Vromans                          | 1251       | 28   |
+     | TINITA    | Tina Muller                            | 1229       | 29   |
+     | MLEHMANN  | Marc A. Lehmann                        | 1188       | 30   |
+     | SHLOMIF   | Shlomi Fish                            | 1166       | 31   |
+     | JKEENAN   | James E Keenan                         | 1154       | 32   |
+     | TOBYINK   | Toby Inkster                           | 1142       | 33   |
+     | APOCAL    | Apocalypse                             | 1122       | 34   |
+     | RIBASUSHI | Peter Rabbitson                        | 1104       | 35   |
+     | TIMB      | Tim Bunce                              | 1042       | 36   |
+     | SRI       | Sebastian Riedel                       | 976        | 37   |
+     | OVID      | Curtis 'Ovid' Poe                      | 919        | 38   |
+     | KENTNL    | Kent Fredric (PAUSE Custodial Account) | 741        | 39   |
+     | KASEI     | Marty Pauley                           | 713        | 40   |
+     | KWILLIAMS | Ken Williams                           | 702        | 41   |
+     | ZEFRAM    | Andrew Main (Zefram)                   | 694        | 42   |
+     | ETJ       | Ed J                                   | 685        | 43   |
+     | SYP       | Stanislaw Pusep                        | 647        | 44   |
+     | ABRAXXA   | Alexander Hartmaier                    | 640        | 45   |
+     | DOHERTY   | Mike Doherty                           | 574        | 46   |
+     | RTHOMPSON | Ryan C. Thompson                       | 570        | 47   |
+     | DOLMEN    | Olivier Mengue                         | 567        | 48   |
+     | GARU      | Breno G. de Oliveira                   | 552        | 49   |
+     | RURBAN    | Reini Urban                            | 549        | 50   |
+     +-----------+----------------------------------------+------------+------+
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANAuthors-CPAN-TopDepended-ByOthers
+    >.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANAuthors-CPAN-TopDepended-ByO
+    thers>.
 
 SEE ALSO
-
     Acme::CPANAuthors
 
     Acme::CPANAuthors::CPAN::TopDepended
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-CPAN
+    -TopDepended-ByOthers>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

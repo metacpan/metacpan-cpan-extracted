@@ -18,26 +18,22 @@ my %WriteMakefileArgs = (
     "script/list-regexp-pattern-modules",
     "script/list-regexp-pattern-patterns",
     "script/match-with-regexp-pattern",
-    "script/rpgrep",
     "script/show-regexp-pattern-module"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::RegexpPatternUtils",
   "PREREQ_PM" => {
-    "AppBase::Grep" => "0.007",
     "Complete::Module" => "0.262",
     "Data::Dump::Color" => "0.246",
     "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => "0.907",
     "Data::Sah::Compiler::perl::TH::hash" => "0.907",
     "Data::Sah::Compiler::perl::TH::str" => "0.907",
-    "Log::ger" => "0.038",
     "Module::List::Tiny" => 0,
     "Perinci::CmdLine::Any" => "0.152",
     "Perinci::CmdLine::Lite" => "1.905",
     "Perinci::Sub::Gen::AccessTable" => "0.586",
-    "Perinci::Sub::Util" => "0.470",
     "Regexp::Pattern" => "0.2.7",
     "Sah::Schema::regexppattern::name" => 0,
     "strict" => 0,
@@ -49,7 +45,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,7 +53,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "AppBase::Grep" => "0.007",
   "Complete::Module" => "0.262",
   "Data::Dump::Color" => "0.246",
   "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
@@ -67,12 +62,10 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.038",
   "Module::List::Tiny" => 0,
   "Perinci::CmdLine::Any" => "0.152",
   "Perinci::CmdLine::Lite" => "1.905",
   "Perinci::Sub::Gen::AccessTable" => "0.586",
-  "Perinci::Sub::Util" => "0.470",
   "Regexp::Pattern" => "0.2.7",
   "Sah::Schema::regexppattern::name" => 0,
   "Test::More" => 0,

@@ -1,5 +1,14 @@
 Revision history for Perl module Archive::Peek:
 
+0.37 Fri Nov 12 22:23:12 EST 2021
+     - update repository metadata (Zakariyya Mughal)
+
+0.36 Fri Nov 12 21:40:27 EST 2021
+     - add repository metadata (thanks David Steinbrunner)
+     - port from Moose to Moo and Type::Tiny (Zakariyya Mughal)
+     - make prereqs more specific with respect to phase (Zakariyya Mughal)
+     - add negative test (Zakariyya Mughal)
+
 0.35 Mon Sep 26 20:21:30 BST 2011
      - add support for .tar.bz2 (as suggested by Fabrizio Regalli)
 

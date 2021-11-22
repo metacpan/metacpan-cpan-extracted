@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our $VERSION = "0.9901";
+
+BEGIN {
+    if ($0 =~ /unexpand$/) {
+	$App::ansiexpand::DEFAULT_UNEXPAND = 1;
+    }
+}
+
+use  App::ansiexpand;
+exit App::ansiexpand->new->run(splice @ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+ansiunexpand - ANSI sequences aware tab unexpand command
+
+=head1 SYNOPSIS
+
+    ansiunexpand [ option ] file ...
+
+=head1 VERSION
+
+Version 0.9901
+
+=head1 DESCRIPTION
+
+See L<ansiexpand(1)>.
+
+=head1 SEE ALSO
+
+L<App::ansiexpand>, L<https://github.com/kaz-utashiro/App-ansiexpand>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2021 Kazumasa Utashiro
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

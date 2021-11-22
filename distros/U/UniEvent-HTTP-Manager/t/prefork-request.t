@@ -12,10 +12,9 @@ my $l = UE::Loop->default;
 my $root = $$;
 my $mgr = UniEvent::HTTP::Manager->new({
     worker_model => UniEvent::HTTP::Manager::WORKER_PREFORK,
-    bind_model   => UniEvent::HTTP::Manager::BIND_DUPLICATE,
     min_servers  => 1,
     max_servers  => 1,
-    server       => { locations => [{host => '127.0.0.1', port => 0}], },
+    server       => { locations => [{host => '127.0.0.1', port => 0, reuse_port => 0}], },
 }, $l);
 
 $mgr->request_callback(sub {

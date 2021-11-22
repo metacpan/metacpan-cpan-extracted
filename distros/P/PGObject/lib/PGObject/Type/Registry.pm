@@ -24,12 +24,18 @@ PGObject::Type::Registry - Registration of types for handing db types
 =cut
 
 package PGObject::Type::Registry;
+
 use strict;
 use warnings;
-use Try::Tiny;
-use Carp;
 
-our $VERSION = 1.000000;
+
+use Carp::Clan qr/^PGObject\b/;
+use List::MoreUtils qw(pairwise);
+use Log::Any qw($log);
+use Scalar::Util qw(reftype);
+
+
+our $VERSION = '2.3.1';
 
 my %registry = ( default => {} );
 
@@ -88,14 +94,17 @@ A warning is thrown if no
 sub register_type {
     my ( $self, %args ) = @_;
     my %defaults = ( registry => 'default' );
-    carp 'Using default registry'    unless $args{registry};
-    croak 'Must provide dbtype arg'  unless $args{dbtype};
-    croak 'Must provide apptype arg' unless $args{apptype};
+    carp $log->warn( 'Using default registry' )
+        unless $args{registry};
+    croak $log->error( 'Missing dbtype arg' )
+        unless $args{dbtype};
+    croak $log->error( 'Missing apptype arg' )
+        unless $args{apptype};
     delete $args{registry}           unless defined $args{registry};
     %args = ( %defaults, %args );
-    croak 'Registry does not exist yet'
+    croak $log->error( 'Registry does not exist yet' )
         unless exists $registry{ $args{registry} };
-    croak 'Type registered with different target'
+    croak $log->error( 'Type registered with different target' )
         if exists $registry{ $args{registry} }->{ $args{dbtype} }
         and $registry{ $args{registry} }->{ $args{dbtype} } ne $args{apptype};
     $args{apptype} =~ /^(.*)::(\w*)$/;
@@ -117,7 +126,7 @@ sub register_type {
 =head1 UNREGISTERING A TYPE
 
 To unregister a type, you provide the dbtype and registry information, both
-of which are required.  Note that at that this is rarely needed.
+of which are required.  Note that at this time this is rarely needed.
 
 =head2 unregister_type
 
@@ -125,11 +134,13 @@ of which are required.  Note that at that this is rarely needed.
 
 sub unregister_type {
     my ( $self, %args ) = @_;
-    croak 'Must provide registry'   unless $args{registry};
-    croak 'Must provide dbtype arg' unless $args{dbtype};
-    croak 'Registry does not exist yet'
+    croak $log->error( 'Missing registry' )
+        unless $args{registry};
+    croak $log->error( 'Missing dbtype arg' )
+        unless $args{dbtype};
+    croak $log->error( 'Registry does not exist yet' )
         unless exists $registry{ $args{registry} };
-    croak 'Type not registered'
+    carp $log->warn( 'Type not registered' )
         unless $registry{ $args{registry} }->{ $args{dbtype} };
     delete $registry{ $args{registry} }->{ $args{dbtype} };
 }
@@ -150,28 +161,115 @@ This function returns the output of the from_db method.
 
 sub deserialize {
     my ( $self, %args ) = @_;
+
+    croak $log->error( "Missing dbstring arg" )
+        unless exists $args{dbstring};
+    return $self->deserializer( %args )->( $args{dbstring} );
+}
+
+=head2 deserializer
+
+This returns a coderef to deserialize data from a db string. The coderef
+should be called with a single argument: the argument that would be passed
+as 'dbstring' into C<deserialize>. E.g.:
+
+   my $deserializer = PGObject::Type::Registry->deserializer(dbtype => $type);
+   my $value = $deserializer->($dbvalue);
+
+Mandatory argument is dbtype.
+The registry arg should be provided but if not, a warning will be issued and
+'default' will be used.
+
+This function returns the output of the C<from_db> method of the registered
+class.
+
+=cut
+
+sub deserializer {
+    my ( $self, %args ) = @_;
     my %defaults = ( registry => 'default' );
-    carp 'No registry specified, using default' unless exists $args{registry};
-    croak "Must specify dbtype arg"             unless $args{dbtype};
-    croak "Must specify dbstring arg"           unless exists $args{dbstring};
+    carp $log->info( 'No registry specified, using default' )
+        unless exists $args{registry};
+    croak $log->error( "Missing dbtype arg" )
+        unless $args{dbtype};
     %args = ( %defaults, %args );
     my $arraytype = 0;
     if ( $args{dbtype} =~ /^_/ ) {
         $args{dbtype} =~ s/^_//;
         $arraytype = 1;
     }
-    no strict 'refs';
-    return $args{dbstring}
+
+    return $args{_unmapped_undef} ? undef : sub { shift }
         unless $registry{ $args{registry} }->{ $args{dbtype} };
 
-    return [ map { $self->deserialize( %args, dbstring => $_ ) }
-            @{ $args{dbstring} } ]
-        if $arraytype;
+    if ($arraytype) {
+        my $deserializer = $self->deserializer( %args );
+        return sub { [ map { $deserializer->( $_ ) } @{ (shift) } ] };
+    }
 
-    return "$registry{$args{registry}}->{$args{dbtype}}"->can('from_db')->(
-        $registry{ $args{registry} }->{ $args{dbtype} },
-        $args{dbstring}, $args{dbtype}
-    );
+    my $clazz = $registry{ $args{registry} }->{ $args{dbtype} };
+    my $from_db = $clazz->can('from_db');
+    my $dbtype = $args{dbtype};
+    return sub { $from_db->($clazz, (shift), $dbtype); }
+}
+
+=head2 rowhash_deserializer
+
+This returns a coderef to deserialize data from a call to e.g.
+C<fetchrow_arrayref>. The coderef should be called with a single argument:
+the hash that holds the row values with the keys being the column names.
+
+Mandatory argument is C<types>, which is either an arrayref or hashref.
+In case of a hashref, the keys are the names of the columns to be expected
+in the data hashrefs. The values are the types (same as the C<dbtype>
+parameter of the C<deserialize> method). In case of an arrayref, an additional
+argument C<columns> is required, containing the names of the columns in the
+same order as C<types>.
+
+The registry arg should be provided but if not, a warning will be issued and
+'default' will be used.
+
+This function returns the output of the C<from_db> method of the registered
+class.
+
+=cut
+
+sub rowhash_deserializer {
+    my ( $self, %args ) = @_;
+    my %defaults = ( registry => 'default' );
+    carp $log->warn( 'No registry specified, using default' )
+        unless exists $args{registry};
+    croak $log->error( 'No types specied' )
+        unless exists $args{types};
+
+    %args = ( %defaults, %args );
+    my $types = $args{types};
+
+    if (reftype $types eq 'ARRAY') {
+        croak $log->error( 'No columns specified' )
+            unless exists $args{columns};
+
+        $types = { pairwise { $a => $b } @{$args{columns}}, @$types };
+    }
+
+    my %column_deserializers =
+        map { $_ => $self->deserializer(dbtype          => $types->{$_},
+                                        registry        => $args{registry},
+                                        _unmapped_undef => 1)  } keys %$types;
+    for (keys %column_deserializers) {
+        if (not defined $column_deserializers{$_}) {
+            delete $column_deserializers{$_}
+        }
+    }
+    return sub {
+        my $row = shift;
+
+        for my $col (keys %column_deserializers) {
+            $row->{$col} =
+                $column_deserializers{$col}->( $row->{$col} );
+        }
+        return $row;
+    }
 }
 
 =head1 INSPECTING A REGISTRY
@@ -187,8 +285,10 @@ $name is required.  If it does not exist an exception is thrown.
 
 sub inspect {
     my ( $self, $name ) = @_;
-    croak 'Must specify a name' unless $name;
-    croak 'Registry does not exist' unless exists $registry{$name};
+    croak $log->error( 'Must specify a name' )
+        unless $name;
+    croak $log->error( 'Registry does not exist' )
+        unless exists $registry{$name};
     return { %{ $registry{$name} } };
 }
 
@@ -204,7 +304,7 @@ sub list {
 
 =head1 COPYRIGHT AND LICENSE
 
-COPYRIGHT (C) 2017 The LedgerSMB Core Team
+COPYRIGHT (C) 2017-2021 The LedgerSMB Core Team
 
 Redistribution and use in source and compiled forms with or without
 modification, are permitted provided that the following conditions are met:

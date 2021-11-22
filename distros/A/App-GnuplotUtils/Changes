@@ -1,3 +1,27 @@
+0.003   2021-07-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [incompatible change] Rename --datasets to --dataset-datas
+	  (multiple --dataset-data).
+
+        - Add option --output-file & --overwrite.
+
+        - [ux] Use Desktop::Open instead of Browser::Open.
+
+        - [bugfix] Plotting multiple datasets didn't work because we
+	  didn't pass all the datasets to plot2d().
+
+        - [ux] Change default style from 'points' to 'linespoints' which is more
+	  visible.
+
+        - [doc] Give more examples.
+
+        - [ux] Allow --dataset-file to be given as arguments, for brevity
+
+        - [ux] Better defaults for chart & dataset title.
+
+        - [ux] Allow field separator to be comma or whitespace.
+
+
 0.002   2020-12-10  Released-By: PERLANCAR; Urgency: medium
 
 	[cli xyplot]

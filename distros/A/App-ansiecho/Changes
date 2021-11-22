@@ -1,5 +1,9 @@
 Revision history for Perl script App-ansiecho
 
+0.07 2021-11-08T13:47:47Z
+
+    - Use the latest Getopt::EX::Hashed interface.
+
 0.06 2021-11-01T22:53:41Z
 
     - Use Getopt::EX@v1.25.0 in which color spec V becomes H.

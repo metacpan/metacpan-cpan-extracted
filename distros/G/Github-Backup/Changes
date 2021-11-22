@@ -1,23 +1,41 @@
 Revision history for Github-Backup
 
+1.04    2021-11-14
+    - We now save open and closed tickets. Open are in backup/issues/repo/open
+      and closed in backup/issues/repo/closed
+
+1.03    2021-11-14
+    - Added 'auto_pagination => 1' to Pithub instantiation which was limiting
+      the number of repositories we operate on to 100 (fixes #3)
+    - Added list(), returns a full list of repository objects
+    - Added --list, prints to STDOUT the full list of available repository
+      objects for the given user
+    - Changed github_backup to github-backup
+    - We now output information on what repo/issue we're working on
+    - Added Hook::Output::Tiny to hide STDERR messages when cloning
+    - Added finish(), so we can set up the backup directory before object
+      destruction
+    - Added POD for _cleanup
+    - Ran Dist::Mgr install for new CI information
+
 1.02    2018-02-12
-        - fix missing newline backslash in SYNOPSIS
-        - added new "FUTURE DIRECTION" POD heading
-        - -h flag is taken as priority in github_backup, and no longer prints
-          erroneous warnings for missing args
-        - we now properly respect GITHUB_TOKEN env var
+    - fix missing newline backslash in SYNOPSIS
+    - added new "FUTURE DIRECTION" POD heading
+    - -h flag is taken as priority in github_backup, and no longer prints
+      erroneous warnings for missing args
+    - we now properly respect GITHUB_TOKEN env var
 
 1.01    2018-02-11
-        - added repos() and issues()
-        - added tests
-        - added github_backup binary
-        - added prereq JSON
-        - cleaned up POD tests; we skip accessor sub docs
-        - we create repo directories under issues dir only if the repo has any
-          issues
+    - added repos() and issues()
+    - added tests
+    - added github_backup binary
+    - added prereq JSON
+    - cleaned up POD tests; we skip accessor sub docs
+    - we create repo directories under issues dir only if the repo has any
+      issues
 
 0.01    Date/time
-        - First version, released on an unsuspecting world.
-        - added Travis-CI and Coveralls.io integration
+    - First version, released on an unsuspecting world.
+    - added Travis-CI and Coveralls.io integration
 
 

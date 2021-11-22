@@ -21,6 +21,7 @@ do { my $x = {
                                       'List::Util' => '0',
                                       'Moo' => '0',
                                       'Pod::Usage' => '0',
+                                      'Try::Tiny' => '0',
                                       'YAML::PP' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'

@@ -6,7 +6,7 @@ require 5.008_001;
 
 # ABSTRACT: SAML2 bindings and protocol implementation
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 $VERSION = eval {$VERSION};
 
 
@@ -41,7 +41,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

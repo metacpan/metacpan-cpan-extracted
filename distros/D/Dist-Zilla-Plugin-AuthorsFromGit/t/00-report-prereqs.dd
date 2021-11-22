@@ -1,0 +1,38 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'DateTime' => '0',
+                                      'Dist::Zilla::Role::FileFinderUser' => '0',
+                                      'Dist::Zilla::Role::FileMunger' => '0',
+                                      'Git::Wrapper' => '0',
+                                      'List::MoreUtils' => '0.4',
+                                      'List::Util' => '1.33',
+                                      'Moose' => '0',
+                                      'Pod::Weaver::Config::Assembler' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Find' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Spec::Functions' => '0',
+                                   'Module::Load' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.010'
+                                 }
+                 }
+     };
+  $x;
+ }

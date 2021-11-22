@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::VNASweep;
-$Lab::Moose::Instrument::VNASweep::VERSION = '3.791';
+$Lab::Moose::Instrument::VNASweep::VERSION = '3.792';
 #ABSTRACT: Role for network analyzer sweeps
 
 use v5.20;
@@ -203,7 +203,7 @@ Lab::Moose::Instrument::VNASweep - Role for network analyzer sweeps
 
 =head1 VERSION
 
-version 3.791
+version 3.792
 
 =head1 METHODS
 

@@ -387,7 +387,6 @@ t/SCPI/shortform.t
 t/XPRESS/LogBlock.t
 t/XPRESS/Sweep-Voltage.t
 t/XPRESS/Sweep-Voltage.yml
-t/pod.t
 t/update-ids.pl
 'utilities/labview/LV Socket Com.txt'
 'utilities/labview/LV Socket Com.vi'
@@ -401,4 +400,5 @@ xt/moose-plot-test-multiline.pl
 xt/moose-plot-test.pl
 xt/perltidy.pl
 xt/pod-manual-coverage.t
+xt/pod.t
 xt/pre-commit.pl

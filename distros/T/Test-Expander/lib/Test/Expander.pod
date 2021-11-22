@@ -201,6 +201,9 @@ variables and subroutines must not be quoted:
 
 =back
 
+All environment variables set up in this manner are logged to STDOUT
+using L<note|https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS>.
+
 Another common feature within test suites is the creation of a temporary directory / file used as an
 isolated container for some testing actions.
 The module options B<-tempdir> and B<-tempfile> are fully syntactically compatible with
@@ -353,6 +356,7 @@ if the option B<-tempfile> was supplied.
 =back
 
 All variables mentioned above are read-only if they are defined after B<use Test::Expander ...>.
+In this case they are logged to STDOUT using L<note|https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS>.
 
 =head1 AUTHOR
 

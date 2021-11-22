@@ -1,6 +1,6 @@
 package App::ansiecho;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use v5.14;
 use warnings;
@@ -28,6 +28,15 @@ use Getopt::EX::Hashed; {
     has help       => " h    " ;
     has version    => " v    " ;
 
+    has '+separate' => action => sub {
+	my($name, $arg) = map "$_", @_;
+	$_->{$name} = safe_backslash($arg);
+    };
+
+    has '+rgb24' => action => sub {
+	$Getopt::EX::Colormap::RGB24 = !!$_[1];
+    };
+
     has '+help' => action => sub {
 	pod2usage
 	    -verbose  => 99,
@@ -52,25 +61,19 @@ use List::Util qw(sum);
 
 sub run {
     my $app = shift;
-    @ARGV = decode_argv @ARGV;
-
-    use Getopt::EX::Long qw(GetOptions Configure ExConfigure);
-    ExConfigure BASECLASS => [ __PACKAGE__, "Getopt::EX" ];
-    Configure qw(bundling no_getopt_compat pass_through);
-    $app->getopt || pod2usage();
-    $app->initialize();
-    $app->params(\@ARGV);
-    print join($app->separate, $app->retrieve()), $app->terminate;
+    $app->options(@_);
+    print join($app->separate, $app->retrieve), $app->terminate;
 }
 
-sub initialize {
+sub options {
     my $app = shift;
-    if ($app->separate) {
-	$app->separate(safe_backslash($app->separate));
-    }
-    if (defined $app->rgb24) {
-	$Getopt::EX::Colormap::RGB24 = !!$app->rgb24;
-    }
+    my @argv = decode_argv @_;
+    use Getopt::EX::Long qw(GetOptionsFromArray Configure ExConfigure);
+    ExConfigure BASECLASS => [ __PACKAGE__, "Getopt::EX" ];
+    Configure qw(bundling no_getopt_compat pass_through);
+    $app->getopt(\@argv) || pod2usage();
+    $app->params(\@argv);
+    $app;
 }
 
 use Getopt::EX::Colormap qw(colorize ansi_code);

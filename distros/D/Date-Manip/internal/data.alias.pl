@@ -269,7 +269,7 @@ foreach my $hpuxz (keys %hpux_zones) {
    'AKST9AKDT'     => 'America/Anchorage',
    'AST10APT'      => 'America/Anchorage',
    'AST4ADT'       => 'America/Halifax',
-   'AST4APT'       => 'America/Blanc-Sablon',
+   'AST4APT'       => 'America/Glace_Bay',
    'AWST-8AWDT'    => 'Australia/Perth',
    'BST11BDT'      => 'America/Adak',
    'CAT-2CAST'     => 'Africa/Juba',

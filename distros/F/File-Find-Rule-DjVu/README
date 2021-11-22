@@ -1,0 +1,112 @@
+NAME
+    File::Find::Rule::DjVu - Common rules for searching DjVu files.
+
+SYNOPSIS
+     use File::Find::Rule;
+     use File::Find::Rule::DjVu;
+
+     my @files = File::Find::Rule->djvu->in($dir);
+     my @files = File::Find::Rule->djvu_chunk($chunk_name)->in($dir);
+
+DESCRIPTION
+    This Perl module contains File::Find::Rule rules for detecting DjVu
+    files.
+
+    See DjVu on Wikipedia <https://en.wikipedia.org/wiki/DjVu>.
+
+    This rule provides functionality for findrule script in directory with
+    djvu files in ways:
+
+     findrule -djvu
+
+     findrule -djvu_chunk INFO
+
+SUBROUTINES
+  "djvu"
+     my @files = File::Find::Rule->djvu->in($dir);
+
+    The "djvu" rule detect DjVu files.
+
+  "djvu_chunk"
+     my @files = File::Find::Rule->djvu_chunk($chunk_name)->in($dir);
+
+    The "djvu_chunk($chunk_name)" rule detect DjVu files with chunk name
+    (e.g. INFO).
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::DjVu;
+
+     # Arguments.
+     if (@ARGV < 2) {
+             print STDERR "Usage: $0 dir djvu_chunk\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+     my $djvu_chunk = $ARGV[1];
+
+     # Print all DjVu files in directory with chunk.
+     foreach my $file (File::Find::Rule->djvu_chunk($djvu_chunk)->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::DjVu;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 dir\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+
+     # Print all DjVu files in directory.
+     foreach my $file (File::Find::Rule->djvu->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir
+
+DEPENDENCIES
+    DjVu::Detect, File::Find::Rule.
+
+SEE ALSO
+    DjVu::Detect
+        Detect DjVu files.
+
+    File::Find::Rule
+        Alternative interface to File::Find.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/File-Find-Rule-DjVu>
+
+TEST FILES
+    Test file 11a7ffc0-c61e-11e6-ac1c-001018b5eb5c.djvu is generated from
+    scanned book edition from
+    <http://www.digitalniknihovna.cz/mzk/view/uuid:814e66a0-b6df-11e6-88f6-0
+    05056827e52?page=uuid:11a7ffc0-c61e-11e6-ac1c-001018b5eb5c>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2021
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

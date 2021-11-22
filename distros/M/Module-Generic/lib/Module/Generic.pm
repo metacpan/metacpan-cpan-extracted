@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.16.4
+## Version v0.17.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/10/22
+## Modified 2021/11/16
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -55,6 +55,8 @@ BEGIN
     {
         select( ( select( STDOUT ), $| = 1 )[ 0 ] );
         require Apache2::Log;
+        # For _is_class_loaded method
+        require Apache2::Module;
         require Apache2::ServerUtil;
         require Apache2::RequestUtil;
         require Apache2::ServerRec;
@@ -67,7 +69,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.16.4';
+    $VERSION     = 'v0.17.2';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -1105,22 +1107,15 @@ sub error
             $o = $this->{error} = ${ $class . '::ERROR' } = $ex_class->new( $args );
         }
         
-        ## Get the warnings status of the caller. We use caller(1) to skip one frame further, ie our caller's caller
-        ## This can be changed by using 'no warnings'
+        # Get the warnings status of the caller. We use caller(1) to skip one frame further, ie our caller's caller
+        # This can be changed by using 'no warnings'
         my $should_display_warning = 0;
         my $no_use_warnings = 1;
         unless( $this->{quiet} )
         {
-            ## Try to get the warnings status if is enabled at all.
-            try
-            {
-                $should_display_warning = $self->_warnings_is_enabled;
-                $no_use_warnings = 0;
-            }
-            catch( $e )
-            {
-                # 
-            }
+            # Try to get the warnings status if is enabled at all.
+            $should_display_warning = $self->_warnings_is_enabled;
+            $no_use_warnings = 0;
         
             ## If no warnings are registered for our package, we display warnings.
             if( $no_use_warnings && !defined( $warnings::Bits{ $class } ) )
@@ -1150,7 +1145,7 @@ sub error
         }
         
         my $r;
-        if( $MOD_PERL && $ENV{HTTP_HOST} )
+        if( $MOD_PERL )
         {
             try
             {
@@ -1248,6 +1243,8 @@ sub error_handler { return( shift->_set_get_code( '_error_handler', @_ ) ); }
 
 *errstr = \&error;
 
+sub fatal { return( shift->_set_get_boolean( 'fatal', @_ ) ); }
+
 sub get
 {
     my $self = shift( @_ );
@@ -1288,7 +1285,7 @@ sub init
     }
     
     ## If the calling module wants to set up object cleanup
-    if( $self->{_mod_perl_cleanup} && $MOD_PERL && $ENV{HTTP_HOST} )
+    if( $self->{_mod_perl_cleanup} && $MOD_PERL )
     {
         try
         {
@@ -1485,7 +1482,7 @@ sub message
     if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
     {
         my $r;
-        if( $MOD_PERL && $ENV{HTTP_HOST} )
+        if( $MOD_PERL )
         {
             try
             {
@@ -1635,6 +1632,7 @@ sub message_check
     my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
     my $this = $self->_obj2h;
+    no warnings 'uninitialized';
     if( @_ )
     {
         if( $_[0] !~ /^\d/ )
@@ -2218,6 +2216,7 @@ sub _get_args_as_hash
 {
     my $self = shift( @_ );
     return( {} ) if( !scalar( @_ ) );
+    no warnings 'uninitialized';
     my $ref = {};
     if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] ) )
     {
@@ -2302,7 +2301,7 @@ sub _is_class_loaded
 {
     my $self = shift( @_ );
     my $class = shift( @_ );
-    if( $ENV{MOD_PERL} )
+    if( $MOD_PERL )
     {
         # https://perl.apache.org/docs/2.0/api/Apache2/Module.html#C_loaded_
         # $self->message( 3, "Does module $class exists in \%INC using Apache2::Module ? ", Apache2::Module::loaded( $class ) ? 'yes' : 'no' );
@@ -2442,8 +2441,17 @@ sub _parse_timestamp
     my $str  = shift( @_ );
     ## No value was actually provided
     return if( !length( $str ) );
+    $str = "$str";
     my $this = $self->_obj2h;
-    my $tz = DateTime::TimeZone->new( name => 'local' );
+    # my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $tz = DateTime::TimeZone->new( name => 'Europe/Berlin' );
+    unless( DateTime->can( 'TO_JSON' ) )
+    {
+        *DateTime::TO_JSON = sub
+        {
+            return( $_[0]->stringify );
+        };
+    }
     my $error = 0;
     # For some Japanese here
     use utf8;
@@ -2507,7 +2515,7 @@ sub _parse_timestamp
     if( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})(?<sep>[\s\t]+)(?<hour>\d{1,2})(?<t_sep>\D)(?<minute>\d{1,2})(?:\D(?<second>\d{1,2}))?(?<tz>([+-])(\d{2})(\d{2}))$/ )
     {
         my $re = { %+ };
-        # $self->message( 3, "Pattern 1 (PO): ", sub{ $self->dump( $re )} );
+        $self->message( 3, "Pattern 1 (PO): ", sub{ $self->dump( $re )} );
         $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . join( $re->{t_sep}, qw( %H %M ) );
         if( length( $re->{second} ) )
         {
@@ -2521,10 +2529,10 @@ sub _parse_timestamp
     ## 2019-06-19 23:23:57.000000000+0900
     ## From PostgreSQL: 2019-06-20 11:02:36.306917+09
     ## ISO 8601: 2019-06-20T11:08:27
-    elsif( $str =~ /(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})(?:\.(?<milli>\d+))?(?<tz>(?:\+|\-)\d{2,4})?/ )
+    elsif( $str =~ /^(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})(?:\.(?<milli>\d+))?(?<tz>(?:\+|\-)\d{2,4})?$/ )
     {
         my $re = { %+ };
-        # $self->message( 3, "Pattern 2 (SQL): ", sub{ $self->dump( $re )} );
+        $self->message( 3, "Pattern 2 (SQL): ", sub{ $self->dump( $re )} );
         $opt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . '%T';
         $str = join( $re->{d_sep}, @$re{qw( year month day )} ) . $re->{sep} . $re->{time};
         if( length( $re->{milli} ) )
@@ -2534,18 +2542,7 @@ sub _parse_timestamp
         }
         $fmt->{pattern} = $opt->{pattern};
         
-        if( !length( $re->{tz} ) )
-        {
-            my $dt = DateTime->now( time_zone => $tz );
-            my $offset = $dt->offset;
-            ## e.g. 9 or possibly 9.5
-            my $offset_hour = ( $offset / 3600 );
-            ## e.g. 9.5 => 0.5 * 60 = 30
-            my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
-            $str .= sprintf( '%+03d%02d', $offset_hour, $offset_min );
-            $opt->{pattern} .= '%z';
-        }
-        else
+        if( length( $re->{tz} ) )
         {
             $opt->{pattern} .= '%z';
             $re->{tz} .= '00' if( length( $re->{tz} ) == 3 );
@@ -2554,21 +2551,106 @@ sub _parse_timestamp
             $fmt->{time_zone} = $opt->{time_zone} = $re->{tz};
         }
     }
-    ## From SQLite: 2019-06-20 02:03:14
-    ## From MySQL: 2019-06-20 11:04:01
-    elsif( $str =~ /(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})/ )
+    # From SQLite: 2019-06-20 02:03:14
+    # From MySQL: 2019-06-20 11:04:01
+    elsif( $str =~ /^(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})$/ )
     {
         my $re = { %+ };
-        $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . $re->{time};
+        # $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . $re->{time};
+        $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . '%T';
         $str = join( $re->{d_sep}, @$re{qw( year month day )} ) . $re->{sep} . $re->{time};
         my $dt = DateTime->now( time_zone => $tz );
         my $offset = $dt->offset;
-        ## e.g. 9 or possibly 9.5
+        # e.g. 9 or possibly 9.5
         my $offset_hour = ( $offset / 3600 );
-        ## e.g. 9.5 => 0.5 * 60 = 30
+        # e.g. 9.5 => 0.5 * 60 = 30
         my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
         $str .= sprintf( '%+03d%02d', $offset_hour, $offset_min );
+        # XXX
+        $self->message( 3, "Time zone '$tz', offset: '$offset', offset hour '$offset_hour', offset minute '$offset_min'. Resulting string is '$str' and pattern is '$opt->{pattern}'" );
         $opt->{pattern} .= '%z';
+    }
+    # e.g. Sun, 06 Oct 2019 06:41:11 GMT
+    elsif( $str =~ /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),[[:blank:]]+(?<day>\d{2})[[:blank:]]+(?<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[[:blank:]]+(?<year>\d{4})[[:blank:]]+(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})[[:blank:]]+GMT$/ )
+    {
+        my $re = { %+ };
+        $opt->{pattern} = $fmt->{pattern} = q{%a, %d %b %Y %T GMT};
+        $self->message( 3, "Pattern 'Sun, 06 Oct 2019 06:41:11 GMT'" );
+    }
+    # 12 March 2001 17:07:30 JST
+    # 12-March-2001 17:07:30 JST
+    # 12/March/2001 17:07:30 JST
+    # 12 March 2001 17:07
+    # 12 March 2001 17:07 JST
+    # 12 March 2001 17:07:30+0900
+    # 12 March 2001 17:07:30 +0900
+    # Monday, 12 March 2001 17:07:30 JST
+    # Monday, 12 Mar 2001 17:07:30 JST
+    # 03/Feb/1994:00:00:00 0000
+    elsif( $str =~ /^
+        (?:
+            (?:
+                (?<wd>Mon|Tue|Wed|Thu|Fri|Sat|Sun)
+                |
+                (?<wd_long>Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)
+            )
+            (?<wd_comma>\,)?(?<blank0>[[:blank:]]+)
+        )?
+        (?<day>\d{1,2})
+        (?<sep1>[[:blank:]]+|[-\/])
+        (?:
+            (?<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)
+            |
+            (?<month_long>January|February|March|April|May|June|July|August|September|Octocber|November|December)
+        )
+        (?<sep2>[[:blank:]]+|[-\/])
+        (?<year>\d{2}|\d{4})
+        (?<blank1>[[:blank:]]+)
+        (?<hour>\d{1,2})
+        :
+        (?<minute>\d{1,2})
+        (?:\:(?<second>\d{1,2}))?
+        (?<tz>
+            (?:
+                (?<blank2>[[:blank:]]*)
+                (?<tz1>[-+]?\d{2,4})
+            )
+            |
+            (?:
+                (?<blank2>[[:blank:]]+)
+                (?<tz2>(?![APap][Mm]\b)[A-Za-z]+)
+            )
+        )?$/x )
+    {
+        my $re = { %+ };
+        my @buff = ();
+        if( $re->{wd} || $re->{wd_long} )
+        {
+            push( @buff, ( $re->{wd} || $re->{wd_long} ) );
+            push( @buff, ',' ) if( $re->{wd_comma} );
+            push( @buff, $re->{blank0} );
+        }
+        push( @buff, length( $re->{day} ) > 1 ? '%d' : '%e' );
+        push( @buff, $re->{sep1} );
+        push( @buff, ( $re->{month} ? '%b' : '%B' ) );
+        push( @buff, $re->{sep2} );
+        push( @buff, length( $re->{year} ) == 2 ? '%y' : '%Y' );
+        push( @buff, $re->{blank1} );
+        if( $re->{hour} && $re->{minute} && $re->{second} )
+        {
+            push( @buff, '%T' );
+        }
+        elsif( $re->{hour} && $re->{minute} )
+        {
+            push( @buff, '%H:%M' );
+        }
+        
+        if( length( $re->{tz} ) )
+        {
+            push( @buff, ( length( $re->{tz1} ) ? ( ( $re->{blank2} // '' ) . $re->{tz1} ) : ( $re->{blank2} . $re->{tz2} ) ) );
+        }
+        $opt->{pattern} = $fmt->{pattern} = join( '', @buff );
+        $self->message( 3, "Pattern 'Monday, 12 March 2001 17:07:30 JST'" );
     }
     # 2019-06-20
     # 2019/06/20
@@ -2734,7 +2816,7 @@ sub _parse_timestamp
         }
     }
     # <https://en.wikipedia.org/wiki/Date_format_by_country>
-    elsif( $str =~ /^\d{10}$/ )
+    elsif( $str =~ /^\d{1,10}$/ )
     {
         try
         {
@@ -2749,18 +2831,23 @@ sub _parse_timestamp
             return( $self->error( "An error occurred while parsing the time stamp based on the unix timestamp '$str': $e" ) );
         }
     }
-    elsif( $str =~ /^([\+\-]?\d+)([YMDhms])$/ )
+    elsif( $str =~ /^([\+\-]?\d+)([YyMDdhms])?$/ )
     {
+        my( $num, $unit ) = ( $1, $2 );
+        $unit = 's' if( !length( $unit ) );
+        # $self->message( 3, "Value is actually a variable time." );
         my $interval =
         {
             's' => 1,
             'm' => 60,
             'h' => 3600,
             'D' => 86400,
+            'd' => 86400,
             'M' => 86400 * 30,
             'Y' => 86400 * 365,
+            'y' => 86400 * 365,
         };
-        my $offset = ( $interval->{$2} || 1 ) * int( $1 );
+        my $offset = ( $interval->{ $unit } || 1 ) * int( $num );
         my $ts = time() + $offset;
         try
         {
@@ -2774,7 +2861,7 @@ sub _parse_timestamp
     }
     elsif( lc( $str ) eq 'now' )
     {
-        ## $self->message( 3, "\tValue is actually the special keyword: '$str'" );
+        # $self->message( 3, "\tValue is actually the special keyword: '$str'" );
         my $dt = DateTime->now( time_zone => 'local' );
         return( $dt );
     }
@@ -3210,7 +3297,7 @@ sub _set_get_datetime
         }
         catch( $e )
         {
-            $self->message( "Error while trying to get the DateTime object for field $k with value $time: $e" );
+            $self->message( "Error while trying to get the DateTime object for field $field with value '$time': $e" );
         }
     };
     
@@ -3231,7 +3318,7 @@ sub _set_get_datetime
         my $null = Module::Generic::Null->new( '', { debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
     }
-    elsif( defined( $data->{ $field } ) && !$self->_is_a( $data->{ $field }, 'DateTime' ) )
+    elsif( defined( $data->{ $field } ) && length( $data->{ $field } ) && !$self->_is_a( $data->{ $field }, 'DateTime' ) )
     {
         my $now = $process->( $data->{ $field } ) || return( $self->pass_error );
         $data->{ $field } = $now;
@@ -4167,7 +4254,7 @@ AUTOLOAD
     if( $sub eq 'Module::Generic::AUTOLOAD' )
     {
         my $mesg = "Module::Generic::AUTOLOAD (called at line '$line') is looping for autoloadable method '$AUTOLOAD' and args '" . join( "', '", @_ ) . "'.";
-        if( $MOD_PERL && $ENV{HTTP_HOST} )
+        if( $MOD_PERL )
         {
             try
             {
@@ -4255,7 +4342,7 @@ AUTOLOAD
         my $sub = $AUTOLOAD;
         my( $pkg, $func ) = ( $sub =~ /(.*)::([^:]+)$/ );
         my $mesg = "Module::Generic::AUTOLOAD(): Searching for routine '$func' from package '$pkg'.";
-        if( $MOD_PERL && $ENV{HTTP_HOST} )
+        if( $MOD_PERL )
         {
             try
             {
@@ -4345,7 +4432,7 @@ AUTOLOAD
         if( $DEBUG )
         {
             my $mesg = "unshifting '$self' to args for sub '$sub'.";
-            if( $MOD_PERL && $ENV{HTTP_HOST} )
+            if( $MOD_PERL )
             {
                 try
                 {
@@ -4442,7 +4529,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.16.4
+    v0.17.2
 
 =head1 DESCRIPTION
 
@@ -4461,28 +4548,21 @@ It is just mentionned here for info only.
 
 =head2 new
 
-B<new> will create a new object for the package, pass any argument it might receive
-to the special standard routine B<init> that I<must> exist. 
+B<new> will create a new object for the package, pass any argument it might receive to the special standard routine B<init> that I<must> exist. 
 Then it returns what returns L</"init">.
 
-To protect object inner content from sneaking by third party, you can declare the 
-package global variable I<OBJECT_PERMS> and give it a Unix permission, but only 1 digit.
-It will then work just like Unix permission. That is, if permission is 7, then only the 
-module who generated the object may read/write content of the object. However, if
-you set 5, the, other may look into the content of the object, but may not modify it.
+To protect object inner content from sneaking by third party, you can declare the package global variable I<OBJECT_PERMS> and give it a Unix permission, but only 1 digit.
+It will then work just like Unix permission. That is, if permission is 7, then only the module who generated the object may read/write content of the object. However, if you set 5, the, other may look into the content of the object, but may not modify it.
 7, as you would have guessed, allow other to modify the content of an object.
-If I<OBJECT_PERMS> is not defined, permissions system is not activated and hence anyone 
-may access and possibly modify the content of your object.
+If I<OBJECT_PERMS> is not defined, permissions system is not activated and hence anyone may access and possibly modify the content of your object.
 
-If the module runs under mod_perl, it is recognised and a clean up registered routine is 
-declared to Apache to clean up the content of the object.
+If the module runs under mod_perl, and assuming you have set the variable C<GlobalRequest> in your Apache configuration, it is recognised and a clean up registered routine is declared to Apache to clean up the content of the object.
 
 =head2 as_hash
 
 This will recursively transform the object into an hash suitable to be encoded in json.
 
-It does this by calling each method of the object and build an hash reference with the 
-method name as the key and the method returned value as the value.
+It does this by calling each method of the object and build an hash reference with the method name as the key and the method returned value as the value.
 
 If the method returned value is an object, it will call its L</"as_hash"> method if it supports it.
 
@@ -4496,8 +4576,7 @@ Alias for L</clear_error>
 
 Clear all error from the object and from the available global variable C<$ERROR>.
 
-This is a handy method to use at the beginning of other methods of calling package,
-so the end user may do a test such as:
+This is a handy method to use at the beginning of other methods of calling package, so the end user may do a test such as:
 
     $obj->some_method( 'some arguments' );
     die( $obj->error() ) if( $obj->error() );
@@ -4511,8 +4590,7 @@ so the end user may do a test such as:
         ## ...
     }
 
-This way the end user may be sure that if C<$obj->error()> returns true something
-wrong has occured.
+This way the end user may be sure that if C<$obj->error()> returns true something wrong has occured.
 
 =head2 clone
 
@@ -4728,6 +4806,21 @@ error in scalar context.
 =head2 errstr
 
 Set/get the error string, period. It does not produce any warning like B<error> would do.
+
+=head2 fatal
+
+Boolean. If enabled, any error will call L<perlfunc/die> instead of returning L<perlfunc/undef> and setting an L<error|Module::Generic/error>.
+
+Defaults to false.
+
+You can enable it in your own package by initialising it in your own C<init> method like this:
+
+    sub init
+    {
+        my $self = shift( @_ );
+        $self->{fatal} = 1;
+        return( $self->SUPER::init( @_ ) );
+    }
 
 =head2 get
 

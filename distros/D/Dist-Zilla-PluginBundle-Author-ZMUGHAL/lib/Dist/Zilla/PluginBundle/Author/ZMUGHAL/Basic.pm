@@ -2,10 +2,11 @@ use strict;
 use warnings;
 package Dist::Zilla::PluginBundle::Author::ZMUGHAL::Basic;
 # ABSTRACT: A plugin bundle that sets up a basic set of plugins for ZMUGHAL
-$Dist::Zilla::PluginBundle::Author::ZMUGHAL::Basic::VERSION = '0.004';
+$Dist::Zilla::PluginBundle::Author::ZMUGHAL::Basic::VERSION = '0.005';
 use Moose;
 
 use Dist::Zilla::Plugin::MetaJSON ();
+use Dist::Zilla::Plugin::MetaNoIndex ();
 use Dist::Zilla::Plugin::AutoPrereqs ();
 use Dist::Zilla::Plugin::PkgVersion ();
 use Dist::Zilla::Plugin::CheckChangeLog ();
@@ -40,6 +41,12 @@ sub configure {
 			PodWeaver
 			MinimumPerl
 		)
+	);
+
+	$self->add_plugins(
+		['MetaNoIndex' => {
+			directory => [ qw(t xt inc share eg examples) ],
+		}],
 	);
 
 	$self->add_plugins(
@@ -88,7 +95,7 @@ Dist::Zilla::PluginBundle::Author::ZMUGHAL::Basic - A plugin bundle that sets up
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

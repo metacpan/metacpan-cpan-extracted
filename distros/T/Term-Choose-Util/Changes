@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.133   2021-11-11
+        - Raised Perl minimum version to 5.10.0.
+
 0.132   2021-10-02
         - Update 'validate_options'.
 

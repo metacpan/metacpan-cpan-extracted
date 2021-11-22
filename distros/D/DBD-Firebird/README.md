@@ -1,11 +1,11 @@
-DBD::Firebird version 1.21
+DBD::Firebird version 1.32
 ==========================
 
 DBI driver for the Firebird RDBMS server.
 
 - Copyright © 2015  Stefan Roas
 - Copyright © 2014  H.Merijn Brand - Tux
-- Copyright © 2010-2015  Popa Adrian Marius
+- Copyright © 2010-2020  Popa Adrian Marius
 - Copyright © 2011-2013  Stefan Suciu
 - Copyright © 2011-2015  Damyan Ivanov
 - Copyright © 2011  Alexandr Ciornii
@@ -18,7 +18,7 @@ License
 
 You may distribute under the terms of either the GNU General Public
 License or the Artistic License, as specified in the Perl README file.
-(http://dev.perl.org/licenses/artistic.html)
+(https://dev.perl.org/licenses/artistic.html)
 
 
 Installation
@@ -31,12 +31,12 @@ Requirements:
 - Firebird (2.5.1 or higher)
 - A C compiler
   * UN*X
-    GCC 4.x (tested, older may or may not work) or other capable
-    clang
+    GCC or Clang
+    
 
   * Windows
-    - Strawberry perl (http://strawberryperl.com/) comes with it's own compiler (mingw)
-    - Visual Studio C++ (http://visualstudio.com) 
+    - Strawberry perl (https://strawberryperl.com/) comes with it's own compiler (mingw)
+    - Visual Studio C++ (https://visualstudio.com) 
     - Cygwin
   * Freebsd
     - Threaded Perl is required (You have to re-install Perl from

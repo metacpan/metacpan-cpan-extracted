@@ -117,15 +117,18 @@ such as yt-dlp (only if wishing to use the I<-youtube> option).
 [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] 
 [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
-Accepts a bitchute.com video ID or URL and creates and returns a new video object, 
-or I<undef> if the URL is not a valid Bitchute video or no streams are found.  
-The URL can be the full URL, ie. https://www.bitchute.com/video/B<video-id>, 
-or just I<video-id>.
+Accepts a bitchute.com video ID or URL and creates and returns a new video 
+object, or I<undef> if the URL is not a valid Bitchute video or no streams are 
+found.  The URL can be the full URL, ie. 
+https://www.bitchute.com/video/B<video-id>, 
+or https://www.bitchute.com/channel/B<channel-id>, 
+or just I<video-id> or I<channel-id>.  If a I<channel-id> or channel URL is 
+given, then the first (latest) video of that channel will be returned.
 
-The optional I<-keep> argument can be either a comma-separated string or an array 
-reference ([...]) of stream types to keep (include) and returned in order specified 
-(type1, type2...).  Each "type" can be one of:  extension (ie. m4a, mp4, etc.), 
-"playlist", "stream", or ("any" or "all").
+The optional I<-keep> argument can be either a comma-separated string or an 
+array reference ([...]) of stream types to keep (include) and returned in 
+order specified (type1, type2...).  Each "type" can be one of:  extension 
+(ie. m4a, mp4, etc.), "playlist", "stream", or ("any" or "all").
 
 DEFAULT I<-keep> list is:  'm4a,mpd,stream,all', meaning that all m4a streams 
 followed by all "mpd" streams, followed by non-playlists, followed by all 
@@ -140,8 +143,8 @@ the video's bitchute.com page, unless none are found; "I<only>" - only include
 streams youtube-dl finds; or "I<first>" - include streams youtube-dl 
 finds first.  Default is B<"no">.
 
-The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
-then only secure ("https://") streams will be returned.
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
+If 1 then only secure ("https://") streams will be returned.
 
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
@@ -157,8 +160,9 @@ applicable when using the option: I<-youtube> => I<yes|only|top>, etc.
 
 I<-log> => "I<logfile>"
 
-Specify path to a log file.  If a valid and writable file is specified, A line will be 
-appended to this file every time one or more streams is successfully fetched for a url.
+Specify path to a log file.  If a valid and writable file is specified, A line 
+will be appended to this file every time one or more streams is successfully 
+fetched for a url.
 
 DEFAULT I<-none-> (no logging).
 
@@ -166,11 +170,11 @@ I<-logfmt> specifies a format string for lines written to the log file.
 
 DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
 
-The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
-[site]:  The site name (Bitchute).  [url]:  The url searched for streams.  
-[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
-[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "I<-na->", if no value).
+The valid field I<[variables]> are:  [stream]: The url of the first/best 
+stream found.  [site]:  The site name (Bitchute).  [url]:  The url searched 
+for streams.  [time]: Perl timestamp when the line was logged.  [title], 
+[artist], [album], [description], [year], [genre], [total], [albumartist]:  
+The corresponding field data returned (or "I<-na->", if no value).
 
 =item $video->B<get>()
 
@@ -255,7 +259,8 @@ and the options are loaded into a hash used only by the specific
 (submodule) specified.  Valid options include 
 I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
-Options specified here override any specified in I<~/.config/StreamFinder/config>.
+Options specified here override any specified in 
+I<~/.config/StreamFinder/config>.
 
 Among options valid for Bitchute streams is the I<-keep> and 
 I<-youtube> options described in the B<new()> function.  Also, 
@@ -423,7 +428,9 @@ sub new
 		$self->{'id'} =~ s/[\?\&].*$//;
 	} else {
 		$self->{'id'} = $url;
-		$url2fetch = 'https://www.bitchute.com/video/' . $url;
+		$url2fetch = ($url =~ /[A-Z]/) ? 'https://www.bitchute.com/video/'
+				: 'https://www.bitchute.com/channel/';   #CHANNEL IDS DON'T *SEEM* TO HAVE UPPER-CASE LETTERS.
+		$url2fetch .= $url;
 	}
 	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$self->{'genre'} = 'Video';
@@ -446,6 +453,32 @@ sub new
 			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
 		}
 	}
+	if ($url2fetch =~ m#\/channel\/#) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO!:
+		print "--WE'RE A BITCHUTE CHANNEL URL!\n"  if ($DEBUG);
+		if ($html =~ m#\<div\s+class\=\"channel\-videos\-image\-container\"\>([^\>]+)#s) {
+			my $divdata = $1;
+			($url2fetch = $1) =~ s#^\/#https\:\/\/www\.bitchute\.com\/#
+					if ($divdata =~ m#\bhref\=\"([^\"]+)#s);
+			if ($url2fetch) {
+				$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+				$self->{'id'} =~ s/[\?\&].*$//;
+				print "---FOUND 1ST VIDEO! FETCHING=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+				$response = $ua->get($url2fetch);
+				if ($response->is_success) {
+					$html = $response->decoded_content;
+				} else {
+					print STDERR $response->status_line  if ($DEBUG);
+					my $no_wget = system('wget','-V');
+					unless ($no_wget) {
+						print STDERR "\n..trying wget...\n"  if ($DEBUG);
+						$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+					}
+				}
+				return undef  unless ($html);
+			}
+		}
+	}
+
 	$html =~ s/\\\"/\&quot\;/gs;
 	$html =~ s/\\u00([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 	if ($html =~ m#\<video(.*?)\<\/video\>#s) {
@@ -518,6 +551,11 @@ sub new
 		my $publishedtime = $1;
 		$self->{'year'} = $1  if ($publishedtime =~ /(\d\d\d\d)\.?\s*$/);
 	}
+	if ($html =~ m#\<tr\>\<td\>Category\<\/td\>\<td\>\<a\s+(.+?)</a>#) {
+		my $genredata = $1;
+		my $genre = ($genredata =~ m#\bclass\=\"spa\"\>([^\<]+)#s) ? $1 : '';
+		$self->{'genre'} = $genre  if ($genre =~ /\w+/ && $genre != /^none/i);
+	}
 	$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<#s) ? $1 : '';
 	$self->{'title'} ||= $1  if ($html =~ m#\<h1\s+id\=\"video\-title\"\s+class\=\"page\-title\"\>([^\<]+)\<#i);
 	$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"#);
@@ -525,7 +563,11 @@ sub new
 	$self->{'description'} ||= $self->{'title'};
 
 	$self->{'iconurl'} = ($html =~ m#\"og\:image\:secure_url\"\s+content\=\"([^\"]+)#) ? $1 : '';
-	$self->{'iconurl'} ||= $1  if ($html =~ m#\<img\s+class\=\"image\s+lazyload\"\s+src="[^\"]*"\s+data\-src\=\"([^\"]+)#);
+#	$self->{'iconurl'} ||= $1  if ($html =~ m#\<img\s+class\=\"image\s+lazyload\"\s+src="[^\"]*"\s+data\-src\=\"([^\"]+)#);
+	if ($html =~ m#\<img\s+class\=\"image\s+lazyload([^\>]+)#) {
+		my $icondata = $1;
+		$self->{'articonurl'} = $1  if ($icondata =~ m#\bdata\-src\=\"([^\"]+)#);
+	}
 	$self->{'imageurl'} = ($html =~ m# poster\=\"([^\"]+)#) ? $1 : $self->{'iconurl'};
 
 	print STDERR "\n--ID=".$self->{'id'}."=\n--ARTIST=".$self->{'artist'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--DESC=".$self->{'description'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
@@ -568,11 +610,11 @@ sub new
 	} else {
 		$self->{'description'} = $self->{'title'};
 	}
-	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
-	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-	$self->{'title'} = uri_unescape($self->{'title'});
-	$self->{'artist'} = HTML::Entities::decode_entities($self->{'artist'});
+	foreach my $i (qw(description title artist genre)) {
+		$self->{$i} = HTML::Entities::decode_entities($self->{$i});
+		$self->{$i} = uri_unescape($self->{$i});
+		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
+	}
 	$self->{'imageurl'} = $self->{'iconurl'};
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';

@@ -1,0 +1,5 @@
+model = Systemd::StandAlone::Service
+require_backend_argument = 1
+use_backend_argument_as_config_file = 1
+config_dir = /etc/systemd/system/
+support_info = https://github.com/dod38fr/config-model-systemd/issues

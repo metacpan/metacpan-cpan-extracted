@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the getsongbpm.com API
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0400';
 
 use Moo;
 use strictures 2;
@@ -25,7 +25,7 @@ has api_key => (
 
 has base => (
     is      => 'rw',
-    default => sub { Mojo::URL->new('https://api.getsongbpm.com') },
+    default => sub { 'https://api.getsongbpm.com' },
 );
 
 
@@ -79,18 +79,23 @@ sub fetch {
     croak "Can't fetch: No type set"
         unless $type;
 
-    my $path = '';
-    my $query = '';
+    my $path  = '';
+    my $query = {};
 
     if ( $self->artist_id or $self->song_id ) {
-        $path .= "/$type/";
-        $query .= 'api_key=' . $self->api_key . "&id=$id";
+        $path .= $type;
+        $query = {
+            api_key => $self->api_key,
+            id      => $id,
+        };
     }
     else {
-        $path .= '/search/';
-        $query .= 'api_key=' . $self->api_key
-            . "&type=$type"
-            . "&lookup=$lookup";
+        $path .= 'search';
+        $query = {
+            api_key => $self->api_key,
+            type    => $type,
+            lookup  => $lookup,
+        };
     }
 
     my $url = Mojo::URL->new($self->base)->path($path)->query($query);
@@ -139,7 +144,7 @@ WebService::GetSongBPM - Access to the getsongbpm.com API
 
 =head1 VERSION
 
-version 0.0302
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -228,7 +233,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

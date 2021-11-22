@@ -1,4 +1,10 @@
+
 Revision history for perl module Lab::Zhinst
+
+2.04 2021-11-05
+
+ - Add support for LabOne 21.08 (Remove dropped symbols)
+
 
 2.00 2019-03-09
 

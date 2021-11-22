@@ -4,9 +4,9 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS;
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 sub add_parent {
     my ($self, $parent, $sig, $parent_status) = @_;
@@ -64,9 +64,9 @@ DNS::LDNS::DNSSecTrustTree - Trust tree from signed RR to trust anchors
 
 =head1 SYNOPSIS
 
-  use DNS::LDNS ':all'
+  use DNS::LDNS ();
 
-  tree = new DNS::LDNS::DNSSecTrustTree
+  tree = DNS::LDNS::DNSSecTrustTree->new
   tree->print(fp)
   d = tree->depth
   status = tree->add_parent(parent, sig, parent_status)

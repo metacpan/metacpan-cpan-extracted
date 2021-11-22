@@ -10,11 +10,11 @@ Search::ESsearcher::Templates::syslog - Provides syslog support for essearcher.
 
 =head1 VERSION
 
-Version 1.1.0
+Version 1.1.1
 
 =cut
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 =head1 LOGSTASH
 
@@ -189,14 +189,14 @@ return '
 					  [% IF o.hostx %]
 					  {"query_string": {
 						  "default_field": "host.keyword",
-						  "query": [% o.host.json %]
+						  "query": [% o.hostx.json %]
 					  }
 					   },
 					  [% END %]
 					  [% IF o.srcx %]
 					  {"query_string": {
 						  "default_field": "logsource.keyword",
-						  "query": [% o.src.json %]
+						  "query": [% o.srcx.json %]
 					  }
 					   },
 					  [% END %]

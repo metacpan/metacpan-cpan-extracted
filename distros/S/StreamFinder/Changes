@@ -366,7 +366,7 @@ Revision history for StreamFinder
         youtube-dl & friends' "--get-id" option, if one is returned.
 1.72    2021/11/03
         - StreamFinder::Youtube:  Fix bug that prevented access to some videos 
-        (namely ones with non-alphanumeric characters in the youtube-id 
+        (namely ones with non-alphanumeric characters in the youtube-id) 
         introduced in previous release.
         Also fix issue with failure to fetch Youtube metadata for Youtube 
         videos embedded in iframes in non-Youtube sites (also broke by v1.71).
@@ -380,3 +380,51 @@ Revision history for StreamFinder
         - StreamFinder::IHeartRadio:  Fix Perl character-encoding issue.  Also 
         try harder to ensure podcast channel pages return the first (latest) 
         episode, instead of the oldest.
+1.80    2021/11/10
+        * This turned into a major release with many improvements to handling 
+        podcasts, particularly metadata fetching and handling of podcast pages 
+        and the multi-episode playlists they can return.
+        - Refactor podcast modules to always return full metadata for the 
+        first (latest) episode for podcast pages (as if they had been called 
+        with the id/URL for the first episode itself - ie. the "description" 
+        field, etc. often had that of the podcast page itself instead of that 
+        of the first episode).  Also have the podcast modules always return 
+        a full extended m3u playlist when $podcast->get('playlist') is called. 
+        This affects StreamFinder::Apple, ::Castbox, ::Google, and ::Spreaker.
+        - Also make "genre" and "year" fields work in all of the above, and 
+        ensure the genre and album fields are included in the m3u playlist 
+        (#EXTGENRE and #EXTALB lines) in all of the above.
+        - Also reverse "artist" and "album" fields in all of the above:  I 
+        was never sure which field was which for podcasts (as most appear 
+        similar) but some actually used them for the artist(s)' names and 
+        the podcast name, and we had them reversed.
+        - Add new "playlist" option to the $podcast->count() function to 
+        return the number of episodes in the playlist instead of the number 
+        of streams returned (for the first episode) in all of the above.
+        - StreamFinder::Apple - Make podcast pages work again (Apple changed 
+        their code some) - episode pages were still working though.
+        - StreamFinder::IHeartRadio (Podcasts), ::Tunein (Podcasts), and 
+        ::SermonAudio (non-Sermon pages):  Add ability to accept podcast 
+        pages and return the first (latest) episode when given a podcast page 
+        URL: (IHeartRadio returned the oldest (last) one rather than latest 
+        (first) due to their podcast pages sometimes having them listed in 
+        reverse order.  Tunein did not return anything for a podcast page, 
+        only for specific podcast episode pages).
+1.81    2021/11/13
+        - Added StreamFinder::Podbean (www.podbean.com podcasts)!
+        - StreamFinder::Bitchute, ::Brighteon, ::Rumble, & ::Youtube - Add 
+        ability to handle channel page URLs and return the first (latest) 
+        video (the same feature we just added for all the podcast sites).  
+        NOTE:  Not added to ::Odysee or ::Vimeo due to those sites requiring 
+        JavaScript to obtain the video links.  
+        - Also added scraping for genre (previously hardcoded to "Video") for 
+        StreamFinder::Bitchute & StreamFinder::Youtube.
+1.82    2021/11/21
+        - StreamFinder::Rumble - Add -quality option to limit maximum video 
+        quality (ie. 720 for 720p, 1080 for 1080p, etc. for users with limited 
+        internet bandwidth.  Also fix very minor issue to ensure that non-
+        classed streams (classed via extension) are rated in the same order as 
+        specified in the -keep option (was previously always mp4, then webm 
+        regardless of -keep order).
+        - StreamFinder::Podbean - Fix doc. that said that a full URL was 
+        required - the module allows for only an ID to be specified.

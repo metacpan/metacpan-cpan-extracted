@@ -1,7 +1,7 @@
 {
    "abstract" : "The main module to handle bags.",
    "author" : [
-      "Rob Schmidt <rjeschmi@gmail.com>"
+      "Andreas Romeyke <cpan@andreas.romeyke.de>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
@@ -68,6 +68,7 @@
             "Moo::Role" : "0",
             "Net::SSLeay" : "1.43",
             "POSIX" : "0",
+            "Parallel::parallel_map" : "0",
             "Time::HiRes" : "0",
             "feature" : "0",
             "namespace::autoclean" : "0",
@@ -104,51 +105,51 @@
    "provides" : {
       "Archive::BagIt" : {
          "file" : "lib/Archive/BagIt.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Base" : {
          "file" : "lib/Archive/BagIt/Base.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Fast" : {
          "file" : "lib/Archive/BagIt/Fast.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Plugin::Algorithm::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/MD5.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Plugin::Algorithm::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Plugin::Manifest::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/MD5.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Plugin::Manifest::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/SHA512.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Role::Algorithm" : {
          "file" : "lib/Archive/BagIt/Role/Algorithm.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Role::Manifest" : {
          "file" : "lib/Archive/BagIt/Role/Manifest.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Role::OpenSSL" : {
          "file" : "lib/Archive/BagIt/Role/OpenSSL.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Role::Plugin" : {
          "file" : "lib/Archive/BagIt/Role/Plugin.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       },
       "Archive::BagIt::Role::Portability" : {
          "file" : "lib/Archive/BagIt/Role/Portability.pm",
-         "version" : "0.083"
+         "version" : "0.085"
       }
    },
    "release_status" : "stable",
@@ -156,15 +157,16 @@
       "bugtracker" : {},
       "repository" : {
          "type" : "git",
-         "url" : "https://art1pirat.spdns.org/art1/Archive-BagIt.git",
-         "web" : "https://art1pirat.spdns.org/art1/Archive-BagIt"
+         "url" : "https://git.fsfe.org/art1pirat/Archive-BagIt.git",
+         "web" : "https://git.fsfe.org/art1pirat/Archive-BagIt"
       }
    },
-   "version" : "0.083",
+   "version" : "0.085",
    "x_contributors" : [
       "Andreas Romeyke <art1@andreas-romeyke.de>",
       "Michiel Beijen <michiel.beijen@gmail.com>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
+      "Robert Schmidt <rjeschmi@gmail.com>",
       "Robert Schmidt <rob@ayr.ca>",
       "Robert Schmidt <rob@c7a.ca>",
       "Russell McOrmond <rmcormond@crkn.ca>",

@@ -5,7 +5,18 @@ use Mojo::JSON qw(from_json to_json);
 
 use constant DEBUG => $ENV{MOJO_REDIS_DEBUG};
 
-has connection => sub { shift->redis->_connection };
+has connection => sub {
+  my $self = shift;
+  my $conn = $self->redis->_connection;
+
+  Scalar::Util::weaken($self);
+  for my $name (qw(close error response)) {
+    my $handler = "_on_$name";
+    $conn->on($name => sub { $self and $self->$handler(@_) });
+  }
+
+  return $conn;
+};
 
 has db => sub {
   my $self = shift;
@@ -17,11 +28,8 @@ has db => sub {
 has reconnect_interval => 1;
 has redis              => sub { Carp::confess('redis is requried in constructor') };
 
-sub channels_p {
-  shift->db->call_p(qw(PUBSUB CHANNELS), @_);
-}
-
-sub json { ++$_[0]{json}{$_[1]} and return $_[0] }
+sub channels_p { shift->db->call_p(qw(PUBSUB CHANNELS), @_) }
+sub json       { ++$_[0]{json}{$_[1]} and return $_[0] }
 
 sub keyspace_listen {
   my ($self, $cb) = (shift, pop);
@@ -38,27 +46,24 @@ sub keyspace_unlisten {
 sub listen {
   my ($self, $name, $cb) = @_;
 
-  $self->_listen($name) unless @{$self->{chans}{$name} ||= []};
-  push @{$self->{chans}{$name}}, $cb;
+  unless (@{$self->{chans}{$name} ||= []}) {
+    Mojo::IOLoop->remove(delete $self->{reconnect_tid}) if $self->{reconnect_tid};
+    $self->_write([($name =~ /\*/ ? 'PSUBSCRIBE' : 'SUBSCRIBE') => $name]);
+  }
 
+  push @{$self->{chans}{$name}}, $cb;
   return $cb;
 }
 
 sub notify_p {
   my ($self, $name, $payload) = @_;
   $payload = to_json $payload if $self->{json}{$name};
-  shift->db->call_p(PUBLISH => $name, $payload);
+  return $self->db->call_p(PUBLISH => $name, $payload);
 }
 
-sub notify { shift->notify_p(@_)->wait }
-
-sub numsub_p {
-  shift->db->call_p(qw(PUBSUB NUMSUB), @_)->then(sub { +{@{$_[0]}} });
-}
-
-sub numpat_p {
-  shift->db->call_p(qw(PUBSUB NUMPAT));
-}
+sub notify   { shift->notify_p(@_)->wait }
+sub numpat_p { shift->db->call_p(qw(PUBSUB NUMPAT)) }
+sub numsub_p { shift->db->call_p(qw(PUBSUB NUMSUB), @_)->then(\&_flatten) }
 
 sub unlisten {
   my ($self, $name, $cb) = @_;
@@ -66,66 +71,67 @@ sub unlisten {
 
   @$chans = $cb ? grep { $cb ne $_ } @$chans : ();
   unless (@$chans) {
-    $self->connection->write_p(($name =~ /\*/ ? 'PUNSUBSCRIBE' : 'UNSUBSCRIBE'), $name);
+    my $conn = $self->connection;
+    $conn->write(($name =~ /\*/ ? 'PUNSUBSCRIBE' : 'UNSUBSCRIBE'), $name) if $conn->is_connected;
     delete $self->{chans}{$name};
   }
 
   return $self;
 }
 
+sub _flatten { +{@{$_[0]}} }
+
 sub _keyspace_key {
   my $args = ref $_[-1] eq 'HASH' ? pop : {};
   my $self = shift;
 
-  local $args->{key} = $_[0] // $args->{key} // '*';
-  local $args->{op}  = $_[1] // $args->{op}  // '*';
+  local $args->{key}  = $_[0] // $args->{key} // '*';
+  local $args->{op}   = $_[1] // $args->{op}  // '*';
   local $args->{type} = $args->{type} || ($args->{key} eq '*' ? 'keyevent' : 'keyspace');
 
   return sprintf '__%s@%s__:%s', $args->{type}, $args->{db} // $self->redis->url->path->[0] // '*',
     $args->{type} eq 'keyevent' ? $args->{op} : $args->{key};
 }
 
-sub _listen {
-  my ($self, $name) = @_;
+sub _on_close {
+  my $self = shift;
+  $self->emit(disconnect => $self->connection);
 
-  if ($self->{setup}) {
-    my $op = $name =~ /\*/ ? 'PSUBSCRIBE' : 'SUBSCRIBE';
-    return $self->connection->write_p($op => $name);
-  }
+  my $delay = $self->reconnect_interval;
+  return $self if $delay < 0 or $self->{reconnect_tid};
 
+  warn qq([Mojo::Redis::PubSub] Reconnecting in ${delay}s...\n) if DEBUG;
   Scalar::Util::weaken($self);
-  my $conn         = $self->connection;
-  my $reconnecting = delete $self->{reconnecting};
-
-  $self->{setup} = 1;
-  $conn->once(close => sub { $self and $self->_reconnect->emit(disconnect => shift) });
-  $conn->on(
-    response => sub {
-      my ($conn, $res) = @_;    # $res = [$type, $name, $payload]
-      return unless ref $res eq 'ARRAY' and @$res >= 3;
-      $res->[2] = eval { from_json $res->[2] } if $self->{json}{$res->[1]};
-      my $keyspace_listen = $self->{keyspace_listen}{$res->[1]};
-      for my $cb (@{$self->{chans}{$res->[1]}}) { $self->$cb($keyspace_listen ? [@$res[2, 3]] : $res->[2]) }
-    }
-  );
-
-  $self->emit(before_connect => $conn);
-  return $self unless my @p = map { $self->_listen($_) } keys %{$self->{chans}};
-  Mojo::Promise->all(@p)->then(sub { $self->emit(reconnect => $conn) if $reconnecting }, sub { $self->_reconnect });
+  $self->{reconnect}     = 1;
+  $self->{reconnect_tid} = Mojo::IOLoop->timer($delay => sub { $self and $self->_reconnect });
   return $self;
+}
 
+sub _on_error { $_[0]->emit(error => $_[2]) }
+
+sub _on_response {
+  my ($self, $conn, $res) = @_;
+  $self->emit(reconnect => $conn) if delete $self->{reconnect};
+
+  return                    unless ref $res eq 'ARRAY';
+  return $self->emit(@$res) unless $res->[0] =~ m!^p?message$!i;
+  my ($psub) = $res->[0] eq 'pmessage' ? splice @$res, 1, 1 : ();
+  $res->[2] = eval { from_json $res->[2] } if $self->{json}{$res->[1]};
+  my $keyspace_listen = $self->{keyspace_listen}{$psub || $res->[1]};
+  for my $cb (@{$self->{chans}{$psub || $res->[1]}}) { $self->$cb($keyspace_listen ? [@$res[1, 2]] : $res->[2]) }
 }
 
 sub _reconnect {
   my $self = shift;
-  delete @$self{qw(connection db setup)};
+  delete $self->{$_} for qw(before_connect connection reconnect_tid);
+  $self->_write(map { [(/\*/ ? 'PSUBSCRIBE' : 'SUBSCRIBE') => $_] } keys %{$self->{chans}});
+}
 
-  my $delay = $self->reconnect_interval;
-  return $self if $delay < 0 or $self->{reconnecting}++;
-
-  warn qq([Mojo::Redis::PubSub] Reconnecting in ${delay}s...\n) if DEBUG;
-  Mojo::IOLoop->timer($delay => sub { $self->_listen });
-  return $self;
+sub _write {
+  my ($self, @commands) = @_;
+  my $conn = $self->connection;
+  $self->emit(before_connect => $conn) unless $self->{before_connect}++;
+  $conn->write(@$_) for @commands;
 }
 
 1;
@@ -182,12 +188,30 @@ or run other commands before it goes into subscribe mode.
 
 Emitted after L</connection> is disconnected from the redis server.
 
+=head2 psubscribe
+
+  $pubsub->on(psubscribe => sub { my ($pubsub, $channel, $success) = @_; ... });
+
+Emitted when the server responds to the L</listen> request and/or when
+L</reconnect> resends psubscribe messages.
+
+This event is EXPERIMENTAL.
+
 =head2 reconnect
 
   $pubsub->on(reconnect => sub { my ($pubsub, $conn) = @_; ... });
 
 Emitted after switching the L</connection> with a new connection. This event
 will only happen if L</reconnect_interval> is 0 or more.
+
+=head2 subscribe
+
+  $pubsub->on(subscribe => sub { my ($pubsub, $channel, $success) = @_; ... });
+
+Emitted when the server responds to the L</listen> request and/or when
+L</reconnect> resends subscribe messages.
+
+This event is EXPERIMENTAL.
 
 =head1 ATTRIBUTES
 

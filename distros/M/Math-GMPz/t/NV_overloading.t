@@ -383,7 +383,7 @@ else {
 }
 
 eval{$x = (Math::GMPz->new(10) ==  $nan )};
-if($@ =~ /In Math::GMPz::overload_equiv, cannot compare a NaN to a Math::GMPz value/) {print "ok 52\n"}
+if($@ =~ /cannot compare a NaN to a Math::GMPz value/) {print "ok 52\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 52\n";
@@ -438,7 +438,7 @@ else {
 }
 
 eval{$x = (Math::GMPz->new(10) !=  $nan )};
-if($@ =~ /In Math::GMPz::overload_not_equiv, cannot compare a NaN to a Math::GMPz value/) {print "ok 59\n"}
+if($@ =~ /cannot compare a NaN to a Math::GMPz value/) {print "ok 59\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 59\n";

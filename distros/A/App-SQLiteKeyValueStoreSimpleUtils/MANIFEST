@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/SQLiteKeyValueStoreSimpleUtils.pm
 script/check-sqlite-kvstore-key-exists
+script/dump-sqlite-kvstore
 script/get-sqlite-kvstore-value
 script/list-sqlite-kvstore-keys
 script/set-sqlite-kvstore-value

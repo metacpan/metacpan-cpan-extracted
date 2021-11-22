@@ -1,0 +1,239 @@
+use alienfile;
+
+use Env qw(@CMAKE_INCLUDE_PATH @CMAKE_LIBRARY_PATH);
+use Config;
+use DynaLoader ();
+use Data::Dumper;
+use File::Basename qw(dirname);
+
+# Also need Alien::SWIProlog::Util
+use lib dirname(__FILE__) . "/lib";
+
+requires 'Path::Tiny';
+requires 'File::Which';
+
+# For system probe
+requires 'List::Util', '1.33';
+requires 'ExtUtils::CBuilder';
+
+my @SWIPL_BIN_NAMES = (
+	( exists $ENV{PL} ? $ENV{PL} : () ),
+	( $^O =~ /Win32/ ? 'plcon' : () ),
+	qw(swipl swi-prolog),
+	( $^O !~ /darwin/ ? 'pl' : () ),
+);
+
+my $test_program = <<EOF;
+/* checking for conflicting symbol */
+extern int PL_version;
+
+#include <SWI-Prolog.h>
+
+int main(int argc, char *argv[]) {
+	return 0;
+}
+EOF
+
+my $PLVARS;
+my $PL;
+my $PL_path;
+probe sub {
+	my $build = shift;
+	eval 'require Alien::SWIProlog::Util';
+
+	local $Data::Dumper::Terse = 1;
+	local $Data::Dumper::Sortkeys = 1;
+
+	for $PL (@SWIPL_BIN_NAMES) {
+		$PL_path = File::Which::which($PL) or next;
+		$build->log("Trying SWI-Prolog binary $PL ($PL_path)");
+		$PLVARS = Alien::SWIProlog::Util::get_plvars($PL);
+		keys %$PLVARS and last;
+	};
+
+	# when not found
+	return 'share' unless keys %$PLVARS;
+
+	$build->log( Dumper($PLVARS) );
+
+	my %threads_support = (
+		swipl_threads => $PLVARS->{PLTHREADS} eq 'yes',
+		perl_usethreads => defined($Config::Config{usethreads}),
+		perl_useithreads => defined($Config::Config{useithreads}),
+	);
+
+	my $all_threads = List::Util::all(
+		sub { $threads_support{$_} },
+		keys %threads_support );
+	my $all_nonthreads = List::Util::all(
+		sub { ! $threads_support{$_} },
+		keys %threads_support );
+
+	unless( $all_threads || $all_nonthreads ) {
+		$build->log(
+			"Threading models of SWI-Prolog and Perl do not match: "
+			. Dumper(\%threads_support)
+		);
+		return 'share';
+	}
+
+	my $prop = Alien::SWIProlog::Util::plvars_to_props($PL_path, $PLVARS);
+
+	eval {
+		require ExtUtils::CBuilder;
+		my $b = ExtUtils::CBuilder->new();
+		my $src = Path::Tiny->tempfile( SUFFIX => '.c' );
+		$src->spew_utf8($test_program);
+		$build->log('Compiling/linking test program');
+		my $obj = $b->compile(
+			source => "$src",
+			extra_compiler_flags => $prop->{cflags},
+		);
+		my $exe = $b->link_executable(
+			objects => $obj,
+			extra_linker_flags   => $prop->{libs},
+		);
+		$build->log('Compiling/linking successful');
+		1;
+	} and return 'system';
+
+	$build->log('Compiling/linking unsuccessful');
+	return 'share';
+};
+
+sys {
+	gather sub {
+		my ($build) = @_;
+		eval 'require Alien::SWIProlog::Util';
+		my $prop = Alien::SWIProlog::Util::plvars_to_props($PL_path, $PLVARS);
+		$build->runtime_prop->{$_} = $prop->{$_} for keys %$prop;
+	};
+};
+
+share {
+	my $release_type = 'stable';
+	die "Release type must be either 'stable' or 'devel'"
+		unless $release_type =~ /^(stable|devel)$/;
+	plugin Download => (
+		# https://www.swi-prolog.org/download/stable/src/
+		# https://www.swi-prolog.org/download/devel/src/
+		url => "https://www.swi-prolog.org/download/$release_type/src/",
+		version => qr/swipl-([\d\.]+)\.tar\.gz/,
+	);
+
+	plugin Extract => 'tar.gz';
+
+	plugin 'Build::CMake';
+
+	patch sub {
+		my @files = qw( src/SWI-Prolog.h src/os/pl-prologflag.c src/pl-fli.c );
+		system( $^X, qw(-pi -e), q{ s/\bPL_version\b/Swi$&/ }, @files );
+	};
+
+	my $threads = $Config{useithreads} ? '-DMULTI_THREADED=ON' : '-DMULTI_THREADED=OFF';
+
+	my @other_cmake_args = ();
+	my $is_msys2_mingw = $^O eq 'MSWin32' && exists $ENV{MSYSTEM} && $ENV{MSYSTEM} =~ /^mingw(32|64)$/i;
+	if( $is_msys2_mingw && File::Which::which('cygpath') ) {
+		# Running under MSYS2
+		chomp( my $MINGW_ROOT = `cygpath -m /$ENV{MSYSTEM}` );
+		push @other_cmake_args, "-DMINGW_ROOT=$MINGW_ROOT";
+
+		# current build not set up to link with libarchive correctly
+		push @other_cmake_args, '-DSWIPL_PACKAGES_ARCHIVE=OFF';
+	}
+	my $is_strawberry = $^O eq 'MSWin32' && $Config{myuname} =~ /^Win32 strawberry-perl/;
+	if( $is_strawberry ) {
+		# This helps to find the paths under Strawberry Perl.
+		my ($zlib_found) = DynaLoader::dl_findfile('-lzlib');
+		if( $zlib_found ) {
+			my $zlib_file = Path::Tiny::path($zlib_found);
+
+			my $c_lib_dir = $zlib_file->parent;
+			my $c_dir = $c_lib_dir->parent;
+			my $c_inc_dir = $c_dir->child('include');
+
+			my $arch = 'x86_64-w64-mingw32';
+			my $arch_lib_dir = $c_dir->child($arch, 'lib' );
+			my $arch_inc_dir = $c_dir->child($arch, 'include' );
+
+			push @CMAKE_LIBRARY_PATH, "$c_lib_dir", "$arch_lib_dir";
+			push @CMAKE_INCLUDE_PATH, "$c_inc_dir", "$arch_inc_dir";
+
+			push @other_cmake_args, "-DMINGW_ROOT=$c_dir";
+
+			# no libgmp in Strawberry Perl
+			push @other_cmake_args, '-DUSE_GMP=OFF';
+
+			# not able to generate certs for tests due to missing
+			# openssl.cnf
+			push @other_cmake_args, '-DSKIP_SSL_TESTS=ON';
+		}
+	}
+
+	build [
+		[ '%{cmake}',
+			@{ meta->prop->{plugin_build_cmake}->{args} },
+			@other_cmake_args,
+			$threads,
+			# no X11 library
+			qw(-DSWIPL_PACKAGES_X=OFF),
+			# do not build docs
+			qw(-DINSTALL_DOCUMENTATION=OFF),
+			# install shared library under lib, not lib/$arch
+			qw(-DSWIPL_INSTALL_IN_LIB=ON),
+			'.',
+		],
+		sub {
+			if( $is_msys2_mingw ) {
+				# because src/mkversion.sh does not run
+				# properly
+				Path::Tiny::path('src', 'version.h')->touch;
+			}
+		},
+		'%{make}',
+		'%{make} install',
+	];
+
+	gather sub {
+		my ($build) = @_;
+		my $prefix = Path::Tiny::path($build->runtime_prop->{prefix});
+
+		my $is_windows = $^O eq 'MSWin32';
+
+		my @home_parts = qw(lib swipl);
+		my $home_path =
+			$is_windows
+			? $prefix
+			: $prefix->child(@home_parts);
+
+		my $swipl_bin = $prefix->child(qw(bin swipl));
+
+		my $inc_path = $home_path->child(qw(include));
+
+		my @lib_paths = $prefix->child(qw(lib));
+		push @lib_paths, $prefix->child(qw(bin)) if $is_windows;
+		my $lib_home_path = Path::Tiny::path(@home_parts, 'lib');
+		if( -d $lib_home_path ) {
+			push @lib_paths, map { $prefix->child($_) }
+				grep { $_->is_dir && $_ !~ /swiplserver/ }
+				$lib_home_path->children;
+		}
+
+		my @ldlibs = "-lswipl";
+
+		my $cflags = "-I$inc_path";
+		my $libs = join " ",
+			( map  "-L$_", @lib_paths  ) ,
+			@ldlibs;
+
+		my @rpaths = map { "" . $_->relative($prefix) }
+			@lib_paths;
+
+		$build->runtime_prop->{'swipl-bin'} = "$swipl_bin";
+		$build->runtime_prop->{home}    = "$home_path";
+		$build->runtime_prop->{cflags}  = $cflags;
+		$build->runtime_prop->{libs}    = $libs;
+		$build->runtime_prop->{rpath}   = \@rpaths;
+	};
+};

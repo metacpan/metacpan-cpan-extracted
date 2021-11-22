@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use PDL::Types qw(types ppdefs ppdefs_all ppdefs_complex);
+require PDL::Core::Dev;
 
 my $A = [ppdefs_all];
 my $C = [ppdefs_complex];
@@ -61,8 +62,7 @@ and Craig DeForest (deforest@boulder.swri.edu).
 EOPM
 
 pp_addhdr('
-#include <math.h>
-#include <complex.h>
+#include <tgmath.h>
 
 /* MOD requires hackage to map properly into the positive-definite numbers. */
 /* Resurrect the old MOD operator as the unsigned BU_MOD to get around this. --DAL 27-Jun-2008 */
@@ -226,28 +226,18 @@ EOH
     if ($isop) { $ovcall = "\$c = \$a $funcov \$b;    # overloaded use"; }
     else       { $ovcall = "\$c = $funcov \$a, \$b;    # overloaded use"; }
 
-    my $complex_bit = join "\n",
-      map 'types('.$_->ppsym.') %{$c() = c'.$func.$_->floatsuffix.'($a(),$b());%}',
-      @Ctypes;
     my $codestr;
     if ($extra{unsigned}){
 #a little dance to avoid the MOD macro warnings for byte & ushort datatypes
       $codestr = << "ENDCODE";
-  types(BU) %{ \$c() = (\$GENERIC(c))BU_$func(\$a(),\$b()); %}
-  types(SLNFD) %{ \$c() = (\$GENERIC(c))$func(\$a(),\$b()); %}
-  types(Q) %{ \$c() = (\$GENERIC(c))Q_$func(\$a(),\$b()); %}
+\$c() = (\$GENERIC(c))\$TBSULNQFD(BU_,,BU_,,,Q_,,)$func(\$a(),\$b());
 ENDCODE
 #end dance
     } else {
-      $codestr = join "\n",
-        map 'types('.$_->ppsym.') %{$c() = ($GENERIC(c))'.$func.'((double)$a(),(double)$b());%}',
-        @Rtypes;
+      $codestr = '$c() = ($GENERIC(c))'.$func.'($a(),$b());';
     }
     delete $extra{unsigned}; #remove the key so it doesn't get added in pp_def.
-    $codestr .= $complex_bit if $got_complex;
-
-    my $badcodestr;
-    $badcodestr = 'if ( $ISBAD(a()) || $ISBAD(b()) )
+    my $badcodestr = 'if ( $ISBAD(a()) || $ISBAD(b()) )
 	       $SETBAD(c());
 	       else {' . $codestr . " } \n";
 
@@ -309,14 +299,14 @@ sub ufunc {
 	#      See also `biop()`.
 	delete $extra{Exception};
     }
-    my $complex_bit = join "\n",
-      map 'types('.$_->ppsym.') %{$b() = c'.$func.$_->floatsuffix.'($a());%}',
-      @Ctypes;
-    my $codestr = join "\n",
-        map 'types('.$_->ppsym.') %{$b() = ($GENERIC(b))'.$func.'('.($func=~/[a-z]/?'(double)':'').'$a());%}',
-        @Rtypes;
-    $codestr .= $complex_bit if $got_complex;
-
+    my $codestr = '$b() = ($GENERIC(b))'.$func.'($a());';
+    if (delete $extra{NoTgmath} and $got_complex) {
+        # don't bother if not got complex version
+        $codestr = join "\n",
+            'types('.join('', map $_->ppsym, @Rtypes).') %{'.$codestr.'%}',
+            (map 'types('.$_->ppsym.') %{$b() = c'.$func.$_->floatsuffix.'($a());%}', @Ctypes),
+            ;
+    }
     pp_addpm(make_overload($funcov, $name, 0, 1)) if $overload;
     # do not have to worry about propagation of the badflag when
     # inplace since only input ndarray is a, hence its badflag
@@ -420,9 +410,13 @@ ufunc('exp','exp',1,'the exponential function',GenericTypes => [@$C, @$F]);
 ufunc('log','log',1,'the natural logarithm',GenericTypes => [@$C, @$F], Exception => '$a() <= 0');
 
 # no export these because clash with Test::Deep (re) or internal (_*abs)
-cfunc('re', 'creal', 1, 'Returns the real part of a complex number.');
-cfunc('im', 'cimag', 1, 'Returns the imaginary part of a complex number.');
-cfunc('_cabs', 'cabs', 1, 'Returns the absolute (length) of a complex number.',
+cfunc('re', 'creal', 1, 'Returns the real part of a complex number.',
+  '$complexv() = $b() + I * cimag($complexv());'
+);
+cfunc('im', 'cimag', 1, 'Returns the imaginary part of a complex number.',
+  '$complexv() = creal($complexv()) + I * $b();'
+);
+cfunc('_cabs', 'cabs', 1, 'Returns the absolute (length) of a complex number.', undef,
     PMFunc=>'',
 );
 my $rabs_code = '
@@ -449,6 +443,7 @@ pp_export_nothing();
 # as well as ndarrays
 ufunc('log10','log10',0,'the base 10 logarithm', GenericTypes => $A,
       Exception => '$a() <= 0',
+      NoTgmath => 1, # glibc for at least GCC 8.3.0 won't tgmath log10 though 7.1.0 did
       PMCode =>
 '
 sub PDL::log10 {
@@ -509,32 +504,34 @@ See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for detai
 # special functions for complex data types that don't work well with
 # the ufunc/bifunc logic
 sub cfunc {
-    my ($name, $func, $make_real, $doc, %extra) = @_;
-    my $badcode = '$ISBAD(complexv())';
-    my $codestr = "\$b() = $func\$T" .
-      join('', map $_->ppsym, @Ctypes) .
-      "(". join(',', map $_->floatsuffix, @Ctypes) .
-      ")(\$complexv());";
+    my ($name, $func, $make_real, $doc, $backcode, %extra) = @_;
+    my $codestr = pp_line_numbers(__LINE__-1,"\$b() = $func(\$complexv());");
     pp_def($name,
 	   GenericTypes=>$C,
 	   Pars => 'complexv(); '.($make_real ? 'real' : '').' [o]b()',
 	   HandleBad => 1,
 	   NoBadifNaN => 1,
 	   Inplace => 1,
-	   Code => pp_line_numbers(__LINE__,
-	       $codestr
+	   Code => $codestr,
+	   BadCode => pp_line_numbers(__LINE__-1, 'if ($ISBAD(complexv()))
+	     $SETBAD(b());
+	     else {' . "\n" . $codestr . "}\n"
 	   ),
-	   BadCode =>
-		    pp_line_numbers(__LINE__, 'if ( ' . $badcode . ' )
-		    $SETBAD(b());
-		    else {' . "\n" . $codestr . "}\n"
-		    ),
+	   !$backcode ? () : (
+	     DefaultFlow => 1,
+	     TwoWay => 1,
+	     BackCode => $backcode,
+	     BadBackCode => pp_line_numbers(__LINE__-1, 'if ($ISBAD(b()))
+	       $SETBAD(complexv());
+	       else {' . "\n" . $backcode . "}\n"
+	     ),
+	   ),
 	   %extra,
 	   Doc => $doc);
 }
 
-cfunc('carg', 'carg', 1, 'Returns the polar angle of a complex number.');
-cfunc('conj', 'conj', 0, 'complex conjugate.');
+cfunc('carg', 'carg', 1, 'Returns the polar angle of a complex number.', undef);
+cfunc('conj', 'conj', 0, 'complex conjugate.', undef);
 
 pp_def('czip',
   Pars => 'r(); i(); complex [o]c()',

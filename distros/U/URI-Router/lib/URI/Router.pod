@@ -1,0 +1,357 @@
+=head1 NAME
+
+URI::Router - highest performance powerful URI router (URI path to value lookup) for HTTP frameworks
+
+
+
+=head1 SYNOPSIS
+
+    use URI::Router;
+
+    my $router = URI::Router->new(
+        "/items/list"        => sub { ... },
+        "POST/avatar/upload" => sub { ... },
+        "/user/*/info"       => sub { ... },
+        "/file/..."          => sub { ... },
+        "/user/*/..."        => sub { ... },
+        qr#/img/(.+\.jpg)#   => sub { ... },
+    );
+
+    my $sub = $router->route("/items/list");
+    my ($sub, @args) = $router->route("/user/10/info");         # @args = ("10")
+    my ($sub, @args) = $router->route("/file/folder/data.txt"); # @args = ("folder", "data.txt")
+    my ($sub, @args) = $router->route("/user/10/view");         # @args = ("10", "view")
+    my ($sub, @args) = $router->route("/img/avatar/foo.jpg");   # @args = ("avatar/foo.jpg")
+    my $sub = $router->route("/avatar/upload", METHOD_POST);    # ok
+    my $sub = $router->route("/avatar/upload", METHOD_GET);     # undef
+    my $sub = $router->route("/nonexistent");                   # undef
+
+=head1 DESCRIPTION
+
+C<URI::Router> maps a path pattern to a specific value.
+It routes a path in a constant time (no matter how many and how complex the routes are).
+It supports static, pattern and regexp routes.
+C<URI::Router> is written in C++ and performs very fast.
+For static routes it uses hash and for dynamic routes it uses custom DFA which searches all routes at once.
+
+Module supports different values for different http methods and capturing dynamic part from url paths.
+
+The value associated with a pattern doesn't have to be a subroutine reference, it can be any perl scalar.
+
+Module supports 3 different types of routes and they have different priorities.
+
+
+
+=head1 ROUTES
+
+=head2 STATIC ROUTES
+
+    my $router = URI::Router->new(
+        "/foo/bar" => 1,
+        ...
+    );
+    
+This type of route has maximum performance. It will match only exact the same
+path with exclusion that it's insensitive to slashes (both in route and in tested path).
+
+    $router->route("/foo/bar") == 1;
+    $router->route("/foo/bar/") == 1;
+    $router->route("////foo////bar////") == 1;
+
+Also this type of route has maximum priority in case of ambiguity, see L<URI::Router/RELEVANCE>
+
+
+=head2 SIMPLE PATTERN
+
+    my $router = URI::Router->new(
+        "/user/*/info"         => 1,
+        "/user/*/gifts_from/*" => 2,
+        "/file/..."            => 3,
+        "/a/*/b/*/c/..."       => 4,
+    );
+
+Simple patterns can include:
+
+=over
+
+=item "*"
+
+This is a placeholder for the whole (but single) path segment. This segment can't be empty. It is logically the same as ([^/]+).
+
+Every "*" in pattern will result in exactly one captured arg being returned from C<route()> method.
+
+    my ($value, @args) = $router->route("/user/123/info");           # $value = 1, @args = (123);
+    my ($value, @args) = $router->route("/user/123/gifts_from/321"); # $value = 2, @args = (123, 321);
+
+=item "..."
+
+Ellipsis is a placeholder for zero or more trailing path segments. It can only appear at the end of the pattern and will result in zero or more
+additional arguments being returned from C<route()> method.
+
+    my ($value, @args) = $router->route("/file");             # $value = 3, @args = ()
+    my ($value, @args) = $router->route("/file/foo.txt");     # $value = 3, @args = ("foo.txt")
+    my ($value, @args) = $router->route("/file/foo/bar.txt"); # $value = 3, @args = ("foo", "bar.txt")
+    my ($value, @args) = $router->route("/a/1/b/2/c/3/4");    # $value = 4, @args = (1,2,3,4)
+
+=back    
+
+Simple patterns are insensitive to slashes (both in route and in tested path).
+
+All of these lines adds the same route (the latest added will replace others)
+
+    $router->add("/user/*/info", 1);
+    $router->add("/user/*/info/", 1);
+    $router->add("/user/*///info///", 1);
+
+All of these will find the same route
+
+    $router->route("/user/10/info");
+    $router->route("/user/10/info/");
+    $router->route("//user//10//info");
+
+
+=head2 REGEXP PATTERN
+
+    my $router = URI::Router->new(
+        qr#/user/(\d+)/info#             => 1,
+        qr#/user/(\d+)/gifts_from/(\d+)# => 2,
+        qr#/file/(.+)#                   => 3,
+    );
+
+Regexp patterns have lower priory and will only match if no static or simple patterns match.
+
+Regexp engines are too slow for the purpose of this module and under the hood no regexp engines are involved. Instead C<URI::Router>
+constructs a custom DFA from all the regexps and patterns supplied and tests all at once in a single pass.
+Therefore in the sake of performance it can't support all the functionality of perl regexps and its features are limited to a basic set.
+
+Regexp features supported: "\d\D\w\W\s\S\t\r\n", ".", "[symbol class]", "(capturing)", "(?:non-capturing)", "|", "?", "*", "+", "{x}", "{x,}", "{,y}", "{x,y}"
+
+Every capturing group in matched regexp route will result in additinal argument being returned from C<route()> method. No attempts are made to split
+any argument by slash.
+
+    my ($value, @args) = $router->route("/user/123/info");           # $value = 1, @args = (123)
+    my ($value, @args) = $router->route("/user/123/gifts_from/321"); # $value = 2, @args = (123, 321)
+    my ($value, @args) = $router->route("/file/foo.txt");            # $value = 3, @args = ("foo.txt")
+    my ($value, @args) = $router->route("/file/foo/bar.txt");        # $value = 3, @args = ("foo/bar.txt")
+
+Regexp patterns are insensitive only to slashes in path being tested (because it gets normalized during search).
+Regexp itself must start with slash (or accept it via ".+" and so on), must not require trailing slash and must not have empty segments (repeating slashes).
+
+    $router->route("/user/123/info"); # finds 1
+    $router->route("/user/123/info/"); # finds 1
+    $router->route("/user/123//info"); # finds 1
+
+    $route->add(qr#abc/def#, $val); # will not match anything
+    $route->add(qr#.+abc/def#, $val); # ok
+    $route->add(qr#/abc/def/#, $val); # will not match anything
+    $route->add(qr#/abc/def/?#, $val); # ok, but does not make sense (tested paths never have trailing slashes)
+    $route->add(qr#/abc//def#, $val); # will not match anything
+    $route->add(qr#/abc/.*/def#, $val); # ok, but will not match /abc/def
+    $route->add(qr#/abc/(.+/)?def#, $val); # ok
+
+
+
+=head1 RELEVANCE
+
+If there are more than one route that matches a given path, C<URI::Router> returns the most relevant match.
+
+The rules are as following:
+
+=over
+
+=item Static route has the highest priority
+
+    my $router = URI::Router->new(
+        "/foo/*"   => 1,
+        "/foo/bar" => 2,
+    );
+    $r->route("/foo/bar"); # matches 2
+    $r->route("/foo/baz"); # matches 1
+
+=item Then simple pattern routes
+
+If several pattern routes match then more relevant is the one with more static part in the beginning of the path.
+
+    my $router = URI::Router->new(
+        "/foo/bar/*" => 1,
+        "/foo/*/*"   => 2,
+        "/x/*/*/b"   => 3,
+        "/x/*/y/*"   => 4,
+    );
+    $r->route("/foo/bar/baz"); # matches 1
+    $r->route("/foo/abc/bar"); # matches 2
+    $r->route("/x/a/y/b");     # matches 4
+    $r->route("/x/a/z/b");     # matches 3
+
+The number of "*" in pattern doesn't matter as well as its order of adding into the router, only position in path does
+
+    my $router = URI::Router->new(
+        "/*/1/2/3"   => 1,
+        "/foo/*/*/*" => 2,
+    );
+    $r->route("/foo/1/2/3"); # matches 2
+
+If keeping in mind the above, two routes still have the same priority (the only case for that is "*" vs "..."), then "*" wins.
+
+    my $router = URI::Router->new(
+        "/foo/..." => 1,
+        "/foo/*"   => 2,
+    );
+    $r->route("/foo/bar");     # matches 2
+    $r->route("/foo");         # matches 1
+    $r->route("/foo/bar/baz"); # matches 1
+
+
+=item And finally, regexp routes
+
+If several regexp routes match, then the earliest added to the router is more relevant.
+
+=back
+
+=head1 HTTP METHODS
+
+Method C<route()> accepts 2 arguments - a path and an http method of the request made.
+If http method is not passed as in examples above, method GET is assumed by default.
+
+If the found route doesn't support that method, the result of the routing is "not found".
+
+Http method can be specified for each route as a prefix before path NOT starting with "/".
+Accepted methods are "OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "TRACE", "CONNECT".
+
+If no method is specified for a certain route in config, it will accept any http method.
+
+    my $router = URI::Router->new(
+        "GET/foo/*"   => 1, # accepts only GET
+        "POST/foo/*"  => 2, # accepts only POST
+        "/x/y"        => 3, # accepts any method
+        qr#POST/\d+#  => 4, # accepts only POST
+    );
+    
+    $router->route("/foo/bar", METHOD_GET);  # matches 1
+    $router->route("/foo/bar");              # matches 1
+    $router->route("/foo/bar", METHOD_POST); # matches 2
+    $router->route("/foo/bar", METHOD_PUT);  # no match
+    $router->route("/x/y", METHOD_POST);     # matches 3
+    $router->route("/x/y", METHOD_PUT);      # matches 3
+    $router->route("/123", METHOD_POST);     # matches 4
+    $router->route("/123", METHOD_HEAD);     # no match
+
+If the matched most relevant route doesn't accept specified http method, then the result is no-match. No attempts are made to fallback to less
+relevant route to inspect if it has specified http method.
+
+
+
+=head1 METHODS
+
+=head4 new([$pattern1 => $value1, ...])
+
+Constructs router object and adds routes via C<add()> method, see below for details
+
+
+=head4 add($pattern, $value)
+
+Adds a route to the router.
+
+C<$pattern> can be of the following:
+
+=over
+
+=item Static path
+
+    $router->add("/foo/bar", 1);
+
+=item Simple pattern
+
+    $router->add("/user/*/info", 2);
+    $router->add("/file/...", 3);
+
+=item Regex pattern
+
+    $router->add(qr#/img/(.+\.jpg)#, 4);
+
+=back
+
+C<$value> can be any perl scalar
+
+This method can be called at any time, C<URI::Router> will recompile its DFA machine on the nearest C<route()> call.
+
+
+=head4 route($path, [$method = METHOD_GET])
+
+Finds the most relevant route for the path and http method and returns the value associated with it or C<undef> if no match is found.
+
+If called in list context, additinaly returns all captured values for placeholders in simple pattern or capturing groups in regexps if any.
+
+    my $router = URI::Router->new(
+        "/user/*/info" => 1,
+    );
+    
+    my $val = $router->route("/hello"); # undef
+    my $val = $router->route("/user/123/info"); # $val = 1
+    my ($val, @args) = $router->route("/user/123/info"); # $val = 1, @args = (123)
+
+
+
+=head1 PERFORMANCE
+
+C<URI::Router>'s performance is constant (only depends on the length of the path being tested).
+It doesn't matter how many routes there are even if all of them are regexps (actually, it translates all routes to regexps).
+
+However, C<URI::Router> finds paths that match static routes significantly faster (performance is constant).
+
+Benchmark script can be found in "misc/bench.pl", it configures about 700 routes (static routes, with placeholders and regexps) and matches with
+3 different paths.
+
+Benchmark matching with static route "/social/v2/auth":
+
+                        Rate http_router router_simple router_boom router_r3 (router_xs)* uri_router
+    http_router        207/s          --          -94%       -100%     -100%        -100%      -100%
+    router_simple     3319/s       1500%            --        -99%     -100%        -100%      -100%
+    router_boom     455111/s     219329%        13614%          --      -68%         -95%       -97%
+    router_r3      1442616/s     695447%        43372%        217%        --         -83%       -89%
+    (router_xs)*   8738132/s    4212928%       263214%       1820%      506%           --       -35%
+    uri_router    13467948/s    6493375%       405742%       2859%      834%          54%         --
+
+Benchmark matching with pattern route with capture "/ai/scans/penalty/xx/ban" matching "/ai/scans/penalty/*/ban"
+
+                       Rate http_router router_simple router_boom router_r3 (router_xs)* uri_router
+    http_router       615/s          --          -94%       -100%     -100%        -100%      -100%
+    router_simple   10960/s       1681%            --        -95%      -99%        -100%      -100%
+    router_boom    236307/s      38300%         2056%          --      -82%         -94%       -96%
+    router_r3     1279827/s     207872%        11578%        442%        --         -69%       -78%
+    (router_xs)*  4095999/s     665500%        37274%       1633%      220%           --       -28%
+    uri_router    5716536/s     928837%        52060%       2319%      347%          40%         --
+
+Benchmark matching with regexp route "/shop/cart.php" mathing "/.+\.php" (only for those who can handle that)
+
+                       Rate router_simple   router_boom     router_r3    uri_router
+    router_simple    3258/s            --          -98%         -100%         -100%
+    router_boom    183794/s         5541%            --          -90%          -98%
+    router_r3     1787345/s        54757%          872%            --          -79%
+    uri_router    8495407/s       260641%         4522%          375%            --
+
+Tests were performed on AMD Ryzen 3970x
+
+P.S.
+
+(router_xs)*: L<Router::XS> doesn't actually work and is completely useless and can't be used in production because it is buggy
+(it core dumps if any path segment is more than 32 bytes, or path segments count > 32), so that using it makes a huge security hole in your project.
+Also it returns incorrect captured args (not the ones that matched with "*").
+Additionaly it can't handle overlapping routes, such as "/path/*" and "/path/foo"
+
+L<Router::R3> is also not a stable product, it segfaults on duplicate paths and also do not accept the tested set of urls unless it is sorted alphabetically.
+Some regexps doesn't work at all (no matches were found) in L<Router::R3>.
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

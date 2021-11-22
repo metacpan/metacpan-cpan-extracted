@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use Path::Tiny;
 use HTTP::Tiny;
+use JSON::Schema::Modern;
 
 my %files = (
-  'draft2020-12/schema.json'              => 'https://json-schema.org/draft/2020-12/schema',
   'draft2020-12/meta/applicator.json'     => 'https://json-schema.org/draft/2020-12/meta/applicator',
   'draft2020-12/meta/content.json'        => 'https://json-schema.org/draft/2020-12/meta/content',
   'draft2020-12/meta/core.json'           => 'https://json-schema.org/draft/2020-12/meta/core',
@@ -14,17 +14,15 @@ my %files = (
   'draft2020-12/meta/meta-data.json'      => 'https://json-schema.org/draft/2020-12/meta/meta-data',
   'draft2020-12/meta/unevaluated.json'    => 'https://json-schema.org/draft/2020-12/meta/unevaluated',
   'draft2020-12/meta/validation.json'     => 'https://json-schema.org/draft/2020-12/meta/validation',
+  'draft2020-12/output/schema.json'       => 'https://json-schema.org/draft/2020-12/output/schema',
+  'draft2020-12/schema.json'              => 'https://json-schema.org/draft/2020-12/schema',
 
-  'draft2019-09/hyper-schema.json'        => 'https://json-schema.org/draft/2019-09/hyper-schema',
-  'draft2019-09/links.json'               => 'https://json-schema.org/draft/2019-09/links',
   'draft2019-09/meta/applicator.json'     => 'https://json-schema.org/draft/2019-09/meta/applicator',
   'draft2019-09/meta/content.json'        => 'https://json-schema.org/draft/2019-09/meta/content',
   'draft2019-09/meta/core.json'           => 'https://json-schema.org/draft/2019-09/meta/core',
   'draft2019-09/meta/format.json'         => 'https://json-schema.org/draft/2019-09/meta/format',
-  'draft2019-09/meta/hyper-schema.json'   => 'https://json-schema.org/draft/2019-09/meta/hyper-schema',
   'draft2019-09/meta/meta-data.json'      => 'https://json-schema.org/draft/2019-09/meta/meta-data',
   'draft2019-09/meta/validation.json'     => 'https://json-schema.org/draft/2019-09/meta/validation',
-  'draft2019-09/output/hyper-schema.json' => 'https://json-schema.org/draft/2019-09/output/hyper-schema',
   'draft2019-09/output/schema.json'       => 'https://json-schema.org/draft/2019-09/output/schema',
   'draft2019-09/schema.json'              => 'https://json-schema.org/draft/2019-09/schema',
 
@@ -37,5 +35,15 @@ foreach my $target (keys %files) {
   $target->parent->mkpath;
 
   my $response = HTTP::Tiny->new->get($source);
+  die "Failed to fetch $source: $response->{status} $response->{reason}" if not $response->{success};
+
   $target->spew($response->{content});
+}
+
+my $js = JSON::Schema::Modern->new(validate_formats => 1);
+foreach my $uri (values %files) {
+  print "# validating $uri\n" if $ENV{DEBUG};
+
+  my $result = $js->_fetch_from_uri($uri)->{document}->validate;
+  die $js->_json_decoder->pretty->encode($result) if not $result;
 }

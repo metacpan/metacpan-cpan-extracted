@@ -1368,6 +1368,13 @@ now
    =>
    '[_locate_n] Unable to find an interval in 100 attempts'
 
+### Empty
+0:0:0:1*17:00:00
+2020101000:00:00
+2020101000:00:00
+2020101000:00:00
+  =>
+
 ";
 
 $::ti->tests(func  => \&test,

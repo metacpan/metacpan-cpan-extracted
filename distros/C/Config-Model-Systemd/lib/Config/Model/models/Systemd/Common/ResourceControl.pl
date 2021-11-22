@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -17,7 +17,7 @@ return [
       {
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'Unknown parameter'
+        'warn' => 'Unexpected systemd parameter. Please contact cme author to update systemd model.'
       }
     ],
     'class_description' => 'Unit configuration files for services, slices, scopes, sockets, mount points, and swap devices share a subset
@@ -76,11 +76,13 @@ L<systemd-system.conf(5)>.',
       },
       'CPUWeight',
       {
-        'description' => 'Assign the specified CPU time weight to the processes executed, if the unified control group hierarchy
-is used on the system. These options take an integer value and control the C<cpu.weight>
-control group attribute. The allowed range is 1 to 10000. Defaults to 100. For details about this control
-group attribute, see L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html> and L<CFS Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.
-The available CPU time is split up among all units within one slice relative to their CPU time weight.
+        'description' => 'Assign the specified CPU time weight to the processes executed, if the unified control group
+hierarchy is used on the system. These options take an integer value and control the
+C<cpu.weight> control group attribute. The allowed range is 1 to 10000. Defaults to
+100. For details about this control group attribute, see L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html>
+and L<CFS
+Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.  The available CPU time is split up among all units within one slice relative to
+their CPU time weight. A higher weight means more CPU time, a lower weight means less.
 
 While C<StartupCPUWeight> only applies to the startup phase of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
@@ -96,11 +98,13 @@ These settings replace C<CPUShares> and C<StartupCPUShares>.',
       },
       'StartupCPUWeight',
       {
-        'description' => 'Assign the specified CPU time weight to the processes executed, if the unified control group hierarchy
-is used on the system. These options take an integer value and control the C<cpu.weight>
-control group attribute. The allowed range is 1 to 10000. Defaults to 100. For details about this control
-group attribute, see L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html> and L<CFS Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.
-The available CPU time is split up among all units within one slice relative to their CPU time weight.
+        'description' => 'Assign the specified CPU time weight to the processes executed, if the unified control group
+hierarchy is used on the system. These options take an integer value and control the
+C<cpu.weight> control group attribute. The allowed range is 1 to 10000. Defaults to
+100. For details about this control group attribute, see L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html>
+and L<CFS
+Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.  The available CPU time is split up among all units within one slice relative to
+their CPU time weight. A higher weight means more CPU time, a lower weight means less.
 
 While C<StartupCPUWeight> only applies to the startup phase of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
@@ -160,7 +164,7 @@ This setting is supported only with the unified control group hierarchy.',
       {
         'description' => 'Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
 or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
-CPU indices separated by a dash.
+NUMA nodes indices separated by a dash.
 
 Setting C<AllowedMemoryNodes> doesn\'t guarantee that all of the memory NUMA nodes will
 be used by the processes as it may be limited by parent units. The effective configuration is reported as
@@ -332,12 +336,13 @@ C<BlockIO> or C<StartupBlockIO>.',
       },
       'IOWeight',
       {
-        'description' => 'Set the default overall block I/O weight for the executed processes, if the unified control group
-hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the default block
-I/O weight. This controls the C<io.weight> control group attribute, which defaults to
-100. For details about this control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
-The available I/O bandwidth is split up among all units within one slice relative to their block
-I/O weight.
+        'description' => 'Set the default overall block I/O weight for the executed processes, if the unified control
+group hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the
+default block I/O weight. This controls the C<io.weight> control group attribute,
+which defaults to 100. For details about this control group attribute, see L<IO
+Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.  The available I/O bandwidth is split up among all units within one slice
+relative to their block I/O weight. A higher weight means more I/O bandwidth, a lower weight means
+less.
 
 While C<StartupIOWeight> only applies
 to the startup phase of the system,
@@ -353,12 +358,13 @@ and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>.',
       },
       'StartupIOWeight',
       {
-        'description' => 'Set the default overall block I/O weight for the executed processes, if the unified control group
-hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the default block
-I/O weight. This controls the C<io.weight> control group attribute, which defaults to
-100. For details about this control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
-The available I/O bandwidth is split up among all units within one slice relative to their block
-I/O weight.
+        'description' => 'Set the default overall block I/O weight for the executed processes, if the unified control
+group hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the
+default block I/O weight. This controls the C<io.weight> control group attribute,
+which defaults to 100. For details about this control group attribute, see L<IO
+Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.  The available I/O bandwidth is split up among all units within one slice
+relative to their block I/O weight. A higher weight means more I/O bandwidth, a lower weight means
+less.
 
 While C<StartupIOWeight> only applies
 to the startup phase of the system,
@@ -625,6 +631,12 @@ By default there are no filters specified.
 If these settings are used multiple times in the same unit all the specified programs are attached. If an
 empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
 
+If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
+is already being handled by C<BPFProgram> ingress hook, e.g.
+C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
+the assignment will be still considered valid and the program will be attached to a cgroup. Same for
+C<IPEgressFilterPath> path and C<egress> hook.
+
 Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
 all sockets associated with it directly, but not to any sockets created by the ultimately activated services
 for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
@@ -654,6 +666,12 @@ By default there are no filters specified.
 If these settings are used multiple times in the same unit all the specified programs are attached. If an
 empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
 
+If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
+is already being handled by C<BPFProgram> ingress hook, e.g.
+C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
+the assignment will be still considered valid and the program will be attached to a cgroup. Same for
+C<IPEgressFilterPath> path and C<egress> hook.
+
 Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
 all sockets associated with it directly, but not to any sockets created by the ultimately activated services
 for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
@@ -665,6 +683,216 @@ Note that these settings might not be supported on some systems (for example if 
 support is not enabled in the underlying kernel or container manager). These settings will fail the service in
 that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
 (requires C<Delegate>C<yes>) instead of using this setting.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'BPFProgram',
+      {
+        'description' => 'Add a custom cgroup BPF program.
+
+C<BPFProgram> allows attaching BPF hooks to the cgroup of a systemd unit.
+(This generalizes the functionality exposed via C<IPEgressFilterPath> for egress and
+C<IPIngressFilterPath> for ingress.)
+Cgroup-bpf hooks in the form of BPF programs loaded to the BPF filesystem are attached with cgroup-bpf attach
+flags determined by the unit. For details about attachment types and flags see L<|https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/include/uapi/linux/bpf.h>.
+For general BPF documentation please refer to L<|https://www.kernel.org/doc/html/latest/bpf/index.html>.
+
+The specification of BPF program consists of a type followed by a
+program-path with C<:> as the separator:
+typeC<:>program-path.
+
+type is the string name of BPF attach type also used in
+bpftool. type can be one of C<egress>,
+C<ingress>, C<sock_create>, C<sock_ops>,
+C<device>, C<bind4>, C<bind6>,
+C<connect4>, C<connect6>, C<post_bind4>,
+C<post_bind6>, C<sendmsg4>, C<sendmsg6>,
+C<sysctl>, C<recvmsg4>, C<recvmsg6>,
+C<getsockopt>, C<setsockopt>.
+
+Setting C<BPFProgram> to an empty value makes previous assignments ineffective.
+
+Multiple assignments of the same type:program-path
+value have the same effect as a single assignment: the program with the path program-path
+will be attached to cgroup hook type just once.
+
+If BPF C<egress> pinned to program-path path is already being
+handled by C<IPEgressFilterPath>, C<BPFProgram>
+assignment will be considered valid and C<BPFProgram> will be attached to a cgroup.
+Similarly for C<ingress> hook and C<IPIngressFilterPath> assignment.
+
+BPF programs passed with C<BPFProgram> are attached to the cgroup of a unit with BPF
+attach flag C<multi>, that allows further attachments of the same
+type within cgroup hierarchy topped by the unit cgroup.
+
+Examples:
+
+    BPFProgram=egress:/sys/fs/bpf/egress-hook
+    BPFProgram=bind6:/sys/fs/bpf/sock-addr-hook
+
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'SocketBindAllow',
+      {
+        'description' => "Allow or deny binding a socket address to a socket by matching it with the bind-rule and
+applying a corresponding action if there is a match.
+
+bind-rule describes socket properties such as address-family,
+transport-protocol and ip-ports.
+
+bind-rule :=
+{ [address-familyC<:>][transport-protocolC<:>][ip-ports] | C<any> }
+
+address-family := { C<ipv4> | C<ipv6> }
+
+transport-protocol := { C<tcp> | C<udp> }
+
+ip-ports := { ip-port | ip-port-range }
+
+An optional address-family expects C<ipv4> or C<ipv6> values.
+If not specified, a rule will be matched for both IPv4 and IPv6 addresses and applied depending on other socket fields, e.g. transport-protocol,
+ip-port.
+
+An optional transport-protocol expects C<tcp> or C<udp> transport protocol names.
+If not specified, a rule will be matched for any transport protocol.
+
+An optional ip-port value must lie within 1\x{2026}65535 interval inclusively, i.e.
+dynamic port C<0> is not allowed. A range of sequential ports is described by
+ip-port-range := ip-port-lowC<->ip-port-high,
+where ip-port-low is smaller than or equal to ip-port-high
+and both are within 1\x{2026}65535 inclusively.
+
+A special value C<any> can be used to apply a rule to any address family, transport protocol and any port with a positive value.
+
+To allow multiple rules assign C<SocketBindAllow> or C<SocketBindDeny> multiple times.
+To clear the existing assignments pass an empty C<SocketBindAllow> or C<SocketBindDeny>
+assignment.
+
+For each of C<SocketBindAllow> and C<SocketBindDeny>, maximum allowed number of assignments is
+C<128>.
+
+The feature is implemented with C<cgroup/bind4> and C<cgroup/bind6> cgroup-bpf hooks.
+
+Examples:
+    \x{2026}
+    # Allow binding IPv6 socket addresses with a port greater than or equal to 10000.
+    [Service]
+    SocketBindAllow=ipv6:10000-65535
+    SocketBindDeny=any
+    \x{2026}
+    # Allow binding IPv4 and IPv6 socket addresses with 1234 and 4321 ports.
+    [Service]
+    SocketBindAllow=1234
+    SocketBindAllow=4321
+    SocketBindDeny=any
+    \x{2026}
+    # Deny binding IPv6 socket addresses.
+    [Service]
+    SocketBindDeny=ipv6
+    \x{2026}
+    # Deny binding IPv4 and IPv6 socket addresses.
+    [Service]
+    SocketBindDeny=any
+    \x{2026}
+    # Allow binding only over TCP
+    [Service]
+    SocketBindAllow=tcp
+    SocketBindDeny=any
+    \x{2026}
+    # Allow binding only over IPv6/TCP
+    [Service]
+    SocketBindAllow=ipv6:tcp
+    SocketBindDeny=any
+    \x{2026}
+    # Allow binding ports within 10000-65535 range over IPv4/UDP.
+    [Service]
+    SocketBindAllow=ipv4:udp:10000-65535
+    SocketBindDeny=any
+    \x{2026}
+",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'SocketBindDeny',
+      {
+        'description' => "Allow or deny binding a socket address to a socket by matching it with the bind-rule and
+applying a corresponding action if there is a match.
+
+bind-rule describes socket properties such as address-family,
+transport-protocol and ip-ports.
+
+bind-rule :=
+{ [address-familyC<:>][transport-protocolC<:>][ip-ports] | C<any> }
+
+address-family := { C<ipv4> | C<ipv6> }
+
+transport-protocol := { C<tcp> | C<udp> }
+
+ip-ports := { ip-port | ip-port-range }
+
+An optional address-family expects C<ipv4> or C<ipv6> values.
+If not specified, a rule will be matched for both IPv4 and IPv6 addresses and applied depending on other socket fields, e.g. transport-protocol,
+ip-port.
+
+An optional transport-protocol expects C<tcp> or C<udp> transport protocol names.
+If not specified, a rule will be matched for any transport protocol.
+
+An optional ip-port value must lie within 1\x{2026}65535 interval inclusively, i.e.
+dynamic port C<0> is not allowed. A range of sequential ports is described by
+ip-port-range := ip-port-lowC<->ip-port-high,
+where ip-port-low is smaller than or equal to ip-port-high
+and both are within 1\x{2026}65535 inclusively.
+
+A special value C<any> can be used to apply a rule to any address family, transport protocol and any port with a positive value.
+
+To allow multiple rules assign C<SocketBindAllow> or C<SocketBindDeny> multiple times.
+To clear the existing assignments pass an empty C<SocketBindAllow> or C<SocketBindDeny>
+assignment.
+
+For each of C<SocketBindAllow> and C<SocketBindDeny>, maximum allowed number of assignments is
+C<128>.
+
+The feature is implemented with C<cgroup/bind4> and C<cgroup/bind6> cgroup-bpf hooks.
+
+Examples:
+    \x{2026}
+    # Allow binding IPv6 socket addresses with a port greater than or equal to 10000.
+    [Service]
+    SocketBindAllow=ipv6:10000-65535
+    SocketBindDeny=any
+    \x{2026}
+    # Allow binding IPv4 and IPv6 socket addresses with 1234 and 4321 ports.
+    [Service]
+    SocketBindAllow=1234
+    SocketBindAllow=4321
+    SocketBindDeny=any
+    \x{2026}
+    # Deny binding IPv6 socket addresses.
+    [Service]
+    SocketBindDeny=ipv6
+    \x{2026}
+    # Deny binding IPv4 and IPv6 socket addresses.
+    [Service]
+    SocketBindDeny=any
+    \x{2026}
+    # Allow binding only over TCP
+    [Service]
+    SocketBindAllow=tcp
+    SocketBindDeny=any
+    \x{2026}
+    # Allow binding only over IPv6/TCP
+    [Service]
+    SocketBindAllow=ipv6:tcp
+    SocketBindDeny=any
+    \x{2026}
+    # Allow binding ports within 10000-65535 range over IPv4/UDP.
+    [Service]
+    SocketBindAllow=ipv4:udp:10000-65535
+    SocketBindDeny=any
+    \x{2026}
+",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -864,16 +1092,51 @@ systemd-oomd to act on.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
-      'ManagedOOMMemoryPressureLimitPercent',
+      'ManagedOOMMemoryPressureLimit',
       {
         'description' => 'Overrides the default memory pressure limit set by
-L<oomd.conf(5)> for this unit
-(cgroup). Takes a percentage value between 0% and 100%, inclusive. This property is ignored unless
-C<ManagedOOMMemoryPressure>C<kill>. Defaults to 0%, which means use the
-default set by L<oomd.conf(5)>.
+L<oomd.conf(5)> for
+this unit (cgroup). Takes a percentage value between 0% and 100%, inclusive. This property is
+ignored unless C<ManagedOOMMemoryPressure>C<kill>. Defaults to 0%,
+which means to use the default set by
+L<oomd.conf(5)>.
 ',
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'ManagedOOMPreference',
+      {
+        'choice' => [
+          'none',
+          'avoid',
+          'omit'
+        ],
+        'description' => 'Allows deprioritizing or omitting this unit\'s cgroup as a candidate when
+systemd-oomd needs to act. Requires support for extended attributes (see
+L<xattr(7)>)
+in order to use C<avoid> or C<omit>. Additionally,
+systemd-oomd will ignore these extended attributes if the unit\'s cgroup is not
+owned by the root user.
+
+If this property is set to C<avoid>, the service manager will convey this to
+systemd-oomd, which will only select this cgroup if there are no other viable
+candidates.
+
+If this property is set to C<omit>, the service manager will convey this to
+systemd-oomd, which will ignore this cgroup as a candidate and will not perform
+any actions on it.
+
+It is recommended to use C<avoid> and C<omit> sparingly, as it
+can adversely affect systemd-oomd\'s kill behavior. Also note that these extended
+attributes are not applied recursively to cgroups under this unit\'s cgroup.
+
+Defaults to C<none> which means systemd-oomd will rank this
+unit\'s cgroup as defined in
+L<systemd-oomd.service(8)>
+and L<oomd.conf(5)>.
+',
+        'type' => 'leaf',
+        'value_type' => 'enum'
       },
       'CPUShares',
       {
@@ -1063,7 +1326,7 @@ C<IOWriteBandwidthMax> instead.',
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 247 doc',
+    'generated_by' => 'parse-man.pl from systemd 249 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

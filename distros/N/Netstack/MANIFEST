@@ -28,6 +28,7 @@ lib/Netstack/Utils/Date.pm
 lib/Netstack/Utils/Ip.pm
 lib/Netstack/Utils/Mail.pm
 lib/Netstack/Utils/Set.pm
+t/radio
 t/utils/cache.t
 t/utils/date.t
 t/utils/ip.t

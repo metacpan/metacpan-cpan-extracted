@@ -1,9 +1,9 @@
 package Module::Features::Dummy;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-26'; # DATE
+our $DATE = '2021-07-05'; # DATE
 our $DIST = 'Module-Features-Dummy'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -21,7 +21,7 @@ our %FEATURES_DEF = (
             req => 1,
         },
         feature3 => {
-            summary => 'Second feature, a string',
+            summary => 'Third feature, a string with range of valid values, optional',
             schema => ['str*', in=>['a','b','c']],
         },
     },
@@ -42,7 +42,7 @@ Module::Features::Dummy - Dummy feature set, for testing
 
 =head1 VERSION
 
-This document describes version 0.004 of Module::Features::Dummy (from Perl distribution Module-Features-Dummy), released on 2021-02-26.
+This document describes version 0.005 of Module::Features::Dummy (from Perl distribution Module-Features-Dummy), released on 2021-07-05.
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,7 @@ Required. Type: bool. Second feature, a bool, required.
 
 =item * feature3
 
-Optional. Type: str. Second feature, a string. 
+Optional. Type: str. Third feature, a string with range of valid values, optional. 
 
 =back
 
@@ -78,7 +78,7 @@ Source repository is at L<https://github.com/perlancar/perl-Module-Features-Dumm
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-Features-Dummy/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Features-Dummy>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

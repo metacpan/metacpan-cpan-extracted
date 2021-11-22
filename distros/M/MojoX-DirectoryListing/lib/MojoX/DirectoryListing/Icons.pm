@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our @EXPORT = qw(choose_icon get_icon);
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our %BYTES;
 
 sub get_icon {

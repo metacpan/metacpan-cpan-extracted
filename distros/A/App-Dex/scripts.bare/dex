@@ -3,6 +3,7 @@ use warnings;
 use strict;
 use App::Dex;
 use Pod::Usage qw(pod2usage);
+use Try::Tiny;
 
 if ( @ARGV && ( $ARGV[0] eq '--help' || $ARGV[0] eq '-h' ) ) {
     pod2usage( -verbose => 2 );
@@ -10,8 +11,23 @@ if ( @ARGV && ( $ARGV[0] eq '--help' || $ARGV[0] eq '-h' ) ) {
 
 my $app = App::Dex->new;
 
+# Throw an error if we couldn't find a config file.
+try { $app->config_file } catch { die "Error: No config file found.\n" };
+
 if ( @ARGV ) {
-    $app->process_block( $app->resolve_block( [ @ARGV ] ) );
+    my $block = $app->resolve_block( [ @ARGV ] );
+
+    if ( ! $block ) {
+        if ( $ENV{DEX_FALLBACK_CMD} ) {
+            exec $ENV{DEX_FALLBACK_CMD}, @ARGV;
+        } else {
+            print STDERR "Error: No such command.\n\n";
+            $app->display_menu;
+            exit -1;
+        }
+    }
+
+    $app->process_block( $block );
 } else {
     $app->display_menu;
 }

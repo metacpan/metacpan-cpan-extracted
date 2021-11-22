@@ -3,7 +3,7 @@ package Text::Guess::Script;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Unicode::Normalize;
 use Unicode::UCD qw(charscript prop_value_aliases);
@@ -49,20 +49,21 @@ sub _guesses {
   }
 
   my $guesses = {};
-  #my @other_codes = @codes;
-  #my @seen_codes;
+  my $names   = {};
 
   for my $char (keys %$chars) {
-    my ($code, $name) = prop_value_aliases("Script",charscript(ord($char)));
+    my ($code, $name) = prop_value_aliases( 'Script', charscript( ord($char) ) );
 
     $guesses->{$code} += $chars->{$char};
+    $names->{$code}  //= $name;
   }
 
   my $result = [
-  	map { [ $_, $guesses->{$_}/scalar(@tokens) ] }
+  	map { [ $_, $guesses->{$_}/scalar(@tokens), $names->{$_} ] }
     sort { $guesses->{$b} <=> $guesses->{$a} }
-    keys(%$guesses)
+    keys( %$guesses )
   ];
+
   return $result;
 }
 
@@ -93,25 +94,30 @@ Text::Guess::Script - Guess script from text using ISO-15924 codes
   print Text::Guess::Script->guess('Hello World'); # prints Latn
 
   print Text::Guess::Script->guesses('Hello World')->[0]->[0]; # Latn
+  print Text::Guess::Script->guesses('Hello World')->[0]->[2]; # Latin
+
   print Text::Guess::Script->guesses('Hello World')->[1]->[0]; # Zyyy
+  print Text::Guess::Script->guesses('Hello World')->[1]->[2]; # Common
 
   use Data::Dumper;
   print Dumper(Text::Guess::Script->guesses('Hello World'));
   $VAR1 = [
           [
             'Latn',
-            '0.909090909090909'
+            '0.909090909090909',
+            'Latin'
           ],
           [
             'Zyyy',
-            '0.0909090909090909'
+            '0.0909090909090909',
+            'Common'
           ]
         ];
 
 =head1 DESCRIPTION
 
-Text::Guess::Script matches the characters in the text against the script property
-and returns the code of the script with most characters.
+Text::Guess::Script gets the script property for each character in the text
+and returns the code of the script with the most characters.
 
 =head2 CONSTRUCTOR
 
@@ -136,11 +142,11 @@ Returns the script code with the most characters.
 =item guesses($text)
 
 Returns an array reference with an array, sorted descending by relative frequency for
-each script. Each entry is a pair of script code and relative frequency like this:
+each script. Each entry is a triple of script code, relative frequency and script name:
 
   $guesses = [
-    [ 'Latn', '0.909090909090909'  ],
-    [ 'Zyyy', '0.0909090909090909' ]
+    [ 'Latn', '0.909090909090909',  'Latin'  ],
+    [ 'Zyyy', '0.0909090909090909', 'Common' ],
   ];
 
 =back

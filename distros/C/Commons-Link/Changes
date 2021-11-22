@@ -1,3 +1,14 @@
+0.05 2021-11-14T13:40:23+01:00
+ - Add thumb_link() method.
+
+0.04 2021-11-11T22:33:26+01:00
+ - Add mw_file_link() method.
+ - Add mw_link() method.
+ - Add mw_user_link() method.
+
+0.03 2021-11-07T11:53:42+01:00
+ - Fix URI constucting.
+
 0.02 2021-11-03T17:50:53+01:00
  - Fix abstract.
  - Regen examples/ex2.pl example.

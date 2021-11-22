@@ -4,16 +4,17 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
 use JSON::Schema::Modern::Utilities qw(is_type E A assert_keyword_type);
-use Moo;
 use Feature::Compat::Try;
 use namespace::clean;
 
@@ -136,21 +137,17 @@ sub keywords {
     'uri-template' => sub { 1 },
   };
 
-  sub _get_default_format_validation {
-    my ($self, $format) = @_;
+  sub _get_default_format_validation ($self, $format) {
     return $formats->{$format};
   }
 }
 
-sub _traverse_keyword_format {
-  my ($self, $schema, $state) = @_;
+sub _traverse_keyword_format ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'string');
   return 1;
 }
 
-sub _eval_keyword_format {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_format ($self, $data, $schema, $state) {
   return E($state, 'unimplemented format "%s"', $schema->{format})
     if $schema->{format} eq 'iri-reference' or $schema->{format} eq 'uri-template';
 
@@ -202,7 +199,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 DESCRIPTION
 

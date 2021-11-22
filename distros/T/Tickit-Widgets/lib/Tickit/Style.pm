@@ -3,13 +3,14 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.51;
 
-package Tickit::Style 0.52;
+package Tickit::Style 0.53;
 
 use strict;
 use warnings;
 use 5.010;
+use experimental 'postderef';
 
 use Carp;
 
@@ -235,7 +236,7 @@ sub import
 
       foreach my $hash ( \%RESHAPE_KEYS, \%RESHAPE_TEXTWIDTH_KEYS, \%REDRAW_KEYS ) {
          # shallow copy is sufficient
-         $hash->{$type} = { %{ $hash->{$srctype} } } if $hash->{$srctype};
+         $hash->{$type} = { $hash->{$srctype}->%* } if $hash->{$srctype};
       }
    }
 
@@ -319,7 +320,7 @@ sub style_reshape_keys
 sub _reshape_keys
 {
    my ( $type ) = @_;
-   return keys %{ $RESHAPE_KEYS{$type} };
+   return keys $RESHAPE_KEYS{$type}->%*;
 }
 
 =head2 style_reshape_textwidth_keys
@@ -343,7 +344,7 @@ sub style_reshape_textwidth_keys
 sub _reshape_textwidth_keys
 {
    my ( $type ) = @_;
-   return keys %{ $RESHAPE_TEXTWIDTH_KEYS{$type} };
+   return keys $RESHAPE_TEXTWIDTH_KEYS{$type}->%*;
 }
 
 =head2 style_redraw_keys
@@ -370,7 +371,7 @@ sub style_redraw_keys
 sub _redraw_keys
 {
    my ( $type ) = @_;
-   return keys %{ $REDRAW_KEYS{$type} };
+   return keys $REDRAW_KEYS{$type}->%*;
 }
 
 my @ON_STYLE_LOAD;
@@ -480,23 +481,30 @@ class # hide from indexer
    # style tags
    has $tags  :reader :param;
    has $style :reader :param;
+
+   method clone
+   {
+      return __PACKAGE__->new( tags => $tags, style => { %$style } );
+   }
 }
 
 class # hide from indexer
-   Tickit::Style::_Tagset;
+   Tickit::Style::_Tagset :strict(params);
+
+use experimental 'postderef';
 
 has @_keysets;
 
-BUILD
+ADJUSTPARAMS
 {
-   @_keysets = @_;
+   my ( $params ) = @_;
+   $params->{keysets} and
+      @_keysets = ( delete $params->{keysets} )->@*;
 }
 
 method clone
 {
-   return __PACKAGE__->new(
-      map { Tickit::Style::_Keyset->new( tags => $_->tags, style => { %{$_->style} } ) } @_keysets
-   );
+   return __PACKAGE__->new( keysets => [ map { $_->clone } @_keysets ] );
 }
 
 method add
@@ -528,7 +536,7 @@ method merge_with_tags
    # First see if we have to merge an existing one
    KEYSET: foreach my $keyset ( @_keysets ) {
       $keyset->tags->{$_} or next KEYSET for keys %$tags;
-      $tags->{$_} or next KEYSET for keys %{ $keyset->tags };
+      $tags->{$_} or next KEYSET for keys $keyset->tags->%*;
 
       # Merge
       foreach my $key ( keys %$style ) {
@@ -540,7 +548,7 @@ method merge_with_tags
 
    # Keep sorted, most tags first
    # TODO: this might be doable more efficiently but we don't care for now
-   @_keysets = sort { scalar keys %{ $b->tags } <=> scalar keys %{ $a->tags } } ( @_keysets, $keyset );
+   @_keysets = sort { scalar keys $b->tags->%* <=> scalar keys $a->tags->%* } ( @_keysets, $keyset );
 }
 
 method keysets

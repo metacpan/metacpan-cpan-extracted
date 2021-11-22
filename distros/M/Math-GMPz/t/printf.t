@@ -7,41 +7,43 @@ print "1..7\n";
 
 print "# Using gmp version ", Math::GMPz::gmp_v(), "\n";
 
-open(WR1, '>', 'out21.txt') or die "Can't open WR1: $!";
-open(WR2, '>', 'out22.txt') or die "Can't open WR2: $!";
+my($WR1, $WR2, $RD1, $RD2);
+
+open($WR1, '>', 'out21.txt') or die "Can't open WR1: $!";
+open($WR2, '>', 'out22.txt') or die "Can't open WR2: $!";
 
 my $mp = Math::GMPz->new(-1234567);
 my $int = -17;
 my $ul = 56789;
 my $string = "A string";
 
-Rmpz_fprintf(\*WR1, "An mpz object: %Zd ", $mp);
+Rmpz_fprintf(\*$WR1, "An mpz object: %Zd ", $mp);
 $mp++;
-Rmpz_fprintf(\*WR2, "An mpz object: %Zd ", $mp);
+Rmpz_fprintf(\*$WR2, "An mpz object: %Zd ", $mp);
 
-Rmpz_fprintf(\*WR1, "followed by a signed int: $int ");
+Rmpz_fprintf(\*$WR1, "followed by a signed int: $int ");
 $int++;
-Rmpz_fprintf(\*WR2, "followed by a signed int: $int ");
+Rmpz_fprintf(\*$WR2, "followed by a signed int: $int ");
 
-Rmpz_fprintf(\*WR1, "followed by an unsigned long: $ul\n");
+Rmpz_fprintf(\*$WR1, "followed by an unsigned long: $ul\n");
 $ul++;
-Rmpz_fprintf(\*WR2, "followed by an unsigned long: $ul\n");
+Rmpz_fprintf(\*$WR2, "followed by an unsigned long: $ul\n");
 
-Rmpz_fprintf(\*WR1, "%s ", $string);
-Rmpz_fprintf(\*WR2, "%s ", $string);
+Rmpz_fprintf(\*$WR1, "%s ", $string);
+Rmpz_fprintf(\*$WR2, "%s ", $string);
 
-Rmpz_fprintf(\*WR1, "and an mpz object in hex: %Zx\n", $mp);
+Rmpz_fprintf(\*$WR1, "and an mpz object in hex: %Zx\n", $mp);
 $mp++;
-Rmpz_fprintf(\*WR2, "and an mpz object in hex: %Zx\n", $mp);
+Rmpz_fprintf(\*$WR2, "and an mpz object in hex: %Zx\n", $mp);
 
-close(WR1) or die "Can't close WR1: $!";
-close(WR2) or die "Can't close WR2: $!";
-open(RD1, '<', 'out21.txt') or die "Can't open RD1: $!";
-open(RD2, '<', 'out22.txt') or die "Can't open RD2: $!";
+close($WR1) or die "Can't close WR1: $!";
+close($WR2) or die "Can't close WR2: $!";
+open($RD1, '<', 'out21.txt') or die "Can't open RD1: $!";
+open($RD2, '<', 'out22.txt') or die "Can't open RD2: $!";
 
 my $ok;
 
-while(<RD1>) {
+while(<$RD1>) {
      chomp;
      if($. == 1) {
        if($_ eq 'An mpz object: -1234567 followed by a signed int: -17 followed by an unsigned long: 56789') {$ok .= 'a'}
@@ -53,7 +55,7 @@ while(<RD1>) {
      }
 }
 
-while(<RD2>) {
+while(<$RD2>) {
      chomp;
      if($. == 1) {
        if($_ eq 'An mpz object: -1234566 followed by a signed int: -16 followed by an unsigned long: 56790') {$ok .= 'c'}
@@ -65,8 +67,8 @@ while(<RD2>) {
      }
 }
 
-close(RD1) or die "Can't close RD1: $!";
-close(RD2) or die "Can't close RD2: $!";
+close($RD1) or die "Can't close RD1: $!";
+close($RD2) or die "Can't close RD2: $!";
 
 if($ok eq 'abcd') {print "ok 1\n"}
 else {print "not ok 1 $ok\n"}

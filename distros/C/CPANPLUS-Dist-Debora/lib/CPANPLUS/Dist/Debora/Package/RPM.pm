@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -47,9 +47,10 @@ my %PROVIDES_FOR = (
         perl(LWP::Protocol::http::Socket)
         perl(LWP::Protocol::http::SocketMethods)
     }],
-    'Module-CoreList' => [qw{perl-Module-CoreList-tools}],
-    'Moose'           => [qw{perl(Moose::Conflicts)}],
-    'Package-Stash'   => [qw{perl(Package::Stash::Conflicts)}],
+    'Module-CoreList'  => [qw{perl-Module-CoreList-tools}],
+    'Moose'            => [qw{perl(Moose::Conflicts)}],
+    'Package-Stash'    => [qw{perl(Package::Stash::Conflicts)}],
+    'XS-Parse-Keyword' => [qw{perl(:XS_Parse_Keyword_ABI_2)}],
 );
 
 sub format_priority {
@@ -532,7 +533,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

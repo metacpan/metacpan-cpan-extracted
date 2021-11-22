@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -17,7 +17,7 @@ return [
       {
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'Unknown parameter'
+        'warn' => 'Unexpected systemd parameter. Please contact cme author to update systemd model.'
       }
     ],
     'element' => [

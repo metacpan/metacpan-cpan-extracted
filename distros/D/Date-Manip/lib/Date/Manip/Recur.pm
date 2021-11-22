@@ -26,7 +26,7 @@ use Date::Manip::Base;
 use Date::Manip::TZ;
 
 our $VERSION;
-$VERSION='6.85';
+$VERSION='6.86';
 END { undef $VERSION; }
 
 ########################################################################
@@ -916,7 +916,7 @@ sub next {
              defined $$self{'data'}{'end'}) {
 
             my $n = $self->_locate_n('first');
-            return (undef,'Not found')  if ($$self{'err'});
+            return (undef,'Not found')  if ($$self{'err'}  ||  ! defined($n));
             $$self{'data'}{'curr'} = $n-1;
 
          } else {
@@ -969,7 +969,7 @@ sub prev {
              defined $$self{'data'}{'end'}) {
 
             my $n = $self->_locate_n('last');
-            return (undef,'Not found')  if ($$self{'err'});
+            return (undef,'Not found')  if ($$self{'err'}  ||  ! defined($n));
             $$self{'data'}{'curr'} = $n+1;
 
          } else {

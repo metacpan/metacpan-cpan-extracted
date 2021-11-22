@@ -8,11 +8,11 @@ use PPIx::Regexp;
 use base qw( Perl::Critic::Policy );
 
 # ABSTRACT: Prohibit non-ASCII \d in regular expressions
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 use constant DESC => 'Using non-ASCII \d';
-use constant EXPL => 'The character class \d matches non-ASCI unicode digits.  ' .
+use constant EXPL => 'The character class \d matches non-ASCII unicode digits.  ' .
                      'Use [0-9] or the /a modifier (Perl 5.14+) instead.';
 
 sub supported_parameters { ()                                        }
@@ -61,7 +61,7 @@ Perl::Critic::Policy::Plicease::ProhibitUnicodeDigitInRegexp - Prohibit non-ASCI
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -92,8 +92,10 @@ some thought.  This is frequently true for L<Perl::Critic> policies, but especia
 for this policy.
 
 In the general the ability to match against unicode digits is a useful ability, and doesn't
-constitute bad code.  Some applications don't ever need to match non-ASCII digit characters,
-and incorrectly rely on C<\d> to validate as a number.
+constitute bad code.  On the other hand, some applications don't ever need to match non-ASCII
+digit characters, and incorrectly rely on C<\d> to validate as a number as Perl understands
+it (and Perl understands non-ASCII digits as zero regardless of what they mean in their
+respective languages).
 
 This policy doesn't take into account using the L<re> pragma.
 
@@ -103,7 +105,11 @@ This policy doesn't take into account using the L<re> pragma.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Ville Skyttä (SCOP)
 
 =head1 COPYRIGHT AND LICENSE
 

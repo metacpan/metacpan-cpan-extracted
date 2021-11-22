@@ -1,4 +1,4 @@
-package HTTPConfig;
+package My::HTTPConfig;
 
 use strict;
 use warnings;

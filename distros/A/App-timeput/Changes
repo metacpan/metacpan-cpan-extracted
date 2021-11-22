@@ -1,0 +1,11 @@
+
+Revision history for the module "App::timeput"
+
+-.---  2016-07-19T18:55:16+09:00 First appear in the author's own repository.
+-.---  2016-07-27T22:25:19T09:00 Implemented the option "-." ; in the beginning it was "-k".
+0.060  2021-11-13T21:28+09:00  This module is created by copyting the file from my own.
+0.070  2021-11-14T17:06+09:00 An option "-b" deleted. "-w" added. Ctrl+C behavior. Examples on the help page.
+0.071  2021-11-14T21:14+09:00 Wrote the author's name both in the program file and the .pm file.
+0.075  2021-11-15T00:00+09:00 Debugged "-w" part. Tuned precisely on "-g" part. Tiny revision on Manual.
+0.076  2021-11-17T17:52+09:00 Removed "-b" while adding "-b". And "-. 3" became the default.
+0.077  2021-11-17T22:16+09:00 Added "-z" to enable specifying the time zone. 

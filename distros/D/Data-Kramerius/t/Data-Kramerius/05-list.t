@@ -8,4 +8,4 @@ use Test::NoWarnings;
 # Test.
 my $obj = Data::Kramerius->new;
 my @ret = $obj->list;
-is(@ret, 47, 'Number of Kramerius systems in data is 47.');
+is(@ret, 50, 'Number of Kramerius systems in data is 50.');

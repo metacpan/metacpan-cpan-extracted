@@ -1,0 +1,1 @@
+- Fix switching versions in env mode which broke in the previous release.

@@ -1,5 +1,9 @@
 Revision history for Business-Fixflo
 
+0.46     2021-10-05
+        - Add ExternalRef to Business::Fixflo::Issue
+        - Add warn_unknown_attributes to Business::Fixflo::Resource
+
 0.45     2021-10-05
         - Add InactiveJobs to Business::Fixflo::Issue
 

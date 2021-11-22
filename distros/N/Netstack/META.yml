@@ -18,6 +18,7 @@ requires:
   Carp: '0'
   DBIx::Custom: '0'
   Digest::MD5: '0'
+  Encode: '0'
   Expect: '0'
   Mail::Sender: '0'
   Mojo::Util: '0'
@@ -32,7 +33,7 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: '0.019'
+version: '0.021'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: BSD

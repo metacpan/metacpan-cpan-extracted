@@ -6,9 +6,9 @@ Date::Manip::Offset::off192;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Mar  1 14:20:51 EST 2021
-#    Data version: tzdata2021a
-#    Code version: tzcode2021a
+#    Generated on: Mon Nov 15 11:18:13 EST 2021
+#    Data version: tzdata2021e
+#    Code version: tzcode2021e
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.85';
+$VERSION='6.86';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -44,7 +44,6 @@ $Offset        = '+10:00:00';
       'asia/ust-nera',
       'etc/gmt+10',
       'w',
-      'antarctica/dumontdurville',
       'antarctica/macquarie',
       'asia/magadan',
       'asia/sakhalin',

@@ -1,5 +1,9 @@
 Revision history for VMware-vCloudDirector2
 
+0.108     2021-11-17 09:42:53+00:00 Europe/London
+  - Minimal changes to make work with newer vCloud versions
+    authentication changes.
+
 0.107     2019-11-22 17:10:59+00:00 Europe/London
 	- Add a fetch_link just like find_link
 	- Inject href into objects that have this missing

@@ -5,6 +5,7 @@
 #include <memory>
 
 #if PANDA_HAS_LIBUNWIND
+    #define UNW_LOCAL_ONLY
     #include <libunwind.h>
 #endif
 

@@ -67,7 +67,7 @@ PDL::Logical - PDL subclass for keeping logical data
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 SYNOPSIS
 

@@ -56,13 +56,16 @@ Data::Frame::Partial::Eval - Partial class for data frame's eval method
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 SYNOPSIS
 
     $df->eval_tidy($x);
 
 =head1 DESCRIPTION
+
+Do not use this module in your code. This is only internally used by
+L<Data::Frame>.
 
 The C<eval_tidy> method is similar to R's data frame tidy evaluation.
 

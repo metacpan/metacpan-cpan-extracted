@@ -36,7 +36,7 @@ should be included in the file.
 
 EOD
 
-pp_add_exported('',"rcols wcols swcols rgrep rdsa");
+pp_add_exported('',"rcols wcols swcols rgrep");
 
 ############################## PM CODE ########################################
 
@@ -857,7 +857,7 @@ sub PDL::wcols {
    my $header;
    if ( ref( $_[-1] ) eq "HASH" ) {
        my $opt = pop;
-       foreach my $key ( keys %$opt ) {
+       foreach my $key ( sort keys %$opt ) {
            if ( $key =~ /^H/i ) { $header = $opt->{$key}; }             # option: HEADER
 	   elsif ( $key =~ /^COLSEP/i ) { $usecolsep = $opt->{$key}; }  # option: COLSEP
 	   elsif ( $key =~ /^FORMAT/i ) { $format_string = $opt->{$key}; }  # option: FORMAT
@@ -1162,84 +1162,6 @@ of C<$1>, C<$2> etc.
    wantarray ? return(@ret) : return $ret[0];
 }
 
-
-=head2 rdsa
-
-=for ref
-
-  Read a FIGARO/NDF format file.
-
-  Requires non-PDL DSA module. Contact Frossie (frossie@jach.hawaii.edu)
-
-Usage:
-
-=for usage
-
- ([$xaxis],$data) = rdsa($file)
-
-=for example
-
- $x = rdsa 'file.sdf'
-
-Not yet tested with PDL-1.9X versions
-
-=cut
-
-sub rdsa{PDL->rdsa(@_)}
-
-use vars qw/ $dsa_loaded /;
-sub PDL::rdsa {
-    my $class = shift;
-    barf 'Usage: ([$xaxis],$data) = rdsa($file)' if $#_!=0;
-    my $file = shift; my $pdl = $class->new; my $xpdl;
-    eval 'use DSA' unless $dsa_loaded++;
-    barf 'Cannot use DSA library' if $@ ne "";
-
-    my $status = 0;
-
-    # Most of this stuff stolen from Frossie:
-
-    dsa_open($status);
-    dsa_named_input('IMAGE',$file,$status);
-    goto skip if $status != 0;
-
-    dsa_get_range('IMAGE',my $vmin,my $vmax,$status);
-    my @data_dims;
-    dsa_data_size('IMAGE',5, my $data_ndims, \@data_dims, my $data_elements, 
-                  $status);
-    dsa_map_data('IMAGE','READ','FLOAT',my $data_address,my $data_slot,
-                 $status);
-
-    @data_dims = @data_dims[0..$data_ndims-1];
-    print "Dims of $file = @data_dims\n" if $PDL::verbose;
-    $pdl->set_datatype($PDL_F);
-    $pdl->setdims([@data_dims]);
-    my $dref = $pdl->get_dataref;
-    mem2string($data_address,4*$data_elements,$$dref);
-    $pdl->upd_data();
-
-    if (wantarray) { # Map X axis values
-      my @axis_dims;
-      dsa_axis_size('IMAGE',1,5, my $axis_ndims, \@axis_dims,
-                    my $axis_elements, $status);
-      dsa_map_axis_data('IMAGE',1,'READ','FLOAT',my $axis_address,
-                    my $axis_slot,$status);
-      @axis_dims = @axis_dims[0..$axis_ndims-1];
-      $xpdl = $class->new;
-      $xpdl->set_datatype($PDL_F);
-      $xpdl->setdims([@axis_dims]);
-      my $xref = $xpdl->get_dataref;
-      mem2string($axis_address,4*$axis_elements,$$xref);
-      $xpdl->upd_data();
-    }
-
-    skip: dsa_close($status);
-
-    barf("rdsa: obtained DSA error") if $status != 0;
-
-    return ($xpdl,$pdl);
-}
-
 =head2 isbigendian
 
 =for ref
@@ -1268,171 +1190,8 @@ sub defpdl {
 
 ###### Read ASCII Function ##########
 pp_addhdr(<<'EOH');
-
-#define SWALLOWLINE(fp) while ((s = PerlIO_getc(fp)) != '\n' && s != EOF)
-#define    TRAILING_WHITESPACE_CHECK(s) \
-   if (s!=' ' && s!='\t' && s!='\r' && s!='\n' && s!=',')  return -1
-
-int getfloat(PerlIO *fp, PDL_Float *fz)
-{
-  PDL_Float f = 0;
-  int nread = 0;
-  int i, s = PerlIO_getc(fp);
-  int afterp = 0, aftere=0;
-  int expo = 0;
-  PDL_Float sig = 1.0, esig = 1.0;
-  PDL_Float div = 1.0;
-
-  if (s == EOF) return 0;
-  while (1) {
-    if (s == EOF)
-      return 0;   /* signal end of line */
-    if (s == '#')
-      SWALLOWLINE(fp);
-    if ((s >='0' && s <='9') || s =='.' || s == 'e' || s == 'E' 
-        || s == '+' || s == '-') break; 
-    if (s!=' ' && s!='\t' && s!='\r' && s!='\n' && s!=',')
-      return -1;  /* garbage */      
-    s = PerlIO_getc(fp); /* else skip whitespace */
-  }
-  /* parse number */
-  while (1) {
-    switch (s) {
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-      if (aftere)
-        expo = (expo*10) + (s - '0');
-      else if (afterp) {
-        div /= 10.0;
-        f += div*(s - '0');
-      } else
-        f = (f*10) + (s - '0');
-      break;
-    case '+':
-      /* ignore */
-      break;
-    case '-':
-      if (aftere)
-        esig = -1;
-      else
-        sig = -1;
-      break;
-    case 'e':
-    case 'E':
-      if (aftere)
-        return -1;
-      aftere = 1;
-      break;
-    case '.':
-      if (afterp || aftere)
-        return -1;
-      afterp = 1;
-      break;
-    default:
-      goto endread;
-      break;
-    }
-    nread++;
-    s = PerlIO_getc(fp);
-  }
-endread:
-  f *= sig;
-  for (i=0;i<expo; i++)
-    f *= (esig > 0 ? 10.0 : 0.1);
-
-  *fz = f;
-  TRAILING_WHITESPACE_CHECK(s);
-  return nread;
-}
-
-int getdouble(PerlIO *fp, PDL_Double *fz)
-{
-  PDL_Double f = 0;
-  int nread = 0;
-  int i, s = PerlIO_getc(fp);
-  int afterp = 0, aftere=0;
-  int expo = 0;
-  PDL_Double sig = 1.0, esig = 1.0;
-  PDL_Double div = 1.0;
-
-  if (s == EOF) return 0;
-  while (1) {
-    if (s == EOF)
-      return 0;   /* signal end of line */
-    if (s == '#')
-      SWALLOWLINE(fp);
-    if ((s >='0' && s <='9') || s =='.' || s == 'e' || s == 'E' 
-        || s == '+' || s == '-') break; 
-    if (s!=' ' && s!='\t' && s!='\r' && s!='\n' && s!=',')
-      return -1;  /* garbage */      
-    s = PerlIO_getc(fp); /* else skip whitespace */
-  }
-  /* parse number */
-  while (1) {
-    switch (s) {
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-      if (aftere)
-        expo = (expo*10) + (s - '0');
-      else if (afterp) {
-        div /= 10.0;
-        f += div*(s - '0');
-      } else
-        f = (f*10) + (s - '0');
-      break;
-    case '+':
-      /* ignore */
-      break;
-    case '-':
-      if (aftere)
-        esig = -1;
-      else
-        sig = -1;
-      break;
-    case 'e':
-    case 'E':
-      if (aftere)
-        return -1;
-      aftere = 1;
-      break;
-    case '.':
-      if (afterp || aftere)
-        return -1;
-      afterp = 1;
-      break;
-    default:
-      goto endread;
-      break;
-    }
-    nread++;
-    s = PerlIO_getc(fp);
-  }
-endread:
-  f *= sig;
-  for (i=0;i<expo; i++)
-    f *= (esig > 0 ? 10.0 : 0.1);
-
-  *fz = f;
-  TRAILING_WHITESPACE_CHECK(s);
-  return nread;
-}
-
+int getfloat(PerlIO *fp, PDL_Float *fz);
+int getdouble(PerlIO *fp, PDL_Double *fz);
 EOH
 
 pp_add_exported('', 'rasc rcube');
@@ -1549,22 +1308,15 @@ EOPM
 # if appropriate
 pp_def('_rasc',
        Pars => '[o] nums(n); int [o] ierr(n)',
-       OtherPars => 'int num => n; SV* fd',
+       OtherPars => 'int num => n; PerlIO *fp',
        GenericTypes => [F,D],
        Code => q@ 
                  int ns, i, j;
-                 PerlIO *fp;
-                 IO *io;
-
-                 /* io = GvIO(gv_fetchpv($COMP(fd),FALSE,SVt_PVIO)); */
-                 io = sv_2io($COMP(fd));
-                 if (!io || !(fp = IoIFP(io)))
-                        croak("Can\'t figure out FP");
                  ns = $SIZE(n);
                  threadloop %{
                    for (i=0;i<ns; i++) {
                        if (($ierr(n=>i) =
-                           $TFD(getfloat,getdouble)(fp, &($nums(n=>i)))) <= 0)
+                           $TFD(getfloat,getdouble)($COMP(fp), &($nums(n=>i)))) <= 0)
                               break;
                    }
                    for (j=i+1; j<ns; j++)

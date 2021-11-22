@@ -12,7 +12,7 @@ my $init_called;
 
 class Example
 {
-   has $value :param :reader :writer :LazyInit(_make_value) = undef;
+   has $value :param :reader :writer :LazyInit(_make_value);
 
    method _make_value { $init_called++; return 1234 };
 

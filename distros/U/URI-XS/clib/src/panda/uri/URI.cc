@@ -291,7 +291,7 @@ std::vector<string> URI::path_segments () const {
         ret.push_back(decode_uri_component(string_view(p+start, i-start)));
         start = i+1;
     }
-    if (p[plen-1] != '/') ret.push_back(string(p+start, plen-start));
+    if (p[plen-1] != '/') ret.push_back(decode_uri_component(string_view(p+start, plen-start)));
     return ret;
 }
 

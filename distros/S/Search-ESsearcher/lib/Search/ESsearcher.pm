@@ -17,11 +17,11 @@ Search::ESsearcher - Provides a handy system for doing templated elasticsearch s
 
 =head1 VERSION
 
-Version 0.4.3
+Version 0.4.4
 
 =cut
 
-our $VERSION = '0.4.3';
+our $VERSION = '0.4.4';
 
 
 =head1 SYNOPSIS

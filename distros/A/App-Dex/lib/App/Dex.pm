@@ -4,7 +4,7 @@ use List::Util qw( first );
 use YAML::PP qw( LoadFile );
 use IPC::Run3;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.002002';
 
 has config_file => (
     is      => 'ro',
@@ -81,8 +81,7 @@ sub _resolve_block {
     while ( defined ( my $segment = shift @{$path} ) ) {
         $block = first { $_->{name} eq $segment } @{$config};
 
-        die "There is no such command.\n"
-            unless $block;
+        return undef unless $block;
 
         if ( @{$path} ) {
             $config = $block->{children};
@@ -124,7 +123,80 @@ B<dex> provides a command line utility for managing directory-specific commands.
 
 =head1 USAGE
 
+    dex                    - Display the menu
+    dex command            - Run a command
+    dex command subcommand - Run a sub command
+
+Create a file called C<dex.yaml> or C<.dex.yaml> and define commands to be run.
+
 =head1 DEX FILE SPECIFICATION
+
+This is an example dex file.
+
+    - name: build
+      desc: "Run through the build process, including testing."
+      shell:
+        - ./fatpack.sh
+        - dzil test
+        - dzil build
+    - name: test
+      desc: "Just test the changes"
+      shell:
+        - dzil test
+    - name: release
+      desc: "Publish App::Dex to CPAN"
+      shell:
+        - dzil release
+    - name: clean
+      desc: "Remove artifacts"
+      shell:
+        - dzil clean
+    - name: authordeps
+      desc: "Install distzilla and dependencies"
+      shell:
+        - cpanm Dist::Zilla
+        - dzil authordeps --missing | cpanm
+        - dzil listdeps --develop --missing | cpanm
+
+When running the command dex, a menu will display:
+
+    $ dex
+    build                   : Run through the build process, including testing.
+    test                    : Just test the changes
+    release                 : Publish App::Dex to CPAN
+    clean                   : Remove artifacts
+    authordeps              : Install distzilla and dependencies
+
+To execute the build command run C<dex build>.
+
+=head2 SUBCOMMANDS
+
+Commands can be grouped to logically organize them, for example:
+
+    - name: foo
+      desc: "Foo command"
+      children:
+        - name: bar
+          desc: "Bar subcommand"
+          shell:
+            - echo "Ran the command!"
+
+The menu for this would show the relationship:
+
+    $ dex
+    foo                     : Foo command
+        bar                     : Bar subcommand
+
+To execute the command one would run C<dex foo bar>.
+
+
+=head1 FALLBACK COMMAND
+
+When dex doesn't understand the command it will give an error and display the menu. It
+can be configured to allow another program to try to execute the command.
+
+Set the environment variable C<DEX_FALLBACK_CMD> to the command you would like to run
+instead.
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use warnings
   NONFATAL => qw(deprecated exec internal malloc newline once portable redefine recursion uninitialized);
 
 use constant {
-  CLASS      => 't::Test::Expander::Boilerplate',
+  CLASS      => 'IO::Select',
   TEST_CASES => {
     'no args'       => undef,
     'args supplied' => [ 0 .. 1 ],
@@ -15,8 +15,8 @@ use constant {
 use Test::Builder::Tester tests => scalar(keys(%{TEST_CASES()}));
 
 use Test::Expander;
-use t::Test::Expander::Boilerplate;
 
+eval("use @{[CLASS]}");
 foreach my $title (keys(%{TEST_CASES()})) {
   test_out("ok 1 - An object of class '@{[CLASS]}' isa '@{[CLASS]}'");
   new_ok(CLASS, TEST_CASES->{$title}, $title);

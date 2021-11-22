@@ -1,3 +1,11 @@
+0.003006  2021-11-01 21:46:06+01:00 Europe/London
+- Updated Inline::C integration via Alien::OpenMP::Inline
+  to provide 'auto_include', which provides the
+  line, #include <omp.h>, saving the programmer the
+  need to worry about it. It's compiler specific,
+  but both supported compilers (gcc, clang) use the
+  same one (omp.h).
+
 0.003005  2021-10-31 21:46:06+01:00 Europe/London
 - Got a nice dist.ini and test update; no functional
   changes but dist.ini is now proper - thanks, @Grinnz!

@@ -15,7 +15,7 @@ package Base::HASH {
    sub new { bless {}, shift }
 }
 
-class Derived::HASH isa Base::HASH does ARole {
+class Derived::HASH :isa(Base::HASH) :does(ARole) {
 }
 
 {
@@ -28,7 +28,7 @@ package Base::ARRAY {
    sub new { bless [], shift }
 }
 
-class Derived::ARRAY isa Base::ARRAY does ARole {
+class Derived::ARRAY :isa(Base::ARRAY) :does(ARole) {
 }
 
 {

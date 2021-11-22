@@ -1,0 +1,30 @@
+---
+abstract: 'like require for relative paths'
+author:
+  - 'Branislav Zahradník <barney@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: require-relative
+provides:
+  require::relative:
+    file: lib/require/relative.pm
+    version: v1.0.0
+requires:
+  Path::Tiny: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: 1.0.0
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

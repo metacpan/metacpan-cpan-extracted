@@ -2,7 +2,7 @@
 
 package App::plx;
 
-our $VERSION = '0.901001'; # 0.901.1
+our $VERSION = '0.902002'; # 0.902.2
 
 $VERSION = eval $VERSION;
 
@@ -15,10 +15,14 @@ use lib ();
 use Config;
 use File::Which ();
 use List::Util ();
+use local::lib ();
 
-BEGIN { our %orig_env = %ENV }
-use local::lib '--deactivate-all';
-BEGIN { delete @ENV{grep /^PERL/, keys %ENV} }
+BEGIN {
+  our %orig_env = %ENV;
+  { local $0 = $0 eq '-' ? 'plx' : $0;
+    local::lib->import('--deactivate-all') }
+  delete @ENV{grep /^PERL/, keys %ENV}
+}
 no lib @Config{qw(sitearch sitelibexp)};
 
 my $fs = 'File::Spec';
@@ -161,6 +165,7 @@ sub prepend_env {
 
 sub setup_env_for_ll {
   my ($self, $path) = @_;
+  local $0 = $0 eq '-' ? 'plx' : $0;
   local::lib->import($path);
 }
 
@@ -170,6 +175,7 @@ sub setup_env_for_dir {
 }
 
 sub setup_env {
+  $ENV{PERL_PLX_BASE} = $self->layout_base_dir;
   my ($site_libs) = $self->slurp_command(
     $self->layout_perl, '-MConfig', '-e',
       'print join(",", @Config{qw(sitearch sitelibexp)})'
@@ -314,9 +320,10 @@ sub run_action_installenv {
   barf "Couldn't find plx in PATH" unless $plx_bin;
   {
     open my $fh, '<', $bashrc or die "Couldn't open ${bashrc} to read: $!";
-    if (my ($line) = grep /plx --env/, <$fh>) {
+    if (my ($line) = grep /plx-packed/, <$fh>) {
       chomp($line);
       stderr("Found line in .bashrc: $line");
+      return;
     }
   }
   my $base = $self->layout_base_dir;
@@ -338,20 +345,23 @@ sub run_action_init {
 }
 
 sub _which {
-  my ($self, $cmd, @args) = @_;
+  my ($self, @args) = @_;
   $self->ensure_layout_config_dir;
+
+  my @env;
+
+  push @env, shift @args while $args[0] =~ /^\w+=/;
+
+  my $cmd = shift @args;
+
   barf "--cmd <cmd> <args>" unless $cmd;
 
   if ($fs->file_name_is_absolute($cmd)) {
-    return (exec => $cmd => @args);
+    return (exec => @env => $cmd => @args);
   }
 
   if ($cmd eq 'perl') {
-    return (perl => @args);
-  }
-
-  if ($cmd =~ m{/}) {
-    return (perl => $cmd, @args);
+    return (perl => @env => @args);
   }
 
   if ($cmd =~ /^-/) {
@@ -366,16 +376,16 @@ sub _which {
       }
       last;
     }
-    return (perl => @optargs);
+    return (perl => @env => @optargs);
   }
 
   foreach my $dirname ($self->cmd_search_path) {
     if (-f (my $file = $self->layout_file($dirname => $cmd))) {
-      return (perl => $file, @args);
+      return (perl => @env => $file, @args);
     }
   }
 
-  return (exec => $cmd, @args);
+  return (exec => @env => $cmd, @args);
 }
 
 sub run_action_which {
@@ -394,13 +404,18 @@ sub run_action_perl {
   my ($self, @call) = @_;
   $self->ensure_layout_config_dir;
   return $self->show_config_perl unless @call;
-  $self->run_action_exec($self->layout_perl, @call);
+  my @env;
+  push @env, shift @call while $call[0] =~ /^\w+=/;
+  $self->run_action_exec(@env, $self->layout_perl, @call);
 }
 
 sub run_action_exec {
   my ($self, @exec) = @_;
   $self->ensure_layout_config_dir;
   $self->setup_env;
+
+  shift @exec and $ENV{$1} = $2 while $exec[0] =~ /^(\w+)=(.*)$/;
+
   exec(@exec) or barf "exec of (".join(' ', @exec).") failed: $!";
 }
 
@@ -495,7 +510,8 @@ sub show_config_libspec {
 
 sub run_named_config_add {
   my ($self, $type, $name, $value) = @_;
-  barf "plx --config ${type} add <name> <value>" unless $name and $value;
+  barf "plx --config ${type} add <name> <value>"
+    unless $name and defined($value);
   unless (-d (my $dir = $self->layout_config_dir($type))) {
     mkdir($dir) or die "Couldn't make config dir ${dir}: $!";
   }
@@ -778,8 +794,35 @@ installer available, you can run:
 
 to get the current latest packed version.
 
-The packed version bundled L<local::lib> and L<File::Which>, and also includes
+The packed version bundles L<local::lib> and L<File::Which>, and also includes
 a modified C<--cpanm> action that uses an inline C<App::cpanminus>.
+
+=head1 ENVIRONMENT
+
+C<plx> actions that execute external commands all clear any existing
+environment variables that start with C<PERL> to keep an encapsulated setup
+for commands being run within the layouts - and also set C<PERL5OPT> to
+exclude C<site_perl> (but not C<vendor_perl>) to avoid locally installed
+modules causing unexpected effects.
+
+Having done so, C<plx> then loads each env config entry and sets those
+variables - then prepends the C<plx> specific entries to both C<PATH> and
+C<PERL5LIB>. You can add env config entries with L</--config>:
+
+  plx --config env add NAME VALUE
+
+The changes that will be made to your environment can be output by calling
+the L</--env> command.
+
+Additionally, environment variable overrides may be provided to the
+L</--cmd>, L</--exec> and L</--perl> commands by providing them in
+ C<NAME=VALUE> format:
+
+  # do not do this, it will be deleted
+  PERL_RL=Perl5 plx <something>
+
+  # do this instead, it will provide the environment variable to the command
+  plx PERL_RL=Perl5 <something>
 
 =head1 ACTIONS
 

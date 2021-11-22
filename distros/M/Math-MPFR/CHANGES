@@ -1,3 +1,22 @@
+4.18
+ - Allow anytoa() to (optionally) take just one (Math::MPFR object) arg, instead of
+   the two args originally mandated.
+ - Simplify Makefile.PL.
+ - Replace XS defines NV_IS_FLOAT128 and NV_IS_LONG_DOUBLE with
+   USE_QUADMATH and USE_LONG_DOUBLE (which are already defined by perl headers).
+ - Replace XS defines NV_IS_DOUBLE and NV_IS_53_BIT with the condition NVSIZE == 8
+   (which is already defined in the perl headers).
+ - Add Rmpfr_set_IV.
+ - Utilize Rmpfr_cmp_IV and Rmpfr_cmp_NV in the overloaded comparison subs.
+ - Remove the *_UV functions and adapt the corresponding *_IV functions to handle the case
+   that SvUOK() is true. (This is how it should always have been.)
+ - Add Rmpfr_init_set_IV, Rmpfr_init_set_NV and Rmpfr_init_set_float128.
+ - Add Rmpfr_cmp_float128.
+ - Rmpfr_cmp_IV, Rmpfr_set_IV, Rmpfr_init_set_IV, Rmpfr_cmp_NV, Rmpfr_set_NV
+   and Rmpfr_init_set_NV accept only scalars that are IOK or (respectively) NOK as their
+   2nd argument.
+ - Add POK_flag(), IOK_flag(), NOK_flag (@EXPORT_OK only)
+
 4.17
  - In Rmpfr_set_default_prec(), Rmpfr_set_prec() and Rmpfr_set_prec_raw(), check
    that the argument is not less than 2 if mpfr version is less than 4.0.0.

@@ -15,7 +15,7 @@ role ARole {
   ADJUST { push @ADJUST, "ARole" }
 }
 
-class AClass does ARole {
+class AClass :does(ARole) {
   BUILD { push @BUILD, "AClass" }
   ADJUST { push @ADJUST, "AClass" }
 }
@@ -33,7 +33,7 @@ class AClass does ARole {
       'Roles are adjusted before their implementing classes' );
 }
 
-class BClass isa AClass does ARole {
+class BClass :isa(AClass) :does(ARole) {
   BUILD { push @BUILD, "BClass" }
 }
 

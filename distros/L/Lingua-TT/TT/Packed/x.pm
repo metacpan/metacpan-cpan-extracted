@@ -4,14 +4,14 @@
 ## Descript: TT I/O: packed docs: human-readable ascii hexadecimal
 
 package Lingua::TT::Packed::x;
-use Lingua::TT::PackedA;
+use Lingua::TT::Packed::a;
 use strict;
 
 ##==============================================================================
 ## Globals & Constants
 
 #our @ISA = qw(Lingua::TT::Document);
-our @ISA = qw(Lingua::TT::PackedA);
+our @ISA = qw(Lingua::TT::Packed::a);
 
 ##==============================================================================
 ## Constructors etc.

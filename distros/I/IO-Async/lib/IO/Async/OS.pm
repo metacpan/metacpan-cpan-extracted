@@ -8,7 +8,7 @@ package IO::Async::OS;
 use strict;
 use warnings;
 
-our $VERSION = '0.79';
+our $VERSION = '0.800';
 
 our @ISA = qw( IO::Async::OS::_Base );
 
@@ -344,25 +344,32 @@ This utility method converts a signal name (such as "TERM") into its system-
 specific signal number. This may be useful to pass to C<POSIX::SigSet> or use
 in other places which use numbers instead of symbolic names.
 
+=head2 signum2name
+
+   $signame = IO::Async::OS->signum2name( $signum )
+
+The inverse of L<signame2num>; this method convers signal numbers into
+readable names.
+
 =cut
 
-my %sig_num;
+my %sig_name2num;
+my %sig_num2name;
+
 sub _init_signum
 {
    my $self = shift;
-   # Copypasta from Config.pm's documentation
 
-   our %Config;
    require Config;
-   Config->import;
 
-   unless($Config{sig_name} && $Config{sig_num}) {
+   $Config::Config{sig_name} and $Config::Config{sig_num} or
       die "No signals found";
-   }
-   else {
-      my @names = split ' ', $Config{sig_name};
-      @sig_num{@names} = split ' ', $Config{sig_num};
-   }
+
+   my @names = split ' ', $Config::Config{sig_name};
+   my @nums  = split ' ', $Config::Config{sig_num};
+
+   @sig_name2num{ @names } = @nums;
+   @sig_num2name{ @nums  } = @names;
 }
 
 sub signame2num
@@ -370,9 +377,19 @@ sub signame2num
    my $self = shift;
    my ( $signame ) = @_;
 
-   %sig_num or $self->_init_signum;
+   %sig_name2num or $self->_init_signum;
 
-   return $sig_num{$signame};
+   return $sig_name2num{$signame};
+}
+
+sub signum2name
+{
+   my $self = shift;
+   my ( $signum ) = @_;
+
+   %sig_num2name or $self->_init_signum;
+
+   return $sig_num2name{$signum};
 }
 
 =head2 extract_addrinfo

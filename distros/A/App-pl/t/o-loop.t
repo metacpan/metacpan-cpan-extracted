@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::Simple tests => 9;
+use Test::Simple tests => 11;
 
 # chdir to t/
 $_ = $0;
@@ -31,10 +31,13 @@ sub pl_e($@) {
 
 my @files = <atom-weight-[123].csv>;
 my $files = join '', @files;
+my $filesa = join '][', @files;
 my $filesn = join "\n", @files, '';
 
 pl_e '', '-o', '', @files;
 pl_e $files, '-o', 'Echo', @files;
+pl_e $files, '-oA<atom-weight-[123].csv>', 'Echo';
+pl_e "[$filesa]", '-oA"[$_]"', 'Echo', @files;
 pl_e $files, '-op', '', @files;
 pl_e $files[0], '-op1', '', @files;
 pl_e $files[1], '-oP', '/2/', @files;

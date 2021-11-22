@@ -4,7 +4,7 @@
       "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -76,11 +76,23 @@
    "provides" : {
       "CtrlO::Crypt::XkcdPassword" : {
          "file" : "lib/CtrlO/Crypt/XkcdPassword.pm",
-         "version" : "1.010"
+         "version" : "1.011"
+      },
+      "CtrlO::Crypt::XkcdPassword::Wordlist::eff_large" : {
+         "file" : "lib/CtrlO/Crypt/XkcdPassword/Wordlist/eff_large.pm",
+         "version" : "1.011"
+      },
+      "CtrlO::Crypt::XkcdPassword::Wordlist::eff_short_1" : {
+         "file" : "lib/CtrlO/Crypt/XkcdPassword/Wordlist/eff_short_1.pm",
+         "version" : "1.011"
+      },
+      "CtrlO::Crypt::XkcdPassword::Wordlist::eff_short_2_0" : {
+         "file" : "lib/CtrlO/Crypt/XkcdPassword/Wordlist/eff_short_2_0.pm",
+         "version" : "1.011"
       },
       "CtrlO::Crypt::XkcdPassword::Wordlist::en_gb" : {
          "file" : "lib/CtrlO/Crypt/XkcdPassword/Wordlist/en_gb.pm",
-         "version" : "1.010"
+         "version" : "1.011"
       }
    },
    "release_status" : "stable",
@@ -95,9 +107,9 @@
          "web" : "https://github.com/domm/CtrlO-Crypt-XkcdPassword"
       }
    },
-   "version" : "1.010",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "1.011",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

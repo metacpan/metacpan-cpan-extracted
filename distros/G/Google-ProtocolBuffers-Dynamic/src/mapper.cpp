@@ -297,6 +297,7 @@ Mapper::DecoderHandlers *Mapper::DecoderHandlers::on_start_sub_message(DecoderHa
 
     cxt->mark_seen(field_index);
     const Mapper *mapper = cxt->mappers.back();
+    const Mapper *message_mapper = mapper->fields[*field_index].mapper;
     SV *target = cxt->get_target(field_index);
     HV *hv = NULL;
 
@@ -310,14 +311,14 @@ Mapper::DecoderHandlers *Mapper::DecoderHandlers::on_start_sub_message(DecoderHa
         hv = (HV *) SvRV(target);
 
     cxt->items.push_back((SV *) hv);
-    cxt->mappers.push_back(mapper->fields[*field_index].mapper);
+    cxt->mappers.push_back(message_mapper);
     cxt->seen_fields.resize(cxt->seen_fields.size() + 1);
     cxt->seen_fields.back().resize(cxt->mappers.back()->fields.size());
     if (int oneof_count = cxt->mappers.back()->message_def->oneof_count()) {
         cxt->seen_oneof.resize(cxt->seen_oneof.size() + 1);
         cxt->seen_oneof.back().resize(oneof_count, -1);
     }
-    if (mapper->get_decode_blessed())
+    if (message_mapper->get_decode_blessed())
         sv_bless(target, cxt->mappers.back()->stash);
 
     return cxt;
@@ -902,7 +903,7 @@ SV *Mapper::decode_json(const char *buffer, STRLEN bufsize) {
     if (json_decoder_method.get() == NULL)
         croak("It looks like resolve_references() was not called (and please use map() anyway)");
     upb::Environment *env = make_localized_environment(aTHX_ &status);
-    upb::json::Parser *json_decoder = upb::json::Parser::Create(env, json_decoder_method.get(), &decoder_sink);
+    upb::json::Parser *json_decoder = upb::json::Parser::Create(env, json_decoder_method.get(), NULL, &decoder_sink, true);
     status.Clear();
     decoder_callbacks.prepare(newHV());
 

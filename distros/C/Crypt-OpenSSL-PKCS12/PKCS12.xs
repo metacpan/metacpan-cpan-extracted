@@ -329,7 +329,7 @@ new(class)
   CODE:
 
   if ((RETVAL = PKCS12_new()) == NULL) {
-    croak("Couldn't create PKCS12_new() for class %s", (char*)class);
+    croak("Couldn't create PKCS12_new() for class %" SVf "\n", SVfARG(class));
   }
 
   OUTPUT:
@@ -338,22 +338,45 @@ new(class)
 Crypt::OpenSSL::PKCS12
 new_from_string(class, string)
   SV  *class
-  char *string
+  SV  *string
 
   ALIAS:
   new_from_file = 1
 
   PREINIT:
   BIO *bio;
+  STRLEN str_len;
+  char *str_ptr;
 
   CODE:
 
-  if (!string) croak("PKCS12_new_from: No string or file was passed.");
+  SvGETMAGIC(string);
+
+  if (SvPOKp(string) || SvNOKp(string) || SvIOKp(string)) {
+    if (ix == 1) {
+      /* We are not looking up the SV's UTF8 bit because BIO_new_file() accepts
+       * filename like syscall fopen() which mainly may accept octet sequences
+       * for UTF-8 in C char*. That's what we get from using SvPV(). Also,
+       * using SvPV() is not a bug if ASCII input is only allowed. */
+      str_ptr = SvPV(string, str_len);
+    } else {
+      /* To avoid encoding mess, caller is not allowed to provide octets from
+       * UTF-8 encoded strings. BIO_new_mem_buf() needs octet input only. */
+      if (SvUTF8(string)) {
+        croak("PKCS12_new_from: Source string must not be UTF-8 encoded (please use octets)");
+      }
+      str_ptr = SvPV(string, str_len);
+    }
+  } else {
+    croak("PKCS12_new_from: Invalid Perl type for string or file was passed (0x%x).", (unsigned int)SvFLAGS(string));
+  }
+
+  if (!str_ptr || !str_len) croak("PKCS12_new_from: No string or file was passed.");
 
   if (ix == 1) {
-    bio = BIO_new_file(string, "r");
+    bio = BIO_new_file(str_ptr, "rb");
   } else {
-    bio = BIO_new_mem_buf(string, strlen(string));
+    bio = BIO_new_mem_buf(str_ptr, str_len);
   }
 
   if (!bio) croak("Failed to create BIO");
@@ -361,7 +384,7 @@ new_from_string(class, string)
   /* this can come in any number of ways */
   if ((RETVAL = d2i_PKCS12_bio(bio, 0)) == NULL) {
     BIO_free_all(bio);
-    croak("%s: Couldn't create PKCS12 from d2i_PKCS12_BIO(): %s", (char*)class, ssl_error());
+    croak("%" SVf ": Couldn't create PKCS12 from d2i_PKCS12_BIO(): %s", SVfARG(class), ssl_error());
   }
 
   BIO_free_all(bio);
@@ -481,6 +504,40 @@ create(pkcs12, cert_chain_pem = "", pk = "", pass = 0, file = 0, name = "PKCS12 
   fclose(fp);
 
   RETVAL = &PL_sv_yes;
+
+  OUTPUT:
+  RETVAL
+
+
+SV*
+create_as_string(pkcs12, cert_chain_pem = "", pk = "", pass = 0, name = "PKCS12 Certificate")
+  char *cert_chain_pem
+  char *pk
+  char *pass
+  char *name
+
+  PREINIT:
+  BIO *bio;
+  EVP_PKEY* pkey;
+  PKCS12 *p12;
+  STACK_OF(X509) *cert_chain = NULL;
+
+  CODE:
+
+  pkey       = _load_pkey(pk, PEM_read_bio_PrivateKey);
+  cert_chain = _load_cert_chain(cert_chain_pem, PEM_X509_INFO_read_bio);
+  p12        = PKCS12_create(pass, name, pkey, sk_X509_shift(cert_chain), cert_chain, 0, 0, 0, 0, 0);
+
+  if (!p12) {
+    ERR_print_errors_fp(stderr);
+    croak("Error creating PKCS#12 structure\n");
+  }
+
+  bio = sv_bio_create();
+  i2d_PKCS12_bio(bio, p12);
+
+  RETVAL = sv_bio_final(bio);
+  PKCS12_free(p12);
 
   OUTPUT:
   RETVAL

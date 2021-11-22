@@ -8,7 +8,7 @@ use base 'Exporter';
 use Cwd;
 
 our @EXPORT = ('serve_directory_listing');
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use constant TEXT_403 => 'Forbidden';
 use constant TEXT_404 => 'File not found';
@@ -426,11 +426,12 @@ __END__
 
 =head1 NAME
 
-MojoX::DirectoryListing - show Apache-style directory listings in your Mojolicious app
+MojoX::DirectoryListing - show Apache-style directory listings in your 
+Mojolicious app
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 SYNOPSIS
 

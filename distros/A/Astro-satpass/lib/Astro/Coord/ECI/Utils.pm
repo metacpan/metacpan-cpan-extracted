@@ -123,7 +123,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.121';
+our $VERSION = '0.122';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -1518,9 +1518,11 @@ __END__
 =head1 ACKNOWLEDGMENTS
 
 The author wishes to acknowledge Jean Meeus, whose book "Astronomical
-Algorithms" (second edition) published by Willmann-Bell Inc
-(L<https://www.willbell.com/>) provided several of the algorithms
-implemented herein.
+Algorithms" (second edition) published by Willmann-Bell Inc provided
+several of the algorithms implemented herein. Willmann-Bell ceased to be
+a separate entity in 2021, but their publications, including Dr. Meeus'
+book, are still available through Sky and Telescope's Willmann-Bell
+imprint at L<https://shopatsky.com/collections/willmann-bell>.
 
 =head1 BUGS
 

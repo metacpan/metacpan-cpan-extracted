@@ -62,7 +62,6 @@ std::ostream& operator<< (std::ostream& os, const Manager::Config& config) {
     if (config.min_spare_servers) os << ", spare servers: <" << config.min_spare_servers << "-" << config.max_spare_servers << ">";
     if (config.max_load)          os << ", load: <" << config.min_load << "-" << config.max_load << " for " << config.load_average_period << "s>";
     os << ", mpm: " << (config.worker_model == Manager::WorkerModel::PreFork ? "prefork" : "thread");
-    os << ", bind: " << (config.bind_model == Manager::BindModel::Duplicate ? "dup" : "reuse");
     if (config.max_requests) os << ", max_requests: " << config.max_requests;
     os << ", min_worker_ttl: " << config.min_worker_ttl << "s";
     if (config.activity_timeout) os << ", activity_timeout: " << config.activity_timeout << "s";

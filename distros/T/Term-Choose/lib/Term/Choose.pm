@@ -2,9 +2,9 @@ package Term::Choose;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.10.0;
 
-our $VERSION = '1.743';
+our $VERSION = '1.745';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -138,14 +138,14 @@ sub __copy_orig_list {
         for ( @{$self->{list}} ) {
             if ( ! $_ ) {
                 $_ = $self->{undef} if ! defined $_;
-                $_ = $self->{empty} if $_ eq '';    #
+                $_ = $self->{empty} if ! length $_;
             }
             if ( $self->{color} ) {
                 s/\x{feff}//g;
                 s/\e\[[\d;]*m/\x{feff}/g;
             }
             s/\t/ /g;
-            s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
+            s/\v+/\ \ /g;
             # \p{Cn} might not be up to date and remove assigned codepoints
             # therefore only \p{Noncharacter_Code_Point}
             s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
@@ -1222,7 +1222,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.743
+Version 1.745
 
 =cut
 
@@ -1546,7 +1546,7 @@ Allowed values: 1 or greater
 
 (default: 5)
 
-=head3 layout CHANGED
+=head3 layout
 
 =over
 
@@ -1812,7 +1812,7 @@ list context.
 
 =head2 Perl version
 
-Requires Perl version 5.8.3 or greater.
+Requires Perl version 5.10.0 or greater.
 
 =head2 Optional modules
 

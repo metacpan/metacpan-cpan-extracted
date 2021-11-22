@@ -16,8 +16,9 @@ for file in `cd tzdata/dump; echo *` ;do
    ln=`wc -l z.dump.new | awk '{print $1}'`
 
    # Copy the old dump.  Ignore the 2 first and 2 last lines.
-
-   tail --lines=+3 tzdata/dump/$file | head --lines=-2 > z.dump.old
+   #  ***NOTE*** this no longer holds true since I now do dumps with -V instead of -v
+   #  tail --lines=+3 tzdata/dump/$file | head --lines=-2 > z.dump.old
+   cp tzdata/dump/$file z.dump.old
    lo=`wc -l z.dump.old | awk '{print $1}'`
 
    if [ "$ln" = "0" ]; then

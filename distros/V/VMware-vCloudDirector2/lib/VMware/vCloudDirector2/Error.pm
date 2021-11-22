@@ -5,7 +5,7 @@ package VMware::vCloudDirector2::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.107'; # VERSION
+our $VERSION = '0.108'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -40,7 +40,7 @@ VMware::vCloudDirector2::Error - Throw errors with the best of them
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ReplyWithMail;
 
-our $VERSION = '0.01';
+our $VERSION = '0.014';
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ Works with RT 5.0.2
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -36,7 +36,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -44,7 +44,7 @@ Add this line:
 
 =head1 AUTHOR
 
-Averkios Averkiadis E<lt>averkios at outlook dot comE<gt>
+Averkios Averkiadis E<lt>aaverkios at outlook dot comE<gt>
 
 =for html <p>All bugs should be reported via email to <a
 href="mailto:bug-RT-Extension-ReplyWithMail@rt.cpan.org">bug-RT-Extension-ReplyWithMail@rt.cpan.org</a>

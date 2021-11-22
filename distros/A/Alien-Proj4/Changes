@@ -1,3 +1,9 @@
+2.019113 2021-11-10
+- skip conversion operations to dodge errors on Strawberry 5.30 - thanks @shawnlaffan
+
+2.019112 2021-11-09
+- bump Alien::MSYS version - thanks @shawnlaffan
+
 2.019111 2021-07-23
 - fix POD typo - thanks @eserte for report
 

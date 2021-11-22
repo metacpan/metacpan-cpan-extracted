@@ -2,8 +2,8 @@ NAME
     App::RegexpPatternUtils - CLI utilities related to Regexp::Pattern
 
 VERSION
-    This document describes version 0.006 of App::RegexpPatternUtils (from
-    Perl distribution App-RegexpPatternUtils), released on 2021-06-27.
+    This document describes version 0.007 of App::RegexpPatternUtils (from
+    Perl distribution App-RegexpPatternUtils), released on 2021-07-02.
 
 SYNOPSIS
 DESCRIPTION
@@ -16,8 +16,6 @@ DESCRIPTION
     *   list-regexp-pattern-patterns
 
     *   match-with-regexp-pattern
-
-    *   rpgrep
 
     *   show-regexp-pattern-module
 

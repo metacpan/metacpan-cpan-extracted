@@ -13,7 +13,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Test::More;
-use Test::NoWarnings;
+use Test::FailWarnings;
 use Test::Deep;
 use Test::Exception;
 
@@ -27,11 +27,7 @@ use parent qw(
 
 use Crypt::Perl::PK ();
 
-if ( !caller ) {
-    my $test_obj = __PACKAGE__->new();
-    plan tests => $test_obj->expected_tests(+1);
-    $test_obj->runtests();
-}
+__PACKAGE__->new()->runtests() if !caller;
 
 #----------------------------------------------------------------------
 
@@ -56,7 +52,38 @@ END
     return;
 }
 
-sub test__parse_key : Tests(4) {
+sub test__parse_key : Tests(8) {
+    throws_ok(
+        sub { Crypt::Perl::PK::parse_key([]) },
+        'Crypt::Perl::X::Generic',
+        'fail on arrayref',
+    );
+
+    my $err = $@;
+    like($err, qr<ARRAY>, '… and value is given');
+
+    my $dsa_priv = <<END;
+-----BEGIN DSA PRIVATE KEY-----
+MIIBWAIBAAJhAOEnQNSaTbnSurfFZeR9i/E9SzorfARYn3ORM2tW+cz44FX/BDQR
+dCqvi9t2Vi8IRA15dzA96OGojmnIv+6Mq8EFGE7dZvMXhVP+z1jBQX4mF2PFU694
+hqm+xDHRgAq4xQIVAN4yNCwCl5V8+9+zZTEDmEfTUaJNAmBoi6Wh7A7J0Kr9S7Vz
+kXpG0Ryj+CJh8oAt4Vqu3rIDdah0gw7QYc5mlyqSCwgEbmhG5DKdvW50/oFrOQ4E
+zxpC3fALBuK/5BYd8zgObG+o6OAY7pJFD3W5d+P+CxSrfwkCYCF7+jOGXMREtJQu
+AnGULUho2RD1u0g3hvJE7LJumUe7pAYXGhecG/ABIz1OxUWNJ+cSrZX3rEqU5u7T
+/IvHIYdvE2XoaXeFx8NdPuvuyBiZ/PeHwXeHIvzBQonOPnOrnwIVAIBoSa04LKAE
+EvF3uh/r74EWHYD8
+-----END DSA PRIVATE KEY-----
+END
+
+    throws_ok(
+        sub { Crypt::Perl::PK::parse_key($dsa_priv) },
+        'Crypt::Perl::X::Generic',
+        'fail on arrayref',
+    );
+
+    $err = $@;
+    like($err, qr<DSA PRIVATE>, '… and value is given');
+
     my $rsa_priv = <<END;
 -----BEGIN RSA PRIVATE KEY-----
 MIIBPAIBAAJBAMUG9V5cTXHM0gAaPp4cmxiUL9oVD/JBWtVXapjVWLpCiQSR+IqK
@@ -118,6 +145,102 @@ END
     );
 
     return;
+}
+
+sub test__parse_jwk__junk : Tests(6) {
+    dies_ok(
+        sub { Crypt::Perl::PK::parse_jwk([]) },
+        'fail on arrayref',
+    );
+
+    my $err = $@;
+    cmp_deeply(
+        $err,
+        all( re(qr<HASH>), re(qr<ARRAY>) ),
+        '… error contents',
+    );
+
+    #----------------------------------------------------------------------
+
+    my $pr_jwk = {
+        kty => "whatwhat",
+        crv => "Ed25519",
+        x => "oF0a6lgwrJplzfs4RmDUl-NpfEa0Gc8s7IXei9JFRZ0",
+    };
+
+    throws_ok(
+        sub { Crypt::Perl::PK::parse_jwk($pr_jwk) },
+        'Crypt::Perl::X::UnknownJWKkty',
+        'fail on unknown kty',
+    );
+
+    $err = $@;
+    cmp_deeply(
+        $err,
+        all( re(qr<whatwhat>) ),
+        '… error contents',
+    );
+
+    #----------------------------------------------------------------------
+
+    $pr_jwk = {
+        foo => 'bar',
+        baz => 'qux',
+    };
+
+    throws_ok(
+        sub { Crypt::Perl::PK::parse_jwk($pr_jwk) },
+        'Crypt::Perl::X::InvalidJWK',
+        'fail on bad JWK',
+    );
+
+    $err = $@;
+    cmp_deeply(
+        $err,
+        all(
+            map { re(qr<$_>) } sort %$pr_jwk
+        ),
+        '… error contents',
+    );
+}
+
+sub test__parse_jwk__ed25519 : Tests(3) {
+    my $pr_jwk = {
+        kty => "OKP",
+        crv => "Ed25519",
+        x => "oF0a6lgwrJplzfs4RmDUl-NpfEa0Gc8s7IXei9JFRZ0",
+    };
+
+    my $got = Crypt::Perl::PK::parse_jwk($pr_jwk);
+
+    cmp_deeply(
+        $got,
+        all(
+            Isa('Crypt::Perl::Ed25519::PublicKey'),
+        ),
+        'expected parse',
+    );
+
+    #----------------------------------------------------------------------
+
+    $pr_jwk = {
+        kty => "OKP",
+        crv => "whatwhat",
+        x => "oF0a6lgwrJplzfs4RmDUl-NpfEa0Gc8s7IXei9JFRZ0",
+    };
+
+    throws_ok(
+        sub { Crypt::Perl::PK::parse_jwk($pr_jwk) },
+        'Crypt::Perl::X::Generic',
+        'fail on unknown crv',
+    );
+
+    my $err = $@;
+    cmp_deeply(
+        $err,
+        all( re(qr<crv>), re(qr<whatwhat>) ),
+        '… error contents',
+    );
 }
 
 sub test__parse_jwk__rsa : Tests(2) {

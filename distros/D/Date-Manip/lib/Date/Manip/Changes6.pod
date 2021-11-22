@@ -27,6 +27,38 @@ For the most part, Date::Manip has remained backward compatible at
 every release, but occasionally, a change is made which is backward
 incompatible. These are marked with an exclamation mark (!).
 
+#=head1 VERSION 6.90 (expected 2022-12-01)
+#
+#=head1 VERSION 6.89 (expected 2022-09-01)
+#
+#=head1 VERSION 6.88 (expected 2022-06-01)
+#
+#=head1 VERSION 6.87 (expected 2022-03-01)
+
+=head1 VERSION 6.86 (2021-11-15)
+
+=over 5
+
+=item Change warn to carp
+
+All warnings are now issued with the carp command rather than warn.  Requested
+in GitHup pull request #18, but that request was not used because it only
+changed the uses in the Date::Manip::Date module.
+
+=item Bug fixes
+
+Fixed a bug where the next/prev Date::Manip::Recur methods gave incorrect
+results when there are no dates that match the criteria.  (GitHub #36)
+
+=item Time zone fixes
+
+There were no new timezone fixes on 2021-06-01 or 2021-09-01, so no
+releases made then.
+
+Newest zoneinfo data (tzdata 2021e).  (GitHub #37)
+
+=back
+
 =head1 VERSION 6.85 (2021-03-01)
 
 =over 5

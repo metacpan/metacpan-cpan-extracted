@@ -25,7 +25,7 @@ name: Perinci-CmdLine-Inline
 provides:
   Perinci::CmdLine::Inline:
     file: lib/Perinci/CmdLine/Inline.pm
-    version: '0.552'
+    version: '0.553'
 requires:
   Class::GenSource: '0'
   Complete::Bash: '0.333'
@@ -79,7 +79,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Inline
   homepage: https://metacpan.org/release/Perinci-CmdLine-Inline
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Inline.git
-version: '0.552'
+version: '0.553'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

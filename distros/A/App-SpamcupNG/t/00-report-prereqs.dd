@@ -22,8 +22,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Getopt::Std' => '0',
-                                      'HTML::Entities' => '3.69',
-                                      'HTML::Form' => '6.03',
+                                      'HTML::Form' => '6.07',
                                       'HTML::TreeBuilder::XPath' => '0.14',
                                       'HTTP::Cookies' => '6.01',
                                       'LWP::UserAgent' => '6.05',
@@ -39,10 +38,11 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Perl::Tidy::Sweetened' => '1.12',
+                                   'Perl::Tidy::Sweetened' => '1.18',
                                    'Pod::Tidy' => '0.10',
-                                   'Test::Code::TidyAll' => '0.69',
-                                   'Test::More' => '0'
+                                   'Test::Code::TidyAll' => '0.78',
+                                   'Test::More' => '0',
+                                   'lib' => '0'
                                  }
                  }
      };

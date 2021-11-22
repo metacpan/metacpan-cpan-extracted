@@ -82,7 +82,12 @@ private:
     ClientSP _client; // holds client when active
     TimerSP  _timer;
 
-    NetLoc netloc () const { return { uri->host(), uri->port(), ssl_ctx, proxy, ssl_check_cert }; }
+    NetLoc netloc () const {
+        if (proxy && proxy->scheme() == "http") {
+            return { proxy->host(), proxy->port(), nullptr, nullptr, false };
+        }
+        return { uri->host(), uri->port(), ssl_ctx, proxy, ssl_check_cert };
+    }
 
     void check () const {
         if (!uri) throw HttpError("request must have uri");

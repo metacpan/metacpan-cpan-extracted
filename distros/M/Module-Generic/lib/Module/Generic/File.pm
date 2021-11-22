@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.1.8
+## Version v0.1.10
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/10/21
+## Modified 2021/11/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -41,7 +41,7 @@ BEGIN
         fallback => 1,
     );
     use constant HAS_PERLIO_MMAP => ( version->parse($]) >= version->parse('v5.16.0') ? 1 : 0 );
-    our $VERSION = 'v0.1.8';
+    our $VERSION = 'v0.1.10';
     ## https://en.wikipedia.org/wiki/Path_(computing)
     ## perlport
     our $OS2SEP  =
@@ -100,16 +100,8 @@ BEGIN
     win32       => "\\",
     };
     our $DIR_SEP = $OS2SEP->{ lc( $^O ) };
-    our $MODE_BITS = {};
-    our $DEFAULT_MMAP_SIZE = 10240;
-    # Default to use PerlIO mmap layer if possible
-    our $MMAP_USE_FILE_MAP = 0;
-};
-
-INIT
-{
     # Credits: David Golden for code borrowed from Path::Tiny;
-    $MODE_BITS = 
+    our $MODE_BITS = 
     {
     om => 0007,
     gm => 0070,
@@ -117,6 +109,9 @@ INIT
     };
     my $m = 0;
     $MODE_BITS->{ $_ } = ( 1 << $m++ ) for( qw( ox ow or gx gw gr ux uw ur ) );
+    our $DEFAULT_MMAP_SIZE = 10240;
+    # Default to use PerlIO mmap layer if possible
+    our $MMAP_USE_FILE_MAP = 0;
 };
 
 my $FILES_TO_REMOVE = {};
@@ -262,6 +257,8 @@ sub append
     return( $self );
 }
 
+sub atime { return( shift->finfo->atime ); }
+
 # sub auto_remove { return( shift->_set_get_boolean( 'auto_remove', @_ ) ); }
 sub auto_remove
 {
@@ -357,7 +354,11 @@ sub basename { return( scalar( shift->baseinfo( @_ ) ) ); }
 
 sub binmode { return( shift->_filehandle_method( 'binmode', 'file', @_ ) ); }
 
+sub block_size { return( shift->finfo->block_size ); }
+
 sub blocking { return( shift->_filehandle_method( 'blocking', 'file', @_ ) ); }
+
+sub blocks { return( shift->finfo->blocks ); }
 
 sub can_append
 {
@@ -396,7 +397,7 @@ sub can_read
         }
         else
         {
-            my $opened = $self->opened;
+            my $opened = $self->opened // '';
             $self->message( 4, "Is file '$file' opened? '$opened'" );
             my $io;
             if( $opened )
@@ -809,6 +810,8 @@ sub copy { return( shift->_move_or_copy( copy => @_ ) ); }
 
 sub cp { return( shift->copy( @_ ) ); }
 
+sub ctime { return( shift->finfo->ctime ); }
+
 sub cwd { return( __PACKAGE__->new( ( substr( URI::file->cwd, 0, 7 ) eq 'file://' ? URI->new( URI::file->cwd )  : URI::file->new( URI::file->cwd ) )->file( $^O ) ) ); }
 
 sub delete
@@ -834,6 +837,8 @@ sub delete
         return( $self->error( "An unexpected error has occurred while trying to remove ", ( $self->is_dir ? 'directory' : 'file' ), " \"${file}\": $e" ) );
     }
 }
+
+sub device { return( shift->finfo->device ); }
 
 sub digest
 {
@@ -1189,6 +1194,8 @@ sub getline { return( shift->_filehandle_method( 'getline', 'file', @_ ) ); }
 
 sub getlines { return( shift->_filehandle_method( 'getlines', 'file', @_ ) ); }
 
+sub gid { return( shift->finfo->gid ); }
+
 sub gobble { return( shift->load( @_ ) ); }
 
 sub gush { return( shift->unload( @_ ) ); }
@@ -1201,6 +1208,8 @@ sub handle
     $opened = $self->open( @_ ) || return( $self->pass_error );
     return( $opened );
 }
+
+sub inode { return( shift->finfo->inode ); }
 
 sub ioctl { return( shift->_filehandle_method( 'ioctl', 'file', @_ ) ); }
 
@@ -1316,12 +1325,40 @@ sub join
     return( $self->new( $new, debug => $self->debug ) );
 }
 
+sub last_accessed { return( shift->finfo->atime ); }
+
+sub last_modified { return( shift->finfo->mtime ); }
+
 sub length
 {
     my $self = shift( @_ );
     return( $self->new_number(0) ) if( !$self->exists );
     $self->finfo->reset;
     return( $self->finfo->size );
+}
+
+sub line
+{
+    my $self = shift( @_ );
+    my $code = shift( @_ );
+    return( $self->error( "No callback code was provided for line()" ) ) if( !defined( $code ) || ref( $code ) ne 'CODE' );
+    return( $self->error( "File \"", $self->filename, "\" is not opened." ) ) if( !$self->opened );
+    return( $self->error( "File \"", $self->filename, "\" is not opened in read mode." ) ) if( !$self->can_read );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{chomp} //= 0;
+    $opts->{auto_next} //= 0;
+    my $l;
+    while( defined( $l = $self->getline ) )
+    {
+        chomp( $l ) if( $opts->{chomp} );
+        local $_ = $l;
+        my $rv = $code->( $l );
+        if( !defined( $rv ) && !$opts->{auto_next} )
+        {
+            last;
+        }
+    }
+    return( $self );
 }
 
 sub lines
@@ -1765,9 +1802,15 @@ sub mmap
     }
 }
 
+sub mode { return( shift->finfo->mode ); }
+
 sub move { return( shift->_move_or_copy( move => @_ ) ); }
 
+sub mtime { return( shift->finfo->mtime ); }
+
 sub mv { return( shift->move( @_ ) ); }
+
+sub nlink { return( shift->finfo->nlink ); }
 
 sub open
 {
@@ -1934,7 +1977,7 @@ sub parent
     $self->message( 3, "Creating new object with document uri '", $vol . File::Spec->catdir( @segments ), "'." );
     # return( $self->new( join( '/', @segments ), ( $r ? ( apache_request => $r ) : () ) ) );
     # return( $self->new( $vol . File::Spec->catdir( @segments ) ) );
-    $self->{parent} = $self->new( File::Spec->catpath( $vol, File::Spec->catdir( @segments ) ) );
+    $self->{parent} = $self->new( File::Spec->catpath( $vol, File::Spec->catdir( @segments ), '' ) );
     return( $self->{parent} );
 }
 
@@ -1945,6 +1988,8 @@ sub printflush { return( shift->_filehandle_method( 'printflush', 'file', @_ ) )
 sub printf { return( shift->_filehandle_method( 'printf', 'file', @_ ) ); }
 
 sub println { return( shift->_filehandle_method( 'say', 'file', @_ ) ); }
+
+sub rdev { return( shift->finfo->rdev ); }
 
 sub read
 {
@@ -2327,6 +2372,10 @@ sub split
     return( $self->new_array( $frags ) );
 }
 
+sub spurt { return( shift->unload( @_ ) ); }
+
+sub spurt_utf8 { return( shift->unload_utf8( @_ ) ); }
+
 sub stat { return( shift->finfo ); }
 
 sub symlink
@@ -2399,7 +2448,8 @@ sub tempfile
         $opts->{suffix} = CORE::delete( $opts->{ext} );
     }
     
-    $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^\.[\w\-]+$/ );
+    # $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^\.[\w\-\_]+$/ );
+    $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^[\w\-\_\.]+$/ );
     $self->message( 3, "Filename generated is '$fname'" );
     my $dir;
     my $sys_tmpdir = File::Spec->tmpdir;
@@ -2558,6 +2608,8 @@ sub type
     return( $self->_set_get_scalar( 'type' ) );
 }
 
+sub uid { return( shift->finfo->uid ); }
+
 sub ungetc { return( shift->_filehandle_method( 'ungetc', 'file', @_ ) ); }
 
 sub unlink
@@ -2580,8 +2632,8 @@ sub unload
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{append} //= 0;
     my $file = $self->filepath;
-    my $io;
-    if( !( $io = $self->opened ) )
+    my $opened = $io = $self->opened;
+    if( !$opened )
     {
         if( $opts->{append} )
         {
@@ -2593,6 +2645,8 @@ sub unload
         }
     }
     $io->print( ref( $data ) ? $$data : $data ) || return( $self->error( "Unable to print ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) );
+    # close it if it were close before we opened it
+    $io->close if( !$opened );
     return( $self );
 }
 
@@ -2656,6 +2710,15 @@ sub unmap
 }
 
 sub use_file_map { return( shift->_set_get_boolean( 'use_file_map', @_ ) ); }
+
+sub utime
+{
+    my $self = shift( @_ );
+    # $atime and $mtime may very well be null, in which case, on most system this will
+    # set those time to current time.. See man page of utime(2)
+    my( $atime, $mtime ) = @_;
+    return( CORE::utime( $atime, $mtime, $self->filename ) );
+}
 
 sub volume
 {
@@ -2804,7 +2867,7 @@ sub _filehandle_method
         $self->message( 3, "File handle is '$opened'. Calling method '$what' with arguments: '", CORE::join( "', '", @_ ), "'." );
         # return( $opened->$what( @_ ) );
         my $rv = $opened->$what( @_ );
-        return( $self->error({ skip_frames => 1, message => "Error with $what on file \"$file\": $!" }) ) if( !CORE::defined( $rv ) );
+        return( $self->error({ skip_frames => 1, message => "Error with $what on file \"$file\": $!" }) ) if( !CORE::defined( $rv ) && $what ne 'getline' );
         return( $rv );
     }
     catch( $e )
@@ -2826,7 +2889,7 @@ sub _function2method
         # our object, so we take only one or two arguments:
         # file( $dir_to_remove )->rmtree
         if( substr( $caller[3], rindex( $caller[3], '::' ) + 2 ) eq 'file' && 
-            ref( $caller[0] ) eq ref( $ref->[0] ) )
+            $caller[0] eq ref( $ref->[0] ) )
         {
             return( shift( @$ref ) );
         }
@@ -2975,7 +3038,7 @@ sub _move_or_copy
                 # And the destination exists and is a file too
                 if( -e( $dest ) && !-d( $dest ) && !$opts->{overwrite} )
                 {
-                    return( $self->error( "Unable to copy file \"${file}\" to \"${dest}\"." ) );
+                    return( $self->error( "Unable to copy file \"${file}\" to \"${dest}\". A file with the same name exists and the option \"overwrite\" is not enabled." ) );
                 }
             }
         
@@ -3250,9 +3313,13 @@ Module::Generic::File - File Object Abstraction Class
     say $f->extension->length; # 3
     # Enable cleanup, auto removing temporary file during perl cleanup phase
 
+    $file->utime( time(), time() );
+    # or to set the access and modification time to current time:
+    $file->utime;
+
 =head1 VERSION
 
-    v0.1.8
+    v0.1.10
 
 =head1 DESCRIPTION
 
@@ -3325,6 +3392,10 @@ If the file was already opened, whatever position you were in the file, will be 
 
 It returns the curent file object upon success for chaining or undef and sets an error object if an error occurred.
 
+=head2 atime
+
+This is a shortcut to L<Module::Generic::Finfo/atime>
+
 =head2 auto_remove
 
 This takes a boolean value and enables or disables the auto remove of temporary file or directory created by this module upon perl cleanup phase.
@@ -3373,9 +3444,17 @@ You can provide optionally a list or array reference of possible extensions or r
 
 Sets or get the file binmode.
 
+=head2 block_size
+
+This is a shortcut to L<Module::Generic::Finfo/block_size>
+
 =head2 blocking
 
 Turns on or off blocking or non-blocking io for file opened.
+
+=head2 blocks
+
+This is a shortcut to L<Module::Generic::Finfo/blocks>
 
 =head2 can_append
 
@@ -3494,6 +3573,10 @@ Note that you can also use the shortcut C<cp> instead of C<copy>
 
 Shorthand for L</copy>
 
+=head2 ctime
+
+This is a shortcut to L<Module::Generic::Finfo/ctime>
+
 =head2 cwd
 
 Returns a new L<Module::Generic::File> object representing the current working directory.
@@ -3501,6 +3584,10 @@ Returns a new L<Module::Generic::File> object representing the current working d
 =head2 delete
 
 This will attempt to remove the underlying directory or file and returns the current object upon success or undef and set the exception object if an error occurred.
+
+=head2 device
+
+This is a shortcut to L<Module::Generic::Finfo/device>
 
 =head2 digest
 
@@ -3639,6 +3726,10 @@ This is a thin wrapper around L<IO::Handle> method of the same name.
 
 "This works like <$io> when called in a list context to read all the remaining lines in a file, except that it's more readable. It will also croak() if accidentally called in a scalar context."
 
+=head2 gid
+
+This is a shortcut to L<Module::Generic::Finfo/gid>
+
 =head2 gobble
 
 Assuming this is object represents a regular file, this will return its content as a regular string.
@@ -3660,6 +3751,10 @@ See also L</unload>
 Returns the current file/directory handle if it is already opened, or attempts to open it.
 
 It will return undef and set an exception object if an error occurred.
+
+=head2 inode
+
+This is a shortcut to L<Module::Generic::Finfo/inode>
 
 =head2 ioctl
 
@@ -3735,6 +3830,14 @@ It does not use nor affect the current object used and it can actually be called
     my $f2 = $f->join( [qw( new path please )] ); # works using an existing object
     # Returns: /new/path/please
 
+=head2 last_accessed
+
+This is a shortcut to L<Module::Generic::Finfo/atime>
+
+=head2 last_modified
+
+This is a shortcut to L<Module::Generic::Finfo/mtime>
+
 =head2 length
 
 This returns the size of the element as a L<Module::Generic::Number> object.
@@ -3742,6 +3845,26 @@ This returns the size of the element as a L<Module::Generic::Number> object.
 if the element does not yet exist, L<Module::Generic::Number> object representing the value 0 is returned.
 
 This uses L<Module::Generic::Finfo/size>
+
+=head2 line
+
+Provided with a callback as a subroutine reference or anonymous subroutine, and this will call the callback passing it each line of the file.
+
+If the callback returns C<undef>, this will terminate the browsing of each line, unless the option I<auto_next> is set. See below.
+
+It takes some optional arguments as follow:
+
+=over 4
+
+=item I<chomp> boolean
+
+If true, each line will be L<perlfunc/chomp>'ed before being passed to the callback.
+
+=item I<auto_next> boolean
+
+If true, this will ignore the return value from the callback and will move on to the next line.
+
+=back
 
 =head2 lines
 
@@ -3953,15 +4076,27 @@ The mode can be accompanied by a PerlIO layer like C<:raw>, which is the default
 
 See also L<BSD documentation for mmap|https://man.openbsd.org/mmap>
 
+=head2 mode
+
+This is a shortcut to L<Module::Generic::Finfo/mode>
+
 =head2 move
 
 This behaves exactly like L</copy> except it moves the element instead of copying it.
 
 Note that you can use C<mv> as a method shortcut instead.
 
+=head2 mtime
+
+This is a shortcut to L<Module::Generic::Finfo/mtime>
+
 =head2 mv
 
 Shorthand for L</move>
+
+=head2 nlink
+
+This is a shortcut to L<Module::Generic::Finfo/nlink>
 
 =head2 open
 
@@ -4030,6 +4165,10 @@ This is a thin wrapper around L<IO::Handle> method of the same name.
 =head2 println
 
 Calls L<perlfunc/say> on the file handle and pass it whatever arguments is provided.
+
+=head2 rdev
+
+This is a shortcut to L<Module::Generic::Finfo/rdev>
 
 =head2 read
 
@@ -4162,6 +4301,14 @@ It can take an optional hash or hash reference of parameters. The only one curre
     my $frags = $f->split( remove_leading_sep => 1 );
     # Returns ['some', 'where', 'in', 'time.txt']
 
+=head2 spurt
+
+This is an alias for L</unload>
+
+=head2 spurt_utf8
+
+This is an alias for L</unload_utf8>
+
 =head2 stat
 
 Returns the value from L</finfo>
@@ -4268,6 +4415,10 @@ Returns the type of element this object represents. It can be either C<file> or 
 
 If there is no value set, this will try to guess it.
 
+=head2 uid
+
+This is a shortcut to L<Module::Generic::Finfo/uid>
+
 =head2 ungetc
 
 This is a thin wrapper around L<IO::Handle> method of the same name.
@@ -4323,6 +4474,18 @@ This is useful only if you are using L<File::Map>, which happens if your perl ve
 Set or get the boolean value for using L<File::Map> in the L</mmap> method. By default, the value is taken from the package global variable C<$MMAP_USE_FILE_MAP>, and also by default if your perl version is greater or equal to C<v5.16.0>, then L</mmap> will use L<PerlIO/:mmap>. By setting this to true, you can force L/mmap> to use L<File::Map> rather than L<PerlIO/:mmap>
 
 It returns the current file object upon success, or C<undef> and sets an L<error|Module::Generic/error> object upon failure.
+
+=head2 utime
+
+Provided with an optional access time and modification time as unix timestamp value, i.e. 10 digits representing the number of seconds elapsed since epoch, and this will change the access and modification time of the underline file or directory. For example:
+
+    $f->utime( time(), time() );
+    # is same, on most system, as:
+    $f->utime;
+
+Quoting L<perlfunc/utime>, "if the first two elements of the list are C<undef>, the utime(2) syscall from your C library is called with a null second argument. On most systems, this will set the file's access and modification times to the current time"
+
+It returns the value returned by the core C<utime> function, which is true if the file was changed, and false otherwise.
 
 =head2 volume
 

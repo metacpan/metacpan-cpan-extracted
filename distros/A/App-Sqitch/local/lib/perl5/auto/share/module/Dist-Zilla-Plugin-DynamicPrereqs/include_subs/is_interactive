@@ -1,0 +1,3 @@
+sub is_interactive {
+  return -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ? 1 : 0;
+}

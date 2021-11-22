@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.51;
+use Object::Pad 0.57;
 
-package Tickit::Widget::HSplit 0.33;
+package Tickit::Widget::HSplit 0.34;
 class Tickit::Widget::HSplit
-   extends Tickit::Widget::LinearSplit;
+   :isa(Tickit::Widget::LinearSplit);
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE CAP_BOTH );

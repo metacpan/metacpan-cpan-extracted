@@ -12,11 +12,11 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.05
+Version 0.09
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -27,6 +27,8 @@ Handle text in an OO way.
 =head2 new
 
 Creates a Data::Text object.
+
+The optional parameter 'text' contains a string, or object, to initialise the object with.
 
 =cut
 
@@ -40,16 +42,62 @@ sub new {
 		return;
 	}
 
+	if(scalar(@_)) {
+		my $self = bless { }, $class;
+
+		return $self->set(@_);
+	}
+
 	return bless { }, $class;
 }
 
+=head2 set
+
+Sets the object to contain the given text.
+
+=cut
+
+sub set {
+	my $self = shift;
+
+	my %params;
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(scalar(@_) % 2 == 0) {
+		%params = @_;
+	} else {
+		$params{'text'} = shift;
+	}
+
+	if(!defined($params{'text'})) {
+		Carp::carp(__PACKAGE__, ': no text given');
+		return;
+	}
+
+	if(ref($params{'text'})) {
+		# Allow the text to be a reference to a list of strings
+		if(ref($params{'text'}) eq 'ARRAY') {
+			foreach my $text(@{$params{'text'}}) {
+				$self = $self->append($text);
+			}
+			return $self;
+		}
+		$params{'text'} = $params{'text'}->as_string();
+	}
+
+	$self->{'text'} = $params{'text'};
+
+	return $self;
+}
+
+
 =head2 append
 
-Adds data to the end of the object.
+Adds data given in "text" to the end of the object.
 Contains a simple sanity test for consecutive punctuation.
 I expect I'll improve that.
 
-Successful calls to append() can be daisy chained.
+Successive calls to append() can be daisy chained.
 
 The argument can be a reference to an array of strings, or an object.
 If called with an object, the message as_string() is sent to it for its contents.
@@ -66,6 +114,11 @@ sub append {
 		%params = @_;
 	} else {
 		$params{'text'} = shift;
+	}
+
+	if(!defined($params{'text'})) {
+		Carp::carp(__PACKAGE__, ': no text given');
+		return;
 	}
 
 	if(ref($params{'text'})) {
@@ -112,6 +165,10 @@ Returns the length of the text.
 
 sub length {
 	my $self = shift;
+
+	if(!defined($self->{'text'})) {
+		return 0;
+	}
 
 	return length($self->{'text'});
 }

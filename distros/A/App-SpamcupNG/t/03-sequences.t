@@ -1,44 +1,44 @@
 use warnings;
 use strict;
-use Test::More;
-use App::SpamcupNG;
-use File::Spec;
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
+use Test::More tests => 6;
+use App::SpamcupNG::HTMLParse qw(find_next_id find_errors find_warnings);
 
-my $base = File::Spec->catdir( ( 't', 'responses' ) );
+use lib './t';
+use Fixture 'read_html';
 
-is( App::SpamcupNG::_check_next_id(
-        read_html( File::Spec->catfile( $base, 'after_login.html' ) )
-    ),
+is( find_next_id( read_html('after_login.html') ),
     'z6444645586z5cebd61f7e0464abe28f045afff01b9dz',
     'got the expected next SPAM id'
 );
 
-is( App::SpamcupNG::_check_error(
-        read_html( File::Spec->catfile( $base, 'failed_load_header.html' ) )
-    ),
-    'Failed to load spam header: 64446486 / cebd6f7e464abe28f4afffb9d',
-    'get the expected error'
+my $errors_ref = find_errors( read_html('failed_load_header.html') );
+is( ref($errors_ref), 'ARRAY',
+    'result from find_errors is an array reference' );
+
+is_deeply(
+    $errors_ref,
+    ['Failed to load spam header: 64446486 / cebd6f7e464abe28f4afffb9d'],
+    'get the expected "load SPAM header" error'
 );
 
-is( App::SpamcupNG::_check_error(
-        read_html( File::Spec->catfile( $base, 'mailhost_problem.html' ) )
-    ),
-    'Mailhost configuration problem, identified internal IP as source',
-    'get the expected error'
+$errors_ref = find_errors( read_html('mailhost_problem.html') );
+is( ref($errors_ref), 'ARRAY',
+    'result from find_errors is an array reference' );
+
+is_deeply(
+    $errors_ref,
+    [   'Mailhost configuration problem, identified internal IP as source',
+        'No source IP address found, cannot proceed.',
+        'Nothing to do.'
+    ],
+    'get the expected errors'
 );
 
-done_testing;
-
-sub read_html {
-    my $html_file = shift;
-    open( my $in, '<', $html_file ) or die "Cannot read $html_file:$!";
-    local $/ = undef;
-    my $content = <$in>;
-    close($in);
-
-    #$content =~ tr/015//d;
-    return \$content;
-}
+is_deeply(
+    find_warnings( read_html('sendreport_form_ok.html') ),
+    [   'Possible forgery. Supposed receiving system not associated with any of your mailhosts',
+        'Yum, this spam is fresh!'
+    ],
+    'get the expected warnings'
+);
 

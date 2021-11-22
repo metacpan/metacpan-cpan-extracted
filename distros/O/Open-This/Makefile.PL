@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.012000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "script/ot"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Open::This",
   "PREREQ_PM" => {
     "Browser::Open" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.000027",
+  "VERSION" => "0.000028",
   "test" => {
     "TESTS" => "t/*.t"
   }

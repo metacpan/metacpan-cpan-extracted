@@ -1,7 +1,7 @@
-use Object::Pad 0.08;
+use Object::Pad 0.57;
 
 class HelloWorldWidget
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 method lines {  1 }
 method cols  { 12 }

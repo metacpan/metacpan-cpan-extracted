@@ -3,7 +3,7 @@ NAME
     by *.pm modules which are a controller
 
 VERSION
-    version 0.19
+    version 0.22
 
 SYNOPSIS
         use Mojolicious::Lite;
@@ -44,6 +44,18 @@ USAGE
       plugin->register($app);
 
     Register plugin in Mojolicious application.
+
+BUGS/CONTRIBUTING
+    Please report any bugs through the web interface at
+    <https://github.com/EmilianoBruni/mojo-websocket-pubsub/issues> If you
+    want to contribute changes or otherwise involve yourself in development,
+    feel free to fork the Git repository from
+    <https://github.com/EmilianoBruni/mojo-websocket-pubsub/>.
+
+SUPPORT
+    You can find this documentation with the perldoc command too.
+
+        perldoc Mojo::WebSocket::PubSub
 
 SEE ALSO
     Mojolicious, Mojolicious::Guides, <http://mojolicio.us>.

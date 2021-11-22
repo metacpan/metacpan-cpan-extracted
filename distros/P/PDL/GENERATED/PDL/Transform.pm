@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Transform;
 
-our @EXPORT_OK = qw(apply invert map PDL::PP map unmap t_inverse t_compose t_wrap t_identity t_lookup t_linear t_scale t_offset  t_rot t_fits t_code  t_cylindrical t_radial t_quadratic t_cubic t_quadratic t_spherical t_projective );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(apply invert map map unmap t_inverse t_compose t_wrap t_identity t_lookup t_linear t_scale t_offset  t_rot t_fits t_code  t_cylindrical t_radial t_quadratic t_cubic t_quadratic t_spherical t_projective );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Transform ;
+
 
 
 
@@ -264,10 +263,7 @@ are both Transform methods and PDL methods.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -374,8 +370,8 @@ sub invert {
 
 =for sig
 
-  Signature: (k0(); SV *in; SV *out; SV *map; SV *boundary; SV *method;
-                    SV *big; SV *blur; SV *sv_min; SV *flux; SV *bv)
+  Signature: (k0(); pdl *in; pdl *out; pdl *map; SV *boundary; SV *method;
+                    long big; double blur; double sv_min; char flux; SV *bv)
 
 
 =head2 match
@@ -726,9 +722,9 @@ sub PDL::match {
   if( ref($_[$#_]) ne 'HASH' ) {
       push(@_,{})
   }
-  my @k = grep(m/^r(e(c(t)?)?)?/,keys %{$_[$#_]});
+  my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
   unless(@k) {
-      $_[$#_]->{rectify} = 0;
+      $_[-1]->{rectify} = 0;
   }
   t_identity()->map(@_);
 }
@@ -2209,7 +2205,7 @@ sub t_fits {
 
   my(@hgrab);
 
-  if(@hgrab = grep(m/^CD\d{1,3}_\d{1,3}$/,keys %$hdr)) {   # assignment
+  if(@hgrab = grep(m/^CD\d{1,3}_\d{1,3}$/,sort keys %$hdr)) {   # assignment
     #
     # CDi_j formalism
     #
@@ -2238,7 +2234,7 @@ sub t_fits {
     $cd .= 1;
 
 
-    if( @hgrab = grep(m/^PC\d{1,3}_\d{1,3}$/,keys %$hdr) ) {  # assignment
+    if( @hgrab = grep(m/^PC\d{1,3}_\d{1,3}$/,sort keys %$hdr) ) {  # assignment
 
       for my $h(@hgrab) {
         $h =~ m/PC(\d{1,3})_(\d{1,3})$/ || die "t_fits - match failed! This should never happen!";
@@ -3261,7 +3257,7 @@ sub t_projective {
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -3336,5 +3332,3 @@ sub stringify {
 # Exit with OK status
 
 1;
-
-		   

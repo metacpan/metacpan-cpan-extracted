@@ -24,7 +24,7 @@ package Base::Class {
    }
 }
 
-class Derived::Class isa Base::Class {
+class Derived::Class :isa(Base::Class) {
    has $derived_field = 456;
 
    BUILD {

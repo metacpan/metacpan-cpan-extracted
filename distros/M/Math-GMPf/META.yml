@@ -19,7 +19,8 @@ no_index:
     - inc
 requires:
   Exporter: '5.58'
+  Test::More: '0.88'
 resources:
   repository: https://github.com/sisyphus/math-gmpf.git
-version: '0.44'
+version: '0.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -196,6 +196,7 @@ sub generate_codegen_request {
             content => $code,
         }),
     );
+    $response->set_supported_features(Google::ProtocolBuffers::Dynamic::ProtocInterface::CodeGeneratorResponse::Feature::FEATURE_PROTO3_OPTIONAL);
 
     return $response;
 }
@@ -214,7 +215,7 @@ Google::ProtocolBuffers::Dynamic::MakeModule
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 AUTHOR
 

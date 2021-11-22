@@ -26,7 +26,7 @@ L<https://tools.ietf.org/html/rfc5280#section-4.2.1.1>
 use parent qw( Crypt::Perl::X509::Extension );
 
 use Crypt::Perl::X ();
-use Crypt::Perl::X509::GeneralName ();
+use Crypt::Perl::X509::GeneralNames ();
 
 use constant {
     OID => '2.5.29.35',

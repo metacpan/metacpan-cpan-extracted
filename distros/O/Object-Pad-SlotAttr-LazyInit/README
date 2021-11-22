@@ -52,7 +52,7 @@ SLOT ATTRIBUTES
     invoking any methods on $self, and only making use of other slots
     already declared before the slot being initialised. By placing the
     initialiser method immediately after the slot declaration, before any
-    other slots, you can reduce the possilibity of getting stuck in such a
+    other slots, you can reduce the possibility of getting stuck in such a
     manner.
 
        has $slot_zero :param;

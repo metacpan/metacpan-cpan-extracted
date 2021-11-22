@@ -1,0 +1,8 @@
+0.002   2021-10-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add participants using URI::ParseSearchString; add datasets.
+
+
+0.001   2021-10-08  Released-By: PERLANCAR
+
+        - First release.

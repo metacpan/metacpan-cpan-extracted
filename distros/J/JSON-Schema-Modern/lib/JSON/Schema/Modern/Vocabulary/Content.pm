@@ -4,17 +4,18 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
 use Storable 'dclone';
 use JSON::Schema::Modern::Utilities qw(is_type A assert_keyword_type);
-use Moo;
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -26,23 +27,19 @@ sub vocabulary {
 
 sub evaluation_order { 4 }
 
-sub keywords {
-  my ($self, $spec_version) = @_;
+sub keywords ($self, $spec_version) {
   return (
     qw(contentEncoding contentMediaType),
     $spec_version ne 'draft7' ? 'contentSchema' : (),
   );
 }
 
-sub _traverse_keyword_contentEncoding {
-  my ($self, $schema, $state) = @_;
+sub _traverse_keyword_contentEncoding ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'string');
   return 1;
 }
 
-sub _eval_keyword_contentEncoding {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_contentEncoding ($self, $data, $schema, $state) {
   return 1 if not is_type('string', $data);
   return A($state, $schema->{$state->{keyword}});
 }
@@ -51,17 +48,13 @@ sub _traverse_keyword_contentMediaType { goto \&_traverse_keyword_contentEncodin
 
 sub _eval_keyword_contentMediaType { goto \&_eval_keyword_contentEncoding }
 
-sub _traverse_keyword_contentSchema {
-  my ($self, $schema, $state) = @_;
-
+sub _traverse_keyword_contentSchema ($self, $schema, $state) {
   # since contentSchema should never be evaluated in the context of the containing schema, it is
   # not appropriate to gather identifiers found therein -- but we can still validate the subschema.
   $self->traverse_subschema($schema, +{ %$state, identifiers => [] });
 }
 
-sub _eval_keyword_contentSchema {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_contentSchema ($self, $data, $schema, $state) {
   return 1 if not exists $schema->{contentMediaType};
   return 1 if not is_type('string', $data);
 
@@ -82,7 +75,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 DESCRIPTION
 

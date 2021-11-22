@@ -55,6 +55,7 @@ void fill (Server::Location& loc, const Hash& h) {
     Scalar v;
     if ((v = h.fetch("host")))       loc.host       = v.as_string();
     if ((v = h.fetch("port")))       loc.port       = v.number();
+    if ((v = h.fetch("path")))       loc.path       = v.as_string();
     if ((v = h.fetch("reuse_port"))) loc.reuse_port = v.is_true();
     if ((v = h.fetch("backlog")))    loc.backlog    = v.number();
     if ((v = h.fetch("domain")))     loc.domain     = v.number();
@@ -66,6 +67,16 @@ void fill (Server::Location& loc, const Hash& h) {
     }
 }
 
+void fill (Hash& h, const Server::Location& loc) {
+    h["host"]       = xs::out<>(loc.host);
+    h["port"]       = xs::out<>(loc.port);
+    h["reuse_port"] = xs::out<>(loc.reuse_port);
+    h["backlog"]    = xs::out<>(loc.backlog);
+    h["domain"]     = xs::out<>(loc.domain);
+    h["ssl_ctx"]    = xs::out<>(loc.ssl_ctx.ctx);
+    h["sock"]       = xs::out<>(loc.sock);
+}
+
 void fill (Server::Config& cfg, const Hash& h) {
     Scalar v;
     if ((v = h.fetch("locations")))              cfg.locations              = xs::in<decltype(cfg.locations)>(v);
@@ -74,6 +85,15 @@ void fill (Server::Config& cfg, const Hash& h) {
     if ((v = h.fetch("max_body_size")))          cfg.max_body_size          = v.number();
     if ((v = h.fetch("tcp_nodelay")))            cfg.tcp_nodelay            = v.is_true();
     if ((v = h.fetch("max_keepalive_requests"))) cfg.max_keepalive_requests = v.number();
+}
+
+void fill (Hash& h, const Server::Config& cfg) {
+    h["locations"]              = xs::out<>(cfg.locations);
+    h["idle_timeout"]           = xs::out<>(cfg.idle_timeout);
+    h["max_headers_size"]       = xs::out<>(cfg.max_headers_size);
+    h["max_body_size"]          = xs::out<>(cfg.max_body_size);
+    h["tcp_nodelay"]            = xs::out<>(cfg.tcp_nodelay);
+    h["max_keepalive_requests"] = xs::out<>(cfg.max_keepalive_requests);
 }
 
 void fill (Pool::Config& cfg, const Hash& h) {

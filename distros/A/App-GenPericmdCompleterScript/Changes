@@ -1,3 +1,8 @@
+0.123   2021-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Generate code that passes standard perlcritic tests.
+
+
 0.122   2020-04-30  Released-By: PERLANCAR; Urgency: low
 
 	- Tweak Rinci metadata: replace deprecated

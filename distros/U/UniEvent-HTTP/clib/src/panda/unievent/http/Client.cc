@@ -48,7 +48,7 @@ void Client::request (const RequestSP& request) {
 
     auto netloc = request->netloc();
 
-    if (!connected() || _netloc != netloc) {
+    if (!connected() || _netloc != netloc || !request->keep_alive()) {
         panda_log_info("connecting to " << netloc);
         if (connected()) drop_connection();
         filters().clear();
@@ -78,6 +78,10 @@ void Client::request (const RequestSP& request) {
             if (uri->scheme() == "socks5") {
                 SocksSP socks = new Socks(uri->host(), uri->port(), uri->user(), uri->password());
                 use_socks(this, socks);
+            }
+            else if (uri->scheme() == "http") {
+                // netloc =  NetLoc { uri->host(), uri->port(), nullptr, nullptr, false };
+                // no-op
             }
             else throw HttpError("client supports only socks5 protocol for proxy");
         }
@@ -286,7 +290,7 @@ void Client::finish_request (const ErrorCode& _err) {
     auto err = _err;
     if (!err && !req->_transfer_completed) err = errc::transfer_aborted;
 
-    if (err || !res->keep_alive()) drop_connection();
+    if (err || !res->keep_alive() || !req->keep_alive()) drop_connection();
     else Tcp::weak(true);
 
     req->_redirection_counter = 0;

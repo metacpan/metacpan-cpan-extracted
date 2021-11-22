@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v4.25.11
+    version: v4.25.12
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -280,7 +280,7 @@ resources:
   bugtracker: https://github.com/sisimai/p5-sisimai/issues
   homepage: https://libsisimai.org/
   repository: git://github.com/sisimai/p5-sisimai.git
-version: v4.25.11
+version: v4.25.12
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'
@@ -290,6 +290,7 @@ x_contributors:
   - 'Mutsutoshi Yoshimoto <negachov@gmail.com>'
   - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
   - 'Valentin Henon <valentin.henon@gmail.com>'
+  - 'Valentin Henon <vhenon@mindbaz.com>'
   - 'Xavier <yadd@debian.org>'
   - 'Xavier Guimard <x.guimard@free.fr>'
   - 'azuma, kuniyuki <azumakuniyuki@users.noreply.github.com>'

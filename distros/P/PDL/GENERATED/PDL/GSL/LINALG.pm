@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSL::LINALG;
 
-our @EXPORT_OK = qw(PDL::PP LU_decomp PDL::PP LU_solve PDL::PP LU_det PDL::PP solve_tridiag );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(LU_decomp LU_solve LU_det solve_tridiag );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSL::LINALG ;
+
 
 
 
@@ -59,10 +58,7 @@ Currently only LU decomposition interfaces here. Pull requests welcome!
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -192,7 +188,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 SEE ALSO
 
@@ -210,5 +206,3 @@ L<https://www.gnu.org/software/gsl/doc/html/linalg.html>
 # Exit with OK status
 
 1;
-
-		   

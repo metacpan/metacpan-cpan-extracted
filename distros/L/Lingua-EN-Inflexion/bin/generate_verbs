@@ -228,6 +228,8 @@ say '';
 say 'my $is_pres_part = {}; @{$is_pres_part}{values %{$pres_part_of} } = ();';
 say '';
 
+# Emit utility function...
+say 'sub tc {my($text)=@_; $text=~s{(\A|\s)(\S)|(\S)}{defined($3)?lc($3):$1.uc($2)}egxms; $text; };';
 
 # Emit pattern-based inflection subroutines...
 emit_converter( 'plural',    $plural_of{pattern}    );
@@ -411,9 +413,10 @@ sub emit_converter {
     # Generate subroutine structure...
     say "sub convert_to_${name} {";
     say '    my ($word) = @_;';
-    say "    return \$${name}_of->{\$word}    if exists \$${name}_of->{\$word};";
-    say "    return \$${name}_of->{lc \$word} if exists \$${name}_of->{lc \$word};";
-    say "    return \$word                    if is_$type(\$word);";
+    say "    return \$${name}_of->{\$word}     if exists \$${name}_of->{\$word};";
+    say "    return \$${name}_of->{lc \$word}  if exists \$${name}_of->{lc \$word};";
+    say "    return \$${name}_of->{tc \$word}  if exists \$${name}_of->{ucfirst lc \$word};";
+    say "    return \$word                     if is_$type(\$word);";
     say '    given ($word) {';
 
     # Generate each alternative replacement pattern...
@@ -435,9 +438,11 @@ sub emit_recognizer {
     say '    my ($word) = @_;';
     say "    return 1 if exists \$is_${name}\->{\$word};";
     say "    return 1 if exists \$is_${name}\->{lc \$word};";
+    say "    return 1 if exists \$is_${name}\->{ucfirst lc \$word};";
     if ($compl_name) {
         say "    return 0 if exists \$is_${compl_name}\->{\$word};";
         say "    return 0 if exists \$is_${compl_name}\->{lc \$word};";
+        say "    return 0 if exists \$is_${compl_name}\->{ucfirst lc \$word};";
     }
     say '    given ($word) {';
 

@@ -1,0 +1,127 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/DBIx-Spreadsheet.svg?branch=master)](https://travis-ci.org/Corion/DBIx-Spreadsheet)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/DBIx-Spreadsheet?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/DBIx-Spreadsheet)
+
+# NAME
+
+DBIx::Spreadsheet - Query a spreadsheet with SQL
+
+# SYNOPSIS
+
+    my $sheet = DBIx::Spreadsheet->new( file => 'workbook.xlsx' );
+    my $dbh = $sheet->dbh;
+
+    my @rows = $dbh->selectall_arrayref(<<'SQL');
+        select *
+          from sheet_1
+         where foo = 'bar'
+    SQL
+
+This module reads a workbook and makes the contained spreadsheets available
+as tables. It assumes that the first row of a spreadsheet are the column
+names. Empty column names will be replaced by `col_$number`. The sheet and
+column names will be sanitized by [Text::CleanFragment](https://metacpan.org/pod/Text%3A%3ACleanFragment) so they are
+conveniently usable.
+
+# WARNING
+
+The parsing and reformatting of cell values is very hacky. Don't expect
+too much consistency between `ods` and `xlsx` cell formats. I try to
+make these consistent, but this is currently a pile of value-specific hacks.
+
+# METHODS
+
+## `DBIx::Spreadsheet->new`
+
+    my $wb = DBIx::Spreadsheet->new(
+        file => 'workboook.ods',
+    );
+
+### Options
+
+- **file** - name of the workbook file. The file will be read using [Spreadsheet::Read](https://metacpan.org/pod/Spreadsheet%3A%3ARead)
+using the options in `spreadsheet_options`.
+- **spreadsheet** - a premade [Spreadsheet::Read](https://metacpan.org/pod/Spreadsheet%3A%3ARead) object
+- **spreadsheet\_options** - options for the [Spreadsheet::Read](https://metacpan.org/pod/Spreadsheet%3A%3ARead) object
+
+## `->dbh`
+
+    my $dbh = $wb->dbh;
+
+Returns the database handle to access the sheets.
+
+## `->tables`
+
+    my $tables = $wb->tables;
+
+Arrayref containing the names of the tables. These are usually the names
+of the sheets.
+
+## `->table_names`
+
+    print "The sheets are available as\n";
+    for my $mapping ($foo->table_names) {
+        printf "Sheet: %s Table name: %s\n", $mapping->{sheet}, $mapping->{table};
+    };
+
+Returns the mapping of sheet names and generated/cleaned-up table names.
+This may be convenient if you want to help your users find the table names that
+they can use.
+
+If you want to list all available table names, consider using the [DBI](https://metacpan.org/pod/DBI)
+catalog methods instead:
+
+    my $table_names = $dbh->table_info(undef,"TABLE,VIEW",undef,undef)
+                          ->fetchall_arrayref(Slice => {});
+    print $_->{TABLE_NAME}, "\n"
+        for @$table_names;
+
+# SUPPORTED FILE TYPES
+
+This module supports the same file types as [Spreadsheet::Read](https://metacpan.org/pod/Spreadsheet%3A%3ARead). The following
+modules need to be installed to read the various file types:
+
+- [Text::CSV\_XS](https://metacpan.org/pod/Text%3A%3ACSV_XS) - CSV files
+- [Spreadsheet::ParseXLS](https://metacpan.org/pod/Spreadsheet%3A%3AParseXLS) - Excel XLS files
+- [Spreadsheet::ParseXLSX](https://metacpan.org/pod/Spreadsheet%3A%3AParseXLSX) - Excel XLSX files
+- [Spreadsheet::ParseSXC](https://metacpan.org/pod/Spreadsheet%3A%3AParseSXC) - Staroffice / Libre Office SXC or ODS files
+
+# TO DO
+
+- Create DBD so direct usage with [DBI](https://metacpan.org/pod/DBI) becomes possible
+
+        my $dbh = DBI->connect('dbi:Spreadsheet:filename=workbook.xlsx,start_row=2');
+
+    DBIx::Spreadsheet will provide the underlying glue.
+
+# SEE ALSO
+
+[DBD::CSV](https://metacpan.org/pod/DBD%3A%3ACSV)
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/DBIx-Spreadsheet](https://github.com/Corion/DBIx-Spreadsheet).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Spreadsheet](https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Spreadsheet)
+or via mail to [dbix-spreadsheet-Bugs@rt.cpan.org](https://metacpan.org/pod/dbix-spreadsheet-Bugs%40rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2019 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

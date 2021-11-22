@@ -2,7 +2,7 @@ NAME
     App::URIInfoUtils - Utilities related to URI::Info
 
 VERSION
-    This document describes version 0.001 of App::URIInfoUtils (from Perl
+    This document describes version 0.002 of App::URIInfoUtils (from Perl
     distribution App-URIInfoUtils), released on 2021-10-17.
 
 DESCRIPTION
@@ -48,6 +48,9 @@ SOURCE
 
 SEE ALSO
     URI::Info
+
+    parse-search-string-from-url from App::ParseSearchStringFromURL, which
+    is currently based from URI::ParseSearchString.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

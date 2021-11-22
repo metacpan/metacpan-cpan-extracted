@@ -133,6 +133,9 @@ Its content is interpreted as follows:
                 NAME_VAR   = $KNIB::App::MyApp::Constants::ABC
                 NAME_FUNC  = join(' ', $KNIB::App::MyApp::Constants::DEF)
 
+All environment variables set up in this manner are logged to STDOUT
+using [note](https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS).
+
 Another common feature within test suites is the creation of a temporary directory / file used as an
 isolated container for some testing actions.
 The module options **-tempdir** and **-tempfile** are fully syntactically compatible with
@@ -178,6 +181,7 @@ if the option **-tempdir** was supplied.
 if the option **-tempfile** was supplied.
 
 All variables mentioned above are read-only if they are defined after **use Test::Expander ...**.
+In this case they are logged to STDOUT using [note](https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS).
 
 # AUTHOR
 

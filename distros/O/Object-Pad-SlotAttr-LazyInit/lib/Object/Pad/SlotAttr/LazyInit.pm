@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::SlotAttr::LazyInit 0.03;
+package Object::Pad::SlotAttr::LazyInit 0.04;
 
 use v5.14;
 use warnings;
@@ -63,7 +63,7 @@ value, it is recommended that the logic in the lazy initialisation method be
 as self-contained as possible; ideally not invoking any methods on C<$self>,
 and only making use of other slots already declared before the slot being
 initialised. By placing the initialiser method immediately after the slot
-declaration, before any other slots, you can reduce the possilibity of getting
+declaration, before any other slots, you can reduce the possibility of getting
 stuck in such a manner.
 
    has $slot_zero :param;

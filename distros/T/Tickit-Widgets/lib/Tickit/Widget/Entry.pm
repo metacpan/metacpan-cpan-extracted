@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.43;  # ADJUST
+use Object::Pad 0.57;
 
-package Tickit::Widget::Entry 0.33;
+package Tickit::Widget::Entry 0.34;
 class Tickit::Widget::Entry
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 use Carp;
 
@@ -183,39 +183,35 @@ has $_text          :reader :param = "";
 has $_pos_ch        :reader(position) :param(position) = 0;
 has $_scrolloffs_co = 0;
 has $_overwrite     = 0;
-has %_keybindings;
+has %_keybindings = (
+   'C-a' => "key_beginning_of_line",
+   'C-e' => "key_end_of_line",
+   'C-k' => "key_delete_line",
+   'C-u' => "key_backward_delete_line",
+   'C-w' => "key_backward_delete_word",
+
+   'M-b' => "key_backward_word",
+   'M-f' => "key_forward_word",
+
+   'Backspace'   => "key_backward_delete_char",
+   'C-Backspace' => "key_backward_delete_word",
+   'Delete'      => "key_forward_delete_char",
+   'C-Delete'    => "key_forward_delete_word",
+   'End'         => "key_end_of_line",
+   'Enter'       => "key_enter_line",
+   'Home'        => "key_beginning_of_line",
+   'Insert'      => "key_overwrite_mode",
+   'Left'        => "key_backward_char",
+   'C-Left'      => "key_backward_word",
+   'Right'       => "key_forward_char",
+   'C-Right'     => "key_forward_word",
+);
 has $_on_enter      :reader :param = undef;
 
 ADJUST
 {
    my $textlen = length $_text;
    $_pos_ch = $textlen if $_pos_ch > $textlen;
-
-   # TODO: It'd be nice to get this out of Object::Pad but it's a list on a
-   #   hash and thus not const
-   %_keybindings = (
-      'C-a' => "key_beginning_of_line",
-      'C-e' => "key_end_of_line",
-      'C-k' => "key_delete_line",
-      'C-u' => "key_backward_delete_line",
-      'C-w' => "key_backward_delete_word",
-
-      'M-b' => "key_backward_word",
-      'M-f' => "key_forward_word",
-
-      'Backspace'   => "key_backward_delete_char",
-      'C-Backspace' => "key_backward_delete_word",
-      'Delete'      => "key_forward_delete_char",
-      'C-Delete'    => "key_forward_delete_word",
-      'End'         => "key_end_of_line",
-      'Enter'       => "key_enter_line",
-      'Home'        => "key_beginning_of_line",
-      'Insert'      => "key_overwrite_mode",
-      'Left'        => "key_backward_char",
-      'C-Left'      => "key_backward_word",
-      'Right'       => "key_forward_char",
-      'C-Right'     => "key_forward_word",
-   );
 
    # Since we take keyboard input we almost certainly want to take focus here
    $self->take_focus;

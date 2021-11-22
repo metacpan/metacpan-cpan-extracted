@@ -3,7 +3,7 @@ use warnings;
 use Math::GMPf qw(:mpf);
 use Math::BigInt; # for some error checking
 
-print "1..101\n";
+print "1..103\n";
 
 print "# Using gmp version ", Math::GMPf::gmp_v(), "\n";
 
@@ -288,44 +288,74 @@ else {print "not ok 8\n"}
 
 $ok = ($p!=$ui).($p==$ui).($p>$ui).($p>=$ui).($p<$ui).($p<=$ui).($p<=>$ui);
 if($ok eq '100011-1') {print "ok 9\n"}
-else {print "not ok 9\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 9\n";
+}
 
 $ok = ($p!=$negi).($p==$negi).($p>$negi).($p>=$negi).($p<$negi).($p<=$negi).($p<=>$negi);
 if($ok eq '1011001') {print "ok 10\n"}
-else {print "not ok 10\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 10\n";
+}
 
 $ok = ($p!=$posd).($p==$posd).($p>$posd).($p>=$posd).($p<$posd).($p<=$posd).($p<=>$posd);
 if($ok eq '100011-1') {print "ok 11\n"}
-else {print "not ok 11\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 11\n";
+}
 
 $ok = ($p!=$negd).($p==$negd).($p>$negd).($p>=$negd).($p<$negd).($p<=$negd).($p<=>$negd);
 if($ok eq '1011001') {print "ok 12\n"}
-else {print "not ok 12\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 12\n";
+}
 
 $ok = ($p!=$frac).($p==$frac).($p>$frac).($p>=$frac).($p<$frac).($p<=$frac).($p<=>$frac);
 if($ok eq '1011001') {print "ok 13\n"}
-else {print "not ok 13\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 13\n";
+}
 
 $ok = ($ui!=$p).($ui==$p).($ui>$p).($ui>=$p).($ui<$p).($ui<=$p).($ui<=>$p);
 if($ok eq '1011001') {print "ok 14\n"}
-else {print "not ok 14\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 14\n";
+}
 
 $ok = ($negi!=$p).($negi==$p).($negi>$p).($negi>=$p).($negi<$p).($negi<=$p).($negi<=>$p);
 if($ok eq '100011-1') {print "ok 15\n"}
-else {print "not ok 15\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 15\n";
+}
 
 $ok = ($posd!=$p).($posd==$p).($posd>$p).($posd>=$p).($posd<$p).($posd<=$p).($posd<=>$p);
 if($ok eq '1011001') {print "ok 16\n"}
-else {print "not ok 16\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 16\n";
+}
 
 $ok = ($negd!=$p).($negd==$p).($negd>$p).($negd>=$p).($negd<$p).($negd<=$p).($negd<=>$p);
 if($ok eq '100011-1') {print "ok 17\n"}
-else {print "not ok 17\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 17\n";
+}
 
 $ok = ($frac!=$p).($frac==$p).($frac>$p).($frac>=$p).($frac<$p).($frac<=$p).($frac<=>$p);
 if($ok eq '100011-1'
    && Math::GMPf::get_refcnt($p) == 1) {print "ok 18\n"}
-else {print "not ok 18\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 18\n";
+}
 
 Rmpf_set_ui($q, 0);
 
@@ -943,6 +973,7 @@ else {print "ok 70\n"}
 
 #######################
 
+
 if($inf != $mpf1) {print "ok 71\n"}
 else {
   warn "\n $inf == $mpf1\n";
@@ -1155,3 +1186,21 @@ else {
   warn "\n \$\@: $@\n";
   print "not ok 101\n";
 }
+
+my $nv = 'inf' + 0;
+
+if($nv != 0 && $nv / $nv != 1) {
+
+  if($nv != Math::GMPf->new(0)) {print "ok 102\n"}
+  else {print "not ok 102\n"}
+
+  if($nv == Math::GMPf->new(0)) { print "not ok 103\n" }
+  else { print "ok 103\n" }
+
+}
+else {
+  print "skipping tests 102 and 103\n";
+  print "ok 102\n";
+  print "ok 103\n";
+}
+ 

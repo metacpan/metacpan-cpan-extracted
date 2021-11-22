@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'Alien::Base';
 
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Alien::uPB::Core - build and find uPB (a.k.a. Unleaded)
 
 =head1 VERSION
 
-version 0.17
+version 0.20
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SignalRecovery7265;
-$Lab::Moose::Instrument::SignalRecovery7265::VERSION = '3.791';
+$Lab::Moose::Instrument::SignalRecovery7265::VERSION = '3.792';
 #ABSTRACT: Model 7265 Lock-In Amplifier
 
 use v5.20;
@@ -59,10 +59,6 @@ sub set_imode {    # basic setting
         value => { isa => 'Int' }
     );
 
-    # $imode == 0  --> Current Mode OFF
-    # $imode == 1  --> High Bandwidth Current Mode
-    # $imode == 2  --> Low Noise Current Mode
-
     if ( defined $value and ( $value == 0 || $value == 1 || $value == 2 ) ) {
         $self->write(command => sprintf("IMODE %d", $value));
         $self->cached_imode($value);
@@ -84,11 +80,6 @@ sub set_vmode {
     my ( $self, $value, %args ) = validated_setter( \@_,
         value => { isa => 'Int' }
     );
-
-    # $vmode == 0  --> Both inputs grounded (testmode)
-    # $vmode == 1  --> A input only
-    # $vmode == 2  --> -B input only
-    # $vmode == 3  --> A-B differential mode
 
     if ( defined $value
         and ( $value == 0 || $value == 1 || $value == 2 || $value == 3 ) ) {
@@ -112,8 +103,6 @@ sub set_fet {
     my ( $self, $value, %args ) = validated_setter( \@_,
         value => { isa => 'Int' }
     );
-    # $value == 0 --> Bipolar device, 10 kOhm input impedance, 2nV/sqrt(Hz) voltage noise at 1 kHz
-    # $value == 1 --> FET, 10 MOhm input impedance, 5nV/sqrt(Hz) voltage noise at 1 kHz
 
     if ( defined $value and ( $value == 0 || $value == 1 ) ) {
         $self->write(command => sprintf( "FET %d", $value ));
@@ -137,9 +126,6 @@ sub set_float {
         value => { isa => 'Int' }
     );
 
-    # $value == 0 --> input conector shield set to GROUND
-    # $value == 1 --> input conector shield set to FLOAT
-
     if ( defined $value and ( $value == 0 || $value == 1 ) ) {
         $self->write(command => sprintf( "FLOAT %d", $value ));
         $self->cached_float($value);
@@ -161,9 +147,6 @@ sub set_cp {
     my ( $self, $value, %args ) = validated_setter( \@_,
         value => { isa => 'Int' }
     );
-
-    # $value == 0 --> input conector shield set to GROUND
-    # $value == 1 --> input conector shield set to FLOAT
 
     if ( defined $value and ( $value == 0 || $value == 1 ) ) {
         $self->write(command => sprintf( "CP %d", $value ));
@@ -331,6 +314,7 @@ sub get_sen {
 
     return $matrix_reverse[$imode][ $self->cached_sen($self->query(command =>"SEN", %args)) - 1 ];
 }
+
 
 sub auto_sen {
     my ( $self, $value, %args ) = validated_setter( \@_,
@@ -600,7 +584,7 @@ sub set_phase {
         value   => { isa => 'Num' },
         verbose => { isa => 'Bool', default => 1 },
         step    => { isa => 'Num', default => 1},
-        rate    => { isa => 'Num', default => 36},
+        rate    => { isa => 'Num', default => 30},
     );
     my $to             = delete $args{value};
     my $verbose        = delete $args{verbose};
@@ -613,12 +597,12 @@ sub set_phase {
         my $distance       = abs( $to - $from );
 
         # Enforce step size and rate.
-        if ( $step < 1e-9 ) {
-            croak "step size must be > 0";
+        if ( $step < 1e-3 ) {
+            croak "step size must be >= 0.001 degrees";
         }
 
-        if ( $rate < 1e-9 ) {
-            croak "rate must be > 0";
+        if ( $rate < 1e-3 ) {
+            croak "rate must be >= 0.001 degrees/second";
         }
 
         my @steps = linspace(
@@ -634,6 +618,7 @@ sub set_phase {
             $time_per_step = $step / $rate;
         }
 
+        usleep(10);
         my $time = time();
 
         if ( $time < $last_timestamp ) {
@@ -671,7 +656,7 @@ sub set_phase {
         STDOUT->autoflush($autoflush);
     }
     else {
-        croak "\nSIGNAL REOCOVERY 726x:\nunexpected value for REFERENCE PHASE in sub set_phase. Expected values must be in the range 0..360";
+        croak "\nSIGNAL REOCOVERY 726x:\nunexpected value for REFERENCE PHASE in sub set_phase. Expected values must be in the range -360..360";
     }
 }
 
@@ -1352,7 +1337,7 @@ Lab::Moose::Instrument::SignalRecovery7265 - Model 7265 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.791
+version 3.792
 
 =head1 SYNOPSIS
 
@@ -1361,107 +1346,94 @@ version 3.791
  # Constructor
  my $SR = instrument(
     type => 'SignalRecovery7265',
-    connection_type => 'LinuxGPIB'
-    %connection_options
+    connection_type => 'LinuxGPIB',
+    min_units => 0,
+    max_units => 1,
+    max_units_per_step => 0.001,
+    max_units_per_second => 1
  );
+
+=over 4
+
+=item * C<max_units>
+
+=item * C<min_units>
+
+=item * C<max_units_per_step>
+
+=item * C<max_units_per_second>
+
+=back
 
 =head2 set_imode
 
 	$SR->set_imode(value => $imode);
 
-Preset Signal Recovery 7260 / 7265 Lock-in Amplifier
-
-=over 4
-
-=item $imode
+Set input amplifier mode; valid arguments for imode are:
 
 	 $imode == 0  --> Current Mode OFF
 	 $imode == 1  --> High Bandwidth Current Mode
 	 $imode == 2  --> Low Noise Current Mode
 
-=back
-
 =head2 set_vmode
 
 	$SR->set_vmode(value => $vmode);
 
-Preset Signal Recovery 7260 / 7265 Lock-in Amplifier
-
-=over 4
-
-=item $vmode
+Set input channel and/or differental mode; valid arguments for vmode are:
 
 	  $vmode == 0  --> Both inputs grounded (testmode)
 	  $vmode == 1  --> A input only
 	  $vmode == 2  --> -B input only
 	  $vmode == 3  --> A-B differential mode
 
-=back
-
 =head2 set_fet
 
 	$SR->set_fet(value => $fet);
 
-Preset Signal Recovery 7260 / 7265 Lock-in Amplifier
-
-=over 4
-
-=item $fet
+Set input impedance and noise via selection of the initial stage transistor;
+valid values for fet are:
 
 	  $fet == 0 --> Bipolar device, 10 kOhm input impedance, 2nV/sqrt(Hz) voltage noise at 1 kHz
 	  $fet == 1 --> FET, 10 MOhm input impedance, 5nV/sqrt(Hz) voltage noise at 1 kHz
-
-=back
 
 =head2 set_float
 
 	$SR->set_float(value => $float);
 
-Preset Signal Recovery 7260 / 7265 Lock-in Amplifier
-
-=over 4
-
-=item $float
+Switch ground reference of the input connector on or off; valid values for float are:
 
 	  $float == 0 --> input conector shield set to GROUND
 	  $float == 1 --> input conector shield set to FLOAT
-
-=back
 
 =head2 set_cp
 
 	$SR->set_cp(value => $cp);
 
-Preset Signal Recovery 7260 / 7265 Lock-in Amplifier
-
-=over 4
-
-=item $cp
+Set input coupling to ac or dc; valid values are:
 
 	  $cp == 0 --> input coupling mode AC\n
 	  $cp == 1 --> input coupling mode DC\n
-
-=back
 
 =head2 set_sen
 
 	$SR->set_sen(value => $value);
 
-Preset Signal Recovery 7260 / 7265 Lock-in Amplifier
-
-=over 4
-
-=item $value
+Set input sensitivity; valid values are:
 
 	  SENSITIVITY (IMODE == 0) --> 2nV, 5nV, 10nV, 20nV, 50nV, 100nV, 200nV, 500nV, 1uV, 2uV, 5uV, 10uV, 20uV, 50uV, 100uV, 200uV, 500uV, 1mV, 2mV, 5mV, 10mV, 20mV, 50mV, 100mV, 200mV, 500mV, 1V\n
 	  SENSITIVITY (IMODE == 1) --> 2fA, 5fA, 10fA, 20fA, 50fA, 100fA, 200fA, 500fA, 1pA, 2pA, 5pA, 10pA, 20pA, 50pA, 100pA, 200pA, 500pA, 1nA, 2nA, 5nA, 10nA, 20nA, 50nA, 100nA, 200nA, 500nA, 1uA\n
 	  SENSITIVITY (IMODE == 2) --> 2fA, 5fA, 10fA, 20fA, 50fA, 100fA, 200fA, 500fA, 1pA, 2pA, 5pA, 10pA, 20pA, 50pA, 100pA, 200pA, 500pA, 1nA, 2nA, 5nA, 10nA\n
 
-=back
-
 Every value can be entered via string, for example
 
     $SR->set_sen(value => '100nV');
+
+=head2 auto_sen
+
+	$SR->auto_sen(value => $amplitude);
+
+Adjust the Lock-Ins sensitivity based on a specified amplitude value $amplitude.
+This function will select a sensitivity, that covers the given amplitude the best.
 
 =head2 set_acgain
 
@@ -1519,8 +1491,9 @@ Preset Signal Recovery 7260 / 7265 Lock-in Amplifier
 
 Trigger an autophase procedure
 
-=head2 set_phase
+=head2 set_refpha/set_phase
 
+    $SR->set_refpha(value => $phase);
 	$SR->set_phase(value => $phase);
 
 Preset Signal Recovery 7260 / 7265 Lock-in Amplifier
@@ -1532,6 +1505,30 @@ Preset Signal Recovery 7260 / 7265 Lock-in Amplifier
 	  REFERENCE PHASE can be between 0 ... 360°
 
 =back
+
+Use C<set_refpha> to instantly set the Lock-Ins phase, use C<set_phase> for a
+linear step sweep to the desired phase. Like the L<Lab::Moose::Instrument::LinearStepSweep>
+class, optional arguments for C<set_phase> are
+
+=over 4
+
+=item $verbose
+
+Default = true. Set to false if you don't want the sweeping process to be
+printed on-screen.
+
+=item $step
+
+Default = 1 [°]. Adjust the step size in degrees, can't be smaller than 0.001°.
+
+=item $rate
+
+Default = 30 [°/s]. Adjust the sweep rate in degrees per second, can't be
+smaller than 0.001°/s.
+
+=back
+
+Note that C<set_phase> is used in phase sweeps.
 
 =head2 set_outputfilter_slope
 

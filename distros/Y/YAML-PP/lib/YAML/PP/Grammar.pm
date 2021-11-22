@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Grammar;
 
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 use base 'Exporter';
 
@@ -75,7 +75,62 @@ $GRAMMAR = {
       'new' => 'DOCUMENT_END'
     }
   },
+  'END_FLOW' => {
+    'EOL' => {
+      'match' => 'cb_end_outer_flow',
+      'return' => 1
+    }
+  },
   'FLOWMAP' => {
+    'ANCHOR' => {
+      'DEFAULT' => {
+        'new' => 'NEWFLOWMAP_ANCHOR'
+      },
+      'EOL' => {
+        'new' => 'NEWFLOWMAP_ANCHOR_SPC'
+      },
+      'WS' => {
+        'new' => 'NEWFLOWMAP_ANCHOR_SPC'
+      },
+      'match' => 'cb_anchor'
+    },
+    'COLON' => {
+      'EOL' => {
+        'match' => 'cb_empty_flow_mapkey',
+        'new' => 'RULE_FULLFLOWSCALAR'
+      },
+      'WS' => {
+        'match' => 'cb_empty_flow_mapkey',
+        'new' => 'RULE_FULLFLOWSCALAR'
+      }
+    },
+    'DEFAULT' => {
+      'new' => 'FLOWMAP_CONTENT'
+    },
+    'EOL' => {
+      'new' => 'FLOWMAP'
+    },
+    'FLOWMAP_END' => {
+      'match' => 'cb_end_flowmap',
+      'return' => 1
+    },
+    'TAG' => {
+      'DEFAULT' => {
+        'new' => 'NEWFLOWMAP_TAG'
+      },
+      'EOL' => {
+        'new' => 'NEWFLOWMAP_TAG_SPC'
+      },
+      'WS' => {
+        'new' => 'NEWFLOWMAP_TAG_SPC'
+      },
+      'match' => 'cb_tag'
+    },
+    'WS' => {
+      'new' => 'FLOWMAP'
+    }
+  },
+  'FLOWMAP_CONTENT' => {
     'ALIAS' => {
       'match' => 'cb_send_alias',
       'return' => 1
@@ -123,6 +178,25 @@ $GRAMMAR = {
     'FLOW_COMMA' => {
       'match' => 'cb_empty_flowmap_key_value',
       'return' => 1
+    }
+  },
+  'FLOWMAP_EXPLICIT_KEY' => {
+    'DEFAULT' => {
+      'new' => 'FLOWMAP'
+    },
+    'EOL' => {
+      'new' => 'FLOWMAP_EXPLICIT_KEY'
+    },
+    'FLOWMAP_END' => {
+      'match' => 'cb_end_empty_flowmap_key_value',
+      'return' => 1
+    },
+    'FLOW_COMMA' => {
+      'match' => 'cb_empty_flowmap_key_value',
+      'return' => 1
+    },
+    'WS' => {
+      'new' => 'FLOWMAP_EXPLICIT_KEY'
     }
   },
   'FLOWMAP_PROPS' => {
@@ -543,53 +617,15 @@ $GRAMMAR = {
     }
   },
   'NEWFLOWMAP' => {
-    'ANCHOR' => {
-      'DEFAULT' => {
-        'new' => 'NEWFLOWMAP_ANCHOR'
-      },
-      'EOL' => {
-        'new' => 'NEWFLOWMAP_ANCHOR_SPC'
-      },
-      'WS' => {
-        'new' => 'NEWFLOWMAP_ANCHOR_SPC'
-      },
-      'match' => 'cb_anchor'
-    },
-    'COLON' => {
-      'EOL' => {
-        'match' => 'cb_empty_flow_mapkey',
-        'new' => 'RULE_FULLFLOWSCALAR'
-      },
-      'WS' => {
-        'match' => 'cb_empty_flow_mapkey',
-        'new' => 'RULE_FULLFLOWSCALAR'
-      }
-    },
     'DEFAULT' => {
       'new' => 'FLOWMAP'
     },
     'EOL' => {
       'new' => 'NEWFLOWMAP'
     },
-    'FLOWMAP_END' => {
-      'match' => 'cb_end_flowmap',
-      'return' => 1
-    },
     'QUESTION' => {
       'match' => 'cb_flow_question',
-      'new' => 'NEWFLOWMAP'
-    },
-    'TAG' => {
-      'DEFAULT' => {
-        'new' => 'NEWFLOWMAP_TAG'
-      },
-      'EOL' => {
-        'new' => 'NEWFLOWMAP_TAG_SPC'
-      },
-      'WS' => {
-        'new' => 'NEWFLOWMAP_TAG_SPC'
-      },
-      'match' => 'cb_tag'
+      'new' => 'FLOWMAP_EXPLICIT_KEY'
     },
     'WS' => {
       'new' => 'NEWFLOWMAP'
@@ -1611,7 +1647,7 @@ This is the Grammar in YAML
       DEFAULT:
         new: FLOWSEQ_NEXT
     
-    FLOWMAP:
+    FLOWMAP_CONTENT:
       FLOWSEQ_START: { match: cb_start_flowseq, new: NEWFLOWSEQ }
       FLOWMAP_START: { match: cb_start_flowmap, new: NEWFLOWMAP }
     
@@ -1762,8 +1798,24 @@ This is the Grammar in YAML
     NEWFLOWMAP:
       EOL: { new: NEWFLOWMAP }
       WS: { new: NEWFLOWMAP }
-      # TODO
-      QUESTION: { match: cb_flow_question, new: NEWFLOWMAP }
+      QUESTION: { match: cb_flow_question, new: FLOWMAP_EXPLICIT_KEY }
+      DEFAULT: { new: FLOWMAP }
+    
+    
+    FLOWMAP_EXPLICIT_KEY:
+      WS: { new: FLOWMAP_EXPLICIT_KEY }
+      EOL: { new: FLOWMAP_EXPLICIT_KEY }
+      FLOWMAP_END:
+        match: cb_end_empty_flowmap_key_value
+        return: 1
+      FLOW_COMMA:
+        match: cb_empty_flowmap_key_value
+        return: 1
+      DEFAULT: { new: FLOWMAP }
+    
+    FLOWMAP:
+      EOL: { new: FLOWMAP }
+      WS: { new: FLOWMAP }
     
       ANCHOR:
         match: cb_anchor
@@ -1788,7 +1840,7 @@ This is the Grammar in YAML
           match: cb_empty_flow_mapkey
           new: RULE_FULLFLOWSCALAR
     
-      DEFAULT: { new: FLOWMAP }
+      DEFAULT: { new: FLOWMAP_CONTENT }
     
     NODETYPE_FLOWMAP:
       EOL: { new: NODETYPE_FLOWMAP }
@@ -1799,6 +1851,10 @@ This is the Grammar in YAML
       FLOW_COMMA: { match: cb_flow_comma, new: NEWFLOWMAP }
       DEFAULT: { new: NEWFLOWMAP }
     
+    END_FLOW:
+      EOL:
+        match: cb_end_outer_flow
+        return: 1
     
     RULE_MAPKEY:
       QUESTION:

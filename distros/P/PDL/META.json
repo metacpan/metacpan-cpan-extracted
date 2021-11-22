@@ -93,6 +93,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.057",
+   "version" : "2.063",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

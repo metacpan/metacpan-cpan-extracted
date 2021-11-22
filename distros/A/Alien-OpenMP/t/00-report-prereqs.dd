@@ -23,6 +23,12 @@ do { my $x = {
                                       'Test::Pod' => '1.41'
                                     }
                     },
+       'runtime' => {
+                      'recommends' => {
+                                        'Inline' => '0.67',
+                                        'Inline::C' => '0.62'
+                                      }
+                    },
        'test' => {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900'
@@ -30,7 +36,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '6.52',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'Test::Needs' => '0'
                                  }
                  }
      };

@@ -22,3 +22,9 @@ The following logs changes for the CPAN distribution Valiant
 
 0.001006 2021-10-15
           - Tweaked the exception class so it plays nicer with subclassers
+
+0.001007 2021-11-05
+          - Default HTML template provides a blank favicon to prevent some browers from creating
+            an extra request to look for it.  Just something that annoys me :)
+          - Documentation and example of subclassing the exception classes to play nice with th
+            RenderError plugin.

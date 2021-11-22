@@ -1,18 +1,6 @@
 /*************************************************
 Documentation of symbols defined by Math::MPFR
 
-NV_IS_LONG_DOUBLE        : Automatically defined by Makefile.PL if
-                           $Config{nvtype} is 'long double'.
-
-NV_IS_FLOAT128           : Automatically defined by Makefile.PL if
-                           $Config{nvtype} is __float128
-                           If NV_IS_FLOAT128 is defined we include the
-                           quadmath.h header.
-
-NV_IS_53_BIT             : Defined only when $Config{nvtype} is 'double' or
-                           when $Config{nvtype} is a 'long double' that's
-                           identical to the double.
-
 MPFR_WANT_FLOAT128       : Defined by Makefile.PL if $have_float128 is
                            set to a true value. $have_float128 can be set
                            to a true value by either editing the Makefile.PL
@@ -27,13 +15,13 @@ MPFR_WANT_FLOAT128       : Defined by Makefile.PL if $have_float128 is
                            MPFR_WANT_FLOAT128 must NOT be defined if the
                            mpfr library has NOT been built with __float128
                            support.
-                           MPFR_WANT_FLOAT128 does not imply that NV_IS_FLOAT128
-                           has been defined - perhaps we have defined
+                           MPFR_WANT_FLOAT128 does not imply that nvtype is
+                           __float128 - perhaps we have defined
                            MPFR_WANT_FLOAT128 solely because we wish to make
                            use of the Math::Float128-Math::MPFR interface.
 
 CAN_PASS_FLOAT128        : Defined only when both MPFR_WANT_FLOAT128 and
-                           NV_IS_FLOAT128 is defined, and then only if the mpfr
+                           USE_QUADMATH is defined, and then only if the mpfr
                            library is at version 4.0.0 or later. (There was no
                            __float128 support in the mpfr library prior to
                            4.0.0.)
@@ -191,14 +179,14 @@ FALLBACK_NOTIFY          : If defined, $Math::MPFR::doubletoa_fallback
 #include <mpfr.h>
 #include <float.h>
 
-#if defined(MPFR_WANT_FLOAT128) || defined(NV_IS_FLOAT128)
+#if defined(MPFR_WANT_FLOAT128) || defined(USE_QUADMATH)
 #include <quadmath.h>
-#if defined(NV_IS_FLOAT128) && defined(MPFR_WANT_FLOAT128) && defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(4,0,0)
+#if defined(USE_QUADMATH) && defined(MPFR_WANT_FLOAT128) && defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(4,0,0)
 #define CAN_PASS_FLOAT128
 #endif
 #if defined(__MINGW32__) && !defined(__MINGW64__)
 typedef __float128 float128 __attribute__ ((aligned(32)));
-#elif defined(__MINGW64__) || (defined(DEBUGGING) && defined(NV_IS_DOUBLE))
+#elif defined(__MINGW64__) || (defined(DEBUGGING) && NVSIZE == 8)
 typedef __float128 float128 __attribute__ ((aligned(8)));
 #else
 typedef __float128 float128;
@@ -206,7 +194,7 @@ typedef __float128 float128;
 #endif
 
 #if defined(MPFR_WANT_DECIMAL128)
-#if defined(__MINGW64__) || (defined(DEBUGGING) && defined(NV_IS_DOUBLE))
+#if defined(__MINGW64__) || (defined(DEBUGGING) && NVSIZE == 8)
 typedef _Decimal128 D128 __attribute__ ((aligned(8)));
 #else
 typedef _Decimal128 D128;
@@ -233,10 +221,6 @@ typedef _Decimal128 D128;
 #define REQUIRED_LDBL_MANT_DIG 2098
 #else
 #define REQUIRED_LDBL_MANT_DIG LDBL_MANT_DIG
-#endif
-
-#if (!defined(NV_IS_FLOAT128) && !defined(NV_IS_LONG_DOUBLE)) || (defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 53)
-#define NV_IS_53_BIT 1
 #endif
 
 #define FAILS_CHECK_INPUT_BASE \
@@ -396,7 +380,7 @@ typedef _Decimal128 D128;
 #define INC_OR_DEC(p) p--
 #endif
 
-#if defined(NV_IS_53_BIT)
+#if NVSIZE == 8
 #define MATH_MPFR_MAX_DIG 17
 #define NVSIZE_BITS 53
 #define MATH_MPFR_NV_MAX 1.7976931348623157e+308
@@ -418,7 +402,7 @@ typedef _Decimal128 D128;
 
 # endif
 
-#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
+#elif defined(USE_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
 #define MATH_MPFR_MAX_DIG 21
 #define NVSIZE_BITS 64
 #define MATH_MPFR_NV_MAX 1.18973149535723176502e4932L
@@ -440,7 +424,7 @@ typedef _Decimal128 D128;
 
 # endif
 
-#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098
+#elif defined(USE_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098
 #define MATH_MPFR_MAX_DIG 33
 #define NVSIZE_BITS 2098
 #define MATH_MPFR_NV_MAX 1.797693134862315807937289714053e+308L

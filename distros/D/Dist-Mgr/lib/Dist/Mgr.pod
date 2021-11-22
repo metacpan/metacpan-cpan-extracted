@@ -10,8 +10,8 @@ release and post-release tasks.
 =head1 DESCRIPTION
 
 For end-users, please review the
-L<documentation|https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr> for
-the L<distmgr|https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr>
+L<documentation|https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr.pod> for
+the L<distmgr|https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr.pod>
 program that we've installed for you as part of this distribution.
 
 This software performs a full suite of automated creation, addition, pre-release,

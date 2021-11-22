@@ -1,7 +1,7 @@
 package # hide
 Z_Data_Test_Choose;
 
-use 5.008003;
+use 5.10.0;
 use warnings;
 use strict;
 

@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 21.9
+    version: 21.10
   AsposeCellsCloud::LiteCellsApi:
     file: lib/AsposeCellsCloud/LiteCellsApi.pm
   AsposeCellsCloud::Configuration:
@@ -47,6 +47,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/AutoShapesResponse.pm
   AsposeCellsCloud::Object::Border:
     file: lib/AsposeCellsCloud/Object/Border.pm
+  AsposeCellsCloud::Object::BatchConvertRequest:
+    file: lib/AsposeCellsCloud/Object/BatchConvertRequest.pm    
   AsposeCellsCloud::Object::CalculationOptions:
     file: lib/AsposeCellsCloud/Object/CalculationOptions.pm
   AsposeCellsCloud::Object::Cell:
@@ -257,6 +259,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/MHtmlSaveOptions.pm
   AsposeCellsCloud::Object::MarkdownSaveOptions:
     file: lib/AsposeCellsCloud/Object/MarkdownSaveOptions.pm
+  AsposeCellsCloud::Object::MatchConditionRequest:
+    file: lib/AsposeCellsCloud/Object/MatchConditionRequest.pm    
   AsposeCellsCloud::Object::MergedCell:
     file: lib/AsposeCellsCloud/Object/MergedCell.pm
   AsposeCellsCloud::Object::MergedCellResponse:
@@ -554,5 +558,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 21.8
+version: 21.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

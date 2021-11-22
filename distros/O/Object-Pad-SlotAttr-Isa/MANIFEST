@@ -1,12 +1,13 @@
 Build.PL
+Changes
 lib/Object/Pad/SlotAttr/Isa.pm
 lib/Object/Pad/SlotAttr/Isa.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01isa.t
 t/02isa+weak.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

@@ -172,11 +172,12 @@ If I<"noplaylists"> is specified, and the stream to be returned is a
 entry (or a random entry if I<"random"> is specified) in the playlist 
 is returned.
 
-=item $podcast->B<count>()
+=item $podcast->B<count>(['playlist'])
 
-Returns the number of streams found for the podcast / episode / album / song.  
-Episodes and songs usually return 1, whereas podcasts and albums usually 1 
-for each episode / sample song clip in the podcast / album respectively.
+Returns the number of streams found for the podcast.
+If I<"playlist"> is specified, the number of episodes returned in the 
+playlist is returned (the playlist can have more than one item if a 
+podcast page URL is specified).
 
 =item $podcast->B<getID>()
 
@@ -380,7 +381,6 @@ sub new
 	if ($url2fetch =~ m#^https?\:\/\/podcasts\.apple\.#) {
 #EXAMPLE1:my $url = 'https://podcasts.apple.com/us/podcast/wnbc-sec-shorts-josh-snead/id1440412195?i=1000448441439';
 #EXAMPLE2:my $url = 'https://podcasts.apple.com/us/podcast/good-bull-hunting-for-texas-a-m-fans/id1440412195';
-#xxxEXAMPLE3:my $url = 'https://music.apple.com/us/album/big-legged-woman/723550112';
 		$self->{'id'} = ($url =~ m#\/(?:id)?(\d+)(?:\?i\=(\d+))?\/?#) ? $1 : '';
 		$self->{'id'} .= '/'. $2  if (defined $2);
 	} elsif ($url2fetch !~ m#^https?\:\/\/#) {
@@ -399,8 +399,62 @@ sub new
 	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
-	print STDERR "i:FETCHING URL ($url2fetch)...\n"  if ($DEBUG);
-	my $response = $ua->get($url2fetch);
+	my $response;
+	$self->{'albumartist'} = $url2fetch;
+	my @epiTitles = ();
+	my @epiStreams = ();
+
+	if ($self->{'id'} !~ m#\/#) {   #PAGE (multiple episodes):
+		print STDERR "i:FETCHING PAGE URL ($url2fetch)...\n"  if ($DEBUG);
+		$response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+			my $no_wget = system('wget','-V');
+			unless ($no_wget) {
+				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+			}
+		}
+
+		print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
+		return undef  unless ($html);
+
+		my $ep1id = $1  if ($html =~ m#\bdata\-episode\-id\=\"([^\"]+)#);
+		$ep1id ||= $1  if ($html =~ m#\btargetId\&quot\;\:\&quot\;(\d+)#);
+		return undef  unless ($ep1id);
+
+		$url2fetch = 'https://podcasts.apple.com/podcast/id' . $self->{'id'}
+				. '?i=' . $ep1id;
+		$self->{'id'} .= '/' . $ep1id;
+
+		$self->{'articonurl'} = ($html =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
+		$self->{'articonurl'} = ($html =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : ''
+				if ($self->{'articonurl'} !~ /^http/);
+
+		$html =~ s#^.+?\"episodes\\?\"\:\{##s;
+		while ($html =~ s#^(.+?)\"assetUrl\\?\"\:\\?\"([^\\\"]+)##so) {
+			my $pre = $1;
+			my $stream = $2;
+			next  if ($self->{'secure'} && $stream !~ /^https/o);
+
+			my $title = ($pre =~ s#\"name\\?\"\:\\?\"([^\\\"]+)##so) ? $1 : '';
+			$title ||= ($html =~ s#\"itunesTitle\\?\"\:\\?\"([^\\\"]+)##so) ? $1 : '';
+			next  unless ($title);
+
+			$title = HTML::Entities::decode_entities($title);
+			$title = uri_unescape($title);
+			$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+			push @epiStreams, $stream;
+			push @epiTitles, $title;
+		}
+ 	}
+
+#FETCH EPISODE:
+
+	print STDERR "i:FETCHING EPISODE URL ($url2fetch)...\n"  if ($DEBUG);
+	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
 	} else {
@@ -412,91 +466,60 @@ sub new
 		}
 	}
 
-	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
+	print STDERR "-2: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html);
 
-	$self->{'albumartist'} = $url2fetch;
-	my @epiTitles = ();
-	my ($pre, $post) = split(/\"included\"\:/, $html, 2);
-	$html = '';
-	return undef  unless ($pre && $post);
-
-	$self->{'iconurl'} = ($pre =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
+	$self->{'iconurl'} = ($html =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
 	if ($self->{'iconurl'} !~ /^http/) {
-		$self->{'iconurl'} = ($pre =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : '';
+		$self->{'iconurl'} = ($html =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : '';
 	}
 	$self->{'imageurl'} = $self->{'iconurl'};
-	if ($pre =~ m#\<span\s+class\=\"product\-header\_\_identity(.+?)\<\/span\>#s) {
+	
+	if ($html =~ m#\<span\s+class\=\"product\-header\_\_identity(.+?)\<\/span\>#s) {
 		my $span = $1;
-		#x $self->{'artist'} = $1  if ($span =~ m#\"\>\s*([^\<]+)\<\/#s);
-		$self->{'artist'} = $1  if ($span =~ m#\>\s*([^\<]+)\<\/a#s);
-		if ($self->{'artist'} !~ /\w/) {
-			$self->{'artist'} = $1  if ($span =~ m#\>\s*([^\<]+)#s);
+		$self->{'album'} = $1  if ($span =~ m#\>\s*([^\<]+)\<\/a#s);
+		if ($self->{'album'} !~ /\w/) {
+			$self->{'album'} = $1  if ($span =~ m#\>\s*([^\<]+)#s);
 		}
-		$self->{'artist'} =~ s/\s+$//;
+		$self->{'album'} =~ s/\s+$//;
 		$self->{'albumartist'} = $1  if ($span =~ m#href\=\"([^\"]+)\"\s+class\=\"link#is);
 	}
-	if ($pre =~ m#\<li\s+class\=\"tracklist\-footer\_\_item\"\>([^\<]+)#) {
-		$self->{'album'} = $1;
-		$self->{'album'} =~ s/^\s+//s;
-		$self->{'album'} =~ s/\s+$//s;
+	$self->{'artist'} = $1  if ($html =~ m#\"creator\"\:\"([^\"]+)#);
+	if (!$self->{'artist'} && $html =~ m#\<li\s+class\=\"tracklist\-footer\_\_item\"\>([^\<]+)#s) {
+		$self->{'artist'} = $1;
+		$self->{'artist'} =~ s/^\s+//s;
+		$self->{'artist'} =~ s/\s+$//s;
 	}
-	if ($pre =~ m#\"assetUrl\"\:\"([^\"]+)\"#s) {   #INVIDUAL EPISODE:
-		print STDERR "---EPISODE---\n"  if ($DEBUG);
-		my $stream = $1;
-		$self->{'streams'}->[0] = $stream  unless ($self->{'secure'} && $stream !~ /^https/o);
-		my $rest = $2;
-		$self->{'title'} = $1  if ($pre =~ m#\"mediaKind\"\:\"[^\"]*\"\,\"name\"\:\"([^\"]+)\"#s);
-		if ($self->{'title'}) {
-			my $title = HTML::Entities::decode_entities($self->{'title'});
-			$title = uri_unescape($title);
-			$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-			@epiTitles = ($title)  if ($self->{'streams'}->[0]);
-		}
-		if ($pre =~ m#episode-description\>(.+?)\<\/section\>#s) {
-			$self->{'description'} = $1;
-			$self->{'description'} =~ s#\<p[^\>]*\>(.+?)\<\/p\>#$1#s;
-		}
-		$self->{'description'} ||= $1  if ($pre =~ m#\"description\"\:\{\"standard\"\:\"([^\"]+)\"#s);
-		$self->{'description'} ||= $1  if ($pre =~ m#\"short\"\:\"([^\"]+)\"#s);
-		$self->{'created'} = $1  if ($pre =~ m#\"datePublished\"\:\"([^\"]+)#s);
-	} else {   #PAGE (multiple episodes):
-		print STDERR "---PAGE (multiple episodes)---\n"  if ($DEBUG);
-		if ($pre =~ m#type\=\".*?json\"\>([^\<]+)#) {
-			my $json = $1;
-			$self->{'title'} = $1  if ($json =~ m#\"name\"\:\"([^\"]+)\"#s);
-			$self->{'description'} = $1  if ($json =~ m#\"description\"\:\"([^\"]+)\"#s);
-			$self->{'created'} = $1  if ($json =~ m#\"datePublished\"\:\"([^\"]+)\"#s);
-		}
-		while ($post =~ s#\"assetUrl\"\:\"([^\"]+)\".+?\,\"name\"\:\"([^\"]+)\"##s) {
-			my $stream = $1;
-			my $title = HTML::Entities::decode_entities($2);
-			$title = uri_unescape($title);
-			$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-			unless ($self->{'secure'} && $stream !~ /^https/o) {
-				push @{$self->{'streams'}}, $stream;
-				push @epiTitles, $title;
-			}
-		}
-	}
-	$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
-	if ($pre =~ m#\<li\s+class\=\"product\-header\_\_list\_\_item\"\>(.*?)\<\/ul\>#s) {
+	if ($html =~ m#\<li\s+class\=\"product\-header\_\_list\_\_item\"\>(.*?)\<\/ul\>#s) {
 		my $prodlistitemdata = $1;
 		$self->{'genre'} = $1  if ($prodlistitemdata =~ s#genre\"?\>\s*([^\<]+)\<\/##s);
 		$self->{'year'} = $1  if ($prodlistitemdata =~ m#\>([\d]+)\D*\<\/time\>#s);
 	}
-	$self->{'genre'} ||= $1  if ($pre =~ m#\<li\s+class\=\"inline\-list\_\_item[^\>]+\>(.*?)\<\/li\>#s);
-	if ($self->{'genre'})	{
-		$self->{'genre'} =~ s/^\s+//;
-		$self->{'genre'} =~ s/\s+$//;
-		$self->{'genre'} = HTML::Entities::decode_entities($self->{'genre'})  if (defined $self->{'genre'});
-		$self->{'genre'} = uri_unescape($self->{'genre'});
-		$self->{'genre'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-	} else {
-		$self->{'genre'} = 'Podcast';
+	$self->{'genre'} ||= $1  if ($html =~ m#\<li\s+class\=\"inline\-list\_\_item[^\>]+\>(.*?)\<\/li\>#s);
+	$self->{'title'} = $1  if ($html =~ m#\"name\\?\"\:\\?\"([^\\\"]+)#s);
+	$self->{'title'} ||= $1  if ($html =~ m#\"itunesTitle\\?\"\:\\?\"([^\\\"]+)#s);
+	if ($html =~ m#episode\-description\>(.+?)\<\/section\>#s) {
+		$self->{'description'} = $1;
+		$self->{'description'} =~ s#\<p[^\>]*\>(.+?)\<\/p\>#$1#s;
+	}
+	$self->{'description'} ||= $1  if ($html =~ m#\"description\\?\"\:\{\\?\"standard\\?\"\:\\?\"([^\\\"]+)#s);
+	$self->{'description'} ||= $1  if ($html =~ m#\"short\"\:\"([^\"]+)\"#s);
+	$self->{'created'} = $1  if ($html =~ m#\"datePublished\"\:\"([^\"]+)#s);
+	while ($html =~ s#\"assetUrl\\?\"\:\\?\"([^\\\"]+)##s) {
+		my $stream = $1;
+		push (@{$self->{'streams'}}, $stream)  unless ($self->{'secure'} && $stream !~ /^https/o);
 	}
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
 	$self->{'total'} = $self->{'cnt'};
+	return undef  unless ($self->{'total'} > 0);
+
+	$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
+	if ($self->{'genre'})	{
+		$self->{'genre'} =~ s/^\s+//;
+		$self->{'genre'} =~ s/\s+$//;
+	} else {
+		$self->{'genre'} = 'Podcast';
+	}
 	$self->{'imageurl'} = $self->{'iconurl'};
 	if ($self->{'description'} =~ /\w/) {
 		$self->{'description'} =~ s/\s+$//;
@@ -504,22 +527,37 @@ sub new
 	} else {
 		$self->{'description'} = $self->{'title'};
 	}
-	foreach my $i (qw(title artist description genre)) {
+	foreach my $i (qw(title artist album description genre)) {
 		$self->{$i} = HTML::Entities::decode_entities($self->{$i});
 		$self->{$i} = uri_unescape($self->{$i});
 		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 	}
-	if ($self->{'total'} > 0) {
-		$self->{'Url'} = $self->{'streams'}->[0];
-		print STDERR "-SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"  if ($DEBUG);
-		$self->{'playlist'} = "#EXTM3U\n";
-		for (my $i=0;$i<$self->{'total'};$i++) {
+	$self->{'Url'} = $self->{'streams'}->[0];
+	print STDERR "-SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"  if ($DEBUG);
+	$self->{'playlist'} = "#EXTM3U\n";
+	if ($#epiStreams >= 0) {
+		$self->{'playlist_cnt'} = scalar @epiStreams;
+		for (my $i=0;$i<=$#epiStreams;$i++) {
 			last  if ($i > $#epiTitles);
-			$self->{'playlist'} .= "#EXTINF:-1, " . $epiTitles[$i]
-					. "\n#EXTART:" . $self->{'artist'} . "\n";
-			$self->{'playlist'} .= "#EXTGENRE:" . $self->{'genre'} . "\n"  if ($self->{'genre'});
-			$self->{'playlist'} .= ${$self->{'streams'}}[$i] . "\n";
+			$self->{'playlist'} .= "#EXTINF:-1, " . $epiTitles[$i] . "\n";
+			$self->{'playlist'} .= "#EXTART:" . $self->{'artist'} . "\n"
+					if ($self->{'artist'});
+			$self->{'playlist'} .= "#EXTALB:" . $self->{'album'} . "\n"
+					if ($self->{'album'});
+			$self->{'playlist'} .= "#EXTGENRE:" . $self->{'genre'} . "\n"
+					if ($self->{'genre'});
+			$self->{'playlist'} .= $epiStreams[$i] . "\n";
 		}
+	} else {
+		$self->{'playlist_cnt'} = 1;
+		$self->{'playlist'} .= "#EXTINF:-1, " . $self->{'title'} . "\n";
+		$self->{'playlist'} .= "#EXTART:" . $self->{'artist'} . "\n"
+				if ($self->{'artist'});
+		$self->{'playlist'} .= "#EXTALB:" . $self->{'album'} . "\n"
+				if ($self->{'album'});
+		$self->{'playlist'} .= "#EXTGENRE:" . $self->{'genre'} . "\n"
+				if ($self->{'genre'});
+		$self->{'playlist'} .= ${$self->{'streams'}}[0] . "\n";
 	}
 	$self->_log($url);
 
@@ -558,11 +596,8 @@ sub getIconURL
 		print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 		return ''  unless ($html);
 
-		my ($pre, $post) = split(/\"included\"\:/, $html, 2);
-		$html = '';
-
-		$self->{'articonurl'} = ($pre =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
-		$self->{'articonurl'} = ($pre =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : ''
+		$self->{'articonurl'} = ($html =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
+		$self->{'articonurl'} = ($html =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : ''
 				if ($self->{'articonurl'} !~ /^http/);
 		print STDERR "--ART ICON URL=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 	}

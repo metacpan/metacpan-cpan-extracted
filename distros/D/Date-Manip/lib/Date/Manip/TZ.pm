@@ -23,9 +23,10 @@ use IO::File;
 require Date::Manip::Zones;
 use Date::Manip::Base;
 use Data::Dumper;
+use Carp;
 
 our $VERSION;
-$VERSION='6.85';
+$VERSION='6.86';
 END { undef $VERSION; }
 
 # To get rid of a 'used only once' warnings.
@@ -376,7 +377,7 @@ sub curr_zone_methods {
    my($self,@methods) = @_;
 
    if (${^TAINT}) {
-      warn "ERROR: [curr_zone_methods] not allowed when taint checking on\n";
+      carp "ERROR: [curr_zone_methods] not allowed when taint checking on";
       return;
    }
 
@@ -420,7 +421,7 @@ sub _get_curr_zone {
 
          if (! @methods) {
             print "]\n"  if ($debug);
-            warn "ERROR: [_set_curr_zone] main requires argument\n";
+            carp "ERROR: [_set_curr_zone] main requires argument";
             return;
          }
          my $var = shift(@methods);
@@ -438,7 +439,7 @@ sub _get_curr_zone {
       } elsif ($method eq 'env') {
          if (@methods < 2) {
             print "]\n"  if ($debug);
-            warn "ERROR: [_set_curr_zone] env requires 2 argument\n";
+            carp "ERROR: [_set_curr_zone] env requires 2 argument";
             return;
          }
          my $type = lc( shift(@methods) );
@@ -447,8 +448,8 @@ sub _get_curr_zone {
          if ($type ne 'zone'  &&
              $type ne 'offset') {
             print "?]\n"  if ($debug);
-            warn "ERROR: [_set_curr_zone] env requires 'offset' or 'zone' " .
-                 "as the first argument\n";
+            carp "ERROR: [_set_curr_zone] env requires 'offset' or 'zone' " .
+                 "as the first argument";
             return;
          }
          my $var  = shift(@methods);
@@ -472,7 +473,7 @@ sub _get_curr_zone {
       } elsif ($method eq 'file') {
          if (! @methods) {
             print "]\n"  if ($debug);
-            warn "ERROR: [_set_curr_zone] file requires argument\n";
+            carp "ERROR: [_set_curr_zone] file requires argument";
             return;
          }
          my $file = shift(@methods);
@@ -566,7 +567,7 @@ sub _get_curr_zone {
       } elsif ($method eq 'tzdata') {
          if (@methods < 2) {
             print "]\n"  if ($debug);
-            warn "ERROR: [_set_curr_zone] tzdata requires two arguments\n";
+            carp "ERROR: [_set_curr_zone] tzdata requires two arguments";
             return;
          }
          my $file    = shift(@methods);
@@ -587,7 +588,7 @@ sub _get_curr_zone {
       } elsif ($method eq 'command') {
          if (! @methods) {
             print "]\n"  if ($debug);
-            warn "ERROR: [_set_curr_zone] command requires argument\n";
+            carp "ERROR: [_set_curr_zone] command requires argument";
             return;
          }
          my $command = shift(@methods);
@@ -606,7 +607,7 @@ sub _get_curr_zone {
       } elsif ($method eq 'cmdfield') {
          if ($#methods < 1) {
             print "]\n"  if ($debug);
-            warn "ERROR: [_set_curr_zone] cmdfield requires 2 arguments\n";
+            carp "ERROR: [_set_curr_zone] cmdfield requires 2 arguments";
             return;
          }
          my $command = shift(@methods);
@@ -663,7 +664,7 @@ sub _get_curr_zone {
 
       } else {
          print "]\n"  if ($debug);
-         warn "ERROR: [_set_curr_zone] invalid method: $method\n";
+         carp "ERROR: [_set_curr_zone] invalid method: $method";
          return;
       }
 
@@ -691,7 +692,7 @@ sub _get_curr_zone {
    }
 
    if (! $currzone) {
-      warn "ERROR: Date::Manip unable to determine Time Zone.  GMT will be used.\n";
+      carp "ERROR: Date::Manip unable to determine Time Zone.  GMT will be used.";
       $currzone = 'Etc/GMT';
    }
 
@@ -743,7 +744,7 @@ sub _get_curr_zone {
       } and return;
       ref $@
         and return $@->{zone};
-      die $@;
+      croak $@;
    }
 
    sub _zoneinfo_find_file {
@@ -753,7 +754,7 @@ sub _get_curr_zone {
         and -f $_
         and $want_size == -s _
         and ($want_content eq _zoneinfo_file_slurp($File::Find::name))
-        and die { zone => $zone };
+        and croak { zone => $zone };
    }
 }
 
@@ -1197,7 +1198,7 @@ sub all_periods {
 
    my $z = $self->_zone($zone);
    if (! $z) {
-      warn "ERROR: [periods] Invalid zone: $zone\n";
+      carp "ERROR: [periods] Invalid zone: $zone";
       return;
    }
    $zone = $z;
@@ -1279,7 +1280,7 @@ sub periods {
 
    my $z = $self->_zone($zone);
    if (! $z) {
-      warn "ERROR: [periods] Invalid zone: $zone\n";
+      carp "ERROR: [periods] Invalid zone: $zone";
       return;
    }
    $zone = $z;
@@ -1345,7 +1346,7 @@ sub date_period {
 
    my $z = $self->_zone($zone);
    if (! $z) {
-      warn "ERROR: [date_period] Invalid zone: $zone\n";
+      carp "ERROR: [date_period] Invalid zone: $zone";
       return;
    }
    $zone = $z;
@@ -1389,7 +1390,7 @@ sub date_period {
             return $per[1];
          }
       } else {
-         warn "ERROR: [date_period] Impossible error\n";
+         carp "ERROR: [date_period] Impossible error";
          return;
       }
 
@@ -1404,7 +1405,7 @@ sub date_period {
             return $period;
          }
       }
-      warn "ERROR: [date_period] Impossible error\n";
+      carp "ERROR: [date_period] Impossible error";
       return;
    }
 }
@@ -1845,7 +1846,7 @@ sub _config_var_setdate {
       return 0;
 
    } else {
-      warn "ERROR: [config_var] invalid SetDate/ForceDate value: $val\n";
+      carp "ERROR: [config_var] invalid SetDate/ForceDate value: $val";
       return 1;
    }
 
@@ -1882,7 +1883,7 @@ sub _config_var_setdate {
       $date = []  if (! defined $date);
       $zone = $self->__zone($date,'',lc($zone),'',lc($dstflag));
       if (! $zone) {
-         warn "ERROR: [config_var] invalid zone in SetDate: @args\n";
+         carp "ERROR: [config_var] invalid zone in SetDate: @args";
          return 1;
       }
 
@@ -1917,7 +1918,7 @@ sub _config_var_setdate {
       }
 
       if (! $per) {
-         warn "ERROR: [config_var] invalid date: SetDate: $date, $zone\n";
+         carp "ERROR: [config_var] invalid date: SetDate: $date, $zone";
          return 1;
       }
       $isdst  = $$per[5];
@@ -1930,7 +1931,7 @@ sub _config_var_setdate {
       my($err);
       ($err,$date,$offset,$isdst,$abb) = $self->convert_from_gmt($date,$zone);
       if ($err) {
-         warn "ERROR: [config_var] invalid SetDate date/offset values: $date, $zone\n";
+         carp "ERROR: [config_var] invalid SetDate date/offset values: $date, $zone";
          return 1;
       }
    }

@@ -20,7 +20,7 @@ Data::Frame::Indexer::Label - Data::Frame indexer by string labels (column names
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 AUTHORS
 

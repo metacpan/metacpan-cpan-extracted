@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::IO::HDF::SD;
 
 our @EXPORT_OK = qw();
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::HDF::SD ;
+
 
 
 
@@ -432,7 +431,7 @@ sub Chunking
 sub SDgetvariablenames
 {
     my($self) = @_;
-    return keys %{$self->{DATASET}};
+    return sort keys %{$self->{DATASET}};
 } # End of SDgetvariablenames()...
 sub SDgetvariablename
 {
@@ -474,11 +473,11 @@ sub SDgetattributenames
     {
         return( undef )
             unless defined( $self->{DATASET}->{$name} );
-        return keys %{ $self->{DATASET}->{$name}->{ATTRS} };
+        return sort keys %{ $self->{DATASET}->{$name}->{ATTRS} };
     }
     else 
     {
-        return keys %{ $self->{GLOBATTR} };
+        return sort keys %{ $self->{GLOBATTR} };
     }
 } # End of SDgetattributenames()...
 # Wrapper (this is now defunct):
@@ -1384,12 +1383,10 @@ perl(1), PDL(1), PDL::IO::HDF(1).
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

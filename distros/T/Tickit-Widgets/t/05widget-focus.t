@@ -44,8 +44,8 @@ is_termlog( [ GOTO(1,2) ],
 
 done_testing;
 
-use Object::Pad 0.09;
-class TestWidget extends Tickit::Widget {
+use Object::Pad;
+class TestWidget :isa(Tickit::Widget) {
    use Tickit::Style;
 
    BEGIN {

@@ -54,6 +54,7 @@ can_ok(
         Job
 		Firstname
 		EmailAddress
+        ExternalRef
         ExternalRefTenancyAgreement
 		DirectEmailAddress
 		DirectMobileNumber

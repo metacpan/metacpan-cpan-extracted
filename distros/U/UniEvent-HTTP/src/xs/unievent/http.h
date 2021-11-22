@@ -18,6 +18,9 @@ void fill (Server::Config&,    const Hash&);
 void fill (UserAgent::Config&, const Hash&);
 void fill_form(Request* req,   const Sv& sv);
 
+void fill (Hash&, const Server::Config&);
+void fill (Hash&, const Server::Location&);
+
 }}}
 
 namespace xs {
@@ -95,10 +98,22 @@ struct Typemap<panda::unievent::http::UserAgent*, TYPE> : TypemapObject<panda::u
 
 template <class TYPE> struct Typemap<panda::unievent::http::Server::Location, TYPE> : TypemapBase<panda::unievent::http::Server::Location, TYPE> {
     static TYPE in (SV* arg) { TYPE loc; xs::unievent::http::fill(loc, arg); return loc; }
+    static Scalar out(const TYPE& loc, const Sv& proto = {}) {
+        (void)proto;
+        auto h = Hash::create();
+        xs::unievent::http::fill(h, loc);
+        return Ref::create(h);
+    }
 };
 
 template <class TYPE> struct Typemap<panda::unievent::http::Server::Config, TYPE> : TypemapBase<panda::unievent::http::Server::Config, TYPE> {
     static TYPE in (SV* arg) { TYPE cfg; xs::unievent::http::fill(cfg, arg); return cfg; }
+    static Scalar out(const panda::unievent::http::Server::Config& cfg, const Sv& proto = {}) {
+        (void)proto;
+        auto h = Hash::create();
+        xs::unievent::http::fill(h, cfg);
+        return Ref::create(h);
+    }
 };
 
 template <class TYPE>

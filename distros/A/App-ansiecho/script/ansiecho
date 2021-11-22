@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use App::ansiecho;
 
-App::ansiecho->new->run();
+App::ansiecho->new->run(splice @ARGV);
 
 exit;
 
@@ -50,7 +50,7 @@ Example:
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 DESCRIPTION
 

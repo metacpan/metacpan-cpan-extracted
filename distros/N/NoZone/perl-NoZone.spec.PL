@@ -34,7 +34,7 @@ Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/NoZone/
 Source0:        http://www.cpan.org/modules/by-module/NoZone/NoZone-%{version}.tar.gz
 BuildArch:      noarch
-BuildRequires:  perl(Config::Record) >= v1.1.2
+BuildRequires:  perl(YAML)
 BuildRequires:  perl(Module::Build)
 BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(File::Temp)
@@ -76,7 +76,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc AUTHORS CHANGES etc LICENSE META.json README
-%config(noreplace) %{_sysconfdir}/nozone.cfg
+%config(noreplace) %{_sysconfdir}/nozone.yml
 %{_bindir}/nozone
 %{perl_vendorlib}/*
 %{_mandir}/man3/NoZone*.3*

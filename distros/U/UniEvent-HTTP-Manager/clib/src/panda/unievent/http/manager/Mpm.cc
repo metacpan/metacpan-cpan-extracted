@@ -1,6 +1,8 @@
 #include "Mpm.h"
 #include "math.h"
 #include <iomanip>
+#include <panda/unievent/Fs.h>
+#include <panda/unievent/Tcp.h>
 #include <panda/unievent/util.h>
 
 #ifdef _WIN32
@@ -15,13 +17,6 @@ static uint64_t lastid;
 
 static excepted<Mpm::Config, string> normalize_config (const Mpm::Config& _config) {
     auto config = _config;
-
-    #ifdef _WIN32
-        if (config.bind_model == BindModel::ReusePort) {
-            panda_log_warning("reuse port is not supported on windows, falling back to duplicate model");
-            config.bind_model = BindModel::Duplicate;
-        }
-    #endif
 
     if (!config.check_interval || !config.load_average_period) {
         return make_unexpected<string>("check_interval, load_average_period must not be zero");
@@ -53,18 +48,6 @@ static excepted<Mpm::Config, string> normalize_config (const Mpm::Config& _confi
         return make_unexpected<string>("no listen addresses supplied");
     }
 
-    // if at least one location has socket, we switch to duplication mode
-    for (auto& row : config.server.locations) {
-        if (row.sock) {
-            config.bind_model = Manager::BindModel::Duplicate;
-            break;
-        }
-    }
-
-    if (config.bind_model == Manager::BindModel::ReusePort) {
-        for (auto& row : config.server.locations) row.reuse_port = true;
-    }
-
     return config;
 }
 
@@ -88,7 +71,7 @@ void Mpm::run () {
     check_termination_timer->start(config.check_interval * 1000);
     check_termination_timer->weak(true);
 
-    if (config.bind_model == Manager::BindModel::Duplicate) create_and_bind_sockets(config);
+    create_and_bind_sockets(config);
 
     start_event();
 
@@ -99,20 +82,42 @@ void Mpm::run () {
 }
 
 excepted<void, string> Mpm::create_and_bind_sockets (Config& config) {
-    assert(config.bind_model == Manager::BindModel::Duplicate);
     // in duplication model we need to create bound sockets for every location in master process
     for (auto& loc : config.server.locations) {
+        #ifdef _WIN32
+        if (loc.reuse_port) {
+            panda_log_warning("ignored reuse_port configuration parameter: not supported on windows");
+            loc.reuse_port = false;
+        }
+        if (loc.path) {
+            return make_unexpected<string>("windows named pipes not yet supported with http-manager");
+        }
+        #else
+        if (loc.path) {
+            unievent::Fs::unlink(loc.path).nevermind();
+            auto res1 = unievent::socket(AF_UNIX, SOCK_STREAM, 0);
+            if (!res1) return make_unexpected<string>(ErrorCode(res1.error()).what());
+            loc.sock = res1.value();
+            auto res2 = unievent::bind(loc.sock.value(), net::SockAddr::Unix(loc.path));
+            if (!res2) return make_unexpected<string>(ErrorCode(res2.error()).what());
+        }
+        #endif
+
         if (loc.sock) {
-            loc.host = ""; // any user-supplied socket is transferred for our ownership so we don't need to do anything
-        } else if (loc.host) {
-            // here we create temporary tcp for cross-platform creation of socket, resolve and bind
-            TcpSP tcp = new Tcp(loop);
-            auto res = tcp->bind(loc.host, loc.port);
-            if (!res) return make_unexpected<string>(res.error().what());
-            // we can't detach socket from tcp handle (it will close the socket) so that we duplicate it to leave socket opened
-            loc.sock = sock_dup(tcp->socket().value());
+            // any user-supplied socket is transferred for our ownership so we don't need to do anything
+            loc.host = "";
+        }
+        else if (loc.host) {
+            if (!loc.reuse_port) {
+                // here we create temporary tcp for cross-platform creation of socket, resolve and bind
+                TcpSP tcp = new Tcp(loop);
+                auto res = tcp->bind(loc.host, loc.port);
+                if (!res) return make_unexpected<string>(res.error().what());
+                // we can't detach socket from tcp handle (it will close the socket) so that we duplicate it to leave socket opened
+                loc.sock = sock_dup(tcp->socket().value());
+            }
         } else {
-            return make_unexpected<string>("neither host nor socket defined in one of the locations");
+            return make_unexpected<string>("neither host nor path nor socket defined in one of the locations");
         }
     }
     return {};
@@ -350,11 +355,9 @@ void Mpm::stop () {
     state = State::stopping;
     check_timer.reset();
 
-    if (config.bind_model == Manager::BindModel::Duplicate) {
-        // we need to close all sockets we've created
-        for (auto& loc : config.server.locations) {
-            if (loc.sock) close_socket(loc.sock.value());
-        }
+    // we need to close all sockets we've created
+    for (auto& loc : config.server.locations) {
+        if (loc.sock) close_socket(loc.sock.value());
     }
 
     if (!workers.size()) {
@@ -405,15 +408,12 @@ excepted<void, string> Mpm::reconfigure (const Config& _newcfg) {
     if (config.worker_model != newcfg.worker_model) {
         return make_unexpected<string>("changing worker model is not allowed");
     }
-    if (config.bind_model != newcfg.bind_model) {
-        return make_unexpected<string>("changing bind model is not allowed");
-    }
 
     auto need_restart = (
         config.server != newcfg.server || config.load_average_period != newcfg.load_average_period || config.check_interval != newcfg.check_interval
     );
 
-    if (need_restart && config.bind_model == Manager::BindModel::Duplicate) {
+    if (need_restart) {
         auto& newlocs = newcfg.server.locations;
         for (auto& loc : config.server.locations) {
             auto it = newlocs.end();
@@ -422,6 +422,14 @@ excepted<void, string> Mpm::reconfigure (const Config& _newcfg) {
                 it = std::find_if(newlocs.begin(), newlocs.end(), [&loc](auto& elem) {
                     return elem.host == loc.host && elem.port == loc.port;
                 });
+                if (it != newlocs.end() && loc.reuse_port != it->reuse_port) {
+                    panda_log_warning("ignored changing of reuse_port parameter in one of the locations");
+                    it->reuse_port = loc.reuse_port;
+                }
+            } else if (loc.path) {
+                it = std::find_if(newlocs.begin(), newlocs.end(), [&loc](auto& elem) {
+                    return elem.path == loc.path;
+                });
             } else {
                 it = std::find_if(newlocs.begin(), newlocs.end(), [&loc](auto& elem) {
                     return elem.sock == loc.sock;
@@ -429,7 +437,7 @@ excepted<void, string> Mpm::reconfigure (const Config& _newcfg) {
             }
 
             if (it == newlocs.end()) {
-                close_socket(loc.sock.value());
+                if (loc.sock) close_socket(loc.sock.value());
             } else {
                 it->sock = loc.sock;
             }
@@ -439,12 +447,11 @@ excepted<void, string> Mpm::reconfigure (const Config& _newcfg) {
         if (!res) return res;
     }
 
-    panda_log_info("manager reconfigured with config:\n" << panda::log::prettify_json{config});
-
     check_timer->stop();
     check_termination_timer->stop();
 
     config = newcfg;
+    panda_log_info("manager reconfigured with config:\n" << panda::log::prettify_json{config});
 
     // we must call spawn() only from pure loop code flow because of prefork child specific run-in-outer-loop exception
     loop->delay([this, need_restart] {

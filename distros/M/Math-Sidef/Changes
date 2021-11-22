@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::Sidef.
 
+0.05    2021-11-06
+
+        - Added the Quadratic(), Quaternion(), Gauss(), Mod(), Poly() and Fraction() constructors.
+
 0.04    2021-04-15
 
         - Fixed the support for functions that return multiple values (like `divmod`).

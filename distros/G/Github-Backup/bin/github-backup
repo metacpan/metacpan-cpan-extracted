@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use Getopt::Long;
+use Github::Backup;
+
+my %opts;
+my $help;
+
+GetOptions(
+    "u|user=s"  => \$opts{user},
+    "t|token=s" => \$opts{token},
+    "d|dir=s"   => \$opts{dir},
+    "p|proxy=s" => \$opts{proxy},
+    "l|list"    => \$opts{list},
+    "r|repos"   => \$opts{repos},
+    "i|issues"  => \$opts{issues},
+    "v|verbose" => \$opts{verbose},
+    "h|help"    => \$help,
+);
+
+if ($help){
+    help();
+}
+
+if (! $opts{user} || ! $opts{dir}){
+    warn "You must supply both a user and a backup directory.\n";
+    help();
+}
+
+if (! $opts{list}) {
+    if (! $opts{token}){
+        if ($ENV{GITHUB_TOKEN}){
+            $opts{token} = $ENV{GITHUB_TOKEN};
+        }
+        else {
+            warn "This application requires a Github token either as an argument, " .
+                "or in the GITHUB_TOKEN environment variable.\n";
+            help();
+        }
+    }
+}
+
+if (! $opts{repos} && ! $opts{issues} && ! $opts{list}){
+    warn "You must supply at least one of -r|--repos, -i|--issues or -l|--list\n";
+    help();
+}
+
+sub help {
+    print <<EOF;
+
+Usage: github_backup -u username -t github_api_token -d /backup/directory -r -i
+
+Options:
+
+-u | --user     Your Github username
+-t | --token    Your Github API token
+-d | --dir      The backup directory
+-p | --proxy    Optional proxy (https://proxy.example.com:PORT)
+-r | --repos    Back up all of your repositories
+-i | --issues   Back up all of your issues
+-h | --help     Display this help page
+
+EOF
+    exit;
+}
+my $gh = Github::Backup->new(
+    api_user    => $opts{user},
+    token   => $opts{token},
+    dir     => $opts{dir},
+    proxy   => $opts{proxy}
+);
+
+if ($opts{list}) {
+    my $repos = $gh->list;
+    for (@$repos) {
+        print "$_->{name}\n";
+    }
+}
+if ($opts{repos}) {
+    $gh->repos;
+}
+if ($opts{issues}) {
+    $gh->issues;
+}

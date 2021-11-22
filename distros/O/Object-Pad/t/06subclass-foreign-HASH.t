@@ -26,7 +26,7 @@ package Base::Class {
 
 my @BUILDS_INVOKED;
 
-class Derived::Class isa Base::Class {
+class Derived::Class :isa(Base::Class) {
    has $derived_field = 456;
 
    BUILD {
@@ -60,7 +60,7 @@ class Derived::Class isa Base::Class {
 
 # Ensure that double-derived classes still chain down to foreign new
 {
-   class DoubleDerived isa Derived::Class {
+   class DoubleDerived :isa(Derived::Class) {
       BUILD {
          push @BUILDS_INVOKED, __PACKAGE__;
       }
@@ -89,7 +89,7 @@ class Derived::Class isa Base::Class {
 
 # Test case one - no slot access in example_method
 {
-   class RT132263::Child1 isa RT132263::Parent {
+   class RT132263::Child1 :isa(RT132263::Parent) {
       method example_method { 1 }
    }
 
@@ -101,7 +101,7 @@ class Derived::Class isa Base::Class {
 
 # Test case two - read from an initialised slot
 {
-   class RT132263::Child2 isa RT132263::Parent {
+   class RT132263::Child2 :isa(RT132263::Parent) {
       has $value = 456;
       method example_method { $value }
    }
@@ -126,7 +126,7 @@ class Derived::Class isa Base::Class {
 # Check we are not allowed to switch the representation type back to native
 {
    like( exception {
-         eval( "class SwitchedToNative isa Base::Class :repr(native) { }" ) or die $@;
+         eval( "class SwitchedToNative :isa(Base::Class) :repr(native) { }" ) or die $@;
       },
       qr/^Cannot switch a subclass of a foreign superclass type to :repr\(native\) at /,
       'Exception from switching a foreign derived class back to native representation' );
@@ -143,7 +143,7 @@ class Derived::Class isa Base::Class {
    package RefcountTest::Base {
       sub new { bless {}, shift }
    }
-   class RefcountTest isa RefcountTest::Base {
+   class RefcountTest :isa(RefcountTest::Base) {
       sub BUILDARGS {
          return DestroyWatch->new( \$buildargs_result_destroyed )
       }

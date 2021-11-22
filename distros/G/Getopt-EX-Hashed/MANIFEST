@@ -19,6 +19,7 @@ t/09_validate.t
 t/10_nospec.t
 t/11_DEFALT_ERROR_1.t
 t/12_DEFALT_ERROR_2.t
+t/13_fromarray.t
 t/App/Foo.pm
 META.yml
 MANIFEST

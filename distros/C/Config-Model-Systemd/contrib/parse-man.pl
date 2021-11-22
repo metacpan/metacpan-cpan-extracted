@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -22,11 +22,15 @@ use Path::Tiny;
 use Config::Model::Itself 2.012;
 use Config::Model::Exception;
 use Getopt::Long;
+
 use experimental qw/postderef signatures/ ;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 # default class name is Systemd::Section::ucfirst($item)
 my @service_list = qw/service socket timer/;
 my @list = qw/exec kill resource-control unit/;
+
+my $unknown_param_msg = "Unexpected systemd parameter. Please contact cme author to update systemd model.";
 
 # Override the default class name
 # Please remove the old generated model if a class name is changed.
@@ -206,7 +210,7 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
         $meta_root->load( steps => [
             qq!class:$config_class!,
             q!generated_by="parseman.pl from systemd doc"!,
-            qq!accept:".*" type=leaf value_type=uniline warn="Unknown parameter"!
+            qq!accept:".*" type=leaf value_type=uniline warn="$unknown_param_msg"!
         ]);
     }
     my $step = "class:$config_class element:$element";
@@ -357,7 +361,7 @@ sub move_deprecated_element ($meta_root, $from, $to) {
         # common Unit class
         $meta_root->load(steps => [
             "class:$unit_class include=Systemd::Section::Unit",
-            'accept:".*" type=leaf value_type=uniline warn="Unknown parameter"'
+            'accept:".*" type=leaf value_type=uniline warn="$unknown_param_msg"'
         ]);
     }
 
@@ -412,7 +416,7 @@ foreach my $config_class (keys $data->{class}->%*) {
         qq!copyright:0="2010-2016 Lennart Poettering and others"!,
         qq!copyright:1="2016 Dominique Dumont"!,
         qq!license="LGPLv2.1+"!,
-        qq!accept:".*" type=leaf value_type=uniline warn="Unknown parameter"!,
+        qq!accept:".*" type=leaf value_type=uniline warn="$unknown_param_msg"!,
     ]);
 }
 
@@ -439,22 +443,34 @@ $meta_root->load(
                                  choice=0,1,2,3,none,realtime,best-effort,idle'
 );
 
-# these warping instructions are used for most services. Serives are
-# disables when a service file is a symlink to /dev/null
+# these warping instructions are used for most services. Services are
+# disabled when a service file is a symlink to /dev/null
 my $common_warp = qq!warp follow:disable="- disable" rules:\$disable level=hidden - - !;
 
 foreach my $service (@service_list) {
     my $name = ucfirst($service);
-    my $class = 'Systemd::'.( $map{$name} || 'Section::'.ucfirst($name));
+    my $sub_class = 'Systemd::'.( $map{$name} || 'Section::'.ucfirst($name));
 
     my $unit_class = $name.'Unit';
     # make sure that the unit class exists (and fill it later when needed)
     $meta_root->load("class:Systemd::Section::$unit_class");
 
-    # create class that hold the service created by parsing man page
-    $meta_root->load(qq!
+    foreach my $class_name ("Systemd::$name", "Systemd::StandAlone::$name") {
+        # create class that hold the service created by parsing man page
+        $meta_root->load(
+            qq!
+            class:$class_name
+              generated_by="parse-man.pl from systemd doc"
+              accept:".*"
+                type=leaf
+                value_type=uniline
+                warn="$unknown_param_msg" - -!
+        );
+    }
+
+    $meta_root->load(
+        qq!
         class:Systemd::$name
-          generated_by="parse-man.pl from systemd doc"
           element:disable
             type=leaf
             value_type=boolean
@@ -463,7 +479,7 @@ foreach my $service (@service_list) {
             description="When true, cme will disable a configuration file supplied by the vendor by placing place a symlink to /dev/null with the same filename as the vendor configuration file. See L<systemd-system.conf> for details." -
           element:$name
             type=warped_node
-            config_class_name=$class
+            config_class_name=$sub_class
             $common_warp -
           element:Unit
             type=warped_node
@@ -477,11 +493,25 @@ foreach my $service (@service_list) {
             backend=Systemd::Unit
             file=&index.$service
             auto_delete=1
-            auto_create=1 -
-          accept:".*"
-            type=leaf
-            value_type=uniline
-            warn="Unknown parameter" - -!
+            auto_create=1 !
+    );
+
+    $meta_root->load(
+        qq!
+        class:Systemd::StandAlone::$name
+          element:$name
+            type=node
+            config_class_name=$sub_class -
+          element:Unit
+            type=node
+            config_class_name=Systemd::Section::$unit_class -
+          element:Install
+            type=node
+            config_class_name=Systemd::Section::Install -
+          rw_config
+            backend=Systemd::Unit
+            auto_delete=1
+            auto_create=1 !
     );
 
     # Link the class above to base Systemd class

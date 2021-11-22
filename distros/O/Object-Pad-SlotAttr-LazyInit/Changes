@@ -1,5 +1,10 @@
 Revision history for Object-Pad-SlotAttr-LazyInit
 
+0.04    2021-11-18
+        [CHANGES]
+         * Updated for Object::Pad 0.57
+         * Fix docs typo "possibility"
+
 0.03    2021-08-10
         [BUGFIXES]
          * Back-compat for perls before 5.28 (too old to have `mg_freeext()`)

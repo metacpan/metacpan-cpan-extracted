@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.792 2021-11-16
+  * Keithley 2000: major rewrite and documentation fixes
+  * SignalRecovery 7265: bug fixes
+  * Socket connection: more verbose error messages
+
 3.791 2021-10-28
   * SignalRecovery 7265, Keithley 2000 updates + bugfixes
   * DataFolder: Added boolean copy_script attribute

@@ -5,44 +5,46 @@ use Math::BigInt; # for some error checks
 
 print "1..7\n";
 
+my($WR1, $WR2, $RD1, $RD2);
+
 print "# Using gmp version ", Math::GMPq::gmp_v(), "\n";
 
-open(WR1, '>', 'out21.txt') or die "Can't open WR1: $!";
-open(WR2, '>', 'out22.txt') or die "Can't open WR2: $!";
+open($WR1, '>', 'out21.txt') or die "Can't open WR1: $!";
+open($WR2, '>', 'out22.txt') or die "Can't open WR2: $!";
 
 my $mp = Math::GMPq->new(-1234567);
 my $int = -17;
 my $ul = 56789;
 my $string = "A string";
 
-Rmpq_fprintf(\*WR1, "An mpq object: %Qd ", $mp);
+Rmpq_fprintf(\*$WR1, "An mpq object: %Qd ", $mp);
 
 $mp++;
-Rmpq_fprintf(\*WR2, "An mpq object: %Qd ", $mp);
+Rmpq_fprintf(\*$WR2, "An mpq object: %Qd ", $mp);
 
-Rmpq_fprintf(\*WR1, "followed by a signed int: $int ");
+Rmpq_fprintf(\*$WR1, "followed by a signed int: $int ");
 $int++;
-Rmpq_fprintf(\*WR2, "followed by a signed int: $int ");
+Rmpq_fprintf(\*$WR2, "followed by a signed int: $int ");
 
-Rmpq_fprintf(\*WR1, "followed by an unsigned long: $ul\n");
+Rmpq_fprintf(\*$WR1, "followed by an unsigned long: $ul\n");
 $ul++;
-Rmpq_fprintf(\*WR2, "followed by an unsigned long: $ul\n");
+Rmpq_fprintf(\*$WR2, "followed by an unsigned long: $ul\n");
 
-Rmpq_fprintf(\*WR1, "%s ", $string);
-Rmpq_fprintf(\*WR2, "%s ", $string);
+Rmpq_fprintf(\*$WR1, "%s ", $string);
+Rmpq_fprintf(\*$WR2, "%s ", $string);
 
-Rmpq_fprintf(\*WR1, "and an mpq object in hex: %Qx\n", $mp);
+Rmpq_fprintf(\*$WR1, "and an mpq object in hex: %Qx\n", $mp);
 $mp++;
-Rmpq_fprintf(\*WR2, "and an mpq object in hex: %Qx\n", $mp);
+Rmpq_fprintf(\*$WR2, "and an mpq object in hex: %Qx\n", $mp);
 
-close(WR1) or die "Can't close WR1: $!";
-close(WR2) or die "Can't close WR2: $!";
-open(RD1, '<', 'out21.txt') or die "Can't open RD1: $!";
-open(RD2, '<', 'out22.txt') or die "Can't open RD2: $!";
+close($WR1) or die "Can't close WR1: $!";
+close($WR2) or die "Can't close WR2: $!";
+open($RD1, '<', 'out21.txt') or die "Can't open RD1: $!";
+open($RD2, '<', 'out22.txt') or die "Can't open RD2: $!";
 
 my $ok;
 
-while(<RD1>) {
+while(<$RD1>) {
      chomp;
      if($. == 1) {
        if($_ eq 'An mpq object: -1234567 followed by a signed int: -17 followed by an unsigned long: 56789') {$ok .= 'a'}
@@ -54,7 +56,7 @@ while(<RD1>) {
      }
 }
 
-while(<RD2>) {
+while(<$RD2>) {
      chomp;
      if($. == 1) {
        if($_ eq 'An mpq object: -1234566 followed by a signed int: -16 followed by an unsigned long: 56790') {$ok .= 'c'}
@@ -66,8 +68,8 @@ while(<RD2>) {
      }
 }
 
-close(RD1) or die "Can't close RD1: $!";
-close(RD2) or die "Can't close RD2: $!";
+close($RD1) or die "Can't close RD1: $!";
+close($RD2) or die "Can't close RD2: $!";
 
 if($ok eq 'abcd') {print "ok 1\n"}
 else {print "not ok 1 $ok\n"}

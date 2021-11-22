@@ -22,7 +22,6 @@ EWT reset =>
    America/New_York
    America/Detroit
    America/Iqaluit
-   America/Nassau
    America/Nipigon
    America/Thunder_Bay
    America/Toronto

@@ -1,16 +1,14 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Complex;
 
-our @EXPORT_OK = qw( Ctan  Catan  re  im  i  cplx  real PDL::PP r2C PDL::PP i2C PDL::PP Cr2p PDL::PP Cp2r PDL::PP Cadd PDL::PP Csub PDL::PP Cmul PDL::PP Cprodover PDL::PP Cscale PDL::PP Cdiv PDL::PP Ceq PDL::PP Cconj PDL::PP Cabs PDL::PP Cabs2 PDL::PP Carg PDL::PP Csin PDL::PP Ccos PDL::PP Cexp PDL::PP Clog PDL::PP Cpow PDL::PP Csqrt PDL::PP Casin PDL::PP Cacos PDL::PP Csinh PDL::PP Ccosh PDL::PP Ctanh PDL::PP Casinh PDL::PP Cacosh PDL::PP Catanh PDL::PP Cproj PDL::PP Croots PDL::PP rCpolynomial );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(Ctan Catan re im i cplx real r2C i2C Cr2p Cp2r Cadd Csub Cmul Cprodover Cscale Cdiv Ceq Cconj Cabs Cabs2 Carg Csin Ccos Cexp Clog Cpow Csqrt Casin Cacos Csinh Ccosh Ctanh Casinh Cacosh Catanh Cproj Croots rCpolynomial );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
-
 
 BEGIN {
    
@@ -18,6 +16,7 @@ BEGIN {
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Complex ;
 }
+
 
 
 
@@ -255,10 +254,7 @@ sub i { $i->copy + (@_ ? $_[0] : 0) };
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -1306,7 +1302,7 @@ sub im($) { $_[0]->slice("(1)") }
 {
 no warnings 'redefine';
 # if the argument does anything other than pass through 0-th dim, re-bless
-sub slice (;@) :lvalue {
+sub slice :lvalue {
   my $first = ref $_[1] ? $_[1][0] : (split ',', $_[1])[0];
   my $class = ($first//'') =~ /^[:x]?$/i ? ref($_[0]) : 'PDL';
   my $ret = bless $_[0]->SUPER::slice(@_[1..$#_]), $class;
@@ -1353,7 +1349,7 @@ BEGIN {*rCpolynomial = \&PDL::Complex::rCpolynomial;
 }
 
 
-;
+
 
 
 # overload must be here, so that all the functions can be seen
@@ -1464,5 +1460,3 @@ perl(1), L<PDL>.
 # Exit with OK status
 
 1;
-
-		   

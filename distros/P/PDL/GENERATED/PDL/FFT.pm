@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::FFT;
 
-our @EXPORT_OK = qw(PDL::PP _fft PDL::PP _ifft  fft ifft fftnd ifftnd fftconvolve realfft realifft kernctr PDL::PP convmath PDL::PP cmul PDL::PP cdiv );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(_fft _ifft fft ifft fftnd ifftnd fftconvolve realfft realifft kernctr convmath cmul cdiv );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFT ;
+
 
 
 
@@ -128,10 +127,7 @@ and so may not be installed.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -627,12 +623,10 @@ PDL distribution, the copyright notice should be included in the file.
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

@@ -1,13 +1,30 @@
 Revision history for Perl module Module::Generic
 
+v0.17.2 2021-11-16T12:20:03+0900
+    - Minor improvement to _parse_timestamp in Module::Generic
+
+v0.17.1 2021-11-15T11:55:16+0900
+    - Minor correction in Module::Generic in _parse_timestamp
+    - Fine tuning of the module versions requirements
+
+v0.17.0 2021-11-05T20:40:13+0900
+    - Updated Module::Generic::Hash, adding alias method size() pointing to length()
+    - Added class Module::Generic::HeaderValue
+    - Added shortcut methods device, inode, mode, nlink, uid, gid, rdev, atime, mtime, ctime, block_size, blocks, last_accessed and last_modified in package Module::Generic::File
+    - Added method utime in package Module::Generic::File
+    - Added method line in package Module::Generic::Scalar::IO
+
+v0.16.5 2021-10-24T12:10:52+0900
+    - Corrected Module::Generic::SharedMem read() method to not decode if buffer is empty
+
 v0.16.4 2021-10-22T15:51:20+0900
     - Correcting an oversight in Module::Generic (module Devel::Confess was required for debugging but not removed later)
 
 v0.16.3 2021-10-21T12:17:58+0900
-    - Improved mmap method in Module::Generif::File
+    - Improved mmap method in Module::Generic::File
 
 v0.16.2 2021-10-15T16:10:14+0900
-    - Improved mmap method in Module::Generif::File
+    - Improved mmap method in Module::Generic::File
 
 v0.16.1 2021-10-12T22:46:58+0900
     - Added methods blocking, eof, fcntl, fdopen, flush, format_write, getc, getline, getlines, ioctl, printflush, sync, sysread, sysseek, syswrite, ungetc and content_objects in Module::Generic::File

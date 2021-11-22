@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $html = `pod2html bin/plx-packed`;
+
+my $code = do { local (@ARGV, $/) = ('bin/plx-packed'); <> };
+
+open my $fh, '>', 'share/plx.html' or die;
+
+print $fh "<!-- > if 0;\n${code}\n__END__\n-->\n${html}";

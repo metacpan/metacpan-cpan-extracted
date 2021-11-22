@@ -1,7 +1,7 @@
 #ifndef __OBJECT_PAD__TYPES_H__
 #define __OBJECT_PAD__TYPES_H__
 
-#define OBJECTPAD_ABIVERSION_MINOR 51
+#define OBJECTPAD_ABIVERSION_MINOR 57
 #define OBJECTPAD_ABIVERSION_MAJOR 0
 
 #define OBJECTPAD_ABIVERSION  ((OBJECTPAD_ABIVERSION_MAJOR << 16) | (OBJECTPAD_ABIVERSION_MINOR))
@@ -39,14 +39,15 @@ struct ClassHookFuncs {
   const char *permit_hintkey;
 
   /* called immediately at apply time; return FALSE means it did its thing immediately, so don't store it */
-  bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr);
+  bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *funcdata);
 
   /* called by mop_class_add_slot() */
-  void (*post_add_slot)(pTHX_ ClassMeta *classmeta, SV *hookdata, SlotMeta *slotmeta);
+  void (*post_add_slot)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, SlotMeta *slotmeta);
 };
 
 struct ClassHook {
   const struct ClassHookFuncs *funcs;
+  void *funcdata;
   SV *hookdata;
 };
 
@@ -56,24 +57,25 @@ struct SlotHookFuncs {
   const char *permit_hintkey;
 
   /* called immediately at apply time; return FALSE means it did its thing immediately, so don't store it */
-  bool (*apply)(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr);
+  bool (*apply)(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *funcdata);
 
   /* called at the end of `has` statement compiletime */
-  void (*seal_slot)(pTHX_ SlotMeta *slotmeta, SV *hookdata);
+  void (*seal_slot)(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *funcdata);
 
   /* called as part of accessor generation */
-  void (*gen_accessor_ops)(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type,
-          struct AccessorGenerationCtx *ctx);
+  void (*gen_accessor_ops)(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *funcdata,
+          enum AccessorType type, struct AccessorGenerationCtx *ctx);
 
   /* called by constructor */
-  void (*post_initslot)(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *slot);
-  void (*post_construct)(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *slot);
+  void (*post_initslot)(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *funcdata, SV *slot);
+  void (*post_construct)(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *funcdata, SV *slot);
 };
 
 struct SlotHook {
   SLOTOFFSET slotix; /* unused when in SlotMeta->hooks; used by ClassMeta->slothooks_* */
   SlotMeta *slotmeta;
   const struct SlotHookFuncs *funcs;
+  void *funcdata;
   SV *hookdata;
 };
 
@@ -124,11 +126,20 @@ OP *ObjectPad_newSLOTPADOP(pTHX_ U32 flags, PADOFFSET padix, SLOTOFFSET slotix);
 SV *ObjectPad_get_obj_slotsav(pTHX_ SV *self, enum ReprType repr, bool create);
 
 /* Class API */
-#define mop_create_class(type, name, super)  ObjectPad_mop_create_class(aTHX_ type, name, super)
-ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *superclassname);
+#define mop_create_class(type, name)  ObjectPad_mop_create_class(aTHX_ type, name)
+ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name);
+
+#define mop_class_set_superclass(class, super)  ObjectPad_mop_class_set_superclass(aTHX_ class, super)
+void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *class, SV *superclassname);
+
+#define mop_class_begin(meta)  ObjectPad_mop_class_begin(aTHX_ meta)
+void ObjectPad_mop_class_begin(pTHX_ ClassMeta *meta);
 
 #define mop_class_seal(meta)  ObjectPad_mop_class_seal(aTHX_ meta)
 void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta);
+
+#define mop_class_load_and_add_role(class, rolename, rolever)  ObjectPad_mop_class_load_and_add_role(aTHX_ class, rolename, rolever)
+void ObjectPad_mop_class_load_and_add_role(pTHX_ ClassMeta *class, SV *rolename, SV *rolever);
 
 #define mop_class_add_role(class, role)  ObjectPad_mop_class_add_role(aTHX_ class, role)
 void ObjectPad_mop_class_add_role(pTHX_ ClassMeta *class, ClassMeta *role);
@@ -151,8 +162,8 @@ void ObjectPad_mop_class_add_ADJUSTPARAMS(pTHX_ ClassMeta *meta, CV *cv);
 #define mop_class_apply_attribute(classmeta, name, value)  ObjectPad_mop_class_apply_attribute(aTHX_ classmeta, name, value)
 void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char *name, SV *value);
 
-#define register_class_attribute(name, funcs)  ObjectPad_register_class_attribute(aTHX_ name, funcs)
-void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs);
+#define register_class_attribute(name, funcs, funcdata)  ObjectPad_register_class_attribute(aTHX_ name, funcs, funcdata)
+void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs, void *funcdata);
 
 /* Slot API */
 #define mop_create_slot(slotname, classmeta)  ObjectPad_mop_create_slot(aTHX_ slotname, classmeta)
@@ -173,7 +184,13 @@ void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *na
 #define mop_slot_get_attribute(slotmeta, name)  ObjectPad_mop_slot_get_attribute(aTHX_ slotmeta, name)
 struct SlotHook *ObjectPad_mop_slot_get_attribute(pTHX_ SlotMeta *slotmeta, const char *name);
 
-#define register_slot_attribute(name, funcs)  ObjectPad_register_slot_attribute(aTHX_ name, funcs)
-void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs);
+#define mop_slot_get_default_sv(slotmeta)  ObjectPad_mop_slot_get_default_sv(aTHX_ slotmeta)
+SV *ObjectPad_mop_slot_get_default_sv(pTHX_ SlotMeta *slotmeta);
+
+#define mop_slot_set_default_sv(slotmeta, sv)  ObjectPad_mop_slot_set_default_sv(aTHX_ slotmeta, sv)
+void ObjectPad_mop_slot_set_default_sv(pTHX_ SlotMeta *slotmeta, SV *sv);
+
+#define register_slot_attribute(name, funcs, funcdata)  ObjectPad_register_slot_attribute(aTHX_ name, funcs, funcdata)
+void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs, void *funcdata);
 
 #endif

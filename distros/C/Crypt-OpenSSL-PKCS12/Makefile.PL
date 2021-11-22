@@ -8,7 +8,7 @@ use Config;
 
 name('Crypt-OpenSSL-PKCS12');
 license('perl');
-perl_version('5.006');
+perl_version('5.008');
 all_from('PKCS12.pm');
 
 homepage 'https://github.com/dsully/perl-crypt-openssl-pkcs12';
@@ -22,19 +22,22 @@ test_requires 'File::Spec::Functions' => '0'; # in core
 
 requires_external_cc();
 
-if ($^O ne 'MSWin32' and my $prefix = `brew --prefix --installed openssl 2>@{[File::Spec->devnull]}`) {
+if ($^O ne 'MSWin32' and my $prefix = `brew --prefix --installed openssl\@1.1 2>@{[File::Spec->devnull]}`) {
   chomp $prefix;
   inc "-I$prefix/include";
   libs "-L$prefix/lib -lcrypto -lssl";
 } else {
-  inc '-I/usr/local/opt/openssl/include -I/usr/local/include/openssl -I/usr/include/openssl -I/usr/local/include/ssl -I/usr/local/ssl/include';
-  libs '-L/usr/local/opt/openssl/lib -L/usr/local/lib -L/usr/lib -L/usr/local/ssl/lib -lcrypto -lssl';
+  inc '-I/usr/local/opt/openssl@1.1/include -I/usr/local/include/openssl -I/usr/include/openssl -I/usr/local/include/ssl -I/usr/local/ssl/include';
+  libs '-L/usr/local/opt/openssl@1.1/lib -L/usr/local/lib -L/usr/lib -L/usr/local/ssl/lib -lcrypto -lssl';
 }
 
-if ($Config::Config{myuname} =~ /darwin/i) {
-    cc_optimize_flags('-O2 -g -Wall -Werror -Wno-deprecated-declarations');
-} else {
-    cc_optimize_flags('-O2 -g -Wall -Werror');
+my $cc_option_flags = '-O2 -g -Wall -Werror';
+
+if ($Config::Config{gccversion} =~ /llvm/i) {
+  $cc_option_flags .= ' -Wno-deprecated-declarations'; # -Wno-incompatible-pointer-types-discards-qualifiers -Wno-compound-token-split-by-macro
+  if ($Config::Config{perl_version} <= 20) {
+    $cc_option_flags .= ' -Wno-error=pointer-bool-conversion';
+  }
 }
 
 auto_install();

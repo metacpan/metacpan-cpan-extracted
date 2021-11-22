@@ -88,6 +88,7 @@ foreach my $family ( undef, "inet" ) {
 }
 
 is( IO::Async::OS->signame2num( 'TERM' ), SIGTERM, 'signame2num' );
+is( IO::Async::OS->signum2name( SIGTERM ), "TERM", 'signum2name' );
 
 is( IO::Async::OS->getfamilybyname( "inet" ),  AF_INET, 'getfamilybyname "inet"' );
 is( IO::Async::OS->getfamilybyname( AF_INET ), AF_INET, 'getfamilybyname AF_INET' );

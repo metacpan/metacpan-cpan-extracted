@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2021/08/28
+## Modified 2021/10/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -102,7 +102,7 @@ EOT
     # be removed in that order
     our $SHEM_REPO = [];
     our $ID2OBJ    = {};
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 sub init
@@ -532,27 +532,34 @@ sub read
     my $packing = $self->_packing_method;
     $j = JSON->new->utf8->relaxed->allow_nonref if( $packing eq 'json' );
     my $data;
-    try
+    if( CORE::length( $buffer ) )
     {
-        if( $packing eq 'json' )
+        try
         {
-            $data = $j->decode( $buffer );
+            if( $packing eq 'json' )
+            {
+                $data = $j->decode( $buffer );
+            }
+            else
+            {
+                $data = Storable::thaw( $buffer );
+            }
+            $self->message( 4, "Decoded data '$buffer' -> '$data': ", sub{ $self->dump( $data ) });
         }
-        else
+        catch( $e )
         {
-            $data = Storable::thaw( $buffer );
+            return( $self->error( "An error occured while decoding data using $packing: $e", ( length( $buffer ) <= 1024 ? "\nData is: '$buffer'" : '' ) ) );
         }
-        $self->message( 4, "Decoded data '$buffer' -> '$data': ", sub{ $self->dump( $data ) });
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "An error occured while decoding data using $packing: $e", ( length( $buffer ) <= 1024 ? "\nData is: '$buffer'" : '' ) ) );
+        $data = $buffer;
     }
     
     if( scalar( @_ ) > 1 )
     {
         $_[1] = $data;
-        return( length( $_[1] ) || "0E0" );
+        return( CORE::length( $_[1] ) || "0E0" );
     }
     else
     {

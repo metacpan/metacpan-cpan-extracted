@@ -4,7 +4,6 @@ package Netstack::Connector::CiscoWlc;
 # 加载扩展模块
 #------------------------------------------------------------------------------
 use 5.016;
-use utf8;
 use Expect;
 use Moose;
 use namespace::autoclean;
@@ -80,7 +79,7 @@ sub runCommands {
   $self->pushCommand("copy run start");
 
   # 执行调度，配置批量下发
-  $self->execCommands( reverse $self->commands->@* );
+  $self->execCommands( $self->commands->@* );
 }
 __PACKAGE__->meta->make_immutable;
 1;

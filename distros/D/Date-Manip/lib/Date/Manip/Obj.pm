@@ -11,9 +11,10 @@ use warnings;
 use strict;
 use IO::File;
 use Storable qw(dclone);
+use Carp;
 
 our ($VERSION);
-$VERSION='6.85';
+$VERSION='6.86';
 END { undef $VERSION; }
 
 ########################################################################
@@ -205,7 +206,7 @@ sub _init_args {
    my($self) = @_;
 
    my @args = @{ $$self{'args'} };
-   warn "WARNING: [new] invalid arguments: @args\n";
+   carp "WARNING: [new] invalid arguments: @args";
 
    return;
 }
@@ -310,7 +311,7 @@ sub get_config {
             push @ret,$$base{'data'}{'sections'}{'conf'}{lc($var)};
          } else {
             # uncoverable statement
-            warn "ERROR: [config] invalid config variable: $var\n";
+            carp "ERROR: [config] invalid config variable: $var";
             # uncoverable statement
             return '';
          }

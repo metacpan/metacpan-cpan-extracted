@@ -16,7 +16,7 @@ use LWP::UserAgent;
 use METS::Files;
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -35,7 +35,7 @@ sub new {
 
 	if (defined $self->{'lwp_user_agent'}) {
 		if (! $self->{'lwp_user_agent'}->isa('LWP::UserAgent')) {
-			err "Parameter 'lwp_user_agent' must be a LWP::UserAgent object.";
+			err "Parameter 'lwp_user_agent' must be a LWP::UserAgent instance.";
 		}
 	} else {
 		$self->{'lwp_user_agent'} = LWP::UserAgent->new;
@@ -82,7 +82,7 @@ sub run {
 
 	$self->{'_kramerius_obj'} = $self->{'_kramerius'}->get($kramerius_id);
 	if (! defined $self->{'_kramerius_obj'}) {
-		err "Library with ID '$self->{'_kramerius_id'}' is unknown.";
+		err "Library with ID '$kramerius_id' is unknown.";
 	}
 	barf('ROOT', <<"END");
 $kramerius_id
@@ -142,7 +142,7 @@ END
 		} else {
 
 			# TODO Stahnout primo soubor. Udelat na to skript.
-			err "Cannot get url '$mets_uri'.",
+			err "Cannot get '$mets_uri' URI.",
 				'HTTP code', $res->code,
 				'Message', $res->message;
 		}
@@ -161,9 +161,15 @@ END
 			$json = $res->content;
 			barf($object_id.'.json', $json);
 		} else {
-			err "Cannot get url $json_uri.",
+			err "Cannot get '$json_uri' URI.",
 				'HTTP code', $res->code,
 				'message', $res->message;
+		}
+
+		# Check JSON content type.
+		if ($res->headers->content_type ne 'application/json') {
+			err "Content type isn't 'application/json' for '$json_uri' URI.",
+				'Content-Type', $res->headers->content_type;
 		}
 
 		# Get perl structure.
@@ -171,7 +177,8 @@ END
 			JSON::XS->new->decode($json);
 		};
 		if ($EVAL_ERROR) {
-			err "Cannot parse JSON on '$json_uri' URL.";
+			err "Cannot parse JSON on '$json_uri' URI.",
+				'JSON decode error', $EVAL_ERROR;
 		}
 
 		# Each page.
@@ -209,7 +216,8 @@ END
 			push @pages, $output_file;
 		}
 	} else {
-		err 'Bad version of Kramerius.';
+		err 'Bad version of Kramerius.',
+			'Kramerius version', $self->{'_kramerius_obj'}->version;
 	}
 	barf('LIST', join "\n", @pages);
 
@@ -288,6 +296,28 @@ Run.
 
 Returns 1 for error, 0 for success.
 
+=head1 ERRORS
+
+ new():
+         From Class::Utils::set_params():
+                 Unknown parameter '%s'.
+         Parameter 'lwp_user_agent' must be a LWP::UserAgent instance.
+
+ run():
+         Bad version of Kramerius.
+                 Kramerius version: %s
+         Cannot get title for page '%s'.
+         Cannot get '%s' URI.
+                 HTTP code: %s
+                 message: %s
+         Cannot parse JSON on '%s' URI.
+                 JSON decode error: %s
+         Cannot read library id and work id.
+         Content type isn't 'application/json' for '%s' URI.
+                 Content-Type: %s
+         Library with ID '%s' is unknown.
+         No images to download.
+
 =head1 EXAMPLE
 
  use strict;
@@ -345,6 +375,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.03
 
 =cut

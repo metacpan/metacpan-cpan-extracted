@@ -23,10 +23,10 @@ README
 SIGNATURE
 t/data/11a7ffc0-c61e-11e6-ac1c-001018b5eb5c.djvu
 t/data/bad.djvu
+t/data/bad2.djvu
 t/DjVu-Detect/01-use.t
 t/DjVu-Detect/02-version.t
 t/DjVu-Detect/03-detect_djvu_chunk.t
 t/DjVu-Detect/04-detect_djvu_file.t
-TODO
 xt/DjVu-Detect/01-pod_coverage.t
 xt/DjVu-Detect/02-pod.t

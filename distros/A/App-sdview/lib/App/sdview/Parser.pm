@@ -6,9 +6,9 @@
 use v5.26;
 use utf8;
 
-use Object::Pad 0.43;  # :strict(params)
+use Object::Pad 0.55;  # :reader on array
 
-package App::sdview::Parser 0.04;
+package App::sdview::Parser 0.05;
 role App::sdview::Parser;
 
 use String::Tagged;
@@ -37,9 +37,10 @@ class App::sdview::Para::Verbatim :strict(params) {
 class App::sdview::Para::List :strict(params) {
    has $listtype :param :reader;
    has $indent   :param :reader;
+   has $initial  :param :reader = 1;  # for number lists
 
-   has @items; # would love to :reader this
-   method items { @items }
+   has @items           :reader;
+
    method push_item ( $item ) { push @items, $item; }
 
    method type { "list-$listtype" }
@@ -51,6 +52,22 @@ class App::sdview::Para::ListItem :strict(params) {
    has $text :param :reader;
 
    method type { "item" }
+}
+
+class App::sdview::Para::Table :strict(params) {
+   method type { "table" }
+
+   has @rows :reader;
+
+   ADJUSTPARAMS ( $params ) {
+      @rows = ( delete $params->{rows} )->@*;
+   }
+}
+
+class App::sdview::Para::TableCell isa App::sdview::Para::Plain :strict(params) {
+   has $align :param :reader;
+
+   method type { "table-cell" }
 }
 
 0x55AA;

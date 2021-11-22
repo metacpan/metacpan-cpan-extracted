@@ -1,7 +1,7 @@
 requires 'Class::Accessor::Lite';
 requires 'IO::Socket::SSL';
 requires 'Furl';
-requires 'JSON::XS';
+requires 'JSON';
 requires 'URI';
 requires 'Try::Tiny';
 requires 'HTTP::Request::Common';

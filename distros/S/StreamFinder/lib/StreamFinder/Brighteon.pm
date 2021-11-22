@@ -117,15 +117,18 @@ such as yt-dlp (only if wishing to use the I<-youtube> option).
 [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] 
 [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
-Accepts a brighteon.com video ID or URL and creates and returns a new video object, 
-or I<undef> if the URL is not a valid Brighteon video or no streams are found.  
-The URL can be the full URL, ie. https://www.brighteon.com/B<video-id>, 
-or just I<video-id>.
+Accepts a brighteon.com video ID or URL and creates and returns a new video 
+object, or I<undef> if the URL is not a valid Brighteon video or no streams 
+are found.  The URL can be the full URL, ie. 
+https://www.brighteon.com/B<video-id>, 
+https://www.brighteon.com/channels/B<channel-id>, 
+or just I<video-id> or I<channel-id>.  If a I<channel-id> or channel URL is 
+given, then the first (latest) video of that channel will be returned.
 
-The optional I<-keep> argument can be either a comma-separated string or an array 
-reference ([...]) of stream types to keep (include) and returned in order specified 
-(type1, type2...).  Each "type" can be one of:  extension (ie. m4a, mp4, etc.), 
-"playlist", "stream", or ("any" or "all").
+The optional I<-keep> argument can be either a comma-separated string or an 
+array reference ([...]) of stream types to keep (include) and returned in 
+order specified (type1, type2...).  Each "type" can be one of:  extension 
+(ie. m4a, mp4, etc.), "playlist", "stream", or ("any" or "all").
 
 DEFAULT I<-keep> list is:  'm4a,mpd,stream,all', meaning that all m4a streams 
 followed by all "mpd" streams, followed by non-playlists, followed by all 
@@ -143,8 +146,8 @@ currently the streams on the page: (mpd plays best but is unseekable, and the
 m3u8 (HLS) stream doesn't seem to work well).  youtube-dl also returns a 
 "chunky" m3u8 (HLS) stream that is seekable and seems to work ok.
 
-The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
-then only secure ("https://") streams will be returned.
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
+If 1 then only secure ("https://") streams will be returned.
 
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
@@ -160,8 +163,9 @@ applicable when using the option: I<-youtube> => I<yes|only|top>, etc.
 
 I<-log> => "I<logfile>"
 
-Specify path to a log file.  If a valid and writable file is specified, A line will be 
-appended to this file every time one or more streams is successfully fetched for a url.
+Specify path to a log file.  If a valid and writable file is specified, A line 
+will be appended to this file every time one or more streams is successfully 
+fetched for a url.
 
 DEFAULT I<-none-> (no logging).
 
@@ -169,11 +173,11 @@ I<-logfmt> specifies a format string for lines written to the log file.
 
 DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
 
-The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
-[site]:  The site name (Brighteon).  [url]:  The url searched for streams.  
-[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
-[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "I<-na->", if no value).
+The valid field I<[variables]> are:  [stream]: The url of the first/best 
+stream found.  [site]:  The site name (Brighteon).  [url]:  The url searched 
+for streams.  [time]: Perl timestamp when the line was logged.  [title], 
+[artist], [album], [description], [year], [genre], [total], [albumartist]:  
+The corresponding field data returned (or "I<-na->", if no value).
 
 =item $video->B<get>()
 
@@ -262,7 +266,8 @@ and the options are loaded into a hash used only by the specific
 (submodule) specified.  Valid options include 
 I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
-Options specified here override any specified in I<~/.config/StreamFinder/config>.
+Options specified here override any specified in 
+I<~/.config/StreamFinder/config>.
 
 Among options valid for Brighteon streams is the I<-keep> and 
 I<-youtube> options described in the B<new()> function.  Also, 
@@ -430,7 +435,9 @@ sub new
 		$self->{'id'} =~ s/[\?\&].*$//;
 	} else {
 		$self->{'id'} = $url;
-		$url2fetch = 'https://www.brighteon.com/' . $url;
+		$url2fetch = ($url =~ /\-\w\w\w\w\-/) ? 'https://www.brighteon.com/'
+				: 'https://www.brighteon.com/channels/';
+		$url2fetch .= $url;
 	}
 	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$self->{'genre'} = 'Video';
@@ -453,6 +460,30 @@ sub new
 			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
 		}
 	}
+	return undef  unless ($html);
+
+	if ($url2fetch =~ m#\/channels\/#) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO!:
+		print "--WE'RE A BRIGHTEON CHANNEL URL!\n"  if ($DEBUG);
+		if ($html =~ m#\bhref\=\"([^\"]+)\"\>\s*\<img\s+src\=\"https\:\/\/photos\.brighteon\.com\/thumbnail#) {
+			($url2fetch = $1) =~ s#^\/#https://www.brighteon.com/#;
+			$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+			$self->{'id'} =~ s/[\?\&].*$//;
+			print "---FOUND 1ST EPISODE! FETCHING=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+			$response = $ua->get($url2fetch);
+			if ($response->is_success) {
+				$html = $response->decoded_content;
+			} else {
+				print STDERR $response->status_line  if ($DEBUG);
+				my $no_wget = system('wget','-V');
+				unless ($no_wget) {
+					print STDERR "\n..trying wget...\n"  if ($DEBUG);
+					$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+				}
+			}
+			return undef  unless ($html);
+		}
+	}
+
 	$html =~ s/\\\"/\&quot\;/gs;
 	if ($html =~ m#\<video(.*?)\<\/video\>#s) {
 		my $videotag = $1;
@@ -524,7 +555,7 @@ sub new
 		$self->{'albumartist'} = 'https://www.brighteon.com' . $one  if ($one);
 	} elsif ($html =~ m#\"shortUrl\"\:\"([^\"]+)\"\,\"name\"\:\"([^\"]+)\"#) {
 		$self->{'artist'} = $2;
-		$self->{'albumartist'} = "http://www.brighteon.com/channel/$1"  if ($1);
+		$self->{'albumartist'} = "http://www.brighteon.com/channels/$1"  if ($1);
 	}
 	my $id = $self->{'id'};
 	$self->{'title'} = ($html =~ m#\<div\s+class\=\"main\-video\-title\"\>([^\<]+)\<#s) ? $1 : '';

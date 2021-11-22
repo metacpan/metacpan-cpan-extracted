@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Ufunc;
 
-our @EXPORT_OK = qw(PDL::PP prodover PDL::PP cprodover PDL::PP dprodover PDL::PP cumuprodover PDL::PP dcumuprodover PDL::PP sumover PDL::PP csumover PDL::PP dsumover PDL::PP cumusumover PDL::PP dcumusumover PDL::PP andover PDL::PP bandover PDL::PP borover PDL::PP orover PDL::PP zcover PDL::PP intover PDL::PP average PDL::PP avgover PDL::PP caverage PDL::PP daverage PDL::PP davgover PDL::PP medover PDL::PP oddmedover PDL::PP modeover PDL::PP pctover PDL::PP oddpctover  pct  oddpct  avg  sum  prod  davg  dsum  dprod  zcheck  and  band  or  bor  min  max  median  mode  oddmedian  any all  minmax PDL::PP qsort PDL::PP qsorti PDL::PP qsortvec PDL::PP qsortveci PDL::PP minimum PDL::PP minimum_ind PDL::PP minimum_n_ind PDL::PP maximum PDL::PP maximum_ind PDL::PP maximum_n_ind PDL::PP maxover PDL::PP maxover_ind PDL::PP maxover_n_ind PDL::PP minover PDL::PP minover_ind PDL::PP minover_n_ind PDL::PP minmaximum PDL::PP minmaxover );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(prodover cprodover dprodover cumuprodover dcumuprodover sumover csumover dsumover cumusumover dcumusumover andover bandover borover orover zcover intover average PDL::PP avgover caverage daverage PDL::PP davgover medover oddmedover modeover pctover oddpctover pct oddpct avg sum prod davg dsum dprod zcheck and band or bor min max median mode oddmedian any all minmax qsort qsorti qsortvec qsortveci minimum minimum_ind minimum_n_ind maximum maximum_ind maximum_n_ind PDL::PP maxover PDL::PP maxover_ind PDL::PP maxover_n_ind PDL::PP minover PDL::PP minover_ind PDL::PP minover_n_ind minmaximum PDL::PP minmaxover );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Ufunc ;
+
 
 
 
@@ -55,10 +54,7 @@ use Carp;
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -2401,7 +2397,7 @@ since they will not contain any bad values.
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -2424,5 +2420,3 @@ the file.
 # Exit with OK status
 
 1;
-
-		   

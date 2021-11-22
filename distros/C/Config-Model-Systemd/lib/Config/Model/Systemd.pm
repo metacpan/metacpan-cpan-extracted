@@ -1,20 +1,20 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Systemd;
-$Config::Model::Systemd::VERSION = '0.247.1';
+$Config::Model::Systemd::VERSION = '0.249.1';
 use strict;
 use warnings;
 
 use 5.10.1;
 
-use Config::Model 2.133;
+use Config::Model 2.143;
 
 1;
 
@@ -24,7 +24,7 @@ __END__
 
 =pod
 
-=encoding UTF-8
+=encoding utf-8
 
 =head1 NAME
 
@@ -32,60 +32,33 @@ Config::Model::Systemd - Editor and validator for systemd configuration files
 
 =head1 VERSION
 
-version 0.247.1
+version 0.249.1
 
 =head1 SYNOPSIS
 
-=head2 command line
+ # run on one service:
+ $ sudo cme <cmd> systemd-service <name>  # run command on name.service
+ $ sudo cme <cmd> systemd-socket <name>   # run command on name.socket
+ $ sudo cme <cmd> systemd-timer <name>    # run command on name.timer
 
-Requires L<App::Cme>:
+ # run on several user units:
+ # Run on several units:
+ $ sudo cme <cmd> systemd *         # run command on all units
+ $ sudo cme <cmd> systemd <pattern> # run command on all units matching pattern
+ $ sudo cme <cmd> systemd <pattern> # run command on all units matching pattern
 
-Handle all user units:
+ $ cme <cmd> systemd-user <pattern> # run command on all user units matching pattern
 
- $ cme edit systemd-user '*'
- $ cme check systemd-user '*'
-
-Handles all user units that match 'foo':
-
- $ cme edit systemd-user foo
- $ cme check systemd-user foo
-
-Check all root units:
-
- # cme check systemd '*'
-
-Check all root units that match 'foo':
-
- # cme check systemd foo
-
-Edit override file of C<foo.service>:
-
- # cme edit systemd foo.service
-
-Handle a service file:
-
- $ cme check systemd-service path/to/file.service
- $ cme edit systemd-service path/to/file.service
-
-Timer and socket units are also supported:
-
- $ cme check systemd-socket path/to/file.socket
- $ cme check systemd-timer path/to/file.timer
-
-=head2 Perl program (experimental)
-
- use Config::Model qw/cme/;
- cme(application => 'systemd-user' backend_arg => 'free')
-    ->modify('socket:free-imap-tunnel Socket Accept=yes') ;
-
- cme(application => 'systemd-service', config_file => 'foo.service')
-    ->modify('Unit Description="a service that does foo things"')
+ # run on one service file (for unit development):
+ $ sudo cme <cmd> systemd-service-file <file-name>
+ $ sudo cme <cmd> systemd-socket-file <file-name>
+ $ sudo cme <cmd> systemd-timer-file <file-name>
 
 =head1 DESCRIPTION
 
-This module provides a configuration editor for the configuration files
-of systemd, i.e. all files in C<~/.config/systemd/user/> or all files
-in C</etc/systemd/system/>
+This module provides (with L<cme>) a configuration editor for the
+configuration files of systemd, i.e. all files in
+C<~/.config/systemd/user/> or all files in C</etc/systemd/system/>
 
 Ok. I simplified. In more details, this module provides the configuration
 models of Systemd configuration file that L<cme>, L<Config::Model> and
@@ -107,7 +80,7 @@ C<systemctl edit> command):
 
 A developer can also edit a systemd file shipped with a software:
 
- cme edit systemd-service software-thing.service
+ cme edit systemd-service-file software-thing.service
 
 =head2 Just check systemd configuration
 
@@ -115,7 +88,8 @@ You can also use L<cme> to run sanity checks on systemd configuration files:
 
  cme check systemd-user '*'
  cme check systemd '*' # may take time
- cme check systemd-service software-thing.service
+ cme check systemd-service foo
+ cme check systemd-service-file software-thing.service
 
 =head2 Use in Perl program (experimental)
 
@@ -137,11 +111,111 @@ Similarly, system Systemd files can be modified using C<systemd> application:
    backend_arg => 'foo'
  )->modify(...) ;
 
-For more details and parameters, please see 
+For more details and parameters, please see
 L<cme|Config::Model/"cme ( ... )">,
 L<modify|Config::Model::Instance/"modify ( ... )">,
 L<load|Config::Model::Instance/"load ( ... )"> and
 L<save|Config::Model::Instance/"save ( ... )"> documentation.
+
+=head1 Command line example
+
+The examples below require L<App::Cme>
+
+Dump override content of a specific service:
+
+ $ cme dump systemd-service transmission-daemon
+ Reading unit 'service' 'transmission-daemon' from '/lib/systemd/system/transmission-daemon.service'.
+ ---
+ Unit:
+   After:
+     - network-online.target
+     - remote-fs.target
+   Before:
+     - umount.target
+   Conflicts:
+     - umount.target
+
+Dump the whole service (like C<systemctl cat>):
+
+ $ cme dump systemd-service transmission-daemon --dumptype full
+ Reading unit 'service' 'transmission-daemon' from '/lib/systemd/system/transmission-daemon.service'.
+ ---
+ Install:
+   WantedBy:
+     - multi-user.target
+ Service:
+   CPUShares: 1024
+   CPUWeight: 100
+   ExecReload:
+     - /bin/kill -s HUP $MAINPID
+   ExecStart:
+     - /usr/bin/transmission-daemon -f --log-error
+ [etc...]
+
+Edit the service override with a GUI:
+
+ $ cme edit systemd-service transmission-daemon.service
+
+Edit the service override with a Shell UI:
+
+ $ cme shell systemd-service transmission-daemon.service
+  >:$ ls
+ Service Unit Install
+  >:$ cd Unit
+  >: Unit $ ll -nz
+ name      │ type │ value
+ ──────────┼──────┼───────────────────────────────────────
+ Conflicts │ list │ umount.target
+ Before    │ list │ umount.target
+ After     │ list │ network-online.target,remote-fs.target
+  >: Unit $ set After:.push(foo.target)
+  >: Unit $ ll -nz
+ name      │ type │ value
+ ──────────┼──────┼──────────────────────────────────────────────────
+ Conflicts │ list │ umount.target
+ Before    │ list │ umount.target
+ After     │ list │ network-online.target,remote-fs.target,foo.target
+
+Run command all user units:
+
+ $ cme edit systemd-user '*'
+ $ cme check systemd-user '*'
+
+Run command all user units that match 'foo':
+
+ $ cme edit systemd-user foo
+ $ cme check systemd-user foo
+
+Check all root units (can be quite long on small systems):
+
+ # cme check systemd '*'
+
+Check all root units that match 'foo':
+
+ # cme check systemd foo
+
+Edit override file of C<foo.service>:
+
+ # cme edit systemd foo.service
+
+Run command on a service file:
+
+ $ cme check systemd-service path/to/file.service
+ $ cme edit systemd-service path/to/file.service
+
+Timer and socket units are also supported:
+
+ $ cme check systemd-socket path/to/file.socket
+ $ cme check systemd-timer path/to/file.timer
+
+=head2 Perl program (experimental)
+
+ use Config::Model qw/cme/;
+ cme(application => 'systemd-user' backend_arg => 'free-imap-tunnel')
+    ->modify('socket:free-imap-tunnel Socket Accept=yes') ;
+
+ cme(application => 'systemd-service', config_file => 'foo.service')
+    ->modify('Unit Description="a service that does foo things"')
 
 =begin :comment
 
@@ -204,7 +278,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2020 by Dominique Dumont.
+This software is Copyright (c) 2008-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

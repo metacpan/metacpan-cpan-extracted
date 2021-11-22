@@ -246,8 +246,7 @@ sub install {
 
     if ($args{install_gitignore} || $args{install_all}) {
         print "\nInstalling .gitignore file...\n";
-        git_ignore() if $args{install_gitignore} || $args{install_all};
-        exit;
+        git_ignore();
     }
     if ($args{install_ci} || $args{install_all}) {
         print "\nInstalling Git Actions CI configuration file\n";
@@ -258,25 +257,21 @@ sub install {
         if ($git) {
             git_add($args{verbose});
         }
-        exit;
     }
     if ($args{add_badges} || $args{install_all}) {
         print "\nInstalling CI badges to POD...\n";
-        ci_badges($args{user}, $args{repo}) if $args{add_badges} || $args{install_all};
-        exit;
+        ci_badges($args{user}, $args{repo});
     }
     if ($args{add_bugtracker} || $args{install_all}) {
         print "\nInstalling bugtracker information to Makefile.PL...\n";
-        add_bugtracker($args{user}, $args{repo}) if $args{add_bugtracker} || $args{install_all};
-        exit;
+        add_bugtracker($args{user}, $args{repo});
     }
     if ($args{add_repository} || $args{install_all}) {
         print "\nInstalling repository information to Makefile.PL...\n";
-        add_repository($args{user}, $args{repo}) if $args{add_repository} || $args{install_all};
-        exit;
+        add_repository($args{user}, $args{repo});
     }
 
-    help('install');
+    help('install') if $args{help};
 }
 sub release {
     my (%args) = @_;
@@ -578,8 +573,8 @@ create - Creates a full blown distribution with everything included
     -e | --email     Mandatory: The email address of the author
     -u | --user      Optional:  The Github username (eg. stevieb9)
     -r | --repo      Optional:  The Github repository name (eg. test-module)
-    -w | --wait      Optional:  Don't wait for CI test results (--nowait to disable)
-    -V | --verbose   Optional:  Display verbose output for each process
+    -h | --help      Optional:  (Flag) Show command specific help screen
+    -V | --verbose   Optional:  (Flag) Display verbose output for each process
 
 Note: For Git integration, create an empty Github repository, send in its short
 name with --repo and your Github username with --user.
@@ -593,6 +588,7 @@ dist - Creates a bare-bones distribution with just the basics
     -m | --module   Mandatory: The module name (eg. Test::Module)
     -a | --author   Mandatory: The name of the author (eg. "Steve Bertrand")
     -e | --email    Mandatory: The email address of the author
+    -h | --help     Optional:  (Flag) Show command specific help screen
     -V | --verbose  Optional:  (Flag) Display verbose output for each process
 
 install - Installs/adds various files or file sections (all flags)
@@ -603,12 +599,17 @@ install - Installs/adds various files or file sections (all flags)
     -b | --bugtracker   Insert bugtracker information into Makefile.PL
     -R | --repository   Insert repository information into Makefile.PL
     -A | --all          Insert/Install all above options
+    -h | --help         (Flag) Show command specific help screen
+    -V | --verbose      (Flag) Display verbose output for each process
 
 release - Tests, runs CI and releases to the CPAN your distribution.
 
-    -i | --cpanid   Optional:  Your PAUSE userid
-    -p | --cpanpw   Optional:  Your PAUSE userid's password
-    -d | --dryrun   Optional:  (Flag) Don't actually upload to the CPAN
+    -i | --cpanid   Optional: Your PAUSE userid
+    -p | --cpanpw   Optional: Your PAUSE userid's password
+    -d | --dryrun   Optional: (Flag) Don't actually upload to the CPAN
+    -w | --wait     Optional: Don't wait for CI test results (--nowait to disable)
+    -h | --help     Optional: (Flag) Show command specific help screen
+    -V | --verbose  Optional: (Flag) Display verbose output for each process
 
 Notes: No Git operations will be performed without C<--repo> and C<--user>. If
 the --cpanid or --cpanpw aren't available or the CPAN_USERNAME or

@@ -1,3 +1,15 @@
+0.006 2021-11-19 12:30:04-0500
+
+  Build changes
+
+   - Use Alien::gmake for autoconf + make on FreeBSD.
+     See PR <https://github.com/zmughal-CPAN/p5-Alien-ZMQ-latest/pull/7>.
+
+   - Allow setting the build configuration system. Now prefers to use CMake on
+     Windows and Autoconf elsewhere.
+     See issue <https://github.com/zmughal-CPAN/p5-Alien-ZMQ-latest/issues/10>
+     and PR <https://github.com/zmughal-CPAN/p5-Alien-ZMQ-latest/pull/11>.
+
 0.005 2021-04-05 08:30:58-0500
 
   Build changes

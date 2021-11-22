@@ -107,7 +107,7 @@ Data::Frame::Partial::Sugar - Partial class for data frame syntax sugar
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 SYNOPSIS
 
@@ -122,6 +122,9 @@ version 0.0058
     my $subset = $mtcars->{ [qw(mpg cyl)] };    # $mtcars->slice([qw(mpg cyl]);
 
 =head1 DESCRIPTION
+
+Do not use this module in your code. This is only internally used by
+L<Data::Frame>.
 
 =head1 SEE ALSO
 

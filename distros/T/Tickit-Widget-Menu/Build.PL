@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Tickit::Widget::Menu',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.42',
+      'Object::Pad' => '0.57',
 
       'Tickit::RenderBuffer' => '0.43', # flush_to_term, in unit tests
       'Tickit::Test' => 0,

@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation for Getopt::Long
 
 # VERSION
 
-Version 1.00
+Version 1.03
 
 # SYNOPSIS
 
@@ -67,6 +67,10 @@ is given.
 
         has left => "=i", default => 1;
 
+    If the number of parameter is not even, default label is assumed to be
+    exist at the head: `action` if the first parameter is code reference,
+    `spec` otherwise.
+
     Following parameters are available.
 
     - \[ **spec** => \] _string_
@@ -117,7 +121,7 @@ is given.
 
             Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
-    - **default** => _value_
+    - **default** => _value_ | _coderef_
 
         Set default value.  If no default is given, the member is initialized
         as `undef`.
@@ -127,10 +131,18 @@ is given.
         multiple `new` calls.  Please be careful if you call `new` multiple
         times and alter the member data.
 
-    - **action** => _coderef_
+        If a code reference is given, it is called at the time of **new** to
+        get default value.  This is effective when you want to evaluate the
+        value at the time of execution, rather than declaration.  Use
+        **action** parameter to define a default action.
+
+    - \[ **action** => \] _coderef_
 
         Parameter `action` takes code reference which is called to process
-        the option.  When called, hash object is passed as `$_`.
+        the option.  `action =>` label can be omitted if and only if it
+        is the first parameter.
+
+        When called, hash object is passed as `$_`.
 
             has [ qw(left right both) ] => '=i';
             has "+both" => action => sub {
@@ -145,15 +157,11 @@ is given.
                 push @{$_->{ARGV}}, $_[0];
             };
 
-        In fact, `default` parameter takes code reference too.  It is stored
-        in the hash object and the code works almost same.  But the hash value
-        can not be used for option storage.
-
     Following parameters are all for data validation.  First `must` is a
     generic validator and can implement anything.  Others are shorthand
     for common rules.
 
-    - **must** => _coderef_ | \[ _codoref_ ... \]
+    - **must** => _coderef_ | \[ _coderef_ ... \]
 
         Parameter `must` takes a code reference to validate option values.
         It takes same arguments as `action` and returns boolean.  With next
@@ -212,18 +220,22 @@ is given.
     `GetOptions` has a capability of storing values in a hash, by giving
     the hash reference as a first argument, but it is not necessary.
 
-- **getopt**
+- **getopt** \[ _arrayref_ \]
 
-    Call `GetOptions` function defined in caller's context with
-    appropriate parameters.
+    Call appropiate function defined in caller's context to process
+    options.
 
         $obj->getopt
 
-    is just a shortcut for:
+        $obj->getopt(\@argv);
+
+    are shortcut for:
 
         GetOptions($obj->optspec)
 
-- **use\_keys**
+        GetOptionsFromArray(\@argv, $obj->optspec)
+
+- **use\_keys** _keys_
 
     Because hash keys are protected by `Hash::Util::lock_keys`, accessing
     non-existent member causes an error.  Use this function to declare new
@@ -263,6 +275,7 @@ is given.
         Produce alias with underscores removed.
 
     - **GETOPT** (default: 'GetOptions')
+    - **GETOPT\_FROM\_ARRAY** (default: 'GetOptionsFromArray')
 
         Set function name called from `getopt` method.
 

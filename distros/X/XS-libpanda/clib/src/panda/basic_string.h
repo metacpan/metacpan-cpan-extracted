@@ -83,8 +83,10 @@ namespace string_detail {
     struct Buffer {
         size_t   capacity;
         uint32_t refcnt;
-        CharT    start[(sizeof(void*)-4)/sizeof(CharT)]; // align to word size
+        CharT*   start() {return (CharT*)(&refcnt + 1);}
     };
+
+    static_assert(sizeof(Buffer<char>) % 8 == 0, "Alignment problem, sizeof(Buffer<char>) should be 8 on 32-bit platforms and 16 on 64");
 
     template <class CharT>
     struct ExternalShared : Buffer<CharT> {
@@ -149,7 +151,8 @@ private:
     template <class C, class T, class A> friend struct basic_string;
     friend mutable_charref;
 
-    static constexpr const size_type BUF_CHARS     = (sizeof(Buffer) - sizeof(Buffer().start)) / sizeof(CharT);
+    static constexpr const size_type BUF_FILLER    = sizeof(void*) - 4;
+    static constexpr const size_type BUF_CHARS     = (sizeof(Buffer) - BUF_FILLER) / sizeof(CharT);
     static constexpr const size_type EBUF_CHARS    = sizeof(ExternalShared) / sizeof(CharT);
     static constexpr const size_type MAX_SSO_BYTES = 3 * sizeof(void*) - 1; // last byte for _state
     static constexpr const float     GROW_RATE     = 1.6;
@@ -183,10 +186,10 @@ public:
     static const size_type MAX_SSO_CHARS = (MAX_SSO_BYTES / sizeof(CharT));
     static const size_type MAX_SIZE      = npos / sizeof(CharT) - BUF_CHARS;
 
-    constexpr basic_string () noexcept : _str_literal(&TERMINAL), _length(0), _state(State::LITERAL) {}
+    basic_string () noexcept : _str_literal(&TERMINAL), _length(0), _state(State::LITERAL) {}
 
     template <size_type SIZE> // implicit constructor for literals, literals are expected to be null-terminated
-    constexpr basic_string (const CharT (&str)[SIZE]) noexcept : _str_literal(str), _length(SIZE-1), _state(State::LITERAL) {}
+    basic_string (const CharT (&str)[SIZE]) noexcept : _str_literal(str), _length(SIZE-1), _state(State::LITERAL) {}
 
     template <size_type SIZE> // implicit constructor for char arrays, array must be null-trminated, behaviour is similar to std::string
     constexpr basic_string (CharT (&str)[SIZE]) noexcept : basic_string(str, traits_type::length(str)) {}
@@ -1162,7 +1165,7 @@ public:
 
 private:
 
-    constexpr size_type _capacity_internal () const { return _storage.internal->capacity - (_str - _storage.internal->start); }
+    constexpr size_type _capacity_internal () const { return _storage.internal->capacity - (_str - _storage.internal->start()); }
     constexpr size_type _capacity_external () const { return _storage.external->capacity - (_str - _storage.external->ptr); }
     constexpr size_type _capacity_sso      () const { return MAX_SSO_CHARS - (_str - _sso); }
 
@@ -1176,7 +1179,7 @@ private:
             _storage.internal           = (Buffer*)Alloc::allocate(capacity + BUF_CHARS);
             _storage.internal->capacity = capacity;
             _storage.internal->refcnt   = 1;
-            _str                        = _storage.internal->start;
+            _str                        = _storage.internal->start();
             _storage.dtor               = &Alloc::deallocate;
         }
     }
@@ -1184,23 +1187,23 @@ private:
     // becomes INTERNAL for capacity, and copy _str to buffer in the way so that none of internal SSO members are written before copy is made.
     void _new_internal_from_sso (size_type capacity) {
         auto ibuf = (Buffer*)Alloc::allocate(capacity + BUF_CHARS);
-        traits_type::copy(ibuf->start, _str, _length);
+        traits_type::copy(ibuf->start(), _str, _length);
         ibuf->capacity    = capacity;
         ibuf->refcnt      = 1;
         _state            = State::INTERNAL;
-        _str              = ibuf->start;
+        _str              = ibuf->start();
         _storage.internal = ibuf;
         _storage.dtor     = &Alloc::deallocate;
     }
 
     void _new_internal_from_sso (size_type capacity, size_type pos, size_type remove_count, size_type insert_count) {
         auto ibuf = (Buffer*)Alloc::allocate(capacity + BUF_CHARS);
-        if (pos) traits_type::copy(ibuf->start, _str, pos);
-        traits_type::copy((CharT*)ibuf->start + pos + insert_count, _str + pos + remove_count, _length - pos - remove_count);
+        if (pos) traits_type::copy(ibuf->start(), _str, pos);
+        traits_type::copy((CharT*)ibuf->start() + pos + insert_count, _str + pos + remove_count, _length - pos - remove_count);
         ibuf->capacity    = capacity;
         ibuf->refcnt      = 1;
         _state            = State::INTERNAL;
-        _str              = ibuf->start;
+        _str              = ibuf->start();
         _storage.internal = ibuf;
         _storage.dtor     = &Alloc::deallocate;
     }
@@ -1287,7 +1290,7 @@ private:
             _free_internal();
             _new_auto(capacity);
         }
-        else _str = _storage.internal->start;
+        else _str = _storage.internal->start();
     }
 
     void _reserve_drop_external (size_type capacity) {
@@ -1348,18 +1351,18 @@ private:
         if (_storage.internal->refcnt > 1) _detach_cow(capacity * extra);
         else if (_storage.internal->capacity < capacity) _internal_realloc(capacity * extra); // need to grow storage
         else if (_capacity_internal() < capacity) { // may not to grow storage if str is moved to the beginning
-            traits_type::move(_storage.internal->start, _str, _length);
-            _str = _storage.internal->start;
+            traits_type::move(_storage.internal->start(), _str, _length);
+            _str = _storage.internal->start();
         }
     }
 
     void _internal_realloc (size_type capacity) {
         // see if we can reallocate. if _str != start we should not reallocate because we would need
         // either allocate more space than needed or move everything to the beginning before reallocation
-        if (_storage.dtor == &Alloc::deallocate && _str == _storage.internal->start) {
+        if (_storage.dtor == &Alloc::deallocate && _str == _storage.internal->start()) {
             if (capacity > MAX_SIZE) throw std::length_error("basic_string::_internal_realloc");
             _storage.internal = (Buffer*)Alloc::reallocate((CharT*)_storage.internal, capacity + BUF_CHARS, _storage.internal->capacity + BUF_CHARS);
-            _str = _storage.internal->start;
+            _str = _storage.internal->start();
             _storage.internal->capacity = capacity;
         } else { // need to allocate/deallocate
             auto old_buf  = _storage.internal;
@@ -1418,7 +1421,7 @@ private:
                     _reserve_middle_new(pos, remove_count, insert_count);
                     _release_internal(old_buf, old_dtor);
                 }
-                else _reserve_middle_move(pos, remove_count, insert_count, _storage.internal->start, _capacity_internal());
+                else _reserve_middle_move(pos, remove_count, insert_count, _storage.internal->start(), _capacity_internal());
                 break;
             case State::EXTERNAL:
                 if (_storage.external->refcnt > 1) {
@@ -1510,8 +1513,12 @@ private:
     static void _free_external_str (ExternalShared* ebuf, dtor_fn dtor) { dtor(ebuf->ptr, ebuf->capacity); }
     static void _free_external_buf (ExternalShared* ebuf)               { ebuf->dtor((CharT*)ebuf, EBUF_CHARS); }
 
+    static size_type min(size_type a, size_type b) { // std::min is in <algorithm> header, it is too heavy to include for one function
+        return a < b ? a : b;
+    }
+
     static int _compare (const CharT* ptr1, size_type len1, const CharT* ptr2, size_type len2) {
-        int r = traits_type::compare(ptr1, ptr2, std::min(len1, len2));
+        int r = traits_type::compare(ptr1, ptr2, min(len1, len2));
         if (!r) r = (len1 < len2) ? -1 : (len1 > len2 ? 1 : 0);
         return r;
     }

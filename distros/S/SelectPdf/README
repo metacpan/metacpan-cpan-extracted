@@ -1,0 +1,33 @@
+SelectPdf version 1.4.0
+=======================
+
+This is a Perl version for SelectPdf Online REST API client library.
+It contains: HTML to PDF client, PDF Merge client, PDF to Text client.
+
+INSTALLATION
+
+To install this module type the following (use make, dmake or nmake depending on your system):
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+LWP::UserAgent
+HTTP::Request::Common
+HTTP::Status
+JSON
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2021 by SelectPdf
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

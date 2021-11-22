@@ -1,0 +1,5 @@
+resources:
+  repository:
+    type: git
+    url: git://github.com/kc2zgu/perl-gpiod.git
+    web: https://github.com/kc2zgu/perl-gpiod/

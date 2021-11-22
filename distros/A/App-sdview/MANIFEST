@@ -3,7 +3,9 @@ Build.PL
 Changes
 lib/App/sdview.pm
 lib/App/sdview/Output.pm
+lib/App/sdview/Output/Formatted.pm
 lib/App/sdview/Output/Markdown.pm
+lib/App/sdview/Output/Plain.pm
 lib/App/sdview/Output/Pod.pm
 lib/App/sdview/Output/Terminal.pm
 lib/App/sdview/Parser.pm
@@ -19,3 +21,4 @@ t/10parser-pod.t
 t/11parser-markdown.t
 t/20output-pod.t
 t/21output-markdown.t
+t/30output-plain.t

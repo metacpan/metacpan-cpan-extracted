@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print "1..49\n";
+print "1..46\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -287,133 +287,15 @@ if(Rmpfr_fits_intmax_p($u, GMP_RNDN) && Rmpfr_fits_sint_p($u, GMP_RNDN) &&
    Rmpfr_fits_ulong_p($u, GMP_RNDN) && Rmpfr_fits_ushort_p($u, GMP_RNDN)) {print "ok 39\n"}
 else {print "not ok 39\n"}
 
-my $bits = $Config{ivsize} * 8;
-Rmpfr_set_default_prec($bits + 5);
-my $check = '10111101111110100101110101101111011111101001011111011011110110110010010111110110111101111110100100110101';
-my $shigh;
-$ok = '';
-
-{
-use integer;
-my $temp = (2 ** ($bits - 2)) - 1;
-$shigh = (2 * $temp) + 1;
-}
-my $uhigh = (2 * $shigh) + 1;
-my $ulow = 0;
-my $slow = ($shigh * -1) - 1;
-
-
-my @obj= (
-Math::MPFR->new($uhigh),
-Math::MPFR->new($shigh),
-Math::MPFR->new($ulow),
-Math::MPFR->new($slow),
-Math::MPFR->new($shigh) + Math::MPFR->new(0.299),
-Math::MPFR->new($shigh) - Math::MPFR->new(0.239),
-Math::MPFR->new($uhigh) + Math::MPFR->new(0.467),
-Math::MPFR->new($uhigh) - Math::MPFR->new(0.6),
-Math::MPFR->new($slow) + Math::MPFR->new(0.299),
-Math::MPFR->new($slow) - Math::MPFR->new(0.239),
-Math::MPFR->new($ulow) + Math::MPFR->new(0.467),
-Math::MPFR->new($ulow) - Math::MPFR->new(0.6),
-Math::MPFR->new(-1),
-);
-
-#for(my $i = 0; $i < @obj; $i++) {
-#  if($obj[$i] <= 0 && $obj[$i] > -1.0){print "$i: $obj[$i]\n"}
-#}
-
-my @rnd = (GMP_RNDN, GMP_RNDZ, GMP_RNDU, GMP_RNDD);
-
-for(my $j = 0; $j < 4; $j++) {
-   for(my $i = 0; $i < 13; $i++) {
-      $ok .= Rmpfr_fits_UV_p($obj[$i], $rnd[$j]);
-      $ok .= Rmpfr_fits_IV_p($obj[$i], $rnd[$j]);
-   }
-}
-
-my $icheck = have_get_IV();
-my $ucheck = have_get_UV();
-
-if($] < 5.007 && !Math::MPFR::_has_longdouble() && Math::MPFR::_has_longlong()) {
-  warn "Skipping tests 40 and 41 as they fail on perl 5.6\nbuilt with -Duse64bitint but without -Duselongdouble\n";
-  print "ok 40\n";
-  print "ok 41\n";
-}
-else {
-  if($ok eq $check) {print "ok 40\n"}
-  else {
-     warn "\nGot:      $ok\nExpected: $check\n";
-     print "not ok 40\n";
-  }
-
-  $ok = '';
-
-  if($ucheck) {
-    for(@rnd) {
-       if(Math::MPFR::_has_longlong()) {
-         # No mpfr_cmp_uj() is yet available
-         Rmpfr_set_default_rounding_mode($_);
-         if(!Rmpfr_cmp($obj[0], Math::MPFR->new(Rmpfr_get_UV($obj[0], $_)))) {$ok .= $_}
-         if(!Rmpfr_cmp($obj[2], Math::MPFR->new(Rmpfr_get_UV($obj[2], $_)))) {$ok .= $_}
-       }
-       else {
-         if(!Rmpfr_cmp_ui($obj[0], Rmpfr_get_UV($obj[0], $_))) {$ok .= $_}
-         if(!Rmpfr_cmp_ui($obj[2], Rmpfr_get_UV($obj[2], $_))) {$ok .= $_}
-       }
-    }
-
-    if($ok eq '00112233') {print "ok 41\n"}
-    else {
-      warn $ok, "\n";
-      print "not ok 41 \n";
-    }
-  }
-
-  else {
-    warn "Skipping test 41 - Rmpfr_get_UV() not implemented\n";
-    print "ok 41\n";
-  }
-}
-
-Rmpfr_set_default_rounding_mode(GMP_RNDN);
-
-$ok = '';
-
-if($icheck) {
-  for(@rnd) {
-     if(Math::MPFR::_has_longlong()) {
-       # No mpfr_cmp_sj is yet available
-       Rmpfr_set_default_rounding_mode($_);
-       if(!Rmpfr_cmp($obj[1], Math::MPFR->new(Rmpfr_get_IV($obj[1], $_)))) {$ok .= $_}
-       if(!Rmpfr_cmp($obj[3], Math::MPFR->new(Rmpfr_get_IV($obj[3], $_)))) {$ok .= $_}
-     }
-     else {
-       if(!Rmpfr_cmp_si($obj[1], Rmpfr_get_IV($obj[1], $_))) {$ok .= $_}
-       if(!Rmpfr_cmp_si($obj[3], Rmpfr_get_IV($obj[3], $_))) {$ok .= $_}
-     }
-  }
-
-  if($ok eq '00112233') {print "ok 42\n"}
-  else {
-    warn $ok, "\n";
-    print "not ok 42 \n";
-  }
-}
-
-else {
-  warn "Skipping test 42 - Rmpfr_get_IV() not implemented\n";
-  print "ok 42\n";
-}
 
 Rmpfr_set_default_rounding_mode(GMP_RNDN);
 
 my $double = 17.625;
 
-if($double == Rmpfr_get_NV(Math::MPFR->new($double), GMP_RNDN)) {print "ok 43\n"}
+if($double == Rmpfr_get_NV(Math::MPFR->new($double), GMP_RNDN)) {print "ok 40\n"}
 else {
   warn "\nGot: ", Rmpfr_get_NV(Math::MPFR->new($double), GMP_RNDN) , "\nExpected: $double\n";
-  print "not ok 43\n";
+  print "not ok 40\n";
 }
 
 $ok = '';
@@ -425,17 +307,17 @@ if(MPFR_VERSION_MAJOR >= 3) {
   if(!Rmpfr_regular_p(Math::MPFR->new(-1) / Math::MPFR->new(0))) {$ok .= 'd'}
   if(!Rmpfr_regular_p(Math::MPFR->new(1) / Math::MPFR->new(0))) {$ok .= 'e'}
 
-  if($ok eq 'abcde') {print "ok 44\n"}
+  if($ok eq 'abcde') {print "ok 41\n"}
   else {
-    warn "44: \$ok: $ok\n";
-    print "not ok 44\n";
+    warn "41: \$ok: $ok\n";
+    print "not ok 41\n";
   }
 
   Rmpfr_set_zero($fma, -1);
-  if($fma == 0) {print "ok 45\n"}
+  if($fma == 0) {print "ok 42\n"}
   else {
-    warn "45: \$fma: $fma\n";
-    print "not ok 45\n";
+    warn "42: \$fma: $fma\n";
+    print "not ok 42\n";
   }
 
   my $dig1 = Math::MPFR->new();
@@ -444,98 +326,75 @@ if(MPFR_VERSION_MAJOR >= 3) {
   Rmpfr_digamma($dig2, Math::MPFR->new(3), MPFR_RNDN);
   # Let's check the recurrence relation
   my $diff = $dig2 - ($dig1 + 0.5);
-  if($diff < 0.00000000001 && $diff > -0.00000000001) {print "ok 46\n"}
+  if($diff < 0.00000000001 && $diff > -0.00000000001) {print "ok 43\n"}
   else {
-    warn "46: \$diff: $diff\n";
-    print "not ok 1\n";
+    warn "43: \$diff: $diff\n";
+    print "not ok 43\n";
   }
 
   my $ai = Math::MPFR->new();
   Rmpfr_ai($ai, 1 / Math::MPFR->new(0), MPFR_RNDN);
-  if($ai == 0) {print "ok 47\n"}
+  if($ai == 0) {print "ok 44\n"}
   else {
-    warn "47: \$ai: $ai\n";
-    print "not ok 47\n";
+    warn "44: \$ai: $ai\n";
+    print "not ok 44\n";
   }
 
   my $flt = Rmpfr_get_flt(Math::MPFR->new(0.25), MPFR_RNDN);
-  if($flt == 0.25) {print "ok 48\n"}
+  if($flt == 0.25) {print "ok 45\n"}
   else {
-    warn "48: \$flt: $flt\n";
-    print "not ok 48\n";
+    warn "45: \$flt: $flt\n";
+    print "not ok 45\n";
   }
 
   Rmpfr_set_flt($ai, 0.25, MPFR_RNDN);
-  if($ai == 0.25) {print "ok 49\n"}
+  if($ai == 0.25) {print "ok 46\n"}
   else {
-    warn "49: \$ai: $ai\n";
-    print "not ok 49\n";
+    warn "46: \$ai: $ai\n";
+    print "not ok 46\n";
   }
 }
 else {
   eval{Rmpfr_regular_p(Math::MPFR->new())};
-  if($@ =~ /Rmpfr_regular_p not implemented/) {print "ok 44\n"}
+  if($@ =~ /Rmpfr_regular_p not implemented/) {print "ok 41\n"}
+  else {
+    warn "41: \$\@: $@\n";
+    print "not ok 41\n";
+  }
+
+  eval{Rmpfr_set_zero($fma, -1);};
+  if($@ =~ /Rmpfr_set_zero not implemented/) {print "ok 42\n"}
+  else {
+    warn "42: \$\@: $@\n";
+    print "not ok 42\n";
+  }
+
+  eval{Rmpfr_digamma($fma, $fma, MPFR_RNDN);};
+  if($@ =~ /Rmpfr_digamma not implemented/) {print "ok 43\n"}
+  else {
+    warn "43: \$\@: $@\n";
+    print "not ok 43\n";
+  }
+
+  eval{Rmpfr_ai($fma, $fma, MPFR_RNDN);};
+  if($@ =~ /Rmpfr_ai not implemented/) {print "ok 44\n"}
   else {
     warn "44: \$\@: $@\n";
     print "not ok 44\n";
   }
 
-  eval{Rmpfr_set_zero($fma, -1);};
-  if($@ =~ /Rmpfr_set_zero not implemented/) {print "ok 45\n"}
+  eval{my $flt = Rmpfr_get_flt($fma, MPFR_RNDN);};
+  if($@ =~ /Rmpfr_get_flt not implemented/) {print "ok 45\n"}
   else {
     warn "45: \$\@: $@\n";
     print "not ok 45\n";
   }
 
-  eval{Rmpfr_digamma($fma, $fma, MPFR_RNDN);};
-  if($@ =~ /Rmpfr_digamma not implemented/) {print "ok 46\n"}
+  eval{Rmpfr_set_flt($fma, 0.3, MPFR_RNDN);};
+  if($@ =~ /Rmpfr_set_flt not implemented/) {print "ok 46\n"}
   else {
     warn "46: \$\@: $@\n";
     print "not ok 46\n";
   }
-
-  eval{Rmpfr_ai($fma, $fma, MPFR_RNDN);};
-  if($@ =~ /Rmpfr_ai not implemented/) {print "ok 47\n"}
-  else {
-    warn "47: \$\@: $@\n";
-    print "not ok 47\n";
-  }
-
-  eval{my $flt = Rmpfr_get_flt($fma, MPFR_RNDN);};
-  if($@ =~ /Rmpfr_get_flt not implemented/) {print "ok 48\n"}
-  else {
-    warn "48: \$\@: $@\n";
-    print "not ok 48\n";
-  }
-
-  eval{Rmpfr_set_flt($fma, 0.3, MPFR_RNDN);};
-  if($@ =~ /Rmpfr_set_flt not implemented/) {print "ok 49\n"}
-  else {
-    warn "49: \$\@: $@\n";
-    print "not ok 49\n";
-  }
 }
 
-
-
-
-##########################################
-##########################################
-
-sub have_get_IV {
-    eval{Rmpfr_get_IV(Math::MPFR->new(0));};
-    if($@) {
-      return 0 if $@ =~ /not implemented/;
-    }
-
-    return 1;
-}
-
-sub have_get_UV {
-    eval{Rmpfr_get_UV(Math::MPFR->new(0));};
-    if($@) {
-      return 0 if $@ =~ /not implemented/;
-    }
-
-    return 1;
-}

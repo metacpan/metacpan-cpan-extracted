@@ -8,13 +8,14 @@ build_requires:
   ExtUtils::MakeMaker: '6.52'
   File::Spec: '0'
   Test::More: '0'
+  Test::Needs: '0'
 configure_requires:
   Alien::Build: '1.40'
   Alien::Build::MM: '0.32'
   ExtUtils::CBuilder: '0'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,11 +32,17 @@ no_index:
 provides:
   Alien::OpenMP:
     file: lib/Alien/OpenMP.pm
-    version: '0.003005'
+    version: '0.003006'
   Alien::OpenMP::configure:
     file: lib/Alien/OpenMP/configure.pm
-    version: '0.003005'
-version: '0.003005'
+    version: '0.003006'
+recommends:
+  Inline: '0.67'
+  Inline::C: '0.62'
+resources:
+  homepage: https://github.com/Perl-OpenMP/p5-Alien-OpenMP
+  repository: https://github.com/Perl-OpenMP/p5-Alien-OpenMP.git
+version: '0.003006'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

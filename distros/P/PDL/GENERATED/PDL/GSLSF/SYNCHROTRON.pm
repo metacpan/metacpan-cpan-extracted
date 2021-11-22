@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::SYNCHROTRON;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_synchrotron_1 PDL::PP gsl_sf_synchrotron_2 );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_synchrotron_1 gsl_sf_synchrotron_2 );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::SYNCHROTRON ;
+
 
 
 
@@ -42,10 +41,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -107,7 +103,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -130,5 +126,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

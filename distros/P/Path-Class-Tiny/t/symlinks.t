@@ -9,7 +9,7 @@ use Path::Tiny ();
 
 # SETUP
 
-my $dir = path(Path::Tiny->tempdir)->child('sub');
+my $dir = tempdir->child('sub');
 $dir->mkpath or die("can't make dir: $dir");
 chdir $dir or die("can't change to dir: $dir");
 note "pwd is ", Path::Tiny->cwd;

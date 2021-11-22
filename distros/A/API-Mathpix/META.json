@@ -1,0 +1,73 @@
+{
+   "abstract" : "Use the API of Mathpix",
+   "author" : [
+      "Eriam Schaffter, C<< <eriam at mediavirtuel.com> >>\r"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.15",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "API-Mathpix",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::LeakyBucket" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "API::Mathpix" : {
+         "file" : "lib/API/Mathpix.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/eriam/API-Mathpix/issues"
+      },
+      "homepage" : "https://github.com/eriam/API-Mathpix",
+      "repository" : {
+         "url" : "git://github.com/eriam/API-Mathpix.git",
+         "web" : "https://github.com/eriam/API-Mathpix"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Eriam Schaffter <eriam@mediavirtuel.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

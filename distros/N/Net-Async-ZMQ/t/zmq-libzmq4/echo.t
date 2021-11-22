@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use Test::Most tests => 1;
-use Test::Requires qw(ZMQ::LibZMQ4 ZMQ::Constants);
+use Test::Needs qw(ZMQ::LibZMQ4 ZMQ::Constants);
 
 use lib 't/lib';
 use ReverseEcho;

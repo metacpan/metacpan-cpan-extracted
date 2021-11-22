@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::IPC;
 
-our $VERSION = '0.000141';
+our $VERSION = '0.000142';
 
 our @CARP_NOT = qw/Test2::Util::HashBase/;
 
@@ -265,7 +265,7 @@ sub start {
     croak "Subtest is already complete"
         if $self->{+FINISHED};
 
-    $self->{+START_STAMP} //= time;
+    $self->{+START_STAMP} = time unless defined $self->{+START_STAMP};
 
     $self->{+ACTIVE}++;
 
@@ -312,7 +312,8 @@ sub finish {
         if $self->{+ACTIVE};
 
     $self->wait;
-    my $stop_stamp = $self->{+STOP_STAMP} //= time;
+    $self->{+STOP_STAMP} = time unless defined $self->{+STOP_STAMP};
+    my $stop_stamp = $self->{+STOP_STAMP};
 
     my $todo       = $params{todo};
     my $skip       = $params{skip};

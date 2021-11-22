@@ -6,7 +6,7 @@ use Carp ();
 use File::Spec ();
 use Moo::Role;
 # ABSTRACT: A role that handles filepaths for improved portability
-our $VERSION = '0.083'; # VERSION
+our $VERSION = '0.085'; # VERSION
 
 
 sub chomp_portable {
@@ -58,7 +58,7 @@ Archive::BagIt::Role::Portability - A role that handles filepaths for improved p
 
 =head1 VERSION
 
-version 0.083
+version 0.085
 
 =head1 AVAILABILITY
 
@@ -73,11 +73,11 @@ web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Rob Schmidt <rjeschmi@gmail.com>
+Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

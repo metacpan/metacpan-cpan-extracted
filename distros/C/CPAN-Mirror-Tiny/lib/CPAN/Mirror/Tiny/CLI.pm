@@ -1,12 +1,13 @@
 package CPAN::Mirror::Tiny::CLI;
 use strict;
 use warnings;
-use CPAN::Mirror::Tiny::Util 'WIN32';
+
 use CPAN::Mirror::Tiny;
 use File::Find ();
 use File::Spec;
 use File::stat ();
 use Getopt::Long ();
+use IPC::Run3 ();
 use POSIX ();
 use Pod::Usage 1.33 ();
 
@@ -99,8 +100,8 @@ sub cmd_cat_index {
     my $index = $cpan->index_path(compress => 1);
     return unless -f $index;
     my @cmd = ($cpan->{gzip}, "--decompress", "--stdout", $index);
-    @cmd = CPAN::Mirror::Tiny::Util::shell_quote(@cmd) if WIN32;
-    return !system @cmd;
+    IPC::Run3::run3 \@cmd, \undef, undef, undef;
+    return $? == 0;
 }
 
 sub cmd_list {

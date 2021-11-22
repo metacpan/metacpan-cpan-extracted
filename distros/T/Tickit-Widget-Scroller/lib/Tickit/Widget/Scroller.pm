@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.41;
+use Object::Pad 0.57;
 
-package Tickit::Widget::Scroller 0.26;
+package Tickit::Widget::Scroller 0.27;
 class Tickit::Widget::Scroller
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 use Tickit::Style;
 Tickit::Widget->VERSION( '0.35' );
@@ -166,9 +166,9 @@ has $_on_scrolled :param :reader :writer = undef;
 has $_gen_top_indicator    :param = undef;
 has $_gen_bottom_indicator :param = undef;
 
-BUILD ( %args )
+ADJUSTPARAMS ( $params )
 {
-   my $gravity = delete $args{gravity} || "top";
+   my $gravity = ( delete $params->{gravity} ) || "top";
 
    $_gravity_bottom = ( $gravity eq "bottom" );
 }

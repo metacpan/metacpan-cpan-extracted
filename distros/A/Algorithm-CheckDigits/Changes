@@ -1,5 +1,8 @@
 Revision history for Perl extension CheckDigits.
 
+v1.3.6 Tue Nov 16 11:38:44 CET 2021
+	- adjust repository to reflect move on GitHub
+
 v1.3.5 Wed Nov 18 16:18:35 CET 2020
 	- added links to repository and bugtracker
 	- added entry to changelog

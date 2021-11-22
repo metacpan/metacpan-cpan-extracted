@@ -26,7 +26,7 @@ class Point {
       'Point fully specified' );
 }
 
-class Point3D isa Point {
+class Point3D :isa(Point) {
    has $z :param = 0;
 
    method pos { return ( $self->next::method, $z ) }

@@ -99,13 +99,18 @@ EXAMPLE2
 DEPENDENCIES
     Error::Pure, Exporter, File::Which.
 
+SEE ALSO
+    File::Find::Rule::DjVu
+        Common rules for searching DjVu files.
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/DjVu-Detect>
 
 TEST FILES
     Test file 11a7ffc0-c61e-11e6-ac1c-001018b5eb5c.djvu is generated from
     scanned book edition from
-    <http://www.digitalniknihovna.cz/mzk/view/uuid:814e66a0-b6df-11e6-88f6-005056827e52?page=uuid:11a7ffc0-c61e-11e6-ac1c-001018b5eb5c>
+    <http://www.digitalniknihovna.cz/mzk/view/uuid:814e66a0-b6df-11e6-88f6-0
+    05056827e52?page=uuid:11a7ffc0-c61e-11e6-ac1c-001018b5eb5c>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -118,5 +123,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

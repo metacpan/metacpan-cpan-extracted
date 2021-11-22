@@ -3,6 +3,7 @@
  *
  *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
  */
+#define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,12 +11,12 @@
 
 #include "object_pad.h"
 
-static void final_post_construct(pTHX_ SlotMeta *slotmeta, SV *_hookdata, SV *slot)
+static void final_post_construct(pTHX_ SlotMeta *slotmeta, SV *_hookdata, void *_funcdata, SV *slot)
 {
   SvREADONLY_on(slot);
 }
 
-static void final_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
+static void final_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata)
 {
   if(mop_slot_get_attribute(slotmeta, "writer"))
     warn("Applying :Final attribute to slot %" SVf " which already has :writer", SVfARG(mop_slot_get_name(slotmeta)));
@@ -33,4 +34,4 @@ static const struct SlotHookFuncs final_hooks = {
 MODULE = Object::Pad::SlotAttr::Final    PACKAGE = Object::Pad::SlotAttr::Final
 
 BOOT:
-  register_slot_attribute("Final", &final_hooks);
+  register_slot_attribute("Final", &final_hooks, NULL);

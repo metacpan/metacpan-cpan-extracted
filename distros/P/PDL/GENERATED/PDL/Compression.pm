@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Compression;
 
-our @EXPORT_OK = qw(PDL::PP rice_compress PDL::PP rice_expand );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(rice_compress rice_expand );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Compression ;
+
 
 
 
@@ -55,10 +54,7 @@ RICE_1 algorithm used in internal FITS-file compression (see PDL::IO::FITS).
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -230,7 +226,7 @@ sub PDL::rice_expand {
 
 
 
-;
+
 
 
 =head1 AUTHORS
@@ -276,5 +272,3 @@ terms than PDL itself; that notice is present in the file "ricecomp.c".
 # Exit with OK status
 
 1;
-
-		   

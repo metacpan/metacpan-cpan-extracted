@@ -1,4 +1,5 @@
 #pragma once
+#include <type_traits>
 
 namespace panda {
 
@@ -42,6 +43,34 @@ template <typename T> struct optional {
     T value() const { return *nullable_val; }
 
     explicit operator bool() const { return nullable_val != nullptr; }
+
+    template< class F >
+    constexpr auto and_then( F&& f ) const {
+        if (nullable_val) {
+            return f(*nullable_val);
+        } else {
+            return decltype(f(*nullable_val)){};
+        }
+    }
+
+    template< class F >
+    constexpr auto transform( F&& f ) const {
+        using Ret = optional<typename std::remove_cv<decltype(f(*nullable_val))>::type>;
+        if (nullable_val) {
+            return Ret(f(*nullable_val));
+        } else {
+            return Ret();
+        }
+    }
+
+    template< class F >
+    constexpr optional or_else( F&& f ) const {
+        if (nullable_val) {
+            return *nullable_val;
+        } else {
+            return f();
+        }
+    }
 
 private:
     T* nullable_val;

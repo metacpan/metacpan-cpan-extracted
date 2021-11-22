@@ -17,6 +17,7 @@ t/path-class/03-filesystem.t
 t/proper-class.t
 t/require.t
 t/symlinks.t
+t/tempdir.t
 t/tempfile.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

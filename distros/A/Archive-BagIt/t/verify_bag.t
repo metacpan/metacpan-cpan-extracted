@@ -1,36 +1,18 @@
 # this file tests how bag information could be accessed
 BEGIN { chdir 't' if -d 't' }
-
+use strict;
 use warnings;
 use utf8;
-use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 139;
-use Test::Exception;
-use strict;
-
-
 use lib '../lib';
-
+use open ':std', ':encoding(UTF-8)';
+use Test::More tests => 155;
+use Test::Exception;
 use File::Spec;
 use Data::Printer;
 use File::Path;
 use File::Copy;
 use File::Temp qw(tempdir);
 use File::Slurp qw( read_file write_file);
-
-my $Class1 = 'Archive::BagIt';
-use_ok($Class1);
-my $Class2 = 'Archive::BagIt::Fast';
-use_ok($Class2);
-
-my @ROOT = grep {length} 'src';
-
-#warn "what is this: ".Dumper(@ROOT);
-
-
-my $SRC_BAG = File::Spec->catdir( @ROOT, 'src_bag');
-my $SRC_FILES = File::Spec->catdir( @ROOT, 'src_files');
-my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
 
 ## tests
 # verify incorrect manifest or tagmanifest-checksums
@@ -57,13 +39,49 @@ sub _modify_bag { # writes invalid checksum to a manifestfile
     return;
 }
 
-
+### TESTS
+note "base tests";
+my $Class_base = 'Archive::BagIt';
+use_ok($Class_base);
 foreach my $prefix (@prefix_manifestfiles) {
     foreach my $alg (@alg) {
+        # preparation tests
         my $bag_dir = File::Temp::tempdir(CLEANUP => 1);
         _prepare_bag($bag_dir);
-        SKIP: {
-            skip "skipped because testbag could not created", 1 unless -d $bag_dir;
+        my $bag_ok = Archive::BagIt->make_bag($bag_dir);
+        isa_ok($bag_ok, 'Archive::BagIt', "create new valid IE bagit");
+        ok($bag_ok->verify_bag(), "check if bag is verified correctly");
+        my $bag_ok2 = Archive::BagIt->make_bag("$bag_dir/"); #add slash at end of $bag_dir
+        isa_ok($bag_ok2, 'Archive::BagIt', "create new valid IE bagit (with slash)");
+        ok($bag_ok2->verify_bag(), "check if bag is verified correctly (with slash)");
+        _modify_bag("$bag_dir/$prefix-$alg.txt");
+        # real tests
+        my $bag_invalid1 = new_ok("Archive::BagIt" => [ bag_path => $bag_dir ]);
+        throws_ok(
+            sub {
+                $bag_invalid1->verify_bag(
+                    { return_all_errors => 1 }
+                )
+            }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken $prefix-$alg.txt (all errors, standard)");
+        my $bag_invalid2 = new_ok("Archive::BagIt" => [ bag_path => $bag_dir ]);
+        throws_ok(
+            sub {
+                $bag_invalid2->verify_bag()
+            }, qr{digest \($alg\) calculated=.*, but expected=}, "check if bag fails verification of broken $prefix-$alg.txt (first error, standard)");
+    }
+}
+######## Fast
+
+note "fast tests";
+SKIP: {
+    skip "IO::AIO required for testing Archive::BagIt::Fast", 33 unless eval "use IO::AIO; 1";
+    my $Class_fast = 'Archive::BagIt::Fast';
+    use_ok($Class_fast);
+    foreach my $prefix (@prefix_manifestfiles) {
+        foreach my $alg (@alg) {
+            # preparation tests
+            my $bag_dir = File::Temp::tempdir(CLEANUP => 1);
+            _prepare_bag($bag_dir);
             my $bag_ok = Archive::BagIt->make_bag($bag_dir);
             isa_ok($bag_ok, 'Archive::BagIt', "create new valid IE bagit");
             ok($bag_ok->verify_bag(), "check if bag is verified correctly");
@@ -71,38 +89,26 @@ foreach my $prefix (@prefix_manifestfiles) {
             isa_ok($bag_ok2, 'Archive::BagIt', "create new valid IE bagit (with slash)");
             ok($bag_ok2->verify_bag(), "check if bag is verified correctly (with slash)");
             _modify_bag("$bag_dir/$prefix-$alg.txt");
-            my $bag_invalid1 = new_ok("Archive::BagIt" => [ bag_path => $bag_dir ]);
-            my $bag_invalid2 = new_ok("Archive::BagIt::Fast" => [ bag_path => $bag_dir ]);
-
+            # real tests
+            my $bag_invalid1 = new_ok("Archive::BagIt::Fast" => [ bag_path => $bag_dir ]);
             throws_ok(
                 sub {
                     $bag_invalid1->verify_bag(
                         { return_all_errors => 1 }
                     )
-                }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken $prefix-$alg.txt (all errors)");
+                }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken $prefix-$alg.txt (all errors, fast)");
+            my $bag_invalid2 = new_ok("Archive::BagIt::Fast" => [ bag_path => $bag_dir ]);
             throws_ok(
                 sub {
-                    $bag_invalid2->verify_bag(
-                        { return_all_errors => 1 }
-                    )
-                }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken $prefix-$alg.txt (all errors)");
-
-
-            my $bag_invalid3 = new_ok("Archive::BagIt" => [ bag_path => $bag_dir ]);
-            throws_ok(
-                sub {
-                    $bag_invalid3->verify_bag()
-                }, qr{digest \($alg\) calculated=.*, but expected=}, "check if bag fails verification of broken $prefix-$alg.txt (first error)");
-            my $bag_invalid4 = new_ok("Archive::BagIt::Fast" => [ bag_path => $bag_dir ]);
-            throws_ok(
-                sub {
-                    $bag_invalid3->verify_bag()
-                }, qr{digest \($alg\) calculated=.*, but expected=}, "check if bag fails verification of broken $prefix-$alg.txt (first error)");
+                    $bag_invalid2->verify_bag()
+                }, qr{digest \($alg\) calculated=.*, but expected=}, "check if bag fails verification of broken $prefix-$alg.txt (first error, fast)");
         }
     }
-}
+}  # end SKIP
+
 
 # special test to ensure that return_all_errors work as expected
+note "return_all_errors tests";
 {
     my $bag_dir = File::Temp::tempdir(CLEANUP => 1);
     _prepare_bag($bag_dir);
@@ -252,8 +258,6 @@ foreach my $prefix (@prefix_manifestfiles) {
             }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken Payload-Oxum"
         );
     }
-
 }
-
 
 1;

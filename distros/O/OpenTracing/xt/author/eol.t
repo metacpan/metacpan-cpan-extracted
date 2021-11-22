@@ -15,6 +15,7 @@ my @files = (
     'lib/OpenTracing/DSL.pm',
     'lib/OpenTracing/Integration.pm',
     'lib/OpenTracing/Integration/HTTP/Tiny.pm',
+    'lib/OpenTracing/Integration/System.pm',
     'lib/OpenTracing/Log.pm',
     'lib/OpenTracing/Log.pod',
     'lib/OpenTracing/Process.pm',
@@ -22,6 +23,8 @@ my @files = (
     'lib/OpenTracing/Protocol.pm',
     'lib/OpenTracing/Protocol/Jaeger.pm',
     'lib/OpenTracing/Protocol/Zipkin.pm',
+    'lib/OpenTracing/Reference.pm',
+    'lib/OpenTracing/Reference.pod',
     'lib/OpenTracing/Span.pm',
     'lib/OpenTracing/SpanContext.pm',
     'lib/OpenTracing/SpanContext.pod',
@@ -38,6 +41,7 @@ my @files = (
     't/dsl.t',
     't/span.t',
     't/tracer.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
@@ -46,8 +50,7 @@ my @files = (
     'xt/author/portability.t',
     'xt/author/test-version.t',
     'xt/release/common_spelling.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

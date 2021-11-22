@@ -2,9 +2,9 @@ package Term::Form;
 
 use warnings;
 use strict;
-use 5.008003;
+use 5.10.0;
 
-our $VERSION = '0.539';
+our $VERSION = '0.540';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -188,7 +188,7 @@ sub _sanitized_string {
     my ( $str ) = @_;
     if ( defined $str ) {
         $str =~ s/\t/ /g;
-        $str =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
+        $str =~ s/\v+/\ \ /g;
         $str =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
     }
     else {
@@ -1579,7 +1579,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.539
+Version 0.540
 
 =cut
 
@@ -1859,7 +1859,7 @@ To close the form and get the modified list (reference to an array or arrays) as
 
 =head2 Perl version
 
-Requires Perl version 5.8.3 or greater.
+Requires Perl version 5.10.0 or greater.
 
 =head2 Terminal
 

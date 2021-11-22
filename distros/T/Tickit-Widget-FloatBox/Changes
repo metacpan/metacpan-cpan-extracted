@@ -1,5 +1,12 @@
 Revision history for Tickit-Widget-FloatBox
 
+0.10    2021-11-20
+        [CHANGES]
+         * Updates for Object::Pad 0.57
+            + Use :isa instead of legacy `extends`
+            + Use ADJUSTPARAMS instead of BUILD
+         * No longer support 'base_child' constructor argument
+
 0.09    2021-07-03
         [CHANGES]
          * Updates for Object::Pad 0.41:

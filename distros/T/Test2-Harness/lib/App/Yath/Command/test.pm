@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000080';
+our $VERSION = '1.000082';
 
 use App::Yath::Options;
 
@@ -60,6 +60,7 @@ include_options(
     'App::Yath::Options::Run',
     'App::Yath::Options::Runner',
     'App::Yath::Options::Workspace',
+    'App::Yath::Options::Collector',
 );
 
 sub MAX_ATTACH() { 1_048_576 }
@@ -972,6 +973,26 @@ Can be specified multiple times
 =back
 
 =head2 COMMAND OPTIONS
+
+=head3 Collector Options
+
+=over 4
+
+=item --max-open-jobs 18
+
+=item --no-max-open-jobs
+
+Maximum number of jobs a collector can process at a time, if more jobs are pending their output will be delayed until the earlier jobs have been processed. (Default: double the -j value)
+
+
+=item --max-poll-events 1000
+
+=item --no-max-poll-events
+
+Maximum number of events to poll from a job before jumping to the next job. (Default: 1000)
+
+
+=back
 
 =head3 Cover Options
 

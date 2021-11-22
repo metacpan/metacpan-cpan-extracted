@@ -1,4 +1,4 @@
-bin/github_backup
+bin/github-backup
 Changes
 examples/initial_test.pl
 lib/Github/Backup.pm
@@ -8,6 +8,7 @@ MANIFEST.SKIP
 README
 t/00-load.t
 t/05-new.t
+t/07-list.t
 t/10-repos.t
 t/15-dir.t
 t/20-issues.t

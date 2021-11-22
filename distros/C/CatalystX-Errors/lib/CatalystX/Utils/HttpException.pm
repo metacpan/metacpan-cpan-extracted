@@ -67,7 +67,7 @@ CatalystX::Utils::HttpException - A basic way to throw exceptions
   extends 'CatalystX::Utils::HttpException';
 
   has '+status' => (init_arg=>undef, default=>sub {418});
-  has '+errors' => (init_args=?indef, default=>sub {'Coffee not allowed!'});
+  has '+errors' => (init_arg=>undef, default=>sub {['Coffee not allowed!']});
 
 =head1 DESCRIPTION
 

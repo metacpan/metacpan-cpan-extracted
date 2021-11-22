@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use 5.008003;
+use 5.10.0;
 
 use Term::Form;
 

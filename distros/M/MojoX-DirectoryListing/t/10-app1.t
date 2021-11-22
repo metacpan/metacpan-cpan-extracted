@@ -48,16 +48,18 @@ sub can_test_forbidden {
 		public private public/dir1 public/dir2
 		public/dir2/dir3 private/dir4);
 
+	$fail += mk_file "$_/old.txt" for @madedirs;
+	sleep 1;
 	$fail += mk_file "$_/forbidden.gif" for @madedirs;
 	chmod 000, "$_/forbidden.gif" for @madedirs;
+	sleep 1;
 	$fail += mk_file "$_/middle.html" for @madedirs;
-	$fail += mk_file "$_/young.vb" for @madedirs;
+	sleep 1;
 
-	# remarkably, creating .../old.txt fails for CPANTS tester
-	# njh at bandsman but  middle.html  and  young.vb  succeed?
 	# cf. http://www.cpantesters.org/cpan/report/
 	#               07c059f4-b916-11e6-886b-73ce95f05882
-	$fail += mk_file "$_/old.txt" for @madedirs;
+	$fail += mk_file "$_/young.vb" for @madedirs;
+	diag "completed test filesystem";
 	return $fail;
     }
 
@@ -117,6 +119,9 @@ $t2->get_ok('/dir2/dir3')->status_is(200)
 $t2->get_ok('/dir2/dir3?C=N&O=D', 'request for list in descending order')
     ->status_is(200, 'request ok')
     ->content_like( qr/young.*old.*middle/s, 'files in descending order' );
+$t2->get_ok('/dir2/dir3?O=D', 'request for list in descending order default C')
+    ->status_is(200, 'request ok')
+    ->content_like( qr/young.*old.*middle/s, 'files in descending order' );
 
 can_test_forbidden && 
     $t2->content_unlike( qr/forbidden/, 'forbidden files hidden' );
@@ -126,7 +131,7 @@ can_test_forbidden &&
 $t2->get_ok('/?C=M', 'request for list from oldest to newest')
     ->status_is(200, 'request ok')
     ->content_like( qr/old.*middle.*young/s, 'files in  correct order' );
-$t2->get_ok('/?C=M&O=D', 'request for list from oldest to newest')
+$t2->get_ok('/?C=M&O=D', 'request for list from newest to oldest')
     ->status_is(200, 'request ok')
     ->content_like( qr/young.*middle.*old/s, 
 		    'files in  correct order' );
@@ -237,8 +242,6 @@ $t6->get_ok('/test')->status_is(200)->content_is('Server6', 'Server6 active');
 $t6->get_ok('/')->status_is(200)
     ->content_like( $identifier, 'dir served by this module' );
 $t6->get_ok('/dir1')->status_is(200, 'public subdir accessible');
-#print Dumper $t6->app->routes;
-#print Dumper $t6->tx->res;
 $t6->get_ok('/dir1/old.txt')->status_is(200, 'file in public/dir1 accessible');
 $t6->get_ok('/hidden')->status_is(200, '/hidden req ok')
     ->content_like( $identifier, '/hidden is a directory listing' )

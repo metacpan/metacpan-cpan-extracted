@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 # ABSTRACT: Some Perl::Critic policies used by Plicease
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Perl::Critic::Plicease - Some Perl::Critic policies used by Plicease
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,11 @@ Prohibit C<\d> (match any digit) in regular expressions without the C</a> or C</
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Ville Skyttä (SCOP)
 
 =head1 COPYRIGHT AND LICENSE
 

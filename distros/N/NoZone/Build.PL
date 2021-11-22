@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (C) 2013  Daniel P. Berrange <dan@berrange.com>
+# Copyright (C) 2013-2021  Daniel P. Berrange <dan@berrange.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ my $build = Module::Build->new(
     },
     requires    => {
 	'perl' => '5.6.0',
-	'Config::Record' => "1.1.2",
+	'YAML' => '0',
 	'File::Spec::Functions' => 0,
     },
     dist_abstract => "A Bind DNS zone file generator",
@@ -42,7 +42,7 @@ my $build = Module::Build->new(
 	"bin/nozone",
     ],
     etc_files => {
-	"etc/nozone.cfg" => "etc/nozone.cfg",
+	"etc/nozone.yml" => "etc/nozone.yml",
     },
     install_path => { etc => "/etc" },
     );

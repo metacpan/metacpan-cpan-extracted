@@ -1,13 +1,12 @@
 certs/test-cert.pem
 certs/test-key.pem
 certs/test.p12
-Changes
+Changes.md
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
-inc/Module/Install/Compiler.pm
 inc/Module/Install/External.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Include.pm
@@ -17,12 +16,12 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.SKIP
 META.yml
 PKCS12.pm
 PKCS12.xs
 ppport.h
-README
+README.md
+t/pkcs12-string.t
 t/pkcs12.t
 t/pod-coverage.t
 t/pod.t

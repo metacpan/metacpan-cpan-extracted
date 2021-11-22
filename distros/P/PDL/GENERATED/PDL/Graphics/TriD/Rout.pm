@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Graphics::TriD::Rout;
 
-our @EXPORT_OK = qw(PDL::PP combcoords PDL::PP repulse PDL::PP attract PDL::PP vrmlcoordsvert PDL::PP contour_segments_internal );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(combcoords repulse attract vrmlcoordsvert contour_segments_internal );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Graphics::TriD::Rout ;
+
 
 
 
@@ -38,10 +37,7 @@ the PDL::Graphics::TriD module. Currently, there are
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -178,7 +174,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (vertices(n=3); char* space; char* fd)
+  Signature: (vertices(n=3); char* space; PerlIO *fp)
 
 
 =for ref
@@ -279,7 +275,7 @@ sub PDL::Graphics::TriD::Contours::contour_segments {
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -302,5 +298,3 @@ the copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

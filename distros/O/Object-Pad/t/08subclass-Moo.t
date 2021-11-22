@@ -23,7 +23,7 @@ package Base::Class {
 }
 
 my $opcount;
-class Derived::Class isa Base::Class {
+class Derived::Class :isa(Base::Class) {
    has $slot;
    BUILD {
       my ( $args ) = @_;

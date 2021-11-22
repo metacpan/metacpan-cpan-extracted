@@ -67,7 +67,7 @@
             "Path::Tiny" : "0",
             "Pod::Usage" : "0",
             "URI" : "0",
-            "perl" : "5.006",
+            "perl" : "v5.12.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -87,7 +87,7 @@
             "Test::Simple" : "1.302177",
             "Test::Warnings" : "0",
             "lib" : "0",
-            "perl" : "5.006"
+            "perl" : "v5.12.0"
          }
       }
    },
@@ -103,7 +103,7 @@
          "web" : "https://github.com/oalders/open-this"
       }
    },
-   "version" : "0.000027",
+   "version" : "0.000028",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030003"
@@ -658,7 +658,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000027",
+                  "tag" : "v0.000028",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

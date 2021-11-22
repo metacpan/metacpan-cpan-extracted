@@ -8,6 +8,7 @@
 #include <vector>
 #include <ostream>
 #include <cstdlib>
+#include <chrono>
 
 namespace panda { namespace log {
 struct Module;
@@ -104,12 +105,14 @@ struct Info {
     Info (Level level, const Module* module, const string_view& file, uint32_t line, const string_view& func, const string_view& program_name)
         : level(level), module(module), file(file), line(line), func(func), program_name{program_name} {}
 
+    using time_point = std::chrono::system_clock::time_point;
+
     Level         level;
     const Module* module;
     string_view   file;
     uint32_t      line;
     string_view   func;
-    timespec      time;
+    time_point    time;
     string_view   program_name;
 };
 

@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Slices;
 
-our @EXPORT_OK = qw(PDL::PP affineinternal PDL::PP s_identity PDL::PP index PDL::PP index1d PDL::PP index2d  indexND indexNDb PDL::PP rangeb PDL::PP rld PDL::PP rle PDL::PP flowconvert PDL::PP converttypei PDL::PP _clump_int PDL::PP xchg PDL::PP mv PDL::PP oslice  using PDL::PP affine PDL::PP diagonalI PDL::PP lags PDL::PP splitdim PDL::PP rotate PDL::PP threadI PDL::PP identvaff PDL::PP unthread  dice dice_axis  slice PDL::PP sliceb );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(index index1d index2d indexND indexNDb rangeb rld rle flowconvert _clump_int xchg mv using diagonal lags splitdim rotate threadI unthread dice dice_axis slice );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Slices ;
+
 
 
 
@@ -92,47 +91,7 @@ use Scalar::Util 'blessed';
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
-
-
-
-
-
-*affineinternal = \&PDL::affineinternal;
-
-
-
-
-
-=head2 s_identity
-
-=for sig
-
-  Signature: (P(); C())
-
-=for ref
-
-Internal vaffine identity function.
-
-
-
-=for bad
-
-s_identity processes bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
-=cut
-
-
-
-
-
-
-*s_identity = \&PDL::s_identity;
 
 
 
@@ -159,7 +118,7 @@ The three routines thread slightly differently.
 
 =over 3
 
-=item * 
+=item *
 
 C<index> uses direct threading for 1-D indexing across the 0 dim
 of C<$source>.  It can thread over source thread dims or index thread
@@ -246,7 +205,7 @@ The three routines thread slightly differently.
 
 =over 3
 
-=item * 
+=item *
 
 C<index> uses direct threading for 1-D indexing across the 0 dim
 of C<$source>.  It can thread over source thread dims or index thread
@@ -333,7 +292,7 @@ The three routines thread slightly differently.
 
 =over 3
 
-=item * 
+=item *
 
 C<index> uses direct threading for 1-D indexing across the 0 dim
 of C<$source>.  It can thread over source thread dims or index thread
@@ -433,6 +392,11 @@ IndexND and IndexNDb were originally separate routines but they are both
 now implemented as a call to L</range>, and have identical syntax to
 one another.
 
+SEE ALSO:
+
+L<PDL::Primitive/whichND> returns N-D indices into a multidimensional
+PDL, suitable for feeding to this.
+
 =cut
 
 sub PDL::indexND {
@@ -492,7 +456,7 @@ sub PDL::range {
 
 =for sig
 
-  Signature: (P(); C(); SV *index; SV *size; SV *boundary)
+  Signature: (P(); C(); pdl *ind_pdl; SV *size; SV *boundary_sv)
 
 =for ref
 
@@ -813,7 +777,7 @@ sub PDL::rld {
     $c = $_[2];
   } else {
 # XXX Need to improve emulation of threading in auto-generating c
-    my ($size) = $x->sumover->max;
+    my ($size) = $x->sumover->max->sclr;
     my (@dims) = $x->dims;
     shift @dims;
     $c = $y->zeroes($size,@dims);
@@ -883,7 +847,7 @@ sub PDL::rle {
   my ($x,$y) = @_==2 ? @_ : (null,null);
   &PDL::_rle_int($c,$x,$y);
   my $max_ind = ($c->ndims<2) ? ($x!=0)->sumover-1 :
-                                ($x!=0)->clump(1..$x->ndims-1)->sumover->max-1;
+                                ($x!=0)->clump(1..$x->ndims-1)->sumover->max->sclr-1;
   return ($x->slice("0:$max_ind"),$y->slice("0:$max_ind"));
 }
 
@@ -895,12 +859,6 @@ sub PDL::rle {
 
 
 *flowconvert = \&PDL::flowconvert;
-
-
-
-
-
-*converttypei = \&PDL::converttypei;
 
 
 
@@ -1121,124 +1079,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-
-=head2 oslice
-
-=for sig
-
-  Signature: (P(); C(); char* str)
-
-=for ref
-
-DEPRECATED:  'oslice' is the original 'slice' routine in pre-2.006_006
-versions of PDL.  It is left here for reference but will disappear in
-PDL 3.000
-
-Extract a rectangular slice of an ndarray, from a string specifier.
-
-C<slice> was the original Swiss-army-knife PDL indexing routine, but is
-largely superseded by the L<NiceSlice|PDL::NiceSlice> source prefilter
-and its associated L<nslice|PDL::Core/nslice> method.  It is still used as the
-basic underlying slicing engine for L<nslice|PDL::Core/nslice>,
-and is especially useful in particular niche applications.
-
-=for example
-
- $x->slice('1:3');  #  return the second to fourth elements of $x
- $x->slice('3:1');  #  reverse the above
- $x->slice('-2:1'); #  return last-but-one to second elements of $x
-
-The argument string is a comma-separated list of what to do
-for each dimension. The current formats include
-the following, where I<a>, I<b> and I<c> are integers and can
-take legal array index values (including -1 etc):
-
-=over 8
-
-=item :
-
-takes the whole dimension intact.
-
-=item ''
-
-(nothing) is a synonym for ":"
-(This means that C<$x-E<gt>slice(':,3')> is equal to C<$x-E<gt>slice(',3')>).
-
-=item a
-
-slices only this value out of the corresponding dimension.
-
-=item (a)
-
-means the same as "a" by itself except that the resulting
-dimension of length one is deleted (so if C<$x> has dims C<(3,4,5)> then
-C<$x-E<gt>slice(':,(2),:')> has dimensions C<(3,5)> whereas
-C<$x-E<gt>slice(':,2,:')> has dimensions C<(3,1,5))>.
-
-=item a:b
-
-slices the range I<a> to I<b> inclusive out of the dimension.
-
-=item a:b:c
-
-slices the range I<a> to I<b>, with step I<c> (i.e. C<3:7:2> gives the indices
-C<(3,5,7)>). This may be confusing to Matlab users but several other
-packages already use this syntax.
-
-
-=item '*'
-
-inserts an extra dimension of width 1 and
-
-=item '*a'
-
-inserts an extra (dummy) dimension of width I<a>.
-
-=back
-
-An extension is planned for a later stage allowing
-C<$x-E<gt>slice('(=1),(=1|5:8),3:6(=1),4:6')>
-to express a multidimensional diagonal of C<$x>.
-
-Trivial out-of-bounds slicing is allowed: if you slice a source
-dimension that doesn't exist, but only index the 0th element, then
-C<slice> treats the source as if there were a dummy dimension there.
-The following are all equivalent:
-
-        xvals(5)->dummy(1,1)->slice('(2),0')  # Add dummy dim, then slice
-        xvals(5)->slice('(2),0')              # Out-of-bounds slice adds dim.
-        xvals(5)->slice((2),0)                # NiceSlice syntax
-        xvals(5)->((2))->dummy(0,1)           # NiceSlice syntax
-
-This is an error:
-
-        xvals(5)->slice('(2),1')        # nontrivial out-of-bounds slice dies
-
-Because slicing doesn't directly manipulate the source and destination
-pdl -- it just sets up a transformation between them -- indexing errors
-often aren't reported until later.  This is either a bug or a feature,
-depending on whether you prefer error-reporting clarity or speed of execution.
-
-
-
-=for bad
-
-oslice does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
-=cut
-
-
-
-
-
-
-*oslice = \&PDL::oslice;
-
-
-
-
 =head2 using
 
 =for ref
@@ -1272,17 +1112,11 @@ sub PDL::using {
 
 
 
-*affine = \&PDL::affine;
-
-
-
-
-
-=head2 diagonalI
+=head2 diagonal
 
 =for sig
 
-  Signature: (P(); C(); SV *list)
+  Signature: (P(); C(); PDL_Indx whichdims[])
 
 =for ref
 
@@ -1292,6 +1126,10 @@ The diagonal is placed at the first (by number) dimension that is
 diagonalized.
 The other diagonalized dimensions are removed. So if C<$x> has dimensions
 C<(5,3,5,4,6,5)> then after
+
+=for usage
+
+ $d = $x->diagonal(dim1, dim2,...)
 
 =for example
 
@@ -1303,10 +1141,31 @@ to C<$x-E<gt>at(2,1,2,0,1,2)>.
 
 NOTE: diagonal doesn't handle threadids correctly. XXX FIX
 
+ pdl> $x = zeroes(3,3,3);
+ pdl> ($y = $x->diagonal(0,1))++;
+ pdl> p $x
+ [
+  [
+   [1 0 0]
+   [0 1 0]
+   [0 0 1]
+  ]
+  [
+   [1 0 0]
+   [0 1 0]
+   [0 0 1]
+  ]
+  [
+   [1 0 0]
+   [0 1 0]
+   [0 0 1]
+  ]
+ ]
+
 
 =for bad
 
-diagonalI does not process bad values.
+diagonal does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -1315,9 +1174,10 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
 
 
-*diagonalI = \&PDL::diagonalI;
+*diagonal = \&PDL::diagonal;
 
 
 
@@ -1457,7 +1317,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (P(); C(); PDL_Indx id; SV *list)
+  Signature: (P(); C(); PDL_Indx id; PDL_Indx whichdims[])
 
 =for ref
 
@@ -1485,38 +1345,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 *threadI = \&PDL::threadI;
-
-
-
-
-
-=head2 identvaff
-
-=for sig
-
-  Signature: (P(); C())
-
-=for ref
-
-A vaffine identity transformation (includes thread_id copying).
-
-Mainly for internal use.
-
-
-=for bad
-
-identvaff does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
-=cut
-
-
-
-
-
-
-*identvaff = \&PDL::identvaff;
 
 
 
@@ -1711,7 +1539,12 @@ sub PDL::dice_axis {
 
 
 
+
 =head2 slice
+
+=for sig
+
+  Signature: (P(); C(); pdl_slice_args *arglist)
 
 =for usage
 
@@ -1859,7 +1692,6 @@ e.g. C<< $x->slice( pdl(3,4,9)) >> gives you elements 3, 4, and
 Because dicing is not an affine transformation, it is slower than
 direct slicing even though the syntax is convenient.
 
-
 =for example
 
  $x->slice('1:3');  #  return the second to fourth elements of $x
@@ -1870,79 +1702,10 @@ direct slicing even though the syntax is convenient.
  $x->slice([3,1]);
  $x->slice([-2,1]);
 
-=cut
-
-
-##############################
-# 'slice' is now implemented as a small Perl wrapper around
-# a PP call.  This permits unification of the former slice,
-# dice, and nslice into a single call.  At the moment, dicing
-# is implemented a bit kludgily (it is detected in the Perl
-# front-end), but it is serviceable.
-#  --CED 12-Sep-2013
-
-*slice = \&PDL::slice;
-sub PDL::slice (;@) {
-    my ($source, @others) = @_;
-
-    # Deal with dicing.  This is lame and slow compared to the
-    # faster slicing, but works okay.  We loop over each argument,
-    # and if it's a PDL we dispatch it in the most straightforward
-    # way.  Single-element and zero-element PDLs are trivial and get
-    # converted into slices for faster handling later.
-
-    for my $i(0..$#others) {
-      if( blessed($others[$i]) && $others[$i]->isa('PDL') ) {
-        my $idx = $others[$i];
-        if($idx->ndims > 1) {
-          barf("slice: dicing parameters must be at most 1D (arg $i)\n");
-        }
-        my $nlm = $idx->nelem;
-
-        if($nlm > 1) {
-
-	   #### More than one element - we have to dice (darn it).
-           my $n = $source->getndims;
-           $source = $source->mv($i,0)->index1d($idx)->mv(0,$i);
-           $others[$i] = '';
-
-        } 
-	elsif($nlm) {
-
-           #### One element - convert to a regular slice.
-           $others[$i] = $idx->flat->at(0);
-
-        }
-	else {
-	
-           #### Zero elements -- force an extended empty.
-           $others[$i] = "1:0:1";
-        }
-      }
-    }
-
-    PDL::sliceb($source,\@others);
-}
-
-
-
-
-
-=head2 sliceb
-
-=for sig
-
-  Signature: (P(); C(); SV *args)
-
-
-=for ref
-
-info not available
-
 
 =for bad
 
-sliceb does not process bad values.
+slice does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -1951,13 +1714,49 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+sub PDL::slice {
+    my ($source, @others) = @_;
+    for my $i(0..$#others) {
+      my $idx = $others[$i];
+      if (ref $idx eq 'ARRAY') {
+        my @arr = map UNIVERSAL::isa($_, 'PDL') ? $_->flat->at(0) : $_, @{$others[$i]};
+        $others[$i] = \@arr;
+        next;
+      }
+      next if !( blessed($idx) && $idx->isa('PDL') );
+      # Deal with dicing.  This is lame and slow compared to the
+      # faster slicing, but works okay.  We loop over each argument,
+      # and if it's a PDL we dispatch it in the most straightforward
+      # way.  Single-element and zero-element PDLs are trivial and get
+      # converted into slices for faster handling later.
+      barf("slice: dicing parameters must be at most 1D (arg $i)\n")
+        if $idx->ndims > 1;
+      my $nlm = $idx->nelem;
+      if($nlm > 1) {
+         #### More than one element - we have to dice (darn it).
+         my $n = $source->getndims;
+         $source = $source->mv($i,0)->index1d($idx)->mv(0,$i);
+         $others[$i] = '';
+      }
+      elsif($nlm) {
+         #### One element - convert to a regular slice.
+         $others[$i] = $idx->flat->at(0);
+      }
+      else {
+         #### Zero elements -- force an extended empty.
+         $others[$i] = "1:0:1";
+      }
+    }
+    PDL::_slice_int($source,my $o=$source->initialize,\@others);
+    $o;
+}
 
 
-*sliceb = \&PDL::sliceb;
+*slice = \&PDL::slice;
 
 
 
-;
+
 
 
 =head1 BUGS
@@ -1991,5 +1790,3 @@ the copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

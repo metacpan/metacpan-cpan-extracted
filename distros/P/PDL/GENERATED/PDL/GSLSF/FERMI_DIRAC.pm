@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::FERMI_DIRAC;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_fermi_dirac_int PDL::PP gsl_sf_fermi_dirac_mhalf PDL::PP gsl_sf_fermi_dirac_half PDL::PP gsl_sf_fermi_dirac_3half PDL::PP gsl_sf_fermi_dirac_inc_0 );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_fermi_dirac_int gsl_sf_fermi_dirac_mhalf gsl_sf_fermi_dirac_half gsl_sf_fermi_dirac_3half gsl_sf_fermi_dirac_inc_0 );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::FERMI_DIRAC ;
+
 
 
 
@@ -52,10 +51,7 @@ Incomplete Fermi-Dirac Integrals:
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -204,7 +200,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -227,5 +223,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

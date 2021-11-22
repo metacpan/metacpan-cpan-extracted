@@ -334,7 +334,7 @@ PDL::Factor - PDL subclass for keeping categorical data
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 SYNOPSIS
 

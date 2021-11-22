@@ -1,3 +1,12 @@
+0.002 2021-11-15 03:50:08-0500
+
+  Features
+
+   - Add support for ZMQ::FFI. Fixes <https://github.com/zmughal-CPAN/p5-Net-Async-ZMQ/issues/3>.
+     See PR <https://github.com/zmughal-CPAN/p5-Net-Async-ZMQ/pull/5>.
+   - Update example and tests to use ZMQ_POLLIN event.
+     See PR <https://github.com/zmughal-CPAN/p5-Net-Async-ZMQ/pull/7>.
+
 0.001 2017-12-16 15:19:57-0600
 
   Features

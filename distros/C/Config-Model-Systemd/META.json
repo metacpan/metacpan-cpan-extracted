@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Config::Model" : "2.133",
+            "Config::Model" : "2.143",
             "Module::Build" : "0.34"
          }
       },
@@ -31,7 +31,7 @@
             "Config::Model::TkUI" : "0"
          },
          "requires" : {
-            "Config::Model" : "2.133",
+            "Config::Model" : "2.143",
             "Config::Model::Backend::Any" : "0",
             "Config::Model::Backend::IniFile" : "0",
             "Log::Log4perl" : "0",
@@ -43,11 +43,14 @@
       },
       "test" : {
          "requires" : {
-            "Config::Model::Tester" : "4.005",
+            "Config::Model::Tester" : "4.007",
             "Config::Model::Tester::Setup" : "0",
             "English" : "0",
+            "File::Spec" : "0",
             "Test::File::Contents" : "0",
+            "Test::Log::Log4perl" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.00"
          }
       }
@@ -65,9 +68,9 @@
          "web" : "http://github.com/dod38fr/config-model-systemd"
       }
    },
-   "version" : "0.247.1",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "0.249.1",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "LGPL-2.1"
 }
 

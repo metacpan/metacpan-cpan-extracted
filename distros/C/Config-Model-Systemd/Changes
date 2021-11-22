@@ -1,3 +1,43 @@
+0.249.1 2021-11-12
+
+  For this release, I've reorganised the cme applications provided by this
+  module. I.e, some of the app names passed to cme command (like
+  systemd or systemd-service) have changed.
+
+  Here are the cme applications now provided by this module.
+
+  * For system administrators:
+    - systemd: applies to all system service:
+      e.g. "cme edit systemd transmission.*"
+    - systemd-service: applies to one system service 
+      e.g. "cme edit systemd transmission-daemon.service"
+    - systemd-timer: applies to one system timer 
+    - systemd-socker: applies to one system socker 
+
+  * For service developers:
+    - systemd-service-file: applies to one system service file.
+      e.g. "cme edit systemd ./src/transmission-daemon.service"
+    - systemd-timer-file: applies to one system timer file
+    - systemd-socker-file: applies to one system socker file
+
+  * For users:
+    - systemd-user: applies to all user service
+
+  Model update:
+    * updated Systemd models for version 249
+
+  Bug fixes
+    * Unit backend: allow on/off as boolean values
+    * improve user msg about unknown parameter
+    * fix (Unit): warn when no unit files were found
+    * fix (Unit): improve warning message to user
+    * systemd backend: rm empty *.d dir when needed
+    * systemd backend: create *.d dir when needed
+
+  Other Changes:
+    * requires Config::Model 2.143
+    * tests requires Config::Model::Tester 4.007
+
 0.247.1 2020-12-17
 
   Model update:

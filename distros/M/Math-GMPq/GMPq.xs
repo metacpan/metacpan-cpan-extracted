@@ -135,13 +135,13 @@ void _mpf_set_doubledouble(mpf_t * q, SV * p) {
      mpf_t t, d;
      long double lsd;                /* Will be assigned the Least Siginficant Double */
 
-     msd = (double)SvNVX(p);
+     msd = (double)SvNV(p);
      if(msd != 0.0) {
-       if(msd != msd) croak("In _Rmpf_set_ld (called from Rmpf_set_NV), cannot coerce a NaN to a Math::GMPf object");
-       if(msd / msd != 1.0) croak("In _Rmpf_set_ld (called from Rmpf_set_NV), cannot coerce an Inf to a Math::GMPf object");
+       if(msd != msd) croak("In _mpf_set_doubledouble (called from Rmpq_set_NV), cannot coerce a NaN to a Math::GMPf object");
+       if(msd / msd != 1.0) croak("In _mpf_set_doubledouble (called from Rmpq_set_NV), cannot coerce an Inf to a Math::GMPf object");
      }
 
-     lsd = SvNVX(p) - (long double)msd;
+     lsd = SvNV(p) - (long double)msd;
 
      mpf_init2(t, 2098);
      mpf_init2(d, 53);
@@ -171,12 +171,15 @@ void Rmpq_set_NV(pTHX_ mpq_t * copy, SV * original) {
      __float128 ld, buffer_size;
      int returned;
 
-     ld = (__float128)SvNVX(original);
+     if(!SV_IS_NOK(original))
+       croak("In Rmpq_set_NV, 2nd argument is not an NV");
+
+     ld = (__float128)SvNV(original);
      if(ld != ld) croak("In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value");
      if(ld != 0 && (ld / ld != 1))
        croak("In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value");
 
-     ld = frexpq((__float128)SvNVX(original), &exp);
+     ld = frexpq((__float128)SvNV(original), &exp);
 
      while(ld != floorq(ld)) {
           ld *= 2;
@@ -202,6 +205,9 @@ void Rmpq_set_NV(pTHX_ mpq_t * copy, SV * original) {
 #  if REQUIRED_LDBL_MANT_DIG == 2098
      mpf_t t;
 
+     if(!SV_IS_NOK(original))
+       croak("In Rmpq_set_NV, 2nd argument is not an NV");
+
      mpf_init2(t, 2098);
      _mpf_set_doubledouble(&t, original);
      mpq_set_f(*copy, t);
@@ -212,12 +218,15 @@ void Rmpq_set_NV(pTHX_ mpq_t * copy, SV * original) {
      int exp, exp2 = 0;
      long double ld, buffer_size;
 
-     ld = (long double)SvNVX(original);
+     if(!SV_IS_NOK(original))
+       croak("In Rmpq_set_NV, 2nd argument is not an NV");
+
+     ld = (long double)SvNV(original);
      if(ld != ld) croak("In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value");
      if(ld != 0 && (ld / ld != 1))
        croak("In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value");
 
-     ld = frexpl((long double)SvNVX(original), &exp);
+     ld = frexpl((long double)SvNV(original), &exp);
 
      while(ld != floorl(ld)) {
           ld *= 2;
@@ -239,7 +248,12 @@ void Rmpq_set_NV(pTHX_ mpq_t * copy, SV * original) {
 #  endif
 
 #else
-     double d = SvNVX(original);
+     double d;
+
+     if(!SV_IS_NOK(original))
+       croak("In Rmpq_set_NV, 2nd argument is not an NV");
+
+     d = SvNV(original);
      if(d != d) croak("In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value");
      if(d != 0 && (d / d != 1))
        croak("In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value");
@@ -253,20 +267,23 @@ int Rmpq_cmp_NV(pTHX_ mpq_t * a, SV * b) {
      mpq_t t;
      int returned;
 
+     if(!SvNOK(b))
+       croak("In Rmpq_cmp_NV, 2nd argument is not an NV");
+
 #if defined(USE_QUADMATH)
 
      char * buffer;
      int exp, exp2 = 0;
      __float128 ld, buffer_size;
 
-     ld = (__float128)SvNVX(b);
-     if(ld != ld) croak("In Rmpq_cmp_NV, cannot coerce a NaN to a Math::GMPq value");
+     ld = (__float128)SvNV(b);
+     if(ld != ld) croak("In Rmpq_cmp_NV, cannot compare a NaN to a Math::GMPq value");
      if(ld != 0 && (ld / ld != 1)) {
        if(ld > 0) return -1;
        return 1;
      }
 
-     ld = frexpq((__float128)SvNVX(b), &exp);
+     ld = frexpq((__float128)SvNV(b), &exp);
 
      while(ld != floorq(ld)) {
           ld *= 2;
@@ -289,19 +306,33 @@ int Rmpq_cmp_NV(pTHX_ mpq_t * a, SV * b) {
      else mpq_mul_2exp(t, t, exp - exp2);
 
 #elif defined(USE_LONG_DOUBLE)
+# if REQUIRED_LDBL_MANT_DIG == 2098
+     mpf_t temp;
+     long double ld = (long double)SvNV(b);
+     if(ld != ld) croak("In Rmpq_cmp_NV, cannot compare a NaN to a Math::GMPq value");
+     if(ld != 0 && ld / ld != 1) {
+       if(ld > 0) return -1;
+       return 1;
+     }
+     mpq_init(t);
+     mpf_init2(temp, 2098);
+     _mpf_set_doubledouble(&temp, b);
+     mpq_set_f(t, temp);
+     mpf_clear(temp);
 
+#  else
      char * buffer;
      int exp, exp2 = 0;
      long double ld, buffer_size;
 
-     ld = (long double)SvNVX(b);
-     if(ld != ld) croak("In Rmpq_cmp_NV, cannot coerce a NaN to a Math::GMPq value");
+     ld = (long double)SvNV(b);
+     if(ld != ld) croak("In Rmpq_cmp_NV, cannot compare a NaN to a Math::GMPq value");
      if(ld != 0 && (ld / ld != 1)) {
        if(ld > 0) return -1;
        return 1;
      }
 
-     ld = frexpl((long double)SvNVX(b), &exp);
+     ld = frexpl((long double)SvNV(b), &exp);
 
      while(ld != floorl(ld)) {
           ld *= 2;
@@ -321,9 +352,10 @@ int Rmpq_cmp_NV(pTHX_ mpq_t * a, SV * b) {
      if (exp2 > exp) mpq_div_2exp(t, t, exp2 - exp);
      else mpq_mul_2exp(t, t, exp - exp2);
 
+#  endif
 #else
-     double d = SvNVX(b);
-     if(d != d) croak("In Rmpq_cmp_NV, cannot coerce a NaN to a Math::GMPq value");
+     double d = SvNV(b);
+     if(d != d) croak("In Rmpq_cmp_NV, cannot compare a NaN to a Math::GMPq value");
      if(d != 0 && (d / d != 1)) {
        if(d > 0) return -1;
        return 1;
@@ -336,32 +368,6 @@ int Rmpq_cmp_NV(pTHX_ mpq_t * a, SV * b) {
      mpq_clear(t);
      return returned;
 }
-
-/* No longer used *//*
-//void _Rmpq_set_ld(pTHX_ mpq_t * q, SV * p) {
-//#ifdef USE_LONG_DOUBLE
-//     char buffer[50];
-//     int exp, exp2 = 0;
-//     long double fr;
-//
-//     fr = frexpl((long double)SvNV(p), &exp);
-//
-//     while(fr != floorl(fr)) {
-//          fr *= 2;
-//          exp2 += 1;
-//     }
-//
-//     sprintf(buffer, "%.0Lf", fr);
-//
-//     mpq_set_str(*q, buffer, 10);
-//
-//     if (exp2 > exp) mpq_div_2exp(*q, *q, exp2 - exp);
-//     else mpq_mul_2exp(*q, *q, exp - exp2);
-//#else
-//     croak("_Rmpq_set_ld not implemented on this build of perl");
-//#endif
-//}
-*/
 
 void Rmpq_set_f(mpq_t * p, mpf_t * f) {
      mpq_set_f(*p, *f);
@@ -619,6 +625,45 @@ void Rmpq_pow_ui(mpq_t * rop, mpq_t * op, unsigned long ui) {
      mpz_pow_ui(mpq_denref(*rop), mpq_denref(*op), ui);
 }
 
+/* Also handles UV values */
+void Rmpq_set_IV(pTHX_ mpq_t * a, SV * my_iv1, SV * my_iv2) {
+     mpq_t temp;
+
+     if(SV_IS_IOK(my_iv1) && SV_IS_IOK(my_iv2)) {
+       mpq_init(temp);
+
+#ifdef MATH_GMPQ_NEED_LONG_LONG_INT
+       mpq_set_str(*a,   SvPV_nolen(my_iv1), 10);
+       mpq_set_str(temp, SvPV_nolen(my_iv2), 10);
+       mpq_div(*a, *a, temp);
+
+#else
+       if(SvUOK(my_iv1)) mpq_set_ui(*a, SvUVX(my_iv1), SvUV(my_iv2));
+       else mpq_set_si(*a, SvIVX(my_iv1), SvUV(my_iv2));
+
+#endif
+       mpq_clear(temp);
+     }
+
+     else croak("Arg provided to Rmpq_set_IV not an IV");
+}
+
+int Rmpq_cmp_IV(pTHX_ mpq_t * q, SV * iv1, SV * iv2) {
+    mpq_t temp;
+    int ret;
+
+    if(!SvIOK(iv1) || !SvIOK(iv2))
+      croak("Arg provided to Rmpq_cmp_IV is not an IV");
+
+    mpq_init(temp);
+
+    Rmpq_set_IV(aTHX_ &temp, iv1, iv2);
+    ret = mpq_cmp(*q, temp);
+
+    mpq_clear(temp);
+    return ret;
+}
+
 /* Finish typemapping - typemap 1st arg only */
 
 SV * overload_mul(pTHX_ SV * a, SV * b, SV * third) {
@@ -638,20 +683,11 @@ SV * overload_mul(pTHX_ SV * a, SV * b, SV * third) {
        SvREADONLY_on(obj);
      }
 
-#ifndef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_set_d(*mpq_t_obj, SvNV(b));
+       Rmpq_set_IV(aTHX_ mpq_t_obj, b, newSViv(1));
        mpq_mul(*mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *mpq_t_obj);
        return obj_ref;
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(mpq_set_str(*mpq_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_mul");
-       mpq_mul(*mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *mpq_t_obj);
-       return obj_ref;
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        if(mpq_set_str(*mpq_t_obj, SvPV_nolen(b), 0))
@@ -703,20 +739,11 @@ SV * overload_add(pTHX_ SV * a, SV * b, SV * third) {
        SvREADONLY_on(obj);
      }
 
-#ifndef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_set_d(*mpq_t_obj, SvNV(b));
+       Rmpq_set_IV(aTHX_ mpq_t_obj, b, newSViv(1));
        mpq_add(*mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *mpq_t_obj);
        return obj_ref;
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(mpq_set_str(*mpq_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_add");
-       mpq_add(*mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *mpq_t_obj);
-       return obj_ref;
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        if(mpq_set_str(*mpq_t_obj, SvPV_nolen(b), 0))
@@ -768,22 +795,12 @@ SV * overload_sub(pTHX_ SV * a, SV * b, SV * third) {
        SvREADONLY_on(obj);
      }
 
-#ifndef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_set_d(*mpq_t_obj, SvNV(b));
+       Rmpq_set_IV(aTHX_ mpq_t_obj, b, newSViv(1));
        if(third == &PL_sv_yes) mpq_sub(*mpq_t_obj, *mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))));
        else mpq_sub(*mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *mpq_t_obj);
        return obj_ref;
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(mpq_set_str(*mpq_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_sub");
-       if(third == &PL_sv_yes) mpq_sub(*mpq_t_obj, *mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))));
-       else mpq_sub(*mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *mpq_t_obj);
-       return obj_ref;
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        if(mpq_set_str(*mpq_t_obj, SvPV_nolen(b), 0))
@@ -843,28 +860,14 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
        SvREADONLY_on(obj);
      }
 
-#ifndef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
        if(SvIV(b) == 0)
          croak("Division by 0 not allowed in Math::GMPq::overload_div");
-       mpq_set_d(*mpq_t_obj, SvNV(b));
+       Rmpq_set_IV(aTHX_ mpq_t_obj, b, newSViv(1));
        if(third == &PL_sv_yes) mpq_div(*mpq_t_obj, *mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))));
        else mpq_div(*mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *mpq_t_obj);
        return obj_ref;
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(SvIV(b) == 0)
-         croak("Division by 0 not allowed in Math::GMPq::overload_div");
-
-       if(mpq_set_str(*mpq_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_div");
-
-       if(third == &PL_sv_yes) mpq_div(*mpq_t_obj, *mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))));
-       else mpq_div(*mpq_t_obj, *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *mpq_t_obj);
-       return obj_ref;
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        if(mpq_set_str(*mpq_t_obj, SvPV_nolen(b), 0))
@@ -1312,32 +1315,12 @@ SV * overload_gt(pTHX_ mpq_t * a, SV * b, SV * third) {
      mpq_t t;
      int ret;
 
-#ifdef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_gt");
-       ret = mpq_cmp(*a, t);
-       mpq_clear(t);
+       ret = Rmpq_cmp_IV(aTHX_ a, b, newSViv(1));
        if(third == &PL_sv_yes) ret *= -1;
        if(ret > 0) return newSViv(1);
        return newSViv(0);
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         ret = mpq_cmp_ui(*a, SvUVX(b), 1);
-         if(third == &PL_sv_yes) ret *= -1;
-         if(ret > 0) return newSViv(1);
-         return newSViv(0);
-       }
-
-       ret = mpq_cmp_si(*a, SvIVX(b), 1);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret > 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
@@ -1391,32 +1374,12 @@ SV * overload_gte(pTHX_ mpq_t * a, SV * b, SV * third) {
      mpq_t t;
      int ret;
 
-#ifdef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_gte");
-       ret = mpq_cmp(*a, t);
-       mpq_clear(t);
+       ret = Rmpq_cmp_IV(aTHX_ a, b, newSViv(1));
        if(third == &PL_sv_yes) ret *= -1;
        if(ret >= 0) return newSViv(1);
        return newSViv(0);
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         ret = mpq_cmp_ui(*a, SvUVX(b), 1);
-         if(third == &PL_sv_yes) ret *= -1;
-         if(ret >= 0) return newSViv(1);
-         return newSViv(0);
-       }
-
-       ret = mpq_cmp_si(*a, SvIVX(b), 1);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret >= 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
@@ -1470,32 +1433,12 @@ SV * overload_lt(pTHX_ mpq_t * a, SV * b, SV * third) {
      mpq_t t;
      int ret;
 
-#ifdef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_lt");
-       ret = mpq_cmp(*a, t);
-       mpq_clear(t);
+       ret = Rmpq_cmp_IV(aTHX_ a, b, newSViv(1));
        if(third == &PL_sv_yes) ret *= -1;
        if(ret < 0) return newSViv(1);
        return newSViv(0);
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         ret = mpq_cmp_ui(*a, SvUVX(b), 1);
-         if(third == &PL_sv_yes) ret *= -1;
-         if(ret < 0) return newSViv(1);
-         return newSViv(0);
-       }
-
-       ret = mpq_cmp_si(*a, SvIVX(b), 1);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret < 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
@@ -1549,32 +1492,12 @@ SV * overload_lte(pTHX_ mpq_t * a, SV * b, SV * third) {
      mpq_t t;
      int ret;
 
-#ifdef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_lte");
-       ret = mpq_cmp(*a, t);
-       mpq_clear(t);
+       ret = Rmpq_cmp_IV(aTHX_ a, b, newSViv(1));
        if(third == &PL_sv_yes) ret *= -1;
        if(ret <= 0) return newSViv(1);
        return newSViv(0);
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         ret = mpq_cmp_ui(*a, SvUVX(b), 1);
-         if(third == &PL_sv_yes) ret *= -1;
-         if(ret <= 0) return newSViv(1);
-         return newSViv(0);
-       }
-
-       ret = mpq_cmp_si(*a, SvIVX(b), 1);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret <= 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
@@ -1629,29 +1552,11 @@ SV * overload_spaceship(pTHX_ mpq_t * a, SV * b, SV * third) {
      mpq_t t;
      int ret;
 
-#ifdef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_spaceship");
-       ret = mpq_cmp(*a, t);
-       mpq_clear(t);
+       ret = Rmpq_cmp_IV(aTHX_ a, b, newSViv(1));
        if(third == &PL_sv_yes) ret *= -1;
        return newSViv(ret);
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         ret = mpq_cmp_ui(*a, SvUVX(b), 1);
-         if(third == &PL_sv_yes) ret *= -1;
-         return newSViv(ret);
-       }
-
-       ret = mpq_cmp_si(*a, SvIVX(b), 1);
-       if(third == &PL_sv_yes) ret *= -1;
-       return newSViv(ret);
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
@@ -1699,48 +1604,10 @@ SV * overload_equiv(pTHX_ mpq_t * a, SV * b, SV * third) {
      mpq_t t;
      int ret = 0;
 
-#if defined(USE_QUADMATH)
-
-     char * buffer;
-     int returned;
-     __float128 buffer_size;
-     __float128 ld;
-
-#elif defined(USE_LONG_DOUBLE)
-#  if REQUIRED_LDBL_MANT_DIG == 2098
-     mpf_t temp;
-     long double ld;
-
-#  else
-     char * buffer;
-     long double buffer_size;
-     long double ld;
-
-#  endif
-#endif
-
-#ifdef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_equiv");
-       ret = mpq_equal(*a, t);
-       mpq_clear(t);
-       return newSViv(ret);
+       if(Rmpq_cmp_IV(aTHX_ a, b, newSViv(1))) return newSViv(0);
+       return newSViv(1);
      }
-#else
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         ret = mpq_cmp_ui(*a, SvUVX(b), 1);
-         if(ret == 0) return newSViv(1);
-         return newSViv(0);
-       }
-
-       ret = mpq_cmp_si(*a, SvIVX(b), 1);
-       if(ret == 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        if(_is_infstring(SvPV_nolen(b))) return newSViv(0);
@@ -1754,90 +1621,8 @@ SV * overload_equiv(pTHX_ mpq_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
-
-#if defined(USE_QUADMATH)
-       int exp, exp2 = 0;
-
-       ld = (__float128)SvNVX(b);
-       if(ld != ld) croak("In Math::GMPq::overload_equiv, cannot compare a NaN to a Math::GMPq value");
-       if(ld != 0 && ld / ld != 1) return newSViv(0);
-
-       ld = frexpq((__float128)SvNVX(b), &exp);
-
-       while(ld != floorq(ld)) {
-            ld *= 2;
-            exp2 += 1;
-       }
-
-       buffer_size = ld < 0.0Q ? ld * -1.0Q : ld;
-       buffer_size = ceilq(logq(buffer_size + 1) / 2.30258509299404568401799145468436418Q);
-
-       Newxz(buffer, (int)buffer_size + 5, char);
-
-       returned = quadmath_snprintf(buffer, (size_t)buffer_size + 5, "%.0Qf", ld);
-       if(returned < 0) croak("In Math::GMPq::overload_equiv, encoding error in quadmath_snprintf function");
-       if(returned >= buffer_size + 5) croak("In Math::GMPq::overload_equiv, buffer given to quadmath_snprintf function was too small");
-       mpq_init(t);
-       mpq_set_str(t, buffer, 10);
-       Safefree(buffer);
-       if (exp2 > exp) mpq_div_2exp(t, t, exp2 - exp);
-       else mpq_mul_2exp(t, t, exp - exp2);
-       ret = mpq_equal(*a, t);
-       mpq_clear(t);
-
-#elif defined(USE_LONG_DOUBLE)
-
-# if REQUIRED_LDBL_MANT_DIG == 2098
-       ld = (long double)SvNVX(b);
-       if(ld != ld) croak("In Math::GMPq::overload_equiv, cannot compare a NaN to a Math::GMPq value");
-       if(ld != 0 && ld / ld != 1) return newSViv(0);
-       mpq_init(t);
-       mpf_init2(temp, 2098);
-       _mpf_set_doubledouble(&temp, b);
-       mpq_set_f(t, temp);
-       ret = mpq_equal(*a, t);
-       mpf_clear(temp);
-       mpq_clear(t);
-
-# else
-       int exp, exp2 = 0;
-
-       ld = (long double)SvNVX(b);
-       if(ld != ld) croak("In Math::GMPq::overload_equiv, cannot compare a NaN to a Math::GMPq value");
-       if(ld != 0 && ld / ld != 1) return newSViv(0);
-
-       ld = frexpl((long double)SvNVX(b), &exp);
-
-       while(ld != floorl(ld)) {
-            ld *= 2;
-            exp2 += 1;
-       }
-
-       buffer_size = ld < 0.0L ? ld * -1.0L : ld;
-       buffer_size = ceill(logl(buffer_size + 1) / 2.30258509299404568401799145468436418L);
-
-       Newxz(buffer, (int)buffer_size + 5, char);
-
-       if(sprintf(buffer, "%.0Lf", ld) >= (int)buffer_size + 5) croak("In Math::GMPq::overload_equiv, buffer overflow in sprintf function");
-       mpq_init(t);
-       mpq_set_str(t, buffer, 10);
-       Safefree(buffer);
-       if (exp2 > exp) mpq_div_2exp(t, t, exp2 - exp);
-       else mpq_mul_2exp(t, t, exp - exp2);
-       ret = mpq_equal(*a, t);
-       mpq_clear(t);
-
-#  endif
-#else
-       double d = SvNVX(b);
-       if(d != d) croak("In Math::GMPq::overload_equiv, cannot compare a NaN to a Math::GMPq value");
-       if(d != 0 && d / d != 1) return newSViv(0);
-       mpq_init(t);
-       mpq_set_d(t, SvNVX(b));
-       ret = mpq_equal(*a, t);
-       mpq_clear(t);
-#endif
-       return newSViv(ret);
+       if(Rmpq_cmp_NV(aTHX_ a, b)) return newSViv(0);
+       return newSViv(1);
      }
 
      if(sv_isobject(b)) {
@@ -1864,44 +1649,11 @@ SV * overload_not_equiv(pTHX_ mpq_t * a, SV * b, SV * third) {
      mpq_t t;
      int ret = 0;
 
-#if defined(USE_QUADMATH)
 
-     char * buffer;
-     int returned;
-     __float128 buffer_size;
-     __float128 ld;
-
-#elif defined(USE_LONG_DOUBLE)
-
-     char * buffer;
-     long double buffer_size;
-     long double ld;
-
-#endif
-
-#ifdef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string supplied to Math::GMPq::overload_not_equiv");
-       ret = mpq_equal(*a, t);
-       mpq_clear(t);
-       if(ret) return newSViv(0);
-       return newSViv(1);
-     }
-#else
-     if(SV_IS_IOK(b)) {
-       if(SvUOK(b)) {
-         ret = mpq_cmp_ui(*a, SvUVX(b), 1);
-         if(ret != 0) return newSViv(1);
-         return newSViv(0);
-       }
-
-       ret = mpq_cmp_si(*a, SvIVX(b), 1);
-       if(ret != 0) return newSViv(1);
+       if(Rmpq_cmp_IV(aTHX_ a, b, newSViv(1))) return newSViv(1);
        return newSViv(0);
      }
-#endif
 
      if(SV_IS_POK(b)) {
        if(_is_infstring(SvPV_nolen(b))) return newSViv(1);
@@ -1916,77 +1668,10 @@ SV * overload_not_equiv(pTHX_ mpq_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
-
-#if defined(USE_QUADMATH)
-       int exp, exp2 = 0;
-
-       ld = (__float128)SvNVX(b);
-       if(ld != ld) croak("In Math::GMPq::overload_not_equiv, cannot compare a NaN to a Math::GMPq value");
-       if(ld != 0 && ld / ld != 1) return newSViv(1);
-
-       ld = frexpq((__float128)SvNVX(b), &exp);
-
-       while(ld != floorq(ld)) {
-            ld *= 2;
-            exp2 += 1;
-       }
-
-       buffer_size = ld < 0.0Q ? ld * -1.0Q : ld;
-       buffer_size = ceilq(logq(buffer_size + 1) / 2.30258509299404568401799145468436418Q);
-
-       Newxz(buffer, (int)buffer_size + 5, char);
-
-       returned = quadmath_snprintf(buffer, (size_t)buffer_size + 5, "%.0Qf", ld);
-       if(returned < 0) croak("In Math::GMPq::overload_not_equiv, encoding error in quadmath_snprintf function");
-       if(returned >= buffer_size + 5) croak("In Math::GMPq::overload_equiv, buffer given to quadmath_snprintf function was too small");
-       mpq_init(t);
-       mpq_set_str(t, buffer, 10);
-       Safefree(buffer);
-       if (exp2 > exp) mpq_div_2exp(t, t, exp2 - exp);
-       else mpq_mul_2exp(t, t, exp - exp2);
-       ret = mpq_equal(*a, t);
-       mpq_clear(t);
-
-#elif defined(USE_LONG_DOUBLE)
-       int exp, exp2 = 0;
-
-       ld = (long double)SvNVX(b);
-       if(ld != ld) croak("In Math::GMPq::overload_not_equiv, cannot compare a NaN to a Math::GMPq value");
-       if(ld != 0 && ld / ld != 1) return newSViv(1);
-
-       ld = frexpl((long double)SvNVX(b), &exp);
-
-       while(ld != floorl(ld)) {
-            ld *= 2;
-            exp2 += 1;
-       }
-
-       buffer_size = ld < 0.0L ? ld * -1.0L : ld;
-       buffer_size = ceill(logl(buffer_size + 1) / 2.30258509299404568401799145468436418L);
-
-       Newxz(buffer, (int)buffer_size + 5, char);
-
-       if(sprintf(buffer, "%.0Lf", ld) >= (int)buffer_size + 5) croak("In Math::GMPq::overload_not_equiv, buffer overflow in sprintf function");
-       mpq_init(t);
-       mpq_set_str(t, buffer, 10);
-       Safefree(buffer);
-       if (exp2 > exp) mpq_div_2exp(t, t, exp2 - exp);
-       else mpq_mul_2exp(t, t, exp - exp2);
-       ret = mpq_equal(*a, t);
-       mpq_clear(t);
-#else
-       double d = SvNVX(b);
-       if(d != d) croak("In Math::GMPq::overload_not_equiv, cannot compare a NaN to a Math::GMPq value");
-       if(d != 0 && d / d != 1) return newSViv(1);
-       mpq_init(t);
-       mpq_set_d(t, SvNVX(b));
-       ret = mpq_equal(*a, t);
-       mpq_clear(t);
-#endif
-
-       if(ret) return newSViv(0);
-       return newSViv(1);
+       if(Rmpq_cmp_NV(aTHX_ a, b)) return newSViv(1);
+       return newSViv(0);
      }
+
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
@@ -2047,26 +1732,13 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      SvREFCNT_inc(a);
 
-#ifndef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
        mpq_init(t);
-       mpq_set_d(t, SvNV(b));
+       Rmpq_set_IV(aTHX_ &t, b, newSViv(1));
        mpq_mul(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), t);
        mpq_clear(t);
        return a;
      }
-#else
-     if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string supplied to Math::GMPq::overload_mul_eq");
-       }
-       mpq_mul(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), t);
-       mpq_clear(t);
-       return a;
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        mpq_init(t);
@@ -2111,28 +1783,15 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      SvREFCNT_inc(a);
 
-#ifndef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
        mpq_init(t);
-       mpq_set_d(t, SvNV(b));
+       Rmpq_set_IV(aTHX_ &t, b, newSViv(1));
        mpq_add(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), t);
        mpq_clear(t);
        return a;
      }
-#else
-     if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string supplied to Math::GMPq::overload_add_eq");
-       }
-       mpq_add(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), t);
-       mpq_clear(t);
-       return a;
-     }
-#endif
 
-     if(SV_IS_POK(b)) {
+     else if(SV_IS_POK(b)) {
        mpq_init(t);
        if(mpq_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
@@ -2144,7 +1803,7 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 
-     if(SV_IS_NOK(b)) {
+     else if(SV_IS_NOK(b)) {
        mpq_init(t);
        Rmpq_set_NV(aTHX_ &t, b);
        mpq_add(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), t);
@@ -2152,7 +1811,7 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 
-     if(sv_isobject(b)) {
+     else if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPq")) {
          mpq_add(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(b)))));
@@ -2173,26 +1832,13 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      SvREFCNT_inc(a);
 
-#ifndef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
        mpq_init(t);
-       mpq_set_d(t, SvNV(b));
+       Rmpq_set_IV(aTHX_ &t, b, newSViv(1));
        mpq_sub(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), t);
        mpq_clear(t);
        return a;
      }
-#else
-     if(SV_IS_IOK(b)) {
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string supplied to Math::GMPq::overload_sub_eq");
-       }
-       mpq_sub(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), t);
-       mpq_clear(t);
-       return a;
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        mpq_init(t);
@@ -2237,34 +1883,15 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      SvREFCNT_inc(a);
 
-#ifndef MATH_GMPQ_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
-
        if(SvIV(b) == 0)
          croak("Division by 0 not allowed in Math::GMPq::overload_div_eq");
-
        mpq_init(t);
-       mpq_set_d(t, SvNV(b));
+       Rmpq_set_IV(aTHX_ &t, b, newSViv(1));
        mpq_div(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), t);
        mpq_clear(t);
        return a;
      }
-#else
-     if(SV_IS_IOK(b)) {
-
-       if(SvIV(b) == 0)
-         croak("Division by 0 not allowed in Math::GMPq::overload_div_eq");
-
-       mpq_init(t);
-       if(mpq_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string supplied to Math::GMPq::overload_div_eq");
-       }
-       mpq_div(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), t);
-       mpq_clear(t);
-       return a;
-     }
-#endif
 
      if(SV_IS_POK(b)) {
        mpq_init(t);
@@ -2768,6 +2395,23 @@ int _SvPOK(pTHX_ SV * in) {
 int _required_ldbl_mant_dig(void) {
     return REQUIRED_LDBL_MANT_DIG;
 }
+
+int IOK_flag(SV * sv) {
+  if(SvUOK(sv)) return 2;
+  if(SvIOK(sv)) return 1;
+  return 0;
+}
+
+int POK_flag(SV * sv) {
+  if(SvPOK(sv)) return 1;
+  return 0;
+}
+
+int NOK_flag(SV * sv) {
+  if(SvNOK(sv)) return 1;
+  return 0;
+}
+
 
 
 MODULE = Math::GMPq  PACKAGE = Math::GMPq
@@ -3584,6 +3228,33 @@ Rmpq_pow_ui (rop, op, ui)
         /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
 
+void
+Rmpq_set_IV (a, my_iv1, my_iv2)
+	mpq_t *	a
+	SV *	my_iv1
+	SV *	my_iv2
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpq_set_IV(aTHX_ a, my_iv1, my_iv2);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+int
+Rmpq_cmp_IV (q, iv1, iv2)
+	mpq_t *	q
+	SV *	iv1
+	SV *	iv2
+CODE:
+  RETVAL = Rmpq_cmp_IV (aTHX_ q, iv1, iv2);
+OUTPUT:  RETVAL
+
 SV *
 overload_mul (a, b, third)
 	SV *	a
@@ -4007,4 +3678,16 @@ OUTPUT:  RETVAL
 int
 _required_ldbl_mant_dig ()
 
+
+int
+IOK_flag (sv)
+	SV *	sv
+
+int
+POK_flag (sv)
+	SV *	sv
+
+int
+NOK_flag (sv)
+	SV *	sv
 

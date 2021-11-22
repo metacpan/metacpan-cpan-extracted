@@ -1,10 +1,11 @@
+.github/workflows/all.yml
 .gitignore
-.travis.yml
 Changes
 LICENSE
 MANIFEST
 Makefile.PL
 README.md
+cpanfile
 lib/Crypt/Perl.pm
 lib/Crypt/Perl/ASN1.pm
 lib/Crypt/Perl/ASN1/BitString.pm

@@ -1,68 +1,97 @@
 Revision history for PGObject
 
-2.0.2	2017-08-25
-	Code cleanup
-	Test case improvements
-	Reduced warnings in test cases in some cases
+2.3.2   2021-11-07
+      * `$sth->rows` works for SELECT queries on DBD::Mock *and* DBD::Pg
+        whereas `$sth->execute()` only returns the number of rows on
+        DBD::Pg
 
-2.0.1	2017-05-24
-	Fixing undeclared dependency in makefile
+2.3.1   2021-11-07
+      * Fix test expectation
 
-2.0.0	2017-05-19
-	Min Perl version is now 5.10
-	Broke the deserialization API off to PGObject::Type::Registry (included)
-	Can now specify PGObject new registries on import
-	Registries are now fully private and cannot be changed from outside
-	Moved column deserialization function
-	Redesigned type registration interface
-	Old type registration routines deprecated
-	Old column deserialization function removed
+2.3.0   2021-11-07
+      * Better formatting of COPYRIGHT section in POD
+      * Update SUPPORT section in POD
+      * Replace Carp with Carp::Clan for better error reporting
+      * Improve some error messages to include some context
+        (notably the object being complained about)
+      * Remove Try::Tiny module from dependencies (unused)
+      * Add Log::Any to dependencies for error logging
+
+2.2.1   2020-08-30
+      * MetaCPAN parseable bulleted lists in Changes
+
+2.2.0   2020-08-16
+      * Add `rowhash_deserializer` to allocate an efficient row deserializer
+        as returned from `fetchrow_hashref`.
+      * Fix two Kwalitee 'extra'-category warnings (license, mixed versions)
+
+2.1.0   2020-08-15
+      * Add `deserializer` method as a performance optimization for repeated
+        calls to `deserialize`
+
+2.0.2   2017-08-25
+      * Code cleanup
+      * Test case improvements
+      * Reduced warnings in test cases in some cases
+
+2.0.1   2017-05-24
+      * Fixing undeclared dependency in makefile
+
+2.0.0   2017-05-19
+      * Min Perl version is now 5.10
+      * Broke the deserialization API off to PGObject::Type::Registry (included)
+      * Can now specify PGObject new registries on import
+      * Registries are now fully private and cannot be changed from outside
+      * Moved column deserialization function
+      * Redesigned type registration interface
+      * Old type registration routines deprecated
+      * Old column deserialization function removed
 
 1.403.2 2016-11-21
-        Fixing matching of 'asc|desc' sort order specifiers
+      * Fixing matching of 'asc|desc' sort order specifiers
 
 1.403.1 2016-11-20
-        Fixing issue #11: Mapper hints from helpers discarded
-        Fix call_procedure() 'orderby' syntax errors
+      * Fixing issue #11: Mapper hints from helpers discarded
+      * Fix call_procedure() 'orderby' syntax errors
 
 1.402.9 2016-02-13
-        Fixing warning in map
+      * Fixing warning in map
 
 1.402.8 2015-10-10
-        Fixing array ref handling, and tightening up ref handling
+      * Fixing array ref handling, and tightening up ref handling
 
 1.402.7 2015-09-09
-        local $@ to hide eval failures from bleeding up
+      * local $@ to hide eval failures from bleeding up
 
 1.402.6 2014-10-09
-        Better exception handling
+      * Better exception handling
 
 1.402.5 2014-09-07
-        Fixed test numbering that caused build failures
+      * Fixed test numbering that caused build failures
 
 1.402.4 2014-09-05
-        Fixed to_db and pgobject_to_db serialization functions (+added tests)
+      * Fixed to_db and pgobject_to_db serialization functions (+added tests)
 
 1.402.3 2014-09-04
-        Supporting both the old pgobject_to_db and the new to_db methods.
-        More code cleanup
+      * Supporting both the old pgobject_to_db and the new to_db methods.
+      * More code cleanup
 
 1.402.2 2014-09-01
-        Code cleanup
+      * Code cleanup
 
 1.402.1 2014-08-21
-        Better documentation of memoization uses and misuses.
+      * Better documentation of memoization uses and misuses.
 
 1.402.0 2014-08-20
-        Added optional memoization of database catalog lookups.
+      * Added optional memoization of database catalog lookups.
 
 1.4.1   2014-03-03
-        Fixed type instantiation bug when calling from externally with a 
+      * Fixed type instantiation bug when calling from externally with a
         named registry
 
 1.4     2014-02-24
         1. Added support for arrays and registered types.   Note that this does
-        not parse the array from text format and only handles an array passed 
+        not parse the array from text format and only handles an array passed
         to it.  This paves the way for array-handling composite types, however.
 
         2.  DB_TESTING environment variable now used to control database tests,
@@ -85,7 +114,7 @@ Revision history for PGObject
         1. Minor changes to test cases to let them finish cleanly when the db is
            not available.
         2. Minor documentation changes.
-        
+
 1.00    2013-05-24
         First version, released on an unsuspecting world.
         Differences from LedgerSMB's interface include:

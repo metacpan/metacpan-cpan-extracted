@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad;
 
-package App::sdview::Output::Markdown 0.04;
+package App::sdview::Output::Markdown 0.05;
 class App::sdview::Output::Markdown
    does App::sdview::Output
    :strict(params);
@@ -50,7 +50,7 @@ method _output_list ( $para )
 {
    $self->maybe_blank;
 
-   my $n = 1;
+   my $n = $para->initial;
    foreach my $item ( $para->items ) {
       my $leader;
 
@@ -62,6 +62,30 @@ method _output_list ( $para )
       }
 
       $self->say( $leader, " ", $self->_convert_str( $item->text ) );
+   }
+}
+
+method output_table ( $para )
+{
+   $self->maybe_blank;
+
+   my @rows = $para->rows;
+
+   my $first = 1;
+   foreach my $row ( @rows ) {
+      my @cells = @$row;
+      $self->say( join "|", "", ( map { " " . $self->_convert_str( $_->text ) . " " } @cells ), "" );
+
+      next unless $first;
+
+      my @aligns = map {
+         my $n = length $_->text;
+         $_->align eq "centre" ? ":".("-"x($n-2)).":" :
+         $_->align eq "right"  ?     ("-"x($n-1)).":" :
+                                     ("-"x $n   );
+      } @cells;
+      $self->say( join "|", "", ( map { " $_ " } @aligns ), "" );
+      undef $first;
    }
 }
 

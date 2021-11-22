@@ -12,9 +12,9 @@ BEGIN {
    plan skip_all => "Future::AsyncAwait >= 0.45 is not available"
       unless eval { require Future::AsyncAwait;
                     Future::AsyncAwait->VERSION( '0.45' ) };
-   plan skip_all => "Object::Pad >= 0.32 is not available"
+   plan skip_all => "Object::Pad >= 0.41 is not available"
       unless eval { require Object::Pad;
-                    Object::Pad->VERSION( '0.32' ) };
+                    Object::Pad->VERSION( '0.41' ) };
 
    Future::AsyncAwait->import;
    Object::Pad->import;
@@ -73,7 +73,7 @@ BEGIN {
    my $waitf;
 
    role Role { async method m { await $waitf = Future->new } }
-   class Class implements Role {}
+   class Class :does(Role) {}
 
    my $obj = Class->new;
 

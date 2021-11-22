@@ -1,6 +1,6 @@
 package App::optex::textconv::msdoc;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use v5.14;
 use warnings;
@@ -13,9 +13,9 @@ use App::optex v0.3;
 use App::optex::textconv::Converter 'import';
 
 our @CONVERTER = (
-    [ qr/\.docx$/ => \&to_text ],
-    [ qr/\.pptx$/ => \&to_text ],
-    [ qr/\.xlsx$/ => \&to_text ],
+    [ qr/\.doc[xm]$/ => \&to_text ],
+    [ qr/\.ppt[xm]$/ => \&to_text ],
+    [ qr/\.xls[xm]$/ => \&to_text ],
     );
 
 sub xml2text {
@@ -31,8 +31,11 @@ sub xml2text {
 
 my %param = (
     docx => { space => 2, separator => ""   },
+    docm => { space => 2, separator => ""   },
     xlsx => { space => 1, separator => "\t" },
+    xlsm => { space => 1, separator => "\t" },
     pptx => { space => 1, separator => ""   },
+    pptm => { space => 1, separator => ""   },
     );
 
 my $replace_reference = do {
@@ -74,7 +77,7 @@ use Archive::Zip 1.37 qw( :ERROR_CODES :CONSTANTS );
 
 sub to_text {
     my $file = shift;
-    my $type = ($file =~ /\.(docx|xlsx|pptx)$/)[0] or return;
+    my $type = ($file =~ /\.((?:doc|xls|ppt)[xm])$/)[0] or return;
     my $zip = Archive::Zip->new($file) or die;
     my @contents;
     for my $entry (get_list($zip, $type)) {
@@ -89,13 +92,13 @@ sub to_text {
 
 sub get_list {
     my($zip, $type) = @_;
-    if ($type eq 'docx') {
+    if    ($type =~ /^doc[xm]$/) {
 	map { "word/$_.xml" } qw(document endnotes footnotes);
     }
-    elsif ($type eq 'xlsx') {
+    elsif ($type =~ /^xls[xm]$/) {
 	map { "xl/$_.xml" } qw(sharedStrings);
     }
-    elsif ($type eq 'pptx') {
+    elsif ($type =~ /^ppt[xm]$/) {
 	map  { $_->[0] }
 	sort { $a->[1] <=> $b->[1] }
 	map  { m{(ppt/slides/slide(\d+)\.xml)$} ? [ $1, $2 ] : () }

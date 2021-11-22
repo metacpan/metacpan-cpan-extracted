@@ -15,16 +15,29 @@
 
 use Modern::Perl;
 use File::Slurper qw(write_text);
+use List::Util qw(any);
 
-if (not -f "t/cert.pem" or not -f "t/key.pem") {
+if (any { not -f } qw(t/cert.pem t/key.pem t/cert2.pem t/key2.pem)) {
   local $/ = undef;
-  my $data = <DATA>;
-  my $pos = index($data, "-----BEGIN PRIVATE KEY-----");
-  write_text("t/cert.pem", substr($data, 0, $pos));
-  write_text("t/key.pem", substr($data, $pos));
+  my @data = split(/(?<=-----\n)(?=-----)/, <DATA>);
+  die "Not the right number of elements in DATA.\n" unless @data == 4;
+  write_text("t/cert.pem", shift(@data));
+  write_text("t/key.pem", shift(@data));
+  write_text("t/cert2.pem", shift(@data));
+  write_text("t/key2.pem", shift(@data));
 }
 
 1;
+
+# To generate new certificates valid for 100 years:
+# openssl req -new -x509 -newkey ec \
+#   -pkeyopt ec_paramgen_curve:prime256v1 \
+#   -days 36500 -nodes -subj '/CN=localhost' \
+#   -out cert.pem -keyout key.pem
+# openssl req -new -x509 -newkey ec \
+#   -pkeyopt ec_paramgen_curve:prime256v1 \
+#   -days 36500 -nodes -subj '/CN=berta' \
+#   -out cert2.pem -keyout key2.pem
 
 __DATA__
 -----BEGIN CERTIFICATE-----
@@ -73,4 +86,19 @@ W+S1eyyXpLN3yYxInnBI9t+R63GicBA5DGpk01jjAoGAKSMCDIm/x2U8Supe2bcn
 UiubRcnZAt4VVi5mftjLd8ah0ykqJaHcgzmHP426ldJW1quNhkUTuEyH4778tUkY
 QDfnz/a4tmi+ZK5P5oe0ECCLnvCRZNlpiJGCJT+b1qZvowrEDy+sBtbAl65JIwON
 FTn8pVaxxN55fnLqWQjM2eE=
+-----END PRIVATE KEY-----
+-----BEGIN CERTIFICATE-----
+MIIBeDCCAR2gAwIBAgIUQoyBvJDYB32TbXKWOdiAF47hYtAwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAwwFYmVydGEwIBcNMjEwNzE3MDkzNjMxWhgPMjEyMTA2MjMwOTM2
+MzFaMBAxDjAMBgNVBAMMBWJlcnRhMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE
+wMfvUCk+Y3JSp1e7edgzUh9R57dJQrD7sCaMUvux1LEoABuZiLly4ZKnfaY0eTJ0
+a8X5c7Y5KNEurXrRo69EvKNTMFEwHQYDVR0OBBYEFAgXb8qGsHSpe2KyPldhIuRE
+aDS8MB8GA1UdIwQYMBaAFAgXb8qGsHSpe2KyPldhIuREaDS8MA8GA1UdEwEB/wQF
+MAMBAf8wCgYIKoZIzj0EAwIDSQAwRgIhALmIZagzdGEsoahqwQ8tRVA/AM0XG7eG
+weUmJ7PRHilXAiEA7VlJtextB9ruWpmMdzMBUcnR4Ozewh+HINWbX4TjO+w=
+-----END CERTIFICATE-----
+-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgaHSm+ExIi6GUazt7
+z6wi499gCx5jubpMTTyRDf3C0WKhRANCAATAx+9QKT5jclKnV7t52DNSH1Hnt0lC
+sPuwJoxS+7HUsSgAG5mIuXLhkqd9pjR5MnRrxflztjko0S6tetGjr0S8
 -----END PRIVATE KEY-----

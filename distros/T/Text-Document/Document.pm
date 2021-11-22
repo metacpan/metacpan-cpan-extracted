@@ -1,7 +1,7 @@
 
 package Text::Document;
 
-$Text::Document::VERSION = '1.05';
+$Text::Document::VERSION = '1.08';
 
 use strict;
 

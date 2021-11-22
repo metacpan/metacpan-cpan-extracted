@@ -1,12 +1,12 @@
 package Data::Sah::CoerceCommon;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
-our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.049'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-18'; # DATE
+our $DIST = 'Data-Sah-Coerce'; # DIST
+our $VERSION = '0.051'; # VERSION
 
 our $SUPPORT_OLD_PREFIX = $ENV{PERL_DATA_SAH_COERCE_SUPPORT_OLD_PREFIX} // 1;
 
@@ -247,7 +247,7 @@ Data::Sah::CoerceCommon - Common stuffs for Data::Sah::Coerce and Data::Sah::Coe
 
 =head1 VERSION
 
-This document describes version 0.049 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2020-05-24.
+This document describes version 0.051 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2021-10-18.
 
 =head1 FUNCTIONS
 
@@ -256,7 +256,7 @@ This document describes version 0.049 of Data::Sah::CoerceCommon (from Perl dist
 
 Usage:
 
- get_coerce_rules(%args) -> [status, msg, payload, meta]
+ get_coerce_rules(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get coerce rules.
 
@@ -314,12 +314,12 @@ yours to make, via this setting.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -338,6 +338,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah-C
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Sah-Coerce>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce>
@@ -345,16 +373,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

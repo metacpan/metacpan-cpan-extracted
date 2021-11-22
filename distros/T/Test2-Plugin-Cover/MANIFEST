@@ -17,6 +17,7 @@ t/import.t
 t/issue2.t
 t/lib/Fake1.pm
 t/lib/Fake2.pm
+t/lib/OpenXXX.pm
 t/open.t
 t/subs.t
 t/sysopen.t

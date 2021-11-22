@@ -363,7 +363,6 @@ t/udp/udp.t
 t/util.t
 t/var/streamer/fout.txt
 t/work.t
-UniEvent.pro
 xs/Backend.xsi
 xs/Check.xs
 xs/Error.xs

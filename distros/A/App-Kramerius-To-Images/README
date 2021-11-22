@@ -72,7 +72,7 @@ REPOSITORY
     <https://github.com/michal-josef-spacek/App-Kramerius-To-Images>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
@@ -82,5 +82,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.03
 

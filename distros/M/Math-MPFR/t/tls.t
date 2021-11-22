@@ -202,26 +202,31 @@ else {
 
 
 sub _save {
-    unless (open(WR, '>', 'save_child_setting.txt')) {
+    my $WR;
+    unless (open($WR, '>', 'save_child_setting.txt')) {
       warn "Can't open file 'save_child_setting.txt' for writing : $!";
       return 0;
     }
-    print WR $_[0];
+    print $WR $_[0];
+    close($WR);
     return 1;
 }
 
 sub _retrieve {
-    unless (open (RD, '<', 'save_child_setting.txt')) {
+    my $RD;
+    unless (open ($RD, '<', 'save_child_setting.txt')) {
       warn "Can't open file 'save_child_setting.txt' for reading: $!";
       return 999999;
     }
     my @ret;
-    my $ret = <RD>;
+    my $ret = <$RD>;
     chomp $ret;
     if($ret =~ / /) {
       @ret = split / /, $ret;
+      close($RD);
       return @ret;
     }
+    close($RD);
     return $ret;
 }
 

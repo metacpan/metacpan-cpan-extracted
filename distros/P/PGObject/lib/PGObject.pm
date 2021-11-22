@@ -6,20 +6,24 @@ PGObject - A toolkit integrating intelligent PostgreSQL dbs into Perl objects
 =cut
 
 package PGObject;
+
 use strict;
 use warnings;
 
-use Carp;
+use Carp::Clan qr/^PGObject\b/;
+use Log::Any qw($log);
 use Memoize;
+
+
 use PGObject::Type::Registry;
 
 =head1 VERSION
 
-Version 2.0.2
+Version 2.3.2
 
 =cut
 
-our $VERSION = 2.000002;
+our $VERSION = '2.3.2';
 
 =head1 SYNPOSIS
 
@@ -176,7 +180,7 @@ sub function_info {
     $args{funcname} = $args{funcprefix} . $args{funcname};
     $args{argschema} ||= 'public';
 
-    my $dbh = $args{dbh} || croak 'No dbh provided';
+    my $dbh = $args{dbh} || croak $log->error( 'No dbh provided' );
 
     my $query = qq|
         SELECT proname, pronargs, proargnames,
@@ -202,10 +206,26 @@ sub function_info {
 
     my $sth = $dbh->prepare($query) || die $!;
     $sth->execute(@queryargs) || die $dbh->errstr . ": " . $query;
+    my $rows = $sth->rows;
+    if ($rows > 1) {
+        if ($args{argtype1}) {
+            croak $log->fatalf(
+                'Ambiguous criteria discovering function %s.%s (with first argument type %s)',
+                $args{funcschema}, $args{funcname}, $args{argtype1}
+                );
+        }
+        else {
+            croak $log->fatalf(
+                'Ambiguous criteria discovering function %s.%s',
+                $args{funcschema}, $args{funcname}
+                );
+        }
+    }
+    elsif ($rows == 0) {
+        croak $log->fatalf( 'No such function: %s.%s',
+                            $args{funcschema}, $args{funcname} );
+    }
     my $ref = $sth->fetchrow_hashref('NAME_lc');
-    croak "transaction already aborted"  if $dbh->state eq '25P02';
-    croak "No such function"             if !$ref;
-    croak 'Ambiguous discovery criteria' if $sth->fetchrow_hashref('NAME_lc');
 
     my $f_args;
     for my $n ( @{ $ref->{proargnames} } ) {
@@ -280,8 +300,10 @@ sub call_procedure {
     $args{registry} ||= 'default';
 
     my $dbh = $args{dbh};
-    croak "No database handle provided" unless $dbh;
-    croak "dbh not a database handle" unless eval { $dbh->isa('DBI::db') };
+    croak $log->error( "No database handle provided" )
+        unless $dbh;
+    croak $log->error( "dbh not a database handle" )
+        unless eval { $dbh->isa('DBI::db') };
 
     my $wf_string = '';
 
@@ -362,20 +384,14 @@ sub call_procedure {
     clear_info_cache() if $dbh->state eq '42883';    # (No Such Function)
 
     my @rows = ();
-    while ( my $row = $sth->fetchrow_hashref('NAME_lc') ) {
-        my @types = @{ $sth->{pg_type} };
-        my @names = @{ $sth->{NAME_lc} };
-        my $i     = 0;
-        for my $type (@types) {
-            $row->{ $names[$i] } = PGObject::Type::Registry->deserialize(
-                registry => $args{registry},
-                dbtype   => $type,
-                dbstring => $row->{ $names[$i] }
-            );
-            ++$i;
-        }
-
-        push @rows, $row;
+    my $row_deserializer =
+        PGObject::Type::Registry->rowhash_deserializer(
+            registry => $args{registry},
+            types    => $sth->{pg_type},
+            columns  => $sth->{NAME_lc},
+        );
+    while (my $row = $sth->fetchrow_hashref('NAME_lc')) {
+        push @rows, $row_deserializer->( $row );
     }
     return @rows;
 }
@@ -395,7 +411,7 @@ This no longer returns anything of significance.
 
 sub new_registry {
     my ( $self, $registry_name ) = @_;
-    carp "Deprecated use of PGObject->new_registry()";
+    carp $log->warn( "Deprecated use of PGObject->new_registry()" );
     PGObject::Type::Registry->new_registry($registry_name);
 }
 
@@ -418,7 +434,7 @@ Use PGObject::Type::Registry->register_type() instead.
 =cut
 
 sub register_type {
-    carp 'Use of deprecated method register_type of PGObject module';
+    carp $log->warn( 'Use of deprecated method register_type of PGObject module' );
     my ( $self, %args ) = @_;
 
     PGObject::Type::Registry->register_type(
@@ -441,7 +457,7 @@ instead.
 =cut
 
 sub unregister_type {
-    carp 'Use of deprecated method unregister_type of PGObject';
+    carp $log->warn( 'Use of deprecated method unregister_type of PGObject' );
     my ( $self, %args ) = @_;
 
     $args{registry} ||= 'default';
@@ -609,17 +625,9 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=PGObject>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/PGObject>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/PGObject>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/PGObject/>
+L<https://metacpan.org/dist/PGObject>
 
 =back
 
@@ -646,8 +654,8 @@ not be half of what it is today.
 
 =head1 COPYRIGHT
 
-COPYRIGHT (C) 2013-2014 Chris Travers
-COPYRIGHT (C) 2014-2017 The LedgerSMB Core Team
+  COPYRIGHT (C) 2013-2014 Chris Travers
+  COPYRIGHT (C) 2014-2021 The LedgerSMB Core Team
 
 Redistribution and use in source and compiled forms with or without
 modification, are permitted provided that the following conditions are met:
@@ -668,6 +676,8 @@ source code, documentation, and/or other materials provided with the
 distribution.
 
 =back
+
+=head1 LICENSE
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED

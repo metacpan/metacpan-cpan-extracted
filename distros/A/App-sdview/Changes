@@ -1,5 +1,16 @@
 Revision history for App-sdview
 
+0.05    2021-11-15
+        [CHANGES]
+         * Use Unicode bullets symbol rather than plain ASCII asterisk
+         * Handle tables in Markdown
+         * Handle 'digits)' in Markdown for numbered lists
+         * Also permit '.markdown' as a filename extension
+         * Added plain-text output format
+
+        [BUGFIXES]
+         * Fix for crash on Terminal output numbered lists
+
 0.04    2021-08-25
         [CHANGES]
          * Better handling of POD's item-text paragraphs

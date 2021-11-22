@@ -409,7 +409,10 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
       ensure_module_version(superclassname, superclassver);
   }
 
-  ClassMeta *meta = mop_create_class(type, packagename, superclassname);
+  ClassMeta *meta = mop_create_class(type, packagename);
+
+  if(superclassname && SvOK(superclassname))
+    mop_class_set_superclass(meta, superclassname);
 
   int nimplements = args[argi++]->i;
   if(nimplements) {
@@ -424,28 +427,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
         SV *rolever = args[argi++]->sv;
 
-        HV *rolestash = gv_stashsv(rolename, 0);
-        if(!rolestash || !hv_fetchs(rolestash, "META", 0)) {
-          /* Try to`require` the module then attempt a second time */
-          load_module(PERL_LOADMOD_NOIMPORT, newSVsv(rolename), NULL, NULL);
-          rolestash = gv_stashsv(rolename, 0);
-        }
-
-        if(!rolestash)
-          croak("Role %" SVf " does not exist", SVfARG(rolename));
-
-        if(rolever)
-          ensure_module_version(rolename, rolever);
-
-        GV **metagvp = (GV **)hv_fetchs(rolestash, "META", 0);
-        ClassMeta *rolemeta = NULL;
-        if(metagvp)
-          rolemeta = NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*metagvp))));
-
-        if(!rolemeta || rolemeta->type != METATYPE_ROLE)
-          croak("%" SVf " is not a role", SVfARG(rolename));
-
-        mop_class_add_role(meta, rolemeta);
+        mop_class_load_and_add_role(meta, rolename, rolever);
       }
     }
   }
@@ -465,6 +447,8 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
       argi++;
     }
   }
+
+  mop_class_begin(meta);
 
   /* At this point XS::Parse::Keyword has parsed all it can. From here we will
    * take over to perform the odd "block or statement" behaviour of `class`
@@ -606,6 +590,9 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
 
       mop_slot_apply_attribute(slotmeta, SvPVX(attrname), attrval);
 
+      if(attrval)
+        SvREFCNT_dec(attrval);
+
       argi++;
     }
   }
@@ -624,13 +611,14 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
     {
       OP *op = args[argi++]->op;
 
-      slotmeta->defaultsv = newSV(0);
+      SV *defaultsv = newSV(0);
+      mop_slot_set_default_sv(slotmeta, defaultsv);
 
       /* An OP_CONST whose op_type is OP_CUSTOM.
        * This way we avoid the opchecker and finalizer doing bad things to our
        * defaultsv SV by setting it SvREADONLY_on().
        */
-      OP *slotop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(slotmeta->defaultsv));
+      OP *slotop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(defaultsv));
 
       OP *lhs, *rhs;
 
@@ -640,12 +628,12 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
           break;
 
         case '@':
-          sv_setrv_noinc(slotmeta->defaultsv, (SV *)newAV());
+          sv_setrv_noinc(defaultsv, (SV *)newAV());
           lhs = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, slotop);
           goto slot_array_hash_common;
 
         case '%':
-          sv_setrv_noinc(slotmeta->defaultsv, (SV *)newHV());
+          sv_setrv_noinc(defaultsv, (SV *)newHV());
           lhs = newUNOP(OP_RV2HV, OPf_MOD|OPf_REF, slotop);
           goto slot_array_hash_common;
 
@@ -1110,7 +1098,7 @@ static int dump_slotmeta(pTHX_ const SV *sv, SlotMeta *slotmeta)
   ret += DMD_ANNOTATE_SV(sv, slotmeta->name, SvPVX(label));
 
   sv_setpvf(label, "the Object::Pad slot %s default value", name);
-  ret += DMD_ANNOTATE_SV(sv, slotmeta->defaultsv, SvPVX(label));
+  ret += DMD_ANNOTATE_SV(sv, mop_slot_get_default_sv(slotmeta), SvPVX(label));
 
   SvREFCNT_dec(label);
 
@@ -1156,6 +1144,47 @@ static int dumppackage_class(pTHX_ const SV *sv)
 }
 #endif
 
+/********************
+ * Custom SlotHooks *
+ ********************/
+
+struct CustomSlotHookData
+{
+  SV *apply_cb;
+};
+
+static bool slothook_custom_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+{
+  struct CustomSlotHookData *funcdata = _funcdata;
+
+  SV *cb;
+  if((cb = funcdata->apply_cb)) {
+    dSP;
+    ENTER;
+    SAVETMPS;
+
+    SV *slotmetasv = sv_newmortal();
+    sv_setref_uv(slotmetasv, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
+
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(slotmetasv);
+    PUSHs(value);
+    PUTBACK;
+
+    call_sv(cb, G_SCALAR);
+
+    SPAGAIN;
+    SV *ret = POPs;
+    *hookdata_ptr = SvREFCNT_inc(ret);
+
+    FREETMPS;
+    LEAVE;
+  }
+
+  return TRUE;
+}
+
 MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Class
 
 INCLUDE: mop-class.xsi
@@ -1167,6 +1196,47 @@ INCLUDE: mop-method.xsi
 MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Slot
 
 INCLUDE: mop-slot.xsi
+
+MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::SlotAttr
+
+void
+register(class, name, ...)
+  SV *class
+  SV *name
+  CODE:
+  {
+    PERL_UNUSED_VAR(class);
+    dKWARG(2);
+
+    struct SlotHookFuncs *funcs;
+    Newxz(funcs, 1, struct SlotHookFuncs);
+
+    struct CustomSlotHookData *funcdata;
+    Newxz(funcdata, 1, struct CustomSlotHookData);
+
+    funcs->ver = OBJECTPAD_ABIVERSION;
+
+    funcs->apply = &slothook_custom_apply;
+
+    static const char *args[] = {
+      "permit_hintkey",
+      "apply",
+      NULL,
+    };
+    while(KWARG_NEXT(args)) {
+      switch(kwarg) {
+        case 0: /* permit_hintkey */
+          funcs->permit_hintkey = savepv(SvPV_nolen(kwval));
+          break;
+
+        case 1: /* apply */
+          funcdata->apply_cb = newSVsv(kwval);
+          break;
+      }
+    }
+
+    register_slot_attribute(savepv(SvPV_nolen(name)), funcs, funcdata);
+  }
 
 BOOT:
   XopENTRY_set(&xop_methstart, xop_name, "methstart");

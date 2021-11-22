@@ -54,7 +54,7 @@ Data::Frame::Types - Custom Type::Tiny types
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 DESCRIPTION 
 

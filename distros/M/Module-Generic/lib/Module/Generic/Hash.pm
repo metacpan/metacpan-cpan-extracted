@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.0.1
+## Version v1.0.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/09/04
+## Modified 2021/11/13
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,7 +42,7 @@ BEGIN
     use Module::Generic::TieHash;
     use Regexp::Common;
     use Want;
-    our( $VERSION ) = 'v1.0.1';
+    our( $VERSION ) = 'v1.0.2';
 };
 
 sub new
@@ -255,6 +255,8 @@ sub merge
 sub reset { %{$_[0]} = () };
 
 sub set { $_[0]->{ $_[1] } = $_[2]; }
+
+sub size { return( shift->length ); }
 
 sub TO_JSON
 {

@@ -1,4 +1,11 @@
-1.0.3    xx.xx.2021
+1.1.0    18.11.2021
+           - support for unix sockets locations
+           - remove bind_model parameter
+           - support reuse_port in each location separately
+           - support for unix sockets for plack
+1.0.4    09.11.2021
+           - add config getter
+1.0.3    13.07.2021
            - internal stuff
 1.0.2    02.07.2021
            - fix docs

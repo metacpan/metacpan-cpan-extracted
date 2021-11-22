@@ -12,6 +12,8 @@
 using namespace panda;
 using panda::unievent::Tcp;
 using panda::unievent::TcpSP;
+using panda::unievent::Pipe;
+using panda::unievent::PipeSP;
 using panda::unievent::Loop;
 using panda::unievent::LoopSP;
 using panda::unievent::Async;

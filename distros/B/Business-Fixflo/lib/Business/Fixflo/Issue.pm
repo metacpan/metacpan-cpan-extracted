@@ -39,6 +39,7 @@ use Business::Fixflo::Property;
     DirectEmailAddress
     DirectMobileNumber
     EmailAddress
+    ExternalRef
     ExternalPropertyRef
     ExternalRefTenancyAgreement
     FaultCategory
@@ -94,6 +95,7 @@ has [ qw/
     DirectEmailAddress
     DirectMobileNumber
     EmailAddress
+    ExternalRef
     ExternalRefTenancyAgreement
     FaultCategory
     FaultId

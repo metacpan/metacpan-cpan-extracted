@@ -93,13 +93,13 @@ for my $it(0, $t) {
     print "not ok ", 9 + $it, "\n";
   }
 
-  if(Rmpf_fits_UV_p($mpf_uv_max)) {print "ok ", 10 + $it, "\n"}
+  if(Rmpf_fits_IV_p($mpf_uv_max)) {print "ok ", 10 + $it, "\n"}
   else {
     warn "\n $mpf_uv_max doesn't fit into a UV\n";
     print "not ok ", 10 + $it, "\n";
   }
 
-  if(!Rmpf_fits_UV_p($mpf_uv_max + 1)) {print "ok ", 11 + $it, "\n"}
+  if(!Rmpf_fits_IV_p($mpf_uv_max + 1)) {print "ok ", 11 + $it, "\n"}
   else {
     warn "\n ", $mpf_uv_max + 1, " fits into a UV\n";
     print "not ok ", 11 + $it, "\n";
@@ -111,7 +111,7 @@ for my $it(0, $t) {
     print "not ok ", 12 + $it, "\n";
   }
 
-  if(!Rmpf_fits_IV_p($mpf_iv_max + 1)) {print "ok ", 13 + $it, "\n"}
+  if(Rmpf_fits_IV_p($mpf_iv_max + 1)) {print "ok ", 13 + $it, "\n"}
   else {
     warn "\n ", $mpf_iv_max + 1, " fits into an IV\n";
     print "not ok ", 13 + $it, "\n";

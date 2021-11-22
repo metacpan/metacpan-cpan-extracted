@@ -1,7 +1,10 @@
 Revision history for Apache2-Mogile-Dispatch
 
-0.1_1  2006-08-31
-       * First version, released on an unsuspecting world.
+0.3    2021-11-22
+       * Change of package names for the examples enclosed
 
 0.1_2  2006-09-06
        * Too many changes to list.
+
+0.1_1  2006-08-31
+       * First version, released on an unsuspecting world.

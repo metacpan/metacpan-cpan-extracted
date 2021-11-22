@@ -3,7 +3,7 @@ autobuild.sh
 bin/nozone
 Build.PL
 CHANGES
-etc/nozone.cfg
+etc/nozone.yml
 lib/NoZone.pm
 lib/NoZone/Zone.pm
 LICENSE

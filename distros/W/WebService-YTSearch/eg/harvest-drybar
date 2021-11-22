@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Storable qw(store);
+use WebService::YTSearch;
+
+my $key = shift || die "Usage: perl $0 12345abcde num\n";
+my $num = shift || 50;
+
+my $q     = 'drybar';
+my $title = 'Dry Bar Comedy';
+my $results_file = 'yt-search-results.dat';
+
+my %results;
+
+my $ws = WebService::YTSearch->new( key => $key );
+
+my $query = { q => $q, type => 'video', order => 'date', maxResults => $num };
+
+my $pub_date = search_loop( $ws, $query, \%results );
+
+my $last_pub_date = '';
+
+sleep 5;
+
+while ( $pub_date && $pub_date ne $last_pub_date ) {
+    $last_pub_date = $pub_date;
+    print "Pub date: $last_pub_date\n";
+
+    $query->{publishedBefore} = $pub_date;
+
+    $pub_date = search_loop( $ws, $query, \%results );
+
+    sleep 5;
+}
+
+store \%results, $results_file;
+
+sub search_loop {
+    my ( $ws, $query, $results ) = @_;
+
+    my $pub_date;
+
+    my $r = $ws->search( %$query );
+
+    for my $item ( @{ $r->{items} } ) {
+        next unless $item->{snippet}{channelTitle} eq $title;
+
+        my $video_id = $item->{id}{videoId};
+        next unless defined $video_id;
+        next if exists $results->{ $video_id };
+
+        printf "https://www.youtube.com/watch?v=%s - %s\n",
+            $video_id, $item->{snippet}{title};
+
+        $pub_date = $item->{snippet}{publishedAt};
+
+        $results->{ $video_id } = {
+            title       => $item->{snippet}{title},
+            description => $item->{snippet}{description},
+        };
+    }
+
+    return $pub_date;
+}

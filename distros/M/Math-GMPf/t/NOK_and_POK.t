@@ -91,7 +91,7 @@ my $z2;
 eval {$z2 = Math::GMPf->new($nan);};
 
 if($@ =~ /^First arg to Rmpf_init_set_str is not a valid base 10 number/ ||
-   $@ =~ /^In Rmpf_init_set_d, cannot coerce a NaN to a Math::GMPf object/ ||
+   $@ =~ /cannot coerce a NaN to a Math::GMPf object/ ||
    $@ =~ /^In _Rmpf_set_ld, cannot coerce/) {print "ok 9\n"}
 else {
   warn "\n \$\@: $@\n";

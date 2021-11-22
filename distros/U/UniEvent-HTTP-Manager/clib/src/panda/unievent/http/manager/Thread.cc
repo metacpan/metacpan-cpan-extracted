@@ -1,6 +1,7 @@
 #include "Thread.h"
 #include <mutex>
 #include <future>
+#include <panda/unievent/util.h>
 
 namespace panda { namespace unievent { namespace http { namespace manager {
 
@@ -110,8 +111,9 @@ WorkerPtr Thread::create_worker () {
             });
 
             auto config = this->config; // copy
-            if (config.bind_model == Manager::BindModel::Duplicate) { // we need to dup sockets
-                for (auto& loc : config.server.locations) loc.sock = sock_dup(loc.sock.value());
+            // duplicate non-reuse-port locations for worker (reuse-port locations don't have sockets in config)
+            for (auto& loc : config.server.locations) {
+                if (loc.sock) loc.sock = sock_dup(loc.sock.value());
             }
 
             child.init({loop, config, server_factory, spawn_event, request_event});

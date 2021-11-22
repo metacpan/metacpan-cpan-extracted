@@ -2,11 +2,6 @@
 
 package App::abgrep;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-08'; # DATE
-our $DIST = 'App-abgrep'; # DIST
-our $VERSION = '0.007'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -14,6 +9,11 @@ use Log::ger;
 
 use AppBase::Grep;
 use Perinci::Sub::Util qw(gen_modified_sub);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-11-14'; # DATE
+our $DIST = 'App-abgrep'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -34,7 +34,7 @@ _
             'x.name.singular' => 'file',
             schema => ['array*', of=>'filename*'],
             pos => 1,
-            greedy => 1,
+            slurpy => 1,
         },
         # XXX recursive (-r)
     },
@@ -58,12 +58,18 @@ _
         my ($fh, $file);
 
         my @files = @{ $args{files} // [] };
-        if ($args{regexps} && @{ $args{regexps} }) {
-            unshift @files, delete $args{pattern};
+        # pattern (arg0) can actually be a file or regexp
+        if (defined $args{pattern}) {
+            if ($args{regexps} && @{ $args{regexps} }) {
+                unshift @files, delete $args{pattern};
+            } else {
+                unshift @{ $args{regexps} }, delete $args{pattern};
+            }
         }
 
         my $show_label = 0;
         if (!@files) {
+            $file = "(stdin)";
             $fh = \*STDIN;
         } elsif (@files > 1) {
             $show_label = 1;
@@ -112,7 +118,7 @@ App::abgrep - Print lines matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.007 of App::abgrep (from Perl distribution App-abgrep), released on 2020-11-08.
+This document describes version 0.008 of App::abgrep (from Perl distribution App-abgrep), released on 2021-11-14.
 
 =head1 FUNCTIONS
 
@@ -121,7 +127,7 @@ This document describes version 0.007 of App::abgrep (from Perl distribution App
 
 Usage:
 
- abgrep(%args) -> [status, msg, payload, meta]
+ abgrep(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Print lines matching a pattern.
 
@@ -139,7 +145,7 @@ Arguments ('*' denotes required arguments):
 
 Require all patterns to match, instead of just one.
 
-=item * B<color> => I<str>
+=item * B<color> => I<str> (default: "auto")
 
 =item * B<count> => I<true>
 
@@ -175,12 +181,12 @@ Invert the sense of matching.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -192,6 +198,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-abgrep
 
 Source repository is at L<https://github.com/perlancar/perl-App-abgrep>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-abgrep>
@@ -199,16 +233,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

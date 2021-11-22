@@ -16,6 +16,7 @@ use strict;
 use warnings;
 use integer;
 use utf8;
+use Carp;
 #use re 'debug';
 
 use Date::Manip::Obj;
@@ -26,7 +27,7 @@ use Encode qw(encode_utf8 from_to find_encoding decode _utf8_off _utf8_on is_utf
 require Date::Manip::Lang::index;
 
 our $VERSION;
-$VERSION='6.85';
+$VERSION='6.86';
 END { undef $VERSION; }
 
 ###############################################################################
@@ -1072,7 +1073,7 @@ sub _config_var_base {
           $val !~ /^c\d\d$/o  &&
           $val !~ /^c\d\d\d\d$/o  &&
           $val !~ /^\d+$/o) {
-         warn "ERROR: [config_var] invalid: YYtoYYYY: $val\n";
+         carp "ERROR: [config_var] invalid: YYtoYYYY: $val";
          return;
       }
 
@@ -1104,7 +1105,7 @@ sub _config_var_base {
             $var eq 'forcedate'  ||
             $var eq 'setdate') {
       # These can only be used if the Date::Manip::TZ module has been loaded
-      warn "ERROR: [config_var] $var config variable requires TZ module\n";
+      carp "ERROR: [config_var] $var config variable requires TZ module";
       return;
 
    } elsif ($var eq 'recurrange') {
@@ -1131,7 +1132,7 @@ sub _config_var_base {
       # do nothing
 
    } else {
-      warn "ERROR: [config_var] invalid config variable: $var\n";
+      carp "ERROR: [config_var] invalid config variable: $var";
       return '';
    }
 
@@ -1154,14 +1155,14 @@ sub _config_var_encoding {
       if ($in) {
          my $o = find_encoding($in);
          if (! $o) {
-            warn "ERROR: [config_var] invalid: Encoding: $in\n";
+            carp "ERROR: [config_var] invalid: Encoding: $in";
             return 1;
          }
       }
       if ($out) {
          my $o = find_encoding($out);
          if (! $o) {
-            warn "ERROR: [config_var] invalid: Encoding: $out\n";
+            carp "ERROR: [config_var] invalid: Encoding: $out";
             return 1;
          }
       }
@@ -1186,7 +1187,7 @@ sub _config_var_encoding {
    } else {
       my $o = find_encoding($val);
       if (! $o) {
-         warn "ERROR: [config_var] invalid: Encoding: $val\n";
+         carp "ERROR: [config_var] invalid: Encoding: $val";
          return 1;
       }
       $$self{'data'}{'calc'}{'enc_in'}  = [ $val ];
@@ -1208,7 +1209,7 @@ sub _config_var_recurrange {
       return 0;
    }
 
-   warn "ERROR: [config_var] invalid: RecurRange: $val\n";
+   carp "ERROR: [config_var] invalid: RecurRange: $val";
    return 1;
 }
 
@@ -1216,11 +1217,11 @@ sub _config_var_workweekbeg {
    my($self,$val) = @_;
 
    if (! $self->_is_int($val,1,7)) {
-      warn "ERROR: [config_var] invalid: WorkWeekBeg: $val\n";
+      carp "ERROR: [config_var] invalid: WorkWeekBeg: $val";
       return 1;
    }
    if ($val >= $self->_config('workweekend')) {
-      warn "ERROR: [config_var] WorkWeekBeg must be before WorkWeekEnd\n";
+      carp "ERROR: [config_var] WorkWeekBeg must be before WorkWeekEnd";
       return 1;
    }
 
@@ -1233,11 +1234,11 @@ sub _config_var_workweekend {
    my($self,$val) = @_;
 
    if (! $self->_is_int($val,1,7)) {
-      warn "ERROR: [config_var] invalid: WorkWeekBeg: $val\n";
+      carp "ERROR: [config_var] invalid: WorkWeekBeg: $val";
       return 1;
    }
    if ($val <= $self->_config('workweekbeg')) {
-      warn "ERROR: [config_var] WorkWeekEnd must be after WorkWeekBeg\n";
+      carp "ERROR: [config_var] WorkWeekEnd must be after WorkWeekBeg";
       return 1;
    }
 
@@ -1269,7 +1270,7 @@ sub _config_var_workdaybegend {
 
    my $tmp = $self->split('hms',$$val);
    if (! defined $tmp) {
-      warn "ERROR: [config_var] invalid: $conf: $$val\n";
+      carp "ERROR: [config_var] invalid: $conf: $$val";
       return 1;
    }
    $$self{'data'}{'calc'}{lc($conf)} = $tmp;
@@ -1283,7 +1284,7 @@ sub _config_var_workdaybegend {
    my $end = $end[0]*3600 + $end[1]*60 + $end[2];
 
    if ($beg > $end) {
-      warn "ERROR: [config_var] WorkDayBeg not before WorkDayEnd\n";
+      carp "ERROR: [config_var] WorkDayBeg not before WorkDayEnd";
       return 1;
    }
 
@@ -1301,7 +1302,7 @@ sub _config_var_firstday {
    my($self,$val) = @_;
 
    if (! $self->_is_int($val,1,7)) {
-      warn "ERROR: [config_var] invalid: FirstDay: $val\n";
+      carp "ERROR: [config_var] invalid: FirstDay: $val";
       return 1;
    }
 
@@ -1315,7 +1316,7 @@ sub _config_var_defaulttime {
        lc($val) eq 'curr') {
       return 0;
    }
-   warn "ERROR: [config_var] invalid: DefaultTime: $val\n";
+   carp "ERROR: [config_var] invalid: DefaultTime: $val";
    return 1;
 }
 
@@ -1327,7 +1328,7 @@ sub _config_var_format_mmmyyyy {
        lc($val) eq '') {
       return 0;
    }
-   warn "ERROR: [config_var] invalid: Format_MMMYYYY: $val\n";
+   carp "ERROR: [config_var] invalid: Format_MMMYYYY: $val";
    return 1;
 }
 
@@ -1343,7 +1344,7 @@ sub _language {
    $lang = lc($lang);
 
    if (! exists $Date::Manip::Lang::index::Lang{$lang}) {
-      warn "ERROR: [language] invalid: $lang\n";
+      carp "ERROR: [language] invalid: $lang";
       return 1;
    }
 
@@ -1354,7 +1355,7 @@ sub _language {
    my $mod = $Date::Manip::Lang::index::Lang{$lang};
    eval "require Date::Manip::Lang::${mod}";
    if ($@) {
-      die "ERROR: failed to load Date::Manip::Lang::${mod}: $@\n";
+      croak "ERROR: failed to load Date::Manip::Lang::${mod}: $@\n";
    }
 
    no warnings 'once';

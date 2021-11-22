@@ -4,7 +4,6 @@ package Netstack::Connector::IosXe;
 # 加载扩展模块
 #------------------------------------------------------------------------------
 use 5.016;
-use utf8;
 use Expect;
 use Moose;
 use namespace::autoclean;
@@ -27,9 +26,9 @@ sub _buildPrompt {
 # 具体实现 _buildCommands,设置抓取设备运行配置的脚本
 #------------------------------------------------------------------------------
 sub _buildCommands {
-  my $self = shift;
-  # my $commands = ["terminal length 0", "how running-config"];
-  my $commands = ["show running-config"];
+  my $self     = shift;
+  my $commands = [ "terminal length 0", "show running-config", "copy run start" ];
+  # my $commands = ["show running-config"];
   return $commands;
 }
 
@@ -80,7 +79,7 @@ sub runCommands {
   $self->pushCommand("copy run start");
 
   # 执行调度，配置批量下发
-  $self->execCommands( reverse $self->commands->@* );
+  $self->execCommands( $self->commands->@* );
 }
 __PACKAGE__->meta->make_immutable;
 1;

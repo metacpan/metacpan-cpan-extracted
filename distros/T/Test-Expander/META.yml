@@ -20,6 +20,7 @@ no_index:
     - t
     - inc
 requires:
+  B: '0'
   Const::Fast: '0'
   Exporter: '0'
   File::Temp: '0'
@@ -28,6 +29,7 @@ requires:
   PadWalker: '0'
   Path::Tiny: '0'
   Scalar::Readonly: '0'
+  Test2::Tools::Basic: '0'
   Test2::Tools::Explain: '0'
   Test2::V0: '0'
   Test::Files: '0'
@@ -37,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/jsf116/Test-Expander/issues
   repository: https://github.com/jsf116/Test-Expander.git
-version: v1.0.1
+version: v1.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

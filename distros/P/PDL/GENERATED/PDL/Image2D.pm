@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Image2D;
 
-our @EXPORT_OK = qw( PDL::PP conv2d PDL::PP med2d PDL::PP med2df PDL::PP box2d PDL::PP patch2d PDL::PP patchbad2d PDL::PP max2d_ind PDL::PP centroid2d  cc8compt cc4compt PDL::PP ccNcompt polyfill  pnpoly  polyfillv  rotnewsz PDL::PP rot2d PDL::PP bilin2d PDL::PP rescale2d  fitwarp2d applywarp2d PDL::PP warp2d  warp2d_kernel PDL::PP warp2d_kernel );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw( conv2d med2d med2df box2d patch2d patchbad2d max2d_ind centroid2d cc8compt cc4compt ccNcompt polyfill pnpoly polyfillv rotnewsz rot2d bilin2d rescale2d fitwarp2d applywarp2d warp2d warp2d_kernel warp2d_kernel );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Image2D ;
+
 
 
 
@@ -51,10 +50,7 @@ use strict;
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -713,7 +709,7 @@ sub PDL::pnpoly {
 
 =for ref
 
-return the (dataflown) area of an image described by a polygon
+return the (dataflowed) area of an image described by a polygon
 
 =for usage
 
@@ -1521,7 +1517,7 @@ sub PDL::warp2d_kernel ($) {
 
 
 
-;
+
 
 
 =head1 AUTHORS
@@ -1545,5 +1541,3 @@ the copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

@@ -1,29 +1,30 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.522-7-g205a42ce
+package JSON::Schema::Modern; # git description: v0.524-14-gee0c2b88
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;  # for fc, unicode_strings features
+use 5.020;  # for fc, unicode_strings features
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
 use JSON::MaybeXS;
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint pairmap);
-use Ref::Util 0.100 qw(is_ref is_hashref);
+use Ref::Util 0.100 qw(is_ref is_plain_hashref);
 use Mojo::URL;
 use Safe::Isa;
 use Path::Tiny;
 use Storable 'dclone';
 use File::ShareDir 'dist_dir';
 use Module::Runtime 'use_module';
-use Moo;
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
 use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy ArrayRef Undef ClassName Tuple);
@@ -31,7 +32,7 @@ use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
 use JSON::Schema::Modern::Document;
-use JSON::Schema::Modern::Utilities qw(get_type canonical_schema_uri E abort annotate_self);
+use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self);
 use namespace::clean;
 
 our @CARP_NOT = qw(
@@ -103,9 +104,7 @@ has _format_validations => (
   default => sub { {} },
 );
 
-around BUILDARGS => sub {
-  my ($orig, $class, @args) = @_;
-
+around BUILDARGS => sub ($orig, $class, @args) {
   my $args = $class->$orig(@args);
   croak 'output_format: strict_basic can only be used with specification_version: draft2019-09'
     if ($args->{output_format}//'') eq 'strict_basic'
@@ -134,7 +133,7 @@ sub add_schema {
     : JSON::Schema::Modern::Document->new(
       schema => shift,
       $uri ? (canonical_uri => $uri) : (),
-      _evaluator => $self,  # used only for traversal during document construction
+      evaluator => $self,  # used mainly for traversal during document construction
     );
 
   croak(!(caller())[0]->isa(__PACKAGE__)
@@ -158,7 +157,7 @@ sub add_schema {
       $document = $existing_doc;
     }
     else {
-      $self->_add_resources(map +($_->[0] => +{ %{$_->[1]}, document => $document }),
+      $self->_add_resources(map +($_->[0] => +{ $_->[1]->%*, document => $document }),
         $document->resource_pairs);
     }
   }
@@ -177,10 +176,8 @@ sub add_schema {
   return $document;
 }
 
-sub evaluate_json_string {
+sub evaluate_json_string ($self, $json_data, $schema, $config_override = {}) {
   croak 'evaluate_json_string called in void context' if not defined wantarray;
-  croak 'insufficient arguments' if @_ < 3;
-  my ($self, $json_data, $schema, $config_override) = @_;
 
   my $data;
   try {
@@ -209,22 +206,19 @@ sub evaluate_json_string {
 # schema structure, to identify the metaschema (via the $schema keyword), and to extract all
 # embedded resources via $id and $anchor keywords within.
 # Returns the internal $state object accumulated during the traversal.
-sub traverse {
-  croak 'insufficient arguments' if @_ < 2;
-  my ($self, $schema_reference, $config_override) = @_;
-
-  my $base_uri = Mojo::URL->new($config_override->{initial_schema_uri} // '');
+sub traverse ($self, $schema_reference, $config_override = {}) {
+  # Note: the starting position is not guaranteed to be at the root of the $document.
+  my $initial_uri = Mojo::URL->new($config_override->{initial_schema_uri} // '');
+  my $initial_path = $config_override->{traversed_schema_path} // '';
   my $spec_version = $self->specification_version//SPECIFICATION_VERSION_DEFAULT;
 
   my $state = {
     depth => 0,
-    data_path => '',                    # this never changes since we don't have an instance yet
-    traversed_schema_path => '',        # the accumulated traversal path as of the start, or last $id
-    initial_schema_uri => $base_uri,    # the canonical URI as of the start, or last $id
-    schema_path => '',                  # the rest of the path, since the last $id
+    data_path => '',                        # this never changes since we don't have an instance yet
+    initial_schema_uri => $initial_uri,     # the canonical URI as of the start of this method, or last $id
+    traversed_schema_path => $initial_path, # the accumulated traversal path as of the start, or last $id
+    schema_path => '',                      # the rest of the path, since the start of this method, or last $id
     errors => [],
-    spec_version => $spec_version,
-    vocabularies => [ use_module('JSON::Schema::Modern::Vocabulary::Core') ], # will be filled in later
     identifiers => [],
     configs => {},
     callbacks => $config_override->{callbacks} // {},
@@ -232,21 +226,30 @@ sub traverse {
   };
 
   try {
-    $self->_traverse_subschema(
-      is_hashref($schema_reference) && !(exists $schema_reference->{'$schema'})
-        ? +{
-          # ensure that specification version and vocabularies are properly determined
-          '$schema' => $self->METASCHEMA_URIS->{$spec_version},
-          %$schema_reference,
-        }
-        : $schema_reference,
-      $state,
+    my $for_canonical_uri = Mojo::URL->new(
+      (is_plain_hashref($schema_reference) && exists $schema_reference->{'$id'}
+          ? Mojo::URL->new($schema_reference->{'$id'}) : undef)
+        // $state->{initial_schema_uri});
+    $for_canonical_uri->fragment(undef) if not length $for_canonical_uri->fragment;
+
+    # a subsequent "$schema" keyword can still change these values
+    $state->@{qw(spec_version vocabularies)} = $self->_get_metaschema_info(
+      $config_override->{metaschema_uri} // $self->METASCHEMA_URIS->{$spec_version},
+      $for_canonical_uri,
     );
+  }
+  catch ($e) {
+    push $state->{errors}->@*, $e->errors;
+    return $state;
+  }
+
+  try {
+    $self->_traverse_subschema($schema_reference, $state);
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Error')) {
       # note: we should never be here, since traversal subs are no longer be fatal
-      push @{$state->{errors}}, $e;
+      push $state->{errors}->@*, $e;
     }
     else {
       E($state, 'EXCEPTION: '.$e);
@@ -257,18 +260,17 @@ sub traverse {
 }
 
 # the actual runtime evaluation of the schema against input data.
-sub evaluate {
+sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
   croak 'evaluate called in void context' if not defined wantarray;
-  croak 'insufficient arguments' if @_ < 3;
-  my ($self, $data, $schema_reference, $config_override) = @_;
 
   my $base_uri = Mojo::URL->new;  # TODO: will be set by a global attribute
+  my $initial_path = $config_override->{traversed_schema_path} // '';
 
   my $state = {
-    data_path => '',
-    traversed_schema_path => '',        # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
-    initial_schema_uri => $base_uri,    # the canonical URI as of the start or last $id, or the last traversed $ref
-    schema_path => '',                  # the rest of the path, since the last $id or the last traversed $ref
+    data_path => $config_override->{data_path} // '',
+    traversed_schema_path => $initial_path, # the accumulated path as of the start of evaluation, or last $id or $ref
+    initial_schema_uri => $base_uri,    # the canonical URI as of the start of evaluation, or last $id or $ref
+    schema_path => '',                  # the rest of the path, since the start of evaluation, or last $id or $ref
   };
 
   my $valid;
@@ -276,8 +278,9 @@ sub evaluate {
     my $schema_info;
 
     if (not is_ref($schema_reference) or $schema_reference->$_isa('Mojo::URL')) {
-      # TODO: resolve $uri against base_uri
+      # TODO: resolve this URI against 'base_uri'
       $schema_info = $self->_fetch_from_uri($schema_reference);
+      $state->{initial_schema_uri} = Mojo::URL->new($config_override->{initial_schema_uri} // $base_uri);
     }
     else {
       # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
@@ -299,17 +302,18 @@ sub evaluate {
     $state = +{
       %$state,
       depth => 0,
-      initial_schema_uri => $schema_info->{canonical_uri}, # the canonical URI as of the start or last $id, or the last traversed $ref
+      initial_schema_uri => $schema_info->{canonical_uri}, # the canonical URI as of the start of evaluation, or last $id or $ref
       document => $schema_info->{document},   # the ::Document object containing this schema
-      document_path => $schema_info->{document_path}, # the path within the document of this schema, since the last $id or $ref traversal
+      document_path => $schema_info->{document_path}, # the path within the document of this schema, as of the start of evaluation, or last $id or $ref
       dynamic_scope => [ $schema_info->{canonical_uri} ],
       errors => [],
       annotations => [],
       seen => {},
       spec_version => $schema_info->{specification_version},
       vocabularies => $schema_info->{vocabularies},
+      callbacks => $config_override->{callbacks} // {},
       evaluator => $self,
-      %{$schema_info->{document}->evaluation_configs},
+      $schema_info->{document}->evaluation_configs->%*,
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
@@ -317,21 +321,21 @@ sub evaluate {
     };
 
     $valid = $self->_eval_subschema($data, $schema_info->{schema}, $state);
-    warn 'result is false but there are no errors' if not $valid and not @{$state->{errors}};
+    warn 'result is false but there are no errors' if not $valid and not $state->{errors}->@*;
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Result')) {
       return $e;
     }
     elsif ($e->$_isa('JSON::Schema::Modern::Error')) {
-      push @{$state->{errors}}, $e;
+      push $state->{errors}->@*, $e;
     }
     else {
       $valid = E($state, 'EXCEPTION: '.$e);
     }
   }
 
-  die 'evaluate validity inconstent with error count' if $valid xor !@{$state->{errors}};
+  die 'evaluate validity inconstent with error count' if $valid xor !$state->{errors}->@*;
 
   return JSON::Schema::Modern::Result->new(
     output_format => $self->output_format,
@@ -346,10 +350,7 @@ sub evaluate {
 
 # sub add_vocabulary { ... } # defined lower down...
 
-sub get {
-  croak 'insufficient arguments' if @_ < 2;
-  my ($self, $uri) = @_;
-
+sub get ($self, $uri) {
   my $schema_info = $self->_fetch_from_uri($uri);
   return if not $schema_info;
   my $subschema = is_ref($schema_info->{schema}) ? dclone($schema_info->{schema}) : $schema_info->{schema};
@@ -378,10 +379,7 @@ my %removed_keywords = (
   },
 );
 
-sub _traverse_subschema {
-  croak 'insufficient arguments' if @_ < 3;
-  my ($self, $schema, $state) = @_;
-
+sub _traverse_subschema ($self, $schema, $state) {
   delete $state->{keyword};
 
   return E($state, 'EXCEPTION: maximum traversal depth exceeded')
@@ -393,7 +391,7 @@ sub _traverse_subschema {
   return E($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
   my $valid = 1;
-  for (my $idx = 0; $idx <= $#{$state->{vocabularies}}; ++$idx) {
+  for (my $idx = 0; $idx <= $state->{vocabularies}->$#*; ++$idx) {
     my $vocabulary = $state->{vocabularies}[$idx];
     foreach my $keyword ($vocabulary->keywords($state->{spec_version})) {
       next if not exists $schema->{$keyword};
@@ -405,7 +403,7 @@ sub _traverse_subschema {
       my $method = '_traverse_keyword_'.($keyword =~ s/^\$//r);
 
       if (not $vocabulary->$method($schema, $state)) {
-        die 'traverse returned false but we have no errors' if not @{$state->{errors}};
+        die 'traverse returned false but we have no errors' if not $state->{errors}->@*;
         $valid = 0;
         next;
       }
@@ -417,10 +415,10 @@ sub _traverse_subschema {
   }
 
   # check for previously-supported but now removed keywords
-  foreach my $keyword (sort keys %{$removed_keywords{$state->{spec_version}}}) {
+  foreach my $keyword (sort keys $removed_keywords{$state->{spec_version}}->%*) {
     next if not exists $schema->{$keyword};
     my $message ='no-longer-supported "'.$keyword.'" keyword present (at location "'
-      .canonical_schema_uri($state).'")';
+      .canonical_uri($state).'")';
     if (my $alternates = $removed_keywords{$state->{spec_version}}->{$keyword}) {
       my @list = map '"'.$_.'"', @$alternates;
       @list = ((map $_.',', @list[0..$#list-1]), $list[-1]) if @list > 2;
@@ -433,26 +431,24 @@ sub _traverse_subschema {
   return $valid;
 }
 
-sub _eval_subschema {
+sub _eval_subschema ($self, $data, $schema, $state) {
   croak '_eval_subschema called in void context' if not defined wantarray;
-  croak 'insufficient arguments' if @_ < 4;
-  my ($self, $data, $schema, $state) = @_;
 
   # callers created a new $state for us, so we do not propagate upwards changes to depth, traversed
   # paths; but annotations, errors are arrayrefs so their contents will be shared
-  $state->{dynamic_scope} = [ @{$state->{dynamic_scope}//[]} ];
-  delete @{$state}{'keyword', grep /^_/, keys %$state};
+  $state->{dynamic_scope} = [ ($state->{dynamic_scope}//[])->@* ];
+  delete $state->@{'keyword', grep /^_/, keys %$state};
 
   abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
     if $state->{depth}++ > $self->max_traversal_depth;
 
   # find all schema locations in effect at this data path + canonical_uri combination
   # if any of them are absolute prefix of this schema location, we are in a loop.
-  my $canonical_uri = canonical_schema_uri($state);
+  my $canonical_uri = canonical_uri($state);
   my $schema_location = $state->{traversed_schema_path}.$state->{schema_path};
   abort($state, 'EXCEPTION: infinite loop detected (same location evaluated twice)')
     if grep substr($schema_location, 0, length) eq $_,
-      keys %{$state->{seen}{$state->{data_path}}{$canonical_uri}};
+      keys $state->{seen}{$state->{data_path}}{$canonical_uri}->%*;
   $state->{seen}{$state->{data_path}}{$canonical_uri}{$schema_location}++;
 
   my $schema_type = get_type($schema);
@@ -467,7 +463,7 @@ sub _eval_subschema {
   $state->{annotations} = [];
   my @new_annotations;
 
-  my @vocabularies = @{$state->{vocabularies}}; # override locally only (copy, not reference)
+  my @vocabularies = $state->{vocabularies}->@*; # override locally only (copy, not reference)
   if ($state->{validate_formats}) {
     s/^JSON::Schema::Modern::Vocabulary::Format\KAnnotation$/Assertion/ foreach @vocabularies;
     require JSON::Schema::Modern::Vocabulary::FormatAssertion;
@@ -487,23 +483,26 @@ sub _eval_subschema {
       next if not $vocabulary->can($method);
 
       $state->{keyword} = $keyword;
-      my $error_count = @{$state->{errors}};
+      my $error_count = $state->{errors}->@*;
       if (not $vocabulary->$method($data, $schema, $state)) {
         warn 'result is false but there are no errors (keyword: '.$keyword.')'
-          if $error_count == @{$state->{errors}};
+          if $error_count == $state->{errors}->@*;
         $valid = 0;
+      }
+      elsif (my $sub = $state->{callbacks}{$keyword}) {
+        $sub->($schema, $state);
       }
 
       last ALL_KEYWORDS if not $valid and $state->{short_circuit};
 
-      push @new_annotations, @{$state->{annotations}}[$#new_annotations+1 .. $#{$state->{annotations}}];
+      push @new_annotations, $state->{annotations}->@[$#new_annotations+1 .. $state->{annotations}->$#*];
     }
   }
 
   $state->{annotations} = $orig_annotations;
 
   if ($valid) {
-    push @{$state->{annotations}}, @new_annotations;
+    push $state->{annotations}->@*, @new_annotations;
     annotate_self(+{ %$state, keyword => $_ }, $schema) foreach sort keys %unknown_keywords;
   }
 
@@ -530,6 +529,7 @@ has _resource_index => (
     _resource_keys => 'keys',
     _add_resources_unsafe => 'set',
     _resource_values => 'values',
+    _resource_exists => 'exists',
   },
   lazy => 1,
   default => sub { {} },
@@ -582,6 +582,7 @@ has _vocabulary_classes => (
   handles => {
     _get_vocabulary_class => 'get',
     _set_vocabulary_class => 'set',
+    _get_vocabulary_values => 'values',
   },
   lazy => 1,
   default => sub {
@@ -593,8 +594,8 @@ has _vocabulary_classes => (
   },
 );
 
-sub add_vocabulary {
-  my ($self, $classname) = @_;
+sub add_vocabulary ($self, $classname) {
+  return if grep $_->[1] eq $classname, $self->_get_vocabulary_values;
 
   $vocabulary_class_type->(use_module($classname));
 
@@ -635,6 +636,37 @@ has _metaschema_vocabulary_classes => (
   },
 );
 
+# retrieves metaschema info either from cache or by parsing the schema for vocabularies
+# throws a JSON::Schema::Modern::Result on error
+sub _get_metaschema_info ($self, $metaschema_uri, $for_canonical_uri) {
+  # check the cache
+  my $metaschema_info = $self->_get_metaschema_vocabulary_classes($metaschema_uri);
+  return @$metaschema_info if $metaschema_info;
+
+  # otherwise, fetch the metaschema and parse its $vocabulary keyword.
+  # we do this by traversing a baby schema with just the $schema keyword.
+  my $state = $self->traverse({ '$schema' => $metaschema_uri.'' });
+  die JSON::Schema::Modern::Result->new(
+    output_format => $self->output_format,
+    valid => JSON::PP::false,
+    errors => [
+      map {
+        my $e = $_;
+        # absolute location is undef iff the location = '/$schema'
+        my $absolute_location = $e->absolute_keyword_location // $for_canonical_uri;
+        JSON::Schema::Modern::Error->new(
+          keyword => $e->keyword eq '$schema' ? '' : $e->keyword,
+          instance_location => $e->instance_location,
+          keyword_location => ($for_canonical_uri->fragment//'').($e->keyword_location =~ s{^/\$schema\b}{}r),
+          length $absolute_location ? ( absolute_keyword_location => $absolute_location ) : (),
+          error => $e->error,
+        )
+      }
+      $state->{errors}->@* ],
+  ) if $state->{errors}->@*;
+  return ($state->{spec_version}, $state->{vocabularies});
+}
+
 # used for determining a default '$schema' keyword where there is none
 use constant METASCHEMA_URIS => {
   'draft2020-12' => 'https://json-schema.org/draft/2020-12/schema',
@@ -651,18 +683,15 @@ use constant CACHED_METASCHEMAS => {
   'https://json-schema.org/draft/2020-12/meta/meta-data'      => 'draft2020-12/meta/meta-data.json',
   'https://json-schema.org/draft/2020-12/meta/unevaluated'    => 'draft2020-12/meta/unevaluated.json',
   'https://json-schema.org/draft/2020-12/meta/validation'     => 'draft2020-12/meta/validation.json',
+  'https://json-schema.org/draft/2020-12/output/schema'       => 'draft2020-12/output/schema.json',
   'https://json-schema.org/draft/2020-12/schema'              => 'draft2020-12/schema.json',
 
-  'https://json-schema.org/draft/2019-09/hyper-schema'        => 'draft2019-09/hyper-schema.json',
-  'https://json-schema.org/draft/2019-09/links'               => 'draft2019-09/links.json',
   'https://json-schema.org/draft/2019-09/meta/applicator'     => 'draft2019-09/meta/applicator.json',
   'https://json-schema.org/draft/2019-09/meta/content'        => 'draft2019-09/meta/content.json',
   'https://json-schema.org/draft/2019-09/meta/core'           => 'draft2019-09/meta/core.json',
   'https://json-schema.org/draft/2019-09/meta/format'         => 'draft2019-09/meta/format.json',
-  'https://json-schema.org/draft/2019-09/meta/hyper-schema'   => 'draft2019-09/meta/hyper-schema.json',
   'https://json-schema.org/draft/2019-09/meta/meta-data'      => 'draft2019-09/meta/meta-data.json',
   'https://json-schema.org/draft/2019-09/meta/validation'     => 'draft2019-09/meta/validation.json',
-  'https://json-schema.org/draft/2019-09/output/hyper-schema' => 'draft2019-09/output/hyper-schema.json',
   'https://json-schema.org/draft/2019-09/output/schema'       => 'draft2019-09/output/schema.json',
   'https://json-schema.org/draft/2019-09/schema'              => 'draft2019-09/schema.json',
 
@@ -671,16 +700,14 @@ use constant CACHED_METASCHEMAS => {
 };
 
 # returns the same as _get_resource
-sub _get_or_load_resource {
-  my ($self, $uri) = @_;
-
+sub _get_or_load_resource ($self, $uri) {
   my $resource = $self->_get_resource($uri);
   return $resource if $resource;
 
   if (my $local_filename = $self->CACHED_METASCHEMAS->{$uri}) {
     my $file = path(dist_dir('JSON-Schema-Modern'), $local_filename);
     my $schema = $self->_json_decoder->decode($file->slurp_raw);
-    my $document = JSON::Schema::Modern::Document->new(schema => $schema, _evaluator => $self);
+    my $document = JSON::Schema::Modern::Document->new(schema => $schema, evaluator => $self);
 
     # this should be caught by the try/catch in evaluate()
     die JSON::Schema::Modern::Result->new(
@@ -691,7 +718,7 @@ sub _get_or_load_resource {
 
     # we have already performed the appropriate collision checks, so we bypass them here
     $self->_add_resources_unsafe(
-      map +($_->[0] => +{ %{$_->[1]}, document => $document }),
+      map +($_->[0] => +{ $_->[1]->%*, document => $document }),
         $document->resource_pairs
     );
 
@@ -710,10 +737,10 @@ sub _get_or_load_resource {
 # - the canonical uri for that schema,
 # - the JSON::Schema::Modern::Document object that holds that schema
 # - the path relative to the document root for this schema
+# - the specification version that applies to this schema
+# - the vocabularies to use when considering schema keywords
 # creates a Document and adds it to the resource index, if not already present.
-sub _fetch_from_uri {
-  my ($self, $uri) = @_;
-
+sub _fetch_from_uri ($self, $uri) {
   $uri = Mojo::URL->new($uri) if not is_ref($uri);
   my $fragment = $uri->fragment;
 
@@ -782,7 +809,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 SYNOPSIS
 
@@ -956,6 +983,21 @@ L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</sc
 L</validate_formats> settings for just this
 evaluation call.
 
+You can pass a series of callback subs to this method corresponding to keywords, which is useful for
+identifying various data that are not exposed by annotations.
+This feature is highly experimental and may change in the future.
+
+For example, to find the locations where all C<$ref> keywords are applied B<successfully>:
+
+  my @used_ref_at;
+  $js->evaluate($data, $schema_or_uri, {
+    callbacks => {
+      '$ref' => sub ($schema, $state) {
+        push @used_ref_at, $state->{data_path};
+      }
+    },
+  });
+
 The result is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
 
 =head2 traverse
@@ -979,7 +1021,7 @@ For example, to find the resolved targets of all C<$ref> keywords in a schema do
     callbacks => {
       '$ref' => sub ($schema, $state) {
         push @refs, Mojo::URL->new($schema->{'$ref'})
-          ->to_abs(JSON::Schema::Modern::Utilities::canonical_schema_uri($state));
+          ->to_abs(JSON::Schema::Modern::Utilities::canonical_uri($state));
       }
     },
   });
@@ -1041,9 +1083,12 @@ For more information, see L<Cpanel::JSON::XS/MAPPING>.
 
 =head2 Format Validation
 
-By default, formats are treated only as annotations, not assertions. When L</validate_formats> is
+By default (and unless you specify a custom metaschema with the C<$schema> keyword or
+L<JSON::Schema::Modern::Document/metaschema>),
+formats are treated only as annotations, not assertions. When L</validate_formats> is
 true, strings are also checked against the format as specified in the schema. At present the
-following formats are supported (use of any other formats than these will always evaluate as true):
+following formats are supported (use of any other formats than these will always evaluate as true,
+but remember you can always supply custom format handlers; see L</format_validations> above):
 
 =over 4
 

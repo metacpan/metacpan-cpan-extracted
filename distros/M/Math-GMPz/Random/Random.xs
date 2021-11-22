@@ -111,7 +111,7 @@ SV * Rgmp_randinit_set(pTHX_ gmp_randstate_t * op) {
 }
 
 SV * Rgmp_urandomb_ui(pTHX_ gmp_randstate_t * state, SV * n) {
-     unsigned long max, req = (unsigned long)SvUV(n);
+     unsigned int max, req = (unsigned int)SvUV(n);
      max = sizeof(unsigned long) * 8;
      if(req > max) croak("In Math::GMPz::Random::Rgmp_urandomb_ui, requested %u bits, but %u is the maximum allowed", req, max);
      return newSVuv(gmp_urandomb_ui(*state, req));

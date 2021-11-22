@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -17,7 +17,7 @@ return [
       {
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'Unknown parameter'
+        'warn' => 'Unexpected systemd parameter. Please contact cme author to update systemd model.'
       }
     ],
     'class_description' => 'A unit configuration file whose name ends in
@@ -134,7 +134,11 @@ file after start-up of the service. The service manager will not write to the fi
 will remove the file after the service has shut down if it still exists. The PID file does not need to be owned
 by a privileged user, but if it is owned by an unprivileged user additional safety restrictions are enforced:
 the file may not be a symlink to a file owned by a different user (neither directly nor indirectly), and the
-PID file must refer to a process already belonging to the service.',
+PID file must refer to a process already belonging to the service.
+
+Note that PID files should be avoided in modern projects. Use C<Type=notify> or
+C<Type=simple> where possible, which does not require use of PID files to determine the
+main process of a service and avoids needless forking.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -640,14 +644,15 @@ C<always>.
 If set to C<no> (the default), the service will
 not be restarted. If set to C<on-success>, it
 will be restarted only when the service process exits cleanly.
-In this context, a clean exit means an exit code of 0, or one
-of the signals
+In this context, a clean exit means any of the following:
+exit code of 0;for types other than
+C<Type=oneshot>, one of the signals
 C<SIGHUP>,
 C<SIGINT>,
-C<SIGTERM> or
-C<SIGPIPE>, and
-additionally, exit statuses and signals specified in
-C<SuccessExitStatus>. If set to
+C<SIGTERM>, or
+C<SIGPIPE>;exit statuses and signals specified in
+C<SuccessExitStatus>.
+If set to
 C<on-failure>, the service will be restarted
 when the process exits with a non-zero exit code, is
 terminated by a signal (including on core dump, but excluding
@@ -695,7 +700,7 @@ C<on-abnormal> is an alternative choice.',
       {
         'description' => 'Takes a list of exit status definitions that, when returned by the main service
 process, will be considered successful termination, in addition to the normal successful exit status
-0 and the signals C<SIGHUP>, C<SIGINT>,
+0 and, except for C<Type=oneshot>, the signals C<SIGHUP>, C<SIGINT>,
 C<SIGTERM>, and C<SIGPIPE>. Exit status definitions can be
 numeric termination statuses, termination status names, or termination signal names, separated by
 spaces. See the Process Exit Codes section in

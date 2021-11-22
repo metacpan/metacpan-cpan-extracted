@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/lib";
 use OpenSSL_Control ();
 
 use Test::More;
-use Test::NoWarnings;
+use Test::FailWarnings;
 use Test::Deep;
 use Test::Exception;
 
@@ -39,11 +39,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Crypt::Perl::ECDSA::Generate ();
 
-if ( !caller ) {
-    my $test_obj = __PACKAGE__->new();
-    plan tests => $test_obj->expected_tests(+1);
-    $test_obj->runtests();
-}
+__PACKAGE__->new()->runtests() if !caller;
 
 #----------------------------------------------------------------------
 
@@ -129,7 +125,7 @@ sub test_generate : Tests() {
             print {$fh} $key_obj->to_pem_with_explicit_curve() or die $!;
             close $fh;
 
-            system( "$ossl_bin ec -text -in $path -out $path.out" );
+            OpenSSL_Control::run( qw(ec -text -in), $path, '-out', "$path.out" );
 
             my $parsed = File::Slurp::read_file("$path.out");
 

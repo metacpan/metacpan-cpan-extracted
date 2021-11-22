@@ -1,117 +1,188 @@
 use strict;
 use warnings;
 use Test::More;
-use IO::Pipely 'pipely';
 use Mojo::IOLoop;
-use Mojo::IOLoop::Stream;
 
-my ($read, $write) = pipely or die "Failed to open pipe: $!";
+subtest 'Basic line buffering' => sub {
+  my @outputs;
+  my $server = Mojo::IOLoop->server(address => '127.0.0.1', sub {
+    my ($loop, $stream, $id) = @_;
+    $stream->with_roles('+LineBuffer')->watch_lines;
+    $stream->on(read_line => sub {
+      my ($stream, $line, $sep) = @_;
+      push @outputs, [$line, $sep];
+    });
+    $stream->on(read => sub { Mojo::IOLoop->stop });
+  });
+  my $port = Mojo::IOLoop->acceptor($server)->port;
 
-my @lines;
-my $reader = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($read)->watch_lines;
-$reader->on(read_line => sub {
-  my ($reader, $line, $sep) = @_;
-  push @lines, [$line, $sep];
-});
-$reader->on(read => sub { Mojo::IOLoop->stop });
-$reader->start;
+  my $client = Mojo::IOLoop->client(address => '127.0.0.1', port => $port, sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->write('foo');
+  });
 
-my $writer = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($write);
-$writer->start;
+  my $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($timeout);
 
-$writer->write('foo');
+  is_deeply \@outputs, [], 'no lines received';
+  @outputs = ();
 
-my $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
-Mojo::IOLoop->start;
-Mojo::IOLoop->remove($timeout);
+  my $input_stream = Mojo::IOLoop->stream($client);
+  $input_stream->write("bar\x0Abaz");
 
-is_deeply \@lines, [], 'no lines received';
-@lines = ();
+  $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($timeout);
 
-$writer->write("bar\x0Abaz");
+  is_deeply \@outputs, [['foobar', "\x0A"]], 'one line received';
+  @outputs = ();
 
-$timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
-Mojo::IOLoop->start;
-Mojo::IOLoop->remove($timeout);
+  $input_stream->with_roles('+LineBuffer')->write_line('line?');
 
-is_deeply \@lines, [['foobar', "\x0A"]], 'one line received';
-@lines = ();
+  $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($timeout);
 
-$writer->write_line('line?');
+  is_deeply \@outputs, [['bazline?', "\x0D\x0A"]], 'one line received';
 
-$timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
-Mojo::IOLoop->start;
-Mojo::IOLoop->remove($timeout);
+  Mojo::IOLoop->reset;
+};
 
-is_deeply \@lines, [['bazline?', "\x0D\x0A"]], 'one line received';
-@lines = ();
+subtest 'Custom line separators' => sub {
+  my @outputs;
+  my $server = Mojo::IOLoop->server(address => '127.0.0.1', sub {
+    my ($loop, $stream, $id) = @_;
+    $stream->with_roles('+LineBuffer')->watch_lines->read_line_separator('bar');
+    $stream->on(read_line => sub {
+      my ($stream, $line, $sep) = @_;
+      push @outputs, [$line, $sep];
+    });
+    $stream->on(read => sub { Mojo::IOLoop->stop });
+  });
+  my $port = Mojo::IOLoop->acceptor($server)->port;
 
-$reader->read_line_separator('bar');
-$writer->write_line_separator('bar');
-$writer->write_line("foobar\x0Abarbaz");
+  my $client = Mojo::IOLoop->client(address => '127.0.0.1', port => $port, sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->with_roles('+LineBuffer')->write_line_separator('bar')->write_line("foobar\x0Abarbaz");
+  });
 
-$timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
-Mojo::IOLoop->start;
-Mojo::IOLoop->remove($timeout);
+  my $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($timeout);
 
-is_deeply \@lines, [['foo', 'bar'],["\x0A",'bar'],['baz','bar']], 'three lines received';
-@lines = ();
+  is_deeply \@outputs, [['foo', 'bar'],["\x0A",'bar'],['baz','bar']], 'three lines received';
 
-$reader->read_line_separator('1');
-$reader->on(read => sub { shift->read_line_separator('2')->close; $writer->close });
-$writer->write('before1mid2after');
+  Mojo::IOLoop->reset;
+};
 
-$timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
-Mojo::IOLoop->start;
-Mojo::IOLoop->remove($timeout);
+subtest 'Multiple lines on close' => sub {
+  my @outputs;
+  my $server = Mojo::IOLoop->server(address => '127.0.0.1', sub {
+    my ($loop, $stream, $id) = @_;
+    $stream->with_roles('+LineBuffer')->watch_lines->read_line_separator('1');
+    $stream->on(read_line => sub {
+      my ($stream, $line, $sep) = @_;
+      push @outputs, [$line, $sep];
+    });
+    $stream->on(read => sub { Mojo::IOLoop->stop; shift->read_line_separator('2')->close });
+  });
+  my $port = Mojo::IOLoop->acceptor($server)->port;
 
-is_deeply \@lines, [['before', '1'], ['mid', '2'], ['after', undef]], 'remaining lines and bytes received';
-@lines = ();
+  my $client = Mojo::IOLoop->client(address => '127.0.0.1', port => $port, sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->write('before1mid2after');
+  });
 
-($read, $write) = pipely or die "Failed to open pipe: $!";
+  my $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($timeout);
 
-$reader = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($read)->watch_lines;
-$reader->on(read_line => sub {
-  my ($reader, $line, $sep) = @_;
-  push @lines, [$line, $sep];
-});
-$reader->on(read => sub { Mojo::IOLoop->stop });
-$reader->start;
+  is_deeply \@outputs, [['before', '1'], ['mid', '2'], ['after', undef]], 'remaining lines and bytes received';
 
-$writer = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($write);
-$writer->start;
+  Mojo::IOLoop->reset;
+};
 
-$reader->on(read => sub { shift->read_line_separator('3')->close; $writer->close });
-$writer->write('bar3');
+subtest 'Line separator on close' => sub {
+  my @outputs;
+  my $server = Mojo::IOLoop->server(address => '127.0.0.1', sub {
+    my ($loop, $stream, $id) = @_;
+    $stream->with_roles('+LineBuffer')->watch_lines;
+    $stream->on(read_line => sub {
+      my ($stream, $line, $sep) = @_;
+      push @outputs, [$line, $sep];
+    });
+    $stream->on(read => sub { Mojo::IOLoop->stop; shift->read_line_separator('3')->close });
+  });
+  my $port = Mojo::IOLoop->acceptor($server)->port;
 
-$timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
-Mojo::IOLoop->start;
-Mojo::IOLoop->remove($timeout);
+  my $client = Mojo::IOLoop->client(address => '127.0.0.1', port => $port, sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->write('bar3');
+  });
 
-is_deeply \@lines, [['bar', '3']], 'remaining line received';
-@lines = ();
+  my $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($timeout);
 
-($read, $write) = pipely or die "Failed to open pipe: $!";
+  is_deeply \@outputs, [['bar', '3']], 'remaining line received';
 
-$reader = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($read)->watch_lines;
-$reader->on(read_line => sub {
-  my ($reader, $line, $sep) = @_;
-  push @lines, [$line, $sep];
-});
-$reader->on(read => sub { Mojo::IOLoop->stop });
-$reader->start;
+  Mojo::IOLoop->reset;
+};
 
-$writer = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($write);
-$writer->start;
+subtest 'No line separator on close' => sub {
+  my @outputs;
+  my $server = Mojo::IOLoop->server(address => '127.0.0.1', sub {
+    my ($loop, $stream, $id) = @_;
+    $stream->with_roles('+LineBuffer')->watch_lines;
+    $stream->on(read_line => sub {
+      my ($stream, $line, $sep) = @_;
+      push @outputs, [$line, $sep];
+    });
+    $stream->on(read => sub { Mojo::IOLoop->stop; shift->read_line_separator('4')->close });
+  });
+  my $port = Mojo::IOLoop->acceptor($server)->port;
 
-$reader->on(read => sub { shift->read_line_separator('4')->close; $writer->close });
-$writer->write('bar');
+  my $client = Mojo::IOLoop->client(address => '127.0.0.1', port => $port, sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->write('bar');
+  });
 
-$timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
-Mojo::IOLoop->start;
-Mojo::IOLoop->remove($timeout);
+  my $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($timeout);
 
-is_deeply \@lines, [['bar', undef]], 'remaining bytes received';
-@lines = ();
+  is_deeply \@outputs, [['bar', undef]], 'remaining bytes received';
+
+  Mojo::IOLoop->reset;
+};
+
+subtest 'Closing stream in read_line event' => sub {
+  my @outputs;
+  my $server = Mojo::IOLoop->server(address => '127.0.0.1', sub {
+    my ($loop, $stream, $id) = @_;
+    $stream->with_roles('+LineBuffer')->watch_lines;
+    $stream->on(read_line => sub {
+      my ($stream, $line, $sep) = @_;
+      push @outputs, [$line, $sep];
+      $stream->close;
+    });
+    $stream->on(read => sub { Mojo::IOLoop->stop });
+  });
+  my $port = Mojo::IOLoop->acceptor($server)->port;
+
+  my $client = Mojo::IOLoop->client(address => '127.0.0.1', port => $port, sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->with_roles('+LineBuffer')->write_line('foo');
+  });
+
+  my $timeout = Mojo::IOLoop->timer(0.1 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($timeout);
+
+  is_deeply \@outputs, [['foo', "\x0D\x0A"]], 'one line received';
+
+  Mojo::IOLoop->reset;
+};
 
 done_testing;

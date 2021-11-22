@@ -1,9 +1,10 @@
 package Archive::Peek;
-use Moose;
+use Moo;
+use Carp qw(confess);
 use Archive::Peek::Tar;
 use Archive::Peek::Zip;
-use MooseX::Types::Path::Class qw( File );
-our $VERSION = '0.35';
+use Types::Path::Tiny qw( File );
+our $VERSION = '0.37';
 
 has 'filename' => (
     is       => 'ro',

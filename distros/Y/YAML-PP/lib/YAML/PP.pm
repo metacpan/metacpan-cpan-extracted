@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -228,10 +228,10 @@ use base qw/ Tie::StdHash /;
 use Scalar::Util qw/ reftype blessed /;
 
 sub TIEHASH {
-    my ($class) = @_;
+    my ($class, %args) = @_;
     my $self = bless {
-        keys => [],
-        data => {},
+        keys => [keys %args],
+        data => { %args },
     }, $class;
 }
 
@@ -243,10 +243,10 @@ sub STORE {
     }
     if (ref $val and not blessed($val)) {
         if (reftype($val) eq 'HASH' and not tied %$val) {
-            tie %$val, 'YAML::PP::Preserve::Hash'
+            tie %$val, 'YAML::PP::Preserve::Hash', %$val;
         }
         elsif (reftype($val) eq 'ARRAY' and not tied @$val) {
-            tie @$val, 'YAML::PP::Preserve::Array'
+            tie @$val, 'YAML::PP::Preserve::Array', @$val;
         }
     }
     $self->{data}->{ $key } = $val;
@@ -302,9 +302,9 @@ use base qw/ Tie::StdArray /;
 use Scalar::Util qw/ reftype blessed /;
 
 sub TIEARRAY {
-    my ($class) = @_;
+    my ($class, @items) = @_;
     my $self = bless {
-        data => [],
+        data => [@items],
     }, $class;
     return $self;
 }
@@ -322,10 +322,10 @@ sub _preserve {
     my ($val) = @_;
     if (ref $val and not blessed($val)) {
         if (reftype($val) eq 'HASH' and not tied %$val) {
-            tie %$val, 'YAML::PP::Preserve::Hash';
+            tie %$val, 'YAML::PP::Preserve::Hash', %$val;
         }
         elsif (reftype($val) eq 'ARRAY' and not tied @$val) {
-            tie @$val, 'YAML::PP::Preserve::Array';
+            tie @$val, 'YAML::PP::Preserve::Array', @$val;
         }
     }
     return $val;
@@ -1089,6 +1089,8 @@ Still TODO:
     [ a, b, c ]: value
 
 =item Implicit mapping in flow style sequences
+
+This is supported since 0.029 (except some not relevant cases):
 
     ---
     [ a, b, c: d ]

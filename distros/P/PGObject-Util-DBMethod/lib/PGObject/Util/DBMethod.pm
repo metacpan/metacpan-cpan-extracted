@@ -4,6 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 use Exporter 'import';
+use Sub::Util qw( set_subname );
 
 =head1 NAME
 
@@ -12,11 +13,11 @@ the PGObject Framework
 
 =head1 VERSION
 
-Version 1.00.003
+Version 1.01.000
 
 =cut
 
-our $VERSION = '1.00.003';
+our $VERSION = '1.01.000';
 
 
 =head1 SYNOPSIS
@@ -125,6 +126,7 @@ sub dbmethod {
        return @results;
     };
     no strict 'refs';
+    set_subname "${target}::${name}", $coderef;
     *{"${target}::${name}"} = $coderef;
 }
 

@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.65 2021-11-20
+
+ - Add support for Esperanto
+
 0.64 2020-11-05
 
  - Fixed manifest

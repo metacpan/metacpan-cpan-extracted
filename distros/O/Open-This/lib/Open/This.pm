@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -340,7 +340,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000027
+version 0.000028
 
 =head1 DESCRIPTION
 
@@ -448,6 +448,33 @@ which has already been pushed to your remote.
 By default, C<ot> will search your C<lib> and C<t/lib> directories for local
 files.  You can override this via the C<$ENV{OPEN_THIS_LIBS}> variable.  It
 accepts a comma-separated list of libs.
+
+=head1 VIM INTEGRATION
+
+If you're a C<vim> user, you can use the following code to your C<.vimrc> to
+integrate C<ot> directly with your editor.
+
+    " Thanks to D. Ben Knoble for getting histadd() to work:
+    " https://vi.stackexchange.com/questions/34818/how-to-use-histadd-with-a-custom-function/34819#34819
+    nnoremap <leader>ot :call OT(input("ot: ", "", "file"))<cr>
+
+    " trim() requires vim 8
+    " https://github.com/vim/vim/commit/295ac5ab5e840af6051bed5ec9d9acc3c73445de
+    function! OT(fname)
+        let res = system("ot --editor vim --print " . shellescape(trim(a:fname)))
+        if v:shell_error
+            echo "\n" . res
+        else
+            execute "e " res
+        endif
+        call histadd(':', printf('call OT("%s")', escape(a:fname, '"\')))
+    endfunction
+
+With the above code, you can enter <leader>ot and then enter your C<ot> args
+directly in C<vim>. If the file is found, it will be opened in a buffer,
+hopefully at the appropriate line and column number. An up to date copy of this
+command should generally be available in my dotfiles repo as well:
+L<https://github.com/oalders/dot-files/blob/main/vim/vimrc>.
 
 =head1 AUTHOR
 

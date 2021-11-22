@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/SQLiteKeyValueStoreSimpleUtils.pm'
@@ -14,6 +14,7 @@ my @module_files = (
 
 my @scripts = (
     'script/check-sqlite-kvstore-key-exists',
+    'script/dump-sqlite-kvstore',
     'script/get-sqlite-kvstore-value',
     'script/list-sqlite-kvstore-keys',
     'script/set-sqlite-kvstore-value'

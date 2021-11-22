@@ -40,7 +40,7 @@ sub new {
         $self->{'_compressed_bin'} = $bin;
     }
     else {
-        die Crypt::Perl::X::Create('Generic', sprintf "Invalid leading octet in ECDSA point: %v02x", $bin);
+        die Crypt::Perl::X::create('Generic', sprintf "Invalid leading octet in ECDSA point: %v02x", $bin);
     }
 
     return $self;

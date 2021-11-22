@@ -1,0 +1,51 @@
+# PODNAME: Config::Model::models::Systemd::StandAlone::Timer
+# ABSTRACT:  Configuration class Systemd::StandAlone::Timer
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Systemd::StandAlone::Timer - Configuration class Systemd::StandAlone::Timer
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 Timer
+
+I< Optional. Type node of class L<Systemd::Section::Timer|Config::Model::models::Systemd::Section::Timer> .  > 
+
+=head2 Unit
+
+I< Optional. Type node of class L<Systemd::Section::TimerUnit|Config::Model::models::Systemd::Section::TimerUnit> .  > 
+
+=head2 Install
+
+I< Optional. Type node of class L<Systemd::Section::Install|Config::Model::models::Systemd::Section::Install> .  > 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::Install>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::Timer>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::TimerUnit>
+
+=back
+
+=cut
+

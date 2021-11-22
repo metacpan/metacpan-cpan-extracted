@@ -2,8 +2,8 @@ NAME
     Module::Features::Dummy - Dummy feature set, for testing
 
 VERSION
-    This document describes version 0.004 of Module::Features::Dummy (from
-    Perl distribution Module-Features-Dummy), released on 2021-02-26.
+    This document describes version 0.005 of Module::Features::Dummy (from
+    Perl distribution Module-Features-Dummy), released on 2021-07-05.
 
 DESCRIPTION
 DEFINED FEATURES
@@ -19,7 +19,8 @@ DEFINED FEATURES
 
     *   feature3
 
-        Optional. Type: str. Second feature, a string.
+        Optional. Type: str. Third feature, a string with range of valid
+        values, optional.
 
     For more details on module features, see Module::Features.
 
@@ -33,7 +34,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Module-Features-Dummy/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Features-Dummy
+    >
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

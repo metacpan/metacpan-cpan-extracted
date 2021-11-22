@@ -5,7 +5,7 @@ use warnings;
 
 use Test::Most;
 
-if($ENV{RELEASE_TESTING}) {
+if($ENV{AUTHOR_TESTING}) {
 	eval 'use Test::NoPlan qw / all_plans_ok /';
 
 	if($@) {

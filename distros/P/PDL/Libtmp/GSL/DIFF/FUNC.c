@@ -1,7 +1,13 @@
-static SV* ext_funname;
-static gsl_function F;
+#include "EXTERN.h"
+#include "perl.h"
+#include "pdlcore.h"
+#include <gsl/gsl_math.h>
 
-double FUNC(double x,void * p);
+SV* ext_funname;
+
+void set_funname(SV *fn) {
+  ext_funname = fn;
+}
 
 double FUNC(double x,void * p){
 
@@ -9,10 +15,7 @@ double FUNC(double x,void * p){
   int count;
 
   dSP;
-  SV* funname;
-
-  /* get function name on the perl side */
-  funname = ext_funname;
+  SV* funname = ext_funname; /* get function name on the perl side */
 
   ENTER;
   SAVETMPS;

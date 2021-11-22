@@ -1,7 +1,4 @@
-.github/workflows/ci-ubuntu.yml
 .perltidyrc
-.travis.yml
-.vstags
 Changes
 cpanfile
 examples/cache.pl

@@ -1,3 +1,9 @@
+0.008   2021-11-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix handling of first argument ('pattern') to better
+	  mimic grep.
+
+
 0.007   2020-11-08  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

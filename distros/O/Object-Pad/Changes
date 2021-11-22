@@ -1,5 +1,19 @@
 Revision history for Object-Pad
 
+0.57    2021-11-18
+        [CHANGES]
+         * Defined new ABI version for class/slot hooks
+            + Adds `funcdata` at registration and callback time
+            + Adds MOP accessor functions for slotmeta default SV
+         * Added :isa() and :does() class attributes; encourage those rather
+           than the older keyword style
+         * Added more MOP methods:
+            + $classmeta->direct_methods, ->get_direct_method
+            + $classmeta->all_methods, ->get_method
+            + $slotmeta->has_attribute, ->get_attribute_value
+         * Added Object::Pad::MOP::SlotAttr, allowing pure-perl slot
+           attributes that provide simple metadata storage
+
 0.56    2021-10-22
         [CHANGES]
          * Support roles inheriting from (possibly-multiple) other roles

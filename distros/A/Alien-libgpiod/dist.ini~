@@ -1,0 +1,9 @@
+name    = Alien-libgpiod
+author  = Stephen Cavilia <sac+cpan@atomicradi.us>
+license = Perl_5
+copyright_holder = Stephen Cavilia
+copyright_year   = 2021
+
+version = 0.001
+
+[@Basic]

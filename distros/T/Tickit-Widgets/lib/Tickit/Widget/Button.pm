@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.51;
+use Object::Pad 0.57;
 
-package Tickit::Widget::Button 0.33;
+package Tickit::Widget::Button 0.34;
 class Tickit::Widget::Button
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_DOUBLE LINE_THICK );

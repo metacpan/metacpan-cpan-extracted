@@ -6,6 +6,28 @@ namespace xs { namespace unievent { namespace http {
 using namespace panda;
 using xs::protocol::http::strings_to_sv;
 
+struct DelayedResponseGuard {
+    DelayedResponseGuard() noexcept {}
+    DelayedResponseGuard(ServerRequest* request_) noexcept: request{request_}{}
+    DelayedResponseGuard(const DelayedResponseGuard&) = delete;
+    DelayedResponseGuard(DelayedResponseGuard&& other) noexcept { *this = std::move(other); }
+
+    DelayedResponseGuard& operator=(DelayedResponseGuard&& other) noexcept {
+        std::swap(request, other.request);
+        return *this;
+    }
+
+    inline void comply()  noexcept { request = nullptr; }
+
+    ~DelayedResponseGuard() {
+        if (request) {
+            request->drop();
+        }
+    }
+
+    ServerRequest* request = nullptr;
+};
+
 Plack::Plack (bool mp, bool mt) : multiprocess(mp), multithread(mt) {
     psgi_version = Array::create({Simple(1), Simple(1)});
     psgi_errors  = Stash("UniEvent::HTTP::Plack::ErrorHandle").bless(Hash::create());
@@ -27,7 +49,9 @@ void Plack::bind (const ServerSP& server, const Sub& app) {
             respond_now(request, psgi_res);
         }
         else if (psgi_res.is_sub_ref()) {
-            panda::function<Scalar(Array)> fn = [this, request](const Array& psgi_array) -> Scalar {
+            auto guard = DelayedResponseGuard(request);
+            panda::function<Scalar(Array)> fn = [this, request, g = std::move(guard)](const Array& psgi_array) mutable -> Scalar {
+                g.comply();
                 return process_delayed_response(request, psgi_array);
             };
             Sub(psgi_res).call(xs::out(fn));
@@ -42,6 +66,14 @@ Sv Plack::make_env (const ServerRequestSP& request) {
     auto sockaddr = request->sockaddr();
     auto peeraddr = request->peeraddr();
 
+    bool is_unix = false;
+    string_view unix_server, unix_remote;
+    #ifndef _WIN32
+    if (sockaddr.is_unix()) unix_server = sockaddr.as_unix().path();
+    if (peeraddr.is_unix()) unix_remote = peeraddr.as_unix().path();
+    is_unix = unix_server.length();
+    #endif
+
     auto env = Hash::create({
         {"REQUEST_METHOD",       Simple(ServerRequest::method_str(request->method()))},
         {"SCRIPT_NAME",          Simple("")},
@@ -49,10 +81,10 @@ Sv Plack::make_env (const ServerRequestSP& request) {
         {"REQUEST_URI",          Simple(request->uri->to_string())},
         {"QUERY_STRING",         Simple(request->uri->query_string())},
         {"SERVER_PROTOCOL",      request->http_version == 11 ? Simple("HTTP/1.1") : Simple("HTTP/1.0")},
-        {"SERVER_NAME",          Simple(sockaddr.ip())},
-        {"SERVER_PORT",          Simple(sockaddr.port())},
-        {"REMOTE_ADDR",          Simple(peeraddr.ip())},
-        {"REMOTE_PORT",          Simple(peeraddr.port())},
+        {"SERVER_NAME",          is_unix ? Simple(unix_server) : Simple(sockaddr.ip())},
+        {"SERVER_PORT",          Simple(is_unix ? 0 : sockaddr.port())},
+        {"REMOTE_ADDR",          is_unix ? Simple(unix_remote) : Simple(peeraddr.ip())},
+        {"REMOTE_PORT",          Simple(is_unix ? 0 : peeraddr.port())},
         {"psgi.url_scheme",      request->is_secure() ? Simple("https") : Simple("http")},
         {"psgi.version",         Ref::create(psgi_version)},
         {"psgi.errors",          Ref::create(psgi_errors)},

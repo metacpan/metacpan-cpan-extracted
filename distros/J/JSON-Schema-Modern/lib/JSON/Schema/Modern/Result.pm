@@ -4,15 +4,16 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
-use Moo;
 use MooX::TypeTiny;
 use Types::Standard qw(ArrayRef InstanceOf Enum);
 use MooX::HandlesVia;
@@ -20,11 +21,13 @@ use JSON::Schema::Modern::Annotation;
 use JSON::Schema::Modern::Error;
 use JSON::PP ();
 use List::Util 1.50 'head';
+use Safe::Isa;
 use namespace::clean;
 
 use overload
   'bool'  => sub { $_[0]->valid },
   '0+'    => sub { $_[0]->count },
+  '&'     => \&combine,
   fallback => 1;
 
 has valid => (
@@ -55,14 +58,11 @@ has output_format => (
   default => 'basic',
 );
 
-sub BUILD {
-  my $self = shift;
+sub BUILD ($self, $) {
   warn 'result is false but there are no errors' if not $self->valid and not $self->error_count;
 }
 
-sub format {
-  my ($self, $style) = @_;
-
+sub format ($self, $style) {
   if ($style eq 'flag') {
     return +{ valid => $self->valid };
   }
@@ -142,15 +142,32 @@ sub format {
 
 sub count { $_[0]->valid ? $_[0]->annotation_count : $_[0]->error_count }
 
-sub TO_JSON {
-  my $self = shift;
+sub combine ($self, $other, $swap) {
+  die 'wrong type for & operation' if not $other->$_isa(__PACKAGE__);
+
+  return $self if $other == $self;
+
+  return ref($self)->new(
+    valid => $self->valid && $other->valid,
+    annotations => [
+      $self->annotations,
+      $other->annotations,
+    ],
+    errors => [
+      $self->errors,
+      $other->errors,
+    ],
+    output_format => $self->output_format,
+  );
+}
+
+sub TO_JSON ($self) {
   $self->format($self->output_format);
 }
 
 # turns the JSON pointers in instance_location, keyword_location  into a URI fragments,
 # for strict draft-201909 adherence
-sub _map_uris {
-  my $data = shift;
+sub _map_uris ($data) {
   return +{
     %$data,
     map +($_ => Mojo::URL->new->fragment($data->{$_})->to_string),
@@ -172,7 +189,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 SYNOPSIS
 
@@ -189,6 +206,9 @@ version 0.523
   # use in string context
   say 'full results: ', $result;
 
+  # combine two results into one:
+  my $overall_result = $result1 & $result2;
+
 =head1 DESCRIPTION
 
 This object holds the complete results of evaluating a data payload against a JSON Schema using
@@ -196,8 +216,14 @@ L<JSON::Schema::Modern>.
 
 =head1 OVERLOADS
 
-The object contains a boolean overload, which evaluates to the value of L</valid>, so you can
+The object contains a I<boolean> overload, which evaluates to the value of L</valid>, so you can
 use the result of L<JSON::Schema::Modern/evaluate> in boolean context.
+
+=for stopwords iff
+
+The object also contains a I<bitwise AND> overload (C<&>), for combining two results into one (the
+result is valid iff both inputs are valid; annotations and errors from the second argument are
+appended to those of the first).
 
 =head1 ATTRIBUTES
 
@@ -268,6 +294,11 @@ Calls L</format> with the style configured in L</output_format>.
 
 Returns the number of annotations when the result is true, or the number of errors when the result
 is false.
+
+=head2 combine
+
+When provided with another result object, returns a new object with the combination of all results.
+See C<&> at L</OVERLOADS>.
 
 =head1 SUPPORT
 

@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "The main module to handle bags.",
-  "AUTHOR" => "Rob Schmidt <rjeschmi\@gmail.com>",
+  "AUTHOR" => "Andreas Romeyke <cpan\@andreas.romeyke.de>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
     "Moo::Role" => 0,
     "Net::SSLeay" => "1.43",
     "POSIX" => 0,
+    "Parallel::parallel_map" => 0,
     "Time::HiRes" => 0,
     "feature" => 0,
     "namespace::autoclean" => 0,
@@ -55,7 +56,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.083",
+  "VERSION" => "0.085",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -85,6 +86,7 @@ my %FallbackPrereqs = (
   "Moo::Role" => 0,
   "Net::SSLeay" => "1.43",
   "POSIX" => 0,
+  "Parallel::parallel_map" => 0,
   "Test::Exception" => 0,
   "Test::File" => 0,
   "Test::More" => 0,

@@ -13,7 +13,8 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
-	'JSON::Parse' => '0.38',
+	# We need "read_json"
+	'JSON::Parse' => '0.61',
 	'Carp' => '0',
 	'Convert::Moji' => '0.10',
     },

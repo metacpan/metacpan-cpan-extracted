@@ -6,10 +6,13 @@ use Carp qw( croak );
 use File::Spec ();
 use Moo::Role;
 use IO::Async::Function;
+#use Parallel::Map qw(pmap_scalar);
+use Parallel::parallel_map;
+#use Future;
 with 'Archive::BagIt::Role::Plugin';
 with 'Archive::BagIt::Role::Portability';
 # ABSTRACT: A role that handles all manifest files for a specific Algorithm
-our $VERSION = '0.083'; # VERSION
+our $VERSION = '0.085'; # VERSION
 
 has 'algorithm' => (
     is => 'rw',
@@ -57,11 +60,13 @@ after BUILD => sub {
     $self->{bagit}->{manifests}->{$algorithm} = $self;
 };
 
+
 has 'manifest_entries' => (
     is => 'ro',
     lazy => 1,
     builder => '_build_manifest_entries',
 );
+
 
 has 'tagmanifest_entries' => (
     is => 'ro',
@@ -78,7 +83,7 @@ sub __build_xxxmanifest_entries {
         $line = chomp_portable($line);
         my ($digest, $file) = split(/\s+/, $line, 2);
         next unless ((defined $digest) && (defined $file)); # empty lines!
-        $xxmanifest_entries->{$algorithm}->{$file} = $digest;
+        $xxmanifest_entries->{$file} = $digest;
     }
     close($XXMANIFEST);
     return $xxmanifest_entries;
@@ -107,7 +112,7 @@ sub _fill_digest_hashref {
     my $digest_hashref;
     my $fullname = File::Spec->catfile($bagit, $localname);
     my $calc_digest = $self->bagit->digest_callback();
-    $digest_hashref->{calculated_digest} = &$calc_digest($self->algorithm(), $fullname);
+    $digest_hashref->{calculated_digest} = eval {&$calc_digest($self->algorithm(), $fullname)} // '';
     $digest_hashref->{local_name} = $localname;
     $digest_hashref->{full_name} = $fullname;
     return $digest_hashref;
@@ -122,39 +127,19 @@ sub _fill_digest_hashref {
 # $tmp->{filename} = $filename;
 sub calc_digests {
     my ($self, $bagit, $filenames_ref) = @_;
-    my $function = IO::Async::Function->new(
-        code      => sub {
-            my ($tmp_bagit, $tmp_localname) = @_;
-            return $self->_fill_digest_hashref($tmp_bagit, $tmp_localname);
-        },
-        #min_workers=>2,
-        #max_workers=>10,
-        #idle_timeout => 1
-    );
-    my $async_loop = $self->_ioloop;
-    $async_loop-> add ( $function);
-    #the parallel version fails with Parallel::Iterator, therefore back to serial version
     my @digest_hashes;
     my %digest_results;
-    my @functions = map {
-        my $localname = $_;
-        $function->call(
-            args=> [$bagit, $localname]
-        )->on_done(
-            sub {
-                my $digest = shift;
-                $digest_results{$localname} = $digest;
-            }
-        )->on_fail(sub {
-            die "could not calc digest $_[0]";
-        });
-    } @{ $filenames_ref};
-
-    foreach my $f (@functions) {
-        $f->get;
+    if ($self->bagit->use_parallel) {
+        # Parallel::Map does not work at the moment, potential bug in Parallel::Map or IO::Async
+        # @digest_hashes = pmap_scalar {
+        #     $self->_fill_digest_hashref($bagit, $_);
+        # } foreach => $filenames_ref;
+        # works as expected:
+        @digest_hashes = parallel_map{ $self->_fill_digest_hashref($bagit, $_) } @{ $filenames_ref};
+    } else {
+        # serial variant
+        @digest_hashes = map {$self->_fill_digest_hashref($bagit, $_)} @{$filenames_ref}
     }
-    $async_loop->remove( $function);
-    @digest_hashes = map { $digest_results{$_} } @{ $filenames_ref };
     return \@digest_hashes;
 }
 
@@ -193,7 +178,7 @@ sub _verify_XXX_manifests {
     foreach my $local_name (@files) {
         my $normalized_local_name = normalize_payload_filepath($local_name);
         # local_name is relative to bagit base
-        unless (exists $xxmanifest_entries->{$algorithm}->{$normalized_local_name}) { # localname as value should exist!
+        unless (exists $xxmanifest_entries->{$normalized_local_name}) { # localname as value should exist!
             &$subref_invalid_report_or_die(
                 "file '$local_name' (normalized='$normalized_local_name') found, which is not in '$local_xxfilename' (bag-path:'$bagit')!"
                     #."DEBUG: \n".join("\n", keys %{$xxmanifest_entries->{$algorithm}})
@@ -205,7 +190,7 @@ sub _verify_XXX_manifests {
     foreach my $file (@files) {
         $normalised_files{ normalize_payload_filepath( $file )} = 1;
     }
-    foreach my $local_mf_entry_path (keys %{$xxmanifest_entries->{$algorithm}}) {
+    foreach my $local_mf_entry_path (keys %{$xxmanifest_entries}) {
         if ( # to avoid escapes via manifest-files
             check_if_payload_filepath_violates($local_mf_entry_path)
         ) {
@@ -225,7 +210,7 @@ sub _verify_XXX_manifests {
     if (defined $digest_hashes_ref && (ref $digest_hashes_ref eq 'ARRAY')) {
         foreach my $digest_entry (@{$digest_hashes_ref}) {
             my $normalized = normalize_payload_filepath($digest_entry->{local_name});
-            $digest_entry->{expected_digest} = $xxmanifest_entries->{$algorithm}->{$normalized};
+            $digest_entry->{expected_digest} = $xxmanifest_entries->{$normalized};
             #use Data::Printer; p( $digest_entry); p( $local_xxfilename);p( $algorithm);p($normalized);
             if (! defined $digest_entry->{expected_digest} ) { next; } # undef expected digests only occur if all preconditions fullfilled but return_all_errors was set, we should ignore it!
             if ($digest_entry->{calculated_digest} ne $digest_entry->{expected_digest}) {
@@ -332,7 +317,19 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.083
+version 0.085
+
+=head2 manifest_entries()
+
+returns the manifest_entries() for the current digest algorithm, the result is hashref like:
+
+   {
+       data/hello.txt   "e7c22b994c59d9cf2b48e549b1e24666636045930d3da7c1acb299d1c3b7f931f94aae41edda2c2b207a36e10f8bcb8d45223e54878f5b316e7ce3b6bc019629"
+   }
+
+=head2 tagmanifest_entries()
+
+returns the tagmanifest_entries() for the current digest algorithm, the result is hashref, see L<manifest_entries()>
 
 =head2 calc_digests($bagit, $filenames_ref, $opts)
 
@@ -367,11 +364,11 @@ web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Rob Schmidt <rjeschmi@gmail.com>
+Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

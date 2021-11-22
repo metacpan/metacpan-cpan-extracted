@@ -1,11 +1,12 @@
-#include <upb/def.h>
+#include <upb/upb.h>
+#include <google/protobuf/descriptor.upb.h>
 #include <stdio.h>
 
 using namespace upb;
 using namespace std;
 
 int main(int argc, char **argv) {
-    reffed_ptr<MessageDef> def1 = MessageDef::New();
+    upb::Arena arena;
 
-    printf("1");
+    printf("%p\n", arena.allocator());
 }

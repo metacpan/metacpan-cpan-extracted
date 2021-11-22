@@ -9,7 +9,7 @@ use DB_File;
 
 use v5.6.0;
 
-$Text::DocumentCollection::VERSION = 1.02;
+$Text::DocumentCollection::VERSION = 1.08;
 
 sub new
 {

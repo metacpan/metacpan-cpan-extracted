@@ -17,7 +17,7 @@ $t->start(1);
 
 MyTest::run_server({
     server => {
-        locations => [{host => 'localhost', port => 4555}],
+        locations => [{host => 'localhost', port => 4555, reuse_port => 1}],
         max_keepalive_requests => 10000,
     },
     min_servers    => 1,
@@ -27,7 +27,6 @@ MyTest::run_server({
     max_load       => 0.5,
     #min_spare_servers => 1,
     #max_spare_servers => 2,
-    bind_model => UniEvent::HTTP::Manager::BIND_REUSE_PORT,
     #activity_timeout => 5,
     termination_timeout => 5,
     min_worker_ttl => 10,

@@ -8,7 +8,7 @@ use Mojo::Util 'steady_time';
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = 'v5.0.5';
+our $VERSION = 'v5.0.6';
 
 has dequeue_interval => 0.5;
 has 'sqlite';
@@ -361,21 +361,18 @@ sub stats {
   my $self = shift;
 
   my $stats = $self->sqlite->db->query(
-    q{select count(case when state = 'inactive' and (expires is null or expires > datetime('now'))
-        then 1 end) as inactive_jobs,
-      count(case state when 'active' then 1 end) as active_jobs,
-      count(case state when 'failed' then 1 end) as failed_jobs,
-      count(case state when 'finished' then 1 end) as finished_jobs,
-      count(case when state = 'inactive' and delayed > datetime('now')
-        then 1 end) as delayed_jobs,
-      (select count(*) from minion_locks where expires > datetime('now'))
-        as active_locks,
-      count(distinct case when state = 'active' then worker end)
-        as active_workers,
-      ifnull((select seq from sqlite_sequence where name = 'minion_jobs'), 0)
-        as enqueued_jobs,
-      (select count(*) from minion_workers) as inactive_workers, null as uptime
-      from minion_jobs}
+    q{select
+      (select count(*) from minion_jobs where state = 'inactive' and (expires is null or expires > datetime('now')))
+        as inactive_jobs,
+      (select count(*) from minion_jobs where state = 'active') as active_jobs,
+      (select count(*) from minion_jobs where state = 'failed') as failed_jobs,
+      (select count(*) from minion_jobs where state = 'finished') as finished_jobs,
+      (select count(*) from minion_jobs where state = 'inactive' and delayed > datetime('now')) as delayed_jobs,
+      (select count(*) from minion_locks where expires > datetime('now')) as active_locks,
+      (select count(distinct(worker)) from minion_jobs where state = 'active') as active_workers,
+      ifnull((select seq from sqlite_sequence where name = 'minion_jobs'), 0) as enqueued_jobs,
+      (select count(*) from minion_workers) as inactive_workers,
+      null as uptime}
   )->hash;
   $stats->{inactive_workers} -= $stats->{active_workers};
 

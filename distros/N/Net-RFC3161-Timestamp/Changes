@@ -1,6 +1,13 @@
 
 History for the Net-RFC3161-Timestamp Perl distribution
 
+0.020 2021-11-05
+  * Also install a "timestamp" utility script
+  * Minor fixes
+
+0.011 2021-11-05
+  * Use Alien::OpenSSL
+
 0.010 2021-11-04
   * Initial release of the module distribution
 

@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 #  Original render code by Tom Molesworth
 
-use Object::Pad 0.41;  # :param
+use Object::Pad 0.57;
 
-package Tickit::Widget::Placegrid 0.33;
+package Tickit::Widget::Placegrid 0.34;
 class Tickit::Widget::Placegrid
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_THICK );

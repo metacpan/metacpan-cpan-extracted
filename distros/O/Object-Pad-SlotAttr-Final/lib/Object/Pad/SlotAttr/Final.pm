@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::SlotAttr::Final 0.03;
+package Object::Pad::SlotAttr::Final 0.04;
 
 use v5.14;
 use warnings;

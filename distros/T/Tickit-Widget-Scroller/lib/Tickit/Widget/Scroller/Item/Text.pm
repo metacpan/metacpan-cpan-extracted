@@ -5,7 +5,7 @@
 
 use Object::Pad 0.27;
 
-package Tickit::Widget::Scroller::Item::Text 0.26;
+package Tickit::Widget::Scroller::Item::Text 0.27;
 class Tickit::Widget::Scroller::Item::Text;
 
 use Tickit::Utils qw( textwidth cols2chars );
@@ -57,17 +57,19 @@ amount. Does not apply to the first line.
 
 =cut
 
+sub BUILDARGS ( $class, $text, %opts ) { return ( text => $text, %opts ) }
+
 has $_indent;
 has @_chunks;
 
 has $_width; # width for which the @_lineruns are valid
 has @_lineruns;
 
-BUILD ( $text, %opts )
+ADJUSTPARAMS ( $params )
 {
-   $_indent = $opts{indent} if defined $opts{indent};
+   $_indent = delete $params->{indent} if exists $params->{indent};
 
-   @_chunks = $self->_build_chunks_for( $text );
+   @_chunks = $self->_build_chunks_for( delete $params->{text} );
 }
 
 =head1 METHODS

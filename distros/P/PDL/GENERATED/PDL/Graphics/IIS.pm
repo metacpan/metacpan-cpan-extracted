@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Graphics::IIS;
 
-our @EXPORT_OK = qw( iis iiscur iiscirc $stdimage $iisframe saoimage ximtool PDL::PP _iis PDL::PP _iiscirc );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(iis iiscur iiscirc $stdimage $iisframe saoimage ximtool _iis _iiscirc );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Graphics::IIS ;
+
 
 
 
@@ -39,14 +38,14 @@ This module provides an interface to any image display 'device' which support th
 old SunView imtool program and presumably even the original IIS CRT itself
 if they aren't all in museums!
 
-These programs should be familiar to astronomer's - they are used by
+These programs should be familiar to astronomers - they are used by
 the common IRAF system. The programs and their HTML documentation
 can be obtained from the following URLs:
 
  SAOimage: http://tdc-www.harvard.edu/software/saoimage.html
  Ximtool:  http://iraf.noao.edu/iraf/web/projects/x11iraf/x11iraf.html
 
-Non-astronomer's may find they quite nifty for displaying 2D data.
+Non-astronomers may find they quite nifty for displaying 2D data.
 
 The Perl variable C<$stdimage> is exported from the module and controls
 the frame buffer configuration currently in use. The default value
@@ -437,7 +436,7 @@ sub findfifo {
 
 
 
-;
+
 
 
 =head1 BUGS
@@ -463,5 +462,3 @@ the copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

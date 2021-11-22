@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.51;
+use Object::Pad 0.57;
 
-package Tickit::Widget::GridBox 0.33;
+package Tickit::Widget::GridBox 0.34;
 class Tickit::Widget::GridBox
-   extends Tickit::ContainerWidget;
+   :isa(Tickit::ContainerWidget);
 
 use experimental 'postderef';
 

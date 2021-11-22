@@ -1,6 +1,17 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
-1.00 2021-10-25T12:47:33Z
+1.03 2021-11-19T03:28:35Z
+
+    - Make "default" parameter to take coderef for lazy evaluation.
+
+1.02 2021-11-18T05:07:22Z
+
+    - When the number of parameter is not even, first parameter is
+      taken as an 'action' if it is coderef.
+
+1.01 2021-11-08T06:41:52Z
+
+    - getopt() takes arrayref and call GetOptionsFromArray().
 
 1.00 2021-10-25T12:46:24Z
 

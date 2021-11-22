@@ -1,3 +1,9 @@
+0.122		2021-11-10	T. R. Wyant
+    Add CONTRIBUTING file
+
+    Document demise of Willmann-Bell and the transfer of their assets to
+    Sky and Telescope.
+
 0.121		2021-08-08	T. R. Wyant
     Fix implementation of Borkowski's algorithm for converting
     geocentric to geodetic coordinates.  An edge case in my

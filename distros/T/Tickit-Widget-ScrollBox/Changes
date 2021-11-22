@@ -1,5 +1,12 @@
 Revision history for Tickit-Widget-ScrollBox
 
+0.11    2021-11-20
+        [CHANGES]
+         * Updates for Object::Pad 0.57
+            + Use :isa instead of legacy `extends`
+            + Use ADJUST / ADJUSTPARAMS instead of BUILD
+            + Use :weak slots
+
 0.10    2021-07-03
         [CHANGES]
          * Updates for Object::Pad 0.41:

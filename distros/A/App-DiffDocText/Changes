@@ -1,3 +1,8 @@
+0.003   2021-07-12  Released-By: PERLANCAR; Urgency: low
+
+	- Also observe DIFF_CMD.
+
+
 0.002   2020-12-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Add script: diff-doc-text-between-conflicted-git-versions.

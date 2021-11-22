@@ -1,5 +1,5 @@
 package Lab::Moose::Countdown;
-$Lab::Moose::Countdown::VERSION = '3.791';
+$Lab::Moose::Countdown::VERSION = '3.792';
 #ABSTRACT: Verbose countdown/delay with pretty printing of remaining time
 
 use v5.20;
@@ -60,7 +60,7 @@ Lab::Moose::Countdown - Verbose countdown/delay with pretty printing of remainin
 
 =head1 VERSION
 
-version 3.791
+version 3.792
 
 =head1 SYNOPSIS
 

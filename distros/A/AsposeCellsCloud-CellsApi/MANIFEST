@@ -262,6 +262,7 @@ lib/AsposeCellsCloud/Object/AutoShapeResponse.pm
 lib/AsposeCellsCloud/Object/AutoShapes.pm
 lib/AsposeCellsCloud/Object/AutoShapesResponse.pm
 lib/AsposeCellsCloud/Object/Border.pm
+lib/AsposeCellsCloud/Object/BatchConvertRequest.pm
 lib/AsposeCellsCloud/Object/CalculationOptions.pm
 lib/AsposeCellsCloud/Object/Cell.pm
 lib/AsposeCellsCloud/Object/CellArea.pm
@@ -362,6 +363,7 @@ lib/AsposeCellsCloud/Object/ListObjectResponse.pm
 lib/AsposeCellsCloud/Object/ListObjects.pm
 lib/AsposeCellsCloud/Object/ListObjectsResponse.pm
 lib/AsposeCellsCloud/Object/MarkdownSaveOptions.pm
+lib/AsposeCellsCloud/Object/MatchConditionRequest.pm
 lib/AsposeCellsCloud/Object/MergedCell.pm
 lib/AsposeCellsCloud/Object/MergedCellResponse.pm
 lib/AsposeCellsCloud/Object/MergedCells.pm

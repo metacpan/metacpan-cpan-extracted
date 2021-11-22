@@ -154,7 +154,7 @@ Data::Frame::PDL - A mixin to add some methods to PDL
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 DESCRIPTION
 
@@ -174,7 +174,7 @@ Returns the length of the first dimension.
 
 =head2 diff
 
-    length($lag=1)
+    diff($lag=1)
 
 =head2 flatten
 

@@ -1,44 +1,40 @@
 #!perl
 use Test::More;
+use Test::Exception;
 
 use Mojo::Base -strict;
 use Mojolicious;
 
-use Try::Tiny qw(try catch);
-
 use_ok 'WebService::Hooktheory';
 
 my $ws = new_ok 'WebService::Hooktheory';
+throws_ok { $ws->fetch }
+    qr/No activkey provided/, 'activkey required';
 
-my $result = try { $ws->fetch } catch { $_ };
-like $result, qr/No activkey provided/, 'activkey required';
+$ws = new_ok 'WebService::Hooktheory' => [ activkey => '1234567890' ];
 
-$ws = WebService::Hooktheory->new( activkey => '1234567890' );
-isa_ok $ws, 'WebService::Hooktheory';
+throws_ok { $ws->fetch }
+    qr/No endpoint provided/, 'endpoint required';
 
-$result = try { $ws->fetch } catch { $_ };
-like $result, qr/No endpoint provided/, 'endpoint required';
+throws_ok { $ws->fetch(endpoint => 'foo') }
+    qr/No query provided/, 'query required';
 
 my $mock = Mojolicious->new;
 $mock->log->level('fatal'); # only log fatal errors to keep the server quiet
-$mock->routes->get('/trends/nodes' => sub {
+$mock->routes->get('/v1/trends/nodes' => sub {
     my $c = shift;
-    my $p = $c->param('cp');
-    return $c->render(status => 200, json => {ok => 1}) if $p eq '4,1';
-    return $c->render(status => 400, text => 'Missing values');
+    is $c->param('cp'), '4,1', 'cp param';
+    return $c->render(status => 200, json => { ok => 1 });
 });
 $ws->ua->server->app($mock); # point our UserAgent to our new mock server
 
-$ws->base(Mojo::URL->new(''));
+$ws->base('');
 
-can_ok $ws, 'fetch';
-
-my $data = try {
+lives_ok {
     $ws->fetch(
         endpoint => '/trends/nodes',
         query    => { cp => '4,1' }
     )
-} catch { $_ };
-is_deeply $data, {ok => 1}, 'fetch';
+} 'fetch lives';
 
 done_testing();

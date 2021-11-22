@@ -14,7 +14,7 @@ do { my $x = {
                                       'Test::EOL' => '0',
                                       'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
-                                      'Test::More' => '0.96',
+                                      'Test::More' => '0.88',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Portability::Files' => '0',
@@ -24,17 +24,11 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Class::Method::Modifiers' => '0',
-                                      'DBI' => '0',
                                       'Log::Any' => '0',
-                                      'OpenTracing' => '1.001',
-                                      'OpenTracing::DSL' => '0',
-                                      'OpenTracing::Integration' => '0',
+                                      'OpenTracing' => '1.004',
                                       'Role::Tiny::With' => '0',
                                       'Syntax::Keyword::Try' => '0',
-                                      'indirect' => '0',
-                                      'strict' => '0',
-                                      'utf8' => '0',
-                                      'warnings' => '0'
+                                      'indirect' => '0'
                                     }
                     },
        'test' => {
@@ -49,12 +43,10 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Log::Any::Adapter' => '0',
-                                   'OpenTracing::Any' => '0',
+                                   'Log::Any::Adapter::TAP' => '0',
                                    'Test::CheckDeps' => '0.010',
                                    'Test::Deep' => '0',
-                                   'Test::More' => '0.98',
-                                   'perl' => '5.006'
+                                   'Test::More' => '0.98'
                                  }
                  }
      };

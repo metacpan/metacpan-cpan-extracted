@@ -237,7 +237,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     This will also mean that overloaded operations that receive an
     NV will evaluate that (__float128) NV to its full precision.
-    And assigning the NV as Math::MPFR->new($nv) will also work as
+    And assigning the NV as Math::MPFR->new($NV) will also work as
     intended.
 
     NOTE:
@@ -534,10 +534,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_set_si($rop, $si, $rnd);
    $si = Rmpfr_set_sj($rop, $sj, $rnd);
    $si = Rmpfr_set_uj($rop, $uj, $rnd);
-   $si = Rmpfr_set_d($rop, $double, $rnd);
+   $si = Rmpfr_set_IV($rop, $iv, $rnd); # $iv is $Config{ivtype}
+   $si = Rmpfr_set_d ($rop, $double, $rnd);
    $si = Rmpfr_set_ld($rop, $ld, $rnd); # long double
-   $si = Rmpfr_set_NV($rop, $nv, $rnd); # double/long double/__float128,
-                                        # depending upon perl's nvtype.
+   $si = Rmpfr_set_NV($rop, $nv, $rnd); # $nv is $Config{nvtype}
    $si = Rmpfr_set_LD($rop, $LD, $rnd); # $LD is a Math::LongDouble object
    $si = Rmpfr_set_z($rop, $z, $rnd); # $z is a mpz object.
    $si = Rmpfr_set_q($rop, $q, $rnd); # $q is a mpq object.
@@ -546,26 +546,20 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_set_float128($rop, $f128, $rnd);# nvtype is __float128
                                                # && mpfr-4.0.0 or later
                                                # && mpfr lib built with
-                                               # --enable-float128 &&
-                                               # F128=1 cmd line arg
-                                               # given to Makefile.PL
+                                               # --enable-float128.
    $si = Rmpfr_set_DECIMAL64($rop, $D64, $rnd) # mpfr-3.1.0 or later &&
                                                # mpfr lib built with
                                                # --enable-decimal-float
-                                               # && D64=1 arg given to
-                                               # Makefile.PL. $D64 is a
+                                               # $D64 is a
                                                # Math::Decimal64 object
    $si = Rmpfr_set_DECIMAL128($rop, $D128, $rnd) # mpfr-3.1.0 or later &&
                                                # mpfr lib built with
-                                               # --enable-decimal-float
-                                               # && D128=1 arg given to
-                                               # Makefile.PL. $D128 is a
+                                               # --enable-decimal-float.
+                                               # $D128 is a
                                                # Math::Decimal128 object
    $si = Rmpfr_set_FLOAT128($rop, $F128, $rnd);# mpfr-4.0.0 and later
                                                # && mpfr lib built with
-                                               # --enable-float128 &&
-                                               # F128=1 cmd line arg
-                                               # given to Makefile.PL.
+                                               # --enable-float128.
                                                # $F128 is a
                                                # Math::Float128 object.
     Set the value of $rop from 2nd arg, rounded to the precision of
@@ -578,6 +572,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     number (this happens for 0.1 for instance), in which case it is
     first rounded by the C compiler to a double-precision number,
     and then only to a mpfr floating-point number.
+
+    NOTE:
+         Rmpfr_set_IV requires that $iv has it's IOK flag set, and
+         Rmpfr_set_NV requires that $nv has its NOK flag set.
+         Otherwise these functions will croak.
+         Best to first check IOK_flag($iv) or NOK_flag($nv), both of which
+         will return a non-zero value if and only if the flag in question
+         is set.
 
    $si = Rmpfr_set_ui_2exp($rop, $ui, $exp, $rnd);
    $si = Rmpfr_set_si_2exp($rop, $si, $exp, $rnd);
@@ -692,8 +694,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    Rmpfr_set_nan($rop);
    Rmpfr_set_zero($rop, $si); # mpfr-3.0.0 and later only.
     Set the variable $rop to infinity or NaN (Not-a-Number) or zero
-    respectively. In 'mpfr_set_inf' and 'mpfr_set_zero', the sign of $rop
-    is positive if 2nd arg >= 0. Else the sign is negative.
+    respectively. In 'Rmpfr_set_inf' and 'Rmpfr_set_zero', the sign of
+    $rop is positive if 2nd arg >= 0. Else the sign is negative.
 
    Rmpfr_swap($op1, $op2);
     Swap the values $op1 and $op2 efficiently. Warning: the precisions
@@ -740,22 +742,29 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     immediately below.
     Note that these functions (below) return a list of 2 values.
 
-   ($rop, $si) = Rmpfr_init_set($op, $rnd);
+   ($rop, $si) = Rmpfr_init_set        ($op, $rnd);
    ($rop, $si) = Rmpfr_init_set_nobless($op, $rnd);
-   ($rop, $si) = Rmpfr_init_set_ui($ui, $rnd);
+   ($rop, $si) = Rmpfr_init_set_ui        ($ui, $rnd);
    ($rop, $si) = Rmpfr_init_set_ui_nobless($ui, $rnd);
-   ($rop, $si) = Rmpfr_init_set_si($si, $rnd);
+   ($rop, $si) = Rmpfr_init_set_si        ($si, $rnd);
    ($rop, $si) = Rmpfr_init_set_si_nobless($si, $rnd);
-   ($rop, $si) = Rmpfr_init_set_d($double, $rnd);
+   ($rop, $si) = Rmpfr_init_set_d        ($double, $rnd);
    ($rop, $si) = Rmpfr_init_set_d_nobless($double, $rnd);
-   ($rop, $si) = Rmpfr_init_set_ld($double, $rnd);
-   ($rop, $si) = Rmpfr_init_set_ld_nobless($double, $rnd);
-   ($rop, $si) = Rmpfr_init_set_f($f, $rnd);        # $f is a mpf object
+   ($rop, $si) = Rmpfr_init_set_ld        ($longdouble, $rnd);
+   ($rop, $si) = Rmpfr_init_set_ld_nobless($longdouble, $rnd);
+   ($rop, $si) = Rmpfr_init_set_float128        ($float128, $rnd);
+   ($rop, $si) = Rmpfr_init_set_float128_nobless($float128, $rnd);
+   ($rop, $si) = Rmpfr_init_set_f        ($f, $rnd);# $f is a mpf object
    ($rop, $si) = Rmpfr_init_set_f_nobless($f, $rnd);# $f is a mpf object
-   ($rop, $si) = Rmpfr_init_set_z($z, $rnd);        # $z is a mpz object
+   ($rop, $si) = Rmpfr_init_set_z        ($z, $rnd);# $z is a mpz object
    ($rop, $si) = Rmpfr_init_set_z_nobless($z, $rnd);# $z is a mpz object
-   ($rop, $si) = Rmpfr_init_set_q($q, $rnd);        # $q is a mpq object
+   ($rop, $si) = Rmpfr_init_set_q        ($q, $rnd);# $q is a mpq object
    ($rop, $si) = Rmpfr_init_set_q_nobless($q, $rnd);# $q is a mpq object
+   ($rop, $si) = Rmpfr_init_set_IV        ($IV,$rnd);# $IV is $Config{ivtype}
+   ($rop, $si) = Rmpfr_init_set_IV_nobless($IV,$rnd);# $IV is $Config{ivtype}
+   ($rop, $si) = Rmpfr_init_set_IV        ($NV,$rnd);# $NV is $Config{nvtype}
+   ($rop, $si) = Rmpfr_init_set_IV_nobless($NV,$rnd);# $NV is $Config{nvtype}
+
     Initialize $rop and set its value from the 1st arg, rounded to
     direction $rnd. The precision of $rop will be taken from the
     active default precision, as set by 'Rmpfr_set_default_prec'.
@@ -827,7 +836,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $bool = Rmpfr_fits_uintmax_p($op, $rnd); # fits in uintmax_t
    $bool = Rmpfr_fits_intmax_p($op, $rnd);  # fits in intmax_t
    $bool = Rmpfr_fits_IV_p($op, $rnd);      # fits in perl IV
-   $bool = Rmpfr_fits_UV_p($op, $rnd);      # fits in perl UV
     Return non-zero if $op would fit in the respective data
     type, when rounded to an integer in the direction $rnd.
 
@@ -835,11 +843,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_get_si($op, $rnd);
    $sj = Rmpfr_get_sj($op, $rnd);
    $uj = Rmpfr_get_uj($op, $rnd);
-   $uv = Rmpfr_get_UV($op, $rnd);
-   $iv = Rmpfr_get_IV($op, $rnd);
+   $IV = Rmpfr_get_IV($op, $rnd); # $IV is $Config{ivtype}
     Convert $op to an 'unsigned long long', a 'signed long', a
-    'signed long long', an 'unsigned long long', a 'UV', or an
-    'IV' - after rounding it with respect to $rnd.
+    'signed long long', an 'unsigned long long' or an 'IV' - after
+    rounding it with respect to $rnd.
     If $op is NaN, the result is undefined. If $op is too big
     for the return type, it returns the maximum or the minimum
     of the corresponding C type, depending on the direction of
@@ -853,7 +860,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                            # --enable-float128 &&
                                            # F128=1 cmd line arg
                                            # given to Makefile.PL
-   $nv     = Rmpfr_get_NV($op, $rnd);    # double/long double/__float128
+   $NV     = Rmpfr_get_NV($op, $rnd);    # double/long double/__float128
    $float  = Rmpfr_get_flt($op, $rnd);   # mpfr-3.0.0 and later
    Rmpfr_get_LD($LD, $op, $rnd);         # $LD is a Math::LongDouble object.
    Rmpfr_get_DECIMAL64($d64, $op, $rnd); # mpfr-3.1.0 or later &&
@@ -1065,8 +1072,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_ui_pow($rop, $ui,  $op,  $rnd);
    $si = Rmpfr_pow   ($rop, $op1, $op2, $rnd);
    $si = Rmpfr_pow_z ($rop, $op,  $z,   $rnd); # $z is a mpz object
-   $si = Rmpfr_pow_UV($rop, $op,  $uv,  $rnd);
-   $si = Rmpfr_pow_IV($rop, $op,  $iv,  $rnd);
+
+   $si = Rmpfr_pow_IV($rop, $op,  $IV,  $rnd); # $IV is $Config{ivtype}
     Set $rop to 2nd arg raised to 3rd arg, rounded to the direction
     $rnd with the precision of $rop.  Return zero if the result is
     exact, a positive value when the result is greater than 2nd arg
@@ -1133,12 +1140,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_cmp_si($op, $si);
    $si = Rmpfr_cmp_d($op, $double);
    $si = Rmpfr_cmp_ld($op, $ld); # long double
+   $si = Rmpfr_cmp_float128($op, $float128); # __float128
    $si = Rmpfr_cmp_z($op, $z); # $z is a mpz object
    $si = Rmpfr_cmp_q($op, $q); # $q is a mpq object
    $si = Rmpfr_cmp_f($op, $f); # $f is a mpf object
-   $si = Rmpfr_cmp_IV($op, $iv);
-   $si = Rmpfr_cmp_UV($op, $uv);
-   $si = Rmpfr_cmp_NV($op, $nv);
+   $si = Rmpfr_cmp_IV($op, $iv); # $iv is $Config{ivtype}
+   $si = Rmpfr_cmp_NV($op, $nv); # $nv is $Config{nvtype}
     Compare 1st and 2nd args. In the case of 'Rmpfr_cmpabs()' and
     'Rmpfr_cmpabs_ui' compare the absolute values of the 2 args.
     Return a positive value if 1st arg > 2nd arg, zero if
@@ -1148,6 +1155,15 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     the absolute value returned is one plus the absolute difference
     of their exponents. If one of the operands is NaN (Not-a-Number),
     return zero and set the erange flag.
+
+    NOTE:
+         Rmpfr_cmp_IV() requires that the 2nd argument has its IOK
+         flag set, and Rmpfr_cmp_NV() requires that the 2nd
+         argument has its NOK flag set.
+         Otherwise these functions croak.
+         Suggestion: first check the status of the flag using
+         IOK_flag($iv) or NOK_flag($nv),which return a non-zero
+         value if and only if the flag in question is set.
 
    $si = fr_cmp_q_rounded($op, $q, $rnd); # $q is a mpq object
     Convert $q to an mpfr object of current default precision,
@@ -1622,8 +1638,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     is different (to match the order of the mpfr_out_str args).
     To print to STDERR:
        TRmpfr_out_str(*stderr, $base, $digits, $op, $round);
-    To print to an open filehandle (let's call it FH):
-       TRmpfr_out_str(\*FH, $base, $digits, $op, $round);
+    To print to an open filehandle (let's call it $fh):
+       TRmpfr_out_str(\*$fh, $base, $digits, $op, $round);
 
    $ui = Rmpfr_inp_str($rop, $base, $round);
     BEST TO USE TRmpfr_inp_str INSTEAD.
@@ -1656,8 +1672,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     from somewhere other than STDIN.
     To read from STDIN:
        TRmpfr_inp_str($rop, *stdin, $base, $round);
-    To read from an open filehandle (let's call it FH):
-       TRmpfr_inp_str($rop, \*FH, $base,  $round);
+    To read from an open filehandle (let's call it $fh):
+       TRmpfr_inp_str($rop, \*$fh, $base,  $round);
 
    Rmpfr_dump($op);
     Output "$op\n" on stdout in base 2.
@@ -1804,32 +1820,32 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    MISCELLANEOUS
 
-   $str = doubletoa($nv [, $x]); # Available only when
+   $str = doubletoa($double [, $x]); # Available only when
                                  # $Config{nvsize} == 8.
                                  # Else use nvtoa().
-    Sets $str to the value of the double $nv.
+    Sets $str to the value of $double.
     $str will appear in standard decimal format such that the
-    condition ($str == $nv) is true.
+    condition ($str == $double) is true.
     The grisu3 algorithm used by this function, whilst very quick,
     will fail for about 0.5% of values. When this happens doubletoa
     will (by default) fall back to using nvtoa() - which is slower,
     but reliable.
     Alternatively, providing a second argument to doubletoa (any
-    scalar will do) will ensure that sprintf("%.16e", $nv) is
-    returned. This will be an accurate return, and it will be
-    quicker than the nvtoa() fallback, but it often provides more
-    digits than are necessary.
+    scalar will do) will ensure that it falls back to returning
+    sprintf("%.17g", $double).This will be an accurate return, and
+    it will be quicker than the nvtoa() fallback, but it often
+    provides more digits than are necessary.
     Whenever doubletoa reverts to a fallback routine,
     $Math::MPFR::doubletoa_fallback (which is initially set to 0)
     will be incremented. This feature can be disabled by providing
     the FB=0 argument to the 'perl Makefile.PL' step of the
     Math::MPFR build.
 
-   $str = nvtoa($nv); # Available irrespective of $Config{nvsize}
+   $str = nvtoa($NV); # Available irrespective of $Config{nvsize}
                       # and $Config{nvtype}
-    Sets $str to the value of $nv.
+    Sets $str to the value of $NV.
     $str will appear in standard decimal format, containing the
-    *minimum* number of digits such that the condition ($str == $nv)
+    *minimum* number of digits such that the condition ($str == $NV)
     is true.
     NOTE 1: Except for perls whose nvtype is __float128:
              1) perl versions prior to 5.30.0 are buggy in their
@@ -1859,7 +1875,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     *minimum* number of digits such that the condition ($str == $op)
     is true.
 
-   $str = anytoa($op, $bits);
+   $str = anytoa($op [, $bits]);
     For example, you want to know what nvtoa(sqrt 3) would return
     on a perl whose nvtype is the 113-bit precision __float128 (or
     IEEE-754 128-bit long double) but you don't have access to such
@@ -1869,37 +1885,55 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
       my $op = Rmpfr_init2($bits);
       Rmpfr_set_ui($op, 3, MPFR_RNDN);
       $op = sqrt($op);
-      print anytoa($op, $bits);
+      print anytoa($op);
+    # alternatively:
+    # print anytoa($op, $bits);
+
+    We allow the second arg solely for back-compatibility.
+    This also allows one to provide a second arg to anytoa()
+    that differs in value to the precision of $op, though it's
+    not clear to me that this is in any way useful.
 
     Similarly, changing $bits to 53, or 64, or 2098 will provide
     the same as nvtoa(sqrt 3) for (respectively) the 53-bit
     precision double , the 64-bit extended precision long double,
     and the double-double.
-    $bits must be either 53, 64, 113 or 2098.
+    $bits must be either 53, 64, 113 or 2098 (and the same goes
+    for the precision of $op).
 
-    When $bits is 53 or 64 or 113, the value returned will be the
-    same as for mpfrtoa($op) unless:
+    When anytoa() is called with only the one argument ($op), or
+    with a 2nd argument that is equivalent to the precision of $op,
+    then the value returned will be the same as returned by
+    mpfrtoa($op) unless:
+
      1) $op holds a finite value that is of such magnitude that
-        the specified nvtype will turn it into (+ or -) Inf, or;
+        the specified nvtype will turn it into (+ or -) Inf;
+
+     or
+
      2) $op holds a finite non-zero value that is so close to zero
         that the specified nvtype will either round it to zero or
-        denormalize it.
+        denormalize it;
+
+     or
+
+     3) the precision of $op is 2098 bits.
 
    $str = numtoa($sv);
     As for nvtoa() but prints out UVs and IVs in integer format.
     (If UV-precision is greater than NV-precision then nvtoa()
-    output can lose precision as it prints out UVs and IVs in floating
+    output can lose precision as it prints out UVs and IVs in
     floating point format.)
 
-   $nv = atodouble($str); # Needs mpfr-3.1.6 or later
-    Sets the $nv to the value of the double that's represented by
+   $double = atodouble($str); # Needs mpfr-3.1.6 or later
+    Sets $double to the value of the double that's represented by
     the string $str.
     If $Config{nvtype} is double, it therefore returns the same
     value as atonv.
     See atonv() below.
 
-   $nv = atonv($str); # Needs mpfr-3.1.6 or later
-    Sets $nv to the NV value represented by the string $str.
+   $NV = atonv($str); # Needs mpfr-3.1.6 or later
+    Sets $NV to the NV value represented by the string $str.
     If $str expresses a base 2 value, begin it with '0b' or '0B'.
     If $str expresses a base 16 value, begin it with '0x' or '0X.
     For example:
@@ -2121,7 +2155,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     NaN, then $rop is set to the numeric value. If $op1 and
     $op2 are zeros of different signs, then $rop is set to +0.
 
-   $iv = Math::MPFR::nnumflag(); # not exported
+   $IV = Math::MPFR::nnumflag(); # not exported
     Returns the value of the non-numeric flag. This flag is
     initialized to zero, but incemented by 1 whenever the
     a string containing non-numeric characters is passed to an
@@ -2129,7 +2163,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     many times such strings were passed to mpfr functions . The
     flag can be reset to 0 by running clear_nnum().
 
-   $iv = Math::MPFR::nok_pokflag(); # not exported
+   $IV = Math::MPFR::nok_pokflag(); # not exported
     Returns the value of the nok_pok flag. This flag is
     initialized to zero, but incemented by 1 whenever a
     scalar that is both a float (NOK) and string (POK) is passed
@@ -2137,12 +2171,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     therefore tells us how many times such events occurred . The
     flag can be reset to 0 by running clear_nok_pok().
 
-   Math::MPFR::set_nnum($iv); # not exported
+   Math::MPFR::set_nnum($IV); # not exported
     Resets the global non-numeric flag to the value specified by
-    $iv.
+    $IV.
 
-   Math::MPFR::set_nok_pok($iv); # not exported
-    Resets the nok_pok flag to the value specified by $iv.
+   Math::MPFR::set_nok_pok($IV); # not exported
+    Resets the nok_pok flag to the value specified by $IV.
 
    Math::MPFR::clear_nnum(); # not exported
     Resets the global non-numeric flag to 0.(Essentially the same
@@ -2182,6 +2216,16 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     In some cases, however, $bits values of 64 and/or 113 might
     throw a fatal error (with diagnostic message stating that the
     requested byte structure is not currently available).
+
+   $si = IOK_flag($sv); # $sv is a perl scalar variable.
+   $si = NOK_flag($sv);
+   $si = POK_flag($sv);
+
+    Return 0 if $sv's IOK/NOK/POK flag is unset.
+    Else return 1.
+    If the IsUV flag is set, then IOK_flag() returns 2, thereby indicating
+    that both the IOK and IsUV flags are set (and that the integer value
+    held by $sv should therefore be treated as unsigned).
 
    ##############
 

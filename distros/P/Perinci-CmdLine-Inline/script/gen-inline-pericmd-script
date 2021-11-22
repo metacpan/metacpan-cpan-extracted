@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Lite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-29'; # DATE
+our $DATE = '2021-10-21'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.552'; # VERSION
+our $VERSION = '0.553'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Lite->new(
     url => "/Perinci/CmdLine/Inline/gen_inline_pericmd_script",
@@ -38,7 +38,7 @@ gen-inline-pericmd-script - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.552 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2021-08-29.
+This document describes version 0.553 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2021-10-21.
 
 =head1 SYNOPSIS
 
@@ -95,9 +95,9 @@ See C<--allow-prereq>.
 A list of modules that can be depended upon.
 
 By default, Perinci::CmdLine::Inline will strive to make the script freestanding
-and require core modules. A dependency to a non-core module will cause failure
-(unless `pack_deps` option is set to false). However, you can pass a list of
-modules that is allowed here.
+and require only core Perl modules. A dependency to a non-core module will cause
+failure (unless `pack_deps` option is set to false). However, you can pass a
+list of modules that is allowed here.
 
 
 Can be specified multiple times.

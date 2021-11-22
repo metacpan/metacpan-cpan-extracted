@@ -28,7 +28,7 @@
          "requires" : {
             "Exporter" : "0",
             "Math::AnyNum" : "0.36",
-            "Sidef" : "3.97",
+            "Sidef" : "3.99",
             "perl" : "v5.16.0"
          }
       }
@@ -36,7 +36,7 @@
    "provides" : {
       "Math::Sidef" : {
          "file" : "lib/Math/Sidef.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "url" : "https://github.com/trizen/Math-Sidef"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,0 +1,28 @@
+>Cluster 0
+0	2090nt, >perl-D1-2_1... at +/99.71%
+1	2204nt, >perl-D1-3_1... at +/99.95%
+2	2033nt, >flash-D1-2_1... at +/99.80%
+3	2207nt, >flash-D1-3_1... *
+4	1605nt, >tracy-D1-1_1... at -/99.88%
+5	1942nt, >tracy-D1-2_1... at -/99.95%
+>Cluster 1
+0	2049nt, >perl-D123-1_1... *
+1	1951nt, >flash-D123-1_1... at +/99.95%
+2	1861nt, >flash-D123-3_1... at +/99.89%
+3	1869nt, >tracy-D123-1_1... at -/99.95%
+>Cluster 2
+0	2048nt, >perl-D1-1_1... *
+1	2040nt, >flash-D1-1_1... at +/99.90%
+>Cluster 3
+0	1956nt, >perl-D12-2_1... at +/99.74%
+1	2012nt, >perl-D12-3_1... *
+2	1834nt, >flash-D12-1_1... at +/99.73%
+3	1939nt, >flash-D12-2_1... at +/99.74%
+4	1939nt, >flash-D12-3_1... at +/99.90%
+5	1623nt, >tracy-D12-1_1... at -/99.75%
+6	1584nt, >tracy-D12-3_1... at -/99.87%
+>Cluster 4
+0	1966nt, >perl-D123-3_1... *
+>Cluster 5
+0	1879nt, >perl-D12-1_1... *
+1	1840nt, >tracy-D12-2_1... at -/99.73%

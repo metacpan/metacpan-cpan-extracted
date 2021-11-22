@@ -4,17 +4,19 @@ package JSON::Schema::Modern::Annotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single annotation from a JSON Schema evaluation
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
-use Moo;
+use Safe::Isa;
 use MooX::TypeTiny;
-use Types::Standard 'Str';
+use Types::Standard qw(Str InstanceOf);
 use namespace::clean;
 
 has [qw(
@@ -29,8 +31,8 @@ has [qw(
 
 has absolute_keyword_location => (
   is => 'ro',
-  isa => Str, # always a uri (absolute uri or uri reference)
-  coerce => sub { "$_[0]" },
+  isa => InstanceOf['Mojo::URL'],
+  coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
 );
 
 # https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.7.7.1
@@ -39,14 +41,13 @@ has annotation => (
   required => 1,
 );
 
-sub TO_JSON {
-  my $self = shift;
+sub TO_JSON ($self) {
   return +{
     # note that locations are JSON pointers, not uri fragments!
     instanceLocation => $self->instance_location,
     keywordLocation => $self->keyword_location,
     !defined($self->absolute_keyword_location) ? ()
-      : ( absoluteKeywordLocation => $self->absolute_keyword_location ),
+      : ( absoluteKeywordLocation => $self->absolute_keyword_location->to_string ),
     annotation => $self->annotation,
   };
 }
@@ -67,7 +68,7 @@ JSON::Schema::Modern::Annotation - Contains a single annotation from a JSON Sche
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,39 @@
 Items list for Acme::FishFarm and related modules
 
-Version 0.01
+Version 1.01
+Fix documentation for:
+   [v] Acme::FishFarm
+   [v] Acme::FishFarm:Feeder
+   [v] Acme::FishFarm::OxygenMaintainer
+   [v] Acme::FishFarm::WaterConditionMonitor
+   [v] Acme::FishFarm::WaterFiltration
+   [v] Acme::FishFarm::WaterLevelMaintainer
+   
+Add synopsis & related sample scripts for:
+   [v] Acme::FishFarm
+      [v] synopsis
+      [v] sample script(s)
+   [v] Acme::FishFarm:Feeder
+      [v] synopsis
+      [v] sample script(s)
+   [v] Acme::FishFarm::OxygenMaintainer
+      [v] synopsis
+      [v] sample script(s)
+   [v] Acme::FishFarm::WaterConditionMonitor
+      [v] synopsis
+      [v] sample script(s)
+   [v] Acme::FishFarm::WaterFiltration
+      [v] synopsis
+      [v] sample script(s)
+   [v] Acme::FishFarm::WaterLevelMaintainer
+      [v] synopsis
+      [v] sample script(s)
+
+Version ?.??
+[] Add synonyms for some existing methods
+
+
+Version 1.00
 [v] Acme::FishFarm
    [v] gist
    [v] export -> ":all"
@@ -87,7 +120,7 @@ Version 0.01
 
 [v] Acme::FishFarm::WaterFiltration
    [v] gist
-   [] implementation
+   [v] implementation
       [v] CREATION
          [v] install
       [v] WASTE LEVEL DETECTION
@@ -136,3 +169,6 @@ Version 0.01
    [v] tests
 
 [v] export all modules' documentation to html
+
+
+

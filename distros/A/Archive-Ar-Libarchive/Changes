@@ -1,5 +1,8 @@
 Revision history for Archive-Ar-Libarchive
 
+2.09      2021-11-15 07:35:40 -0700
+  - Remove unused dependency on ExtUtils::CChecker (gh#24)
+
 2.08      2020-04-20 22:19:30 -0600
   - Switch to EUMM for installer.
 

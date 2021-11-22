@@ -1,10 +1,12 @@
 use strict;
 use warnings;
-use Math::GMPf qw(:mpf);
+use Math::GMPf qw(:mpf IOK_flag NOK_flag POK_flag);
 use Config;
 use POSIX;
 
-print "1..12\n";
+#print "1..12\n";
+
+use Test::More;
 
 my ($prec, $nv_max);
 
@@ -12,11 +14,12 @@ if($Config{nvsize} == 8) {
   # Don't assume that POSIX::DBL_MAX is available
   eval{ $nv_max = POSIX::DBL_MAX };
 
-  # On older perl versions on x64 windows, the following
-  # would assign 'Inf' to $nv_max if POSIX_DBL_MAX were
-  # unavailable.
-  # Luckily, in those cases POSIX::DBL_MAX has already
-  # assigned the correct value.
+  # On older perl versions on x64 windows, assigning
+  # 1.7976931348623157e308 to $nv_max would
+  # result in $nv_max being set to 'Inf'.
+  # Luckily, on those perls, POSIX::DBL_MAX is available
+  # and has already assigned the correct value.
+
   $nv_max = 1.7976931348623157e308
      unless $nv_max;
 }
@@ -44,68 +47,35 @@ my $fi = Rmpf_init();
 
 Rmpf_set_NV($fi, $nv);
 
-if($fi == $nv) {print "ok 1\n"}
-else {
-  warn "\n $fi != $nv\n";
-  print "not ok 1\n";
-}
+cmp_ok($fi, '==', $nv, "1: Math::GMPf obj == given NV");
 
-if($nv == Rmpf_get_NV_rndn($fi)) {print "ok 2\n"}
-else {
-  warn "\n $nv != ", Rmpf_get_NV_rndn($fi), "\n";
-  print "not ok 2\n";
-}
+cmp_ok($nv, '==', Rmpf_get_NV_rndn($fi), "1: NV successfully retrieved from Math::GMPf object");
 
 my $inf = 999**(999**999);
 my $nan = $inf / $inf;
-
 eval {Rmpf_set_NV($fi, $inf);};
 
-if($@ =~ /cannot coerce an Inf to a Math::GMPf object/) {print "ok 3\n"}
-else {
-  warn "\n \$\@: $@\n";
-  print "not ok 3\n";
-}
+like($@, qr/cannot coerce an Inf to a Math::GMPf object/, "Cannot assign Inf to a Math::GMPf object");
 
 eval {Rmpf_set_NV($fi, $nan);};
 
-if($@ =~ /cannot coerce a NaN to a Math::GMPf object/) {print "ok 4\n"}
-else {
-  warn "\n \$\@: $@\n";
-  print "not ok 4\n";
-}
+like($@, qr/cannot coerce a NaN to a Math::GMPf object/, "Cannot assign NaN to a Math::GMPf object");
 
 $nv = -123.45678;
 
 Rmpf_set_NV($fi, $nv);
 
-if($fi == $nv) {print "ok 5\n"}
-else {
-  warn "\n $fi != $nv\n";
-  print "not ok 5\n";
-}
+cmp_ok($fi, '==', $nv, "2: Math::GMPf obj == given NV");
 
-if($nv == Rmpf_get_NV($fi)) {print "ok 6\n"}
-else {
-  warn "\n $nv != ", Rmpf_get_NV($fi), "\n";
-  print "not ok 6\n";
-}
+cmp_ok($nv, '==', Rmpf_get_NV_rndn($fi), "2: NV successfully retrieved from Math::GMPf object");
 
-$nv = -123456.78e70;
+$nv = -12345678.78e70;
 
 Rmpf_set_NV($fi, $nv);
 
-if($fi == $nv) {print "ok 7\n"}
-else {
-  warn "\n $fi != $nv\n";
-  print "not ok 7\n";
-}
+cmp_ok($fi, '==', $nv, "3: Math::GMPf obj == given NV");
 
-if($nv == Rmpf_get_NV_rndn($fi)) {print "ok 8\n"}
-else {
-  warn "\n $nv != ", Rmpf_get_NV($fi), "\n";
-  print "not ok 8\n";
-}
+cmp_ok($nv, '==', Rmpf_get_NV_rndn($fi), "3: NV successfully retrieved from Math::GMPf object");
 
 my $have_mpfr = 0;
 
@@ -165,8 +135,7 @@ else {
     }
   }
 
-  if($ok) {print "ok 9\n"}
-  else    {print "not ok 9\n"}
+  cmp_ok($ok, '==', 1, "Test 9");
 
   $ok = 1;
 
@@ -222,8 +191,7 @@ else {
     }
   }
 
-  if($ok) {print "ok 10\n"}
-  else    {print "not ok 10\n"}
+  cmp_ok($ok, '==', 1, "Test 10");
 
   $ok = 1;
 
@@ -268,8 +236,7 @@ else {
     }
   }
 
-  if($ok) {print "ok 11\n"}
-  else    {print "not ok 11\n"}
+  cmp_ok($ok, '==', 1, "Test 11");
 
   $ok = 1;
 
@@ -321,9 +288,44 @@ else {
     }
   }
 
-  if($ok) {print "ok 12\n"}
-  else    {print "not ok 12\n"}
+  cmp_ok($ok, '==', 1, "Test 12");
+
+  $ok = 1;
+
+  for(-300..300) {
+    my $str = random_dec_string() . "e$_";
+    my $s = $str;
+    my $nv = $s + 0; # don't mess with the $str flags
+
+    # Provide sufficient precision to MPFR and GMPf
+    # objects such that no rounding will occur when
+    # the NV is assigned and retrieved.
+
+    my $mpfr = Math::MPFR::Rmpfr_init2(2098);
+    my $mpf  =             Rmpf_init2 (2098);
+
+    # On Math-MPFR-4.17 and earlier,Rmpfr_set_NV will croak if
+    # $nv is detected as something other than an NV.
+    # We therefore skip further testing of this $nv if this
+    # condition is met:
+
+    next if !NOK_flag($nv);
+
+    Math::MPFR::Rmpfr_set_NV($mpfr, $nv, 0);
+                Rmpf_set_NV ($mpf,  $nv);
+
+    cmp_ok(Math::MPFR::Rmpfr_cmp_f($mpfr, $mpf), '==', 0, "$s:\nRmpfr_set_NV and Rmpf_set_NV agree");
+
+    my $mpfr_nv = Math::MPFR::Rmpfr_get_NV($mpfr, 0);
+    my $mpf_nv  =             Rmpf_get_NV ($mpf);
+
+    cmp_ok($mpf_nv, '==', $mpfr_nv, "$s:\nRetrieved NVs are equivalent");
+
+  }
+
 }
+
+done_testing();
 
 sub random_string {
   my $ret = '';
@@ -334,12 +336,15 @@ sub random_string {
   return $ret;
 }
 
+sub random_dec_string {
+  my $ret = '1.';
+  for (1..36) {$ret .= int rand(10)}
+  $ret =  '-' . $ret if(int(rand(2)));
+  return $ret;
+}
+
 sub _skipper {
-  warn "\n Skipping tests 9 to 12 - $_[0]\n";
-  print "ok 9\n";
-  print "ok 10\n";
-  print "ok 11\n";
-  print "ok 12\n";
+  warn "\n Skipping remaining test - $_[0]\n";
 }
 
 

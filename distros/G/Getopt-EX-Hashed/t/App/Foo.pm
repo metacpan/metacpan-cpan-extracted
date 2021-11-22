@@ -27,6 +27,8 @@ if (defined our $REMOVE_UNDERSCORE) {
     Getopt::EX::Hashed->configure(REMOVE_UNDERSCORE => $REMOVE_UNDERSCORE);
 }
 
+our $DEFAULT = 99;
+
 has string   => ( spec => '=s' );
 has say      => ( spec => '=s', default => "Hello" );
 has number   => ( spec => '=i' );
@@ -38,10 +40,12 @@ has zaphord  => ( spec => '', alias => 'beeblebrox' );
 has so_long  => ( spec => '' );
 has list     => ( spec => '=s@' );
 has hash     => ( spec => '=s%' );
+has lazy     => ( spec => ''), default => sub { $DEFAULT };
+has default  => ( spec => ''), default => $DEFAULT;
 
 # imcremental coderef
 has [ qw( left right both ) ] => ( spec => '=i' );
-has '+both' => default => sub {
+has '+both' => action => sub {
     $_->{left} = $_->{right} = $_[1];
 };
 
@@ -77,7 +81,7 @@ if (our $DEFAULT_AND_ACTION) {
 
 if (our $TAKE_IT_ALL) {
     has ARGV => default => [];
-    has '<>' => default => sub {
+    has '<>' => action => sub {
 	push @{$_->{ARGV}}, $_[0];
     };
 }

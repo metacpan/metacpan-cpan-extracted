@@ -1,3 +1,11 @@
+0.39.7 2021-11-18 18:01:38 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make header items with empty label and note work
+
+0.39.6 2021-11-11 11:31:50 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - take form data properly into account when getting rowcount in excel export
+
 0.39.5 2021-10-21 14:06:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - improve live updates for card form fields

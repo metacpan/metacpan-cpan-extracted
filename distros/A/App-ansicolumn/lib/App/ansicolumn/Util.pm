@@ -60,7 +60,7 @@ sub rpn_calc {
     use Math::RPN;
     state $re = qr/(?:\d*\.)?\d+|[_a-z]+|--|\+\+|[<>!]=|\S/i;
     my @terms = map { /$re/g } @_;
-    my @ans = rpn @terms;
+    my @ans = do { local $_; rpn @terms };
     if (@ans == 1 && $ans[0] && $ans[0] !~ /[^\.\d]/) {
 	int $ans[0];
     } else {

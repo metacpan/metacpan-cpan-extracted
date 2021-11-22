@@ -2,7 +2,7 @@
 #
 # nozone: a Bind DNS zone file generator
 #
-# Copyright (C) 2013  Daniel P. Berrange <dan@berrange.com>
+# Copyright (C) 2013-2021  Daniel P. Berrange <dan@berrange.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@ use warnings;
 
 use Getopt::Long;
 use Pod::Usage;
-use Config::Record;
+use YAML;
 use NoZone;
 
-my $cfgfile = "/etc/nozone.cfg";
+my $cfgfile = "/etc/nozone.yml";
 my $verbose = 0;
 my $help = 0;
 my $datadir = "/var/named/data";
@@ -47,8 +47,7 @@ if ($help) {
 	      -verbose => 1);
 }
 
-my $cfg = Config::Record->new();
-$cfg->load($cfgfile);
+my $cfg = YAML::LoadFile($cfgfile);
 
 my $nozone = NoZone->new(datadir => $datadir,
 			 confdir => $confdir,
@@ -68,7 +67,7 @@ nozone - a Bind DNS zone file generator
 =head1 DESCRIPTION
 
 C<nozone> will read a description of required DNS zones from the
-configuration file C</etc/nozone.cfg>. It will then generate a
+configuration file C</etc/nozone.yml>. It will then generate a
 set of Bind DNS zone files.
 
 =head1 OPTIONS
@@ -79,7 +78,7 @@ Valid command line options are
 
 =item -c CONFIGFILE, --config=CONFIGFILE
 
-Specify a different configuration file from the default (C</etc/nozone.cfg>)
+Specify a different configuration file from the default (C</etc/nozone.yml>)
 
 =item --datadir DIR
 

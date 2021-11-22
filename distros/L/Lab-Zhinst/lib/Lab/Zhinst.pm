@@ -321,7 +321,7 @@ Feel free to contact us at
 
 =head1 AUTHOR
 
-Simon Reinhardt, E<lt>simon.reinhardt@stud.uni-regensburg.deE<gt>
+Simon Reinhardt, E<lt>simon.reinhardt@physik.uni-regensburg.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -345,7 +345,7 @@ use Carp;
 require Exporter;
 use AutoLoader;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(

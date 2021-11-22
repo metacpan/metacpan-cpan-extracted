@@ -4,7 +4,7 @@ Archive::BagIt - The main module to handle bags.
 
 # VERSION
 
-version 0.083
+version 0.085
 
 # NAME
 
@@ -15,7 +15,7 @@ Achive::BagIt - The main module to handle Bags
 The original development version was on github at [http://github.com/rjeschmi/Archive-BagIt](http://github.com/rjeschmi/Archive-BagIt)
 and may be cloned from there.
 
-The actual development version is available at [https://art1pirat.spdns.org/art1/Archive-BagIt](https://art1pirat.spdns.org/art1/Archive-BagIt)
+The actual development version is available at [https://git.fsfe.org/art1pirat/Archive-BagIt](https://git.fsfe.org/art1pirat/Archive-BagIt)
 
 # Conformance to RFC8493
 
@@ -50,8 +50,10 @@ Try this:
 
     foreach my $algorithm ( keys %{ $self->manifests }) {
         my $entries_ref = $self->manifests->{$algorithm}->manifest_entries();
-        # $entries_ref returns a hashref of form:
-        # $entries_ref->{$algorithm}->{$file} = $digest;
+        # $entries_ref returns a hashref like:
+        # {
+        #     data/hello.txt   "e7c22b994c59d9cf2b48e549b1e24666636045930d3da7c1acb299d1c3b7f931f94aae41edda2c2b207a36e10f8bcb8d45223e54878f5b316e7ce3b6bc019629"
+        # }
     }
 
 Similar for tagmanifests
@@ -107,6 +109,19 @@ you have to enable UTF-8 support via 'System Administration' -> 'Region' -> 'Adm
 \-> 'Region Settings' -> Flag 'Use Unicode UTF-8 for worldwide language support'
 
 Hint: The better way is to use only portable filenames. See [perlport](https://metacpan.org/pod/perlport) for details.
+
+# BUGS
+
+There are problems related to Parallel::parallel\_map and IO::AIO under MS Windows. The tests are skipped there. Use the
+ parallel feature or the [Archive::BagIt::Fast](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3AFast) at your own risks on a MS Window System.
+ If you are a MS Windows developer, feel free to send me patches or hints to fix the issues.
+
+# THANKS
+
+Thanks to Rob Schmidt <rjeschmi@gmail.com> for the trustful handover of the project and thanks for your initial work!
+I would also like to thank Patrick Hochstenbach and Rusell McOrmond for their valuable and especially detailed advice!
+And without the helpful, sometimes rude help of the IRC channel #perl I would have been stuck in a lot of problems.
+Without the support of my colleagues at SLUB Dresden, the project would never have made it this far.
 
 # SYNOPSIS
 
@@ -176,10 +191,21 @@ The arguments are:
 
 - `bag_path` - path to bag-directory
 - `force_utf8` - if set the warnings about non portable filenames are disabled (default: enabled)
+- `use_async` - if set it uses IO::Async to read payload files asynchronly, only useful under Linux.
+- `use_parallel` - if set it uses Parallel::parallel\_map to calculate digests of payload files in parallel,
+      only useful if underlying filesystem supports parallel read and if multiple CPU cores available.
 
 The bag object will use $bag\_dir, BUT an existing $bag\_dir is not read. If you use `store()` an existing bag will be overwritten!
 
 See `load()` if you want to parse/modify an existing bag.
+
+## use\_parallel()
+
+if set it uses parallel digest processing, default: false
+
+## use\_async()
+
+if set it uses async IO, default: false
 
 ## has\_force\_utf8()
 
@@ -378,11 +404,11 @@ web interface at [http://rt.cpan.org](http://rt.cpan.org).
 
 # AUTHOR
 
-Rob Schmidt <rjeschmi@gmail.com>
+Andreas Romeyke <cpan@andreas.romeyke.de>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

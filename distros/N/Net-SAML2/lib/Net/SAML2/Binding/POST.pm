@@ -5,7 +5,7 @@ use warnings;
 
 use Moose;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 # ABSTRACT: Net::SAML2::Binding::POST - HTTP POST binding for SAML
 
@@ -61,7 +61,7 @@ Net::SAML2::Binding::POST - Net::SAML2::Binding::POST - HTTP POST binding for SA
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

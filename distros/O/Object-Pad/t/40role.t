@@ -15,7 +15,7 @@ role ARole {
    }
 }
 
-class AClass does ARole {
+class AClass :does(ARole) {
 }
 
 {
@@ -30,7 +30,7 @@ role BRole {
    method two { return 2 }
 }
 
-class BClass does ARole, BRole {
+class BClass :does(ARole) :does(BRole) {
 }
 
 {
@@ -45,7 +45,7 @@ role CRole {
    requires three;
 }
 
-class CClass does CRole {
+class CClass :does(CRole) {
    method three { return 3 }
 }
 
@@ -61,16 +61,16 @@ pass( 'CClass compiled OK' );
       }
    }
 
-   class RecurseClass does RecurseRole {}
+   class RecurseClass :does(RecurseRole) {}
 
    is( RecurseClass->new->recurse( 5 ), 5, 'role methods can be reëntrant' );
 }
 
-role DRole does BRole {
+role DRole :does(BRole) {
    method four { return 4 }
 }
 
-class DClass does DRole {
+class DClass :does(DRole) {
 }
 
 {
@@ -80,10 +80,10 @@ class DClass does DRole {
    is( $obj->two,  2, 'DClass inherited BRole method' );
 }
 
-role ERole does ARole, BRole {
+role ERole :does(ARole) :does(BRole) {
 }
 
-class EClass does ERole {
+class EClass :does(ERole) {
 }
 
 {

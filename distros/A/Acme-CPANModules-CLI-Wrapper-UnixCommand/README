@@ -3,9 +3,9 @@ NAME
     (popular) Unix commands
 
 VERSION
-    This document describes version 0.005 of
+    This document describes version 0.006 of
     Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution
-    Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-11-08.
+    Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2021-07-12.
 
 DESCRIPTION
     These CLI's usually are meant to be called as the Unix commands they
@@ -17,7 +17,7 @@ DESCRIPTION
 
     If you know of others, please drop me a message.
 
-MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
+ACME::CPANMODULES ENTRIES
     *   App::sshwrap::hostcolor - Wraps ssh to remember the background
         terminal color of each user+host you went to
 
@@ -39,6 +39,9 @@ MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
     *   App::DiffDocText - Diffs two office word-processor documents by
         first converting them to plaintext
 
+    *   App::DiffPDFText - Diffs two PDF files by first converting to
+        plaintext
+
     *   App::DiffXlsText - Diffs two office spreadsheets by first converting
         them to directories of CSV files
 
@@ -50,9 +53,21 @@ MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
         in particular order, support negative search)
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n CLI::Wrapper::UnixCommand
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries CLI::Wrapper::UnixCommand | cpanm -n
 
@@ -60,9 +75,13 @@ FAQ
 
         % perl -MAcme::CM::Get=CLI::Wrapper::UnixCommand -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::CLI::Wrapper::UnixCommand -E'say $_->{module} for @{ $Acme::CPANModules::CLI::Wrapper::UnixCommand::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -90,7 +109,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

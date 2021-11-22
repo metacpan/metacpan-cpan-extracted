@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::Constants 2.144;
+package Config::Model::Role::Constants 2.145;
 
 # ABSTRACT: Provide some constant data.
 
@@ -16,8 +16,8 @@ use strict;
 use warnings;
 use 5.020;
 
-use feature qw/signatures/;
-no warnings qw/experimental::signatures/;
+use feature qw/signatures postderef/;
+no warnings qw/experimental::signatures experimental::postderef/;
 
 my %all_props = (
     status      => 'standard',
@@ -44,7 +44,7 @@ Config::Model::Role::Constants - Provide some constant data.
 
 =head1 VERSION
 
-version 2.144
+version 2.145
 
 =head1 AUTHOR
 

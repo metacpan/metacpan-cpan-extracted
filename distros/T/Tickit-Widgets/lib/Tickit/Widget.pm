@@ -8,6 +8,8 @@ use Object::Pad 0.52;  # ADJUSTPARAMS superclass bugfix
 package Tickit::Widget 0.55;
 class Tickit::Widget :repr(HASH);
 
+use experimental 'postderef';
+
 use Carp;
 use Scalar::Util qw( blessed weaken );
 use List::Util 1.33 qw( all );
@@ -212,7 +214,7 @@ method set_style_tag
       KEYSET: foreach my $keyset ( $_style_direct->keysets ) {
          $keyset->tags->{$tag} or next KEYSET;
 
-         $values{$_} ||= [] for keys %{ $keyset->style };
+         $values{$_} ||= [] for keys $keyset->style->%*;
       }
    }
 
@@ -225,7 +227,7 @@ method set_style_tag
          KEYSET: foreach my $keyset ( $tagset->keysets ) {
             $keyset->tags->{$tag} or next KEYSET;
 
-            $keys{$_}++ for keys %{ $keyset->style };
+            $keys{$_}++ for keys $keyset->style->%*;
          }
 
          [ keys %keys ];
@@ -290,7 +292,7 @@ method get_style_values
       defined $tagset or $tagset = Tickit::Style::_ref_tagset( $type, shift @classes );
 
       KEYSET: foreach my $keyset ( $tagset->keysets ) {
-         $_style_tag{$_} or next KEYSET for keys %{ $keyset->tags };
+         $_style_tag{$_} or next KEYSET for keys $keyset->tags->%*;
 
          my $style = $keyset->style;
 
@@ -394,7 +396,7 @@ method set_style
 
    my %values;
    foreach my $keyset ( $new->keysets ) {
-      $values{$_} ||= [] for keys %{ $keyset->style };
+      $values{$_} ||= [] for keys $keyset->style->%*;
    }
 
    my @keys = keys %values;

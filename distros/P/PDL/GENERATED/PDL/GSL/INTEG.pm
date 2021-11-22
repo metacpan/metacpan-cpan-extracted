@@ -1,24 +1,23 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSL::INTEG;
 
-our @EXPORT_OK = qw( gslinteg_qng gslinteg_qag gslinteg_qags gslinteg_qagp
+our @EXPORT_OK = qw(gslinteg_qng gslinteg_qag gslinteg_qags gslinteg_qagp
 	            gslinteg_qagi gslinteg_qagiu gslinteg_qagil gslinteg_qawc
- 		    gslinteg_qaws gslinteg_qawo gslinteg_qawf PDL::PP qng_meat PDL::PP qag_meat PDL::PP qags_meat PDL::PP qagp_meat PDL::PP qagi_meat PDL::PP qagiu_meat PDL::PP qagil_meat PDL::PP qawc_meat PDL::PP qaws_meat PDL::PP qawo_meat PDL::PP qawf_meat );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+ 		    gslinteg_qaws gslinteg_qawo gslinteg_qawf qng_meat qag_meat qags_meat qagp_meat qagi_meat qagiu_meat qagil_meat qawc_meat qaws_meat qawo_meat qawf_meat );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSL::INTEG ;
+
 
 
 
@@ -133,10 +132,7 @@ Please check the GSL documentation for more information.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -673,7 +669,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head2 gslinteg_qng
 
@@ -1125,5 +1121,3 @@ was written by Piessens, Doncker-Kapenga, Uberhuber and Kahaner.
 # Exit with OK status
 
 1;
-
-		   

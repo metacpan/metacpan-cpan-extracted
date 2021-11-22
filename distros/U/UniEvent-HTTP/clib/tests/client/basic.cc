@@ -9,7 +9,7 @@ TEST("trivial get") {
 
     p.server->request_event.prepend([&](auto& req){
         test.happens();
-        auto sa = p.server->listeners().front()->sockaddr().value();
+        auto sa = p.server->sockaddr().value();
         CHECK(req->headers.get("Host") == sa.ip() + ':' + panda::to_string(sa.port()));
     });
 

@@ -83,226 +83,206 @@
     *import = \&Exporter::import;
     require DynaLoader;
 
-    @Math::MPFR::EXPORT_OK = qw(GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
-MPFR_RNDN MPFR_RNDZ MPFR_RNDU MPFR_RNDD MPFR_RNDA MPFR_RNDF
-MPFR_FLAGS_UNDERFLOW MPFR_FLAGS_OVERFLOW MPFR_FLAGS_DIVBY0 MPFR_FLAGS_NAN
-MPFR_FLAGS_INEXACT MPFR_FLAGS_ERANGE MPFR_FLAGS_ALL
-MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
-MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING RMPFR_VERSION_NUM
-RMPFR_PREC_MIN RMPFR_PREC_MAX
+    @Math::MPFR::EXPORT_OK = qw(
+GMP_RNDD GMP_RNDN GMP_RNDU GMP_RNDZ
+IOK_flag NOK_flag POK_flag
+MPFR_DBL_DIG MPFR_FLT128_DIG MPFR_LDBL_DIG
+MPFR_FLAGS_ALL MPFR_FLAGS_DIVBY0 MPFR_FLAGS_ERANGE MPFR_FLAGS_INEXACT MPFR_FLAGS_NAN
+MPFR_FLAGS_OVERFLOW MPFR_FLAGS_UNDERFLOW
 MPFR_FREE_LOCAL_CACHE MPFR_FREE_GLOBAL_CACHE
-Rmpfr_randclear Rmpfr_randinit_mt
-Rmpfr_randinit_default Rmpfr_randinit_lc_2exp
-Rmpfr_randinit_lc_2exp_size Rmpfr_randseed Rmpfr_randseed_ui
-Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q
-Rmpfr_add_si Rmpfr_add_ui Rmpfr_add_z
-Rmpfr_agm Rmpfr_asin Rmpfr_asinh Rmpfr_atan Rmpfr_atan2 Rmpfr_atanh
-Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear Rmpfr_clears
-Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
-Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_cmp Rmpfr_cmp_d Rmpfr_cmp_f
-Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui
-Rmpfr_cmp_sj Rmpfr_cmp_uj Rmpfr_cmp_IV Rmpfr_cmp_UV
-Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui Rmpfr_total_order_p
-Rmpfr_const_catalan Rmpfr_const_euler
-Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth
+MPFR_RNDA MPFR_RNDD MPFR_RNDF MPFR_RNDN MPFR_RNDU MPFR_RNDZ
+MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
+RMPFR_PREC_MAX RMPFR_PREC_MIN RMPFR_VERSION_NUM
+
+Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_acospi Rmpfr_acosu
+Rmpfr_add Rmpfr_add_d Rmpfr_add_q Rmpfr_add_si Rmpfr_add_ui Rmpfr_add_z
+Rmpfr_agm Rmpfr_ai
+Rmpfr_asin Rmpfr_asinh Rmpfr_asinpi Rmpfr_asinu
+Rmpfr_atan Rmpfr_atan2 Rmpfr_atan2pi Rmpfr_atan2u Rmpfr_atanh Rmpfr_atanpi Rmpfr_atanu
+Rmpfr_beta
+Rmpfr_buildopt_decimal_p Rmpfr_buildopt_float128_p Rmpfr_buildopt_gmpinternals_p
+Rmpfr_buildopt_sharedcache_p Rmpfr_buildopt_tls_p Rmpfr_buildopt_tune_case
+Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range
+Rmpfr_clear Rmpfr_clear_divby0 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag
+Rmpfr_clear_nanflag Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_clears
+Rmpfr_cmp Rmpfr_cmp_IV Rmpfr_cmp_NV Rmpfr_cmp_d Rmpfr_cmp_f Rmpfr_cmp_float128 Rmpfr_cmp_ld
+Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_sj Rmpfr_cmp_ui Rmpfr_cmp_ui_2exp
+Rmpfr_cmp_uj Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui
+Rmpfr_compound_si
+Rmpfr_const_catalan Rmpfr_const_euler Rmpfr_const_log2 Rmpfr_const_pi
+Rmpfr_copysign
+Rmpfr_cos Rmpfr_cosh Rmpfr_cospi Rmpfr_cosu Rmpfr_cot Rmpfr_coth
 Rmpfr_csc Rmpfr_csch
-Rmpfr_deref2 Rmpfr_dim Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui
-Rmpfr_div_q Rmpfr_div_si Rmpfr_div_ui Rmpfr_div_z Rmpfr_dump Rmpfr_eint
-Rmpfr_q_div Rmpfr_z_div
-Rmpfr_eq Rmpfr_equal_p Rmpfr_erangeflag_p Rmpfr_erf Rmpfr_erfc Rmpfr_exp
-Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui
-Rmpfr_fits_intmax_p Rmpfr_fits_sint_p Rmpfr_fits_slong_p
-Rmpfr_fits_sshort_p Rmpfr_fits_uint_p Rmpfr_fits_uintmax_p
-Rmpfr_fits_ulong_p Rmpfr_fits_IV_p Rmpfr_fits_UV_p
-Rmpfr_fits_ushort_p Rmpfr_floor Rmpfr_fma Rmpfr_frac Rmpfr_gamma
-Rmpfr_free_cache Rmpfr_free_cache2 Rmpfr_free_pool
-Rmpfr_get_d Rmpfr_get_IV Rmpfr_get_UV Rmpfr_get_NV
-Rmpfr_get_d_2exp Rmpfr_get_d1 Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode
-Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin
-Rmpfr_get_emin_max Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_ld Rmpfr_get_LD
-Rmpfr_get_ld_2exp
-Rmpfr_get_prec Rmpfr_get_si Rmpfr_get_sj Rmpfr_get_str Rmpfr_get_ui
-Rmpfr_get_uj Rmpfr_get_q
-Rmpfr_get_version Rmpfr_get_z Rmpfr_get_z_exp
-Rmpfr_get_z_2exp Rmpfr_greater_p Rmpfr_greaterequal_p
-Rmpfr_hypot
-Rmpfr_inexflag_p Rmpfr_inf_p Rmpfr_init Rmpfr_init2 Rmpfr_init2_nobless
-Rmpfr_inits Rmpfr_inits2 Rmpfr_inits_nobless Rmpfr_inits2_nobless
-Rmpfr_init_nobless Rmpfr_init_set Rmpfr_init_set_d Rmpfr_init_set_d_nobless
-Rmpfr_init_set_f Rmpfr_init_set_f_nobless
-Rmpfr_init_set_nobless Rmpfr_init_set_q
-Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless
-Rmpfr_init_set_str Rmpfr_init_set_str_nobless Rmpfr_init_set_ui
-Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_str
-TRmpfr_inp_str
-Rmpfr_integer_p Rmpfr_overflow_p Rmpfr_integer_string
-Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma
-Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_min
-Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q
-Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg
-Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str
-TRmpfr_out_str Rmpfr_prec_round
-Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_powr Rmpfr_pown Rmpfr_pow_uj
-Rmpfr_pow_UV Rmpfr_pow_IV
-Rmpfr_print_rnd_mode
-Rmpfr_random2 Rmpfr_reldiff Rmpfr_rint Rmpfr_rint_ceil
-Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_trunc Rmpfr_root Rmpfr_rootn_ui Rmpfr_round
-Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_d Rmpfr_set_default_prec
-Rmpfr_set_default_rounding_mode Rmpfr_set_emax Rmpfr_set_emin Rmpfr_set_erangeflag
-Rmpfr_set_exp Rmpfr_set_f Rmpfr_set_inexflag Rmpfr_set_inf Rmpfr_set_ld Rmpfr_set_LD
-Rmpfr_set_NV Rmpfr_cmp_NV
-Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec
-Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj
-Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_ui Rmpfr_set_ui_2exp
-Rmpfr_set_uj Rmpfr_set_uj_2exp
-Rmpfr_set_DECIMAL64 Rmpfr_get_DECIMAL64 Rmpfr_set_float128 Rmpfr_get_float128
-Rmpfr_set_FLOAT128 Rmpfr_get_FLOAT128 Rmpfr_set_DECIMAL128 Rmpfr_get_DECIMAL128
-decimalize check_exact_decimal
-Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin
-Rmpfr_sin_cos Rmpfr_sinu Rmpfr_cosu Rmpfr_tanu Rmpfr_sinpi Rmpfr_cospi Rmpfr_tanpi
-Rmpfr_sinh_cosh Rmpfr_acosu Rmpfr_acospi Rmpfr_asinu Rmpfr_asinpi Rmpfr_atanu
-Rmpfr_atanpi Rmpfr_atan2u Rmpfr_atan2pi
-Rmpfr_pow_sj Rmpfr_log2p1 Rmpfr_log10p1 Rmpfr_compound_si Rmpfr_exp2m1 Rmpfr_exp10m1
-Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub
-Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
+Rmpfr_d_div Rmpfr_d_sub Rmpfr_deref2 Rmpfr_digamma Rmpfr_dim
+Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui Rmpfr_div_d Rmpfr_div_q Rmpfr_div_si
+Rmpfr_div_ui Rmpfr_div_z Rmpfr_divby0_p
+Rmpfr_dot Rmpfr_dump Rmpfr_eint Rmpfr_eq Rmpfr_equal_p Rmpfr_erandom Rmpfr_erangeflag_p
+Rmpfr_erf Rmpfr_erfc Rmpfr_exp Rmpfr_exp10 Rmpfr_exp10m1 Rmpfr_exp2 Rmpfr_exp2m1 Rmpfr_expm1
+Rmpfr_fac_ui
+Rmpfr_fits_IV_p Rmpfr_fits_intmax_p Rmpfr_fits_sint_p Rmpfr_fits_slong_p Rmpfr_fits_sshort_p
+Rmpfr_fits_uint_p Rmpfr_fits_uintmax_p Rmpfr_fits_ulong_p Rmpfr_fits_ushort_p
+Rmpfr_flags_clear Rmpfr_flags_restore Rmpfr_flags_save Rmpfr_flags_set Rmpfr_flags_test
+Rmpfr_floor
+Rmpfr_fma Rmpfr_fmma Rmpfr_fmms Rmpfr_fmod Rmpfr_fmod_ui Rmpfr_fmodquo Rmpfr_fms
+Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_fprintf Rmpfr_frac
+Rmpfr_free_cache Rmpfr_free_cache2 Rmpfr_free_pool Rmpfr_frexp Rmpfr_gamma Rmpfr_gamma_inc
+Rmpfr_get_DECIMAL128 Rmpfr_get_DECIMAL64 Rmpfr_get_FLOAT128 Rmpfr_get_IV Rmpfr_get_LD Rmpfr_get_NV
+Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_d_2exp Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode
+Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin Rmpfr_get_emin_max
+Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_float128 Rmpfr_get_flt Rmpfr_get_ld
+Rmpfr_get_ld_2exp Rmpfr_get_patches Rmpfr_get_prec Rmpfr_get_q Rmpfr_get_si Rmpfr_get_sj
+Rmpfr_get_str Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt Rmpfr_get_ui Rmpfr_get_uj
+Rmpfr_get_version Rmpfr_get_z Rmpfr_get_z_2exp Rmpfr_get_z_exp
+Rmpfr_grandom Rmpfr_greater_p Rmpfr_greaterequal_p Rmpfr_hypot Rmpfr_inexflag_p Rmpfr_inf_p
+Rmpfr_init Rmpfr_init2 Rmpfr_init2_nobless Rmpfr_init_nobless Rmpfr_init_set Rmpfr_init_set_IV
+Rmpfr_init_set_IV_nobless Rmpfr_init_set_NV Rmpfr_init_set_NV_nobless Rmpfr_init_set_d
+Rmpfr_init_set_d_nobless Rmpfr_init_set_f Rmpfr_init_set_f_nobless Rmpfr_init_set_float128
+Rmpfr_init_set_float128_nobless Rmpfr_init_set_ld Rmpfr_init_set_nobless Rmpfr_init_set_q
+Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless Rmpfr_init_set_str
+Rmpfr_init_set_str_nobless Rmpfr_init_set_ui Rmpfr_init_set_ui_nobless Rmpfr_init_set_z
+Rmpfr_init_set_z_nobless Rmpfr_inits Rmpfr_inits2 Rmpfr_inits2_nobless Rmpfr_inits_nobless
+Rmpfr_inp_str Rmpfr_integer_p Rmpfr_integer_string Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_less_p
+Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lgamma Rmpfr_li2 Rmpfr_lngamma
+Rmpfr_log Rmpfr_log10 Rmpfr_log10p1 Rmpfr_log1p Rmpfr_log2 Rmpfr_log2p1 Rmpfr_log_ui
+Rmpfr_max Rmpfr_min Rmpfr_min_prec Rmpfr_modf
+Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_d Rmpfr_mul_q Rmpfr_mul_si
+Rmpfr_mul_ui Rmpfr_mul_z
+Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward
+Rmpfr_nrandom Rmpfr_number_p Rmpfr_out_str Rmpfr_overflow_p
+Rmpfr_pow Rmpfr_pow_IV Rmpfr_pow_si Rmpfr_pow_sj Rmpfr_pow_ui Rmpfr_pow_uj Rmpfr_pow_z
+Rmpfr_pown Rmpfr_powr Rmpfr_prec_round Rmpfr_print_rnd_mode Rmpfr_printf Rmpfr_q_div
+Rmpfr_randclear Rmpfr_randinit_default Rmpfr_randinit_lc_2exp Rmpfr_randinit_lc_2exp_size
+Rmpfr_randinit_mt Rmpfr_random2 Rmpfr_randseed Rmpfr_randseed_ui Rmpfr_rec_root Rmpfr_rec_sqrt
+Rmpfr_regular_p Rmpfr_reldiff Rmpfr_remainder Rmpfr_remquo
+Rmpfr_rint Rmpfr_rint_ceil Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_roundeven Rmpfr_rint_trunc
+Rmpfr_root Rmpfr_rootn_ui Rmpfr_round Rmpfr_round_nearest_away Rmpfr_roundeven
+Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_DECIMAL128 Rmpfr_set_DECIMAL64 Rmpfr_set_FLOAT128
+Rmpfr_set_IV Rmpfr_set_LD Rmpfr_set_NV Rmpfr_set_d Rmpfr_set_default_prec
+Rmpfr_set_default_rounding_mode Rmpfr_set_divby0 Rmpfr_set_emax Rmpfr_set_emin Rmpfr_set_erangeflag
+Rmpfr_set_exp Rmpfr_set_f Rmpfr_set_float128 Rmpfr_set_flt Rmpfr_set_inexflag Rmpfr_set_inf
+Rmpfr_set_ld Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec Rmpfr_set_prec_raw
+Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_ui
+Rmpfr_set_ui_2exp Rmpfr_set_uj Rmpfr_set_uj_2exp Rmpfr_set_underflow Rmpfr_set_z Rmpfr_set_z_2exp
+Rmpfr_set_zero Rmpfr_setsign Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_signbit
+Rmpfr_sin Rmpfr_sin_cos Rmpfr_sinh Rmpfr_sinh_cosh Rmpfr_sinpi Rmpfr_sinu
+Rmpfr_snprintf Rmpfr_sprintf Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr
+Rmpfr_sub Rmpfr_sub_d Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
 Rmpfr_sum Rmpfr_swap
-Rmpfr_tan Rmpfr_tanh Rmpfr_trunc Rmpfr_ui_div Rmpfr_ui_pow Rmpfr_ui_pow_ui
-Rmpfr_ui_sub Rmpfr_underflow_p Rmpfr_unordered_p Rmpfr_urandomb Rmpfr_zero_p
-Rmpfr_zeta Rmpfr_zeta_ui
-Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_y0 Rmpfr_y1 Rmpfr_yn Rmpfr_lgamma
-Rmpfr_signbit Rmpfr_setsign Rmpfr_copysign Rmpfr_get_patches
-Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld
-Rmpfr_add_d Rmpfr_sub_d Rmpfr_d_sub Rmpfr_mul_d Rmpfr_div_d Rmpfr_d_div
-Rmpfr_rec_sqrt Rmpfr_rec_root Rmpfr_li2 Rmpfr_modf Rmpfr_fmod Rmpfr_fmod_ui
-Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_snprintf
-Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmpfr_digamma
-Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
-Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
-Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
-Rmpfr_buildopt_float128_p Rmpfr_buildopt_sharedcache_p prec_cast bytes
-MPFR_DBL_DIG MPFR_LDBL_DIG MPFR_FLT128_DIG
-mpfr_max_orig_len mpfr_min_inter_prec
-Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_set
-Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
-Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
-Rmpfr_round_nearest_away rndna
-atonv nvtoa atodouble doubletoa numtoa atonum mpfrtoa anytoa Rmpfr_dot
-Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
-q_add_fr q_sub_fr q_mul_fr q_div_fr q_cmp_fr fr_cmp_q_rounded
+Rmpfr_tan Rmpfr_tanh Rmpfr_tanpi Rmpfr_tanu
+Rmpfr_total_order_p Rmpfr_trunc
+Rmpfr_ui_div Rmpfr_ui_pow Rmpfr_ui_pow_ui Rmpfr_ui_sub Rmpfr_underflow_p Rmpfr_unordered_p
+Rmpfr_urandom Rmpfr_urandomb Rmpfr_y0 Rmpfr_y1 Rmpfr_yn
+Rmpfr_z_div Rmpfr_z_sub Rmpfr_zero_p Rmpfr_zeta Rmpfr_zeta_ui
+TRmpfr_inp_str TRmpfr_out_str
+anytoa atodouble atonum atonv
+bytes
+check_exact_decimal decimalize doubletoa
+fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa prec_cast
+q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 );
 
-    our $VERSION = '4.17';
+    our $VERSION = '4.18';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
 
+    # The ':mpfr' tag (below) is the same as @EXPORT_OK,
+    # except that the ':mpfr' tag does not include 'bytes'.
+
     %Math::MPFR::EXPORT_TAGS =(mpfr => [qw(
-GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
-MPFR_RNDN MPFR_RNDZ MPFR_RNDU MPFR_RNDD MPFR_RNDA MPFR_RNDF
-MPFR_FLAGS_UNDERFLOW MPFR_FLAGS_OVERFLOW MPFR_FLAGS_DIVBY0 MPFR_FLAGS_NAN
-MPFR_FLAGS_INEXACT MPFR_FLAGS_ERANGE MPFR_FLAGS_ALL
-MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
-MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING RMPFR_VERSION_NUM
-RMPFR_PREC_MIN RMPFR_PREC_MAX
+GMP_RNDD GMP_RNDN GMP_RNDU GMP_RNDZ
+MPFR_DBL_DIG MPFR_FLT128_DIG MPFR_LDBL_DIG
+MPFR_FLAGS_ALL MPFR_FLAGS_DIVBY0 MPFR_FLAGS_ERANGE MPFR_FLAGS_INEXACT MPFR_FLAGS_NAN
+MPFR_FLAGS_OVERFLOW MPFR_FLAGS_UNDERFLOW
 MPFR_FREE_LOCAL_CACHE MPFR_FREE_GLOBAL_CACHE
-Rmpfr_randclear Rmpfr_randinit_mt
-Rmpfr_randinit_default Rmpfr_randinit_lc_2exp
-Rmpfr_randinit_lc_2exp_size Rmpfr_randseed Rmpfr_randseed_ui
-Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q
-Rmpfr_add_si Rmpfr_add_ui Rmpfr_add_z
-Rmpfr_agm Rmpfr_asin Rmpfr_asinh Rmpfr_atan Rmpfr_atan2 Rmpfr_atanh
-Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear Rmpfr_clears
-Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
-Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_cmp Rmpfr_cmp_d Rmpfr_cmp_f
-Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui
-Rmpfr_cmp_sj Rmpfr_cmp_uj Rmpfr_cmp_IV Rmpfr_cmp_UV
-Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui Rmpfr_total_order_p
-Rmpfr_const_catalan Rmpfr_const_euler
-Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth
+MPFR_RNDA MPFR_RNDD MPFR_RNDF MPFR_RNDN MPFR_RNDU MPFR_RNDZ
+MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
+RMPFR_PREC_MAX RMPFR_PREC_MIN RMPFR_VERSION_NUM
+
+Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_acospi Rmpfr_acosu
+Rmpfr_add Rmpfr_add_d Rmpfr_add_q Rmpfr_add_si Rmpfr_add_ui Rmpfr_add_z
+Rmpfr_agm Rmpfr_ai
+Rmpfr_asin Rmpfr_asinh Rmpfr_asinpi Rmpfr_asinu
+Rmpfr_atan Rmpfr_atan2 Rmpfr_atan2pi Rmpfr_atan2u Rmpfr_atanh Rmpfr_atanpi Rmpfr_atanu
+Rmpfr_beta
+Rmpfr_buildopt_decimal_p Rmpfr_buildopt_float128_p Rmpfr_buildopt_gmpinternals_p
+Rmpfr_buildopt_sharedcache_p Rmpfr_buildopt_tls_p Rmpfr_buildopt_tune_case
+Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range
+Rmpfr_clear Rmpfr_clear_divby0 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag
+Rmpfr_clear_nanflag Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_clears
+Rmpfr_cmp Rmpfr_cmp_IV Rmpfr_cmp_NV Rmpfr_cmp_d Rmpfr_cmp_f Rmpfr_cmp_float128 Rmpfr_cmp_ld
+Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_sj Rmpfr_cmp_ui Rmpfr_cmp_ui_2exp
+Rmpfr_cmp_uj Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui
+Rmpfr_compound_si
+Rmpfr_const_catalan Rmpfr_const_euler Rmpfr_const_log2 Rmpfr_const_pi
+Rmpfr_copysign
+Rmpfr_cos Rmpfr_cosh Rmpfr_cospi Rmpfr_cosu Rmpfr_cot Rmpfr_coth
 Rmpfr_csc Rmpfr_csch
-Rmpfr_deref2 Rmpfr_dim Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui
-Rmpfr_div_q Rmpfr_div_si Rmpfr_div_ui Rmpfr_div_z Rmpfr_dump Rmpfr_eint
-Rmpfr_q_div Rmpfr_z_div
-Rmpfr_eq Rmpfr_equal_p Rmpfr_erangeflag_p Rmpfr_erf Rmpfr_erfc Rmpfr_exp
-Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui
-Rmpfr_fits_intmax_p Rmpfr_fits_sint_p Rmpfr_fits_slong_p
-Rmpfr_fits_sshort_p Rmpfr_fits_uint_p Rmpfr_fits_uintmax_p
-Rmpfr_fits_ulong_p Rmpfr_fits_IV_p Rmpfr_fits_UV_p
-Rmpfr_fits_ushort_p Rmpfr_floor Rmpfr_fma Rmpfr_frac Rmpfr_gamma
-Rmpfr_free_cache Rmpfr_free_cache2 Rmpfr_free_pool
-Rmpfr_get_d Rmpfr_get_IV Rmpfr_get_UV Rmpfr_get_NV
-Rmpfr_get_d_2exp Rmpfr_get_d1 Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode
-Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin
-Rmpfr_get_emin_max Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_ld Rmpfr_get_LD
-Rmpfr_get_ld_2exp
-Rmpfr_get_prec Rmpfr_get_si Rmpfr_get_sj Rmpfr_get_str Rmpfr_get_ui
-Rmpfr_get_uj
-Rmpfr_get_version Rmpfr_get_z Rmpfr_get_z_exp
-Rmpfr_get_z_2exp Rmpfr_greater_p Rmpfr_greaterequal_p
-Rmpfr_hypot Rmpfr_get_q
-Rmpfr_inexflag_p Rmpfr_inf_p Rmpfr_init Rmpfr_init2 Rmpfr_init2_nobless
-Rmpfr_inits Rmpfr_inits2 Rmpfr_inits_nobless Rmpfr_inits2_nobless
-Rmpfr_init_nobless Rmpfr_init_set Rmpfr_init_set_d Rmpfr_init_set_d_nobless
-Rmpfr_init_set_f Rmpfr_init_set_f_nobless
-Rmpfr_init_set_nobless Rmpfr_init_set_q
-Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless
-Rmpfr_init_set_str Rmpfr_init_set_str_nobless Rmpfr_init_set_ui
-Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_str
-TRmpfr_inp_str
-Rmpfr_integer_p Rmpfr_overflow_p Rmpfr_integer_string
-Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma
-Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_min
-Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q
-Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg
-Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str
-TRmpfr_out_str Rmpfr_prec_round
-Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_powr Rmpfr_pown Rmpfr_pow_uj
-Rmpfr_pow_UV Rmpfr_pow_IV
-Rmpfr_print_rnd_mode
-Rmpfr_random2 Rmpfr_reldiff Rmpfr_rint Rmpfr_rint_ceil
-Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_trunc Rmpfr_root Rmpfr_rootn_ui Rmpfr_round
-Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_d Rmpfr_set_default_prec
-Rmpfr_set_default_rounding_mode Rmpfr_set_emax Rmpfr_set_emin Rmpfr_set_erangeflag
-Rmpfr_set_exp Rmpfr_set_f Rmpfr_set_inexflag Rmpfr_set_inf Rmpfr_set_ld Rmpfr_set_LD
-Rmpfr_set_NV Rmpfr_cmp_NV
-Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec
-Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj
-Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_ui Rmpfr_set_ui_2exp
-Rmpfr_set_uj Rmpfr_set_uj_2exp
-Rmpfr_set_DECIMAL64 Rmpfr_get_DECIMAL64 Rmpfr_set_float128 Rmpfr_get_float128
-Rmpfr_set_FLOAT128 Rmpfr_get_FLOAT128 Rmpfr_set_DECIMAL128 Rmpfr_get_DECIMAL128
-decimalize check_exact_decimal
-Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin
-Rmpfr_sin_cos Rmpfr_sinu Rmpfr_cosu Rmpfr_tanu Rmpfr_sinpi Rmpfr_cospi Rmpfr_tanpi
-Rmpfr_sinh_cosh Rmpfr_acosu Rmpfr_acospi Rmpfr_asinu Rmpfr_asinpi Rmpfr_atanu
-Rmpfr_atanpi Rmpfr_atan2u Rmpfr_atan2pi
-Rmpfr_pow_sj Rmpfr_log2p1 Rmpfr_log10p1 Rmpfr_compound_si Rmpfr_exp2m1 Rmpfr_exp10m1
-Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub
-Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
+Rmpfr_d_div Rmpfr_d_sub Rmpfr_deref2 Rmpfr_digamma Rmpfr_dim
+Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui Rmpfr_div_d Rmpfr_div_q Rmpfr_div_si
+Rmpfr_div_ui Rmpfr_div_z Rmpfr_divby0_p
+Rmpfr_dot Rmpfr_dump Rmpfr_eint Rmpfr_eq Rmpfr_equal_p Rmpfr_erandom Rmpfr_erangeflag_p
+Rmpfr_erf Rmpfr_erfc Rmpfr_exp Rmpfr_exp10 Rmpfr_exp10m1 Rmpfr_exp2 Rmpfr_exp2m1 Rmpfr_expm1
+Rmpfr_fac_ui
+Rmpfr_fits_IV_p Rmpfr_fits_intmax_p Rmpfr_fits_sint_p Rmpfr_fits_slong_p Rmpfr_fits_sshort_p
+Rmpfr_fits_uint_p Rmpfr_fits_uintmax_p Rmpfr_fits_ulong_p Rmpfr_fits_ushort_p
+Rmpfr_flags_clear Rmpfr_flags_restore Rmpfr_flags_save Rmpfr_flags_set Rmpfr_flags_test
+Rmpfr_floor
+Rmpfr_fma Rmpfr_fmma Rmpfr_fmms Rmpfr_fmod Rmpfr_fmod_ui Rmpfr_fmodquo Rmpfr_fms
+Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_fprintf Rmpfr_frac
+Rmpfr_free_cache Rmpfr_free_cache2 Rmpfr_free_pool Rmpfr_frexp Rmpfr_gamma Rmpfr_gamma_inc
+Rmpfr_get_DECIMAL128 Rmpfr_get_DECIMAL64 Rmpfr_get_FLOAT128 Rmpfr_get_IV Rmpfr_get_LD Rmpfr_get_NV
+Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_d_2exp Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode
+Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin Rmpfr_get_emin_max
+Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_float128 Rmpfr_get_flt Rmpfr_get_ld
+Rmpfr_get_ld_2exp Rmpfr_get_patches Rmpfr_get_prec Rmpfr_get_q Rmpfr_get_si Rmpfr_get_sj
+Rmpfr_get_str Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt Rmpfr_get_ui Rmpfr_get_uj
+Rmpfr_get_version Rmpfr_get_z Rmpfr_get_z_2exp Rmpfr_get_z_exp
+Rmpfr_grandom Rmpfr_greater_p Rmpfr_greaterequal_p Rmpfr_hypot Rmpfr_inexflag_p Rmpfr_inf_p
+Rmpfr_init Rmpfr_init2 Rmpfr_init2_nobless Rmpfr_init_nobless Rmpfr_init_set Rmpfr_init_set_IV
+Rmpfr_init_set_IV_nobless Rmpfr_init_set_NV Rmpfr_init_set_NV_nobless Rmpfr_init_set_d
+Rmpfr_init_set_d_nobless Rmpfr_init_set_f Rmpfr_init_set_f_nobless Rmpfr_init_set_float128
+Rmpfr_init_set_float128_nobless Rmpfr_init_set_ld Rmpfr_init_set_nobless Rmpfr_init_set_q
+Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless Rmpfr_init_set_str
+Rmpfr_init_set_str_nobless Rmpfr_init_set_ui Rmpfr_init_set_ui_nobless Rmpfr_init_set_z
+Rmpfr_init_set_z_nobless Rmpfr_inits Rmpfr_inits2 Rmpfr_inits2_nobless Rmpfr_inits_nobless
+Rmpfr_inp_str Rmpfr_integer_p Rmpfr_integer_string Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_less_p
+Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lgamma Rmpfr_li2 Rmpfr_lngamma
+Rmpfr_log Rmpfr_log10 Rmpfr_log10p1 Rmpfr_log1p Rmpfr_log2 Rmpfr_log2p1 Rmpfr_log_ui
+Rmpfr_max Rmpfr_min Rmpfr_min_prec Rmpfr_modf
+Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_d Rmpfr_mul_q Rmpfr_mul_si
+Rmpfr_mul_ui Rmpfr_mul_z
+Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward
+Rmpfr_nrandom Rmpfr_number_p Rmpfr_out_str Rmpfr_overflow_p
+Rmpfr_pow Rmpfr_pow_IV Rmpfr_pow_si Rmpfr_pow_sj Rmpfr_pow_ui Rmpfr_pow_uj Rmpfr_pow_z
+Rmpfr_pown Rmpfr_powr Rmpfr_prec_round Rmpfr_print_rnd_mode Rmpfr_printf Rmpfr_q_div
+Rmpfr_randclear Rmpfr_randinit_default Rmpfr_randinit_lc_2exp Rmpfr_randinit_lc_2exp_size
+Rmpfr_randinit_mt Rmpfr_random2 Rmpfr_randseed Rmpfr_randseed_ui Rmpfr_rec_root Rmpfr_rec_sqrt
+Rmpfr_regular_p Rmpfr_reldiff Rmpfr_remainder Rmpfr_remquo
+Rmpfr_rint Rmpfr_rint_ceil Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_roundeven Rmpfr_rint_trunc
+Rmpfr_root Rmpfr_rootn_ui Rmpfr_round Rmpfr_round_nearest_away Rmpfr_roundeven
+Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_DECIMAL128 Rmpfr_set_DECIMAL64 Rmpfr_set_FLOAT128
+Rmpfr_set_IV Rmpfr_set_LD Rmpfr_set_NV Rmpfr_set_d Rmpfr_set_default_prec
+Rmpfr_set_default_rounding_mode Rmpfr_set_divby0 Rmpfr_set_emax Rmpfr_set_emin Rmpfr_set_erangeflag
+Rmpfr_set_exp Rmpfr_set_f Rmpfr_set_float128 Rmpfr_set_flt Rmpfr_set_inexflag Rmpfr_set_inf
+Rmpfr_set_ld Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec Rmpfr_set_prec_raw
+Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_ui
+Rmpfr_set_ui_2exp Rmpfr_set_uj Rmpfr_set_uj_2exp Rmpfr_set_underflow Rmpfr_set_z Rmpfr_set_z_2exp
+Rmpfr_set_zero Rmpfr_setsign Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_signbit
+Rmpfr_sin Rmpfr_sin_cos Rmpfr_sinh Rmpfr_sinh_cosh Rmpfr_sinpi Rmpfr_sinu
+Rmpfr_snprintf Rmpfr_sprintf Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr
+Rmpfr_sub Rmpfr_sub_d Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
 Rmpfr_sum Rmpfr_swap
-Rmpfr_tan Rmpfr_tanh Rmpfr_trunc Rmpfr_ui_div Rmpfr_ui_pow Rmpfr_ui_pow_ui
-Rmpfr_ui_sub Rmpfr_underflow_p Rmpfr_unordered_p Rmpfr_urandomb Rmpfr_zero_p
-Rmpfr_zeta Rmpfr_zeta_ui
-Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_y0 Rmpfr_y1 Rmpfr_yn Rmpfr_lgamma
-Rmpfr_signbit Rmpfr_setsign Rmpfr_copysign Rmpfr_get_patches
-Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld
-Rmpfr_add_d Rmpfr_sub_d Rmpfr_d_sub Rmpfr_mul_d Rmpfr_div_d Rmpfr_d_div
-Rmpfr_rec_sqrt Rmpfr_rec_root Rmpfr_li2 Rmpfr_modf Rmpfr_fmod Rmpfr_fmod_ui
-Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_snprintf
-Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmpfr_digamma
-Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
-Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
-Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
-Rmpfr_buildopt_float128_p Rmpfr_buildopt_sharedcache_p prec_cast
-MPFR_DBL_DIG MPFR_LDBL_DIG MPFR_FLT128_DIG
-mpfr_max_orig_len mpfr_min_inter_prec
-Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_set
-Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
-Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
-Rmpfr_round_nearest_away rndna
-atonv nvtoa atodouble doubletoa numtoa atonum mpfrtoa anytoa Rmpfr_dot
-Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
-q_add_fr q_sub_fr q_mul_fr q_div_fr q_cmp_fr fr_cmp_q_rounded
+Rmpfr_tan Rmpfr_tanh Rmpfr_tanpi Rmpfr_tanu
+Rmpfr_total_order_p Rmpfr_trunc
+Rmpfr_ui_div Rmpfr_ui_pow Rmpfr_ui_pow_ui Rmpfr_ui_sub Rmpfr_underflow_p Rmpfr_unordered_p
+Rmpfr_urandom Rmpfr_urandomb Rmpfr_y0 Rmpfr_y1 Rmpfr_yn
+Rmpfr_z_div Rmpfr_z_sub Rmpfr_zero_p Rmpfr_zeta Rmpfr_zeta_ui
+TRmpfr_inp_str TRmpfr_out_str
+anytoa atodouble atonum atonv
+check_exact_decimal decimalize doubletoa
+fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa prec_cast
+q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 )]);
 
 
@@ -914,13 +894,22 @@ sub anytoa {
   die "1st argument given to anytoa() must be a Math::MPFR object"
     unless Math::MPFR::_itsa($_[0]) == 5;
 
-  die "2nd argument given to anytoa() must be 53 or 64 or 113 or 2098"
-    unless ($_[1] == 53 || $_[1] == 64 || $_[1] == 113 || $_[1] == 2098);
+  my $v = shift;
+  my $bits;
+
+  if($_[0]) {
+    $bits = shift;
+    die "2nd argument given to anytoa() must be 0 or 53 or 64 or 113 or 2098"
+    unless ($bits == 53 || $bits == 64 || $bits == 113 || $bits == 2098);
+  }
+  else {
+    $bits = Rmpfr_get_prec($v);
+    die "Precision of arg given to anytoa() must be 53 or 64 or 113 or 2098"
+    unless ($bits == 53 || $bits == 64 || $bits == 113 || $bits == 2098);
+  }
 
   my $emax = Rmpfr_get_emax();                # Save original value
   my $emin = Rmpfr_get_emin();                # Save original value
-
-  my ($v, $bits) = (shift, shift);
 
   my $f_init = Rmpfr_init2($bits);
 

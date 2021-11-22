@@ -9,7 +9,7 @@ use File::Which qw(which);
 
 Readonly::Array our @EXPORT_OK => qw(detect_djvu_chunk detect_djvu_file);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub detect_djvu_chunk {
 	my ($file, $chunk_name) = @_;
@@ -166,6 +166,16 @@ L<Error::Pure>,
 L<Exporter>,
 L<File::Which>.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<File::Find::Rule::DjVu>
+
+Common rules for searching DjVu files.
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/michal-josef-spacek/DjVu-Detect>
@@ -189,6 +199,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

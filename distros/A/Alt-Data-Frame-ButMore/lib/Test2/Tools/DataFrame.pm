@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0058'; # VERSION
+our $VERSION = '0.0060'; # VERSION
 
 use Safe::Isa;
 use Test2::API qw/context/;
@@ -108,7 +108,7 @@ Test2::Tools::DataFrame - Tools for verifying Data::Frame data frames
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 SYNOPSIS
 

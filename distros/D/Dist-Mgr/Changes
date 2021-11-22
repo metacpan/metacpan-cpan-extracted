@@ -1,12 +1,19 @@
 Revision history for Dist-Mgr
 
+1.10    2021-11-14
+    - Remove -w|--wait flag from 'distmgr cycle' docs (fixes #46)
+    - Fix broken links to distmgr POD from module POD (fixes #44)
+    - Removed conditionals in distmgr install which was preventing elements
+      from being installed correctly
+
 1.09    2021-02-03
     - Skip failing tests on Windows due to line-ending issues when
       uploaded to CPAN. Windows CI tests pass just fine
+    - Fix issue where in "install", we were exiting prematurely
 
 1.07    2021-02-02
     - For some reason, CPAN installs were breaking due to an unknown reason
-      on Windows. After a dev release, the problem seems resolved    
+      on Windows. After a dev release, the problem seems resolved
     - Updated _dist_dir_re() so it includes development versions
 
 1.06_01    2021-02-02

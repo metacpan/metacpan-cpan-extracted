@@ -36,7 +36,13 @@ CLASS ATTRIBUTES
        class Name :Struct ... { ... }
 
     Automatically applies the :param and :mutator attributes to every slot
-    defined on the class.
+    defined on the class, meaning the constructor will accept parameters
+    for each slot to initialise the value, and each slot will have an
+    lvalue mutator method.
+
+    In addition, the class itself gains the :strict(params) attribute,
+    meaning the constructor will check parameter names and throw an
+    exception for unrecognised names.
 
 AUTHOR
 

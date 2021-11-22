@@ -3,7 +3,7 @@ package Dist::Mgr::FileData;
 use warnings;
 use strict;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use Exporter qw(import);
 our @ISA = qw(Exporter);
@@ -275,7 +275,7 @@ sub _manifest_skip_file {
         q{pm_to_blib$},
         q{.git/},
         q{.debug$},
-        q{^\.github/},
+        q{.github/},
         q{.gitignore$},
         q{^\w+.pl$},
         q{.ignore.txt$},

@@ -36,6 +36,9 @@ use Test::Expander            -target   => 'Test::Expander',
                               -tempfile => { UNLINK => 1 };
 use Test::Expander::Constants qw($INVALID_VALUE $UNKNOWN_OPTION);
 
+$METHOD     //= 'import';
+$METHOD_REF //= sub {};
+
 foreach my $function (sort @functions) {
   my $title = "$CLASS->can('$function')";
   test_out("ok 1 - $title");

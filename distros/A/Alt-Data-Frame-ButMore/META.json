@@ -38,8 +38,7 @@
             "Function::Parameters" : "2.001003",
             "Hash::Ordered" : "0",
             "Import::Into" : "0",
-            "List::AllUtils" : "0.15",
-            "List::MoreUtils" : "0.423",
+            "List::AllUtils" : "0.19",
             "Module::Load" : "0",
             "Module::Runtime" : "0",
             "Moo" : "2.003004",
@@ -60,7 +59,6 @@
             "Role::Tiny::With" : "0",
             "Safe::Isa" : "1.000009",
             "Scalar::Util" : "0",
-            "Sereal::Decoder" : "4.005",
             "Sereal::Encoder" : "4.005",
             "Syntax::Keyword::Try" : "0.09",
             "Test2::API" : "0",
@@ -108,7 +106,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.0058",
+   "version" : "0.0060",
    "x_contributors" : [
       "Mohammad S Anwar <manwar@cpan.org>"
    ],

@@ -38,16 +38,16 @@
             "Data::Dump" : "1.23",
             "Data::Dumper" : "0",
             "Data::UUID" : "1.226",
-            "DateTime" : "1.52",
+            "DateTime" : "1.50",
             "DateTime::Format::Strptime" : "1.77",
             "Devel::StackTrace" : "0",
-            "Exporter" : "5.73",
-            "Fcntl" : "1.13",
+            "Exporter" : "5.70",
+            "Fcntl" : "0",
             "File::Basename" : "2.85",
-            "File::Copy" : "2.34",
-            "File::Glob" : "1.32",
+            "File::Copy" : "0",
+            "File::Glob" : "0",
             "File::MMagic::XS" : "0.09008",
-            "File::Spec" : "3.78",
+            "File::Spec" : "3.73",
             "IO::Dir" : "1.41",
             "IO::File" : "1.41",
             "IO::Scalar" : "2.113",
@@ -63,11 +63,12 @@
             "Storable" : "3.15",
             "Sub::Util" : "1.54",
             "Tie::Hash" : "1.05",
+            "URI::Escape" : "5.09",
             "URI::file" : "5.09",
             "Want" : "0.29",
             "common::sense" : "0",
-            "overload" : "1.22",
-            "overloading" : "0.02",
+            "overload" : "0",
+            "overloading" : "0",
             "parent" : "0",
             "perl" : "5.026001",
             "strict" : "0",
@@ -77,13 +78,14 @@
       },
       "test" : {
          "requires" : {
-            "Cwd" : "3.78",
+            "Bytes::Random::Secure" : "0.29",
+            "Cwd" : "3.72",
             "Encode" : "3.08",
-            "File::Spec" : "3.78",
+            "File::Find" : "0",
             "File::Which" : "1.23",
-            "IO::File" : "1.41",
             "Test::More" : "1.302162",
             "Test::Pod" : "1.52",
+            "Test::Time" : "0",
             "utf8" : "0"
          }
       }
@@ -98,6 +100,6 @@
          "web" : "https://git.deguest.jp/jack/Module-Generic"
       }
    },
-   "version" : "v0.16.4",
+   "version" : "v0.17.2",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

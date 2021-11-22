@@ -3,7 +3,7 @@ package OpenTracing::Protocol::Jaeger;
 use strict;
 use warnings;
 
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 no indirect;
@@ -152,7 +152,7 @@ Encodes the given L<OpenTracing::Span> instance, returning byte string data.
 sub encode_span {
     my ($self, $span) = @_;
     my $data = '';
-    $data .= pack 'CnH16 CnH16 CnH16 CnH16 CnN/a* CnN CnQ> CnQ>',
+    $data .= pack 'CnH16 CnH16 CnH16 CnH16 CnN/a*',
         # trace_id_low
         10,
         1,
@@ -172,8 +172,38 @@ sub encode_span {
         # operation_name
         11,
         5,
-        encode_utf8($span->operation_name // ''),
-        # references
+        encode_utf8($span->operation_name // '');
+
+    # references
+    if(my $references = $span->references) {
+        # list Log
+        $data .= pack 'C1n1 C1N1',
+            15, # list
+            6, # field ID 6 for References
+            12, # struct
+            0 + @$references;
+        for my $reference (@$references) {
+            $data .= pack 'C1n1N1 CnH16 CnH16 CnH16 C1',
+                    8, # type = int32 (enum)
+                    1,
+                    $reference->ref_type,
+                    # trace_id_low
+                    10,
+                    2,
+                    substr($reference->context->trace_id, 16, 16),
+                    # trace_id_high
+                    10,
+                    3,
+                    substr($reference->context->trace_id, 0, 16),
+                    # span_id
+                    10,
+                    4,
+                    substr($reference->context->id, 0, 16),
+                    0;
+        }
+    }
+
+    $data .= pack 'CnN CnQ> CnQ>',
         # flags
         8,
         7,
@@ -244,5 +274,5 @@ Tom Molesworth C<< TEAM@cpan.org >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2021. Licensed under the same terms as Perl itself.
 

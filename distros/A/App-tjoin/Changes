@@ -1,0 +1,13 @@
+
+Revisio history for the module "App::tjoin"
+
+-.---  First appear with the command name "map1.pl" in my repositoy on 2016-02-26T17:17:34+09:00.
+-.---  Renamed into "xcol" on 2016-03-21T14:23:28+09:00.
+-.---  Renamed into "coltr" on 2018-03-25T18:43:46+09:00.
+-.---  Renamed into "wisejoin" on 2018-06-11T10:20:01+09:00.
+-.---  wisejoin CLI::Table::Key::Finder@0.31 on 2018-06-11
+-.---  wisejoin CLI::KeyValue::Hack@0.07 on 2018-06-23
+-.---  The contents of file "tjoin" is not untouched since 2018-06-23T18:33:32+09:00.
+0.060  2021-11-13T12:32+09:00  This module is created by copyting the file from the filename "wisejoin" into "tjoin".
+0.061  2021-11-13T14:43+09:00  tjoin.pm に他のファイルを真似たことによるミスを1箇所訂正。PAUSEからエラーのメールが来たことで訂正。 
+

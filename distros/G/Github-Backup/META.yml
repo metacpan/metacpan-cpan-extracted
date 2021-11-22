@@ -3,11 +3,12 @@ abstract: 'Back up your Github repositories and/or issues locally'
 author:
   - 'Steve Bertrand <steveb@cpan.org>'
 build_requires:
+  Git::Repository: '1.32'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +19,7 @@ no_index:
     - t
     - inc
 requires:
-  Git::Repository: '1.32'
+  Hook::Output::Tiny: '0'
   JSON: '0'
   LWP::UserAgent: '6.19'
   Moo: '2.003'
@@ -27,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/github-backup/issues
   repository: https://github.com/stevieb9/github-backup.git
-version: '1.02'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

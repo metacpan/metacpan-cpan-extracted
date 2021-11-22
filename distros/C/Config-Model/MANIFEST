@@ -128,6 +128,7 @@ t/lib/dump_load_model.pl
 t/lib/load-data.json
 t/lib/load-data.yaml
 t/lib/test_ini_backend_model.pl
+t/load-model.t
 t/load.t
 t/load_model_snippets.t
 t/loader_logs.t

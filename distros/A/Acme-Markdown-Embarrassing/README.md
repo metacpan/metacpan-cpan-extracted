@@ -1,4 +1,4 @@
-# Acme::Embarrasing
+# Acme::Markdown::Embarrasing
 
 #### Include relative image `![](test.png)`
 ![](test.png)

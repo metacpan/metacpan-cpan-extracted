@@ -1,5 +1,5 @@
 package AnyEvent::SlackRTM;
-$AnyEvent::SlackRTM::VERSION = '1.1';
+$AnyEvent::SlackRTM::VERSION = '1.2';
 use v5.14;
 
 # ABSTRACT: AnyEvent module for interacting with the Slack RTM API
@@ -42,7 +42,8 @@ sub start {
     $VERSION //= '*-devel';
 
     my $furl = Furl->new(
-        agent => "AnyEvent::SlackRTM/$VERSION",
+        agent   => "AnyEvent::SlackRTM/$VERSION",
+        timeout => $self->{client}->timeout,
     );
 
     my $res = $furl->get($START_URL . '?token=' . $self->{token});
@@ -244,7 +245,7 @@ AnyEvent::SlackRTM - AnyEvent module for interacting with the Slack RTM API
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 
@@ -403,7 +404,7 @@ Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Qubling Software LLC.
+This software is copyright (c) 2021 by Qubling Software LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

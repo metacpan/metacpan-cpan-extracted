@@ -13,7 +13,6 @@ $modules{$_} = $_ for qw(
   Alien::Base::Wrapper
   Alien::Libarchive
   Alien::Libarchive3
-  ExtUtils::CChecker
   ExtUtils::MakeMaker
   Math::Int64
   Test::MockObject
@@ -62,7 +61,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (@modules)
 {

@@ -15,9 +15,11 @@ Random/t/gmp_random.t
 README
 t/_1aaa_v.t
 t/_1basic.t
+t/_itsa.t
 t/test1.t
 t/get_set_IV.t
 t/get_set_NV.t
+t/init_set_IV_NV.t
 t/longdouble.t
 t/neg_zero_bug.t
 t/NOK_and_POK.t

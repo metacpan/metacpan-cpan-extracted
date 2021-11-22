@@ -15,15 +15,17 @@ fragment () {
   use File::Which;
   my $cpanm = do { local (@ARGV, $/) = which("cpanm"); <> };
   $cpanm =~ s/^/  /mg;
+  $cpanm =~ s/"--> Working on/"--"."> Working on/;
   (my $out = $ARGV[0]) =~ s/__CPANM__/$cpanm/;
   print $out
 ' '
 BEGIN {
-  if (@ARGV and $ARGV[0] eq "--spiner") {
-    shift @ARGV;
-    my $cpanm = <<'"'"'CPANM'"'"';
+  our $INLINE_CPANM = <<'"'"'CPANM'"'"';
 __CPANM__
 CPANM
+  if (@ARGV and $ARGV[0] eq "--spiner") {
+    shift @ARGV;
+    my $cpanm = $INLINE_CPANM;
     $cpanm =~ s/^  //mg;
     $cpanm =~ s/\Qunless (caller)/if (1)/;
     warn "Running packed cpanm\n";
@@ -32,8 +34,21 @@ CPANM
     exit 0;
   }
 }
-*App::plx::find_cpanm = sub { return ($0, "--spiner") };
-
+local *App::plx::find_cpanm = sub {
+  return ($0, "--spiner") unless $0 eq "-";
+  require File::Temp;
+  # the tempfile will get unlinked when the 'local' of this sub vanishes
+  use feature 'state';
+  state $tempfile = do {
+    my $fh = File::Temp->new;
+    my $cpanm = $INLINE_CPANM;
+    $cpanm =~ s/^  //mg;
+    print $fh $cpanm;
+    close $fh;
+    $fh;
+  };
+  return ($tempfile->filename);
+};
 '
 
 }

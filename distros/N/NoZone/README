@@ -16,8 +16,8 @@ GNU GPL license, version 3 or later.
 
 The master GIT repository for NoZone can be found at
 
-  https://gitorious.org/nozone
+ https://gitlab.com/berrange/nozone
 
 Please file bugs at
 
-  https://rt.cpan.org/
+ https://gitlab.com/berrange/nozone/-/issues

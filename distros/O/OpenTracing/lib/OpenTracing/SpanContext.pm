@@ -3,7 +3,7 @@ package OpenTracing::SpanContext;
 use strict;
 use warnings;
 
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(OpenTracing::Common);
@@ -50,7 +50,7 @@ sub new_span {
         $parent->trace_id,
         $parent->id,
     );
-    $parent->tracer->new_span($name => %args);
+    $parent->tracer->span(operation_name => $name, %args);
 }
 
 =head2 DESTROY
@@ -59,13 +59,6 @@ Called on destruction, will mark completion on the span by calling
 L<OpenTracing::Span/finish>.
 
 =cut
-
-sub DESTROY {
-    my ($self) = @_;
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-    $self->span->finish;
-    delete $self->{span};
-}
 
 1;
 
@@ -77,5 +70,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2021. Licensed under the same terms as Perl itself.
 

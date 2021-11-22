@@ -11,16 +11,49 @@ Acme::FishFarm::WaterLevelMaintainer - Water Level Maintainer for Acme::FishFarm
 
 =head1 VERSION
 
-Version 0.01
+Version 1.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '1.01';
 
 
 =head1 SYNOPSIS
 
-    use Acme::FishFarm::WaterLevelMaintainer;
+    use 5.010;
+
+    use Acme::FishFarm qw( reduce_precision );
+    use Acme::FishFarm::WaterFiltration;
+
+    my $water_level = Acme::FishFarm::WaterLevelMaintainer->install;
+
+    say "Water level maintainer installed and switched on!\n";
+
+    my $height_increase;
+    my $water_level_threshold;
+    my $current_reading;
+
+    while ( "Fish are living under the water..." ) {
+
+        $current_reading = reduce_precision( rand(10) );
+        $height_increase = $water_level->water_level_increase_height;
+        $water_level_threshold = $water_level->low_water_level_threshold;
+        
+        $water_level->current_water_level( $current_reading ); # input by user
+        print "Current Water Level: ", $current_reading, " m (low: < ", $water_level_threshold, " m)\n";
+
+        if ( $water_level->is_low_water_level ) {
+            print "  !! Water level is low!\n";
+            $water_level->pump_water_in;
+            print "  Pumping in ", $height_increase, " m of water...\n";
+            print "Current Water Level: ", $water_level->current_water_level, "\n";
+        } else {
+            print "  Water level is still normal.\n";
+        }
+        
+        sleep(1);
+        say "";
+    }
 
 =head1 EXPORT
 
@@ -38,11 +71,11 @@ The supported C<%options> are:
 
 =item current_water_level
 
-The default water level is to C<5 m>.
+The default water level is to C<5 unit>.
 
 =item low_water_level_threshold
 
-The default threshold is C<2 m>.
+The default threshold is C<2 unit>.
 
 If the current water level is lower than this threshold, then you need to pump water into the tank.
 
@@ -50,7 +83,7 @@ If the current water level is lower than this threshold, then you need to pump w
 
 This is the height of the water level to increase when the water is pumped in.
 
-The default value is C<0.5 m>.
+The default value is C<0.5 unit>.
 
 =back
 
@@ -83,7 +116,7 @@ sub install {
 
 Sets / returns the current water level of the water.
 
-C<$new_water_level> is optional. If present, the current water level will be set to C<$new_water_level>. Otherwise, returns the current water level (depth) in C<metres>.
+C<$new_water_level> is optional. If present, the current water level will be set to C<$new_water_level>. Otherwise, returns the current water level (depth).
 
 =cut
 
@@ -139,7 +172,7 @@ For the pumping mechanism, just assume that the pumps can actually pump in certa
 
 =head2 water_level_increase_height
 
-Returns the height of water level to increase each time the C<pump_water_in> is called.
+Returns the height of water level to increase each water pumping action. See C<pump_water_in> below.
 
 =cut
 
@@ -211,6 +244,7 @@ L<https://metacpan.org/release/.>
 
 =head1 ACKNOWLEDGEMENTS
 
+Besiyata d'shmaya
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,15 +1,15 @@
 package Data::TableData::Object::Base;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-10'; # DATE
-our $DIST = 'Data-TableData-Object'; # DIST
-our $VERSION = '0.112'; # VERSION
-
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
 use Scalar::Util::Numeric qw(isint isfloat);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-11-17'; # DATE
+our $DIST = 'Data-TableData-Object'; # DIST
+our $VERSION = '0.114'; # VERSION
 
 sub _array_is_numeric {
     my $self = shift;
@@ -65,6 +65,23 @@ sub col_idx {
 sub col_count {
     my $self = shift;
     scalar @{ $self->{cols_by_idx} };
+}
+
+sub col_content {
+    my ($self, $name_or_idx) = @_;
+
+    my $col_idx = $self->col_idx($name_or_idx);
+    return undef unless defined $col_idx; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+
+    my $row_count = $self->row_count;
+    return [] unless $row_count;
+
+    my $col_content = [];
+    for my $i (0 .. $row_count-1) {
+        my $row = $self->row_as_aos($i);
+        $col_content->[$i] = $row->[$col_idx];
+    }
+    $col_content;
 }
 
 sub _select {
@@ -225,7 +242,7 @@ Data::TableData::Object::Base - Base class for Data::TableData::Object::*
 
 =head1 VERSION
 
-This document describes version 0.112 of Data::TableData::Object::Base (from Perl distribution Data-TableData-Object), released on 2021-04-10.
+This document describes version 0.114 of Data::TableData::Object::Base (from Perl distribution Data-TableData-Object), released on 2021-11-17.
 
 =head1 METHODS
 
@@ -268,6 +285,21 @@ See also: C<row_count()>.
 Check whether a column exists. Column can be referred to using its name or
 index/position (0, 1, ...).
 
+=head2 $td->col_content($name_or_idx) => aos
+
+Get the content of a column as an array of strings. Return undef if column is
+unknown. For example, given this table data:
+
+ | name  | age |
+ |-------+-----|
+ | andi  | 25  |
+ | budi  | 29  |
+ | cinta | 17  |
+
+then C<< $td->col_content('name') >> or C<< $td->col_content(0) >> will be:
+
+ ['andi', 'budi', 'cinta']
+
 =head2 $td->col_name($idx) => str
 
 Return the name of column referred to by its index/position. Undef if column is
@@ -281,6 +313,18 @@ Return the index/position of column referred to by its name. Undef if column is
 unknown.
 
 See also: C<col_name()>.
+
+=head2 $td->row($idx) => s/aos/hos
+
+Get a specific row (C<$idx> is 0 to mean first row, 1 for second, ...).
+
+=head2 $td->row_as_aos($idx) => aos
+
+Get a specific row (C<$idx> is 0 to mean first row, 1 for second, ...) as aos.
+
+=head2 $td->row_as_hos($idx) => hos
+
+Get a specific row (C<$idx> is 0 to mean first row, 1 for second, ...) as hos.
 
 =head2 $td->rows() => array
 
@@ -391,11 +435,14 @@ Die if either column is unknown. Will simply return if both are the same column.
 
 Might modify data (e.g. in aohos). Will modify spec, if spec was given.
 
-=head2 $td->add_col($name [ , $idx [ , $spec ] ])
+=head2 $td->add_col($name [ , $idx [ , $spec [ , \@data ] ] ])
 
 Add a column named C<$name>. If C<$idx> is specified, will set the position of
 the new column (and existing columns will shift to the right at that position).
 If C<$idx> is not specified, will put the new column at the end.
+
+C<@data> is the value of the new column for each row. If not specified, the new
+column will be set to C<undef>.
 
 Does not make sense for table form which can only have a fixed number of
 columns, e.g. aos, or hash.
@@ -413,7 +460,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Table
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Data-TableData-Object>.
+Source repository is at L<https://github.com/perlancar/perl-TableData-Object>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 BUGS
 
@@ -422,16 +497,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

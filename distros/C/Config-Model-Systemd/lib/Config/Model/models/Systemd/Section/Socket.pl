@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -17,7 +17,7 @@ return [
       {
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'Unknown parameter'
+        'warn' => 'Unexpected systemd parameter. Please contact cme author to update systemd model.'
       }
     ],
     'class_description' => 'A unit configuration file whose name ends in
@@ -91,8 +91,8 @@ example through C<PrivateNetwork>, see
 L<systemd.exec(5)>), receiving only
 the sockets configured through socket-activation from the host\'s namespace. In such a set-up communication within
 the host\'s network namespace is only permitted through the activation sockets passed in while all sockets allocated
-from the service code itself will be associated with the service\'s own namespace, and thus possibly subject to a a
-much more restrictive configuration.
+from the service code itself will be associated with the service\'s own namespace, and thus possibly subject to a
+restrictive configuration.
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
 ',
@@ -824,10 +824,12 @@ from the information provided by the peer. Other parts of the
 resulting SELinux context originate from either the target
 binary that is effectively triggered by socket unit or from
 the value of the C<SELinuxContext> option.
-This configuration option only affects sockets with
-C<Accept> mode set to
-C<yes>. Also note that this option is useful
-only when MLS/MCS SELinux policy is deployed. Defaults to
+This configuration option applies only when activated service
+is passed in single socket file descriptor, i.e. service
+instances that have standard input connected to a socket or
+services triggered by exactly one socket unit. Also note
+that this option is useful only when MLS/MCS SELinux policy
+is deployed. Defaults to
 C<false>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
@@ -1137,7 +1139,7 @@ limit is enforced before the service activation is enqueued.",
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 247 doc',
+    'generated_by' => 'parse-man.pl from systemd 249 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

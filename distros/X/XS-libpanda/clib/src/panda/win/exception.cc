@@ -1,9 +1,26 @@
 // adopted from https://github.com/boostorg/stacktrace/tree/develop/include/boost/stacktrace/detail
 #include "../exception.h"
-#include <cxxabi.h>
 #include "exception_debug.h"
 #include <windows.h>
 #include <dbgeng.h>
+
+#ifdef _MSC_VER
+static panda::string demangle(const panda::string& mangled) {
+    return mangled; //TODO: msvc demangler
+}
+#else
+#include <cxxabi.h>
+static panda::string demangle(const panda::string& mangled) {
+    panda::string result;
+    int status;
+    char* d = abi::__cxa_demangle(mangled.c_str(), nullptr, nullptr, &status);
+    if (d) {
+        result = d;
+        free(d);
+    }
+    return result;
+}
+#endif
 
 namespace panda {
 
@@ -39,12 +56,7 @@ public:
 
                 auto demangled = mangled;
                 if (mangled.size() > 2 && (mangled[0] == '_') && (mangled[1] == 'Z')) {
-                    int status;
-                    char* d = abi::__cxa_demangle(mangled.c_str(), nullptr, nullptr, &status);
-                    if (d) {
-                        demangled = d;
-                        free(d);
-                    }
+                    demangled = demangle(mangled);
                 }
                 f.mangled_name = mangled;
                 f.name = demangled;

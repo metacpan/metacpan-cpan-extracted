@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Math;
 
-our @EXPORT_OK = qw(PDL::PP acos PDL::PP asin PDL::PP atan PDL::PP cosh PDL::PP sinh PDL::PP tan PDL::PP tanh PDL::PP ceil PDL::PP floor PDL::PP rint PDL::PP pow PDL::PP acosh PDL::PP asinh PDL::PP atanh PDL::PP erf PDL::PP erfc PDL::PP bessj0 PDL::PP bessj1 PDL::PP bessy0 PDL::PP bessy1 PDL::PP bessjn PDL::PP bessyn PDL::PP lgamma PDL::PP badmask PDL::PP isfinite PDL::PP erfi PDL::PP ndtri PDL::PP polyroots );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(acos asin atan cosh sinh tan tanh ceil floor rint pow acosh asinh atanh erf erfc bessj0 bessj1 bessy0 bessy1 bessjn bessyn lgamma badmask isfinite erfi ndtri polyroots );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Math ;
+
 
 
 
@@ -58,10 +57,7 @@ BEGIN {use PDL::MatrixOps;}
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -907,7 +903,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 
 =head1 BUGS
@@ -936,5 +932,3 @@ the PDL copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

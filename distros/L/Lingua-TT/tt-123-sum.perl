@@ -14,7 +14,7 @@ use Lingua::TT::Sort qw(:all);
 ## Globals
 ##----------------------------------------------------------------------
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 ##-- program vars
 our $prog         = basename($0);

@@ -16,11 +16,11 @@ use Term::Choose::Util qw( insert_sep );
 use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::Table::CommitWriteSQL              # required
+#use App::DBBrowser::CreateDropAttach::DropTable;   # required
+#use App::DBBrowser::Table::CommitWriteSQL          # required
 use App::DBBrowser::DB;
 use App::DBBrowser::GetContent;
-#use App::DBBrowser::DropTable;             # required
-#use App::DBBrowser::Subqueries;            # required
+#use App::DBBrowser::Subqueries;                    # required
 
 
 sub new {
@@ -221,8 +221,8 @@ sub create_table {
                                 # INSERT_DATA
                                 my $ok_insert = $sf->__insert_data( $sql );
                                 if ( ! $ok_insert ) {
-                                    require App::DBBrowser::DropTable;
-                                    my $dt = App::DBBrowser::DropTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                                    require App::DBBrowser::CreateDropAttach::DropTable;
+                                    my $dt = App::DBBrowser::CreateDropAttach::DropTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
                                     my $drop_ok = $dt->__drop( $sql, 'table' );
                                     if ( ! $drop_ok ) {
                                         return;

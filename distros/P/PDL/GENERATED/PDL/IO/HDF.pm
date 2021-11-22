@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::IO::HDF;
 
 our @EXPORT_OK = qw();
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::HDF ;
+
 
 
 
@@ -252,7 +251,7 @@ sub Vgetchildren
     return( undef )
         unless defined( $self->{VGROUP}->{$name}->{children} );
     
-    return keys %{$self->{VGROUP}->{$name}->{children}};
+    return sort keys %{$self->{VGROUP}->{$name}->{children}};
 } # End of Vgetchildren()...
 # Now defunct:
 sub Vgetchilds
@@ -267,7 +266,7 @@ sub Vgetattach
     return( undef )
         unless defined( $self->{VGROUP}->{$name}->{attach} );
 
-    return keys %{$self->{VGROUP}->{$name}->{children}};
+    return sort keys %{$self->{VGROUP}->{$name}->{children}};
 } # End of Vgetattach()...
 
 sub Vgetparents
@@ -276,14 +275,14 @@ sub Vgetparents
     return( undef )
         unless defined( $self->{VGROUP}->{$name}->{parents} );
     
-    return keys %{$self->{VGROUP}->{$name}->{parents}};
+    return sort keys %{$self->{VGROUP}->{$name}->{parents}};
 } # End of Vgetparents()...     
 
 sub Vgetmains
 {
     my ($self) = @_;
     my @rlist;
-    foreach( keys %{$self->{VGROUP}} )
+    foreach( sort keys %{$self->{VGROUP}} )
     {
         push(@rlist, $_) 
             unless defined( $self->{VGROUP}->{$_}->{parents} );
@@ -365,7 +364,7 @@ sub VSisattr
 sub VSgetnames 
 {
     my $self = shift;
-    return keys %{$self->{VDATA}};
+    return sort keys %{$self->{VDATA}};
 } # End of VSgetnames()...
 
 sub VSgetfieldnames
@@ -377,7 +376,7 @@ sub VSgetfieldnames
     die "$sub: vdata name $name doesn't exist!\n" 
         unless defined( $self->{VDATA}->{$name} );
 
-    return keys %{$self->{VDATA}->{$name}->{FIELDS}};
+    return sort keys %{$self->{VDATA}->{$name}->{FIELDS}};
 } # End of VSgetfieldnames()...
 # Now defunct:
 sub VSgetfieldsnames
@@ -518,12 +517,10 @@ perl(1), PDL(1), PDL::IO::HDF(1).
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

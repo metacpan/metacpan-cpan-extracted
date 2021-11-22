@@ -9,7 +9,7 @@ requires "Module::Util" => "0.016";
 requires "Path::Tiny" => "0";
 requires "Pod::Usage" => "0";
 requires "URI" => "0";
-requires "perl" => "5.006";
+requires "perl" => "v5.12.0";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -24,7 +24,7 @@ on 'test' => sub {
   requires "Test::Simple" => "1.302177";
   requires "Test::Warnings" => "0";
   requires "lib" => "0";
-  requires "perl" => "5.006";
+  requires "perl" => "v5.12.0";
 };
 
 on 'test' => sub {

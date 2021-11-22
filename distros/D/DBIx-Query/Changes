@@ -1,5 +1,8 @@
 Revision history for DBIx::Query
 
+1.13      2021-11-18 09:10:25-08:00 America/Los_Angeles
+        - Silence a "once" warning
+
 1.12      2021-01-13 11:10:03-08:00 America/Los_Angeles
         - Override some minimum version reqs in dist.ini
 

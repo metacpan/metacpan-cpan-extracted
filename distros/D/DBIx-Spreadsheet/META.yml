@@ -1,0 +1,39 @@
+---
+abstract: 'Query a spreadsheet with SQL'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Spreadsheet::ParseODS: '0'
+  Spreadsheet::ParseXLSX: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Spreadsheet
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::SQLite: '0'
+  DBIx::RunSQL: '0'
+  Filesys::Notify::Simple: '0'
+  Filter::signatures: '0.09'
+  Getopt::Long: '0'
+  Moo: '2'
+  Spreadsheet::Read: '0.69'
+  Text::CleanFragment: '0'
+  Text::Unidecode: '0'
+  perl: '5.006'
+resources:
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/DBIx-Spreadsheet.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

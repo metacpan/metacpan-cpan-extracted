@@ -20,7 +20,7 @@ Format::Util::Numbers - Miscellaneous routines to do with manipulating number fo
 
 =cut
 
-our $VERSION = '0.15';    ## VERSION
+our $VERSION = '0.16';    ## VERSION
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ Round a number near the precision of the supplied one.
 # format of precsion should be
 # TYPE:
 #   CURRENCY: PRECISION
-my $precisions = YAML::XS::LoadFile($ENV{FORMAT_UTIL_PRECISION} // File::ShareDir::dist_file('Format-Util', 'precision.yml'));
+my $precisions           = YAML::XS::LoadFile($ENV{FORMAT_UTIL_PRECISION} // File::ShareDir::dist_file('Format-Util', 'precision.yml'));
 my $floating_point_regex = qr/^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/;
 
 =head2 commas

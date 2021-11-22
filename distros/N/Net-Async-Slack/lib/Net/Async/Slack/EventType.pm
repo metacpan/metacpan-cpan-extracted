@@ -3,7 +3,7 @@ package Net::Async::Slack::EventType;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Log::Any qw($log);
 

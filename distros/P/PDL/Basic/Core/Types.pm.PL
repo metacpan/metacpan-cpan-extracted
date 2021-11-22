@@ -9,7 +9,7 @@ use Config;
 use File::Basename qw(&basename &dirname);
 
 my @TYPE_VERBATIM = qw/
-  realctype ppforcetype usenan real unsigned integer
+  realctype ppforcetype usenan real unsigned integer identifier
 /;
 
 # Figure out the 4 byte integer type on this machine
@@ -152,6 +152,7 @@ my @types = (
 	          integer=>0,
 	          unsigned=>0,
 	          isnan=>'isnan(%1$s)',
+	          isfinite=>'isfinite(%1$s)',
 	          floatsuffix=>'f',
 	      },
 	      {
@@ -167,6 +168,7 @@ my @types = (
 	          integer=>0,
 	          unsigned=>0,
 	          isnan=>'isnan(%1$s)',
+	          isfinite=>'isfinite(%1$s)',
 	          floatsuffix=>'',
 	      },
 # the complex types need to be in the same order as their real
@@ -189,6 +191,7 @@ my @types = (
 	          integer=>0,
 	          unsigned=>0,
 	          isnan=>'(isnan(crealf(%1$s)) || isnan(cimagf(%1$s)))',
+	          isfinite=>'(isfinite(crealf(%1$s)) && isfinite(cimagf(%1$s)))',
 	          floatsuffix=>'f',
 	      },
 	      {
@@ -205,6 +208,7 @@ my @types = (
 	          integer=>0,
 	          unsigned=>0,
 	          isnan=>'(isnan(creal(%1$s)) || isnan(cimag(%1$s)))',
+	          isfinite=>'(isfinite(creal(%1$s)) && isfinite(cimag(%1$s)))',
 	          floatsuffix=>'',
 	      },
 	      );
@@ -255,7 +259,7 @@ sub convertfunc {
 sub gentypehashentry ($$) {
   my ($type,$num) = @_;
   checktypehas $_, $type
-    for qw/identifier pdlctype defaultbadval/, @TYPE_VERBATIM;
+    for qw/pdlctype defaultbadval/, @TYPE_VERBATIM;
   my $convertfunc = convertfunc($type);
   (my $shortctype = $type->{pdlctype}) =~ s/PDL_//;
   my $ppsym = $type->{onecharident} || $type->{identifier};
@@ -270,7 +274,7 @@ sub gentypehashentry ($$) {
     shortctype => $shortctype,
     realversion => $type->{realversion} || $ppsym,
     complexversion => $type->{complexversion} || (!$type->{real} ? $ppsym : 'G'),
-    (map +($_ => $type->{$_}), @TYPE_VERBATIM, qw(isnan floatsuffix)),
+    (map +($_ => $type->{$_}), @TYPE_VERBATIM, qw(isnan isfinite floatsuffix)),
   };
 }
 
@@ -285,7 +289,6 @@ sub gentypehashcode {
   my $perlcode = '';
   $perlcode .= "our %typehash = (\n";
   for my $type (@types) {
-    print STDOUT "making ".gentypenames($type)."...\n";
     $perlcode .= "\t".gentypenames($type)." =>\n";
     $perlcode .= Data::Dumper::Dumper(gentypehashentry($type, $i++));
     $perlcode .= "\t\t,\n";
@@ -328,6 +331,7 @@ my $typevars  = join ', ',gentypevars @types;
 my $packtypes = join ' ', genpacktypes @types;
 my $typenames = join ' ', gentypenames @types;
 
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'!NO!SUBS!';
 
 ### Generated from Types.pm.PL automatically - do not modify! ###
@@ -382,7 +386,7 @@ my @RTKEYS = map $_->{sym}, @HASHES;
 our %typenames;
 for my $h (@HASHES) {
   my $n = $h->{numval};
-  $typenames{$_} = $n for $n, @$h{qw(sym ioname ctype ppforcetype ppsym)};
+  $typenames{$_} = $n for $n, @$h{qw(sym ioname ctype ppforcetype ppsym identifier)};
 }
 
 =head1 NAME
@@ -638,7 +642,7 @@ Returns the macro used to represent this type in C code (eg 'PDL_Long').
 
 =item ppsym
 
-The letter used to represent this type in PP code code (eg 'U' for L<ushort|PDL::Core/ushort>).
+The letter used to represent this type in PP code (eg 'U' for L<ushort|PDL::Core/ushort>).
 
 =item realctype
 
@@ -656,7 +660,14 @@ See L<badvalue routine in PDL::Bad|PDL::Bad/badvalue> for more details.
 =item isnan
 
 Given a string representing a C value, will return a C expression for
-this type that indicates whether that value is NaN.
+this type that indicates whether that value is NaN (for complex values,
+if I<either> is finite).
+
+=item isfinite
+
+Given a string representing a C value, will return a C expression for
+this type that indicates whether that value is finite (for complex values,
+if I<both> are finite).
 
 =item floatsuffix
 
@@ -712,6 +723,7 @@ sub types { @CACHED_TYPES }
     }
 
     sub isnan { sprintf $_[0][1]{isnan}, $_[1] }
+    sub isfinite { sprintf $_[0][1]{isfinite}, $_[1] }
 
     sub floatsuffix { $_[0][1]{floatsuffix} // 'floatsuffix called on non-float type' }
 
@@ -727,14 +739,10 @@ EOS
 
 print OUT <<'!NO!SUBS!';
 sub badvalue {
-  my $name = "PDL::_badvalue_int$_[0][0]";
-  no strict 'refs';
-  $name->( $_[1] );
+  PDL::_badvalue_int( $_[1], $_[0][0] );
 }
 sub orig_badvalue {
-  my $name = "PDL::_default_badvalue_int$_[0][0]";
-  no strict 'refs';
-  $name->();
+  PDL::_default_badvalue_int($_[0][0]);
 }
 
 # make life a bit easier

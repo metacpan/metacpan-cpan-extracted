@@ -1,5 +1,10 @@
 Revision history for CtrlO-Crypt-XkcdPassword
 
+1.011     2021-11-11 22:11:31+01:00
+    - pass wordlist via commandline
+    - add various EFF wordlists
+
+
 1.010     2021-04-04 16:41:54+02:00
     - Add initial GitHub actions config (Paul Cochrane)
     - Set minimum Perl version explicitly (Paul Cochrane)

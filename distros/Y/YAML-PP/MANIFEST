@@ -115,6 +115,12 @@ t/data/simple.yaml
 t/invalid/i032/===
 t/invalid/i032/in.yaml
 t/invalid/i032/test.event
+t/invalid/i033/===
+t/invalid/i033/in.yaml
+t/invalid/i033/test.event
+t/invalid/i034/===
+t/invalid/i034/in.yaml
+t/invalid/i034/test.event
 t/lib/MySchema.pm
 t/lib/YAML/PP/Test.pm
 t/valid/v009/===
@@ -151,6 +157,10 @@ t/valid/v024/in.json
 t/valid/v024/in.yaml
 t/valid/v024/out.yaml
 t/valid/v024/test.event
+t/valid/v025/===
+t/valid/v025/in.yaml
+t/valid/v025/out.yaml
+t/valid/v025/test.event
 test-suite/README.md
 test-suite/yaml-test-suite-data/229Q/===
 test-suite/yaml-test-suite-data/229Q/in.json
@@ -677,6 +687,10 @@ test-suite/yaml-test-suite-data/9MAG/===
 test-suite/yaml-test-suite-data/9MAG/error
 test-suite/yaml-test-suite-data/9MAG/in.yaml
 test-suite/yaml-test-suite-data/9MAG/test.event
+test-suite/yaml-test-suite-data/9MMA/===
+test-suite/yaml-test-suite-data/9MMA/error
+test-suite/yaml-test-suite-data/9MMA/in.yaml
+test-suite/yaml-test-suite-data/9MMA/test.event
 test-suite/yaml-test-suite-data/9MMW/===
 test-suite/yaml-test-suite-data/9MMW/in.yaml
 test-suite/yaml-test-suite-data/9MMW/out.yaml
@@ -981,11 +995,6 @@ test-suite/yaml-test-suite-data/G4RS/in.json
 test-suite/yaml-test-suite-data/G4RS/in.yaml
 test-suite/yaml-test-suite-data/G4RS/out.yaml
 test-suite/yaml-test-suite-data/G4RS/test.event
-test-suite/yaml-test-suite-data/G5U8/===
-test-suite/yaml-test-suite-data/G5U8/in.json
-test-suite/yaml-test-suite-data/G5U8/in.yaml
-test-suite/yaml-test-suite-data/G5U8/out.yaml
-test-suite/yaml-test-suite-data/G5U8/test.event
 test-suite/yaml-test-suite-data/G7JE/===
 test-suite/yaml-test-suite-data/G7JE/error
 test-suite/yaml-test-suite-data/G7JE/in.yaml

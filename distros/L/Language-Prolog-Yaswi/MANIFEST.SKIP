@@ -1,0 +1,15 @@
+Language-Prolog-Yaswi-.*
+
+ANNOUNCE-swi\.txt
+ANNOUNCE\.txt
+
+Makefile$
+Makefile\.old
+MYMETA\.(json|yml)
+
+Low/plconfig\.c$
+
+^\.git
+^\.github/
+\.swp$
+^\.vscode

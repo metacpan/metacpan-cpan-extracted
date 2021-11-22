@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Fit::Gaussian;
 
-our @EXPORT_OK = qw(PDL::PP fitgauss1d PDL::PP fitgauss1dr );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(fitgauss1d fitgauss1dr );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Fit::Gaussian ;
+
 
 
 
@@ -158,12 +157,10 @@ PDL distribution, the copyright notice should be included in the file.
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

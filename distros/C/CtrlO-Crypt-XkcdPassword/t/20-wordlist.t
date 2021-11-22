@@ -103,7 +103,12 @@ subtest 'failures' => sub {
     throws_ok {
         CtrlO::Crypt::XkcdPassword->new( wordlist => 'fixtures::NotAList' )
     }
-    qr{Cannot find word list in fixtures::NotAList}, 'Not a wordlist-module';
+    qr{Cannot find word list in Perl module fixtures::NotAList}, 'Not a wordlist-module';
+
+    throws_ok {
+        CtrlO::Crypt::XkcdPassword->new( wordlist => 'NotAnInternalWordlist' )
+    }
+    qr{Cannot load word list module CtrlO::Crypt::XkcdPassword::Wordlist::NotAnInternalWordlist}, 'Not an internal wordlist';
 };
 
 done_testing();

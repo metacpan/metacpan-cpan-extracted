@@ -12,5 +12,7 @@ test.png
 tux.png
 huge.png
 IMAGES.pod
+ANOTHER.md
+MarkdownTest.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

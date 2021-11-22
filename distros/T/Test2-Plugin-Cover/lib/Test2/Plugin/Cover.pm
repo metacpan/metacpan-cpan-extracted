@@ -10,7 +10,7 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000026';
+our $VERSION = '0.000027';
 
 # Directly modifying this is a bad idea, but for the XS to work it needs to be
 # a package var, not a lexical.
@@ -18,8 +18,9 @@ our $FROM = '*';
 my $FROM_MODIFIED = 0;
 my $FROM_MANAGER;
 
-our ($ENABLED, $ROOT, $LOAD_ROOT, %REPORT);
+our ($ENABLED, $ROOT, $LOAD_ROOT, %REPORT, @OPENS, $TRACE_OPENS);
 BEGIN {
+    $TRACE_OPENS = 0;
     $ENABLED = 0;
     $LOAD_ROOT = "" . path('.')->realpath;
     $ROOT = $LOAD_ROOT;

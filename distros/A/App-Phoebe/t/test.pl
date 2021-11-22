@@ -103,16 +103,17 @@ sub query_gemini {
   my $query = shift;
   my $text = shift;
   my $cert = shift // 1; # suppress use of client certificate in the test
+  my $cert_file = [undef, "t/cert.pem", "t/cert2.pem"]->[$cert];
+  my $key_file = [undef, "t/key.pem", "t/key2.pem"]->[$cert];
   my ($header, $mimetype, $encoding, $buffer);
-
   # create client
   Mojo::IOLoop->client(
     {
       address => "localhost",
       port => $port,
       tls => 1,
-      tls_cert => ($cert ? "t/cert.pem" : undef),
-      tls_key => ($cert ? "t/key.pem" : undef),
+      tls_cert => $cert_file,
+      tls_key => $key_file,
       tls_options => { SSL_verify_mode => 0x00 },
     } => sub {
       my ($loop, $err, $stream) = @_;

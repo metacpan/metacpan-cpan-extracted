@@ -1,5 +1,8 @@
 Revision history for Perl-Critic-Plicease
 
+0.04      2021-11-09 10:20:14 -0700
+  - Documentation fixes (gh#3 scop++)
+
 0.03      2019-12-02 09:18:01 -0700
   - (ProhibitUnicodeDigitInRegexp) Allow \d in a regex if there is an explicit /u
 

@@ -4,7 +4,6 @@ package Netstack::Connector::PaloAlto;
 # 加载扩展模块
 #------------------------------------------------------------------------------
 use 5.016;
-use utf8;
 use Expect;
 use Moose;
 use namespace::autoclean;

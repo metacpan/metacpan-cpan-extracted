@@ -1,6 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
+                                        'Alien::OpenSSL' => '0',
                                         'ExtUtils::MakeMaker' => '0'
                                       }
                       },
@@ -12,10 +13,11 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Alien::OpenSSL' => '0',
                                       'Carp' => '0',
                                       'Exporter' => '0',
+                                      'Getopt::Long' => '0',
                                       'HTTP::Request' => '0',
-                                      'LWP::Protocol::https' => '0',
                                       'LWP::UserAgent' => '0',
                                       'perl' => '5.020',
                                       'strict' => '0',
@@ -32,8 +34,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'File::Spec::Functions' => '0',
                                    'Module::Load' => '0',
-                                   'Test::More' => '0',
-                                   'perl' => '5.020'
+                                   'Test::More' => '0'
                                  }
                  }
      };

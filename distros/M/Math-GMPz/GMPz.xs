@@ -52,7 +52,7 @@ int _is_infstring(char * s) {
 
 SV * Rmpz_init_set_str_nobless(pTHX_ SV * num, SV * base) {
      mpz_t * mpz_t_obj;
-     unsigned long b = SvUV(base);
+     int b = (int)SvUV(base);
      SV * obj_ref, * obj;
 
      if(b == 1 || b > 62) croak("Second argument supplied to Rmpz_init_set_str_nobless is not in acceptable range");
@@ -227,46 +227,262 @@ SV * Rmpz_init_set_si(pTHX_ SV * p) {
      return obj_ref;
 }
 
-/* also handles UV values */
-SV * Rmpz_init_set_IV(pTHX_ SV * p) {
-     mpz_t * mpz_t_obj;
-     SV * obj_ref, * obj;
+void Rmpz_set_uj(mpz_t * copy, UV original) {
+#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
+     mpz_set_ui(*copy, original >> 32);
+     if(mpz_cmp_ui(*copy, 0))
+       mpz_mul_2exp(*copy, *copy, 32);
+     mpz_add_ui(*copy, *copy, original & 4294967295);
 
-     New(1, mpz_t_obj, 1, mpz_t);
-     if(mpz_t_obj == NULL) croak("Failed to allocate memory in Rmpz_init_set_si function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::GMPz");
-
-#ifndef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvUOK(p))   mpz_init_set_ui(*mpz_t_obj, SvUVX(p));
-     else {
-       if(SvIOK(p)) mpz_init_set_si(*mpz_t_obj, SvIVX(p));
-       else croak("Arg provided to Rmpz_init_set_IV is not an IV");
-     }
 #else
-     if(SvUOK(p) || SvIOK(p)) mpz_init_set_str(*mpz_t_obj, SvPV_nolen(p), 10);
-     else croak("Arg provided to Rmpz_init_set_IV is not an IV");
+     croak("Rmpz_set_uj function not implemented on this build of perl");
+
 #endif
 
-     sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
-     SvREADONLY_on(obj);
-     return obj_ref;
+}
+
+void Rmpz_set_sj(mpz_t * copy, IV original) {
+#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
+     if(original >= 0) Rmpz_set_uj(copy, original);
+     else {
+       Rmpz_set_uj(copy, -original);
+       mpz_neg(*copy, *copy);
+     }
+
+#else
+     croak("Rmpz_set_sj function not implemented on this build of perl");
+
+#endif
+
 }
 
 /* also handles UV values */
 
 void Rmpz_set_IV(pTHX_ mpz_t * copy, SV * original) {
 
+     if(SV_IS_IOK(original)) {
 #ifndef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvUOK(original))   mpz_set_ui(*copy, SvUVX(original));
-     else {
-       if(SvIOK(original)) mpz_set_si(*copy, SvIVX(original));
-       else croak("Arg provided to Rmpz_set_IV is not an IV");
+       if(SvUOK(original))   mpz_set_ui(*copy, SvUVX(original));
+       else mpz_set_si(*copy, SvIVX(original));
      }
+
 #else
-     if(SvUOK(original) || SvIOK(original)) mpz_set_str(*copy, SvPV_nolen(original), 10);
-     else croak("Arg provided to Rmpz_set_IV is not an IV");
+       if(SvUOK(original))   Rmpz_set_uj(copy, SvUVX(original));
+       else Rmpz_set_sj(copy, SvIVX(original));
+     }
+
 #endif
+     else croak("Arg provided to Rmpz_set_IV is not an IV");
+}
+
+/* also handles UV values */
+SV * Rmpz_init_set_IV(pTHX_ SV * p) {
+     mpz_t * mpz_t_obj;
+     SV * obj_ref, * obj;
+
+     New(1, mpz_t_obj, 1, mpz_t);
+     if(mpz_t_obj == NULL) croak("Failed to allocate memory in Rmpz_init_set_IV function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "Math::GMPz");
+
+     mpz_init(*mpz_t_obj);
+
+     sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
+     Rmpz_set_IV(aTHX_ mpz_t_obj, p);
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
+/* also handles UV values */
+SV * Rmpz_init_set_IV_nobless(pTHX_ SV * p) {
+     mpz_t * mpz_t_obj;
+     SV * obj_ref, * obj;
+
+     New(1, mpz_t_obj, 1, mpz_t);
+     if(mpz_t_obj == NULL) croak("Failed to allocate memory in Rmpz_init_set_IV_nobless function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "NULL");
+
+     mpz_init(*mpz_t_obj);
+
+     sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
+     Rmpz_set_IV(aTHX_ mpz_t_obj, p);
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
+/* also handles UV values */
+SV * _Rmpz_get_IV(pTHX_ mpz_t * n) {
+
+#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
+
+   int negative = 0;
+   char * out;
+   SV * outsv;
+   mpz_t temp;
+   mpz_t _uv_max;
+   mpz_t _iv_max;
+   mpz_t _iv_min;
+
+#endif
+
+   if(mpz_fits_slong_p(*n))
+     return newSViv(mpz_get_si(*n));
+
+   if(mpz_fits_ulong_p(*n))
+     return newSVuv(mpz_get_ui(*n));
+
+#ifndef MATH_GMPZ_NEED_LONG_LONG_INT
+
+   if(mpz_cmp_ui(*n, 0) > 0)
+     return newSVuv(mpz_get_ui(*n));
+
+   return newSViv(mpz_get_si(*n));
+
+#else
+
+   if(mpz_sgn(*n) < 0) negative = 1;
+
+   Newxz(out, 24, char);
+   if(out == NULL)
+     croak("Failed to allocate memory in Rmpz_get_IV function");
+
+   if(negative) { /* must be less than LONG_MIN */
+     mpz_init_set_str(_iv_min, SvPV_nolen(MATH_GMPz_IV_MIN(aTHX)), 10);
+     if(mpz_cmp(*n, _iv_min) < 0) { /* must be less than IV_MIN */
+       mpz_clear(_iv_min);
+       mpz_init(temp);
+       mpz_init_set_str(_iv_max, SvPV_nolen(MATH_GMPz_IV_MAX(aTHX)), 10);
+       mpz_abs(temp, *n);
+       mpz_and(temp, temp, _iv_max);
+       mpz_clear(_iv_max);
+       mpz_neg(temp, temp);
+       mpz_get_str(out, 10, temp);
+       mpz_clear(temp);
+       outsv = newSVpv(out, 0);
+       Safefree(out);
+       return outsv;
+     }
+     else { /* must fit into an IV */
+       mpz_clear(_iv_min);
+       mpz_get_str(out, 10, *n);
+       outsv = newSVpv(out, 0);
+       Safefree(out);
+       return outsv;
+     }
+   }
+   else { /* it's +ve */
+     mpz_init_set_str(_uv_max, SvPV_nolen(MATH_GMPz_UV_MAX(aTHX)), 10);
+     if(mpz_cmp(*n, _uv_max) > 0) { /* needs to be truncated */
+       mpz_init_set(temp, *n);
+       mpz_and(temp, temp, _uv_max);
+       mpz_clear(_uv_max);
+       mpz_get_str(out, 10, temp);
+       mpz_clear(temp);
+       outsv = newSVpv(out, 0);
+       Safefree(out);
+       return outsv;
+     }
+     else { /* must fit into a UV */
+       mpz_clear(_uv_max);
+       mpz_get_str(out, 10, *n);
+       outsv = newSVpv(out, 0);
+       Safefree(out);
+       return outsv;
+     }
+   }
+
+#endif
+}
+
+/* also handles UVs */
+int Rmpz_fits_IV_p(pTHX_ mpz_t * n) {
+
+#ifndef MATH_GMPZ_NEED_LONG_LONG_INT
+     if(mpz_fits_slong_p(*n) || mpz_fits_ulong_p(*n)) return 1;
+     return 0;
+#else
+     mpz_t t;
+
+     if(mpz_fits_slong_p(*n) || mpz_fits_ulong_p(*n)) return 1;
+
+     mpz_init_set_str(t, SvPV_nolen(MATH_GMPz_UV_MAX(aTHX)), 10);
+     if(mpz_cmp(*n, t) > 0) {
+       mpz_clear(t);
+       return 0;
+     }
+
+     mpz_set_str(t, SvPV_nolen(MATH_GMPz_IV_MIN(aTHX)), 10);
+     if(mpz_cmp(*n, t) < 0) {
+       mpz_clear(t);
+       return 0;
+     }
+
+     mpz_clear(t);
+     return 1;
+
+#endif
+}
+
+double Rmpz_get_d(mpz_t * n) {
+     return mpz_get_d(*n);
+}
+
+NV Rmpz_get_NV(mpz_t * n) {
+
+#if NVSIZE == 8
+     return mpz_get_d(*n);
+
+#else
+   /* Rely on strtold/strtoflt128 to correctly handle *
+    * the stringified form of the mpz_t argument      */
+     NV d;
+     char * out;
+
+     Newxz(out, mpz_sizeinbase(*n, 10) + 3, char);
+     if(out == NULL) croak("Failed to allocate memory in Rmpz_get_NV function");
+
+     mpz_get_str(out, 10, *n);
+
+#  if defined(USE_LONG_DOUBLE)
+       d = strtold(out, NULL);
+
+#  elif defined(USE_QUADMATH)
+       d = strtoflt128(out, NULL);
+
+#  else
+       Safefree(out);
+       croak("Unrecognized nvtype");
+
+#  endif
+     Safefree(out);
+     return d;
+
+#endif
+}
+
+/* also handles UV values */
+
+int Rmpz_cmp_IV(pTHX_ mpz_t * z, SV * iv) {
+     int ret;
+
+#ifndef MATH_GMPZ_NEED_LONG_LONG_INT
+     if(SV_IS_IOK(iv)) {
+       if(SvUOK(iv)) ret =  mpz_cmp_ui(*z, SvUVX(iv));
+       else ret = mpz_cmp_si(*z, SvIVX(iv));
+       return ret;
+     }
+     else croak("Arg provided to Rmpz_cmp_IV is not an IV");
+#else
+     mpz_t temp;
+     if(SV_IS_IOK(iv)) mpz_init_set_str(temp, SvPV_nolen(iv), 10);
+     else croak("Arg provided to Rmpz_cmp_IV is not an IV");
+     ret = mpz_cmp(*z, temp);
+     mpz_clear(temp);
+     return ret;
+#endif
+
+
 }
 
 SV * Rmpz_init_set_d(pTHX_ SV * p) {
@@ -289,126 +505,141 @@ SV * Rmpz_init_set_d(pTHX_ SV * p) {
      return obj_ref;
 }
 
-SV * Rmpz_init_set_NV(pTHX_ SV * p) {
-     mpz_t * mpz_t_obj;
-     SV * obj_ref, * obj;
+void _mpf_set_dd(mpf_t * q, SV * p) {
+#if defined(NV_IS_DOUBLEDOUBLE)  /* double-double */
+     double msd;                 /* Most Significant Double */
+     mpf_t t, d;
+     long double lsd;            /* Will be assigned the Least Siginficant Double */
 
-#if defined(NV_IS_FLOAT128)
-     char * buffer;
-     int returned;
-     __float128 buffer_size;
-     __float128 ld = (__float128)SvNVX(p) >= 0 ? floorq((__float128)SvNVX(p)) : ceilq((__float128)SvNVX(p));
-     if(ld != ld) croak("In Rmpz_init_set_NV, cannot coerce a NaN to a Math::GMPz value");
-     if(ld != 0 && (ld / ld != 1))
-       croak("In Rmpz_init_set_NV, cannot coerce an Inf to a Math::GMPz value");
+     msd = (double)SvNV(p);
+     if(msd != 0.0) {
+       if(msd != msd) croak("In _Rmpf_set_ld, cannot coerce a NaN to a Math::GMPf object");
+       if(msd / msd != 1.0) croak("In _Rmpf_set_ld, cannot coerce an Inf to a Math::GMPf object");
+     }
 
-     buffer_size = ld < 0.0Q ? ld * -1.0Q : ld;
-     buffer_size = ceilq(logq(buffer_size + 1) / 2.30258509299404568401799145468436418Q);
+     lsd = SvNV(p) - (long double)msd;
 
-     Newxz(buffer, (int)buffer_size + 5, char);
+     mpf_init2(t, 2098);
+     mpf_init2(d, 53);
+     mpf_set_d(t, msd);
+     mpf_set_d(d, (double)lsd);
+     mpf_add(t, t, d);
 
-     Newx(mpz_t_obj, 1, mpz_t);
-     if(mpz_t_obj == NULL) croak("Failed to allocate memory in Rmpz_init_set_NV function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::GMPz");
+     mpf_clear(d);
 
-     returned = quadmath_snprintf(buffer, (size_t)buffer_size + 5, "%.0Qf", ld);
-     if(returned < 0) croak("In Rmpz_init_set_NV, encoding error in quadmath_snprintf function");
-     if(returned >= buffer_size + 5) croak("In Rmpz_init_set_NV, buffer given to quadmath_snprintf function was too small");
-     mpz_init_set_str(*mpz_t_obj, buffer, 10);
-     Safefree(buffer);
+     mpf_set(*q, t);
 
-#elif defined(USE_LONG_DOUBLE)
-     char * buffer;
-     long double buffer_size;
-     long double ld = (long double)SvNVX(p) >= 0 ? floorl((long double)SvNVX(p)) : ceill((long double)SvNVX(p));
-     if(ld != ld) croak("In Rmpz_init_set_NV, cannot coerce a NaN to a Math::GMPz value");
-     if(ld != 0 && (ld / ld != 1))
-       croak("In Rmpz_init_set_NV, cannot coerce an Inf to a Math::GMPz value");
-
-     buffer_size = ld < 0.0L ? ld * -1.0L : ld;
-     buffer_size = ceill(logl(buffer_size + 1) / 2.30258509299404568401799145468436418L);
-
-     Newxz(buffer, (int)buffer_size + 5, char);
-
-     Newx(mpz_t_obj, 1, mpz_t);
-     if(mpz_t_obj == NULL) croak("Failed to allocate memory in _Rmpz_init_set_NV function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::GMPz");
-
-     if(sprintf(buffer, "%.0Lf", ld) >= (int)buffer_size + 5) croak("In Rmpz_init_set_NV, buffer overflow in sprintf function");
-     mpz_init_set_str(*mpz_t_obj, buffer, 10);
-     Safefree(buffer);
+     mpf_clear(t);
 #else
-     double d = SvNVX(p);
-     if(d != d) croak("In Rmpz_init_set_NV, cannot coerce a NaN to a Math::GMPz value");
-     if(d != 0 && (d / d != 1))
-       croak("In Rmpz_init_set_NV, cannot coerce an Inf to a Math::GMPz value");
+     croak("_mpf_set_dd is unavailable because NV is not DoubleDouble");
 
-     Newx(mpz_t_obj, 1, mpz_t);
-     if(mpz_t_obj == NULL) croak("Failed to allocate memory in _Rmpz_init_set_NV function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::GMPz");
-
-     mpz_init_set_d(*mpz_t_obj, d);
 #endif
-     sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
-     SvREADONLY_on(obj);
-     return obj_ref;
-
 }
 
 void Rmpz_set_NV(pTHX_ mpz_t * copy, SV * original) {
+   NV nv;
 
-#if defined(NV_IS_FLOAT128)
-     char * buffer;
+#if defined(USE_QUADMATH) || defined(USE_LONG_DOUBLE)
+#  if defined(NV_IS_DOUBLEDOUBLE)
+     mpf_t f;
+
+#  else
+     NV buffer_size;
      int returned;
-     __float128 buffer_size;
-     __float128 ld = (__float128)SvNVX(original) >= 0 ? floorq((__float128)SvNVX(original)) : ceilq((__float128)SvNVX(original));
-     if(ld != ld) croak("In Rmpz_set_NV, cannot coerce a NaN to a Math::GMPz value");
-     if(ld != 0 && (ld / ld != 1))
+     char * buffer;
+
+#  endif
+
+#endif
+
+     if(!SV_IS_NOK(original))
+       croak("In Rmpz_set_NV, 2nd argument is not an NV");
+
+     nv = SvNV(original); /* First check that the NV flag is set   *
+                           * else flags of "original" might change */
+
+     if(nv != nv) croak("In Rmpz_set_NV, cannot coerce a NaN to a Math::GMPz value");
+
+     if(nv != 0 && (nv / nv != 1))
        croak("In Rmpz_set_NV, cannot coerce an Inf to a Math::GMPz value");
 
-     buffer_size = ld < 0.0Q ? ld * -1.0Q : ld;
+#if defined(USE_QUADMATH)
+     buffer_size = nv < 0.0Q ? nv * -1.0Q : nv;
      buffer_size = ceilq(logq(buffer_size + 1) / 2.30258509299404568401799145468436418Q);
 
      Newxz(buffer, (int)buffer_size + 5, char);
 
-     returned = quadmath_snprintf(buffer, (size_t)buffer_size + 5, "%.0Qf", ld);
+     nv = nv >= 0 ? floorq(nv) : ceilq(nv);
+
+     returned = quadmath_snprintf(buffer, (size_t)buffer_size + 5, "%.0Qf", nv);
      if(returned < 0) croak("In Rmpz_set_NV, encoding error in quadmath_snprintf function");
      if(returned >= buffer_size + 5) croak("In Rmpz_set_NV, buffer given to quadmath_snprintf function was too small");
      mpz_set_str(*copy, buffer, 10);
      Safefree(buffer);
 
 #elif defined(USE_LONG_DOUBLE)
-     char * buffer;
-     long double buffer_size;
-     long double ld = (long double)SvNVX(original) >= 0 ? floorl((long double)SvNVX(original)) : ceill((long double)SvNVX(original));
-     if(ld != ld) croak("In Rmpz_set_NV, cannot coerce a NaN to a Math::GMPz value");
-     if(ld != 0 && (ld / ld != 1))
-       croak("In Rmpz_set_NV, cannot coerce an Inf to a Math::GMPz value");
+# if defined(NV_IS_DOUBLEDOUBLE)
+     mpf_init2(f, 2098);
+     _mpf_set_dd(&f, original);
+     mpz_set_f(*copy, f);
+     mpf_clear(f);
 
-     buffer_size = ld < 0.0L ? ld * -1.0L : ld;
+#  else
+     buffer_size = nv < 0.0L ? nv * -1.0L : nv;
      buffer_size = ceill(logl(buffer_size + 1) / 2.30258509299404568401799145468436418L);
-
      Newxz(buffer, buffer_size + 5, char);
 
-     if(sprintf(buffer, "%.0Lf", ld) >= (int)buffer_size + 5) croak("In Rmpz_set_NV, buffer overflow in sprintf function");
+     nv = nv >= 0 ? floorl(nv) : ceill(nv);
+     if(sprintf(buffer, "%.0Lf", nv) >= (int)buffer_size + 5) croak("In Rmpz_set_NV, buffer overflow in sprintf function");
+
      mpz_set_str(*copy, buffer, 10);
      Safefree(buffer);
-#else
-     double d = SvNVX(original);
-     if(d != d) croak("In Rmpz_set_NV, cannot coerce a NaN to a Math::GMPz value");
-     if(d != 0 && (d / d != 1))
-       croak("In Rmpz_set_NV, cannot coerce an Inf to a Math::GMPz value");
 
-     mpz_set_d(*copy, d);
+#  endif
+
+#else
+     mpz_set_d(*copy, nv);
+
 #endif
+}
+
+SV * Rmpz_init_set_NV(pTHX_ SV * p) {
+     mpz_t * mpz_t_obj;
+     SV * obj_ref, * obj;
+
+     Newx(mpz_t_obj, 1, mpz_t);
+     if(mpz_t_obj == NULL) croak("Failed to allocate memory in Rmpz_init_set_NV function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "Math::GMPz");
+
+     mpz_init(*mpz_t_obj);
+
+     sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
+     Rmpz_set_NV(aTHX_ mpz_t_obj, p);
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
+SV * Rmpz_init_set_NV_nobless(pTHX_ SV * p) {
+     mpz_t * mpz_t_obj;
+     SV * obj_ref, * obj;
+
+     Newx(mpz_t_obj, 1, mpz_t);
+     if(mpz_t_obj == NULL) croak("Failed to allocate memory in Rmpz_init_set_NV_nobless function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "NULL");
+
+     mpz_init(*mpz_t_obj);
+
+     sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
+     Rmpz_set_NV(aTHX_ mpz_t_obj, p);
+     SvREADONLY_on(obj);
+     return obj_ref;
 }
 
 SV * Rmpz_init_set_str(pTHX_ SV * num, SV * base) {
      mpz_t * mpz_t_obj;
-     unsigned long b = SvUV(base);
+     int b = (int)SvUV(base);
      SV * obj_ref, * obj;
 
      if(b == 1 || b > 62) croak("Second argument supplied to Rmpz_init_set_str is not in acceptable range");
@@ -530,142 +761,6 @@ long Rmpz_get_si(mpz_t * n) {
      return mpz_get_si(*n);
 }
 
-/* also handles UV values */
-SV * _Rmpz_get_IV(pTHX_ mpz_t * n) {
-
-#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-
-   int negative = 0;
-   char * out;
-   SV * outsv;
-   mpz_t temp;
-   mpz_t _uv_max;
-   mpz_t _iv_max;
-   mpz_t _iv_min;
-
-#endif
-
-   if(mpz_fits_slong_p(*n))
-     return newSViv(mpz_get_si(*n));
-
-   if(mpz_fits_ulong_p(*n))
-     return newSVuv(mpz_get_ui(*n));
-
-#ifndef MATH_GMPZ_NEED_LONG_LONG_INT
-
-   if(mpz_cmp_ui(*n, 0) > 0)
-     return newSVuv(mpz_get_ui(*n));
-
-   return newSViv(mpz_get_si(*n));
-
-#else
-
-   if(mpz_sgn(*n) < 0) negative = 1;
-
-   Newxz(out, 24, char);
-   if(out == NULL)
-     croak("Failed to allocate memory in Rmpz_get_IV function");
-
-   if(negative) { /* must be less than LONG_MIN */
-     mpz_init_set_str(_iv_min, SvPV_nolen(MATH_GMPz_IV_MIN(aTHX)), 10);
-     if(mpz_cmp(*n, _iv_min) < 0) { /* must be less than IV_MIN */
-       mpz_clear(_iv_min);
-       mpz_init(temp);
-       mpz_init_set_str(_iv_max, SvPV_nolen(MATH_GMPz_IV_MAX(aTHX)), 10);
-       mpz_abs(temp, *n);
-       mpz_and(temp, temp, _iv_max);
-       mpz_clear(_iv_max);
-       mpz_neg(temp, temp);
-       mpz_get_str(out, 10, temp);
-       mpz_clear(temp);
-       outsv = newSVpv(out, 0);
-       Safefree(out);
-       return outsv;
-     }
-     else { /* must fit into an IV */
-       mpz_clear(_iv_min);
-       mpz_get_str(out, 10, *n);
-       outsv = newSVpv(out, 0);
-       Safefree(out);
-       return outsv;
-     }
-   }
-   else { /* it's +ve */
-     mpz_init_set_str(_uv_max, SvPV_nolen(MATH_GMPz_UV_MAX(aTHX)), 10);
-     if(mpz_cmp(*n, _uv_max) > 0) { /* needs to be truncated */
-       mpz_init_set(temp, *n);
-       mpz_and(temp, temp, _uv_max);
-       mpz_clear(_uv_max);
-       mpz_get_str(out, 10, temp);
-       mpz_clear(temp);
-       outsv = newSVpv(out, 0);
-       Safefree(out);
-       return outsv;
-     }
-     else { /* must fit into a UV */
-       mpz_clear(_uv_max);
-       mpz_get_str(out, 10, *n);
-       outsv = newSVpv(out, 0);
-       Safefree(out);
-       return outsv;
-     }
-   }
-
-#endif
-}
-
-int Rmpz_fits_IV_p(pTHX_ mpz_t * n) {
-
-#ifndef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(mpz_fits_slong_p(*n)) return 1;
-     return 0;
-#else
-     mpz_t _iv_max;
-     mpz_t _iv_min;
-     if(mpz_fits_slong_p(*n)) return 1;
-     mpz_init_set_str(_iv_min, SvPV_nolen(MATH_GMPz_IV_MIN(aTHX)), 10);
-     if(mpz_cmp(*n, _iv_min) < 0) {
-       mpz_clear(_iv_min);
-       return 0;
-     }
-     mpz_init_set_str(_iv_max, SvPV_nolen(MATH_GMPz_IV_MAX(aTHX)), 10);
-     if(mpz_cmp(*n, _iv_max) > 0) {
-       mpz_clear(_iv_min);
-       mpz_clear(_iv_max);
-       return 0;
-     }
-
-     mpz_clear(_iv_min);
-     mpz_clear(_iv_max);
-     return 1;
-
-#endif
-}
-
-int Rmpz_fits_UV_p(pTHX_ mpz_t * n) {
-
-#ifndef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(mpz_fits_ulong_p(*n)) return 1;
-     return 0;
-#else
-     mpz_t _uv_max;
-     if(mpz_fits_ulong_p(*n)) return 1;
-     if(mpz_sgn(*n) < 0) return 0;
-     mpz_init_set_str(_uv_max, SvPV_nolen(MATH_GMPz_UV_MAX(aTHX)), 10);
-     if(mpz_cmp(*n, _uv_max) > 0) {
-       mpz_clear(_uv_max);
-       return 0;
-     }
-     mpz_clear(_uv_max);
-     return 1;
-
-#endif
-}
-
-double Rmpz_get_d(mpz_t * n) {
-     return mpz_get_d(*n);
-}
-
 void Rmpz_get_d_2exp(pTHX_ mpz_t * n) {
      dXSARGS;
      double d;
@@ -713,6 +808,14 @@ void Rmpz_mul(mpz_t * dest, mpz_t * src1, mpz_t * src2) {
 void Rmpz_mul_si(mpz_t * dest, mpz_t * src, long num) {
      mpz_mul_si(*dest, *src, num);
 }
+
+/* NOT TO BE USED
+void overload_mul_expt(SV * op, SV * iv, SV * unused) {
+     mpz_mul_si(*(INT2PTR(mpz_t *, SvIVX(SvRV(op)))),
+                *(INT2PTR(mpz_t *, SvIVX(SvRV(op)))),
+                SvIV(iv));
+}
+*/
 
 void Rmpz_mul_ui(mpz_t * dest, mpz_t * src, unsigned long num) {
      mpz_mul_ui(*dest, *src, num);
@@ -1195,9 +1298,8 @@ int Rmpz_cmp_d(mpz_t * n, double d) {
 }
 
 int Rmpz_cmp_NV(pTHX_ mpz_t * a, SV * b) {
-    if(SvNOK(b)) {
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int ret, returned;
@@ -1205,7 +1307,10 @@ int Rmpz_cmp_NV(pTHX_ mpz_t * a, SV * b) {
      __float128 ld;
      mpz_t t;
 
-     ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
+     if(!SvNOK(b))
+       croak("In Rmpz_cmp_NV, 2nd argument is not an NV");
+
+     ld = (__float128)SvNV(b) >= 0 ? floorq((__float128)SvNV(b)) : ceilq((__float128)SvNV(b));
      if(ld != ld) croak("In Rmpz_cmp_NV, cannot compare a NaN to a Math::GMPz value");
      if((ld != 0 && (ld / ld != 1))) {
        if(ld > 0) return -1;
@@ -1223,7 +1328,7 @@ int Rmpz_cmp_NV(pTHX_ mpz_t * a, SV * b) {
      ret = mpz_cmp(*a, t);
      mpz_clear(t);
 
-     if(ld == (__float128)SvNVX(b)) return ret;
+     if(ld == (__float128)SvNV(b)) return ret;
      /* else cannot be equal - ie must be less than or greater than */
      if(!ret) {
        if(ld >= 0) ret = -1;
@@ -1233,19 +1338,68 @@ int Rmpz_cmp_NV(pTHX_ mpz_t * a, SV * b) {
      return ret;
 
 #elif defined(USE_LONG_DOUBLE)
-
-     char * buffer;
-     long double buffer_size;
      long double ld;
      int ret;
-     mpz_t t;
 
-     ld = (long double)SvNVX(b) >= 0 ? floorl((long double)SvNVX(b)) : ceill((long double)SvNVX(b));
+# if defined(NV_IS_DOUBLEDOUBLE)
+     mpf_t f, f_trunc;
+     mpz_t z;
+
+     if(!SvNOK(b))
+       croak("In Rmpz_cmp_NV, 2nd argument is not an NV");
+
+     ld = SvNV(b);
+
      if(ld != ld) croak("In Rmpz_cmp_NV, cannot compare a NaN to a Math::GMPz value");
      if((ld != 0 && (ld / ld != 1))) {
        if(ld > 0) return -1;
        return 1;
      }
+
+     mpf_init2(f, 2098);
+     mpf_init2(f_trunc, 2098);
+     mpz_init(z);
+
+     _mpf_set_dd(&f, b);
+     mpf_trunc(f_trunc, f);
+     mpz_set_f(z, f_trunc);
+
+     ret = mpf_cmp(f, f_trunc);
+
+     if(ret == 0) {
+       ret = mpz_cmp(*a, z);
+     }
+     else if(ret > 0) {
+       if(mpz_cmp(*a, z) <= 0) ret = -1;
+     }
+
+     else {
+       if(mpz_cmp(*a, z) >= 0) ret = 1;
+     }
+
+     mpf_clear(f);
+     mpf_clear(f_trunc);
+     mpz_clear(z);
+     return ret;
+
+# else
+     char * buffer;
+     long double buffer_size;
+     mpz_t t;
+
+     if(!SvNOK(b))
+       croak("In Rmpz_cmp_NV, 2nd argument is not an NV");
+
+     ld = SvNV(b);
+
+     if(ld != ld) croak("In Rmpz_cmp_NV, cannot compare a NaN to a Math::GMPz value");
+     if((ld != 0 && (ld / ld != 1))) {
+       if(ld > 0) return -1;
+       return 1;
+     }
+
+     ld = ld >= 0 ? floorl((long double)SvNV(b)) : ceill((long double)SvNV(b));
+
      buffer_size = ld < 0.0L ? ld * -1.0L : ld;
      buffer_size = ceill(logl(buffer_size + 1) / 2.30258509299404568401799145468436418L);
      Newxz(buffer, (int)buffer_size + 5, char);
@@ -1255,7 +1409,7 @@ int Rmpz_cmp_NV(pTHX_ mpz_t * a, SV * b) {
      Safefree(buffer);
      ret = mpz_cmp(*a, t);
      mpz_clear(t);
-     if(ld == (long double)SvNVX(b)) return ret;
+     if(ld == (long double)SvNV(b)) return ret;
      /* else cannot be equal - ie must be less than or greater than */
      if(!ret) {
        if(ld >= 0) ret = -1;
@@ -1264,15 +1418,20 @@ int Rmpz_cmp_NV(pTHX_ mpz_t * a, SV * b) {
 
      return ret;
 
-#else
-    if((double)SvNVX(b) != (double)SvNVX(b))
-      croak("In Rmpz_cmp_NV, cannot compare a NaN to a Math::GMPz value");
+#  endif
 
-    return mpz_cmp_d(*a, (double)SvNVX(b));
+#else
+
+     if(!SvNOK(b))
+       croak("In Rmpz_cmp_NV, 2nd argument is not an NV");
+
+     if((double)SvNV(b) != (double)SvNV(b))
+       croak("In Rmpz_cmp_NV, cannot compare a NaN to a Math::GMPz value");
+
+     return mpz_cmp_d(*a, (double)SvNV(b));
+
 #endif
 
-    }
-    croak("Invalid argument provided to Rmpz_cmp_NV");
 }
 
 int Rmpz_cmp_si(mpz_t * n, long d) {
@@ -1858,7 +2017,7 @@ SV * overload_mul(pTHX_ SV * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -1886,28 +2045,34 @@ SV * overload_mul(pTHX_ SV * a, SV * b, SV * third) {
      }
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak(" Invalid string (%s) supplied to Math::GMPz::overload_mul", SvPV_nolen(b));
+     if(SV_IS_IOK(b)) {
+       Rmpz_set_IV(aTHX_ mpz_t_obj, b);
        mpz_mul(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
        return obj_ref;
      }
 #else
 
-     if(SvUOK(b)) {
-       mpz_mul_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
-       return obj_ref;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_mul_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
+         return obj_ref;
+       }
 
-     if(SvIOK(b)) {
        mpz_mul_si(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvIVX(b));
        return obj_ref;
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
+         croak(" Invalid string (%s) supplied to Math::GMPz::overload_mul", SvPV_nolen(b));
+       mpz_mul(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
+       return obj_ref;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) croak("In Math::GMPz::overload_mul, cannot coerce a NaN to a Math::GMPz value");
@@ -1952,13 +2117,6 @@ SV * overload_mul(pTHX_ SV * a, SV * b, SV * third) {
        return obj_ref;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak(" Invalid string (%s) supplied to Math::GMPz::overload_mul", SvPV_nolen(b));
-       mpz_mul(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
-       return obj_ref;
-     }
-
      if(sv_isobject(b)) {
        if(strEQ(h, "Math::GMPz")) {
          mpz_mul(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
@@ -1999,7 +2157,7 @@ SV * overload_add(pTHX_ SV * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -2027,19 +2185,18 @@ SV * overload_add(pTHX_ SV * a, SV * b, SV * third) {
      }
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak(" Invalid string (%s) supplied to Math::GMPz::overload_add", SvPV_nolen(b));
+     if(SV_IS_IOK(b)) {
+       Rmpz_set_IV(aTHX_ mpz_t_obj, b);
        mpz_add(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
        return obj_ref;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_add_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
-       return obj_ref;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_add_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
+         return obj_ref;
+       }
 
-     if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
          mpz_add_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvIVX(b));
          return obj_ref;
@@ -2049,9 +2206,16 @@ SV * overload_add(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
+         croak(" Invalid string (%s) supplied to Math::GMPz::overload_add", SvPV_nolen(b));
+       mpz_add(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
+       return obj_ref;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) croak("In Math::GMPz::overload_add, cannot coerce a NaN to a Math::GMPz value");
@@ -2091,13 +2255,6 @@ SV * overload_add(pTHX_ SV * a, SV * b, SV * third) {
          croak("In Math::GMPz::overload_add, cannot coerce an Inf to a Math::GMPz value");
        mpz_set_d(*mpz_t_obj, d);
 #endif
-       mpz_add(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
-       return obj_ref;
-     }
-
-     if(SvPOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak(" Invalid string (%s) supplied to Math::GMPz::overload_add", SvPV_nolen(b));
        mpz_add(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
        return obj_ref;
      }
@@ -2147,7 +2304,7 @@ SV * overload_sub(pTHX_ SV * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -2176,24 +2333,23 @@ SV * overload_sub(pTHX_ SV * a, SV * b, SV * third) {
 
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak(" Invalid string (%s) supplied to Math::GMPz::overload_sub", SvPV_nolen(b));
+     if(SV_IS_IOK(b)) {
+       Rmpz_set_IV(aTHX_ mpz_t_obj, b);
        if(third == &PL_sv_yes) mpz_sub(*mpz_t_obj, *mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))));
        else mpz_sub(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
        return obj_ref;
      }
 #else
-     if(SvUOK(b)) {
-       if(third == &PL_sv_yes) {
-         mpz_ui_sub(*mpz_t_obj, SvUVX(b), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))));
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         if(third == &PL_sv_yes) {
+           mpz_ui_sub(*mpz_t_obj, SvUVX(b), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))));
+           return obj_ref;
+         }
+         mpz_sub_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
          return obj_ref;
        }
-       mpz_sub_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
-       return obj_ref;
-     }
 
-     if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
          if(third == &PL_sv_yes) {
            mpz_ui_sub(*mpz_t_obj, SvIVX(b), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))));
@@ -2208,9 +2364,17 @@ SV * overload_sub(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
+         croak(" Invalid string (%s) supplied to Math::GMPz::overload_sub", SvPV_nolen(b));
+       if(third == &PL_sv_yes) mpz_sub(*mpz_t_obj, *mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))));
+       else mpz_sub(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
+       return obj_ref;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
      ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
      if(ld != ld) croak("In Math::GMPz::overload_sub, cannot coerce a NaN to a Math::GMPz value");
@@ -2255,13 +2419,6 @@ SV * overload_sub(pTHX_ SV * a, SV * b, SV * third) {
        return obj_ref;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak(" Invalid string (%s) supplied to Math::GMPz::overload_sub", SvPV_nolen(b));
-       if(third == &PL_sv_yes) mpz_sub(*mpz_t_obj, *mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))));
-       else mpz_sub(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
-       return obj_ref;
-     }
      if(sv_isobject(b)) {
        if(strEQ(h, "Math::GMPz")) {
          mpz_sub(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
@@ -2307,7 +2464,7 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -2335,25 +2492,24 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
      }
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-          croak(" Invalid string (%s) supplied to Math::GMPz::overload_div", SvPV_nolen(b));
+     if(SV_IS_IOK(b)) {
+       Rmpz_set_IV(aTHX_ mpz_t_obj, b);
        if(third == &PL_sv_yes) Rmpz_tdiv_q(mpz_t_obj, mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))));
        else Rmpz_tdiv_q(mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))), mpz_t_obj);
        return obj_ref;
      }
 #else
-     if(SvUOK(b)) {
-       if(third == &PL_sv_yes) {
-         mpz_set_ui(*mpz_t_obj, SvUVX(b));
-         Rmpz_tdiv_q(mpz_t_obj, mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))));
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         if(third == &PL_sv_yes) {
+           mpz_set_ui(*mpz_t_obj, SvUVX(b));
+           Rmpz_tdiv_q(mpz_t_obj, mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))));
+           return obj_ref;
+         }
+         Rmpz_tdiv_q_ui(mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))), SvUVX(b));
          return obj_ref;
        }
-       Rmpz_tdiv_q_ui(mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))), SvUVX(b));
-       return obj_ref;
-     }
 
-     if(SvIOK(b)) {
        if(SvIVX(b) >= 0) {
          if(third == &PL_sv_yes) {
            mpz_set_si(*mpz_t_obj, SvIVX(b));
@@ -2363,20 +2519,30 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
          Rmpz_tdiv_q_ui(mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))), SvIVX(b));
          return obj_ref;
        }
+
        if(third == &PL_sv_yes) {
          mpz_set_si(*mpz_t_obj, SvIVX(b));
          Rmpz_tdiv_q(mpz_t_obj, mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))));
          return obj_ref;
-     }
+       }
+
        Rmpz_tdiv_q_ui(mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))), SvIVX(b) * -1);
        mpz_neg(*mpz_t_obj, *mpz_t_obj);
        return obj_ref;
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
+          croak(" Invalid string (%s) supplied to Math::GMPz::overload_div", SvPV_nolen(b));
+       if(third == &PL_sv_yes) Rmpz_tdiv_q(mpz_t_obj, mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))));
+       else Rmpz_tdiv_q(mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))), mpz_t_obj);
+       return obj_ref;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
      ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
      if(ld != ld) croak("In Math::GMPz::overload_div, cannot coerce a NaN to a Math::GMPz value");
@@ -2416,14 +2582,6 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
          croak("In Math::GMPz::overload_div, cannot coerce an Inf to a Math::GMPz value");
        mpz_set_d(*mpz_t_obj, d);
 #endif
-       if(third == &PL_sv_yes) Rmpz_tdiv_q(mpz_t_obj, mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))));
-       else Rmpz_tdiv_q(mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))), mpz_t_obj);
-       return obj_ref;
-     }
-
-     if(SvPOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-          croak(" Invalid string (%s) supplied to Math::GMPz::overload_div", SvPV_nolen(b));
        if(third == &PL_sv_yes) Rmpz_tdiv_q(mpz_t_obj, mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))));
        else Rmpz_tdiv_q(mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))), mpz_t_obj);
        return obj_ref;
@@ -2469,7 +2627,7 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -2493,9 +2651,8 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-          croak(" Invalid string (%s) supplied to Math::GMPz::overload_mod", SvPV_nolen(b));
+     if(SV_IS_IOK(b)) {
+       Rmpz_set_IV(aTHX_ mpz_t_obj, b);
        if(third == &PL_sv_yes) {
          mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
          return obj_ref;
@@ -2504,17 +2661,17 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
        return obj_ref;
      }
 #else
-     if(SvUOK(b)) {
-       if(third == &PL_sv_yes) {
-         mpz_set_ui(*mpz_t_obj, SvUVX(b));
-         mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         if(third == &PL_sv_yes) {
+           mpz_set_ui(*mpz_t_obj, SvUVX(b));
+           mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
+           return obj_ref;
+         }
+         mpz_mod_ui(*mpz_t_obj, *a, SvUVX(b));
          return obj_ref;
        }
-       mpz_mod_ui(*mpz_t_obj, *a, SvUVX(b));
-       return obj_ref;
-     }
 
-     if(SvIOK(b)) {
        mpz_set_si(*mpz_t_obj, SvIVX(b));
        if(third == &PL_sv_yes) {
          mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
@@ -2525,9 +2682,20 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
+          croak(" Invalid string (%s) supplied to Math::GMPz::overload_mod", SvPV_nolen(b));
+       if(third == &PL_sv_yes) {
+         mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
+         return obj_ref;
+       }
+       mpz_mod(*mpz_t_obj, *a, *mpz_t_obj);
+       return obj_ref;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) croak("In Math::GMPz::overload_mod, cannot coerce a NaN to a Math::GMPz value");
@@ -2567,17 +2735,6 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
          croak("In Math::GMPz::overload_mod, cannot coerce an Inf to a Math::GMPz value");
        mpz_set_d(*mpz_t_obj, d);
 #endif
-       if(third == &PL_sv_yes) {
-         mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
-         return obj_ref;
-       }
-       mpz_mod(*mpz_t_obj, *a, *mpz_t_obj);
-       return obj_ref;
-     }
-
-     if(SvPOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-          croak(" Invalid string (%s) supplied to Math::GMPz::overload_mod", SvPV_nolen(b));
        if(third == &PL_sv_yes) {
          mpz_mod(*mpz_t_obj, *mpz_t_obj, *a);
          return obj_ref;
@@ -2669,20 +2826,20 @@ SV * overload_lshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      obj = newSVrv(obj_ref, "Math::GMPz");
      mpz_init(*mpz_t_obj);
 
-     if(SvUOK(b)) {
-       mpz_mul_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUV(b));
-       sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
-       SvREADONLY_on(obj);
-       return obj_ref;
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_mul_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUV(b));
+         sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
+         SvREADONLY_on(obj);
+         return obj_ref;
        }
 
-     if(SvIOK(b)) {
        if(SvIV(b) < 0) croak("Invalid argument supplied to Math::GMPz::overload_lshift");
        mpz_mul_2exp(*mpz_t_obj, *a, SvUV(b));
        sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
        SvREADONLY_on(obj);
        return obj_ref;
-       }
+     }
 
      croak("Invalid argument supplied to Math::GMPz::overload_lshift");
 }
@@ -2699,20 +2856,20 @@ SV * overload_rshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      obj = newSVrv(obj_ref, "Math::GMPz");
      mpz_init(*mpz_t_obj);
 
-     if(SvUOK(b)) {
-       mpz_tdiv_q_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUVX(b));
-       sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
-       SvREADONLY_on(obj);
-       return obj_ref;
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_tdiv_q_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUVX(b));
+         sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
+         SvREADONLY_on(obj);
+         return obj_ref;
        }
 
-     if(SvIOK(b)) {
        if(SvIV(b) < 0) croak("Invalid argument supplied to Math::GMPz::overload_rshift");
        mpz_tdiv_q_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUVX(b));
        sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
        SvREADONLY_on(obj);
        return obj_ref;
-       }
+     }
 
      croak("Invalid argument supplied to Math::GMPz::overload_rshift");
 }
@@ -2735,19 +2892,19 @@ SV * overload_pow(pTHX_ SV * a, SV * b, SV * third) {
        SvREADONLY_on(obj);
      }
 
-     if(SvUOK(b)) {
-       if(third == &PL_sv_yes) {
-         if(ui) {
-           mpz_ui_pow_ui(*mpz_t_obj, SvUVX(b), ui);
-           return obj_ref;
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         if(third == &PL_sv_yes) {
+           if(ui) {
+             mpz_ui_pow_ui(*mpz_t_obj, SvUVX(b), ui);
+             return obj_ref;
+           }
+           croak("Exponent does not fit into unsigned long int in Math::GMPz::overload_pow");
          }
-         croak("Exponent does not fit into unsigned long int in Math::GMPz::overload_pow");
+         mpz_pow_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))) , SvUVX(b));
+         return obj_ref;
        }
-       mpz_pow_ui(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))) , SvUVX(b));
-       return obj_ref;
-     }
 
-     if(SvIOK(b)) {
        if(SvIVX(b) < 0) croak("Negative argument supplied to Math::GMPz::overload_pow");
        if(third == &PL_sv_yes) {
          if(ui) {
@@ -2807,7 +2964,7 @@ SV * overload_and(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -2831,30 +2988,35 @@ SV * overload_and(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      SvREADONLY_on(obj);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_and", SvPV_nolen(b));
+     if(SV_IS_IOK(b)) {
+       Rmpz_set_IV(aTHX_ mpz_t_obj, b);
        mpz_and(*mpz_t_obj, *a, *mpz_t_obj);
        return obj_ref;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_set_ui(*mpz_t_obj, SvUVX(b));
-       mpz_and(*mpz_t_obj, *a, *mpz_t_obj);
-       return obj_ref;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_set_ui(*mpz_t_obj, SvUVX(b));
+         mpz_and(*mpz_t_obj, *a, *mpz_t_obj);
+         return obj_ref;
+       }
 
-     if(SvIOK(b)) {
        mpz_set_si(*mpz_t_obj, SvIVX(b));
        mpz_and(*mpz_t_obj, *a, *mpz_t_obj);
        return obj_ref;
      }
 #endif
 
+     if(SV_IS_POK(b)) {
+       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_and", SvPV_nolen(b));
+       mpz_and(*mpz_t_obj, *a, *mpz_t_obj);
+       return obj_ref;
+     }
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_NOK(b)) {
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) croak("In Math::GMPz::overload_and, cannot coerce a NaN to a Math::GMPz value");
@@ -2898,13 +3060,6 @@ SV * overload_and(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
        return obj_ref;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_and", SvPV_nolen(b));
-       mpz_and(*mpz_t_obj, *a, *mpz_t_obj);
-       return obj_ref;
-     }
-
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
@@ -2944,7 +3099,7 @@ SV * overload_ior(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -2968,29 +3123,35 @@ SV * overload_ior(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      SvREADONLY_on(obj);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_ior", SvPV_nolen(b));
+     if(SV_IS_IOK(b)) {
+       Rmpz_set_IV(aTHX_ mpz_t_obj, b);
        mpz_ior(*mpz_t_obj, *a, *mpz_t_obj);
        return obj_ref;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_set_ui(*mpz_t_obj, SvUVX(b));
-       mpz_ior(*mpz_t_obj, *a, *mpz_t_obj);
-       return obj_ref;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_set_ui(*mpz_t_obj, SvUVX(b));
+         mpz_ior(*mpz_t_obj, *a, *mpz_t_obj);
+         return obj_ref;
+       }
 
-     if(SvIOK(b)) {
        mpz_set_si(*mpz_t_obj, SvIVX(b));
        mpz_ior(*mpz_t_obj, *a, *mpz_t_obj);
        return obj_ref;
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_ior", SvPV_nolen(b));
+       mpz_ior(*mpz_t_obj, *a, *mpz_t_obj);
+       return obj_ref;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) croak("In Math::GMPz::overload_ior, cannot coerce a NaN to a Math::GMPz value");
@@ -3034,13 +3195,6 @@ SV * overload_ior(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
        return obj_ref;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_ior", SvPV_nolen(b));
-       mpz_ior(*mpz_t_obj, *a, *mpz_t_obj);
-       return obj_ref;
-     }
-
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
@@ -3080,7 +3234,7 @@ SV * overload_xor(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -3104,29 +3258,35 @@ SV * overload_xor(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      SvREADONLY_on(obj);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_xor", SvPV_nolen(b));
+     if(SV_IS_IOK(b)) {
+       Rmpz_set_IV(aTHX_ mpz_t_obj, b);
        mpz_xor(*mpz_t_obj, *a, *mpz_t_obj);
        return obj_ref;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_set_ui(*mpz_t_obj, SvUVX(b));
-       mpz_xor(*mpz_t_obj, *a, *mpz_t_obj);
-       return obj_ref;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_set_ui(*mpz_t_obj, SvUVX(b));
+         mpz_xor(*mpz_t_obj, *a, *mpz_t_obj);
+         return obj_ref;
+       }
 
-     if(SvIOK(b)) {
        mpz_set_si(*mpz_t_obj, SvIVX(b));
        mpz_xor(*mpz_t_obj, *a, *mpz_t_obj);
        return obj_ref;
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_xor", SvPV_nolen(b));
+       mpz_xor(*mpz_t_obj, *a, *mpz_t_obj);
+       return obj_ref;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) croak("In Math::GMPz::overload_xor, cannot coerce a NaN to a Math::GMPz value");
@@ -3166,13 +3326,6 @@ SV * overload_xor(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
          croak("In Math::GMPz::overload_xor, cannot coerce an Inf to a Math::GMPz value");
        mpz_set_d(*mpz_t_obj, d);
 #endif
-       mpz_xor(*mpz_t_obj, *a, *mpz_t_obj);
-       return obj_ref;
-     }
-
-     if(SvPOK(b)) {
-       if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_xor", SvPV_nolen(b));
        mpz_xor(*mpz_t_obj, *a, *mpz_t_obj);
        return obj_ref;
      }
@@ -3243,39 +3396,15 @@ SV * overload_gt(pTHX_ mpz_t * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_gt", SvPV_nolen(b));
-       ret = mpz_cmp(*a, t);
-       mpz_clear(t);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret > 0) return newSViv(1);
-       return newSViv(0);
-     }
-#else
-     if(SvUOK(b)) {
-       ret = mpz_cmp_ui(*a, SvUVX(b));
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret > 0) return newSViv(1);
-       return newSViv(0);
-     }
-     if(SvIOK(b)) {
-       ret = mpz_cmp_si(*a, SvIVX(b));
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret > 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
-
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-       ret = Rmpz_cmp_NV(aTHX_ a, b);
+     if(SV_IS_IOK(b)) {
+       ret = Rmpz_cmp_IV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        if(ret > 0) return newSViv(1);
        return newSViv(0);
      }
 
-     if(SvPOK(b)) {
+
+     if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) {
          if(ret > 0) return newSViv(0);
@@ -3286,6 +3415,13 @@ SV * overload_gt(pTHX_ mpz_t * a, SV * b, SV * third) {
          croak("Invalid string (%s) supplied to Math::GMPz::overload_gt", SvPV_nolen(b));
        ret = mpz_cmp(*a, t);
        mpz_clear(t);
+       if(third == &PL_sv_yes) ret *= -1;
+       if(ret > 0) return newSViv(1);
+       return newSViv(0);
+     }
+
+     if(SV_IS_NOK(b)) {
+       ret = Rmpz_cmp_NV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        if(ret > 0) return newSViv(1);
        return newSViv(0);
@@ -3349,40 +3485,14 @@ SV * overload_gte(pTHX_ mpz_t * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_gte", SvPV_nolen(b));
-       ret = mpz_cmp(*a, t);
-       mpz_clear(t);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret >= 0) return newSViv(1);
-       return newSViv(0);
-     }
-#else
-     if(SvUOK(b)) {
-       ret = mpz_cmp_ui(*a, SvUVX(b));
+     if(SV_IS_IOK(b)) {
+       ret = Rmpz_cmp_IV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        if(ret >= 0) return newSViv(1);
        return newSViv(0);
      }
 
-     if(SvIOK(b)) {
-       ret = mpz_cmp_si(*a, SvIVX(b));
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret >= 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
-
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-       ret = Rmpz_cmp_NV(aTHX_ a, b);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret >= 0) return newSViv(1);
-       return newSViv(0);
-     }
-
-     if(SvPOK(b)) {
+     if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) {
          if(ret > 0) return newSViv(0);
@@ -3393,6 +3503,13 @@ SV * overload_gte(pTHX_ mpz_t * a, SV * b, SV * third) {
          croak("Invalid string (%s) supplied to Math::GMPz::overload_gte", SvPV_nolen(b));
        ret = mpz_cmp(*a, t);
        mpz_clear(t);
+       if(third == &PL_sv_yes) ret *= -1;
+       if(ret >= 0) return newSViv(1);
+       return newSViv(0);
+     }
+
+     if(SV_IS_NOK(b)) {
+       ret = Rmpz_cmp_NV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        if(ret >= 0) return newSViv(1);
        return newSViv(0);
@@ -3456,40 +3573,14 @@ SV * overload_lt(pTHX_ mpz_t * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_lt", SvPV_nolen(b));
-       ret = mpz_cmp(*a, t);
-       mpz_clear(t);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret < 0) return newSViv(1);
-       return newSViv(0);
-     }
-#else
-     if(SvUOK(b)) {
-       ret = mpz_cmp_ui(*a, SvUVX(b));
+     if(SV_IS_IOK(b)) {
+       ret = Rmpz_cmp_IV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        if(ret < 0) return newSViv(1);
        return newSViv(0);
      }
 
-     if(SvIOK(b)) {
-       ret = mpz_cmp_si(*a, SvIVX(b));
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret < 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
-
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-       ret = Rmpz_cmp_NV(aTHX_ a, b);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret < 0) return newSViv(1);
-       return newSViv(0);
-     }
-
-     if(SvPOK(b)) {
+     if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) {
          if(ret > 0) return newSViv(1);
@@ -3500,6 +3591,13 @@ SV * overload_lt(pTHX_ mpz_t * a, SV * b, SV * third) {
          croak("Invalid string (%s) supplied to Math::GMPz::overload_lt", SvPV_nolen(b));
        ret = mpz_cmp(*a, t);
        mpz_clear(t);
+       if(third == &PL_sv_yes) ret *= -1;
+       if(ret < 0) return newSViv(1);
+       return newSViv(0);
+     }
+
+     if(SV_IS_NOK(b)) {
+       ret = Rmpz_cmp_NV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        if(ret < 0) return newSViv(1);
        return newSViv(0);
@@ -3563,40 +3661,14 @@ SV * overload_lte(pTHX_ mpz_t * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_lte", SvPV_nolen(b));
-       ret = mpz_cmp(*a, t);
-       mpz_clear(t);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret <= 0) return newSViv(1);
-       return newSViv(0);
-     }
-#else
-     if(SvUOK(b)) {
-       ret = mpz_cmp_ui(*a, SvUVX(b));
+     if(SV_IS_IOK(b)) {
+       ret = Rmpz_cmp_IV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        if(ret <= 0) return newSViv(1);
        return newSViv(0);
      }
 
-     if(SvIOK(b)) {
-       ret = mpz_cmp_si(*a, SvIVX(b));
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret <= 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
-
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-       ret = Rmpz_cmp_NV(aTHX_ a, b);
-       if(third == &PL_sv_yes) ret *= -1;
-       if(ret <= 0) return newSViv(1);
-       return newSViv(0);
-     }
-
-     if(SvPOK(b)) {
+     if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) {
          if(ret > 0) return newSViv(1);
@@ -3607,6 +3679,13 @@ SV * overload_lte(pTHX_ mpz_t * a, SV * b, SV * third) {
          croak("Invalid string (%s) supplied to Math::GMPz::overload_lte", SvPV_nolen(b));
        ret = mpz_cmp(*a, t);
        mpz_clear(t);
+       if(third == &PL_sv_yes) ret *= -1;
+       if(ret <= 0) return newSViv(1);
+       return newSViv(0);
+     }
+
+     if(SV_IS_NOK(b)) {
+       ret = Rmpz_cmp_NV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        if(ret <= 0) return newSViv(1);
        return newSViv(0);
@@ -3670,36 +3749,13 @@ SV * overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_spaceship", SvPV_nolen(b));
-       ret = mpz_cmp(*a, t);
-       mpz_clear(t);
-       if(third == &PL_sv_yes) ret *= -1;
-       return newSViv(ret);
-     }
-#else
-     if(SvUOK(b)) {
-       ret = mpz_cmp_ui(*a, SvUVX(b));
+     if(SV_IS_IOK(b)) {
+       ret = Rmpz_cmp_IV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        return newSViv(ret);
      }
 
-     if(SvIOK(b)) {
-       ret = mpz_cmp_si(*a, SvIVX(b));
-       if(third == &PL_sv_yes) ret *= -1;
-       return newSViv(ret);
-     }
-#endif
-
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-       ret = Rmpz_cmp_NV(aTHX_ a, b);
-       if(third == &PL_sv_yes) ret *= -1;
-       return newSViv(ret);
-     }
-
-     if(SvPOK(b)) {
+     if(SV_IS_POK(b)) {
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) return newSViv(ret * -1);
 
@@ -3707,6 +3763,12 @@ SV * overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
          croak("Invalid string (%s) supplied to Math::GMPz::overload_spaceship", SvPV_nolen(b));
        ret = mpz_cmp(*a, t);
        mpz_clear(t);
+       if(third == &PL_sv_yes) ret *= -1;
+       return newSViv(ret);
+     }
+
+     if(SV_IS_NOK(b)) {
+       ret = Rmpz_cmp_NV(aTHX_ a, b);
        if(third == &PL_sv_yes) ret *= -1;
        return newSViv(ret);
      }
@@ -3763,100 +3825,24 @@ SV * overload_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
-
-     char * buffer;
-     int returned;
-     __float128 buffer_size;
-     __float128 ld;
-
-#elif defined(USE_LONG_DOUBLE)
-
-     char * buffer;
-     long double buffer_size;
-     long double ld;
-
-#endif
-
-#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_equiv", SvPV_nolen(b));
-       ret = mpz_cmp(*a, t);
-       mpz_clear(t);
-       if(ret == 0) return newSViv(1);
-       return newSViv(0);
-     }
-#else
-     if(SvUOK(b)) {
-       ret = mpz_cmp_ui(*a, SvUVX(b));
+     if(SV_IS_IOK(b)) {
+       ret = Rmpz_cmp_IV(aTHX_ a, b);
        if(ret == 0) return newSViv(1);
        return newSViv(0);
      }
 
-     if(SvIOK(b)) {
-       ret = mpz_cmp_si(*a, SvIVX(b));
-       if(ret == 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
-
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-
-#if defined(NV_IS_FLOAT128)
-
-       ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
-       if(ld != ld) croak("In Math::GMPz::overload_equiv, cannot compare a NaN to a Math::GMPz value");
-       if((ld != 0 && (ld / ld != 1)) || (ld != (__float128)SvNVX(b))) ret = -1;
-
-       if(!ret) {
-         buffer_size = ld < 0.0Q ? ld * -1.0Q : ld;
-         buffer_size = ceilq(logq(buffer_size + 1) / 2.30258509299404568401799145468436418Q);
-
-         Newxz(buffer, (int)buffer_size + 5, char);
-
-         returned = quadmath_snprintf(buffer, (size_t)buffer_size + 5, "%.0Qf", ld);
-         if(returned < 0) croak("In Math::GMPz::overload_equiv, encoding error in quadmath_snprintf function");
-         if(returned >= buffer_size + 5) croak("In Math::GMPz::overload_equiv, buffer given to quadmath_snprintf function was too small");
-         mpz_init_set_str(t, buffer, 10);
-         Safefree(buffer);
-         ret = mpz_cmp(*a, t);
-         mpz_clear(t);
-       }
-
-#elif defined(USE_LONG_DOUBLE)
-
-       ld = (long double)SvNVX(b) >= 0 ? floorl((long double)SvNVX(b)) : ceill((long double)SvNVX(b));
-       if(ld != ld) croak("In Math::GMPz::overload_equiv, cannot compare a NaN to a Math::GMPz value");
-       if((ld != 0 && (ld / ld != 1)) || (ld != (long double)SvNVX(b))) ret = -1;
-
-       if(!ret) {
-         buffer_size = ld < 0.0L ? ld * -1.0L : ld;
-         buffer_size = ceill(logl(buffer_size + 1) / 2.30258509299404568401799145468436418L);
-
-         Newxz(buffer, (int)buffer_size + 5, char);
-
-         if(sprintf(buffer, "%.0Lf", ld) >= (int)buffer_size + 5) croak("In Math::GMPz::overload_equiv, buffer overflow in sprintf function");
-         mpz_init_set_str(t, buffer, 10);
-         Safefree(buffer);
-         ret = mpz_cmp(*a, t);
-         mpz_clear(t);
-       }
-#else
-       double d = SvNVX(b);
-       if(d != d) croak("In Math::GMPz::overload_equiv, cannot compare a NaN to a Math::GMPz value");
-       ret = mpz_cmp_d(*a, d); /* no need to check for Inf */
-#endif
-       if(ret == 0) return newSViv(1);
-       return newSViv(0);
-     }
-
-     if(SvPOK(b)) {
+     if(SV_IS_POK(b)) {
        if(_is_infstring(SvPV_nolen(b))) return newSViv(0);
        if(mpz_init_set_str(t, SvPV_nolen(b), 0))
          croak("Invalid string (%s) supplied to Math::GMPz::overload_equiv", SvPV_nolen(b));
        ret = mpz_cmp(*a, t);
        mpz_clear(t);
+       if(ret == 0) return newSViv(1);
+       return newSViv(0);
+     }
+
+     if(SV_IS_NOK(b)) { /* do not use the NV if POK is set */
+       ret = Rmpz_cmp_NV(aTHX_ a, b);
        if(ret == 0) return newSViv(1);
        return newSViv(0);
      }
@@ -3918,100 +3904,24 @@ SV * overload_not_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
-
-     char * buffer;
-     int returned;
-     __float128 buffer_size;
-     __float128 ld;
-
-#elif defined(USE_LONG_DOUBLE)
-
-     char * buffer;
-     long double buffer_size;
-     long double ld;
-
-#endif
-
-#ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0))
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_not_equiv", SvPV_nolen(b));
-       ret = mpz_cmp(*a, t);
-       mpz_clear(t);
-       if(ret != 0) return newSViv(1);
-       return newSViv(0);
-     }
-#else
-     if(SvUOK(b)) {
-       ret = mpz_cmp_ui(*a, SvUVX(b));
+     if(SV_IS_IOK(b)) {
+       ret = Rmpz_cmp_IV(aTHX_ a, b);
        if(ret != 0) return newSViv(1);
        return newSViv(0);
      }
 
-     if(SvIOK(b)) {
-       ret = mpz_cmp_si(*a, SvIVX(b));
-       if(ret != 0) return newSViv(1);
-       return newSViv(0);
-     }
-#endif
-
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-
-#if defined(NV_IS_FLOAT128)
-
-       ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
-       if(ld != ld) croak("In Math::GMPz::overload_not_equiv, cannot compare a NaN to a Math::GMPz value");
-       if((ld != 0 && (ld / ld != 1)) || (ld != (__float128)SvNVX(b))) ret = -1;
-
-       if(!ret) {
-         buffer_size = ld < 0.0Q ? ld * -1.0Q : ld;
-         buffer_size = ceilq(logq(buffer_size + 1) / 2.30258509299404568401799145468436418Q);
-
-         Newxz(buffer, (int)buffer_size + 5, char);
-
-         returned = quadmath_snprintf(buffer, (size_t)buffer_size + 5, "%.0Qf", ld);
-         if(returned < 0) croak("In Math::GMPz::overload_not_equiv, encoding error in quadmath_snprintf function");
-         if(returned >= buffer_size + 5) croak("In Math::GMPz::overload_not_equiv, buffer given to quadmath_snprintf function was too small");
-         mpz_init_set_str(t, buffer, 10);
-         Safefree(buffer);
-         ret = mpz_cmp(*a, t);
-         mpz_clear(t);
-       }
-
-#elif defined(USE_LONG_DOUBLE)
-
-       ld = (long double)SvNVX(b) >= 0 ? floorl((long double)SvNVX(b)) : ceill((long double)SvNVX(b));
-       if(ld != ld) croak("In Math::GMPz::overload_not_equiv, cannot compare a NaN to a Math::GMPz value");
-       if((ld != 0 && (ld / ld != 1)) || (ld != (long double)SvNVX(b))) ret = -1;
-
-       if(!ret) {
-         buffer_size = ld < 0.0L ? ld * -1.0L : ld;
-         buffer_size = ceill(logl(buffer_size + 1) / 2.30258509299404568401799145468436418L);
-
-         Newxz(buffer, (int)buffer_size + 5, char);
-
-         if(sprintf(buffer, "%.0Lf", ld) >= (int)buffer_size + 5) croak("In Math::GMPz::overload_not_equiv, buffer overflow in sprintf function");
-         mpz_init_set_str(t, buffer, 10);
-         Safefree(buffer);
-         ret = mpz_cmp(*a, t);
-         mpz_clear(t);
-       }
-#else
-       double d = SvNVX(b);
-       if(d != d) croak("In Math::GMPz::overload_not_equiv, cannot compare a NaN to a Math::GMPz value");
-       ret = mpz_cmp_d(*a, d); /* no need to check for INf */
-#endif
-       if(ret != 0) return newSViv(1);
-       return newSViv(0);
-     }
-
-     if(SvPOK(b)) {
+     if(SV_IS_POK(b)) {
        if(_is_infstring(SvPV_nolen(b))) return newSViv(1);
        if(mpz_init_set_str(t, SvPV_nolen(b), 0))
          croak("Invalid string (%s) supplied to Math::GMPz::overload_not_equiv", SvPV_nolen(b));
        ret = mpz_cmp(*a, t);
        mpz_clear(t);
+       if(ret != 0) return newSViv(1);
+       return newSViv(0);
+     }
+
+     if(SV_IS_NOK(b)) { /* do not use the NV if POK is set */
+       ret = Rmpz_cmp_NV(aTHX_ a, b);
        if(ret != 0) return newSViv(1);
        return newSViv(0);
      }
@@ -4079,7 +3989,7 @@ SV * overload_xor_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -4097,7 +4007,7 @@ SV * overload_xor_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      SvREFCNT_inc(a);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s)supplied to Math::GMPz::overload_xor_eq", SvPV_nolen(b));
@@ -4105,26 +4015,36 @@ SV * overload_xor_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
        mpz_xor(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
        mpz_clear(t);
        return a;
-       }
+     }
 #else
-     if(SvUOK(b)) {
-       mpz_init_set_ui(t, SvUVX(b));
-       mpz_xor(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_init_set_ui(t, SvUVX(b));
+         mpz_xor(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+         mpz_clear(t);
+         return a;
        }
 
-     if(SvIOK(b)) {
        mpz_init_set_si(t, SvIVX(b));
        mpz_xor(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
        mpz_clear(t);
        return a;
-       }
+     }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
+         SvREFCNT_dec(a);
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_xor_eq", SvPV_nolen(b));
+         }
+       mpz_xor(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+       mpz_clear(t);
+       return a;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) {
@@ -4191,17 +4111,7 @@ SV * overload_xor_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
        mpz_xor(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
        mpz_clear(t);
        return a;
-       }
-
-     if(SvPOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_xor_eq", SvPV_nolen(b));
-         }
-       mpz_xor(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-       }
+     }
 
 
      if(sv_isobject(b)) {
@@ -4247,7 +4157,7 @@ SV * overload_ior_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -4265,7 +4175,7 @@ SV * overload_ior_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      SvREFCNT_inc(a);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_ior_eq", SvPV_nolen(b));
@@ -4275,14 +4185,14 @@ SV * overload_ior_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
        return a;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_init_set_ui(t, SvUVX(b));
-       mpz_ior(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_init_set_ui(t, SvUVX(b));
+         mpz_ior(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+         mpz_clear(t);
+         return a;
+       }
 
-     if(SvIOK(b)) {
        mpz_init_set_si(t, SvIVX(b));
        mpz_ior(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
        mpz_clear(t);
@@ -4290,9 +4200,19 @@ SV * overload_ior_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
+         SvREFCNT_dec(a);
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_ior_eq", SvPV_nolen(b));
+       }
+       mpz_ior(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+       mpz_clear(t);
+       return a;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) {
@@ -4361,16 +4281,6 @@ SV * overload_ior_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
        return a;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_ior_eq", SvPV_nolen(b));
-       }
-       mpz_ior(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-     }
-
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
@@ -4414,7 +4324,7 @@ SV * overload_and_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -4432,7 +4342,7 @@ SV * overload_and_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      SvREFCNT_inc(a);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_and_eq", SvPV_nolen(b));
@@ -4442,14 +4352,14 @@ SV * overload_and_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
        return a;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_init_set_ui(t, SvUVX(b));
-       mpz_and(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_init_set_ui(t, SvUVX(b));
+         mpz_and(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+         mpz_clear(t);
+         return a;
+       }
 
-     if(SvIOK(b)) {
        mpz_init_set_si(t, SvIVX(b));
        mpz_and(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
        mpz_clear(t);
@@ -4457,9 +4367,19 @@ SV * overload_and_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
+         SvREFCNT_dec(a);
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_and_eq", SvPV_nolen(b));
+       }
+       mpz_and(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+       mpz_clear(t);
+       return a;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) {
@@ -4528,16 +4448,6 @@ SV * overload_and_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
        return a;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_and_eq", SvPV_nolen(b));
-       }
-       mpz_and(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-     }
-
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
@@ -4579,19 +4489,19 @@ SV * overload_and_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
 SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
-     if(SvUOK(b)) {
-       mpz_pow_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
-       return a;
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_pow_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
+         return a;
        }
 
-     if(SvIOK(b)) {
        if(SvIVX(b) < 0) {
          SvREFCNT_dec(a);
          croak("Negative argument supplied to Math::GMPz::overload_pow_eq");
        }
        mpz_pow_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
        return a;
-       }
+     }
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
@@ -4615,19 +4525,19 @@ SV * overload_rshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      SvREFCNT_inc(a);
 
-     if(SvUOK(b)) {
-       mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUVX(b));
-       return a;
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUVX(b));
+         return a;
        }
 
-     if(SvIOK(b)) {
        if(SvIV(b) < 0) {
          SvREFCNT_dec(a);
          croak("Invalid argument supplied to Math::GMPz::overload_rshift_eq");
        }
        mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUVX(b));
        return a;
-       }
+     }
 
      SvREFCNT_dec(a);
      croak("Invalid argument supplied to Math::GMPz::overload_rshift_eq");
@@ -4639,19 +4549,19 @@ SV * overload_lshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      SvREFCNT_inc(a);
 
-     if(SvUOK(b)) {
-       mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
-       return a;
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
+         return a;
        }
 
-     if(SvIOK(b)) {
        if(SvIV(b) < 0) {
          SvREFCNT_dec(a);
          croak("Invalid argument supplied to Math::GMPz::overload_lshift_eq");
        }
        mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
        return a;
-       }
+     }
 
      SvREFCNT_dec(a);
      croak("Invalid argument supplied to Math::GMPz::overload_lshift_eq");
@@ -4674,7 +4584,7 @@ SV * overload_mod_eq(pTHX_ SV * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -4692,7 +4602,7 @@ SV * overload_mod_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_mod_eq", SvPV_nolen(b));
@@ -4702,12 +4612,12 @@ SV * overload_mod_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_mod_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
-       return a;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_mod_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
+         return a;
+       }
 
-     if(SvIOK(b)) {
        if(SvIV(b) > 0) {
          mpz_mod_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
          return a;
@@ -4719,9 +4629,19 @@ SV * overload_mod_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
+         SvREFCNT_dec(a);
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_mod_eq", SvPV_nolen(b));
+       }
+       mpz_mod(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+       mpz_clear(t);
+       return a;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) {
@@ -4790,16 +4710,6 @@ SV * overload_mod_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_mod_eq", SvPV_nolen(b));
-       }
-       mpz_mod(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-     }
-
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
@@ -4841,7 +4751,7 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -4859,7 +4769,7 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_div_eq", SvPV_nolen(b));
@@ -4869,12 +4779,12 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_tdiv_q_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
-       return a;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_tdiv_q_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
+         return a;
+       }
 
-     if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
          mpz_tdiv_q_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvIVX(b));
          return a;
@@ -4885,9 +4795,19 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
+         SvREFCNT_dec(a);
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_div_eq", SvPV_nolen(b));
+       }
+       mpz_tdiv_q(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+       mpz_clear(t);
+       return a;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) {
@@ -4956,16 +4876,6 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_div_eq", SvPV_nolen(b));
-       }
-       mpz_tdiv_q(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-     }
-
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
@@ -5004,7 +4914,7 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -5022,7 +4932,7 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_sub_eq", SvPV_nolen(b));
@@ -5032,12 +4942,12 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_sub_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
-       return a;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_sub_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
+         return a;
+       }
 
-     if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
          mpz_sub_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvIVX(b));
          return a;
@@ -5047,9 +4957,19 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
+         SvREFCNT_dec(a);
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_sub_eq", SvPV_nolen(b));
+       }
+       mpz_sub(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+       mpz_clear(t);
+       return a;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) {
@@ -5118,16 +5038,6 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_sub_eq", SvPV_nolen(b));
-       }
-       mpz_sub(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-     }
-
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
@@ -5170,7 +5080,7 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -5188,7 +5098,7 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_add_eq", SvPV_nolen(b));
@@ -5198,12 +5108,13 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_add_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
-       return a;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_add_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
+         return a;
+       }
 
-     if(SvIOK(b)) {
+
        if(SvIV(b) >= 0) {
          mpz_add_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvIVX(b));
          return a;
@@ -5213,9 +5124,19 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
+         SvREFCNT_dec(a);
+         croak("Invalid string (%s) supplied to Math::GMPz::overload_add_eq", SvPV_nolen(b));
+       }
+       mpz_add(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+       mpz_clear(t);
+       return a;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) {
@@ -5284,16 +5205,6 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak("Invalid string (%s) supplied to Math::GMPz::overload_add_eq", SvPV_nolen(b));
-       }
-       mpz_add(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-     }
-
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
@@ -5336,7 +5247,7 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
      MBI_DECLARATIONS
      MBI_GMP_DECLARATIONS
 
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
 
      char * buffer;
      int returned;
@@ -5354,7 +5265,7 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
 #ifdef MATH_GMPZ_NEED_LONG_LONG_INT
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak(" Invalid string (%s) supplied to Math::GMPz::overload_mul_eq", SvPV_nolen(b));
@@ -5364,20 +5275,30 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 #else
-     if(SvUOK(b)) {
-       mpz_mul_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
-       return a;
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         mpz_mul_ui(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUVX(b));
+         return a;
+       }
 
-     if(SvIOK(b)) {
        mpz_mul_si(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvIVX(b));
        return a;
      }
 #endif
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
+     if(SV_IS_POK(b)) {
+       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
+         SvREFCNT_dec(a);
+         croak(" Invalid string (%s) supplied to Math::GMPz::overload_mul_eq", SvPV_nolen(b));
+       }
+       mpz_mul(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
+       mpz_clear(t);
+       return a;
+     }
 
-#if defined(NV_IS_FLOAT128)
+     if(SV_IS_NOK(b)) {
+
+#if defined(USE_QUADMATH)
 
        ld = (__float128)SvNVX(b) >= 0 ? floorq((__float128)SvNVX(b)) : ceilq((__float128)SvNVX(b));
        if(ld != ld) {
@@ -5446,16 +5367,6 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 
-     if(SvPOK(b)) {
-       if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
-         SvREFCNT_dec(a);
-         croak(" Invalid string (%s) supplied to Math::GMPz::overload_mul_eq", SvPV_nolen(b));
-       }
-       mpz_mul(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), t);
-       mpz_clear(t);
-       return a;
-     }
-
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz")) {
@@ -5487,6 +5398,8 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_dec(a);
      croak("Invalid argument supplied to Math::GMPz::overload_mul_eq");
 }
+
+
 
 SV * eratosthenes_string(pTHX_ SV * x_arg) {
 
@@ -5564,23 +5477,26 @@ SV * wrap_gmp_printf(pTHX_ SV * a, SV * b) {
        croak("Unrecognised object supplied as argument to Rmpz_printf");
      }
 
-     if(SvUOK(b)) {
-       ret = gmp_printf(SvPV_nolen(a), SvUVX(b));
-       fflush(stdout);
-       return newSViv(ret);
-     }
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         ret = gmp_printf(SvPV_nolen(a), SvUVX(b));
+         fflush(stdout);
+         return newSViv(ret);
+       }
+
        ret = gmp_printf(SvPV_nolen(a), SvIVX(b));
        fflush(stdout);
        return newSViv(ret);
      }
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-       ret = gmp_printf(SvPV_nolen(a), SvNVX(b));
+
+     if(SV_IS_POK(b)) {
+       ret = gmp_printf(SvPV_nolen(a), SvPV_nolen(b));
        fflush(stdout);
        return newSViv(ret);
      }
-     if(SvPOK(b)) {
-       ret = gmp_printf(SvPV_nolen(a), SvPV_nolen(b));
+
+     if(SV_IS_NOK(b)) {
+       ret = gmp_printf(SvPV_nolen(a), SvNVX(b));
        fflush(stdout);
        return newSViv(ret);
      }
@@ -5615,23 +5531,26 @@ SV * wrap_gmp_fprintf(pTHX_ FILE * stream, SV * a, SV * b) {
        else croak("Unrecognised object supplied as argument to Rmpz_fprintf");
      }
 
-     if(SvUOK(b)) {
-       ret = gmp_fprintf(stream, SvPV_nolen(a), SvUVX(b));
-       fflush(stream);
-       return newSViv(ret);
-     }
-     if(SvIOK(b)) {
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         ret = gmp_fprintf(stream, SvPV_nolen(a), SvUVX(b));
+         fflush(stream);
+         return newSViv(ret);
+       }
+
        ret = gmp_fprintf(stream, SvPV_nolen(a), SvIVX(b));
        fflush(stream);
        return newSViv(ret);
      }
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-       ret = gmp_fprintf(stream, SvPV_nolen(a), SvNVX(b));
+
+     if(SV_IS_POK(b)) {
+       ret = gmp_fprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
        fflush(stream);
        return newSViv(ret);
      }
-     if(SvPOK(b)) {
-       ret = gmp_fprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
+
+     if(SV_IS_NOK(b)) {
+       ret = gmp_fprintf(stream, SvPV_nolen(a), SvNVX(b));
        fflush(stream);
        return newSViv(ret);
      }
@@ -5675,29 +5594,29 @@ SV * wrap_gmp_sprintf(pTHX_ SV * s, SV * a, SV * b, int buflen) {
        croak("Unrecognised object supplied as argument to Rmpz_sprintf");
      }
 
-     if(SvUOK(b)) {
-       ret = gmp_sprintf(stream, SvPV_nolen(a), SvUVX(b));
-       sv_setpv(s, stream);
-       Safefree(stream);
-       return newSViv(ret);
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         ret = gmp_sprintf(stream, SvPV_nolen(a), SvUVX(b));
+         sv_setpv(s, stream);
+         Safefree(stream);
+         return newSViv(ret);
+       }
 
-     if(SvIOK(b)) {
        ret = gmp_sprintf(stream, SvPV_nolen(a), SvIVX(b));
        sv_setpv(s, stream);
        Safefree(stream);
        return newSViv(ret);
      }
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-       ret = gmp_sprintf(stream, SvPV_nolen(a), SvNVX(b));
+     if(SV_IS_POK(b)) {
+       ret = gmp_sprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
        sv_setpv(s, stream);
        Safefree(stream);
        return newSViv(ret);
      }
 
-     if(SvPOK(b)) {
-       ret = gmp_sprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
+     if(SV_IS_NOK(b)) {
+       ret = gmp_sprintf(stream, SvPV_nolen(a), SvNVX(b));
        sv_setpv(s, stream);
        Safefree(stream);
        return newSViv(ret);
@@ -5742,29 +5661,29 @@ SV * wrap_gmp_snprintf(pTHX_ SV * s, SV * bytes, SV * a, SV * b, int buflen) {
        croak("Unrecognised object supplied as argument to Rmpz_snprintf");
      }
 
-     if(SvUOK(b)) {
-       ret = gmp_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvUVX(b));
-       sv_setpv(s, stream);
-       Safefree(stream);
-       return newSViv(ret);
-     }
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) {
+         ret = gmp_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvUVX(b));
+         sv_setpv(s, stream);
+         Safefree(stream);
+         return newSViv(ret);
+       }
 
-     if(SvIOK(b)) {
        ret = gmp_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvIVX(b));
        sv_setpv(s, stream);
        Safefree(stream);
        return newSViv(ret);
      }
 
-     if(SvNOK(b) && !SvPOK(b)) { /* do not use the NV if POK is set */
-       ret = gmp_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvNVX(b));
+     if(SV_IS_POK(b)) {
+       ret = gmp_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvPV_nolen(b));
        sv_setpv(s, stream);
        Safefree(stream);
        return newSViv(ret);
      }
 
-     if(SvPOK(b)) {
-       ret = gmp_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvPV_nolen(b));
+     if(SV_IS_NOK(b)) {
+       ret = gmp_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvNVX(b));
        sv_setpv(s, stream);
        Safefree(stream);
        return newSViv(ret);
@@ -5774,10 +5693,12 @@ SV * wrap_gmp_snprintf(pTHX_ SV * s, SV * bytes, SV * a, SV * b, int buflen) {
 }
 
 SV * _itsa(pTHX_ SV * a) {
-     if(SvUOK(a)) return newSViv(1);
-     if(SvIOK(a)) return newSViv(2);
-     if(SvNOK(a) && !SvPOK(a)) return newSViv(3);
-     if(SvPOK(a)) return newSViv(4);
+     if(SV_IS_IOK(a)) {
+       if(SvUOK(a)) return newSViv(1);
+       return newSViv(2);
+     }
+     if(SV_IS_POK(a)) return newSViv(4);
+     if(SV_IS_NOK(a)) return newSViv(3);
      if(sv_isobject(a)) {
        const char *h = HvNAME(SvSTASH(SvRV(a)));
        if(strEQ(h, "Math::GMPz"))        return newSViv(8);
@@ -5872,7 +5793,7 @@ int _has_longdouble(void) {
 }
 
 int _has_float128(void) {
-#if defined(NV_IS_FLOAT128)
+#if defined(USE_QUADMATH)
     return 1;
 #else
     return 0;
@@ -6298,7 +6219,7 @@ void autocorrelation(pTHX_ mpz_t * bitstream, int offset) {
        mpz_mul_2exp(temp, temp, 19999);
        mpz_add(*bitstream, *bitstream, temp);
      }
-     if(mpz_sizeinbase(*bitstream, 2) != 20000) croak("Bit sequence has length of %d bits in autocorrelation function", mpz_sizeinbase(*bitstream, 2));
+     if(mpz_sizeinbase(*bitstream, 2) != 20000) croak("Bit sequence has length of %d bits in autocorrelation function", (int)mpz_sizeinbase(*bitstream, 2));
 
      index = 19999 - offset;
      for(i = 0; i < index - 1; ++i) {
@@ -6344,7 +6265,7 @@ int autocorrelation_20000(pTHX_ mpz_t * bitstream, int offset) {
       mpz_mul_2exp(temp, temp, 19999 + offset);
       mpz_add(*bitstream, *bitstream, temp);
     }
-   if(mpz_sizeinbase(*bitstream, 2) != 20000 + offset) croak("Bit sequence has length of %d bits in autocorrelation_20000 function; should have size of %d bits", mpz_sizeinbase(*bitstream, 2), 20000 + offset);
+   if(mpz_sizeinbase(*bitstream, 2) != 20000 + offset) croak("Bit sequence has length of %d bits in autocorrelation_20000 function; should have size of %d bits", (int)mpz_sizeinbase(*bitstream, 2), 20000 + offset);
 
     for(i = 0; i < 19999; ++i) {
       if(mpz_tstbit(*bitstream, i) ^ mpz_tstbit(*bitstream, i + offset)) count += 1;
@@ -6440,12 +6361,33 @@ void _dump_mbi_gmp(pTHX_ SV * b) {
 }
 
 int _SvIOK(pTHX_ SV * sv) {
-  if(SvIOK(sv)) return 1;
+  if(SV_IS_IOK(sv)) return 1;
   return 0;
 }
 
 int _SvPOK(SV * sv) {
+  if(SV_IS_POK(sv)) return 1;
+  return 0;
+}
+
+int _SvNOK(SV * sv) {
+  if(SV_IS_NOK(sv)) return 1;
+  return 0;
+}
+
+int IOK_flag(SV * sv) {
+  if(SvUOK(sv)) return 2;
+  if(SvIOK(sv)) return 1;
+  return 0;
+}
+
+int POK_flag(SV * sv) {
   if(SvPOK(sv)) return 1;
+  return 0;
+}
+
+int NOK_flag(SV * sv) {
+  if(SvNOK(sv)) return 1;
   return 0;
 }
 
@@ -6571,12 +6513,39 @@ CODE:
   RETVAL = Rmpz_init_set_si (aTHX_ p);
 OUTPUT:  RETVAL
 
-SV *
-Rmpz_init_set_IV (p)
-	SV *	p
-CODE:
-  RETVAL = Rmpz_init_set_IV (aTHX_ p);
-OUTPUT:  RETVAL
+void
+Rmpz_set_uj (copy, original)
+	mpz_t *	copy
+	UV	original
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpz_set_uj(copy, original);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+void
+Rmpz_set_sj (copy, original)
+	mpz_t *	copy
+	IV	original
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpz_set_sj(copy, original);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 void
 Rmpz_set_IV (copy, original)
@@ -6596,18 +6565,72 @@ Rmpz_set_IV (copy, original)
         return; /* assume stack size is correct */
 
 SV *
+Rmpz_init_set_IV (p)
+	SV *	p
+CODE:
+  RETVAL = Rmpz_init_set_IV (aTHX_ p);
+OUTPUT:  RETVAL
+
+SV *
+Rmpz_init_set_IV_nobless (p)
+	SV *	p
+CODE:
+  RETVAL = Rmpz_init_set_IV_nobless (aTHX_ p);
+OUTPUT:  RETVAL
+
+SV *
+_Rmpz_get_IV (n)
+	mpz_t *	n
+CODE:
+  RETVAL = _Rmpz_get_IV (aTHX_ n);
+OUTPUT:  RETVAL
+
+int
+Rmpz_fits_IV_p (n)
+	mpz_t *	n
+CODE:
+  RETVAL = Rmpz_fits_IV_p (aTHX_ n);
+OUTPUT:  RETVAL
+
+double
+Rmpz_get_d (n)
+	mpz_t *	n
+
+NV
+Rmpz_get_NV (n)
+	mpz_t *	n
+
+int
+Rmpz_cmp_IV (z, iv)
+	mpz_t *	z
+	SV *	iv
+CODE:
+  RETVAL = Rmpz_cmp_IV (aTHX_ z, iv);
+OUTPUT:  RETVAL
+
+SV *
 Rmpz_init_set_d (p)
 	SV *	p
 CODE:
   RETVAL = Rmpz_init_set_d (aTHX_ p);
 OUTPUT:  RETVAL
 
-SV *
-Rmpz_init_set_NV (p)
+void
+_mpf_set_dd (q, p)
+	mpf_t *	q
 	SV *	p
-CODE:
-  RETVAL = Rmpz_init_set_NV (aTHX_ p);
-OUTPUT:  RETVAL
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        _mpf_set_dd(q, p);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 void
 Rmpz_set_NV (copy, original)
@@ -6625,6 +6648,20 @@ Rmpz_set_NV (copy, original)
         }
         /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
+
+SV *
+Rmpz_init_set_NV (p)
+	SV *	p
+CODE:
+  RETVAL = Rmpz_init_set_NV (aTHX_ p);
+OUTPUT:  RETVAL
+
+SV *
+Rmpz_init_set_NV_nobless (p)
+	SV *	p
+CODE:
+  RETVAL = Rmpz_init_set_NV_nobless (aTHX_ p);
+OUTPUT:  RETVAL
 
 SV *
 Rmpz_init_set_str (num, base)
@@ -6873,31 +6910,6 @@ Rmpz_get_ui (n)
 
 long
 Rmpz_get_si (n)
-	mpz_t *	n
-
-SV *
-_Rmpz_get_IV (n)
-	mpz_t *	n
-CODE:
-  RETVAL = _Rmpz_get_IV (aTHX_ n);
-OUTPUT:  RETVAL
-
-int
-Rmpz_fits_IV_p (n)
-	mpz_t *	n
-CODE:
-  RETVAL = Rmpz_fits_IV_p (aTHX_ n);
-OUTPUT:  RETVAL
-
-int
-Rmpz_fits_UV_p (n)
-	mpz_t *	n
-CODE:
-  RETVAL = Rmpz_fits_UV_p (aTHX_ n);
-OUTPUT:  RETVAL
-
-double
-Rmpz_get_d (n)
 	mpz_t *	n
 
 void
@@ -9458,6 +9470,22 @@ OUTPUT:  RETVAL
 
 int
 _SvPOK (sv)
+	SV *	sv
+
+int
+_SvNOK (sv)
+	SV *	sv
+
+int
+IOK_flag (sv)
+	SV *	sv
+
+int
+POK_flag (sv)
+	SV *	sv
+
+int
+NOK_flag (sv)
 	SV *	sv
 
 SV *

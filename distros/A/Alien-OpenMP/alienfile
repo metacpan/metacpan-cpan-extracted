@@ -16,16 +16,18 @@ configure {
 };
 
 plugin 'Probe::CBuilder' => (
-  cflags  => Alien::OpenMP::configure->cflags,
-  lang    => 'C',
-  libs    => Alien::OpenMP::configure->libs,
-  options => {quiet => 0},
-  program => join("\n" => <DATA>),
+  lang         => 'C',
+  cflags       => Alien::OpenMP::configure->cflags,
+  libs         => Alien::OpenMP::configure->libs,
+  options      => {quiet => 0},
+  program      => join("\n" => <DATA>),
 );
 
 after probe => sub {
   # only reached on success AFAICT
-  shift->install_prop->{'alien_openmp_compiler_has_openmp'} = 1;
+  my $build = shift;
+  $build->install_prop->{'alien_openmp_compiler_has_openmp'} = 1;
+  $build->runtime_prop->{auto_include}                       = Alien::OpenMP::configure->auto_include;
 };
 
 share {

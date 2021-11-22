@@ -1,6 +1,6 @@
 package App::optex::textconv;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use v5.14;
 use warnings;
@@ -14,7 +14,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -44,11 +44,49 @@ Next command simply produces the same result.
 
     $ diff OLD.docx NEW.docx
 
+=head2 FILE FORMATS
+
+=over 7
+
+=item msdoc
+
+Microsoft office format files in XML (.docx, .pptx, .xlsx, .docm,
+.pptm, .xlsm).
+See L<App::optex::textconv::msdoc>.
+
+=item pdf
+
+Use L<pdftotext(1)> command to covert PDF format.
+See L<App::optex::textconv::pdf>.
+
+=item jpeg
+
+JPEG files is converted to their exif information (.jpeg, .jpg).
+
+=item http
+
+Name start with C<http://> or C<https://> is converted to text data
+translated by L<w3c(1)> command.
+
+=item pandoc
+
+Use L<pandoc|https://pandoc.org/> command to translate Microsoft
+office document in XML format.
+See L<App::optex::textconv::pandoc>.
+
+=item tika
+
+Use L<Pache Tika|https://tika.apache.org/> command to translate
+Microsoft office document in XML and non-XML format.
+See L<App::optex::textconv::tika>.
+
+=back
+
 =head1 MICROSOFT DOCUMENTS
 
 Microsoft office document in XML format (.docx, .pptx, .xlsx) is
 converted to plain text by original code implemented in
-C<App::optex::textconv::msdoc> module.  Algorithm used in this module
+L<App::optex::textconv::msdoc> module.  Algorithm used in this module
 is extremely simple, and consequently runs fast.
 
 Two module are included in this distribution to use other external
@@ -107,7 +145,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2019-2020 Kazumasa Utashiro.
+Copyright 2019-2021 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

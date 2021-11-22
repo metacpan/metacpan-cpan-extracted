@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Slatec;
 
-our @EXPORT_OK = qw( eigsys matinv polyfit polycoef polyvalue PDL::PP svdc PDL::PP poco PDL::PP geco PDL::PP gefa PDL::PP podi PDL::PP gedi PDL::PP gesl PDL::PP rs PDL::PP ezffti PDL::PP ezfftf PDL::PP ezfftb PDL::PP pcoef PDL::PP pvalue PDL::PP chim PDL::PP chic PDL::PP chsp PDL::PP chfd PDL::PP chfe PDL::PP chia PDL::PP chid PDL::PP chcm PDL::PP chbs PDL::PP polfit );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(eigsys matinv polyfit polycoef polyvalue svdc poco geco gefa podi gedi gesl rs ezffti ezfftf ezfftb pcoef pvalue chim chic chsp chfd chfe chia chid chcm chbs polfit );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Slatec ;
+
 
 
 
@@ -99,10 +98,7 @@ data using L</chcm>.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -1679,12 +1675,10 @@ the copyright notice should be included in the file.
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

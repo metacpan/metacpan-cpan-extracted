@@ -10,40 +10,6 @@ use File::Spec;
 # file globals(!)
 my ($pdl_f77conf, $seen_f77conf);
 
-sub checkbuggysetup {
-    # detect buggy Perl setups
-    my($dot);
-    for(@INC) {$dot += $_ eq '.'}
-    $dot-- if($INC[-1] eq '.');
-    if($dot) {
-	$INC = join(":",@INC);
-	warn << "EOM"
-
-**********************************************************************
-Your Perl \@INC path is:
-
-$INC
-
-That seems to include the directory '.' before the last entry in the
-path.  Configurations like that might be broken, because they may
-prevent strict division of hierarchy in the module name space.
-In particular, adding a module Foo::Bar::Baz can cause trouble
-if Baz exists in the top level elsewhere, and if you run from the
-Foo/Bar directory.
-
-This happens with the PDL::Config and some other modules.  You may
-not be able to build PDL with this \@INC setup.
-
-If you strike trouble, you may need to fix your \@INC.
-**********************************************************************
-
-
-EOM
-unless $ENV{PDL_INC_OK};
-}
-
-}
-
 # The user specifies configuration options using the PDL_CONFIG
 # array in perldl.conf - or ~/.perldl.conf or via the PDLCONF command-line
 # argument.
@@ -141,8 +107,6 @@ use warnings;
 	}
 } @ARGV;
 
-checkbuggysetup(); # check for buggy Perl setups
-
 # needs to be called before any of the make_XX routines
 getpdl_config();
 $seen_f77conf = check_f77conf($seen_f77conf);
@@ -150,6 +114,7 @@ $seen_f77conf = check_f77conf($seen_f77conf);
 # this will make PDL::Core::Dev's functions available
 # in Makefile.PL files in all subdirectories
 require "./Basic/Core/Dev.pm"; PDL::Core::Dev->import();
+$INC{'PDL/Core/Dev.pm'} = 1; # so require P:C:Dev will report success after
 
 my @podpms = map { $_.".pod", '$(INST_LIBDIR)/PDL/' . $_ .".pod"}
   qw/Bugs/;
@@ -292,7 +257,9 @@ doctest ::
 %HTML%	$(NOECHO) $(ECHO) "doctest: Building PDL documentation web pages in blib ..."
 %HTML%	$(NOECHO) $(PERLRUNINST) Doc$(DFSEP)mkhtmldoc.pl
 
-doc_site_install ::
+doc_site_install :: doc_pdldoc_install
+
+doc_pdldoc_install :: pure_install # needs installed .../PDL dir to exist
 	$(NOECHO) $(ECHO) "doc_site_install: Building PDL documentation database ..."
 	$(NOECHO) $(PERLRUNINST) Doc$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLSITEARCH)"
 %HTML%	$(NOECHO) $(ECHO) "doc_site_install: Building PDL documentation web pages ..."

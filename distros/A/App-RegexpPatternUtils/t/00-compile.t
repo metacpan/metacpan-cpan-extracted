@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/RegexpPatternUtils.pm'
@@ -17,7 +17,6 @@ my @scripts = (
     'script/list-regexp-pattern-modules',
     'script/list-regexp-pattern-patterns',
     'script/match-with-regexp-pattern',
-    'script/rpgrep',
     'script/show-regexp-pattern-module'
 );
 

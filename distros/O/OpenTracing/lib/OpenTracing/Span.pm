@@ -3,7 +3,7 @@ package OpenTracing::Span;
 use strict;
 use warnings;
 
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(OpenTracing::Common);
@@ -53,8 +53,8 @@ sub new {
     my ($class, %args) = @_;
     $args{operation_name} //= (caller 1)[3];
     if(my $parent = $args{parent}) {
-        $args{parent_id} = $parent->id;
-        $args{trace_id} = $parent->trace_id;
+        $args{parent_id} = $parent->{id};
+        $args{trace_id} = $parent->{trace_id};
     }
 
     # Alternatively reduce { $a * 1_000_000 + $b } Time::HiRes::gettimeofday(),
@@ -210,6 +210,37 @@ sub tag : method {
     return $self;
 }
 
+=head2 references
+
+The references relating to this span.
+
+=cut
+
+sub references { shift->{references} }
+
+=head2 reference_list
+
+A list of reference entries for this span, as L<OpenTracing::Reference> instances.
+
+=cut
+
+sub reference_list {
+    (shift->{references} //= [])->@*
+}
+
+
+=head2 reference
+
+Records a reference.
+
+=cut
+
+sub reference : method {
+    my ($self, %args) = @_;
+    push +($self->{references} //= [])->@*, my $reference = OpenTracing::Reference->new(%args);
+    $reference;
+}
+
 =head2 tracer
 
 Returns the L<OpenTracing::Tracer> for this span.
@@ -252,5 +283,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2021. Licensed under the same terms as Perl itself.
 

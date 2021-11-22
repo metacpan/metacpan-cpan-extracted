@@ -1,0 +1,29 @@
+CHANGES
+CONTRIBUTING.md
+lib/Cookie.pm
+lib/Cookie/Domain.pm
+lib/Cookie/Jar.pm
+lib/Cookie/public_suffix_list.txt
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+scripts/startup.pl
+t/001_load.t
+t/002_domain.t
+t/003_cookie.t
+t/004_cookies.t
+t/005_modperl.t
+t/090_coverage.t
+t/091_pod.t
+t/092_manifest.t
+t/093_prereq.t
+t/099_kwalitee.t
+t/conf/extra.conf.in
+t/CookieTest.pm
+t/server.crt
+t/server.key
+t/TEST.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

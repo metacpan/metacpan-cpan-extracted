@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-use 5.026; # signatures
-use Object::Pad 0.41;
+use v5.26; # signatures
+use Object::Pad 0.57;
 
-package Tickit::Widget::Choice 0.05;
+package Tickit::Widget::Choice 0.06;
 class Tickit::Widget::Choice
-   extends Tickit::Widget;
+   :isa(Tickit::Widget);
 
 use Carp;
 
@@ -81,9 +81,9 @@ has $_on_changed :param = undef;
 
 has $_chosen;
 
-BUILD ( %params )
+ADJUSTPARAMS ( $params )
 {
-   $self->push_choice( @$_ ) for @{ $params{choices} || [] };
+   $self->push_choice( @$_ ) for @{ delete $params->{choices} || [] };
 }
 
 method lines () { 1 }

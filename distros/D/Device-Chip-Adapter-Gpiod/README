@@ -1,0 +1,41 @@
+NAME
+    Device::Chip::Adapter::Gpiod - Device::Chip::Adapter implementation for
+    Linux GPIO character devices
+
+DESCRIPTION
+    This module allows Device::Chip to use Linux GPIO character devices
+    through the libgpiod library.
+
+CONSTRUCTOR
+  new
+      my $adapter = Device::Chip::Adapter::Gpiod->new(device => "gpiochip0");
+
+    Returns a new "Device::Chip::Adapter::Gpiod" instance. The "device"
+    argument indicates the GPIO chip to use. It is passed to
+    "gpiod_chip_open_lookup()", which takes either a device node name, full
+    path, or chip number. For example, it is possible to use either
+    "gpiochip2", "/dev/gpiochip2", or 2 to open the same device.
+
+PROTOCOLS
+    Only the "GPIO" protocol is supported:
+
+      my $protocol = $adapter->make_protocol('GPIO');
+
+BUGS AND LIMITATIONS
+    The "meta_gpios" method is not yet supported.
+
+    The "tris_gpios" method is not yet supported.
+
+    Libgpiod supports passing a "consumer" string when GPIO lines are opened
+    that can identify the application using them. This is currently always
+    set to "Device::Chip".
+
+AUTHOR
+    Stephen Cavilia <sac@atomicradi.us>
+
+COPYRIGHT
+    Copyright 2021 Stephen Cavilia
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -15,7 +15,7 @@ BEGIN { select STDERR; $|=1; select STDOUT; $|=0; }
 ## Globals
 ##----------------------------------------------------------------------
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 ##-- program vars
 our $prog         = basename($0);

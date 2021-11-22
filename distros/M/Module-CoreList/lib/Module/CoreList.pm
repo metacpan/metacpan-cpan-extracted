@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20211020';
+our $VERSION = '5.20211120';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -384,6 +384,7 @@ sub changes_between {
     5.035003 => '2021-08-20',
     5.035004 => '2021-09-20',
     5.035005 => '2021-10-21',
+    5.035006 => '2021-11-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -18974,6 +18975,36 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.035006 => {
+        delta_from => 5.035005,
+        changed => {
+            'B::Op_private'         => '5.035006',
+            'Config'                => '5.035006',
+            'File::Glob'            => '1.37',
+            'File::stat'            => '1.12',
+            'GDBM_File'             => '1.22',
+            'HTTP::Tiny'            => '0.080',
+            'Math::BigFloat'        => '1.999827',
+            'Math::BigFloat::Trace' => '0.63',
+            'Math::BigInt'          => '1.999827',
+            'Math::BigInt::Calc'    => '1.999827',
+            'Math::BigInt::FastCalc'=> '0.5012',
+            'Math::BigInt::Lib'     => '1.999827',
+            'Math::BigInt::Trace'   => '0.63',
+            'Math::BigRat'          => '0.2620',
+            'Module::CoreList'      => '5.20211120',
+            'Module::CoreList::Utils'=> '5.20211120',
+            'POSIX'                 => '2.02',
+            'bigint'                => '0.63',
+            'bignum'                => '0.63',
+            'bigrat'                => '0.63',
+            'diagnostics'           => '1.39',
+            'feature'               => '1.69',
+            'warnings'              => '1.56',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -20221,6 +20252,13 @@ sub is_core
         removed => {
         }
     },
+    5.035006 => {
+        delta_from => 5.035005,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -20411,6 +20449,7 @@ sub is_core
     'Math::BigInt::Lib'     => 'cpan',
     'Math::BigInt::Trace'   => 'cpan',
     'Math::BigRat'          => 'cpan',
+    'Math::BigRat::Trace'   => 'cpan',
     'Math::Complex'         => 'cpan',
     'Math::Trig'            => 'cpan',
     'Memoize'               => 'cpan',
@@ -20839,6 +20878,7 @@ sub is_core
     'Math::BigInt::Lib'     => undef,
     'Math::BigInt::Trace'   => undef,
     'Math::BigRat'          => undef,
+    'Math::BigRat::Trace'   => undef,
     'Math::Complex'         => undef,
     'Math::Trig'            => undef,
     'Memoize'               => undef,

@@ -11,6 +11,7 @@ struct HandleType {
     const char* name;
     HandleType (const char* val) : name(val) {}
     bool operator== (const HandleType& oth) const { return name == oth.name; }
+    bool operator!= (const HandleType& oth) const { return name != oth.name; }
     bool operator<  (const HandleType& oth) const { return name < oth.name; }
 };
 std::ostream& operator<< (std::ostream& out, const HandleType&);

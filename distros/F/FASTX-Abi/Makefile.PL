@@ -13,6 +13,11 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "FASTX-Abi",
+  "EXE_FILES" => [
+    "bin/abi2fq",
+    "bin/mergeabi",
+    "bin/stripabitags"
+  ],
   "LICENSE" => "mit",
   "MIN_PERL_VERSION" => "5.016",
   "NAME" => "FASTX::Abi",
@@ -22,7 +27,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => "2.1",
     "File::Basename" => "2.5"
   },
-  "VERSION" => "0.11",
+  "VERSION" => "1.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

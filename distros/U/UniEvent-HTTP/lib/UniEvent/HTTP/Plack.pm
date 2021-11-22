@@ -23,25 +23,24 @@ sub make_config {
     my $backlog = $p->{backlog};
     
     my $listen = $p->{listen} ||= [];
-    if (!@$listen and $p->{host} and $p->{port}) {
+    if (!@$listen and $p->{host} and defined($p->{port})) {
         push @$listen, "$p->{host}:$p->{port}";
     }
     
     foreach my $row (@$listen) {
         my ($host, $port) = split ':', $row;
+        my $loc = {};
         if (defined $port) {
             # host:port
-            my $loc = {
-                host => $host || '*',
-                port => $port,
-            };
-            $loc->{backlog} = $backlog if $backlog;
-            $loc->{ssl_ctx} = $ssl_ctx if $ssl_ctx;
-            push @$locations, $loc;
+            $loc->{host} = $host || '*';
+            $loc->{port} = $port;
         } else {
-            # path (unix socket)
-            die "unix sockets are not supported by UniEvent::HTTP yet";
+            # path for unix socket / name for windows named pipe
+            $loc->{path} = $row;
         }
+        $loc->{backlog} = $backlog if $backlog;
+        $loc->{ssl_ctx} = $ssl_ctx if $ssl_ctx;
+        push @$locations, $loc;
     }
 
     foreach my $name (qw/idle_timeout max_headers_size max_body_size tcp_nodelay max_keepalive_requests/) {

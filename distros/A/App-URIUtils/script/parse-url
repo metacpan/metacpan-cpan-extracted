@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/URIUtils/parse_url
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-30'; # DATE
+our $DATE = '2021-06-30'; # DATE
 our $DIST = 'App-URIUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,15 +40,48 @@ parse-url - Parse URL string into a hash of information
 
 =head1 VERSION
 
-This document describes version 0.001 of parse-url (from Perl distribution App-URIUtils), released on 2020-10-30.
+This document describes version 0.003 of parse-url (from Perl distribution App-URIUtils), released on 2021-06-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % parse-url [--debug] [--format=name] [--json] [--log-level=level]
-     [--(no)naked-res] [--page-result[=program]] [--quiet] [--trace]
-     [--verbose] [--view-result[=program]] <url> [base]
+     [--(no)naked-res] [-p] [--page-result[=program]] [--parse-type=s]
+     [--quiet] [-t=s] [--trace] [--verbose] [--view-result[=program]] --
+     <url> [base]
+
+Examples:
+
+ % parse-url 'https://www.tokopedia.com/search?st=product&q=soundmagic%20e10'
+ +-----------------------+----------------------------------------------------------------+
+ | key                   | value                                                          |
+ +-----------------------+----------------------------------------------------------------+
+ | authority             | www.tokopedia.com                                              |
+ | base                  |                                                                |
+ | canonical             | https://www.tokopedia.com/search?st=product&q=soundmagic%20e10 |
+ | default_port          | 443                                                            |
+ | fragment              |                                                                |
+ | full_path             | /search?st=product&q=soundmagic%20e10                          |
+ | has_recognized_scheme | 1                                                              |
+ | host                  | www.tokopedia.com                                              |
+ | opaque                | //www.tokopedia.com/search?st=product&q=soundmagic%20e10       |
+ | orig                  | https://www.tokopedia.com/search?st=product&q=soundmagic%20e10 |
+ | path                  | /search                                                        |
+ | port                  | 443                                                            |
+ | query                 | st=product&q=soundmagic e10                                    |
+ | scheme                | https                                                          |
+ +-----------------------+----------------------------------------------------------------+
+
+Just parse the query parameters into hash:
+
+ % parse-url -p 'https://www.tokopedia.com/search?st=product&q=soundmagic%20e10'
+ +-----+----------------+
+ | key | value          |
+ +-----+----------------+
+ | q   | soundmagic e10 |
+ | st  | product        |
+ +-----+----------------+
 
 =head1 OPTIONS
 
@@ -60,7 +93,27 @@ C<*> marks required options.
 
 =item B<--base>=I<s>
 
+Can also be specified as the 2nd command-line argument.
+
+=item B<--parse-type>=I<s>, B<-t>
+
+Default value:
+
+ "url"
+
+Valid values:
+
+ ["url","query-params"]
+
 =item B<--url>=I<s>*
+
+Can also be specified as the 1st command-line argument.
+
+=item B<-p>
+
+Shortcut for --parse-type=query-params.
+
+See C<--parse-type>.
 
 =back
 
@@ -207,7 +260,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

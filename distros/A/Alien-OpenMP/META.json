@@ -4,7 +4,7 @@
       "oodler <oodler@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,12 @@
             "Test::Pod" : "1.41"
          }
       },
+      "runtime" : {
+         "recommends" : {
+            "Inline" : "0.67",
+            "Inline::C" : "0.62"
+         }
+      },
       "test" : {
          "recommends" : {
             "CPAN::Meta" : "2.120900"
@@ -55,22 +61,31 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.52",
             "File::Spec" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Needs" : "0"
          }
       }
    },
    "provides" : {
       "Alien::OpenMP" : {
          "file" : "lib/Alien/OpenMP.pm",
-         "version" : "0.003005"
+         "version" : "0.003006"
       },
       "Alien::OpenMP::configure" : {
          "file" : "lib/Alien/OpenMP/configure.pm",
-         "version" : "0.003005"
+         "version" : "0.003006"
       }
    },
    "release_status" : "stable",
-   "version" : "0.003005",
+   "resources" : {
+      "homepage" : "https://github.com/Perl-OpenMP/p5-Alien-OpenMP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Perl-OpenMP/p5-Alien-OpenMP.git",
+         "web" : "https://github.com/Perl-OpenMP/p5-Alien-OpenMP"
+      }
+   },
+   "version" : "0.003006",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
@@ -79,7 +94,7 @@
       }
    },
    "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

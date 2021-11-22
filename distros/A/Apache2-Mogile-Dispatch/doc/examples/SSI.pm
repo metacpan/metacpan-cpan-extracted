@@ -1,4 +1,4 @@
-package SSI;
+package My::SSI;
 
 use strict;
 use warnings;

@@ -1,10 +1,153 @@
 ==================================================
-Changes from 2018-04-06 00:00:00 +0000 to present.
+Changes from 2020-11-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2019-04-06 04:29:32 +0000
+version 0.004 at 2021-11-20 21:01:47 +0000
 ------------------------------------------
+
+  Change: ef6bb1fa0db1191a6384f7285943c10471de0799
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 17:44:11 +0000
+
+    fix: proper URL for bug reporting 
+
+  Change: 5299e90cfc1ce83ccbc77c23fa8b228d6a605814
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 17:38:42 +0000
+
+    feat: find_receivers
+
+    Also applied small improvements and testing coverage. 
+
+  Change: 0f5ff8841c1104e9f5b68279bc98fd10e344974d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 14:39:20 +0000
+
+    refactor: using find_best_contacts 
+
+  Change: dc2423560bf448d932297e7839bfb3a7a993a718
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 14:28:09 +0000
+
+    fix: perltidy issues 
+
+  Change: dd2e7230ccf610948215e28e68a25728e4dfc939
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 14:04:55 +0000
+
+    fix: perltidy issues 
+
+  Change: dc48ea3dbd0469751ce184e97ccc5840fefd40b0
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 14:04:27 +0000
+
+    fix: perltidy issues 
+
+  Change: 6fdc47d6ac3c59d4ea9bd45847293d98a4ba6228
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 13:45:57 +0000
+
+    fix: small fixes on automation 
+
+  Change: b0ddea0394ffc3942539f7be6ce2e9b49c152bcc
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 12:49:35 +0000
+
+    refactor: using module HTMLParse 
+
+  Change: 99ebb0a2bed0428d537527606ba1df2c2875d697
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 12:49:08 +0000
+
+    fix: fixed broken tests 
+
+  Change: 1f1b3d22b0ac17953f344df3a95b8a8aeacf1e92
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 12:47:51 +0000
+
+    refactor: replacing SPAM header function 
+
+  Change: 6cf154200920678c49a06c26fc20249ad327cdb6
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 11:50:10 +0000
+
+    fix: returning array references from finders 
+
+  Change: 1ca295f1108babf90e2fc4aec8c980e5752037b5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-19 22:19:49 +0000
+
+    feat: new module 
+
+  Change: 10127fef26f73637e71be20aa466d93d7fc9398e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-15 23:04:15 +0000
+
+    refactor: HTMLParse initial development 
+
+  Change: a9329fb702b66efbb66d99db639ef4af37ae9ae0
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-15 22:10:01 +0000
+
+    refactor: reusing read_html 
+
+  Change: 00e81b2cfaf62d9681b1d47b643d4caffc0102ac
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-15 21:31:29 +0000
+
+    doc: cosmetic changes 
+
+  Change: 4b9df775273b180933d4e8831b4f36a38f5870a8
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-13 20:23:32 +0000
+
+    fix: removed perltidy comments 
+
+  Change: 42850bbda6d6e10989fd9c8773a896632330c531
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-13 20:11:38 +0000
+
+    doc: text enhancement 
+
+  Change: 34f1000b830e2360e6e280ddf775d040eb9591ce
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-11-12 17:38:30 +0000
+
+    feature: testing SPAM header parsing 
+
+  Change: 05d91fd2add75b9936a7394c41cbd4d0ff4a64bf
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-11-12 15:09:35 +0000
+
+    refactor: making functions private
+
+    In order to avoid having to add documentation in this stage where the
+    interface is still instable. 
+
+  Change: 3c0f5135dce5c9e6e9568912edf531c29f9f299a
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-11-12 13:45:47 +0000
+
+    fix: perltidy error 
+
+  Change: 128ed64642b3f5878a6c57a7b7fe2c7d6cee007b
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-11-12 13:22:32 +0000
+
+    fix: properly handling forms 
+
+  Change: 83af57e999810904209f15f7e658fa37847d1fad
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-11-11 22:40:19 +0000
+
+    refactor: initial form processing 
+
+  Change: 8e761baa6d52f111f4d7f5cb18397b51cd0f755d
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-11-11 22:38:41 +0000
+
+    fix: missing author dependency 
 
   Change: 015ec759a9869d3daf5a88e9cdb4fee92b9e3e53
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

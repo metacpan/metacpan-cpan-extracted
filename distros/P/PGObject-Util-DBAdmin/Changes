@@ -1,5 +1,13 @@
 Revision history for PGObject-Util-DBAdmin
 
+1.6.1   2021-11-07
+      * Fix syntax error
+
+1.6.0   2021-11-07
+      * Add support for passing variables to 'psql' invocations
+      * Sort keys in environment variable settings being logged
+      * Add support for the 'pg_isready' tool
+
 1.5.0   2021-09-25
       * Don't parse the server version string; use the database handle's
         'pg_server_version' property instead -- parsing the server version

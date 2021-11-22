@@ -1,0 +1,63 @@
+{
+   "abstract" : "Yet another interface to SWI-Prolog",
+   "author" : [
+      "Salvador Fandiño <sfandino@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Language-Prolog-Yaswi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.00"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Language::Prolog::Sugar" : "0.03",
+            "Language::Prolog::Types" : "0.09"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/salva/p5-Language-Prolog-Yaswi/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/salva/p5-Language-Prolog-Yaswi.git",
+         "web" : "https://github.com/salva/p5-Language-Prolog-Yaswi"
+      }
+   },
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

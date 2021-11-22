@@ -1,0 +1,40 @@
+---
+abstract: 'Dead-simple mocking'
+author:
+  - 'Curtis "Ovid" Poe <ovid@allaroundtheworld.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mock-Object
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Test::Mock::Object:
+    file: lib/Test/Mock/Object.pm
+    version: '0.1'
+  Test::Mock::Object::Chain:
+    file: lib/Test/Mock/Object/Chain.pm
+    version: '0.1'
+resources:
+  bugtracker: https://github.com/Ovid/test-mock-object/issues
+  homepage: https://github.com/Ovid/test-mock-object
+  repository: https://github.com/Ovid/test-mock-object.git
+version: '0.1'
+x_generated_by_perl: v5.22.0
+x_serialization_backend: 'YAML::Tiny version 1.69'
+x_spdx_expression: Artistic-2.0

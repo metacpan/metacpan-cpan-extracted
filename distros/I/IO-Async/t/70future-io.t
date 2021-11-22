@@ -6,6 +6,7 @@ use warnings;
 use IO::Async::Test;
 
 use Test::More;
+use Test::Future::IO::Impl;
 
 use lib ".";
 use t::TimeAbout;
@@ -62,5 +63,7 @@ testing_loop( IO::Async::Loop->new_builtin );
    1 while $rd->sysread( $buf, 4096 ) == 4096;
    is( $buf, "ABCD", 'Future::IO->syswrite wrote data' );
 }
+
+run_tests qw( sleep sysread syswrite waitpid );
 
 done_testing;

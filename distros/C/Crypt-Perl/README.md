@@ -4,6 +4,10 @@ Crypt::Perl - Cryptography in pure Perl
 
 # DESCRIPTION
 
+<div>
+    <a href='https://coveralls.io/github/FGasper/p5-Crypt-Perl?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Crypt-Perl/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
+
 Just as it sounds: cryptography with no non-core XS dependencies!
 This is useful if you don’t have access to
 other tools that do this work like [OpenSSL](http://openssl.org), [CryptX](https://metacpan.org/pod/CryptX),
@@ -16,21 +20,21 @@ See submodules for usage examples of:
 - Key parsing
 - Signing & verification
 - Encryption & decryption
-- Import ([Crypt::Perl::PK](https://metacpan.org/pod/Crypt::Perl::PK)) from & export to [JSON Web Key](https://tools.ietf.org/html/rfc7517) format
+- Import ([Crypt::Perl::PK](https://metacpan.org/pod/Crypt%3A%3APerl%3A%3APK)) from & export to [JSON Web Key](https://tools.ietf.org/html/rfc7517) format
 - [JWK thumbprints](https://tools.ietf.org/html/rfc7638)
-- Certificate Signing Request (PKCS #10) generation ([Crypt::Perl::PKCS10](https://metacpan.org/pod/Crypt::Perl::PKCS10))
-- SSL/TLS certificate (X.509) generation ([Crypt::Perl::X509v3](https://metacpan.org/pod/Crypt::Perl::X509v3)), including
+- Certificate Signing Request (PKCS #10) generation ([Crypt::Perl::PKCS10](https://metacpan.org/pod/Crypt%3A%3APerl%3A%3APKCS10))
+- SSL/TLS certificate (X.509) generation ([Crypt::Perl::X509v3](https://metacpan.org/pod/Crypt%3A%3APerl%3A%3AX509v3)), including
 a broad variety of extensions
 
 # SUPPORTED PUBLIC KEY ALGORITHMS
 
-- [RSA](https://metacpan.org/pod/Crypt::Perl::RSA)
-- [ECDSA](https://metacpan.org/pod/Crypt::Perl::ECDSA)
-- [Ed25519](https://metacpan.org/pod/Crypt::Perl::Ed25519)
+- [RSA](https://metacpan.org/pod/Crypt%3A%3APerl%3A%3ARSA)
+- [ECDSA](https://metacpan.org/pod/Crypt%3A%3APerl%3A%3AECDSA)
+- [Ed25519](https://metacpan.org/pod/Crypt%3A%3APerl%3A%3AEd25519)
 
 # SECURITY
 
-Random number generation here comes from [Bytes::Random::Secure::Tiny](https://metacpan.org/pod/Bytes::Random::Secure::Tiny).
+Random number generation here comes from [Bytes::Random::Secure::Tiny](https://metacpan.org/pod/Bytes%3A%3ARandom%3A%3ASecure%3A%3ATiny).
 See that module’s documentation for details of its reliability.
 
 An extensive test suite is included that compares against
@@ -54,7 +58,7 @@ Caveat emptor.
 # SPEED
 
 RSA key generation is slow—too slow, probably, unless you have
-[Math::BigInt::GMP](https://metacpan.org/pod/Math::BigInt::GMP) or [Math::BigInt::Pari](https://metacpan.org/pod/Math::BigInt::Pari) (either of which requires XS).
+[Math::BigInt::GMP](https://metacpan.org/pod/Math%3A%3ABigInt%3A%3AGMP) or [Math::BigInt::Pari](https://metacpan.org/pod/Math%3A%3ABigInt%3A%3APari) (either of which requires XS).
 It’s one application where pure-Perl cryptography just doesn’t seem
 feasible. :-( Everything else, though, including all ECDSA and Ed25519
 operations, should be fine even in pure Perl.

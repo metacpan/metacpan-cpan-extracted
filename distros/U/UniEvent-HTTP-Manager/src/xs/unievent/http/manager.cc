@@ -24,11 +24,24 @@ void fill (Manager::Config& cfg, const Hash& h) {
         case Manager::WorkerModel::Thread  : cfg.worker_model = Manager::WorkerModel::Thread; break;
         default: throw Simple("bad worker model supplied");
     }
-    if ((v = h.fetch("bind_model"))) switch ((Manager::BindModel)v.as_number<int>()) {
-        case Manager::BindModel::Duplicate : cfg.bind_model = Manager::BindModel::Duplicate; break;
-        case Manager::BindModel::ReusePort : cfg.bind_model = Manager::BindModel::ReusePort; break;
-        default: throw Simple("bad bind model supplied");
-    }
+}
+
+void fill (Hash& h, const Manager::Config& cfg) {
+    h["server"]              = xs::out<>(cfg.server);
+    h["min_servers"]         = xs::out<>(cfg.min_servers);
+    h["max_servers"]         = xs::out<>(cfg.max_servers);
+    h["min_spare_servers"]   = xs::out<>(cfg.min_spare_servers);
+    h["max_spare_servers"]   = xs::out<>(cfg.max_spare_servers);
+    h["min_load"]            = xs::out<>(cfg.min_load);
+    h["max_load"]            = xs::out<>(cfg.max_load);
+    h["load_average_period"] = xs::out<>(cfg.load_average_period);
+    h["max_requests"]        = xs::out<>(cfg.max_requests);
+    h["min_worker_ttl"]      = xs::out<>(cfg.min_worker_ttl);
+    h["check_interval"]      = xs::out<>(cfg.check_interval);
+    h["activity_timeout"]    = xs::out<>(cfg.activity_timeout);
+    h["termination_timeout"] = xs::out<>(cfg.termination_timeout);
+    h["force_worker_stop"]   = xs::out<>(cfg.force_worker_stop);
+    h["worker_model"]        = xs::out<>(int(cfg.worker_model));
 }
 
 }}}

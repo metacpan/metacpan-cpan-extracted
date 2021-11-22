@@ -36,7 +36,7 @@ use Binance::API::Request;
 use Binance::Exception::Parameter::BadValue;
 use Binance::Exception::Parameter::Required;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =head1 NAME
 
@@ -1014,6 +1014,59 @@ sub cancel_order {
     };
 
     return $self->ua->delete('/api/v3/order', { signed => 1, body => $body } );
+}
+
+=head2 cancel_open_orders
+
+    $api->cancel_open_orders( symbol => 'ETHBTC' );
+
+Cancel all active orders for a given symbol.
+
+B<PARAMETERS>
+
+=over
+
+=item symbol
+
+[REQUIRED] Symbol, for example C<ETHBTC>.
+
+=item recvWindow
+
+[OPTIONAL]
+
+=back
+
+B<RETURNS>
+    An ARRAYref of HASHrefs
+
+    [
+      {
+        "symbol": "ETHBTC",
+        "origClientOrderId": "myOrder1",
+        "orderId": 1,
+        "clientOrderId": "cancelMyOrder1"
+      }
+    ]
+
+=cut
+
+sub cancel_open_orders {
+    my ($self, %params) = @_;
+
+    unless ($params{'symbol'}) {
+        $self->log->error('Parameter "symbol" required');
+        Binance::Exception::Parameter::Required->throw(
+            error => 'Parameter "symbol" required',
+            parameters => ['symbol']
+        );
+    }
+
+    my $body = {
+        symbol             => $params{'symbol'},
+        recvWindow         => $params{'recvWindow'},
+    };
+
+    return $self->ua->delete('/api/v3/openOrders', { signed => 1, body => $body } );
 }
 
 =head2 open_orders

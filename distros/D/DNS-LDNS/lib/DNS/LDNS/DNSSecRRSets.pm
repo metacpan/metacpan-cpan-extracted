@@ -4,9 +4,9 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS;
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 # Note: Since this class does not have a constructor, we can let its child
 # objects be owned by the parent. This reduces the recursion depth on
@@ -56,7 +56,7 @@ DNS::LDNS::DNSSecRRSets - Linked list of rrsets in a dnssec zone
 
 =head1 SYNOPSIS
 
-  use DNS::LDNS ':all'
+  use DNS::LDNS ();
 
   rrs = rrsets->rrs
   rrs = rrsets->signatures

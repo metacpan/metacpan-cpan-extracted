@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the AcousticBrainz API
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0600';
 
 use Moo;
 use strictures 2;
@@ -11,7 +11,6 @@ use namespace::clean;
 
 use Carp;
 use Mojo::UserAgent;
-use Mojo::JSON::MaybeXS;
 use Mojo::JSON qw( decode_json );
 use Mojo::URL;
 use Try::Tiny;
@@ -19,7 +18,7 @@ use Try::Tiny;
 
 has base => (
     is      => 'rw',
-    default => sub { Mojo::URL->new('https://acousticbrainz.org/api/v1') },
+    default => sub { 'https://acousticbrainz.org' },
 );
 
 
@@ -32,17 +31,13 @@ has ua => (
 sub fetch {
     my ( $self, %args ) = @_;
 
-    my $query;
-    if ( $args{query} ) {
-        $query = join '&', map { "$_=$args{query}->{$_}" } keys %{ $args{query} };
-    }
-
     croak 'No mbid provided' unless $args{mbid};
     croak 'No endpoint provided' unless $args{endpoint};
+    croak 'No query provided' unless $args{query};
 
-    my $url = $self->base . '/'. $args{mbid} . '/'. $args{endpoint};
-    $url .= '?' . $query
-        if $query;
+    my $url = Mojo::URL->new($self->base)
+        ->path('/api/v1/' . $args{mbid} . '/'. $args{endpoint})
+        ->query(%{ $args{query} });
 
     my $tx = $self->ua->get($url);
 
@@ -61,11 +56,11 @@ sub _handle_response {
     if ( $res->is_success ) {
         my $body = $res->body;
         try {
-            $data = decode_json( $res->body );
+            $data = decode_json($body);
         }
         catch {
             croak $body, "\n";
-        }
+        };
     }
     else {
         croak "Connection error: ", $res->message;
@@ -88,7 +83,7 @@ WebService::AcousticBrainz - Access to the AcousticBrainz API
 
 =head1 VERSION
 
-version 0.0401
+version 0.0600
 
 =head1 SYNOPSIS
 
@@ -110,7 +105,7 @@ C<WebService::AcousticBrainz> provides access to the L<https://acousticbrainz.or
 
 =head2 base
 
-The base URL.  Default: https://acousticbrainz.org/api/v1
+The base URL.  Default: https://acousticbrainz.org
 
 =head2 ua
 
@@ -118,13 +113,13 @@ The user agent.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
   $w = WebService::AcousticBrainz->new;
 
 Create a new C<WebService::AcousticBrainz> object.
 
-=head2 fetch()
+=head2 fetch
 
   $r = $w->fetch(%arguments);
 
@@ -133,15 +128,19 @@ optional B<query> arguments.
 
 =head1 SEE ALSO
 
+The F<t/*> tests
+
+The F<eg/*> programs
+
+L<https://acousticbrainz.org/data>
+
 L<Moo>
 
 L<Mojo::UserAgent>
 
 L<Mojo::JSON>
 
-L<Mojo::JSON::MaybeXS>
-
-L<https://acousticbrainz.org/data>
+L<Try::Tiny>
 
 =head1 AUTHOR
 
@@ -149,7 +148,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

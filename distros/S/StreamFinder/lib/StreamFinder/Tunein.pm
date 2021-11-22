@@ -415,6 +415,9 @@ sub new
 	$ua->env_proxy;
 
 	(my $url2fetch = $url);
+
+	my $tried = 0;
+TRYIT:
 	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
 	if ($url2fetch =~ m#^https?\:#) {
 		($self->{'id'} = $url) =~ s#^.*?\/([a-zA-Z0-9\-\_]+)(?:\/?|\/\?[^\/]+\/?)$#$1#;
@@ -424,7 +427,7 @@ sub new
 		$url2fetch = ($podcastid ? 'https://tunein.com/podcasts/' : 'https://tunein.com/radio/'). $id;
 		$url2fetch .= '/?topicId=' . $podcastid  if ($podcastid);
 	}
-	print STDERR "-1 FETCHING URL=$url2fetch=\n"  if ($DEBUG);
+	print STDERR "-1 (try=$tried) FETCHING URL=$url2fetch=\n"  if ($DEBUG);
 	my $response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
@@ -493,12 +496,17 @@ sub new
 		}
 		print STDERR "i:Found stream ($one) in page.\n"  if ($DEBUG);
 	}
-	if ($self->{'cnt'}) {   #STREAM(S) FOUND, PBLY A PODCAST:
+	if ($self->{'cnt'}) {   #STREAM(S) FOUND, PBLY. A PODCAST (EPISODE):
 		$self->{'id'} .= '/' . $1  if ($html =~ s#\"guideId\"\:\"([^\"]+)\"\,STREAMFINDER_MARK#STREAMFINDER_MARK#i);
 		$self->{'created'} = $1  if ($html =~ s#\"publishTime\"\:\"([^\"]*)\"\,STREAMFINDER_MARK##i);
 		$self->{'year'} = (defined($self->{'created'}) && $self->{'created'} =~ /(\d\d\d\d)/) ? $1 : '';
 		print STDERR "i:Podcast found, ID changed to (".$self->{'id'}."), year (".$self->{'year'}.").\n"  if ($DEBUG);
-	} else {  #(USUALLY) NO STREAMS FOUND, TRY youtube-dl! (PBLY A STATION):
+	} elsif ($html =~ m#\bhref\=\".+?\/\?topicId\=([^\"]+)#) {  #NO STREAMS FOUND, BUT WE'RE A PODCAST (PAGE):
+		$url2fetch = 'https://tunein.com/podcasts/'.$self->{'id'}.'/?topicId=' . $1;
+		print STDERR "--RETRY (PODCAST PAGE) 1ST EPISODE URL=$url2fetch=\n"  if ($DEBUG);
+		++$tried;
+		goto TRYIT;
+	} elsif (!$tried) {  #(USUALLY) NO STREAMS / PODCASTS EPISODES FOUND, TRY youtube-dl! (PBLY. A STATION):
 		my $haveYoutube = 0;
 		eval { require 'StreamFinder/Youtube.pm'; $haveYoutube = 1; };
 		if ($haveYoutube) {

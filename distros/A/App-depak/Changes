@@ -1,3 +1,8 @@
+0.584   2021-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: code_after_shebang.
+
+
 0.583   2020-04-29  Released-By: PERLANCAR; Urgency: low
 
 	- Tweak Rinci metadata: replace deprecated

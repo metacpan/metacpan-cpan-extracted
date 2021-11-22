@@ -10697,7 +10697,7 @@ EOT
 pp_def(
 	'augment',
 	DefaultFlow => 1,
-	Reversible => 1,
+	TwoWay => 1,
 	Pars => 'x(n); y(p);[o]out(q)',
 	RedoDimsCode => '$SIZE(q) = ( $PDL(x)->ndims > 0 ? $PDL(x)->dims[0] : 1) + ( $PDL(y)->ndims > 0 ? $PDL(y)->dims[0] : 1);',
 	Code => '
@@ -10740,7 +10740,7 @@ EOT
 pp_def(
 	'mstack',
 	DefaultFlow => 1,
-	Reversible => 1,
+	TwoWay => 1,
 	Pars => 'x(n,m);y(n,p);[o]out(n,q);',
 	RedoDimsCode => '$SIZE(q) = $PDL(x)->dims[1] + $PDL(y)->dims[1];',
 	Code => '

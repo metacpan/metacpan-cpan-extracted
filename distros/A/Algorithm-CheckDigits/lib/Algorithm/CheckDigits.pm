@@ -28,7 +28,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( CheckDigits );
 
-use version; our $VERSION = qv('v1.3.5');
+use version; our $VERSION = qv('v1.3.6');
 
 my %methods = (
     'upc'                => [ 'Algorithm::CheckDigits::MBase_001',

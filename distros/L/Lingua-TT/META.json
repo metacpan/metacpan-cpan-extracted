@@ -4,13 +4,13 @@
       "Bryan Jurish <moocow@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-TT",
    "no_index" : {
@@ -44,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

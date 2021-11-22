@@ -17,4 +17,7 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
 plan tests => 3;
 pod_coverage_ok("Archive::BagIt", { also_private =>[ qw( BUILD BUILDARGS) ]});
 pod_coverage_ok("Archive::BagIt::Base");
-pod_coverage_ok("Archive::BagIt::Fast");
+SKIP: {
+    skip "IO::AIO required for testing Archive::BagIt::Fast", 1 unless eval "use IO::AIO; 1";
+    pod_coverage_ok("Archive::BagIt::Fast");
+}

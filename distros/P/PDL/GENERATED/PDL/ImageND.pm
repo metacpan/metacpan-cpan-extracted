@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::ImageND;
 
-our @EXPORT_OK = qw( kernctr PDL::PP convolve  ninterpol PDL::PP rebin  circ_mean circ_mean_p PDL::PP convolveND );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(kernctr convolve ninterpol rebin circ_mean circ_mean_p convolveND );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::ImageND ;
+
 
 
 
@@ -54,10 +53,7 @@ loaded.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -626,7 +622,7 @@ sub PDL::convolveND {
 
 
 
-;
+
 
 
 =head1 AUTHORS
@@ -648,5 +644,3 @@ the copyright notice should be included in the file.
 # Exit with OK status
 
 1;
-
-		   

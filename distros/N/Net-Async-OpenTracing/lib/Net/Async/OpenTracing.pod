@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::OpenTracing
 at lib/Net/Async/OpenTracing.pm
@@ -177,9 +176,9 @@ L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/a
 
 =head1 AUTHOR
 
-Tom Molesworth <TEAM@cpan.org>
+Tom Molesworth <TEAM@cpan.org> with contributions from C<chp9-u>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2021. Licensed under the same terms as Perl itself.
 

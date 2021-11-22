@@ -1,0 +1,9 @@
+0.001 2021-11-15 01:42:21-0500
+
+  Features
+
+   - First release.
+   - Checks to see if the system SWI-Prolog can build against Perl. There is
+     currently a bug where SWI-Prolog has an exported symbol PL_version that
+     conflicts with a symbol in Perl <https://github.com/SWI-Prolog/swipl-devel/issues/900>.
+     If the system SWI-Prolog does not work, builds a share install.

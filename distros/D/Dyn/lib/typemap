@@ -1,0 +1,65 @@
+TYPEMAP
+char *  T_PV
+char    T_CHAR
+
+// https://perldoc.perl.org/perlxs#Returning-SVs,-AVs-and-HVs-through-RETVAL
+AV    * T_AVREF_REFCOUNT_FIXED
+
+Dyncall   * T_PTROBJ_SPECIAL
+DynXSub   * T_PTROBJ_SPECIAL
+
+DCvoid      void
+DCCallVM  * T_PTROBJ_SPECIAL
+DCsize      T_INT
+DCshort     T_SHORT
+DCint       T_INT
+DCbool      T_BOOL
+DCchar      T_CHAR
+DClong      T_LONG
+DClonglong  LONG_LONG_INT
+DCfloat     T_FLOAT
+DCdouble    T_DOUBLE
+DCpointer * T_PTROBJ_SPECIAL
+DCstruct  * T_PTROBJ_SPECIAL
+DCsigchar * T_PV
+const DCsigchar * T_PV
+DCValue   * T_PTRREF
+DLLib     * T_PTROBJ_SPECIAL
+DLSyms    * T_PTRREF
+DCValue   * T_PTRREF
+DCValue     T_PTRREF
+
+DCValue * T_PTRREF
+DCpointer T_PTROBJ_SPECIAL
+const DCsigchar T_CHAR
+
+DCCallback * T_PTROBJ_SPECIAL
+DCCallbackHandler * T_PTRREF
+
+INPUT
+T_PV
+  $var = ($type)SvPV_nolen($arg)
+
+LONG_LONG_INT
+  $var = ($type)SvIV($arg);
+
+T_PTROBJ_SPECIAL
+  // $Package | $type | $ntype
+  if (sv_derived_from($arg, \"Dyn::${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s[(?:VM)?Ptr$][];$ntt=~s[^DC][];\$ntt}\")){
+    IV tmp = SvIV((SV*)SvRV($arg));
+    $var = INT2PTR($type, tmp);
+  }
+  else
+    croak(\"$var is not of type Dyn::${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s[(?:VM)?Ptr$][];$ntt=~s[^DC][];\$ntt}\")
+
+OUTPUT
+T_PV
+  sv_setpv((SV*)$arg, $var);
+
+LONG_LONG_INT
+  sv_setiv($arg, (IV)$var);
+
+T_PTROBJ_SPECIAL
+  // $Package | $type | $ntype
+  sv_setref_pv($arg, \"Dyn::${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s[(?:VM)?Ptr$][];$ntt=~s[^DC][];\$ntt}\",
+               (void*)$var);

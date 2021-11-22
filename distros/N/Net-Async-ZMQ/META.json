@@ -4,15 +4,25 @@
       "Zakariyya Mughal <zmughal@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Async-ZMQ",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -25,11 +35,11 @@
             "Fcntl" : "0",
             "IO::Async::Handle" : "0",
             "IO::Async::Notifier" : "0",
+            "Module::Load" : "0",
             "Package::Stash" : "0",
-            "ZMQ::Constants" : "0",
             "base" : "0",
             "if" : "0",
-            "perl" : "5.006",
+            "perl" : "5.013002",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -37,24 +47,32 @@
       "test" : {
          "requires" : {
             "IO::Async::Loop" : "0",
-            "Module::Load" : "0",
             "Test::Most" : "0",
-            "Test::Requires" : "0",
+            "Test::Needs" : "0",
+            "constant" : "0",
             "lib" : "0",
-            "perl" : "5.006"
+            "perl" : "5.013002"
+         },
+         "suggests" : {
+            "ZMQ::Constants" : "0",
+            "ZMQ::FFI" : "0",
+            "ZMQ::LibZMQ3" : "0",
+            "ZMQ::LibZMQ4" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/zmughal/p5-Net-Async-ZMQ",
+      "homepage" : "https://github.com/zmughal-CPAN/p5-Net-Async-ZMQ",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/zmughal/p5-Net-Async-ZMQ.git",
-         "web" : "https://github.com/zmughal/p5-Net-Async-ZMQ"
+         "url" : "https://github.com/zmughal-CPAN/p5-Net-Async-ZMQ.git",
+         "web" : "https://github.com/zmughal-CPAN/p5-Net-Async-ZMQ"
       }
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -13,7 +13,7 @@ Lab::Measurement::Examples::Example1_Simple_IV - Lab::Measurement for DUMMIES - 
 
 =head1 VERSION
 
-version 3.791
+version 3.792
 
 =head1 Abstract
 

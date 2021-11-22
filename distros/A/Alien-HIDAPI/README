@@ -16,7 +16,7 @@ GIT REPOSITORY
 
 SEE ALSO
 
-    HIDAPI <http://github.com/signal11/hidapi>
+    HIDAPI <http://github.com/libusb/hidapi>
 
     Alien
 

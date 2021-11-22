@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/RegexpPatternUtils.pm','script/get-regexp-pattern-pattern','script/list-regexp-pattern-modules','script/list-regexp-pattern-patterns','script/match-with-regexp-pattern','script/rpgrep','script/show-regexp-pattern-module'];
+my $filenames = ['lib/App/RegexpPatternUtils.pm','script/get-regexp-pattern-pattern','script/list-regexp-pattern-modules','script/list-regexp-pattern-patterns','script/match-with-regexp-pattern','script/show-regexp-pattern-module'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

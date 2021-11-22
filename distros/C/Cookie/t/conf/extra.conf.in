@@ -1,0 +1,41 @@
+# -*- conf -*-
+# this file will be Include-d by @ServerRoot@/conf/httpd.conf
+
+<IfModule mod_ssl.c>
+    SSLEngine on
+    SSLCertificateFile    @ServerRoot@/server.crt
+    SSLCertificateKeyFile @ServerRoot@/server.key
+</IfModule>
+# where Cookie::Jar can be found
+PerlSwitches -I@ServerRoot@/../lib
+PerlSwitches -I@ServerRoot@/..
+# preload the module
+PerlModule Cookie::Jar
+PerlOptions +GlobalRequest
+PerlSetupEnv On
+PerlSetVar COOKIES_DEBUG 4
+<Directory "@documentroot@">
+    SetHandler modperl
+    PerlResponseHandler CookieTest
+    AcceptPathInfo On
+    <Files ~ "\.(pl|cgi)$">
+        Options All +Includes +ExecCGI -Indexes -MultiViews
+        # AllowOverride All
+        # SetHandler perl-script
+        SetHandler cgi-script
+        AcceptPathInfo On
+        # PerlResponseHandler ModPerl::PerlRun
+        # Even better for stable cgi scripts:
+        # PerlResponseHandler ModPerl::Registry
+        # Change this in mod_perl1 PerlSendHeader On to the following:
+        # <https://perl.apache.org/docs/2.0/user/porting/compat.html#C_PerlSendHeader_>
+        #  PerlOptions +ParseHeaders
+    </Files>
+</Directory>
+# <Location "/tests">
+#     SetHandler modperl
+#     PerlResponseHandler CookieTest
+#     AcceptPathInfo On
+# </Location>
+# To cleanup Apache2 notes in memory
+PerlPostConfigRequire @ServerRoot@/../scripts/startup.pl

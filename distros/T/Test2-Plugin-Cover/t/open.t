@@ -3,19 +3,40 @@ use Test2::V0 -target => 'Test2::Plugin::Cover';
 use Path::Tiny qw/path/;
 use File::Spec();
 
+BEGIN { unshift @INC => 't/lib' }
+
+$Test2::Plugin::Cover::TRACE_OPENS = 0;
+
 $CLASS->reset_coverage;
 my $fh;
 open($fh, '<', 'aaa.json');
 open($fh, '<bbb.json');
 $CLASS->set_from('xxx');
 open($fh, '+<ccc.json');
-open($fh, '-<ddd.json');
-open($fh, File::Spec->catfile('dir', 'eee'));
-open($fh, File::Spec->catfile('dir', 'eee'));
+
+is(@Test2::Plugin::Cover::OPENS, 0, "No Opens traced");
+$Test2::Plugin::Cover::TRACE_OPENS = 1;
+
+require OpenXXX;
+OpenXXX->doit();
+
 $CLASS->set_from(['yyy']);
 open($fh, File::Spec->catfile('dir', 'eee'));
 
 my $eee = path(File::Spec->catfile('dir', 'eee'))->relative(path('.'))->stringify();
+
+$Test2::Plugin::Cover::TRACE_OPENS = 0;
+
+is(
+    \@Test2::Plugin::Cover::OPENS,
+    [
+        ['-<ddd.json', 't/lib/OpenXXX.pm', 9,  'OpenXXX'],
+        ['dir/eee',    't/lib/OpenXXX.pm', 10, 'OpenXXX'],
+        ['dir/eee',    't/lib/OpenXXX.pm', 11, 'OpenXXX'],
+        ['dir/eee',    't/open.t',         24, 'main'],
+    ],
+    "Traced opens",
+);
 
 close($fh);
 my $data = $CLASS->files(root => path('.'));

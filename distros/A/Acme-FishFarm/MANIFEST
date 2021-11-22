@@ -1,10 +1,10 @@
 Changes
-docs/Acme-FishFarm-1.00.html
-docs/Acme-FishFarm-Feeder-1.00.html
-docs/Acme-FishFarm-OxygenMaintainer-1.00.html
-docs/Acme-FishFarm-WaterConditionMonitor-1.00.html
-docs/Acme-FishFarm-WaterFiltration-1.00.html
-docs/Acme-FishFarm-WaterLevelMaintainer-1.00.html
+docs/Acme-FishFarm-1.01.html
+docs/Acme-FishFarm-Feeder-1.01.html
+docs/Acme-FishFarm-OxygenMaintainer-1.01.html
+docs/Acme-FishFarm-WaterConditionMonitor-1.01.html
+docs/Acme-FishFarm-WaterFiltration-1.01.html
+docs/Acme-FishFarm-WaterLevelMaintainer-1.01.html
 docs/items_list
 docs/specifications
 lib/Acme/FishFarm.pm
@@ -17,6 +17,14 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
+scripts/feeder.pl
+scripts/feeder_2.pl
+scripts/fish_farm.pl
+scripts/fish_farm_2.pl
+scripts/oxygen_maintainer.pl
+scripts/water_filter.pl
+scripts/water_level.pl
+scripts/water_monitor.pl
 t/00-load.t
 t/02-fish_farm.t
 t/04-feeder.t

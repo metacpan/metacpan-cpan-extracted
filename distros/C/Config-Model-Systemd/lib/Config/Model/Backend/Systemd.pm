@@ -1,23 +1,26 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd ;
-$Config::Model::Backend::Systemd::VERSION = '0.247.1';
+$Config::Model::Backend::Systemd::VERSION = '0.249.1';
 use strict;
 use warnings;
-use 5.010;
+use 5.020;
 use Mouse ;
 use Log::Log4perl qw(get_logger :levels);
 use Path::Tiny 0.086;
 
 extends 'Config::Model::Backend::Any';
 with 'Config::Model::Backend::Systemd::Layers';
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 my $logger = get_logger("Backend::Systemd");
 my $user_logger = get_logger("User");
@@ -47,22 +50,19 @@ sub get_backend_arg {
     return $ba;
 }
 
-sub read {
-    my $self = shift ;
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub read ($self, @args) {
     my $app = $self->instance->application;
 
     if ($app =~ /file/) {
-        $self->read_systemd_files(@_);
+        return $self->read_systemd_files(@args);
     }
     else {
-        $self->read_systemd_units(@_);
+        return $self->read_systemd_units(@args);
     }
 }
 
-sub read_systemd_files {
-    my $self = shift ;
-    my %args = @_ ;
-
+sub read_systemd_files ($self, %args) {
     # args are:
     # root       => './my_test',  # fake root directory, used for tests
     # config_dir => /etc/foo',    # absolute path
@@ -87,12 +87,10 @@ sub read_systemd_files {
         $logger->debug("registering unit $unit_type name $service_name from file name");
         $self->node->load(step => qq!$unit_type:"$service_name"!, check => $args{check} ) ;
     }
+    return 1;
 }
 
-sub read_systemd_units {
-    my $self = shift ;
-    my %args = @_ ;
-
+sub read_systemd_units ($self, %args) {
     # args are:
     # root       => './my_test',  # fake root directory, used for tests
     # config_dir => /etc/foo',    # absolute path
@@ -107,8 +105,25 @@ sub read_systemd_units {
     if (not $select_unit) {
         Config::Model::Exception::User->throw(
             objet => $self->node,
-            error => "Missing systemd unit to work on. This may be passed as 3rd argument to cme",
+            error => "Missing systemd unit to work on. This must be passed as 3rd argument to cme",
         );
+    }
+
+    if ($app ne 'systemd-user' and $select_unit =~ $filter) {
+        my $unit_type = $1;
+        if ($app eq 'systemd') {
+            Config::Model::Exception::User->throw(
+                objet => $self->node,
+                error => "With 'systemd' app, unit name should not specify '$unit_type'. "
+                ." Use 'systemd-$unit_type' app if you want to act only on $select_unit",
+            );
+        }
+        elsif ($app ne 'systemd-$unit_type') {
+            Config::Model::Exception::User->throw(
+                objet => $self->node,
+                error => "Unit name $select_unit does not match app $app"
+            );
+        }
     }
 
     if ($select_unit ne '*') {
@@ -187,10 +202,7 @@ sub read_systemd_units {
     return 1 ;
 }
 
-sub write {
-    my $self = shift ;
-    my %args = @_ ;
-
+sub write ($self, %args) {
     # args are:
     # root       => './my_test',  # fake root directory, userd for tests
     # config_dir => /etc/foo',    # absolute path
@@ -200,6 +212,7 @@ sub write {
 
     # file write is handled by Unit backend
     return 1 if $self->instance->application =~ /file/;
+    return 1 if $self->instance->application eq 'systemd';
 
     my $root_path = $args{root} || path('/');
     my $dir = $args{root}->path($args{config_dir});
@@ -243,7 +256,7 @@ Config::Model::Backend::Systemd - R/W backend for systemd configurations files
 
 =head1 VERSION
 
-version 0.247.1
+version 0.249.1
 
 =head1 SYNOPSIS
 
@@ -282,7 +295,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2020 by Dominique Dumont.
+This software is Copyright (c) 2008-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -42,7 +42,7 @@ Ichinose Shogo &lt;shogo82148@gmail.com >
 
 # SEE ALSO
 
-[AnySan](https://metacpan.org/pod/AnySan), [AnyEvent::IRC::Client](https://metacpan.org/pod/AnyEvent::IRC::Client), [Slack API](https://api.slack.com/)
+[AnySan](https://metacpan.org/pod/AnySan), [AnyEvent::IRC::Client](https://metacpan.org/pod/AnyEvent%3A%3AIRC%3A%3AClient), [Slack API](https://api.slack.com/)
 
 # LICENSE
 

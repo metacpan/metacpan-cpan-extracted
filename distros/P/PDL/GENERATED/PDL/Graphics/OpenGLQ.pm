@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Graphics::OpenGLQ;
 
-our @EXPORT_OK = qw(PDL::PP line_3x_3c PDL::PP gl_points PDL::PP gl_lines PDL::PP gl_line_strip PDL::PP gl_texts PDL::PP gl_triangles_mat PDL::PP gl_triangles_n_mat PDL::PP gl_triangles_wn_mat PDL::PP gl_triangles PDL::PP gl_triangles_n PDL::PP gl_triangles_wn PDL::PP gl_arrows );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(line_3x_3c gl_points gl_lines gl_line_strip gl_texts gl_triangles_mat gl_triangles_n_mat gl_triangles_wn_mat gl_triangles gl_triangles_n gl_triangles_wn gl_arrows );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Graphics::OpenGLQ ;
+
 
 
 
@@ -124,12 +123,10 @@ the copyright notice should be included in the file.
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

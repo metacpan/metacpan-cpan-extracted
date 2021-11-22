@@ -9,17 +9,18 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Acme/FishFarm.pm',
     ABSTRACT_FROM    => 'lib/Acme/FishFarm.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.008',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+        'Test::Output' => '0',
     },
     PREREQ_PM => {
         'Carp' => '0',
     },
-    META_MERGE => {
+    META_ADD => {
       resources => {
         repository => {
             type => 'git',

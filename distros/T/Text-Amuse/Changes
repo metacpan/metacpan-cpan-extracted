@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.77 2021-11-20
+
+ - Add support for Esperanto
+
 1.76 2021-04-11
 
  - Add support for Greek script

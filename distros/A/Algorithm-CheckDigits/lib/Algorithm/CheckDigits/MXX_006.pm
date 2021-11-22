@@ -7,7 +7,7 @@ use integer;
 
 use Data::Dumper;
 
-use version; our $VERSION = 'v1.3.5';
+use version; our $VERSION = 'v1.3.6';
 
 our @ISA = qw(Algorithm::CheckDigits);
 

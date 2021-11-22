@@ -1,0 +1,13 @@
+routes:
+ Example:
+  Tester:
+   route: /tester
+ Example::Tester:
+  Tester:
+   route: /example/tester
+  Post:
+   route: /post
+   via: POST
+  Any:
+   route: /any
+   via: ANY

@@ -2,6 +2,9 @@
 #include <ostream>
 #include <algorithm>
 #include <panda/time.h>
+#include <panda/unievent/Fs.h>
+#include <panda/unievent/Tcp.h>
+#include <panda/unievent/Pipe.h>
 
 namespace panda { namespace unievent { namespace http {
 
@@ -27,7 +30,7 @@ void Server::configure (const Config& conf) {
     if (!conf.locations.size()) throw HttpError("no locations to listen supplied");
 
     for (auto& loc : conf.locations) {
-        if (!loc.host && !loc.sock) throw HttpError("neither host nor socket defined in one of the locations");
+        if (!loc.host && !loc.path && !loc.sock) throw HttpError("neither host nor path nor socket defined in one of the locations");
     }
 
     if (running()) stop_listening();
@@ -71,24 +74,51 @@ void Server::graceful_stop () {
 void Server::start_listening () {
     if (_listeners.size()) throw HttpError("server is already listening");
     for (auto& loc : _conf.locations) {
-        TcpSP lst;
+        StreamSP lst;
 
         if (loc.sock) {
-            lst = new Tcp(_loop);
-            lst->open(loc.sock.value());
-        } else {
-            lst = new Tcp(_loop, loc.domain);
+            bool is_unix_sock = false;
+            #ifndef _WIN32
+            auto sa = unievent::getsockname(loc.sock.value()).value();
+            if (sa.is_unix()) {
+                loc.path = sa.as_unix().path();
+                PipeSP p = new Pipe(_loop);
+                p->open(loc.sock.value(), Pipe::Mode::not_connected);
+                lst = p;
+                is_unix_sock = true;
+            }
+            #endif
+            if (!is_unix_sock) {
+                TcpSP t = new Tcp(_loop);
+                t->open(loc.sock.value());
+                t->set_nodelay(_conf.tcp_nodelay);
+                lst = t;
+            }
+        }
+        else if (loc.path) {
+            #ifndef _WIN32
+            // if unix socket: remove socket file if it exists
+            panda::unievent::Fs::unlink(loc.path).nevermind();
+            #endif
+            PipeSP p = new Pipe(_loop);
+            p->bind(loc.path);
+            lst = p;
+        }
+        else {
+            TcpSP t = new Tcp(_loop, loc.domain);
+            t->set_nodelay(_conf.tcp_nodelay);
 
             if (loc.reuse_port) {
                 #ifdef _WIN32
                 panda_log_warning("ignored reuse_port configuration parameter: not supported on windows");
                 #else
                 int on = 1;
-                lst->setsockopt(SOL_SOCKET, SO_REUSEPORT, &on, sizeof(on));
+                t->setsockopt(SOL_SOCKET, SO_REUSEPORT, &on, sizeof(on));
                 #endif
             }
 
-            lst->bind(loc.host, loc.port);
+            t->bind(loc.host, loc.port);
+            lst = t;
         }
 
         lst->listen(loc.backlog);
@@ -96,33 +126,56 @@ void Server::start_listening () {
 
         lst->event_listener(this);
 
-        panda_log_notice("listening: " << (loc.ssl_ctx ? "https://" : "http://") << (loc.sock ? lst->sockaddr()->ip() : loc.host) << ":" << lst->sockaddr()->port());
+        panda_log_notice([&]{
+            log << "listening ";
+            if (loc.path) {
+                log << (loc.ssl_ctx ? "unix/pipe-ssl:" : "unix/pipe:") << loc.path;
+            } else {
+                auto sa = panda::dyn_cast<Tcp*>(lst.get())->sockaddr().value();
+                log << (loc.ssl_ctx ? "https://" : "http://") << (loc.sock ? sa.ip() : loc.host) << ":" << sa.port();
+            }
+        });
+
         _listeners.push_back(lst);
     }
 }
 
+excepted<net::SockAddr, ErrorCode> Server::sockaddr () const {
+    if (!_listeners.size()) return make_unexpected(errc::server_stopping);
+    return get_sockaddr(_listeners.front());
+}
+
 void Server::stop_listening () {
+    #ifndef _WIN32
+    for (auto& lst : _listeners) {
+        if (lst->type() != Pipe::TYPE) continue;
+        auto res = panda::dyn_cast<Pipe*>(lst.get())->sockname();
+        if (res) panda::unievent::Fs::unlink(res.value()).nevermind();
+    }
+    #endif
+
     _listeners.clear();
 }
 
-StreamSP Server::create_connection (const StreamSP&) {
-    ServerConnection::Config cfg {_conf.idle_timeout, _conf.max_keepalive_requests, _conf.max_headers_size, _conf.max_body_size, _factory};
-    return new_connection(++lastid, cfg);
-}
-
-ServerConnectionSP Server::new_connection (uint64_t id, const ServerConnection::Config& conf) {
-    ServerConnectionSP conn = new ServerConnection(this, id, conf);
-    if (_conf.tcp_nodelay) conn->set_nodelay(true);
-    return conn;
+ServerConnectionSP Server::new_connection (uint64_t id, const ServerConnection::Config& conf, const StreamSP& stream) {
+    return new ServerConnection(this, id, conf, stream);
 }
 
 void Server::on_connection (const StreamSP& stream, const ErrorCode& err) {
     if (err) return;
-    auto connection = dynamic_pointer_cast<ServerConnection>(stream);
-    assert(connection);
+    ServerConnection::Config cfg {_conf.idle_timeout, _conf.max_keepalive_requests, _conf.max_headers_size, _conf.max_body_size, _factory};
+    auto connection = new_connection(++lastid, cfg, stream);
     _connections[connection->id()] = connection;
     connection->start();
-    panda_log_info("client connected to " << connection->sockaddr() << ", id=" << connection->id() << ", total connections: " << _connections.size());
+    panda_log_info([&]{
+        log << "client connected to ";
+        if (stream->type() == Pipe::TYPE) {
+            log << "unix/pipe '" << panda::dyn_cast<Pipe*>(stream.get())->sockname() << "'";
+        } else {
+            log << panda::dyn_cast<Tcp*>(stream.get())->sockaddr();
+        }
+        log << ", id=" << connection->id() << ", total connections: " << _connections.size();
+    });
 }
 
 const string& Server::date_header_now () {
@@ -184,22 +237,21 @@ string rfc822_date (time::ptime_t epoch) {
 
 std::ostream& operator<< (std::ostream& os, const Server::Location& location) {
     os << "{uri: " << (location.ssl_ctx ? "https://" : "http://");
-    if (location.sock) {
+    if (location.path) {
+        os << "<unix:" << location.path << ">";
+    }
+    else if (location.sock) {
         auto res = unievent::getsockname(location.sock.value());
         if (res) {
             auto sa = res.value();
-            #ifndef _WIN32
-            if (sa.is_unix()) os << "<unix:" << sa.as_unix().path() << ">";
-            else
-            #endif
-            { os << sa.ip() << ":" << sa.port(); }
+            os << sa.ip() << ":" << sa.port();
         } else {
             os << "<unknown custom socket>";
         }
     } else {
         os << location.host << ":" << location.port;
+        if (location.reuse_port) os << ", reuse_port: true";
     }
-    if (location.reuse_port) os << ", reuse_port: true";
     os << ", backlog: " << location.backlog;
     os << "}";
     return os;

@@ -1,10 +1,11 @@
 use strict;
 use warnings;
-use 5.016;
+use 5.020;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -959,8 +960,8 @@ subtest 'bad regex in schema' => sub {
     $js->evaluate(
       { my_runtime_pattern => 'foo' },
       $schema = {
-        type => @{$schema}{type},
-        properties => +{ my_runtime_pattern => @{$schema->{properties}}{my_runtime_pattern} },
+        $schema->%{type},
+        properties => +{ $schema->{properties}->%{my_runtime_pattern} },
       },
     )->TO_JSON,
     {
@@ -1292,6 +1293,85 @@ subtest dependentRequired => sub {
       ],
     },
     'dependentRequired traversal error',
+  );
+};
+
+subtest 'evaluate in the middle of a document' => sub {
+  $js->add_schema({
+    '$id' => 'https://myschema',
+    properties => {
+      foo => {
+        '$id' => 'https://my-inner-schema',
+        allOf => [
+          {                       # <-- evaluation starts here
+            type => 'object',
+            properties => {
+              bar => {
+                type => 'string',
+              },
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  cmp_deeply(
+    $js->evaluate(
+      {
+        bar => ['not a string'],
+      },
+      'https://myschema#/properties/foo/allOf/1',
+      {
+        data_path => '/request/body',
+        traversed_schema_path => '/some/other/thing/$ref/foo/$ref',
+        initial_schema_uri => 'https://somewhere/else#/foo',
+      },
+    )->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => '/some/other/thing/$ref/foo/$ref',
+          absoluteKeywordLocation => 'https://somewhere/else#/foo',
+          error => 'EXCEPTION: unable to find resource https://myschema#/properties/foo/allOf/1',
+        },
+      ],
+    },
+    'provided evaluation uri does not exist',
+  );
+
+  cmp_deeply(
+    $js->evaluate(
+      {
+        bar => ['not a string'],
+      },
+      'https://myschema#/properties/foo/allOf/0', # <-- not the canonical URI!
+      {
+        data_path => '/request/body',
+        traversed_schema_path => '/some/other/thing/$ref/foo/$ref',
+        initial_schema_uri => 'https://somewhere/else#/foo',
+      },
+    )->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body/bar',
+          keywordLocation => '/some/other/thing/$ref/foo/$ref/properties/bar/type',
+          absoluteKeywordLocation => 'https://my-inner-schema#/allOf/0/properties/bar/type',
+          error => 'wrong type (expected string)',
+        },
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => '/some/other/thing/$ref/foo/$ref/properties',
+          absoluteKeywordLocation => 'https://my-inner-schema#/allOf/0/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    error => 'error has correct locations from override hash',
   );
 };
 

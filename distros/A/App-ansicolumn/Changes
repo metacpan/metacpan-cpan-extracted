@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ansicolumn
 
+1.16 2021-11-15T10:07:37Z
+
+    - Update border styles.
+
 1.15 2021-10-28T04:03:11Z
 
     - Rename --fullwidth -> --widen.

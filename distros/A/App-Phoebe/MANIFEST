@@ -3,6 +3,7 @@ contrib/README.md
 CONTRIBUTING.md
 lib/App/Phoebe.pm
 lib/App/Phoebe/BlockFediverse.pm
+lib/App/Phoebe/Capsules.pm
 lib/App/Phoebe/Chat.pm
 lib/App/Phoebe/Comments.pm
 lib/App/Phoebe/Css.pm
@@ -44,6 +45,7 @@ t/archive-spaces.t
 t/archive.t
 t/basics.t
 t/BlockFediverse.t
+t/Capsules.t
 t/cert.pl
 t/Chat.t
 t/Comments.t

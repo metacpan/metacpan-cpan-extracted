@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::SlotAttr::Isa 0.01;
+package Object::Pad::SlotAttr::Isa 0.02;
 
 use v5.14;
 use warnings;

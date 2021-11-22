@@ -8,7 +8,7 @@ WriteMakefile
   'PREREQ_PM' => {
                    'Exporter' => '0',
                    'Math::AnyNum' => '0.36',
-                   'Sidef' => '3.97',
+                   'Sidef' => '3.99',
                    'Test::More' => 0
                  },
   'INSTALLDIRS' => 'site',

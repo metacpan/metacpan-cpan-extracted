@@ -59,38 +59,39 @@ use Apache::TestRun ();
 use vars qw(%Usage);
 
 %Usage = (
-   top_dir         => 'top-level directory (default is $PWD)',
-   t_dir           => 'the t/ test directory (default is $top_dir/t)',
-   t_conf          => 'the conf/ test directory (default is $t_dir/conf)',
-   t_logs          => 'the logs/ test directory (default is $t_dir/logs)',
-   t_state         => 'the state/ test directory (default is $t_dir/state)',
-   t_pid_file      => 'location of the pid file (default is $t_logs/httpd.pid)',
-   t_conf_file     => 'test httpd.conf file (default is $t_conf/httpd.conf)',
-   src_dir         => 'source directory to look for mod_foos.so',
-   serverroot      => 'ServerRoot (default is $t_dir)',
-   documentroot    => 'DocumentRoot (default is $ServerRoot/htdocs',
-   port            => 'Port [port_number|select] (default ' . DEFAULT_PORT . ')',
-   servername      => 'ServerName (default is localhost)',
-   user            => 'User to run test server as (default is $USER)',
-   group           => 'Group to run test server as (default is $GROUP)',
-   bindir          => 'Apache bin/ dir (default is apxs -q BINDIR)',
-   sbindir         => 'Apache sbin/ dir (default is apxs -q SBINDIR)',
-   httpd           => 'server to use for testing (default is $bindir/httpd)',
-   target          => 'name of server binary (default is apxs -q TARGET)',
-   apxs            => 'location of apxs (default is from Apache2::BuildConfig)',
-   startup_timeout => 'seconds to wait for the server to start (default is 60)',
-   httpd_conf      => 'inherit config from this file (default is apxs derived)',
-   httpd_conf_extra=> 'inherit additional config from this file',
-   minclients      => 'minimum number of concurrent clients (default is 1)',
-   maxclients      => 'maximum number of concurrent clients (default is minclients+1)',
-   threadsperchild => 'number of threads per child when using threaded MPMs (default is 10)',
-   perlpod         => 'location of perl pod documents (for testing downloads)',
-   proxyssl_url    => 'url for testing ProxyPass / https (default is localhost)',
-   sslca           => 'location of SSL CA (default is $t_conf/ssl/ca)',
-   sslcaorg        => 'SSL CA organization to use for tests (default is asf)',
-   sslproto        => 'SSL/TLS protocol version(s) to test',
-   libmodperl      => 'path to mod_perl\'s .so (full or relative to LIBEXECDIR)',
-   defines         => 'values to add as -D defines (for example, "VAR1 VAR2")',
+   top_dir          => 'top-level directory (default is $PWD)',
+   t_dir            => 'the t/ test directory (default is $top_dir/t)',
+   t_conf           => 'the conf/ test directory (default is $t_dir/conf)',
+   t_logs           => 'the logs/ test directory (default is $t_dir/logs)',
+   t_state          => 'the state/ test directory (default is $t_dir/state)',
+   t_pid_file       => 'location of the pid file (default is $t_logs/httpd.pid)',
+   t_conf_file      => 'test httpd.conf file (default is $t_conf/httpd.conf)',
+   src_dir          => 'source directory to look for mod_foos.so',
+   serverroot       => 'ServerRoot (default is $t_dir)',
+   documentroot     => 'DocumentRoot (default is $ServerRoot/htdocs',
+   port             => 'Port [port_number|select] (default ' . DEFAULT_PORT . ')',
+   servername       => 'ServerName (default is localhost)',
+   user             => 'User to run test server as (default is $USER)',
+   group            => 'Group to run test server as (default is $GROUP)',
+   bindir           => 'Apache bin/ dir (default is apxs -q BINDIR)',
+   sbindir          => 'Apache sbin/ dir (default is apxs -q SBINDIR)',
+   httpd            => 'server to use for testing (default is $bindir/httpd)',
+   target           => 'name of server binary (default is apxs -q TARGET)',
+   apxs             => 'location of apxs (default is from Apache2::BuildConfig)',
+   startup_timeout  => 'seconds to wait for the server to start (default is 60)',
+   httpd_conf       => 'inherit config from this file (default is apxs derived)',
+   httpd_conf_extra => 'inherit additional config from this file',
+   minclients       => 'minimum number of concurrent clients (default is 1)',
+   maxclients       => 'maximum number of concurrent clients (default is minclients+1)',
+   threadsperchild  => 'number of threads per child when using threaded MPMs (default is 10)',
+   limitrequestline => 'global LimitRequestLine setting (default is 128)',
+   perlpod          => 'location of perl pod documents (for testing downloads)',
+   proxyssl_url     => 'url for testing ProxyPass / https (default is localhost)',
+   sslca            => 'location of SSL CA (default is $t_conf/ssl/ca)',
+   sslcaorg         => 'SSL CA organization to use for tests (default is asf)',
+   sslproto         => 'SSL/TLS protocol version(s) to test',
+   libmodperl       => 'path to mod_perl\'s .so (full or relative to LIBEXECDIR)',
+   defines          => 'values to add as -D defines (for example, "VAR1 VAR2")',
    (map { $_ . '_module_name', "$_ module name"} qw(cgi ssl thread access auth php)),
 );
 
@@ -367,6 +368,9 @@ sub new {
     if ($vars->{maxclientsthreadedmpm} < $vars->{maxsparethreadedmpm} + $vars->{threadsperchild}) {
         $vars->{maxclientsthreadedmpm} = $vars->{maxsparethreadedmpm} + $vars->{threadsperchild};
     }
+
+    $vars->{limitrequestline} ||= 128;
+    $vars->{limitrequestlinex2} = 2 * $vars->{limitrequestline};
 
     $vars->{proxy}        ||= 'off';
     $vars->{proxyssl_url} ||= '';
@@ -1777,6 +1781,11 @@ sub which {
     my $program = shift;
 
     return undef unless $program;
+
+    # No need to search PATH components
+    # if $program already contains a path
+    return $program if !OSX and !WINFU and
+        $program =~ /\// and -f $program and -x $program;
 
     my @dirs = File::Spec->path();
 

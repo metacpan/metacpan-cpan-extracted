@@ -1,5 +1,21 @@
 This is the changelog for FASTX::Abi. Version prior to v 0.1 are preliminary (alpha) release, not to be used in production.
 
+1.0.1	2021-11-12
+	* Documentation updates
+	* Minor changes in mergeabi
+
+1.0.0	2021-11-11
+	* Added stripAbiTags script
+
+0.3.1	2021-11-10
+	* Minor changes
+	
+0.3.0	2021-11-09 
+	* Added merge() function [experimental]
+
+0.2.0	2021-11-09
+    * Module packaging workflow updated
+
 0.11	2020-01-09
 	* Updated documentation
 

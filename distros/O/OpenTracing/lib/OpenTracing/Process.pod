@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with OpenTracing::Process
 at lib/OpenTracing/Process.pm
@@ -21,6 +20,10 @@ Each batch of spans is linked to a process. This can either be a Unix-style proc
 concept.
 
 =head1 METHODS
+
+=head2 pid
+
+The process pid.
 
 =head2 name
 
@@ -50,5 +53,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2021. Licensed under the same terms as Perl itself.
 

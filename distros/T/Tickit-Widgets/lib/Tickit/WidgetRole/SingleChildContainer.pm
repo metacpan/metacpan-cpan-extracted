@@ -5,7 +5,7 @@
 
 use Object::Pad 0.32;
 
-package Tickit::WidgetRole::SingleChildContainer 0.33;
+package Tickit::WidgetRole::SingleChildContainer 0.34;
 role Tickit::WidgetRole::SingleChildContainer;
 
 use Carp;

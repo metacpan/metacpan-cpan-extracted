@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-10-17'; # DATE
 our $DIST = 'App-URIInfoUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -61,7 +61,7 @@ App::URIInfoUtils - Utilities related to URI::Info
 
 =head1 VERSION
 
-This document describes version 0.001 of App::URIInfoUtils (from Perl distribution App-URIInfoUtils), released on 2021-10-17.
+This document describes version 0.002 of App::URIInfoUtils (from Perl distribution App-URIInfoUtils), released on 2021-10-17.
 
 =head1 DESCRIPTION
 
@@ -117,6 +117,9 @@ Source repository is at L<https://github.com/perlancar/perl-App-URIInfoUtils>.
 =head1 SEE ALSO
 
 L<URI::Info>
+
+L<parse-search-string-from-url> from L<App::ParseSearchStringFromURL>, which is
+currently based from L<URI::ParseSearchString>.
 
 =head1 AUTHOR
 

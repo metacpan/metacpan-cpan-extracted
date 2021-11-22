@@ -351,6 +351,14 @@ To exit the loop, return C<undef()>, for example:
         print( "ok, this one\n" );
     });
 
+But, you can also use L<perlfunc/last> as it will affect the loop. For example:
+
+    $a->for(sub
+    {
+        last if( $_ eq $not_this_one );
+        print( "ok, this one\n" );
+    });
+
 If you wanted to affect the current offset position relative to the current counter value, you can return a scalar reference containing an integer. For example:
 
     my $a = Module::Generic::Array->new( [qw( Jack John Peter Peter Gabriel Raphael Emmanuel )] );
@@ -385,6 +393,18 @@ And if you wanted to modify the counter value itself, you can change the value o
 
 This is useful if you want to modify the array and avoid getting unexpected results.
 
+You can also use L<perlfunc/next> to move to the next iteration like in a regular loop, such as:
+
+    $a->for(sub
+    {
+        my( $i, $name ) = @_;
+        if( $name eq 'Peter' )
+        {
+            next;
+        }
+        print( "$name\n" );
+    });
+
 =head2 foreach
 
 Provided with a subroutine reference and this will call the subroutine reference, passing it the value for each entry in the array.
@@ -410,6 +430,8 @@ To exit the loop, return C<undef()>, for example:
         return if( $_ eq $not_this_one );
         print( "ok, this one\n" );
     });
+
+Or just like for L</for> you can use L<perlfunc/next> and L<perlfunc/last> for the flow control.
 
 =head2 fourth
 

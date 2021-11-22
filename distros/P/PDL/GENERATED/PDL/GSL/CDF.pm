@@ -1,16 +1,14 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSL::CDF;
 
-our @EXPORT_OK = qw(PDL::PP gsl_cdf_beta_P PDL::PP gsl_cdf_beta_Pinv PDL::PP gsl_cdf_beta_Q PDL::PP gsl_cdf_beta_Qinv PDL::PP gsl_cdf_binomial_P PDL::PP gsl_cdf_binomial_Q PDL::PP gsl_cdf_cauchy_P PDL::PP gsl_cdf_cauchy_Pinv PDL::PP gsl_cdf_cauchy_Q PDL::PP gsl_cdf_cauchy_Qinv PDL::PP gsl_cdf_chisq_P PDL::PP gsl_cdf_chisq_Pinv PDL::PP gsl_cdf_chisq_Q PDL::PP gsl_cdf_chisq_Qinv PDL::PP gsl_cdf_exponential_P PDL::PP gsl_cdf_exponential_Pinv PDL::PP gsl_cdf_exponential_Q PDL::PP gsl_cdf_exponential_Qinv PDL::PP gsl_cdf_exppow_P PDL::PP gsl_cdf_exppow_Q PDL::PP gsl_cdf_fdist_P PDL::PP gsl_cdf_fdist_Pinv PDL::PP gsl_cdf_fdist_Q PDL::PP gsl_cdf_fdist_Qinv PDL::PP gsl_cdf_flat_P PDL::PP gsl_cdf_flat_Pinv PDL::PP gsl_cdf_flat_Q PDL::PP gsl_cdf_flat_Qinv PDL::PP gsl_cdf_gamma_P PDL::PP gsl_cdf_gamma_Pinv PDL::PP gsl_cdf_gamma_Q PDL::PP gsl_cdf_gamma_Qinv PDL::PP gsl_cdf_gaussian_P PDL::PP gsl_cdf_gaussian_Pinv PDL::PP gsl_cdf_gaussian_Q PDL::PP gsl_cdf_gaussian_Qinv PDL::PP gsl_cdf_geometric_P PDL::PP gsl_cdf_geometric_Q PDL::PP gsl_cdf_gumbel1_P PDL::PP gsl_cdf_gumbel1_Pinv PDL::PP gsl_cdf_gumbel1_Q PDL::PP gsl_cdf_gumbel1_Qinv PDL::PP gsl_cdf_gumbel2_P PDL::PP gsl_cdf_gumbel2_Pinv PDL::PP gsl_cdf_gumbel2_Q PDL::PP gsl_cdf_gumbel2_Qinv PDL::PP gsl_cdf_hypergeometric_P PDL::PP gsl_cdf_hypergeometric_Q PDL::PP gsl_cdf_laplace_P PDL::PP gsl_cdf_laplace_Pinv PDL::PP gsl_cdf_laplace_Q PDL::PP gsl_cdf_laplace_Qinv PDL::PP gsl_cdf_logistic_P PDL::PP gsl_cdf_logistic_Pinv PDL::PP gsl_cdf_logistic_Q PDL::PP gsl_cdf_logistic_Qinv PDL::PP gsl_cdf_lognormal_P PDL::PP gsl_cdf_lognormal_Pinv PDL::PP gsl_cdf_lognormal_Q PDL::PP gsl_cdf_lognormal_Qinv PDL::PP gsl_cdf_negative_binomial_P PDL::PP gsl_cdf_negative_binomial_Q PDL::PP gsl_cdf_pareto_P PDL::PP gsl_cdf_pareto_Pinv PDL::PP gsl_cdf_pareto_Q PDL::PP gsl_cdf_pareto_Qinv PDL::PP gsl_cdf_pascal_P PDL::PP gsl_cdf_pascal_Q PDL::PP gsl_cdf_poisson_P PDL::PP gsl_cdf_poisson_Q PDL::PP gsl_cdf_rayleigh_P PDL::PP gsl_cdf_rayleigh_Pinv PDL::PP gsl_cdf_rayleigh_Q PDL::PP gsl_cdf_rayleigh_Qinv PDL::PP gsl_cdf_tdist_P PDL::PP gsl_cdf_tdist_Pinv PDL::PP gsl_cdf_tdist_Q PDL::PP gsl_cdf_tdist_Qinv PDL::PP gsl_cdf_ugaussian_P PDL::PP gsl_cdf_ugaussian_Pinv PDL::PP gsl_cdf_ugaussian_Q PDL::PP gsl_cdf_ugaussian_Qinv PDL::PP gsl_cdf_weibull_P PDL::PP gsl_cdf_weibull_Pinv PDL::PP gsl_cdf_weibull_Q PDL::PP gsl_cdf_weibull_Qinv );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_cdf_beta_P gsl_cdf_beta_Pinv gsl_cdf_beta_Q gsl_cdf_beta_Qinv gsl_cdf_binomial_P gsl_cdf_binomial_Q gsl_cdf_cauchy_P gsl_cdf_cauchy_Pinv gsl_cdf_cauchy_Q gsl_cdf_cauchy_Qinv gsl_cdf_chisq_P gsl_cdf_chisq_Pinv gsl_cdf_chisq_Q gsl_cdf_chisq_Qinv gsl_cdf_exponential_P gsl_cdf_exponential_Pinv gsl_cdf_exponential_Q gsl_cdf_exponential_Qinv gsl_cdf_exppow_P gsl_cdf_exppow_Q gsl_cdf_fdist_P gsl_cdf_fdist_Pinv gsl_cdf_fdist_Q gsl_cdf_fdist_Qinv gsl_cdf_flat_P gsl_cdf_flat_Pinv gsl_cdf_flat_Q gsl_cdf_flat_Qinv gsl_cdf_gamma_P gsl_cdf_gamma_Pinv gsl_cdf_gamma_Q gsl_cdf_gamma_Qinv gsl_cdf_gaussian_P gsl_cdf_gaussian_Pinv gsl_cdf_gaussian_Q gsl_cdf_gaussian_Qinv gsl_cdf_geometric_P gsl_cdf_geometric_Q gsl_cdf_gumbel1_P gsl_cdf_gumbel1_Pinv gsl_cdf_gumbel1_Q gsl_cdf_gumbel1_Qinv gsl_cdf_gumbel2_P gsl_cdf_gumbel2_Pinv gsl_cdf_gumbel2_Q gsl_cdf_gumbel2_Qinv gsl_cdf_hypergeometric_P gsl_cdf_hypergeometric_Q gsl_cdf_laplace_P gsl_cdf_laplace_Pinv gsl_cdf_laplace_Q gsl_cdf_laplace_Qinv gsl_cdf_logistic_P gsl_cdf_logistic_Pinv gsl_cdf_logistic_Q gsl_cdf_logistic_Qinv gsl_cdf_lognormal_P gsl_cdf_lognormal_Pinv gsl_cdf_lognormal_Q gsl_cdf_lognormal_Qinv gsl_cdf_negative_binomial_P gsl_cdf_negative_binomial_Q gsl_cdf_pareto_P gsl_cdf_pareto_Pinv gsl_cdf_pareto_Q gsl_cdf_pareto_Qinv gsl_cdf_pascal_P gsl_cdf_pascal_Q gsl_cdf_poisson_P gsl_cdf_poisson_Q gsl_cdf_rayleigh_P gsl_cdf_rayleigh_Pinv gsl_cdf_rayleigh_Q gsl_cdf_rayleigh_Qinv gsl_cdf_tdist_P gsl_cdf_tdist_Pinv gsl_cdf_tdist_Q gsl_cdf_tdist_Qinv gsl_cdf_ugaussian_P gsl_cdf_ugaussian_Pinv gsl_cdf_ugaussian_Q gsl_cdf_ugaussian_Qinv gsl_cdf_weibull_P gsl_cdf_weibull_Pinv gsl_cdf_weibull_Q gsl_cdf_weibull_Qinv );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
-
 
 
    
@@ -22,10 +20,9 @@ use DynaLoader;
 
 
 
+
 use strict;
 use warnings;
-
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
 =head1 NAME
 
@@ -79,10 +76,7 @@ while C<P(1) = p(1)>, C<Q(1) = 1 - p(1)>.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -2796,7 +2790,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -2816,5 +2810,3 @@ All rights reserved. There is no warranty. You are allowed to redistribute this 
 # Exit with OK status
 
 1;
-
-		   

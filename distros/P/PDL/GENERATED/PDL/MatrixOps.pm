@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::MatrixOps;
 
-our @EXPORT_OK = qw( identity  stretcher  inv  det  determinant PDL::PP eigens_sym PDL::PP eigens PDL::PP svd  lu_decomp  lu_decomp2  lu_backsub PDL::PP simq PDL::PP squaretotri );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(identity stretcher inv det determinant eigens_sym eigens svd lu_decomp lu_decomp2 lu_backsub simq squaretotri );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::MatrixOps ;
+
 
 
 
@@ -136,10 +135,7 @@ use strict;
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -1339,7 +1335,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -1360,5 +1356,3 @@ PDL copyright notice should be included in this file.
 # Exit with OK status
 
 1;
-
-		   

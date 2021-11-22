@@ -26,7 +26,8 @@ static const char* dates[] = {"%Y-%m-%d %H:%M:%S", "%y-%m-%d %H:%M:%S", "%H:%M:%
 
 PatternFormatter::PatternFormatter (string_view fmt) : _fmt(string(fmt)) {}
 
-static void add_mks (string& dest, long nsec, unsigned prec) {
+static void add_mks (string& dest, const Info::time_point& tp, unsigned prec) {
+    long nsec = tp.time_since_epoch().count() % 1000000000L;
     dest += '.';
     if (nsec < 100000000) dest += '0';
     if (nsec < 10000000)  dest += '0';
@@ -152,9 +153,9 @@ string PatternFormatter::format (const string& fmt, std::string& msg, const Info
                 break;
             }
             case 't': {
-                if (x < 4) ymdhms(ret, info.time.tv_sec, x);
-                else       ret += panda::to_string(info.time.tv_sec);
-                if (y) add_mks(ret, info.time.tv_nsec, y);
+                if (x < 4) ymdhms(ret, std::chrono::system_clock::to_time_t(info.time), x);
+                else       ret += panda::to_string(std::chrono::duration_cast<std::chrono::seconds>(info.time.time_since_epoch()).count());
+                if (y) add_mks(ret, info.time, y);
                 break;
             }
             case 'T': {

@@ -1,5 +1,14 @@
 Revision history for Perl extension Math::GMP.
 
+2.24  2021-11-17 Shlomif
+    - tests+better docs for bnok() (Binomial)
+    - Eliminate warning about not_here() in GMP.xs.
+
+2.23  2021-11-05 Shlomif
+	- add support for bmulf() to multiply by a floating point number
+        - Hugo
+    - add support for bnok() (Binomial)
+
 2.22  2021-09-20 Shlomif
     - Signature files are generated unreliably and are an ongoing source of
     bug reports. As a result, we decided to axe them altogether.

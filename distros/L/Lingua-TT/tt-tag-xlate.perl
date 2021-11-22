@@ -12,7 +12,7 @@ use File::Basename qw(basename);
 ## Globals
 ##----------------------------------------------------------------------
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 ##-- program vars
 our $progname     = basename($0);
@@ -21,6 +21,7 @@ our $verbose      = 1;
 our $outfile      = '-';
 our %ioargs       = (encoding=>'UTF-8');
 our $from_field   = 1;
+our $multimap     = 0;
 
 our $replace	  = 0;       ##-- replace tags in-place?
 our $prepend	  = '$X=';   ##-- prepend literal string to translated tags?
@@ -30,18 +31,19 @@ our $trim	  = '^\$.='; ##-- regex to trim from translated tags
 ## Command-line processing
 ##----------------------------------------------------------------------
 GetOptions(##-- general
-	   'help|h' => \$help,
-	   'man|m'  => \$man,
-	   'version|V' => \$version,
-	   'verbose|v=i' => \$verbose,
+	   'h|help' => \$help,
+	   'm|man'  => \$man,
+	   'V|version' => \$version,
+	   'v|verbose=i' => \$verbose,
 
 	   ##-- I/O
-	   'output|o=s' => \$outfile,
-	   'encoding|e=s' => \$ioargs{encoding},
-	   'from-field|ff|from|f=i' => \$from_field,
-	   'replace|repl|r|in-place|inplace|i!' => \$replace,
-	   'prepend|p=s' => \$prepend,
-	   'trim|t=s' => \$trim,
+	   'o|output=s' => \$outfile,
+	   'e|encoding=s' => \$ioargs{encoding},
+	   'f|ff|from-field|from=i' => \$from_field,
+	   'r|i|replace|repl|in-place|inplace!' => \$replace,
+	   'p|prepend=s' => \$prepend,
+	   't|trim=s' => \$trim,
+           'M|multimap|multi!' => \$multimap,
 	  );
 
 pod2usage({-exitval=>0,-verbose=>0}) if ($help);
@@ -74,7 +76,7 @@ foreach my $infile (@ARGV) {
   my $ttin = Lingua::TT::IO->fromFile($infile,%ioargs)
     or die("$0: open failed for '$infile': $!");
   my $infh = $ttin->{fh};
-  my (@f,@x,$xtag);
+  my (@f,@x,$xtags,@xtags,$xtag, $tagl,$tag,$tagr, $xf);
 
   while (defined($_=<$infh>)) {
     if (/^%%/ || /^\s*$/) {
@@ -83,18 +85,46 @@ foreach my $infile (@ARGV) {
     }
     chomp;
     @f = split(/\t/,$_);
+    @x = (@f[0..($from_field-1)]);
     foreach (@f[${from_field}..$#f]) {
-      if (/\[_?([^\s\]]+)[\s\]]/ && defined($xtag=$tagx->{$1})) {
-	substr($_, $-[1], $+[1] - $-[1]) = ($replace ? $xtag : "$xtag ~$1");
-	s/$trim//o if (defined($trim));
-	$_ = $prepend . $_;
+      ##-- parse input tag
+      if (/^?\[_?([^\s\]]+)[\s\]]/) {
+        ##-- TAGH/ATT notation
+        $tag  = $1;
+        $tagl = substr($_, 0, $-[1]);
+        $tagr = substr($_, $+[1]);
       }
-      elsif (defined($xtag=$tagx->{$_})) {
-	s/$trim//o if (defined($trim));
-	$_ = $prepend . ($replace ? $xtag : "$xtag %%~$_");
+      else {
+        ##-- bare tag
+        ($tag,$tagl,$tagr) = ($_,'','');
+      }
+
+      ##-- get translation(s)
+      @xtags = (defined($xtags=$tagx->{$tag})
+                ? ($multimap ? split(/\t/,$xtags) : ($xtags))
+                : qw());
+
+      if (!@xtags) {
+        ##-- no translations
+        push(@x,$_);
+        next;
+      }
+
+      foreach $xtag (@xtags) {
+        if ($tagl || $tagr) {
+          ##-- TAGH/ATT notation
+          $xf = $tagl . ($replace ? $xtag : "$xtag ~$tag") . $tagr;
+          $xf =~ s/$trim//o if (defined($trim));
+        } else {
+          ##-- bare tag
+          $xf = $_;
+          $xf =~ s/$trim//o if (defined($trim));
+          $xf = ($replace ? $xtag : "$xtag %%~$_");
+        }
+        push(@x, $prepend.$xf);
       }
     }
-    print $outfh join("\t",@f), "\n";
+    print $outfh join("\t", @x), "\n";
   }
   undef $infh;
   $ttin->close;
@@ -118,17 +148,18 @@ tt-tag-xlate.perl - apply tag-translation dictionary to a TT-file
  tt-tag-xlate.perl OPTIONS TAG_DICT [TT_FILE(s)]
 
  General Options:
-   -help
-   -version
-   -verbose LEVEL
+   -h, -help
+   -V, -version
+   -v, -verbose LEVEL
 
  Other Options:
-   -output FILE         ##-- output file (default: STDOUT)
-   -encoding ENCODING   ##-- I/O encoding (default: UTF-8)
-   -from=INDEX		##-- minimum index for translated fields (default=1)
-   -replace , -norepl   ##-- do/don't replace tags in-place (default: don't)
-   -prepend=PREFIX	##-- prepend PREFIX to translated tags (default: '$X=')
-   -trim=REGEX		##-- trim REGEX from translated tags (default: '^\$.=')
+   -o, -output FILE         ##-- output file (default: STDOUT)
+   -e, -encoding ENCODING   ##-- I/O encoding (default: UTF-8)
+   -f, -from=INDEX          ##-- minimum index for translated fields (default=1)
+   -r, -[no]replace         ##-- do/don't replace tags in-place (default: don't)
+   -p, -prepend=PREFIX      ##-- prepend PREFIX to translated tags (default: '$X=')
+   -t, -trim=REGEX          ##-- trim REGEX from translated tags (default: '^\$.=')
+   -M, -[no]multimap        ##-- do/don't allow multiple translations per input tag (default: don't)
 
 =cut
 

@@ -27,8 +27,7 @@ my $yts = "$Bin/../test-suite/yaml-test-suite-data";
 # skip tests that parser can't parse
 my @skip = qw/
     4FJ6 87E4 8CWC 8UDB 9MMW
-    CN3R CT4Q DFF7
-    G5U8
+    CN3R CT4Q
     L9U5 LQZ7 LX3P
     Q9WF QF4Y
 

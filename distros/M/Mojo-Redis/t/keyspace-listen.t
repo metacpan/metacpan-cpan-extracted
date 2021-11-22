@@ -3,9 +3,11 @@ use Test::More;
 use Mojo::Redis;
 
 my @events;
-my $redis  = Mojo::Redis->new('redis://localhost');
+my $redis  = Mojo::Redis->new($ENV{TEST_ONLINE} || 'redis://localhost');
 my $pubsub = $redis->pubsub;
-is $pubsub->_keyspace_key, '__keyevent@*__:*', 'keyevent default db wildcard';
+
+my $dbsel = $redis->url->path->[0] // '*';
+is $pubsub->_keyspace_key, '__keyevent@'.$dbsel.'__:*', 'keyevent default db wildcard';
 
 $redis->url->path->parse('/5');
 is $pubsub->_keyspace_key, '__keyevent@5__:*', 'keyevent default wildcard';
@@ -25,9 +27,8 @@ $pubsub->{chans}{'__keyevent@1__:del'} = [$cb];
 is $pubsub->keyspace_unlisten(undef, 'del', {db => 1}), $pubsub, 'keyspace_unlisten without callback';
 ok !$pubsub->{chans}{'__keyevent@1__:del'}, 'callback is removed';
 
-if ($ENV{TEST_KEA}) {
-  my $redis = Mojo::Redis->new($ENV{TEST_ONLINE} || 'redis://localhost');
-  my $kea   = $redis->db->config(qw(get notify-keyspace-events))->[1];
+if ($ENV{TEST_KEA} && $ENV{TEST_ONLINE}) {
+  my $kea = $redis->db->config(qw(get notify-keyspace-events))->[1];
   diag "config get notify-keyspace-events == $kea";
   $redis->db->config(qw(set notify-keyspace-events KEA));
 

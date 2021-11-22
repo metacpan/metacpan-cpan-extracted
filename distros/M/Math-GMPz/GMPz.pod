@@ -178,6 +178,14 @@
    Rmpz_set_ui($rop, $ui);
     Assign the 'unsigned int', $ui, to $rop.
 
+   Rmpz_set_sj($rop, $sj); # GMP does not provide mpz_set_sj
+    Assign the 'signed long long int', $sj, to $rop.
+    Available only if $Config{ivtype} is 'long long'.
+
+   Rmpz_set_uj($rop, $uj); # GMP does not provide mpz_set_uj
+    Assign the 'unsigned long long int', $uj, to $rop.
+    Available only if $Config{ivtype} is 'long long'.
+
    Rmpz_set_d($rop, $double);
     Assign $double to $rop. (First truncate to an integer if $double
     does not contain an integer value.)
@@ -197,15 +205,22 @@
     hexadecimal is assumed, otherwise if the first character is "0",
     octal is assumed, otherwise decimal is assumed.
 
-   Rmpz_set_IV($rop, $IV); # $IV is a perl integer value
-    Set $rop to the value of $IV. (If $IV is an unsigned integer
+   Rmpz_set_IV($rop, $iv); # $iv is a perl integer value (IV)
+    Set $rop to the value of $iv. (If $iv is an unsigned integer
     value then that unsigned value is assigned.)
+    $iv must have its IOK flag set, or the function will croak.
+    Best to first check IOK_flag($iv), which will return a non-zero
+    value if and only if the IOK flag is set.
 
-   Rmpz_set_NV($rop, $NV); # $NV is a perl floating point value
-    Set $rop to the value of $NV. (First truncate to an integer if
-    $NV does not contain an integer value.)
-    The program dies with an appropriate error message if $NV is
+   Rmpz_set_NV($rop, $nv); # $nv is a perl floating point value (NV)
+    Set $rop to the value of $nv. (First truncate to an integer if
+    $nv does not contain an integer value.)
+    The program dies with an appropriate error message if $nv is
     Inf or NaN.
+    $nv must have its NOK flag set, or the function will croak.
+    Best to first check NOK_flag($nv), which will return a non-zero
+    value if and only if the NOK flag is set.
+
 
    Rmpz_swap($rop1, $rop2); # swap the values
 
@@ -246,7 +261,9 @@
    $rop = Rmpz_init_set_str_nobless($str, $base);
 
    $rop = Rmpz_init_set_IV($IV); # $IV is a perl integer value
-   $rop - Rmpz_init_set_NV($NV); # $NV is a perl floating point value
+   $rop = Rmpz_init_set_IV_nobless($IV);
+   $rop = Rmpz_init_set_NV($NV); # $NV is a perl floating point value
+   $rop = Rmpz_init_set_NV_nobless($NV);
     Note that Rmpz_init_set_d and Rmpz_init_set_NV will truncate the
     double/NV to an integer value prior to assigning if the double/NV
     does not hold an integer value.
@@ -280,11 +297,15 @@
     Otherwise return the least significant part of $op, with the
     same sign as $op. If $op does not fit into either an IV or a
     UV, the returned result is probably not very useful. To find
-    find out if the value will fit, use the functions
-    'Rmpz_fits_IV_p' and 'Rmpz_fits_UV_p'.
+    find out if the value will fit, use the 'Rmpz_fits_IV_p'
+    function.
 
    $double = Rmpz_get_d($op);
-     Place the value of $op into a normal perl scalar.
+     Assign the value of $op, expressed in double precision, to
+     an NV.
+
+   $NV = Rmpz_get_NV($op);
+     Assign the value of $op to an NV.
 
    ($double, $si) = Rmpz_get_d_2exp($op);
     Find $double and $si such that $double times 2 raised to
@@ -623,6 +644,7 @@
    $si = Rmpz_cmp($op1, $op2);
    $si = Rmpz_cmp_d($op, $double);
    $si = Rmpz_cmp_NV($op, $nv); # $nv is an NV
+   $si = Rmpz_cmp_IV($op, $iv); # $iv is an IV
    $si = Rmpz_cmp_si($op, $si);
    $si = Rmpz_cmp_ui($op, $ui);
     Compare 1st and 2nd args.  Return a positive value if
@@ -632,6 +654,15 @@
     actual value held in the double/NV - not to the truncated
     integer value. Comparison to an Inf is allowed, but
     comparison to a NaN is a fatal error.
+
+    NOTE:
+         Rmpz_cmp_IV() requires that the 2nd argument has its IOK
+         flag set, and Rmpz_cmp_NV() requires that the 2nd
+         argument has its NOK flag set.
+         Otherwise these functions croak.
+         Suggestion: first check the status of the flag using
+         IOK_flag($iv) or NOK_flag($nv),which return a non-zero
+         value if and only if the flag in question is set.
 
    $si = Rmpz_cmpabs($op1, $op2);
    $si = Rmpz_cmpabs_d($op, $double);
@@ -705,6 +736,7 @@
    I/O of INTEGERS
 
    $bytes_written = Rmpz_out_str([$prefix,] $op, $base [, $suffix]);
+
     BEST TO USE TRmpz_out_str INSTEAD.
     Output $op to STDOUT, as a string of digits in base $base.
     The base may vary from -36..-2, 2..62. Return the number
@@ -714,17 +746,19 @@
     $bytes_written does not include the bytes contained in
     $prefix and $suffix.
 
+
    $bytes_written = TRmpz_out_str([$prefix,] $stream, $base, $op, [, $suffix]);
+    (This function doesn't work with unblessed objects.)
     As for Rmpz_out_str, except that there's the capability to print
     to somewhere other than STDOUT. Note that the order of the args
     is different (to match the order of the mpz_out_str args).
     To print to STDERR:
        TRmpz_out_str(*stderr, $base, $digits, $op);
-    To print to an open filehandle (let's call it FH):
-       TRmpz_out_str(\*FH, $base, $digits, $op);
+    To print to an open filehandle (let's call it $fh):
+       TRmpz_out_str(\*$fh, $base, $digits, $op);
 
-   $bytes_written = Rmpz_out_raw(\*FH, $op);
-    Output $op to filehandle FH, in raw binary format. The integer is
+   $bytes_written = Rmpz_out_raw(\*$fh, $op);
+    Output $op to filehandle $fh, in raw binary format. The integer is
     written in a portable format, with 4 bytes of size information, and
     that many bytes of limbs. Both the size and the limbs are written
     in decreasing significance order (i.e., in big-endian). The output
@@ -741,15 +775,16 @@
     Return the number of bytes read, or if an error occurred, return 0.
 
    $bytes_read = TRmpz_inp_str($rop, $stream, $base);
+    (This function doesn't work with unblessed objects.)
     As for Rmpz_inp_str, except that there's the capability to read
     from somewhere other than STDIN.
     To read from STDIN:
        TRmpz_inp_str($rop, *stdin, $base);
-    To read from an open filehandle (let's call it FH):
-       TRmpz_inp_str($rop, \*FH, $base);
+    To read from an open filehandle (let's call it $fh):
+       TRmpz_inp_str($rop, \*$fh, $base);
 
-    $bytes_read = Rmpz_inp_raw($rop, \*FH);
-     Input from filehandle FH in the format written by Rmpz_out_raw,
+    $bytes_read = Rmpz_inp_raw($rop, \*$fh);
+     Input from filehandle $fh in the format written by Rmpz_out_raw,
      and put the result in $rop. Return the number of bytes read, or
      if an error occurred, return 0.
 
@@ -992,13 +1027,22 @@
    $bool = Rmpz_fits_sint_p  ($op);
    $bool = Rmpz_fits_ushort_p($op);
    $bool = Rmpz_fits_sshort_p($op);
-   $bool = Rmpz_fits_UV_p    ($op);
    $bool = Rmpz_fits_IV_p    ($op);
 
     Return non-zero iff the value of $op fits an 'unsigned long int',
     'signed long int', 'unsigned int', 'signed int', 'unsigned short
-    int', or 'signed short int', 'UV', or 'IV' respectively.
+    int', or 'signed short int', or 'IV' respectively.
     Otherwise, return zero.
+
+   $si = IOK_flag($sv); # $sv is a perl scalar variable.
+   $si = NOK_flag($sv);
+   $si = POK_flag($sv);
+
+   Return 0 if $sv's IOK/NOK/POK flag is unset.
+   Else return 1.
+   If the IsUV flag is set, then IOK_flag() returns 2, thereby indicating
+   that both the IOK and IsUV flags are set (and that the integer value
+   held by $sv should therefore be treated as unsigned).
 
    $bool = Rmpz_odd_p ($op);
    $bool = Rmpz_even_p($op);
@@ -1072,30 +1116,22 @@
     using the first value it finds, or croaking if it gets
     to step 6:
 
-    1. If the variable is an unsigned long then that value is used.
-       The variable is considered to be an unsigned long if
-       (perl 5.8) the UOK flag is set or if (perl 5.6) SvIsUV()
-       returns true. (In the case of perls whose ivtype is long long,
-       the variable is treated as an unsigned long long int if the
-       UOK/SvISUV flag is set.)
+    1. If the variable is a UV then that value is used. The variable
+       is considered to be a UV if the IOK and IsUV flags are set.
 
-    2. If the variable is a signed long int, then that value is used.
-       The variable is considered to be a signed long int if the
-       IOK flag is set. (In the case of perls whose ivtype is long long,
-       the variable is treated as a signed long long int if the IOK flag
-       is set.)
+    2. If the variable is an IV, then that value is used.
+       The variable is considered to be an IV if the IOK flag is set.
 
-    3. If the variable is an NV, then that value is used. The variable
-       is considered to be an NV if the NOK flag is set && the POK flag
-       is unset.
-
-    4. If the variable is a string (ie the POK flag is set) then the
+    3. If the variable is a string (ie the POK flag is set) then the
        value of that string is used. Octal strings must begin with
        '0', hex strings must begin with either '0x' or '0X' -
        otherwise the string is assumed to be decimal. If the POK
        flag is set, but the string is not a valid base 8, 10, or 16
        number, the subroutine croaks with an appropriate error
        message.
+
+    4. If the variable is an NV, then that value is used. The variable
+       is considered to be an NV if the NOK flag is set.
 
     5. If the variable is a Math::GMPz object (or, for operators
        specified above, a Math::MPFR/Math::GMPq object) then the value

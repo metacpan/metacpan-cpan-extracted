@@ -8,7 +8,7 @@ package IO::Async::Function;
 use strict;
 use warnings;
 
-our $VERSION = '0.79';
+our $VERSION = '0.800';
 
 use base qw( IO::Async::Notifier );
 use IO::Async::Timer::Countdown;
@@ -124,6 +124,8 @@ body itself.
 =head2 module => STRING
 
 =head2 func => STRING
+
+I<Since version 0.79.>
 
 An alternative to the C<code> argument, which names a module to load and a
 function to call within it. C<module> should give a perl module name (i.e.

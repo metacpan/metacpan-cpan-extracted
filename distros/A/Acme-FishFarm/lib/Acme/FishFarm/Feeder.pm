@@ -1,6 +1,6 @@
 package Acme::FishFarm::Feeder;
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 
@@ -12,11 +12,11 @@ Acme::FishFarm::Feeder - Automated Feeder for Acme::FishFarm
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 
 =head1 SYNOPSIS
@@ -29,8 +29,7 @@ our $VERSION = '1.00';
     say "Feeder installed and switched on!";
     say "";
 
-    #while (1) {
-    for (0..20){
+    while ( "fish are living happilly" ) {
 
         if ( $feeder->timer_is_up ) {
             say "\nTimer is up, time to feed the fish!";
@@ -41,7 +40,7 @@ our $VERSION = '1.00';
             say $feeder->food_remaining, " cm^3 of fish food remaining in the tank.\n";
         }
         
-        if ( $feeder->food_remaining <=0  ) {
+        if ( $feeder->food_remaining <= 0  ) {
             $feeder->refill; # default back to 500 cm^3
             say "Refilled food tank back to ", $feeder->food_tank_capacity, " cm^3.\n";
         }
@@ -57,9 +56,9 @@ our $VERSION = '1.00';
 
 =head1 EXPORT
 
-None by default
+None
 
-=head1 CREATION RELATED SUBROUTINES/METHODS
+=head1 CREATION RELATED METHODS
 
 =head2 install ( %options )
 
@@ -71,7 +70,7 @@ The following are available for C<%options>:
 
 =item * timer
 
-The default is 8 hours.
+The default is C<8>.
 
 This is used as a threshold to identify that the time is up to feed the fish or not.
 
@@ -137,7 +136,7 @@ sub get_timer {
     $self->{timer};
 }
 
-=head2 set_timer ( $hours )
+=head2 set_timer ( $time )
 
 Sets the new timer threshold of the feeder.
 
@@ -190,9 +189,9 @@ sub time_remaining {
 
 =head2 tick_clock ( $custom_tick )
 
-C<$custom_tick> is optional and the default is C<1> hour.
+C<$custom_tick> is optional and the default is C<1>.
 
-This will cause the timer of the feeder to increase by C<1> hour (default) or by C<$custom_tick> hours.
+This will cause the timer of the feeder to increase by C<1> (default) or by C<$custom_tick>.
 
 =cut
 
@@ -206,7 +205,7 @@ sub tick_clock {
 
 =head2 food_tank_capacity
 
-Returns the current food tank capacity in C<cm^3>.
+Returns the current food tank capacity.
 
 =cut
 
@@ -230,7 +229,7 @@ sub set_food_tank_capacity {
 
 =head2 food_remaining
 
-Checks the remaining of food left in C<cm^3>.
+Returns the remaining amount of food left.
 
 =cut
 
@@ -243,12 +242,12 @@ sub food_remaining {
 
 =head2 feed_fish ( %options )
 
-Feeds the fish. This will cause the C<current_food_amount> to become less.
+Feeds the fish.
 
 Take note that this will feed the fish no matter what. So it's up to you to make sure that you check if the 
 feeder timer is really up or not before calling this method. See C<timer_is_up> for more info.
 
-C<%options> support the following:
+C<%options> supports the following key:
 
 =over 4
 
@@ -276,7 +275,7 @@ sub feed_fish {
 
 =head2 set_feeding_volume ( $volume )
 
-Sets the feeding volume for the fish.
+Sets the fish food feeding volume.
 
 C<$volume> must be a positive number. No error checking is done for this yet.
 
@@ -290,7 +289,7 @@ sub set_feeding_volume {
 
 =head2 feeding_volume
 
-Returns the amount of food in C<cm^3> to feed the fish each time.
+Returns the amount of food to feed the fish each time the C<feed_fish> method is called.
 
 =cut
 
@@ -301,7 +300,7 @@ sub feeding_volume {
 
 =head2 refill ( $volume )
 
-Refills the fish food tank B<TO> C<$volume cm^3>.
+Refills the fish food tank B<TO> C<$volume>.
 
 If C<$volume> is not specified, the food tank will be filled to max.
 
@@ -366,6 +365,10 @@ L<https://metacpan.org/release/.>
 =head1 ACKNOWLEDGEMENTS
 
 Besiyata d'shmaya
+
+=head1 SEE ALSO
+
+    Acme::FishFarm
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -24,5 +24,5 @@ requires:
   ExtUtils::ParseXS: '3.24'
   PkgConfig: '0.24'
   perl: '5.010000'
-version: v1.3.4
+version: v1.3.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

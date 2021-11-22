@@ -45,10 +45,10 @@
          "web" : "https://github.com/ap/Config-INI-Tiny"
       }
    },
-   "version" : "0.103",
+   "version" : "0.104",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
-      "year" : 2020
+      "year" : 2021
    },
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,0 +1,36 @@
+---
+abstract: 'Install modules for Kramerius system.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Task-Kramerius
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  App::Kramerius::To::Images: 0.03
+  App::Kramerius::URI: 0.03
+  App::Kramerius::V4: 0.02
+  Data::Kramerius: 0.04
+  WebService::Kramerius::API4: 0.01
+  perl: 5.6.0
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/Task-Kramerius/issues
+  homepage: https://github.com/michal-josef-spacek/Task-Kramerius
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/Task-Kramerius
+version: '0.01'

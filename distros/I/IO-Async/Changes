@@ -1,5 +1,15 @@
 Revision history for IO-Async
 
+0.800   2021-11-11
+        [CHANGES]
+         * Bumped up to three-digit minor version number
+         * Added IO::Async::OS->signum2name
+         * Implement Future::IO->waitpid API
+         * Skip the `spawn` Routine model if POSIX fork() is not available
+         * Replace getaddrinfo / getnameinfo with virtual mocking functions
+           for unit-testing the resolve, so as not to rely on local platform
+           resolver behaviours
+
 0.79    2021-08-06
         [CHANGES]
          * Permit IO::Async::Routine or Function by module+func names instead

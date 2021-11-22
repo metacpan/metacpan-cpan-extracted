@@ -46,6 +46,12 @@ has [ qw/ url / ] => (
     },
 );
 
+has 'warn_unknown_attributes' => (
+    is      => 'rw',
+    isa     => sub { $_[0] || ! $_[0] },
+    default => 0,
+);
+
 has [ qw/ url_no_id / ] => (
     is      => 'rw',
     lazy    => 1,
@@ -85,10 +91,11 @@ the objects you are interested in) you need to call the ->get method to
 populate the attributes on an object. Really the Paginator just contains a list
 of URLs and an easy way to navigate through them.
 
-If the data returned from Fixflo contains attributes not available on the object
-then warnings will be raised for those attributes that couldn't be set - if you
-see any of these please raise an issue against the dist as these are likely due
-to updates to the Fixflo API.
+Note that Fixflo have a habit of updating their API to add new attributes to the
+entities - these would normally cause the parsing of the envelope data to throw
+an exception, but a check is in place to defend against this. If you want to see
+warnings about those then set C<warn_unknown_attributes> on this Resource object
+(a boolean, which defaults to false).
 
 =cut
 
@@ -96,7 +103,10 @@ sub to_hash {
     my ( $self ) = @_;
 
     my %hash = %{ $self };
+
     delete( $hash{client} );
+    delete( $hash{warn_unknown_attributes} );
+
     return %hash;
 }
 
@@ -113,7 +123,14 @@ sub get {
     foreach my $attr ( keys( %{ $data } ) ) {
         try { $self->$attr( $data->{$attr} ); }
         catch {
-            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $_" );
+            my $e = $_;
+
+            if (
+                $e =~ /Can't locate object method/ 
+                && $self->warn_unknown_attributes
+            ) {
+                carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $e" );
+            }
         };
     }
 
@@ -133,7 +150,14 @@ sub _parse_envelope_data {
     foreach my $attr ( keys( %{ $Envelope->Entity // {} } ) ) {
         try { $self->$attr( $Envelope->Entity->{$attr} ); }
         catch {
-            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $_" );
+            my $e = $_;
+
+            if (
+                $e =~ /Can't locate object method/ 
+                && $self->warn_unknown_attributes
+            ) {
+                carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $e" );
+            }
         };
     }
 

@@ -5,7 +5,7 @@ package Data::Frame::Autobox;
 use strict;
 use warnings;
 
-our $VERSION = '0.0058'; # VERSION
+our $VERSION = '0.0060'; # VERSION
 
 use parent 'autobox';
 
@@ -173,7 +173,7 @@ Data::Frame::Autobox - Autobox arrays and hashes for Data::Frame
 
 =head1 VERSION
 
-version 0.0058
+version 0.0060
 
 =head1 SYNOPSIS
 

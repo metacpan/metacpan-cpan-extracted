@@ -1,6 +1,6 @@
 package Net::RFC3161::Timestamp;
 # ABSTRACT: Utility functions to request RFC3161 timestamps
-$Net::RFC3161::Timestamp::VERSION = '0.010';
+$Net::RFC3161::Timestamp::VERSION = '0.020';
 use strict;
 use warnings;
 use Exporter 'import';
@@ -165,7 +165,7 @@ Net::RFC3161::Timestamp - Utility functions to request RFC3161 timestamps
 
 =head1 VERSION
 
-version 0.010
+version 0.020
 
 =head2 list_tsas
 
@@ -187,7 +187,7 @@ Generate a timestamp request for a file and place it into $req_buf.
 Post a timestamp request to a timestamping authority and retrieve the result.
 
 $tsa can either be the name of a timestamping authority from the above table
-or directly a https URL.
+or directly a http URL.
 
 =head2 write_response_to_file
 

@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Output;
 
 BEGIN {
     use_ok( "Acme::FishFarm::OxygenMaintainer" ) || BAIL_OUT;

@@ -37,9 +37,9 @@ Here are the ways you can hook into Phoebe code:
 C<@extensions> is a list of code references allowing you to handle additional
 URLs; return 1 if you handle a URL; each code reference gets called with $stream
 (L<Mojo::IOLoop::Stream>), the first line of the request (a Gemini URL, a Gopher
-selector, a finger user, a HTTP request line), a hash reference for the headers
-(in the case of HTTP requests), and a buffer of bytes (e.g. for Titan or HTTP
-PUT or POST requests).
+selector, a finger user, a HTTP request line), a hash reference (with the
+headers of HTTP requests or the parameters of Titan requests), a buffer of bytes
+(e.g. for Titan or HTTP PUT or POST requests), and (sometimes) size.
 
 C<@main_menu> adds more lines to the main menu, possibly links that aren't
 simply links to existing pages.
@@ -151,7 +151,7 @@ use Mojo::IOLoop;
 use Mojo::Log;
 use utf8;
 
-our $VERSION = 4.02;
+our $VERSION = 4.03;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -160,12 +160,12 @@ our @EXPORT_OK = qw(@extensions @main_menu @footer $log $server $full_url_regex
 		    result get_ip_numbers run_extensions pages blog blog_pages
 		    text save_page serve_index serve_page serve_raw serve_html
 		    serve_history serve_diff html_page to_html @request_handlers
-		    handle_request process_titan process_gemini valid_id
-		    valid_mime_type valid_size valid_token print_link all_logs
-		    gemini_link colourize modified changes diff bogus_hash
-		    quote_html write_page @known_fingerprints with_lock wiki_dir
-		    to_url handle_titan footer atom rss files space_links search
-		    decode_query);
+		    handle_request process_titan process_gemini valid_params
+		    valid_id valid_mime_type valid_size valid_token print_link
+		    all_logs gemini_link colourize modified changes diff
+		    bogus_hash quote_html write_page @known_fingerprints
+		    with_lock wiki_dir to_url handle_titan footer atom rss files
+		    space_links search decode_query);
 
 # Phoebe variables you can set in the config file
 
@@ -293,8 +293,12 @@ sub process_titan {
   eval {
     local $SIG{'ALRM'} = sub { $log->error("Timeout processing upload $request") };
     alarm(10); # timeout
-    save_page($stream, $upload->{host}, $upload->{space}, $upload->{id},
-	      $upload->{params}->{mime}, $buffer, $size);
+    if (run_extensions($stream, $request, $upload, $buffer, $size)) {
+      # config file goes first
+    } else {
+      save_page($stream, $upload->{host}, $upload->{space}, $upload->{id},
+		$upload->{params}->{mime}, $buffer, $size);
+    }
     alarm(0);
   };
   return unless $@;

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.7';
+our $VERSION = '1.9';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -40,59 +40,74 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
   print $pkcs12->private_key($pass);
 
   if ($pkcs12->mac_ok($pass)) {
-  ....
+  ...
 
-  $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', "friendly name");
+  # Creating a file
+  $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', 'friendly name');
 
-=head1 ABSTRACT
 
-  Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
+  # Creating a string
+  my $pksc12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
+
+=head1 VERSION
+
+This documentation describes version 1.9
 
 =head1 DESCRIPTION
 
-  This implements a small bit of OpenSSL's PKCS12 API.
+PKCS12 is a file format for storing cryptography objects as a single file or string. PKCS12 is commonly used to bundle a private key with its X.509 certificate or to bundle all the members of a chain of trust.
 
-=head1 FUNCTIONS
+This distribution implements a subset of OpenSSL's PKCS12 API.
+
+=head1 SUBROUTINES/METHODS
 
 =over 4
 
 =item * new( )
 
-=item * new_from_string( $string )
+=item * new_from_string( C<$string> )
 
-=item * new_from_file( $filename )
+=item * new_from_file( C<$filename> )
 
 Create a new Crypt::OpenSSL::PKCS12 instance.
 
-=item * certificate( [$pass] )
+=item * certificate( [C<$pass>] )
 
 Get the Base64 representation of the certificate.
 
-=item * private_key( [$pass] )
+=item * private_key( [C<$pass>] )
 
 Get the Base64 representation of the private key.
 
-=item * as_string( [$pass] )
+=item * as_string( [C<$pass>] )
 
 Get the binary represenation as a string.
 
-=item * mac_ok( [$pass] )
+=item * mac_ok( [C<$pass>] )
 
 Verifiy the certificates Message Authentication Code
 
-=item * changepass( $old, $new )
+=item * changepass( C<$old>, C<$new> )
 
 Change a certificate's password.
 
-=item * create( $cert, $key, $pass, $output_file, $friendly_name )
+=item * create( C<$cert>, C<$key>, C<$pass>, C<$output_file>, C<$friendly_name> )
 
 Create a new PKCS12 certificate. $cert & $key may either be strings or filenames.
 
-$friendly_name is optional.
+C<$friendly_name> is optional.
+
+=item * create_as_string( C<$cert>, C<$key>, C<$pass>, C<$friendly_name> )
+
+Create a new PKCS12 certificate string. $cert & $key may either be strings or filenames.
+
+C<$friendly_name> is optional.
+
+Returns a string holding the PKCS12 certicate.
 
 =back
 
-=head1 EXPORT
+=head1 EXPORTS
 
 None by default.
 
@@ -100,55 +115,137 @@ On request:
 
 =over 4
 
-=item * NOKEYS
+=item * C<NOKEYS>
 
-=item * NOCERTS
+=item * C<NOCERTS>
 
-=item * INFO
+=item * C<INFO>
 
-=item * CLCERTS
+=item * C<CLCERTS>
 
-=item * CACERTS
+=item * C<CACERTS>
+
+=back
+
+=head1 DIAGNOSTICS
+
+No diagnostics are documented at this time
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+No special environment or configuration is required.
+
+=head1 DEPENDENCIES
+
+This distribution has the following dependencies
+
+=over
+
+=item * An installation of OpenSSL, version 1.X.X
+
+=item * Perl 5.8
 
 =back
 
 =head1 SEE ALSO
 
-OpenSSL(1), Crypt::OpenSSL::X509, Crypt::OpenSSL::RSA, Crypt::OpenSSL::Bignum
-
-=head1 AUTHOR
-
-Dan Sully, E<lt>daniel@cpan.orgE<gt>
-
-=head1 CONTRIBUTORS
-
 =over
 
-=item * Shoichi Kaji
+=item * OpenSSL(1) (L<HTTP version with OpenSSL.org|https://www.openssl.org/docs/man1.1.1/man1/openssl.html>)
 
-=item * Todd Rinaldo
+=item * L<Crypt::OpenSSL::X509|https://metacpan.org/pod/Crypt::OpenSSL::X509>
 
-=item * Alexandr Ciornii
+=item * L<Crypt::OpenSSL::RSA|https://metacpan.org/pod/Crypt::OpenSSL::RSA>
 
-=item * Songmu
+=item * L<Crypt::OpenSSL::Bignum|https://metacpan.org/pod/Crypt::OpenSSL::Bignum>
 
-=item * Christopher Hoskin
+=item * L<OpenSSL.org|https://www.openssl.org/>
 
-=item * jonasbn
+=item * L<Wikipedia: PKCS12|https://en.wikipedia.org/wiki/PKCS_12>
 
-=item * Mikołaj Zalewski
-
-=item * Darko Prelec
-
-=item * Leonid Antonenkov
-
-=item * kelson
-
-=item * HMBRAND
+=item * L<RFC:7292: "PKCS #12: Personal Information Exchange Syntax v1.1"|https://datatracker.ietf.org/doc/html/rfc7292>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 INCOMPATIBILITIES
+
+Currently the library only supports OpenSSL 1.X.X
+
+The library has not been tested with OpenSSL 3.X.X and is not expected to work with this version at this time
+
+=head1 BUGS AND LIMITATIONS
+
+Please see the L<GitHub repository|https://github.com/dsully/perl-crypt-openssl-pkcs12/issues> for known issues.
+
+=head1 AUTHOR
+
+=over
+
+=item * Dan Sully, E<lt>daniel@cpan.orgE<gt>
+
+=back
+
+Current maintainer
+
+=over
+
+=item * jonasbn
+
+=back
+
+=head1 CONTRIBUTORS
+
+In alphabetical order, contributors, bug reporters and all
+
+=over
+
+=item * @mmuehlenhoff
+
+=item * @sectokia
+
+=item * @SmartCodeMaker
+
+=item * Alexandr Ciornii, @chorny
+
+=item * Christopher Hoskin, @mans0954
+
+=item * Daisuke Murase, @typester
+
+=item * Darko Prelec, @dprelec
+
+=item * David Steinbrunner, @dsteinbrunner
+
+=item * Giuseppe Di Terlizzi, @giterlizzi
+
+=item * H.Merijn Brand, @tux
+
+=item * Hakim, @osfameron
+
+=item * J. Nick Koston, @bdraco
+
+=item * James Rouzier, @jrouzierinverse
+
+=item * jonasbn. @jonasbn
+
+=item * Kelson, @kelson42
+
+=item * Lance Wicks, @lancew
+
+=item * Leonid Antonenkov
+
+=item * Masayuki Matsuki, @songmu
+
+=item * Mikołaj Zalewski
+
+=item * Shoichi Kaji
+
+=item * Slaven Rezić
+
+=item * Todd Rinaldo, @toddr
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
 
 Copyright 2004-2021 by Dan Sully
 

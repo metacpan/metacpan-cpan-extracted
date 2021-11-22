@@ -7,7 +7,7 @@ package Lingua::EN::Inflexion::Nouns;
 use 5.010; use strict; use warnings; use re q{eval};
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = 20190427.201137;
+our $VERSION = 20211117.032229;
 
 my $modern_plural_of = {
   " ox"                    => " oxen",
@@ -143,8 +143,8 @@ my $modern_plural_of = {
   "atman"                  => "atmas",
   "aureus"                 => "aurei",
   "aurora"                 => "auroras",
-  "auslese"                => "ausleses",
   "Auslese"                => "Auslesen",
+  "auslese"                => "ausleses",
   "auspex"                 => "auspices",
   "auto"                   => "autos",
   "auto de fe"             => "auto de fes",
@@ -673,13 +673,12 @@ my $modern_plural_of = {
   "furioso"                => "furiosos",
   "fuzz"                   => "fuzzes",
   "Gabunese"               => "Gabunese",
-  "galla"                  => "gallas",
   "Galla"                  => "Gallas",
+  "galla"                  => "gallas",
   "gallows"                => "gallows",
   "gametangium"            => "gametangia",
   "ganglion"               => "ganglions",
   "gaon"                   => "gaons",
-  "gas"                    => "gases",
   "gastrocnemius"          => "gastrocnemii",
   "geisha"                 => "geishas",
   "geisteswissenschaft"    => "geisteswissenschaften",
@@ -710,7 +709,6 @@ my $modern_plural_of = {
   "globigerina"            => "globigerinae",
   "glochidium"             => "glochidia",
   "glomus"                 => "glomera",
-  "glottis"                => "glottises",
   "glutaeus"               => "glutei",
   "gluteus"                => "glutei",
   "gmina"                  => "gminy",
@@ -908,6 +906,7 @@ my $modern_plural_of = {
   "jo"                     => "joes",
   "joe"                    => "joes",
   "Johnsonese"             => "Johnsonese",
+  "judas"                  => "judases",
   "judicatum"              => "judicata",
   "juelet"                 => "iueles",
   "jugum"                  => "juga",
@@ -947,8 +946,8 @@ my $modern_plural_of = {
   "laika"                  => "laiki",
   "lamella"                => "lamellae",
   "lamina"                 => "laminae",
-  "lapith"                 => "lapiths",
   "Lapith"                 => "Lapiths",
+  "lapith"                 => "lapiths",
   "Lapponese"              => "Lapponese",
   "lar"                    => "lars",
   "larnax"                 => "larnakes",
@@ -1095,8 +1094,8 @@ my $modern_plural_of = {
   "mare"                   => "mares",
   "maremma"                => "maremme",
   "marquis"                => "marquises",
-  "mary"                   => "maries",
   "Mary"                   => "Marys",
+  "mary"                   => "maries",
   "mater lectionis"        => "matres lectionis",
   "math"                   => "maths",
   "matin"                  => "matins",
@@ -1339,8 +1338,8 @@ my $modern_plural_of = {
   "osteoma"                => "osteomata",
   "ostium"                 => "ostia",
   "oto"                    => "otos",
-  "otomi"                  => "otomies",
   "Otomi"                  => "Otomies",
+  "otomi"                  => "otomies",
   "ottoman"                => "ottomans",
   "ovarium"                => "ovaria",
   "ovolo"                  => "ovoli",
@@ -1617,8 +1616,8 @@ my $modern_plural_of = {
   "punto blanco"           => "puntos blancos",
   "pupa"                   => "pupae",
   "purlieu"                => "purlieus",
-  "Purum"                  => "Purums",
   "purum"                  => "purums",
+  "Purum"                  => "Purums",
   "putto"                  => "putti",
   "puttony"                => "puttonys",
   "pycnidium"              => "pycnidia",
@@ -1703,6 +1702,7 @@ my $modern_plural_of = {
   "rococo"                 => "rococos",
   "roe"                    => "roes",
   "Rom"                    => "Roma",
+  "rom"                    => "roms",
   "Romagnese"              => "Romagnese",
   "Roman"                  => "Romans",
   "Romanese"               => "Romanese",
@@ -2135,6 +2135,7 @@ my $modern_plural_of = {
   "them"                   => "them",
   "thema"                  => "themata",
   "themself"               => "themselves",
+  "themselves"             => "themselves",
   "theologoumenon"         => "theologoumena",
   "thesaurus"              => "thesauruses",
   "they"                   => "they",
@@ -2560,8 +2561,8 @@ my $classical_plural_of = {
   "atman"                  => "atmas",
   "aureus"                 => "aurei",
   "aurora"                 => "aurorae",
-  "auslese"                => "auslesen",
   "Auslese"                => "Auslesen",
+  "auslese"                => "auslesen",
   "auspex"                 => "auspices",
   "auto"                   => "autos",
   "auto de fe"             => "autos de fes",
@@ -3090,13 +3091,12 @@ my $classical_plural_of = {
   "furioso"                => "furiosos",
   "fuzz"                   => "fuzzes",
   "Gabunese"               => "Gabunese",
-  "galla"                  => "galla",
   "Galla"                  => "Galla",
+  "galla"                  => "galla",
   "gallows"                => "gallows",
   "gametangium"            => "gametangia",
   "ganglion"               => "ganglia",
   "gaon"                   => "gaonim",
-  "gas"                    => "gases",
   "gastrocnemius"          => "gastrocnemii",
   "geisha"                 => "geisha",
   "geisteswissenschaft"    => "geisteswissenschaften",
@@ -3127,7 +3127,6 @@ my $classical_plural_of = {
   "globigerina"            => "globigerinae",
   "glochidium"             => "glochidia",
   "glomus"                 => "glomera",
-  "glottis"                => "glottises",
   "glutaeus"               => "glutaei",
   "gluteus"                => "glutaei",
   "gmina"                  => "gminy",
@@ -3325,6 +3324,7 @@ my $classical_plural_of = {
   "jo"                     => "joes",
   "joe"                    => "joes",
   "Johnsonese"             => "Johnsonese",
+  "judas"                  => "judases",
   "judicatum"              => "judicata",
   "juelet"                 => "iueles",
   "jugum"                  => "juga",
@@ -3364,8 +3364,8 @@ my $classical_plural_of = {
   "laika"                  => "laiki",
   "lamella"                => "lamellae",
   "lamina"                 => "laminae",
-  "lapith"                 => "lapithae",
   "Lapith"                 => "Lapithae",
+  "lapith"                 => "lapithae",
   "Lapponese"              => "Lapponese",
   "lar"                    => "lares",
   "larnax"                 => "larnakes",
@@ -3756,8 +3756,8 @@ my $classical_plural_of = {
   "osteoma"                => "osteomata",
   "ostium"                 => "ostia",
   "oto"                    => "otos",
-  "otomi"                  => "otomi",
   "Otomi"                  => "Otomi",
+  "otomi"                  => "otomi",
   "ottoman"                => "ottomans",
   "ovarium"                => "ovaria",
   "ovolo"                  => "ovoli",
@@ -4120,6 +4120,7 @@ my $classical_plural_of = {
   "rococo"                 => "rococos",
   "roe"                    => "roe",
   "Rom"                    => "Roma",
+  "rom"                    => "roms",
   "Romagnese"              => "Romagnese",
   "Roman"                  => "Romans",
   "Romanese"               => "Romanese",
@@ -4552,6 +4553,7 @@ my $classical_plural_of = {
   "them"                   => "them",
   "thema"                  => "themata",
   "themself"               => "themselves",
+  "themselves"             => "themselves",
   "theologoumenon"         => "theologoumena",
   "thesaurus"              => "thesauri",
   "they"                   => "they",
@@ -5682,7 +5684,6 @@ my $singular_of = {
   "ganglions"             => "ganglion",
   "gaonim"                => "gaon",
   "gaons"                 => "gaon",
-  "gases"                 => "gas",
   "gastrocnemii"          => "gastrocnemius",
   "geese"                 => "goose",
   "geisha"                => "geisha",
@@ -5718,7 +5719,6 @@ my $singular_of = {
   "globigerinae"          => "globigerina",
   "glochidia"             => "glochidium",
   "glomera"               => "glomus",
-  "glottises"             => "glottis",
   "glutaei"               => "glutaeus",
   "glutei"                => "glutaeus",
   "gminy"                 => "gmina",
@@ -5943,6 +5943,7 @@ my $singular_of = {
   "jeux"                  => "jeu",
   "joes"                  => "joe",
   "Johnsonese"            => "Johnsonese",
+  "judases"               => "judas",
   "judicata"              => "judicatum",
   "juga"                  => "jugum",
   "jumbos"                => "jumbo",
@@ -5994,8 +5995,8 @@ my $singular_of = {
   "laminae"               => "lamina",
   "Lapithae"              => "Lapith",
   "lapithae"              => "lapith",
-  "Lapiths"               => "Lapith",
   "lapiths"               => "lapith",
+  "Lapiths"               => "Lapith",
   "Lapponese"             => "Lapponese",
   "lares"                 => "lar",
   "larnakes"              => "larnax",
@@ -6376,8 +6377,8 @@ my $singular_of = {
   "nectocalyces"          => "nectocalyx",
   "nemathecia"            => "nemathecium",
   "Nenets"                => "Nenets",
-  "nentsi"                => "nenets",
   "Nentsi"                => "Nenets",
+  "nentsi"                => "nenets",
   "nentsy"                => "nenets",
   "Nepalese"              => "Nepalese",
   "nephridia"             => "nephridium",
@@ -6484,8 +6485,8 @@ my $singular_of = {
   "ostia"                 => "ostium",
   "otomi"                 => "otomi",
   "Otomi"                 => "Otomi",
-  "Otomies"               => "Otomi",
   "otomies"               => "otomi",
+  "Otomies"               => "Otomi",
   "otos"                  => "oto",
   "ottomans"              => "ottoman",
   "ours"                  => "mine",
@@ -6510,10 +6511,10 @@ my $singular_of = {
   "palpebrae"             => "palpebra",
   "palpi"                 => "palpus",
   "Panamans"              => "Panaman",
-  "Pangasinanes"          => "Pangasinan",
   "pangasinanes"          => "pangasinan",
-  "pangasinans"           => "pangasinan",
+  "Pangasinanes"          => "Pangasinan",
   "Pangasinans"           => "Pangasinan",
+  "pangasinans"           => "pangasinan",
   "panini"                => "panino",
   "panorpae"              => "panorpa",
   "pantos"                => "panto",
@@ -6940,6 +6941,7 @@ my $singular_of = {
   "Romanies"              => "Romany",
   "Romans"                => "Roman",
   "romanzen"              => "romanze",
+  "roms"                  => "rom",
   "rond de jambes"        => "rond de jambe",
   "rondeaus"              => "rondeau",
   "rondeaux"              => "rondeau",
@@ -7472,7 +7474,7 @@ my $singular_of = {
   "thelyca"               => "thelycum",
   "them"                  => "it",
   "themata"               => "thema",
-  "themselves"            => "itself",
+  "themselves"            => "themselves",
   "theologoumena"         => "theologoumenon",
   "thesauri"              => "thesaurus",
   "thesauruses"           => "thesaurus",
@@ -7844,16 +7846,17 @@ my $PREP_PAT = qr{ about | above | across | after | among | around | athwart | a
 
 sub prep_pat { $PREP_PAT }
 
+sub tc {my($text)=@_; $text=~s{(\A|\s)(\S)|(\S)}{defined($3)?lc($3):$1.uc($2)}egxms; $text; };
 sub convert_to_modern_plural {
     my ($word) = @_;
-    return $modern_plural_of->{$word}    if exists $modern_plural_of->{$word};
-    return $modern_plural_of->{lc $word} if exists $modern_plural_of->{lc $word};
-    return $word                    if is_plural($word) && !is_singular($word);
+    return $modern_plural_of->{$word}     if exists $modern_plural_of->{$word};
+    return $modern_plural_of->{lc $word}  if exists $modern_plural_of->{lc $word};
+    return $modern_plural_of->{tc $word}  if exists $modern_plural_of->{tc $word};
+    return $word                     if is_plural($word) && !is_singular($word);
     given ($word) {
-        when (m{\A(.*?)'s?$}i) { return "${continue if !is_singular($1); my
-        $plural = $modern_plural_of->{$1}; \($plural =~ /s$/ ? $plural.q{'} : $plural.q{'s})}"; }
-        when (m{\A(.*)staff$}i) { return "${1}staffs"; }
+        when (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->plural)}"; }
         when (m{\A(.*)stave$}i) { return "${1}staves"; }
+        when (m{\A(.*)staff$}i) { return "${1}staffs"; }
         when (m{\A(.*)genus$}i) { return "${1}genera"; }
         when (m{\A(.*)person$}i) { return "${1}people"; }
         when (m{\A(.*)hertz$}i) { return "${1}hertz"; }
@@ -7914,6 +7917,8 @@ sub convert_to_modern_plural {
         when (m{\A(.*)sheep$}i) { return "${1}sheep"; }
         when (m{\A(.*)wildebeest$}i) { return "${1}wildebeests"; }
         when (m{\A(.*)craft$}i) { return "${1}craft"; }
+        when (m{\A(.*)gas$}i) { return "${1}gases"; }
+        when (m{\A(.*)glottis$}i) { return "${1}glottises"; }
         when (m{\A(.+)star general$}i) { return "${1}star generals"; }
         when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-general"; }
         when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} general"; }
@@ -7961,14 +7966,14 @@ sub convert_to_modern_plural {
 
 sub convert_to_classical_plural {
     my ($word) = @_;
-    return $classical_plural_of->{$word}    if exists $classical_plural_of->{$word};
-    return $classical_plural_of->{lc $word} if exists $classical_plural_of->{lc $word};
-    return $word                    if is_plural($word) && !is_singular($word);
+    return $classical_plural_of->{$word}     if exists $classical_plural_of->{$word};
+    return $classical_plural_of->{lc $word}  if exists $classical_plural_of->{lc $word};
+    return $classical_plural_of->{tc $word}  if exists $classical_plural_of->{tc $word};
+    return $word                     if is_plural($word) && !is_singular($word);
     given ($word) {
-        when (m{\A(.*?)'s?$}i) { return "${continue if !is_singular($1); my
-        $plural = $classical_plural_of->{$1}; \($plural =~ /s$/ ? $plural.q{'} : $plural.q{'s})}"; }
-        when (m{\A(.*)staff$}i) { return "${1}staves"; }
+        when (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->classical->plural)}"; }
         when (m{\A(.*)stave$}i) { return "${1}staves"; }
+        when (m{\A(.*)staff$}i) { return "${1}staves"; }
         when (m{\A(.*)genus$}i) { return "${1}genera"; }
         when (m{\A(.*)person$}i) { return "${1}persons"; }
         when (m{\A(.*)hertz$}i) { return "${1}hertz"; }
@@ -8029,6 +8034,8 @@ sub convert_to_classical_plural {
         when (m{\A(.*)sheep$}i) { return "${1}sheep"; }
         when (m{\A(.*)wildebeest$}i) { return "${1}wildebeest"; }
         when (m{\A(.*)craft$}i) { return "${1}craft"; }
+        when (m{\A(.*)gas$}i) { return "${1}gases"; }
+        when (m{\A(.*)glottis$}i) { return "${1}glottises"; }
         when (m{\A(.+)star general$}i) { return "${1}star generals"; }
         when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-general"; }
         when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} general"; }
@@ -8076,14 +8083,15 @@ sub convert_to_classical_plural {
 
 sub convert_to_singular {
     my ($word) = @_;
-    return $singular_of->{$word}    if exists $singular_of->{$word};
-    return $singular_of->{lc $word} if exists $singular_of->{lc $word};
-    return $word                    if is_singular($word);
+    return $singular_of->{$word}     if exists $singular_of->{$word};
+    return $singular_of->{lc $word}  if exists $singular_of->{lc $word};
+    return $singular_of->{tc $word}  if exists $singular_of->{tc $word};
+    return $word                     if is_singular($word);
     given ($word) {
-        when (m{\A(.*?)'s?$}i) { return "${continue if !is_plural($1); my $sing = convert_to_singular($1); \($sing =~ /s$/ ? $sing.q{'} : $sing.q{'s})}"; }
+        when (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->singular)}"; }
+        when (m{\A(.*)staves$}i) { return "${1}stave"; }
         when (m{\A(.*)staffs$}i) { return "${1}staff"; }
         when (m{\A(.*)staves$}i) { return "${1}staff"; }
-        when (m{\A(.*)staves$}i) { return "${1}stave"; }
         when (m{\A(.*)genera$}i) { return "${1}genus"; }
         when (m{\A(.*)people$}i) { return "${1}person"; }
         when (m{\A(.*)persons$}i) { return "${1}person"; }
@@ -8163,6 +8171,8 @@ sub convert_to_singular {
         when (m{\A(.*)wildebeests$}i) { return "${1}wildebeest"; }
         when (m{\A(.*)wildebeest$}i) { return "${1}wildebeest"; }
         when (m{\A(.*)craft$}i) { return "${1}craft"; }
+        when (m{\A(.*)gases$}i) { return "${1}gas"; }
+        when (m{\A(.*)glottises$}i) { return "${1}glottis"; }
         when (m{\A(.+)star generals$}i) { return "${1}star general"; }
         when (m{\A(.*?)-general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-general"; }
         when (m{\A(.*?) general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} general"; }
@@ -8216,12 +8226,16 @@ sub is_plural {
     my ($word) = @_;
     return 1 if exists $is_plural->{$word};
     return 1 if exists $is_plural->{lc $word};
+    return 1 if exists $is_plural->{ucfirst lc $word};
     return 0 if exists $is_singular->{$word};
     return 0 if exists $is_singular->{lc $word};
+    return 0 if exists $is_singular->{ucfirst lc $word};
     given ($word) {
-        when (m{\A(.*?)'s?$}i) { return 1 }
-        when (m{\A(.*)staffs$}i) { return 1 }
+        when (m{'$})  { return 1 }
+        when (m{'s$}) { return is_plural(substr($word,0,-2)) }
+        when (m{\A.*'s?$}i) { return 1 }
         when (m{\A(.*)staves$}i) { return 1 }
+        when (m{\A(.*)staffs$}i) { return 1 }
         when (m{\A(.*)genera$}i) { return 1 }
         when (m{\A(.*)people$}i) { return 1 }
         when (m{\A(.*)persons$}i) { return 1 }
@@ -8301,6 +8315,8 @@ sub is_plural {
         when (m{\A(.*)wildebeests$}i) { return 1 }
         when (m{\A(.*)wildebeest$}i) { return 1 }
         when (m{\A(.*)craft$}i) { return 1 }
+        when (m{\A(.*)gases$}i) { return 1 }
+        when (m{\A(.*)glottises$}i) { return 1 }
         when (m{\A(.+)star generals$}i) { return 1 }
         when (m{\A($PREP_PAT) them$}i) { return 1 }
         when (m{\Asons-of-(.*?)$}i) { continue if !is_plural($1);return 1 }
@@ -8341,7 +8357,7 @@ sub is_plural {
         when (m{\A(.+)ies$}i) { return 1 }
         when (m{\A(.+)zzes$}i) { return 1 }
         when (m{\A(.+)zoa$}i) { return 1 }
-        default { return $word =~ m{ s \Z }xms; }
+        default { return $word =~ m{ s \Z }ixms; }
     }
 }
 
@@ -8349,12 +8365,16 @@ sub is_singular {
     my ($word) = @_;
     return 1 if exists $is_singular->{$word};
     return 1 if exists $is_singular->{lc $word};
+    return 1 if exists $is_singular->{ucfirst lc $word};
     return 0 if exists $is_plural->{$word};
     return 0 if exists $is_plural->{lc $word};
+    return 0 if exists $is_plural->{ucfirst lc $word};
     given ($word) {
-        when (m{\A(.*?)'s?$}i) { return 1 }
-        when (m{\A(.*)staff$}i) { return 1 }
+        when (m{'$})  { return 0 }
+        when (m{'s$}) { return is_singular(substr($word,0,-2)) }
+        when (m{\A.*'s?$}i) { return 1 }
         when (m{\A(.*)stave$}i) { return 1 }
+        when (m{\A(.*)staff$}i) { return 1 }
         when (m{\A(.*)genus$}i) { return 1 }
         when (m{\A(.*)person$}i) { return 1 }
         when (m{\A(.*)hertz$}i) { return 1 }
@@ -8415,6 +8435,8 @@ sub is_singular {
         when (m{\A(.*)sheep$}i) { return 1 }
         when (m{\A(.*)wildebeest$}i) { return 1 }
         when (m{\A(.*)craft$}i) { return 1 }
+        when (m{\A(.*)gas$}i) { return 1 }
+        when (m{\A(.*)glottis$}i) { return 1 }
         when (m{\A(.+)star general$}i) { return 1 }
         when (m{\A($PREP_PAT) it$}i) { return 1 }
         when (m{\Ason-of-a-(.*?)$}i) { continue if !is_singular($1);return 1 }

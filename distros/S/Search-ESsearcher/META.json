@@ -50,6 +50,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.3",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/VVelox/Search-ESsearcher"
+      }
+   },
+   "version" : "v0.4.4",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -72,7 +72,7 @@ sub parse_jwk {
     my ($hr) = @_;
 
     if ('HASH' ne ref $hr) {
-        die Crypt::Perl::X::create('InvalidJWK', $hr);
+        die( (caller 0)[3] . " needs a HASH reference, not $hr" );
     }
 
     my $kty = $hr->{'kty'};
@@ -95,7 +95,7 @@ sub parse_jwk {
             $module = 'Crypt::Perl::ECDSA::Parse';
         }
         else {
-            die Crypt::Perl::X::create('UnknownJTKkty', $kty);
+            die Crypt::Perl::X::create('UnknownJWKkty', $kty);
         }
 
         Module::Load::load($module);

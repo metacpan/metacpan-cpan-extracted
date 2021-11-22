@@ -2,7 +2,7 @@ package Google::API::Client;
 
 use strict;
 use 5.008_001;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Google::API::Method;
 use Google::API::Resource;
@@ -27,12 +27,27 @@ sub build {
     my $self = shift;
     my ($service, $version, $args) = @_;
 
-    my $discovery_service_url = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}/rest';
+    my $discovery_service_url;
+    if ($args->{discovery_service_url}) {
+        $discovery_service_url = $args->{discovery_service_url};
+    } else {
+        $discovery_service_url = 'https://{api}.googleapis.com/$discovery/rest';
+        if ($version) {
+            $discovery_service_url .= '?version={apiVersion}';
+        }
+
+        $service = $self->_replace_to_subdomain($service);
+
+        if ($self->_is_v1_discovery_url($service, $version)) {
+            $discovery_service_url = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}/rest';
+        }
+    }
     $discovery_service_url =~ s/{api}/$service/;
     $discovery_service_url =~ s/{apiVersion}/$version/;
 
     my $req = HTTP::Request->new(GET => $discovery_service_url);
     my $res = $self->{ua}->request($req);
+    $self->{ua}{response} = $res;
     unless ($res->is_success) {
         # throw an error
         die 'could not get service document.' . $res->status_line;
@@ -44,9 +59,8 @@ sub build {
 sub build_from_document {
     my $self = shift;
     my ($document, $url, $args) = @_;
-    my $base = $document->{basePath};
-    my $base_url = URI->new($url);
-    $base_url = URI->new_abs($base, $base_url);
+    my $base = $document->{rootUrl}.$document->{servicePath};
+    my $base_url = URI->new($base);
     my $resource = $self->_create_resource($document, $base_url, $args); 
     return $resource;
 }
@@ -99,6 +113,38 @@ sub _new_json_parser {
     return $parser;
 }
 
+sub _replace_to_subdomain {
+    my ($self, $service) = @_;
+
+    # Following services are different from subdomains.
+    # It needs to be converted.
+    my %replacement = (
+        'adexchangebuyer2'  => 'adexchangebuyer',
+        'calendar'          => 'calendar-json',
+        'content'           => 'shoppingcontent',
+        'prod_tt_sasportal' => 'prod-tt-sasportal',
+        'translate'         => 'translation',
+    );
+    if (grep { $service eq $_ } keys %replacement) {
+        $service = $replacement{$service};
+    }
+    return $service;
+}
+
+sub _is_v1_discovery_url {
+    my ($self, $service, $version) = @_;
+    # Following services are still using V1 type URL
+    if (($service eq 'compute' && $version eq 'alpha') ||
+        ($service eq 'compute' && $version eq 'beta') ||
+        ($service eq 'compute' && $version eq 'v1') ||
+        ($service eq 'drive' && $version eq 'v2') ||
+        ($service eq 'drive' && $version eq 'v3') ||
+        ($service eq 'oauth2' && $version eq 'v2')) {
+        return 1;
+    }
+    return;
+}
+
 1;
 __END__
 
@@ -136,7 +182,16 @@ Google::API::Client is a client for Google APIs Discovery Service. You make usin
 
 =item build
 
+Construct a resource for interacting with an API. The service name and version
+are passed to specify the build function to retrieve the appropriate discovery
+document from the server. Calls C<build_from_document()> with the downloaded file.
+
 =item build_from_document
+
+Same as the C<build()> function, but the document is to be passed I<locally>
+instead of being downloaded. The C<discovery_service_url> is a deprecated 
+argument. Instead, the URL is constructed by combining the C<rootUrl> and 
+the C<servicePath>.
 
 =back
 

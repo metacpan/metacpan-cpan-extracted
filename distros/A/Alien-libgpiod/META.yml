@@ -1,0 +1,39 @@
+---
+abstract: 'Find or build libgpiod (Linux GPIO character device library)'
+author:
+  - 'Stephen Cavilia <sac@atomicradi.us>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libgpiod
+no_index:
+  directory:
+    - inc
+resources:
+  repository: git://github.com/kc2zgu/perl-gpiod.git
+version: v0.1
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  requires:
+    share:
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      Mojo::DOM58: '1.00'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

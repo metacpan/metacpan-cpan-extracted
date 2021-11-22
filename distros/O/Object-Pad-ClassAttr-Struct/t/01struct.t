@@ -23,4 +23,12 @@ class Example :Struct {
    is( $obj->z, "the z", 'obj has ->z from mutator' );
 }
 
+{
+   ok( !defined eval { Example->new( x => 0, y => 0, w => "no" ) },
+      'Example constructor does not like w param' );
+   my $e = $@;
+   like( $e, qr/^Unrecognised parameters for Example constructor: w /,
+      'exception from Example constructor param failure' );
+}
+
 done_testing;

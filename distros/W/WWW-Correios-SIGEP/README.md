@@ -67,7 +67,7 @@ Breno G. de Oliveira
 
 ### LICENÇA E COPYRIGHT ###
 
-Copyright (c) 2016, Breno G. de Oliveira. Todos os direitos reservados.
+Copyright (c) 2016-2021, Breno G. de Oliveira. Todos os direitos reservados.
 
 Este módulo é software livre; você pode redistribuí-lo e/ou
 modificá-lo sob os mesmos termos que o Perl. Veja L<perlartistic>.

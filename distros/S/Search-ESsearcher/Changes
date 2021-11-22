@@ -1,43 +1,46 @@
 Revision history for Search-ESsearcher
 
-0.4.3	 2021-11-04/04:00
-		 -Remove mutate from geoip on fail2ban.
+0.4.4	2021-11-04/20:30
+		-Fix srcx and hostx for syslog.
+
+0.4.3	2021-11-04/04:00
+		-Remove mutate from geoip on fail2ban.
 		  This removes the need for mappings in Elasticsearch.
-		 -Add back in GeoIP for Postfix.
+		-Add back in GeoIP for Postfix.
 
-0.4.2	 2021-10-21/23:15
-		 - Include logstash examples.
-		 - Update Postfix logstash bits.
+0.4.2	2021-10-21/23:15
+		- Include logstash examples.
+		- Update Postfix logstash bits.
 
-0.4.1	 2019-12-08/04:05
-		 - Remove accidentally included emacs save.
-		 - Correct datestamp on previous change log entry.
+0.4.1	2019-12-08/04:05
+		- Remove accidentally included emacs save.
+		- Correct datestamp on previous change log entry.
 
-0.4.0	 2019-12-08/04:00
-		 - Make host searching work better. Thanks, Kevin Greene.
-		 - Add the aonHost.
+0.4.0	2019-12-08/04:00
+		- Make host searching work better. Thanks, Kevin Greene.
+		- Add the aonHost.
 
-0.3.1	 2019-06-05/05:0
-		 - Add missing options to postfix pod.
+0.3.1	2019-06-05/05:0
+		- Add missing options to postfix pod.
 
-0.3.0	 2019-06-05/01:30
-		 - Add postfix support.
-		 - Add repo info.
+0.3.0	2019-06-05/01:30
+		- Add postfix support.
+		- Add repo info.
 
-0.2.0	 2019-06-03/04:30
-		 - The bf2b template now properly processes --ip
-		 - Add the httpAccess template.
-		 - Add a missing flag to the help for bf2b.
-		 - Added the option for pretty printing -S via -p
+0.2.0	2019-06-03/04:30
+		- The bf2b template now properly processes --ip
+		- Add the httpAccess template.
+		- Add a missing flag to the help for bf2b.
+		- Added the option for pretty printing -S via -p
 
 
-0.1.0	 2019-06-02/09:00
-		 - Add bf2b, beats fail2ban support.
-		 - Actually set the output template now.
-		 - name validation no longer chokes on numbers.
-		 - Now prints the proper help info instead of the
-		   one for the default, syslog.
+0.1.0	2019-06-02/09:00
+		- Add bf2b, beats fail2ban support.
+		- Actually set the output template now.
+		- name validation no longer chokes on numbers.
+		- Now prints the proper help info instead of the
+		  one for the default, syslog.
 
-0.0.0	 2019-06-02/04:40
-		 - Initial release.
+0.0.0	2019-06-02/04:40
+		- Initial release.
 

@@ -24,9 +24,9 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(gen_inline_pericmd_script);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-29'; # DATE
+our $DATE = '2021-10-21'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.552'; # VERSION
+our $VERSION = '0.553'; # VERSION
 
 our %SPEC;
 
@@ -1005,9 +1005,9 @@ _
             description => <<'_',
 
 By default, Perinci::CmdLine::Inline will strive to make the script freestanding
-and require core modules. A dependency to a non-core module will cause failure
-(unless `pack_deps` option is set to false). However, you can pass a list of
-modules that is allowed here.
+and require only core Perl modules. A dependency to a non-core module will cause
+failure (unless `pack_deps` option is set to false). However, you can pass a
+list of modules that is allowed here.
 
 _
         },
@@ -1547,6 +1547,8 @@ _
 
             "# You probably should not manually edit this file.\n\n",
 
+            "## no critic: TestingAndDebugging::RequireUseStrict\n\n", # fatpack/datapack code is not using strict currently
+
             # for dzil
             "# PODNAME: ", ($args{script_name} // ''), "\n",
             do {
@@ -1667,7 +1669,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.552 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2021-08-29.
+This document describes version 0.553 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2021-10-21.
 
 =head1 SYNOPSIS
 
@@ -1781,9 +1783,9 @@ Currently does nothing, provided only for compatibility with Perinci::CmdLine::B
 A list of modules that can be depended upon.
 
 By default, Perinci::CmdLine::Inline will strive to make the script freestanding
-and require core modules. A dependency to a non-core module will cause failure
-(unless C<pack_deps> option is set to false). However, you can pass a list of
-modules that is allowed here.
+and require only core Perl modules. A dependency to a non-core module will cause
+failure (unless C<pack_deps> option is set to false). However, you can pass a
+list of modules that is allowed here.
 
 =item * B<code_add_extra_log_outputs> => I<str>
 

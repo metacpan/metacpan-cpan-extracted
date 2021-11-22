@@ -1,6 +1,6 @@
 package Lab::Connection::MODBUS_RS232;
 #ABSTRACT: RS232/RS485 MODBUS RTU connection
-$Lab::Connection::MODBUS_RS232::VERSION = '3.791';
+$Lab::Connection::MODBUS_RS232::VERSION = '3.792';
 use v5.20;
 
 use strict;
@@ -93,7 +93,7 @@ Lab::Connection::MODBUS_RS232 - RS232/RS485 MODBUS RTU connection
 
 =head1 VERSION
 
-version 3.791
+version 3.792
 
 =head1 CAVEATS/BUGS
 

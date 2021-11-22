@@ -25,4 +25,14 @@ ok noun('MAXIMUM')->is_singular,                   'MAXIMUM  is singular';
 ok noun('MAXIMUMS')->is_plural,                    'MAXIMUMS is plural';
 ok noun('MAXIMA')->is_plural,                      'MAXIMA   is plural';
 
+
+is  noun(q{atlas})->plural, q{atlases}  =>  "altas --> atlases";
+is  noun(q{Atlas})->plural, q{Atlantes} =>  "Atlas --> Atlantes";
+is  noun(q{ATLAS})->plural, q{ATLASES}  =>  "ALTAS --> ATLASES";
+
+is  noun(q{alfurese})->plural, q{alfurese}  =>  "alfurese --> alfurese";
+is  noun(q{Alfurese})->plural, q{Alfurese}  =>  "Alfurese --> Alfurese";
+is  noun(q{ALFURESE})->plural, q{ALFURESE}  =>  "ALFURESE --> ALFURESE";
+
+
 done_testing();

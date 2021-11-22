@@ -1,5 +1,9 @@
 Changelog for Mojo-Leds
 
+1.12 2021-11-17T12:25:00
+ - Optimized route algoritm. Removed .text extension response
+ - Required AutoRoutePM >= 0.21
+
 1.11 2021-09-24T15:55:00
  - It's now possibile to not have a config file
 

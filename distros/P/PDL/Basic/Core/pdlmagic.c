@@ -242,8 +242,6 @@ pdl_magic *pdl_add_fammutmagic(pdl *it,pdl_trans *ft)
  *
  */
 
-#define TVERB 0
-
 typedef struct ptarg {
 	pdl_magic_pthread *mag;
 	void (*func)(pdl_trans *);
@@ -256,12 +254,10 @@ int pdl_pthreads_enabled(void) {return 1;}
 
 static void *pthread_perform(void *vp) {
 	struct ptarg *p = (ptarg *)vp;
-	/* if(TVERB) printf("STARTING THREAD %d (%d)\n",p->no, pthread_self()); */
-	if(TVERB) printf("STARTING THREAD number %d\n",p->no);
+	PDLDEBUG_f(printf("STARTING THREAD %d (%lu)\n",p->no, (long unsigned)pthread_self());)
 	pthread_setspecific(p->mag->key,(void *)&(p->no));
 	(p->func)(p->t);
-	/* if(TVERB) printf("ENDING THREAD %d (%d)\n",p->no, pthread_self());   */
-	if(TVERB) printf("ENDING THREAD number %d\n",p->no);
+	PDLDEBUG_f(printf("ENDING THREAD %d (%lu)\n",p->no, (long unsigned)pthread_self());)
 	return NULL;
 }
 
@@ -272,28 +268,23 @@ int pdl_magic_thread_nthreads(pdl *it,PDL_Indx *nthdim) {
 	return ptr->nthreads;
 }
 
-int pdl_magic_get_thread(pdl *it) { /* XXX -> only one thread can handle pdl at once */
-	pdl_magic_pthread *ptr;
-	int *p;
-	ptr = (pdl_magic_pthread *)pdl__find_magic(it, PDL_MAGIC_THREADING);
-	if(!ptr) {die("Invalid pdl_magic_get_thread!");}
-	p = (int*)pthread_getspecific(ptr->key);
-	if(!p) {
-		die("Invalid pdl_magic_get_thread specific!!!!");
-	}
+int pdl_magic_get_thread(pdl *it) {
+	pdl_magic_pthread *ptr = (pdl_magic_pthread *)pdl__find_magic(it, PDL_MAGIC_THREADING);
+	if(!ptr) die("Invalid pdl_magic_get_thread!");
+	int *p = (int*)pthread_getspecific(ptr->key);
+	if(!p) die("Invalid pdl_magic_get_thread specific!!!!");
 	return *p;
 }
 
 void pdl_magic_thread_cast(pdl *it,void (*func)(pdl_trans *),pdl_trans *t, pdl_thread *thread) {
-	pdl_magic_pthread *ptr; pthread_t *tp; ptarg *tparg;
 	PDL_Indx i;
 	int clearMagic = 0; /* Flag = 1 if we are temporarily creating pthreading magic in the
 						   supplied pdl.  */
-	SV * barf_msg;	  /* Deferred barf message. Using a perl SV here so it's memory can be freeed by perl
+	SV * barf_msg;	  /* Deferred barf message. Using a perl SV here so it's memory can be freed by perl
 						 after it is sent to croak */
 	SV * warn_msg;	  /* Similar deferred warn message. */
 
-	ptr = (pdl_magic_pthread *)pdl__find_magic(it, PDL_MAGIC_THREADING);
+	pdl_magic_pthread *ptr = (pdl_magic_pthread *)pdl__find_magic(it, PDL_MAGIC_THREADING);
 	if(!ptr) {
 		/* Magic doesn't exist, create it
 			Probably was deleted before the transformation performed, due to
@@ -310,36 +301,34 @@ void pdl_magic_thread_cast(pdl *it,void (*func)(pdl_trans *),pdl_trans *t, pdl_t
 
 	}
 
-	tp = malloc(sizeof(pthread_t) * thread->mag_nthr);
-	tparg = malloc(sizeof(*tparg) * thread->mag_nthr);
+	pthread_t tp[thread->mag_nthr];
+	ptarg tparg[thread->mag_nthr];
 	pthread_key_create(&(ptr->key),NULL);
 
-	if(TVERB) printf("CREATING THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key));
+	PDLDEBUG_f(printf("CREATING THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key));)
 
 	/* Get the pthread ID of this main thread we are in.
 	 *	Any barf, warn, etc calls in the spawned pthreads can use this
 	 *	to tell if its a spawned pthread
 	 */
-	pdl_main_pthreadID = pthread_self();   /* should do inside pthread_once() */
-    done_pdl_main_pthreadID_init = 1;
+	pdl_main_pthreadID = pthread_self();
+	done_pdl_main_pthreadID_init = 1;
 
-    for(i=0; i<thread->mag_nthr; i++) {
-        tparg[i].mag = ptr;
-        tparg[i].func = func;
-        tparg[i].t = t;
-        tparg[i].no = i;
-        if (pthread_create(tp+i, NULL, pthread_perform, tparg+i)) {
-            die("Unable to create pthreads!");
-        }
-    }
+	for(i=0; i<thread->mag_nthr; i++) {
+	    tparg[i].mag = ptr;
+	    tparg[i].func = func;
+	    tparg[i].t = t;
+	    tparg[i].no = i;
+	    if (pthread_create(tp+i, NULL, pthread_perform, tparg+i)) {
+		die("Unable to create pthreads!");
+	    }
+	}
 
-    if(TVERB) printf("JOINING THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key));
-
+	PDLDEBUG_f(printf("JOINING THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key));)
 	for(i=0; i<thread->mag_nthr; i++) {
 		pthread_join(tp[i], NULL);
 	}
-
-	if(TVERB) printf("FINISHED THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key));
+	PDLDEBUG_f(printf("FINISHED THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key));)
 
 	pthread_key_delete((ptr->key));
 
@@ -347,10 +336,6 @@ void pdl_magic_thread_cast(pdl *it,void (*func)(pdl_trans *),pdl_trans *t, pdl_t
 	if( clearMagic ){
 		pdl_add_threading_magic(it, -1, -1);
 	}
-
-	/* Clean up memory allocated */
-	free(tp);
-	free(tparg);
 
 	// handle any errors that may have occurred in the worker threads I reset the
 	// length before actually barfing/warning because barf() may not come back.
@@ -411,7 +396,7 @@ void pdl_add_threading_magic(pdl *it,PDL_Indx nthdim,PDL_Indx nthreads)
 }
 
 // Barf/warn function for deferred barf message handling during pthreading We
-// can't barf/warn during ptheading, because perl-level code isn't
+// can't barf/warn during pthreading, because perl-level code isn't
 // threadsafe. This routine does nothing if we're in the main thread (allowing
 // the caller to barf normally, since there are not threading issues then). If
 // we're in a worker thread, this routine stores the message for main-thread
@@ -476,6 +461,57 @@ int pdl_pthread_barf_or_warn(const char* pat, int iswarn, va_list *args)
 	return 0;
 }
 
+/* copied from git@github.com:git/git.git 2.34-ish thread-util.c */
+/* changed GIT_WINDOWS_NATIVE to WIN32 */
+#if defined(hpux) || defined(__hpux) || defined(_hpux)
+#  include <sys/pstat.h>
+#endif
+/*
+ * By doing this in two steps we can at least get
+ * the function to be somewhat coherent, even
+ * with this disgusting nest of #ifdefs.
+ */
+#ifndef _SC_NPROCESSORS_ONLN
+#  ifdef _SC_NPROC_ONLN
+#    define _SC_NPROCESSORS_ONLN _SC_NPROC_ONLN
+#  elif defined _SC_CRAY_NCPU
+#    define _SC_NPROCESSORS_ONLN _SC_CRAY_NCPU
+#  endif
+#endif
+int pdl_online_cpus(void)
+{
+#ifdef WIN32
+	SYSTEM_INFO info;
+	GetSystemInfo(&info);
+	if ((int)info.dwNumberOfProcessors > 0)
+		return (int)info.dwNumberOfProcessors;
+#elif defined(hpux) || defined(__hpux) || defined(_hpux)
+	struct pst_dynamic psd;
+	if (!pstat_getdynamic(&psd, sizeof(psd), (size_t)1, 0))
+		return (int)psd.psd_proc_cnt;
+#elif defined(HAVE_BSD_SYSCTL) && defined(HW_NCPU)
+	int mib[2];
+	size_t len;
+	int cpucount;
+	mib[0] = CTL_HW;
+#  ifdef HW_AVAILCPU
+	mib[1] = HW_AVAILCPU;
+	len = sizeof(cpucount);
+	if (!sysctl(mib, 2, &cpucount, &len, NULL, 0))
+		return cpucount;
+#  endif /* HW_AVAILCPU */
+	mib[1] = HW_NCPU;
+	len = sizeof(cpucount);
+	if (!sysctl(mib, 2, &cpucount, &len, NULL, 0))
+		return cpucount;
+#endif /* defined(HAVE_BSD_SYSCTL) && defined(HW_NCPU) */
+#ifdef _SC_NPROCESSORS_ONLN
+	long ncpus;
+	if ((ncpus = (long)sysconf(_SC_NPROCESSORS_ONLN)) > 0)
+		return (int)ncpus;
+#endif
+	return 1;
+}
 
 #else
 /* Dummy versions */
@@ -485,6 +521,7 @@ void pdl_magic_thread_cast(pdl *it,void (*func)(pdl_trans *),pdl_trans *t, pdl_t
 int pdl_magic_thread_nthreads(pdl *it,PDL_Indx *nthdim) {return 0;}
 int pdl_pthreads_enabled() {return 0;}
 int pdl_pthread_barf_or_warn(const char* pat, int iswarn, va_list *args){ return 0;}
+int pdl_online_cpus() {return 1;}
 #endif
 
 /***************************

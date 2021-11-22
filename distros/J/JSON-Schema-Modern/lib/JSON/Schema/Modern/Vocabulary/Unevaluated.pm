@@ -4,17 +4,18 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
 use List::Util 1.45 qw(any max);
 use JSON::Schema::Modern::Utilities qw(is_type jsonp local_annotations E A abort true);
-use Moo;
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -26,15 +27,12 @@ sub vocabulary {
 sub evaluation_order { 7 }
 
 # This vocabulary should be evaluated after the Applicator vocabulary.
-sub keywords {
-  my ($self, $spec_version) = @_;
+sub keywords ($self, $spec_version) {
   die 'Unevaluated not implemented in '.$spec_version if $spec_version =~ /^draft[467]$/;
   qw(unevaluatedItems unevaluatedProperties);
 }
 
-sub _traverse_keyword_unevaluatedItems {
-  my ($self, $schema, $state) = @_;
-
+sub _traverse_keyword_unevaluatedItems ($self, $schema, $state) {
   my $valid = $self->traverse_subschema($schema, $state);
 
   # remember that annotations need to be collected in order to evaluate this keyword
@@ -43,9 +41,7 @@ sub _traverse_keyword_unevaluatedItems {
   return $valid;
 }
 
-sub _eval_keyword_unevaluatedItems {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_unevaluatedItems ($self, $data, $schema, $state) {
   abort($state, 'EXCEPTION: "unevaluatedItems" keyword present, but annotation collection is disabled')
     if not $state->{collect_annotations};
 
@@ -71,15 +67,15 @@ sub _eval_keyword_unevaluatedItems {
   my $last_index = max(-1, grep is_type('integer', $_),
     map +($_->keyword eq $max_index_annotation_keyword ? $_->annotation : ()), @annotations);
 
-  return 1 if $last_index == $#{$data};
+  return 1 if $last_index == $data->$#*;
 
   my @contains_annotation_indexes = $state->{spec_version} eq 'draft2019-09' ? ()
-    : map +($_->keyword eq 'contains' ? @{$_->annotation} : ()), @annotations;
+    : map +($_->keyword eq 'contains' ? $_->annotation->@* : ()), @annotations;
 
   my $valid = 1;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my @new_annotations;
-  foreach my $idx ($last_index+1 .. $#{$data}) {
+  foreach my $idx ($last_index+1 .. $data->$#*) {
     next if any { $idx == $_ } @contains_annotation_indexes;
     if (is_type('boolean', $schema->{unevaluatedItems})) {
       next if $schema->{unevaluatedItems};
@@ -102,13 +98,11 @@ sub _eval_keyword_unevaluatedItems {
   }
 
   return E($state, 'subschema is not valid against all additional items') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return A($state, true);
 }
 
-sub _traverse_keyword_unevaluatedProperties {
-  my ($self, $schema, $state) = @_;
-
+sub _traverse_keyword_unevaluatedProperties ($self, $schema, $state) {
   my $valid = $self->traverse_subschema($schema, $state);
 
   # remember that annotations need to be collected in order to evaluate this keyword
@@ -117,9 +111,7 @@ sub _traverse_keyword_unevaluatedProperties {
   return $valid;
 }
 
-sub _eval_keyword_unevaluatedProperties {
-  my ($self, $data, $schema, $state) = @_;
-
+sub _eval_keyword_unevaluatedProperties ($self, $data, $schema, $state) {
   abort($state, 'EXCEPTION: "unevaluatedProperties" keyword present, but annotation collection is disabled')
     if not $state->{collect_annotations};
 
@@ -131,11 +123,11 @@ sub _eval_keyword_unevaluatedProperties {
   my @evaluated_properties = map {
     my $keyword = $_->keyword;
     (grep $keyword eq $_, qw(properties additionalProperties patternProperties unevaluatedProperties))
-      ? @{$_->annotation} : ();
+      ? $_->annotation->@* : ();
   } local_annotations($state);
 
   my $valid = 1;
-  my @orig_annotations = @{$state->{annotations}};
+  my @orig_annotations = $state->{annotations}->@*;
   my (@valid_properties, @new_annotations);
   foreach my $property (sort keys %$data) {
     next if any { $_ eq $property } @evaluated_properties;
@@ -166,7 +158,7 @@ sub _eval_keyword_unevaluatedProperties {
   }
 
   return E($state, 'not all additional properties are valid') if not $valid;
-  push @{$state->{annotations}}, @new_annotations;
+  push $state->{annotations}->@*, @new_annotations;
   return A($state, \@valid_properties);
 }
 
@@ -184,7 +176,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 DESCRIPTION
 

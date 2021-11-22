@@ -1,5 +1,8 @@
 Revision history for Net-Silverpeak-Orchestrator
 
+0.004000  2021-11-10 11:50:05+01:00 Europe/Vienna
+    - add application group support
+
 0.003000  2021-10-05 13:38:29+02:00 Europe/Vienna
     - add domain name application support
 

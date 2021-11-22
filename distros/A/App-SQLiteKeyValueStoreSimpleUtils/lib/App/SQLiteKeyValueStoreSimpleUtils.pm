@@ -1,9 +1,9 @@
 package App::SQLiteKeyValueStoreSimpleUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-18'; # DATE
+our $DATE = '2021-07-01'; # DATE
 our $DIST = 'App-SQLiteKeyValueStoreSimpleUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities for SQLite::KeyValueStore::Simple
@@ -20,7 +20,7 @@ App::SQLiteKeyValueStoreSimpleUtils - CLI utilities for SQLite::KeyValueStore::S
 
 =head1 VERSION
 
-This document describes version 0.001 of App::SQLiteKeyValueStoreSimpleUtils (from Perl distribution App-SQLiteKeyValueStoreSimpleUtils), released on 2021-06-18.
+This document describes version 0.002 of App::SQLiteKeyValueStoreSimpleUtils (from Perl distribution App-SQLiteKeyValueStoreSimpleUtils), released on 2021-07-01.
 
 =head1 DESCRIPTION
 
@@ -29,6 +29,8 @@ This distribution provides the following command-line utilities:
 =over
 
 =item * L<check-sqlite-kvstore-key-exists>
+
+=item * L<dump-sqlite-kvstore>
 
 =item * L<get-sqlite-kvstore-value>
 

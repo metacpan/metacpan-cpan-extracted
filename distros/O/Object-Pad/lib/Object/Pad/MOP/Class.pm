@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.56;
+package Object::Pad::MOP::Class 0.57;
 
 use v5.14;
 use warnings;
@@ -179,9 +179,9 @@ Adds a new named method to the class under the given name, as CODE reference.
 
 Returns an instance of L<Object::Pad::MOP::Method> to represent it.
 
-=head2 get_own_method
+=head2 get_direct_method
 
-   $metamethod = $metaclass->get_own_method( $name )
+   $metamethod = $metaclass->get_direct_method( $name )
 
 Returns an instance of L<Object::Pad::MOP::Method> to represent the method of
 the given name, if one exists. If not an exception is thrown.
@@ -190,6 +190,40 @@ This can only see directly-applied methods; that is, methods created by the
 C<method> keyword on the class itself, or added via L</add_method>. This will
 not see other names in the package stash, even if they contain a C<CODE> slot,
 nor will it see methods inherited from a superclass.
+
+This is also aliased as C<get_own_method> for compatibility with the
+L<MOP::Class> interface.
+
+=head2 get_method
+
+   $metamethod = $metaclass->get_method( $name )
+
+I<Since version 0.57.>
+
+Returns an instance of L<Object::Pad::MOP::Method> to represent the method of
+the given name, if one exists. If not an exception is thrown.
+
+This will additionally search superclasses, and may return a method belonging
+to a parent class.
+
+=head2 direct_methods
+
+   @metamethods = $metaclass->direct_methods
+
+I<Since version 0.57.>
+
+Returns a list of L<Object::Pad::MOP::Method> instances to represent all the
+direct methods of the class. This list may be empty.
+
+=head2 all_methods
+
+   @metamethods = $metaclass->all_methods
+
+I<Since version 0.57.>
+
+Returns a list of L<Object::Pad::MOP::Method> instances to represent all the
+methods of the class, including those inherited from superclasses. This list
+may be empty.
 
 =head2 add_slot
 
@@ -267,6 +301,8 @@ slots of the class. This list may be empty.
 =cut
 
 *roles = \&direct_roles;
+
+*get_own_method = \&get_direct_method;
 
 =head1 AUTHOR
 

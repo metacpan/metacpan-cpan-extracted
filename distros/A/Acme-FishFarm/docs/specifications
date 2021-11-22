@@ -1,4 +1,4 @@
-Specification for Acme::FishFarm v0.01
+Specification for Acme::FishFarm v1.01
 
 Only allow installation of a system once, however, make it changable
 
@@ -8,8 +8,6 @@ Only allow installation of a system once, however, make it changable
     
 2. Acme::FishFarm will contain these subroutines for X system
    -install_X() : instantiate Acme::FishFarm::X
-   -install( systems => ["X1", "X2", "X3"] )
-    -X refers to a general system name and not the module name
    -install_all_systems(): installs all the Acme::FishFarm::* systems
    -check_X() : return values of sensors or whatever for system X
    -all_systems_report() : returns a hash of all the systems with corresponding sensor
@@ -28,8 +26,6 @@ Only allow installation of a system once, however, make it changable
       * oxygen needs to be generated constantly if DO is lower than threshold
     - Acme::FishFarm::WaterLevelMaintainer
       * water needs to be pumped constantly if water level is lower than threshold
-    - Acme::FishFarm::WaterConditionMonitor
-      * the long buzzer needs to be turned on explicitely
 There's really no obvious reason why this is so, it's just what and how I want the method names to be :)
 
 3. Actual script:
@@ -40,11 +36,3 @@ There's really no obvious reason why this is so, it's just what and how I want t
 3.3 There will be a loop to make everything work, this is a full program
 3.4 Implement randomness here and there if possible
 
-4. YAML
-YAML file will contain the following:
-
-
-5. Execution of script
-Since the script will be compiled, and a config file is used, use @ARGV to get the 
-config file name
-Compile under linux and windows (to do last)

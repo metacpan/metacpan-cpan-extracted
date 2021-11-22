@@ -1,4 +1,3 @@
-build.sh
 Changes
 clib/CMakeLists.txt
 clib/src/panda/unievent/http.h
@@ -51,9 +50,11 @@ clib/tests/lib/test.cc
 clib/tests/lib/test.h
 clib/tests/server/basic.cc
 clib/tests/server/keep-alive.cc
+clib/tests/server/misc.cc
 clib/tests/server/partial.cc
 clib/tests/server/pipeline.cc
 clib/tests/server/version.cc
+clib/tests/testsock
 clib/unievent-http-config.cmake
 INSTALL.SKIP
 lib/Plack/Handler/UniEvent/HTTP/Simple.pm
@@ -82,6 +83,7 @@ lib/UniEvent/HTTP/UserAgent.pod
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+misc/app.psgi
 misc/SRV-1746/client.plx
 misc/SRV-1746/server.plx
 misc/test.plx
@@ -118,11 +120,11 @@ t/lib/MyTest.pm
 t/lib/MyTest.xs
 t/server/basic.t
 t/server/keep-alive.t
+t/server/misc.t
 t/server/partial.t
 t/server/pipeline.t
 t/server/plack-handler.t
 t/server/version.t
-UniEvent-HTTP.pro
 xs/Client.xsi
 xs/Error.xsi
 xs/main.xs

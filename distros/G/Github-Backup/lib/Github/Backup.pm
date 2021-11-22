@@ -6,6 +6,7 @@ use warnings;
 use Carp qw(croak);
 use Data::Dumper;
 use Git::Repository;
+use Hook::Output::Tiny;
 use File::Copy;
 use File::Path;
 use JSON;
@@ -15,7 +16,7 @@ use Pithub;
 
 use namespace::clean;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 # external
 
@@ -41,6 +42,9 @@ has proxy => (
 has user => (
     is => 'rw',
 );
+has limit => (
+    is => 'rw',
+);
 
 # internal
 
@@ -60,10 +64,9 @@ sub BUILD {
         $self->token($ENV{GITHUB_TOKEN}) if $ENV{GITHUB_TOKEN};
     }
 
-    for ($self->api_user, $self->token, $self->dir){
-        if (! $_){
-            croak "When instantiating an object, the 'api_user', 'token' and " .
-                  "'dir' parameters are mandatory...\n";
+    for my $key (qw/api_user token dir/){
+        if (! $self->{$key}){
+            croak "ERROR: Missing mandatory parameter [$key].\n";
         }
     }
 
@@ -79,7 +82,8 @@ sub BUILD {
     my $gh = Pithub->new(
         ua => $ua,
         user => $self->api_user,
-        token => $self->token
+        token => $self->token,
+        auto_pagination => 1,
     );
 
     $self->stg($self->dir . '.stg');
@@ -92,20 +96,36 @@ sub BUILD {
     }
 
     mkdir $self->stg or die "can't create the backup staging directory...$!\n";
+}
 
+sub list {
+    my ($self) = @_;
+
+    if (! $self->{repo_list}) {
+        my $repo_list = $self->gh->repos->list(user => $self->user);
+        while (my $repo = $repo_list->next) {
+            push @{ $self->{repo_list} }, $repo;
+        }
+    }
+
+    return $self->{repo_list};
 }
 sub repos {
     my ($self) = @_;
 
-    my $repo_list = $self->gh->repos->list(user => $self->user);
+    my $repos = $self->list;
 
-    my @repos;
+    my $repo_count = 0;
+    for my $repo (@$repos){
+        $repo_count++;
 
-    while (my $repo = $repo_list->next){
-        push @repos, $repo;
-    }
+        if ($self->limit) {
+            last if $repo_count >= $self->limit;
+        }
 
-    for my $repo (@repos){
+        $self->_trap->hook('stderr');
+
+        print "Cloning $repo->{name}\n";
 
         my $stg = $self->stg . "/$repo->{name}";
 
@@ -113,16 +133,17 @@ sub repos {
             if (! exists $repo->{parent}){
                 Git::Repository->run(
                     clone => $repo->{clone_url} => $stg,
-                    {quiet => 1}
+                    { quiet => 0 }
                 );
             }
         }
         else {
              Git::Repository->run(
                 clone => $repo->{clone_url} => $stg,
-                { quiet => 1 }
+                { quiet => 0 }
             );
         }
+        $self->_trap->unhook('stderr');
     }
 }
 sub issues {
@@ -130,30 +151,74 @@ sub issues {
 
     mkdir $self->stg . "/issues" or die "can't create the 'issues' dir: $!";
 
-    my $repo_list = $self->gh->repos->list(user => $self->user);
+    my $repos = $self->list;
 
-    while (my $repo = $repo_list->next){
-        my $issue_list = $self->gh->issues->list(
+    my $repo_count = 0;
+
+    for my $repo (@$repos) {
+        $repo_count++;
+
+        if ($self->limit) {
+            last if $repo_count >= $self->limit;
+        }
+
+        my $closed_issue_list = $self->gh->issues->list(
             user => $self->user,
-            repo => $repo->{name}
+            repo => $repo->{name},
+            params => {
+                state => 'closed'
+            }
         );
+
+        my $open_issue_list = $self->gh->issues->list(
+            user => $self->user,
+            repo => $repo->{name},
+            params => {
+                state => 'open'
+            }
+        );
+
+        my $open_issues     = $open_issue_list->content;
+        my $closed_issues   = $closed_issue_list->content;
 
         my $issue_dir = $self->stg . "/issues/$repo->{name}";
 
-
         my $dir_created = 0;
 
-        while (my $issue = $issue_list->next){
+        for my $issue (@$open_issues, @$closed_issues) {
             if (! $dir_created) {
-                mkdir $issue_dir or die $!;
+                mkdir $issue_dir            or die $!;
+                mkdir "$issue_dir/open"     or die $!;
+                mkdir "$issue_dir/closed"   or die $!;
                 $dir_created = 1;
             }
-            open my $fh, '>', "$issue_dir/$issue->{id}"
-                or die "can't create the issue file";
+
+            my $issue_path = $issue->{state} eq 'open'
+                ? "$issue_dir/open/$issue->{id}"
+                : "$issue_dir/closed/$issue->{id}";
+
+            open my $fh, '>', $issue_path or die "can't create the issue file";
+
+            print "Copied $repo->{name} issue #$issue->{number} to $issue_path\n";
 
             print $fh encode_json $issue;
         }
     }
+}
+sub finish {
+    my ($self) = @_;
+    if ($self->stg && -d $self->stg) {
+        move $self->stg,
+            $self->dir or die "can't rename the staging directory: $!";
+    }
+}
+sub _trap {
+    my ($self) = @_;
+    if (! $self->{trap}) {
+        $self->{trap} = Hook::Output::Tiny->new;
+    }
+
+    return $self->{trap};
 }
 sub DESTROY {
     my $self = shift;
@@ -180,6 +245,11 @@ __END__
 =head1 NAME
 
 Github::Backup - Back up your Github repositories and/or issues locally
+
+=for html
+<a href="https://github.com/stevieb9/github-backup/actions"><img src="https://github.com/stevieb9/github-backup/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/github-backup?branch=master'><img src='https://coveralls.io/repos/stevieb9/github-backup/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
 
 =head1 SYNOPSIS
 
@@ -216,18 +286,27 @@ Mandatory: Your Github API token. If you wish to not include this on the
 command line, you can put the token into the C<GITHUB_TOKEN> environment
 variable.
 
+=head2 -l | --list
+
+Optional: Simply prints a list of all available repositories for the specified
+user.
+
 =head2 -d | --dir
 
-Mandatory: The backup directory where your repositories and/or issues will be
-stored. The format of the directory structure will be as follows:
+Mandatory (if using C<--repos> or C<--issues>): The backup directory where your
+repositories and/or issues will be stored. The format of the directory
+structure will be as follows:
 
     backup_dir/
         - issues/
             - repo1/
-                - issue_id_x
-                - issue_id_y
+                - open
+                    - issue_id_x
+                - closed
+                    - issue_id_y
             - repo2/
-                - issue_id_a
+                - open
+                    - issue_id_a
         - repo1/
             - repository data
         - repo2/
@@ -245,6 +324,7 @@ Note that either C<--repos> or C<--issues> must be sent in.
 =head2 -i | --issues
 
 Optional: Back up all of your issues across all of your Github repositories.
+This includes both open and closed issues.
 
 Note that either C<--issues> or C<--repos> must be sent in.
 
@@ -285,6 +365,25 @@ information to.
 Optional, String: Send in a proxy in the format
 C<https://proxy.example.com:PORT> and we'll use this to do our fetching.
 
+=head3 _clean
+
+Optional, Bool. Used only for testing. Tells C<< DESTROY >> to remove the
+backup directory.
+
+=head2 limit
+
+Optional, Integer: Sets the number of repositories we'll operate on. Used
+primarily for testing.
+
+Default: Unlimited.
+
+=head2 list
+
+Takes no parameters. Returns a list of all repository objects as returned from
+L<Pithub> / the Github API.
+
+Common fields are C<$repo->{name}>, C<$repo->{clone_url}> etc.
+
 =head2 repos
 
 Takes no parameters. Backs up all of your Github repositories, and stores them
@@ -293,7 +392,25 @@ in the specified backup directory.
 =head2 issues
 
 Takes no parameters. Backs up all of your Github issues. Stores them per-repo
-within the C</backup_dir/issues> directory.
+within the C</backup_dir/issues> directory. Structure of the issues directory
+is as follows:
+
+    backup_dir/
+        - issues/
+            - repo/
+                - open/
+                    - issue_x
+                - closed/
+                    - issue_y
+            - repo2/
+                - open/
+                - closed/
+
+=head2 finish
+
+Takes no parameters. Normally, we copy the staging backup directory to the
+actual backup directory at the time we destroy the object. Call this method to
+set up the backup directory immediately.
 
 =head1 FUTURE DIRECTION
 
@@ -316,4 +433,3 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See L<http://dev.perl.org/licenses/> for more information.
-

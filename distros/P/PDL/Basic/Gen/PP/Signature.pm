@@ -23,7 +23,7 @@ Internal module to handle signatures
 sub nospacesplit {grep /\S/, split $_[0],$_[1]}
 
 sub new {
-  my ($type,$str,$bvalflag) = @_;
+  my ($type,$str,$bvalflag,$otherpars) = @_;
   $bvalflag ||= 0;
   my $this = bless {}, $type;
   my @objects = map PDL::PP::PdlParObj->new($_,$bvalflag, $this), nospacesplit ';',$str;
@@ -34,12 +34,50 @@ sub new {
   $this->{NamesSorted} = [ map $_->name, @objects_sorted ];
   $this->{DimsObj} = my $dimsobj = PDL::PP::PdlDimsObj->new;
   $_->add_inds($dimsobj) for @objects;
-  my %ind2use;
+  my (%ind2use, %ind2obj);
   for my $o (@objects) {
-    push @{$ind2use{$_}}, $o for map $_->name, @{$o->{IndObjs}};
+    for my $io (@{$o->{IndObjs}}) {
+      push @{$ind2use{$io->name}}, $o;
+      $ind2obj{$io->name} = $io;
+    }
   }
   $this->{Ind2Use} = \%ind2use;
+  $this->{Ind2Obj} = \%ind2obj;
+  $this->{IndNamesSorted} = [ sort keys %ind2use ];
+  my $i=0; my %ind2index = map +($_=>$i++), @{$this->{IndNamesSorted}};
+  $this->{Ind2Index} = \%ind2index;
+  $ind2obj{$_}->set_index($ind2index{$_}) for sort keys %ind2index;
+  @$this{qw(OtherNames OtherObjs)} = $this->_otherPars_nft($otherpars||'');
   $this;
+}
+
+sub _otherPars_nft {
+    my ($sig,$otherpars) = @_;
+    my $dimobjs = $sig && $sig->dims_obj;
+    my(@names,%types,$type);
+    # support 'int ndim => n;' syntax
+    for (nospacesplit(';',$otherpars)) {
+	if (/^\s*([^=]+)\s*=>\s*(\S+)\s*$/) {
+	    my ($ctype,$dim) = ($1,$2);
+	    $ctype =~ s/\s+$//; # get rid of trailing ws
+	    print "OtherPars: setting dim '$dim' from '$ctype'\n" if $::PP_VERBOSE;
+	    $type = PDL::PP::CType->new($ctype);
+	    croak "can't set unknown dimension '$dim' from '$otherpars'"
+		unless defined($dimobjs->{$dim});
+	    $dimobjs->{$dim}->set_from($type);
+	} elsif(/^\s*\(\s*void\s*\)/) {
+	    # suppressing unused param warning - skip
+	    next;
+	} else {
+	    $type = PDL::PP::CType->new($_);
+	}
+	my $name = $type->protoname;
+	croak "Invalid OtherPars name: $name"
+	  if $PDL::PP::PdlParObj::INVALID_PAR{$name};
+	push @names,$name;
+	$types{$name} = $type;
+    }
+    return (\@names,\%types);
 }
 
 *with = \&new;
@@ -56,20 +94,76 @@ the copyright notice should be included in the file.
 
 =cut
 
-sub names { $_[0]->{Names} }
-sub names_sorted { $_[0]->{NamesSorted} }
+sub names { $_[0]{Names} }
+sub names_sorted { $_[0]{NamesSorted} }
 
-sub objs { $_[0]->{Objects} }
+sub objs { $_[0]{Objects} }
+sub names_in { my $o=$_[0]->objs; grep !$o->{$_}{FlagOut} && !$o->{$_}{FlagTemp}, @{$_[0]{Names}} }
+sub names_out { my $o=$_[0]->objs; grep $o->{$_}{FlagOut}, @{$_[0]{Names}} }
+sub names_oca { my $o=$_[0]->objs; grep $o->{$_}{FlagCreateAlways}, @{$_[0]{Names}} }
+sub names_out_nca { my $o=$_[0]->objs; grep $o->{$_}{FlagOut} && !$o->{$_}{FlagCreateAlways}, @{$_[0]{Names}} }
+sub names_tmp { my $o=$_[0]->objs; grep $o->{$_}{FlagTemp}, @{$_[0]{Names}} }
 
 sub dims_obj { $_[0]->{DimsObj} }
-sub dims_count { scalar keys %{$_[0]->{DimsObj}} }
-sub dims_values { values %{$_[0]->{DimsObj}} }
+sub dims_count { scalar keys %{$_[0]{DimsObj}} }
+sub dims_values { values %{$_[0]{DimsObj}} }
 
-sub ind_used { $_[0]->{Ind2Use}{$_[1]} }
+sub ind_used { $_[0]{Ind2Use}{$_[1]} }
+sub ind_obj { $_[0]{Ind2Obj}{$_[1]} }
+sub ind_names_sorted { @{$_[0]{IndNamesSorted}} }
+sub ind_index { $_[0]{Ind2Index}{$_[1]} }
+
+sub othernames {
+  my ($self, $for_xs) = @_;
+  return $self->{OtherNames} if $for_xs;
+  my $objs = $self->otherobjs($for_xs);
+  my @raw_names = @{$self->{OtherNames}};
+  [ map $objs->{$_}->is_array ? ($_, "${_}_count") : $_, @raw_names ];
+}
+sub otherobjs {
+  my ($self, $for_xs) = @_;
+  return $self->{OtherObjs} if $for_xs;
+  my $objs = $self->{OtherObjs};
+  my @raw_names = @{$self->{OtherNames}};
+  +{ map $objs->{$_}->is_array
+      ? ($_=>$objs->{$_}, "${_}_count"=>PDL::PP::CType->new("PDL_Indx ${_}_count"))
+      : ($_=>$objs->{$_}),
+      @raw_names };
+}
+
+sub allnames { [@{$_[0]{Names}}, @{$_[0]->othernames($_[1])}] }
+sub allobjs {
+  my $pdltype = PDL::PP::CType->new("pdl *__foo__");
+  +{ ( map +($_,$pdltype), @{$_[0]{Names}} ), %{$_[0]->otherobjs($_[1])} };
+}
+sub alldecls {
+  my ($self, $long, $for_xs) = @_;
+  return @{$self->allnames($for_xs)} if !$long;
+  my $objs = $self->allobjs($for_xs);
+  map $objs->{$_}->get_decl($_, {VarArrays2Ptrs=>1}), @{$self->allnames($for_xs)};
+}
+sub getcomp {
+  my ($self) = @_;
+  my $objs = $self->otherobjs(0);
+  join '', map "$_;", grep $_, map $objs->{$_}->get_decl($_, {VarArrays2Ptrs=>1}), @{$self->othernames(0)};
+}
+sub getfree {
+  my ($self,$symbol) = @_;
+  my $objs = $self->otherobjs(0);
+  join '', map $objs->{$_}->get_free("\$$symbol($_)",
+    { VarArrays2Ptrs => 1 }), @{$self->othernames(0)};
+}
+sub getcopy {
+  my ($self) = @_;
+  my $objs = $self->otherobjs(0);
+  PDL::PP::pp_line_numbers(__LINE__,
+    join '', map $objs->{$_}->get_copy($_,"\$COMP($_)"), @{$self->othernames(0)}
+  );
+}
 
 sub realdims {
   my $this = shift;
-  [ map scalar @{$this->{Objects}->{$_}->{RawInds}}, @{$this->{Names}} ];
+  [ map scalar @{$this->{Objects}{$_}{RawInds}}, @{$this->{Names}} ];
 }
 
 sub creating {
@@ -83,7 +177,7 @@ sub checkdims {
   my $this = shift;
   # we have to recreate to keep defaults currently
   $this->{Dims} = PDL::PP::PdlDimsObj->new;
-  $this->{Objects}->{$_}->add_inds($this->{Dims}) for @{$this->{Names}};
+  $this->{Objects}{$_}->add_inds($this->{Dims}) for @{$this->{Names}};
   my $n = @{$this->{Names}};
   croak "not enough pdls to match signature" unless $#_ >= $n-1;
   my @pdls = @_[0..$n-1];
@@ -91,18 +185,18 @@ sub checkdims {
 		     join(' ,',map { "[".join(',',$_->dims)."]," } @pdls)
 		       . "\n"}
   my $i = 0;
-  my @creating = map $this->{Objects}->{$_}->perldimcheck($pdls[$i++]),
+  my @creating = map $this->{Objects}{$_}->perldimcheck($pdls[$i++]),
          @{$this->{Names}};
   $i = 0;
   for (@{$this->{Names}}) {
-    push @creating, $this->{Objects}->{$_}->getcreatedims
+    push @creating, $this->{Objects}{$_}->getcreatedims
       if $creating[$i++];
   }
   $this->{Create} = \@creating;
   $i = 0;
   my $corr = 0;
   for (@{$this->{Names}}) {
-    $corr = $this->{Objects}->{$_}->finalcheck($pdls[$i++]);
+    $corr = $this->{Objects}{$_}->finalcheck($pdls[$i++]);
     next unless $#$corr>-1;
     my ($j,$str) = (0,"");
     for (@$corr) {$str.= ":,"x($_->[0]-$j)."(0),*$_->[1],";

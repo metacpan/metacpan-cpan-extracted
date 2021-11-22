@@ -7,6 +7,12 @@ XS::libpanda - panda::lib C++ library for XS.
 This library is intended to use only from XS modules.
 No perl interface.
 
+=head1 DEPENDENCIES
+
+This module requires either C<execinfo.h> (it is shipped with C<libc6-dev> or
+C<glibc-devel> or C<libexecinfo-dev> on Linux) or <libunwind.h> (shipped with FreeBSD,
+but also can be found with packages like C<libunwind-dev> on Linux).
+
 =head1 SEE ALSO
 
 L<XS::Install>

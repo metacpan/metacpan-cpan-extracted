@@ -4,7 +4,6 @@ package Netstack::Connector::Radware;
 # 加载扩展模块
 #------------------------------------------------------------------------------
 use 5.016;
-use utf8;
 use Expect;
 use Moose;
 use namespace::autoclean;
@@ -30,7 +29,7 @@ sub _buildPrompt {
 sub _buildCommands {
   my $self = shift;
 
-  # my $commands = ["terminal length 0", "how running-config"];
+  # my $commands = ["terminal length 0", "show running-config"];
   my $commands = [ "cfg/dump", "cd" ];
   return $commands;
 }

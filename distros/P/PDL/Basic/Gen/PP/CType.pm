@@ -9,39 +9,21 @@ use Carp;
 
 sub new {
 	my $this = bless {},shift;
-	$this->{Resolve} = shift;
-	if(@_) {
-		$this->parsefrom(shift);
-	}
+	$this->parsefrom(shift) if @_;
 	return $this;
 }
 
 sub stripptrs {
 	my($this,$str) = @_;
-	if($str =~ /^\s*\w+\s*$/) {
-		$str =~ s/\s//g;
+	if($str =~ s/^\s*(\w+)\s*$/$1/g) {
 		$this->{ProtoName} = $str;
 		return [];
-	} else {
-# Now, recall the different C syntaxes. First priority is a pointer:
-		my $decl;
-		if($str =~ /^\s*\*(.*)$/) {
-			$decl = $this->stripptrs($1);
-			unshift @$decl,"PTR";
-		} elsif($str =~ /^\s*\(.*\)\s*$/) {
-# XXX Should try to see if a funccall.
-			return $this->stripptrs($1);
-		} elsif($str =~ /^(.*)\[([^]]+)\]\s*$/) {
-			my $siz = $2;
-			print "ARR($str): ($siz)\n" if $::PP_VERBOSE;
-			$decl = $this->stripptrs($1);
-			unshift @$decl,"ARR($siz)";
-			print "ARR($str): ($siz)\n" if $::PP_VERBOSE;
-		} else {
-			Carp::confess("Invalid C type '$str'");
-		}
-		return $decl;
 	}
+	# Now, recall the different C syntaxes. First priority is a pointer:
+	return [["PTR"], @{$this->stripptrs($1)}] if $str =~ /^\s*\*(.*)$/;
+	return $this->stripptrs($1) if $str =~ /^\s*\(.*\)\s*$/; # XXX Should try to see if a funccall.
+	return [["ARR",$2], @{$this->stripptrs($1)}] if $str =~ /^(.*)\[([^]]*)\]\s*$/;
+	Carp::confess("Invalid C type '$str'");
 }
 
 # XXX Correct to *real* parsing. This is only a subset.
@@ -49,24 +31,22 @@ sub parsefrom {
 	my($this,$str) = @_;
 # First, take the words in the beginning
 	$str =~ /^\s*((?:\w+\b\s*)+)([^[].*)$/;
-	my $base = $1; my $decl = $2;
-	my $foo = $this->stripptrs($decl);
-	$this->{Base} = $base;
-	$this->{Chain} = $foo;
+	$this->{Base} = $1;
+	$this->{Chain} = $this->stripptrs($2);
 }
 
 sub get_decl {
 	my($this,$name,$opts) = @_;
 	for(@{$this->{Chain}}) {
-		if($_ eq "PTR") {$name = "*$name"}
-		elsif($_ =~/^ARR\((.*)\)$/) {
+		my ($type, $arg) = @$_;
+		if($type eq "PTR") {$name = "*$name"}
+		elsif($type eq "ARR") {
 			if($opts->{VarArrays2Ptrs}) {
 				$name = "*$name";
 			} else {
-				$name = "($name)[$1]";
+				$name = "($name)[$arg]";
 			}
-		}
-		else { confess("Invalid decl") }
+		} else { confess("Invalid decl @$_") }
 	}
 	return "$this->{Base} $name";
 }
@@ -76,107 +56,70 @@ sub protoname { return shift->{ProtoName} }
 
 sub get_copy {
 	my($this,$from,$to) = @_;
-	my ($prev,$close);
-	if($#{$this->{Chain}} >= 0) {
-		# strdup loses portability :(
-		return "($to) = malloc(strlen($from)+1); strcpy($to,$from);"
-		 if $this->{Base} =~ /^\s*char\s*$/;
-                return "($to) = newSVsv($from);"
-                 if $this->{Base} =~ /^\s*SV\s*$/;
-		my $code = $this->get_malloc($to,$from);
-		my ($deref0,$deref1) = ($from,$to);
-		for(@{$this->{Chain}}) {
-			if($_ eq "PTR") {confess("Cannot alloc pointer, must be array");}
-			elsif($_ =~/^ARR\((.*)\)$/) {
-				$no++;
-				$prev .= "
-				  if(!$deref0) {$deref1=0;}
-				  else {int __malloc_ind_$no;
-					for(__malloc_ind_$no = 0;
-						__malloc_ind_$no < $1;
-						__malloc_ind_$no ++) {";
-				$deref0 = $deref0."[__malloc_ind_$no]";
-				$deref1 = $deref1."[__malloc_ind_$no]";
-				$close .= "}}";
-			} else { confess("Invalid decl $_") }
-		}
-		$code .= "$prev $deref1 = $deref0; $close";
-		return $code;
+	return "($to) = ($from);" if !@{$this->{Chain}};
+	# strdup loses portability :(
+	return "($to) = malloc(strlen($from)+1); strcpy($to,$from);"
+	 if $this->{Base} =~ /^\s*char\s*$/;
+	return "($to) = newSVsv($from);" if $this->{Base} =~ /^\s*SV\s*$/;
+	my $code = $this->get_malloc($to,$from);
+	return "($to) = ($from);" if !defined $code; # pointer
+	my ($deref0,$deref1,$prev,$close) = ($from,$to);
+	for(@{$this->{Chain}}) {
+		my ($type, $arg) = @$_;
+		if($type eq "PTR") {confess("Cannot copy pointer, must be array");}
+		elsif($type eq "ARR") {
+			$no++;
+			$arg = "$this->{ProtoName}_count" if $this->is_array;
+			$prev .= PDL::PP::pp_line_numbers(__LINE__-1, "
+			  if(!$deref0) {$deref1=0;}
+			  else {int __malloc_ind_$no;
+				for(__malloc_ind_$no = 0;
+					__malloc_ind_$no < $arg;
+					__malloc_ind_$no ++) {");
+			$deref0 = $deref0."[__malloc_ind_$no]";
+			$deref1 = $deref1."[__malloc_ind_$no]";
+			$close .= "}}";
+		} else { confess("Invalid decl @$_") }
 	}
-	return "($to) = ($from);";
+	$code .= "$prev $deref1 = $deref0; $close";
+	return $code;
 }
 
 sub get_free {
 	my($this,$from) = @_;
-	my ($prev,$close);
-	if($#{$this->{Chain}} >= 0) {
-		return "free($from);"
-		 if $this->{Base} =~ /^\s*char\s*$/;
-                return "SvREFCNT_dec($from);"
-                 if $this->{Base} =~ /^\s*SV\s*$/;
-		my @mallocs;
-		my $str = "{";
-		my $deref = "$from";
-		my $prev = undef;
-		my $close = undef;
-		my $no = 0;
-		for(@{$this->{Chain}}) {
-			$no++;
-			if($no > 1) {croak("Can only free one layer!\n");}
-#			if($_ eq "PTR") {confess("Cannot free pointer, must be array ;) (FIX CType.pm)");}
-			return "free($from);\n ";
-		}
-	} else {
-		"";
-	}
+	return "" if !@{$this->{Chain}} or $this->{Chain}[0][0] eq 'PTR';
+	return "free($from);" if $this->{Base} =~ /^\s*char\s*$/;
+	return "SvREFCNT_dec($from);" if $this->{Base} =~ /^\s*SV\s*$/;
+	croak("Can only free one layer!\n") if @{$this->{Chain}} > 1;
+	"free($from);";
 }
 
 sub need_malloc {
 	my($this) = @_;
-	return scalar grep /(ARR|PTR)/,(@{$this->{Chain}})
+	grep /(ARR|PTR)/, map $_->[0], @{$this->{Chain}};
 }
 
-# Just returns with the array string.
+# returns with the array string - undef if a pointer not needing malloc
 sub get_malloc {
-	my($this,$assignto) = @_;
-	my $str = "{";
-	my $deref = "$assignto";
-	my $prev = undef;
-	my $close = undef;
-	my $no = 0;
-	for(@{$this->{Chain}}) {
-		if($_ eq "PTR") {confess("Cannot alloc pointer, must be array");}
-		elsif($_ =~/^ARR\((.*)\)$/) {
-			$str .= "$prev $assignto =
-				malloc(sizeof(* $assignto) * $1);
-				";
-			$no++;
-			$prev = "{int __malloc_ind_$no;
-				for(__malloc_ind_$no = 0;
-					__malloc_ind_$no < $1;
-					__malloc_ind_$no ++) {";
-			$deref = $deref."[__malloc_ind_$no]";
-			$close .= "}}";
-		} else { confess("Invalid decl $_") }
-	}
-	$str .= "}";
-	return $str;
+  my($this,$assignto) = @_;
+  my $str = "";
+  for(@{$this->{Chain}}) {
+    my ($type, $arg) = @$_;
+    if($type eq "PTR") {return}
+    elsif($type eq "ARR") {
+      $arg = "$this->{ProtoName}_count" if $this->is_array;
+      $str .= PDL::PP::pp_line_numbers(__LINE__-1, "$assignto = malloc(sizeof(*$assignto) * $arg);\n");
+    } else { confess("Invalid decl (@$_)") }
+  }
+  return $str;
 }
 
-sub getvar {
-}
-
-# Determine if everything constant and can just declare
-sub need_alloc {
-}
-
-sub alloccode {
-}
-
-sub copycode {
-}
-
-sub freecode {
+sub is_array {
+  my ($self) = @_;
+  @{$self->{Chain}} &&
+    @{$self->{Chain}[0]} &&
+    $self->{Chain}[0][0] eq 'ARR' &&
+    !$self->{Chain}[0][1];
 }
 
 1;

@@ -1,0 +1,54 @@
+---
+abstract: 'Cookie Object with Encryption or Signature'
+author:
+  - 'Jacques Deguest <jack@deguest.jp>'
+build_requires:
+  Bytes::Random::Secure: '0.29'
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  File::Which: '0'
+  HTTP::Request: '6.22'
+  HTTP::Response: '6.22'
+  Test::More: '1.302162'
+  Test::Time: '0'
+  open: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Cookie
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Apache::Test: '0'
+  DateTime: '1.52'
+  DateTime::Format::Strptime: '1.77'
+  JSON: '4.03'
+  Module::Generic: v0.17.0
+  Net::IDN::Encode: '2.500'
+  Nice::Try: v1.1.2
+  Scalar::Util: '1.50'
+  URI::Escape: '5.09'
+  Want: '0.29'
+  constant: '0'
+  lib: '0'
+  overload: '1.22'
+  overloading: '0.02'
+  parent: '0'
+  perl: '5.016000'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://git.deguest.jp/jack/Cookie/issues
+  repository: https://git.deguest.jp/jack/Cookie
+version: v0.1.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

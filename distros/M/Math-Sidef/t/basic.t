@@ -11,8 +11,8 @@ use Math::Sidef qw(factor composite prime ipow factor_exp is_prime is_composite)
 
 is(ref(prime(100)), 'Math::AnyNum');
 
-is(prime(1e9),     "22801763489");    # 10^9-th prime number
-is(composite(1e9), "1053422339");     # 10^9-th composite number
+is(prime(1e7),     "179424673");    # 10^9-th prime number
+is(composite(1e7), "10708555");     # 10^9-th composite number
 
 ok(is_prime(ipow(2,  127) - 1));
 ok(!is_prime(ipow(2, 128) + 1));

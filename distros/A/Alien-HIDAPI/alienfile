@@ -28,7 +28,7 @@ share {
   }
 
   plugin Download => (
-      url => 'https://github.com/signal11/hidapi/archive/master.tar.gz'
+      url => 'https://github.com/libusb/hidapi/archive/hidapi-0.11.0.tar.gz'
   );
 
   plugin Extract => 'tar.gz';

@@ -30,7 +30,7 @@ is_oneref( $arr, '$arr has one reference before we start' );
 
 # RT139665
 {
-   class subWithWeak isa WithWeak {}
+   class subWithWeak :isa(WithWeak) {}
 
    my $obj = subWithWeak->new( slot => $arr );
    is_oneref( $arr, '$arr has one reference after subWithWeak construction' );

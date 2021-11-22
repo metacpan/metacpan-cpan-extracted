@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-my $tests = 29;
+my $tests = 41;
 
 print "1..$tests\n";
 
@@ -361,8 +361,60 @@ if(!$@) {
 }
 else {
   warn "\nSkipping tests 21 .. $tests - couldn't load Math::GMPZ:\n\$\@: $@\n";
-  for(21 .. $tests) {print "ok $_\n"};
+  for(21 .. 29) {print "ok $_\n"};
 }
 
+my $fr_nan = Math::MPFR->new();
+my $sv_nan = Rmpfr_get_NV($fr_nan, MPFR_RNDN);
+
+Rmpfr_clear_erangeflag();
+
+if( Math::MPFR->new(6) == $sv_nan) { print "not ok 30\n" }
+else { print "ok 30\n" }
+
+if(Rmpfr_erangeflag_p()) { print "ok 31\n" }
+else { print "not ok 31\n" }
+
+Rmpfr_clear_erangeflag();
+
+if( Math::MPFR->new(6) != $sv_nan) { print "ok 32\n" }
+else { print "not ok 32\n" }
+
+if(Rmpfr_erangeflag_p()) { print "ok 33\n" }
+else { print "not ok 33\n" }
+
+
+Rmpfr_clear_erangeflag();
+
+if( $fr_nan == 6) { print "not ok 34\n" }
+else { print "ok 34\n" }
+
+if(Rmpfr_erangeflag_p()) { print "ok 35\n" }
+else { print "not ok 35\n" }
+
+Rmpfr_clear_erangeflag();
+
+if( $fr_nan != 6) { print "ok 36\n" }
+else { print "not ok 36\n" }
+
+if(Rmpfr_erangeflag_p()) { print "ok 37\n" }
+else { print "not ok 37\n" }
+
+
+Rmpfr_clear_erangeflag();
+
+if( $fr_nan == 6.1) { print "not ok 38\n" }
+else { print "ok 38\n" }
+
+if(Rmpfr_erangeflag_p()) { print "ok 39\n" }
+else { print "not ok 39\n" }
+
+Rmpfr_clear_erangeflag();
+
+if( $fr_nan != 6.1) { print "ok 40\n" }
+else { print "not ok 40\n" }
+
+if(Rmpfr_erangeflag_p()) { print "ok 41\n" }
+else { print "not ok 41\n" }
 
 

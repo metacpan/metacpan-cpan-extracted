@@ -1,5 +1,6 @@
     package Math::GMPz;
     use strict;
+    use warnings;
     use Math::GMPz::Random;
     require Exporter;
     *import = \&Exporter::import;
@@ -63,6 +64,7 @@ use overload
 __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
 __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS MATH_GMPz_IV_MAX MATH_GMPz_IV_MIN
 MATH_GMPz_UV_MAX
+IOK_flag NOK_flag POK_flag
 Rmpz_abs Rmpz_add Rmpz_add_ui Rmpz_addmul Rmpz_addmul_ui Rmpz_and Rmpz_bin_ui
 Rmpz_bin_uiui Rmpz_bin_si Rmpz_cdiv_q Rmpz_cdiv_q_2exp Rmpz_cdiv_q_ui Rmpz_cdiv_qr
 Rmpz_cdiv_qr_ui Rmpz_cdiv_r Rmpz_cdiv_r_2exp Rmpz_cdiv_r_ui Rmpz_cdiv_ui
@@ -79,12 +81,13 @@ Rmpz_fdiv_ui Rmpz_fib2_ui Rmpz_fib_ui Rmpz_fits_sint_p Rmpz_fits_slong_p
 Rmpz_fits_sshort_p Rmpz_fits_uint_p Rmpz_fits_ulong_p Rmpz_fits_ushort_p
 Rmpz_fprintf Rmpz_sprintf Rmpz_snprintf
 Rmpz_gcd Rmpz_gcd_ui Rmpz_gcdext Rmpz_get_d_2exp Rmpz_get_si Rmpz_get_str
+Rmpz_get_d Rmpz_get_NV
 Rmpz_get_ui Rmpz_getlimbn Rmpz_hamdist Rmpz_import Rmpz_import_UV
 Rmpz_init Rmpz_init2
 Rmpz_init2_nobless Rmpz_init_nobless Rmpz_init_set Rmpz_init_set_d
-Rmpz_init_set_IV Rmpz_init_set_NV
-Rmpz_set_IV Rmpz_set_NV Rmpz_cmp_NV
-Rmpz_get_IV Rmpz_fits_IV_p Rmpz_fits_UV_p
+Rmpz_init_set_IV Rmpz_init_set_IV_nobless Rmpz_init_set_NV Rmpz_init_set_NV_nobless
+Rmpz_set_IV Rmpz_set_NV Rmpz_cmp_NV Rmpz_cmp_IV
+Rmpz_get_IV Rmpz_fits_IV_p
 Rmpz_init_set_d_nobless Rmpz_init_set_nobless Rmpz_init_set_si
 Rmpz_init_set_si_nobless Rmpz_init_set_str Rmpz_init_set_str_nobless
 Rmpz_init_set_ui Rmpz_init_set_ui_nobless Rmpz_inp_str Rmpz_inp_raw
@@ -97,7 +100,8 @@ Rmpz_perfect_power_p Rmpz_perfect_square_p
 Rmpz_popcount Rmpz_pow_ui Rmpz_powm Rmpz_powm_sec Rmpz_powm_ui Rmpz_printf
 Rmpz_probab_prime_p Rmpz_realloc2 Rmpz_remove Rmpz_root Rmpz_rootrem
 Rmpz_rrandomb Rmpz_scan0 Rmpz_scan1 Rmpz_set Rmpz_set_d Rmpz_set_f Rmpz_set_q
-Rmpz_set_si Rmpz_set_str Rmpz_set_ui Rmpz_setbit Rmpz_sgn Rmpz_si_kronecker
+Rmpz_set_si Rmpz_set_sj Rmpz_set_str Rmpz_set_ui Rmpz_set_uj
+Rmpz_setbit Rmpz_sgn Rmpz_si_kronecker
 Rmpz_size Rmpz_sizeinbase Rmpz_sqrt Rmpz_sqrtrem Rmpz_sub Rmpz_sub_ui
 Rmpz_submul Rmpz_submul_ui Rmpz_swap Rmpz_tdiv_q Rmpz_tdiv_q_2exp
 Rmpz_tdiv_q_ui Rmpz_tdiv_qr Rmpz_tdiv_qr_ui Rmpz_tdiv_r Rmpz_tdiv_r_2exp
@@ -111,7 +115,7 @@ zgmp_randinit_set zgmp_randinit_default_nobless zgmp_randinit_mt_nobless
 zgmp_randinit_lc_2exp_nobless zgmp_randinit_lc_2exp_size_nobless zgmp_randinit_set_nobless
 zgmp_urandomb_ui zgmp_urandomm_ui
     );
-    our $VERSION = '0.51';
+    our $VERSION = '0.52';
     #$VERSION = eval $VERSION;
 
     Math::GMPz->DynaLoader::bootstrap($VERSION);
@@ -142,15 +146,16 @@ Rmpz_fdiv_ui Rmpz_fib2_ui Rmpz_fib_ui Rmpz_fits_sint_p Rmpz_fits_slong_p
 Rmpz_fits_sshort_p Rmpz_fits_uint_p Rmpz_fits_ulong_p Rmpz_fits_ushort_p
 Rmpz_fprintf Rmpz_sprintf Rmpz_snprintf
 Rmpz_gcd Rmpz_gcd_ui Rmpz_gcdext Rmpz_get_d_2exp Rmpz_get_si Rmpz_get_str
+Rmpz_get_d Rmpz_get_NV
 Rmpz_get_ui Rmpz_getlimbn Rmpz_hamdist Rmpz_import Rmpz_import_UV
 Rmpz_init Rmpz_init2
 Rmpz_init2_nobless Rmpz_init_nobless Rmpz_init_set Rmpz_init_set_d
 Rmpz_init_set_d_nobless Rmpz_init_set_nobless Rmpz_init_set_si
 Rmpz_init_set_si_nobless Rmpz_init_set_str Rmpz_init_set_str_nobless
 Rmpz_init_set_ui Rmpz_init_set_ui_nobless Rmpz_inp_str Rmpz_inp_raw
-Rmpz_init_set_IV Rmpz_init_set_NV
-Rmpz_set_IV Rmpz_set_NV Rmpz_cmp_NV
-Rmpz_get_IV Rmpz_fits_IV_p Rmpz_fits_UV_p
+Rmpz_init_set_IV Rmpz_init_set_IV_nobless Rmpz_init_set_NV Rmpz_init_set_NV_nobless
+Rmpz_set_IV Rmpz_set_NV Rmpz_cmp_NV Rmpz_cmp_IV
+Rmpz_get_IV Rmpz_fits_IV_p
 Rmpz_invert Rmpz_ior new_from_MBI
 Rmpz_jacobi Rmpz_kronecker Rmpz_kronecker_si Rmpz_kronecker_ui Rmpz_lcm
 Rmpz_lcm_ui Rmpz_legendre Rmpz_lucnum2_ui Rmpz_lucnum_ui Rmpz_mod Rmpz_mod_ui
@@ -160,7 +165,8 @@ Rmpz_perfect_power_p Rmpz_perfect_square_p
 Rmpz_popcount Rmpz_pow_ui Rmpz_powm Rmpz_powm_sec Rmpz_powm_ui Rmpz_printf
 Rmpz_probab_prime_p Rmpz_realloc2 Rmpz_remove Rmpz_root Rmpz_rootrem
 Rmpz_rrandomb Rmpz_scan0 Rmpz_scan1 Rmpz_set Rmpz_set_d Rmpz_set_f Rmpz_set_q
-Rmpz_set_si Rmpz_set_str Rmpz_set_ui Rmpz_setbit Rmpz_sgn Rmpz_si_kronecker
+Rmpz_set_si Rmpz_set_sj Rmpz_set_str Rmpz_set_ui Rmpz_set_uj
+Rmpz_setbit Rmpz_sgn Rmpz_si_kronecker
 Rmpz_size Rmpz_sizeinbase Rmpz_sqrt Rmpz_sqrtrem Rmpz_sub Rmpz_sub_ui
 Rmpz_submul Rmpz_submul_ui Rmpz_swap Rmpz_tdiv_q Rmpz_tdiv_q_2exp
 Rmpz_tdiv_q_ui Rmpz_tdiv_qr Rmpz_tdiv_qr_ui Rmpz_tdiv_r Rmpz_tdiv_r_2exp
@@ -219,15 +225,9 @@ sub new {
 
     # Create a Math::GMPz object that has $arg1 as its value.
     # Die if there are any additional args (unless $type == _POK_T)
-    if($type == _UOK_T || $type == _IOK_T) {
+    if($type == _IOK_T || $type == _UOK_T) {
       if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
       return Rmpz_init_set_IV($arg1);
-    }
-
-    if($type == _NOK_T) {
-      if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
-      return Rmpz_init_set_NV($arg1);
-
     }
 
     if($type == _POK_T) { # POK
@@ -236,6 +236,12 @@ sub new {
       if($base < 0 || $base == 1 || $base > 62) {die "Invalid value for base"}
       $arg1 =~ s/^(\s+)?\+//; # Rmpz_init_set_str() dies if there's a leading '+'.
       return Rmpz_init_set_str($arg1, $base);
+    }
+
+    if($type == _NOK_T) {
+      if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
+      return Rmpz_init_set_NV($arg1);
+
     }
 
     if($type == _MATH_GMPz_T || $type == _MATH_GMP_T) { # Math::GMPz or Math::GMP object

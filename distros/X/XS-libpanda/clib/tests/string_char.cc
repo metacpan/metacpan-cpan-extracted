@@ -14,4 +14,8 @@ void test_compilation_warnings () {
         string str = "andedf";
         string str2 = std::move(str);
     }
+    {
+        string_view in("123zzz");
+        in.find("zzz");
+    }
 }

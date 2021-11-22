@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,12 +20,12 @@ no_index:
 requires:
   Carp: '0'
   Convert::Moji: '0.10'
-  JSON::Parse: '0.38'
+  JSON::Parse: '0.61'
   perl: '5.006001'
 resources:
   bugtracker: https://github.com/benkasminbullock/Lingua-EN-ABC/issues
   repository: https://github.com/benkasminbullock/Lingua-EN-ABC
-version: '0.10'
+version: '0.12'
 x_contributors:
   - 'Nigel Horne <njh@cpan.org>'
   - 'Ed Avis <edavis@cpan.org>'

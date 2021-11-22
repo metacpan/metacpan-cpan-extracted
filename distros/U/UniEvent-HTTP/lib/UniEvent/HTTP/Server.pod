@@ -9,7 +9,8 @@ UniEvent::HTTP::Server - efficient asynchronous http server
     my $server = UE::HTTP::Server->new({
         locations => [
             {host => '*', port => 80},
-            {host => '*', port => 443, ssl_ctx => $ssl_ctx},
+            {host => '*', port => 443, ssl_ctx => $ssl_ctx, reuse_port => 0},
+            {path => '/var/run/mysock.sock'},
         ]
     }, $loop);
     
@@ -39,6 +40,8 @@ To utilize several cpu cores, several server objects should be created in differ
 Out-of-the-box multi-process/thread solution is implemented in L<UniEvent::HTTP::Manager>.
 
 Server supports keep-alive connections, compression, http pipelining, request/response body streaming.
+
+Server supports for listening host:port, unix socket, windows named pipe or custom socket. Multiple listening locations can be defined.
 
 
 
@@ -105,10 +108,14 @@ Port to listen. Can be zero, in which case server will bind to a random free por
     $server->sockaddr->port; # from the first location
     $server->listeners->[$n]->sockaddr->port; # from the $n-th location
 
-=item reuse_port [false]
+=item path
+
+Path to unix socket or name for named pipe (on windows) to listen. If defined, ignores C<host>, C<port>, C<reuse_port>, C<domain>, C<sock>.
+
+=item reuse_port [true]
 
 If set to true, will use C<REUSE_PORT> feature when binding. This is the simplest (and efficient) way to create several server objects on the same port.
-This option is ignored on systems where it's not supported.
+This option is ignored on systems where it's not supported (for example, windows).
 
 =item backlog [4096]
 
@@ -126,9 +133,9 @@ Enables SSL for this location. Must be an SSL context object which you can creat
 
 Allows to pass previously created socket. Socket must be bound to an address, but MUST NOT listen (C<listen()> must not be called). Server will call C<listen()>
 by itself. Useful if you want to use C<prefork-socket> scheme (i.e. create socket in master process, then fork and create server object and listen
-the same socket in multiple child processes).
+the same socket in multiple child processes). This socket can be of family AF_INET, AF_INET6 or AF_UNIX (except for windows).
 
-C<sock> and C<host>, C<port>, C<reuse_port>, C<domain> are mutually exclusive.
+C<sock> and C<host>, C<port>, C<path>, C<reuse_port>, C<domain> are mutually exclusive.
 
 =back
 

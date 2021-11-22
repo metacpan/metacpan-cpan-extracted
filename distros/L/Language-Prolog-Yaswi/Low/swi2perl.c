@@ -35,31 +35,31 @@ SV *swi2perl(pTHX_ term_t t, AV *cells) {
     case PL_ATOM: {
         return swi2perl_atom_sv(aTHX_ t);
     }
-    case PL_TERM: {
-        if (PL_is_list(t)) {
-            AV *array=newAV();
-            SV *ref=newRV_noinc((SV *)array);
-            int len=0;
-            term_t head, tail;
-            while(PL_is_list(t)) {
-                if(PL_get_nil(t)) {
-                    sv_bless(ref, gv_stashpv( len ?
-                                              TYPEINTPKG "::list" :
-                                              TYPEINTPKG "::nil", 1));
-                    return ref;
-                }
-                head=PL_new_term_refs(2);
-                tail=head+1;
-                PL_get_list(t, head, tail);
-                av_push(array, swi2perl(aTHX_ head, cells));
-                t=tail;
-                len++;
+    case PL_NIL:
+    case PL_LIST_PAIR: {
+        AV *array=newAV();
+        SV *ref=newRV_noinc((SV *)array);
+        int len=0;
+        term_t head, tail;
+        while(PL_is_list(t)) {
+            if(PL_get_nil(t)) {
+                sv_bless(ref, gv_stashpv( len ?
+                                          TYPEINTPKG "::list" :
+                                          TYPEINTPKG "::nil", 1));
+                return ref;
             }
-            av_push(array, swi2perl(aTHX_ tail, cells));
-            sv_bless(ref, gv_stashpv(TYPEINTPKG "::ulist", 1));
-            return ref;
+            head=PL_new_term_refs(2);
+            tail=head+1;
+            PL_get_list(t, head, tail);
+            av_push(array, swi2perl(aTHX_ head, cells));
+            t=tail;
+            len++;
         }
-
+        av_push(array, swi2perl(aTHX_ tail, cells));
+        sv_bless(ref, gv_stashpv(TYPEINTPKG "::ulist", 1));
+        return ref;
+    }
+    case PL_TERM: {
         {
             /* any other compound */
             SV *ref;

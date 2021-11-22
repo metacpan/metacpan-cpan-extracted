@@ -1,12 +1,12 @@
 {
-   "abstract" : "show Apache-style directory listings in your Mojolicious app",
+   "abstract" : "show Apache-style directory listings in your  Mojolicious app",
    "author" : [
       "Marty O'Brien <mob@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -34,11 +34,11 @@
       "runtime" : {
          "requires" : {
             "Mojolicious::Lite" : "0",
-            "perl" : "5.010"
+            "perl" : "5.01"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -9,7 +9,7 @@ use Exporter ();
 # @EXPORT_OK/%EXPORT_TAGS are set up in XS
 *import = \&Exporter::import;
 
-our $VERSION = '0.32'; # VERSION
+our $VERSION = '0.34'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -19,6 +19,8 @@ my $REQUIRED_MAP_PACKAGE = [qw(package prefix)];
 my $REQUIRED_MAP_MESSAGE = [qw(message to)];
 my $REQUIRED_MAP_ENUM = [qw(enum to)];
 my $REQUIRED_MAP_SERVICE = [qw(service to)];
+
+my $DEFAULT_WKT_MAPPING = 0;
 
 sub map {
     my ($self, @mappings) = @_;
@@ -47,6 +49,7 @@ sub map {
         }
     }
 
+    $self->map_wkts;
     $self->resolve_references;
 }
 
@@ -73,6 +76,24 @@ sub _dump {
     Data::Dumper::Dumper(@_)
 }
 
+sub _load_wkt_proto {
+    my ($self) = @_;
+
+    $self->load_file('google/protobuf/duration.proto');
+    $self->load_file('google/protobuf/timestamp.proto');
+    $self->load_file('google/protobuf/wrappers.proto');
+}
+
+sub map_wkts {
+    return if $DEFAULT_WKT_MAPPING;
+    $DEFAULT_WKT_MAPPING = 1;
+
+    my ($self, $options) = @_;
+
+    $self->_load_wkt_proto;
+    $self->map_package('google.protobuf', 'Google::ProtocolBuffers::Dynamic::WKT', $options);
+}
+
 1;
 
 __END__
@@ -87,7 +108,7 @@ Google::ProtocolBuffers::Dynamic - fast and complete protocol buffer implementat
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 

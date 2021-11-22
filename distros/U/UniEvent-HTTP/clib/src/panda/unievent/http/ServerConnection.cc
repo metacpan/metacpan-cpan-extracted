@@ -1,14 +1,40 @@
 #include "ServerConnection.h"
 #include "Server.h"
 #include "msg.h" // for uehtlog
+#include <panda/unievent/Tcp.h>
+#include <panda/unievent/Pipe.h>
 
 namespace panda { namespace unievent { namespace http {
 
-ServerConnection::ServerConnection (Server* server, uint64_t id, const Config& conf)
-    : Tcp(server->loop()), server(server), _id(id), factory(conf.factory), parser(this), idle_timeout(conf.idle_timeout),
+excepted<net::SockAddr, ErrorCode> get_sockaddr (const Stream* stream) {
+    if (stream->type() == Tcp::TYPE) return panda::dyn_cast<const Tcp*>(stream)->sockaddr();
+
+    auto res = panda::dyn_cast<const Pipe*>(stream)->sockname();
+    if (!res) return make_unexpected(res.error());
+    #ifndef _WIN32
+    return net::SockAddr::Unix(res.value());
+    #else
+    return {};
+    #endif
+}
+
+excepted<net::SockAddr, ErrorCode> get_peeraddr (const Stream* stream) {
+    if (stream->type() == Tcp::TYPE) return panda::dyn_cast<const Tcp*>(stream)->peeraddr();
+
+    auto res = panda::dyn_cast<const Pipe*>(stream)->peername();
+    if (!res) return make_unexpected(res.error());
+    #ifndef _WIN32
+    return net::SockAddr::Unix(res.value());
+    #else
+    return {};
+    #endif
+}
+
+ServerConnection::ServerConnection (Server* server, uint64_t id, const Config& conf, const StreamSP& stream)
+    : server(server), _id(id), stream(stream), factory(conf.factory), parser(this), idle_timeout(conf.idle_timeout),
       max_keepalive_requests(conf.max_keepalive_requests)
 {
-    event_listener(this);
+    stream->event_listener(this);
 
     parser.max_headers_size = conf.max_headers_size;
     parser.max_body_size    = conf.max_body_size;
@@ -31,6 +57,7 @@ protocol::http::RequestSP ServerConnection::new_request () {
 
 void ServerConnection::on_read (string& buf, const ErrorCode& err) {
     ServerSP holdsrv = server; // protect against user loosing all server refs in one of the callbacks
+    ServerConnectionSP hold = this; // finish_request may remove this connection
     panda_log_debug("recv: \n" << buf);
 
     if (err) {
@@ -79,7 +106,7 @@ void ServerConnection::on_read (string& buf, const ErrorCode& err) {
             // if request is non-KA or non-KA response is already started, stop receiving any further requests
             if (req->_finish_on_receive) finish_request();
             else if (closing || !req->keep_alive()) {
-                read_ignore();
+                stream->read_ignore();
                 break; // skip parsing possible rest of the buffer
             }
         }
@@ -87,6 +114,7 @@ void ServerConnection::on_read (string& buf, const ErrorCode& err) {
 }
 
 void ServerConnection::respond (const ServerRequestSP& req, const ServerResponseSP& res) {
+    ServerConnectionSP hold = this; (void)hold;
     assert(req->_connection == this);
     panda_log_info("respond " << req << "," << res << "," << requests.front());
     if (req->_response) throw HttpError("double response for request given");
@@ -119,7 +147,7 @@ void ServerConnection::write_next_response () {
     panda_log_debug("sending <<\n" << res->to_string(req));
 
     auto v = res->to_vector(req);
-    write(v.begin(), v.end());
+    stream->write(v.begin(), v.end());
     server->write_request_queued();
 
     if (!res->keep_alive() || !req->keep_alive()) {
@@ -127,7 +155,7 @@ void ServerConnection::write_next_response () {
 
         // stop accepting further requests if this request is fully received.
         // if not, we'll continue receiving current request until it's done (read_ignore() will be called later by on_read() because closing==true)
-        if (req->is_done()) read_ignore();
+        if (req->is_done()) stream->read_ignore();
 
         if (requests.size() > 1) { // drop all pipelined requests
             requests.pop_front();
@@ -140,7 +168,7 @@ void ServerConnection::write_next_response () {
         if (tmp_chunks.size()) {
             for (auto& chunk : tmp_chunks) {
                 auto v = res->make_chunk(chunk);
-                write(v.begin(), v.end());
+                stream->write(v.begin(), v.end());
                 server->write_request_queued();
             }
         }
@@ -156,7 +184,7 @@ void ServerConnection::send_continue (const ServerRequestSP& req) {
     if (!req->expects_continue() || req->http_version == 10) return; // client doesn't expect 100
     if (req->_response) throw HttpError("100-continue can only be sent before response");
 
-    write("HTTP/1.1 100 Continue\r\n\r\n");
+    stream->write("HTTP/1.1 100 Continue\r\n\r\n");
     server->write_request_queued();
 }
 
@@ -166,7 +194,7 @@ void ServerConnection::send_chunk (const ServerResponseSP& res, const string& ch
 
     if (requests.front()->_response == res) {
         auto v = res->make_chunk(chunk);
-        write(v.begin(), v.end());
+        stream->write(v.begin(), v.end());
         server->write_request_queued();
         return;
     }
@@ -180,13 +208,13 @@ void ServerConnection::send_final_chunk (const ServerResponseSP& res, const stri
     if (requests.front()->_response != res) return;
 
     auto v = res->final_chunk(chunk);
-    write(v.begin(), v.end());
+    stream->write(v.begin(), v.end());
     server->write_request_queued();
     finish_request();
 }
 
 void ServerConnection::finish_request () {
-    ServerSP holdsrv = server; // cleanup_request() may release last server ref
+    ServerSP holdsrv = server; (void)holdsrv; // cleanup_request() may release last server ref
 
     auto req = requests.front();
     assert(req->_response && req->_response->_completed);
@@ -255,14 +283,14 @@ void ServerConnection::close (const ErrorCode& err, bool soft) {
     ServerConnectionSP hold = this; (void)hold;
     ServerSP hold_srv = server; (void)hold_srv;
 
-    event_listener(nullptr);
+    stream->event_listener(nullptr);
 
     if (idle_timer) {
         idle_timer->stop();
         idle_timer = nullptr;
     }
 
-    soft ? disconnect() : reset();
+    soft ? stream->disconnect() : stream->reset();
     drop_requests(err);
 
     server->remove(this);
@@ -308,7 +336,7 @@ ServerResponseSP ServerConnection::default_error_response (int code) {
 
 void ServerConnection::request_error (const ServerRequestSP& req, const ErrorCode& err) {
     auto hold = req; // in case of respond in _event that remove req from requests
-    read_ignore();
+    stream->read_ignore();
     if (req->_partial) req->partial_event(req, err);
     else               server->error_event(req, err);
 

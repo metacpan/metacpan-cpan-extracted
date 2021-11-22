@@ -20,5 +20,8 @@ no_index:
     - inc
 requires:
   perl: '5.006'
-version: '2.4'
+resources:
+  repository: https://github.com/thibaultduponchelle/Acme-Markdown-Embarrassing
+version: '3.2'
+x_homepage: https://github.com/thibaultduponchelle/Acme-Markdown-Embarrassing
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

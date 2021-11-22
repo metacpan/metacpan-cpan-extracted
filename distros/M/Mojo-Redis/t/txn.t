@@ -27,8 +27,4 @@ is_deeply(\@res, ['QUEUED'], 'set after multi');
 undef $db;
 is $redis->db->get($key), 1012, 'rollback when $db goes out of scope';
 
-$db = $redis->db;
-$db->multi_p($db->set_p($key => 1011), $db->set_p($key), $db->get_p($key))->catch(sub { @res = @_ })->wait;
-like $res[0], qr{^ERR}, "invalid command: @res";
-
 done_testing;

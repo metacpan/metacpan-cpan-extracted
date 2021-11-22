@@ -30,7 +30,7 @@ throws_ok{PGObject->register_type(
 'Correction exception thrown, reregistering in nonexistent registry.';
 
 ok(PGObject->unregister_type(pg_type => 'foo'), 'Unregister type, try 1');
-dies_ok(sub {PGObject->unregister_type(pg_type => 'foo')}, 'Unregister type, try 2');
+lives_ok(sub {PGObject->unregister_type(pg_type => 'foo')}, 'Unregister type, try 2');
 is(PGObject->register_type(pg_type => 'foo', perl_class => 'Foo2'), 1,
        "Repeat type registration, different type, succeeds now");
 

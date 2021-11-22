@@ -23,6 +23,8 @@ SlotMeta *ObjectPad_mop_create_slot(pTHX_ SV *slotname, ClassMeta *classmeta)
   SlotMeta *slotmeta;
   Newx(slotmeta, 1, SlotMeta);
 
+  assert(classmeta->next_slotix > -1);
+
   slotmeta->name = SvREFCNT_inc(slotname);
   slotmeta->class = classmeta;
   slotmeta->slotix = classmeta->next_slotix;
@@ -77,6 +79,19 @@ static void S_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, SV *paramname)
   hv_store_ent(parammap, paramname, (SV *)parammeta, 0);
 }
 
+SV *ObjectPad_mop_slot_get_default_sv(pTHX_ SlotMeta *slotmeta)
+{
+  return slotmeta->defaultsv;
+}
+
+void ObjectPad_mop_slot_set_default_sv(pTHX_ SlotMeta *slotmeta, SV *sv)
+{
+  if(slotmeta->defaultsv)
+    SvREFCNT_dec(slotmeta->defaultsv);
+
+  slotmeta->defaultsv = sv;
+}
+
 typedef struct SlotAttributeRegistration SlotAttributeRegistration;
 
 struct SlotAttributeRegistration {
@@ -86,17 +101,19 @@ struct SlotAttributeRegistration {
   STRLEN permit_hintkeylen;
 
   const struct SlotHookFuncs *funcs;
+  void *funcdata;
 };
 
 static SlotAttributeRegistration *slotattrs = NULL;
 
-static void register_slot_attribute(const char *name, const struct SlotHookFuncs *funcs)
+static void register_slot_attribute(const char *name, const struct SlotHookFuncs *funcs, void *funcdata)
 {
   SlotAttributeRegistration *reg;
   Newx(reg, 1, struct SlotAttributeRegistration);
 
-  reg->name = name;
-  reg->funcs = funcs;
+  reg->name     = name;
+  reg->funcs    = funcs;
+  reg->funcdata = funcdata;
 
   if(funcs->permit_hintkey)
     reg->permit_hintkeylen = strlen(funcs->permit_hintkey);
@@ -131,17 +148,12 @@ void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *na
     SV *hookdata = value;
 
     if(reg->funcs->apply) {
-      if(reg->funcs->ver >= 51) {
-        if(!(*reg->funcs->apply)(aTHX_ slotmeta, value, &hookdata))
-          return;
-      }
-      else {
-        /* ABIVERSION_MINOR 50 apply did not have hookdata_ptr */
-        bool (*apply)(pTHX_ SlotMeta *, SV *) = (void *)(reg->funcs->apply);
-        if(!(*apply)(aTHX_ slotmeta, value))
-          return;
-      }
+      if(!(*reg->funcs->apply)(aTHX_ slotmeta, value, &hookdata, reg->funcdata))
+        return;
     }
+
+    if(hookdata && hookdata == value)
+      SvREFCNT_inc(hookdata);
 
     if(!slotmeta->hooks)
       slotmeta->hooks = newAV();
@@ -151,11 +163,9 @@ void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *na
 
     hook->funcs = reg->funcs;
     hook->hookdata = hookdata;
+    hook->funcdata = reg->funcdata;
 
     av_push(slotmeta->hooks, (SV *)hook);
-
-    if(value && value != hookdata)
-      SvREFCNT_dec(value);
 
     return;
   }
@@ -165,7 +175,7 @@ void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *na
 
 struct SlotHook *ObjectPad_mop_slot_get_attribute(pTHX_ SlotMeta *slotmeta, const char *name)
 {
-  HV *hints = GvHV(PL_hintgv);
+  COPHH *cophh = CopHINTHASH_get(PL_curcop);
 
   /* First, work out what hookfuncs the name maps to */
 
@@ -175,7 +185,7 @@ struct SlotHook *ObjectPad_mop_slot_get_attribute(pTHX_ SlotMeta *slotmeta, cons
       continue;
 
     if(reg->funcs->permit_hintkey &&
-        (!hints || !hv_fetch(hints, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0)))
+        !cophh_fetch_pvn(cophh, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0, 0))
       continue;
 
     break;
@@ -211,7 +221,7 @@ void ObjectPad_mop_slot_seal(pTHX_ SlotMeta *slotmeta)
 
 /* :weak */
 
-static void slothook_weak_post_construct(pTHX_ SlotMeta *slotmeta, SV *_hookdata, SV *slot)
+static void slothook_weak_post_construct(pTHX_ SlotMeta *slotmeta, SV *_hookdata, void *_funcdata, SV *slot)
 {
   sv_rvweaken(slot);
 }
@@ -224,7 +234,7 @@ static OP *pp_weaken(pTHX)
   return NORMAL;
 }
 
-static void slothook_weak_gen_accessor(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void slothook_weak_gen_accessor(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_WRITER)
     return;
@@ -241,7 +251,7 @@ static struct SlotHookFuncs slothooks_weak = {
 
 /* :param */
 
-static bool slothook_param_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
+static bool slothook_param_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
   if(SvPVX(slotmeta->name)[0] != '$')
     croak("Can only add a named constructor parameter for scalar slots");
@@ -261,11 +271,11 @@ static bool slothook_param_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookd
   }
 
   SV *namesv = newSVpvn_flags(paramname, strlen(paramname), flags);
-  SAVEFREESV(namesv);
 
   mop_slot_set_param(slotmeta, namesv);
 
-  return FALSE;
+  *hookdata_ptr = namesv;
+  return TRUE;
 }
 
 static struct SlotHookFuncs slothooks_param = {
@@ -377,18 +387,18 @@ static void S_generate_slot_accessor_method(pTHX_ SlotMeta *slotmeta, SV *mname,
   LEAVE;
 }
 
-static bool slothook_reader_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
+static bool slothook_reader_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
   *hookdata_ptr = make_accessor_mnamesv(aTHX_ slotmeta, value, "%s");
   return TRUE;
 }
 
-static void slothook_reader_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
+static void slothook_reader_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata)
 {
   S_generate_slot_accessor_method(aTHX_ slotmeta, hookdata, ACCESSOR_READER);
 }
 
-static void slothook_gen_reader_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void slothook_gen_reader_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_READER)
     return;
@@ -415,18 +425,18 @@ static struct SlotHookFuncs slothooks_reader = {
 
 /* :writer */
 
-static bool slothook_writer_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
+static bool slothook_writer_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
   *hookdata_ptr = make_accessor_mnamesv(aTHX_ slotmeta, value, "set_%s");
   return TRUE;
 }
 
-static void slothook_writer_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
+static void slothook_writer_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata)
 {
   S_generate_slot_accessor_method(aTHX_ slotmeta, hookdata, ACCESSOR_WRITER);
 }
 
-static void slothook_gen_writer_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void slothook_gen_writer_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_WRITER)
     return;
@@ -465,7 +475,7 @@ static struct SlotHookFuncs slothooks_writer = {
 
 /* :mutator */
 
-static bool slothook_mutator_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
+static bool slothook_mutator_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
   if(SvPVX(slotmeta->name)[0] != '$')
     /* TODO: A reader for an array or hash slot should also be fine */
@@ -475,12 +485,12 @@ static bool slothook_mutator_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hoo
   return TRUE;
 }
 
-static void slothook_mutator_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
+static void slothook_mutator_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata)
 {
   S_generate_slot_accessor_method(aTHX_ slotmeta, hookdata, ACCESSOR_LVALUE_MUTATOR);
 }
 
-static void slothook_gen_mutator_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void slothook_gen_mutator_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_LVALUE_MUTATOR)
     return;
@@ -501,12 +511,12 @@ static struct SlotHookFuncs slothooks_mutator = {
 
 /* :accessor */
 
-static void slothook_accessor_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
+static void slothook_accessor_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata)
 {
   S_generate_slot_accessor_method(aTHX_ slotmeta, hookdata, ACCESSOR_COMBINED);
 }
 
-static void slothook_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void slothook_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_COMBINED)
     return;
@@ -532,10 +542,54 @@ static struct SlotHookFuncs slothooks_accessor = {
   .gen_accessor_ops = &slothook_gen_accessor_ops,
 };
 
-void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs)
+struct SlotHookFuncs_v51 {
+  U32 ver;
+  U32 flags;
+  const char *permit_hintkey;
+
+  bool (*apply)(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr);
+  void (*seal_slot)(pTHX_ SlotMeta *slotmeta, SV *hookdata);
+  void (*gen_accessor_ops)(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type,
+          struct AccessorGenerationCtx *ctx);
+  void (*post_initslot)(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *slot);
+  void (*post_construct)(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *slot);
+};
+
+static bool slothook_compat_apply_v51(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
-  if(funcs->ver < 50)
-    croak("Mismatch in third-party slot attribute ABI version field: module wants %d, we require >= 50\n",
+  struct SlotHookFuncs_v51 *funcdata = _funcdata;
+  return (*funcdata->apply)(aTHX_ slotmeta, value, hookdata_ptr);
+}
+
+static void slothook_compat_seal_slot_v51(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata)
+{
+  struct SlotHookFuncs_v51 *funcdata = _funcdata;
+  (*funcdata->seal_slot)(aTHX_ slotmeta, hookdata);
+}
+
+static void slothook_compat_gen_accessor_ops_v51(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata,
+    enum AccessorType type, struct AccessorGenerationCtx *ctx)
+{
+  struct SlotHookFuncs_v51 *funcdata = _funcdata;
+  (*funcdata->gen_accessor_ops)(aTHX_ slotmeta, hookdata, type, ctx);
+}
+
+static void slothook_compat_post_initslot_v51(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, SV *slot)
+{
+  struct SlotHookFuncs_v51 *funcdata = _funcdata;
+  (*funcdata->post_initslot)(aTHX_ slotmeta, hookdata, slot);
+}
+
+static void slothook_compat_post_construct_v51(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, SV *slot)
+{
+  struct SlotHookFuncs_v51 *funcdata = _funcdata;
+  (*funcdata->post_construct)(aTHX_ slotmeta, hookdata, slot);
+}
+
+void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs, void *funcdata)
+{
+  if(funcs->ver < 51)
+    croak("Mismatch in third-party slot attribute ABI version field: module wants %d, we require >= 51\n",
         funcs->ver);
   if(funcs->ver > OBJECTPAD_ABIVERSION)
     croak("Mismatch in third-party slot attribute ABI version field: attribute supplies %d, module wants %d\n",
@@ -547,7 +601,31 @@ void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct Slot
   if(!funcs->permit_hintkey)
     croak("Third-party slot attributes require a permit hinthash key");
 
-  register_slot_attribute(name, funcs);
+  if(funcs->ver < 57) {
+    funcdata = (void *)funcs;
+
+    struct SlotHookFuncs *compatfuncs;
+    Newxz(compatfuncs, 1, struct SlotHookFuncs);
+
+    compatfuncs->ver            = OBJECTPAD_ABIVERSION;
+    compatfuncs->flags          = funcs->flags;
+    compatfuncs->permit_hintkey = funcs->permit_hintkey;
+
+    if(funcs->apply)
+      compatfuncs->apply = &slothook_compat_apply_v51;
+    if(funcs->seal_slot)
+      compatfuncs->seal_slot = &slothook_compat_seal_slot_v51;
+    if(funcs->gen_accessor_ops)
+      compatfuncs->gen_accessor_ops = &slothook_compat_gen_accessor_ops_v51;
+    if(funcs->post_initslot)
+      compatfuncs->post_initslot = &slothook_compat_post_initslot_v51;
+    if(funcs->post_construct)
+      compatfuncs->post_construct = &slothook_compat_post_construct_v51;
+
+    funcs = (const struct SlotHookFuncs *)compatfuncs;
+  }
+
+  register_slot_attribute(name, funcs, funcdata);
 }
 
 void ObjectPad__boot_slots(pTHX)
@@ -557,10 +635,10 @@ void ObjectPad__boot_slots(pTHX)
   XopENTRY_set(&xop_weaken, xop_class, OA_UNOP);
   Perl_custom_op_register(aTHX_ &pp_weaken, &xop_weaken);
 
-  register_slot_attribute("weak",     &slothooks_weak);
-  register_slot_attribute("param",    &slothooks_param);
-  register_slot_attribute("reader",   &slothooks_reader);
-  register_slot_attribute("writer",   &slothooks_writer);
-  register_slot_attribute("mutator",  &slothooks_mutator);
-  register_slot_attribute("accessor", &slothooks_accessor);
+  register_slot_attribute("weak",     &slothooks_weak,     NULL);
+  register_slot_attribute("param",    &slothooks_param,    NULL);
+  register_slot_attribute("reader",   &slothooks_reader,   NULL);
+  register_slot_attribute("writer",   &slothooks_writer,   NULL);
+  register_slot_attribute("mutator",  &slothooks_mutator,  NULL);
+  register_slot_attribute("accessor", &slothooks_accessor, NULL);
 }

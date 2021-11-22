@@ -1,4 +1,13 @@
-1.0.3    xx.xx.xxxx
+1.1.1    18.11.2021
+           - support for unix sockets for plack
+1.1.0    18.11.2021
+           - http server: support for unix sockets and windows named pipes
+1.0.5    09.11.2021
+           - c++ lib up: do not use keep-alive connections for non-keep-alive requests
+           - http client: close connection even if server responds keep-alive and a connection close request
+1.0.4    13.07.2021
+           - [xs] add typemaps for location, and server config
+1.0.3    13.07.2021
            - allow stringifyable objects in various parts
 1.0.2    02.07.2021
            - C++ codes moved to its own library with cmake

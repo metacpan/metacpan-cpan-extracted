@@ -136,8 +136,17 @@ Accepts a youtube.com video ID, or any full URL that youtube-dl supports
 and creates and returns a new video object, or I<undef> if the URL is 
 not a youtube-supported video URL or no streams are found.  The URL can 
 be the full URL, 
-ie. https://www.youtube.com/watch?v=B<video-id>, or just I<video-id> 
+ie. https://www.youtube.com/watch?v=B<video-id>, a user or channel URL, 
+ie. https://www.youtube.com/channel/B<channel-id> or 
+https://www.youtube.com/user/B<user-id>. or just B<video-id> 
 (if the site is www.youtube.com, since YouTube has multiple sites).
+If a I<channel-id>, I<user-id>, or a Youtube channel/user URL is 
+given, then the first (latest) video uploaded to that channel will be 
+returned.  Note:  Some users and channels have a "featured" video (shown 
+with a larger thumbnail at the top) or multiple groupings of videos, but 
+the "first" video returned will normally be from the "Uploads" group.  
+Channels and users' urls must currently be specified as full URLs, as 
+just specifying an ID will be interpreted as a specific B<video-id>!
 
 If I<-format> is specified, it should be a valid "I<youtube-dl -f>" format 
 string (see the youtube-dl manpage for details).  Examples:  
@@ -167,10 +176,10 @@ again on that URL to find the stream).  Default is 0 (false / unset) - search
 for StreamFinder-searchable URLs in an iframe, if the page is HTML and not an 
 actual video URL.
 
-If I<-youtubeonly> Some non-Youtube pages have embedded Rumble (Rumble.com) 
+I<-youtubeonly> - Some non-Youtube pages have embedded Rumble (Rumble.com) 
 videos embedded in them and since StreamFinder::Youtube is somewhat of a 
 "catchall" (for videos), and we (the Author) prefer the less-woke Rumble to 
-Youtube (whish has major censorship issues), we search for embedded Rumble 
+Youtube (which has major censorship issues), we search for embedded Rumble 
 videos here, as opposed to L<StreamFinder::Rumble> or 
 L<StreamFinder::AnyStream>, and, upon finding one, we return that rather than 
 continuing the search for Youtube videos.  To NOT do this (consider only 
@@ -330,7 +339,8 @@ and the options are loaded into a hash used only by the specific
 (submodule) specified.  Valid options include 
 I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
-Options specified here override any specified in I<~/.config/StreamFinder/config>.
+Options specified here override any specified in 
+I<~/.config/StreamFinder/config>.
 
 =item ~/.config/StreamFinder/config
 
@@ -520,11 +530,44 @@ sub new
 		$self->{'id'} = $url;
 		$url2fetch = 'https://youtube.be/watch?v=' . $url;
 	}
-	print STDERR "-1 (isYT=".$self->{'_isaYtPage'}.") FETCHING URL=$url= VIA youtube-dl: ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	print STDERR "-1 (isYT=".$self->{'_isaYtPage'}.") FETCHING URL=$url2fetch= VIA youtube-dl: ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$self->{'genre'} = 'Video';
 	$self->{'albumartist'} = $url2fetch;
 
-	#FIRST:  IF NON-YOUTUBE PAGE, LOOK FOR ANYTHING EMBEDDED IN AN IFRAME:
+	#FIRST, CHECK IF WE'RE A CHANNEL OR USER PAGE, IF SO, FETCH & RETURN LATEST UPLOADED VIDEO (EXCLUDE MARQUEE VIDEO AT TOP):
+
+	if ($self->{'_isaYtPage'} && !$self->{'noiframes'} && $url2fetch =~ m#\/(?:channel|user)\/#) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO!:
+		print STDERR "..1a:We're a channel or user page!...\n"  if ($DEBUG);
+		my $embedded_video;
+		my $html = '';
+		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+		$ua->timeout($self->{'timeout'});
+		$ua->max_size(1024);  #LIMIT FETCH-SIZE TO AVOID INFINITELY DOWNLOADING A STREAM!
+		$ua->cookie_jar({});
+		$ua->env_proxy;
+	 	my $response = $ua->get($url2fetch);
+	 	$html = $response->decoded_content  if ($response->is_success);
+	 	if ($html =~ /\<\!DOCTYPE\s+(?:html|text)/i) {  #IF WE'RE AN HTML DOC. (NOT A STREAM!), THEN FETCH THE WHOLE THING:
+			$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
+		 	my $response = $ua->get($url2fetch);
+		 	$html = $response->decoded_content  if ($response->is_success);
+			return undef  unless ($html);
+
+			$html =~ s#^.+\:\{\"runs\"\:\[\{\"text\"\:\"Uploads\"\,##s;  #USER PAGES CAN HAVE A BANNER VIDEO, SKIP THIS!
+			if ($html =~ m#\:\{\"url\"\:\"([^\"]+)\"\,\"webPageType\"\:\"WEB\_PAGE\_TYPE\_WATCH\"\,#s) {
+				$url2fetch = $1;
+				$url2fetch =~ s#^\/#https\:\/\/youtube\.be\/#;
+				$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+				$self->{'id'} =~ s/^watch\?v\=//;
+				print STDERR "---FOUND 1ST EPISODE! FETCHING=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+				goto DO_YTDL;   #SKIP NON-YOUTUBE PAGE CHECK (NEXT PARAGRAPH):
+			}
+		}
+		print STDERR "u:DID NOT FIND A VIDEO ON CHANNEL/USER PAGE, PUNT!"  if ($DEBUG);
+		return undef;
+	}
+
+	#IF NON-YOUTUBE PAGE, LOOK FOR ANYTHING EMBEDDED IN AN IFRAME:
 
 	unless ($self->{'_isaYtPage'} || $self->{'noiframes'}) {
 		print STDERR "..1a:See if we have a StreamFinder-supported URL in 1st iframe?...\n"  if ($DEBUG);
@@ -539,7 +582,7 @@ sub new
 	 	$html = $response->decoded_content  if ($response->is_success);
 	 	if ($html =~ /\<\!DOCTYPE\s+(?:html|text)/i) {  #IF WE'RE AN HTML DOC. (NOT A STREAM!), THEN FETCH THE WHOLE THING:
 			$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
-		 	my $response = $ua->get($url);
+		 	my $response = $ua->get($url2fetch);
 		 	$html = $response->decoded_content  if ($response->is_success);
 			while ($html && $html =~ s#\<iframe([^\>]+)\>##s) {
 				my $one = $1;
@@ -582,6 +625,7 @@ sub new
 
 	#NEXT:  GET STREAMS, THUMBNAIL, ETC. FROM youtube-dl:
 
+DO_YTDL:
 	my $ytformat = (defined $self->{'format'}) ? $self->{'format'} : 'mp4';
 	my $ua = (defined $self->{'user-agent'}) ? (' --user-agent "'.$self->{'user-agent'}.'"') : '';
 	my $ytdlArgs = $self->{'youtube-dl-args'};
@@ -598,9 +642,9 @@ RETRYIT:
 		my $uid = $self->{'userid'};
 		my $upw = $self->{'userpw'};
 		$cmd = $self->{'youtube-dl'} . '--username "' . $uid . '" --password "' . $upw . '" '
-				. $ytdlArgs. ' "' . $url .'"';
+				. $ytdlArgs. ' "' . $url2fetch .'"';
 	} else {
-		$cmd = $self->{'youtube-dl'} . " $ytdlArgs " . '"' . $url . '"';
+		$cmd = $self->{'youtube-dl'} . " $ytdlArgs " . '"' . $url2fetch . '"';
 	}
 	print STDERR "--TRY($try of 1): youtube-dl: ARGS=$ytdlArgs= FMT=$ytformat= YT COMMAND==>$cmd<==\n"  if ($DEBUG);
 	$_ = `$cmd`;
@@ -679,6 +723,7 @@ RETRYPAGE:
 				}
 			}
 			$html =~ s/\\\"/\&quot\;/gs;
+			$self->{'genre'} = $1  if ($html =~ m#\"category\"\:\"([^\"]+)#s);
 			if ($html =~ s#\]\}\,\"title\"\:\{\"runs\"\:\[\{\"text\"\:\"([^\"]+)\"\,\"navigationEndpoint\"\:([^\}]+)##s) {
 				my $two = $2;
 				$self->{'artist'} = $1;
@@ -721,13 +766,13 @@ RETRYPAGE:
 	} else {
 		$self->{'description'} = $self->{'title'};
 	}
-	foreach my $i (qw(title artist albumartist description)) {
+	foreach my $i (qw(title artist albumartist description genre)) {
 		$self->{$i} = HTML::Entities::decode_entities($self->{$i});
 		$self->{$i} = uri_unescape($self->{$i});
 		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
 	}
 	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."= artist=".$self->{'artist'}."= year(Published)=".$self->{'year'}."=\n"  if ($DEBUG);
-	$self->_log($url);
+	$self->_log($url2fetch);
 
 	bless $self, $class;   #BLESS IT!
 

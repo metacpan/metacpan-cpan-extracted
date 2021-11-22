@@ -53,7 +53,8 @@ my @files = (
     't/src/src_files/1',
     't/src/src_files/2',
     't/store_bag.t',
-    't/verify_bag.t'
+    't/verify_bag.t',
+    't/verify_simple.t'
 );
 
 notabs_ok($_) foreach @files;

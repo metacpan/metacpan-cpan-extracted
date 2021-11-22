@@ -16,7 +16,7 @@ use File::Basename qw(basename);
 ##----------------------------------------------------------------------
 
 our $prog = basename($0);
-our $VERSION  = "0.12";
+our $VERSION  = "0.13";
 
 our $iencoding = undef;
 

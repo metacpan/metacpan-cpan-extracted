@@ -3,6 +3,7 @@
  *
  *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
  */
+#define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -12,7 +13,7 @@
 
 #include "perl-backcompat.c.inc"
 
-static void trigger_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+static void trigger_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_WRITER)
     return;
@@ -32,7 +33,7 @@ static void trigger_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enu
   return;
 }
 
-static void trigger_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
+static void trigger_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata)
 {
   if(mop_slot_get_attribute(slotmeta, "writer"))
     return;
@@ -53,4 +54,4 @@ static const struct SlotHookFuncs trigger_hooks = {
 MODULE = Object::Pad::SlotAttr::Trigger    PACKAGE = Object::Pad::SlotAttr::Trigger
 
 BOOT:
-  register_slot_attribute("Trigger", &trigger_hooks);
+  register_slot_attribute("Trigger", &trigger_hooks, NULL);

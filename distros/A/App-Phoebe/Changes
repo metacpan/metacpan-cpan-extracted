@@ -1,3 +1,11 @@
+4.03
+
+- App::Phoebe::Capsule is new.
+
+- titan now parses the command line arguments better and doesn't
+  prefer the default certificate over the one given on the command
+  line; use --key_file instead of --cert_key.
+
 4.02
 
 - App::Phoebe::WebDAV is new.

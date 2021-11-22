@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::TRIG;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_sin PDL::PP gsl_sf_cos PDL::PP gsl_sf_hypot PDL::PP gsl_sf_complex_sin PDL::PP gsl_sf_complex_cos PDL::PP gsl_sf_complex_logsin PDL::PP gsl_sf_lnsinh PDL::PP gsl_sf_lncosh PDL::PP gsl_sf_polar_to_rect PDL::PP gsl_sf_rect_to_polar PDL::PP gsl_sf_angle_restrict_symm PDL::PP gsl_sf_angle_restrict_pos PDL::PP gsl_sf_sin_err PDL::PP gsl_sf_cos_err );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_sin gsl_sf_cos gsl_sf_hypot gsl_sf_complex_sin gsl_sf_complex_cos gsl_sf_complex_logsin gsl_sf_lnsinh gsl_sf_lncosh gsl_sf_polar_to_rect gsl_sf_rect_to_polar gsl_sf_angle_restrict_symm gsl_sf_angle_restrict_pos gsl_sf_sin_err gsl_sf_cos_err );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::TRIG ;
+
 
 
 
@@ -42,10 +41,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -455,7 +451,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -478,5 +474,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

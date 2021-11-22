@@ -4,21 +4,21 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS ':all';
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 sub new {
     my ($class, %args) = @_;
 
     my $line_nr;
-    my $status = &LDNS_STATUS_OK;
+    my $status = &DNS::LDNS::LDNS_STATUS_OK;
     my $zone;
     my $file;
 
     if ($args{filename}) {
 	unless (open FILE, $args{filename}) {
-	    $DNS::LDNS::last_status = &LDNS_STATUS_FILE_ERR;
+	    $DNS::LDNS::last_status = &DNS::LDNS::LDNS_STATUS_FILE_ERR;
 	    $DNS::LDNS::line_nr = 0;
 	    return;
 	}
@@ -125,19 +125,19 @@ DNS::LDNS::DNSSecZone - Zone with dnssec data
 
 =head1 SYNOPSIS
 
-  use DNS::LDNS ':all'
+  use DNS::LDNS ();
 
-  my z = new DNS::LDNS::DNSSecZone(
+  my z = DNS::LDNS::DNSSecZone->new(
     filename => '/path/to/myzone',
-    origin => new DNS::LDNS::RData(LDNS_RDF_TYPE_DNAME, 'myzone'), #optional
+    origin => DNS::LDNS::RData->new(LDNS_RDF_TYPE_DNAME, 'myzone'), #optional
     ttl => 3600, #optional
     class => LDNS_RR_CLASS_, #optional
   )
-  my z = new DNS::LDNS::DNSSecZone(
+  my z = DNS::LDNS::DNSSecZone->new(
     file => \*FILE,
     origin => ..., ttl => ..., class => ...
   )
-  my z = new DNS::LDNS::DNSSecZone
+  my z = DNS::LDNS::DNSSecZone->new
 
   rr = z->soa
   rbtree = z->names

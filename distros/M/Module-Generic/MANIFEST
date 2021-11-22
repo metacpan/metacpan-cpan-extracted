@@ -14,6 +14,7 @@ lib/Module/Generic/File.pm
 lib/Module/Generic/Finfo.pm
 lib/Module/Generic/Hash.pm
 lib/Module/Generic/Hash.pod
+lib/Module/Generic/HeaderValue.pm
 lib/Module/Generic/Iterator.pm
 lib/Module/Generic/Iterator.pod
 lib/Module/Generic/Iterator/Element.pod
@@ -50,6 +51,7 @@ t/10.file.t
 t/11.finfo.t
 t/12.sharedmem.pl
 t/12.sharedmem.t
+t/13.header_value.t
 t/90.coverage.t
 t/99.kwalitee.t
 t/test.bat

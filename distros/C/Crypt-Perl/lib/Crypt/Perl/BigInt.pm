@@ -3,9 +3,11 @@ package Crypt::Perl::BigInt;
 use strict;
 use warnings;
 
-#Even though Crypt::Perl intends to be pure Perl, there’s no reason
-#not to use faster computation methods when they’re available.
-use Math::BigInt try => 'GMP,Pari';
+# Even though Crypt::Perl intends to be pure Perl, there’s no reason
+# not to use faster computation methods when they’re available.
+#
+# Sorted in descending order of observed speed:
+use Math::BigInt try => 'GMP,LTM,GMPz,Pari,BitVect';
 
 #No FastCalc because of bugs shown in the following test runs:
 #http://www.cpantesters.org/cpan/report/a03dce70-c698-11e6-a1ce-1a99c671d6e6

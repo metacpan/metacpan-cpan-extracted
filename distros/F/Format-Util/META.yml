@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,5 +34,7 @@ requires:
 resources:
   bugtracker: https://github.com/binary-com/perl-Format-Util/issues
   repository: git://github.com/binary-com/perl-Format-Util.git
-version: '0.15'
-x_serialization_backend: 'YAML::Tiny version 1.66'
+version: '0.16'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

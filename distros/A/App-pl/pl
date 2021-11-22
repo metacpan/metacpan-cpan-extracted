@@ -3,11 +3,11 @@
 # Beware: DON'T PERFORM ANY ACTIONS AT TOP LEVEL: this file runs many times under -n!
 
 BEGIN {
-    $pl::VERSION = 'v0.61.0';
+    $pl::VERSION = 'v0.62.0';
     my $execed = shift if @ARGV && $ARGV[0] eq '+'; # don't recursively call perl again for -p
     return unless @ARGV and $ARGV[0] =~ /^-/s;
     my $onepl = qr/[oOrhv?]|[pP](?:[1-9][0-9]*)?/; # simple pl opts, reflect these in pod/html
-    my $one = qr/[cftTuUwWXan]|$onepl/; # simple opts to pass to perl, which handles them well
+    my $one = qr/[cfTtUuWwXan]|$onepl/; # simple opts to pass to perl, which handles them well
     my( $perl, @perl, @pl1, %seen );
     while( @ARGV ) {		# no for, may need to shift
 	$_ = $ARGV[0];
@@ -19,12 +19,12 @@ BEGIN {
 	    next;
 	}
 	unshift @ARGV, "-$1" if s/^-$one*[0l][0-7]*$onepl+\K(0.*)//; # avoid -l012o0 -> -l0120
-	if( /^(-$one*(?:[0l][0-7]*$one*)*)(?:([CdDFiImM0bBeEV])(.*))?$/s ) { # Perl does 0 & l inline only with oct arg.
+	if( /^(-$one*(?:[0l][0-7]*$one*)*)(?:([CDdFiIMm0ABbEeV])(.*))?$/s ) { # Perl does 0 & l inline only with oct arg.
 	    my( $opts, $opt, $arg ) = ($1, $2, $3);
-	    $seen{$_} ||= $opts =~ $_ for qw(a n o O p P r);
+	    $seen{$_} ||= $opts =~ $_ for qw(a n O o P p r);
 	    push @pl1, $1 while $opts =~ s/($onepl)//;
 	    if( defined $opt ) {
-		if( ! length $arg and $opt =~ /[IbBeEV]/ ) { # These can have arg glued or separated
+		if( ! length $arg and $opt =~ /[IABbEeV]/ ) { # These can have arg glued or separated
 		    $arg = shift;
 		    unless( defined $arg ) {
 			warn "Missing argument to -$opt.\n";
@@ -36,7 +36,7 @@ BEGIN {
 		    undef $opt; # treat $opts below
 		} elsif( $opt eq 'I' ) {
 		    push @perl, $opts.'I', $arg; # let perl check for empty arg
-		} elsif( $opt =~ /[be]/i ) {
+		} elsif( $opt =~ /[ABbEe]/ ) {
 		    $seen{$opt} ||= $opt =~ /[be]/;
 		    push @pl::opts, join( '', '-', @pl1, $opt ), $arg;
 		    @pl1 = ();
@@ -58,7 +58,7 @@ BEGIN {
     $seen{a} ||= push @perl, '-a' if $seen{F};
     $seen{n} ||= push @perl, '-n'
       if ! grep $seen{$_}, qw(o O)
-      and grep $seen{$_}, qw(a b e p P r);
+      and grep $seen{$_}, qw(a b e P p r);
     push @pl::opts, join '', '-', @pl1 if @pl1;
 #warn join '|', $perl // $^X, @perl, '--', $0, '+', @pl::opts, '--', @ARGV, "\n";
     if( ! $execed and $perl || @perl ) { # let perl do perl-opts
@@ -153,12 +153,13 @@ sub Echo(@) {
 
 # Would call it format, but that's not overridable.
 sub form($@) {
-    echo sprintf shift, &Echo;
+    echo &Form;
 }
 
 # Form without newline
 sub Form($@) {
-    Echo sprintf shift, &Echo;
+    (my $form = shift) =~ s/(%[^a-z]+)/ my $x = $1; $x =~ tr!:!$!; $x /eg; # also matches %%, todo /r
+    Echo sprintf $form, &Echo;
 }
 
 
@@ -334,6 +335,7 @@ sub help(;$) {
     if( @_ && ! defined $_[0] ) {
 	print <<\EOF;
 usage: pl {-{BbeE} program} [-o] [-Vversion] [-perlopt...] [--] [main program] [arg ...]
+  -Aprog            map prog over @A (or undef) returning new @A
   -bprog & -eprog   wrap begin/end program around each file in -n/-p...
   -Bprog & -Eprog   wrap begin/end program around program in same scope, my-vars work.
   -o                assume "for(@A) { ... }" loop around main program
@@ -345,7 +347,7 @@ usage: pl {-{BbeE} program} [-o] [-Vversion] [-perlopt...] [--] [main program] [
   --color[=when]    colorize the output; when can be 'never', 'always', or 'auto' (the default)
 These options are handled by perl:
 EOF
-	piped { print if /^\s+-[0acCdDfFiImMntTuUvwWX]/ } $^X, '-h';
+	piped { print if /^\s+-[0acCdDfFiIlmMntTuUvwWX]/ } $^X, '-h';
     }
     print <<\EOF;
 Predefined functions:
@@ -355,7 +357,7 @@ Predefined functions:
   D [arg...][, tz]  Date (from arg [s, us], s{.us}, offset [+-]s{.us}, tz ([+-]0-14{:mm|.ff})
   e arg...          echo prettified args or $_ with spaces and newline
   E arg...          same, but no newline
-  f fmt, arg...     format prettified args with newline
+  f fmt, arg...     format prettified args with newline, index can be "%1:" instead of "%1\$"
   F fmt, arg...     same, but no newline
   h ip|name...      dns-lookup as hosts file
   I [arg...][, tz]  Isodate (from arg [s, us], s{.us}, offset [+-]s{.us}, tz ([+-]0-14{:mm|.ff})
@@ -581,7 +583,7 @@ BEGIN {
     {
 	# Assemble a program that works under perl -n, etc., while adding in pl's options.
 	# This is wild stuff, as it has to blend in various options, while potentially accomodating an outer loop.
-	my @prog;
+	my @prog = '';
 	@prog[2, 4, 11, 13, 22] =
 	  ('sub pl::prog { $pl::last = 1;',
 	   'LINE: {',		# dummy loop
@@ -600,21 +602,24 @@ BEGIN {
 	    } elsif( /v/ ) {
 		say "This is pl $pl::VERSION, with perl $^V
 
-Copyright 1997-2020, Daniel Pfeiffer
+Copyright 1997-2021, Daniel Pfeiffer
 
 Pl may be copied only under the terms of either the Artistic License or the
 GNU General Public License, which may be found in the Perl 5 source kit.";
 		exit;
 	    }
 
-	    if( /([be])/i ) {
+	    if( /([ABbEe])/ ) {
 		# put ; after \n as user may end with a comment
-		my $bit = "\n#line 1 \"-$1 option\"\n" . shift( @pl::opts ) . "\n;";
-		if( /b/ ) {
+		my $bit = "\n#line 1 \"-$1 option\"\n$pl::opts[0]\n;";
+		my $block = shift( @pl::opts ) =~ /\A\{.+\}\Z/s;
+		if( /A/ ) {
+		    $prog[0] .= "\@ARGV = map { $bit } \@ARGV ? \@ARGV : undef;\n";
+		} elsif( /b/ ) {
 		    # Do it each time ARGV changes
 		    $prog[5] = 'if( ($pl::exARGV //= "") ne $ARGV ) {' . $bit . '$pl::exARGV = $ARGV; }';
 		} elsif( /B/ ) {
-		    $prog[0] = $bit;
+		    $prog[0] .= $block ? "BEGIN$bit" : $bit;
 		} elsif( /e/ ) {
 		    # append 1 to not leak any wantarray into $bit
 		    $prog[8] = "\nINIT { \$pl::_e = sub { $bit 1 }}";
@@ -746,8 +751,16 @@ quotes mimic Shell quotes, so here they collide.  As Perl also uses Shell
 meta-characters like C<$>, the best solution is to protect Perl-code from the
 Shell with single quotes.  That means they can't be used inside.  (An ugly way
 around that is C<'\''>, which ends a string, blackslashes a quote and starts
-another.  For literal quotes use C<$q(uote)>.)  For quoting use double quotes
+another.)  For literal quotes use C<$q(uote)>.  For quoting use double quotes
 or C<q{}>.
+
+I<Shell and Perl, unlike most other languages, don't make you stick your toe
+up your nose to get newlines into strings.  So, long "one-liners" are spread
+very naturally to legible many-liners.  You get more features on the L<pl
+homepage|https://perl1liner.sourceforge.io/>, like in the veggie-burger menu,
+you can toggle many-line display.  In normal text short and long name variants
+are initial-bold as C<X(YZ)>.  All examples use the long names, if applicable.
+On the homepage those are in the darker blue upper half.  They are repeated with the short variant.  Many examples are followed by their output, indented with C<< > >>.>
 
 =head1 DOCUMENTATION
 
@@ -763,6 +776,12 @@ oriented towards one liners.
 
 I<perl:> Specify record separator with B<-n>/B<-p> (C<\0>, if no argument).
 
+=item C<-AI<prog>>
+
+Map program over already available C<@A(RGV)> (from command line or previous
+B<-A>) or undef.  The result becomes the new C<@A(RGV)>.  May be mixed with
+B<-B>.
+
 =item C<-a>
 
 I<perl:> Autosplit mode with B<-n>/B<-p> (splits C<$_> into C<@F(IELD)>).
@@ -776,8 +795,8 @@ Run program before reading a new file in B<-n>/B<-p>.
 Add program before main program in same scope.  So you can use it to
 initialise C<my> variables.  Whereas, if you define a my variable in the main
 program of a B<-n>, B<-p>, B<-P>, B<-o> or B<-O> loop, it's a new variable on
-each iteration.  This doesn't do a C<BEGIN> block, but this might be changed in
-a later version if program is wrapped in C<{}>.
+each iteration.  This doesn't do a C<BEGIN> block, unless program is wrapped
+in C<{}>.  May be mixed with B<-A>.
 
 =item C<-c>
 
@@ -806,7 +825,7 @@ Run program after finishing reading a file in B<-n>/B<-p>.
 =item C<-EI<prog>>
 
 Add an C<END> block after main-program in same scope.  So C<my>-vars work as
-follows: The C<END> block, is a closure of the 1st C<$inner> variable.  Perl
+follows: The C<END> block is a closure of the 1st C<$inner> variable.  Perl
 warns "Variable "$inner" will not stay shared":
 
     pl -OB 'my $outer' -E 'echo $inner, $outer' 'my $inner = $outer = $ARGV' a b c
@@ -831,6 +850,8 @@ I<perl:> Specify C<@INC>/C<#include> directory (several B<-I>'s allowed).
 I<perl:> Edit C<< <> >> files in place (makes backup if extension supplied).
 
 =item C<-n>
+
+I<As I said before, I never repeat myself. :-)>
 
 I<perl:> Assume C<< while (<>) { ... } >> loop around program.  It's a little
 richer than that: if you use C<last>, it closes the current file, leaving you
@@ -921,7 +942,7 @@ Import and return C<%Config>, e.g. C<< Config->{sitelib} >>, optionally only par
 =item C<Date I<[arg...][, tz]>> |
 C<D I<[arg...][, tz]>>
 
-I<Why is Halloween Christmas?  Because Oct. 31 = Dec. 25. ;-)>
+I<Why is Halloween Christmas?  Because Oct 31 = Dec 25. ;-)>
 
 Date (from arg [s, us], s{.us}, offset [+-]s{.us}, tz ([+-]0-14{:mm|.ff}).
 Microseconds should be passed as strings, because floats have
@@ -929,11 +950,15 @@ implementation-dependent rounding issues.  Positive offsets must be passed as
 strings, because otherwise the C<+> gets lost.  Returns the date, if called in
 some context, else echoes it.
 
-    pl 'Date; $_ = Date -86400, "+3600"; e $_, " -- ", Date "+8:45"'
-    pl 'D; $_ = D -86400, "+3600"; e $_, " -- ", D "+8:45"'
+    pl 'Date;
+        $_ = Date -86400, "+3600";
+        e $_, " -- ", Date "+8:45"'
+    pl 'D;
+        $_ = D -86400, "+3600";
+        e $_, " -- ", D "+8:45"'
 
-    >   Wed Sep  1 00:25:17.583847 2021
-    >   Tue Aug 31 01:25:17.583923 2021  --  Wed Sep  1 07:10:17.583959 +08:45 2021
+    >   Sun Nov 21 20:51:19.053752 2021
+    >   Sat Nov 20 21:51:19.053849 2021  --  Mon Nov 22 04:36:19.053891 +08:45 2021
 
 =item C<echo I<[arg...]>> |
 C<e I<[arg...]>>
@@ -958,7 +983,7 @@ C<f I<format, [arg...]>>
 
 Form(at) and echo prettified args or C<$_> with newline.  If it is called in
 scalar or list context (e.g. C<$x = form ...>) instead return the same as it
-would echo, in one string.
+would echo, in one string.  Parameter index can be "%1:" instead of "%1\$".
 
 =item C<Form I<format, [arg...]>> |
 C<F I<format, [arg...]>>
@@ -970,11 +995,15 @@ C<I I<[arg...][, tz]>>
 
 Same as C<D(ate)>, but uses ISO format.
 
-    pl 'Isodate; $_ = Isodate 7 * -86400; e $_, " -- ", Isodate "+8.75"'
-    pl 'I; $_ = I 7 * -86400; e $_, " -- ", I "+8.75"'
+    pl 'Isodate;
+        $_ = Isodate 7 * -86400;
+        e $_, " -- ", Isodate "+8.75"'
+    pl 'I;
+        $_ = I 7 * -86400;
+        e $_, " -- ", I "+8.75"'
 
-    >   2021-09-01T00:25:17.606616
-    >   2021-08-25T00:25:17.606698  --  2021-09-01T07:10:17.606730 +08:45
+    >   2021-11-21T20:51:19.073235
+    >   2021-11-14T20:51:19.073299  --  2021-11-22T04:36:19.073320 +08:45
 
 =item C<keydiff I<[key[, value]]>> |
 C<k I<[key[, value]]>>
@@ -1040,7 +1069,7 @@ This does the same for literal quotes.
 C<%K>
 
 At END, sort by keys, print keydiff of C<$ARGIND> array elements.  Filled by
-C<keydiff>.
+C<k(eydiff)>.
 
 =item C<%NUMBER> |
 C<%N>
@@ -1109,7 +1138,7 @@ in a B<-n> loop C<last> is per file instead of behaving like C<exit>
 
 =item *
 
-using C<pop>, etc. to implicitly modify C<@A(RGV)> works in B<-B> BEGIN code,
+using C<pop>, etc. to implicitly modify C<@A(RGV)> works in B<-B> begin code,
 but not in your main program (which gets compiled to a function)
 
 =item *

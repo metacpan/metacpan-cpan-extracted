@@ -34,7 +34,7 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
         _gotNote: null,
         addItems: function(items,names,title,itemOptions,headerOptions){
             // add the header
-            if (title) {
+            if (title != null) {
                 if (headerOptions && headerOptions.widget){
                     this._add(
                         headerOptions.widget.set({

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -17,7 +17,7 @@ return [
       {
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'Unknown parameter'
+        'warn' => 'Unexpected systemd parameter. Please contact cme author to update systemd model.'
       }
     ],
     'class_description' => 'Unit configuration files for services, sockets, mount points, and swap devices share a subset of
@@ -78,7 +78,15 @@ the chroot() jail. Note that setting this parameter might result in additional
 dependencies to be added to the unit (see above).
 
 The C<MountAPIVFS> and C<PrivateUsers> settings are particularly useful
-in conjunction with C<RootDirectory>. For details, see below.',
+in conjunction with C<RootDirectory>. For details, see below.
+
+If C<RootDirectory>/C<RootImage> are used together with
+C<NotifyAccess> the notification socket is automatically mounted from the host into
+the root environment, to ensure the notification interface can work correctly.
+
+Note that services using C<RootDirectory>/C<RootImage> will
+not be able to log via the syslog or journal protocols to the host logging infrastructure, unless the
+relevant sockets are mounted from the host, specifically:',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -117,8 +125,10 @@ string removes previous assignments. Duplicated options are ignored. For a list 
 refer to
 L<mount(8)>.
 
-Valid partition names follow the L<Discoverable
-Partitions Specification|https://systemd.io/DISCOVERABLE_PARTITIONS>.',
+Valid partition names follow the L<Discoverable Partitions Specification|https://systemd.io/DISCOVERABLE_PARTITIONS>:
+C<root>, C<usr>, C<home>, C<srv>,
+C<esp>, C<xbootldr>, C<tmp>,
+C<var>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -174,21 +184,26 @@ not have it in its name), the verity data is read from it and automatically used
 
 This option is supported only for disk images that contain a single file system, without an
 enveloping partition table. Images that contain a GPT partition table should instead include both
-root file system and matching Verity data in the same image, implementing the L<Discoverable Partition Specification|https://systemd.io/DISCOVERABLE_PARTITIONS>.',
+root file system and matching Verity data in the same image, implementing the L<Discoverable Partitions Specification|https://systemd.io/DISCOVERABLE_PARTITIONS>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'MountAPIVFS',
       {
         'description' => 'Takes a boolean argument. If on, a private mount namespace for the unit\'s processes is created
-and the API file systems C</proc/>, C</sys/>, and C</dev/>
-are mounted inside of it, unless they are already mounted. Note that this option has no effect unless used in
-conjunction with C<RootDirectory>/C<RootImage> as these three mounts are
+and the API file systems C</proc/>, C</sys/>, C</dev/> and
+C</run/> (as an empty C<tmpfs>) are mounted inside of it, unless they are
+already mounted. Note that this option has no effect unless used in conjunction with
+C<RootDirectory>/C<RootImage> as these four mounts are
 generally mounted in the host anyway, and unless the root directory is changed, the private mount namespace
-will be a 1:1 copy of the host\'s, and include these three mounts. Note that the C</dev/> file
+will be a 1:1 copy of the host\'s, and include these four mounts. Note that the C</dev/> file
 system of the host is bind mounted if this option is used without C<PrivateDevices>. To run
 the service with a private, minimal version of C</dev/>, combine this option with
-C<PrivateDevices>.',
+C<PrivateDevices>.
+
+In order to allow propagating mounts at runtime in a safe manner, C</run/systemd/propagate>
+on the host will be used to set up new mounts, and C</run/host/incoming/> in the private namespace
+will be used as an intermediate step to store them before being moved to the final mount point.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -219,8 +234,11 @@ L<The /proc
 Filesystem|https://www.kernel.org/doc/html/latest/filesystems/proc.html#mount-options>. It is generally recommended to run most system services with this option set to
 C<invisible>. This option is implemented via file system namespacing, and thus cannot
 be used with services that shall be able to install mount points in the host file system
-hierarchy. It also cannot be used for services that need to access metainformation about other users\'
-processes. This option implies C<MountAPIVFS>.
+hierarchy. Note that the root user is unaffected by this option, so to be effective it has to be used
+together with C<User> or C<DynamicUser=yes>, and also without the
+C<CAP_SYS_PTRACE> capability, which also allows a process to bypass this feature. It
+cannot be used for services that need to access metainformation about other users\' processes. This
+option implies C<MountAPIVFS>.
 
 If the kernel doesn\'t support per-mount point C<hidepid=> mount options this
 setting remains without effect, and the unit\'s processes will be able to access and see other process
@@ -235,10 +253,10 @@ as if the option was not used.',
           'pid'
         ],
         'description' => 'Takes one of C<all> (the default) and C<pid>. If
-the latter all files and directories not directly associated with process management and introspection
-are made invisible in the C</proc/> file system configured for the unit\'s
-processes. This controls the C<subset=> mount option of the C<procfs>
-instance for the unit. For further details see L<The /proc
+C<pid>, all files and directories not directly associated with process management and
+introspection are made invisible in the C</proc/> file system configured for the
+unit\'s processes. This controls the C<subset=> mount option of the
+C<procfs> instance for the unit. For further details see L<The /proc
 Filesystem|https://www.kernel.org/doc/html/latest/filesystems/proc.html#mount-options>. Note that Linux exposes various kernel APIs via C</proc/>,
 which are made unavailable with this setting. Since these APIs are used frequently this option is
 useful only in a few, specific cases, and is not suitable for most non-trivial programs.
@@ -356,6 +374,50 @@ Note that the destination directory must exist or systemd must be able to create
 is not possible to use those options for mount points nested underneath paths specified in
 C<InaccessiblePaths>, or under C</home/> and other protected
 directories if C<ProtectHome=yes> is specified.
+
+When C<DevicePolicy> is set to C<closed> or
+C<strict>, or set to C<auto> and C<DeviceAllow> is
+set, then this setting adds C</dev/loop-control> with C<rw> mode,
+C<block-loop> and C<block-blkext> with C<rwm> mode
+to C<DeviceAllow>. See
+L<systemd.resource-control(5)>
+for the details about C<DevicePolicy> or C<DeviceAllow>. Also, see
+C<PrivateDevices> below, as it may change the setting of
+C<DevicePolicy>.',
+        'type' => 'list'
+      },
+      'ExtensionImages',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'This setting is similar to C<MountImages> in that it mounts a file
+system hierarchy from a block device node or loopback file, but instead of providing a destination
+path, an overlay will be set up. This option expects a whitespace separated list of mount
+definitions. Each definition consists of a source path, optionally followed by a colon and a list of
+mount options.
+
+A read-only OverlayFS will be set up on top of C</usr/> and
+C</opt/> hierarchies. The order in which the images are listed will determine the
+order in which the overlay is laid down: images specified first to last will result in overlayfs
+layers bottom to top.
+
+Mount options may be defined as a single comma-separated list of options, in which case they
+will be implicitly applied to the root partition on the image, or a series of colon-separated tuples
+of partition name and mount options. Valid partition names and mount options are the same as for
+C<RootImageOptions> setting described above.
+
+Each mount definition may be prefixed with C<->, in which case it will be
+ignored when its source path does not exist. The source argument is a path to a block device node or
+regular file. If the source path contains a C<:>, it needs to be escaped as
+C<\\:>. The device node or file system image file needs to follow the same rules as
+specified for C<RootImage>. Any mounts created with this option are specific to the
+unit, and are not visible in the host\'s mount table.
+
+These settings may be used more than once, each usage appends to the unit\'s list of image
+paths. If the empty string is assigned, the entire list of mount paths defined prior to this is
+reset.
 
 When C<DevicePolicy> is set to C<closed> or
 C<strict>, or set to C<auto> and C<DeviceAllow> is
@@ -602,16 +664,27 @@ children can never gain new privileges through execve() (e.g. via setuid or
 setgid bits, or filesystem capabilities). This is the simplest and most effective way to ensure that
 a process and its children can never elevate privileges again. Defaults to false, but certain
 settings override this and ignore the value of this setting.  This is the case when
-C<SystemCallFilter>, C<SystemCallArchitectures>,
-C<RestrictAddressFamilies>, C<RestrictNamespaces>,
-C<PrivateDevices>, C<ProtectKernelTunables>,
-C<ProtectKernelModules>, C<ProtectKernelLogs>,
-C<ProtectClock>, C<MemoryDenyWriteExecute>,
-C<RestrictRealtime>, C<RestrictSUIDSGID>, C<DynamicUser>
-or C<LockPersonality> are specified. Note that even if this setting is overridden by them,
-systemctl show shows the original value of this setting.
-Also see L<No New Privileges
-Flag|https://www.kernel.org/doc/html/latest/userspace-api/no_new_privs.html>.',
+C<DynamicUser>,
+C<LockPersonality>,
+C<MemoryDenyWriteExecute>,
+C<PrivateDevices>,
+C<ProtectClock>,
+C<ProtectHostname>,
+C<ProtectKernelLogs>,
+C<ProtectKernelModules>,
+C<ProtectKernelTunables>,
+C<RestrictAddressFamilies>,
+C<RestrictNamespaces>,
+C<RestrictRealtime>,
+C<RestrictSUIDSGID>,
+C<SystemCallArchitectures>,
+C<SystemCallFilter>, or
+C<SystemCallLog> are specified. Note that even if this setting is overridden
+by them, systemctl show shows the original value of this setting. In case the
+service will be run in a new mount namespace anyway and SELinux is disabled, all file systems
+are mounted with C<MS_NOSUID> flag. Also see
+L<No New
+Privileges Flag|https://www.kernel.org/doc/html/latest/userspace-api/no_new_privs.html>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -683,8 +756,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -734,8 +807,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -785,8 +858,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -836,8 +909,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -887,8 +960,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -938,8 +1011,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -989,8 +1062,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1040,8 +1113,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1091,8 +1164,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1142,8 +1215,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1193,8 +1266,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1244,8 +1317,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1295,8 +1368,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1346,8 +1419,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1397,8 +1470,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1448,8 +1521,8 @@ implied. Also, note that the effective granularity of the limits might influence
 enforcement. For example, time limits specified for C<LimitCPU> will be rounded up
 implicitly to multiples of 1s. For C<LimitNICE> the value may be specified in two
 syntaxes: if prefixed with C<+> or C<->, the value is understood as
-regular Linux nice value in the range -20..19. If not prefixed like this the value is understood as
-raw resource limit parameter in the range 0..40 (with 0 being equivalent to 1).
+regular Linux nice value in the range -20\x{2026}19. If not prefixed like this the value is understood as
+raw resource limit parameter in the range 0\x{2026}40 (with 0 being equivalent to 1).
 
 Note that most process resource limits configured with these options are per-process, and
 processes may fork in order to acquire a new set of resources that are accounted independently of the
@@ -1605,8 +1678,10 @@ pipelines.',
       },
       'Nice',
       {
-        'description' => 'Sets the default nice level (scheduling priority) for executed processes. Takes an integer
-between -20 (highest priority) and 19 (lowest priority). See
+        'description' => 'Sets the default nice level (scheduling priority) for executed processes. Takes an
+integer between -20 (highest priority) and 19 (lowest priority). In case of resource contention,
+smaller values mean more resources will be made available to the unit\'s processes, larger values mean
+less resources will be made available. See
 L<setpriority(2)> for
 details.',
         'max' => '19',
@@ -1632,11 +1707,12 @@ details.',
       },
       'CPUSchedulingPriority',
       {
-        'description' => 'Sets the CPU scheduling priority for executed processes. The available priority range depends
-on the selected CPU scheduling policy (see above). For real-time scheduling policies an integer between 1
-(lowest priority) and 99 (highest priority) can be used. See
-L<sched_setscheduler(2)> for
-details.',
+        'description' => 'Sets the CPU scheduling priority for executed processes. The available priority range
+depends on the selected CPU scheduling policy (see above). For real-time scheduling policies an
+integer between 1 (lowest priority) and 99 (highest priority) can be used. In case of CPU resource
+contention, smaller values mean less CPU time is made available to the service, larger values mean
+more. See L<sched_setscheduler(2)>
+for details.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1717,11 +1793,13 @@ details.',
       },
       'IOSchedulingPriority',
       {
-        'description' => 'Sets the I/O scheduling priority for executed processes. Takes an integer between 0 (highest
-priority) and 7 (lowest priority). The available priorities depend on the selected I/O scheduling class (see
-above). If the empty string is assigned to this option, all prior assignments to both
-C<IOSchedulingClass> and C<IOSchedulingPriority> have no effect.
-See L<ioprio_set(2)> for
+        'description' => 'Sets the I/O scheduling priority for executed processes. Takes an integer between 0
+(highest priority) and 7 (lowest priority). In case of I/O contention, smaller values mean more I/O
+bandwidth is made available to the unit\'s processes, larger values mean less bandwidth. The available
+priorities depend on the selected I/O scheduling class (see above). If the empty string is assigned
+to this option, all prior assignments to both C<IOSchedulingClass> and
+C<IOSchedulingPriority> have no effect.  See
+L<ioprio_set(2)> for
 details.',
         'max' => '7',
         'min' => '0',
@@ -1829,16 +1907,15 @@ These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
 are mounted from there into the unit's file system namespace.
 
-If C<DynamicUser> is used in conjunction with
-C<StateDirectory>, the logic for C<CacheDirectory> and
-C<LogsDirectory> is slightly altered: the directories are created below
-C</var/lib/private>, C</var/cache/private> and
-C</var/log/private>, respectively, which are host directories made inaccessible to
+If C<DynamicUser> is used, the logic for C<CacheDirectory>,
+C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
+C</var/cache/private>, C</var/log/private> and C</var/lib/private>,
+respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic
 user ID recycling. Symbolic links are created to hide this difference in behaviour. Both from
 perspective of the host and from inside the unit, the relevant directories hence always appear
-directly below C</var/lib>, C</var/cache> and
-C</var/log>.
+directly below C</var/cache>, C</var/log> and
+C</var/lib>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
@@ -1913,16 +1990,15 @@ These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
 are mounted from there into the unit's file system namespace.
 
-If C<DynamicUser> is used in conjunction with
-C<StateDirectory>, the logic for C<CacheDirectory> and
-C<LogsDirectory> is slightly altered: the directories are created below
-C</var/lib/private>, C</var/cache/private> and
-C</var/log/private>, respectively, which are host directories made inaccessible to
+If C<DynamicUser> is used, the logic for C<CacheDirectory>,
+C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
+C</var/cache/private>, C</var/log/private> and C</var/lib/private>,
+respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic
 user ID recycling. Symbolic links are created to hide this difference in behaviour. Both from
 perspective of the host and from inside the unit, the relevant directories hence always appear
-directly below C</var/lib>, C</var/cache> and
-C</var/log>.
+directly below C</var/cache>, C</var/log> and
+C</var/lib>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
@@ -1997,16 +2073,15 @@ These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
 are mounted from there into the unit's file system namespace.
 
-If C<DynamicUser> is used in conjunction with
-C<StateDirectory>, the logic for C<CacheDirectory> and
-C<LogsDirectory> is slightly altered: the directories are created below
-C</var/lib/private>, C</var/cache/private> and
-C</var/log/private>, respectively, which are host directories made inaccessible to
+If C<DynamicUser> is used, the logic for C<CacheDirectory>,
+C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
+C</var/cache/private>, C</var/log/private> and C</var/lib/private>,
+respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic
 user ID recycling. Symbolic links are created to hide this difference in behaviour. Both from
 perspective of the host and from inside the unit, the relevant directories hence always appear
-directly below C</var/lib>, C</var/cache> and
-C</var/log>.
+directly below C</var/cache>, C</var/log> and
+C</var/lib>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
@@ -2081,16 +2156,15 @@ These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
 are mounted from there into the unit's file system namespace.
 
-If C<DynamicUser> is used in conjunction with
-C<StateDirectory>, the logic for C<CacheDirectory> and
-C<LogsDirectory> is slightly altered: the directories are created below
-C</var/lib/private>, C</var/cache/private> and
-C</var/log/private>, respectively, which are host directories made inaccessible to
+If C<DynamicUser> is used, the logic for C<CacheDirectory>,
+C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
+C</var/cache/private>, C</var/log/private> and C</var/lib/private>,
+respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic
 user ID recycling. Symbolic links are created to hide this difference in behaviour. Both from
 perspective of the host and from inside the unit, the relevant directories hence always appear
-directly below C</var/lib>, C</var/cache> and
-C</var/log>.
+directly below C</var/cache>, C</var/log> and
+C</var/lib>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
@@ -2165,16 +2239,15 @@ These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
 are mounted from there into the unit's file system namespace.
 
-If C<DynamicUser> is used in conjunction with
-C<StateDirectory>, the logic for C<CacheDirectory> and
-C<LogsDirectory> is slightly altered: the directories are created below
-C</var/lib/private>, C</var/cache/private> and
-C</var/log/private>, respectively, which are host directories made inaccessible to
+If C<DynamicUser> is used, the logic for C<CacheDirectory>,
+C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
+C</var/cache/private>, C</var/log/private> and C</var/lib/private>,
+respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic
 user ID recycling. Symbolic links are created to hide this difference in behaviour. Both from
 perspective of the host and from inside the unit, the relevant directories hence always appear
-directly below C</var/lib>, C</var/cache> and
-C</var/log>.
+directly below C</var/cache>, C</var/log> and
+C</var/lib>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
@@ -2330,12 +2403,18 @@ desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
 C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
 see C<TemporaryFileSystem>.
 
+Content in paths listed in C<NoExecPaths> are not executable even if the usual
+file access controls would permit this. Nest C<ExecPaths> inside of
+C<NoExecPaths> in order to provide executable content within non-executable
+directories.
+
 Non-directory paths may be specified as well. These options may be specified more than once,
 in which case all paths listed will have limited access from within the namespace. If the empty string is
 assigned to this option, the specific list is reset, and all prior assignments have no effect.
 
-Paths in C<ReadWritePaths>, C<ReadOnlyPaths> and
-C<InaccessiblePaths> may be prefixed with C<->, in which case they will be
+Paths in C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<InaccessiblePaths>, C<ExecPaths> and
+C<NoExecPaths> may be prefixed with C<->, in which case they will be
 ignored when they do not exist. If prefixed with C<+> the paths are taken relative to the root
 directory of the unit, as configured with C<RootDirectory>/C<RootImage>,
 instead of relative to the root directory of the host (see above). When combining C<-> and
@@ -2356,7 +2435,18 @@ setting is not complete, and does not offer full protection.
 Note that the effect of these settings may be undone by privileged processes. In order to set up an
 effective sandboxed environment for a unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
-C<SystemCallFilter=~@mount>.',
+C<SystemCallFilter=~@mount>.
+
+Simple allow-list example using these directives:
+
+    [Service]
+    ReadOnlyPaths=/
+    ReadWritePaths=/var /run
+    InaccessiblePaths=-/lost+found
+    NoExecPaths=/
+    ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
+
+',
         'type' => 'list'
       },
       'ReadOnlyPaths',
@@ -2385,12 +2475,18 @@ desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
 C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
 see C<TemporaryFileSystem>.
 
+Content in paths listed in C<NoExecPaths> are not executable even if the usual
+file access controls would permit this. Nest C<ExecPaths> inside of
+C<NoExecPaths> in order to provide executable content within non-executable
+directories.
+
 Non-directory paths may be specified as well. These options may be specified more than once,
 in which case all paths listed will have limited access from within the namespace. If the empty string is
 assigned to this option, the specific list is reset, and all prior assignments have no effect.
 
-Paths in C<ReadWritePaths>, C<ReadOnlyPaths> and
-C<InaccessiblePaths> may be prefixed with C<->, in which case they will be
+Paths in C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<InaccessiblePaths>, C<ExecPaths> and
+C<NoExecPaths> may be prefixed with C<->, in which case they will be
 ignored when they do not exist. If prefixed with C<+> the paths are taken relative to the root
 directory of the unit, as configured with C<RootDirectory>/C<RootImage>,
 instead of relative to the root directory of the host (see above). When combining C<-> and
@@ -2411,7 +2507,18 @@ setting is not complete, and does not offer full protection.
 Note that the effect of these settings may be undone by privileged processes. In order to set up an
 effective sandboxed environment for a unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
-C<SystemCallFilter=~@mount>.',
+C<SystemCallFilter=~@mount>.
+
+Simple allow-list example using these directives:
+
+    [Service]
+    ReadOnlyPaths=/
+    ReadWritePaths=/var /run
+    InaccessiblePaths=-/lost+found
+    NoExecPaths=/
+    ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
+
+',
         'type' => 'list'
       },
       'InaccessiblePaths',
@@ -2440,12 +2547,18 @@ desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
 C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
 see C<TemporaryFileSystem>.
 
+Content in paths listed in C<NoExecPaths> are not executable even if the usual
+file access controls would permit this. Nest C<ExecPaths> inside of
+C<NoExecPaths> in order to provide executable content within non-executable
+directories.
+
 Non-directory paths may be specified as well. These options may be specified more than once,
 in which case all paths listed will have limited access from within the namespace. If the empty string is
 assigned to this option, the specific list is reset, and all prior assignments have no effect.
 
-Paths in C<ReadWritePaths>, C<ReadOnlyPaths> and
-C<InaccessiblePaths> may be prefixed with C<->, in which case they will be
+Paths in C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<InaccessiblePaths>, C<ExecPaths> and
+C<NoExecPaths> may be prefixed with C<->, in which case they will be
 ignored when they do not exist. If prefixed with C<+> the paths are taken relative to the root
 directory of the unit, as configured with C<RootDirectory>/C<RootImage>,
 instead of relative to the root directory of the host (see above). When combining C<-> and
@@ -2466,7 +2579,162 @@ setting is not complete, and does not offer full protection.
 Note that the effect of these settings may be undone by privileged processes. In order to set up an
 effective sandboxed environment for a unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
-C<SystemCallFilter=~@mount>.',
+C<SystemCallFilter=~@mount>.
+
+Simple allow-list example using these directives:
+
+    [Service]
+    ReadOnlyPaths=/
+    ReadWritePaths=/var /run
+    InaccessiblePaths=-/lost+found
+    NoExecPaths=/
+    ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
+
+',
+        'type' => 'list'
+      },
+      'ExecPaths',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Sets up a new file system namespace for executed processes. These options may be used
+to limit access a process has to the file system. Each setting takes a space-separated list of paths
+relative to the host\'s root directory (i.e. the system running the service manager). Note that if
+paths contain symlinks, they are resolved relative to the root directory set with
+C<RootDirectory>/C<RootImage>.
+
+Paths listed in C<ReadWritePaths> are accessible from within the namespace
+with the same access modes as from outside of it. Paths listed in C<ReadOnlyPaths>
+are accessible for reading only, writing will be refused even if the usual file access controls would
+permit this. Nest C<ReadWritePaths> inside of C<ReadOnlyPaths> in
+order to provide writable subdirectories within read-only directories. Use
+C<ReadWritePaths> in order to allow-list specific paths for write access if
+C<ProtectSystem=strict> is used.
+
+Paths listed in C<InaccessiblePaths> will be made inaccessible for processes inside
+the namespace along with everything below them in the file system hierarchy. This may be more restrictive than
+desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
+see C<TemporaryFileSystem>.
+
+Content in paths listed in C<NoExecPaths> are not executable even if the usual
+file access controls would permit this. Nest C<ExecPaths> inside of
+C<NoExecPaths> in order to provide executable content within non-executable
+directories.
+
+Non-directory paths may be specified as well. These options may be specified more than once,
+in which case all paths listed will have limited access from within the namespace. If the empty string is
+assigned to this option, the specific list is reset, and all prior assignments have no effect.
+
+Paths in C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<InaccessiblePaths>, C<ExecPaths> and
+C<NoExecPaths> may be prefixed with C<->, in which case they will be
+ignored when they do not exist. If prefixed with C<+> the paths are taken relative to the root
+directory of the unit, as configured with C<RootDirectory>/C<RootImage>,
+instead of relative to the root directory of the host (see above). When combining C<-> and
+C<+> on the same path make sure to specify C<-> first, and C<+>
+second.
+
+Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
+host. This means that this setting may not be used for services which shall be able to install mount points in
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
+unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
+mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
+i.e. writable mounts appearing on the host will be writable in the unit\'s namespace too, even when propagated
+below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
+not extend to submounts of a directory that are created later on. This means the lock-down offered by that
+setting is not complete, and does not offer full protection.
+
+Note that the effect of these settings may be undone by privileged processes. In order to set up an
+effective sandboxed environment for a unit it is thus recommended to combine these settings with either
+C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
+C<SystemCallFilter=~@mount>.
+
+Simple allow-list example using these directives:
+
+    [Service]
+    ReadOnlyPaths=/
+    ReadWritePaths=/var /run
+    InaccessiblePaths=-/lost+found
+    NoExecPaths=/
+    ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
+
+',
+        'type' => 'list'
+      },
+      'NoExecPaths',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Sets up a new file system namespace for executed processes. These options may be used
+to limit access a process has to the file system. Each setting takes a space-separated list of paths
+relative to the host\'s root directory (i.e. the system running the service manager). Note that if
+paths contain symlinks, they are resolved relative to the root directory set with
+C<RootDirectory>/C<RootImage>.
+
+Paths listed in C<ReadWritePaths> are accessible from within the namespace
+with the same access modes as from outside of it. Paths listed in C<ReadOnlyPaths>
+are accessible for reading only, writing will be refused even if the usual file access controls would
+permit this. Nest C<ReadWritePaths> inside of C<ReadOnlyPaths> in
+order to provide writable subdirectories within read-only directories. Use
+C<ReadWritePaths> in order to allow-list specific paths for write access if
+C<ProtectSystem=strict> is used.
+
+Paths listed in C<InaccessiblePaths> will be made inaccessible for processes inside
+the namespace along with everything below them in the file system hierarchy. This may be more restrictive than
+desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
+see C<TemporaryFileSystem>.
+
+Content in paths listed in C<NoExecPaths> are not executable even if the usual
+file access controls would permit this. Nest C<ExecPaths> inside of
+C<NoExecPaths> in order to provide executable content within non-executable
+directories.
+
+Non-directory paths may be specified as well. These options may be specified more than once,
+in which case all paths listed will have limited access from within the namespace. If the empty string is
+assigned to this option, the specific list is reset, and all prior assignments have no effect.
+
+Paths in C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<InaccessiblePaths>, C<ExecPaths> and
+C<NoExecPaths> may be prefixed with C<->, in which case they will be
+ignored when they do not exist. If prefixed with C<+> the paths are taken relative to the root
+directory of the unit, as configured with C<RootDirectory>/C<RootImage>,
+instead of relative to the root directory of the host (see above). When combining C<-> and
+C<+> on the same path make sure to specify C<-> first, and C<+>
+second.
+
+Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
+host. This means that this setting may not be used for services which shall be able to install mount points in
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
+unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
+mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
+i.e. writable mounts appearing on the host will be writable in the unit\'s namespace too, even when propagated
+below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
+not extend to submounts of a directory that are created later on. This means the lock-down offered by that
+setting is not complete, and does not offer full protection.
+
+Note that the effect of these settings may be undone by privileged processes. In order to set up an
+effective sandboxed environment for a unit it is thus recommended to combine these settings with either
+C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
+C<SystemCallFilter=~@mount>.
+
+Simple allow-list example using these directives:
+
+    [Service]
+    ReadOnlyPaths=/
+    ReadWritePaths=/var /run
+    InaccessiblePaths=-/lost+found
+    NoExecPaths=/
+    ExecPaths=/usr/sbin/my_daemon /usr/lib /usr/lib64
+
+',
         'type' => 'list'
       },
       'TemporaryFileSystem',
@@ -2503,14 +2771,13 @@ C</var/lib/systemd> or its contents.',
 executed processes and mounts private C</tmp/> and C</var/tmp/>
 directories inside it that are not shared by processes outside of the namespace. This is useful to
 secure access to temporary files of the process, but makes sharing between processes via
-C</tmp/> or C</var/tmp/> impossible. If this is enabled, all
-temporary files created by a service in these directories will be removed after the service is
-stopped. Defaults to false. It is possible to run two or more units within the same private
-C</tmp/> and C</var/tmp/> namespace by using the
-C<JoinsNamespaceOf> directive, see
-L<systemd.unit(5)> for
-details. This setting is implied if C<DynamicUser> is set. For this setting the same
-restrictions regarding mount propagation and privileges apply as for
+C</tmp/> or C</var/tmp/> impossible. If true, all temporary files
+created by a service in these directories will be removed after the service is stopped. Defaults to
+false. It is possible to run two or more units within the same private C</tmp/> and
+C</var/tmp/> namespace by using the C<JoinsNamespaceOf> directive,
+see L<systemd.unit(5)>
+for details. This setting is implied if C<DynamicUser> is set. For this setting the
+same restrictions regarding mount propagation and privileges apply as for
 C<ReadOnlyPaths> and related calls, see above. Enabling this setting has the side
 effect of adding C<Requires> and C<After> dependencies on all mount
 units necessary to access C</tmp/> and C</var/tmp/>. Moreover an
@@ -2541,14 +2808,14 @@ C<CAP_MKNOD> and C<CAP_SYS_RAWIO> from the capability bounding set for the
 unit (see above), and set C<DevicePolicy=closed> (see
 L<systemd.resource-control(5)>
 for details). Note that using this setting will disconnect propagation of mounts from the service to the host
-(propagation in the opposite direction continues to work).  This means that this setting may not be used for
+(propagation in the opposite direction continues to work). This means that this setting may not be used for
 services which shall be able to install mount points in the main mount namespace. The new
 C</dev/> will be mounted read-only and \'noexec\'. The latter may break old programs which try
 to set up executable memory by using
 L<mmap(2)> of
 C</dev/zero> instead of using C<MAP_ANON>. For this setting the same
 restrictions regarding mount propagation and privileges apply as for C<ReadOnlyPaths> and
-related calls, see above.  If turned on and if running in user mode, or in system mode, but without the
+related calls, see above. If turned on and if running in user mode, or in system mode, but without the
 C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
 C<NoNewPrivileges=yes> is implied.
 
@@ -2610,6 +2877,53 @@ bound within the specified network namespace.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'PrivateIPC',
+      {
+        'description' => 'Takes a boolean argument. If true, sets up a new IPC namespace for the executed processes.
+Each IPC namespace has its own set of System V IPC identifiers and its own POSIX message queue file system.
+This is useful to avoid name clash of IPC identifiers. Defaults to false. It is possible to run two or
+more units within the same private IPC namespace by using the C<JoinsNamespaceOf> directive,
+see L<systemd.unit(5)> for
+details.
+
+Note that IPC namespacing does not have an effect on
+C<AF_UNIX> sockets, which are the most common
+form of IPC used on Linux. Instead, C<AF_UNIX>
+sockets in the file system are subject to mount namespacing, and
+those in the abstract namespace are subject to network namespacing.
+IPC namespacing only has an effect on SysV IPC (which is mostly
+legacy) as well as POSIX message queues (for which
+C<AF_UNIX>/C<SOCK_SEQPACKET>
+sockets are typically a better replacement). IPC namespacing also
+has no effect on POSIX shared memory (which is subject to mount
+namespacing) either. See
+L<ipc_namespaces(7)> for
+the details.
+
+Note that the implementation of this setting might be impossible (for example if IPC namespaces are
+not available), and the unit should be written in a way that does not solely rely on this setting for
+security.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'IPCNamespacePath',
+      {
+        'description' => 'Takes an absolute file system path refererring to a Linux IPC namespace
+pseudo-file (i.e. a file like C</proc/$PID/ns/ipc> or a bind mount or symlink to
+one). When set the invoked processes are added to the network namespace referenced by that path. The
+path has to point to a valid namespace file at the moment the processes are forked off. If this
+option is used C<PrivateIPC> has no effect. If this option is used together with
+C<JoinsNamespaceOf> then it only has an effect if this unit is started before any of
+the listed units that have C<PrivateIPC> or
+C<IPCNamespacePath> configured, as otherwise the network namespace of those
+units is reused.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'PrivateUsers',
       {
         'description' => 'Takes a boolean argument. If true, sets up a new user namespace for the executed processes and
@@ -2658,7 +2972,11 @@ for security.
 
 Note that when this option is enabled for a service hostname changes no longer propagate from
 the system into the service, it is hence not suitable for services that need to take notice of system
-hostname changes dynamically.',
+hostname changes dynamically.
+
+If this setting is on, but the unit doesn\'t have the C<CAP_SYS_ADMIN>
+capability (e.g. services for which C<User> is set),
+C<NoNewPrivileges=yes> is implied.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -2675,7 +2993,9 @@ capability bounding set for this unit, installs a system call filter to block ca
 clock, and C<DeviceAllow=char-rtc r> is implied. This ensures C</dev/rtc0>,
 C</dev/rtc1>, etc. are made read-only to the service. See
 L<systemd.resource-control(5)>
-for the details about C<DeviceAllow>.',
+for the details about C<DeviceAllow>. If this setting is on, but the unit
+doesn\'t have the C<CAP_SYS_ADMIN> capability (e.g. services for which
+C<User> is set), C<NoNewPrivileges=yes> is implied.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -2694,13 +3014,14 @@ boot-time, for example with the
 L<sysctl.d(5)> mechanism. Few
 services need to write to these at runtime; it is hence recommended to turn this on for most services. For this
 setting the same restrictions regarding mount propagation and privileges apply as for
-C<ReadOnlyPaths> and related calls, see above. Defaults to off.  If turned on and if running
-in user mode, or in system mode, but without the C<CAP_SYS_ADMIN> capability (e.g.  services
-for which C<User> is set), C<NoNewPrivileges=yes> is implied. Note that this
-option does not prevent indirect changes to kernel tunables effected by IPC calls to other processes. However,
-C<InaccessiblePaths> may be used to make relevant IPC file system objects inaccessible. If
-C<ProtectKernelTunables> is set, C<MountAPIVFS=yes> is
-implied.',
+C<ReadOnlyPaths> and related calls, see above. Defaults to off. If this
+setting is on, but the unit doesn\'t have the C<CAP_SYS_ADMIN> capability
+(e.g. services for which C<User> is set),
+C<NoNewPrivileges=yes> is implied. Note that this option does not prevent
+indirect changes to kernel tunables effected by IPC calls to other processes. However,
+C<InaccessiblePaths> may be used to make relevant IPC file system objects
+inaccessible. If C<ProtectKernelTunables> is set,
+C<MountAPIVFS=yes> is implied.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -2720,9 +3041,9 @@ C<ReadOnlyPaths> and related calls, see above.  Note that limited automatic modu
 to user configuration or kernel mapping tables might still happen as side effect of requested user operations,
 both privileged and unprivileged. To disable module auto-load feature please see
 L<sysctl.d(5)>C<kernel.modules_disabled> mechanism and
-C</proc/sys/kernel/modules_disabled> documentation.  If turned on and if running in user
-mode, or in system mode, but without the C<CAP_SYS_ADMIN> capability (e.g. setting
-C<User>), C<NoNewPrivileges=yes> is implied.',
+C</proc/sys/kernel/modules_disabled> documentation. If this setting is on,
+but the unit doesn\'t have the C<CAP_SYS_ADMIN> capability (e.g. services for
+which C<User> is set), C<NoNewPrivileges=yes> is implied.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -2740,7 +3061,10 @@ L<syslog(2)>
 system call (not to be confused with the libc API
 L<syslog(3)>
 for userspace logging). The kernel exposes its log buffer to userspace via C</dev/kmsg> and
-C</proc/kmsg>. If enabled, these are made inaccessible to all the processes in the unit.',
+C</proc/kmsg>. If enabled, these are made inaccessible to all the processes in the unit.
+If this setting is on, but the unit doesn\'t have the C<CAP_SYS_ADMIN>
+capability (e.g. services for which C<User> is set),
+C<NoNewPrivileges=yes> is implied.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -2767,10 +3091,13 @@ is implied.',
       'RestrictAddressFamilies',
       {
         'description' => 'Restricts the set of socket address families accessible to the processes of this
-unit. Takes a space-separated list of address family names to allow-list, such as
-C<AF_UNIX>, C<AF_INET> or C<AF_INET6>. When
-prefixed with C<~> the listed address families will be applied as deny list,
-otherwise as allow list.  Note that this restricts access to the L<socket(2)>
+unit. Takes C<none>, or a space-separated list of address family names to
+allow-list, such as C<AF_UNIX>, C<AF_INET> or
+C<AF_INET6>. When C<none> is specified, then all address
+families will be denied. When prefixed with C<~> the listed address
+families will be applied as deny list, otherwise as allow list. Note that this restricts access
+to the
+L<socket(2)>
 system call only. Sockets passed into the process by other means (for example, by using socket
 activation with socket units, see
 L<systemd.socket(5)>)
@@ -2782,7 +3109,7 @@ recommended to turn off alternative ABIs for services, so that they cannot be us
 restrictions of this option. Specifically, it is recommended to combine this option with
 C<SystemCallArchitectures=native> or similar. If running in user mode, or in system
 mode, but without the C<CAP_SYS_ADMIN> capability (e.g. setting
-C<User=nobody>), C<NoNewPrivileges=yes> is implied. By default, no
+C<User>), C<NoNewPrivileges=yes> is implied. By default, no
 restrictions apply, all address families are accessible to processes. If assigned the empty string,
 any previous address family restriction changes are undone. This setting does not affect commands
 prefixed with C<+>.
@@ -3026,7 +3353,7 @@ terminating the processes immediately. Special setting C<kill> can be used to
 explicitly specify killing. This value takes precedence over the one given in
 C<SystemCallErrorNumber>, see below.  If running in user mode, or in system mode,
 but without the C<CAP_SYS_ADMIN> capability (e.g. setting
-C<User=nobody>), C<NoNewPrivileges=yes> is implied. This feature
+C<User>), C<NoNewPrivileges=yes> is implied. This feature
 makes use of the Secure Computing Mode 2 interfaces of the kernel ('seccomp filtering') and is useful
 for enforcing a minimal sandboxing environment. Note that the execve(),
 exit(), exit_group(), getrlimit(),
@@ -3117,7 +3444,7 @@ as well as C<x32>, C<mips64-n32>, C<mips64-le-n32>, and
 the special identifier C<native>.  The special identifier C<native>
 implicitly maps to the native architecture of the system (or more precisely: to the architecture the system
 manager is compiled for). If running in user mode, or in system mode, but without the
-C<CAP_SYS_ADMIN> capability (e.g. setting C<User=nobody>),
+C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
 C<NoNewPrivileges=yes> is implied. By default, this option is set to the empty list, i.e. no
 filtering is applied.
 
@@ -3150,7 +3477,7 @@ details.",
 system calls executed by the unit processes for the listed ones will be logged. If the first
 character of the list is C<~>, the effect is inverted: all system calls except the
 listed system calls will be logged. If running in user mode, or in system mode, but without the
-C<CAP_SYS_ADMIN> capability (e.g. setting C<User=nobody>),
+C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
 C<NoNewPrivileges=yes> is implied. This feature makes use of the Secure Computing
 Mode 2 interfaces of the kernel (\'seccomp filtering\') and is useful for auditing or setting up a
 minimal sandboxing environment. This option may be specified more than once, in which case the filter
@@ -3164,18 +3491,23 @@ have no effect. This does not affect commands prefixed with C<+>.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Sets environment variables for executed processes. Takes a space-separated list of
-variable assignments. This option may be specified more than once, in which case all listed variables
-will be set. If the same variable is set twice, the later setting will override the earlier
-setting. If the empty string is assigned to this option, the list of environment variables is reset,
-all prior assignments have no effect. Variable expansion is not performed inside the strings,
-however, specifier expansion is possible. The C<\$> character has no special
-meaning. If you need to assign a value containing spaces or the equals sign to a variable, use double
-quotes (\") for the assignment.
+        'description' => "Sets environment variables for executed processes. Each line is unquoted using the
+rules described in \"Quoting\" section in
+L<systemd.syntax(7)>
+and becomes a list of variable assignments. If you need to assign a value containing spaces or the
+equals sign to a variable, put quotes around the whole assignment. Variable expansion is not
+performed inside the strings and the C<\$> character has no special meaning. Specifier
+expansion is performed, see the \"Specifiers\" section in
+L<systemd.unit(5)>.
 
-The names of the variables can contain ASCII letters, digits, and the underscore
-character. Variable names cannot be empty or start with a digit. In variable values, most characters
-are allowed, but non-printable characters are currently rejected.
+This option may be specified more than once, in which case all listed variables will be set. If
+the same variable is listed twice, the later setting will override the earlier setting. If the empty
+string is assigned to this option, the list of environment variables is reset, all prior assignments
+have no effect.
+
+The names of the variables can contain ASCII letters, digits, and the underscore character.
+Variable names cannot be empty or start with a digit. In variable values, most characters are
+allowed, but non-printable characters are currently rejected.
 
 Example:
 
@@ -3186,8 +3518,8 @@ C<VAR2>, C<VAR3>
 with the values C<word1 word2>,
 C<word3>, C<\$word 5 6>.
 
-See L<environ(7)> for details
-about environment variables.
+See L<environ(7)> for
+details about environment variables.
 
 Note that environment variables are not suitable for passing secrets (such as passwords, key
 material, \x{2026})  to service processes. Environment variables set for a unit are exposed to unprivileged
@@ -3290,8 +3622,9 @@ the system manager\'s global set of environment variables, inherited via C<PassE
 set by the service manager itself (such as C<$NOTIFY_SOCKET> and such), or set by a PAM module
 (in case C<PAMName> is used).
 
-See L<environ(7)> for details
-about environment variables.',
+See "Environment Variables in Spawned Processes" below for a description of how those
+settings combine to form the inherited environment. See L<environ(7)> for general
+information about environment variables.',
         'type' => 'list'
       },
       'StandardInput',
@@ -3355,7 +3688,9 @@ matches are found, the first one will be used.  See C<FileDescriptorName> in
 L<systemd.socket(5)> for more
 details about named file descriptors and their ordering.
 
-This setting defaults to C<null>.",
+This setting defaults to C<null>, unless
+C<StandardInputText>/C<StandardInputData> are set, in which case it
+defaults to C<data>.",
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -3375,8 +3710,8 @@ This setting defaults to C<null>.",
 to. Takes one of C<inherit>, C<null>, C<tty>,
 C<journal>, C<kmsg>, C<journal+console>,
 C<kmsg+console>, C<file:path>,
-C<append:path>, C<socket> or
-C<fd:name>.
+C<append:path>, C<truncate:path>,
+C<socket> or C<fd:name>.
 
 C<inherit> duplicates the file descriptor of standard input for standard output.
 
@@ -3414,6 +3749,21 @@ single stream connection is created for both input and output.
 
 C<append:path> is similar to
 C<file:path> above, but it opens the file in append mode.
+
+C<truncate:path> is similar to
+C<file:path> above, but it truncates the file when opening
+it. For units with multiple command lines, e.g. C<Type=oneshot> services with
+multiple C<ExecStart>, or services with C<ExecCondition>,
+C<ExecStartPre> or C<ExecStartPost>, the output file is reopened
+and therefore re-truncated for each command line. If the output file is truncated while another
+process still has the file open, e.g. by an C<ExecReload> running concurrently with
+an C<ExecStart>, and the other process continues writing to the file without
+adjusting its offset, then the space between the file pointers of the two processes may be filled
+with C<NUL> bytes, producing a sparse file. Thus,
+C<truncate:path> is typically only useful for units where
+only one process runs at a time, such as services with a single C<ExecStart> and no
+C<ExecStartPost>, C<ExecReload>, C<ExecStop> or
+similar.
 
 C<socket> connects standard output to a socket acquired via socket activation. The
 semantics are similar to the same option of C<StandardInput>, see above.
@@ -3462,9 +3812,11 @@ to be added to the unit (see above).',
       },
       'StandardInputText',
       {
-        'description' => 'Configures arbitrary textual or binary data to pass via file descriptor 0 (STDIN) to the
-executed processes. These settings have no effect unless C<StandardInput> is set to
-C<data>. Use this option to embed process input data directly in the unit file.
+        'description' => 'Configures arbitrary textual or binary data to pass via file descriptor 0 (STDIN) to
+the executed processes. These settings have no effect unless C<StandardInput> is set
+to C<data> (which is the default if C<StandardInput> is not set
+otherwise, but C<StandardInputText>/C<StandardInputData> is). Use
+this option to embed process input data directly in the unit file.
 
 C<StandardInputText> accepts arbitrary textual data. C-style escapes for special
 characters as well as the usual C<%>-specifiers are resolved. Each time this setting is used
@@ -3490,9 +3842,11 @@ details). This is particularly useful for large data configured with these two o
       },
       'StandardInputData',
       {
-        'description' => 'Configures arbitrary textual or binary data to pass via file descriptor 0 (STDIN) to the
-executed processes. These settings have no effect unless C<StandardInput> is set to
-C<data>. Use this option to embed process input data directly in the unit file.
+        'description' => 'Configures arbitrary textual or binary data to pass via file descriptor 0 (STDIN) to
+the executed processes. These settings have no effect unless C<StandardInput> is set
+to C<data> (which is the default if C<StandardInput> is not set
+otherwise, but C<StandardInputText>/C<StandardInputData> is). Use
+this option to embed process input data directly in the unit file.
 
 C<StandardInputText> accepts arbitrary textual data. C-style escapes for special
 characters as well as the usual C<%>-specifiers are resolved. Each time this setting is used
@@ -3527,7 +3881,8 @@ details. By default no filtering is applied (i.e. the default maximum log level 
 this option to configure the logging system to drop log messages of a specific service above the specified
 level. For example, set C<LogLevelMax>C<info> in order to turn off debug logging
 of a particularly chatty unit. Note that the configured level is applied to any log messages written by any
-of the processes belonging to this unit, sent via any supported logging protocol. The filtering is applied
+of the processes belonging to this unit, as well as any log messages written by the system manager process
+(PID 1) in reference to this unit, sent via any supported logging protocol. The filtering is applied
 early in the logging pipeline, before any kind of further processing is done. Moreover, messages which pass
 through this filter successfully might still be dropped by filters applied at a later stage in the logging
 subsystem. For example, C<MaxLevelStore> configured in
@@ -3717,19 +4072,21 @@ available, the location of credentials is exported as the C<$CREDENTIALS_DIRECTO
 environment variable to the unit\'s processes.
 
 The C<LoadCredential> setting takes a textual ID to use as name for a
-credential plus a file system path. The ID must be a short ASCII string suitable as filename in the
-filesystem, and may be chosen freely by the user. If the specified path is absolute it is opened as
-regular file and the credential data is read from it. If the absolute path refers to an
-C<AF_UNIX> stream socket in the file system a connection is made to it (only once
-at unit start-up) and the credential data read from the connection, providing an easy IPC integration
-point for dynamically providing credentials from other services. If the specified path is not
-absolute and itself qualifies as valid credential identifier it is understood to refer to a
-credential that the service manager itself received via the C<$CREDENTIALS_DIRECTORY>
-environment variable, which may be used to propagate credentials from an invoking environment (e.g. a
-container manager that invoked the service manager) into a service. The contents of the file/socket
-may be arbitrary binary or textual data, including newline characters and C<NUL>
-bytes. This option may be used multiple times, each time defining an additional credential to pass to
-the unit.
+credential plus a file system path, separated by a colon. The ID must be a short ASCII string
+suitable as filename in the filesystem, and may be chosen freely by the user. If the specified path
+is absolute it is opened as regular file and the credential data is read from it. If the absolute
+path refers to an C<AF_UNIX> stream socket in the file system a connection is made
+to it (only once at unit start-up) and the credential data read from the connection, providing an
+easy IPC integration point for dynamically providing credentials from other services. If the
+specified path is not absolute and itself qualifies as valid credential identifier it is understood
+to refer to a credential that the service manager itself received via the
+C<$CREDENTIALS_DIRECTORY> environment variable, which may be used to propagate
+credentials from an invoking environment (e.g. a container manager that invoked the service manager)
+into a service. The contents of the file/socket may be arbitrary binary or textual data, including
+newline characters and C<NUL> bytes. If the file system path is omitted it is
+chosen identical to the credential name, i.e. this is a terse way do declare credentials to inherit
+from the service manager into a service. This option may be used multiple times, each time defining
+an additional credential to pass to the unit.
 
 The credential files/IPC sockets must be accessible to the service manager, but don\'t have to
 be directly accessible to the unit\'s processes: the credential data is read and copied into separate,
@@ -3742,8 +4099,7 @@ In order to reference the path a credential may be read from within a
 C<ExecStart> command line use C<${CREDENTIALS_DIRECTORY}/mycred>,
 e.g. C<ExecStart=cat ${CREDENTIALS_DIRECTORY}/mycred>.
 
-Currently, an accumulated credential size limit of 1M bytes per unit is
-enforced.
+Currently, an accumulated credential size limit of 1 MB per unit is enforced.
 
 If referencing an C<AF_UNIX> stream socket to connect to, the connection will
 originate from an abstract namespace socket, that includes information about the unit and the
@@ -3813,7 +4169,7 @@ leader. Defaults to C<init>.',
         'value_type' => 'enum'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 247 doc',
+    'generated_by' => 'parse-man.pl from systemd 249 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Exec'
   }

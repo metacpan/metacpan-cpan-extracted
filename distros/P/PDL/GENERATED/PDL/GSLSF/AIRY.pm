@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::AIRY;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_airy_Ai PDL::PP gsl_sf_airy_Bi PDL::PP gsl_sf_airy_Ai_scaled PDL::PP gsl_sf_airy_Bi_scaled PDL::PP gsl_sf_airy_Ai_deriv PDL::PP gsl_sf_airy_Bi_deriv PDL::PP gsl_sf_airy_Ai_deriv_scaled PDL::PP gsl_sf_airy_Bi_deriv_scaled );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_airy_Ai gsl_sf_airy_Bi gsl_sf_airy_Ai_scaled gsl_sf_airy_Bi_scaled gsl_sf_airy_Ai_deriv gsl_sf_airy_Bi_deriv gsl_sf_airy_Ai_deriv_scaled gsl_sf_airy_Bi_deriv_scaled );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::AIRY ;
+
 
 
 
@@ -41,10 +40,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -280,7 +276,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -302,5 +298,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

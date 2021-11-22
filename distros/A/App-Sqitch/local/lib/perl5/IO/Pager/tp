@@ -1,0 +1,346 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use IO::Pager::Perl;
+use Term::ReadKey;
+use Getopt::Long;
+
+use vars '$VERSION';
+$VERSION = '2.10'; #Untouched since 2.10
+
+my %Opts = (fold=>1);
+(my $LESS = $ENV{LESS} || '') =~ s/P.+(?:\$|$)//;
+$Opts{eof} = 1       if $LESS =~ /e/;
+$Opts{statusCol} = 1 if $LESS =~ /J/;
+$Opts{lineNo} = 1    if $LESS =~ /N/;
+$Opts{raw} = 1       if $LESS =~ /r/;
+$Opts{squeeze} = 1   if $LESS =~ /s/;
+$Opts{fold} = 0      if $LESS =~ /S/;
+$Opts{pause} = "\cL" if defined($ENV{MORE}) && $ENV{MORE} =~ /l/;
+
+@ARGV = (map('-'.$_, split(//, $ENV{TPOPT})), @ARGV) if defined($ENV{TPOPT});
+
+my %Long;
+#Custom argument processing
+{
+  no warnings 'uninitialized';
+  ($Long{jump}   =  (grep { /^\+\d+$/ } @ARGV)[-1]) =~ s/^\+//;
+  ($Long{search} =  (grep { /^\+\// }   @ARGV)[-1]) =~ s%\+/=%%;
+}
+@ARGV          =   grep { $_ !~ /^[-+]\d+$|^\+\// } @ARGV;
+Getopt::Long::Configure("no_ignore_case");
+GetOptions(\%Long,
+	   (map { "$_!"  } split//, 'JSenrs'),  # bare
+	   (map { "$_=s" } qw'j p cols'),       # args ##rows
+	   'f:s',
+	   qw/tail|$ scrollbar|[/
+	  );
+$Long{f} = "\cL" if defined($Long{f}) && $Long{f} eq '';
+$Long{tail} = $Long{tail} && scalar(@ARGV) == 1 ? 1 : 0;
+
+$Opts{eof}       = $Long{e} if defined($Long{e});
+$Opts{statusCol} = $Long{J} if defined($Long{J});
+$Opts{pause}     = $Long{f} if defined($Long{f});
+$Opts{lineNo}    = $Long{n} if defined($Long{n});
+$Opts{raw}       = $Long{r} if defined($Long{r});
+$Opts{squeeze}   = $Long{s} if defined($Long{s});
+#$Opts{rows}      = $Long{rows} if defined($Long{rows});
+$Opts{cols}      = $Long{cols} if defined($Long{cols});
+$Opts{fold}      = not $Long{S} if defined($Long{S});
+$Opts{jump}      = ($Long{j}||$Long{jump})
+  if defined($Long{j})||defined($Long{jump});
+$Opts{search}    = $Long{p}||$Long{search}
+  if defined($Long{p})||defined($Long{search});
+
+$Opts{scrollBar} = $Long{scrollbar} if defined($Long{scrollbar});
+
+#use Data::Dumper; print Dumper \%Opts; exit 0;
+
+my $t = IO::Pager::Perl->new(%Opts);
+
+my($PIPE, $FILE, @F, $prevsize);
+if( -t STDIN ){
+  if( scalar(@ARGV) == 1){
+    #Tail comes first because <ARGV> clobbers @ARGV
+    if( $Long{tail} ){
+      open($FILE, '<', $ARGV[0]) or die $!;
+      seek($FILE, 0, 2);
+      $prevsize = tell($FILE) }
+
+    @F = <ARGV> }
+  else{
+    #Current multi-file implementation gives us continuous numbering
+    
+    #Dead-simple option slurs everything together
+    # $t->add_text( <ARGV> );
+
+    my $i=1;
+    foreach my $file ( @ARGV ){
+      my $err='';
+      open(FILE, '<', $file) or $err=$!;
+      push @F, sprintf("======== \cF\c]\cL\cE [%i/%i] %s ========%s\n",
+		       $i++, $#ARGV+1, $file, $err), <FILE>;
+      $F[-1] .= $/ unless $F[-1] =~ /\n$/;
+      close(FILE);
+      $t->set_fileN($i);
+    }
+  }
+  $t->add_text(@F);
+}
+else{
+  #Separate piped input from keyboard input
+  open($PIPE, '<&=STDIN' ) or die $!;
+  close(STDIN);
+  open(STDIN, '<', '/dev/tty') or die $!;
+}
+
+eval{
+  $t->jump($Opts{jump}) if $Opts{jump};
+  while( $t->more(RT=>.05) ){
+    my $X;
+
+    if( defined($PIPE) ){
+      $t->add_text($X) if sysread($PIPE, $X, 1024);
+    }
+    elsif( $Long{tail} ){
+      my $cursize = -s $FILE;
+      if( $cursize > $prevsize ){
+	$t->add_text($X) if sysread($FILE, $X, $cursize-$prevsize);
+	$prevsize = $cursize;
+	$t->scrollbar() if $t->{scrollBar};
+      }
+    }
+  }
+};
+
+__END__
+=pod
+
+=head1 NAME
+
+tp - a pure perl pager
+
+=head1 SYNOPSIS
+
+    tp -[JSenrs] [-cols] [-f STR] [-j|+ #] [-p|+/ STR] [FILE]...
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-e>
+
+Exit at end of file.
+
+=item B<-f STR>
+
+If defined, the pager will pause when the character sequence specified
+by STR is encountered in the input text.
+
+The default value when enabled is formfeed i.e; ^L; in order to mimic
+traditional behavior of L<more/1>, but due to the pecularities of
+L<Getopt::Long>> you need to use the -- argument separator in order to
+to trigger this e.g;
+
+    tp -f -- foo #pauses on lines in foo with "^L" in them
+
+You might also supply a regular expression as STR e.g;
+
+    tp -f '[ie]t' bar #pauses on lines in bar with "it" or "et" in them
+
+=item B<-J>
+
+Add a column with markers indicating which lines match a search expression.
+
+=item B<-n>
+
+Display line numbering. Toggleable at run time with I<#>.
+
+=item B<-r>
+
+Send raw control characters from input unadulterated to the terminal.
+By default, chracters other than tab and newline will be converted to
+caret notation e.g; ^@ for null or ^L for form feed.
+
+=item B<-s>
+
+Squeeze multiple blank lines into one.
+
+=item B<-S>
+
+Do not fold long lines.
+
+=item B<-[> or B<--scrollbar>
+
+Display an interactive scrollbar in the right-most column.
+
+=item B<-$> or B<--tail>
+
+Keep checking the displayed file for new content.
+Only available when paging a single file.
+
+=cut
+
+#=item B<-rows>
+
+Set the number of rows for the pager.
+
+If absent, the terminal is queried directly with L<Term::ReadKey> if
+loaded or C<stty> or C<tput>, and if these fail it defaults to 25.
+
+=pod
+
+=item B<--cols>
+
+Set the number of columns for the pager.
+
+If absent, the terminal is queried directly with L<Term::ReadKey> if
+loaded or C<stty> or C<tput>, and if these fail it defaults to 80.
+
+=back
+
+=head1 User Interface
+
+C<C-> is Control, C<M-> is Meta/Alt, C<S-> is Shift, and C<\d+> is a sequence of digits
+
+=head2 General
+
+=over
+
+=item help - C<h> or C<H>
+
+=item close - C<q> or C<Q> or C<:q> or C<:Q>
+
+=item refresh - C<r> or C<C-l> or C<C-R>
+
+=item flush buffer - C<R>
+
+=item save buffer - C<:w>
+
+=item open file - C<:e>
+
+=back
+
+=head2 Navigation
+
+=over
+
+=item down one line - C<ENTER> or C<e> or C<j> or C<J> or C<C-e> or C<C-n> or C<down arrow>
+
+=item down half page - C<d> or C<C-d>
+
+=item down one page - C<SPACE> C<f> or C<z> or C<C-f> or C<C-v> or C<M-space> or C<PgDn>
+
+=item up one page - C<b> or C<w> or C<C-b> or C<M-v> or C<PgUp>
+
+=item up half page - C<u> or C<C-u>
+
+=item up one line - C<k> or C<y> or C<K> or C<Y> or C<C-K> or C<C-P> or C<C-Y> or C<up arrow>
+
+=item to bottom - C<G> or C<$> or C<E<gt>> or C<M-E<gt>> or C<End>
+
+=item to top - C<g> or C<E<lt>> or C<M-E<lt>>
+
+=item left one tab - C<left arrow>
+
+=item left half screen - C<S-left arrow>
+
+=item right one tab - C<right arrow>
+
+=item right half screen  - C<S-right arrow>
+
+=item jump to line number - C<\d+>
+
+=item next file - C<:n> or C<S-M-right arrow>
+
+=item previous file - C<:p> or C<S-M-left arrow>
+
+=back
+
+=head3 Bookmarks
+
+=over
+
+=item Save mark - C<m> or C<Ins>
+
+=item Goto mark - C<'>
+
+=item Special mark: Beginning of file - C<^>
+
+=item Special mark: End of file - C<$>
+
+=item Special mark: Previous location - C<'>
+
+=item Special mark: List user-created marks - C<">
+
+=item Special mark: C<\d> - Top of file \d when viewing multiple files
+
+=back
+
+=head2 Search
+
+=over
+
+=item forward - /
+
+=item backward - ? 
+
+=item next match - n or P
+
+=item previous match - p or N 
+
+=item grep (show only matching lines) - &
+
+=back
+
+=head1 Options
+
+=over
+
+=item toggle line-numbering - #
+
+=item toggle folding - S
+
+=item toggle raw/cooked output - C
+
+=back
+
+=head1 ENVIRONMENT
+
+tp checks the I<LESS>, I<MORE>, I<TPOPT>, I<TERM> and I<TERMCAP> variables.
+
+The I<TPOPT> variable is used to set options explicitly for tp, by
+concatenating undecorated options together e.g; Sr for squished raw output.
+
+I<LESS> and I<MORE> are checked for options that tp supports, and if detected
+they are enabled.
+
+=head1 SEE ALSO
+
+L<IO::Pager::Perl>, L<less(1)>
+
+=head1 AUTHORS
+
+    Jerrad Pierce jpierce@cpan.org
+
+=head1 LICENSE
+
+=over
+ 
+=item * Thou shalt not claim ownership of unmodified materials.
+
+=item * Thou shalt not claim whole ownership of modified materials.
+
+=item * Thou shalt grant the indemnity of the provider of materials.
+
+=item * Thou shalt use and dispense freely without other restrictions.
+
+=back
+
+Or, if you prefer:
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

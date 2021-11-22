@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::GAMMA;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_lngamma PDL::PP gsl_sf_gamma PDL::PP gsl_sf_gammastar PDL::PP gsl_sf_gammainv PDL::PP gsl_sf_lngamma_complex PDL::PP gsl_sf_taylorcoeff PDL::PP gsl_sf_fact PDL::PP gsl_sf_doublefact PDL::PP gsl_sf_lnfact PDL::PP gsl_sf_lndoublefact PDL::PP gsl_sf_lnchoose PDL::PP gsl_sf_choose PDL::PP gsl_sf_lnpoch PDL::PP gsl_sf_poch PDL::PP gsl_sf_pochrel PDL::PP gsl_sf_gamma_inc_Q PDL::PP gsl_sf_gamma_inc_P PDL::PP gsl_sf_lnbeta PDL::PP gsl_sf_beta );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_lngamma gsl_sf_gamma gsl_sf_gammastar gsl_sf_gammainv gsl_sf_lngamma_complex gsl_sf_taylorcoeff gsl_sf_fact gsl_sf_doublefact gsl_sf_lnfact gsl_sf_lndoublefact gsl_sf_lnchoose gsl_sf_choose gsl_sf_lnpoch gsl_sf_poch gsl_sf_pochrel gsl_sf_gamma_inc_Q gsl_sf_gamma_inc_P gsl_sf_lnbeta gsl_sf_beta );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::GAMMA ;
+
 
 
 
@@ -42,10 +41,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -600,7 +596,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -623,5 +619,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

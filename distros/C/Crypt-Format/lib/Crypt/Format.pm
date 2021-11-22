@@ -3,7 +3,7 @@ package Crypt::Format;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 our $BASE64_MODULE = 'MIME::Base64';
 
@@ -42,15 +42,17 @@ tired of writing out.
 
 =cut
 
+my $_LINE_SEP = "\n";
+
 sub der2pem {
     my ($der_r, $whatsit) = (\$_[0], $_[1]);
 
     die "Missing object type!" if !$whatsit;
 
-    my $pem = _do_base64('encode', $$der_r);
-    my $line_sep = substr($pem, -1);
+    my $pem = _do_base64('encode', $$der_r, q<>);
+    $pem = join( $_LINE_SEP, $pem =~ m<(.{1,64})>g, q<> );
 
-    substr( $pem, 0, 0, "-----BEGIN $whatsit-----$line_sep" );
+    substr( $pem, 0, 0, "-----BEGIN $whatsit-----$_LINE_SEP" );
     substr( $pem, length($pem), 0, "-----END $whatsit-----" );
 
     return $pem;
@@ -59,10 +61,11 @@ sub der2pem {
 sub pem2der {
     my ($pem) = @_;
 
-    chomp $pem;
-
+    # Strip the first line:
     $pem =~ s<.+?[\x0d\x0a]+><>s;
-    $pem =~ s<[\x0d\x0a]+[^\x0d\x0a]+?\z><>s;
+
+    # Strip the last line and any trailing CRs and LFs:
+    $pem =~ s<[\x0d\x0a]+ [^\x0d\x0a]+? [\x0d\x0a]*\z><>sx;
 
     return _do_base64('decode', $pem);
 }

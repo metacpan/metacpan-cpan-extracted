@@ -4,7 +4,7 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -57,8 +57,9 @@
          "web" : "http://github.com/book/perlsecret"
       }
    },
-   "version" : "1.016",
+   "version" : "1.017",
    "x_contributors" : [
+      "Ferenc Erki <ferki@cpan.org>",
       "Lorenzo Taviani <lorenzo@cpan.org>",
       "Slaven Rezi\u0107 <srezic@cpan.org>",
       "Mike Jones <mikejones@cpan.org>",
@@ -73,6 +74,7 @@
       "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason <avar@cpan.org>",
       "Abigail <abigail@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

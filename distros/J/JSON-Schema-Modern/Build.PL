@@ -20,7 +20,7 @@ if (!grep { $_ } values %errors)
     use strict;
     use warnings;
 
-    use 5.016;
+    use v5.20.0;
     # use Module::Build::Tiny 0.034;
     Module::Build::Tiny::Build_PL();
 }
@@ -82,14 +82,14 @@ EOW
         "ExtUtils::MakeMaker" => 0,
         "File::ShareDir::Install" => "0.06",
         "Module::Build::Tiny" => "0.034",
-        "perl" => "5.016"
+        "perl" => "5.020"
       },
       "dist_abstract" => "Validate data against a schema",
       "dist_author" => [
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Modern",
-      "dist_version" => "0.523",
+      "dist_version" => "0.525",
       "license" => "perl",
       "module_name" => "JSON::Schema::Modern",
       "recursive_test_files" => 1,
@@ -107,7 +107,6 @@ EOW
         "Mojo::URL" => 0,
         "Mojolicious" => "7.23",
         "Moo" => 0,
-        "Moo::Object" => 0,
         "Moo::Role" => 0,
         "MooX::HandlesVia" => 0,
         "MooX::TypeTiny" => "0.002002",
@@ -119,10 +118,11 @@ EOW
         "Sub::Install" => 0,
         "Types::Standard" => "1.010002",
         "constant" => 0,
+        "experimental" => 0,
         "if" => 0,
         "namespace::clean" => 0,
         "overload" => 0,
-        "perl" => "5.016",
+        "perl" => "v5.20.0",
         "strict" => 0,
         "strictures" => 2,
         "warnings" => 0
@@ -144,7 +144,7 @@ EOW
         "Test::Warnings" => 0,
         "lib" => 0,
         "open" => 0,
-        "perl" => "5.016",
+        "perl" => "v5.20.0",
         "utf8" => 0
       }
     );
@@ -164,7 +164,7 @@ EOW
       "Test::Warnings" => 0,
       "lib" => 0,
       "open" => 0,
-      "perl" => "5.016",
+      "perl" => "v5.20.0",
       "utf8" => 0
     );
 

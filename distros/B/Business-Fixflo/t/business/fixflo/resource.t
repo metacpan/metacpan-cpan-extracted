@@ -66,6 +66,7 @@ no warnings 'once';
     cmp_deeply(
         $Resource->get,
         bless( {
+            'warn_unknown_attributes' => ignore(),
             'client' => ignore(),
             'url'    => 'https://baz.fixflo.com/api/v2/Resource/1',
             'url_no_id' => 'https://baz.fixflo.com/api/v2/Resource',

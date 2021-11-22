@@ -9,7 +9,7 @@ use Getopt::Long;
 
 use Getopt::EX::Hashed 'has'; {
 
-    has answer    => '=i', min => 42, max => 42;
+    has answer => '=i', min => 42, max => 42;
 
     has answer_is => '=i', min => 42, max => 42,
 	action => sub {

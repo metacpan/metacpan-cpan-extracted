@@ -18,7 +18,7 @@ class Animal 1.23 {
 
 is( $Animal::VERSION, 1.23, 'Versioned class has $VERSION' );
 
-class Spider 4.56 isa Animal {
+class Spider 4.56 :isa(Animal) {
    sub BUILDARGS {
       my $self = shift;
       return $self->SUPER::BUILDARGS( 8 );
@@ -39,9 +39,9 @@ is( $Spider::VERSION, 4.56, 'Versioned subclass has $VERSION' );
 
 {
    ok( !eval <<'EOPERL',
-      class Antelope isa Animal 2.34;
+      class Antelope :isa(Animal 2.34);
 EOPERL
-      'isa insufficient version fails' );
+      ':isa insufficient version fails' );
    like( $@, qr/^Animal version 2.34 required--this is only version 1.23 /,
       'message from insufficient version' );
 }
@@ -51,7 +51,7 @@ EOPERL
    class BaseClass {
       has $_aslot;
 
-      class SubClass isa BaseClass {
+      class SubClass :isa(BaseClass) {
          method one { 1 }
       }
    }
@@ -70,7 +70,7 @@ EOPERL
       }
    }
 
-   class TrivialSubclass isa WithAdjustParams {}
+   class TrivialSubclass :isa(WithAdjustParams) {}
 
    TrivialSubclass->new( param => "value" );
    is( $param, "value", 'ADJUSTPARAMS still invoked on superclass' );

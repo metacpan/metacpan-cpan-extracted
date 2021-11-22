@@ -1,3 +1,7 @@
+0.000027  2021-11-04 14:18:05-07:00 America/Los_Angeles
+
+    - Add ability to trace opens for debugging
+
 0.000026  2021-11-03 14:22:24-07:00 America/Los_Angeles
 
     - Add ability to manually touch coverage data

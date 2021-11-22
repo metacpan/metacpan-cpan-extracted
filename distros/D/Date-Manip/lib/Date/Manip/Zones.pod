@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Mar  1 14:22:21 EST 2021
-#    Data version: tzdata2021a
-#    Code version: tzcode2021a
+#    Generated on: Mon Nov 15 11:19:56 EST 2021
+#    Data version: tzdata2021e
+#    Code version: tzcode2021e
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -50,7 +50,6 @@ database:
      TIME ZONE                            MODULE NAME         
      -----------------------------------  --------------------
      Africa/Abidjan                       afabid00
-     Africa/Accra                         afaccr00
      Africa/Algiers                       afalgi00
      Africa/Bissau                        afbiss00
      Africa/Cairo                         afcair00
@@ -85,13 +84,11 @@ database:
      America/Argentina/Tucuman            amtucu00
      America/Argentina/Ushuaia            amushu00
      America/Asuncion                     amasun00
-     America/Atikokan                     amatik00
      America/Bahia                        ambahi00
      America/Bahia_Banderas               ambahi01
      America/Barbados                     ambarb00
      America/Belem                        ambele00
      America/Belize                       ambeli00
-     America/Blanc-Sablon                 amblan00
      America/Boa_Vista                    amboa_00
      America/Bogota                       ambogo00
      America/Boise                        ambois00
@@ -103,9 +100,7 @@ database:
      America/Chicago                      amchic00
      America/Chihuahua                    amchih00
      America/Costa_Rica                   amcost00
-     America/Creston                      amcres00
      America/Cuiaba                       amcuia00
-     America/Curacao                      amcura00
      America/Danmarkshavn                 amdanm00
      America/Dawson                       amdaws00
      America/Dawson_Creek                 amdaws01
@@ -156,7 +151,6 @@ database:
      America/Moncton                      ammonc00
      America/Monterrey                    ammont01
      America/Montevideo                   ammont02
-     America/Nassau                       amnass00
      America/New_York                     amnew_00
      America/Nipigon                      amnipi00
      America/Nome                         amnome00
@@ -171,8 +165,7 @@ database:
      America/Paramaribo                   ampara00
      America/Phoenix                      amphoe00
      America/Port-au-Prince               amport00
-     America/Port_of_Spain                amport01
-     America/Porto_Velho                  amport02
+     America/Porto_Velho                  amport01
      America/Puerto_Rico                  ampuer00
      America/Punta_Arenas                 ampunt00
      America/Rainy_River                  amrain00
@@ -201,12 +194,10 @@ database:
      America/Yellowknife                  amyell00
      Antarctica/Casey                     ancase00
      Antarctica/Davis                     andavi00
-     Antarctica/DumontDUrville            andumo00
      Antarctica/Macquarie                 anmacq00
      Antarctica/Mawson                    anmaws00
      Antarctica/Palmer                    anpalm00
      Antarctica/Rothera                   anroth00
-     Antarctica/Syowa                     ansyow00
      Antarctica/Troll                     antrol00
      Antarctica/Vostok                    anvost00
      Asia/Almaty                          asalma00
@@ -370,7 +361,6 @@ database:
      Pacific/Chuuk                        pachuu00
      Pacific/Easter                       paeast00
      Pacific/Efate                        paefat00
-     Pacific/Enderbury                    paende00
      Pacific/Fakaofo                      pafaka00
      Pacific/Fiji                         pafiji00
      Pacific/Funafuti                     pafuna00
@@ -379,6 +369,7 @@ database:
      Pacific/Guadalcanal                  paguad00
      Pacific/Guam                         paguam00
      Pacific/Honolulu                     pahono00
+     Pacific/Kanton                       pakant00
      Pacific/Kiritimati                   pakiri00
      Pacific/Kosrae                       pakosr00
      Pacific/Kwajalein                    pakwaj00
@@ -476,6 +467,7 @@ The zoneinfo database provides several standard aliases, including:
 
      ALTERNATE NAME                       TIME ZONE           
      -----------------------------------  --------------------
+     Africa/Accra                         Africa/Abidjan
      Africa/Addis_Ababa                   Africa/Nairobi
      Africa/Asmara                        Africa/Nairobi
      Africa/Asmera                        Africa/Nairobi
@@ -510,45 +502,53 @@ The zoneinfo database provides several standard aliases, including:
      Africa/Ouagadougou                   Africa/Abidjan
      Africa/Porto-Novo                    Africa/Lagos
      Africa/Timbuktu                      Africa/Abidjan
-     America/Anguilla                     America/Port_of_Spain
-     America/Antigua                      America/Port_of_Spain
+     America/Anguilla                     America/Puerto_Rico
+     America/Antigua                      America/Puerto_Rico
      America/Argentina/ComodRivadavia     America/Argentina/Catamarca
-     America/Aruba                        America/Curacao
+     America/Aruba                        America/Puerto_Rico
+     America/Atikokan                     America/Panama
      America/Atka                         America/Adak
+     America/Blanc-Sablon                 America/Puerto_Rico
      America/Buenos_Aires                 America/Argentina/Buenos_Aires
      America/Catamarca                    America/Argentina/Catamarca
      America/Cayman                       America/Panama
-     America/Coral_Harbour                America/Atikokan
+     America/Coral_Harbour                America/Panama
      America/Cordoba                      America/Argentina/Cordoba
-     America/Dominica                     America/Port_of_Spain
+     America/Creston                      America/Phoenix
+     America/Curacao                      America/Puerto_Rico
+     America/Dominica                     America/Puerto_Rico
      America/Ensenada                     America/Tijuana
      America/Fort_Wayne                   America/Indiana/Indianapolis
      America/Godthab                      America/Nuuk
-     America/Grenada                      America/Port_of_Spain
-     America/Guadeloupe                   America/Port_of_Spain
+     America/Grenada                      America/Puerto_Rico
+     America/Guadeloupe                   America/Puerto_Rico
      America/Indianapolis                 America/Indiana/Indianapolis
      America/Jujuy                        America/Argentina/Jujuy
      America/Knox_IN                      America/Indiana/Knox
-     America/Kralendijk                   America/Curacao
+     America/Kralendijk                   America/Puerto_Rico
      America/Louisville                   America/Kentucky/Louisville
-     America/Lower_Princes                America/Curacao
-     America/Marigot                      America/Port_of_Spain
+     America/Lower_Princes                America/Puerto_Rico
+     America/Marigot                      America/Puerto_Rico
      America/Mendoza                      America/Argentina/Mendoza
      America/Montreal                     America/Toronto
-     America/Montserrat                   America/Port_of_Spain
+     America/Montserrat                   America/Puerto_Rico
+     America/Nassau                       America/Toronto
+     America/Port_of_Spain                America/Puerto_Rico
      America/Porto_Acre                   America/Rio_Branco
      America/Rosario                      America/Argentina/Cordoba
      America/Santa_Isabel                 America/Tijuana
      America/Shiprock                     America/Denver
-     America/St_Barthelemy                America/Port_of_Spain
-     America/St_Kitts                     America/Port_of_Spain
-     America/St_Lucia                     America/Port_of_Spain
-     America/St_Thomas                    America/Port_of_Spain
-     America/St_Vincent                   America/Port_of_Spain
-     America/Tortola                      America/Port_of_Spain
-     America/Virgin                       America/Port_of_Spain
+     America/St_Barthelemy                America/Puerto_Rico
+     America/St_Kitts                     America/Puerto_Rico
+     America/St_Lucia                     America/Puerto_Rico
+     America/St_Thomas                    America/Puerto_Rico
+     America/St_Vincent                   America/Puerto_Rico
+     America/Tortola                      America/Puerto_Rico
+     America/Virgin                       America/Puerto_Rico
+     Antarctica/DumontDUrville            Pacific/Port_Moresby
      Antarctica/McMurdo                   Pacific/Auckland
      Antarctica/South_Pole                Pacific/Auckland
+     Antarctica/Syowa                     Asia/Riyadh
      Arctic/Longyearbyen                  Europe/Oslo
      Asia/Aden                            Asia/Riyadh
      Asia/Ashkhabad                       Asia/Ashgabat
@@ -641,6 +641,7 @@ The zoneinfo database provides several standard aliases, including:
      NZ-CHAT                              Pacific/Chatham
      Navajo                               America/Denver
      PRC                                  Asia/Shanghai
+     Pacific/Enderbury                    Pacific/Kanton
      Pacific/Johnston                     Pacific/Honolulu
      Pacific/Midway                       Pacific/Pago_Pago
      Pacific/Ponape                       Pacific/Pohnpei
@@ -704,9 +705,7 @@ default alias can be overridden as described above.
                                           America/Pangnirtung
                                           America/Barbados
                                           America/Martinique
-                                          America/Blanc-Sablon
-     AST4APT                              America/Blanc-Sablon
-                                          America/Glace_Bay
+     AST4APT                              America/Glace_Bay
                                           America/Halifax
                                           America/Moncton
                                           America/Pangnirtung
@@ -793,7 +792,6 @@ default alias can be overridden as described above.
                                           America/Kentucky/Louisville
                                           America/Indiana/Indianapolis
                                           America/Indiana/Vevay
-                                          America/Atikokan
      CST6CPT                              America/Belize
                                           America/Chicago
                                           America/Indiana/Indianapolis
@@ -840,7 +838,6 @@ default alias can be overridden as described above.
                                           America/Nipigon
                                           America/Toronto
                                           America/Detroit
-                                          America/Nassau
                                           America/Kentucky/Louisville
                                           America/Indiana/Indianapolis
                                           America/Indiana/Marengo
@@ -1147,13 +1144,11 @@ L<Date::Manip::TZ> module.
      0      -12:00:00   Etc/GMT-12
                         M
                         Pacific/Kwajalein
-                        Pacific/Enderbury
+                        Pacific/Kanton
      0      -11:46:38   America/Adak
-     0      -11:30:00   Pacific/Niue
-                        Pacific/Apia
+     0      -11:30:00   Pacific/Apia
      0      -11:26:56   Pacific/Apia
      0      -11:24:56   Pacific/Fakaofo
-     0      -11:24:20   Pacific/Enderbury
      0      -11:22:48   Pacific/Pago_Pago
      0      -11:20:00   Pacific/Niue
      0      -11:19:40   Pacific/Niue
@@ -1164,7 +1159,7 @@ L<Date::Manip::TZ> module.
                         L
                         Pacific/Fakaofo
                         Pacific/Apia
-                        Pacific/Enderbury
+                        Pacific/Kanton
                         America/Adak
                         America/Nome
      0      -10:40:00   Pacific/Kiritimati
@@ -1226,10 +1221,8 @@ L<Date::Manip::TZ> module.
                         America/Hermosillo
                         America/Mazatlan
                         America/Boise
-                        America/Creston
      0      -07:52:58   America/Los_Angeles
      0      -07:48:04   America/Tijuana
-     0      -07:46:04   America/Creston
      0      -07:44:49   America/Boise
      0      -07:33:52   America/Edmonton
      0      -07:28:18   America/Phoenix
@@ -1241,7 +1234,6 @@ L<Date::Manip::TZ> module.
      0      -07:01:00   America/Bahia_Banderas
      0      -07:00:00   America/Denver
                         America/Phoenix
-                        America/Creston
                         America/Edmonton
                         America/Cambridge_Bay
                         America/Chihuahua
@@ -1277,7 +1269,6 @@ L<Date::Manip::TZ> module.
      0      -06:36:36   America/Mexico_City
      0      -06:28:36   America/Winnipeg
      0      -06:18:16   America/Rainy_River
-     0      -06:06:28   America/Atikokan
      0      -06:02:04   America/Guatemala
      0      -06:00:00   America/Chicago
                         America/Indiana/Knox
@@ -1323,7 +1314,6 @@ L<Date::Manip::TZ> module.
                         America/Indiana/Vevay
                         America/Hermosillo
                         America/Mazatlan
-                        America/Atikokan
                         America/Detroit
                         America/Thunder_Bay
      0      -05:58:28   America/Merida
@@ -1357,7 +1347,6 @@ L<Date::Manip::TZ> module.
      0      -05:18:08   America/Panama
      0      -05:17:32   America/Toronto
      0      -05:14:00   America/Guayaquil
-     0      -05:09:30   America/Nassau
      0      -05:08:36   America/Lima
      0      -05:08:12   America/Lima
      0      -05:07:10   America/Jamaica
@@ -1370,7 +1359,6 @@ L<Date::Manip::TZ> module.
                         America/Thunder_Bay
                         America/Grand_Turk
                         America/Jamaica
-                        America/Nassau
                         America/Bogota
                         America/Eirunepe
                         America/Rio_Branco
@@ -1378,7 +1366,6 @@ L<Date::Manip::TZ> module.
                         America/Port-au-Prince
                         America/Havana
                         America/Guayaquil
-                        America/Atikokan
                         America/Iqaluit
                         America/Indiana/Vevay
                         America/Indiana/Indianapolis
@@ -1418,7 +1405,6 @@ L<Date::Manip::TZ> module.
      0      -04:39:36   America/Santo_Domingo
      0      -04:39:28   America/Eirunepe
      0      -04:36:52   America/Argentina/Rio_Gallegos
-     0      -04:35:47   America/Curacao
      0      -04:35:16   America/Argentina/Mendoza
      0      -04:35:08   America/Thule
      0      -04:34:04   America/Argentina/San_Juan
@@ -1426,7 +1412,6 @@ L<Date::Manip::TZ> module.
      0      -04:32:36   America/La_Paz
      0      -04:31:12   America/Rio_Branco
      0      -04:30:00   America/Caracas
-                        America/Curacao
      0      -04:27:44   America/Caracas
      0      -04:27:40   America/Caracas
      0      -04:27:24   America/Argentina/La_Rioja
@@ -1452,18 +1437,17 @@ L<Date::Manip::TZ> module.
                         America/Argentina/Ushuaia
      0      -04:15:36   America/Porto_Velho
      0      -04:14:24   America/Halifax
-     0      -04:06:04   America/Port_of_Spain
      0      -04:04:20   America/Martinique
      0      -04:02:40   America/Boa_Vista
      0      -04:01:40   America/Goose_Bay
      0      -04:00:04   America/Manaus
-     0      -04:00:00   America/Blanc-Sablon
-                        America/Puerto_Rico
+     0      -04:00:00   America/Puerto_Rico
                         America/Glace_Bay
                         America/Halifax
                         America/Moncton
+                        America/Barbados
+                        America/Guyana
                         America/Martinique
-                        America/Port_of_Spain
                         America/Boa_Vista
                         America/Campo_Grande
                         America/Cuiaba
@@ -1473,13 +1457,10 @@ L<Date::Manip::TZ> module.
                         America/Santiago
                         Atlantic/Bermuda
                         America/Asuncion
-                        America/Barbados
                         America/La_Paz
                         America/Caracas
-                        America/Curacao
                         America/Goose_Bay
                         America/Santo_Domingo
-                        America/Guyana
                         Etc/GMT-4
                         D
                         America/Grand_Turk
@@ -1508,10 +1489,9 @@ L<Date::Manip::TZ> module.
      0      -03:59:48   America/Glace_Bay
      0      -03:58:29   America/Barbados
      0      -03:53:48   America/Argentina/Buenos_Aires
-     0      -03:52:40   America/Guyana
+     0      -03:52:39   America/Guyana
      0      -03:51:24   Atlantic/Stanley
      0      -03:50:40   America/Asuncion
-     0      -03:48:28   America/Blanc-Sablon
      0      -03:45:00   America/Guyana
      0      -03:44:51   America/Montevideo
      0      -03:44:40   America/Miquelon
@@ -1612,14 +1592,12 @@ L<Date::Manip::TZ> module.
      0      -00:16:08   Africa/Abidjan
      0      -00:14:44   Europe/Madrid
      0      -00:01:15   Europe/London
-     0      -00:00:52   Africa/Accra
      0      +00:00:00   WET
                         Europe/London
                         Atlantic/Faroe
                         Europe/Lisbon
                         Africa/Abidjan
                         Africa/Sao_Tome
-                        Africa/Accra
                         Atlantic/Canary
                         Atlantic/Madeira
                         Atlantic/Reykjavik
@@ -1649,18 +1627,17 @@ L<Date::Manip::TZ> module.
                         Europe/Monaco
                         Europe/Paris
                         Europe/Luxembourg
+                        Pacific/Kanton
                         America/Yellowknife
                         America/Pangnirtung
                         America/Cambridge_Bay
                         Africa/Lagos
                         Antarctica/Casey
                         Antarctica/Davis
-                        Antarctica/DumontDUrville
                         Antarctica/Macquarie
                         Antarctica/Mawson
                         Antarctica/Palmer
                         Antarctica/Rothera
-                        Antarctica/Syowa
                         Antarctica/Vostok
      0      +00:06:04   Europe/Andorra
      0      +00:09:21   Europe/Paris
@@ -1676,8 +1653,7 @@ L<Date::Manip::TZ> module.
      0      +00:26:56   Africa/Sao_Tome
      0      +00:29:32   Europe/Monaco
      0      +00:29:46   Europe/Zurich
-     0      +00:30:00   Africa/Accra
-                        Africa/Lagos
+     0      +00:30:00   Africa/Lagos
      0      +00:34:08   Europe/Zurich
      0      +00:40:44   Africa/Tunis
      0      +00:43:00   Europe/Oslo
@@ -1844,7 +1820,6 @@ L<Date::Manip::TZ> module.
                         Africa/Juba
                         Etc/GMT+3
                         P
-                        Antarctica/Syowa
                         Africa/Khartoum
                         Asia/Famagusta
                         Europe/Saratov
@@ -2163,7 +2138,6 @@ L<Date::Manip::TZ> module.
                         Asia/Ust-Nera
                         Etc/GMT+10
                         W
-                        Antarctica/DumontDUrville
                         Antarctica/Macquarie
                         Asia/Magadan
                         Asia/Sakhalin
@@ -2247,17 +2221,18 @@ L<Date::Manip::TZ> module.
      0      +12:13:48   Pacific/Chatham
      0      +12:15:00   Pacific/Chatham
      0      +12:15:20   Pacific/Wallis
-     0      +12:19:20   Pacific/Tongatapu
+     0      +12:19:12   Pacific/Tongatapu
      0      +12:20:00   Pacific/Tongatapu
      0      +12:33:04   Pacific/Apia
      0      +12:37:12   Pacific/Pago_Pago
      0      +12:45:00   Pacific/Chatham
      0      +12:58:22   America/Nome
      0      +13:00:00   Pacific/Tongatapu
-                        Pacific/Enderbury
+                        Pacific/Kanton
                         Pacific/Fakaofo
                         Pacific/Apia
                         Asia/Anadyr
+     0      +13:20:56   Pacific/Rarotonga
      0      +14:00:00   Pacific/Kiritimati
      0      +14:00:24   America/Anchorage
      0      +14:41:05   America/Yakutat
@@ -2348,7 +2323,6 @@ L<Date::Manip::TZ> module.
                         America/Kentucky/Louisville
                         America/Yellowknife
                         America/Indiana/Indianapolis
-                        America/Atikokan
                         America/Indiana/Vevay
      1      -04:30:00   America/Santo_Domingo
      1      -04:00:00   America/New_York
@@ -2357,7 +2331,6 @@ L<Date::Manip::TZ> module.
                         America/Havana
                         America/Detroit
                         America/Iqaluit
-                        America/Nassau
                         America/Thunder_Bay
                         America/Kentucky/Louisville
                         America/Indiana/Indianapolis
@@ -2384,6 +2357,7 @@ L<Date::Manip::TZ> module.
                         America/Punta_Arenas
                         America/Santiago
      1      -03:32:36   America/La_Paz
+     1      -03:30:00   America/Barbados
      1      -03:19:18   Atlantic/Bermuda
      1      -03:00:00   America/Halifax
                         America/Glace_Bay
@@ -2417,7 +2391,6 @@ L<Date::Manip::TZ> module.
                         America/Barbados
                         America/Martinique
                         America/Iqaluit
-                        America/Blanc-Sablon
                         America/Puerto_Rico
                         America/Montevideo
                         Antarctica/Palmer
@@ -2467,8 +2440,6 @@ L<Date::Manip::TZ> module.
                         Atlantic/Reykjavik
                         Atlantic/Madeira
                         Europe/Prague
-     1      +00:20:00   Africa/Accra
-     1      +00:30:00   Africa/Accra
      1      +00:34:39   Europe/Dublin
      1      +01:00:00   WET
                         Europe/Lisbon
@@ -2761,7 +2732,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Pangnirtung
                       America/Barbados
                       America/Martinique
-                      America/Blanc-Sablon
      AEDT             Australia/Melbourne
                       Australia/Hobart
                       Australia/Sydney
@@ -2796,22 +2766,18 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Athens
      APT              America/Halifax
                       America/Anchorage
-                      America/Blanc-Sablon
                       America/Glace_Bay
                       America/Moncton
                       America/Pangnirtung
                       America/Puerto_Rico
-     AST              America/Blanc-Sablon
-                      America/Puerto_Rico
+     AST              America/Puerto_Rico
                       America/Glace_Bay
                       America/Halifax
                       America/Moncton
+                      America/Barbados
                       America/Martinique
-                      America/Port_of_Spain
                       America/Thule
                       Atlantic/Bermuda
-                      America/Barbados
-                      America/Curacao
                       America/Goose_Bay
                       America/Santo_Domingo
                       America/Grand_Turk
@@ -2822,7 +2788,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
      AWST             Australia/Perth
      AWT              America/Halifax
                       America/Anchorage
-                      America/Blanc-Sablon
                       America/Glace_Bay
                       America/Moncton
                       America/Pangnirtung
@@ -2832,8 +2797,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/London
      BDT              America/Adak
                       America/Nome
-     BMT              America/Barbados
-                      Europe/Bucharest
+     BMT              Europe/Bucharest
                       Europe/Chisinau
                       Atlantic/Bermuda
                       Asia/Jakarta
@@ -2897,7 +2861,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Indiana/Marengo
                       America/Kentucky/Louisville
                       America/Indiana/Indianapolis
-                      America/Atikokan
                       America/Indiana/Vevay
      CEMT             Europe/Berlin
      CEST             CET
@@ -2996,7 +2959,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Panama
                       Europe/Copenhagen
      CPT              America/Chicago
-                      America/Atikokan
                       America/Belize
                       America/Indiana/Indianapolis
                       America/Indiana/Knox
@@ -3055,11 +3017,9 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Indiana/Vevay
                       America/Hermosillo
                       America/Mazatlan
-                      America/Atikokan
                       America/Detroit
                       America/Thunder_Bay
      CWT              America/Chicago
-                      America/Atikokan
                       America/Belize
                       America/Indiana/Indianapolis
                       America/Indiana/Knox
@@ -3087,7 +3047,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Nipigon
                       America/Toronto
                       America/Detroit
-                      America/Nassau
                       America/Kentucky/Louisville
                       America/Indiana/Indianapolis
                       America/Indiana/Marengo
@@ -3162,7 +3121,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
      EPT              America/New_York
                       America/Detroit
                       America/Iqaluit
-                      America/Nassau
                       America/Nipigon
                       America/Thunder_Bay
                       America/Toronto
@@ -3173,10 +3131,8 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Thunder_Bay
                       America/Grand_Turk
                       America/Jamaica
-                      America/Nassau
                       America/Detroit
                       America/Port-au-Prince
-                      America/Atikokan
                       America/Iqaluit
                       America/Indiana/Vevay
                       America/Indiana/Indianapolis
@@ -3202,7 +3158,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
      EWT              America/New_York
                       America/Detroit
                       America/Iqaluit
-                      America/Nassau
                       America/Nipigon
                       America/Thunder_Bay
                       America/Toronto
@@ -3215,7 +3170,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/London
                       Africa/Abidjan
                       Africa/Sao_Tome
-                      Africa/Accra
                       Europe/Dublin
                       Atlantic/Reykjavik
                       Africa/Monrovia
@@ -3363,7 +3317,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Kaliningrad
      MST              America/Denver
                       America/Phoenix
-                      America/Creston
                       America/Edmonton
                       America/Cambridge_Bay
                       America/Chihuahua
@@ -3470,7 +3423,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Hermosillo
                       America/Mazatlan
                       America/Boise
-                      America/Creston
      PWT              America/Dawson_Creek
                       America/Fort_Nelson
                       America/Juneau

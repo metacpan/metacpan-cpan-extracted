@@ -3,12 +3,12 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.51;
+use Object::Pad 0.57;
 
-package Tickit::SingleChildWidget 0.55;
+package Tickit::SingleChildWidget 0.56;
 class Tickit::SingleChildWidget
-   extends Tickit::ContainerWidget
-   implements Tickit::WidgetRole::SingleChildContainer;
+   :isa(Tickit::ContainerWidget)
+   :does(Tickit::WidgetRole::SingleChildContainer);
 
 use Carp;
 

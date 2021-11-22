@@ -15,7 +15,7 @@ use Test::Differences qw(eq_or_diff);
 use Test::More;
 use Test::UnixExit qw(exit_is exit_is_nonzero);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has cmd => (
     is      => 'rwp',
@@ -44,13 +44,19 @@ sub BUILD {
         # interacts with chdir (or if the caller is making any of those)
         $self->_set_cmd( Test::Cmd->new( prog => $args->{cmd}, workdir => '' ) );
     }
+    # TODO better way to apply Devel::Cover to only the script runs?
+    if ( $ENV{DEVEL_COVER} ) {
+        diag "coverage enabled... (slow)";
+        `cover -delete`;
+        $ENV{PERL5OPT} = '-MDevel::Cover';
+    }
 }
 
 sub run {
     my ( $self, %p ) = @_;
 
     $p{env} //= {};
-    # no news is good news. and here is the default
+    # no news is good news. and here it is the default
     $p{status} //= 0;
     $p{stderr} //= qr/^$/;
     $p{stdout} //= qr/^$/;
@@ -108,10 +114,6 @@ In C<./t/echo.t> and assuming that an C<./echo> exists...
   # create testor for ./echo
   my $echo = Test::UnixCmdWrap->new;
 
-  # enable coverage of the (presumably Perl) program via
-  #`cover -delete`
-  #$ENV{PERL5OPT} = '-MDevel::Cover';
-
   # the program being tested
   $echo->prog;
 
@@ -149,6 +151,11 @@ C<Test::UnixCmdWrap> wraps L<Test::Cmd> and provides automatic filename
 detection of the program being tested, and tests the exit status word,
 stdout, and stderr of each program run. Various other parameters can be
 used to customize individual program runs.
+
+If the C<DEVEL_COVER> environment variable is true, L<Devel::Cover> will
+be enabled for the commands run under this module (unless one of the
+tests clears the environment, or changes C<PERL5LIB>). The current
+coverage database is deleted when this option is acted on.
 
 These are very specific tests for unix commands that behave in specific
 ways (known exit status word for given inputs, etc) so this module will

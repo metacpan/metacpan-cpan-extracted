@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GenPericmdCompleterScript/gen_pericmd_completer_script
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-30'; # DATE
-our $DIST = 'App-GenPericmdCompleterScript'; # DIST
-our $VERSION = '0.122'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-21'; # DATE
+our $DIST = 'App-GenPericmdCompleterScript'; # DIST
+our $VERSION = '0.123'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GenPericmdCompleterScript/gen_pericmd_completer_script",
@@ -36,27 +36,13 @@ gen-pericmd-completer - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.122 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2020-04-30.
+This document describes version 0.123 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2021-10-21.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gen-pericmd-completer [--completion-json=s] [--completion=s]
-     [--config-path=path | -c] [--config-profile=profile | -P]
-     [--default-subcommand=s] [--exclude-package-functions-match=s]
-     [--format=name] [--get-subcommand-from-arg=s]
-     [--include-package-functions-match=s] [--interpreter-path=s] [--json]
-     [--load-module-json=s] [--load-module=s+] [--(no)naked-res]
-     [--no-config | -C] [--no-env] [--no-overwrite] [--no-per-arg-json]
-     [--no-per-arg-yaml] [--no-read-config] [--no-read-env]
-     [--no-skip-format] [--no-strip] [--nooverwrite] [--noper-arg-json]
-     [--noper-arg-yaml] [--noread-config] [--noread-env] [--noskip-format]
-     [--nostrip] [-o=s] [--output-file=s] [--overwrite]
-     [--page-result[=program]] [--per-arg-json] [--per-arg-yaml]
-     [--read-config] [--read-env] [-s=s] [--skip-format] [--strip]
-     [--subcommands-from-package-functions] [--subcommands-json=s]
-     [--subcommands=s] <program_name> <url>
+% B<gen-pericmd-completer> [B<--completion>=I<code>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--default-subcommand>=I<str>] [B<--exclude-package-functions-match>=I<re>] [B<--format>=I<name>|B<--json>] [B<--get-subcommand-from-arg>=I<int>] [B<--include-package-functions-match>=I<re>] [B<--interpreter-path>=I<str>] [(B<--load-module>=I<str>)+] [B<--(no)naked-res>] [B<--no-env>] [B<--output-file>=I<filename>] [B<--overwrite>|B<--no-overwrite>|B<--nooverwrite>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--per-arg-json>|B<--no-per-arg-json>|B<--noper-arg-json>] [B<--per-arg-yaml>|B<--no-per-arg-yaml>|B<--noper-arg-yaml>] [B<--read-config>|B<--no-read-config>|B<--noread-config>] [B<--read-env>|B<--no-read-env>|B<--noread-env>] [B<--skip-format>|B<--no-skip-format>|B<--noskip-format>] [B<--strip>|B<--no-strip>|B<--nostrip>] [B<--subcommands-from-package-functions>] [B<--subcommands>=I<any*>] [B<--completion-json>=I<json>] [B<--load-module-json>=I<json>] [B<--subcommands-json>=I<json>|B<-s>=I<any*>] [B<-o>=I<filename>] -- E<lt>I<program_name>E<gt> E<lt>I<url>E<gt>
 
 =head1 OPTIONS
 
@@ -93,6 +79,8 @@ Can be specified multiple times.
 =item B<--program-name>=I<s>*
 
 Program name that is being completed.
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--strip>
 
@@ -201,6 +189,10 @@ Whether to overwrite output if previously exists.
 
 Filter output through a pager.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Pericmd attribute options
@@ -260,9 +252,13 @@ URL to function (or package, if you have subcommands) (JSON-encoded).
 
 See C<--url>.
 
+Can also be specified as the 2nd command-line argument.
+
 =item B<--url>=I<s>*
 
 URL to function (or package, if you have subcommands).
+
+Can also be specified as the 2nd command-line argument.
 
 =back
 
@@ -328,7 +324,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -376,6 +387,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-GenPer
 
 Source repository is at L<https://github.com/perlancar/perl-App-GenPericmdCompleterScript>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GenPericmdCompleterScript>
@@ -383,16 +422,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

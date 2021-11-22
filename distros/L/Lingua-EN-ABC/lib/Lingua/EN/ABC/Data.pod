@@ -364,6 +364,7 @@ in British English, or "vice" and "vise" in American English.
     | traveler          | traveller         | traveller         |          |          |         | Y          |
     | traveling         | travelling        | travelling        |          |          |         | Y          |
     | triple            | treble            | triple            |          |          |         |            |
+    | truck             | lorry             | truck             |          |          |         |            |
     | tumor             | tumour            | tumour            |          |          |         | Y          |
     | tunneled          | tunnelled         | tunnelled         |          |          |         | Y          |
     | tunneler          | tunneller         | tunneller         |          |          |         | Y          |

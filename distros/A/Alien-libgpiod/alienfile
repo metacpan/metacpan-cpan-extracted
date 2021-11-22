@@ -1,0 +1,19 @@
+# -*- cperl -*-
+use alienfile;
+
+plugin 'PkgConfig' => ( pkg_name => 'libgpiod' );
+
+share {
+    start_url 'http://mirrors.edge.kernel.org/pub/software/libs/libgpiod';
+    plugin 'Download' => (
+                          filter => qr/^libgpiod-[0-9.]+\.tar\.xz$/,
+                          version => qr/^libgpiod-([0-9.]+)\.tar\.xz$/
+                         );
+    plugin 'Extract' => 'tar.xz';
+    plugin 'Build::Autoconf';
+    build [
+           '%{configure}',
+           '%{make}',
+           '%{make} install'
+          ];
+};

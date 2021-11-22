@@ -146,7 +146,7 @@ class WithBuildargs {
    class One {
       BUILD { $BUILD_invoked++ }
    }
-   class Two isa One {}
+   class Two :isa(One) {}
 
    Two->new;
    is( $BUILD_invoked, 1, 'One::BUILD invoked only once for Two->new' );

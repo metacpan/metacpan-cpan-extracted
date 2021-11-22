@@ -1,5 +1,9 @@
 Revision history for PGObject-Util-DBMethod
 
+1.01.000 2021-11-07
+         Improve backtraces by allocating a function name to the generated
+         'dbmethod'.
+
 1.00.003 2019-09-20
          Correct dist to exclude MYMETA.json from archive
          as - still - pointed out by Kwalitee

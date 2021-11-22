@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::BESSEL;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_bessel_Jn PDL::PP gsl_sf_bessel_J_array PDL::PP gsl_sf_bessel_Yn PDL::PP gsl_sf_bessel_Y_array PDL::PP gsl_sf_bessel_In PDL::PP gsl_sf_bessel_I_array PDL::PP gsl_sf_bessel_In_scaled PDL::PP gsl_sf_bessel_I_scaled_array PDL::PP gsl_sf_bessel_Kn PDL::PP gsl_sf_bessel_K_array PDL::PP gsl_sf_bessel_Kn_scaled PDL::PP gsl_sf_bessel_K_scaled_array PDL::PP gsl_sf_bessel_jl PDL::PP gsl_sf_bessel_j_array PDL::PP gsl_sf_bessel_yl PDL::PP gsl_sf_bessel_y_array PDL::PP gsl_sf_bessel_il_scaled PDL::PP gsl_sf_bessel_i_scaled_array PDL::PP gsl_sf_bessel_kl_scaled PDL::PP gsl_sf_bessel_k_scaled_array PDL::PP gsl_sf_bessel_Jnu PDL::PP gsl_sf_bessel_Ynu PDL::PP gsl_sf_bessel_Inu_scaled PDL::PP gsl_sf_bessel_Inu PDL::PP gsl_sf_bessel_Knu_scaled PDL::PP gsl_sf_bessel_Knu PDL::PP gsl_sf_bessel_lnKnu );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_bessel_Jn gsl_sf_bessel_Jn_array gsl_sf_bessel_Yn gsl_sf_bessel_Yn_array gsl_sf_bessel_In gsl_sf_bessel_I_array gsl_sf_bessel_In_scaled gsl_sf_bessel_In_scaled_array gsl_sf_bessel_Kn gsl_sf_bessel_K_array gsl_sf_bessel_Kn_scaled gsl_sf_bessel_Kn_scaled_array gsl_sf_bessel_jl gsl_sf_bessel_jl_array gsl_sf_bessel_yl gsl_sf_bessel_yl_array gsl_sf_bessel_il_scaled gsl_sf_bessel_il_scaled_array gsl_sf_bessel_kl_scaled gsl_sf_bessel_kl_scaled_array gsl_sf_bessel_Jnu gsl_sf_bessel_Ynu gsl_sf_bessel_Inu_scaled gsl_sf_bessel_Inu gsl_sf_bessel_Knu_scaled gsl_sf_bessel_Knu gsl_sf_bessel_lnKnu );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::BESSEL ;
+
 
 
 
@@ -42,10 +41,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -80,7 +76,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 gsl_sf_bessel_J_array
+=head2 gsl_sf_bessel_Jn_array
 
 =for sig
 
@@ -92,7 +88,7 @@ Array of Regular Bessel Functions J_{s}(x) to J_{s+n-1}(x).
 
 =for bad
 
-gsl_sf_bessel_J_array does not process bad values.
+gsl_sf_bessel_Jn_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -103,7 +99,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*gsl_sf_bessel_J_array = \&PDL::gsl_sf_bessel_J_array;
+*gsl_sf_bessel_Jn_array = \&PDL::gsl_sf_bessel_Jn_array;
 
 
 
@@ -138,7 +134,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 gsl_sf_bessel_Y_array
+=head2 gsl_sf_bessel_Yn_array
 
 =for sig
 
@@ -150,7 +146,7 @@ Array of Regular Bessel Functions Y_{s}(x) to Y_{s+n-1}(x).
 
 =for bad
 
-gsl_sf_bessel_Y_array does not process bad values.
+gsl_sf_bessel_Yn_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -161,7 +157,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*gsl_sf_bessel_Y_array = \&PDL::gsl_sf_bessel_Y_array;
+*gsl_sf_bessel_Yn_array = \&PDL::gsl_sf_bessel_Yn_array;
 
 
 
@@ -254,7 +250,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 gsl_sf_bessel_I_scaled_array
+=head2 gsl_sf_bessel_In_scaled_array
 
 =for sig
 
@@ -266,7 +262,7 @@ Array of Scaled Regular Modified Bessel Functions exp(-|x|) I_{s}(x) to exp(-|x|
 
 =for bad
 
-gsl_sf_bessel_I_scaled_array does not process bad values.
+gsl_sf_bessel_In_scaled_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -277,7 +273,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*gsl_sf_bessel_I_scaled_array = \&PDL::gsl_sf_bessel_I_scaled_array;
+*gsl_sf_bessel_In_scaled_array = \&PDL::gsl_sf_bessel_In_scaled_array;
 
 
 
@@ -370,7 +366,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 gsl_sf_bessel_K_scaled_array
+=head2 gsl_sf_bessel_Kn_scaled_array
 
 =for sig
 
@@ -382,7 +378,7 @@ Array of Scaled IrRegular Modified Bessel Functions exp(-|x|) K_{s}(x) to exp(-|
 
 =for bad
 
-gsl_sf_bessel_K_scaled_array does not process bad values.
+gsl_sf_bessel_Kn_scaled_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -393,7 +389,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*gsl_sf_bessel_K_scaled_array = \&PDL::gsl_sf_bessel_K_scaled_array;
+*gsl_sf_bessel_Kn_scaled_array = \&PDL::gsl_sf_bessel_Kn_scaled_array;
 
 
 
@@ -428,7 +424,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 gsl_sf_bessel_j_array
+=head2 gsl_sf_bessel_jl_array
 
 =for sig
 
@@ -440,7 +436,7 @@ Array of Spherical Regular Bessel Functions J_{0}(x) to J_{n-1}(x).
 
 =for bad
 
-gsl_sf_bessel_j_array does not process bad values.
+gsl_sf_bessel_jl_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -451,7 +447,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*gsl_sf_bessel_j_array = \&PDL::gsl_sf_bessel_j_array;
+*gsl_sf_bessel_jl_array = \&PDL::gsl_sf_bessel_jl_array;
 
 
 
@@ -486,7 +482,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 gsl_sf_bessel_y_array
+=head2 gsl_sf_bessel_yl_array
 
 =for sig
 
@@ -498,7 +494,7 @@ Array of Regular Spherical Bessel Functions y_{0}(x) to y_{n-1}(x).
 
 =for bad
 
-gsl_sf_bessel_y_array does not process bad values.
+gsl_sf_bessel_yl_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -509,7 +505,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*gsl_sf_bessel_y_array = \&PDL::gsl_sf_bessel_y_array;
+*gsl_sf_bessel_yl_array = \&PDL::gsl_sf_bessel_yl_array;
 
 
 
@@ -544,7 +540,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 gsl_sf_bessel_i_scaled_array
+=head2 gsl_sf_bessel_il_scaled_array
 
 =for sig
 
@@ -556,7 +552,7 @@ Array of Scaled Regular Modified Spherical Bessel Functions exp(-|x|) i_{0}(x) t
 
 =for bad
 
-gsl_sf_bessel_i_scaled_array does not process bad values.
+gsl_sf_bessel_il_scaled_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -567,7 +563,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*gsl_sf_bessel_i_scaled_array = \&PDL::gsl_sf_bessel_i_scaled_array;
+*gsl_sf_bessel_il_scaled_array = \&PDL::gsl_sf_bessel_il_scaled_array;
 
 
 
@@ -602,7 +598,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 gsl_sf_bessel_k_scaled_array
+=head2 gsl_sf_bessel_kl_scaled_array
 
 =for sig
 
@@ -614,7 +610,7 @@ Array of Scaled IrRegular Modified Spherical Bessel Functions exp(-|x|) k_{s}(x)
 
 =for bad
 
-gsl_sf_bessel_k_scaled_array does not process bad values.
+gsl_sf_bessel_kl_scaled_array does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -625,7 +621,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*gsl_sf_bessel_k_scaled_array = \&PDL::gsl_sf_bessel_k_scaled_array;
+*gsl_sf_bessel_kl_scaled_array = \&PDL::gsl_sf_bessel_kl_scaled_array;
 
 
 
@@ -832,7 +828,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -856,5 +852,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

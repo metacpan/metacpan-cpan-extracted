@@ -5,7 +5,7 @@ package VMware::vCloudDirector2::Object;
 use strict;
 use warnings;
 
-our $VERSION = '0.107'; # VERSION
+our $VERSION = '0.108'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -337,7 +337,7 @@ VMware::vCloudDirector2::Object - Module to contain an object!
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head2 Attributes
 

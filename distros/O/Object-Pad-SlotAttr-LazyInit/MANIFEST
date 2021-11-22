@@ -2,11 +2,11 @@ Build.PL
 Changes
 lib/Object/Pad/SlotAttr/LazyInit.pm
 lib/Object/Pad/SlotAttr/LazyInit.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01lazyinit.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

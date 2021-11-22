@@ -3,7 +3,7 @@ package OpenTracing::SpanProxy;
 use strict;
 use warnings;
 
-our $VERSION = '1.003'; # VERSION
+our $VERSION = '1.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(OpenTracing::Common);
@@ -55,7 +55,13 @@ sub tags { shift->span->tags }
 
 sub tag { shift->span->tag(@_) }
 
+sub reference { shift->span->reference(@_) }
+
+sub references { shift->span->references }
+
 sub start_time { shift->span->start_time }
+
+sub finish_time { shift->span->finish_time }
 
 sub duration { shift->span->duration(@_) }
 
@@ -110,5 +116,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2021. Licensed under the same terms as Perl itself.
 

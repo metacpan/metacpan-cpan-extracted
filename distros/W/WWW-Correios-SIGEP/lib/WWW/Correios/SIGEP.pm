@@ -4,7 +4,7 @@ use warnings;
 use WWW::Correios::SIGEP::LogisticaReversa;
 use WWW::Correios::SIGEP::Common;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub new {
     my ($class, $params) = @_;
@@ -244,8 +244,8 @@ sub gera_xml_plp {
                         unless $valor_declarado >= 18.5 && $valor_declarado <= 10_000;
                 }
                 else {
-                    die "objetos[].codigo_postagem_sigla precisa ser SEDEX, PAC ou CARTA"
-                        unless $obj->{codigo_postagem_sigla} eq 'CARTA';
+                    die "objetos[].codigo_postagem_sigla ($obj->{codigo_postagem_sigla}) precisa ser SEDEX, PAC, CARTA ou MINI"
+                        unless $obj->{codigo_postagem_sigla} eq 'CARTA' || $obj->{codigo_postagem_sigla} eq 'MINI';
                 }
             }
             else {
@@ -904,7 +904,7 @@ Breno G. de Oliveira  C<< <garu@cpan.org> >>
 
 =head1 LICENÇA E COPYRIGHT
 
-Copyright (c) 2016, Breno G. de Oliveira. Todos os direitos reservados.
+Copyright (c) 2016-2021, Breno G. de Oliveira. Todos os direitos reservados.
 
 Este módulo é software livre; você pode redistribuí-lo e/ou
 modificá-lo sob os mesmos termos que o Perl. Veja L<perlartistic>.

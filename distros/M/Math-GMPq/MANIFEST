@@ -18,7 +18,7 @@ t/_1basic.t
 t/_itsa.t
 t/cmp_z.t
 t/divby0.t
-t/test1.t
+t/get_set_cmp_IV_NV.t
 t/longdouble.t
 t/NV_overloading.t
 t/NOK_and_POK.t
@@ -32,6 +32,7 @@ t/printf.t
 t/TRmpq_out_str.t
 t/pod.t
 t/Rmpq_integer_p.t
+t/test1.t
 t/z_arith.t
 t/z_arith_2.t
 t/z_arith_overload.t

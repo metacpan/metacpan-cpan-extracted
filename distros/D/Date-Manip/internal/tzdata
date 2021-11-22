@@ -12,7 +12,7 @@ use lib "./lib";
 use lib "./internal";
 
 require 5.010000;
-use YAML;
+use YAML::XS;
 use IO::File;
 use Date::Manip::Base;
 use Date::Manip::TZdata;
@@ -20,7 +20,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION='6.85';
+$VERSION='6.86';
 
 our ($dmb);
 $dmb = new Date::Manip::Base;
@@ -330,7 +330,7 @@ sub do_dump {
       my($module,$type) = @{ $module{$zone} };
       next  if ($type ne "tzdata");
       system("cd tzdata; " .
-             "./zdump -c $test_year -v $zone > dump/$module");
+             "./zdump -c $test_year -V $zone > dump/$module");
    }
    print "\n";
 }
@@ -2165,7 +2165,7 @@ sub do_clean {
 sub _yaml_read {
    my($file) = @_;
    return {}  if (! -e $file);
-   my($data) = YAML::LoadFile($file);
+   my($data) = YAML::XS::LoadFile($file);
    return {}  if (! defined $data);
    return $data;
 }
@@ -2174,7 +2174,7 @@ sub _yaml_write {
    my($data,$file,$backup) = @_;
 
    rename($file,"$file.bak")  if ($backup  &&  -e $file);
-   YAML::DumpFile($file,$data);
+   YAML::XS::DumpFile($file,$data);
 }
 
 # Local Variables:

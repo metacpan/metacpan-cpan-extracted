@@ -16,7 +16,7 @@ use List::MoreUtils qw(firstidx);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.1.0'; # VERSION
+our $VERSION = 'v1.2.0'; # VERSION
 
 has uri => (
     is       => 'ro',
@@ -303,6 +303,24 @@ sub begin_work {
     return $self;
 }
 
+# Override to try to acquire a lock on the string "sqitch working" without
+# waiting.
+sub try_lock {
+    shift->dbh->selectcol_arrayref(
+        q{SELECT get_lock('sqitch working', 0)}
+    )->[0]
+}
+
+# Override to try to acquire a lock on the string "sqitch working", waiting
+# for the lock until timeout.
+sub wait_lock {
+    my $self = shift;
+    $self->dbh->selectcol_arrayref(
+        q{SELECT get_lock('sqitch working', ?)},
+        undef, $self->lock_timeout
+    )->[0]
+}
+
 # Override to unlock the tables, otherwise future transactions on this
 # connection can fail.
 sub finish_work {
@@ -529,7 +547,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2020 iovation Inc.
+Copyright (c) 2012-2021 iovation Inc., David E. Wheeler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -16,6 +16,7 @@ is(ansiecho(qw(-n a b c))->{stdout}, "a b c", '-n a b c');
 is(ansiecho(qw(-j a b c))->{stdout}, "abc\n", '-j a b c');
 is(ansiecho(qw(-nj a b c))->{stdout}, "abc", '-nj a b c');
 is(ansiecho(qw(--separate=: a b c))->{stdout}, "a:b:c\n", '--seprate=: a b c');
+is(ansiecho(qw(--separate=\N{COLON} a b c))->{stdout}, "a:b:c\n", '--seprate=\N{COLON} a b c');
 
 is(ansiecho(qw(\\-c))->{stdout}, "-c\n", '\\-c');
 is(ansiecho(qw(\\055c))->{stdout}, "-c\n", '\\055c');

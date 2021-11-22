@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::PSI;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_psi PDL::PP gsl_sf_psi_1piy PDL::PP gsl_sf_psi_n );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_psi gsl_sf_psi_1piy gsl_sf_psi_n );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::PSI ;
+
 
 
 
@@ -47,10 +46,7 @@ psi(m,x) := (d/dx)^m psi(0,x) = (d/dx)^{m+1} log(gamma(x))
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -141,7 +137,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -164,5 +160,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

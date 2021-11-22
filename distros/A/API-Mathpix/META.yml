@@ -1,0 +1,40 @@
+---
+abstract: 'Use the API of Mathpix'
+author:
+  - "Eriam Schaffter, C<< <eriam at mediavirtuel.com> >>\r"
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.15, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: API-Mathpix
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  API::Mathpix:
+    file: lib/API/Mathpix.pm
+    version: '0.01'
+requires:
+  Algorithm::LeakyBucket: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+resources:
+  bugtracker: https://github.com/eriam/API-Mathpix/issues
+  homepage: https://github.com/eriam/API-Mathpix
+  repository: git://github.com/eriam/API-Mathpix.git
+version: '0.01'
+x_contributors:
+  - 'Eriam Schaffter <eriam@mediavirtuel.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,6 +3,7 @@ package
 use strict;
 use warnings;
 use Env qw/@PATH/;
+use Cwd 'abs_path';
 
 sub configure {
     my $result = run(@_);
@@ -11,6 +12,7 @@ sub configure {
 
 sub run {
     my ($bdir, $props_dir, $target, $options) = @_;
+    $props_dir = abs_path($props_dir); # in case, it has symlink in path: cmake cannot work with build dirs with symlink parts
     my $ok = eval { require Alien::cmake3; 1 };
     die "This module requires Alien::cmake3 to build.\n" unless $ok;
 

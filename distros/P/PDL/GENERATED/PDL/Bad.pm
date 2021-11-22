@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Bad;
 
-our @EXPORT_OK = qw( badflag check_badflag badvalue orig_badvalue nbad nbadover ngood ngoodover setbadat  PDL::PP isbad PDL::PP isgood PDL::PP nbadover PDL::PP ngoodover PDL::PP setbadif PDL::PP setvaltobad PDL::PP setnantobad PDL::PP setbadtonan PDL::PP setbadtoval PDL::PP copybad );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(badflag check_badflag badvalue orig_badvalue nbad nbadover ngood ngoodover setbadat  isbad isgood nbadover ngoodover setbadif setvaltobad setnantobad setinftobad setnonfinitetobad setbadtonan setbadtoval copybad );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Bad ;
+
 
 
 
@@ -69,10 +68,7 @@ Set to 1 as of PDL 2.035 as always available.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -155,8 +151,7 @@ C<$x> have that value, they will unceremoniously be marked
 as bad data. See L</setvaltobad>, L</setbadtoval>, and
 L</setbadif> for ways to actually modify the data in ndarrays
 
-If the C<$PDL::Bad::PerPdl> flag is set then it is possible to
-change the bad value on a per-ndarray basis, so
+It is possible to change the bad value on a per-ndarray basis, so
 
     $x = sequence (10);
     $x->badvalue (3); $x->badflag (1);
@@ -164,11 +159,7 @@ change the bad value on a per-ndarray basis, so
     $y->badvalue (4); $y->badflag (1);
 
 will set $x to be C<[0 1 2 BAD 4 5 6 7 8 9]> and $y to be
-C<[0 1 2 3 BAD 5 6 7 8 9]>. If the flag is not set then both
-$x and $y will be set to C<[0 1 2 3 BAD 5 6 7 8 9]>. Please
-note that the code to support per-ndarray bad values is
-I<experimental> in the current release, and it requires that
-you modify the settings under which PDL is compiled.
+C<[0 1 2 3 BAD 5 6 7 8 9]>.
 
 =for bad
 
@@ -253,16 +244,14 @@ sub PDL::badvalue {
 	    $self->inplace->setbadtoval( $val );
 	    $self->badflag(1);
 	}
-	my $name = "PDL::_badvalue_per_pdl_int$num";
-	return &{$name}($self, $val);
+	return PDL::_badvalue_per_pdl_int($self, $val, $num);
     } elsif ( UNIVERSAL::isa($self,"PDL::Type") ) {
 	$num = $self->enum;
     } else {
         # assume it's a number
         $num = $self;
     }
-    my $name = "PDL::_badvalue_int$num";
-    &{$name}( $val );
+    PDL::_badvalue_int( $val, $num );
 }
 
 sub PDL::orig_badvalue {
@@ -277,8 +266,7 @@ sub PDL::orig_badvalue {
         # assume it's a number
         $num = $self;
     }
-    my $name = "PDL::_default_badvalue_int$num";
-    return &${name}();
+    PDL::_default_badvalue_int($num);
 }
 
 ############################################################
@@ -632,7 +620,7 @@ Set bad all those elements which equal the supplied value.
 
 This is a simpler version of L</setbadif>, but this
 function can be done inplace.  See L</setnantobad>
-if you want to convert NaN/Inf to the bad value.
+if you want to convert NaN to the bad value.
 
 =for bad
 
@@ -663,7 +651,7 @@ Any bad values in the input ndarrays are copied across to the output ndarray.
 
 =for ref
 
-Sets NaN/Inf values in the input ndarray bad
+Sets NaN values (for complex, where either is NaN) in the input ndarray bad
 (only relevant for floating-point ndarrays).
 Can be done inplace.
 
@@ -675,11 +663,11 @@ Can be done inplace.
 =for bad
 
 This method can process ndarrays with bad values: those bad values
-are propagated into the output ndarray. Any value that is not finite
+are propagated into the output ndarray. Any value that is not a number
+(before version 2.040 the test was for "not finite")
 is also set to bad in the output ndarray. If all values from the input
-ndarray are good and finite, the output ndarray will B<not> have its
-bad flag set. One more caveat: if done inplace, and if the input ndarray's
-bad flag is set, it will no
+ndarray are good, the output ndarray will B<not> have its
+bad flag set.
 
 
 
@@ -690,6 +678,84 @@ bad flag is set, it will no
 
 
 *setnantobad = \&PDL::setnantobad;
+
+
+
+
+
+=head2 setinftobad
+
+=for sig
+
+  Signature: (a(); [o]b())
+
+=for ref
+
+Sets non-finite values (for complex, where either is non-finite) in
+the input ndarray bad (only relevant for floating-point ndarrays).
+Can be done inplace.
+
+=for usage
+
+ $y = $x->setinftobad;
+ $x->inplace->setinftobad;
+
+=for bad
+
+This method can process ndarrays with bad values: those bad values
+are propagated into the output ndarray. Any value that is not finite
+is also set to bad in the output ndarray. If all values from the input
+ndarray are finite, the output ndarray will B<not> have its
+bad flag set.
+
+
+
+=cut
+
+
+
+
+
+*setinftobad = \&PDL::setinftobad;
+
+
+
+
+
+=head2 setnonfinitetobad
+
+=for sig
+
+  Signature: (a(); [o]b())
+
+=for ref
+
+Sets non-finite values (for complex, where either is non-finite) in
+the input ndarray bad (only relevant for floating-point ndarrays).
+Can be done inplace.
+
+=for usage
+
+ $y = $x->setnonfinitetobad;
+ $x->inplace->setnonfinitetobad;
+
+=for bad
+
+This method can process ndarrays with bad values: those bad values
+are propagated into the output ndarray. Any value that is not finite
+is also set to bad in the output ndarray. If all values from the input
+ndarray are finite, the output ndarray will B<not> have its
+bad flag set.
+
+
+
+=cut
+
+
+
+
+
+*setnonfinitetobad = \&PDL::setnonfinitetobad;
 
 
 
@@ -819,7 +885,7 @@ its bad value flag set to true.
 
 
 
-;
+
 
 
 =head1 AUTHOR
@@ -845,5 +911,3 @@ included in the file.
 # Exit with OK status
 
 1;
-
-		   

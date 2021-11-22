@@ -1,10 +1,5 @@
 package Calendar::Indonesia::Holiday;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-12'; # DATE
-our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.341'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -17,6 +12,12 @@ use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 use Perinci::Sub::Util qw(err gen_modified_sub);
 
 require Exporter;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-11-15'; # DATE
+our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
+our $VERSION = '0.343'; # VERSION
+
 our @ISA = qw(Exporter);
 our @EXPORT_OK = (
     'list_idn_holidays',
@@ -1151,6 +1152,10 @@ my %year_holidays;
 # ref:
 # - https://www.menpan.go.id/site/berita-terkini/cegah-penularan-covid-19-pemerintah-pangkas-cuti-bersama-2021-jadi-2-hari
 # - https://www.kemenkopmk.go.id/sites/default/files/pengumuman/2021-02/SKB%203%20Menteri%20tentang%20Perubahan%20Libnas%20%26%20Cutber%202021%20.pdf
+#
+# revised jun 18, 2021: hijra moved from aug 10 to aug 11, mawlid moved from oct 19 to oct 20, remove christmas/new year joint leave so total reduced from 2 -> 1 (SKB No. 712/2021, 1/2021, 3/2021)
+# ref:
+# - https://www.kemenkopmk.go.id/sites/default/files/pengumuman/2021-06/SKB%203%20Menteri%20tentang%20Perubahan%20kedua%20Libur%20Nasional%20dan%20Cuti%20Bersama%202021.pdf
 
 {
     my $isramiraj2021;
@@ -1168,15 +1173,14 @@ my %year_holidays;
         _h_vesakha   ({_expand_dm("26-05")}, {hyear=>2565}),
         # - pancasila day
         _h_eidula ({_expand_dm("20-07")}, {hyear=>1442}),
-        _h_hijra   ({_expand_dm("10-08")}, {hyear=>1443}),
+        _h_hijra   ({_expand_dm("11-08")}, {hyear=>1443, original_date=>"2021-08-10"}),
         # - independence day
-        _h_mawlid({_expand_dm("19-10")}, {hyear=>1443}),
+        _h_mawlid({_expand_dm("20-10")}, {hyear=>1443, original_date=>"2021-10-19"}),
         # - christmas
     ];
 
     push @{ $year_holidays{2021} }, (
         _jointlv     ({_expand_dm("12-05")}, {holiday=>$eidulf2021}),
-        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
     );
 }
 
@@ -1600,7 +1604,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.341 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-05-12.
+This document describes version 0.343 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-11-15.
 
 =head1 SYNOPSIS
 
@@ -1686,6 +1690,19 @@ This module provides functions to list Indonesian holidays.
 
 There is a command-line script interface for this module: L<list-id-holidays>.
 
+=head1 DEVELOPER NOTES
+
+To mark that a holiday has been moved from its original date, use the
+C<original_date> option. For example, Mawlid in 2021 has been moved from its
+original date 2021-11-19 (this is the day it is actually observed/commemorated)
+to 2021-11-20 (this is the day the holiday is in effect where offices and public
+places are closed). By adding this option, the summary will reflect this
+information:
+
+ date: 2021-12-20
+ eng_name: Mawlid (commemorated on 2021-12-19)
+ ind_name: Maulid Nabi Muhammad (diperingati 2021-12-19)
+
 =head1 FUNCTIONS
 
 
@@ -1693,7 +1710,7 @@ There is a command-line script interface for this module: L<list-id-holidays>.
 
 Usage:
 
- count_idn_workdays(%args) -> [status, msg, payload, meta]
+ count_idn_workdays(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Count working days (non-holiday business days) for a certain period.
 
@@ -1737,12 +1754,12 @@ If set to 1, Saturday is a working day.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1752,7 +1769,7 @@ Return value:  (any)
 
 Usage:
 
- is_idn_holiday(%args) -> [status, msg, payload, meta]
+ is_idn_holiday(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether a date is an Indonesian holiday.
 
@@ -1797,12 +1814,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1812,7 +1829,7 @@ Return value:  (any)
 
 Usage:
 
- is_idn_workday(%args) -> [status, msg, payload, meta]
+ is_idn_workday(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether a date is a working day (non-holiday business day).
 
@@ -1850,12 +1867,12 @@ If set to 1, Saturday is a working day.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1865,7 +1882,7 @@ Return value:  (any)
 
 Usage:
 
- list_idn_holidays(%args) -> [status, msg, payload, meta]
+ list_idn_holidays(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List Indonesian holidays in calendar.
 
@@ -2285,12 +2302,12 @@ Only return records where the 'year' field is greater than specified value.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2300,7 +2317,7 @@ Return value:  (any)
 
 Usage:
 
- list_idn_workdays(%args) -> [status, msg, payload, meta]
+ list_idn_workdays(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List working days (non-holiday business days) for a certain period.
 
@@ -2344,12 +2361,12 @@ If set to 1, Saturday is a working day.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2435,14 +2452,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Calendar-I
 
 Source repository is at L<https://github.com/perlancar/perl-Calendar-Indonesia-Holiday>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Holiday>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 This API will also be available on GudangAPI, http://gudangapi.com/
@@ -2454,11 +2463,42 @@ election day for East Java province, etc).
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Holiday>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

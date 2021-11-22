@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::More tests => 13;
+use Test::More tests => 16;
 use File::Spec::Functions qw(:ALL);
 use Data::Dumper;
 
@@ -58,3 +58,18 @@ ok($created);
 ok($created->mac_ok($pass), 'Reasserting new mac');
 
 unlink $outfile;
+
+my $pksc12_data = $pkcs12->create_as_string(
+	catdir($base, 'test-cert.pem'),
+	catdir($base, 'test-key.pem'),
+	$pass,
+	"Friendly Name"
+);
+
+ok($pksc12_data);
+
+$created = Crypt::OpenSSL::PKCS12->new_from_string($pksc12_data);
+
+ok($created);
+
+ok($created->mac_ok($pass));

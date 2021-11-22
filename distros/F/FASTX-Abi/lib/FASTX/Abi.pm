@@ -5,8 +5,24 @@ use Carp qw(confess);
 use Bio::Trace::ABIF;
 use Data::Dumper;
 use File::Basename;
+use FASTX::sw 'align';
+$FASTX::Abi::VERSION = '1.0.1';
 
-$FASTX::Abi::VERSION = '0.11';
+use constant DEFAULT_MATRIX => { 'wildcard_match'  => 0,
+                                 'match'           => 1,
+                                 'mismatch'        => -1,
+                                 'gap'             => -2,
+                                 'gap_extend'      => 0,
+                                 'wildcard'        => 'N',
+                                 };
+ 
+use constant SCORE => 0;
+use constant EVENT => 1;
+use constant EXTEND => 0;
+use constant GAP_SRC => 1;
+use constant GAP_TGT => 2;
+
+
 
 #ABSTRACT: Read Sanger trace file (chromatograms) in FASTQ format. For traces called with I<hetero> option, the ambiguities will be split into two sequences to allow usage from NGS tools that usually do not understand IUPAC ambiguities.
 
@@ -93,7 +109,7 @@ sub new {
 
     my @ext = ('.abi','.ab1','.ABI','.abI','.AB1','.ab');
     my ($seqname) = basename($self->{filename}, @ext);
-    $object->{sequence_name} = $seqname;
+    $object->{sequence_name} = $abif->sample_name();
 
     # DEFAULTS
     # -----------------------------------
@@ -171,6 +187,79 @@ sub get_trace_info {
   $data->{avg_peak_spacing} = $self->{avg_peak_spacing};
 
   return $data;
+}
+
+
+sub rc {
+  my $self = shift;
+  $self->{seq1} = reverse $self->{seq1};
+  $self->{seq2} = reverse $self->{seq2};
+  $self->{seq1} =~ tr/ACGTacgt/TGCAtgca/;
+  $self->{seq2} =~ tr/ACGTacgt/TGCAtgca/;
+  return $self;
+}
+
+
+sub merge {
+  my ($self, $other) = @_;
+  $other->rc();
+
+  my $aligner = FASTX::sw->new($self->{seq1}, $other->{seq1});
+  my ($top, $bars, $bottom) = $aligner->pads;
+  my $consensus = "";
+  my $pos1 = 0;
+  my $pos2 = 0;
+  for (my $pos = 0; $pos < length($top); $pos++) {
+    my $base1 = substr($top,    $pos, 1);
+    my $base2 = substr($bottom, $pos, 1);
+
+    my $pos1++ if ($base1 ne '-');
+    my $pos2++ if ($base2 ne '-');
+
+    if ($base1 eq $base2) {
+      $consensus .= $base1;
+    } elsif ($base1 eq '-' and $base2 ne '-') {
+      $consensus .= $base2;
+    } elsif ($base1 ne '-' and $base2 eq '-') {
+      $consensus .= $base1;
+    } elsif ($base1 ne '-' and $base2 ne '-') {
+      my $qual1 = substr($self->{quality}, $pos1, 1);
+      my $qual2 = substr($other->{quality}, $pos2, 1);
+      $consensus .= _ascii_qual($qual1) > _ascii_qual($qual2) ? lc($base1) : lc($base2);
+    }
+  }
+  # evaluate longest stretch of "|" in $m
+  # my $longest = 0;
+  # my $longest_start = 0;
+  # my $longest_end = 0;
+  # my $longest_str = '';
+  # my $i = 0;
+  # while ($i < length($m)) {
+  #   my $str = substr($m, $i, 1);
+  #   if ($str eq '|') {
+  #     my $start = $i;
+  #     my $end = $i;
+  #     while ($str eq '|') {
+  #       $end++;
+  #       $str = substr($m, $end, 1);
+  #     }
+  #     if ($end - $start > $longest) {
+  #       $longest = $end - $start;
+  #       $longest_start = $start;
+  #       $longest_end = $end;
+  #       $longest_str = $str;
+  #     }
+  #   }
+  #   $i++;
+  # }
+  
+  $self->{merge} = $aligner;
+  $self->{top} = $top;
+  $self->{bottom} = $bottom;
+  $self->{consensus} = $consensus;
+  $self->{bars} = $bars;
+  return $consensus;
+
 }
 
 
@@ -270,6 +359,11 @@ sub _get_sequence {
 
 }
 
+sub _ascii_qual {
+  my ($qual, $offset) = @_;
+  $offset = 33 unless defined $offset;
+  return ord($qual) - $offset;
+}
 1;
 
 __END__
@@ -284,7 +378,7 @@ FASTX::Abi - Read Sanger trace file (chromatograms) in FASTQ format. For traces 
 
 =head1 VERSION
 
-version 0.11
+version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -405,6 +499,18 @@ Returns an object with trace information:
   print "Instrument:            ", $info->{instrument}, "\n";
   print "Version:               ", $info->{version}, "\n";
   print "Average peak distance: ", $info->{avg_peak_spacing}, "\n";
+
+=head2 rc()
+
+  $trace->rc();
+
+Reverse complement the chromatogram sequence.
+
+=head2 merge()
+
+Merge two chromatograms if overlapping returning the merged sequence.
+
+  my $merged = $trace->merge($other_trace);
 
 =head2 _get_sequence()
 

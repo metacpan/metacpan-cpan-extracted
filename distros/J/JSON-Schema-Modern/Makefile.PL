@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use 5.016;
+use 5.020000;
 use ExtUtils::MakeMaker;
 
 BEGIN {
@@ -86,7 +86,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "JSON-Schema-Modern",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.016",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "JSON::Schema::Modern",
   "PL_FILES" => {},
   "PREREQ_PM" => {
@@ -103,7 +103,6 @@ my %WriteMakefileArgs = (
     "Mojo::URL" => 0,
     "Mojolicious" => "7.23",
     "Moo" => 0,
-    "Moo::Object" => 0,
     "Moo::Role" => 0,
     "MooX::HandlesVia" => 0,
     "MooX::TypeTiny" => "0.002002",
@@ -115,6 +114,7 @@ my %WriteMakefileArgs = (
     "Sub::Install" => 0,
     "Types::Standard" => "1.010002",
     "constant" => 0,
+    "experimental" => 0,
     "if" => 0,
     "namespace::clean" => 0,
     "overload" => 0,
@@ -138,7 +138,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.523",
+  "VERSION" => "0.525",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -161,7 +161,6 @@ my %FallbackPrereqs = (
   "Mojo::URL" => 0,
   "Mojolicious" => "7.23",
   "Moo" => 0,
-  "Moo::Object" => 0,
   "Moo::Role" => 0,
   "MooX::HandlesVia" => 0,
   "MooX::TypeTiny" => "0.002002",
@@ -181,6 +180,7 @@ my %FallbackPrereqs = (
   "Test::Warnings" => 0,
   "Types::Standard" => "1.010002",
   "constant" => 0,
+  "experimental" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::clean" => 0,

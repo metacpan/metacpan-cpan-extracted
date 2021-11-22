@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution PDL::VectorValued
 
+v1.0.14 Fri, 12 Nov 2021 20:05:32 +0100 moocow
+	* explicitly use PDL::Types from VectorValued/Dev; fixes https://github.com/moocow-the-bovine/PDL-VectorValued/issues/1
+
 v1.0.13 Mon, 20 Sep 2021 17:30:18 +0200 moocow
 	* cleaned up stale acknowledgements in docs
 

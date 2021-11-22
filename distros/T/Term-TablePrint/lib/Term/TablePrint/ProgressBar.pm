@@ -3,7 +3,7 @@ Term::TablePrint::ProgressBar;
 
 use strict;
 use warnings;
-use 5.008003;
+use 5.10.0;
 
 use Term::Choose::Constants qw( WIDTH_CURSOR );
 use Term::Choose::Screen    qw( clear_screen );

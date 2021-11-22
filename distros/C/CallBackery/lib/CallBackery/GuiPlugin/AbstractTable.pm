@@ -142,7 +142,7 @@ sub makeExportAction {
             my $data = $self->getTableData({
                 formData => $args,
                 firstRow => 0,
-                lastRow => $self->getTableRowCount($args)
+                lastRow => $self->getTableRowCount({ formData=>$args })
             });
 
             # Use the (translated) table headers in row 1.

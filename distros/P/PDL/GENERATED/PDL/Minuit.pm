@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Minuit;
 
-our @EXPORT_OK = qw( mn_init mn_def_pars mn_excm mn_pout mn_stat mn_err mn_contour mn_emat PDL::PP mninit PDL::PP mn_abre PDL::PP mn_cierra PDL::PP mnparm PDL::PP mnexcm PDL::PP mnpout PDL::PP mnstat PDL::PP mnemat PDL::PP mnerrs PDL::PP mncont );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(mn_init mn_def_pars mn_excm mn_pout mn_stat mn_err mn_contour mn_emat mninit mn_abre mn_cierra mnparm mnexcm mnpout mnstat mnemat mnerrs mncont );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Minuit ;
+
 
 
 
@@ -48,10 +47,7 @@ See the test file minuit.t in the test (t/) directory for a basic example.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -883,12 +879,10 @@ PDL distribution, the copyright notice should be included in the file.
 
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

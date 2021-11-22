@@ -26,7 +26,12 @@ begin_class(pkg, name, ...)
       }
     }
 
-    ClassMeta *meta = mop_create_class(ix, name, superclassname);
+    ClassMeta *meta = mop_create_class(ix, name);
+
+    if(superclassname && SvOK(superclassname))
+      mop_class_set_superclass(meta, superclassname);
+
+    mop_class_begin(meta);
 
     compclassmeta_set(meta);
 
@@ -205,31 +210,86 @@ add_method(self, mname, code)
     RETVAL
 
 void
-get_own_method(self, methodname)
+get_direct_method(self, methodname)
     SV *self
     SV *methodname
+  ALIAS:
+    get_method = 1
   PPCODE:
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+    bool recurse = !!ix;
 
-    AV *methods = meta->direct_methods;
-    U32 nmethods = av_count(methods);
+    do {
+      AV *methods = meta->direct_methods;
+      U32 nmethods = av_count(methods);
 
-    U32 i;
-    for(i = 0; i < nmethods; i++) {
-      MethodMeta *methodmeta = (MethodMeta *)AvARRAY(methods)[i];
+      U32 i;
+      for(i = 0; i < nmethods; i++) {
+        MethodMeta *methodmeta = (MethodMeta *)AvARRAY(methods)[i];
 
-      if(!sv_eq(methodmeta->name, methodname))
-        continue;
+        if(!sv_eq(methodmeta->name, methodname))
+          continue;
 
-      ST(0) = sv_newmortal();
-      sv_setref_iv(ST(0), "Object::Pad::MOP::Method", PTR2UV(methodmeta));
-      XSRETURN(1);
-    }
+        ST(0) = sv_newmortal();
+        sv_setref_iv(ST(0), "Object::Pad::MOP::Method", PTR2UV(methodmeta));
+        XSRETURN(1);
+      }
+
+      if(meta->type == METATYPE_CLASS)
+        meta = meta->cls.supermeta;
+      else
+        meta = NULL;
+    } while(recurse && meta);
 
     croak("Class %" SVf " does not have a method called '%" SVf "'",
       meta->name, methodname);
   }
+
+void
+direct_methods(self)
+    SV *self
+  ALIAS:
+    all_methods = 1
+  PPCODE:
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+    bool recurse = !!ix;
+
+    /* A hash to remove overrides */
+    HV *mnames = NULL;
+    if(recurse) {
+      mnames = newHV();
+      SAVEFREESV(mnames);
+    }
+
+    U32 retcount = 0;
+
+    do {
+      AV *methods = meta->direct_methods;
+      U32 nmethods = av_count(methods);
+
+      EXTEND(SP, retcount + nmethods);  /* might be an overestimate but don't worry */
+      U32 i;
+      for(i = 0; i < nmethods; i++) {
+        MethodMeta *methodmeta = (MethodMeta *)AvARRAY(methods)[i];
+
+        if(mnames && hv_exists_ent(mnames, methodmeta->name, 0))
+          continue;
+
+        ST(retcount) = sv_newmortal();
+        sv_setref_iv(ST(retcount), "Object::Pad::MOP::Method", PTR2UV(methodmeta));
+        retcount++;
+
+        hv_store_ent(mnames, methodmeta->name, &PL_sv_yes, 0);
+      }
+
+      if(meta->type == METATYPE_CLASS)
+        meta = meta->cls.supermeta;
+      else
+        meta = NULL;
+    } while(recurse && meta);
+
+    XSRETURN(retcount);
 
 SV *
 add_slot(self, slotname, ...)

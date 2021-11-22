@@ -1,4 +1,4 @@
-package Large;
+package My::Large;
 
 use strict;
 use warnings;

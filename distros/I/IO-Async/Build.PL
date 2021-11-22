@@ -27,6 +27,7 @@ my $build = Module::Build->new(
    test_requires => {
       'File::Temp' => 0,
       'Test::Fatal' => 0,
+      'Test::Future::IO::Impl' => 0,
       'Test::Identity' => 0,
       'Test::Metrics::Any' => 0,
       'Test::More' => '0.88',

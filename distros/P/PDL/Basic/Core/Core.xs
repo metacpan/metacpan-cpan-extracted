@@ -14,6 +14,7 @@
 #include "pdl.h"      /* Data structure declarations */
 #define PDL_IN_CORE /* access funcs directly not through PDL-> */
 #include "pdlcore.h"  /* Core declarations */
+#include "pdlperl.h"
 
 /* Return a integer or numeric scalar as appropriate */
 
@@ -24,31 +25,10 @@ Core PDL; /* Struct holding pointers to shared C routines */
 int pdl_debugging=0;
 int pdl_autopthread_targ   = 0; /* No auto-pthreading unless set using the set_autopthread_targ */
 int pdl_autopthread_actual = 0;
+PDL_Indx pdl_autopthread_dim = -1;
 int pdl_autopthread_size   = 1;
 
 #define CHECKP(p)    if ((p) == NULL) croak("Out of memory")
-
-static PDL_Indx* pdl_packint( SV* sv, int *ndims ) {
-
-   SV*  bar;
-   AV*  array;
-   int i;
-   PDL_Indx *dims;
-
-   if (!(SvROK(sv) && SvTYPE(SvRV(sv))==SVt_PVAV))  /* Test */
-       return NULL;
-   array = (AV *) SvRV(sv);   /* dereference */
-     *ndims = (int) av_len(array) + 1;  /* Number of dimensions */
-   /* Array space */
-   dims = (PDL_Indx *) pdl_smalloc( (*ndims) * sizeof(*dims) );
-   CHECKP(dims);
-
-   for(i=0; i<(*ndims); i++) {
-      bar = *(av_fetch( array, i, 0 )); /* Fetch */
-      dims[i] = (PDL_Indx) SvIV(bar);
-   }
-   return dims;
-}
 
 static SV* pdl_unpackint ( PDL_Indx *dims, int ndims ) {
 
@@ -63,76 +43,7 @@ static SV* pdl_unpackint ( PDL_Indx *dims, int ndims ) {
    return (SV*) array;
 }
 
-/* newval = 1 means set flag, 0 means clear it */
-/* thanks to Christian Soeller for this */
-
-void pdl_propagate_badflag( pdl *it, int newval ) {
-    PDL_DECL_CHILDLOOP(it)
-    PDL_START_CHILDLOOP(it)
-    {
-	pdl_trans *trans = PDL_CHILDLOOP_THISCHILD(it);
-	int i;
-
-	for( i = trans->vtable->nparents;
-	     i < trans->vtable->npdls; i++ ) {
-
-	    pdl *child = trans->pdls[i];
-
-	    if ( newval ) child->state |=  PDL_BADVAL;
-            else          child->state &= ~PDL_BADVAL;
-
-	    /* make sure we propagate to grandchildren, etc */
-	    pdl_propagate_badflag( child, newval );
-
-        } /* for: i */
-    }
-    PDL_END_CHILDLOOP(it)
-} /* pdl_propagate_badflag */
-
-void pdl_propagate_badvalue( pdl *it ) {
-    PDL_DECL_CHILDLOOP(it)
-    PDL_START_CHILDLOOP(it)
-    {
-	pdl_trans *trans = PDL_CHILDLOOP_THISCHILD(it);
-	int i;
-
-	for( i = trans->vtable->nparents;
-	     i < trans->vtable->npdls; i++ ) {
-
-	    pdl *child = trans->pdls[i];
-
-            child->has_badvalue = 1;
-            child->badvalue = it->badvalue;
-
-	    /* make sure we propagate to grandchildren, etc */
-	    pdl_propagate_badvalue( child );
-
-        } /* for: i */
-    }
-    PDL_END_CHILDLOOP(it)
-} /* pdl_propagate_badvalue */
-
-
-/* this is horrible - the routines from bad should perhaps be here instead ? */
-PDL_Anyval pdl_get_badvalue( int datatype ) {
-    PDL_Anyval retval = { -1, 0 };
-    switch ( datatype ) {
-
-#include "pdldataswitch.c"
-
-      default:
-	croak("Unknown type sent to pdl_get_badvalue\n");
-    }
-    return retval;
-} /* pdl_get_badvalue() */
-
-
-PDL_Anyval pdl_get_pdl_badvalue( pdl *it ) {
-    return it->has_badvalue ? it->badvalue : pdl_get_badvalue( it->datatype );
-}
-
 MODULE = PDL::Core     PACKAGE = PDL
-
 
 # Destroy a PDL - note if a hash do nothing, the $$x{PDL} component
 # will be destroyed anyway on a separate call
@@ -157,32 +68,11 @@ get_trans(self)
 	pdl *self;
 	CODE:
 	ST(0) = sv_newmortal();
-	if(self->trans)  {
-		sv_setref_pv(ST(0), "PDL::Trans", (void*)(self->trans));
+	if(self->trans_parent)  {
+		sv_setref_pv(ST(0), "PDL::Trans", (void*)(self->trans_parent));
 	} else {
                ST(0) = &PL_sv_undef;
 	}
-
-int
-iscontig(x)
-   pdl*	x
-   CODE:
-      RETVAL = 1;
-      pdl_make_physvaffine( x );
-	if PDL_VAFFOK(x) {
-	   int i;
-           PDL_Indx inc=1;
-	   PDLDEBUG_f(printf("vaff check...\n");)
-  	   for (i=0;i<x->ndims;i++) {
-     	      if (PDL_REPRINC(x,i) != inc) {
-		     RETVAL = 0;
-		     break;
-              }
-     	      inc *= x->dims[i];
-  	   }
-        }
-  OUTPUT:
-    RETVAL
 
 INCLUDE_COMMAND: $^X -e "require q{./Dev.pm}; PDL::Core::Dev::generate_core_flags()"
 
@@ -200,22 +90,6 @@ address(self)
     RETVAL = PTR2IV(self);
   OUTPUT:
     RETVAL
-
-pdl *
-pdl_hard_copy(src)
-	pdl *src;
-
-pdl *
-sever(src)
-	pdl *src;
-	CODE:
-		if(src->trans) {
-			pdl_make_physvaffine(src);
-			pdl_destroytransform(src->trans,1);
-		}
-		RETVAL=src;
-	OUTPUT:
-		RETVAL
 
 int
 set_donttouchdata(it)
@@ -314,6 +188,13 @@ get_autopthread_actual()
 	OUTPUT:
 	RETVAL
 
+int
+get_autopthread_dim()
+	CODE:
+	RETVAL = pdl_autopthread_dim;
+	OUTPUT:
+	RETVAL
+
 void
 _ci(...)
  PPCODE:
@@ -330,6 +211,20 @@ _inf(...)
   PDL_XS_SCALAR(PDL_D, PDL_Double, INFINITY)
 
 MODULE = PDL::Core     PACKAGE = PDL::Core
+
+IV
+seed()
+  CODE:
+    RETVAL = pdl_pdl_seed();
+  OUTPUT:
+    RETVAL
+
+int
+online_cpus()
+  CODE:
+    RETVAL = pdl_online_cpus();
+  OUTPUT:
+    RETVAL
 
 unsigned int
 is_scalar_SvPOK(arg)
@@ -348,7 +243,6 @@ set_debugging(i)
 	pdl_debugging = i;
 	OUTPUT:
 	RETVAL
-
 
 
 SV *
@@ -414,7 +308,6 @@ SV *
 listref_c(x)
    pdl *x
   PREINIT:
-   PDL_Indx * inds;
    PDL_Indx * incs;
    PDL_Indx offs;
    void *data;
@@ -438,13 +331,13 @@ listref_c(x)
    }
 
    pdl_make_physvaffine( x );
-   inds = pdl_smalloc(sizeof(PDL_Indx) * x->ndims); /* GCC -> on stack :( */
    data = PDL_REPRP(x);
    incs = (PDL_VAFFOK(x) ? x->vafftrans->incs : x->dimincs);
    offs = PDL_REPROFFS(x);
    av = newAV();
    av_extend(av,x->nvals);
    lind=0;
+   PDL_Indx inds[x->ndims];
    for(ind=0; ind < x->ndims; ind++) inds[ind] = 0;
    while(!stop) {
       pdl_val = pdl_at( data, x->datatype, inds, x->dims, incs, offs, x->ndims );
@@ -503,8 +396,6 @@ set_c(x,position,value)
     else
        pdl_changed( x , PDL_PARENTDATACHANGED , 0 );
 
-#define PDL_CORE_BOOT(sym) PDL.sym = pdl_ ## sym;
-
 BOOT:
 {
 #if NVSIZE > 8
@@ -514,62 +405,13 @@ BOOT:
    /* Initialize structure of pointers to core C routines */
 
    PDL.Version     = PDL_CORE_VERSION;
-   PDL_CORE_BOOT(SvPDLV)
-   PDL_CORE_BOOT(SetSV_PDL)
-   PDL_CORE_BOOT(create)
-   PDL_CORE_BOOT(pdlnew)
-   PDL_CORE_BOOT(destroy)
-   PDL_CORE_BOOT(null)
-   PDL_CORE_BOOT(copy)
-   PDL_CORE_BOOT(hard_copy)
-   PDL_CORE_BOOT(converttype)
-   PDL_CORE_BOOT(twod)
-   PDL_CORE_BOOT(smalloc)
-   PDL_CORE_BOOT(howbig)
-   PDL_CORE_BOOT(packdims)
-   PDL_CORE_BOOT(unpackdims)
-   PDL_CORE_BOOT(setdims)
-   PDL_CORE_BOOT(grow)
-   PDL_CORE_BOOT(at0)
-   PDL_CORE_BOOT(reallocdims)
-   PDL_CORE_BOOT(reallocthreadids)
-   PDL_CORE_BOOT(resize_defaultincs)
-   PDL_CORE_BOOT(get_threadoffsp)
-   PDL_CORE_BOOT(thread_copy)
-   PDL_CORE_BOOT(clearthreadstruct)
-   PDL_CORE_BOOT(initthreadstruct)
-   PDL_CORE_BOOT(startthreadloop)
-   PDL_CORE_BOOT(iterthreadloop)
-   PDL_CORE_BOOT(freethreadloop)
-   PDL_CORE_BOOT(thread_create_parameter)
-   PDL_CORE_BOOT(add_deletedata_magic)
-
-   PDL_CORE_BOOT(setdims_careful)
-   PDL_CORE_BOOT(put_offs)
-   PDL_CORE_BOOT(get_offs)
-   PDL_CORE_BOOT(get)
-   PDL_CORE_BOOT(set_trans_childtrans)
-   PDL_CORE_BOOT(set_trans_parenttrans)
-
-   PDL_CORE_BOOT(get_convertedpdl)
-
-   PDL_CORE_BOOT(make_trans_mutual)
-   PDL_CORE_BOOT(trans_mallocfreeproc)
-   PDL_CORE_BOOT(make_physical)
-   PDL_CORE_BOOT(make_physdims)
-   PDL_CORE_BOOT(make_physvaffine)
-   PDL_CORE_BOOT(pdl_barf)
-   PDL_CORE_BOOT(pdl_warn)
-   PDL_CORE_BOOT(allocdata)
-   PDL_CORE_BOOT(safe_indterm)
-   PDL_CORE_BOOT(children_changesoon)
-   PDL_CORE_BOOT(changed)
-   PDL_CORE_BOOT(vaffinechanged)
-
-   PDL_CORE_BOOT(propagate_badflag)
-   PDL_CORE_BOOT(propagate_badvalue)
-   PDL_CORE_BOOT(get_pdl_badvalue)
-#include "pdlbadvalinit.c"
+#define X(sym, rettype, args) PDL.sym = pdl_ ## sym;
+   PDL_CORE_LIST(X)
+#undef X
+#define X(symbol, ctype, ppsym, shortctype, defbval) \
+  PDL.bvals.shortctype = defbval;
+   PDL_GENERICLIST(X)
+#undef X
    /*
       "Publish" pointer to this structure in perl variable for use
        by other modules
@@ -634,16 +476,6 @@ pdl_avref(array_ref, class, type)
        pdl_from_array(av,dims,type,p); /* populate ;) */
      }
 
-MODULE = PDL::Core	PACKAGE = PDL
-
-# pdl_null is created/imported with no PREFIX  as pdl_null.
-#  'null' is supplied in Core.pm that calls 'initialize' which calls
-#   the pdl_null here
-
-pdl *
-pdl_null(...)
-
-
 MODULE = PDL::Core     PACKAGE = PDL::Core     PREFIX = pdl_
 
 int
@@ -686,6 +518,15 @@ make_physdims(self)
 		RETVAL = self;
 	OUTPUT:
 		RETVAL
+
+void
+pdl_set_datatype(a,datatype)
+   pdl *a
+   int datatype
+
+pdl *
+pdl_sever(src)
+	pdl *src;
 
 void
 pdl_dump(x)
@@ -784,6 +625,22 @@ getndims(x)
 	OUTPUT:
 		RETVAL
 
+void
+dims_c(x)
+	pdl *x
+	PREINIT:
+		PDL_Indx i;
+		U8 gimme = GIMME_V;
+	PPCODE:
+		pdl_make_physdims(x);
+		if (gimme == G_ARRAY) {
+			EXTEND(sp, x->ndims);
+			for(i=0; i<x->ndims; i++) mPUSHi(x->dims[i]);
+		}
+		else if (gimme == G_SCALAR) {
+			mXPUSHu(x->ndims);
+		}
+
 PDL_Indx
 getdim(x,y)
 	pdl *x
@@ -810,6 +667,22 @@ getnthreadids(x)
 	OUTPUT:
 		RETVAL
 
+void
+threadids_c(x)
+	pdl *x
+	PREINIT:
+		PDL_Indx i;
+		U8 gimme = GIMME_V;
+	PPCODE:
+		pdl_make_physdims(x);
+		if (gimme == G_ARRAY) {
+			EXTEND(sp, x->nthreadids);
+			for(i=0; i<x->nthreadids; i++) mPUSHi(x->threadids[i]);
+		}
+		else if (gimme == G_SCALAR) {
+			mXPUSHu(x->nthreadids);
+		}
+
 int
 getthreadid(x,y)
 	pdl *x
@@ -828,22 +701,8 @@ setdims(x,dims_arg)
 	 PDL_Indx ndims;
        int i;
 	CODE:
-	{
-	        /* This mask avoids all kinds of subtle dereferencing bugs (CED 11/2015) */
-	        if(x->trans || x->vafftrans || x->children.next ) {
-		  pdl_pdl_barf("Can't setdims on a PDL that already has children");
-		}
-
-		/* not sure if this is still necessary with the mask above... (CED 11/2015)  */
-		pdl_children_changesoon(x,PDL_PARENTDIMSCHANGED|PDL_PARENTDATACHANGED);
 		dims = pdl_packdims(dims_arg,&ndims);
-		pdl_reallocdims(x,ndims);
-		for(i=0; i<ndims; i++) x->dims[i] = dims[i];
-		pdl_resize_defaultincs(x);
-		x->threadids[0] = ndims;
-		x->state &= ~PDL_NOMYDIMS;
-		pdl_changed(x,PDL_PARENTDIMSCHANGED|PDL_PARENTDATACHANGED,0);
-	}
+		pdl_setdims(x,dims,ndims);
 
 void
 dowhenidle()
@@ -904,10 +763,6 @@ hdr(p)
 	OUTPUT:
 	 RETVAL
 
-# fhdr(p) is implemented in perl; see Core.pm.PL if you're looking for it
-#   --CED 9-Feb-2003
-#
-
 SV *
 gethdr(p)
 	pdl *p
@@ -924,62 +779,44 @@ gethdr(p)
 	 RETVAL
 
 void
-set_datatype(a,datatype)
-   pdl *a
-   int datatype
-   CODE:
-    pdl_make_physical(a);
-    if(a->trans)
-	    pdl_destroytransform(a->trans,1);
-/*     if(! (a->state && PDL_NOMYDIMS)) { */
-    pdl_converttype( &a, datatype, PDL_PERM );
-/*     } */
-
-void
 threadover_n(...)
    PREINIT:
    int npdls;
    SV *sv;
    CODE:
-   {
     npdls = items - 1;
     if(npdls <= 0)
     	croak("Usage: threadover_n(pdl[,pdl...],sub)");
-    {
-	    int i,sd;
-	    pdl **pdls = malloc(sizeof(pdl *) * npdls);
-	    PDL_Indx *realdims = malloc(sizeof(PDL_Indx) * npdls);
-	    pdl_thread pdl_thr;
-	    SV *code = ST(items-1);
-	    for(i=0; i<npdls; i++) {
-		pdls[i] = pdl_SvPDLV(ST(i));
-		/* XXXXXXXX Bad */
-		pdl_make_physical(pdls[i]);
-		realdims[i] = 0;
-	    }
-	    PDL_THR_CLRMAGIC(&pdl_thr);
-	    pdl_initthreadstruct(0,pdls,realdims,realdims,npdls,NULL,&pdl_thr,NULL, 1);
-	    pdl_startthreadloop(&pdl_thr,NULL,NULL);
-	    sd = pdl_thr.ndims;
-	    do {
-	    	dSP;
-		PUSHMARK(sp);
-		EXTEND(sp,items);
-		PUSHs(sv_2mortal(newSViv((sd-1))));
-		for(i=0; i<npdls; i++) {
-			PDL_Anyval pdl_val = { -1, 0 };
-			pdl_val = pdl_get_offs(pdls[i],pdl_thr.offs[i]);
-			ANYVAL_TO_SV(sv, pdl_val);
-			PUSHs(sv_2mortal(sv));
-		}
-	    	PUTBACK;
-		perl_call_sv(code,G_DISCARD);
-	    } while( (sd = pdl_iterthreadloop(&pdl_thr,0)) );
-	    pdl_freethreadloop(&pdl_thr);
-	    free(pdls);
-	    free(realdims);
+    int i,sd;
+    pdl *pdls[npdls];
+    PDL_Indx realdims[npdls];
+    pdl_thread pdl_thr;
+    SV *code = ST(items-1);
+    for(i=0; i<npdls; i++) {
+	pdls[i] = pdl_SvPDLV(ST(i));
+	/* XXXXXXXX Bad */
+	pdl_make_physical(pdls[i]);
+	realdims[i] = 0;
     }
-   }
+    PDL_THR_CLRMAGIC(&pdl_thr);
+    pdl_initthreadstruct(0,pdls,realdims,realdims,npdls,NULL,&pdl_thr,NULL,NULL,NULL, 1);
+    pdl_startthreadloop(&pdl_thr,NULL,NULL);
+    sd = pdl_thr.ndims;
+    do {
+    	dSP;
+	PUSHMARK(sp);
+	EXTEND(sp,items);
+	PUSHs(sv_2mortal(newSViv((sd-1))));
+	for(i=0; i<npdls; i++) {
+		PDL_Anyval pdl_val = { -1, 0 };
+		pdl_val = pdl_get_offs(pdls[i],pdl_thr.offs[i]);
+		ANYVAL_TO_SV(sv, pdl_val);
+		PUSHs(sv_2mortal(sv));
+	}
+    	PUTBACK;
+	perl_call_sv(code,G_DISCARD);
+    } while( (sd = pdl_iterthreadloop(&pdl_thr,0)) );
+    pdl_freethreadloop(&pdl_thr);
 
 void
 threadover(...)
@@ -988,113 +825,85 @@ threadover(...)
     int targs;
     int nothers = -1;
    CODE:
-   {
-        targs = items - 4;
+    targs = items - 4;
     if (items > 0) nothers = SvIV(ST(0));
     if(targs <= 0 || nothers < 0 || nothers >= targs)
-    	croak("Usage: threadover(nothers,pdl[,pdl...][,otherpars..],realdims,creating,sub)");
+	croak("Usage: threadover(nothers,pdl[,pdl...][,otherpars..],realdims,creating,sub)");
     npdls = targs-nothers;
-    {
-	    int i,nd1,nd2,dtype=0;
-	    PDL_Indx j,nc=npdls;
-	    SV* rdimslist = ST(items-3);
-	    SV* cdimslist = ST(items-2);
-	    SV *code = ST(items-1);
-	    pdl_thread pdl_thr;
-	    pdl **pdls = malloc(sizeof(pdl *) * npdls);
-	    pdl **child = malloc(sizeof(pdl *) * npdls);
-	    SV **csv = malloc(sizeof(SV *) * npdls);
-	    SV **dims = malloc(sizeof(SV *) * npdls);
-	    SV **incs = malloc(sizeof(SV *) * npdls);
-	    SV **others = malloc(sizeof(SV *) * nothers);
-	    PDL_Indx *creating = pdl_packint(cdimslist,&nd2);
-	    PDL_Indx *realdims = pdl_packint(rdimslist,&nd1);
-	    CHECKP(pdls); CHECKP(child); CHECKP(dims);
-	    CHECKP(incs); CHECKP(csv);
-
-	    if (nd1 != npdls || nd2 < npdls)
-		croak("threadover: need one realdim and creating flag "
-		      "per pdl!");
-	    for(i=0; i<npdls; i++) {
-		pdls[i] = pdl_SvPDLV(ST(i+1));
-		if (creating[i])
-		  nc += realdims[i];
-		else {
-		  pdl_make_physical(pdls[i]); /* is this what we want?XXX */
-		  dtype = PDLMAX(dtype,pdls[i]->datatype);
-		}
-	    }
-	    for (i=npdls+1; i<=targs; i++)
-		others[i-npdls-1] = ST(i);
-	    if (nd2 < nc)
-		croak("Not enough dimension info to create pdls");
-#ifdef DEBUG_PTHREAD
-		for (i=0;i<npdls;i++) { /* just for debugging purposes */
-		printf("pdl %d Dims: [",i);
-		for (j=0;j<realdims[i];j++)
-			printf("%d ",pdls[i]->dims[j]);
-		printf("] Incs: [");
-		for (j=0;j<realdims[i];j++)
-			printf("%d ",PDL_REPRINC(pdls[i],j));
-		printf("]\n");
-	        }
-#endif
-	    PDL_THR_CLRMAGIC(&pdl_thr);
-	    pdl_initthreadstruct(0,pdls,realdims,creating,npdls,
-				NULL,&pdl_thr,NULL, 1);
-	    for(i=0, nc=npdls; i<npdls; i++)  /* create as necessary */
-              if (creating[i]) {
-		PDL_Indx *cp = creating+nc;
-		pdls[i]->datatype = dtype;
-		pdl_thread_create_parameter(&pdl_thr,i,cp,0);
-		nc += realdims[i];
-		pdl_make_physical(pdls[i]);
-		PDLDEBUG_f(pdl_dump(pdls[i]));
-		/* And make it nonnull, now that we've created it */
-		pdls[i]->state &= (~PDL_NOMYDIMS);
-	      }
-	    pdl_startthreadloop(&pdl_thr,NULL,NULL);
-	    for(i=0; i<npdls; i++) { /* will the SV*'s be properly freed? */
-		dims[i] = newRV(pdl_unpackint(pdls[i]->dims,realdims[i]));
-		incs[i] = newRV(pdl_unpackint(PDL_VAFFOK(pdls[i]) ?
-		pdls[i]->vafftrans->incs: pdls[i]->dimincs,realdims[i]));
-		/* need to make sure we get the vaffine (grand)parent */
-		if (PDL_VAFFOK(pdls[i]))
-		   pdls[i] = pdls[i]->vafftrans->from;
-		child[i]=pdl_null();
-		/*  instead of pdls[i] its vaffine parent !!!XXX */
-		PDL.affine_new(pdls[i],child[i],pdl_thr.offs[i],dims[i],
-						incs[i]);
-		pdl_make_physical(child[i]); /* make sure we can get at
-						the vafftrans          */
-		csv[i] = sv_newmortal();
-		pdl_SetSV_PDL(csv[i], child[i]); /* pdl* into SV* */
-	    }
-	    do {  /* the actual threadloop */
-		pdl_trans_affine *traff;
-	    	dSP;
-		PUSHMARK(sp);
-		EXTEND(sp,npdls);
-		for(i=0; i<npdls; i++) {
-		   /* just twiddle the offset - quick and dirty */
-		   /* we must twiddle both !! */
-		   traff = (pdl_trans_affine *) child[i]->trans;
-		   traff->offs = pdl_thr.offs[i];
-		   child[i]->vafftrans->offs = pdl_thr.offs[i];
-		   child[i]->state |= PDL_PARENTDATACHANGED;
-		   PUSHs(csv[i]);
-		}
-		for (i=0; i<nothers; i++)
-		  PUSHs(others[i]);   /* pass the OtherArgs onto the stack */
-	    	PUTBACK;
-		perl_call_sv(code,G_DISCARD);
-	    } while (pdl_iterthreadloop(&pdl_thr,0));
-	    pdl_freethreadloop(&pdl_thr);
-	    free(pdls);  /* should all these be done with pdl_smalloc */
-	    free(dims);  /* in case the sub barfs ? XXXX            */
-	    free(child);
-	    free(csv);
-	    free(incs);
-	    free(others);
+    int i,dtype=0;
+    PDL_Indx j,nc=npdls,nd1,nd2;
+    SV* rdimslist = ST(items-3);
+    SV* cdimslist = ST(items-2);
+    SV *code = ST(items-1);
+    pdl_thread pdl_thr;
+    pdl *pdls[npdls], *child[npdls];
+    SV *csv[npdls], *dims[npdls], *incs[npdls], *others[nothers];
+    PDL_Indx *creating = pdl_packdims(cdimslist,&nd2);
+    PDL_Indx *realdims = pdl_packdims(rdimslist,&nd1);
+    if (nd1 != npdls) croak("threadover: need one realdim flag per pdl!");
+    if (nd2 != npdls) croak("threadover: need one creating flag per pdl!");
+    for(i=0; i<npdls; i++) {
+	pdls[i] = pdl_SvPDLV(ST(i+1));
+	if (creating[i])
+	  nc += realdims[i];
+	else {
+	  pdl_make_physical(pdls[i]); /* is this what we want?XXX */
+	  dtype = PDLMAX(dtype,pdls[i]->datatype);
+	}
     }
-   }
+    for (i=npdls+1; i<=targs; i++)
+	others[i-npdls-1] = ST(i);
+    if (nd2 < nc)
+	croak("Not enough dimension info to create pdls");
+    PDLDEBUG_f(for (i=0;i<npdls;i++) { printf("pdl %d ",i); pdl_dump(pdls[i]); });
+    PDL_THR_CLRMAGIC(&pdl_thr);
+    pdl_initthreadstruct(0,pdls,realdims,creating,npdls,
+			NULL,&pdl_thr,NULL,NULL,NULL, 1);
+    for(i=0, nc=npdls; i<npdls; i++)  /* create as necessary */
+      if (creating[i]) {
+	PDL_Indx *cp = creating+nc;
+	pdls[i]->datatype = dtype;
+	pdl_thread_create_parameter(&pdl_thr,i,cp,0);
+	nc += realdims[i];
+	pdl_make_physical(pdls[i]);
+	PDLDEBUG_f(pdl_dump(pdls[i]));
+	/* And make it nonnull, now that we've created it */
+	pdls[i]->state &= (~PDL_NOMYDIMS);
+      }
+    pdl_startthreadloop(&pdl_thr,NULL,NULL);
+    for(i=0; i<npdls; i++) { /* will the SV*'s be properly freed? */
+	dims[i] = newRV(pdl_unpackint(pdls[i]->dims,realdims[i]));
+	incs[i] = newRV(pdl_unpackint(PDL_VAFFOK(pdls[i]) ?
+	pdls[i]->vafftrans->incs: pdls[i]->dimincs,realdims[i]));
+	/* need to make sure we get the vaffine (grand)parent */
+	if (PDL_VAFFOK(pdls[i]))
+	   pdls[i] = pdls[i]->vafftrans->from;
+	child[i]=pdl_null();
+	/*  instead of pdls[i] its vaffine parent !!!XXX */
+	PDL.affine_new(pdls[i],child[i],pdl_thr.offs[i],dims[i],
+					incs[i]);
+	pdl_make_physical(child[i]); /* make sure we can get at
+					the vafftrans          */
+	csv[i] = sv_newmortal();
+	pdl_SetSV_PDL(csv[i], child[i]); /* pdl* into SV* */
+    }
+    do {  /* the actual threadloop */
+	pdl_trans *traff;
+    	dSP;
+	PUSHMARK(sp);
+	EXTEND(sp,npdls);
+	for(i=0; i<npdls; i++) {
+	   /* just twiddle the offset - quick and dirty */
+	   /* we must twiddle both !! */
+	   traff = child[i]->trans_parent;
+	   traff->offs = pdl_thr.offs[i];
+	   child[i]->vafftrans->offs = pdl_thr.offs[i];
+	   child[i]->state |= PDL_PARENTDATACHANGED;
+	   PUSHs(csv[i]);
+	}
+	for (i=0; i<nothers; i++)
+	  PUSHs(others[i]);   /* pass the OtherArgs onto the stack */
+    	PUTBACK;
+	perl_call_sv(code,G_DISCARD);
+    } while (pdl_iterthreadloop(&pdl_thr,0));
+    pdl_freethreadloop(&pdl_thr);

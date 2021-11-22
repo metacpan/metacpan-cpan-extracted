@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/lib";
 use OpenSSL_Control ();
 
 use Test::More;
-use Test::NoWarnings;
+use Test::FailWarnings;
 use Test::Deep;
 use Test::Exception;
 
@@ -32,11 +32,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Crypt::Perl::ECDSA::Parse ();
 
-if ( !caller ) {
-    my $test_obj = __PACKAGE__->new();
-    plan tests => $test_obj->expected_tests(+1);
-    $test_obj->runtests();
-}
+__PACKAGE__->new()->runtests() if !caller;
 
 #----------------------------------------------------------------------
 
@@ -73,6 +69,17 @@ sub test_public : Tests(1) {
     ) or diag explain $obj;
 
     return;
+}
+
+sub test_public__junk : Tests(2) {
+    throws_ok(
+        sub { Crypt::Perl::ECDSA::Parse::public('nonononono') },
+        'Crypt::Perl::X::Generic',
+        'garbage in',
+    );
+
+    my $err = $@;
+    like($err, qr<ECDSA>, 'error mentions ECDSA');
 }
 
 sub test_jwk_private : Tests(1) {

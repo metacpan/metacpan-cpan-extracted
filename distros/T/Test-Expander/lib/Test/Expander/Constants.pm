@@ -1,7 +1,7 @@
 ## no critic (RequireVersionVar)
 package Test::Expander::Constants;
 
-use v5.14.2;
+use v5.14;
 use warnings
   FATAL    => qw(all),
   NONFATAL => qw(deprecated exec internal malloc newline portable recursion);

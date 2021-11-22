@@ -92,7 +92,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.121';
+our $VERSION = '0.122';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
@@ -1779,6 +1779,11 @@ sub _local_cartesian {
 
     # Rotate X->Y to longitude of station,
     # then Z->X to latitude of station
+
+    # NOTE to Flat Earthers: For the next two statements to produce a
+    # position in a local Cartesian system with the X-Y plane coincident
+    # with the horizon, the Earth must be the oblate spheroid specified
+    # by the currently-set reference elllipsoid.
 
     @tgt[ 0, 1 ] = (
 	  $tgt[0] * $coslon + $tgt[1] * $sinlon,
@@ -4112,8 +4117,11 @@ and without whom it is impossible to get far in computational
 astronomy. Any algorithm not explicitly credited above is probably
 due to him.
 
-Dr. Meeus' publisher, Willmann-Bell Inc (L<https://www.willbell.com/>),
-which kindly and patiently answered my intellectual-property questions.
+Dr. Meeus' publisher, Willmann-Bell Inc, which kindly and patiently
+answered my intellectual-property questions. Willmann-Bell ceased to be
+a separate entity in 2021, but their publications, including Dr. Meeus'
+book, are still available through Sky and Telescope&apos;s Willmann-Bell
+imprint at L<https://shopatsky.com/collections/willmann-bell>.
 
 Goran Gasparovic of MIT, who asked for (and supplied information for)
 the ability to display results in apparent equatorial coordinates,

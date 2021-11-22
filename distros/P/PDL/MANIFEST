@@ -16,17 +16,14 @@ Basic/Core/IFiles.pm
 Basic/Core/Makefile.PL
 Basic/Core/Overloads.pm
 Basic/Core/pdl.h.PL
+Basic/Core/pdlaffine.c
 Basic/Core/pdlapi.c
-Basic/Core/pdlbadvalinit.c.PL
-Basic/Core/pdlconv.c.PL
-Basic/Core/pdlcore.c.PL
-Basic/Core/pdlcore.h.PL
-Basic/Core/pdldataswitch.c.PL
-Basic/Core/pdlhash.c
+Basic/Core/pdlconv.c
+Basic/Core/pdlcore.c
+Basic/Core/pdlcore.h
 Basic/Core/pdlmagic.c
 Basic/Core/pdlmagic.h
 Basic/Core/pdlperl.h.PL
-Basic/Core/pdlsections.g
 Basic/Core/pdlsimple.h.PL
 Basic/Core/pdlthread.c
 Basic/Core/pdlthread.h
@@ -45,16 +42,11 @@ Basic/Gen/PP/dump.pp
 Basic/Gen/PP/PDLCode.pm
 Basic/Gen/PP/PdlParObj.pm
 Basic/Gen/PP/Signature.pm
-Basic/Gen/PP/SymTab.pm
-Basic/Gen/PP/XS.pm
 Basic/Gen/pptemplate
 Basic/Lite.pm
 Basic/LiteF.pm
 Basic/Lvalue.pm
 Basic/Makefile.PL
-Basic/Math/acosh.c
-Basic/Math/asinh.c
-Basic/Math/atanh.c
 Basic/Math/const.c
 Basic/Math/cpoly.c
 Basic/Math/cpoly.h
@@ -76,8 +68,6 @@ Basic/Math/rint.c
 Basic/Math/yn.c
 Basic/Matrix.pm
 Basic/MatrixOps/blas.c
-Basic/MatrixOps/complex.c
-Basic/MatrixOps/complex.h
 Basic/MatrixOps/eigen.c
 Basic/MatrixOps/eigen.h
 Basic/MatrixOps/eigens.c
@@ -86,7 +76,6 @@ Basic/MatrixOps/matrix.c
 Basic/MatrixOps/matrix.h
 Basic/MatrixOps/matrixops.pd
 Basic/MatrixOps/NOTES
-Basic/MatrixOps/protos.h
 Basic/MatrixOps/README.ssl
 Basic/MatrixOps/simq.c
 Basic/MatrixOps/sslib.c
@@ -119,6 +108,7 @@ Basic/Pod/Tips.pod
 Basic/Pod/Tutorials.pod
 Basic/Primitive/Makefile.PL
 Basic/Primitive/primitive.pd
+Basic/Primitive/xoshiro256plus.c
 Basic/Reduce.pm
 Basic/Slices/Makefile.PL
 Basic/Slices/slices.pd
@@ -209,6 +199,7 @@ Example/Benchmark/Bench.xs
 Example/Benchmark/Makefile.PL
 Example/Benchmark/README.md
 Example/Benchmark/time.pl
+Example/doc-pp
 Example/Fit/lmfit_example.pl
 Example/InlinePdlpp/inlpp.pl
 Example/InlinePdlpp/inlpp_link.pl
@@ -351,7 +342,6 @@ INSTALL
 INTERNATIONALIZATION
 IO/Browser/browse.c
 IO/Browser/browser.pd
-IO/Browser/hints/dec_osf.pl
 IO/Browser/Makefile.PL
 IO/Dicom/Dicom.pm
 IO/Dicom/Makefile.PL
@@ -395,9 +385,12 @@ IO/IDL/Makefile.PL
 IO/IDL/README
 IO/IO.pod
 IO/Makefile.PL
+IO/Misc/get.c
 IO/Misc/Makefile.PL
 IO/Misc/misc.pd
 IO/Misc/t/misc.t
+IO/Pnm/get.c
+IO/Pnm/get.h
 IO/Pnm/Makefile.PL
 IO/Pnm/Pic.pm
 IO/Pnm/pnm.pd
@@ -418,6 +411,7 @@ Libtmp/CallExt/t/callext.t
 Libtmp/Compression/compression.pd
 Libtmp/Compression/Makefile.PL
 Libtmp/Compression/ricecomp.c
+Libtmp/Compression/ricecomp.h
 Libtmp/DiskCache.pm
 Libtmp/FFT/fft.pd
 Libtmp/FFT/fftn.c
@@ -531,9 +525,11 @@ Libtmp/GSL/SF/zeta/gsl_sf_zeta.pd
 Libtmp/GSL/SF/zeta/Makefile.PL
 Libtmp/Image2D/image2d.pd
 Libtmp/Image2D/Makefile.PL
+Libtmp/Image2D/misc.c
 Libtmp/Image2D/resample.c
 Libtmp/Image2D/resample.h
 Libtmp/Image2D/rotate.c
+Libtmp/Image2D/select.c
 Libtmp/Image2D/t/image2d.t
 Libtmp/ImageND/imagend.pd
 Libtmp/ImageND/Makefile.PL
@@ -547,6 +543,7 @@ Libtmp/ImageRGB/t/picnorgb.t
 Libtmp/ImageRGB/t/picrgb.t
 Libtmp/Makefile.PL
 Libtmp/Minuit/FCN.c
+Libtmp/Minuit/FCN.h
 Libtmp/Minuit/Makefile.PL
 Libtmp/Minuit/minuit.pd
 Libtmp/Minuit/minuitlib/futils.f
@@ -556,6 +553,7 @@ Libtmp/Minuit/t/minuit.t
 Libtmp/Simplex/Makefile.PL
 Libtmp/Simplex/Simplex.pm
 Libtmp/Simplex/t/simplex.t
+Libtmp/Slatec/barf.c
 Libtmp/Slatec/Gaussian.pm
 Libtmp/Slatec/Linfit.pm
 Libtmp/Slatec/LinPred.pm
@@ -807,7 +805,6 @@ GENERATED/PDL/Image2D.pm                 mod=PDL::Image2D pd=Libtmp/Image2D/imag
 GENERATED/PDL/ImageND.pm                 mod=PDL::ImageND pd=Libtmp/ImageND/imagend.pd (added by pdlpp_mkgen)
 GENERATED/PDL/ImageRGB.pm                mod=PDL::ImageRGB pd=Libtmp/ImageRGB/imagergb.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/Browser.pm              mod=PDL::IO::Browser pd=IO/Browser/browser.pd (added by pdlpp_mkgen)
-GENERATED/PDL/IO/GD.pm                   mod=PDL::IO::GD pd=IO/GD/GD.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/HDF.pm                  mod=PDL::IO::HDF pd=IO/HDF/VS/VS.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/HDF/SD.pm               mod=PDL::IO::HDF::SD pd=IO/HDF/SD/SD.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/Misc.pm                 mod=PDL::IO::Misc pd=IO/Misc/misc.pd (added by pdlpp_mkgen)

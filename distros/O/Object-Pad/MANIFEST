@@ -25,6 +25,7 @@ lib/Object/Pad/ExtensionBuilder_data.pm.PL
 lib/Object/Pad/MOP/Class.pm
 lib/Object/Pad/MOP/Method.pm
 lib/Object/Pad/MOP/Slot.pm
+lib/Object/Pad/MOP/SlotAttr.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -65,16 +66,17 @@ t/51pragmata.t
 t/52croak-scope.t
 t/53croak-override.t
 t/54croak-role.t
-t/70mop-class.t
-t/71mop-create-class.t
-t/72mop-slot.t
-t/73mop-create-slot.t
-t/74mop-method.t
-t/75mop-create-method.t
-t/76mop-role.t
-t/77mop-create-role.t
-t/78mop-compose-role.t
-t/79mop-generated.t
+t/60mop-class.t
+t/61mop-create-class.t
+t/62mop-slot.t
+t/63mop-create-slot.t
+t/64mop-method.t
+t/65mop-create-method.t
+t/66mop-role.t
+t/67mop-create-role.t
+t/68mop-compose-role.t
+t/69mop-generated.t
+t/70mop-custom-slotattr.t
 t/80async-method.t
 t/80dynamically+Object-Pad.t
 t/81async-method+dynamically.t

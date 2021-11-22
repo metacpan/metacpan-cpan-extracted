@@ -65,7 +65,7 @@ require AutoLoader;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-our $VERSION = '2.22';
+our $VERSION = '2.24';
 
 
 bootstrap Math::GMP $VERSION;
@@ -118,7 +118,7 @@ Math::GMP - High speed arbitrary size integer math
 
 =head1 VERSION
 
-version 2.22
+version 2.24
 
 =head1 SYNOPSIS
 
@@ -205,6 +205,17 @@ be represented in the base specified by the second parameter.
   print $val;
 
 Calculates the factorial of $x and returns the result.
+
+=head2 $n->bnok($k)
+
+  $x = Math::GMP->new(5);
+  my $val = $x->bnok(2);      # 1*2*3*4*5/(1*2)/(1*2*3) = 10
+  print $val;
+
+Calculates the binomial coefficient of $n over $k and returns the result.
+Equals to $n!/($k!*($n-$k)!).
+
+( Added in version 2.23 .)
 
 =head2 my $val = $x->band($y, $swap)
 
@@ -430,6 +441,18 @@ modifying $x).
 
 Returns a Math::GMP object containing $x shifted by $shift bits
 (where $shift is a plain integer).
+
+=head2 my $multiplied = $x->bmulf($float)
+
+  my $x = Math::GMP->new(3)->bpow(100);
+  my $ret = $x->bmulf(1.5);
+
+  # $ret is now Math::GMP of floor(3^101 / 2)
+
+Returns a Math::GMP object representing $x multiplied by the floating point
+value $float (with the result truncated towards zero).
+
+( Added in version 2.23 .)
 
 =head2 my $ret = $base->powm_gmp($exp, $mod);
 

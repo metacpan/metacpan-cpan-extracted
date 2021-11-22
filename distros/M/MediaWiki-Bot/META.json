@@ -33,7 +33,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -71,7 +71,7 @@
             "List::Util" : "0",
             "MediaWiki::API" : "0.36",
             "Module::Pluggable" : "0",
-            "perl" : "5.008",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -86,7 +86,7 @@
             "Test::More" : "0.96",
             "Test::RequiresInternet" : "0",
             "Test::Warn" : "0",
-            "perl" : "5.008",
+            "perl" : "5.010",
             "utf8" : "0"
          }
       }
@@ -103,7 +103,7 @@
          "web" : "https://github.com/MediaWiki-Bot/MediaWiki-Bot"
       }
    },
-   "version" : "5.006004",
+   "version" : "5.007000",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "GPL-3.0-only"

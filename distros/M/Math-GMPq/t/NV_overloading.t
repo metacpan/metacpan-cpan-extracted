@@ -1,13 +1,15 @@
 # Mainly want to test that:
-# inf and nan are handled correctly when passed to overloaded subs (including when they're passed as strings)
-# valid floating point NV's are handled correctly when passed to overloaded subs
-# valid floating point values are a fatal error when passed as a string
+# inf and nan are handled correctly when passed to overloaded subs (including when they're passed as strings);
+# valid floating point NV's are handled correctly when passed to overloaded subs;
+# valid floating point values are a fatal error when passed as a string.
+
+# Also test that, when NV is doubledouble, overloaded comparison of NV with Math::RMPq object is correct.
 
 use strict;
 use warnings;
 use Math::GMPq;
 
-print "1..121\n";
+print "1..138\n";
 
 my $inf  = 999 ** (999 ** 999);
 my $ninf = $inf * -1;
@@ -32,7 +34,7 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) *  $nan };
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 3\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 3\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 3\n";
@@ -81,7 +83,7 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) +  $nan };
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 9\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 9\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 9\n";
@@ -130,7 +132,7 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) /  $nan };
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 15\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 15\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 15\n";
@@ -180,7 +182,7 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) -  $nan };
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 21\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 21\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 21\n";
@@ -232,7 +234,7 @@ else {
 }
 
 eval{$ret *=  $nan };
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 27\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 27\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 27\n";
@@ -281,7 +283,7 @@ else {
 }
 
 eval{$ret +=  $nan };
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 33\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 33\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 33\n";
@@ -331,7 +333,7 @@ else {
 }
 
 eval{$ret -=  $nan };
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 39\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 39\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 39\n";
@@ -380,7 +382,7 @@ else {
 }
 
 eval{$ret /=  $nan };
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 45\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 45\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 45\n";
@@ -437,7 +439,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) ==  $nan )};
-if($@ =~ /In Math::GMPq::overload_equiv, cannot compare a NaN to a Math::GMPq value/) {print "ok 52\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 52\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 52\n";
@@ -492,7 +494,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) !=  $nan )};
-if($@ =~ /In Math::GMPq::overload_not_equiv, cannot compare a NaN to a Math::GMPq value/) {print "ok 59\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 59\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 59\n";
@@ -548,7 +550,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) <  $nan )};
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 66\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 66\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 66\n";
@@ -605,7 +607,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) <=  $nan )};
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 73\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 73\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 73\n";
@@ -661,7 +663,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) >=  $nan )};
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 80\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 80\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 80\n";
@@ -718,7 +720,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) >  $nan )};
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 87\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 87\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 87\n";
@@ -825,7 +827,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) <=>  $nan )};
-if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 102\n"}
+if($@ =~ /cannot (coerce|compare) a NaN to a Math::GMP/) {print "ok 102\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 102\n";
@@ -965,4 +967,234 @@ if($s1 == 0.625) {print "ok 121\n"}
 else {
   warn "\n $s1 != 0.625\n";
   print "not ok 121\n";
+}
+
+
+my $big       = 2 ** 100;
+my $big_plus  = $big + (2 ** -1060);
+my $big_minus = $big - (2 ** -1060);
+
+# If NV is doubledouble, then $big_plus > $big > $big_minus.
+# Else $big_plus == $big == $big_minus.
+
+######## big+ > big #######
+
+if($big_plus > $big) {
+  if(Math::GMPq->new($big_plus) > Math::GMPq->new($big)
+      &&
+    Math::GMPq->new($big_plus) > $big
+      &&
+    $big < Math::GMPq->new($big_plus)) { print "ok 122\n" }
+  else {
+    warn "Math::GMPq overloading of '>' is mistaken\n";
+    print "not ok 122\n";
+  }
+}
+else { print "ok 122\n" }
+
+######## big+ == big #######
+
+if($big_plus == $big) {
+  if(Math::GMPq->new($big_plus) == Math::GMPq->new($big)
+      &&
+     Math::GMPq->new($big_plus) == $big
+      &&
+     $big == Math::GMPq->new($big_plus)) { print "ok 123\n" }
+  else {
+    warn "Math::GMPq overloading of '==' is mistaken\n";
+    print "not ok 123\n";
+  }
+}
+else { print "ok 123\n" }
+
+######## big > big- #######
+
+if($big > $big_minus) {
+  if(Math::GMPq->new($big) > Math::GMPq->new($big_minus)) { print "ok 124\n" }
+  else {
+    warn "Math::GMPq overloading of '>' is mistaken\n";
+    print "not ok 124\n";
+  }
+}
+else { print "ok 124\n" }
+
+######## big == big- #######
+
+if($big == $big_minus) {
+  if(Math::GMPq->new($big) == Math::GMPq->new($big_minus)) { print "ok 125\n" }
+  else {
+    warn "Math::GMPq overloading of '==' is mistaken\n";
+    print "not ok 125\n";
+  }
+}
+else { print "ok 125\n" }
+
+######## big+ > big- #######
+
+if($big_plus > $big_minus) {
+  if(Math::GMPq->new($big_plus) > Math::GMPq->new($big_minus)) { print "ok 126\n" }
+  else {
+    warn "Math::GMPq overloading of '>' is mistaken\n";
+    print "not ok 126\n";
+  }
+}
+else { print "ok 126\n" }
+
+######## big+ == big- #######
+
+if($big_plus == $big_minus) {
+  if(Math::GMPq->new($big_plus) == Math::GMPq->new($big_minus)) { print "ok 127\n" }
+  else {
+    warn "Math::GMPq overloading of '==' is mistaken\n";
+    print "not ok 127\n";
+  }
+}
+else { print "ok 127\n" }
+
+###################
+###################
+
+######## big < big+ #######
+
+if($big < $big_plus) {
+  if(Math::GMPq->new($big) < Math::GMPq->new($big_plus)
+      &&
+     Math::GMPq->new($big) < $big_plus
+      &&
+    $big_plus > Math::GMPq->new($big)) { print "ok 128\n" }
+  else {
+    warn "Math::GMPq overloading of '<' is mistaken\n";
+    print "not ok 128\n";
+  }
+}
+else { print "ok 128\n" }
+
+######## big- < big+ #######
+
+if($big_minus < $big_plus) {
+  if(Math::GMPq->new($big_minus) < Math::GMPq->new($big_plus)) { print "ok 129\n" }
+  else {
+    warn "Math::GMPq overloading of '<' is mistaken\n";
+    print "not ok 129\n";
+  }
+}
+else { print "ok 129\n" }
+
+######## big- < big #######
+
+if($big_minus < $big) {
+  if(Math::GMPq->new($big_minus) < Math::GMPq->new($big)) { print "ok 130\n" }
+  else {
+    warn "Math::GMPq overloading of '<' is mistaken\n";
+    print "not ok 130\n";
+  }
+}
+else { print "ok 130\n" }
+
+#############################
+#############################
+
+######## big+ >= big #######
+
+if($big_plus >= $big) {
+  if(Math::GMPq->new($big_plus) >= Math::GMPq->new($big)
+      &&
+     Math::GMPq->new($big_plus) >= $big
+      &&
+     $big <= Math::GMPq->new($big_plus)) { print "ok 131\n" }
+  else {
+    warn "Math::GMPq overloading of '>=' is mistaken\n";
+    print "not ok 131\n";
+  }
+}
+else { print "ok 131\n" }
+
+######## big >= big- #######
+
+if($big >= $big_minus) {
+  if(Math::GMPq->new($big) >= Math::GMPq->new($big_minus)) { print "ok 132\n" }
+  else {
+    warn "Math::GMPq overloading of '>=' is mistaken\n";
+    print "not ok 132\n";
+  }
+}
+else { print "ok 132\n" }
+
+######## big+ >= big- #######
+
+if($big_plus >= $big_minus) {
+  if(Math::GMPq->new($big_plus) >= Math::GMPq->new($big_minus)) { print "ok 133\n" }
+  else {
+    warn "Math::GMPq overloading of '>=' is mistaken\n";
+    print "not ok 133\n";
+  }
+}
+else { print "ok 133\n" }
+
+######## big <= big+ #######
+
+if($big <= $big_plus) {
+  if(Math::GMPq->new($big) <= Math::GMPq->new($big_plus)
+      &&
+     Math::GMPq->new($big) <= $big_plus
+      &&
+     $big_plus >= Math::GMPq->new($big)) { print "ok 134\n" }
+  else {
+    warn "Math::GMPq overloading of '<=' is mistaken\n";
+    print "not ok 134\n";
+  }
+}
+else { print "ok 134\n" }
+
+######## big- <= big+ #######
+
+if($big_minus <= $big_plus) {
+  if(Math::GMPq->new($big_minus) <= Math::GMPq->new($big_plus)) { print "ok 135\n" }
+  else {
+    warn "Math::GMPq overloading of '<=' is mistaken\n";
+    print "not ok 135\n";
+  }
+}
+else { print "ok 135\n" }
+
+######## big- <= big #######
+
+if($big_minus <= $big) {
+  if(Math::GMPq->new($big_minus) <= Math::GMPq->new($big)) { print "ok 136\n" }
+  else {
+    warn "Math::GMPq overloading of '<=' is mistaken\n";
+    print "not ok 136\n";
+  }
+}
+else { print "ok 136\n" }
+
+######## big- != big #######
+
+if($big_minus != $big) {
+  if((Math::GMPq->new($big_minus) <=> Math::GMPq->new($big)) < 0
+      &&
+     (Math::GMPq->new($big) <=> Math::GMPq->new($big_minus)) > 0
+      &&
+     (Math::GMPq->new($big_minus) <=> $big) < 0
+      &&
+     (Math::GMPq->new($big) <=> $big_minus) > 0
+      &&
+     ($big_minus <=> Math::GMPq->new($big)) < 0
+      &&
+     ($big <=> Math::GMPq->new($big_minus)) > 0) { print "ok 137\n" }
+  else {
+    warn "Math::GMPq overloading of '<=>' is mistaken\n";
+    print "not ok 137\n";
+  }
+}
+else { print "ok 137\n" }
+
+if((Math::GMPq->new($big_minus) <=> Math::GMPq->new($big_minus)) == 0
+     &&
+   (Math::GMPq->new($big_minus) <=> $big_minus) == 0
+     &&
+   ($big_minus <=> Math::GMPq->new($big_minus)) == 0) { print "ok 138\n" }
+else {
+  warn "Math::GMPq overloading of '<=>' is mistaken\n";
+  print "not ok 138\n";
 }

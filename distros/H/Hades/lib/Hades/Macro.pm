@@ -1,7 +1,7 @@
 package Hades::Macro;
 use strict;
 use warnings;
-our $VERSION = 0.19;
+our $VERSION = 0.21;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );

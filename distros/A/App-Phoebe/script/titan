@@ -29,8 +29,8 @@ B<titan> [B<--help>] [B<--token=>I<TOKEN>] [B<--mime=>I<MIMETYPE>]
 
 This is a script to upload content to a Titan-enabled site like Phoebe.
 
-B<--url=URL> specifies the Titan URL to use; this should be really similar to
-the Gemini URL you used to read the page.
+B<URL> specifies the Titan URL to use; this should be really similar to the
+Gemini URL you used to read the page.
 
 B<--token=TOKEN> specifies the token to use; this is optional but spammers and
 vandals basically ensured that any site out on the Internet needs some sort of
@@ -79,14 +79,14 @@ use File::Temp qw(tempfile);
 use IO::Socket::SSL;
 use Getopt::Long;
 
-my $cert_file;
-my $cert_key;
+my $cert;
+my $key;
 my $token;
 my $help;
 my $mime;
 
-GetOptions ("cert_file=s" => \$cert_file,
-	    "cert_key=s" => \$cert_key,
+GetOptions ("cert_file=s" => \$cert,
+	    "key_file=s" => \$key,
 	    "token=s"  => \$token,
 	    "mime=s"  => \$mime,
 	    "help"  => \$help,)
@@ -147,13 +147,10 @@ my %args = (PeerHost => $host,
 	    PeerService => $port,
 	    SSL_verify_mode => SSL_VERIFY_NONE);
 # Default certs
-$args{SSL_cert_file} = 'client-cert.pem' if -f 'client-cert.pem';
-$args{SSL_key_file} = 'client-key.pem' if -f 'client-key.pem';
-# Read --cert_file and --key_file
-for (grep(/--(key|cert)_file=/, @ARGV)) {
-  $args{SSL_cert_file} = $1 if /--cert_file=(.*)/;
-  $args{SSL_key_file} = $1 if /--key_file=(.*)/;
-}
+$args{SSL_cert_file} = $cert;
+$args{SSL_key_file} = $key;
+$args{SSL_cert_file} //= 'client-cert.pem' if -f 'client-cert.pem';
+$args{SSL_key_file} //= 'client-key.pem' if -f 'client-key.pem';
 
 for my $file (@files) {
   open(my $fh, '<', $file) or die "⚠ The file '$file' cannot be read: $!\n";

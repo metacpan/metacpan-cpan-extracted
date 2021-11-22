@@ -23,13 +23,13 @@ produces output
     colour
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-EN-ABC-0.10/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-EN-ABC-0.12/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Lingua::EN::ABC version 0.10
-corresponding to git commit L<84cbfd6ac012731380f626dac5981b376fe5f251|https://github.com/benkasminbullock/Lingua-EN-ABC/commit/84cbfd6ac012731380f626dac5981b376fe5f251> released on Wed Sep 26 21:05:50 2018 +0900.
+This documents Lingua::EN::ABC version 0.12
+corresponding to git commit L<20d6292bafb5dd6d7e04bd1b24ffc119d01ab761|https://github.com/benkasminbullock/Lingua-EN-ABC/commit/20d6292bafb5dd6d7e04bd1b24ffc119d01ab761> released on Tue Nov 16 17:19:21 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ produces output
     aluminum airplane labour centre pyjamas
 
 
-(This example is included as L<F<alairlab.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-EN-ABC-0.10/examples/alairlab.pl> in the distribution.)
+(This example is included as L<F<alairlab.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-EN-ABC-0.12/examples/alairlab.pl> in the distribution.)
 
 
 In this case, word pairs with differing pronunciations, like "burnt"
@@ -164,7 +164,7 @@ that it's easy to search and check.
 
 C<respell> is a tool to convert English text from one spelling system
 to another. This used to be at http://membled.com/work/apps/respell,
-but that web site has now disappeared as of Wed Sep 26 21:05:50 2018 +0900.
+but that web site has now disappeared as of Tue Nov 16 17:19:21 2021 +0900.
 
 =back
 
@@ -250,7 +250,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2013-2018
+2013-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

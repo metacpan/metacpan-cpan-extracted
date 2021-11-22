@@ -29,6 +29,7 @@ Low/vars.c
 Low/vars.h
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 pl.pl
 README
 t/1Low.t
@@ -38,4 +39,5 @@ t/4pods.t
 t/5opaque.t
 Yaswi.pm
 samples/clp.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

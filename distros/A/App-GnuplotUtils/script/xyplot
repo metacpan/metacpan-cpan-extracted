@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GnuplotUtils/xyplot
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-10'; # DATE
+our $DATE = '2021-07-02'; # DATE
 our $DIST = 'App-GnuplotUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,47 +38,55 @@ xyplot - Plot XY dataset(s) using gnuplot
 
 =head1 VERSION
 
-This document describes version 0.002 of xyplot (from Perl distribution App-GnuplotUtils), released on 2020-12-10.
+This document describes version 0.003 of xyplot (from Perl distribution App-GnuplotUtils), released on 2021-07-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % xyplot [--chart-title=s] [-d=s] [--dataset-file=s+]
-     [--dataset-files-json=s] [--dataset-style=s+]
-     [--dataset-styles-json=s] [--dataset-title=s+]
-     [--dataset-titles-json=s] [--datasets-json=s] [--datasets=s]
-     [--field-delimiter=s] [--format=name] [--json] [--(no)naked-res]
-     [--page-result[=program]] [--view-result[=program]]
+ % xyplot [-O] [--chart-title=s] [-d=s] [--dataset-data=s+]
+     [--dataset-datas-json=s] [--dataset-file=s+] [--dataset-files-json=s]
+     [--dataset-style=s+] [--dataset-styles-json=s] [--dataset-title=s+]
+     [--dataset-titles-json=s] [--field-delimiter=s] [--format=name]
+     [--json] [--(no)naked-res] [--no-overwrite] [--nooverwrite] [-o=s]
+     [--output-file=s] [--overwrite] [--page-result[=program]]
+     [--view-result[=program]] -- [dataset_file] ...
 
 =head1 DESCRIPTION
 
-Example C<input1.txt>, each line contains whitespace-separated values of X data
-(number), Y data (number):
+This utility is a wrapper for gnuplot to quickly generate a graph from the
+command-line and view it using a browser or an image viewer program. You can
+specify the dataset to plot directly from the command-line or specify filename
+to read the dataset from.
+
+To plot directly from the command-line:
+
+ % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' ; # whitespaces are optional
+
+To add more datasets, specify more C<--dataset-data> options:
+
+ % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
+          --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
+
+To add a title to your chart and every dataset:
+
+ % xyplot --chart-title "my chart" \
+          --dataset-title "foo" --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
+          --dataset-title "bar" --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
+
+To specify dataset from a file, use C<--dataset-file> option (or specify as
+arguments):
+
+ % xyplot --dataset-file ds1.txt --dataset-file ds2.txt
+ % xyplot ds1.txt ds2.txt
+
+C<ds1.txt> contains these lines:
 
  1 1
  2 3
  3 5.5
  4 7.9
  6 11.5
-
-Example using C<xyplot> (one data-set):
-
- % xyplot < input1.txt
-
-Example C<input2.txt>:
-
- 1 8
- 2 12
- 3 5
- 4 4
- 6 8
-
-Using two datasets:
-
- % xyplot --dataset-file  input1.txt  --dataset-file  input2.txt \
-          --dataset-color red         --dataset-color blue \
-          --dataset-style linespoints --dataset-style points
 
 Keywords: xychart, XY chart, XY plot
 
@@ -92,9 +100,23 @@ C<*> marks required options.
 
 =item B<--chart-title>=I<s>
 
+=item B<--dataset-data>=I<s@>
+
+Dataset(s).
+
+Can be specified multiple times.
+
+=item B<--dataset-datas-json>=I<s>
+
+Dataset(s) (JSON-encoded).
+
+See C<--dataset-data>.
+
 =item B<--dataset-file>=I<s@>
 
 Dataset(s) from file(s).
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
@@ -103,6 +125,8 @@ Can be specified multiple times.
 Dataset(s) from file(s) (JSON-encoded).
 
 See C<--dataset-file>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--dataset-style>=I<s@>
 
@@ -128,19 +152,9 @@ Dataset title(s) (JSON-encoded).
 
 See C<--dataset-title>.
 
-=item B<--datasets-json>=I<s>
-
-Dataset(s) (JSON-encoded).
-
-See C<--datasets>.
-
-=item B<--datasets>=I<s>
-
-Dataset(s).
-
 =item B<--field-delimiter>=I<s>, B<-d>
 
-Supply field delimiter character in dataset file instead of the default whitespace(s).
+Supply field delimiter character in dataset file instead of the default whitespace(s) or comma(s).
 
 =back
 
@@ -180,6 +194,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--output-file>=I<s>, B<-o>
+
+=item B<--overwrite>, B<-O>
 
 =item B<--page-result>
 
@@ -249,7 +267,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-GnuplotUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-GnuplotUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GnuplotUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -261,7 +279,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

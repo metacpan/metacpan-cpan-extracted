@@ -1,43 +1,7 @@
-#ifdef NO_TRAILING_USCORE
+#include "FCN.h"
 
-#define MNINIT mninit
-#define MNSETI mnseti
-#define MNPARM mnparm
-#define MNPARS mnpars
-#define MNEXCM mnexcm
-#define MNCOMD mncomd
-#define MNPOUT mnpout
-#define MNSTAT mnstat
-#define MNEMAT mnemat
-#define MNERRS mnerrs
-#define MNCONT mncont
-
-#define ABRE   abre
-#define CIERRA cierra
-
-#else
-
-#define MNINIT mninit_
-#define MNSETI mnseti_
-#define MNPARM mnparm_
-#define MNPARS mnpars_
-#define MNEXCM mnexcm_
-#define MNCOMD mncomd_
-#define MNPOUT mnpout_
-#define MNSTAT mnstat_
-#define MNEMAT mnemat_
-#define MNERRS mnerrs_
-#define MNCONT mncont_
-
-#define ABRE   abre_
-#define CIERRA cierra_
-
-#endif 
-
-static SV* mnfunname;
-static int ene;
-
-void FCN(int* npar,double* grad,double* fval,double* xval,int* iflag,double* futil);
+SV* mnfunname;
+int ene;
 
 void FCN(int* npar,double* grad,double* fval,double* xval,int* iflag,double* futil){
 
@@ -54,9 +18,6 @@ void FCN(int* npar,double* grad,double* fval,double* xval,int* iflag,double* fut
   pdl* pxval;
   SV* pxvalsv;
   
-  int ndims;
-  PDL_Indx *pdims;
-
   dSP;
   ENTER;
   SAVETMPS;
@@ -64,8 +25,8 @@ void FCN(int* npar,double* grad,double* fval,double* xval,int* iflag,double* fut
   /* get name of function on the Perl side */
   funname = mnfunname;
 
-  ndims = 1;
-  pdims = (PDL_Indx *)  PDL->smalloc( (STRLEN) ((ndims) * sizeof(*pdims)) );
+  int ndims = 1;
+  PDL_Indx pdims[ndims];
   
   pdims[0] = (PDL_Indx) ene;
 
@@ -78,10 +39,9 @@ void FCN(int* npar,double* grad,double* fval,double* xval,int* iflag,double* fut
   PUTBACK;
   pxval = PDL->SvPDLV(pxvalsv);
  
-  PDL->converttype( &pxval, PDL_D, PDL_PERM );
+  PDL->converttype( pxval, PDL_D );
   PDL->children_changesoon(pxval,PDL_PARENTDIMSCHANGED|PDL_PARENTDATACHANGED);
   PDL->setdims (pxval,pdims,ndims);
-  pxval->state &= ~PDL_NOMYDIMS;
   pxval->state |= PDL_ALLOCATED | PDL_DONTTOUCHDATA;
   PDL->changed(pxval,PDL_PARENTDIMSCHANGED|PDL_PARENTDATACHANGED,0);
 
@@ -94,10 +54,9 @@ void FCN(int* npar,double* grad,double* fval,double* xval,int* iflag,double* fut
   PUTBACK;
   pgrad = PDL->SvPDLV(pgradsv);
   
-  PDL->converttype( &pgrad, PDL_D, PDL_PERM );
+  PDL->converttype( pgrad, PDL_D );
   PDL->children_changesoon(pgrad,PDL_PARENTDIMSCHANGED|PDL_PARENTDATACHANGED);
   PDL->setdims (pgrad,pdims,ndims);
-  pgrad->state &= ~PDL_NOMYDIMS;
   pgrad->state |= PDL_ALLOCATED | PDL_DONTTOUCHDATA;
   PDL->changed(pgrad,PDL_PARENTDIMSCHANGED|PDL_PARENTDATACHANGED,0);
 

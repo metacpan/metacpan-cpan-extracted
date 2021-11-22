@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.791
+version 3.792
 
 =head1 OVERVIEW
 
@@ -184,7 +184,7 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 =item * L<Lab::Moose::Instrument::ZI_HF2LI>
 
-=item * work in progress: L<Lab::Moose::Instrument::SignalRecovery7265>
+=item * L<Lab::Moose::Instrument::SignalRecovery7265>
 
 =back
 

@@ -7,13 +7,14 @@ package Date::Manip::TZdata;
 require 5.010000;
 use IO::File;
 use Date::Manip::Base;
+use Carp;
 
 use strict;
 use integer;
 use warnings;
 
 our $VERSION;
-$VERSION='6.85';
+$VERSION='6.86';
 END { undef $VERSION; }
 
 ###############################################################################
@@ -87,7 +88,7 @@ sub new {
   $dir = '.'  if (! $dir);
 
   if (! -d "$dir/tzdata") {
-     die "ERROR: no tzdata directory found\n";
+     croak "ERROR: no tzdata directory found\n";
   }
 
   my $self = {
@@ -353,7 +354,7 @@ sub _tzd_ParseFile {
    my $dir   = $$self{'dir'};
    print "... $file\n"  if ($Verbose);
    if (! $in->open("$dir/tzdata/$file")) {
-      warn "WARNING: [parse_file] unable to open file: $file: $!\n";
+      carp "WARNING: [parse_file] unable to open file: $file: $!";
       return;
    }
    my @in   = <$in>;
@@ -388,7 +389,7 @@ sub _tzd_ParseFile {
       } else {
          $n++;
          my $line = shift(@in);
-         warn "WARNING: [parse_file] unknown line: $n\n" .
+         carp "WARNING: [parse_file] unknown line: $n\n" .
               "         $line\n";
       }
    }
@@ -402,7 +403,7 @@ sub _tzd_ParseLink {
 
    my(@tmp) = split(/\s+/,$line);
    if ($#tmp != 2  ||  lc($tmp[0]) ne 'link') {
-      warn "ERROR: [parse_file] invalid Link line: $file: $$n\n" .
+      carp "ERROR: [parse_file] invalid Link line: $file: $$n\n" .
            "       $line\n";
       return;
    }
@@ -410,7 +411,7 @@ sub _tzd_ParseLink {
    my($tmp,$zone,$alias) = @tmp;
 
    if ($self->_tzd_Alias($alias)) {
-      warn "WARNING: [parse_file] alias redefined: $file: $$n: $alias\n";
+      carp "WARNING: [parse_file] alias redefined: $file: $$n: $alias";
    }
 
    $self->_tzd_Alias($alias,$zone);
@@ -424,7 +425,7 @@ sub _tzd_ParseRule {
 
    my(@tmp) = split(/\s+/,$line);
    if ($#tmp != 9  ||  lc($tmp[0]) ne 'rule') {
-      warn "ERROR: [parse_file] invalid Rule line: $file: $$n:\n" .
+      carp "ERROR: [parse_file] invalid Rule line: $file: $$n:\n" .
            "       $line\n";
       return;
    }
@@ -444,7 +445,7 @@ sub _tzd_ParseZone {
    my @tmp  = split(/\s+/,$line);
 
    if ($#tmp < 4  ||  lc($tmp[0]) ne 'zone') {
-      warn "ERROR: [parse_file] invalid Zone line: $file :$$n\n" .
+      carp "ERROR: [parse_file] invalid Zone line: $file :$$n\n" .
            "       $line\n";
       return;
    }
@@ -458,7 +459,7 @@ sub _tzd_ParseZone {
    # Store the zone name information
 
    if ($self->_tzd_Zone($zone)) {
-      warn "ERROR: [parse_file] zone redefined: $file: $$n: $zone\n";
+      carp "ERROR: [parse_file] zone redefined: $file: $$n: $zone";
       $self->_tzd_DeleteZone($zone);
    }
    $self->_tzd_Alias($zone,$zone);
@@ -478,7 +479,7 @@ sub _tzd_ParseZone {
       @tmp = split(/\s+/,$line);
 
       if ($#tmp < 2) {
-         warn "ERROR: [parse_file] invalid Zone line: $file: $$n\n" .
+         carp "ERROR: [parse_file] invalid Zone line: $file: $$n\n" .
               "       $line\n";
          return;
       }
@@ -559,7 +560,7 @@ sub _tzd_CheckAliases {
             next ALIAS;
 
          } elsif (exists $tmp{$zone}) {
-            warn "ERROR: [check_aliases] circular alias definition: $alias\n";
+            carp "ERROR: [check_aliases] circular alias definition: $alias";
             $self->_tzd_DeleteAlias($alias);
             next ALIAS;
 
@@ -569,7 +570,7 @@ sub _tzd_CheckAliases {
             next;
          }
 
-         warn "ERROR: [check_aliases] unresolved alias definition: $alias\n";
+         carp "ERROR: [check_aliases] unresolved alias definition: $alias";
          $self->_tzd_DeleteAlias($alias);
          next ALIAS;
       }
@@ -793,7 +794,7 @@ sub _rule_From {
    } elsif ($from eq 'minimum'  ||  $from eq 'min') {
       return '0001';
    }
-   warn "ERROR: [rule_from] invalid: $rule: $from\n";
+   carp "ERROR: [rule_from] invalid: $rule: $from";
    $Error = 1;
    return '';
 }
@@ -809,7 +810,7 @@ sub _rule_To {
    } elsif (lc($to) eq 'only') {
       return $from;
    }
-   warn "ERROR: [rule_to] invalid: $rule: $to\n";
+   carp "ERROR: [rule_to] invalid: $rule: $to";
    $Error = 1;
    return '';
 }
@@ -820,7 +821,7 @@ sub _rule_Type {
    return lc($type)  if (lc($type) eq "-"     ||
                          lc($type) eq 'even'  ||
                          lc($type) eq 'odd');
-   warn "ERROR: [rule_type] invalid: $rule: $type\n";
+   carp "ERROR: [rule_type] invalid: $rule: $type";
    $Error = 1;
    return '';
 }
@@ -830,7 +831,7 @@ sub _rule_In {
    my($self,$rule,$in) = @_;
    my($i) = $self->_rule_Month($in);
    if (! $i) {
-      warn "ERROR: [rule_in] invalid: $rule: $in\n";
+      carp "ERROR: [rule_in] invalid: $rule: $in";
       $Error = 1;
    }
    return $i;
@@ -845,7 +846,7 @@ sub _rule_On {
    my($dow,$num,$flag,$err) = $self->_rule_DOM($on);
 
    if ($err) {
-      warn "ERROR: [rule_on] invalid: $rule: $on\n";
+      carp "ERROR: [rule_on] invalid: $rule: $on";
       $Error = 1;
    }
 
@@ -857,7 +858,7 @@ sub _rule_At {
    my($self,$rule,$at) = @_;
    my($ret,$attype) = $self->_rule_Time($at,0,1);
    if (! $ret) {
-      warn "ERROR: [rule_at] invalid: $rule: $at\n";
+      carp "ERROR: [rule_at] invalid: $rule: $at";
       $Error = 1;
    }
    return($attype,$ret);
@@ -869,7 +870,7 @@ sub _rule_Save {
    $save = '00:00:00'  if ($save eq "-");
    my($ret) = $self->_rule_Time($save,1);
    if (! $ret) {
-      warn "ERROR: [rule_save] invalid: $rule: $save\n";
+      carp "ERROR: [rule_save] invalid: $rule: $save";
       $Error=1;
    }
    return $ret;
@@ -1030,7 +1031,7 @@ sub _zone_GMTOff {
    my($self,$zone,$gmt) = @_;
    my($ret) = $self->_rule_Time($gmt,1);
    if (! $ret) {
-      warn "ERROR: [zone_gmtoff] invalid: $zone: $gmt\n";
+      carp "ERROR: [zone_gmtoff] invalid: $zone: $gmt";
       $Error = 1;
    }
    return $ret;
@@ -1043,7 +1044,7 @@ sub _zone_Rule {
    my($ret) = $self->_rule_Time($rule,1);
    return ($TZ_OFFSET,$ret)     if ($ret);
    if (! $self->_tzd_Rule($rule)) {
-      warn "ERROR: [zone_rule] rule undefined: $zone: $rule\n";
+      carp "ERROR: [zone_rule] rule undefined: $zone: $rule";
       $Error = 1;
    }
    return ($TZ_RULE,$rule);
@@ -1070,7 +1071,7 @@ sub _zone_Until {
    } else {
       # Until '1975 ...'
       if ($y !~ /^\d\d\d\d$/) {
-         warn "ERROR: [zone_until] invalid year: $zone: $y\n";
+         carp "ERROR: [zone_until] invalid year: $zone: $y";
          $Error = 1;
          return ();
       }
@@ -1086,7 +1087,7 @@ sub _zone_Until {
          # Until '1920 Mar ...'
          $tmp = $self->_rule_Month($m);
          if (! $tmp) {
-            warn "ERROR: [zone_until] invalid month: $zone: $m\n";
+            carp "ERROR: [zone_until] invalid month: $zone: $m";
             $Error = 1;
             return ();
          }
@@ -1144,7 +1145,7 @@ sub _zone_Until {
    # Make sure that day and month are valid and formatted correctly
    ($dow,$num,$flag,$err) = $self->_rule_DOM($d);
    if ($err) {
-      warn "ERROR: [zone_until] invalid day: $zone: $d\n";
+      carp "ERROR: [zone_until] invalid day: $zone: $d";
       $Error = 1;
       return ();
    }
@@ -1157,7 +1158,7 @@ sub _zone_Until {
    } else {
       ($tmp,$type) = $self->_rule_Time($t,0,1);
       if (! $tmp) {
-         warn "ERROR: [zone_until] invalid time: $zone: $t\n";
+         carp "ERROR: [zone_until] invalid time: $zone: $t";
          $Error = 1;
          return ();
       }

@@ -11,7 +11,7 @@ use Config;
 use Cwd;
 
 my $base = Cwd::cwd;
-my $commit = 'd0838c21ef7104e3dc4e4bad74676ed815aed981';
+my $commit = '3e4cd724ea7ac538723a2044878e7af40481fa4b';
 
 sub new {
     my $class = shift;
@@ -28,7 +28,8 @@ sub new {
             'Alien::gmake' => 0.11, # needed for %{gmake} helper
         },
         alien_build_commands => [
-            "%{gmake} default CXXFLAGS=\"$protobuf_cxxflags\" USER_CPPFLAGS=\"$protobuf_flags -fPIC\" $make_args",
+            "CFLAGS='$protobuf_flags -fPIC' cmake .",
+            "%{gmake} $make_args",
         ],
         alien_install_commands => [
             "$^X ../../scripts/install.pl %s",
@@ -53,8 +54,8 @@ sub alien_check_built_version {
     my %cxx_flags = ExtUtils::CppGuess->new->module_build_options;
     my ($version, $flags) = _check_flags(
         $builder, \%cxx_flags,
-        compiler_flags  => '-I. ' . Alien::ProtoBuf->cflags,
-        linker_flags    => '-Llib -lupb ' . Alien::ProtoBuf->libs,
+        compiler_flags  => '-I. -Igenerated_for_cmake ' . Alien::ProtoBuf->cflags,
+        linker_flags    => '-L. -lupb ' . Alien::ProtoBuf->libs,
     );
 
     die "It seems something went wrong while building uPB"
@@ -72,7 +73,7 @@ sub alien_generate_manual_pkgconfig {
     $config->{keywords}{Libs} =
         '-L${pcfiledir}/lib ' .
         join " ", map "-l$_", qw(
-            upb.pb upb.json upb.descriptor upb
+            upb_descriptor upb_json upb_pb upb
         );
 
     return $config;

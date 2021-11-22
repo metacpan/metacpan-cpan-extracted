@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd::Layers;
-$Config::Model::Backend::Systemd::Layers::VERSION = '0.247.1';
+$Config::Model::Backend::Systemd::Layers::VERSION = '0.249.1';
 use Mouse::Role;
 
 
@@ -27,7 +27,7 @@ sub default_directories {
             '/usr/lib/systemd/user/'
         );
     }
-    elsif ($app eq 'systemd') {
+    elsif ($app !~ /file$/) {
         @layers = (
             # paths documented by systemd-system.conf man page
             '/etc/systemd/system.conf.d/',
@@ -59,7 +59,7 @@ Config::Model::Backend::Systemd::Layers - Role that provides Systemd default dir
 
 =head1 VERSION
 
-version 0.247.1
+version 0.249.1
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2020 by Dominique Dumont.
+This software is Copyright (c) 2008-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

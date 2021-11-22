@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.17;
+use Object::Pad 0.57;
 
-package Tickit::Widget::Scroller::Item::RichText 0.26;
+package Tickit::Widget::Scroller::Item::RichText 0.27;
 class Tickit::Widget::Scroller::Item::RichText
-   extends Tickit::Widget::Scroller::Item::Text;
+   :isa(Tickit::Widget::Scroller::Item::Text);
 
 use Tickit::Utils qw( textwidth );
 

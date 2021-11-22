@@ -2,7 +2,7 @@ package Net::SAML2::IdP;
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 # ABSTRACT: Net::SAML2::IdP - SAML Identity Provider object
 
@@ -244,7 +244,7 @@ Net::SAML2::IdP - Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

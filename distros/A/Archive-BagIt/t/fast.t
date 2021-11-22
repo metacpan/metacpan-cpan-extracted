@@ -124,10 +124,14 @@ my $tempdir =tempdir(CLEANUP => 1);
     is(Archive::BagIt::Fast::sysread_based_digest($digest_obj_md5, $fh, 5), '5d41402abc4b2a76b9719d911017c592', '_small_digest, 5bytes, md5');
     seek($fh, 0, 0);
     is(Archive::BagIt::Fast::sysread_based_digest($digest_obj_sha, $fh, 5), '9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043', '_small_digest, 5byts, sha');
-    seek($fh, 0, 0);
-    is(Archive::BagIt::Fast::mmap_based_digest($digest_obj_md5, $fh, 5), '5d41402abc4b2a76b9719d911017c592', '_large_digest, 5bytes, md5');
-    seek($fh, 0, 0);
-    is(Archive::BagIt::Fast::mmap_based_digest($digest_obj_sha, $fh, 5), '9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043', '_large_digest, 5bytes, sha');
+    { # warnings disabled, because if mmap not available it will be switched to sysread, which will be reported as "warning"
+        Test::Warnings::allow_warnings(1);
+        seek($fh, 0, 0);
+        is(Archive::BagIt::Fast::mmap_based_digest($digest_obj_md5, $fh, 5), '5d41402abc4b2a76b9719d911017c592', '_large_digest, 5bytes, md5');
+        seek($fh, 0, 0);
+        is(Archive::BagIt::Fast::mmap_based_digest($digest_obj_sha, $fh, 5), '9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043', '_large_digest, 5bytes, sha');
+        Test::Warnings::allow_warnings(0);
+    }
     seek($fh, 0, 0);
     is($digest_obj_md5->get_hash_string($fh), '5d41402abc4b2a76b9719d911017c592', 'get_hash_string, 5bytes, md5');
     seek($fh, 0, 0);

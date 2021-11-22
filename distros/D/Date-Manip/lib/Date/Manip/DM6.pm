@@ -54,12 +54,13 @@ use integer;
 use warnings;
 
 our $VERSION;
-$VERSION='6.85';
+$VERSION='6.86';
 
 ###########################################################################
 
 our ($dmb,$dmt,$date,$delta,$recur,$date2,$dateUT);
 use Date::Manip::Date;
+use Carp;
 
 $dateUT = new Date::Manip::Date;
 $dateUT->config('setdate','now,Etc/GMT');
@@ -90,7 +91,7 @@ sub Date_Init {
       if ($arg =~ /^(\S+)\s*=\s*(.*)$/) {
          push(@args2,$1,$2);
       } else {
-         warn "ERROR: invalid Date_Init argument: $arg\n";
+         carp "ERROR: invalid Date_Init argument: $arg";
       }
    }
    $date->config(@args2);
@@ -676,7 +677,7 @@ sub Events_List {
       my $arg  = shift(@args);
       $flag    = shift(@args)  if (@args);
       if (@args) {
-         warn "ERROR: unknown argument list\n";
+         carp "ERROR: unknown argument list";
          return [];
       }
 
@@ -688,7 +689,7 @@ sub Events_List {
       } else {
          $err = $date2->parse($arg);
          if ($err) {
-            warn "ERROR: invalid argument: $arg\n";
+            carp "ERROR: invalid argument: $arg";
             return [];
          }
          @list = $date->list_events($date2, 'dates');
@@ -741,7 +742,7 @@ sub Events_List {
       }
 
    } else {
-      warn "ERROR: Invalid flag $flag\n";
+      carp "ERROR: Invalid flag $flag";
       return [];
    }
 

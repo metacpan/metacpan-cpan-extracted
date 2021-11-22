@@ -18,7 +18,7 @@ use Moo;
 use App::Sqitch::Types qw(Str Int HashRef ChangeList LineList Maybe Sqitch URI File Target);
 use constant SYNTAX_VERSION => '1.0.0';
 
-our $VERSION = 'v1.1.0'; # VERSION
+our $VERSION = 'v1.2.0'; # VERSION
 
 # Like [:punct:], but excluding _. Copied from perlrecharclass.
 my $punct = q{-!"#$%&'()*+,./:;<=>?@[\\]^`{|}~};
@@ -648,7 +648,7 @@ sub search_changes {
     if ($reverse) {
         # Go backwards.
         my $index  = $changes->count - ($offset + 1);
-        my $end_at = $limit - 1;
+        my $end_at = $limit ? $index - $limit : -1;
         return sub {
             while ($index > $end_at) {
                 my $change = $changes->change_at($index--) or return;
@@ -1597,7 +1597,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2020 iovation Inc.
+Copyright (c) 2012-2021 iovation Inc., David E. Wheeler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

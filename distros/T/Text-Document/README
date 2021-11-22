@@ -27,3 +27,6 @@ and introduces a textual one which is sexier, e.g. in XML.
 
 Version 1.06 corrects a quirk in the tests and changes the size of
 a prime, p, used in Text::Bloom, which caused errors on my linux box.
+
+Version 1.08, nineteen years later (sigh!), solves a missing requirement quirk.
+

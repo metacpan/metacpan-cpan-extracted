@@ -1,5 +1,17 @@
 Revision history for Alien-uPB-Core
 
+0.20      2021-11-20 19:52:02 CET
+
+    - New revision of uPB (fixes handling of timezones for timestamp types on Mac)
+
+0.19      2021-11-19 12:35:54 CET
+
+    - New revision of uPB (fixes handling of timezones for timestamp types)
+
+0.18      2021-11-18 21:00:49 CET
+
+    - New revision of uPB (support for well-known types)
+
 0.17      2021-03-13 09:47:58 CET
 
     - Stop building googlepb binding

@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-Choice
 
+0.06    2021-11-20
+        [CHANGES]
+         * Updates for Object::Pad 0.57
+            + Use :isa instead of legacy `extends`
+            + Use ADJUSTPARAMS instead of ADJUST
+
 0.05    2021-07-03
         [CHANGES]
          * Update to Object::Pad 0.41:

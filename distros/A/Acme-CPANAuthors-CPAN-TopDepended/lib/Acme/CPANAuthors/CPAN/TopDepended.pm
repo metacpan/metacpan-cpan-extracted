@@ -1,64 +1,64 @@
 package Acme::CPANAuthors::CPAN::TopDepended;
 
-our $DATE = '2016-10-20'; # DATE
-our $VERSION = '0.003'; # VERSION
-
 use strict;
 use warnings;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-11-17'; # DATE
+our $DIST = 'Acme-CPANAuthors-CPAN-TopDepended'; # DIST
+our $VERSION = '0.004'; # VERSION
+
 use Acme::CPANAuthors::Register (
-    "EXODIST"   => "Chad Granum",                           #  18261
-    "BINGOS"    => "Chris Williams",                        #  16214
-    "RJBS"      => "Ricardo SIGNES",                        #  11423
-    "ETHER"     => "Karen Etheridge",                       #   9019
-    "LEONT"     => "Leon Timmermans",                       #   5635
-    "DAGOLDEN"  => "David Golden",                          #   3949
-    "GBARR"     => "Graham Barr",                           #   3653
-    "PEVANS"    => "Paul Evans",                            #   3291
-    "NEILB"     => "Neil Bowers",                           #   2952
-    "GAAS"      => "Gisle Aas",                             #   2294
-    "TODDR"     => "Todd Rinaldo",                          #   2243
-    "SMUELLER"  => "Steffen Mueller",                       #   2173
-    "DROLSKY"   => "Dave Rolsky",                           #   2155
-    "CORION"    => "Max Maischein",                         #   1461
-    "BARBIE"    => "Barbie",                                #   1408
-    "TOKUHIROM" => "Tokuhiro Matsuno''<xmp>",               #   1286
-    "REHSACK"   => "Jens Rehsack",                          #   1268
-    "ADAMK"     => "Adam Kennedy",                          #   1223
-    "ISHIGAKI"  => "Kenichi Ishigaki",                      #   1217
-    "MIYAGAWA"  => "Tatsuhiko Miyagawa",                    #   1121
-    "PERLANCAR" => "perlancar",                             #    968
-    "MLEHMANN"  => "Marc A. Lehmann",                       #    967
-    "HAARG"     => "Graham Knop",                           #    935
-    "DANKOGAI"  => "Dan Kogai",                             #    929
-    "JV"        => "Johan Vromans",                         #    906
-    "RIBASUSHI" => "Peter Rabbitson",                       #    888
-    "SHLOMIF"   => "Shlomi Fish",                           #    879
-    "TIMB"      => "Tim Bunce",                             #    855
-    "TOBYINK"   => "Toby Inkster",                          #    838
-    "TINITA"    => "Tina Muller",                           #    826
-    "JHI"       => "Jarkko Hietaniemi",                     #    812
-    "BOBTFISH"  => "Tomas Doran",                           #    810
-    "RICHE"     => "Richard Elberger",                      #    754
-    "PLICEASE"  => "Graham Ollis",                          #    739
-    "KASEI"     => "Marty Pauley",                          #    662
-    "CHORNY"    => "Alexandr Ciornii",                      #    648
-    "OVID"      => "Curtis 'Ovid' Poe",                     #    631
-    "JJNAPIORK" => "John Napiorkowski",                     #    618
-    "KWILLIAMS" => "Ken Williams",                          #    614
-    "INGY"      => "Ingy dot Net",                          #    601
-    "SRI"       => "Sebastian Riedel",                      #    600
-    "MSCHILLI"  => "Michael Schilli",                       #    594
-    "URI"       => "Uri Guttman",                           #    592
-    "MAREKR"    => "Marek Rouchal",                         #    574
-    "SYOHEX"    => "Syohei Yoshida",                        #    551
-    "FREW"      => "Arthur Axel 'fREW' Schmidt",            #    547
-    "ZEFRAM"    => "Andrew Main (Zefram)",                  #    532
-    "ABW"       => "Andy Wardley",                          #    527
-    "KENTNL"    => "Kent Fredric",                          #    524
-    "AMS"       => "Abhijit Menon-Sen",                     #    511
-
-
+    "EXODIST"   => "Chad Granum",                           #  23543
+    "BINGOS"    => "Chris Williams",                        #  21688
+    "ETHER"     => "Karen Etheridge",                       #  14188
+    "XSAWYERX"  => "Sawyer X",                              #  14045
+    "TODDR"     => "Todd Rinaldo",                          #   9500
+    "RJBS"      => "Ricardo SIGNES",                        #   9223
+    "LEONT"     => "Leon Timmermans",                       #   7905
+    "NEILB"     => "Neil Bowers",                           #   6666
+    "HAARG"     => "Graham Knop",                           #   5168
+    "OALDERS"   => "Olaf Alders",                           #   4678
+    "PEVANS"    => "Paul Evans",                            #   4574
+    "DAGOLDEN"  => "David Golden",                          #   4315
+    "PETDANCE"  => "Andy Lester",                           #   2975
+    "DROLSKY"   => "Dave Rolsky",                           #   2918
+    "ISHIGAKI"  => "Kenichi Ishigaki",                      #   2913
+    "BARBIE"    => "Barbie",                                #   2715
+    "ATOOMIC"   => "icolas .",                              #   2703
+    "CAPOEIRAB" => "Chase Whitener",                        #   2656
+    "NWCLARK"   => "Nicholas Clark",                        #   2317
+    "CORION"    => "Max Maischein",                         #   2017
+    "PERLANCAR" => "perlancar",                             #   2011
+    "REHSACK"   => "Jens Rehsack",                          #   1940
+    "MIYAGAWA"  => "Tatsuhiko Miyagawa",                    #   1896
+    "TOKUHIROM" => "Tokuhiro Matsuno''<xmp>",               #   1828
+    "PLICEASE"  => "Graham Ollis",                          #   1823
+    "SMUELLER"  => "Steffen Mueller",                       #   1559
+    "DANKOGAI"  => "Dan Kogai",                             #   1416
+    "TOBYINK"   => "Toby Inkster",                          #   1348
+    "SKAJI"     => "Shoichi Kaji",                          #   1346
+    "SHLOMIF"   => "Shlomi Fish",                           #   1307
+    "JV"        => "Johan Vromans",                         #   1265
+    "MLEHMANN"  => "Marc A. Lehmann",                       #   1250
+    "TINITA"    => "Tina Muller",                           #   1246
+    "JKEENAN"   => "James E Keenan",                        #   1165
+    "APOCAL"    => "Apocalypse",                            #   1129
+    "RIBASUSHI" => "Peter Rabbitson",                       #   1106
+    "TIMB"      => "Tim Bunce",                             #   1048
+    "SRI"       => "Sebastian Riedel",                      #    980
+    "OVID"      => "Curtis 'Ovid' Poe",                     #    935
+    "KENTNL"    => "Kent Fredric (PAUSE Custodial Account)", #    909
+    "ZEFRAM"    => "Andrew Main (Zefram)",                  #    736
+    "ETJ"       => "Ed J",                                  #    730
+    "KASEI"     => "Marty Pauley",                          #    713
+    "KWILLIAMS" => "Ken Williams",                          #    704
+    "ABRAXXA"   => "Alexander Hartmaier",                   #    651
+    "SYP"       => "Stanislaw Pusep",                       #    651
+    "INGY"      => "Ingy dot Net",                          #    622
+    "DOHERTY"   => "Mike Doherty",                          #    580
+    "RTHOMPSON" => "Ryan C. Thompson",                      #    574
+    "DOLMEN"    => "Olivier Mengue",                        #    570
 );
 
 1;
@@ -76,12 +76,12 @@ Acme::CPANAuthors::CPAN::TopDepended - Authors with the largest number of distri
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::CPANAuthors::CPAN::TopDepended (from Perl distribution Acme-CPANAuthors-CPAN-TopDepended), released on 2016-10-20.
+This document describes version 0.004 of Acme::CPANAuthors::CPAN::TopDepended (from Perl distribution Acme-CPANAuthors-CPAN-TopDepended), released on 2021-11-17.
 
 =head1 SYNOPSIS
 
    use Acme::CPANAuthors;
-   use Acme::CPANAuthors::TopDepended;
+   use Acme::CPANAuthors::CPAN::TopDepended;
 
    my $authors = Acme::CPANAuthors->new('CPAN::TopDepended');
 
@@ -101,71 +101,71 @@ a local mini CPAN mirror using this command:
 
 Statistics of the CPAN mirror:
 
- +---------------------+----------------------+
- | key                 | value                |
- +---------------------+----------------------+
- | cpan                | /home/s1/cpan        |
- | index_name          | index.db             |
- | last_index_time     | 2016-10-20T11:45:05Z |
- | raw_last_index_time | 1476963905           |
- +---------------------+----------------------+
+ +---------------------+--------------------------------+
+ | key                 | value                          |
+ +---------------------+--------------------------------+
+ | cpan                | /home/u1/cpan                  |
+ | index_name          | /media/minicpan-index/index.db |
+ | last_index_time     | 2021-11-16T19:50:46Z           |
+ | raw_last_index_time | 1637092246                     |
+ +---------------------+--------------------------------+
 
 Current ranking:
 
- +------+-----------+----------------------------+------------+
- | rank | id        | name                       | rdep_count |
- +------+-----------+----------------------------+------------+
- | 1    | EXODIST   | Chad Granum                | 18261      |
- | 2    | BINGOS    | Chris Williams             | 16214      |
- | 3    | RJBS      | Ricardo SIGNES             | 11423      |
- | 4    | ETHER     | Karen Etheridge            | 9019       |
- | 5    | LEONT     | Leon Timmermans            | 5635       |
- | 6    | DAGOLDEN  | David Golden               | 3949       |
- | 7    | GBARR     | Graham Barr                | 3653       |
- | 8    | PEVANS    | Paul Evans                 | 3291       |
- | 9    | NEILB     | Neil Bowers                | 2952       |
- | 10   | GAAS      | Gisle Aas                  | 2294       |
- | 11   | TODDR     | Todd Rinaldo               | 2243       |
- | 12   | SMUELLER  | Steffen Mueller            | 2173       |
- | 13   | DROLSKY   | Dave Rolsky                | 2155       |
- | 14   | CORION    | Max Maischein              | 1461       |
- | 15   | BARBIE    | Barbie                     | 1408       |
- | 16   | TOKUHIROM | Tokuhiro Matsuno''<xmp>    | 1286       |
- | 17   | REHSACK   | Jens Rehsack               | 1268       |
- | 18   | ADAMK     | Adam Kennedy               | 1223       |
- | 19   | ISHIGAKI  | Kenichi Ishigaki           | 1217       |
- | 20   | MIYAGAWA  | Tatsuhiko Miyagawa         | 1121       |
- | 21   | PERLANCAR | perlancar                  | 968        |
- | 22   | MLEHMANN  | Marc A. Lehmann            | 967        |
- | 23   | HAARG     | Graham Knop                | 935        |
- | 24   | DANKOGAI  | Dan Kogai                  | 929        |
- | 25   | JV        | Johan Vromans              | 906        |
- | 26   | RIBASUSHI | Peter Rabbitson            | 888        |
- | 27   | SHLOMIF   | Shlomi Fish                | 879        |
- | 28   | TIMB      | Tim Bunce                  | 855        |
- | 29   | TOBYINK   | Toby Inkster               | 838        |
- | 30   | TINITA    | Tina Muller                | 826        |
- | 31   | JHI       | Jarkko Hietaniemi          | 812        |
- | 32   | BOBTFISH  | Tomas Doran                | 810        |
- | 33   | RICHE     | Richard Elberger           | 754        |
- | 34   | PLICEASE  | Graham Ollis               | 739        |
- | 35   | KASEI     | Marty Pauley               | 662        |
- | 36   | CHORNY    | Alexandr Ciornii           | 648        |
- | 37   | OVID      | Curtis 'Ovid' Poe          | 631        |
- | 38   | JJNAPIORK | John Napiorkowski          | 618        |
- | 39   | KWILLIAMS | Ken Williams               | 614        |
- | 40   | INGY      | Ingy dot Net               | 601        |
- | 41   | SRI       | Sebastian Riedel           | 600        |
- | 42   | MSCHILLI  | Michael Schilli            | 594        |
- | 43   | URI       | Uri Guttman                | 592        |
- | 44   | MAREKR    | Marek Rouchal              | 574        |
- | 45   | SYOHEX    | Syohei Yoshida             | 551        |
- | 46   | FREW      | Arthur Axel 'fREW' Schmidt | 547        |
- | 47   | ZEFRAM    | Andrew Main (Zefram)       | 532        |
- | 48   | ABW       | Andy Wardley               | 527        |
- | 49   | KENTNL    | Kent Fredric               | 524        |
- | 50   | AMS       | Abhijit Menon-Sen          | 511        |
- +------+-----------+----------------------------+------------+
+ +-----------+----------------------------------------+------------+------+
+ | id        | name                                   | rdep_count | rank |
+ +-----------+----------------------------------------+------------+------+
+ | EXODIST   | Chad Granum                            | 23543      | 1    |
+ | BINGOS    | Chris Williams                         | 21688      | 2    |
+ | ETHER     | Karen Etheridge                        | 14188      | 3    |
+ | XSAWYERX  | Sawyer X                               | 14045      | 4    |
+ | TODDR     | Todd Rinaldo                           | 9500       | 5    |
+ | RJBS      | Ricardo SIGNES                         | 9223       | 6    |
+ | LEONT     | Leon Timmermans                        | 7905       | 7    |
+ | NEILB     | Neil Bowers                            | 6666       | 8    |
+ | HAARG     | Graham Knop                            | 5168       | 9    |
+ | OALDERS   | Olaf Alders                            | 4678       | 10   |
+ | PEVANS    | Paul Evans                             | 4574       | 11   |
+ | DAGOLDEN  | David Golden                           | 4315       | 12   |
+ | PETDANCE  | Andy Lester                            | 2975       | 13   |
+ | DROLSKY   | Dave Rolsky                            | 2918       | 14   |
+ | ISHIGAKI  | Kenichi Ishigaki                       | 2913       | 15   |
+ | BARBIE    | Barbie                                 | 2715       | 16   |
+ | ATOOMIC   | icolas .                               | 2703       | 17   |
+ | CAPOEIRAB | Chase Whitener                         | 2656       | 18   |
+ | NWCLARK   | Nicholas Clark                         | 2317       | 19   |
+ | CORION    | Max Maischein                          | 2017       | 20   |
+ | PERLANCAR | perlancar                              | 2011       | 21   |
+ | REHSACK   | Jens Rehsack                           | 1940       | 22   |
+ | MIYAGAWA  | Tatsuhiko Miyagawa                     | 1896       | 23   |
+ | TOKUHIROM | Tokuhiro Matsuno''<xmp>                | 1828       | 24   |
+ | PLICEASE  | Graham Ollis                           | 1823       | 25   |
+ | SMUELLER  | Steffen Mueller                        | 1559       | 26   |
+ | DANKOGAI  | Dan Kogai                              | 1416       | 27   |
+ | TOBYINK   | Toby Inkster                           | 1348       | 28   |
+ | SKAJI     | Shoichi Kaji                           | 1346       | 29   |
+ | SHLOMIF   | Shlomi Fish                            | 1307       | 30   |
+ | JV        | Johan Vromans                          | 1265       | 31   |
+ | MLEHMANN  | Marc A. Lehmann                        | 1250       | 32   |
+ | TINITA    | Tina Muller                            | 1246       | 33   |
+ | JKEENAN   | James E Keenan                         | 1165       | 34   |
+ | APOCAL    | Apocalypse                             | 1129       | 35   |
+ | RIBASUSHI | Peter Rabbitson                        | 1106       | 36   |
+ | TIMB      | Tim Bunce                              | 1048       | 37   |
+ | SRI       | Sebastian Riedel                       | 980        | 38   |
+ | OVID      | Curtis 'Ovid' Poe                      | 935        | 39   |
+ | KENTNL    | Kent Fredric (PAUSE Custodial Account) | 909        | 40   |
+ | ZEFRAM    | Andrew Main (Zefram)                   | 736        | 41   |
+ | ETJ       | Ed J                                   | 730        | 42   |
+ | KASEI     | Marty Pauley                           | 713        | 43   |
+ | KWILLIAMS | Ken Williams                           | 704        | 44   |
+ | ABRAXXA   | Alexander Hartmaier                    | 651        | =45  |
+ | SYP       | Stanislaw Pusep                        | 651        | =45  |
+ | INGY      | Ingy dot Net                           | 622        | 47   |
+ | DOHERTY   | Mike Doherty                           | 580        | 48   |
+ | RTHOMPSON | Ryan C. Thompson                       | 574        | 49   |
+ | DOLMEN    | Olivier Mengue                         | 570        | 50   |
+ +-----------+----------------------------------------+------------+------+
 
 =head1 HOMEPAGE
 
@@ -174,14 +174,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANA
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANAuthors-CPAN-TopDepended>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-CPAN-TopDepended>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -193,11 +185,36 @@ L<Acme::CPANAuthors::CPAN::TopDepended::ByOthers>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-CPAN-TopDepended>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

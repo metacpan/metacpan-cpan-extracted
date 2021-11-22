@@ -1,3 +1,5 @@
+#define CATCH_CONFIG_ENABLE_BENCHMARKING
+
 #include "test.h"
 #include <panda/function.h>
 #include <panda/function_utils.h>
@@ -36,6 +38,34 @@ namespace test {
 }
 
 using namespace test;
+
+TEST("synopsis") {
+    int a = 13;
+    function<int(int)> f = [&](int b){return a + b;};
+    REQUIRE(f(42) == 55); // calling lambda 42 + 13 == 55
+
+    struct Test {
+        int operator()(int v) {return v;}
+        bool operator == (const Test&) const { return true; }
+    };
+
+    f = Test(); // make function from callable object
+    REQUIRE(f(42) == 42); // calling Test::operator()
+
+    function<int(int)> f2 = Test();
+    REQUIRE(f == f2); // if functors are equal so do panda::functions
+
+    function<int(void)> l1 = [&](){return a;};
+    auto l2 = l1;
+    function<int(void)> l3 = [&](){return a;};
+
+    REQUIRE(l1 == l2); // copies are equal
+    REQUIRE(l1 != l3); // l3 made from different lambda
+
+    // compatible types of arguments and return are allowed if implicitly convertible
+    function<double (int)> cb = [](double) -> int {return 10;};
+    REQUIRE(cb(3) == 10);
+}
 
 TEST("simplest function") {
     function<void(void)> f = &void_func;
@@ -378,3 +408,38 @@ TEST("lambda self reference auto...") {
     };
     CHECK(f3(123) == 111);
 }
+
+//template <typename F>
+//int bench(const F& f) {
+//    int ret = 0;
+//    for (size_t i = 0; i < 1000000; ++i) {
+//        ret += f(i);
+//    }
+//    return ret;
+//};
+
+//int free_function(int a) {
+//    return a*2;
+//}
+
+//template <typename F>
+//int launch(string name) {
+//    F free_wrapped = &free_function;
+//    F simple_lambda = [](int a){return a*2;};
+//    int val = 2;
+//    F capture_lambda = [=](int a){return a*val;};
+
+//    BENCHMARK(name + " free")          { return bench(free_function); };
+//    BENCHMARK(name + " free wrapped")  { return bench(free_wrapped); };
+//    BENCHMARK(name + " capture_lambda"){ return bench(capture_lambda); };
+
+//    return 0;
+//}
+
+//TEST_CASE("benchmark", "[!benchmark]") {
+//    launch<panda::function<int(int)>>("panda");
+//    launch<std::function<int(int)>>("std");
+//    launch<panda::function<int(int)>>("panda");
+//    launch<std::function<int(int)>>("std");
+//}
+

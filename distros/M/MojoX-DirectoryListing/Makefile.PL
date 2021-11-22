@@ -8,7 +8,7 @@ WriteMakefile(
     AUTHOR           => q{Marty O'Brien <mob@cpan.org>},
     VERSION_FROM     => 'lib/MojoX/DirectoryListing.pm',
     ABSTRACT_FROM    => 'lib/MojoX/DirectoryListing.pm',
-    LICENSE          => 'Artistic_2_0',
+    LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
@@ -20,8 +20,6 @@ WriteMakefile(
     },
     PREREQ_PM => {
 	'Mojolicious::Lite' => 0,
-        #'ABC'              => 1.6,
-        #'Foo::Bar::Module' => 5.0401,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'MojoX-DirectoryListing-*' },

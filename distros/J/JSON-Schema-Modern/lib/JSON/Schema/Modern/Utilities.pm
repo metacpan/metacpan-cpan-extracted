@@ -4,18 +4,19 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.523';
+our $VERSION = '0.525';
 
-use 5.016;
+use 5.020;
+use strictures 2;
+use experimental qw(signatures postderef);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use if "$]" >= 5.022, 'experimental', 're_strict';
-use strictures 2;
 use B;
 use Carp 'croak';
 use JSON::MaybeXS 1.004001 'is_bool';
-use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref is_arrayref);
+use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
 use Scalar::Util 'blessed';
 use Storable 'dclone';
 use Feature::Compat::Try;
@@ -32,12 +33,14 @@ our @EXPORT_OK = qw(
   is_elements_unique
   jsonp
   local_annotations
-  canonical_schema_uri
+  canonical_uri
   E
   A
   abort
+  assert_keyword_exists
   assert_keyword_type
   assert_pattern
+  is_uri_reference
   assert_uri_reference
   assert_uri
   annotate_self
@@ -48,9 +51,7 @@ our @EXPORT_OK = qw(
 use JSON::PP ();
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 
-sub is_type {
-  my ($type, $value) = @_;
-
+sub is_type ($type, $value) {
   if ($type eq 'null') {
     return !(defined $value);
   }
@@ -91,9 +92,7 @@ sub is_type {
 
 # only the core six types are reported (integers are numbers)
 # use is_type('integer') to differentiate numbers from integers.
-sub get_type {
-  my ($value) = @_;
-
+sub get_type ($value) {
   return 'null' if not defined $value;
   return 'object' if is_plain_hashref($value);
   return 'array' if is_plain_arrayref($value);
@@ -111,9 +110,8 @@ sub get_type {
 
 # compares two arbitrary data payloads for equality, as per
 # https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.2
-# if provided with a state hashref, any differences are recorded within
-sub is_equal {
-  my ($x, $y, $state) = @_;
+# if provided with a state hashref with a 'path' key, any differences are recorded within
+sub is_equal ($x, $y, $state = undef) {
   $state->{path} //= '';
 
   my @types = map get_type($_), $x, $y;
@@ -141,7 +139,7 @@ sub is_equal {
 
   if ($types[0] eq 'array') {
     return 0 if @$x != @$y;
-    foreach my $idx (0 .. $#{$x}) {
+    foreach my $idx (0 .. $x->$#*) {
       $state->{path} = $path.'/'.$idx;
       return 0 if not is_equal($x->[$idx], $y->[$idx], $state);
     }
@@ -153,10 +151,9 @@ sub is_equal {
 
 # checks array elements for uniqueness. short-circuits on first pair of matching elements
 # if second arrayref is provided, it is populated with the indices of identical items
-sub is_elements_unique {
-  my ($array, $equal_indices) = @_;
-  foreach my $idx0 (0 .. $#{$array}-1) {
-    foreach my $idx1 ($idx0+1 .. $#{$array}) {
+sub is_elements_unique ($array, $equal_indices = undef) {
+  foreach my $idx0 (0 .. $array->$#*-1) {
+    foreach my $idx1 ($idx0+1 .. $array->$#*) {
       if (is_equal($array->[$idx0], $array->[$idx1], { scalarref_booleans => 1 })) {
         push @$equal_indices, $idx0, $idx1 if defined $equal_indices;
         return 0;
@@ -168,21 +165,18 @@ sub is_elements_unique {
 
 # shorthand for creating and appending json pointers
 sub jsonp {
-  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, map +(is_arrayref($_) ? @$_ : $_), grep defined, @_);
+  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, map +(is_plain_arrayref($_) ? @$_ : $_), grep defined, @_);
 }
 
 # get all annotations produced for the current instance data location (that are visible to this
 # schema location)
-sub local_annotations {
-  my ($state) = @_;
-  grep $_->instance_location eq $state->{data_path}, @{$state->{annotations}};
+sub local_annotations ($state) {
+  grep $_->instance_location eq $state->{data_path}, $state->{annotations}->@*;
 }
 
 # shorthand for finding the canonical uri of the present schema location
-sub canonical_schema_uri {
-  my ($state, @extra_path) = @_;
-
-  splice(@extra_path, -1, 1, @{$extra_path[-1]}) if @extra_path and is_arrayref($extra_path[-1]);
+sub canonical_uri ($state, @extra_path) {
+  splice(@extra_path, -1, 1, $extra_path[-1]->@*) if @extra_path and is_plain_arrayref($extra_path[-1]);
   my $uri = $state->{initial_schema_uri}->clone;
   $uri->fragment(($uri->fragment//'').jsonp($state->{schema_path}, @extra_path));
   $uri->fragment(undef) if not length($uri->fragment);
@@ -190,12 +184,19 @@ sub canonical_schema_uri {
 }
 
 # shorthand for creating error objects
-sub E {
+# uses these keys from $state:
+# - initial_schema_uri
+# - keyword
+# - data_path
+# - traversed_schema_path
+# - schema_path
+# - _schema_path_suffix
+# - errors
+sub E ($state, $error_string, @args) {
   croak 'E called in void context' if not defined wantarray;
-  my ($state, $error_string, @args) = @_;
 
   # sometimes the keyword shouldn't be at the very end of the schema path
-  my $uri = canonical_schema_uri($state, $state->{keyword}, $state->{_schema_path_suffix});
+  my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix});
 
   my $keyword_location = $state->{traversed_schema_path}
     .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
@@ -203,7 +204,7 @@ sub E {
   undef $uri if $uri eq '' and $keyword_location eq ''
     or ($uri->fragment // '') eq $keyword_location and $uri->clone->fragment(undef) eq '';
 
-  push @{$state->{errors}}, JSON::Schema::Modern::Error->new(
+  push $state->{errors}->@*, JSON::Schema::Modern::Error->new(
     keyword => $state->{keyword},
     instance_location => $state->{data_path},
     keyword_location => $keyword_location,
@@ -215,11 +216,19 @@ sub E {
 }
 
 # shorthand for creating annotations
-sub A {
-  my ($state, $annotation) = @_;
+# uses these keys from $state:
+# - initial_schema_uri
+# - keyword
+# - data_path
+# - traversed_schema_path
+# - schema_path
+# - _schema_path_suffix
+# - annotations
+# - collect_annotations
+sub A ($state, $annotation) {
   return 1 if not $state->{collect_annotations};
 
-  my $uri = canonical_schema_uri($state, $state->{keyword}, $state->{_schema_path_suffix});
+  my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix});
 
   my $keyword_location = $state->{traversed_schema_path}
     .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
@@ -227,7 +236,7 @@ sub A {
   undef $uri if $uri eq '' and $keyword_location eq ''
     or ($uri->fragment // '') eq $keyword_location and $uri->clone->fragment(undef) eq '';
 
-  push @{$state->{annotations}}, JSON::Schema::Modern::Annotation->new(
+  push $state->{annotations}->@*, JSON::Schema::Modern::Annotation->new(
     keyword => $state->{keyword},
     instance_location => $state->{data_path},
     keyword_location => $keyword_location,
@@ -242,27 +251,31 @@ sub A {
 # only this error is returned, because other errors on the stack might not actually be "real"
 # errors (consider if we were in the middle of evaluating a "not" or "if").
 # Therefore this is only appropriate during the evaluation phase, not the traverse phase.
-sub abort {
-  my ($state, $error_string, @args) = @_;
+sub abort ($state, $error_string, @args) {
   ()= E($state, $error_string, @args);
-  die pop @{$state->{errors}};
+  die pop $state->{errors}->@*;
 }
 
-sub assert_keyword_type {
+sub assert_keyword_exists ($state, $schema) {
+  croak 'assert_keyword_exists called in void context' if not defined wantarray;
+  return E($state, '%s keyword is required', $state->{keyword}) if not exists $schema->{$state->{keyword}};
+  return 1;
+}
+
+sub assert_keyword_type ($state, $schema, $type) {
   croak 'assert_keyword_type called in void context' if not defined wantarray;
-  my ($state, $schema, $type) = @_;
   my $value = $schema->{$state->{keyword}};
-  $value = is_plain_hashref($value) ? $value->{$state->{_schema_path_suffix}}
-      : is_plain_arrayref($value) ? $value->[$state->{_schema_path_suffix}]
+  my $thing = 'value';
+  ($value, $thing) = is_plain_hashref($value) ? ($value->{$state->{_schema_path_suffix}}, 'value at "'.$state->{_schema_path_suffix}.'"')
+      : is_plain_arrayref($value) ? ($value->[$state->{_schema_path_suffix}], 'item '.$state->{_schema_path_suffix})
       : die 'unknown type'
     if exists $state->{_schema_path_suffix};
   return 1 if is_type($type, $value);
-  E($state, '%s value is not a%s %s', $state->{keyword}, ($type =~ /^[aeiou]/ ? 'n' : ''), $type);
+  E($state, '%s %s is not a%s %s', $state->{keyword}, $thing, ($type =~ /^[aeiou]/ ? 'n' : ''), $type);
 }
 
-sub assert_pattern {
+sub assert_pattern ($state, $pattern) {
   croak 'assert_pattern called in void context' if not defined wantarray;
-  my ($state, $pattern) = @_;
   try {
     local $SIG{__WARN__} = sub { die @_ };
     qr/$pattern/;
@@ -271,13 +284,10 @@ sub assert_pattern {
   return 1;
 }
 
-sub assert_uri_reference {
-  croak 'assert_uri_reference called in void context' if not defined wantarray;
-  my ($state, $schema) = @_;
+sub is_uri_reference ($ref) {
+  croak 'is_uri_reference called in void context' if not defined wantarray;
 
-  my $ref = $schema->{$state->{keyword}};
-
-  return E($state, '%s value is not a valid URI reference', $state->{keyword})
+  return 0
     # see also uri-reference format sub
     if fc(Mojo::URL->new($ref)->to_unsafe_string) ne fc($ref)
       or $ref =~ /[^[:ascii:]]/
@@ -289,9 +299,15 @@ sub assert_uri_reference {
   return 1;
 }
 
-sub assert_uri {
+sub assert_uri_reference ($state, $schema) {
+  croak 'assert_uri_reference called in void context' if not defined wantarray;
+
+  return 1 if is_uri_reference($schema->{$state->{keyword}});
+  return E($state, '%s value is not a valid URI reference', $state->{keyword});
+}
+
+sub assert_uri ($state, $schema, $override = undef) {
   croak 'assert_uri called in void context' if not defined wantarray;
-  my ($state, $schema, $override) = @_;
 
   my $string = $override // $schema->{$state->{keyword}};
   my $uri = Mojo::URL->new($string);
@@ -310,8 +326,7 @@ sub assert_uri {
 }
 
 # produces an annotation whose value is the same as that of the current keyword
-sub annotate_self {
-  my ($state, $schema) = @_;
+sub annotate_self ($state, $schema) {
   A($state, is_ref($schema->{$state->{keyword}}) ? dclone($schema->{$state->{keyword}})
     : $schema->{$state->{keyword}});
 }
@@ -330,7 +345,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.523
+version 0.525
 
 =head1 SYNOPSIS
 
@@ -341,8 +356,8 @@ version 0.523
 This class contains internal utilities to be used by L<JSON::Schema::Modern>.
 
 =for Pod::Coverage is_type get_type is_equal is_elements_unique jsonp local_annotations
-canonical_schema_uri E A abort assert_keyword_type assert_pattern assert_uri_reference assert_uri
-annotate_self
+canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
+annotate_self is_uri_reference
 
 =head1 SUPPORT
 

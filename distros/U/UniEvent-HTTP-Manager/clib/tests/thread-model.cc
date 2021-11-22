@@ -53,7 +53,7 @@ TEST_CASE("thread_model", "[thread_model]") {
         std::atomic_bool invoked{false};
         mgr->spawn_event.add([&](const http::ServerSP& server){
             server->run_event.add([&](){
-                auto port  = server->listeners()[0]->sockaddr()->port();
+                auto port  = server->sockaddr()->port();
                 printf("going to use port %d\n", port);
                 std::cout << "run thread = " << std::this_thread::get_id() << "\n";
                 TimerSP timer = new Timer(server->loop());

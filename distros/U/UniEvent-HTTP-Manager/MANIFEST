@@ -36,6 +36,7 @@ t/lib/MyTest.pm
 t/lib/MyTest.xs
 t/mpm.t
 t/plack-handler.t
+t/prefork-cfg.t
 t/prefork-master-death.t
 t/prefork-request.t
 t/prefork-spawn_callback.t

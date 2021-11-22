@@ -1,5 +1,17 @@
 Revision history for Data::Text
 
+0.09	Tue Nov 16 08:14:19 EST 2021
+	new() now supports initialisation of the object
+
+0.08	Sun Nov 14 18:54:41 EST 2021
+	Added the set() method
+
+0.07	Tue Nov  9 19:11:42 EST 2021
+	Length() now returns 0 when no text has been appended
+
+0.06	Tue Nov  9 09:55:19 EST 2021
+	Carp if no text is given
+
 0.05	Thu Sep 30 18:17:43 EDT 2021
 	Added replace()
 

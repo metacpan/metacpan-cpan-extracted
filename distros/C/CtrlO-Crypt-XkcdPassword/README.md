@@ -4,7 +4,7 @@ CtrlO::Crypt::XkcdPassword - Yet another xkcd style password generator
 
 # VERSION
 
-version 1.010
+version 1.011
 
 # SYNOPSIS
 
@@ -121,7 +121,7 @@ You can also pass in `digits` to append a random number consisting of
 
 # DEFINING CUSTOM WORD LISTS
 
-Please note that `language` is only supported for the word lists
+Please note that `language` is only supported for the default word list
 included in this distribution.
 
 ## in a plain file
@@ -166,6 +166,16 @@ wordlist module and try to figure out what kind of API you're using)
 To create a module using the [Crypt::Diceware](https://metacpan.org/pod/Crypt%3A%3ADiceware) wordlist API, just
 create a package containing a public array `@Words` containing your
 word list.
+
+# INCLUDED WORD LISTS
+
+This distribution comes with a hand-crafted word list
+[CtrlO::Crypt::XkcdPassword::Wordlist::en\_gb](https://metacpan.org/pod/CtrlO%3A%3ACrypt%3A%3AXkcdPassword%3A%3AWordlist%3A%3Aen_gb) and three word lists
+provided by
+[EFF](https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases):
+[CtrlO::Crypt::XkcdPassword::Wordlist::eff\_large](https://metacpan.org/pod/CtrlO%3A%3ACrypt%3A%3AXkcdPassword%3A%3AWordlist%3A%3Aeff_large),
+[CtrlO::Crypt::XkcdPassword::Wordlist::eff\_short\_1](https://metacpan.org/pod/CtrlO%3A%3ACrypt%3A%3AXkcdPassword%3A%3AWordlist%3A%3Aeff_short_1) and
+[CtrlO::Crypt::XkcdPassword::Wordlist::eff\_short\_2\_0](https://metacpan.org/pod/CtrlO%3A%3ACrypt%3A%3AXkcdPassword%3A%3AWordlist%3A%3Aeff_short_2_0).
 
 # WRAPPER SCRIPT
 

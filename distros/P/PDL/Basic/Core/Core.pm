@@ -14,6 +14,7 @@ bootstrap PDL::Core $VERSION;
 use PDL::Types ':All';
 use Config;
 use List::Util qw(max);
+use Scalar::Util 'blessed';
 
 our @EXPORT = qw( piddle pdl null barf ); # Only stuff always exported!
 my @convertfuncs = map $_->convertfunc, PDL::Types::types();
@@ -22,10 +23,10 @@ my @exports_normal   = (@EXPORT,
   @convertfuncs,
   qw(nelem dims shape null
       convert inplace zeroes zeros ones nan inf i list listindices unpdl
-      set at flows thread_define over reshape dog cat barf type diagonal
+      set at flows thread_define over reshape dog cat barf type
       dummy mslice approx flat sclr squeeze
       get_autopthread_targ set_autopthread_targ get_autopthread_actual
-      get_autopthread_size set_autopthread_size) );
+      get_autopthread_dim get_autopthread_size set_autopthread_size) );
 our @EXPORT_OK = (@exports_internal, @exports_normal);
 our %EXPORT_TAGS = (
    Func     => [@exports_normal],
@@ -73,7 +74,6 @@ BEGIN {
     *convert      = \&PDL::convert;   *over 	 = \&PDL::over;
     *dog          = \&PDL::dog;       *cat 	         = \&PDL::cat;
     *type         = \&PDL::type;      *approx        = \&PDL::approx;
-    *diagonal     = \&PDL::diagonal;
     *dummy        = \&PDL::dummy;
     *mslice       = \&PDL::mslice;
     *isempty      = \&PDL::isempty;
@@ -330,7 +330,8 @@ sub cluck { goto &Carp::cluck }
 *PDL::cluck = \&cluck;
 
 ########## Set Auto-PThread Based On Environment Vars ############
-PDL::set_autopthread_targ( $ENV{PDL_AUTOPTHREAD_TARG} ) if( defined ( $ENV{PDL_AUTOPTHREAD_TARG} ) );
+$ENV{PDL_AUTOPTHREAD_TARG} //= online_cpus();
+PDL::set_autopthread_targ( $ENV{PDL_AUTOPTHREAD_TARG} ) if $ENV{PDL_AUTOPTHREAD_TARG} > 1;
 PDL::set_autopthread_size( $ENV{PDL_AUTOPTHREAD_SIZE} ) if( defined ( $ENV{PDL_AUTOPTHREAD_SIZE} ) );
 ##################################################################
 
@@ -752,21 +753,12 @@ sub topdl {PDL->topdl(@_)}
 
 ##################### Data type/conversion stuff ########################
 
-
-# XXX Optimize!
-
 sub PDL::dims {  # Return dimensions as @list
-   my $pdl = PDL->topdl (shift);
-   my @dims = ();
-   for(0..$pdl->getndims()-1) {push @dims,($pdl->getdim($_))}
-   return @dims;
+   PDL->topdl(shift)->dims_c;
 }
 
 sub PDL::shape {  # Return dimensions as a pdl
-   my $pdl = PDL->topdl (shift);
-   my @dims = ();
-   for(0..$pdl->getndims()-1) {push @dims,($pdl->getdim($_))}
-   return indx(\@dims);
+   indx([PDL->topdl(shift)->dims]);
 }
 
 sub PDL::howbig {
@@ -794,10 +786,7 @@ below for usage).
 =cut
 
 sub PDL::threadids {  # Return dimensions as @list
-   my $pdl = PDL->topdl (shift);
-   my @dims = ();
-   for(0..$pdl->getnthreadids()) {push @dims,($pdl->getthreadid($_))}
-   return @dims;
+   PDL->topdl(shift)->threadids_c;
 }
 
 ################# Creation/copying functions #######################
@@ -1154,7 +1143,11 @@ sub _establish_type {
   return $PDL_CD if UNIVERSAL::isa($item, 'Math::Complex');
   return max($item->type->enum, $sofar) if UNIVERSAL::isa($item, 'PDL');
   return $PDL_D if ref($item) ne 'ARRAY';
-  max($sofar, map _establish_type($_, $sofar), @$item);
+  #  only need to check first item for an array of complex vals 
+  return $MAX_TYPE if _establish_type($item->[0], $sofar) == $MAX_TYPE;
+  #  only need to recurse for items that are refs
+  #  as $sofar will be $PDL_D at a minimum
+  max ($sofar, map _establish_type($_, $sofar), grep ref, @$item);
 }
 
 sub PDL::new {
@@ -1169,7 +1162,7 @@ sub PDL::new {
        }
        $value = ($PDL::undefval//0)+0
    }
-   $type = _establish_type($value, $PDL_D) if !defined $type;
+   $type //= ref($value) ? _establish_type($value, $PDL_D) : $PDL_D;
 
    return pdl_avref($value,$this,$type) if ref($value) eq "ARRAY";
    my $new = $this->initialize();
@@ -1319,21 +1312,12 @@ sub PDL::_deep_hdr_copy {
   my $val = shift;
 
   if(ref $val eq 'HASH') {
-    my (%a,$key);
-    for $key(keys %$val) {
-      my $value = $val->{$key};
-      $a{$key} = (ref $value) ? PDL::_deep_hdr_copy($value) : $value;
-    }
+    my %a;
+    @a{keys %$val} = map ref($_) ? PDL::_deep_hdr_copy($_) : $_, values %$val;
     return \%a;
   }
 
-  if(ref $val eq 'ARRAY') {
-    my (@a,$z);
-    for $z(@$val) {
-      push(@a,(ref $z) ? PDL::_deep_hdr_copy($z) : $z);
-    }
-    return \@a;
-  }
+  return [map ref($_) ? PDL::_deep_hdr_copy($_) : $_, @$val] if ref $val eq 'ARRAY';
 
   if(ref $val eq 'SCALAR') {
     my $x = $$val;
@@ -1534,24 +1518,21 @@ the usual cases. The following example demonstrates typical usage:
 =cut
 
 sub PDL::clump {
-  my $ndims = $_[0]->getndims;
-  if ($#_ < 2) {
-    return &PDL::_clump_int(@_);
-  } else {
-    my ($this,@dims) = @_;
-    my $targd = $ndims-1;
-    my @dimmark = (0..$ndims-1);
-    barf "too many dimensions" if @dims > $ndims;
-    for my $dim (@dims) {
-      barf "dimension index $dim larger than greatest dimension"
-	if $dim > $ndims-1 ;
-      $targd = $dim if $targd > $dim;
-      barf "duplicate dimension $dim" if $dimmark[$dim]++ > $dim;
-    }
-    my $clumped = $this->thread(@dims)->unthread(0)->clump(scalar @dims);
-    $clumped = $clumped->mv(0,$targd) if $targd > 0;
-    return $clumped;
+  goto &PDL::_clump_int if @_ < 3;
+  my ($this,@dims) = @_;
+  my $ndims = $this->getndims;
+  my $targd = $ndims-1;
+  my @dimmark = (0..$ndims-1);
+  barf "too many dimensions" if @dims > $ndims;
+  for my $dim (@dims) {
+    barf "dimension index $dim larger than greatest dimension"
+      if $dim > $ndims-1 ;
+    $targd = $dim if $targd > $dim;
+    barf "duplicate dimension $dim" if $dimmark[$dim]++ > $dim;
   }
+  my $clumped = $this->thread(@dims)->unthread(0)->clump(scalar @dims);
+  $clumped = $clumped->mv(0,$targd) if $targd > 0;
+  return $clumped;
 }
 
 =head2 thread_define
@@ -1675,46 +1656,6 @@ Same as L</thread1>, i.e. uses thread id 1.
 sub PDL::thread {
 	my $var = shift;
 	$var->threadI(1,\@_);
-}
-
-=head2 diagonal
-
-=for ref
-
-Returns the multidimensional diagonal over the specified dimensions.
-
-=for usage
-
- $d = $x->diagonal(dim1, dim2,...)
-
-=for example
-
- pdl> $x = zeroes(3,3,3);
- pdl> ($y = $x->diagonal(0,1))++;
- pdl> p $x
- [
-  [
-   [1 0 0]
-   [0 1 0]
-   [0 0 1]
-  ]
-  [
-   [1 0 0]
-   [0 1 0]
-   [0 0 1]
-  ]
-  [
-   [1 0 0]
-   [0 1 0]
-   [0 0 1]
-  ]
- ]
-
-=cut
-
-sub PDL::diagonal {
-	my $var = shift;
-	$var->diagonalI(\@_);
 }
 
 =head2 thread1
@@ -1841,8 +1782,6 @@ my %info = (
                                sprintf "%$ivdformat", $_[0]->address }
 		 },
 	   );
-
-my $allowed = join '',keys %info;
 
 # print the dimension information about a pdl in some appropriate form
 sub dimstr {
@@ -2025,34 +1964,11 @@ sub PDL::approx {
 
 =for ref
 
-Convenience interface to L<slice|PDL::Slices/slice>,
-allowing easier inclusion of dimensions in perl code.
-
-=for usage
-
- $w = $x->mslice(...);
-
-=for example
-
- # below is the same as $x->slice("5:7,:,3:4:2")
- $w = $x->mslice([5,7],X,[3,4,2]);
+Alias to L<PDL::Slices/slice>.
 
 =cut
 
-# called for colon-less args
-# preserves parens if present
-sub intpars { $_[0] =~ /\(.*\)/ ? '('.int($_[0]).')' : int $_[0] }
-
-sub PDL::mslice {
-        my($pdl) = shift;
-        return $pdl->slice(join ',',(map {
-                        !ref $_ && $_ eq "X" ? ":" :
-			   ref $_ eq "ARRAY" ? $#$_ > 1 && @$_[2] == 0 ?
-			   "(".int(@$_[0]).")" : join ':', map {int $_} @$_ :
-                        !ref $_ ? intpars $_ :
-                        die "INVALID SLICE DEF $_"
-                } @_));
-}
+*PDL::mslice = \&PDL::Slices::slice;
 
 =head2 nslice_if_pdl
 
@@ -2086,28 +2002,6 @@ sub PDL::nslice_if_pdl {
 
    unshift @_, $pdl;
    goto &PDL::slice;
-}
-
-=head2 nslice
-
-=for ref
-
-C<nslice> was an internally used interface for L<PDL::NiceSlice>,
-but is now merely a springboard to L<PDL::Slices>.  It is deprecated
-and likely to disappear in PDL 3.0.
-
-=cut
-sub PDL::nslice {
-    unless($PDL::nslice_warning_issued) {
-	$PDL::nslice_warning_issued = 1;
-	warn "WARNING: deprecated call to PDL::nslice detected.  Use PDL::slice instead.\n (Warning will be issued only once per session)\n";
-    }
-    goto &PDL::slice;
-}
-
-sub blessed {
-    my $ref = ref(shift);
-    return $ref =~ /^(REF|SCALAR|ARRAY|HASH|CODE|GLOB||)$/ ? 0 : 1;
 }
 
 # Convert numbers to PDL if not already
@@ -2233,7 +2127,6 @@ a preferred type.
 sub new_or_inplace {
 	my $pdl = shift;
 	my $preferred = shift;
-	my $force = shift;
 	if(blessed($pdl) && $pdl->is_inplace) {
 		$pdl->set_inplace(0);
 		return $pdl;
@@ -2249,13 +2142,12 @@ sub new_or_inplace {
 		} else {
 		    # No match - promote it to the first in the list.
 		    $preferred =~ s/\,.*//;
-		    my $out = PDL::new_from_specification('PDL',new PDL::Type($preferred),$pdl->dims);
+		    my $out = PDL->new_from_specification(PDL::Type->new($preferred),$pdl->dims);
 		    $out .= $pdl;
 		    return $out;
 		}
 	    }
 	}
-	barf "PDL::Core::new_or_inplace - This can never happen!";
 }
 *PDL::new_or_inplace = \&new_or_inplace;
 
@@ -2315,29 +2207,23 @@ obvious that would not break existing scripts.
 sub PDL::new_from_specification{
     my $class = shift;
     my $type = ref($_[0]) eq 'PDL::Type' ? ${shift @_}[0]  : $PDL_D;
-    my $nelems = 1; my @dims;
-    for (@_) {
-       if (ref $_) {
-         barf "Trying to use non-ndarray as dimensions?" unless $_->isa('PDL');
-         barf "Trying to use multi-dim ndarray as dimensions?"
-              if $_->getndims > 1;
-         warn "creating > 10 dim ndarray (ndarray arg)!"
-              if $_->nelem > 10;
-         for my $dim ($_->list) {$nelems *= $dim; push @dims, $dim}
-       } else {
-          if ($_) {  # quiet warnings when $_ is the empty string
-             barf "Dimensions must be non-negative" if $_<0;
-             $nelems *= $_; push @dims, $_
-          } else {
-             $nelems *= 0; push @dims, 0;
-          }
-       }
-    }
+    my @dims = &_dims_from_args;
     my $pdl = $class->initialize();
     $pdl->set_datatype($type);
-    $pdl->setdims([@dims]);
-    print "Dims: ",(join ',',@dims)," DLen: ",(length $ {$pdl->get_dataref}),"\n" if $PDL::debug;
+    $pdl->setdims(\@dims);
+    print "Dims: ",(join ',',@dims)," DLen: ",length(${$pdl->get_dataref}),"\n" if $PDL::debug;
     return $pdl;
+}
+
+sub _dims_from_args {
+    barf "Dimensions must be non-negative" if grep !ref && ($_||0)<0, @_;
+    barf "Trying to use non-ndarray as dimensions?"
+       if grep ref && !$_->isa('PDL'), @_;
+    barf "Trying to use multi-dim ndarray as dimensions?"
+       if grep ref && $_->getndims > 1, @_;
+    warn "creating > 10 dim ndarray (ndarray arg)!"
+       if grep ref && $_->nelem > 10, @_;
+    map ref($_) ? $_->list : $_ || 0, @_;
 }
 
 =head2 isnull
@@ -2408,7 +2294,7 @@ Various forms of usage,
  # usage type (i):
  $w = zeroes([type], $nx, $ny, $nz,...);
  $w = PDL->zeroes([type], $nx, $ny, $nz,...);
- $w = $pdl->zeroes([type], $nx, $ny, $nz,...);
+ $w = $pdl->zeroes([type], $nx, $ny, $nz,...); # all info about $pdl ignored
  # usage type (ii):
  $w = zeroes $y;
  $w = $y->zeroes
@@ -2435,8 +2321,18 @@ for details on using ndarrays in the dimensions list.
 sub zeroes { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::zeroes($_[0]) : PDL->zeroes(@_) }
 sub PDL::zeroes {
     my $class = shift;
-    my $pdl = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
-    $pdl.=0;
+    if (ref $class and UNIVERSAL::isa($class, 'PDL') and $class->is_inplace) {
+        $class .= 0; # resets the "inplace"
+        return $class;
+    }
+    my $type = ref($_[0]) eq 'PDL::Type' ? ${shift @_}[0]  : $PDL_D;
+    my @dims = _dims_from_args(
+      ref $class && UNIVERSAL::isa($class, 'PDL') && !@_ ? $class->dims : @_
+    );
+    my $pdl = $class->initialize();
+    $pdl->set_datatype($type);
+    $pdl->setdims(\@dims);
+    $pdl->make_physical;
     return $pdl;
 }
 
@@ -2960,6 +2856,11 @@ large datasets PDL is designed to handle. Sometimes, however, you really
 want to move your data back to Perl, and with proper dimensionality,
 unlike C<list>.
 
+If you want to round-trip data including the use of C<PDL::undefval>,
+C<unpdl> does not support this. However, it is suggested you would
+generate an index-set with C<< $pdl->whereND($pdl == $PDL::undefval)
+>>, then loop over the Perl data, setting those locations to C<undef>.
+
 =for example
 
  use JSON;
@@ -3320,7 +3221,7 @@ Opposite of 'cat' :). Split N dim ndarray to list of N-1 dim ndarrays
 
 Takes a single N-dimensional ndarray and splits it into a list of N-1 dimensional
 ndarrays. The breakup is done along the last dimension.
-Note the dataflown connection is still preserved by default,
+Note the dataflowed connection is still preserved by default,
 e.g.:
 
 =for example
@@ -3813,6 +3714,14 @@ Switch on/off automatic header copying, with PDL pass-through
 C<hcpy> sets or clears the hdrcpy flag of a PDL, and returns the PDL
 itself.  That makes it convenient for inline use in expressions.
 
+=head2 online_cpus
+
+=for ref
+
+Returns the number of available processors cores. Used to set the number
+of threads with L</set_autopthread_targ> if C<$ENV{PDL_AUTOPTHREAD_TARG}>
+is not set.
+
 =head2 set_autopthread_targ
 
 =for ref
@@ -3881,6 +3790,26 @@ See L<PDL::ParallelCPU> for an overview of the auto-pthread process.
 
 *get_autopthread_actual      = \&PDL::get_autopthread_actual;
 
+=head2 get_autopthread_dim
+
+=for ref
+
+Get the actual dimension on which pthreads were used for the last
+pdl processing function.
+
+=for usage
+
+ $autopthread_dim = get_autopthread_dim();
+
+C<$autopthread_dim> is the actual dimension on which pthreads were
+used for the last pdl processing function.
+
+See L<PDL::ParallelCPU> for an overview of the auto-pthread process.
+
+=cut
+
+*get_autopthread_dim      = \&PDL::get_autopthread_dim;
+
 =head2 set_autopthread_size
 
 =for ref
@@ -3905,7 +3834,7 @@ See L<PDL::ParallelCPU> for an overview of the auto-pthread process.
   set_autopthread_size(1);
 
   # Execute a pdl function, processing will split into two pthreads as long as
-  #  one of the pdl-threaded dimensions is divisible by 2.
+  #  one of the pdl-threaded dimensions is at least 2.
   $x = minimum($y);
 
   # Get the actual number of pthreads that were run.

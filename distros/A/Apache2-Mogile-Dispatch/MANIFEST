@@ -1,8 +1,8 @@
-Build.PL
-Changes
 MANIFEST
-META.yml
 README
+LICENSE
+Changes
+Makefile.PL
 lib/Apache2/Mogile/Dispatch.pm
 t/00-compile.t
 t/05-pod.t
@@ -12,3 +12,5 @@ doc/examples/Cookie.pm
 doc/examples/HTTPConfig.pm
 doc/examples/Large.pm
 doc/examples/SSI.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

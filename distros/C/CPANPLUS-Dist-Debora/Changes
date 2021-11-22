@@ -1,5 +1,9 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.005  2021-11-09 09:36:37 CET
+
+  - XS::Parse::Keyword provides perl(:XS_Parse_Keyword_ABI_2)
+
 0.004  2021-10-24 10:50:36 CEST
 
   - Code improvements recommended by Perl::Critic::Community

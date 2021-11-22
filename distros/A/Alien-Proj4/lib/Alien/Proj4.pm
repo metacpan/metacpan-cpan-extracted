@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '2.019111';
+our $VERSION = '2.019113';
 
 #  most of the following are for compat with PDLA Makefiles
 #  and should not be used by other code
@@ -65,10 +65,13 @@ sub load_projection_information {
     my $info = {};
     foreach my $projection ( keys %$descriptions ) {
         my $description = $descriptions->{$projection};
-        my $hash = {};
-        $hash->{CODE} = $projection;
         my @lines = split( /\n/, $description );
         chomp @lines;
+        #  skip conversion entries if they appear
+        next if !defined $lines[1];
+
+        my $hash = {};
+        $hash->{CODE} = $projection;
         # Full name of this projection:
         $hash->{NAME} = $lines[0];
         # The second line is usually a list of projection types this one is:

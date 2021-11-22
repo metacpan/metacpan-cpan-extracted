@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::GSLSF::EXPINT;
 
-our @EXPORT_OK = qw(PDL::PP gsl_sf_expint_E1 PDL::PP gsl_sf_expint_E2 PDL::PP gsl_sf_expint_Ei PDL::PP gsl_sf_Shi PDL::PP gsl_sf_Chi PDL::PP gsl_sf_expint_3 PDL::PP gsl_sf_Si PDL::PP gsl_sf_Ci PDL::PP gsl_sf_atanint );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(gsl_sf_expint_E1 gsl_sf_expint_E2 gsl_sf_expint_Ei gsl_sf_Shi gsl_sf_Chi gsl_sf_expint_3 gsl_sf_Si gsl_sf_Ci gsl_sf_atanint );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
    
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::EXPINT ;
+
 
 
 
@@ -42,10 +41,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -310,7 +306,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-;
+
 
 =head1 AUTHOR
 
@@ -333,5 +329,3 @@ The GSL SF modules were written by G. Jungman.
 # Exit with OK status
 
 1;
-
-		   

@@ -17,14 +17,14 @@ if( $Config{ccname} eq "gcc" ) {
 my $build = Module::Build->new(
    module_name => 'Object::Pad::SlotAttr::Final',
    requires => {
-      'Object::Pad' => '0.50',
+      'Object::Pad' => '0.57',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'Object::Pad::ExtensionBuilder' => '0.50',
+      'Object::Pad::ExtensionBuilder' => '0.57',
    },
    license => 'perl',
    create_license => 1,

@@ -1,26 +1,32 @@
---- #YAML:1.0
-name:               Archive-Peek
-version:            0.35
-abstract:           Peek into archives without extracting them
+---
+abstract: 'Peek into archives without extracting them'
 author:
-    - Leon Brocard <acme@astray.com>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Leon Brocard <acme@astray.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Archive::Tar:         0
-    Archive::Zip:         0
-    Moose:                0
-    MooseX::Types::Path::Class:  0
-    Test::More:           0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-Peek
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Tar: '0'
+  Archive::Zip: '0'
+  Carp: '0'
+  Moo: '0'
+  Types::Path::Tiny: '0'
+resources:
+  bugtracker: https://github.com/acme/archive-peek/issues
+  repository: git://github.com/acme/archive-peek.git
+version: '0.37'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

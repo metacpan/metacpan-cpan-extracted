@@ -16,14 +16,21 @@ struct Server : Refcnt, private IStreamSelfListener {
     static constexpr const size_t   DEFAULT_MAX_HEADERS_SIZE = 16384;
     static constexpr const size_t   DEFAULT_MAX_BODY_SIZE    = SIZE_UNLIMITED;
 
+    #ifdef _WIN32
+    static constexpr const bool DEFRPORT = false;
+    #else
+    static constexpr const bool DEFRPORT = true;
+    #endif
+
     struct Location {
         string           host;
         uint16_t         port       = 0;
-        bool             reuse_port = true;            // several listeners(servers) can be bound to the same port if true, useful for threaded apps
+        string           path       = {};              // path for unix sockets or name for named pipes (windows), if supplied ignores host, port, domain, reuse_port
+        bool             reuse_port = DEFRPORT;        // several listeners(servers) can be bound to the same port if true, useful for threaded apps
         int              backlog    = DEFAULT_BACKLOG; // max accept queue
         int              domain     = AF_INET;
         SslContext       ssl_ctx    = nullptr;         // if set, will use SSL
-        optional<sock_t> sock       = {};              // if supplied, uses this socket and ignores host, port, reuse_port, backlog, domain
+        optional<sock_t> sock       = {};              // if supplied, uses this socket and ignores host, port, path, reuse_port, backlog, domain
                                                        // socket must be bound but NOT LISTENING!
         bool operator== (const Location&) const;
         bool operator!= (const Location& oth) const { return !operator==(oth); }
@@ -42,7 +49,7 @@ struct Server : Refcnt, private IStreamSelfListener {
         bool operator!= (const Config& oth) const { return !operator==(oth); }
     };
 
-    using Listeners    = std::vector<TcpSP>;
+    using Listeners    = std::vector<StreamSP>;
     using run_fptr     = void();
     using route_fptr   = void(const ServerRequestSP&);
     using request_fptr = ServerRequest::receive_fptr;
@@ -79,14 +86,12 @@ struct Server : Refcnt, private IStreamSelfListener {
     virtual void start_listening ();
     virtual void stop_listening  ();
 
-    excepted<net::SockAddr, ErrorCode> sockaddr () const {
-        return _listeners.size() ? _listeners.front()->sockaddr() : make_unexpected(errc::server_stopping);
-    }
+    excepted<net::SockAddr, ErrorCode> sockaddr () const;
 
     const string& date_header_now ();
 
 protected:
-    virtual ServerConnectionSP new_connection (uint64_t id, const ServerConnection::Config&);
+    virtual ServerConnectionSP new_connection (uint64_t id, const ServerConnection::Config&, const StreamSP&);
 
     ~Server (); // restrict stack allocation
 
@@ -107,8 +112,6 @@ private:
     uint64_t    _hdate_time = 0;
     string      _hdate_str;
     uint64_t    _awrs = 0; // active write requests
-
-    StreamSP create_connection (const StreamSP&) override;
 
     void on_connection (const StreamSP&, const ErrorCode&) override;
 

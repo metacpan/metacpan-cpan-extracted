@@ -84,15 +84,6 @@ sub _get_x_or_y {
     );
 }
 
-sub negate {
-    my ($self) = @_;
-
-    my @args = @{$self}{qw( curve x y z )};
-    $args[2] = $args[2]->negate();
-
-    return (ref $self)->new(@args);
-}
-
 sub twice {
     my ($self) = @_;
 

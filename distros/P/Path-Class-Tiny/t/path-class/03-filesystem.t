@@ -1,7 +1,7 @@
 use Test::Most 0.25;
 
 use strict;
-use File::Temp qw(tmpnam tempdir);
+use File::Temp qw(tmpnam);
 
 use_ok 'Path::Class::Tiny';
 
@@ -36,7 +36,7 @@ ok -e $file, "$file should exist";
 ok not -e $file;
 
 
-my $dir = dir(tempdir(CLEANUP => 1));
+my $dir = tempdir();
 ok $dir;
 ok -d $dir;
 
@@ -330,16 +330,14 @@ SKIP: { skip '"foreign" methods not implemented';
 }
 } # SKIP block
 
-SKIP: { skip 'tempdir methods not fully implemented';
 # MODIFIED from original
 {
-  $dir = Path::Class::Tiny->tempdir();
+  $dir = Path::Class::Tiny::tempdir();
   isa_ok $dir, 'Path::Class::Tiny';
 
-  $dir = Path::Class::Tiny->tempdir(CLEANUP => 1);
+  $dir = Path::Class::Tiny::tempdir(CLEANUP => 1);
   isa_ok $dir, 'Path::Class::Tiny';
 }
-} # SKIP block
 
 
 # copy_to()

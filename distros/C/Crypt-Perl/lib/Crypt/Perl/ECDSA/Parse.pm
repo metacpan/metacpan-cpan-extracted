@@ -95,27 +95,7 @@ sub public {
         $struct = $asn1_ec->decode($pem_or_der);
     }
     catch {
-        my $ec_err = $_;
-
-        my $asn1_pkcs8 = $asn1->find('SubjectPublicKeyInfo');
-
-        try {
-            my $spk_struct = $asn1_pkcs8->decode($pem_or_der);
-
-            #It still might succeed, even if this is wrong, so don’t die().
-            if ( $spk_struct->{'algorithm'}{'algorithm'} ne Crypt::Perl::ECDSA::ECParameters::OID_ecPublicKey() ) {
-                warn "Unknown private key algorithm OID: “$spk_struct->{'algorithm'}{'algorithm'}”";
-            }
-
-            my $asn1_params = $asn1->find('EcpkParameters');
-            my $params = $asn1_params->decode($spk_struct->{'algorithm'}{'parameters'});
-
-            $struct = { publicKey => $spk_struct->{'subjectPublicKey'} };
-            $struct->{'keydata'}{'parameters'} = $params;
-        }
-        catch {
-            die Crypt::Perl::X::create('Generic', "Failed to decode public key as either ECDSA native ($ec_err) or SubjectPublicKeyInfo ($_)");
-        };
+        die Crypt::Perl::X::create('Generic', "Failed to decode input as ECDSA public key ($_)");
     };
 
     return Crypt::Perl::ECDSA::PublicKey->new(

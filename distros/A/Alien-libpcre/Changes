@@ -1,5 +1,13 @@
 Revision history for Alien-libpcre},
 
+0.02      2021-11-15 08:45:21 -0700
+  - Use hard coded full path to tarball, as PCRE1 has been
+    EOLd and there is unlikely to be another new version,
+    now fetching from (unofficial) sourceforce mirror as the
+    old https is gone (gh#5, gh#8)
+  - Documentation now makes it clear that this is for the
+    older and no longer supported PCRE1 (gh#7, gh#8)
+
 0.01      2020-05-15 06:57:34 -0600
   - initial version
 

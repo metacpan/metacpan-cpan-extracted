@@ -142,15 +142,13 @@ while (my $line = readline $noun_data_fh) {
 
 # Add conversions for possessives...
 unshift @{$modern_plural_of{pattern}},
-        { from=>q{(.*?)'s?}, to => q{${continue if !is_singular($1); my
-        $plural = $modern_plural_of->{$1}; \($plural =~ /s$/ ? $plural.q{'} : $plural.q{'s})}},  tag => q{}, };
+        { from=>q{.*'s?}, to => q{${\(Lingua::EN::Inflexion::adj($word)->plural)}},  tag => q{}, };
 
 unshift @{$classical_plural_of{pattern}},
-        { from=>q{(.*?)'s?}, to => q{${continue if !is_singular($1); my
-        $plural = $classical_plural_of->{$1}; \($plural =~ /s$/ ? $plural.q{'} : $plural.q{'s})}},  tag => q{}, };
+        { from=>q{.*'s?}, to => q{${\(Lingua::EN::Inflexion::adj($word)->classical->plural)}},  tag => q{}, };
 
 unshift @{$singular_of{pattern}},
-        { from=>q{(.*?)'s?}, to => q{${continue if !is_plural($1); my $sing = convert_to_singular($1); \($sing =~ /s$/ ? $sing.q{'} : $sing.q{'s})}},  tag => q{}, };
+        { from=>q{.*'s?}, to => q{${\(Lingua::EN::Inflexion::adj($word)->singular)}}, tag => q{}, };
 
 
 # Emit standard header...
@@ -192,6 +190,9 @@ say '';
 
 say 'sub prep_pat { $PREP_PAT }';
 say '';
+
+# Emit utility function...
+say 'sub tc {my($text)=@_; $text=~s{(\A|\s)(\S)|(\S)}{defined($3)?lc($3):$1.uc($2)}egxms; $text; };';
 
 # Emit pattern-based inflection subroutines...
 emit_converter( 'modern_plural'   , $modern_plural_of{pattern}    );
@@ -323,9 +324,10 @@ sub emit_converter {
     # Generate subroutine structure...
     say "sub convert_to_${name} {";
     say '    my ($word) = @_;';
-    say "    return \$${name}_of->{\$word}    if exists \$${name}_of->{\$word};";
-    say "    return \$${name}_of->{lc \$word} if exists \$${name}_of->{lc \$word};";
-    say "    return \$word                    if is_$type(\$word)$plus_extra_check;";
+    say "    return \$${name}_of->{\$word}     if exists \$${name}_of->{\$word};";
+    say "    return \$${name}_of->{lc \$word}  if exists \$${name}_of->{lc \$word};";
+    say "    return \$${name}_of->{tc \$word}  if exists \$${name}_of->{tc \$word};";
+    say "    return \$word                     if is_$type(\$word)$plus_extra_check;";
     say '    given ($word) {';
 
     # Generate each alternative replacement pattern...
@@ -345,14 +347,23 @@ sub emit_converter {
 sub emit_recognizer {
     my ($name, $compl_name, $negatives_ref, $positives_ref) = @_;
 
+    my %final_apost   = ( singular => 0, plural => 1 );
+    my %final_apost_s = ( singular => 'is_singular(substr($word,0,-2))',
+                          plural   => 'is_plural(substr($word,0,-2))'
+                        );
+
     # Generate subroutine structure...
     say "sub is_${name} {";
     say '    my ($word) = @_;';
     say "    return 1 if exists \$is_${name}\->{\$word};";
     say "    return 1 if exists \$is_${name}\->{lc \$word};";
+    say "    return 1 if exists \$is_${name}\->{ucfirst lc \$word};";
     say "    return 0 if exists \$is_${compl_name}\->{\$word};";
     say "    return 0 if exists \$is_${compl_name}\->{lc \$word};";
+    say "    return 0 if exists \$is_${compl_name}\->{ucfirst lc \$word};";
     say '    given ($word) {';
+    say "        when (m{'\$})  { return $final_apost{$name} }";
+    say "        when (m{'s\$}) { return $final_apost_s{$name} }";
 
     # Generate each alternative success pattern...
     my %generated;
@@ -373,7 +384,7 @@ sub emit_recognizer {
         say '        default { return !is_plural($word); }';
     }
     else {
-        say '        default { return $word =~ m{ s \Z }xms; }';
+        say '        default { return $word =~ m{ s \Z }ixms; }';
     }
     say '    }';
     say '}';

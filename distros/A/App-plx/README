@@ -141,8 +141,34 @@ BOOTSTRAP
 
     to get the current latest packed version.
 
-    The packed version bundled local::lib and File::Which, and also includes
+    The packed version bundles local::lib and File::Which, and also includes
     a modified "--cpanm" action that uses an inline "App::cpanminus".
+
+ENVIRONMENT
+    "plx" actions that execute external commands all clear any existing
+    environment variables that start with "PERL" to keep an encapsulated
+    setup for commands being run within the layouts - and also set
+    "PERL5OPT" to exclude "site_perl" (but not "vendor_perl") to avoid
+    locally installed modules causing unexpected effects.
+
+    Having done so, "plx" then loads each env config entry and sets those
+    variables - then prepends the "plx" specific entries to both "PATH" and
+    "PERL5LIB". You can add env config entries with "--config":
+
+      plx --config env add NAME VALUE
+
+    The changes that will be made to your environment can be output by
+    calling the "--env" command.
+
+    Additionally, environment variable overrides may be provided to the
+    "--cmd", "--exec" and "--perl" commands by providing them in
+    "NAME=VALUE" format:
+
+      # do not do this, it will be deleted
+      PERL_RL=Perl5 plx <something>
+
+      # do this instead, it will provide the environment variable to the command
+      plx PERL_RL=Perl5 <something>
 
 ACTIONS
       plx --help                             # Print synopsis

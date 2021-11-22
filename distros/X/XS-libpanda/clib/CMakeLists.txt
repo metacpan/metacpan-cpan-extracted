@@ -27,7 +27,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
 
 if (UNIX)
     # needed for *bsd
@@ -39,6 +39,7 @@ if (UNIX)
         target_compile_definitions(${PROJECT_NAME} PRIVATE "PANDA_HAS_LIBUNWIND")
         message(STATUS "PANDA_HAS_LIBUNWIND")
         find_library(libunwind_lib unwind)
+        find_library(libunwind_generic_lib unwind-generic)
         if (libunwind_lib)
             list(APPEND panda-lib-libraries unwind)
         endif()

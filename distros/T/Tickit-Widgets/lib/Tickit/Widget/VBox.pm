@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.09;
+use Object::Pad 0.57;
 
-package Tickit::Widget::VBox 0.49;
+package Tickit::Widget::VBox 0.50;
 class Tickit::Widget::VBox
-   extends Tickit::Widget::LinearBox;
+   :isa(Tickit::Widget::LinearBox);
 
 use Tickit::Style;
 

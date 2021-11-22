@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+# PODNAME: timestamp.pl
+# ABSTRACT: Utility to request RFC3161 timestamps for files
 
 #
 # Originally based on timestamp 
@@ -69,3 +71,30 @@ for my $in_file (@ARGV) {
     $out_file = "$in_file.ts";
     attest_file($in_file, $out_file, $tsa, $hash_algo, $policy, $verbose);
 }
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+timestamp.pl - Utility to request RFC3161 timestamps for files
+
+=head1 VERSION
+
+version 0.020
+
+=head1 AUTHOR
+
+Andreas K. Huettel <dilfridge@gentoo.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Andreas K. Huettel.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

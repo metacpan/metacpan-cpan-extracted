@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Slot 0.56;
+package Object::Pad::MOP::Slot 0.57;
 
 use v5.14;
 use warnings;
@@ -64,6 +64,30 @@ instance.
 
 On scalar slots, this method can also act as an lvalue mutator allowing a new
 value to be set.
+
+=head2 has_attribute
+
+   $exists = $metaslot->has_attribute( $name )
+
+I<Since version 0.57.>
+
+Returns a boolean indicating whether the named attribute has been attached to
+the slot. The attribute name should not include the leading colon (C<:>)
+character.
+
+=head2 get_attribute_value
+
+   $value = $metaslot->get_attribute_value( $name )
+
+I<Since version 0.57.>
+
+Returns the stored value of an attached attribute, if one exists. If the
+attribute has not been attached then an exception is thrown.
+
+Note that most core-defined attributes will either store no data at all, or
+a method name string. This accessor method is provided largely for the benefit
+of obtaining data defined by third-party attributes, which may more clearly
+define how that data is generated and used.
 
 =cut
 

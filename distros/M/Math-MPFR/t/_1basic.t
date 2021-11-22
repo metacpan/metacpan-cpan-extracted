@@ -18,7 +18,7 @@ elsif(pack("L", 305419897) eq pack("V", 305419897)) {warn "# Machine appears to 
 
 warn "# Byte Order: ", $Config{byteorder}, "\n";
 
-my($evaluate, $rebuild, $f128, $d64) = (0, 0, 0, 0);
+my($evaluate, $f128, $d64) = (0, 0, 0, 0);
 
 eval {$evaluate = Rmpfr_buildopt_tls_p()};
 if(!$@) {
@@ -31,7 +31,11 @@ if(!$@) {
   $evaluate ? warn "# mpfr library built WITH _Decimal64 support\n"
             : warn "# mpfr library built WITHOUT _Decimal64 support\n";
 
-  if(!Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS() && $evaluate) {$rebuild += 2}
+  if(262400 <= MPFR_VERSION()){
+    $evaluate ? warn "# mpfr library built WITH _Decimal128 support\n"
+              : warn "# mpfr library built WITHOUT _Decimal128 support\n";
+  }
+
   $d64 = 1 if $evaluate;
 }
 
@@ -40,7 +44,6 @@ if(!$@) {
   $evaluate ? warn "# mpfr library built WITH __float128 support\n"
             : warn "# mpfr library built WITHOUT __float128 support\n";
 
-  if(!Math::MPFR::_MPFR_WANT_FLOAT128() && $evaluate) {$rebuild += 1}
   $f128 = 1 if $evaluate;
 }
 
@@ -62,10 +65,10 @@ if(!$@) {
             : warn "# mpfr library thresholds file: $evaluate\n";
 }
 
-if($Math::MPFR::VERSION eq '4.17') {print "ok 1\n"}
+if($Math::MPFR::VERSION eq '4.18') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPFR::VERSION\n"}
 
-if(Math::MPFR::_get_xs_version() eq '4.17') {print "ok 2\n"}
+if(Math::MPFR::_get_xs_version() eq '4.18') {print "ok 2\n"}
 else {
   warn "Module version: $Math::MPFR::VERSION\nXS version: ", Math::MPFR::_get_xs_version(), "\n";
   print "not ok 2\n";
@@ -129,35 +132,4 @@ else {
   print "not ok 9\n";
 }
 
-if($rebuild == 1) {
-  if($d64) {
-    warn "\nIndications are that your mpfr library was built with __float128 support\n",
-         "I suggest rebuilding Math::MPFR with:\n",
-         "     perl Makefile.PL D64=1 F128=1\n\n";
-  }
-  else {
-    warn "\nIndications are that your mpfr library was built with __float128 support\n",
-         "I suggest rebuilding Math::MPFR with:\n",
-         "     perl Makefile.PL F128=1\n\n";
-  }
-}
 
-if($rebuild == 2) {
-  if($f128) {
-    warn "\nIndications are that your mpfr library was built with _Decimal64 support\n",
-         "I suggest rebuilding Math::MPFR with:\n",
-         "     perl Makefile.PL F128=1 D64=1\n\n";
-  }
-  else {
-    warn "\nIndications are that your mpfr library was built with _Decimal64 support\n",
-         "I suggest rebuilding Math::MPFR with:\n",
-         "     perl Makefile.PL D64=1\n\n";
-  }
-}
-
-if($rebuild == 3) {
-  warn "\nIndications are that your mpfr library was built with __float128 support\n",
-       "  and with _Decimal64 support\n",
-       "I suggest rebuilding Math::MPFR with:\n",
-       "     perl Makefile.PL F128=1 D64=1\n\n";
-}

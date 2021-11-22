@@ -10,9 +10,10 @@ require 5.010000;
 use warnings;
 use strict;
 use IO::File;
+use Carp;
 
 our ($VERSION);
-$VERSION='6.85';
+$VERSION='6.86';
 END { undef $VERSION; }
 
 ########################################################################
@@ -34,7 +35,7 @@ sub _config_var {
                    $var eq 'setdate'    ||
                    $var eq 'configfile')) {
       if ($var eq 'tz') {
-         warn "WARNING: the TZ Date::Manip config variable is deprecated\n" .
+         carp "WARNING: the TZ Date::Manip config variable is deprecated\n" .
               "         and will be removed in version 7.00.  Please use\n" .
               "         the SetDate or ForceDate config variables instead.\n";
       }
@@ -53,17 +54,17 @@ sub _config_file {
    return  if (! $file);
 
    if (! -f $file) {
-      warn "ERROR: [config_file] file doesn't exist: $file\n";
+      carp "ERROR: [config_file] file doesn't exist: $file";
       return;
    }
    if (! -r $file) {
-      warn "ERROR: [config_file] file not readable: $file\n";
+      carp "ERROR: [config_file] file not readable: $file";
       return;
    }
 
    my $in = new IO::File;
    if (! $in->open($file)) {
-      warn "ERROR: [config_file] unable to open file: $file: $!\n";
+      carp "ERROR: [config_file] unable to open file: $file: $!";
       return;
    }
    my @in = <$in>;
@@ -126,7 +127,7 @@ sub _config_file_section {
    $line    =~ s/\s*$//o;
    my $sect = lc($line);
    if (! exists $$base{'data'}{'sections'}{$sect}) {
-      warn "WARNING: [config_file] unknown section created: $sect\n";
+      carp "WARNING: [config_file] unknown section created: $sect";
       $base->_section($sect);
    }
    return $sect;
@@ -142,7 +143,7 @@ sub _config_file_var {
    if ($line =~ /^\s*(.*?)\s*=\s*(.*?)\s*$/o) {
       ($var,$val) = ($1,$2);
    } else {
-      die "ERROR: invalid Date::Manip config file line:\n  $line\n";
+      croak "ERROR: invalid Date::Manip config file line:\n  $line\n";
    }
 
    if ($sect eq 'conf') {
@@ -180,7 +181,7 @@ sub _config {
    if (exists $$self{'data'}{'sections'}{$sect}{$var}) {
       return $$self{'data'}{'sections'}{$sect}{$var};
    } else {
-      warn "ERROR: [config] invalid config variable: $var\n";
+      carp "ERROR: [config] invalid config variable: $var";
       return '';
    }
 }
@@ -335,7 +336,7 @@ sub _now {
       return $now[5];
 
    } else {
-      warn "ERROR: [now] invalid argument list: $op\n";
+      carp "ERROR: [now] invalid argument list: $op";
       return ();
    }
 }

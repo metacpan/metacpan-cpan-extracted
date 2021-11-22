@@ -4,9 +4,9 @@ use 5.008008;
 use strict;
 use warnings;
 
-use DNS::LDNS;
+use DNS::LDNS ();
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 sub rrset {
     my $self = shift;
@@ -52,9 +52,9 @@ DNS::LDNS::DNSSecDataChain - DNSSec data chain element
 
 =head1 SYNOPSIS
 
-  use DNS::LDNS ':all'
+  use DNS::LDNS ();
 
-  chain = new DNS::LDNS::DNSSecDataChain
+  chain = DNS::LDNS::DNSSecDataChain->new
   chain->print(fp)
   chain->derive_trust_tree(rr)
   chain->derive_trust_tree_time(rr, checktime)

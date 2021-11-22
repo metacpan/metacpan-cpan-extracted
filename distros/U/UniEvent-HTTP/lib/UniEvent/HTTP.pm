@@ -3,7 +3,7 @@ use 5.012;
 use UniEvent();
 use Protocol::HTTP();
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.1.1';
 
 XS::Loader::bootstrap;
 

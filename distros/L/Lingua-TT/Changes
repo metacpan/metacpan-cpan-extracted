@@ -2,6 +2,11 @@
 ##
 ## Change log for perl distribution Lingua::TT
 
+v0.13 Tue, 16 Nov 2021 19:09:21 +0100 moocow
+	* added -multimap mode for tt-tag-xlate.perl
+	* fixed typo in Packed/x.pm, which probably doesn't work anyway
+	  - resolves RT #140076
+
 v0.12 Wed, 13 Feb 2019 08:46:52 +0100 moocow
 	* Makefile.PL administrivia
 	* use 5.010 (for // operator)

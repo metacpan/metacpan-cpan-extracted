@@ -10,6 +10,7 @@ using panda::net::SockAddr;
 using panda::unievent::Loop;
 using panda::unievent::LoopSP;
 using panda::unievent::TcpSP;
+using panda::unievent::StreamSP;
 using panda::unievent::SslContext;
 using xs::protocol::http::strings_to_sv;
 using xs::protocol::http::CookieJar;

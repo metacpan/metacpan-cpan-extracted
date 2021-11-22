@@ -1,0 +1,144 @@
+#!/usr/bin/env perl
+# PODNAME: stripabitags - Remove tags by content from ABI traces
+
+use 5.018;
+use warnings;
+use Data::Dumper;
+use Bio::Trace::ABIF;
+use Term::ANSIColor;
+use Getopt::Long;
+use File::Spec;
+use File::Copy;
+my $tag_name = undef;
+my $REMOVE_TAG = undef;
+my $verbose = 0;
+my $help = undef;
+
+GetOptions(
+	'tag=s' => \$tag_name,
+	'value=s' => \$REMOVE_TAG,
+	'verbose' => \$verbose,
+	'help' => \$help
+);
+# STRIP TAGS FROM AB1 FILE IF CONTENT MATCHES $REMOVE_TAG
+
+my $file = shift;
+die "Missing argument <AB1File>\n(usage: FileABI TagContentToStrip)\n" if (not defined $file or not -e "$file");
+say "Processing $file";
+
+if ($file !~/bak$/) {
+	# OPENING REGULAR FILE: TO BE BACKUPPED
+	my $backup_filename = $file . ".bak";
+	unless (-e "$backup_filename") {
+		say STDERR "Backing up to $backup_filename" if ($verbose);
+		copy($file, $backup_filename);
+	}
+} 
+
+
+
+my $trace = Bio::Trace::ABIF->new();
+$trace->open_abif("$file", 1);
+
+unless ($trace->is_abif_format() ) {
+	die " $file is not ABIF\n";
+}
+
+my $num = $trace->num_dir_entries();
+my @tag = $trace->tags();
+
+if (not defined $REMOVE_TAG) {
+	for my $tag (@tag) {
+		my $num = chop($tag);
+		my %DirEntry = $trace->get_directory($tag, $num);
+		my $str =  $DirEntry{'ELEMENT_TYPE'} =~ /string/i ? substr( $DirEntry{'DATA_ITEM'}, 0, 200) : "";
+		$str =~s/^(\s+)//g;
+		$str =~s/(\s+)$//g;
+		$str = ";data=$str";
+		say $tag , "\tTagNum=", $DirEntry{'TAG_NUMBER'}, ";Type=", $DirEntry{'ELEMENT_TYPE'}, $str;
+		
+	}
+	exit;
+}
+
+my $true = 1;
+
+
+for my $t (@tag) {
+	my $num = chop($t);
+		say color('bold'),  "[$t] $num" , color('reset');
+		my %DirEntry = $trace->get_directory($t, $num);
+
+	#
+	# $VAR1 = {
+	#           'DATA_ITEM' => '
+	# Gingol-H09',
+	#           'ELEMENT_SIZE' => 1,
+	#           'TAG_NUMBER' => '1',
+	#           'TAG_NAME' => 'SMPL',
+	#           'ELEMENT_TYPE' => 'pString',
+	#           'NUM_ELEMENTS' => 11,
+	#           'DATA_SIZE' => 11
+	#         };
+
+	if ($DirEntry{'DATA_ITEM'} =~/$REMOVE_TAG/i) {
+		my $data = '';
+		$trace->write_tag($t, $num, \$data);
+		say STDERR "Stripping tag $t";
+	}
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+stripabitags - Remove tags by content from ABI traces
+
+=head1 VERSION
+
+version 1.0.1
+
+=head2 Description
+
+List ABI tags and remove a tag based on its content.
+
+=head2 Usage
+
+	stripabitags.pl <AB1File> [--tag=<TagName>] [--value=<TagValue>] [--verbose] [--help]
+
+=head2 Parameters
+
+=over 4
+
+=item <AB1File>
+
+Input file
+
+=item --value=<TagValue>
+
+If the content is included in one of the tags, it will be removed
+If no value is specified, a list of tags is printed.
+
+=item --tag=<TagName>
+
+Not implemented
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

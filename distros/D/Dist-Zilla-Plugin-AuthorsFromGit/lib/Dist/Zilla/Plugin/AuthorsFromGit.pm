@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::AuthorsFromGit;
 # ABSTRACT: Add per-file per-year copyright info to each Perl document
-$Dist::Zilla::Plugin::AuthorsFromGit::VERSION = '0.006';
+$Dist::Zilla::Plugin::AuthorsFromGit::VERSION = '0.007';
 use Git::Wrapper;
 use DateTime;
 use List::MoreUtils 0.4 qw(uniq sort_by true);
@@ -26,6 +26,10 @@ sub getblacklist {
 
 sub gitauthorlist {
   my ($file, $git)= @_;
+
+  # Switching the warning off when the code works nicely is safer than rewriting
+  # the logic to suppress a harmless warning.
+  no warnings 'uninitialized';
 
   my @log_lines = $git->RUN('log', '--follow', '-M75%', '--format=%H %at %aN', '--', $file->name);
   my @outputlines;
@@ -90,6 +94,8 @@ sub gitauthorlist {
     };
     push @outputlines, "";
   };
+
+  use warnings 'uninitialized';
 
   return @outputlines;
 }
@@ -173,7 +179,7 @@ Dist::Zilla::Plugin::AuthorsFromGit - Add per-file per-year copyright info to ea
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

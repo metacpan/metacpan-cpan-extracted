@@ -8,6 +8,7 @@ requires 'Text::ANSI::Fold', '2.11';
 requires 'Text::ANSI::Fold::Util';
 requires 'Text::ANSI::Printf', '1.03';
 requires 'Math::RPN';
+requires 'Clone';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

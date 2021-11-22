@@ -2,8 +2,8 @@ NAME
     App::GnuplotUtils - Utilities related to plotting data using gnuplot
 
 VERSION
-    This document describes version 0.002 of App::GnuplotUtils (from Perl
-    distribution App-GnuplotUtils), released on 2020-12-10.
+    This document describes version 0.003 of App::GnuplotUtils (from Perl
+    distribution App-GnuplotUtils), released on 2021-07-02.
 
 DESCRIPTION
     This distributions provides the following command-line utilities. They
@@ -15,36 +15,43 @@ FUNCTIONS
   xyplot
     Usage:
 
-     xyplot(%args) -> [status, msg, payload, meta]
+     xyplot(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Plot XY dataset(s) using gnuplot.
 
-    Example "input1.txt", each line contains whitespace-separated values of
-    X data (number), Y data (number):
+    This utility is a wrapper for gnuplot to quickly generate a graph from
+    the command-line and view it using a browser or an image viewer program.
+    You can specify the dataset to plot directly from the command-line or
+    specify filename to read the dataset from.
+
+    To plot directly from the command-line:
+
+     % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' ; # whitespaces are optional
+
+    To add more datasets, specify more "--dataset-data" options:
+
+     % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
+              --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
+
+    To add a title to your chart and every dataset:
+
+     % xyplot --chart-title "my chart" \
+              --dataset-title "foo" --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
+              --dataset-title "bar" --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
+
+    To specify dataset from a file, use "--dataset-file" option (or specify
+    as arguments):
+
+     % xyplot --dataset-file ds1.txt --dataset-file ds2.txt
+     % xyplot ds1.txt ds2.txt
+
+    "ds1.txt" contains these lines:
 
      1 1
      2 3
      3 5.5
      4 7.9
      6 11.5
-
-    Example using "xyplot" (one data-set):
-
-     % xyplot < input1.txt
-
-    Example "input2.txt":
-
-     1 8
-     2 12
-     3 5
-     4 4
-     6 8
-
-    Using two datasets:
-
-     % xyplot --dataset-file  input1.txt  --dataset-file  input2.txt \
-              --dataset-color red         --dataset-color blue \
-              --dataset-style linespoints --dataset-style points
 
     Keywords: xychart, XY chart, XY plot
 
@@ -53,6 +60,10 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   chart_title => *str*
+
+    *   dataset_datas => *array[str]*
+
+        Dataset(s).
 
     *   dataset_files => *array[filename]*
 
@@ -66,23 +77,26 @@ FUNCTIONS
 
         Dataset title(s).
 
-    *   datasets => *array[array]*
-
-        Dataset(s).
-
     *   field_delimiter => *str*
 
         Supply field delimiter character in dataset file instead of the
-        default whitespace(s).
+        default whitespace(s) or comma(s).
+
+    *   output_file => *filename*
+
+    *   overwrite => *bool*
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -96,7 +110,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-GnuplotUtils/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GnuplotUtils>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -106,7 +120,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

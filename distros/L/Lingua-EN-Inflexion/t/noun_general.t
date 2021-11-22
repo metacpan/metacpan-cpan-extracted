@@ -7,8 +7,8 @@ for my $line (<DATA>) {
     next if $line =~ m{\A \s* \Z  }xms;
     next if $line =~ m{\A \s* [#] }xms;
 
-    my (                     $singular,       $plural,              $classical) 
-        = $line =~ m{ \A \s* (.*?) \s* => \s* ([^|]*?) \s* (?: [|] \s* (.*?) )? \s* \Z }xms
+    my (                     $ambig,  $singular,       $plural,                 $classical) 
+        = $line =~ m{ \A \s* (!?) \s* (.*?) \s* => \s* ([^|]*?) \s* (?: [|] \s* (.*?) )? \s* \Z }xms
             or fail "Unexpected test data: $line";
 
     $plural ||= $classical;
@@ -25,12 +25,14 @@ for my $line (<DATA>) {
     };
 
     if ($classical) {
-        subtest "$singular -> $classical" => sub {
+        subtest "$singular -> $classical (classical)" => sub {
             my $n_class = noun($classical);
 
             is $n_sing->classical->singular,  $singular  =>  "sc->s: $singular -> $singular";
             is $n_sing->classical->plural,    $classical =>  "sc->p: $singular -> $classical";
-            is $n_class->classical->singular, $singular  =>  "pc->s: $plural -> $singular";
+            if (!$ambig) {
+                is $n_class->classical->singular, $singular  =>  "pc->s: $plural -> $singular";
+            }
             is $n_class->classical->plural,   $classical =>  "pc->pc: $plural -> $plural";
             done_testing();
         };
@@ -55,6 +57,7 @@ __DATA__
     aviatrix          =>  aviatrixes         |  aviatrices
     bacillus          =>                     |  bacilli
     bale              =>  bales              |
+    base              =>  bases              |
     bass              =>  basses             |  bass
     bay               =>  bays               |
     beau              =>  beaus              |  beaux
@@ -170,7 +173,8 @@ __DATA__
     person            =>  people             |  persons
     phalanx           =>  phalanxes          |  phalanges
     phenomenon        =>                     |  phenomena
-    pikestaff         =>  pikestaffs         |  pikestaves
+!   pikestaff         =>  pikestaffs         |  pikestaves
+    pikestave         =>  pikestaves
     pill              =>  pills              |
     play              =>  plays              |
     polyhedron        =>  polyhedrons        |  polyhedra
@@ -202,7 +206,8 @@ __DATA__
     smallpox          =>  smallpox           |
     soliloquy         =>  soliloquies        |
     sphinx            =>  sphinxes           |  sphinges
-    staff             =>  staffs             |  staves
+!   staff             =>  staffs             |  staves
+    stave             =>  staves             |
     stepbrother       =>  stepbrothers       |  stepbrethren
     stepchild         =>                     |  stepchildren
     stoma             =>  stomas             |  stomata

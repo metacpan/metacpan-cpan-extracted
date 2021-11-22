@@ -29367,6 +29367,112 @@ sub cells_worksheets_delete_worksheet_freeze_panes {
 }
 
 #
+# cells_worksheets_delete_worksheets
+#
+# Read worksheets info.
+# 
+# @param string $name  (required)
+# @param MatchConditionRequest $match_condition  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'match_condition' => {
+        data_type => 'MatchConditionRequest',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_worksheets_delete_worksheets' } = { 
+    	summary => 'Read worksheets info.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_worksheets_delete_worksheets {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_worksheets_delete_worksheets");
+    }
+
+    # verify the required parameter 'match_condition' is set
+    unless (exists $args{'match_condition'}) {
+      croak("Missing the required parameter 'match_condition' when calling cells_worksheets_delete_worksheets");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'match_condition'}) {
+        $_body_data = $args{'match_condition'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
 # cells_worksheets_get_named_ranges
 #
 # Read worksheets ranges info.
@@ -34057,6 +34163,72 @@ sub object_exists {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('ObjectExist', $response);
+    return $_response_object;
+}
+
+#
+# post_batch_convert
+#
+# 
+# 
+# @param BatchConvertRequest $batch_convert_request  (required)
+{
+    my $params = {
+    'batch_convert_request' => {
+        data_type => 'BatchConvertRequest',
+        description => '',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_batch_convert' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+        };
+}
+# @return string
+#
+sub post_batch_convert {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'batch_convert_request' is set
+    unless (exists $args{'batch_convert_request'}) {
+      croak("Missing the required parameter 'batch_convert_request' when calling post_batch_convert");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/batch/convert';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'batch_convert_request'}) {
+        $_body_data = $args{'batch_convert_request'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
     return $_response_object;
 }
 

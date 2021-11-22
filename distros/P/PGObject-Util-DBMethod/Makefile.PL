@@ -12,8 +12,11 @@ WriteMakefile(
       ? ('LICENSE'=> 'BSD')
       : ()),
     PL_FILES            => {},
-    BUILD_REQUIRES => {
+    TEST_REQUIRES => {
         'Test::More' => 0,
+    },
+    PREREQ_PM => {
+        'Sub::Util' => '1.40',
     },
     MIN_PERL_VERSION    => '5.008001',
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

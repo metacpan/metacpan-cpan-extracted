@@ -1,5 +1,13 @@
 Revision history for perl module Lingua::EN::ABC
 
+0.12 2021-11-16
+
+* Bug due to dependency on version of JSON::Parse
+
+0.11 2021-11-08
+
+* More vocabulary added
+
 0.10 2018-09-26
 
 * Plurals ending in s also changed

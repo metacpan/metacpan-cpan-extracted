@@ -1,21 +1,31 @@
-#!/usr/bin/perl
-use Test::More tests => 16;
+# -*- perl -*-
+BEGIN
+{
+    use strict;
+    use lib './lib';
+    use Test::More qw( no_plan );
+    use File::Find;
+    our @modules;
+    File::Find::find(sub
+    {
+        next unless( /\.pm$/ );
+        # print( "Checking file '$_' ($File::Find::name)\n" );
+        $_ = $File::Find::name;
+        s,^./lib/,,;
+        s,\.pm$,,;
+        s,/,::,g;
+        push( @modules, $_ );
+    }, qw( ./lib ) );
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+};
 
-BEGIN {
-    use_ok( "Module::Generic" );
-    use_ok( "Module::Generic::Exception" );
-    use_ok( "Module::Generic::Number" );
-    use_ok( "Module::Generic::Scalar" );
-    use_ok( "Module::Generic::Null" );
-    use_ok( "Module::Generic::TieHash" );
-    use_ok( "Module::Generic::Boolean" );
-    use_ok( "Module::Generic::Iterator" );
-    use_ok( "Module::Generic::File" );
-    use_ok( "Module::Generic::Dynamic" );
-    use_ok( "Module::Generic::Hash" );
-    use_ok( "Module::Generic::SharedMem" );
-    use_ok( "Module::Generic::Array" );
-    use_ok( "Module::Generic::DateTime" );
-    use_ok( "Module::Generic::Finfo" );
-    use_ok( "Module::Generic::Tie" );
-}
+BEGIN
+{
+    diag( "Checking module $_" ) if( $DEBUG );
+    use_ok( $_ ) for( sort( @modules ) );
+};
+
+done_testing();
+
+# To generate the list of modules:
+# for m in `find ./lib -type f -name "*.pm"`; do echo $m | perl -pe 's,./lib/,,' | perl -pe 's,\.pm$,,' | perl -pe 's/\//::/g' | perl -pe 's,^(.*?)$,use_ok\( "$1" \)\;,'; done

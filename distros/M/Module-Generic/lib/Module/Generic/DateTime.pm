@@ -272,6 +272,27 @@ sub _make_my_own
     }
 }
 
+sub STORABLE_freeze
+{
+    my $self = shift( @_ );
+    return( '' ) if( !$self->{dt} || !Scalar::Util::blessed( $self->{dt} ) );
+    return( $self->{dt}->STORABLE_freeze( @_ ) );
+}
+
+sub STORABLE_thaw
+{
+    my $self = shift( @_ );
+    return( '' ) if( !$self->{dt} || !Scalar::Util::blessed( $self->{dt} ) );
+    return( $self->{dt}->STORABLE_thaw( @_ ) );
+}
+
+sub TO_JSON
+{
+    my $self = shift( @_ );
+    return( '' ) if( !$self->{dt} || !Scalar::Util::blessed( $self->{dt} ) );
+    return( $self->{dt}->stringify );
+}
+
 DESTROY
 {
 };

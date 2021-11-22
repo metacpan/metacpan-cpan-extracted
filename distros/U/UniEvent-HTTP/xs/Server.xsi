@@ -36,7 +36,7 @@ void Server::configure (Server::Config cfg)
 
 LoopSP Server::loop ()
 
-std::vector<TcpSP> Server::listeners ()
+std::vector<StreamSP> Server::listeners ()
 
 SockAddr Server::sockaddr () {
     RETVAL = THIS->sockaddr().value();

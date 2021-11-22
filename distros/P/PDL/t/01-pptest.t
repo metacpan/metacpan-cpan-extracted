@@ -16,11 +16,51 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use PDL::Core::Dev;
-my @pack = (["tests.pd", qw(Tests PDL::Tests)]);
+my @pack = (["tests.pd", qw(Tests PDL::Tests), '', 1]);
 sub MY::postamble {
 	pdlpp_postamble(@pack);
 };  # Add genpp rule
-WriteMakefile(pdlpp_stdargs(@pack));
+my %hash = pdlpp_stdargs(@pack);
+$hash{OBJECT} .= ' ppcp$(OBJ_EXT)';
+WriteMakefile(%hash);
+EOF
+
+    'ppcp.c' => <<'EOF',
+#include "pdl.h"
+/* to test the $P vaffining */
+void ppcp(PDL_Byte *dst, PDL_Byte *src, int len)
+{
+  int i;
+  for (i=0;i<len;i++)
+     *dst++=*src++;
+}
+
+void tinplace_c1(int n, PDL_Float* data)
+{
+  int i;
+  for (i=0;i<n;i++) {
+    data[i] = 599.0;
+  }
+}
+
+void tinplace_c2(int n, PDL_Float* data1, PDL_Float* data2)
+{
+  int i;
+  for (i=0;i<n;i++) {
+    data1[i] = 599.0;
+    data2[i] = 699.0;
+  }
+}
+
+void tinplace_c3(int n, PDL_Float* data1, PDL_Float* data2, PDL_Float* data3)
+{
+  int i;
+  for (i=0;i<n;i++) {
+    data1[i] = 599.0;
+    data2[i] = 699.0;
+    data3[i] = 799.0;
+  }
+}
 EOF
 
     'tests.pd' => <<'EOF',
@@ -38,14 +78,7 @@ sub pp_deft {
 }
 
 pp_addhdr('
-/* to test the $P vaffining */
-void ppcp(PDL_Byte *dst, PDL_Byte *src, int len)
-{
-  int i;
-
-  for (i=0;i<len;i++)
-     *dst++=*src++;
-}
+void ppcp(PDL_Byte *dst, PDL_Byte *src, int len);
 ');
 
 # test the $P vaffine behaviour
@@ -96,34 +129,9 @@ pp_deft('fooseg',
 ');
 
 pp_addhdr << 'EOH';
-
-void tinplace_c1(int n, PDL_Float* data)
-{
-  int i;
-  for (i=0;i<n;i++) {
-    data[i] = 599.0;
-  }
-}
-
-void tinplace_c2(int n, PDL_Float* data1, PDL_Float* data2)
-{
-  int i;
-  for (i=0;i<n;i++) {
-    data1[i] = 599.0;
-    data2[i] = 699.0;
-  }
-}
-
-void tinplace_c3(int n, PDL_Float* data1, PDL_Float* data2, PDL_Float* data3)
-{
-  int i;
-  for (i=0;i<n;i++) {
-    data1[i] = 599.0;
-    data2[i] = 699.0;
-    data3[i] = 799.0;
-  }
-}
-
+void tinplace_c1(int n, PDL_Float* data);
+void tinplace_c2(int n, PDL_Float* data1, PDL_Float* data2);
+void tinplace_c3(int n, PDL_Float* data1, PDL_Float* data2, PDL_Float* data3);
 EOH
 
 pp_deft('fooflow1',
@@ -180,6 +188,37 @@ A comment.
 
 EOXS
 
+# test whitespace problem with pp_line_numbers and pp_add_boot
+pp_add_boot pp_line_numbers(__LINE__, q{
+        /* nothing happening here */
+});
+
+# test fixed value for named dim, wrong Code for simplicity
+pp_deft('Cpow',
+	Pars => 'a(m=2); b(m=2); [o]c(m=2)',
+	Code => '$c(m => 0) = $a(m => 0) + $b(m => 0);',
+);
+
+# test XS args with OtherPars
+pp_deft('gl_arrows',
+	Pars => 'coords(tri=3,n); int indsa(); int indsb();',
+	OtherPars => 'float headlen; float width;',
+	Code => ';', # do nothing
+);
+
+# test XS args with funky Pars ordering
+pp_deft('polyfill_pp',
+	Pars => 'int [o,nc] im(m,n); float ps(two=2,np); int col()',
+	Code => ';', # do nothing
+);
+
+# test valid non-single-letter GenericTypes arg
+pp_def( "rice_compress",
+        Pars => 'in(n); [o]out(m); int[o]len(); lbuf(n)',
+        GenericTypes =>['B','S','US','L'],
+        Code => ';', # do nothing
+);
+
 pp_done;
 
 # this tests the bug with a trailing comment and *no* newline
@@ -190,6 +229,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Warn;
+BEGIN { $ENV{PDL_AUTOPTHREAD_TARG} = 1 } # for continue-in-threadloop test
 use PDL::LiteF;
 use PDL::Types;
 use PDL::Dbg;
@@ -232,7 +272,7 @@ eval { test_foop(pdl([1]),($y=pdl([1]))) };
 is $@, '', '[phys] with multi-used matched dim of 1 no exception';
 
 eval { test_foop1($x,($y=pdl([1]))) };
-is $@, '', '[phys] with single-used dim of 1 throws exception';
+is $@, '', '[phys] with single-used dim of 1 no exception';
 
 # float qualifier
 $x = ones(byte,3000);
@@ -291,38 +331,71 @@ ok(all $xx->slice('(1)') == 699);
       or do { diag "got     : $got"; diag "expected: $exp" };
 }
 
+test_Cpow(sequence(2), 1);
+
+test_polyfill_pp(zeroes(5,5), ones(2,3), 1);
+
 done_testing;
 EOF
 
 );
 
-my %OTHERPARSFILES = (
+my %BADOTHERPARSFILES = (
     'Makefile.PL' => <<'EOF',
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use PDL::Core::Dev;
 my @pack = (["otherpars.pd", qw(Otherpars PDL::Otherpars)]);
-sub MY::postamble {
-	pdlpp_postamble(@pack);
-};  # Add genpp rule
+sub MY::postamble { pdlpp_postamble(@pack) }
 WriteMakefile(pdlpp_stdargs(@pack));
 EOF
-
     'otherpars.pd' => <<'EOF',
-pp_core_importList( '()' );
-
 pp_def( "myexternalfunc",
   Pars => " p(m);  x(n);  [o] y(); [t] work(wn); ",
+  OtherPars => 'int flags;',
     RedoDimsCode => '
     int im = $PDL(p)->dims[0];
     int in = $PDL(x)->dims[0];
     int min = in + im * im;
     int inw = $PDL(work)->dims[0];
     $SIZE(wn) = inw >= min ? inw : min;',
-	OtherPars => 'int flags;',
     Code => 'int foo = 1;  ');
 
+pp_def( "myexternalfunc2",
+  Pars => "x(m);",
+  OtherPars => 'int I;',
+  Code => 'int foo = 1;  '
+);
+
+pp_done();
+EOF
+
+    't/all.t' => <<'EOF',
+use strict;
+use warnings;
+use Test::More tests => 1;
+use PDL::LiteF;
+use_ok 'PDL::Otherpars';
+EOF
+
+);
+
+my %BADPARSFILES = (
+    'Makefile.PL' => <<'EOF',
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+use PDL::Core::Dev;
+my @pack = (["otherpars.pd", qw(Otherpars PDL::Otherpars)]);
+sub MY::postamble { pdlpp_postamble(@pack) }
+WriteMakefile(pdlpp_stdargs(@pack));
+EOF
+    'otherpars.pd' => <<'EOF',
+pp_def( "myexternalfunc3",
+  Pars => "I(m);",
+  Code => 'int foo = 1;  '
+);
 pp_done();
 EOF
 
@@ -352,7 +425,7 @@ EOF
     'threadtest.pd' => <<'EOF',
 # previously in t/inline-comment-test.t
 
-pp_addpm('');
+pp_addpm(pp_line_numbers(__LINE__-1, q{ sub myfunc { } }));
 
 pp_def('testinc',
         Pars => 'a(); [o] b()',
@@ -427,7 +500,8 @@ EOF
 
 do_tests(\%THREADTESTFILES);
 do_tests(\%PPTESTFILES);
-do_tests(\%OTHERPARSFILES, qr/Invalid OtherPars name/);
+do_tests(\%BADOTHERPARSFILES, qr/Invalid OtherPars name/);
+do_tests(\%BADPARSFILES, qr/Invalid Pars name/);
 
 sub do_tests {
     my ($hash, $error_re) = @_;

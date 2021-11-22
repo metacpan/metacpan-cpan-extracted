@@ -42,11 +42,11 @@ static int magic_set(pTHX_ SV *sv, MAGIC *mg)
   return 1;
 }
 
-static MGVTBL vtbl = {
+static const MGVTBL vtbl = {
   .svt_set = &magic_set,
 };
 
-static bool isa_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
+static bool isa_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
   struct Data *data;
   Newx(data, 1, struct Data);
@@ -60,7 +60,7 @@ static bool isa_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
   return TRUE;
 }
 
-static void isa_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
+static void isa_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata)
 {
   struct Data *data = (struct Data *)hookdata;
 
@@ -68,7 +68,7 @@ static void isa_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
     data->is_weak = true;
 }
 
-static void isa_post_initslot(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *slot)
+static void isa_post_initslot(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *_funcdata, SV *slot)
 {
   sv_magicext(slot, newSV(0), PERL_MAGIC_ext, &vtbl, (char *)hookdata, 0);
 }
@@ -86,4 +86,4 @@ static const struct SlotHookFuncs isa_hooks = {
 MODULE = Object::Pad::SlotAttr::Isa    PACKAGE = Object::Pad::SlotAttr::Isa
 
 BOOT:
-  register_slot_attribute("Isa", &isa_hooks);
+  register_slot_attribute("Isa", &isa_hooks, NULL);

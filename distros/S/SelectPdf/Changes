@@ -1,0 +1,14 @@
+Revision history for SelectPdf Online API client for Perl.
+
+1.4.0
+
+	- Added Pdf Merge client.
+	- Added Pdf to Text client.
+
+1.3.0
+	- Modified package structure. Added more documentation.
+
+1.2.2
+	- Initial version for HtmlToPdfClient.
+
+

@@ -25,7 +25,7 @@ my $builder = Module::Build->new(
     },
     meta_merge => {
         resources => {
-            repository => 'https://github.com/matwei/perl-Algorithm-CheckDigits',
+            repository => 'https://github.com/matwei-perl/Algorithm-CheckDigits',
             bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-CheckDigits',
         }
     },

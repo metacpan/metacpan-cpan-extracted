@@ -1,10 +1,10 @@
 {
    "abstract" : "Sensible database change management",
    "author" : [
-      "\"iovation Inc.\""
+      "\"iovation Inc., David E. Wheeler\""
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -191,6 +191,7 @@
             "Type::Tiny::XS" : "0.010"
          },
          "requires" : {
+            "Algorithm::Backoff::Exponential" : "0.006",
             "Clone" : "0",
             "Config::GitLike" : "1.15",
             "DBI" : "0",
@@ -300,9 +301,9 @@
          "url" : "https://github.com/sqitchers/sqitch/"
       }
    },
-   "version" : "v1.1.0",
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "version" : "v1.2.0",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "MIT"
 }
 

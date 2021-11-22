@@ -1,20 +1,23 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2020 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd::Unit ;
-$Config::Model::Backend::Systemd::Unit::VERSION = '0.247.1';
+$Config::Model::Backend::Systemd::Unit::VERSION = '0.249.1';
 use strict;
 use warnings;
-use 5.010;
+use 5.020;
 use Mouse ;
 use Log::Log4perl qw(get_logger :levels);
 use Path::Tiny;
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 extends 'Config::Model::Backend::IniFile';
 
@@ -23,10 +26,42 @@ with 'Config::Model::Backend::Systemd::Layers';
 my $logger = get_logger("Backend::Systemd::Unit");
 my $user_logger = get_logger("User");
 
-sub read {
-    my $self = shift ;
-    my %args = @_ ;
+sub get_unit_info ($self, $file_path) {
+    # get info from tree when Unit is children of systemd (app is systemd)
+    my $unit_type = $self->node->element_name;
+    my $unit_name = $self->node->index_value;
+    my $app = $self->instance->application;
+    my ($trash, $app_type) = split /-/, $app;
 
+    # get info from file name (app is systemd-* not -user)
+    if (my $fp = $file_path->basename) {
+        my ($n,$t) = split /\./, $fp;
+        $unit_type ||= $t;
+        $unit_name ||= $n;
+    }
+
+    # fallback to app type when file is name without unit type
+    $unit_type ||= $app_type if ($app_type and $app_type ne 'user');
+
+    Config::Model::Exception::User->throw(
+        object => $self,
+        error  => "Unknown unit type. Please add type to file name. e.g. "
+        . $file_path->basename.".service or socket..."
+    ) unless $unit_type;
+
+    # safety check
+    if ($app !~ /^systemd(-user)?$/ and $app !~ /^systemd-$unit_type/) {
+        Config::Model::Exception::User->throw(
+            objet => $self->node,
+            error => "Unit type $unit_type does not match app $app"
+        );
+    }
+
+    return ($unit_name, $unit_type);
+}
+
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub read ($self, %args) {
     # enable 2 styles of comments (gh #1)
     $args{comment_delimiter} = "#;";
 
@@ -37,24 +72,22 @@ sub read {
     # file_path  => './my_test/etc/foo/foo.conf'
     # check      => yes|no|skip
 
-    # file write is handled by Unit backend
-    if ($self->instance->application =~ /systemd-(?!user)/) {
-        # file_path overridden by model => how can config_dir be found ?
-        my $file = $args{file_path};
+    if ($self->instance->application =~ /-file$/) {
         # allow non-existent file to let user start from scratch
-        return 1 unless  path( $file )->exists;
+        return 1 unless  $args{file_path}->exists;
 
-        return $self->load_ini_file(%args, file_path => $file);
+        return $self->load_ini_file(%args);
     }
 
-    my $unit_type = $self->node->element_name;
-    my $unit_name = $self->node->index_value;
+    my ($unit_name, $unit_type) = $self->get_unit_info($args{file_path});
+    my $app = $self->instance->application;
 
     $self->node->instance->layered_start;
     my $root = $args{root} || path('/');
     my $cwd = $args{root} || path('.');
 
     # load layers for this service
+    my $found_unit = 0;
     foreach my $layer ($self->default_directories) {
         my $local_root = $layer =~ m!^/! ? $root : $cwd;
         my $layer_dir = $local_root->child($layer);
@@ -63,14 +96,19 @@ sub read {
         my $layer_file = $layer_dir->child($unit_name.'.'.$unit_type);
         next unless $layer_file->exists;
 
-        $logger->warn("reading default layer from unit $unit_type name $unit_name from $layer_file");
+        $user_logger->warn("Reading unit '$unit_type' '$unit_name' from '$layer_file'.");
         $self->load_ini_file(%args, file_path => $layer_file);
+        $found_unit++;
 
         # TODO: may also need to read files in
         # $unit_name.'.'.$unit_type.'.d' to get all default values
         # (e.g. /lib/systemd/system/rc-local.service.d/debian.conf)
     }
     $self->node->instance->layered_stop;
+
+    if (not $found_unit) {
+        $user_logger->warn("Could not find unit files for $unit_type name $unit_name");
+    }
 
     # now read editable file (files that can be edited with systemctl edit <unit>.<type>
     # for systemd -> /etc/ systemd/system/unit.type.d/override.conf
@@ -81,14 +119,12 @@ sub read {
     # systemd/system/unit.type.d/ and
     # ~/.local/systemd/user/unit.type.d/*.conf
 
-    my $app = $self->instance->application;
-
     my $service_path;
-    if ($app eq 'systemd') {
-        $service_path = $args{file_path}->parent->child("$unit_name.$unit_type.d/override.conf");
+    if ($app =~ /-user$/) {
+        $service_path = $args{file_path} ;
     }
     else {
-        $service_path = $args{file_path} ;
+        $service_path = $args{file_path}->parent->child("$unit_name.$unit_type.d/override.conf");
     }
 
     if ($service_path->exists and $service_path->realpath eq '/dev/null') {
@@ -98,6 +134,7 @@ sub read {
         $logger->debug("reading unit $unit_type name $unit_name from $service_path");
         $self->load_ini_file(%args, file_path => $service_path);
     }
+    return 1;
 }
 
 sub load_ini_file {
@@ -107,15 +144,13 @@ sub load_ini_file {
 
     my $res = $self->SUPER::read( %args );
     die "failed ". $args{file_path}." read" unless $res;
+    return;
 }
 
 # overrides call to node->load_data
-sub load_data {
-    my $self = shift;
-    my %args = @_ ; # data, check, split_reg
-
+sub load_data ($self, %args) {
     my $check = $args{check};
-    my $data = $args{data} ;
+    my $data  = $args{data} ;
 
     my $disp_leaf = sub {
         my ($scanner, $data, $node,$element_name,$index, $leaf_object) = @_ ;
@@ -128,6 +163,11 @@ sub load_data {
                 ."You can use -force option to load value '". $data->[-1]."'."
             ) if $check eq 'yes';
             $data = $data->[-1];
+        }
+        # remove this translation after Config::Model 2.146
+        if ($leaf_object->value_type eq 'boolean') {
+            $data = 'yes' if $data eq 'on';
+            $data = 'no'  if $data eq 'off';
         }
         $leaf_object->store(value =>  $data, check => $check);
     } ;
@@ -144,10 +184,6 @@ sub load_data {
         # read accepted elements
         foreach my $elt (sort keys %$data_ref) {
             my $unit_data = $data_ref->{$elt}; # extract relevant data
-
-            # force creation of element (can be removed with Config::Model 2.086)
-            my $obj = $node->fetch_element(name => $elt, check => $check);
-
             $scanner->scan_element($unit_data, $node,$elt) ;
         }
     };
@@ -174,12 +210,10 @@ sub load_data {
     ) ;
 
     $scan->scan_node($data, $self->node) ;
+    return;
 }
 
-sub write {
-    my $self = shift ;
-    my %args = @_ ;
-
+sub write ($self, %args) {
     # args are:
     # root       => './my_test',  # fake root directory, userd for tests
     # config_dir => /etc/foo',    # absolute path
@@ -197,22 +231,33 @@ sub write {
         return 1;
     }
 
-    my $unit_name = $self->node->index_value;
-    my $unit_type = $self->node->element_name;
+    my ($unit_name, $unit_type) = $self->get_unit_info($args{file_path});
 
     my $app = $self->instance->application;
     my $service_path;
-    if ($app eq 'systemd') {
-        my $dir = $args{file_path}->parent->child("$unit_name.$unit_type.d");
-        $service_path = $dir->child('override.conf');
+    if ($app =~  /-(user|file)$/) {
+        $service_path = $args{file_path};
+
+        $logger->debug("writing unit to $service_path");
+        # mouse super() does not work...
+        $self->SUPER::write(%args, file_path => $service_path);
     }
     else {
-        $service_path = $args{file_path};
-    }
+        my $dir = $args{file_path}->parent->child("$unit_name.$unit_type.d");
+        $dir->mkpath({ mode => oct(755) });
+        $service_path = $dir->child('override.conf');
 
-    $logger->debug("writing unit to $service_path");
-    # mouse super() does not work...
-    $self->SUPER::write(%args, file_path => $service_path);
+        $logger->debug("writing unit to $service_path");
+        # mouse super() does not work...
+        $self->SUPER::write(%args, file_path => $service_path);
+
+        if (scalar $dir->children == 0) {
+            # remove empty dir
+            $logger->warn("Removing empty dir $dir");
+            rmdir $dir;
+        }
+    }
+    return 1;
 }
 
 sub _write_leaf{
@@ -244,7 +289,7 @@ Config::Model::Backend::Systemd::Unit - R/W backend for systemd unit files
 
 =head1 VERSION
 
-version 0.247.1
+version 0.249.1
 
 =head1 SYNOPSIS
 
@@ -283,7 +328,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2020 by Dominique Dumont.
+This software is Copyright (c) 2008-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

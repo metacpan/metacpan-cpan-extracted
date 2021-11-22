@@ -1,0 +1,256 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Acme::FishFarm::WaterFiltration - Water Filter for Acme::FishFarm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORT">EXPORT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CREATION-SUBROUTINES-METHODS">CREATION SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#install-options">install ( %options )</a></li>
+    </ul>
+  </li>
+  <li><a href="#WASTE-LEVEL-DETECTING-SUBROUTINES-METHODS">WASTE LEVEL DETECTING SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#current_waste_count-new_waste_count">current_waste_count ( $new_waste_count )</a></li>
+      <li><a href="#waste_count_threshold">waste_count_threshold</a></li>
+      <li><a href="#set_waste_count_threshold">set_waste_count_threshold</a></li>
+      <li><a href="#reduce_waste_count_by1">reduce_waste_count_by</a></li>
+      <li><a href="#set_waste_count_to_reduce-new_count">set_waste_count_to_reduce ( $new_count )</a></li>
+      <li><a href="#is_filter_layer_dirty">is_filter_layer_dirty</a></li>
+      <li><a href="#is_cylinder_dirty">is_cylinder_dirty</a></li>
+    </ul>
+  </li>
+  <li><a href="#CLEANING-RELATED-SUBROUTINES-METHODS">CLEANING RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#clean_filter_layer">clean_filter_layer</a></li>
+      <li><a href="#clean_cylinder-reduce_waste_by">clean_cylinder ( $reduce_waste_by )</a></li>
+      <li><a href="#turn_on_spatulas">turn_on_spatulas</a></li>
+      <li><a href="#turn_off_spatulas">turn_off_spatulas</a></li>
+      <li><a href="#is_on_spatulas">is_on_spatulas</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Acme::FishFarm::WaterFiltration - Water Filter for Acme::FishFarm</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 1.01</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    use 5.010;
+
+    use Acme::FishFarm qw( reduce_precision );
+    use Acme::FishFarm::WaterFiltration;
+
+    my $water_filter = Acme::FishFarm::WaterFiltration-&gt;install;
+
+    say &quot;Water filter installed and switched on!\n&quot;;
+
+
+    my $current_reading;
+    my $waste_count_threshold;
+    
+    while ( &quot;Fish are living under the water...&quot; ) {
+        $water_filter-&gt;current_waste_count( reduce_precision ( rand(100) ) );
+        
+        $current_reading = $water_filter-&gt;current_waste_count;
+        $waste_threshold = $water_filter-&gt;waste_count_threshold;
+        
+        print &quot;Current Waste Count: &quot;, $current_reading, &quot; (high: &gt;= &quot;, $waste_threshold, &quot;)\n&quot;;
+
+        if ( $water_filter-&gt;is_cylinder_dirty ) {
+            print &quot;  !! Filtering cylinder is dirty!\n&quot;;
+            print &quot;  Cleaned the filter!\n&quot;;
+            $water_filter-&gt;clean_cylinder;
+        } else {
+            print &quot;  Filtering cylinder is still clean.\n&quot;;
+        }
+        sleep(1);
+        say &quot;&quot;;
+    }</code></pre>
+
+<h1 id="EXPORT">EXPORT</h1>
+
+<p>None</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module assumes a cool water filter with a filtering cylinder constantly filtering water in the tank. It has inlet, outlet and a drainage valves. The drainage valve is only opened when the cleaners are switched on automatically to remove waste from the cylinder. To be honest, those cleaners look more like spatulas to me :)</p>
+
+<p>This feature is based on the water filter found <a href="https://www.filternox.com/filters/spt-wbv-mr/">here</a></p>
+
+<h1 id="CREATION-SUBROUTINES-METHODS">CREATION SUBROUTINES/METHODS</h1>
+
+<h2 id="install-options">install ( %options )</h2>
+
+<p>Installs a cool water filtration system.</p>
+
+<p>The following are avaiable for <code>%options</code>:</p>
+
+<dl>
+
+<dt id="current_waste_count">current_waste_count</dt>
+<dd>
+
+<p>The current waste count in the cylinder. Default is <code>0</code>.</p>
+
+</dd>
+<dt id="waste_threshold">waste_threshold</dt>
+<dd>
+
+<p>Default value is <code>75</code>.</p>
+
+<p>Sets the waste treshold.</p>
+
+<p>This is the maximum limit of waste in the cylinder. When this count is hit, it will turn on the cleaners / spatulas or whatever it&#39;s called :).</p>
+
+</dd>
+<dt id="reduce_waste_count_by">reduce_waste_count_by</dt>
+<dd>
+
+<p>Default is <code>10</code>.</p>
+
+<p>The amount of waste to remove from the cylinder / filter each time the cleaning process is called.</p>
+
+</dd>
+</dl>
+
+<h1 id="WASTE-LEVEL-DETECTING-SUBROUTINES-METHODS">WASTE LEVEL DETECTING SUBROUTINES/METHODS</h1>
+
+<h2 id="current_waste_count-new_waste_count">current_waste_count ( $new_waste_count )</h2>
+
+<p>Sets / returns the current waste count inside the cylinder.</p>
+
+<p><code>$new_waste_count</code> is optional. If present, the current waste count will be set to <code>$new_waste_count</code>. Otherwise, returns the current waste count.</p>
+
+<h2 id="waste_count_threshold">waste_count_threshold</h2>
+
+<p>Returns the waste count threshold.</p>
+
+<h2 id="set_waste_count_threshold">set_waste_count_threshold</h2>
+
+<p>Sets the waste count threshold.</p>
+
+<h2 id="reduce_waste_count_by1">reduce_waste_count_by</h2>
+
+<p>Returns the amount of waste to be reduce each time the cleaning process is called.</p>
+
+<h2 id="set_waste_count_to_reduce-new_count">set_waste_count_to_reduce ( $new_count )</h2>
+
+<p>Sets the waste count reduction value to <code>$new_count</code>.</p>
+
+<h2 id="is_filter_layer_dirty">is_filter_layer_dirty</h2>
+
+<p>Synonym for <code>is_cylinder_dirty</code>. See next method.</p>
+
+<h2 id="is_cylinder_dirty">is_cylinder_dirty</h2>
+
+<p>Returns <code>1</code> if the filtering cylinder is dirty ie current waste count hits the waste count threshold. Returns <code>0</code> otherwise.</p>
+
+<p>Remember to clean your cylinder ie. filter layer as soon as possible if it is dirty.</p>
+
+<h1 id="CLEANING-RELATED-SUBROUTINES-METHODS">CLEANING RELATED SUBROUTINES/METHODS</h1>
+
+<h2 id="clean_filter_layer">clean_filter_layer</h2>
+
+<p>Synonym for <code>is_cylinder_dirty</code>. See next method.</p>
+
+<h2 id="clean_cylinder-reduce_waste_by">clean_cylinder ( $reduce_waste_by )</h2>
+
+<p>Cleans the filter layer in the cylinder.</p>
+
+<p><code>$reduce_waste_by</code> is optional. If present, it will reduce waste by that specific value. Otherwise, it cleans the cylinder completly in one shot ie waste count will be <code>0</code>.</p>
+
+<p>If <code>$reduce_waste_by</code> is a negative value, it will be turned into a positive value with the same magnitude.</p>
+
+<p>Make sure that you turn on the spatulas, if not this process will not do anything :) See <code>turn_on_spatulas</code> below.</p>
+
+<h2 id="turn_on_spatulas">turn_on_spatulas</h2>
+
+<p>Activates the cleaning mechanism ie the spatulas :)</p>
+
+<p>Take note that turning on the spatulas does not clean the cylinder. You need to do it explicitly. See <code>clean_cylinder</code> method above for more info :)</p>
+
+<h2 id="turn_off_spatulas">turn_off_spatulas</h2>
+
+<p>Deactivates the cleaning mechanism ie the spatulas :)</p>
+
+<h2 id="is_on_spatulas">is_on_spatulas</h2>
+
+<p>Returns <code>1</code> if the spatula are turned on. The spatula will not clean the cylinder until you explicitly tell the system to do so. See <code>clean_cylinder</code> method above for more info.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Raphael Jong Jun Jie, <code>&lt;ellednera at cpan.org&gt;</code></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-. at rt.cpan.org</code>, or through the web interface at <a href="https://rt.cpan.org/NoAuth/ReportBug.html?Queue=.">https://rt.cpan.org/NoAuth/ReportBug.html?Queue=.</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc Acme::FishFarm::WaterFiltration</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
+
+<p><a href="https://rt.cpan.org/NoAuth/Bugs.html?Dist=.">https://rt.cpan.org/NoAuth/Bugs.html?Dist=.</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="https://cpanratings.perl.org/d/.">https://cpanratings.perl.org/d/.</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="https://metacpan.org/release/.">https://metacpan.org/release/.</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Besiyata d&#39;shmaya</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>This software is Copyright (c) 2021 by Raphael Jong Jun Jie.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

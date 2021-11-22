@@ -118,3 +118,61 @@ Revision history for Lingua-EN-Inflexion
 
     * Repositioned errant level-3 heading
       (Thank-you, Lady Aleena!)
+
+
+
+0.002001  Thu Nov 11 22:38:21 2021
+
+    * Corrected wishful thinking: invalid Rakudoc V<> code in Perldoc
+      plus an extraneous ')' in the documentation.
+      (Thank-you, Lady Aleena. Thank-you, Karen.)
+
+
+0.002002  Sat Nov 13 10:55:27 2021
+
+    * Fixed handling of singular and plural possessives
+      (Thanks Dave!)
+
+
+0.002003  Sun Nov 14 02:21:29 2021
+
+    * Squashed a doc nit.
+      (Thanks, Ron!)
+
+    * Fixed recognition of shouty plurals: "DOGS", "CATS", etc.
+      (Thanks, Dave!)
+
+
+0.002004  Mon Nov 15 04:44:12 2021
+
+    * Fixed behaviour of "stave" --> "staves" --> "stave" in classical mode.
+      It's a modern word too, so it should round-trip without being modernized to "staff"
+      (Thanks, Dave!)
+
+
+0.002005  Tue Nov 16 00:52:44 2021
+
+    * Allowed more natural handling of uppercased and lowercased nouns and verbs
+      that inflect to distinct plural forms when titlecased (such as
+      "atlas"/"Atlas", "jerry"/"Jerry", etc.)
+      (Thanks, Dave!)
+
+    * Also fixed uppercase and lowercase handling of words whose fundamental
+      forms are always titlecased, but which inflect irregularly in the plural
+      (such as "Alfurese" and "Spaetlese")
+      (Thanks again, Dave!)
+
+
+0.002006  Wed Nov 17 06:12:11 2021
+
+    * Improved title-casing of multi-word terms.
+      (Thanks, Dave).
+
+    * Added special case for "judas", and allowed prefixes on "gas" and "glottis"
+      (e.g. "biogas", "avgas"; "epiglottis", "periglottis")
+      (Thanks, Dave)
+
+    * Fixed classical plural processing.
+      (Thanks, Dave!)
+
+

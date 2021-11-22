@@ -4,12 +4,10 @@
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.41;
+use Object::Pad 0.44;  # :weak
 
-package Tickit::Widget::ScrollBox::Extent 0.10;
+package Tickit::Widget::ScrollBox::Extent 0.11;
 class Tickit::Widget::ScrollBox::Extent;
-
-use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -26,13 +24,8 @@ returned by the C<hextent> and C<vextent> methods of the associated ScrollBox.
 has $_start = 0;
 has $_total;
 
-has $_scrollbox :param;
+has $_scrollbox :param :weak;
 has $_id        :param;
-
-BUILD
-{
-   weaken( $_scrollbox );
-}
 
 method _clamp ()
 {

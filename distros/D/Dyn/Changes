@@ -1,0 +1,13 @@
+Revision history for Perl extension Dyn.pm
+
+0.02 2021-11-18T15:34:12Z
+
+    - Callbacks work (better than before)
+        - now store their own DCCallVM for speed and to use dyncall itself for arg handling
+    - Documentation is somewhat less non-existent
+    - Windows examples using user32.dll joins libm example from 0.01
+
+0.01 2021-11-17T04:52:02Z
+
+    - Release early. Check.
+    - Release often. Let's hope so.

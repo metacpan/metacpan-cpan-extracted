@@ -3,7 +3,7 @@ use Moose;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 # ABSTRACT: Net::SAML2::Binding::Artifact - SOAP binding for SAML
 
@@ -170,7 +170,7 @@ Net::SAML2::Binding::SOAP - Net::SAML2::Binding::Artifact - SOAP binding for SAM
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

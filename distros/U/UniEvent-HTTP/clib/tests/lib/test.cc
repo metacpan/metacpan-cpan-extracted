@@ -329,7 +329,7 @@ ServerPair::ServerPair (const LoopSP& loop, Server::Config cfg) {
         }
         conn->loop()->stop();
     });
-    conn->connect(server->listeners().front()->sockaddr().value());
+    conn->connect(server->sockaddr().value());
     loop->run();
 }
 
