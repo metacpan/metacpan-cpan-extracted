@@ -2,7 +2,7 @@ NAME
     App::ClipboardUtils - CLI utilities related to clipboard
 
 VERSION
-    This document describes version 0.001 of App::ClipboardUtils (from Perl
+    This document describes version 0.002 of App::ClipboardUtils (from Perl
     distribution App-ClipboardUtils), released on 2021-07-15.
 
 DESCRIPTION

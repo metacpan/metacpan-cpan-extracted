@@ -1,16 +1,16 @@
 {
-   "abstract" : "libunbound in Perl",
+   "abstract" : "Query DNS recursively via L<libunbound|https://www.nlnetlabs.nl/documentation/unbound/libunbound/>",
    "author" : [
       "Felipe Gasper (FELIPE)"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DNS-Unbound",
    "no_index" : {
@@ -27,12 +27,20 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Mojolicious" : "0"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "ExtUtils::PkgConfig" : "0"
+         },
          "requires" : {
-            "Class::XSAccessor" : "0.1",
+            "Class::XSAccessor" : "0.10",
             "Net::DNS" : "0",
             "Promise::ES6" : "0.11",
             "X::Tiny" : "0",
@@ -41,8 +49,8 @@
       },
       "test" : {
          "requires" : {
-            "File::Temp" : "0",
             "Net::DNS::Nameserver" : "0",
+            "Test::Deep" : "0",
             "Test::DescribeMe" : "0",
             "Test::Exception" : "0",
             "Test::FailWarnings" : "0",
@@ -61,6 +69,6 @@
          "web" : "https://github.com/FGasper/p5-DNS-Unbound"
       }
    },
-   "version" : "0.26",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.27",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

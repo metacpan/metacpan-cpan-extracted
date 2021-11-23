@@ -3,11 +3,10 @@ package Test::Unit::Setup;
 use strict;
 use warnings;
 
-use base 'ToolSet';
+use parent 'ToolSet';
 
 ToolSet->use_pragma('strict');
 ToolSet->use_pragma('warnings');
-ToolSet->use_pragma('feature', 'state');
 
 ToolSet->no_pragma('autovivification');
 
@@ -21,7 +20,6 @@ ToolSet->export(
   'Test::Most'             =>  '',
   'Test::Utils'            => ':all',
   'Test::Unit::Utils'      => ':all',
-  'Google::RestApi::Types' => ':all',
 );
 
 1;

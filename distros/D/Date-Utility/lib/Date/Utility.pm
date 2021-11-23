@@ -11,7 +11,7 @@ Date::Utility - A class that represents a datetime in various format
 
 =cut
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,6 @@ A class that represents a datetime in various format
 
 use Moose;
 use Carp qw( confess croak );
-use DateTime;
 use POSIX qw( floor );
 use Scalar::Util qw(looks_like_number);
 use Tie::Hash::LRU;
@@ -68,11 +67,13 @@ has [qw(
         date_ddmmmyy
         date_yyyymmdd
         date_ddmmmyyyy
+        date_ddmonthyyyy
         days_in_month
         db_timestamp
         day_as_string
         full_day_name
         month_as_string
+        full_month_name
         http_expires_format
         iso8601
         time
@@ -96,10 +97,10 @@ has [qw(
         is_a_weekend
         is_a_weekday
         )
-    ] => (
+] => (
     is         => 'ro',
     lazy_build => 1,
-    );
+);
 
 sub _build__gmtime_attrs {
     my $self = shift;
@@ -326,6 +327,18 @@ sub _build_date_ddmmmyyyy {
     return join('-', ($self->day_of_month, $self->month_as_string, $self->year));
 }
 
+=head2 date_ddmonthyyyy
+
+Returns date in dd-month-yyyy format
+
+=cut
+
+sub _build_date_ddmonthyyyy {
+    my $self = shift;
+
+    return join(' ', ($self->day_of_month, $self->full_month_name, $self->year));
+}
+
 =head2 date
 
 Returns datetime in YYYY-MM-DD format
@@ -351,7 +364,6 @@ sub _build_date_ddmmmyy {
 }
 
 =head2 days_since_epoch
-
 
 Returns number of days since 1970-01-01
 
@@ -437,13 +449,11 @@ sub new {
         $popular{$new_params->{epoch}} = $obj;
     }
 
-    $obj->{_truncated} = !($new_params->{epoch} % 86400);
-
     return $obj;
 
 }
 
-=head2 _parse_datetime_parm
+=head2 _parse_datetime_param
 
 User may supplies datetime parameters but it currently only supports the following formats:
 dd-mmm-yy ddhddGMT, dd-mmm-yy, dd-mmm-yyyy, dd-Mmm-yy hh:mm:ssGMT, YYYY-MM-DD, YYYYMMDD, YYYYMMDDHHMMSS, yyyy-mm-dd hh:mm:ss, yyyy-mm-ddThh:mm:ss or yyyy-mm-ddThh:mm:ssZ.
@@ -467,7 +477,7 @@ sub _parse_datetime_param {
 
     # If it's date only, take the epoch at midnight.
     my ($hour, $minute, $second) = (0, 0, 0);
-    my ($day, $month, $year);
+    my ($day,  $month,  $year);
 
     # The ordering of these regexes is an attempt to match early
     # to avoid extra comparisons.  If our mix of supplied datetimes changes
@@ -556,7 +566,7 @@ sub days_between {
 
 =head2 is_before
 
-Returns a boolena which indicates whether this date object is earlier in time than the supplied date object.
+Returns a boolean which indicates whether this date object is earlier in time than the supplied date object.
 
 =cut
 
@@ -571,7 +581,7 @@ sub is_before {
 
 =head2 is_after
 
-Returns a boolena which indicates whether this date object is later in time than the supplied date object.
+Returns a boolean which indicates whether this date object is later in time than the supplied date object.
 
 =cut
 
@@ -586,7 +596,7 @@ sub is_after {
 
 =head2 is_same_as
 
-Returns a boolena which indicates whether this date object is the same time as the supplied date object.
+Returns a boolean which indicates whether this date object is the same time as the supplied date object.
 
 =cut
 
@@ -623,8 +633,8 @@ my %days_to_num = map {
     my $day = lc $day_names[$_];
     (
         substr($day, 0, 3) => $_,    # Three letter abbreviation
-        $day => $_,                  # Full day name
-        $_   => $_,                  # Number as number
+        $day               => $_,    # Full day name
+        $_                 => $_,    # Number as number
     );
 } 0 .. $#day_names;
 
@@ -644,6 +654,18 @@ sub _build_month_as_string {
     my $self = shift;
 
     return month_number_to_abbrev($self->month);
+}
+
+=head2 full_month_name
+
+Returns the full name of current month. Example: January
+
+=cut
+
+sub _build_full_month_name {
+    my $self = shift;
+
+    return month_number_to_fullname($self->month);
 }
 
 =head2 http_expires_format
@@ -781,32 +803,85 @@ Returns a TimeInterval which represents the difference between UTC and the time 
 
 =cut
 
-sub timezone_offset {
-    my ($self, $timezone) = @_;
-
-    my $dt = DateTime->from_epoch(
-        epoch     => $self->{epoch},
-        time_zone => $timezone
-    );
-
-    return Time::Duration::Concise::Localize->new(interval => $dt->offset);
-}
-
 =head2 is_dst_in_zone
 
-Returns a boolena which indicates whether a certain zone is in DST at the given epoch
+Returns a boolean which indicates whether a certain zone is in DST at the given epoch
 
 =cut
 
-sub is_dst_in_zone {
-    my ($self, $timezone) = @_;
+{
+    use DateTime;
+    use DateTime::TimeZone;
 
-    my $dt = DateTime->from_epoch(
-        epoch     => $self->{epoch},
-        time_zone => $timezone
-    );
+    my $bignum = 20000000;
 
-    return $dt->is_dst;
+    my %cache;
+    my $cache_for = sub {
+        my $tm     = shift;
+        my $tzname = shift;
+        my $k      = int $tm / $bignum;
+
+        if (my $val = $cache{"$k $tzname"}) {
+            return $val;
+        }
+
+        my $z                 = DateTime::TimeZone->new(name => $tzname);
+        my $start_of_interval = $k * $bignum;
+        my $dt                = DateTime->from_epoch(epoch => $start_of_interval);
+        my $rdoff             = $dt->utc_rd_as_seconds - $start_of_interval;
+
+        my ($span_start, $span_end, undef, undef, $off, $is_dst, $name) = @{$z->_span_for_datetime(utc => $dt)};
+        $_ -= $rdoff for ($span_start, $span_end);
+
+        my @val = ([$span_start, $span_end, $off, $is_dst, $name]);
+
+        while ($span_end < ($k + 1) * $bignum) {
+            $dt = DateTime->from_epoch(epoch => $span_end);
+
+            ($span_start, $span_end, undef, undef, $off, $is_dst, $name) = @{$z->_span_for_datetime(utc => $dt)};
+            $_ -= $rdoff for ($span_start, $span_end);
+
+            push @val, [$span_start, $span_end, $off, $is_dst, $name];
+        }
+
+        return $cache{"$k $tzname"} = \@val;
+    };
+
+    sub timezone_offset {
+        my ($self, $tzname) = @_;
+
+        if ($tzname eq 'UTC' or $tzname eq 'Z') {
+            return Time::Duration::Concise::Localize->new(interval => DateTime::TimeZone::UTC->offset_for_datetime);
+        }
+        my $tm    = $self->{epoch};
+        my $spans = $cache_for->($tm, $tzname);
+
+        for my $sp (@$spans) {
+            if ($tm < $sp->[1]) {
+                return Time::Duration::Concise::Localize->new(interval => $sp->[2]);
+            }
+        }
+
+        die "time $tm not found in span";
+    }
+
+    sub is_dst_in_zone {
+        my ($self, $tzname) = @_;
+
+        if ($tzname eq 'UTC' or $tzname eq 'Z') {
+            return DateTime::TimeZone::UTC->is_dst_for_datetime;
+        }
+        my $tm    = $self->{epoch};
+        my $spans = $cache_for->($tm, $tzname);
+
+        for my $sp (@$spans) {
+            if ($tm < $sp->[1]) {
+                return $sp->[3];
+            }
+        }
+
+        die "time $tm not found in span";
+    }
 }
 
 =head2 plus_time_interval
@@ -909,7 +984,7 @@ sub move_to_nth_dow {
     my $dow = $days_to_num{lc $dow_abb} // croak 'Invalid day of week. We got [' . $dow_abb . ']';
 
     my $dow_first = (7 - ($self->day_of_month - 1 - $self->day_of_week)) % 7;
-    my $dom = ($dow + 7 - $dow_first) % 7 + ($nth - 1) * 7 + 1;
+    my $dom       = ($dow + 7 - $dow_first) % 7 + ($nth - 1) * 7 + 1;
 
     return try { Date::Utility->new(join '-', $self->year, $self->month, $dom) };
 }
@@ -963,6 +1038,34 @@ sub month_abbrev_to_number {
     return $abbrev_number_map{$which};
 }
 
+=head1 STATIC METHODS
+
+=head2 month_number_to_fullname
+
+Static method returns a standard mapping from month numbers to fullname.
+
+=cut
+
+my %number_fullname_map = (
+    1  => 'January',
+    2  => 'February',
+    3  => 'March',
+    4  => 'April',
+    5  => 'May',
+    6  => 'June',
+    7  => 'July',
+    8  => 'August',
+    9  => 'September',
+    10 => 'October',
+    11 => 'November',
+    12 => 'December',
+);
+
+sub month_number_to_fullname {
+
+    return $number_fullname_map{int shift};
+}
+
 =head2 is_epoch_timestamp
 
 Check if a given datetime is an epoch timestemp, i.e. an integer of under 14 digits.
@@ -997,12 +1100,10 @@ object representing '2011-12-13 00:00:00'
 sub truncate_to_day {
     my ($self) = @_;
 
-    return $self if $self->{_truncated};
-
-    my $epoch  = $self->{epoch};
-    my $tepoch = $epoch - $epoch % 86400;
-
-    return $popular{$tepoch} // Date::Utility->new($tepoch);
+    my $epoch = $self->{epoch};
+    my $rem   = $epoch % 86400;
+    return $self if $rem == 0;
+    return Date::Utility->new($epoch - $rem);
 }
 
 =head2 truncate_to_month
@@ -1055,52 +1156,80 @@ sub today {
     return $today_obj;
 }
 
-=head2 _plus_years
+=head2 plus_years
+
+Takes the following argument as named parameter:
+
+=over 4
+
+=item * C<years> - number of years to be added. (Integer)
+
+=back
 
 Returns a new L<Date::Utility> object plus the given years. If the day is greater than days in the new month, it will take the day of end month.
 e.g.
 
-    print Date::Utility->new('2000-02-29')->_plus_years(1)->date_yyyymmdd;
-    # will got 2001-02-28
+    print Date::Utility->new('2000-02-29')->plus_years(1)->date_yyyymmdd;
+    # will print 2001-02-28
 
 =cut
 
-sub _plus_years {
+sub plus_years {
     my ($self, $years) = @_;
-    die "Need a integer years number"
+    die "Need an integer years number"
         unless looks_like_number($years)
         and $years == int($years);
     return $self->_create_trimmed_date($self->year + $years, $self->month, $self->day_of_month);
 }
 
-=head2 _minus_years
+*_plus_years = \&plus_years;
+
+=head2 minus_years
+
+Takes the following argument as named parameter:
+
+=over 4
+
+=item * C<years> - number of years to be subracted. (Integer)
+
+=back
 
 Returns a new L<Date::Utility> object minus the given years. If the day is greater than days in the new month, it will take the day of end month.
 e.g.
 
     print Date::Utility->new('2000-02-29')->minus_years(1)->date_yyyymmdd;
-    # will got 1999-02-28
+    # will print 1999-02-28
 
 =cut
 
-sub _minus_years {
+sub minus_years {
     my ($self, $years) = @_;
     return $self->_plus_years(-$years);
 }
 
-=head2 _plus_months
+*_minus_years = \&minus_years;
+
+=head2 plus_months
+
+Takes the following argument as named parameter:
+
+=over 4
+
+=item * C<years> - number of months to be added. (Integer)
+
+=back
 
 Returns a new L<Date::Utility> object plus the given months. If the day is greater than days in the new month, it will take the day of end month.
 e.g.
 
     print Date::Utility->new('2000-01-31')->plus_months(1)->date_yyyymmdd;
-    # will got 2000-02-28
+    # will print 2000-02-28
 
 =cut
 
-sub _plus_months {
+sub plus_months {
     my ($self, $months) = @_;
-    (looks_like_number($months) && $months == int($months)) || die "Need a integer months number";
+    (looks_like_number($months) && $months == int($months)) || die "Need an integer months number";
     my $new_year  = $self->year;
     my $new_month = $self->month + $months;
     if ($new_month < 1 || $new_month > 12) {
@@ -1115,34 +1244,60 @@ sub _plus_months {
     return $self->_create_trimmed_date($new_year, $new_month, $new_day);
 }
 
-=head2 _minus_months
+*_plus_months = \&plus_months;
+
+=head2 minus_months
+
+Takes the following argument as named parameter:
+
+=over 4
+
+=item * C<years> - number of months to be subracted. (Integer)
+
+=back
 
 Returns a new L<Date::Utility> object minus the given months. If the day is greater than days in the new month, it will take the day of end month.
 e.g.
 
     print Date::Utility->new('2000-03-31')->minus_months(1)->date_yyyymmdd;
-    # will got 2000-02-28
+    # will print 2000-02-28
 
 =cut
 
-sub _minus_months {
+sub minus_months {
     my ($self, $months) = @_;
     return $self->_plus_months(-$months);
 }
 
-=head2 _create_trimmed_date
+*_minus_months = \&minus_months;
 
-Return a valid L<Date::Utility> object whose date part is same with the given year, month and day and time part is not changed. If the day is greater than the max day in that month , then use that max day as the day in the new object.
+=head2 create_trimmed_date
+
+Takes the following argument as named parameter:
+
+=over 4
+
+=item * C<year> - calendar year of the date (Integer)
+
+=item * C<month> - calendar month of the date. (Integer)
+
+=item * C<day> - day of the month of the date. (Integer)
+
+=back
+
+Returns a valid L<Date::Utility> object whose date part is same with the given year, month and day and time part is not changed. If the day is greater than the max day in that month , then use that max day as the day in the new object.
 
 =cut
 
-sub _create_trimmed_date {
+sub create_trimmed_date {
     my ($self, $year, $month, $day) = @_;
     my $max_day = __PACKAGE__->new(sprintf("%04d-%02d-01", $year, $month))->days_in_month;
     $day = $day < $max_day ? $day : $max_day;
     my $date_string = sprintf("%04d-%02d-%02d %02d:%02d:%02d", $year, $month, $day, $self->hour, $self->minute, $self->second);
     return __PACKAGE__->new($date_string);
 }
+
+*_create_trimmed_date = \&create_trimmed_date;
 
 no Moose;
 
@@ -1255,4 +1410,3 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 =cut
-

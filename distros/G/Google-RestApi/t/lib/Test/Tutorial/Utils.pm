@@ -9,7 +9,7 @@ use FindBin;
 use lib "$FindBin::RealBin/../../lib";
 
 use File::Temp qw(tempdir);
-use Log::Log4perl qw(:easy);
+use Log::Log4perl qw(:easy get_logger);
 use Term::ANSIColor;
 use Test::More;
 use YAML::Any qw(Dump LoadFile);
@@ -21,7 +21,8 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(
   rest_api sheets_api
   spreadsheet_name
-  message start end end_go show_api
+  message start end end_go start_note
+  show_api
 );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
@@ -46,8 +47,23 @@ sub start { message('yellow', @_, ".."); }
 sub end { message('green', @_, " Press enter to continue.\n"); <>; }
 sub end_go { message('green', @_, "\n"); }
 
+sub start_note {
+  my $spreadsheet_name = spreadsheet_name();
+  end(
+    "NOTE:\n" .
+    "Before running this script, you must have already run @_.\n" .
+    "If more than one spreadsheet exists called '$spreadsheet_name', you must run 99_delete_all and start over again with 10_spreadsheet.pl."
+  );
+  return;
+}
+
 sub show_api {
   my $trans = shift;
+
+  # if debug logging is turned on no sense in repeating the same info.
+  my $logger = get_logger();
+  return if $logger->level() <= $DEBUG;
+
   my %dump = (
     request  => $trans->{request},
     response => $trans->{decoded_response},

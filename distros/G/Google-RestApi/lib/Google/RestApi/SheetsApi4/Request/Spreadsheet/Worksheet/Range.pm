@@ -1,10 +1,10 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
-use Scalar::Util qw(looks_like_number);
+use Scalar::Util qw( looks_like_number );
 use aliased "Google::RestApi::SheetsApi4::Range";
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet";
 
@@ -247,7 +247,7 @@ sub merge_cells {
   my $self = shift;
 
   state $check = compile_named(
-    merge_type => Range->DimsAll,
+    merge_type => DimColRow | DimAll,
   );
   my $p = $check->(@_);
   $p->{merge_type} = dims_all($p->{merge_type});
@@ -436,7 +436,7 @@ sub delete_named {
   my $named = $self->named() or LOGDIE "Not a named range";
   $self->batch_requests(
     deleteNamedRange => {
-      namedRangeId => $named->{namedRangeId},
+      namedRangeId => $named,
     },
   );
 

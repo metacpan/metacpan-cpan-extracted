@@ -7,6 +7,12 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.14	2021-11-22
+
+ [ Bug Fixes ]
+ - fix tests to use executable set in environment variable LICENSECHECK
+   Paul Gevers++
+
 v3.2.13	2021-10-11
 
  [ Bug Fixes ]

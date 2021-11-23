@@ -1,16 +1,16 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Encoding according to DIN 66003",
    "author" : [
-      "unknown"
+      "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Encode-DIN66003",
    "no_index" : {
@@ -19,14 +19,36 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "1.41",
+            "charnames" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/Corion/Encode-DIN66003.git",
          "web" : "https://github.com/Corion/Encode-DIN66003"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27202"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

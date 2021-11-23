@@ -3,11 +3,20 @@ package DNS::Unbound;
 use strict;
 use warnings;
 
+use XSLoader ();
+
+our ($VERSION);
+
+BEGIN {
+    $VERSION = '0.27';
+    XSLoader::load( __PACKAGE__, $VERSION );
+}
+
 =encoding utf-8
 
 =head1 NAME
 
-DNS::Unbound - libunbound in Perl
+DNS::Unbound - Query DNS recursively via L<libunbound|https://www.nlnetlabs.nl/documentation/unbound/libunbound/>
 
 =head1 SYNOPSIS
 
@@ -48,9 +57,23 @@ You can also integrate with a custom event loop; see L</"EVENT LOOPS"> below.
 
 =head1 DESCRIPTION
 
-This library is a Perl interface to the libary component of NLNetLabs’s
-widely-used L<Unbound|https://nlnetlabs.nl/projects/unbound/> recursive
-DNS resolver.
+=begin html
+
+<a href='https://coveralls.io/github/FGasper/p5-DNS-Unbound?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-DNS-Unbound/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=end html
+
+Typical DNS lookups involve a request to a local server that caches
+information from DNS. The caching makes it fast, but it also means
+updates to DNS aren’t always available via that local server right away.
+Most applications don’t need to care and so can enjoy the speed of
+cached results.
+
+Applications that need up-to-date DNS query results, though, need
+I<fully-recursive> DNS queries. NLnet Labs’s
+L<libunbound|https://www.nlnetlabs.nl/documentation/unbound/libunbound/>
+is a popular solution for such queries; the present Perl module is an
+interface to that library.
 
 =head1 CHARACTER ENCODING
 
@@ -79,8 +102,6 @@ allow all queries to complete, or cancel queries you no longer care about.
 
 #----------------------------------------------------------------------
 
-use XSLoader ();
-
 use DNS::Unbound::Result ();
 use DNS::Unbound::X      ();
 
@@ -88,13 +109,6 @@ use DNS::Unbound::X      ();
 # This may change when non-default implementations
 # leave experimental status.
 use DNS::Unbound::AsyncQuery::PromiseES6 ();
-
-our ($VERSION);
-
-BEGIN {
-    $VERSION = '0.26';
-    XSLoader::load( __PACKAGE__, $VERSION );
-}
 
 # Retain this to avoid having to load Net::DNS::Parameters
 # except in unusual cases.
@@ -143,23 +157,44 @@ use constant _COMMON_RR => {
     URI        => 256,
 };
 
-# Copied from libunbound
-use constant _ctx_err => {
-    -1  => 'socket error',
-    -2  => 'alloc failure',
-    -3  => 'syntax error',
-    -4  => 'DNS service failed',
-    -5  => 'fork() failed',
-    -6  => 'cfg change after finalize()',
-    -7  => 'initialization failed (bad settings)',
-    -8  => 'error in pipe communication with async bg worker',
-    -9  => 'error reading from file',
-    -10 => 'async_id does not exist or result already been delivered',
+use constant {
+    _DEFAULT_PROMISE_ENGINE => 'Promise::ES6',
+
+    UB_NOERROR => 0,
+    UB_SOCKET => -1,
+    UB_NOMEM => -2,
+    UB_SYNTAX => -3,
+    UB_SERVFAIL => -4,
+    UB_FORKFAIL => -5,
+    UB_AFTERFINAL => -6,
+    UB_INITFAIL => -7,
+    UB_PIPE => -8,
+    UB_READFILE => -9,
+    UB_NOID => -10,
 };
 
-use constant _DEFAULT_PROMISE_ENGINE => 'Promise::ES6';
+# Copied from libunbound:
+use constant _ctx_err => {
+    UB_SOCKET()  => 'socket error',
+    UB_NOMEM()  => 'alloc failure',
+    UB_SYNTAX()  => 'syntax error',
+    UB_SERVFAIL()  => 'DNS service failed',
+    UB_FORKFAIL()  => 'fork() failed',
+    UB_AFTERFINAL()  => 'cfg change after finalize()',
+    UB_INITFAIL()  => 'initialization failed (bad settings)',
+    UB_PIPE()  => 'error in pipe communication with async bg worker',
+    UB_READFILE()  => 'error reading from file',
+    UB_NOID() => 'async_id does not exist or result already been delivered',
+};
 
 #----------------------------------------------------------------------
+
+=head1 CONSTANTS
+
+The following from F<libunbound/context.h> are defined here:
+C<UB_NOERROR>, C<UB_SOCKET>, C<UB_NOMEM>, C<UB_SYNTAX>, C<UB_SERVFAIL>,
+C<UB_FORKFAIL>, C<UB_AFTERFINAL>, C<UB_INITFAIL>, C<UB_PIPE>,
+C<UB_READFILE>, C<UB_NOID>
 
 =head1 METHODS
 
@@ -745,6 +780,11 @@ sub _get_error_string_from_number {
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<Net::DNS::Resolver::Recurse> provides comparable logic to this module
+in pure Perl. Like Unbound, it is maintained by L<NLnet Labs>.
 
 =head1 LICENSE & COPYRIGHT
 

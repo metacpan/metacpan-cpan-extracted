@@ -1,46 +1,29 @@
 package Google::RestApi::SheetsApi4::Range::Iterator;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
   state $check = compile_named(
-    range  => HasMethods[qw(range worksheet)],
-    dim    => StrMatch[qr/^(col|row)$/], { default => 'row' },
-    by     => Int->where('$_ > 0'), { default => 1 },
+    range => HasMethods[qw(range worksheet)],
+    dim   => StrMatch[qr/^(col|row)$/], { default => 'row' },
+    by    => PositiveInt, { default => 1 },
+    from  => PositiveOrZeroInt, { optional => 1 },
+    to    => PositiveOrZeroInt, { optional => 1 },
   );
   my $self = $check->(@_);
-  $self->{cell} = $self->{range}->range_to_hash();
-  $self->{cell} = $self->{cell}->[0] if ref($self->{cell}) eq 'ARRAY';
-  $self->{first} = 1;
+  $self->{current} = delete $self->{from} || 0;
   return bless $self, $class;
 }
 
 sub iterate {
   my $self = shift;
-
-  my $cell = $self->{cell};
-  my $range = $self->range()->range_to_hash();
-  $range = [$range, $range] if !ref($range->[0]);  # is just a cell.
-
-  my $dim = $self->{dim};
-  my $other_dim = $dim eq 'col' ? 'row' : 'col';
-  my $new_dim = $cell->{$dim} + $self->{by};
-  if ($new_dim > $range->[1]->{$dim}) {
-    $cell->{$dim} = $range->[0]->{$dim};
-    $cell->{$other_dim}++ unless $self->{first};
-    return if $cell->{$other_dim} > $range->[1]->{$other_dim};
-  } else {
-    $cell->{$dim} = $new_dim unless $self->{first};
-  }
-
-  delete $self->{first};
-  my $new_cell = $self->worksheet()->range_cell($cell);
-  $new_cell->share_values($self->range());
-
-  return $new_cell;
+  return if defined $self->{to} && $self->{current} + 1 > $self->{to};
+  my $cell = $self->range()->cell_at_offset($self->{current}, $self->{dim});
+  $self->{current} += $self->{by} if $cell;
+  return $cell;
 }
 sub next { iterate(@_); }
 

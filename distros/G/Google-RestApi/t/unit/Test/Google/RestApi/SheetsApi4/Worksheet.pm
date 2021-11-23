@@ -2,15 +2,11 @@ package Test::Google::RestApi::SheetsApi4::Worksheet;
 
 use Test::Unit::Setup;
 
+use aliased 'Google::RestApi::SheetsApi4::Worksheet';
+
 use parent 'Test::Unit::TestBase';
 
-use aliased 'Google::RestApi::SheetsApi4::Worksheet';
-use aliased 'Google::RestApi::SheetsApi4::Range::Col';
-use aliased 'Google::RestApi::SheetsApi4::Range::Row';
-
 # init_logger($TRACE);
-
-sub class { Worksheet; }
 
 sub setup : Tests(setup) {
   my $self = shift;
@@ -32,26 +28,23 @@ sub setup : Tests(setup) {
   return;
 }
 
-sub _constructor : Tests(8) {
+sub _constructor : Tests(7) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
-  my $class = $self->class();
-
-  use_ok $self->class();
 
   ok my $ws0 = $self->_fake_worksheet(), 'Constructor should succeed';
-  isa_ok $ws0, $class, 'Constructor with "id" returns';
+  isa_ok $ws0, Worksheet, 'Constructor with "id" returns';
 
   ok $ws0 = $self->_fake_worksheet(name => fake_worksheet_name()),
     'Constructor with "name" should succeed';
-  isa_ok $ws0, $class, 'Constructor with "name" returns';
+  isa_ok $ws0, Worksheet, 'Constructor with "name" returns';
 
   ok $ws0 = $self->_fake_worksheet(uri => fake_worksheet_uri()),
     'Constructor with "uri`" should succeed';
-  isa_ok $ws0, $class, 'Constructor with "uri" returns';
+  isa_ok $ws0, Worksheet, 'Constructor with "uri" returns';
 
-  throws_ok sub { $ws0 = $class->new(spreadsheet => fake_spreadsheet()) },
+  throws_ok sub { $ws0 = Worksheet->new(spreadsheet => fake_spreadsheet()) },
     qr/At least one of/i,
     'Constructor with missing params should throw';
 
@@ -82,6 +75,7 @@ sub col : Tests(3) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
+
   my $ws0 = $self->_fake_worksheet();
   is $ws0->col('A'), undef, 'Col returns undef';
   is_deeply $ws0->col('A', [qw(joe)]), [qw(joe)], 'Col returns the correct array of values';
@@ -96,6 +90,7 @@ sub cols : Tests(3) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
+
   my $ws0 = $self->_fake_worksheet();
   is_valid $ws0->cols(['A', 'B', 'C']), ArrayRef[Undef], 'Cols returns undef';
   my $cols = [['joe'], ['fred'], ['charlie']];
@@ -109,10 +104,11 @@ sub row : Tests(3) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
+
   my $ws0 = $self->_fake_worksheet();
   is $ws0->row(1), undef, 'Row returns undef';
   is_deeply $ws0->row(1, [qw(joe)]), [qw(joe)], 'Row returns an array of values';
-  throws_ok sub { $ws0->row('A1:B2') }, qr/Must be a positive integer/i, 'Bad row throws';
+  throws_ok sub { $ws0->row('A1:B2') }, qr/Unable to translate/i, 'Bad row throws';
   
   return;
 }
@@ -121,11 +117,12 @@ sub rows : Tests(3) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
+
   my $ws0 = $self->_fake_worksheet();
   is_valid $ws0->rows([1, 2, 3]), ArrayRef[Undef], 'Rows returns undef';
   my $rows = [['joe'], ['fred'], ['charlie']];
   is_deeply $ws0->rows([1, 2, 3], $rows), $rows, 'Rows returns the correct array of values';
-  throws_ok sub { $ws0->rows(['A1:B2']) }, qr/did not pass type constraint/i, 'Bad rows throws';
+  throws_ok sub { $ws0->rows(['A1:B2']) }, qr/Unable to translate/i, 'Bad rows throws';
   
   return;
 }
@@ -193,7 +190,7 @@ sub _fake_worksheet {
   my $self = shift;
   my %p = @_;
   $p{id} = fake_worksheet_id() if !%p;
-  return $self->class()->new(%p, spreadsheet => fake_spreadsheet());
+  return Worksheet->new(%p, spreadsheet => fake_spreadsheet());
 }
 
 1;

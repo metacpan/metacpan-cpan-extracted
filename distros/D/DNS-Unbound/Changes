@@ -1,5 +1,12 @@
 Revision history for Perl module DNS::Unbound
 
+0.27 Tue, 23 Nov 2021
+- BUG FIX: Close dup()ed file descriptors when setting debugout() away from them.
+- UB_* constants are now defined and documented.
+- Add test coverage metrics.
+- Add Cygwin CI.
+- Tweak documentation verbiage to clarify why this moduule exists.
+
 0.26 Tue, 10 Aug 2021
 - Fix t/mojo.t to ignore spurious warning from some older Mojo versions.
 

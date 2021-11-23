@@ -6,18 +6,23 @@ use lib "$FindBin::RealBin/../../../lib";
 
 use Test::Tutorial::Setup;
 
-# init_logger($DEBUG);
+# init_logger($TRACE);
 
 my $name = "Sheet1";
 my $spreadsheet_name = spreadsheet_name();
 my $sheets_api = sheets_api();
-$sheets_api->rest_api()->api_callback(\&show_api);
 
-start("Now we will open the spreadsheet and worksheet.");
+start_note("10_spreadsheet.pl to create a spreadsheet to work with");
+
 my $ss = $sheets_api->open_spreadsheet(name => $spreadsheet_name);
 my $uri = $ss->spreadsheet_uri();
+end("Spreadsheet successfully opened, enter url '$uri' in your browser to follow along.");
+
+$sheets_api->rest_api()->api_callback(\&show_api);
+
+start("Now we will open the spreadsheet and worksheet");
 my $ws0 = $ss->open_worksheet(id => 0);
-end_go("Worksheet is now open, uri: $uri.");
+end_go("Worksheet is now open.");
 
 # resets the spreadsheet. collects up a bunch of batch requests, then
 # gets the spreadsheet to run them. running 'submit_requests' against
@@ -45,10 +50,11 @@ $ws0->rows([1, 2, 3], \@rows);
 end("'Payroll' worksheet should now have some data.");
 
 # still points to row 1 after the insert.
-# no batch used, values instantly update.
+# insert a row and freeze it using batch request.
 start("Now we will insert some column headings.");
 $row->insert_d()->freeze()->submit_requests();
-$row->values(values => [qw(ID Name Tax Salary)]);
+# no batch used, values instantly update.
+$row->values(values => [qw(Id Name Tax Salary)]);
 end("'Payroll' worksheet should now have headings.");
 
 # 'heading' sets a bunch of formats at once.
@@ -80,5 +86,7 @@ my $rg = $ss->range_group($tax, $salary);
 $rg->submit_values();
 $rg->bold()->italic()->bd_solid()->bd_thick('bottom')->submit_requests();
 end("Totals should now be set with formulas.");
+
+message('green', "\nProceed to 25_worksheet.pl.\n");
 
 message('blue', "We are done, here are some api stats:\n", Dump($ss->stats()));

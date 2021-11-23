@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::FailWarnings;
+use Test::FailWarnings -allow_deps => 1;
 use Test::Fatal;
 use Test::Deep;
 
@@ -20,6 +20,10 @@ BEGIN {
     for my $req ( qw( Future::AsyncAwait  AnyEvent ) ) {
         eval "require $req" or plan skip_all => "No $req";
     }
+
+    eval { Future::AsyncAwait->VERSION(0.47) } or do {
+        plan skip_all => "Future::AsyncAwait $Future::AsyncAwait::VERSION is too old.";
+    };
 }
 
 use Promise::ES6;

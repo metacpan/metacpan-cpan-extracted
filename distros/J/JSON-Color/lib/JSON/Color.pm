@@ -1,13 +1,13 @@
 package JSON::Color;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-07'; # DATE
-our $DIST = 'JSON-Color'; # DIST
-our $VERSION = '0.131'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-11-23'; # DATE
+our $DIST = 'JSON-Color'; # DIST
+our $VERSION = '0.132'; # VERSION
 
 our $sul_available = eval { require Scalar::Util::LooksLikeNumber; 1 } ? 1:0;
 
@@ -44,19 +44,21 @@ sub _string {
         $c_e  = $ct->get_item_color_as_ansi('string_escape');
     }
 
+    for ($c_q, $c_s, $c_e) { $_ //= "" }
+
     $value =~ s/([\x22\x5c\n\r\t\f\b])|([\x00-\x08\x0b\x0e-\x1f])/
         join("",
              $c_e,
              $1 ? $esc{$1} : '\\u00' . unpack('H2', $2),
-             $c_reset, $c_s,
+             ($c_e ? $c_reset : ""), $c_s,
          )
             /eg;
 
     return join(
         "",
-        $c_q, '"', $c_reset,
-        $c_s, $value, $c_reset,
-        $c_q, '"', $c_reset,
+        $c_q, '"', ($c_q ? $c_reset : ""),
+        $c_s, $value, ($c_s ? $c_reset : ""),
+        $c_q, '"', ($c_q ? $c_reset : ""),
     );
 }
 
@@ -171,6 +173,9 @@ sub _encode {
         } else {
             return _string($data, $opts);
         }
+    } elsif ($sul_available &&
+             Scalar::Util::blessed($data) && $data->can('TO_JSON')) {
+        return _encode($data->TO_JSON, $opts);
     } else {
         die "Can't encode $data";
     }
@@ -183,10 +188,13 @@ sub encode_json {
     $opts->{color_theme} //=
         $ENV{JSON_COLOR_COLOR_THEME} //
         $ENV{COLOR_THEME} //
-        "JSON::Color::ColorTheme::default_ansi";
+        "default_ansi";
 
     require Module::Load::Util;
-    my $ct = Module::Load::Util::instantiate_class_with_optional_args($opts->{color_theme});
+    my $ct = Module::Load::Util::instantiate_class_with_optional_args(
+        {ns_prefixes=>["ColorTheme::JSON::Color", "ColorTheme", ""]},
+        $opts->{color_theme},
+    );
     require Role::Tiny;
     Role::Tiny->apply_roles_to_object($ct, 'ColorThemeRole::ANSI');
     $opts->{_color_theme_obj} = $ct;
@@ -220,7 +228,7 @@ JSON::Color - Encode to colored JSON
 
 =head1 VERSION
 
-This document describes version 0.131 of JSON::Color (from Perl distribution JSON-Color), released on 2021-05-07.
+This document describes version 0.132 of JSON::Color (from Perl distribution JSON-Color), released on 2021-11-23.
 
 =head1 SYNOPSIS
 
@@ -317,14 +325,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/JSON-Color
 
 Source repository is at L<https://github.com/perlancar/perl-JSON-Color>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-Color>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 To colorize with HTML, you can try L<Syntax::Highlight::JSON>.
@@ -336,11 +336,42 @@ escape. It requires the GNU Source-highlight library.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015, 2014, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-Color>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

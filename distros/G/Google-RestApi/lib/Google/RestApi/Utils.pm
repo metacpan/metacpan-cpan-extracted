@@ -3,18 +3,21 @@ package Google::RestApi::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use feature 'state';
 
 use autodie;
-use File::Spec::Functions;
-use File::Basename;
-use Hash::Merge;
-use Log::Log4perl qw(:easy);
-use Type::Params qw(compile_named compile);
-use Types::Standard qw(Str StrMatch HashRef Any slurpy);
-use YAML::Any qw(Dump LoadFile);
+use File::Spec::Functions qw( catfile );
+use File::Basename qw( dirname );
+use Hash::Merge ();
+use Log::Log4perl qw( :easy );
+use Scalar::Util qw( blessed );
+use Type::Params qw( compile compile_named );
+use Types::Standard qw( Str StrMatch HashRef Any slurpy );
+use YAML::Any qw( Dump LoadFile );
+
+use Google::RestApi::Types qw( ReadableFile );
 
 no autovivification;
 
@@ -22,8 +25,9 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(
   named_extra
   merge_config_file resolve_config_file_path
+  flatten_range
   bool
-  dim dims dims_all
+  dim_any dims_any dims_all
   cl_black cl_white
   strip
 );
@@ -49,7 +53,7 @@ sub named_extra {
 
 sub merge_config_file {
   state $check = compile_named(
-    config_file => Str->where( '-f -r $_' ), { optional => 1 },
+    config_file => ReadableFile, { optional => 1 },
     _extra_     => slurpy Any,
   );
   my $passed_config = named_extra($check->(@_));
@@ -102,32 +106,48 @@ sub resolve_config_file_path {
   return $full_file_path;
 }
 
+# these are just used for debug message just above
+# to display the original range in a pretty format.
+sub flatten_range {
+  my $range = shift;
+  $range = $range->range_to_hash() if blessed($range);
+  return 'False' if !$range;
+  return $range if !ref($range);
+  return _flatten_range_hash($range) if ref($range) eq 'HASH';
+  return _flatten_range_array($range) if ref($range) eq 'ARRAY';
+  LOGDIE("Unable to flatten: " . ref($range));
+}
+
+sub _flatten_range_hash {
+  my $range = shift;
+  my @flat = map { "$_ => " . flatten_range($range->{$_}); } sort keys %$range;
+  my $flat = join(', ', @flat);
+  return "{ $flat }";
+}
+
+sub _flatten_range_array {
+  my $range = shift;
+  my @flat = map { flatten_range($_); } @$range;
+  my $flat = join(', ', @flat);
+  return "[ $flat ]";
+}
+
 # changes perl boolean to json boolean.
 sub bool {
   my $bool = shift;
   return 'true' if !defined $bool;  # bold() should turn on bold.
-  $bool =~ s/^true$/true/i;
-  $bool =~ s/^false$/false/i;
-  return $bool if $bool =~ /^(true|false)$/i;
+  return 'false' if $bool =~ qr/^false$/i;
   return $bool ? 'true' : 'false';  # converts bold(0) to 'false'.
 }
 
-# allows 'col' and 'row' internally instead of 'COLUMN' and 'ROW'.
-# less shouting.
-sub dim {
-  state $check = compile(StrMatch[qr/^(col|row)/i]);
-  my ($dim) = $check->(@_);
-  return $dim =~ /^col/i ? "COLUMN" : "ROW";
-}
-
-sub dims {
+sub dims_any {
   state $check = compile(StrMatch[qr/^(col|row)/i]);
   my ($dims) = $check->(@_);
   return $dims =~ /^col/i ? "COLUMNS" : "ROWS";
 }
 
 sub dims_all {
-  my $dims = eval { dims(@_); };
+  my $dims = eval { dims_any(@_); };
   return $dims if $dims;
   state $check = compile(StrMatch[qr/^all/i]);
   ($dims) = $check->(@_);

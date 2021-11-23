@@ -1,8 +1,10 @@
 package Google::RestApi::SheetsApi4::Worksheet;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
+
+use List::MoreUtils qw( first_index );
 
 use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Range';
@@ -13,29 +15,21 @@ use aliased 'Google::RestApi::SheetsApi4::Range::All';
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie';
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Iterator';
 
-use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet";
+use parent 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet';
 
 sub new {
   my $class = shift;
 
   my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
   state $check = compile_named(
-    spreadsheet => HasMethods[qw(api sheets_api worksheets_config worksheet_properties)],  # if it's got these basics, it must be a duck.
+    spreadsheet => HasApi,
     id          => Str, { optional => 1 },
     name        => Str, { optional => 1 },
     uri         => StrMatch[qr|$qr_worksheet_uri|], { optional => 1 },
-    config_id   => Str, { optional => 1 },
   );
   my $self = $check->(@_);
   $self = bless $self, $class;
 
-  if ($self->config_id()) {
-    my $config = $self->worksheet_config()
-      or LOGDIE "Worksheet config id '" . $self->config_id() . "' is missing";
-    foreach (qw(id name uri)) {
-      $self->{$_} = $config->{$_} if defined $config->{$_};
-    }
-  }
   defined $self->{id} || defined $self->{name} || $self->{uri}
     or LOGDIE "At least one of id, name, or uri must be specified";
 
@@ -87,22 +81,22 @@ sub properties {
 }
 
 # the following don't return ranges and don't use any batch, they are immediate.
+# first arg is a range in any format. allow the range_col call to verify it.
 sub col {
   my $self = shift;
-  state $check = compile(Range->Col, ArrayRef[Str], { optional => 1 });   # A or 1
+  state $check = compile(Defined, ArrayRef[Str], { optional => 1 });   # A or 1
   my ($col, $values) = $check->(@_);
-  my $range = $self->range_col({ col => $col });
+  my $range = $self->range_col($col);
   return $range->values(defined $values ? (values => $values) : ());
 }
 
 sub cols {
   my $self = shift;
 
-  state $check = compile(ArrayRef[Range->Col], ArrayRef[ArrayRef[Str]], { optional => 1 });
+  state $check = compile(ArrayRef[Defined], ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($cols, $values) = $check->(@_);
 
-  my @cols = map { $self->range_col($_); } @$cols;
-  my $range_group = $self->spreadsheet()->range_group(@cols);
+  my $range_group = $self->range_group_cols($cols);
   return $range_group->values() if !$values;
 
   my @ranges = $range_group->ranges();
@@ -117,20 +111,19 @@ sub cols {
 
 sub row {
   my $self = shift;
-  state $check = compile(Range->Row, ArrayRef[Str], { optional => 1 });
+  state $check = compile(Defined, ArrayRef[Str], { optional => 1 });
   my ($row, $values) = $check->(@_);
-  my $range = $self->range_row({row => $row});
+  my $range = $self->range_row($row);
   return $range->values(defined $values ? (values => $values) : ());
 }
 
 sub rows {
   my $self = shift;
 
-  state $check = compile(ArrayRef[Range->Row], ArrayRef[ArrayRef[Str]], { optional => 1 });
+  state $check = compile(ArrayRef[Defined], ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($rows, $values) = $check->(@_);
 
-  my @rows = map { $self->range_row($_); } @$rows;
-  my $range_group = $self->spreadsheet()->range_group(@rows);
+  my $range_group = $self->range_group_rows($rows);
   return $range_group->values() if !$values;
 
   my @ranges = $range_group->ranges();
@@ -145,40 +138,19 @@ sub rows {
 
 sub cell {
   my $self = shift;
-
-  state $check = multisig(
-    [
-      Range->Col, Range->Row,
-      Str, { optional => 1 },
-    ],
-    [
-      Range->Range,
-      Str, { optional => 1 },
-    ],
-  );
-  my @check = $check->(@_);
-  my $range;
-  if (${^TYPE_PARAMS_MULTISIG} == 0) {
-    my $col = shift(@check);
-    my $row = shift(@check);
-    $range = $self->range_cell([$col, $row]);
-  } else {
-    my $cell = shift(@check);
-    $range = $self->range_cell($cell);
-  }
-  my $value = shift(@check);
-
+  state $check = compile(Defined, Str, { optional => 1 });
+  my ($cell, $value) = $check->(@_);
+  my $range = $self->range_cell($cell);
   return $range->values(defined $value ? (values => $value) : ());
 }
 
 sub cells {
   my $self = shift;
 
-  state $check = compile(ArrayRef, ArrayRef[Str], { optional => 1 });
+  state $check = compile(ArrayRef[Defined], ArrayRef[Str], { optional => 1 });
   my ($cells, $values) = $check->(@_);
 
-  my @cells = map { $self->range_cell($_); } @$cells;
-  my $range_group = $self->spreadsheet()->range_group(@cells);
+  my $range_group = $self->range_group_cells($cells);
   return $range_group->values() if !$values;
 
   my @ranges = $range_group->ranges();
@@ -191,33 +163,76 @@ sub cells {
   return $range_group->submit_values();
 }
 
-# call this before calling tie_rows or header_col. it's an
-# "are you sure you want to do this?" check.
-# () or (1) turns it on, (0) turns it off.
-# this is because you may have a worksheet with thousands
-# of rows that end up being 'headers'. this is less of an
-# issue with header row.
+sub submit_requests {
+  my $self = shift;
+  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
+}
+
+# this is used by range to see if there is a match for a header col or row.
+sub resolve_header_range {
+  my $self = shift;
+  return
+    $self->resolve_header_range_col(@_) ||
+    $self->resolve_header_range_row(@_);
+}
+
+sub resolve_header_range_col {
+  my $self = shift;
+
+  state $check = compile(RangeNamed);
+  my ($header) = $check->(@_);
+  
+  my $headers = $self->header_col() or return;
+  my $i = first_index { $_ eq $header; } @$headers;
+  return [{col => 2, row => $i}, {row => $i}] if ++$i > 0;
+
+  return;
+}
+
+sub resolve_header_range_row {
+  my $self = shift;
+
+  state $check = compile(RangeNamed);
+  my ($header) = $check->(@_);
+  
+  my $headers = $self->header_row() or return;
+  my $i = first_index { $_ eq $header; } @$headers;
+  return [{col => $i, row => 2}, {col => $i}] if ++$i > 0;
+
+  return;
+}
+
+# call this before calling tie_rows or header_col.
+# ('i really want to do this') turns it on, (false) turns it off.
+# you must pass 'i really want to do this' to enable it. this is because you
+# may have a worksheet with thousands of rows that end up being 'headers'.
+# this is less of an issue with header row.
 sub enable_header_col {
   my $self = shift;
   my $enable = shift // 1;
-  if ($enable) {
+  if ($enable =~ qr/i really want to do this/i) {
     $self->{header_col_enabled} = 1;
+  } elsif ($enable) {
+    LOGDIE("You must enable header column by passing 'I really want to do this'");
   } else {
     delete @{$self}{qw(header_col header_col_enabled)};
   }
-  return 1;
+  return $enable;
 }
 
+# call with true to refresh.
 sub header_col {
   my $self = shift;
+  my $refresh = shift;
 
   if (!$self->{header_col_enabled}) {
     DEBUG("Header column is not enabled, call 'enable_header_col' first.");
     delete $self->{header_col};
-    return [];
+    return;
   }
 
-  delete $self->{header_col} if shift;
+  delete $self->{header_col} if $refresh;
+
   if (!$self->{header_col}) {
     $self->{header_col} = $self->col(1);
     DEBUG("Header col found:\n", Dump($self->{header_col}));
@@ -226,9 +241,32 @@ sub header_col {
   return $self->{header_col};
 }
 
+# call this before calling tie_cols (to use headings) or header_row.
+# () or (true) turns it on, (false) turns it off.
+sub enable_header_row {
+  my $self = shift;
+  my $enable = shift // 1;
+  if ($enable) {
+    $self->{header_row_enabled} = 1;
+  } else {
+    delete @{$self}{qw(header_row header_row_enabled)};
+  }
+  return $enable;
+}
+
+# call with 1 to refresh.
 sub header_row {
   my $self = shift;
-  delete $self->{header_row} if shift;
+  my $refresh = shift;
+
+  if (!$self->{header_row_enabled}) {
+    DEBUG("Header row is not enabled, call 'enable_header_row' first.");
+    delete $self->{header_row};
+    return;
+  }
+
+  delete $self->{header_row} if $refresh;
+
   if (!$self->{header_row}) {
     $self->{header_row} = $self->row(1);
     DEBUG("Header row found:\n", Dump($self->{header_row}));
@@ -236,15 +274,31 @@ sub header_row {
   return $self->{header_row};
 }
 
+sub header_col_enabled { shift->{header_col_enabled}; }
+sub header_row_enabled { shift->{header_row_enabled}; }
+
+sub normalize_named {
+  my $self = shift;
+
+  state $check = compile(RangeNamed);
+  my ($named_range_name) = $check->(@_);
+
+  my ($sheet_id, $range) = $self->spreadsheet()->normalize_named($named_range_name);
+  my $this_sheet_id = $self->worksheet_id();
+  LOGDIE "Named range '$named_range_name' sheet ID is '$sheet_id', this sheet ID is '$this_sheet_id'"
+    if $sheet_id && $sheet_id != $this_sheet_id;
+
+  return $range;
+}
+
 sub name_value_pairs {
   my $self = shift;
 
   state $check = compile(
-    Range->Col, { default => 1 },
-    Range->Col, { default => 2 },
-    Bool, { optional => 1 }
+    Defined, { default => 1 },
+    Defined, { default => 2 },
   );
-  my ($name_col, $value_col, $has_headers) = $check->(@_);
+  my ($name_col, $value_col) = $check->(@_);
 
   my $cols = $self->cols([$name_col, $value_col]);
   my %pairs = map {
@@ -253,47 +307,26 @@ sub name_value_pairs {
     ( strip($cols->[0]->[$_]) => strip($cols->[1]->[$_]) )
     :
     ();
-  } (($has_headers ? 1 : 0)..$#{ $cols->[0] });
+  } (($self->header_row_enabled() ? 1 : 0)..$#{ $cols->[0] });
 
   return \%pairs;
 }
 
-sub tie_ranges { shift->_tie('', @_); }
-sub tie_cols { shift->_tie('cols', @_); }
-sub tie_rows { shift->_tie('rows', @_); }
-sub tie_cells { shift->_tie('cells', @_); }
+sub tie_cols { shift->_tie('range_col', @_); }
+sub tie_rows { shift->_tie('range_row', @_); }
+sub tie_cells { shift->_tie('range_cell', @_); }
+sub tie_ranges { shift->_tie('range_factory', @_); }
 
 sub _tie {
   my $self = shift;
 
   state $check = compile(
-    StrMatch[qr/^(cols|rows|cells|)$/],
-    slurpy ArrayRef[Range->Range], { optional => 1 },
+    Str->where( sub { /^range/ && $self->can($_) or die "Must be a 'range' method"; } ),
+    slurpy HashRef,
   );
-  my ($which, $ranges) = $check->(@_);
+  my ($method, $ranges) = $check->(@_);
 
-  if (!@$ranges) {
-    my $config = $self->worksheet_config($which) || {};
-    $ranges = [ keys %$config ];
-  }
-
-  my $method = "range";
-  if ($which) {
-    $method .= "_$which";
-    $method =~ s/s$//;
-  }
-
-  my %ranges = map {
-    my ($key, $value);
-    if (ref($_) eq 'HASH') {
-      keys %$_;  # reset each
-      ($key, $value) = each %$_;
-    } else {
-      $key = $value = $_;
-    }
-    $key => $self->$method($value);
-  } @$ranges;
-
+  my %ranges = map { $_ => $self->$method( $ranges->{$_} ); } keys %$ranges;
   return $self->tie(%ranges);
 }
 
@@ -304,25 +337,47 @@ sub tie {
   return $tie;
 }
 
-sub submit_requests {
+sub range_group_cols {
   my $self = shift;
-  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
+  state $check = compile(ArrayRef[Defined]);
+  my ($cols) = $check->(@_);
+  my @cols = map { $self->range_col($_); } @$cols;
+  return $self->spreadsheet()->range_group(@cols);
 }
 
-sub worksheet_config {
+sub range_group_rows {
   my $self = shift;
-  my $key = shift;
-  my $config_id = $self->config_id() or return;
-  my $config = $self->spreadsheet()->worksheets_config()->{$config_id} or return;
-  return defined $key ? $config->{$key} : $config;
+  state $check = compile(ArrayRef[Defined]);
+  my ($rows) = $check->(@_);
+  my @rows = map { $self->range_row($_); } @$rows;
+  return $self->spreadsheet()->range_group(@rows);
 }
 
-sub config_id { shift->{config_id}; }
-sub range { Range->new(worksheet => shift, range => shift); }
+sub range_group_cells {
+  my $self = shift;
+  state $check = compile(ArrayRef[Defined]);
+  my ($cells) = $check->(@_);
+  my @cells = map { $self->range_cell($_); } @$cells;
+  return $self->spreadsheet()->range_group(@cells);
+}
+
+sub range_group {
+  my $self = shift;
+  state $check = compile(ArrayRef[Defined]);
+  my ($ranges) = $check->(@_);
+  my @ranges = map { $self->range_factory($_); } @$ranges;
+  return $self->spreadsheet()->range_group(@ranges);
+}
+
+# can't use aliased here for some reason.
+sub range_factory { Google::RestApi::SheetsApi4::Range::factory(worksheet => shift, range => shift, @_); }
+
+sub range { shift->range_factory(@_); }
+# create these spcific subclasses so that invalid ranges will get caught.
 sub range_col { Col->new(worksheet => shift, range => shift); }
 sub range_row { Row->new(worksheet => shift, range => shift); }
 sub range_cell { Cell->new(worksheet => shift, range => shift); }
-sub range_all { All->new(worksheet => shift); }
+sub range_all { All->new(worksheet => shift, @_); }
 sub api { shift->spreadsheet()->api(@_); }
 sub sheets_api { shift->spreadsheet()->sheets_api(@_); }
 sub rest_api { shift->spreadsheet()->rest_api(@_); }
@@ -346,7 +401,7 @@ See the description and synopsis at Google::RestApi::SheetsApi4.
 
 =over
 
-=item new(spreadsheet => <object>, (id => <string> | name => <string> | uri => <string>), config_id => <string>);
+=item new(spreadsheet => <object>, (id => <string> | name => <string> | uri => <string>));
 
 Creates a new instance of a Worksheet object. You would not normally
 call this directly, you would obtain it from the 
@@ -356,7 +411,6 @@ Spreadsheet->open_worksheet routine.
  id: The id of the worksheet (0, 1, 2 etc).
  name: The name of the worksheet (as shown on the tab).
  uri: The worksheet ID extracted from the overall URI.
- config_id: The custom config for this worksheet.
 
 Only one of id/name/uri should be specified and this API will derive the others
 as necessary.
@@ -554,10 +608,6 @@ Returns the parent Spreadsheet object.
 =item spreadsheet_id();
 
 Returns the parent Spreadsheet id.
-
-=item worksheet_config();
-
-Returns the parent Spreadsheet's worksheet config.
 
 =back
 

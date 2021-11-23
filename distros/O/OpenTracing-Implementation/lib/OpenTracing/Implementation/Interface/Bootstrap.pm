@@ -1,16 +1,12 @@
 package OpenTracing::Implementation::Interface::Bootstrap;
 
-use Role::MethodReturns;
+use Role::Declare::Should;
+use Types::Standard qw/ConsumerOf/;
 
 
 
-around bootstrap_tracer => class_method ( @args ) {
-    
-    returns_object_does_interface( 'OpenTracing::Interface::Tracer' =>
-        $original->( $class => @args )
-    )
-    
-};
+class_method bootstrap_tracer(
+) :Return ( ConsumerOf['OpenTracing::Interface::Tracer'] ) { }
 
 
 

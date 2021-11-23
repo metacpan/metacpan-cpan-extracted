@@ -2,23 +2,21 @@ package Test::Google::RestApi;
 
 use Test::Unit::Setup;
 
-use parent 'Test::Unit::TestBase';
+use Google::RestApi::Types qw( :all );
 
 use aliased 'Google::RestApi';
 use aliased 'Google::RestApi::Auth::OAuth2Client';
 
+use parent 'Test::Unit::TestBase';
+
 # init_logger($DEBUG);
 
-sub class { RestApi; }
-
-sub _constructor : Tests(4) {
+sub _constructor : Tests(3) {
   my $self = shift;
 
-  my $class = $self->class();
-  use_ok $class;
-  throws_ok sub { $class->new(config_file => 'x'); }, qr/did not pass type constraint/i, 'Constructor from bad config file should throw';
-  ok my $api = $class->new(config_file => fake_config_file()), 'Constructor from proper config_file should succeed';
-  isa_ok $api, $class, 'Constructor returns';
+  throws_ok sub { RestApi->new(config_file => 'x'); }, qr/did not pass type constraint/i, 'Constructor from bad config file should throw';
+  ok my $api = RestApi->new(config_file => fake_config_file()), 'Constructor from proper config_file should succeed';
+  isa_ok $api, RestApi, 'Constructor returns';
 
   return;
 }
@@ -85,8 +83,6 @@ sub api : Tests(16) {
 sub auth : Tests(4) {
   my $self = shift;
 
-  my $class = $self->class();
-
   my %auth = (
     auth => {
       class         => 'x',
@@ -96,16 +92,16 @@ sub auth : Tests(4) {
     },
   );
 
-  my $api = $class->new(%auth);
+  my $api = RestApi->new(%auth);
   throws_ok sub { $api->auth(); }, qr/you may need to install/i, 'Bad auth class should throw';
   $auth{auth}->{class} = 'OAuth2Client';
 
-  $api = $class->new(%auth);
+  $api = RestApi->new(%auth);
   throws_ok sub { $api->auth() }, qr/unable to resolve/i, 'Bad token file should throw';
 
   $auth{auth}->{class} = 'OAuth2Client';
   $auth{auth}->{token_file} = fake_token_file();
-  $api = $class->new(%auth);
+  $api = RestApi->new(%auth);
   isa_ok $api->auth(), OAuth2Client, 'Proper token file should be found';
 
   %auth = (
@@ -116,7 +112,7 @@ sub auth : Tests(4) {
     },
   );
 
-  $api = $class->new(%auth);
+  $api = RestApi->new(%auth);
   throws_ok sub { $api->auth()->account_file() }, qr/unable to resolve/i, 'Bad account file should throw';
 
   return;

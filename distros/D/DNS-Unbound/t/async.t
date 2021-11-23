@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::FailWarnings;
+use Test::Deep;
 
 use_ok('DNS::Unbound');
 
@@ -29,6 +30,15 @@ for my $use_threads_yn ( 0, 1 ) {
                 my ($result) = @_;
 
                 isa_ok( $result, 'DNS::Unbound::Result', 'promise resolution' );
+
+                my $rrs_ar = $result->to_net_dns_rrs();
+                cmp_deeply(
+                    $rrs_ar,
+                    array_each(
+                        Isa('Net::DNS::RR'),
+                    ),
+                    'to_net_dns_rrs() - DEPRECATED',
+                );
 
                 diag explain [ passed => $result ];
             },
@@ -68,6 +78,25 @@ for my $use_threads_yn ( 0, 1 ) {
 
         $dns->wait() while $done_count < @tlds;
     }
+}
+
+{
+    my $dns = DNS::Unbound->new();
+    my $done;
+
+    $dns->resolve_async( '....', 'NS' )->catch(
+        sub {
+            my $err = shift;
+
+            isa_ok( $err, 'DNS::Unbound::X::ResolveError', 'exception' );
+
+            is($err->get('number'), DNS::Unbound::UB_SYNTAX(), 'number');
+
+            like( $err->get('string'), qr<.>, 'string' );
+        }
+    )->then( sub { die 'badbad' } )->finally( sub { $done = 1 } );
+
+    $dns->wait() while !$done;
 }
 
 done_testing();

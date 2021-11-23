@@ -120,3 +120,7 @@ Revision history for Mac-PropertyList-SAX
         Mac::PropertyList v1.501. Thanks !
         Made minor tweaks like upgrading bundled Module::Install version.
 
+0.91    2021-11-22T20:11-05:00
+        Address https://rt.cpan.org/Ticket/Display.html?id=140151 to avoid
+        depending on '.' being in @INC.
+

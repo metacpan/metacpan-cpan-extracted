@@ -1,22 +1,33 @@
+# for some (*&^ing reason can't use is_deeply or cmp_deeply on tied hashes
+# (at least here). just get "does not exist" when looking for a hash key
+# value. the tied hash can be copied to a normal hash and compared.
+# is_deeply_tied is in utils.
+
 use Test::Integration::Setup;
 
-use Test::Most tests => 32;
+use Test::Most tests => 14;
 
 use aliased "Google::RestApi::SheetsApi4::Range::Cell";
 use aliased "Google::RestApi::SheetsApi4::Range::Row";
 use aliased "Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator";
 
+# use Carp::Always;
 # init_logger($DEBUG);
 
+delete_all_spreadsheets(sheets_api());
+
 my $spreadsheet = spreadsheet();
-my $worksheet = $spreadsheet->open_worksheet(id => 0);
+my $ws0 = $spreadsheet->open_worksheet(id => 0);
 
 my @values = (
   [ '',        'Freddie', 'Iggy' ],
   [ 'Mercury', 1,         2      ],
   [ 'Pop',     3,         4      ],
 );
-$worksheet->range("A1:C3")->values(values => \@values);
+$ws0->range("A1:C3")->values(values => \@values);
+
+$ws0->enable_header_row();
+$ws0->enable_header_col("I really want to do this");
 
 cols_read();
 rows_read();
@@ -24,81 +35,56 @@ cols_write();
 rows_write();
 
 sub cols_read {
-  my $cols = $worksheet->tie_cols(qw(Freddie Iggy));
+  my $cols = $ws0->tie_cols(freddie => 'Freddie', iggy => 'Iggy');
+  isa_ok my $i = tied(%$cols)->iterator(), Iterator, "Tied row iterator cols_read";
 
-  my ($i, $row);
-  isa_ok $i = tied(%$cols)->iterator(from => 1), Iterator, "Tied row iterator";
-  is_hash $row = $i->next(), "First tied row iteration";
-  is_array tied(%$row)->values(), "Retrieving row iterator values";
-  is $row->{Freddie}, 1, "Freddie should be 1";
-  is $row->{Iggy}, 2, "Iggy should be 2";
-
-  is_hash $row = $i->next(), "Third tied row iteration";
-  is_array sub { tied(%$row)->values(); }, "Retrieving row iterator values";
-  is $row->{Freddie}, 3, "Freddie should be 3";
-  is $row->{Iggy}, 4, "Iggy should be 4";
-
-  is_hash $row = $i->next(), "Forth tied row iteration";
-  is_array tied(%$row)->values(), "Retrieving row iterator values";
-  is $row->{Freddie}, undef, "Freddie should be undef";
-  is $row->{Iggy}, undef, "Iggy should be undef";
+  is_deeply_tied my $row = $i->next(), { freddie => 1, iggy => 2 }, "Check first row iterator hash values";
+  is_deeply_tied $row = $i->next(), { freddie => 3, iggy => 4 }, "Check second row iterator hash values";
+  is_deeply_tied $row = $i->next(), { freddie => undef, iggy => undef }, "Check third row iterator hash values";
 
   return;
 }
 
 sub cols_write {
-  my $cols = $worksheet->tie_cols(qw(Freddie Iggy));
+  my $cols = $ws0->tie_cols(freddie => 'Freddie', iggy => 'Iggy');
+  isa_ok my $i = tied(%$cols)->iterator(), Iterator, "Tied row iterator cols_write";
 
-  my ($i, $row);
-  $i = tied(%$cols)->iterator(from => 1);
-  $row = $i->next();
-  $row->{Freddie} = 10;
-  $row->{Iggy} = 20;
-  is_array tied(%$row)->submit_values(), "Submitting row values";
-  is_deeply $worksheet->row(2), ['Mercury', 10, 20], "Updated row values should be set";
+  my $row = $i->next();
+  $row->{freddie} = 10;
+  $row->{iggy} = 20;
+  # since this is hash based, order of values is unpredictable.
+  is_array my $x = tied(%$row)->submit_values(), "Submitting row values";
+  is_deeply $ws0->row(2), ['Mercury', 10, 20], "Updated row values should be set";
 
   return;
 }
 
 sub rows_read {
-  my $rows = $worksheet->tie_rows(qw(Mercury Pop));
+  my $rows = $ws0->tie_rows(mercury => 'Mercury', pop => 'Pop');
+  isa_ok my $i = tied(%$rows)->iterator(), Iterator, "Tied col iterator rows_read";
 
-  my ($i, $col);
-  isa_ok $i = tied(%$rows)->iterator(from => 1), Iterator, "Tied col iterator";
-  throws_ok sub { $col = $i->next(); }, qr/Unable to translate row/, "First tied col iteration should die";
-  is $worksheet->enable_header_col(1), 1, "Enabling header col should succeed";
-  is_hash sub { $col = $i->next(); }, "First tied col iteration";
-  is_array tied(%$col)->values(), "Retrieving col iterator values";
-  is $col->{Mercury}, 1, "Mercury should be 1";
-  is $col->{Pop}, 3, "Pop should be 3";
-
-  is_hash sub { $col = $i->next(); }, "Third tied col iteration";
-  is_array sub { tied(%$col)->values(); }, "Retrieving col iterator values";
-  is $col->{Mercury}, 2, "Mercury should be 2";
-  is $col->{Pop}, 4, "Pop should be 4";
-
-  is_hash sub { $col = $i->next(); }, "Forth tied col iteration";
-  is_array sub { tied(%$col)->values(); }, "Retrieving col iterator values";
-  is $col->{Mercury}, undef, "Mercury should be undef";
-  is $col->{Pop}, undef, "Pop should be undef";
+  is_deeply_tied my $col = $i->next(), { mercury => 1, pop => 3 }, "Check first col iterator hash values";
+  is_deeply_tied $col = $i->next(), { mercury => 2, pop => 4 }, "Check second col iterator hash values";
+  is_deeply_tied $col = $i->next(), { mercury => undef, pop => undef }, "Check third col iterator hash values";
 
   return;
 }
 
 sub rows_write {
-  my $cols = $worksheet->tie_rows(qw(Mercury Pop));
+  my $rows = $ws0->tie_rows(mercury => 'Mercury', pop => 'Pop');
+  isa_ok my $i = tied(%$rows)->iterator(), Iterator, "Tied col iterator rows_write";
 
-  my $i = tied(%$cols)->iterator(from => 1);
   my $col = $i->next();
-  $col->{Mercury} = 30;
-  $col->{Pop} = 40;
-  is_array sub { tied(%$col)->submit_values(); }, "Submitting col values";
-  is_deeply $worksheet->col(2), ['Freddie', 30, 40], "Updated col values should be set";
+  $col->{mercury} = 30;
+  $col->{pop} = 40;
+  # since this is hash based, order of values is unpredictable.
+  is_array tied(%$col)->submit_values(), "Submitting col values";
+  is_deeply $ws0->col(2), ['Freddie', 30, 40], "Updated col values should be set";
 
   return;
 }
 
-delete_all_spreadsheets($spreadsheet->sheets_api());
+delete_all_spreadsheets(sheets_api());
 
 # use YAML::Any qw(Dump);
 # warn Dump($spreadsheet->stats());

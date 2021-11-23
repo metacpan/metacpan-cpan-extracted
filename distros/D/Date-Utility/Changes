@@ -1,6 +1,11 @@
 Revision history for Date-Utility
 
+1.10      2021-11-23 09:10:32+00:00 UTC
+        Correct typo in _parse_datetime_parm method pod. Changed it to _parse_datetime_param.
+        Add alias for earlier private methods _plus_years, _minus_years, _plus_months, _minus_months, _create_trimmed_date
+
 1.09      2018-06-21 04:34:43+00:00 UTC
+        Add truncate_to_hour()
 
 1.08      2017-06-23 12:52:08+08:00 Asia/Kuala_Lumpur
         Add missing Test::Most dependency. Thanks to @eserte for reporting.

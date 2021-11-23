@@ -6,8 +6,6 @@ use parent 'Test::Unit::TestBase';
 
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
 
-sub class { RangeGroup; }
-
 sub setup : Tests(setup) {
   my $self = shift;
   $self->SUPER::setup(@_);
@@ -27,29 +25,25 @@ sub _constructor : Tests(2) {
 
   $self->_fake_http_response_by_uri();
 
-  my $class = class();
-
-  my @ranges = $self->new_ranges("A1", "B2");
-  my $range_group = $class->new(
+  my @ranges = _new_ranges("A1", "B2");
+  my $range_group = RangeGroup->new(
     spreadsheet => fake_spreadsheet(),
     ranges      => \@ranges,
   );
-  isa_ok $range_group, $class, 'Constructor returns';
+  isa_ok $range_group, RangeGroup, 'Constructor returns';
   can_ok $range_group, 'ranges';
 
   return;
 }
 
-sub new_ranges {
-  my $self = shift;
+sub _new_ranges {
   my @ranges = map { fake_worksheet()->range($_); } @_;
   return @ranges;
 }
 
-sub new_range_group {
-  my $self = shift;
-  my @ranges = $self->new_ranges(@_);
-  return $self->class()->new(spreadsheet => fake_spreadsheet(), ranges => \@ranges);
+sub _new_range_group {
+  my @ranges = _new_ranges(@_);
+  return RangeGroup->new(spreadsheet => fake_spreadsheet(), ranges => \@ranges);
 }
 
 sub ranges : Tests(1) {
@@ -57,7 +51,7 @@ sub ranges : Tests(1) {
 
   $self->_fake_http_response_by_uri();
 
-  my $range_group = $self->new_range_group("A1", "B2");
+  my $range_group = _new_range_group("A1", "B2");
   isa_ok $range_group->bold()->red(0.1), RangeGroup, "Setting bold and red";
 
   return;

@@ -1,6 +1,6 @@
 package Google::RestApi::DriveApi3::File;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
@@ -10,7 +10,7 @@ sub new {
   my $class = shift;
   my $qr_id = DriveApi3->Drive_File_Id;
   state $check = compile_named(
-    drive => HasMethods['api'],
+    drive => HasApi,
     id    => StrMatch[qr/$qr_id/],
   );
   return bless $check->(@_), $class;

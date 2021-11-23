@@ -18,6 +18,7 @@ meta-spec:
 name: App-ClipboardUtils
 requires:
   Clipboard::Any: '0'
+  Data::Sah::Compiler::perl::TH::str: '0.907'
   Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.152'
   Perinci::CmdLine::Lite: '1.905'
@@ -25,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ClipboardUtils
   homepage: https://metacpan.org/release/App-ClipboardUtils
   repository: git://github.com/perlancar/perl-App-ClipboardUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

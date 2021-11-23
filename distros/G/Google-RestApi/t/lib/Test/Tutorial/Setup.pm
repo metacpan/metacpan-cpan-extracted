@@ -3,7 +3,7 @@ package Test::Tutorial::Setup;
 use strict;
 use warnings;
 
-use base 'ToolSet';
+use parent 'ToolSet';
 
 ToolSet->use_pragma('strict');
 ToolSet->use_pragma('warnings');
@@ -16,6 +16,7 @@ ToolSet->export(
   'YAML::Any'              => 'Dump',
   'Test::Utils'            => ':all',
   'Test::Tutorial::Utils'  => ':all',
+  'Try::Tiny'              =>  [],
 );
 
 1;

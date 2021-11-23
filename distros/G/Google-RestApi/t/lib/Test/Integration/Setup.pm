@@ -3,7 +3,7 @@ package Test::Integration::Setup;
 use strict;
 use warnings;
 
-use base 'ToolSet';
+use parent 'ToolSet';
 
 ToolSet->use_pragma('strict');
 ToolSet->use_pragma('warnings');

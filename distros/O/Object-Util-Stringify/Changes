@@ -1,3 +1,16 @@
+0.003   2021-11-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump minimum perl to 5.18 because object stringification seems to work
+          only from perl 5.18 (RT #140135).
+
+
+0.002   2021-09-28  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Add caveats about cloning & serialization.
+
+
 0.001   2021-09-28  Released-By: PERLANCAR
 
         - First release.

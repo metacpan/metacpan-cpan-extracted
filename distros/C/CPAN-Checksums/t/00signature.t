@@ -58,7 +58,7 @@ BEGIN {
                     $socket,
                     pack_sockaddr_in(
                         scalar getservbyname('hkp', 'tcp'),
-                        inet_aton('pool.sks-keyservers.net')
+                        inet_aton('pgpkeys.eu')
                     )
                 ) and
                 close($socket)

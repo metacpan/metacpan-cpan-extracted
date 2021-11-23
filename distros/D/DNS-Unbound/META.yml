@@ -1,18 +1,18 @@
 ---
-abstract: 'libunbound in Perl'
+abstract: 'Query DNS recursively via L<libunbound|https://www.nlnetlabs.nl/documentation/unbound/libunbound/>'
 author:
   - 'Felipe Gasper (FELIPE)'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  File::Temp: '0'
   Net::DNS::Nameserver: '0'
+  Test::Deep: '0'
   Test::DescribeMe: '0'
   Test::Exception: '0'
   Test::FailWarnings: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -23,8 +23,10 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  ExtUtils::PkgConfig: '0'
 requires:
-  Class::XSAccessor: '0.1'
+  Class::XSAccessor: '0.10'
   Net::DNS: '0'
   Promise::ES6: '0.11'
   X::Tiny: '0'
@@ -32,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-DNS-Unbound/issues
   repository: https://github.com/FGasper/p5-DNS-Unbound.git
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

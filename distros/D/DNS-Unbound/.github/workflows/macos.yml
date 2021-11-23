@@ -27,20 +27,14 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        run: curl -L https://cpanmin.us | perl - --notest --installdeps .
-      - name: Install AnyEvent (optional)
-        run: "curl -L https://cpanmin.us | perl - --notest AnyEvent ||:"
-      - name: Install AnyEvent::XSPromises (optional)
-        run: "curl -L https://cpanmin.us | perl - --notest AnyEvent::XSPromises ||:"
-      - name: Install IO::Async (optional)
-        run: "curl -L https://cpanmin.us | perl - --notest IO::Async ||:"
-      - name: Install Mojolicious (optional)
-        run: "curl -L https://cpanmin.us | perl - --notest Mojolicious ||:"
-      - name: Install Promise::XS (optional)
-        run: "curl -L https://cpanmin.us | perl - --notest Promise::XS ||:"
+        run: curl -L https://cpanmin.us | perl - --notest --installdeps --with-configure --with-recommends --with-develop .
       - name: perl Makefile.PL
         run: perl Makefile.PL
       - name: make
         run: make
-      - name: Run Tests
-        run: make test
+      - name: Run tests (with coverage)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -L https://cpanmin.us | perl - --notest Devel::Cover::Report::Coveralls
+          `perl -MConfig -E'print $Config::Config{"sitebin"}'`/cover -test -report Coveralls

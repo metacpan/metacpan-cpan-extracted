@@ -1,22 +1,22 @@
 package Google::RestApi;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
-use File::Basename;
-use Furl;
-use JSON::MaybeXS;
-use List::Util qw(pairs);
-use Log::Log4perl qw(get_logger);
-use Module::Load qw(load);
-use Scalar::Util qw(blessed);
-use Retry::Backoff 'retry';
-use Storable qw(dclone);
-use Time::Out qw(timeout);
-use Try::Tiny;
-use URI;
-use URI::QueryParam;
+use File::Basename qw( dirname );
+use Furl ();
+use JSON::MaybeXS qw( decode_json encode_json JSON );
+use List::Util ();
+use Log::Log4perl qw( get_logger );
+use Module::Load qw( load );
+use Scalar::Util qw( blessed );
+use Retry::Backoff qw( retry );
+use Storable qw( dclone );
+use Time::Out qw( timeout );
+use Try::Tiny qw( catch try );
+use URI ();
+use URI::QueryParam ();
 
 sub new {
   my $class = shift;
@@ -27,7 +27,7 @@ sub new {
     auth         => HashRef | Object,
     throttle     => PositiveOrZeroInt, { default => 0 },
     timeout      => Int, { default => 120 },
-    max_attempts => PositiveInt->where('$_ < 10'), { default => 4 },
+    max_attempts => PositiveInt->where(sub { $_ < 10; }), { default => 4 },
   );
   $self = $check->(%$self);
 
@@ -92,9 +92,13 @@ sub api {
   $self->_api_callback();
 
   # this is for capturing request/responses for unit tests. copy/paste the results
-  # in the log into t/etc/uri_responses for unit testing.
-  my $logger = get_logger('unit.test.capture');
-  if ($logger && $response) {
+  # in the log into t/etc/uri_responses for unit testing. log appender 'UnitTestCapture'
+  # is defined in t/etc/log4perl.conf. you can use this logger by pointing to it via
+  # GOOGLE_RESTAPI_LOGGER env var.
+  if ($response && Log::Log4perl::appenders->{'UnitTestCapture'}) {
+    # special log category for this. it should be tied to the UnitTestCapture appender.
+    # we want to dump this in the same format as what we need to store in
+    # t/etc/uri_responses.
     my %request_response;
     my $json = JSON->new->ascii->pretty->canonical;
     my $pretty_request_json = $request_json ?
@@ -107,7 +111,7 @@ sub api {
         response => $pretty_response_json,
       },
     };
-    $logger->info(Dump(\%request_response) . "\n\n");
+    get_logger('unit.test.capture')->info(Dump(\%request_response) . "\n\n");
   }
 
   if (!$response || !$response->is_success()) {
@@ -232,7 +236,7 @@ sub _caller_external {
   my ($package, $subroutine, $line, $i) = ('', '', 0);
   do {
     ($package, undef, $line, $subroutine) = caller(++$i);
-  } while($package && $package =~ m[^(Google::RestApi|Cache)]);
+  } while($package && $package =~ m[^(Google::RestApi|Cache|Try)]);
   return "$package:$line => $subroutine";
 }
 
@@ -240,7 +244,7 @@ sub _caller_external {
 # 0 sets and returns default value.
 sub max_attempts {
   my $self = shift;
-  state $check = compile(PositiveOrZeroInt->where('$_ < 10'), { optional => 1 });
+  state $check = compile(PositiveOrZeroInt->where(sub { $_ < 10; }), { optional => 1 });
   my ($max_attempts) = $check->(@_);
   $self->{max_attempts} = $max_attempts if $max_attempts;
   $self->{max_attempts} = 4 if defined $max_attempts && $max_attempts == 0;

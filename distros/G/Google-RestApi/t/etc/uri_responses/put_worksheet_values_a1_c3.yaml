@@ -1,0 +1,34 @@
+PUT:
+  https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1/values/'Sheet1'!A1:C3?valueInputOption=USER_ENTERED:
+    content: |
+      {
+         "majorDimension" : "ROWS",
+         "range" : "'Sheet1'!A1:C3",
+         "values" : [
+            [
+               1,
+               2,
+               3
+            ],
+            [
+               4,
+               5,
+               6
+            ],
+            [
+               7,
+               8,
+               9
+            ]
+         ]
+      }
+    response: |
+      {
+         "spreadsheetId" : "fake_spreadsheet_id1",
+         "updatedCells" : 9,
+         "updatedColumns" : 3,
+         "updatedRange" : "Sheet1!A1:C3",
+         "updatedRows" : 3
+      }
+    tweaks:
+    - batch_update_values

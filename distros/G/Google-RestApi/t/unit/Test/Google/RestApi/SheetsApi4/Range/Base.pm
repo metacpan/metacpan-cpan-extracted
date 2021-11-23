@@ -18,7 +18,7 @@ sub setup : Tests(setup) {
   $self->_fake_http_no_retries();
 
   $self->_uri_responses(qw(
-    get_spreadsheet_named_ranges
+    get_spreadsheet_named_range_george
     get_worksheet_properties_title_sheetid
     get_worksheet_values_col
     get_worksheet_values_row
@@ -34,16 +34,6 @@ sub _to_str {
   return 'undef' if !defined $x;
   return $x if looks_like_number($x);
   return "'$x'";
-}
-
-sub _new_range {
-  my $self = shift;
-  return $self->class()->new(worksheet => fake_worksheet(), range => shift);
-}
-
-sub _new_config_range {
-  my $self = shift;
-  return $self->class()->new(worksheet => fake_config_worksheet(), range => shift);
 }
 
 1;

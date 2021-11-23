@@ -4,14 +4,14 @@ use Test::Unit::Setup;
 
 use Time::HiRes qw(sleep);
 
-use parent 'Test::Unit::TestBase';
+use Google::RestApi::Types qw( :all );
 
 use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
 
-# init_logger();
+use parent 'Test::Unit::TestBase';
 
-sub class { Spreadsheet; }
+# init_logger();
 
 sub setup : Tests(setup) {
   my $self = shift;
@@ -37,24 +37,21 @@ sub setup : Tests(setup) {
   return;
 }
 
-sub _constructor : Tests(8) {
+sub _constructor : Tests(7) {
   my $self = shift;
 
-  my $class = $self->class();
-  use_ok $self->class();
-
   ok my $ss = $self->_fake_spreadsheet(), 'Constructor should succeed';
-  isa_ok $ss, $class, 'Constructor with "id" returns';
+  isa_ok $ss, Spreadsheet, 'Constructor with "id" returns';
 
   ok $ss = $self->_fake_spreadsheet(name => fake_spreadsheet_name()),
     'Constructor with "name" should succeed';
-  isa_ok $ss, $class, 'Constructor with "name" returns';
+  isa_ok $ss, Spreadsheet, 'Constructor with "name" returns';
 
   ok $ss = $self->_fake_spreadsheet(uri => fake_spreadsheet_uri()),
     'Constructor with "uri`" should succeed';
-  isa_ok $ss, $class, 'Constructor with "uri" returns';
+  isa_ok $ss, Spreadsheet, 'Constructor with "uri" returns';
 
-  throws_ok sub { $ss = $class->new(sheets_api => fake_sheets_api()) },
+  throws_ok sub { $ss = Spreadsheet->new(sheets_api => fake_sheets_api()) },
     qr/At least one of/i,
     'Constructor with missing params should throw';
 
@@ -168,7 +165,7 @@ sub properties : Tests(4) {
   return;
 }
 
-sub worksheet_properties : Tests(4) {
+sub worksheet_properties : Tests(5) {
   my $self = shift;
   $self->_fake_http_response_by_uri();
   my $ss = $self->_fake_spreadsheet();
@@ -215,15 +212,14 @@ sub copy_spreadsheet : Tests(3) {
   my $self = shift;
   $self->_fake_http_response_by_uri();
   my $ss = $self->_fake_spreadsheet();
-  my $class = $self->class();
   
-  isa_ok $ss->copy_spreadsheet(), $class, 'Copy sheet';
+  isa_ok $ss->copy_spreadsheet(), Spreadsheet, 'Copy sheet';
   isa_ok $ss->copy_spreadsheet(
     name => fake_spreadsheet_name()
-  ), $class, 'Copy sheet with name';
+  ), Spreadsheet, 'Copy sheet with name';
   isa_ok $ss->copy_spreadsheet(
     title => fake_spreadsheet_name()
-  ), $class, 'Copy sheet with title';
+  ), Spreadsheet, 'Copy sheet with title';
 
   return;
 }
@@ -282,7 +278,7 @@ sub _fake_spreadsheet {
   my $self = shift;
   my %p = @_;
   $p{id} = fake_spreadsheet_id() if !%p;
-  return $self->class()->new(%p, sheets_api => fake_sheets_api());
+  return Spreadsheet->new(%p, sheets_api => fake_sheets_api());
 }
 
 1;

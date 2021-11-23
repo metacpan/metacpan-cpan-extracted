@@ -1,7 +1,12 @@
 package Acme::CPANModules::PERLANCAR::Retired;
 
-our $DATE = '2020-08-09'; # DATE
-our $VERSION = '0.007'; # VERSION
+use strict;
+use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-11-09'; # DATE
+our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 our $LIST = {
     summary => 'Retired modules',
@@ -111,7 +116,7 @@ Acme::CPANModules::PERLANCAR::Retired - Retired modules
 
 =head1 VERSION
 
-This document describes version 0.007 of Acme::CPANModules::PERLANCAR::Retired (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2020-08-09.
+This document describes version 0.008 of Acme::CPANModules::PERLANCAR::Retired (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
 
 =head1 DESCRIPTION
 
@@ -124,7 +129,7 @@ have used them.
 Note that you can always get these retired modules from BackPAN or GitHub (I
 don't purge most of the repos) if needed.
 
-=head1 INCLUDED MODULES
+=head1 ACME::MODULES ENTRIES
 
 =over
 
@@ -189,10 +194,22 @@ Alternate modules: L<Package::Stash>, L<Package::Util::Lite>
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n PERLANCAR::Retired
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries PERLANCAR::Retired | cpanm -n
 
@@ -200,9 +217,15 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=PERLANCAR::Retired -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::PERLANCAR::Retired -E'say $_->{module} for @{ $Acme::CPANModules::PERLANCAR::Retired::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -211,14 +234,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModulesBundle-PERLANCAR>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesBundle-PERLANCAR>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -230,11 +245,36 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesBundle-PERLANCAR>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

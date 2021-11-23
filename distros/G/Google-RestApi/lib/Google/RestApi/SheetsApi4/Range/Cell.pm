@@ -1,19 +1,45 @@
 package Google::RestApi::SheetsApi4::Range::Cell;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
-use parent 'Google::RestApi::SheetsApi4::Range';
+use Try::Tiny qw( try catch );
+
+use aliased 'Google::RestApi::SheetsApi4::Range';
+
+use parent Range;
 
 # make sure the translated range refers to a single cell (no ':').
-sub range {
-  my $self = shift;
-  return $self->{normalized_range} if $self->{normalized_range};
-  my $range = $self->SUPER::range(@_);
-  LOGDIE "Unable to translate '$range' into a worksheet cell"
-    if $range =~ /:/;
-  return $range;
+sub new {
+  my $class = shift;
+  my %self = @_;
+
+  # this is fucked up, but want to support creating this object directly and also
+  # via the range::factory method, so have to handle both cases here. try to create
+  # the cell directly first (which could also come via the factory method, which will
+  # have already translated the address into a cell), and failing that, see if the
+  # range factory can create a cell (which will resolve any named or header references).
+  # this has the potential of looping between this and factory method.
+
+  # if factory has already been used, then this should resolve here.
+  my $err;
+  try {
+    state $check = compile(RangeCell);
+    ($self{range}) = $check->($self{range});
+  } catch {
+    $err = $_;
+  };
+  return $class->SUPER::new(%self) if !$err;
+
+  # see if the range passed can be translated to what we want via the factory.
+  my $factory_range;
+  try {
+    $factory_range = Google::RestApi::SheetsApi4::Range::factory(%self);
+  } catch {};
+  return $factory_range if $factory_range && $factory_range->isa(__PACKAGE__);
+
+  LOGDIE sprintf("Unable to translate '%s' into a worksheet cell: $err", flatten_range($self{range}));
 }
 
 sub values {
@@ -40,7 +66,21 @@ sub batch_values {
   return $self->SUPER::batch_values(%$p);
 }
 
-sub cell { shift; }
+# is this 0 or infinity? return self if offset is 0, undef otherwise.
+sub cell_at_offset {
+  my $self = shift;
+  state $check = compile(Int, DimColRow, { optional => 1 });
+  my ($offset) = $check->(@_);   # we're a cell, no dim required.
+  return $self if !$offset;
+  return;
+}
+
+sub is_other_inside {
+  my $self = shift;
+  state $check = compile(HasRange);
+  my ($inside_range) = $check->(@_);
+  return $self->range() eq $inside_range->range();
+}
 
 1;
 

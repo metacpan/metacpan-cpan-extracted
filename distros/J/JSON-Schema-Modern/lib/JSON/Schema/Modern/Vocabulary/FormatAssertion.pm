@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.525';
+our $VERSION = '0.526';
 
 use 5.020;
 use Moo;
@@ -199,7 +199,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.525
+version 0.526
 
 =head1 DESCRIPTION
 
@@ -224,6 +224,11 @@ the equivalent Draft 2019-09 keyword, indicated in metaschemas with the URI C<ht
 the equivalent Draft 7 keyword, as formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-7>.
 
 =back
+
+Assertion behaviour can be enabled by
+L<https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.8.1.2/referencing this vocabulary explicitly>
+in a metaschema's C<$vocabulary> keyword, or by toggling the
+L<JSON::Schema::Modern/validate_formats> option.
 
 Overrides to particular format implementations, or additions of new ones, can be done through
 L<JSON::Schema::Modern/format_validations>.

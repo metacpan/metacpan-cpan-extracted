@@ -22,6 +22,7 @@ requires:
   Carp: '0'
   Module::Load: '0'
   OpenTracing::GlobalTracer: '0'
-  Role::MethodReturns: '0'
-version: v0.31.0
+  Role::Declare::Should: '0'
+  Types::Standard: '0'
+version: v0.32.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

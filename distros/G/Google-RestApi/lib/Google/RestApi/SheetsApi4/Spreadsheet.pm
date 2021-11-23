@@ -1,12 +1,10 @@
 package Google::RestApi::SheetsApi4::Spreadsheet;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
-use Cache::Memory::Simple;
-use Carp qw(confess);
-use Scalar::Util qw(blessed);
+use Cache::Memory::Simple ();
 
 use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Worksheet';
@@ -21,13 +19,12 @@ sub new {
   my $qr_id = SheetsApi4->Spreadsheet_Id;
   my $qr_uri = SheetsApi4->Spreadsheet_Uri;
   state $check = compile_named(
-    sheets_api => HasMethods[qw(api sheets_config spreadsheets)],
+    sheets_api => HasApi,
     # https://developers.google.com/sheets/api/guides/concepts
     id         => StrMatch[qr/^$qr_id$/], { optional => 1 },
     name       => Str, { optional => 1 },
     title      => Str, { optional => 1 },
     uri        => StrMatch[qr|^$qr_uri/$qr_id/?|], { optional => 1 },
-    config_id  => Str, { optional => 1 },
     cache_seconds => PositiveOrZeroNum, { default => 5 },
   );
   my $self = $check->(@_);
@@ -35,14 +32,6 @@ sub new {
   $self = bless $self, $class;
   $self->{name} ||= $self->{title};
   delete $self->{title};
-
-  if ($self->config_id()) {
-    my $config = $self->spreadsheet_config()
-      or LOGDIE "Sheets config id '" . $self->config_id() . "' is missing";
-    foreach (qw(id name uri)) {
-      $self->{$_} = $config->{$_} if defined $config->{$_};
-    }
-  }
 
   $self->{id} || $self->{name} || $self->{uri} or LOGDIE "At least one of id, name, or uri must be specified";
 
@@ -153,14 +142,28 @@ sub _cache {
   );
 }
 
+sub _cache_delete {
+  my $self = shift;
+  delete $self->{_cache};
+  return;
+}
+
 # sets the number of seconds that things will be cached.
 sub cache_seconds {
   my $self = shift;
+
   state $check = compile(PositiveOrZeroNum);
   my ($cache_seconds) = $check->(@_);
+
   $self->{_cache}->delete_all() if $self->{_cache};
-  delete $self->{_cache} if !$cache_seconds;
-  $self->{cache_seconds} = $cache_seconds;
+
+  if (!$cache_seconds) {
+    $self->_cache_delete();
+    delete $self->{cache_seconds};
+  } else {
+    $self->{cache_seconds} = $cache_seconds;
+  }
+
   return;
 }
 
@@ -178,7 +181,7 @@ sub delete_spreadsheet {
 
 sub range_group {
   my $self = shift;
-  state $check = compile(slurpy ArrayRef[HasMethods['range']]);
+  state $check = compile(slurpy ArrayRef[HasRange]);
   my ($ranges) = $check->(@_);
   return RangeGroup->new(
     spreadsheet => $self,
@@ -200,7 +203,7 @@ sub tie {
 # TODO: if worksheet is renamed, registration should be updated too.
 sub _register_worksheet {
   my $self = shift;
-  state $check = compile(HasMethods['worksheet_name']);
+  state $check = compile(HasApi);
   my ($worksheet) = $check->(@_);
   my $name = $worksheet->worksheet_name();
   return $self->{registered_worksheet}->{$name} if $self->{registered_worksheet}->{$name};
@@ -262,7 +265,11 @@ sub submit_requests {
   } @all_requests;
   return if !@batch_requests;
 
-  # call the batch requuest api.
+  # we're about to do a bunch of requests that could affect what's in the cache.
+  # TODO: selectively invalidate the cache based on what's being submitted.
+  $self->_cache_delete();
+
+  # call the batch request api.
   $p->{content}->{requests} = \@batch_requests;
   $p->{method} = 'post';
   $p->{uri} = ':batchUpdate';
@@ -281,12 +288,31 @@ sub submit_requests {
 
 sub named_ranges {
   my $self = shift;
-  state $check = compile(Str, { optional => 1 });
-  my ($named_range) = $check->(@_);
+
+  state $check = compile(RangeNamed, { optional => 1 });
+  my ($named_range_name) = $check->(@_);
+
   my $named_ranges = $self->attrs('namedRanges')->{namedRanges};
-  return $named_ranges if !$named_range;
-  ($named_range) = grep { $_->{name} eq $named_range; } @$named_ranges;
+  return $named_ranges if !$named_range_name;
+
+  my ($named_range) = grep { $_->{name} eq $named_range_name; } @$named_ranges;
   return $named_range;
+}
+
+sub normalize_named {
+  my $self = shift;
+
+  state $check = compile(RangeNamed);
+  my ($named_range_name) = $check->(@_);
+
+  my $named_range = $self->named_ranges($named_range_name) or return;
+  $named_range = $named_range->{range};
+  my $range = [
+    [ $named_range->{startColumnIndex} + 1, $named_range->{startRowIndex} + 1 ],
+    [ $named_range->{endColumnIndex}, $named_range->{endRowIndex} ],
+  ];
+
+  return ($named_range->{sheetId}, $range);
 }
 
 sub protected_ranges { shift->attrs('sheets.protectedRanges')->{sheets}; }
@@ -314,19 +340,10 @@ sub delete_all_protected_ranges {
   return $self;
 }
 
-sub spreadsheet_config {
-  my $self = shift;
-  my $key = shift;
-  my $config = $self->sheets_config( $self->config_id() ) or return;
-  return defined $key ? $config->{$key} : $config;
-}
-
-sub config_id { shift->{config_id}; }
-sub worksheets_config { shift->spreadsheet_config('worksheets'); }
 sub open_worksheet { Worksheet->new(spreadsheet => shift, @_); }
-sub sheets_config { shift->sheets_api()->sheets_config(shift); }
 sub sheets_api { shift->{sheets_api}; }
 sub rest_api { shift->sheets_api()->rest_api(); }
+sub transaction { shift->sheets_api()->transaction(); }
 sub stats { shift->sheets_api()->stats(); }
 
 1;
@@ -345,7 +362,7 @@ See the description and synopsis at Google::RestApi::SheetsApi4.
 
 =over
 
-=item new(sheets => <SheetsApi4>, (id => <string> | name => <string> | title => <string> | uri => <string>), config_id => <string>, cache_seconds => <int>);
+=item new(sheets => <SheetsApi4>, (id => <string> | name => <string> | title => <string> | uri => <string>), cache_seconds => <int>);
 
 Creates a new instance of a Spreadsheet object. You would not normally
 call this directly, you would obtain it from the
@@ -356,7 +373,6 @@ Sheets::open_spreadsheet routine.
  name: The name of the spreadsheet (as shown in Google Drive).
  title: An alias for name.
  uri: The spreadsheet ID extracted from the overall URI.
- config_id: The custom config for this worksheet.
  cache_seconds: Cache information for this many seconds (default to 5, 0 disables).
 
 Only one of id/name/title/uri should be specified and this API will derive the others
@@ -455,11 +471,6 @@ when the underlying batch requests have been submitted.
 
 See also Google::RestApi::SheetsApi4::Worksheet::tie.
 
-=item config(key<string>)
-
-Returns the custom configuration item with the given key, or the entire
-configuration for this spreadsheet if no key is specified.
-
 =item submit_values(values<arrayref>, content<hashref>);
 
 Submits the batch values (Google API's batchUpdate) for the
@@ -480,10 +491,6 @@ Returns all the protected ranges for this spreadsheet.
 
 Creates a new Worksheet object, passing the args to that object's
 'new' routine (which see).
-
-=item sheets_config();
-
-Returns the parent SheetsApi4 config.
 
 =item sheets_api();
 

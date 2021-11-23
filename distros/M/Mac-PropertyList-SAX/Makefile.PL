@@ -1,4 +1,5 @@
 # Load the Module::Install bundled in ./inc/
+use lib ".";
 use inc::Module::Install;
 
 # Define metadata

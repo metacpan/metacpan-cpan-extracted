@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-07-15'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,13 @@ list-clipboard-history - List the clipboard history
 
 =head1 VERSION
 
-This document describes version 0.001 of list-clipboard-history (from Perl distribution App-ClipboardUtils), released on 2021-07-15.
+This document describes version 0.002 of list-clipboard-history (from Perl distribution App-ClipboardUtils), released on 2021-07-15.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<list-clipboard-history> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
+% B<list-clipboard-history> [B<--clipboard-manager>=I<str>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
 
 =head1 DESCRIPTION
 
@@ -61,6 +61,23 @@ empty result.
 =head1 OPTIONS
 
 C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--clipboard-manager>=I<s>
+
+Explicitly set clipboard manager to use.
+
+Valid values:
+
+ ["klipper"]
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+
+=back
 
 =head2 Logging options
 

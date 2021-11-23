@@ -1,3 +1,11 @@
+0.002   2021-07-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with Clipboard::Any 0.002 to show --clipboard-manager
+          option.
+
+
 0.001   2021-07-15  Released-By: PERLANCAR
 
         - First release.

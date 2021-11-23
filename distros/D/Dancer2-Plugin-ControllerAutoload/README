@@ -1,0 +1,85 @@
+NAME
+    Dancer2::Plugin::ControllerAutoload - Autoload controllers
+
+SYNOPSIS
+    When we "use" the plugin in MyApp.pm it'll load all the controllers
+    under the "Controller" directory, so you don't have to write one "use
+    $controller" in MyApp.pm for each controller.
+
+        # MyApp.pm
+        package MyApp;
+        use Dancer2;
+        use Dancer2::Plugin::ControllerAutoload;
+
+        # MyApp/Controller/Users.pm
+        package MyApp::Controller::Users;
+        use Dancer2 appname => 'MyApp';
+
+        # MyApp/Controller/Users/Thoughts.pm
+        package MyApp::Controller::Users::Thoughts;
+        use Dancer2 appname => 'MyApp';
+
+DESCRIPTION
+    If you have these three controllers
+
+        # MyApp/Controller/Users.pm
+        package MyApp::Controller::Users;
+        use Dancer2 appname => 'MyApp';
+
+        # MyApp/Controller/Users/Thoughts.pm
+        package MyApp::Controller::Users::Thoughts;
+        use Dancer2 appname => 'MyApp';
+
+        # MyApp/Controller/Services.pm
+        package MyApp::Controller::Services;
+        use Dancer2 appname => 'MyApp';
+
+    you'd have to load each with an "use"
+
+        # MyApp.pm
+        package MyApp;
+        use Dancer2;
+        use MyApp::Controller::Users;
+        use MyApp::Controller::Users::Thoughts;
+        use MyApp::Controller::Services;
+
+    This plugin simplifies this process. When you "use" the plugin, all
+    controllers will be loaded.
+
+        # MyApp.pm
+        package MyApp;
+        use Dancer2;
+        use Dancer2::Plugin::ControllerAutoload;
+
+    A controller will be by default identified as such if it is under the
+    "Controller" directory. But that's configurable. If your controller
+    directory is called "Contr":
+
+        # in a config or environment file
+        plugins:
+            ControllerAutoload:
+                controller_dir: Contr
+
+AUTHOR
+    Gil Magno, "<gilmagno at gilmagno.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dancer2-plugin-controllerautoload at rt.cpan.org", or through the
+    web interface at
+    <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer2-Plugin-Controll
+    erAutoload>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+    Also you can use github: <https://github.com/gilmagno>.
+
+ACKNOWLEDGEMENTS
+    Angel Leyva, José Biskofski, Natanael Lizama, Uriel Lizama
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2021 by Gil Magno.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

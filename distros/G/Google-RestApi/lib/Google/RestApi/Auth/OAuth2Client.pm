@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::OAuth2Client;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
@@ -10,10 +10,10 @@ use Google::RestApi::Setup;
 # NOTE NOTE NOTE: to generate a config file and token file for use by this module, see:
 # bin/google_restapi_oauth_token_creator in this package.
 
-use Net::OAuth2::Client;
-use Net::OAuth2::Profile::WebServer;
-use Storable qw(retrieve);
-use URI;
+use Net::OAuth2::Client ();
+use Net::OAuth2::Profile::WebServer ();
+use Storable qw( retrieve );
+use URI ();
 
 use parent 'Google::RestApi::Auth';
 

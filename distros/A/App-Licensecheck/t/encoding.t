@@ -18,11 +18,13 @@ plan 13;
 
 diag 'locale encoding: ', $Encode::Locale::ENCODING_LOCALE;
 
-my @CMD
-	= ( $ENV{'LICENSECHECK'} )
-	|| path('blib')->exists
-	? ('blib/script/licensecheck')
-	: ( $^X, 'bin/licensecheck' );
+my @CMD = ( $^X, 'bin/licensecheck' );
+if ( $ENV{'LICENSECHECK'} ) {
+	@CMD = ( $ENV{'LICENSECHECK'} );
+}
+elsif ( path('blib')->exists ) {
+	@CMD = ('blib/script/licensecheck');
+}
 diag "executable: @CMD";
 
 my $basic

@@ -116,7 +116,7 @@ Once you have successfully created your OAuth2 token, you can run the integratio
 Set the environment variable GOOGLE_RESTAPI_CONFIG = to the path to your auth config file for the integration scripts to run.
 See t/run_integration for further instructions.
 
-t/tutorial/Sheets also has a step-by-step tutorial of creating and updating a spreadsheet, showing you the API calls and return values for each step. This will help you understand how the API interacts with Google.
+t/tutorial/sheets also has a step-by-step tutorial of creating and updating a spreadsheet, showing you the API calls and return values for each step. This will help you understand how the API interacts with Google.
 
 # STATUS
 
@@ -124,8 +124,6 @@ This api is currently very much in beta status. It is incomplete.
 There may be design flaws that need to be addressed in later
 releases. Later releases may break this release. Not all api
 calls have been implemented. Tests are not comprehensive.
-
-But it gets the job done.
 
 This is a work in progress, released at this stage in order to
 assist others, and in the hopes that others will contribute to

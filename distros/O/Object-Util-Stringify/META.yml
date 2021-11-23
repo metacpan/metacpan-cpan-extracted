@@ -19,18 +19,19 @@ name: Object-Util-Stringify
 provides:
   Object::Util::Stringify:
     file: lib/Object/Util/Stringify.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   Exporter: '5.57'
   Scalar::Util: '0'
   overload: '0'
+  perl: '5.018000'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Util-Stringify
   homepage: https://metacpan.org/release/Object-Util-Stringify
   repository: git://github.com/perlancar/perl-Object-Util-Stringify.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -110,7 +111,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.605'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

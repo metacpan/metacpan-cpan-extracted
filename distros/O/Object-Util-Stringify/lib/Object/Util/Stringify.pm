@@ -1,5 +1,6 @@
 package Object::Util::Stringify;
 
+use 5.018000;
 use strict;
 use warnings;
 
@@ -8,9 +9,9 @@ use Scalar::Util qw(blessed refaddr);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-28'; # DATE
+our $DATE = '2021-11-23'; # DATE
 our $DIST = 'Object-Util-Stringify'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(
                        set_stringify
@@ -36,8 +37,6 @@ sub set_stringify {
 }
 
 sub unset_stringify {
-    require overload;
-
     my ($obj, $str) = @_;
 
     die "First argument must be a blessed reference" unless blessed($obj);
@@ -70,7 +69,7 @@ Object::Util::Stringify - Utility routines related to object stringification
 
 =head1 VERSION
 
-This document describes version 0.001 of Object::Util::Stringify (from Perl distribution Object-Util-Stringify), released on 2021-09-28.
+This document describes version 0.003 of Object::Util::Stringify (from Perl distribution Object-Util-Stringify), released on 2021-11-23.
 
 =head1 SYNOPSIS
 
@@ -102,6 +101,9 @@ Usage:
  set_stringify($obj, $str);
 
 Set object stringification to C<$str>.
+
+Caveats: cloned object currently will not inherit the stringification,
+serialization currently does not serialize the stringification information.
 
 =head2 unset_stringify
 

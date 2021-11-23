@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.525';
+our $VERSION = '0.526';
 
 use 5.020;
 use Moo;
@@ -247,18 +247,18 @@ sub _traverse_keyword_vocabulary ($self, $schema, $state) {
   return E($state, '$vocabulary can only appear at the schema resource root')
     if length($state->{schema_path});
 
-  return E($state, '$vocabulary can only appear at the document root')
+  my $valid = 1;
+  $valid = E($state, '$vocabulary can only appear at the document root')
     if length($state->{traversed_schema_path}.$state->{schema_path});
 
-  my $valid = 1;
+  $valid = E($state, 'metaschemas must have an $id')
+    if not length $state->{initial_schema_uri};
+
   my @vocabulary_classes;
   foreach my $uri (sort keys $schema->{'$vocabulary'}->%*) {
     $valid = 0, next if not assert_keyword_type({ %$state, _schema_path_suffix => $uri }, $schema, 'boolean');
     $valid = 0, next if not assert_uri({ %$state, _schema_path_suffix => $uri }, undef, $uri);
   }
-
-  $valid = E($state, 'metaschemas must have an $id')
-    if not length $state->{initial_schema_uri};
 
   # we cannot return an error here for invalid or incomplete vocabulary lists, because
   # - the specification vocabulary schemas themselves don't list Core,
@@ -344,7 +344,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.525
+version 0.526
 
 =head1 DESCRIPTION
 

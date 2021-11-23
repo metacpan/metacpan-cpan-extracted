@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.018000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Object-Util-Stringify",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.018000",
   "NAME" => "Object::Util::Stringify",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

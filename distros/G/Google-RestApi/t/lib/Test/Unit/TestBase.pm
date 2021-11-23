@@ -49,12 +49,15 @@ sub _uri_responses {
 }
 
 # don't send any auth request to google, just use blank headers.
+# TODO: see if some other non-G::R routine can be faked so this doesn't have to be
+# 'required' in the tests.
 sub _fake_http_auth {
   my $self = shift;
   $self->_fake('http_auth', 'Google::RestApi::Auth::OAuth2Client', 'headers', sub { []; });
   return;
 }
 
+# TODO: same as above.
 sub _fake_http_no_retries {
   my $self = shift;
   $self->_fake('http_no_retries', 'Google::RestApi', 'max_attempts', sub { 1; });

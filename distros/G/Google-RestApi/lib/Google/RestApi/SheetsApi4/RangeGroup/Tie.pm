@@ -1,22 +1,17 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Tie;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
-use Tie::Hash;
+use Tie::Hash ();
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator';
 use parent -norequire, 'Tie::StdHash';
 
 sub iterator {
   my $self = shift;
 
-  my %ranges = map {
-    my $range = $self->ranges()->{$_};
-    $range->can('cell') ? ($_ => $range) : ();
-  } keys %{ $self->ranges() };
-  my $tied = $self->spreadsheet()->tie(%ranges);
-
+  my $tied = $self->spreadsheet()->tie(%{ $self->ranges() });
   tied(%$tied)->default_worksheet($self->worksheet())
     if $self->worksheet();
 
@@ -38,7 +33,7 @@ sub batch_values {
 sub add_ranges {
   my $self = shift;
   my %ranges = @_;
-  state $check = compile(slurpy ArrayRef[HasMethods[qw(range)]]);
+  state $check = compile(slurpy ArrayRef[HasRange]);
   $check->(CORE::values %ranges);
   @{ $self->{ranges} }{ keys %ranges } = CORE::values %ranges;
   return \%ranges;
@@ -124,15 +119,8 @@ sub STORE {
   my ($key, $value) = @_;
   if (!$self->ranges()->{$key}) {
     my $worksheet = $self->worksheet()
-      or LOGDIE "No default worksheet provided for new range '$key'. Call default_worksheet() first.";
-    # have to make assumptions here. if there is a : somewhere in
-    # the range, assume it's a range, else a cell. this may not
-    # always do the right thing. in those cases, the initial tie
-    # should specify the range you want instead of auto-creating
-    # it here.
-    my $tied = $key =~ /\:/
-      ? $worksheet->tie_ranges($key)
-      : $worksheet->tie_cells($key);
+      or LOGDIE "No default worksheet provided for new range '$key'. Call default_worksheet() first.";    
+    my $tied = $worksheet->tie_ranges({ $key => $key });
     $self->add_tied($tied);
   }
 

@@ -46,6 +46,7 @@
             "Module::Load" : "0",
             "Net::OAuth2::Client" : "0",
             "Net::OAuth2::Profile::WebServer" : "0",
+            "Readonly" : "0",
             "Retry::Backoff" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
@@ -84,6 +85,6 @@
          "web" : "https://github.com/mvsjes2/p5-google-restapi"
       }
    },
-   "version" : "0.8",
+   "version" : "0.9",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

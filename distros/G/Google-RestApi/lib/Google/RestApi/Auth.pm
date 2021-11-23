@@ -1,6 +1,6 @@
 package Google::RestApi::Auth;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 

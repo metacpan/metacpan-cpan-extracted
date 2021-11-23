@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::ClipboardUtils",
   "PREREQ_PM" => {
     "Clipboard::Any" => 0,
+    "Data::Sah::Compiler::perl::TH::str" => "0.907",
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.152",
     "Perinci::CmdLine::Lite" => "1.905"
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Clipboard::Any" => 0,
+  "Data::Sah::Compiler::perl::TH::str" => "0.907",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

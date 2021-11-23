@@ -2,17 +2,17 @@
 
 # see perldoc below for instructions on how to use this script.
 
-use FindBin;
+use FindBin ();
 use lib "$FindBin::RealBin/../lib";
 
-use File::Basename;
-use Storable;
-use Term::Prompt;
-use Type::Params qw(compile_named);
-use Types::Standard qw(Str StrMatch);
-use YAML::Any qw(Dump LoadFile);
+use File::Basename qw( dirname );
+use Storable qw( store );
+use Term::Prompt qw( prompt );
+use Type::Params qw( compile_named );
+use Types::Standard qw( Str StrMatch );
+use YAML::Any qw( Dump LoadFile );
 
-use Google::RestApi::Auth::OAuth2Client;
+use Google::RestApi::Auth::OAuth2Client ();
 
 # set the scope for the project you are working one.
 # for this package, drive and spreadsheets are required.

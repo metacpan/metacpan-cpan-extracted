@@ -1,0 +1,30 @@
+---
+abstract: 'Format checklists'
+author:
+  - 'Mathias Weidner <mamawe@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Probe::Perl: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Checklist-Formatter
+provides:
+  App::Checklist::Formatter:
+    file: lib/App/Checklist/Formatter.pm
+    version: v0.0.6
+requires:
+  Carp: '0'
+  perl: v5.6.0
+  version: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/matwei-perl/App-Checklist-Formatter
+version: v0.0.6
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

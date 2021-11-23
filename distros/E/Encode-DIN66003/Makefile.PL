@@ -11,8 +11,8 @@ use Config;
 # Please edit the following to the taste!
 my $name = 'DIN66003';
 my %tables = (
-         DIN66003_t   => [ 'ucm/din66003.ucm' ],
-         );
+    DIN66003_t   => [ 'ucm/din66003.ucm' ],
+);
 
 #### DO NOT EDIT BEYOND THIS POINT!
 require File::Spec;
@@ -44,6 +44,9 @@ for my $d (@INC){
 print "encode.h is at $encode_h\n";
 
 WriteMakefile(
+          ABSTRACT_FROM   => "lib/Encode/$name.pm", # retrieve abstract from module
+          AUTHOR          => 'Max Maischein <corion@cpan.org>',
+          MIN_PERL_VERSION => '5.006',
           INC       => "-I$encode_h",
           NAME      => 'Encode::'.$name,
           VERSION_FROM  => "lib/Encode/$name.pm",
@@ -61,7 +64,9 @@ WriteMakefile(
                       web => 'https://github.com/Corion/Encode-DIN66003',
                       url => 'git://github.com/Corion/Encode-DIN66003.git',
                       type => 'git',
-                  }
+                  },
+                  bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=Encode-DIN66003',
+                  license    => 'http://dev.perl.org/licenses/',
               },
           },
           PREREQ_PM => {
@@ -70,7 +75,7 @@ WriteMakefile(
           },
           # OS 390 winges about line numbers > 64K ???
           XSOPT => '-nolinenumbers',
-          );
+);
 
 package MY;
 

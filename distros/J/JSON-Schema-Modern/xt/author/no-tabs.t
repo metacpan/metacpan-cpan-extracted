@@ -91,6 +91,7 @@ my @files = (
     't/boolean-schemas.t',
     't/cached-metaschemas.t',
     't/callbacks.t',
+    't/content-encoding.t',
     't/dialects.t',
     't/document.t',
     't/equality.t',

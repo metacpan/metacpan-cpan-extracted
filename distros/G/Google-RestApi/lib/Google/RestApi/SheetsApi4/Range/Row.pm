@@ -1,24 +1,47 @@
 package Google::RestApi::SheetsApi4::Range::Row;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
+
+use Try::Tiny qw( try catch );
 
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 
-use parent 'Google::RestApi::SheetsApi4::Range';
+use parent Range;
 
-sub range {
-  my $self = shift;
-  return $self->{normalized_range} if $self->{normalized_range};
+sub new {
+  my $class = shift;
+  my %self = @_;
 
-  $self->{range} = { row => $self->{range} } if !ref($self->{range});
-  my $range = $self->SUPER::range(@_);
-  my $rowA1 = Range->RowA1;
-  LOGDIE "Unable to translate '$range' into a worksheet row"
-    if !$self->is_named() && $range !~ qr/$rowA1/;
-  return $range;
+  $self{dim} = 'row';
+
+  # this is fucked up, but want to support creating this object directly and also
+  # via the range::factory method, so have to handle both cases here. try to create
+  # the row directly first (which could also come via the factory method, which will
+  # have already translated the address into a row), and failing that, see if the
+  # range factory can create a row (which will resolve any named or header references).
+  # this has the potential of looping between this and factory method.
+
+  # if factory has already been used, then this should resolve here.
+  my $err;
+  try {
+    state $check = compile(RangeRow);
+    ($self{range}) = $check->($self{range});
+  } catch {
+    $err = $_;
+  };
+  return $class->SUPER::new(%self) if !$err;
+
+  # see if the range passed can be translated to what we want via the factory.
+  my $factory_range;
+  try {
+    $factory_range = Google::RestApi::SheetsApi4::Range::factory(%self);
+  } catch {};
+  return $factory_range if $factory_range && $factory_range->isa(__PACKAGE__);
+
+  LOGDIE sprintf("Unable to translate '%s' into a worksheet row: $err", flatten_range($self{range}));
 }
 
 sub values {
@@ -43,20 +66,37 @@ sub batch_values {
   return $self->SUPER::batch_values(%$p);
 }
 
-sub cell {
+sub cell_at_offset {
   my $self = shift;
-  state $check = compile(Int, { default => 0 });
-  my ($offset) = $check->(@_);
-  my $range = $self->range_to_array();
-  $range->[0] = ($range->[0] || 1) + $offset;
-  return Cell->new(worksheet => $self->worksheet(), range => $range);
+
+  state $check = compile(Int, DimColRow, { optional => 1 });
+  my ($offset) = $check->(@_);   # we're a column, no dim required.
+
+  my $row_range = $self->range_to_array($Google::RestApi::SheetsApi4::Range::RANGE_EXPANDED); # can't use aliased
+  my $cell_range = $row_range->[0];
+  $cell_range->[0] = ($cell_range->[0] || 1) + $offset;
+  return if $row_range->[1]->[0] && $cell_range->[0] > $row_range->[1]->[0];
+
+  my $cell = Cell->new(worksheet => $self->worksheet(), range => $cell_range);
+  $cell->share_values($self);
+  return $cell;
 }
 
-sub range_to_index {
+sub is_other_inside {
   my $self = shift;
-  my $range = $self->SUPER::range_to_index(@_);
-  delete @$range{qw(startColumnIndex endColumnIndex)};
-  return $range;
+
+  state $check = compile(HasRange);
+  my ($inside_range) = $check->(@_);
+
+  my $range = $self->range_to_hash($Google::RestApi::SheetsApi4::Range::RANGE_EXPANDED);
+  $inside_range = $inside_range->range_to_hash($Google::RestApi::SheetsApi4::Range::RANGE_EXPANDED); # can't use aliased.
+
+  return if $range->[0]->{row} ne $inside_range->[0]->{row};
+  return if $range->[1]->{row} ne $inside_range->[1]->{row};
+  return if $range->[0]->{col} && $range->[0]->{col} > $inside_range->[0]->{col};
+  return if $range->[1]->{col} && $range->[1]->{col} < $inside_range->[1]->{col};
+  
+  return 1;
 }
 
 sub freeze {

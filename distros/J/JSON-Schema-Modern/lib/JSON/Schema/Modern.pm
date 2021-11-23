@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.524-14-gee0c2b88
+package JSON::Schema::Modern; # git description: v0.525-10-g2613da3e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.525';
+our $VERSION = '0.526';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -72,6 +72,15 @@ has validate_formats => (
   is => 'ro',
   isa => Bool,
   default => 0, # as specified by https://json-schema.org/draft/<version>/schema#/$vocabulary
+);
+
+has validate_content_schemas => (
+  is => 'ro',
+  isa => Bool,
+  lazy => 1,
+  # defaults to false in latest versions, as specified by
+  # https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.8.2
+  default => sub { ($_[0]->specification_version//'') eq 'draft7' },
 );
 
 has collect_annotations => (
@@ -239,7 +248,16 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     );
   }
   catch ($e) {
-    push $state->{errors}->@*, $e->errors;
+    if ($e->$_isa('JSON::Schema::Modern::Result')) {
+      push $state->{errors}->@*, $e->errors;
+    }
+    elsif ($e->$_isa('JSON::Schema::Modern::Error')) {
+      push $state->{errors}->@*, $e;
+    }
+    else {
+      ()= E($state, 'EXCEPTION: '.$e);
+    }
+
     return $state;
   }
 
@@ -317,7 +335,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
-      } qw(validate_formats short_circuit collect_annotations annotate_unknown_keywords scalarref_booleans)),
+      } qw(validate_formats validate_content_schemas short_circuit collect_annotations annotate_unknown_keywords scalarref_booleans)),
     };
 
     $valid = $self->_eval_subschema($data, $schema_info->{schema}, $state);
@@ -348,14 +366,17 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
   );
 }
 
-# sub add_vocabulary { ... } # defined lower down...
-
 sub get ($self, $uri) {
   my $schema_info = $self->_fetch_from_uri($uri);
   return if not $schema_info;
   my $subschema = is_ref($schema_info->{schema}) ? dclone($schema_info->{schema}) : $schema_info->{schema};
   return wantarray ? ($subschema, $schema_info->{canonical_uri}) : $subschema;
 }
+
+# defined lower down:
+# sub add_vocabulary { ... }
+# sub add_encoding { ... }
+# sub add_media_type { ... }
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
@@ -480,20 +501,24 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       delete $unknown_keywords{$keyword};
 
       my $method = '_eval_keyword_'.($keyword =~ s/^\$//r);
-      next if not $vocabulary->can($method);
-
       $state->{keyword} = $keyword;
-      my $error_count = $state->{errors}->@*;
-      if (not $vocabulary->$method($data, $schema, $state)) {
-        warn 'result is false but there are no errors (keyword: '.$keyword.')'
-          if $error_count == $state->{errors}->@*;
-        $valid = 0;
+
+      if ($vocabulary->can($method)) {
+        my $error_count = $state->{errors}->@*;
+
+        if (not $vocabulary->$method($data, $schema, $state)) {
+          warn 'result is false but there are no errors (keyword: '.$keyword.')'
+            if $error_count == $state->{errors}->@*;
+          $valid = 0;
+
+          last ALL_KEYWORDS if $state->{short_circuit};
+          next;
+        }
       }
-      elsif (my $sub = $state->{callbacks}{$keyword}) {
+
+      if (my $sub = $state->{callbacks}{$keyword}) {
         $sub->($schema, $state);
       }
-
-      last ALL_KEYWORDS if not $valid and $state->{short_circuit};
 
       push @new_annotations, $state->{annotations}->@[$#new_annotations+1 .. $state->{annotations}->$#*];
     }
@@ -503,7 +528,8 @@ sub _eval_subschema ($self, $data, $schema, $state) {
 
   if ($valid) {
     push $state->{annotations}->@*, @new_annotations;
-    annotate_self(+{ %$state, keyword => $_ }, $schema) foreach sort keys %unknown_keywords;
+    annotate_self(+{ %$state, keyword => $_, unknown => 1 }, $schema)
+      foreach sort keys %unknown_keywords;
   }
 
   return $valid;
@@ -793,6 +819,44 @@ has _json_decoder => (
   default => sub { JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 1) },
 );
 
+has _media_type => (
+  is => 'bare',
+  isa => HashRef[CodeRef],
+  handles_via => 'Hash',
+  handles => {
+    get_media_type => 'get',
+    add_media_type => 'set',
+  },
+  lazy => 1,
+  default => sub ($self) {
+    +{
+      'application/json' => sub ($content_ref) {
+        \ JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1)->decode($content_ref->$*);
+      },
+      'text/plain' => sub ($content_ref) { $content_ref }
+    };
+  },
+);
+
+has _encoding => (
+  is => 'bare',
+  isa => HashRef[CodeRef],
+  handles_via => 'Hash',
+  handles => {
+    get_encoding => 'get',
+    add_encoding => 'set',
+  },
+  lazy => 1,
+  default => sub ($self) {
+    +{
+      'base64' => sub ($content_ref) {
+        die "invalid characters in base64 string" if $content_ref->$* =~ m{[^A-Za-z0-9+/]};
+        require MIME::Base64; \ MIME::Base64::decode($content_ref->$*);
+      },
+    };
+  },
+);
+
 1;
 
 __END__
@@ -809,7 +873,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.525
+version 0.526
 
 =head1 SYNOPSIS
 
@@ -892,6 +956,21 @@ the format sub is a coderef that takes one argument and returns a boolean result
 be specified in the form of C<< { $format_name => { type => $type, sub => $format_sub } } >>,
 where the type indicates which of the core JSON Schema types (null, object, array, boolean, string,
 number, or integer) the instance value must be for the format validation to be considered.
+
+=head2 validate_content_schemas
+
+When true, the C<contentMediaType> and C<contentSchema> keywords are not treated as pure annotations:
+C<contentEncoding> (when present) is used to decode the applied data payload and then
+C<contentMediaType> will be used as the media-type for decoding to produce the data payload which is
+then applied to the schema in C<contentSchema> for validation.
+
+See L</add_media_type> and L</add_encoding> for adding additional type support.
+
+=for stopwords shhh
+
+Technically only draft7 allows this and drafts 2019-09 and 2020-12 prohibit ever returning the
+subschema evaluation results together with their parent schema's, so shhh. I'm trying to get this
+fixed for the next draft.
 
 =head2 collect_annotations
 
@@ -980,7 +1059,7 @@ or a URI string indicating the location where such a schema is located.
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
 L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</scalarref_booleans> and/or
-L</validate_formats> settings for just this
+L</validate_formats>, L<validate_content_schemas> settings for just this
 evaluation call.
 
 You can pass a series of callback subs to this method corresponding to keywords, which is useful for
@@ -1056,6 +1135,79 @@ L<"Meta-Schemas and Vocabularies"|https://json-schema.org/draft/2020-12/json-sch
 The class must compose the L<JSON::Schema::Modern::Vocabulary> role and implement the
 L<vocabulary|JSON::Schema::Modern::Vocabulary/vocabulary> and
 L<keywords|JSON::Schema::Modern::Vocabulary/keywords> methods.
+
+=head2 add_media_type
+
+  $js->add_media_type('application/furble' => sub ($content_ref) {
+    return ...;  # data representing the deserialized text for Content-Type: application/furble
+  });
+
+=for stopwords subref
+
+Takes a media-type name and a subref which takes a single scalar reference, which is expected to be
+a reference to a string, which might contain wide characters (i.e. not octets), especially when used
+in conjunction with L</get_encoding> below. Must return B<a reference to a value of any type> (which is
+then dereferenced for the C<contentSchema> keyword).
+
+These media types are already known:
+
+=over 4
+
+=item *
+
+C<application/json>
+
+=item *
+
+C<text/plain>
+
+=back
+
+=head2 get_media_type
+
+Fetches a decoder sub for the indicated media type.
+
+=for stopwords thusly
+
+You can use it thusly:
+
+  my $decoder = $self->get_media_type('application/furble') or die 'cannot find media type decoder';
+  my $content_ref = $decoder->(\$content_string);
+
+=head2 add_encoding
+
+  $js->add_media_type('application/furble' => sub ($content_ref) {
+    return \ ...;  # data representing the deserialized content for Content-Type: application/furble
+  });
+
+Takes an encoding name and a subref which takes a single scalar reference, which is expected to be
+a reference to a string, which SHOULD be a 7-bit or 8-bit string. Result values MUST be a scalar-reference
+to a string.
+
+=for stopwords natively
+
+Encodings handled natively are:
+
+=over 4
+
+=item *
+
+C<base64>
+
+=back
+
+See also L<HTTP::Message/encode>.
+
+=head2 get_encoding
+
+Fetches a decoder sub for the indicated encoding. Incoming values MUST be a reference to an octet
+string. Result values will be a scalar-reference to a string, which might be passed to a media_type
+decoder (see above).
+
+You can use it thusly:
+
+  my $decoder = $self->get_encoding('base64') or die 'cannot find encoding decoder';
+  my $content_ref = $decoder->(\$content_string);
 
 =head2 get
 

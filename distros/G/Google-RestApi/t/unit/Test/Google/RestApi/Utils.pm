@@ -10,13 +10,7 @@ use Test::Unit::Setup;
 
 use parent 'Test::Unit::TestBase';
 
-sub class { 'Google::RestApi::Utils' }
-
-sub _constructor : Tests(1) {
-  my $self = shift;
-  use_ok $self->class(), ':all';
-  return;
-}
+use Google::RestApi::Utils qw(:all);
 
 sub test_named_extra : Tests(2) {
   my %args;
@@ -58,13 +52,14 @@ sub test_resolve_config_file_path : Tests(5) {
 }
 
 sub test_bool : Tests(7) {
+  # bool clashes with Test::Deeply::bool.
   is bool(), 'true', "bool: passing undef returns true";
   is bool('true'), 'true', "bool: passing true returns true";
   is bool('false'), 'false', "bool: passing false returns false";
   is bool('TRUE'), 'true', "bool: passing TRUE returns true";
   is bool('FALSE'), 'false', "bool: passing FALSE returns false";
   is bool(1), 'true', "bool: passing 1 returns true";
-  is bool(0), 'false', "bool: passing 1 returns false";
+  is bool(0), 'false', "bool: passing 0 returns false";
   return;
 }
 

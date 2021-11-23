@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1921;
+use Test::More tests => 2017;
 use Test::NoWarnings;
 use Date::Utility;
 
@@ -18,6 +18,7 @@ my %results = (
         date_ddmmyy                 => '06-07-10',
         date_ddmmyyyy               => '06-07-2010',
         date_ddmmmyyyy              => '6-Jul-2010',
+        date_ddmonthyyyy            => '6 July 2010',
         date_yyyymmdd               => '2010-07-06',
         day_as_string               => 'Tue',
         db_timestamp                => '2010-07-06 02:14:46',
@@ -27,6 +28,7 @@ my %results = (
         is_a_weekend                => 0,
         iso8601                     => '2010-07-06T02:14:46Z',
         month_as_string             => 'Jul',
+        full_month_name             => 'July',
         timezone_offset             => '-4h',
         http_expires_format         => 'Tue, 06 Jul 2010 02:14:46 GMT',
         time                        => '02h14',
@@ -59,6 +61,7 @@ my %results = (
         date_ddmmyy                 => '02-01-99',
         date_ddmmyyyy               => '02-01-1999',
         date_ddmmmyyyy              => '2-Jan-1999',
+        date_ddmonthyyyy            => '2 January 1999',
         date_yyyymmdd               => '1999-01-02',
         day_as_string               => 'Sat',
         db_timestamp                => '1999-01-02 23:59:00',
@@ -68,6 +71,7 @@ my %results = (
         is_dst_in_zone              => 0,
         iso8601                     => '1999-01-02T23:59:00Z',
         month_as_string             => 'Jan',
+        full_month_name             => 'January',
         http_expires_format         => 'Sat, 02 Jan 1999 23:59:00 GMT',
         time                        => '23h59',
         time_hhmm                   => '23:59',
@@ -100,6 +104,7 @@ my %results = (
         date_ddmmyy                 => '17-07-11',
         date_ddmmyyyy               => '17-07-2011',
         date_ddmmmyyyy              => '17-Jul-2011',
+        date_ddmonthyyyy            => '17 July 2011',
         date_yyyymmdd               => '2011-07-17',
         day_as_string               => 'Sun',
         db_timestamp                => '2011-07-17 12:34:56',
@@ -109,6 +114,7 @@ my %results = (
         is_dst_in_zone              => 1,
         iso8601                     => '2011-07-17T12:34:56Z',
         month_as_string             => 'Jul',
+        full_month_name             => 'July',
         http_expires_format         => 'Sun, 17 Jul 2011 12:34:56 GMT',
         time                        => '12h34',
         time_hhmm                   => '12:34',
@@ -280,7 +286,7 @@ sub comparisons {
 
     isa_ok($date_obj, 'Date::Utility', 'Object creation for ' . $which);
     foreach my $attr (
-        qw(epoch datetime datetime_ddmmmyy_hhmmss_TZ datetime_yyyymmdd_hhmmss datetime_iso8601 datetime_yyyymmdd_hhmmss_TZ date date_ddmmyy date_ddmmyyyy date_ddmmmyyyy date_yyyymmdd day_as_string db_timestamp full_day_name is_a_weekday is_a_weekend iso8601 month_as_string http_expires_format time time_hhmm time_hhmmss time_cutoff timezone quarter_of_year second minute hour day_of_month month year year_in_two_digit day_of_week day_of_year days_since_epoch seconds_after_midnight days_in_month is_dst_in_zone timezone_offset)
+        qw(epoch datetime datetime_ddmmmyy_hhmmss_TZ datetime_yyyymmdd_hhmmss datetime_iso8601 datetime_yyyymmdd_hhmmss_TZ date date_ddmmyy date_ddmmyyyy date_ddmmmyyyy date_ddmonthyyyy date_yyyymmdd day_as_string db_timestamp full_day_name is_a_weekday is_a_weekend iso8601 month_as_string full_month_name http_expires_format time time_hhmm time_hhmmss time_cutoff timezone quarter_of_year second minute hour day_of_month month year year_in_two_digit day_of_week day_of_year days_since_epoch seconds_after_midnight days_in_month is_dst_in_zone timezone_offset)
         )
     {
         if ($attr eq 'timezone_offset') {

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.525';
+our $VERSION = '0.526';
 
 use 5.020;
 use Moo;
@@ -18,7 +18,7 @@ use Mojo::URL;
 use Carp 'croak';
 use List::Util 1.29 'pairs';
 use Ref::Util 0.100 'is_plain_hashref';
-use Safe::Isa;
+use Safe::Isa 1.000008;
 use MooX::TypeTiny;
 use MooX::HandlesVia;
 use Types::Standard qw(InstanceOf HashRef Str Dict ArrayRef Enum ClassName Undef slurpy);
@@ -183,6 +183,8 @@ sub traverse ($self, $evaluator) {
     }
   );
 
+  return $state if $state->{errors}->@*;
+
   # we don't store the metaschema_uri in $state nor in resource_index, but we can figure it out
   # easily enough.
   my $metaschema_uri = (is_plain_hashref($self->schema) ? $self->schema->{'$schema'} : undef)
@@ -215,7 +217,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.525
+version 0.526
 
 =head1 SYNOPSIS
 

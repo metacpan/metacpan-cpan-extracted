@@ -1,10 +1,11 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
 use aliased "Google::RestApi::SheetsApi4::Request";
+
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet";
 
 sub worksheet_id { LOGDIE "Pure virtual function 'worksheet_id' must be overridden"; }

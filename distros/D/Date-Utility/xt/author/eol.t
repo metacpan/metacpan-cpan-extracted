@@ -15,6 +15,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/attributes.t',
     't/constructor.t',
+    't/is_dst.t',
     't/mocktime.t',
     't/object_methods.t',
     't/perlcritic.t',

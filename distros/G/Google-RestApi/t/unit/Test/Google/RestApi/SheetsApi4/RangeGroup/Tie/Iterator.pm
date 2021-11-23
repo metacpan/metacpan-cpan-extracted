@@ -2,11 +2,9 @@ package Test::Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
 
 use Test::Unit::Setup;
 
-use parent qw(Test::Unit::TestBase);
-
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator';
 
-sub class { Iterator; }
+use parent qw(Test::Unit::TestBase);
 
 sub setup : Tests(setup) {
   my $self = shift;
@@ -16,6 +14,7 @@ sub setup : Tests(setup) {
   $self->_fake_http_no_retries();
 
   $self->_uri_responses(qw(
+    get_spreadsheet_named_ranges
     get_worksheet_properties_title_sheetid
     get_worksheet_values_cell
     get_worksheet_values_row
@@ -25,13 +24,20 @@ sub setup : Tests(setup) {
   return;
 }
 
-sub tie_range : Tests(14) {
+sub interate : Tests(14) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
 
-  my $ws0 = fake_config_worksheet();
-  my $cols = $ws0->tie_cols();
+  my $ws0 = fake_worksheet();
+  $ws0->enable_header_row();
+
+  my %ties = (
+    id      => 'B',
+    name    => [ 3 ],
+    address => { col => 4 },
+  );
+  my $cols = $ws0->tie_cols(%ties);
 
   isa_ok my $iterator = tied(%$cols)->iterator(from => 1), Iterator, "Tie iterator creation";
 

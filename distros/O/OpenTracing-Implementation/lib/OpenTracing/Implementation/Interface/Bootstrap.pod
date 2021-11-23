@@ -22,8 +22,7 @@ OpenTracing::Implementation::Interface::Bootstrap - Ensure we do the right thing
     
     BEGIN {
         use Role::Tiny::With;
-        with 'OpenTracing::Implementation::Interface::Bootstrap'
-            if $ENV{OPENTRACING_INTERFACE}
+        with 'OpenTracing::Implementation::Interface::Bootstrap';
     } # check at compile time, perl -c will work
     
     1;

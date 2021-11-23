@@ -19,7 +19,7 @@ require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(updatedir);
-$VERSION = "2.12";
+$VERSION = "2.13";
 $VERSION =~ s/_//;
 $CAUTION ||= 0;
 $TRY_SHORTNAME ||= 0;
@@ -40,16 +40,17 @@ use Data::Compare ();
 use Digest::SHA ();
 
 sub _dir_to_dref {
-  my($dirname,$old_dref) = @_;
+  my($dirname,$old_dref,$root) = @_;
+  my $cpan_path = File::Spec->abs2rel( $dirname, $root ) ;
   my($dref) = {};
   my($dh)= DirHandle->new;
   my($fh) = new IO::File;
   $dh->open($dirname) or die "Couldn't opendir $dirname\: $!";
   my(%shortnameseen);
  DIRENT: for my $de ($dh->read) {
-    next if $de =~ /^\./;
-    next if substr($de,0,9) eq "CHECKSUMS";
-    next if $IGNORE_MATCH && $de =~ $IGNORE_MATCH;
+    next DIRENT if $de =~ /^\./;
+    next DIRENT if substr($de,0,9) eq "CHECKSUMS";
+    next DIRENT if $IGNORE_MATCH && $de =~ $IGNORE_MATCH;
 
     my $abs = File::Spec->catfile($dirname,$de);
 
@@ -131,8 +132,8 @@ sub _dir_to_dref {
         $can_reuse_old_md5 = 0;
       }
       if ( $can_reuse_old_md5 ) {
-        for my $param (qw(md5 md5-ungz md5-unbz2)) {
-          next unless exists $old_dref->{$de}{$param};
+      MD5KEY: for my $param (qw(md5 md5-ungz md5-unbz2)) {
+          next MD5KEY unless exists $old_dref->{$de}{$param};
           $dref->{$de}{$param} = $old_dref->{$de}{$param};
         }
       } else {
@@ -140,6 +141,8 @@ sub _dir_to_dref {
       }
 
     } # ! -d
+    $dref->{$de}{cpan_path} = $cpan_path;
+
   }
   $dh->close;
   $dref;
@@ -162,12 +165,12 @@ sub _read_old_ddump {
   return($old_ddump,$is_signed);
 }
 
-sub updatedir ($) {
-  my($dirname) = @_;
+sub updatedir ($;$) {
+  my($dirname, $root) = @_;
   my $ckfn = File::Spec->catfile($dirname, "CHECKSUMS"); # checksum-file-name
   my($old_ddump,$is_signed) = _read_old_ddump($ckfn);
   my($old_dref) = makehashref($old_ddump);
-  my $dref = _dir_to_dref($dirname,$old_dref);
+  my $dref = _dir_to_dref($dirname,$old_dref,$root);
   local $Data::Dumper::Indent = 1;
   local $Data::Dumper::Quotekeys = 1;
   local $Data::Dumper::Sortkeys = 1;
@@ -326,7 +329,7 @@ CPAN::Checksums - Write a C<CHECKSUMS> file for a directory as on CPAN
 =head1 SYNOPSIS
 
   use CPAN::Checksums qw(updatedir);
-  my $success = updatedir($directory);
+  my $success = updatedir($directory, $root);
 
 =head1 INCOMPATIBILITY ALERT
 
@@ -340,13 +343,15 @@ $TRY_SHORTNAME to a true value.
 
 =over 2
 
-=item $success = updatedir($dir)
+=item $success = updatedir($dir[, $root])
 
-C<updatedir()> takes a directory name as argument and writes a typical
-C<CHECKSUMS> file in that directory as used on CPAN unless a previously
-written C<CHECKSUMS> file is there that is still valid. Returns 2 if a
-new C<CHECKSUMS> file has been written, 1 if a valid C<CHECKSUMS> file is
-already there, otherwise dies.
+$dir is a directory. Updatedir() writes a C<CHECKSUMS> file into that
+directory, unless a previously written C<CHECKSUMS> file is there that
+is still valid. Returns 2 if a new C<CHECKSUMS> file has been written,
+1 if a valid C<CHECKSUMS> file is already there, otherwise dies.
+
+If $root is given, the hash entry with the key C<cpan_path> is
+relative to this root directory.
 
 Note: since version 2.0 updatedir on empty directories behaves just
 the same. In older versions it silently did nothing.

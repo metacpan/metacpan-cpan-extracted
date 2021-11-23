@@ -2,10 +2,10 @@ package Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Rang
 
 use Test::Unit::Setup;
 
-use parent 'Test::Unit::TestBase';
-
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range' => 'Request::Range';
+
+use parent 'Test::Unit::TestBase';
 
 my $index = {
   sheetId          => 'Sheet1',
@@ -14,8 +14,6 @@ my $index = {
   endColumnIndex   => 1,
   endRowIndex      => 1,
 };
-
-sub class { Request::Range; }
 
 sub setup : Tests(setup) {
   my $self = shift;
@@ -462,7 +460,7 @@ sub range_merge : Tests(6) {
 
 sub _new_range {
   my $self = shift;
-  return Range->new(worksheet => fake_worksheet(), range => shift);
+  return Google::RestApi::SheetsApi4::Range::factory(worksheet => fake_worksheet(), range => shift);
 }
 
 sub _add_field {

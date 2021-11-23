@@ -5,14 +5,13 @@ package Google::RestApi::SheetsApi4::RangeGroup;
 # called are commented thusly:
 # "private range routine called here!"
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
-use Carp qw(cluck confess);
-use List::Util qw(first);
-use Scalar::Util qw(looks_like_number);
-use Storable qw(dclone);
+use List::Util qw( first );
+use Scalar::Util ();
+use Storable qw( dclone );
 
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Iterator';
 
@@ -20,8 +19,8 @@ sub new {
   my $class = shift;
 
   state $check = compile_named(
-    spreadsheet => HasMethods[qw(api)],
-    ranges      => ArrayRef[HasMethods['range']], { default => [] },
+    spreadsheet => HasApi,
+    ranges      => ArrayRef[HasRange], { default => [] },
   );
 
   return bless $check->(@_), $class;
@@ -29,7 +28,7 @@ sub new {
 
 sub push_ranges {
   my $self = shift;
-  state $check = compile(slurpy ArrayRef[HasMethods['range']]);
+  state $check = compile(slurpy ArrayRef[HasRange]);
   my ($ranges) = $check->(@_);
   push(@{ $self->{ranges} }, @$ranges);
   return;

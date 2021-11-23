@@ -4,11 +4,13 @@ use Test::Most tests => 15;
 
 use aliased "Google::RestApi::SheetsApi4";
 
+# use Carp::Always;
 # init_logger($DEBUG);
 
+delete_all_spreadsheets(sheets_api());
+
 my $name = spreadsheet_name();
-my $sheets_api = sheets_api();
-my $spreadsheet = $sheets_api->create_spreadsheet(title => $name);
+my $spreadsheet = sheets_api()->create_spreadsheet(title => $name);
 
 my ($id, $uri);
 my $qr_id = SheetsApi4->Spreadsheet_Id;
@@ -53,4 +55,4 @@ is $worksheets->[0]->{title}, 'Sheet1', "First worksheet title should be 'Sheet1
 
 is $spreadsheet->delete_spreadsheet(), 1, "Deleting spreadsheet should return 1";
 
-$sheets_api->delete_all_spreadsheets($name);
+delete_all_spreadsheets(sheets_api());

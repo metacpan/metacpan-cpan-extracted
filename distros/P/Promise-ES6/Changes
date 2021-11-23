@@ -1,5 +1,9 @@
 Revision history for Perl module Promise::ES6
 
+0.25 Tue 23 Nov 2021
+- Make async/await tests require a suitably modern F::AA.
+- Ignore warnings from F::AA in t/async_await_additional.t.
+
 0.24 Fri 16 Jul 2021
 - Added EXPERIMENTAL async/await support via Future::AsyncAwait.
 - Fix tests under Devel::Cover.

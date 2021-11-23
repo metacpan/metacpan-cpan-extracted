@@ -20,19 +20,27 @@ our @EXPORT_OK = qw(
   init_logger
   $OFF $FATAL $WARN $ERROR $INFO $DEBUG $TRACE
   debug_on debug_off
-  is_array is_hash is_valid_n is_valid
+  is_array is_hash is_valid_n is_valid is_not_valid is_deeply_tied
 );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
-# if you want your own logger, specify the logger config file in GOOGLE_RESTAPI_LOGGER env var.
-# else logger will be turned off.
+# if you pass a logger level, it will be used with easy_init and ignore GOOGLE_RESTAPI_LOGGER.
+# if you want your own logger, specify the logger config file in GOOGLE_RESTAPI_LOGGER env var
+# and pass nothing to this routine. if no level and no env var set, default to deug level.
+# levels are: $OFF $FATAL $WARN $ERROR $INFO $DEBUG $TRACE. all these log4perl scalars
+# scalars are expored above.
 sub init_logger {
+  my $level = shift;
   my $logger_conf = $ENV{GOOGLE_RESTAPI_LOGGER};
-  if ($logger_conf) {
+
+  if ($level) {
+    Log::Log4perl->easy_init($level);
+  } elsif ($logger_conf) {
     Log::Log4perl->init($logger_conf);
   } else {
-    Log::Log4perl->easy_init(shift || $OFF);
+    Log::Log4perl->easy_init($DEBUG);
   }
+
   return;
 }
 
@@ -47,7 +55,7 @@ sub log_file_name {
   make_path($logdir);
 
   my $logpath = File::Spec->catfile($logdir, $logfile);
-  # warn "File logging will be sent to $logpath\n";
+  warn "File logging will be sent to $logpath\n";
   return $logpath;
 }
 
@@ -77,15 +85,33 @@ sub is_valid {
   $test_name = pop if !ref($_[-1]);
   $test_name .= ' passes validation' if $test_name;
 
-  my ($array, @validation) = @_;
+  my ($values, @validation) = @_;
 
+  my @result;
   try {
-    $array = $array->() if ref($array) eq 'CODE';
-    validate([$array], @validation);
+    $values = $values->() if ref($values) eq 'CODE';
+    @result = validate([$values], @validation);
     pass $test_name;
   } catch {
     my $err = $_;
     fail "$test_name: $err";
+  };
+  return @result;
+}
+
+sub is_not_valid {
+  my $test_name = '';
+  $test_name = pop if !ref($_[-1]);
+  $test_name .= ' does not pass validation' if $test_name;
+
+  my ($values, @validation) = @_;
+
+  try {
+    $values = $values->() if ref($values) eq 'CODE';
+    validate([$values], @validation);
+    fail $test_name;
+  } catch {
+    pass $test_name;
   };
   return;
 }
@@ -106,6 +132,13 @@ sub is_valid_n {
     fail "$test_name: $err";
   };
   return;
+}
+
+sub is_deeply_tied {
+  my ($got, $expected, $title) = @_;
+  my %got;
+  @got{ keys %$got } = values %$got;
+  return is_deeply \%got, $expected, $title;
 }
 
 1;

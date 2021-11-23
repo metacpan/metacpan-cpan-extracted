@@ -30,6 +30,7 @@
       "runtime" : {
          "requires" : {
             "Clipboard::Any" : "0",
+            "Data::Sah::Compiler::perl::TH::str" : "0.907",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.152",
             "Perinci::CmdLine::Lite" : "1.905"
@@ -56,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-App-ClipboardUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

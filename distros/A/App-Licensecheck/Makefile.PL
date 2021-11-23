@@ -64,7 +64,7 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.2.13" },
+                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.2.14" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -79,9 +79,9 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.2.13",
+  "version"            => "v3.2.14",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
-  "x_help_wanted"      => ["documenter", "tester"],
+  "x_help_wanted"      => ["tester", "documenter"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },
 };
 

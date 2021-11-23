@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.525';
+our $VERSION = '0.526';
 
 use 5.020;
 use strictures 2;
@@ -242,6 +242,7 @@ sub A ($state, $annotation) {
     keyword_location => $keyword_location,
     defined $uri ? ( absolute_keyword_location => $uri ) : (),
     annotation => $annotation,
+    $state->{unknown} ? ( unknown => 1 ) : (),
   );
 
   return 1;
@@ -345,7 +346,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.525
+version 0.526
 
 =head1 SYNOPSIS
 

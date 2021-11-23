@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Iterator;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
@@ -10,6 +10,7 @@ sub new {
   my $class = shift;
   state $check = compile_named(
     range_group => HasMethods[qw(ranges)],
+    dim         => StrMatch[qr/^(col|row)$/], { default => 'row' },
     by          => PositiveInt, { default => 1 },
     from        => PositiveOrZeroInt, { optional => 1 },
     to          => PositiveOrZeroInt, { optional => 1 },
@@ -25,13 +26,13 @@ sub iterate {
   return if defined $self->{to} && $self->{current} + 1 > $self->{to};
 
   my @ranges = map {
-    $_->cell($self->{current});
+    $_->cell_at_offset($self->{current}, $self->{dim});
   } $self->range_group()->ranges();
-  my $range_group = $self->spreadsheet()->range_group(@ranges);
+  return if grep { undef; } @ranges;
 
-  $self->{current} += $self->{by} if $range_group;
+  $self->{current} += $self->{by};
 
-  return $range_group;
+  return $self->spreadsheet()->range_group(@ranges);
 }
 sub next { iterate(@_); }
 
@@ -52,7 +53,7 @@ A RangeGroup::Iterator is used to iterate through a range group, returning
 a range group of cells, one group at a time.
 
 Iterating over a range group assumes the range group is made up of
-a series of ranges that implement a 'cell' subroutine. This 'cell'
+a series of ranges that implement a 'cell_at_offset' subroutine. This
 routine is called on each iteration to return a Cell object that
 represents that iteration at a particular offset. The offset increases
 for each iteration.

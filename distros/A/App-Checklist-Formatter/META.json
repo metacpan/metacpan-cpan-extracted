@@ -1,0 +1,54 @@
+{
+   "abstract" : "Format checklists",
+   "author" : [
+      "Mathias Weidner <mamawe@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Checklist-Formatter",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Probe::Perl" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "v5.6.0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Checklist::Formatter" : {
+         "file" : "lib/App/Checklist/Formatter.pm",
+         "version" : "v0.0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/matwei-perl/App-Checklist-Formatter"
+      }
+   },
+   "version" : "v0.0.6",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

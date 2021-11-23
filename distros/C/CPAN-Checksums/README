@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
       use CPAN::Checksums qw(updatedir);
-      my $success = updatedir($directory);
+      my $success = updatedir($directory, $root);
 
 INCOMPATIBILITY ALERT
     Since version 1.0 the generation of the attribute "shortname" is turned
@@ -13,12 +13,14 @@ INCOMPATIBILITY ALERT
     true value.
 
 DESCRIPTION
-    $success = updatedir($dir)
-      "updatedir()" takes a directory name as argument and writes a typical
-      "CHECKSUMS" file in that directory as used on CPAN unless a previously
-      written "CHECKSUMS" file is there that is still valid. Returns 2 if a
-      new "CHECKSUMS" file has been written, 1 if a valid "CHECKSUMS" file
-      is already there, otherwise dies.
+    $success = updatedir($dir[, $root])
+      $dir is a directory. Updatedir() writes a "CHECKSUMS" file into that
+      directory, unless a previously written "CHECKSUMS" file is there that
+      is still valid. Returns 2 if a new "CHECKSUMS" file has been written,
+      1 if a valid "CHECKSUMS" file is already there, otherwise dies.
+
+      If $root is given, the hash entry with the key "cpan_path" is relative
+      to this root directory.
 
       Note: since version 2.0 updatedir on empty directories behaves just
       the same. In older versions it silently did nothing.

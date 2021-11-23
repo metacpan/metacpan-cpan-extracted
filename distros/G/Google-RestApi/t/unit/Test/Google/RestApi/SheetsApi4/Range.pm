@@ -2,257 +2,246 @@ package Test::Google::RestApi::SheetsApi4::Range;
 
 use Test::Unit::Setup;
 
+use Google::RestApi::Types qw( :all );
+use Google::RestApi::Utils qw( :all );
+
 use aliased 'Google::RestApi::SheetsApi4::Range';
+use aliased 'Google::RestApi::SheetsApi4::Range::Col';
+use aliased 'Google::RestApi::SheetsApi4::Range::Row';
+use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 
 use parent qw(Test::Google::RestApi::SheetsApi4::Range::Base);
 
 my $sheet = "'Sheet1'";
-my $sheet_config = "'Customer Addresses'";
-
-sub class { Range; }
 
 sub _constructor : Tests(2) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
 
-  my $class = class();
-  my $range = $class->new(
+  my $range = Google::RestApi::SheetsApi4::Range::factory(
     worksheet => fake_worksheet,
-    range     => 'A1',
+    range     => 'A1:B2',
   );
-  isa_ok $range, $class, 'Constructor returns';
+  isa_ok $range, Range, 'Constructor returns';
   can_ok $range, 'range';
+
   return;
 }
 
-sub range : Tests(6) {
+# we don't want to recreate the 'types' tests here, just want to
+# ensure that the factory object returns all the right objects.
+sub factory : Tests(23) {
+  my $self = shift;
+  
+  $self->_fake_http_response_by_uri();
+
+  my $range = fake_worksheet()->range_factory('A1:B2');
+  is $range->range(), "$sheet!A1:B2", "A1:B2 returns A1:B2";
+  isa_ok $range, Range, "A1:B2 returns a Range object";
+
+  
+  $range = fake_worksheet()->range_factory('A:A');
+  is $range->range(), "$sheet!A:A", "A:A returns A:A";
+  isa_ok $range, Col, "A:A returns a Col object";
+
+  $range = fake_worksheet()->range_factory('A1:A');
+  is $range->range(), "$sheet!A1:A", "A1:A returns A1:A";
+  isa_ok $range, Col, "A1:A returns a Col object";
+
+  $range = fake_worksheet()->range_factory('A:A2');
+  is $range->range(), "$sheet!A:A2", "A:A2 returns A:A2";
+  isa_ok $range, Col, "A:A2 returns a Col object";
+
+  $range = fake_worksheet()->range_factory('A');
+  is $range->range(), "$sheet!A:A", "A returns A:A";
+  isa_ok $range, Col, "A returns a Col object";
+
+  
+  $range = fake_worksheet()->range_factory('1:1');
+  is $range->range(), "$sheet!1:1", "1:1 returns 1:1";
+  isa_ok $range, Row, "1:1 returns a Row object";
+
+  $range = fake_worksheet()->range_factory('A1:1');
+  is $range->range(), "$sheet!A1:1", "A1:1 returns A1:1";
+  isa_ok $range, Row, "A1:1 returns a Row object";
+
+  $range = fake_worksheet()->range_factory('1:B1');
+  is $range->range(), "$sheet!1:B1", "1:B1 returns 1:B1";
+  isa_ok $range, Row, "1:B1 returns a Row object";
+
+  $range = fake_worksheet()->range_factory('1');
+  is $range->range(), "$sheet!1:1", "1 returns 1:1";
+  isa_ok $range, Row, "1 returns a Row object";
+
+
+  $range = fake_worksheet()->range_factory('A1');
+  is $range->range(), "$sheet!A1", "A1 returns A1";
+  isa_ok $range, Cell, "A1 returns a Cell object";
+
+  $range = fake_worksheet()->range_factory("George");
+  is $range->named(), 'George', "George should be a named range";
+  isa_ok $range, Col, "Named range";
+
+  $range = fake_worksheet()->range_factory("A1");
+  is $range->named(), undef, "A1 should not be a named range";
+
+  return;
+}
+
+sub clear {
+}
+
+sub values {
+}
+
+sub values_response_from_api {
+}
+
+sub batch_values {
+}
+
+sub append {
+}
+
+sub range : Tests(2) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
 
-  my $x = "A1:B2";
-
-  my $range;
-  isa_ok $range = $self->_new_range($x), Range, "New range '$x'";
-  is $range->range(), "$sheet!$x", "A1:B2 should be $x";
-
-  $range = $self->_new_range([[1,1], [2,2]]);
-  is $range->range(), "$sheet!$x", "[[1,1], [2,2]] should be $x";
-
-  $range = $self->_new_range([['A',1], ['B',2]]);
-  is $range->range(), "$sheet!$x", "[[A,1], [B,2]] should be $x";
-
-  $range = $self->_new_range([{row => 1, col => 1}, {row => 2, col => 2}]);
-  is $range->range(), "$sheet!$x", "[{row => 1, col => 1}, {row => 2, col => 2}] should be $x";
-
-  $range = $self->_new_range([{row => 1, col => 'A'}, {row => 2, col =>'B'}]);
-  is $range->range(), "$sheet!$x", "[{row => 1, col => A}, {row => 2, col => B}] should be $x";
+  isa_ok my $range = _new_range('A1:B2'), Range, "New range 'A1:B2'";
+  is $range->range(), "$sheet!A1:B2", "A1:B2 should be '$sheet!A1:B2'";
 
   return;
 }
 
-sub range_col : Tests(27) {
-  my $self = shift;
-
-  my $col = $self->class()->can('is_colA1');
-
-  is $col->("A"), 1, "Range A should be a col";
-  is $col->("A:A"), 1, "Range A:A should be a col";
-  is $col->("A1:A"), 1, "Range A1:A should be a col";
-  is $col->("A1:A2"), 1, "Range A1:A2 should be a col";
-
-  is $col->("$sheet!A"), 1, "Range $sheet!A should be a col";
-  is $col->("$sheet!A:A"), 1, "Range $sheet!A:A should be a col";
-  is $col->("$sheet!A1:A"), 1, "Range $sheet!A1:A should be a col";
-  is $col->("$sheet!A1:A2"), 1, "Range $sheet!A1:A2 should be a col";
-
-  is $col->("'$sheet'!A"), 1, "Range '$sheet'!A should be a col";
-  is $col->("'$sheet'!A:A"), 1, "Range '$sheet'!A:A should be a col";
-  is $col->("'$sheet'!A1:A"), 1, "Range '$sheet'!A1:A should be a col";
-  is $col->("'$sheet'!A1:A2"), 1, "Range '$sheet'!A1:A2 should be a col";
-  is $col->("'$sheet'!A5:A"), 1, "Range '$sheet'!A5:A should be a col";
-
-  is $col->("AZ"), 1, "Range AZ should be a col";
-  is $col->("AZ:AZ"), 1, "Range AZ:AZ should be a col";
-  is $col->("AZ1:AZ"), 1, "Range AZ1:AZ should be a col";
-  is $col->("AZ1:AZ2"), 1, "Range AZ1:AZ2 should be a col";
-
-  is $col->("AA:AZ"), undef, "Range AA:AZ should not be a col";
-  is $col->("AA1:AZ"), undef, "Range AA1:AZ should not be a col";
-  is $col->("AA1:AZ2"), undef, "Range AA1:AZ2 should not be a col";
-
-  is $col->("1"), undef, "Range 1 should not be a col";
-  is $col->("1:1"), undef, "Range 1:1 should not be a col";
-  is $col->("A1:1"), undef, "Range A1:1 should not be a col";
-  is $col->("A1"), undef, "Range A1 should not be a col";
-  is $col->("A1:B2"), undef, "Range A1:B2 should not be a col";
-
-  is $col->([[1, 1]]), undef, "Range [[1, 1]] should not be a col";
-  is $col->({ col => 1, row => 1 }), undef, "Range { col => 1, row => 1 } should not be a col";
-
-  return;
+sub range_to_array {
 }
 
-sub range_row : Tests(27) {
-  my $self = shift;
-
-  my $row = $self->class()->can('is_rowA1');
-
-  is $row->("1"), 1, "Range 1 should be a row";
-  is $row->("1:1"), 1, "Range 1:1 should be a row";
-  is $row->("1:A1"), 1, "Range 1:A1 should be a row";
-  is $row->("A1:B1"), 1, "Range A1:B1 should be a row";
-
-  is $row->("$sheet!1"), 1, "Range $sheet!1 should be a row";
-  is $row->("$sheet!1:1"), 1, "Range $sheet!1:1 should be a row";
-  is $row->("$sheet!1:A1"), 1, "Range $sheet!1:A1 should be a row";
-  is $row->("$sheet!A1:B1"), 1, "Range $sheet!A1:B1 should be a row";
-
-  is $row->("'$sheet'!1"), 1, "Range '$sheet'!1 should be a row";
-  is $row->("'$sheet'!1:1"), 1, "Range '$sheet'!1:1 should be a row";
-  is $row->("'$sheet'!A1:1"), 1, "Range '$sheet'!A1:1 should be a row";
-  is $row->("'$sheet'!A1:B1"), 1, "Range '$sheet'!A1:B1 should be a row";
-  is $row->("'$sheet'!D1:1"), 1, "Range '$sheet'!D1:1 should be a row";
-
-  is $row->("11"), 1, "Range 11 should be a row";
-  is $row->("11:Z11"), 1, "Range 11:Z11 should be a row";
-  is $row->("Z11:11"), 1, "Range Z11:11 should be a row";
-  is $row->("A11:Z11"), 1, "Range A11:Z11 should be a row";
-
-  is $row->("11:12"), undef, "Range 11:12 should not be a row";
-  is $row->("A11:A12"), undef, "Range A11:A12 should not be a row";
-  is $row->("A11:AZ12"), undef, "Range A11:AZ12 should not be a row";
-
-  is $row->("A"), undef, "Range A should not be a row";
-  is $row->("A:A"), undef, "Range A:A should not be a row";
-  is $row->("A1:A"), undef, "Range A1:A should not be a row";
-  is $row->("A1"), undef, "Range A1 should not be a row";
-  is $row->("A1:B2"), undef, "Range A1:B2 should not be a row";
-
-  is $row->([[1, 1]]), undef, "Range [[1, 1]] should not be a row";
-  is $row->({ col => 1, row => 1 }), undef, "Range { col => 1, row => 1 } should not be a row";
-
-  return;
+sub range_to_hash {
 }
 
-sub range_cell : Tests(14) {
-  my $self = shift;
-
-  my $cell = $self->class()->can('is_cellA1');
-
-  is $cell->("A1"), 1, "Range A1 should be a cell";
-  is $cell->("AZ99"), 1, "Range AZ99 should be a cell";
-  is $cell->("$sheet!AZ99"), 1, "Range $sheet!AZ99 should be a cell";
-  is $cell->("'$sheet'!AZ99"), 1, "Range '$sheet'!AZ99 should be a cell";
-
-  is $cell->("A1:B2"), undef, "Range A1:B2 should not be a cell";
-  is $cell->("A"), undef, "Range A should not be a cell";
-  is $cell->("A:A"), undef, "Range A:A should not be a cell";
-  is $cell->("A1:A"), undef, "Range A1:A should not be a cell";
-
-  is $cell->("1"), undef, "Range 1 should not be a cell";
-  is $cell->("1:1"), undef, "Range 1:1 should not be a cell";
-  is $cell->("1:A1"), undef, "Range 1:A1 should not be a cell";
-  is $cell->("A1:1"), undef, "Range A1:1 should not be a cell";
-
-  is $cell->([[1, 1]]), undef, "Range [[1, 1]] should not be a cell";
-  is $cell->({ col => 1, row => 1 }), undef, "Range { col => 1, row => 1 } should not be a cell";
-
-  return;
+sub range_to_index {
 }
 
-sub range_config : Tests(9) {
+sub range_to_dimension {
+}
+
+sub cell_at_offset : Tests(24) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
 
-  my $x = 'B';
-  my $y = 3;
+  for my $col_row (qw(A:A 1:1)) {
+    my $range = _new_range($col_row);
+    for (qw(col row)) {
+      isa_ok my $cell = $range->cell_at_offset(0, $_), Cell, "Cell from $col_row, dim $_ at offset 0";
+      is $cell->range(), "$sheet!A1", "Cell from $col_row, dim $_ offset 0 should be '$sheet!A1'";
+    }
+  }
 
-  my $range = $self->_new_config_range([['id'],['id']]);
-  is $range->range(), "$sheet_config!$x:$x", "[['id'],['id']] should be $x:$x";
+  my $range = _new_range('A1');
+  for (qw(col row)) {
+    isa_ok my $cell = $range->cell_at_offset(0, $_), Cell, "Cell $_ at offset 0";
+    is $cell->range(), "$sheet!A1", "$_ offset 0 should be '$sheet!A1'";
+    is $range->cell_at_offset(1, $_), undef, "Cell at offset 1 is undef";
+  }
 
-  $range = $self->_new_config_range([['id']]);
-  is $range->range(), "$sheet_config!$x:$x", "[['id']] should be $x:$x";
+  $range = _new_range('A1:B2');
+  for (qw(col row)) {
+    isa_ok my $cell = $range->cell_at_offset(0, $_), Cell, "Cell $_ at offset 0";
+    is $cell->range(), "$sheet!A1", "$_ offset 0 should be '$sheet!A1'";
 
-  $range = $self->_new_config_range(['id']);
-  is $range->range(), "$sheet_config!$x:$x", "['id'] should be $x:$x";
-
-  $range = $self->_new_config_range([['id', 5],['id']]);
-  is $range->range(), "$sheet_config!${x}5:$x", "[['id', 5],['id']] should be ${x}5:$x";
-
-  $range = $self->_new_config_range([[undef, 'george'],[undef, 'george']]);
-  is $range->range(), "$sheet_config!$y:$y", "[[undef, 'george'],[undef, 'george']] should be $y:$y";
-  $range = $self->_new_config_range([[0, 'george'],[0, 'george']]);
-  is $range->range(), "$sheet_config!$y:$y", "[[0, 'george'],[0, 'george']] should be $y:$y";
-  $range = $self->_new_config_range([['', 'george'],['', 'george']]);
-  is $range->range(), "$sheet_config!$y:$y", "[['', 'george'],['', 'george']] should be $y:$y";
-
-  $range = $self->_new_config_range([['id', 'sam'],['address', 'george']]);
-  is $range->range(), "$sheet_config!B2:D3", "[['id', 'sam'],['address', 'george']] should be B2:D3";
-
-  $range = $self->_new_config_range([ {col => 'id', row => 'sam'}, {col => 'address', row => 'george'} ]);
-  is $range->range(), "$sheet_config!B2:D3", "[ {col => 'id', row => 'sam'}, {col => 'address', row => 'george'} ] should be B2:D3";
+    isa_ok $cell = $range->cell_at_offset(3, $_), Cell, "Cell $_ at offset 3";
+    is $cell->range(), "$sheet!B2", "$_ offset 3 should be '$sheet!B2'";
+    
+    is $range->cell_at_offset(4, $_), undef, "Cell at offset 4 is undef";
+  }
 
   return;
 }
 
-sub range_named : Tests(3) {
-  my $self = shift;
+sub offset {
+}
 
+sub offsets {
+}
+
+sub is_other_inside : Tests() {
+  my $self = shift;
+  
   $self->_fake_http_response_by_uri();
 
-  is $self->_new_range("George")->is_named(), 1, "George should be a named range";
-  is $self->_new_range("A1")->is_named(), undef, "A1 should not be a named range";
-  is $self->_new_range("A1:B2")->is_named(), undef, "A1:B2 should not be a named range";
+  my $outside = _new_range('A1:B2');
+  my $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 1 is inside " . flatten_range($outside);
+
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 2 is inside " . flatten_range($outside);
+
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 3 is inside " . flatten_range($outside);
+
+  $inside = _new_range('B2');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 4 is inside " . flatten_range($outside);
+
+  $inside = _new_range('C1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 5 is not inside " . flatten_range($outside);
+
+  $inside = _new_range('B3');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 6 is not inside " . flatten_range($outside);
+  
+  $outside = _new_range('A');
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 7 is inside " . flatten_range($outside);
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 8 is not inside " . flatten_range($outside);
+  
+  $outside = _new_range('A2:A');
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 9 is inside " . flatten_range($outside);
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 10 is not inside " . flatten_range($outside);
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 11 is not inside " . flatten_range($outside);
+
+  $outside = _new_range('A2:A3');
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 9 is inside " . flatten_range($outside);
+  $inside = _new_range('A3');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 9 is inside " . flatten_range($outside);
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 10 is not inside " . flatten_range($outside);
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 11 is not inside " . flatten_range($outside);
+
+  $outside = _new_range('1');
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 12 is inside " . flatten_range($outside);
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 13 is not inside " . flatten_range($outside);
+
+  $outside = _new_range('B1:1');
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 14 is inside " . flatten_range($outside);
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 15 is not inside " . flatten_range($outside);
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 16 is not inside " . flatten_range($outside);
+
+  $outside = _new_range('B1:C1');
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 14 is inside " . flatten_range($outside);
+  $inside = _new_range('C1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 14 is inside " . flatten_range($outside);
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 15 is not inside " . flatten_range($outside);
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 16 is not inside " . flatten_range($outside);
 
   return;
 }
 
-sub range_mixed : Tests(6) {
-  my $self = shift;
-
-  $self->_fake_http_response_by_uri();
-
-  my $range = $self->_new_range(['A1', [2, 2]]);
-  is $range->range(), "$sheet!A1:B2", "[A1, [2, 2]] should be A1:B2";
-
-  $range = $self->_new_range(['A1', {col => 2, row => 2}]);
-  is $range->range(), "$sheet!A1:B2", "[A1, {col => 2, row => 2}] should be A1:B2";
-
-  $range = $self->_new_range([[1, 1], 'B2']);
-  is $range->range(), "$sheet!A1:B2", "[[1, 1], 'B2'] should be A1:B2";
-
-  $range = $self->_new_range([{col => 1, row => 1}, 'B2']);
-  is $range->range(), "$sheet!A1:B2", "[{col => 1, row => 1}, 'B2'] should be A1:B2";
-
-  $range = $self->_new_range([{col => 1, row => 1}, [2, 2]]);
-  is $range->range(), "$sheet!A1:B2", "[{col => 1, row => 1}, [2, 2]] should be A1:B2";
-
-  $range = $self->_new_range([[1, 1], {col => 2, row => 2}]);
-  is $range->range(), "$sheet!A1:B2", "[[1, 1], {col => 2, row => 2}] should be A1:B2";
-
-  return;
-}
-
-sub range_bad : Tests(3) {
-  my $self = shift;
-
-  $self->_fake_http_response_by_uri();
-
-  # should be able to support this but will make the range routine too
-  # unnecessarily complex, and the easy workaround is 'A1:B2'.
-  my $range = $self->_new_range(["A1", "B2"]);
-  throws_ok { $range->range() } $self->{err}, "[A1, B2] should fail";
-
-  $range = $self->_new_range('bad');
-  throws_ok { $range->range() } $self->{err}, "'bad' should fail";
-
-  $range = $self->_new_range(['bad']);
-  throws_ok { $range->range() } $self->{err}, "['bad'] should fail";
-
-  return;
-}
+sub _new_range { fake_worksheet()->range(shift); }
 
 1;

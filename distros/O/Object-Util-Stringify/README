@@ -3,8 +3,8 @@ NAME
     stringification
 
 VERSION
-    This document describes version 0.001 of Object::Util::Stringify (from
-    Perl distribution Object-Util-Stringify), released on 2021-09-28.
+    This document describes version 0.003 of Object::Util::Stringify (from
+    Perl distribution Object-Util-Stringify), released on 2021-11-23.
 
 SYNOPSIS
      use Object::Util::Stringify qw(
@@ -30,6 +30,10 @@ FUNCTIONS
      set_stringify($obj, $str);
 
     Set object stringification to $str.
+
+    Caveats: cloned object currently will not inherit the stringification,
+    serialization currently does not serialize the stringification
+    information.
 
   unset_stringify
     Usage:

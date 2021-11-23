@@ -9,9 +9,9 @@ use Test::More;
 plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'JSON/Color.pm',
-    'JSON/Color/ColorTheme/default_ansi.pm',
-    'JSON/Color/ColorTheme/default_rgb.pm'
+    'ColorTheme/JSON/Color/default_ansi.pm',
+    'ColorTheme/JSON/Color/default_rgb.pm',
+    'JSON/Color.pm'
 );
 
 

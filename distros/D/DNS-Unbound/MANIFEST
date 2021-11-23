@@ -1,3 +1,4 @@
+.github/workflows/cygwin.yml
 .github/workflows/linux.yml
 .github/workflows/macos.yml
 .gitignore
@@ -8,6 +9,7 @@ MANIFEST
 Makefile.PL
 README.md
 Unbound.xs
+cpanfile
 examples/anyevent.pl
 examples/io_async.pl
 lib/DNS/Unbound.pm
@@ -37,6 +39,7 @@ t/convenience.t
 t/debuglevel.t
 t/debugout_badfd.t
 t/debugout_bug.t
+t/debugout_no_fd_leak.t
 t/hosts.t
 t/ioasync.t
 t/load.t
@@ -44,6 +47,7 @@ t/mojo.t
 t/option.t
 t/parallel.t
 t/resolvconf.t
+t/resolve_error.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,4 +1,4 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker::CPANfile;
 
 my $pkgconfig_name = 'libunbound';
 
@@ -275,22 +275,6 @@ WriteMakefile(
     LIBS           => [ $ldflags ],
     LICENSE        => 'perl',
 
-    PREREQ_PM => {
-        'Class::XSAccessor' => 0.10,
-        'Net::DNS'  => 0,
-        'Promise::ES6' => 0.11,
-        'X::Tiny' => 0,
-        'XSLoader' => 0.24,
-    },
-
-    TEST_REQUIRES => {
-        'Test::DescribeMe' => 0,
-        'Test::More'            => 0,
-        'Test::FailWarnings'    => 0,
-        'Test::Exception' => 0,
-        'File::Temp' => 0,
-        'Net::DNS::Nameserver' => 0,
-    },
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources   => {
@@ -302,10 +286,6 @@ WriteMakefile(
                 url  => 'https://github.com/FGasper/p5-DNS-Unbound.git',
                 web  => 'https://github.com/FGasper/p5-DNS-Unbound',
             },
-        },
-
-        recommends => {
-            'ExtUtils::PkgConfig' => 0,
         },
     },
 );

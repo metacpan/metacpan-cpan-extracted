@@ -5,20 +5,23 @@ use Test::Most tests => 21;
 use aliased "Google::RestApi::SheetsApi4::RangeGroup";
 use aliased "Google::RestApi::SheetsApi4::RangeGroup::Iterator";
 
+# use Carp::Always;
 # init_logger($DEBUG);
 
+delete_all_spreadsheets(sheets_api());
+
 my $spreadsheet = spreadsheet();
-my $worksheet = $spreadsheet->open_worksheet(id => 0);
+my $ws0 = $spreadsheet->open_worksheet(id => 0);
 
 my @values = (
   [ 1, 2, 3],
   [ 4, 5, 6],
   [ 7, 8, 9],
 );
-$worksheet->range("A1:C3")->values(values => \@values);
+$ws0->range("A1:C3")->values(values => \@values);
 
-my $col = $worksheet->range_col(1);
-my $row = $worksheet->range_row(1);
+my $col = $ws0->range_col(1);
+my $row = $ws0->range_row(1);
 my $range_group = $spreadsheet->range_group($col, $row);
 
 defaults();
@@ -73,7 +76,7 @@ sub to {
   return;
 }
 
-delete_all_spreadsheets($spreadsheet->sheets_api());
+delete_all_spreadsheets(sheets_api());
 
 # use YAML::Any qw(Dump);
 # warn Dump($spreadsheet->stats());

@@ -7,11 +7,13 @@ use Test::Command::Simple;
 use Software::LicenseUtils;
 use Path::Tiny 0.053;
 
-my @CMD
-	= ( $ENV{'LICENSECHECK'} )
-	|| path('blib')->exists
-	? ('blib/script/licensecheck')
-	: ( $^X, 'bin/licensecheck' );
+my @CMD = ( $^X, 'bin/licensecheck' );
+if ( $ENV{'LICENSECHECK'} ) {
+	@CMD = ( $ENV{'LICENSECHECK'} );
+}
+elsif ( path('blib')->exists ) {
+	@CMD = ('blib/script/licensecheck');
+}
 diag "executable: @CMD";
 
 my %LICENSES = (

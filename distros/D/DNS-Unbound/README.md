@@ -1,6 +1,6 @@
 # NAME
 
-DNS::Unbound - libunbound in Perl
+DNS::Unbound - Query DNS recursively via [libunbound](https://www.nlnetlabs.nl/documentation/unbound/libunbound/)
 
 # SYNOPSIS
 
@@ -39,9 +39,21 @@ You can also integrate with a custom event loop; see ["EVENT LOOPS"](#event-loop
 
 # DESCRIPTION
 
-This library is a Perl interface to the libary component of NLNetLabs’s
-widely-used [Unbound](https://nlnetlabs.nl/projects/unbound/) recursive
-DNS resolver.
+<div>
+    <a href='https://coveralls.io/github/FGasper/p5-DNS-Unbound?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-DNS-Unbound/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
+
+Typical DNS lookups involve a request to a local server that caches
+information from DNS. The caching makes it fast, but it also means
+updates to DNS aren’t always available via that local server right away.
+Most applications don’t need to care and so can enjoy the speed of
+cached results.
+
+Applications that need up-to-date DNS query results, though, need
+_fully-recursive_ DNS queries. NLnet Labs’s
+[libunbound](https://www.nlnetlabs.nl/documentation/unbound/libunbound/)
+is a popular solution for such queries; the present Perl module is an
+interface to that library.
 
 # CHARACTER ENCODING
 
@@ -51,8 +63,8 @@ All returned strings will be byte strings as well.
 
 # EVENT LOOPS
 
-This distribution includes the classes [DNS::Unbound::AnyEvent](https://metacpan.org/pod/DNS::Unbound::AnyEvent),
-[DNS::Unbound::IOAsync](https://metacpan.org/pod/DNS::Unbound::IOAsync), and [DNS::Unbound::Mojo](https://metacpan.org/pod/DNS::Unbound::Mojo), which provide
+This distribution includes the classes [DNS::Unbound::AnyEvent](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AAnyEvent),
+[DNS::Unbound::IOAsync](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AIOAsync), and [DNS::Unbound::Mojo](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AMojo), which provide
 out-of-the-box compatibility with those popular event loop interfaces.
 You should probably use one of these.
 
@@ -66,6 +78,13 @@ Objects in this namespace will, if left alive at global destruction,
 throw a warning about memory leaks. To silence these warnings, either
 allow all queries to complete, or cancel queries you no longer care about.
 
+# CONSTANTS
+
+The following from `libunbound/context.h` are defined here:
+`UB_NOERROR`, `UB_SOCKET`, `UB_NOMEM`, `UB_SYNTAX`, `UB_SERVFAIL`,
+`UB_FORKFAIL`, `UB_AFTERFINAL`, `UB_INITFAIL`, `UB_PIPE`,
+`UB_READFILE`, `UB_NOID`
+
 # METHODS
 
 ## _CLASS_->new()
@@ -78,7 +97,7 @@ Runs a synchronous query for a given $NAME and $TYPE. $TYPE may be
 expressed numerically or, for convenience, as a string. $CLASS is
 optional and defaults to 1 (`IN`), which is probably what you want.
 
-Returns a [DNS::Unbound::Result](https://metacpan.org/pod/DNS::Unbound::Result) instance.
+Returns a [DNS::Unbound::Result](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AResult) instance.
 
 **NOTE:** libunbound doesn’t seem to offer effective controls for
 timing out a synchronous query.
@@ -90,11 +109,11 @@ to use `resolve_async()` instead.
 Like `resolve()` but starts an asynchronous query rather than a
 synchronous one.
 
-This returns an instance of [DNS::Unbound::AsyncQuery](https://metacpan.org/pod/DNS::Unbound::AsyncQuery) (a subclass
+This returns an instance of [DNS::Unbound::AsyncQuery](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AAsyncQuery) (a subclass
 thereof, to be precise).
 
 If you’re using one of the special event interface subclasses
-(e.g., [DNS::Unbound::IOAsync](https://metacpan.org/pod/DNS::Unbound::IOAsync)) then the returned promise will resolve
+(e.g., [DNS::Unbound::IOAsync](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AIOAsync)) then the returned promise will resolve
 on its own. Otherwise, [see below](#custom-event-loop-integration)
 for the methods you’ll need to use in tandem with this one.
 
@@ -210,8 +229,8 @@ functions (but not as class methods). In addition to these,
 [Socket](https://metacpan.org/pod/Socket) provides the `inet_ntoa()` and `inet_ntop()`
 functions for decoding the values of `A` and `AAAA` records.
 
-**NOTE:** Consider parsing [DNS::Unbound::Result](https://metacpan.org/pod/DNS::Unbound::Result)’s `answer_packet()`
-with [Net::DNS::Packet](https://metacpan.org/pod/Net::DNS::Packet) as a more robust, albeit heavier, way to
+**NOTE:** Consider parsing [DNS::Unbound::Result](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AResult)’s `answer_packet()`
+with [Net::DNS::Packet](https://metacpan.org/pod/Net%3A%3ADNS%3A%3APacket) as a more robust, albeit heavier, way to
 parse query result data.
 
 ## $decoded = decode\_name($encoded)
@@ -227,6 +246,11 @@ and expected.
 
 Decodes a list of character-strings into component strings,
 returned as an array reference. Useful for `TXT` query results.
+
+# SEE ALSO
+
+[Net::DNS::Resolver::Recurse](https://metacpan.org/pod/Net%3A%3ADNS%3A%3AResolver%3A%3ARecurse) provides comparable logic to this module
+in pure Perl. Like Unbound, it is maintained by ["NLnet Labs"](#nlnet-labs).
 
 # LICENSE & COPYRIGHT
 

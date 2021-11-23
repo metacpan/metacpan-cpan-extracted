@@ -2,14 +2,14 @@ package Test::Google::RestApi::SheetsApi4;
 
 use Test::Unit::Setup;
 
-use parent 'Test::Unit::TestBase';
+use Google::RestApi::Types qw( :all );
 
 use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
 
-# init_logger();
+use parent 'Test::Unit::TestBase';
 
-sub class { SheetsApi4; }
+# init_logger();
 
 sub setup : Tests(setup) {
   my $self = shift;
@@ -28,14 +28,11 @@ sub setup : Tests(setup) {
   return;
 }
 
-sub _constructor : Tests(3) {
+sub _constructor : Tests(2) {
   my $self = shift;
 
-  my $class = $self->class();
-
-  use_ok $self->class();
-  ok my $spreadsheets = $class->new(api => fake_rest_api()), 'Constructor should succeed';
-  isa_ok $spreadsheets, $class, 'Constructor returns';
+  ok my $spreadsheets = SheetsApi4->new(api => fake_rest_api()), 'Constructor should succeed';
+  isa_ok $spreadsheets, SheetsApi4, 'Constructor returns';
 
   return;
 }
@@ -64,7 +61,7 @@ sub spreadsheets : Tests(1) {
   $self->_fake_http_response_by_uri();
 
   my @spreadsheets = $sheets_api->spreadsheets();
-  my $qr_id = $self->class()->Spreadsheet_Id;
+  my $qr_id = SheetsApi4->Spreadsheet_Id;
   is_valid \@spreadsheets, ArrayRef[Dict[id => StrMatch[qr/$qr_id/], name => Str]], "Spreadsheets return";
   
   return;

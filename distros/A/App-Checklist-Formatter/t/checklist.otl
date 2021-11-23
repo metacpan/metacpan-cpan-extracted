@@ -1,0 +1,9 @@
+; checklist: please change title in checklist.otl
+; author: 	  please change author in checklist.otl
+
+[_] Create template and Makefile
+	: checklist-formatter [--author 'author'] init [title]
+[_] Write checklist
+	: vim checklist.otl
+[_] Generate PDF checklist
+	: make pdf

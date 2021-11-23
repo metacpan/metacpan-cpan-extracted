@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-07-15'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ detect-clipboard-manager - Detect which clipboard manager program is currently r
 
 =head1 VERSION
 
-This document describes version 0.001 of detect-clipboard-manager (from Perl distribution App-ClipboardUtils), released on 2021-07-15.
+This document describes version 0.002 of detect-clipboard-manager (from Perl distribution App-ClipboardUtils), released on 2021-07-15.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,364 @@
+#!/usr/bin/perl -w
+# vim: set ts=4 sw=4 tw=78 et si:
+#
+use strict;
+
+use Carp;
+use Getopt::Long;
+use Pod::Usage;
+
+use version; our $VERSION = qv('v0.0.6');
+
+my %opt = (
+    author   => '',
+    filename => 'checklist.otl',
+    title    => '',
+    imyself  => $0,
+);
+
+my @optiondefs = qw(
+    author=s
+    filename=s
+    help|?
+    man
+    title=s
+    workdir=s
+);
+
+GetOptions(\%opt, @optiondefs);
+
+pod2usage(-exitstatus => 0, -input => \*DATA)                if $opt{help};
+pod2usage(-exitstatus => 0, -input => \*DATA, -verbose => 2) if $opt{man};
+
+my %tmpl = ();
+
+my @list = ();
+my $lastindent = 0;
+my $curr_item;
+my $curr_list = \@list;
+my @last_items = ();
+my @last_lists = ();
+my $indentlevel;
+
+init(\%opt);
+
+my $cmd = shift;
+
+pod2usage(0)   unless $cmd;
+
+if ($cmd =~ /^init(ialize)?$/i) {
+    $opt{title} .= join(' ', @ARGV) || '';
+    create_Makefile(\%opt,\%tmpl);
+    create_template(\%opt,\%tmpl);
+}
+elsif ($cmd =~ /^otl2latex$/i) {
+    read_vim_outliner(\%opt, \%tmpl);
+    output_latex(\%opt, \%tmpl);
+}
+else {
+    pod2usage(1);
+}
+
+exit 0;
+
+#----- only functions from here -----
+sub create_Makefile {
+    my ($opt,$tmpl) = @_;
+    my $MAKEFILE;
+
+    if (open $MAKEFILE, '>', 'Makefile') {
+        my $filename = $opt->{filename};
+        my $makefile = $tmpl->{Makefile};
+
+        $filename =~ s/\.[^.]+$//;              # remove file suffix here
+        $makefile =~ s/%%FILENAME%%/$filename/g;
+        $makefile =~ s/%%IMYSELF%%/$opt->{imyself}/g;
+        print $MAKEFILE $makefile;
+        close $MAKEFILE;
+    }
+    else {
+        die "could not open 'Makefile' for writing: $!";
+    }
+} # create_Makefile()
+
+sub create_template {
+    my ($opt,$tmpl) = @_;
+    my $TEMPLATE;
+    my $filename = $opt->{filename};
+
+    if (open $TEMPLATE, '>', $filename) {
+        my $template = $tmpl->{'checklist.otl'};
+        my $author   = $opt->{author} || "please change author in $filename";
+        my $title    = $opt->{title}  || "please change title in $filename";
+
+        $template =~ s/%%AUTHOR%%/$author/g;
+        $template =~ s/%%TITLE%%/$title/g;
+        print $TEMPLATE $template;
+        close $TEMPLATE;
+    }
+    else {
+        die "could not open template file '$filename' for writing: $!";
+    }
+} # create_template()
+
+sub down {
+    my ($indent,$check,$text) = @_;
+
+    push @last_lists, $curr_list;
+    $curr_list = $curr_item->{sublist} = [];
+    $lastindent = length $indent;
+    next_item($check,$text);
+} # down()
+
+sub next_item {
+    my ($check,$text) = @_;
+
+    $curr_item = { text => $text, check => $check, comment => [], };
+    push @$curr_list, $curr_item;
+    $last_items[$lastindent] = $curr_item;
+
+} # down()
+
+sub up {
+    my ($indent,$check,$text) = @_;
+    
+    $lastindent = length $indent;
+    $curr_list = pop @last_lists;
+    $#last_items = $lastindent;
+    next_item($check,$text);
+} # down()
+
+sub init {
+    my $cfg = shift;
+    # read in templates from after __DATA__
+    while (<DATA>) { last if /^__DATA__/; }
+    while (<DATA>) {
+        my ($key,$val) = split /:/, $_, 2;
+        $tmpl{$key} .= $val;
+    }
+    if (defined $cfg->{workdir} and -d $cfg->{workdir}) {
+        chdir $cfg->{workdir};
+    }
+} # init()
+
+sub item {
+    my ($indent,$check,$text) = @_;
+
+    if (length($indent) > $lastindent) {
+        down($indent,$check,$text);
+    }
+    elsif (length($indent) == $lastindent) {
+        next_item($check,$text);
+    }
+    else {
+        up($indent,$check,$text);
+    }
+} # item()
+
+sub item_comment {
+    my ($indent,$comment) = @_;
+
+    push @{$last_items[length($indent) - 1]->{comment}}, $comment;
+} # item_comment()
+
+sub item_semicolon {
+    my ($opt,$indent,$text) = @_;
+
+    if ($text =~ /^\s*author:(.+)/) {
+        $opt->{author} = $1;
+    }
+    if ($text =~ /^\s*checklist:(.+)/) {
+        $opt->{title} = $1;
+    }
+} # item_semicolon()
+
+sub read_vim_outliner {
+    my ($opt,$tmpl) = @_;
+    my $OTL;
+    my $filename = $opt->{filename};
+
+    if (open $OTL, '<', $filename) {
+        # read in vim outliner
+        while (<$OTL>) {
+            next if /^\s*$/;
+            if (/^(\s*):(.*)$/) {
+                item_comment($1,$2);
+            }
+            elsif (/^(\s*);(.*)$/) {
+                item_semicolon($opt,$1,$2);
+            }
+            elsif (/^(\s*)\[([x_])\]\s(.+)$/i) {
+                item($1,$2,$3);
+            }
+            else {
+                croak("can't process line $.: $_");
+            }
+        }
+        close $OTL;
+    }
+    else {
+        die "can't open '$filename' for reading: $!";
+    }
+} # read_vim_outliner()
+
+sub output_latex {
+    my ($opt,$tmpl) = @_;
+
+    print $tmpl->{header};
+    print '\title{',$opt->{title},"}\n";
+    print '\author{',$opt->{author},"}\n";
+    printf "\\maketitle\n";
+    $indentlevel = 1;
+    output_list(\@list);
+    print $tmpl->{footer};
+} # output()
+
+sub output_list {
+    my ($list) = @_;
+    print $tmpl{listhd};
+    foreach my $item (@$list) {
+        print $tmpl{itemhd};
+        printf "%s\\\\\n", $item->{text};
+        if (@{$item->{comment}}) {
+            print '\framebox{\begin{minipage}[t]{1\columnwidth-';
+            print $indentlevel;
+            print "\\leftmargin}%\n";
+            foreach (@{$item->{comment}}) {
+                printf "%s\n", latexify($_);
+            }
+            print $tmpl{commft};
+        }
+        if ($item->{sublist}) {
+            $indentlevel++;
+            output_list($item->{sublist});
+            $indentlevel--;
+        }
+    }
+    print $tmpl{listft};
+} # output_list()
+
+sub latexify {
+    my $line = shift;
+
+    if ($line =~ /^  /) {   # indented lines get a line break
+        $line .= "\\\\*";
+    }
+    $line =~ s/_/\\_/g;
+    $line =~ s/#/\\#/g;
+
+    return $line;
+} # latexify()
+
+__END__
+
+=head1 NAME
+
+checklist-formatter - convert vimoutline to LaTeX
+
+=head1 SYNOPSIS
+
+  checklist-formatter [options] command [command options]
+
+  options:
+
+   --author 'your name' - use your name as author
+   --filename filename  - use file filename instead of 'checklist.otl'
+   --help               - show a short help text
+   --man                - show the full man page
+   --title 'the title'  - use 'the title' as title of the checklist
+   --workdir directory  - cd to directory before doing anything else
+
+  commands:
+
+    initialize [title of checklist] - create templates for new checklist
+    otl2latex                       - convert vimoutliner to latex
+
+=head1 OPTIONS AND ARGUMENTS
+
+=head2 Options
+
+=head3 --author aname
+
+This name will be preset in the template file.
+
+=head3 --filename fname
+
+This filename will be used instead of 'checklist.otl'.
+
+=head3 --title atitle
+
+Sets 'atitle' as the title to be used. This can be amended by the arguments
+following the C<< initialize >> command.
+
+=head2 Commands
+
+=head3 initialize [the title]
+
+Generates a template for the checklist and a Makefile. Any argument following
+this command will be concatenated and amended to the title.
+
+=head3 otl2latex
+
+The .otl file will be read and a LaTeX file will be generated.
+
+=head1 AUTHOR
+
+Mathias Weidner C<< mamawe@cpan.org >>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2010, Mathias Weidner C<< mamawe@cpan.org >>.
+All rights reserved.
+
+This software is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut
+
+__DATA__
+header:\documentclass[english,ngerman]{scrartcl}
+header:\usepackage[T1]{fontenc}
+header:\usepackage[utf8]{inputenc}
+header:\usepackage{latexsym}
+header:\usepackage{calc}
+header:\AtBeginDocument{
+header:  \def\labelitemi{\Large\(\Box\)}
+header:  \def\labelitemii{\(\Box\)}
+header:  \def\labelitemiii{\Box}
+header:}
+header:\usepackage{babel}
+header:\begin{document}
+title:\title{You forgot the title in the .otl file}
+title:\maketitle
+footer:\end{document}
+listhd:\begin{itemize}
+listft:\end{itemize}
+itemhd:\item %
+commhd:\\
+commhd:\framebox{\begin{minipage}[t]{1\columnwidth}%
+commft:\end{minipage}}
+Makefile:LISTNAME = %%FILENAME%%
+Makefile:CLFORMAT = %%IMYSELF%%
+Makefile:
+Makefile:all:
+Makefile:
+Makefile:pdf: $(LISTNAME).pdf
+Makefile:
+Makefile:%.pdf: %.tex; pdflatex $<
+Makefile:%.tex: %.otl; $(CLFORMAT) --filename=$< otl2latex > $@
+Makefile:
+Makefile:clean:
+Makefile:	rm -f $(LISTNAME).aux $(LISTNAME).log $(LISTNAME).tex
+Makefile:
+Makefile:reallyclean: clean
+Makefile:	rm -f $(LISTNAME).pdf
+checklist.otl:; checklist: %%TITLE%%
+checklist.otl:; author: 	  %%AUTHOR%%
+checklist.otl:
+checklist.otl:[_] Create template and Makefile
+checklist.otl:	: checklist-formatter [--author 'author'] init [title]
+checklist.otl:[_] Write checklist
+checklist.otl:	: vim checklist.otl
+checklist.otl:[_] Generate PDF checklist
+checklist.otl:	: make pdf

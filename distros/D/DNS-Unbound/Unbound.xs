@@ -34,6 +34,7 @@ typedef struct {
     struct ub_ctx* ub_ctx;
     HV* queries;
     unsigned refcount;
+    int debugfd;    /* -1 means no stored debug out */
 } DNS__Unbound__Context;
 
 typedef struct {
@@ -79,6 +80,7 @@ SV* _my_new_blessedstruct_f (pTHX_ unsigned size, const char* classname) {
         .ub_ctx = ubctx,                    \
         .queries = newHV(),                 \
         .refcount = 1,                      \
+        .debugfd = -1,                      \
     }                                       \
 )
 
@@ -94,6 +96,9 @@ static void _decrement_dub_ctx_refcount (pTHX_ DNS__Unbound__Context* dub_ctx) {
         if ((getpid() == dub_ctx->pid) && PL_dirty) {
             warn("Freeing DNS::Unbound context at global destruction; memory leak likely!");
         }
+
+        // We do NOT need to _close_saved_debugfd() here because
+        // Unbound will do that for us.
 
         ub_ctx_delete(dub_ctx->ub_ctx);
         dub_ctx->ub_ctx = NULL;
@@ -272,6 +277,10 @@ void _async_resolve_callback(void* mydata, int err, struct ub_result* result) {
     return;
 }
 
+void _close_saved_debugfd (DNS__Unbound__Context* ctx) {
+        if (-1 != ctx->debugfd) close(ctx->debugfd);
+}
+
 // ----------------------------------------------------------------------
 
 MODULE = DNS::Unbound           PACKAGE = DNS::Unbound
@@ -337,6 +346,8 @@ _ub_ctx_debugout( DNS__Unbound__Context* ctx, int fd, SV *mode_sv )
         char *mode = SvPVbyte_nolen(mode_sv);
         FILE *fstream;
 
+        int fd_to_save = -1;
+
         // Since libunbound does equality checks against stderr,
         // let’s ensure we use that same pointer.
         if (fd == fileno(stderr)) {
@@ -352,6 +363,9 @@ _ub_ctx_debugout( DNS__Unbound__Context* ctx, int fd, SV *mode_sv )
                 croak("Failed to dup(%d): %s", fd, strerror(errno));
             }
 
+            // We opened it, so we need to close it:
+            fd_to_save = dupfd;
+
             // Linux doesn’t care, but MacOS will segfault if you
             // setvbuf() on an append stream opened on a non-append fd.
             fstream = fdopen( dupfd, mode );
@@ -365,7 +379,10 @@ _ub_ctx_debugout( DNS__Unbound__Context* ctx, int fd, SV *mode_sv )
 
         ub_ctx_debugout( ctx->ub_ctx, fstream );
 
+        _close_saved_debugfd(ctx);
 
+        // This will usually be -1:
+        ctx->debugfd = fd_to_save;
 
 SV*
 _ub_ctx_get_option( DNS__Unbound__Context* ctx, SV* opt)

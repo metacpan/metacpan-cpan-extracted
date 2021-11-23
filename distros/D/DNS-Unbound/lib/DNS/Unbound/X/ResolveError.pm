@@ -18,7 +18,8 @@ resolution failure. Its instances contain the following properties:
 
 =over
 
-=item * C<number> - The libunbound error number.
+=item * C<number> - The libunbound error number. Will correspond
+to one of L<DNS::Unbound>’s C<UB_*> constants.
 
 =item * C<string> - libunbound’s string that describes the error.
 

@@ -45,7 +45,7 @@ interface. As the SYNOPSIS above shows, you can thus use patterns from
 JavaScript in Perl with only minimal changes needed to accommodate language
 syntax.
 
-This is a rewrite of an earlier module, [Promise::Tiny](https://metacpan.org/pod/Promise::Tiny). It fixes several
+This is a rewrite of an earlier module, [Promise::Tiny](https://metacpan.org/pod/Promise%3A%3ATiny). It fixes several
 bugs and superfluous dependencies in the original.
 
 # STATUS
@@ -79,11 +79,11 @@ This module considers any object that has a `then()` method to be a promise.
 Note that, in the case of [Future](https://metacpan.org/pod/Future), this will yield a “false-positive”, as
 Future is not compatible with promises.
 
-(See [Promise::ES6::Future](https://metacpan.org/pod/Promise::ES6::Future) for more tools to interact with [Future](https://metacpan.org/pod/Future).)
+(See [Promise::ES6::Future](https://metacpan.org/pod/Promise%3A%3AES6%3A%3AFuture) for more tools to interact with [Future](https://metacpan.org/pod/Future).)
 
 # **EXPERIMENTAL:** ASYNC/AWAIT SUPPORT
 
-This module implements [Future::AsyncAwait::Awaitable](https://metacpan.org/pod/Future::AsyncAwait::Awaitable). This lets you do
+This module implements [Future::AsyncAwait::Awaitable](https://metacpan.org/pod/Future%3A%3AAsyncAwait%3A%3AAwaitable). This lets you do
 nifty stuff like:
 
     use Future::AsyncAwait;
@@ -160,9 +160,9 @@ avoid it, though, is to use asynchronous promises, à la JavaScript.
 
 To do that, first choose one of the following event interfaces:
 
-- [IO::Async](https://metacpan.org/pod/IO::Async)
+- [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync)
 - [AnyEvent](https://metacpan.org/pod/AnyEvent)
-- [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop) (part of [Mojolicious](https://metacpan.org/pod/Mojolicious))
+- [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop) (part of [Mojolicious](https://metacpan.org/pod/Mojolicious))
 
 Then, before you start creating promises, do this:
 
@@ -180,7 +180,7 @@ That’s it! Promise::ES6 instances will now work asynchronously rather than
 synchronously.
 
 Note that this changes Promise::ES6 _globally_. In IO::Async’s case, it
-won’t increase the passed-in [IO::Async::Loop](https://metacpan.org/pod/IO::Async::Loop) instance’s reference count,
+won’t increase the passed-in [IO::Async::Loop](https://metacpan.org/pod/IO%3A%3AAsync%3A%3ALoop) instance’s reference count,
 but if that loop object goes away, Promise::ES6 won’t work until you call
 `use_event()` again.
 
@@ -194,13 +194,13 @@ aborting an in-process operation. If you need this functionality, then, you’ll
 have to implement it yourself. Two ways of doing this are:
 
 - Subclass Promise::ES6 and provide cancellation logic in that
-subclass. See [DNS::Unbound::AsyncQuery](https://metacpan.org/pod/DNS::Unbound::AsyncQuery)’s implementation for an
+subclass. See [DNS::Unbound::AsyncQuery](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AAsyncQuery)’s implementation for an
 example of this.
 - Implement the cancellation on a request object that your
 “promise-creator” also consumes. This is probably the more straightforward
 approach but requires that there
 be some object or ID besides the promise that uniquely identifies the action
-to be canceled. See [Net::Curl::Promiser](https://metacpan.org/pod/Net::Curl::Promiser) for an example of this approach.
+to be canceled. See [Net::Curl::Promiser](https://metacpan.org/pod/Net%3A%3ACurl%3A%3APromiser) for an example of this approach.
 
 You’ll need to decide if it makes more sense for your application to leave
 a canceled query in the “pending” state or to “settle” (i.e., resolve or
@@ -265,7 +265,7 @@ If you’re not sure of what promises are, there are several good
 introductions to the topic. You might start with
 [this one](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
-[Promise::XS](https://metacpan.org/pod/Promise::XS) is my refactor of [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises). It’s a lot like
+[Promise::XS](https://metacpan.org/pod/Promise%3A%3AXS) is my refactor of [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent%3A%3AXSPromises). It’s a lot like
 this library but implemented mostly in XS for speed.
 
 [Promises](https://metacpan.org/pod/Promises) is another pure-Perl Promise implementation.

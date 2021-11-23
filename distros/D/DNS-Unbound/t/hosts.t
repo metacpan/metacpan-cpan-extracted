@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::FailWarnings;
+use Test::Exception;
 
 use File::Temp;
 
@@ -15,7 +16,15 @@ my ($fh, $fpath) = File::Temp::tempfile( CLEANUP => 1 );
 print $fh "127.0.0.1  myhost.local$/";
 close $fh;
 
-my $dns = DNS::Unbound->new()->hosts($fpath);
+my $dns = DNS::Unbound->new();
+
+throws_ok(
+    sub { $dns->hosts('/hahaha/haha/qweqwe' . rand) },
+    qr<file>i,
+    'error when hosts() path doesn’t exist',
+);
+
+$dns->hosts($fpath);
 
 my $result = $dns->resolve( 'myhost.local', 'A' );
 

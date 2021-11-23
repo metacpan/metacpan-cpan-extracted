@@ -8,11 +8,13 @@ use Path::Tiny 0.053;
 
 plan 1;
 
-my @CMD
-	= ( $ENV{'LICENSECHECK'} )
-	|| path('blib')->exists
-	? ('blib/script/licensecheck')
-	: ( $^X, 'bin/licensecheck' );
+my @CMD = ( $^X, 'bin/licensecheck' );
+if ( $ENV{'LICENSECHECK'} ) {
+	@CMD = ( $ENV{'LICENSECHECK'} );
+}
+elsif ( path('blib')->exists ) {
+	@CMD = ('blib/script/licensecheck');
+}
 diag "executable: @CMD";
 
 subtest 'copyright declared on 3 lines' => sub {

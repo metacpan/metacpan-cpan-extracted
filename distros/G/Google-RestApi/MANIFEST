@@ -23,6 +23,7 @@ lib/Google/RestApi/SheetsApi4/Request/Spreadsheet.pm
 lib/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet.pm
 lib/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet/Range.pm
 lib/Google/RestApi/SheetsApi4/Spreadsheet.pm
+lib/Google/RestApi/SheetsApi4/Types.pm
 lib/Google/RestApi/SheetsApi4/Worksheet.pm
 lib/Google/RestApi/Types.pm
 lib/Google/RestApi/Utils.pm
@@ -38,6 +39,7 @@ t/etc/rest_config.yaml
 t/etc/sheets_config.yaml
 t/etc/uri_responses/delete_spreadsheet.yaml
 t/etc/uri_responses/get_spreadsheet_attrs_joe.yaml
+t/etc/uri_responses/get_spreadsheet_named_range_george.yaml
 t/etc/uri_responses/get_spreadsheet_named_ranges.yaml
 t/etc/uri_responses/get_spreadsheet_properties_defaultformat_backgroundcolor.yaml
 t/etc/uri_responses/get_spreadsheet_properties_defaultformat_backgroundcolor_red.yaml
@@ -50,6 +52,7 @@ t/etc/uri_responses/get_worksheet_properties_index_rowcount.yaml
 t/etc/uri_responses/get_worksheet_properties_rowcount.yaml
 t/etc/uri_responses/get_worksheet_properties_title_sheetid.yaml
 t/etc/uri_responses/get_worksheet_values_a1_b1_c1.yaml
+t/etc/uri_responses/get_worksheet_values_a1_c3.yaml
 t/etc/uri_responses/get_worksheet_values_cell.yaml
 t/etc/uri_responses/get_worksheet_values_col.yaml
 t/etc/uri_responses/get_worksheet_values_cols.yaml
@@ -60,6 +63,7 @@ t/etc/uri_responses/post_spreadsheet_copy.yaml
 t/etc/uri_responses/post_spreadsheet_create.yaml
 t/etc/uri_responses/post_worksheet_batch_request.yaml
 t/etc/uri_responses/post_worksheet_values_x_y_z.yaml
+t/etc/uri_responses/put_worksheet_values_a1_c3.yaml
 t/etc/uri_responses/put_worksheet_values_col.yaml
 t/etc/uri_responses/put_worksheet_values_range.yaml
 t/etc/uri_responses/put_worksheet_values_row.yaml
@@ -87,24 +91,28 @@ t/perlcriticrc
 t/run_integration
 t/run_unit_some
 t/run_unit_tests.t
-t/tutorial/Sheets/10_spreadsheet.pl
-t/tutorial/Sheets/20_worksheet.pl
+t/tutorial/sheets/10_spreadsheet.pl
+t/tutorial/sheets/20_worksheet.pl
+t/tutorial/sheets/25_iterators.pl
+t/tutorial/sheets/99_delete_all.pl
 t/unit/perlcritic.t
 t/unit/Test/Google/RestApi.pm
 t/unit/Test/Google/RestApi/SheetsApi4.pm
-t/unit/Test/Google/RestApi/SheetsApi4/Base.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Range.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Range/Base.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Range/Cell.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Range/Col.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Range/Row.pm
 t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup.pm
+t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup/Iterator.pm
 t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup/Tie.pm
 t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup/Tie/Iterator.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet/Range.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Spreadsheet.pm
+t/unit/Test/Google/RestApi/SheetsApi4/Types.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Worksheet.pm
+t/unit/Test/Google/RestApi/Types.pm
 t/unit/Test/Google/RestApi/Utils.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

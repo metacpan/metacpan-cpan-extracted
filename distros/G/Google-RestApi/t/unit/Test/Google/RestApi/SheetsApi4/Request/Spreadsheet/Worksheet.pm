@@ -2,11 +2,9 @@ package Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet;
 
 use Test::Unit::Setup;
 
-use parent 'Test::Unit::TestBase';
-
 use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet';
 
-sub class { Worksheet; }
+use parent 'Test::Unit::TestBase';
 
 sub setup : Tests(setup) {
   my $self = shift;

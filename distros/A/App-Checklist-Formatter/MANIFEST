@@ -1,0 +1,15 @@
+bin/checklist-formatter
+Build.PL
+Changes
+lib/App/Checklist/Formatter.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/checklist.otl
+t/formatter.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/script-checklist-formatter.t
+META.json

@@ -1,10 +1,11 @@
 package Google::RestApi::Auth::ServiceAccount;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
-use WWW::Google::Cloud::Auth::ServiceAccount;
+use WWW::Google::Cloud::Auth::ServiceAccount ();
+
 use parent 'Google::RestApi::Auth';
 
 sub new {

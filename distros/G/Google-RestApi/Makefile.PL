@@ -30,6 +30,7 @@ WriteMakefile(
       'Module::Load'                    => 0,
       'Net::OAuth2::Client'             => 0,
       'Net::OAuth2::Profile::WebServer' => 0,
+      'Readonly'                        => 0,
       'Retry::Backoff'                  => 0,
       'Scalar::Util'                    => 0,
       'Storable'                        => 0,

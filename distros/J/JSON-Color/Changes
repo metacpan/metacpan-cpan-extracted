@@ -1,3 +1,17 @@
+0.132   2021-11-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Work better when using ColorTheme::NoColor (don't emit ANSI reset
+	  because there's no ANSI color set, avoid perl undef warning)
+	  (RT#140117, reported by Kevin Van Workum).
+
+	- Observe object's TO_JSON() (thanks Kevin Van Workum, RT #140118).
+
+        - Rename color theme modules to be more compliant with ColorTheme v2
+          (all modules are named under ColorTheme:: namespace). But allow
+          searching using ColorTheme:: as well as ColorTheme::JSON::Color::
+          prefixes.
+
+
 0.131   2021-05-07  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Add missing prereq to ColorThemeRole::ANSI (resolves

@@ -1,12 +1,12 @@
 package Google::RestApi::SheetsApi4;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Google::RestApi::Setup;
 
-use Module::Load qw(load);
-use Try::Tiny;
-use YAML::Any qw(LoadFile);
+use Module::Load qw( load );
+use Try::Tiny ();
+use YAML::Any ();
 
 use aliased 'Google::RestApi::DriveApi3';
 use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
@@ -25,10 +25,9 @@ sub new {
   my $class = shift;
 
   state $check = compile_named(
-    api           => HasMethods[qw(api)],
+    api           => HasApi,
     drive         => HasMethods[qw(filter_files)], { optional => 1 },
     endpoint      => Str, { default => Sheets_Endpoint },
-    sheets_config => ReadableFile|HashRef, { optional => 1 },
   );
   my $self = $check->(@_);
 
@@ -98,12 +97,18 @@ sub delete_spreadsheet {
 
 sub delete_all_spreadsheets {
   my $self = shift;
-  state $check = compile(Str);
-  my ($name) = $check->(@_);
-  my @spreadsheets = grep { $_->{name} eq $name; } $self->spreadsheets();
-  DEBUG(sprintf("Deleting %d spreadsheets for name '$name'", scalar @spreadsheets));
-  $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
-  return scalar @spreadsheets;
+
+  state $check = compile(ArrayRef->plus_coercions(Str, sub { [$_]; }));
+  my ($names) = $check->(@_);
+
+  my $count = 0;
+  foreach my $name (@$names) {
+    my @spreadsheets = grep { $_->{name} eq $name; } $self->spreadsheets();
+    $count += scalar @spreadsheets;
+    DEBUG(sprintf("Deleting %d spreadsheets for name '$name'", scalar @spreadsheets));
+    $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
+  }
+  return $count;
 }
 
 sub spreadsheets {
@@ -121,24 +126,6 @@ sub drive {
     $self->{drive} = DriveApi3->new(api => $self->rest_api());
   }
   return $self->{drive};
-}
-
-sub sheets_config {
-  my $self = shift;
-  my $config = $self->{sheets_config} or return;
-
-  if (!ref($config)) {
-    try {
-      $config = LoadFile($config);
-    } catch {
-      my $err = $_;
-      LOGDIE("Unable to load sheets config file '$config': $err");
-    };
-    $self->{sheets_config} = $config;
-  }
-
-  my $key = shift;
-  return defined $key ? $config->{$key} : $config;
 }
 
 sub open_spreadsheet { Spreadsheet->new(sheets_api => shift, @_); }
@@ -370,11 +357,6 @@ Returns a list of spreadsheets in Google Drive.
 
 Returns an instance of Google Drive that shares the same RestApi as this
 SheetsApi object. You would not normally need to use this directly.
-
-=item config(key<string>);
-
-Returns a configuration item with the given key, or the entire configuration
-if no key is specified.
 
 =item open_spreadsheet(%args);
 
