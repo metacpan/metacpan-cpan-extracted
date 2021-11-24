@@ -6,7 +6,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-09'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $LIST = {
     summary => 'My experiments writing Getopt::Long replacements/alternatives',
@@ -43,28 +43,40 @@ Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment - My experiments writing Ge
 
 =head1 VERSION
 
-This document describes version 0.008 of Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
+This document describes version 0.009 of Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
 
 =head1 DESCRIPTION
 
 Most of these modules provide a L<Getopt::Long>-compatible interface, but they
 differ in some aspect: either they offer more features (or less).
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Getopt::Long::Less>
+=item * L<Getopt::Long::Less> - Like Getopt::Long, but with less features
 
-=item * L<Getopt::Long::EvenLess>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Getopt::Long::More>
+=item * L<Getopt::Long::EvenLess> - Like Getopt::Long::Less, but with even less features
 
-=item * L<Getopt::Long::Complete>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Getopt::Long::Subcommand>
+=item * L<Getopt::Long::More> - Like Getopt::Long, but with more stuffs
 
-=item * L<Getopt::Panjang>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Getopt::Long::Complete> - A drop-in replacement for Getopt::Long, with shell tab completion
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Getopt::Long::Subcommand> - Process command-line options, with subcommands and completion
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Getopt::Panjang> - Parse command-line options
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 

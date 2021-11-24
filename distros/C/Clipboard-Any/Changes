@@ -1,3 +1,8 @@
+0.002   2021-07-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Forgot to add clipboard_manager argument to the functions.
+
+
 0.001   2021-07-15  Released-By: PERLANCAR
 
         - First release.

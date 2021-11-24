@@ -1,3 +1,11 @@
+0.009   2021-11-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Pod::From::Acme::CPANModules (0.010) for
+          updated generated POD section names.
+
+
 0.008   2021-11-09  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

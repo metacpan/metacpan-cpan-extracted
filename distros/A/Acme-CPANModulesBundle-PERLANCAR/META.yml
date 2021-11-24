@@ -19,19 +19,19 @@ name: Acme-CPANModulesBundle-PERLANCAR
 provides:
   Acme::CPANModules::PERLANCAR::Avoided:
     file: lib/Acme/CPANModules/PERLANCAR/Avoided.pm
-    version: '0.008'
+    version: '0.009'
   Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment:
     file: lib/Acme/CPANModules/PERLANCAR/MyGetoptLongExperiment.pm
-    version: '0.008'
+    version: '0.009'
   Acme::CPANModules::PERLANCAR::Retired:
     file: lib/Acme/CPANModules/PERLANCAR/Retired.pm
-    version: '0.008'
+    version: '0.009'
   Acme::CPANModules::PERLANCAR::Weird:
     file: lib/Acme/CPANModules/PERLANCAR/Weird.pm
-    version: '0.008'
+    version: '0.009'
   Acme::CPANModulesBundle::PERLANCAR:
     file: lib/Acme/CPANModulesBundle/PERLANCAR.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   strict: '0'
   warnings: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesBundle-PERLANCAR
   homepage: https://metacpan.org/release/Acme-CPANModulesBundle-PERLANCAR
   repository: git://github.com/perlancar/perl-Acme-CPANModulesBundle-PERLANCAR.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

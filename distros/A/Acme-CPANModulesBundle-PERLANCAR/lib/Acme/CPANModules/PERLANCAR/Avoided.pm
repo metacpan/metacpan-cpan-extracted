@@ -6,7 +6,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-09'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $LIST = {
     summary => "Modules I'm currently avoiding",
@@ -178,7 +178,7 @@ Acme::CPANModules::PERLANCAR::Avoided - Modules I'm currently avoiding
 
 =head1 VERSION
 
-This document describes version 0.008 of Acme::CPANModules::PERLANCAR::Avoided (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
+This document describes version 0.009 of Acme::CPANModules::PERLANCAR::Avoided (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
 
 =head1 DESCRIPTION
 
@@ -190,11 +190,13 @@ L<Dist::Zilla::Plugin::Acme::CPANModules::Blacklist>, you can make sure that
 during building, your distribution does not specify a prerequisite to any of the
 modules listed here. (You should make your own blacklist though).
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
 =item * L<Log::Any> - Startup overhead
+
+Author: L<PREACTION|https://metacpan.org/author/PREACTION>
 
 After the 1.x version, I no longer prefer L<Log::Any> and have developed an
 alternative called L<Log::ger>.
@@ -203,6 +205,8 @@ alternative called L<Log::ger>.
 Alternate modules: L<Log::ger>
 
 =item * L<List::MoreUtils> - License confusion
+
+Author: L<REHSACK|https://metacpan.org/author/REHSACK>
 
 For more information, see https://www.reddit.com/r/perl/comments/6ymdez/what_are_the_background_details_pertaining_to_the/.
 
@@ -214,9 +218,13 @@ Alternate modules: L<List::Util>, L<List::SomeUtils>, L<List::AllUtils>
 
 =item * L<Log::Any::IfLOG> - Retired workaround
 
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
 Alternate modules: L<Log::ger>
 
 =item * L<File::Flock> - Too many deps
+
+Author: L<MUIR|https://metacpan.org/author/MUIR>
 
 I used to use L<File::Flock> due to its simple interface. However, this module
 depends on things like L<AnyEvent>, L<Data::Structure::Util>,
@@ -228,13 +236,19 @@ Alternate modules: L<File::Flock::Retry>
 
 =item * L<File::Slurp> - Buggy
 
+Author: L<CAPOEIRAB|https://metacpan.org/author/CAPOEIRAB>
+
 Alternate modules: L<File::Slurper>
 
 =item * L<File::Slurp::Tiny> - Use the newer File::Slurper instead
 
+Author: L<LEONT|https://metacpan.org/author/LEONT>
+
 Alternate modules: L<File::Slurper>
 
 =item * L<Exporter::Lite> - Unnecessary, use Exporter instead
+
+Author: L<NEILB|https://metacpan.org/author/NEILB>
 
 I used to use this module because I didn't know that L<Exporter> (since perl
 5.8.3, 2004) can also be used without subclassing, i.e. instead of:
@@ -257,6 +271,8 @@ Alternate modules: L<Exporter>
 
 =item * L<JSON> - Somewhat broken
 
+Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
+
 JSON.pm is a discouraged module now, due to its somewhat broken backend handling
 and lack of support for L<Cpanel::JSON::XS>. consider switching to
 L<JSON::MaybeXS> or perhaps just L<JSON::PP>.
@@ -266,6 +282,8 @@ Alternate modules: L<JSON::MaybeXS>, L<JSON::PP>, L<Cpanel::JSON::XS>
 
 =item * L<JSON::XS>
 
+Author: L<MLEHMANN|https://metacpan.org/author/MLEHMANN>
+
 L<Cpanel::JSON::XS> is the fork of L<JSON::XS> that fixes some bugs and adds
 some features, mainly so it's more compatible with L<JSON::PP>. See the
 documentation of L<Cpanel::JSON::XS> for more details on those.
@@ -274,6 +292,8 @@ documentation of L<Cpanel::JSON::XS> for more details on those.
 Alternate modules: L<Cpanel::JSON::XS>
 
 =item * L<Module::Path>
+
+Author: L<NEILB|https://metacpan.org/author/NEILB>
 
 It's a nice little concept and module, and often useful. But the decision like
 defaulting to doing abs_path()
@@ -286,7 +306,9 @@ file, and find all matches instead of the first.
 
 Alternate modules: L<Module::Path::More>
 
-=item * L<String::Truncate>
+=item * L<String::Truncate> - a module for when strings are too long to be displayed in...
+
+Author: L<RJBS|https://metacpan.org/author/RJBS>
 
 Has non-core dependencies to L<Sub::Exporter> and L<Sub::Install>.
 

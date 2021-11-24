@@ -3,7 +3,7 @@ package Clipboard::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-07-15'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,7 +16,7 @@ use IPC::System::Options 'system', 'readpipe', -log=>1;
 
 my $known_clipboard_managers = [qw/klipper/];
 my $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
-our %arg_clipboard_manager = (
+our %argspecopt_clipboard_manager = (
     clipboard_manager => {
         summary => 'Explicitly set clipboard manager to use',
         schema => $sch_clipboard_manager,
@@ -94,6 +94,9 @@ $SPEC{'clear_clipboard_history'} = {
     description => <<'_',
 
 _
+    args => {
+        %argspecopt_clipboard_manager,
+    },
     result => {
         schema => $sch_clipboard_manager,
     },
@@ -128,6 +131,9 @@ If the current item is e.g. an image, then the next text item from history will
 be returned instead, or empty string if none exists.
 
 _
+    args => {
+        %argspecopt_clipboard_manager,
+    },
     result => {
         schema => $sch_clipboard_manager,
     },
@@ -166,6 +172,9 @@ empty result.
 2) Non-text items are not retrievable by getClipboardHistoryItem().
 
 _
+    args => {
+        %argspecopt_clipboard_manager,
+    },
     result => {
         schema => $sch_clipboard_manager,
     },
@@ -224,7 +233,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.001 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2021-07-15.
+This document describes version 0.002 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2021-07-15.
 
 =head1 DESCRIPTION
 
@@ -266,13 +275,24 @@ welcome.
 
 Usage:
 
- clear_clipboard_history() -> [$status_code, $reason, $payload, \%result_meta]
+ clear_clipboard_history(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete all clipboard items.
 
 This function is not exported by default, but exportable.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<clipboard_manager> => I<str>
+
+Explicitly set clipboard manager to use.
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+
+=back
 
 Returns an enveloped result (an array).
 
@@ -310,7 +330,7 @@ Return value:  (str)
 
 Usage:
 
- get_clipboard_content() -> [$status_code, $reason, $payload, \%result_meta]
+ get_clipboard_content(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get the clipboard content (most recent, history index [0]).
 
@@ -320,7 +340,18 @@ be returned instead, or empty string if none exists.
 
 This function is not exported by default, but exportable.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<clipboard_manager> => I<str>
+
+Explicitly set clipboard manager to use.
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+
+=back
 
 Returns an enveloped result (an array).
 
@@ -339,7 +370,7 @@ Return value:  (str)
 
 Usage:
 
- list_clipboard_history() -> [$status_code, $reason, $payload, \%result_meta]
+ list_clipboard_history(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List the clipboard history.
 
@@ -353,7 +384,18 @@ empty result.
 
 This function is not exported by default, but exportable.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<clipboard_manager> => I<str>
+
+Explicitly set clipboard manager to use.
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+
+=back
 
 Returns an enveloped result (an array).
 

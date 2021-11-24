@@ -5,7 +5,26 @@ use Carp;
 use 5.010;  # M::V::R requires 5.010, so might as well make use of the defined-or // notation :-)
 use CAD::Format::STL qw//;
 use CAD::Mesh3D qw/:create/;
-our $VERSION = '0.003'; # auto-populated from CAD::Mesh3D
+our $VERSION = '0.005'; # auto-populated from CAD::Mesh3D
+
+# start by deciding which formatter to use
+our $STL_FORMATTER;
+BEGIN {
+    use version 0.77;
+    my $v = version->parse($CAD::Format::STL::VERSION);
+    #print STDERR "CAD::Format::STL version = $v\n";
+    #print STDERR "> $_\n" for @INC;
+
+    if( $v <= version->parse(v0.2.1) ) {
+        $STL_FORMATTER = 'CAD::Mesh3D::FormatSTL';
+        eval "require $STL_FORMATTER";
+    } else {
+        $STL_FORMATTER = 'CAD::Format::STL';
+    }
+
+    #print STDERR "\tFinal formatter: $STL_FORMATTER\n";
+}
+
 
 =head1 NAME
 
@@ -144,9 +163,9 @@ sub outputStl {
     binmode $fh unless $asc;
 
     #############################################################################################
-    # use CAD::Format::STL to output the STL
+    # use $STL_FORMATTER package to output the STL
     #############################################################################################
-    my $stl = CAD::Format::STL->new;
+    my $stl = $STL_FORMATTER->new;
     my $part = $stl->add_part("my part", @$mesh);
 
     if($asc) {
@@ -227,7 +246,7 @@ sub inputStl {
         croak "\ninputStl($file, '$asc_or_bin'): ERROR: unknown mode '$asc_or_bin'\n ";
     }
 
-    my $stl = CAD::Format::STL->new()->load(@pass_args); # CFS claims it take handle or name
+    my $stl = $STL_FORMATTER->new()->load(@pass_args); # CFS claims it take handle or name
         # TODO: bug report <https://rt.cpan.org/Public/Dist/Display.html?Name=CAD-Format-STL>:
         #   examples show ->reader() and ->writer(), but that example code doesn't compile
     my @stlf = $stl->part()->facets();
@@ -272,11 +291,10 @@ C<sub _write_binary>, add the line C<binmode $fh;> as the fourth line of code in
 near line 348, add the line C<binmode $fh;> as the third line of code inside the C<sub _read_binary>.
 
 The author of CAD::Format::STL has been notified, both through the
-L<issue tracker|https://rt.cpan.org/Public/Bug/Display.html?id=83595>, and responding to requests to
+L<issue tracker|https://rt.cpan.org/Public/Bug/Display.html?id=83595>, and responded to requests to
 fix the bug.  Hopefully, when the author has time, a new version of CAD::Format::STL will be released
 with the bug fixed.  Until then, patching the module is the best workaround.  A patched copy of v0.2.1.001
-is available through L<this github link|https://github.com/pryrt/CAD-Mesh3D/blob/master/patch/STL.pm>,
-or in the C<patch> folder of the distribution.
+is available through L<this github link|https://github.com/pryrt/CAD-Mesh3D/blob/master/patch/STL.pm>.
 
 =head1 AUTHOR
 
@@ -284,7 +302,7 @@ Peter C. Jones C<E<lt>petercj AT cpan DOT orgE<gt>>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017,2018,2019,2020 Peter C. Jones
+Copyright (C) 2017,2018,2019,2020,2021 Peter C. Jones
 
 =head1 LICENSE
 

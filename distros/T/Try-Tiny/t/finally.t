@@ -119,7 +119,7 @@ is($_, "foo", "same afterwards");
 
   is( scalar @warnings, 2, 'warnings from both fatal finally blocks' );
 
-  my @originals = sort map { $_ =~ /Original exception text follows:\n\n(.+)/s } @warnings;
+  my @originals = sort map /Original exception text follows:\n\n(.+)/s, @warnings;
 
   like $originals[0], qr/fin 1 at/, 'First warning contains original exception';
   like $originals[1], qr/fin 3 at/, 'Second warning contains original exception';

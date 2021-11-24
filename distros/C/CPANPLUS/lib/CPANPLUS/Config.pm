@@ -20,7 +20,7 @@ use Module::Load::Conditional   qw[check_install];
 use version;
 
 use vars qw[$VERSION];
-$VERSION = "0.9912";
+$VERSION = "0.9914";
 
 =pod
 

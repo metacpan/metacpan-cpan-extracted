@@ -6,7 +6,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-09'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $LIST = {
     summary => 'Weird modules',
@@ -45,18 +45,20 @@ Acme::CPANModules::PERLANCAR::Weird - Weird modules
 
 =head1 VERSION
 
-This document describes version 0.008 of Acme::CPANModules::PERLANCAR::Weird (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
+This document describes version 0.009 of Acme::CPANModules::PERLANCAR::Weird (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
 
 =head1 DESCRIPTION
 
 List of modules I find weird (non-pejoratively speaking) in one way or another,
 e.g. peculiar API, name.
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<String::Tools>
+=item * L<String::Tools> - Various tools for manipulating strings.
+
+Author: L<BOBK|https://metacpan.org/author/BOBK>
 
 Function names chosen are too similar with perl's builtins and will be prone to
 typos: C<subst> (C<substr>), C<define> (C<defined>). I don't think C<stitch> is more

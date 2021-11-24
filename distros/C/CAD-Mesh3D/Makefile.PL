@@ -15,65 +15,94 @@ use 5.010;
         'Carp'                  => 0,
         'CAD::Format::STL'      => v0.2.1,
     },
+    'realclean'     => {
+        FILES => 'cover_db LICENSE.pod README.pod MYMETA.json.lock lib/CAD/Format',
+    },
+    'META_MERGE'    => {            # EUMM 6.46
+        'meta-spec' => {
+            version => '2',
+            url     => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
+        },
+        resources => {
+            bugtracker => {
+                mailto  => 'bug-CAD-Mesh3D@rt.cpan.org',
+                web     => 'https://github.com/pryrt/CAD-Mesh3D/issues',
+            },
+            repository => {
+                url     => 'https://github.com/pryrt/CAD-Mesh3D.git',
+                web     => 'https://github.com/pryrt/CAD-Mesh3D',
+                type    => 'git',
+            },
+        },
+        keywords => [ '3D', 'CAD', 'STL'],
+        no_index => {
+            directory   => [ 'patch' ], # don't include packages in patch/ in the indexer report
+        },
+        provides => {
+            'CAD::Mesh3D' => { file => 'lib/CAD/Mesh3D.pm' },
+            'CAD::Mesh3D::STL' => { file => 'lib/CAD/Mesh3D/STL.pm' },
+        },
+    },
+    'LICENSE' => 'perl_5',          # EUMM 6.31
+    'MIN_PERL_VERSION' => '5.10.0', # EUMM 6.48
+    'CONFIGURE_REQUIRES' => {       # EUMM 6.52
+        'ExtUtils::MakeMaker' => 0,
+        'warnings' => 0,
+        'strict' => 0,
+        'Test::More' => 0.86,
+        'Test::Exception' => 0,
+        'constant' => 0,
+        'Config' => 0,
+    },
+    'TEST_REQUIRES' => {            # EUMM 6.64
+        'warnings' => 0,
+        'strict' => 0,
+        'Test::More' => 0.86,
+        'Test::Exception' => 0,
+        'constant' => 0,
+        'Config' => 0,
+    },
 );
 
 {
+    # in most cases, delete from %mm_args rather than adding to the hash like I used to do
     no warnings;
-    if( $ExtUtils::MakeMaker::VERSION >= '6.46' ) {
-        $mm_args{META_MERGE} = {
-            'meta-spec' => {
-                version => '2',
-                url     => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
-            },
-            resources => {
-                bugtracker => {
-                    mailto  => 'bug-CAD-Mesh3D@rt.cpan.org',
-                    web     => 'https://github.com/pryrt/CAD-Mesh3D/issues',
-                },
-                repository => {
-                    url     => 'https://github.com/pryrt/CAD-Mesh3D.git',
-                    web     => 'https://github.com/pryrt/CAD-Mesh3D',
-                    type    => 'git',
-                },
-            },
-            keywords => [ '3D', 'CAD', 'STL'],
-        },
+    if( $ExtUtils::MakeMaker::VERSION < '6.46' ) {
+        delete $mm_args{META_MERGE};
+    } else {
         # automatically determine the versions for 'provides'; MM->parse_version exists as of MM v6.31, so not a problem with >= 6.46
-        #   => this comes out right when printed... but MYMETA.* shows values that look wrong
-        $mm_args{META_MERGE}{provides} = {
-            $mm_args{NAME} => {
-                file => $mm_args{VERSION_FROM},
-                version => ''.MM->parse_version( $mm_args{VERSION_FROM} ),
-            }
+        my $v = ''.MM->parse_version( $mm_args{VERSION_FROM} );
+        for my $k ( keys %{ $mm_args{META_MERGE}{provides} }) {
+            $mm_args{META_MERGE}{provides}{$k}{version} = $v;
         };
     }
-    if( $ExtUtils::MakeMaker::VERSION >= '6.31' ) {
-        $mm_args{LICENSE} = 'perl_5';
+
+    # simple deletions
+    if( $ExtUtils::MakeMaker::VERSION < '6.31' ) {
+        delete $mm_args{LICENSE};
     }
-    if( $ExtUtils::MakeMaker::VERSION >= '6.48' ) {
-        $mm_args{MIN_PERL_VERSION} = '5.10.0';
+    if( $ExtUtils::MakeMaker::VERSION < '6.48' ) {
+        delete $mm_args{MIN_PERL_VERSION};
     }
-    if( $ExtUtils::MakeMaker::VERSION >= '6.52' ) {
+
+    # merge TEST_REQUIRES into CONFIGURE_REQUIRES, or both into PREREQ_PM
+    if( $ExtUtils::MakeMaker::VERSION < '6.52' ) {
+        $mm_args{PREREQ_PM} = {
+            $mm_args{TEST_REQUIRES},
+            $mm_args{CONFIGURE_REQUIRES},
+            $mm_args{PREREQ_PM},
+        };            # merge TEST and CONFIG into PREREQ
+        delete $mm_args{CONFIGURE_REQUIRES};
+        delete $mm_args{TEST_REQUIRES};
+    } elsif( $ExtUtils::MakeMaker::VERSION < '6.64' ) {
         $mm_args{CONFIGURE_REQUIRES} = {
-            'ExtUtils::MakeMaker' => 0,
-            'warnings' => 0,
-            'strict' => 0,
-            'Test::More' => 0.86,
-            'Test::Exception' => 0,
-            'constant' => 0,
-            'Config' => 0,
-        },
+            $mm_args{TEST_REQUIRES},
+            $mm_args{CONFIGURE_REQUIRES},
+        } if exists $mm_args{CONFIGURE_REQUIRES};   # merge TEST into CONFIG
+        delete $mm_args{TEST_REQUIRES};
     }
-    if( $ExtUtils::MakeMaker::VERSION >= '6.64' ) {
-        $mm_args{TEST_REQUIRES} = {
-            'warnings' => 0,
-            'strict' => 0,
-            'Test::More' => 0.86,
-            'Test::Exception' => 0,
-            'constant' => 0,
-            'Config' => 0,
-        };
-    }
+
+    # sign distro if able
     if( $ExtUtils::MakeMaker::VERSION >= '6.18' ) {
         $mm_args{SIGN} = 1 if MM->can('signature_target') && $ENV{MM_SIGN_DIST};
     }
@@ -84,7 +113,7 @@ sub MY::postamble {
     return <<'POSTAMBLE';
 TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
 
-MY_COPYRIGHT = Copyright (C) 2017,2018,2019,2020 Peter C. Jones
+MY_COPYRIGHT = Copyright (C) 2017,2018,2019,2020,2021 Peter C. Jones
 
 testcover :: lib/CAD/Mesh3D.pm
 	$(NOECHO) cover -test -report html
@@ -101,10 +130,11 @@ distauthtest :: disttest
 	cd $(DISTVNAME) && $(TEST_D) xt && $(MAKE) test TEST_FILES='xt/*.t'
 
 #coverclean :: realclean
-realclean ::
-	$(NOECHO) ( $(TEST_D) cover_db && $(RM_RF) cover_db ) || $(ECHO) realclean:: skip "rm -rf cover_db"
-	$(NOECHO) ( $(TEST_F) MYMETA.json.lock && $(RM_RF) MYMETA.json.lock ) || $(ECHO) realclean:: skip "rm -rf MYMETA.json.lock"
-	$(NOECHO) ( $(TEST_D) lib/CAD/Format && $(RM_RF) lib/CAD/Format ) || $(ECHO) realclean:: skip "rm -rf lib/CAD/Format"
+# moved "realclean ::" into the realclean=> element of the %mm_args hash
+#realclean ::
+#	$(NOECHO) ( $(TEST_D) cover_db && $(RM_RF) cover_db ) || $(ECHO) realclean:: skip "rm -rf cover_db"
+#	$(NOECHO) ( $(TEST_F) MYMETA.json.lock && $(RM_RF) MYMETA.json.lock ) || $(ECHO) realclean:: skip "rm -rf MYMETA.json.lock"
+#	$(NOECHO) ( $(TEST_D) lib/CAD/Format && $(RM_RF) lib/CAD/Format ) || $(ECHO) realclean:: skip "rm -rf lib/CAD/Format"
 
 # auto-populate the VERSION in the submodules from $(VERSION), which comes from main module
 populateversion :: lib/CAD/Mesh3D.pm

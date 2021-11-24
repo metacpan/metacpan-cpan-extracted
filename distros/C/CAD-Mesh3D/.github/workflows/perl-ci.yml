@@ -1,0 +1,86 @@
+# This is a basic workflow to help you get started with Actions
+# use [tobyink]'s https://github.com/tobyink/p5-exporter-tiny/blob/master/.github/workflows/ci.yml as a reference
+# - for testing, don't need the "dist" job, because I don't need the tarball; I can just run tests from the repo checkout
+# - eventually, might want to add back in a "dist", which creates and archives the tarball during a tag
+#   -- that probably won't work, because of gpg signing
+
+name: perl-ci
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on all pushes to branches, and pull request for the main branch
+  push:
+    branches: 
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test: 
+    name: Test With Perl ${{ matrix.perl }} ${{ matrix.os }} ${{ matrix.joblabel }}
+    runs-on: ${{ ( ( startsWith(matrix.os, 'ubuntu:') && 'ubuntu-latest' ) || ( startsWith(matrix.os, 'macos:') && 'macos-latest' ) || startsWith(matrix.os, 'windows:') && 'windows-latest' ) || matrix.os }}
+    env: 
+      PCJ: ${{ ( startsWith(matrix.os, 'windows') && '(get-command perl).Path'  ) || 'which perl' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:                 [ 'windows-latest', 'ubuntu-latest' ]
+        #perl:               [ '5.8.5', '5.8.6', '5.8.7', '5.8.8', '5.8.9', '5.10', '5.10.1', '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32' ]
+        #perl:               [ '5.10', '5.32' ]
+        perl:               [ '5.10', '5.34']
+        include:
+          - perl: '5.32'
+            os: 'ubuntu-latest'
+            coverage: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up perl ${{ matrix.perl }} ${{ matrix.os }} ${{ matrix.joblabel }}
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+          multi-thread: ${{ ( ( startsWith(matrix.os, 'windows') || endsWith(matrix.os, ':thr') ) && true ) || false }}
+          distribution: ${{ ( endsWith(matrix.os, ':strawberry') && 'strawberry' ) || 'default' }}
+      - name: Find binaries expecting  ${{ matrix.perl }} ${{ matrix.os }} ${{ matrix.joblabel }}
+        run: |
+          ${{ ( startsWith(matrix.os, 'windows') && '(get-command perl).Path'  ) || 'which perl' }}
+          perl -v
+          ${{ ( startsWith(matrix.os, 'windows') && '(get-command cpanm).Path' ) || 'which cpanm' }}
+          cpanm --version
+      - name: Pre-Makefile.PL prereqs for older perls
+        if: ${{ matrix.perl < '5.14' }}
+        run: |
+            cpanm ExtUtils::MakeMaker
+      - name: Run Makefile.PL and get prereqs
+        # but there might be some modules needed by configure, which makes chicken/egg problem
+        run: |
+          # intial run of Makefile.PL to see missing dependencies
+          perl Makefile.PL
+          cpanm --notest --installdeps .
+          # re-run Makefile.PL after dependencies met
+          perl Makefile.PL
+      - name: cpanm test-only
+        run: |
+          cpanm --test-only --verbose --no-interactive .
+      - name: verbose prove (for debug)
+        run: |
+          prove -vl t
+      #- name: final directory listing
+      #  run: |
+      #    ${{ ( startsWith(matrix.os, 'windows') && 'Get-ChildItem -Recurse') || 'ls -latrR' }}
+      #- name: Archive artifacts for this push
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: nppConfigCheck.exe
+      #    path: ./bin/nppConfigCheck.exe
+      - name: Run and report test coverage
+        if: ${{ matrix.coverage }}
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cpanm -n Devel::Cover::Report::Coveralls
+          cover -test -report Coveralls
+#

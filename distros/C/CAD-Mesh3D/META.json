@@ -21,7 +21,8 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "patch"
       ]
    },
    "prereqs" : {
@@ -66,7 +67,11 @@
    "provides" : {
       "CAD::Mesh3D" : {
          "file" : "lib/CAD/Mesh3D.pm",
-         "version" : "0.003"
+         "version" : "0.005"
+      },
+      "CAD::Mesh3D::STL" : {
+         "file" : "lib/CAD/Mesh3D/STL.pm",
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -81,6 +86,6 @@
          "web" : "https://github.com/pryrt/CAD-Mesh3D"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

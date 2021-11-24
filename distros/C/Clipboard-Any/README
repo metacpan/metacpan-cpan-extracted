@@ -2,7 +2,7 @@ NAME
     Clipboard::Any - Common interface to clipboard manager functions
 
 VERSION
-    This document describes version 0.001 of Clipboard::Any (from Perl
+    This document describes version 0.002 of Clipboard::Any (from Perl
     distribution Clipboard-Any), released on 2021-07-15.
 
 DESCRIPTION
@@ -36,13 +36,20 @@ FUNCTIONS
   clear_clipboard_history
     Usage:
 
-     clear_clipboard_history() -> [$status_code, $reason, $payload, \%result_meta]
+     clear_clipboard_history(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Delete all clipboard items.
 
     This function is not exported by default, but exportable.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   clipboard_manager => *str*
+
+        Explicitly set clipboard manager to use.
+
+        The default, when left undef, is to detect what clipboard manager is
+        running.
 
     Returns an enveloped result (an array).
 
@@ -77,7 +84,7 @@ FUNCTIONS
   get_clipboard_content
     Usage:
 
-     get_clipboard_content() -> [$status_code, $reason, $payload, \%result_meta]
+     get_clipboard_content(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Get the clipboard content (most recent, history index [0]).
 
@@ -88,7 +95,14 @@ FUNCTIONS
 
     This function is not exported by default, but exportable.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   clipboard_manager => *str*
+
+        Explicitly set clipboard manager to use.
+
+        The default, when left undef, is to detect what clipboard manager is
+        running.
 
     Returns an enveloped result (an array).
 
@@ -107,7 +121,7 @@ FUNCTIONS
   list_clipboard_history
     Usage:
 
-     list_clipboard_history() -> [$status_code, $reason, $payload, \%result_meta]
+     list_clipboard_history(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List the clipboard history.
 
@@ -121,7 +135,14 @@ FUNCTIONS
 
     This function is not exported by default, but exportable.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   clipboard_manager => *str*
+
+        Explicitly set clipboard manager to use.
+
+        The default, when left undef, is to detect what clipboard manager is
+        running.
 
     Returns an enveloped result (an array).
 

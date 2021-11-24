@@ -1,5 +1,8 @@
 Revision history for Try-Tiny
 
+0.31      2021-11-23 20:29:12Z
+  - plug Syntax::Keyword::Try and Feature::Compat::Try in the docs
+
 0.30      2017-12-21 07:23:03Z
   - expand "when" test skippage to more perl versions
 

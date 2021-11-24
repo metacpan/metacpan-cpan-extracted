@@ -6,7 +6,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-09'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $LIST = {
     summary => 'Retired modules',
@@ -116,7 +116,7 @@ Acme::CPANModules::PERLANCAR::Retired - Retired modules
 
 =head1 VERSION
 
-This document describes version 0.008 of Acme::CPANModules::PERLANCAR::Retired (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
+This document describes version 0.009 of Acme::CPANModules::PERLANCAR::Retired (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
 
 =head1 DESCRIPTION
 
@@ -129,7 +129,7 @@ have used them.
 Note that you can always get these retired modules from BackPAN or GitHub (I
 don't purge most of the repos) if needed.
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
@@ -162,26 +162,34 @@ L<Unix::Passwd::File>.
 
 Alternate modules: L<Unix::Passwd::File>
 
-=item * L<Module::List::WithPath>
+=item * L<Module::List::WithPath> - Like Module::List, but set hash values with paths
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 Superseded by L<PERLANCAR::Module::List>.
 
 
 Alternate modules: L<PERLANCAR::Module::List>
 
-=item * L<App::CreateSparseFile>
+=item * L<App::CreateSparseFile> - Create sparse file
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 I didn't know about the C<fallocate> command.
 
 
-=item * L<Log::Any::App>
+=item * L<Log::Any::App> - An easy way to use Log::Any in applications
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 I've written L<Log::ger::App> to be its successor.
 
 
 Alternate modules: L<Log::ger::App>
 
-=item * L<Package::MoreUtil>
+=item * L<Package::MoreUtil> - Package-related utilities
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 I didn't know about L<Package::Stash>, which does things more properly and
 performantly. But I've spun routines not yet covered by Package::Stash to

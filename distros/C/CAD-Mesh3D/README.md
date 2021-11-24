@@ -40,7 +40,7 @@ Peter C. Jones `<petercj AT cpan DOT org>`
 
 # COPYRIGHT
 
-Copyright (C) 2017,2018,2019,2020 Peter C. Jones
+Copyright (C) 2017,2018,2019,2020,2021 Peter C. Jones
 
 # LICENSE
 

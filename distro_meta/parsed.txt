@@ -75839,3 +75839,10 @@ K/KU/KULP/Mac-PropertyList-SAX-0.91.tar.gz
 P/PE/PERLANCAR/Object-Util-Stringify-0.003.tar.gz
 V/VA/VANHOESEL/OpenTracing-Implementation-v0.32.0.tar.gz
 F/FE/FELIPE/Promise-ES6-0.25.tar.gz
+P/PE/PERLANCAR/Acme-CPANModulesBundle-PERLANCAR-0.009.tar.gz
+P/PE/PETERCJ/CAD-Mesh3D-0.005.tar.gz
+P/PE/PERLANCAR/Clipboard-Any-0.002.tar.gz
+B/BI/BINGOS/CPANPLUS-0.9914.tar.gz
+P/PR/PRBRENAN/Data-Table-Text-20211124.tar.gz
+P/PR/PRBRENAN/Nasm-X86-20211123.tar.gz
+E/ET/ETHER/Try-Tiny-0.31.tar.gz

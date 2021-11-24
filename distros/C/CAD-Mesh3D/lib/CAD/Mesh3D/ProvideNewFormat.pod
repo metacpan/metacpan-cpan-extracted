@@ -169,7 +169,7 @@ Peter C. Jones C<E<lt>petercj AT cpan DOT orgE<gt>>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017,2018,2019,2020 Peter C. Jones
+Copyright (C) 2017,2018,2019,2020,2021 Peter C. Jones
 
 =head1 LICENSE
 
