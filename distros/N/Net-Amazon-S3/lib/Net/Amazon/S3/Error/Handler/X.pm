@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler::X;
-$Net::Amazon::S3::Error::Handler::X::VERSION = '0.98';
+$Net::Amazon::S3::Error::Handler::X::VERSION = '0.99';
 # ABSTRACT: Throw error specific exception
 
 use Moose;
@@ -36,7 +36,7 @@ Net::Amazon::S3::Error::Handler::X - Throw error specific exception
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

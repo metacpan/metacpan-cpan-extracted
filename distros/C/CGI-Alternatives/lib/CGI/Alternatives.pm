@@ -3,7 +3,7 @@ package CGI::Alternatives;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 1;
 
@@ -17,7 +17,7 @@ CGI::Alternatives - Documentation for alternative solutions to CGI.pm
 
 =head1 VERSION
 
-0.18
+0.19
 
 =head1 DESCRIPTION
 
@@ -517,6 +517,10 @@ L<https://metacpan.org/pod/Pinto>
 L<https://stratopan.com/>
 
 L<https://metacpan.org/release/local-lib>
+
+=head1 BUT I DON'T WANT TO USE A FRAMEWORK
+
+Then take a look at L<CGI::Tiny>, specifically L<https://metacpan.org/pod/CGI::Tiny#COMPARISON-TO-CGI.PM>
 
 =head1 SEE ALSO
 

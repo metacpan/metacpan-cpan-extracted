@@ -13,7 +13,7 @@ BEGIN {
     }
 }
 
-use Getopt::Long 2.33;
+use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 use PPI::Document;
 use PPIx::Regexp::Dumper;
@@ -21,7 +21,7 @@ use Scalar::Util qw{ refaddr };
 
 use vars qw{ $VERSION };
 
-$VERSION = '0.081';
+$VERSION = '0.082';
 
 my %opt = (
     default_modifiers => [],
@@ -38,7 +38,8 @@ GetOptions( \%opt,
     qw{
         default_modifiers|default-modifiers=s@
 	encoding=s explain! files!
-	indent=i locations! margin=i objectify! ordinal! perl_version!
+	indent=i locations! margin=i objectify! ordinal!
+	perl_version|perl-version!
 	ppi! short! significant! strict!
 	test! tokens! trace+ unescape! verbose+
     } )
@@ -179,61 +180,67 @@ predump - Dump a regular expression
 =head1 SYNOPSIS
 
  predump 'qr{foo}smx'
- predump -ordinal 'm/foo/x'
+ predump --ordinal 'm/foo/x'
 
 You can use
 
- predump -help
+ predump --help
 
 for full documentation on usage.
 
 =head1 DESCRIPTION
 
 This Perl script parses the regular expression given on its command line
-and dumps the results of the parse to standard out. The following
+and dumps the results of the parse to standard out. Options are accepted
+with leading single dashes as well as double dashes. The following
 options are recognized:
 
 =over
 
-=item -default-modifiers text
+=item --default-modifiers text
 
 This option specifies default modifiers for the regular expression. You
 can specify more than one, either as a comma-separated list or by
 specifying the option multiple times, or both. It is simply passed
 through to L<< PPIx::Regexp->new()|PPIx::Regexp/new >>.
 
-This option can also be expressed as C<-default_modifiers>.
+This option can also be expressed as C<--default_modifiers>.
 
-=item -encoding name
+=item --encoding name
 
 This option specifies the encoding of the regular expression. It is
 simply passed through to L<< PPIx::Regexp->new()|PPIx::Regexp/new >>.
 
-=item -files
+=item --files
 
 If true, this option specifies that the arguments are files whose
 regular expressions are to be analyzed. If this options is asserted,
-C<-objectify> and C<-unescape> are ignored.
+C<--objectify> and C<--unescape> are ignored.
 
-=item -indent number
+=item --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=item --indent number
 
 This option specifies the number of spaces to indent each level of the
 parse hierarchy. It is simply passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
-=item -margin number
+=item --margin number
 
 This option specifies the width of the left margin of the dump output.
 It is simply passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
-=item -objectify
+=item --objectify
 
 If true, this option specifies that the arguments should be made into
 L<PPI::Token|PPI::Token> objects before being passed to PPIx::Regexp.
-This option is ignored if C<-files> is asserted.
+This option is ignored if C<--files> is asserted.
 
-=item -ordinal
+=item --ordinal
 
 If true, this option specifies that the ordinal value of all
 L<PPIx::Regexp::Token::Literal|PPIx::Regexp::Token::Literal> objects be
@@ -241,27 +248,29 @@ displayed as part of the dump. The default is false. This is simply
 passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
-=item -perl_version
+=item --perl-version
 
 If true, this option specifies that the dump include the perl version
 applicable to each dumped item. The default is false. This is simply
 passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
-=item -significant
+This option can also be expressed as C<--perl_version>.
+
+=item --significant
 
 If true, this option specifies that the dump include only significant
 syntax elements. That is, no comments or non-significant white space.
 The default is false. This is simply passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
-=item -short
+=item --short
 
 If true, this option specifies that class names in the dump will have
 the leading C<'PPIx::Regexp::'> removed.  This is simply passed through
 to L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
-=item -test
+=item --test
 
 If true, this option specifies that the dump take the form of a
 predefined set of tests be generated for the regular expression. This
@@ -270,14 +279,14 @@ to what it will do, and reserves the right to change it without notice.
 This is simply passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
-=item -tokens
+=item --tokens
 
 If true, this option specifies that only tokenization be done on the
 regular expression, and the output tokens dumped to standard out.
 This is simply passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
-=item -trace
+=item --trace
 
 If true, this option specifies the generation of trace output from the
 parse. It is unsupported in the sense that the author makes no
@@ -285,20 +294,24 @@ commitment to what it will do, and reserves the right to change it
 without notice.  This is simply passed through to
 L<< PPIx::Regexp->new()|PPIx::Regexp/new >>.
 
-=item -unescape
+=item --unescape
 
 If true, this option causes the argument to be unescaped before
 processing. You would use it if the argument is a Perl single-quotish
 string, since Perl's single-quoted syntax differs from that of the usual
 Unix shell. This option is ignored if C<-files> is asserted.
 
-=item -verbose
+=item --verbose
 
 If true, this option causes more information to be dumped about each
 object produced by the parse.  It is unsupported in the sense that the
 author makes no commitment to what it will do, and reserves the right to
 change it without notice. This is simply passed through to L<<
 PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
+
+=item --version
+
+This option displays the version of this script. The script then exits.
 
 =back
 

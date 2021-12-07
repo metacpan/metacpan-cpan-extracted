@@ -1,16 +1,17 @@
 ---
 abstract: 'Extract-Transform-Load pattern for data file conversions'
 author:
-  - 'Robert Wohlfarth <robert.j.wohlfarth@vanderbilt.edu>'
+  - 'Robert Wohlfarth <robert.j.wohlfarth@vumc.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
   Test::More: '0.88'
   Test::Pod: '1.44'
+  Try::Tiny: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +23,9 @@ no_index:
     - t
 requires:
   Carp: 0
+  Data::DPath: 0
+  Data::Traverse: 0
+  JSON: 0
   List::AllUtils: 0
   Moose: 0
   Moose::Role: 0
@@ -34,9 +38,9 @@ requires:
   Spreadsheet::XLSX: 0
   String::Util: 0
   Text::CSV: 0
-  XML::XPath: 0
+  XML::Bare: 0
   perl: 5.14.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rbwohlfarth/ETL-Pipeline
-version: '2.02'
+version: '3.00'

@@ -1,7 +1,7 @@
 package Sah::SchemaR::natnum;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.075'; # VERSION
+our $DATE = '2021-07-16'; # DATE
+our $VERSION = '0.076'; # VERSION
 
 our $rschema = ["int",[{description=>"\nZero is not included in this schema because zero is neither positive nor\nnegative. See also `uint` for integers that start from 0.\n\n",examples=>[{data=>1,valid=>1},{data=>0,valid=>0},{data=>-1,valid=>0}],min=>1,summary=>"Positive integer (1, 2, ...)"},{description=>"\nNatural numbers are those used for counting and ordering. Some definitions, like\nISO 80000-2 begin the natural numbers with 0. But in this definition, natural\nnumbers start with 1. For integers that start at 0, see `uint`.\n\n",summary=>"Same as posint"}],["posint","int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::natnum - Same as posint
 
 =head1 VERSION
 
-This document describes version 0.075 of Sah::SchemaR::natnum (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
+This document describes version 0.076 of Sah::SchemaR::natnum (from Perl distribution Sah-Schemas-Int), released on 2021-07-16.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017, 2016, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

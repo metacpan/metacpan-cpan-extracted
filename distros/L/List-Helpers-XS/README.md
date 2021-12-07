@@ -27,8 +27,7 @@
 ```
 
 ### DESCRIPTION
-    This module provides some rare but usefull functions to work with
-    arrays.
+    This module provides some rare but usefull functions to work with arrays.
     It supports tied arrays.
 
 ##### random_slice

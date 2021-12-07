@@ -6,10 +6,10 @@
 # ~    ~          ~              ~      ~          ~        ~                                                                    #        
 #                                                                                                                                # 
 #                                                                                                                                #
-# geoCancerPrognosticDatasetsRetriever, version 1.01                                                                             #
+# geoCancerPrognosticDatasetsRetriever, version 1.02                                                                             #
 # -----------------------------------------------------                                                                          #
 #                                                                                                                                #
-# Last Update: 20/10/21                                                                                                          #
+# Last Update: 30/11/21                                                                                                          #
 #                                                                                                                                #
 # Author:    Abbas Alameer <abbas.alameer@ku.edu.kw>,                                                                            #
 #          Bioinformatics and Molecular Modelling Group,                                                                         #
@@ -39,7 +39,7 @@
 # Program Usage:                                                                                                                 #
 # --------------                                                                                                                 #
 #                                                                                                                                #
-# geoCancerPrognosticDatasetsRetriever -h [-d CANCER TYPE] [-p PLATFORMS_CODES]                                                  #
+# geoCancerPrognosticDatasetsRetriever -h [-d CANCER_TYPE] [-p PLATFORMS_CODES] [-f DIRECTORY_PATH] [-k]                         #
 #                                                                                                                                #
 ##################################################################################################################################
 
@@ -60,6 +60,7 @@ my %options 	          = (); #hash for storing command line switches and argumen
 my $input_file;
 my $formatted_input_file  = "formatted-input.dat";
 my $cancer_type;
+my ($query_term_1, $query_term_2);
 my $output_file;
 my $platform_gpl;
 my $regex_platform;
@@ -75,7 +76,7 @@ my $ftp_keyword_count     = 0;
 my $extra_count           = 0;
 my $filter2_count         = 0;
 my %simple_hash           = ();
-my ($cwd, $prog_path);
+my $prog_path;
 my $current_date_time     = date_time();
 my $run_dir;
 my @GEO_list              = ();
@@ -84,6 +85,11 @@ my $general_dir;
 my $temp_subdir;
 my $data_subdir;
 my $results_subdir;
+my $home_dir              = File::HomeDir -> my_home;
+my $absolute_path;
+my $file_cleanup_switch   = 1; #set switch to true (i.e. defaults to file cleanup, unless user disables switch at CLI)
+my $argv_line;
+
 
 
 #run start-up.
@@ -119,24 +125,12 @@ sub initial_checks {
 	#check 1 - check that the script is installed on the system.
 	#Prompt user to install it, if not found in the $PATH.
 	my $which_path	  = qx{which geoCancerPrognosticDatasetsRetriever};
-	$general_dir	  = "~/geoCancerPrognosticDatasetsRetriever_files";
-	$temp_subdir       = "~/geoCancerPrognosticDatasetsRetriever_files/temp/";
-	$data_subdir	  = "~/geoCancerPrognosticDatasetsRetriever_files/data/";
-	$results_subdir = "~/geoCancerPrognosticDatasetsRetriever_files/results/";
 	
 	unless ($which_path) {
 		
 		print color ("red"), "geoCancerPrognosticDatasetsRetriever is not installed on this system...\n", color("reset");
 		print color ("red"), "See \"README\" for installation instructions.\n", color("reset");
 		exit;
-	} 
-
-	else {
-		
-		#create main run directories - ignore if already present
-		system("mkdir -p $general_dir $temp_subdir $data_subdir $results_subdir");
-		my $home_dir = File::HomeDir -> my_home;
-		$prog_path = $home_dir . "/geoCancerPrognosticDatasetsRetriever_files";
 	} 
 
 	#check 2 - check if CPAN module (LWP::Protocol::https) is installed on current system 
@@ -179,8 +173,7 @@ sub initial_checks {
 				
 			print color ("red"), "curl binary was not found: install it on your system.\n", color("reset"); 
 		}	
-	}
-	
+	}	
 }
 ############################ SUBROUTINE 2 #######################################################
 #get the current date and time.
@@ -208,34 +201,66 @@ sub start_up {
 	print color ("yellow"),"  
 #######################################################################
 #                                                                     #
-#           GEO Cancer Prognostic Datasets Retriever v1.01            #
+#           GEO Cancer Prognostic Datasets Retriever v1.02            #
 #           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            #
 #                                                                     #
 #              Author: Abbas Alameer, Kuwait University               #
 #                         abbas.alameer\@ku.edu.kw                     #
 #                                                                     #
 #                                                                     #
-#                       Developed in March/October 2021               #
+#                       Developed in March/November 2021              #
 #                     and released under GPLv2 license                #
 #                                                                     #
 #######################################################################\n\n\n" , color("reset");
 }
 ############################ SUBROUTINE 4 #######################################################
-#This subroutine checks all command line input switches and arguments and warns user if something 
-#is missing.
+#This subroutine checks all command line input switches and arguments (including optional ones).
+#It warns user if mandatory command line input switches and arguments are missing.
 sub input_parameters_check {
 
-my $error_message = "Error: The following arguments are missing: CANCER_TYPE PLATFORM_CODES\n";
-my $help_message1  = "Usage: geoCancerPrognosticDatasetsRetriever -d \"CANCER_TYPE\" -p \"PLATFORMS_CODES\"";
+my $error_message = "Error: The following argument is missing: CANCER_TYPE\n";
+my $help_message1  = "Usage: geoCancerPrognosticDatasetsRetriever -d \"CANCER_TYPE\"";
 my $help_message2  = "Mandatory arguments:
   CANCER_TYPE           type of the cancer as query search term
-  PLATFORM_CODES        list of GPL platform codes
 
-  Optional arguments:
-  -h                    show help message and exit";
+Optional arguments:
+  -p                    list of GPL platform codes
+  -f                    user-specified absolute path to save results files
+  -k                    option to keep temporary files
+  -h                    show help message and exit\n";
+ 
+ 
+ 	#get command line parameters from @ARGV and append them all in string. Used for later output at the end of a run.	
+	foreach my $element (@ARGV) {
+	
+		if ($element !~ m/-d|-f|-p|-k/) {
+		
+			$argv_line .= "\"$element\" ";
+			
+		} else {
+		
+			$argv_line .= "$element ";
+		}
+	}
+
+	if ($argv_line) {
+		
+		$input_command_line = "User input command: geoCancerPrognosticDatasetsRetriever $argv_line";
+	}
+ 
  
 	#parse command line switches and their arguments into a hash.
-	getopts("hd:p:", \%options);
+	getopts("hd:p:kf:", \%options);
+	
+	#create main run directories - ignore if already present
+	$general_dir	  = "~/geoCancerPrognosticDatasetsRetriever_files";
+	$temp_subdir       = "~/geoCancerPrognosticDatasetsRetriever_files/temp/";
+	$data_subdir	  = "~/geoCancerPrognosticDatasetsRetriever_files/data/";
+	system("mkdir -p $general_dir $temp_subdir $data_subdir");
+	$prog_path = $home_dir . "/geoCancerPrognosticDatasetsRetriever_files";
+	
+	#if user specifies that all results files should be kept, change $file_cleanup_switch to false.
+	$file_cleanup_switch = 0 if defined $options{k};
 	
     #Check for help switch and, if present, output help text.
 	if ($options{h}) {
@@ -245,13 +270,83 @@ my $help_message2  = "Mandatory arguments:
 		exit;
 	}
 	
-	elsif ($options{d} and $options{p}) {
+	#elsif ($options{d} and $options{p}) {
+	elsif ($options{d}) {
 		
-		print color ("green"), "Checking input parameters...", color("reset");
+		print color ("green"), "Checking input parameters...\n", color("reset");
+		
+		my $temp_filename = "$options{d}";
+		($query_term_1, $query_term_2) = split ( / /, $temp_filename );
+		
+		#enforce a user to use full term for cancer in -d argument (i.e. "bladder cancer", not "bladder")
+		if (!$query_term_1 or !$query_term_2) {
+			
+			print color ("red"), "Input argument error: Use full name for cancer in -d argument...\nFor example: \"bladder cancer\", not \"bladder\". The script will terminate here.\n", color("reset");
+			exit;
+			
+		} else {
+			
+			#add dash in cancer type query search term.
+			$cancer_type = uc ( join ( '-', $query_term_1, $query_term_2 ) );
+		}
+		
+		#check for optional user-specified results directory and create it
+		#or default to standard result directory
+		if (exists $options{f}) {
+		
+			my $absolute_path = $options{f};
+			$results_subdir = "/geoCancerPrognosticDatasetsRetriever_files/results/";
+		
+			#check for string argument (i.e. user-specified absolute path)
+			if ($absolute_path =~ m/^\/\S+\/$/) {
+			 
+				chomp($absolute_path);
+				
+				#Check for forward slashes enclosing the arguments
+				$results_subdir = "$absolute_path". "results/";
+			} else {
+				
+				print color ("red"), "Input argument error: The directory name should include forward slashes...\nFor example: -f \"/temp_directory/\". The script will terminate here.\n", color("reset");
+				exit;
+			} 
+		
+		} else {
+			
+			print color ("green"), "No user-provided temporary file path through the -f argument is present...\nSaving files to: \"~/geoCancerPrognosticDatasetsRetriever_files/\" folder...\n", color("reset");
+			 
+			$results_subdir = "/geoCancerPrognosticDatasetsRetriever_files/results/";
+		}
+	
+		#after checking if the CLI's "-f" option is present or not, create results directory's path.
+		$results_subdir = $home_dir . $results_subdir;
+		system("mkdir -p $results_subdir");
+		
+		#check if user-defined GPL platforms are specified.
+		if (defined $options{p}) {
+				
+			$platform_gpl = uc($options{p});
+				
+			#error checks done in case a user specifies "-p" flag but includes missing or wrong inputs
+			#and if that is the case, the default platform will be used.
+			if ($platform_gpl !~ m/^GPL|^\d+/) { 
+					
+				$platform_gpl = "GPL570";
+				print color ("green"), "No user-provided input platform through the -p argument is present...\nDefault platform: GPL570 will be used...\n", color("reset"); 
+			}
+				
+		} else {
+				
+			#if a user does not specify any platform, default platform is set to "GPL570" 		
+			$platform_gpl = "GPL570";
+			print color ("green"), "No user-provided input platform through the -p argument is present...\nDefault platform: GPL570 will be used...\n", color("reset"); 
+		}
+		
+		#after all checks above are completed - run mini() to initiate a run or check/restart aborted runs.
 		mini();
 	}
 	
-	elsif (!$options{d} or !$options{p}) {
+	#elsif (!$options{d} or !$options{p}) {
+	elsif (!$options{d}) {
 			
 		print color ("green"), "$help_message1\n$help_message2\n", color("reset");
 		print color ("red"), $error_message, color("reset");
@@ -260,17 +355,13 @@ my $help_message2  = "Mandatory arguments:
 	
 	sub mini {
 		
-		print color ("green"), "done\n", color("reset");
+		#print color ("green"), "done\n", color("reset");
 		
 		my $restart_input_file;
-		my $temp_filename = "$options{d}";
-		my ($query_term_1, $query_term_2) = split ( / /, $temp_filename );
-		#add dash in cancer type query search term.
-		$cancer_type = uc ( join ( '-', $query_term_1, $query_term_2 ) );
 		my $cancer = "$query_term_1";
 		my @files = glob("$prog_path/data/$cancer\_cancer_GEO_*.txt");
 		my @sorted_files = sort {$b cmp $a} @files;
-		$run_dir = "$prog_path/results/$cancer_type\_GEO-files";
+		$run_dir = "$results_subdir" . "$cancer_type\_GEO-files";
 		
 		foreach my $file (@sorted_files) {
 			
@@ -283,7 +374,7 @@ my $help_message2  = "Mandatory arguments:
 			
 			print color ("red"), "$cancer_type\_GEO-files directory exists...This run was not completed\n", color("reset");
 			my $text = "";
-			my $ok = timed_response( sub { 	
+			my $ok   = timed_response( sub { 	
 			
 				print color ("red"), "Do you want to resume an interrupted execution [r], or start a new one [n]? (r/n)\nDefault selection will be [n] after 10 seconds...\n", color("reset"); $text = <STDIN>; 
 			
@@ -294,11 +385,12 @@ my $help_message2  = "Mandatory arguments:
 			if ($text eq "r") {
 				
 				print color ("green"), "Resuming analysis using input file: $restart_input_file\n", color("reset");
-				$platform_gpl= uc($options{p});
-				my $regex1 = join( '', ( split(/GPL/, $platform_gpl) ) );
+				#$platform_gpl	= uc($options{p});
+				$platform_gpl	= uc($platform_gpl);
+				my $regex1 		= join( '', ( split(/GPL/, $platform_gpl) ) );
 				$regex_platform = join( '|', ( split(/ /, $regex1) ) );
-				$input_file = $restart_input_file;
-				$output_file = "$cancer_type.out";
+				$input_file 	= $restart_input_file;
+				$output_file 	= "$cancer_type.out";
 			}
 			
 			#this is when the user selects "n", or types nothing/ or 10 seconds elapse -> defaults to "n"
@@ -332,15 +424,14 @@ my $help_message2  = "Mandatory arguments:
 
 		sub new_run {
 			
-			my $cancer = $_[0];
+			my $cancer      = $_[0];
 			print color ("green"), "Downloading input file for \"$cancer\" cancer from GeoDatasets...", color("reset");
-			$input_file  = download_geo_input($options{d});
+			$input_file     = download_geo_input($options{d});
 			print color ("green"), "done\n", color("reset");
 			system ("mkdir $run_dir"); #create results output directory
-			$platform_gpl= uc($options{p});
-			my $regex1 = join( '', ( split(/GPL/, $platform_gpl) ) );
+			my $regex1      = join( '', ( split(/GPL/, $platform_gpl) ) );
 			$regex_platform = join( '|', ( split(/ /, $regex1) ) );
-			$output_file = "$cancer_type.out";
+			$output_file    = "$cancer_type.out";
 			
 			#Check for the presence of the input file.
 			unless (-e "$prog_path/data/$input_file") {
@@ -350,10 +441,6 @@ my $help_message2  = "Mandatory arguments:
 			}
 		}	
 	}
-	
-	my $local_query = $options{d};
-	my $local_gpl    = $options{p};
-	$input_command_line = "User input command: geoCancerPrognosticDatasetsRetriever -d \"$local_query\" -p \"$local_gpl\"";
 }
 ############################ SUBROUTINE 5 #######################################################
 # The following code was reused from the NCBI's NBK25501 reference textbook.
@@ -447,7 +534,7 @@ sub main {
 	open (FH, "$prog_path/data/$main_formatted_input_file") or die "Cannot open file: $main_formatted_input_file $!\n";
 
 	#open output file
-	open (FH2, '>', "$prog_path/results/$main_output_file") or die "Cannot open file for writing data: $!\n";
+	open (FH2, '>', "$results_subdir$main_output_file") or die "Cannot open file for writing data: $!\n";
     
 	while ($line = <FH>) {
 			
@@ -591,11 +678,11 @@ sub main {
 	my ($main_output_file_1, $main_outputout_file_2) = split (/\./, $main_output_file);
 	my $main_output_file_timestamped = $main_output_file_1 . "_" . $current_date_time . "." . $main_outputout_file_2;
 	
-	system("mv $prog_path/results/$main_output_file $prog_path/results/$main_output_file_timestamped");
+	system("mv $results_subdir$main_output_file $results_subdir$main_output_file_timestamped");
 	
 	print color ("green"), "=========================================================================================\n", color("reset");
 	print FH2 "==========================================================================================\n";
-	print color ("green"), "Check results file: $general_dir\/results\/", color("reset");
+	print color ("green"), "Check results file: $results_subdir", color("reset");
 	print color ("blue"), "$main_output_file_timestamped\n", color("reset");
 	print color ("green"), "Total prognostic datasets found: $filter2_count\n";
 	print FH2 "Total prognostic datasets found:\t$filter2_count\n";
@@ -616,13 +703,22 @@ sub main {
 
 	#append date and time stamp to current run_dir in the results directory
 	system("mv $run_dir $run_dir\_$current_date_time");
+	
+	#check $file_cleanup_switch status: if "1" ==> delete .soft files directory. 
+	#This is only done at the end of a run here to allow for restarts of prematurely terminated runs.
+	if ($file_cleanup_switch) {
+		
+		#remove the temp run files, keeping only the .out file
+		system("rm -r $run_dir\_$current_date_time");
+	}
+	
 }
 ############################ SUBROUTINE 8 #######################################################
 #This subroutine checks if the output file is empty. If it is, then defined GPL series were not 
 #present in user's input file.
 sub is_file_empty {
 		
-	open my $check_file, '<', "$prog_path/results/$_[0]"; 
+	open my $check_file, '<', "$results_subdir$_[0]"; 
 	my $first_line = <$check_file>;
 
 	if ($first_line =~ m/^=+/) {
@@ -817,43 +913,120 @@ geoCancerPrognosticDatasetsRetriever - GEO Cancer Prognostic Datasets Retriever 
 
 =head1 SYNOPSIS
 
-    Usage: geoCancerPrognosticDatasetsRetriever -d "CANCER_TYPE" -p "PLATFORMS_CODES"
+    Usage: geoCancerPrognosticDatasetsRetriever -h -d "CANCER_TYPE" -p "PLATFORMS_CODES" -f "DIRECTORY_PATH" -k 
 
-An example command using "bladder cancer" as a query: 
+An example basic command using "bladder cancer" as a query: 
 
-    $ geoCancerPrognosticDatasetsRetriever -d "bladder cancer" -p "GPL570 GPL97 GPL96"
+    $ geoCancerPrognosticDatasetsRetriever -d "bladder cancer"
 
-The input and output files of geoCancerPrognosticDatasetsRetriever will be found in the ~/geoCancerPrognosticDatasetsRetriever_files/data/ and ~/geoCancerPrognosticDatasetsRetriever_files/results/ directories, respectively.
+When using the basic command, the input and output files of geoCancerPrognosticDatasetsRetriever will be found in the `~/geoCancerPrognosticDatasetsRetriever_files/data/` and `~/geoCancerPrognosticDatasetsRetriever_files/results/` directories, respectively.
 
 =head1 DESCRIPTION
 
 Gene Expression Omnibus (GEO) Cancer Prognostic Datasets Retriever is a bioinformatics tool for cancer prognostic dataset retrieval from the GEO database. It requires a GeoDatasets input file listing all GSE dataset entries for a specific cancer (for example, bladder cancer), obtained as a download from the GEO database. This bioinformatics tool functions by applying two heuristic filters to examine individual GSE dataset entries listed in a GEO DataSets input file. The Prognostic Text filter flags for prognostic keywords (ex. "prognosis" or "survival") used by clinical scientists and present in the title/abstract entries of a GSE dataset. If found, this tool retrieves those flagged datasets. Next, the second filter (Prognostic Signature filter) filters these datasets further by applying prognostic signature pattern matching (Perl regular expression signatures) to identify if the GSE dataset is a likely prognostic dataset.
 
+=head1 DEPENDENCIES
+
+=over
+
+=item strict
+
+=item warnings
+
+=item Term::ANSIColor
+
+=item Getopt::Std
+
+=item LWP::Simple
+
+=item File::Basename
+
+=item File::HomeDir
+
+=item App::cpanminus
+
+=item Net::SSLeay
+
+=back
+
 =head1 INSTALLATION
 
-geoCancerPrognosticDatasetsRetriever can be used on any Linux or macOS machines. To run the program, you need to have the cURL program (version 7.68.0 or later) installed on your computer.
+geoCancerPrognosticDatasetsRetriever can be used on any Linux, macOS, or Windows machines. On the Windows operating system you will need to install the Windows Subsystem for Linux (WSL) compatibility layer (L<The WSL Installation Page|https://docs.microsoft.com/en-us/windows/wsl/install/>). Once WSL is launched, the user can follow the geoCancerPrognosticDatasetsRetriever installation instructions described below.
 
-By default, cURL is installed on all macOS versions. cURL may not be installed on Linux and would need to be manually installed through a Linux distribution’s software centre. It will be installed automatically on Linux Ubuntu by geoCancerPrognosticDatasetsRetriever.
+By default, Perl is installed on all Linux or macOS operating systems. Likewise, cURL is installed on all macOS versions. cURL may not be installed on Linux and would need to be manually installed through a Linux distribution’s software centre. It will be installed automatically on Linux Ubuntu by geoCancerPrognosticDatasetsRetriever.
 
 Manual install:
 
-    $ perl Makefile.PL
-    $ make
-    $ make install
+    $  perl Makefile.PL
+    $  make
+    $  make install
 
-On Linux Ubuntu, you might need to run the last command as a superuser (sudo make install) and to manually install the libfile-homedir-perl package (sudo apt-get install -y libfile-homedir-perl), if not already installed in your Perl 5 configuration.
+On Linux Ubuntu, you might need to run the last command as a superuser
+(`sudo make install`) and you will need to manually install (if not
+already installed in your Perl 5 configuration) the following packages:
+
+libfile-homedir-perl
+
+    $  sudo apt-get install -y libfile-homedir-perl
+
+cpanminus
+
+    $  sudo apt -y install cpanminus
+
+LWP::Simple
+
+    $  perl -MCPAN -e 'install "LWP::Simple"'
+
+libnet-ssleay-perl
+
+    $  sudo apt-get install -y libnet-ssleay-perl
 
 CPAN install:
 
-    $ cpanm App::geoCancerPrognosticDatasetsRetriever
+    $  cpanm App::geoCancerPrognosticDatasetsRetriever
 
 To uninstall:
 
-    $ cpanm --uninstall App::geoCancerPrognosticDatasetsRetriever
+    $  cpanm --uninstall App::geoCancerPrognosticDatasetsRetriever
     
 =head1 DATA FILE
 
 The required input file is a GEO DataSets file obtainable as a download from GEO DataSets, upon querying for any particular cancer (for example, bladder cancer) in geoCancerPrognosticDatasetsRetriever.
+
+=head1 EXECUTION INSTRUCTIONS
+
+The basic usage for running geoCancerPrognosticDatasetsRetriever is:
+
+    $  geoCancerPrognosticDatasetsRetriever -d "CANCER_TYPE"
+
+An example basic usage command using "bladder cancer" as a query: 
+
+    $  geoCancerPrognosticDatasetsRetriever -d "bladder cancer"
+
+With the basic usage command, the mandatory -d (download) flag is used to download and then retrieve bladder cancer prognostic dataset(s) associated with the GPL570 platform code (default selection). When using this command, the input and output files of geoCancerPrognosticDatasetsRetriever will be found in the `~/geoCancerPrognosticDatasetsRetriever_files/data/` and `~/geoCancerPrognosticDatasetsRetriever_files/results/` directories, respectively.
+
+For specialized options, allowing more fine-grained user control, the following options are made available:
+
+-p <list of GPL platform codes>
+
+A list of GPL platform codes may be specified prior to execution, for expanding prognostic datasets retrieval for a particular cancer (i.e. bladder cancer). For example:
+
+    $  geoCancerPrognosticDatasetsRetriever -d "bladder cancer" -p "GPL570 GPL97 GPL96"
+
+-f <user-specified absolute path to save results files>
+
+A user-specified absolute path to save results files (overriding the default results directory) may by specified prior to execution. For example:
+
+    $  geoCancerPrognosticDatasetsRetriever -d "bladder cancer" -p "GPL570 GPL97 GPL96" -f "/Bladder_cancer_files/"
+
+With this command, the input files will be found in the same directory as a basic usage run's input files (`~/geoCancerPrognosticDatasetsRetriever_files/data/`. The output files will be found in the user-specified directory (for example, "/Bladder_cancer_files/"), created in the user's home directory.
+
+-k <option to keep temporary files>
+
+This option allows a user to keep large temporary/output files instead of them
+being removed by default. For example:
+
+    $  geoCancerPrognosticDatasetsRetriever -d "bladder cancer" -p "GPL570 GPL97 GPL96" -f "/Bladder_cancer_files/" -k
 
 =head1 HELP
 
@@ -868,9 +1041,12 @@ Usage: geoCancerPrognosticDatasetsRetriever -h
 Mandatory arguments:
 
     CANCER_TYPE           type of the cancer as query search term
-    PLATFORM_CODES        list of GPL platform codes
 
     Optional arguments:
+    -h                    show help message and exit
+    -p                    list of GPL platform codes
+    -f                    user-specified absolute path to save results files
+    -k                    option to keep temporary files
     -h                    show help message and exit
 
 =head1 AUTHOR

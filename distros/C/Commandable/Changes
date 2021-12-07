@@ -1,5 +1,11 @@
 Revision history for Commandable
 
+0.06    2021-11-03
+        [CHANGES]
+         * Initial support for declaring named options to commands
+         * Also parse out commandline options
+         * Include options in `help` output
+
 0.05    2021-10-10
         [CHANGES]
          * Added Commandable::Finder::SubAttributes

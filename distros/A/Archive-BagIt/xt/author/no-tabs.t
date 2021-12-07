@@ -17,6 +17,8 @@ my @files = (
     'lib/Archive/BagIt/Role/Algorithm.pm',
     'lib/Archive/BagIt/Role/Manifest.pm',
     'lib/Archive/BagIt/Role/OpenSSL.pm',
+    'lib/Archive/BagIt/Role/OpenSSL/Async.pm',
+    'lib/Archive/BagIt/Role/OpenSSL/Sync.pm',
     'lib/Archive/BagIt/Role/Plugin.pm',
     'lib/Archive/BagIt/Role/Portability.pm',
     't/00-compile.t',

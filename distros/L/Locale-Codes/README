@@ -473,11 +473,25 @@ KNOWN BUGS AND LIMITATIONS
 
 BUGS AND QUESTIONS
     If you find a bug in Locale::Codes, there are three ways to send it to
-    me. Any of them are fine, so use the method that is easiest for you.
+    me. In order of preference, they are:
+
+    GitHub
+        You can submit it as an issue on GitHub. This can be done at the
+        following URL:
+
+        <https://github.com/SBECK-github/Locale-Codes>
+
+        This is the preferred method. Please submit problems requests as
+        GitHub issues if at all possible.
 
     Direct email
         You are welcome to send it directly to me by email. The email
         address to use is: sbeck@cpan.org.
+
+        Please note that because cpan.org addresses are published, they are
+        used by a lot of spammers and phishers. Please include the name of
+        the perl module in the subject line of ALL messages sent to my
+        cpan.org address or it will likely be missed.
 
     CPAN Bug Tracking
         You can submit it using the CPAN tracking tool. This can be done at
@@ -485,11 +499,8 @@ BUGS AND QUESTIONS
 
         <http://rt.cpan.org/Public/Dist/Display.html?Name=Locale-Codes>
 
-    GitHub
-        You can submit it as an issue on GitHub. This can be done at the
-        following URL:
-
-        <https://github.com/SBECK-github/Locale-Codes>
+        There was discussion of halting this service a while back (though it
+        continues to function), so only use this as a last resort.
 
     Please do not use other means to report bugs (such as forums for a
     specific OS or Linux distribution) as it is impossible for me to keep up

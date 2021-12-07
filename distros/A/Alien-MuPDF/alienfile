@@ -11,7 +11,7 @@ share {
 	requires 'IO::Socket::SSL' => 0;
 
 	plugin Download => (
-		url => 'https://mupdf.com/downloads/',
+		url => 'https://mupdf.com/releases/',
 		version => qr/mupdf-([\w\.]+)-source\.tar\.gz/,
 	);
 

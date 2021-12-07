@@ -1,15 +1,3 @@
-package Quiq::AxisTick;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Math;
-use POSIX ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -43,6 +31,24 @@ Referenz auf das Achsen-Objekt.
 Wert des Tick.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::AxisTick;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Math;
+use POSIX ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -232,7 +238,7 @@ sub height {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -12,7 +12,7 @@ use vars qw(
 ## Inheritance and Versioning ##
 
 @ISA     = qw( Exporter );
-$VERSION = '0.17';
+$VERSION = '0.18';
 
 ## General Definitions ##
 
@@ -560,7 +560,7 @@ sub _update_timers
 
 =head1 NAME
 
-Net::BGP::Peer - Class encapsulating BGP-4 peering session state and functionality
+C<Net::BGP::Peer> - Class encapsulating BGP-4 peering session state and functionality
 
 =head1 SYNOPSIS
 
@@ -638,19 +638,19 @@ Net::BGP::Peer - Class encapsulating BGP-4 peering session state and functionali
 =head1 DESCRIPTION
 
 This module encapsulates the state and functionality associated with a BGP
-peering session. Each instance of a B<Net::BGP::Peer> object corresponds
+peering session. Each instance of a C<Net::BGP::Peer> object corresponds
 to a peering session with a distinct peer and presents a programming
 interface to manipulate the peering session state and exchange of routing
-information. Through the methods provided by the B<Net::BGP::Peer> module,
+information. Through the methods provided by the C<Net::BGP::Peer> module,
 a program can start or stop peering sessions, send BGP routing UPDATE
 messages, and register callback functions which are invoked whenever the
 peer receives BGP messages from its peer.
 
 =head1 CONSTRUCTOR
 
-I<new()> - create a new Net::BGP::Peer object
+I<new()> - create a new C<Net::BGP::Peer> object
 
-This is the constructor for Net::BGP::Peer objects. It returns a
+This is the constructor for C<Net::BGP::Peer> objects. It returns a
 reference to the newly created object. The following named parameters may
 be passed to the constructor. Once the object is created, only the
 callback function references can later be changed.
@@ -659,7 +659,7 @@ callback function references can later be changed.
 
 Setting this parameter to a true value causes the peer to initiate a
 session with its peer immediately after it is registered with the
-B<Net::BGP::Process> object's I<add_peer()> method. If omitted or
+L<Net::BGP::Process> object's I<add_peer()> method. If omitted or
 set to a false value, the peer will remain in the Idle state until
 the I<start()> method is called explicitly by the program. When in
 the Idle state the peer will refuse connections and will not initiate
@@ -667,12 +667,12 @@ connection attempts.
 
 =head2 ThisID
 
-This parameter sets the BGP ID (IP address) of the B<Net::BGP::Peer>
+This parameter sets the BGP ID (IP address) of the C<Net::BGP::Peer>
 object. It takes a string in IP dotted decimal notation.
 
 =head2 ThisAS
 
-This parameter sets the BGP Autonomous System number of the B<Net::BGP::Peer>
+This parameter sets the BGP Autonomous System number of the C<Net::BGP::Peer>
 object. It takes an integer value in the range of a 16-bit unsigned integer.
 
 =head2 PeerID
@@ -707,7 +707,7 @@ is given in seconds.
 
 =head2 Listen
 
-This parameter specifies whether the B<Net::BGP::Peer> will listen for
+This parameter specifies whether the C<Net::BGP::Peer> will listen for
 and accept connections from its peer. If set to a false value, the peer
 will only initiate connections and will not accept connection attempts
 from the peer (unless the B<Passive> parameter is set to a true value).
@@ -718,7 +718,7 @@ configured to listen.
 
 =head2 Passive
 
-This parameter specifies whether the B<Net::BGP::Peer> will attempt to
+This parameter specifies whether the C<Net::BGP::Peer> will attempt to
 initiate connections to its peer. If set to a true value, the peer will
 only listen for connections and will not initate connections to its peer
 (unless the B<Listen> parameter is set to false value). Note that this
@@ -727,44 +727,44 @@ However, it is useful under certain circumstances and should not present
 problems as long as one side of the connection is configured to initiate
 connections.
 
-=head2 Refresh
+=head2 AnnounceRefresh
 
-This parameter specifies whether the B<Net::BGP::Peer> will annonce support
+This parameter specifies whether the C<Net::BGP::Peer> will announce support
 for route refresh ('soft re-configure' as specified by RFC 2918). No support
-for route refresh is implemented - only the B<RefreshCallback> function.  This
+for route refresh is implemented - only the B<RefreshCallback> function. This
 has no effect if SupportCapabilities is FALSE.
 
 =head2 SupportCapabilities
 
-This parameter specifies whether the B<Net::BGP::Peer> will attempt to
-negotiate capabilities.  You can set this to FALSE if talking to an old BGP
+This parameter specifies whether the C<Net::BGP::Peer> will attempt to
+negotiate capabilities. You can set this to FALSE if talking to an old BGP
 speaker that doesn't support it (you'll get a notification message for an
-unsupported capability if this is the case).  This defaults to TRUE.
+unsupported capability if this is the case). This defaults to TRUE.
 
 =head2 SupportMBGP
 
-This parameter specifies whether the B<NET::BGP::Peer> will attempt to
-negotiate MBGP.  Quagga (and probably others) need this if you want to send
-the REFRESH capability. Today this just indicates support for IPv4 Unicast.
-This defaults to TRUE.  This has no effect if SupportCapabilities is FALSE.
+This parameter specifies whether the C<Net::BGP::Peer> will attempt to
+negotiate MBGP. Quagga (and probably others) need this if you want to send
+the REFRESH capability. Today this just indicates support for IPv4 unicast.
+This defaults to TRUE. This has no effect if SupportCapabilities is FALSE.
 
 =head2 SupportAS4
 
-This paramemter specifies whether outgoing connections from B<NET::BGP::Peer>
+This parameter specifies whether outgoing connections from the C<Net::BGP::Peer>
 will attempt to negotiate AS4 (32 bit ASNs). For received connections, this
 parameter has no effect - it only determines whether or not AS4 is negotiated
-during outgoing connection.  For received connections, this will be changed
+during outgoing connection. For received connections, this will be changed
 to TRUE (on the listening connection) whenever the appropriate OPEN capability
-is received.  Note that the B<SupportCapabilities> must be true for this to
-be sent.  This defaults to FALSE.
+is received. Note that the B<SupportCapabilities> must be true for this to
+be sent. This defaults to FALSE.
 
 =head2 OpaqueData
 
 This parameter is an optional scalar that will be kept as part of the
-B<Net::BGP::Peer> and can be queried by the callback routines when they
+C<Net::BGP::Peer> and can be queried by the callback routines when they
 receive a peer hashref - see B<opaque_data>. This allows extra data to be
 stored with the peer. The contents of this are completely ignored by
-B<Net::BGP::Peer>. This defaults to I<undef>.
+C<Net::BGP::Peer>. This defaults to I<undef>.
 
 =head2 OpenCallback
 
@@ -809,10 +809,10 @@ peer. It takes a subroutine reference. See L<"CALLBACK FUNCTIONS">
 later in this manual for further details of the conventions of callback
 invocation.
 
-I<renew> - fetch the existing Net::BGP::Peer object from the "object string".
+I<renew> - fetch the existing C<Net::BGP::Peer> object from the "object string".
 
-This "reconstructor" returns a previeus constructed object from the
-perl genereted string-context scalar of the object, eg.
+This "reconstructor" returns a previously constructed object from the
+perl generated string-context scalar of the object, e.g.
 I<Net::BGP::Peer=HASH(0x820952c)>.
 
 =head1 ACCESSOR METHODS
@@ -842,7 +842,7 @@ I<update()> - send a BGP UPDATE message to the peer
     $peer->update($update);
 
 This method sends the peer an UPDATE message. It takes a reference
-to a Net::BGP::Update object. See the Net::BGP::Update
+to a L<Net::BGP::Update> object. See the L<Net::BGP::Update>
 manual page for details on setting UPDATE attributes.
 
 I<refresh()> - send a BGP REFRESH message to the peer
@@ -850,20 +850,9 @@ I<refresh()> - send a BGP REFRESH message to the peer
     $peer->refresh($refresh);
 
 This method sends the peer a REFRESH message. It takes a reference
-to a Net::BGP::Refesh object. If no argument is provided, a default
-Net::BGP::Refresh object is constructed. See the Net::BGP::Refresh
+to a L<Net::BGP::Refresh> object. If no argument is provided, a default
+L<Net::BGP::Refresh> object is constructed. See the L<Net::BGP::Refresh>
 manual page for details on setting REFRESH attributes.
-
-I<transport()>
-
-Returns the active transport object to the peer - See Net::BGP::Transport.
-
-I<transports()>
-
-Return a list of transport objects. The list will contain one or two elements.
-The first will always be the primary transport object. If there are two
-sessions (e.g. collision detection hasn't removed one of them), the sibling
-will be returned as the second element of the list.
 
 I<this_id()>
 
@@ -963,7 +952,7 @@ to the subroutine previously added.
 
 =head1 CALLBACK FUNCTIONS
 
-Whenever a B<Net::BGP::Peer> object receives one of the BGP protocol messages -
+Whenever a C<Net::BGP::Peer> object receives one of the BGP protocol messages -
 OPEN, KEEPALIVE, UPDATE, REFRESH, or NOTIFICATION - from its peer, or whenever it
 encounters an error condition and must send a NOTIFICATION message to its peer,
 the peer object will invoke a program defined callback function corresponding
@@ -972,19 +961,19 @@ the event. These callback functions are installed as described in the preceding
 section of the manual. Whenever any callback function is invoked, it is passed
 one or more arguments, depending on the BGP message type associated with the
 callback. The first argument passed to all of the callbacks is a reference
-to the B<Net::BGP::Peer> object which the application may use to identify
+to the C<Net::BGP::Peer> object which the application may use to identify
 which peer has signalled the event and to take appropriate action. For OPEN
 and KEEPALIVE callbacks, this is the only argument passed. It is very unlikely
 that applications will be interested in OPEN and KEEPALIVE events, since the
-B<Net::BGP> module handles all details of OPEN and KEEPALIVE message processing
+C<Net::BGP> module handles all details of OPEN and KEEPALIVE message processing
 in order to establish and maintain BGP sessions. Callback handling for these
 messages is mainly included for the sake of completeness. For UPDATE and
 NOTIFICATION messages, however, most applications will install callback handlers.
 Whenever an UPDATE, REFRESH, NOTIFICATION, or error handler is called, the object
-will pass a second argument. In the first two cases, this is a B<Net::BGP::Update>
-or B<Net::BGP::Refresh> object respectivly encapsulating the information contained
+will pass a second argument. In the first two cases, this is a L<Net::BGP::Update>
+or L<Net::BGP::Refresh> object respectivly encapsulating the information contained
 in the UPDATE or REFRESH message, while in the latter two cases it is a
-B<Net::BGP::Notification> object encapsulating the information in the
+L<Net::BGP::Notification> object encapsulating the information in the
 NOTIFICATION message sent or received.
 
 The RESET and ESTABLISHED callbacks are special, since they are used whenever an
@@ -1020,7 +1009,7 @@ constructor or through the I<set_open_callback()>, I<set_established_callback()>
 I<set_keepalive_callback()>, I<set_update_callback()>, I<set_refresh_callback()>,
 I<set_reset_callback()>, I<set_notification_callback()>, and I<set_error_callback()>
 methods, an application may effect a similar result by sub-classing the
-B<Net::BGP::Peer> module and overridding the defintions of the above methods
+C<Net::BGP::Peer> module and overridding the defintions of the above methods
 to perform whatever actions would have been executed by ordinary callback functions.
 The overridden methods are passed the same arguments as the callback functions.
 This method might offer an advantage in organizing code according to different
@@ -1037,20 +1026,35 @@ Keepalive timer expires. In this case, the peer responds by sending a NOTIFICATI
 message to its peer. In the former case the I<notification_callback()> method
 is invoked as described above to handle the error, while in the latter the
 I<error_callback()> method is invoked to inform the application that it has
-encountered an error. Both methods are passed a B<Net::BGP::Notification>
+encountered an error. Both methods are passed a L<Net::BGP::Notification>
 object encapsulating the details of the error. In both cases, the transport-layer
 connection and BGP session are closed and the peer transitions to the Idle state.
 The error handler callbacks can examine the cause of the error and take appropriate
 action. This could be to attempt to re-establish the session (perhaps after
 sleeping for some amount of time), or to unregister the peer object from the
-B<Net::BGP::Process> object and permanently end the session (for the duration
+L<Net::BGP::Process> object and permanently end the session (for the duration
 of the application's running time), or to log the event to a file on the host
 system, or some combination of these or none.
 
 =head1 SEE ALSO
 
-Net::BGP, Net::BGP::Process, Net::BGP::Update, Net::BGP::Transport,
-Net::BGP::Refresh, Net::BGP::Notification
+=over
+
+=item L<Net::BGP>
+
+=item L<Net::BGP::Process>
+
+=item L<Net::BGP::Update>
+
+=item L<Net::BGP::Refresh>
+
+=item L<Net::BGP::ASPath>
+
+=item L<Net::BGP::NLRI>
+
+=item L<Net::BGP::Notification>
+
+=back
 
 =head1 AUTHOR
 

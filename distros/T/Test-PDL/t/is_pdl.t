@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 41;
+use Test::More;
 use Test::Builder::Tester;
 use Test::Exception;
 use PDL;
 use Test::PDL;
-use Test::NoWarnings;
+use Test::NoWarnings qw(had_no_warnings); $Test::NoWarnings::do_end_test = 0;
 
 my ( $got, $expected );
 
@@ -241,3 +241,6 @@ lives_ok { Test::PDL::set_options(
 	} 'accepts two options at the same time';
 is( $Test::PDL::OPTIONS{TOLERANCE}, 1e-4, 'TOLERANCE set correctly' );
 is( $Test::PDL::OPTIONS{EQUAL_TYPES}, 2, 'EQUAL_TYPES set correctly' );
+
+had_no_warnings;
+done_testing;

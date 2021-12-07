@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Alien::Build::Wizard 0.05 {
+package Alien::Build::Wizard 0.06 {
 
   use Moose;
   use Moose::Util::TypeConstraints;
@@ -242,7 +242,7 @@ Alien::Build::Wizard - Alien distribution creation wizard
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

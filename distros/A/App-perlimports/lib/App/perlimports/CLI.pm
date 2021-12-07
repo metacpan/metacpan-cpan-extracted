@@ -2,8 +2,9 @@ package App::perlimports::CLI;
 
 use Moo;
 use utf8;
+use feature qw( say );
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000027';
 
 use App::perlimports           ();
 use App::perlimports::Document ();
@@ -62,10 +63,7 @@ sub _build_args {
     my $self = shift;
     my ( $opt, $usage ) = describe_options(
         'perlimports %o',
-        [
-            'filename|f=s', 'The file containing the imports',
-            { required => 1 }
-        ],
+        [ 'filename|f=s', 'The file containing the imports' ],
         [],
         [
             'ignore-modules=s',
@@ -209,13 +207,13 @@ sub run {
     my $self = shift;
     my $opts = $self->_opts;
 
-    ( print $VERSION )            && return if $opts->version;
+    ( print $VERSION, "\n" )      && return if $opts->version;
     ( print $self->_usage->text ) && return if $opts->help;
 
     if ( $opts->verbose_help ) {
         print $self->_usage->text;
         require Pod::Usage;    ## no perlimports
-        print Pod::Usage::pod2usage();
+        Pod::Usage::pod2usage( ( { -exitval => 0 } ) );
         return;
     }
 
@@ -235,7 +233,8 @@ sub run {
         ? $self->logger
         : Log::Dispatch->new(
         outputs => [
-            $opts->log_filename ? [
+            $opts->log_filename
+            ? [
                 'File',
                 binmode   => ':encoding(UTF-8)',
                 filename  => $opts->log_filename,
@@ -253,7 +252,20 @@ sub run {
         ]
         );
 
-    $logger->notice( '🚀 Starting file: ' . $opts->filename );
+    my $filename = $opts->filename || shift @ARGV;
+    if ( !$filename ) {
+        say STDERR q{Mandatory parameter 'filename' missing};
+        print STDERR $self->_usage->text;
+        exit(1);
+    }
+
+    if ( !path($filename)->is_file ) {
+        say STDERR "$filename does not appear to be a file";
+        print STDERR $self->_usage->text;
+        exit(1);
+    }
+
+    $logger->notice( '🚀 Starting file: ' . $filename );
 
     # Capture STDOUT here so that 3rd party code printing to STDOUT doesn't get
     # piped back into vim.
@@ -261,7 +273,7 @@ sub run {
         sub {
             my $pi_doc = App::perlimports::Document->new(
                 cache    => $opts->cache,
-                filename => $opts->filename,
+                filename => $filename,
                 @{ $self->_ignore_modules }
                 ? ( ignore_modules => $self->_ignore_modules )
                 : (),
@@ -275,6 +287,7 @@ sub run {
                 padding             => $opts->padding,
                 preserve_duplicates => $opts->preserve_duplicates,
                 preserve_unused     => $opts->preserve_unused,
+                tidy_whitespace     => $opts->tidy_whitespace,
                 $input ? ( selection => $input ) : (),
             );
 
@@ -288,7 +301,7 @@ sub run {
     elsif ( $opts->inplace_edit ) {
 
         # append() with truncate, because spew() can change file permissions
-        path( $opts->filename )->append( { truncate => 1 }, $tidied );
+        path($filename)->append( { truncate => 1 }, $tidied );
     }
     else {
         print $tidied;
@@ -307,7 +320,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000025
+version 0.000027
 
 =head1 DESCRIPTION
 

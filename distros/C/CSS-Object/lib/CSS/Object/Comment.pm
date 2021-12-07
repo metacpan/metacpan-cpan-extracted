@@ -43,7 +43,7 @@ sub as_string
     return( $self->format->comment_as_string( $self ) );
 }
 
-sub values { return( shift->_set_get_array_as_object( 'values', @_ ) ); }
+sub values { return( shift->_set_get_object_array_object( 'values', 'CSS::Object::Value', @_ ) ); }
 
 1;
 

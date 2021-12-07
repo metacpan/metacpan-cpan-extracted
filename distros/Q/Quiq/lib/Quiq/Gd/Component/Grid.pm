@@ -1,14 +1,3 @@
-package Quiq::Gd::Component::Grid;
-use base qw/Quiq::Gd::Component/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use GD ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -120,6 +109,23 @@ Grafik:
 
     [Grafik: Gitter eines XY-Plot]
 
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gd::Component::Grid;
+use base qw/Quiq::Gd::Component/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use GD ();
+
+# -----------------------------------------------------------------------------
+
 =head1 METHODS
 
 =head2 Konstruktor
@@ -222,7 +228,7 @@ siehe L<BASE CLASS|"BASE CLASS">
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

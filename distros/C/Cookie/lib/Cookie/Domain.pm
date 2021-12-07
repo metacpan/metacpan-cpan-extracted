@@ -926,7 +926,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<Mozilla::PublicSuffix>, L<Domain::PublicSuffix>, L<Net::PublicSuffixList>
+L<Cookie>, L<Cookie::Jar>, L<Mozilla::PublicSuffix>, L<Domain::PublicSuffix>, L<Net::PublicSuffixList>
 
 L<https://publicsuffix.org/list/>
 

@@ -1,5 +1,11 @@
 Revision history for Task-BeLike-SHLOMIF
 
+0.0.8      2021-11-29
+    - Add Docker/etc.
+
+0.0.7      2021-11-24
+    - Add wml/bh-solve/etc. deps.
+
 0.0.6      2020-03-29
     - Add Task::FreecellSolver::Testing::MultiConfig
 

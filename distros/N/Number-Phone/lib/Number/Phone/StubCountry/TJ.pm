@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211833;
+our $VERSION = 1.20211206222447;
 
 my $formatters = [
                 {
@@ -45,10 +45,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '
-            [02-57-9]|
-            11
-          ',
+                  'leading_digits' => '[0-57-9]',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
@@ -92,10 +89,10 @@ my $validators = {
           41[18]\\d{6}|
           (?:
             [034]0|
-            11|
+            1[01]|
             2[02]|
             5[05]|
-            7[07]|
+            7[017]|
             8[08]|
             9\\d
           )\\d{7}
@@ -107,75 +104,72 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9923130", "Tursun\-Zade",
-"9923131", "Rasht",
-"9923246", "Vakhsh",
-"9923551", "Vanj",
-"9923247", "Kolkhozabad",
-"9923456", "Shakhristan",
-"9923455", "Jabarrasulov",
-"9923248", "Djilikul",
-"9923445", "Matchinskiy",
-"9923154", "Tadjikabad",
-"9923245", "Bokhtar",
-"9923552", "Darvaz",
+$areanames{en} = {"992331700", "Khovaling",
+"9923130", "Tursun\-Zade",
 "9923222", "Kurgan\-Tube",
+"9923248", "Djilikul",
+"9923246", "Vakhsh",
+"9923314", "Temurmalik",
+"9923137", "Rudaki",
+"9923155", "Shakhrinav",
+"9923553", "Ishkashim",
 "9923422", "Khujand",
+"9923322", "Kulyab",
+"9923441", "Spitamen",
+"9923454", "Istravshan",
+"9923453", "Asht",
+"9923554", "Murgab",
+"9923522", "Khorog",
+"9923135", "Fayzabad",
+"9923462", "Isfara",
+"9923551", "Vanj",
+"9923456", "Shakhristan",
+"9923443", "Kayrakum",
+"9923467", "Kanibadam",
+"9923451", "Chkalovsk",
+"9923556", "Rushan",
+"9923139", "Hissar",
+"9923311", "Vose",
+"9923243", "Abdurakhmana\ Jami",
+"9923316", "Parkhar",
+"9923318", "Muminobod",
+"9923251", "Kabodion",
+"9923465", "Taboshar",
 "9923132", "Jirgital",
-"9923475", "Pendjikent",
-"9923464", "Ganchi",
+"9923153", "Varzob",
 "9923442", "Gafurov",
+"9923315", "M\.\ Khamadoni",
+"9923154", "Tadjikabad",
+"9923141", "Yavan",
+"99237", "Dushanbe",
+"9923479", "Ayni",
+"9923133", "Nurobod",
+"9923249", "Kumsangir",
+"9923455", "Jabarrasulov",
 "9923242", "Khuroson",
 "9923555", "Roshtkala",
-"9923314", "Temurmalik",
-"9923135", "Fayzabad",
-"9923138", "Nurek",
-"9923522", "Khorog",
-"9923252", "Panj",
-"9923452", "Zafarabad",
-"9923153", "Varzob",
-"9923251", "Kabodion",
-"9923451", "Chkalovsk",
 "9923250", "Sarband",
-"9923556", "Rushan",
-"9923137", "Rudaki",
-"9923240", "Shaartuz",
-"9923441", "Spitamen",
-"9923136", "Vakhdat",
-"9923443", "Kayrakum",
-"9923243", "Abdurakhmana\ Jami",
-"9923141", "Yavan",
-"9923453", "Asht",
-"9923316", "Parkhar",
-"9923479", "Ayni",
-"9923554", "Murgab",
-"99237", "Dushanbe",
-"9923462", "Isfara",
-"9923315", "M\.\ Khamadoni",
-"9923249", "Kumsangir",
 "9923134", "Rogun",
-"9923318", "Muminobod",
-"9923454", "Istravshan",
-"9923322", "Kulyab",
-"992331700", "Khovaling",
-"9923139", "Hissar",
-"9923155", "Shakhrinav",
-"9923465", "Taboshar",
+"9923475", "Pendjikent",
+"9923240", "Shaartuz",
+"9923131", "Rasht",
+"9923252", "Panj",
 "9923312", "Dangara",
+"9923445", "Matchinskiy",
+"9923136", "Vakhdat",
+"9923138", "Nurek",
+"9923247", "Kolkhozabad",
+"9923452", "Zafarabad",
+"9923245", "Bokhtar",
+"9923464", "Ganchi",
 "9923156", "Tavildara",
-"9923311", "Vose",
-"9923467", "Kanibadam",
-"9923553", "Ishkashim",
-"9923133", "Nurobod",};
+"9923552", "Darvaz",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+992|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-      return $self if ($self->is_valid());
-      $number =~ s/^(?:8)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-      return $self->is_valid() ? $self : undef;
+        return $self->is_valid() ? $self : undef;
     }
 1;

@@ -1,15 +1,17 @@
 # -*- cperl -*-
 
 use ExtUtils::testlib;
-use Test::Warn;
 use Test::More ;
 use Test::Memory::Cycle;
+use Test::Log::Log4perl;
 use Test::Exception;
 use Config::Model;
 use Config::Model::Tester::Setup qw/init_test/;
 
 use strict;
 use warnings;
+
+Test::Log::Log4perl->ignore_priority("info");
 
 my ($model, $trace) = init_test();
 
@@ -225,7 +227,13 @@ throws_ok { $root->fetch_element("refer_to_wrong_path"); } 'Config::Model::Excep
 
 throws_ok { $root->fetch_element("refer_to_unknown_elt") } 'Config::Model::Exception::Model',"fetching refer_to_unknown_elt" ;
 
-warning_like { $root->fetch_element("host_reference")->store(value => 'Foo', check => 'skip') } qr/skipping value/,"store unknown host (skip mode)";
+{
+    # store unknown host (skip mode)
+    my $xp = Test::Log::Log4perl->expect(
+        ['User', warn => qr/skipping value/]
+    );
+    $root->fetch_element("host_reference")->store(value => 'Foo', check => 'skip')
+}
 
 throws_ok { $root->fetch_element("host_reference")->store('Foo') } "Config::Model::Exception::WrongValue","store unknown host (failure mode)";
 

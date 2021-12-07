@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.23.0",
+            "Getopt::EX" : "v1.26.0",
             "Hash::Util" : "0",
             "List::BinarySearch" : "0",
             "List::Util" : "1.45",
@@ -58,7 +58,7 @@
    "provides" : {
       "App::Greple" : {
          "file" : "lib/App/Greple.pm",
-         "version" : "8.4601"
+         "version" : "8.5201"
       },
       "App::Greple::Common" : {
          "file" : "lib/App/Greple/Common.pm"
@@ -87,9 +87,6 @@
       "App::Greple::Text" : {
          "file" : "lib/App/Greple/Grep.pm"
       },
-      "App::Greple::Util" : {
-         "file" : "lib/App/Greple/Util.pm"
-      },
       "App::Greple::colors" : {
          "file" : "lib/App/Greple/colors.pm"
       },
@@ -114,6 +111,9 @@
       "App::Greple::select" : {
          "file" : "lib/App/Greple/select.pm"
       },
+      "Indexer" : {
+         "file" : "lib/App/Greple/Util.pm"
+      },
       "UniqIndex" : {
          "file" : "lib/App/Greple/Util.pm"
       },
@@ -132,7 +132,7 @@
          "web" : "https://github.com/kaz-utashiro/greple"
       }
    },
-   "version" : "8.4601",
+   "version" : "8.5201",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

@@ -9,7 +9,7 @@ use Alien::Build::Util qw( _destdir_prefix );
 use File::Copy ();
 
 # ABSTRACT: Plugin to gather dynamic libraries into a separate directory
-our $VERSION = '2.45'; # VERSION
+our $VERSION = '2.46'; # VERSION
 
 
 sub init
@@ -69,7 +69,7 @@ Alien::Build::Plugin::Gather::IsolateDynamic - Plugin to gather dynamic librarie
 
 =head1 VERSION
 
-version 2.45
+version 2.46
 
 =head1 SYNOPSIS
 

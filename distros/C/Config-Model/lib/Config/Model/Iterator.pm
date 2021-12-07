@@ -7,8 +7,9 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Iterator 2.145;
+package Config::Model::Iterator 2.147;
 
+use v5.20;
 use Carp;
 use strict;
 use warnings;
@@ -17,11 +18,12 @@ use Log::Log4perl qw(get_logger :levels);
 
 use Config::Model::Exception;
 
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
+
 my $logger = get_logger("Iterator");
 
-sub new {
-    my $type = shift;
-    my %args = @_;
+sub new ($type, %args){
 
     my $self = {
         call_back_on_important => 0,
@@ -94,11 +96,13 @@ sub start {
     my $self = shift;
     $self->{bail_out} = 0;
     $self->{scanner}->scan_node( undef, $self->{root} );
+    return;
 }
 
 sub bail_out {
     my $self = shift;
     $self->{bail_out} = 1;
+    return;
 }
 
 # internal. This call-back is passed to ObjTreeScanner. It will call
@@ -126,6 +130,7 @@ sub node_content_cb {
         $self->{scanner}->scan_element( $data_r, $node, $element );
         return if $self->{bail_out};
     }
+    return;
 }
 
 # internal. Used to find which user call-back to use for a given
@@ -141,9 +146,8 @@ sub get_cb {
 # scan_hash in an order which depends on $self->{forward}.  it will
 # also check if the hash (or list) element is flagged as 'important'
 # and call user's hash or list call-back if needed
-sub hash_element_cb {
-    my ( $self, $scanner, $data_r, $node, $element ) = splice @_, 0, 5;
-    my @keys = sort @_;
+sub hash_element_cb ( $self, $scanner, $data_r, $node, $element, @raw_keys ) {
+    my @keys = sort @raw_keys;
 
     my $level = $node->get_element_property( element => $element, property => 'level' );
 
@@ -181,6 +185,7 @@ sub hash_element_cb {
         }
         $i += $self->{forward};
     }
+    return;
 }
 
 # internal. This call-back is passed to ObjTreeScanner. It will also
@@ -251,18 +256,21 @@ sub leaf_cb {
     elsif ($e) {
         die "Iterator failed on value object: $e";
     }
+    return;
 }
 
 sub go_forward {
     my $self = shift;
     $logger->info("Going forward") if $self->{forward} == -1;
     $self->{forward} = 1;
+    return;
 }
 
 sub go_backward {
     my $self = shift;
     $logger->info("Going backward") if $self->{forward} == 1;
     $self->{forward} = -1;
+    return;
 }
 
 1;
@@ -281,7 +289,7 @@ Config::Model::Iterator - Iterates forward or backward a configuration tree
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

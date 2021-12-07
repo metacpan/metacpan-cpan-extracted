@@ -36,6 +36,7 @@
          },
          "requires" : {
             "Color::ANSI::Util" : "0.164",
+            "ColorTheme::NoColor" : "0",
             "ColorThemeBase::Static::FromStructColors" : "0.006",
             "ColorThemeRole::ANSI" : "0",
             "Exporter" : "5.57",
@@ -54,22 +55,22 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
       "ColorTheme::JSON::Color::default_ansi" : {
          "file" : "lib/ColorTheme/JSON/Color/default_ansi.pm",
-         "version" : "0.132"
+         "version" : "0.133"
       },
       "ColorTheme::JSON::Color::default_rgb" : {
          "file" : "lib/ColorTheme/JSON/Color/default_rgb.pm",
-         "version" : "0.132"
+         "version" : "0.133"
       },
       "JSON::Color" : {
          "file" : "lib/JSON/Color.pm",
-         "version" : "0.132"
+         "version" : "0.133"
       }
    },
    "release_status" : "stable",
@@ -84,7 +85,7 @@
          "web" : "https://github.com/perlancar/perl-JSON-Color"
       }
    },
-   "version" : "0.132",
+   "version" : "0.133",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -623,6 +624,17 @@
                }
             },
             "name" : "DevelopX_spec",
+            "version" : "6.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
             "version" : "6.017"
          },
          {

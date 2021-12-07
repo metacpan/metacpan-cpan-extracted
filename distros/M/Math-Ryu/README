@@ -1,0 +1,21 @@
+Interface to the C implementation of Ryu at:
+https://github.com/ulfjack/ryu/tree/master/ryu.
+
+The files d2fixed.c, generic_128.c and ryu/generic_128.h have received
+some superficial modifications because some perl builds do not honor
+the permissiveness of "C99 mode".
+
+This implementation is not currently usable with perl builds whose
+$Config{nvsize} > 8.
+
+Building Math::Ryu also requires that the __uint128_t data type
+is available.
+Therefore 32-bit builds of perl are also unable to use this
+implementation.
+
+Otherwise, you can build with:
+
+$ cpan -i Math::Ryu
+
+
+

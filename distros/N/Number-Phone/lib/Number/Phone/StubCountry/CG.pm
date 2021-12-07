@@ -22,14 +22,9 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211829;
+our $VERSION = 1.20211206222443;
 
 my $formatters = [
-                {
-                  'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '801',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
-                },
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '8',
@@ -64,7 +59,7 @@ my $validators = {
                 'specialrate' => '(
           80(?:
             0\\d\\d|
-            11[0-4]
+            120
           )\\d{4}
         )',
                 'toll_free' => '',
@@ -72,13 +67,13 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{fr} = {};
-$areanames{en} = {"2422229", "Pointe\-Noire",
-"2422221", "Cuvette",
-"2422228", "Brazzaville",
+$areanames{en} = {"2422225", "Bouenza\/Lekoumou\/Niari",
 "2422224", "Plateaux",
-"2422225", "Bouenza\/Lekoumou\/Niari",
 "2422222", "Likouala\/Sangha",
-"2422223", "Pool",};
+"2422228", "Brazzaville",
+"2422223", "Pool",
+"2422229", "Pointe\-Noire",
+"2422221", "Cuvette",};
 
     sub new {
       my $class = shift;

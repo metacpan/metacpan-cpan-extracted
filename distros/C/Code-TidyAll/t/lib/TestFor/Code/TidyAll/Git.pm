@@ -5,8 +5,9 @@ use Code::TidyAll::Git::Util qw(git_files_to_commit git_modified_files);
 use Code::TidyAll::Util qw(tempdir_simple);
 use Code::TidyAll;
 use File::pushd qw(pushd);
+use FindBin qw( $Bin );
 use IPC::System::Simple qw(capturex runx);
-use Path::Tiny qw(cwd path);
+use Path::Tiny qw(path);
 use Test::Class::Most parent => 'TestHelper::Test::Class';
 use Try::Tiny;
 
@@ -14,13 +15,21 @@ use constant IS_WIN32 => $^O eq 'MSWin32';
 
 my ( $precommit_hook_template, $prereceive_hook_template, $tidyall_ini_template );
 
-my $Cwd = cwd()->realpath;
-
 $ENV{GIT_AUTHOR_NAME}  = $ENV{GIT_COMMITTER_NAME}  = 'G. Author';
 $ENV{GIT_AUTHOR_EMAIL} = $ENV{GIT_COMMITTER_EMAIL} = 'git-author@example.com';
 
+BEGIN {
+    if (IS_WIN32) {
+        __PACKAGE__->SKIP_CLASS(
+            q{These tests behave oddly on Windows (at least in Azure). I think it has to do with differences in how output is captured and possible also some line ending issues when the test plugins like UpperText are invoked.}
+        );
+    }
+}
+
 sub test_git : Tests {
     my ($self) = @_;
+
+    return unless $self->require_executable('git');
 
     my ( $temp_dir, $work_dir, $pushd ) = $self->_make_working_dir_and_repo;
 
@@ -129,6 +138,8 @@ sub test_git : Tests {
 sub test_copied_status : Tests {
     my ($self) = @_;
 
+    return unless $self->require_executable('git');
+
     my ( $temp_dir, $work_dir, $pushd ) = $self->_make_working_dir_and_repo;
 
     my $foo_file = $work_dir->child('foo.txt');
@@ -155,6 +166,8 @@ sub test_copied_status : Tests {
 
 sub test_precommit_stash_issues : Tests {
     my ($self) = @_;
+
+    return unless $self->require_executable('git');
 
     my ( $temp_dir, $work_dir, $pushd ) = $self->_make_working_dir_and_repo;
 
@@ -274,6 +287,8 @@ sub test_precommit_stash_issues : Tests {
 sub test_precommit_no_stash_merge : Tests {
     my ($self) = @_;
 
+    return unless $self->require_executable('git');
+
     my ( $temp_dir, $work_dir, $pushd ) = $self->_make_working_dir_and_repo;
 
     $work_dir->child('file1.txt')->spew("A\nB\n");
@@ -315,8 +330,6 @@ sub test_precommit_no_stash_merge : Tests {
 sub _make_working_dir_and_repo {
     my $self = shift;
 
-    $self->require_executable('git');
-
     my $temp_dir  = tempdir_simple;
     my $work_dir  = $temp_dir->child('work');
     my $hooks_dir = $work_dir->child(qw( .git hooks ));
@@ -353,7 +366,12 @@ sub _quote_for_win32 {
 }
 
 sub _lib_dirs {
-    join q{ }, map { $Cwd->child($_) } qw( lib t/lib );
+    my %dirs = map { $_ => 1 } map { path($Bin)->parent->child($_) } qw( lib t/lib );
+    if ( $ENV{PERL5LIB} ) {
+        my $sep = $^O eq 'MSWin32' ? q{;} : q{:};
+        $dirs{$_} = 1 for split /\Q$sep/, $ENV{PERL5LIB};
+    }
+    return join q{ }, sort keys %dirs;
 }
 
 sub _assert_nothing_to_commit {

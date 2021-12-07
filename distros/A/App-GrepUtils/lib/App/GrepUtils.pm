@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-14'; # DATE
 our $DIST = 'App-GrepUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to the Unix command 'grep'
@@ -22,7 +22,7 @@ App::GrepUtils - CLI utilities related to the Unix command 'grep'
 
 =head1 VERSION
 
-This document describes version 0.004 of App::GrepUtils (from Perl distribution App-GrepUtils), released on 2021-11-14.
+This document describes version 0.005 of App::GrepUtils (from Perl distribution App-GrepUtils), released on 2021-11-14.
 
 =head1 DESCRIPTION
 

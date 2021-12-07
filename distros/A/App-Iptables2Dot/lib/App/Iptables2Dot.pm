@@ -7,7 +7,7 @@ use strict;
 use Carp;
 use Getopt::Long qw(GetOptionsFromString);
 
-use version; our $VERSION = qv('v0.3.1');
+use version; our $VERSION = qv('v0.3.2');
 
 # Module implementation here
 
@@ -325,7 +325,7 @@ App::Iptables2Dot - turn iptables-save output into graphs for GraphViz
 
 =head1 VERSION
 
-This document describes App::Iptables2Dot version v0.3.1
+This document describes App::Iptables2Dot version v0.3.2
 
 
 =head1 SYNOPSIS

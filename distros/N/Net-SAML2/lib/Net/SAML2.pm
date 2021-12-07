@@ -1,12 +1,12 @@
-package Net::SAML2;
 use strict;
 use warnings;
+package Net::SAML2;
 
 require 5.008_001;
 
 # ABSTRACT: SAML2 bindings and protocol implementation
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 $VERSION = eval {$VERSION};
 
 
@@ -41,7 +41,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 

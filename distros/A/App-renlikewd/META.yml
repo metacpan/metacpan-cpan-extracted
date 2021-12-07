@@ -19,7 +19,7 @@ name: App-renlikewd
 provides:
   App::renlikewd:
     file: lib/App/renlikewd.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Cwd: '0'
   File::MoreUtil: '0.625'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-renlikewd
   homepage: https://metacpan.org/release/App-renlikewd
   repository: git://github.com/perlancar/perl-App-renlikewd.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

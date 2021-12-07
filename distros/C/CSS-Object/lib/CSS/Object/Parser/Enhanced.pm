@@ -115,7 +115,7 @@ sub parse_element
     die( "Value provided is not a scalar reference\n" ) if( ref( $sref ) ne 'SCALAR' );
     die( "Position provided is not an integer\n" ) if( $pos !~ /^\-?\d+$/ );
     my $css = $self->css || return( $self->error( "Our css object is gone!" ) );
-    my $rule = $self->rule_from_token( $opts->{name} ) || return;
+    my $rule = $self->rule_from_token( $opts->{name} ) || return( $self->pass_error );
     my $p;
     my $this = {};
     for( $p = $pos; $p < length( $$sref ); $p++ )
@@ -154,7 +154,7 @@ sub parse_element
                 data => $sref,
                 ## After the opening brace we just found
                 pos => $p + 1,
-            }) || return;
+            }) || return( $self->pass_error );
             my $props = $res->{properties};
             $p = $res->{pos};
         }

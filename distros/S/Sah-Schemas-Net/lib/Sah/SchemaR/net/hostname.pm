@@ -1,7 +1,7 @@
 package Sah::SchemaR::net::hostname;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2021-07-19'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"example"},{valid=>1,value=>"example.com"},{valid=>1,value=>"www.example.com"},{valid=>1,value=>"12.34.56.78"},{summary=>"Underscore not allowed",valid=>0,value=>"www_new.example.com"},{valid=>1,value=>"www.example-two.com"},{valid=>1,value=>"www.example--two.com"},{summary=>"Word ending in dash not allowed",valid=>0,value=>"www.example-.com"},{summary=>"Word starting in dash not allowed",valid=>0,value=>"www.-example.com"},{summary=>"Word starting in dash not allowed",valid=>0,value=>"www.-example.com"}],match=>"\\A(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])\\z",summary=>"Hostname"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::net::hostname - Hostname
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::net::hostname (from Perl distribution Sah-Schemas-Net), released on 2020-05-27.
+This document describes version 0.010 of Sah::SchemaR::net::hostname (from Perl distribution Sah-Schemas-Net), released on 2021-07-19.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

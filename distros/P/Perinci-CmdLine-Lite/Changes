@@ -1,3 +1,30 @@
+1.912   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe argument specification's attribute:
+	  x.perinci.cmdline.default_from_schema. Setting this to true lets an
+	  argument get default value from schema even if the argument is not
+	  specified.
+
+	- [dist] Add dzil plugin and weaver plugin Perinci::CmdLine.
+
+	[internal]
+
+        - Make log more concise by collapsing more request keys.
+
+        - Always use Moo, no longer use Mo. We need BUILDARGS.
+
+	[reorganization, plugins]
+
+        - Move run as plugin event 'run'.
+
+	- Move plugins attribute to Base.
+
+        - Reorganize plugin subnamespace: use per-topic subnamespace, since we
+	  will be anticipating many more plugins.
+
+        - Simplify things by always providing -orig_ARGNAME arguments.
+
+
 1.911   2021-10-02  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

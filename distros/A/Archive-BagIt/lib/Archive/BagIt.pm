@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.085'; # VERSION
+our $VERSION = '0.086'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -57,16 +57,8 @@ has 'use_async' => (
 has 'force_utf8' => (
     is        => 'rw',
     lazy      => 1,
+    predicate => 1,
 );
-
-sub has_force_utf8 {
-    my $self = shift;
-    if ((exists $self->{force_utf8}) && ($self->{force_utf8})) {
-        return 1;
-    } else {
-        return;
-    }
-}
 
 ###############################################
 
@@ -209,11 +201,15 @@ has 'digest_callback' => (
     builder => sub {
         my $sub = sub {
             my ($digestobj, $filename) = @_;
-            open(my $fh, '<:raw', $filename) or confess("Cannot open '$filename', $!");
-            binmode($fh);
-            my $digest = $digestobj->get_hash_string($fh);
-            close $fh or confess ("could not close file '$filename', $!");
-            $digest;
+            if (-f $filename) {
+                open(my $fh, '<:raw', $filename) or confess("Cannot open '$filename', $!");
+                binmode($fh);
+                my $digest = $digestobj->get_hash_string($fh);
+                close $fh or confess("could not close file '$filename', $!");
+                return $digest;
+            } else {
+                croak "file $filename is not a real file!";
+            }
         };
         return $sub;
     }
@@ -975,7 +971,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 NAME
 

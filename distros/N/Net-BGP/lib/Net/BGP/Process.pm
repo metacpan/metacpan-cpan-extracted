@@ -7,7 +7,7 @@ use vars qw( $VERSION );
 
 ## Inheritance and Versioning ##
 
-$VERSION = '0.17';
+$VERSION = '0.18';
 
 ## Module Imports ##
 
@@ -342,7 +342,7 @@ sub _update_select
 
 =head1 NAME
 
-Net::BGP::Process - Class encapsulating BGP session multiplexing functionality
+C<Net::BGP::Process> - Class encapsulating BGP session multiplexing functionality
 
 =head1 SYNOPSIS
 
@@ -357,20 +357,20 @@ Net::BGP::Process - Class encapsulating BGP session multiplexing functionality
 =head1 DESCRIPTION
 
 This module encapsulates the functionality necessary to multiplex multiple
-BGP peering sessions. While individual B<Net::BGP::Peer> objects contain
-the state of each peering session, it is the B<Net::BGP::Process> object
+BGP peering sessions. While individual L<Net::BGP::Peer> objects contain
+the state of each peering session, it is the C<Net::BGP::Process> object
 which monitors each peer's transport-layer connection and timers and signals
 the peer whenever messages are available for processing or timers expire.
-A B<Net::BGP::Process> object must be instantiated, even if a program only
+A C<Net::BGP::Process> object must be instantiated, even if a program only
 intends to establish a session with a single peer.
 
 =head1 METHODS
 
-I<new()> - create a new Net::BGP::Process object
+I<new()> - create a new C<Net::BGP::Process> object
 
     $bgp = Net::BGP::Process->new( Port => $port, ListenAddr => '1.2.3.4' );
 
-This is the constructor for Net::BGP::Process objects. It returns a
+This is the constructor for C<Net::BGP::Process> objects. It returns a
 reference to the newly created object. The following named parameters may
 be passed to the constructor.
 
@@ -381,7 +381,7 @@ omitted, in which case it defaults to the well-known BGP port TCP/179.
 If the program cannot run with root priviliges, it is necessary to set
 this parameter to a value greater than or equal to 1024. Note that some
 BGP implementations may not allow the specification of an alternate port
-and may be unable to establish a connection to the B<Net::BGP::Process>.
+and may be unable to establish a connection to the C<Net::BGP::Process>.
 
 =head2 ListenAddr
 
@@ -392,11 +392,11 @@ I<add_peer()> - add a new peer to the BGP process
 
     $bgp->add_peer($peer);
 
-Each B<Net::BGP::Peer> object, which corresponds to a distinct peering
-session, must be registered with the B<Net::BGP::Process> object via this
+Each L<Net::BGP::Peer> object, which corresponds to a distinct peering
+session, must be registered with the C<Net::BGP::Process> object via this
 method. It is typically called immediately after a new peer object is created
 to add the peer to the BGP process. The method accepts a single parameter,
-which is a reference to a B<Net::BGP::Peer> object.
+which is a reference to a L<Net::BGP::Peer> object.
 
 I<remove_peer()> - remove a peer from the BGP process
 
@@ -405,7 +405,7 @@ I<remove_peer()> - remove a peer from the BGP process
 This method should be called if a peer should no longer be managed by the
 BGP process, for example, if the session is broken or closed and will not
 be re-established. The method accepts a single parameter, which is a
-reference to a Net::BGP::Peer object which has previously been registered
+reference to a L<Net::BGP::Peer> object which has previously been registered
 with the process object with the add_peer() method.
 
 I<event_loop()> - start the process event loop
@@ -419,14 +419,30 @@ only return to user code when one of the event callback functions is
 invoked upon receipt of a BGP protocol message or a user
 established timer expires (see L<Net::BGP::Peer> for details
 on how to establish timers and callback functions). The method takes
-no parameters. It will only return when there are no Net::BGP::Peer
+no parameters. It will only return when there are no L<Net::BGP::Peer>
 objects remaining under its management, which can only occur if they
 are explicitly removed with the remove_peer() method (perhaps called
 in one of the callback or timer functions).
 
 =head1 SEE ALSO
 
-Net::BGP, Net::BGP::Peer, Net::BGP::Update, Net::BGP::Notification
+=over
+
+=item L<Net::BGP>
+
+=item L<Net::BGP::Peer>
+
+=item L<Net::BGP::Update>
+
+=item L<Net::BGP::Refresh>
+
+=item L<Net::BGP::ASPath>
+
+=item L<Net::BGP::NLRI>
+
+=item L<Net::BGP::Notification>
+
+=back
 
 =head1 AUTHOR
 

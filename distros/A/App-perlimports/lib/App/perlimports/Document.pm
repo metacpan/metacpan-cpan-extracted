@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000027';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -241,15 +241,20 @@ around BUILDARGS => sub {
 
 my %default_ignore = (
     'Carp::Always'                   => 1,
+    'Constant::Generate'             => 1,
     'Data::Printer'                  => 1,
     'DDP'                            => 1,
     'Devel::Confess'                 => 1,
     'Encode::Guess'                  => 1,
+    'Env'                            => 1,    # see t/env.t
     'Exception::Class'               => 1,
     'Exporter'                       => 1,
     'Exporter::Lite'                 => 1,
     'Feature::Compat::Try'           => 1,
+    'Git::Sub'                       => 1,
     'HTTP::Message::PSGI'            => 1,    # HTTP::Request::(to|from)_psgi
+    'Import::Into'                   => 1,
+    'MLDBM'                          => 1,
     'Mojo::Base'                     => 1,
     'Mojo::Date'                     => 1,
     'Mojolicious::Lite'              => 1,
@@ -267,6 +272,7 @@ my %default_ignore = (
     'MooX::StrictConstructor'                             => 1,
     'namespace::autoclean'                                => 1,
     'Regexp::Common'                                      => 1,
+    'Sort::ByExample'                                     => 1,
     'Struct::Dumb'                                        => 1,
     'Sub::Exporter'                                       => 1,
     'Sub::Exporter::Progressive'                          => 1,
@@ -765,8 +771,12 @@ sub _is_ignored {
         = exists $default_ignore{ $element->module }
         || exists $self->_ignore_modules->{ $element->module }
         || $self->_annotations->is_ignored($element)
-        || any { $element->module =~ /$_/ }
-    grep { $_ } @{ $self->_ignore_modules_pattern || [] };
+        || (
+        any { $element->module =~ /$_/ }
+        grep { $_ } @{ $self->_ignore_modules_pattern || [] }
+        )
+        || ( $self->inspector_for( $element->module )
+        && !$self->inspector_for( $element->module )->evals_ok );
     return $res;
 }
 
@@ -1006,7 +1016,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000025
+version 0.000027
 
 =head2 inspector_for( $module_name )
 

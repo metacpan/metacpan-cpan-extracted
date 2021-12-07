@@ -26,6 +26,9 @@ expect_client_bucket_objects_delete 'delete multiple objects' => (
 	<Object><Key>key-2</Key></Object>
 </Delete>
 XML
+	expect_request_headers  => {
+		content_md5 => 'gAp9c7yOkifhnztMWAOlCg==',
+	},
 );
 
 expect_client_bucket_objects_delete 'S3 error - Access Denied' => (

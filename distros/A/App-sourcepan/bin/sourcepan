@@ -2,7 +2,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ GetOptions(
    'extract|x'     => \$EXTRACT,
    'unversioned|U' => \$UNVERSIONED,
    'vc-init=s'     => \$VC_INIT,
+   'overwrite'     => \my $OVERWRITE,
 
    # Shortcuts
    'git'           => sub { $EXTRACT++, $UNVERSIONED++, $VC_INIT = "git" },
@@ -35,6 +36,7 @@ App::sourcepan->run( {
       extract     => $EXTRACT,
       unversioned => $UNVERSIONED,
       vc_init     => $VC_INIT,
+      overwrite   => $OVERWRITE,
    }, @ARGV );
 
 =head1 NAME
@@ -103,6 +105,11 @@ Git
 
 Convenience shortcuts to specifying the C<--extract>, C<--unversioned> and
 C<--vc-init> arguments individually.
+
+=item --overwrite
+
+Permit overwriting an existing target directory. Normally this is not
+performed, as a safety measure in case of already-present local changes.
 
 =back
 

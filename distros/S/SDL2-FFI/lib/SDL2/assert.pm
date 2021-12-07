@@ -1,5 +1,6 @@
 package SDL2::assert {
-    use strictures 2;
+    use strict;
+    use warnings;
     use experimental 'signatures';
     use SDL2::Utils;
     use Try::Tiny;

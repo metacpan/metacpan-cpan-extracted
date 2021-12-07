@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000027';
 
 use Data::Dumper qw( Dumper );
 use List::Util qw( any none uniq );
@@ -607,10 +607,16 @@ sub _maybe_get_new_include {
     # statement rather than mess with the original formatting. This check is
     # naive, but should be good enough for now. It should reduce the churn
     # created by this script.
-    my $check_string = $self->_include . q{};
-    $check_string =~ s{\s+}{ }g;
+    #
+    # This check will fail if a newline has been added or removed. That's fine
+    # for now as that indicates a formatting change that we *probably* want. We
+    # could make this configurable.
+    my $a = $self->_include . q{};
+    my $b = $rewrite . q{};
+    $a =~ s{\s}{}g;
+    $b =~ s{\s}{}g;
 
-    return ( "$rewrite" eq $check_string ) ? $self->_include : $rewrite;
+    return ( $a eq $b ) ? $self->_include : $rewrite;
 }
 
 # If there's a different module in this document which has already imported
@@ -675,7 +681,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000025
+version 0.000027
 
 =head1 METHODS
 

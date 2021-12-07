@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Future/Workflow.pm
+lib/Future/Workflow/Pipeline.pm
+MANIFEST			This list of files
+t/00use.t
+t/01pipeline.t
+t/02pipeline-queue.t
+t/03pipeline-concurrent.t
+t/10pipeline-sync.t
+t/11pipeline-failure.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

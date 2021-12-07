@@ -1,14 +1,3 @@
-package Quiq::JQuery::ContextMenu;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Assert;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -35,6 +24,23 @@ jQuery-Plugin L<jQuery contextmenu|https://swisnl.github.io/jQuery-contextMenu/d
 L<Allgmeine Doku|https://swisnl.github.io/jQuery-contextMenu/docs.html>
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::JQuery::ContextMenu;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Assert;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -173,7 +179,7 @@ sub js {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

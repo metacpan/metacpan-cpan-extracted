@@ -1,9 +1,0 @@
-use lib 'inc';
-use ExtUtils::HasCompiler 0.014 'can_compile_loadable_object';
-{
-  my $can_xs;
-  sub can_xs {
-    return $can_xs if defined $can_xs;
-    $can_xs = can_compile_loadable_object(quiet => 1) ? 1 : 0;
-  }
-}

@@ -3,7 +3,7 @@ App::DBBrowser::Opt::DBGet;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;

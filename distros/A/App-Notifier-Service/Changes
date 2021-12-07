@@ -1,3 +1,15 @@
+0.0902   2021-11-25
+    - https://github.com/shlomif/app-notifier/issues/1
+        - Subroutine signatures
+        - Thanks to @eserte
+
+0.0901   2021-11-24
+    - Remove remnants of Dancer.
+
+0.0900   2021-11-24
+    - Convert from Dancer2 to Mojolicious.
+        - Mojolicious seems to be a much more popular choice.
+
 0.0802   2020-10-19
     - Avoid stale POD
         - Inspired by Lady_Aleena.

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::HelpAsText 2.145;
+package Config::Model::Role::HelpAsText 2.147;
 
 # ABSTRACT: Translate element help from pod to text
 
@@ -57,7 +57,7 @@ Config::Model::Role::HelpAsText - Translate element help from pod to text
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

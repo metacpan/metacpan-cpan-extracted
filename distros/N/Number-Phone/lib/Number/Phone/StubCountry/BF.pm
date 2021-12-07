@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211828;
+our $VERSION = 1.20211206222442;
 
 my $formatters = [
                 {
@@ -89,30 +89,30 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"226204", "Kaya",
-"2262052", "Dédougou",
-"2262090", "Gaoua",
-"2262470", "Pouytenga\/Koupéla",
+$areanames{en} = {"2262454", "Yako",
+"2262455", "Ouahigouya",
+"2262477", "Fada\/Diabo",
+"2262097", "Bobo\-Dioulasso",
+"2262098", "Bobo\-Dioulasso",
+"2262096", "Orodara",
+"226204", "Kaya",
 "2262471", "Tenkodogo",
 "2262091", "Banfora",
-"2262454", "Yako",
-"2262449", "Falagountou\/Dori",
-"226253", "Ouagadougou",
-"2262098", "Bobo\-Dioulasso",
-"2262455", "Ouahigouya",
-"2262479", "Kantchari",
-"226254", "Ouagadougou",
-"2262099", "Béréba\/Fo\/Houndé",
-"2262053", "Boromo\/Djibasso\/Nouna",
-"2262544", "Koudougou",
-"2262445", "Kaya",
-"2262096", "Orodara",
-"2262446", "Falagountou\/Dori",
-"2262097", "Bobo\-Dioulasso",
-"2262477", "Fada\/Diabo",
 "2262541", "Léo\/Sapouy",
+"2262446", "Falagountou\/Dori",
+"2262470", "Pouytenga\/Koupéla",
+"2262090", "Gaoua",
 "2262540", "Pô\/Kombissiri\/Koubri",
-"2262456", "Djibo",};
+"2262449", "Falagountou\/Dori",
+"226254", "Ouagadougou",
+"2262053", "Boromo\/Djibasso\/Nouna",
+"2262456", "Djibo",
+"2262544", "Koudougou",
+"2262099", "Béréba\/Fo\/Houndé",
+"2262479", "Kantchari",
+"226253", "Ouagadougou",
+"2262052", "Dédougou",
+"2262445", "Kaya",};
 
     sub new {
       my $class = shift;

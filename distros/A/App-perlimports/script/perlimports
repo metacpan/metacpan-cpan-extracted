@@ -482,7 +482,7 @@ perlimports - A command line utility for cleaning up imports in your Perl code
 
 =head1 VERSION
 
-version 0.000025
+version 0.000027
 
 =head1 SYNOPSIS
 
@@ -995,13 +995,14 @@ configuration might look something like this:
     [commands.perlimports]
     type = "tidy"
     include = [ "**/*.{pl,pm,t,psgi}" ]
-    cmd = [ "perl", "-Ilib", "script/perlimports" ]
+    cmd = [ "perlimports" ]
     tidy_flags = [
         "--libs", "lib,t/lib",
         "--log-filename", "/tmp/perlimports.txt",
         "--log-level", "debug",
         "--no-preserve-duplicates",
         "--no-preserve-unused",
+        "-i",
         "-f",
     ]
     ok_exit_codes = 0

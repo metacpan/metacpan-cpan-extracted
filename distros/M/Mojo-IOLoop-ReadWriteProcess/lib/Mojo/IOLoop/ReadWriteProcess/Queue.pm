@@ -28,6 +28,7 @@ sub consume {
     $self->queue->maximum_processes + $self->pool->maximum_processes);
   until ($self->exhausted) {
     sleep .5;
+    $self->session->consume_collected_info;
     $self->session->_protect(
       sub {
         $self->pool->each(

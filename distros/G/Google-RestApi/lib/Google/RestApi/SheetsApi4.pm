@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4;
 
-our $VERSION = '0.9';
+our $VERSION = '1.0.0';
 
 use Google::RestApi::Setup;
 
@@ -275,79 +275,134 @@ Google::RestApi::SheetsApi4 - API to Google Sheets API V4.
 
 =head1 DESCRIPTION
 
-SheetsApi4 is an API to Google Sheets. It is very perl-ish in that there
-is usually "more than one way to do it". It provides default behaviours
-that should be fine for most normal needs, but those behaviours can be
-overridden when necessary.
+SheetsApi4 is an API to Google Sheets. It is very perl-ish in that there is usually "more than one way to do it". It provides default behaviours
+that should be fine for most normal needs, but those behaviours can be overridden when necessary.
 
-It is assumed that you are familiar with the Google Sheets API:
-https://developers.google.com/sheets/api
+It is assumed that you are familiar with the Google Sheets API: https://developers.google.com/sheets/api
 
-The synopsis above is a quick reference. For more detailed information, see:
+C<t/tutorial/sheets/*> also has a step-by-step tutorial of creating and updating a spreadsheet, showing you the API calls and return values for each step.
 
- Google::RestApi
- Google::RestApi::SheetsApi4::Spreadsheet
- Google::RestApi::SheetsApi4::Worksheet
- 
- t/tutorial/Sheets also has a step-by-step tutorial of creating and
- updating a spreadsheet, showing you the API calls and return values
- for each step.
+=head1 NAVIGATION
+
+=over
+
+=item * L<Google::RestApi::SheetsApi4>
+
+=item * L<Google::RestApi::SheetsApi4::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Range>
+
+=item * L<Google::RestApi::SheetsApi4::Range::All>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Col>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Row>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Cell>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range>
+
+=back
 
 =head1 SUBROUTINES
 
 =over
 
-=item new(api => <Google::RestApi>);
+=item new(%args);
 
 Creates a new instance of a SheetsApi object.
 
- api: A reference to a configured RestApi instance.
+%args consists of:
 
-=item api(uri => <path_segments_string>, %args);
+=over
 
-Sets up a call to the RestApi's 'api' subroutine using the given arguments.
-The Sheets endpoint is the URI that's passed to RestApi, along with any
-other URI segment passed in the uri arg.
+=item C<api> L<<Google::RestApi>>: A reference to a configured L<Google::RestApi> instance.
 
- uri: Adds this path segment to the Sheets endpoint and calls the RestApi's
-   'api' subroutine.
- %args: Passes any extra arguments to the RestApi's 'api' subroutine (content,
-   params, method etc).
+=back
 
-You would not normally call this directly unless you were
-making a Google API call not currently supported by this API
-framework.
+=item api(%args);
 
-=item create_spreadsheet(title|name => <string>, %args);
+%args consists of:
 
-Creates a new spreadsheet with the title/name (same thing). Note that Sheets
-allows multiple spreadsheets with the same name.
+=over
 
- title|name: The title (or name) of the new spreadsheet.
- %args: Passes any extra arguments to Google Drive's create file routine.
+=item * C<uri> <path_segments_string>: Adds this path segment to the Sheets endpoint and calls the L<Google::RestApi>'s C<api> subroutine.
 
-=item copy_spreadsheet(spreadsheet_id => <string>, %args);
+=item * C<%args>: Passes any extra arguments to the L<Google::RestApi>'s C<api> subroutine (content, params, method etc).
+
+=back
+
+This is essentially a pass-through method between lower-level Worksheet/Range objects and L<Google::RestApi>, where this method adds in the Sheets endpoint.
+See <Google::RestApi::SheetsApi4::Worksheet>'s C<api> routine for how this is called. You would not normally call this directly unless you were making a Google API call not currently
+supported by this API framework.
+
+Returns the response hash from Google API.
+
+=item create_spreadsheet(%args);
+
+Creates a new spreadsheet.
+
+%args consists of:
+
+=over
+
+=item * C<title|name> <string>: The title (or name) of the new spreadsheet.
+
+=item * C<%args>: Passes through any extra arguments to Google Drive's create file routine.
+
+=back
+
+Args C<title> and C<name> are synonymous, you can use either. Note that Sheets allows multiple spreadsheets with the same name. 
+
+Normally this would be called via the Spreadsheet object, which would fill in the Drive file ID for you.
+
+Returns the object instance of the new spreadsheet object.
+
+=item copy_spreadsheet(%args);
 
 Creates a copy of a spreadsheet.
 
- spreadsheet_id: The file ID in Google Drive of the spreadsheet you want to
-   make a copy of.
- %args: Additional arguments passed to Google Drive file copy subroutine.
+%args consists of:
+
+=over
+
+=item * C<spreadsheet_id> <string>: The file ID in Google Drive of the spreadsheet you want to make a copy of.
+
+=item * C<%args>: Additional arguments passed through to Google Drive file copy subroutine.
+
+=back
+
+Returns the object instance of the new spreadsheet object.
 
 =item delete_spreadsheet(spreadsheet_id<string>);
 
-Deletes a spreadsheet from Google Drive.
+Deletes the spreadsheet from Google Drive.
 
- spreadsheet_id: The file ID in Google Drive of the spreadsheet you want to
-   delete.
+%args consists of:
+
+spreadsheet_id is the file ID in Google Drive of the spreadsheet you want to delete.
+
+Returns the Google API response.
 
 =item delete_all_spreadsheets(spreadsheet_name<string>);
 
-Deletes all spreadsheets with the given name from Google Drive. Note that
-Google Sheets allows more than one spreadsheet to have the same name. Returns
-the number of spreadsheets deleted.
+Deletes all spreadsheets with the given name from Google Drive. 
 
- spreadsheet_name: The name of the spreadsheets you want to delete.
+Returns the number of spreadsheets deleted.
 
 =item spreadsheets();
 
@@ -355,36 +410,20 @@ Returns a list of spreadsheets in Google Drive.
 
 =item drive();
 
-Returns an instance of Google Drive that shares the same RestApi as this
-SheetsApi object. You would not normally need to use this directly.
+Returns an instance of Google Drive that shares the same RestApi as this SheetsApi object. You would not normally need to use this directly.
 
 =item open_spreadsheet(%args);
 
-Opens a new spreadsheet from the given ID, URI, or name.
+Opens a new spreadsheet from the given id, uri, or name.
 
- %args: Passes any args to Spreadsheet->new routine.
-
-=item stats()
-
-Shows some statistics on how many get/put/post etc calls were made.
-Useful for performance tuning during development.
+%args consists of any args passed to Spreadsheet->new routine (which see).
 
 =back
 
 =head1 STATUS
 
-This api is currently very much in beta status. It is incomplete.
-There may be design flaws that need to be addressed in later
-releases. Later releases may break this release. Not all api
-calls have been implemented. Tests are not comprehensive.
-
-But it gets the job done.
-
-This is a work in progress, released at this stage in order to
-assist others, and in the hopes that others will contribute to
-its completeness.
-
-Pull requests welcome.
+This api is currently in beta status. It is incomplete. There may be design flaws that need to be addressed in later releases. Later
+releases may break this release. Not all api calls have been implemented.
 
 =head1 AUTHORS
 
@@ -398,6 +437,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019, Robin Murray. All rights reserved.
+Copyright (c) 2021, Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

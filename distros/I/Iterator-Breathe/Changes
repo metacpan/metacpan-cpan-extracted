@@ -1,0 +1,12 @@
+Revision history for Iterator-Breathe
+
+0.0201 2021-11-28 09:16:31
+    - Improve documentation.
+    - Correct the top attribute "isa."
+
+0.0200 2021-11-28 09:06:52
+    - Improve documentation.
+    - Add an iteration step size, instead of always using 1.
+
+0.0100 2021-11-28 08:41:14
+    - Mint with Dist::Zilla.

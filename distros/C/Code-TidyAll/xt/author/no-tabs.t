@@ -48,10 +48,25 @@ my @files = (
     't/00-report-prereqs.t',
     't/Basic.t',
     't/Conf.t',
+    't/Git.t',
+    't/Plugin-CSSUnminifier.t',
     't/Plugin-GenericTransformer.t',
     't/Plugin-GenericValidator.t',
+    't/Plugin-JSBeautify.t',
+    't/Plugin-JSHint.t',
+    't/Plugin-JSLint.t',
+    't/Plugin-MasonTidy.t',
+    't/Plugin-PHPCodeSniffer.t',
+    't/Plugin-PerlCritic.t',
+    't/Plugin-PerlTidy.t',
+    't/Plugin-PerlTidySweet.t',
+    't/Plugin-PodChecker.t',
+    't/Plugin-PodSpell.t',
+    't/Plugin-PodTidy.t',
     't/Plugin-SortLines.t',
+    't/Util.t',
     't/Zglob.t',
+    't/diff-on-tidy-error.t',
     't/helper-bin/exit.pl',
     't/helper-bin/generic-transformer.pl',
     't/helper-bin/generic-validator.pl',
@@ -89,7 +104,9 @@ my @files = (
     't/lib/TestHelper/Plugin/RepeatFoo.pm',
     't/lib/TestHelper/Plugin/ReverseFoo.pm',
     't/lib/TestHelper/Plugin/UpperText.pm',
-    't/lib/TestHelper/Test/Class.pm'
+    't/lib/TestHelper/Test/Class.pm',
+    't/parallel.t',
+    't/spaces-in-paths.t'
 );
 
 notabs_ok($_) foreach @files;

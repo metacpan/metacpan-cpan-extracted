@@ -87,20 +87,26 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Modern-Document-OpenAPI",
-      "dist_version" => "0.002",
+      "dist_version" => "0.009",
       "license" => "perl",
       "module_name" => "JSON::Schema::Modern::Document::OpenAPI",
       "recursive_test_files" => 1,
       "requires" => {
+        "Carp" => 0,
+        "Feature::Compat::Try" => 0,
         "File::ShareDir" => 0,
-        "JSON::Schema::Modern" => "0.525",
+        "JSON::Schema::Modern" => "0.531",
         "JSON::Schema::Modern::Document" => 0,
-        "JSON::Schema::Modern::Utilities" => "0.525",
+        "JSON::Schema::Modern::Utilities" => "0.531",
         "JSON::Schema::Modern::Vocabulary" => 0,
         "List::Util" => 0,
         "Moo" => 0,
+        "MooX::HandlesVia" => 0,
+        "MooX::TypeTiny" => "0.002002",
         "Path::Tiny" => 0,
+        "Ref::Util" => 0,
         "Safe::Isa" => 0,
+        "Scalar::Util" => 0,
         "Types::Standard" => 0,
         "constant" => 0,
         "experimental" => 0,
@@ -113,28 +119,38 @@ EOW
       },
       "test_requires" => {
         "File::Spec" => 0,
-        "JSON::Schema::Modern" => "0.525",
+        "HTTP::Request" => 0,
+        "HTTP::Response" => 0,
         "Module::Metadata" => 0,
         "Test::Deep" => 0,
+        "Test::Fatal" => 0,
         "Test::File::ShareDir" => 0,
         "Test::JSON::Schema::Acceptance" => 0,
+        "Test::Memory::Cycle" => 0,
         "Test::More" => "0.96",
+        "YAML::PP" => 0,
         "open" => 0,
-        "perl" => "v5.20.0"
+        "perl" => "v5.20.0",
+        "utf8" => 0
       }
     );
 
 
     my %fallback_build_requires = (
       "File::Spec" => 0,
-      "JSON::Schema::Modern" => "0.525",
+      "HTTP::Request" => 0,
+      "HTTP::Response" => 0,
       "Module::Metadata" => 0,
       "Test::Deep" => 0,
+      "Test::Fatal" => 0,
       "Test::File::ShareDir" => 0,
       "Test::JSON::Schema::Acceptance" => 0,
+      "Test::Memory::Cycle" => 0,
       "Test::More" => "0.96",
+      "YAML::PP" => 0,
       "open" => 0,
-      "perl" => "v5.20.0"
+      "perl" => "v5.20.0",
+      "utf8" => 0
     );
 
 

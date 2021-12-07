@@ -11,7 +11,7 @@ Net::Amazon::S3::Features - Features available in Net::Amazon::S3
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

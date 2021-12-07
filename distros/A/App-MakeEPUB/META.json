@@ -4,20 +4,20 @@
       "Mathias Weidner <mamawe@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-MakeEPUB",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Probe::Perl" : 0,
-            "Test::More" : 0
+            "Probe::Perl" : "0",
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -27,28 +27,35 @@
       },
       "runtime" : {
          "requires" : {
-            "Archive::Zip" : 0,
-            "File::Basename" : 0,
-            "File::Find" : 0,
-            "File::Path" : 0,
-            "File::Spec" : 0,
-            "HTML::TreeBuilder" : 0,
+            "Archive::Zip" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "HTML::TreeBuilder" : "0",
             "perl" : "v5.10.1",
-            "version" : 0
+            "version" : "0"
          }
       }
    },
    "provides" : {
       "App::MakeEPUB" : {
          "file" : "lib/App/MakeEPUB.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.3.2"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-MakeEPUB"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/matwei-perl/App-MakeEPUB"
+      }
    },
-   "version" : "v0.3.1"
+   "version" : "v0.3.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

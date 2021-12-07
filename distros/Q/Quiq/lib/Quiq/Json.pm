@@ -1,15 +1,3 @@
-package Quiq::Json;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Unindent;
-use Scalar::Util ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -294,6 +282,24 @@ erzeugt
           },
       },
   }
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Json;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Unindent;
+use Scalar::Util ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -737,7 +743,7 @@ sub key {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -37,6 +37,7 @@ t/10_select.t
 t/11_block.t
 t/12_error.t
 t/13_max.t
+t/14_no_color.t
 t/Checker.pm
 t/JA.txt
 t/Runner.pm

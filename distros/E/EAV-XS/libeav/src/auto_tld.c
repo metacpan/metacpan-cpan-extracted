@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2021-11-01 19:41:04 */
+/* this file was auto-generated at 2021-12-04 21:39:27 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -31,7 +31,7 @@ const tld_t tld_list[] = {
     { "aero", 5, TLD_TYPE_SPONSORED },
     { "aetna", 6, TLD_TYPE_GENERIC },
     { "af", 3, TLD_TYPE_COUNTRY_CODE },
-    { "afamilycompany", 15, TLD_TYPE_GENERIC },
+    { "afamilycompany", 15, TLD_TYPE_NOT_ASSIGNED },
     { "afl", 4, TLD_TYPE_GENERIC },
     { "africa", 7, TLD_TYPE_GENERIC },
     { "ag", 3, TLD_TYPE_COUNTRY_CODE },
@@ -381,7 +381,7 @@ const tld_t tld_list[] = {
     { "drive", 6, TLD_TYPE_GENERIC },
     { "dtv", 4, TLD_TYPE_GENERIC },
     { "dubai", 6, TLD_TYPE_GENERIC },
-    { "duck", 5, TLD_TYPE_GENERIC },
+    { "duck", 5, TLD_TYPE_NOT_ASSIGNED },
     { "dunlop", 7, TLD_TYPE_GENERIC },
     { "duns", 5, TLD_TYPE_NOT_ASSIGNED },
     { "dupont", 7, TLD_TYPE_GENERIC },
@@ -522,7 +522,7 @@ const tld_t tld_list[] = {
     { "gives", 6, TLD_TYPE_GENERIC },
     { "giving", 7, TLD_TYPE_GENERIC },
     { "gl", 3, TLD_TYPE_COUNTRY_CODE },
-    { "glade", 6, TLD_TYPE_GENERIC },
+    { "glade", 6, TLD_TYPE_NOT_ASSIGNED },
     { "glass", 6, TLD_TYPE_GENERIC },
     { "gle", 4, TLD_TYPE_GENERIC },
     { "global", 7, TLD_TYPE_GENERIC },
@@ -934,7 +934,7 @@ const tld_t tld_list[] = {
     { "nz", 3, TLD_TYPE_COUNTRY_CODE },
     { "obi", 4, TLD_TYPE_GENERIC },
     { "observer", 9, TLD_TYPE_GENERIC },
-    { "off", 4, TLD_TYPE_GENERIC },
+    { "off", 4, TLD_TYPE_NOT_ASSIGNED },
     { "office", 7, TLD_TYPE_GENERIC },
     { "okinawa", 8, TLD_TYPE_GENERIC },
     { "olayan", 7, TLD_TYPE_GENERIC },
@@ -1041,7 +1041,7 @@ const tld_t tld_list[] = {
     { "qvc", 4, TLD_TYPE_NOT_ASSIGNED },
     { "racing", 7, TLD_TYPE_GENERIC },
     { "radio", 6, TLD_TYPE_GENERIC },
-    { "raid", 5, TLD_TYPE_GENERIC },
+    { "raid", 5, TLD_TYPE_NOT_ASSIGNED },
     { "re", 3, TLD_TYPE_COUNTRY_CODE },
     { "read", 5, TLD_TYPE_GENERIC },
     { "realestate", 11, TLD_TYPE_GENERIC },
@@ -1121,7 +1121,7 @@ const tld_t tld_list[] = {
     { "schule", 7, TLD_TYPE_GENERIC },
     { "schwarz", 8, TLD_TYPE_GENERIC },
     { "science", 8, TLD_TYPE_GENERIC },
-    { "scjohnson", 10, TLD_TYPE_GENERIC },
+    { "scjohnson", 10, TLD_TYPE_NOT_ASSIGNED },
     { "scor", 5, TLD_TYPE_NOT_ASSIGNED },
     { "scot", 5, TLD_TYPE_GENERIC },
     { "sd", 3, TLD_TYPE_COUNTRY_CODE },

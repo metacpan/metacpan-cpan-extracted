@@ -1,5 +1,19 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.30      2021-11-30 13:05:48-06:00 America/Chicago
+
+  [Added]
+
+  - Added some denormalized columns to the dependencies table to improve
+    dequeue performance. These optimizations improve performance by 2-3x
+    on MySQL 5.7 and 5-6x on MySQL 8.
+
+  [Fixed]
+
+  - Reduced the size of some columns that were entirely too large:
+    "state" is now an enum, so it takes only one byte.
+    "task" is now a VARCHAR limited to 50 characters.
+
 0.29      2021-06-07 10:38:25-05:00 America/Chicago
 
   [Fixed]

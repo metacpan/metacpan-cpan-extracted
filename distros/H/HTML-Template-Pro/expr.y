@@ -242,9 +242,6 @@ yyerror (struct tmplpro_state* state, struct expr_parser* exprobj, PSTRING* expr
 
 static
 const symrec_const
-#ifndef __cplusplus
-const 
-#endif
 builtin_funcs_symrec[] =
   {
     /* built-in funcs */
@@ -270,9 +267,6 @@ builtin_funcs_symrec[] =
 
 static
 const symrec_const
-#ifndef __cplusplus
-const 
-#endif
 builtin_ops_symrec[] =
   {
     /* built-in ops */

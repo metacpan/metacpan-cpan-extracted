@@ -1,4 +1,7 @@
-Revision history for Dist-Zilla-MintingProfile-AlienBuild},
+Revision history for Dist-Zilla-MintingProfile-AlienBuild,
+
+0.06      2021-11-28 05:22:11 -0700
+  - Remove erroneous extra } from Changes template (gh#20)
 
 0.05      2021-10-05 05:59:09 -0600
   - Test name is now based on the generated class name (gh#18)

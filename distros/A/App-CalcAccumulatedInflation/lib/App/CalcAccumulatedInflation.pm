@@ -1,9 +1,9 @@
 package App::CalcAccumulatedInflation;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-01'; # DATE
+our $DATE = '2021-07-17'; # DATE
 our $DIST = 'App-CalcAccumulatedInflation'; # DIST
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 
 use 5.010001;
 use strict;
@@ -120,11 +120,17 @@ App::CalcAccumulatedInflation - Calculate accumulated inflation (or savings rate
 
 =head1 VERSION
 
-This document describes version 0.051 of App::CalcAccumulatedInflation (from Perl distribution App-CalcAccumulatedInflation), released on 2021-04-01.
+This document describes version 0.052 of App::CalcAccumulatedInflation (from Perl distribution App-CalcAccumulatedInflation), released on 2021-07-17.
 
 =head1 SYNOPSIS
 
 See the included script L<calc-accumulated-inflation>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 FUNCTIONS
 
@@ -262,7 +268,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CalcAccumulatedI
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CalcAccumulatedInflation/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalcAccumulatedInflation>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

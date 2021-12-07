@@ -1,6 +1,7 @@
 # -*- cperl -*-
 
 use warnings;
+use strict;
 
 use ExtUtils::testlib;
 use Test::More;
@@ -11,12 +12,9 @@ use Test::Log::Log4perl;
 
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 
-use warnings;
-use strict;
+Test::Log::Log4perl->ignore_priority("info");
 
 my ($model, $trace) = init_test();
-
-$::_use_log4perl_to_warn = 1;
 
 my @rules = (
     F => { choice => [qw/A B C F F2/], default => 'F' },

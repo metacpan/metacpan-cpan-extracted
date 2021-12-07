@@ -1,6 +1,6 @@
 #ifdef _WIN32
 
-#include "panda/exception/win_debug.h"
+#include "panda/win/exception_debug.h"
 
 #include <windows.h>
 #include <dbgeng.h>

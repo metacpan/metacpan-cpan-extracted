@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 63 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 71 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modname_wildcard.pm',
@@ -23,13 +23,19 @@ my @module_files = (
     'Data/Sah/Filter/perl/Perl/check_module_installed.pm',
     'Data/Sah/Filter/perl/Perl/check_module_not_installed.pm',
     'Data/Sah/Filter/perl/Perl/normalize_perl_modname.pm',
+    'Data/Sah/Value/perl/Perl/these_dists.pm',
+    'Data/Sah/Value/perl/Perl/these_mods.pm',
+    'Data/Sah/Value/perl/Perl/this_dist.pm',
+    'Data/Sah/Value/perl/Perl/this_mod.pm',
     'Sah/Schema/perl/distname.pm',
+    'Sah/Schema/perl/distname/default_this_dist.pm',
     'Sah/Schema/perl/distname_with_optional_ver.pm',
     'Sah/Schema/perl/distname_with_ver.pm',
     'Sah/Schema/perl/filename.pm',
     'Sah/Schema/perl/funcname.pm',
     'Sah/Schema/perl/modargs.pm',
     'Sah/Schema/perl/modname.pm',
+    'Sah/Schema/perl/modname/default_this_mod.pm',
     'Sah/Schema/perl/modname/installed.pm',
     'Sah/Schema/perl/modname/not_installed.pm',
     'Sah/Schema/perl/modname_or_prefix.pm',
@@ -48,12 +54,14 @@ my @module_files = (
     'Sah/Schema/perl/unqualified_funcname.pm',
     'Sah/Schema/perl/version.pm',
     'Sah/SchemaR/perl/distname.pm',
+    'Sah/SchemaR/perl/distname/default_this_dist.pm',
     'Sah/SchemaR/perl/distname_with_optional_ver.pm',
     'Sah/SchemaR/perl/distname_with_ver.pm',
     'Sah/SchemaR/perl/filename.pm',
     'Sah/SchemaR/perl/funcname.pm',
     'Sah/SchemaR/perl/modargs.pm',
     'Sah/SchemaR/perl/modname.pm',
+    'Sah/SchemaR/perl/modname/default_this_mod.pm',
     'Sah/SchemaR/perl/modname/installed.pm',
     'Sah/SchemaR/perl/modname/not_installed.pm',
     'Sah/SchemaR/perl/modname_or_prefix.pm',

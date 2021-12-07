@@ -39,7 +39,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.26",
-            "Object::Pad" : "0.43",
+            "Object::Pad" : "0.58",
             "Scalar::Util" : "0",
             "Struct::Dumb" : "0",
             "Tickit::ContainerWidget" : "0.44",
@@ -53,14 +53,14 @@
    "provides" : {
       "Tickit::Widget::Tabbed" : {
          "file" : "lib/Tickit/Widget/Tabbed.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Tickit::Widget::Tabbed::Ribbon" : {
          "file" : "lib/Tickit/Widget/Tabbed/Ribbon.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       }
    },
    "release_status" : "stable",
-   "version" : "0.024",
+   "version" : "0.025",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

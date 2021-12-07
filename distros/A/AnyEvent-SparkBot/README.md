@@ -1,5 +1,5 @@
 
-# Cico SparkBot implementation
+# Cisco SparkBot implementation
 
 This bundle includess the following libraries:
 

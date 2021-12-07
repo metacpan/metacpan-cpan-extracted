@@ -29,7 +29,7 @@ private:
     static cap_flags    flag_list;
 
     excepted<void, CapabilityErrors> set_flag(cap_values, cap_flag_t, cap_flag_value_t);
-    excepted<void, CapabilityErrors> set(cap_values, cap_flags, cap_flag_value_t);
+    void set(cap_values, cap_flags, cap_flag_value_t);
 
     Capabilities(cap_t c) { caps = c; }
 public:
@@ -59,8 +59,8 @@ public:
     excepted <CapFlags, CapabilityErrors> get_value(cap_value_t);
     excepted <cap_flag_value_t, CapabilityErrors> get_value_flag(cap_value_t, cap_flag_t);
 
-    excepted <void, CapabilityErrors> drop(cap_values values = cap_list, cap_flags flags = flag_list);
-    excepted <void, CapabilityErrors> raise(cap_values values = cap_list, cap_flags flags = flag_list);
+    void drop(cap_values values = cap_list, cap_flags flags = flag_list);
+    void raise(cap_values values = cap_list, cap_flags flags = flag_list);
 
     excepted<CapabilitiesMap, CapabilityErrors> get_all();
 };

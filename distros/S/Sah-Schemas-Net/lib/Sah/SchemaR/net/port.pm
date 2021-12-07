@@ -1,7 +1,7 @@
 package Sah::SchemaR::net::port;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2021-07-19'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["int",[{between=>[1,65535],examples=>[{valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>80},{valid=>1,value=>65535},{valid=>0,value=>65536}],summary=>"Network port number"}],["int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::net::port - Network port number
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::net::port (from Perl distribution Sah-Schemas-Net), released on 2020-05-27.
+This document describes version 0.010 of Sah::SchemaR::net::port (from Perl distribution Sah-Schemas-Net), released on 2021-07-19.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

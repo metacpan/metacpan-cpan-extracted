@@ -1,9 +1,9 @@
 {
-   "abstract" : "set of usefull methods to work with processes and signals",
+   "abstract" : "set of usefull methods to work with processes and signals on Linux platform",
    "author" : [
       "Chernenko Dmitiry cdn@cpan.org"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "apache_2_0"
@@ -23,12 +23,18 @@
          "requires" : {
             "Module::Build" : "0.19"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "POSIX" : "0",
+            "perl" : "5.012001"
+         }
       }
    },
    "provides" : {
       "Fork::Utils" : {
          "file" : "lib/Fork/Utils.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -43,6 +49,6 @@
          "url" : "https://github.com/KalessinD/perl_fork_utils"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

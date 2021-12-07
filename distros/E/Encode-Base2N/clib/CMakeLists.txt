@@ -28,7 +28,6 @@ target_link_libraries(${PROJECT_NAME} panda-lib)
 
 ########################tests#######################################
 file(GLOB_RECURSE testSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*.cc")
-list(FILTER testSource EXCLUDE REGEX "tests/main.cc")
 
 add_library(${PROJECT_NAME}-tests STATIC EXCLUDE_FROM_ALL ${testSource})
 target_link_libraries(${PROJECT_NAME}-tests PUBLIC ${PROJECT_NAME})
@@ -39,7 +38,7 @@ target_link_libraries(${PROJECT_NAME}-tests PUBLIC Catch2::Catch2)
 ########################ctests######################################
 enable_testing()
 add_executable(${PROJECT_NAME}-runtests ${EXCLUDE_TEST} ${testSource} "tests/main.cc")
-target_link_libraries(${PROJECT_NAME}-runtests ${PROJECT_NAME}-tests)
+target_link_libraries(${PROJECT_NAME}-runtests ${PROJECT_NAME}-tests Catch2::Catch2WithMain)
 add_test(test-all ${PROJECT_NAME}-runtests)
 
 ########################install#####################################

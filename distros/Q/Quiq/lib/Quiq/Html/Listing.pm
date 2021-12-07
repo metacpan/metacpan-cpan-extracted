@@ -1,14 +1,3 @@
-package Quiq::Html::Listing;
-use base qw/Quiq::Html::Base/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::FileHandle;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -83,15 +72,53 @@ Inhalt. Dieser kann aus einer Datei oder einem String kommen.
 
 Programm:
 
-  1: Command failed: Blob/sdoc_reference/sdoc-highlight perl pod
+   1: require R1::HtmlTag;
+   2: require R1::Html::Listing;
+   3: 
+   4: my $h = R1::HtmlTag->new;
+   5: 
+   6: my $text = << '__PERL__';
+   7: #!/usr/bin/perl
+   8: 
+   9: =encoding utf8
+  10: 
+  11: Nur ein Demo-Programm.
+  12: 
+  13: =cut
+  14: 
+  15: print "Hello world!\n";
+  16: 
+  17: # eof
+  18: __PERL__
+  19: 
+  20: my $html = R1::Html::Listing->html($h,
+  21:     cssPrefix=>'sdoc-code',
+  22:     language=>'Perl',
+  23:     source=>\$text,
+  24: );
 
 Ergebnis:
 
-  1: Command failed: Blob/R1/Html/Listing/html-listing.pl html
+  1: 
 
 Im Browser:
 
-Command failed: Blob/R1/Html/Listing/html-listing.pl pod%%CLASS-CODE%%
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Listing;
+use base qw/Quiq::Html::Base/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::FileHandle;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -379,7 +406,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

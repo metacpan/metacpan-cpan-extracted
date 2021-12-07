@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Objects::Delete::Request;
 # ABSTRACT: An internal class to delete multiple objects from a bucket
-$Net::Amazon::S3::Operation::Objects::Delete::Request::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Objects::Delete::Request::VERSION = '0.99';
 use Moose 0.85;
 use Carp qw/croak/;
 
@@ -8,6 +8,7 @@ extends 'Net::Amazon::S3::Request::Bucket';
 
 has 'keys'      => ( is => 'ro', isa => 'ArrayRef',   required => 1 );
 
+with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5';
 with 'Net::Amazon::S3::Request::Role::HTTP::Method::POST';
 with 'Net::Amazon::S3::Request::Role::Query::Action::Delete';
 with 'Net::Amazon::S3::Request::Role::XML::Content';
@@ -44,7 +45,7 @@ Net::Amazon::S3::Operation::Objects::Delete::Request - An internal class to dele
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 

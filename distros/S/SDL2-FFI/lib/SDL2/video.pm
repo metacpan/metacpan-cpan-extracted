@@ -1,6 +1,7 @@
 package SDL2::video {
     use lib '../../lib';
-    use strictures 2;
+    use strict;
+    use warnings;
     use experimental 'signatures';
     use SDL2::Utils;
     #

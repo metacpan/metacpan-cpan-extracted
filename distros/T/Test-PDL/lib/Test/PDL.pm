@@ -1,5 +1,5 @@
 package Test::PDL;
-$Test::PDL::VERSION = '0.16';
+$Test::PDL::VERSION = '0.17';
 # ABSTRACT: Test Perl Data Language arrays (a.k.a. ndarrays) for equality
 
 
@@ -183,7 +183,7 @@ Test::PDL - Test Perl Data Language arrays (a.k.a. ndarrays) for equality
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 

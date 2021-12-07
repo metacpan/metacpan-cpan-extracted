@@ -1,5 +1,15 @@
 Revision history for Perl extension Net::SAML2.
 
+0.46 -- Thu Nov 25 21:53:52 AST 2021
+
+  - dd9776e Merge pull request #50 from timlegge/issue-38
+  - 54cf599 Testapp should display unicode
+  - ac74ac4 Fixes Issue #49 - Issue verifying XML that includes wide characters
+  - 5afc7dd Add strict and warnings to tests
+  - c20ed8c Add strict and warnings and move existing to the stop
+  - 26c53c1 v0.45
+  - 5397713 (tag: 0.45) Update for new version
+
 0.45 -- Wed Nov 17 17:33:34 AST 2021
 
   - 594d135 add missing use statement (ziali088)

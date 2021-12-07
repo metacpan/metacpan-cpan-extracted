@@ -1,15 +1,3 @@
-package Quiq::Confluence::Markup;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Unindent;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -46,6 +34,24 @@ L<Macros|https://confluence.atlassian.com/doc/macros-139387.html>
 
 Die Implementierung ist nicht vollständig, sondern wird nach Bedarf
 erweitert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Confluence::Markup;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Unindent;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -949,7 +955,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

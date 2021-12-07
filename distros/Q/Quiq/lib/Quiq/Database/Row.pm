@@ -1,15 +1,3 @@
-package Quiq::Database::Row;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Perl;
-use Quiq::Database::ResultSet::Object;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -25,6 +13,24 @@ L<Quiq::Object>
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert einen Datensatz.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::Row;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Perl;
+use Quiq::Database::ResultSet::Object;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -173,7 +179,7 @@ sub makeTable {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

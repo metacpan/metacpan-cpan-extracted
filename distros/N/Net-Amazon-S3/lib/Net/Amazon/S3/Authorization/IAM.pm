@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Authorization::IAM;
-$Net::Amazon::S3::Authorization::IAM::VERSION = '0.98';
+$Net::Amazon::S3::Authorization::IAM::VERSION = '0.99';
 # ABSTRACT: IAM authorization information
 
 use Moose 0.85;
@@ -61,7 +61,7 @@ Net::Amazon::S3::Authorization::IAM - IAM authorization information
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 

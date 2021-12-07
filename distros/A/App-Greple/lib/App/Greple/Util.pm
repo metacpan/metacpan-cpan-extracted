@@ -1,20 +1,11 @@
-package App::Greple::Util;
-
 use v5.14;
 use warnings;
 
-use Exporter 'import';
-our @EXPORT      = qw();
-our %EXPORT_TAGS = ();
-our @EXPORT_OK   = qw();
-
 use App::Greple::Common;
-
 
 ##
 ## easy implementation. don't be serious.
 ##
-push @EXPORT, 'shellquote';
 sub shellquote {
     my $quote = qr/[\s\\(){}\|\*?]/;
     map { /^(-+\w+=)(.*$quote.*)$/
@@ -25,58 +16,72 @@ sub shellquote {
     @_;
 }
 
-1;
+package UniqIndex {
+    use strict;
+    use warnings;
 
+    sub new {
+	my $class = shift;
+	my $obj = bless {
+	    HASH  => {},
+	    LIST  => [],
+	    COUNT => [],
+	}, $class;
+	$obj->configure(@_) if @_;
+	$obj;
+    }
 
-package UniqIndex;
+    sub hash  { shift->{HASH}  }
+    sub list  { shift->{LIST}  }
+    sub count { shift->{COUNT} }
 
-use strict;
-use warnings;
+    sub configure {
+	my $obj = shift;
+	while (@_ >= 2) {
+	    $obj->{$_[0]} = $_[1];
+	    splice @_, 0, 2;
+	}
+    }
 
-sub new {
-    my $class = shift;
-    my $obj = bless {
-	HASH  => {},
-	LIST  => [],
-	COUNT => [],
-    }, $class;
-    $obj->configure(@_) if @_;
-    $obj;
-}
+    sub index {
+	my $opt = ref $_[0] eq 'HASH' ? shift : {};
+	my $obj = shift;
+	local $_ = shift;
 
-sub hash  { shift->{HASH}  }
-sub list  { shift->{LIST}  }
-sub count { shift->{COUNT} }
+	my $index = $obj->{HASH}->{$_} //= do {
+	    if (my $prepare = $obj->{prepare}) {
+		for my $sub (@$prepare) {
+		    $_ = $sub->call();
+		}
+	    }
+	    s/\n+//g    if $obj->{ignore_newline};
+	    s/\s+//g    if $obj->{ignore_space};
+	    s/\pS+//g   if $obj->{ignore_symbol};
+	    s/\pP+//g   if $obj->{ignore_punct};
+	    $_ = lc($_) if $obj->{ignore_case};
+	    $obj->{HASH}->{$_} //= do {
+		my $list = $obj->{LIST};
+		push @$list, $_;
+		$#{ $list };
+	    };
+	};
 
-sub configure {
-    my $obj = shift;
-    while (@_ >= 2) {
-	$obj->{$_[0]} = $_[1];
-	splice @_, 0, 2;
+	$obj->{COUNT}->[$index] += 1;
+
+	$index;
     }
 }
 
-sub index {
-    my $opt = ref $_[0] eq 'HASH' ? shift : {};
-    my $obj = shift;
-    local $_ = shift;
-
-    my $index = $obj->{HASH}->{$_} //= do {
-	s/\n+//g    if $obj->{ignore_newline};
-	s/\s+//g    if $obj->{ignore_space};
-	s/\pS+//g   if $obj->{ignore_symbol};
-	s/\pP+//g   if $obj->{ignore_punct};
-	$_ = lc($_) if $obj->{ignore_case};
-	$obj->{HASH}->{$_} //= do {
-	    my $list = $obj->{LIST};
-	    push @$list, $_;
-	    $#{ $list };
-	};
-    };
-
-    $obj->{COUNT}->[$index] += 1;
-
-    $index;
+package Indexer {
+    sub new {
+	my $class = shift;
+	my $obj = { @_ };
+	bless $obj, $class;
+    }
+    sub index   { shift->{index}->() }
+    sub reset   { shift->{reset}->() }
+    sub block   { shift->{block}     }
+    sub reverse { shift->{reverse}   }
 }
 
 1;

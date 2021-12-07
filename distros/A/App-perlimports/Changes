@@ -1,5 +1,20 @@
 Revision history for App-perlimports
 
+0.000027  2021-11-29 22:29:05Z
+    - Detect Test::Builder objects used in import() (GH#56) (Olaf Alders)
+    - Require Test::Script 1.29
+
+0.000026  2021-11-26 21:35:12Z
+    - Ignore Env.pm for the time being (GH#47) (Olaf Alders)
+    - Allow module name to be passed to dump-perl-exports without flag (GH#46) (Olaf Alders)
+    - Ignore Constant::Generate and Git::Sub (GH#46) (Olaf Alders)
+    - Bump minimum Perl to 5.12.0 (GH#46) (Olaf Alders)
+    - Ignore modules which we cannot eval (GH#49) (Olaf Alders)
+    - Ignore Sort::ByExample and MLDBM
+    - Ensure --no-tidy-whitespace is passed as a CLI param (GH#53) (Olaf Alders)
+    - Ignore Import::Into (GH#52) (Olaf Alders)
+    - Ignore more whitespace changes (GH#54) (Olaf Alders)
+
 0.000025  2021-10-13 21:42:40Z
     - Add another minimum version to t/with-version.t (GH#43) (Olaf Alders)
 

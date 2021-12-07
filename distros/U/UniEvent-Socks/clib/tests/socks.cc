@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <openssl/ssl.h>
 #include <panda/unievent/socks.h>
 #include <panda/unievent/test/AsyncTest.h>

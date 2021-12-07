@@ -1,12 +1,22 @@
 The revision history for Net-Pcap
 
+0.19 - 2021-11-27 - Max Maischein (CORION)
+  [Bugfixes]
+  - CPAN RT #127685 Restore compilation with libpcap 1.9+
+    This incorporates the RedHat patch from
+
+    https://www.cpan.org/authors/id/S/SR/SREZIC/patches/Net-Pcap-0.18-RT127685-RH1485429.patch
+
+    and guards it with the newly introduced version #define
+  - GH #9, CPAN RT #117831 , CPAN RT #125352 Too strict test for
+    error message from libpcap
+    Fix contributed by KENTNL
+
 0.18 - 2016-05-15 - Sebastien Aperghis-Tramoni (SAPER)
 
   [Bugfixes]
   - CPAN RT #77807: Net::Pcap is no longer limited to one callback function,
     thanks to a patch by James Rouzier.
-  - CPAN RT #55163: Typo in eg/pcapdump (Iain Arnell and Jose Pedro Oliveira).
-  - CPAN RT #83842: Typo in Net:Pcap (Xavier Guimard).
 
   [API]
   - Added pcap_offline_filter() (Martijn Lievaart).
@@ -15,6 +25,8 @@ The revision history for Net-Pcap
   - use warnings (David Farrell).
 
   [Documentation]
+  - CPAN RT #55163: Typo in eg/pcapdump (Iain Arnell and Jose Pedro Oliveira).
+  - CPAN RT #83842: Typo in Net:Pcap (Xavier Guimard).
   - Moved HISTORY from README to main documentation.
   - Rewrote AUTHORS to acknowledge all contributors.
   - Updated copyright years.

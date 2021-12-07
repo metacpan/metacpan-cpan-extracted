@@ -35,10 +35,11 @@ my %WriteMakefileArgs = (
     "Perl::Tidy::Sweetened" => "1.18",
     "Pod::Tidy" => "0.10",
     "Test::Code::TidyAll" => "0.78",
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,6 +59,7 @@ my %FallbackPrereqs = (
   "Perl::Tidy::Sweetened" => "1.18",
   "Pod::Tidy" => "0.10",
   "Test::Code::TidyAll" => "0.78",
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "YAML::XS" => "0.62",
   "lib" => 0

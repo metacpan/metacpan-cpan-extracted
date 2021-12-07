@@ -1,11 +1,17 @@
 use alienfile;
 
+use Env qw(@LIBRARY_PATH @PATH);
+use Cwd;
+use File::Spec;
+
 plugin 'PkgConfig' => 'graphene-gobject-1.0';
 
 # http://ebassi.github.io/graphene/
 share {
 	requires 'Alien::Build::Plugin::Gather::Dino';
 	requires 'Devel::FindPerl';
+	requires 'Alien::Meson';
+	requires 'Alien::Ninja';
 
 	plugin Download => (
 		url => 'https://github.com/ebassi/graphene/releases',
@@ -17,17 +23,23 @@ share {
 	my $prop = meta_prop;
 
 	my $build_dir = '_build';
-	my @ninja_run = ("%{perl}", "%{.install.root}/../tool/ninja-run.pl");
 	build [
-		[ qw(meson),
+		[ '%{meson}',
 			'--prefix=%{.install.prefix}',
 			'--libdir=lib',
 			'--buildtype=release',
 			'-Dintrospection=enabled',
 			'-Dgobject_types=true',
 			$build_dir ],
-		[ @ninja_run, qw(-C), $build_dir, "test" ],
-		[ @ninja_run, qw(-C), $build_dir, 'install' ],
+		sub {
+			if( $^O eq 'MSWin32' ) {
+				my $src_dir = File::Spec->catfile( getcwd(), $build_dir, qw(src) );
+				push @LIBRARY_PATH, $src_dir;
+				push @PATH, $src_dir;
+			}
+		},
+		[ '%{ninja}', qw(-C), $build_dir, "test" ],
+		[ '%{ninja}', qw(-C), $build_dir, 'install' ],
 	];
 
 	plugin 'Gather::Dino';

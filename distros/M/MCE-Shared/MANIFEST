@@ -21,6 +21,7 @@ lib/MCE/Shared/Scalar.pm
 lib/MCE/Shared/Sequence.pm
 lib/MCE/Shared/Server.pm
 t/05_mce_hobo.t
+t/05_mce_hobo_max_workers.t
 t/07_shared_array.t
 t/07_shared_cache.t
 t/07_shared_cache_lru.t

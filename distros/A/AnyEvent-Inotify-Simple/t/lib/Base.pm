@@ -28,9 +28,9 @@ role t::lib::Base {
         default => sub { +[] },
     );
 
-    has 'type_filter' => (
+    has 'wanted_events' => (
         is         => 'ro',
-        isa        => 'RegexpRef',
+        isa        => 'ArrayRef',
         lazy_build => 1,
     );
 
@@ -42,10 +42,9 @@ role t::lib::Base {
             my $self = shift;
             AnyEvent::Inotify::Simple->new(
                 directory      => $self->base,
+                wanted_events  => $self->wanted_events,
                 event_receiver => sub {
                     my ($type, @args) = @_;
-                    my $f = $self->type_filter;
-                    return if $type !~ /$f/;
                     push @{$self->state}, [
                         $type,
                         map { $_->stringify } @args,

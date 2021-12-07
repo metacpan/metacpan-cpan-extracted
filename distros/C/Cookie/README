@@ -261,18 +261,18 @@ METHODS
     no other attribute.
 
     The http client, when receiving those cookies will derive the missing
-    cookie path to be "/my/path", i.e. the current uri path, and will
-    override the previously stored cookie with the same name for that host
-    that had the path set to "/"
+    cookie path to be "/my/path", i.e. the current uri path, and will create
+    a duplicate cookie from the previously stored cookie with the same name
+    for that host, but that had the path set to "/"
 
     So you can create a repository and use it to store the cookies sent by
     the http client using "fetch", but in preparation of the server
     response, either use a separate repository with, for example, "my
-    $jar_out = Cookie::Jar-"new> or use "set" which will still add the
-    cookie to the repository, but also before set the "Set-Cookie" header
-    for that cookie.
+    $jar_out = Cookie::Jar-"new> or use "set" which will not add the cookie
+    to the repository, but rather only set the "Set-Cookie" header for that
+    cookie.
 
-        # Add Set-Cookie header for that cookie and add cookie to repository
+        # Add Set-Cookie header for that cookie, but do not add cookie to repository
         $jar->set( $cookie_object );
 
   delete
@@ -385,13 +385,13 @@ METHODS
     Ultimately, if none of those are available, it will use the environment
     variable "HTTP_COOKIE"
 
-    In void context, this method, will add the fetched cookies to its
-    repository.
+    If the option *store* is true, this method will add the fetched cookies
+    to the repository.
 
     It returns an hash reference of cookie key => cookie object
 
-    A cookie key is made of the host (possibly empty) and the cookie name
-    separated by ";"
+    A cookie key is made of the host (possibly empty), the path and the
+    cookie name separated by ";"
 
         # Cookies added to the repository
         $jar->fetch || die( $jar->error );
@@ -860,11 +860,21 @@ INSTALLATION
     See also modperl testing documentation
     <https://perl.apache.org/docs/general/testing/testing.html>
 
+    But, if for some reason, you do not want to perform the mod_perl tests,
+    you can call use "NO_MOD_PERL=1" when calling "perl Makefile.PL", such
+    as:
+
+        NO_MOD_PERL=1 perl Makefile.PL
+        make
+        make test
+        sudo make install
+
 AUTHOR
     Jacques Deguest <jack@deguest.jp>
 
 SEE ALSO
-    Apache2::Cookies, APR::Request::Cookie, Cookie::Baker
+    Cookie, Cookie::Domain, Apache2::Cookies, APR::Request::Cookie,
+    Cookie::Baker
 
     Latest tentative version of the cookie standard
     <https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-09>

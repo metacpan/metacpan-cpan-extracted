@@ -1,0 +1,41 @@
+Changes
+=======
+
+0.10 2021 Dec 03
+    - fixing bug made in 0.09
+
+0.09 2021 Dec 01
+    - add some checks for Win32 platform
+    - use IP address in "t/secure.t" test
+    - skip "t/secure.t" if connection was refused by test server
+
+0.08 2021 Nov 30
+    - tests refactoring
+    - getting rid of Time::HiRes's sleep and alarm functions
+    - specify the minimum version of required libs
+    - decrease version of required Perl
+
+0.07 2021 Nov 27
+    - fix version in meta-files
+    - trying to get rid of race conditions between client and server in tests
+
+0.06 2021 Nov 27                                                                                                                                                                                                    
+    - updating test certs due to some OpenSSl version don't accept the initial ones
+
+0.05 2021 Nov 27
+    - updating POD
+    - updating META-files
+    - fixes in MANIFEST.SKIP file
+    - making the "t/insecure.t" test more stable
+
+0.04 2021 Nov 25
+    - adding test cases
+
+0.03 2021 Nov 25
+    - fixing POD, README
+
+0.02 2021 Nov 25
+    - fixing POD, README
+
+0.01  2021 Jun 23
+    - Initial version.

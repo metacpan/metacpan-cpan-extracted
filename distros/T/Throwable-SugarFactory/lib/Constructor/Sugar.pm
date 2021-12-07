@@ -5,7 +5,7 @@ use strictures 2;
 use String::CamelCase 'decamelize';
 use Throwable::SugarFactory::Utils '_getglob';
 
-our $VERSION = '0.152700'; # VERSION
+our $VERSION = '0.213360'; # VERSION
 
 # ABSTRACT: export constructor syntax sugar
 
@@ -62,7 +62,7 @@ Constructor::Sugar - export constructor syntax sugar
 
 =head1 VERSION
 
-version 0.152700
+version 0.213360
 
 =head1 SYNOPSIS
 

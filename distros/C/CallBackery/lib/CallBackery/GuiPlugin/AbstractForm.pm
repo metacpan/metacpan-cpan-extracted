@@ -20,7 +20,7 @@ The base class for gui forms.
 
 =cut
 
-use Mojo::Base 'CallBackery::GuiPlugin::Abstract';
+use Mojo::Base 'CallBackery::GuiPlugin::AbstractAction';
 
 =head1 ATTRIBUTES
 
@@ -36,58 +36,10 @@ Qooxdoo form.
 
 has screenCfg => sub {
     my $self = shift;
-    # prepend plugin name (see also messageConfig below)
-    my $name = $self->name;
-    for my $action (@{$self->actionCfg}) {
-        if ($action->{action} =~ /popup|wizzard/) {
-            $action->{name} = "${name}_$action->{name}";
-        }
-    }
-    return {
-        type    => 'form',
-        options => $self->screenOpts,
-        form    => $self->formCfg,
-        action  => $self->actionCfg,
-    }
-};
-
-=head2 screenOpts
-
-Returns a hash of options for the screen Options
-
-=cut
-
-has screenOpts => sub {
-    {
-        warnAboutUnsavedData => 1
-    }
-};
-
-=head2 actionCfg
-
-Returns a list of action buttons to place at the top of the form.
-
-=cut
-
-has actionCfg => sub {
-   [];
-};
-
-=head2 actionCfgMap
-
-TODOC
-
-=cut
-
-has actionCfgMap => sub {
-    my $self = shift;
-    my %map;
-    for my $row (@{$self->actionCfg}){
-        next unless $row->{action} =~ /^(submit|upload|download|autoSubmit|save)/;
-        next unless $row->{key};
-        $map{$row->{key}} = $row;
-    }
-    return \%map;
+    my $cfg = $self->SUPER::screenCfg;
+    $cfg->{type} = 'form';
+    $cfg->{form} = $self->formCfg;
+    return $cfg;
 };
 
 =head2 formCfg
@@ -275,42 +227,6 @@ sub getData {
     }
     else {
         die mkerror(38334, 'Requested unknown data type ' . ($type // 'unknown'));
-    }
-}
-
-=head2 massageConfig
-
-Function to integrate the plugin configuration recursively into the main config
-hash.
-
-=cut
-
-sub massageConfig {
-    my $self = shift;
-    my $cfg = shift;
-    my $actionCfg = $self->actionCfg;
-    for my $button (@$actionCfg){
-        if ($button->{action} =~ /popup|wizzard/) {
-            # prepend plugin name (see also screenCfg above)
-            my $name = $self->name . '_' . $button->{name};
-            $button->{name} = $name;
-            # allow same plugin multiple times
-            if ($cfg->{PLUGIN}{prototype}{$name}) {
-                my $newCfg = encode_json($button->{backend});
-                my $oldCfg = encode_json($cfg->{PLUGIN}{prototype}{$name}{backend});
-                if ($oldCfg ne 'null' and $newCfg ne $oldCfg) {
-                    $self->log->warn("oldCfg=" . dumper $oldCfg);
-                    $self->log->warn("newCfg=", dumper $newCfg);
-                    die "Not unique plugin instance name $name not allowed as backend config is different\n";
-                }
-            }
-            my $popup = $cfg->{PLUGIN}{prototype}{$name}
-                = $self->app->config->loadAndNewPlugin($button->{backend}{plugin});
-            $popup->config($button->{backend}{config});
-            $popup->name($name);
-            $popup->app($self->app);
-            $popup->massageConfig($cfg);
-        }
     }
 }
 

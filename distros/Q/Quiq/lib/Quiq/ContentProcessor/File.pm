@@ -1,12 +1,3 @@
-package Quiq::ContentProcessor::File;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -18,6 +9,21 @@ Quiq::ContentProcessor::File - Basisklasse für Ausgabe-Dateien
 =head1 BASE CLASS
 
 L<Quiq::Hash>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ContentProcessor::File;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -80,7 +86,7 @@ sub generate {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -1,3 +1,10 @@
+0.585   2021-11-14  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Tweak Abstract.
+
+
 0.584   2021-10-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: code_after_shebang.

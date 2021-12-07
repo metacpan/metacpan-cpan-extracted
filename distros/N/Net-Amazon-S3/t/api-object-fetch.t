@@ -9,7 +9,7 @@ BEGIN { require "$FindBin::Bin/test-helper-s3-api-error-confess.pl" }
 
 use Shared::Examples::Net::Amazon::S3::API qw[ expect_api_object_fetch ];
 
-plan tests => 7;
+plan tests => 8;
 
 expect_api_object_fetch 'fetch existing object' => (
 	with_bucket             => 'some-bucket',
@@ -35,6 +35,23 @@ expect_api_object_fetch 'fetch existing object' => (
 		'content-length'        => 10,
 		'client-date'           => ignore,
 	},
+);
+
+expect_api_object_fetch 'fetch range of existing object' => (
+	with_bucket             => 'some-bucket',
+	with_key                => 'some-key',
+	with_range              => 'bytes=1024-1034',
+	with_response_code      => HTTP_OK,
+	with_response_data      => 'some-value',
+	with_response_headers   => {
+		content_type        => 'text/plain',
+		etag                => 'some-key-etag',
+	},
+	expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/some-key' },
+	expect_request_headers  => {
+		range               => 'bytes=1024-1034',
+	},
+	expect_data             => ignore,
 );
 
 expect_api_object_fetch 'S3 error - Access Denied' => (

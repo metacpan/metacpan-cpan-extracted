@@ -22,6 +22,9 @@ use IO::File;
 use IO::Uncompress::Unzip qw($UnzipError);
 use File::stat;
 use Config;
+use Module::Load::Conditional;
+#
+my $libver;
 #
 sub write_file {
     my ( $filename, $content ) = @_;
@@ -56,7 +59,7 @@ sub alien {
     die "Can't build xs files under --pureperl-only\n" if $opt{'pureperl-only'};
     my $http     = HTTP::Tiny->new;
     my $response = $http->get('https://dyncall.org/download');
-    die "Failed to download %s: %s!", $response->{url}, $response->{content}
+    die sprintf "Failed to download %s: %s!", $response->{url}, $response->{content}
         unless $response->{success};
 
     #print "$response->{status} $response->{reason}\n";
@@ -66,22 +69,33 @@ sub alien {
     #    }
     #}
     #print $response->{content} if length $response->{content};
+    # https://dyncall.org/r1.2/dyncall-1.2-windows-xp-x64-r.zip
+    # https://dyncall.org/r1.2/dyncall-1.2-windows-xp-x86-r.zip
+    # https://dyncall.org/r1.2/dyncall-1.2-windows-10-arm64-r.zip
     if ( $^O eq 'MSWin32' ) {    # Use prebuilt libs on Windows
         my $x64  = $Config{ptrsize} == 8;
         my $plat = $x64 ? '64' : '86';
-        my @src
-            = map { 'https://dyncall.org/' . $_ }
+        my %versions;
+        for my $url ( map { 'https://dyncall.org/' . $_ }
             $response->{content}
-            =~ m[href="(.+/dyncall-\d\.\d+\-windows-xp-x${plat}(?:-r)?\.zip)"]g;
+            =~ m[href="(.+/dyncall-\d\.\d+\-windows-xp-x${plat}(?:-r)?\.zip)"]g ) {
+            my ($version) = $url =~ m[-(\d+\.\d+)-windows];
+            $versions{$version} = $url;
+        }
+        for my $version ( reverse sort keys %versions ) {
+            $libver //= $version;
+
+            #printf "%s %s => %s\n", ($pick eq $version ? '*': ' '), $version, $versions{$version};
+        }
 
         #ddx \@src;
         # https://dyncall.org/r1.2/dyncall-1.2-windows-xp-x64-r.zip
         # https://dyncall.org/r1.2/dyncall-1.2-windows-xp-x86-r.zip
         # https://dyncall.org/r1.2/dyncall-1.2-windows-10-arm64-r.zip
-        my $filename = Path::Tiny->new( $src[0] )->basename;
+        my $filename = Path::Tiny->new( $versions{$libver} )->basename;
         my $dest     = Path::Tiny::tempdir( { realpath => 1 } );
         $dest     = Path::Tiny->cwd;
-        $response = $http->mirror( $src[0], $dest->child($filename), {} );
+        $response = $http->mirror( $versions{$libver}, $dest->child($filename), {} );
         if ( $response->{success} ) {
 
             #print $dest->child($filename) . " is up to date\n";
@@ -100,7 +114,7 @@ sub alien {
             }
         }
         else {
-            die "Failed to download %s: %s!", $response->{url}, $response->{content}
+            die sprintf 'Failed to download %s: %s!', $response->{url}, $response->{content}
                 unless $response->{success};
         }
     }
@@ -111,16 +125,15 @@ sub alien {
             my ($version) = $url =~ m[/r(\d\.\d+)/];
             $versions{$version} = $url;
         }
-        my $pick;
         for my $version ( reverse sort keys %versions ) {
-            $pick //= $version;
+            $libver //= $version;
 
             #printf "%s %s => %s\n", ($pick eq $version ? '*': ' '), $version, $versions{$version};
         }
-        my $filename = Path::Tiny->new( $versions{$pick} )->basename;
+        my $filename = Path::Tiny->new( $versions{$libver} )->basename;
         my $dest     = Path::Tiny::tempdir( { realpath => 1 } );
         $dest     = Path::Tiny->cwd;
-        $response = $http->mirror( $versions{$pick}, $dest->child($filename), {} );
+        $response = $http->mirror( $versions{$libver}, $dest->child($filename), {} );
 
         #use Data::Dump;
         #ddx $response;
@@ -140,11 +153,13 @@ sub alien {
             my $pre = Path::Tiny->cwd->child( qw[blib arch auto], $opt{meta}->name )->absolute;
             chdir $kid->absolute->stringify;
             warn($_) && system($_ )
-                for './configure --prefix=' . $pre->absolute, 'make', 'make install';
+                for './configure --prefix=' .
+                $pre->absolute,    # . ' CFLAGS="-Ofast" LDFLAGS="-Ofast"',
+                'make', 'make install';
             chdir $cwd->stringify;
         }
         else {
-            die "Failed to download %s: %s!", $response->{url}, $response->{content}
+            die sprintf 'Failed to download %s: %s!', $response->{url}, $response->{content}
                 unless $response->{success};
         }
     }
@@ -153,6 +168,16 @@ sub alien {
 sub process_xs {
     my ( $source, %opt ) = @_;
     die "Can't build xs files under --pureperl-only\n" if $opt{'pureperl-only'};
+    my $OP = 0;
+    if (
+        Module::Load::Conditional::can_load(
+            modules => { 'Object::Pad' => 0, 'Object::Pad::ExtensionBuilder' => 0.57 }
+        )
+    ) {
+        Object::Pad::ExtensionBuilder->write_object_pad_h;
+        $OP = 1;
+    }
+    warn $@ if $@;
     my ( undef, @parts ) = splitdir( dirname($source) );
     push @parts, my $file_base = basename( $source, '.xs' );
     my $archdir = catdir( qw/blib arch auto/, @parts );
@@ -160,24 +185,33 @@ sub process_xs {
     my $c_file  = catfile( $tempdir, "$file_base.c" );
     require ExtUtils::ParseXS;
     mkpath( $tempdir, $opt{verbose}, oct '755' );
-    ExtUtils::ParseXS::process_file( filename => $source, prototypes => 0, output => $c_file );
+    ExtUtils::ParseXS::process_file( filename => $source, prototypes => 1, output => $c_file );
     my $version = $opt{meta}->version;
     require ExtUtils::CBuilder;
-    my $builder = ExtUtils::CBuilder->new( config => $opt{config}->values_set );
+    my $builder = ExtUtils::CBuilder->new( config => ( $opt{config}->values_set ) );
     my $pre     = Path::Tiny->cwd->child(qw[blib arch auto])->absolute;
+    my $obj     = $builder->object_file($c_file);
     my $ob_file = $builder->compile(
+        'C++'        => 1,
         source       => $c_file,
         defines      => { VERSION => qq/"$version"/, XS_VERSION => qq/"$version"/ },
         include_dirs =>
             [ curdir, dirname($source), $pre->child( $opt{meta}->name, 'include' )->stringify ],
 
-        #extra_compiler_flags => '-std=c99'
+        # extra_compiler_flags =>	( $OP ? '-DOBJECT_PAD' : '-DNOOBJECT_PAD' ) #.' -std=c99'
     );
     require DynaLoader;
     my $mod2fname
         = defined &DynaLoader::mod2fname ? \&DynaLoader::mod2fname : sub { return $_[0][-1] };
     mkpath( $archdir, $opt{verbose}, oct '755' ) unless -d $archdir;
     my $lib_file = catfile( $archdir, $mod2fname->( \@parts ) . '.' . $opt{config}->get('dlext') );
+    my $paths    = ExtUtils::InstallPaths->new( dist_name => 'Object::Pad' );
+
+    #my $op_lib_file = catfile(
+    #    $paths->install_destination('arch'),
+    #qw[auto Object],
+    #'Pad' . $opt{config}->get('dlext')
+    #);
     return $builder->link(
         extra_linker_flags => [
             '-L' . dirname($source),

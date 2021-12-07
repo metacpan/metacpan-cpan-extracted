@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.57;
+package Object::Pad 0.58;
 
 use v5.14;
 use warnings;
@@ -204,7 +204,16 @@ because it follows a more standard grammar without this special-case.
 An optional list of attributes may be supplied in similar syntax as for subs
 or lexical variables. (These are annotations about the class itself; the
 concept should not be confused with per-object-instance data, which here is
-called "slots"). The following class attributes are supported:
+called "slots").
+
+Whitespace is permitted within the value and is automatically trimmed, but as
+standard Perl parsing rules, no space is permitted between the attribute's
+name and the open parenthesis of its value:
+
+   :attr( value here )     # is permitted
+   :attr (value here)      # not permitted
+
+The following class attributes are supported:
 
 =head3 :isa
 
@@ -244,6 +253,9 @@ I<Since version 0.57.>
 Composes a role into the class; optionally requiring a version check on the
 role package. This is a newer form of the C<implements> and C<does>
 keywords and should be preferred for new code.
+
+Multiple roles can be composed by using multiple C<:does> attributes, one per
+role.
 
 The package will be loaded in a similar way to how the L</:isa> attribute is
 handled.
@@ -358,10 +370,10 @@ I<Since version 0.33.>
       method slot { return $slot }
    }
 
-I<Since version 0.56> a role can declare that it provides another role:
+I<Since version 0.57> a role can declare that it provides another role:
 
-   role Name does OTHERROLE { ... }
-   role Name does OTHERROLE OTHERVER { ... }
+   role Name :does(OTHERROLE) { ... }
+   role Name :does(OTHERROLE OTHERVER) { ... }
 
 This will include all of the methods from the included role. Effectively this
 means that applying the "outer" role to a class will imply applying the other
@@ -774,7 +786,7 @@ For example; in the following
       sub get_value { return "A" }
    }
 
-   class DerivedClass isa ClassicPerlBaseClass {
+   class DerivedClass :isa(ClassicPerlBaseClass) {
       has $_value = "B";
       BUILD {
          $_value = "C";

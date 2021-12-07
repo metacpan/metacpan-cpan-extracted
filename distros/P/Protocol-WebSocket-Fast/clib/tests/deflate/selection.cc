@@ -26,12 +26,12 @@ TEST("permessage-deflate extension in request") {
     SECTION("no deflate enabled => no extension") {
         client.no_deflate();
         auto str = client.connect_request(creq());
-        CHECK_THAT(str, !Contains("permessage-deflate"));
+        CHECK_THAT(str, !ContainsSubstring("permessage-deflate"));
     }
 
     SECTION("deflate enabled => extension is present") {
         auto str = client.connect_request(creq());
-        CHECK_THAT(str, Contains("permessage-deflate"));
+        CHECK_THAT(str, ContainsSubstring("permessage-deflate"));
     }
 
     SECTION("deflate enabled(custom params) => extension is present") {
@@ -42,11 +42,11 @@ TEST("permessage-deflate extension in request") {
         cfg.deflate->client_max_window_bits     = 14;
         client.configure(cfg);
         auto str = client.connect_request(creq());
-        CHECK_THAT(str, Contains("permessage-deflate"));
-        CHECK_THAT(str, Contains("client_no_context_takeover"));
-        CHECK_THAT(str, Contains("server_no_context_takeover"));
-        CHECK_THAT(str, Contains("server_max_window_bits=13"));
-        CHECK_THAT(str, Contains("client_max_window_bits=14"));
+        CHECK_THAT(str, ContainsSubstring("permessage-deflate"));
+        CHECK_THAT(str, ContainsSubstring("client_no_context_takeover"));
+        CHECK_THAT(str, ContainsSubstring("server_no_context_takeover"));
+        CHECK_THAT(str, ContainsSubstring("server_max_window_bits=13"));
+        CHECK_THAT(str, ContainsSubstring("client_max_window_bits=14"));
     }
 }
 
@@ -58,7 +58,7 @@ TEST("permessage-deflate extension in server reply") {
         client.no_deflate();
         auto req = server.accept(client.connect_request(creq()));
         auto res_str = server.accept_response();
-        CHECK_THAT(res_str, !Contains("permessage-deflate"));
+        CHECK_THAT(res_str, !ContainsSubstring("permessage-deflate"));
     }
 
     SECTION("client deflate: on, server deflate: off => extension: off") {
@@ -66,8 +66,8 @@ TEST("permessage-deflate extension in server reply") {
         auto req_str = client.connect_request(creq());
         auto req = server.accept(req_str);
         auto res_str = server.accept_response();
-        CHECK_THAT(req_str, Contains("permessage-deflate"));
-        CHECK_THAT(res_str, !Contains("permessage-deflate"));
+        CHECK_THAT(req_str, ContainsSubstring("permessage-deflate"));
+        CHECK_THAT(res_str, !ContainsSubstring("permessage-deflate"));
         CHECK_FALSE(client.is_deflate_active());
         CHECK_FALSE(server.is_deflate_active());
     }
@@ -77,8 +77,8 @@ TEST("permessage-deflate extension in server reply") {
         auto req = server.accept(req_str);
         auto res_str = server.accept_response();
         client.connect(res_str);
-        CHECK_THAT(req_str, Contains("permessage-deflate"));
-        CHECK_THAT(res_str, Contains("permessage-deflate"));
+        CHECK_THAT(req_str, ContainsSubstring("permessage-deflate"));
+        CHECK_THAT(res_str, ContainsSubstring("permessage-deflate"));
         CHECK(server.is_deflate_active());
         CHECK(client.is_deflate_active());
         CHECK(client.established());
@@ -90,9 +90,9 @@ TEST("permessage-deflate extension in server reply") {
         auto req = server.accept(req_str);
         auto res_str = server.accept_response();
         client.connect(res_str);
-        CHECK_THAT(req_str, Contains("permessage-deflate"));
-        CHECK_THAT(res_str, Contains("permessage-deflate"));
-        CHECK_THAT(res_str, Contains("client_max_window_bits=15"));
+        CHECK_THAT(req_str, ContainsSubstring("permessage-deflate"));
+        CHECK_THAT(res_str, ContainsSubstring("permessage-deflate"));
+        CHECK_THAT(res_str, ContainsSubstring("client_max_window_bits=15"));
         CHECK(server.is_deflate_active());
         CHECK(client.is_deflate_active());
         CHECK(client.established());
@@ -135,8 +135,8 @@ TEST("permessage-deflate extension in server reply") {
         auto req = server.accept(req_str);
         auto res_str = server.accept_response();
         client.connect(res_str);
-        CHECK_THAT(req_str, Contains("permessage-deflate"));
-        CHECK_THAT(res_str, !Contains("permessage-deflate"));
+        CHECK_THAT(req_str, ContainsSubstring("permessage-deflate"));
+        CHECK_THAT(res_str, !ContainsSubstring("permessage-deflate"));
         CHECK_FALSE(client.is_deflate_active());
         CHECK_FALSE(server.is_deflate_active());
         CHECK(client.established());
@@ -228,8 +228,8 @@ TEST("server ignores permessage-deflate option with window_bits=8, and uses no c
         auto req = server.accept(req_str);
         auto res_str = server.accept_response();
         client.connect(res_str);
-        CHECK_THAT(req_str, Contains("permessage-deflate"));
-        CHECK_THAT(res_str, !Contains("permessage-deflate"));
+        CHECK_THAT(req_str, ContainsSubstring("permessage-deflate"));
+        CHECK_THAT(res_str, !ContainsSubstring("permessage-deflate"));
         CHECK_FALSE(server.is_deflate_active());
         CHECK_FALSE(client.is_deflate_active());
         CHECK(client.established());
@@ -238,8 +238,8 @@ TEST("server ignores permessage-deflate option with window_bits=8, and uses no c
     SECTION("8-bit response is rejected") {
         auto req = server.accept(req_str);
         auto res_str = server.accept_response();
-        CHECK_THAT(req_str, Contains("permessage-deflate"));
-        CHECK_THAT(res_str, Contains("permessage-deflate"));
+        CHECK_THAT(req_str, ContainsSubstring("permessage-deflate"));
+        CHECK_THAT(res_str, ContainsSubstring("permessage-deflate"));
         CHECK(server.is_deflate_active());
 
         regex_replace(res_str, "window_bits=9", "window_bits=8");
@@ -277,6 +277,6 @@ TEST("SRV-1229 bufix") {
     ServerParser server;
     auto req = server.accept(req_str);
     auto res_str = server.accept_response();
-    CHECK_THAT(res_str, Contains("permessage-deflate"));
-    CHECK_THAT(res_str, Contains("client_max_window_bits=15"));
+    CHECK_THAT(res_str, ContainsSubstring("permessage-deflate"));
+    CHECK_THAT(res_str, ContainsSubstring("client_max_window_bits=15"));
 }

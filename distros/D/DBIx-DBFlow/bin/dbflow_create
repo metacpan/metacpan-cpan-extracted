@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/say/;
+
+use DBIx::Class::DeploymentHandler;
+use Getopt::Long;
+
+package CreateDBFlow::Args {
+  use Moose;
+  with 'MooseX::Getopt';
+  use Module::Runtime qw/require_module/;
+
+  has schema => (is => 'ro', isa => 'Str', required => 1, documentation => 'The name of the schema class to load. Must be a DBIx::Class');
+
+  has _schema => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my $self = shift;
+      my $schema_name = $self->schema;
+      $self->use_lib_include_dir;
+      require_module $schema_name;
+      my $schema = $schema_name->admin_connection;
+      return $schema;
+    }
+  );
+
+  has include_dir => (
+    traits => ['Getopt'],
+    is => 'ro',
+    isa => 'Str',
+    default => 'lib',
+    cmd_aliases => 'I',
+    documentation => 'library directory for the schema (will be added to @INC). Defaults to lib',
+  );
+
+  sub use_lib_include_dir {
+    my $self = shift;
+    require lib;
+    lib->import($self->include_dir);
+  }
+
+  has dir => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'database',
+    documentation => 'The directory to create support files in',
+  );
+}
+
+my $opts = CreateDBFlow::Args->new_with_options;
+
+#my $force_overwrite = 0;
+#unless ( GetOptions( 'force_overwrite!' => \$force_overwrite ) ) {
+#    die "Invalid options";
+#}
+
+my $schema_version = $opts->_schema->schema_version;
+
+die "Schema must be in version 1. Please add \"our \$VERSION = 1\" to the schema" if (not defined $schema_version);
+die "This schema should be at version 1 to run $0" if ($schema_version != 1);
+
+my $dh = DBIx::Class::DeploymentHandler->new({
+        schema              => $opts->_schema,
+        script_directory    => $opts->dir,
+        databases           => 'MySQL',
+        sql_translator_args => { add_drop_table => 0 },
+        force_overwrite     => 0,
+});
+
+$dh->prepare_install;
+
+$dh->install_version_storage;
+
+my $version_insert = $opts->_schema->storage->dbh->prepare(
+  "INSERT INTO dbix_class_deploymenthandler_versions (version) VALUES (?)"
+);
+$version_insert->execute(1);
+
+

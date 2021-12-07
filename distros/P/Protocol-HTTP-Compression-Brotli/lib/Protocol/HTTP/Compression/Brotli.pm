@@ -1,7 +1,7 @@
 package Protocol::HTTP::Compression::Brotli;
 use Protocol::HTTP;
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.0.4';
 
 XS::Loader::bootstrap;
 

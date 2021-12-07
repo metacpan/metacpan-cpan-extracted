@@ -306,18 +306,18 @@ called, it stringifies the cookies and create a `Set-Cookie` header for
 each one, but only with their value and no other attribute.
 
 The http client, when receiving those cookies will derive the missing
-cookie path to be `/my/path`, i.e. the current uri path, and will
-override the previously stored cookie with the same name for that host
-that had the path set to `/`
+cookie path to be `/my/path`, i.e. the current uri path, and will create
+a duplicate cookie from the previously stored cookie with the same name
+for that host, but that had the path set to `/`
 
 So you can create a repository and use it to store the cookies sent by
 the http client using [\"fetch\"](#fetch){.perl-module}, but in
 preparation of the server response, either use a separate repository
 with, for example, `my $jar_out = Cookie::Jar-`new\> or use
-[\"set\"](#set){.perl-module} which will still add the cookie to the
-repository, but also before set the `Set-Cookie` header for that cookie.
+[\"set\"](#set){.perl-module} which will not add the cookie to the
+repository, but rather only set the `Set-Cookie` header for that cookie.
 
-        # Add Set-Cookie header for that cookie and add cookie to repository
+        # Add Set-Cookie header for that cookie, but do not add cookie to repository
         $jar->set( $cookie_object );
 
 delete
@@ -458,14 +458,14 @@ You can also provide the `Cookie` string to parse by providing the
 Ultimately, if none of those are available, it will use the environment
 variable `HTTP_COOKIE`
 
-In void context, this method, will add the fetched cookies to its
-[repository](#repo){.perl-module}.
+If the option *store* is true, this method will add the fetched cookies
+to the [repository](#repo){.perl-module}.
 
 It returns an hash reference of cookie key =\> [cookie
 object](https://metacpan.org/pod/Cookie){.perl-module}
 
-A cookie key is made of the host (possibly empty) and the cookie name
-separated by `;`
+A cookie key is made of the host (possibly empty), the path and the
+cookie name separated by `;`
 
         # Cookies added to the repository
         $jar->fetch || die( $jar->error );
@@ -1079,14 +1079,25 @@ For example:
 See also [modperl testing
 documentation](https://perl.apache.org/docs/general/testing/testing.html){.perl-module}
 
+But, if for some reason, you do not want to perform the mod\_perl tests,
+you can call use `NO_MOD_PERL=1` when calling `perl Makefile.PL`, such
+as:
+
+        NO_MOD_PERL=1 perl Makefile.PL
+        make
+        make test
+        sudo make install
+
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55a2c78baf58)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5577dce5f858)"}\>
 
 SEE ALSO
 ========
 
+[Cookie](https://metacpan.org/pod/Cookie){.perl-module},
+[Cookie::Domain](https://metacpan.org/pod/Cookie::Domain){.perl-module},
 [Apache2::Cookies](https://metacpan.org/pod/Apache2::Cookies){.perl-module},
 [APR::Request::Cookie](https://metacpan.org/pod/APR::Request::Cookie){.perl-module},
 [Cookie::Baker](https://metacpan.org/pod/Cookie::Baker){.perl-module}

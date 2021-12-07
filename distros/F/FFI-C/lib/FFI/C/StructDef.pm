@@ -18,7 +18,7 @@ use base qw( FFI::C::Def );
 our @CARP_NOT = qw( FFI::C::Util FFI::C );
 
 # ABSTRACT: Structured data definition for FFI
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub _is_kind
@@ -230,7 +230,7 @@ sub new
                   $all->($ptr, $array, (@$array * $unitsize));
                   # we don't want to have to get the array and tie it if
                   # it isn't going to be used anyway.
-                  return unless defined wantarray;  ## no critic (Freenode::Wantarray)
+                  return unless defined wantarray;  ## no critic (Community::Wantarray)
                 }
                 elsif(! is_ref $_[0])
                 {
@@ -339,7 +339,7 @@ FFI::C::StructDef - Structured data definition for FFI
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -481,7 +481,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020,2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

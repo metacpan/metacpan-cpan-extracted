@@ -1,6 +1,7 @@
 #include "test.h"
 #include <panda/exception.h>
 #include <iostream>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 // prevent inlining
 extern "C" {
@@ -96,11 +97,11 @@ TEST_CASE("esception", "[exception]") {
                 REQUIRE(fn01_frame);
                 REQUIRE(fn45_frame);
 
-                CHECK_THAT( fn01_frame->library, Catch::Matchers::Contains( "MyTest" ) );
-                CHECK_THAT( fn01_frame->name, Catch::Matchers::Contains( "fn01" ) );
+                CHECK_THAT( fn01_frame->library, Catch::Matchers::ContainsSubstring( "MyTest" ) );
+                CHECK_THAT( fn01_frame->name, Catch::Matchers::ContainsSubstring( "fn01" ) );
                 CHECK( fn01_frame->address > 0);
                 CHECK( fn45_frame->address > 0);
-                CHECK_THAT( fn45_frame->library, Catch::Matchers::Contains( "MyTest" ) );
+                CHECK_THAT( fn45_frame->library, Catch::Matchers::ContainsSubstring( "MyTest" ) );
             }
             was_catch = true;
         }
@@ -146,6 +147,6 @@ TEST_CASE("esception", "[exception]") {
     }
     SECTION("Backtrace::dump_trace()") {
         auto trace = Backtrace::dump_trace();
-        CHECK_THAT( trace, Catch::Matchers::Contains( "Backtrace" ) || Catch::Matchers::Contains( "0x" )  );
+        CHECK_THAT( trace, Catch::Matchers::ContainsSubstring( "Backtrace" ) || Catch::Matchers::ContainsSubstring( "0x" )  );
     }
 }

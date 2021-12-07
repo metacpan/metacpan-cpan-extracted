@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Upload::Create;
 # ABSTRACT: Internal class to perform CreateMultipartUpload operation
-$Net::Amazon::S3::Operation::Object::Upload::Create::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Object::Upload::Create::VERSION = '0.99';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Object::Upload::Create - Internal class to perform C
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

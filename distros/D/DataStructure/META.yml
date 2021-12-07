@@ -4,7 +4,7 @@ author:
   - 'Mathias Kende <mathias@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
+  Test2::Suite: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
@@ -24,5 +24,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/perl-datastructure/issues
   repository: https://github.com/mkende/perl-datastructure
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

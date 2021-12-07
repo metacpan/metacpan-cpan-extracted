@@ -3,45 +3,45 @@ abstract: 'extremely fast asynchronous preforking / threading event based web se
 author:
   - unknown
 build_requires:
-  Date: v5.2.9
+  Date: v5.2.10
   Export::XS: v3.0.5
-  Net::SockAddr: v1.1.1
-  Protocol::HTTP: v1.1.4
-  Test::Catch: v1.0.16
+  Net::SockAddr: v1.1.2
+  Protocol::HTTP: v1.1.5
+  Test::Catch: v2.0.0
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  URI::XS: v2.1.4
-  UniEvent: v1.2.8
-  UniEvent::HTTP: v1.1.1
-  UniEvent::Socks: v1.0.0
+  URI::XS: v2.1.5
+  UniEvent: v1.2.9
+  UniEvent::HTTP: v1.1.2
+  UniEvent::Socks: v1.0.1
   XLog: v1.1.2
-  XS::Framework: v1.5.1
+  XS::Framework: v1.5.2
   XS::libboost::mini: v1.76.0.0
   XS::libcares: v1.17.1.2
-  XS::libcatch: v2.13.4.2
-  XS::libpanda: v1.5.7
+  XS::libcatch: v3.0.0.3
+  XS::libpanda: v1.5.8
   XS::librangeV3: v1.0.2
   XS::libuv: v1.41.0.0
   next::XS: v1.0.7
 configure_requires:
   Alien::cmake3: '0'
-  Date: v5.2.9
+  Date: v5.2.10
   Export::XS: v3.0.5
-  Net::SockAddr: v1.1.1
-  Protocol::HTTP: v1.1.4
-  Test::Catch: v1.0.16
-  URI::XS: v2.1.4
-  UniEvent: v1.2.8
-  UniEvent::HTTP: v1.1.1
-  UniEvent::Socks: v1.0.0
+  Net::SockAddr: v1.1.2
+  Protocol::HTTP: v1.1.5
+  Test::Catch: v2.0.0
+  URI::XS: v2.1.5
+  UniEvent: v1.2.9
+  UniEvent::HTTP: v1.1.2
+  UniEvent::Socks: v1.0.1
   XLog: v1.1.2
-  XS::Framework: v1.5.1
+  XS::Framework: v1.5.2
   XS::Install: v1.3.5
   XS::libboost::mini: v1.76.0.0
   XS::libcares: v1.17.1.2
-  XS::libcatch: v2.13.4.2
-  XS::libpanda: v1.5.7
+  XS::libcatch: v3.0.0.3
+  XS::libpanda: v1.5.8
   XS::librangeV3: v1.0.2
   XS::libuv: v1.41.0.0
   next::XS: v1.0.7
@@ -57,22 +57,22 @@ no_index:
     - t
     - inc
 requires:
-  Date: v5.2.9
+  Date: v5.2.10
   Export::XS: v3.0.5
-  Net::SockAddr: v1.1.1
-  Protocol::HTTP: v1.1.4
-  URI::XS: v2.1.4
-  UniEvent: v1.2.8
-  UniEvent::HTTP: v1.1.1
-  UniEvent::Socks: v1.0.0
+  Net::SockAddr: v1.1.2
+  Protocol::HTTP: v1.1.5
+  URI::XS: v2.1.5
+  UniEvent: v1.2.9
+  UniEvent::HTTP: v1.1.2
+  UniEvent::Socks: v1.0.1
   XLog: v1.1.2
-  XS::Framework: v1.5.1
+  XS::Framework: v1.5.2
   XS::Install: v1.3.5
   XS::libboost::mini: v1.76.0.0
   XS::libcares: v1.17.1.2
-  XS::libpanda: v1.5.7
+  XS::libpanda: v1.5.8
   XS::librangeV3: v1.0.2
   XS::libuv: v1.41.0.0
   next::XS: v1.0.7
-version: v1.1.0
+version: v1.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

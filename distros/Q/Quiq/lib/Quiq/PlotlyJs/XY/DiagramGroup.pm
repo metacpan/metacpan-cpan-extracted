@@ -1,22 +1,3 @@
-package Quiq::PlotlyJs::XY::DiagramGroup;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Math;
-use Quiq::Json;
-use Quiq::JavaScript;
-use Quiq::Html::Table::Simple;
-use Quiq::JQuery::Function;
-use Quiq::Html::Widget::CheckBox;
-use Quiq::Html::Widget::SelectMenu;
-use Quiq::Html::Widget::Button;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -239,6 +220,31 @@ Id der Nten Rangeslider-Checkbox.
 Klasse aller Rangeslider.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::PlotlyJs::XY::DiagramGroup;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Math;
+use Quiq::Json;
+use Quiq::JavaScript;
+use Quiq::Html::Table::Simple;
+use Quiq::JQuery::Function;
+use Quiq::Html::Widget::CheckBox;
+use Quiq::Html::Widget::SelectMenu;
+use Quiq::Html::Widget::Button;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -1187,7 +1193,7 @@ sub jsDiagram {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

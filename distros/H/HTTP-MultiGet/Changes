@@ -56,3 +56,5 @@
   -- Now uses default timeout of AnyEvent::HTTP
 1.022
   -- Added AnyEvent timer issue fix for non async calls
+1.023
+  -- added undef to functions that should go away

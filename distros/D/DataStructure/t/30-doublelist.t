@@ -4,9 +4,8 @@ use utf8;
 
 
 use Scalar::Util qw(weaken);
-use Test::More;
-
-BEGIN { use_ok('DataStructure::DoubleList') }
+use Test2::Bundle::More;
+use Test2::Tools::Target 'DataStructure::DoubleList';
 
 {
   my $l = DataStructure::DoubleList->new();

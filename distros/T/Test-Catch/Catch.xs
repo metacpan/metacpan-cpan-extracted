@@ -1,9 +1,11 @@
 #include <math.h> // this fixes win32 because <cmath> that is included by <catch.hpp> breaks <perl.h> unless previously included <math.h>
-#define CATCH_CONFIG_RUNNER
-#define CATCH_CONFIG_DEFAULT_REPORTER "perl"
-//#define CATCH_CONFIG_ENABLE_BENCHMARKING
-#include <catch2/catch.hpp>
 #include <vector>
+#include <iostream>
+#include <catch2/catch_session.hpp>
+#include <catch2/internal/catch_string_manip.hpp>
+#include <catch2/internal/catch_console_colour.hpp>
+#include <catch2/reporters/catch_reporter_registrars.hpp>
+#include <catch2/reporters/catch_reporter_streaming_base.hpp>
 #include <xsheader.h>
 
 using namespace Catch;
@@ -136,7 +138,7 @@ private:
 };
 
 
-struct PerlReporter : IStreamingReporter {
+struct PerlReporter : StreamingReporterBase {
     struct Scope {
         uint32_t count;
         uint32_t failed;
@@ -148,20 +150,18 @@ struct PerlReporter : IStreamingReporter {
 
     static string getDescription () { return "Reports test results in perl test-harness compatible format"; }
     
-    PerlReporter (const ReporterConfig& _config)
-        : scope(), sliding_scope(), fatal(), config(_config.fullConfig()), stream(_config.stream())
-    {
-        reporterPrefs.shouldRedirectStdOut = false;
-        reporterPrefs.shouldReportAllAssertions = true;
+    PerlReporter (const ReporterConfig& config) : StreamingReporterBase(config), scope(), sliding_scope(), fatal() {
+        m_preferences.shouldRedirectStdOut = false;
+        m_preferences.shouldReportAllAssertions = true;
     }
     
-    ReporterPreferences getPreferences () const override { return reporterPrefs; }
-
-    void noMatchingTestCases (const string& spec) override {
-        startErrorLine() << "# No test cases matched '" << spec << "'" << endl;
+    void noMatchingTestCases (StringRef unmatchedSpec) override {
+        startErrorLine() << "# No test cases matched '" << unmatchedSpec << "'" << endl;
     }
     
-    void skipTest (const TestCaseInfo&) override {}
+    void reportInvalidArguments(StringRef invalidArgument) override {
+        startErrorLine() << "# invalid argument '" << invalidArgument << "'" << endl;
+    }
     
     void testRunStarting (const TestRunInfo&) override {
         scopes.push_back(context);
@@ -174,9 +174,6 @@ struct PerlReporter : IStreamingReporter {
         scopes.clear();
         scope = nullptr;
     }
-    
-    void testGroupStarting (const GroupInfo&)      override {}
-    void testGroupEnded    (const TestGroupStats&) override {}
     
     void testCaseStarting (const TestCaseInfo&)  override {}
     
@@ -200,7 +197,7 @@ struct PerlReporter : IStreamingReporter {
     void startScope (const SectionInfo& info) {
         startLine();
         auto fullname = scope->fullname.length() ? (scope->fullname + " / " + info.name) : info.name;
-        stream << "# Subtest: " << fullname << endl;
+        m_stream << "# Subtest: " << fullname << endl;
         scopes.push_back({0, 0, scope->depth + 1, info.name, fullname});
         scope = &scopes.back();
     }
@@ -235,15 +232,15 @@ struct PerlReporter : IStreamingReporter {
         startLine();
         if (failed) {
             ++scope->failed;
-            stream << "not ok";
+            m_stream << "not ok";
         }
-        else stream << "ok";
-        stream << " " << scope->count << " - [" << name << "]" << endl;
+        else m_stream << "ok";
+        m_stream << " " << scope->count << " - [" << name << "]" << endl;
     }
     
     ostream& startLine () {
-        for (size_t i = 0; i < scope->depth; ++i) stream << "    ";
-        return stream;
+        for (size_t i = 0; i < scope->depth; ++i) m_stream << "    ";
+        return m_stream;
     }
 
     ostream& startErrorLine () {
@@ -253,11 +250,10 @@ struct PerlReporter : IStreamingReporter {
 
     void assertionStarting (const AssertionInfo&) override {}
 
-    bool assertionEnded (const AssertionStats& stats) override {
+    void assertionEnded (const AssertionStats& stats) override {
         ostringstream s;
         Printer(s, stats).print();
         assertions.push_back({stats, s.str()});
-        return true;
     }
     
     void commitAssertions () {
@@ -301,25 +297,56 @@ struct PerlReporter : IStreamingReporter {
         fatal = true;
     }
     
-//    void benchmarkPreparing (const std::string& ) override {}
-//    void benchmarkStarting  (const BenchmarkInfo& ) override {}
-//    void benchmarkEnded     (const BenchmarkStats<>& ) override {}
-//    void benchmarkFailed    (const std::string& ) override {}
-
+    void benchmarkEnded(const BenchmarkStats<>& stats) override {
+        ostream& ss = startLine();
+        ++scope->count;
+        ss << "ok " << scope->count << " - ";
+        if (stats.info.name.length()) ss << stats.info.name << ": ";
+        ss << speed(stats.mean.point.count()) << ", " << spent(stats.mean.point.count()) << endl;
+    }
+    
 private:
     struct AData {
         AssertionStats stats;
         string         expr;
     };
     
-    vector<Scope>       scopes;
-    Scope*              scope;
-    Scope*              sliding_scope;
-    vector<AData>       assertions;
-    bool                fatal;
-    ReporterPreferences reporterPrefs;
-    IConfigPtr          config;
-    ostream&            stream;
+    vector<Scope> scopes;
+    Scope*        scope;
+    Scope*        sliding_scope;
+    vector<AData> assertions;
+    bool          fatal;
+    
+    static constexpr const uint64_t usec = 1000;
+    static constexpr const uint64_t msec = 1000 * usec;
+    static constexpr const uint64_t sec  = 1000 * msec;
+    static constexpr const uint64_t min  = 60 * sec;
+    
+    static inline string spent (double ns) {
+        double val;
+        const char* units;
+        if      (ns < usec) { val = ns; units = "ns"; }
+        else if (ns < msec) { val = ns / usec; units = "us"; }
+        else if (ns < sec)  { val = ns / static_cast<double>(msec); units = "ms"; }
+        else if (ns < min)  { val = ns / static_cast<double>(sec);  units = "s"; }
+        else                { val = ns / static_cast<double>(min);  units = "m"; }
+        char buf[30];
+        auto sz = snprintf(buf, sizeof(buf), "%.2f %s", val, units);
+        assert(sz > 0);
+        return string(buf, sz);
+    }
+    
+    static inline string speed (double ns) {
+        double val;
+        const char* units;
+        if      (ns < usec) { val = 1000/ns; units = "M"; }
+        else if (ns < msec) { val = 1000000/ns; units = "K"; }
+        else                { val = 1000000000 / ns; units = ""; }
+        char buf[30];
+        auto sz = snprintf(buf, sizeof(buf), "%.2f %s/sec", val, units);
+        assert(sz > 0);
+        return string(buf, sz);
+    }
 };
 
 PerlReporter::Scope PerlReporter::context;
@@ -341,6 +368,8 @@ bool _run (SV* count, SV* failed, int depth, ...) {
         }
         
         argv.push_back("-i");
+        argv.push_back("-r");
+        argv.push_back("perl");
         
         session.useConfigData({});
         err = session.applyCommandLine(argv.size(), argv.data());

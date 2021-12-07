@@ -17,7 +17,7 @@ use Capture::Tiny qw/capture/;
 use App::Git::Workflow;
 use Mock::App::Git::Workflow::Repository;
 
-our $VERSION     = version->new(1.1.16);
+our $VERSION     = version->new(1.1.17);
 our @EXPORT      = qw/command_ok/;
 our @EXPORT_OK   = qw/command_ok/;
 our %EXPORT_TAGS = ();
@@ -119,7 +119,7 @@ Test::Git::Workflow::Command - Test Git::Workflow::Command::* files
 
 =head1 VERSION
 
-This documentation refers to Test::Git::Workflow::Command version 1.1.16
+This documentation refers to Test::Git::Workflow::Command version 1.1.17
 
 =head1 SYNOPSIS
 

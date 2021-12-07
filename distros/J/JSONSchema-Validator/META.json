@@ -78,8 +78,9 @@
          "web" : "https://github.com/skbkontur/perl-jsonschema-validator"
       }
    },
-   "version" : "0.008",
+   "version" : "0.010",
    "x_contributors" : [
+      "Erik Huelsmann <ehuels@gmail.com>",
       "James Waters <james@jcwaters.co.uk>",
       "uid66 <19481514+uid66@users.noreply.github.com>"
    ],

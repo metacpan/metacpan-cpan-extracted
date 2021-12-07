@@ -162,6 +162,9 @@ sub cache_id_dfs {
     my ($self, $schema, $scopes) = @_;
     return unless ref $schema eq 'HASH';
 
+    # skip all fields (id field too) if $ref present (draft 4-7)
+    return if exists $schema->{'$ref'};
+
     if (exists $schema->{$self->validator->ID_FIELD} && !ref $schema->{$self->validator->ID_FIELD}) {
         my $id = URI->new($schema->{$self->validator->ID_FIELD});
         my $scope = $scopes->[-1];
@@ -212,7 +215,7 @@ JSONSchema::Validator::URIResolver - URI resolver
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 AUTHORS
 

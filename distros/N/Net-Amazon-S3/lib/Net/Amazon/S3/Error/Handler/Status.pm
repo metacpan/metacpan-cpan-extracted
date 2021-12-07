@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler::Status;
-$Net::Amazon::S3::Error::Handler::Status::VERSION = '0.98';
+$Net::Amazon::S3::Error::Handler::Status::VERSION = '0.99';
 # ABSTRACT: An internal class to report response errors via err properties
 
 use Moose;
@@ -34,7 +34,7 @@ Net::Amazon::S3::Error::Handler::Status - An internal class to report response e
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

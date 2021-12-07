@@ -1,14 +1,3 @@
-package Quiq::Database::Tree;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Time::HiRes ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -28,6 +17,23 @@ die mittels zweier Attribute $pkColumn und $fkColumn in einer
 hierarchischen Beziehung zueinander stehen und somit eine
 Baumstruktur bilden. Die Klasse bietet Methoden, um auf dieser
 Baumstruktur operieren zu können.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::Tree;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Time::HiRes ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -707,7 +713,7 @@ sub siblings {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

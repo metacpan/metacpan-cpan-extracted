@@ -45,3 +45,14 @@ Change to how page loading is checked in fire events.
 0.129 Thu Nov 19 14:00:00 CET 2020
 - Remove uneeded lib path in test file
 - Improved cookie management using Webkit2s Website data manage and cookie manager
+
+0.13 Fri Nov 26 16:17:00 CET 2021
+- Sometimes errors captured in get_javascript_result were lost due to the use of a global variable.
+- The value in the global variable is now stored in a seperate variable and output during its normal error handling.
+- Updated name of test modules to be the correct ones rather than the Webkit1 names.
+- Use Glib::Timeout instead of Time::HiRes to improve waiting times while while waiting for page updates.
+- Wayland display will not be used if it is detected over Xvfb
+
+0.131 Tue Nov 30 14:11:00 CET 2021
+- wait_for_condition: reduce check overhead
+- correct previous changedate

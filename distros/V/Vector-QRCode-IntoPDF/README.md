@@ -31,7 +31,7 @@ Vector::QRCode::IntoPDF makes to imprint QRCode as vector-data into PDF file.
 
 - workdir
 
-    Optional. A directory to use like temporary storage. Default is [File::Temp](https://metacpan.org/pod/File::Temp)::tempdir(CLEANUP => 1);
+    Optional. A directory to use like temporary storage. Default is [File::Temp](https://metacpan.org/pod/File%3A%3ATemp)::tempdir(CLEANUP => 1);
 
 # METHODS
 
@@ -41,7 +41,7 @@ Return PDF::API2 object for source pdf.
 
 ## imprint
 
-Imprint a qrcode. You may use options for [Vector::QRCode::EPS](https://metacpan.org/pod/Vector::QRCode::EPS)::generate(), and following options.
+Imprint a qrcode. You may use options for [Vector::QRCode::EPS](https://metacpan.org/pod/Vector%3A%3AQRCode%3A%3AEPS)::generate(), and following options.
 
 - page
 

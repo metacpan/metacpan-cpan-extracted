@@ -4,7 +4,7 @@ use strictures 2;
 use Class::Inspector;
 use Moo::Role;
 
-our $VERSION = '0.152700'; # VERSION
+our $VERSION = '0.213360'; # VERSION
 
 # ABSTRACT: role provides a generic to_hash function for Throwable exceptions
 
@@ -27,7 +27,7 @@ sub to_hash {
     my @base_methods = qw( error namespace description previous_exception );
     my %skip_methods = map { $_ => 1 } @base_methods,
       qw( BUILDALL BUILDARGS DEMOLISHALL DOES after around before does extends
-      has meta new throw previous_exception to_hash with );
+      has meta new throw previous_exception to_hash with new_with_previous );
     my $methods = Class::Inspector->methods( ref $self, 'public' );
     my %data = map { $_ => $self->$_ } grep { !$skip_methods{$_} } @{$methods};
     my %out = ( data => \%data, map { $_ => $self->$_ } @base_methods );
@@ -46,7 +46,7 @@ Throwable::SugarFactory::Hashable - role provides a generic to_hash function for
 
 =head1 VERSION
 
-version 0.152700
+version 0.213360
 
 =head1 METHODS
 

@@ -1,0 +1,20 @@
+=head1 NAME
+
+Exception::Backtrace::PerlTraceInfo - container of Perl stack frames
+
+=head1 METHODS
+
+=head2 $info->to_string()
+
+Stringifies all stack frames, optionally using custom arguments
+decorator, see L<Exception::Backtrace::PerlFrame/to_string>.
+
+=head2 $frames->get_frames()
+
+Returns array of L<Exception::Backtrace::PerlFrame>
+
+=head1 REFERENCE
+
+L<Exception::Backtrace>
+
+=cut

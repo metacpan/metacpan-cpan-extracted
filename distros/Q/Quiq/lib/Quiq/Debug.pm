@@ -1,15 +1,3 @@
-package Quiq::Debug;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Data::Printer color=>{string=>'black'};
-use Data::Printer ();
-
 # -----------------------------------------------------------------------------
 
 =head1 NAME
@@ -19,6 +7,24 @@ Quiq::Debug - Hilfe beim Debuggen von Programmen
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Debug;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Data::Printer color=>{string=>'black'};
+use Data::Printer ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -108,7 +114,7 @@ sub modulePaths {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

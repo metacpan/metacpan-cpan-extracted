@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::BGP.
 
+0.18    2021-11-30
+
+        Added by Wojciech Janiszewski <wojciech.janiszewski@gmail.com>:
+
+        - Fix for outbound BGP messages getting lost in Net::BGP::Transport::_send_msg()
+          when syswrite() sets EAGAIN on errno.
+
 0.17    2019-08-03
 
         Added by Damian Ivereigh <damo@launtel.net.au>:

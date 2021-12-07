@@ -1,10 +1,46 @@
 ==================================================
-Changes from 2020-11-20 00:00:00 +0000 to present.
+Changes from 2020-11-28 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2021-11-20 21:01:47 +0000
+version 0.005 at 2021-11-28 01:21:48 +0000
 ------------------------------------------
+
+  Change: 74b8afd837c0e511188609ada804d6219a156236
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-23 23:34:24 +0000
+
+    refactor: better format for logging 
+
+  Change: cb39d232465b116231588044a03473cfbdcf711d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-23 23:23:38 +0000
+
+    fix: caught wrong sub invocation 
+
+  Change: 23bd0bcfa1949b3144c72e603af2e2333e70fd33
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-23 23:17:32 +0000
+
+    fix: not reporting without results 
+
+  Change: 32c1b3f82070a7053ad4723435373fbe72d817d7
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-11-23 19:08:42 +0000
+
+    fix: added more checkings 
+
+  Change: 496950cce3c8b8fba43086ab996edba52b4d62c1
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-11-23 18:54:50 +0000
+
+    feat: added more checks 
+
+  Change: 7b6fb846fdb538f2827b77c16889c47b2250749e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-22 01:30:56 +0000
+
+    fix: domain of Toni is unavailable 
 
   Change: ef6bb1fa0db1191a6384f7285943c10471de0799
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

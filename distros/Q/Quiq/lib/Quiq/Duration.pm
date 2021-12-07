@@ -1,16 +1,3 @@
-package Quiq::Duration;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Quiq::Math;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -70,6 +57,25 @@ Bei der Instantiierung kann die Zeitdauer auch in Doppelpunkt-Notation
 übergeben werden:
 
   D:H:M:S.X
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Duration;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Quiq::Math;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -514,7 +520,7 @@ sub secondsToString {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -1,66 +1,64 @@
 package Archive::BagIt::Role::OpenSSL;
 use strict;
 use warnings;
+use Archive::BagIt::Role::OpenSSL::Sync;
+use Class::Load qw(load_class);
+use Carp qw(carp);
 use Moo::Role;
 use namespace::autoclean;
-use Net::SSLeay ();
-use IO::Async::Loop;
 # ABSTRACT: A role that handles plugin loading
-our $VERSION = '0.085'; # VERSION
+our $VERSION = '0.086'; # VERSION
 
-sub BEGIN {
-    Net::SSLeay::OpenSSL_add_all_digests();
-}
 
-has '_io_loop' => (
-    is      => 'ro',
-    lazy    => 1,
-    default => sub {IO::Async::Loop->new},
+has 'async_support' => (
+    is        => 'ro',
+    builder   => '_check_async_support',
+    predicate => 1,
+    lazy      => 1,
 );
 
-sub _init_digest {
-    my ($self) = @_;
-    my $md  = Net::SSLeay::EVP_get_digestbyname($self->name);
-    my $digest = Net::SSLeay::EVP_MD_CTX_create();
-    Net::SSLeay::EVP_DigestInit($digest, $md);
-    return $digest;
+sub _check_async_support {
+    my $self = shift;
+    if (! exists $INC{'IO/Async.pm'}) {
+        carp "Module 'IO::Async' not available, disable async support";
+        $self->bagit->use_async(0);
+        return 0;
+    }
+    load_class('IO::Async');
+    return 1;
 }
+
+
+
+sub _get_hash_string_sync {
+    my ($self, $fh, $blksize)=@_;
+    my $obj = Archive::BagIt::Role::OpenSSL::Sync->new( name => $self->name);
+    return $obj->calc_digest($fh, $blksize);
+}
+
+sub _get_hash_string_async {
+    my ($self, $fh, $blksize) = @_;
+    my $result;
+    if ($self->has_async_support()) {
+        my $class = 'Archive::BagIt::Role::OpenSSL::Async';
+        load_class($class) or croak("could not load class $class");
+        my $obj = $class->new(name => $self->name);
+        $result = $obj->calc_digest($fh, $blksize);
+    } else {
+        $result = $self->_get_hash_string_sync($fh, $blksize);
+    }
+    return $result;
+}
+
 
 sub get_hash_string {
     my ($self, $fh) = @_;
     my $blksize = $self->get_optimal_bufsize($fh);
     my $bagobj = $self->bagit;
     if ($bagobj->use_async) {
-        my $loop = $self->_io_loop;
-        my $stream = IO::Async::Stream->new(
-            read_handle       => $fh,
-            read_len          => 1000 * $blksize,
-            on_read           => sub {
-                my ($s, $buffref, $eof) = @_;
-                if (defined $$buffref) {
-                    Net::SSLeay::EVP_DigestUpdate($self->_digest, $$buffref);
-                    $$buffref = undef;
-                }
-                return 0;
-            },
-            on_read_eof       => sub {
-                $loop->stop
-            },
-            close_on_read_eof => 0,
-        );
-        $loop->add($stream);
-        $loop->run();
-        $loop->remove($stream);
-    } else {
-        my $buffer;
-        while (read($fh, $buffer, $blksize)) {
-            Net::SSLeay::EVP_DigestUpdate($self->_digest, $buffer);
-        }
+        return $self->_get_hash_string_async($fh, $blksize);
     }
-    my $result = Net::SSLeay::EVP_DigestFinal($self->_digest);
-    Net::SSLeay::EVP_MD_CTX_destroy($self->_digest);
-    delete $self->{_digest};
-    return unpack('H*', $result);
+    return $self->_get_hash_string_sync($fh, $blksize);
 }
 
 
@@ -79,7 +77,16 @@ Archive::BagIt::Role::OpenSSL - A role that handles plugin loading
 
 =head1 VERSION
 
-version 0.085
+version 0.086
+
+=head2 has_async_support()
+
+returns true if async IO is possible, because IO::Async could be loaded, otherwise returns false
+
+=head2 get_hash_string($fh)
+
+calls synchronous or asynchronous function to calc digest of file, depending on result of $bag->use_async()
+returns the digest result as hex string
 
 =head1 AVAILABILITY
 

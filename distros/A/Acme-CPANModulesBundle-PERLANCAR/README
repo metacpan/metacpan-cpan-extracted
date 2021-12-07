@@ -3,9 +3,9 @@ NAME
     Acme::CPANModules::* modules
 
 VERSION
-    This document describes version 0.009 of
+    This document describes version 0.010 of
     Acme::CPANModulesBundle::PERLANCAR (from Perl distribution
-    Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
+    Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-13.
 
 DESCRIPTION
 ACME::CPANMODULES MODULES

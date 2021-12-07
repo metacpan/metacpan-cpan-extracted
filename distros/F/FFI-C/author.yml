@@ -8,6 +8,7 @@ pod_spelling_system:
   stopwords:
     - ffi
     - nullable
+    - addressof
 
 pod_coverage:
   skip: 0

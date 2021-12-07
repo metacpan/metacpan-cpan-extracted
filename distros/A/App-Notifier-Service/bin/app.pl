@@ -4,7 +4,6 @@
 use strict;
 use warnings;
 
-use Dancer2 0.300003;
 use App::Notifier::Service;
 
 {
@@ -13,7 +12,7 @@ use App::Notifier::Service;
         exit(0);
     };
     local $SIG{CHLD} = 'IGNORE';
-    dance;
+    start();
 }
 
 __END__
@@ -24,7 +23,7 @@ __END__
 
 =head1 VERSION
 
-version 0.0802
+version 0.0902
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -118,7 +117,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Shlomi Fish.
+This software is Copyright (c) 2021 by Shlomi Fish.
 
 This is free software, licensed under:
 

@@ -1,5 +1,6 @@
 #include "../lib/test.h"
 #include <thread>
+#include <catch2/generators/catch_generators.hpp>
 
 TEST_PREFIX("tcp-connect: ", "[tcp-connect]");
 

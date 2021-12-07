@@ -1,4 +1,9 @@
-Revision history for FFI-C},
+Revision history for FFI-C
+
+0.11      2021-12-06 15:59:29 -0700
+  - Add addressof function to FFI::C::Util (gh#49)
+  - Fix version prereq for Sub::Identify (gh#55)
+  - Fix test on OpenBSD, probably because we are testing undefined behavior (gh#56)
 
 0.10      2020-09-23 03:16:36 -0600
   - Add tmpfile constructor for FFI::C::File (gh#41)

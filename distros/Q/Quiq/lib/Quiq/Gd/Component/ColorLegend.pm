@@ -1,16 +1,3 @@
-package Quiq::Gd::Component::ColorLegend;
-use base qw/Quiq::Gd::Component/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Axis::Numeric;
-use Quiq::Gd::Component::Axis;
-use Quiq::Gd::Component::ColorBar;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -142,6 +129,25 @@ bei der Instantiierung des Grafik-Objekts noch nicht existiert.
 Erzeugte Grafik (der Rahmen ist per CSS hinzugefügt):
 
     [Bild nur im Browser sichtbar]
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gd::Component::ColorLegend;
+use base qw/Quiq::Gd::Component/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Axis::Numeric;
+use Quiq::Gd::Component::Axis;
+use Quiq::Gd::Component::ColorBar;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -358,7 +364,7 @@ sub height {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

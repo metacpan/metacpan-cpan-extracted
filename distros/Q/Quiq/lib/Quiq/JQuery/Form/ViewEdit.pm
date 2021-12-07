@@ -1,19 +1,3 @@
-package Quiq::JQuery::Form::ViewEdit;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Unindent;
-use Quiq::Hash;
-use Quiq::Html::Widget::Button;
-use Quiq::Html::Widget::CheckBox;
-use Quiq::Html::Form::Layout;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -226,6 +210,28 @@ Liste der Widgets, die in das Layout eingesetzt werden.
           ),
       ],
   );
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::JQuery::Form::ViewEdit;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Unindent;
+use Quiq::Hash;
+use Quiq::Html::Widget::Button;
+use Quiq::Html::Widget::CheckBox;
+use Quiq::Html::Form::Layout;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -570,7 +576,7 @@ sub instantiate {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

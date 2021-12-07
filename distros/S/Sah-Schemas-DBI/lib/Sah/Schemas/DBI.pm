@@ -1,9 +1,9 @@
 package Sah::Schemas::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-08'; # DATE
+our $DATE = '2021-07-19'; # DATE
 our $DIST = 'Sah-Schemas-DBI'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to DBI
@@ -20,7 +20,26 @@ Sah::Schemas::DBI - Schemas related to DBI
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schemas::DBI (from Perl distribution Sah-Schemas-DBI), released on 2020-03-08.
+This document describes version 0.005 of Sah::Schemas::DBI (from Perl distribution Sah-Schemas-DBI), released on 2021-07-19.
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
+=head1 SAH SCHEMAS
+
+=over
+
+=item * L<dbi::connstr|Sah::Schema::dbi::connstr>
+
+DBI connection string.
+
+
+
+
+=back
 
 =head1 HOMEPAGE
 
@@ -50,7 +69,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

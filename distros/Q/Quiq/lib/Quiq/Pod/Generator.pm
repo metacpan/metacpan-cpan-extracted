@@ -1,14 +1,3 @@
-package Quiq::Pod::Generator;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Unindent;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -39,6 +28,23 @@ und die Details der Formatierung nicht zu kümmern braucht.
 Einrücktiefe bei Code-Abschnitten und Listen.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Pod::Generator;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Unindent;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -602,7 +608,7 @@ sub fmt {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

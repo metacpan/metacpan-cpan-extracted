@@ -1,14 +1,3 @@
-package Quiq::Properties;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::String;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -86,6 +75,23 @@ Erzeuge eine formatierte Liste von Float-Werten:
       5.45000
   92345.60000
      42.56739
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Properties;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::String;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -618,7 +624,7 @@ sub set {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -1,19 +1,3 @@
-package Quiq::System;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Shell;
-use Quiq::FileHandle;
-use Socket ();
-use Sys::Hostname ();
-use 5.010;
-use Quiq::Option;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -25,6 +9,28 @@ Quiq::System - Information über das System und seine Umgebung
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::System;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Shell;
+use Quiq::FileHandle;
+use Socket ();
+use Sys::Hostname ();
+use 5.010;
+use Quiq::Option;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -308,7 +314,7 @@ sub searchProgram {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

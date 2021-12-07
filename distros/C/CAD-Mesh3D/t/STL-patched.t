@@ -6,6 +6,12 @@ use Test::More;
 use version 0.77;
 use FindBin;
 use lib "$FindBin::Bin/patched";
+
+BEGIN {
+    if( $^O eq 'linux' ) { # want linux to pretend it is windows, to get full coverage of patched/unpatched
+        $ENV{CAD_MESH3D_OVERRIDE_OS} = 'MSWin32';
+    }
+}
 use CAD::Mesh3D::STL;
 
 my $exp = version::->parse( v0.2.1.001 );

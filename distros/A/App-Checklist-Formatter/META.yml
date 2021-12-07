@@ -18,13 +18,14 @@ name: App-Checklist-Formatter
 provides:
   App::Checklist::Formatter:
     file: lib/App/Checklist/Formatter.pm
-    version: v0.0.6
+    version: v0.0.7
 requires:
   Carp: '0'
+  Class::Std: '0'
   perl: v5.6.0
   version: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/matwei-perl/App-Checklist-Formatter
-version: v0.0.6
+version: v0.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

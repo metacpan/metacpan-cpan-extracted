@@ -3,7 +3,7 @@ App::DBBrowser::CreateDropAttach::CreateTable;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use Encode         qw( decode );
 use File::Basename qw( basename );
@@ -272,7 +272,7 @@ sub __get_table_name {
                     }
                 }
                 else {
-                    ( $table_name = $file_name ) =~ s/\.[^.]{1,4}\z//;
+                    $table_name = $file_name =~ s/\.[^.]{1,4}\z//r;
                 }
                 $table_name =~ s/ /_/g;
             }

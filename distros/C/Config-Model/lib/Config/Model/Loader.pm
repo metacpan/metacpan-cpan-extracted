@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.145;
+package Config::Model::Loader 2.147;
 
 use Carp;
 use strict;
@@ -507,7 +507,7 @@ sub _load_check_list {
         leaf => {
             ':.rm_value' => \&_remove_by_value,
             ':.rm_match' => \&_remove_matched_value,
-            ':.subtitute' => \&_substitute_value,
+            ':.substitute' => \&_substitute_value,
         },
         fallback => {
             ':.rm' => \&_remove_by_id,
@@ -519,7 +519,7 @@ sub _load_check_list {
         'hash_*' => { qw/:@ :.sort/},
         list_leaf => { qw/:@ :.sort :< :.push :> :.unshift/ },
         # fix for cme gh#2
-        leaf => { qw/:-= :.rm_value :-~ :.rm_match :=~ :.subtitute/ },
+        leaf => { qw/:-= :.rm_value :-~ :.rm_match :=~ :.substitute/ },
         fallback => { qw/:- :.rm ~ :.rm/ },
     );
 
@@ -1065,7 +1065,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

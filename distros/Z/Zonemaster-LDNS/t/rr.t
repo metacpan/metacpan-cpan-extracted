@@ -35,12 +35,12 @@ subtest 'SOA' => sub {
         foreach my $rr ( $p->answer ) {
             isa_ok( $rr, 'Zonemaster::LDNS::RR::SOA' );
             is( lc($rr->mname), 'ns.nic.se.' );
-            is( lc($rr->rname), 'hostmaster.iis.se.' );
+            is( lc($rr->rname), 'hostmaster.nic.se.' );
             ok( $rr->serial >= 1381471502, 'serial' );
             is( $rr->refresh, 14400,   'refresh' );
             is( $rr->retry,   3600,    'retry' );
-            is( $rr->expire,  1814400, 'expire' );
-            is( $rr->minimum, 14400,   'minimum' );
+            is( $rr->expire,  2592000, 'expire' );
+            is( $rr->minimum, 600,     'minimum' );
         }
     }
 };

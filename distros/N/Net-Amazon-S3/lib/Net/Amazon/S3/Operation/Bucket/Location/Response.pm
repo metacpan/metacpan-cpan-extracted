@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Bucket::Location::Response;
 # ABSTRACT: An internal class to handle bucket location response
-$Net::Amazon::S3::Operation::Bucket::Location::Response::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Bucket::Location::Response::VERSION = '0.99';
 use Moose;
 
 extends 'Net::Amazon::S3::Response';
@@ -41,7 +41,7 @@ Net::Amazon::S3::Operation::Bucket::Location::Response - An internal class to ha
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

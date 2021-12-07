@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::Packages 0.05;
+package Commandable::Finder::Packages 0.06;
 
 use v5.14;
 use warnings;
@@ -74,6 +74,16 @@ to generate the name of the command. Default C<COMMAND_NAME>.
 Optional. Gives the name of the method inside each command package to invoke
 to generate the description text of the command. Default C<COMMAND_DESC>.
 
+=item arguments_method => STR
+
+Optional. Gives the name of the method inside each command package to invoke
+to generate a list of argument specifications. Default C<COMMAND_ARGS>.
+
+=item options_method => STR
+
+Optional. Gives the name of the method inside each command package to invoke
+to generate a list of option specifications. Default C<COMMAND_OPTS>.
+
 =item named_by_package => BOOL
 
 Optional. If true, the name of each command will be taken from its package
@@ -97,6 +107,7 @@ sub new
    my $name_method        = $args{name_method}        // "COMMAND_NAME";
    my $description_method = $args{description_method} // "COMMAND_DESC";
    my $arguments_method   = $args{arguments_method}   // "COMMAND_ARGS";
+   my $options_method     = $args{options_method}     // "COMMAND_OPTS";
 
    undef $name_method if $args{named_by_package};
 
@@ -112,6 +123,7 @@ sub new
          name => $name_method,
          desc => $description_method,
          args => $arguments_method,
+         opts => $options_method,
       },
    }, $class;
 }
@@ -150,10 +162,20 @@ sub _commands
             ];
          }
 
+         my $opts;
+         if( my $code = $pkg->can( $self->{methods}{opts} ) ) {
+            $opts = {
+               map { my $o = Commandable::Command::_Option->new( %$_ );
+                     map { ( $_ => $o ) } $o->names
+                   } $code->( $pkg )
+            };
+         }
+
          $commands{ $name } = Commandable::Command->new(
             name        => $name,
             description => $desc,
             arguments   => $args,
+            options     => $opts,
 
             package => $pkg,
          );

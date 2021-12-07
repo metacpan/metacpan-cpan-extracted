@@ -6,6 +6,16 @@ use Test::More;
 use version 0.77;
 use FindBin;
 use lib "$FindBin::Bin/unpatched";
+BEGIN {
+    if( $^O eq 'linux' ) {
+        # want linux to pretend it is windows, to get full coverage of patched/unpatched
+        #   it will _work_ on linux, but isn't required
+        $ENV{CAD_MESH3D_OVERRIDE_OS} = 'MSWin32';
+    } elsif ( $^O ne 'MSWin32' and $^O ne 'cygwin' ) {
+        # if it's not windows and not linux, then we don't need this
+        plan skip_all => 'Unpatched test not needed except on Windows';
+    }
+}
 use CAD::Mesh3D::STL;
 
 

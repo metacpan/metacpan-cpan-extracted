@@ -1,14 +1,3 @@
-package Quiq::Html::Widget::CheckBox;
-use base qw/Quiq::Html::Widget/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::JavaScript;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -75,6 +64,23 @@ Aktueller Wert. Stimmt dieser mit dem Wert des Attributs option
 überein, wird die Checkbox aktiviert.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Widget::CheckBox;
+use base qw/Quiq::Html::Widget/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::JavaScript;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -177,7 +183,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

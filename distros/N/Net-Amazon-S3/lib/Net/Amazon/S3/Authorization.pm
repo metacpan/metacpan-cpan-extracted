@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Authorization;
-$Net::Amazon::S3::Authorization::VERSION = '0.98';
+$Net::Amazon::S3::Authorization::VERSION = '0.99';
 use Moose 0.85;
 
 # ABSTRACT: Authorization context base class
@@ -30,11 +30,11 @@ Net::Amazon::S3::Authorization - Authorization context base class
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 
-Authorization context provides an access to authorization informations
+Authorization context provides an access to authorization information
 
 =head1 AUTHOR
 

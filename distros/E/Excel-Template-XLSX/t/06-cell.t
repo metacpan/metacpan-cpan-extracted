@@ -14,6 +14,14 @@ $File::Temp::KEEP_ALL = 0;
 
 ###############################################################################
 
+# Issue with using EWX to create array formulas
+# Expected spreadsheet developed by hand.
+my $efilename = q[./t/06-cell.xlsx];
+TODO: {
+  local $TODO = "Restore programmitically generated expected Excel worksheet";
+  ok(0, 'Add ability to programmactically generate Excel Worksheet');
+}
+=for nothing
 # Create expected workbook content
 my ( $efh, $efilename ) = tempfile( SUFFIX => '.xlsx' );
 my $wbk     = Excel::Writer::XLSX->new($efilename);
@@ -31,13 +39,14 @@ for ( 4 .. 8 ) {
    $wksheet->write( $_, 0, $_ );
    $wksheet->write( $_, 1, $_ * 2 );
 }
-$wksheet->write_array_formula( 'C5:C9', '{=TREND(B5:B9,A5:A9)}' );
+$wksheet->write( 'C5:C9', '{=TREND(B5:B9,A5:A9)}' );
 
 # These are not tested.  EWX just writes them as strings
 $wksheet->write( 'D1', 'TRUE' );
 $wksheet->write( 'D2', 'FALSE' );
 
 $wbk->close();
+=cut
 
 # Get workbook content as a template
 my ( $gfh, $gfilename ) = tempfile( SUFFIX => '.xlsx' );
@@ -59,6 +68,7 @@ for (qw[A1 A2]) {
    );
 }
 
+# warn dumper( $sheet->{_table} );
 is( $sheet->{_table}{4}{2}[1], 'TREND(B5:B9,A5:A9)', "Array Formula" );
 
 $twbk->close();

@@ -3,7 +3,7 @@ the data with your own functions.
 
 To install, do the usual dance:
     less Makefile.PL
-    less lib/Tie/Hash/Longest.pm
+    less lib/Tie/STDOUT.pm
     less t/*
 those being to ensure that I'm not being evil.  Pay particular attention
 to t/01_defaults.t, as that generates code and executes it using system().

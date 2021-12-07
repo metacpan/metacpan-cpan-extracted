@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.001-15-g67f9fe8
+package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.008-16-g34b098c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.002';
+our $VERSION = '0.009';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -15,12 +15,15 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use JSON::Schema::Modern::Utilities 0.525 qw(assert_keyword_exists assert_keyword_type E get_type canonical_uri);
+use JSON::Schema::Modern::Utilities 0.525 qw(assert_keyword_exists assert_keyword_type E canonical_uri);
 use Safe::Isa;
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
 use List::Util 'any';
-use Types::Standard 'InstanceOf';
+use Ref::Util 'is_plain_hashref';
+use MooX::HandlesVia;
+use MooX::TypeTiny 0.002002;
+use Types::Standard qw(InstanceOf HashRef Str);
 use namespace::clean;
 
 extends 'JSON::Schema::Modern::Document';
@@ -49,6 +52,19 @@ has json_schema_dialect => (
   is => 'rwp',
   isa => InstanceOf['Mojo::URL'],
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
+);
+
+# operationId => document path
+has operationIds => (
+  is => 'bare',
+  isa => HashRef[Str],
+   handles_via => 'Hash',
+   handles => {
+     _add_operationId => 'set',
+     get_operationId => 'get',
+  },
+  lazy => 1,
+  default => sub { {} },
 );
 
 sub traverse ($self, $evaluator) {
@@ -104,16 +120,20 @@ sub traverse ($self, $evaluator) {
     $self->_set_json_schema_dialect($json_schema_dialect);
   }
 
-  # evaluate the document against its metaschema to find any errors, and to identify all schema
-  # resources within to add to the global resource index.
-  my @json_schema_paths;
+  # evaluate the document against its metaschema to find any errors, to identify all schema
+  # resources within to add to the global resource index, and to extract all operationIds
+  my (@json_schema_paths, @operation_paths);
   my $result = $self->evaluator->evaluate(
     $self->schema,
     $self->metaschema_uri,
     {
       callbacks => {
-        '$dynamicRef' => sub ($schema, $state) {
+        '$dynamicRef' => sub ($, $schema, $state) {
           push @json_schema_paths, $state->{data_path} if $schema->{'$dynamicRef'} eq '#meta';
+        },
+        '$ref' => sub ($data, $schema, $state) {
+          push @operation_paths, [ $data->{operationId} => $state->{data_path} ]
+            if $schema->{'$ref'} eq '#/$defs/operation' and defined $data->{operationId};
         },
       },
     },
@@ -127,10 +147,21 @@ sub traverse ($self, $evaluator) {
   my @real_json_schema_paths;
   foreach my $path (sort @json_schema_paths) {
     # disregard paths that are not the root of each embedded subschema.
-    next if any { $_->subsumes($path) } @real_json_schema_paths;
+    next if any { return $path =~ m{^\Q$_\E(?:/|\z)} } @real_json_schema_paths;
 
-    push @real_json_schema_paths, path($path);
+    unshift @real_json_schema_paths, $path;
     $self->_traverse_schema($self->get($path), { %$state, schema_path => $path });
+  }
+
+  foreach my $pair (@operation_paths) {
+    my ($operation_id, $path) = @$pair;
+    if (my $existing = $self->get_operationId($operation_id)) {
+      ()= E({ %$state, keyword => 'operationId', schema_path => $path },
+        'duplicate of operationId at %s', $existing);
+    }
+    else {
+      $self->_add_operationId($operation_id => $path);
+    }
   }
 
   return $state;
@@ -153,8 +184,7 @@ sub _add_vocab_and_default_schemas ($self) {
 
 # https://spec.openapis.org/oas/v3.1.0#schema-object
 sub _traverse_schema ($self, $schema, $state) {
-  my $schema_type = get_type($schema);
-  return 1 if $schema_type eq 'boolean' or $schema_type eq 'object' and not keys %$schema;
+  return if not is_plain_hashref($schema) or not keys %$schema;
 
   my $subschema_state = $self->evaluator->traverse($schema, {
     %$state,  # so we don't have to ennumerate everything that may be in config_override
@@ -164,7 +194,7 @@ sub _traverse_schema ($self, $schema, $state) {
   });
 
   push $state->{errors}->@*, $subschema_state->{errors}->@*;
-  return if @{$subschema_state->{errors}};
+  return if $subschema_state->{errors}->@*;
 
   push $state->{identifiers}->@*, $subschema_state->{identifiers}->@*;
 }
@@ -183,7 +213,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.002
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -245,11 +275,21 @@ not a JSON Schema). Note that you may need to explicitly set that attribute as w
 C<json_schema_dialect>, as the default metaschema used by the default C<metaschema_uri> can no
 longer be assumed.
 
+=head1 METHODS
+
+=head2 get_operationId
+
+Returns the json pointer location of the operation containing the provided C<operationId> (suitable
+for passing to C<< $document->get(..) >>), or C<undef> if it is not contained in the document.
+
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern-Document-OpenAPI/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+You can also find me on the L<JSON Schema Slack server|json-schema.slack.com> and L<OpenAPI Slack
+server|open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

@@ -1,12 +1,3 @@
-package Quiq::Gnuplot::Graph;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -22,6 +13,21 @@ L<Quiq::Hash>
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert einen Graph.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gnuplot::Graph;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -76,7 +82,7 @@ sub hasData {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

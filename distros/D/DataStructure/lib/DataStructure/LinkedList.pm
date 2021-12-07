@@ -11,6 +11,12 @@ no warnings 'experimental::signatures';
 
 use DataStructure::LinkedList::Node;
 
+use parent qw(DataStructure::Queue);
+
+package DataStructure::ReverseLinkedList {
+  use parent qw(DataStructure::LinkedList DataStructure::Queue DataStructure::Stack);
+}
+
 =pod
 
 =head1 NAME
@@ -28,14 +34,41 @@ offers a richer interface.
 
 =head2 CONSTRUCTOR
 
-C<DataStructure::LinkedList->new()>
+C<< DataStructure::LinkedList->new(%options) >>
 
 Creates an empty list.
 
+The following options are available:
+
+=over 4
+
+=item reverse
+
+By default this class implements the standard C<shift> and C<unshift> methods
+that operate on the beginning of the list and the C<push> method that operates
+on the end of the list. And C<pop> is a synonym for C<shift> (so not the
+opposite of C<push>).
+
+If the C<reverse> option is set to a true value then the semantics of the list
+is reversed and C<pop> and C<push> operate on the beginning of the list,
+C<unshift> operates on the end of the list and C<shift> becomes a synonym for
+C<pop>.
+
+=back
+
 =cut
 
-sub new ($class) {
-  return bless { size => 0, first => undef}, $class;
+sub new ($class, %options) {
+  if ($options{reverse}) {
+    die unless $class eq 'DataStructure::LinkedList';
+    $class = 'DataStructure::ReverseLinkedList';
+  }
+  return bless {
+    size => 0,
+    first => undef,
+    last => undef,
+    reverse => $options{reverse} // 0,
+  }, $class;
 }
 
 =pod
@@ -43,10 +76,12 @@ sub new ($class) {
 =head2 METHODS
 
 All the functions below are class methods that should be called on a
-B<DataStructure::LinkedList> object. Unless documented, they run in constant
-time.
+B<DataStructure::LinkedList> object. Unless documented otherwise, they run in
+constant time.
 
-=head3 I<first()>
+=over 4
+
+=item first()
 
 Returns the first L<DataStructure::LinkedList::Node> of the list, or B<undef> if
 the list is empty.
@@ -59,52 +94,99 @@ sub first ($self) {
 
 =pod
 
-=head3 I<unshift($value)>
+=item last()
 
-Adds a new node at the beginning of the list with the given value. Returns the
-newly added node.
-
-For conveniance, I<push()> can be used as a synonym of I<unshift()>.
+Returns the last L<DataStructure::LinkedList::Node> of the list, or B<undef> if
+the list is empty.
 
 =cut
 
-sub unshift ($self, $value) {
+sub last ($self) {
+  return $self->{last};
+}
+
+# Actual unshift that always operates on the beginning of the list.
+sub _unshift ($self, $value) {
   my $new_node = DataStructure::LinkedList::Node->new($self, $self->{first}, $value);
   $self->{first} = $new_node;
+  $self->{last} = $new_node unless defined $self->{last};
   $self->{size}++;
   return $new_node;
 }
 
-sub push ($self, $value) {
-  return $self->unshift($value);
+# Actual push that always operates on the end of the list.
+sub _push ($self, $value) {
+  my $new_node = DataStructure::LinkedList::Node->new($self, undef, $value);
+  if (defined $self->{last}) {
+    $self->{last}{next} = $new_node;
+  } else {
+    $self->{first} = $new_node;
+  }
+  $self->{last} = $new_node;
+  $self->{size}++;
+  return $new_node;
+}
+
+# Actual shift that always operates on the beginning of the list.
+sub _shift ($self) {
+  return unless defined $self->{first};
+  my $old_first = $self->first();
+  $self->{first} = $old_first->next();
+  $self->{last} = undef unless defined $self->{first};
+  return $old_first->_delete_first();
 }
 
 =pod
 
-=head3 I<shift()>
+=item unshift($value)
+
+Adds a new node at the beginning of the list with the given value. Returns the
+newly added node.
+
+=cut
+
+sub unshift ($self, $value) {
+  return $self->_push($value) if $self->{reverse};
+  return $self->_unshift($value);
+}
+
+=pod
+
+=item push($value)
+
+Adds a new node at the end of the list with the given value. Returns the
+newly added node.
+
+=cut
+
+sub push ($self, $value) {
+  return $self->_unshift($value) if $self->{reverse};
+  return $self->_push($value);
+}
+
+=pod
+
+=item shift()
 
 Removes the first node of the list and returns its value. Returns B<undef> if
 the list is empty. Note that the method can also return B<undef> if the first
 node’s value is B<undef>
 
-For conveniance, I<pop()> can be used as a synonym of I<shift()>.
+For convenience, C<pop()> can be used as a synonym of C<shift()>.
 
 =cut
 
 sub shift ($self) {
-  return unless defined $self->{first};
-  my $old_first = $self->first();
-  $self->{first} = $old_first->next();
-  return $old_first->_delete_first();
+  return $self->_shift();
 }
 
 sub pop ($self) {
-  $self->shift();
+  return $self->_shift();
 }
 
 =pod
 
-=head3 I<size()>
+=item size()
 
 Returns the number of nodes in the list.
 
@@ -116,7 +198,7 @@ sub size ($self) {
 
 =pod
 
-=head3 I<empty()>
+=item empty()
 
 Returns whether the list is empty.
 
@@ -128,7 +210,7 @@ sub empty ($self) {
 
 =pod
 
-=head3 I<values()>
+=item values()
 
 Returns all the values of the list, as a normal Perl list. This runs in linear
 time with the size of the list.
@@ -147,6 +229,39 @@ sub values ($self) {
   return @ret;
 }
 
+# Runs a consistency check of the list. Assumes that tests are running with
+# Test::More.
+sub _self_check ($self, $name) {
+  eval { use Test2::Tools::Compare qw(is T D U); use Test2::Tools::Subtest };
+  subtest_streamed $name => sub {
+    my $s = $self->{size};
+    is($s >= 0, T(), 'Size is non-negative');
+    if ($s == 0) {
+      is($self->{first}, U(), 'No first when size is 0');
+      is($self->{last}, U(), 'No last when size is 0');
+    } else {
+      is($self->{first}, D(), 'Has first when size is not 0');
+      is($self->{last}, D(), 'Has last when size is not 0');
+      my $n = $self->{first};
+      my $c = 0;
+      while ($n) {
+        $c++;
+        is($n->{list} == $self, T(), 'Self pointer in node');
+        if ($c < $s) {
+          is($n->{next}, D(), 'Node has next element');
+        } else {
+          is($n->{next}, U(), 'Node has no next element');
+          is($n == $self->{last}, T(), 'Correct last element');
+        }
+        $n = $n->{next};
+      }
+      is($c, $s, 'Correct node count');
+    }
+  };
+}
+
+# The destructor is not strictly needed because all the nodes don’t have cyclic
+# references. But let’s keep it.
 sub DESTROY ($self) {
   my $next = $self->{first};
   while (defined $next) {
@@ -158,6 +273,12 @@ sub DESTROY ($self) {
 }
 
 =pod
+
+=back
+
+=head1 SEE ALSO
+
+L<DataStructure::DoubleList>
 
 =head1 AUTHOR
 
@@ -190,10 +311,6 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-
-=head1 SEE ALSO
-
-L<DataStructure::DoubleList>
 
 =cut
 

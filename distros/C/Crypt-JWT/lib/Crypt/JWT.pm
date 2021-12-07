@@ -3,7 +3,7 @@ package Crypt::JWT;
 use strict;
 use warnings;
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(decode_jwt encode_jwt)] );
@@ -280,7 +280,7 @@ sub _payload_unzip {
 sub _payload_enc {
   my ($payload) = @_;
   if (ref($payload) =~ /^(HASH|ARRAY)$/) {
-    $payload = encode_json($payload);
+    $payload = JSON->new->utf8->canonical->encode($payload);
   }
   else {
     utf8::downgrade($payload, 1) or croak "JWT: payload cannot contain wide character";

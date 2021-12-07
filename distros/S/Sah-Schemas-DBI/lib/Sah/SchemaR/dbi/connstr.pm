@@ -1,7 +1,7 @@
 package Sah::SchemaR::dbi::connstr;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2021-07-19'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $rschema = ["str",[{description=>"\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"dbi:SQLite:dbname=foo"},{valid=>0,value=>"DBI:SQLite:dbname=foo"},{valid=>0,value=>"dbi:Foo"},{valid=>1,value=>"dbi:Foo:bar=baz"}],match=>"\\Adbi:\\w+:.+\\z",summary=>"DBI connection string","x.completion"=>["dbi_connstr"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::dbi::connstr - DBI connection string
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::dbi::connstr (from Perl distribution Sah-Schemas-DBI), released on 2020-03-08.
+This document describes version 0.005 of Sah::SchemaR::dbi::connstr (from Perl distribution Sah-Schemas-DBI), released on 2021-07-19.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

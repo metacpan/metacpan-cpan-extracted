@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::Filter::SearchAndReplace;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use List::MoreUtils qw( any none );
 
@@ -372,7 +372,7 @@ sub __history {
                 if ( ! defined $idx || ! defined $menu->[$idx] ) {
                     next HISTORY;
                 }
-                ( my $name = $menu->[$idx] ) =~ s/^- //;
+                my $name = $menu->[$idx] =~ s/^- //r;
                 $top = join "\n", 'Saved s_&_r', map( '  ' . $_, sort { $a cmp $b } keys %$saved ), ' ';
                 my $sr_group = delete $saved->{$name};
                 my $old_idx_edit = 0;

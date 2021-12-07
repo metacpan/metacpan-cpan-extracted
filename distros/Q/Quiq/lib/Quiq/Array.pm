@@ -1,17 +1,3 @@
-package Quiq::Array;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Encode ();
-use Quiq::Reference;
-use Quiq::Math;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -38,6 +24,26 @@ Aufruf als Objektmethode:
 Aufruf als Klassenmethode:
 
   $class->$meth(\@arr, ...);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Array;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Encode ();
+use Quiq::Reference;
+use Quiq::Math;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -678,9 +684,9 @@ Hash. Im Skalarkontext wird eine Referenz auf den Hash geliefert.
 
 =head4 Description
 
-  Erzeuge aus Array @$arr bzw. @arr einen Hash mit den Werten des Array
-  als Schlüssel und dem Wert $val als deren Werte und liefere diesen zurück.
-  Ist $val nicht angegeben, werden alle Werte des Hash auf 1 gesetzt.
+Erzeuge aus Array @$arr bzw. @arr einen Hash mit den Werten des Array
+als Schlüssel und dem Wert $val als deren Werte und liefere diesen zurück.
+Ist $val nicht angegeben, werden alle Werte des Hash auf 1 gesetzt.
 
 =cut
 
@@ -1051,6 +1057,7 @@ sub restore {
         return $colSep if $_[0] eq '!';
         return "\n" if $_[0] eq 'n';
         return "\r" if $_[0] eq 'r';
+        return "\x" if $_[0] eq 'x';
 
         $class->throw(
             'ARR-00001: Inkorrekte Array-Repräsentation',
@@ -1070,7 +1077,7 @@ sub restore {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -81,7 +81,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '7.9.0';
+our $VERSION = '7.10.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -305,7 +305,7 @@ the hypervisor.
 sub create_network {
     my $self = shift;
     my $xml = shift;
-    my $flags = shift;
+    my $flags = shift || 0;
 
     return Sys::Virt::Network->_new(connection => $self, xml => $xml, flags => $flags);
 }

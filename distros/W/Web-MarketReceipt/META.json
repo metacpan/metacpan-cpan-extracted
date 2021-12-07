@@ -4,7 +4,7 @@
       "Konboi <ryosuke.yabuki@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.16",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -65,7 +65,7 @@
    "provides" : {
       "Web::MarketReceipt" : {
          "file" : "lib/Web/MarketReceipt.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Web::MarketReceipt::Order" : {
          "file" : "lib/Web/MarketReceipt/Order.pm"
@@ -97,13 +97,15 @@
          "web" : "https://github.com/kayac/p5-Web-MarketReceipt"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "chibapse <tall.toothpick.102248@gmail.com>",
       "hitode909 <hitode909@gmail.com>",
       "mackee <macopy123@gmail.com>",
       "root <root@3330ac66f871.(none)>",
       "root <root@44d7b834f1c5.(none)>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

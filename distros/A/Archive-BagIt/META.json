@@ -24,7 +24,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "v5.16.0"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -51,7 +51,11 @@
       },
       "runtime" : {
          "recommends" : {
-            "IO::AIO" : "0"
+            "IO::AIO" : "0",
+            "IO::Async" : "0",
+            "IO::Async::Loop" : "0",
+            "IO::Async::Stream" : "0",
+            "Parallel::parallel_map" : "0"
          },
          "requires" : {
             "Carp" : "0",
@@ -60,20 +64,17 @@
             "File::Find" : "0",
             "File::Spec" : "0",
             "IO::AIO" : "0",
-            "IO::Async" : "0",
-            "IO::Async::Function" : "0",
             "IO::Async::Loop" : "0",
+            "IO::Async::Stream" : "0",
             "List::Util" : "1.450",
             "Moo" : "0",
             "Moo::Role" : "0",
             "Net::SSLeay" : "1.43",
             "POSIX" : "0",
-            "Parallel::parallel_map" : "0",
             "Time::HiRes" : "0",
-            "feature" : "0",
             "namespace::autoclean" : "0",
             "open" : "0",
-            "perl" : "v5.16.0",
+            "perl" : "5.010",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -83,6 +84,12 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "IO::Async" : "0",
+            "IO::Async::Loop" : "0",
+            "IO::Async::Stream" : "0",
+            "Parallel::parallel_map" : "0"
+         },
          "requires" : {
             "Data::Dumper" : "0",
             "Data::Printer" : "0",
@@ -97,59 +104,68 @@
             "Test::File" : "0",
             "Test::More" : "0",
             "Test::Warnings" : "0",
+            "diagnostics" : "0",
             "lib" : "0",
-            "perl" : "v5.16.0"
+            "perl" : "5.010"
          }
       }
    },
    "provides" : {
       "Archive::BagIt" : {
          "file" : "lib/Archive/BagIt.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Base" : {
          "file" : "lib/Archive/BagIt/Base.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Fast" : {
          "file" : "lib/Archive/BagIt/Fast.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Plugin::Algorithm::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/MD5.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Plugin::Algorithm::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Plugin::Manifest::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/MD5.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Plugin::Manifest::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/SHA512.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Role::Algorithm" : {
          "file" : "lib/Archive/BagIt/Role/Algorithm.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Role::Manifest" : {
          "file" : "lib/Archive/BagIt/Role/Manifest.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Role::OpenSSL" : {
          "file" : "lib/Archive/BagIt/Role/OpenSSL.pm",
-         "version" : "0.085"
+         "version" : "0.086"
+      },
+      "Archive::BagIt::Role::OpenSSL::Async" : {
+         "file" : "lib/Archive/BagIt/Role/OpenSSL/Async.pm",
+         "version" : "0.086"
+      },
+      "Archive::BagIt::Role::OpenSSL::Sync" : {
+         "file" : "lib/Archive/BagIt/Role/OpenSSL/Sync.pm",
+         "version" : "0.086"
       },
       "Archive::BagIt::Role::Plugin" : {
          "file" : "lib/Archive/BagIt/Role/Plugin.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       },
       "Archive::BagIt::Role::Portability" : {
          "file" : "lib/Archive/BagIt/Role/Portability.pm",
-         "version" : "0.085"
+         "version" : "0.086"
       }
    },
    "release_status" : "stable",
@@ -161,7 +177,7 @@
          "web" : "https://git.fsfe.org/art1pirat/Archive-BagIt"
       }
    },
-   "version" : "0.085",
+   "version" : "0.086",
    "x_contributors" : [
       "Andreas Romeyke <art1@andreas-romeyke.de>",
       "Michiel Beijen <michiel.beijen@gmail.com>",

@@ -1,18 +1,3 @@
-package Quiq::Html::Page;
-use base qw/Quiq::Html::Base/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Html::Component::Bundle;
-use Quiq::Css;
-use Quiq::JQuery::Function;
-use Quiq::JavaScript;
-use Quiq::Template;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -139,6 +124,27 @@ Titel der Seite.
 Einrückung des Inhalts der obersten Elemente <head> und <body>.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Page;
+use base qw/Quiq::Html::Base/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Html::Component::Bundle;
+use Quiq::Css;
+use Quiq::JQuery::Function;
+use Quiq::JavaScript;
+use Quiq::Template;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -298,7 +304,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.525-10-g2613da3e
+package JSON::Schema::Modern; # git description: v0.530-10-g3555f8b5
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.526';
+our $VERSION = '0.531';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -17,17 +17,17 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use JSON::MaybeXS;
 use Carp qw(croak carp);
-use List::Util 1.55 qw(pairs first uniqint pairmap);
+use List::Util 1.55 qw(pairs first uniqint pairmap uniq);
 use Ref::Util 0.100 qw(is_ref is_plain_hashref);
 use Mojo::URL;
 use Safe::Isa;
 use Path::Tiny;
 use Storable 'dclone';
 use File::ShareDir 'dist_dir';
-use Module::Runtime 'use_module';
+use Module::Runtime qw(use_module require_module);
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
-use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy ArrayRef Undef ClassName Tuple);
+use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy ArrayRef Undef ClassName Tuple Map);
 use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
@@ -100,7 +100,7 @@ has scalarref_booleans => (
 
 has _format_validations => (
   is => 'bare',
-  isa => Dict[
+  isa => my $format_type = Dict[
     (map +($_ => Optional[CodeRef]), qw(date-time date time duration email idn-email hostname idn-hostname ipv4 ipv6 uri uri-reference iri iri-reference uuid uri-template json-pointer relative-json-pointer regex)),
     slurpy HashRef[Dict[type => Enum[qw(null object array boolean string number integer)], sub => CodeRef]],
   ],
@@ -108,10 +108,13 @@ has _format_validations => (
   handles_via => 'Hash',
   handles => {
     _get_format_validation => 'get',
+    add_format_validation => 'set',
   },
   lazy => 1,
   default => sub { {} },
 );
+
+before add_format_validation => sub ($self, $name, $sub) { $format_type->({ $name => $sub }) };
 
 around BUILDARGS => sub ($orig, $class, @args) {
   my $args = $class->$orig(@args);
@@ -146,14 +149,14 @@ sub add_schema {
     );
 
   croak(!(caller())[0]->isa(__PACKAGE__)
-    ? join('; ', map $_->keyword_location.': '.$_->error, $document->errors)
+    ? join("\n", $document->errors)
     : JSON::Schema::Modern::Result->new(
       output_format => $self->output_format,
       valid => 0,
       errors => [ $document->errors ],
     )) if $document->has_errors;
 
-  if (not grep $_->{document} == $document, $self->_resource_values) {
+  if (not grep $_->{document} == $document, $self->_canonical_resources) {
     my $schema_content = $document->_serialized_schema
       // $document->_serialized_schema($self->_json_decoder->encode($document->schema));
 
@@ -161,7 +164,7 @@ sub add_schema {
           my $existing_content = $_->_serialized_schema
             // $_->_serialized_schema($self->_json_decoder->encode($_->schema));
           $existing_content eq $schema_content
-        } uniqint map $_->{document}, $self->_resource_values) {
+        } uniqint map $_->{document}, $self->_canonical_resources) {
       # we already have this schema content in another document object.
       $document = $existing_doc;
     }
@@ -179,6 +182,7 @@ sub add_schema {
         specification_version => $resource->{specification_version},
         vocabularies => $resource->{vocabularies},  # reference, not copy
         document => $document,
+        configs => $resource->{configs},
       });
   }
 
@@ -310,7 +314,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
         schema => $document->schema,
         document => $document,
         document_path => '',
-        (map +($_ => $base_resource->{$_}), qw(canonical_uri specification_version vocabularies)),
+        $base_resource->%{qw(canonical_uri specification_version vocabularies configs)},
       };
     }
 
@@ -331,7 +335,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       vocabularies => $schema_info->{vocabularies},
       callbacks => $config_override->{callbacks} // {},
       evaluator => $self,
-      $schema_info->{document}->evaluation_configs->%*,
+      $schema_info->{configs}->%*,
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
@@ -412,6 +416,7 @@ sub _traverse_subschema ($self, $schema, $state) {
   return E($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
   my $valid = 1;
+  # we must check the array length on every iteration because some keywords can change it!
   for (my $idx = 0; $idx <= $state->{vocabularies}->$#*; ++$idx) {
     my $vocabulary = $state->{vocabularies}[$idx];
     foreach my $keyword ($vocabulary->keywords($state->{spec_version})) {
@@ -499,14 +504,13 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       next if $keyword ne '$ref' and exists $schema->{'$ref'} and $state->{spec_version} eq 'draft7';
 
       delete $unknown_keywords{$keyword};
-
-      my $method = '_eval_keyword_'.($keyword =~ s/^\$//r);
       $state->{keyword} = $keyword;
 
-      if ($vocabulary->can($method)) {
+      my $method = '_eval_keyword_'.($keyword =~ s/^\$//r);
+      if (my $sub = $vocabulary->can($method)) {
         my $error_count = $state->{errors}->@*;
 
-        if (not $vocabulary->$method($data, $schema, $state)) {
+        if (not $sub->($vocabulary, $data, $schema, $state)) {
           warn 'result is false but there are no errors (keyword: '.$keyword.')'
             if $error_count == $state->{errors}->@*;
           $valid = 0;
@@ -517,7 +521,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       }
 
       if (my $sub = $state->{callbacks}{$keyword}) {
-        $sub->($schema, $state);
+        $sub->($data, $schema, $state);
       }
 
       push @new_annotations, $state->{annotations}->@[$#new_annotations+1 .. $state->{annotations}->$#*];
@@ -528,7 +532,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
 
   if ($valid) {
     push $state->{annotations}->@*, @new_annotations;
-    annotate_self(+{ %$state, keyword => $_, unknown => 1 }, $schema)
+    annotate_self(+{ %$state, keyword => $_, _unknown => 1 }, $schema)
       foreach sort keys %unknown_keywords;
   }
 
@@ -544,6 +548,7 @@ has _resource_index => (
       document => InstanceOf['JSON::Schema::Modern::Document'],
       # the vocabularies used when evaluating instance data against schema
       vocabularies => ArrayRef[my $vocabulary_class_type = ClassName->where(q{$_->DOES('JSON::Schema::Modern::Vocabulary')})],
+      configs => HashRef,
       slurpy HashRef[Undef],  # no other fields allowed
     ]],
   handles_via => 'Hash',
@@ -554,7 +559,7 @@ has _resource_index => (
     _resource_index => 'elements',
     _resource_keys => 'keys',
     _add_resources_unsafe => 'set',
-    _resource_values => 'values',
+    _canonical_resources => 'values',
     _resource_exists => 'exists',
   },
   lazy => 1,
@@ -564,11 +569,12 @@ has _resource_index => (
 around _add_resources => sub {
   my ($orig, $self) = (shift, shift);
 
-  $resource_type->($_[1]) if @_;  # check type of hash value against Dict
-
   my @resources;
   foreach my $pair (sort { $a->[0] cmp $b->[0] } pairs @_) {
     my ($key, $value) = @$pair;
+
+    $resource_type->($value); # check type of hash value against Dict
+
     if (my $existing = $self->_get_resource($key)) {
       # we allow overwriting canonical_uri = '' to allow for ad hoc evaluation of schemas that
       # lack all identifiers altogether, but preserve other resources from the original document
@@ -753,7 +759,6 @@ sub _get_or_load_resource ($self, $uri) {
 
   # TODO:
   # - load from network or disk
-  # - handle such resources with $anchor fragments
 
   return;
 };
@@ -765,6 +770,7 @@ sub _get_or_load_resource ($self, $uri) {
 # - the path relative to the document root for this schema
 # - the specification version that applies to this schema
 # - the vocabularies to use when considering schema keywords
+# - the config overrides to set when considering schema keywords
 # creates a Document and adds it to the resource index, if not already present.
 sub _fetch_from_uri ($self, $uri) {
   $uri = Mojo::URL->new($uri) if not is_ref($uri);
@@ -778,7 +784,7 @@ sub _fetch_from_uri ($self, $uri) {
       my $document = $resource->{document};
       my $closest_resource = first { !length($_->[1]{path})       # document root
           || length($document_path)
-            && path($_->[1]{path})->subsumes($document_path) }    # path is above present location
+            && $document_path =~ m{^\Q$_->[1]{path}\E(?:/|\z)} }  # path is above present location
         sort { length($b->[1]{path}) <=> length($a->[1]{path}) }  # sort by length, descending
         grep { not length Mojo::URL->new($_->[0])->fragment }     # omit anchors
         $document->resource_pairs;
@@ -791,8 +797,7 @@ sub _fetch_from_uri ($self, $uri) {
         canonical_uri => $canonical_uri,
         document => $document,
         document_path => $document_path,
-        specification_version => $resource->{specification_version},
-        vocabularies => $resource->{vocabularies},  # reference, not copy
+        $resource->%{qw(specification_version vocabularies configs)}, # reference, not copy
       };
     }
   }
@@ -805,8 +810,7 @@ sub _fetch_from_uri ($self, $uri) {
         canonical_uri => $resource->{canonical_uri}->clone, # this is *not* the anchor-containing URI
         document => $resource->{document},
         document_path => $resource->{path},
-        specification_version => $resource->{specification_version},
-        vocabularies => $resource->{vocabularies},  # reference, not copy
+        $resource->%{qw(specification_version vocabularies configs)}, # reference, not copy
       };
     }
   }
@@ -819,24 +823,40 @@ has _json_decoder => (
   default => sub { JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 1) },
 );
 
+# since media types are case-insensitive, all type names must be foldcased on insertion.
 has _media_type => (
   is => 'bare',
-  isa => HashRef[CodeRef],
+  isa => my $media_type_type = Map[Str->where(q{$_ eq CORE::fc($_)}), CodeRef],
   handles_via => 'Hash',
   handles => {
     get_media_type => 'get',
     add_media_type => 'set',
+    _media_types => 'keys',
   },
   lazy => 1,
   default => sub ($self) {
     +{
+      # note: utf-8 decoding is NOT done, as we can't be sure that's the correct charset!
       'application/json' => sub ($content_ref) {
-        \ JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1)->decode($content_ref->$*);
+        \ JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0)->decode($content_ref->$*);
       },
-      'text/plain' => sub ($content_ref) { $content_ref }
+      map +($_ => sub ($content_ref) { $content_ref }),
+        qw(text/plain application/octet-stream),
     };
   },
 );
+
+# get_media_type('TExT/bloop') will match an entry for 'text/*' or '*/*'
+# TODO: support queries for application/schema+json to match entry of application/json
+around get_media_type => sub ($orig, $self, $type) {
+  my $mt = $self->$orig(fc $type);
+  return $mt if $mt;
+
+  return $self->$orig((first { m{([^/]+)/\*$} && fc($type) =~ m{^\Q$1\E/[^/]+$} } $self->_media_types)
+    // '*/*');
+};
+
+before add_media_type => sub ($self, $type, $sub) { $media_type_type->({ $type => $sub }) };
 
 has _encoding => (
   is => 'bare',
@@ -849,13 +869,32 @@ has _encoding => (
   lazy => 1,
   default => sub ($self) {
     +{
-      'base64' => sub ($content_ref) {
-        die "invalid characters in base64 string" if $content_ref->$* =~ m{[^A-Za-z0-9+/]};
+      identity => sub ($content_ref) { $content_ref },
+      base64 => sub ($content_ref) {
+        die "invalid characters in base64 string"
+          if $content_ref->$* =~ m{[^A-Za-z0-9+/=]} or $content_ref->$* =~ m{=(?=[^=])};
         require MIME::Base64; \ MIME::Base64::decode($content_ref->$*);
       },
     };
   },
 );
+
+sub FREEZE ($self, $serializer) {
+  my $data = +{ %$self };
+  # Cpanel::JSON::XS doesn't serialize: https://github.com/Sereal/Sereal/issues/266
+  # coderefs can't serialize cleanly and must be re-added by the user.
+  delete $data->@{qw(_json_decoder _format_validations _media_type _encoding)};
+  return $data;
+}
+
+sub THAW ($class, $serializer, $data) {
+  my $self = bless($data, $class);
+
+  # load all vocabulary classes
+  require_module($_) foreach uniq map $_->{vocabularies}->@*, $self->_canonical_resources;
+
+  return $self;
+}
 
 1;
 
@@ -873,7 +912,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.526
+version 0.531
 
 =head1 SYNOPSIS
 
@@ -949,10 +988,12 @@ to false.
 
 =head2 format_validations
 
+=for stopwords subref
+
 An optional hashref that allows overriding the validation method for formats, or adding new ones.
 Overrides to existing formats (see L</Format Validation>)
 must be specified in the form of C<< { $format_name => $format_sub } >>, where
-the format sub is a coderef that takes one argument and returns a boolean result. New formats must
+the format sub is a subref that takes one argument and returns a boolean result. New formats must
 be specified in the form of C<< { $format_name => { type => $type, sub => $format_sub } } >>,
 where the type indicates which of the core JSON Schema types (null, object, array, boolean, string,
 number, or integer) the instance value must be for the format validation to be considered.
@@ -993,7 +1034,7 @@ Defaults to false.
 
 =head1 METHODS
 
-=for Pod::Coverage BUILDARGS
+=for Pod::Coverage BUILDARGS FREEZE THAW
 
 =head2 evaluate_json_string
 
@@ -1024,8 +1065,9 @@ or a URI string indicating the location where such a schema is located.
 =back
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
-L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</scalarref_booleans> and/or
-L</validate_formats> settings for just this evaluation call.
+L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</scalarref_booleans>,
+L</validate_formats>, and/or L<validate_content_schemas>
+settings for just this evaluation call.
 
 The result is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
 
@@ -1058,9 +1100,9 @@ or a URI string indicating the location where such a schema is located.
 =back
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
-L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</scalarref_booleans> and/or
-L</validate_formats>, L<validate_content_schemas> settings for just this
-evaluation call.
+L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</scalarref_booleans>,
+L</validate_formats>, and/or L<validate_content_schemas>
+settings for just this evaluation call.
 
 You can pass a series of callback subs to this method corresponding to keywords, which is useful for
 identifying various data that are not exposed by annotations.
@@ -1071,7 +1113,7 @@ For example, to find the locations where all C<$ref> keywords are applied B<succ
   my @used_ref_at;
   $js->evaluate($data, $schema_or_uri, {
     callbacks => {
-      '$ref' => sub ($schema, $state) {
+      '$ref' => sub ($data, $schema, $state) {
         push @used_ref_at, $state->{data_path};
       }
     },
@@ -1124,6 +1166,16 @@ Returns C<undef> if the resource could not be found;
 if there were errors in the document, will die with these errors;
 otherwise returns the L<JSON::Schema::Modern::Document> that contains the added schema.
 
+=head2 add_format_validation
+
+=for comment we are the nine Eleven Deniers
+
+  $js->add_format_validation(no_nines => { type => 'number', sub => sub ($value) { $value =~ m/^[0-8]$$/ });
+
+Adds support for a custom format. The data type that this format applies to must be supplied; all
+values of any other type will automatically be deemed to be valid, and will not be passed to the
+subref.
+
 =head2 add_vocabulary
 
   $js->add_vocabulary('My::Custom::Vocabulary::Class');
@@ -1141,8 +1193,6 @@ L<keywords|JSON::Schema::Modern::Vocabulary/keywords> methods.
   $js->add_media_type('application/furble' => sub ($content_ref) {
     return ...;  # data representing the deserialized text for Content-Type: application/furble
   });
-
-=for stopwords subref
 
 Takes a media-type name and a subref which takes a single scalar reference, which is expected to be
 a reference to a string, which might contain wide characters (i.e. not octets), especially when used
@@ -1165,7 +1215,7 @@ C<text/plain>
 
 =head2 get_media_type
 
-Fetches a decoder sub for the indicated media type.
+Fetches a decoder sub for the indicated media type. Lookups are performed B<without case sensitivity>.
 
 =for stopwords thusly
 
@@ -1182,13 +1232,17 @@ You can use it thusly:
 
 Takes an encoding name and a subref which takes a single scalar reference, which is expected to be
 a reference to a string, which SHOULD be a 7-bit or 8-bit string. Result values MUST be a scalar-reference
-to a string.
+to a string (which is then dereferenced for the C<contentMediaType> keyword).
 
 =for stopwords natively
 
 Encodings handled natively are:
 
 =over 4
+
+=item *
+
+C<identity>
 
 =item *
 
@@ -1339,7 +1393,8 @@ C<idn-hostname> requires L<Net::IDN::Encode>
 
 =head2 Specification Compliance
 
-This implementation is now fully specification-compliant, but until version 1.000 is released, it is
+This implementation is now fully specification-compliant (for versions draft7, draft2019-09,
+draft2020-12), but until version 1.000 is released, it is
 still deemed to be missing some optional but quite useful features, such as:
 
 =over 4

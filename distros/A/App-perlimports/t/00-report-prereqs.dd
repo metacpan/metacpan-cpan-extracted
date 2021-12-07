@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.008'
+                                        'perl' => '5.010'
                                       }
                       },
        'develop' => {
@@ -60,7 +60,8 @@ do { my $x = {
                                       'Text::SimpleTable::AutoWidth' => '0',
                                       'Try::Tiny' => '0',
                                       'Types::Standard' => '0',
-                                      'perl' => '5.008',
+                                      'feature' => '0',
+                                      'perl' => 'v5.12.0',
                                       'strict' => '0',
                                       'utf8' => '0',
                                       'warnings' => '0'
@@ -79,10 +80,10 @@ do { my $x = {
                                    'Test::More' => '0',
                                    'Test::Needs' => '0',
                                    'Test::RequiresInternet' => '0',
-                                   'Test::Script' => '1.27',
+                                   'Test::Script' => '1.29',
                                    'Test::Warnings' => '0',
                                    'lib' => '0',
-                                   'perl' => '5.008'
+                                   'perl' => 'v5.12.0'
                                  }
                  }
      };

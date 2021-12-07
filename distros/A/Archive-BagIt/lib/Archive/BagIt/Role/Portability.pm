@@ -6,7 +6,7 @@ use Carp ();
 use File::Spec ();
 use Moo::Role;
 # ABSTRACT: A role that handles filepaths for improved portability
-our $VERSION = '0.085'; # VERSION
+our $VERSION = '0.086'; # VERSION
 
 
 sub chomp_portable {
@@ -14,6 +14,7 @@ sub chomp_portable {
     $line =~ s#\x{0d}?\x{0a}?\Z##s; # replace CR|CRNL with empty
     return $line;
 }
+
 
 sub normalize_payload_filepath {
     my ($filename) = @_;
@@ -25,6 +26,7 @@ sub normalize_payload_filepath {
     $filename =~ s#"##g; # quotes
     return $filename;
 }
+
 
 sub check_if_payload_filepath_violates{
     my ($local_name) = @_;
@@ -58,7 +60,19 @@ Archive::BagIt::Role::Portability - A role that handles filepaths for improved p
 
 =head1 VERSION
 
-version 0.085
+version 0.086
+
+=head2 chomp_portable($line)
+
+returns chomped $line where last CR or CRLF removed
+
+=head2 normalize_payload_filepath($filename)
+
+returns the normalized $filename
+
+=head2 check_if_payload_filepath_violates($local_name)
+
+this checks if payload file path violates some OS dependent filename rules
 
 =head1 AVAILABILITY
 

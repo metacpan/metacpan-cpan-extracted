@@ -33,6 +33,7 @@ t/020_dsakeys-2048.t
 t/021_dsakeys-3072.t
 t/022_sign_no_xml_declaration.t
 t/023_hmac.t
+t/024-sign-wide-char.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t
@@ -51,11 +52,13 @@ t/ecdsa.public.pem
 t/intermediate.pem
 t/issues/issue-20.xml
 t/issues/issue-31.xml
+t/issues/issue-38.xml
 t/pkcs8.private.key
 t/release-trailing-space.t
 t/rsa.cert.pem
 t/rsa.private.key
 t/signed/inclusive.xml
+t/signed/inclusive2.xml
 t/signed/logout_response.xml
 t/signed/one-of-three-sigs-unassocated.xml
 t/signed/saml_request-xmlsec1-dsa-signed.xml

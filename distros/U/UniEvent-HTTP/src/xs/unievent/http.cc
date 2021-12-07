@@ -41,7 +41,8 @@ void fill (Request* req, const Hash& h) {
                 }
                 break;
             case 'c':
-                if (key == "continue_callback") req->continue_event.add(xs::in<Request::continue_fn>(v));
+                if      (key == "continue_callback") req->continue_event.add(xs::in<Request::continue_fn>(v));
+                else if (key == "connect_timeout")   req->connect_timeout = v.as_number<double>() * 1000;
                 break;
         }
     }

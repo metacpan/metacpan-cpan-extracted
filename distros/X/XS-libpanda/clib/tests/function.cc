@@ -9,7 +9,7 @@
 using function_details::make_method;
 using function_details::tmp_abstract_function;
 
-#define TEST(name) TEST_CASE("function: " name, "[function]")
+TEST_PREFIX("function: ", "[function]");
 
 namespace test {
     void void_func(){}

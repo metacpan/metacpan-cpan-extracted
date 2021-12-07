@@ -2,7 +2,7 @@ NAME
     App::GrepUtils - CLI utilities related to the Unix command 'grep'
 
 VERSION
-    This document describes version 0.004 of App::GrepUtils (from Perl
+    This document describes version 0.005 of App::GrepUtils (from Perl
     distribution App-GrepUtils), released on 2021-11-14.
 
 DESCRIPTION

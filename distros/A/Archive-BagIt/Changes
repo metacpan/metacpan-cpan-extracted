@@ -1,10 +1,123 @@
 ==================================================
-Changes from 2020-11-09 00:00:00 +0000 to present.
+Changes from 2020-11-24 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.085 at 2021-11-09 10:48:29 +0000
+version 0.086 at 2021-11-24 17:05:17 +0000
 ------------------------------------------
+
+  Change: a0e1202cf566befda217ee23285896706867bd5e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 18:04:12 +0000
+
+    - added POD 
+
+  Change: 6e3904cff97bae10f0e7b25caa5e4ef15804e74a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 18:03:57 +0000
+
+    - added POD 
+
+  Change: 196a0f92decbbbd47eacdf347b1be6bda40b3f45
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 18:03:46 +0000
+
+    - added POD 
+
+  Change: f114868ef7df0fdf245a696c348a1aa22f8db00f
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 18:03:36 +0000
+
+    - fixed perlcritic warning 
+
+  Change: 1c32161f326b315656e06c708b1bfb6a59052f0b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 18:03:16 +0000
+
+    - removed unused feature - added POD 
+
+  Change: cf8bfd029e5b6d8f824a02f9cb5dca48cfcf0245
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 18:02:56 +0000
+
+    - enhanced 
+
+  Change: 9d517b0c9fb7d22ce290ca230a2bccc38f143749
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:27:51 +0000
+
+    - adapted to changes in Archive::BagIt::XXXXX 
+
+  Change: 34a524a4b5a07fe3f1eeab94752dd29aae7e125d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:27:09 +0000
+
+    - removed dead code 
+
+  Change: a5869bcb87488d045f94050a98a348ec6985a46c
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:26:50 +0000
+
+    - added version and abstract 
+
+  Change: 9cfa5fdf4c53de99bf69c0471570c36fa4b6c10c
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:26:29 +0000
+
+    - added has_parallel_support - added pluggable Parallel::parallel_map
+    - bugfix in _fill_digst_hashref() if localfilename not defined (could
+    occure if used in parallel map, because undef) 
+
+  Change: 7613bf8d8d2d419635eb52bfe6c421ddc5654d02
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:24:43 +0000
+
+    - defaults to use Archive::BagIt::Role::OpenSSL::Sync - added
+    pluggable Archive::BagIt::Role::OpenSSL::Async - added
+    has_async_support() 
+
+  Change: db3500508b2cd7f600a7f1f27874776d1e550aa7
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:21:07 +0000
+
+    - removed dead code 
+
+  Change: 53b35f1bab507bd1f44a2b0a099a49cce3d4c76e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:18:20 +0000
+
+    - init 
+
+  Change: dc1f62baa543df694160e2df4822234ccc8f965d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:18:10 +0000
+
+    - more descripive test output 
+
+  Change: 5752be6ff5f5aaaa521a0253a4334a26ca5b9d6f
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:17:38 +0000
+
+    - fix, use moo-predicate for force_utf8 - added error handling, if
+    given filename to digest_callback() is not a file 
+
+  Change: 7231dde6adb010e5ee9e4d9c1e442147e9d2eb0d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-24 16:15:58 +0000
+
+    - added skip in Test::Compile (t/00-compile.t) for package
+    Archive::BagIt::Role::OpenSSL::Async - fixed Recommends and
+    Test::Recommends 
+
+------------------------------------------
+version 0.085 at 2021-11-09 10:48:49 +0000
+------------------------------------------
+
+  Change: 0ce77e53346a9941684a61b8d3d658d0ce9260e3
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-11-09 11:48:49 +0000
+
+    Released 0.085 
 
   Change: f790e97b93861b4a3ecb975370e7e3416cdf7be7
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -507,5 +620,5 @@ version 0.071 at 2021-01-14 14:10:38 +0000
     - enhanced tests for Archive::BagIt::Fast 
 
 =================================================
-Plus 24 releases after 2020-11-09 00:00:00 +0000.
+Plus 24 releases after 2020-11-24 00:00:00 +0000.
 =================================================

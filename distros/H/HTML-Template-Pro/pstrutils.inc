@@ -155,15 +155,17 @@ urlencode_pstring (pbuffer* StrBuffer, PSTRING pstring) {
       buf=pbuffer_resize(StrBuffer, 2*(offset+MAX_ESCAPE_SEQ));
       buflen=pbuffer_size(StrBuffer);
     }
-    /* 
+    /*
      * # do the translation (RFC 2396 ^uric)
      * s!([^a-zA-Z0-9_.\-])!sprintf('%%%02X', $_)
+     * note that \- above means -, not '\\' + '-', and '\\' should not be urlencoded.
+     * https://rt.cpan.org/Ticket/Display.html?id=109255
      */
     if ((curchar>='a' && curchar<='z') ||
 	(curchar>='A' && curchar<='Z') ||
 	(curchar>='0' && curchar<='9') ||
-	curchar=='_' || curchar=='.' || curchar=='\\' || curchar=='-'
-	) 
+	curchar=='_' || curchar=='.' || curchar=='-'
+	)
       *(buf+offset)=curchar;
     else {
       bufdelta=3; sprintf(buf+offset,"%%%.2X",(int) curchar);

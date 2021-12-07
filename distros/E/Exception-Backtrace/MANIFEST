@@ -7,6 +7,10 @@ lib/Exception/Backtrace/BacktraceInfo.pm
 lib/Exception/Backtrace/BacktraceInfo.pod
 lib/Exception/Backtrace/DualTrace.pm
 lib/Exception/Backtrace/DualTrace.pod
+lib/Exception/Backtrace/PerlFrame.pm
+lib/Exception/Backtrace/PerlFrame.pod
+lib/Exception/Backtrace/PerlTraceInfo.pm
+lib/Exception/Backtrace/PerlTraceInfo.pod
 lib/Exception/Backtrace/Stackframe.pm
 lib/Exception/Backtrace/Stackframe.pod
 Makefile.PL
@@ -18,18 +22,21 @@ src/xs/backtrace.cc
 src/xs/backtrace.h
 src/xs/DualTrace.cc
 src/xs/DualTrace.h
-src/xs/PerlTrace.cc
-src/xs/PerlTrace.h
+src/xs/PerlTraceInfo.cc
+src/xs/PerlTraceInfo.h
 t/04-no-segfault-at-start.t
 t/05-perl-exceptions.t
 t/06-c-exceptions.t
 t/07-api.t
 t/08-subname.t
 t/09-global-destruction.t
+t/10-args-decorator.t
 t/MyTest.pm
 t/MyTest.xs
 xs/BacktraceInfo.xsi
 xs/DualTrace.xsi
+xs/PerlFrame.xsi
+xs/PerlTraceInfo.xsi
 xs/Stackframe.xsi
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

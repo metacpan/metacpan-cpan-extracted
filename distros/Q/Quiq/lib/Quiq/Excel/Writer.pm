@@ -1,14 +1,3 @@
-package Quiq::Excel::Writer;
-use base qw/Excel::Writer::XLSX/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Path;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -39,6 +28,23 @@ Exceptions im Fehlerfall
 =back
 
 Dokumentation siehe Basisklasse.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Excel::Writer;
+use base qw/Excel::Writer::XLSX/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Path;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -100,7 +106,7 @@ sub new {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

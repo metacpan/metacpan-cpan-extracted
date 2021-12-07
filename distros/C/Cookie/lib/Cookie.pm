@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.1.4
+## Version v0.1.6
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2021/11/22
+## Modified 2021/12/07
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -22,14 +22,16 @@ BEGIN
     use URI::Escape ();
     use overload (
         '""'     => \&as_string,
+        bool     => sub{ return( $_[0] ) },
         # '""'     => sub{ $_[0]->as_string },
         'eq'     => \&same_as,
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.1.6';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
+    use constant CRYPTX_VERSION => '0.074';
 };
 
 sub init
@@ -92,12 +94,13 @@ sub algo
         {
             try
             {
-                $self->_load_class( 'Crypt::Mode::CBC' ) || return( $self->pass_error );
+                $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
                 # Crypt::Mode::CBC dies when it is unhappy, but we catch a null return 
                 # value anyway just in case
                 my $o = Crypt::Mode::CBC->new( $algo ) ||
                     return( $self->error( "Unsupported algorithm \"$algo\"" ) );
                 $self->_set_get_scalar_as_object( 'algo', $algo );
+                $self->reset(1);
             }
             catch( $e )
             {
@@ -188,14 +191,14 @@ sub as_string
         {
             if( $self->sign->is_true )
             {
-                $self->_load_class( 'Crypt::Mac::HMAC' ) || return( $self->pass_error );
+                $self->_load_class( 'Crypt::Mac::HMAC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
                 my $signature = Crypt::Mac::HMAC::hmac_b64( "SHA256", "$key", "$value" );
                 $value = "$value.$signature";
                 $self->message( 4, "Signature is '$signature' with new cookie value '$value'" );
             }
             elsif( $self->encrypt )
             {
-                $self->_load_class( 'Crypt::Misc' ) || return( $self->pass_error );
+                $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
                 my $algo = $self->algo;
                 my $p = $self->_encrypt_objects( $key => $algo ) || return( $self->pass_error );
                 my $crypt = $p->{crypt};
@@ -282,7 +285,7 @@ sub decrypt
     # $self->message( 4, "Value to decrypt is '$value'" );
     try
     {
-        $self->_load_class( 'Crypt::Misc' ) || return( $self->pass_error );
+        $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         # If IV is not provided, _encrypt_objects will generate one and save it for next time
         my $p = $self->_encrypt_objects( $key => $algo, $opts->{iv} ) || return( $self->pass_error );
         my $crypt = $p->{crypt};
@@ -298,7 +301,7 @@ sub decrypt
 
 sub discard { return( shift->_set_get_boolean( 'discard', @_ ) ); }
 
-sub domain { return( shift->reset->_set_get_scalar_as_object( 'domain', @_ ) ); }
+sub domain { return( shift->reset(@_)->_set_get_scalar_as_object( 'domain', @_ ) ); }
 
 # To expire a cookie, the domain and path must match that was previously set
 # <https://datatracker.ietf.org/doc/html/rfc6265#section-3.1>
@@ -309,7 +312,7 @@ sub elapse
     return( $self );
 }
 
-sub encrypt { return( shift->reset->_set_get_boolean( 'encrypt', @_ ) ); }
+sub encrypt { return( shift->reset(@_)->_set_get_boolean( 'encrypt', @_ ) ); }
 
 # sub expires { return( shift->APR::Request::Cookie::expires( @_ ) ); }
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date
@@ -319,7 +322,7 @@ sub expires
     my $self = shift( @_ );
     if( @_ )
     {
-        $self->reset( @_ );
+        $self->reset(1);
         my $exp = shift( @_ );
         $self->message( 3, "Received expiration value of '", ( $exp // '' ), "' (", ( defined( $exp ) ? 'defined' : 'undefined' ), ")." ) if( $COOKIE_DEBUG );
         my $dt;
@@ -404,11 +407,11 @@ sub host { return( shift->domain( @_ ) ); }
 
 sub host_only { return( shift->implicit( @_ ) ); }
 
-sub http_only { return( shift->reset->_set_get_boolean( 'http_only', @_ ) ); }
+sub http_only { return( shift->reset(@_)->_set_get_boolean( 'http_only', @_ ) ); }
 
 sub httponly { return( shift->http_only( @_ ) ); }
 
-sub implicit { return( shift->reset->_set_get_boolean( 'implicit', @_ ) ); }
+sub implicit { return( shift->reset(@_)->_set_get_boolean( 'implicit', @_ ) ); }
 
 # For cookie encryption
 sub initialisation_vector { return( shift->_set_get_scalar_as_object( 'initialisation_vector', @_ ) ); }
@@ -474,7 +477,7 @@ sub is_valid
     $self->message( 3, "Original string is '$orig' and signature is '$sig' and key is '$key'." );
     try
     {
-        $self->_load_class( 'Crypt::Mac::HMAC' ) || return( $self->pass_error );
+        $self->_load_class( 'Crypt::Mac::HMAC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         my $check = Crypt::Mac::HMAC::hmac_b64( 'SHA256', "$key", "$orig" );
         # $self->message( 3, "Is check '$check' same as signature '$sig' ? ", ( $check eq $sig ? 'yes' : 'no' ) );
         return( "$check" eq "$sig" );
@@ -512,7 +515,7 @@ sub match_host
     return(0);
 }
 
-# sub max_age { return( shift->reset->_set_get_scalar( 'max_age', @_ ) ); }
+# sub max_age { return( shift->reset(@_)->_set_get_scalar( 'max_age', @_ ) ); }
 sub max_age
 {
     my $self = shift( @_ );
@@ -583,9 +586,9 @@ sub name
     return( $self->_set_get_scalar_as_object( 'name' ) );
 }
 
-sub path { return( shift->reset->_set_get_scalar_as_object( 'path', @_ ) ); }
+sub path { return( shift->reset(@_)->_set_get_scalar_as_object( 'path', @_ ) ); }
 
-sub port { return( shift->reset->_set_get_number( 'port', @_ ) ); }
+sub port { return( shift->reset(@_)->_set_get_number( 'port', @_ ) ); }
 
 sub reset
 {
@@ -619,13 +622,13 @@ sub same_as
     return(1);
 }
 
-sub same_site { return( shift->reset->_set_get_scalar_as_object( 'same_site', @_ ) ); }
+sub same_site { return( shift->reset(@_)->_set_get_scalar_as_object( 'same_site', @_ ) ); }
 
 sub samesite { return( shift->same_site( @_ ) ); }
 
-sub secure { return( shift->reset->_set_get_boolean( 'secure', @_ ) ); }
+sub secure { return( shift->reset(@_)->_set_get_boolean( 'secure', @_ ) ); }
 
-sub sign { return( shift->reset->_set_get_boolean( 'sign', @_ ) ); }
+sub sign { return( shift->reset(@_)->_set_get_boolean( 'sign', @_ ) ); }
 
 sub uri
 {
@@ -650,7 +653,7 @@ sub uri
     return( $self->_set_get_uri( 'uri' ) );
 }
 
-sub value { return( shift->reset->_set_get_scalar_as_object( 'value', @_ ) ); }
+sub value { return( shift->reset(@_)->_set_get_scalar_as_object( 'value', @_ ) ); }
 
 # Deprecated. Was a version 2 cookie spec: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie2
 sub version { return( shift->_set_get_number( 'version', @_ ) ); }
@@ -664,7 +667,7 @@ sub _encrypt_objects
     $iv //= '';
     try
     {
-        $self->_load_class( 'Crypt::Mode::CBC' ) || return( $self->pass_error );
+        $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         $self->_load_class( 'Bytes::Random::Secure' ) || return( $self->pass_error );
         # $self->message( 4, "Algorithm is '$algo'" );
         my $crypt = Crypt::Mode::CBC->new( "$algo" ) || return( $self->error( "Unable to create a Crypt::Mode::CBC object." ) );
@@ -835,7 +838,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.6
 
 =head1 DESCRIPTION
 
@@ -1385,6 +1388,41 @@ To use this feature you need to have installed L<Crypt::Mode::CBC> which is part
 The methods available to use for cookie encryption are: L</algo> to set the desired algorithm, L</key>, L</encrypt> to enable encryption, L</decrypt> to decrypt the cookie value, and optionally L</initialisation_vector>.
 
 Cookie encryption is performed by L<CryptX>, which is an XS module, and thus very fast.
+
+=head1 INSTALLATION
+
+As usual, to install this module, you can do:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+If you have Apache/modperl2 installed, this will also prepare the Makefile and run test under modperl.
+
+The Makefile.PL tries hard to find your Apache configuration, but you can give it a hand by specifying some command line parameters. See L<Apache::TestMM> for available parameters or you can type on the command line:
+
+    perl -MApache::TestConfig -le 'Apache::TestConfig::usage()'
+
+For example:
+
+    perl Makefile.PL -apxs /usr/bin/apxs -port 1234
+    # which will also set the path to httpd_conf, otherwise
+    perl Makefile.PL -httpd_conf /etc/apache2/apache2.conf
+
+    # then
+    make
+    make test
+    sudo make install
+
+See also L<modperl testing documentation|https://perl.apache.org/docs/general/testing/testing.html>
+
+But, if for some reason, you do not want to perform the mod_perl tests, you can use C<NO_MOD_PERL=1> when calling C<perl Makefile.PL>, such as:
+
+    NO_MOD_PERL=1 perl Makefile.PL
+    make
+    make test
+    sudo make install
 
 =head1 AUTHOR
 

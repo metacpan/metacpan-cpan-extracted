@@ -9,9 +9,9 @@ use warnings;
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-02'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.911'; # VERSION
+our $VERSION = '1.912'; # VERSION
 
 sub new {
     my ($class, %args) = (shift, @_);
@@ -53,7 +53,7 @@ sub activate {
 
         (my $event = $k) =~ s/^on_//;
 
-        Perinci::CmdLine::Base::__plugin_add_handler(
+        $self->cmdline->_plugin_add_handler(
             defined $wanted_event ? $wanted_event : $event,
             $plugin_name,
             defined $wanted_prio ? $wanted_prio :
@@ -64,6 +64,10 @@ sub activate {
             },
         );
     }
+}
+
+sub cmdline {
+    $_[0]{cmdline};
 }
 
 1;
@@ -81,7 +85,7 @@ Perinci::CmdLine::PluginBase - Base class for Perinci::CmdLine plugin
 
 =head1 VERSION
 
-This document describes version 1.911 of Perinci::CmdLine::PluginBase (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-02.
+This document describes version 1.912 of Perinci::CmdLine::PluginBase (from Perl distribution Perinci-CmdLine-Lite), released on 2021-12-01.
 
 =head1 DESCRIPTION
 

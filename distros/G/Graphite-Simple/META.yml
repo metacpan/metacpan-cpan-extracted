@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -22,6 +22,10 @@ requires:
   Test::Deep: '1.130'
   Test::LeakTrace: '0.14'
   Test::More: '1.302183'
-  XSLoader: '0'
-version: '0.06'
+  XSLoader: '0.27'
+  perl: '5.026001'
+resources:
+  bugtracker: https://github.com/KalessinD/perl_graphite_simple/issues
+  repository: https://github.com/KalessinD/perl_graphite_simple
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

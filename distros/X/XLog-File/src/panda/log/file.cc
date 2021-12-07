@@ -91,7 +91,7 @@ bool FileLogger::reopen () {
 }
 
 void FileLogger::log (const string& msg, const Info& info) {
-    uint64_t now = ((uint64_t)info.time.tv_sec) * 1000 + info.time.tv_nsec / 1000000;
+    uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(info.time.time_since_epoch()).count();
     if (now >= last_check + check_freq) {
         last_check = now;
         auto res = Fs::stat(file);

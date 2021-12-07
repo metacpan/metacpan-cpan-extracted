@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::Content_type;
 # ABSTRACT: Content-Type header role
-$Net::Amazon::S3::Request::Role::HTTP::Header::Content_type::VERSION = '0.98';
+$Net::Amazon::S3::Request::Role::HTTP::Header::Content_type::VERSION = '0.99';
 use MooseX::Role::Parameterized;
 
 parameter content_type => (
@@ -34,7 +34,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::Content_type - Content-Type header
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

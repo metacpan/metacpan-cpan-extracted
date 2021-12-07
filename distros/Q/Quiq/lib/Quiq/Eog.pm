@@ -1,17 +1,3 @@
-package Quiq::Eog;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Trash;
-use Quiq::Shell;
-use Quiq::Path;
-use Quiq::Eog;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -23,6 +9,26 @@ Quiq::Eog - Operationen mit eog
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Eog;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Trash;
+use Quiq::Shell;
+use Quiq::Path;
+use Quiq::Eog;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -54,10 +60,10 @@ Liste von Bildpfaden, im Skalarkontext eine Referenz auf die Liste.
 Zeige die Bilddateien mit C<eog> an. Bilder, die in C<eog> mit C<DEL>
 gelöscht werden, landen im Trash. Nach Verlassen von C<eog> kehrt die
 Methode zurück und liefert die Liste aller Dateien im Trash. Diese
-können dann nach Wunsch verarbeitet werden.
+können dann nach Belieben verarbeitet werden.
 
 Ist der Trash bei Aufruf der Methode nicht leer, wird gefragt, ob
-die Dateien im Trash gelöscht werden sollen.
+die Dateien im Trash vorab gelöscht werden sollen.
 
 =cut
 
@@ -108,7 +114,8 @@ Zielverzeichnis.
 
 Wandele den Basisnamen der Bilddatei im Zielverzeichnis in eine Nummer.
 Die Nummer hat die Breite $width mit führenden Nullen und wird
-mit der Schrittweite $step weitergezählt.
+mit der Schrittweite $step weitergezählt. Enthält das Zielverzeichnis
+bereits Dateien, wird ab der höchsten Nummer weiter gezählt.
 
 =back
 
@@ -117,10 +124,16 @@ mit der Schrittweite $step weitergezählt.
 Zeige die Bilddateien des Quellverzeichnisses $srcDir mit C<eog>
 an. Bilder, die in C<eog> mit C<DEL> gelöscht werden, landen im
 Trash. Nach Verlassen von C<eog> werden die Bilddateien aus dem Trash
-ins Zielverzeichnis bewegt.
+ins Zielverzeichnis bewegt. Existiert das Zielverzeichnis nicht,
+wird es automatisch erzeugt.
+
+Die Methode ist so konzipiert, dass auch Dateien mit dem gleichen
+Grundnamen wie die Bilddatei mitkopiert werden (z.B. .xfc-Dateien).
+Daher arbeitet diese Methode anders als pickImages() mit genau
+einem Quellverzeichnis, nicht mit mehreren Verzeichnissen/Dateinamen.
 
 Ist der Trash bei Aufruf der Methode nicht leer, wird gefragt, ob
-die Dateien im Trash gelöscht werden sollen.
+die Dateien im Trash vorab gelöscht werden sollen.
 
 =cut
 
@@ -130,6 +143,11 @@ sub transferImages {
     my ($class,$srcDir,$destDir) = splice @_,0,3;
 
     my $p = Quiq::Path->new;
+
+    if (!-e $destDir) {
+        say "Creating directory: $destDir";
+        $p->mkdir($destDir);
+    }
 
     # Optionen
 
@@ -167,7 +185,7 @@ sub transferImages {
                 $destFile = sprintf '%s/%s',$destDir,$p->filename($srcFile);
             }
 
-            # say "$srcFile => $destFile";
+            say "$srcFile => $destFile";
             $p->rename($srcFile,$destFile);
         }
     }
@@ -179,7 +197,7 @@ sub transferImages {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

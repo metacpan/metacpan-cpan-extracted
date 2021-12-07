@@ -13,7 +13,8 @@ qx.Class.define("callbackery.ui.plugin.Form", {
     /**
      * create a page for the View Tab with the given title
      *
-     * @param vizWidget {Widget} visualization widget to embedd
+     * @param cfg {Object} plugin configuration map
+     * @param getParentFormData {Function} method to get data of parent form
      */
     construct : function(cfg,getParentFormData) {
         this.base(arguments);
@@ -30,6 +31,9 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         this._getParentFormData = getParentFormData;
         this._populate();
         this._addValidation();
+
+        qx.core.Id.getInstance().register(this, cfg.name);
+        this.setQxObjectId(cfg.name);
 
         let urlCfg = callbackery.data.Config.getInstance().getUrlConfig();
 
@@ -106,7 +110,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             var cfg = this._cfg;
             this.setLayout(new qx.ui.layout.VBox(30));
             var form = this._form = new callbackery.ui.form.Auto(
-                cfg.form,null,callbackery.ui.form.renderer.NoteForm
+                cfg.form,null,callbackery.ui.form.renderer.NoteForm,this
             );
             if (cfg['options'] && cfg.options['warnAboutUnsavedData']){
                 form.addListener('changeData',function(e){
@@ -127,8 +131,10 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     else {
                         return false;
                     }
-                }
+                },
+                this
             );
+
             this.add(action);
         },
 

@@ -1,8 +1,9 @@
-package SDL2::FFI 0.07 {
+package SDL2::FFI 0.08 {
     use lib '../lib', 'lib';
 
     # ABSTRACT: FFI Wrapper for SDL (Simple DirectMedia Layer) Development Library
-    use strictures 2;
+    use strict;
+    use warnings;
     use experimental 'signatures';
     use base 'Exporter::Tiny';
     use SDL2::Utils;
@@ -26,40 +27,43 @@ package SDL2::FFI 0.07 {
     my $platform = $^O;                            # https://perldoc.perl.org/perlport#PLATFORMS
     my $Windows  = !!( $platform eq 'MSWin32' );
     #
-    use SDL2::stdinc;
-    use SDL2::assert;                              # Enable with use var like C<use SDL2 -assert=3;>
-    use SDL2::atomic;
-    use SDL2::rwops;                               # Does not belong here?
-    use SDL2::audio;
-    use SDL2::clipboard;
-    use SDL2::cpuinfo;
-    use SDL2::error;
-    use SDL2::events;
-    use SDL2::filesystem;
-    use SDL2::gamecontroller;
-    use SDL2::haptic;
-    use SDL2::hints;
-    use SDL2::joystick;
-    use SDL2::loadso;
-    use SDL2::log;
-    use SDL2::messagebox;
-    use SDL2::metal;
-    use SDL2::mutex;
-    use SDL2::power;
-    use SDL2::render;
-    use SDL2::rwops;
-    use SDL2::sensor;
-    use SDL2::shape;
-    use SDL2::system;
-    use SDL2::thread;
-    use SDL2::timer;
-    use SDL2::version;
-    use SDL2::video;
-    use SDL2::locale;
-    use SDL2::misc;
+    load_lib('SDL2');
     #
-    use SDL2::platform;    # We bypass config.h to get platform.h
-    use SDL2::syswm;
+    require SDL2::stdinc;
+    require SDL2::assert;                          # Enable with use var like C<use SDL2 -assert=3;>
+    require SDL2::atomic;
+    require SDL2::rwops;                           # Does not belong here?
+    require SDL2::audio;
+    require SDL2::clipboard;
+    require SDL2::cpuinfo;
+    require SDL2::error;
+    require SDL2::events;
+    require SDL2::filesystem;
+    require SDL2::gamecontroller;
+    require SDL2::haptic;
+    require SDL2::hints;
+    require SDL2::joystick;
+    require SDL2::loadso;
+    require SDL2::log;
+    require SDL2::messagebox;
+    require SDL2::metal;
+    require SDL2::mutex;
+    require SDL2::power;
+    require SDL2::render;
+    require SDL2::rwops;
+    require SDL2::sensor;
+    require SDL2::shape;
+    require SDL2::system;
+    require SDL2::thread;
+    require SDL2::timer;
+    require SDL2::version;
+    require SDL2::video;
+    require SDL2::locale;
+    require SDL2::misc;
+    #
+    require SDL2::platform;    # We bypass config.h to get platform.h
+    require SDL2::syswm;
+    #
     #
     define init => [
         [ SDL_INIT_TIMER          => 0x00000001 ],
@@ -78,8 +82,6 @@ package SDL2::FFI 0.07 {
             }
         ]
     ];
-    #
-    use Data::Dump;
 
     # https://github.com/libsdl-org/SDL/blob/main/include/SDL.h
     push @{ $EXPORT_TAGS{default} }, qw[:init];
@@ -91,31 +93,33 @@ package SDL2::FFI 0.07 {
         SDL_WasInit       => [ ['uint32'] => 'uint32' ],
         SDL_Quit          => [ [] ],
         },
-        unknown => { SDL_SetMainReady => [ [] => 'void' ] },
-        bundle  => {
-        ffi_pl_bundle_init => [ [ 'string', 'int', 'opaque' ] ],
-        ffi_pl_bundle_fini => [ ['string'] ]
-        };
-    ffi_pl_bundle_init( __PACKAGE__, scalar @ARGV, @ARGV );
-    END { ffi_pl_bundle_fini(__PACKAGE__) }
-    #
+        unknown => { SDL_SetMainReady => [ [] => 'void' ] };
+
+    # bundled code testing
+    #my $holder;
+    #die;
+    if ( threads_wrapped() ) {
+        attach
+            events  => { Bundle_SDL_Yield => [ [] ] },
+            threads => {
+            Bundle_SDL_Wrap_BEGIN => [ [ 'string', 'int', 'opaque' ] ],
+            Bundle_SDL_Wrap_END   => [ ['string'] ]
+            };
+        SDL_Wrap_BEGIN( __PACKAGE__, scalar(@ARGV), \@ARGV );
+        END { SDL_Wrap_END(__PACKAGE__) if threads_wrapped() }
+    }
+    else {
+        define events => [ [ SDL_Yield => sub () {1} ], ];
+    }
+
     # Define a four character code as a Uint32
     sub SDL_FOURCC ( $A, $B, $C, $D ) {
         ( ord($A) << 0 ) | ( ord($B) << 8 ) | ( ord($C) << 16 ) | ( ord($D) << 24 );
     }
 
+    # Exts
     # TODO
     package SDL2::Mixer {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::Mixer::Mix::Chunk {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::Mixer::Mix::Fading {
         use SDL2::Utils;
         has;
     };
@@ -125,52 +129,7 @@ package SDL2::FFI 0.07 {
         has;
     };
 
-    package SDL2::Mixer::Mix::Music {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::Mixer::Chunk {
-        use SDL2::Utils;
-        has;
-    };
-
     package SDL2::Mixer::Fading {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::Mixer::MusicType {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::Mixer::Music {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::Image {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::TTF {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::TTF::Image {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::TTF::Font {
-        use SDL2::Utils;
-        has;
-    };
-
-    package SDL2::TTF::PosBuf {
         use SDL2::Utils;
         has;
     };
@@ -194,17 +153,6 @@ package SDL2::FFI 0.07 {
         use SDL2::Utils;
         has;
     };
-
-    # bundled code testing
-    #my $holder;
-    if ( threads_wrapped() ) {
-        attach
-            debug  => { Bundle_SDL_PrintEvent => [ ['SDL_Event'] ], },
-            events => { Bundle_SDL_Yield      => [ [] ], };
-    }
-    else {
-        define events => [ [ SDL_Yield => sub () {1} ] ];
-    }
 
     #warn SDL2::SDLK_UP();
     #warn SDL2::SDLK_DOWN();

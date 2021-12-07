@@ -1,3 +1,8 @@
+0.911   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Support dynamic default value via x.perl.default_value_rules.
+
+
 0.910   2021-08-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereq of Sah::SpecTest to 0.9.50 (RT#131729).

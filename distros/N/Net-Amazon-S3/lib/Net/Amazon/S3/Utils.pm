@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Utils;
 # ABSTRACT: misc utils
-$Net::Amazon::S3::Utils::VERSION = '0.98';
+$Net::Amazon::S3::Utils::VERSION = '0.99';
 sub parse_arguments {
 	my ($self, $arguments, $positional, $aliases) = @_;
 	my %args;
@@ -76,7 +76,7 @@ Net::Amazon::S3::Utils - misc utils
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

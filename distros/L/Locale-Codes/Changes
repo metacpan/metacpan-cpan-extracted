@@ -7,6 +7,9 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
+3.69  2021-12-01  sbeck
+  -  NEW CODE(s)
+
 3.68  2021-09-02  sbeck
   -  NEW CODE(s)
          NOTE: no code changes on 2021-06-01 so no release made at that
@@ -16,8 +19,8 @@ related information.
          Also code2countrys, code2languages, etc. This allows you to see all
          names and aliases that correspond to a code. My apologies for
          making 'countrys' to be the plural of 'country', but because these
-         modules are all derived, I didn't want to put in an exception for
-         the strange pluralization.
+         modules are all generated from a template, I didn't want to put in
+         an exception for the strange pluralization.
 
          Prompted by David Cantrell.
 
@@ -502,7 +505,8 @@ related information.
         Previous versions had only two semi-private routines: rename_country
         and alias_code which had the ability to modify the internal data in
         a couple of very limited ways. It was requested (in an anonymous
-        posting by someone named Steve and also by Steve Hay) that better
+        posting by someone named Steve and also by Steve Hay - unknown if
+        they are the same person or two different Steves) that better
         support for modifying internal data, so a full set of routines were
         added.
 

@@ -13,9 +13,9 @@ use File::Slurper qw(write_binary read_binary);
 use version;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-21'; # DATE
+our $DATE = '2021-11-14'; # DATE
 our $DIST = 'App-depak'; # DIST
-our $VERSION = '0.584'; # VERSION
+our $VERSION = '0.585'; # VERSION
 
 my @ALLOW_XS = qw(List::MoreUtils version::vxs);
 
@@ -430,7 +430,7 @@ my $trace_methods;
 
 $SPEC{depak} = {
     v => 1.1,
-    summary => 'Pack your dependencies onto your script file',
+    summary => 'Pack dependencies onto your script file',
     args => {
         input_file => {
             summary => 'Path to input file (script to be packed)',
@@ -890,7 +890,7 @@ require PERLANCAR::AppUtil::PerlStripper; PERLANCAR::AppUtil::PerlStripper::_add
 # END IFUNBUILT
 
 1;
-# ABSTRACT: Pack your dependencies onto your script file
+# ABSTRACT: Pack dependencies onto your script file
 
 __END__
 
@@ -900,11 +900,11 @@ __END__
 
 =head1 NAME
 
-App::depak - Pack your dependencies onto your script file
+App::depak - Pack dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.584 of App::depak (from Perl distribution App-depak), released on 2021-10-21.
+This document describes version 0.585 of App::depak (from Perl distribution App-depak), released on 2021-11-14.
 
 =head1 SYNOPSIS
 
@@ -921,7 +921,7 @@ Usage:
 
  depak(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Pack your dependencies onto your script file.
+Pack dependencies onto your script file.
 
 This function is not exported.
 

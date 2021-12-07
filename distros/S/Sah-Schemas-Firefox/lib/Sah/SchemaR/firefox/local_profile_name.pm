@@ -1,7 +1,7 @@
 package Sah::SchemaR::firefox::local_profile_name;
 
-our $DATE = '2020-06-04'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-07-19'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"standard"}],min_len=>1,summary=>"Firefox profile name","x.completion"=>"firefox_profile_name"},{examples=>[{test=>0,valid=>0,value=>""},{summary=>"Assuming the default profile name exists in local Firefox installation",test=>0,valid=>1,value=>"default"}],prefilters=>["Firefox::check_profile_name_exists"],summary=>"Firefox profile name, must exist in local Firefox installation"}],["firefox::profile_name","str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::firefox::local_profile_name - Firefox profile name, must exist in 
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::firefox::local_profile_name (from Perl distribution Sah-Schemas-Firefox), released on 2020-06-04.
+This document describes version 0.003 of Sah::SchemaR::firefox::local_profile_name (from Perl distribution Sah-Schemas-Firefox), released on 2021-07-19.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

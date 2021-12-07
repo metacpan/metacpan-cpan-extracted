@@ -4,7 +4,6 @@ LICENSE
 META.json
 README.md
 builder/custom.pm
-circle.yml
 codecov.yml
 cpanfile
 lib/Mojo/IOLoop/ReadWriteProcess.pm

@@ -10,10 +10,10 @@ cache:
   - C:\Perl\site -> appveyor.yml
 
 install:
-  - ps: . { iwr -useb https://raw.githubusercontent.com/oberth-manoeuvre/oberth-prototype/master/script/ci/appveyor-oberth.ps1 } | iex
-  - ps: appveyor-oberth install
+  - ps: . { iwr -useb https://raw.githubusercontent.com/orbital-transfer/launch-site/master/script/ci/appveyor-orbital.ps1 } | iex
+  - ps: appveyor-orbital install
 
 build_script:
-  - ps: appveyor-oberth build-script
+  - ps: appveyor-orbital build-script
 test_script:
-  - ps: appveyor-oberth test-script
+  - ps: appveyor-orbital test-script

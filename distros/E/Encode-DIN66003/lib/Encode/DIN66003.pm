@@ -1,6 +1,6 @@
 package Encode::DIN66003;
 use vars qw($VERSION);
-$VERSION = "0.04";
+$VERSION = "0.05";
 
 use Encode;
 use XSLoader;

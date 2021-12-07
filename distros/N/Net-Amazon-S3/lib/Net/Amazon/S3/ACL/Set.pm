@@ -1,6 +1,6 @@
 package Net::Amazon::S3::ACL::Set;
-# Abstract: Representation of explicit ACL
-$Net::Amazon::S3::ACL::Set::VERSION = '0.98';
+# ABSTRACT: Representation of explicit ACL
+$Net::Amazon::S3::ACL::Set::VERSION = '0.99';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
@@ -124,11 +124,11 @@ __END__
 
 =head1 NAME
 
-Net::Amazon::S3::ACL::Set
+Net::Amazon::S3::ACL::Set - Representation of explicit ACL
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -198,7 +198,7 @@ instance of C<Net::Amazon::S3::ACL::Grantee::*>.
 		Net::Amazon::S3::ACL::Grantee::Email->new ('foo@bar.baz'),
 	);
 
-=over
+=back
 
 =head1 AUTHOR
 

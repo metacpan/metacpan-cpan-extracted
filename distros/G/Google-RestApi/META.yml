@@ -58,5 +58,5 @@ requires:
   constant: '0'
 resources:
   repository: https://github.com/mvsjes2/p5-google-restapi.git
-version: '0.9'
+version: v1.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

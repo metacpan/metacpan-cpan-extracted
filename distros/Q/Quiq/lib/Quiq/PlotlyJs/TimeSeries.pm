@@ -1,15 +1,3 @@
-package Quiq::PlotlyJs::TimeSeries;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Json;
-use Quiq::Template;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -236,6 +224,24 @@ Windgeschwindigkeits-Messung)
 </script>
 
 =end html
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::PlotlyJs::TimeSeries;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Json;
+use Quiq::Template;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -631,7 +637,7 @@ sub js {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

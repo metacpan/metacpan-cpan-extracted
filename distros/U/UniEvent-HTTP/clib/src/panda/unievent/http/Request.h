@@ -49,6 +49,7 @@ struct Request : protocol::http::Request {
     static constexpr const uint16_t DEFAULT_REDIRECTION_LIMIT = 20;    // [hops]
 
     uint64_t                          timeout           = DEFAULT_TIMEOUT;
+    uint64_t                          connect_timeout   = 0; // [in ms, 0 means equal to timeout]
     bool                              follow_redirect   = true;
     bool                              tcp_nodelay       = false;
     uint16_t                          redirection_limit = DEFAULT_REDIRECTION_LIMIT;
@@ -115,6 +116,11 @@ struct Request::Builder : protocol::http::Request::BuilderImpl<Builder, RequestS
 
     Builder& timeout (uint64_t timeout) {
         _message->timeout = timeout;
+        return *this;
+    }
+
+    Builder& connect_timeout (uint64_t connect_timeout) {
+        _message->connect_timeout = connect_timeout;
         return *this;
     }
 

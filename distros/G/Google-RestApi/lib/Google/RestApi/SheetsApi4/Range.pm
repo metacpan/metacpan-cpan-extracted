@@ -79,7 +79,7 @@ package Google::RestApi::SheetsApi4::Range;
 # too complex, and the simple workaround is to just A1:B2.
 # [A1, B2]
 
-our $VERSION = '0.9';
+our $VERSION = '1.0.0';
 
 use Google::RestApi::Setup;
 
@@ -746,14 +746,10 @@ A Range object that represents a range in a remote spreadsheet. These are
 normally short-lived objects used to set up and execute a remote action.
 Keep in mind that the remote spreadsheet can be concurrently updated by
 many people, so a compromise must always be reached between holding a copy
-of the local cell values and the number of network calls to the Google
+of the local cell values versus the number of network calls to the Google
 API to keep the values current.
 
-A range can be specified in whatever way is most convenient. For cells:
-
- * A1 notation: A1
- * Hash: { col => (A|1), row => 1 }
- * Array: [ (A|1), 1 ]
+A range can be specified in whatever way is most convenient.
 
 For ranges:
 
@@ -773,31 +769,80 @@ For rows:
  * Hash: { row => 1 }
  * Array: [ <false>, 1 ]
 
-See the description and synopsis at Google::RestApi::SheetsApi4.
+For cells:
+
+ * A1 notation: A1
+ * Hash: { col => (A|1), row => 1 }
+ * Array: [ (A|1), 1 ]
+
+See the description and synopsis at L<Google::RestApi::SheetsApi4>.
+
+=head1 NAVIGATION
+
+=over
+
+=item * L<Google::RestApi::SheetsApi4>
+
+=item * L<Google::RestApi::SheetsApi4::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Range>
+
+=item * L<Google::RestApi::SheetsApi4::Range::All>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Col>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Row>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Cell>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range>
+
+=back
 
 =head1 SUBROUTINES
 
 =over
 
-=item new(worksheet => <Worksheet>, range => <Range>, dim => (col|row));
+=item new(%args);
 
 Creates a new range object for the given worksheet.
 
- worksheet: The parent Worksheet object for this range.
- range: The range for this object, either A1 notation, hash {col => x, row => x} or array [col, row].
- dim: The major dimension for this range, either 'col' or 'row', defaults to 'row'.
+%args consists of:
 
-You would not normally call this directly, you'd use Worksheet::range*
-methods to create the range object for you.
+=over
+
+=item * C<worksheet> <Worksheet>: The parent Worksheet object for this range.
+
+=item * C<range> <range>: The range for this object, either A1 notation, hash {col => x, row => x} or array [col, row].
+
+=item * C<dim> <col|row>: The major dimension for this range, either 'col' or 'row', defaults to 'row'.
+
+=back
+
+You would not normally call this directly, you'd use Worksheet::range* methods to create the range object for you. It is recommended and safer to use
+the Worksheet's methods to create ranges.
 
 =item api(%args);
 
-Calls the parent worksheet's 'api' routine with the range added into
-the URI or content appropriately.
+Calls the parent Worksheet's 'api' routine with the range added into the URI or content appropriately. This then get's passed to the
+Spreadsheet's C<api> routine where the spreadsheet ID is tacked on to the URI. This then gets passed to the SheetsApi4's C<api>
+routine where the Sheets endpoint is tacked on to the URI. This then gets passed to RestApi's api routine for actual execution.
 
-You would not normally call this directly unless you were
-making a Google API call not currently supported by this API
-framework.
+You would not normally call this directly unless you were making a Google API call not currently supported by this API framework.
 
 =item clear();
 
@@ -805,7 +850,7 @@ Clears the values using Google API's 'A1:clear' call.
 
 =item refresh_values();
 
-Immediately refreshes the values from the spreadsheet.
+Immediately refreshes and returns the values from the spreadsheet.
 
 =item values(values => <arrayref>, %args);
 
@@ -814,7 +859,7 @@ Immediately gets or sets the values using Google API's 'get' or 'update'.
  values: The array ref of cells to update.
 
 'args' are passed to the SheetsApi4's 'api' routine so you may add
-extra arguments to the 'params' or 'content' as necessary.
+extra arguments to the 'params' (such as C<valueInputOption>) or 'content' as necessary.
 
 =item batch_values(values => <arrayref>);
 
@@ -859,7 +904,8 @@ will always return a double cell notations: [{col => 1, row => 1}, {col => 1, ro
 
 =item range_to_array();
 
-Returns the array representation for this range (e.g. [1, 1]).
+Returns the array representation for this range (e.g. [1, 1]). Passing $RANGE_EXPANDED
+will always return a double cell notations: [[ 1, 1 ], [ 1, 1]].
 
 =item range_to_index();
 
@@ -875,12 +921,12 @@ insert requests etc. You would not normally need to call this yourself.
 
 Returns a new range object offset from this range.
 
- col: Optional offset of the new range by this many columns.
- row: Optional offset of the new range by this many rows.
- top: Optional offset of the new range with the new top.
- left: Optional offset of the new range with the new left.
- bottom: Optional offset of the new range with the new bottom.
- right: Optional offset of the new range with the new right.
+ col: Optionally offset the new range by this many columns.
+ row: Optionally offset the new range by this many rows.
+ top: Optionally offset the new range with the new top.
+ left: Optionally offset the new range with the new left.
+ bottom: Optionally offset the new range with the new bottom.
+ right: Optionally offset the new range with the new right.
 
 =item offsets(range<Range>);
 
@@ -920,7 +966,7 @@ grid between ranges.
 
 =item dimension();
 
-Returns this range's major dimension.
+Returns this range's major dimension (col|row).
 
 =item has_values();
 
@@ -961,6 +1007,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019, Robin Murray. All rights reserved.
+Copyright (c) 2021, Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

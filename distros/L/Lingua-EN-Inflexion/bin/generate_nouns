@@ -112,7 +112,7 @@ while (my $line = readline $noun_data_fh) {
 
         push @{$singular_of{pattern}},
                 { build_recursive({from=>$pl2,  to => $sing, from_type=>'classical_plural', to_type=>'singular'}),        tag => $tag, };
-        
+
         redo if grep { defined && s/-/ /g } $sing, $pl1, $pl2;
         $is_pure_generic = 1;
     }}
@@ -241,7 +241,7 @@ say '1;';
     say 'use Test::More;';
     say 'use Lingua::EN::Inflexion;';
     say '';
-    
+
     for my $plural (keys %plural_word) {
         say "ok noun(q{$plural})->is_plural  => q{is_plural: '$plural'};";
     }
@@ -357,10 +357,10 @@ sub emit_recognizer {
     say '    my ($word) = @_;';
     say "    return 1 if exists \$is_${name}\->{\$word};";
     say "    return 1 if exists \$is_${name}\->{lc \$word};";
-    say "    return 1 if exists \$is_${name}\->{ucfirst lc \$word};";
+    say "    return 1 if exists \$is_${name}\->{tc \$word};";
     say "    return 0 if exists \$is_${compl_name}\->{\$word};";
     say "    return 0 if exists \$is_${compl_name}\->{lc \$word};";
-    say "    return 0 if exists \$is_${compl_name}\->{ucfirst lc \$word};";
+    say "    return 0 if exists \$is_${compl_name}\->{tc \$word};";
     say '    given ($word) {';
     say "        when (m{'\$})  { return $final_apost{$name} }";
     say "        when (m{'s\$}) { return $final_apost_s{$name} }";
@@ -409,12 +409,14 @@ sub build_recursive {
         }
         elsif ($+{sing}) {
             push @replacements, "\${is_singular($cap_var) ? \\convert_to_${to_type}($cap_var) : \\$cap_var}";
-            $conditional = "continue if !is_singular($cap_var);";
+#            $conditional = "continue if !is_singular($cap_var);";
+            $conditional = "return is_singular($cap_var);";
             q{(.*?)};
         }
         elsif ($+{plur}) {
             push @replacements, "\${is_plural($cap_var) ? \\convert_to_${to_type}($cap_var) : \\$cap_var}";
-            $conditional = "continue if !is_plural($cap_var);";
+#            $conditional = "continue if !is_plural($cap_var);";
+            $conditional = "return is_plural($cap_var);";
             q{(.*?)};
         }
         elsif ($+{prep}) {

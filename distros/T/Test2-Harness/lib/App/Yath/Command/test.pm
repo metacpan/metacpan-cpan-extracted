@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000082';
+our $VERSION = '1.000086';
 
 use App::Yath::Options;
 
@@ -721,6 +721,12 @@ sub start_collector {
     my ($rh, $wh);
     pipe($rh, $wh) or die "Could not create pipe";
 
+    my %options = (show_runner_output => 1);
+    if ($settings->check_prefix('display')) {
+        $options{show_runner_output}     = $settings->display->hide_runner_output ? 0 : 1;
+        $options{truncate_runner_output} = $settings->display->truncate_runner_output;
+    }
+
     my $ipc = $self->ipc;
     $ipc->spawn(
         stdout      => $self->collector_writer,
@@ -732,7 +738,7 @@ sub start_collector {
             '--no-scan-plugins',    # Do not preload any plugin modules
             collector => 'Test2::Harness::Collector',
             $dir, $run->run_id, $runner_pid,
-            show_runner_output => 1,
+            %options,
         ],
     );
 
@@ -1150,6 +1156,13 @@ Create a json or jsonl file of all coverage data seen during the run (This impli
 Turn color on, default is true if STDOUT is a TTY.
 
 
+=item --hide-runner-output
+
+=item --no-hide-runner-output
+
+Hide output from the runner, showing only test output. (See Also truncate_runner_output)
+
+
 =item --no-wrap
 
 =item --no-no-wrap
@@ -1210,6 +1223,13 @@ Show the timing data for each job
 =item --no-term-width
 
 Alternative to setting $TABLE_TERM_SIZE. Setting this will override the terminal width detection to the number of characters specified.
+
+
+=item --truncate-runner-output
+
+=item --no-truncate-runner-output
+
+Only show runner output that was generated after the current command. This is only useful with a persistent runner.
 
 
 =item --verbose

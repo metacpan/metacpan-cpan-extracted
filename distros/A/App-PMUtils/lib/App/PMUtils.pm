@@ -6,18 +6,23 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-27'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.736'; # VERSION
+our $VERSION = '0.737'; # VERSION
 
 our %SPEC;
 
 our $arg_module_multiple = {
     #schema => ['perl::modnames*', min_len=>1], # XXX Perinci::Sub::GetArgs::Argv can't yet handle case for greedy=1 and when 'array' is not specified explicitly
-    schema => ['array*', of=>['perl::modname*'], min_len=>1],
-    req    => 1,
+    schema => ['array*', {
+        of=>['perl::modname*'],
+        min_len=>1,
+        'x.perl.default_value_rules' => ["Perl::these_mods"],
+    }],
+    'x.perinci.cmdline.default_from_schema' => 1,
+    #req    => 1,
     pos    => 0,
-    greedy => 1,
+    slurpy => 1,
     element_completion => sub {
         require Complete::Module;
         my %args = @_;
@@ -26,8 +31,11 @@ our $arg_module_multiple = {
 };
 
 our $arg_module_single = {
-    schema => 'perl::modname*',
-    req    => 1,
+    schema => ['perl::modname*', {
+        'x.perl.default_value_rules' => ["Perl::this_mod"],
+    }],
+    'x.perinci.cmdline.default_from_schema' => 1,
+    #req    => 1,
     pos    => 0,
     completion => sub {
         require Complete::Module;
@@ -274,7 +282,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.736 of App::PMUtils (from Perl distribution App-PMUtils), released on 2021-08-27.
+This document describes version 0.737 of App::PMUtils (from Perl distribution App-PMUtils), released on 2021-12-01.
 
 =head1 SYNOPSIS
 
@@ -362,7 +370,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<module>* => I<array[perl::modname]>
+=item * B<module> => I<array[perl::modname]>
 
 
 =back
@@ -405,7 +413,7 @@ Arguments ('*' denotes required arguments):
 
 Absolutify each path.
 
-=item * B<module>* => I<array[perl::modname]>
+=item * B<module> => I<array[perl::modname]>
 
 =item * B<pm> => I<int> (default: 1)
 
@@ -462,7 +470,7 @@ shell:
 
 and it won't change directory if the module doesn't exist.
 
-=item * B<module>* => I<array[perl::modname]>
+=item * B<module> => I<array[perl::modname]>
 
 =item * B<pm> => I<int> (default: 1)
 
@@ -509,7 +517,7 @@ Arguments ('*' denotes required arguments):
 
 Get all found files for each module instead of the first one.
 
-=item * B<module>* => I<array[perl::modname]>
+=item * B<module> => I<array[perl::modname]>
 
 =item * B<pm> => I<int> (default: 1)
 
@@ -622,9 +630,9 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTOR
 
-=for stopwords Steven Haryanto (on PC, Bandung)
+=for stopwords Steven Haryanto
 
-Steven Haryanto (on PC, Bandung) <stevenharyanto@gmail.com>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 CONTRIBUTING
 

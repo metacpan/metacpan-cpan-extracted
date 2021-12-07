@@ -1,0 +1,15 @@
+=head1 NAME
+
+Exception::Backtrace::PerlFrame - Perl Frame Information
+
+=head1 DESCRIPTION
+
+The Perl stack frame; it is the specialization of  L<Exception::Backtrace::Stackframe>.
+
+=head1 METHODS
+
+=head2 args()
+
+Returns an string representation of arguments of the current frame.
+
+=cut

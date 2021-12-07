@@ -22,27 +22,27 @@ name: Object-Pad
 provides:
   Object::Pad:
     file: lib/Object/Pad.pm
-    version: '0.57'
+    version: '0.58'
   Object::Pad::ExtensionBuilder:
     file: lib/Object/Pad/ExtensionBuilder.pm
-    version: '0.57'
+    version: '0.58'
   Object::Pad::MOP::Class:
     file: lib/Object/Pad/MOP/Class.pm
-    version: '0.57'
+    version: '0.58'
   Object::Pad::MOP::Method:
     file: lib/Object/Pad/MOP/Method.pm
-    version: '0.57'
+    version: '0.58'
   Object::Pad::MOP::Slot:
     file: lib/Object/Pad/MOP/Slot.pm
-    version: '0.57'
+    version: '0.58'
   Object::Pad::MOP::SlotAttr:
     file: lib/Object/Pad/MOP/SlotAttr.pm
-    version: '0.57'
+    version: '0.58'
 requires:
   XS::Parse::Keyword: '0.19'
   XS::Parse::Sublike: '0.13'
   perl: '5.018'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.57'
+version: '0.58'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

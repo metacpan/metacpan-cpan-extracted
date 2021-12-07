@@ -1,4 +1,4 @@
-# Only used to define the version of the module.
+# Only used to define the version of the module and the core documentation.
 
 package DataStructure;
 
@@ -7,7 +7,7 @@ use warnings;
 use utf8;
 use feature ':5.24';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =pod
 
@@ -22,14 +22,69 @@ Collection of useful data-structures in pure Perl.
 =head1 DESCRIPTION
 
 This package is only here to define a common version for all the data-structure
-is this distribution. Please refer to the documentation of the individual
-data-structure for more details.
+in this distribution and to contain the core documentation. Please refer to the
+documentation of the individual data-structure for more details.
+
+=head1 DATA-STRUCTURE IMPLEMENTATIONS
+
+These classes are actual implementations of data-structure. You should use them
+to create objects but, in general, you should then only expect object of a
+particular role (see below).
 
 =over 4
 
 =item L<DataStructure::DoubleList>
 
 =item L<DataStructure::LinkedList>
+
+=back
+
+Note that you should never directly test the
+
+=head1 ROLES
+
+Roles, or data-structure interfaces, are
+
+In DataStructure, the role are only implemented using normal Perl classes
+inheritence. So you can test that an object has a particular role with
+C<$obj->DOES('DataStructure::RoleName')> (you should use C<DOES> and not C<isa>
+as the library might use another system in the future).
+
+=over 4
+
+=item DataStructure::Queue
+
+Implemented by L<DataStructure::LinkedList> and L<DataStructure::DoubleList>
+
+Has the following methods C<shift()>, C<push($value)>, C<values()>, C<empty()>,
+C<size()>.
+
+Nodes have the following methods: C<value()>.
+
+Synonym: C<DataStructure::FIFO>.
+
+=item DataStructure::Stack
+
+Implemented by L<DataStructure::LinkedList> (with the C<reverse> option) and
+L<DataStructure::DoubleList>.
+
+Has the following methods C<first()>, C<push($value)>, C<pop()>, C<values()>,
+C<empty()>, C<size()>.
+
+Nodes have the following methods: C<value()>, C<insert_after($value)>, C<next()>.
+
+Note that, without the C<reverse> option a L<DataStructure::LinkedList> can also
+behave like a stack but you would need to use the less common C<shift> and
+C<unshift> pair of methods. In that case, it will not have the C<Stack> role.
+
+Synonym: C<DataStructure::LIFO>.
+
+=item DataStructure::OrderedSet
+
+Implemented by L<DataStructure::BTree>
+
+Has the following methods C<insert($value)>, C<find($value)>,
+C<delete($value | $node)>, C<values()>, C<empty()>, C<size()>.
 
 =back
 

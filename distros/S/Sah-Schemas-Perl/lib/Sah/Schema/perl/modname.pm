@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-05'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.040'; # VERSION
+our $VERSION = '0.042'; # VERSION
 
 use Regexp::Pattern::Perl::Module ();
 
@@ -70,7 +70,7 @@ Sah::Schema::perl::modname - Perl module name, e.g. Foo::Bar
 
 =head1 VERSION
 
-This document describes version 0.040 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2021-10-05.
+This document describes version 0.042 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2021-12-01.
 
 =head1 SYNOPSIS
 

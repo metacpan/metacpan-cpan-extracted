@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.084';
+our $VERSION = '1.085';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -800,7 +800,7 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.084
+version 1.085
 
 =head1 SYNOPSIS
 

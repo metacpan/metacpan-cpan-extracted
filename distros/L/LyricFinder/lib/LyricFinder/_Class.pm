@@ -7,7 +7,7 @@ use HTTP::Request;
 use HTML::Strip;
 use Carp;
 
-our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0";
+our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0";
 our $DEBUG = 0; # If you want debug messages, set debug to a true value, and
 				# messages will be output with warn.
 

@@ -1,6 +1,13 @@
+0.003   2021-08-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add description about notation.
+
+
 0.002   2020-06-07  Released-By: PERLANCAR; Urgency: high
 
-	- Bump prereq Color::RGB::Util -> 0.600.
+	- [bugfix] Bump prereq Color::RGB::Util -> 0.600.
 
 
 0.001   2020-06-07  Released-By: PERLANCAR

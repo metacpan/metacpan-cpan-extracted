@@ -18,22 +18,21 @@ ETL::Pipeline::Output::Perl - Execute arbitrary Perl code against every record
 B<ETL::Pipeline::Output::Perl> runs arbitrary Perl code for every record. It
 comes in useful when debugging data issues or prototyping a new technique.
 
-B<ETL::Pipeline::Output::Perl> stores the record in a hash (see L</current>).
-The class passes that hash reference into your subroutine.
+Your code receives two parameters - the L<ETL::Pipeline> object and the current
+record. These are the same arguments passed to L</write>. The current record is
+a Perl hash reference.
 
 =cut
 
 package ETL::Pipeline::Output::Perl;
-use Moose;
 
-use 5.14.0;
+use 5.014000;
 use warnings;
 
-use Carp;
-use String::Util qw/hascontent/;
+use Moose;
 
 
-our $VERSION = '2.00';
+our $VERSION = '3.00';
 
 
 =head1 METHODS & ATTRIBUTES
@@ -42,17 +41,12 @@ our $VERSION = '2.00';
 
 =head3 code
 
-Assign this attribute your code reference. Your code receives two parameters.
-The first one is the L<ETL::Pipeline> object. The second is the hash reference
-with the data record.
+Required. Assign a code reference to this attribute. The code receives two
+parameters. The first one is the L<ETL::Pipeline> object. The second is a hash
+reference with the current record.
 
-The code reference can do anything. It should return a boolean. B<True> means
-success and B<false> means failure. You determine what I<success> or I<failure>
-really means.
-
-B<WARNING:> Do not save the hash reference. Make a copy of the hash instead.
-B<ETL::Pipeline::Output::Perl> re-uses the same hash reference. The second
-record will overwrite the first, etc.
+The code reference can do anything you want. If you need setup or shut down,
+then create a L<custom output destination|ETL::Pipeline::Output> instead.
 
 =cut
 
@@ -62,71 +56,52 @@ has 'code' => (
 	required => 1,
 );
 
+=head2 Methods
 
-=head2 Called from L<ETL::Pipeline/process>
+=head3 close
 
-=head3 write_record
-
-Passes the subroutine in L</code> to L<ETL::Pipeline/execute_code_ref>.
-L</current> is passed to the subroutine as a parameter.
+This method doesn't do anything. There's nothing to close or shut down.
 
 =cut
 
-sub write_record {
-	my $self = shift;
-	return $self->pipeline->execute_code_ref( $self->code, $self->current );
-}
+sub close {}
 
 
-=head3 configure
+=head3 open
 
-B<configure> doesn't actually do anything. But it is required by
-L<ETL::Pipeline/process>.
+This method doesn't do anything. There's nothing to open or setup.
 
 =cut
 
-sub configure {}
+sub open {}
 
 
-=head3 finish
+=head3 write
 
-B<finish> doesn't actually do anything. But it is required by
-L<ETL::Pipeline/process>.
-
-=cut
-
-sub finish {}
-
-
-=head2 Other methods and attributes
-
-=head3 default_fields
-
-Initialize L</current> for the next record.
+Executes the subroutine in L</code>. The arguments are passed directly into the
+subroutine.
 
 =cut
 
-sub default_fields { () }
+sub write { return shift->code->( @_ ); }
 
 
 =head1 SEE ALSO
 
-L<ETL::Pipeline>, L<ETL::Pipeline::Output>, 
-L<ETL::Pipeline::Output::Storage::Hash>
+L<ETL::Pipeline>, L<ETL::Pipeline::Output>
 
 =cut
 
-with 'ETL::Pipeline::Output::Storage::Hash';
 with 'ETL::Pipeline::Output';
 
 
 =head1 AUTHOR
 
-Robert Wohlfarth <robert.j.wohlfarth@vanderbilt.edu>
+Robert Wohlfarth <robert.j.wohlfarth@vumc.org>
 
 =head1 LICENSE
 
-Copyright 2016 (c) Vanderbilt University
+Copyright 2021 (c) Vanderbilt University
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

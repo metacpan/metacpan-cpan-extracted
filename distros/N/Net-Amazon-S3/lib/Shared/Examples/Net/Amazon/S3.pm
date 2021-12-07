@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::VERSION = '0.98';
+$Shared::Examples::Net::Amazon::S3::VERSION = '0.99';
 use strict;
 use warnings;
 
@@ -192,6 +192,7 @@ sub _with_keys {
 sub _keys_operation () {
 	return (
 		qw[ -shared_examples ],
+		qw[ -method ],
 		qw[ with_s3 ],
 		qw[ with_client ],
 		qw[ shared_examples ],
@@ -417,6 +418,7 @@ _generate_operation_expectation object_delete =>
 	;
 
 _generate_operation_expectation object_fetch =>
+	qw[ range ],
 	;
 
 _generate_operation_expectation object_head =>
@@ -453,7 +455,7 @@ Shared::Examples::Net::Amazon::S3 - used for testing and as example
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@
       "Zakariyya Mughal <zmughal@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,6 +13,16 @@
       "version" : 2
    },
    "name" : "Alien-MuPDF",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -57,20 +67,20 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/project-renard/p5-Alien-MuPDF",
+      "homepage" : "https://github.com/Intertangle/p5-Alien-MuPDF",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/project-renard/p5-Alien-MuPDF.git",
-         "web" : "https://github.com/project-renard/p5-Alien-MuPDF"
+         "url" : "https://github.com/Intertangle/p5-Alien-MuPDF.git",
+         "web" : "https://github.com/Intertangle/p5-Alien-MuPDF"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
             "Alien::gmake" : "0.14",
-            "Alien::patch" : "0.09",
+            "Alien::patch" : "0.08",
             "Archive::Tar" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
@@ -87,7 +97,7 @@
       }
    },
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.14",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,12 +1,3 @@
-package Quiq::Gnuplot::Arrow;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -23,6 +14,21 @@ L<Quiq::Hash>
 
 Ein Objekt der Klasse repräsentiert einen Arrow, also eine Linie
 zwischen zwei Punkten mit optionaler Dekoration.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gnuplot::Arrow;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -59,7 +65,7 @@ sub new {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

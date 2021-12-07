@@ -1,15 +1,3 @@
-package Quiq::LockedContent;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Path;
-use Quiq::FileHandle;
-
 # -----------------------------------------------------------------------------
 
 =head1 NAME
@@ -35,6 +23,24 @@ Die Klasse realisiert einen persisteten Inhalt mit Exklusiv-Lock.
 Der Inhalt kann gelesen und geschrieben werden. Die Datei wird
 gelockt. Der Lock wird bis zur Destrukturierung des Objekts
 gehalten.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::LockedContent;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Path;
+use Quiq::FileHandle;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -163,7 +169,7 @@ sub write {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

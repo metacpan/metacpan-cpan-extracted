@@ -28,10 +28,18 @@ if ($command =~ /^v(ersion)?$/) {
     closedir(DIR);
 
 } elsif ($command =~ /^i(nstall)?$/) {
-    
-    say "Installing latest release of Pandoc...";
-    my $pandoc = Pandoc::Release::latest->download;
-    $pandoc->symlink( verbose => 1 );
+    my $pandoc;
+
+    $version = Pandoc::Version->new($args[1]) if $args[1];
+    if ($version) {
+        say "Installing release $version of Pandoc...";
+        $pandoc = Pandoc::Release->get($version);
+    } else {
+        say "Installing latest release of Pandoc...";
+        $pandoc = Pandoc::Release->latest;
+    }
+
+    $pandoc->download->symlink( verbose => 1 );
 
 } elsif ($command =~ /^u(se)?$/) {
     $version //= eval { Pandoc::Version->new($args[1]) } 
@@ -61,7 +69,7 @@ pandoc-version [-v|--verbose] [command] [version]
    v|version      show current version
    l|list         list installed versions
    u|use          switch version
-   i|nstall       install latest release version
+   i|nstall       install latest or specified release
    h|help         show help
 
 =head1 DESCRIPTION

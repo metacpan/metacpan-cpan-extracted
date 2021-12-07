@@ -10,6 +10,7 @@ BEGIN
     use DateTime;
     use DateTime::Format::Strptime;
     use Module::Generic::HeaderValue;
+    our $CRYPTX_REQUIRED_VERSION = '0.074';
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -138,7 +139,7 @@ subtest 'encrypted cookie' => sub
 {
     SKIP:
     {
-        eval( "use Crypt::Cipher" );
+        eval( "use Crypt::Cipher ${CRYPTX_REQUIRED_VERSION}" );
         my $algos = [qw( AES Anubis Blowfish CAST5 Camellia DES DES_EDE KASUMI Khazad MULTI2 Noekeon RC2 RC5 RC6 SAFERP SAFER_K128 SAFER_K64 SAFER_SK128 SAFER_SK64 SEED Skipjack Twofish XTEA IDEA Serpent )];
         if( $@ )
         {

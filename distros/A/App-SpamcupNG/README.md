@@ -8,7 +8,7 @@ introducing forced delays to not overwhelm SpamCop.net website. All reports are 
 
 App-SpamcupNG is a fork from the original Spamcup project.
 
-Spamcup is copyright (C) Toni Willberg <toniw@iki.fi>.
+Spamcup is copyright (C) Toni Willberg.
 
 ## INTRO
 

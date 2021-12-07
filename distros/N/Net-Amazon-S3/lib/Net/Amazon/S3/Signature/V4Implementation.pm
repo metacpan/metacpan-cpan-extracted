@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature::V4Implementation;
 # ABSTRACT: Implements the Amazon Web Services signature version 4, AWS4-HMAC-SHA256 (copy of Net::Amazon::Signature::V4)
-$Net::Amazon::S3::Signature::V4Implementation::VERSION = '0.98';
+$Net::Amazon::S3::Signature::V4Implementation::VERSION = '0.99';
 
 use strict;
 use warnings;
@@ -313,7 +313,7 @@ Net::Amazon::S3::Signature::V4Implementation - Implements the Amazon Web Service
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

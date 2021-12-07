@@ -68,13 +68,14 @@ sub format
                 # $self->message( 3, "New formatter provided for our class '", $self->class, "' called from package $p at line $l in file $f to set indent from '", $self->format->indent->scalar, "' to '", $clone->indent->scalar, "'." );
                 $clone->copy_parameters_from( $self->format );
             }
-            $format = $self->_set_get_object( 'format', 'CSS::Object::Format', $clone ) || return;
+            $format = $self->_set_get_object( 'format', 'CSS::Object::Format', $clone ) || 
+                return( $self->pass_error );
             # die( "Provided value (", overload::StrVal( $val ), " and stored value (", overload::StrVal( $format ), ") are the same. It should have been cloned.\n" ) if( overload::StrVal( $val ) eq overload::StrVal( $format ) );
         }
         ## format as a class name
         elsif( !ref( $val ) && CORE::index( $val, '::' ) != -1 )
         {
-            $self->_load_class( $val ) || return;
+            $self->_load_class( $val ) || return( $self->pass_error );
             $format = $val->new( debug => $self->debug ) || return( $self->pass_error( $val->error ) );
             $self->_set_get_object( 'format', 'CSS::Object::Format', $format );
         }

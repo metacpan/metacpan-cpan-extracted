@@ -11,7 +11,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Graphite/Simple.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     MIN_PERL_VERSION  => 5.026001,
     PREREQ_PM         => {
-        'XSLoader'        =>  0,
+        'XSLoader'        =>  0.27,
         'Test::More'      => '1.302183',
         'Test::Deep'      => '1.130',
         'Test::LeakTrace' => '0.14',

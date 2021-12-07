@@ -1,6 +1,7 @@
 use warnings;
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 7;
+use Test::Exception;
 use App::SpamcupNG qw(TARGET_HTML_FORM);
 use App::SpamcupNG::HTMLParse qw(find_best_contacts);
 use Log::Log4perl qw(:easy);
@@ -32,4 +33,6 @@ is_deeply(
     [qw(abuse@ovh.net noc@ovh.net)],
     'It has the expected best contacts'
 );
+throws_ok { find_best_contacts('foobar') } qr/scalar\sreference/,
+    'find_best_contacts dies with invalid parameter';
 

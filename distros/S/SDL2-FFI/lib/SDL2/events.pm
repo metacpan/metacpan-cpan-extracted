@@ -1,4 +1,6 @@
 package SDL2::events 0.01 {
+    use strict;
+    use warnings;
     use SDL2::Utils;
     use experimental 'signatures';
     #
@@ -96,7 +98,7 @@ package SDL2::events 0.01 {
         # and should be allocated with SDL_RegisterEvents()
         [ SDL_USEREVENT => 0x8000 ],
 
-        # This last event is only  for bounding internal arrays
+        # This last event is only for bounding internal arrays
         [ SDL_LASTEVENT => 0xFFFF ]
     ];
 
@@ -157,9 +159,18 @@ package SDL2::events 0.01 {
             type      => 'uint32',
             timestamp => 'uint32',
             windowId  => 'uint32',
-            text      => 'char[' . SDL2::FFI::SDL_TEXTEDITINGEVENT_TEXT_SIZE() . ']',
+            _text     => 'char[' . SDL2::FFI::SDL_TEXTEDITINGEVENT_TEXT_SIZE() . ']',
             start     => 'sint32',
             length    => 'sint32';
+
+        sub text ($s) {
+            my $txt = '';
+            for my $chr ( @{ $s->_text } ) {
+                last if $chr == 0;
+                $txt .= chr $chr;
+            }
+            $txt;
+        }
     };
     define events => [ [ SDL_TEXTINPUTEVENT_TEXT_SIZE => 32 ] ];
 
@@ -169,7 +180,16 @@ package SDL2::events 0.01 {
             type      => 'uint32',
             timestamp => 'uint32',
             windowId  => 'uint32',
-            text      => 'char[' . SDL2::FFI::SDL_TEXTINPUTEVENT_TEXT_SIZE() . ']';
+            _text     => 'char[' . SDL2::FFI::SDL_TEXTINPUTEVENT_TEXT_SIZE() . ']';
+
+        sub text ($s) {
+            my $txt = '';
+            for my $chr ( @{ $s->_text } ) {
+                last if $chr == 0;
+                $txt .= chr $chr;
+            }
+            $txt;
+        }
     };
 
     package SDL2::MouseMotionEvent {
@@ -480,7 +500,10 @@ package SDL2::events 0.01 {
     attach events        => {
         SDL_PeepEvents => [
             [ 'SDL_Event', 'int', 'SDL_eventaction', 'uint32', 'uint32' ] => 'int' =>
-                sub ( $inner, @etc ) { SDL2::FFI::SDL_Yield(); $inner->(@etc) }
+                sub ( $inner, $events, $numevents, $action, $minType, $maxType ) {
+                SDL2::FFI::SDL_Yield();
+                $inner->( $events, $numevents, $action, $minType, $maxType );
+            }
         ],
         SDL_HasEvent => [
             ['uint32'] => 'bool' => sub ( $inner, @etc ) { SDL2::FFI::SDL_Yield(); $inner->(@etc) }

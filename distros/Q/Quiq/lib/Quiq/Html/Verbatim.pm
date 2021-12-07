@@ -1,14 +1,3 @@
-package Quiq::Html::Verbatim;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Html::Table::Simple;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -123,6 +112,23 @@ wird kein Verbatim-Block erzeugt, d.h. die Methode $obj->html()
 liefert einen Leerstring.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Verbatim;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Html::Table::Simple;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -291,7 +297,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

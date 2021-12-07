@@ -1,7 +1,7 @@
 #include "test.h"
 #include <panda/endian.h>
 
-#define TEST(name) TEST_CASE("endian: " name, "[endian]")
+TEST_PREFIX("endian: ", "[endian]");
 
 TEST("basic") {
     auto r1 = h2be16(999);

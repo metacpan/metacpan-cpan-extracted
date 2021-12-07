@@ -1,17 +1,3 @@
-package Quiq::Terminal;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Quiq::FileHandle;
-use Time::HiRes ();
-use Term::ANSIColor ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -23,6 +9,26 @@ Quiq::Terminal - Ein- und Ausgabe aufs Terminal
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Terminal;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Quiq::FileHandle;
+use Time::HiRes ();
+use Term::ANSIColor ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -193,8 +199,14 @@ sub askUser {
         for my $val (split m|[/,]|,$values) {
             my $text = $val;
             if ($val =~ /\((.+)\)/) {
+                # (y)es,(a)bort
                 $val = $1;
                 $text = sprintf '%s(%s%s%s)%s',$`,$color,$val,$reset,$';
+            }
+            elsif ($val =~ /^(.*?)=(.*)/) {
+                # y=yes,a=abort
+                $val = $1;
+                $text = sprintf '%s%s%s=%s',$color,$val,$reset,$2;
             }
             push @values,$val;
 
@@ -332,7 +344,7 @@ sub ansiEsc {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

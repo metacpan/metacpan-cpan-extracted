@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object.pm
-## Version v0.1.3
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.1.5
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/24
-## Modified 2020/08/12
+## Modified 2021/11/28
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package CSS::Object;
 BEGIN
@@ -25,7 +28,7 @@ BEGIN
     use CSS::Object::Value;
     use Want ();
     use Devel::Confess;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.5';
 };
 
 sub init
@@ -34,7 +37,7 @@ sub init
     $self->{parser}     = 'CSS::Object::Parser::Default';
     $self->{format}     = '';
     $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ );
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     # $self->message( 3, "Formatter class set: '", ref( $self->format ), "'." );
     unless( $self->_is_a( $self->{format}, 'CSS::Object::Format' ) )
     {
@@ -47,7 +50,7 @@ sub init
     return( $self );
 }
 
-## Add comment at the top level. To add comment inside a rule, see add_element in CSS::Object::Rule
+# Add comment at the top level. To add comment inside a rule, see add_element in CSS::Object::Rule
 sub add_element
 {
 	my $self = shift( @_ );
@@ -65,12 +68,12 @@ sub add_rule
 {
     my $self = shift( @_ );
     my $rule = shift( @_ );
-    # $self->message( 3, "CSS rule provided to add to our stack of elements: '", overload::StrVal( $rule ), "'." );
+    $self->message( 4, "CSS rule provided to add to our stack of elements: '", overload::StrVal( $rule ), "'." );
     return( $self->error( "No rule object was provided to add." ) ) if( !defined( $rule ) );
     return( $self->error( "Object provided is not a CSS::Object::Rule object." ) ) if( !$self->_is_a( $rule, 'CSS::Object::Rule' ) );
     # $self->rules->push( $rule );
     $self->elements->push( $rule );
-    ## $self->message( 3, "Returning rule objected added: '", overload::StrVal( $rule ), "'." );
+    $self->message( 4, "Returning rule object added: '", overload::StrVal( $rule ), "'. Now we have ", $self->elements->length, " rules stored." );
     return( $rule );
 }
 
@@ -111,8 +114,8 @@ sub builder
 
 sub charset { return( shift->_set_get_scalar_as_object( 'charset', @_ ) ); }
 
-## Array of CSS::Object::Element objects or their sub classes
-sub elements { return( shift->_set_get_array_as_object( 'elements', @_ ) ); }
+# Array of CSS::Object::Element objects or their sub classes
+sub elements { return( shift->_set_get_object_array_object( 'elements', 'CSS::Object::Element', @_ ) ); }
 
 sub format
 {
@@ -123,12 +126,12 @@ sub format
         my $format;
         if( ref( $val ) )
         {
-            $format = $self->_set_get_object( 'format', 'CSS::Object::Format', $val ) || return;
+            $format = $self->_set_get_object( 'format', 'CSS::Object::Format', $val ) || return( $self->pass_error );
         }
-        ## Formatter as a class name
+        # Formatter as a class name
         elsif( !ref( $val ) && CORE::index( $val, '::' ) != -1 )
         {
-            $self->_load_class( $val ) || return;
+            $self->_load_class( $val ) || return( $self->pass_error );
             $format = $val->new( debug => $self->debug ) || return( $self->pass_error( $val->error ) );
             $self->_set_get_object( 'format', 'CSS::Object::Format', $format );
         }
@@ -136,9 +139,10 @@ sub format
         {
             return( $self->error( "Unknown format \"$val\". I do not know what to do with it." ) );
         }
-        # $self->message( 3, "New formatter set: '$format'." );
+        $self->messagef( 3, "Setting new formatter '$format' for %d elements -> %s", $self->elements->length, sub{ $self->elements->join( "', '" )} );
         $self->elements->foreach(sub
         {
+            return(1) if( !$self->_is_object( $_[0] ) );
             shift->format( $format ) || return;
         });
         return( $format );
@@ -269,7 +273,7 @@ sub parse_string
     $string =~ s|<!--||g;
     $string =~ s|-->||g;
     
-    my $parser = $self->load_parser || return;
+    my $parser = $self->load_parser || return( $self->pass_error );
     my $elems = $parser->parse_string( $string ) || return( $self->pass_error( $parser->error ) );
     $self->messagef( 3, "Parser returned %d elements.", $elems->length );
     $self->messagef( 3, "First element is of class \"", ref( $elems->first ), "\"." );
@@ -304,7 +308,7 @@ sub read_file
         $self->messagef( 3, "%d bytes of data read.", CORE::length( $source ) );
         if( $source )
         {
-            my $elems = $self->parse_string( $source ) || return;
+            my $elems = $self->parse_string( $source ) || return( $self->pass_error );
             $self->messagef( 3, "%d elements found from parsing.", $elems->length );
             # $self->rules->push( @$rules );
             $self->elements->push( @$elems );
@@ -323,24 +327,39 @@ sub read_string
     {
         if( ref( $data ) eq 'ARRAY' )
         {
-            $self->read_string( $_ ) for( @$data );
+            for( @$data )
+            {
+                $self->read_string( $_ ) || return( $self->pass_error );
+            }
             return( $self );
         }
     }
     elsif( length( $data ) )
     {
-        my $elems = $self->parse_string( $data );
+        my $elems = $self->parse_string( $data ) || return( $self->pass_error );
         ## $self->rules->push( @$rules );
         $self->elements->push( @$elems );
     }
     return( $self );
 }
 
+sub remove_rule
+{
+    my $self = shift( @_ );
+    my $rule = shift( @_ );
+    # $self->message( 3, "CSS rule provided to add to our stack of elements: '", overload::StrVal( $rule ), "'." );
+    return( $self->error( "No rule object was provided to remove." ) ) if( !defined( $rule ) );
+    return( $self->error( "Object provided is not a CSS::Object::Rule object." ) ) if( !$self->_is_a( $rule, 'CSS::Object::Rule' ) );
+    $self->elements->remove( $rule );
+    return( $self );
+}
+
 # sub rules { return( shift->_set_get_array_as_object( 'rules', @_ ) ); }
-sub rules { return( shift->elements->map(sub{ $_->isa( 'CSS::Object::Rule' ) ? $_ : () }) ); }
+sub rules { return( $_[0]->elements->map(sub{ $_[0]->_is_a( $_, 'CSS::Object::Rule' ) ? $_ : () }) ); }
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf-8
@@ -355,7 +374,7 @@ CSS::Object - CSS Object Oriented
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.5
 
 =head1 DESCRIPTION
 
@@ -431,6 +450,18 @@ L<CSS::Object::Format> objects control the stringification of the css structure.
 
 Provided with a selector and this returns a L<CSS::Object::Rule> object or an empty string.
 
+Hoever, if this method is called in an object context, such as chaining, then it returns a L<Module::Generic::Null> object instead of an empty string to prevent the perl error of C<xxx method called on an undefined value>. For example:
+
+    $css->get_rule_by_selector( '.does-not-exists' )->add_element( $elem ) ||
+    die( "Unable to add css element to rule \".does-not-exists\": ", $css->error );
+
+But, in a non-object context, such as:
+
+    my $rule = $css->get_rule_by_selector( '.does-not-exists' ) ||
+    die( "Unable to add css element to rule \".does-not-exists\": ", $css->error );
+
+L</get_rule_by_selector> will return an empty value.
+
 =head2 load_parser
 
 This will instantiate a new object based on the parser name specified with L</parser> or during css object instantiation.
@@ -500,6 +531,8 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 =head1 SEE ALSO
 
 L<CSS::Object>
+
+L<Mozilla documentation on Custom CSS Properties|https://developer.mozilla.org/en-US/docs/Web/CSS/--*>
 
 =head1 COPYRIGHT & LICENSE
 

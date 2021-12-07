@@ -4,7 +4,9 @@ Exception::Backtrace::Stackframe - Stack Frame Information
 
 =head1 DESCRIPTION
 
-The generic class for representing Perl and C/C++ stack frame.
+The generic class for representing Perl and C/C++ stack frame. For
+perl-specific frame information access see
+L<Exception::Backtrace::PerlFrame>.
 
 The object of the class cannot be constructed directly. All properties
 are read only.
@@ -55,5 +57,7 @@ be empty string.
 =head1 REFERENCE
 
 L<Exception::Backtrace>
+
+L<Exception::Backtrace::PerlFrame>
 
 =cut

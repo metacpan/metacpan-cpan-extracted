@@ -8,7 +8,7 @@ use parent 'Exporter';
 
 our @EXPORT_OK = qw( make_variant_package_name make_variant );
 
-our $VERSION = '0.152700'; # VERSION
+our $VERSION = '0.213360'; # VERSION
 
 # ABSTRACT: methods for MooX::BuildClass and MooX::BuildRole
 
@@ -58,7 +58,7 @@ MooX::BuildClass::Utils - methods for MooX::BuildClass and MooX::BuildRole
 
 =head1 VERSION
 
-version 0.152700
+version 0.213360
 
 =head1 DESCRIPTION
 

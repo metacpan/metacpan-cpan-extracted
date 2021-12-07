@@ -7,7 +7,7 @@ for my $line (<DATA>) {
     next if $line =~ m{\A \s* \Z  }xms;
     next if $line =~ m{\A \s* [#] }xms;
 
-    my (                     $ambig,  $singular,       $plural,                 $classical) 
+    my (                     $ambig,  $singular,       $plural,                 $classical)
         = $line =~ m{ \A \s* (!?) \s* (.*?) \s* => \s* ([^|]*?) \s* (?: [|] \s* (.*?) )? \s* \Z }xms
             or fail "Unexpected test data: $line";
 
@@ -17,10 +17,10 @@ for my $line (<DATA>) {
     my $n_plur  = noun($plural    );
 
     subtest "$singular -> $plural" => sub {
-        is $n_sing->singular, $singular  =>  "s->s: $singular -> $singular";
-        is $n_sing->plural,   $plural    =>  "s->p: $singular -> $plural";
-        is $n_plur->singular, $singular    =>  "p->s: $plural -> $singular";
-        is $n_plur->plural,   $plural      =>  "p->p: $plural -> $plural";
+        is $n_sing->singular, $singular => "s->s: $singular -> $singular";
+        is $n_sing->plural,   $plural   => "s->p: $singular -> $plural";
+        is $n_plur->singular, $singular => "p->s: $plural -> $singular";
+        is $n_plur->plural,   $plural   => "p->p: $plural -> $plural";
         done_testing();
     };
 
@@ -42,6 +42,39 @@ for my $line (<DATA>) {
 done_testing();
 
 __DATA__
+
+    general            => generals
+    army corps general => army corps generals
+    army-corps general => army-corps generals
+    corps general      => corps generals
+    lieutenant general => lieutenant generals
+    captain general    => captain generals
+    colonel general    => colonel generals
+    commanding general => commanding generals
+    major general      => major generals
+    brigadier general  => brigadier generals
+    divisional general => divisional generals
+    two-star general   => two-star generals
+    two star general   => two star generals
+    5-star general     => 5-star generals
+
+    consul general         => consuls general
+    consulate general      => consulates general
+    attorney general       => attorneys general
+    surgeon general        => surgeons general
+    secretary general      => secretaries general
+    solicitor general      => solicitors general
+    governor general       => governors general
+    postmaster general     => postmasters general
+    judge advocate general => judge advocates general
+    judge-advocate general => judge-advocates general
+    advocate general       => advocates general
+    quartermaster general  => quartermasters general
+    agent general          => agents general
+    inspector general      => inspectors general
+    adjutant general       => adjutants general
+    comptroller general    => comptrollers general
+    auditor general        => auditors general
 
     aba               =>  abas               |
     accusal           =>  accusals           |
@@ -227,7 +260,6 @@ __DATA__
     tooth             =>  teeth              |
     top               =>  tops               |
     toy               =>  toys               |
-    two-star general  =>  two-star generals  |
     ubermensch        =>  ubermenschen       |
     umbra             =>  umbras             |  umbrae
     watt              =>  watts              |

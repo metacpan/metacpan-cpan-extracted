@@ -6,9 +6,9 @@ use Log::ger;
 use parent qw(Perinci::CmdLine::Lite);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-21'; # DATE
+our $DATE = '2021-11-14'; # DATE
 our $DIST = 'App-depak'; # DIST
-our $VERSION = '0.584'; # VERSION
+our $VERSION = '0.585'; # VERSION
 
 sub hook_before_read_config_file {
     my ($self, $r) = @_;
@@ -68,7 +68,7 @@ Perinci::CmdLine::depak - Subclass of Perinci::CmdLine::Lite to set config_profi
 
 =head1 VERSION
 
-This document describes version 0.584 of Perinci::CmdLine::depak (from Perl distribution App-depak), released on 2021-10-21.
+This document describes version 0.585 of Perinci::CmdLine::depak (from Perl distribution App-depak), released on 2021-11-14.
 
 =head1 DESCRIPTION
 

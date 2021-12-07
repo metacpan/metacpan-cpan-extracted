@@ -1,18 +1,3 @@
-package Quiq::Udl;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash;
-use Quiq::Database::Config;
-use Quiq::Option;
-use Quiq::Path;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -109,6 +94,27 @@ Der Port, über welchen die Netzverbindung aufgebaut wird.
 Referenz auf Hash mit optionalen Angaben.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Udl;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash;
+use Quiq::Database::Config;
+use Quiq::Option;
+use Quiq::Path;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -599,7 +605,7 @@ sub dsn {
 
     if ($api ne 'dbi') {
         $self->throw(
-            'UDL-00001: DSN nur für DBI API definiert',
+            'UDL-00001: DSN defined for DBI API only',
             API => $api,
         );
     }
@@ -637,6 +643,12 @@ sub dsn {
     elsif ($dbms eq 'sqlite') {
         $db = Quiq::Path->expandTilde($db);
         $dsn = "DBI:SQLite:dbname=$db";
+        if ($host) {
+            # Wenn Host (und Port) angegeben sind, bauen wir
+            # eine Verbindung über den DBIProxy auf (der remote
+            # laufen muss)
+            $dsn = "DBI:Proxy:hostname=$host;port=$port;dsn=$dsn";
+        }
     }
     elsif ($dbms eq 'access') {
         $dsn = "DBI:ODBC:$db";
@@ -644,9 +656,15 @@ sub dsn {
     elsif ($dbms eq 'mssql') {
         $dsn = "DBI:ODBC:$db";
     }
+    elsif ($dbms eq 'jdbc') {
+        $dsn = "DBI:JDBC:hostname=$host;port=$port";
+        for my $key (keys %$options) {
+            $dsn .= ";$key=$options->{$key}";
+        }
+    }
     else {
         $self->throw(
-            'UDL-00002: Nicht-unterstütztes DBMS',
+            'UDL-00002: DBMS not supported',
             Dbms => $dbms,
         );
     }
@@ -746,7 +764,7 @@ sub udl {
         # Rückwärtskompatibilität
 
         if (!grep { $dbms eq $_ } qw/oracle postgresql sqlite mysql
-                access mssql/) {
+                access mssql jdbc/) {
             ($dbms,$db,$user,$password) = ($user,$password,$dbms,$db);
         }
 
@@ -772,7 +790,7 @@ sub udl {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

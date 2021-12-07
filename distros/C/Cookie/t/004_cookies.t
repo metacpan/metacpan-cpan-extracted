@@ -9,6 +9,7 @@ BEGIN
     use Test::Time time => 1635754330;
     use HTTP::Request ();
     use HTTP::Response ();
+    our $CRYPTX_REQUIRED_VERSION = '0.074';
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 

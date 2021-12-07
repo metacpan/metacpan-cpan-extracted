@@ -43,8 +43,8 @@ resources:
   bugtracker: https://github.com/PerlAlien/Dist-Zilla-MintingProfile-AlienBuild/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::MintingProfile::AlienBuild
   repository: git://github.com/PerlAlien/Dist-Zilla-MintingProfile-AlienBuild.git
-version: '0.05'
-x_generated_by_perl: v5.35.4
+version: '0.06'
+x_generated_by_perl: v5.35.6
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet;
 
-our $VERSION = '0.9';
+our $VERSION = '1.0.0';
 
 use Google::RestApi::Setup;
 
@@ -51,6 +51,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019, Robin Murray. All rights reserved.
+Copyright (c) 2021, Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

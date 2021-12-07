@@ -1,4 +1,6 @@
 #include "../test.h"
+#include <catch2/reporters/catch_reporter_registrars.hpp>
+#include <catch2/reporters/catch_reporter_event_listener.hpp>
 
 #define TEST(name) TEST_CASE("scheme-custom: " name, "[scheme-custom]")
 
@@ -7,15 +9,15 @@ struct MyScheme2 : URI::Strict<MyScheme2> {
     static string default_scheme () { return "myscheme2"; }
 };
 
-struct RegisterSchems : Catch::TestEventListenerBase {
-    using TestEventListenerBase::TestEventListenerBase; // inherit constructor
+struct RegisterSchems : Catch::EventListenerBase {
+    using EventListenerBase::EventListenerBase; // inherit constructor
 
     void testRunStarting( Catch::TestRunInfo const&) override {
         URI::register_scheme("myscheme1", 6666, true);
         URI::register_scheme("myscheme2", &typeid(MyScheme2), [](const URI& u)->URI*{ return new MyScheme2(u);  }, 7777, false);
     }
 };
-CATCH_REGISTER_LISTENER(RegisterSchems)
+CATCH_REGISTER_LISTENER(RegisterSchems);
 
 TEST("simple scheme") {
     auto uri = URI::create("myscheme1://ya.ru");

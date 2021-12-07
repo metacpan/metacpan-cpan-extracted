@@ -1,14 +1,3 @@
-package Quiq::LockedCounter;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::FileHandle;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -35,6 +24,23 @@ Die Klasse realisiert einen Zähler mit Exklusiv-Lock. Der
 Zählerstand wird in einer Datei gespeichert. Die Datei wird
 gelockt. Der Lock wird bis zur Destrukturierung des Objekts
 gehalten.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::LockedCounter;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::FileHandle;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -145,7 +151,7 @@ sub increment {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

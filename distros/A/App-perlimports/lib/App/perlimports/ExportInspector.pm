@@ -4,7 +4,7 @@ use Moo;
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000027';
 
 use App::perlimports::Sandbox ();
 use Class::Inspector          ();
@@ -12,7 +12,7 @@ use List::Util qw( any );
 use Module::Runtime qw( require_module );
 use Sub::HandlesVia;
 use Try::Tiny qw( catch try );
-use Types::Standard qw(ArrayRef Bool HashRef InstanceOf Str);
+use Types::Standard qw(ArrayRef Bool HashRef Int InstanceOf Str);
 
 with 'App::perlimports::Role::Logger';
 
@@ -185,12 +185,30 @@ has _pkg_for_implicit => (
     default => sub { return shift()->_random_pkg_name },
 );
 
+has success_counter => (
+    traits  => ['Counter'],
+    is      => 'ro',
+    isa     => Int,
+    default => 0,
+    handles => {
+        _increment_success_counter => 'inc',
+    },
+);
+
 has uses_moose => (
     is      => 'ro',
     isa     => Bool,
     lazy    => 1,
     builder => '_build_uses_moose',
 );
+
+sub evals_ok {
+    my $self = shift;
+
+    $self->explicit_exports;
+    $self->implicit_exports;
+    return $self->success_counter;
+}
 
 sub _build_explicit_exports {
     my $self = shift;
@@ -254,8 +272,28 @@ sub _build_is_oo_class {
 
 sub _build_isa_test_builder {
     my $self = shift;
-    return any { $_ eq 'Test::Builder::Module' }
-    @{ $self->_implicit->{class_isa} };
+    if (
+        any { $_ eq 'Test::Builder::Module' }
+        @{ $self->_implicit->{class_isa} }
+    ) {
+        return 1;
+    }
+
+    return 0 if $self->_module_name !~ m{\ATest};
+
+    my $err = App::perlimports::Sandbox::eval_pkg(
+        $self->_module_name,
+        sprintf( 'use %s qw( some_function );', $self->_module_name )
+    );
+
+    # Catch cases like Test::HTML::Lint, where, which doesn't subclass
+    # Test::Builder, but essentially calls Tester::Builder->new->plan(@_); in
+    # its import(). The error will be something like "plan() doesn't understand
+    # some_function at"
+    if ( $err =~ m{plan} ) {
+        return 1;
+    }
+    return 0;
 }
 
 sub _list_to_hash {
@@ -379,6 +417,9 @@ EOF
         $logger_cb->($@);
         return undef, $@;
     }
+    else {
+        $self->_increment_success_counter;
+    }
 
     ## no critic (TestingAndDebugging::ProhibitNoStrict)
     no strict 'refs';
@@ -481,7 +522,7 @@ App::perlimports::ExportInspector - Inspect code for exportable symbols
 
 =head1 VERSION
 
-version 0.000025
+version 0.000027
 
 =head1 SYNOPSIS
 
@@ -530,6 +571,11 @@ In cases where we cannot be certain about the explicit exports, you can try to
 fall back to the implicit exports to get an idea of what this module can
 export.
 
+=head2 evals_ok
+
+Returns true if either implicit or explicit exports can be built without
+setting C<$@>.
+
 =head2 implicit_export_names_match_values
 
 Returns true if the keys and values in C<implicit_exports> match.
@@ -537,6 +583,11 @@ Returns true if the keys and values in C<implicit_exports> match.
 =head2 explicit_export_names_match_values
 
 Returns true if the keys and values in C<explicit_exports> match.
+
+=head2 success_counter
+
+Returns an integer representing the number of times we were able to execute
+eval statements for this package which did not pollute C<$@>.
 
 =head1 CAVEATS
 

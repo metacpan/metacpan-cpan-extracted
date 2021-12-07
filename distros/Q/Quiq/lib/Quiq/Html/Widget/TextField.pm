@@ -1,12 +1,3 @@
-package Quiq::Html::Widget::TextField;
-use base qw/Quiq::Html::Widget/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -56,6 +47,10 @@ Name des Textfelds.
 
 JavaScript-Handler.
 
+=item password => $bool (Default: 0)
+
+Wenn gesetzt, wird der Eingawert verschleiert.
+
 =item readonly => $bool (Default: 0)
 
 Zeige das Feld und seinen Wert unveränderbar an.
@@ -77,6 +72,21 @@ Wenn wahr, liefere C<undef> als Widget-Code.
 Anfänglicher Wert des Textfelds.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Widget::TextField;
+use base qw/Quiq::Html::Widget/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -106,6 +116,7 @@ sub new {
         maxLength => undef,
         name => undef,
         onKeyUp => undef,
+        password => 0,
         readonly => 0,
         size => undef,
         style => undef,
@@ -144,9 +155,10 @@ sub html {
 
     # Attribute
 
-    my ($class,$disabled,$id,$maxLength,$name,$onKeyUp,$readonly,$size,$style,
-        $title,$undefIf,$value) = $self->get(qw/class disabled id maxLength
-        name onKeyUp readonly size style title undefIf value/);
+    my ($class,$disabled,$id,$maxLength,$name,$onKeyUp,$password,
+        $readonly,$size,$style, $title,$undefIf,$value) =
+        $self->get(qw/class disabled id maxLength name onKeyUp password
+        readonly size style title undefIf value/);
 
     if (!defined $maxLength) {
         $maxLength = $size;
@@ -169,7 +181,7 @@ sub html {
     }
 
     return $h->tag('input',
-        type => 'text',
+        type => $password? 'password': 'text',
         id => $id,
         class => $class,
         style => $style,
@@ -188,7 +200,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

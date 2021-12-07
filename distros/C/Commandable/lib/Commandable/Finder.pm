@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder 0.05;
+package Commandable::Finder 0.06;
 
 use v5.14;
 use warnings;
@@ -157,6 +157,7 @@ sub builtin_command_helpcmd
       die "Unrecognised command '$cmdname' - see 'help' for a list of commands\n";
 
    my @argspecs = $cmd->arguments;
+   my %optspecs = $cmd->options;
 
    printf "%s - %s\n",
       $cmd->name, $cmd->description;
@@ -164,7 +165,25 @@ sub builtin_command_helpcmd
    printf "\nSYNOPSIS:\n";
    printf "  %s\n", join " ",
       $cmd->name,
+      %optspecs ? "[OPTIONS...]" : (),
       @argspecs ? ( map { "\$" . uc $_->name } @argspecs ) : ();
+
+   if( %optspecs ) {
+      print "\nOPTIONS:\n";
+
+      # %optspecs contains duplicates; filter them
+      my %primary_names = map { $_->name => 1 } values %optspecs;
+      my @primary_optspecs = @optspecs{ sort keys %primary_names };
+
+      print join "\n", map {
+         my $optspec = $_;
+         my $default = $optspec->default;
+
+         ( "    " . join( ", ", map { length $_ > 1 ? "--$_" : "-$_" } $optspec->names ),
+            "      " . $optspec->description . ( defined $default ? " (default: $default)" : "" ),
+            "" );
+      } @primary_optspecs;
+   }
 
    if( @argspecs ) {
       print "\nARGUMENTS:\n";

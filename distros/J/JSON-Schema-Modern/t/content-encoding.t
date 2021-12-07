@@ -10,6 +10,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
+use Test::Fatal;
 use JSON::Schema::Modern;
 use lib 't/lib';
 use Helper;
@@ -53,24 +54,43 @@ subtest 'unrecognized encoding formats do not result in errors' => sub {
 subtest 'media_type and encoding handlers' => sub {
   my $js = JSON::Schema::Modern->new;
 
+  like(
+    exception { $js->add_media_type('FOO/BAR' => sub { \1 }) },
+    qr!Value "FOO/BAR" did not pass type constraint !,
+    'upper-cased names are not accepted',
+  );
+
   cmp_deeply(
     $js->get_media_type('application/json')->(\'{"alpha": "a string"}'),
     \ { alpha => 'a string' },
     'application/json media_type decoder',
   );
 
-  cmp_deeply(
-    $js->get_media_type('text/plain')->(\'foo'),
-    \'foo',
-    'text/plain media_type decoder',
-  );
+  cmp_deeply($js->get_media_type('text/plain')->(\'foo'), \'foo', 'text/plain media_type decoder');
+
+  cmp_deeply($js->get_media_type('tExt/PLaIN')->(\'foo'), \'foo', 'getter uses the casefolded name');
+
+  $js->add_media_type('furble/*' => sub { \1 });
+  cmp_deeply($js->get_media_type('furble/bloop')->(\''), \'1', 'getter matches to wildcard entries');
+
+  $js->add_media_type('text/*' => sub { \'wildcard' });
+  cmp_deeply($js->get_media_type('TExT/plain')->(\'foo'), \'foo', 'getter prefers case-insensitive matches to wildcard entries');
+  cmp_deeply($js->get_media_type('TExT/blop')->(\'foo'), \'wildcard', 'getter matches to wildcard entries');
+  cmp_deeply($js->get_media_type('TExT/*')->(\'foo'), \'wildcard', 'text/* matches itself');
+
+  $js->add_media_type('*/*' => sub { \'wildercard' });
+  cmp_deeply($js->get_media_type('TExT/plain')->(\'foo'), \'foo', 'getter still prefers case-insensitive matches to wildcard entries');
+  cmp_deeply($js->get_media_type('TExT/blop')->(\'foo'), \'wildcard', 'text/* is preferred to */*');
+  cmp_deeply($js->get_media_type('*/*')->(\'foo'), \'wildercard', '*/* matches */*');
+  cmp_deeply($js->get_media_type('fOO/bar')->(\'foo'), \'wildercard', '*/* is returned as a last resort');
+
+  $js = JSON::Schema::Modern->new;
 
   cmp_deeply(
     $js->get_media_type('application/json')->($js->get_encoding('base64')->(\'eyJmb28iOiAiYmFyIn0K')),
     \ { foo => 'bar' },
     'base64 encoding decoder + application/json media_type decoder',
   );
-
 
   # evaluate some schemas under draft7 and see that they validate
   cmp_deeply(
@@ -83,10 +103,8 @@ subtest 'media_type and encoding handlers' => sub {
             contentMediaType => 'application/json',
             contentSchema => {
               type => 'object',
-              properties => {
-                foo => {
-                  type => 'number',
-                },
+              additionalProperties => {
+                type => 'number',
               },
             },
           },
@@ -111,13 +129,13 @@ subtest 'media_type and encoding handlers' => sub {
       errors => [
         {
           instanceLocation => '/encoded_object/foo',
-          keywordLocation => '/properties/encoded_object/contentSchema/properties/foo/type',
+          keywordLocation => '/properties/encoded_object/contentSchema/additionalProperties/type',
           error => 'wrong type (expected number)',
         },
         {
           instanceLocation => '/encoded_object',
-          keywordLocation => '/properties/encoded_object/contentSchema/properties',
-          error => 'not all properties are valid',
+          keywordLocation => '/properties/encoded_object/contentSchema/additionalProperties',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '/encoded_object',
@@ -210,6 +228,20 @@ subtest 'media_type and encoding handlers' => sub {
       ],
     },
     'under draft7, these keywords are assertions',
+  );
+
+  cmp_deeply(
+    $js->evaluate(
+      # this is a ISO-8601 string that is json-encoded and then base64-encoded
+      { encoded_object => MIME::Base64::encode('{"'.chr(0xe9).'clair": 42}', '') },
+      $schema,
+      {
+        specification_version => 'draft7',
+        validate_content_schemas => 1,
+      },
+    )->TO_JSON,
+    { valid => true },
+    'successfully able to decode a non-UTF-8-encoded string',
   );
 };
 

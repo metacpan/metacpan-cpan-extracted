@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.162     2021-11-28 20:10:01Z
+          - now using 're_strict' feature in boilerplate
+          - removed podweaver override for "SUPPORT" section, giving
+            individual distributions more flexibility
+
 0.161     2021-05-26 03:59:08Z
           - freenode irc channels have migrated to libera
 

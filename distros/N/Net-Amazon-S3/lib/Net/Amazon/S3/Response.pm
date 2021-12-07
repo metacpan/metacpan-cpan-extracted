@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Response;
-# Abstract: Behaviour common to most S3 responses.
-$Net::Amazon::S3::Response::VERSION = '0.98';
+# ABSTRACT: Behaviour common to most S3 responses.
+$Net::Amazon::S3::Response::VERSION = '0.99';
 use Moose;
 
 use Carp ();
@@ -251,11 +251,11 @@ __END__
 
 =head1 NAME
 
-Net::Amazon::S3::Response
+Net::Amazon::S3::Response - Behaviour common to most S3 responses.
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 

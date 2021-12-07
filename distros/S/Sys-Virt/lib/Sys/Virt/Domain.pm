@@ -2225,6 +2225,10 @@ Filesystem mount information
 
 Block device information
 
+=item Sys::Virt::Domain::GUEST_INFO_INTERFACES
+
+Network interfaces information
+
 =back
 
 C<$flags> is currently unused and defaults to zero.

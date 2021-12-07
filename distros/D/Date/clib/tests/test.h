@@ -1,8 +1,8 @@
 #include <cstdlib>
 #include <panda/time.h>
 #include <panda/date.h>
-#include <catch2/catch.hpp>
 #include <panda/unordered_string_map.h>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace panda;
 using namespace panda::date;

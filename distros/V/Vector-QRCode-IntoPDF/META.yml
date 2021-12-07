@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   Vector::QRCode::IntoPDF:
     file: lib/Vector/QRCode/IntoPDF.pm
-    version: '0.03'
+    version: '0.05'
 requires:
   Class::Accessor::Lite: '0'
   File::Spec: '0'
@@ -41,6 +41,6 @@ resources:
   bugtracker: https://github.com/ytnobody/Vector-QRCode-IntoPDF/issues
   homepage: https://github.com/ytnobody/Vector-QRCode-IntoPDF
   repository: git://github.com/ytnobody/Vector-QRCode-IntoPDF.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

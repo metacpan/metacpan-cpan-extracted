@@ -8,10 +8,10 @@ build_requires:
   Test::Differences: 0
   Test::Exception: 0
   Test::Fatal: 0
+  Test::NoWarnings: 0
   Test::Pod: 1.22
 configure_requires:
   ExtUtils::MakeMaker: 6.59
-  Locale::Msgfmt: 0.15
 distribution_type: module
 dynamic_config: 1
 generated_by: 'Module::Install version 1.19'
@@ -29,6 +29,7 @@ recommends:
   Net::IP::XS: 0
   Readonly::XS: 0
 requires:
+  Class::Accessor: 0
   Clone: 0
   Email::Valid: 0
   File::ShareDir: 1
@@ -49,4 +50,4 @@ resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '4.002003'
+version: '4.003000'

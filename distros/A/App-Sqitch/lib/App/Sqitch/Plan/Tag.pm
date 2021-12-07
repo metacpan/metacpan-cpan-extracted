@@ -9,7 +9,7 @@ use Encode;
 
 extends 'App::Sqitch::Plan::Line';
 
-our $VERSION = 'v1.2.0'; # VERSION
+our $VERSION = 'v1.2.1'; # VERSION
 
 sub format_name {
     '@' . shift->name;

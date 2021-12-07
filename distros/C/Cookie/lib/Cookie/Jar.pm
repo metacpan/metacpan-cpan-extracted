@@ -42,6 +42,7 @@ BEGIN
     our $VERSION = 'v0.1.1';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
+    use constant CRYPTX_VERSION => '0.074';
 };
 
 sub init
@@ -87,6 +88,8 @@ sub add
     {
         my $hv = Module::Generic::HeaderValue->new_from_header( $this, decode => 1, debug => $self->debug ) ||
             return( $self->error( Module::Generic::HeaderValue->error ) );
+        $self->message( 5, "Got here for string '", overload::StrVal( $this ), "' and header value object '", overload::StrVal( $hv ), "'" );
+        $self->message( 5, "header value is '$hv'" );
         my $ref = {};
         $ref->{name} = $hv->value->first;
         $ref->{value} = $hv->value->second;
@@ -873,7 +876,7 @@ sub load
         $self->message( 4, "Value to decrypt is ", CORE::length( $json ), " bytes big." ) if( $COOKIES_DEBUG );
         try
         {
-            $self->_load_class( 'Crypt::Misc' ) || return( $self->pass_error );
+            $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
             my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
             my $crypt = $p->{crypt};
             my $bin = Crypt::Misc::decode_b64( "$json" );
@@ -940,6 +943,7 @@ sub load_as_lwp
     $opts->{iv} //= $self->_initialisation_vector->scalar || '';
     my $f = $self->new_file( $file );
     my $host = $opts->{host} || $self->host || '';
+    # $self->message( 4, "Loading LWP cookies from file '$f' for host '$host'" );
     $f->open( '<', { binmode => ( $opts->{decrypt} ? 'raw' : 'utf-8' ) }) || return( $self->pass_error( $f->error ) );
     my $code = sub
     {
@@ -965,7 +969,7 @@ sub load_as_lwp
         $self->message( 4, "Value to decrypt is ", CORE::length( $raw ), " bytes big." ) if( $COOKIES_DEBUG );
         try
         {
-            $self->_load_class( 'Crypt::Misc' ) || return( $self->pass_error );
+            $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
             my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
             my $crypt = $p->{crypt};
             my $bin = Crypt::Misc::decode_b64( "$raw" );
@@ -1268,7 +1272,7 @@ sub save
         return( $self->pass_error( $f->error ) );
     if( $opts->{encrypt} )
     {
-        $self->_load_class( 'Crypt::Misc' ) || return( $self->pass_error );
+        $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
         my $crypt = $p->{crypt};
         # $value = Crypt::Misc::encode_b64( $crypt->encrypt( "$value", $p->{key}, $p->{iv} ) );
@@ -1306,7 +1310,7 @@ sub save_as_lwp
     my $p = {};
     if( $opts->{encrypt} )
     {
-        $self->_load_class( 'Crypt::Misc' ) || return( $self->pass_error );
+        $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
         $self->message( 4, "Key size '", CORE::length( $p->{key} ), " and IV size '", CORE::length( $p->{iv} ), "'." ) if( $COOKIES_DEBUG );
     }
@@ -1436,7 +1440,7 @@ sub _encrypt_objects
     return( $self->error( "No algorithm was provided to encrypt cookie value. You can choose any <NAME> for which there exists Crypt::Cipher::<NAME>" ) ) if( !defined( $algo ) || !CORE::length( "$algo" ) );
     try
     {
-        $self->_load_class( 'Crypt::Mode::CBC' ) || return( $self->pass_error );
+        $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         $self->_load_class( 'Bytes::Random::Secure' ) || return( $self->pass_error );
         my $crypt = Crypt::Mode::CBC->new( "$algo" ) || return( $self->error( "Unable to create a Crypt::Mode::CBC object." ) );
         my $class = "Crypt::Cipher::${algo}";
@@ -1728,11 +1732,11 @@ As you can see, 3 cookies were sent: C<session_token>, C<csrf_token> and C<site_
 
 So, when L</fetch> creates an object for each one and store them, those cookies have no C<path> value and no other attribute, and when L</add_response_header> is then called, it stringifies the cookies and create a C<Set-Cookie> header for each one, but only with their value and no other attribute.
 
-The http client, when receiving those cookies will derive the  missing cookie path to be C</my/path>, i.e. the current uri path, and will override the previously stored cookie with the same name for that host that had the path set to C</>
+The http client, when receiving those cookies will derive the  missing cookie path to be C</my/path>, i.e. the current uri path, and will create a duplicate cookie from the previously stored cookie with the same name for that host, but that had the path set to C</>
 
-So you can create a repository and use it to store the cookies sent by the http client using L</fetch>, but in preparation of the server response, either use a separate repository with, for example, C<my $jar_out = Cookie::Jar->new> or use L</set> which will still add the cookie to the repository, but also before set the C<Set-Cookie> header for that cookie.
+So you can create a repository and use it to store the cookies sent by the http client using L</fetch>, but in preparation of the server response, either use a separate repository with, for example, C<my $jar_out = Cookie::Jar->new> or use L</set> which will not add the cookie to the repository, but rather only set the C<Set-Cookie> header for that cookie.
 
-    # Add Set-Cookie header for that cookie and add cookie to repository
+    # Add Set-Cookie header for that cookie, but do not add cookie to repository
     $jar->set( $cookie_object );
 
 =head2 delete
@@ -1819,11 +1823,11 @@ You can also provide the C<Cookie> string to parse by providing the C<string> op
 
 Ultimately, if none of those are available, it will use the environment variable C<HTTP_COOKIE>
 
-In void context, this method, will add the fetched cookies to its L<repository|/repo>.
+If the option I<store> is true, this method will add the fetched cookies to the L<repository|/repo>.
 
 It returns an hash reference of cookie key => L<cookie object|Cookie>
 
-A cookie key is made of the host (possibly empty) and the cookie name separated by C<;>
+A cookie key is made of the host (possibly empty), the path and the cookie name separated by C<;>
 
     # Cookies added to the repository
     $jar->fetch || die( $jar->error );
@@ -2243,13 +2247,20 @@ For example:
 
 See also L<modperl testing documentation|https://perl.apache.org/docs/general/testing/testing.html>
 
+But, if for some reason, you do not want to perform the mod_perl tests, you can use C<NO_MOD_PERL=1> when calling C<perl Makefile.PL>, such as:
+
+    NO_MOD_PERL=1 perl Makefile.PL
+    make
+    make test
+    sudo make install
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<Apache2::Cookies>, L<APR::Request::Cookie>, L<Cookie::Baker>
+L<Cookie>, L<Cookie::Domain>, L<Apache2::Cookies>, L<APR::Request::Cookie>, L<Cookie::Baker>
 
 L<Latest tentative version of the cookie standard|https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-09>
 

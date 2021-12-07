@@ -27,9 +27,11 @@ Denis
 Draft4
 Draft6
 Draft7
+Erik
 Error
 Fedotov
 Format
+Huelsmann
 Ibaev
 Ivan
 JSONPointer
@@ -46,6 +48,7 @@ Validator
 Waters
 andrey
 dionys
+ehuels
 james
 lib
 logioniz

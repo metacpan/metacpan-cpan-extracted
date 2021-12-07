@@ -2,8 +2,20 @@ NAME
     Sah::Schemas::Firefox - Various Sah schemas related to Firefox
 
 VERSION
-    This document describes version 0.002 of Sah::Schemas::Firefox (from
-    Perl distribution Sah-Schemas-Firefox), released on 2020-06-04.
+    This document describes version 0.003 of Sah::Schemas::Firefox (from
+    Perl distribution Sah-Schemas-Firefox), released on 2021-07-19.
+
+CONTRIBUTOR
+    perlancar (on pc-home) <perlancar@gmail.com>
+
+SAH SCHEMAS
+    *   firefox::local_profile_name
+
+        Firefox profile name, must exist in local Firefox installation.
+
+    *   firefox::profile_name
+
+        Firefox profile name.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -29,7 +41,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

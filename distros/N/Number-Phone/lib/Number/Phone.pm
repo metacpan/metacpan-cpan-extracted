@@ -14,7 +14,7 @@ use Number::Phone::Data;
 use Number::Phone::StubCountry;
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '3.8001';
+our $VERSION = '3.8002';
 
 my $NOSTUBS = 0;
 sub import {
@@ -183,7 +183,7 @@ bad design decision. Use of those calling conventions was deprecated
 in version 2.0, released in January 2012, and started to emit
 warnings. All code to support those calling conventions has now been removed.
 
-Until 2017 we ued KOS for the country code for Kosovo, that has now changed to
+Until 2017 we used KOS for the country code for Kosovo, that has now changed to
 XK. See L<Number::Phone::Country>.
 
 From version 3.4000 to 3.4003 inclusive we accepted any old garbage after
@@ -212,7 +212,7 @@ constructor. This may affect users who specify places like Guernsey but
 provide numbers from Jersey or the Isle of Man, all three of which are separate
 jurisdictions squatting on random places all over the UK's number plan.
 
-=head1 COMPATIBILTY WITH libphonenumber
+=head1 COMPATIBILITY WITH libphonenumber
 
 libphonenumber is a similar project for other languages, maintained
 by Google.

@@ -1,12 +1,3 @@
-package Quiq::PlotlyJs::XY::Diagram;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -35,6 +26,21 @@ Plotly.js die Wertebereiche auch selbständig setzt, dann aber nach
 eigenen Kriterien. Ist kein Y-Wertebereich vorgegeben, wird z.B. bei
 B<fill: 'tozeroy'> die Y-Achse bis 0 ausgedeht, auch wenn alle
 Y-Werte > 0 sind.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::PlotlyJs::XY::Diagram;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -163,7 +169,7 @@ sub new {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

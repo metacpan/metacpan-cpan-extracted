@@ -6,9 +6,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-15'; # DATE
+our $DATE = '2021-11-16'; # DATE
 our $DIST = 'App-renlikewd'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -18,8 +18,18 @@ $SPEC{app} = {
     description => <<'_',
 
     % pwd
-    /home/u1/Some Project/Some Title
-    % renlikewd foo.jpg; # foo.jpg now becomes "Some Title.jpg"
+    /home/u1/Some Project/Some Rather Long Title
+    % renlikewd foo.jpg; # foo.jpg now becomes "Some Rather Long Title.jpg"
+
+Here's what I now often have to do: put some file under a subdirectory with the
+same name as the file (sans the extension), with the name being quite long. I
+also often create the directory first, then move the originally named file into
+this directory and rename it to follow the directory name.
+
+I use Midnight Commander and this workflow sometimes makes it hard for me to use
+Alt-Enter because one of the pane is already inside the directory.
+
+This utility helps.
 
 _
     args => {
@@ -85,7 +95,7 @@ renlikewd - REName a file so it becomes LIKE the current (Working) Directory's n
 
 =head1 VERSION
 
-This document describes version 0.001 of renlikewd (from Perl distribution App-renlikewd), released on 2021-11-15.
+This document describes version 0.002 of renlikewd (from Perl distribution App-renlikewd), released on 2021-11-16.
 
 =head1 SYNOPSIS
 
@@ -96,8 +106,18 @@ This document describes version 0.001 of renlikewd (from Perl distribution App-r
 =head1 DESCRIPTION
 
     % pwd
-    /home/u1/Some Project/Some Title
-    % renlikewd foo.jpg; # foo.jpg now becomes "Some Title.jpg"
+    /home/u1/Some Project/Some Rather Long Title
+    % renlikewd foo.jpg; # foo.jpg now becomes "Some Rather Long Title.jpg"
+
+Here's what I now often have to do: put some file under a subdirectory with the
+same name as the file (sans the extension), with the name being quite long. I
+also often create the directory first, then move the originally named file into
+this directory and rename it to follow the directory name.
+
+I use Midnight Commander and this workflow sometimes makes it hard for me to use
+Alt-Enter because one of the pane is already inside the directory.
+
+This utility helps.
 
 =head1 OPTIONS
 

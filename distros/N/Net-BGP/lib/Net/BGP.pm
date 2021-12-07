@@ -7,7 +7,7 @@ use vars qw( $VERSION );
 
 ## Inheritance and Versioning ##
 
-$VERSION = '0.17';
+$VERSION = '0.18';
 
 ## End Code Section ##
 
@@ -15,7 +15,7 @@ $VERSION = '0.17';
 
 =head1 NAME
 
-Net::BGP - Border Gateway Protocol version 4 speaker/listener library
+C<Net::BGP> - Border Gateway Protocol version 4 speaker/listener library
 
 =head1 SYNOPSIS
 
@@ -49,12 +49,12 @@ API provided by the module.
 
 The module takes an object-oriented approach to abstracting the operations
 of the BGP protocol. It supports multiple peering sessions and each peer
-corresponds to one instance of a B<Net::BGP::Peer> object. The details of
+corresponds to one instance of a L<Net::BGP::Peer> object. The details of
 maintaining each peering session are handled and coordinated by an instance
-of a B<Net::BGP::Process> object. BGP UPDATE messages and the routing
-information they represent are encapsulated by B<Net::BGP::Update> objects.
+of a L<Net::BGP::Process> object. BGP UPDATE messages and the routing
+information they represent are encapsulated by L<Net::BGP::Update> objects.
 Whenever protocol errors occur and a BGP NOTIFICATION is sent or received,
-programs can determine the details of the error via B<Net::BGP::Notification>
+programs can determine the details of the error via L<Net::BGP::Notification>
 objects.
 
 The module interacts with client programs through the paradigm of callback
@@ -65,7 +65,7 @@ UPDATE message is received from a peer, the module handles the details of
 decoding the message, validating it, and encapsulating it in an object and
 passing the object to the specific callback function supplied by the user
 for UPDATE message handling. The callback function is free to do whatever
-with the object - it might send a Net::BGP::Update object to other peers
+with the object - it might send a L<Net::BGP::Update> object to other peers
 as UPDATE messages, perhaps after modifying some of the UPDATE attributes,
 log the routing information to a file, or do nothing at all. The
 possibilities for implementing routing policy via such a mechanism are
@@ -87,17 +87,17 @@ session, house-keeping, etc.
 =head1 BUGS
 
 The connection collision resolution code is broken. As currently implemented,
-whenever a connection is received from a peer, the B<Net::BGP::Peer> object
+whenever a connection is received from a peer, the L<Net::BGP::Peer> object
 is cloned and each peer object proceeds through the session establishment
 process until the collision resolution procedure is reached. At this point, if
 the cloned object is chosen by the collison resolution procedure, the original
 peer object is destroyed, leaving the cloned object. Unfortunately, a user
 program will only have a reference to the original peer object it created and
 will have no way of accessing the cloned object. It is therefore recommended
-that B<Net::BGP::Peer> objects be instantiated with the B<Listen> parameter
+that L<Net::BGP::Peer> objects be instantiated with the I<Listen> parameter
 set to a false value. This prevents the peer object from receiving connections
 from its BGP peer, although it will continue actively attempting to establish
-sessions. This problem will be addressed in a future revision of B<Net::BGP>.
+sessions. This problem will be addressed in a future revision of C<Net::BGP>.
 
 As an initial revision, the code has not been subjected to a thorough security
 audit. It is possible and likely that exploitable code exists in the packet
@@ -107,10 +107,37 @@ using the module will be run with root priviliges (which is necessary if
 programs want to modify the kernel routing table or bind to the well-known
 BGP port 179).
 
+=head1 PROTOCOL SUPPORT
+
+=over
+
+=item L<RFC 1771 (BGP-4)|https://tools.ietf.org/html/rfc1771>
+=item L<RFC 1997 (BGP Communities Attribute)|https://tools.ietf.org/html/rfc1997>
+=item L<RFC 2918 (Route Refresh Capability for BGP-4)|https://tools.ietf.org/html/rfc2918>
+=item L<RFC 4893 (BGP Support for Four-octet AS Number Space)|https://tools.ietf.org/html/rfc4893>
+=item L<RFC 5492 (Capabilities Advertisement with BGP-4)|https://tools.ietf.org/html/rfc5492>
+
+=back
+
 =head1 SEE ALSO
 
-RFC 1771, and the perldocs for Net::BGP::Process, Net::BGP::Peer, Net::BGP::Update,
-and Net::BGP::Notification
+=over
+
+=item L<Net::BGP::Process>
+
+=item L<Net::BGP::Peer>
+
+=item L<Net::BGP::Update>
+
+=item L<Net::BGP::Refresh>
+
+=item L<Net::BGP::ASPath>
+
+=item L<Net::BGP::NLRI>
+
+=item L<Net::BGP::Notification>
+
+=back
 
 =head1 AUTHOR
 

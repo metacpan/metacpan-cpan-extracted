@@ -1,14 +1,3 @@
-package Quiq::Html::Util;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Time::HiRes ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -20,6 +9,23 @@ Quiq::Html::Util - Hilfsmethoden für die HTML-Generierung
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Util;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Time::HiRes ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -60,7 +66,7 @@ sub insertDurationBytes {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

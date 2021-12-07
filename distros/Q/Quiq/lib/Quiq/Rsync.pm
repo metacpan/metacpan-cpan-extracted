@@ -1,15 +1,3 @@
-package Quiq::Rsync;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use File::Rsync ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -61,6 +49,24 @@ eine Ausgabe findet nur im Fehlerfall und bei Änderungen statt,
 die statistische Ausgabe von rsync unterbleibt
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Rsync;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use File::Rsync ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -220,7 +226,7 @@ sub exec {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

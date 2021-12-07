@@ -88,7 +88,8 @@ void Client::request (const RequestSP& request) {
 
         if (request->tcp_nodelay) set_nodelay(true);
         _netloc = std::move(netloc);
-        connect(_netloc.host, _netloc.port, request->timeout, request->tcp_hints);
+        auto conn_timeout = request->connect_timeout ? request->connect_timeout : request->timeout;
+        connect(_netloc.host, _netloc.port, conn_timeout, request->tcp_hints);
     }
 
     // this code should be after connect, because in case of connect timeout, timer inside Tcp class must react first to mark multiDNS address as bad

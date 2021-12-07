@@ -21,6 +21,8 @@ SYNOPSIS
 
       my $avg_counters = $graphite->get_average_counters();
 
+      my $invalid = $graphite->get_invalid_metrics();
+
       $graphite->clear_bulk();
 
       $graphite->incr_bulk($key, $value);
@@ -84,6 +86,10 @@ DESCRIPTION
 
         Optional.
 
+    store_invalid_metrics
+        Optional. By default takes false value. Turns on the collecting of
+        invalid metrics into "invalid" hash.
+
     block_metrics_re
         The compiled regular expression. If any metric matches, then it will
         be ignored and won't be stored in the resulted hash.
@@ -97,7 +103,12 @@ DESCRIPTION
           my %metrics      = %Graphite::Simple::bulk;
           my %avg_counters = %Graphite::Simple::avg_counters;
 
-        Otherweise internal hashes will be used.
+        In case of "store_invalid_metrics" true value the following hash
+        will be available too:
+
+          my %invalid = %Graphite::Simple::invalid;
+
+        Otherwise internal hashes will be used.
 
   $self->connect()
     Establishes the connection to Graphite server if "enabled" was set as
@@ -139,6 +150,10 @@ DESCRIPTION
     Returns the hash reference with counters of average metrics. Average
     metric is a metric started with "avg." string.
 
+  $self->get_invalid_metrics()
+    Returns hsh with invalid metrics. It doesn't contain any blocked metric
+    by reqular expressions.
+
   $self->get_metrics()
     Returns the hash reference with result metrics. Each metric started with
     "avg." string is divided by its counter from "average_counter".
@@ -174,7 +189,7 @@ DESCRIPTION
     invalid key counter will be bumped by 1.
 
   $self->is_metric_blocked($key)
-    Returns 1 if $key matches with reqular expression set with
+    Returns 1 if $key matches with regular expression set with
     "set_blocked_metrics_re" or "block_metrics_re".
 
     Otherwise returns 0.

@@ -5,7 +5,7 @@ use warnings;
 use base qw( FFI::C::Struct );
 
 # ABSTRACT: Union data instance for FFI
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ FFI::C::Union - Union data instance for FFI
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ version 0.10
  my $int = AnyInt->new({ u8 => 42 });
  printf "0x%x\n", $int->u32;   # 0x2a on Intel
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 This class represents an instance of a C C<union>.  This class can be created using
 C<new> on the generated class, if that was specified for the L<FFI::C::UnionDef>,
@@ -95,7 +95,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020,2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

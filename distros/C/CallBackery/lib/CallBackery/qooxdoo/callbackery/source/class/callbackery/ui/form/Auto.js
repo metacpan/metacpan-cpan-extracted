@@ -38,14 +38,18 @@ qx.Class.define("callbackery.ui.form.Auto", {
 
     /**
      * @param structure {Array} form structure
-     * @param layout {Incstance} qooxdoo layout instance
+     * @param layout {Instance} qooxdoo layout for this widget
      * @param formRenderer {Class} qooxdoo form render class
+     * @param plugin {Object} CallBackery (parent) widget this widget is added to
      */
-    construct : function(structure, layout, formRenderer) {
+    construct : function(structure, layout, formRenderer, plugin) {
         this.base(arguments);
         this._settingData = 0;
         this._setLayout(layout || new qx.ui.layout.Grow());
         var form = this._form = new qx.ui.form.Form();
+        if (plugin) {
+            plugin.addOwnedQxObject(form, 'Form');
+        }
         this._ctrl = {};
         var formCtrl = new qx.data.controller.Form(null, form);
         this._boxCtrl = {};
@@ -80,7 +84,8 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     new qx.ui.basic.Label().set({
                         font: 'bold'
                     });
-                if (s.key){
+                if (s.key) {
+                    form.addOwnedQxObject(header, s.key || s.label);
                     this._ctrl[s.key] = header;
                 }
                 if (s.set){
@@ -180,6 +185,9 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 default:
                     throw new Error("unknown widget type " + s.widget);
                     break;
+            }
+            if (s.key) {
+                form.addOwnedQxObject(s.widget, s.key);
             }
             if (s.autocomplete) {
                 var el = control.getContentElement();

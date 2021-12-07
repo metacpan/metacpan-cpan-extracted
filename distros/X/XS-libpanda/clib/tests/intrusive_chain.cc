@@ -5,7 +5,7 @@
 
 using std::shared_ptr;
 
-#define TEST(name) TEST_CASE("intrusive chain: " name, "[intrusive_chain]")
+TEST_PREFIX("intrusive chain: ", "[intrusive_chain]");
 
 struct MyPtr : IntrusiveChainNode<MyPtr*> {};
 

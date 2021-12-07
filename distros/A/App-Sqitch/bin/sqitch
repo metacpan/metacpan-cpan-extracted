@@ -1,6 +1,6 @@
 #!perl -w -CAS
 
-our $VERSION = 'v1.2.0'; # VERSION
+our $VERSION = 'v1.2.1'; # VERSION
 use POSIX qw(setlocale);
 BEGIN {
     if ($^O eq 'MSWin32') {

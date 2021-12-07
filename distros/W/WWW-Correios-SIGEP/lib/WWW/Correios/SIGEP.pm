@@ -4,7 +4,7 @@ use warnings;
 use WWW::Correios::SIGEP::LogisticaReversa;
 use WWW::Correios::SIGEP::Common;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub new {
     my ($class, $params) = @_;
@@ -243,9 +243,13 @@ sub gera_xml_plp {
                     die "objetos[].valor_declarado (SEDEX) precisa ser entre 18,50 e 10000,00"
                         unless $valor_declarado >= 18.5 && $valor_declarado <= 10_000;
                 }
+                elsif ($obj->{codigo_postagem_sigla} eq 'MINI') {
+                    die "objetos[].valor_declarado (MINI) precisa ser entre 1 e 100,00"
+                        unless $valor_declarado > 1 && $valor_declarado <= 100;
+                }
                 else {
                     die "objetos[].codigo_postagem_sigla ($obj->{codigo_postagem_sigla}) precisa ser SEDEX, PAC, CARTA ou MINI"
-                        unless $obj->{codigo_postagem_sigla} eq 'CARTA' || $obj->{codigo_postagem_sigla} eq 'MINI';
+                        unless $obj->{codigo_postagem_sigla} eq 'CARTA';
                 }
             }
             else {
@@ -314,10 +318,13 @@ sub gera_xml_plp {
                  : ''
                )
              . (defined $obj->{valor_declarado}
-                ? '<codigo_servico_adicional>' . ($obj->{codigo_postagem_sigla} eq 'PAC'
-                    ? '064' : $obj->{codigo_postagem_sigla} eq 'SEDEX' ? '019' : '035'
-                  ) . '</codigo_servico_adicional><valor_declarado>' . $obj->{valor_declarado} . '</valor_declarado>'
-                  : ''
+                ? '<codigo_servico_adicional>' . ($obj->{codigo_postagem_sigla} eq 'PAC'   ? '064'
+                                                : $obj->{codigo_postagem_sigla} eq 'SEDEX' ? '019'
+                                                : $obj->{codigo_postagem_sigla} eq 'MINI'  ? '065'
+                                                : '035' # CARTA
+                                                )
+                  . '</codigo_servico_adicional><valor_declarado>' . $obj->{valor_declarado} . '</valor_declarado>'
+                : ''
              )
              . '</servico_adicional>'
              . '<dimensao_objeto><tipo_objeto>'

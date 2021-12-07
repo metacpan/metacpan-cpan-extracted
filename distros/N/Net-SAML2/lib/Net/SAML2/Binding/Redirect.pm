@@ -1,12 +1,11 @@
-package Net::SAML2::Binding::Redirect;
-
 use strict;
 use warnings;
+package Net::SAML2::Binding::Redirect;
 
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 # ABSTRACT: Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
 
@@ -153,7 +152,7 @@ Net::SAML2::Binding::Redirect - Net::SAML2::Binding::Redirect - HTTP Redirect bi
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 

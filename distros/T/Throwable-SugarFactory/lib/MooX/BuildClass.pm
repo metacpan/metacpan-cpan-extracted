@@ -8,7 +8,7 @@ use Package::Variant 1.003002    #
 
 use MooX::BuildClass::Utils qw( make_variant_package_name make_variant );
 
-our $VERSION = '0.152700'; # VERSION
+our $VERSION = '0.213360'; # VERSION
 
 # ABSTRACT: build a Moo class at runtime
 
@@ -38,7 +38,7 @@ MooX::BuildClass - build a Moo class at runtime
 
 =head1 VERSION
 
-version 0.152700
+version 0.213360
 
 =head1 SYNOPSIS
 

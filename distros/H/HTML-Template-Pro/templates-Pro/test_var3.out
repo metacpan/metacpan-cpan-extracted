@@ -3,7 +3,7 @@
  &foo"bar'</script>=-;+ \<>"; %FAhidden:
 end 
  
- %26foo%22bar%27%3C%2Fscript%3E%3D-%3B%2B%20\%3C%3E%22%3B%20%25FAhidden%3A%0D%0Aend 
+ %26foo%22bar%27%3C%2Fscript%3E%3D-%3B%2B%20%5C%3C%3E%22%3B%20%25FAhidden%3A%0D%0Aend 
  
  &amp;foo&quot;bar&#39;&lt;/script&gt;=-;+ \&lt;&gt;&quot;; %FAhidden:
 end 

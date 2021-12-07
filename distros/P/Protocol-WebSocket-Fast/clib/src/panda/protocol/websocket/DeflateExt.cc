@@ -6,7 +6,6 @@ namespace panda { namespace protocol { namespace websocket {
 
 static const char extension_name[] = "permessage-deflate";
 
-static const int   UNCOMPRESS_PREALLOCATE_RATIO = 10;
 static const float GROW_RATIO                   = 1.5;
 
 static const char PARAM_SERVER_NO_CONTEXT_TAKEOVER[] = "server_no_context_takeover";
@@ -227,7 +226,7 @@ void DeflateExt::uncompress (Frame& frame) {
         while (1) {
             auto r = inflate(&rx_stream, flush);
             if (r != Z_OK) {
-                panda_log_warning("zlib::inflate error msg='" << rx_stream.msg << "' code=" << r);
+                panda_log_warning("zlib::inflate error: " << r << ", " << (rx_stream.msg ? rx_stream.msg : "<no error message>"));
                 frame.error(errc::inflate_error);
                 return false;
             }
@@ -252,6 +251,11 @@ void DeflateExt::uncompress (Frame& frame) {
     }
 
     if (final) {
+        if (rx_stream.avail_out == 0) {
+            // actually no memory needed, grow just to prevent Z_BUF_ERROR when output buffer ends on the last byte of input
+            // it is very rare situation so no perfomance penalty, happend in MEIACORE-1738
+            grow(acc, rx_stream);
+        }
         auto res = inflate_impl(acc, TRAILER, Z_SYNC_FLUSH);
         if (!res) return reset_rx();
         message_size = 0;
@@ -272,14 +276,14 @@ void DeflateExt::reset_tx() {
     if (!tx_stream.next_in) return;
     tx_stream.next_in = Z_NULL;
     auto zerr = deflateReset(&tx_stream);
-    if (zerr != Z_OK) panda_log_error("zlib::deflateReset error msg='" << tx_stream.msg << "' code=" << zerr);
+    if (zerr != Z_OK) panda_log_error("zlib::deflateReset error msg='" << (tx_stream.msg ? tx_stream.msg : "<no error message>") << "' code=" << zerr);
 }
 
 void DeflateExt::reset_rx() {
     if (!rx_stream.next_in) return;
     rx_stream.next_in = Z_NULL;
     auto zerr = inflateReset(&rx_stream);
-    if (zerr != Z_OK) panda_log_error("zlib::inflateReset error msg='" << rx_stream.msg << "' code=" << zerr);
+    if (zerr != Z_OK) panda_log_error("zlib::inflateReset error msg='" << (rx_stream.msg ? rx_stream.msg : "<no error message>") << "' code=" << zerr);
 }
 
 }}}

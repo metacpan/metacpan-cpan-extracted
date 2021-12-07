@@ -1,14 +1,3 @@
-package Quiq::Http::Cookie;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Time::RFC822;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -99,6 +88,23 @@ Cookie-Spezifikation von Netscape
 Die Angabe '+1y' wird von Methode L<asString|"asString() - Generiere Zeichenketten-Repräsentation">() durch Aufruf
 von Quiq::Time::RFC822->get() in eine gültige RFC822-Datumsangabe
 gewandelt. Weitere abkürzende Schreibweisen siehe dort.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Http::Cookie;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Time::RFC822;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -199,7 +205,7 @@ sub asString {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

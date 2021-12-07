@@ -30,7 +30,7 @@ our @EXPORT_OK = (
 
 our @EXPORT = qw();
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 require XSLoader;
 XSLoader::load('Linux::Sys::CPU::Affinity', $VERSION);

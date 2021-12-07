@@ -1,3 +1,7 @@
+0.012 2021-11-28 13:12:48-0500
+  - Update URL for download.
+    See PR <https://github.com/Intertangle/p5-Alien-MuPDF/pull/55>.
+
 0.011 2020-07-09 00:55:04-0500
   - Updates build parameters for MuPDF v1.17.0.
 

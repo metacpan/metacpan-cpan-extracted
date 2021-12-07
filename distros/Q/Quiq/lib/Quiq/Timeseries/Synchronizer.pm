@@ -1,18 +1,3 @@
-package Quiq::Timeseries::Synchronizer;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Quiq::Array;
-use Quiq::Time;
-use Quiq::Math;
-use Quiq::Formatter;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -84,6 +69,27 @@ legt das Zeitraster auf 0, 10, 20, 30, 40, 50 Minuten.
   $interval = 600, -offset => 300
 
 legt das Zeitraster auf 5, 15, 25, 35, 45, 55 Minuten.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Timeseries::Synchronizer;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Quiq::Array;
+use Quiq::Time;
+use Quiq::Math;
+use Quiq::Formatter;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -611,7 +617,7 @@ sub rows {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

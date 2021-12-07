@@ -1,3 +1,10 @@
+2021-12-04  k  <andk@cpan.org>
+
+	* Version 2.14
+
+	* fix test t/updatedir.t for old CPAN versions: we cannot predict the
+	name of the parent directory, so simplify the test;
+
 2021-11-20  k  <andk@cpan.org>
 
 	* Version 2.13

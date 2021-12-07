@@ -11,7 +11,7 @@ All contributions are assumed to be provided under the terms of [perl5 license](
 
 ### Issues
 
-File [an issue on CPAN bug tracker](https://rt.cpan.org/Public/Dist/Display.html?Name=CSS-Object) if you think you've found a bug. Please describe
+File [an issue on CPAN bug tracker](https://git.deguest.jp/jack/CSS-Object/issues) if you think you've found a bug. Please describe
 
 1. How can it be reproduced
 
@@ -39,11 +39,11 @@ You can reach me via e-mail <jdeguest@cpan.org>, or via [Telegram](https://t.me/
 
 ## Issue Tracking
 
-Issues are currently reported using CPAN [bug tracker](https://rt.cpan.org/Public/Dist/Display.html?Name=CSS-Object)
+Issues are currently reported using CPAN [bug tracker](https://git.deguest.jp/jack/CSS-Object/issues)
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/CSS-Object-v0.1.2/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/CSS-Object-v0.1.4/README.md)
 
 ## Author
 

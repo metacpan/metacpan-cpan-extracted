@@ -1,7 +1,7 @@
 #include "test.h"
 #include <panda/excepted.h>
 
-#define TEST(name) TEST_CASE("excepted: " name, "[excepted]")
+TEST_PREFIX("excepted: ", "[excepted]");
 
 TEST("moveable") {
     excepted<int, double> a;

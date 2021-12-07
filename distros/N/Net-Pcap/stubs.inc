@@ -2,10 +2,10 @@
  * stubs.inc - compatibility definitions to make this module compile in every cases
  *
  * Copyright (C) 2005, 2006 Sebastien Aperghis-Tramoni. All rights reserved.
- * 
- * This program is free software; you can redistribute it and/or modify 
+ *
+ * This program is free software; you can redistribute it and/or modify
  * it under the same terms as Perl itself.
- * 
+ *
  */
 
 /* Macros and constants */
@@ -354,11 +354,14 @@ int pcap_parsesrcstr(const char *source, int *type, char *host, char *port, char
 #ifdef _MSC_VER
 #pragma message( "Warning: the function pcap_open() is not available" )
 #endif
+
+#if PERL_PCAP_VERSION < 1009000
 struct pcap_rmtauth {
     int type;
     char *username;
     char *password;
 };
+#endif
 
 pcap_t * pcap_open(const char *source, int snaplen, int flags, int read_timeout, struct pcap_rmtauth *auth, char *err);
 pcap_t * pcap_open(const char *source, int snaplen, int flags, int read_timeout, struct pcap_rmtauth *auth, char *err) {
@@ -516,10 +519,12 @@ HANDLE pcap_getevent(pcap_t *p) {
 #ifdef _MSC_VER
 #pragma message( "Warning: the function pcap_setsampling() is not available" )
 #endif
+#if PERL_PCAP_VERSION < 1009000
 struct pcap_samp {
     int method;
     int value;
 };
+#endif
 
 struct pcap_samp *pcap_setsampling(pcap_t *p);
 struct pcap_samp *pcap_setsampling(pcap_t *p) {

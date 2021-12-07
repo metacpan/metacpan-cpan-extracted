@@ -182,12 +182,15 @@ sub que_function {
     my ($self,$req,$id)=@_;
     my $code=$self->SUPER::que_function($req,$id);
 
-    return sub {
+    my $cb;
+    $cb=sub {
       $code->(@_);
       $self->_common_handle_callback($id);
       $self->run_next;
       $self->log_always("our que count is: ".$self->que_count);
+      undef $cb;
     };
+    return $cb;
 }
 
 sub _common_handle_callback {

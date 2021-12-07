@@ -91,7 +91,7 @@ WriteMakefile(
 	provides => {
 	    'URPM' => {
 		file => 'URPM.pm',
-		version => 'v5.125',
+		version => 'v5.221',
 	    },
 	    'URPM::Resolve' => {
 		file => 'URPM/Resolve.pm',

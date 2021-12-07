@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Bucket;
-$Net::Amazon::S3::Client::Bucket::VERSION = '0.98';
+$Net::Amazon::S3::Client::Bucket::VERSION = '0.99';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Data::Stream::Bulk::Callback;
@@ -214,7 +214,7 @@ Net::Amazon::S3::Client::Bucket - An easy-to-use Amazon S3 client bucket
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 

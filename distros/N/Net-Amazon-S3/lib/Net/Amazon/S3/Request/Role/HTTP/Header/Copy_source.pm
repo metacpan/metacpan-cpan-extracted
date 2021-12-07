@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::Copy_source;
 # ABSTRACT: x-amz-copy-source header role
-$Net::Amazon::S3::Request::Role::HTTP::Header::Copy_source::VERSION = '0.98';
+$Net::Amazon::S3::Request::Role::HTTP::Header::Copy_source::VERSION = '0.99';
 use Moose::Role;
 
 use Net::Amazon::S3::Constants;
@@ -36,7 +36,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::Copy_source - x-amz-copy-source he
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

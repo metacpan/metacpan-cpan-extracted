@@ -1,21 +1,3 @@
-package Quiq::Perl;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Object;
-use Cwd ();
-use Quiq::Array;
-use Quiq::Perl;
-use Quiq::Option;
-use Quiq::FileHandle;
-use Encode ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -33,6 +15,30 @@ L<Quiq::Object>
 Die Klasse implementiert grundlegende Perl-Operationen, die
 Erweiterungen darstellen und/oder durch Exception-Behandlung
 abgesichert sind.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Perl;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Object;
+use Cwd ();
+use Quiq::Array;
+use Quiq::Perl;
+use Quiq::Option;
+use Quiq::FileHandle;
+use Encode ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -1778,7 +1784,7 @@ sub removePod {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

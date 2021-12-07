@@ -1,5 +1,8 @@
 Revision history for JavaScript-Packer
 
+2.08       2021-11-24
+    - Fix use of //# sourceMappingURL=url in comments without stripping (GH #9)
+
 2.07       2021-11-01
     - Allow use of //# sourceMappingURL=url in comments without stripping (GH #9)
 

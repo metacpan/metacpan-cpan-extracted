@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More 0.88;
 use Test::Deep qw( cmp_deeply code );
 use Test::PDL qw( :deep eq_pdl eq_pdl_diag );
 use Test::Builder::Tester;
@@ -9,7 +9,6 @@ use PDL;
 use PDL::Types;
 
 my @types = PDL::Types::types;
-plan tests => 15 + 10 * @types;
 
 isa_ok test_pdl( 1,2,3 ), 'Test::Deep::PDL';
 for my $type ( @types ) {
@@ -176,3 +175,5 @@ for my $vals ( [ 0 ], [ 2,3,0,1,99 ], [ 99,99,99 ] ) {
 	cmp_deeply $got, { data => code( sub { eq_pdl_diag shift, $pdl2 } ) };
 	test_test '... but the diagnostics are better than with code()';
 }
+
+done_testing;

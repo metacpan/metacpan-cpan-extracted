@@ -1,5 +1,8 @@
 Revision history for Perl extension Web-MarketReceipt
 
+0.06 2021-12-02T08:21:18Z
+    - Add Google Play purchase state "pending" by @chibapse
+
 0.05 2018-03-14T09:06:42Z
     - add receipt verification mock module for AppStore
 

@@ -39,6 +39,7 @@ t/09-authn-request.t
 t/10-artifact-resolve.t
 t/11-more-metadata.t
 t/12-full-client.t
+t/13-verify-issues.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t
@@ -51,6 +52,7 @@ t/author/podcoverage.t
 t/cacert.pem
 t/idp-metadata.xml
 t/idp-metadata2.xml
+t/issues/issue-49.xml
 t/lib/Test/Net/SAML2.pm
 t/lib/Test/Net/SAML2/Util.pm
 t/net-saml2-cacert.pem

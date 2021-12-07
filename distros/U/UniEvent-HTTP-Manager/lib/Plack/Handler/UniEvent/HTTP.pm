@@ -22,6 +22,8 @@ sub loop    { return shift->{manager}->loop }
 sub make_config {
     my $p = shift;
     return $p->{config} if $p->{config} && ref($p->{config}) eq 'HASH';
+
+    # code below runs for command line options only
     
     my $config = {
         server => UniEvent::HTTP::Plack::make_config($p),

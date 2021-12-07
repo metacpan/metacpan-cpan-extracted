@@ -1,14 +1,3 @@
-package Quiq::Database::Api;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Database::Api::Dbi::Connection;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -64,6 +53,23 @@ Quiq::Database::Api::Dbi::Cursor
 Potentielle andere Lowlevel-Datenbank-Schnittstellen müssen
 die gleichen Methoden implementieren.
 
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::Api;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Database::Api::Dbi::Connection;
+
+# -----------------------------------------------------------------------------
+
 =head1 METHODS
 
 =head2 Verbindungsaufbau
@@ -109,7 +115,7 @@ sub connect {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

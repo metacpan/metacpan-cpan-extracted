@@ -1,14 +1,3 @@
-package Quiq::Color;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Reference;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -53,6 +42,23 @@ verschiedene externe Repräsentationen liefern. Ferner kann die
 Helligkeit der Farbe ermittelt werden, was für eine Fontauswahl
 nützlich sein kann. Außerdem kann der Farbe ein Name zugewiesen
 werden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Color;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Reference;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -259,7 +265,7 @@ sub rgb {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

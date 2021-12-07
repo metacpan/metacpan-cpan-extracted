@@ -4,13 +4,13 @@
       "Jakob Voß"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
-      "open_source"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Pandoc",
    "no_index" : {
@@ -20,19 +20,24 @@
          "inc",
          "share",
          "eg",
-         "examples"
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.039"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
-            "Test::Pod" : "1.41"
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
@@ -51,6 +56,28 @@
          }
       }
    },
+   "provides" : {
+      "App::Prove::Plugin::andoc" : {
+         "file" : "lib/App/Prove/Plugin/andoc.pm",
+         "version" : "v0.9.1"
+      },
+      "Pandoc" : {
+         "file" : "lib/Pandoc.pm",
+         "version" : "v0.9.1"
+      },
+      "Pandoc::Error" : {
+         "file" : "lib/Pandoc/Error.pm",
+         "version" : "v0.9.1"
+      },
+      "Pandoc::Release" : {
+         "file" : "lib/Pandoc/Release.pm",
+         "version" : "v0.9.1"
+      },
+      "Pandoc::Version" : {
+         "file" : "lib/Pandoc/Version.pm",
+         "version" : "v0.9.1"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -58,18 +85,18 @@
       },
       "homepage" : "https://github.com/nichtich/Pandoc-Wrapper",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/nichtich/Pandoc-Wrapper.git",
+         "url" : "git://github.com/nichtich/Pandoc-Wrapper.git",
          "web" : "https://github.com/nichtich/Pandoc-Wrapper"
       }
    },
-   "version" : "0.9.0",
+   "version" : "0.9.1",
    "x_contributors" : [
       "Benct Philip Jonsson <bpjonsson@gmail.com>",
       "Edward Betts <edward@4angle.com>",
       "Jakob Voß <jakob.voss@gbv.de>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
 }
-

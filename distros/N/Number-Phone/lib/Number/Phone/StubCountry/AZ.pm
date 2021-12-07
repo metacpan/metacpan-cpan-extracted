@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211828;
+our $VERSION = 1.20211206222442;
 
 my $formatters = [
                 {
@@ -43,8 +43,8 @@ my $formatters = [
             1[28]|
             2|
             365(?:
-              [0-46-9]|
-              5[0-35-9]
+              4|
+              5[02]
             )|
             46
           ',
@@ -62,58 +62,58 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '
           (?:
-            222[0-79]\\d|
-            365(?:
-              [0-46-9]\\d|
-              5[0-35-9]
-            )
+            2[12]428|
+            3655[02]
           )\\d{4}|
+          (?:
+            2(?:
+              22[0-79]|
+              63[0-28]
+            )|
+            3654
+          )\\d{5}|
           (?:
             (?:
               1[28]|
               46
             )\\d|
             2(?:
-              [045]2|
-              1[24]|
-              2[34]|
-              33|
-              6[23]
+              [014-6]2|
+              [23]3
             )
           )\\d{6}
         ',
                 'geographic' => '
           (?:
-            222[0-79]\\d|
-            365(?:
-              [0-46-9]\\d|
-              5[0-35-9]
-            )
+            2[12]428|
+            3655[02]
           )\\d{4}|
+          (?:
+            2(?:
+              22[0-79]|
+              63[0-28]
+            )|
+            3654
+          )\\d{5}|
           (?:
             (?:
               1[28]|
               46
             )\\d|
             2(?:
-              [045]2|
-              1[24]|
-              2[34]|
-              33|
-              6[23]
+              [014-6]2|
+              [23]3
             )
           )\\d{6}
         ',
                 'mobile' => '
-          (?:
-            36554|
-            99[2-9]\\d\\d
-          )\\d{4}|
+          36554\\d{4}|
           (?:
             [16]0|
             4[04]|
             5[015]|
-            7[07]
+            7[07]|
+            99
           )\\d{7}
         ',
                 'pager' => '',
@@ -123,87 +123,87 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9942527", "Lerik",
-"9942022", "Agsu",
-"99436552", "Sharur",
-"9942629", "Khojavand",
-"9942331", "Khizi",
-"9942233", "Yevlakh",
-"9942421", "Oguz",
-"9942221", "Dashkasan",
-"9942220", "Goygol",
-"9942420", "Gabala",
-"9942330", "Siyazan",
-"9942632", "Agdam",
-"9942123", "Sabirabad",
-"99421428", "Hajigabul",
-"99436550", "Nakhchivan\ city",
-"9942623", "Qubadli",
-"9942631", "Fuzuli",
-"9942630", "Hadrut",
-"99412", "Baku",
-"9942422", "Zagatala",
-"9942222", "Agstafa",
-"9942332", "Khachmaz",
-"99436543", "Shahbuz",
-"9942021", "Ujar",
-"9942525", "Lankaran",
-"9942020", "Barda",
-"9942026", "Shamakhi",
-"9942338", "Gusar",
-"9942124", "Imishli",
-"9942027", "Goychay",
-"99436548", "Kangarli",
+$areanames{en} = {"9942126", "Neftchala",
 "9942522", "Astara",
-"9942425", "Gakh",
-"9942225", "Ganja",
-"9942335", "Shabran",
-"9942427", "Mingachevir",
-"9942227", "Samukh",
-"99436546", "Julfa",
-"9942226", "Ganja",
-"9942028", "Ismayilli",
-"9942521", "Masalli",
-"9942624", "Askaran",
-"9942638", "Jabrayil",
-"9942520", "Yardimli",
-"9942025", "Kurdamir",
-"99436544", "Nakhchivan\ city",
-"9942628", "Agdara",
-"99436547", "Ordubad",
-"9942625", "Zangilan",
-"9942127", "Agjabadi",
-"99418", "Sumgayit",
-"9942024", "Gobustan",
-"9942126", "Neftchala",
-"99436549", "Sadarak",
-"9942235", "Naftalan",
-"9942529", "Bilasuvar",
-"9942626", "Shusha",
-"9942125", "Salyan",
-"9942627", "Kalbajar",
-"9942128", "Saatli",
-"9942224", "Goranboy",
-"9942424", "Shaki",
-"9942229", "Gazakh",
-"9942429", "Balakan",
-"9942023", "Agdash",
-"99422428", "Agstafa\/Ganja\/Yevlakh",
-"9942232", "Gadabay",
-"9942620", "Khojali",
-"9942524", "Jalilabad",
-"9942122", "Beylagan",
-"9942621", "Lachin",
 "9942622", "Khankandi",
+"9942128", "Saatli",
+"99436547", "Ordubad",
+"9942233", "Yevlakh",
+"9942026", "Shamakhi",
+"9942429", "Balakan",
+"9942028", "Ismayilli",
+"99418", "Sumgayit",
+"9942422", "Zagatala",
+"9942021", "Ujar",
+"9942529", "Bilasuvar",
+"99412", "Baku",
+"9942629", "Khojavand",
 "9942121", "Shirvan",
-"9942120", "Hajigabul",
-"99436542", "Sharur",
-"9942230", "Shamkir",
-"9942029", "Zardab",
+"99436550", "Nakhchivan\ city",
 "9942333", "Guba",
+"9942229", "Gazakh",
+"9942222", "Agstafa",
+"99436543", "Shahbuz",
+"9942220", "Goygol",
+"9942625", "Zangilan",
+"9942525", "Lankaran",
+"9942638", "Jabrayil",
+"9942331", "Khizi",
+"99436549", "Sadarak",
+"994214", "Hajigabul",
+"9942425", "Gakh",
+"9942338", "Gusar",
+"9942227", "Samukh",
+"9942631", "Fuzuli",
+"9942420", "Gabala",
+"9942124", "Imishli",
+"9942024", "Gobustan",
+"9942627", "Kalbajar",
+"99436552", "Sharur",
+"9942527", "Lerik",
+"9942231", "Tovuz",
+"9942620", "Khojali",
+"9942520", "Yardimli",
+"9942023", "Agdash",
+"9942225", "Ganja",
+"9942427", "Mingachevir",
+"9942123", "Sabirabad",
+"9942330", "Siyazan",
+"9942221", "Dashkasan",
+"9942235", "Naftalan",
+"9942226", "Ganja",
+"99436544", "Nakhchivan\ city",
+"9942630", "Hadrut",
+"9942122", "Beylagan",
+"9942628", "Agdara",
+"9942626", "Shusha",
+"9942230", "Shamkir",
+"9942022", "Agsu",
+"9942421", "Oguz",
+"9942335", "Shabran",
+"9942029", "Zardab",
+"99436546", "Julfa",
+"9942621", "Lachin",
+"9942521", "Masalli",
+"9942027", "Goychay",
+"994224", "Agstafa\/Ganja\/Yevlakh",
+"9942624", "Askaran",
+"9942524", "Jalilabad",
+"9942127", "Agjabadi",
+"9942120", "Hajigabul",
+"9942424", "Shaki",
+"9942232", "Gadabay",
+"9942623", "Qubadli",
+"9942020", "Barda",
+"9942632", "Agdam",
+"9942125", "Salyan",
+"99436548", "Kangarli",
+"9942025", "Kurdamir",
 "99436541", "Babek",
 "9942223", "Tartar",
-"9942231", "Tovuz",};
+"99436542", "Sharur",
+"9942332", "Khachmaz",
+"9942224", "Goranboy",};
 
     sub new {
       my $class = shift;

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.873';
+our $VERSION = '1.875';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -383,7 +383,7 @@ MCE::Shared::Array - Array helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Array version 1.873
+This document describes MCE::Shared::Array version 1.875
 
 =head1 DESCRIPTION
 

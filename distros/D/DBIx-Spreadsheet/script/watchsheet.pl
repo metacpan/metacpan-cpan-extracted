@@ -6,7 +6,7 @@ use DBIx::RunSQL;
 use Filesys::Notify::Simple;
 use File::Basename 'dirname';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 GetOptions();
 

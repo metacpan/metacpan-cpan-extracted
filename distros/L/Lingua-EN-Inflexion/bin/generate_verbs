@@ -85,38 +85,58 @@ while (my $line = readline $verb_data_fh) {
         # Add the pattern data to the list of generics...
         push @{$plural_of{pattern}},    { is   => "($plur_gen$plur_restriction)$plur",
                                           from => "(.*$sing_restriction)$sing",
-                                          to   => '${1}'.$plur
+                                          to   => '${1}'.$plur,
+                                          root => $plur,
                                         };
         push @{$singular_of{pattern}},  { is   => "($sing_gen$sing_restriction)$sing",
                                           from => "(.*$plur_restriction)$plur",
-                                          to   => '${1}'.$sing
+                                          to   => '${1}'.$sing,
+                                          root => $sing,
                                         };
         if ($pret ne '_') {
             push @{$past_of{pattern}},  { is   => "($pret_gen$pret_restriction)$pret",
                                           from => "(.*$sing_restriction)$sing",
-                                          to   => '${1}'.$pret
+                                          to   => '${1}'.$pret,
+                                          root => $pret,
                                         };
             push @{$past_of{pattern}},  { from => "(.*$plur_restriction)$plur",
-                                          to   => '${1}'.$pret
+                                          to   => '${1}'.$pret,
+                                          root => $pret,
                                         };
+            if ($past ne '_') {
+                push @{$past_of{pattern}},  { from => "(.*$past_restriction)$past",
+                                              to   => '${1}'.$pret,
+                                              root => $pret,
+                                            };
+            }
         }
         if ($pres ne '_') {
             push @{$pres_part_of{pattern}}, { is   => "($pres_gen$pres_restriction)$pres",
                                               from => "(.*$sing_restriction)$sing",
-                                              to   => '${1}'.$pres
+                                              to   => '${1}'.$pres,
+                                              root => $pres,
                                             };
             push @{$pres_part_of{pattern}}, { from => "(.*$plur_restriction)$plur",
-                                              to   => '${1}'.$pres
+                                              to   => '${1}'.$pres,
+                                              root => $pres,
                                             };
         }
         if ($past ne '_') {
             push @{$past_part_of{pattern}}, { is   => "($past_gen$past_restriction)$past",
                                               from => "(.*$sing_restriction)$sing",
-                                              to   => '${1}'.$past
+                                              to   => '${1}'.$past,
+                                              root => $past,
                                             };
             push @{$past_part_of{pattern}}, { from => "(.*$plur_restriction)$plur",
-                                              to   => '${1}'.$past
+                                              to   => '${1}'.$past,
+                                              root => $past,
                                             };
+            if ($pret ne '_') {
+                push @{$past_part_of{pattern}},  { from => "(.*$pret_restriction)$pret",
+                                                     to   => '${1}'.$past,
+                                                     root => $past,
+                                                 };
+            }
         }
     }
 
@@ -227,6 +247,16 @@ say 'my $is_past_part = {}; @{$is_past_part}{values %{$past_part_of} } = ();';
 say '';
 say 'my $is_pres_part = {}; @{$is_pres_part}{values %{$pres_part_of} } = ();';
 say '';
+
+# Sort recognizer pattern tables...
+# (THIS DOESN'T ACTUALLY SOLVE THE PROBLEM! NEEDS IDENTITY-BASED OBJECTS.)
+#for my $table_ref ($plural_of{pattern},
+#                   $singular_of{pattern},
+#                   $past_of{pattern},
+#                   $pres_part_of{pattern},
+#                   $past_part_of{pattern}) {
+#    @{$table_ref} = sort { $b->{root} cmp $a->{root} } @{$table_ref};
+#}
 
 # Emit utility function...
 say 'sub tc {my($text)=@_; $text=~s{(\A|\s)(\S)|(\S)}{defined($3)?lc($3):$1.uc($2)}egxms; $text; };';
@@ -415,7 +445,7 @@ sub emit_converter {
     say '    my ($word) = @_;';
     say "    return \$${name}_of->{\$word}     if exists \$${name}_of->{\$word};";
     say "    return \$${name}_of->{lc \$word}  if exists \$${name}_of->{lc \$word};";
-    say "    return \$${name}_of->{tc \$word}  if exists \$${name}_of->{ucfirst lc \$word};";
+    say "    return \$${name}_of->{tc \$word}  if exists \$${name}_of->{tc \$word};";
     say "    return \$word                     if is_$type(\$word);";
     say '    given ($word) {';
 
@@ -438,11 +468,11 @@ sub emit_recognizer {
     say '    my ($word) = @_;';
     say "    return 1 if exists \$is_${name}\->{\$word};";
     say "    return 1 if exists \$is_${name}\->{lc \$word};";
-    say "    return 1 if exists \$is_${name}\->{ucfirst lc \$word};";
+    say "    return 1 if exists \$is_${name}\->{tc \$word};";
     if ($compl_name) {
         say "    return 0 if exists \$is_${compl_name}\->{\$word};";
         say "    return 0 if exists \$is_${compl_name}\->{lc \$word};";
-        say "    return 0 if exists \$is_${compl_name}\->{ucfirst lc \$word};";
+        say "    return 0 if exists \$is_${compl_name}\->{tc \$word};";
     }
     say '    given ($word) {';
 

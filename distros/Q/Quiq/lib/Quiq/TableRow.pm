@@ -1,14 +1,3 @@
-package Quiq::TableRow;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Scalar::Util ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -29,6 +18,23 @@ und ein Verweis auf ein Array von Werten. Das Array muss keiner Klasse
 angehören, kann also ungeblesst sein. Eine Tabellenzeile wird
 typischerweise nicht direkt instantiiert, sondern von der Methode push()
 der Klasse Quiq::Table. Details siehe dort.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::TableRow;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Scalar::Util ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -150,7 +156,7 @@ sub values {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

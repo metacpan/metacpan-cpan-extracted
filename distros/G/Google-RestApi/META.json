@@ -85,6 +85,6 @@
          "web" : "https://github.com/mvsjes2/p5-google-restapi"
       }
    },
-   "version" : "0.9",
+   "version" : "v1.0.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -225,7 +225,7 @@ layout 'site',
 @@ partials/_footer_right.html.ep
 <div class="pull-right text-right social">
 <%
-my $sharer_url = url_for->base . $canonical_path;
+my $sharer_url = $canonical_path;
 %>
 <a class="button outline primary sharer" target="_blank"
     href="https://www.facebook.com/share.php?u=<%= $sharer_url %>" rel="noopener"
@@ -238,27 +238,27 @@ my $sharer_url = url_for->base . $canonical_path;
     title="Споделяне в Reddit">r</a><a
 
     class="button outline primary sharer" target="_blank"
-    href="https://www.linkedin.com/shareArticle?mini=true&url=<%= $sharer_url %>;title=<%= title %>"
+    href="https://www.linkedin.com/shareArticle?mini=true&url=<%= $sharer_url %>&title=<%= title %>"
     aria-label="Споделяне в LinkedIn"
     title="Споделяне в LinkedIn">in</a><a
 
     class="button outline primary sharer" target="_blank"
-    href="https://twitter.com/intent/tweet?url=<%= $sharer_url %>;via=@kberov;title=<%= title %>"
+    href="https://twitter.com/intent/tweet?url=<%= $sharer_url %>&via=@kberov&title=<%= title %>"
     aria-label="Споделяне в Twitter"
     title="Споделяне в Twitter">t</a><!--<a
 
     class="button outline primary sharer" target="_blank"
-    href="https://pinterest.com/pin/create/button/?url=<%= $sharer_url %>;description=<%= title %>"
+    href="https://pinterest.com/pin/create/button/?url=<%= $sharer_url %>&description=<%= title %>"
     aria-label="Споделяне в Pinterest"
     title="Споделяне в Pinterest">P</a>--><a
 
     class="button outline primary sharer" target="_blank"
-    href="mailto:?subject=<%= title %>;body=<%= $sharer_url %>"
+    href="mailto:?subject=<%= title %>&body=<%= $sharer_url %>"
     aria-label="Напишете писмо"
     title="Напишете писмо">✉</a><a
 
     class="button outline primary sharer" target="_blank"
-    href="tg://msg_url?url=<%= $sharer_url %>;text=<%= title %>"
+    href="tg://msg_url?url=<%= $sharer_url %>&text=<%= title %>"
     aria-label="Споделяне в Telegram"
     title="Споделяне в Telegram">➢</a><a
 
@@ -277,9 +277,7 @@ my $sharer_url = url_for->base . $canonical_path;
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon" />
-    % my $base = url_for->base;
-    % $canonical_path =~ s|^/|| if $base =~ m|/$|;
-    <link rel="canonical" href="<%= $base . $canonical_path %>" />
+    <link rel="canonical" href="<%= $canonical_path %>" />
 
     <title><%= title %></title>
     <meta name="author" content="<%= $author %>" />
@@ -290,7 +288,7 @@ my $sharer_url = url_for->base . $canonical_path;
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="<%= $domain->{site_name} %>" />
     <meta property="og:title" content="<%= title %>" />
-    <meta property="og:url" content="<%= $base . $canonical_path %>" />
+    <meta property="og:url" content="<%= $canonical_path %>" />
     <meta property="og:type" content="article" />
     <meta property="og:article:author" content="<%= $author %>" />
     <meta property="og:description" content="<%= $description %>" />

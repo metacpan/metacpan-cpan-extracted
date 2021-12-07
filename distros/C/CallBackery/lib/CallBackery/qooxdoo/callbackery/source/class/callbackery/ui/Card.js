@@ -164,7 +164,6 @@ qx.Class.define("callbackery.ui.Card", {
                         if (event == 'changeSelection') {
                             field.addListener(event, (e) => {
                                 let value = e.getData()[0].getModel();
-                                console.log('key=', key, ', event=', event, ', value=', e.getData());
                                 this.__parentForm.setSelection({ data : this.__dataCache, key : fieldCfg.key, value : value });
                                 if (this.__buttonMap[this._updateAction]) {
                                     this.__buttonMap[this._updateAction].execute();

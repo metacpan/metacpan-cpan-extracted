@@ -1,5 +1,8 @@
 Revision history for Perl extension List::Helpers::XS.
 
+0.19 2021 Dec 03
+    - fixing meta-files, MANIFEST file
+
 0.18 2021 Oct 12
     - POD Fixes
 

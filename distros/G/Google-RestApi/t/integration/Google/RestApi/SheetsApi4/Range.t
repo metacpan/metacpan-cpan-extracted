@@ -67,10 +67,8 @@ sub named {
 
 sub formulas {
   my $sum = '=SUM(A1:B1)';
-  my @values = (
-    [ 1, 1, $sum ],
-  );
-  my $range = $ws0->range("A1:C1");
+  my @values = (1, 1, $sum);
+  my $range = $ws0->range_row("A1:C1");
   $range->values(values => \@values);
 
   is $ws0->range_cell('C1')->values(), 2, "Returned formula value should be 2";
@@ -86,7 +84,8 @@ sub formulas {
       includeValuesInResponse => 'true',
     },
   ), "Returning values in response";
-  is $range->values()->[0]->[2], 2, "Returned formula value should be 2";
+
+  is $range->values()->[2], 2, "Returned formula value should be 2";
 
   is_array $range->values(
     values => \@values,
@@ -95,13 +94,13 @@ sub formulas {
       responseValueRenderOption => 'FORMULA',
     },
   ), "Returning values in response";
-  is $range->values()->[0]->[2], $sum, "Returned formula value should be '$sum'";
+  is $range->values()->[2], $sum, "Returned formula value should be '$sum'";
 
   is_hash $range->batch_values(values => \@values), "Returning batch values";
   is_array $range->submit_values(
     content => { includeValuesInResponse   => 'true' },
   ),"Submitting batch values in response";
-  is $range->values()->[0]->[2], 2, "Returned batch formula value should be 2";
+  is $range->values()->[2], 2, "Returned batch formula value should be 2";
 
   is_hash $range->batch_values(values => \@values), "Returning batch values";
   is_array $range->submit_values(
@@ -110,7 +109,7 @@ sub formulas {
       responseValueRenderOption => 'FORMULA',
     },
   ), "Returning batch values in response";
-  is $range->values()->[0]->[2], $sum, "Returned batch formula value should be '$sum'";
+  is $range->values()->[2], $sum, "Returned batch formula value should be '$sum'";
 
   return;
 }

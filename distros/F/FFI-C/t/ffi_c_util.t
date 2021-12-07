@@ -1,5 +1,5 @@
 use Test2::V0 0.000081 -no_srand => 1;
-use FFI::C::Util qw( owned take perl_to_c c_to_perl set_array_count );
+use FFI::C::Util qw( owned take perl_to_c c_to_perl set_array_count addressof );
 use FFI::Platypus::Memory qw( free );
 use FFI::C::StructDef;
 use FFI::C::UnionDef;
@@ -29,8 +29,23 @@ subtest 'owned / take' => sub {
 
   is owned($inst), T(), 'instance is owned';
 
-  my $ptr = take $inst;
-  is $ptr, match qr/^[0-9]+$/, 'gave us a pointer';
+  my $ptr1 = addressof $inst;
+  is $ptr1, match qr/^[0-9]+$/, 'addressof is a pointer';
+
+  is
+    $inst,
+    object {
+      call [ isa => 'FFI::C::Struct' ] => T();
+      field ptr => match qr/^[0-9]+$/;
+      etc;
+    },
+    'object after addressof',
+  ;
+
+  my $ptr2 = take $inst;
+  is $ptr2, match qr/^[0-9]+$/, 'gave us a pointer';
+
+  is $ptr2, $ptr1, 'pointer from take and addressof are the same';
 
   is
     $inst,

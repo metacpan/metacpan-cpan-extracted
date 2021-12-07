@@ -1,5 +1,14 @@
 Revision history for Object-Pad
 
+0.58    2021-11-25
+        [CHANGES]
+         * Trim whitespace within :attribute values (RT140109)
+
+        [BUGFIXES]
+         * Early seal on outer class when deriving an inner subclass of it
+         * Store the real slotix in fasthook cache, not its index within the
+           direct_slots AV
+
 0.57    2021-11-18
         [CHANGES]
          * Defined new ABI version for class/slot hooks

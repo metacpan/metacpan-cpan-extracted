@@ -1,15 +1,3 @@
-package Quiq::Confluence::Page;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use JSON ();
-use Quiq::Debug;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -28,6 +16,24 @@ Ein Objekt der Klasse kapselt den Body der HTTP Antwort einer
 getPage()-Operation des Confluence-Client (Klasse
 Quiq::Confluence::Client). Mit den Methoden der Klasse kann
 auf die Information in der Antwort zugegriffen werden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Confluence::Page;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use JSON ();
+use Quiq::Debug;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -234,7 +240,7 @@ sub asString {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

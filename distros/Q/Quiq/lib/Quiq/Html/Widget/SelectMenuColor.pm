@@ -1,15 +1,3 @@
-package Quiq::Html::Widget::SelectMenuColor;
-use base qw/Quiq::Html::Widget::SelectMenu/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Color;
-use Quiq::String;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -70,6 +58,24 @@ Erzeuge Auswahlmenü mit farbigen Hintergründen:
       value => 'Birne',
   );
   print $w->html($h);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Widget::SelectMenuColor;
+use base qw/Quiq::Html::Widget::SelectMenu/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Color;
+use Quiq::String;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -188,7 +194,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

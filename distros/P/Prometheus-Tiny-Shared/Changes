@@ -1,5 +1,8 @@
 Revision history for Prometheus-Tiny-Shared
 
+0.025     2021-12-07 16:46:28+11:00 Australia/Melbourne
+- Update for Prometheus::Tiny 0.009 default_labels support
+
 0.024     2021-07-21 14:27:51+10:00 Australia/Melbourne
 - Update for Prometheus::Tiny 0.008 enum support
 

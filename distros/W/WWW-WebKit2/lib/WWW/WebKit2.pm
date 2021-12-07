@@ -49,14 +49,13 @@ use Gtk3::Soup;
 use Glib qw(TRUE FALSE);
 use File::Path qw(make_path);
 use File::Slurper qw(write_text);
-use Time::HiRes qw(time usleep);
 use X11::Xlib;
 use Carp qw(carp croak);
 use XSLoader;
 use English '-no_match_vars';
 use POSIX qw(F_SETFD F_GETFD FD_CLOEXEC);
 
-our $VERSION = '0.129';
+our $VERSION = '0.131';
 
 use constant DOM_TYPE_ELEMENT => 1;
 use constant ORDERED_NODE_SNAPSHOT_TYPE => 7;
@@ -499,6 +498,7 @@ sub setup_xvfb {
     my $display = <$read>;
     chomp $display;
 
+    $ENV{WAYLAND_DISPLAY} = '';
     $ENV{DISPLAY} = ":$display";
 
     return;
@@ -558,11 +558,11 @@ sub DESTROY {
 =head1 SEE ALSO
 
 See L<WWW::Selenium> for API documentation.
-See L<Test::WWW::WebKit> for a replacement for L<Test::WWW::Selenium>.
-See L<Test::WWW::WebKit::Catalyst> for a replacement for L<Test::WWW::Selenium::Catalyst>.
+See L<Test::WWW::WebKit2> for a replacement for L<Test::WWW::Selenium>.
+See L<Test::WWW::WebKit2::Catalyst> for a replacement for L<Test::WWW::Selenium::Catalyst>.
 
 The current development version can be found in the git repository at:
-https://github.com/jscarty/WWW-WebKit2
+https://github.com/sorryforthecommit/WWW-WebKit2
 
 =head1 AUTHOR
 

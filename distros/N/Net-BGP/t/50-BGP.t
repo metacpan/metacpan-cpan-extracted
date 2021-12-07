@@ -34,9 +34,8 @@ use_ok('Net::BGP::Process');
 my $lh1 = '127.0.0.1';
 my $lh2 = '127.0.0.1'; # Windows don't know of 127.0.0.2!
 
-# TODO This probably needs to be more dynamic
-my $port = 10179; # > 1024 to allow non-root execution
-#my $port = 179; # 179 for debuging!
+my $port = random_high_port();
+
 my $keepalive = 5; # To allow faster execution. Must long enough to allow code to execute!
 
 # Construction
@@ -149,6 +148,26 @@ ok($shutaok == 2,'Shutdown active');
 ok($timerok == 2,'Timer');
 
 ## End of test script - Functions below ##
+
+##
+# Return a random TCP port number in the range [32768, 65536). If a parameter is
+# provided specifying another port, ensure the port returned is different.
+#
+sub random_high_port
+{
+    my $unique_port = shift();
+    my $random_port = int(rand(65536 - 32768)) + 32768;
+
+    if (defined($unique_port))
+    {
+        if ($random_port == $unique_port)
+        {
+            return random_high_port($unique_port);
+        }
+    }
+
+    return $random_port;
+}
 
 sub opencallback
 {

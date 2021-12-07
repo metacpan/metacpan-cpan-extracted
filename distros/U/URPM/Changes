@@ -1,3 +1,9 @@
+Version 5.221 - 2 December 2021
+
+- Bump static buffer size when generating synthesys
+
+Version 5.125 - 23 October 2021
+
 - Further prevent SRPM to conflicts with its own build deps with rpm-4.16+
 
 Version 5.124 - 19 October 2021

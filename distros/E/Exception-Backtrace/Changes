@@ -1,3 +1,7 @@
+1.1.0   26.11.2021
+    - Introduce agruments decorator to allow custom stringification
+      of perl frame arguments
+
 1.0.11   08.04.2021
     - Don't gather traces twice. Might happen if perl exception is
       invoked twice, i.e. in Perl layers in the flow "Perl->C->Perl"

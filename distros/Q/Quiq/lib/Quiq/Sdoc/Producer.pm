@@ -1,14 +1,3 @@
-package Quiq::Sdoc::Producer;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Unindent;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -36,6 +25,23 @@ Sdoc-Dokument aufgebaut ist.
 Einrücktiefe bei der Codegenerierung
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Sdoc::Producer;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Unindent;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -500,7 +506,7 @@ sub eof {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

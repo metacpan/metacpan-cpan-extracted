@@ -49,6 +49,6 @@
          "url" : "https://github.com/leejo/javascript-packer-perl"
       }
    },
-   "version" : "2.07",
+   "version" : "2.08",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

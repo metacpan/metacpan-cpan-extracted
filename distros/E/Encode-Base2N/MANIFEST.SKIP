@@ -1,7 +1,7 @@
 clib/build/
 clib/cmake_props/
 
-#!start included /home/syber/perl5/perlbrew/perls/5.32.1g/lib/5.32.1/ExtUtils/MANIFEST.SKIP
+#!start included /home/syber/perl5/perlbrew/perls/5.34.0g/lib/5.34.0/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -9,6 +9,7 @@ clib/cmake_props/
 ,v$
 \B\.svn\b
 \B\.git\b
+^\.github\b
 \B\.gitignore\b
 \b_darcs\b
 \B\.cvsignore$
@@ -55,6 +56,8 @@ clib/cmake_props/
 \B\.DS_Store
 # Mac OSX SMB mount metadata files
 \B\._
+# Placeholder files created when iCloud will "optimize Mac storage"
+\.i[cC]loud$
 
 # Avoid Devel::Cover and Devel::CoverX::Covered files.
 \bcover_db\b
@@ -74,5 +77,5 @@ clib/cmake_props/
 
 # Avoid AppVeyor file
 ^\.?appveyor.yml
-#!end included /home/syber/perl5/perlbrew/perls/5.32.1g/lib/5.32.1/ExtUtils/MANIFEST.SKIP
+#!end included /home/syber/perl5/perlbrew/perls/5.34.0g/lib/5.34.0/ExtUtils/MANIFEST.SKIP
 

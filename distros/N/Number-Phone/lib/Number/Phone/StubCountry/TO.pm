@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211833;
+our $VERSION = 1.20211206222447;
 
 my $formatters = [
                 {
@@ -92,33 +92,33 @@ my $validators = {
                 'voip' => '55[0-37-9]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"67638", "Vaini",
-"67630", "Pea",
+$areanames{en} = {"67674", "Vava\’u",
+"67643", "Matangiake",
+"67629", "Pea",
 "67676", "Vava\’u",
+"67675", "Vava\’u",
+"67637", "Vaini",
+"6762", "Nuku\'alofa",
 "67685", "Niuas",
+"67642", "Masilamea",
+"67672", "Vava\’u",
+"67680", "Niuas",
 "67641", "Masilamea",
 "67671", "Vava\’u",
-"67643", "Matangiake",
-"6762", "Nuku\'alofa",
-"67675", "Vava\’u",
-"67634", "Kolonga",
-"67632", "Muʻa",
-"67637", "Vaini",
-"67633", "Kolonga",
-"67631", "Muʻa",
-"67679", "Vava\’u",
-"67680", "Niuas",
-"67669", "Ha\’apai",
-"67642", "Masilamea",
-"67635", "Nakolo",
-"67672", "Vava\’u",
-"67674", "Vava\’u",
-"67650", "\‘Eua",
 "67660", "Ha\’apai",
 "67670", "Vava\’u",
+"67640", "Kolovai",
+"67632", "Muʻa",
+"67650", "\‘Eua",
+"67638", "Vaini",
+"67631", "Muʻa",
+"67669", "Ha\’apai",
+"67679", "Vava\’u",
+"67630", "Pea",
+"67633", "Kolonga",
+"67634", "Kolonga",
 "67636", "Nakolo",
-"67629", "Pea",
-"67640", "Kolovai",};
+"67635", "Nakolo",};
 
     sub new {
       my $class = shift;

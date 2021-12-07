@@ -1,9 +1,9 @@
 NAME
-    App::depak - Pack your dependencies onto your script file
+    App::depak - Pack dependencies onto your script file
 
 VERSION
-    This document describes version 0.584 of App::depak (from Perl
-    distribution App-depak), released on 2021-10-21.
+    This document describes version 0.585 of App::depak (from Perl
+    distribution App-depak), released on 2021-11-14.
 
 SYNOPSIS
     See depak.
@@ -14,7 +14,7 @@ FUNCTIONS
 
      depak(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    Pack your dependencies onto your script file.
+    Pack dependencies onto your script file.
 
     This function is not exported.
 

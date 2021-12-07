@@ -1,25 +1,3 @@
-package Quiq::Shell;
-BEGIN {
-    $INC{'Quiq/Shell.pm'} ||= __FILE__;
-}
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Time::HiRes ();
-use Quiq::Duration;
-use Quiq::AnsiColor;
-use Quiq::Option;
-use Quiq::Path;
-use Quiq::Converter;
-use Quiq::Process;
-use Cwd ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -31,6 +9,34 @@ Quiq::Shell - Ausführung von Shell-Kommandos
 =head1 BASE CLASS
 
 L<Quiq::Hash>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Shell;
+BEGIN {
+    $INC{'Quiq/Shell.pm'} ||= __FILE__;
+}
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Time::HiRes ();
+use Quiq::Duration;
+use Quiq::AnsiColor;
+use Quiq::Option;
+use Quiq::Path;
+use Quiq::Converter;
+use Quiq::Process;
+use Cwd ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -635,7 +641,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

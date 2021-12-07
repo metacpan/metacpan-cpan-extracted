@@ -245,12 +245,13 @@ std::ostream& operator<< (std::ostream& os, const Server::Location& location) {
         if (res) {
             auto sa = res.value();
             os << sa.ip() << ":" << sa.port();
+            os << ", reuse_port: false";
         } else {
             os << "<unknown custom socket>";
         }
     } else {
         os << location.host << ":" << location.port;
-        if (location.reuse_port) os << ", reuse_port: true";
+        os << ", reuse_port: " << location.reuse_port;
     }
     os << ", backlog: " << location.backlog;
     os << "}";
@@ -263,7 +264,7 @@ std::ostream& operator<< (std::ostream& os, const Server::Config& conf) {
     os << ", max_headers_size: " << conf.max_headers_size;
     if (conf.max_body_size != panda::protocol::http::SIZE_UNLIMITED) os << ", max_body_size: " << conf.max_body_size;
     if (conf.max_keepalive_requests) os << ", max_keepalive_requests: " << conf.max_keepalive_requests;
-    if (conf.tcp_nodelay) os << ", tcp_nodelay: true";
+    os << ", tcp_nodelay: " << conf.tcp_nodelay;
     os << ", locations: [";
     for (auto loc : conf.locations) os << loc << ", ";
     os << "]}";

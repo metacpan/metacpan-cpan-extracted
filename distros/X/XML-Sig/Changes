@@ -1,10 +1,43 @@
 Revision history for XML-Sig
 
+0.55 -- Tue Dec 07 18:12:45 AST 2021
+
+  - 9da4192 Updates version and small packaging change
+  - d0ab34b v0.54
+
+0.54 -- Sun Dec 05 13:14:38 AST 2021
+
+  [A few minor changes preparing for it becoming a Net::SAML2 dependency]
+
+  [Change Log]
+  - bef4535 Increment version
+  - 5e0bdcf Add additional test for inclusive prefixes
+  - f18c60e Merge pull request #39 from perl-net-saml2/exporter-cleanup
+  - 4a27044 Exporter not actually needed
+
+0.53 -- Sun Nov 28 11:06:46 AST 2021
+
+  - Official Release
+
+  - 17eefc7 Updates for Release 0.53
+  - c2ad0c2 v0.53
+
+0.52 -- Sat Nov 27 15:46:27 AST 2021
+
+  - 2de15f5 (tag: 0.53) v0.52
+  - ed2296b Prepare for new release
+  - 7c157e6 Make sha256 the default signature and digest hash
+  - dbac9d7 Fix issue verifying ecdsa with multiple signatures and ECDSAKeyValue
+  - 1c39e8d test for signing wide characters
+  - da1e45b Fixed #38 - Issue verifying XML that includes wide characters
+  - 092269f Dist::Zilla and packaging improvements
+  - 57f049a Fixes #37 - Inconsistent Canonicalization method
+
 0.51 - 2021-07-03
 
   [Change Log]
 
-  - TBD     Update Changes and Increment version
+  - e852d07 Update Changes and Increment version
   - 3ad26aa Renew RSA certificate for 10 years
 
 0.50 - 2021-04-18

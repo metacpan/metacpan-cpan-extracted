@@ -1,0 +1,16 @@
+1.0500  2021-11-25
+
+- Add support for binmode
+
+1.0401  2009-03-19      Apply the patch properly this time!
+
+1.04    2009-03-18      Fix failing test on Windows (stupid quoting rules on -e)
+                          thanks to David Golden for the patch
+
+1.03    2007-08-28      Added dependency on perl 5.8
+
+1.02    2006-07-05      Added 'no warnings' to start of module
+
+1.01    2006-07-03      Doh!  Forget to set $VERSION
+
+1.0     2006-07-03      Original release

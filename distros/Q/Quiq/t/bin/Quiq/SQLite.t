@@ -33,7 +33,7 @@ sub test_unitTest_root: Test(3) {
 
     # Erzeuge initiale Datenbank
 
-    Quiq::SQLite->recreateDatabase($dbFile,$exportDir,sub {
+    Quiq::SQLite->recreateDatabase($dbFile,$exportDir,-interactive=>0,sub {
         my $dbFile = shift;
         
         my $db = Quiq::Database::Connection->new("dbi#sqlite:$dbFile");
@@ -55,7 +55,7 @@ sub test_unitTest_root: Test(3) {
 
     # Erzeuge die Datenbank mit geändertem Schema neu
 
-    Quiq::SQLite->recreateDatabase($dbFile,$exportDir,sub {
+    Quiq::SQLite->recreateDatabase($dbFile,$exportDir,-interactive=>0,sub {
         my $dbFile = shift;
         
         my $db = Quiq::Database::Connection->new("dbi#sqlite:$dbFile");

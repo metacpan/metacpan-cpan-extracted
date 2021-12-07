@@ -19,12 +19,20 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-MuPDF
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 recommends:
   Inline: '0.67'
   Inline::C: '0.62'
@@ -36,15 +44,15 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  homepage: https://github.com/project-renard/p5-Alien-MuPDF
-  repository: https://github.com/project-renard/p5-Alien-MuPDF.git
-version: '0.011'
+  homepage: https://github.com/Intertangle/p5-Alien-MuPDF
+  repository: https://github.com/Intertangle/p5-Alien-MuPDF.git
+version: '0.012'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.29'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
       Alien::gmake: '0.14'
-      Alien::patch: '0.09'
+      Alien::patch: '0.08'
       Archive::Tar: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'

@@ -1,17 +1,3 @@
-package Quiq::Axis::Numeric;
-use base qw/Quiq::Axis/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Math;
-use Quiq::Hash;
-use Quiq::AxisTick;
-use POSIX ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -95,6 +81,26 @@ Mindestabstand zwischen zwei Ticks: C<< LABELL<lt>--minTickGap-->LABEL >>
 Gib Information über die Tickberechnung auf STDERR aus.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Axis::Numeric;
+use base qw/Quiq::Axis/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Math;
+use Quiq::Hash;
+use Quiq::AxisTick;
+use POSIX ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -455,7 +461,7 @@ sub label {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

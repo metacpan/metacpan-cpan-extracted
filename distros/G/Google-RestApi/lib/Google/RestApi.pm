@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '0.9';
+our $VERSION = '1.0.0';
 
 use Google::RestApi::Setup;
 
@@ -13,6 +13,7 @@ use Module::Load qw( load );
 use Scalar::Util qw( blessed );
 use Retry::Backoff qw( retry );
 use Storable qw( dclone );
+use Time::HiRes;   # prevent 'unimplmented in this platform' for windows, for time::out below. order is important.
 use Time::Out qw( timeout );
 use Try::Tiny qw( catch try );
 use URI ();
@@ -23,9 +24,9 @@ sub new {
 
   my $self = merge_config_file(@_);
   state $check = compile_named(
-    config_file  => ReadableFile, { optional => 1 },
-    auth         => HashRef | Object,
-    throttle     => PositiveOrZeroInt, { default => 0 },
+    config_file  => ReadableFile, { optional => 1 },          # specify any of the below in a yaml file instead.
+    auth         => HashRef | HasMethods[qw(headers params)], # a string that will be used to construct an auth obj, or the obj itself.
+    throttle     => PositiveOrZeroInt, { default => 0 },      # mostly used for integration testing, to ensure we don't blow our rate limit.
     timeout      => Int, { default => 120 },
     max_attempts => PositiveInt->where(sub { $_ < 10; }), { default => 4 },
   );
@@ -36,15 +37,17 @@ sub new {
   return bless $self, $class;
 }
 
+# this is the actual call to the google api endpoint. handles retries, error checking etc.
+# this would normally be called via Drive or Sheets objects.
 sub api {
   my $self = shift;
 
   state $check = compile_named(
     uri     => StrMatch[qr(^https://)],
     method  => StrMatch[qr/^(get|head|put|patch|post|delete)$/i], { default => 'get' },
-    params  => HashRef[Str|ArrayRef[Str]], { default => {} },
-    headers => ArrayRef[Str], { default => [] },
-    content => 0,
+    params  => HashRef[Str|ArrayRef[Str]], { default => {} },   # uri param string.
+    headers => ArrayRef[Str], { default => [] },                # http headers.
+    content => 0,                                               # rest payload.
   );
   my $request = $check->(@_);
 
@@ -74,7 +77,10 @@ sub api {
   my $req = HTTP::Request->new(
     $request->{method}, $request->{uri}, \@headers, $request_json
   );
+  # this is where the action is.
   my ($response, $tries, $last_error) = $self->_api($req);
+  # save the api call details so that the user can examine it in detail if necessary.
+  # further information is also recorded below in this routine.
   $self->{transaction} = {
     request => $request,
     tries   => $tries,
@@ -89,10 +95,11 @@ sub api {
     DEBUG("Rest API response:\n", Dump( $decoded_response ));
   }
 
+  # calls the callback when an api call is madem, if any.
   $self->_api_callback();
 
   # this is for capturing request/responses for unit tests. copy/paste the results
-  # in the log into t/etc/uri_responses for unit testing. log appender 'UnitTestCapture'
+  # in the log into t/etc/uri_responses/* for unit testing. log appender 'UnitTestCapture'
   # is defined in t/etc/log4perl.conf. you can use this logger by pointing to it via
   # GOOGLE_RESTAPI_LOGGER env var.
   if ($response && Log::Log4perl::appenders->{'UnitTestCapture'}) {
@@ -125,6 +132,7 @@ sub api {
   return $self->{transaction}->{decoded_response};
 }
 
+# this wraps the http api call around retries.
 sub _api {
   my ($self, $req) = @_;
 
@@ -158,7 +166,7 @@ sub _api {
   return ($response, $tries, $last_error);
 }
 
-# convert a plain hash auth to an object if a hash was passed.
+# convert a plain hash auth to an object if a hash was passed in new() above.
 sub auth {
   my $self = shift;
 
@@ -176,6 +184,7 @@ sub auth {
   return $self->{auth};
 }
 
+# if user registered a callback, notify them of an api call.
 sub _api_callback {
   my $self = shift;
   return if !$self->{api_callback};
@@ -188,6 +197,7 @@ sub _api_callback {
   return;
 }
 
+# sets the api callback code.
 sub api_callback {
   my $self = shift;
   state $check = compile(CodeRef, { optional => 1 });
@@ -197,6 +207,8 @@ sub api_callback {
   return $prev_api_callback;
 }
 
+# a simple record of how many gets, posts, deletes etc were completed.
+# useful for tuning network calls.
 sub _stat {
   my $self = shift;
   my @stats = @_;
@@ -208,6 +220,7 @@ sub _stat {
   return;
 }
 
+# returns the stats recorded above.
 sub stats {
   my $self = shift;
   my $stats = dclone($self->{stats} || {});
@@ -216,6 +229,7 @@ sub stats {
 
 sub transaction { shift->{transaction} || {}; }
 
+# used for debugging/logging purposes.
 sub _caller_internal {
   my ($package, $subroutine, $line, $i) = ('', '', 0);
   do {
@@ -240,6 +254,7 @@ sub _caller_external {
   return "$package:$line => $subroutine";
 }
 
+# the maximum number of attempts to call the google api endpoint before giving up.
 # undef returns current value. postitive int sets and returns new value.
 # 0 sets and returns default value.
 sub max_attempts {
@@ -295,29 +310,74 @@ Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
 
 =head1 DESCRIPTION
 
-Google Rest API is the foundation class used by the included Drive
-and Sheets APIs. It is used to send API requests to the Google API
-endpoint on behalf of the underlying API classes (Sheets and Drive).
+Google Rest API is the foundation class used by the included Drive (L<Google::RestApi::DriveApi3>) and Sheets (L<Google::RestApi::SheetsApi4>) APIs. It is used
+to send API requests to the Google API endpoint on behalf of the underlying API classes.
+
+=head1 NAVIGATION
+
+=over
+
+=item * L<Google::RestApi::DriveApi3>
+
+=item * L<Google::RestApi::DriveApi3::File>
+
+=item * L<Google::RestApi::SheetsApi4>
+
+=item * L<Google::RestApi::SheetsApi4::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Range>
+
+=item * L<Google::RestApi::SheetsApi4::Range::All>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Col>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Row>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Cell>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range>
+
+=back
 
 =head1 SUBROUTINES
 
 =over
 
-=item new(config_file => <path_to_config_file>, auth => <object|hash>, api_callback => <coderef>, throttle => <int>);
+=item new(%args); %args consists of:
 
- config_file: Optional YAML configuration file that can specify any
-   or all of the following args:
- auth: A hashref to create the specified auth class, or (outside the config file) an instance of the blessed class itself.
- api_callback: A coderef to call after each API call.
- throttle: Used in development to sleep the number of seconds
-   specified between API calls to avoid threshhold errors from Google.
+=over
 
-You can specify any of the arguments in the optional YAML config file.
-Any passed-in arguments will override what is in the config file.
+=item * C<config_file> <path_to_config_file>: Optional YAML configuration file that can specify any or all of the following args...
 
-The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::*
-classes, or, for convenience sake, you can specify a hash of the required
-arguments to create an instance of that class:
+=item * C<auth> <hash|object>: A hashref to create the specified auth class, or (outside the config file) an instance of the blessed class itself.
+If this is an object, it must provide the 'params' and 'headers' subroutines to provide the appropriate Google authentication/authorization.
+See below for more details.
+
+=item * C<api_callback> <coderef>: A coderef to call after each API call. 
+
+=item * C<throttle> <int>: Used in development to sleep the number of seconds specified between API calls to avoid rate limit violations from Google.
+
+=back
+
+You can specify any of the arguments in the optional YAML config file. Any passed-in arguments will override what is in the config file.
+
+The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::* classes (e.g. 'OAuth2Client'), or, for convenience sake,
+you may specify a hash of the required arguments to create an instance of that class:
+
   auth:
     class: OAuth2Client
     client_id: xxxxxx
@@ -325,43 +385,63 @@ arguments to create an instance of that class:
     token_file: <path_to_token_file>
 
 Note that the auth hash itself can also contain a config_file:
+
   auth:
     class: OAuth2Client
     config_file: <path_to_oauth_config_file>
 
 This allows you the option to keep the auth file in a separate, more secure place.
 
-=item api(uri => <uri_string>, method => <http_method_string>,
-  headers => <headers_string_array>, params => <query_parameters_hash>,
-  content => <body_hash>);
+=item api(%args);
 
-The ultimate Google API call for the underlying classes. Handles timeouts
-and retries etc.
+The ultimate Google API call for the underlying classes. Handles timeouts and retries etc. %args consists of:
 
- uri: The Google API endpoint such as https://www.googleapis.com/drive/v3
-   along with any path segments added.
- method: The http method being used get|head|put|patch|post|delete.
- headers: Array ref of http headers.
- params: Http query params to be added to the uri.
- content: The body being sent for post/put etc. Will be encoded to JSON.
+=over
 
-You would not normally call this directly unless you were
-making a Google API call not currently supported by this API
-framework.
+=item * C<uri> <uri_string>: The Google API endpoint such as https://www.googleapis.com/drive/v3 along with any path segments added.
 
-=item stats();
+=item * C<method> <http_method_string>: The http method being used get|head|put|patch|post|delete.
 
-Shows some statistics on how many get/put/post etc calls were made.
-Useful for performance tuning during development.
+=item * C<headers> <headers_string_array>: Array ref of http headers.
+
+=item * C<params> <query_parameters_hash>: Http query params to be added to the uri.
+
+=item * C<content> <payload hash>: The body being sent for post/put etc. Will be encoded to JSON.
 
 =back
 
-=head1 SEE ALSO
+You would not normally call this directly unless you were making a Google API call not currently supported by this API framework.
 
-For specific use of this class, see:
+Returns the response hash from Google API.
 
- Google::RestApi::DriveApi3
- Google::RestApi::SheetsApi4
+=item api_callback(<coderef>);
+
+=over
+
+=item C<coderef> is user code that will be called back after each call to the Google API.
+
+=back
+
+The last transaction details are passed to the callback. What you do with this information is up to you. For an example of how this is used, see the
+C<t/tutorial/sheets/*> scripts.
+
+Returns the previous callback, if any.
+
+=item transaction();
+
+Returns the transaction information from the last Google API call. This is the same information that is provided by the callback
+above, but can be accessed directly if you have no need to provide a callback.
+
+=item stats();
+
+Returns some statistics on how many get/put/post etc calls were made. Useful for performance tuning during development.
+
+=back
+
+=head1 STATUS
+
+This api is currently in beta status. It is incomplete. There may be design flaws that need to be addressed in later releases. Later
+releases may break this release. Not all api calls have been implemented.
 
 =head1 AUTHORS
 
@@ -375,6 +455,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019, Robin Murray. All rights reserved.
+Copyright (c) 2021, Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

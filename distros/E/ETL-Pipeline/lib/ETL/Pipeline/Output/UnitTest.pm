@@ -16,23 +16,34 @@ ETL::Pipeline::Output::UnitTest - Output destination for unit tests
 =head1 DESCRIPTION
 
 B<ETL::Pipeline::Output::UnitTest> is an output destination used by the unit
-tests. It proves that the L<ETL::Pipeline::Output> role works.
+tests. It proves that the L<ETL::Pipeline::Output> role works. You should not
+use this destination in production code - only unit tests.
 
-The "data" is stored in memory.
+The I<data> is stored in memory. The class provides methods to access the saved
+records.
 
 =cut
 
 package ETL::Pipeline::Output::UnitTest;
-use Moose;
+
+use 5.014000;
+use warnings;
 
 use Carp;
-use String::Util qw/hascontent/;
+use Moose;
 
 
-our $VERSION = '2.00';
+our $VERSION = '3.00';
 
 
 =head1 METHODS & ATTRIBUTES
+
+=head2 Arguments for L<ETL::Pipeline/output>
+
+None - there's no configuration for this destination. It's meant to be quick and
+light for unit testing.
+
+=head2 Attributes
 
 =head3 records
 
@@ -43,26 +54,16 @@ calling L<ETL::Pipeline/process>.
 
 The list is cleared after calling L</configure>.
 
-=head3 all_records
-
-The B<all_records> method returns a list of all the records. It dereferences 
-L</records>.
-
-=head3 number_of_records
-
-The B<number_of_records> method returns the count of records currently in the
-list.
-
 =cut
 
 has 'records' => (
 	default => sub { [] },
 	handles => {
-		all_records          => 'elements', 
-		_reset               => 'clear', 
-		get_record           => 'get',
-		number_of_records    => 'count',
-		_save_current_record => 'push',
+		_add_record       => 'push',
+		all_records       => 'elements',
+		_reset            => 'clear',
+		get_record        => 'get',
+		number_of_records => 'count',
 	},
 	is     => 'ro',
 	isa    => 'ArrayRef[HashRef[Any]]',
@@ -70,72 +71,100 @@ has 'records' => (
 );
 
 
-=head2 Called from L<ETL::Pipeline/process>
+=head2 Methods
 
-=head3 write_record
+=head3 all_records
 
-Saves the current record into L</records>.
+Returns a list of all the records. It dereferences L</records>.
 
 =cut
 
-sub write_record {
-	my $self = shift;
-	
-	$self->_save_current_record( $self->current );
-	return 1;
+# This method is defined by the "records" attribute.
+
+
+=head3 close
+
+Prevents further storage of records. L</write> will throw a fatal exception if
+it is called after B<close>. This helps ensure that everything runs in the
+proper order.
+
+=cut
+
+sub close { shift->_state( "already called 'closed'" ); }
+
+
+=head3 get_record
+
+Returns a single record from storage. Useful to check the values and make sure
+things were added in the correct order. It returns the ame hash reference passed
+into L</write>.
+
+=head3 number_of_records
+
+Returns the count of records currently in storage.
+
+=cut
+
+# These methods are defined by the "records" attribute.
+
+
+=head3 open
+
+Allows storage of records. L</write> will throw a fatal exception if it is
+called before B<open>. This helps ensure that everything runs in the proper
+order.
+
+=cut
+
+sub open { shift->_state( 'processing records' ); }
+
+
+=head3 write
+
+Add the current record into the L</records> attribute. Unit tests can then
+check what was saved, to make sure the pipeline completed.
+
+=cut
+
+sub write {
+	my ($self, $etl, $record) = @_;
+
+	if ($self->_state eq 'processing records') {
+		$self->_add_record( $record );
+	} else {
+		croak sprintf "'write' failed because ETL::Pipeline %s", $self->_state;
+	}
 }
 
 
-=head3 configure
+#-------------------------------------------------------------------------------
+# Internal methods and attributes
 
-B<configure> doesn't actually do anything. But it is required by
-L<ETL::Pipeline/process>.
-
-=cut
-
-sub configure { }
-
-
-=head3 finish
-
-B<finish> doesn't actually do anything. But it is required by
-L<ETL::Pipeline/process>. L</records> persists so that the unit test can check
-its values.
-
-=cut
-
-sub finish {}
-
-
-=head2 Other methods & attributes
-
-=head3 default_fields
-
-Initialize L</current> for the next record.
-
-=cut
-
-sub default_fields { () }
+# Object state. It lets "write" verify that everything has happened in the
+# correct order.
+has '_state' => (
+	default => "hasn't called 'open' yet",
+	is      => 'rw',
+	isa     => 'Str',
+);
 
 
 =head1 SEE ALSO
 
-L<ETL::Pipeline>, L<ETL::Pipeline::Output>, 
-L<ETL::Pipeline::Output::Storage::Hash>, L<ETL::Pipeline::Input::UnitTest>
+L<ETL::Pipeline>, L<ETL::Pipeline::Output>, L<ETL::Pipeline::Input::UnitTest>
 
 =cut
 
-with 'ETL::Pipeline::Output::Storage::Hash';
 with 'ETL::Pipeline::Output';
 
 
 =head1 AUTHOR
 
-Robert Wohlfarth <robert.j.wohlfarth@vanderbilt.edu>
+Robert Wohlfarth <robert.j.wohlfarth@vumc.org>
 
 =head1 LICENSE
 
-Copyright 2016 (c) Vanderbilt University
+Copyright 2021 (c) Vanderbilt University
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

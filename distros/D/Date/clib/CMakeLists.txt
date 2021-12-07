@@ -46,7 +46,6 @@ target_link_libraries(${PROJECT_NAME} panda-lib)
 ########################tests#######################################
 file(GLOB_RECURSE testSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*.cc")
 set_source_files_properties(tests/relative/operations.cc PROPERTIES COMPILE_FLAGS "-Wno-self-assign-overloaded")
-list(FILTER testSource EXCLUDE REGEX "tests/main.cc")
 if(WIN32)
     list(FILTER testSource EXCLUDE REGEX "tests/time/full.cc")
 endif()
@@ -61,7 +60,7 @@ target_link_libraries(${PROJECT_NAME}-tests PUBLIC Catch2::Catch2 Threads::Threa
 ########################ctests######################################
 enable_testing()
 add_executable(${PROJECT_NAME}-runtests ${EXCLUDE_TEST} ${testSource} "tests/main.cc")
-target_link_libraries(${PROJECT_NAME}-runtests ${PROJECT_NAME}-tests)
+target_link_libraries(${PROJECT_NAME}-runtests ${PROJECT_NAME}-tests Catch2::Catch2WithMain)
 add_test(NAME test-all COMMAND ${PROJECT_NAME}-runtests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 ########################install#####################################

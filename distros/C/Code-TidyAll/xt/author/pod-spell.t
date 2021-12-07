@@ -15,6 +15,7 @@ Adam
 Alders
 Andy
 Anwar
+Bernhard
 CPAN
 CSSUnminifier
 Cache
@@ -88,6 +89,7 @@ STDERR
 STDIN
 STDOUT
 SVN
+Schmalhofer
 Sergey
 Shared
 Shlomi

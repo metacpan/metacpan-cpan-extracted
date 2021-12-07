@@ -40,6 +40,7 @@ requires:
   Fcntl: '0'
   File::Basename: '2.85'
   File::Copy: '0'
+  File::DosGlob: '0'
   File::Glob: '0'
   File::MMagic::XS: '0.09008'
   File::Spec: '3.73'
@@ -72,5 +73,5 @@ requires:
 resources:
   bugtracker: https://git.deguest.jp/jack/Module-Generic/issues
   repository: https://git.deguest.jp/jack/Module-Generic
-version: v0.17.2
+version: v0.18.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

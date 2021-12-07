@@ -1,15 +1,3 @@
-package Quiq::Database::Row::Object::Table;
-use base qw/Quiq::Database::Row::Object Quiq::ClassConfig/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Perl;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -44,6 +32,24 @@ Tabellennamen. Dieser wird von der Methode L<tableName|"tableName() - Liefere Na
 Über eine Tabelle wird vorausgesetzt, dass diese eine
 Primärschlüssel-Kolumne besitzt. Deren Name wird von der Methode
 L<primaryKey|"primaryKey() - Liefere Namen der Primärschlüssel-Kolumne">() geliefert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::Row::Object::Table;
+use base qw/Quiq::Database::Row::Object Quiq::ClassConfig/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Perl;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -437,7 +443,7 @@ sub delete {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

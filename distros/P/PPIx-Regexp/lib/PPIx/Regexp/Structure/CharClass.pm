@@ -40,7 +40,7 @@ use PPIx::Regexp::Constant qw{
 };
 use PPIx::Regexp::Util qw{ __instance };
 
-our $VERSION = '0.081';
+our $VERSION = '0.082';
 
 sub __new {
     my ( $class, @args ) = @_;

@@ -16,3 +16,5 @@
  - Fixed the order displacement between DEBUG and TRACE
  - Fixed Dancer2 loader issue
  - Added Unit test for order validation
+1.008
+ - $Log::LogMethods::SKIP_TRIGGER=1, now just disables the trigger

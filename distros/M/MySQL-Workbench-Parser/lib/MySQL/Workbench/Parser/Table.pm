@@ -29,7 +29,7 @@ has parser => (
     isa      => sub {
         blessed $_[0] && $_[0]->isa( 'MySQL::Workbench::Parser' );
     },
-); 
+);
 
 has columns => (
     is  => 'rwp',
@@ -77,7 +77,7 @@ has column_mapping => (
     isa  => sub {
         ref $_[0] && ref $_[0] eq 'HASH'
     },
-    default => sub { 
+    default => sub {
         my $self = shift;
 
         my %map  = map{
@@ -233,9 +233,11 @@ MySQL::Workbench::Parser::Table - A table of the ER model
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =for Pod::Coverage BUILD
+
+=head1 METHODS
 
 =head2 as_hash
 
@@ -257,13 +259,15 @@ returns
             ],
         },
         columns      => [
-            name          => 'id',
-            datatype      => 'INT',
-            length        => '',
-            precision     => '0',
-            not_null      => '1',
-            autoincrement => '1',
-            default_value => '',
+            {
+                name          => 'id',
+                datatype      => 'INT',
+                length        => '',
+                precision     => '0',
+                not_null      => '1',
+                autoincrement => '1',
+                default_value => '',
+            }
         ],
     )
 
@@ -283,9 +287,17 @@ returns the MySQL name of the datatype
 
 =item * comment
 
+=item * columns
+
+An array reference of L<MySQL::Workbench::Parser::Column> objects
+
 =item * foreign_keys
 
+An array reference of all relationships to other tables
+
 =item * name
+
+The name of the table
 
 =item * node
 

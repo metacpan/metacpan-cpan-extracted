@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Upload::Complete;
 # ABSTRACT: Internal class to perform CompleteMultipartUpload operation
-$Net::Amazon::S3::Operation::Object::Upload::Complete::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Object::Upload::Complete::VERSION = '0.99';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Object::Upload::Complete - Internal class to perform
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

@@ -19,7 +19,7 @@ ConnectRequestSP bad_http (string from, string to) {
     CHECK(!p.accepted());
     CHECK(!p.established());
     auto ans = p.accept_error();
-    CHECK_THAT(ans, Contains("HTTP/1.1 400 Bad Request\r\n"));
+    CHECK_THAT(ans, ContainsSubstring("HTTP/1.1 400 Bad Request\r\n"));
     return creq;
 }
 
@@ -40,7 +40,7 @@ TEST("bad websocket http") {
     CHECK(p.accept_parsed());
     CHECK(!p.accepted());
     auto ans = p.accept_error();
-    CHECK_THAT(ans, Contains("HTTP/1.1 400 Bad Request\r\n"));
+    CHECK_THAT(ans, ContainsSubstring("HTTP/1.1 400 Bad Request\r\n"));
 }
 
 TEST("bad websocket version") {
@@ -54,8 +54,8 @@ TEST("bad websocket version") {
     CHECK(p.accept_parsed());
     CHECK(!p.accepted());
     auto ans = p.accept_error();
-    CHECK_THAT(ans, Contains("HTTP/1.1 426 Upgrade Required\r\n"));
-    CHECK_THAT(ans, Contains("Sec-WebSocket-Version: 13\r\n"));
+    CHECK_THAT(ans, ContainsSubstring("HTTP/1.1 426 Upgrade Required\r\n"));
+    CHECK_THAT(ans, ContainsSubstring("Sec-WebSocket-Version: 13\r\n"));
 }
 
 TEST("custom error override ignored when request error") {
@@ -68,7 +68,7 @@ TEST("custom error override ignored when request error") {
     protocol::http::ResponseSP eres = new protocol::http::Response();
     eres->code = 404;
     auto ans = p.accept_error(eres);
-    CHECK_THAT(ans, Contains("HTTP/1.1 400 Bad Request\r\n"));
+    CHECK_THAT(ans, ContainsSubstring("HTTP/1.1 400 Bad Request\r\n"));
 }
 
 TEST("custom error") {
@@ -85,9 +85,9 @@ TEST("custom error") {
         {"def", "2"},
     };
     auto ans = p.accept_error(eres);
-    CHECK_THAT(ans, Contains("HTTP/1.1 404 Hello World\r\n"));
-    CHECK_THAT(ans, Contains("abc: 1\r\n"));
-    CHECK_THAT(ans, Contains("def: 2\r\n"));
+    CHECK_THAT(ans, ContainsSubstring("HTTP/1.1 404 Hello World\r\n"));
+    CHECK_THAT(ans, ContainsSubstring("abc: 1\r\n"));
+    CHECK_THAT(ans, ContainsSubstring("def: 2\r\n"));
     CHECK_THAT(ans, MatchesRe("\r\n404 Hello World$"));
 }
 
@@ -102,6 +102,6 @@ TEST("custom error with body") {
     eres->message = "Hello World";
     eres->body = "Fuck You";
     auto ans = p.accept_error(eres);
-    CHECK_THAT(ans, Contains("HTTP/1.1 404 Hello World\r\n"));
+    CHECK_THAT(ans, ContainsSubstring("HTTP/1.1 404 Hello World\r\n"));
     CHECK_THAT(ans, MatchesRe("\r\nFuck You$"));
 }

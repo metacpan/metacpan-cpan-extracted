@@ -1,5 +1,8 @@
 Revision history for CGI::Alternatives
 
+0.19 2021-12-02
+    - Add CGI::Tiny
+
 0.18 2018-11-21
     - Add header line to Plack example
 

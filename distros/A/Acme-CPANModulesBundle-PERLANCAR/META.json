@@ -100,23 +100,23 @@
    "provides" : {
       "Acme::CPANModules::PERLANCAR::Avoided" : {
          "file" : "lib/Acme/CPANModules/PERLANCAR/Avoided.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment" : {
          "file" : "lib/Acme/CPANModules/PERLANCAR/MyGetoptLongExperiment.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Acme::CPANModules::PERLANCAR::Retired" : {
          "file" : "lib/Acme/CPANModules/PERLANCAR/Retired.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Acme::CPANModules::PERLANCAR::Weird" : {
          "file" : "lib/Acme/CPANModules/PERLANCAR/Weird.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Acme::CPANModulesBundle::PERLANCAR" : {
          "file" : "lib/Acme/CPANModulesBundle/PERLANCAR.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -131,7 +131,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModulesBundle-PERLANCAR"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

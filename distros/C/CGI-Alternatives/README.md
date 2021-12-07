@@ -10,7 +10,7 @@ CGI::Alternatives - Documentation for alternative solutions to CGI.pm
 
 # VERSION
 
-0.17
+0.19
 
 # DESCRIPTION
 
@@ -119,7 +119,7 @@ don't use these functions, i am merely showing them here for comparison reasons.
     print $out;
 
 If you really want to continue using the HTML generation functionality of CGI.pm
-then you should take a look at [HTML::Tiny](https://metacpan.org/pod/HTML::Tiny) instead, which may give you a migration
+then you should take a look at [HTML::Tiny](https://metacpan.org/pod/HTML%3A%3ATiny) instead, which may give you a migration
 path away from CGI.pm's html generation functions; i strongly encourage you to
 move towards template driven page generation for anything involving markup as
 it will make porting your app to other frameworks much easier in the long run.
@@ -200,11 +200,11 @@ scripts above would have to be called example\_form or the webserver would
 have to be setup to redirect routes to /example\_form to whatever the cgi
 script is called (cgi.pl and cgi\_tt.pl in the examples/ directory)
 
-Note that I have used [Template::Toolkit](https://metacpan.org/pod/Template::Toolkit) here, another excellent template
-engine is [Text::Xslate](https://metacpan.org/pod/Text::Xslate). I would **avoid** [Mason](https://metacpan.org/pod/Mason)(2) and [HTML::Template](https://metacpan.org/pod/HTML::Template).
+Note that I have used [Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit) here, another excellent template
+engine is [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate). I would **avoid** [Mason](https://metacpan.org/pod/Mason)(2) and [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate).
 Please don't write your own template engine. If you want to completely split
 out your html and still have some sort of templating system there are modules
-to do that, such as [HTML::Zoom](https://metacpan.org/pod/HTML::Zoom).
+to do that, such as [HTML::Zoom](https://metacpan.org/pod/HTML%3A%3AZoom).
 
 # Mojolicious
 
@@ -511,9 +511,13 @@ Managing perl modules:
 
 [https://metacpan.org/release/local-lib](https://metacpan.org/release/local-lib)
 
+# BUT I DON'T WANT TO USE A FRAMEWORK
+
+Then take a look at [CGI::Tiny](https://metacpan.org/pod/CGI%3A%3ATiny), specifically [https://metacpan.org/pod/CGI::Tiny#COMPARISON-TO-CGI.PM](https://metacpan.org/pod/CGI::Tiny#COMPARISON-TO-CGI.PM)
+
 # SEE ALSO
 
-[Task::Kensho](https://metacpan.org/pod/Task::Kensho) - A Glimpse at an Enlightened Perl
+[Task::Kensho](https://metacpan.org/pod/Task%3A%3AKensho) - A Glimpse at an Enlightened Perl
 
 # AUTHOR INFORMATION
 

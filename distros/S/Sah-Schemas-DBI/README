@@ -2,8 +2,16 @@ NAME
     Sah::Schemas::DBI - Schemas related to DBI
 
 VERSION
-    This document describes version 0.004 of Sah::Schemas::DBI (from Perl
-    distribution Sah-Schemas-DBI), released on 2020-03-08.
+    This document describes version 0.005 of Sah::Schemas::DBI (from Perl
+    distribution Sah-Schemas-DBI), released on 2021-07-19.
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
+SAH SCHEMAS
+    *   dbi::connstr
+
+        DBI connection string.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -29,7 +37,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

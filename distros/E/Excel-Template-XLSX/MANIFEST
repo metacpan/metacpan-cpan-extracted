@@ -14,6 +14,7 @@ t/03-worksheet.t
 t/04-styles.t
 t/05-shared_strings.t
 t/06-cell.t
+t/06-cell.xlsx
 t/07-two_templates.t
 t/08-open_output.t
 t/09-template_callback.t
@@ -25,4 +26,3 @@ t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-

@@ -3,7 +3,7 @@
    "author" : [
       "Chernenko Dmitriy <cnd@cpan.org>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -36,11 +36,20 @@
             "Test::Deep" : "1.130",
             "Test::LeakTrace" : "0.14",
             "Test::More" : "1.302183",
-            "XSLoader" : "0"
+            "XSLoader" : "0.27",
+            "perl" : "5.026001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/KalessinD/perl_graphite_simple/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/KalessinD/perl_graphite_simple"
+      }
+   },
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

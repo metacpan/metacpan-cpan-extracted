@@ -7,7 +7,7 @@ use Carp;
 use Getopt::Long;
 use Pod::Usage;
 
-use version; our $VERSION = qv('v0.0.6');
+use version; our $VERSION = qv('v0.0.7');
 
 my %opt = (
     author   => '',

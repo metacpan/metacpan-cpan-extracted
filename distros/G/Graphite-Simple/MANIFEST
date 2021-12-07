@@ -1,8 +1,10 @@
 Changes
 lib/Graphite/Simple.pm
 LICENSE
+Makefile
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
 README

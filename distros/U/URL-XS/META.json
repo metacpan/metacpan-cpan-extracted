@@ -1,0 +1,53 @@
+{
+   "abstract" : "Parsing URLs with zero-copy and no mallocs",
+   "author" : [
+      "Peter P. Neuromantic <p.brovchenko@protonmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "URL-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.024000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ChaoticEvil/p5-url-xs/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ChaoticEvil/p5-url-xs.git",
+         "web" : "https://github.com/ChaoticEvil/p5-url-xs"
+      }
+   },
+   "version" : "v0.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

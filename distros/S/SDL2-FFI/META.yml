@@ -7,9 +7,19 @@ build_requires:
   Test::More: '0.98'
   Test::NeedsDisplay: '1.07'
 configure_requires:
-  Alien::libsdl2: '== 1.06'
+  Alien::gmake: '0'
+  Archive::Extract: '0'
+  Capture::Tiny: '0'
+  Carp::Always: '0'
+  Data::Dump: '0'
   Devel::CheckBin: '0'
+  ExtUtils::CBuilder: '0'
+  FFI::Build: '0'
+  FFI::ExtractSymbols: '0.06'
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
   Module::Build::Tiny: '0.039'
+  Path::Tiny: '0'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -73,7 +83,7 @@ provides:
     file: lib/SDL2/events.pm
   SDL2::FFI:
     file: lib/SDL2/FFI.pm
-    version: '0.07'
+    version: '0.08'
   SDL2::FPoint:
     file: lib/SDL2/rect.pm
   SDL2::FRect:
@@ -115,7 +125,10 @@ provides:
   SDL2::IDirect3DDevice9:
     file: lib/SDL2/system.pm
   SDL2::Image:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/Image.pm
+    version: '0.01'
+  SDL2::Image::Animation:
+    file: lib/SDL2/Image.pm
   SDL2::JoyAxisEvent:
     file: lib/SDL2/events.pm
   SDL2::JoyBallEvent:
@@ -147,23 +160,16 @@ provides:
   SDL2::MetalView:
     file: lib/SDL2/metal.pm
   SDL2::Mixer:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/Mixer.pm
+    version: '0.01'
   SDL2::Mixer::Chunk:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/Mixer.pm
   SDL2::Mixer::Fading:
-    file: lib/SDL2/FFI.pm
-  SDL2::Mixer::Mix::Chunk:
-    file: lib/SDL2/FFI.pm
-  SDL2::Mixer::Mix::Fading:
-    file: lib/SDL2/FFI.pm
-  SDL2::Mixer::Mix::Music:
     file: lib/SDL2/FFI.pm
   SDL2::Mixer::Mix::MusicType:
     file: lib/SDL2/FFI.pm
   SDL2::Mixer::Music:
-    file: lib/SDL2/FFI.pm
-  SDL2::Mixer::MusicType:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/Mixer.pm
   SDL2::MouseButtonEvent:
     file: lib/SDL2/events.pm
   SDL2::MouseMotionEvent:
@@ -219,13 +225,10 @@ provides:
   SDL2::SysWMmsg:
     file: lib/SDL2/syswm.pm
   SDL2::TTF:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/TTF.pm
+    version: '0.01'
   SDL2::TTF::Font:
-    file: lib/SDL2/FFI.pm
-  SDL2::TTF::Image:
-    file: lib/SDL2/FFI.pm
-  SDL2::TTF::PosBuf:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/TTF.pm
   SDL2::TextEditingEvent:
     file: lib/SDL2/events.pm
   SDL2::TextInputEvent:
@@ -244,7 +247,7 @@ provides:
     file: lib/SDL2/Utils.pm
   SDL2::Utils::Type::Enum:
     file: lib/SDL2/Utils/Type/Enum.pm
-    version: '0.07'
+    version: '0.08'
   SDL2::Version:
     file: lib/SDL2/version.pm
   SDL2::Vivante:
@@ -391,24 +394,20 @@ provides:
 recommends:
   B::Deparse: '0'
 requires:
-  Alien::libsdl2: '== 1.06'
   Data::Dump: '0'
-  Devel::CheckBin: '0'
   Exporter::Tiny: '0'
-  FFI::Build: '1.04'
   FFI::C: '0'
+  FFI::ExtractSymbols: '0.06'
   FFI::Platypus: '1.55'
   File::Share: '0'
-  File::Spec::Functions: '0'
   Path::Tiny: '0'
   Try::Tiny: '0'
-  perl: '5.02000'
-  strictures: '2'
+  perl: '5.030000'
 resources:
   bugtracker: https://github.com/sanko/SDL2.pm/issues
   homepage: https://github.com/sanko/SDL2.pm
   repository: git://github.com/sanko/SDL2.pm.git
-version: '0.07'
+version: '0.08'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1
+x_static_install: 0

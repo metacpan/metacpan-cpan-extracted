@@ -1,14 +1,14 @@
 package Net::Amazon::S3::Client;
 # ABSTRACT: An easy-to-use Amazon S3 client
-$Net::Amazon::S3::Client::VERSION = '0.98';
+$Net::Amazon::S3::Client::VERSION = '0.99';
 use Moose 0.85;
 use HTTP::Status qw(status_message);
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
 
+use Net::Amazon::S3;
+use Net::Amazon::S3::Constraint::Etag;
 use Net::Amazon::S3::Error::Handler::Confess;
-
-type 'Etag' => where { $_ =~ /^[a-z0-9]{32}(?:-\d+)?$/ };
 
 has 's3' => (
 	is => 'ro',
@@ -127,7 +127,7 @@ Net::Amazon::S3::Client - An easy-to-use Amazon S3 client
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -197,6 +197,8 @@ Default: L<< Net::Amazon::S3::Error::Handler::Confess >>
 =item error_handler
 
 Instance of error handler class.
+
+=back
 
 =head1 METHODS
 

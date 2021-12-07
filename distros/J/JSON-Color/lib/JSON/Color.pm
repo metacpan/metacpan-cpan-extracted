@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-23'; # DATE
+our $DATE = '2021-11-24'; # DATE
 our $DIST = 'JSON-Color'; # DIST
-our $VERSION = '0.132'; # VERSION
+our $VERSION = '0.133'; # VERSION
 
 our $sul_available = eval { require Scalar::Util::LooksLikeNumber; 1 } ? 1:0;
 
@@ -66,11 +66,13 @@ sub _number {
     my ($value, $opts) = @_;
 
     my $ct = $opts->{_color_theme_obj};
+    my $c_reset = ansi_reset(1);
+    my $c_s = $ct->get_item_color_as_ansi('number') // "";
     return join(
         "",
-        $ct->get_item_color_as_ansi('number'),
+        $c_s,
         $value,
-        ansi_reset(1),
+        ($c_s ? $c_reset : ""),
     );
 }
 
@@ -78,11 +80,13 @@ sub _null {
     my ($value, $opts) = @_;
 
     my $ct = $opts->{_color_theme_obj};
+    my $c_reset = ansi_reset(1);
+    my $c_s = $ct->get_item_color_as_ansi('null') // "";
     return join(
         "",
-        $ct->get_item_color_as_ansi('null'),
+        $c_s,
         "null",
-        ansi_reset(1),
+        ($c_s ? $c_reset : ""),
     );
 }
 
@@ -90,11 +94,13 @@ sub _bool {
     my ($value, $opts) = @_;
 
     my $ct = $opts->{_color_theme_obj};
+    my $c_reset = ansi_reset(1);
+    my $c_s = $ct->get_item_color_as_ansi($value ? 'true' : 'false') // "";
     return join(
         "",
-        $ct->get_item_color_as_ansi($value ? 'true' : 'false'),
+        $c_s,
         "$value",
-        ansi_reset(1),
+        ($c_s ? $c_reset : ""),
     );
 }
 
@@ -186,6 +192,7 @@ sub encode_json {
     $opts //= {};
     $opts->{_indent} //= 0;
     $opts->{color_theme} //=
+        (defined $ENV{NO_COLOR} ? "NoColor" : undef) //
         $ENV{JSON_COLOR_COLOR_THEME} //
         $ENV{COLOR_THEME} //
         "default_ansi";
@@ -228,7 +235,7 @@ JSON::Color - Encode to colored JSON
 
 =head1 VERSION
 
-This document describes version 0.132 of JSON::Color (from Perl distribution JSON-Color), released on 2021-11-23.
+This document describes version 0.133 of JSON::Color (from Perl distribution JSON-Color), released on 2021-11-24.
 
 =head1 SYNOPSIS
 
@@ -308,6 +315,11 @@ prerequisite is installed:
  [1,"1"]
 
 =head1 ENVIRONMENT
+
+=head2 NO_COLOR
+
+If defined, will set default color theme to L<ColorTheme::NoColor>. See
+L<https://no-color.org/> for more details.
 
 =head2 JSON_COLOR_COLOR_THEME
 

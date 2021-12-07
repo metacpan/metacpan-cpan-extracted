@@ -1,5 +1,5 @@
 package Test::Selenium::Remote::WebElement;
-$Test::Selenium::Remote::WebElement::VERSION = '1.45';
+$Test::Selenium::Remote::WebElement::VERSION = '1.46';
 # ABSTRACT: A sub-class of L<Selenium::Remote::WebElement>, with several test-specific method additions.
 
 use Moo;

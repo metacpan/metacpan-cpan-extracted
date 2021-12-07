@@ -1,4 +1,5 @@
 package SDL2::rwops_h {
+    use strict;
     use SDL2::Utils;
     use experimental 'signatures';
     use FFI::C::File;

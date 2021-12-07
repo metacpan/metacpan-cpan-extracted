@@ -20,6 +20,7 @@ BEGIN
     }
     # 2021-11-1T167:12:10+0900
     use Test::Time time => 1635754330;
+    our $CRYPTX_REQUIRED_VERSION = '0.074';
     our $DEBUG = exists( $ENV{COOKIES_DEBUG} ) ? $ENV{COOKIES_DEBUG} : exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     our( $hostport, $host, $port, $mp_host, $proto );
 };
@@ -186,7 +187,7 @@ subtest 'encrypted' => sub
 {
     SKIP:
     {
-        eval( "use Crypt::Cipher" );
+        eval( "use Crypt::Cipher ${CRYPTX_REQUIRED_VERSION}" );
         if( $@ )
         {
             skip( "Crypt::Cipher is not installed on your system", 4 );
@@ -239,7 +240,7 @@ subtest 'signed' => sub
 {
     SKIP:
     {
-        eval( "use Crypt::Cipher" );
+        eval( "use Crypt::Cipher ${CRYPTX_REQUIRED_VERSION}" );
         if( $@ )
         {
             skip( "Crypt::Cipher is not installed on your system", 4 );

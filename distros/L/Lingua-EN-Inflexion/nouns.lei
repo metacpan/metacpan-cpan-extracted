@@ -1,3 +1,14 @@
+# Compound postfix forms require recursive inflection of the core noun(s)...
+
+    (SING)-general   =>  (PL)-general      # E.g. Consul General --> Consuls General
+    (PREP) it        =>  (PREP) them       # E.g. on it          --> on them
+    son-of-a-(SING)  =>  sons-of-(PL)      # E.g. son-of-a-gun   --> sons-of-guns
+    (SING)-(PREP)-*  =>  (PL)-(PREP)-*     # E.g. mother-in-law  --> mothers-in-law
+    (PREP)-(SING)    =>  (PREP)-(PL)       # E.g. of him         --> of them
+    (SING)-errant    =>  (PL)-errant       # E.g. knight-errant  --> knights-errant
+    (SING)-(PREP)    =>  (PL)-(PREP)       # E.g. passer-by      --> passers-by
+
+
 # Words that inflect singular->plural normally
 # but which are ambiguous when inflected plural->singular...
 # (e.g. "axes"-->"ax" vs "axes"-->"axe" vs "axes"-->"axis")
@@ -403,24 +414,24 @@
 
 # German imports that retain their native -en plurals...
 
-    Auslese               =>  Auslesen
-    beerenauslese         =>  beerenauslesen
-    bursch                =>  burschen
-    geisteswissenschaft   =>  geisteswissenschaften
-    herr                  =>  herren
-    lebensform            =>  lebensformen
+    Auslese               =>   Auslesen
+    beerenauslese         =>   beerenauslesen
+    bursch                =>   burschen
+    geisteswissenschaft   =>   geisteswissenschaften
+    herr                  =>   herren
+    lebensform            =>   lebensformen
    *mensch                =>  *menschen
-    Spaetlese             =>  Spaetlesen
-    trockenbeerenauslese  =>  trockenbeerenauslesen
-    umwelt                =>  umwelten
-    vorstellung           =>  vorstellungen
+    Spaetlese             =>   Spaetlesen
+    trockenbeerenauslese  =>   trockenbeerenauslesen
+    umwelt                =>   umwelten
+    vorstellung           =>   vorstellungen
 
 
 # Russian imports that classically inflect natively...
 
-    apparatchik => apparatchiks | apparatchiki
-    ispravnik => ispravniks | ispravniki
-    subbotnik => subbotniks | subbotniki
+    apparatchik  =>  apparatchiks  |  apparatchiki
+    ispravnik    =>  ispravniks    |  ispravniki
+    subbotnik    =>  subbotniks    |  subbotniki
 
 
 # Words ending in unvoiced fricatives that classically inflect to voiced...
@@ -489,13 +500,13 @@
 
 # Words with ablaut plurals...
 
-    *foot       =>  feet
-    *goose      =>  geese
-    *louse      =>  lice
-    *man        =>  men
+   *foot        =>  feet
+   *goose       =>  geese
+   *louse       =>  lice
+   *man         =>  men
     manservant  =>  menservants
-    *mouse      =>  mice
-    *tooth      =>  teeth
+   *mouse       =>  mice
+   *tooth       =>  teeth
 
 
 # Words ending in "-z" and "-ze" that don't double the "z" for the plural...
@@ -1769,11 +1780,11 @@
 
 # Words ending in '-oe' which are ambiguous in the plural...
 
-    coe  => coes
-    hoe  => hoes
-    joe  => joes
-    moe  => moes
-    toe  => toes
+        coe  => coes
+        hoe  => hoes
+        joe  => joes
+        moe  => moes
+        toe  => toes
 
 # Italian and Spanish imports, abbreviations, and other words ending in "-o"
 # that always inflect to "-os"
@@ -2060,10 +2071,10 @@
 
 # Greek imports (via Latin) ending in "-x" that classically inflect to "-ges"...
 
-        phalanx => phalanxes | phalanges
-        remex   => remexes   | remiges
-        larynx  =>           | larynges
-        sphinx  => sphinxes  | sphinges
+        phalanx   =>   phalanxes  |  phalanges
+        remex     =>   remexes    |  remiges
+        larynx    =>              |  larynges
+        sphinx    =>   sphinxes   |  sphinges
 
 
 # Latin or Greek imports ending in "-x" that classically inflect to "-ces"...
@@ -2122,28 +2133,28 @@
 
 # Arabic imports ending in "-t" that classically inflect to "-ti"...
 
-        afrit   => afrits  | afriti
-        afreet  => afreets | afreeti
-        efreet  => efreets | efreeti
+        afrit   =>  afrits   |  afriti
+        afreet  =>  afreets  |  afreeti
+        efreet  =>  efreets  |  efreeti
 
 
 # Hebrew imports that classically inflect by adding "-im"...
 
-        Asherah   => Asherahs  | Asherim
-        baal      => baals     | baalim
-        cherub    => cherubs   | cherubim
-        gaon      => gaons     | gaonim
-        goy       => goys      | goyim
-        kibbutz   => kibbutzes | kibbutzim
-        meshumad  =>           | meshumadim
-        meshummad =>           | meshummadim
-        minyan    =>           | minyanim
-        parnas    =>           | parnassim
-        parnass   =>           | parnassim
-        seraph    => seraphs   | seraphim
-        shochet   =>           | shochetim
-        ulpan     =>           | ulpanim
-        zuz       => zuzzes    | zuzim
+        Asherah    =>  Asherahs  |  Asherim
+        baal       =>  baals     |  baalim
+        cherub     =>  cherubs   |  cherubim
+        gaon       =>  gaons     |  gaonim
+        goy        =>  goys      |  goyim
+        kibbutz    =>  kibbutzes |  kibbutzim
+        meshumad   =>            |  meshumadim
+        meshummad  =>            |  meshummadim
+        minyan     =>            |  minyanim
+        parnas     =>            |  parnassim
+        parnass    =>            |  parnassim
+        seraph     =>  seraphs   |  seraphim
+        shochet    =>            |  shochetim
+        ulpan      =>            |  ulpanim
+        zuz        =>  zuzzes    |  zuzim
 
 
 # Pairs or groups subsumed to a singular that don't inflect...
@@ -2172,8 +2183,8 @@
 
 # Inuktitut imports ending in "-uk" that always inflect to "-uit"...
 
-        inuk      => inuit
-        inukshuk  => inukshuit
+        inuk      =>  inuit
+        inukshuk  =>  inukshuit
 
 
 # French imports ending in "-u" that classically inflect to "-ux"...
@@ -2253,11 +2264,11 @@
 
 # Names of diseases that don't inflect...
 
-        diabetes  => diabetes
-       *measles   => measles
-        mumps     => mumps
-       *pox       => pox
-        rabies    => rabies
+        diabetes  =>  diabetes
+       *measles   =>  measles
+        mumps     =>  mumps
+       *pox       =>  pox
+        rabies    =>  rabies
 
 
 # Miscellaneous words ending with "-s" that don't inflect...
@@ -2317,7 +2328,7 @@
 
 # Vehicles that don't inflect...
 
-        *craft          => craft
+        *craft   =>  craft
 
 # Other imports that don't inflect...
 
@@ -2330,146 +2341,146 @@
 
 # Individuals of nationalities end in "-ese" that don't inflect...
 
-        Achinese      => Achinese
-        Alfurese      => Alfurese
-        Amboinese     => Amboinese
-        Americanese   => Americanese
-        Amoyese       => Amoyese
-        Amoyese       => Amoyese
-        Andamanese    => Andamanese
-        Angolese      => Angolese
-        Annamese      => Annamese
-        Aragonese     => Aragonese
-        Arakanese     => Arakanese
-        Assamese      => Assamese
-        Avignonese    => Avignonese
-        Azerbaijanese => Azerbaijanese
-        Balinese      => Balinese
-        Bengalese     => Bengalese
-        Bernese       => Bernese
-        Bhutanese     => Bhutanese
-        Bolognese     => Bolognese
-        Borghese      => Borghese
-        Borghese      => Borghese
-        Bostonese     => Bostonese
-        Buginese      => Buginese
-        Burmese       => Burmese
-        Calabrese     => Calabrese
-        Camaldolese   => Camaldolese
-        Cantonese     => Cantonese
-        Carlylese     => Carlylese
-        Cassinese     => Cassinese
-        Celanese      => Celanese
-        Ceylonese     => Ceylonese
-        Chinese       => Chinese
-        Congoese      => Congoese
-        Congoese      => Congoese
-        Congolese     => Congolese
-        Dongolese     => Dongolese
-        Faroese       => Faroese
-        Faroese       => Faroese
-        Ferrarese     => Ferrarese
-        Foochowese    => Foochowese
-        Foochowese    => Foochowese
-        Gabunese      => Gabunese
-        Genevese      => Genevese
-        Genevese      => Genevese
-        Genoese       => Genoese
-        Genoese       => Genoese
-        Gilbertese    => Gilbertese
-        Gilbertese    => Gilbertese
-        Goanese       => Goanese
-        Guianese      => Guianese
-        Hainanese     => Hainanese
-        Hararese      => Hararese
-        Harlemese     => Harlemese
-        Havanese      => Havanese
-        Heavenese     => Heavenese
-        Hoosierese    => Hoosierese
-        Hottentotese  => Hottentotese
-        Hottentotese  => Hottentotese
-        Hunanese      => Hunanese
-        Indochinese   => Indochinese
-        Japanese      => Japanese
-        Javanese      => Javanese
-        Johnsonese    => Johnsonese
-        Kanarese      => Kanarese
-        Kiplingese    => Kiplingese
-        Kiplingese    => Kiplingese
-        Kongoese      => Kongoese
-        Kongoese      => Kongoese
-        Kongolese     => Kongolese
-        Lapponese     => Lapponese
-        Lebanese      => Lebanese
-        Leonese       => Leonese
-        Londonese     => Londonese
-        Lorrainese    => Lorrainese
-        Lucchese      => Lucchese
-        Lucchese      => Lucchese
-        Lyonese       => Lyonese
-        Macanese      => Macanese
-        Macassarese   => Macassarese
-        Madurese      => Madurese
-        Malabarese    => Malabarese
-        Maltese       => Maltese
-        Maltese       => Maltese
-        Messinese     => Messinese
-        Milanese      => Milanese
-        Modenese      => Modenese
-        Muranese      => Muranese
-        Nankingese    => Nankingese
-        Nankingese    => Nankingese
-        Navarrese     => Navarrese
-        Nepalese      => Nepalese
-        Niasese       => Niasese
-        Niasese       => Niasese
-        Nicobarese    => Nicobarese
-        Nipponese     => Nipponese
-        Parmese       => Parmese
-        Pekingese     => Pekingese
-        Pekingese     => Pekingese
-        Piedmontese   => Piedmontese
-        Piedmontese   => Piedmontese
-        Pistoiese     => Pistoiese
-        Pistoiese     => Pistoiese
-        Polonese      => Polonese
-        Portuguese    => Portuguese
-        Portuguese    => Portuguese
-        Romagnese     => Romagnese
-        Romanese      => Romanese
-        Sangirese     => Sangirese
-        Sarawakese    => Sarawakese
-        Sarawakese    => Sarawakese
-        Senegalese    => Senegalese
-        Shavese       => Shavese
-        Shavese       => Shavese
-        Shawanese     => Shawanese
-        Siamese       => Siamese
-        Sienese       => Sienese
-        Sikkimese     => Sikkimese
-        Singhalese    => Singhalese
-        Sinhalese     => Sinhalese
-        Sogdianese    => Sogdianese
-        Sudanese      => Sudanese
-        Sundanese     => Sundanese
-        Swahilese     => Swahilese
-        Tenggerese    => Tenggerese
-        Timorese      => Timorese
-        Tirolese      => Tirolese
-        Tocharese     => Tocharese
-        Tonkinese     => Tonkinese
-        Torinese      => Torinese
-        Tyrolese      => Tyrolese
-        Vermontese    => Vermontese
-        Vermontese    => Vermontese
-        Veronese      => Veronese
-        Viennese      => Viennese
-        Vietnamese    => Vietnamese
-        Wenchowese    => Wenchowese
-        Wenchowese    => Wenchowese
-        Whitmanese    => Whitmanese
-        Yengeese      => Yengeese
-        Yunnanese     => Yunnanese
+        Achinese       =>  Achinese
+        Alfurese       =>  Alfurese
+        Amboinese      =>  Amboinese
+        Americanese    =>  Americanese
+        Amoyese        =>  Amoyese
+        Amoyese        =>  Amoyese
+        Andamanese     =>  Andamanese
+        Angolese       =>  Angolese
+        Annamese       =>  Annamese
+        Aragonese      =>  Aragonese
+        Arakanese      =>  Arakanese
+        Assamese       =>  Assamese
+        Avignonese     =>  Avignonese
+        Azerbaijanese  =>  Azerbaijanese
+        Balinese       =>  Balinese
+        Bengalese      =>  Bengalese
+        Bernese        =>  Bernese
+        Bhutanese      =>  Bhutanese
+        Bolognese      =>  Bolognese
+        Borghese       =>  Borghese
+        Borghese       =>  Borghese
+        Bostonese      =>  Bostonese
+        Buginese       =>  Buginese
+        Burmese        =>  Burmese
+        Calabrese      =>  Calabrese
+        Camaldolese    =>  Camaldolese
+        Cantonese      =>  Cantonese
+        Carlylese      =>  Carlylese
+        Cassinese      =>  Cassinese
+        Celanese       =>  Celanese
+        Ceylonese      =>  Ceylonese
+        Chinese        =>  Chinese
+        Congoese       =>  Congoese
+        Congoese       =>  Congoese
+        Congolese      =>  Congolese
+        Dongolese      =>  Dongolese
+        Faroese        =>  Faroese
+        Faroese        =>  Faroese
+        Ferrarese      =>  Ferrarese
+        Foochowese     =>  Foochowese
+        Foochowese     =>  Foochowese
+        Gabunese       =>  Gabunese
+        Genevese       =>  Genevese
+        Genevese       =>  Genevese
+        Genoese        =>  Genoese
+        Genoese        =>  Genoese
+        Gilbertese     =>  Gilbertese
+        Gilbertese     =>  Gilbertese
+        Goanese        =>  Goanese
+        Guianese       =>  Guianese
+        Hainanese      =>  Hainanese
+        Hararese       =>  Hararese
+        Harlemese      =>  Harlemese
+        Havanese       =>  Havanese
+        Heavenese      =>  Heavenese
+        Hoosierese     =>  Hoosierese
+        Hottentotese   =>  Hottentotese
+        Hottentotese   =>  Hottentotese
+        Hunanese       =>  Hunanese
+        Indochinese    =>  Indochinese
+        Japanese       =>  Japanese
+        Javanese       =>  Javanese
+        Johnsonese     =>  Johnsonese
+        Kanarese       =>  Kanarese
+        Kiplingese     =>  Kiplingese
+        Kiplingese     =>  Kiplingese
+        Kongoese       =>  Kongoese
+        Kongoese       =>  Kongoese
+        Kongolese      =>  Kongolese
+        Lapponese      =>  Lapponese
+        Lebanese       =>  Lebanese
+        Leonese        =>  Leonese
+        Londonese      =>  Londonese
+        Lorrainese     =>  Lorrainese
+        Lucchese       =>  Lucchese
+        Lucchese       =>  Lucchese
+        Lyonese        =>  Lyonese
+        Macanese       =>  Macanese
+        Macassarese    =>  Macassarese
+        Madurese       =>  Madurese
+        Malabarese     =>  Malabarese
+        Maltese        =>  Maltese
+        Maltese        =>  Maltese
+        Messinese      =>  Messinese
+        Milanese       =>  Milanese
+        Modenese       =>  Modenese
+        Muranese       =>  Muranese
+        Nankingese     =>  Nankingese
+        Nankingese     =>  Nankingese
+        Navarrese      =>  Navarrese
+        Nepalese       =>  Nepalese
+        Niasese        =>  Niasese
+        Niasese        =>  Niasese
+        Nicobarese     =>  Nicobarese
+        Nipponese      =>  Nipponese
+        Parmese        =>  Parmese
+        Pekingese      =>  Pekingese
+        Pekingese      =>  Pekingese
+        Piedmontese    =>  Piedmontese
+        Piedmontese    =>  Piedmontese
+        Pistoiese      =>  Pistoiese
+        Pistoiese      =>  Pistoiese
+        Polonese       =>  Polonese
+        Portuguese     =>  Portuguese
+        Portuguese     =>  Portuguese
+        Romagnese      =>  Romagnese
+        Romanese       =>  Romanese
+        Sangirese      =>  Sangirese
+        Sarawakese     =>  Sarawakese
+        Sarawakese     =>  Sarawakese
+        Senegalese     =>  Senegalese
+        Shavese        =>  Shavese
+        Shavese        =>  Shavese
+        Shawanese      =>  Shawanese
+        Siamese        =>  Siamese
+        Sienese        =>  Sienese
+        Sikkimese      =>  Sikkimese
+        Singhalese     =>  Singhalese
+        Sinhalese      =>  Sinhalese
+        Sogdianese     =>  Sogdianese
+        Sudanese       =>  Sudanese
+        Sundanese      =>  Sundanese
+        Swahilese      =>  Swahilese
+        Tenggerese     =>  Tenggerese
+        Timorese       =>  Timorese
+        Tirolese       =>  Tirolese
+        Tocharese      =>  Tocharese
+        Tonkinese      =>  Tonkinese
+        Torinese       =>  Torinese
+        Tyrolese       =>  Tyrolese
+        Vermontese     =>  Vermontese
+        Vermontese     =>  Vermontese
+        Veronese       =>  Veronese
+        Viennese       =>  Viennese
+        Vietnamese     =>  Vietnamese
+        Wenchowese     =>  Wenchowese
+        Wenchowese     =>  Wenchowese
+        Whitmanese     =>  Whitmanese
+        Yengeese       =>  Yengeese
+        Yunnanese      =>  Yunnanese
 
 
 # Singular words (mainly Latin and Greek imports) ending in "-s" that inflect to "-ses" (instead of "-sses")...
@@ -2663,24 +2674,27 @@
 
 # "General" as a noun (as opposed to a postfix adjective)...
 
-     adjutant general    =>   adjutant generals
-     brigadier general   =>   brigadier generals
-     lieutenant general  =>   lieutenant generals
-     major general       =>   major generals
-    -star general        =>  -star generals
-
-
-# Compound postfix forms require recursive inflection of the core noun(s)...
-# ['(SING)-general' is non-indicative because it includes the above '-star general' form]
-
-   <nonindicative>   (SING)-general   =>  (PL)-general      # E.g. Consul General --> Consuls General
-
-        (PREP) it        => (PREP) them
-        son-of-a-(SING)  =>  sons-of-(PL)      # E.g. son-of-a-gun   --> sons-of-guns
-        (SING)-(PREP)-*  =>  (PL)-(PREP)-*     # E.g. mother-in-law  --> mothers-in-law
-        (PREP)-(SING)    =>  (PREP)-(PL)       # E.g. of him         --> of them
-        (SING)-errant    =>  (PL)-errant       # E.g. knight-errant  --> knights-errant
-        (SING)-(PREP)    =>  (PL)-(PREP)       # E.g. passer-by      --> passers-by
+     army-corps general  =>  army-corps generals
+     brigadier general   =>  brigadier generals
+     captain general     =>  captain generals
+     colonel general     =>  colonel generals
+     commanding general  =>  commanding generals
+     corps general       =>  corps generals
+     divisional general  =>  divisional generals
+     lieutenant general  =>  lieutenant generals
+     major general       =>  major generals
+     one-star general    =>  one-star generals
+     two-star general    =>  two-star generals
+     three-star general  =>  three-star generals
+     four-star general   =>  four-star generals
+     five-star general   =>  five-star generals
+     six-star general    =>  six-star generals
+     1-star general      =>  1-star generals
+     2-star general      =>  2-star generals
+     3-star general      =>  3-star generals
+     4-star general      =>  4-star generals
+     5-star general      =>  5-star generals
+     6-star general      =>  6-star generals
 
 
 # Pronouns in the nominative...
@@ -2731,15 +2745,15 @@
 # Pronouns in the possessive...
 # (note: the order is important here!)
 
-        mine    => ours
-        yours   => yours
-        its     => theirs
-        hers    => theirs
-        his     => theirs
-        theirs  => theirs
-        whose      => whose
-        whosever    => whosever
-        whosesoever  => whosesoever
+        its          =>  theirs
+        hers         =>  theirs
+        his          =>  theirs
+        mine         =>  ours
+        theirs       =>  theirs
+        whose        =>  whose
+        whosesoever  =>  whosesoever
+        whosever     =>  whosever
+        yours        =>  yours
 
 
 # Standard patterns of inflection for other nouns (in increasing order of generality)...

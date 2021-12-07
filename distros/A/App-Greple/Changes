@@ -1,5 +1,44 @@
 Revision history for Perl application 'greple'.
 
+8.5201 2021-12-07T05:15:51Z
+
+    - Add .tar.gz as an archive in -Mdig.
+
+8.52 2021-11-24T07:12:13Z
+
+    - Update result output algorithm, and runs about 30 times faster
+      in the best case.
+
+8.51 2021-11-22T23:20:07Z
+
+    - Now --uc option does not imply case-insensitive color selection.
+      Use --uniqsub in that case.
+
+8.50 2021-11-03T10:25:11Z
+
+    - Update --matchcount option behavior.
+
+    Now --matchcount=3 means exact three, not a minumum.
+    Takes multiple ranges: --matchcount=,10,20,30,40
+
+8.49 2021-11-03T01:24:59Z
+
+    - Update test code.pm.
+    - Fix a bug of --inside/outside option joining matched area.
+    - Use Getopt::EX@v1.26.0 and update document for colorspec.
+    - Add --git-color-blame in -Mcolors.
+
+8.48 2021-10-20T08:58:25Z
+
+    - Use NO_COLOR for test.
+    - Update --face handling to use ^ (reset) mark.
+    - Introduce --uniqsub option.
+    - Add solarized color in -Mcolors.
+
+8.47 2021-09-29T08:35:10Z
+
+    - Require Getopt::EX to v1.25 to support NO_COLOR and COLORTERM env.
+
 8.4601 2021-07-05T13:41:05Z
 
     - Make --Mselect module work more precisely.

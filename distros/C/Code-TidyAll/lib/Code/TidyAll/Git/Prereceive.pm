@@ -16,7 +16,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.78';
+our $VERSION = '0.80';
 
 has allow_repeated_push => (
     is      => 'ro',
@@ -192,12 +192,11 @@ __END__
 
 =head1 NAME
 
-Code::TidyAll::Git::Prereceive - Git pre-receive hook that requires files to be
-tidyall'd
+Code::TidyAll::Git::Prereceive - Git pre-receive hook that requires files to be tidyall'd
 
 =head1 VERSION
 
-version 0.78
+version 0.80
 
 =head1 SYNOPSIS
 
@@ -353,15 +352,11 @@ newlines), as an imperfect way of filtering out symlinks.
 
 =head1 SUPPORT
 
-Bugs may be submitted at
-L<https://github.com/houseabsolute/perl-code-tidyall/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/perl-code-tidyall/issues>.
 
 =head1 SOURCE
 
-The source code repository for Code-TidyAll can be found at
-L<https://github.com/houseabsolute/perl-code-tidyall>.
+The source code repository for Code-TidyAll can be found at L<https://github.com/houseabsolute/perl-code-tidyall>.
 
 =head1 AUTHORS
 
@@ -379,12 +374,12 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2020 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2021 by Jonathan Swartz.
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-The full text of the license can be found in the F<LICENSE> file included with
-this distribution.
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

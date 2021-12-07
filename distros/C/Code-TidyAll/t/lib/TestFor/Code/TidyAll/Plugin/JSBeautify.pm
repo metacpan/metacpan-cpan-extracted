@@ -1,28 +1,12 @@
 package TestFor::Code::TidyAll::Plugin::JSBeautify;
 
 use Encode qw(encode);
+use Path::Tiny qw( cwd );
 use Test::Class::Most parent => 'TestFor::Code::TidyAll::Plugin';
-
-BEGIN {
-    unless ( $ENV{TRAVIS} ) {
-        require Test::Warnings;
-        Test::Warnings->import('warnings');
-    }
-}
-
-sub SKIP_CLASS {
-
-    # For some reason running js-beautify fails under Travis for no reason I
-    # can understand
-    # (https://travis-ci.org/houseabsolute/perl-code-tidyall/jobs/276610909). I've
-    # updating all the NPM modules. I've tried changing how the command is
-    # called. I've tried a lot of things! But the test still passes locally,
-    # so I'm giving up for now.
-    return $ENV{TRAVIS} ? 'Running js-beautify fails under travis for some reason' : 0;
-}
+use Test::Warnings qw( warnings );
 
 sub _extra_path {
-    'node_modules/.bin';
+    cwd()->child(qw( node_modules .bin ));
 }
 
 sub test_main : Tests {

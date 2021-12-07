@@ -7,7 +7,7 @@ on 'configure' => sub {
 };
 
 on 'test' => sub {
-  requires 'Test::More';
+  requires 'Test2::Suite';
 };
 
 # Phases that exist: configure, build, test, runtime, develop.

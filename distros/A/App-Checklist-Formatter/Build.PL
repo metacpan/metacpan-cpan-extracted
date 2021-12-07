@@ -25,6 +25,7 @@ my $builder = Module::Build->new(
 	'perl'		=> '5.6.0',
         'version'	=> 0,
 	'Carp'		=> 0,
+	'Class::Std'	=> 0,
     },
     script_files	=> [ 'bin/checklist-formatter' ],
 );

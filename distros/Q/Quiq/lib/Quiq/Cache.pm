@@ -1,16 +1,3 @@
-package Quiq::Cache;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Digest;
-use Quiq::Path;
-use Quiq::Storable;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -82,6 +69,25 @@ Cachen einer HTML-Seite, die von einem einzigen Parameter $day abhängt:
   my $html = ...HTML erzeugen...
   
   $c->write(\$html);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Cache;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Digest;
+use Quiq::Path;
+use Quiq::Storable;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -256,7 +262,7 @@ sub write {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

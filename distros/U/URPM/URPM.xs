@@ -2177,7 +2177,7 @@ Pkg_build_info(pkg, fileno, provides_files=NULL, recommends=0)
   int recommends
   CODE:
   if (pkg->info) {
-    char buff[65536*2];
+    char buff[65536*3];
     UV size;
 
     /* info line should be the last to be written */
@@ -2189,6 +2189,8 @@ Pkg_build_info(pkg, fileno, provides_files=NULL, recommends=0)
 	  size += snprintf(buff+size, sizeof(buff)-size, "@%s\n", provides_files);
 	}
 	write_nocheck(fileno, buff, size);
+      } else {
+	fprintf(stderr, "buffer overflow: %d < %d for provides\n", size, sizeof(buff));
       }
     }
     if (pkg->conflicts && *pkg->conflicts) {

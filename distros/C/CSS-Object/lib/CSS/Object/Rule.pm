@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object/Rule.pm
-## Version v0.1.1
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.local>
+## Version v0.1.3
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/21
-## Modified 2020/06/24
+## Modified 2021/11/28
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package CSS::Object::Rule;
 BEGIN
@@ -19,7 +22,7 @@ BEGIN
         '""' => 'as_string',
         fallback => 1,
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.3';
 };
 
 sub init
@@ -73,7 +76,7 @@ sub add_selector
 sub add_to
 {
     my $self = shift( @_ );
-    ## no overloading;
+    # no overloading;
     my $css  = shift( @_ ) || return( $self->error( "No css object was provided to add our rule to it." ) );
     # my $caller = ( split( /\::/, (caller(1))[3] ) )[-1];
     # $self->message( 3, "Called from '$caller' and css object is '$css'." );
@@ -86,7 +89,7 @@ sub add_to
 sub as_string
 {
 	my $self = shift( @_ );
-	my( $p, $f, $l ) = caller;
+	# my( $p, $f, $l ) = caller;
 	# $self->message( 3, "Stringifying rule called from package $p at line $l in file $f" );
 	my $format = $self->format || return( $self->error( "No formatter set to format this rule as string." ) );
 	return( $format->rule_as_string( $self ) );
@@ -97,7 +100,7 @@ sub comments
 	my $self = shift( @_ );
 	return( $self->elements->map(sub{ $_->isa( 'CSS::Object::Comment' ) ? $_ : () }) );
 }
-sub elements { return( shift->_set_get_array_as_object( 'elements', @_ ) ); }
+sub elements { return( shift->_set_get_object_array_object( 'elements', 'CSS::Object::Element', @_ ) ); }
 
 sub elements_as_string
 {
@@ -113,7 +116,7 @@ sub format
 	{
         # my( $p, $f, $l ) = caller;
         # $self->message( 3, "Rule format called in package $p at line $l in file $f" );
-	    my $format = $self->SUPER::format( @_ ) || return;
+	    my $format = $self->SUPER::format( @_ ) || return( $self->pass_error );
 	    # $self->message( 3, "New format set: '$format'." );
 	    $self->selectors->foreach(sub
 	    {
@@ -159,12 +162,12 @@ sub get_property_by_name
     }
 }
 
-## Obsolete. See elements instead which has a wider scope including also comments
+# Obsolete. See elements instead which has a wider scope including also comments
 # sub properties { return( shift->_set_get_object_array_object( 'properties', 'CSS::Object::Property', @_ ) ); }
 sub properties
 {
 	my $self = shift( @_ );
-	return( $self->elements->map(sub{ $_->isa( 'CSS::Object::Property' ) ? $_ : () }) );
+	return( $self->elements->map(sub{ $self->_is_a( $_, 'CSS::Object::Property' ) ? $_ : () }) );
 }
 
 sub properties_as_string
@@ -174,8 +177,28 @@ sub properties_as_string
 	return( $format->properties_as_string( $self->properties ) );
 }
 
-## Array of CSS::Object::Selector objects
-sub selectors { return( shift->_set_get_array_as_object( 'selectors', @_ ) ); }
+sub remove_from
+{
+    my $self = shift( @_ );
+    my $css  = shift( @_ ) || return( $self->error( "No css object was provided to remove our rule from it." ) );
+    # my $caller = ( split( /\::/, (caller(1))[3] ) )[-1];
+    # $self->message( 3, "Called from '$caller' and css object is '$css'." );
+    return( $self->error( "CSS object provided (", overload::StrVal( $css ), ") is not actually a CSS::Object object." ) ) if( !$self->_is_a( $css, 'CSS::Object' ) );
+    $css->remove_rule( $self );
+    return( $self );
+}
+
+sub remove_property
+{
+    my $self = shift( @_ );
+    my $prop = shift( @_ );
+	return( $self->error( "Property object provided ($prop) is not a CSS::Object::Property object." ) ) if( !$self->_is_a( $prop, 'CSS::Object::Property' ) );
+	$self->elements->remove( $prop );
+	return( $self );
+}
+
+# Array of CSS::Object::Selector objects
+sub selectors { return( shift->_set_get_object_array_object( 'selectors', 'CSS::Object::Property', @_ ) ); }
 
 sub selectors_as_string
 {
@@ -202,7 +225,7 @@ CSS::Object::Rule - CSS Object Oriented Rule
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.3
 
 =head1 DESCRIPTION
 
@@ -274,7 +297,7 @@ Provided with a property name, and this returns its matching L<CSS::Object::Prop
 
 It returns a list of objects in list context or an empty list if no match found.
 
-In object context, it returns the first match found o the L<Module::Generic::Null> special class object to all chaining even when nothing was returned. in scalar context, it just returns the first entry found, if any, so this could very well be undefined.
+In object context, it returns the first match found or the L<Module::Generic::Null> special class object to allow chaining even when nothing was returned. in scalar context, it just returns the first entry found, if any, so this could very well be undefined.
 
 =head2 properties
 
@@ -284,6 +307,22 @@ This sets or gets the L<Module::Generic::Array> object used to store all the L<C
 
 This returns the string value of all the properties objects currently held. It calls the method L<CSS::Object::Format/properties_as_string> to stringify those properties.
 
+=head2 remove_from
+
+This takes a L<CSS::Object> as argument and it will remove this current rule object from the css list of rules.
+
+It basically calls L<CSS::Object/remove_rule>.
+
+It returns the current rule object.
+
+=head2 remove_property
+
+Given a L<CSS::Object::Property>, this will remove it from its list of elements. It returns the current rule object.
+
+It basically does:
+
+    $self->elements->remove( $rule );
+
 =head2 selectors
 
 This sets or gets the L<Module::Generic::Array> object used to store all the L<CSS::Object::Selector> objects.
@@ -292,7 +331,7 @@ This sets or gets the L<Module::Generic::Array> object used to store all the L<C
 
 This returns the string value of all the selector objects currently held. It calls the method L<CSS::Object::Format/selectors_as_string> to stringify those selectors.
 
-head1 AUTHOR
+=head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 

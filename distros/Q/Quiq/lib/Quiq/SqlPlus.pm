@@ -1,16 +1,3 @@
-package Quiq::SqlPlus;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Unindent;
-use Quiq::Option;
-use Quiq::Template;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -126,6 +113,25 @@ erzeugt
   EXIT
   
   -- eof
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::SqlPlus;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Unindent;
+use Quiq::Option;
+use Quiq::Template;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -314,7 +320,7 @@ sub script {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

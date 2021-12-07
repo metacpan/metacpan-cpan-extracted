@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Constraint::ACL::Canned;
-# Abstract: Moose constraint - valid Canned ACL constants
-$Net::Amazon::S3::Constraint::ACL::Canned::VERSION = '0.98';
+# ABSTRACT: Moose constraint - valid Canned ACL constants
+$Net::Amazon::S3::Constraint::ACL::Canned::VERSION = '0.99';
 use Moose::Util::TypeConstraints;
 
 # Current list at https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
@@ -28,11 +28,11 @@ __END__
 
 =head1 NAME
 
-Net::Amazon::S3::Constraint::ACL::Canned
+Net::Amazon::S3::Constraint::ACL::Canned - Moose constraint - valid Canned ACL constants
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

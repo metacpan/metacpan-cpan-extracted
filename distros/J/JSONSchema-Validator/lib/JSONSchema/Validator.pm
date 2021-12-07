@@ -14,7 +14,7 @@ use JSONSchema::Validator::Draft7;
 use JSONSchema::Validator::OAS30;
 use JSONSchema::Validator::Util qw(get_resource decode_content read_file);
 
-our $VERSION = '0.008';
+our $VERSION = '0.010';
 
 my $SPECIFICATIONS = {
     JSONSchema::Validator::OAS30::ID => JSONSchema::Validator::OAS30::SPECIFICATION,
@@ -149,7 +149,7 @@ JSONSchema::Validator - Validator for JSON Schema Draft4/Draft6/Draft7 and OpenA
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -278,9 +278,13 @@ Andrey Khozov <andrey@rydlab.ru>
 
 =head1 CONTRIBUTORS
 
-=for stopwords James Waters uid66
+=for stopwords Erik Huelsmann James Waters uid66
 
 =over 4
+
+=item *
+
+Erik Huelsmann <ehuels@gmail.com>
 
 =item *
 

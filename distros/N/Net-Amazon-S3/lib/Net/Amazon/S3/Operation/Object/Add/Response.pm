@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Add::Response;
 # ABSTRACT: An internal class to handle object add response
-$Net::Amazon::S3::Operation::Object::Add::Response::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Object::Add::Response::VERSION = '0.99';
 use Moose;
 extends 'Net::Amazon::S3::Response';
 
@@ -18,7 +18,7 @@ Net::Amazon::S3::Operation::Object::Add::Response - An internal class to handle 
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

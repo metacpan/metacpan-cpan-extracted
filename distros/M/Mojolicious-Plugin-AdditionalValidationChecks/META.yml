@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ name: Mojolicious-Plugin-AdditionalValidationChecks
 provides:
   Mojolicious::Plugin::AdditionalValidationChecks:
     file: lib/Mojolicious/Plugin/AdditionalValidationChecks.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Email::Valid: '1.192'
   Mojo::URL: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks/issues
   homepage: http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks
   repository: http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks.git
-version: '0.17'
+version: '0.18'
 x_contributors:
   - 'Florian Heyer <info@heyer-it.de>'
   - 'Graham Knop <haarg@haarg.org>'
@@ -41,4 +41,5 @@ x_contributors:
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'
   - 'Renee <reb@perl-services.de>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

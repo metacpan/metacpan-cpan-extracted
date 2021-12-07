@@ -12,11 +12,15 @@ my $default_depth = MyTest::default_trace_depth();
 
 subtest "perl exception thrown" => sub {
     my $ex_line;
-    my $ok = eval { $ex_line = __LINE__;  die("abc"); 1; };
-    ok !$ok;
-    like "$@", qr/^abc/;
 
-    my $bt = Exception::Backtrace::get_backtrace($@);
+    my $gen_bt = sub {
+        my $ok = eval { $ex_line = __LINE__;  die("abc"); 1; };
+        ok !$ok;
+        like "$@", qr/^abc/;
+
+        my $bt = Exception::Backtrace::get_backtrace($@);
+    };
+    my $bt = $gen_bt->();
     note "$bt";
     ok $bt;
 
@@ -43,6 +47,21 @@ subtest "perl exception thrown" => sub {
             is $f_more->library, 'Test::More';
             is $f_more->file, __FILE__;
             ok $f_more->line_no;
+        };
+
+        subtest "custom args decorator" => sub {
+            local $Exception::Backtrace::decorator = sub { return '[args skipped]' };
+            my $str = $gen_bt->()->perl_trace->to_string;
+            note "perl trace: ", $str;
+            my $count = $str =~ s/args skipped//g;
+            ok( $count > 4, "N times args has been skipped");
+        };
+
+        subtest "undef decorator" => sub {
+            local $Exception::Backtrace::decorator = undef;
+            my $str = $gen_bt->()->perl_trace->get_frames->[0]->to_string();
+            note "perl farame: ", $str;
+            unlike $str, qr/[()]/;
         };
     };
 
@@ -184,15 +203,16 @@ subtest "create backtrace" => sub {
             subtest "check args" => sub {
                 my $args = $f_main->args;
                 ok $args;
-                is scalar(@$args), 8;
-                is $args->[0], '5';
-                is $args->[1], "'str'";
-                like $args->[2], qr/SCALAR/;
-                like $args->[3], qr/ARRAY/;
-                like $args->[4], qr/HASH/;
-                is $args->[5], 'undef';
-                like $args->[6], qr/CODE/;
-                like $args->[7], qr/Some::Package=HASH/;
+                my @args = split(', ', $args);
+                is scalar(@args), 8;
+                like $args[0], qr/5/;
+                like $args[1], qr/str/;
+                like $args[2], qr/SCALAR/;
+                like $args[3], qr/ARRAY/;
+                like $args[4], qr/HASH/;
+                like $args[5], qr/undef/;
+                like $args[6], qr/CODE/;
+                like $args[7], qr/Some::Package=HASH/;
             };
         };
 

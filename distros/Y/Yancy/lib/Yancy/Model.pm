@@ -1,5 +1,5 @@
 package Yancy::Model;
-our $VERSION = '1.084';
+our $VERSION = '1.085';
 # ABSTRACT: Model layer for Yancy apps
 
 #pod =head1 SYNOPSIS
@@ -180,8 +180,6 @@ sub read_schema {
     my ( $self, @names ) = @_;
     my $conf_schema = $self->_config_schema;
     my $read_schema;
-    # ; use Data::Dumper;
-    # ; say "READ SCHEMA: " . Dumper $read_schema;
     if ( @names ) {
         $read_schema = { map { $_ => $self->backend->read_schema( $_ ) } @names };
     }
@@ -307,7 +305,7 @@ Yancy::Model - Model layer for Yancy apps
 
 =head1 VERSION
 
-version 1.084
+version 1.085
 
 =head1 SYNOPSIS
 

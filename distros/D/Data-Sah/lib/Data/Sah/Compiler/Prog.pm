@@ -1,10 +1,5 @@
 package Data::Sah::Compiler::Prog;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-01'; # DATE
-our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.910'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -30,6 +25,11 @@ has logical_and_op => (is => 'rw', default => sub {'&&'});
 has logical_not_op => (is => 'rw', default => sub {'!'});
 
 #has logical_or_op => (is => 'rw', default => sub {'||'});
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-12-01'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.911'; # VERSION
 
 sub init_cd {
     my ($self, %args) = @_;
@@ -649,26 +649,83 @@ sub before_all_clauses {
     }
 
     # handle default
-    for my $i (0..@$clsets-1) {
-        my $clset  = $clsets->[$i];
-        my $def    = $clset->{default};
-        my $defie  = $clset->{"default.is_expr"};
-        if (defined $def) {
-            local $cd->{_debug_ccl_note} = "default #$i";
-            my $ct = $defie ?
-                $self->expr($cd, $def) : $self->literal($def);
+  HANDLE_DEFAULT: {
+
+        my $default_value_expr;
+        my $default_value_ccl_note;
+      GEN_DEFAULT_VALUE_RULES:
+        {
+            require Data::Sah::DefaultValueCommon;
+
+            my @default_value_rules;
+            for my $i (0..@$clsets-1) {
+                my $clset = $clsets->[$i];
+                push @default_value_rules,
+                    @{ $clset->{"x.$cname.default_value_rules"} // [] },
+                    @{ $clset->{'x.default_value_rules'} // [] };
+            }
+
+            my $rules = Data::Sah::DefaultValueCommon::get_default_value_rules(
+                compiler => $self->name,
+                default_value_rules => \@default_value_rules,
+            );
+            last unless @$rules;
+
+            for my $i (reverse 0..$#{$rules}) {
+                my $rule = $rules->[$i];
+
+                $self->add_compile_module(
+                    $cd, "Data::Sah::Value::$cname\::$rule->{name}",
+                    {category => 'default_value'},
+                );
+
+                if ($rule->{modules}) {
+                    for my $mod (keys %{ $rule->{modules} }) {
+                        my $modspec = $rule->{modules}{$mod};
+                        $modspec = {version=>$modspec} unless ref $modspec eq 'HASH';
+                        $self->add_runtime_module($cd, $mod, {category=>'default_value', %$modspec});
+                    }
+                }
+            }
+
+            $default_value_expr = join " // " , map { "($_->{expr_value})" } @$rules;
+            $default_value_ccl_note = "default value rule(s): ".
+                join(", ", map {$_->{name}} @$rules);
+        } # GEN_DEFAULT_VALUE_RULES
+
+        for my $i (0..@$clsets-1) {
+            my $clset  = $clsets->[$i];
+            my $def    = $clset->{default};
+            my $defie  = $clset->{"default.is_expr"};
+            if (defined $def) {
+                local $cd->{_debug_ccl_note} = "default #$i";
+                my $ct = $defie ?
+                    $self->expr($cd, $def) : $self->literal($def);
+                $self->add_ccl(
+                    $cd,
+                    $self->expr_list(
+                        $self->expr_setif($dt, $ct),
+                        $self->true,
+                    ),
+                    {err_msg => ""},
+                );
+            }
+            delete $cd->{uclsets}[$i]{"default"};
+            delete $cd->{uclsets}[$i]{"default.is_expr"};
+        }
+
+        if (defined $default_value_expr) {
+            local $cd->{_debug_ccl_note} = $default_value_ccl_note;
             $self->add_ccl(
                 $cd,
                 $self->expr_list(
-                    $self->expr_setif($dt, $ct),
+                    $self->expr_setif($dt, $default_value_expr),
                     $self->true,
                 ),
                 {err_msg => ""},
             );
         }
-        delete $cd->{uclsets}[$i]{"default"};
-        delete $cd->{uclsets}[$i]{"default.is_expr"};
-    }
+    } # HANDLE_DEFAULT
 
     # handle req
     my $has_req;
@@ -1111,7 +1168,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.910 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2021-08-01.
+This document describes version 0.911 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2021-12-01.
 
 =head1 SYNOPSIS
 
@@ -1448,6 +1505,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah>.
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Sah>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah>
@@ -1455,16 +1540,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

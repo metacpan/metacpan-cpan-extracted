@@ -1,12 +1,3 @@
-package Quiq::PostgreSql::CopyFormat;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -43,6 +34,21 @@ PostgreSQL COPY-Kommando verarbeitet werden können.
 Anzahl der Kolumnen pro Zeile.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::PostgreSql::CopyFormat;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -147,7 +153,7 @@ sub arrayToLine {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

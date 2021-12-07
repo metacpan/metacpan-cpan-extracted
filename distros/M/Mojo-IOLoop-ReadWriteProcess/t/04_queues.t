@@ -5,6 +5,7 @@ use strict;
 use Test::More;
 use POSIX;
 use FindBin;
+use Time::HiRes 'sleep';
 use Mojo::File qw(tempfile path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
 

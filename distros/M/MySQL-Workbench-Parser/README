@@ -5,9 +5,20 @@ NAME
 
 VERSION
 
-    version 1.10
+    version 1.11
 
 SYNOPSIS
+
+        # create the parser
+        my $parser = MySQL::Workbench::Parser->new(
+            file => '/path/to/file.mwb',
+        );
+    
+        # access tables of the workbench ER model
+        my @tables = @{ $parser->tables };
+    
+        # access views of the workbench ER model
+        my @views = @{ $parser->views };
 
 DESCRIPTION
 

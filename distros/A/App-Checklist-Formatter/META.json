@@ -29,6 +29,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Class::Std" : "0",
             "perl" : "v5.6.0",
             "version" : "0"
          }
@@ -37,7 +38,7 @@
    "provides" : {
       "App::Checklist::Formatter" : {
          "file" : "lib/App/Checklist/Formatter.pm",
-         "version" : "v0.0.6"
+         "version" : "v0.0.7"
       }
    },
    "release_status" : "stable",
@@ -49,6 +50,6 @@
          "url" : "https://github.com/matwei-perl/App-Checklist-Formatter"
       }
    },
-   "version" : "v0.0.6",
+   "version" : "v0.0.7",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

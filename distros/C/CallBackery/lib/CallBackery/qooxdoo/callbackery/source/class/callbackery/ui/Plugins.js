@@ -16,6 +16,9 @@ qx.Class.define("callbackery.ui.Plugins", {
 
         plugins : {
             init: {
+                action: function(pluginConfig,getParentFormData) {
+                    return new callbackery.ui.plugin.ActionForm(pluginConfig,getParentFormData);
+                },
                 form: function(pluginConfig,getParentFormData) {
                     return new callbackery.ui.plugin.Form(pluginConfig,getParentFormData);
                 },

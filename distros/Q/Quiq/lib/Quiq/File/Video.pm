@@ -1,16 +1,3 @@
-package Quiq::File::Video;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Quiq::Ipc;
-use Quiq::Formatter;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -22,6 +9,25 @@ Quiq::File::Video - Informationen über Video-Datei
 =head1 BASE CLASS
 
 L<Quiq::Hash>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::File::Video;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Quiq::Ipc;
+use Quiq::Formatter;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -361,7 +367,7 @@ sub analyzeFile {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

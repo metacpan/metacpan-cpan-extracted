@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211832;
+our $VERSION = 1.20211206222446;
 
 my $formatters = [
                 {
@@ -81,39 +81,39 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"960682", "Gaafu\ Alifu",
-"960664", "Kaafu",
-"960330", "Malé\/Hulhulé\/Aarah",
-"960686", "Gnaviyani",
-"960303", "Malé\ Region",
-"960665", "Kaafu",
-"960331", "Malé\/Hulhulé\/Aarah",
-"960654", "Shaviyani",
-"960688", "Addu",
-"960680", "Laamu",
-"960332", "Malé\/Hulhulé\/Aarah",
-"960674", "Faafu",
-"960334", "Malé\/Hulhulé\/Aarah",
-"960333", "Malé\/Hulhulé\/Aarah",
-"960672", "Meemu",
-"960656", "Noonu",
-"960300", "Malé\/Hulhulé\/Aarah",
-"960660", "Baa",
-"960652", "Haa\ Dhaalu",
-"960676", "Dhaalu",
-"960689", "Addu",
-"960335", "Hulhumalé",
-"960668", "Alifu\ Dhaalu",
+$areanames{en} = {"960333", "Malé\/Hulhulé\/Aarah",
 "960666", "Alifu\ Alifu",
-"960302", "Malé\ Region",
-"960670", "Vaavu",
-"960339", "Vilimalé",
-"960678", "Thaa",
-"960658", "Raa",
+"960656", "Noonu",
+"960680", "Laamu",
 "960684", "Gaafu\ Dhaalu",
+"960331", "Malé\/Hulhulé\/Aarah",
+"960662", "Lhaviyani",
+"960652", "Haa\ Dhaalu",
+"960654", "Shaviyani",
+"960664", "Kaafu",
+"960682", "Gaafu\ Alifu",
 "960301", "Malé\/Hulhulé\/Aarah",
+"960335", "Hulhumalé",
 "960650", "Haa\ Alifu",
-"960662", "Lhaviyani",};
+"960660", "Baa",
+"960686", "Gnaviyani",
+"960689", "Addu",
+"960678", "Thaa",
+"960303", "Malé\ Region",
+"960670", "Vaavu",
+"960674", "Faafu",
+"960668", "Alifu\ Dhaalu",
+"960330", "Malé\/Hulhulé\/Aarah",
+"960658", "Raa",
+"960302", "Malé\ Region",
+"960334", "Malé\/Hulhulé\/Aarah",
+"960665", "Kaafu",
+"960676", "Dhaalu",
+"960332", "Malé\/Hulhulé\/Aarah",
+"960688", "Addu",
+"960300", "Malé\/Hulhulé\/Aarah",
+"960339", "Vilimalé",
+"960672", "Meemu",};
 
     sub new {
       my $class = shift;

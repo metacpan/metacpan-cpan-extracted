@@ -1,3 +1,8 @@
+0.008   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Set default length from 10 to 1000.
+
+
 0.007   2020-11-08  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Don't exclude all rows when user type '-' term in search

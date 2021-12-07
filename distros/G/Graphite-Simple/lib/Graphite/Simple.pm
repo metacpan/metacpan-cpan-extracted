@@ -9,7 +9,11 @@ our %EXPORT_TAGS = ( 'all' => [ ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
+
+our %avg_counters;
+our %bulk;
+our %invalid;
 
 require XSLoader;
 XSLoader::load('Graphite::Simple', $VERSION);
@@ -41,6 +45,8 @@ Graphite::Simple - Perl XS package provides methods to collect metrics and send 
   my $metrics = $graphite->get_metrics();
 
   my $avg_counters = $graphite->get_average_counters();
+
+  my $invalid = $graphite->get_invalid_metrics();
 
   $graphite->clear_bulk();
 
@@ -113,6 +119,11 @@ Be aware that the invocation of this method can lead to some performance penalti
 
 Optional.
 
+=item store_invalid_metrics
+
+Optional. By default takes false value.
+Turns on the collecting of invalid metrics into C<invalid> hash.
+
 =item block_metrics_re
 
 The compiled regular expression.
@@ -128,7 +139,11 @@ If flag is set then the package global hashes will be used to store collected da
   my %metrics      = %Graphite::Simple::bulk;
   my %avg_counters = %Graphite::Simple::avg_counters;
 
-Otherweise internal hashes will be used.
+In case of C<store_invalid_metrics> true value the following hash will be available too:
+
+  my %invalid = %Graphite::Simple::invalid;
+
+Otherwise internal hashes will be used.
 
 =back
 
@@ -168,6 +183,11 @@ Here "avg.key" counter will be equal to 2. And result value for "avg.key" is 6: 
 
 Returns the hash reference with counters of average metrics.
 Average metric is a metric started with "avg." string.
+
+=head2 $self->get_invalid_metrics()
+
+Returns hsh with invalid metrics.
+It doesn't contain any blocked metric by reqular expressions.
 
 =head2 $self->get_metrics()
 
@@ -210,7 +230,7 @@ IF passed C<$key> is invalid, then invalid key counter will be bumped by 1.
 
 =head2 $self->is_metric_blocked($key)
 
-Returns 1 if C<$key> matches with reqular expression set with C<set_blocked_metrics_re>
+Returns 1 if C<$key> matches with regular expression set with C<set_blocked_metrics_re>
 or C<block_metrics_re>.
 
 Otherwise returns 0.

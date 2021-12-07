@@ -3,7 +3,7 @@ package RT::Extension::ActivityReports;
 use Exporter qw( import );
 @EXPORT_OK = qw( RelevantTxns );
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 RT->AddStyleSheets('activity-reports.css');
 
@@ -50,6 +50,8 @@ and/or between two dates, so it's quite flexible.
 =head1 RT VERSION
 
 Works with RT 4.0, 4.2, 4.4
+
+Works with RT 5.0, but styling has not yet been updated
 
 =head1 INSTALLATION
 

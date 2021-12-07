@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 54;
+use Test::More;
 use PDL;
 use Test::PDL qw( eq_pdl_diag );
-use Test::NoWarnings;
+use Test::NoWarnings qw(had_no_warnings); $Test::NoWarnings::do_end_test = 0;
 
 # remember that ok() forces scalar context on the condition it tests, the
 # prototype being ok($;$)
@@ -182,3 +182,6 @@ $got = long( 4,5,6,7,8,9 );
 $got->badflag( 0 );
 ( $ok, $diag ) = eq_pdl_diag( $got, $expected );
 ok $ok;
+
+had_no_warnings;
+done_testing;

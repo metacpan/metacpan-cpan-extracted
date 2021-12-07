@@ -1,0 +1,27 @@
+---
+abstract: 'parsing URLs with zero-copy and no mallocs'
+author:
+  - 'Peter P. Neuromantic <p.brovchenko@protonmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IURL-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0'
+  perl: '5.024000'
+resources:
+  bugtracker: https://github.com/ChaoticEvil/p5-iurl-xs/issues
+  repository: https://github.com/ChaoticEvil/p5-iurl-xs.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

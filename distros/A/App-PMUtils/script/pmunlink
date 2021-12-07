@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-27'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.736'; # VERSION
+our $VERSION = '0.737'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/PMUtils/pmunlink",
@@ -40,13 +40,13 @@ pmunlink - Unlink (remove) locally installed Perl module
 
 =head1 VERSION
 
-This document describes version 0.736 of pmunlink (from Perl distribution App-PMUtils), released on 2021-08-27.
+This document describes version 0.737 of pmunlink (from Perl distribution App-PMUtils), released on 2021-12-01.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<pmunlink> [B<--all>|B<-a>|B<--no-all>|B<--noall>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--dry-run>|B<-n>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pm>=I<int>] [B<--pmc>=I<int>] [B<--pod>=I<int>] -- E<lt>I<module>E<gt> ...
+% B<pmunlink> [B<--all>|B<-a>|B<--no-all>|B<--noall>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--dry-run>|B<-n>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pm>=I<int>] [B<--pmc>=I<int>] [B<--pod>=I<int>] -- [I<module>] ...
 
 =head1 OPTIONS
 
@@ -66,7 +66,7 @@ See C<--module>.
 
 Can also be specified as the 1st command-line argument and onwards.
 
-=item B<--module>=I<s@>*
+=item B<--module>=I<s@>
 
 Can also be specified as the 1st command-line argument and onwards.
 

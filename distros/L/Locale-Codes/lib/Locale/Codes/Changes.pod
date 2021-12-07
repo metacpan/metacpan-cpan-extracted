@@ -24,7 +24,13 @@ changes that you use, feel free to contact me.  Based on my available
 time and the time until the next release is scheduled, I will try to
 do a release any time the standards change.
 
-=head1 VERSION 3.69  (expected 2021-12-01  sbeck)
+=head1 VERSION 3.69  (2021-12-01  sbeck)
+
+=over 5
+
+=item NEW CODE(s)
+
+=back
 
 =head1 VERSION 3.68  (2021-09-02  sbeck)
 
@@ -38,8 +44,8 @@ NOTE: no code changes on 2021-06-01 so no release made at that time.
 
 Also code2countrys, code2languages, etc.  This allows you to see all names and
 aliases that correspond to a code.  My apologies for making 'countrys' to be the
-plural of 'country', but because these modules are all derived, I didn't want to
-put in an exception for the strange pluralization.
+plural of 'country', but because these modules are all generated from a template,
+I didn't want to put in an exception for the strange pluralization.
 
 Prompted by David Cantrell.
 
@@ -909,8 +915,9 @@ returned:
 Previous versions had only two semi-private routines: rename_country
 and alias_code which had the ability to modify the internal data in
 a couple of very limited ways. It was requested (in an anonymous posting
-by someone named Steve and also by Steve Hay) that better support
-for modifying internal data, so a full set of routines were added.
+by someone named Steve and also by Steve Hay - unknown if they are the same
+person or two different Steves) that better support for modifying internal
+data, so a full set of routines were added.
 
 The full set of routines includes:
 

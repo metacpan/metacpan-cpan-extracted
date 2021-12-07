@@ -52,11 +52,11 @@ sub as_string
 #     );
 }
 
-sub comment { return( shift->_set_get_array_as_object( 'comment_after', @_ ) ); }
+sub comment { return( shift->_set_get_object_array_object( 'comment_after', 'CSS::Object::Comment', @_ ) ); }
 
-sub comment_after { return( shift->_set_get_array_as_object( 'comment_after', @_ ) ); }
+sub comment_after { return( shift->_set_get_object_array_object( 'comment_after', 'CSS::Object::Comment', @_ ) ); }
 
-sub comment_before { return( shift->_set_get_array_as_object( 'comment_before', @_ ) ); }
+sub comment_before { return( shift->_set_get_object_array_object( 'comment_before', 'CSS::Object::Comment', @_ ) ); }
 
 sub value
 {
@@ -116,13 +116,15 @@ sub with_comment
     $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
     if( $opts->{before} )
     {
-        my $cmt = $self->_comment_data_to_object( $opts->{before} ) || return;
-        $self->comment_before->push( $cmt );
+        my $cmt = $self->_comment_data_to_object( $opts->{before} );
+        defined( $cmt ) || return( $self->pass_error );
+        $self->comment_before->push( $cmt ) if( defined( $cmt ) && CORE::length( $cmt ) );
     }
     if( $opts->{after} )
     {
-        my $cmt = $self->_comment_data_to_object( $opts->{after} ) || return;
-        $self->comment_after->push( $cmt );
+        my $cmt = $self->_comment_data_to_object( $opts->{after} );
+        defined( $cmt ) || return( $self->pass_error );
+        $self->comment_after->push( $cmt ) if( defined( $cmt ) && CORE::length( $cmt ) );
     }
     return( $self );
 }
@@ -130,8 +132,8 @@ sub with_comment
 sub _comment_data_to_object
 {
     my $self = shift( @_ );
-    ## No data received, we silently return undef
-    my $this = shift( @_ ) || return;
+    # No data received, we silently return false
+    my $this = shift( @_ ) || return( '' );
     if( $self->_is_a( $this, 'CSS::Objet::Comment' ) )
     {
         return( $this );

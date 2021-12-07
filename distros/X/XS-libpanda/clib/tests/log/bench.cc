@@ -16,7 +16,7 @@
 //    };
 //}
 
-TEST_CASE("thread-safe test") {
+TEST_CASE("thread-safe test", "[.]") {
     int nthr = 0, cnt = 0;
     auto nthr_str = getenv("NTHR");
     if (nthr_str) nthr = atoi(nthr_str);

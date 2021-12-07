@@ -5,7 +5,9 @@ META.json
 README.md
 builder/Dyn.pm
 cpanfile
+eg/benchmark.pl
 eg/callback.pl
+eg/sugar.pl
 eg/unix_math.pl
 eg/win32_msgbox.pl
 eg/win32_screenres.pl
@@ -24,6 +26,8 @@ lib/xshelper.h
 minil.toml
 t/00_compile.t
 t/01_basics.t
+t/02_sin.t
 t/05_callback.t
+t/06_sugar.t
 META.yml
 MANIFEST

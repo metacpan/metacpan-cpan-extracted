@@ -5,7 +5,7 @@ use warnings;
 use base 'Excel::Writer::XLSX';
 use Excel::Writer::XLSX::Utility;
 
-use version; our $VERSION = version->declare("v1.1.1");
+use version; our $VERSION = version->declare("v1.1.2");
 
 use Archive::Zip;
 use Graphics::ColorUtils 'rgb2hls', 'hls2rgb';
@@ -125,6 +125,7 @@ return value, then just the $self object is returned.
 
    my ( $class, $output_file, @template_files ) = @_;
    my $self = {
+      CELL_FORMAT    => [],
       FORMATS        => [],
       HYPERLINKS     => {},
       NEED_PROPS     => 1,
@@ -134,7 +135,6 @@ return value, then just the $self object is returned.
       SHARED_STRINGS => [],
       THEMES         => [],
       ZIP            => [],
-
       template_callback => undef,
    };
 
@@ -608,6 +608,8 @@ Returns an array of border styles, each one as a hash.
       my %diag = ();
       my $down = $border->att('diagonalDown') // 0;
       my $up   = $border->att('diagonalUp') // 0;
+      $down = ($down =~ m/true|1/x) ? 1 : 0;
+      $up   = ($up   =~ m/true|1/x) ? 1 : 0;
       $diag{'diag_type'} = 2 * $down + $up if $down + $up;
       my $dborder = $border->first_child('diagonal')->att('style');
       $diag{'diag_border'} = $border_map{$dborder} if $dborder;
@@ -615,9 +617,6 @@ Returns an array of border styles, each one as a hash.
       $diag{'diag_color'} = $self->_color($dcolor) if $dcolor;
 
       my $border_ref = { %colors, %types, %diag };
-#      use Mojo::Util qw(dumper);
-# warn dumper ($border_ref);
-#    $border_ref;
 
    } $styles->find_nodes('//borders/border');
    return $borders;
@@ -890,6 +889,9 @@ hyperlinks, and merged cells).
    $pass1->parse( $sheet_file->{xml} );
 
    # Half time show - track down the URLs for hyperlinks found in pass 1
+
+# warn "Sheet is $sheet->{_index}: ", dumper ( $self->{MERGED_RANGES} );
+
    while ( my ( $a1, $rid ) = each %{ $self->{HYPERLINKS} } ) {
       my $xpath = qq<//Relationship[\@Id="$rid"]>;
       my $url   = ( $sheet_file->{rels}->find_nodes($xpath) )[0];
@@ -905,6 +907,9 @@ hyperlinks, and merged cells).
    my $pass2
        = XML::Twig->new( twig_roots => $self->_parse_sheet_pass2($sheet) );
    $pass2->parse( $sheet_file->{xml} );
+
+   # EndGame:  Process any merge ranges that exist, but have no cell content.
+   $self->_parse_final_pass($sheet);
 }
 ###############################################################################
 sub _parse_sheet_pass1 {
@@ -1012,6 +1017,22 @@ heights, Sheet selection, and Tab Color)
       },
 
       # Default row height
+      'dimension' => sub {
+         my ( $twig, $format ) = @_;
+         my $ref = $format->att('ref');
+        $self->_cell_to_row_col($ref);
+
+        $self->{_dim_rowmin} = undef;
+        $self->{_dim_rowmax} = undef;
+        $self->{_dim_colmin} = undef;
+        $self->{_dim_colmax} = undef;
+
+
+         $sheet->set_default_row($default_row_height);
+         $twig->purge;
+      },
+
+      # Default row height
       'sheetFormatPr' => sub {
          my ( $twig, $format ) = @_;
          $default_row_height   //= $format->att('defaultRowHeight');
@@ -1020,14 +1041,13 @@ heights, Sheet selection, and Tab Color)
          $twig->purge;
       },
 
+      # Sets (one or more) column widths
       'col' => sub {
          my ( $twig, $col ) = @_;
 
-         for my $ci ( $col->att('min') .. $col->att('max') ) {
-            #set_column($first,$last,$width,$fmt,$hide,$level,$collapsed )
-            $sheet->set_column( $ci - 1, $ci - 1, $col->att('width') );
-            #?? just sets width, not $col->att('style')
-         }
+         my $min =  $col->att('min') - 1;
+         my $max =  $col->att('max') - 1;
+         $sheet->set_column( $min, $max, $col->att('width') );
          $twig->purge;
       },
 
@@ -1081,7 +1101,9 @@ font, and number formats.
             my $string_index = 0;
             my $a1           = $cell->att('r');           # Cell Address
             my $t            = $cell->att('t') || 'n';    # Cell Type
-            my $s            = $cell->att('s');           # Cell Format Index
+            my $s            = $cell->att('s') // 0;      # Cell Format Index (e.g. styles)
+            my ($r, $c) = $self->_cell_to_row_col($a1);
+            $self->{CELL_FORMAT}->[$r][$c] = $s;
             my $val_xml
                 = $t eq 'inlineStr'
                 ? $cell->first_child('is')->first_child('t')
@@ -1089,9 +1111,8 @@ font, and number formats.
             my $val = $val_xml ? $val_xml->text() : undef;
 
 
-            my $format_idx = $s // 0;
+            my $format_idx = $s;
             my $format = $self->{FORMATS}[$format_idx];
-
             # Formatted cell, no contents
             if ( !defined($val) ) {
                $sheet->write_blank($a1, $format);
@@ -1107,6 +1128,7 @@ font, and number formats.
                if ( my $ref = $self->{MERGED_RANGES}{$sheet_idx}{$a1} ) {
                   my $type = $is_array ? 'rich_string' : 'string';
                   $sheet->merge_range_type($type, $ref, @aval, $format );
+                  $self->{MERGED_RANGES}{$sheet_idx}{$a1} = 0; # Flag it as used.  Handle unused ranges at end
                   next;
                }
 
@@ -1139,9 +1161,9 @@ font, and number formats.
                      $sheet->write_array_formula( $ref, "=${formula}", $format, $val );
                   }
                   else {
-                     #if ( my $ref = $self->{MERGED_RANGES}{$a1} ) {
                      if ( my $ref = $self->{MERGED_RANGES}{$sheet_idx}{$a1} ) {
                        $sheet->merge_range_type('formula', $ref, "=${formula}", $format, $val);
+                       $self->{MERGED_RANGES}{$sheet_idx}{$a1} = 0; # Flag it as used.  Handle unused ranges at end
                      } else {
                         $sheet->write_formula( $a1, "=${formula}", $format, $val );
                      }
@@ -1167,6 +1189,35 @@ font, and number formats.
          $twig->purge;
       }
    };
+}
+###############################################################################
+sub _parse_final_pass {
+
+=head2 _parse_final_pass
+
+Make a final pass to process merge_ranges that do not have any cell contents.  
+This is it for now, but more may be added in the future.
+
+=cut
+
+  my $self = shift;
+  my ($sheet) = @_;
+  my $idx = $sheet->{_index};
+
+  foreach my $r (keys %{ $self->{MERGED_RANGES}->{ $idx } } ) {
+    my $ref = $self->{MERGED_RANGES}->{ $idx }->{$r};
+    next unless $ref;  # Only process merged ranges that have not been referenced yet.
+    $sheet->merge_range_type('blank', $ref, $self->{FORMATS}[0]);
+    my ($first, $last) = split('\:', $ref);
+    my ($rf, $cf) = $self->_cell_to_row_col($first);
+    my ($rl, $cl) = $self->_cell_to_row_col($last);
+    for my $r ($rf .. $rl) {
+      for my $c ($cf .. $cl) {
+       my $fid = $self->{CELL_FORMAT}->[$r][$c] // 0;
+       $sheet->write_blank($r, $c, $self->{FORMATS}[$fid] );
+      }
+    }
+  }
 }
 ###############################################################################
 sub _parse_styles {

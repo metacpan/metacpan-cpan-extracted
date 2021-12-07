@@ -1,18 +1,3 @@
-package Quiq::Epoch;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Time::HiRes ();
-use Time::Local ();
-use Quiq::Duration;
-use Time::Zone ();
-use POSIX ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -45,6 +30,27 @@ Zeitangabe in der Darstellung C<YYYY-MM-DD HH:MI:SS.X>.
 Ein Objekt der Klasse repräsentiert einen Zeitpunkt. Die Klasse
 implementiert Operationen auf einem solchen Zeitpunkt. Der
 Zeitpunkt ist hochauflösend, umfasst also auch Sekundenbruchteile.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Epoch;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Time::HiRes ();
+use Time::Local ();
+use Quiq::Duration;
+use Time::Zone ();
+use POSIX ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -508,7 +514,7 @@ sub asIso {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

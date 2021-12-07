@@ -40,6 +40,14 @@ double Request::timeout (SV* v = nullptr) {
     RETVAL = double(THIS->timeout)/1000;
 }
 
+double Request::connect_timeout (SV* v = nullptr) {
+    if (v) {
+        THIS->connect_timeout = xs::in<double>(v) * 1000;
+        XSRETURN_UNDEF;
+    }
+    RETVAL = double(THIS->connect_timeout)/1000;
+}
+
 bool Request::follow_redirect (Sv v = {}) {
     if (v) {
         THIS->follow_redirect = v.is_true();

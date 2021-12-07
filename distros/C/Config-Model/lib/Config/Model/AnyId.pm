@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.145;
+package Config::Model::AnyId 2.147;
 
 use 5.020;
 
@@ -515,12 +515,7 @@ sub check_content ($self, %args) {
 
         if (not $silent) {
             for ( @warn ) {
-                if ($::_use_log4perl_to_warn) {
-                    $user_logger->warn( "Warning in '" . $self->location_short . "': $_" )
-                }
-                else {
-                    warn( "Warning in '" . $self->location_short . "': $_\n" )
-                }
+                $user_logger->warn( "Warning in '" . $self->location_short . "': $_" )
             }
         }
 
@@ -592,12 +587,7 @@ sub check_idx ($self, @args) {
 
     if (@warn and not $silent and $check ne 'no') {
         for (@warn) {
-            if ($::_use_log4perl_to_warn) {
-                $user_logger->warn( "Warning in '" . $self->location_short . "': $_" );
-            }
-            else {
-                warn( "Warning in '" . $self->location_short . "': $_\n" )
-            }
+            $user_logger->warn( "Warning in '" . $self->location_short . "': $_" );
         }
     }
 
@@ -1076,7 +1066,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

@@ -110,8 +110,10 @@ sub _validate_schema {
 
     my $apply_scope = $params{apply_scope} // 1;
 
+    my $is_exists_ref = exists $schema->{'$ref'};
+
     my $id = $schema->{$self->ID_FIELD};
-    if ($id && $apply_scope && $self->using_id_with_ref) {
+    if ($id && $apply_scope && $self->using_id_with_ref && !$is_exists_ref) {
         my $uri = $id;
         $uri = URI->new($id)->abs($self->scope)->as_string if $self->scope;
         push @{$self->scopes}, $uri;
@@ -139,7 +141,7 @@ sub _validate_schema {
         $result = 0 unless $r;
     }
 
-    pop @{$self->scopes} if $id && $apply_scope && $self->using_id_with_ref;
+    pop @{$self->scopes} if $id && $apply_scope && $self->using_id_with_ref && !$is_exists_ref;
     return $result;
 }
 
@@ -164,7 +166,7 @@ JSONSchema::Validator::Draft4 - Validator for JSON Schema Draft4
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 

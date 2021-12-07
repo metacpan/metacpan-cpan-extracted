@@ -1,0 +1,64 @@
+{
+   "abstract" : "Asynchronous evaluation of Perl code (with optional timeouts)",
+   "author" : [
+      "Mark-Jason Dominus"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Async",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         },
+         "suggests" : {
+            "Storable" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Async"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/Async.git",
+         "web" : "https://github.com/ap/Async"
+      }
+   },
+   "version" : "0.12",
+   "x_copyright" : {
+      "holder" : "Mark-Jason Dominus",
+      "year" : 2001
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

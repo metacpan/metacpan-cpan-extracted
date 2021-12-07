@@ -1,14 +1,3 @@
-package Quiq::Sql::Composer;
-use base qw/Quiq::Dbms/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Reference;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -36,6 +25,23 @@ CASE:
 
   $sql = $s->case($expr,@pairs,@opt);
   $sql = $s->case($expr,@pairs,$else,@opt);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Sql::Composer;
+use base qw/Quiq::Dbms/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Reference;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -418,7 +424,7 @@ sub stringLiteral {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

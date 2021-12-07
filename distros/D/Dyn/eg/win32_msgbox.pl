@@ -15,4 +15,4 @@ CORE::say 'user32 has MessageBoxA()? ' . ( dlFindSymbol( $lib, 'MessageBoxA' ) ?
 CORE::say 'user32 has NonExistant()? ' . ( dlFindSymbol( $lib, 'NonExistant' ) ? 'yes' : 'no' );
 #
 CORE::say 'MessageBoxA(...) = ' .
-    call( $lib, 'MessageBoxA', 'IZZI)i', 0, 'JAPH!', 'Hello, World', 0 );
+    Dyn::load( $lib, 'MessageBoxA', '(IZZI)i' )->call( 0, 'JAPH!', 'Hello, World', 0 );

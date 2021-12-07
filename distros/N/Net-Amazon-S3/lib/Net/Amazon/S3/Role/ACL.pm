@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Role::ACL;
 # ABSTRACT: ACL specification
-$Net::Amazon::S3::Role::ACL::VERSION = '0.98';
+$Net::Amazon::S3::Role::ACL::VERSION = '0.99';
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 
@@ -53,7 +53,7 @@ Net::Amazon::S3::Role::ACL - ACL specification
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

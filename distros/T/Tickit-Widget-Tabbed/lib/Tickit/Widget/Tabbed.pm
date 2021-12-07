@@ -5,11 +5,11 @@
 #      Paul Evans, 2011-2015 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.43;  # ADJUST
+use Object::Pad 0.57;
 
-package Tickit::Widget::Tabbed 0.024;
+package Tickit::Widget::Tabbed 0.025;
 class Tickit::Widget::Tabbed
-        extends Tickit::ContainerWidget;
+        :isa(Tickit::ContainerWidget);
 
 Tickit::Widget->VERSION("0.12");
 Tickit::Window->VERSION("0.23");
@@ -118,13 +118,12 @@ method TAB_CLASS { $_tab_class || "Tickit::Widget::Tabbed::Tab" }
 has $_ribbon_class :param = undef;
 method RIBBON_CLASS { $_ribbon_class || "Tickit::Widget::Tabbed::Ribbon" }
 
-has $_ribbon;
-method ribbon { $_ribbon }
+has $_ribbon :reader;
 
 has @_child_window_geometry;
 
-BUILD ( %args ) {
-        $self->tab_position(delete($args{tab_position}) || 'top');
+ADJUSTPARAMS ( $params ) {
+        $self->tab_position(delete($params->{tab_position}) || 'top');
         # sets $_ribbon
 
         $_ribbon->set_style( $self->get_style_pen("ribbon")->getattrs );
@@ -410,7 +409,6 @@ method render_to_rb ( $rb, $rect ) {
 class # hide from indexer
         Tickit::Widget::Tabbed::Tab :repr(HASH);
 
-use Scalar::Util qw( weaken );
 use Tickit::Utils qw( textwidth );
 
 =head1 METHODS ON TAB OBJECTS
@@ -424,19 +422,14 @@ sub BUILDARGS ( $class, $tabbed, %args ) {
         return ( tabbed => $tabbed, %args );
 }
 
-has $_tabbed :param;
+has $_tabbed :param :weak;
 
-has $_widget :param;
-has $_label  :param;
+has $_widget :param :reader;
+has $_label  :param :reader;
 has $_active        = 0;
 
 has $_on_activated;
 has $_on_deactivated;
-
-ADJUST
-{
-        weaken( $_tabbed );
-}
 
 =head2 index
 
@@ -454,7 +447,7 @@ Returns the C<Tickit::Widget> contained by this tab
 
 =cut
 
-method widget () { $_widget }
+# generated accessor
 
 =head2 label
 
@@ -468,7 +461,7 @@ method label_width () {
         return $_label_width //= textwidth( $_label );
 }
 
-method label () { $_label }
+# generated accessor
 
 =head2 set_label
 
@@ -537,11 +530,9 @@ pen on the tab, use the C<set_pen> method instead.
 
 =cut
 
-has $_pen;
+has $_pen :reader;
 
 method _has_pen () { defined $_pen }
-
-method pen () { $_pen }
 
 method set_pen ($) {
         $_pen = $_[0];

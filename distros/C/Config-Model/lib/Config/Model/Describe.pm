@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 
-package Config::Model::Describe 2.145;
+package Config::Model::Describe 2.147;
 
 use Carp;
 use strict;
@@ -52,19 +52,23 @@ sub describe {
     my $std_cb = sub {
         my ( $scanner, $data_r, $obj, $element, $index, $value_obj ) = @_;
 
-        my $value = $value_obj->fetch( check => $check );
+        my $value = $value_obj->fetch( check => $check, mode => 'user' );
 
         return unless $show_empty or (defined $value and length($value));
 
-        $value = '"' . $value . '"' if defined $value and $value =~ /\s/;
+        $value = substr($value,0,12).'[…]' if $value and length($value) > 12;
 
-        #print "DEBUG: std_cb on $element, idx $index, value $value\n";
+        $value = '"' . $value . '"' if defined $value and $value =~ /\s/;
 
         my $name = defined $index ? "$element:$index" : $element;
         $value = defined $value ? $value : '[undef]';
 
         my $type = $value_obj->value_type;
         my @comment;
+        if (my $default = $value_obj->fetch(mode => 'standard')) {
+            my $defstr =  $type =~ /uniline|string/ ? qq!"$default"! : $default;
+            push @comment, "default: $defstr";
+        }
         push @comment, "choice: " . join( ' ', @{ $value_obj->choice } )
             if $type eq 'enum';
         push @comment, 'mandatory' if $value_obj->mandatory;
@@ -214,7 +218,7 @@ Config::Model::Describe - Provide a description of a node element
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

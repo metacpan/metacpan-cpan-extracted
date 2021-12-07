@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Module Generic - ~/lib/Module/Generic/HeaderValue.pm
-## Version v0.1.0
+## Module Generic - ~/lib/Generic/HeaderValue.pm
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/11/03
-## Modified 2021/11/03
+## Modified 2021/12/07
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,9 +16,10 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
     use overload (
-        '""' => 'as_string',
+        '""'     => 'as_string',
+        bool     => sub{ return( $_[0] ) },  
         fallback => 1,
     );
     our $QUOTE_REGEXP = qr/([\\"])/;
@@ -264,12 +265,12 @@ sub as_string
                 {
                     $string .= $params->[$i];
                 }
-                # $self->message( 3, "Resulting string is now '$string'" );
+                # $self->message( 5, "Resulting string is now '$string'" );
             }
         }
         $self->original( $string );
     }
-    return( $self->original );
+    return( $self->original->scalar );
 }
 
 sub decode { return( shift->_set_get_boolean( 'decode', @_ ) ); }
@@ -377,7 +378,7 @@ Module::Generic::HeaderValue - Generic Header Value Parser
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

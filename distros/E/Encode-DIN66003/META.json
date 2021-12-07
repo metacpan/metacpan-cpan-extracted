@@ -49,6 +49,6 @@
          "web" : "https://github.com/Corion/Encode-DIN66003"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

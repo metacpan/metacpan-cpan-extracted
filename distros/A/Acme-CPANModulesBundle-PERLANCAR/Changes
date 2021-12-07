@@ -1,3 +1,10 @@
+0.010   2021-11-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Revise description for File::Slurp (ref:
+	  https://old.reddit.com/r/perl/comments/qpazvv/a_list_of_problemat
+	  ic_perl_modules/hjxy3no/).
+
+
 0.009   2021-11-09  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

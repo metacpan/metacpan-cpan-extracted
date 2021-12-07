@@ -44,7 +44,7 @@ my %regexes = (
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 =head1 NAME
 
@@ -423,8 +423,16 @@ sub main_loop {
     }
 
     if ( my $warns_ref = find_warnings( \( $res->content ) ) ) {
-        foreach my $warning ( @{$warns_ref} ) {
-            $logger->warn($warning);
+
+        if ( @{$warns_ref} ) {
+
+            foreach my $warning ( @{$warns_ref} ) {
+                $logger->warn($warning);
+            }
+
+        }
+        else {
+            $logger->info('No warnings found in response');
         }
     }
 
@@ -471,9 +479,12 @@ sub main_loop {
     }
 
     if ( $logger->is_info ) {
-        my $best_ref     = find_best_contacts( $res->content );
-        my $best_as_text = join( ', ', @$best_ref );
-        $logger->info("Best contacts for SPAM reporting: $best_as_text");
+        my $best_ref = find_best_contacts( \( $res->content ) );
+
+        if ( @{$best_ref} ) {
+            my $best_as_text = join( ', ', @$best_ref );
+            $logger->info("Best contacts for SPAM reporting: $best_as_text");
+        }
     }
 
     my $form = _report_form( $res->content, $base_uri );
@@ -525,10 +536,10 @@ sub main_loop {
                         or ( $type =~ /^mole/ and $send == 1 ) )
                     )
                 {
-                    $willsend .= "\t$master \t($info)\n";
+                    $willsend .= "$master ($info)\n";
                 }
                 else {
-                    $wontsend .= "\t$master \t($info)\n";
+                    $wontsend .= "$master ($info)\n";
                 }
             }
 
@@ -684,7 +695,7 @@ sub main_loop {
     }
 
     # parse response
-    my $receivers_ref = find_receivers( $res->content );
+    my $receivers_ref = find_receivers( \( $res->content ) );
 
     if ( scalar( @{$receivers_ref} ) > 0 ) {
 

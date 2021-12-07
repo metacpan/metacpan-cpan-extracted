@@ -1,19 +1,3 @@
-package Quiq::TimeLapse::Directory;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Path;
-use Quiq::TimeLapse::File;
-use Quiq::TimeLapse::RangeDef;
-use Quiq::Option;
-use Quiq::Image;
-use Quiq::Progress;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -110,6 +94,28 @@ Zugriff zugewiesen. Existiert die Datei range.def nicht, wird eine
 Exception geworfen.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::TimeLapse::Directory;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Path;
+use Quiq::TimeLapse::File;
+use Quiq::TimeLapse::RangeDef;
+use Quiq::Option;
+use Quiq::Image;
+use Quiq::Progress;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -957,7 +963,7 @@ sub reorganize {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

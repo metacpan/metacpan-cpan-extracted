@@ -100,7 +100,7 @@ Expected parameters include:
 
 Returns an integer.
 
-=head2 C<SDL_VERSION_ATLEAST( )>
+=head2 C<SDL_VERSION_ATLEAST( ... )>
 
 Evaluates to true if compiled with SDL at least C<major.minor.patch>.
 

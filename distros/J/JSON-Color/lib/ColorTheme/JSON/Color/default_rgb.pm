@@ -5,9 +5,9 @@ use parent 'ColorThemeBase::Static::FromStructColors';
 use Graphics::ColorNamesLite::WWW;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-23'; # DATE
+our $DATE = '2021-11-24'; # DATE
 our $DIST = 'JSON-Color'; # DIST
-our $VERSION = '0.132'; # VERSION
+our $VERSION = '0.133'; # VERSION
 
 my $t = $Graphics::ColorNamesLite::WWW::NAMES_RGB_TABLE;
 
@@ -44,7 +44,7 @@ ColorTheme::JSON::Color::default_rgb - The default color theme for JSON::Color, 
 
 =head1 VERSION
 
-This document describes version 0.132 of ColorTheme::JSON::Color::default_rgb (from Perl distribution JSON-Color), released on 2021-11-23.
+This document describes version 0.133 of ColorTheme::JSON::Color::default_rgb (from Perl distribution JSON-Color), released on 2021-11-24.
 
 =head1 HOMEPAGE
 

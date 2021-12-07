@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Bucket::Acl::Fetch;
 # ABSTRACT: Internal class to perform GetBucketAcl operation
-$Net::Amazon::S3::Operation::Bucket::Acl::Fetch::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Bucket::Acl::Fetch::VERSION = '0.99';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Bucket::Acl::Fetch - Internal class to perform GetBu
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

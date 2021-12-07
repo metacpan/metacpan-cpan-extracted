@@ -9,16 +9,16 @@ use warnings;
 use Perinci::CmdLine::depak;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-21'; # DATE
+our $DATE = '2021-11-14'; # DATE
 our $DIST = 'App-depak'; # DIST
-our $VERSION = '0.584'; # VERSION
+our $VERSION = '0.585'; # VERSION
 
 Perinci::CmdLine::depak->new(
     log => 1,
     url => '/App/depak/depak',
 )->run;
 
-# ABSTRACT: Pack your dependencies onto your script file
+# ABSTRACT: Pack dependencies onto your script file
 # PODNAME: depak
 
 __END__
@@ -29,11 +29,11 @@ __END__
 
 =head1 NAME
 
-depak - Pack your dependencies onto your script file
+depak - Pack dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.584 of depak (from Perl distribution App-depak), released on 2021-10-21.
+This document describes version 0.585 of depak (from Perl distribution App-depak), released on 2021-11-14.
 
 =head1 SYNOPSIS
 

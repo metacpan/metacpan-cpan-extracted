@@ -6,7 +6,7 @@ use Moo;
 use namespace::autoclean;
 with 'Archive::BagIt::Role::Algorithm';
 with 'Archive::BagIt::Role::OpenSSL';
-our $VERSION = '0.085'; # VERSION
+our $VERSION = '0.086'; # VERSION
 # ABSTRACT: The default SHA algorithms plugin (default for v1.0)
 
 has '+plugin_name' => (
@@ -19,19 +19,6 @@ has '+name' => (
     #isa     => 'Str',
     default => 'sha512',
 );
-
-has '_digest' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_digest_sha',
-    init_arg => undef,
-);
-
-sub _build_digest_sha {
-    my ($self) = @_;
-    return $self->_init_digest();
-}
-
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -48,7 +35,7 @@ Archive::BagIt::Plugin::Algorithm::SHA512 - The default SHA algorithms plugin (d
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 AVAILABILITY
 

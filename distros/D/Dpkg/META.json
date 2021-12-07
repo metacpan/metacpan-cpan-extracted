@@ -43,7 +43,7 @@
             "Locale::gettext" : "0"
          },
          "requires" : {
-            "perl" : "v5.24.1"
+            "perl" : "v5.28.1"
          }
       },
       "test" : {
@@ -144,7 +144,7 @@
       },
       "Dpkg::Control::FieldsCore" : {
          "file" : "lib/Dpkg/Control/FieldsCore.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "Dpkg::Control::Hash" : {
          "file" : "lib/Dpkg/Control/Hash.pm",
@@ -152,7 +152,7 @@
       },
       "Dpkg::Control::HashCore" : {
          "file" : "lib/Dpkg/Control/HashCore.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "Dpkg::Control::HashCore::Tie" : {
          "file" : "lib/Dpkg/Control/HashCore.pm"
@@ -379,6 +379,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.20.9",
+   "version" : "v1.21.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

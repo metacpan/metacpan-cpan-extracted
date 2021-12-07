@@ -1,15 +1,3 @@
-package Quiq::JQuery::ContextMenu::Ajax;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Assert;
-use Quiq::Json;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -118,6 +106,24 @@ Der serverseitige Perl-Code, der eine Menü-Definition liefert (Beispiel):
 L<Allgmeine Doku|https://swisnl.github.io/jQuery-contextMenu/docs.html>
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::JQuery::ContextMenu::Ajax;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Assert;
+use Quiq::Json;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -272,7 +278,7 @@ sub js {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -1,13 +1,3 @@
-package Quiq::ClassConfig;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Perl;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -61,6 +51,22 @@ definieren, verwaltet die Klasse sämliche Information in einem
 einzigen Hash (je Klasse natürlich) mit dem Namen
 C<%ClassConfig>. Die Methoden der Klasse verwalten (erzeugen,
 setzen, lesen) diesen Hash.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ClassConfig;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Perl;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -362,7 +368,7 @@ sub defCumulate {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

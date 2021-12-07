@@ -1,15 +1,15 @@
-use 5.010; # Perl 5.10+ needed for PDL/PDLA
+use 5.010; # Perl 5.10+ needed for PDL
 use strict;
 use warnings;
 package BenchmarkAnything::Evaluations;
-# git description: v0.002-3-g453b389
+# git description: v0.003-2-gf405410
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Evaluation support for BenchmarkAnything data
-$BenchmarkAnything::Evaluations::VERSION = '0.003';
-use PDLA::Core;
-use PDLA::Stats;
-use PDLA::Ufunc;
+$BenchmarkAnything::Evaluations::VERSION = '0.004';
+use PDL::Core;
+use PDL::Stats;
+use PDL::Ufunc;
 
 
 sub multi_point_stats
@@ -258,7 +258,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Steffen Schwigon.
+This software is copyright (c) 2021 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

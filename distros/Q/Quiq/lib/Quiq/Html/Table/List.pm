@@ -1,12 +1,3 @@
-package Quiq::Html::Table::List;
-use base qw/Quiq::Html::Table::Base/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -122,6 +113,21 @@ für die td-Elemente ein skalarer Wert (der Content des Elements):
       },
   );
   $html = $e->html($h);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Table::List;
+use base qw/Quiq::Html::Table::Base/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -310,7 +316,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

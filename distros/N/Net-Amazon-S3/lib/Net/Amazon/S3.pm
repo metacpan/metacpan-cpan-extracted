@@ -1,6 +1,6 @@
 package Net::Amazon::S3;
 # ABSTRACT: Use the Amazon S3 - Simple Storage Service
-$Net::Amazon::S3::VERSION = '0.98';
+$Net::Amazon::S3::VERSION = '0.99';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -405,7 +405,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -546,7 +546,7 @@ Create a new S3 client object. Takes some arguments:
 
 =item authorization_context
 
-Class that provides authorization informations.
+Class that provides authorization information.
 
 See one of available implementations for more
 

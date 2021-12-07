@@ -164,6 +164,12 @@ For example :
 
 Set or get the class/package name where the error originated. It returns the current value.
 
+=head2 PROPAGATE
+
+This method is called by perl when you call L<perlfunc/die> with no parameters and C<$@> is set to a L<Module::Generic::Exception> object.
+
+This returns a new exception object that perl will use to replace the value in C<$@>
+
 =head2 rethrow
 
 This rethrow (i.e. L<perlfunc/"die">) the original error. It must be called with the exception object or else it will return undef.

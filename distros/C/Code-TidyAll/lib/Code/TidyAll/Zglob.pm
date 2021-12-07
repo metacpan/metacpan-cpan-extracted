@@ -2,7 +2,7 @@ package Code::TidyAll::Zglob;
 use strict;
 use warnings 'all', FATAL => 'recursion';
 use 5.008008;
-our $VERSION = '0.78';
+our $VERSION = '0.80';
 use base qw(Exporter);
 
 our @EXPORT = qw(zglob);
@@ -293,7 +293,7 @@ Code::TidyAll::Zglob - A borged copy of File::Zglob
 
 =head1 VERSION
 
-version 0.78
+version 0.80
 
 =head1 DESCRIPTION
 
@@ -312,8 +312,6 @@ it under the same terms as Perl itself.
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/perl-code-tidyall/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -335,7 +333,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2020 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2021 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

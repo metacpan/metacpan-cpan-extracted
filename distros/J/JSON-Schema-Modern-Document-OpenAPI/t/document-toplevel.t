@@ -42,6 +42,7 @@ subtest 'basic construction' => sub {
         specification_version => 'draft2020-12',
         vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        configs => {},
       },
     },
     'the document itself is recorded as a resource',
@@ -291,6 +292,7 @@ subtest 'top level document fields' => sub {
         document => shallow($doc),
         vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ],
+        configs => {},
       },
       # the oas vocabulary, and the dialect that uses it
       (map +($_ => {
@@ -299,6 +301,7 @@ subtest 'top level document fields' => sub {
         specification_version => 'draft2020-12',
         document => ignore,
         vocabularies => ignore,
+        configs => {},
       }), 'https://spec.openapis.org/oas/3.1/dialect/base', 'https://spec.openapis.org/oas/3.1/dialect/base#meta'),
       (map +($_ => {
         canonical_uri => str('https://spec.openapis.org/oas/3.1/meta/base'),
@@ -306,6 +309,7 @@ subtest 'top level document fields' => sub {
         specification_version => 'draft2020-12',
         document => ignore,
         vocabularies => ignore,
+        configs => { collect_annotations => 1 },
       }), 'https://spec.openapis.org/oas/3.1/meta/base', 'https://spec.openapis.org/oas/3.1/meta/base#meta'),
     }),
     'resources are properly stored on the evaluator',
@@ -349,6 +353,7 @@ subtest 'top level document fields' => sub {
         specification_version => 'draft2020-12',
         document => shallow($doc),
         vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Core Applicator) ],
+        configs => {},
       },
       (map +($_ => {
         canonical_uri => str('https://mymetaschema'),
@@ -356,6 +361,7 @@ subtest 'top level document fields' => sub {
         specification_version => 'draft2020-12',
         document => ignore,
         vocabularies => ignore,
+        configs => {},
       }), 'https://mymetaschema'),
     }),
     'resources are properly stored on the evaluator',

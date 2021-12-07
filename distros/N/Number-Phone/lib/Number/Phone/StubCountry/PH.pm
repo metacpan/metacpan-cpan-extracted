@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211833;
+our $VERSION = 1.20211206222447;
 
 my $formatters = [
                 {
@@ -168,9 +168,8 @@ my $validators = {
             9(?:
               0[5-9]|
               1[0-24-9]|
-              [2357]\\d|
+              [235-7]\\d|
               4[2-9]|
-              6[0-35-9]|
               8[135-9]|
               9[1-9]
             )
@@ -183,53 +182,53 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"6338", "Bohol",
-"636422", "North\ Cotabato",
-"6362", "Zamboanga\ del\ Sur",
-"634251", "Quezon",
-"634244", "Quezon",
-"6332", "Cebu",
-"638851", "Bukidnon",
-"6383", "South\ Cotabato",
-"6374", "Abra\/Benguet\/Kalinga\-Apayao\/Ifugao\/Mountain\ Province",
-"6375", "Pangasinan",
-"634597", "Pampanga",
-"634594", "Pampanga",
-"634279", "Quezon",
-"638842", "Misamis\ Oriental",
-"638822", "Misamis\ Oriental",
-"6346", "Cavite",
-"6385", "Agusan\ del\ Sur\/Agusan\ del\ Norte",
-"6384", "Davao\ del\ Norte",
-"6378", "Isabela\/Quirino\/Batanes\/Nueva\ Vizcaya\/Cagayan\ Valley",
-"635221", "Albay",
-"6356", "Sorsogon\/Masbate",
-"6355", "Western\ Samar",
-"6372", "La\ Union",
+$areanames{en} = {"634244", "Quezon",
 "634761", "Zambales",
+"6362", "Zamboanga\ del\ Sur",
 "6377", "Ilocos\ Sur\/Ilocos\ Norte",
-"6365", "Zamboanga\ del\ Norte\/Zamboanga\ del\ Sur",
-"634396", "Batangas",
-"635446", "Camarines\ Sur",
-"6335", "Negros\ Oriental",
-"634593", "Pampanga",
-"6336", "Antique\/Aklan\/Capiz",
-"634422", "Bulacan",
-"6333", "Iloilo",
+"6374", "Abra\/Benguet\/Kalinga\-Apayao\/Ifugao\/Mountain\ Province",
 "634264", "Quezon",
-"6382", "Davao\ del\ Sur\/Davao",
-"633461", "Negros\ Occidental",
-"6348", "Palawan",
-"6363", "Lanao\ del\ Norte\/Lanao\ del\ Sur",
-"638622", "Surigao\ del\ Sur",
-"634235", "Quezon",
-"634765", "Zambales",
-"638834", "Misamis\ Occidental",
+"6355", "Western\ Samar",
+"6378", "Isabela\/Quirino\/Batanes\/Nueva\ Vizcaya\/Cagayan\ Valley",
 "634463", "Bulacan",
+"6365", "Zamboanga\ del\ Norte\/Zamboanga\ del\ Sur",
+"638851", "Bukidnon",
+"6346", "Cavite",
+"636422", "North\ Cotabato",
+"6333", "Iloilo",
+"634765", "Zambales",
+"638853", "Bukidnon",
+"635446", "Camarines\ Sur",
+"6372", "La\ Union",
+"634251", "Quezon",
+"634279", "Quezon",
+"6336", "Antique\/Aklan\/Capiz",
+"6375", "Pangasinan",
+"6383", "South\ Cotabato",
+"638622", "Surigao\ del\ Sur",
+"633461", "Negros\ Occidental",
+"638834", "Misamis\ Occidental",
+"634235", "Quezon",
+"6332", "Cebu",
 "6353", "Leyte",
 "6387", "Davao\ Oriental",
+"6384", "Davao\ del\ Norte",
+"635221", "Albay",
+"6335", "Negros\ Oriental",
+"634593", "Pampanga",
+"6348", "Palawan",
+"6363", "Lanao\ del\ Norte\/Lanao\ del\ Sur",
+"634396", "Batangas",
+"634422", "Bulacan",
+"638842", "Misamis\ Oriental",
 "636423", "North\ Cotabato",
-"638853", "Bukidnon",};
+"6338", "Bohol",
+"6382", "Davao\ del\ Sur\/Davao",
+"634597", "Pampanga",
+"638822", "Misamis\ Oriental",
+"6356", "Sorsogon\/Masbate",
+"634594", "Pampanga",
+"6385", "Agusan\ del\ Sur\/Agusan\ del\ Norte",};
 
     sub new {
       my $class = shift;

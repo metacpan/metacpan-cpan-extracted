@@ -25,6 +25,7 @@ use_ok('App::Git::Workflow::Command::Pom');
 use_ok('App::Git::Workflow::Command::Popb');
 use_ok('App::Git::Workflow::Command::Pushb');
 use_ok('App::Git::Workflow::Command::Recent');
+use_ok('App::Git::Workflow::Command::RemoteDelete');
 use_ok('App::Git::Workflow::Command::ResetTo');
 use_ok('App::Git::Workflow::Command::Search');
 use_ok('App::Git::Workflow::Command::TagGrep');

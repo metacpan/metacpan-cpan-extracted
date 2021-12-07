@@ -9,7 +9,7 @@ use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @AFI @SAFI );
 ## Inheritance and Versioning ##
 
 @ISA     = qw( Exporter );
-$VERSION = '0.17';
+$VERSION = '0.18';
 
 ## Module Imports ##
 
@@ -136,7 +136,7 @@ sub _encode_message
 
 =head1 NAME
 
-Net::BGP::Refresh - Class encapsulating BGP-4 REFRESH message
+C<Net::BGP::Refresh> - Class encapsulating BGP-4 REFRESH message
 
 =head1 SYNOPSIS
 
@@ -147,30 +147,29 @@ Net::BGP::Refresh - Class encapsulating BGP-4 REFRESH message
         SAFI     => $subsequent_address_family_identifier
     );
 
-    $address_family_identifier            = $error->afi();
-    $subsequent_address_family_identifier = $error->safi();
+    $address_family_identifier            = $refresh->afi();
+    $subsequent_address_family_identifier = $refresh->safi();
 
     $peer->refresh($refresh);
 
 =head1 DESCRIPTION
 
 This module encapsulates the data contained in a BGP-4 REFRESH message as
-specifed by RFC2918.
-It provides a constructor, and accessor methods for each of the fields, AFI
-and SAFI, of a REFRESH message.
-To refresh the route table for a given address family, call the peer object's
-I<refresh()> function with a B<Net::BGP::Refresh> object as argument.
+specified by RFC 2918. It provides a constructor, and accessor methods for
+each of the fields, AFI and SAFI, of a REFRESH message. To refresh the route
+table for a given address family, call the peer object's I<refresh()> function
+with a C<Net::BGP::Refresh> object as argument.
 
 =head1 METHODS
 
-I<new()> - create a new Net::BGP::Refresh object
+I<new()> - create a new C<Net::BGP::Refresh> object
 
-    $error = Net::BGP::Refresh->new(
+    $refresh = Net::BGP::Refresh->new(
         AFI      => $address_family_identifier,
         SAFI     => $subsequent_address_family_identifier
     );
 
-This is the constructor for Net::BGP::Refresh objects. It returns a
+This is the constructor for C<Net::BGP::Refresh> objects. It returns a
 reference to the newly created object. The following named parameters may
 be passed to the constructor.
 
@@ -186,16 +185,31 @@ a REFRESH message. Default is I<SAFI_BOTH>.
 
 I<afi()> - retrieve the value of the Address Family Identifier field
 
-    $address_family_identifier            = $error->afi();
+    $address_family_identifier            = $refresh->afi();
 
 I<safi()> - retrieve the value of the Subsequent Address Family Identifier field
 
-    $subsequent_address_family_identifier = $error->safi();
+    $subsequent_address_family_identifier = $refresh->safi();
 
 =head1 SEE ALSO
 
-B<Net::BGP>, B<Net::BGP::Process>, B<Net::BGP::Peer>,
-B<Net::BGP::Notification>, B<Net::BGP::Update>
+=over
+
+=item L<Net::BGP>
+
+=item L<Net::BGP::Process>
+
+=item L<Net::BGP::Peer>
+
+=item L<Net::BGP::Update>
+
+=item L<Net::BGP::ASPath>
+
+=item L<Net::BGP::NLRI>
+
+=item L<Net::BGP::Notification>
+
+=back
 
 =head1 AUTHOR
 

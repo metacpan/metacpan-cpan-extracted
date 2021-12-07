@@ -3,11 +3,11 @@ App::DBBrowser::Auxil;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use Scalar::Util qw( looks_like_number );
 
-use JSON qw( decode_json );
+use JSON::MaybeXS qw( decode_json );
 
 use Term::Choose            qw();
 use Term::Choose::Constants qw( WIDTH_CURSOR );
@@ -418,7 +418,7 @@ sub write_json {
         close $fh;
         return;
     }
-    my $json = JSON->new->utf8( 1 )->pretty->canonical->encode( $ref );
+    my $json = JSON::MaybeXS->new->pretty->canonical->encode( $ref );
     open my $fh, '>', $file_fs or die "$file_fs: $!";
     print $fh $json;
     close $fh;

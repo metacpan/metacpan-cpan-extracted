@@ -1,5 +1,5 @@
 package AnyEvent::Inotify::EventReceiver;
-$AnyEvent::Inotify::EventReceiver::VERSION = '0.03';
+$AnyEvent::Inotify::EventReceiver::VERSION = '0.04';
 use Moose::Role;
 
 requires 'handle_access';
@@ -31,10 +31,6 @@ __END__
 =head1 NAME
 
 AnyEvent::Inotify::EventReceiver - interface of event-receiving classes
-
-=head1 VERSION
-
-version 0.03
 
 =head1 METHODS
 

@@ -3,21 +3,17 @@ package XML::Sig;
 use strict;
 use warnings;
 
+use Encode;
+# ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 # use 'our' on v5.6.0
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.51';
+our $VERSION = '0.55';
 
 use base qw(Class::Accessor);
 XML::Sig->mk_accessors(qw(key));
-
-# We are exporting functions
-use base qw/Exporter/;
-
-# Export list - to allow fine tuning of export table
-@EXPORT_OK = qw( sign verify );
 
 
 use Digest::SHA qw(sha1 sha224 sha256 sha384 sha512 hmac_sha1 hmac_sha256 hmac_sha384 hmac_sha512);
@@ -73,7 +69,7 @@ sub new {
         $self->{ sig_hash } = $params->{ sig_hash };
     }
     else {
-        $self->{ sig_hash } = 'sha1';
+        $self->{ sig_hash } = 'sha256';
     }
 
     if ( exists $params->{ digest_hash } && grep { $_ eq $params->{ digest_hash } } ('sha1', 'sha224', 'sha256', 'sha384','sha512', 'ripemd160'))
@@ -81,7 +77,7 @@ sub new {
         $self->{ digest_hash } = $params->{ digest_hash };
     }
     else {
-        $self->{ digest_hash } = 'sha1';
+        $self->{ digest_hash } = 'sha256';
     }
 
     if (defined $self->{ key_type } && $self->{ key_type } eq 'dsa') {
@@ -89,7 +85,7 @@ sub new {
             $self->{ sig_hash } = $params->{ sig_hash };
         }
         else {
-            $self->{ sig_hash } = 'sha1';
+            $self->{ sig_hash } = 'sha256';
         }
     }
 
@@ -167,7 +163,7 @@ sub sign {
         }
 
         # Calculate the digest of the XML being signed
-        my $bin_digest    = $self->{digest_method}->( $xml_canon );
+        my $bin_digest    = $self->{digest_method}->( Encode::encode_utf8( $xml_canon ));
         my $digest        = encode_base64( $bin_digest, '' );
         print ("   Digest: $digest\n") if $DEBUG;
 
@@ -394,8 +390,10 @@ sub verify {
         # signatures to be validated if they exist
         $signed_xml->addChild( $signature_node );
 
+        print ( "    Canonical XML:  " . $canonical ."\n") if $DEBUG;
+
         # Obtain the DigestValue of the Canonical XML
-        my $digest = $self->{digest_method}->($canonical);
+        my $digest = $self->{digest_method}->(Encode::encode_utf8($canonical));
 
         print ( "    Reference Digest:  " . _trim($refdigest) ."\n") if $DEBUG;
 
@@ -874,7 +872,7 @@ sub _verify_ecdsa {
     or confess "Crypt::PK::ECC 0.036+ needs to be installed so
              that we can handle ECDSA signatures";
     # Generate Public Key from XML
-    my $oid = _trim($self->{parser}->findvalue('//dsig:NamedCurve/@URN', $context));
+    my $oid = _trim($self->{parser}->findvalue('.//dsig:NamedCurve/@URN', $context));
 
     use URI ();
     my $u1 = URI->new($oid);
@@ -895,8 +893,8 @@ sub _verify_ecdsa {
         '1.3.36.3.3.2.8.1.1.13' => 'brainpoolP512r1',
     );
 
-    my $x = $self->{parser}->findvalue('//dsig:PublicKey/dsig:X/@Value', $context);
-    my $y = $self->{parser}->findvalue('//dsig:PublicKey/dsig:Y/@Value', $context);
+    my $x = $self->{parser}->findvalue('.//dsig:PublicKey/dsig:X/@Value', $context);
+    my $y = $self->{parser}->findvalue('.//dsig:PublicKey/dsig:Y/@Value', $context);
 
     my $ecdsa_pub = Crypt::PK::ECC->new();
 
@@ -1417,7 +1415,7 @@ sub _signedinfo_xml {
 
     #return qq{<dsig:SignedInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
     return qq{<dsig:SignedInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
-                <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments" />
+                <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
                 <dsig:SignatureMethod Algorithm="$algorithm" />
                 $digest_xml
             </dsig:SignedInfo>};
@@ -1651,11 +1649,11 @@ sub _calc_hmac_signature {
 
 =head1 NAME
 
-XML::Sig
+XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.51
+version 0.55
 
 =head1 SYNOPSIS
 

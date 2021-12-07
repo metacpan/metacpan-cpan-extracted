@@ -1,38 +1,39 @@
 use ETL::Pipeline;
 use Test::More;
-
-push @INC, './t/Modules';
-
-my $etl = ETL::Pipeline->new( {
-	work_in   => 't/DataFiles',
-	input     => ['+FileInput', matching => qr/\.txt/],
-	constants => {one => 1},
-	output    => 'UnitTest',
-} );
-is( $etl->input->file->basename, 'DelimitedText.txt', 'matching regular expression' );
+use Try::Tiny;
 
 my $etl = ETL::Pipeline->new( {
-	work_in   => 't/DataFiles',
-	input     => ['+FileInput', matching => '*.txt'],
-	constants => {one => 1},
-	output    => 'UnitTest',
-} );
-is( $etl->input->file->basename, 'DelimitedText.txt', 'matching glob' );
+	input   => ['DelimitedText', iname => 'Test 2.txt'],
+	mapping => {One => '0'},
+	output  => 'UnitTest',
+	work_in => 't/DataFiles/FileListing',
+} )->process;
+is( $etl->input->path->basename, 'Test 2.txt', 'Exact name' );
 
 my $etl = ETL::Pipeline->new( {
-	work_in   => 't/DataFiles',
-	input     => ['+FileInput', matching => sub { shift; shift->basename =~ m/\.txt/i; }],
-	constants => {one => 1},
-	output    => 'UnitTest',
-} );
-is( $etl->input->file->basename, 'DelimitedText.txt', 'matching code reference' );
+	input   => ['DelimitedText', iname => '*.txt'],
+	mapping => {One => '0'},
+	output  => 'UnitTest',
+	work_in => 't/DataFiles/FileListing',
+} )->process;
+is( $etl->input->path->basename, 'Test 1.txt', 'Wildcard' );
 
 my $etl = ETL::Pipeline->new( {
-	work_in   => 't/DataFiles',
-	input     => ['+FileInput', file => 'DelimitedText.txt'],
-	constants => {one => 1},
-	output    => 'UnitTest',
-} );
-is( $etl->input->file->basename, 'DelimitedText.txt', 'file' );
+	input   => ['DelimitedText', iname => qr/\.txt$/],
+	mapping => {One => '0'},
+	output  => 'UnitTest',
+	work_in => 't/DataFiles/FileListing',
+} )->process;
+is( $etl->input->path->basename, 'Test 1.txt', 'Regular expression' );
+
+try {
+	my $etl = ETL::Pipeline->new( {
+		input   => ['DelimitedText', iname => 'Invalid.jpg'],
+		mapping => {One => '0'},
+		output  => 'UnitTest',
+		work_in => 't/DataFiles/FileListing',
+	} )->process;
+	fail( 'No match' );
+} catch { pass( 'No match' ) };
 
 done_testing;

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler::Legacy;
-$Net::Amazon::S3::Error::Handler::Legacy::VERSION = '0.98';
+$Net::Amazon::S3::Error::Handler::Legacy::VERSION = '0.99';
 # ABSTRACT: An internal class to report errors like legacy API
 
 use Moose;
@@ -47,7 +47,7 @@ Net::Amazon::S3::Error::Handler::Legacy - An internal class to report errors lik
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

@@ -35,8 +35,8 @@ resources:
   bugtracker: https://github.com/PerlFFI/Dist-Zilla-MintingProfile-FFI/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::MintingProfile::FFI
   repository: git://github.com/PerlFFI/Dist-Zilla-MintingProfile-FFI.git
-version: '0.02'
-x_generated_by_perl: v5.35.4
+version: '0.03'
+x_generated_by_perl: v5.35.6
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

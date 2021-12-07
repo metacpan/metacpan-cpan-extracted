@@ -1,12 +1,3 @@
-package Quiq::Html::Base;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -44,6 +35,21 @@ CSS-Klassennamen vorangestellt. (MEMO: dieses Konzept ist zweifelhaft
 und sollte abgeschafft werden)
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Base;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -84,7 +90,7 @@ sub new {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

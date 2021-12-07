@@ -31,11 +31,8 @@ $opts->{colour} = 1 if -t STDOUT;
 # realtime display, but the log messages already have the JSON formatting applied...
 # $Log::Any::Adapter::DERIV::JSON->pretty($opts->{colour});
 
-while(<>) {
+while (<>) {
     chomp;
-    print Log::Any::Adapter::DERIV->format_line(
-        decode_json_text($_),
-        $opts
-    ) . "\n";
+    print Log::Any::Adapter::DERIV->format_line(decode_json_text($_), $opts) . "\n";
 }
 

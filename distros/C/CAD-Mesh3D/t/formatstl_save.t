@@ -3,9 +3,13 @@
 use warnings;
 use strict;
 
-use Test::More 'no_plan';
+use Test::More;
 
 use CAD::Mesh3D::FormatSTL;
+
+if ( $^O eq 'freebsd' ) {
+    plan skip_all => 'Tests not needed except on Windows, and dont work on FreeBSD';
+}
 
 my $stl = CAD::Mesh3D::FormatSTL->new;
 isa_ok($stl, 'CAD::Mesh3D::FormatSTL');
@@ -52,4 +56,5 @@ if($ENV{DO_REGEN}) {
   is($string, $expect, 'string match');
 }
 
+done_testing();
 # vim:ts=2:sw=2:et:sta

@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Astro::SpaceTrack;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use LWP::UserAgent;
+use Pod::Usage;
+
+our $VERSION = '0.148';
+
+my %opt = (
+    https	=> 1,
+);
+
+GetOptions( \%opt,
+    qw{ debug! https! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) and @ARGV or pod2usage( { -verbose => 0 } );
+
+my $ua = LWP::UserAgent->new();
+my $st = Astro::SpaceTrack->new();
+
+my $scheme = $opt{https} ? 'https' : 'http';
+
+foreach my $catalog ( @ARGV ) {
+    my @info = $catalog;
+    foreach (
+	[ direct	=> '%s://celestrak.com/NORAD/elements/%s.txt' ],
+	[ spacetrack	=> '%s://celestrak.com/SpaceTrack/query/%s.txt' ],
+    ) {
+	my $url = sprintf $_->[1], $scheme, $catalog;
+	$opt{debug}
+	    and warn "Debug - head( '$url' )";
+	my $resp = $ua->head( $url );
+	$opt{debug}
+	    and warn 'Debug - status ', $resp->status_line();
+	if ( my $check = $st->_response_check( $resp, celestrak =>
+		$catalog ) ) {
+	    $opt{debug}
+		and warn 'Debug - response_check ',
+	    $check->status_line();
+	    next;
+	}
+	push @info, $_->[0];
+    }
+    local $" = "\t";
+    print "@info\n";
+}
+
+__END__
+
+=head1 TITLE
+
+celestrak-availability - Check availability of specified Celestrak catalogs
+
+=head1 SYNOPSIS
+
+ celestrak-availability stations
+ celestrak-availability --help
+ celestrak-availability --version
+
+=head1 OPTIONS
+
+=head2 --debug
+
+This Boolean option causes debug output when it is asserted. The author
+makes no representation what this will be, and reserves the right to
+change or revoke it without notice.
+
+The default is C<--no-debug>.
+
+=head2 --https
+
+This Boolean option causes the queries to be done using C<https:>. If
+not asserted, the queries use C<http:>.
+
+The default is C<--https>, but you can negate this by specifying
+C<--no-https>.
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script takes prospective Celestrak catalog names on its
+command line. The output (to STDOUT) is a tab-separated report, one
+catalog per line, giving the catalog name, the word C<'direct'> if it
+can be direct-fetched, and the word C<'spacetrack'> if it can be used to
+fetch data from Space Track. If the catalog name is invalid, neither of
+these will appear.
+
+The catalog name is the relevant portion of the URL used to fetch it,
+which is substituted into the URL as follows:
+
+ direct     => 'https://celestrak.com/NORAD/elements/%s.txt',
+ spacetrack => 'https://celestrak.com/SpaceTrack/query/%s.txt',
+
+Only a HEAD request is done, and the Space Track web site is not
+accessed at all.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

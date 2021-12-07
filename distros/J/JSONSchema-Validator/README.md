@@ -4,7 +4,7 @@ JSONSchema::Validator - Validator for JSON Schema Draft4/Draft6/Draft7 and OpenA
 
 # VERSION
 
-version 0.008
+version 0.010
 
 # SYNOPSIS
 
@@ -115,6 +115,7 @@ Validates all files specified by path globs.
 
 # CONTRIBUTORS
 
+- Erik Huelsmann <ehuels@gmail.com>
 - James Waters <james@jcwaters.co.uk>
 - uid66 <19481514+uid66@users.noreply.github.com>
 

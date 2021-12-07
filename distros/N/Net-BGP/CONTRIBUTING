@@ -1,0 +1,8 @@
+Contribution Guidelines
+=======================
+
+1. Submit one merge request per bug fix or new feature. Do not combine multiple bugs and/or features in a single merge request. Merge requests which address multiple bugs or new features will be rejected.
+2. If a bug fix addresses an issue caused by incorrectly or insufficiently specified behavior, add a unit test which captures the tightened specification of behavior.
+3. For new features, particularly those which modify or expand the module's public API, please open an issue which details the proposed changes for consideration, *prior to submitting any code*. Merge requests with new features which have not been so reviewed will be rejected.
+4. Attempt to mimic the existing code style, formatting, variable, and subroutine naming conventions as closely as possible. At some point, automated tooling may be employed to enforce such conventions.
+5. Use proper grammar, spelling, and punctuation when writing public API documentation. Aim for clarity and concise explanations. Provide usage examples when appropriate.

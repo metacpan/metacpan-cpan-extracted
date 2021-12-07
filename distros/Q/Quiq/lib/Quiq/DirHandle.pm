@@ -1,13 +1,3 @@
-package Quiq::DirHandle;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -35,6 +25,22 @@ L<Quiq::Object>
 Die Klasse stellt eine objektorientierte Schnittstelle zu
 Perls Directory Handles her. Mit den Methoden der Klasse kann
 ein Verzeichnis geöffnet und über seine Einträge iteriert werden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::DirHandle;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -128,7 +134,7 @@ sub next {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

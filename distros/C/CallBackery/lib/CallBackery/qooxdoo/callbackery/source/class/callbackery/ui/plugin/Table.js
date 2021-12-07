@@ -45,14 +45,15 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                     else {
                         return false;
                     }
-                }
+                },
+                this
             );
             action.set({
                 paddingLeft: -10
             });
             toolbar.add(action);
             toolbar.addSpacer();
-            var form = this._form = new callbackery.ui.form.Auto(cfg.form,null,callbackery.ui.form.renderer.HBox);
+            var form = this._form = new callbackery.ui.form.Auto(cfg.form,null,callbackery.ui.form.renderer.HBox, this);
             toolbar.add(form);
 	    return toolbar;
         },

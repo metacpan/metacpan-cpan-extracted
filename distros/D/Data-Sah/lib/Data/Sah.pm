@@ -1,16 +1,16 @@
 package Data::Sah;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-01'; # DATE
-our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.910'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 #use Log::ger;
 
 use Mo qw(build default);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-12-01'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.911'; # VERSION
 
 our $Log_Validator_Code = $ENV{LOG_SAH_VALIDATOR_CODE} // 0;
 
@@ -85,7 +85,7 @@ sub gen_validator {
     my $code = $pl->expr_validator_sub(%args);
     return $code if $opt_source;
 
-    my $res = eval $code;
+    my $res = eval $code; ## no critic: BuiltinFunctions::ProhibitStringyEval
     die "Can't compile validator: $@" if $@;
     $res;
 }
@@ -96,7 +96,7 @@ sub get_compiler {
 
     die "Invalid compiler name `$name`" unless $name =~ $compiler_re;
     my $module = "Data::Sah::Compiler::$name";
-    if (!eval "require $module; 1") {
+    if (!eval "require $module; 1") { ## no critic: BuiltinFunctions::ProhibitStringyEval
         die "Can't load compiler module $module".($@ ? ": $@" : "");
     }
 
@@ -126,7 +126,7 @@ Data::Sah - Fast and featureful data structure validation
 
 =head1 VERSION
 
-This document describes version 0.910 of Data::Sah (from Perl distribution Data-Sah), released on 2021-08-01.
+This document describes version 0.911 of Data::Sah (from Perl distribution Data-Sah), released on 2021-12-01.
 
 =head1 SYNOPSIS
 
@@ -286,6 +286,8 @@ B<Data::Sah::Coerce::$LANG::To_$TARGET_TYPE::From_$SOURCE_TYPE::$DESCRIPTION>
 contains coercion rules.
 
 B<Data::Sah::Filter::$LANG::$TOPIC::$DESCRIPTION> contains filtering rules.
+
+B<Data::Sah::Value::$LANG::$TOPIC::$DESCRIPTION> contains value codes.
 
 B<Data::Sah::TypeX::$TYPENAME::$CLAUSENAME> namespace can be used to name
 distributions that extend an existing Sah type by introducing a new clause for
@@ -690,14 +692,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah>.
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Sah>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Data::Sah::Tiny>, L<Params::Sah>
@@ -724,7 +718,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Michal Sedlák Steven Haryanto
+=for stopwords Michal Sedlák Steven Haryanto Szymon Nieznański
 
 =over 4
 
@@ -734,19 +728,48 @@ Michal Sedlák <sedlakmichal@gmail.com>
 
 =item *
 
-Steven Haryanto <sharyanto@cpan.org>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =item *
 
 Steven Haryanto <steven@masterweb.net>
 
+=item *
+
+Szymon Nieznański <s.nez@member.fsf.org>
+
 =back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

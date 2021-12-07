@@ -1,0 +1,115 @@
+use alienfile;
+
+use Config;
+
+# NOTE: you can set ALIEN_NINJA_FROM_SOURCE to force a build from source.
+
+plugin 'Probe::CommandLine' => (
+  command => 'ninja',
+  args    => [ '--version' ],
+  match   => qr/([0-9\.]+)/,
+  version => qr/([0-9\.]+)/,
+);
+
+share {
+  requires 'Path::Tiny';
+
+  # same URL used for both source and binary releases
+  start_url 'https://github.com/ninja-build/ninja/releases';
+
+  my ($binary_release_name, $binary_release_format);
+  if( $^O eq 'linux' && $Config{archname} =~ /^x86_64/ ) {
+    # ELF 64-bit LSB executable, x86-64
+    $binary_release_name = 'ninja-linux';
+    $binary_release_format = 'zip';
+  } elsif( $^O eq 'darwin' ) {
+    # Mach-O universal binary with 2 architectures: [x86_64:Mach-O 64-bit x86_64 executable] [arm64:Mach-O 64-bit arm64 executable]
+    $binary_release_name = 'ninja-mac';
+    $binary_release_format = 'zip';
+  } elsif( $^O eq 'MSWin32' && $Config{ptrsize} == 8 ) {
+    # PE32+ executable (console) x86-64
+    $binary_release_name = 'ninja-win';
+    $binary_release_format = 'zip';
+  }
+
+  if($binary_release_name && !$ENV{ALIEN_NINJA_FROM_SOURCE}) {
+    my $binary_release_re = qr/$binary_release_name\.\Q$binary_release_format\E/;
+    plugin Download => (
+      filter  => qr/^$binary_release_re$/,
+      version => qr/([0-9\.]+)/,
+    );
+    plugin 'Prefer::SortVersions';
+
+    my $cmp = sub {
+      my($A,$B) = @_;
+      Sort::Versions::versioncmp($B,$A);
+    };
+    meta->around_hook( prefer => sub {
+      my $orig  = shift;
+      my $build = shift;
+      my $data  = $orig->($build, @_);
+
+      # extract version from URL
+      for my $file (@{ $data->{list} }) {
+        ( $file->{version} ) = $file->{url} =~ m,/v([0-9\.]+)/${binary_release_re}$,;
+      }
+
+      # versioncmp
+      my @sorted = sort { $cmp->($a->{version}, $b->{version}) } @{ $data->{list} };
+
+      return +{ type => 'list', list => \@sorted };
+    });
+    plugin Extract => $binary_release_format;
+    patch sub {
+      my $bin_dir = Path::Tiny->new('bin');
+      $bin_dir->mkpath;
+
+      my $ninja_bin_name = "ninja$Config{_exe}";
+      my $ninja_bin = Path::Tiny->new($ninja_bin_name);
+      $ninja_bin->move( $bin_dir->child($ninja_bin_name) );
+    };
+    plugin 'Build::Copy';
+    meta->after_hook( build => sub {
+      my($build) = @_;
+      $build->runtime_prop->{'style'} = 'binary';
+    });
+  } else {
+    # build from source
+    plugin Download => (
+      filter  => qr/^v.*\.tar\.gz$/,
+      version => qr/([0-9\.]+)/,
+    );
+    plugin Extract => 'tar.gz';
+    plugin 'Build::CMake';
+    build [
+      ['%{cmake}',
+        ( $^O eq 'MSWin32'
+        ? qw(
+          -DPLATFORM_HAS_UNISTD_HEADER=0
+          -DHAVE_FORK=0 -DHAVE_PIPE=0
+        ) : () ),
+        @{ meta->prop->{plugin_build_cmake}->{args} },
+        '%{.install.extract}',
+      ],
+      '%{make}',
+      '%{make} install',
+    ];
+    meta->after_hook( build => sub {
+      my($build) = @_;
+      $build->runtime_prop->{'style'} = 'source';
+    });
+  }
+
+  gather sub {
+    my($build) = @_;
+    $build->runtime_prop->{command} = 'ninja';
+  };
+
+};
+
+sys {
+  meta->after_hook( probe => sub {
+    my($build) = @_;
+    $build->runtime_prop->{'style'} = 'system';
+  });
+};

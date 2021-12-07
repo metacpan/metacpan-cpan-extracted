@@ -1,6 +1,7 @@
 #pragma once
-#include <catch2/catch.hpp>
+#include <algorithm>
 #include <panda/encode/base2n.h>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace panda;
 using namespace panda::encode;

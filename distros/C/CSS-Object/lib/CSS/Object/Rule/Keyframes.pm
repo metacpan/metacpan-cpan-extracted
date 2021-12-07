@@ -27,7 +27,7 @@ BEGIN
 sub init
 {
     my $self = shift( @_ );
-    $self->SUPER::init( @_ );
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->format->indent( '    ' );
     return( $self );
 }
@@ -78,8 +78,8 @@ sub frame
     return( $self );
 }
 
-## In our @ rule, we hold all the rules. This makes our @ rule special, because it is a rule that contains a set of rules
-## Array of CSS::Object::Rule::Keyframes objects
+# In our @ rule, we hold all the rules. This makes our @ rule special, because it is a rule that contains a set of rules
+# Array of CSS::Object::Rule::Keyframes objects
 sub rules { return( shift->_set_get_array_as_object( 'rules', @_ ) ); }
 
 sub type { return( shift->_set_get_scalar_as_object( 'type', @_ ) ); }

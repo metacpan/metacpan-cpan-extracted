@@ -25,6 +25,18 @@
          "builder"
       ]
    },
+   "optional_features" : {
+      "object_pad" : {
+         "description" : "Object::Pad support",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Object::Pad" : "0.57"
+               }
+            }
+         }
+      }
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -44,6 +56,7 @@
             "IO::Uncompress::Unzip" : "0",
             "JSON::PP" : "2",
             "Module::Build::Tiny" : "0.035",
+            "Module::Load::Conditional" : "0",
             "Path::Tiny" : "0"
          }
       },
@@ -63,6 +76,7 @@
       },
       "test" : {
          "requires" : {
+            "Test2::V0" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -70,23 +84,23 @@
    "provides" : {
       "Dyn" : {
          "file" : "lib/Dyn.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Dyn::Call" : {
          "file" : "lib/Dyn/Call.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Dyn::Callback" : {
          "file" : "lib/Dyn/Callback.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Dyn::Load" : {
          "file" : "lib/Dyn/Load.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Dyn::Sugar" : {
          "file" : "lib/Dyn/Sugar.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -100,7 +114,7 @@
          "web" : "https://github.com/sanko/Dyn.pm"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:SANKO",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 0

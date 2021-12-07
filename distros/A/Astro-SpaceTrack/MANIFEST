@@ -1,5 +1,6 @@
 Build.PL
 Changes
+CONTRIBUTING
 eg/celestrak
 eg/README
 eg/sh_data
@@ -61,7 +62,6 @@ t/data/Mock-LWP-UserAgent/ecef6b565d11dadf7b8457118813d872.json
 t/file.dat
 t/query_amsat.t
 t/query_celestrak.t
-t/query_human_space_flight.t
 t/query_iridium_status_kelso.t
 t/query_iridium_status_sladen.t
 t/query_mccants.t
@@ -70,6 +70,7 @@ t/query_spacetrack.t
 t/spacetrack_request.t
 tools/all_iridium_classic
 tools/capture
+tools/celestrak-availability
 tools/modeldef
 tools/README
 xt/author/celestrak_datasets.t

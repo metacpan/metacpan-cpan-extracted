@@ -12,5 +12,5 @@ TEST("SRV-1608") {
     for (size_t i = 0; i < cnt; ++i) v.push_back(sample);
     auto bin = p.start_message(DeflateFlag::YES).send(v.begin(), v.end(), IsFinal::YES);
     CHECK(bin.length());
-    CHECK("no crash occur");
+    SUCCEED("no crash occur");
 }

@@ -1,5 +1,40 @@
 Revision history for JSON-Schema-Modern-Document-OpenAPI
 
+0.009     2021-12-06 05:55:01Z
+          - validation no longer errors on a missing media type if the
+            corresponding schema is empty (true)
+          - validate_request and validate_response now accept an operation_id
+            instead of a path_template for looking up the endpoint
+            specification in the openapi document
+          - treat Content-Type headers and media-type entries in openapi
+            documents case-insensitively, and also match wildcards
+            (image/jpg falls back to image/* or */*)
+
+0.008     2021-12-03 05:33:29Z
+          - process response headers in canonical order
+
+0.007     2021-12-02 05:43:34Z
+          - properly handle missing message bodies, with possibly a mising
+            Content-Type header as well
+          - better type handling for numeric strings and stringy numbers
+          - detect and handle infinite recursion while evaluating
+
+0.006     2021-12-01 05:22:01Z
+          - support media type encodings in parameters
+
+0.005     2021-11-30 06:22:10Z
+          - performance improvements when loading and parsing documents
+          - extract and cache all operationIds in the document
+
+0.004     2021-11-28 22:09:01Z
+          - implemented validate_response()
+          - when validating requests and responses, values that look like
+            numbers, and are evaluated as numbers in schemas, are now coerced
+            to numbers automatically
+
+0.003     2021-11-26 01:01:47Z
+          - OpenAPI::Modern is born
+
 0.002     2021-11-17 05:49:29Z
           - minimum Perl version raised to 5.20
           - embedded schemas are now traversed for resource URIs

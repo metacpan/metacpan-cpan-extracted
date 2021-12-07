@@ -9,7 +9,7 @@ use overload
   fallback => 1;
 
 # ABSTRACT: Array instance for FFI
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub get
@@ -88,7 +88,7 @@ FFI::C::Array - Array instance for FFI
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ version 0.10
  $rect->[1]->x(2.0);
  $rect->[1]->y(3.0);
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 This class represents an instance of a C an array.  This class can be created using
 C<new> on the generated class, if that was specified for the L<FFI::C::ArrayDef>,
@@ -214,7 +214,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020,2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

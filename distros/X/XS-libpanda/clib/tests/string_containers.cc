@@ -4,7 +4,7 @@
 #include <panda/unordered_string_map.h>
 #include <panda/unordered_string_set.h>
 
-#define TEST(name) TEST_CASE("string_containers: " name, "[string_containers]")
+TEST_PREFIX("string_containers: ", "[string_containers]");
 
 using String = panda::basic_string<char, std::char_traits<char>, Allocator<char>>;
 

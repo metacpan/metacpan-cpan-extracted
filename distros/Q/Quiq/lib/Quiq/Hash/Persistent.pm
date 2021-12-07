@@ -1,14 +1,3 @@
-package Quiq::Hash::Persistent;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Storable;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -65,6 +54,23 @@ wird in der anonymen Subroutine sub{} imlementiert
 Die anonyme Subroutine liefert einen Hash der Klasse Quiq::Hash
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Hash::Persistent;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Storable;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -172,7 +178,7 @@ Liefere das für die Cachedatei definierte Timeout.
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

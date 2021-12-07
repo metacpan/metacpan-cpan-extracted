@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Constants;
-# Abstract: Misc constants used by S3
-$Net::Amazon::S3::Constants::VERSION = '0.98';
+# ABSTRACT: Misc constants used by S3
+$Net::Amazon::S3::Constants::VERSION = '0.99';
 use constant {
 	HEADER_BUCKET_REGION        => 'x-amz-bucket-region',
 	HEADER_CANNED_ACL           => 'x-amz-acl',
@@ -30,11 +30,11 @@ __END__
 
 =head1 NAME
 
-Net::Amazon::S3::Constants
+Net::Amazon::S3::Constants - Misc constants used by S3
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

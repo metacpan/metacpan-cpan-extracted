@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::Grab 2.145;
+package Config::Model::Role::Grab 2.147;
 
 # ABSTRACT: Role to grab data from elsewhere in the tree
 
@@ -65,6 +65,8 @@ sub grab ($self, @args) {
 
     # accept commands, grep remove empty items left by spurious spaces
     my $huge_string = ref $steps ? join( ' ', @$steps ) : $steps;
+    return $self unless $huge_string;
+
     my @command = (
         $huge_string =~ m/
          (         # begin of *one* command
@@ -280,16 +282,15 @@ sub grab_value ($self, @args) {
 
     return if ( $args{mode} and $args{mode} eq 'loose' and not defined $obj );
 
-    Config::Model::Exception::User->throw(
-        object  => $self,
-        message => "grab_value: cannot get value of non-leaf or check_list "
-            . "item with '"
-            . join( "' '", @args )
-            . "'. item is $obj"
-        )
-        unless ref $obj
-        and ( $obj->isa("Config::Model::Value")
-        or $obj->isa("Config::Model::CheckList") );
+    if (not $obj->isa("Config::Model::Value")
+        and not $obj->isa("Config::Model::CheckList")
+    ) {
+        Config::Model::Exception::User->throw(
+            object  => $self,
+            message => "Cannot get a value from '". $obj->location . "'. ",
+            info    => "grab arguments are '".join( "' '", @args ) . "'."
+        );
+    }
 
     my $value = $obj->fetch;
     if ( $logger->is_debug ) {
@@ -369,7 +370,7 @@ Config::Model::Role::Grab - Role to grab data from elsewhere in the tree
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

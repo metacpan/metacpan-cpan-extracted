@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::Firefox::check_profile_name_exists;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-04'; # DATE
+our $DATE = '2021-07-19'; # DATE
 our $DIST = 'Sah-Schemas-Firefox'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -51,7 +51,7 @@ Data::Sah::Filter::perl::Firefox::check_profile_name_exists
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::Filter::perl::Firefox::check_profile_name_exists (from Perl distribution Sah-Schemas-Firefox), released on 2020-06-04.
+This document describes version 0.003 of Data::Sah::Filter::perl::Firefox::check_profile_name_exists (from Perl distribution Sah-Schemas-Firefox), released on 2021-07-19.
 
 =for Pod::Coverage ^(meta|filter)$
 
@@ -77,7 +77,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

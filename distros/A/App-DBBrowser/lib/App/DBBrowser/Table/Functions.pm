@@ -3,7 +3,7 @@ App::DBBrowser::Table::Functions;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use List::MoreUtils qw( all );
 
@@ -73,7 +73,7 @@ sub __get_info_string {
         push @tmp_info, @$multi_col_info_rows;
     }
     my $uc_func = uc $func;
-    push @tmp_info, ( map { ( my $n = $_ ) =~ s/$uc_func/$func/e; ( ' ' x 10 ) . $n } @$col_with_func );
+    push @tmp_info, ( map { my $n = $_ =~ s/$uc_func/$func/re; ( ' ' x 10 ) . $n } @$col_with_func );
     if ( defined $incomplete ) {
         push @tmp_info, $incomplete;
     }
@@ -152,7 +152,7 @@ sub col_function {
             }
             $old_idx = $idx;
         }
-        ( my $func = $menu->[$idx] ) =~ s/^\Q${prefix}\E//;
+        my $func = $menu->[$idx] =~ s/^\Q${prefix}\E//r;
         my $multi_col = 0;
         if ( $func eq $hidden ) { # documentation
             require App::DBBrowser::Opt::Set;

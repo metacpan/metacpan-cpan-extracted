@@ -9,7 +9,7 @@ use File::Which qw( which );
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Default interpolator for Alien::Build
-our $VERSION = '2.45'; # VERSION
+our $VERSION = '2.46'; # VERSION
 
 sub _config
 {
@@ -250,7 +250,7 @@ Alien::Build::Interpolate::Default - Default interpolator for Alien::Build
 
 =head1 VERSION
 
-version 2.45
+version 2.46
 
 =head1 CONSTRUCTOR
 

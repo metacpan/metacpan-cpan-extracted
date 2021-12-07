@@ -1,16 +1,3 @@
-package Quiq::Database::ResultSet::Object;
-use base qw/Quiq::Database::ResultSet/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Quiq::Hash;
-use Quiq::Formatter;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -27,6 +14,25 @@ L<Quiq::Database::ResultSet>
 
 Ein Objekt der Klasse repräsentiert eine Liste von gleichartigen
 Datensätzen in Objekt-Repräsentation.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::ResultSet::Object;
+use base qw/Quiq::Database::ResultSet/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Quiq::Hash;
+use Quiq::Formatter;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -758,7 +764,7 @@ sub selectParentRows {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

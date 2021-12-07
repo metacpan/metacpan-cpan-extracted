@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.526';
+our $VERSION = '0.531';
 
 use 5.020;
 use Moo;
@@ -71,7 +71,7 @@ sub keywords {
         $_[0] =~ m/^(?:\d{4}-\d\d-\d\dT\d\d:\d\d):(\d\d)(?:\.\d+)?(?:[Zz]|[+-]\d\d:\d\d)$/a
           && $1 eq '60'
           && do {
-            +require DateTime::Format::RFC3339;
+            require DateTime::Format::RFC3339;
             eval { DateTime::Format::RFC3339->parse_datetime($_[0]) };
           });
     },
@@ -199,7 +199,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.526
+version 0.531
 
 =head1 DESCRIPTION
 

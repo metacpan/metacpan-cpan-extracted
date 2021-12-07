@@ -104,7 +104,7 @@ Module::Generic::Array - An Array Manipulation Object Class
     $a->remove( $dummy, qw( John Paul Peter Emmanuel ) );
     say( "@$a" ); # Jack Gabriel Raphael
 
-    $ar->reset; # No the array object is empty
+    $ar->reset; # Now the array object is empty
 
     $ar->for(sub
     {
@@ -187,15 +187,9 @@ The purpose of this class/package is to provide an object-oriented approach at a
 
 Provided with an optional array reference or an array object such as L<Module::Generic::Array>, this will create a new object and return it.
 
-=head2 as_array
+=head2 append
 
-This simply returns the current object, so it does nothing special. It is here, so that one can blindly call C<as_array> on any of the L<Module::Generic::Array>, L<Module::Generic::Boolean>, L<Module::Generic::Number> or L<Module::Generic::Scalar> object and get an L<Module::Generic::Array> object in return.
-
-=head2 as_string
-
-Returns the array as string, which is essentially the same as C<"@array">
-
-It takes an optional boolean value that, if true, will sort the array before.
+This is an alias for L</push>
 
 =head2 as_hash
 
@@ -221,6 +215,16 @@ Example:
         John => 2,
         Peter => 3,
     }
+
+=head2 as_array
+
+This simply returns the current object, so it does nothing special. It is here, so that one can blindly call C<as_array> on any of the L<Module::Generic::Array>, L<Module::Generic::Boolean>, L<Module::Generic::Number> or L<Module::Generic::Scalar> object and get an L<Module::Generic::Array> object in return.
+
+=head2 as_string
+
+Returns the array as string, which is essentially the same as C<"@array">
+
+It takes an optional boolean value that, if true, will sort the array before.
 
 =head2 chomp
 
@@ -530,6 +534,10 @@ This returns a new iterator to cycle through all the array items using iterator'
         printf( "Next value is: %s at offset %d\n", $elem->next, $elem->next->pos  );
     }
 
+=head2 is_empty
+
+Returns L<true|Module::Generic::Boolean/true> if the array is empty, L<false|Module::Generic::Boolean/false> otherwise.
+
 =head2 join
 
 Provided with a string, or expression just as documented in L<perlfunc/"join"> and this will return a string as an L<Module::Generic::Scalar> object.
@@ -575,6 +583,26 @@ For each iteration of the array, C<$_> is made available.
 
     print( $a->map(sub{ $_->value })->join( "\n" ), "\n" );
 
+If you want C<map> to discard a value, your anonymous subroutine must return an empty list, such as:
+
+    my $a = Module::Generic::Array->new( [qw( Joe John Mary )] );
+    my $new = $a->map(sub
+    {
+        return if( $_ eq 'John' );
+        return( $_ );
+    });
+
+C<$new> will be a L<Module::Generic::Array> object containing only C<Joe> and C<Mary>.
+
+However, do not return C<undef> explicitly in your anonymous subroutine, because perl's C<map> expect an empty list to discard the entry and C<undef> is a not an empty list. So, the following is B<wrong>:
+
+    my $a = Module::Generic::Array->new( [qw( Joe John Mary )] );
+    my $new = $a->map(sub
+    {
+        return( undef ) if( $_ eq 'John' );
+        return( $_ );
+    });
+
 =head2 max
 
 Returns the the element in the array object that has the highest numerical value, as a L<Module::Generic::Scalar> object. For example:
@@ -606,7 +634,7 @@ Alternatively, you could simply do:
 
     $a->push( $b->list );
 
-Note that this will not discard duplicates, if any. If you want to reove possibke duplicates, you could do:
+Note that this will not discard duplicates, if any. If you want to remove possible duplicates, you could do:
 
     $a->merge( $b )->unique;
 
@@ -713,6 +741,10 @@ Provided with some value (references are ok too), and this will return the posit
     $a->pos( $hash ); # Returns 3
 
 Note that it returns the position in the array of the first occurrence found. Maybe I should consider returning a list of all occurrences in list context?
+
+=head2 prepend
+
+This is an alias for L</unshift>
 
 =head2 push
 

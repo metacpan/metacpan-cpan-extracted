@@ -1,13 +1,3 @@
-package Quiq::Net;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use IO::Socket::INET ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -15,6 +5,22 @@ use IO::Socket::INET ();
 =head1 NAME
 
 Quiq::Net - Allgemeine Netzwerkfunktionalität
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Net;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use IO::Socket::INET ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -70,7 +76,7 @@ sub checkPort {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

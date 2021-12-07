@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Action::Tagging;
 # ABSTRACT: tagging query action role
-$Net::Amazon::S3::Request::Role::Query::Action::Tagging::VERSION = '0.98';
+$Net::Amazon::S3::Request::Role::Query::Action::Tagging::VERSION = '0.99';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Action' => { action => 'tagging' };
@@ -19,7 +19,7 @@ Net::Amazon::S3::Request::Role::Query::Action::Tagging - tagging query action ro
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

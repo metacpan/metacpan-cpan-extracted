@@ -1,14 +1,3 @@
-package Quiq::JQuery::Function;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Unindent;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -24,6 +13,23 @@ L<Quiq::Object>
 =head1 DESCRIPTION
 
 Diese Klasse erweitert das jQuery-Objekt um nützliche Funktionen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::JQuery::Function;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Unindent;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -314,7 +320,7 @@ sub ready {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

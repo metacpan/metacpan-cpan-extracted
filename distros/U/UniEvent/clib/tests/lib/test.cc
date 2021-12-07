@@ -5,9 +5,26 @@
 #include <openssl/ssl.h>
 #include <openssl/conf.h>
 #include <openssl/engine.h>
+#include <catch2/reporters/catch_reporter_registrars.hpp>
+#include <catch2/reporters/catch_reporter_event_listener.hpp>
 
 Variation variation;
 string root_vdir = "tests/var";
+
+struct VariationReseter : Catch::EventListenerBase {
+    using EventListenerBase::EventListenerBase; // inherit constructor
+
+    void testCaseStarting(const Catch::TestCaseInfo&) override {
+        variation = {};
+    }
+
+    void testRunEnded(Catch::TestRunStats const&) override {
+        if (Fs::exists(root_vdir)) {
+            Fs::remove_all(root_vdir);
+        }
+    };
+};
+CATCH_REGISTER_LISTENER(VariationReseter);
 
 SslContext get_ssl_ctx() {
     static SslContext ctx = nullptr;

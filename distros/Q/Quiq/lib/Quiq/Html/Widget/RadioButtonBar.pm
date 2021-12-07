@@ -1,14 +1,3 @@
-package Quiq::Html::Widget::RadioButtonBar;
-use base qw/Quiq::Html::Widget/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Html::Widget::RadioButton;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -28,6 +17,10 @@ L<Quiq::Html::Widget>
 =item class => $class (Default: undef)
 
 CSS Klasse des Konstruktes.
+
+=item default => $default (Default: keiner)
+
+Wert, der angenommen wird, wenn value ein Leerstring oder C<undef> ist.
 
 =item disabled => $bool (Default: 0)
 
@@ -86,6 +79,23 @@ aktiviert.
 
 =back
 
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Widget::RadioButtonBar;
+use base qw/Quiq::Html::Widget/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Html::Widget::RadioButton;
+
+# -----------------------------------------------------------------------------
+
 =head1 METHODS
 
 =head2 Konstruktor
@@ -113,6 +123,7 @@ sub new {
 
     my $self = $class->SUPER::new(
         class => undef,
+        default => undef,
         disabled => 0,
         hidden => 0,
         id => undef,
@@ -161,10 +172,10 @@ sub html {
 
     # Attribute
 
-    my ($class,$disabled,$hidden,$id,$labelA,$name,$onClickA,$optionA,
-        $orientation,$buttonClass,$style,$titleA,$undefIf,$value) =
-        $self->get(qw/class disabled hidden id labels name onClick options
-        orientation buttonClass style titles undefIf value/);
+    my ($class,$default,$disabled,$hidden,$id,$labelA,$name,$onClickA,
+        $optionA,$orientation,$buttonClass,$style,$titleA,$undefIf,$value) =
+        $self->get(qw/class default disabled hidden id labels name onClick
+        options orientation buttonClass style titles undefIf value/);
 
     # Generierung
 
@@ -174,6 +185,10 @@ sub html {
 
     if ($hidden || !@$optionA) {
         return '';
+    }
+
+    if (!defined($value) || $value eq '' && !grep {$_ eq ''} @$optionA) {
+        $value = $default;
     }
 
     return $h->tag('span',
@@ -209,7 +224,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

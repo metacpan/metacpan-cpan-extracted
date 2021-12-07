@@ -23,11 +23,36 @@
     would              would             _                 _                 _
 
 
+#_____/ Modal and other negated verbs \______________________________________________________
+
+    isn't              aren't            wasn't            _                 _
+    aren't             aren't            weren't           _                 _
+
+    can't              can't             couldn't          _                 _
+    daren't            daren't           _                 _                 _
+    doesn't            don't             didn't            _                 _
+    don't              don't             didn't            _                 _
+    hasn't             haven't           hadn't            _                 _
+    haven't            haven't           hadn't            _                 _
+    mayn't             mayn't            mightn't          _                 _
+    mustn't            mustn't           _                 _                 _
+    needn't            needn't           _                 _                 _
+    oughtn't           oughtn't          _                 _                 _
+    sha'n't            sha'n't           shouldn't         _                 _
+    shan't             shan't            shouldn't         _                 _
+    won't              won't             wouldn't          _                 _
+    -n't               -n't              _                 _                 _
+
+
 #_____/ Common irregular verbs \____________________________________________________________
 #
 #   Singular           Plural            Preterite         Pres particple    Past participle
 #   ____________       _____________     _______           _____________     __________
 
+# This one needs to come first, otherwise a later one pre-empts it...
+   *shears            *shear            *sheared          *shearing         *shorn
+
+# The order of these doesn't matter, so alphabetize them...
     aches              ache              ached             aching            ached
     arises             arise             arose             arising           arisen
     asks               ask               asked             asking            asked
@@ -71,6 +96,7 @@
     digs               dig               dug               digging           dug
     dives              dive              dived             diving            dived
    *does              *do               *did              *doing            *done
+   *do                *do               *did              *doing            *done
     douches            douche            douched           douching          douched
     drags              drag              dragged           dragging          dragged
    *draws             *draw             *drew             *drawing          *drawn
@@ -163,7 +189,6 @@
    *sews              *sew              *sewed            *sewing           *sewn
     shakes             shake             shook             shaking           shaken
     shaves             shave             shaved            shaving           shaved
-   *shears            *shear            *sheared          *shearing         *shorn
     sheds              shed              shed              shedding          shed
    *shines            *shine            *shone            *shining          *shone
     shits              shit              shat              shitting          shitted
@@ -316,13 +341,10 @@
 #   Singular           Plural            Preterite         Pres particple    Past participle
 #   ____________       _____________     _______           _____________     __________
 
-# Negations...
-
-    -n't               -n't              -n't              _                 _
-
 # Common patterns of verb inflexion...
 #
 
+    -aes               -ae               -aed              -aeing            -aed
     -[aeiou]ys         -[aeiou]y         -[aeiou]yed       -[aeiou]ying      -[aeiou]yed
     -[aiy]nxes         -[aiy]nx          -[aiy]nxed        -[aiy]nxing       -[aiy]nxed
     -ceps              -ceps             -cepsed           -cepsing          -cepsed
@@ -339,9 +361,6 @@
     -is                -i                -ied              -iing             -ied
     -ees               -ee               -eed              -eeing            -eed
     -yes               -ye               -yed              -yeing            -yed
-    -[au]es            -[au]e            -[au]ed           -[au]ing          -[au]ed
-    -[^b]is            -[^b]i            -[^b]ied          -[^b]ing          -[^b]ied
-    -sses              -ss               -ssed             -ssing            -ssed
     -ies               -y                -ied              -ying             -ied
     -ys                -y                -yed              -ying             -yed
     -[^e]es            -[^e]e            -[^e]ed           -[^e]ing          -[^e]ed

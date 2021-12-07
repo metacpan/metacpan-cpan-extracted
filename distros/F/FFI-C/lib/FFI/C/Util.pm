@@ -4,15 +4,15 @@ use strict;
 use warnings;
 use 5.008001;
 use Ref::Util qw( is_blessed_ref is_plain_arrayref is_plain_hashref is_ref is_blessed_hashref );
-use Sub::Identify ();
+use Sub::Identify 0.05 ();
 use Carp ();
 use Class::Inspector;
 use base qw( Exporter );
 
-our @EXPORT_OK = qw( perl_to_c c_to_perl take owned set_array_count );
+our @EXPORT_OK = qw( perl_to_c c_to_perl take owned set_array_count addressof );
 
 # ABSTRACT: Utility functions for dealing with structured C data
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub perl_to_c ($$)
@@ -107,6 +107,16 @@ sub take ($)
 }
 
 
+sub addressof ($)
+{
+  my $inst = shift;
+  Carp::croak("Not an object") unless is_blessed_ref $inst;
+  my $ptr = $inst->{ptr};
+  Carp::croak("Object pointer went away") unless $ptr;
+  $ptr;
+}
+
+
 sub set_array_count ($$)
 {
   my($inst, $count) = @_;
@@ -131,7 +141,7 @@ FFI::C::Util - Utility functions for dealing with structured C data
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -216,6 +226,18 @@ So don't try to get/set any of its members, or pass it into a function.
 The returned pointer can be cast into something else or passed into
 a function that takes an C<opaque> argument.
 
+=head2 addressof
+
+[version 0.11]
+
+ my $ptr = addressof $instance;
+
+This function returns the address (as an C<opaque> type) of the
+instance object.  This is similar to C<take> above in that it gets
+you the address of the object, but doesn't take ownership of it,
+so care needs to be taken when using C<$ptr> that the object
+is still allocated.
+
 =head2 set_array_count
 
  set_array_count $inst, $count;
@@ -261,7 +283,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020,2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

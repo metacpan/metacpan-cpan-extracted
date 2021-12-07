@@ -1,5 +1,5 @@
 package Alien::MuPDF;
-$Alien::MuPDF::VERSION = '0.011';
+$Alien::MuPDF::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -64,7 +64,7 @@ Alien::MuPDF - Alien package for the MuPDF PDF rendering library
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 
@@ -80,8 +80,6 @@ This module supports L<Inline's with functionality|Inline/"Playing 'with' Others
 =head1 SEE ALSO
 
 L<MuPDF|http://mupdf.com/>
-
-L<Repository information|http://project-renard.github.io/doc/development/repo/p5-Alien-MuPDF/>
 
 =head1 AUTHOR
 

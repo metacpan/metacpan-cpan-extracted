@@ -1,4 +1,5 @@
 #include "../test.h"
+#include <algorithm>
 #include <unordered_set>
 
 static ptime_t epoch_from (int32_t year, ptime_t mon = 1, ptime_t mday = 1, ptime_t hour = 0, ptime_t min = 0, ptime_t sec = 0) {

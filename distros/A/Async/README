@@ -1,0 +1,33 @@
+Async
+
+This module runs some code in a separate process and retrieves its
+result. Since the code is running in a separate process, your main
+program can continue with whatever it was doing while the separate code
+is executing. This separate code is called an *asynchronous computation*.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+Mark-Jason Dominus has dedicated the work to the Commons by waiving all
+of his or her rights to the work worldwide under copyright law and all
+related or neighboring legal rights he or she had in the work, to the
+extent allowable by law.
+
+Works under CC0 do not require attribution. When citing the work, you
+should not imply endorsement by the author.

@@ -60,7 +60,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 8.4601
+Version 8.5201
 
 
 =head1 SYNOPSIS
@@ -83,7 +83,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     -i                   ignore case
     --need=[+-]n         required positive match count
     --allow=[+-]n        acceptable negative match count
-    --matchcount=n[,m]   specify required match count for each block
+    --matchcount=n[,m]   required match count for each block
   STYLE
     -l                   list filename only
     -c                   print count of matched block only
@@ -113,14 +113,15 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --[no]256            same as --ansicolor 256 or 16
     --regioncolor        use different color for inside/outside regions
     --uniqcolor          use different color for unique string
+    --uniqsub=func       preprocess function before check uniqueness
     --random             use random color each time
     --face               set/unset visual effects
   BLOCK
     -p, --paragraph      paragraph mode
     --all                print whole data
-    --border=pattern     specify the border pattern
-    --block=pattern      specify the block of records
-    --blockend=s         specify the block end mark (Default: "--\n")
+    --border=pattern     border pattern
+    --block=pattern      block of records
+    --blockend=s         block end mark (Default: "--\n")
   REGION
     --inside=pattern     select matches inside of pattern
     --outside=pattern    select matches outside of pattern
@@ -128,8 +129,8 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --exclude=pattern    reduce matches to outside of the area
     --strict             strict mode for --inside/outside --block
   CHARACTER CODE
-    --icode=name         specify file encoding
-    --ocode=name         specify output encoding
+    --icode=name         file encoding
+    --ocode=name         output encoding
   FILTER
     --if,--of=filter     input/output filter command
     --pf=filter          post process filter command
@@ -144,7 +145,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --epilogue=func      call function after command execution
   OTHER
     --usage[=expand]     show this message
-    --exit=n             specify exit status
+    --exit=n             command exit status
     --norc               skip reading startup file
     --man                display command or module manual page
     --show               display module file
@@ -196,6 +197,7 @@ my $opt_colorful = 1;
 my $opt_colorindex = '';
 my @opt_face;
 my $opt_uniqcolor;
+my @opt_uniqsub;
 my $opt_random;
 my $opt_regioncolor;
 my $opt_icode;
@@ -308,6 +310,7 @@ my @optargs = (
     'colorindex|ci=s'    => \$opt_colorindex,
     'face=s'             => \@opt_face,
     'uniqcolor|uc!'      => \$opt_uniqcolor,
+    'uniqsub|us=s'       => \@opt_uniqsub,
     'random!'            => sub {
 	if ($_[1]) { $opt_colorindex .= 'R' }
 	else       { $opt_colorindex =~ s/R//gi }
@@ -384,7 +387,7 @@ sub setopt {
 }
 
 ##
-## @ARGV staff
+## @ARGV stuff
 ##
 
 require Getopt::Long;
@@ -607,16 +610,19 @@ my $count_allow = 0;
 ##
 my $count_match_sub = sub {
     local $_ = shift or return undef;
-    if (/\A(\d+)?,(\d+)\z/) {
-	my($min, $max) = (int($1//0), int($2));
-	sub { $min <= $_[0] and $_[0] <= $max }
+    /[^\d,]/ and die "$_ is not valid count.\n";
+    my @c = map { $_ eq '' ? 0 : int } split(/,/, $_, -1);
+    if (@c == 1) {
+	return sub { $_[0] == $c[0] };
     }
-    elsif (/\A(\d+),?\z/) {
-	my $min = int($1);
-	sub { $min <= $_[0] }
-    }
-    else {
-	die "$_ is not valid count.\n"
+    push @c, -1 if @c % 2;
+    return sub {
+	my @n = @c;
+	while (my($min, $max) = splice(@n, 0, 2)) {
+	    return 0 if $_[0] < $min;
+	    return 1 if $max <= 0 || $_[0] <= $max;
+	}
+	return 0;
     }
 }->($opt_matchcount);
 
@@ -707,19 +713,12 @@ if ($opt_ansicolor eq '24bit') {
 
 if (@opt_face) {
     for my $opt (@opt_face) {
-	my($rm, $bg);
-	for my $s ($opt =~ m{[-+/]|[\w;{}]+}g) {
-	    if ($s eq '+') { $rm = 0; next }
-	    if ($s eq '-') { $rm = 1; next }
-	    if ($s eq '/') { $bg = 1; next }
+	while ($opt =~ /(?:(?<rm>-)|\+)? (?<s>[^-+]+)/xg) {
 	    for my $c (@colors) {
-		if ($rm) {
-		    $c =~ s/[$s]//g;
-		} elsif ($bg) {
-		    $c .= '/' if ($c =~ tr'/'/') % 2 == 0;
-		    $c .= $s;
+		if ($+{rm}) {
+		    $c =~ s/[\Q$+{s}\E]//g;
 		} else {
-		    $c = $s . $c;
+		    $c .= '^' . $+{s};
 		}
 	    }
 	}
@@ -728,16 +727,6 @@ if (@opt_face) {
 
 my $need_color = (($opt_color eq 'always')
 		  or (($opt_color eq 'auto') and (!$opt_o and -t STDOUT)));
-
-if ($opt_d{c}) {
-    my $dump = sub {
-	local $_ = Dumper shift;
-	s/^\s*'\K([^'\s]+)(?=')/color($1, $1)/mge;
-	$_;
-    };
-    warn 'colormap = ', $dump->(\%colormap);
-    warn 'colors = ', $dump->(\@colors);
-}
 
 for (values %opt_format) {
     s{\\(.)}{ { t => "\t", n => "\n" }->{$1} // $1 }egx;
@@ -768,7 +757,7 @@ sub color {
 
 my $uniq_color = UniqIndex->new(
     ignore_newline => 1,
-    ignore_case => $opt_i,
+    prepare => \@opt_uniqsub,
     );
 
 sub dump_uniqcolor {
@@ -779,6 +768,38 @@ sub dump_uniqcolor {
 		     $i, $count->[$i],
 		     index_color($i, $list->[$i]));
     }
+}
+
+# --colorindex
+my $indexer = do {
+    my %ci = map { uc $_ => 1 } $opt_colorindex =~ /\w/g;
+    if ($ci{S}) {
+	@colors = shuffle @colors;
+    }
+    if ($ci{A} or $ci{D}) {
+	my $i = 0;
+	Indexer->new(
+	    index   => sub { $i++   },
+	    reset   => sub { $i = 0 },
+	    block   => $ci{B},
+	    reverse => $ci{D},
+	    );
+    }
+    elsif ($ci{R}) {
+	Indexer->new(index => sub { int rand @colors });
+    }
+    else { undef }
+};
+
+# -dc
+if ($opt_d{c}) {
+    my $dump = sub {
+	local $_ = Dumper shift;
+	s/^\s*'\K([^'\s]+)(?=')/color($1, $1)/mge;
+	$_;
+    };
+    warn 'colormap = ', $dump->(\%colormap);
+    warn 'colors = ', $dump->(\@colors);
 }
 
 ##
@@ -823,6 +844,7 @@ for my $set (
     [ "prologue", \@opt_prologue, 0 ],
     [ "epilogue", \@opt_epilogue, 0 ],
     [ "callback", \@opt_callback, 0 ],
+    [ "uniqsub" , \@opt_uniqsub , 0 ],
     [ "block"   , \@opt_block   , 1 ], # need &
     [ "inside"  , \@opt_inside  , 1 ], # need &
     [ "outside" , \@opt_outside , 1 ], # need &
@@ -1144,8 +1166,6 @@ sub open_nextfile {
 sub grep_data {
     local *_ = shift;
 
-    $progress_show->() if $progress_show;
-
     ##
     ## --begin
     ##
@@ -1160,6 +1180,8 @@ sub grep_data {
 	    }
 	}
     }
+
+    $progress_show->() if $progress_show;
 
     my $grep = App::Greple::Grep->new(
 	text         => \$_,
@@ -1224,18 +1246,6 @@ sub grep_data {
     $matched;
 }
 
-package Indexer {
-    sub new {
-	my $class = shift;
-	my $obj = { @_ };
-	bless $obj, $class;
-    }
-    sub index   { shift->{index}->() }
-    sub reset   { shift->{reset}->() }
-    sub block   { shift->{block}     }
-    sub reverse { shift->{reverse}   }
-}
-
 sub display_result {
     my $grep = shift;
     my $file = $grep->{filename};
@@ -1248,27 +1258,6 @@ sub display_result {
 	!$opt_all &&
 	$blockend ne '' &&
 	($opt_blockend || $opt_p || $opt_A || $opt_B || @opt_block);
-
-    # --colorindex
-    my $indexer = do {
-	my %ci = map { uc $_ => 1 } $opt_colorindex =~ /\w/g;
-	if ($ci{S}) {
-	    @colors = shuffle @colors;
-	}
-	if ($ci{A} or $ci{D}) {
-	    my $i = 0;
-	    Indexer->new(
-		index   => sub { $i++   },
-		reset   => sub { $i = 0 },
-		block   => $ci{B},
-		reverse => $ci{D},
-		);
-	}
-	elsif ($ci{R}) {
-	    Indexer->new(index => sub { int rand @colors });
-	}
-	else { undef }
-    };
 
     my $line = 1;
     my $lastpos = 0;
@@ -1313,44 +1302,48 @@ sub display_result {
 	    }
 	}
 
+	my $template = unpack_template($result, $block_start);
+	my @blocks = unpack($template, $block);
+
 	my $mark = "\001";
-	for my $matched (reverse @$result) {
-	    my($start, $end, $pi, $callback) = @$matched;
-	    my $ms = max($start - $block_start, 0);
-	    my $me = $end - $block_start;
-	    my $s = substr($block, $ms, $me - $ms);
+	for my $i (0 .. $#{$result}) {
+	    my($start, $end, $pi, $callback) = @{$result->[$i]};
+	    local *b = \$blocks[$i * 2 + 1];
 
 	    ## run callback function
 	    if ($callback) {
-		if (ref $callback eq 'CODE') {
-		    $s = $callback->($start, $end, $pi, $s);
-		}
-		elsif (callable $callback) {
-		    $s = $callback->call(
-			&FILELABEL => $file,
-			start => $start,
-			end   => $end,
-			index => $pi,
-			match => $s);
-		}
+		$b = do {
+		    if (ref $callback eq 'CODE') {
+			$callback->($start, $end, $pi, $b);
+		    }
+		    elsif (callable $callback) {
+			$callback->call(
+			    &FILELABEL => $file,
+			    start => $start,
+			    end   => $end,
+			    index => $pi,
+			    match => $b);
+		    }
+		    else { die }
+		};
 	    }
 
 	    if ($opt_join) {
 		if ($opt_n and $opt_linestyle eq 'line') {
-		    $s =~ s/(?<!\A)\n(?!\z)/$mark/g;
+		    $b =~ s/(?<!\A)\n(?!\z)/$mark/g;
 		} else {
-		    $s =~ s/(?<!\A)\n(?!\z)/$opt_joinby/g;
+		    $b =~ s/(?<!\A)\n(?!\z)/$opt_joinby/g;
 		}
 	    }
 
-	    # --uniqcolor
-	    if ($opt_uniqcolor) {
-		$pi = $uniq_color->index($s);
+	    if ($need_color) {
+		$pi = $uniq_color->index($b) if $opt_uniqcolor;
+		$b = index_color($pi, $b);
 	    }
-
-	    substr($block, $ms, $me - $ms,
-		   $need_color ? index_color($pi, $s) : $s);
 	}
+
+	$block = join '', @blocks;
+
 	if ($opt_n) {
 	    if ($opt_linestyle eq 'line') {
 		my $increment = $block =~ /[\n$mark]/ ? 1 : 0;
@@ -1380,6 +1373,16 @@ sub display_result {
     }
 }
 
+##
+## split text using match information
+##
+sub unpack_template {
+    my($matched, $offset) = @_;
+    my @length = map {
+	($_->[0] - $offset, ($offset = $_->[1]) - $_->[0]);
+    } @$matched;
+    join '', map "a$_", @length, '*';
+}
 
 __END__
 
@@ -1620,8 +1623,9 @@ it.
 
 Order of capture group in the pattern is not guaranteed.  Please avoid
 to use direct index, and use relative or named capture group instead.
-For example, repeated character can be written as S<C<(\w)\g{-1}>>
-or S<C<(?E<lt>cE<gt>\w)\g{c}>>.
+For example, if you want to search repeated characters, use
+S<< C<(\w)\g{-1}> >> or S<< C<(?E<lt>cE<gt>\w)\g{c}> >> rather than
+S<< C<(\w)\1> >>.
 
 =over 7
 
@@ -1636,9 +1640,10 @@ more of `yabba' and 'dabba', and none of `baz' and `doo'.
 
     greple --le='foo bar -baz ?yabba ?dabba -doo'
 
-Multiple `?' preceded tokens are treated all mixed together.  That
-means `?A|B ?C|D' is equivalent to `?A|B|C|D'.  If you want to mean
-`(A or B) and (C or D)', use AND syntax instead: `A|B C|D'.
+Multiple C<?> preceded tokens are treated all mixed together.  That
+means S<< C<?A|B ?C|D> >> is equivalent to S<< C<?A|B|C|D> >>.  If you
+want to mean S<< C<(A or B)> >> and S<< C<(C or D)> >>, use AND syntax
+instead: S<< C<A|B C|D> >>.
 
 This is the summary of start character for B<--le> option:
 
@@ -1763,19 +1768,25 @@ value.
 If the option B<--need=0> is specified and no pattern was found,
 entire data is printed.  This is true even for required pattern.
 
-=item B<--matchcount>=I<min>[,I<max>], B<--mc>=I<min>[,I<max>]
+=item B<--matchcount>=I<count>|I<min>,I<max>, B<--mc>=...
 
 When option B<--matchcount> is specified, only blocks which have given
-match count will be shown.  Count I<min> and I<max> can be omitted,
-and single number is taken as I<min>.  Next commands print lines
-including semicolons; 3 or more, exactly 3, and 3 or less,
+match count will be shown.  Minimum and maximum number can be given,
+connecting by comma, and they can be omitted.  Next commands print
+lines including semicolons; 3 or more, exactly 3, and 3 or less,
 respectively.
 
-    greple --matchcount=3 ';' file
+    greple --matchcount=3, ';' file
 
-    greple --matchcount=3,3 ';' file
+    greple --matchcount=3  ';' file
 
     greple --matchcount=,3 ';' file
+
+In fact, I<min> and I<max> can repeat to represent multiple range.
+Missing, negative or zero I<max> means infinite.  Next command find
+match count 0 to 10, 20 to 30, and 40-or-greater.
+
+    greple --matchcount=,10,20,30,40
 
 =item B<-f> I<file>, B<--file>=I<file>
 
@@ -1868,14 +1879,14 @@ number of output.
 =item B<-m> I<*>, B<--max-count>=I<*>
 
 In fact, I<n> and I<m> can repeat as many as possible.  Next example
-removes first 10 blocks, then get first 10 blocks from the result.
-Consequently, get 10 blocks from 10th (10-19).
+removes first 10 blocks (by C<0,10>), then get first 10 blocks from
+the result (by C<10>).  Consequently, get 10 blocks from 10th (10-19).
 
     greple -m 0,10,10
 
-Next command get first 20 and get last 10, producing same result.
-Empty string behaves like absence for I<length> and zero for
-I<offset>.
+Next command get first 20 (by C<20,>) and get last 10 (by C<,-10>),
+producing same result.  Empty string behaves like absence for
+I<length> and zero for I<offset>.
 
     greple -m 20,,,-10
 
@@ -2068,15 +2079,15 @@ with other special effects:
 
     N    None
     Z  0 Zero (reset)
-    D  1 Double-struck (boldface)
+    D  1 Double strike (boldface)
     P  2 Pale (dark)
     I  3 Italic
     U  4 Underline
     F  5 Flash (blink: slow)
     Q  6 Quick (blink: rapid)
-    S  7 Stand-out (reverse video)
-    V  8 Vanish (concealed)
-    X  9 Crossed out
+    S  7 Stand out (reverse video)
+    H  8 Hide (concealed)
+    X  9 Cross out
     E    Erase Line
 
     ;    No effect
@@ -2243,10 +2254,28 @@ different colors.
 
     greple --uniqcolor 'colou?r\w*'
 
-When used with option B<-i>, color is selected in case-insensitive
-fashion.  If you want case-insensitive match and case-sensitive color
-selection, indicate insensitiveness in the pattern rather than command
-option (e.g. C<(?i)pattern>).
+When used with option B<-i>, color is selected still in case-sensitive
+fashion.  If you want case-insensitive color selection, use next
+B<--uniqsub> option.
+
+=item B<--uniqsub>=I<function>, B<--us>=I<function>
+
+Above option B<--uniqcolor> set same color for same literal string.
+Option B<--uniqsub> specify the preprocessor code applied before
+comparison.  I<function> get matched string by C<$_> and returns the
+result.  For example, next command will choose unique colors for each
+word by their length.
+
+    greple --uniqcolor --uniqsub 'sub{length}' '\w+' file
+
+If you want case-insensitive color selection, do like this.
+
+    greple -i pattern --uc --uniqsub 'sub{lc}'
+
+Next command read the output from C<git blame> command and set unique
+color for each entire line by their commit ids.
+
+    git blame ... | greple .+ --uc --us='sub{s/\s.*//r}' --face=E-D
 
 =item B<--face>=[-+]I<effect>
 
@@ -2596,14 +2625,15 @@ processed.
 	    or die "skip $name\n";
     }
 
-1;
+    1;
 
-__DATA__
+    __DATA__
 
-option default --filestyle=once --format FILE='\n%s:\n'
+    option default --filestyle=once --format FILE='\n%s:\n'
 
-autoload -Mdig --dig
-option --perl $<move> --begin &__PACKAGE__::is_perl --dig .
+    autoload -Mdig --dig
+    option --perl $<move> --begin &__PACKAGE__::is_perl --dig .
+
 =item B<--end>=I<function>(I<...>)
 
 =item B<--end>=I<function>=I<...>
@@ -2833,10 +2863,10 @@ content to know line borders, and it takes several seconds or more if
 it contains large number of lines.
 
 By default, if the target file contains more than B<512 * 1024
-characters> (I<size>), B<2 seconds> timer is started (I<time>).  Alert
+characters> (I<size>), B<2 seconds> timer will start (I<time>).  Alert
 message is shown when the timer expired.
 
-To disable this alert, set I<size> to 0:
+To disable this alert, set the size as zero:
 
     --alert size=0
 
@@ -2868,6 +2898,11 @@ Enable L<Getopt::Long> debug option.
 =item B<DEBUG_GETOPTEX>
 
 Enable L<Getopt::EX> debug option.
+
+=item B<NO_COLOR>
+
+If true, all coloring capability with ANSI terminal sequence is
+disabled.  See L<https://no-color.org/>.
 
 =back
 

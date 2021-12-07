@@ -49,7 +49,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::response::bucket_objects_list_v1_goo
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

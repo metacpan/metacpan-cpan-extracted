@@ -7,7 +7,7 @@ SDL2::Color - RGBA color structure
 =head1 SYNOPSIS
 
     use SDL2 qw[:all];
-    # TODO: I need to whip up a quick example
+	my $orange = SDL2::Color->new( { r => 255, g =>167, b => 0, a => 255 } );
 
 =head1 DESCRIPTION
 

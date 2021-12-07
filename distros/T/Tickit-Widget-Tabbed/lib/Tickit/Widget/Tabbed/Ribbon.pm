@@ -4,15 +4,14 @@
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.43;  # ADJUST
+use Object::Pad 0.58;
 
-package Tickit::Widget::Tabbed::Ribbon 0.024;
+package Tickit::Widget::Tabbed::Ribbon 0.025;
 class Tickit::Widget::Tabbed::Ribbon
-        extends Tickit::Widget;
+        :isa(Tickit::Widget);
 
 Tickit::Window->VERSION( '0.57' );  # ->bind_event
 
-use Scalar::Util qw( weaken );
 use Tickit::Utils qw( textwidth );
 
 use Carp;
@@ -110,24 +109,22 @@ sub new_for_orientation ( $class, $orientation, @args ) {
         };
 }
 
-has $_tabbed :param;
+has $_tabbed :param :weak;
 method tabbed { $_tabbed }
 
-has $_prev_more; method prev_more { $_prev_more }
-has $_next_more; method next_more { $_next_more }
+has $_prev_more :reader;
+has $_next_more :reader;
 
-has $_active_tab_index :param = 0;
+has $_active_tab_index :param :reader = 0;
 
 has @_tabs;
 
-BUILD ( %args ) {
-        push @_tabs, @{$args{tabs}} if $args{tabs};
+ADJUSTPARAMS ( $params ) {
+        push @_tabs, (delete $params->{tabs})->@* if exists $params->{tabs};
 }
 
 ADJUST
 {
-        weaken( $_tabbed );
-
         my ( $prev_more, $next_more ) = $_tabbed->get_style_values(qw( more_left more_right ));
         $_prev_more = MoreMarker( $prev_more, textwidth( $prev_more ), undef );
         $_next_more = MoreMarker( $next_more, textwidth( $next_more ), undef );
@@ -183,7 +180,7 @@ Returns the index of the currently-active tab
 
 =cut
 
-method active_tab_index { $_active_tab_index }
+# generated accessor
 
 =head2 active_tab
 
@@ -297,18 +294,13 @@ method on_mouse { 0 }
 
 class # hide from indexer
     Tickit::Widget::Tabbed::Ribbon::horizontal
-        extends Tickit::Widget::Tabbed::Ribbon;
+        :isa(Tickit::Widget::Tabbed::Ribbon);
 use constant orientation => "horizontal";
 
 use List::Util qw( sum0 );
 
-has $_active_marker :param = undef;
+has $_active_marker :param { [ "[", "]" ] };
 has $_scroll_offset        = 0;
-
-ADJUST
-{
-        $_active_marker //= [ "[", "]" ];
-}
 
 method lines { 1 }
 method cols {
@@ -516,7 +508,7 @@ method on_mouse ( $ev ) {
 
 class # hide from indexer
     Tickit::Widget::Tabbed::Ribbon::vertical
-        extends Tickit::Widget::Tabbed::Ribbon;
+        :isa(Tickit::Widget::Tabbed::Ribbon);
 use constant orientation => "vertical";
 
 use List::Util qw( max );

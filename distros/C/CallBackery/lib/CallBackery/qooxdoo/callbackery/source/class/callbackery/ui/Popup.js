@@ -30,6 +30,9 @@ qx.Class.define("callbackery.ui.Popup", {
             centerOnContainerResize: true,
             centerOnAppear: true
         });
+        qx.core.Id.getInstance().register(this, cfg.name + 'Popup');
+        this.setQxObjectId(cfg.name + 'Popup');
+
         this.getApplicationRoot().addListener('resize',this.__autoMax,this);
         this.__autoMax();
 
@@ -57,7 +60,8 @@ qx.Class.define("callbackery.ui.Popup", {
             // make sure it gets added to the translation
             this.tr('Cancel');
             var extraAction = {
-                label : 'Cancel',
+                key    : 'cancel',
+                label  : 'Cancel',
                 action : 'cancel'
             };
             if (cfg.cancelLabel) {

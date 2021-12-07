@@ -1,5 +1,5 @@
 package Yancy::Backend::Memory;
-our $VERSION = '1.084';
+our $VERSION = '1.085';
 # ABSTRACT: A backend entirely in memory
 
 #pod =head1 DESCRIPTION
@@ -318,7 +318,7 @@ Yancy::Backend::Memory - A backend entirely in memory
 
 =head1 VERSION
 
-version 1.084
+version 1.085
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Method::DELETE;
 # ABSTRACT: HTTP DELETE method role
-$Net::Amazon::S3::Request::Role::HTTP::Method::DELETE::VERSION = '0.98';
+$Net::Amazon::S3::Request::Role::HTTP::Method::DELETE::VERSION = '0.99';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::HTTP::Method' => { method => 'DELETE' };
@@ -19,7 +19,7 @@ Net::Amazon::S3::Request::Role::HTTP::Method::DELETE - HTTP DELETE method role
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

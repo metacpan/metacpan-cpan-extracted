@@ -1030,9 +1030,9 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
       SVfARG(meta->name));
 
   {
-    U32 slotix;
-    for(slotix = 0; slotix < av_count(meta->direct_slots); slotix++) {
-      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(meta->direct_slots)[slotix];
+    U32 i;
+    for(i = 0; i < av_count(meta->direct_slots); i++) {
+      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(meta->direct_slots)[i];
 
       U32 hooki;
       for(hooki = 0; slotmeta->hooks && hooki < av_count(slotmeta->hooks); hooki++) {
@@ -1045,7 +1045,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
           struct SlotHook *fasth;
           Newx(fasth, 1, struct SlotHook);
 
-          fasth->slotix   = slotix;
+          fasth->slotix   = slotmeta->slotix;
           fasth->slotmeta = slotmeta;
           fasth->funcs    = h->funcs;
           fasth->funcdata = h->funcdata;
@@ -1061,7 +1061,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
           struct SlotHook *fasth;
           Newx(fasth, 1, struct SlotHook);
 
-          fasth->slotix   = slotix;
+          fasth->slotix   = slotmeta->slotix;
           fasth->slotmeta = slotmeta;
           fasth->funcs    = h->funcs;
           fasth->funcdata = h->funcdata;
@@ -1652,6 +1652,12 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
     /* A subclass of an Object::Pad class */
     if(supermeta->type != METATYPE_CLASS)
       croak("%" SVf " is not a class", SVfARG(superclassname));
+
+    /* If it isn't yet sealed (e.g. because we're an inner class of it),
+     * seal it now
+     */
+    if(!supermeta->sealed)
+      mop_class_seal(supermeta);
 
     meta->start_slotix = supermeta->next_slotix;
     meta->repr = supermeta->repr;

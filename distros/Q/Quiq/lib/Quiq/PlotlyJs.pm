@@ -1,12 +1,3 @@
-package Quiq::PlotlyJs;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -185,6 +176,21 @@ Y-Wertebereich explizit vorgegeben ist. Ist für die Y-Achse
 findet die Ausdehnung bis 0 nicht statt, der Raum unter der
 Kurve wird dennoch wie gewünscht gefüllt.
 
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::PlotlyJs;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
+
 =head1 METHODS
 
 =head2 Klassenmethoden
@@ -222,7 +228,7 @@ sub cdnUrl {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

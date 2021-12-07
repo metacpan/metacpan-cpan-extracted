@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.145;
+package Config::Model::Node 2.147;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -673,8 +673,7 @@ sub fetch_element ($self, @args) {
         # FIXME elaborate more ? or include parameter description ??
         my $msg = "Element '$element_name' of node '". $self->name. "' is deprecated";
         if (not $self->was_element_warned($element_name)) {
-            if ($::_use_log4perl_to_warn) { $user_logger->warn($msg); }
-            else                          { warn("$msg\n"); }
+            $user_logger->warn($msg);
             $self->warn_element_done($element_name,1);
         }
         # this will also force a rewrite of the file even if no other
@@ -800,16 +799,11 @@ sub _get_accepted_data {
             my $dist = $tld->dld_best_distance($tld_arg);
             if ($dist < 3) {
                 my $best = $tld->dld_best_match($tld_arg);
-                if ($::_use_log4perl_to_warn) {
-                    $user_logger->warn("Warning: ".$self->location
+                $user_logger->warn(
+                    "Warning: ".$self->location
                     ." '$name' is confusingly close to '$best' (edit distance is $dist)."
-                    ." Is there a typo ?");
-                }
-                else {
-                    warn "Warning: ".$self->location
-                        ." '$name' is confusingly close to '$best' (edit distance is $dist)."
-                        ." Is there a typo ?\n";
-                }
+                    ." Is there a typo ?"
+                );
             }
 
         }
@@ -1187,7 +1181,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

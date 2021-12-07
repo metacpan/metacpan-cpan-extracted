@@ -1,14 +1,3 @@
-package Quiq::Schedule;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -27,6 +16,23 @@ Ordne eine Menge von zeitlichen Vorgängen (z.B. gelaufene Prozesse)
 in einer Reihe von Zeitschienen (Matrix) an. Finden Vorgänge parallel
 statt (also zeitlich überlappend), hat die Matrix mehr als eine
 Zeitschiene.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Schedule;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -340,7 +346,7 @@ sub width {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

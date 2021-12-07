@@ -43,7 +43,7 @@ use Carp qw{ confess };
 
 use PPIx::Regexp::Constant qw{ RE_CAPTURE_NAME @CARP_NOT };
 
-our $VERSION = '0.081';
+our $VERSION = '0.082';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 1;
 

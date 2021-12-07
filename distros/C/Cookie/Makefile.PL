@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
         'DateTime'      => '1.52',
         'DateTime::Format::Strptime' => '1.77',
         'JSON'          => '4.03',
-        'Module::Generic' => 'v0.17.0',
+        'Module::Generic' => 'v0.18.1',
         'Net::IDN::Encode' => '2.500',
         'Nice::Try'     => 'v1.1.2',
         'Scalar::Util'  => '1.50',
@@ -70,7 +70,7 @@ eval
 my @scripts = ();
 
 my $MY_DEBUG = $ENV{COOKIES_DEBUG};
-if( !$@ )
+if( !$@ && !$ENV{NO_MOD_PERL} )
 {
     print( STDERR "Generating Makefile including modperl\n" ) if( $MY_DEBUG );
     Apache::TestMM->import( qw(test clean) ); #enable 'make test'

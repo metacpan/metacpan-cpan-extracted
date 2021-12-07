@@ -60,7 +60,7 @@ static const char* const TAGOPT[]={"NAME", "EXPR", "ESCAPE", "DEFAULT" };
 #include "prostate.inc"
 #include "tags.inc"
 
-static const char const tag_can_be_closed[]={
+static const char tag_can_be_closed[]={
   1 /*Bad or unsupported tag*/,
   0 /*VAR*/,
   0 /*INCLUDE*/,
@@ -72,7 +72,7 @@ static const char const tag_can_be_closed[]={
   0 /**/,
 };
 
-static const char const tag_has_opt[][6]={
+static const char tag_has_opt[][6]={
   /* "name", "expr", "escape", "default", todo, todo */
 
   { 0, 0, 0, 0, 0, 0 }, /*Bad or unsupported tag*/
@@ -88,7 +88,7 @@ static const char const tag_has_opt[][6]={
 
 typedef void (*tag_handler_func)(struct tmplpro_state *state, const PSTRING* const TagOptVal);
 
-static const tag_handler_func const output_closetag_handler[]={
+static const tag_handler_func output_closetag_handler[]={
   tag_handler_unknown,	/*Bad or unsupported tag*/
   tag_handler_unknown,	/*VAR*/
   tag_handler_unknown,	/*INCLUDE*/
@@ -99,7 +99,7 @@ static const tag_handler_func const output_closetag_handler[]={
   tag_handler_unknown,	/*ELSIF*/
   tag_handler_unknown,	/**/
 };
-static const tag_handler_func const output_opentag_handler[]={
+static const tag_handler_func output_opentag_handler[]={
   tag_handler_unknown,	/*Bad or unsupported tag*/
   tag_handler_var,	/*VAR*/
   tag_handler_include,	/*INCLUDE*/
@@ -460,6 +460,7 @@ tmplpro_exec_tmpl_filename (struct tmplpro_param *param, const char* filename)
   /* destroying */
   if (param->filters) mmapstatus=(param->UnloadFileFuncPtr)(param->ext_filter_state,memarea);
   else mmapstatus=mmap_unload_file(memarea);
+  if (mmapstatus && debuglevel) log_state(&state,TMPL_LOG_DEBUG, "exec_tmpl: unloading %s caused munmap error\n",filename);
  cleanup_filepath:
   if (filepath!=NULL) free((void*) filepath);
   param->masterpath=saved_masterpath;

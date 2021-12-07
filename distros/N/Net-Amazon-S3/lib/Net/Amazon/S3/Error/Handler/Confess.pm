@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler::Confess;
-$Net::Amazon::S3::Error::Handler::Confess::VERSION = '0.98';
+$Net::Amazon::S3::Error::Handler::Confess::VERSION = '0.99';
 # ABSTRACT: An internal class to report errors via Carp::confess
 
 use Moose;
@@ -17,6 +17,9 @@ my %return_false = (
 	NoSuchBucket => {
 		'Net::Amazon::S3::Operation::Object::Head::Response' => 1,
 	},
+	'404' => {
+                'Net::Amazon::S3::Operation::Object::Head::Response' => 1,
+        },
 );
 
 sub handle_error {
@@ -46,7 +49,7 @@ Net::Amazon::S3::Error::Handler::Confess - An internal class to report errors vi
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

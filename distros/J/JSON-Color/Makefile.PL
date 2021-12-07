@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "JSON::Color",
   "PREREQ_PM" => {
     "Color::ANSI::Util" => "0.164",
+    "ColorTheme::NoColor" => 0,
     "ColorThemeBase::Static::FromStructColors" => "0.006",
     "ColorThemeRole::ANSI" => 0,
     "Exporter" => "5.57",
@@ -33,9 +34,9 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0
+    "Test::More" => "0.98"
   },
-  "VERSION" => "0.132",
+  "VERSION" => "0.133",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Color::ANSI::Util" => "0.164",
+  "ColorTheme::NoColor" => 0,
   "ColorThemeBase::Static::FromStructColors" => "0.006",
   "ColorThemeRole::ANSI" => 0,
   "Exporter" => "5.57",
@@ -54,7 +56,7 @@ my %FallbackPrereqs = (
   "Module::Load::Util" => "0.004",
   "Role::Tiny" => 0,
   "Term::ANSIColor" => "3.00",
-  "Test::More" => 0,
+  "Test::More" => "0.98",
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

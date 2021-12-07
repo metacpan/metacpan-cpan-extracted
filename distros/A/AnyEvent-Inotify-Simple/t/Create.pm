@@ -3,7 +3,7 @@ use MooseX::Declare;
 class t::Create with t::lib::Base {
     use Test::More;
 
-    method _build_type_filter { qr/create/ }
+    method _build_wanted_events { [ qw(create) ] }
 
     method do_test {
         $self->op('touch', 'foo');

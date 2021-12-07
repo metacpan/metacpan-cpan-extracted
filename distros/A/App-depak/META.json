@@ -1,5 +1,5 @@
 {
-   "abstract" : "Pack your dependencies onto your script file",
+   "abstract" : "Pack dependencies onto your script file",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -94,11 +94,11 @@
    "provides" : {
       "App::depak" : {
          "file" : "lib/App/depak.pm",
-         "version" : "0.584"
+         "version" : "0.585"
       },
       "Perinci::CmdLine::depak" : {
          "file" : "lib/Perinci/CmdLine/depak.pm",
-         "version" : "0.584"
+         "version" : "0.585"
       }
    },
    "release_status" : "stable",
@@ -113,7 +113,7 @@
          "web" : "https://github.com/perlancar/perl-App-depak"
       }
    },
-   "version" : "0.584",
+   "version" : "0.585",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -218,7 +218,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Filter/PERLANCAR::BeforeBuild",
-            "version" : "0.605"
+            "version" : "0.606"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",

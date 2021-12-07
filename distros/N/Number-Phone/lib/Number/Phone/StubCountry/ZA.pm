@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211833;
+our $VERSION = 1.20211206222448;
 
 my $formatters = [
                 {
@@ -164,43 +164,43 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"2748", "Cradock\/Northern\ part\ of\ Eastern\ Cape\/Steynsburg",
-"2727", "Alexander\ Bay\/Calvinia\/Clanwilliam\/Namaqualand\/Port\ Nolloth\/Springbok\/Vredendal",
-"2712", "Brits\/Tshwane",
-"2751", "Aliwal\ North\/Bloemfontein\/Far\ eastern\ part\ of\ Eastern\ Cape\/Southern\ and\ Central\ Free\ State",
-"2742", "Jeffreys\ Bay\/Humansdorp\/Southern\ and\ central\ Eastern\ Cape",
-"2733", "KwaZulu\ Natal\ Midlands\/Pietermaritzburg",
-"2718", "Klerksdorp\/Lichtenburg\/Potchefstroom",
-"2744", "Garden\ Route\/George\/Knysna\/Mossel\ Bay\/Oudtshoorn\/Plettenberg\ Bay",
-"2731", "Durban",
-"2753", "Eastern\ part\ of\ Northern\ Cape\/Far\ western\ part\ of\ North\ West\/Kimberley\/Kuruman",
-"2716", "Vaal\ Triangle",
-"2728", "Caledon\/Hermanus\/Southern\ coast\ of\ Western\ Cape\/Swellendam",
-"2747", "Butterworth\/Eastern\ part\ of\ Eastern\ Cape\/Mthatha",
-"2715", "Northern\ and\ Eastern\ Limpopo\/Polokwane",
+$areanames{en} = {"2718", "Klerksdorp\/Lichtenburg\/Potchefstroom",
+"2748", "Cradock\/Northern\ part\ of\ Eastern\ Cape\/Steynsburg",
 "2746", "Bathurst\/Southern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Grahamstown\/Kenton\-on\-Sea\/Port\ Alfred",
-"2714", "Modimolle\/Northern\ North\ West\ and\ Southwestern\ Limpopo\/Rustenburg",
-"2749", "Graaff\-Reinet\/Western\ part\ of\ Eastern\ Cape",
-"2745", "Northern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Queenstown",
-"2722", "Boland\/Malmesbury\/Vredenburg\/Western\ coast\ of\ Western\ Cape",
-"2717", "Ermelo\/Secunda\/Southern\ Mpumalanga",
-"2740", "Alice\/Bhisho",
-"2757", "Northern\ Free\ State\ Goldfields\/Welkom",
-"2743", "East\ London",
-"2732", "Ballito\/KwaZulu\ Natal\ coast\/Stanger\/Tongaat\/Verulam",
-"2754", "Upington\/Gordonia",
-"2721", "Cape\ Town\/Gordons\ Bay\/Somerset\ West\/Stellenbosch",
-"2710", "Johannesburg",
-"2756", "Kroonstad\/Parys\/Northern\ Free\ State",
-"2713", "Bronkhorstspruit\/Eastern\ Gauteng\/Middelburg\/Nelspruit\/Northern\ and\ Western\ Mpumalanga\/Witbank",
-"2711", "Johannesburg",
-"2739", "Eastern\ Pondoland\/Port\ Shepstone\/Southern\ coast\ of\ KwaZulu\ Natal",
-"2758", "Bethlehem\/Eastern\ Free\ State",
-"2736", "Drakensberg\/Ladysmith",
-"2723", "Beaufort\ West\/Karoo\/Robertson\/Worcester",
 "2735", "Richards\ Bay\/St\.\ Lucia\/Ulundi\/Zululand",
+"2716", "Vaal\ Triangle",
+"2747", "Butterworth\/Eastern\ part\ of\ Eastern\ Cape\/Mthatha",
+"2744", "Garden\ Route\/George\/Knysna\/Mossel\ Bay\/Oudtshoorn\/Plettenberg\ Bay",
+"2717", "Ermelo\/Secunda\/Southern\ Mpumalanga",
+"2714", "Modimolle\/Northern\ North\ West\ and\ Southwestern\ Limpopo\/Rustenburg",
+"2721", "Cape\ Town\/Gordons\ Bay\/Somerset\ West\/Stellenbosch",
+"2733", "KwaZulu\ Natal\ Midlands\/Pietermaritzburg",
+"2727", "Alexander\ Bay\/Calvinia\/Clanwilliam\/Namaqualand\/Port\ Nolloth\/Springbok\/Vredendal",
+"2753", "Eastern\ part\ of\ Northern\ Cape\/Far\ western\ part\ of\ North\ West\/Kimberley\/Kuruman",
+"2728", "Caledon\/Hermanus\/Southern\ coast\ of\ Western\ Cape\/Swellendam",
+"2732", "Ballito\/KwaZulu\ Natal\ coast\/Stanger\/Tongaat\/Verulam",
+"2739", "Eastern\ Pondoland\/Port\ Shepstone\/Southern\ coast\ of\ KwaZulu\ Natal",
+"2711", "Johannesburg",
 "2741", "Port\ Elizabeth\/Uitenhage",
-"2734", "Newcastle\/Northern\ KwaZulu\ Natal\/Vryheid",};
+"2749", "Graaff\-Reinet\/Western\ part\ of\ Eastern\ Cape",
+"2756", "Kroonstad\/Parys\/Northern\ Free\ State",
+"2723", "Beaufort\ West\/Karoo\/Robertson\/Worcester",
+"2758", "Bethlehem\/Eastern\ Free\ State",
+"2757", "Northern\ Free\ State\ Goldfields\/Welkom",
+"2731", "Durban",
+"2754", "Upington\/Gordonia",
+"2712", "Brits\/Tshwane",
+"2742", "Jeffreys\ Bay\/Humansdorp\/Southern\ and\ central\ Eastern\ Cape",
+"2710", "Johannesburg",
+"2740", "Alice\/Bhisho",
+"2743", "East\ London",
+"2713", "Bronkhorstspruit\/Eastern\ Gauteng\/Middelburg\/Nelspruit\/Northern\ and\ Western\ Mpumalanga\/Witbank",
+"2745", "Northern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Queenstown",
+"2715", "Northern\ and\ Eastern\ Limpopo\/Polokwane",
+"2736", "Drakensberg\/Ladysmith",
+"2722", "Boland\/Malmesbury\/Vredenburg\/Western\ coast\ of\ Western\ Cape",
+"2734", "Newcastle\/Northern\ KwaZulu\ Natal\/Vryheid",
+"2751", "Aliwal\ North\/Bloemfontein\/Far\ eastern\ part\ of\ Eastern\ Cape\/Southern\ and\ Central\ Free\ State",};
 
     sub new {
       my $class = shift;

@@ -1,5 +1,12 @@
 Revision history for App-MakeEPUB
 
+v0.3.2 Tue Dec  7 16:40:29 CET 2021
+	- move on GitHub
+	- examples/rfc/bin/rfc2xhtml.pl: concatenate paragraphs that were
+	  interupted by a pagebreak
+	- examples/initramfs-man: create EPUB for man pages of programs in
+	  InitRAMFS
+
 0.3.1 Mon Apr  1 09:11:37 CEST 2013
 	- repaired some character set issues in the POD
 

@@ -2,7 +2,7 @@ package Pandoc::Release;
 use 5.014;
 use warnings;
 
-our $VERSION = '0.9.0';
+our $VERSION = '0.9.1';
 
 use HTTP::Tiny;
 use JSON::PP;
@@ -93,7 +93,7 @@ sub download {
     my ( $self, %opts ) = @_;
 
     my $version = Pandoc::Version->new( $self->{tag_name} );
-    my $bin = $opts{bin} // pandoc_data_dir('bin');
+    my $bin     = $opts{bin} // pandoc_data_dir('bin');
 
     if ($bin) {
         make_path($bin);
@@ -158,8 +158,8 @@ From command line:
   # download latest release unless already in ~/.pandoc/bin
   perl -MPandoc::Release -E 'latest->download'
 
-  # same and create symlink ~/.pandoc/bin/pandoc
-  perl -MPandoc::Release -E 'latest->download->symlink'
+  # download specific release and create symlink ~/.pandoc/bin/pandoc
+  perl -MPandoc::Release -E 'get("2.7.3")->download->symlink'
 
 In Perl code:
 

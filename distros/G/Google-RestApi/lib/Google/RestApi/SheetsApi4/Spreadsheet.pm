@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Spreadsheet;
 
-our $VERSION = '0.9';
+our $VERSION = '1.0.0';
 
 use Google::RestApi::Setup;
 
@@ -356,41 +356,84 @@ Google::RestApi::SheetsApi4::Spreadsheet - Represents a Google Spreadsheet.
 
 =head1 DESCRIPTION
 
-See the description and synopsis at Google::RestApi::SheetsApi4.
+See the description and synopsis at L<Google::RestApi::SheetsApi4>.
+
+=head1 NAVIGATION
+
+=over
+
+=item * L<Google::RestApi::SheetsApi4>
+
+=item * L<Google::RestApi::SheetsApi4::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Range>
+
+=item * L<Google::RestApi::SheetsApi4::Range::All>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Col>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Row>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Cell>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range>
+
+=back
 
 =head1 SUBROUTINES
 
 =over
 
-=item new(sheets => <SheetsApi4>, (id => <string> | name => <string> | title => <string> | uri => <string>), cache_seconds => <int>);
+=item new(%args);
 
-Creates a new instance of a Spreadsheet object. You would not normally
-call this directly, you would obtain it from the
-Sheets::open_spreadsheet routine.
+Creates a new instance of a Spreadsheet object.
 
- sheets: The parent SheetsApi4 object.
- id: The id of the spreadsheet (Google Drive file ID).
- name: The name of the spreadsheet (as shown in Google Drive).
- title: An alias for name.
- uri: The spreadsheet ID extracted from the overall URI.
- cache_seconds: Cache information for this many seconds (default to 5, 0 disables).
+%args consists of:
 
-Only one of id/name/title/uri should be specified and this API will derive the others
-as necessary.
+=over
 
-The cache exists so that repeated calls for the same attributes
-or worksheet properties doesn't keep hammering the Google API
-over and over. The default is 5 seconds. See 'cache_seconds' below.
+=item * C<sheets_api> <SheetsApi4>: The parent SheetsApi4 object.
+
+=item * C<id> <string>: The id of the spreadsheet (Google Drive file ID).
+
+=item * C<name> <string>: The name of the spreadsheet (as shown in Google Drive).
+
+=item * C<title> <string>: An alias for name.
+
+=item * C<uri> <string>: The spreadsheet ID extracted from the overall URI.
+
+=item * C<cache_seconds> <int>: Cache information for this many seconds (default to 5, 0 disables).
+
+=back
+
+You would not normally call this directly, you would obtain it from the Sheets::open_spreadsheet routine.
+
+Only one of id/name/title/uri should be specified and this API will derive the others as necessary.
+
+The cache exists so that repeated calls for the same attributes or worksheet properties doesn't keep hammering the Google API over and over.
+The default is 5 seconds. See 'cache_seconds' below.
 
 =item api(%args);
 
-Calls the parent SheetsApi4's 'api' routine with the Sheet's
-endpoint, along with any args to be passed such as content,
-params, headers, etc.
+Calls the parent SheetsApi4's 'api' routine adding the sheet file ID, and passing through any args such as content, params, headers, etc.
 
-You would not normally call this directly unless you were
-making a Google API call not currently supported by this API
-framework.
+You would not normally call this directly unless you were making a Google API call not currently supported by this API framework.
+
+Returns the response hash from Google API.
 
 =item spreadsheet_id();
 
@@ -418,28 +461,23 @@ Returns the spreadsheet property attributes of the specified fields.
 
 =item worksheet_properties(what<string>);
 
-Returns an array ref of the properties of the worksheets
-owned by this spreadsheet.
+Returns an array ref of the properties of the worksheets owned by this spreadsheet.
 
-=item cache_seconds(<int>)
+=item cache_seconds(seconds<int>)
 
-Sets the caching time in seconds. Calling will always
-delete the existing cache. 0 also disables the cache.
+Sets the caching time in seconds. Calling will always delete the existing cache. 0 disables the cache (not recommended).
 
 =item delete_all_protected_ranges();
 
-Deletes all the protected ranges from all the worksheets
-owned by this spreadsheet.
+Deletes all the protected ranges from all the worksheets owned by this spreadsheet.
 
 =item named_ranges(name<string>);
 
-Returns the properties of the named range passed, or if
-false is passed, all the named ranges for this spreadsheet.
+Returns the properties of the named range passed, or if false is passed, all the named ranges for this spreadsheet.
 
 =item copy_spreadsheet(%args);
 
-Creates a copy of this spreadsheet and passes any args
-to the Google Drive File copy routine.
+Creates a copy of this spreadsheet and passes any args to the Google Drive file copy routine.
 
 =item delete_spreadsheet();
 
@@ -447,41 +485,54 @@ Deletes this spreadsheet from Google Drive.
 
 =item range_group(range<array>...);
 
-Creates a range group with the contained ranges.
+Creates a range group with the contained ranges. See the RangeGroup object.
 
-=item tie(ranges<hash>);
+=item tie(%args);
 
-Ties the given 'key => range' pairs into a tied range group. The
-range group can be used to send batch values (API batchUpdate) and
-batch requests (API batchRequests) as a single call once all the
-changes have been made to the overall hash.
+%args is a hash of key => Range object pairs.
 
-Turning on the 'fetch_range' property will return the underlying
-ranges on fetch so that formatting for the ranges can be set. You
-would normally only turn this on for a short time, and turn it off
-when the underlying batch requests have been submitted.
+Ties the given 'key => range' pairs into a tied range group. The range group can be used to send batch values (API batchUpdate) and
+batch requests (API batchRequests) as a single call once all the changes have been made to the overall hash.
+
+Turning on the 'fetch_range' property will return the underlying ranges on fetch so that formatting for the ranges can be set. You
+would normally only turn this on for a short time, and turn it off when the underlying batch requests have been submitted.
 
  $tied = $ss->tie(id => $range_cell);
- $tied->{id} = 1001;
- tied(%$tied)->submit_values();
-
  tied(%$tied)->fetch_range(1);
  $tied->{id}->bold()->red()->background_blue();
  tied(%$tied)->fetch_range(0)->submit_requests();
 
-See also Google::RestApi::SheetsApi4::Worksheet::tie.
+See also Worksheet::tie.
 
-=item submit_values(values<arrayref>, content<hashref>);
+=item submit_values(%args);
 
-Submits the batch values (Google API's batchUpdate) for the
-specified ranges. Content is passed to the SheetsApi4's 'api'
-call for any customized content you may need to pass.
+%args consists of:
 
-=item submit_requests(requests<arrayref>, content<hashref>);
+=over
 
-Submits any outstanding requests (Google API's batchRequests)
-for this spreadsheet. content will be passed to the SheetsApi4's
-'api' call for any customized content you may need to pass.
+=item * C<ranges> <arrayref>: The ranges that have requests to be sent in one batchUpdate Google API call.
+
+=item * C<content> <hashref>: Any additional content to be sent to the Google API for this batch submit, for any customized content that needs to be passed.
+
+=back
+
+Submits the batch values (Google API's batchUpdate) for the specified ranges. Content is passed to the SheetsApi4's 'api' call for any customized
+content you may need to pass.
+
+=item submit_requests(%args);
+
+%args consists of:
+
+=over
+
+=item * C<ranges> <arrayref>: The ranges that have requests to be sent in one batchRequest Google API call.
+
+=item * C<content> <hashref>: Any additional content to be sent to the Google API for this batch submit, for any customized content that needs to be passed.
+
+=back
+
+Submits the batch requests (Google API's batchRequest) for the specified ranges. Content is passed to the SheetsApi4's 'api' call for any customized
+content you may need to pass.
 
 =item protected_ranges();
 
@@ -489,17 +540,11 @@ Returns all the protected ranges for this spreadsheet.
 
 =item open_worksheet(%args);
 
-Creates a new Worksheet object, passing the args to that object's
-'new' routine (which see).
+Creates a new Worksheet object, passing the args to that object's 'new' routine (which see).
 
 =item sheets_api();
 
 Returns the SheetsApi4 object.
-
-=item stats()
-
-Shows some statistics on how many get/put/post etc calls were made.
-Useful for performance tuning during development.
 
 =back
 
@@ -515,6 +560,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019, Robin Murray. All rights reserved.
+Copyright (c) 2021, Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

@@ -126,6 +126,7 @@ my @files = (
     't/results/draft7-acceptance-format.txt',
     't/results/draft7-acceptance.txt',
     't/results/draft7-additional-tests.txt',
+    't/serialization.t',
     't/specification_version.t',
     't/traverse.t',
     't/type.t',

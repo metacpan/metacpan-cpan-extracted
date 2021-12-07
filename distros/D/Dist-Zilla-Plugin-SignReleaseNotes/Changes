@@ -1,0 +1,7 @@
+Revision history for Dist-Zilla-Plugin-SignReleaseNotes
+
+0.0001 -- Tue Dec 07 17:52:03 AST 2021
+
+  - d537cd7 (HEAD -> main) Add .gitignore
+  - 20b6ea5 Fix packaging issues
+  - 1511bd9 (origin/main) Initial Version

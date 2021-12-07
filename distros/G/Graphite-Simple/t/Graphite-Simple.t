@@ -65,6 +65,10 @@ my %expected_avg_counters = (
     'avg.my.new.key' => 2
 );
 
+my %expected_invalid_metrics = (
+	"invalid.avg.my.new.key " => 3,
+);
+
 my %expected_flushed_metrics = (
     'wrong.avg.my.new.key' => 2,
     'my.new.key' => 12.4,
@@ -79,7 +83,7 @@ my %expected_flushed_metrics = (
 
     local $SIG{'__WARN__'} = sub {
         my ($msg) = @_;
-        like($msg, qr/The sender must return a number type of status. Using 0 as sender status now./, "Checking the warn message");
+        like($msg, qr/The sender must return a number type of status. Using 0 as sender status now/, "Checking the warn message");
         $warns_cnt++;
     };
 
@@ -91,9 +95,61 @@ my %expected_flushed_metrics = (
     is($warns_cnt, 4, "Asserting amount of checked warns");
 };
 
+# just to test common storage
+{
+    my $graphite = Graphite::Simple->new({
+        'host' => 'localhost',
+        'port' => 2023,
+        'project' => 'test',
+        'enabled' => 1,
+        'use_common_storage' => 1,
+        'store_invalid_metrics' => 1,
+    });
+
+    $graphite->incr_bulk("my.key", 2);
+    $graphite->incr_bulk("my.key");
+    $graphite->incr_bulk("my.new.key", 12.4);
+    $graphite->incr_bulk("avg.my.new.key", 4.8);
+    $graphite->incr_bulk("avg.my.new.key", 2);
+    $graphite->incr_bulk("wrong.avg.my.new.key", 2);
+    $graphite->incr_bulk("invalid.avg.my.new.key ", 3); # using trailing space in the path
+
+    cmp_deeply(\%Graphite::Simple::bulk, \%expected_bulk_metrics, "Checking common bulk hash");
+    cmp_deeply(\%Graphite::Simple::avg_counters, \%expected_avg_counters, "Checking common avg_counter hash");
+    cmp_deeply(\%Graphite::Simple::invalid, \%expected_invalid_metrics, "Checking common invalid hash");
+
+    cmp_deeply($graphite->get_bulk_metrics(), \%expected_bulk_metrics, "Checking bulk hash");
+    cmp_deeply($graphite->get_average_counters(), \%expected_avg_counters, "Checking avg_counter hash");
+    cmp_deeply($graphite->get_invalid_metrics(), \%expected_invalid_metrics, "Checking invalid hash");
+
+    $graphite->clear_bulk();
+
+    undef $graphite;
+
+    cmp_deeply(\%Graphite::Simple::bulk, {}, "Checking common bulk hash");
+    cmp_deeply(\%Graphite::Simple::avg_counters, {}, "Checking common avg_counter hash");
+    cmp_deeply(\%Graphite::Simple::invalid, {}, "Checking common invalid hash");
+}
+
+{ # just to test segfaults in case of wrong types as arguments
+
+    my $graphite = Graphite::Simple->new({
+        'host' => 'localhost',
+        'port' => 2023,
+        'project' => 'test',
+        'enabled' => 1,
+    });
+
+    eval {
+        $graphite->incr_bulk([]);
+        $graphite->incr_bulk({});
+        $graphite->incr_bulk(sub {});
+    };
+}
+
 my $graphite = Graphite::Simple->new({
     'sender_name' => 'Graphite::Sender::receiver_ok',
-    'block_metrics_re' => qr/initial.block/,
+    'block_metrics_re' => qr/initial\.block/,
     'host' => 'localhost',
     'port' => 2023,
     'project' => 'test',
@@ -261,6 +317,7 @@ no_leaks_ok {
     $g->incr_bulk("avg.my.new.key", 2);
     $g->get_average_counters();
     $g->get_bulk_metrics();
+    $g->get_invalid_metrics();
     $g->is_valid_key("my.key");
     $g->get_invalid_key_counter();
     $g->set_blocked_metrics_re(qr/.+\.block.me\.+/);

@@ -1,21 +1,3 @@
-package Quiq::Database::DataAnalysis;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Quiq::Unindent;
-use List::Util ();
-use POSIX ();
-use Quiq::Formatter;
-use Quiq::Database::Row::Array;
-use Quiq::Database::ResultSet::Array;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -34,6 +16,30 @@ Führe eine Analyse auf den Daten einer Relation (Tabelle oder View) oder
 eines SQL-Statements durch, das Daten liefert (üblicherweise ein
 SELECT-Statement). Das Analyseergebnis kann mit den Methoden der Klasse
 ausgegeben werden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::DataAnalysis;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Quiq::Unindent;
+use List::Util ();
+use POSIX ();
+use Quiq::Formatter;
+use Quiq::Database::Row::Array;
+use Quiq::Database::ResultSet::Array;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -425,7 +431,7 @@ sub asTable {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -37,7 +37,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::response::service_list_buckets_witho
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

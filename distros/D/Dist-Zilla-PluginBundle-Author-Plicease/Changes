@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.69      2021-11-28 05:21:20 -0700
+  - An extra } crept into the Changes template during a refactor.
+    The extra } has been removed, and a warning will be displayed
+    when a build is attempted on a dist with this error.
+
 2.68      2021-08-03 12:23:20 -0600
   - Use [ArchiveTar] or [Libarchive] to build archive
   - Removed workaround to disable Archive::Tar::Wrapper

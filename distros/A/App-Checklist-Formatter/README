@@ -1,4 +1,4 @@
-App-Checklist-Formatter version v0.0.6
+App-Checklist-Formatter version v0.0.7
 
 This is a program that takes a vimoutline file (.otl) with checkboxes
 and processes it into an LaTeX file that may be printed out to get a

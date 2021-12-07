@@ -1,3 +1,0 @@
-sub is_trial {
-  return {{ $dist->distmeta->{release_status} eq 'testing' ? 1 : 0 }};
-}

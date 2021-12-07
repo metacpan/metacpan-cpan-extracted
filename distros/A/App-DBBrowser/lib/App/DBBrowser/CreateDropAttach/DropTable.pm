@@ -3,7 +3,7 @@ App::DBBrowser::CreateDropAttach::DropTable;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use Term::Choose       qw();
 use Term::Choose::Util qw( insert_sep );

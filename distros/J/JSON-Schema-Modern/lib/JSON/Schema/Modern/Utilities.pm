@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.526';
+our $VERSION = '0.531';
 
 use 5.020;
 use strictures 2;
@@ -32,6 +32,7 @@ our @EXPORT_OK = qw(
   is_equal
   is_elements_unique
   jsonp
+  unjsonp
   local_annotations
   canonical_uri
   E
@@ -168,6 +169,11 @@ sub jsonp {
   return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, map +(is_plain_arrayref($_) ? @$_ : $_), grep defined, @_);
 }
 
+# splits a json pointer apart into its path segments
+sub unjsonp ($path) {
+  return map s!~0!~!gr =~ s!~1!/!gr, split m!/!, $path;
+}
+
 # get all annotations produced for the current instance data location (that are visible to this
 # schema location)
 sub local_annotations ($state) {
@@ -242,7 +248,7 @@ sub A ($state, $annotation) {
     keyword_location => $keyword_location,
     defined $uri ? ( absolute_keyword_location => $uri ) : (),
     annotation => $annotation,
-    $state->{unknown} ? ( unknown => 1 ) : (),
+    $state->{_unknown} ? ( unknown => 1 ) : (),
   );
 
   return 1;
@@ -346,7 +352,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.526
+version 0.531
 
 =head1 SYNOPSIS
 
@@ -356,7 +362,7 @@ version 0.526
 
 This class contains internal utilities to be used by L<JSON::Schema::Modern>.
 
-=for Pod::Coverage is_type get_type is_equal is_elements_unique jsonp local_annotations
+=for Pod::Coverage is_type get_type is_equal is_elements_unique jsonp unjsonp local_annotations
 canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
 annotate_self is_uri_reference
 

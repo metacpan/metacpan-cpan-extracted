@@ -1,5 +1,6 @@
 #include "logtest.h"
 #include <regex>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 #define TEST(name) TEST_CASE("log-formatter: " name, "[log-formatter]")
 
@@ -60,7 +61,7 @@ TEST("set formatter string") {
     SECTION("function") {
         set_formatter("FUNC=%F");
         panda_log_alert();
-        CHECK(c.fstr.find("FUNC=____C_A_T_C_H____T_E_S_T____") == 0);
+        CHECK_THAT(c.fstr, Catch::Matchers::StartsWith("FUNC=CATCH2_INTERNAL_TEST_"));
     }
 
     SECTION("file") {
@@ -79,7 +80,7 @@ TEST("set formatter string") {
     SECTION("line") {
         set_formatter("LINE=%l");
         panda_log_alert();
-        CHECK(c.fstr == "LINE=81");
+        CHECK(c.fstr == "LINE=82");
     }
 
     SECTION("message") {

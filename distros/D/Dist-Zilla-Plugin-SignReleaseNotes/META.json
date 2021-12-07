@@ -1,0 +1,66 @@
+{
+   "abstract" : "Create and signs a 'Release' notes file",
+   "author" : [
+      "Timothy Legge"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-SignReleaseNotes",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "2.100921",
+            "File::chdir" : "0",
+            "Module::Signature" : "0.87"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::SignReleaseNotes" : {
+         "file" : "lib/Dist/Zilla/Plugin/SignReleaseNotes.pm",
+         "version" : "0.0001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/timlegge/perl-Dist-Zilla-Plugin-SignReleaseNotes/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/perl-Dist-Zilla-Plugin-SignReleaseNotes/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/timlegge/perl-Dist-Zilla-Plugin-SignReleaseNotes.git",
+         "web" : "https://github.com/timlegge/perl-Dist-Zilla-Plugin-SignReleaseNotes"
+      }
+   },
+   "version" : "0.0001",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

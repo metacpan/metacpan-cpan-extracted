@@ -4,7 +4,7 @@ package XS::libpanda::backtrace;
 use XS::libpanda;
 use XS::libdwarf;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.2';
 
 use XS::Loader;
 XS::Loader::load_noboot();

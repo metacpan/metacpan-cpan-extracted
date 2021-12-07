@@ -11,7 +11,8 @@ use Test::Log::Log4perl;
 
 use strict;
 use warnings;
-$::_use_log4perl_to_warn = 1;
+
+Test::Log::Log4perl->ignore_priority("info");
 
 use lib "t/lib";
 

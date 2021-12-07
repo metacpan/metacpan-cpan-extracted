@@ -84,7 +84,7 @@ BEGIN {
 with 'Log::LogMethods';
 with 'Data::Result::Moo';
 }
-our $VERSION='1.022';
+our $VERSION='1.023';
 
 sub BUILD {
   my ($self)=@_;
@@ -558,11 +558,11 @@ sub create_request {
     while(my ($key,$value)=splice(@args,0,2)) {
       if($key eq 'on_body') {
         my $code=sub {
-	   my ($body,$headers)=@_;
-	   my $header=new HTTP::Headers( %{$headers});
-	   $value->($self,$req,$header,$body);
-	};
-	$opt->{params}->{$key}=$code;
+	        my ($body,$headers)=@_;
+	        my $header=new HTTP::Headers( %{$headers});
+	        $value->($self,$req,$header,$body);
+	      };
+	      $opt->{params}->{$key}=$code;
       } else {
         $opt->{params}->{$key}=$value;
       }
@@ -594,7 +594,8 @@ sub que_function {
   my ($self,$req,$id)=@_;
   my $loop_id=$self->loop_id;
 
-  my $code=sub {
+  my $code;
+  $code=sub {
     my $response=$self->RESPONSE_CLASS->new(@_)->to_http_message;
     $self->log_debug("Got Response for id: [$id] Status Line: ".$response->status_line);
 
@@ -624,6 +625,7 @@ sub que_function {
       if($self->que_count==0) {
         $self->loop_control->send if $self->loop_control;
       }
+      undef $code;
       return;
     }
 
@@ -631,13 +633,14 @@ sub que_function {
       $self->log_debug('Que Count has reached 0');
       if($loop_id!=$self->loop_id) {
         $self->log_info("A result outside of it's lifecycle has arived loop_id: $loop_id que_id: $id, but we are in loop_id: ".$self->loop_id);
+        undef $code;
         return;
       }
       $self->loop_control->send if $self->loop_control;
     } else {
       $self->log_debug("Que Count is at $self->{que_count}");
     }
-
+    undef $code;
   };
   return $code;
 }
@@ -673,6 +676,7 @@ sub block_loop : BENCHMARK_DEBUG {
     $self->loop_control->send if $self->{que_count}<=0;
 
     $self->loop_control->recv;
+    undef $t;
   }
   $self->loop_control(undef);
   undef $t;

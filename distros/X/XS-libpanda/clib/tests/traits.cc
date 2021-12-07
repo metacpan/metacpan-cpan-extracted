@@ -1,7 +1,7 @@
 #include "test.h"
 #include <panda/traits.h>
 
-#define TEST(name) TEST_CASE("traits: " name, "[traits]")
+TEST_PREFIX("traits: ", "[traits]");
 
 TEST("bool_or") {
     struct N {};

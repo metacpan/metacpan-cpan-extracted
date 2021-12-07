@@ -1,16 +1,3 @@
-package Quiq::SQLite;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Database::Connection;
-use Quiq::Path;
-use Quiq::Terminal;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -22,6 +9,25 @@ Quiq::SQLite - Operationen auf einer SQLite-Datenbank
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::SQLite;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Database::Connection;
+use Quiq::Path;
+use Quiq::Terminal;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -128,6 +134,7 @@ sub importData {
 
     my $udl = "dbi#sqlite:$dbFile";
     my $db = Quiq::Database::Connection->new($udl,-utf8=>1);
+    $db->sql('PRAGMA foreign_keys = OFF');
 
     for my $file (Quiq::Path->glob("$importDir/*.dat")) {
         my ($table) = $file =~ m|/([^/]+).dat$|;
@@ -145,7 +152,7 @@ sub importData {
 
 =head4 Synopsis
 
-  $class->recreateDatabase($dbFile,$exportDir,$sub);
+  $class->recreateDatabase($dbFile,$exportDir,@opt,$sub);
 
 =head4 Arguments
 
@@ -183,6 +190,16 @@ an die Subroutine übergeben.
   
       return;
   });
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -interactive => $bool (Default: 1)
+
+Stelle Rückfragen an den Benutzer.
 
 =back
 
@@ -230,7 +247,19 @@ fehlgeschlagen ist.
 # -----------------------------------------------------------------------------
 
 sub recreateDatabase {
-    my ($class,$dbFile,$exportDir,$sub) = @_;
+    my $class = shift;
+    # @_: $dbFile,$exportDir,@opt,$sub
+
+    # Optionen und Argumente
+
+    my $interactive = 1;
+
+    my $argA = $class->parameters(3,3,\@_,
+        -interactive => \$interactive,
+    );
+    my ($dbFile,$exportDir,$sub) = @$argA;
+
+    # Operation ausführen
 
     my $p = Quiq::Path->new;
 
@@ -240,13 +269,13 @@ sub recreateDatabase {
     # fehlgeschlagenen Import sein.
 
     my $export = 1;
-    if ($p->exists($exportDir)) {
+    if ($p->exists($exportDir) && $interactive) {
         my $answ = Quiq::Terminal->askUser(
-            "ExportDir $exportDir already exists. Export again?",
+            "ExportDir $exportDir already exists. Delete and export again?",
             -values => 'y/n',
             -default => 'n',
         );
-        if ($answ ne 'y') {
+        if ($answ eq 'n') {
             $export = 0;
         }
     }
@@ -264,6 +293,15 @@ sub recreateDatabase {
     eval {
         $p->truncate($dbFile);
         $sub->($dbFile);
+        my $answ = Quiq::Terminal->askUser(
+            "Ready to import data from $exportDir?",
+            -values => '(y)es,(a)bort',
+            -default => 'y',
+            -automatic => !$interactive,
+        );
+        if ($answ eq 'a') {
+            return;
+        }
         $class->importData($dbFile,$exportDir);
     };
     if ($@) {
@@ -285,7 +323,7 @@ sub recreateDatabase {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

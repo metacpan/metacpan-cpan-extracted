@@ -1,5 +1,24 @@
 Revision history for JSON-Schema-Modern
 
+0.531     2021-12-06 05:39:53Z
+          - add method to add format implementations after construction
+          - treat media_type names case-insensitively, as per RFC6838,
+            and lookups support wildcards (get_media_type('text/plain')
+            will match an entry for 'text/*' or '*/*)
+
+0.530     2021-12-03 16:44:23Z
+          - fix hash slice syntax that is not available before perl 5.28
+
+0.529     2021-12-03 04:00:26Z
+          - added FREEZE and THAW callbacks to assist with serialization
+
+0.528     2021-11-30 06:17:29Z
+          - evaluation callback sub signature has changed, to add $data
+          - minor performance improvement during evaluation
+
+0.527     2021-11-26 00:53:42Z
+          - fixes to base64 and json decoders used in the Content vocabulary
+
 0.526     2021-11-23 05:11:46Z
           - fix evaluate() callbacks for keywords that have no
             runtime-specific actions

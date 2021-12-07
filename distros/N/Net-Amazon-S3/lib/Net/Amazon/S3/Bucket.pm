@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Bucket;
 # ABSTRACT: convenience object for working with Amazon S3 buckets
-$Net::Amazon::S3::Bucket::VERSION = '0.98';
+$Net::Amazon::S3::Bucket::VERSION = '0.99';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Carp;
@@ -158,6 +158,7 @@ sub get_key {
 		'Net::Amazon::S3::Operation::Object::Fetch',
 
 		filename => $args{filename},
+		(range   => $args{range}) x defined $args{range},
 
 		key    => $args{key},
 		method => $args{method},
@@ -447,7 +448,7 @@ Net::Amazon::S3::Bucket - convenience object for working with Amazon S3 buckets
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -477,6 +478,9 @@ version 0.98
   is( $val->{content_type},        'text/html' );
   is( $val->{etag},                'b9ece18c950afbfa6b0fdbfa4ff731d3' );
   is( $val->{'x-amz-meta-colour'}, 'orange' );
+
+  # fetch a part of the key
+  $val = $bucket->get_key("key", { range => "bytes=1024-10240" });
 
   # returns undef on missing or on error (check $bucket->err)
   is(undef, $bucket->get_key("non-existing-key"));

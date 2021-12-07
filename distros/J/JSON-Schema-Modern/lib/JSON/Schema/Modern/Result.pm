@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.526';
+our $VERSION = '0.531';
 
 use 5.020;
 use Moo;
@@ -26,8 +26,9 @@ use namespace::clean;
 
 use overload
   'bool'  => sub { $_[0]->valid },
-  '0+'    => sub { $_[0]->count },
   '&'     => \&combine,
+  '0+'    => sub { Scalar::Util::refaddr($_[0]) },
+  '""' => sub { $_[0]->stringify },
   fallback => 1;
 
 has valid => (
@@ -161,6 +162,8 @@ sub combine ($self, $other, $swap) {
   );
 }
 
+sub stringify ($self) { $self->error_count ? join("\n", $self->errors) : 'valid' }
+
 sub TO_JSON ($self) {
   $self->format($self->output_format);
 }
@@ -189,7 +192,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.526
+version 0.531
 
 =head1 SYNOPSIS
 
@@ -277,7 +280,7 @@ C<allOf> failed evaluation).
 
 =head1 METHODS
 
-=for Pod::Coverage BUILD OUTPUT_FORMATS result
+=for Pod::Coverage BUILD OUTPUT_FORMATS result stringify
 
 =head2 format
 

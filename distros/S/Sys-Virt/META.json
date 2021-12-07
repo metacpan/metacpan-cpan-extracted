@@ -41,7 +41,7 @@
    "provides" : {
       "Sys::Virt" : {
          "file" : "lib/Sys/Virt.pm",
-         "version" : "v7.9.0"
+         "version" : "v7.10.0"
       },
       "Sys::Virt::Domain" : {
          "file" : "lib/Sys/Virt/Domain.pm"
@@ -100,6 +100,6 @@
       },
       "x_MailingList" : "http://www.redhat.com/mailman/listinfo/libvir-list"
    },
-   "version" : "v7.9.0",
+   "version" : "v7.10.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

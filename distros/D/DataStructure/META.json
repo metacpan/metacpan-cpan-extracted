@@ -38,7 +38,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test2::Suite" : "0"
          }
       }
    },
@@ -52,6 +52,6 @@
          "web" : "https://github.com/mkende/perl-datastructure"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,14 +1,3 @@
-package Quiq::LaTeX::Code;
-use base qw/Quiq::TeX::Code/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -28,6 +17,23 @@ Code-Generator. Mit den Methoden der Klasse kann aus einem
 Perl-Programm heraus LaTeX-Code erzeugt werden. Die Klasse stützt
 sich ab auf ihre Basisklasse Quiq::TeX::Code. Weitere Methoden
 siehe dort.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::LaTeX::Code;
+use base qw/Quiq::TeX::Code/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -285,7 +291,7 @@ sub section {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

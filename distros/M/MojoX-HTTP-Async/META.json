@@ -1,0 +1,68 @@
+{
+   "abstract" : "The simple package to execute multiple parallel requests to the same host",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MojoX-HTTP-Async",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "FindBin" : "1.51",
+            "Net::EmptyPort" : "0",
+            "Test::More" : "1.302183",
+            "Test::SharedFork" : "0.35",
+            "Test::TCP" : "2.19"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4220"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.42",
+            "Errno" : "1.28",
+            "Fcntl" : "1.13",
+            "IO::Socket::SSL" : "2.072",
+            "List::Util" : "1.4602",
+            "Mojo::Message::Request" : "0",
+            "Mojo::Message::Response" : "0",
+            "Mojo::Transaction::HTTP" : "0",
+            "Mojolicious" : "7.59",
+            "POSIX" : "1.76",
+            "Scalar::Util" : "1.4602",
+            "Socket" : "2.03",
+            "Time::HiRes" : "1.9741",
+            "URI" : "1.73",
+            "perl" : "5.02"
+         }
+      }
+   },
+   "provides" : {
+      "MojoX::HTTP::Async" : {
+         "file" : "lib/MojoX/HTTP/Async.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/KalessinD/perl_mojox_http_async/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/KalessinD/perl_mojox_http_async"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

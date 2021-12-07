@@ -8,6 +8,10 @@ use 5.010;      # for //
 use Test::More;
 use Test::Exception;
 
+if ( $^O eq 'freebsd' ) {
+    plan skip_all => 'Tests not needed except on Windows, and dont work on FreeBSD';
+}
+
 use CAD::Mesh3D::FormatSTL;
 
 #################################################################

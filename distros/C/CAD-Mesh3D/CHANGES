@@ -1,5 +1,17 @@
 Revision history for Perl distribution Win32-Mechanize-NotepadPlusPlus
 
+v0.006001 2021-Nov-25
+    - Update test suite again for FreeBSD: doesn't need to cover
+      "STL-unpatched.t" (#13)
+    - Fix MANIFEST.SKIP to not bundle the .github folder in the
+      distribution
+
+
+v0.006 2021-Nov-25
+    - Try to prevent FreeBSD from freezing during test suite: skip
+      offending tests which cover FormatSTL.pm, as that module
+      isn't needed in FreeBSD (#13)
+
 v0.005 2021-Nov-23
     - Accidentally emptied {provides} with v0.004, so _none_ were indexed.
       Fixed. (#7)

@@ -22,6 +22,8 @@
 
       my $avg_counters = $graphite->get_average_counters();
 
+      my $invalid = $graphite->get_invalid_metrics();
+
       $graphite->clear_bulk();
 
       $graphite->incr_bulk($key, $value);
@@ -86,6 +88,10 @@
 
         Optional.
 
+#####    store_invalid_metrics
+        Optional. By default takes false value. Turns on the collecting of
+        invalid metrics into "invalid" hash.
+
 #####    block_metrics_re
         The compiled regular expression. If any metric matches, then it will
         be ignored and won't be stored in the resulted hash.
@@ -96,10 +102,19 @@
         This flag is optional. If flag is set then the package global hashes
         will be used to store collected data.
 
+```perl
           my %metrics      = %Graphite::Simple::bulk;
           my %avg_counters = %Graphite::Simple::avg_counters;
+```
 
-        Otherweise internal hashes will be used.
+        In case of "store_invalid_metrics" true value the following hash
+        will be available too:
+
+```perl
+          my %invalid = %Graphite::Simple::invalid;
+```
+
+        Otherwise internal hashes will be used.
 
 ####  $self->connect()
     Establishes the connection to Graphite server if "enabled" was set as
@@ -144,6 +159,10 @@
 ####  $self->get_average_counters()
     Returns the hash reference with counters of average metrics. Average
     metric is a metric started with "avg." string.
+
+####  $self->get_invalid_metrics()
+    Returns hsh with invalid metrics. It doesn't contain any blocked metric
+    by regular expressions.
 
 ####  $self->get_metrics()
     Returns the hash reference with result metrics. Each metric started with

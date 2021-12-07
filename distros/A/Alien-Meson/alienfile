@@ -1,0 +1,30 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => $_,
+  args    => [ '--version' ],
+  match   => qr/([0-9\.]+)/,
+  version => qr/([0-9\.]+)/,
+) for qw( meson.py meson );
+
+share {
+  requires 'Path::Tiny';
+  start_url 'https://github.com/mesonbuild/meson/releases';
+  plugin Download => (
+    filter  => qr/^meson-.*\.tar\.gz$/,
+    version => qr/([0-9\.]+)/,
+  );
+  plugin 'Extract::CommandLine' => 'tar.gz';
+  patch sub {
+	my @tests = Path::Tiny::path('.')->children( qr/.*test.*/ );
+	$_->remove_tree for @tests;
+	Path::Tiny::path('graphics')->remove_tree;
+	Path::Tiny::path('setup.py')->remove_tree;
+  };
+  plugin 'Build::Copy';
+  after build => sub {
+      my($build) = @_;
+      $build->runtime_prop->{'python-source'} = 1;
+      $build->runtime_prop->{command} = 'meson.py';
+  };
+}

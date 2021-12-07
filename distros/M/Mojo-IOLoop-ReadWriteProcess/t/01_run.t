@@ -301,6 +301,13 @@ subtest 'process execute()' => sub {
   $p->stop();
 };
 
+subtest 'process(execute =>"/usr/bin/true")' => sub {
+  use Mojo::IOLoop::ReadWriteProcess qw(process);
+  plan skip_all => "Missing '/usr/bin/true'" unless -e '/usr/bin/true';
+
+  is(process(execute => '/usr/bin/true')->quirkiness(1)->start()->wait_stop()->exit_status(), 0, 'Simple exec of "/usr/bin/true" return 0');
+};
+
 subtest 'process code()' => sub {
   use Mojo::IOLoop::ReadWriteProcess;
   use IO::Select;
@@ -538,6 +545,37 @@ process';
 
   like $buffer, qr/Execute: .*process_check.sh/,
 'setting MOJO_PROCESS_DEBUG to 1 enables debug mode when executing external process';
+};
+
+subtest 'process_args' => sub {
+  use Mojo::IOLoop::ReadWriteProcess;
+  my $code = sub {
+    shift; 
+    print $_.$/ for(@_);
+  };
+
+  my $p = Mojo::IOLoop::ReadWriteProcess->new($code, args => '0' )->start->wait_stop();
+  is($p->read_all_stdout(), "0$/", '1) False scalar value was given as args.');
+
+  $p = Mojo::IOLoop::ReadWriteProcess->new($code)->args('0')->start->wait_stop();
+  is($p->read_all_stdout(), "0$/", '2) False scalar value was given as args.');
+
+  $p = Mojo::IOLoop::ReadWriteProcess->new($code, args => [(0..3)] )->start->wait_stop();
+  is($p->read_all_stdout(), "0$/1$/2$/3$/", '1) Args given as arrayref.');
+
+  $p = Mojo::IOLoop::ReadWriteProcess->new($code)->args([(0..3)])->start->wait_stop();
+  is($p->read_all_stdout(), "0$/1$/2$/3$/", '2) Args given as arrayref.');
+};
+
+subtest 'process in process' => sub {
+    my $p = process(sub {
+        is( process(execute => '/usr/bin/true')->quirkiness(1)->start()->wait_stop()->exit_status(), 0, 'process(execute) from process(code) -- retval check true');
+        is( process(execute => '/usr/bin/false')->quirkiness(1)->start()->wait_stop()->exit_status(), 1, 'process(execute) from process(code) -- retval check false');
+        is( process(sub { print 'sub-sub-process'})->start()->wait_stop()->read_all_stdout, 'sub-sub-process', 'process(code) works from process(code)');
+        print 'DONE';
+    })->start()->wait_stop();
+
+    is ($p->read_all_stdout(), 'DONE', "Use ReadWriteProcess inside of ReadWriteProcess(code=>'')");
 };
 
 done_testing;

@@ -1,7 +1,7 @@
 #include "test.h"
 #include <panda/owning_list.h>
 
-#define TEST(name) TEST_CASE("owning_list: " name, "[owning_list]")
+TEST_PREFIX("owning_list: ", "[owning_list]");
 
 TEST("empty") {
     owning_list<int> list;

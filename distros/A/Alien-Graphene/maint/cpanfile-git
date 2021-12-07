@@ -1,0 +1,6 @@
+requires 'Alien::Meson',
+	git => 'https://github.com/PerlAlien/Alien-Meson.git',
+	branch => 'main';
+requires 'Alien::Ninja',
+	git => 'https://github.com/PerlAlien/Alien-Ninja.git',
+	branch => 'main';

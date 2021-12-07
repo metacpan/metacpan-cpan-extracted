@@ -1,7 +1,7 @@
 #include "../lib/test.h"
 #include <panda/unievent/streamer/File.h>
 
-using Catch::Matchers::Contains;
+using Catch::Matchers::ContainsSubstring;
 
 #define TEST(name) TEST_CASE("client-form: " name, "[client-form]")
 
@@ -13,8 +13,8 @@ TEST("form field") {
         // TODO: parse form
         test.happens();
         auto body = req->body.to_string();
-        REQUIRE_THAT(body, Contains("secret"));
-        REQUIRE_THAT(body, Contains("password"));
+        REQUIRE_THAT(body, ContainsSubstring("secret"));
+        REQUIRE_THAT(body, ContainsSubstring("password"));
         ServerResponseSP res = new ServerResponse(200, Headers(), Body());
         req->respond(res);
     });
@@ -32,12 +32,12 @@ TEST("embedded form file + field") {
         // TODO: parse form
         test.happens();
         auto body = req->body.to_string();
-        REQUIRE_THAT(body, Contains("secret"));
-        REQUIRE_THAT(body, Contains("password"));
-        REQUIRE_THAT(body, Contains("resume"));
-        REQUIRE_THAT(body, Contains("[pdf]"));
-        REQUIRE_THAT(body, Contains("application/pdf"));
-        REQUIRE_THAT(body, Contains("cv.pdf"));
+        REQUIRE_THAT(body, ContainsSubstring("secret"));
+        REQUIRE_THAT(body, ContainsSubstring("password"));
+        REQUIRE_THAT(body, ContainsSubstring("resume"));
+        REQUIRE_THAT(body, ContainsSubstring("[pdf]"));
+        REQUIRE_THAT(body, ContainsSubstring("application/pdf"));
+        REQUIRE_THAT(body, ContainsSubstring("cv.pdf"));
         ServerResponseSP res = new ServerResponse(200, Headers(), Body());
         req->respond(res);
     });
@@ -58,8 +58,8 @@ TEST("form file streaming") {
         // TODO: parse form
         test.happens();
         auto body = req->body.to_string();
-        REQUIRE_THAT(body, Contains("source"));
-        REQUIRE_THAT(body, Contains("test.happens()"));
+        REQUIRE_THAT(body, ContainsSubstring("source"));
+        REQUIRE_THAT(body, ContainsSubstring("test.happens()"));
         ServerResponseSP res = new ServerResponse(200, Headers(), Body());
         req->respond(res);
     });
@@ -80,12 +80,12 @@ TEST("form file streaming + fields") {
         // TODO: parse form
         test.happens();
         auto body = req->body.to_string();
-        REQUIRE_THAT(body, Contains("secret"));
-        REQUIRE_THAT(body, Contains("password"));
-        REQUIRE_THAT(body, Contains("source"));
-        REQUIRE_THAT(body, Contains("test.happens()"));
-        REQUIRE_THAT(body, Contains("signature"));
-        REQUIRE_THAT(body, Contains("Darth Vader"));
+        REQUIRE_THAT(body, ContainsSubstring("secret"));
+        REQUIRE_THAT(body, ContainsSubstring("password"));
+        REQUIRE_THAT(body, ContainsSubstring("source"));
+        REQUIRE_THAT(body, ContainsSubstring("test.happens()"));
+        REQUIRE_THAT(body, ContainsSubstring("signature"));
+        REQUIRE_THAT(body, ContainsSubstring("Darth Vader"));
         ServerResponseSP res = new ServerResponse(200, Headers(), Body());
         req->respond(res);
     });

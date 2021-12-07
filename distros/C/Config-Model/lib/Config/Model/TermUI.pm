@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TermUI 2.145;
+package Config::Model::TermUI 2.147;
 
 use Carp;
 use utf8;      # so literals and identifiers can be in UTF-8
@@ -158,18 +158,19 @@ my $node_completion_sub = sub {
 };
 
 my %completion_dispatch = (
-    cd     => $cd_completion_sub,
-    desc   => $completion_sub,
-    ll     => $ll_completion_sub,
-    ls     => $path_completion_sub,
-    tree   => $node_completion_sub,
-    info   => $path_completion_sub,
-    check  => $completion_sub,
-    fix    => $fix_completion_sub,
-    clear  => $completion_sub,
-    set    => $leaf_completion_sub,
-    delete => $leaf_completion_sub,
-    reset  => $completion_sub,
+    cd      => $cd_completion_sub,
+    desc    => $completion_sub,
+    display => $completion_sub,
+    ll      => $ll_completion_sub,
+    ls      => $path_completion_sub,
+    tree    => $node_completion_sub,
+    info    => $path_completion_sub,
+    check   => $completion_sub,
+    fix     => $fix_completion_sub,
+    clear   => $completion_sub,
+    set     => $leaf_completion_sub,
+    delete  => $leaf_completion_sub,
+    reset   => $completion_sub,
 );
 
 sub completion {
@@ -288,7 +289,7 @@ Config::Model::TermUI - Interactive command line interface for cme
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

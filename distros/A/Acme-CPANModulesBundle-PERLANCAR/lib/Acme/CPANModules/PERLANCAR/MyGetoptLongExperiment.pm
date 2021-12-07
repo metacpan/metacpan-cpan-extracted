@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-09'; # DATE
+our $DATE = '2021-11-13'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our $LIST = {
     summary => 'My experiments writing Getopt::Long replacements/alternatives',
@@ -43,7 +43,7 @@ Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment - My experiments writing Ge
 
 =head1 VERSION
 
-This document describes version 0.009 of Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
+This document describes version 0.010 of Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-13.
 
 =head1 DESCRIPTION
 

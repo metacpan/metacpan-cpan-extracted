@@ -7,220 +7,236 @@ package Lingua::EN::Inflexion::Verbs;
 use 5.010; use strict; use warnings;
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = 20211117.031833;
+our $VERSION = 20211130.055022;
 
 my $plural_of = {
-  abides         => "abide",
-  aches          => "ache",
-  am             => "are",
-  are            => "are",
-  arises         => "arise",
-  asks           => "ask",
-  avalanches     => "avalanche",
-  awakes         => "awake",
-  beats          => "beat",
-  becomes        => "become",
-  begets         => "beget",
-  begins         => "begin",
-  beholds        => "behold",
-  bellyaches     => "bellyache",
-  bends          => "bend",
-  bets           => "bet",
-  binds          => "bind",
-  bites          => "bite",
-  bleeds         => "bleed",
-  blitzes        => "blitz",
-  blows          => "blow",
-  breaks         => "break",
-  breeds         => "breed",
-  brings         => "bring",
-  builds         => "build",
-  burns          => "burn",
-  bursts         => "burst",
-  busts          => "bust",
-  caches         => "cache",
-  can            => "can",
-  catches        => "catch",
-  changes        => "change",
-  chooses        => "choose",
-  claps          => "clap",
-  clings         => "cling",
-  comes          => "come",
-  continues      => "continue",
-  costs          => "cost",
-  could          => "could",
-  creches        => "creche",
-  creeps         => "creep",
-  dares          => "dare",
-  deals          => "deal",
-  dies           => "die",
-  digs           => "dig",
-  dives          => "dive",
-  douches        => "douche",
-  drags          => "drag",
-  dreams         => "dream",
-  drinks         => "drink",
-  drives         => "drive",
-  dwells         => "dwell",
-  eats           => "eat",
-  expects        => "expect",
-  falls          => "fall",
-  feels          => "feel",
-  fights         => "fight",
-  finds          => "find",
-  flees          => "flee",
-  flies          => "fly",
-  flings         => "fling",
-  follows        => "follow",
-  forbids        => "forbid",
-  foresees       => "foresee",
-  foretells      => "foretell",
-  forgets        => "forget",
-  forgives       => "forgive",
-  forsakes       => "forsake",
-  gets           => "get",
-  gilds          => "gild",
-  gives          => "give",
-  goes           => "go",
-  grinds         => "grind",
-  happens        => "happen",
-  has            => "have",
-  helps          => "help",
-  hews           => "hew",
-  hits           => "hit",
-  holds          => "hold",
-  hurts          => "hurt",
-  inlays         => "inlay",
-  insists        => "insist",
-  interlays      => "interlay",
-  irises         => "iris",
-  is             => "are",
-  keeps          => "keep",
-  kills          => "kill",
-  kneels         => "kneel",
-  knits          => "knit",
-  knows          => "know",
-  lays           => "lay",
-  leads          => "lead",
-  leans          => "lean",
-  leaps          => "leap",
-  learns         => "learn",
-  leaves         => "leave",
-  lies           => "lie",
-  likes          => "like",
-  lives          => "live",
-  looks          => "look",
-  loses          => "lose",
-  loves          => "love",
-  may            => "may",
-  means          => "mean",
-  meets          => "meet",
-  menus          => "menu",
-  might          => "might",
-  misleads       => "mislead",
-  mistakes       => "mistake",
-  misunderstands => "misunderstand",
-  moves          => "move",
-  must           => "must",
-  needs          => "need",
-  niches         => "niche",
-  ought          => "ought",
-  overdraws      => "overdraw",
-  overhears      => "overhear",
-  overtakes      => "overtake",
-  presets        => "preset",
-  proves         => "prove",
-  provides       => "provide",
-  psyches        => "psyche",
-  puts           => "put",
-  quits          => "quit",
-  quizzes        => "quiz",
-  reaches        => "reach",
-  remains        => "remain",
-  remembers      => "remember",
-  rends          => "rend",
-  rides          => "ride",
-  rids           => "rid",
-  rings          => "ring",
-  rises          => "rise",
-  rives          => "rive",
-  runs           => "run",
-  s              => "",
-  saws           => "saw",
-  seeks          => "seek",
-  seems          => "seem",
-  shakes         => "shake",
-  shall          => "shall",
-  shaves         => "shave",
-  sheds          => "shed",
-  shits          => "shit",
-  shoes          => "shoe",
-  should         => "should",
-  shows          => "show",
-  shrinks        => "shrink",
-  sings          => "sing",
-  sinks          => "sink",
-  sits           => "sit",
-  skis           => "ski",
-  slays          => "slay",
-  slides         => "slide",
-  slinks         => "slink",
-  slits          => "slit",
-  smells         => "smell",
-  smites         => "smite",
-  sneaks         => "sneak",
-  sows           => "sow",
-  speaks         => "speak",
-  speeds         => "speed",
-  spends         => "spend",
-  spits          => "spit",
-  spoils         => "spoil",
-  springs        => "spring",
-  stands         => "stand",
-  staves         => "stave",
-  stays          => "stay",
-  steals         => "steal",
-  stings         => "sting",
-  stinks         => "stink",
-  stops          => "stop",
-  strews         => "strew",
-  strides        => "stride",
-  strips         => "strip",
-  strives        => "strive",
-  sublets        => "sublet",
-  sunburns       => "sunburn",
-  swears         => "swear",
-  sweats         => "sweat",
-  sweeps         => "sweep",
-  swells         => "swell",
-  swims          => "swim",
-  swings         => "swing",
-  talks          => "talk",
-  tears          => "tear",
-  thrives        => "thrive",
-  thrusts        => "thrust",
-  treads         => "tread",
-  undergoes      => "undergo",
-  understands    => "understand",
-  undertakes     => "undertake",
-  upsets         => "upset",
-  vexes          => "vex",
-  waits          => "wait",
-  wakes          => "wake",
-  walks          => "walk",
-  wants          => "want",
-  was            => "were",
-  watches        => "watch",
-  wears          => "wear",
-  weeps          => "weep",
-  wends          => "wend",
-  will           => "will",
-  wins           => "win",
-  withdraws      => "withdraw",
-  withholds      => "withhold",
-  withstands     => "withstand",
-  would          => "would",
-  wrings         => "wring",
+  "abides"         => "abide",
+  "aches"          => "ache",
+  "am"             => "are",
+  "are"            => "are",
+  "aren't"         => "aren't",
+  "arises"         => "arise",
+  "asks"           => "ask",
+  "avalanches"     => "avalanche",
+  "awakes"         => "awake",
+  "beats"          => "beat",
+  "becomes"        => "become",
+  "begets"         => "beget",
+  "begins"         => "begin",
+  "beholds"        => "behold",
+  "bellyaches"     => "bellyache",
+  "bends"          => "bend",
+  "bets"           => "bet",
+  "binds"          => "bind",
+  "bites"          => "bite",
+  "bleeds"         => "bleed",
+  "blitzes"        => "blitz",
+  "blows"          => "blow",
+  "breaks"         => "break",
+  "breeds"         => "breed",
+  "brings"         => "bring",
+  "builds"         => "build",
+  "burns"          => "burn",
+  "bursts"         => "burst",
+  "busts"          => "bust",
+  "caches"         => "cache",
+  "can"            => "can",
+  "can't"          => "can't",
+  "catches"        => "catch",
+  "changes"        => "change",
+  "chooses"        => "choose",
+  "claps"          => "clap",
+  "clings"         => "cling",
+  "comes"          => "come",
+  "continues"      => "continue",
+  "costs"          => "cost",
+  "could"          => "could",
+  "creches"        => "creche",
+  "creeps"         => "creep",
+  "daren't"        => "daren't",
+  "dares"          => "dare",
+  "deals"          => "deal",
+  "dies"           => "die",
+  "digs"           => "dig",
+  "dives"          => "dive",
+  "doesn't"        => "don't",
+  "don't"          => "don't",
+  "douches"        => "douche",
+  "drags"          => "drag",
+  "dreams"         => "dream",
+  "drinks"         => "drink",
+  "drives"         => "drive",
+  "dwells"         => "dwell",
+  "eats"           => "eat",
+  "expects"        => "expect",
+  "falls"          => "fall",
+  "feels"          => "feel",
+  "fights"         => "fight",
+  "finds"          => "find",
+  "flees"          => "flee",
+  "flies"          => "fly",
+  "flings"         => "fling",
+  "follows"        => "follow",
+  "forbids"        => "forbid",
+  "foresees"       => "foresee",
+  "foretells"      => "foretell",
+  "forgets"        => "forget",
+  "forgives"       => "forgive",
+  "forsakes"       => "forsake",
+  "gets"           => "get",
+  "gilds"          => "gild",
+  "gives"          => "give",
+  "goes"           => "go",
+  "grinds"         => "grind",
+  "happens"        => "happen",
+  "has"            => "have",
+  "hasn't"         => "haven't",
+  "haven't"        => "haven't",
+  "helps"          => "help",
+  "hews"           => "hew",
+  "hits"           => "hit",
+  "holds"          => "hold",
+  "hurts"          => "hurt",
+  "inlays"         => "inlay",
+  "insists"        => "insist",
+  "interlays"      => "interlay",
+  "irises"         => "iris",
+  "is"             => "are",
+  "isn't"          => "aren't",
+  "keeps"          => "keep",
+  "kills"          => "kill",
+  "kneels"         => "kneel",
+  "knits"          => "knit",
+  "knows"          => "know",
+  "lays"           => "lay",
+  "leads"          => "lead",
+  "leans"          => "lean",
+  "leaps"          => "leap",
+  "learns"         => "learn",
+  "leaves"         => "leave",
+  "lies"           => "lie",
+  "likes"          => "like",
+  "lives"          => "live",
+  "looks"          => "look",
+  "loses"          => "lose",
+  "loves"          => "love",
+  "may"            => "may",
+  "mayn't"         => "mayn't",
+  "means"          => "mean",
+  "meets"          => "meet",
+  "menus"          => "menu",
+  "might"          => "might",
+  "misleads"       => "mislead",
+  "mistakes"       => "mistake",
+  "misunderstands" => "misunderstand",
+  "moves"          => "move",
+  "must"           => "must",
+  "mustn't"        => "mustn't",
+  "n't"            => "n't",
+  "needn't"        => "needn't",
+  "needs"          => "need",
+  "niches"         => "niche",
+  "ought"          => "ought",
+  "oughtn't"       => "oughtn't",
+  "overdraws"      => "overdraw",
+  "overhears"      => "overhear",
+  "overtakes"      => "overtake",
+  "presets"        => "preset",
+  "proves"         => "prove",
+  "provides"       => "provide",
+  "psyches"        => "psyche",
+  "puts"           => "put",
+  "quits"          => "quit",
+  "quizzes"        => "quiz",
+  "reaches"        => "reach",
+  "remains"        => "remain",
+  "remembers"      => "remember",
+  "rends"          => "rend",
+  "rides"          => "ride",
+  "rids"           => "rid",
+  "rings"          => "ring",
+  "rises"          => "rise",
+  "rives"          => "rive",
+  "runs"           => "run",
+  "s"              => "",
+  "saws"           => "saw",
+  "seeks"          => "seek",
+  "seems"          => "seem",
+  "sha'n't"        => "sha'n't",
+  "shakes"         => "shake",
+  "shall"          => "shall",
+  "shan't"         => "shan't",
+  "shaves"         => "shave",
+  "sheds"          => "shed",
+  "shits"          => "shit",
+  "shoes"          => "shoe",
+  "should"         => "should",
+  "shows"          => "show",
+  "shrinks"        => "shrink",
+  "sings"          => "sing",
+  "sinks"          => "sink",
+  "sits"           => "sit",
+  "skis"           => "ski",
+  "slays"          => "slay",
+  "slides"         => "slide",
+  "slinks"         => "slink",
+  "slits"          => "slit",
+  "smells"         => "smell",
+  "smites"         => "smite",
+  "sneaks"         => "sneak",
+  "sows"           => "sow",
+  "speaks"         => "speak",
+  "speeds"         => "speed",
+  "spends"         => "spend",
+  "spits"          => "spit",
+  "spoils"         => "spoil",
+  "springs"        => "spring",
+  "stands"         => "stand",
+  "staves"         => "stave",
+  "stays"          => "stay",
+  "steals"         => "steal",
+  "stings"         => "sting",
+  "stinks"         => "stink",
+  "stops"          => "stop",
+  "strews"         => "strew",
+  "strides"        => "stride",
+  "strips"         => "strip",
+  "strives"        => "strive",
+  "sublets"        => "sublet",
+  "sunburns"       => "sunburn",
+  "swears"         => "swear",
+  "sweats"         => "sweat",
+  "sweeps"         => "sweep",
+  "swells"         => "swell",
+  "swims"          => "swim",
+  "swings"         => "swing",
+  "talks"          => "talk",
+  "tears"          => "tear",
+  "thrives"        => "thrive",
+  "thrusts"        => "thrust",
+  "treads"         => "tread",
+  "undergoes"      => "undergo",
+  "understands"    => "understand",
+  "undertakes"     => "undertake",
+  "upsets"         => "upset",
+  "vexes"          => "vex",
+  "waits"          => "wait",
+  "wakes"          => "wake",
+  "walks"          => "walk",
+  "wants"          => "want",
+  "was"            => "were",
+  "watches"        => "watch",
+  "wears"          => "wear",
+  "weeps"          => "weep",
+  "wends"          => "wend",
+  "will"           => "will",
+  "wins"           => "win",
+  "withdraws"      => "withdraw",
+  "withholds"      => "withhold",
+  "withstands"     => "withstand",
+  "won't"          => "won't",
+  "would"          => "would",
+  "wrings"         => "wring",
 };
 
 my $singular_of = {
@@ -228,6 +244,7 @@ my $singular_of = {
   "abide"         => "abides",
   "ache"          => "aches",
   "are"           => "is",
+  "aren't"        => "isn't",
   "arise"         => "arises",
   "ask"           => "asks",
   "avalanche"     => "avalanches",
@@ -254,6 +271,7 @@ my $singular_of = {
   "bust"          => "busts",
   "cache"         => "caches",
   "can"           => "can",
+  "can't"         => "can't",
   "catch"         => "catches",
   "change"        => "changes",
   "choose"        => "chooses",
@@ -266,10 +284,12 @@ my $singular_of = {
   "creche"        => "creches",
   "creep"         => "creeps",
   "dare"          => "dares",
+  "daren't"       => "daren't",
   "deal"          => "deals",
   "die"           => "dies",
   "dig"           => "digs",
   "dive"          => "dives",
+  "don't"         => "doesn't",
   "douche"        => "douches",
   "drag"          => "drags",
   "dream"         => "dreams",
@@ -299,6 +319,7 @@ my $singular_of = {
   "grind"         => "grinds",
   "happen"        => "happens",
   "have"          => "has",
+  "haven't"       => "hasn't",
   "help"          => "helps",
   "hew"           => "hews",
   "hit"           => "hits",
@@ -326,6 +347,7 @@ my $singular_of = {
   "lose"          => "loses",
   "love"          => "loves",
   "may"           => "may",
+  "mayn't"        => "mayn't",
   "mean"          => "means",
   "meet"          => "meets",
   "menu"          => "menus",
@@ -335,9 +357,13 @@ my $singular_of = {
   "misunderstand" => "misunderstands",
   "move"          => "moves",
   "must"          => "must",
+  "mustn't"       => "mustn't",
+  "n't"           => "n't",
   "need"          => "needs",
+  "needn't"       => "needn't",
   "niche"         => "niches",
   "ought"         => "ought",
+  "oughtn't"      => "oughtn't",
   "overdraw"      => "overdraws",
   "overhear"      => "overhears",
   "overtake"      => "overtakes",
@@ -361,8 +387,10 @@ my $singular_of = {
   "saw"           => "saws",
   "seek"          => "seeks",
   "seem"          => "seems",
+  "sha'n't"       => "sha'n't",
   "shake"         => "shakes",
   "shall"         => "shall",
+  "shan't"        => "shan't",
   "shave"         => "shaves",
   "shed"          => "sheds",
   "shit"          => "shits",
@@ -431,6 +459,7 @@ my $singular_of = {
   "withdraw"      => "withdraws",
   "withhold"      => "withholds",
   "withstand"     => "withstands",
+  "won't"         => "won't",
   "would"         => "would",
   "wring"         => "wrings",
 };
@@ -448,6 +477,7 @@ my $past_of = {
   "aching"           => "ached",
   "am"               => "was",
   "are"              => "were",
+  "aren't"           => "wasn't",
   "arise"            => "arose",
   "arisen"           => "arose",
   "arises"           => "arose",
@@ -547,6 +577,7 @@ my $past_of = {
   "caches"           => "cached",
   "caching"          => "cached",
   "can"              => "could",
+  "can't"            => "couldn't",
   "catch"            => "caught",
   "catches"          => "caught",
   "catching"         => "caught",
@@ -588,6 +619,7 @@ my $past_of = {
   "crept"            => "crept",
   "dare"             => "dared",
   "dared"            => "dared",
+  "daren't"          => "_",
   "dares"            => "dared",
   "daring"           => "dared",
   "deal"             => "dealt",
@@ -604,6 +636,8 @@ my $past_of = {
   "dived"            => "dived",
   "dives"            => "dived",
   "diving"           => "dived",
+  "doesn't"          => "didn't",
+  "don't"            => "didn't",
   "douche"           => "douched",
   "douched"          => "douched",
   "douches"          => "douched",
@@ -720,7 +754,9 @@ my $past_of = {
   "happening"        => "happened",
   "happens"          => "happened",
   "has"              => "had",
+  "hasn't"           => "hadn't",
   "have"             => "had",
+  "haven't"          => "hadn't",
   "having"           => "had",
   "held"             => "held",
   "help"             => "helped",
@@ -757,6 +793,7 @@ my $past_of = {
   "irises"           => "irised",
   "irising"          => "irised",
   "is"               => "was",
+  "isn't"            => "wasn't",
   "keep"             => "kept",
   "keeping"          => "kept",
   "keeps"            => "kept",
@@ -826,6 +863,7 @@ my $past_of = {
   "loving"           => "loved",
   "lying"            => "lay",
   "may"              => "might",
+  "mayn't"           => "mightn't",
   "mean"             => "meant",
   "meaning"          => "meant",
   "means"            => "meant",
@@ -856,15 +894,19 @@ my $past_of = {
   "moves"            => "moved",
   "moving"           => "moved",
   "must"             => "_",
+  "mustn't"          => "_",
+  "n't"              => "_",
   "need"             => "needed",
   "needed"           => "needed",
   "needing"          => "needed",
+  "needn't"          => "_",
   "needs"            => "needed",
   "niche"            => "niched",
   "niched"           => "niched",
   "nicheing"         => "niched",
   "niches"           => "niched",
   "ought"            => "_",
+  "oughtn't"         => "_",
   "overdraw"         => "overdrew",
   "overdrawing"      => "overdrew",
   "overdrawn"        => "overdrew",
@@ -954,11 +996,13 @@ my $past_of = {
   "seemed"           => "seemed",
   "seeming"          => "seemed",
   "seems"            => "seemed",
+  "sha'n't"          => "shouldn't",
   "shake"            => "shook",
   "shaken"           => "shook",
   "shakes"           => "shook",
   "shaking"          => "shook",
   "shall"            => "should",
+  "shan't"           => "shouldn't",
   "shave"            => "shaved",
   "shaved"           => "shaved",
   "shaves"           => "shaved",
@@ -1217,6 +1261,7 @@ my $past_of = {
   "withstood"        => "withstood",
   "woken"            => "woke",
   "won"              => "won",
+  "won't"            => "wouldn't",
   "worn"             => "wore",
   "would"            => "_",
   "wring"            => "wrung",
@@ -1238,6 +1283,7 @@ my $pres_part_of = {
   "aching"           => "aching",
   "am"               => "being",
   "are"              => "being",
+  "aren't"           => "_",
   "arise"            => "arising",
   "arisen"           => "arising",
   "arises"           => "arising",
@@ -1347,6 +1393,7 @@ my $pres_part_of = {
   "caching"          => "caching",
   "came"             => "coming",
   "can"              => "_",
+  "can't"            => "_",
   "catch"            => "catching",
   "catches"          => "catching",
   "catching"         => "catching",
@@ -1379,6 +1426,7 @@ my $pres_part_of = {
   "costing"          => "costing",
   "costs"            => "costing",
   "could"            => "_",
+  "couldn't"         => "_",
   "creche"           => "creching",
   "creched"          => "creching",
   "creches"          => "creching",
@@ -1389,12 +1437,14 @@ my $pres_part_of = {
   "crept"            => "creeping",
   "dare"             => "daring",
   "dared"            => "daring",
+  "daren't"          => "_",
   "dares"            => "daring",
   "daring"           => "daring",
   "deal"             => "dealing",
   "dealing"          => "dealing",
   "deals"            => "dealing",
   "dealt"            => "dealing",
+  "didn't"           => "_",
   "die"              => "dying",
   "died"             => "dying",
   "dies"             => "dying",
@@ -1405,6 +1455,8 @@ my $pres_part_of = {
   "dived"            => "diving",
   "dives"            => "diving",
   "diving"           => "diving",
+  "doesn't"          => "_",
+  "don't"            => "_",
   "douche"           => "douching",
   "douched"          => "douching",
   "douches"          => "douching",
@@ -1527,12 +1579,15 @@ my $pres_part_of = {
   "grinds"           => "grinding",
   "ground"           => "grinding",
   "had"              => "having",
+  "hadn't"           => "_",
   "happen"           => "happening",
   "happened"         => "happening",
   "happening"        => "happening",
   "happens"          => "happening",
   "has"              => "having",
+  "hasn't"           => "_",
   "have"             => "having",
+  "haven't"          => "_",
   "having"           => "having",
   "held"             => "holding",
   "help"             => "helping",
@@ -1570,6 +1625,7 @@ my $pres_part_of = {
   "irises"           => "irising",
   "irising"          => "irising",
   "is"               => "being",
+  "isn't"            => "_",
   "keep"             => "keeping",
   "keeping"          => "keeping",
   "keeps"            => "keeping",
@@ -1640,6 +1696,7 @@ my $pres_part_of = {
   "loving"           => "loving",
   "lying"            => "lying",
   "may"              => "_",
+  "mayn't"           => "_",
   "mean"             => "meaning",
   "meaning"          => "meaning",
   "means"            => "meaning",
@@ -1653,6 +1710,7 @@ my $pres_part_of = {
   "menus"            => "menuing",
   "met"              => "meeting",
   "might"            => "_",
+  "mightn't"         => "_",
   "mislead"          => "misleading",
   "misleading"       => "misleading",
   "misleads"         => "misleading",
@@ -1671,15 +1729,19 @@ my $pres_part_of = {
   "moves"            => "moving",
   "moving"           => "moving",
   "must"             => "_",
+  "mustn't"          => "_",
+  "n't"              => "_",
   "need"             => "needing",
   "needed"           => "needing",
   "needing"          => "needing",
+  "needn't"          => "_",
   "needs"            => "needing",
   "niche"            => "nicheing",
   "niched"           => "nicheing",
   "nicheing"         => "nicheing",
   "niches"           => "nicheing",
   "ought"            => "_",
+  "oughtn't"         => "_",
   "overdraw"         => "overdrawing",
   "overdrawing"      => "overdrawing",
   "overdrawn"        => "overdrawing",
@@ -1779,11 +1841,13 @@ my $pres_part_of = {
   "seemed"           => "seeming",
   "seeming"          => "seeming",
   "seems"            => "seeming",
+  "sha'n't"          => "_",
   "shake"            => "shaking",
   "shaken"           => "shaking",
   "shakes"           => "shaking",
   "shaking"          => "shaking",
   "shall"            => "_",
+  "shan't"           => "_",
   "shat"             => "shitting",
   "shave"            => "shaving",
   "shaved"           => "shaving",
@@ -1802,6 +1866,7 @@ my $pres_part_of = {
   "shoes"            => "shoeing",
   "shook"            => "shaking",
   "should"           => "_",
+  "shouldn't"        => "_",
   "show"             => "showing",
   "showed"           => "showing",
   "showing"          => "showing",
@@ -2029,6 +2094,7 @@ my $pres_part_of = {
   "wanting"          => "wanting",
   "wants"            => "wanting",
   "was"              => "being",
+  "wasn't"           => "_",
   "watch"            => "watching",
   "watched"          => "watching",
   "watches"          => "watching",
@@ -2046,6 +2112,7 @@ my $pres_part_of = {
   "went"             => "going",
   "wept"             => "weeping",
   "were"             => "being",
+  "weren't"          => "_",
   "will"             => "_",
   "win"              => "winning",
   "winning"          => "winning",
@@ -2066,9 +2133,11 @@ my $pres_part_of = {
   "woke"             => "waking",
   "woken"            => "waking",
   "won"              => "winning",
+  "won't"            => "_",
   "wore"             => "wearing",
   "worn"             => "wearing",
   "would"            => "_",
+  "wouldn't"         => "_",
   "wring"            => "wringing",
   "wringing"         => "wringing",
   "wrings"           => "wringing",
@@ -2088,6 +2157,7 @@ my $past_part_of = {
   "aching"           => "ached",
   "am"               => "been",
   "are"              => "been",
+  "aren't"           => "_",
   "arise"            => "arisen",
   "arisen"           => "arisen",
   "arises"           => "arisen",
@@ -2197,6 +2267,7 @@ my $past_part_of = {
   "caching"          => "cached",
   "came"             => "come",
   "can"              => "_",
+  "can't"            => "_",
   "catch"            => "caught",
   "catches"          => "caught",
   "catching"         => "caught",
@@ -2229,6 +2300,7 @@ my $past_part_of = {
   "costing"          => "cost",
   "costs"            => "cost",
   "could"            => "_",
+  "couldn't"         => "_",
   "creche"           => "creched",
   "creched"          => "creched",
   "creches"          => "creched",
@@ -2239,12 +2311,14 @@ my $past_part_of = {
   "crept"            => "crept",
   "dare"             => "dared",
   "dared"            => "dared",
+  "daren't"          => "_",
   "dares"            => "dared",
   "daring"           => "dared",
   "deal"             => "dealt",
   "dealing"          => "dealt",
   "deals"            => "dealt",
   "dealt"            => "dealt",
+  "didn't"           => "_",
   "die"              => "died",
   "died"             => "died",
   "dies"             => "died",
@@ -2255,6 +2329,8 @@ my $past_part_of = {
   "dived"            => "dived",
   "dives"            => "dived",
   "diving"           => "dived",
+  "doesn't"          => "_",
+  "don't"            => "_",
   "douche"           => "douched",
   "douched"          => "douched",
   "douches"          => "douched",
@@ -2377,12 +2453,15 @@ my $past_part_of = {
   "grinds"           => "ground",
   "ground"           => "ground",
   "had"              => "had",
+  "hadn't"           => "_",
   "happen"           => "happened",
   "happened"         => "happened",
   "happening"        => "happened",
   "happens"          => "happened",
   "has"              => "had",
+  "hasn't"           => "_",
   "have"             => "had",
+  "haven't"          => "_",
   "having"           => "had",
   "held"             => "held",
   "help"             => "helped",
@@ -2420,6 +2499,7 @@ my $past_part_of = {
   "irises"           => "irised",
   "irising"          => "irised",
   "is"               => "been",
+  "isn't"            => "_",
   "keep"             => "kept",
   "keeping"          => "kept",
   "keeps"            => "kept",
@@ -2490,6 +2570,7 @@ my $past_part_of = {
   "loving"           => "loved",
   "lying"            => "lain",
   "may"              => "_",
+  "mayn't"           => "_",
   "mean"             => "meant",
   "meaning"          => "meant",
   "means"            => "meant",
@@ -2503,6 +2584,7 @@ my $past_part_of = {
   "menus"            => "menued",
   "met"              => "met",
   "might"            => "_",
+  "mightn't"         => "_",
   "mislead"          => "misled",
   "misleading"       => "misled",
   "misleads"         => "misled",
@@ -2521,15 +2603,19 @@ my $past_part_of = {
   "moves"            => "moved",
   "moving"           => "moved",
   "must"             => "_",
+  "mustn't"          => "_",
+  "n't"              => "_",
   "need"             => "needed",
   "needed"           => "needed",
   "needing"          => "needed",
+  "needn't"          => "_",
   "needs"            => "needed",
   "niche"            => "niched",
   "niched"           => "niched",
   "nicheing"         => "niched",
   "niches"           => "niched",
   "ought"            => "_",
+  "oughtn't"         => "_",
   "overdraw"         => "overdrawn",
   "overdrawing"      => "overdrawn",
   "overdrawn"        => "overdrawn",
@@ -2629,11 +2715,13 @@ my $past_part_of = {
   "seemed"           => "seemed",
   "seeming"          => "seemed",
   "seems"            => "seemed",
+  "sha'n't"          => "_",
   "shake"            => "shaken",
   "shaken"           => "shaken",
   "shakes"           => "shaken",
   "shaking"          => "shaken",
   "shall"            => "_",
+  "shan't"           => "_",
   "shat"             => "shitted",
   "shave"            => "shaved",
   "shaved"           => "shaved",
@@ -2652,6 +2740,7 @@ my $past_part_of = {
   "shoes"            => "shod",
   "shook"            => "shaken",
   "should"           => "_",
+  "shouldn't"        => "_",
   "show"             => "shown",
   "showed"           => "shown",
   "showing"          => "shown",
@@ -2879,6 +2968,7 @@ my $past_part_of = {
   "wanting"          => "wanted",
   "wants"            => "wanted",
   "was"              => "been",
+  "wasn't"           => "_",
   "watch"            => "watched",
   "watched"          => "watched",
   "watches"          => "watched",
@@ -2896,6 +2986,7 @@ my $past_part_of = {
   "went"             => "gone",
   "wept"             => "wept",
   "were"             => "been",
+  "weren't"          => "_",
   "will"             => "_",
   "win"              => "won",
   "winning"          => "won",
@@ -2916,9 +3007,11 @@ my $past_part_of = {
   "woke"             => "woken",
   "woken"            => "woken",
   "won"              => "won",
+  "won't"            => "_",
   "wore"             => "worn",
   "worn"             => "worn",
   "would"            => "_",
+  "wouldn't"         => "_",
   "wring"            => "wrung",
   "wringing"         => "wrung",
   "wrings"           => "wrung",
@@ -2948,9 +3041,11 @@ sub convert_to_plural {
     my ($word) = @_;
     return $plural_of->{$word}     if exists $plural_of->{$word};
     return $plural_of->{lc $word}  if exists $plural_of->{lc $word};
-    return $plural_of->{tc $word}  if exists $plural_of->{ucfirst lc $word};
+    return $plural_of->{tc $word}  if exists $plural_of->{tc $word};
     return $word                     if is_plural($word);
     given ($word) {
+        when (m{(.*)n't$}i) { return "${1}n't"; }
+        when (m{(.*)shears$}i) { return "${1}shear"; }
         when (m{(.*)bears$}i) { return "${1}bear"; }
         when (m{(.*)bids$}i) { return "${1}bid"; }
         when (m{(.*)buys$}i) { return "${1}buy"; }
@@ -2958,6 +3053,7 @@ sub convert_to_plural {
         when (m{(.*)clads$}i) { return "${1}clad"; }
         when (m{(.*)cuts$}i) { return "${1}cut"; }
         when (m{(.*)does$}i) { return "${1}do"; }
+        when (m{(.*)do$}i) { return "${1}do"; }
         when (m{(.*)draws$}i) { return "${1}draw"; }
         when (m{(.*)feeds$}i) { return "${1}feed"; }
         when (m{(.*)freezes$}i) { return "${1}freeze"; }
@@ -2980,7 +3076,6 @@ sub convert_to_plural {
         when (m{(.*)sends$}i) { return "${1}send"; }
         when (m{(.*)sets$}i) { return "${1}set"; }
         when (m{(.*)sews$}i) { return "${1}sew"; }
-        when (m{(.*)shears$}i) { return "${1}shear"; }
         when (m{(.*)shines$}i) { return "${1}shine"; }
         when (m{(.*)shoots$}i) { return "${1}shoot"; }
         when (m{(.*)shuts$}i) { return "${1}shut"; }
@@ -3026,7 +3121,7 @@ sub convert_to_plural {
         when (m{(.*)turns$}i) { return "${1}turn"; }
         when (m{(.*)uses$}i) { return "${1}use"; }
         when (m{(.*)works$}i) { return "${1}work"; }
-        when (m{(.*)n't$}i) { return "${1}n't"; }
+        when (m{(.*)aes$}i) { return "${1}ae"; }
         when (m{(.*[aeiou])ys$}i) { return "${1}y"; }
         when (m{(.*[aiy])nxes$}i) { return "${1}nx"; }
         when (m{(.*)ceps$}i) { return "${1}ceps"; }
@@ -3043,9 +3138,6 @@ sub convert_to_plural {
         when (m{(.*)is$}i) { return "${1}i"; }
         when (m{(.*)ees$}i) { return "${1}ee"; }
         when (m{(.*)yes$}i) { return "${1}ye"; }
-        when (m{(.*[au])es$}i) { return "${1}e"; }
-        when (m{(.*[^b])is$}i) { return "${1}i"; }
-        when (m{(.*)sses$}i) { return "${1}ss"; }
         when (m{(.*)ies$}i) { return "${1}y"; }
         when (m{(.*)ys$}i) { return "${1}y"; }
         when (m{(.*[^e])es$}i) { return "${1}e"; }
@@ -3059,9 +3151,11 @@ sub convert_to_singular {
     my ($word) = @_;
     return $singular_of->{$word}     if exists $singular_of->{$word};
     return $singular_of->{lc $word}  if exists $singular_of->{lc $word};
-    return $singular_of->{tc $word}  if exists $singular_of->{ucfirst lc $word};
+    return $singular_of->{tc $word}  if exists $singular_of->{tc $word};
     return $word                     if is_singular($word);
     given ($word) {
+        when (m{(.*)n't$}i) { return "${1}n't"; }
+        when (m{(.*)shear$}i) { return "${1}shears"; }
         when (m{(.*)bear$}i) { return "${1}bears"; }
         when (m{(.*)bid$}i) { return "${1}bids"; }
         when (m{(.*)buy$}i) { return "${1}buys"; }
@@ -3069,6 +3163,7 @@ sub convert_to_singular {
         when (m{(.*)clad$}i) { return "${1}clads"; }
         when (m{(.*)cut$}i) { return "${1}cuts"; }
         when (m{(.*)do$}i) { return "${1}does"; }
+        when (m{(.*)do$}i) { return "${1}do"; }
         when (m{(.*)draw$}i) { return "${1}draws"; }
         when (m{(.*)feed$}i) { return "${1}feeds"; }
         when (m{(.*)freeze$}i) { return "${1}freezes"; }
@@ -3091,7 +3186,6 @@ sub convert_to_singular {
         when (m{(.*)send$}i) { return "${1}sends"; }
         when (m{(.*)set$}i) { return "${1}sets"; }
         when (m{(.*)sew$}i) { return "${1}sews"; }
-        when (m{(.*)shear$}i) { return "${1}shears"; }
         when (m{(.*)shine$}i) { return "${1}shines"; }
         when (m{(.*)shoot$}i) { return "${1}shoots"; }
         when (m{(.*)shut$}i) { return "${1}shuts"; }
@@ -3137,7 +3231,7 @@ sub convert_to_singular {
         when (m{(.*)turn$}i) { return "${1}turns"; }
         when (m{(.*)use$}i) { return "${1}uses"; }
         when (m{(.*)work$}i) { return "${1}works"; }
-        when (m{(.*)n't$}i) { return "${1}n't"; }
+        when (m{(.*)ae$}i) { return "${1}aes"; }
         when (m{(.*[aeiou])y$}i) { return "${1}ys"; }
         when (m{(.*[aiy])nx$}i) { return "${1}nxes"; }
         when (m{(.*)ceps$}i) { return "${1}ceps"; }
@@ -3154,9 +3248,6 @@ sub convert_to_singular {
         when (m{(.*)i$}i) { return "${1}is"; }
         when (m{(.*)ee$}i) { return "${1}ees"; }
         when (m{(.*)ye$}i) { return "${1}yes"; }
-        when (m{(.*[au])e$}i) { return "${1}es"; }
-        when (m{(.*[^b])i$}i) { return "${1}is"; }
-        when (m{(.*)ss$}i) { return "${1}sses"; }
         when (m{(.*)y$}i) { return "${1}ies"; }
         when (m{(.*)y$}i) { return "${1}ys"; }
         when (m{(.*[^e])e$}i) { return "${1}es"; }
@@ -3170,207 +3261,300 @@ sub convert_to_past {
     my ($word) = @_;
     return $past_of->{$word}     if exists $past_of->{$word};
     return $past_of->{lc $word}  if exists $past_of->{lc $word};
-    return $past_of->{tc $word}  if exists $past_of->{ucfirst lc $word};
+    return $past_of->{tc $word}  if exists $past_of->{tc $word};
     return $word                     if is_past($word);
     given ($word) {
+        when (m{(.*)shears$}i) { return "${1}sheared"; }
+        when (m{(.*)shear$}i) { return "${1}sheared"; }
+        when (m{(.*)shorn$}i) { return "${1}sheared"; }
         when (m{(.*)bears$}i) { return "${1}bore"; }
         when (m{(.*)bear$}i) { return "${1}bore"; }
+        when (m{(.*)borne$}i) { return "${1}bore"; }
         when (m{(.*)bids$}i) { return "${1}bade"; }
         when (m{(.*)bid$}i) { return "${1}bade"; }
+        when (m{(.*)bidden$}i) { return "${1}bade"; }
         when (m{(.*)buys$}i) { return "${1}bought"; }
         when (m{(.*)buy$}i) { return "${1}bought"; }
+        when (m{(.*)bought$}i) { return "${1}bought"; }
         when (m{(.*)casts$}i) { return "${1}cast"; }
+        when (m{(.*)cast$}i) { return "${1}cast"; }
         when (m{(.*)cast$}i) { return "${1}cast"; }
         when (m{(.*)clads$}i) { return "${1}clad"; }
         when (m{(.*)clad$}i) { return "${1}clad"; }
+        when (m{(.*)clad$}i) { return "${1}clad"; }
         when (m{(.*)cuts$}i) { return "${1}cut"; }
+        when (m{(.*)cut$}i) { return "${1}cut"; }
         when (m{(.*)cut$}i) { return "${1}cut"; }
         when (m{(.*)does$}i) { return "${1}did"; }
         when (m{(.*)do$}i) { return "${1}did"; }
+        when (m{(.*)done$}i) { return "${1}did"; }
+        when (m{(.*)do$}i) { return "${1}did"; }
+        when (m{(.*)do$}i) { return "${1}did"; }
+        when (m{(.*)done$}i) { return "${1}did"; }
         when (m{(.*)draws$}i) { return "${1}drew"; }
         when (m{(.*)draw$}i) { return "${1}drew"; }
+        when (m{(.*)drawn$}i) { return "${1}drew"; }
         when (m{(.*)feeds$}i) { return "${1}fed"; }
         when (m{(.*)feed$}i) { return "${1}fed"; }
+        when (m{(.*)fed$}i) { return "${1}fed"; }
         when (m{(.*)freezes$}i) { return "${1}froze"; }
         when (m{(.*)freeze$}i) { return "${1}froze"; }
+        when (m{(.*)frozen$}i) { return "${1}froze"; }
         when (m{(.*)grows$}i) { return "${1}grew"; }
         when (m{(.*)grow$}i) { return "${1}grew"; }
+        when (m{(.*)grown$}i) { return "${1}grew"; }
         when (m{(.*)hangs$}i) { return "${1}hung"; }
         when (m{(.*)hang$}i) { return "${1}hung"; }
+        when (m{(.*)hung$}i) { return "${1}hung"; }
         when (m{(.*)hears$}i) { return "${1}heard"; }
         when (m{(.*)hear$}i) { return "${1}heard"; }
+        when (m{(.*)heard$}i) { return "${1}heard"; }
         when (m{(.*)hides$}i) { return "${1}hid"; }
         when (m{(.*)hide$}i) { return "${1}hid"; }
+        when (m{(.*)hidden$}i) { return "${1}hid"; }
         when (m{(.*)inputs$}i) { return "${1}input"; }
+        when (m{(.*)input$}i) { return "${1}input"; }
         when (m{(.*)input$}i) { return "${1}input"; }
         when (m{(.*)knits$}i) { return "${1}knitted"; }
         when (m{(.*)knit$}i) { return "${1}knitted"; }
+        when (m{(.*)knitted$}i) { return "${1}knitted"; }
         when (m{(.*)lends$}i) { return "${1}lent"; }
         when (m{(.*)lend$}i) { return "${1}lent"; }
+        when (m{(.*)lent$}i) { return "${1}lent"; }
         when (m{(.*)lets$}i) { return "${1}let"; }
+        when (m{(.*)let$}i) { return "${1}let"; }
         when (m{(.*)let$}i) { return "${1}let"; }
         when (m{(.*)lights$}i) { return "${1}lit"; }
         when (m{(.*)light$}i) { return "${1}lit"; }
+        when (m{(.*)lit$}i) { return "${1}lit"; }
         when (m{(.*)makes$}i) { return "${1}made"; }
         when (m{(.*)make$}i) { return "${1}made"; }
+        when (m{(.*)made$}i) { return "${1}made"; }
         when (m{(.*)mows$}i) { return "${1}mowed"; }
         when (m{(.*)mow$}i) { return "${1}mowed"; }
+        when (m{(.*)mown$}i) { return "${1}mowed"; }
         when (m{(.*)pays$}i) { return "${1}paid"; }
         when (m{(.*)pay$}i) { return "${1}paid"; }
+        when (m{(.*)paid$}i) { return "${1}paid"; }
         when (m{(.*)reads$}i) { return "${1}read"; }
+        when (m{(.*)read$}i) { return "${1}read"; }
         when (m{(.*)read$}i) { return "${1}read"; }
         when (m{(.*)says$}i) { return "${1}said"; }
         when (m{(.*)say$}i) { return "${1}said"; }
+        when (m{(.*)said$}i) { return "${1}said"; }
         when (m{(.*)sees$}i) { return "${1}saw"; }
         when (m{(.*)see$}i) { return "${1}saw"; }
+        when (m{(.*)seen$}i) { return "${1}saw"; }
         when (m{(.*)sells$}i) { return "${1}sold"; }
         when (m{(.*)sell$}i) { return "${1}sold"; }
+        when (m{(.*)sold$}i) { return "${1}sold"; }
         when (m{(.*)sends$}i) { return "${1}sent"; }
         when (m{(.*)send$}i) { return "${1}sent"; }
+        when (m{(.*)sent$}i) { return "${1}sent"; }
         when (m{(.*)sets$}i) { return "${1}set"; }
+        when (m{(.*)set$}i) { return "${1}set"; }
         when (m{(.*)set$}i) { return "${1}set"; }
         when (m{(.*)sews$}i) { return "${1}sewed"; }
         when (m{(.*)sew$}i) { return "${1}sewed"; }
-        when (m{(.*)shears$}i) { return "${1}sheared"; }
-        when (m{(.*)shear$}i) { return "${1}sheared"; }
+        when (m{(.*)sewn$}i) { return "${1}sewed"; }
         when (m{(.*)shines$}i) { return "${1}shone"; }
         when (m{(.*)shine$}i) { return "${1}shone"; }
+        when (m{(.*)shone$}i) { return "${1}shone"; }
         when (m{(.*)shoots$}i) { return "${1}shot"; }
         when (m{(.*)shoot$}i) { return "${1}shot"; }
+        when (m{(.*)shot$}i) { return "${1}shot"; }
         when (m{(.*)shuts$}i) { return "${1}shut"; }
+        when (m{(.*)shut$}i) { return "${1}shut"; }
         when (m{(.*)shut$}i) { return "${1}shut"; }
         when (m{(.*)sleeps$}i) { return "${1}slept"; }
         when (m{(.*)sleep$}i) { return "${1}slept"; }
+        when (m{(.*)slept$}i) { return "${1}slept"; }
         when (m{(.*)slings$}i) { return "${1}slung"; }
         when (m{(.*)sling$}i) { return "${1}slung"; }
+        when (m{(.*)slung$}i) { return "${1}slung"; }
         when (m{(.*)spins$}i) { return "${1}spun"; }
         when (m{(.*)spin$}i) { return "${1}spun"; }
+        when (m{(.*)spun$}i) { return "${1}spun"; }
         when (m{(.*)splits$}i) { return "${1}split"; }
+        when (m{(.*)split$}i) { return "${1}split"; }
         when (m{(.*)split$}i) { return "${1}split"; }
         when (m{(.*)spreads$}i) { return "${1}spread"; }
         when (m{(.*)spread$}i) { return "${1}spread"; }
+        when (m{(.*)spread$}i) { return "${1}spread"; }
         when (m{(.*)sticks$}i) { return "${1}stuck"; }
         when (m{(.*)stick$}i) { return "${1}stuck"; }
+        when (m{(.*)stuck$}i) { return "${1}stuck"; }
         when (m{(.*)strikes$}i) { return "${1}struck"; }
         when (m{(.*)strike$}i) { return "${1}struck"; }
+        when (m{(.*)struck$}i) { return "${1}struck"; }
         when (m{(.*)strings$}i) { return "${1}strung"; }
         when (m{(.*)string$}i) { return "${1}strung"; }
+        when (m{(.*)strung$}i) { return "${1}strung"; }
         when (m{(.*)takes$}i) { return "${1}took"; }
         when (m{(.*)take$}i) { return "${1}took"; }
+        when (m{(.*)taken$}i) { return "${1}took"; }
         when (m{(.*)teaches$}i) { return "${1}taught"; }
         when (m{(.*)teach$}i) { return "${1}taught"; }
+        when (m{(.*)taught$}i) { return "${1}taught"; }
         when (m{(.*)tells$}i) { return "${1}told"; }
         when (m{(.*)tell$}i) { return "${1}told"; }
+        when (m{(.*)told$}i) { return "${1}told"; }
         when (m{(.*)thinks$}i) { return "${1}thought"; }
         when (m{(.*)think$}i) { return "${1}thought"; }
+        when (m{(.*)thought$}i) { return "${1}thought"; }
         when (m{(.*)throws$}i) { return "${1}threw"; }
         when (m{(.*)throw$}i) { return "${1}threw"; }
+        when (m{(.*)thrown$}i) { return "${1}threw"; }
         when (m{(.*)tries$}i) { return "${1}tried"; }
         when (m{(.*)try$}i) { return "${1}tried"; }
+        when (m{(.*)tried$}i) { return "${1}tried"; }
         when (m{(.*)weaves$}i) { return "${1}wove"; }
         when (m{(.*)weave$}i) { return "${1}wove"; }
+        when (m{(.*)woven$}i) { return "${1}wove"; }
         when (m{(.*)weds$}i) { return "${1}wed"; }
+        when (m{(.*)wed$}i) { return "${1}wed"; }
         when (m{(.*)wed$}i) { return "${1}wed"; }
         when (m{(.*)wets$}i) { return "${1}wet"; }
         when (m{(.*)wet$}i) { return "${1}wet"; }
+        when (m{(.*)wetted$}i) { return "${1}wet"; }
         when (m{(.*)winds$}i) { return "${1}wound"; }
         when (m{(.*)wind$}i) { return "${1}wound"; }
+        when (m{(.*)wound$}i) { return "${1}wound"; }
         when (m{(.*)writes$}i) { return "${1}wrote"; }
         when (m{(.*)write$}i) { return "${1}wrote"; }
+        when (m{(.*)written$}i) { return "${1}wrote"; }
         when (m{(.*)adds$}i) { return "${1}added"; }
         when (m{(.*)add$}i) { return "${1}added"; }
+        when (m{(.*)added$}i) { return "${1}added"; }
         when (m{(.*)alights$}i) { return "${1}alighted"; }
         when (m{(.*)alight$}i) { return "${1}alighted"; }
+        when (m{(.*)alighted$}i) { return "${1}alighted"; }
         when (m{(.*)allows$}i) { return "${1}allowed"; }
         when (m{(.*)allow$}i) { return "${1}allowed"; }
+        when (m{(.*)allowed$}i) { return "${1}allowed"; }
         when (m{(.*)appears$}i) { return "${1}appeared"; }
         when (m{(.*)appear$}i) { return "${1}appeared"; }
+        when (m{(.*)appeared$}i) { return "${1}appeared"; }
         when (m{(.*)believes$}i) { return "${1}believed"; }
         when (m{(.*)believe$}i) { return "${1}believed"; }
+        when (m{(.*)believed$}i) { return "${1}believed"; }
         when (m{(.*)calls$}i) { return "${1}called"; }
         when (m{(.*)call$}i) { return "${1}called"; }
+        when (m{(.*)called$}i) { return "${1}called"; }
         when (m{(.*)clothes$}i) { return "${1}clothed"; }
         when (m{(.*)clothe$}i) { return "${1}clothed"; }
+        when (m{(.*)clothed$}i) { return "${1}clothed"; }
         when (m{(.*)considers$}i) { return "${1}considered"; }
         when (m{(.*)consider$}i) { return "${1}considered"; }
+        when (m{(.*)considered$}i) { return "${1}considered"; }
         when (m{(.*)creates$}i) { return "${1}created"; }
         when (m{(.*)create$}i) { return "${1}created"; }
+        when (m{(.*)created$}i) { return "${1}created"; }
         when (m{(.*)fits$}i) { return "${1}fitted"; }
         when (m{(.*)fit$}i) { return "${1}fitted"; }
+        when (m{(.*)fitted$}i) { return "${1}fitted"; }
         when (m{(.*)includes$}i) { return "${1}included"; }
         when (m{(.*)include$}i) { return "${1}included"; }
+        when (m{(.*)included$}i) { return "${1}included"; }
         when (m{(.*)melts$}i) { return "${1}melted"; }
         when (m{(.*)melt$}i) { return "${1}melted"; }
+        when (m{(.*)melted$}i) { return "${1}melted"; }
         when (m{(.*)offers$}i) { return "${1}offered"; }
         when (m{(.*)offer$}i) { return "${1}offered"; }
+        when (m{(.*)offered$}i) { return "${1}offered"; }
         when (m{(.*)opens$}i) { return "${1}opened"; }
         when (m{(.*)open$}i) { return "${1}opened"; }
+        when (m{(.*)opened$}i) { return "${1}opened"; }
         when (m{(.*)plays$}i) { return "${1}played"; }
         when (m{(.*)play$}i) { return "${1}played"; }
+        when (m{(.*)played$}i) { return "${1}played"; }
         when (m{(.*)serves$}i) { return "${1}served"; }
         when (m{(.*)serve$}i) { return "${1}served"; }
+        when (m{(.*)served$}i) { return "${1}served"; }
         when (m{(.*)smells$}i) { return "${1}smelled"; }
         when (m{(.*)smell$}i) { return "${1}smelled"; }
+        when (m{(.*)smelled$}i) { return "${1}smelled"; }
         when (m{(.*)spells$}i) { return "${1}spelled"; }
         when (m{(.*)spell$}i) { return "${1}spelled"; }
+        when (m{(.*)spelled$}i) { return "${1}spelled"; }
         when (m{(.*)spills$}i) { return "${1}spilled"; }
         when (m{(.*)spill$}i) { return "${1}spilled"; }
+        when (m{(.*)spilled$}i) { return "${1}spilled"; }
         when (m{(.*)starts$}i) { return "${1}started"; }
         when (m{(.*)start$}i) { return "${1}started"; }
+        when (m{(.*)started$}i) { return "${1}started"; }
         when (m{(.*)turns$}i) { return "${1}turned"; }
         when (m{(.*)turn$}i) { return "${1}turned"; }
+        when (m{(.*)turned$}i) { return "${1}turned"; }
         when (m{(.*)uses$}i) { return "${1}used"; }
         when (m{(.*)use$}i) { return "${1}used"; }
+        when (m{(.*)used$}i) { return "${1}used"; }
         when (m{(.*)works$}i) { return "${1}worked"; }
         when (m{(.*)work$}i) { return "${1}worked"; }
-        when (m{(.*)n't$}i) { return "${1}n't"; }
-        when (m{(.*)n't$}i) { return "${1}n't"; }
+        when (m{(.*)worked$}i) { return "${1}worked"; }
+        when (m{(.*)aes$}i) { return "${1}aed"; }
+        when (m{(.*)ae$}i) { return "${1}aed"; }
+        when (m{(.*)aed$}i) { return "${1}aed"; }
         when (m{(.*[aeiou])ys$}i) { return "${1}yed"; }
         when (m{(.*[aeiou])y$}i) { return "${1}yed"; }
+        when (m{(.*[aeiou])yed$}i) { return "${1}yed"; }
         when (m{(.*[aiy])nxes$}i) { return "${1}nxed"; }
         when (m{(.*[aiy])nx$}i) { return "${1}nxed"; }
+        when (m{(.*[aiy])nxed$}i) { return "${1}nxed"; }
         when (m{(.*)ceps$}i) { return "${1}cepsed"; }
         when (m{(.*)ceps$}i) { return "${1}cepsed"; }
+        when (m{(.*)cepsed$}i) { return "${1}cepsed"; }
         when (m{(.*[cs])hes$}i) { return "${1}hed"; }
         when (m{(.*[cs])h$}i) { return "${1}hed"; }
+        when (m{(.*[cs])hed$}i) { return "${1}hed"; }
         when (m{(.*)oes$}i) { return "${1}oed"; }
         when (m{(.*)oe$}i) { return "${1}oed"; }
+        when (m{(.*)oed$}i) { return "${1}oed"; }
         when (m{(.*)ieus$}i) { return "${1}ieued"; }
         when (m{(.*)ieu$}i) { return "${1}ieued"; }
+        when (m{(.*)ieued$}i) { return "${1}ieued"; }
         when (m{(.*)eaus$}i) { return "${1}eaued"; }
         when (m{(.*)eau$}i) { return "${1}eaued"; }
+        when (m{(.*)eaued$}i) { return "${1}eaued"; }
         when (m{(.*)sses$}i) { return "${1}ssed"; }
         when (m{(.*)ss$}i) { return "${1}ssed"; }
+        when (m{(.*)ssed$}i) { return "${1}ssed"; }
         when (m{(.*)trixes$}i) { return "${1}trixed"; }
         when (m{(.*)trix$}i) { return "${1}trixed"; }
+        when (m{(.*)trixed$}i) { return "${1}trixed"; }
         when (m{(.*)xes$}i) { return "${1}xed"; }
         when (m{(.*)x$}i) { return "${1}xed"; }
+        when (m{(.*)xed$}i) { return "${1}xed"; }
         when (m{(.*)zzes$}i) { return "${1}zzed"; }
         when (m{(.*)zz$}i) { return "${1}zzed"; }
+        when (m{(.*)zzed$}i) { return "${1}zzed"; }
         when (m{(.*)zes$}i) { return "${1}zed"; }
         when (m{(.*)ze$}i) { return "${1}zed"; }
+        when (m{(.*)zed$}i) { return "${1}zed"; }
         when (m{(.*)ues$}i) { return "${1}ued"; }
         when (m{(.*)ue$}i) { return "${1}ued"; }
+        when (m{(.*)ued$}i) { return "${1}ued"; }
         when (m{(.*)is$}i) { return "${1}ied"; }
         when (m{(.*)i$}i) { return "${1}ied"; }
+        when (m{(.*)ied$}i) { return "${1}ied"; }
         when (m{(.*)ees$}i) { return "${1}eed"; }
         when (m{(.*)ee$}i) { return "${1}eed"; }
+        when (m{(.*)eed$}i) { return "${1}eed"; }
         when (m{(.*)yes$}i) { return "${1}yed"; }
         when (m{(.*)ye$}i) { return "${1}yed"; }
-        when (m{(.*[au])es$}i) { return "${1}ed"; }
-        when (m{(.*[au])e$}i) { return "${1}ed"; }
-        when (m{(.*[^b])is$}i) { return "${1}ied"; }
-        when (m{(.*[^b])i$}i) { return "${1}ied"; }
-        when (m{(.*)sses$}i) { return "${1}ssed"; }
-        when (m{(.*)ss$}i) { return "${1}ssed"; }
+        when (m{(.*)yed$}i) { return "${1}yed"; }
         when (m{(.*)ies$}i) { return "${1}ied"; }
         when (m{(.*)y$}i) { return "${1}ied"; }
+        when (m{(.*)ied$}i) { return "${1}ied"; }
         when (m{(.*)ys$}i) { return "${1}yed"; }
         when (m{(.*)y$}i) { return "${1}yed"; }
+        when (m{(.*)yed$}i) { return "${1}yed"; }
         when (m{(.*[^e])es$}i) { return "${1}ed"; }
         when (m{(.*[^e])e$}i) { return "${1}ed"; }
+        when (m{(.*[^e])ed$}i) { return "${1}ed"; }
         when (m{(.*)ers$}i) { return "${1}ered"; }
         when (m{(.*)er$}i) { return "${1}ered"; }
+        when (m{(.*)ered$}i) { return "${1}ered"; }
         default { return "_"; }
     }
 }
@@ -3379,9 +3563,11 @@ sub convert_to_pres_part {
     my ($word) = @_;
     return $pres_part_of->{$word}     if exists $pres_part_of->{$word};
     return $pres_part_of->{lc $word}  if exists $pres_part_of->{lc $word};
-    return $pres_part_of->{tc $word}  if exists $pres_part_of->{ucfirst lc $word};
+    return $pres_part_of->{tc $word}  if exists $pres_part_of->{tc $word};
     return $word                     if is_pres_part($word);
     given ($word) {
+        when (m{(.*)shears$}i) { return "${1}shearing"; }
+        when (m{(.*)shear$}i) { return "${1}shearing"; }
         when (m{(.*)bears$}i) { return "${1}bearing"; }
         when (m{(.*)bear$}i) { return "${1}bearing"; }
         when (m{(.*)bids$}i) { return "${1}bidding"; }
@@ -3395,6 +3581,8 @@ sub convert_to_pres_part {
         when (m{(.*)cuts$}i) { return "${1}cutting"; }
         when (m{(.*)cut$}i) { return "${1}cutting"; }
         when (m{(.*)does$}i) { return "${1}doing"; }
+        when (m{(.*)do$}i) { return "${1}doing"; }
+        when (m{(.*)do$}i) { return "${1}doing"; }
         when (m{(.*)do$}i) { return "${1}doing"; }
         when (m{(.*)draws$}i) { return "${1}drawing"; }
         when (m{(.*)draw$}i) { return "${1}drawing"; }
@@ -3440,8 +3628,6 @@ sub convert_to_pres_part {
         when (m{(.*)set$}i) { return "${1}setting"; }
         when (m{(.*)sews$}i) { return "${1}sewing"; }
         when (m{(.*)sew$}i) { return "${1}sewing"; }
-        when (m{(.*)shears$}i) { return "${1}shearing"; }
-        when (m{(.*)shear$}i) { return "${1}shearing"; }
         when (m{(.*)shines$}i) { return "${1}shining"; }
         when (m{(.*)shine$}i) { return "${1}shining"; }
         when (m{(.*)shoots$}i) { return "${1}shooting"; }
@@ -3532,6 +3718,8 @@ sub convert_to_pres_part {
         when (m{(.*)use$}i) { return "${1}using"; }
         when (m{(.*)works$}i) { return "${1}working"; }
         when (m{(.*)work$}i) { return "${1}working"; }
+        when (m{(.*)aes$}i) { return "${1}aeing"; }
+        when (m{(.*)ae$}i) { return "${1}aeing"; }
         when (m{(.*[aeiou])ys$}i) { return "${1}ying"; }
         when (m{(.*[aeiou])y$}i) { return "${1}ying"; }
         when (m{(.*[aiy])nxes$}i) { return "${1}nxing"; }
@@ -3564,12 +3752,6 @@ sub convert_to_pres_part {
         when (m{(.*)ee$}i) { return "${1}eeing"; }
         when (m{(.*)yes$}i) { return "${1}yeing"; }
         when (m{(.*)ye$}i) { return "${1}yeing"; }
-        when (m{(.*[au])es$}i) { return "${1}ing"; }
-        when (m{(.*[au])e$}i) { return "${1}ing"; }
-        when (m{(.*[^b])is$}i) { return "${1}ing"; }
-        when (m{(.*[^b])i$}i) { return "${1}ing"; }
-        when (m{(.*)sses$}i) { return "${1}ssing"; }
-        when (m{(.*)ss$}i) { return "${1}ssing"; }
         when (m{(.*)ies$}i) { return "${1}ying"; }
         when (m{(.*)y$}i) { return "${1}ying"; }
         when (m{(.*)ys$}i) { return "${1}ying"; }
@@ -3586,205 +3768,300 @@ sub convert_to_past_part {
     my ($word) = @_;
     return $past_part_of->{$word}     if exists $past_part_of->{$word};
     return $past_part_of->{lc $word}  if exists $past_part_of->{lc $word};
-    return $past_part_of->{tc $word}  if exists $past_part_of->{ucfirst lc $word};
+    return $past_part_of->{tc $word}  if exists $past_part_of->{tc $word};
     return $word                     if is_past_part($word);
     given ($word) {
+        when (m{(.*)shears$}i) { return "${1}shorn"; }
+        when (m{(.*)shear$}i) { return "${1}shorn"; }
+        when (m{(.*)sheared$}i) { return "${1}shorn"; }
         when (m{(.*)bears$}i) { return "${1}borne"; }
         when (m{(.*)bear$}i) { return "${1}borne"; }
+        when (m{(.*)bore$}i) { return "${1}borne"; }
         when (m{(.*)bids$}i) { return "${1}bidden"; }
         when (m{(.*)bid$}i) { return "${1}bidden"; }
+        when (m{(.*)bade$}i) { return "${1}bidden"; }
         when (m{(.*)buys$}i) { return "${1}bought"; }
         when (m{(.*)buy$}i) { return "${1}bought"; }
+        when (m{(.*)bought$}i) { return "${1}bought"; }
         when (m{(.*)casts$}i) { return "${1}cast"; }
+        when (m{(.*)cast$}i) { return "${1}cast"; }
         when (m{(.*)cast$}i) { return "${1}cast"; }
         when (m{(.*)clads$}i) { return "${1}clad"; }
         when (m{(.*)clad$}i) { return "${1}clad"; }
+        when (m{(.*)clad$}i) { return "${1}clad"; }
         when (m{(.*)cuts$}i) { return "${1}cut"; }
+        when (m{(.*)cut$}i) { return "${1}cut"; }
         when (m{(.*)cut$}i) { return "${1}cut"; }
         when (m{(.*)does$}i) { return "${1}done"; }
         when (m{(.*)do$}i) { return "${1}done"; }
+        when (m{(.*)did$}i) { return "${1}done"; }
+        when (m{(.*)do$}i) { return "${1}done"; }
+        when (m{(.*)do$}i) { return "${1}done"; }
+        when (m{(.*)did$}i) { return "${1}done"; }
         when (m{(.*)draws$}i) { return "${1}drawn"; }
         when (m{(.*)draw$}i) { return "${1}drawn"; }
+        when (m{(.*)drew$}i) { return "${1}drawn"; }
         when (m{(.*)feeds$}i) { return "${1}fed"; }
         when (m{(.*)feed$}i) { return "${1}fed"; }
+        when (m{(.*)fed$}i) { return "${1}fed"; }
         when (m{(.*)freezes$}i) { return "${1}frozen"; }
         when (m{(.*)freeze$}i) { return "${1}frozen"; }
+        when (m{(.*)froze$}i) { return "${1}frozen"; }
         when (m{(.*)grows$}i) { return "${1}grown"; }
         when (m{(.*)grow$}i) { return "${1}grown"; }
+        when (m{(.*)grew$}i) { return "${1}grown"; }
         when (m{(.*)hangs$}i) { return "${1}hung"; }
         when (m{(.*)hang$}i) { return "${1}hung"; }
+        when (m{(.*)hung$}i) { return "${1}hung"; }
         when (m{(.*)hears$}i) { return "${1}heard"; }
         when (m{(.*)hear$}i) { return "${1}heard"; }
+        when (m{(.*)heard$}i) { return "${1}heard"; }
         when (m{(.*)hides$}i) { return "${1}hidden"; }
         when (m{(.*)hide$}i) { return "${1}hidden"; }
+        when (m{(.*)hid$}i) { return "${1}hidden"; }
         when (m{(.*)inputs$}i) { return "${1}input"; }
+        when (m{(.*)input$}i) { return "${1}input"; }
         when (m{(.*)input$}i) { return "${1}input"; }
         when (m{(.*)knits$}i) { return "${1}knitted"; }
         when (m{(.*)knit$}i) { return "${1}knitted"; }
+        when (m{(.*)knitted$}i) { return "${1}knitted"; }
         when (m{(.*)lends$}i) { return "${1}lent"; }
         when (m{(.*)lend$}i) { return "${1}lent"; }
+        when (m{(.*)lent$}i) { return "${1}lent"; }
         when (m{(.*)lets$}i) { return "${1}let"; }
+        when (m{(.*)let$}i) { return "${1}let"; }
         when (m{(.*)let$}i) { return "${1}let"; }
         when (m{(.*)lights$}i) { return "${1}lit"; }
         when (m{(.*)light$}i) { return "${1}lit"; }
+        when (m{(.*)lit$}i) { return "${1}lit"; }
         when (m{(.*)makes$}i) { return "${1}made"; }
         when (m{(.*)make$}i) { return "${1}made"; }
+        when (m{(.*)made$}i) { return "${1}made"; }
         when (m{(.*)mows$}i) { return "${1}mown"; }
         when (m{(.*)mow$}i) { return "${1}mown"; }
+        when (m{(.*)mowed$}i) { return "${1}mown"; }
         when (m{(.*)pays$}i) { return "${1}paid"; }
         when (m{(.*)pay$}i) { return "${1}paid"; }
+        when (m{(.*)paid$}i) { return "${1}paid"; }
         when (m{(.*)reads$}i) { return "${1}read"; }
+        when (m{(.*)read$}i) { return "${1}read"; }
         when (m{(.*)read$}i) { return "${1}read"; }
         when (m{(.*)says$}i) { return "${1}said"; }
         when (m{(.*)say$}i) { return "${1}said"; }
+        when (m{(.*)said$}i) { return "${1}said"; }
         when (m{(.*)sees$}i) { return "${1}seen"; }
         when (m{(.*)see$}i) { return "${1}seen"; }
+        when (m{(.*)saw$}i) { return "${1}seen"; }
         when (m{(.*)sells$}i) { return "${1}sold"; }
         when (m{(.*)sell$}i) { return "${1}sold"; }
+        when (m{(.*)sold$}i) { return "${1}sold"; }
         when (m{(.*)sends$}i) { return "${1}sent"; }
         when (m{(.*)send$}i) { return "${1}sent"; }
+        when (m{(.*)sent$}i) { return "${1}sent"; }
         when (m{(.*)sets$}i) { return "${1}set"; }
+        when (m{(.*)set$}i) { return "${1}set"; }
         when (m{(.*)set$}i) { return "${1}set"; }
         when (m{(.*)sews$}i) { return "${1}sewn"; }
         when (m{(.*)sew$}i) { return "${1}sewn"; }
-        when (m{(.*)shears$}i) { return "${1}shorn"; }
-        when (m{(.*)shear$}i) { return "${1}shorn"; }
+        when (m{(.*)sewed$}i) { return "${1}sewn"; }
         when (m{(.*)shines$}i) { return "${1}shone"; }
         when (m{(.*)shine$}i) { return "${1}shone"; }
+        when (m{(.*)shone$}i) { return "${1}shone"; }
         when (m{(.*)shoots$}i) { return "${1}shot"; }
         when (m{(.*)shoot$}i) { return "${1}shot"; }
+        when (m{(.*)shot$}i) { return "${1}shot"; }
         when (m{(.*)shuts$}i) { return "${1}shut"; }
+        when (m{(.*)shut$}i) { return "${1}shut"; }
         when (m{(.*)shut$}i) { return "${1}shut"; }
         when (m{(.*)sleeps$}i) { return "${1}slept"; }
         when (m{(.*)sleep$}i) { return "${1}slept"; }
+        when (m{(.*)slept$}i) { return "${1}slept"; }
         when (m{(.*)slings$}i) { return "${1}slung"; }
         when (m{(.*)sling$}i) { return "${1}slung"; }
+        when (m{(.*)slung$}i) { return "${1}slung"; }
         when (m{(.*)spins$}i) { return "${1}spun"; }
         when (m{(.*)spin$}i) { return "${1}spun"; }
+        when (m{(.*)spun$}i) { return "${1}spun"; }
         when (m{(.*)splits$}i) { return "${1}split"; }
+        when (m{(.*)split$}i) { return "${1}split"; }
         when (m{(.*)split$}i) { return "${1}split"; }
         when (m{(.*)spreads$}i) { return "${1}spread"; }
         when (m{(.*)spread$}i) { return "${1}spread"; }
+        when (m{(.*)spread$}i) { return "${1}spread"; }
         when (m{(.*)sticks$}i) { return "${1}stuck"; }
         when (m{(.*)stick$}i) { return "${1}stuck"; }
+        when (m{(.*)stuck$}i) { return "${1}stuck"; }
         when (m{(.*)strikes$}i) { return "${1}struck"; }
         when (m{(.*)strike$}i) { return "${1}struck"; }
+        when (m{(.*)struck$}i) { return "${1}struck"; }
         when (m{(.*)strings$}i) { return "${1}strung"; }
         when (m{(.*)string$}i) { return "${1}strung"; }
+        when (m{(.*)strung$}i) { return "${1}strung"; }
         when (m{(.*)takes$}i) { return "${1}taken"; }
         when (m{(.*)take$}i) { return "${1}taken"; }
+        when (m{(.*)took$}i) { return "${1}taken"; }
         when (m{(.*)teaches$}i) { return "${1}taught"; }
         when (m{(.*)teach$}i) { return "${1}taught"; }
+        when (m{(.*)taught$}i) { return "${1}taught"; }
         when (m{(.*)tells$}i) { return "${1}told"; }
         when (m{(.*)tell$}i) { return "${1}told"; }
+        when (m{(.*)told$}i) { return "${1}told"; }
         when (m{(.*)thinks$}i) { return "${1}thought"; }
         when (m{(.*)think$}i) { return "${1}thought"; }
+        when (m{(.*)thought$}i) { return "${1}thought"; }
         when (m{(.*)throws$}i) { return "${1}thrown"; }
         when (m{(.*)throw$}i) { return "${1}thrown"; }
+        when (m{(.*)threw$}i) { return "${1}thrown"; }
         when (m{(.*)tries$}i) { return "${1}tried"; }
         when (m{(.*)try$}i) { return "${1}tried"; }
+        when (m{(.*)tried$}i) { return "${1}tried"; }
         when (m{(.*)weaves$}i) { return "${1}woven"; }
         when (m{(.*)weave$}i) { return "${1}woven"; }
+        when (m{(.*)wove$}i) { return "${1}woven"; }
         when (m{(.*)weds$}i) { return "${1}wed"; }
+        when (m{(.*)wed$}i) { return "${1}wed"; }
         when (m{(.*)wed$}i) { return "${1}wed"; }
         when (m{(.*)wets$}i) { return "${1}wetted"; }
         when (m{(.*)wet$}i) { return "${1}wetted"; }
+        when (m{(.*)wet$}i) { return "${1}wetted"; }
         when (m{(.*)winds$}i) { return "${1}wound"; }
         when (m{(.*)wind$}i) { return "${1}wound"; }
+        when (m{(.*)wound$}i) { return "${1}wound"; }
         when (m{(.*)writes$}i) { return "${1}written"; }
         when (m{(.*)write$}i) { return "${1}written"; }
+        when (m{(.*)wrote$}i) { return "${1}written"; }
         when (m{(.*)adds$}i) { return "${1}added"; }
         when (m{(.*)add$}i) { return "${1}added"; }
+        when (m{(.*)added$}i) { return "${1}added"; }
         when (m{(.*)alights$}i) { return "${1}alighted"; }
         when (m{(.*)alight$}i) { return "${1}alighted"; }
+        when (m{(.*)alighted$}i) { return "${1}alighted"; }
         when (m{(.*)allows$}i) { return "${1}allowed"; }
         when (m{(.*)allow$}i) { return "${1}allowed"; }
+        when (m{(.*)allowed$}i) { return "${1}allowed"; }
         when (m{(.*)appears$}i) { return "${1}appeared"; }
         when (m{(.*)appear$}i) { return "${1}appeared"; }
+        when (m{(.*)appeared$}i) { return "${1}appeared"; }
         when (m{(.*)believes$}i) { return "${1}believed"; }
         when (m{(.*)believe$}i) { return "${1}believed"; }
+        when (m{(.*)believed$}i) { return "${1}believed"; }
         when (m{(.*)calls$}i) { return "${1}called"; }
         when (m{(.*)call$}i) { return "${1}called"; }
+        when (m{(.*)called$}i) { return "${1}called"; }
         when (m{(.*)clothes$}i) { return "${1}clothed"; }
         when (m{(.*)clothe$}i) { return "${1}clothed"; }
+        when (m{(.*)clothed$}i) { return "${1}clothed"; }
         when (m{(.*)considers$}i) { return "${1}considered"; }
         when (m{(.*)consider$}i) { return "${1}considered"; }
+        when (m{(.*)considered$}i) { return "${1}considered"; }
         when (m{(.*)creates$}i) { return "${1}created"; }
         when (m{(.*)create$}i) { return "${1}created"; }
+        when (m{(.*)created$}i) { return "${1}created"; }
         when (m{(.*)fits$}i) { return "${1}fitted"; }
         when (m{(.*)fit$}i) { return "${1}fitted"; }
+        when (m{(.*)fitted$}i) { return "${1}fitted"; }
         when (m{(.*)includes$}i) { return "${1}included"; }
         when (m{(.*)include$}i) { return "${1}included"; }
+        when (m{(.*)included$}i) { return "${1}included"; }
         when (m{(.*)melts$}i) { return "${1}melted"; }
         when (m{(.*)melt$}i) { return "${1}melted"; }
+        when (m{(.*)melted$}i) { return "${1}melted"; }
         when (m{(.*)offers$}i) { return "${1}offered"; }
         when (m{(.*)offer$}i) { return "${1}offered"; }
+        when (m{(.*)offered$}i) { return "${1}offered"; }
         when (m{(.*)opens$}i) { return "${1}opened"; }
         when (m{(.*)open$}i) { return "${1}opened"; }
+        when (m{(.*)opened$}i) { return "${1}opened"; }
         when (m{(.*)plays$}i) { return "${1}played"; }
         when (m{(.*)play$}i) { return "${1}played"; }
+        when (m{(.*)played$}i) { return "${1}played"; }
         when (m{(.*)serves$}i) { return "${1}served"; }
         when (m{(.*)serve$}i) { return "${1}served"; }
+        when (m{(.*)served$}i) { return "${1}served"; }
         when (m{(.*)smells$}i) { return "${1}smelled"; }
         when (m{(.*)smell$}i) { return "${1}smelled"; }
+        when (m{(.*)smelled$}i) { return "${1}smelled"; }
         when (m{(.*)spells$}i) { return "${1}spelled"; }
         when (m{(.*)spell$}i) { return "${1}spelled"; }
+        when (m{(.*)spelled$}i) { return "${1}spelled"; }
         when (m{(.*)spills$}i) { return "${1}spilled"; }
         when (m{(.*)spill$}i) { return "${1}spilled"; }
+        when (m{(.*)spilled$}i) { return "${1}spilled"; }
         when (m{(.*)starts$}i) { return "${1}started"; }
         when (m{(.*)start$}i) { return "${1}started"; }
+        when (m{(.*)started$}i) { return "${1}started"; }
         when (m{(.*)turns$}i) { return "${1}turned"; }
         when (m{(.*)turn$}i) { return "${1}turned"; }
+        when (m{(.*)turned$}i) { return "${1}turned"; }
         when (m{(.*)uses$}i) { return "${1}used"; }
         when (m{(.*)use$}i) { return "${1}used"; }
+        when (m{(.*)used$}i) { return "${1}used"; }
         when (m{(.*)works$}i) { return "${1}worked"; }
         when (m{(.*)work$}i) { return "${1}worked"; }
+        when (m{(.*)worked$}i) { return "${1}worked"; }
+        when (m{(.*)aes$}i) { return "${1}aed"; }
+        when (m{(.*)ae$}i) { return "${1}aed"; }
+        when (m{(.*)aed$}i) { return "${1}aed"; }
         when (m{(.*[aeiou])ys$}i) { return "${1}yed"; }
         when (m{(.*[aeiou])y$}i) { return "${1}yed"; }
+        when (m{(.*[aeiou])yed$}i) { return "${1}yed"; }
         when (m{(.*[aiy])nxes$}i) { return "${1}nxed"; }
         when (m{(.*[aiy])nx$}i) { return "${1}nxed"; }
+        when (m{(.*[aiy])nxed$}i) { return "${1}nxed"; }
         when (m{(.*)ceps$}i) { return "${1}cepsed"; }
         when (m{(.*)ceps$}i) { return "${1}cepsed"; }
+        when (m{(.*)cepsed$}i) { return "${1}cepsed"; }
         when (m{(.*[cs])hes$}i) { return "${1}hed"; }
         when (m{(.*[cs])h$}i) { return "${1}hed"; }
+        when (m{(.*[cs])hed$}i) { return "${1}hed"; }
         when (m{(.*)oes$}i) { return "${1}oed"; }
         when (m{(.*)oe$}i) { return "${1}oed"; }
+        when (m{(.*)oed$}i) { return "${1}oed"; }
         when (m{(.*)ieus$}i) { return "${1}ieued"; }
         when (m{(.*)ieu$}i) { return "${1}ieued"; }
+        when (m{(.*)ieued$}i) { return "${1}ieued"; }
         when (m{(.*)eaus$}i) { return "${1}eaued"; }
         when (m{(.*)eau$}i) { return "${1}eaued"; }
+        when (m{(.*)eaued$}i) { return "${1}eaued"; }
         when (m{(.*)sses$}i) { return "${1}ssed"; }
         when (m{(.*)ss$}i) { return "${1}ssed"; }
+        when (m{(.*)ssed$}i) { return "${1}ssed"; }
         when (m{(.*)trixes$}i) { return "${1}trixed"; }
         when (m{(.*)trix$}i) { return "${1}trixed"; }
+        when (m{(.*)trixed$}i) { return "${1}trixed"; }
         when (m{(.*)xes$}i) { return "${1}xed"; }
         when (m{(.*)x$}i) { return "${1}xed"; }
+        when (m{(.*)xed$}i) { return "${1}xed"; }
         when (m{(.*)zzes$}i) { return "${1}zzed"; }
         when (m{(.*)zz$}i) { return "${1}zzed"; }
+        when (m{(.*)zzed$}i) { return "${1}zzed"; }
         when (m{(.*)zes$}i) { return "${1}zed"; }
         when (m{(.*)ze$}i) { return "${1}zed"; }
+        when (m{(.*)zed$}i) { return "${1}zed"; }
         when (m{(.*)ues$}i) { return "${1}ued"; }
         when (m{(.*)ue$}i) { return "${1}ued"; }
+        when (m{(.*)ued$}i) { return "${1}ued"; }
         when (m{(.*)is$}i) { return "${1}ied"; }
         when (m{(.*)i$}i) { return "${1}ied"; }
+        when (m{(.*)ied$}i) { return "${1}ied"; }
         when (m{(.*)ees$}i) { return "${1}eed"; }
         when (m{(.*)ee$}i) { return "${1}eed"; }
+        when (m{(.*)eed$}i) { return "${1}eed"; }
         when (m{(.*)yes$}i) { return "${1}yed"; }
         when (m{(.*)ye$}i) { return "${1}yed"; }
-        when (m{(.*[au])es$}i) { return "${1}ed"; }
-        when (m{(.*[au])e$}i) { return "${1}ed"; }
-        when (m{(.*[^b])is$}i) { return "${1}ied"; }
-        when (m{(.*[^b])i$}i) { return "${1}ied"; }
-        when (m{(.*)sses$}i) { return "${1}ssed"; }
-        when (m{(.*)ss$}i) { return "${1}ssed"; }
+        when (m{(.*)yed$}i) { return "${1}yed"; }
         when (m{(.*)ies$}i) { return "${1}ied"; }
         when (m{(.*)y$}i) { return "${1}ied"; }
+        when (m{(.*)ied$}i) { return "${1}ied"; }
         when (m{(.*)ys$}i) { return "${1}yed"; }
         when (m{(.*)y$}i) { return "${1}yed"; }
+        when (m{(.*)yed$}i) { return "${1}yed"; }
         when (m{(.*[^e])es$}i) { return "${1}ed"; }
         when (m{(.*[^e])e$}i) { return "${1}ed"; }
+        when (m{(.*[^e])ed$}i) { return "${1}ed"; }
         when (m{(.*)ers$}i) { return "${1}ered"; }
         when (m{(.*)er$}i) { return "${1}ered"; }
+        when (m{(.*)ered$}i) { return "${1}ered"; }
         default { return "_"; }
     }
 }
@@ -3793,17 +4070,20 @@ sub is_plural {
     my ($word) = @_;
     return 1 if exists $is_plural->{$word};
     return 1 if exists $is_plural->{lc $word};
-    return 1 if exists $is_plural->{ucfirst lc $word};
+    return 1 if exists $is_plural->{tc $word};
     return 0 if exists $is_singular->{$word};
     return 0 if exists $is_singular->{lc $word};
-    return 0 if exists $is_singular->{ucfirst lc $word};
+    return 0 if exists $is_singular->{tc $word};
     given ($word) {
+        when (m{\A(.+)n't$}i) { return 1 }
+        when (m{\A(.*)shear$}i) { return 1 }
         when (m{\A(.*)bear$}i) { return 1 }
         when (m{\A(.*)bid$}i) { return 1 }
         when (m{\A(.*)buy$}i) { return 1 }
         when (m{\A(.*)cast$}i) { return 1 }
         when (m{\A(.*)clad$}i) { return 1 }
         when (m{\A(.*)cut$}i) { return 1 }
+        when (m{\A(.*)do$}i) { return 1 }
         when (m{\A(.*)do$}i) { return 1 }
         when (m{\A(.*)draw$}i) { return 1 }
         when (m{\A(.*)feed$}i) { return 1 }
@@ -3827,7 +4107,6 @@ sub is_plural {
         when (m{\A(.*)send$}i) { return 1 }
         when (m{\A(.*)set$}i) { return 1 }
         when (m{\A(.*)sew$}i) { return 1 }
-        when (m{\A(.*)shear$}i) { return 1 }
         when (m{\A(.*)shine$}i) { return 1 }
         when (m{\A(.*)shoot$}i) { return 1 }
         when (m{\A(.*)shut$}i) { return 1 }
@@ -3873,7 +4152,7 @@ sub is_plural {
         when (m{\A(.*)turn$}i) { return 1 }
         when (m{\A(.*)use$}i) { return 1 }
         when (m{\A(.*)work$}i) { return 1 }
-        when (m{\A(.+)n't$}i) { return 1 }
+        when (m{\A(.+)ae$}i) { return 1 }
         when (m{\A(.+[aeiou])y$}i) { return 1 }
         when (m{\A(.+[aiy])nx$}i) { return 1 }
         when (m{\A(.+)ceps$}i) { return 1 }
@@ -3890,9 +4169,6 @@ sub is_plural {
         when (m{\A(.+)i$}i) { return 1 }
         when (m{\A(.+)ee$}i) { return 1 }
         when (m{\A(.+)ye$}i) { return 1 }
-        when (m{\A(.+[au])e$}i) { return 1 }
-        when (m{\A(.+[^b])i$}i) { return 1 }
-        when (m{\A(.+)ss$}i) { return 1 }
         when (m{\A(.+)y$}i) { return 1 }
         when (m{\A(.+)y$}i) { return 1 }
         when (m{\A(.+[^e])e$}i) { return 1 }
@@ -3906,11 +4182,13 @@ sub is_singular {
     my ($word) = @_;
     return 1 if exists $is_singular->{$word};
     return 1 if exists $is_singular->{lc $word};
-    return 1 if exists $is_singular->{ucfirst lc $word};
+    return 1 if exists $is_singular->{tc $word};
     return 0 if exists $is_plural->{$word};
     return 0 if exists $is_plural->{lc $word};
-    return 0 if exists $is_plural->{ucfirst lc $word};
+    return 0 if exists $is_plural->{tc $word};
     given ($word) {
+        when (m{\A(.+)n't$}i) { return 1 }
+        when (m{\A(.*)shears$}i) { return 1 }
         when (m{\A(.*)bears$}i) { return 1 }
         when (m{\A(.*)bids$}i) { return 1 }
         when (m{\A(.*)buys$}i) { return 1 }
@@ -3918,6 +4196,7 @@ sub is_singular {
         when (m{\A(.*)clads$}i) { return 1 }
         when (m{\A(.*)cuts$}i) { return 1 }
         when (m{\A(.*)does$}i) { return 1 }
+        when (m{\A(.*)do$}i) { return 1 }
         when (m{\A(.*)draws$}i) { return 1 }
         when (m{\A(.*)feeds$}i) { return 1 }
         when (m{\A(.*)freezes$}i) { return 1 }
@@ -3940,7 +4219,6 @@ sub is_singular {
         when (m{\A(.*)sends$}i) { return 1 }
         when (m{\A(.*)sets$}i) { return 1 }
         when (m{\A(.*)sews$}i) { return 1 }
-        when (m{\A(.*)shears$}i) { return 1 }
         when (m{\A(.*)shines$}i) { return 1 }
         when (m{\A(.*)shoots$}i) { return 1 }
         when (m{\A(.*)shuts$}i) { return 1 }
@@ -3986,7 +4264,7 @@ sub is_singular {
         when (m{\A(.*)turns$}i) { return 1 }
         when (m{\A(.*)uses$}i) { return 1 }
         when (m{\A(.*)works$}i) { return 1 }
-        when (m{\A(.+)n't$}i) { return 1 }
+        when (m{\A(.+)aes$}i) { return 1 }
         when (m{\A(.+[aeiou])ys$}i) { return 1 }
         when (m{\A(.+[aiy])nxes$}i) { return 1 }
         when (m{\A(.+)ceps$}i) { return 1 }
@@ -4003,9 +4281,6 @@ sub is_singular {
         when (m{\A(.+)is$}i) { return 1 }
         when (m{\A(.+)ees$}i) { return 1 }
         when (m{\A(.+)yes$}i) { return 1 }
-        when (m{\A(.+[au])es$}i) { return 1 }
-        when (m{\A(.+[^b])is$}i) { return 1 }
-        when (m{\A(.+)sses$}i) { return 1 }
         when (m{\A(.+)ies$}i) { return 1 }
         when (m{\A(.+)ys$}i) { return 1 }
         when (m{\A(.+[^e])es$}i) { return 1 }
@@ -4019,14 +4294,16 @@ sub is_past {
     my ($word) = @_;
     return 1 if exists $is_past->{$word};
     return 1 if exists $is_past->{lc $word};
-    return 1 if exists $is_past->{ucfirst lc $word};
+    return 1 if exists $is_past->{tc $word};
     given ($word) {
+        when (m{\A(.*)sheared$}i) { return 1 }
         when (m{\A(.*)bore$}i) { return 1 }
         when (m{\A(.*)bade$}i) { return 1 }
         when (m{\A(.*)bought$}i) { return 1 }
         when (m{\A(.*)cast$}i) { return 1 }
         when (m{\A(.*)clad$}i) { return 1 }
         when (m{\A(.*)cut$}i) { return 1 }
+        when (m{\A(.*)did$}i) { return 1 }
         when (m{\A(.*)did$}i) { return 1 }
         when (m{\A(.*)drew$}i) { return 1 }
         when (m{\A(.*)fed$}i) { return 1 }
@@ -4050,7 +4327,6 @@ sub is_past {
         when (m{\A(.*)sent$}i) { return 1 }
         when (m{\A(.*)set$}i) { return 1 }
         when (m{\A(.*)sewed$}i) { return 1 }
-        when (m{\A(.*)sheared$}i) { return 1 }
         when (m{\A(.*)shone$}i) { return 1 }
         when (m{\A(.*)shot$}i) { return 1 }
         when (m{\A(.*)shut$}i) { return 1 }
@@ -4096,7 +4372,7 @@ sub is_past {
         when (m{\A(.*)turned$}i) { return 1 }
         when (m{\A(.*)used$}i) { return 1 }
         when (m{\A(.*)worked$}i) { return 1 }
-        when (m{\A(.+)n't$}i) { return 1 }
+        when (m{\A(.+)aed$}i) { return 1 }
         when (m{\A(.+[aeiou])yed$}i) { return 1 }
         when (m{\A(.+[aiy])nxed$}i) { return 1 }
         when (m{\A(.+)cepsed$}i) { return 1 }
@@ -4113,9 +4389,6 @@ sub is_past {
         when (m{\A(.+)ied$}i) { return 1 }
         when (m{\A(.+)eed$}i) { return 1 }
         when (m{\A(.+)yed$}i) { return 1 }
-        when (m{\A(.+[au])ed$}i) { return 1 }
-        when (m{\A(.+[^b])ied$}i) { return 1 }
-        when (m{\A(.+)ssed$}i) { return 1 }
         when (m{\A(.+)ied$}i) { return 1 }
         when (m{\A(.+)yed$}i) { return 1 }
         when (m{\A(.+[^e])ed$}i) { return 1 }
@@ -4128,14 +4401,16 @@ sub is_pres_part {
     my ($word) = @_;
     return 1 if exists $is_pres_part->{$word};
     return 1 if exists $is_pres_part->{lc $word};
-    return 1 if exists $is_pres_part->{ucfirst lc $word};
+    return 1 if exists $is_pres_part->{tc $word};
     given ($word) {
+        when (m{\A(.*)shearing$}i) { return 1 }
         when (m{\A(.*)bearing$}i) { return 1 }
         when (m{\A(.*)bidding$}i) { return 1 }
         when (m{\A(.*)buying$}i) { return 1 }
         when (m{\A(.*)casting$}i) { return 1 }
         when (m{\A(.*)cladding$}i) { return 1 }
         when (m{\A(.*)cutting$}i) { return 1 }
+        when (m{\A(.*)doing$}i) { return 1 }
         when (m{\A(.*)doing$}i) { return 1 }
         when (m{\A(.*)drawing$}i) { return 1 }
         when (m{\A(.*)feeding$}i) { return 1 }
@@ -4159,7 +4434,6 @@ sub is_pres_part {
         when (m{\A(.*)sending$}i) { return 1 }
         when (m{\A(.*)setting$}i) { return 1 }
         when (m{\A(.*)sewing$}i) { return 1 }
-        when (m{\A(.*)shearing$}i) { return 1 }
         when (m{\A(.*)shining$}i) { return 1 }
         when (m{\A(.*)shooting$}i) { return 1 }
         when (m{\A(.*)shutting$}i) { return 1 }
@@ -4205,6 +4479,7 @@ sub is_pres_part {
         when (m{\A(.*)turning$}i) { return 1 }
         when (m{\A(.*)using$}i) { return 1 }
         when (m{\A(.*)working$}i) { return 1 }
+        when (m{\A(.+)aeing$}i) { return 1 }
         when (m{\A(.+[aeiou])ying$}i) { return 1 }
         when (m{\A(.+[aiy])nxing$}i) { return 1 }
         when (m{\A(.+)cepsing$}i) { return 1 }
@@ -4221,9 +4496,6 @@ sub is_pres_part {
         when (m{\A(.+)iing$}i) { return 1 }
         when (m{\A(.+)eeing$}i) { return 1 }
         when (m{\A(.+)yeing$}i) { return 1 }
-        when (m{\A(.+[au])ing$}i) { return 1 }
-        when (m{\A(.+[^b])ing$}i) { return 1 }
-        when (m{\A(.+)ssing$}i) { return 1 }
         when (m{\A(.+)ying$}i) { return 1 }
         when (m{\A(.+)ying$}i) { return 1 }
         when (m{\A(.+[^e])ing$}i) { return 1 }
@@ -4236,14 +4508,16 @@ sub is_past_part {
     my ($word) = @_;
     return 1 if exists $is_past_part->{$word};
     return 1 if exists $is_past_part->{lc $word};
-    return 1 if exists $is_past_part->{ucfirst lc $word};
+    return 1 if exists $is_past_part->{tc $word};
     given ($word) {
+        when (m{\A(.*)shorn$}i) { return 1 }
         when (m{\A(.*)borne$}i) { return 1 }
         when (m{\A(.*)bidden$}i) { return 1 }
         when (m{\A(.*)bought$}i) { return 1 }
         when (m{\A(.*)cast$}i) { return 1 }
         when (m{\A(.*)clad$}i) { return 1 }
         when (m{\A(.*)cut$}i) { return 1 }
+        when (m{\A(.*)done$}i) { return 1 }
         when (m{\A(.*)done$}i) { return 1 }
         when (m{\A(.*)drawn$}i) { return 1 }
         when (m{\A(.*)fed$}i) { return 1 }
@@ -4267,7 +4541,6 @@ sub is_past_part {
         when (m{\A(.*)sent$}i) { return 1 }
         when (m{\A(.*)set$}i) { return 1 }
         when (m{\A(.*)sewn$}i) { return 1 }
-        when (m{\A(.*)shorn$}i) { return 1 }
         when (m{\A(.*)shone$}i) { return 1 }
         when (m{\A(.*)shot$}i) { return 1 }
         when (m{\A(.*)shut$}i) { return 1 }
@@ -4313,6 +4586,7 @@ sub is_past_part {
         when (m{\A(.*)turned$}i) { return 1 }
         when (m{\A(.*)used$}i) { return 1 }
         when (m{\A(.*)worked$}i) { return 1 }
+        when (m{\A(.+)aed$}i) { return 1 }
         when (m{\A(.+[aeiou])yed$}i) { return 1 }
         when (m{\A(.+[aiy])nxed$}i) { return 1 }
         when (m{\A(.+)cepsed$}i) { return 1 }
@@ -4329,9 +4603,6 @@ sub is_past_part {
         when (m{\A(.+)ied$}i) { return 1 }
         when (m{\A(.+)eed$}i) { return 1 }
         when (m{\A(.+)yed$}i) { return 1 }
-        when (m{\A(.+[au])ed$}i) { return 1 }
-        when (m{\A(.+[^b])ied$}i) { return 1 }
-        when (m{\A(.+)ssed$}i) { return 1 }
         when (m{\A(.+)ied$}i) { return 1 }
         when (m{\A(.+)yed$}i) { return 1 }
         when (m{\A(.+[^e])ed$}i) { return 1 }

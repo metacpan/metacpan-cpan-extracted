@@ -14,9 +14,10 @@ use Test::Differences;
 use strict;
 use 5.10.1;
 
+Test::Log::Log4perl->ignore_priority("info");
+
 my ($model, $trace) = init_test();
 
-$::_use_log4perl_to_warn =1;
 # minimal set up to get things working
 
 $model->create_config_class(

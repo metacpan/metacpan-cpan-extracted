@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
         'overload'      => '1.22',
         'overloading'   => '0.02',
         'Devel::Confess'    => '0.009004',
-        'Module::Generic'   => 'v0.12.16',
+        'Module::Generic'   => 'v0.17.3',
         'Want'          => '0.29',
     },
     TEST_REQUIRES =>
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=CSS::Object',
+                web         => 'https://git.deguest.jp/jack/CSS-Object/issues',
             },
             license => [ 'http://dev.perl.org/licenses/' ],
         },

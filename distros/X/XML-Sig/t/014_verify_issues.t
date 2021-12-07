@@ -14,6 +14,7 @@ BEGIN {
 my %issues = (
     "Issue 20 - Digest New Lines" => "20",
     "Issue 31 - InclusiveNameSpaces" => "31",
+    "Issue 38 - Wide Characters" => "38",
 );
 
 for my $issue (keys %issues) {

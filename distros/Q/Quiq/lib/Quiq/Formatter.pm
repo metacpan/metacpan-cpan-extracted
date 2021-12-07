@@ -1,14 +1,3 @@
-package Quiq::Formatter;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Epoch;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -20,6 +9,23 @@ Quiq::Formatter - Formatierung von Werten
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Formatter;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Epoch;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -253,7 +259,7 @@ sub reducedIsoTime {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

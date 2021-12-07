@@ -8,7 +8,7 @@ use overload
     '""'     => sub { shift->{_value} },
     fallback => 1;
 
-our $VERSION = '1.0.11';
+our $VERSION = '1.1.0';
 
 
 require XS::Loader;
@@ -21,7 +21,10 @@ my $handler = sub {
     die($wrapped_ex) if ($wrapped_ex);
 };
 
+our $decorator = \&default_decorator;
+
 sub install {
+    $decorator = (shift) // \&default_decorator;
     $SIG{__DIE__} = $handler;
 };
 
@@ -29,6 +32,12 @@ sub new {
     my ($class, $value) = @_;
     my $obj = { _value => $value };
     return bless $obj => $class;
+}
+
+sub default_decorator {
+    my $args = shift;
+    my $r = join(', ', map { defined($_) ? "$_" : 'undef' } @$args);
+    return "($r)";
 }
 
 

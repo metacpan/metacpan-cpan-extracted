@@ -1,0 +1,31 @@
+---
+abstract: 'SVG transformer'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.96'
+  Test::UseAllModules: '0.10'
+  XML::SAX: '0'
+  XML::SAX::Writer: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-SAX-SVGTransformer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Matrix: '0.92'
+  Math::Trig: '0'
+  XML::SAX::Base: '0'
+resources:
+  repository: https://github.com/charsbar/XML-SAX-SVGTransformer
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

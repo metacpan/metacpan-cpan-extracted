@@ -1,0 +1,42 @@
+
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::TTF::Font - A Rectangle with the Origin at the Upper Left in Integers
+
+=head1 SYNOPSIS
+
+    use SDL2::TTF qw[:all];
+    TTF_Init( );
+    # load font.ttf at size 16 into font
+    my $font = TTF_OpenFont( 'path/to/your/font.ttf', 16 );
+
+=head1 DESCRIPTION
+
+SDL2::TTF::Font is an opaque holder of a loaded font.
+
+This stores the font data in a struct that is exposed only by using the API
+functions to get information. You should not try to access the struct data
+directly, since the struct may change in different versions of the API, and
+thus your program would be unreliable.
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+
+
+=end stopwords
+
+=cut

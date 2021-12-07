@@ -1,15 +1,3 @@
-package Quiq::Assert;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Path;
-use Quiq::Math;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -59,6 +47,24 @@ Test von der Kommandozeile aus:
       Quiq::Assert::isNotNull() [+1 -e]
         Quiq::Object::throw() [+210 .../Quiq/Assert.pm]
           Quiq::Stacktrace::asString() [+425 .../Quiq/Object.pm]
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Assert;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Path;
+use Quiq::Math;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -517,7 +523,7 @@ sub isNumber {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

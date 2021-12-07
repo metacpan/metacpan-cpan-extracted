@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Test::Deep::PDL;
-$Test::Deep::PDL::VERSION = '0.16';
+$Test::Deep::PDL::VERSION = '0.17';
 # ABSTRACT: Test ndarrays inside data structures with Test::Deep
 
 
@@ -63,7 +63,7 @@ Test::Deep::PDL - Test ndarrays inside data structures with Test::Deep
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 DESCRIPTION
 

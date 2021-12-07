@@ -7,10 +7,12 @@ AV    * T_AVREF_REFCOUNT_FIXED
 
 Dyncall   * T_PTROBJ_SPECIAL
 DynXSub   * T_PTROBJ_SPECIAL
+Call      * T_DYN
 
 DCvoid      void
 DCCallVM  * T_PTROBJ_SPECIAL
 DCsize      T_INT
+DCsize    * T_INTPTR
 DCshort     T_SHORT
 DCint       T_INT
 DCbool      T_BOOL
@@ -50,7 +52,15 @@ T_PTROBJ_SPECIAL
     $var = INT2PTR($type, tmp);
   }
   else
-    croak(\"$var is not of type Dyn::${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s[(?:VM)?Ptr$][];$ntt=~s[^DC][];\$ntt}\")
+    croak(\"$var is not of type Dyn::${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s[(?:VM)?Ptr$][];$ntt=~s[^DC][];\$ntt}\");
+
+T_DYN
+  if (sv_derived_from($arg, \"Dyn\")) {
+    IV tmp = SvIV((SV*)SvRV($arg));
+    $var = INT2PTR($type, tmp);
+  }
+  else
+    croak(\"$var is not of type Dyn\");
 
 OUTPUT
 T_PV
@@ -63,3 +73,6 @@ T_PTROBJ_SPECIAL
   // $Package | $type | $ntype
   sv_setref_pv($arg, \"Dyn::${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s[(?:VM)?Ptr$][];$ntt=~s[^DC][];\$ntt}\",
                (void*)$var);
+
+T_DYN
+  sv_setref_pv($arg, \"Dyn\", (void*)$var);

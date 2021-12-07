@@ -1,5 +1,5 @@
 package Net::Amazon::S3::X;
-$Net::Amazon::S3::X::VERSION = '0.98';
+$Net::Amazon::S3::X::VERSION = '0.99';
 # ABSTRACT: Net::Amazon::S3 exceptions
 
 use Moose;
@@ -53,7 +53,7 @@ Net::Amazon::S3::X - Net::Amazon::S3 exceptions
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

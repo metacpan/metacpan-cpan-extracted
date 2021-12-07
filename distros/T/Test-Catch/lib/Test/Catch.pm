@@ -1,10 +1,10 @@
 package Test::Catch;
 use 5.012;
-use XS::Loader;
 use Test::More();
+use XS::libcatch();
 use Test::Builder();
 
-our $VERSION = '1.0.16';
+our $VERSION = '2.0.0';
 
 XS::Loader::load();
 

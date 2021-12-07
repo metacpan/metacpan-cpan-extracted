@@ -1,3 +1,10 @@
+0.076   2021-07-16  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Sah::Schemas::IntRange, Sah::PSchemas::IntRange.
+
+
 0.075   2020-05-21  Released-By: PERLANCAR; Urgency: low
 
 	- Add more examples.

@@ -1,3 +1,8 @@
+1.0.2     26.11.2021
+    - version bump
+1.0.1     26.11.2021
+    - fix compilation for windows
+    - upgrade tests for catch-v3
 1.0.0     24.11.2020
     - C++ part moved from Exception::Backtrace
     - Fix issues with clang-generated traces (affected FreeBSD)

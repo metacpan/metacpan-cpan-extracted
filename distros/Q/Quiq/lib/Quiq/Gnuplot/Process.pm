@@ -1,16 +1,3 @@
-package Quiq::Gnuplot::Process;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Gnuplot::Plot;
-use Quiq::FileHandle;
-use Quiq::Path;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -27,6 +14,25 @@ L<Quiq::Hash>
 
 Ein Objekt der Klasse repräsentiert einen Gnuplot-Prozess.
 Ein Gnuplot-Prozess erzeugt Plots.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gnuplot::Process;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Gnuplot::Plot;
+use Quiq::FileHandle;
+use Quiq::Path;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -330,7 +336,7 @@ sub print {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

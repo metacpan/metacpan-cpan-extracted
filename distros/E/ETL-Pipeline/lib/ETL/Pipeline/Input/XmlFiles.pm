@@ -2,36 +2,34 @@
 
 =head1 NAME
 
-ETL::Pipeline::Input::XmlFiles - Records in individual XML files
+ETL::Pipeline::Input::XmlFiles - Process XML content from individual files
 
 =head1 SYNOPSIS
 
   use ETL::Pipeline;
   ETL::Pipeline->new( {
-    input   => ['XmlFiles', from => 'Documents'],
-    mapping => {Name => '/Root/Name', Address => '/Root/Address'},
+    input   => ['XmlFiles', iname => qr/\.xlsx$/i, records_at => '/Xml'],
+    mapping => {First => '/File/A', Second => '/File/Patient'},
     output  => ['UnitTest']
   } )->process;
 
 =head1 DESCRIPTION
 
-B<ETL::Pipeline::Input::XmlFiles> defines an input source that reads multiple
-XML files from a directory. Each XML file contains exactly one record. Fields
-are accessed with the full XML path.
+B<ETL::Pipeline::Input::XmlFiles> defines an input source that reads one or more
+records from one or more XML files. Most of the time, there should be one record
+per file. But the class handles multiple records per file too.
 
 =cut
 
 package ETL::Pipeline::Input::XmlFiles;
-use Moose;
 
 use 5.014000;
 use warnings;
 
 use Carp;
-use MooseX::Types::Path::Class qw/Dir File/;
-use Path::Class qw//;
-use Path::Class::Rule;
-use XML::XPath;
+use Data::DPath qw/dpath/;
+use XML::Bare;
+use Moose;
 
 
 our $VERSION = '2.00';
@@ -41,301 +39,96 @@ our $VERSION = '2.00';
 
 =head2 Arguments for L<ETL::Pipeline/input>
 
-=head3 from
+=head3 records_at
 
-B<from> tells B<ETL::Pipeline::Input::XmlFiles> where to find the data files. 
-By default, B<ETL::Pipeline::Input::XmlFiles> looks in 
-L<ETL::Pipeline/data_in>. B<from> tells the code to look in another place.
+Optional. The path to the record nodes, such as C</XMLDATA/Root/Record>. The
+last item in the list is the name of the root for each individual record. The
+default is B</> - one record in the file.
 
-If B<from> is a regular expression, the code finds the first directory whose
-name matches. If B<from> is a relative path, it is expected to reside under 
-L<ETL::Pipeline/data_in>. An absolute path is exact.
+You might use this attribute in two cases...
 
-=cut
+=over
 
-has 'from' => (
-	init_arg => undef,
-	is       => 'bare',
-	isa      => Dir,
-	reader   => '_get_from',
-	writer   => '_set_from',
-);
+=item 1. Multiple records per file. This is the top of each record, like in L<ETL::Pipeline::Input::Xml>.
 
+=item 2. Shorthand to leave off extra nodes from every path. One record per file, but you don't want extra path parts on the beginning of every field.
 
-sub from {
-	my $self = shift;
+=back
 
-	if (scalar( @_ ) > 0) {
-		my $new = shift;
-		if (ref( $new ) eq 'Regexp') {
-			my $match = Path::Class::Rule->new
-				->iname( $new )
-				->max_depth( 1 )
-				->directory
-				->iter( $self->pipeline->data_in )
-				->()
-			;
-			croak 'No matching directories' unless defined $match;
-			$self->_set_from( $match );
-		} else  {
-			my $folder = Path::Class::dir( $new );
-			$folder = $folder->absolute( $self->pipeline->data_in ) 
-				if $folder->is_relative;
-			$self->_set_from( $folder );
-		}
-	}
-	return $self->_get_from;
-}
-
-
-=head3 ...
-
-B<ETL::Pipeline::Input::XmlFiles> accepts any of the tests provided by
-L<Path::Iterator::Rule>. The value of the argument is passed directly into the 
-test. For boolean tests (e.g. readable, exists, etc.), pass an C<undef> value.
-
-B<ETL::Pipeline::Input::XmlFiles> automatically applies the C<file> and
-C<iname> filters. Do not pass C<file> through L<ETL::Pipeline/input>. You may
-pass in C<name> or C<iname> to override the default filter of B<*.xml>.
+This can be any value accepted by L<Data::DPath>. Fortunately, L<Data::Dpath>
+takes paths that look like XPath for XML.
 
 =cut
 
-sub BUILD {
-	my $self = shift;
-	my $arguments = shift;
-
-	# Set the top level directory.
-	if (defined $arguments->{from}) {
-		$self->from( $arguments->{from} );
-	} else { $self->from( '.' ); }
-
-	# Configure the file search.
-	my @criteria = grep { 
-		$_ ne 'file' 
-		&& !$self->meta->has_attribute( $_ ) 
-	} keys %$arguments;
-	my $search = Path::Class::Rule->new;
-	foreach my $name (@criteria) {
-		my $value = $arguments->{$name};
-		eval "\$search->$name( \$value )";
-		croak $@ unless $@ eq '';
-	}
-	$search->iname( '*.xml' ) 
-		unless exists( $arguments->{name} ) || exists( $arguments->{iname} );
-	$search->file;
-	$self->_set_iterator( $search->iter( $self->from ) );
-}
-
-
-=head2 Called from L<ETL::Pipeline/process>
-
-=head3 get
-
-B<get> returns a list of values from matching nodes. The field name is an 
-I<XPath>. See L<http://www.w3schools.com/xpath/xpath_functions.asp> for more
-information on XPaths.
-
-XML lends itself to recursive records. What happens when you need two fields
-under the same subnode? For example, a I<person involved> can have both a 
-I<name> and a I<role>. The names and roles go together. How do you B<get> them
-together?
-
-B<get> supports subnodes as additional parameters. Pass the top node as the
-first parameter. Pass the subnode names in subsequent parameters. The values
-are returned in the same order as the parameters. B<get> returns C<undef> for
-any non-existant subnodes.
-
-Here are some examples...
-
-  # Return a single value from a single field.
-  $etl->get( '/Root/Name' );
-  'John Doe'
-  
-  # Return a list from multiple fields with the same name.
-  $etl->get( '/Root/PersonInvolved/Name' );
-  ('John Doe', 'Jane Doe')
-  
-  # Return a list from subnodes.
-  $etl->get( '/Root/PersonInvolved', 'Name' );
-  ('John Doe', 'Jane Doe')
-  
-  # Return a list of related fields from subnodes.
-  $etl->get( '/Root/PersonInvolved', 'Name', 'Role' );
-  (['John Doe', 'Husband'], ['Jane Doe', 'Wife'])
-
-In the L<ETL::Pipeline/mapping>, those examples looks like this...
-
-  {Name => '/Root/Name'}
-  {Name => '/Root/PersonInvolved/Name'}
-  {Name => ['/Root/PersonInvolved', 'Name']}
-  {Name => ['/Root/PersonInvolved', 'Name', 'Role']}
-
-=cut
-
-sub get {
-	my ($self, $top, @subnodes) = @_;
-	my $xpath = $self->xpath;
-
-	my $match = $xpath->find( $top );
-	if ($match->isa( 'XML::XPath::NodeSet' )) {
-		if (scalar( @subnodes ) == 0) {
-			return map { $_->string_value } $match->get_nodelist;
-		} elsif (scalar( @subnodes ) == 1) {
-			my @values;
-			foreach my $node ($match->get_nodelist) {
-				my $data = $xpath->find( $subnodes[0], $node );
-				push @values, $data->string_value;
-			}
-			return @values;
-		} else {
-			my @values;
-			foreach my $node ($match->get_nodelist) {
-				my @current;
-				foreach my $path (@subnodes) {
-					my $data = $xpath->find( $path, $node );
-					push @current, $data->string_value;
-				}
-				push @values, \@current;
-			}
-			return @values;
-		}
-	} else { return $match->value; }
-}
-
-
-=head3 next_record
-
-This method parses the next file in the folder.
-
-B<Data::ETL::Extract::XmlFiles> builds a list of file names when it first
-starts. B<next_record> iterates over this in-memory list. It will not parse
-any new files saved into the folder.
-
-=cut
-
-sub next_record {
-	my ($self) = @_;
-
-	my $object = $self->_next_file;
-	if (defined $object) {
-		$self->_set_file( $object );
-
-		my $parser = XML::XPath->new( filename => "$object" );
-		croak "Unable to parse the XML in '$object'" unless defined $parser;
-		$self->_set_xpath( $parser );
-
-		return 1;
-	} else { return 0; }
-}
-
-
-=head3 configure
-
-B<configure> doesn't actually do anything. But it is required by
-L<ETL::Pipeline/process>.
-
-=cut
-
-sub configure { }
-
-
-=head3 finish
-
-B<finish> doesn't actually do anything. But it is required by
-L<ETL::Pipeline/process>. 
-
-=cut
-
-sub finish { }
-
-
-=head2 Other Methods & Attributes
-
-=head3 exists
-
-The B<exists> method tells you whether the given path exists or not. It returns
-a boolean value. B<True> means that the given node exists in this XML file.
-B<False> means that it does not.
-
-B<exists> accepts an XPath string as the only parameter. You can learn more 
-about XPath here: L<http://www.w3schools.com/xpath/xpath_functions.asp>.
-
-=cut
-
-sub exists {
-	my ($self, $xpath_string) = @_;
-
-	my @matches = $self->xpath->findnodes( $xpath_string );
-	return (scalar( @matches ) > 0 ? 1 : 0);
-}
-
-
-=head3 file
-
-The B<file> attribute holds a L<Path::Class:File> object for the current XML
-file. You can use it for accessing the file name or directory.
-
-B<file> is automatically set by L</next_record>.
-
-=cut
-
-has 'file' => (
-	init_arg => undef,
-	is       => 'ro',
-	isa      => File,
-	writer   => '_set_file',
-);
-
-
-=head3 iterator
-
-L<Path::Class::Rule> creates an iterator that returns each file in turn. 
-B<iterator> holds it for L</next_record>.
-
-=cut
-
-has 'iterator' => (
-	handles => {_next_file => 'execute'},
+has 'records_at' => (
+	default => '/',
 	is      => 'ro',
-	isa     => 'CodeRef',
-	traits  => [qw/Code/],
-	writer  => '_set_iterator',
+	isa     => 'Str',
 );
 
 
-=head3 xpath
+=head3 skipping
 
-The B<xpath> attribute holds the current L<XML::XPath> object. It is 
-automatically set by the L</next_record> method.
+Not used. This attribute is ignored. XML files must follow specific formatting
+rules. Extra rows are parsed as data. There's nothing to skip.
+
+=head2 Methods
+
+=head3 run
+
+This is the main loop. It opens the file, reads records, and closes it when
+done. This is the place to look if there are problems.
+
+L<ETL::Pipeline> automatically calls this method.
 
 =cut
 
-has 'xpath' => (
-	init_arg => undef,
-	is       => 'ro',
-	isa      => 'XML::XPath',
-	writer   => '_set_xpath',
-);
+sub run {
+	my ($self, $etl) = @_;
+
+	while (my $path = $self->next_path( $etl )) {
+		# Load the XML file and turn it into a Perl hash.
+		my $parser = XML::Bare->new( file => "$path" );
+		my $xml = $parser->parse;
+
+		# Find the node that is an array of records. dpath should return a list
+		# with one array reference. And that array has the actual records. But I
+		# check, just in case your XML is structured a little differently.
+		#
+		# XML should generate hashes - field/value pairs. In theory, there might
+		# be an XML file that sends back a single record as an array reference.
+		# Not likely when transfering data.
+		my @matches = dpath( $self->records_at )->match( $xml );
+		my $list = (scalar( @matches ) == 1 && ref( $matches[0] ) eq 'ARRAY') ? $matches[0] : \@matches;
+
+		# Process each record. And that's it.
+		my $source = $self->source;
+		foreach my $record (@$list) {
+			$self->source( sprintf( '%s character %d', $source, $record->{_pos} ) );
+			$etl->record( $record );
+		}
+	}
+}
 
 
 =head1 SEE ALSO
 
-L<ETL::Pipeline>, L<ETL::Pipeline::Input>, L<ETL::Pipeline::Input::XML>, 
-L<Path::Class::File>, L<Path::Class::Rule>, L<Path::Iterator::Rule>, 
-L<XML::XPath>
+L<ETL::Pipeline>, L<ETL::Pipeline::Input>, L<ETL::Pipeline::Input::File::List>,
+L<XML::Bare>
 
 =cut
 
 with 'ETL::Pipeline::Input';
+with 'ETL::Pipeline::Input::File::List';
 
 
 =head1 AUTHOR
 
-Robert Wohlfarth <robert.j.wohlfarth@vanderbilt.edu>
+Robert Wohlfarth <robert.j.wohlfarth@vumc.org>
 
 =head1 LICENSE
 
-Copyright 2016 (c) Vanderbilt University Medical Center
+Copyright 2021 (c) Vanderbilt University Medical Center
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

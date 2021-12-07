@@ -187,6 +187,25 @@ sub message { return( shift->_set_get_scalar( 'message', @_ ) ); }
 
 sub package { return( shift->_set_get_scalar( 'package', @_ ) ); }
 
+# From perlfunc docmentation on "die":
+# "If LIST was empty or made an empty string, and $@ contains an
+# object reference that has a "PROPAGATE" method, that method will
+# be called with additional file and line number parameters. The
+# return value replaces the value in $@; i.e., as if "$@ = eval {
+# $@->PROPAGATE(__FILE__, __LINE__) };" were called."
+sub PROPAGATE
+{
+    my( $self, $file, $line ) = @_;
+    if( defined( $file ) && defined( $line ) )
+    {
+        my $clone = $self->clone;
+        $clone->file( $file );
+        $clone->line( $line );
+        return( $clone );
+    }
+    return( $self );
+}
+
 sub rethrow 
 {
     my $self = shift( @_ );

@@ -3,15 +3,17 @@
 use ExtUtils::testlib;
 use Test::More;
 use Test::Exception;
-use Test::Warn;
 use Test::Differences;
 use Test::Memory::Cycle;
+use Test::Log::Log4perl;
 use Config::Model;
 use Config::Model::AnyId;
 
 use strict;
 use warnings;
 use Config::Model::Tester::Setup qw/init_test/;
+
+Test::Log::Log4perl->ignore_priority("info");
 
 my ($model, $trace) = init_test();
 
@@ -375,12 +377,18 @@ foreach my $what (qw/forbid warn suppress/) {
             is( $lwd->needs_content_check, 1, "verify needs_content_check after list content modif" );
         }
         elsif ( $what eq 'warn' ) {
-            warnings_like { $lwd->fetch_all_values; } qr/Duplicated/, "warns with duplicated values";
+            {
+                my $tlog = Test::Log::Log4perl->expect([ 'User' =>  warn => qr/Duplicated/ ]);
+                $lwd->fetch_all_values;
+            }
             is ( $lwd->has_warning, 1, "detected duplicated values");
             is( $lwd->has_fixes, 2, "check nb of fixes" );
             $inst->apply_fixes;
-            warnings_like { $lwd->fetch_all_values; }[], # no warning accepted
-                "no longer warns with duplicated values";
+            {
+                # no warning expected
+                my $tlog = Test::Log::Log4perl->expect([]);
+                $lwd->fetch_all_values;
+            }
         }
         else {
             $lwd->check_content;

@@ -18,6 +18,28 @@ $skip = site_check( 'celestrak.com' )
     and plan skip_all => $skip;
 
 $st->set(
+    direct	=> 0,
+);
+
+SKIP: {
+    is_success_or_skip( $st, qw{ celestrak --observing-list stations },
+	'Fetch Celestrak stations observing list', 4 );
+
+    is $st->content_type(), 'observing-list',
+	"Content type is 'observing-list'";
+
+    is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
+
+    my $resp = most_recent_http_response(  );
+
+    is $st->content_type( $resp ), 'observing-list',
+	"Result type is 'observing-list'";
+
+    is $st->content_source( $resp ), 'celestrak',
+	"Result source is 'celestrak'";
+}
+
+$st->set(
     direct	=> 1,
 );
 

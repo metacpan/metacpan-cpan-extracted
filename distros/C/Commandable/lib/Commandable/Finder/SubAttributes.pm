@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes 0.05;
+package Commandable::Finder::SubAttributes 0.06;
 
 use v5.14;
 use warnings;
@@ -57,7 +57,7 @@ with the C<:attrs> symbol:
 
 =head2 Command_description
 
-   :Command_description("name")
+   :Command_description("description text")
 
 Gives a plain string description text for the command.
 
@@ -69,6 +69,27 @@ Gives a named argument for the command and its description.
 
 If the name is suffixed by a C<?> character, this argument is optional. (The
 C<?> character itself will be removed from the name).
+
+=head2 Command_opt
+
+   :Command_opt("optname", "description")
+
+Gives a named option for the command and its description.
+
+If the name contains C<|> characters it provides multiple name aliases for the
+same option.
+
+If the name field ends in a C<:> character, a value is expected for the
+option. It can either be parsed from the next input token, or after an C<=>
+sign of the same token:
+
+   --optname VALUE
+   --optname=VALUE
+
+An optional third argument may be present to specify a default value, if not
+provided by the invocation:
+
+   :Command_opt("optname", "description", "default")
 
 =cut
 
@@ -97,7 +118,7 @@ sub import
 
 =head2 new
 
-   $finder = Commandable::Finder::SubAttributes->mew( %args )
+   $finder = Commandable::Finder::SubAttributes->new( %args )
 
 Constructs a new instance of C<Commandable::Finder::SubAttributes>.
 
@@ -197,10 +218,18 @@ sub _commands
          $args = [ map { Commandable::Command::_Argument->new( %$_ ) } @$args ];
       }
 
+      my $opts;
+      if( $opts = Attribute::Storage::get_subattr( $code, "Command_opt" ) ) {
+         $opts = { map { my $o = Commandable::Command::_Option->new( %$_ );
+                         map { ( $_ => $o ) } $o->names
+                       } @$opts };
+      }
+
       $commands{ $name } = Commandable::Command->new(
          name        => $name,
          description => Attribute::Storage::get_subattr( $code, "Command_description" ),
          arguments   => $args,
+         options     => $opts,
          package     => $self->{package},
          code        => $code,
       );

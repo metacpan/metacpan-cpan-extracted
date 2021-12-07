@@ -73,6 +73,8 @@ sub _purchase_state {
         return 'refunded';
     } elsif ($purchase_state == 3) {
         return 'expired';
+    } elsif ($purchase_state == 4) {
+        return 'pending';
     }
 
     croak sprintf 'invalid purchase state: %s', $purchase_state;

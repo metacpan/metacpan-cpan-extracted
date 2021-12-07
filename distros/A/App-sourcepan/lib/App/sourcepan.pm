@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 package App::sourcepan;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use CPAN;
 use File::Basename qw( basename );
@@ -89,28 +89,30 @@ sub run
 
       next unless $opts->{extract};
 
+      my @unpack_cmd;
       my $dirname;
 
       if( $id =~ m/\.tar\.(?:gz|bz2)$/ ) {
          my $tarflags = ( $id =~ m/bz2$/ ) ? "xjf" : "xzf";
-         system( "tar", $tarflags, $basename ) == 0 or
-            die "Unable to extract - tar failed with exit code $?\n";
-
+         @unpack_cmd = ( "tar", $tarflags, $basename );
          ( $dirname = $basename ) =~ s/\.tar.(?:gz|bz2)$//;
-         -d $dirname or
-            die "Expected to extract a directory called $dirname\n";
       }
       elsif( $id =~ m/\.zip$/ ) {
-         IPC::Run::run [ "unzip", $basename ], ">/dev/null" or
-            die "Unable to extract - unzip failed with exit code $?\n";
-
+         @unpack_cmd = ( "unzip", $basename );
          ( $dirname = $basename ) =~ s/\.zip$//;
-         -d $dirname or
-            die "Expected to extract a directory called $dirname\n";
       }
       else {
          die "Unsure how to unpack $id\n";
       }
+
+      !$opts->{overwrite} and -d $dirname and
+         die "Target directory $dirname already exists; rename it out of the way first or pass --overwrite\n";
+
+      IPC::Run::run [ @unpack_cmd ], ">/dev/null" or
+         die "Unable to extract - $unpack_cmd[0] failed with exit code $?\n";
+
+      -d $dirname or
+         die "Expected to extract a directory called $dirname\n";
 
       if( $opts->{unversioned} ) {
          ( my $newname = $dirname ) =~ s/-[0-9._]+$// or

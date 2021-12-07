@@ -1,7 +1,7 @@
 package Sah::SchemaR::byte;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.075'; # VERSION
+our $DATE = '2021-07-16'; # DATE
+our $VERSION = '0.076'; # VERSION
 
 our $rschema = ["int",[{examples=>[{data=>0,valid=>1},{data=>-1,valid=>0},{data=>1,valid=>1},{data=>255,valid=>1},{data=>256,valid=>0}],max=>255,min=>0,summary=>"8-bit unsigned integer"},{summary=>"Same as uint8"}],["uint8","int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::byte - Same as uint8
 
 =head1 VERSION
 
-This document describes version 0.075 of Sah::SchemaR::byte (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
+This document describes version 0.076 of Sah::SchemaR::byte (from Perl distribution Sah-Schemas-Int), released on 2021-07-16.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017, 2016, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

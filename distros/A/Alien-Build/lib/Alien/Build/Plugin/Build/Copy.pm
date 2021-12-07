@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Copy plugin for Alien::Build
-our $VERSION = '2.45'; # VERSION
+our $VERSION = '2.46'; # VERSION
 
 
 sub init
@@ -21,7 +21,7 @@ sub init
     $meta->register_hook(build => sub {
       my($build) = @_;
       my $stage = Path::Tiny->new($build->install_prop->{stage})->canonpath;
-      $build->system("xcopy . $stage /E");
+      $build->system(qq{xcopy . "$stage" /E});
     });
   }
   elsif($^O eq 'darwin')
@@ -35,7 +35,7 @@ sub init
     # important enough to care about.
 
     $meta->register_hook(build => [
-      'cp -pPR * %{.install.stage}',
+      'cp -pPR * "%{.install.stage}"',
     ]);
   }
   else
@@ -43,7 +43,7 @@ sub init
     # TODO: some platforms might not support -a
     # I think most platforms will support -r
     $meta->register_hook(build => [
-      'cp -aR * %{.install.stage}',
+      'cp -aR * "%{.install.stage}"',
     ]);
   }
 }
@@ -62,7 +62,7 @@ Alien::Build::Plugin::Build::Copy - Copy plugin for Alien::Build
 
 =head1 VERSION
 
-version 2.45
+version 2.46
 
 =head1 SYNOPSIS
 

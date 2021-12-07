@@ -3,8 +3,8 @@ NAME
     etc)
 
 VERSION
-    This document describes version 0.009 of Sah::Schemas::Net (from Perl
-    distribution Sah-Schemas-Net), released on 2020-05-27.
+    This document describes version 0.010 of Sah::Schemas::Net (from Perl
+    distribution Sah-Schemas-Net), released on 2021-07-19.
 
 DESCRIPTION
     Todo:
@@ -14,6 +14,22 @@ DESCRIPTION
      net::ip_range
      net::ipv4_range
      net::ipv6_range
+
+SAH SCHEMAS
+    *   net::hostname
+
+        Hostname.
+
+    *   net::ipv4
+
+        IPv4 address.
+
+    *   net::port
+
+        Network port number.
+
+CONTRIBUTOR
+    perlancar (on netbook-zenbook-ux305) <perlancar@gmail.com>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -39,7 +55,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2016 by
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

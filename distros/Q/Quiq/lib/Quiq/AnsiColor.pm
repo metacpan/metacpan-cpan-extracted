@@ -1,14 +1,3 @@
-package Quiq::AnsiColor;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Term::ANSIColor ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -30,7 +19,7 @@ L<Quiq::Object>
 
 =head1 DESCRIPTION
 
-Die  Klasse erlaubt es, Textausgaben - die typischerweise aufs
+Die Klasse erlaubt es, Textausgaben - die typischerweise aufs
 Terminal gehen - mit ANSI Colorcodes auszuzeichnen und diese
 Auszeichnung bei Aufruf des Konstruktors zentral an- oder ab-zuschalten.
 
@@ -56,7 +45,7 @@ Beispiele: 'bold reverse' oder 'dark red on_green'
 
 =head2 Texte mit Colorcodes weiter verarbeiten
 
-Die im folgenden genannten Programme C<aha>, C<wkhtmltopdf> sind im
+Die im folgenden genannten Programme C<aha> und C<wkhtmltopdf> sind im
 Debian-Repository enthalten.
 
 =head3 Nach PDF wandeln
@@ -80,6 +69,23 @@ Debian-Repository enthalten.
 Term::ANSIColor
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::AnsiColor;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Term::ANSIColor ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -235,7 +241,7 @@ sub strLn {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

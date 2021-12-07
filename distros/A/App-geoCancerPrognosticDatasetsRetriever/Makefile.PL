@@ -17,7 +17,6 @@ WriteMakefile(
     'strict'   => 0,
     'warnings' => 0,
     'Term::ANSIColor' => 0,
-    'Cwd' => 0,
     'Getopt::Std' => 0,
     'LWP::Simple' => 0,
     'File::Basename' => 0,

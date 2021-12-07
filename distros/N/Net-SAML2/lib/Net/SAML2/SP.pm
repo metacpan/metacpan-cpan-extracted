@@ -1,8 +1,10 @@
+use strict;
+use warnings;
 package Net::SAML2::SP;
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 # ABSTRACT: Net::SAML2::SP - SAML Service Provider object
 
@@ -298,7 +300,7 @@ Net::SAML2::SP - Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.9.0';
+our $VERSION = '0.9.1';
 
 use Pandoc::Version;
 use Pandoc::Error;

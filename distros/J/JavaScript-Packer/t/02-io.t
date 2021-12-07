@@ -8,7 +8,7 @@
 
 use Test::More;
 
-my $not = 33;
+my $not = 38;
 
 SKIP: {
     eval( 'use JavaScript::Packer' );
@@ -17,18 +17,19 @@ SKIP: {
 
     plan tests => $not;
 
-    fileTest( 's1',  'clean',     'compression level "clean"' );
-    fileTest( 's2',  'shrink',    'compression level "shrink"' );
-    fileTest( 's3',  'obfuscate', 'compression level "obfuscate"' );
-    fileTest( 's4',  'best',      'compression level "best" whith short javascript' );
-    fileTest( 's5',  'best',      'compression level "best" whith long javascript' );
-    fileTest( 's7',  'clean',     'compression level "clean" function as argument' );
-    fileTest( 's8',  'shrink',    'compression level "shrink" function as argument' );
-    fileTest( 's9',  'shrink',    'compression level "shrink" with _no_shrink_ argument' );
-    fileTest( 's10', 'shrink',    'compression level "shrink" with quoted args' );
-    fileTest( 's11', 'best',      'compression level "best" with long javascript matching _encode62 ord match 57' );
-    fileTest( 's12', 'best',      'compression level "best" with long javascript matching _encode62 ord match 65' );
-    fileTest( 's13', 'minify',    'compression level "minify" keep sourceMappingURL' );
+    fileTest( 's1',  'clean',     's1 compression level "clean"' );
+    fileTest( 's2',  'shrink',    's2 compression level "shrink"' );
+    fileTest( 's3',  'obfuscate', 's3 compression level "obfuscate"' );
+    fileTest( 's4',  'best',      's4 compression level "best" whith short javascript' );
+    fileTest( 's5',  'best',      's5 compression level "best" whith long javascript' );
+    fileTest( 's7',  'clean',     's7 compression level "clean" function as argument' );
+    fileTest( 's8',  'shrink',    's8 compression level "shrink" function as argument' );
+    fileTest( 's9',  'shrink',    's9 compression level "shrink" with _no_shrink_ argument' );
+    fileTest( 's10', 'shrink',    's10 compression level "shrink" with quoted args' );
+    fileTest( 's11', 'best',      's11 compression level "best" with long javascript matching _encode62 ord match 57' );
+    fileTest( 's12', 'best',      's12 compression level "best" with long javascript matching _encode62 ord match 65' );
+    fileTest( "s$_", 'minify',    "s$_ compression level \"minify\" keep sourceMappingURL" )
+		for 13 .. 18;
 
     my $packer = JavaScript::Packer->init();
 
@@ -144,6 +145,7 @@ sub filesMatch {
             $a ne $b
             )
         {                                            # a and b not the same
+note( "[$a] [$b]" );
             return 0;
         }
     }
@@ -166,9 +168,10 @@ sub fileTest {
     close( INFILE );
     close( GOTFILE );
 
-    open( EXPECTEDFILE, 't/scripts/' . $filename . '-expected.js' ) or die( "couldn't open file" );
-    open( GOTFILE,      't/scripts/' . $filename . '-got.js' )      or die( "couldn't open file" );
-    ok( filesMatch( GOTFILE, EXPECTEDFILE ), $comment );
+    open( EXPECTEDFILE, 't/scripts/' . $filename . '-expected.js' ) ;#or die( "couldn't open file $filename-expected.js: $!" );
+    open( GOTFILE,      't/scripts/' . $filename . '-got.js' )      ;#or die( "couldn't open file $filename-got.js: $!" );
+    ok( filesMatch( GOTFILE, EXPECTEDFILE ), $comment )
+		|| BAIL_OUT( "fail" );
     close( EXPECTEDFILE );
     close( GOTFILE );
 }

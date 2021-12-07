@@ -3,7 +3,7 @@ App::DBBrowser::DB::MariaDB;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use File::Basename qw( basename );
 

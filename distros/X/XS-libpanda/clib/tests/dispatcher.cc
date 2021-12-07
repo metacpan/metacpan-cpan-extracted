@@ -5,7 +5,7 @@
 using Dispatcher = CallbackDispatcher<int(int)>;
 using Event = Dispatcher::Event;
 
-#define TEST(name) TEST_CASE("callback dispatcher: " name, "[callback dispatcher]")
+TEST_PREFIX("callback dispatcher: ", "[callback dispatcher]");
 
 TEST("empty") {
     Dispatcher d;

@@ -1,5 +1,6 @@
 Brotli.xs
 Changes
+INSTALL.SKIP
 lib/Protocol/HTTP/Compression/Brotli.pm
 Makefile.PL
 MANIFEST			This list of files

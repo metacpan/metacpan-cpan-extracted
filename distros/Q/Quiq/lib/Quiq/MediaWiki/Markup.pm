@@ -1,16 +1,3 @@
-package Quiq::MediaWiki::Markup;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Unindent;
-use Quiq::Parameters;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -63,6 +50,25 @@ Globale Community Site für Wikimedia-Projekte:
 L<https://meta.wikimedia.org/>
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::MediaWiki::Markup;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Unindent;
+use Quiq::Parameters;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -1823,7 +1829,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

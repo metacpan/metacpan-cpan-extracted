@@ -1,10 +1,15 @@
 package App::Notifier::Service;
-$App::Notifier::Service::VERSION = '0.0802';
+$App::Notifier::Service::VERSION = '0.0902';
 use 5.014;
 
-use Dancer2 0.300003;
+use strict;
+use warnings;
+
+use Mojolicious::Lite;
+use Plack::Builder;
 
 use File::Spec ();
+use JSON::MaybeXS qw( decode_json );
 use YAML::XS qw( LoadFile );
 use List::MoreUtils qw();
 
@@ -57,12 +62,13 @@ sub _process_cmd_line_arg
 }
 
 get '/notify' => sub {
+    my $c = shift;
 
     $config ||= LoadFile($config_fn);
 
-    my $cmd_id      = ( params->{cmd_id} || 'default' );
+    my $cmd_id      = ( $c->req->param('cmd_id') || 'default' );
     my $text_params = {};
-    if ( defined( my $text_params_as_json = params->{text_params} ) )
+    if ( defined( my $text_params_as_json = $c->req->param('text_params') ) )
     {
         $text_params = decode_json($text_params_as_json);
         if ( ref($text_params) ne 'HASH' )
@@ -115,20 +121,27 @@ get '/notify' => sub {
         {
             waitpid( $pid, 0 );
         }
-        return "Success.\n";
+        $c->render( text => "Success.\n" );
     }
     else
     {
-        debug "Unknown Command ID '$cmd_id'.";
+        $c->log("Unknown Command ID '$cmd_id'.");
         return "Unknown Command ID.\n";
     }
 };
 
 get '/' => sub {
-    return "OK\n";
+    my $c = shift;
+    $c->render( text => "OK\n" );
 };
 
-true;
+builder
+{
+    # enable 'Deflater';
+    app->start;
+};
+
+# "true";
 
 # start;
 
@@ -145,7 +158,7 @@ notifying that an event (such as the finish of a task) occured.
 
 =head1 VERSION
 
-version 0.0802
+version 0.0902
 
 =head1 SYNOPSIS
 
@@ -166,11 +179,10 @@ version 0.0802
               param_name: "msg"
     EOF
 
-    # Run the Dancer application from the distribution's root directory.
+    # Run the Mojo application from the distribution's root directory.
     plackup ./bin/app.psgi
 
     # Alternatively run the following Perl code:
-    use Dancer2 0.300003;
     use App::Notifier::Service;
     start;
 
@@ -180,7 +192,7 @@ version 0.0802
 
 =head1 AUTHOR
 
-Shlomi Fish, L<http://www.shlomifish.org/> .
+Shlomi Fish, L<https://www.shlomifish.org/> .
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -304,7 +316,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Shlomi Fish.
+This software is Copyright (c) 2021 by Shlomi Fish.
 
 This is free software, licensed under:
 

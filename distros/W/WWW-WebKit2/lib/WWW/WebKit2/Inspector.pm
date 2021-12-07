@@ -35,11 +35,13 @@ sub get_javascript_result {
         $value = $self->view->run_javascript_finish($result);
     };
     if ($@) {
+        my $exception = $@;
+
         my $log_file = $self->log_html_source;
         my $message = "Unexpected return value! "
             . "Hint: One cause is a function assignment to a js-object (foo.bar = function...)"
             . "\nFailing call was: $js"
-            . "\nSpecific error was: $@";
+            . "\nSpecific error was: '$exception'";
         $message .= "\n(Page-source written to $log_file)" if $log_file;
 
         die $message;

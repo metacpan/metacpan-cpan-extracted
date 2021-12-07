@@ -3,9 +3,16 @@
 #include <xs/Ref.h>
 #include <panda/exception.h>
 #include <xs/typemap.h>
+#include <xs/function.h>
+
 #include "DualTrace.h"
+#include "PerlTraceInfo.h"
 
 namespace xs {
+
+struct PerlArgumentsHolder: panda::ArgumentsHolder {
+    xs::Simple args;
+};
 
 extern Sv::payload_marker_t backtrace_c_marker;
 extern Sv::payload_marker_t backtrace_perl_marker;
@@ -32,9 +39,27 @@ struct Typemap<panda::BacktraceInfo*, TYPE*>: TypemapObject<panda::BacktraceInfo
     static panda::string_view package() {return "Exception::Backtrace::BacktraceInfo"; }
 };
 
-template <>
-struct Typemap<panda::Stackframe*>: TypemapObject<panda::Stackframe*, panda::Stackframe*, ObjectTypeRefcntPtr, ObjectStorageMG>{
+template <class TYPE>
+struct Typemap<PerlTraceInfo*, TYPE*>: Typemap<panda::BacktraceInfo*, TYPE*> {
+    static panda::string_view package() {return "Exception::Backtrace::PerlTraceInfo"; }
+};
+
+template <class TYPE>
+struct Typemap<panda::Stackframe*, TYPE*>: TypemapObject<panda::Stackframe*, TYPE*, ObjectTypeRefcntPtr, ObjectStorageMG>{
     static panda::string_view package() {return "Exception::Backtrace::Stackframe"; }
 };
+
+template <class TYPE>
+struct Typemap<PerlFrame*, TYPE*>: Typemap<panda::Stackframe*, TYPE*> {
+    static panda::string_view package() {return "Exception::Backtrace::PerlFrame"; }
+};
+
+template <> struct Typemap<panda::ArgumentsHolder*> : TypemapBase<panda::ArgumentsHolder*> {
+    static Sv out (panda::ArgumentsHolder* var, const Sv& = {}) {
+        return static_cast<PerlArgumentsHolder*>(var)->args;
+    }
+};
+
+
 
 };

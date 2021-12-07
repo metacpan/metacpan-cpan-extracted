@@ -1,15 +1,3 @@
-package Quiq::Dumper;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::AnsiColor;
-use Scalar::Util ();
-
 # -----------------------------------------------------------------------------
 
 =head1 NAME
@@ -19,6 +7,24 @@ Quiq::Dumper - Ausgabe Datenstruktur
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Dumper;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::AnsiColor;
+use Scalar::Util ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -147,7 +153,7 @@ sub dump {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

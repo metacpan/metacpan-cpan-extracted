@@ -16,7 +16,7 @@ use YAML::Tiny;
 use MySQL::Workbench::Parser::Table;
 use MySQL::Workbench::Parser::View;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 has lint => ( is => 'ro', default => sub { 1 } );
 
@@ -70,7 +70,7 @@ sub dump {
     my %info;
     for my $table ( @{$tables} ) {
         push @{$info{tables}}, $table->as_hash;
-    } 
+    }
 
     for my $view ( @{ $self->views } ) {
         push @{$info{views}}, $view->as_hash;
@@ -164,14 +164,14 @@ sub _parse {
     my %column_mapping;
     if ( @view_nodes ) {
 
-        TABLE: 
-        for my $table ( @tables ) { 
-            my $name = $table->name; 
-         
-            for my $col ( @{ $table->columns } ) { 
-                my $col_name = $col->name; 
+        TABLE:
+        for my $table ( @tables ) {
+            my $name = $table->name;
+
+            for my $col ( @{ $table->columns } ) {
+                my $col_name = $col->name;
                 $column_mapping{$name}->{$col_name} = $col;
-            } 
+            }
         }
     }
 
@@ -261,9 +261,20 @@ MySQL::Workbench::Parser - parse .mwb files created with MySQL Workbench
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
+
+    # create the parser
+    my $parser = MySQL::Workbench::Parser->new(
+        file => '/path/to/file.mwb',
+    );
+
+    # access tables of the workbench ER model
+    my @tables = @{ $parser->tables };
+
+    # access views of the workbench ER model
+    my @views = @{ $parser->views };
 
 =head1 DESCRIPTION
 

@@ -1,22 +1,3 @@
-package Quiq::Database::ResultSet;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Object;
-use Time::HiRes ();
-use Quiq::Option;
-use Quiq::Hash;
-use Quiq::Array;
-use Quiq::FileHandle;
-use Quiq::Properties;
-use Quiq::AnsiColor;
-use Quiq::Duration;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -33,6 +14,31 @@ L<Quiq::Hash>
 
 Ein Objekt der Klasse repräsentiert eine Liste von gleichartigen
 Datensätzen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::ResultSet;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Object;
+use Time::HiRes ();
+use Quiq::Option;
+use Quiq::Hash;
+use Quiq::Array;
+use Quiq::FileHandle;
+use Quiq::Properties;
+use Quiq::AnsiColor;
+use Quiq::Duration;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -1150,7 +1156,7 @@ sub reverse {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

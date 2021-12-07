@@ -1,15 +1,3 @@
-package Quiq::JQuery::Tabs;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash;
-use Quiq::Html::List;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -91,6 +79,24 @@ HTML:
       </p>
     </div>
   </div>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::JQuery::Tabs;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash;
+use Quiq::Html::List;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -198,7 +204,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

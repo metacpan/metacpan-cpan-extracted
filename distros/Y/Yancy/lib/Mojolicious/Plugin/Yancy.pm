@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.084';
+our $VERSION = '1.085';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -40,6 +40,11 @@ our $VERSION = '1.084';
 #pod
 #pod (optional) Specify a model class or object that extends L<Yancy::Model>.
 #pod By default, will create a basic L<Yancy::Model> object.
+#pod
+#pod     plugin Yancy => { backend => { Pg => app->pg }, model => 'MyApp::Model' };
+#pod
+#pod     my $model = Yancy::Model->with_roles( 'MyRole' );
+#pod     plugin Yancy => { backend => { Pg => app->pg }, model => $model };
 #pod
 #pod =item route
 #pod
@@ -661,12 +666,16 @@ sub register {
         $config->{schema} = dclone( $config->{openapi}{definitions} );
     }
 
-    my $model = $config->{model} // Yancy::Model->new(
-      backend => $app->yancy->backend,
-      log => $app->log,
-      ( read_schema => $config->{read_schema} )x!!exists $config->{read_schema},
-      schema => $config->{schema},
-    );
+    my $model = $config->{model} && blessed $config->{model} ? $config->{model} : undef;
+    if ( !$model ) {
+      my $class = $config->{model} // 'Yancy::Model';
+      $model = $class->new(
+        backend => $app->yancy->backend,
+        log => $app->log,
+        ( read_schema => $config->{read_schema} )x!!exists $config->{read_schema},
+        schema => $config->{schema},
+      );
+    }
     $app->helper( 'yancy.model' => sub {
         my ( $c, $schema ) = @_;
         return $schema ? $model->schema( $schema ) : $model;
@@ -680,7 +689,11 @@ sub register {
         $schema->_check_json_schema; # In case we haven't already
         $config->{schema}{ $schema_name } = dclone( $schema->json_schema );
     }
-
+    # XXX: Add the fully-read schema back to the backend. This should be
+    # removed in favor of the backend's read_schema filling things in.
+    # The backend should keep a copy of the original schema, as read
+    # from the database. The model's schema can be altered.
+    $app->yancy->backend->schema( $model->json_schema );
 
     # Resources and templates
     my $share = path( __FILE__ )->sibling( 'Yancy' )->child( 'resources' );
@@ -935,7 +948,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.084
+version 1.085
 
 =head1 SYNOPSIS
 
@@ -975,6 +988,11 @@ connections.
 
 (optional) Specify a model class or object that extends L<Yancy::Model>.
 By default, will create a basic L<Yancy::Model> object.
+
+    plugin Yancy => { backend => { Pg => app->pg }, model => 'MyApp::Model' };
+
+    my $model = Yancy::Model->with_roles( 'MyRole' );
+    plugin Yancy => { backend => { Pg => app->pg }, model => $model };
 
 =item route
 

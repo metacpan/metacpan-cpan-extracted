@@ -10,11 +10,11 @@ Stringifies Perl and C/C++ stack frames
 
 =head2 $bt->c_trace()
 
-Returns container of C/C++ stack frames
+Returns container of C/C++ stack frames, see L<Exception::Backtrace::BacktraceInfo>
 
 =head2 $bt->perl_trace()
 
-Returns container of C/C++ perl frames
+Returns container of perl frames, see L<Exception::Backtrace::PerlTraceInfo>
 
 =head1 REFERENCE
 

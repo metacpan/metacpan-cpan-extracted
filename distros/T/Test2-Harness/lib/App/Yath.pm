@@ -2,7 +2,7 @@ package App::Yath;
 use strict;
 use warnings;
 
-our $VERSION = '1.000082';
+our $VERSION = '1.000086';
 
 use Test2::Harness::Util::HashBase qw{
     -config
@@ -146,6 +146,7 @@ sub process_argv {
     $options->set_command_class($cmd_class);
     $self->{+_COMMAND_CLASS} = $cmd_class;
 
+
     $options->grab_pre_command_opts(stop_at_non_opt => 1, passthrough => 1, die_at_non_opt => 0);
 
     my $config_cmd_args = $self->{+CONFIG}->{$cmd_name};
@@ -212,6 +213,11 @@ sub _command_from_argv {
             return 'help';
         }
 
+        if ($arg eq 'do') {
+            splice(@$argv, $idx, 1);
+            last;
+        }
+
         last if $arg eq '::';
         next if $arg =~ /^-/;
 
@@ -230,7 +236,7 @@ sub _command_from_argv {
         return splice(@$argv, $idx, 1) unless $is_path;
     }
 
-    if (find_pfile($self->settings)) {
+    if (my $pfile = find_pfile($self->settings)) {
         warn "\n** Persistent runner detected, defaulting to the 'run' command **\n\n";
         return 'run';
     }

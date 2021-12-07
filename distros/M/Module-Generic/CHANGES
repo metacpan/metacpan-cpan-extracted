@@ -1,5 +1,25 @@
 Revision history for Perl module Module::Generic
 
+v0.18.1 2021-12-07T21:24:28+0900
+    - Resubmission
+
+v0.18.0 2021-12-04T11:13:15+0900
+    - Correction in baseinfo() in Module::Generic::File
+    - Minor improvement in helper method _is_a in Module::Generic
+    - Added the standard PROPAGATE method in Module::Generic::Exeption
+    - Added the support for global variable FATAL_ERROR to trigger fatal error
+    - Implemented virtualisation in Module::Generic::File. See documentation
+    - Improved error() in Module::Generic to allow the use of "class" parameter
+    - Added method aliases append() and prepend() in Module::Generic::Array
+    - Implemented lvalue support for many support methods in Module::Generic
+    - Added test units to better test Module::Generic
+    - Improved Module::Generic::Number, lightening new()
+    - Corrected a bug in as_String in Module::Generic::HeaderValue
+    - Module::Generic::HeaderValue returns a boolean rather than the string in boolean context
+
+v0.17.3 2021-11-22T11:14:35+0900
+    - Minor correction in Module::Generic removing the INIT block
+
 v0.17.2 2021-11-16T12:20:03+0900
     - Minor improvement to _parse_timestamp in Module::Generic
 

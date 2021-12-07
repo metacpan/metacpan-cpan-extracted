@@ -100,5 +100,7 @@ TEST("unix-socket in config.location.sock") {
     );
 
     test.run();
+
+    unievent::Fs::unlink("tests/testsock").nevermind();
 }
 #endif

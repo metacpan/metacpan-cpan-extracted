@@ -1,4 +1,0 @@
-sub runtime_requires {
-  my ($module, $version_or_range) = @_;
-  _add_prereq(PREREQ_PM => $module, $version_or_range);
-}

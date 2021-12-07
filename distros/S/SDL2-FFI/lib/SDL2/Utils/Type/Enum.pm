@@ -8,7 +8,7 @@ package SDL2::Utils::Type::Enum {    # Cribbed from FFI::Platypus::Type::Enum
     use Carp qw( croak );
 
     # ABSTRACT: Custom platypus type for dealing with C enumerated types
-    our $VERSION  = '0.07';                # VERSION
+    our $VERSION  = '0.08';                # VERSION
     our @CARP_NOT = qw( FFI::Platypus );
 
     sub ffi_custom_type_api_1 {

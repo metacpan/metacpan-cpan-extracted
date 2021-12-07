@@ -1,5 +1,5 @@
 package Yancy::Backend;
-our $VERSION = '1.084';
+our $VERSION = '1.085';
 # ABSTRACT: Interface to a database
 
 #pod =head1 SYNOPSIS
@@ -91,7 +91,7 @@ use Scalar::Util qw( blessed );
 use Yancy::Util qw( is_type is_format );
 use Mojo::JSON qw( encode_json );
 
-has schema =>;
+has schema => sub { {} };
 sub collections {
     require Carp;
     Carp::carp( '"collections" method is now "schema"' );
@@ -124,7 +124,7 @@ sub new {
     if ( $class eq __PACKAGE__ ) {
         return load_backend( $driver, $schema );
     }
-    return $class->SUPER::new( driver => $driver, schema => $schema );
+    return $class->SUPER::new( driver => $driver, schema => $schema // {} );
 }
 
 #pod =head2 list
@@ -260,10 +260,10 @@ sub list_p { ... }
 #pod
 #pod =item join
 #pod
-#pod Join one or more tables using a C<x-foreign-key> field. This can be the
-#pod name of a foreign key field on this schema, or the name of a table with
-#pod a foreign key field that refers to this schema. Join multiple tables at
-#pod the same time by passing an arrayref of joins.
+#pod Join one or more tables using a C<x-foreign-key> field. This should be
+#pod the name of the schema to join, either by a foreign key on this table,
+#pod or a foreign key on the joined table. Join multiple tables at the same
+#pod time by passing an arrayref of joins.
 #pod
 #pod =cut
 
@@ -524,7 +524,7 @@ Yancy::Backend - Interface to a database
 
 =head1 VERSION
 
-version 1.084
+version 1.085
 
 =head1 SYNOPSIS
 
@@ -752,10 +752,10 @@ names:
 
 =item join
 
-Join one or more tables using a C<x-foreign-key> field. This can be the
-name of a foreign key field on this schema, or the name of a table with
-a foreign key field that refers to this schema. Join multiple tables at
-the same time by passing an arrayref of joins.
+Join one or more tables using a C<x-foreign-key> field. This should be
+the name of the schema to join, either by a foreign key on this table,
+or a foreign key on the joined table. Join multiple tables at the same
+time by passing an arrayref of joins.
 
 =head2 get_p
 

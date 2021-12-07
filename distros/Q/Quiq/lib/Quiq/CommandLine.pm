@@ -1,12 +1,3 @@
-package Quiq::CommandLine;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -49,6 +40,21 @@ Die Klasse stellt Methoden zur Konstruktion einer Unix-Kommandozeile
 zur Verfügung. Die Klasse ist hilfreich, wenn einzelne Bestandteile
 der Kommandozeile dynamisch sind, also von Bedingungen und
 variablen Werten abhängen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::CommandLine;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -536,7 +542,7 @@ sub value {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

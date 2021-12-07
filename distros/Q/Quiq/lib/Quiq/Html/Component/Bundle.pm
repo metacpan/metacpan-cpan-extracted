@@ -1,12 +1,3 @@
-package Quiq::Html::Component::Bundle;
-use base qw/Quiq::List/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -58,6 +49,21 @@ deren Bestandteile abzufragen.
 Quiq::Html::Component
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Component::Bundle;
+use base qw/Quiq::List/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -349,7 +355,7 @@ sub getValue {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

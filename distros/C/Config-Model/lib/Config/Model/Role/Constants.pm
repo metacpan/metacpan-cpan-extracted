@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::Constants 2.145;
+package Config::Model::Role::Constants 2.147;
 
 # ABSTRACT: Provide some constant data.
 
@@ -44,7 +44,7 @@ Config::Model::Role::Constants - Provide some constant data.
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 AUTHOR
 

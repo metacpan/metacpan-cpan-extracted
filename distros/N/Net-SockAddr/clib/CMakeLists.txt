@@ -28,7 +28,6 @@ endif()
 
 ########################tests#######################################
 file(GLOB_RECURSE testSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*.cc")
-list(FILTER testSource EXCLUDE REGEX "tests/main.cc")
 
 add_library(tests  STATIC EXCLUDE_FROM_ALL ${testSource})
 target_link_libraries(tests PUBLIC ${PROJECT_NAME})
@@ -40,7 +39,7 @@ target_link_libraries(tests PUBLIC Catch2::Catch2)
 #executable should be MyTest to pass test esception.cc that checks "library" name
 enable_testing()
 add_executable(runtests ${EXCLUDE_TEST} ${testSource} "tests/main.cc")
-target_link_libraries(runtests tests)
+target_link_libraries(runtests tests Catch2::Catch2WithMain)
 add_test(test-all runtests)
 
 ########################install#####################################

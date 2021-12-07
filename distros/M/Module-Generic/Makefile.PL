@@ -32,6 +32,7 @@ WriteMakefile(
         # Previously requiring 2.34, but removing any requirement. Let's see.
         'File::Copy'    => 0,
         # Same as File::Copy, this is a core module
+        'File::DosGlob' => 0,
         'File::Glob'    => 0,
         'File::MMagic::XS' => '0.09008',
         'File::Spec'    => '3.73',

@@ -15,7 +15,8 @@ use Moo::Role;
 use Carp qw(croak);
 use namespace::clean;
 
-our $VERSION='1.007';
+our $VERSION='1.008';
+our $SKIP_TRIGGER=0;
 
 # used as a place holder for extended format data
 our $CURRENT_CB;
@@ -184,6 +185,11 @@ Example:
     }
   };
 
+
+If you wish to just disable the trigger globally, you just disable it using the following flag.
+
+  $Log::LogMethods::SKIP_TRIGGER=1;
+
 =over 4
 
 =cut
@@ -200,10 +206,12 @@ has logger=>(
 
 sub _trigger_logger {
   my ($self,$logger)=@_;
+
   unless(defined($logger)) {
     return undef unless exists $self->{logger};
     return $self->{logger};
   }
+  return $logger if $SKIP_TRIGGER;
 
   if($logger->DOES('Log::Log4perl::Logger')) {
     my $class=blessed $self;

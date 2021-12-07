@@ -112,8 +112,8 @@ sub round {
 # scheme_handlers - map[scheme -> handler]
 # uri - string
 sub get_resource {
-    my ($scheme_handlers, $uri) = @_;
-    $uri = URI->new($uri);
+    my ($scheme_handlers, $resource) = @_;
+    my $uri = URI->new($resource);
 
     for my $s ('http', 'https') {
         $scheme_handlers->{$s} = \&user_agent_get unless exists $scheme_handlers->{$s};
@@ -122,12 +122,17 @@ sub get_resource {
     my $scheme = $uri->scheme;
 
     my ($response, $mime_type);
-    if (exists $scheme_handlers->{$scheme}) {
-        ($response, $mime_type) = $scheme_handlers->{$scheme}->($uri->as_string);
-    } elsif ($scheme eq 'file') {
-        ($response, $mime_type) = read_file($uri->file);
+    if ($scheme) {
+        if (exists $scheme_handlers->{$scheme}) {
+            ($response, $mime_type) = $scheme_handlers->{$scheme}->($uri->as_string);
+        } elsif ($scheme eq 'file') {
+            ($response, $mime_type) = read_file($uri->file);
+        } else {
+            croak 'Unsupported scheme of uri ' . $uri->as_string;
+        }
     } else {
-        croak 'Unsupported scheme of uri ' . $uri->as_string;
+        # may it is path of local file without scheme?
+        ($response, $mime_type) = read_file($resource);
     }
     return ($response, $mime_type);
 }
@@ -196,7 +201,10 @@ sub is_array {
 
 # params: $value, $is_strict
 sub is_bool {
-    return 1 if ref $_[0] eq 'JSON::PP::Boolean';
+    my $type = ref $_[0];
+    return 1 if $type eq 'JSON::PP::Boolean' or
+                $type eq 'JSON::XS::Boolean' or
+                $type eq 'Cpanel::JSON::XS::Boolean';
     return 0 if $_[1]; # is strict
     my $is_number = looks_like_number($_[0]) && ($_[0] == 1 || $_[0] == 0);
     my $is_string = defined $_[0] && $_[0] eq '';
@@ -275,7 +283,7 @@ JSONSchema::Validator::Util - Useful functions
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 AUTHORS
 

@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,8 +45,9 @@
             "Data::Cmp" : "0.002",
             "Data::Dmp" : "0.241",
             "Data::Dump" : "0",
-            "Data::Sah::Coerce" : "0.048",
-            "Data::Sah::CoerceCommon" : "0.048",
+            "Data::Sah::Coerce" : "0.050",
+            "Data::Sah::CoerceCommon" : "0.050",
+            "Data::Sah::DefaultValueCommon" : "0",
             "Data::Sah::Filter" : "0.006",
             "Data::Sah::FilterCommon" : "0.003",
             "Data::Sah::Normalize" : "0.051",
@@ -88,7 +89,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "List::Util" : "1.45",
+            "List::Util" : "1.54",
             "Sah::SpecTest" : "v0.9.50",
             "Test::Exception" : "0",
             "Test::More" : "0.98",
@@ -98,6 +99,372 @@
             "lib::filter" : "0.03",
             "overload" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Data::Sah" : {
+         "file" : "lib/Data/Sah.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler" : {
+         "file" : "lib/Data/Sah/Compiler.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::Prog" : {
+         "file" : "lib/Data/Sah/Compiler/Prog.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::Prog::TH" : {
+         "file" : "lib/Data/Sah/Compiler/Prog/TH.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::Prog::TH::all" : {
+         "file" : "lib/Data/Sah/Compiler/Prog/TH/all.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::Prog::TH::any" : {
+         "file" : "lib/Data/Sah/Compiler/Prog/TH/any.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::TH" : {
+         "file" : "lib/Data/Sah/Compiler/TH.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::TextResultRole" : {
+         "file" : "lib/Data/Sah/Compiler/TextResultRole.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human" : {
+         "file" : "lib/Data/Sah/Compiler/human.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::Comparable" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/Comparable.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::HasElems" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/HasElems.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::Sortable" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/Sortable.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::all" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/all.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::any" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/any.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::array" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/array.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::bool" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/bool.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::buf" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/buf.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::cistr" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/cistr.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::code" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/code.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::date" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/date.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::datenotime" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/datenotime.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::datetime" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/datetime.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::duration" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/duration.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::float" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/float.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::hash" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/hash.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::int" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/int.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::num" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/num.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::obj" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/obj.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::re" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/re.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::str" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/str.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::timeofday" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/timeofday.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::human::TH::undef" : {
+         "file" : "lib/Data/Sah/Compiler/human/TH/undef.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl" : {
+         "file" : "lib/Data/Sah/Compiler/perl.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::all" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/all.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::any" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/any.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::array" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/array.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::bool" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/bool.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::buf" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/buf.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::cistr" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/cistr.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::code" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/code.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::date" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/date.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::datenotime" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/datenotime.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::datetime" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/datetime.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::duration" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/duration.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::float" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/float.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::hash" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/hash.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::int" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/int.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::num" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/num.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::obj" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/obj.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::re" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/re.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::str" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/str.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::timeofday" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/timeofday.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Compiler::perl::TH::undef" : {
+         "file" : "lib/Data/Sah/Compiler/perl/TH/undef.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Human" : {
+         "file" : "lib/Data/Sah/Human.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Lang" : {
+         "file" : "lib/Data/Sah/Lang.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Lang::fr_FR" : {
+         "file" : "lib/Data/Sah/Lang/fr_FR.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Lang::id_ID" : {
+         "file" : "lib/Data/Sah/Lang/id_ID.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Lang::zh_CN" : {
+         "file" : "lib/Data/Sah/Lang/zh_CN.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::BaseType" : {
+         "file" : "lib/Data/Sah/Type/BaseType.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::Comparable" : {
+         "file" : "lib/Data/Sah/Type/Comparable.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::HasElems" : {
+         "file" : "lib/Data/Sah/Type/HasElems.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::Sortable" : {
+         "file" : "lib/Data/Sah/Type/Sortable.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::all" : {
+         "file" : "lib/Data/Sah/Type/all.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::any" : {
+         "file" : "lib/Data/Sah/Type/any.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::array" : {
+         "file" : "lib/Data/Sah/Type/array.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::bool" : {
+         "file" : "lib/Data/Sah/Type/bool.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::buf" : {
+         "file" : "lib/Data/Sah/Type/buf.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::cistr" : {
+         "file" : "lib/Data/Sah/Type/cistr.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::code" : {
+         "file" : "lib/Data/Sah/Type/code.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::date" : {
+         "file" : "lib/Data/Sah/Type/date.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::datenotime" : {
+         "file" : "lib/Data/Sah/Type/datenotime.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::datetime" : {
+         "file" : "lib/Data/Sah/Type/datetime.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::duration" : {
+         "file" : "lib/Data/Sah/Type/duration.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::float" : {
+         "file" : "lib/Data/Sah/Type/float.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::hash" : {
+         "file" : "lib/Data/Sah/Type/hash.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::int" : {
+         "file" : "lib/Data/Sah/Type/int.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::num" : {
+         "file" : "lib/Data/Sah/Type/num.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::obj" : {
+         "file" : "lib/Data/Sah/Type/obj.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::re" : {
+         "file" : "lib/Data/Sah/Type/re.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::str" : {
+         "file" : "lib/Data/Sah/Type/str.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::timeofday" : {
+         "file" : "lib/Data/Sah/Type/timeofday.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Type::undef" : {
+         "file" : "lib/Data/Sah/Type/undef.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Util::Func" : {
+         "file" : "lib/Data/Sah/Util/Func.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Util::Role" : {
+         "file" : "lib/Data/Sah/Util/Role.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Util::Type::Date" : {
+         "file" : "lib/Data/Sah/Util/Type/Date.pm",
+         "version" : "0.911"
+      },
+      "Data::Sah::Util::TypeX" : {
+         "file" : "lib/Data/Sah/Util/TypeX.pm",
+         "version" : "0.911"
+      },
+      "Test::Data::Sah" : {
+         "file" : "lib/Test/Data/Sah.pm",
+         "version" : "0.911"
+      },
+      "Test::Data::Sah::Human" : {
+         "file" : "lib/Test/Data/Sah/Human.pm",
+         "version" : "0.911"
+      },
+      "Test::Data::Sah::Perl" : {
+         "file" : "lib/Test/Data/Sah/Perl.pm",
+         "version" : "0.911"
       }
    },
    "release_status" : "stable",
@@ -112,7 +479,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah"
       }
    },
-   "version" : "0.910",
+   "version" : "0.911",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -142,52 +509,52 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/GatherDir",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Author::PERLANCAR/@Filter/PruneCruft",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::PERLANCAR/@Filter/ManifestSkip",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::PERLANCAR/@Filter/MetaYAML",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Author::PERLANCAR/@Filter/License",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Author::PERLANCAR/@Filter/PodCoverageTests",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::PERLANCAR/@Filter/PodSyntaxTests",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::PERLANCAR/@Filter/ExtraTests",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/@Filter/ExecDir",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::PERLANCAR/@Filter/ShareDir",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -197,27 +564,27 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/MakeMaker",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::PERLANCAR/@Filter/Manifest",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Author::PERLANCAR/@Filter/ConfirmRelease",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.604"
+            "version" : "0.606"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -269,7 +636,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.17.1",
+                  "git_version" : "2.25.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -282,22 +649,49 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.006"
+            "version" : "0.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.03"
+            "version" : "0.02"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::PERLANCAR/MetaJSON",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::PERLANCAR/MetaConfig",
-            "version" : "6.023"
+            "version" : "6.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.017"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::PERLANCAR/MetaProvides::Package",
+            "version" : "2.004003"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
@@ -331,67 +725,67 @@
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@Author::PERLANCAR/Name",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@Author::PERLANCAR/Version",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/prelude",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "SYNOPSIS",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "DESCRIPTION",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "OVERVIEW",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "ATTRIBUTES",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "METHODS",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "FUNCTIONS",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@Author::PERLANCAR/Leftovers",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/postlude",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Completion::GetoptLongComplete",
@@ -426,7 +820,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@Author::PERLANCAR/Authors",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Contributors",
@@ -434,9 +828,14 @@
                         "version" : "0.009"
                      },
                      {
+                        "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
+                        "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
+                        "version" : "0.292"
+                     },
+                     {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Author::PERLANCAR/Legal",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
@@ -456,7 +855,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@Author::PERLANCAR/SingleEncoding",
-                        "version" : "4.018"
+                        "version" : "4.017"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
@@ -467,12 +866,12 @@
                }
             },
             "name" : "@Author::PERLANCAR/PodWeaver",
-            "version" : "4.009"
+            "version" : "4.008"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "@Author::PERLANCAR/PruneFiles",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Pod2Readme",
@@ -534,7 +933,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.005"
+            "version" : "3.001.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
@@ -570,7 +969,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::CheckCircular",
             "name" : "@Author::PERLANCAR/Prereqs::CheckCircular",
-            "version" : "0.007"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",
@@ -586,7 +985,7 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -597,7 +996,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -608,7 +1007,7 @@
                }
             },
             "name" : "TestRecommends",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -619,7 +1018,7 @@
                }
             },
             "name" : "RuntimeRecommends",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -630,7 +1029,7 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Acme::CPANModules::Whitelist",
@@ -640,52 +1039,57 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.023"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.023"
+            "version" : "6.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "6.017"
          }
       ],
       "zilla" : {
@@ -693,14 +1097,15 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.023"
+         "version" : "6.017"
       }
    },
    "x_authority" : "cpan:PERLANCAR",
    "x_contributors" : [
       "Michal Sedl\u00e1k <sedlakmichal@gmail.com>",
-      "Steven Haryanto <sharyanto@cpan.org>",
-      "Steven Haryanto <steven@masterweb.net>"
+      "Steven Haryanto <stevenharyanto@gmail.com>",
+      "Steven Haryanto <steven@masterweb.net>",
+      "Szymon Niezna\u0144ski <s.nez@member.fsf.org>"
    ],
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",

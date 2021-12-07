@@ -291,6 +291,10 @@ if( $f5 )
             is( $f5->length, length( Encode::encode_utf8( $data ) ), 'size' );
             my $digest = $f5->digest( 'sha256' );
             is( $digest, $digest_sha256, 'digest sha256' );
+            if( !defined( $digest ) )
+            {
+                diag( "digest() returned an error: ", $f5->error ) if( $DEBUG );
+            }
             $f5->close;
         }
         catch( $e )

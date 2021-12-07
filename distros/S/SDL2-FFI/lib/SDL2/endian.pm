@@ -1,6 +1,7 @@
 package SDL2::endian {
-    use strictures 2;
-    use SDL2::Utils;
+    use strict;
+    use warnings;
+    use SDL2::Utils qw[define];
     use Config;
     #
     use SDL2::stdinc;

@@ -1,7 +1,6 @@
-package Net::SAML2::XML::Util;
-
 use strict;
 use warnings;
+package Net::SAML2::XML::Util;
 
 use XML::LibXML;
 
@@ -9,7 +8,7 @@ use XML::LibXML;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 # We are exporting functions
 use base qw/Exporter/;
@@ -52,7 +51,7 @@ Net::SAML2::XML::Util - Net::SAML2::XML::Util - XML Util class
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 

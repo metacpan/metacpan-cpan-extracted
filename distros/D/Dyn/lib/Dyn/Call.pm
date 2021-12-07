@@ -1,9 +1,9 @@
-package Dyn::Call 0.02 {
+package Dyn::Call 0.03 {
     use strict;
     use warnings;
     use 5.030;
     use XSLoader;
-    XSLoader::load( __PACKAGE__, $Dyn::Call::VERSION );
+    XSLoader::load( __PACKAGE__, our $VERSION );
     use parent 'Exporter';
     our %EXPORT_TAGS = (
         bind => [
@@ -11,11 +11,14 @@ package Dyn::Call 0.02 {
                 dcArgFloat dcArgDouble
                 dcArgPointer
                 dcArgString
+                dcArgStruct
             ]
         ],
         callvm => [qw[dcNewCallVM dcFree dcMode dcReset]],
         call   => [qw[dcCallVoid dcCallInt dcCallPointer dcCallString]],
-        vars   => [
+        struct =>
+            [qw[dcNewStruct dcCloseStruct dcStructSize dcStructField dcSubStruct dcFreeStruct]],
+        vars => [
             qw[
                 DC_CALL_C_DEFAULT
                 DC_CALL_C_ELLIPSIS DC_CALL_C_ELLIPSIS_VARARGS
@@ -32,7 +35,16 @@ package Dyn::Call 0.02 {
                 DC_CALL_C_ARM64
                 DC_CALL_C_PPC64 DC_CALL_C_PPC64_LINUX
                 DC_CALL_SYS_DEFAULT DC_CALL_SYS_X86_INT80H_LINUX DC_CALL_SYS_X86_INT80H_BSD
-                DC_CALL_SYS_PPC32 DC_CALL_SYS_PPC64], qw[DC_ERROR_NONE DC_ERROR_UNSUPPORTED_MODE]
+                DC_CALL_SYS_PPC32 DC_CALL_SYS_PPC64], qw[DC_ERROR_NONE DC_ERROR_UNSUPPORTED_MODE],
+            qw[DC_SIGCHAR_VOID DC_SIGCHAR_BOOL DC_SIGCHAR_CHAR DC_SIGCHAR_UCHAR DC_SIGCHAR_SHORT
+                DC_SIGCHAR_USHORT DC_SIGCHAR_INT DC_SIGCHAR_UINT DC_SIGCHAR_LONG DC_SIGCHAR_ULONG
+                DC_SIGCHAR_LONGLONG DC_SIGCHAR_ULONGLONG DC_SIGCHAR_FLOAT DC_SIGCHAR_DOUBLE
+                DC_SIGCHAR_POINTER DC_SIGCHAR_STRING DC_SIGCHAR_STRUCT DC_SIGCHAR_ENDARG
+                DC_SIGCHAR_CC_PREFIX DC_SIGCHAR_CC_DEFAULT DC_SIGCHAR_CC_ELLIPSIS
+                DC_SIGCHAR_CC_ELLIPSIS_VARARGS DC_SIGCHAR_CC_CDECL DC_SIGCHAR_CC_STDCALL
+                DC_SIGCHAR_CC_FASTCALL_MS DC_SIGCHAR_CC_FASTCALL_GNU DC_SIGCHAR_CC_THISCALL_MS
+                DC_SIGCHAR_CC_THISCALL_GNU DC_SIGCHAR_CC_ARM_ARM DC_SIGCHAR_CC_ARM_THUMB
+                DC_SIGCHAR_CC_SYSCALL], qw[DEFAULT_ALIGNMENT]
         ]
     );
     @{ $EXPORT_TAGS{all} } = our @EXPORT_OK = map { @{ $EXPORT_TAGS{$_} } } keys %EXPORT_TAGS;
@@ -526,7 +538,68 @@ Expected parameters include:
 
 =back
 
-=head2 Errors
+=head1 Structure Functions
+
+These functions aide in computing the size of a structure. They may be imported
+by name or with the C<:struct> tag.
+
+=head2 C<dcNewStruct( ... )>
+
+Creates a new C<DCstruct>.
+
+	my $struct = dcNewStruct( 4, DEFAULT_ALIGNMENT );
+
+Expected parameters include:
+
+=over
+
+=item C<fieldCount> - the number of fields in the structure
+
+=item C<alignment> - L<data structure alignment|https://en.wikipedia.org/wiki/Data_structure_alignment>
+
+=back
+
+=head2 C<dcStructField( ... )>
+
+Adds a new field to the structure.
+
+	dcStructField( $struct, DC_SIGCHAR_INT, DEFAULT_ALIGNMENT, 1 );
+
+Expected parameters include:
+
+=over
+
+=item C<struct> - C<DCstruct>
+
+=item C<type> - Structure type (you may reuse signature values here)
+
+=item C<alignment> - L<data structure alignment|https://en.wikipedia.org/wiki/Data_structure_alignment>
+
+=item C<arrayLength> - number of elements in field
+
+=back
+
+=head2 C<dcSubStruct( ... )>
+
+Nests a structure inside of another.
+
+	dcSubStruct( $struct, 1, DEFAULT_ALIGNMENT, 1 );
+
+Expected parameters include:
+
+=over
+
+=item C<struct> - C<DCstruct>
+
+=item C<fieldCount> - the number of fields in the structure
+
+=item C<alignment> - L<data structure alignment|https://en.wikipedia.org/wiki/Data_structure_alignment>
+
+=item C<arrayLength> - number of elements in field
+
+=back
+
+=head1 Errors
 
 These values are returned by L<< C<dcGetError( ... )>|/C<dcGetError( ... )> >>
 and include:
@@ -622,6 +695,88 @@ You may set the calling convention to use with L<< C<dcMode( ... )>|/C<dcMode(
 
 =back
 
+=head2 Signature
+
+=over
+
+=item C<DC_SIGCHAR_VOID>
+
+=item C<DC_SIGCHAR_BOOL>
+
+=item C<DC_SIGCHAR_CHAR>
+
+=item C<DC_SIGCHAR_UCHAR>
+
+=item C<DC_SIGCHAR_SHORT>
+
+=item C<DC_SIGCHAR_USHORT>
+
+=item C<DC_SIGCHAR_INT>
+
+=item C<DC_SIGCHAR_UINT>
+
+=item C<DC_SIGCHAR_LONG>
+
+=item C<DC_SIGCHAR_ULONG>
+
+=item C<DC_SIGCHAR_LONGLONG>
+
+=item C<DC_SIGCHAR_ULONGLONG>
+
+=item C<DC_SIGCHAR_FLOAT>
+
+=item C<DC_SIGCHAR_DOUBLE>
+
+=item C<DC_SIGCHAR_POINTER>
+
+=item C<DC_SIGCHAR_STRING> - in theory same as C<DC_SIGCHAR_POINTER>, but convenient to disambiguate
+
+=item C<DC_SIGCHAR_STRUCT>
+
+=item C<DC_SIGCHAR_ENDARG>  - also works for end struct
+
+=back
+
+=head3 Calling Convention / Mode Signatures
+
+=over
+
+=item C<DC_SIGCHAR_CC_PREFIX>
+
+=item C<DC_SIGCHAR_CC_DEFAULT>
+
+=item C<DC_SIGCHAR_CC_ELLIPSIS>
+
+=item C<DC_SIGCHAR_CC_ELLIPSIS_VARARGS>
+
+=item C<DC_SIGCHAR_CC_CDECL>
+
+=item C<DC_SIGCHAR_CC_STDCALL>
+
+=item C<DC_SIGCHAR_CC_FASTCALL_MS>
+
+=item C<DC_SIGCHAR_CC_FASTCALL_GNU>
+
+=item C<DC_SIGCHAR_CC_THISCALL_MS>
+
+=item C<DC_SIGCHAR_CC_THISCALL_GNU> - GNU C<thiscall>s are C<cdecl>, but keep specific sig char for clarity
+
+=item C<DC_SIGCHAR_CC_ARM_ARM>
+
+=item C<DC_SIGCHAR_CC_ARM_THUMB>
+
+=item C<DC_SIGCHAR_CC_SYSCALL>
+
+=back
+
+=head2 Structures
+
+=over
+
+=item C<DEFAULT_ALIGNMENT> - Default value for data structure alignment
+
+=back
+
 =head1 Platform Support
 
 The dyncall library runs on many different platforms and operating systems
@@ -646,6 +801,7 @@ Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 dyncall OpenBSD FreeBSD macOS DragonFlyBSD NetBSD iOS ReactOS mips mips64 ppc32
 ppc64 sparc sparc64 (AArch64) SystemV syscall eabi cdecl CallVM PowerPC
+thiscall sig struct
 
 =end stopwords
 

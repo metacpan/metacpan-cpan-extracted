@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::Request;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::Request::VERSION = '0.98';
+$Shared::Examples::Net::Amazon::S3::Request::VERSION = '0.99';
 use strict;
 use warnings;
 
@@ -200,7 +200,7 @@ Shared::Examples::Net::Amazon::S3::Request - used for testing and as example
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

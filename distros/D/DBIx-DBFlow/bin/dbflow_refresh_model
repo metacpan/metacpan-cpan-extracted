@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use DBIx::Class::Schema::Loader;
+use Module::Runtime qw/use_module/;
+
+package RefreshModel::Args {
+  use Moose;
+  with 'MooseX::Getopt';
+
+  use Module::Runtime qw/use_module/;
+
+  has schema => (
+    is => 'ro',
+    isa => 'Str',
+    documentation => 'The name of the schema class to generate/refresh',
+    required => 1,
+  );
+  has _schema => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my $self = shift;
+      my $schema_name = $self->schema;
+      $self->use_lib_include_dir;
+      use_module $schema_name;
+      my $schema = $schema_name->admin_connection;
+      return $schema;
+    }
+  );
+  has include_dir => (
+    traits => ['Getopt'],
+    is => 'ro',
+    isa => 'Str',
+    default => 'lib',
+    cmd_aliases => 'I',
+    documentation => 'library directory for the schema (will be added to @INC). Defaults to lib',
+  );
+
+  sub use_lib_include_dir {
+    my $self = shift;
+    require lib;
+    lib->import($self->include_dir);
+  }
+
+
+  has dir => (
+    is => 'ro', isa => 'Str', default => 'lib/'
+  );
+  has dbh => (
+    is => 'ro',
+    isa => 'Str',
+  );
+  has user => (
+    is => 'ro',
+    isa => 'Str',
+  );
+  has pass => (
+    is => 'ro',
+    isa => 'Str',
+  );
+
+  has use_inflatecolumn_datetime => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 1
+  );
+}
+
+my $opts = RefreshModel::Args->new_with_options;
+
+die "Must provide --schema or --dbh to generate a schema" if (not defined $opts->schema and not defined $opts->dbh);
+
+my $connect_info;
+
+if (defined $opts->dbh){
+  $connect_info = [ $opts->dbh, $opts->user, $opts->pass ];
+} else {
+  my $s = $opts->_schema;
+  $connect_info = $s->storage->connect_info;
+  if ($@){
+    die "Can't retrieve connect info from schema" if (not defined $opts->dbh);
+  }
+}
+
+my $schema_dir = $opts->dir;
+
+DBIx::Class::Schema::Loader->import(
+  "dump_to_dir:$schema_dir", 'make_schema_at'
+);
+
+my $components = [
+  ($opts->use_inflatecolumn_datetime) ? 'InflateColumn::DateTime' : (),
+];
+
+make_schema_at(
+  $opts->schema,
+  {
+    components => $components,
+    relationships => 1,
+  },
+  $connect_info,
+);
+
+require lib;
+lib->import($schema_dir);
+
+my @sources = $opts->schema->sources;
+
+if (not @sources) {
+  print "ERROR: No tables found. Check that the schema is OK\n";
+  exit 1;
+}
+
+exit 0;

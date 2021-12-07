@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::Filter;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use List::MoreUtils qw( any minmax );
 

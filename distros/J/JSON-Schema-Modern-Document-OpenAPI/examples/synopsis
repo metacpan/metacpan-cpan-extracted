@@ -1,0 +1,79 @@
+use strict;
+use warnings;
+use 5.020;
+
+use OpenAPI::Modern;
+use HTTP::Request;
+use HTTP::Response;
+use YAML::PP;
+
+my $openapi = OpenAPI::Modern->new(
+  openapi_uri => 'openapi.yaml',
+  openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML'),
+openapi: 3.1.0
+info:
+  title: Test API
+  version: 1.2.3
+paths:
+  /foo/{foo_id}:
+    parameters:
+    - name: foo_id
+      in: path
+      required: true
+      schema:
+        pattern: ^[a-z]+$
+    post:
+      parameters:
+      - name: My-Request-Header
+        in: header
+        required: true
+        schema:
+          pattern: ^[0-9]+$
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hello:
+                  type: string
+                  pattern: ^[0-9]+$
+      responses:
+        200:
+          description: success
+          headers:
+            My-Response-Header:
+              required: true
+              schema:
+                pattern: ^[0-9]+$
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ status ]
+                properties:
+                  status:
+                    const: ok
+YAML
+);
+
+say 'request:';
+my $request = HTTP::Request->new(
+  POST => 'http://example.com/foo/bar',
+  [ 'My-Request-Header' => '123', 'Content-Type' => 'application/json' ],
+  '{"hello": 123}',
+);
+say $openapi->validate_request($request, {
+  path_template => '/foo/{foo_id}',
+  path_captures => { foo_id => 'bar' },
+});
+
+say 'response:';
+my $response = HTTP::Response->new(
+  200 => 'OK',
+  [ 'My-Response-Header' => '123' ],
+  '{"status": "ok"}',
+);
+say $openapi->validate_response($response, '/foo/{foo_id}');
+

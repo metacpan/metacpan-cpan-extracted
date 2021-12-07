@@ -16,6 +16,21 @@ for my $term (qw< am are is >) {
     }
 }
 
+for my $term (qw< do does >) {
+    subtest qq{"$term", singular and plural} => sub {
+        my $verb = verb($term);
+
+        is $verb->singular,    $term  => "sing->sing:        $term -> $term";
+        is $verb->plural,      'do'   => "sing->plural:      $term -> do";
+        is $verb->singular(1), 'do'   => "sing->sing   1st:  $term -> I do";
+        is $verb->plural(1),   'do'   => "sing->plural 1st:  $term -> We do";
+        is $verb->singular(2), 'do'   => "sing->sing   2nd:  $term -> You do";
+        is $verb->plural(2),   'do'   => "sing->plural 2nd:  $term -> Y'all do";
+#        is $verb->singular(3), 'does' => "sing->sing   3rd:  $term -> It does";
+        is $verb->plural(3),   'do'   => "sing->plural 3rd:  $term -> They do";
+    }
+}
+
 for my $modal (qw< can could may might must ought will shall should would >) {
     subtest qq{modal "$modal", singular and plural} => sub {
         my $verb = verb($modal);
@@ -116,6 +131,7 @@ __DATA__
     graffitis     graffiti      graffitied       graffitiing        graffitied
     graphs        graph         graphed          graphing           graphed
     has           have          had              having             had
+    hears         hear          heard            hearing            heard
     jams          jam           jammed           jamming            jammed
     japes         jape          japed            japing             japed
     kings         king          kinged           kinging            kinged
@@ -129,7 +145,9 @@ __DATA__
     reaps         reap          reaped           reaping            reaped
     revs          rev           revved           revving            revved
     scries        scry          scried           scrying            scried
+#   shears        shear         sheared          shearing           shorn
     sins          sin           sinned           sinning            sinned
+    spaes         spae          spaed            spaeing            spaed
     tics          tic           ticced           ticcing            ticced
     tills         till          tilled           tilling            tilled
     yapps         yapp          yapped           yapping            yapped

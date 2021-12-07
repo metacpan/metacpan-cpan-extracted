@@ -1,16 +1,3 @@
-package Quiq::Object;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Scalar::Util ();
-use Hash::Util ();
-use Quiq::Parameters;
-use Quiq::Stacktrace;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -24,6 +11,25 @@ Quiq::Object - Basisklasse für alle Klassen der Klassenbibliothek
   package MyClass;
   use base qw/Quiq::Object/;
   ...
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Object;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Scalar::Util ();
+use Hash::Util ();
+use Quiq::Parameters;
+use Quiq::Stacktrace;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -592,7 +598,7 @@ sub this {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

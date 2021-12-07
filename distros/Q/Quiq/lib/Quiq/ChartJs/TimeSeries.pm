@@ -1,16 +1,3 @@
-package Quiq::ChartJs::TimeSeries;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Json;
-use Quiq::Array;
-use Quiq::Template;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -392,6 +379,25 @@ L<https://github.com/chartjs/Chart.js>
 L<Everything you need to know to create great looking charts using Chart.js|http://www.shilling.co.uk/survey/Charts/docs/>
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ChartJs::TimeSeries;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Json;
+use Quiq::Array;
+use Quiq::Template;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -819,7 +825,7 @@ Zoomen in die Daten. Wie? Plugin?
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

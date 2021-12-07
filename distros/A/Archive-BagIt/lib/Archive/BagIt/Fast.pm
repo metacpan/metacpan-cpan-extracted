@@ -9,7 +9,7 @@ use Net::SSLeay ();
 extends "Archive::BagIt";
 
 
-our $VERSION = '0.085'; # VERSION
+our $VERSION = '0.086'; # VERSION
 
 # ABSTRACT: A module to use L<IO::AIO> to get better performance
 
@@ -22,10 +22,12 @@ sub _XXX_digest {
     my $digestobj = shift;
     my $data_ref = shift;
     my $data = ${ $data_ref };
-    Net::SSLeay::EVP_DigestUpdate($digestobj->_digest, $data);
-    my $result = Net::SSLeay::EVP_DigestFinal($digestobj->_digest);
-    Net::SSLeay::EVP_MD_CTX_destroy($digestobj->_digest);
-    delete $digestobj->{_digest};
+    my $md  = Net::SSLeay::EVP_get_digestbyname($digestobj->name);
+    my $internal_digest = Net::SSLeay::EVP_MD_CTX_create();
+    Net::SSLeay::EVP_DigestInit($internal_digest, $md);
+    Net::SSLeay::EVP_DigestUpdate($internal_digest, $data);
+    my $result = Net::SSLeay::EVP_DigestFinal($internal_digest);
+    Net::SSLeay::EVP_MD_CTX_destroy($internal_digest);
     my $digest = unpack('H*', $result);
     return $digest;
 
@@ -112,7 +114,7 @@ Archive::BagIt::Fast - A module to use L<IO::AIO> to get better performance
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 NAME
 

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,22 +18,22 @@ name: MySQL-Workbench-Parser
 provides:
   MySQL::Workbench::Parser:
     file: lib/MySQL/Workbench/Parser.pm
-    version: '1.10'
+    version: '1.11'
   MySQL::Workbench::Parser::Column:
     file: lib/MySQL/Workbench/Parser/Column.pm
-    version: '1.10'
+    version: '1.11'
   MySQL::Workbench::Parser::Index:
     file: lib/MySQL/Workbench/Parser/Index.pm
-    version: '1.10'
+    version: '1.11'
   MySQL::Workbench::Parser::MySQLParser:
     file: lib/MySQL/Workbench/Parser/MySQLParser.pm
-    version: '1.10'
+    version: '1.11'
   MySQL::Workbench::Parser::Table:
     file: lib/MySQL/Workbench/Parser/Table.pm
-    version: '1.10'
+    version: '1.11'
   MySQL::Workbench::Parser::View:
     file: lib/MySQL/Workbench/Parser/View.pm
-    version: '1.10'
+    version: '1.11'
 requires:
   Archive::Zip: '1.30'
   Carp: '0'
@@ -51,11 +51,13 @@ resources:
   bugtracker: http://github.com/reneeb/MySQL-Workbench-Parser/issues
   homepage: http://github.com/reneeb/MySQL-Workbench-Parser
   repository: git://github.com/reneeb/MySQL-Workbench-Parser.git
-version: '1.10'
+version: '1.11'
 x_contributors:
   - 'Graham Knop <haarg@haarg.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Paul Cochrane <paul.cochrane@posteo.de>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'
   - 'Renee <reb@perl-services.de>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

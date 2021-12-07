@@ -27,7 +27,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::response::create-multipart-upload-wi
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

@@ -14,7 +14,7 @@ my $ua = LWP::UserAgent->new ();
 
 note 'Celestrak current data';
 
-my $rslt = $ua->get ('http://celestrak.com/NORAD/elements/');
+my $rslt = $ua->get ('https://celestrak.com/NORAD/elements/');
 
 $rslt->is_success()
     or plan skip_all => 'Celestrak inaccessable: ' . $rslt->status_line;
@@ -32,6 +32,10 @@ foreach (@$names) {
     };
 }
 
+=begin comment
+
+# Fetchable as of November 16 2021.
+
 $expect{'1999-025'} = {
     name => 'Fengyun 1C debris',
     note => 'Not actually provided as a fetchable data set.',
@@ -47,18 +51,11 @@ $expect{'iridium-33-debris'} = {
     note => 'Not actually provided as a fetchable data set.',
     ignore => 1,
 };
-$expect{'2012-044'} = {
-    name => 'BREEZE-M R/B Breakup (2012-044C)',
-    note => 'Not actually provided as a fetchable data set.',
-    ignore => 1,
-};
 $expect{'2019-006'} = {
     name	=> 'Indian ASAT Test Debris',
     note => 'Not actually provided as a fetchable data set.',
     ignore => 1,
 };
-
-=begin comment
 
 # Removed October 23, 2008
 
@@ -71,6 +68,12 @@ $expect{'usa-193-debris'} = {
 =end comment
 
 =cut
+
+$expect{'2012-044'} = {
+    name => 'BREEZE-M R/B Breakup (2012-044C)',
+    note => 'Fetchable as of November 16 2021, but not on web page',
+    ignore => 1,
+};
 
 if ($expect{sts}) {
     $expect{sts}{note} = 'Only available when a mission is in progress.';
@@ -100,7 +103,7 @@ ok ( ! keys %got, 'The above is all there is' ) or do {
 
 note 'Celestrak supplemental data';
 
-$rslt = $ua->get ('http://celestrak.com/NORAD/elements/supplemental/');
+$rslt = $ua->get ('https://celestrak.com/NORAD/elements/supplemental/');
 
 %got = parse_string( $rslt->content, source => 'celestrak_supplemental' );
 

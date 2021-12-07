@@ -1,0 +1,173 @@
+NAME
+    CSS::Object - CSS Object Oriented
+
+SYNOPSIS
+        use CSS::Object;
+
+VERSION
+        v0.1.3
+
+DESCRIPTION
+    CSS::Object is a object oriented CSS parser and manipulation interface.
+
+CONSTRUCTOR
+  new
+    To instantiate a new CSS::Object object, pass an hash reference of
+    following parameters:
+
+    *debug*
+        This is an integer. The bigger it is and the more verbose is the
+        output.
+
+    *format*
+        This is a CSS::Object::Format object or one of its child modules.
+
+    *parser*
+        This is a CSS::Object::Parser object or one of its child modules.
+
+EXCEPTION HANDLING
+    Whenever an error has occurred, CSS::Object will set a
+    Module::Generic::Exception object containing the detail of the error and
+    return undef.
+
+    The error object can be retrieved with the inherited "error" in
+    Module::Generic method. For example:
+
+        my $css = CSS::Object->new( debug => 3 ) || die( CSS::Object->error );
+
+METHODS
+  add_element
+    Provided with a CSS::Object::Element object and this adds it to the list
+    of css elements.
+
+    It uses an array object "elements" which is an Module::Generic::Array
+    object.
+
+  add_rule
+    Provided with a CSS::Object::Rule object and this adds it to our list of
+    rules. It returns the rule object that was added.
+
+  as_string
+    This will return the css data structure, currently registered, as a
+    string.
+
+    It takes an optional CSS::Object::Format object as a parameter, to
+    control the output. If none are provided, it will use the default one
+    calling "format"
+
+  builder
+    This returns a new CSS::Object::Builder object.
+
+  charset
+    This sets or gets the css charset. It stores the value in a
+    Module::Generic::Scalar object.
+
+  elements
+    Sets or gets the array of CSS elements. This is a Module::Generic::Array
+    object that accepts only CSS::Object::Element objects or its child
+    classes, such as CSS::Object::Rule, CSS::Object::Comment, etc
+
+  format
+    Sets or gets a CSS::Object::Format object. See "as_string" below for
+    more detail about their use.
+
+    CSS::Object::Format objects control the stringification of the css
+    structure. By default, it will return the data in a string identical or
+    at least very similar to the one parsed if it was parsed.
+
+  get_rule_by_selector
+    Provided with a selector and this returns a CSS::Object::Rule object or
+    an empty string.
+
+    Hoever, if this method is called in an object context, such as chaining,
+    then it returns a Module::Generic::Null object instead of an empty
+    string to prevent the perl error of "xxx method called on an undefined
+    value". For example:
+
+        $css->get_rule_by_selector( '.does-not-exists' )->add_element( $elem ) ||
+        die( "Unable to add css element to rule \".does-not-exists\": ", $css->error );
+
+    But, in a non-object context, such as:
+
+        my $rule = $css->get_rule_by_selector( '.does-not-exists' ) ||
+        die( "Unable to add css element to rule \".does-not-exists\": ", $css->error );
+
+    "get_rule_by_selector" will return an empty value.
+
+  load_parser
+    This will instantiate a new object based on the parser name specified
+    with "parser" or during css object instantiation.
+
+    It returns a new CSS::Object::Parser object, or one of its child module
+    matching the "parser" specified.
+
+  new_comment
+    This returns a new CSS::Object::Comment object and pass its
+    instantiation method the provided arguments.
+
+        return( $css->new_comment( $array_ref_of_comment_ilnes ) );
+
+  new_property
+    This takes a property name, and an optional value o array of values and
+    return a new CSS::Object::Property object
+
+  new_rule
+    This returns a new CSS::Object::Rule object.
+
+  new_selector
+    This takes a selector name and returns a new CSS::Object::Selector
+    object.
+
+  new_value
+    This takes a property value and returns a new CSS::Object::Value object.
+
+  parse_string
+    Provided with some css data and this will instantiate the "parser", call
+    "parse_string" in CSS::Object::Parser and returns an array of
+    CSS::Object::Rule objects. The array is an array object from
+    Module::Generic::Array and can be used as a regular array or as an
+    object.
+
+  parser
+    Sets or gets the CSS::Object::Parser object to be used by "parse_string"
+    to parse css data.
+
+    A valid parser object can be from CSS::Object::Parser or any of its sub
+    modules.
+
+    It returns the current parser object.
+
+  purge
+    This empties the array containing all the CSS::Object::Rule objects.
+
+  read_file
+    Provided with a css file, and this will load it into memory and parse it
+    using the parser name registered with "parser".
+
+    It can also take an array reference of css files who will be each fed to
+    "read_file"
+
+    It returns the CSS::Object used to call this method.
+
+  read_string
+    Provided with some css data, and this will call "parse_string". It also
+    accepts an array reference of data.
+
+    It returns the css object used to call this method.
+
+  rules
+    This sets or gets the Module::Generic::Array object used to store all
+    the CSS::Object::Rule objects.
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    CSS::Object
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2020 DEGUEST Pte. Ltd.
+
+    You can use, copy, modify and redistribute this package and associated
+    files under the same terms as Perl itself.
+

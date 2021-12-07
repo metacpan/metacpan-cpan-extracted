@@ -12,6 +12,7 @@ lib/CallBackery/Config.pm
 lib/CallBackery/Controller/RpcService.pm
 lib/CallBackery/Database.pm
 lib/CallBackery/Exception.pm
+lib/CallBackery/GuiPlugin/AbstractAction.pm
 lib/CallBackery/GuiPlugin/AbstractCardlist.pm
 lib/CallBackery/GuiPlugin/AbstractForm.pm
 lib/CallBackery/GuiPlugin/AbstractHtml.pm
@@ -57,6 +58,7 @@ lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/MsgBox.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/HtmlBox.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/Page.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/plugin/Action.js
+lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/plugin/ActionForm.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/plugin/CardList.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/plugin/Form.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/plugin/Html.js

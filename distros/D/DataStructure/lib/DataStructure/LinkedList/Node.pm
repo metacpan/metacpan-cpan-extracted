@@ -52,9 +52,11 @@ sub new ($class, $list, $next, $value) {
 =head2 METHODS
 
 All the functions below are class methods that should be called on a
-B<DataStructure::LinkedList::Node> object.
+C<DataStructure::LinkedList::Node> object.
 
-=head3 I<value()>
+=over 4
+
+=item value()
 
 Returns the value held by this node.
 
@@ -66,7 +68,7 @@ sub value ($self) {
 
 =pod
 
-=head3 I<next()>
+=item next()
 
 Returns the next B<DataStructure::DoubleList::Node> in this list or B<undef>
 if the current object is the last node in its list.
@@ -81,18 +83,21 @@ sub next ($self) {
 
 =pod
 
-=head3 I<insert_after($value)>
+=item insert_after($value)
 
 Inserts a new node in the list after the current one, with the given value and
 returns that new node.
 
 The current node can still be used after that call.
 
+=back
+
 =cut
 
 sub insert_after ($self, $value) {
    my $new_node = new(ref $self, $self->{list}, $self->{next}, $value);
    $self->{next} = $new_node;
+   $self->{list}{last} = $new_node unless defined $new_node->{next};
    $self->{list}{size}++;
    return $new_node;
 }

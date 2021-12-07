@@ -1,0 +1,9 @@
+Revision history for Alien-Ninja
+
+0.02      2021-11-29 22:45:50-05:00 America/New_York
+  - Download binary release of Ninja if possible.
+    See <https://github.com/PerlAlien/Alien-Ninja/issues/3>,
+    <https://github.com/PerlAlien/Alien-Ninja/pull/4>.
+
+0.01      2021-11-26 11:14:35-05:00 America/New_York
+  - initial version

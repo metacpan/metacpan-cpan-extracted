@@ -7,14 +7,20 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'examples/synopsis',
     'lib/JSON/Schema/Modern/Document/OpenAPI.pm',
     'lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm',
+    'lib/OpenAPI/Modern.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/document-schemas.t',
     't/document-toplevel.t',
     't/oas-invalid-schemas/discriminator.json',
     't/oas-vocabulary.t',
+    't/openapi-constructor.t',
+    't/operationIds.t',
+    't/validate_request.t',
+    't/validate_response.t',
     'xt/author/00-compile.t',
     'xt/author/clean-namespaces.t',
     'xt/author/distmeta.t',

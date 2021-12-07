@@ -1,4 +1,5 @@
 package SDL2::thread 0.01 {
+    use strict;
     use SDL2::Utils;
     use experimental 'signatures';
     #

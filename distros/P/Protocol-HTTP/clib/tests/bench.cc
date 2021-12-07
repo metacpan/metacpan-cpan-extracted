@@ -1,9 +1,6 @@
 #include "test.h"
 #include <unordered_map>
-
-#ifndef BENCHMARK // stub if benchmarking is disabled
-    #define BENCHMARK(name) [&]()
-#endif
+#include <catch2/benchmark/catch_benchmark.hpp>
 
 static string xcnt (string s, int cnt) {
     string ret;
@@ -197,7 +194,7 @@ TEST_CASE("bench heavy chunked", "[.bench]") {
         "Transfer-Encoding: gzip\r\n"
         "\r\n"
         ;
-    if (p.parse(buf).error) throw p.parse(buf).error;
+    if (p.parse(buf).error) throw std::logic_error(p.parse(buf).error.message());
     //warn("%d", p.parse(buf).request->headers.size());
 
     BENCHMARK("") {

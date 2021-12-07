@@ -5,7 +5,7 @@
 typedef struct
 {
     DLLib *lib;
-    void *syms;
+    DLSyms *syms;
     DCCallVM *cvm;
 } Dyncall;
 

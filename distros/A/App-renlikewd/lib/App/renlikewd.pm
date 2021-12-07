@@ -3,9 +3,9 @@ package App::renlikewd;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-15'; # DATE
+our $DATE = '2021-11-16'; # DATE
 our $DIST = 'App-renlikewd'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: REName a file so it becomes LIKE the current (Working) Directory's name
@@ -22,7 +22,7 @@ App::renlikewd - REName a file so it becomes LIKE the current (Working) Director
 
 =head1 VERSION
 
-This document describes version 0.001 of App::renlikewd (from Perl distribution App-renlikewd), released on 2021-11-15.
+This document describes version 0.002 of App::renlikewd (from Perl distribution App-renlikewd), released on 2021-11-16.
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package App::Yath::Options::Display;
 use strict;
 use warnings;
 
-our $VERSION = '1.000082';
+our $VERSION = '1.000086';
 
 use Test2::Harness::Util qw/mod2file/;
 
@@ -37,6 +37,16 @@ option_group {prefix => 'display', category => "Display Options"} => sub {
     option show_times => (
         short       => 'T',
         description => 'Show the timing data for each job',
+    );
+
+    option hide_runner_output => (
+        description => 'Hide output from the runner, showing only test output. (See Also truncate_runner_output)',
+        default     => 0,
+    );
+
+    option truncate_runner_output => (
+        description => 'Only show runner output that was generated after the current command. This is only useful with a persistent runner.',
+        default     => 0,
     );
 
     option term_width => (
@@ -207,6 +217,13 @@ This is where display options are defined.
 Turn color on, default is true if STDOUT is a TTY.
 
 
+=item --hide-runner-output
+
+=item --no-hide-runner-output
+
+Hide output from the runner, showing only test output. (See Also truncate_runner_output)
+
+
 =item --no-wrap
 
 =item --no-no-wrap
@@ -267,6 +284,13 @@ Show the timing data for each job
 =item --no-term-width
 
 Alternative to setting $TABLE_TERM_SIZE. Setting this will override the terminal width detection to the number of characters specified.
+
+
+=item --truncate-runner-output
+
+=item --no-truncate-runner-output
+
+Only show runner output that was generated after the current command. This is only useful with a persistent runner.
 
 
 =item --verbose

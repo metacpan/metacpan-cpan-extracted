@@ -1,12 +1,3 @@
-package Quiq::Html::Image;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -135,6 +126,21 @@ produziert:
   <div>
     <img src="img/illusion.png" width="100" height="100" alt="">
   </div>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Image;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -289,7 +295,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

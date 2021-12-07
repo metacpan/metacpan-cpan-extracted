@@ -183,12 +183,16 @@ ATTRIBUTES
 
     SQL::Abstract::Pg provides additional features to the SQL::Abstract
     query methods in Mojo::SQLite::Database such as -json and limit/offset.
-    The on_conflict and for features are not applicable to SQLite queries.
+    The for feature is not applicable to SQLite queries.
 
       $sql->db->select(['some_table', ['other_table', foo_id => 'id']],
         ['foo', [bar => 'baz'], \q{datetime('now') as dt}],
         {foo => 'value'},
         {order_by => 'foo', limit => 10, offset => 5, group_by => ['foo'], having => {baz => 'value'}});
+    
+      # Upsert supported since SQLite 3.24.0
+      $sql->db->insert('some_table', {name => $name, value => $value},
+        {on_conflict => [name => {value => \'"excluded"."value"'}]});
 
  auto_migrate
 

@@ -1,20 +1,3 @@
-package Quiq::Confluence::Client;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use LWP::UserAgent ();
-use Quiq::Option;
-use Quiq::Confluence::Markup;
-use JSON ();
-use Quiq::Confluence::Page;
-use HTTP::Request::Common ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -38,6 +21,29 @@ zur Kommunikation mit dem Server zur Verfügung, realisiert
 z.Zt. jedoch nur einen kleinen Ausschnitt der Funktionalität der
 Confluence REST API. Die Implementierung wird nach Bedarf
 erweitert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Confluence::Client;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use LWP::UserAgent ();
+use Quiq::Option;
+use Quiq::Confluence::Markup;
+use JSON ();
+use Quiq::Confluence::Page;
+use HTTP::Request::Common ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -660,7 +666,7 @@ sub url {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

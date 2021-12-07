@@ -16,6 +16,10 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-ThisDist
+provides:
+  App::ThisDist:
+    file: lib/App/ThisDist.pm
+    version: '0.013'
 requires:
   CPAN::Dist::FromRepoName: '0'
   CPAN::Dist::FromURL: '0'
@@ -24,7 +28,6 @@ requires:
   File::Slurper: '0'
   File::chdir: '0'
   Getopt::Long: '2.50'
-  IPC::System::Options: '0.339'
   JSON::PP: '0'
   Log::ger: '0.038'
   Log::ger::Screen: '0'
@@ -36,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist
   homepage: https://metacpan.org/release/App-ThisDist
   repository: git://github.com/perlancar/perl-App-ThisDist.git
-version: '0.011'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -116,7 +119,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.604'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -166,7 +169,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.006'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -179,6 +182,26 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.017'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::PERLANCAR/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::Authority
       name: '@Author::PERLANCAR/PERLANCAR::Authority'
@@ -288,6 +311,10 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Contributors'
               version: '0.009'
             -
+              class: Pod::Weaver::Section::PERLANCAR::Contributing
+              name: '@Author::PERLANCAR/PERLANCAR/Contributing'
+              version: '0.292'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.017'
@@ -364,7 +391,7 @@ x_Dist_Zilla:
             - ':InstallModules'
             - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.005
+      version: 3.001.006
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -449,14 +476,16 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
       version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.017'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
     version: '6.017'
 x_authority: cpan:PERLANCAR
-x_contributors:
-  - 'perlancar (on netbook-dell-xps13) <perlancar@gmail.com>'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

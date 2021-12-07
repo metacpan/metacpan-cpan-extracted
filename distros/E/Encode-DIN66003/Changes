@@ -1,3 +1,6 @@
+0.05 20211206
+  * Actually map \x7E to \u00FD , instead of \u00DF
+
 0.04 20211122
   * Fix transliteration of \x7E to \x00FD . Previously it was to
     \N{LATIN CAPITAL LETTER SHARP S} , which was wrong.

@@ -96,6 +96,8 @@ struct DeflateExt {
 
     const Config& effective_config() const { return effective_cfg; }
 
+    static constexpr int UNCOMPRESS_PREALLOCATE_RATIO = 10;
+
 private:
     static const constexpr unsigned TRAILER_SIZE = 4; // tail empty frame 0x00 0x00 0xff 0xff
 

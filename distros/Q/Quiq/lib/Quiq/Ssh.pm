@@ -1,17 +1,3 @@
-package Quiq::Ssh;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Parameters;
-use Net::SSH::Perl ();
-use Quiq::Shell;
-use Encode ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -56,6 +42,26 @@ behoben werden. Siehe: L<https://github.com/ajgb/crypt-curve25519/issues/9#issue
 Zeige den Inhalt des Homeverzeichnisses auf Host dssp an:
 
   $ perl -MQuiq::Ssh -E 'print Quiq::Ssh->new("dssp")->exec("ls")'
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Ssh;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Parameters;
+use Net::SSH::Perl ();
+use Quiq::Shell;
+use Encode ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -246,7 +252,7 @@ sub exec {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

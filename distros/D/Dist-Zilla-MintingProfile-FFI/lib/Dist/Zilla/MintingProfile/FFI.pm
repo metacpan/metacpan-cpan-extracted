@@ -3,7 +3,7 @@ use warnings;
 use 5.020;
 use experimental qw( postderef );
 
-package Dist::Zilla::MintingProfile::FFI 0.02 {
+package Dist::Zilla::MintingProfile::FFI 0.03 {
 
   use Moose;
   with 'Dist::Zilla::Role::MintingProfile::ShareDir';
@@ -28,7 +28,7 @@ Dist::Zilla::MintingProfile::FFI - A minimal Dist::Zilla minting profile for FFI
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

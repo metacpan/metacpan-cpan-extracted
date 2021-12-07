@@ -25260,6 +25260,96 @@ sub cells_workbook_delete_workbook_names {
 }
 
 #
+# cells_workbook_get_page_count
+#
+# Get page count for workbook.
+# 
+# @param string $name Document name. (required)
+# @param string $folder Document&#39;s folder. (optional)
+# @param string $storage_name storage name. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document&#39;s folder.',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_workbook_get_page_count' } = { 
+    	summary => 'Get page count for workbook.',
+        params => $params,
+        returns => 'object',
+        };
+}
+# @return object
+#
+sub cells_workbook_get_page_count {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_workbook_get_page_count");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/pagecount';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('object', $response);
+    return $_response_object;
+}
+
+#
 # cells_workbook_get_workbook
 #
 # Read workbook info or export.
@@ -29559,6 +29649,114 @@ sub cells_worksheets_get_named_ranges {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('RangesResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_worksheets_get_page_count
+#
+# Get page count for worksheet.
+# 
+# @param string $name Document name. (required)
+# @param string $sheet_name The worksheet name. (required)
+# @param string $folder Document&#39;s folder. (optional)
+# @param string $storage_name storage name. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => 'The worksheet name.',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document&#39;s folder.',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_worksheets_get_page_count' } = { 
+    	summary => 'Get page count for worksheet.',
+        params => $params,
+        returns => 'object',
+        };
+}
+# @return object
+#
+sub cells_worksheets_get_page_count {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_worksheets_get_page_count");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_worksheets_get_page_count");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/pagecount';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('object', $response);
     return $_response_object;
 }
 

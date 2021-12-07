@@ -1,7 +1,9 @@
 package App::realpath;
 
-our $DATE = '2021-07-15'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-16'; # DATE
+our $DIST = 'App-realpath'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Print the resolved (absolute) path
@@ -18,7 +20,7 @@ App::realpath - Print the resolved (absolute) path
 
 =head1 VERSION
 
-This document describes version 0.002 of App::realpath (from Perl distribution App-realpath), released on 2021-07-15.
+This document describes version 0.003 of App::realpath (from Perl distribution App-realpath), released on 2021-07-16.
 
 =head1 DESCRIPTION
 

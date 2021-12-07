@@ -5,7 +5,7 @@ use Config ();
 use XSLoader;
 
 BEGIN {
-    our $VERSION = '0.03';
+    our $VERSION = '0.06';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -51,6 +51,8 @@ As bonus it provides 128-bit hex method.
 This package was inspired by C<Digest::xxHash>, but it includes the fresh C code and has
 some optimisations. Thus all hex methods are implemented in Perl XS.
 Also this module doesn't use C<Math::Int64> in favor of native 64 bit digits.
+
+The used version of xxHash is v0.8.0
 
 =head2 $h = xxhash32( $data, $seed )
 

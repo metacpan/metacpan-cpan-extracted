@@ -53,9 +53,11 @@ sub new ($class, $list, $prev, $next, $value) {
 =head2 METHODS
 
 All the functions below are class methods that should be called on a
-B<DataStructure::DoubleList::Node> object.
+C<DataStructure::DoubleList::Node> object.
 
-=head3 I<value()>
+=over 4
+
+=item value()
 
 Returns the value held by this node.
 
@@ -67,7 +69,7 @@ sub value ($self) {
 
 =pod
 
-=head3 I<prev()>
+=item prev()
 
 Returns the previous B<DataStructure::DoubleList::Node> in this list or B<undef>
 if the current object is the first node in its list.
@@ -82,7 +84,7 @@ sub prev ($self) {
 
 =pod
 
-=head3 I<next()>
+=item next()
 
 Returns the next B<DataStructure::DoubleList::Node> in this list or B<undef>
 if the current object is the last node in its list.
@@ -97,7 +99,7 @@ sub next ($self) {
 
 =pod
 
-=head3 I<insert_after($value)>
+=item insert_after($value)
 
 Inserts a new node in the list after the current one, with the given value and
 returns that new node.
@@ -121,7 +123,7 @@ sub insert_after ($self, $value) {
 
 =pod
 
-=head3 I<insert_before($value)>
+=item insert_before($value)
 
 Inserts a new node before in the list before the current one, with the given
 value and returns that new node.
@@ -145,10 +147,12 @@ sub insert_before ($self, $value) {
 
 =pod
 
-=head3 I<delete()>
+=item delete()
 
 Removes the node from the list and returns the value that it help value. The
 node becomes invalid and can no longer be used.
+
+=over
 
 =cut
 

@@ -17,5 +17,8 @@ capture - A script to execute Space Track queries, censor the results
 	files are completely cryptic, it will also list the files with
 	their contents. Use tools/capture --help for the documentation.
 
+celestrak-availability - A script to determine the availability on
+	the Celestrak web site of one or more catalog names.
+
 modeldef - A script to query the Space Track metadata and build a web
 	page that describes it.

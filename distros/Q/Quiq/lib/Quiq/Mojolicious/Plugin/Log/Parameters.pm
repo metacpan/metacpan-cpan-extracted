@@ -1,12 +1,3 @@
-package Quiq::Mojolicious::Plugin::Log::Parameters;
-use base qw/Mojolicious::Plugin/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -36,6 +27,21 @@ und POST-Parameter ins Log ausgibt.
 Das Plugin ist bei der Entwicklung von Action-Seiten zu Formularen
 nützlich, denn es macht sichtbar, welche Daten die Action-Seite
 empfängt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Mojolicious::Plugin::Log::Parameters;
+use base qw/Mojolicious::Plugin/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -77,7 +83,7 @@ sub register {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

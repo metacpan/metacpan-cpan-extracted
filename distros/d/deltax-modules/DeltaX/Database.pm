@@ -1471,25 +1471,28 @@ sub get_source {
 
 	return undef if ! $driver or ! get_driver($driver);
 	my $source = shift;
-	my @src_arr;
-	if ($driver ne 'Oracle' and $driver ne 'mssql' and $driver ne 'Solid') {
-		@src_arr = DBI->data_sources($driver);
-		if ($driver eq 'Informix' and $source !~ /@/) {
-			for (my $i = 0; $i < scalar @src_arr; $i++) {
-				$src_arr[$i] =~ s/@.*//;
+
+	if (! defined $source) {
+		my @src_arr;
+		if ($driver ne 'Oracle' and $driver ne 'mssql' and $driver ne 'Solid') {
+			@src_arr = DBI->data_sources($driver);
+			if ($driver eq 'Informix' and $source !~ /@/) {
+				for (my $i = 0; $i < scalar @src_arr; $i++) {
+					$src_arr[$i] =~ s/@.*//;
+				}
 			}
 		}
+		elsif ($driver eq 'Oracle') {
+			@src_arr = ("dbi:Oracle:$source", $source, "dbi:Oracle:");
+		}
+		elsif ($driver eq 'mssql') {
+			@src_arr = ("dbi:Sybase:", $source, "dbi:Sybase:");
+		}
+		elsif ($driver eq 'Solid') {
+			@src_arr = ("dbi:Solid:$source", $source, "dbi:Solid:");
+		}
+		return @src_arr;
 	}
-	elsif ($driver eq 'Oracle') {
-		@src_arr = ("dbi:Oracle:$source", $source, "dbi:Oracle:");
-	}
-	elsif ($driver eq 'mssql') {
-		@src_arr = ("dbi:Sybase:", $source, "dbi:Sybase:");
-	}
-	elsif ($driver eq 'Solid') {
-		@src_arr = ("dbi:Solid:$source", $source, "dbi:Solid:");
-	}
-	return @src_arr if ! defined $source;
 	SWITCH: for ($driver) {
 		/Pg/		&& do {
 			$source = 'dbi:Pg:dbname=' . $source if $source !~ /dbi:Pg:dbname=/;

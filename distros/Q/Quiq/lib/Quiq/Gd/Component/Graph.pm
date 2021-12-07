@@ -1,15 +1,3 @@
-package Quiq::Gd::Component::Graph;
-use base qw/Quiq::Gd::Component/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Array;
-use Quiq::Math;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -261,6 +249,24 @@ Im Browser:
 
 Mit C<adaptPlotRegion> wird der Plotbereich so verkleinert, dass
 Punkte am Rand vollständig sichtbar sind.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gd::Component::Graph;
+use base qw/Quiq::Gd::Component/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Array;
+use Quiq::Math;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -606,7 +612,7 @@ sub yMax {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

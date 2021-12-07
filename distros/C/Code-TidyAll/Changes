@@ -1,3 +1,19 @@
+0.80     2021-11-26
+
+- Don't run the PodSpell plugin test unless `ispell` is installed. Reported by
+  Slaven Rezić. GH #108.
+
+
+0.79     2021-11-26
+
+- Run `git stash pop` with `--quiet` flag again, as long as Git is not
+  2.24.x. See notes in 0.75 for why we stopped passing `--quiet` in the first
+  place.
+
+- Fixed a bug where the class in the `--tidyall-class` option was not
+  loaded. Fixed by Shlomi Fish. PR #107. Fixed GH #43.
+
+
 0.78     2020-04-25
 
 - Fix an issue with the pre-commit hook code when commit after a merge. If
@@ -31,8 +47,8 @@
 - Git v2.24.0 introduced a serious bug when running `git stash` with the
   `--quiet` flag that causes it to delete files. This in turn caused this
   package's pre-commit hook code to be seriously broken. We no longer pass the
-  `--quiet` flag if the git version is >= 2.24. We re-enable the flag once
-  there is a version that fixes this bug.
+  `--quiet` flag if the git version is >= 2.24. We will re-enable the flag
+  once there is a version that fixes this bug.
 
 - The pre-commit hook code now uses `git rev-parse -q --verify refs/stash` to
   determine if the call to `git stash` actually does anything. This seems
@@ -724,7 +740,7 @@
 
 0.03    2012-07-24
 
-[eNHANCEMENTS]
+[ENHANCEMENTS]
 
 * Added svn precommit hook (Code::TidyAll::SVN::Precommit)
 

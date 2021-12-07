@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## CSS Object Oriented - ~/lib/CSS/Object/Property.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.local>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/06/21
-## Modified 2020/06/21
+## Modified 2021/04/28
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package CSS::Object::Property;
 BEGIN
@@ -16,7 +19,7 @@ BEGIN
     use CSS::Object::Format;
     use CSS::Object::Value;
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 sub init
@@ -52,7 +55,7 @@ sub format
     {
         # my( $p, $f, $l ) = caller;
         # $self->message( 3, "Property format called in package $p at line $l in file $f" );
-	    my $format = $self->SUPER::format( @_ ) || return;
+	    my $format = $self->SUPER::format( @_ ) || return( $self->pass_error );
         $self->values->foreach(sub
         {
             shift->format( $format ) || return;
@@ -64,6 +67,15 @@ sub format
 }
 
 sub name { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
+
+sub remove_from
+{
+    my $self = shift( @_ );
+    my $rule = shift( @_ ) || return( $self->error( "No rule object was provided to remove our property from it." ) );
+    return( $self->error( "Rule object provided (", overload::StrVal( $rule ), ") is not actually a CSS::Object::Rule object." ) ) if( !$self->_is_a( $rule, 'CSS::Object::Rule' ) );
+    $rule->elements->remove( $self );
+    return( $self );
+}
 
 sub value
 {
@@ -122,8 +134,8 @@ sub value
     return( $self->values->last );
 }
 
-## Array of CSS::Object::Value objects
-sub values { return( shift->_set_get_array_as_object( 'values', @_ ) ); }
+# Array of CSS::Object::Value objects
+sub values { return( shift->_set_get_object_array_object( 'values', 'CSS::Object::Value', @_ ) ); }
 
 sub values_as_string { return( $_[0]->format->values_as_string( $_[0]->values ) ); }
 
@@ -149,7 +161,7 @@ CSS::Object::Property - CSS Object Oriented Property
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -200,6 +212,16 @@ This sets or gets the L<CSS::Object::Format> object. When set, this will share t
 =head2 name
 
 Sets or gets the property's name. The name stored here becomes a L<Module::Generic::Scalar> and thus all its object methods can be used
+
+=head2 remove_from
+
+This takes an L<CSS::Object::Rule> object as single argument and remove this property object from its list of elements.
+
+It basically does:
+
+    $rule->elements->remove( $self );
+
+It returns the current property object.
 
 =head2 value
 

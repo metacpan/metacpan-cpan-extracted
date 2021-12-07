@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 8.4601
+Version 8.5201
 
 # SYNOPSIS
 
@@ -26,7 +26,7 @@ Version 8.4601
       -i                   ignore case
       --need=[+-]n         required positive match count
       --allow=[+-]n        acceptable negative match count
-      --matchcount=n[,m]   specify required match count for each block
+      --matchcount=n[,m]   required match count for each block
     STYLE
       -l                   list filename only
       -c                   print count of matched block only
@@ -56,14 +56,15 @@ Version 8.4601
       --[no]256            same as --ansicolor 256 or 16
       --regioncolor        use different color for inside/outside regions
       --uniqcolor          use different color for unique string
+      --uniqsub=func       preprocess function before check uniqueness
       --random             use random color each time
       --face               set/unset visual effects
     BLOCK
       -p, --paragraph      paragraph mode
       --all                print whole data
-      --border=pattern     specify the border pattern
-      --block=pattern      specify the block of records
-      --blockend=s         specify the block end mark (Default: "--\n")
+      --border=pattern     border pattern
+      --block=pattern      block of records
+      --blockend=s         block end mark (Default: "--\n")
     REGION
       --inside=pattern     select matches inside of pattern
       --outside=pattern    select matches outside of pattern
@@ -71,8 +72,8 @@ Version 8.4601
       --exclude=pattern    reduce matches to outside of the area
       --strict             strict mode for --inside/outside --block
     CHARACTER CODE
-      --icode=name         specify file encoding
-      --ocode=name         specify output encoding
+      --icode=name         file encoding
+      --ocode=name         output encoding
     FILTER
       --if,--of=filter     input/output filter command
       --pf=filter          post process filter command
@@ -87,7 +88,7 @@ Version 8.4601
       --epilogue=func      call function after command execution
     OTHER
       --usage[=expand]     show this message
-      --exit=n             specify exit status
+      --exit=n             command exit status
       --norc               skip reading startup file
       --man                display command or module manual page
       --show               display module file
@@ -315,8 +316,9 @@ it.
 
 Order of capture group in the pattern is not guaranteed.  Please avoid
 to use direct index, and use relative or named capture group instead.
-For example, repeated character can be written as `(\w)\g{-1}`
-or `(?<c>\w)\g{c}`.
+For example, if you want to search repeated characters, use
+`(\w)\g{-1}` or `(?<c>\w)\g{c}` rather than
+`(\w)\1`.
 
 - **-x** _pattern_, **--le**=_pattern_
 
@@ -329,9 +331,10 @@ or `(?<c>\w)\g{c}`.
 
         greple --le='foo bar -baz ?yabba ?dabba -doo'
 
-    Multiple \`?' preceded tokens are treated all mixed together.  That
-    means \`?A|B ?C|D' is equivalent to \`?A|B|C|D'.  If you want to mean
-    \`(A or B) and (C or D)', use AND syntax instead: \`A|B C|D'.
+    Multiple `?` preceded tokens are treated all mixed together.  That
+    means `?A|B&nbsp;?C|D` is equivalent to `?A|B|C|D`.  If you
+    want to mean `(A&nbsp;or&nbsp;B)` and `(C&nbsp;or&nbsp;D)`, use AND syntax
+    instead: `A|B&nbsp;C|D`.
 
     This is the summary of start character for **--le** option:
 
@@ -455,19 +458,25 @@ or `(?<c>\w)\g{c}`.
     If the option **--need=0** is specified and no pattern was found,
     entire data is printed.  This is true even for required pattern.
 
-- **--matchcount**=_min_\[,_max_\], **--mc**=_min_\[,_max_\]
+- **--matchcount**=_count_|_min_,_max_, **--mc**=...
 
     When option **--matchcount** is specified, only blocks which have given
-    match count will be shown.  Count _min_ and _max_ can be omitted,
-    and single number is taken as _min_.  Next commands print lines
-    including semicolons; 3 or more, exactly 3, and 3 or less,
+    match count will be shown.  Minimum and maximum number can be given,
+    connecting by comma, and they can be omitted.  Next commands print
+    lines including semicolons; 3 or more, exactly 3, and 3 or less,
     respectively.
 
-        greple --matchcount=3 ';' file
+        greple --matchcount=3, ';' file
 
-        greple --matchcount=3,3 ';' file
+        greple --matchcount=3  ';' file
 
         greple --matchcount=,3 ';' file
+
+    In fact, _min_ and _max_ can repeat to represent multiple range.
+    Missing, negative or zero _max_ means infinite.  Next command find
+    match count 0 to 10, 20 to 30, and 40-or-greater.
+
+        greple --matchcount=,10,20,30,40
 
 - **-f** _file_, **--file**=_file_
 
@@ -554,14 +563,14 @@ or `(?<c>\w)\g{c}`.
 - **-m** _\*_, **--max-count**=_\*_
 
     In fact, _n_ and _m_ can repeat as many as possible.  Next example
-    removes first 10 blocks, then get first 10 blocks from the result.
-    Consequently, get 10 blocks from 10th (10-19).
+    removes first 10 blocks (by `0,10`), then get first 10 blocks from
+    the result (by `10`).  Consequently, get 10 blocks from 10th (10-19).
 
         greple -m 0,10,10
 
-    Next command get first 20 and get last 10, producing same result.
-    Empty string behaves like absence for _length_ and zero for
-    _offset_.
+    Next command get first 20 (by `20,`) and get last 10 (by `,-10`),
+    producing same result.  Empty string behaves like absence for
+    _length_ and zero for _offset_.
 
         greple -m 20,,,-10
 
@@ -735,15 +744,15 @@ or `(?<c>\w)\g{c}`.
 
         N    None
         Z  0 Zero (reset)
-        D  1 Double-struck (boldface)
+        D  1 Double strike (boldface)
         P  2 Pale (dark)
         I  3 Italic
         U  4 Underline
         F  5 Flash (blink: slow)
         Q  6 Quick (blink: rapid)
-        S  7 Stand-out (reverse video)
-        V  8 Vanish (concealed)
-        X  9 Crossed out
+        S  7 Stand out (reverse video)
+        H  8 Hide (concealed)
+        X  9 Cross out
         E    Erase Line
 
         ;    No effect
@@ -905,10 +914,28 @@ or `(?<c>\w)\g{c}`.
 
         greple --uniqcolor 'colou?r\w*'
 
-    When used with option **-i**, color is selected in case-insensitive
-    fashion.  If you want case-insensitive match and case-sensitive color
-    selection, indicate insensitiveness in the pattern rather than command
-    option (e.g. `(?i)pattern`).
+    When used with option **-i**, color is selected still in case-sensitive
+    fashion.  If you want case-insensitive color selection, use next
+    **--uniqsub** option.
+
+- **--uniqsub**=_function_, **--us**=_function_
+
+    Above option **--uniqcolor** set same color for same literal string.
+    Option **--uniqsub** specify the preprocessor code applied before
+    comparison.  _function_ get matched string by `$_` and returns the
+    result.  For example, next command will choose unique colors for each
+    word by their length.
+
+        greple --uniqcolor --uniqsub 'sub{length}' '\w+' file
+
+    If you want case-insensitive color selection, do like this.
+
+        greple -i pattern --uc --uniqsub 'sub{lc}'
+
+    Next command read the output from `git blame` command and set unique
+    color for each entire line by their commit ids.
+
+        git blame ... | greple .+ --uc --us='sub{s/\s.*//r}' --face=E-D
 
 - **--face**=\[-+\]_effect_
 
@@ -1218,16 +1245,16 @@ or `(?<c>\w)\g{c}`.
                 or die "skip $name\n";
         }
 
-    1;
+        1;
 
-    \_\_DATA\_\_
+        __DATA__
 
-    option default --filestyle=once --format FILE='\\n%s:\\n'
+        option default --filestyle=once --format FILE='\n%s:\n'
 
-    autoload -Mdig --dig
-    option --perl $<move> --begin &\_\_PACKAGE\_\_::is\_perl --dig .
-    &#x3d;item **--end**=_function_(_..._)
+        autoload -Mdig --dig
+        option --perl $<move> --begin &__PACKAGE__::is_perl --dig .
 
+- **--end**=_function_(_..._)
 - **--end**=_function_=_..._
 
     Option **--end** is almost same as **--begin**, except that the function
@@ -1416,10 +1443,10 @@ interpreted as a bare word.
     it contains large number of lines.
 
     By default, if the target file contains more than **512 \* 1024
-    characters** (_size_), **2 seconds** timer is started (_time_).  Alert
+    characters** (_size_), **2 seconds** timer will start (_time_).  Alert
     message is shown when the timer expired.
 
-    To disable this alert, set _size_ to 0:
+    To disable this alert, set the size as zero:
 
         --alert size=0
 
@@ -1445,6 +1472,11 @@ interpreted as a bare word.
 - **DEBUG\_GETOPTEX**
 
     Enable [Getopt::EX](https://metacpan.org/pod/Getopt::EX) debug option.
+
+- **NO\_COLOR**
+
+    If true, all coloring capability with ANSI terminal sequence is
+    disabled.  See [https://no-color.org/](https://no-color.org/).
 
 Before starting execution, _greple_ reads the file named `.greplerc`
 on user's home directory.  Following directives can be used.

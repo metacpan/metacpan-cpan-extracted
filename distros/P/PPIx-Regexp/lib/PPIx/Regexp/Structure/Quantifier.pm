@@ -49,7 +49,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.081';
+our $VERSION = '0.082';
 
 sub can_be_quantified {
     return;
@@ -111,6 +111,9 @@ sub __PPIX_LEXER__finalize {
 		and return $self->_too_big();
 
 	    my ( $lo, $hi ) = split qr{ , }smx, $quant;
+
+	    defined $hi
+		or $hi = $lo;
 
 	    my $numeric = 1;
 	    foreach ( $lo, $hi ) {

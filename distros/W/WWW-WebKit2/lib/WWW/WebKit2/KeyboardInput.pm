@@ -106,7 +106,7 @@ sub key_press {
     $display->XTestFakeKeyEvent($shift_keycode, 0, 1) if $self->modifiers->{'shift'};
     $display->XFlush;
 
-    usleep 50000; # time for the X server to deliver the event
+    $self->pause(50); # time for the X server to deliver the event
 
     $self->process_page_load;
 

@@ -1,0 +1,71 @@
+[
+
+    {
+        "subject": "first allOf without additionalProperties",
+        "schema": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "definitions": {
+                "definition": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "allOf 0": { "type": "string" }
+                    }
+                }
+            },
+            "type": "object",
+            "properties": {
+                "property": {
+                    "allOf": [
+                        { "$ref": "#/definitions/definition" },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "allOf 1": { "type": "string" }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "tests": [
+            {
+                "description": "ok minimal",
+                "data": {
+                    "property": {}
+                },
+                "valid": true
+            },
+            {
+                "description": "ok maximal",
+                "data": {
+                    "property": {
+                        "allOf 0": "value 0"
+                    }
+                },
+                "valid": true
+            },
+            {
+                "description": "fail existent",
+                "data": {
+                    "property": {
+                        "allOf 0": "value 0",
+                        "allOf 1": "value 1"
+                    }
+                },
+                "valid": false
+            },
+            {
+                "description": "fail non-existent",
+                "data": {
+                    "property": {
+                        "allOf 0": "value 0",
+                        "non-existent": "value"
+                    }
+                },
+                "valid": false
+            }
+        ]
+    }
+
+]

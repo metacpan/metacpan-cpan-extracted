@@ -1,12 +1,23 @@
 cpanfile
 lib/DataStructure.pm
+lib/DataStructure/BTree.pm
+lib/DataStructure/BTree/Node.pm
 lib/DataStructure/DoubleList.pm
 lib/DataStructure/DoubleList/Node.pm
+lib/DataStructure/FIFO.pm
+lib/DataStructure/LIFO.pm
 lib/DataStructure/LinkedList.pm
 lib/DataStructure/LinkedList/Node.pm
+lib/DataStructure/OrderedSet.pm
+lib/DataStructure/Queue.pm
+lib/DataStructure/RedBlackTree.pm
+lib/DataStructure/Roles.pm
+lib/DataStructure/Set.pm
+lib/DataStructure/Stack.pm
 LICENCE
 Makefile.PL
 MANIFEST
+t/30-btree.t
 t/30-doublelist.t
 t/30-linkedlist.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

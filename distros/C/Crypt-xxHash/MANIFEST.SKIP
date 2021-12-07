@@ -1,0 +1,13 @@
+#!install_default
+^MYMETA\.yml$
+^MYMETA\.json$
+^\.git
+\.vstags
+^_build
+^Build$
+^blib
+\.bak$
+\.old$
+xs/\.c$
+xs/\.h$
+xs/\.o$

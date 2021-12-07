@@ -23,7 +23,7 @@ no_index:
 provides:
   URPM:
     file: URPM.pm
-    version: v5.125.0
+    version: v5.221.0
   URPM::Resolve:
     file: URPM/Resolve.pm
 requires:
@@ -31,5 +31,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: git://git.mageia.org/software/rpm/perl-URPM/
-version: v5.125
+version: v5.221
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

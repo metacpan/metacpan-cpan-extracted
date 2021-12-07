@@ -1,8 +1,5 @@
 package Data::Sah::Util::Type::Date;
 
-our $DATE = '2021-08-01'; # DATE
-our $VERSION = '0.910'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
@@ -11,6 +8,12 @@ use warnings;
 use Scalar::Util qw(blessed looks_like_number);
 
 require Exporter;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-12-01'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.911'; # VERSION
+
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        coerce_date
@@ -26,7 +29,7 @@ my $re_ymdThmsZ = qr/\A([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([
 sub coerce_date {
     my $val = shift;
     if (!defined($val)) {
-        return undef;
+        return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     }
 
     if ($DATE_MODULE eq 'DateTime') {
@@ -38,19 +41,19 @@ sub coerce_date {
         } elsif ($val =~ $re_ymd) {
             my $d;
             eval { $d = DateTime->new(year=>$1, month=>$2, day=>$3, time_zone=>'UTC') };
-            return undef if $@;
+            return undef if $@; ## no critic: Subroutines::ProhibitExplicitReturnUndef
             return $d;
         } elsif ($val =~ $re_ymdThmsZ) {
             my $d;
             eval { $d = DateTime->new(year=>$1, month=>$2, day=>$3, hour=>$4, minute=>$5, second=>$6, time_zone=>'UTC') };
-            return undef if $@;
+            return undef if $@; ## no critic: Subroutines::ProhibitExplicitReturnUndef
             return $d;
         } elsif (blessed($val) && $val->isa('Time::Moment')) {
             return DateTime->from_epoch(epoch => $val->epoch);
         } elsif (blessed($val) && $val->isa('Time::Piece')) {
             return DateTime->from_epoch(epoch => $val->epoch);
         } else {
-            return undef;
+            return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
         }
     } elsif ($DATE_MODULE eq 'Time::Moment') {
         require Time::Moment;
@@ -61,19 +64,19 @@ sub coerce_date {
         } elsif ($val =~ $re_ymd) {
             my $d;
             eval { $d = Time::Moment->new(year=>$1, month=>$2, day=>$3) };
-            return undef if $@;
+            return undef if $@; ## no critic: Subroutines::ProhibitExplicitReturnUndef
             return $d;
         } elsif ($val =~ $re_ymdThmsZ) {
             my $d;
             eval { $d = Time::Moment->new(year=>$1, month=>$2, day=>$3, hour=>$4, minute=>$5, second=>$6) };
-            return undef if $@;
+            return undef if $@; ## no critic: Subroutines::ProhibitExplicitReturnUndef
             return $d;
         } elsif (blessed($val) && $val->isa('DateTime')) {
             return Time::Moment->from_epoch($val->epoch);
         } elsif (blessed($val) && $val->isa('Time::Piece')) {
             return Time::Moment->from_epoch($val->epoch);
         } else {
-            return undef;
+            return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
         }
     } elsif ($DATE_MODULE eq 'Time::Piece') {
         require Time::Piece;
@@ -84,19 +87,19 @@ sub coerce_date {
         } elsif ($val =~ $re_ymd) {
             my $d;
             eval { $d = Time::Piece->strptime($val, "%Y-%m-%d") };
-            return undef if $@;
+            return undef if $@; ## no critic: Subroutines::ProhibitExplicitReturnUndef
             return $d;
         } elsif ($val =~ $re_ymdThmsZ) {
             my $d;
             eval { $d = Time::Piece->strptime($val, "%Y-%m-%dT%H:%M:%SZ") };
-            return undef if $@;
+            return undef if $@; ## no critic: Subroutines::ProhibitExplicitReturnUndef
             return $d;
         } elsif (blessed($val) && $val->isa('DateTime')) {
             return scalar Time::Piece->gmtime(epoch => $val->epoch);
         } elsif (blessed($val) && $val->isa('Time::Moment')) {
             return scalar Time::Piece->gmtime(epoch => $val->epoch);
         } else {
-            return undef;
+            return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
         }
     } else {
         die "BUG: Unknown Perl date module '$DATE_MODULE'";
@@ -106,7 +109,7 @@ sub coerce_date {
 sub coerce_duration {
     my $val = shift;
     if (!defined($val)) {
-        return undef;
+        return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     } elsif (blessed($val) && $val->isa('DateTime::Duration')) {
         return $val;
     } elsif ($val =~ /\AP
@@ -134,10 +137,10 @@ sub coerce_duration {
                 seconds => $7 // 0,
             );
         };
-        return undef if $@;
+        return undef if $@; ## no critic: Subroutines::ProhibitExplicitReturnUndef
         return $d;
     } else {
-        return undef;
+        return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     }
 }
 
@@ -156,7 +159,7 @@ Data::Sah::Util::Type::Date - Utility related to date/duration type
 
 =head1 VERSION
 
-This document describes version 0.910 of Data::Sah::Util::Type::Date (from Perl distribution Data-Sah), released on 2021-08-01.
+This document describes version 0.911 of Data::Sah::Util::Type::Date (from Perl distribution Data-Sah), released on 2021-12-01.
 
 =head1 DESCRIPTION
 
@@ -193,6 +196,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah>.
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Sah>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah>
@@ -200,16 +231,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

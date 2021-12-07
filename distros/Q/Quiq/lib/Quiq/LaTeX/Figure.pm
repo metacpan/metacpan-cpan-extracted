@@ -1,14 +1,3 @@
-package Quiq::LaTeX::Figure;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Reference;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -38,6 +27,23 @@ Der Code
 produziert
 
   FIXME
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::LaTeX::Figure;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Reference;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -299,7 +305,7 @@ sub latex {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

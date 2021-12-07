@@ -1,5 +1,18 @@
 Revision history for Excel-Template-XLSX 
 
+v1.1.2  04-Dec-2021
+        Added sub _parse_final_pass, ot process merge_ranges, that have blank cells.
+        Fixed handling of styles to accept either 'True' or '1' as an XML attribute
+        
+v1.1.1  10-Dec-2019
+        added command to upload to CPAN
+        
+v1.1.0  10-Dec-2019
+        Changed build.pl to require Excel::Writer::XLSX version 1.01
+        
+v1.0.9  07-Oct-2019
+        Removed references to Mojo::Util which were used for development.
+        
 v1.0.8  24-Sep-2019
         Fixed bug in handling of array formulas
         

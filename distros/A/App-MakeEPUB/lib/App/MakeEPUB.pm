@@ -10,7 +10,7 @@ use File::Find;
 use File::Path qw(make_path);
 use HTML::TreeBuilder;
 
-use version; our $VERSION = qv('0.3.1');
+use version; our $VERSION = qv('v0.3.2');
 
 my %guidetitle = (
     cover   => 'Cover',
@@ -428,7 +428,7 @@ App::MakeEPUB - Create an EPUB ebook
 
 =head1 VERSION
 
-This document describes App::MakeEPUB version 0.0.1
+This document describes App::MakeEPUB version v0.3.2
 
 =head1 SYNOPSIS
 

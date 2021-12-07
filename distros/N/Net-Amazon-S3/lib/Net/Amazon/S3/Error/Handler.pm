@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler;
-$Net::Amazon::S3::Error::Handler::VERSION = '0.98';
+$Net::Amazon::S3::Error::Handler::VERSION = '0.99';
 use Moose;
 
 # ABSTRACT: A base class for S3 response error handler
@@ -26,7 +26,7 @@ Net::Amazon::S3::Error::Handler - A base class for S3 response error handler
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 CONSTRUCTOR
 
@@ -36,13 +36,15 @@ version 0.98
 
 Instance of L<< Net::Amazon::S3 >>
 
+=back
+
 =head1 METHODS
 
-=head2 handler_error ($response)
+=head2 handle_error ($response)
 
-=head2 handler_error ($response, $request)
+=head2 handle_error ($response, $request)
 
-Method will recieve instance of L<< Net::Amazon::S3::Response >> sub-class.
+Method will receive instance of L<< Net::Amazon::S3::Response >> sub-class.
 
 Method should return false (or throw exception) in case of error, true otherwise.
 

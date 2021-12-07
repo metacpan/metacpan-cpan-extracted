@@ -3,7 +3,7 @@ use 5.012;
 use URI::XS;
 use UniEvent;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 XS::Loader::load();
 

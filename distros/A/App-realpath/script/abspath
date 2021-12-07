@@ -1,15 +1,16 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-15'; # DATE
+our $DATE = '2021-07-16'; # DATE
 our $DIST = 'App-realpath'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
 
 use Getopt::Long qw(:config gnu_getopt no_ignore_case);
 
+my $opt_logical = 0;
 sub parse_cmdline {
     my $res = GetOptions(
         'help|h' => sub {
@@ -20,11 +21,15 @@ Usage:
   realpath --help (-h, -?)
 
 Options:
+  -L   use logical path (from PWD env) for working directory
+  -P   use physical path (from Cwd::cwd()) for working directory (the default)
 
 For more details, see the manpage/documentation.
 USAGE
             exit 0;
         },
+        'logical|L'  => sub { $opt_logical = 1 },
+        'physical|P' => sub { $opt_logical = 0 },
         'version|v' => sub {
             no warnings 'once';
             print "realpath (perl-based) version ".($main::VERSION // 'dev').
@@ -43,8 +48,14 @@ USAGE
 
 sub run {
     require Cwd;
+    require File::Spec;
+
     for my $path (@ARGV) {
-        print Cwd::realpath($path), "\n";
+        if ($opt_logical) {
+            print File::Spec->rel2abs($path, $ENV{PWD}), "\n";
+        } else {
+            print Cwd::realpath($path), "\n";
+        }
     }
 }
 
@@ -69,7 +80,7 @@ abspath - Print the resolved (absolute) path
 
 =head1 VERSION
 
-This document describes version 0.002 of abspath (from Perl distribution App-realpath), released on 2021-07-15.
+This document describes version 0.003 of abspath (from Perl distribution App-realpath), released on 2021-07-16.
 
 =head1 SYNOPSIS
 
@@ -91,10 +102,13 @@ different results:
  /home/ujang/dir1
  % abspath .       ;# an alias for realpath
  /home/ujang/dir1
+ % realpath foo    ;# uses PWD for working directory
+ /home/ujang/sym1/foo
 
  % quickabspath .  ;# gives absolute path but does not resolve symlinks
  /home/ujang/sym1
 
+                    # relpath does the opposite, converting to relative path
  % relpath /home/ujang/dir1
  .
  % relpath /home/ujang/sym1
@@ -108,6 +122,9 @@ the same as C<abs_path>) function. The function works by reading "." (the
 current directory) and moving upwards until it reaches the root directory,
 resolving symlinks along the way.
 
+When L<-L> (C<--logical>) option is given, will use PWD environment variable and
+not resolve symlinks.
+
 =head1 EXIT CODES
 
 0 on success.
@@ -116,7 +133,15 @@ resolving symlinks along the way.
 
 =head1 OPTIONS
 
+=head2 --physical, -P
+
+=head2 --logical, -L
+
 =head1 FAQ
+
+=head1 ENVIRONMENT
+
+=head2 PWD
 
 =head1 HOMEPAGE
 

@@ -1,3 +1,0 @@
-sub is_smoker {
-  return $ENV{AUTOMATED_TESTING} ? 1 : 0;
-}

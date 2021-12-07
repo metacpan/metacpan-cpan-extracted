@@ -1,44 +1,37 @@
 package SDL2::timer 0.01 {
-    use SDL2::Utils;
+    use strict;
+    use SDL2::Utils qw[attach define ffi load_lib threads_wrapped];
     use experimental 'signatures';
     #
     use SDL2::stdinc;
     use SDL2::error;
+    #
+    load_lib('api_wrapper');
+    #
     #
     ffi->type( '(uint32,opaque)->uint32' => 'SDL_TimerCallback' );
     ffi->type( 'int'                     => 'SDL_TimerID' );
     my %_timers;
     END { %_timers = () }
     attach timer => {
-        SDL_GetTicks                                            => [ [], 'uint32' ],
-        SDL_GetPerformanceCounter                               => [ [], 'uint64' ],
-        SDL_GetPerformanceFrequency                             => [ [], 'uint64' ],
-        SDL_Delay                                               => [ ['uint32'] ],
-        ( threads_wrapped() ? 'Bundle_' : '' ) . 'SDL_AddTimer' => [
-            [ 'uint32', 'SDL_TimerCallback', 'opaque' ],
-            'SDL_TimerID',
-            sub ( $inner, $delay, $code, $params = () ) {
-                my $cb = ffi->closure(
-                    sub {
-                        my ( $delay, $etc ) = @_;
-                        my $retval = $code->( $delay, $params );
-                        $retval;
-                    }
-                );
-                my $id = $inner->( $delay, $cb, undef );
-                $_timers{$id} = $cb;    # Store reference
-                $_timers{$id}->sticky;
-                return $id;
+        SDL_GetTicks                => [ [], 'uint32' ],
+        SDL_GetPerformanceCounter   => [ [], 'uint64' ],
+        SDL_GetPerformanceFrequency => [ [], 'uint64' ],
+        SDL_Delay                   => [
+            ['uint32'] => sub ( $inner, $ticks ) {
+                SDL2::FFI::SDL_Yield();
+                $inner->($ticks);
+                SDL2::FFI::SDL_Yield();
             }
         ],
-        ( threads_wrapped() ? 'Bundle_' : '' ) . 'SDL_RemoveTimer' => [
-            ['SDL_TimerID'] => 'SDL_bool' => sub ( $inner, $id ) {
-                my $retval = $inner->($id);
-                $_timers{$id}->unstick;
-                delete $_timers{$id};
-                return $retval;
+        Bundle_SDL_AddTimer => [
+            [ 'uint32', 'opaque', 'opaque' ],
+            'SDL_TimerID',
+            sub ( $inner, $delay, $code, $params = () ) {
+                $inner->( $delay, $code, \$params );
             }
-        ]
+        ],
+        SDL_RemoveTimer => [ ['SDL_TimerID'] => 'SDL_bool' ]
     };
     define timer => [ [ SDL_TICKS_PASSED => sub ( $A, $B ) { ( $B - $A ) <= 0 } ] ];
 

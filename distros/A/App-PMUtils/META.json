@@ -43,13 +43,14 @@
             "Config" : "0",
             "Cwd" : "0",
             "Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard" : "0",
-            "Data::Sah::Compiler::perl::TH::array" : "0.910",
-            "Data::Sah::Compiler::perl::TH::bool" : "0.910",
-            "Data::Sah::Compiler::perl::TH::code" : "0.910",
-            "Data::Sah::Compiler::perl::TH::int" : "0.910",
-            "Data::Sah::Compiler::perl::TH::re" : "0.910",
-            "Data::Sah::Compiler::perl::TH::str" : "0.910",
+            "Data::Sah::Compiler::perl::TH::array" : "0.911",
+            "Data::Sah::Compiler::perl::TH::bool" : "0.911",
+            "Data::Sah::Compiler::perl::TH::code" : "0.911",
+            "Data::Sah::Compiler::perl::TH::int" : "0.911",
+            "Data::Sah::Compiler::perl::TH::re" : "0.911",
+            "Data::Sah::Compiler::perl::TH::str" : "0.911",
             "Data::Sah::Filter::perl::Perl::normalize_perl_modname" : "0",
+            "Data::Sah::Value::perl::Perl::these_mods" : "0",
             "Dist::Util" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::ShareDir" : "0",
@@ -100,15 +101,15 @@
    "provides" : {
       "App::ModuleUtils" : {
          "file" : "lib/App/ModuleUtils.pm",
-         "version" : "0.736"
+         "version" : "0.737"
       },
       "App::PMUtils" : {
          "file" : "lib/App/PMUtils.pm",
-         "version" : "0.736"
+         "version" : "0.737"
       },
       "App::pmgrep" : {
          "file" : "lib/App/pmgrep.pm",
-         "version" : "0.736"
+         "version" : "0.737"
       }
    },
    "release_status" : "stable",
@@ -123,7 +124,7 @@
          "web" : "https://github.com/perlancar/perl-App-PMUtils"
       }
    },
-   "version" : "0.736",
+   "version" : "0.737",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -132,7 +133,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InsertBlock",
             "name" : "InsertBlock",
-            "version" : "0.100"
+            "version" : "0.103"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertExample",
@@ -253,7 +254,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.605"
+            "version" : "0.606"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -744,7 +745,7 @@
    },
    "x_authority" : "cpan:PERLANCAR",
    "x_contributors" : [
-      "Steven Haryanto (on PC, Bandung) <stevenharyanto@gmail.com>"
+      "Steven Haryanto <stevenharyanto@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",

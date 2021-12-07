@@ -278,7 +278,6 @@ qx.Class.define("callbackery.ui.form.DateTime",
      */
     setValue : function(value)
     {
-      //  console.log('setValue(): value=', value);
       // set the date to the textfield
 
       if (value != null) {      
@@ -570,7 +569,6 @@ qx.Class.define("callbackery.ui.form.DateTime",
         if (time == null && defaultTime != null) {
             timefield.setValue(defaultTime);
         }
-//          console.log('_onChangeDate(): date=', selectedDate, ', timefield=', timefield.getValue(), ', placeholder=', timefield.getPlaceholder());
         this.close();
     },
 
@@ -670,18 +668,14 @@ qx.Class.define("callbackery.ui.form.DateTime",
      */
     _onDateFieldChangeValue : function(e)
     {
-// console.log('_onDateFieldChangeValue(): e.getData()=', e.getData());
       // Apply to popup
-//      var date = this.getValue();
       var date = e.getData();
-//console.log('_onDateFieldChangeValue(): date=', date);
       if (date != null && date != '')
       {
 
         var timefield = this.getChildControl("timefield");
         var time        = timefield.getValue();
         var defaultTime = timefield.getPlaceholder();
-//        console.log('_onDateFieldChangeValue(): date=', date, ', timefield=', timefield.getValue(), ', placeholder=', timefield.getPlaceholder());
         var today = new Date();
           var dateValue;
         try {

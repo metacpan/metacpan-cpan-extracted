@@ -1,16 +1,3 @@
-package Quiq::Url;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Encode ();
-use Quiq::Array;
-use Quiq::Option;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -22,6 +9,25 @@ Quiq::Url - URL Klasse
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Url;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Encode ();
+use Quiq::Array;
+use Quiq::Option;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -487,7 +493,7 @@ sub split {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -1,9 +1,9 @@
-package Dyn::Callback 0.02 {
+package Dyn::Callback 0.03 {
     use strict;
     use warnings;
     use 5.030;
     use XSLoader;
-    XSLoader::load( __PACKAGE__, $Dyn::Callback::VERSION );
+    XSLoader::load( __PACKAGE__, our $VERSION );
     use parent 'Exporter';
     our %EXPORT_TAGS = (
         dcb => [

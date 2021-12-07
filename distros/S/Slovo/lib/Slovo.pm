@@ -1,6 +1,6 @@
 package Slovo;
-use Mojo::Base 'Mojolicious', -signatures;
 use feature ':5.26';
+use Mojo::Base 'Mojolicious', -signatures;
 
 use Mojo::Util 'class_to_path';
 use Mojo::File 'path';
@@ -11,7 +11,7 @@ use Slovo::Cache;
 use Time::Piece;
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '2021.11.20';
+our $VERSION   = '2021.11.22';
 our $CODENAME  = 'U+2C14 GLAGOLITIC CAPITAL LETTER SLOVO (Ⱄ)';
 my $CLASS = __PACKAGE__;
 

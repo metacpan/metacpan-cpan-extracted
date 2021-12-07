@@ -23,7 +23,7 @@ POSIX::AtFork->add_to_child(sub {
 use Ref::Util             ();
 use Hash::Util::FieldHash ();
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 my sub deferred { AnyEvent::XSPromises::deferred() }
 my sub resolved { AnyEvent::XSPromises::resolved(@_) }
@@ -65,6 +65,7 @@ our @EXPORT_OK = qw(
     mkdir
     rmdir
     rmtree
+    scandir
 
     slurp
     readline
@@ -92,6 +93,20 @@ my sub lazily_require_aio {
         1;
     };
     return $loaded;
+}
+sub scandir {
+    &_drop_self;
+    my $path     = File::Spec->rel2abs(shift);
+    my $max_req  = shift;
+    my $deferred = AnyEvent::XSPromises::deferred();
+    IO::AIO::aio_scandir($path, $max_req, sub {
+        if ( !@_ ) {
+            $deferred->reject(errno());
+            return;
+        }
+        $deferred->resolve(@_);
+    });
+    return $deferred->promise;
 }
 
 sub open {
@@ -121,8 +136,8 @@ sub open {
 }
 
 my sub _arg_is_fh {
-    &_drop_self;
     my $cb                   = shift;
+    &_drop_self;
     my $deferred             = deferred();
     $cb->(@_, sub { $_[0] < 0 ? $deferred->reject(errno()) : $deferred->resolve(@_) });
     return $deferred->promise;
@@ -149,8 +164,8 @@ my sub _ensure_globref_or_absolute_path {
 }
 
 my sub _arg_is_fh_or_file {
-    &_drop_self;
     my $cb                   = shift;
+    &_drop_self;
     my $fh_or_maybe_rel_path = shift;
     my $fh_or_abs_path       = _ensure_globref_or_absolute_path($fh_or_maybe_rel_path);
     my $deferred             = deferred();
@@ -160,8 +175,8 @@ my sub _arg_is_fh_or_file {
 }
 
 my sub _wrap_stat_and_lstat {
-    &_drop_self;
     my $cb                   = shift;
+    &_drop_self;
     my $fh_or_maybe_rel_path = shift;
     my $fh_or_abs_path       = _ensure_globref_or_absolute_path($fh_or_maybe_rel_path);
     my $deferred             = deferred();
@@ -193,8 +208,8 @@ sub chmod    { lazily_require_aio(); _arg_is_fh_or_file(\&IO::AIO::aio_chmod,   
 sub unlink   { lazily_require_aio(); _arg_is_fh_or_file(\&IO::AIO::aio_unlink,   @_) }
 
 my sub _arg_is_two_paths {
-    &_drop_self;
     my $cb                         = shift;
+    &_drop_self;
     my ($first_path, $second_path) = map File::Spec->rel2abs($_), shift, shift;
     my $deferred                   = deferred();
     $cb->($first_path, $second_path, @_, sub {
@@ -211,8 +226,8 @@ sub move    { lazily_require_aio(); _arg_is_two_paths(\&IO::AIO::aio_move,    @_
 
 
 my sub _arg_is_single_path {
-    &_drop_self;
     my $cb         = shift;
+    &_drop_self;
     my $first_path = File::Spec->rel2abs(shift);
     my $deferred   = deferred();
     $cb->($first_path, @_, sub {

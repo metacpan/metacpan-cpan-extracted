@@ -1,12 +1,3 @@
-package Quiq::Database::Api::Dbi::Cursor;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -50,6 +41,21 @@ Anzahl der getroffenen Datensätze.
 Id nach INSERT in Tabelle mit AUTOINCREMENT-Kolumne (MySQL, SQLite)
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::Api::Dbi::Cursor;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -385,7 +391,7 @@ sub fetch {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

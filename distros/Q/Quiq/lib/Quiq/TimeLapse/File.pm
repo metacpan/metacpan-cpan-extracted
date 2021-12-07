@@ -1,14 +1,3 @@
-package Quiq::TimeLapse::File;
-use base qw/Quiq::File::Image/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::TimeLapse::Filename;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -51,6 +40,23 @@ einer Bildsequenz ist. Der Dateiname hat den Aufbau
   NNNNNN-WIDTHxHEIGHT[-NAME].EXT
 
 Hierbei ist NNNNNN die Bild-Nummer.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::TimeLapse::File;
+use base qw/Quiq::File::Image/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::TimeLapse::Filename;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -206,7 +212,7 @@ sub text {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

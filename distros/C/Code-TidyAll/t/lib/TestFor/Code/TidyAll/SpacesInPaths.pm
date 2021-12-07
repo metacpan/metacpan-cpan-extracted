@@ -5,12 +5,31 @@ use warnings;
 
 use Test::Class::Most parent => 'TestFor::Code::TidyAll::Plugin';
 
+use Code::TidyAll::Plugin::PerlCritic;
 use Code::TidyAll::Util qw(tempdir_simple);
+use Module::Runtime qw( require_module );
+use Path::Tiny qw( cwd );
+use Try::Tiny;
+
+BEGIN {
+    my @mods
+        = qw( Mason::Tidy Perl::Critic Perl::Tidy Perl::Tidy::Sweetened Pod::Checker Pod::Tidy );
+    push @mods, 'Pod::Spell'
+        unless $^O eq 'MSWin32';
+    for my $mod (@mods) {
+        unless ( try { require_module($mod); 1 } ) {
+            __PACKAGE__->SKIP_CLASS("This test requires the $mod module");
+            return;
+        }
+    }
+}
 
 sub _extra_path {
-    (
-        'node_modules/.bin',
-        'php5/usr/bin',
+    my $cwd = cwd();
+
+    return (
+        $cwd->child(qw( node_modules .bin )),
+        $cwd->child(qw( php5 usr bin )),
     );
 }
 
@@ -37,7 +56,7 @@ sub test_js_plugins : Tests {
     my $self = shift;
 
     return unless $self->require_executable('node');
-    return unless $self->require_executable('js-beautify') || $ENV{TRAVIS};
+    return unless $self->require_executable('js-beautify');
     return unless $self->require_executable('jshint');
     return unless $self->require_executable('jslint');
 
@@ -46,9 +65,9 @@ sub test_js_plugins : Tests {
 
     $self->tidyall(
         plugin_conf => {
-            ( $ENV{TRAVIS} ? () : ( JSBeautify => { select => '**/*.js' } ) ),
-            JSHint => { select => '**/*.js' },
-            JSLint => { select => '**/*.js' },
+            JSBeautify => { select => '**/*.js' },
+            JSHint     => { select => '**/*.js' },
+            JSLint     => { select => '**/*.js' },
         },
         source_file => $file,
         expect_ok   => 1,
@@ -76,6 +95,8 @@ sub test_mason_tidy : Tests {
 
 sub test_perl_plugins : Tests {
     my $self = shift;
+
+    return unless $self->require_executable( Code::TidyAll::Plugin::PerlCritic->_build_cmd );
 
     my $file   = $self->_spaces_dir->child('foo bar.pl');
     my $source = <<'EOF';

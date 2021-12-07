@@ -6,7 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -19,17 +19,18 @@ name: JSON-Color
 provides:
   ColorTheme::JSON::Color::default_ansi:
     file: lib/ColorTheme/JSON/Color/default_ansi.pm
-    version: '0.132'
+    version: '0.133'
   ColorTheme::JSON::Color::default_rgb:
     file: lib/ColorTheme/JSON/Color/default_rgb.pm
-    version: '0.132'
+    version: '0.133'
   JSON::Color:
     file: lib/JSON/Color.pm
-    version: '0.132'
+    version: '0.133'
 recommends:
   Scalar::Util::LooksLikeNumber: '0'
 requires:
   Color::ANSI::Util: '0.164'
+  ColorTheme::NoColor: '0'
   ColorThemeBase::Static::FromStructColors: '0.006'
   ColorThemeRole::ANSI: '0'
   Exporter: '5.57'
@@ -45,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-Color
   homepage: https://metacpan.org/release/JSON-Color
   repository: git://github.com/perlancar/perl-JSON-Color.git
-version: '0.132'
+version: '0.133'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -465,6 +466,14 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
       version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode

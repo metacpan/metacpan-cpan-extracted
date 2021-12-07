@@ -1,16 +1,3 @@
-package Quiq::Database::Api::Dbi::Connection;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use DBI ();
-use Quiq::Database::Api::Dbi::Cursor;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -41,6 +28,25 @@ DBI Database Handle.
 Name des DBMS, für DBMS-spezifische Fallunterscheidungen.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::Api::Dbi::Connection;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use DBI ();
+use Quiq::Database::Api::Dbi::Cursor;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -172,6 +178,9 @@ sub new {
         elsif ($dbms eq 'access') {
             $msg = sprintf('ACCESS-%05d: %s',$err,$errstr);
         }
+        elsif ($dbms eq 'jdbc') {
+            $msg = sprintf('JDBC-%05d: %s',$err,$errstr);
+        }
 
         if ($stmt) {
             substr($stmt,$pos,0) = '<*>' if $pos;
@@ -252,7 +261,10 @@ sub new {
                 $dbh->{'odbc_utf8_on'} = 1;
             }
             $dbh->{LongTruncOk} = 0; # RuV Auftrags-DB
-            $dbh->{LongReadLen} = 3*1024*1024; # 3MB / 32768; # RuV Auftrags-DB
+            # RuV Auftrags-DB
+            $dbh->{LongReadLen} = 3*1024*1024; # 3MB / 32768;
+        }
+        elsif ($dbms eq 'jdbc') {
         }
         else {
             $class->throw('Not implemented');
@@ -493,7 +505,12 @@ sub sql {
                 $id = $dbh->{'mysql_insertid'};
             }
             elsif ($dbms eq 'sqlite') {
-                $id = $dbh->func('last_insert_rowid');
+                # Sind wir über die DBD::Proxy Schnittstelle verbunden,
+                # ist die Methode zur Ermittelung der rowid nicht definiert
+                if ($dbh->can('sqlite_last_insert_rowid')) {
+                    # $id = $dbh->func('last_insert_rowid');
+                    $id = $dbh->sqlite_last_insert_rowid;
+                }
             }
 
             # Hits. -1, wenn unbekannt oder nicht verfügbar. Wir mappen auf 0.
@@ -540,7 +557,7 @@ sub sql {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

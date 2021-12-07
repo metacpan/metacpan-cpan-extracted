@@ -1,6 +1,10 @@
 Release history for Mojolicious-Plugin-AdditionalValidationChecks
 =================================================================
 
+0.18 2021-11-25 14:10:00
+
+  * Add support for hsl color notation (see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value)
+
 0.17 2020-08-19 16:32:00
 
   * fix typo (thanks @haarg, GH#6)

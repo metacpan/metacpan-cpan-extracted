@@ -1,0 +1,77 @@
+NAME
+    Dist::Zilla::Plugin::SignReleaseNotes - Create and signs a 'Release'
+    notes file
+
+VERSION
+    version 0.0001
+
+DESCRIPTION
+    This plugin will sign a 'Release' file that includes:
+
+      1. Git commits since the last tag
+      2. the sha256 checksum of the file that is being distributed to CPAN
+
+    the file is then signed using Module::Signature.
+
+    The resulting file can be used as the Release information for GitHub or
+    similar.
+
+    This plugin should appear after any other AfterBuild plugin in your
+    "dist.ini" file
+
+ATTRIBUTES
+    sign
+        A string value. If "always" then a signature will be created after
+        an archive is created. If "always" then the 'Release' file will be
+        signed after the release. Default is "always"
+
+        This attribute can be overridden by an environment variable "DZSIGN"
+
+METHODS
+    after_release
+        The main processing function includes getting the git information.
+        Should likely be split up.
+
+    create_release_file
+        Create's the plaintext Release file contents.
+
+    do_sign
+        Signs the 'Release' file to Module::Signature. Unfortunately we
+        cannot use the Module::Signature::sign function as it gets its
+        plaintext from the list of files that are normally used.
+
+    sub get_git_checksums_and_titles
+        Gets the short version of the checksums and the titles of each git
+        commit since the most recent tag that was found in the repo.
+
+    get_checksum
+        Get's the checksum of the file being released. Expects the filename
+        and returns the checksum (currently sha256 only).
+
+    get_name
+        Get's the name of the Distribution being released. This takes it
+        from the filename. There is likely a better way to obtain it.
+
+    get_version
+        Get's the version of the Distribution being released. This takes it
+        from the $self->{zilla}->version. There is likely a better way to
+        obtain it.
+
+AUTHOR
+      Timothy Legge <timlegge@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Timothy Legge.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+AUTHOR
+    Timothy Legge
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Timothy Legge.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -12,21 +12,15 @@ use IO::Interactive qw(is_interactive);
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-02'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.911'; # VERSION
+our $VERSION = '1.912'; # VERSION
 
 # this class can actually be a role instead of base class for pericmd &
 # pericmd-lite, but Mo is more lightweight than Role::Tiny (also R::T doesn't
 # have attributes), Role::Basic, or Moo::Role.
 
-BEGIN {
-    if ($INC{'Perinci/CmdLine/Classic.pm'}) {
-        require Moo; Moo->import;
-    } else {
-        require Mo; Mo->import(qw(build default));
-    }
-}
+use Moo;
 
 # BEGIN taken from Array::Iter
 sub __array_iter {
@@ -128,6 +122,10 @@ has use_locale => (
 has default_dry_run => (
     is=>'rw',
     default => 0,
+);
+
+has plugins => (
+    is => 'rw',
 );
 
 # role: requires 'default_prompt_template'
@@ -453,6 +451,20 @@ _
 
 );
 
+sub BUILD {
+    my ($self, $args) = @_;
+
+    $self->{plugins} //= [];
+    # always add these plugins
+    push @{ $self->{plugins} }, (
+        "Run::Normal",
+    );
+
+    $self->_plugin_activate_plugins_in_env();
+    $self->_plugin_activate_plugins(@{ $self->{plugins} })
+          if $self->{plugins};
+}
+
 # plugin stuffs
 our @Plugin_Instances;
 our %Handlers; # key=event name, val=[ [$label, $prio, $handler, $epoch], ... ]
@@ -461,13 +473,15 @@ our $tempfile_opt_suffix = '';
 
 my $r;
 
-sub __plugin_run_event {
-    my %args = @_;
+sub _plugin_run_event {
+    my ($self, %args) = @_;
 
     my $name = $args{name};
-    {
+    if (log_is_trace()) {
         local $args{code} = '...';
         local $args{r} = '...';
+        local $args{on_success} = '...';
+        local $args{on_failure} = '...';
         log_trace "[pericmd] -> run_event(%s)", \%args;
     }
     defined $name or die "Please supply 'name'";
@@ -618,8 +632,8 @@ sub __plugin_run_event {
 }
 
 my $handler_seq = 0;
-sub __plugin_add_handler {
-    my ($event, $label, $prio, $handler) = @_;
+sub _plugin_add_handler {
+    my ($self, $event, $label, $prio, $handler) = @_;
 
     # XXX check for known events?
     $Handlers{$event} ||= [];
@@ -630,8 +644,8 @@ sub __plugin_add_handler {
          [$label, $prio, $handler, $handler_seq++]);
 }
 
-sub __plugin_activate_single {
-    my ($plugin_name0, $args) = @_;
+sub _plugin_activate_single {
+    my ($self, $plugin_name0, $args) = @_;
 
     my ($plugin_name, $wanted_event, $wanted_prio) =
         $plugin_name0 =~ /\A(\w+(?:::\w+)*)(?:\@(\w+)(?:\@(\d+))?)?\z/
@@ -641,14 +655,14 @@ sub __plugin_activate_single {
     local $r->{plugin_name} = $plugin_name;
     local $r->{plugin_args} = $args;
 
-    __plugin_run_event(
+    $self->_plugin_run_event(
         name => 'activate_plugin',
         on_success => sub {
             my $package = "Perinci::CmdLine::Plugin::$plugin_name";
             (my $package_pm = "$package.pm") =~ s!::!/!g;
             log_trace "[pericmd] Loading module $package ...";
             require $package_pm;
-            my $obj = $package->new(%{ $args || {} });
+            my $obj = $package->new(%{ $args || {} }, cmdline => $self);
             $obj->activate($wanted_event, $wanted_prio);
         },
         on_failure => sub {
@@ -657,8 +671,8 @@ sub __plugin_activate_single {
     );
 }
 
-sub __plugin_unflatten_import {
-    my ($env, $what) = @_;
+sub _plugin_unflatten_import {
+    my ($self, $env, $what) = @_;
 
     $what ||= "import";
     my @imports;
@@ -694,23 +708,27 @@ sub __plugin_unflatten_import {
     @imports;
 }
 
-sub __plugin_activate_plugins {
+sub _plugin_activate_plugins {
+    my $self = shift;
+
     while (@_) {
         my $plugin_name0 = shift;
         my $plugin_args = @_ && ref($_[0]) eq 'HASH' ? shift : {};
-        __plugin_activate_single($plugin_name0, $plugin_args);
+        $self->_plugin_activate_single($plugin_name0, $plugin_args);
     }
 }
 
 my $has_read_env;
-sub __plugin_activate_plugins_in_env {
+sub _plugin_activate_plugins_in_env {
+    my $self = shift;
+
     last if $has_read_env;
 
   READ_PERINCI_CMDLINE_PLUGINS:
     {
         last unless defined $ENV{PERINCI_CMDLINE_PLUGINS};
         log_trace "[pericmd] Reading env variable PERINCI_CMDLINE_PLUGINS ...";
-        __plugin_activate_plugins(__plugin_unflatten_import($ENV{PERINCI_CMDLINE_PLUGINS}, "PERINCI_CMDLINE_PLUGINS"));
+        $self->_plugin_activate_plugins($self->_plugin_unflatten_import($ENV{PERINCI_CMDLINE_PLUGINS}, "PERINCI_CMDLINE_PLUGINS"));
         $has_read_env++;
         return;
     }
@@ -721,7 +739,7 @@ sub __plugin_activate_plugins_in_env {
         require JSON::PP;
         log_trace "[pericmd] Reading env variable PERINCI_CMDLINE_PLUGINS_JSON ...";
         my $imports = JSON::PP::decode_json($ENV{PERINCI_CMDLINE_PLUGINS_JSON});
-        __plugin_active_plugins(@$imports);
+        $self->_plugin_active_plugins(@$imports);
         $has_read_env++;
         return;
     }
@@ -1339,15 +1357,15 @@ sub _parse_argv2 {
               PLUGINS_FROM_DASH_PLUGINS: {
                     my $plugins = delete $args{-plugins};
                     last unless defined $plugins;
-                    __plugin_activate_plugins(
+                    $self->_plugin_activate_plugins(
                         ref $plugins eq 'ARRAY' ? @$plugins :
-                            __plugin_unflatten_import($plugins)
+                            $self->_plugin_unflatten_import($plugins)
                         );
                 } # PLUGINS_FROM_DASH_PLUGINS
 
               PLUGINS_FROM_CONFIG_SECTIONS: {
                     last unless @plugins;
-                    __plugin_activate_plugins(@plugins);
+                    $self->_plugin_activate_plugins(@plugins);
                 } # PLUGINS_FROM_CONFIG_SECTIONS
             } # TREAT_SPECIAL_PARAMS
 
@@ -1883,29 +1901,6 @@ sub display_result {
 sub run {
     my ($self) = @_;
 
-  DEBUG_COMPLETION:
-    {
-        last; # disabled
-        last unless $ENV{PERINCI_CMDLINE_DEBUG_COMPLETION};
-        no warnings;
-        open my $fh, ">>", ($ENV{PERINCI_CMDLINE_DEBUG_COMPLETION_FILE} // "/tmp/pericmd-completion.log")
-            or do { warn "Can't open completion log file, skipped: $!"; last };
-        print $fh sprintf(
-            "[%s] [prog %s] [pid %d] [uid %d] COMP_LINE=<%s> (%d char(s)) COMP_POINT=<%s>\n",
-            scalar(localtime),
-            $0,
-            $$,
-            $>,
-            $ENV{COMP_LINE},
-            length($ENV{COMP_LINE}),
-            $ENV{COMP_POINT},
-        );
-        print $fh join("", map {"  $_=$ENV{$_}\n"} sort keys %ENV);
-        close $fh;
-    }
-
-    log_trace("[pericmd] -> run(), \@ARGV=%s", \@ARGV);
-
     my $co = $self->common_opts;
 
     $r = {
@@ -1916,216 +1911,9 @@ sub run {
         cmdline => $self,
     };
 
-    # dump object is special case, we delegate to do_dump_object()
-    if ($ENV{PERINCI_CMDLINE_DUMP_OBJECT} //
-            $ENV{PERINCI_CMDLINE_DUMP} # old name that will be removed
-        ) {
-        $r->{res} = $self->do_dump_object($r);
-        goto FORMAT;
-    }
-
-    # completion is special case, we delegate to do_completion()
-    if ($self->_detect_completion($r)) {
-        $r->{res} = $self->do_completion($r);
-        goto FORMAT;
-    }
-
-    # set default from common options
-    $r->{naked_res} = $co->{naked_res}{default} if $co->{naked_res};
-    $r->{format}    = $co->{format}{default} if $co->{format};
-
-    # EXPERIMENTAL, set default format to json if we are running in a pipeline
-    # and the right side of the pipe is the 'td' program
-    {
-        last if is_interactive(*STDOUT) || $r->{format};
-        last unless eval { require Pipe::Find; 1 };
-        my $pipeinfo = Pipe::Find::get_stdout_pipe_process();
-        last unless $pipeinfo;
-        last unless $pipeinfo->{exe} =~ m![/\\]td\z! ||
-            $pipeinfo->{cmdline} =~ m!\A([^\0]*[/\\])?perl\0([^\0]*[/\\])?td\0!;
-        $r->{format} = 'json';
-    }
-
-    $r->{format} //= $self->default_format;
-
-    if ($self->read_config) {
-        # note that we will be reading config file
-        $r->{read_config} = 1;
-    }
-
-    if ($self->read_env) {
-        # note that we will be reading env for default options
-        $r->{read_env} = 1;
-    }
-
-    eval {
-        log_trace("[pericmd] Running hook_before_run ...");
-        $self->hook_before_run($r);
-
-        log_trace("[pericmd] Running hook_before_parse_argv ...");
-        $self->hook_before_parse_argv($r);
-
-        my $parse_res = $self->parse_argv($r);
-        if ($parse_res->[0] == 501) {
-            # we'll need to send ARGV to the server, because it's impossible to
-            # get args from ARGV (e.g. there's a cmdline_alias with CODE, which
-            # has been transformed into string when crossing network boundary)
-            $r->{send_argv} = 1;
-        } elsif ($parse_res->[0] != 200) {
-            die $parse_res;
-        }
-        $r->{parse_argv_res} = $parse_res;
-        $r->{args} = $parse_res->[2] // {};
-
-        # set defaults
-        $r->{action} //= 'call';
-
-        # init logging
-        if ($self->log) {
-            require Log::ger::App;
-            my $default_level = do {
-                my $dry_run = $r->{dry_run} // $self->default_dry_run;
-                $dry_run ? 'info' : 'warn';
-            };
-            Log::ger::App->import(
-                level => $r->{log_level} // $self->log_level // $default_level,
-                name  => $self->program_name,
-            );
-        }
-
-        log_trace("[pericmd] Running hook_after_parse_argv ...");
-        $self->hook_after_parse_argv($r);
-
-        if ($ENV{PERINCI_CMDLINE_DUMP_CONFIG}) {
-            log_trace "[pericmd] Dumping config ...";
-            $r->{res} = $self->do_dump_config($r);
-            goto FORMAT;
-        }
-
-        $self->parse_cmdline_src($r);
-
-        #log_trace("TMP: parse_res: %s", $parse_res);
-
-        my $missing = $parse_res->[3]{"func.missing_args"};
-        die [400, "Missing required argument(s): ".join(", ", @$missing)]
-            if $missing && @$missing;
-
-        my $scd = $r->{subcommand_data};
-        if ($scd->{pass_cmdline_object} // $self->pass_cmdline_object) {
-            $r->{args}{-cmdline} = $self;
-            $r->{args}{-cmdline_r} = $r;
-        }
-
-        log_trace("[pericmd] Running hook_before_action ...");
-        $self->hook_before_action($r);
-
-        my $meth = "action_$r->{action}";
-        die [500, "Unknown action $r->{action}"] unless $self->can($meth);
-        if ($ENV{PERINCI_CMDLINE_DUMP_ARGS}) {
-            log_trace "[pericmd] Dumping arguments ...";
-            $r->{res} = $self->do_dump_args($r);
-            goto FORMAT;
-        }
-        log_trace("[pericmd] Running %s() ...", $meth);
-        __plugin_run_event(
-            name => 'action',
-            on_success => sub {
-                $r->{res} = $self->$meth($r);
-            },
-        );
-
-        log_trace("[pericmd] Running hook_after_action ...");
-        $self->hook_after_action($r);
-    };
-
-    my $err = $@;
-    if ($err || !$r->{res}) {
-        if ($err) {
-            $err = [500, "Died: $err"] unless ref($err) eq 'ARRAY';
-            if (%Devel::Confess::) {
-                no warnings 'once';
-                require Scalar::Util;
-                my $id = Scalar::Util::refaddr($err);
-                my $stack_trace = $Devel::Confess::MESSAGES{$id};
-                $err->[1] .= "\n$stack_trace" if $stack_trace;
-            }
-            $err->[1] =~ s/\n+$//;
-            $r->{res} = $err;
-        } else {
-            $r->{res} = [500, "Bug: no response produced"];
-        }
-    } elsif (ref($r->{res}) ne 'ARRAY') {
-        log_trace("[pericmd] res=%s", $r->{res}); #2
-        $r->{res} = [500, "Bug in program: result not an array"];
-    }
-
-    if (!$r->{res}[0] || $r->{res}[0] < 200 || $r->{res}[0] > 555) {
-        $r->{res}[3]{'x.orig_status'} = $r->{res}[0];
-        $r->{res}[0] = 555;
-    }
-
-    $r->{format} //= $r->{res}[3]{'cmdline.default_format'};
-    $r->{format} //= $r->{meta}{'cmdline.default_format'};
-    my $restore_orig_result;
-    my $orig_result;
-    if (exists $r->{res}[3]{'cmdline.result.noninteractive'} && !is_interactive(*STDOUT)) {
-        $restore_orig_result = 1;
-        $orig_result = $r->{res}[2];
-        $r->{res}[2] = $r->{res}[3]{'cmdline.result.noninteractive'};
-    } elsif (exists $r->{res}[3]{'cmdline.result.interactive'} && is_interactive(*STDOUT)) {
-        $restore_orig_result = 1;
-        $orig_result = $r->{res}[2];
-        $r->{res}[2] = $r->{res}[3]{'cmdline.result.interactive'};
-    } elsif (exists $r->{res}[3]{'cmdline.result'}) {
-        $restore_orig_result = 1;
-        $orig_result = $r->{res}[2];
-        $r->{res}[2] = $r->{res}[3]{'cmdline.result'};
-    }
-  FORMAT:
-    my $is_success = $r->{res}[0] =~ /\A2/ || $r->{res}[0] == 304;
-
-    if (defined $ENV{PERINCI_CMDLINE_OUTPUT_DIR}) {
-        $self->save_output($r);
-    }
-
-    if ($is_success &&
-            ($self->skip_format ||
-             $r->{meta}{'cmdline.skip_format'} ||
-             $r->{res}[3]{'cmdline.skip_format'})) {
-        $r->{fres} = $r->{res}[2] // '';
-    } elsif ($is_success &&
-                 ($r->{res}[3]{stream} // $r->{meta}{result}{stream})) {
-        # stream will be formatted as displayed by display_result()
-    }else {
-        log_trace("[pericmd] Running hook_format_result ...");
-        $r->{res}[3]{stream} = 0;
-        $r->{fres} = $self->hook_format_result($r) // '';
-    }
-    $self->select_output_handle($r);
-    log_trace("[pericmd] Running hook_display_result ...");
-    $self->hook_display_result($r);
-    log_trace("[pericmd] Running hook_after_run ...");
-    $self->hook_after_run($r);
-
-    if ($restore_orig_result) {
-        $r->{res}[2] = $orig_result;
-    }
-
-    my $exitcode;
-    if ($r->{res}[3] && defined($r->{res}[3]{'cmdline.exit_code'})) {
-        $exitcode = $r->{res}[3]{'cmdline.exit_code'};
-    } else {
-        $exitcode = $self->status2exitcode($r->{res}[0]);
-    }
-    if ($self->exit) {
-        log_trace("[pericmd] exit(%s)", $exitcode);
-        exit $exitcode;
-    } else {
-        # so this can be tested
-        log_trace("[pericmd] <- run(), exitcode=%s", $exitcode);
-        $r->{res}[3]{'x.perinci.cmdline.base.exit_code'} = $exitcode;
-        return $r->{res};
-    }
+    $self->_plugin_run_event(
+        name => 'run',
+    );
 }
 
 1;
@@ -2143,7 +1931,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.911 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-02.
+This document describes version 1.912 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-12-01.
 
 =head1 DESCRIPTION
 
@@ -2361,7 +2149,7 @@ After this event, C<< $r->{res} >> should have already been set to the result.
 =item * From the source code
 
 (Currently no public API, but you can see the source code, particularly the
-C<__plugin_activate_plugins()> function).
+C<_plugin_activate_plugins()> method).
 
 =item * From configuration file (special parameter C<-plugins>)
 
@@ -2654,6 +2442,13 @@ If you set it to 1, you specify that function's result never needs formatting
 (i.e. the function outputs raw text to be outputted directly), so no formatting
 will be done. See also: C<skip_format> attribute, C<cmdline.skip_format> result
 metadata attribute.
+
+=head2 METADATA'S ARGUMENT SPECIFICATION ATTRIBUTE
+
+=head3 x.perinci.cmdline.default_from_schema
+
+Bool. If set to true, then even when an argument is not specified, the schema
+will be evaluated to get default/coerced value from the schema.
 
 =head1 RESULT METADATA
 

@@ -1,3 +1,8 @@
+0.012   2021-11-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix declaring pipe in system().
+
+
 0.011   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update coerce rule names in Sah schemas (Data::Sah::Coerce

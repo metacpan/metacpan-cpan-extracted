@@ -1,3 +1,10 @@
+0.005   2021-11-14  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Fix location of logging statement.
+
+
 0.004   2021-11-14  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli grep-terms] Allow highlighting by passing the terms to the

@@ -150,6 +150,7 @@ lib/Yancy/Plugin/Form.pm
 lib/Yancy/Plugin/Form/Bootstrap4.pm
 lib/Yancy/Plugin/Roles.pm
 lib/Yancy/Util.pm
+package.json
 share/update_resources.sh
 t/00-compile.t
 t/00-report-prereqs.dd

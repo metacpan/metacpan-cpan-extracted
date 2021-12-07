@@ -1,16 +1,3 @@
-package Quiq::ImagePool::Sequence;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash::Ordered;
-use Quiq::FileHandle;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -40,6 +27,25 @@ Geordneter Hash der Schlüssel/Definitions-Paare.
 Liste aller Bilder.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ImagePool::Sequence;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash::Ordered;
+use Quiq::FileHandle;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -378,7 +384,7 @@ sub images {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

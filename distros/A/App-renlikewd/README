@@ -3,8 +3,8 @@ NAME
     Directory's name
 
 VERSION
-    This document describes version 0.001 of App::renlikewd (from Perl
-    distribution App-renlikewd), released on 2021-11-15.
+    This document describes version 0.002 of App::renlikewd (from Perl
+    distribution App-renlikewd), released on 2021-11-16.
 
 SYNOPSIS
     See the command-line script renlikewd.

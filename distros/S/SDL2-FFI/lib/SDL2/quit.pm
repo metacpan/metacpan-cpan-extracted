@@ -1,4 +1,6 @@
 package SDL2::quit 0.01 {
+    use strict;
+    use warnings;
     use SDL2::Utils;
     use experimental 'signatures';
     #
@@ -6,9 +8,9 @@ package SDL2::quit 0.01 {
         [   SDL_QuitRequested => sub () {
                 SDL2::FFI::SDL_PumpEvents(), (
                     SDL2::FFI::SDL_PeepEvents(
-                        undef,                    0,
-                        SDL2::FFI::SDL_PEEKEVENT, SDL2::FFI::SDL_QUIT,
-                        SDL2::FFI::SDL_QUIT
+                        undef,                      0,
+                        SDL2::FFI::SDL_PEEKEVENT(), SDL2::FFI::SDL_QUIT(),
+                        SDL2::FFI::SDL_QUIT()
                     ) > 0
                     );
             }
@@ -31,7 +33,7 @@ An C<SDL_QUIT> event is generated when the user tries to close the application
 window.
 
 If it is ignored or filtered out, the window will remain open. If it is not
-ignored or filtered, it is queued normally and the window is allowed to close. 
+ignored or filtered, it is queued normally and the window is allowed to close.
 When the window is closed, screen updates will complete, but have no effect.
 
 C<SDL_Init( ... )> installs signal handlers for C<SIGINT> (keyboard interrupt)

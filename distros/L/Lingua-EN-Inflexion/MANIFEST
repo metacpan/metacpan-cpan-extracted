@@ -41,5 +41,8 @@ t/person_singular.t
 t/possessives.t
 t/shouty_plurals.t
 t/ambiguous_plurals.t
+t/noun_recursive.t
+t/nt.t
+t/prepositional_phrases.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::API;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::API::VERSION = '0.98';
+$Shared::Examples::Net::Amazon::S3::API::VERSION = '0.99';
 use strict;
 use warnings;
 
@@ -241,7 +241,11 @@ sub operation_object_fetch {
 
 	$self
 		->bucket ($params{with_bucket})
-		->get_key ($params{with_key}, 'GET')
+		->get_key (
+			$params{with_key},
+			'GET',
+			({ range => $params{with_range} }) x exists $params{with_range},
+		)
 		;
 }
 
@@ -313,7 +317,7 @@ Shared::Examples::Net::Amazon::S3::API - used for testing and as example
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

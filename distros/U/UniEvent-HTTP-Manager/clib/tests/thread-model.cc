@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <panda/unievent/http/manager/Mpm.h>
 #include <panda/unievent/http.h>
 #include <panda/log.h>

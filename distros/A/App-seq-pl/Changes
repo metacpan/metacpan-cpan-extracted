@@ -1,5 +1,10 @@
-Revision history for App-seq-pl
+0.002   2021-07-17  Released-By: PERLANCAR; Urgency: low
 
-0.001   2016-12-16 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Mention seq-intrange, seq-numseq.
+
+
+0.001   2016-12-16  Released-By: PERLANCAR
 
         - First release.

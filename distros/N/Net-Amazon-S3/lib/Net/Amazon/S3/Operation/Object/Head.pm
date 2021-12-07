@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Head;
 # ABSTRACT: Internal class to perform HeadObject operation
-$Net::Amazon::S3::Operation::Object::Head::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Object::Head::VERSION = '0.99';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Object::Head - Internal class to perform HeadObject 
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

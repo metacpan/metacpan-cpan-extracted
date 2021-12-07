@@ -1,22 +1,3 @@
-package Quiq::MediaWiki::Client;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::AnsiColor;
-use LWP::UserAgent ();
-use Quiq::Option;
-use Quiq::Debug;
-use Quiq::Hash;
-use Quiq::Path;
-use Quiq::Record;
-use Quiq::Url;
-use JSON ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -88,6 +69,31 @@ L<http://lxv0103.ruv.de:8080/api.php>
 (nicht allgemein aufrufbar)
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::MediaWiki::Client;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::AnsiColor;
+use LWP::UserAgent ();
+use Quiq::Option;
+use Quiq::Debug;
+use Quiq::Hash;
+use Quiq::Path;
+use Quiq::Record;
+use Quiq::Url;
+use JSON ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -1386,7 +1392,7 @@ sub log {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

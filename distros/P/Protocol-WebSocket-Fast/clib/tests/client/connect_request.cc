@@ -29,17 +29,17 @@ TEST("default request") {
 
     auto str = p.connect_request(req);
     CHECK_THAT(str, StartsWith("GET /path?a=b HTTP/1.1\r\n"));
-    CHECK_THAT(str, Contains("Sec-WebSocket-Protocol: fuck\r\n"));
-    CHECK_THAT(str, Contains("Sec-WebSocket-Version: 12\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Sec-WebSocket-Protocol: fuck\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Sec-WebSocket-Version: 12\r\n"));
     CHECK_THAT(str, MatchesRe("Sec-WebSocket-Key: (.+)\r\n"));
-    CHECK_THAT(str, Contains("Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits\r\n"));
-    CHECK_THAT(str, Contains("Connection: Upgrade\r\n"));
-    CHECK_THAT(str, Contains("Upgrade: websocket\r\n"));
-    CHECK_THAT(str, Contains("Origin: http://www.crazypanda.ru\r\n"));
-    CHECK_THAT(str, Contains("Accept-Encoding: gzip, deflate, sdch\r\n"));
-    CHECK_THAT(str, Contains("Cache-Control: no-cache\r\n"));
-    CHECK_THAT(str, Contains("User-Agent: PWS-Test\r\n"));
-    CHECK_THAT(str, Contains("Host: crazypanda.ru\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Connection: Upgrade\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Upgrade: websocket\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Origin: http://www.crazypanda.ru\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Accept-Encoding: gzip, deflate, sdch\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Cache-Control: no-cache\r\n"));
+    CHECK_THAT(str, ContainsSubstring("User-Agent: PWS-Test\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Host: crazypanda.ru\r\n"));
 
     CHECK(!p.established());
 
@@ -50,9 +50,9 @@ TEST("default values") {
     ClientParser p;
     auto str = p.connect_request(ConnectRequest::Builder().uri("ws://crazypanda.ru:4321/path?a=b").build());
     CHECK_THAT(str, StartsWith("GET /path?a=b HTTP/1.1\r\n"));
-    CHECK_THAT(str, Contains("Sec-WebSocket-Version: 13\r\n"));
-    CHECK_THAT(str, Contains("Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits=15; server_max_window_bits=15\r\n"));
-    CHECK_THAT(str, !Contains("Sec-Websocket-Protocol: \r\n"));
+    CHECK_THAT(str, ContainsSubstring("Sec-WebSocket-Version: 13\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits=15; server_max_window_bits=15\r\n"));
+    CHECK_THAT(str, !ContainsSubstring("Sec-Websocket-Protocol: \r\n"));
 }
 
 TEST("custom ws_key") {
@@ -62,7 +62,7 @@ TEST("custom ws_key") {
         .ws_key("suka")
         .build()
     );
-    CHECK_THAT(str, Contains("Sec-WebSocket-Key: suka\r\n"));
+    CHECK_THAT(str, ContainsSubstring("Sec-WebSocket-Key: suka\r\n"));
 }
 
 TEST("empty relative url") {

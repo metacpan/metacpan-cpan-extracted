@@ -3,7 +3,7 @@ App::DBBrowser::Join;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use List::MoreUtils qw( any );
 
@@ -286,7 +286,7 @@ sub __add_join_condition {
                 if ( ! $AND ) {
                     return;
                 }
-                ( my $condition = $join->{stmt} ) =~ s/^\Q$bu_stmt\E\s//;
+                my $condition = $join->{stmt} =~ s/^\Q$bu_stmt\E\s//r;
                 $join->{stmt} = $bu_stmt; # add condition to the info print only after edit (?)
                 my $info = $ax->get_sql_info( $join );
                 my $tf = Term::Form->new( $sf->{i}{tf_default} );

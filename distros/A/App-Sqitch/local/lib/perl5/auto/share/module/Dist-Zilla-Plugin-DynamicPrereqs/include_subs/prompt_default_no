@@ -1,3 +1,0 @@
-sub prompt_default_no {
-  prompt("$_[0] [y/N]", 'N') =~ /^y/i ? 1 :0;
-}

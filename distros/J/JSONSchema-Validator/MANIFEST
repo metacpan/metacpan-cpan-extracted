@@ -31,7 +31,10 @@ t/acceptance.t
 t/author-critic.t
 t/author-pod-spell.t
 t/data/json_schema/draft4/basic.json
+t/data/json_schema/draft4/both-allOf-additionalProperties.json
 t/data/json_schema/draft4/complex.json
+t/data/json_schema/draft4/first-allOf-additionalProperties.json
+t/data/json_schema/draft4/second-allOf-additionalProperties.json
 t/data/json_schema/draft4/types.json
 t/data/json_schema/draft4/types_no_strict.json
 t/data/json_schema/draft6/basic.json

@@ -1,4 +1,7 @@
-Revision history for Dist-Zilla-MintingProfile-FFI},
+Revision history for Dist-Zilla-MintingProfile-FFI
+
+0.03      2021-11-28 05:04:11 -0700
+  - Remove erroneous extra } from Changes template (gh#3)
 
 0.02      2021-10-06 08:34:30 -0600
   - Fixed prereq bug where [@Starter] and [DynamicPrereqs] 

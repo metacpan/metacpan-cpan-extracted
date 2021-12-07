@@ -1,0 +1,15 @@
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/cmake_props/CMakeFiles/install/strip.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/cmake_props/CMakeFiles/install/local.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/cmake_props/CMakeFiles/install.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/cmake_props/CMakeFiles/list_install_components.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/cmake_props/CMakeFiles/rebuild_cache.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/cmake_props/CMakeFiles/edit_cache.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/install/strip.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/install/local.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/install.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/list_install_components.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/rebuild_cache.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/edit_cache.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/MyTest.dir
+/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir

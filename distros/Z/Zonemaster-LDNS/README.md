@@ -1,12 +1,12 @@
-Zonemaster LDNS
-===============
+# Zonemaster LDNS
 
-**Table of contents**
+## Table of contents
 
 * [Introduction](#introduction)
 * [Dependencies and Compatibility](#dependencies-and-compatibility)
 * [Installation and verification](#installation-and-verification)
   * [Recommended installation](#recommended-installation)
+  * [Docker](#Docker)
   * [Installation from source](#installation-from-source)
   * [Post-installation sanity check](#post-installation-sanity-check)
   * [Testing](#testing)
@@ -19,11 +19,19 @@ Zonemaster LDNS
 
 ## Introduction
 
-This module provides a Perl interface to the [ldns library](https://www.nlnetlabs.nl/projects/ldns/) from [NLnet Labs](https://www.nlnetlabs.nl/). This module includes the necessary C code from ldns, so the library does not need to be globally installed. It does, however, rely on a sufficiently recent version of OpenSSL being present.
+This module provides a Perl interface to the [ldns library] from [NLnet Labs]
+and depends on it being available. The module can either compile and use those
+libraries internally or link to already available ldns library given that the
+version is high enough. In both cases it relies on a sufficiently recent version
+of OpenSSL being present.
 
-This module is written as part of the [Zonemaster project](http://github.com/zonemaster/zonemaster), and therefore primarily exposes the functionality needed for that. Since Zonemaster is a diagnostic tool, that means the functions most used are those for looking things up and inspecting them.
+This module is written as part of the [Zonemaster project], and therefore
+primarily exposes the functionality needed for that. Since Zonemaster is a
+diagnostic tool, that means the functions most used are those for looking things
+up and inspecting them.
 
-If you want a module that specifically aims to be a complete and transparent interface to ldns, [DNS::LDNS](http://search.cpan.org/~erikoest/DNS-LDNS/) is a better fit than this module.
+If you want a module that specifically aims to be a complete and transparent
+interface to ldns, [DNS::LDNS] is a better fit than this module.
 
 Initially this module was named Net::LDNS.
 
@@ -32,7 +40,8 @@ Initially this module was named Net::LDNS.
 Run-time dependencies:
  * `openssl` (openssl >= 1.1.1 unless [Ed25519] is disabled)
  * `libidn` (if [IDN] is enabled)
- * `libldns` (if [Internal ldns] is disabled; libldns >= 1.7.0, or libldns >= 1.7.1 if [Ed25519] is enabled)
+ * `libldns` (if [Internal ldns] is disabled; libldns >= 1.7.0, or
+   libldns >= 1.7.1 if [Ed25519] is enabled)
 
 Compile-time dependencies (only when installing from source):
  * `make`
@@ -48,13 +57,26 @@ Compile-time dependencies (only when installing from source):
 Test-time dependencies:
  * `Test::Fatal`
 
-There is a small part in the code that may not be compatible with non-Unix operating systems, in that it assumes that the file /dev/null exists.
+There is a small part in the code that may not be compatible with non-Unix
+operating systems, in that it assumes that the file /dev/null exists.
 
 ## Installation and verification
 
 ### Recommended installation
 
-The recommended way to install Zonemaster::LDNS is to install it from CPAN as a dependency to Zonemaster::Engine. If you follow the [installation instructions for Zonemaster::Engine](https://github.com/zonemaster/zonemaster-engine/blob/master/docs/Installation.md) you will get all the prerequisites and dependencies for Zonemaster::LDNS before installing it from CPAN.
+The recommended way to install Zonemaster::LDNS is to follow the
+[installation instructions for Zonemaster::Engine] where you will find all
+prerequisites and dependencies for Zonemaster::LDNS before installing it.
+
+
+### Docker
+
+Zonemaster-CLI is available on [Docker Hub], and can be conveniently downloaded
+and run without any installation. See [USING] Zonemaster-CLI for how to run
+Zonemaster-CLI on Docker.
+
+To build your own Docker image, see the [Docker Image Creation] documentation.
+
 
 ### Installation from source
 
@@ -73,6 +95,7 @@ make install
 > **Note:** The source ZIP files downloaded from Github are broken with
 > respect to this instruction.
 
+
 ### Post-installation sanity check
 
 ```sh
@@ -81,11 +104,13 @@ perl -MZonemaster::LDNS -E 'say Zonemaster::LDNS->new("8.8.8.8")->query("zonemas
 
 The above command should print some `dig`-like output.
 
+
 ### Testing
 
-Some of the unit tests depend on data on Internet, which may change. To avoid false 
-fails, those unit tests are only run if the environment variable `TEST_WITH_NETWORK` is `true`. By default that variable
-is unset (those tests are not run). To run all tests, execute
+Some of the unit tests depend on data on the Internet, which may change. To avoid
+false fails, those unit tests are only run if the environment variable
+`TEST_WITH_NETWORK` is `true`. By default that variable is unset (those tests are
+not run). To run all tests, execute
 
 ```sh
 TEST_WITH_NETWORK=1 make test
@@ -161,7 +186,15 @@ Technically this does two things:
 > dynamic linker or feature checks will fail.
 
 
-[IDN]: #idn
-[Internal ldns]: #internal-ldns
-[Ed25519]: #ed25519
+[DNS::LDNS]:                                         http://search.cpan.org/~erikoest/DNS-LDNS/
+[Docker Hub]:                                        https://hub.docker.com/u/zonemaster
+[Docker Image Creation]:                             https://github.com/zonemaster/zonemaster/blob/master/docs/internal-documentation/maintenance/ReleaseProcess-create-docker-image.md
+[Ed25519]:                                           #ed25519
+[IDN]:                                               #idn
+[Installation instructions for Zonemaster::Engine]:  https://github.com/zonemaster/zonemaster-engine/blob/master/docs/Installation.md
+[Internal ldns]:                                     #internal-ldns
+[Ldns library]:                                      https://www.nlnetlabs.nl/projects/ldns/
+[NLnet Labs]:                                        https://www.nlnetlabs.nl/
+[USING]:                                             https://github.com/zonemaster/zonemaster-cli/blob/master/USING.md
+[Zonemaster project]:                                http://github.com/zonemaster/zonemaster
 

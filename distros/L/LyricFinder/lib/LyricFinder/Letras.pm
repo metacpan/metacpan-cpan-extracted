@@ -99,12 +99,16 @@ sub _parse {
 		if ($html =~ m#\<div\s+class\=\"cnt\-head\_title\"\>(.+?)\<\/div\>#msi) {
 			my $headers = $1;
 			my $title = ($headers =~ m#\<h1\>(.+?)\<\/h1\>#si) ? $hs->parse($1) : '';
+			$title =~ s/^\s+//;
+			$title =~ s/\s+$//;
 			if ($title) {
 				if ($self->{'_confirm_title'} !~ /^${title}$/i) {
 					$self->{'Error'} = "e:$Source - Results did not match title ($title).";
 					return '';
 				}
 				my $artist = ($headers =~ m#\<h2\>(.+?)\<\/h2\>#si) ? $hs->parse($1) : '';
+				$artist =~ s/^\s+//;
+				$artist =~ s/\s+$//;
 				if ($artist && $self->{'_confirm_artist'} !~ /^${artist}$/i) {
 					$self->{'Error'} = "e:$Source - Results did not match artist ($artist).";
 					return '';

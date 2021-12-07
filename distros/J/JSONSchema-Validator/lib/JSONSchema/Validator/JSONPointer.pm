@@ -169,7 +169,7 @@ JSONSchema::Validator::JSONPointer - JSON Pointer with URI resolving
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 AUTHORS
 

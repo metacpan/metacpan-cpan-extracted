@@ -1,18 +1,3 @@
-package Quiq::DestinationTree;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Quiq::DirHandle;
-use Quiq::Path;
-use Quiq::Terminal;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -44,6 +29,27 @@ Die Klasse verwaltet die Dateien und Unterverzeichnisse von
 einem oder mehreren Zielverzeichnissen. Sie ist für Dateigeneratoren
 gedacht, die den Inhalt ihrer Zielverzeichnisse komplett
 kontrollieren.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::DestinationTree;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Quiq::DirHandle;
+use Quiq::Path;
+use Quiq::Terminal;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -785,7 +791,7 @@ sub getText {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

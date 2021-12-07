@@ -1,21 +1,3 @@
-package Quiq::Sql;
-use base qw/Quiq::Dbms/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash;
-use Quiq::Option;
-use Quiq::String;
-use Quiq::Template;
-use Scalar::Util ();
-use Quiq::Unindent;
-use Quiq::Reference;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -73,6 +55,30 @@ Folgende DBMSe werden von der Klasse unterstützt:
   PostgreSQL
   SQLite
   MySQL
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Sql;
+use base qw/Quiq::Dbms/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash;
+use Quiq::Option;
+use Quiq::String;
+use Quiq::Template;
+use Scalar::Util ();
+use Quiq::Unindent;
+use Quiq::Reference;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -445,6 +451,8 @@ my %Commands = (
     ],
     MSSQL => [
     ],
+    JDBC => [
+    ],
 );
 
 sub commands {
@@ -566,6 +574,15 @@ my %DataType = (
         BLOB => 'LONGBINARY',
     },
     MSSQL => {
+        # FIXME: Ungeprüft
+        STRING => 'TEXT',
+        TEXT => 'MEMO',
+        INTEGER => 'LONG',
+        REAL => 'DOUBLE',
+        DATETIME => 'DATETIME',
+        BLOB => 'LONGBINARY',
+    },
+    JDBC => {
         # FIXME: Ungeprüft
         STRING => 'TEXT',
         TEXT => 'MEMO',
@@ -926,7 +943,7 @@ sub setDateFormat {
     my $self = shift;
     my $format = shift || 'iso';
 
-    my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) =
+    my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql,$jdbc) =
         $self->dbmsTestVector;
 
     # Statement generieren
@@ -945,7 +962,7 @@ sub setDateFormat {
             return ('SET datestyle TO iso, ymd');
         }
     }
-    elsif ($sqlite || $mysql || $access || $mssql) {
+    elsif ($sqlite || $mysql || $access || $mssql || $jdbc) {
         return; # FIXME: bislang nicht untersucht
     }
 
@@ -993,7 +1010,7 @@ sub setNumberFormat {
     my $self = shift;
     my $format = shift || '.,';
 
-    my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) =
+    my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql,$jdbc) =
         $self->dbmsTestVector;
 
     # Statement generieren
@@ -1002,7 +1019,7 @@ sub setNumberFormat {
     if ($oracle) {
         return ("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '$format'");
     }
-    elsif ($postgresql || $sqlite || $mysql || $access || $mssql) {
+    elsif ($postgresql || $sqlite || $mysql || $access || $mssql || $jdbc) {
         return; # FIXME: bislang nicht untersucht
     }
 
@@ -2257,14 +2274,17 @@ sub addForeignKeyConstraint {
 
         if ($onDelete) {
             $stmt .= "\n    ON DELETE ";
-            if ($onDelete eq 'cascade') {
+            if ($onDelete =~ /^CASCADE$/i) {
                 $stmt .= 'CASCADE';
             }
-            elsif ($onDelete eq 'null') {
+            elsif ($onDelete =~ /NULL/i) {
                 $stmt .= 'SET NULL';
             }
             else {
-                $self->throw;
+                $self->throw(
+                    'SQL-00001: Unexpected ON DELETE action',
+                    Action => $onDelete,
+                );
             }
         }
 
@@ -3859,7 +3879,7 @@ sub select {
         -placeholders => \@placeholders,
     );
 
-    my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) =
+    my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql,$jdbc) =
         $self->dbmsTestVector;
 
     if (defined $offset && $oracle) {
@@ -5629,7 +5649,7 @@ sub diff {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

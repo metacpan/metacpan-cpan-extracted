@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # =========================================================================== #
 
-our $VERSION = "2.07";
+our $VERSION = "2.08";
 
 our @BOOLEAN_ACCESSORS = ( 'no_compress_comment', 'remove_copyright' );
 
@@ -622,7 +622,7 @@ sub minify {
     }
 
     # GH #9 bodge for sourceMappingURL
-    ${$javascript} =~ s/__NEW_LINE__\s/\n/xsmg;
+    ${$javascript} =~ s/__NEW_LINE__/\n/xsmg;
     ${$javascript} =~ s!//#sourceMappingURL!//# sourceMappingURL!g;
     chomp( ${$javascript} );
 
@@ -747,7 +747,7 @@ JavaScript::Packer - Perl version of Dean Edwards' Packer.js
 
 =head1 VERSION
 
-Version 2.07
+Version 2.08
 
 =head1 DESCRIPTION
 

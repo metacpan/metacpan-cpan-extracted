@@ -18,4 +18,5 @@ t/10finder-packages-namemethod.t
 t/11finder-packages-namepkg.t
 t/12finder-subattributes.t
 t/20command-args.t
+t/21command-opts.t
 t/99pod.t

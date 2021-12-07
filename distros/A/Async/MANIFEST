@@ -1,3 +1,17 @@
 MANIFEST
 Async.pm
+Changes
 Makefile.PL
+boilerplate.pl
+t/00-load.t
+t/destroy-globals.t
+t/destroy-siblings.t
+t/error-fork.t
+t/error-pipe.t
+t/error-read-blocking.t
+t/error-read-polling.t
+t/read-multiple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

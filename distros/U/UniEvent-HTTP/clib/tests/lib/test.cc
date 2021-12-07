@@ -6,6 +6,8 @@
 #include <openssl/engine.h>
 #include <chrono>
 #include <iostream>
+#include <catch2/reporters/catch_reporter_registrars.hpp>
+#include <catch2/reporters/catch_reporter_event_listener.hpp>
 
 using panda::unievent::Timer;
 using panda::unievent::TimerSP;
@@ -15,6 +17,15 @@ int TServer::dcnt;
 int TClient::dcnt;
 
 static int64_t _time_mark;
+
+struct SSLVerifyReseter : Catch::EventListenerBase {
+    using EventListenerBase::EventListenerBase; // inherit constructor
+
+    void testCaseStarting( Catch::TestCaseInfo const& ) override {
+        default_ssl_verify = false;
+    }
+};
+CATCH_REGISTER_LISTENER(SSLVerifyReseter);
 
 string active_scheme() { return string(secure ? "https" : "http"); }
 

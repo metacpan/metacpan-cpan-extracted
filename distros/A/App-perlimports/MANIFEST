@@ -79,6 +79,7 @@ t/original-imports.pl
 t/padding.t
 t/perl-imports.t
 t/perl.t
+t/perlimports.t
 t/pragma.t
 t/preserve-spaces.t
 t/qualified-bareword.t
@@ -93,6 +94,7 @@ t/socket.t
 t/switches-in-import.t
 t/symbol-as-method-call.t
 t/symbol-in-export.t
+t/test-builder.t
 t/test-most.t
 t/typeglob.t
 t/use-and-require.t
@@ -177,6 +179,7 @@ test-data/stdout.pl
 test-data/switches-in-import.pl
 test-data/symbol-as-method-call.pl
 test-data/symbol-in-signature.pl
+test-data/test-html-lint.t
 test-data/test-more.t
 test-data/test-most.t
 test-data/typeglob.pl

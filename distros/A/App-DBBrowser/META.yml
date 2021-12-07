@@ -31,7 +31,7 @@ requires:
   File::Which: '0'
   FindBin: '0'
   Getopt::Long: '0'
-  JSON: '0'
+  JSON::MaybeXS: '0'
   List::MoreUtils: '0.428'
   Pod::Usage: '0'
   SQL::Type::Guess: '0'
@@ -45,12 +45,12 @@ requires:
   Text::CSV: '0'
   bytes: '0'
   open: '0'
-  perl: '5.010001'
+  perl: '5.014'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.288'
+version: '2.290'
 x_bugtracker:
   web: https://github.com/kuerbis/App-DBBrowser/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

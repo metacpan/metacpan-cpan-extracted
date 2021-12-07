@@ -5,7 +5,7 @@ use Carp qw( croak );
 use Moo;
 use namespace::autoclean;
 with 'Archive::BagIt::Role::Algorithm', 'Archive::BagIt::Role::OpenSSL';
-our $VERSION = '0.085'; # VERSION
+our $VERSION = '0.086'; # VERSION
 # ABSTRACT: The MD5 algorithm plugin (default for v0.97)
 
 has '+plugin_name' => (
@@ -19,17 +19,7 @@ has '+name' => (
     default => 'md5',
 );
 
-has '_digest' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_digest_md5',
-    init_arg => undef,
-);
 
-sub _build_digest_md5 {
-    my ($self) = @_;
-    return $self->_init_digest();
-}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -46,7 +36,7 @@ Archive::BagIt::Plugin::Algorithm::MD5 - The MD5 algorithm plugin (default for v
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 AVAILABILITY
 

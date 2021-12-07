@@ -1,52 +1,16 @@
 use ETL::Pipeline;
 use Test::More;
 
-
-sub value {
-	my ($etl, $field) = @_;
-	my @data = $etl->input->get( $field );
-	return $data[0];
-}
-
 my $etl = ETL::Pipeline->new( {
+	input   => ['Xml', path => 'FM-Export.XML', records_at => '/RLXML/FILES/FEEDBACK'],
+	mapping => {One => '/ROW/DATA/FILESEQUENCEID/value', Two => '/ROW/SUBTABLES/PERSON'},
+	output  => 'UnitTest',
 	work_in => 't/DataFiles',
-	input   => ['Xml', matching => 'FM-Export.XML', root => '/RLXML/FILES/FEEDBACK'],
-} );
-$etl->input->configure;
-pass( 'configure' );
+} )->process;
+is( $etl->count, 3, 'All records processed' );
 
-ok( $etl->input->next_record, 'next_record' );
-is( $etl->input->attribute( 'ACTION' ), 'DELETE', 'attribute' );
-
-subtest 'Second record' => sub {
-	ok( $etl->input->next_record, 'next_record' );
-	is( value( $etl, 'ROW/DATA/FILESEQUENCEID' ), '12345', 'get' );
-
-	subtest 'Multiple values' => sub {
-		my @data = $etl->input->get( 
-			'ROW/SUBTABLES/PERSON', 
-			'ROW/DATA/LASTNAME'
-		);
-		is_deeply( \@data, ['DOE', 'Smith'], 'List' );
-
-		my @data = $etl->input->get( 
-			'ROW/SUBTABLES/PERSON', 
-			'ROW/DATA/LASTNAME', 
-			'ROW/DATA/FIRSTNAME',
-		);
-		is_deeply( \@data, [['DOE', 'JOHN'], ['Smith', 'Fred']], 'Related' );
-	};
-};	
-subtest 'Third record' => sub {
-	ok( $etl->input->next_record, 'next_record' );
-	is( value( $etl, 'ROW/DATA/FILESEQUENCEID' ), '67890', 'get' );
-};
-subtest 'Fourth record' => sub {
-	ok( $etl->input->next_record, 'next_record' );
-	is( value( $etl, 'ROW/DATA/FILESEQUENCEID' ), '15926', 'get' );
-};
-
-ok( !$etl->input->next_record, 'end of file' );
-$etl->input->finish;
+my $output = $etl->output->get_record( 0 );
+is( $output->{One}, '12345', 'Individual value' );
+is( $output->{Two}, undef  , 'Repeating node'   );
 
 done_testing();

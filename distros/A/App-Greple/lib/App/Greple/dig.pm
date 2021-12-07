@@ -4,15 +4,14 @@ dig - Greple module for recursive search
 
 =head1 SYNOPSIS
 
-greple -Mdig [ options ] --dig directories ...
+greple -Mdig pattern --dig directories ...
 
-greple -Mdig --git ...
+greple -Mdig pattern --git ...
 
 =head1 DESCRIPTION
 
-Option B<--dig> searches all files under directories specified after
-it.  Since it takes all following arguments as target files or
-directories, use after all necessary options.
+Option B<--dig> searches all files under specified directories.  Since
+it takes all following arguments, place at the end of all options.
 
 It is possible to specify AND condition after directories, in B<find>
 option format.  Next command will search all C source files under the
@@ -54,6 +53,8 @@ L<App::Greple>
 
 L<App::Greple::select>
 
+L<find(1)>, L<git-ls-files(1)>
+
 =cut
 
 package App::Greple::dig;
@@ -63,6 +64,7 @@ package App::Greple::dig;
 __DATA__
 
 expand is_repository	( -name .git -o -name .svn -o -name RCS -o -name CVS )
+expand is_environment	( -name .vscode )
 expand is_temporary	( -name .build -o -name _build )
 expand is_dots		  -name .*
 expand is_version	  -name *,v
@@ -73,7 +75,7 @@ expand is_image 	( -iname *.jpg  -o -iname *.jpeg -o \
 			  -iname *.heic -o -iname *.heif -o \
 			  -iname *.svg \
 			)
-expand is_archive	( -iname *.tar -o -iname *.tbz -o -iname *.tgz -o \
+expand is_archive	( -iname *.tar -o -iname *.tar.gz -o -iname *.tbz -o -iname *.tgz -o \
 			  -name  *.a   -o -name  *.zip \
 			)
 expand is_pdf		  -iname *.pdf
@@ -84,7 +86,7 @@ expand is_others	( -name *.bundle -o -name *.dylib -o -name *.o -o \
 option --dig -Mfind \
 	$<move> \
 	( \
-		( is_repository -o is_temporary ) \
+		( is_repository -o is_environment -o is_temporary ) \
 		-prune -o \
 		-type f \
 	) \

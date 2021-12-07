@@ -1,6 +1,11 @@
 bin/make-epub
 Build.PL
 Changes
+examples/initramfs-man/bin/clean-utf8-man.pl
+examples/initramfs-man/bin/initramfs-epub.sh
+examples/initramfs-man/bin/mangle-rman-html.pl
+examples/initramfs-man/bin/one-man-page.sh
+examples/initramfs-man/README
 examples/rfc/bin/finish-htmlrfc.pl
 examples/rfc/bin/rfc2xhtml.pl
 examples/rfc/README.pod

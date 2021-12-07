@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-09'; # DATE
+our $DATE = '2021-11-13'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our $LIST = {
     summary => "Modules I'm currently avoiding",
@@ -39,7 +39,8 @@ _
             summary => 'License confusion',
             description => <<'_',
 
-For more information, see https://www.reddit.com/r/perl/comments/6ymdez/what_are_the_background_details_pertaining_to_the/.
+For more information, see
+<https://www.reddit.com/r/perl/comments/6ymdez/what_are_the_background_details_pertaining_to_the/>.
 
 Recent versions of <pm:List::Util> have implemented many functions from
 <pm:List::MoreUtils>.
@@ -67,12 +68,26 @@ _
         },
         {
             module => 'File::Slurp',
-            summary => 'Buggy',
+            summary => 'Not encoding-friendly',
+            description => <<'_',
+
+File::Slurp was created (1996) before Perl IO layers (5.8, 2002) and its API
+does not handle encoding properly. See:
+<http://blogs.perl.org/users/leon_timmermans/2015/08/fileslurp-is-broken-and-wrong.html>
+or discussion on RT.
+
+_
             alternate_modules => ['File::Slurper'],
         },
         {
             module => 'File::Slurp::Tiny',
-            summary => 'Use the newer File::Slurper instead',
+            summary => 'Discouraged by the author',
+            description => <<'_',
+
+The author of File::Slurp::Tiny has discouraged its use and recommends his newer
+module <pm:File::Slurper>.
+
+_
             alternate_modules => ['File::Slurper'],
         },
         {
@@ -105,7 +120,7 @@ _
             description => <<'_',
 
 JSON.pm is a discouraged module now, due to its somewhat broken backend handling
-and lack of support for <pm:Cpanel::JSON::XS>. consider switching to
+and lack of support for <pm:Cpanel::JSON::XS>. Consider switching to
 <pm:JSON::MaybeXS> or perhaps just <pm:JSON::PP>.
 
 _
@@ -178,7 +193,7 @@ Acme::CPANModules::PERLANCAR::Avoided - Modules I'm currently avoiding
 
 =head1 VERSION
 
-This document describes version 0.009 of Acme::CPANModules::PERLANCAR::Avoided (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
+This document describes version 0.010 of Acme::CPANModules::PERLANCAR::Avoided (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-13.
 
 =head1 DESCRIPTION
 
@@ -208,7 +223,8 @@ Alternate modules: L<Log::ger>
 
 Author: L<REHSACK|https://metacpan.org/author/REHSACK>
 
-For more information, see https://www.reddit.com/r/perl/comments/6ymdez/what_are_the_background_details_pertaining_to_the/.
+For more information, see
+L<https://www.reddit.com/r/perl/comments/6ymdez/what_are_the_background_details_pertaining_to_the/>.
 
 Recent versions of L<List::Util> have implemented many functions from
 L<List::MoreUtils>.
@@ -234,15 +250,25 @@ use L<File::Flock::Retry>, or just plain C<flock()>.
 
 Alternate modules: L<File::Flock::Retry>
 
-=item * L<File::Slurp> - Buggy
+=item * L<File::Slurp> - Not encoding-friendly
 
 Author: L<CAPOEIRAB|https://metacpan.org/author/CAPOEIRAB>
 
+File::Slurp was created (1996) before Perl IO layers (5.8, 2002) and its API
+does not handle encoding properly. See:
+L<http://blogs.perl.org/users/leon_timmermans/2015/08/fileslurp-is-broken-and-wrong.html>
+or discussion on RT.
+
+
 Alternate modules: L<File::Slurper>
 
-=item * L<File::Slurp::Tiny> - Use the newer File::Slurper instead
+=item * L<File::Slurp::Tiny> - Discouraged by the author
 
 Author: L<LEONT|https://metacpan.org/author/LEONT>
+
+The author of File::Slurp::Tiny has discouraged its use and recommends his newer
+module L<File::Slurper>.
+
 
 Alternate modules: L<File::Slurper>
 
@@ -274,7 +300,7 @@ Alternate modules: L<Exporter>
 Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
 
 JSON.pm is a discouraged module now, due to its somewhat broken backend handling
-and lack of support for L<Cpanel::JSON::XS>. consider switching to
+and lack of support for L<Cpanel::JSON::XS>. Consider switching to
 L<JSON::MaybeXS> or perhaps just L<JSON::PP>.
 
 

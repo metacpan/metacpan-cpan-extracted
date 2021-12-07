@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::SlotAttr 0.57;
+package Object::Pad::MOP::SlotAttr 0.58;
 
 use v5.14;
 use warnings;

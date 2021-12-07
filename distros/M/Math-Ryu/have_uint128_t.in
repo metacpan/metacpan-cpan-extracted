@@ -1,0 +1,4 @@
+int main(void) {
+ __uint128_t x;
+ return 0;
+}

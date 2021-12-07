@@ -1,18 +1,3 @@
-package Quiq::FFmpeg;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::File::Video;
-use POSIX ();
-use Quiq::Option;
-use Quiq::Duration;
-use Quiq::FileHandle;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -38,6 +23,27 @@ andererseits I<höhere> (Klassen-)Methoden, die eine vollständige
 Kommandozeile zur Erfüllung eines bestimmten Zwecks unter
 Rückgriff auf die elementaren Methoden erstellen. Die höheren
 Methoden Methoden befinden sich im Abschnitt L<Klassenmethoden (vollständige Kommandozeilen)|"Klassenmethoden (vollständige Kommandozeilen)">.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::FFmpeg;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::File::Video;
+use POSIX ();
+use Quiq::Option;
+use Quiq::Duration;
+use Quiq::FileHandle;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -1533,7 +1539,7 @@ sub execute {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

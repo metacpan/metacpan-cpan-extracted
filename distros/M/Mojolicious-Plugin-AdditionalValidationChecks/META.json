@@ -4,7 +4,7 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -50,7 +50,7 @@
    "provides" : {
       "Mojolicious::Plugin::AdditionalValidationChecks" : {
          "file" : "lib/Mojolicious/Plugin/AdditionalValidationChecks.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_contributors" : [
       "Florian Heyer <info@heyer-it.de>",
       "Graham Knop <haarg@haarg.org>",
@@ -74,6 +74,7 @@
       "reneeb <info@perl-services.de>",
       "Renee <reb@perl-services.de>"
    ],
+   "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

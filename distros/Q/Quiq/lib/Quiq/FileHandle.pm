@@ -1,20 +1,3 @@
-package Quiq::FileHandle;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Path;
-use Quiq::Option;
-use Scalar::Util ();
-use Quiq::Perl;
-no bytes;
-use Fcntl qw(:flock);
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -60,6 +43,29 @@ Siehe auch Quiq::LockedCounter.
 
 Ein Objekt der Klasse repräsentiert eine Dateihandle, über die
 Daten gelesen oder geschrieben werden können.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::FileHandle;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Path;
+use Quiq::Option;
+use Scalar::Util ();
+use Quiq::Perl;
+no bytes;
+use Fcntl qw(:flock);
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -947,7 +953,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

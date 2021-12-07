@@ -6,7 +6,7 @@ use MooX::SugarFactory ();
 use Throwable::SugarFactory::Utils '_getglob';
 use Throwable ();
 
-our $VERSION = '0.152700'; # VERSION
+our $VERSION = '0.213360'; # VERSION
 
 # ABSTRACT: build a library of syntax-sugared Throwable-based exceptions
 
@@ -58,7 +58,7 @@ Throwable::SugarFactory - build a library of syntax-sugared Throwable-based exce
 
 =head1 VERSION
 
-version 0.152700
+version 0.213360
 
 =head1 SYNOPSIS
 
@@ -201,14 +201,14 @@ conversion to JSON.
 L<Throwable>, L<Throwable::Factory>, L<Exception::Class>, L<Exception::Base>,
 L<Try::Tiny>, L<Try::Tiny::ByClass>
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Throwable-SugarFactory>.
+at L<https://github.com/wchristian/Throwable-SugarFactory/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -223,6 +223,12 @@ L<https://github.com/wchristian/Throwable-SugarFactory>
 =head1 AUTHOR
 
 Christian Walde <walde.christian@gmail.com>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Christian Walde
+
+Christian Walde <walde.christian@googlemail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

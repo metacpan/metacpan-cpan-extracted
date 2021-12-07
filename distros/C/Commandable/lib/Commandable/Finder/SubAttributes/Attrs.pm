@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes::Attrs 0.05;
+package Commandable::Finder::SubAttributes::Attrs 0.06;
 
 use v5.14;
 use warnings;
@@ -47,6 +47,26 @@ sub Command_arg :ATTR(CODE,MULTI)
    push @$args, \%arg;
 
    return $args;
+}
+
+sub Command_opt :ATTR(CODE,MULTI)
+{
+   my $class = shift;
+   my ( $opts, $name, $description, $default ) = @_;
+
+   my $mode = "set";
+   $mode = "value" if $name =~ s/:$//;
+
+   my %optspec = (
+      name        => $name,
+      description => $description,
+      mode        => $mode,
+      default     => $default,
+   );
+
+   push @$opts, \%optspec;
+
+   return $opts;
 }
 
 0x55AA;

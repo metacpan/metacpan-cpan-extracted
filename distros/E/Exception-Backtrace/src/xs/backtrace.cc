@@ -2,7 +2,7 @@
 #include <vector>
 #include <xs/catch.h>
 #include <xs/Stash.h>
-#include "PerlTrace.h"
+#include "PerlTraceInfo.h"
 #include <iostream>
 
 using namespace panda;
@@ -17,70 +17,52 @@ using xs::my_perl;
 
 namespace xs {
 
-using PerlTraceSP = iptr<PerlTrace>;
-
-static string stringize_arg(SV* it) {
-    string value;
-    if (SvIS_FREED(it)) { value = "n/a"; }  // already freed
-    else {
-        Sv sv(it);
-        bool escape = false;
-        if      (!sv.defined())  { value += "undef"; }
-        else if (sv.is_simple()) {
-            Simple simple(sv);
-            value = simple.as_string();
-            escape = !simple.is_like_number();
-        }
-        else {
-            char buff[32];
-            auto res = to_chars(buff, buff+32, uint64_t(it), 16);
-            if (!res.ec) {
-                escape = true;
-                auto size = res.ptr - buff;
-                string addr = string("(0x") + string(buff, static_cast<size_t>(size)) + ")";
-
-                string type = "UNKNOWN";
-                if     (sv.is_io_ref())    { type = "IO"; }
-                else if(sv.is_sub_ref())   { type = "CODE"; }
-                else if(sv.is_array_ref()) { type = "ARRAY"; }
-                else if(sv.is_hash_ref())  { type = "HASH"; }
-                else if(sv.is_stash())     { type = "STASH"; }
-                else if(sv.is_ref())       { type = "SCALAR"; }
-
-                if(sv.is_object_ref()) {
-                    addr = string("=") + type + addr;
-                    Object obj(sv);
-                    type = obj.stash().effective_name();
-                }
-                value = type + addr;
-            }
-            else { value = "*ERROR*"; }
-        }
-        value = (escape ? "'" : "") + value + (escape ? "'" : "");
+static ArgumentsHolderSP get_args(const PERL_CONTEXT* cx, Sub& decorator) {
+    if (!decorator) {
+        auto r = new PerlArgumentsHolder();
+        r->args = Sv::undef;
+        return r;
     }
-    return value;
-}
-
-static std::vector<string> get_args(const PERL_CONTEXT* cx) {
-    std::vector<string> r;
+    xs::Array array = xs::Array::create();
     if (CxTYPE(cx) == CXt_SUB && CxHASARGS(cx)) {
         /* slot 0 of the pad contains the original @_ */
         AV * const ary = MUTABLE_AV(AvARRAY(MUTABLE_AV(PadlistARRAY(CvPADLIST(cx->blk_sub.cv))[cx->blk_sub.olddepth+1]))[0]);
         auto args_count = av_top_index(ary);
-        //auto off = AvARRAY(ary) - AvALLOC(ary);
         auto off = 0;
         auto arr = AvARRAY(ary);
         auto last = args_count + off;
         for(decltype(off) i = off; i <= last; ++i) {
-            auto it = arr[i];
-            r.emplace_back(stringize_arg(it));
+            auto& it = arr[i];
+            if (SvIS_FREED(it)) {
+                array.push(Sv::undef);
+            } else {
+                array.push(it);
+            }
         }
     }
+
+    Simple stringified;
+    try {
+        auto args = Ref::create(array);
+        auto result = decorator(args);
+        if (result.is_simple()) {
+            stringified =  Simple(result).as_string();
+        }
+    }  catch (...) {
+            stringified = Simple("(*exception*)");
+    };
+
+    auto r = new PerlArgumentsHolder();
+    r->args = stringified;
     return r;
 }
 
-static PerlTraceSP get_trace() noexcept {
+static PerlTraceInfoSP get_trace() noexcept {
     dTHX;
+    auto stash = Stash("Exception::Backtrace");
+    auto raw_decorator = stash["decorator"].scalar();
+    Sub decorator = raw_decorator && raw_decorator.is_sub_ref() ? Sub(raw_decorator) : Sub();
+
     std::vector<StackframeSP> frames;
     I32 level = 0;
     const PERL_CONTEXT *dbcx = nullptr;
@@ -111,20 +93,18 @@ static PerlTraceSP get_trace() noexcept {
 
         if (!library && pv_raw) { library = pv_raw; };
 
-        auto args = get_args(cx);
-
-        StackframeSP frame(new Stackframe());
+        StackframeSP frame(new PerlFrame());
         frame->library = library;
         frame->file = file;
         frame->line_no = line;
         frame->name = name;
-        frame->args = std::move(args);
+        frame->args = get_args(cx, decorator);
         frames.emplace_back(std::move(frame));
 
         ++level;
         cx = caller_cx(level, &dbcx);
     }
-    return new PerlTrace(std::move(frames));
+    return new PerlTraceInfo(std::move(frames));
 }
 
 
@@ -140,7 +120,7 @@ int payload_backtrace_c_free(pTHX_ SV*, MAGIC* mg) {
     return 0;
 }
 
-string _get_backtrace_string(Ref except, bool include_c_trace) {
+static string _get_backtrace_string(Ref except, bool include_c_trace) {
     string result;
     auto it = except.value();
     if (include_c_trace) {
@@ -161,10 +141,8 @@ string _get_backtrace_string(Ref except, bool include_c_trace) {
     if (it.payload_exists(&backtrace_perl_marker)) {
         result += "Perl backtrace:\n";
         auto payload = it.payload(&backtrace_perl_marker);
-        auto bt = xs::in<BacktraceInfo*>(payload.obj);
-        for (const auto& frame : bt->get_frames() ) {
-            result += frame->library + "::" + frame->name + " at " + frame->file + ":" + string::from_number(frame->line_no, 10) + "\n";
-        }
+        auto bt = xs::in<PerlTraceInfo*>(payload.obj);
+        result += bt->to_string();
     }
     else {
         result += "<Perl backtrace is n/a>";
@@ -172,7 +150,7 @@ string _get_backtrace_string(Ref except, bool include_c_trace) {
     return result;
 }
 
-string get_backtrace_string(Ref except) { return _get_backtrace_string(except, true); }
+string get_backtrace_string   (Ref except) { return _get_backtrace_string(except, true);  }
 string get_backtrace_string_pp(Ref except) { return _get_backtrace_string(except, false); }
 
 panda::iptr<DualTrace> get_backtrace(Ref except) {
@@ -239,7 +217,7 @@ static bool has_backtraces(const Ref& except) {
     return it.payload_exists(&backtrace_c_marker) && it.payload_exists(&backtrace_perl_marker);
 }
 
-static void attach_backtraces(Ref except, const PerlTraceSP& perl_trace) {
+static void attach_backtraces(Ref except, const PerlTraceInfoSP& perl_trace) {
     auto it = except.value();
     if (!it.payload_exists(&backtrace_c_marker)) {
         auto bt = new Backtrace();
@@ -258,7 +236,7 @@ Sv safe_wrap_exception(Sv ex) {
         }
 
         auto perl_traces = get_trace();
-        auto& frames = perl_traces->get_frames();
+        auto frames = perl_traces->get_frames();
         bool in_destroy = std::any_of(frames.begin(), frames.end(), [](auto& frame) { return frame->name == "DESTROY"; } );
         if (in_destroy) {
             // we don't want to corrupt Perl's warning with Exception::Backtrace handler, instead let it warns
@@ -303,14 +281,12 @@ panda::string as_perl_string(const panda::Stackframe& frame) {
     r += frame.library;
     r += "::";
     r += frame.name;
-    r += "(";
-    auto& args = frame.args;
-    auto last = args.size() - 1;
-    for (size_t i = 0; i < args.size(); ++i) {
-        r += args[i];
-        if (i < last) { r += ", "; }
+    if (frame.args) {
+        auto& args = static_cast<PerlArgumentsHolder*>(frame.args.get())->args;
+        if (args && args.defined()) {
+            r += args.as_string();
+        }
     }
-    r += ")";
     r += " at ";
     r += frame.file;
     r += ":";

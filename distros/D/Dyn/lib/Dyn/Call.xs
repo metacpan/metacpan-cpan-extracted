@@ -11,6 +11,7 @@
 #include <dyncall_callf.h>
 #include <dyncall_signature.h>
 #include <dyncall_callback.h>
+//#include <dyncall/dyncall_signature.h>
 
 #include "lib/types.h"
 
@@ -119,7 +120,7 @@ dcCallPointer(DCCallVM * vm, DCpointer funcptr);
 const char *
 dcCallString(DCCallVM * vm, DCpointer funcptr);
 CODE:
-    RETVAL = dcCallPointer(vm, funcptr);
+    RETVAL = (const char *) dcCallPointer(vm, funcptr);
 OUTPUT:
     RETVAL
 
@@ -149,6 +150,67 @@ dcVCallF(DCCallVM * vm, DCValue * result, DCpointer funcptr, const DCsigchar * s
 
 DCint
 dcGetError(DCCallVM* vm);
+
+
+
+void
+struct_test( )
+CODE:
+    {
+        typedef struct {
+            double a, b, c, d;
+        } S;
+
+        size_t size;
+        DCstruct* s = dcNewStruct(4, DEFAULT_ALIGNMENT);
+        dcStructField(s, DC_SIGCHAR_DOUBLE, DEFAULT_ALIGNMENT, 1);
+        dcStructField(s, DC_SIGCHAR_DOUBLE, DEFAULT_ALIGNMENT, 1);
+        dcStructField(s, DC_SIGCHAR_DOUBLE, DEFAULT_ALIGNMENT, 1);
+        dcStructField(s, DC_SIGCHAR_DOUBLE, DEFAULT_ALIGNMENT, 1);
+        dcCloseStruct(s);
+
+        //DC_TEST_STRUCT_SIZE(S, s);
+        dcFreeStruct(s);
+    }
+
+DCstruct *
+dcNewStruct( DCsize fieldCount, DCint alignment )
+
+void
+dcStructField( DCstruct* s, int type, DCint alignment, DCsize arrayLength )
+
+void
+dcSubStruct( DCstruct *s, DCsize fieldCount, DCint alignment, DCsize arrayLength )
+
+void
+dcCloseStruct( DCstruct *s )
+
+DCsize
+dcStructSize( DCstruct *s )
+
+DCsize
+dcStructAlignment( DCstruct *s )
+
+void
+dcFreeStruct( DCstruct * s )
+
+DCstruct *
+dcDefineStruct( const char * signature );
+
+=pod
+
+DC_API DCstruct*  dcNewStruct      (DCsize fieldCount, DCint alignment);
+DC_API void       dcStructField    (DCstruct* s, DCint type, DCint alignment, DCsize arrayLength);
+DC_API void       dcSubStruct      (DCstruct* s, DCsize fieldCount, DCint alignment, DCsize arrayLength);
+/* Each dcNewStruct or dcSubStruct call must be paired with a dcCloseStruct. */
+DC_API void       dcCloseStruct    (DCstruct* s);
+DC_API DCsize     dcStructSize     (DCstruct* s);
+DC_API DCsize     dcStructAlignment(DCstruct* s);
+DC_API void       dcFreeStruct     (DCstruct* s);
+
+DC_API DCstruct*  dcDefineStruct  (const char* signature);
+
+=cut
 
 BOOT:
 {
@@ -192,7 +254,46 @@ BOOT:
     newCONSTSUB(stash, "DC_CALL_SYS_PPC32", newSViv(DC_CALL_SYS_PPC32));
     newCONSTSUB(stash, "DC_CALL_SYS_PPC64", newSViv(DC_CALL_SYS_PPC64));
 
+    // Signature characters
+    newCONSTSUB(stash, "DC_SIGCHAR_VOID", newSViv(DC_SIGCHAR_VOID));
+    newCONSTSUB(stash, "DC_SIGCHAR_BOOL", newSViv(DC_SIGCHAR_BOOL));
+    newCONSTSUB(stash, "DC_SIGCHAR_CHAR", newSViv(DC_SIGCHAR_CHAR));
+    newCONSTSUB(stash, "DC_SIGCHAR_UCHAR", newSViv(DC_SIGCHAR_UCHAR));
+    newCONSTSUB(stash, "DC_SIGCHAR_SHORT", newSViv(DC_SIGCHAR_SHORT));
+    newCONSTSUB(stash, "DC_SIGCHAR_USHORT", newSViv(DC_SIGCHAR_USHORT));
+    newCONSTSUB(stash, "DC_SIGCHAR_INT", newSViv(DC_SIGCHAR_INT));
+    newCONSTSUB(stash, "DC_SIGCHAR_UINT", newSViv(DC_SIGCHAR_UINT));
+    newCONSTSUB(stash, "DC_SIGCHAR_LONG", newSViv(DC_SIGCHAR_LONG));
+    newCONSTSUB(stash, "DC_SIGCHAR_ULONG", newSViv(DC_SIGCHAR_ULONG));
+    newCONSTSUB(stash, "DC_SIGCHAR_LONGLONG", newSViv(DC_SIGCHAR_LONGLONG));
+    newCONSTSUB(stash, "DC_SIGCHAR_ULONGLONG", newSViv(DC_SIGCHAR_ULONGLONG));
+    newCONSTSUB(stash, "DC_SIGCHAR_FLOAT", newSViv(DC_SIGCHAR_FLOAT));
+    newCONSTSUB(stash, "DC_SIGCHAR_DOUBLE", newSViv(DC_SIGCHAR_DOUBLE));
+    newCONSTSUB(stash, "DC_SIGCHAR_POINTER", newSViv(DC_SIGCHAR_POINTER));
+    newCONSTSUB(stash, "DC_SIGCHAR_STRING", newSViv(DC_SIGCHAR_STRING));/* in theory same as 'p', but convenient to disambiguate */
+    newCONSTSUB(stash, "DC_SIGCHAR_STRUCT", newSViv(DC_SIGCHAR_STRUCT));
+    newCONSTSUB(stash, "DC_SIGCHAR_ENDARG", newSViv(DC_SIGCHAR_ENDARG));/* also works for end struct */
+
+    /* calling convention / mode signatures */
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_PREFIX", newSViv(DC_SIGCHAR_CC_PREFIX));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_DEFAULT", newSViv(DC_SIGCHAR_CC_DEFAULT));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_ELLIPSIS", newSViv(DC_SIGCHAR_CC_ELLIPSIS));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_ELLIPSIS_VARARGS", newSViv(DC_SIGCHAR_CC_ELLIPSIS_VARARGS));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_CDECL", newSViv(DC_SIGCHAR_CC_CDECL));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_STDCALL", newSViv(DC_SIGCHAR_CC_STDCALL));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_FASTCALL_MS", newSViv(DC_SIGCHAR_CC_FASTCALL_MS));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_FASTCALL_GNU", newSViv(DC_SIGCHAR_CC_FASTCALL_GNU));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_THISCALL_MS", newSViv(DC_SIGCHAR_CC_THISCALL_MS));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_THISCALL_GNU", newSViv(DC_SIGCHAR_CC_THISCALL_GNU));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_ARM_ARM", newSViv(DC_SIGCHAR_CC_ARM_ARM));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_ARM_THUMB", newSViv(DC_SIGCHAR_CC_ARM_THUMB));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_SYSCALL", newSViv(DC_SIGCHAR_CC_SYSCALL));
+
     // Error codes
     newCONSTSUB(stash, "DC_ERROR_NONE", newSViv(DC_ERROR_NONE));
     newCONSTSUB(stash, "DC_ERROR_UNSUPPORTED_MODE", newSViv(DC_ERROR_UNSUPPORTED_MODE));
+
+    // Struct alignment
+    newCONSTSUB(stash, "DEFAULT_ALIGNMENT", newSViv(DEFAULT_ALIGNMENT));
 }
+

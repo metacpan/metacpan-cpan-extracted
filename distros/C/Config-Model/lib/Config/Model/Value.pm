@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.145;
+package Config::Model::Value 2.147;
 
 use 5.10.1;
 
@@ -1265,12 +1265,7 @@ sub show_warnings {
                 $user_logger->debug($w_msg);
             }
             else {
-                if ($::_use_log4perl_to_warn) {
-                    $user_logger->warn($w_msg);
-                }
-                else {
-                    warn "$w_msg\n";
-                }
+                $user_logger->warn($w_msg);
             }
         }
     }
@@ -1401,12 +1396,7 @@ sub _store {
             if (not $silent and $msg) {
                 # fuse UI exits when a warning is issued. No other need to advertise this option
                 print $msg if $args{say_dont_warn};
-                if ($::_use_log4perl_to_warn) {
-                    $user_logger->warn($msg) unless $args{say_dont_warn};
-                }
-                else {
-                    warn $msg unless $args{say_dont_warn};
-                }
+                $user_logger->warn($msg) unless $args{say_dont_warn};
             }
         }
         else {
@@ -1446,8 +1436,9 @@ sub transform_boolean {
     }
 
     # convert yes no to 1 or 0
-    $$v_ref = 1 if ( $$v_ref =~ /^y/i or $$v_ref =~ /true/i );
-    $$v_ref = 0 if ( $$v_ref =~ /^n/i or $$v_ref =~ /false/i or length($$v_ref) == 0);
+    $$v_ref = 1 if ( $$v_ref =~ /^(y|yes|true|on)$/i );
+    $$v_ref = 0 if ( $$v_ref =~ /^(n|no|false|off)$/i or length($$v_ref) == 0);
+    return;
 }
 
 # internal. return ( undef, value)
@@ -1851,14 +1842,8 @@ sub fetch {
     elsif ( $check eq 'skip' ) {
         my $msg = $self->error_msg;
         my $str = $value // '<undef>';
-        if ($::_use_log4perl_to_warn) {
-            $user_logger->warn("Warning: fetch [".$self->name,"] skipping value $str because of the following errors:\n$msg\n")
+        $user_logger->warn("Warning: fetch [".$self->name,"] skipping value $str because of the following errors:\n$msg\n")
             if not $silent and $msg;
-        }
-        else {
-            warn "Warning: fetch [".$self->name,"] skipping value $str because of the following errors:\n$msg\n\n"
-                if not $silent and $msg;
-        }
         # this method is supposed to return a scalar
         return undef; ## no critic(Subroutines::ProhibitExplicitReturnUndef)
 
@@ -2001,7 +1986,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

@@ -13,7 +13,7 @@ package SDL2::surface 0.01 {
         use SDL2::Utils;
         our $TYPE = has
             flags     => 'uint32',
-            format    => 'opaque',     # SDL_PixelFormat*
+            _format   => 'opaque',     # SDL_PixelFormat*
             w         => 'int',
             h         => 'int',
             pitch     => 'int',
@@ -22,8 +22,18 @@ package SDL2::surface 0.01 {
             locked    => 'int',
             lock_data => 'opaque',     # void*
             clip_rect => 'SDL_Rect',
-            map       => 'opaque',     # SDL_BlitMap*
+            _map      => 'opaque',     # SDL_BlitMap*
             refcount  => 'int';
+        #
+        sub format ( $s, $color = () ) {
+            defined $_[1] ? $_[0]->_color( ffi->cast( 'SDL_PixelFormat', 'opaque', $_[1] ) ) :
+                ffi->cast( 'opaque', 'SDL_PixelFormat', $_[0]->_format );
+        }
+
+        sub map ( $s, $color = () ) {
+            defined $_[1] ? $_[0]->_map( ffi->cast( 'SDL_BlitMap', 'opaque', $_[1] ) ) :
+                ffi->cast( 'opaque', 'SDL_BlitMap', $_[0]->_map );
+        }
     };
     #
     enum SDL_YUV_CONVERSION_MODE => [
@@ -139,7 +149,7 @@ Allocate a new RGB surface.
     my ( $rmask, $gmask, $bmask, $amask );
     # SDL interprets each pixel as a 32-bit number, so our masks must depend
     #   on the endianness (byte order) of the machine
-    if ( SDL2::FFI::bigendian() ) {
+    if ( SDL_BYTEORDER() eq SDL_LIL_ENDIAN() ) {
         $rmask = 0xff000000;
         $gmask = 0x00ff0000;
         $bmask = 0x0000ff00;

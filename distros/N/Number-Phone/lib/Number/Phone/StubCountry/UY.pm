@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211833;
+our $VERSION = 1.20211206222447;
 
 my $formatters = [
                 {
@@ -43,7 +43,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '[24]',
+                  'leading_digits' => '[124]',
                   'pattern' => '(\\d{4})(\\d{4})'
                 },
                 {
@@ -57,15 +57,27 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '
           (?:
-            2\\d|
-            4[2-7]
-          )\\d{6}
+            1(?:
+              770|
+              987
+            )|
+            (?:
+              2\\d|
+              4[2-7]
+            )\\d\\d
+          )\\d{4}
         ',
                 'geographic' => '
           (?:
-            2\\d|
-            4[2-7]
-          )\\d{6}
+            1(?:
+              770|
+              987
+            )|
+            (?:
+              2\\d|
+              4[2-7]
+            )\\d\\d
+          )\\d{4}
         ',
                 'mobile' => '9[1-9]\\d{6}',
                 'pager' => '',
@@ -81,33 +93,33 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5984361", "Durazno",
-"5984360", "Durazno",
-"598462", "Rivera",
-"598444", "Minas\/Lavalleja",
-"5984364", "Trinidad\/Flores",
-"598456", "Fray\ Bentos\/Rio\ Negro",
-"598472", "Paysandu",
-"598447", "Rocha",
-"59842", "San\ Carlos",
-"598445", "Treinta\ y\ Tres",
-"5984362", "Durazno",
-"598452", "Colonia\ del\ Scaramento",
-"5984365", "Durazno",
-"598435", "Florida",
-"598453", "Mercedes\/Soriano",
-"598473", "Salto",
+$areanames{en} = {"598473", "Salto",
 "5982", "Montevideo",
-"598477", "Artigas",
-"598433", "Canelones",
-"5984369", "Durazno",
-"5984368", "Durazno",
-"598434", "San\ Jose\ de\ Mayo",
-"598463", "Tacuarembo",
-"598464", "Melo\/Cerro\ Largo",
-"5984366", "Durazno",
+"5984364", "Trinidad\/Flores",
+"5984365", "Durazno",
+"598452", "Colonia\ del\ Scaramento",
+"598462", "Rivera",
+"598456", "Fray\ Bentos\/Rio\ Negro",
 "5984363", "Durazno",
-"5984367", "Durazno",};
+"598434", "San\ Jose\ de\ Mayo",
+"598444", "Minas\/Lavalleja",
+"5984367", "Durazno",
+"598464", "Melo\/Cerro\ Largo",
+"598447", "Rocha",
+"5984360", "Durazno",
+"59842", "San\ Carlos",
+"5984362", "Durazno",
+"598477", "Artigas",
+"598445", "Treinta\ y\ Tres",
+"5984369", "Durazno",
+"598435", "Florida",
+"5984366", "Durazno",
+"5984368", "Durazno",
+"598472", "Paysandu",
+"598463", "Tacuarembo",
+"598453", "Mercedes\/Soriano",
+"598433", "Canelones",
+"5984361", "Durazno",};
 
     sub new {
       my $class = shift;

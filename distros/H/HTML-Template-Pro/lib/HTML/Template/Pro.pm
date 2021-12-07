@@ -12,7 +12,7 @@ require Exporter;
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 @ISA = qw(DynaLoader Exporter);
 
-$VERSION = '0.9510';
+$VERSION = '0.9522';
 
 @EXPORT_OK = qw/ASK_NAME_DEFAULT ASK_NAME_AS_IS ASK_NAME_LOWERCASE ASK_NAME_UPPERCASE ASK_NAME_MASK/;
 %EXPORT_TAGS = (const => [qw/ASK_NAME_DEFAULT ASK_NAME_AS_IS ASK_NAME_LOWERCASE ASK_NAME_UPPERCASE ASK_NAME_MASK/]);
@@ -96,7 +96,7 @@ sub new {
 #=============================================
 #		stack_debug => 0,
 #		timing => 0,
-#		cache => 0,		
+#		cache => 0,
 #		blind_cache => 0,
 #		file_cache => 0,
 #		file_cache_dir => '',
@@ -516,7 +516,7 @@ Kirill Rebenok E<lt>kirill at rebenok.plE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2009 by I. Yu. Vlasenko.
+Copyright (C) 2005-2021 by I. Yu. Vlasenko.
 Pieces of code in Pro.pm and documentation of HTML::Template are
 copyright (C) 2000-2002 Sam Tregar (sam@tregar.com)
 

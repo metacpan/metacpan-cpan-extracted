@@ -1,8 +1,7 @@
 use strictures 2;
-use lib '../lib';
+use lib '../blib/lib';
 use SDL2::FFI qw[:all];
 
-#warn SDLK_KP_LEFTPAREN();
 # Taken from example found here: https://wiki.libsdl.org/SDL_CreateSoftwareRenderer
 # Globals
 my ( $window, $renderer, $done );

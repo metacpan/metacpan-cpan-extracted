@@ -1,3 +1,28 @@
+2.052000 - 2021-11-30
+
+  [NEW FEATURES]
+
+  * Added SSHCollector::Platform::ASAContext (@haught)
+
+2.051005 - 2021-11-25
+
+  [ENHANCEMENTS]
+
+  * do not accept any job queue entries for demo hosting
+
+2.051004 - 2021-11-25
+
+  [BUG FIXES]
+
+  * fix snapshot for bulkwalk_no devies
+  * fix snapshot bug on index with trailing zero
+
+2.051003 - 2021-11-24
+
+  [BUG FIXES]
+
+  * #840 after rotate_logs, restarter() may have a stale PID
+
 2.051002 - 2021-11-23
 
   [BUG FIXES]

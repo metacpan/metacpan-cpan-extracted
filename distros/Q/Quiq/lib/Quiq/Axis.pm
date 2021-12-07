@@ -1,14 +1,3 @@
-package Quiq::Axis;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::AxisTick;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -20,6 +9,23 @@ Quiq::Axis - Definition einer Plot-Achse (abstrakte Basisklasse)
 =head1 BASE CLASS
 
 L<Quiq::Hash>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Axis;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::AxisTick;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -165,7 +171,7 @@ sub height {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

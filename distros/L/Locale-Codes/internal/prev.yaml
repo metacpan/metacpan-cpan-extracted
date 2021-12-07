@@ -46431,6 +46431,7 @@ langvar:
       fonnapa: North American Phonetic Alphabet
       fonupa: Uralic Phonetic Alphabet
       fonxsamp: X-SAMPA transcription
+      gallo: Gallo
       gascon: Gascon
       grclass: Classical Occitan orthography
       grital: Italian-inspired Occitan orthography
@@ -46483,6 +46484,7 @@ langvar:
       surmiran: Surmiran idiom of Romansh
       sursilv: Sursilvan idiom of Romansh
       sutsilv: Sutsilvan idiom of Romansh
+      synnejyl: Synnejysk
       tarask: Belarusian in Taraskievica orthography
       tongyong: Tongyong Pinyin romanization
       tunumiit: Tunumiisiut
@@ -46567,6 +46569,9 @@ langvar:
       epic sanskrit: 
         - itihasa
         - Epic Sanskrit
+      gallo: 
+        - gallo
+        - Gallo
       gascon: 
         - gascon
         - Gascon
@@ -46729,6 +46734,9 @@ langvar:
       sutsilvan idiom of romansh: 
         - sutsilv
         - Sutsilvan idiom of Romansh
+      synnejysk: 
+        - synnejyl
+        - Synnejysk
       the balanka dialect of anii: 
         - balanka
         - The Balanka dialect of Anii

@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.28';
+our $VERSION = '0.31';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -43,13 +43,12 @@ has [qw(blocking_stop serialize quirkiness total_sleeptime_during_kill)] => 0;
 has [
   qw(execute code process_id pidfile return_status),
   qw(channel_in channel_out write_stream read_stream error_stream),
-  qw(_internal_err _internal_return _status)
+  qw(_internal_err _internal_return _status args)
 ];
 
 has max_kill_attempts => 5;
 has kill_whole_group  => 0;
 
-has args  => sub { [] };
 has error => sub { Mojo::Collection->new };
 
 has ioloop  => sub { Mojo::IOLoop->singleton };
@@ -121,7 +120,7 @@ sub _open {
   my ($self, @args) = @_;
   $self->_diag('Execute: ' . (join ', ', map { "'$_'" } @args)) if DEBUG;
 
-  $self->session->enable;
+  $self->on(collect_status => \&_open_collect_status);
 
   my ($wtr, $rdr, $err);
   $err = gensym;
@@ -131,7 +130,6 @@ sub _open {
   $self->process_id($pid);
 
   # Defered collect of return status and removal of pidfile
-  $self->on(collect_status => \&_open_collect_status);
 
   return $self unless $self->set_pipes();
 
@@ -150,6 +148,7 @@ sub _collect {
   my ($self, $pid) = @_;
   $pid //= $self->pid;
 
+  $self->session->consume_collected_info;
   $self->session->_protect(
     sub {
       local $?;
@@ -220,6 +219,7 @@ sub _fork {
 
   # Separated handles that could be used for internal comunication.
   my ($channel_in, $channel_out);
+
 
   if ($self->set_pipes) {
     $input_pipe = IO::Pipe->new()
@@ -337,8 +337,6 @@ sub _fork {
   }
   $self->process_id($pid);
 
-  $self->session->enable;
-
   return $self unless $self->set_pipes();
 
   $self->read_stream($output_pipe->reader) if $output_pipe;
@@ -398,7 +396,11 @@ sub exit_status {
 sub restart {
   $_[0]->is_running ? $_[0]->stop->start : $_[0]->start;
 }
-sub is_running { $_[0]->process_id ? kill 0 => $_[0]->process_id : 0; }
+sub is_running {
+    my ($self) = shift;
+    $self->session->consume_collected_info;
+    $self->process_id ? kill 0 => $self->process_id : 0;
+}
 
 sub write_pidfile {
   my ($self, $pidfile) = @_;
@@ -424,7 +426,7 @@ sub _getline {
 
 sub _getlines {
   return unless IO::Select->new($_[0])->can_read(10);
-  wantarray ? shift->getlines : join '\n', @{[shift->getlines]};
+  wantarray ? shift->getlines : join '', @{[shift->getlines]};
 }
 
 # Write to the controlled-process STDIN
@@ -465,7 +467,7 @@ sub start {
   die "Nothing to do" unless !!$self->execute || !!$self->code;
 
   my @args
-    = $self->args
+    = defined($self->args)
     ? ref($self->args) eq "ARRAY"
       ? @{$self->args}
       : $self->args
@@ -473,6 +475,8 @@ sub start {
 
   $self->session->enable_subreaper if $self->subreaper;
   $self->_status(undef);
+  $self->session->enable;
+
 
   if ($self->code) {
     $self->_fork($self->code, @args);
@@ -645,7 +649,7 @@ Mojo::IOLoop::ReadWriteProcess - Execute external programs or internal code bloc
     my $output = process( sub { print "Hello\n" } )->start()->wait_stop->getline;
 
     # Handles seamelessy also external processes:
-    my $process = process(execute=> '/path/to/bin' )->args(qw(foo bar baz));
+    my $process = process(execute=> '/path/to/bin' )->args([qw(foo bar baz)]);
     $process->start();
     my $line_output = $process->getline();
     my $pid = $process->pid();
@@ -798,7 +802,7 @@ You do not need to specify C<code>, it is implied if no arguments is given.
 
     # The process will print "Hello User"
 
-Array or arrayref of options to pass by to the external binary or the code block.
+Arguments pass to the external binary or the code block. Use arrayref to pass many.
 
 =head2 blocking_stop
 

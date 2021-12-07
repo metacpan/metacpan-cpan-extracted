@@ -1,5 +1,11 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+
+2.2.1 2021-12-03
+ [Features]
+ - Adds support for Docker (#125, #124)
+
+
 2.2.0 2021-05-28
 
  [Features]

@@ -1,7 +1,6 @@
-package Net::SAML2::XML::Sig;
-
 use strict;
 use warnings;
+package Net::SAML2::XML::Sig;
 
 # ABSTRACT: Net::SAML2::XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
@@ -11,7 +10,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
 # Based on XML::Sig VERSION = '0.47';
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use base qw(Class::Accessor);
 Net::SAML2::XML::Sig->mk_accessors(qw(key));
@@ -28,6 +27,7 @@ use XML::LibXML;
 use Net::SAML2::XML::Util qw/ no_comments /;
 use MIME::Base64;
 use Carp;
+use Encode;
 
 
 use constant TRANSFORM_ENV_SIG           => 'http://www.w3.org/2000/09/xmldsig#enveloped-signature';
@@ -167,7 +167,7 @@ sub sign {
         }
 
         # Calculate the digest of the XML being signed
-        my $bin_digest    = $self->{digest_method}->( $xml_canon );
+        my $bin_digest    = $self->{digest_method}->( Encode::encode_utf8( $xml_canon ) );
         my $digest        = encode_base64( $bin_digest, '' );
         print ("   Digest: $digest\n") if $DEBUG;
 
@@ -416,8 +416,10 @@ sub verify {
         # signatures to be validated if they exist
         $signed_xml->addChild( $signature_node );
 
+        print ( "    Canonical XML:  " . $canonical ."\n") if $DEBUG;
+
         # Obtain the DigestValue of the Canonical XML
-        my $digest = $self->{digest_method}->($canonical);
+        my $digest = $self->{digest_method}->( Encode::encode_utf8( $canonical ) );
 
         print ( "    Reference Digest:  " . _trim($refdigest) ."\n") if $DEBUG;
 
@@ -1491,7 +1493,7 @@ Net::SAML2::XML::Sig - Net::SAML2::XML::Sig - A toolkit to help sign and verify 
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 

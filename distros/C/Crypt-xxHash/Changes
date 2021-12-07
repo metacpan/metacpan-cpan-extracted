@@ -1,6 +1,15 @@
 Changes
 =======
 
+0.06 - 2021 Dec 02
+    - fixes in MANIFEST files
+
+0.05 - 2021 Nov 28
+    - using v.0.8.1 of xxHash
+
+0.04 - 2021 Apr 28
+    - Update xxHash up to v0.8.0
+
 0.03 - 2021 March 26
     - Fix possible issues with compilation  under Perl with thread support
 
@@ -8,4 +17,4 @@ Changes
     - Fix dependencies
 
 0.01 - 2021 Feb 19
-    - Initial version.
+    - Initial version (xxHash v0.7.4).

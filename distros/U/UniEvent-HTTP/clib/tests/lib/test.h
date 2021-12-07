@@ -1,6 +1,4 @@
 #pragma once
-#define CATCH_CONFIG_EXTERNAL_INTERFACES
-#include <catch2/catch.hpp>
 #include <panda/log.h>
 #include <panda/unievent/http.h>
 #include <panda/unievent/http/Server.h>
@@ -8,6 +6,9 @@
 #include <panda/unievent/test/AsyncTest.h>
 #include <memory>
 #include <functional>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 using namespace panda;
 using panda::unievent::Tcp;
@@ -141,12 +142,3 @@ private:
 
 TServerSP make_server (const LoopSP&, Server::Config = {});
 TServerSP make_ssl_server (const LoopSP&);
-
-struct SSLVerifyReseter : Catch::TestEventListenerBase {
-    using TestEventListenerBase::TestEventListenerBase; // inherit constructor
-
-    void testCaseStarting( Catch::TestCaseInfo const& ) override {
-        default_ssl_verify = false;
-    }
-};
-CATCH_REGISTER_LISTENER(SSLVerifyReseter)

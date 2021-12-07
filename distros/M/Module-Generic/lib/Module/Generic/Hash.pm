@@ -74,7 +74,10 @@ sub as_hash
 {
     my $self = CORE::shift( @_ );
     my $hash = {};
+    $self->_tie_object->enable( 1 );
     my $keys = $self->keys;
+    # XXX
+    print( STDERR ref( $self ), "::as_hash: keys found are: '", $keys->join( "', '" ), "'\n" );
     @$hash{ @$keys } = @$self{ @$keys };
     return( $hash );
 }

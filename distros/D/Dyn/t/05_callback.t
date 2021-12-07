@@ -66,11 +66,12 @@ SKIP: {
 };
 #
 $lib_file = File::Spec->rel2abs($lib_file);
-diag $lib_file;
-diag -s $lib_file;
-my $lib = dlLoadLibrary($lib_file);
-diag $lib;
 
+#diag $lib_file;
+#diag -s $lib_file;
+my $lib = dlLoadLibrary($lib_file);
+
+#diag $lib;
 #diag -s $lib;
 #
 subtest 'int cb( int )' => sub {
@@ -106,7 +107,8 @@ subtest 'void cb( )' => sub {
             my $userdata = dcbGetUserData($cb);
             if ( !$called++ ) {
                 is_deeply $userdata, [ 5, 'time', { anon => 'hash' } ], 'userdata array is correct';
-                diag 'inc value in userdata...';
+
+                #diag 'inc value in userdata...';
                 $userdata->[0]++;
             }
             else {

@@ -1,0 +1,37 @@
+MANIFEST
+Changes
+have_uint128_t.in
+Makefile.PL
+math_ryu_include.h
+README
+Ryu.pm
+Ryu.pod
+Ryu.xs
+t/_1basic.t
+t/mpfr_checks.t
+
+# The following are all ryu source files
+# from https://github.com/ulfjack/ryu/tree/master/ryu.
+# The files d2fixed.c, generic_128.c and ryu/generic_128.h
+# have received some superficial modifications because
+# some perl builds do not honor the permissiveness of "C99 mode".
+# Also the paths to the header files, relative to the location
+# of the C files, has been changed.
+
+d2fixed.c
+d2s.c
+generic_128.c
+s2d.c
+ryu_headers/common.h
+ryu_headers/d2fixed_full_table.h
+ryu_headers/d2s_full_table.h
+ryu_headers/d2s_intrinsics.h
+ryu_headers/d2s_small_table.h
+ryu_headers/digit_table.h
+ryu_headers/generic_128.h
+ryu_headers/ryu.h
+ryu_headers/ryu_generic_128.h
+ryu_headers/ryu_parse.h
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

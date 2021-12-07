@@ -8,9 +8,9 @@ use App::PMUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-27'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.736'; # VERSION
+our $VERSION = '0.737'; # VERSION
 
 our %SPEC;
 $SPEC{pmbin} = {
@@ -123,7 +123,7 @@ pmbin - List scripts that come with the same distribution of a Perl module
 
 =head1 VERSION
 
-This document describes version 0.736 of pmbin (from Perl distribution App-PMUtils), released on 2021-08-27.
+This document describes version 0.737 of pmbin (from Perl distribution App-PMUtils), released on 2021-12-01.
 
 =head1 SYNOPSIS
 
@@ -187,7 +187,7 @@ See C<--module>.
 
 Can also be specified as the 1st command-line argument and onwards.
 
-=item B<--module>=I<s@>*
+=item B<--module>=I<s@>
 
 Can also be specified as the 1st command-line argument and onwards.
 

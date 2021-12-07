@@ -1,10 +1,19 @@
 Revision history for JSONSchema-Validator
 
+0.010  2021-12-01
+    - Added verbosity to test (uid66)
+    - Fixed bug with $ref and sibling $id
+    - Added TO_JSON method to Error class (ehuelsmann)
+    - Fixed bug with wrong detection of booleans
+
+0.009-TRIAL  2021-11-28
+    - Trial release to find the bug with type boolean
+
 0.008  2021-09-13
     - Handle default value of content-type of "encoding" option for body property
 
 0.007  2021-09-11
-    - Add ability to handle "encoding" option (for now, only decode property by content-type) for body property
+    - Added ability to handle "encoding" option (for now, only decode property by content-type) for body property
 
 0.006  2021-08-07
     - Fixed warnings when using undef variables

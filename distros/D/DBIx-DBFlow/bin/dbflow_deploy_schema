@@ -1,0 +1,97 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/say/;
+
+use DBIx::Class::DeploymentHandler;
+
+package DeployDBFlow::Args {
+  use Moose;
+  with 'MooseX::Getopt';
+  use Module::Runtime qw/require_module/;
+
+  has schema => (is => 'ro', isa => 'Str', required => 1, documentation => 'The name of the schema class to load. Must be a DBIx::Class');
+
+  has dbh => (
+    is => 'ro',
+    isa => 'Str',
+    documentation => 'DBI connection string to override what the schema says',
+  );
+  has user => (
+    is => 'ro',
+    isa => 'Str',
+    documentation => 'DBI user to use. Only valid when --dbh is in use',
+  );
+  has pass => (
+    is => 'ro',
+    isa => 'Str',
+    documentation => 'DBI pass to use. Only valid when --dbh is in use',
+  );
+  has to_database => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+    documentation => ''
+  );
+  has _schema => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my $self = shift;
+      my $schema_name = $self->schema;
+      $self->use_lib_include_dir;
+      require_module $schema_name;
+      my $schema;
+      if (not defined $self->dbh) {
+        $schema = $schema_name->admin_connection;
+      } else {
+        $schema = $schema_name->connect($self->dbh, $self->user, $self->pass);
+      }
+      return $schema;
+    }
+  );
+
+  has dir => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'database',
+    documentation => 'The directory to create support files in',
+  );
+
+  has include_dir => (
+    traits => ['Getopt'],
+    is => 'ro',
+    isa => 'Str',
+    default => 'lib',
+    cmd_aliases => 'I',
+    documentation => 'library directory for the schema (will be added to @INC). Defaults to lib',
+  );
+
+  sub use_lib_include_dir {
+    my $self = shift;
+    require lib;
+    lib->import($self->include_dir);
+  }
+}
+
+#We have a problem: when you specify a dbh that connects to a non-existant DB
+# the connect fails (mysql can't connect to a non-existing database)
+# If we don't specify a database, mysql says that no db is selected.
+# It looks like we need to find the guy that does a CREATE DATABASE, and a USE DATABASE
+# before deploying the DB... The guy should be aware of how to put the correct encoding
+# info onto the database.
+die "This utility is not production-ready. See comments on why";
+
+my $opts = DeployDBFlow::Args->new_with_options;
+
+my $dh = DBIx::Class::DeploymentHandler->new({
+        schema              => $opts->_schema,
+        script_directory    => $opts->dir,
+        databases           => 'MySQL',
+        sql_translator_args => { add_drop_table => 0 },
+        #force_overwrite     => $force_overwrite,
+});
+
+$dh->deploy;
+

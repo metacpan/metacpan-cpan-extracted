@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 37;
+use Test::More;
 use PDL;
 use Test::PDL qw( eq_pdl );
-use Test::NoWarnings;
+use Test::NoWarnings qw(had_no_warnings); $Test::NoWarnings::do_end_test = 0;
 
 my ( $got, $expected );
 
@@ -134,3 +134,6 @@ $expected->badflag( 1 );
 $got = long( 4,5,6,7,8,9 );
 $got->badflag( 0 );
 ok eq_pdl( $got, $expected ), "isn't fooled by differing badflags";
+
+had_no_warnings;
+done_testing;

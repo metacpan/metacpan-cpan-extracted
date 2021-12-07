@@ -4,8 +4,9 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.161';
+our $VERSION = '0.162';
 
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -85,13 +86,6 @@ sub configure {
 ) }}
 SUPPORT
                         ] },
-        ],
-
-        [ 'AllowOverride' => 'allow override SUPPORT' => {
-               header_re => '^(SUPPORT|BUGS)\b',
-               action => 'prepend',
-               match_anywhere => 0,
-            },
         ],
 
         'Authors',
@@ -178,7 +172,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.161
+version 0.162
 
 =head1 SYNOPSIS
 

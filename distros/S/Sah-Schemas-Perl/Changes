@@ -1,3 +1,14 @@
+0.042   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add default value rules: Perl::these_{dists,mods}.
+
+
+0.041   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: perl::modname::default_this_mod,
+	  perl::distname::default_this_dist.
+
+
 0.040   2021-10-05  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix coerce/filter

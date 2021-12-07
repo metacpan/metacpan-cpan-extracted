@@ -11,3 +11,10 @@
 0.005
   - Removed Data::Dumper import
   - Changed min version of Carp to 1.38
+0.006
+  - Patches contributed by Ryan Newington
+  - Adds support for EC14N transform with InclusivePrefixes
+0.007
+  - removed the need for the string eval, and localized list scoping for each node context in $self->get_transforms
+0.008
+  - Cleaned up Changes file

@@ -1,5 +1,6 @@
 package SDL2::audio {
-    use strictures 2;
+    use strict;
+    use warnings;
     use experimental 'signatures';
     use SDL2::Utils;
     #
@@ -69,7 +70,8 @@ package SDL2::audio {
     ffi->type( '(opaque,opaque,int)->void' => 'SDL_AudioCallback' );    # void*, uint8*, int -> void
 
     package SDL2::AudioSpec {
-        use strictures 2;
+        use strict;
+        use warnings;
         use experimental 'signatures';
         use SDL2::Utils;
         has

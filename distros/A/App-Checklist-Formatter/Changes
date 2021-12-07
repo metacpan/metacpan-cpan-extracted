@@ -1,5 +1,8 @@
 Revision history for App-Checklist-Formatter
 
+v0.0.7 Tue Nov 30 08:17:42 CET 2021
+	- Build.PL: note dependency on Class::Std
+
 v0.0.6 Tue Nov 23 17:46:59 CET 2021
 	- set the same version string on module and distribution
 	- move repository to https://github.com/matwei-perl/App-Checklist-Formatter

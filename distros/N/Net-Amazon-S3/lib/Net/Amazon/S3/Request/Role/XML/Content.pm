@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::XML::Content;
 # ABSTRACT: Role providing XML content
-$Net::Amazon::S3::Request::Role::XML::Content::VERSION = '0.98';
+$Net::Amazon::S3::Request::Role::XML::Content::VERSION = '0.99';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_length';
@@ -52,7 +52,7 @@ Net::Amazon::S3::Request::Role::XML::Content - Role providing XML content
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

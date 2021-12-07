@@ -1,18 +1,3 @@
-package Quiq::String;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Encode::Guess ();
-use Encode ();
-use Quiq::Option;
-use Quiq::Array;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -24,6 +9,27 @@ Quiq::String - Operationen auf Zeichenketten
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::String;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Encode::Guess ();
+use Encode ();
+use Quiq::Option;
+use Quiq::Array;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -847,7 +853,7 @@ sub wrap {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

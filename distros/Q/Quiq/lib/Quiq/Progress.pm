@@ -1,17 +1,3 @@
-package Quiq::Progress;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Time::HiRes ();
-use Quiq::Duration;
-use Quiq::Math;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -115,6 +101,26 @@ Vergangene Zeit in Sekunden (mit Nachkommastellen)
 Die letzte von msg() erzeugte Meldung.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Progress;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Time::HiRes ();
+use Quiq::Duration;
+use Quiq::Math;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -750,7 +756,7 @@ sub warn {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

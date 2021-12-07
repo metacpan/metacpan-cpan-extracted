@@ -1,9 +1,9 @@
 package Color::HSV::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-07'; # DATE
+our $DATE = '2021-08-06'; # DATE
 our $DIST = 'Color-HSV-Util'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -38,7 +38,7 @@ Color::HSV::Util - Utilities related to HSV color space
 
 =head1 VERSION
 
-This document describes version 0.002 of Color::HSV::Util (from Perl distribution Color-HSV-Util), released on 2020-06-07.
+This document describes version 0.003 of Color::HSV::Util (from Perl distribution Color-HSV-Util), released on 2021-08-06.
 
 =head1 SYNOPSIS
 
@@ -50,6 +50,15 @@ This document describes version 0.002 of Color::HSV::Util (from Perl distributio
  );
 
 =head1 DESCRIPTION
+
+HSV color value is written using this notation:
+
+ H S V
+
+that is, three floating point numbers separated by a single space. Examples:
+
+ 0 1 1                     # red (RGB ff0000)
+ 120 0.498 1               # light green (RGB 80ff80)
 
 =head1 FUNCTIONS
 
@@ -91,7 +100,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

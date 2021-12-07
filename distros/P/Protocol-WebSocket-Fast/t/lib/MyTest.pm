@@ -9,10 +9,27 @@ use Protocol::WebSocket::Fast;
 
 XS::Loader::load();
 
+
+{
+    package Protocol::WebSocket::Logger;
+    use parent 'XLog::Logger';
+
+    sub log_format {
+        my ($self, $msg, $level, $module, $file, $line, $func, $formatter) = @_;
+        $file = substr($file, rindex($file, '/'));
+        $module = substr($module, rindex($module, '::')+2);
+        my $code = "$module$file:$line";
+        my $res = sprintf '%-32s %s', $code, $msg;
+        say $res;
+    }
+}
+
+
 if ($ENV{LOGGER}) {
-    require XLog;
-    XLog::set_logger(sub { say $_[1] });
-    XLog::set_level(XLog::VERBOSE_DEBUG());
+    XLog::set_logger(Protocol::WebSocket::Logger->new);
+    XLog::set_level(XLog::WARNING);
+
+    XLog::set_level(XLog::DEBUG, "Protocol::WebSocket");
 }
 
 sub accept_packet {

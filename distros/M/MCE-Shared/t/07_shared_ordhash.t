@@ -721,5 +721,42 @@ my $length = $h5->append("ἀθάνατῳ", "Ǣ");
 is( $h5->get("ἀθάνατῳ"), $sappho_text . "Ǣ", 'shared ordhash, check unicode append' );
 is( $length, length($sappho_text) + 1, 'shared ordhash, check unicode length' );
 
+## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+# The internal index is populated on-demand. This checks _fill_index is working.
+
+my $ho = MCE::Shared::Ordhash->new();
+my $val;
+
+$ho->clear();
+$ho->set($_,$_) for 10..19;
+$ho->del(15);
+$ho->push(20,20);
+$ho->push(21,21);
+$ho->unshift(9,9);
+$ho->unshift(8,8);
+
+$val = $ho->del(9);
+is( $val, 9, 'check fill_index delete value - from start of list' );
+cmp_array(
+   $ho->[1], [ 8, undef, 10, 11, 12, 13, 14, undef, 16, 17, 18, 19, 20, 21 ],
+   'check fill_index keys array - from start of list'
+);
+
+$ho->clear();
+$ho->set($_,$_) for 10..19;
+$ho->del(15);
+$ho->push(20,20);
+$ho->push(21,21);
+$ho->unshift(9,9);
+$ho->unshift(8,8);
+
+$val = $ho->del(20);
+is( $val, 20, 'check fill_index delete value - from end of list' );
+cmp_array(
+   $ho->[1], [ 8, 9, 10, 11, 12, 13, 14, undef, 16, 17, 18, 19, undef, 21 ],
+   'check fill_index keys array - from end of list'
+);
+
 done_testing;
 

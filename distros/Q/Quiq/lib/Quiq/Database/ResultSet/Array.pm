@@ -1,14 +1,3 @@
-package Quiq::Database::ResultSet::Array;
-use base qw/Quiq::Database::ResultSet/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -25,6 +14,23 @@ L<Quiq::Database::ResultSet>
 
 Ein Objekt der Klasse repräsentiert eine Liste von gleichartigen
 Datensätzen in Array-Repräsentation.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::ResultSet::Array;
+use base qw/Quiq::Database::ResultSet/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -149,7 +155,7 @@ sub index {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

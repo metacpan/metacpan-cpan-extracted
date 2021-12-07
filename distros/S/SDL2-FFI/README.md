@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/sanko/SDL2.pm/workflows/CI/badge.svg)](https://github.com/sanko/SDL2.pm/actions) [![MetaCPAN Release](https://badge.fury.io/pl/SDL2-FFI.svg)](https://metacpan.org/release/SDL2-FFI)
+[![Actions Status](https://github.com/sanko/SDL2.pm/actions/workflows/linux.yaml/badge.svg)](https://github.com/sanko/SDL2.pm/actions) [![Actions Status](https://github.com/sanko/SDL2.pm/actions/workflows/windows.yaml/badge.svg)](https://github.com/sanko/SDL2.pm/actions) [![Actions Status](https://github.com/sanko/SDL2.pm/actions/workflows/osx.yaml/badge.svg)](https://github.com/sanko/SDL2.pm/actions) [![MetaCPAN Release](https://badge.fury.io/pl/SDL2-FFI.svg)](https://metacpan.org/release/SDL2-FFI)
 # NAME
 
 SDL2::FFI - FFI Wrapper for SDL (Simple DirectMedia Layer) Development Library

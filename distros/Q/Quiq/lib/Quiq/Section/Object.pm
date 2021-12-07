@@ -1,15 +1,3 @@
-package Quiq::Section::Object;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Path;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -71,6 +59,24 @@ Name der Quelldatei.
 Zeilennummer in Quelldatei.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Section::Object;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Path;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -1432,7 +1438,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

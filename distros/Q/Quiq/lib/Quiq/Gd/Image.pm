@@ -1,21 +1,3 @@
-package Quiq::Gd::Image;
-use base qw/GD::Image Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use GD ();
-use Quiq::Gd::Font;
-use Quiq::Gd::Image;
-use Scalar::Util ();
-use Quiq::Color;
-use Quiq::Option;
-use Quiq::Math;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -135,6 +117,30 @@ Anwendung testen. Sie sollte fehlerfrei laufen.
   my $img = Quiq::Gd::Image->new($width,$height);
   my $white = $img->background(255,255,255);
   $img->transparent($white);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gd::Image;
+use base qw/GD::Image Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use GD ();
+use Quiq::Gd::Font;
+use Quiq::Gd::Image;
+use Scalar::Util ();
+use Quiq::Color;
+use Quiq::Option;
+use Quiq::Math;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -769,7 +775,7 @@ sub rainbowColors {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 name = "SDL2-FFI"
-badges = ["github-actions/CI", "metacpan"]
+badges = ["github-actions/linux.yaml", "github-actions/windows.yaml", "github-actions/osx.yaml", "metacpan"]
 module_maker="ModuleBuildTiny"
 static_install = "auto"
 license="artistic_2"
@@ -8,6 +8,7 @@ readme_from="lib/SDL2/FFI.pm"
 abstract_from="lib/SDL2/FFI.pm"
 #requires_external_bin=["make');check_bin('gcc');\nBuild_PL();\nmkdir 'share';chdir 'ffi';`make install prefix='../share'`;\nexit;('1"]
 #requires_external_bin=["perl');\nBuild_PL();\nuse lib qw[blib/lib lib];use SDL2::Utils;SDL2::Utils::ffi();\nexit;('1"]
+requires_external_bin=["perl');\nuse lib '.';use builder::SDL2; builder::SDL2::SDL_Build_PL();\nexit;('1"]
 
 [release]
 hook=[

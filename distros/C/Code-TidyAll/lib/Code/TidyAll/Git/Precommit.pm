@@ -16,7 +16,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.78';
+our $VERSION = '0.80';
 
 has conf_name => (
     is  => 'ro',
@@ -90,11 +90,10 @@ sub check {
                         or die 'Cannot determine version number from git version output!';
                     my $minor = ( split /\./, $version )[1];
 
-                    # When pop is run quietly in 2.24.x it deletes files! I can
-                    # make this guard smarter once there's a fixed version. See
+                    # When pop is run quietly in 2.24.x it deletes files! See
                     # https://public-inbox.org/git/CAMcnqp22tEFva4vYHYLzY83JqDHGzDbDGoUod21Dhtnvv=h_Pg@mail.gmail.com/
-                    # for the initial bug report.
-                    my @args = $minor >= 24 ? () : ('-q');
+                    # for the initial bug report. This was fixed in 2.25.
+                    my @args = $minor == 24 ? () : ('-q');
                     run( $self->git_path, 'stash', 'pop', @args );
                 }
             }
@@ -139,12 +138,11 @@ __END__
 
 =head1 NAME
 
-Code::TidyAll::Git::Precommit - Git pre-commit hook that requires files to be
-tidyall'd
+Code::TidyAll::Git::Precommit - Git pre-commit hook that requires files to be tidyall'd
 
 =head1 VERSION
 
-version 0.78
+version 0.80
 
 =head1 SYNOPSIS
 
@@ -167,6 +165,19 @@ not. Files/commits are never modified by this hook.
 See also L<Code::TidyAll::Git::Prereceive>, which validates pushes to a shared
 repo.
 
+The tidyall configuration file (F<tidyall.ini> or F<.tidyallrc>) must be
+checked into git in the repo root directory i.e. next to the .git directory.
+
+By default, the hook will stash any changes not in the index beforehand, and
+restore them afterwards, via
+
+    git stash save --keep-index --include-untracked
+    ....
+    git stash pop
+
+This means that if the configuration file has uncommitted changes that are not
+in the index, they will not affect the tidyall run.
+
 =head1 METHODS
 
 This class provides one method:
@@ -188,20 +199,7 @@ In an emergency the hook can be bypassed by passing --no-verify to commit:
 
     % git commit --no-verify ...
 
-or you can just move C<.git/hooks/pre-commit> out of the way temporarily.
-
-The configuration file (C<tidyall.ini> or C<.tidyallrc>) must be checked into
-git in the repo root directory i.e. next to the .git directory.
-
-By default, the hook will stash any changes not in the index beforehand, and
-restore them afterwards, via
-
-    git stash save --keep-index --include-untracked
-    ....
-    git stash pop
-
-This means that if the configuration file has uncommitted changes that are not
-in the index, they will not affect the tidyall run.
+or you can just move F<.git/hooks/pre-commit> out of the way temporarily.
 
 This class passes mode = "commit" by default to tidyall; see
 L<modes|tidyall/MODES>.
@@ -244,14 +242,14 @@ yourself or your developers as follows:
 
 =item *
 
-Create a directory called C<git/hooks> at the top of your repo (note no dot
+Create a directory called F<git/hooks> at the top of your repo (note no dot
 prefix).
 
     mkdir -p git/hooks
 
 =item *
 
-Commit your pre-commit script in C<git/hooks/pre-commit> containing:
+Commit your pre-commit script in F<git/hooks/pre-commit> containing:
 
     #!/usr/bin/env perl
 
@@ -263,7 +261,7 @@ Commit your pre-commit script in C<git/hooks/pre-commit> containing:
 
 =item *
 
-Add a setup script in C<git/setup.sh> containing
+Add a setup script in F<git/setup.sh> containing
 
     #!/bin/bash
     chmod +x git/hooks/pre-commit
@@ -287,15 +285,11 @@ a remote shared repository.
 
 =head1 SUPPORT
 
-Bugs may be submitted at
-L<https://github.com/houseabsolute/perl-code-tidyall/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/perl-code-tidyall/issues>.
 
 =head1 SOURCE
 
-The source code repository for Code-TidyAll can be found at
-L<https://github.com/houseabsolute/perl-code-tidyall>.
+The source code repository for Code-TidyAll can be found at L<https://github.com/houseabsolute/perl-code-tidyall>.
 
 =head1 AUTHORS
 
@@ -313,12 +307,12 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2020 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2021 by Jonathan Swartz.
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-The full text of the license can be found in the F<LICENSE> file included with
-this distribution.
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

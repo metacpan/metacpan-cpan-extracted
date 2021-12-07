@@ -1,17 +1,3 @@
-package Quiq::ImagePool;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Path;
-use Quiq::ImagePool::Directory;
-use Quiq::Option;
-use Quiq::FileHandle;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -23,6 +9,26 @@ Quiq::ImagePool - Speicher für Bild-Dateien
 =head1 BASE CLASS
 
 L<Quiq::Hash>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ImagePool;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Path;
+use Quiq::ImagePool::Directory;
+use Quiq::Option;
+use Quiq::FileHandle;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -275,7 +281,7 @@ sub images {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

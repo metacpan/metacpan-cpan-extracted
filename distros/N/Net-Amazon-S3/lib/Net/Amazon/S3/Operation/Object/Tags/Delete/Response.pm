@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Tags::Delete::Response;
 # ABSTRACT: An internal class to handle DeleteObjectTagging responses
-$Net::Amazon::S3::Operation::Object::Tags::Delete::Response::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Object::Tags::Delete::Response::VERSION = '0.99';
 use Moose;
 extends 'Net::Amazon::S3::Response';
 
@@ -18,7 +18,7 @@ Net::Amazon::S3::Operation::Object::Tags::Delete::Response - An internal class t
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

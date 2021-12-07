@@ -1,16 +1,3 @@
-package Quiq::Option;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash;
-use Scalar::Util ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -22,6 +9,25 @@ Quiq::Option - Verarbeitung von Programm- und Methoden-Optionen
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Option;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash;
+use Scalar::Util ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -507,7 +513,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

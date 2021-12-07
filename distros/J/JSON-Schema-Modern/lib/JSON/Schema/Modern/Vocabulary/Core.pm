@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.526';
+our $VERSION = '0.531';
 
 use 5.020;
 use Moo;
@@ -77,6 +77,7 @@ sub _traverse_keyword_id ($self, $schema, $state) {
       canonical_uri => $state->{initial_schema_uri}->clone,
       specification_version => $state->{spec_version}, # note! $schema keyword can change this
       vocabularies => $state->{vocabularies}, # reference, not copy
+      configs => $state->{configs},
     };
   return 1;
 }
@@ -92,6 +93,7 @@ sub _eval_keyword_id ($self, $data, $schema, $state) {
   $state->{schema_path} = '';
   $state->{spec_version} = $schema_info->{specification_version};
   $state->{vocabularies} = $schema_info->{vocabularies};
+  $state->@{keys $state->{configs}->%*} = values $state->{configs}->%*;
   push $state->{dynamic_scope}->@*, $state->{initial_schema_uri};
 
   return 1;
@@ -132,8 +134,7 @@ sub _traverse_keyword_schema ($self, $schema, $state) {
 
   # remember, if we don't have a sibling $id, we must be at the document root with no identifiers
   if ($state->{identifiers}->@*) {
-    $state->{identifiers}[-1]{specification_version} = $state->{spec_version};
-    $state->{identifiers}[-1]{vocabularies} = $state->{vocabularies};
+    $state->{identifiers}[-1]->@{qw(specification_version vocabularies)} = $state->@{qw(spec_version vocabularies)};
   }
 
   return 1;
@@ -157,6 +158,7 @@ sub _traverse_keyword_anchor ($self, $schema, $state) {
       canonical_uri => $canonical_uri,
       specification_version => $state->{spec_version},
       vocabularies => $state->{vocabularies}, # reference, not copy
+      configs => $state->{configs},
     };
   return 1;
 }
@@ -291,8 +293,9 @@ sub _traverse_keyword_defs { shift->traverse_object_schemas(@_) }
 
 # translate vocabulary URIs into classes, caching the results (if any)
 sub __fetch_vocabulary_data ($self, $state, $schema_info) {
-
   if (not exists $schema_info->{schema}{'$vocabulary'}) {
+    # "If "$vocabulary" is absent, an implementation MAY determine behavior based on the meta-schema
+    # if it is recognized from the URI value of the referring schema's "$schema" keyword."
     my $metaschema_uri = $state->{evaluator}->METASCHEMA_URIS->{$schema_info->{specification_version}};
     return $state->{evaluator}->_get_metaschema_vocabulary_classes($metaschema_uri)->@*;
   }
@@ -344,7 +347,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.526
+version 0.531
 
 =head1 DESCRIPTION
 

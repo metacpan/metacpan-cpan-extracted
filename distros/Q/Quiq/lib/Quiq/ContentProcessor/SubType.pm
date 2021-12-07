@@ -1,12 +1,3 @@
-package Quiq::ContentProcessor::SubType;
-use base qw/Quiq::ContentProcessor::BaseType/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -24,6 +15,21 @@ L<Quiq::ContentProcessor::BaseType>
 Diese Klasse ist die Basisklasse von Typen, die keine Entitäten,
 sondern Bestandteile von Entitäten sind. In Jaz werden
 die Abschnitts-Objekte Group und Method durch SubTypes repräsentiert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ContentProcessor::SubType;
+use base qw/Quiq::ContentProcessor::BaseType/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -127,7 +133,7 @@ sub name {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -11,9 +11,9 @@ panda::BacktraceInfoSP DualTrace::get_c_trace() noexcept {
     return c_trace_cached;
 }
 
-panda::BacktraceInfoSP DualTrace::get_perl_trace() noexcept {
+PerlTraceInfoSP DualTrace::get_perl_trace() noexcept {
     if (!perl_trace_cached && perl_trace_producer) {
-        perl_trace_cached = perl_trace_producer();
+        perl_trace_cached = panda::static_pointer_cast<PerlTraceInfo>(perl_trace_producer());
     }
     return perl_trace_cached;
 }

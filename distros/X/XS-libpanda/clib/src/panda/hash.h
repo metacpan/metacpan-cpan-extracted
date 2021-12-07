@@ -7,9 +7,10 @@
 namespace panda { namespace hash {
 
 uint64_t hash_murmur64a             (string_view);
+uint64_t hash_murmur64a_misaligned  (string_view);
 uint32_t hash_jenkins_one_at_a_time (string_view);
 
-inline uint64_t hash64 (string_view v) { return hash_murmur64a(v); }
+inline uint64_t hash64 (string_view v) { return hash_murmur64a_misaligned(v); }
 inline uint32_t hash32 (string_view v) { return hash_jenkins_one_at_a_time(v); }
 
 namespace {

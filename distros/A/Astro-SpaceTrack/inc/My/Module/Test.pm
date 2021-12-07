@@ -13,7 +13,7 @@ use HTTP::Date;
 use HTTP::Status qw{ :constants };
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.147';
+our $VERSION = '0.148';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.
@@ -192,7 +192,7 @@ sub not_defined {
     BEGIN {
 	%info = (
 	    'celestrak.com'	=> {
-		url	=> 'http://celestrak.com/',
+		url	=> 'https://celestrak.com/',
 	    },
 	    'mike.mccants'	=> {
 		url	=> 'http://www.prismnet.com/~mmccants/',

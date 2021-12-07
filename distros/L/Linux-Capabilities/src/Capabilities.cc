@@ -20,7 +20,7 @@ excepted<void, CapabilityErrors> Capabilities::set_flag(cap_values values, cap_f
     return {};
 }
 
-excepted<void, CapabilityErrors> Capabilities::set(cap_values values, cap_flags flags, cap_flag_value_t flag_value) {
+void Capabilities::set(cap_values values, cap_flags flags, cap_flag_value_t flag_value) {
     Capabilities caps_old = *this;
 
     for ( const auto flag : flags ) {
@@ -28,11 +28,9 @@ excepted<void, CapabilityErrors> Capabilities::set(cap_values values, cap_flags 
 
         if (!res.has_value()) {
             *this = std::move(caps_old);
-            return res;
+            throw res.error();
         }
     }
-
-    return {};
 }
 
 excepted<Capabilities*, CapabilityErrors> Capabilities::init_empty() {
@@ -200,11 +198,10 @@ excepted<void, CapabilityErrors> Capabilities::submit_to_file(string fpath) {
     return {};
 }
 
-excepted<void, CapabilityErrors> Capabilities::drop(cap_values values, cap_flags flags) {
+void Capabilities::drop(cap_values values, cap_flags flags) {
     return set(values, flags, CAP_CLEAR);
 }
-
-excepted<void, CapabilityErrors> Capabilities::raise(cap_values values, cap_flags flags) {
+void Capabilities::raise(cap_values values, cap_flags flags) {
     return set(values, flags, CAP_SET);
 }
 

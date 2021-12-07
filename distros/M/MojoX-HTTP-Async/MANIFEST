@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/MojoX/HTTP/Async.pm
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+README.md
+t/certs/server-cert.pem
+t/certs/server-key.pem
+t/insecure.t
+t/lib/Test/Utils.pm
+t/secure.t

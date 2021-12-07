@@ -1,0 +1,14 @@
+NAME
+
+    Future::Workflow - asynchronous workflow management using futures
+
+DESCRIPTION
+
+    This distribution is a work-in-progress, aiming to eventually contain a
+    collection of classes for arranging Future-based workflow patterns into
+    larger structures.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

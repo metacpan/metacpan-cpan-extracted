@@ -5,17 +5,19 @@ use Carp;
 use 5.010;  # M::V::R requires 5.010, so might as well make use of the defined-or // notation :-)
 use CAD::Format::STL qw//;
 use CAD::Mesh3D qw/:create/;
-our $VERSION = '0.005'; # auto-populated from CAD::Mesh3D
+our $VERSION = '0.006001'; # auto-populated from CAD::Mesh3D
 
 # start by deciding which formatter to use
 our $STL_FORMATTER;
+
 BEGIN {
+    my $os = $ENV{CAD_MESH3D_OVERRIDE_OS} // $^O;
     use version 0.77;
     my $v = version->parse($CAD::Format::STL::VERSION);
     #print STDERR "CAD::Format::STL version = $v\n";
     #print STDERR "> $_\n" for @INC;
 
-    if( $v <= version->parse(v0.2.1) ) {
+    if( $v <= version->parse(v0.2.1) and $os eq 'MSWin32') {
         $STL_FORMATTER = 'CAD::Mesh3D::FormatSTL';
         eval "require $STL_FORMATTER";
     } else {

@@ -40,4 +40,8 @@ INCLUDE: xs/DualTrace.xsi
 
 INCLUDE: xs/BacktraceInfo.xsi
 
+INCLUDE: xs/PerlTraceInfo.xsi
+
+INCLUDE: xs/PerlFrame.xsi
+
 INCLUDE: xs/Stackframe.xsi

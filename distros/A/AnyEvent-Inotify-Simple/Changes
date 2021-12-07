@@ -1,5 +1,13 @@
 Change history for AnyEvent-Inotify-Simple
 
+0.04      2021-12-04 13:04:02+11:00 Australia/Melbourne
+  - get tests working again under Perl 5.26+
+  - don't consume a ton of memory and CPU in response to unexpected events
+  - ignore overflow events rather than entering the (heavy) unexpected event
+    handler for them when there's nothing we can do anyway (thanks Rob Mueller!)
+  - added wanted_events, to filter events in the kernel before watchers receive
+    them (thanks Rob Mueller!)
+
 0.03      2014-06-09 20:56:31+10:00 Australia/Melbourne
   - handle new file disappearing quickly while we're checking to see if its a
     directory and needs to be watched

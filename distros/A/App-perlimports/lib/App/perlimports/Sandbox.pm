@@ -3,7 +3,7 @@ package App::perlimports::Sandbox;
 use strict;
 use warnings;
 
-our $VERSION = '0.000025';
+our $VERSION = '0.000027';
 
 use Data::UUID ();
 
@@ -59,7 +59,7 @@ App::perlimports::Sandbox - Internal Tools for perlimports
 
 =head1 VERSION
 
-version 0.000025
+version 0.000027
 
 =head2 pkg_for( $string )
 
@@ -71,6 +71,10 @@ created.
 
 Takes a module name and content to eval. Returns the contents of C<$@>. So, if
 it returns true, the C<eval> failed.
+
+Returns a random module/package name, which can be used to eval arbitrary code.
+Requires the name of the module which will be imported into the package to be
+created.
 
 =head1 AUTHOR
 

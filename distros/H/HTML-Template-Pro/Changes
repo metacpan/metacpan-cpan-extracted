@@ -324,3 +324,16 @@ Revision history for Perl extension HTML::Template::Pro.
 
 0.9510 Mon May 13 11:30:15 EEST 2013
 	- rt.cpan.org #85211 - pod fix
+	- misc bugfixes
+
+0.9520 Mon Nov 29 22:01:58 EET 2021
+	- added pcre2 support (old pcre support stil exists)
+	- closed rt.cpan.org #140119 - pcre2 support
+
+0.9521 Thu Dec  2 09:09:51 EET 2021
+	- closed rt.cpan.org #109255 - urlencode shouldn't encode '\'.
+
+0.9522 Mon Dec  6 19:25:43 EET 2021
+	- fixed memory leak in perl wrapper code. libhtmltmplpro
+	  was not affected by it.
+	- closed rt.cpan.org #78121 - 'I found a memory leak'

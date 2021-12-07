@@ -23,8 +23,8 @@ sub init
     my $css  = shift( @_ ) || return( $self->error( "No css object was provided." ) );
     return( $self->error( "CSS object provided is not a CSS::Object object." ) ) if( !$self->_is_a( $css, 'CSS::Object' ) );
     $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ ) || return;
-    $self->css( $css ) || return;
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
+    $self->css( $css ) || return( $self->pass_error );
     return( $self );
 }
 
@@ -54,13 +54,13 @@ sub css { return( shift->_set_get_object( '__css', 'CSS::Object', @_ ) ); }
 
 sub current_rule { return( shift->css->elements->last ); }
 
-sub elements { return( shift->_set_get_array_as_object( 'elements', @_ ) ); }
+sub elements { return( shift->_set_get_object_array_object( 'elements', 'CSS::Object::Element', @_ ) ); }
 
 sub new_rule
 {
     my $self = shift( @_ );
     my $css = $self->css || return( $self->error( "Our main css object is gone!" ) );
-    # $self->message( 3, "Creating new CSS::Object::Builder::Rule object with css object '$css' and formatter set to '", $css->format, "'." );
+    $self->message( 3, "Creating new CSS::Object::Builder::Rule object with css object '$css' and formatter set to '", $css->format, "'." );
 #     return( CSS::Object::Builder::Rule->new( @_,
 #         format => $css->format,
 #         debug => $self->debug,
@@ -94,7 +94,7 @@ sub select
         });
         $rule = bless( $this, 'CSS::Object::Builder::Rule' );
         $rule->css( $css );
-        ## Unless this object is already added to the CSS::Object we add it now
+        # Unless this object is already added to the CSS::Object we add it now
         unless( $found )
         {
             $rule->add_to( $css );
@@ -103,7 +103,7 @@ sub select
     }
     else
     {
-        # $self->message( 3, "Creating new CSS::Object::Builder::Rule object." );
+        $self->message( 3, "Creating new CSS::Object::Builder::Rule object." );
         $rule = $self->new_rule->add_to( $css );
         defined( $rule ) || return( $self->error( "Cannot create CSS::Object::Builder::Rule object: ", CSS::Object::Builder::Rule->error ) );
     }
@@ -115,11 +115,12 @@ sub select
             $css->new_selector( name => $s )->add_to( $rule );
         }
     }
-    ## further calls will be made in the context of the CSS::Object::Builder::Rule package with dynamic method name
+    # further calls will be made in the context of the CSS::Object::Builder::Rule package with dynamic method name
     return( $rule );
 }
 
-## Dynamic css property name pakcage
+# XXX CSS::Object::Builder::Rule class
+# Dynamic css property name pakcage
 package CSS::Object::Builder::Rule;
 BEGIN
 {
@@ -184,7 +185,7 @@ CSS::Object::Builder - CSS Object Oriented Builder
     use CSS::Object;
     my $css = CSS::Object->new( debug => 3 ) ||
         die( CSS::Object->error );
-    ny $b = $css->builder;
+    my $b = $css->builder;
     $b->select( ['#main_section > .article', 'section .article'] )
         ->display( 'none' )
         ->font_size( '+0.2rem' )

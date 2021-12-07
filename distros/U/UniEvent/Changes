@@ -1,4 +1,6 @@
-1.2.8     xx.xx.2021
+1.2.9     xx.xx.2021
+           - upgrade tests for catch-v3
+1.2.8     18.11.2021
            - internal misc junk
 1.2.7     09.11.2021
            - inherit cloexec on file/sock dup

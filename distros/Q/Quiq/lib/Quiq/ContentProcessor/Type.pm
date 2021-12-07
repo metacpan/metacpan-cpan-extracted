@@ -1,12 +1,3 @@
-package Quiq::ContentProcessor::Type;
-use base qw/Quiq::ContentProcessor::BaseType/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -145,6 +136,21 @@ kompilierbar/ausführbar sein. Die Basisklassenmethode liefert
 C<undef>. Die Methode wird überschrieben.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ContentProcessor::Type;
+use base qw/Quiq::ContentProcessor::BaseType/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -637,7 +643,7 @@ sub needsUpdate {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

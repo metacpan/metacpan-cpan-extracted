@@ -25,7 +25,7 @@ sub init
     return( $self->error( "CSS object provded is actually not a CSS::Object object." ) ) if( !$self->_is_a( $css, 'CSS::Object' ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
-    $self->css( $css ) || return;
+    $self->css( $css ) || return( $self->pass_error );
     return( $self );
 }
 

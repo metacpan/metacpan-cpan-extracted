@@ -54,7 +54,6 @@ clib/tests/server/misc.cc
 clib/tests/server/partial.cc
 clib/tests/server/pipeline.cc
 clib/tests/server/version.cc
-clib/tests/testsock
 clib/unievent-http-config.cmake
 INSTALL.SKIP
 lib/Plack/Handler/UniEvent/HTTP/Simple.pm

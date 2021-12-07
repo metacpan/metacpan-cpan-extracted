@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::realpath",
   "PREREQ_PM" => {
     "Cwd" => 0,
+    "File::Spec" => 0,
     "Getopt::Long" => "2.50",
     "strict" => 0,
     "warnings" => 0
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

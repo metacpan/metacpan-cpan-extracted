@@ -1,7 +1,8 @@
 #pragma once
-#include <catch2/catch.hpp>
 #include <panda/optional.h>
 #include <panda/protocol/websocket.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 namespace test {
 
@@ -9,7 +10,7 @@ using namespace panda;
 using namespace panda::protocol::websocket;
 using panda::protocol::http::Headers;
 
-struct ReMatcher : Catch::MatcherBase<string> {
+struct ReMatcher : Catch::Matchers::MatcherBase<string> {
     ReMatcher (const string& regex, bool case_sen = false) : re(regex), case_sen(case_sen) {}
     bool match (const string& matchee) const override;
     std::string describe () const override;

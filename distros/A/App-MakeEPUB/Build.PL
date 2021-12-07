@@ -14,6 +14,12 @@ my $builder = Module::Build->new(
     dist_author         => 'Mathias Weidner <mamawe@cpan.org>',
     dist_version_from   => 'lib/App/MakeEPUB.pm',
     license             => 'perl',
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/matwei-perl/App-MakeEPUB',
+            bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=App-MakeEPUB',
+        }
+    },
     module_name         => 'App::MakeEPUB',
     requires => {
 	# Perl 5.10.1 includes "configure_requires" support

@@ -1257,4 +1257,196 @@ sub post_watermark {
     return $_response_object;
 }
 
+#
+# post_compress
+#
+# 
+# 
+# @param File $file File to upload (required)
+# @param string $compress_level  (required)
+{
+    my $params = {
+    'file' => {
+        data_type => 'hash',
+        description => 'File to upload',
+        required => '1',
+    },
+    'compress_level' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_compress' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+        };
+}
+# @return FilesResult
+#
+sub post_compress {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'file' is set
+    unless (exists $args{'file'}) {
+      croak("Missing the required parameter 'file' when calling post_compress");
+    }
+
+    # verify the required parameter 'text' is set
+    unless (exists $args{'compress_level'}) {
+      croak("Missing the required parameter 'compress_level' when calling post_compress");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/compress';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if ( exists $args{'compress_level'}) {
+        $query_params->{'CompressLevel'} = $self->{api_client}->to_query_value($args{'compress_level'});
+    }
+
+    if ( exists $args{'file'} ) {   
+        my $map_file =$args{'file'};
+        while ( my ($filename,$value) = each( %$map_file ) ) {
+             $form_params->{$filename} = [$value ,$filename,'application/octet-stream'];
+        }
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
+# post_replace
+#
+# 
+# 
+# @param File $file File to upload (required)
+# @param string $compress_level  (required)
+{
+    my $params = {
+    'file' => {
+        data_type => 'hash',
+        description => 'File to upload',
+        required => '1',
+    },
+    'text' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'newtext' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+     'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_replace' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+        };
+}
+# @return FilesResult
+#
+sub post_replace {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'file' is set
+    unless (exists $args{'file'}) {
+      croak("Missing the required parameter 'file' when calling post_replace");
+    }
+
+    # verify the required parameter 'text' is set
+    unless (exists $args{'text'}) {
+      croak("Missing the required parameter 'text' when calling post_replace");
+    }
+    unless (exists $args{'newtext'}) {
+      croak("Missing the required parameter 'newtext' when calling post_replace");
+    }
+    # parse inputs
+    my $_resource_path = '/cells/replace';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if ( exists $args{'text'}) {
+        $query_params->{'text'} = $self->{api_client}->to_query_value($args{'text'});
+    }
+    if ( exists $args{'newtext'}) {
+        $query_params->{'newtext'} = $self->{api_client}->to_query_value($args{'newtext'});
+    }
+    if ( exists $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+    if ( exists $args{'sheet_name'}) {
+        $query_params->{'sheetName'} = $self->{api_client}->to_query_value($args{'sheet_name'});
+    }        
+    if ( exists $args{'file'} ) {   
+        my $map_file =$args{'file'};
+        while ( my ($filename,$value) = each( %$map_file ) ) {
+             $form_params->{$filename} = [$value ,$filename,'application/octet-stream'];
+        }
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
 1;

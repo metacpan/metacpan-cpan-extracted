@@ -17,6 +17,7 @@ lib/App/Yath.pm
 lib/App/Yath/Command.pm
 lib/App/Yath/Command/auditor.pm
 lib/App/Yath/Command/collector.pm
+lib/App/Yath/Command/do.pm
 lib/App/Yath/Command/failed.pm
 lib/App/Yath/Command/help.pm
 lib/App/Yath/Command/init.pm
@@ -209,6 +210,7 @@ t/integration/reload.t
 t/integration/reload/lib/Preload.pm
 t/integration/reload/lib/Preload/A.pm
 t/integration/reload/lib/Preload/B.pm
+t/integration/reload/lib/Preload/Churn.pm
 t/integration/reload/lib/Preload/ExceptionA.pm
 t/integration/reload/lib/Preload/ExceptionB.pm
 t/integration/reload/lib/Preload/ExporterA.pm

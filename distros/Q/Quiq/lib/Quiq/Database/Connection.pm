@@ -1,3 +1,24 @@
+# -----------------------------------------------------------------------------
+
+=encoding utf8
+
+=head1 NAME
+
+Quiq::Database::Connection - Verbindung zu einer Relationalen Datenbank
+
+=head1 BASE CLASS
+
+L<Quiq::Hash>
+
+=head1 DESCRIPTION
+
+Ein Objekt der Klasse repräsentiert eine Verbindung zu einer
+Relationalen Datenbank.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
 package Quiq::Database::Connection;
 use base qw/Quiq::Hash/;
 
@@ -6,7 +27,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.195';
+our $VERSION = '1.196';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -28,21 +49,6 @@ use Quiq::Database::ResultSet;
 use Quiq::Parameters;
 
 # -----------------------------------------------------------------------------
-
-=encoding utf8
-
-=head1 NAME
-
-Quiq::Database::Connection - Verbindung zu einer Relationalen Datenbank
-
-=head1 BASE CLASS
-
-L<Quiq::Hash>
-
-=head1 DESCRIPTION
-
-Ein Objekt der Klasse repräsentiert eine Verbindung zu einer
-Relationalen Datenbank.
 
 =head1 METHODS
 
@@ -90,7 +96,7 @@ Name der Sql-Klasse zur Statementgenerierung.
 
 Aktiviere oder deaktiviere automatische Fehlerbehandlung.
 
-=item -utf8 => $bool (Default: 0)
+=item -utf8 => $bool (Default: 1)
 
 Definiere das clientseitige Character Encoding als UTF-8.
 
@@ -124,7 +130,7 @@ sub new {
     my $logfile = '-';
     my $sqlClass = undef;
     my $strict = undef;
-    my $utf8 = undef;
+    my $utf8 = 1;
 
     Quiq::Option->extract(\@_,
         -autoCommit => \$autoCommit,
@@ -539,7 +545,7 @@ sub dbms {
 
 =head4 Synopsis
 
-  ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $db->dbmsTestVector;
+  ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql,$jdbc) = $db->dbmsTestVector;
 
 =cut
 
@@ -673,6 +679,27 @@ sonst "falsch".
 
 sub isMSSQL {
     return shift->{'sqlObj'}->isMSSQL;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 isJDBC() - Prüfe auf JDBC-DBMS
+
+=head4 Synopsis
+
+  $bool = $db->isJDBC;
+
+=head4 Description
+
+Liefere "wahr", wenn die Datenbank eine JDBC-Datenbank ist,
+sonst "falsch".
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub isJDBC {
+    return shift->{'sqlObj'}->isJDBC;
 }
 
 # -----------------------------------------------------------------------------
@@ -2524,7 +2551,10 @@ sub loadRow {
             }
         }
         if ($lookup) {
-            return $self->lookup($table,-where,@_);
+            my $row = $self->lookup($table,-sloppy=>1,-where,@_);
+            if ($row) {
+                return $row;
+            }
         }
     }
 
@@ -5455,7 +5485,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

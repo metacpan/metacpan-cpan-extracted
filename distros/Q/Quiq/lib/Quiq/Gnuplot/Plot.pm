@@ -1,16 +1,3 @@
-package Quiq::Gnuplot::Plot;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Gnuplot::Graph;
-use Quiq::Gnuplot::Arrow;
-use Quiq::Gnuplot::Label;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -26,6 +13,25 @@ L<Quiq::Hash>
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert einen Plot.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gnuplot::Plot;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Gnuplot::Graph;
+use Quiq::Gnuplot::Arrow;
+use Quiq::Gnuplot::Label;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -243,7 +249,7 @@ sub graphsWithData {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -1,17 +1,3 @@
-package Quiq::Table;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash;
-use Quiq::Properties;
-use Quiq::TableRow;
-use Quiq::AnsiColor;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -97,6 +83,26 @@ ausgegeben.
 =head1 EXAMPLE
 
 Siehe quiq-ls
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Table;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash;
+use Quiq::Properties;
+use Quiq::TableRow;
+use Quiq::AnsiColor;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -588,7 +594,7 @@ sub asText {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

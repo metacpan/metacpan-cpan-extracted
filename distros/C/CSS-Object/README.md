@@ -1,156 +1,285 @@
-# NAME
+SYNOPSIS
+========
 
-CSS::Object - CSS Object Oriented
+        use CSS::Object;
 
-# SYNOPSIS
+VERSION
+=======
 
-    use CSS::Object;
+        v0.1.3
 
-# VERSION
+DESCRIPTION
+===========
 
-    v0.1.1
+[CSS::Object](https://metacpan.org/pod/CSS::Object){.perl-module} is a
+object oriented CSS parser and manipulation interface.
 
-# DESCRIPTION
+CONSTRUCTOR
+===========
 
-[CSS::Object](https://metacpan.org/pod/CSS%3A%3AObject) is a object oriented CSS parser and manipulation interface.
+new
+---
 
-# CONSTRUCTOR
+To instantiate a new
+[CSS::Object](https://metacpan.org/pod/CSS::Object){.perl-module}
+object, pass an hash reference of following parameters:
 
-## new
+*debug*
 
-To instantiate a new [CSS::Object](https://metacpan.org/pod/CSS%3A%3AObject) object, pass an hash reference of following parameters:
+:   This is an integer. The bigger it is and the more verbose is the
+    output.
 
-- _debug_
+*format*
 
-    This is an integer. The bigger it is and the more verbose is the output.
+:   This is a
+    [CSS::Object::Format](https://metacpan.org/pod/CSS::Object::Format){.perl-module}
+    object or one of its child modules.
 
-- _format_
+*parser*
 
-    This is a [CSS::Object::Format](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AFormat) object or one of its child modules.
+:   This is a
+    [CSS::Object::Parser](https://metacpan.org/pod/CSS::Object::Parser){.perl-module}
+    object or one of its child modules.
 
-- _parser_
+EXCEPTION HANDLING
+==================
 
-    This is a [CSS::Object::Parser](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AParser) object or one of its child modules.
+Whenever an error has occurred,
+[CSS::Object](https://metacpan.org/pod/CSS::Object){.perl-module} will
+set a
+[Module::Generic::Exception](https://metacpan.org/pod/Module::Generic::Exception){.perl-module}
+object containing the detail of the error and return undef.
 
-# EXCEPTION HANDLING
+The error object can be retrieved with the inherited [\"error\" in
+Module::Generic](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+method. For example:
 
-Whenever an error has occurred, [CSS::Object](https://metacpan.org/pod/CSS%3A%3AObject) will set a [Module::Generic::Exception](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException) object containing the detail of the error and return undef.
+        my $css = CSS::Object->new( debug => 3 ) || die( CSS::Object->error );
 
-The error object can be retrieved with the inherited ["error" in Module::Generic](https://metacpan.org/pod/Module%3A%3AGeneric#error) method. For example:
+METHODS
+=======
 
-    my $css = CSS::Object->new( debug => 3 ) || die( CSS::Object->error );
+add\_element
+------------
 
-# METHODS
+Provided with a
+[CSS::Object::Element](https://metacpan.org/pod/CSS::Object::Element){.perl-module}
+object and this adds it to the list of css elements.
 
-## add\_element
+It uses an array object [\"elements\"](#elements){.perl-module} which is
+an
+[Module::Generic::Array](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
+object.
 
-Provided with a [CSS::Object::Element](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AElement) object and this adds it to the list of css elements.
+add\_rule
+---------
 
-It uses an array object ["elements"](#elements) which is an [Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) object.
+Provided with a
+[CSS::Object::Rule](https://metacpan.org/pod/CSS::Object::Rule){.perl-module}
+object and this adds it to our list of rules. It returns the rule object
+that was added.
 
-## add\_rule
+as\_string
+----------
 
-Provided with a [CSS::Object::Rule](https://metacpan.org/pod/CSS%3A%3AObject%3A%3ARule) object and this adds it to our list of rules. It returns the rule object that was added.
+This will return the css data structure, currently registered, as a
+string.
 
-## as\_string
+It takes an optional
+[CSS::Object::Format](https://metacpan.org/pod/CSS::Object::Format){.perl-module}
+object as a parameter, to control the output. If none are provided, it
+will use the default one calling [\"format\"](#format){.perl-module}
 
-This will return the css data structure, currently registered, as a string.
+builder
+-------
 
-It takes an optional [CSS::Object::Format](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AFormat) object as a parameter, to control the output. If none are provided, it will use the default one calling ["format"](#format)
+This returns a new
+[CSS::Object::Builder](https://metacpan.org/pod/CSS::Object::Builder){.perl-module}
+object.
 
-## builder
+charset
+-------
 
-This returns a new [CSS::Object::Builder](https://metacpan.org/pod/CSS%3A%3AObject%3A%3ABuilder) object.
+This sets or gets the css charset. It stores the value in a
+[Module::Generic::Scalar](https://metacpan.org/pod/Module::Generic::Scalar){.perl-module}
+object.
 
-## charset
+elements
+--------
 
-This sets or gets the css charset. It stores the value in a [Module::Generic::Scalar](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AScalar) object.
+Sets or gets the array of CSS elements. This is a
+[Module::Generic::Array](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
+object that accepts only
+[CSS::Object::Element](https://metacpan.org/pod/CSS::Object::Element){.perl-module}
+objects or its child classes, such as
+[CSS::Object::Rule](https://metacpan.org/pod/CSS::Object::Rule){.perl-module},
+[CSS::Object::Comment](https://metacpan.org/pod/CSS::Object::Comment){.perl-module},
+etc
 
-## elements
+format
+------
 
-Sets or gets the array of CSS elements. This is a [Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) object that accepts only [CSS::Object::Element](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AElement) objects or its child classes, such as [CSS::Object::Rule](https://metacpan.org/pod/CSS%3A%3AObject%3A%3ARule), [CSS::Object::Comment](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AComment), etc
+Sets or gets a
+[CSS::Object::Format](https://metacpan.org/pod/CSS::Object::Format){.perl-module}
+object. See [\"as\_string\"](#as_string){.perl-module} below for more
+detail about their use.
 
-## format
+[CSS::Object::Format](https://metacpan.org/pod/CSS::Object::Format){.perl-module}
+objects control the stringification of the css structure. By default, it
+will return the data in a string identical or at least very similar to
+the one parsed if it was parsed.
 
-Sets or gets a [CSS::Object::Format](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AFormat) object. See ["as\_string"](#as_string) below for more detail about their use.
+get\_rule\_by\_selector
+-----------------------
 
-[CSS::Object::Format](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AFormat) objects control the stringification of the css structure. By default, it will return the data in a string identical or at least very similar to the one parsed if it was parsed.
+Provided with a selector and this returns a
+[CSS::Object::Rule](https://metacpan.org/pod/CSS::Object::Rule){.perl-module}
+object or an empty string.
 
-## get\_rule\_by\_selector
+Hoever, if this method is called in an object context, such as chaining,
+then it returns a
+[Module::Generic::Null](https://metacpan.org/pod/Module::Generic::Null){.perl-module}
+object instead of an empty string to prevent the perl error of
+`xxx method called on an undefined value`. For example:
 
-Provided with a selector and this returns a [CSS::Object::Rule](https://metacpan.org/pod/CSS%3A%3AObject%3A%3ARule) object or an empty string.
+        $css->get_rule_by_selector( '.does-not-exists' )->add_element( $elem ) ||
+        die( "Unable to add css element to rule \".does-not-exists\": ", $css->error );
 
-## load\_parser
+But, in a non-object context, such as:
 
-This will instantiate a new object based on the parser name specified with ["parser"](#parser) or during css object instantiation.
+        my $rule = $css->get_rule_by_selector( '.does-not-exists' ) ||
+        die( "Unable to add css element to rule \".does-not-exists\": ", $css->error );
 
-It returns a new [CSS::Object::Parser](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AParser) object, or one of its child module matching the ["parser"](#parser) specified.
+[\"get\_rule\_by\_selector\"](#get_rule_by_selector){.perl-module} will
+return an empty value.
 
-## new\_comment
+load\_parser
+------------
 
-This returns a new [CSS::Object::Comment](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AComment) object and pass its instantiation method the provided arguments.
+This will instantiate a new object based on the parser name specified
+with [\"parser\"](#parser){.perl-module} or during css object
+instantiation.
 
-    return( $css->new_comment( $array_ref_of_comment_ilnes ) );
+It returns a new
+[CSS::Object::Parser](https://metacpan.org/pod/CSS::Object::Parser){.perl-module}
+object, or one of its child module matching the
+[\"parser\"](#parser){.perl-module} specified.
 
-## new\_property
+new\_comment
+------------
 
-This takes a property name, and an optional value o array of values and return a new [CSS::Object::Property](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AProperty) object
+This returns a new
+[CSS::Object::Comment](https://metacpan.org/pod/CSS::Object::Comment){.perl-module}
+object and pass its instantiation method the provided arguments.
 
-## new\_rule
+        return( $css->new_comment( $array_ref_of_comment_ilnes ) );
 
-This returns a new [CSS::Object::Rule](https://metacpan.org/pod/CSS%3A%3AObject%3A%3ARule) object.
+new\_property
+-------------
 
-## new\_selector
+This takes a property name, and an optional value o array of values and
+return a new
+[CSS::Object::Property](https://metacpan.org/pod/CSS::Object::Property){.perl-module}
+object
 
-This takes a selector name and returns a new [CSS::Object::Selector](https://metacpan.org/pod/CSS%3A%3AObject%3A%3ASelector) object.
+new\_rule
+---------
 
-## new\_value
+This returns a new
+[CSS::Object::Rule](https://metacpan.org/pod/CSS::Object::Rule){.perl-module}
+object.
 
-This takes a property value and returns a new [CSS::Object::Value](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AValue) object.
+new\_selector
+-------------
 
-## parse\_string
+This takes a selector name and returns a new
+[CSS::Object::Selector](https://metacpan.org/pod/CSS::Object::Selector){.perl-module}
+object.
 
-Provided with some css data and this will instantiate the ["parser"](#parser), call ["parse\_string" in CSS::Object::Parser](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AParser#parse_string) and returns an array of [CSS::Object::Rule](https://metacpan.org/pod/CSS%3A%3AObject%3A%3ARule) objects. The array is an array object from [Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) and can be used as a regular array or as an object.
+new\_value
+----------
 
-## parser
+This takes a property value and returns a new
+[CSS::Object::Value](https://metacpan.org/pod/CSS::Object::Value){.perl-module}
+object.
 
-Sets or gets the [CSS::Object::Parser](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AParser) object to be used by ["parse\_string"](#parse_string) to parse css data.
+parse\_string
+-------------
 
-A valid parser object can be from [CSS::Object::Parser](https://metacpan.org/pod/CSS%3A%3AObject%3A%3AParser) or any of its sub modules.
+Provided with some css data and this will instantiate the
+[\"parser\"](#parser){.perl-module}, call [\"parse\_string\" in
+CSS::Object::Parser](https://metacpan.org/pod/CSS::Object::Parser#parse_string){.perl-module}
+and returns an array of
+[CSS::Object::Rule](https://metacpan.org/pod/CSS::Object::Rule){.perl-module}
+objects. The array is an array object from
+[Module::Generic::Array](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
+and can be used as a regular array or as an object.
+
+parser
+------
+
+Sets or gets the
+[CSS::Object::Parser](https://metacpan.org/pod/CSS::Object::Parser){.perl-module}
+object to be used by [\"parse\_string\"](#parse_string){.perl-module} to
+parse css data.
+
+A valid parser object can be from
+[CSS::Object::Parser](https://metacpan.org/pod/CSS::Object::Parser){.perl-module}
+or any of its sub modules.
 
 It returns the current parser object.
 
-## purge
+purge
+-----
 
-This empties the array containing all the [CSS::Object::Rule](https://metacpan.org/pod/CSS%3A%3AObject%3A%3ARule) objects.
+This empties the array containing all the
+[CSS::Object::Rule](https://metacpan.org/pod/CSS::Object::Rule){.perl-module}
+objects.
 
-## read\_file
+read\_file
+----------
 
-Provided with a css file, and this will load it into memory and parse it using the parser name registered with ["parser"](#parser).
+Provided with a css file, and this will load it into memory and parse it
+using the parser name registered with
+[\"parser\"](#parser){.perl-module}.
 
-It can also take an array reference of css files who will be each fed to ["read\_file"](#read_file)
+It can also take an array reference of css files who will be each fed to
+[\"read\_file\"](#read_file){.perl-module}
 
-It returns the [CSS::Object](https://metacpan.org/pod/CSS%3A%3AObject) used to call this method.
+It returns the
+[CSS::Object](https://metacpan.org/pod/CSS::Object){.perl-module} used
+to call this method.
 
-## read\_string
+read\_string
+------------
 
-Provided with some css data, and this will call ["parse\_string"](#parse_string). It also accepts an array reference of data.
+Provided with some css data, and this will call
+[\"parse\_string\"](#parse_string){.perl-module}. It also accepts an
+array reference of data.
 
 It returns the css object used to call this method.
 
-## rules
+rules
+-----
 
-This sets or gets the [Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) object used to store all the [CSS::Object::Rule](https://metacpan.org/pod/CSS%3A%3AObject%3A%3ARule) objects.
+This sets or gets the
+[Module::Generic::Array](https://metacpan.org/pod/Module::Generic::Array){.perl-module}
+object used to store all the
+[CSS::Object::Rule](https://metacpan.org/pod/CSS::Object::Rule){.perl-module}
+objects.
 
-# AUTHOR
+AUTHOR
+======
 
-Jacques Deguest <`jack@deguest.jp`>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55cf7803bcd0)"}\>
 
-# SEE ALSO
+SEE ALSO
+========
 
-[CSS::Object](https://metacpan.org/pod/CSS%3A%3AObject)
+[CSS::Object](https://metacpan.org/pod/CSS::Object){.perl-module}
 
-# COPYRIGHT & LICENSE
+COPYRIGHT & LICENSE
+===================
 
 Copyright (c) 2020 DEGUEST Pte. Ltd.
 

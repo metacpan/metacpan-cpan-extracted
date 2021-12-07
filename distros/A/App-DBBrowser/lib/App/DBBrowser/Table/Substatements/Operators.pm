@@ -3,7 +3,7 @@ App::DBBrowser::Table::Substatements::Operators;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use List::MoreUtils qw( any );
 
@@ -29,7 +29,7 @@ sub build_having_col {
     my ( $sf, $sql, $aggr ) = @_;
     my $quote_aggr;
     if ( any { '@' . $_ eq $aggr } @{$sql->{aggr_cols}} ) {
-        ( $quote_aggr = $aggr ) =~ s/^\@//;
+        $quote_aggr = $aggr =~ s/^\@//r;
         $sql->{having_stmt} .= ' ' . $quote_aggr;
     }
     elsif ( $aggr eq 'COUNT(*)' ) {

@@ -1,10 +1,11 @@
-#define CATCH_CONFIG_EXTERNAL_INTERFACES
 #include "test.h"
 #include <panda/log.h>
+#include <catch2/reporters/catch_reporter_registrars.hpp>
+#include <catch2/reporters/catch_reporter_event_listener.hpp>
 
 namespace test {
-    struct MyListener : Catch::TestEventListenerBase {
-        using TestEventListenerBase::TestEventListenerBase;
+    struct MyListener : Catch::EventListenerBase {
+        using EventListenerBase::EventListenerBase;
 
         void testRunStarting (Catch::TestRunInfo const&) override {
             panda::log::set_level(panda::log::Level::Warning);

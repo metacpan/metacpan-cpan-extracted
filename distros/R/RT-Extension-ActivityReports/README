@@ -36,6 +36,8 @@ DESCRIPTION
 RT VERSION
     Works with RT 4.0, 4.2, 4.4
 
+    Works with RT 5.0, but styling has not yet been updated
+
 INSTALLATION
     perl Makefile.PL
     make

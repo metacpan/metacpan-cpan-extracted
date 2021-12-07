@@ -1,5 +1,8 @@
 Revision history for Perl extension DeltaX.
 
+3.18  Tue Nov 30 10:54:00 2021
+  - get_source() corrected
+
 3.17  Thu Apr 07 16:40:00 2017
   - support autocommit with transactions for Pg
 

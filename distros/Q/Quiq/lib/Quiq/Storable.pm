@@ -1,15 +1,3 @@
-package Quiq::Storable;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Storable ();
-use Quiq::Path;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -26,6 +14,24 @@ L<Quiq::Object>
 
 Die Klasse ist ein objektorientierter Wrapper für das Core-Modul
 Storable, speziell für die Funktionen freeze(), thaw(), clone().
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Storable;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Storable ();
+use Quiq::Path;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -171,7 +177,7 @@ sub memoize {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

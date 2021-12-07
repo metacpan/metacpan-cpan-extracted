@@ -1,19 +1,3 @@
-package Quiq::Math;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use 5.010;
-use Quiq::Formatter;
-use POSIX ();
-use Math::Trig ();
-use Quiq::Math;
-use Scalar::Util ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -25,6 +9,28 @@ Quiq::Math - Mathematische Funktionen
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Math;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use 5.010;
+use Quiq::Formatter;
+use POSIX ();
+use Math::Trig ();
+use Quiq::Math;
+use Scalar::Util ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -705,7 +711,7 @@ sub spikeValue {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

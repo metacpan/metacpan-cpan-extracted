@@ -71,6 +71,8 @@ Params can contain:
 
 =item timeout [=20]
 
+=item connect_timeout [=timeout]
+
 =item follow_redirect [=true]
 
 =item redirection_limit [=20]
@@ -144,6 +146,14 @@ you return. By default it is a reference to undef, you can upgrade it to hash-ba
 =head2 timeout([$timeout])
 
 Get/set timeout for the whole request (connect + sending request + receiving response) in seconds (can be fractional). To disable timeout, set zero.
+
+If time is up, request will finish with error C<UniEvent::SystemError::timed_out>.
+
+
+=head2 connect_timeout([$timeout])
+
+Get/set timeout for the process of connecting to http server (tcp + possible ssl) in seconds (can be fractional). If set to zero, equals to C<timeout()>.
+Should not be greater than C<timeout()>.
 
 If time is up, request will finish with error C<UniEvent::SystemError::timed_out>.
 

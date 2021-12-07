@@ -1,7 +1,14 @@
 Changes
+lib/List/Helpers/XS.pm
+LICENSE
+Makefile
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+pm_to_blib
 README
-XS.xs
+README.md
 t/List-Helpers-XS.t
-lib/List/Helpers/XS.pm
+XS.xs

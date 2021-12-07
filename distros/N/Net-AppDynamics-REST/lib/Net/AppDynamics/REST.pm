@@ -82,7 +82,7 @@ This module makes use of the following roles:  L<HTTP::MultiGet::Role>, L<Log::L
 
 =cut
 
-our $VERSION = "1.007";
+our $VERSION = "1.008";
 
 has USER => (
   is       => 'ro',
@@ -229,7 +229,7 @@ Returns a Data::Result object, when true it contains the Listing of Applications
 
 =cut
 
-=item * Non Blocking context my $id=$self->que_list_applicatinos($cb)
+=item * Non Blocking context my $id=$self->que_list_applications($cb)
 
 Queues a requst to fetch the list of all applications.
 

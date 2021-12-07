@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Command 0.05;
+package Commandable::Command 0.06;
 
 use v5.14;
 use warnings;
@@ -19,7 +19,8 @@ sub new
    my $class = shift;
    my %args = @_;
    $args{arguments} //= [];
-   bless [ @args{qw( name description arguments package code )} ], $class;
+   $args{options}   //= {};
+   bless [ @args{qw( name description arguments options package code )} ], $class;
 }
 
 =head1 ACCESSORS
@@ -49,8 +50,9 @@ A (possibly-empty) list of argument metadata structures.
 sub name        { shift->[0] }
 sub description { shift->[1] }
 sub arguments   { @{ shift->[2] } }
-sub package     { shift->[3] }
-sub code        { shift->[4] }
+sub options     { %{ shift->[3] } }
+sub package     { shift->[4] }
+sub code        { shift->[5] }
 
 =head1 METHODS
 
@@ -75,7 +77,44 @@ sub parse_invocation
 
    my @args;
 
-   # TODO: options parsing here
+   if( my %optspec = $self->options ) {
+      push @args, my $opts = {};
+      my @remaining;
+
+      while( defined( my $token = $cinv->pull_token ) ) {
+         last if $token eq "--";
+
+         my $spec;
+         my $value_in_token;
+
+         if( $token =~ s/^--([^=]+)(=|$)// ) {
+            $spec = $optspec{$1} or die "Unrecognised option name --$1\n";
+            $value_in_token = length $2;
+         }
+         elsif( $token =~ s/^-(.)// ) {
+            $spec = $optspec{$1} or die "Unrecognised option name -$1\n";
+            $value_in_token = length $token;
+         }
+         else {
+            push @remaining, $token;
+            next;
+         }
+
+         my $value = 1;
+         if( $spec->mode eq "value" ) {
+            $value = $value_in_token ? $token
+                                     : ( $cinv->pull_token // die "Expected value for option --".$spec->name."\n" );
+         }
+
+         $opts->{ $spec->name } = $value;
+      }
+
+      $cinv->putback_tokens( @remaining );
+
+      foreach my $spec ( values %optspec ) {
+         $opts->{ $spec->name } //= $spec->default if defined $spec->default;
+      }
+   }
 
    foreach my $argspec ( $self->arguments ) {
       my $val = $cinv->pull_token;
@@ -107,6 +146,25 @@ sub new
 sub name        { shift->[0] }
 sub description { shift->[1] }
 sub optional    { shift->[2] }
+
+package # hide
+   Commandable::Command::_Option;
+
+sub new
+{
+   my $class = shift;
+   my %args = @_;
+   $args{mode} = "value" if $args{name} =~ s/:$//;
+   my @names = split m/\|/, delete $args{name};
+   $args{mode} //= "set";
+   bless [ \@names, @args{qw( description mode default )} ], $class;
+}
+
+sub name        { shift->[0]->[0] }
+sub names       { @{ shift->[0] } }
+sub description { shift->[1] }
+sub mode        { shift->[2] }
+sub default     { shift->[3] }
 
 =head1 AUTHOR
 

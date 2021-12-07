@@ -70,7 +70,8 @@ EOPERL
       }
    }
 
-   class TrivialSubclass :isa(WithAdjustParams) {}
+   # Test whitespace trimming
+   class TrivialSubclass :isa( WithAdjustParams ) {}
 
    TrivialSubclass->new( param => "value" );
    is( $param, "value", 'ADJUSTPARAMS still invoked on superclass' );

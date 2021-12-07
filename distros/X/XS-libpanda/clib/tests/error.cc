@@ -1,7 +1,7 @@
 #include "test.h"
 #include <panda/error.h>
 
-#define TEST(name) TEST_CASE("error: " name, "[error]")
+TEST_PREFIX("error: ", "[error]");
 
 enum MyErr {
     Err1 = 1,

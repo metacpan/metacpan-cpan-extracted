@@ -58,7 +58,7 @@ SKIP: {
     my @answer = $p2->answer;
     cmp_ok( scalar( @answer ), '<=', 6, 'at most 6 NS records in answer (iis.se)' );
     cmp_ok( scalar( @answer ), '>=', 2, 'at least 2 NS records in answer (iis.se)' );
-    my %known_ns = map { $_ => 1 } qw[ns.nic.se. i.ns.se. ns3.nic.se.];
+    my %known_ns = map { $_ => 1 } qw[nsp.dnsnode.net. nsa.dnsnode.net. nsu.dnsnode.net.];
     foreach my $rr ( @answer ) {
         isa_ok( $rr, 'Zonemaster::LDNS::RR::NS' );
         is( lc($rr->owner), 'iis.se.', 'expected owner name' );

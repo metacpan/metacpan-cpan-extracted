@@ -1,5 +1,6 @@
 package SDL2::stdinc 0.01 {
-    use strictures 2;
+    use strict;
+    use warnings;
     use experimental 'signatures';
     use SDL2::Utils;
     #

@@ -41,6 +41,7 @@ do { my $x = {
                                    'Perl::Tidy::Sweetened' => '1.18',
                                    'Pod::Tidy' => '0.10',
                                    'Test::Code::TidyAll' => '0.78',
+                                   'Test::Exception' => '0',
                                    'Test::More' => '0',
                                    'lib' => '0'
                                  }

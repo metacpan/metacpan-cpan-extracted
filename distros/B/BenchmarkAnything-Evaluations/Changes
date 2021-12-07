@@ -1,5 +1,8 @@
 Revision history for BenchmarkAnything-Evaluations
 
+0.004     2021-12-01
+        - switch from PDLA to PDL
+
 0.003     2016-04-25
         - provide raw text (what once used to be just verbose output)
 

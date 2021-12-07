@@ -1,15 +1,3 @@
-package Quiq::File::Audio;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Shell;
-use Quiq::Path;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -21,6 +9,24 @@ Quiq::File::Audio - Informationen über Audio-Datei
 =head1 BASE CLASS
 
 L<Quiq::Hash>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::File::Audio;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Shell;
+use Quiq::Path;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -306,7 +312,7 @@ sub extractMetaData {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

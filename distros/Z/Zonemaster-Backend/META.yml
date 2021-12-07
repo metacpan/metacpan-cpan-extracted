@@ -8,6 +8,7 @@ build_requires:
   Test::NoWarnings: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
+  Locale::Msgfmt: 0.15
 distribution_type: module
 dynamic_config: 1
 generated_by: 'Module::Install version 1.19'
@@ -35,11 +36,13 @@ requires:
   HTML::Entities: 0
   JSON::PP: 0
   JSON::RPC: 1.01
-  JSON::Validator: 3.12
+  JSON::Validator: 4
   LWP::UserAgent: 0
+  Locale::TextDomain: 1.2
   Log::Any: 0
   Log::Any::Adapter::Dispatch: 0
   Log::Dispatch: 0
+  Mojolicious: 7.28
   Moose: 2.04
   Parallel::ForkManager: 1.12
   Plack::Builder: 0
@@ -49,11 +52,11 @@ requires:
   Starman: 0
   String::ShellQuote: 0
   Try::Tiny: 0.12
-  Zonemaster::Engine: 4.002
+  Zonemaster::Engine: 4.003
   Zonemaster::LDNS: 2.002
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-backend/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-backend
-version: 7.0.0
+version: 8.0.0

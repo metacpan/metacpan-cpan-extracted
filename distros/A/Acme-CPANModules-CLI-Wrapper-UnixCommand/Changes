@@ -1,3 +1,10 @@
+0.007   2021-11-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entries: App::CpMvUtils, App::ImageMagickUtils.
+
+	- Mention related list: Acme::CPANModules::GrepVariants.
+
+
 0.006   2021-07-12  Released-By: PERLANCAR; Urgency: medium
 
 	- Add entry: App::DiffPDFText.

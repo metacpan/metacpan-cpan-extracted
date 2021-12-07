@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211829;
+our $VERSION = 1.20211206222443;
 
 my $formatters = [
                 {
@@ -90,43 +90,43 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2252121", "Abidjan\-sud",
+$areanames{fr} = {};
+$areanames{en} = {"2252720", "Plateau\,\ Abidjan",
 "2252133", "Man",
-"2252136", "Korhogo",
-"2252120", "Plateau\,\ Abidjan",
-"2252721", "Abidjan\-sud",
-"2252733", "Man",
-"2252736", "Korhogo",
-"2252720", "Plateau\,\ Abidjan",
-"2252521", "Abidjan\-sud",
-"2252533", "Man",
-"2252536", "Korhogo",
-"2252520", "Plateau\,\ Abidjan",
-"2252724", "Abobo\,\ Abidjan",
-"2252535", "Abengourou",
-"2252124", "Abobo\,\ Abidjan",
-"2252522", "Cocody\,\ Abidjan",
-"2252135", "Abengourou",
-"2252722", "Cocody\,\ Abidjan",
-"2252735", "Abengourou",
-"2252524", "Abobo\,\ Abidjan",
-"2252122", "Cocody\,\ Abidjan",
-"2252132", "Daloa",
-"2252534", "San\-Pédro",
-"2252732", "Daloa",
-"2252532", "Daloa",
-"2252134", "San\-Pédro",
-"2252734", "San\-Pédro",
+"2252121", "Abidjan\-sud",
 "2252530", "Yamoussoukro",
-"2252531", "Bouaké",
-"2252523", "Banco\,\ Abidjan",
-"2252730", "Yamoussoukro",
-"2252731", "Bouaké",
+"2252732", "Daloa",
+"2252135", "Abengourou",
+"2252522", "Cocody\,\ Abidjan",
+"2252134", "San\-Pédro",
+"2252533", "Man",
+"2252521", "Abidjan\-sud",
 "2252723", "Banco\,\ Abidjan",
 "2252130", "Yamoussoukro",
+"2252731", "Bouaké",
+"2252736", "Korhogo",
+"2252724", "Abobo\,\ Abidjan",
+"2252122", "Cocody\,\ Abidjan",
+"2252535", "Abengourou",
+"2252534", "San\-Pédro",
+"2252531", "Bouaké",
+"2252523", "Banco\,\ Abidjan",
+"2252721", "Abidjan\-sud",
+"2252733", "Man",
+"2252120", "Plateau\,\ Abidjan",
+"2252735", "Abengourou",
+"2252734", "San\-Pédro",
+"2252536", "Korhogo",
+"2252524", "Abobo\,\ Abidjan",
+"2252132", "Daloa",
+"2252131", "Bouaké",
 "2252123", "Banco\,\ Abidjan",
-"2252131", "Bouaké",};
-$areanames{fr} = {};
+"2252730", "Yamoussoukro",
+"2252520", "Plateau\,\ Abidjan",
+"2252722", "Cocody\,\ Abidjan",
+"2252136", "Korhogo",
+"2252532", "Daloa",
+"2252124", "Abobo\,\ Abidjan",};
 
     sub new {
       my $class = shift;

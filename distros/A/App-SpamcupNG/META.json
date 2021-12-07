@@ -66,6 +66,7 @@
             "Perl::Tidy::Sweetened" : "1.18",
             "Pod::Tidy" : "0.10",
             "Test::Code::TidyAll" : "0.78",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "lib" : "0"
          }
@@ -74,11 +75,11 @@
    "provides" : {
       "App::SpamcupNG" : {
          "file" : "lib/App/SpamcupNG.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::SpamcupNG::HTMLParse" : {
          "file" : "lib/App/SpamcupNG/HTMLParse.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -93,10 +94,10 @@
          "web" : "https://github.com/glasswalk3r/App-SpamcupNG"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030002"
+         "version" : "5.035005"
       },
       "plugins" : [
          {
@@ -409,7 +410,7 @@
          "version" : "6.024"
       }
    },
-   "x_generated_by_perl" : "v5.30.2",
+   "x_generated_by_perl" : "v5.35.5",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "GPL-3.0-only"
 }

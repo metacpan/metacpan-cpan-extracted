@@ -9,11 +9,12 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.161',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.162',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
                                       'Data::Validate::Domain' => '0',
+                                      'DateTime::Format::RFC3339' => '0',
                                       'Email::Address::XS' => '1.04',
                                       'Encode' => '0',
                                       'File::Spec' => '0',
@@ -79,6 +80,7 @@ do { my $x = {
                                       'Class::XSAccessor' => '0',
                                       'Cpanel::JSON::XS' => '0',
                                       'Data::Validate::Domain' => '0',
+                                      'DateTime::Format::RFC3339' => '0',
                                       'Email::Address::XS' => '1.04',
                                       'Net::IDN::Encode' => '0',
                                       'Ref::Util::XS' => '0',

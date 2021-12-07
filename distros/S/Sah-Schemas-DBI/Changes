@@ -1,3 +1,11 @@
+0.005   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          properly list schemas in distribution.
+
+
 0.004   2020-03-08  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

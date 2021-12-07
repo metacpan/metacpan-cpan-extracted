@@ -23,6 +23,9 @@ qx.Class.define("callbackery.ui.TabView", {
             var page = tabMap[cfg.name]
                 = new callbackery.ui.Page(cfg);
             this.add(page);
+            qx.core.Id.getInstance().register(page, cfg.name);
+            page.setQxObjectId(cfg.name);
+            page.addOwnedQxObject(page.getButton(), 'TabButton');
         },this);
         var initialPlugin = tabMap[baseCfg.initial_plugin];
         // #app=pluginKey

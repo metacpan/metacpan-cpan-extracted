@@ -128,8 +128,7 @@ sub parse_string
             return( $self->error( "Invalid or unexpected style data '$_'" ) );
         }
         # $self->message( 3, "Adding rule object for \$1 = '$1' and \$2 = '$2'." );
-        my $rule = $self->add_rule( $1, $2 );
-        return if( !defined( $rule ) );
+        my $rule = $self->add_rule( $1, $2 ) || return( $self->pass_error );
         $rules->push( $rule );
     }   
     return( $rules );

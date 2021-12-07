@@ -19,7 +19,7 @@ name: App-GrepUtils
 provides:
   App::GrepUtils:
     file: lib/App/GrepUtils.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Getopt::Long: '2.50'
   IPC::System::Options: '0.339'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GrepUtils
   homepage: https://metacpan.org/release/App-GrepUtils
   repository: git://github.com/perlancar/perl-App-GrepUtils.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

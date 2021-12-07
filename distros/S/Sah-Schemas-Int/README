@@ -2,8 +2,11 @@ NAME
     Sah::Schemas::Int - Sah schemas for various integers
 
 VERSION
-    This document describes version 0.075 of Sah::Schemas::Int (from Perl
-    distribution Sah-Schemas-Int), released on 2020-05-21.
+    This document describes version 0.076 of Sah::Schemas::Int (from Perl
+    distribution Sah-Schemas-Int), released on 2021-07-16.
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 SAH SCHEMAS
     *   byte
@@ -124,6 +127,10 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Sah::Schemas::IntRange
+
+    Sah::PSchemas::IntRange
+
     Sah - specification
 
     Data::Sah
@@ -132,7 +139,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018, 2017, 2016, 2014 by
+    This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

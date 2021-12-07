@@ -39,12 +39,10 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
             var that = this;
             var rpc = callbackery.data.Server.getInstance();
             var currentFormData = this._form.getData();
-            // console.log('_loadData(): currentFormData=', currentFormData);
             var busy = callbackery.ui.Busy.getInstance();
             busy.show(this.tr('Loading Card Data'));
             this._loading++;
             rpc.callAsync(function(data,exc){
-                // console.log('exc=', exc, ', data=', data);
                 if (!exc){
                     that.setData(data,true);
                     if (that._hasTrigger) {

@@ -3,7 +3,7 @@ App::DBBrowser::Union;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use List::MoreUtils qw( any );
 
@@ -203,7 +203,7 @@ sub __union_all_tables {
             $union->{subselect_data} = [];
             return;
         }
-        ( my $union_table = $menu->[$idx_tbl] ) =~ s/^-\s//;
+        my $union_table = $menu->[$idx_tbl] =~ s/^-\s//r;
         my $qt_union_table = $ax->quote_table( $sf->{d}{tables_info}{$union_table} );
         my $ok = $sf->__union_table_columns( $union, $union_table, $qt_union_table );
         if ( $ok ) {

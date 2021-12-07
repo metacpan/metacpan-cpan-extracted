@@ -2,7 +2,7 @@
 #include <panda/string.h>
 #include <panda/from_chars.h>
 
-#define TEST(name) TEST_CASE("to_chars: " name, "[to_chars]")
+TEST_PREFIX("to_chars: ", "[to_chars]");
 
 struct Exc : std::exception {};
 

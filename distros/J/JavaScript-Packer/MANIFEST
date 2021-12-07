@@ -32,5 +32,15 @@ t/scripts/s12-expected.js
 t/scripts/s12.js
 t/scripts/s13-expected.js
 t/scripts/s13.js
+t/scripts/s14-expected.js
+t/scripts/s14.js
+t/scripts/s15-expected.js
+t/scripts/s15.js
+t/scripts/s16-expected.js
+t/scripts/s16.js
+t/scripts/s17-expected.js
+t/scripts/s17.js
+t/scripts/s18-expected.js
+t/scripts/s18.js
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,16 @@
+^\.cover
+^\.git
+^\.travis.yml
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^blib/
+^MakeMaker-\d
+^MYMETA\.
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+^#.*#$
+^\.#

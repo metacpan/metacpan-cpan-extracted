@@ -1,14 +1,14 @@
-# CHECKSUMS file written on Sat Nov 20 21:00:28 2021 GMT by CPAN::Checksums (v2.13)
+# CHECKSUMS file written on Sat Dec  4 09:50:24 2021 GMT by CPAN::Checksums (v2.14)
 $cksum = {
   '00signature.t' => {
-    'cpan_path' => 'CPAN-Checksums/t',
+    'cpan_path' => 't',
     'md5' => '9cf677f32e958d6b4f869387bb6b2f89',
     'mtime' => '2021-11-20',
     'sha256' => '0a7eb8f011b252d11252f9e2629b0509c6031f95564ac2694f9f7b91c1c47d48',
     'size' => 2990
   },
   '42.gz' => {
-    'cpan_path' => 'CPAN-Checksums/t',
+    'cpan_path' => 't',
     'md5' => '915cdde7181ab542763969e063b7a9a9',
     'md5-ungz' => '50a2fabfdd276f573ff97ace8b11c5f4',
     'mtime' => '2014-04-04',
@@ -17,14 +17,14 @@ $cksum = {
     'size' => 26
   },
   '43' => {
-    'cpan_path' => 'CPAN-Checksums/t',
+    'cpan_path' => 't',
     'md5' => 'f0287f33eba7192e2a9c6a14f829aa1a',
-    'mtime' => '2021-11-20',
+    'mtime' => '2021-12-04',
     'sha256' => '0e55092af0746630c98d1b2e0d960617c33f8ea7b55739fd18cb7cd5342a28ca',
     'size' => 3
   },
   '44.bz2' => {
-    'cpan_path' => 'CPAN-Checksums/t',
+    'cpan_path' => 't',
     'md5' => 'b3c551bfbf1d15ce93b47346a11cc87a',
     'md5-unbz2' => 'e760668b6273d38c832c153fde5725da',
     'mtime' => '2014-04-04',
@@ -33,33 +33,33 @@ $cksum = {
     'size' => 39
   },
   '45.tgz' => {
-    'cpan_path' => 'CPAN-Checksums/t',
+    'cpan_path' => 't',
     'md5' => '451f5c94254854f9b50e0e0d815efc25',
     'md5-ungz' => '40b724cf2b5b077219e99409e33f233f',
-    'mtime' => '2016-04-09',
+    'mtime' => '2021-12-03',
     'sha256' => '00a153865e3f7bd5dd0627767a1763404d36fa34793db95ba6d403530d09cdfd',
     'sha256-ungz' => '75e63a955767ae72abf0675e666ae6f3774dce667cb3503d5af6b936ae05a785',
     'size' => 115
   },
   '52podcover.t' => {
-    'cpan_path' => 'CPAN-Checksums/t',
+    'cpan_path' => 't',
     'md5' => '9845f6c5f049d637c92ae34e67328c77',
     'mtime' => '2014-04-04',
     'sha256' => '558d9083fe9dfa6aa66806caf4545bee35f2cac36592627aeed3b8cf0ca4fdf2',
     'size' => 567
   },
   'pod.t' => {
-    'cpan_path' => 'CPAN-Checksums/t',
+    'cpan_path' => 't',
     'md5' => '45b17e11a9736a0c485f861f95f063b9',
     'mtime' => '2014-04-04',
     'sha256' => '6109dadab614d170fc3db10b00a4c41c221860b1b1085a54af9a5f9f52480494',
     'size' => 152
   },
   'updatedir.t' => {
-    'cpan_path' => 'CPAN-Checksums/t',
-    'md5' => '5658ba72bdd2382446a3322377b1af6e',
-    'mtime' => '2021-11-20',
-    'sha256' => '33f8fee0dc894b0e32f6b121a8218bd5115dd2b6c76df625a7f01b0cb10fe601',
-    'size' => 3153
+    'cpan_path' => 't',
+    'md5' => 'ae0611d75e829ff8e7b873787e93a81b',
+    'mtime' => '2021-12-04',
+    'sha256' => '0b20f57520fcbfc97f7fcfee65d6fb155f69c00de6fc161e6d7f2aaa474b22e9',
+    'size' => 3223
   }
 };

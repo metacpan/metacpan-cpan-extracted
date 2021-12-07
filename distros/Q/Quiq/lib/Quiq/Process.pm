@@ -1,15 +1,3 @@
-package Quiq::Process;
-use base qw/Quiq::System/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Cwd ();
-use Quiq::System;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -21,6 +9,24 @@ Quiq::Process - Informationen über den laufenden Prozess
 =head1 BASE CLASS
 
 L<Quiq::System>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Process;
+use base qw/Quiq::System/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Cwd ();
+use Quiq::System;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -262,7 +268,7 @@ sub user {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

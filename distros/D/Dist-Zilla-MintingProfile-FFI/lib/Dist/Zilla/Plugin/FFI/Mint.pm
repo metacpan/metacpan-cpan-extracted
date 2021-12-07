@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.020;
 
-package Dist::Zilla::Plugin::FFI::Mint 0.02 {
+package Dist::Zilla::Plugin::FFI::Mint 0.03 {
 
   use Moose;
   with 'Dist::Zilla::Role::FileMunger', 'Dist::Zilla::Role::FileGatherer', 'Dist::Zilla::Role::ModuleMaker';
@@ -211,7 +211,7 @@ Dist::Zilla::Plugin::FFI::Mint - Generate module and modify dist.ini for use wit
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

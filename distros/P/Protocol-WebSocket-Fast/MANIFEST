@@ -88,9 +88,9 @@ MANIFEST.SKIP
 misc/bench.plx
 misc/mytest.plx
 misc/trun.plx
-Protocol-WebSocket-Fast.pro
 src/xs/protocol/websocket.cc
 src/xs/protocol/websocket.h
+t/bug-SRV-1608.t
 t/bugs.t
 t/client/connect.t
 t/client/connect_request.t

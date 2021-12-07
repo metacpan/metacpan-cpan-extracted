@@ -70,7 +70,7 @@ eval { $foo->price_pair_is_required };
 
 like $@, qr/Missing argument: pair/;
 
-my $expected = qr{api.kucoin.com/api/v1/market/stats\?symbol=XRP-USDT};
+my $expected = qr{/api/v1/market/stats\?symbol=XRP-USDT};
 
 like $foo->price_pair_is_required(pair => {coin => 'XRP', base => 'USDT'})->as_string, $expected;
 

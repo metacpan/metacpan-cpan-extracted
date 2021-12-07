@@ -1,16 +1,3 @@
-package Quiq::ImageMagick;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Shell;
-use Quiq::File::Image;
-use Quiq::Path;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -35,6 +22,25 @@ sukzessive aus ihren elementaren Bestandteilen konstruieren zu
 können und I<höhere> (Klassen-)Methoden, die eine bestimmte
 Funktion durch das Hinzufügen einer Reihe von Optionen
 realisieren.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ImageMagick;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Shell;
+use Quiq::File::Image;
+use Quiq::Path;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -565,7 +571,7 @@ sub morph {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

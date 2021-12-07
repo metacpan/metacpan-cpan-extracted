@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.526';
+our $VERSION = '0.531';
 
 use 5.020;
 use Moo;
@@ -48,6 +48,7 @@ sub _eval_keyword_contentEncoding ($self, $data, $schema, $state) {
     abort($state, 'cannot find decoder for contentEncoding "%s"', $schema->{contentEncoding})
       if not $decoder;
 
+    # decode the data now, so we can report errors for the right keyword
     try { $state->{_content_ref} = $decoder->(\$data) }
     catch ($e) { return E($state, $e) }
   }
@@ -68,6 +69,7 @@ sub _eval_keyword_contentMediaType ($self, $data, $schema, $state) {
     # contentEncoding failed to decode the content
     return 1 if exists $schema->{contentEncoding} and not exists $state->{_content_ref};
 
+    # decode the data now, so we can report errors for the right keyword
     try { $state->{_content_ref} = $decoder->($state->{_content_ref} // \$data) }
     catch ($e) { return E($state, $e) }
   }
@@ -109,7 +111,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.526
+version 0.531
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Acl::Fetch::Request;
 # ABSTRACT: An internal class to get an object's access control
-$Net::Amazon::S3::Operation::Object::Acl::Fetch::Request::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Object::Acl::Fetch::Request::VERSION = '0.99';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Object';
@@ -24,7 +24,7 @@ Net::Amazon::S3::Operation::Object::Acl::Fetch::Request - An internal class to g
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 

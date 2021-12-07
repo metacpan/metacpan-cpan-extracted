@@ -1,4 +1,0 @@
-sub build_requires {
-  my ($module, $version_or_range) = @_;
-  _add_prereq(BUILD_REQUIRES => $module, $version_or_range);
-}

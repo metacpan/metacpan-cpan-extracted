@@ -1,7 +1,6 @@
 package WWW::WebKit2::Events;
 
 use Moose::Role;
-use Time::HiRes qw(time usleep);
 
 =head3 set_timeout($timeout)
 
@@ -22,17 +21,10 @@ sub set_timeout {
 sub pause {
     my ($self, $time) = @_;
 
-    my $expiry = time + $time / 1000;
-
-    while (1) {
-        $self->process_events;
-
-        if (time < $expiry) {
-            usleep 10000;
-        }
-        else {
-            last;
-        }
+    my $timed_out = 0;
+    my $source = Glib::Timeout->add($time, sub { $timed_out = 1; return 0; });
+    until ($timed_out) {
+        Gtk3::main_iteration;
     }
 }
 
@@ -52,16 +44,18 @@ sub wait_for_condition {
 
     $timeout ||= $self->default_timeout;
 
-    my $expiry = time + $timeout / 1000;
-
     $self->process_events;
 
     my $result;
-    until ($result = $condition->()) {
-        $self->process_events;
-        return 0 if time > $expiry;
-        usleep 10000;
+    my $timed_out = 0;
+    my $source = Glib::Timeout->add($timeout, sub { $timed_out = 1; return 0; });
+
+    until ($timed_out or $result = $condition->()) {
+        Gtk3::main_iteration();
+        Gtk3::main_iteration_do(0) while Gtk3::events_pending;
     }
+
+    Glib::Source->remove($source) unless $timed_out;
 
     $self->process_events;
 

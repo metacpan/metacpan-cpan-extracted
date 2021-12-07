@@ -7,4 +7,6 @@ foreach (glob('xt/bin/*')) {
    is(Pandoc->new($_)->version, $1, $1);
 }
 
+ok(1); # to avoid zero tests if no executables available
+
 done_testing;

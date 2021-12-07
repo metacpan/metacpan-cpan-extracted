@@ -3,9 +3,9 @@
 package Acme::CPANModulesBundle::PERLANCAR;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-09'; # DATE
+our $DATE = '2021-11-13'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: PERLANCAR's collection of Acme::CPANModules::* modules
@@ -22,7 +22,7 @@ Acme::CPANModulesBundle::PERLANCAR - PERLANCAR's collection of Acme::CPANModules
 
 =head1 VERSION
 
-This document describes version 0.009 of Acme::CPANModulesBundle::PERLANCAR (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-09.
+This document describes version 0.010 of Acme::CPANModulesBundle::PERLANCAR (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-13.
 
 =head1 DESCRIPTION
 

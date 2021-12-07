@@ -1,16 +1,3 @@
-package Quiq::LineProcessor;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Quiq::FileHandle;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -51,6 +38,26 @@ produziert (z.B.)
       20
   Stacktrace:
       ...
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::LineProcessor;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Quiq::FileHandle;
+use Encode ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -155,6 +162,9 @@ sub new {
         @lines = @$input;
     }
     else { # Zeilen aus Datei oder String lesen
+        if (ref($input) && $encoding) {
+            $$input = Encode::encode($encoding,$$input);
+        }
         my $fh = Quiq::FileHandle->new('<',$input);
         if ($encoding) {
             $fh->binmode(":encoding($encoding)");
@@ -393,7 +403,7 @@ sub dump {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

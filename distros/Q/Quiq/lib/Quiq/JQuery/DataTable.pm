@@ -1,16 +1,3 @@
-package Quiq::JQuery::DataTable;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Html::Table::List;
-use Quiq::Unindent;
-use Quiq::Hash;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -407,6 +394,25 @@ erzeugt den HTML-Code (lange Zeilen umbrochen)
   </body>
   </html>
 
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::JQuery::DataTable;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Html::Table::List;
+use Quiq::Unindent;
+use Quiq::Hash;
+
+# -----------------------------------------------------------------------------
+
 =head1 METHODS
 
 =head2 Plugin-Code (Klassenmethoden)
@@ -717,7 +723,7 @@ sub getColumns {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

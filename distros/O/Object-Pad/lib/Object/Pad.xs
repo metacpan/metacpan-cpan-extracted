@@ -343,6 +343,31 @@ static bool S_is_valid_ident_utf8(pTHX_ const U8 *s)
   return true;
 }
 
+void inplace_trim_whitespace(SV *sv)
+{
+  if(!SvPOK(sv) || !SvCUR(sv))
+    return;
+
+  char *dst = SvPVX(sv);
+  char *src = dst;
+
+  while(*src && isSPACE(*src))
+    src++;
+
+  if(src > dst) {
+    size_t offset = src - dst;
+    Move(src, dst, SvCUR(sv) - offset, char);
+    SvCUR(sv) -= offset;
+  }
+
+  src = dst + SvCUR(sv) - 1;
+  while(src > dst && isSPACE(*src))
+    src--;
+
+  SvCUR(sv) = src - dst + 1;
+  dst[SvCUR(sv)] = 0;
+}
+
 static void S_check_method_override(pTHX_ struct XSParseSublikeContext *ctx, const char *val, void *_data)
 {
   if(!ctx->name)
@@ -441,6 +466,8 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
     for(i = 0; i < nattrs; i++) {
       SV *attrname = args[argi]->attr.name;
       SV *attrval  = args[argi]->attr.value;
+
+      inplace_trim_whitespace(attrval);
 
       mop_class_apply_attribute(meta, SvPVX(attrname), attrval);
 
@@ -587,6 +614,8 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
     while(argi < (nattrs+2)) {
       SV *attrname = args[argi]->attr.name;
       SV *attrval  = args[argi]->attr.value;
+
+      inplace_trim_whitespace(attrval);
 
       mop_slot_apply_attribute(slotmeta, SvPVX(attrname), attrval);
 

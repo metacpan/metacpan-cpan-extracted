@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.68
+    version 2.69
 
 SYNOPSIS
 
@@ -120,7 +120,7 @@ DESCRIPTION
      type = gfm
      
      [Author::Plicease::NoUnsafeInc]
-     [ArchiveTar]
+     [Libarchive]
 
 OPTIONS
 

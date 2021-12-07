@@ -7,15 +7,18 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SimpleUI 2.145;
+package Config::Model::SimpleUI 2.147;
 
 use Carp;
-use 5.010;
+use v5.020;
 use strict;
 use warnings;
 use open      qw(:std :utf8);    # undeclared streams in UTF-8
 use Encode qw(decode_utf8);
 use Regexp::Common qw/delimited/;
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 my $syntax = '
 cd <elt>, cd <elt:key>, cd - , cd !
@@ -149,10 +152,12 @@ my %run_dispatch = (
         }
         return "";
     },
-    display => sub {
-        my $self = shift;
-        say "Nothing to display" unless @_;
-        return $self->{current_node}->grab_value(@_);
+    display => sub ($self, @args) {
+        unless (@args) {
+            say "Nothing to display";
+            return;
+        }
+        return $self->{current_node}->grab_value(@args);
     },
     info => sub {
         my $self = shift;
@@ -319,8 +324,12 @@ sub run {
     my ( $action, @args ) = ( $user_cmd =~ /((?:[^\s"']|$re)+)/g );
 
     if ( defined $run_dispatch{$action} ) {
-        my $res = eval { $run_dispatch{$action}->( $self, @args ); };
-        print $@ if $@;
+        my $res;
+        my $ok = eval {
+            $res = $run_dispatch{$action}->( $self, @args );
+            1;
+        };
+        say $@->message unless $ok;
         return $res;
     }
     else {
@@ -363,7 +372,7 @@ Config::Model::SimpleUI - Simple interface for Config::Model
 
 =head1 VERSION
 
-version 2.145
+version 2.147
 
 =head1 SYNOPSIS
 

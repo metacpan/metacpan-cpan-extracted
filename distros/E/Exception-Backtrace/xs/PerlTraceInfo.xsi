@@ -1,0 +1,10 @@
+MODULE = Exception::Backtrace       PACKAGE = Exception::Backtrace::PerlTraceInfo
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Exception::Backtrace::BacktraceInfo");
+}
+
+string                    PerlTraceInfo::to_string()
+
+std::vector<PerlFrameSP> PerlTraceInfo::get_frames () { RETVAL = THIS->get_frames(); }

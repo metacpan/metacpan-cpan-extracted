@@ -50,12 +50,12 @@ TEST("rule parsing") {
         if (chk.abbrev.size()) CHECK(info.abbrev == chk.abbrev);
 
         switch (chk.end.size()) {
-            case 6 : CHECK(info.end.sec  == chk.end[5]);
-            case 5 : CHECK(info.end.min  == chk.end[4]);
-            case 4 : CHECK(info.end.hour == chk.end[3]);
-            case 3 : CHECK(info.end.wday == chk.end[2]);
-            case 2 : CHECK(info.end.yday == chk.end[1]);
-            case 1 : CHECK(info.end.mon  == chk.end[0]);
+            case 6 : CHECK(info.end.sec  == chk.end[5]); // fallthrough
+            case 5 : CHECK(info.end.min  == chk.end[4]); // fallthrough
+            case 4 : CHECK(info.end.hour == chk.end[3]); // fallthrough
+            case 3 : CHECK(info.end.wday == chk.end[2]); // fallthrough
+            case 2 : CHECK(info.end.yday == chk.end[1]); // fallthrough
+            case 1 : CHECK(info.end.mon  == chk.end[0]); // fallthrough
             default: break;
         }
 

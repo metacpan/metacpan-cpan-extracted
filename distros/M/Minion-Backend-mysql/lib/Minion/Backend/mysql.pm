@@ -4,6 +4,7 @@ use 5.010;
 
 use Mojo::Base 'Minion::Backend';
 
+use constant DEBUG => $ENV{MINION_BACKEND_DEBUG} || 0;
 use Mojo::IOLoop;
 use Mojo::JSON qw(encode_json decode_json);
 use Mojo::mysql;
@@ -14,7 +15,7 @@ use Time::Piece ();
 has 'mysql';
 has 'no_txn' => sub { 0 };
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 sub dequeue {
   my ($self, $worker_id, $wait, $options) = @_;
@@ -172,7 +173,7 @@ sub list_jobs {
 
   my ( @where, @params );
   if ( my $states = $options->{states} ) {
-    push @where, 'state in (' . join( ',', ('?') x @$states ) . ')';
+    push @where, 'j.state in (' . join( ',', ('?') x @$states ) . ')';
     push @params, @$states;
   }
   if ( my $queues = $options->{queues} ) {
@@ -198,7 +199,7 @@ sub list_jobs {
     push @params, @$notes;
   }
 
-  push @where, q{(state != 'inactive' or expires is null or expires > now())};
+  push @where, q{(j.state != 'inactive' or j.expires is null or j.expires > now())};
   my $where = @where ? 'WHERE ' . join( ' AND ', @where ) : '';
 
   my $db = $self->mysql->db;
@@ -206,7 +207,7 @@ sub list_jobs {
   my $list_sql = qq{
     SELECT
       id, args, attempts,
-      state, task, worker,
+      minion_jobs.state, task, worker,
       lax, priority, queue, result, retries,
       children, parents,
       UNIX_TIMESTAMP(created) AS created,
@@ -215,7 +216,7 @@ sub list_jobs {
       UNIX_TIMESTAMP(retried) AS retried,
       UNIX_TIMESTAMP(started) AS started,
       UNIX_TIMESTAMP(NOW()) AS time,
-      UNIX_TIMESTAMP(expires) AS expires
+      UNIX_TIMESTAMP(minion_jobs.expires) AS expires
     FROM minion_jobs
     JOIN (
       SELECT id,
@@ -593,28 +594,40 @@ sub _try {
     push @bind_vars, $options->{id};
   }
 
+  # The dependencies table stores a copy of the parent job's state and
+  # expiration (updated automatically via triggers). We use this to roll
+  # up a count of pending and failed parent jobs for the current child
+  # job. If there are no pending jobs, or if the current child job is
+  # "lax" and there are only failed jobs, the child job is ready.
+  # An expired job is considered "failed" for this check.
   my $sql = qq{
     SELECT job.id, job.args, job.retries, job.task
     FROM minion_jobs job
-    LEFT JOIN minion_jobs_depends depends ON depends.child_id = job.id
-    LEFT JOIN minion_jobs parent ON parent.id = depends.parent_id
+    LEFT JOIN (
+        SELECT child_id, COUNT(child_id) AS pending,
+            COALESCE( SUM(depends.state = 'failed' OR (depends.expires IS NOT NULL AND depends.expires > NOW())), 0 ) AS failed
+        FROM minion_jobs_depends depends
+        WHERE depends.state IS NOT NULL AND (
+            depends.state = 'active'
+            OR ( depends.state = 'failed' )
+            OR ( depends.state = 'inactive' AND (depends.expires IS NULL OR depends.expires > NOW()))
+        )
+        GROUP BY child_id
+    ) depends ON depends.child_id = job.id
     WHERE job.state = 'inactive'
       AND job.`delayed` <= NOW()
       AND job.queue IN ($qq) AND job.task IN ($qt)
       $sql_job_id
       AND (job.expires IS NULL OR job.expires > NOW())
-    GROUP BY job.id
-    HAVING SUM(
-      parent.state IS NOT NULL AND (
-        parent.state = 'active'
-        OR ( parent.state = 'failed' AND NOT job.lax )
-        OR ( parent.state = 'inactive' AND (parent.expires IS NULL OR parent.expires > NOW()))
+      AND (
+        depends.pending IS NULL
+        OR ( depends.pending = depends.failed AND job.lax )
       )
-    ) = 0
     ORDER BY job.priority DESC, job.created
     LIMIT 1
   };
 
+  warn "Dequeuing SQL: $sql" if DEBUG;
   my $db = $self->mysql->db;
   my $i = 5; # Try this many times to get a job
   my $job;
@@ -1162,7 +1175,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -1818,3 +1831,14 @@ DROP INDEX minion_notes_note_key ON minion_notes;
 -- 11 up
 CREATE INDEX minion_jobs_stats_idx ON minion_jobs (state, `delayed`);
 
+-- 12 up
+ALTER TABLE minion_jobs MODIFY COLUMN state ENUM('inactive','active','finished','failed') NOT NULL DEFAULT 'inactive';
+ALTER TABLE minion_jobs MODIFY COLUMN task VARCHAR(50) NOT NULL;
+ALTER TABLE minion_jobs_depends ADD COLUMN state ENUM('inactive','active','finished','failed') NOT NULL DEFAULT 'inactive';
+ALTER TABLE minion_jobs_depends ADD COLUMN expires DATETIME;
+UPDATE minion_jobs_depends dep JOIN minion_jobs job ON dep.parent_id=job.id SET dep.state=job.state, dep.expires=job.expires;
+CREATE TRIGGER minion_trigger_insert_depends BEFORE INSERT ON minion_jobs_depends FOR EACH ROW
+    SET NEW.state = COALESCE(( SELECT state FROM minion_jobs WHERE id=NEW.parent_id ), "finished"),
+        NEW.expires = ( SELECT expires FROM minion_jobs WHERE id=NEW.parent_id );
+CREATE TRIGGER minion_trigger_update_jobs AFTER UPDATE ON minion_jobs FOR EACH ROW
+    UPDATE minion_jobs_depends SET state=NEW.state, expires=NEW.expires WHERE parent_id=OLD.id;

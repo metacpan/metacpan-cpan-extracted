@@ -1,0 +1,51 @@
+{
+   "abstract" : "xxHash implementation for Perl",
+   "author" : [
+      "Chernenko Dmitiry cdn@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-xxHash",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.280225",
+            "File::Which" : "1.21",
+            "Math::Int64" : "0.54",
+            "Test::More" : "1.302171"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.19"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::xxHash" : {
+         "file" : "lib/Crypt/xxHash.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/KalessinD/perl_crypt_xxhash/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://github.com/KalessinD/perl_crypt_xxhash"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

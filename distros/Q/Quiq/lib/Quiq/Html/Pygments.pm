@@ -1,20 +1,3 @@
-package Quiq::Html::Pygments;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::CommandLine;
-use Quiq::Shell;
-use Quiq::Ipc;
-use Quiq::Unindent;
-use Quiq::Css;
-use Quiq::Html::Table::Simple;
-use Quiq::Html::Page;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -64,6 +47,29 @@ Diese Klasse stellt eine Schnittstelle zum Pygments Syntax
 Highlighting Paket dar, speziell zum Syntax Highlighting in HTML.
 Die Methoden der Klassen liefern die CSS-Regeln und den HTML-Code,
 um gehighlighteten Quelltext in HTML-Seiten integrieren zu können.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Pygments;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::CommandLine;
+use Quiq::Shell;
+use Quiq::Ipc;
+use Quiq::Unindent;
+use Quiq::Css;
+use Quiq::Html::Table::Simple;
+use Quiq::Html::Page;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -367,7 +373,7 @@ sub stylesPage {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

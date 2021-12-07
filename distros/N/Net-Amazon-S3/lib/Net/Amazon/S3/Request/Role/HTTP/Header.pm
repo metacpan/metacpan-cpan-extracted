@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header;
 # ABSTRACT: HTTP Header Role
-$Net::Amazon::S3::Request::Role::HTTP::Header::VERSION = '0.98';
+$Net::Amazon::S3::Request::Role::HTTP::Header::VERSION = '0.99';
 use MooseX::Role::Parameterized;
 
 parameter name => (
@@ -71,7 +71,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header - HTTP Header Role
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

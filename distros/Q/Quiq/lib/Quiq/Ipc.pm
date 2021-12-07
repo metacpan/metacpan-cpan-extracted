@@ -1,16 +1,3 @@
-package Quiq::Ipc;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Quiq::Shell;
-use IPC::Open3 ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -22,6 +9,25 @@ Quiq::Ipc - Interprozesskommunikation
 =head1 BASE CLASS
 
 L<Quiq::Object>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Ipc;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Quiq::Shell;
+use IPC::Open3 ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -110,7 +116,7 @@ sub filter {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

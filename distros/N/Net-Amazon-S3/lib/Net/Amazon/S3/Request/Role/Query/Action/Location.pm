@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Action::Location;
 # ABSTRACT: location query action role
-$Net::Amazon::S3::Request::Role::Query::Action::Location::VERSION = '0.98';
+$Net::Amazon::S3::Request::Role::Query::Action::Location::VERSION = '0.99';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Action' => { action => 'location' };
@@ -19,7 +19,7 @@ Net::Amazon::S3::Request::Role::Query::Action::Location - location query action 
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

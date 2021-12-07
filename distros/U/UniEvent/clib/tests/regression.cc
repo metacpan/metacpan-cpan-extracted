@@ -1,4 +1,5 @@
 #include "lib/test.h"
+#include <catch2/generators/catch_generators.hpp>
 
 TEST_PREFIX("regression: ", "[regression]");
 

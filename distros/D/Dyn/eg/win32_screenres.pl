@@ -4,9 +4,8 @@ use lib '../lib', '../blib/arch', '../blib/lib';
 use Dyn qw[:dc :dl :sugar];
 $|++;
 #
-my $path = 'C:\Windows\System32\user32.dll';
-my $lib  = dlLoadLibrary($path);
+sub GetSystemMetrics : Dyn('C:\Windows\System32\user32.dll', '(i)i');
 #
-CORE::say 'width = ' . call( $lib, 'GetSystemMetrics', 'i)i', 0 );
-CORE::say 'height = ' . call( $lib, 'GetSystemMetrics', 'i)i', 1 );
-CORE::say 'number of monitors = ' . call( $lib, 'GetSystemMetrics', 'i)i', 80 );
+CORE::say 'width = ' . GetSystemMetrics(0);
+CORE::say 'height = ' . GetSystemMetrics(1);
+CORE::say 'number of monitors = ' . GetSystemMetrics(80);

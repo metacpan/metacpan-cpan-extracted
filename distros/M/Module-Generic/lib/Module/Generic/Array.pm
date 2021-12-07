@@ -17,6 +17,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use List::Util ();
+    use Module::Generic::Boolean;
     use Module::Generic::Hash;
     use Module::Generic::Iterator;
     use Module::Generic::Null;
@@ -35,6 +36,8 @@ BEGIN
         fallback => 1,
     );
     our $RETURN = {};
+    our $TRUE  = ${"Module::Generic::Boolean::true"};
+    our $FALSE = ${"Module::Generic::Boolean::false"};
     our( $VERSION ) = 'v1.1.0';
 };
 
@@ -57,6 +60,8 @@ sub new
     CORE::return( bless( $init => ( ref( $this ) || $this ) ) );
 }
 
+sub append { return( CORE::shift->push( @_ ) ); }
+
 sub as_array { CORE::return( $_[0] ); }
 
 sub as_hash
@@ -65,7 +70,7 @@ sub as_hash
     my $opts = {};
     $opts = CORE::shift( @_ ) if( Scalar::Util::reftype( $opts ) eq 'HASH' );
     my $ref = {};
-    my( @offsets ) = $self->keys;
+    my $offsets = $self->keys;
     if( $opts->{start_from} )
     {
         my $start = CORE::int( $opts->{start_from} );
@@ -74,7 +79,7 @@ sub as_hash
             $offsets[ $i ] += $start;
         }
     }
-    @$ref{ @$self } = @offsets;
+    @$ref{ @$self } = @$offsets;
     CORE::return( Module::Generic::Hash->new( $ref ) );
 }
 
@@ -336,6 +341,8 @@ sub intersection
     CORE::return( $new );
 }
 
+sub is_empty { CORE::return( CORE::scalar( @{$_[0]} ) ? $FALSE : $TRUE ) }
+
 sub iterator { CORE::return( Module::Generic::Iterator->new( $self ) ); }
 
 sub join
@@ -347,7 +354,7 @@ sub join
 sub keys
 {
     my $self = CORE::shift( @_ );
-    CORE::return( $self->new( [ CORE::keys( @$self ) ] ) );
+    CORE::return( $self->new( scalar( @$self ) ? [ CORE::keys( @$self ) ] : [] ) );
 }
 
 sub last { CORE::return( CORE::shift->get_null(-1) ); }
@@ -470,6 +477,8 @@ sub pos
     }
     CORE::return;
 }
+
+sub prepend { return( CORE::shift->unshift( @_ ) ); }
 
 sub push
 {
@@ -711,6 +720,11 @@ sub values
     {
         CORE::return( $self->new( $ref ) );
     }
+}
+
+sub _boolean
+{
+    my $self = CORE::shift( @_ );
 }
 
 sub _number

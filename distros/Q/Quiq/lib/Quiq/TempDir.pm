@@ -1,15 +1,3 @@
-package Quiq::TempDir;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
-use File::Temp ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -28,6 +16,24 @@ Der Konstruktor der Klasse erzeugt ein temporäres Verzeichnis.
 Geht die letzte Objekt-Referenz aus dem Scope, wird das Verzeichnis
 automatisch gelöscht. Das Verzeichnis-Objekt stringifiziert sich
 im String-Kontext automatisch zum Verzeichnis-Pfad.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::TempDir;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
+use File::Temp ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -90,7 +96,7 @@ sub new {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

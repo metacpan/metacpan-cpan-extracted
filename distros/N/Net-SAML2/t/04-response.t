@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use Test::Lib;
 use Test::Net::SAML2;
 

@@ -3,13 +3,11 @@ package Output;
 use Moose;
 
 
-sub set { }
-sub write_record { return 1; }
-sub new_record { }
-sub configure { }
-sub finish { }
-
+sub close { }
+sub open { }
+sub write { }
 with 'ETL::Pipeline::Output';
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

@@ -1,13 +1,3 @@
-package Quiq::Reference;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Scalar::Util ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -20,6 +10,22 @@ Quiq::Reference - Operationen auf Referenzen
 
 Die Klasse stellt Methoden auf Referenzen zur Verfügung, insbesondere,
 um den Grundtyp einer Referenz zu ermitteln.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Reference;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Scalar::Util ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -174,7 +180,7 @@ sub isRegexRef {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use XML::Sig::OO;
 use Getopt::Long;
 use Pod::Usage;
 
-our $VERSION="0.002";
+our $VERSION="0.008";
 
 our ($fh_in,$fh_out,$xml);
 our $mode=undef;

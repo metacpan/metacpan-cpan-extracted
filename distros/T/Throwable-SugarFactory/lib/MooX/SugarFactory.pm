@@ -7,7 +7,7 @@ use MooX::BuildRole;
 use Constructor::SugarLibrary ();
 use Throwable::SugarFactory::Utils '_getglob';
 
-our $VERSION = '0.152700'; # VERSION
+our $VERSION = '0.213360'; # VERSION
 
 # ABSTRACT: build a library of syntax-sugared Moo classes
 
@@ -35,10 +35,16 @@ sub import {
 
 sub _creator_with {
     my ( $class, $factory, $type ) = @_;
+
+    # put MooX::Build<Class|Role>'s Build<> into sub <target>::<class|role>
+    # haarg says this working is a perl bug that ignores strict 'refs'
     my $create = \&{ "Build" . ucfirst $type };
     sub {
         my ( $spec, @args ) = @_;
         my ( $class ) = split /->/, $spec;
+
+        # BUILDARGS can be defined in the factory and munges all class/role's
+        # args, unsure what to do about this yet, need to ask haarg
         my $build = $factory->can( "BUILDARGS" ) || sub { shift; @_ };
         $create->( $class, $build->( $class, @args ) );
         $factory->sweeten_meth( $spec );
@@ -58,7 +64,7 @@ MooX::SugarFactory - build a library of syntax-sugared Moo classes
 
 =head1 VERSION
 
-version 0.152700
+version 0.213360
 
 =head1 SYNOPSIS
 

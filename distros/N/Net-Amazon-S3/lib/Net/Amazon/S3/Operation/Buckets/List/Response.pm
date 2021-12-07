@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Buckets::List::Response;
 # ABSTRACT: An internal class to process list all buckets response
-$Net::Amazon::S3::Operation::Buckets::List::Response::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Buckets::List::Response::VERSION = '0.99';
 use Moose;
 
 extends 'Net::Amazon::S3::Response';
@@ -52,7 +52,7 @@ Net::Amazon::S3::Operation::Buckets::List::Response - An internal class to proce
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

@@ -26,7 +26,7 @@
   use strict;
   use warnings;
   use vars qw(%areanames %fixed_line_regexes %mobile_regexes);
-our $VERSION = 1.20210921211732;
+our $VERSION = 1.20211206222341;
 
 
 
@@ -7212,6 +7212,9 @@ our $VERSION = 1.20210921211732;
     '1337991' => "Lafayette\,\ LA",
     '1337993' => "Lafayette\,\ LA",
     '1339' => "Massachusetts",
+    '1340200' => "Chtamstths\,\ VI",
+    '1340203' => "Chtamstths\,\ VI",
+    '1340208' => "St\.\ Croix\,\ VI",
     '1340423' => "Chtamstths\,\ VI",
     '134044' => "Chtamstths\,\ VI",
     '1340725' => "Chtamstths\,\ VI",

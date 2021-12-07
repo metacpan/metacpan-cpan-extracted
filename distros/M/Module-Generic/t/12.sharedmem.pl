@@ -21,13 +21,29 @@ BEGIN
     # For debugging only
     # $shem->create(1);
     # $shem->destroy(1);
-    my $s = $shem->open || die( $shem->error );
+    my $s = $shem->open || do
+    {
+        print( STDOUT $shem->error, "\n" );
+        die( $shem->error );
+    };
     my $ref = $s->read;
-    defined( $ref ) || die( $s->error );
-    ref( $ref ) eq 'HASH' || die( "Shared memory data is not an hash reference." );
+    defined( $ref ) || do
+    {
+        print( STDOUT $s->error, "\n" );
+        die( $s->error );
+    };
+    ref( $ref ) eq 'HASH' || do
+    {
+        print( STDOUT "Shared memory data is not an hash reference.\n" );
+        die( "Shared memory data is not an hash reference." );
+    };
     # $ref = {};
     $ref->{year} = 2021;
-    defined( $s->write( $ref ) ) || die( "Unable to write to shared memory: $!" );
+    defined( $s->write( $ref ) ) || do
+    {
+        print( STDOUT "Unable to write to shared memory: $!\n" );
+        die( "Unable to write to shared memory: $!" );
+    };
     # $ref = $s->read;
     # ref( $ref ) eq 'HASH' || die( "Shared memory data is not an hash reference." );
     print( STDOUT "ok\n" );

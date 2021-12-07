@@ -4,7 +4,7 @@
       "Branislav Zahradn\u00edk <barney@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -115,7 +115,7 @@
          "web" : "https://github.com/rustyconover/net-amazon-s3"
       }
    },
-   "version" : "0.98",
+   "version" : "0.99",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Ali Anari <ali@anari.me>",
@@ -124,6 +124,7 @@
       "Branislav Zahradnik <branislav.zahradnik@gooddata.com>",
       "Branislav Zahradn\u00edk <happy.barney@gmail.com>",
       "Christian Lackas <lackas@invicro.com>",
+      "Conor Keegan <git@cpk.ee>",
       "Douglas Sims <ratsbane@gmail.com>",
       "Dylan William Hardison <dylan@hardison.net>",
       "Eden Crane <>",
@@ -132,6 +133,7 @@
       "Gabriel Andrade <gabriel@zumba.home>",
       "Gabriel Andrade <gabriel@Zumba.local>",
       "Gavin Carr <gavin@openfusion.com.au>",
+      "gregor herrmann <gregoa@debian.org>",
       "Haruka Iwao <haruka@fout.jp>",
       "Jun Kuriyama <kuriyama@s2factory.co.jp>",
       "Leo Lapworth <leo@cuckoo.org>",
@@ -150,6 +152,7 @@
       "Renato Santos <renato@aware.com.br>",
       "robert clarke <robert_clarke@trendmicro.co.uk>",
       "Robert Ward <robert@rtward.com>",
+      "rocketgithub <rodrigo@solucionesprisma.com>",
       "Rusty Conover <rusty_conover@me.com>",
       "Rusty Conover <rustyconover@users.noreply.github.com>",
       "Rusty Conover <rusty@luckydinosaur.com>",

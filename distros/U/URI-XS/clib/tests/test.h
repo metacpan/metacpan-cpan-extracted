@@ -1,7 +1,6 @@
 #pragma once
-#define CATCH_CONFIG_EXTERNAL_INTERFACES
-#include <catch2/catch.hpp>
 #include <panda/uri/all.h>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace panda;
 using namespace panda::uri;

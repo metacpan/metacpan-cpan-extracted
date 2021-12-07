@@ -11,7 +11,7 @@ use vars qw(
 ## Inheritance and Versioning ##
 
 @ISA     = qw( Exporter );
-$VERSION = '0.17';
+$VERSION = '0.18';
 
 ## Module Imports ##
 
@@ -473,7 +473,7 @@ sub _length_helper {
 
 =head1 NAME
 
-Net::BGP::ASPath - Class encapsulating BGP-4 AS Path information
+C<Net::BGP::ASPath> - Class encapsulating BGP-4 AS Path information
 
 =head1 SYNOPSIS
 
@@ -530,45 +530,45 @@ Net::BGP::ASPath - Class encapsulating BGP-4 AS Path information
 
 =head1 DESCRIPTION
 
-This module encapsulates the data contained in a BGP-4 AS_PATH, inluding
-confederation extentions.
+This module encapsulates the data contained in a BGP-4 AS_PATH, including
+confederation extensions.
 
 =head1 CONSTRUCTOR
 
 =over 4
 
-=item new() - create a new Net::BGP::ASPath object
+=item new() - create a new C<Net::BGP::ASPath> object
 
     $aspath = Net::BGP::ASPath->new( PATHDATA, OPTIONS );
 
-This is the constructor for Net::BGP::ASPath objects. It returns a
+This is the constructor for C<Net::BGP::ASPath> objects. It returns a
 reference to the newly created object. The first parameter may be either:
 
 =over 4
 
 =item ARRAY_REF
 
-An array ref containing AS numbers inteperted as an AS_PATH_SEQUENCE.
+An array ref containing AS numbers interpreted as an AS_PATH_SEQUENCE.
 
 =item SCALAR
 
-A string with AS numbers seperated by spaces (AS_PATH_SEQUANCE).
-AS_PATH_SETs is written using "{}" with "," to seperate AS numbers. 
-AS_PATH_CONFED_* is writen equally, but encapsulated in "()".
+A string with AS numbers separated by spaces (AS_PATH_SEQUANCE).
+AS_PATH_SETs are written using "{}" with "," to separate AS numbers.
+AS_PATH_CONFED_* is written similarly, but encapsulated in "()".
 
-=item Net::BGP::ASPath
+=item C<Net::BGP::ASPath>
 
 Another ASPath object, in which case a clone is constructed.
 
 =item C<undef>
 
-This will create the ASPath object with empty contents
+This will create the ASPath object with empty contents.
 
 =back
 
 Following the PATHDATA, the OPTIONS may be specified.  Currently the
 only valid option is c<as4>, which, if true, builds ASPath objects
-usable for talking to an peer that supports 32 bit ASNs.  False, or
+usable for talking to a peer that supports 32 bit ASNs.  False, or
 the default value, assumes that the peer does not support 32 bit ASNs,
 which affects the decode routines.  Note that the encode routines
 are not dependent upon this option.
@@ -588,11 +588,11 @@ will also allow output of AS4_PATH objects when appropriate.
 
 =over 4
 
-=item clone() - clone a Net::BGP::ASPath object
+=item clone() - clone a C<Net::BGP::ASPath> object
 
     $clone = $aspath->clone();
 
-This method creates an exact copy of the Net::BGP::ASPath object.
+This method creates an exact copy of the C<Net::BGP::ASPath> object.
 
 =back
 
@@ -604,16 +604,16 @@ This method creates an exact copy of the Net::BGP::ASPath object.
 
 Return the path-length used in BGP path selection. This is the sum
 of the lengths of all AS_PATH elements. This does however not include
-AS_PATH_CONFED_* elements and AS_SEGMENTS count as one BGP hop.
+AS_PATH_CONFED_* elements and AS_SEGMENTS which count as one BGP hop.
 
 =item as_string()
 
-Returns the path as a string in same notation as the constructor accept.
+Returns the path as a string in same notation that the constructor accepts.
 
 =item cleanup()
 
 Reduce the path by removing meaningless AS_PATH elements (empty sets or
-sequences) and joining neighbour elements of same _SET type.
+sequences) and joining neighbor elements of the same _SET type.
 
 =item strip()
 
@@ -629,8 +629,8 @@ Returns a strip() 'ed clone() of the path.
 
 Strips AS_CONFED_* segments from the path and prepends one or more AS numbers
 to the path as given as arguments, either as an array of AS numbers or as a
-string with space seperated AS numbers. If string has "()" arround, prepend_confed
-will be used instead.
+string with space separated AS numbers. If the string has "()" surrounding it,
+prepend_confed will be used instead.
 
 =item prepend_confed(ARRAY)
 
@@ -638,29 +638,44 @@ will be used instead.
 
 Prepends one or more confederation AS numbers to the path as given as
 arguments, either as an array of AS numbers or as a string with space
-seperated AS numbers. "()" arround the string is ignored.
+separated AS numbers. "()" around the string is ignored.
 
 =item aggregate(ASPath)
 
 =item aggregate(ARRAY)
 
 Aggregates the current ASPath with the ASPath(s) given as argument.
-If invoked as class method, aggregate all ASPaths given as argument.
+If invoked as a class method, aggregate all ASPaths given as argument.
 
 To aggregate means to find the longest common substring (of the paths of all
 objects that should be aggregated) and keep them, but
 replacing the non-common substrings with AS_SET segments. Currently only
-the longest common normal and confederation head will be found and the remaing
+the longest common normal and confederation head will be found and the remaining
 will be left as an AS_SET and AS_CONFED_SET.
 
-Returns the aggregated object. The objects self are not modified.
+Returns the aggregated object. The objects themselves are not modified.
 
 =back
 
 =head1 SEE ALSO
 
-B<RFC 1771>, B<RFC 1997>, Net::BGP, Net::BGP::Process, Net::BGP::Peer,
-Net::BGP::Notification, Net::BGP::NLRI, Net::BGP::Update
+=over
+
+=item L<Net::BGP>
+
+=item L<Net::BGP::Process>
+
+=item L<Net::BGP::Peer>
+
+=item L<Net::BGP::Update>
+
+=item L<Net::BGP::Refresh>
+
+=item L<Net::BGP::NLRI>
+
+=item L<Net::BGP::Notification>
+
+=back
 
 =head1 AUTHOR
 
@@ -669,3 +684,5 @@ Martin Lorensen <bgp@martin.lorensen.dk>
 =cut
 
 ## End Package Net::BGP::ASPath ##
+
+1;

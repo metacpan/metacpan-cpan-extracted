@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 package Net::SAML2::Role::ProtocolMessage;
 
 use Moose::Role;
@@ -10,7 +12,7 @@ use DateTime;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::Util qw(generate_id);
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 
 has id => (
@@ -91,7 +93,7 @@ Net::SAML2::Role::ProtocolMessage - Common behaviour for Protocol messages
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 DESCRIPTION
 

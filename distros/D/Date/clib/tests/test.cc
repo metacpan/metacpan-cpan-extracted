@@ -1,12 +1,13 @@
-#define CATCH_CONFIG_EXTERNAL_INTERFACES
 #include "test.h"
+#include <catch2/reporters/catch_reporter_registrars.hpp>
+#include <catch2/reporters/catch_reporter_event_listener.hpp>
 
 static unordered_string_map<string, unordered_string_map<string, string>> test_dates =
     #include "time/gendata.icc"
 ;
 
-struct MyListener : Catch::TestEventListenerBase {
-    using TestEventListenerBase::TestEventListenerBase;
+struct MyListener : Catch::EventListenerBase {
+    using EventListenerBase::EventListenerBase;
 
     void testRunStarting (Catch::TestRunInfo const&) override {
         tzembededdir("zoneinfo");

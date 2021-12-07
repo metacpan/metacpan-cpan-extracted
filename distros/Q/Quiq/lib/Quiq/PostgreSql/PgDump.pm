@@ -1,17 +1,3 @@
-package Quiq::PostgreSql::PgDump;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Stopwatch;
-use Quiq::Udl;
-use Quiq::CommandLine;
-use Expect ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -37,6 +23,26 @@ Die Klasse stellt einen Wrapper für den PostgreSQL-Client pg_dump dar.
 =head1 EXAMPLE
 
   $ perl -MQuiq::PostgreSql::PgDump -E 'Quiq::PostgreSql::PgDump->run("prod","--table","p_muster.admviews","--schema-only","--debug")'
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::PostgreSql::PgDump;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Stopwatch;
+use Quiq::Udl;
+use Quiq::CommandLine;
+use Expect ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -166,7 +172,7 @@ sub run {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

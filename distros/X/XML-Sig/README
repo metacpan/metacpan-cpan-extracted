@@ -1,8 +1,9 @@
 NAME
-    XML::Sig
+    XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital
+    Signatures
 
 VERSION
-    version 0.51
+    version 0.55
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';

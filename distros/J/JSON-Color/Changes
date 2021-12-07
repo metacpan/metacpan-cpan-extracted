@@ -1,3 +1,13 @@
+0.133   2021-11-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Previous commit to work better with ColorTheme::NoColor was
+          incomplete. Apply patch from Kevin Van Workum (RT#140117).
+
+	- Observe NO_COLOR.
+
+	- [test] Add test script.
+
+
 0.132   2021-11-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Work better when using ColorTheme::NoColor (don't emit ANSI reset

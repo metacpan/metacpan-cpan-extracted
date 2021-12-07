@@ -1,5 +1,4 @@
-//#define CATCH_CONFIG_ENABLE_BENCHMARKING
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <string>
 
 TEST_CASE("a", "[single]") {
@@ -45,9 +44,3 @@ TEST_CASE("e", "[multi]") {
     }
     REQUIRE(cnt);
 }
-
-//TEST_CASE("bench", "[.]") {
-//    BENCHMARK("hello") {
-//        return 1;
-//    };
-//}

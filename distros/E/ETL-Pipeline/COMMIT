@@ -1,0 +1,18 @@
+Simplify input sources
+
+WARNING: Loading this new version requires that you rewrite any custom input
+         sources. The way that ETL::Pipeline interacts with them has changed.
+
+Move the file processing loop into the input source with a callback to the
+ETL::Pipeline object. The object callback performs the transform and load steps.
+Input sources were complicated, with several different required methods. It
+wasn't clear how these worked together. This change simplifies the code for
+new input sources. I expect a lot of input sources and very few output targets.
+So it makes sense for the input side to be easier.
+
+Fixed two bugs reported through Github. One was during installation.
+Automanifest.pm was missing. The distribution needed the /inc directory which
+will always have a copy of the module for installation.
+
+The other bug was with variable interpolation. I used the incorrect syntax.
+Fixed the line as suggested by the submitter - jimeUWOshkosh.

@@ -55,6 +55,16 @@ TEST("timeout") {
     CHECK(err.contains(make_error_code(std::errc::timed_out)));
 }
 
+TEST("connect_timeout") {
+    AsyncTest test(1000);
+
+    TClientSP client = new TClient(test.loop);
+    client->sa = test.get_blackhole_addr();
+
+    auto err = client->get_error(Request::Builder().uri("/").timeout(999999999).connect_timeout(5).build());
+    CHECK(err.contains(make_error_code(std::errc::timed_out)));
+}
+
 TEST("client retains until request is complete") {
     AsyncTest test(1000);
     ClientPair p(test.loop);

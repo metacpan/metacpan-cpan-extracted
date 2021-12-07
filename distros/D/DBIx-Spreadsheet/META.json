@@ -38,7 +38,7 @@
             "Filter::signatures" : "0.09",
             "Getopt::Long" : "0",
             "Moo" : "2",
-            "Spreadsheet::Read" : "0.69",
+            "Spreadsheet::Read" : "0.82",
             "Text::CleanFragment" : "0",
             "Text::Unidecode" : "0",
             "perl" : "5.006"
@@ -63,7 +63,7 @@
          "web" : "https://github.com/Corion/DBIx-Spreadsheet"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

@@ -4,6 +4,12 @@ enable_testing()
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(LIB_TYPE CACHE STRING STATIC)
+option(PANDA_BACKTRACE_BUILD_TESTS OFF)
+if (${PANDA_BACKTRACE_BUILD_TESTS})
+    set(EXCLUDE_TEST)
+else()
+    set(EXCLUDE_TEST EXCLUDE_FROM_ALL)
+endif()
 
 file(GLOB_RECURSE libSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cc")
 add_library(panda-backtrace ${LIB_TYPE} ${libSource})
@@ -26,17 +32,17 @@ list(FILTER testSource EXCLUDE REGEX "tests/main.cc")
 list(APPEND compile_opts ${CMAKE_CXX_FLAGS_DEBUG})
 set_property(SOURCE ${testSource} PROPERTY COMPILE_OPTIONS ${compile_opts})
 
-add_library(panda-backtrace-tests  STATIC ${testSource})
+add_library(panda-backtrace-tests EXCLUDE_FROM_ALL STATIC ${testSource})
 
 find_package(Catch2)
 target_link_libraries(panda-backtrace-tests PUBLIC panda-backtrace Catch2::Catch2)
 
-add_executable(MyTest ${testSource} "tests/main.cc")
+add_executable(MyTest ${EXCLUDE_TEST} ${testSource} "tests/main.cc")
 target_link_libraries(MyTest panda-backtrace-tests panda-backtrace)
 add_test(test-all MyTest)
 
 #install
-install(DIRECTORY src DESTINATION include FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY include/ DESTINATION include FILES_MATCHING PATTERN "*.h")
 install(TARGETS panda-backtrace EXPORT panda-backtraceTargets ARCHIVE DESTINATION lib)
 
 install(EXPORT panda-backtraceTargets

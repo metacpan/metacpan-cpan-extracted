@@ -1,3 +1,21 @@
+0.148		2021-11-28	T. R. Wyant
+    Add Celestrak catalog 1982-092 (Russian ASAT debris)
+
+    Add Celestrak catalogs for historical debris events
+
+    Add celestrak option 'observing_list'.  If this is true, and the
+    'direct' attribute is false, you get back the observing list stored
+    on Celestrak, rather than the Space Track TLEs specified by the
+    observing list.
+
+    Use https: for Celestrak.
+
+commit 64bce81410add91be6b014cda3b39cd8b18871a2
+Author: Tom Wyant <wyant@cpan.org>
+Date:   Tue Nov 16 10:48:11 2021 -0500
+
+    Add file CONTRIBUTING
+
 0.147		2021-09-08	T. R. Wyant
     Warn on first use of deprecated spaceflight() method.  It does not
     work anyway since the underlying web site has gone away.

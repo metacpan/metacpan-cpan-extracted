@@ -1,4 +1,6 @@
-1.2.3    xx.xx.2021
+1.2.4    xx.xx.2021
+           - upgrade tests for catch-v3
+1.2.3    13.07.2021
            - internal improvements
 1.2.2    02.07.2021
            - fix compilation warnings

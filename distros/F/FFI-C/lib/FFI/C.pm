@@ -7,7 +7,7 @@ use Carp ();
 use Ref::Util qw( is_ref is_plain_arrayref is_plain_hashref );
 
 # ABSTRACT: C data types for FFI
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 our %ffi;
@@ -150,7 +150,7 @@ FFI::C - C data types for FFI
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -423,7 +423,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020,2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

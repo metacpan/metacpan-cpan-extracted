@@ -1,24 +1,3 @@
-package Quiq::ContentProcessor;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Path;
-use Quiq::Option;
-use Time::HiRes ();
-use Quiq::Perl;
-use Quiq::Hash;
-use Quiq::DestinationTree;
-use Quiq::Terminal;
-use Quiq::Section::Parser;
-use Quiq::Section::Object;
-use Quiq::Hash::Db;
-use Quiq::Formatter;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -121,6 +100,33 @@ Liste alle Entitäten vom Typ $type auf:
   for my $ent ($cop->entities($type)) {
       $cop->msg($ent->name);
   }
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ContentProcessor;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Path;
+use Quiq::Option;
+use Time::HiRes ();
+use Quiq::Perl;
+use Quiq::Hash;
+use Quiq::DestinationTree;
+use Quiq::Terminal;
+use Quiq::Section::Parser;
+use Quiq::Section::Object;
+use Quiq::Hash::Db;
+use Quiq::Formatter;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -1392,7 +1398,7 @@ sub msg {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

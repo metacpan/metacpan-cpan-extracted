@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Defines a Job
 # PODNAME: Acme::Resume::Types::Job
-our $VERSION = '0.0106';
+our $VERSION = '0.0107';
 
 class Acme::Resume::Types::Job :rw {
 
@@ -58,7 +58,7 @@ Acme::Resume::Types::Job - Defines a Job
 
 =head1 VERSION
 
-Version 0.0106, released 2021-10-31.
+Version 0.0107, released 2021-11-30.
 
 =head1 SOURCE
 

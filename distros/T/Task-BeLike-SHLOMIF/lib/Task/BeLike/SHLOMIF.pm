@@ -1,5 +1,5 @@
 package Task::BeLike::SHLOMIF;
-$Task::BeLike::SHLOMIF::VERSION = '0.0.6';
+$Task::BeLike::SHLOMIF::VERSION = '0.0.8';
 use strict;
 use warnings;
 
@@ -17,11 +17,15 @@ Task::BeLike::SHLOMIF - Be like SHLOMIF / Shlomi Fish.
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.8
 
 =head1 TASK CONTENTS
 
 =head2 Shlomi Fish's Favourite Dists
+
+=head3 L<Bit::Vector>
+
+=head3 L<Carp::Always>
 
 =head3 L<Devel::LineTrace>
 
@@ -32,6 +36,20 @@ version 0.0.6
 =head3 L<Devel::TraceVars>
 
 =head3 L<Dist::Zilla::PluginBundle::SHLOMIF>
+
+=head3 L<Dist::Zilla::Plugin::Keywords>
+
+=head3 L<Docker::CLI::Wrapper>
+
+=head3 L<GD>
+
+=head3 L<HTML::Links::Localize>
+
+=head3 L<Image::Size>
+
+=head3 L<Math::Random::MT>
+
+=head3 L<Perl::Tidy>
 
 =head3 L<Pod::Coverage::TrustPod>
 
@@ -47,7 +65,13 @@ version 0.0.6
 
 =head3 L<Term::ReadLine::Gnu>
 
+=head3 L<Test::File::IsSorted>
+
 =head3 L<Test::Pod>
+
+=head3 L<Test::Some>
+
+=head3 L<Tree::AVL>
 
 =head2 Favourite Apps
 
@@ -75,11 +99,15 @@ version 0.0.6
 
 =head3 L<App::Timestamper::Format>
 
+=head3 L<App::Timestamper::WithElapsed>
+
 =head3 L<App::gimpgitbuild>
 
 =head3 L<App::intrunningsum>
 
 =head3 L<App::intsum>
+
+=head3 L<App::prefixintsumcol>
 
 =head3 L<App::stopw>
 

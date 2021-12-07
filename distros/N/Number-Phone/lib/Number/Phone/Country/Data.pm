@@ -2,7 +2,7 @@
     # automatically generated file, don't edit
 
     package Number::Phone::Country::Data;
-    $VERSION = '2.20210921211732';
+    $VERSION = '2.20211206222341';
         %Number::Phone::Country::idd_codes = (
     20 => 'EG',
 211 => 'SS',
@@ -426,7 +426,7 @@
 'TD' => ['235', '00', undef, qr/\A 00|16 /xms],
 'TG' => ['228', '00', undef, qr/\A 00 /xms],
 'TH' => ['66', '001', '0', qr/\A 00[1-9] /xms],
-'TJ' => ['992', '810', '8', qr/\A 810 /xms],
+'TJ' => ['992', '810', undef, qr/\A 810 /xms],
 'TK' => ['690', '00', undef, qr/\A 00 /xms],
 'TL' => ['670', '00', undef, qr/\A 00 /xms],
 'TM' => ['993', '810', '8', qr/\A 810 /xms],

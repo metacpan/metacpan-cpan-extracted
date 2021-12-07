@@ -1,3 +1,4 @@
+^.git
 ^App-MakeEPUB-*
 \.bak$
 ^blib/

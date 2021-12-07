@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use DBIx::Class::DeploymentHandler;
+
+package MakeUpgradeDBFlow::Args {
+  use Moose;
+  with 'MooseX::Getopt';
+  use Module::Runtime qw/require_module/;
+
+  has schema => (is => 'ro', isa => 'Str', required => 1, documentation => 'The name of the schema class to load. Must be a DBIx::Class');
+
+  has _schema => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my $self = shift;
+      my $schema_name = $self->schema;
+      $self->use_lib_include_dir;
+      require_module $schema_name;
+      my $schema = $schema_name->admin_connection;
+      return $schema;
+    }
+  );
+
+  has include_dir => (
+    traits => ['Getopt'],
+    is => 'ro',
+    isa => 'Str',
+    default => 'lib',
+    cmd_aliases => 'I',
+    documentation => 'library directory for the schema (will be added to @INC). Defaults to lib',
+  );
+
+  sub use_lib_include_dir {
+    my $self = shift;
+    require lib;
+    lib->import($self->include_dir);
+  }
+
+  has dir => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'database',
+    documentation => 'The directory to create support files in',
+  );
+}
+
+my $opts = MakeUpgradeDBFlow::Args->new_with_options;
+
+my $dh = DBIx::Class::DeploymentHandler->new({
+     schema              => $opts->_schema,
+     script_directory    => $opts->dir,
+     databases           => 'MySQL',
+     sql_translator_args => { add_drop_table => 0 },
+
+     force_overwrite => 1,
+});
+
+my $sth = $opts->_schema->storage->dbh->prepare(
+        'SELECT version 
+         FROM dbix_class_deploymenthandler_versions 
+         WHERE id IN (SELECT MAX(id) 
+                      FROM dbix_class_deploymenthandler_versions
+                     )');
+$sth->execute;
+my $row= $sth->fetchrow_hashref;
+die "The dbix_class_deploymenthandler_versions has no versioning info. Was dbflow_create correctly executed?" if (not defined $row);
+
+my $version = $row->{version};
+$sth->finish;
+
+my $schema_version = $opts->_schema->schema_version;
+if ($version >= $schema_version) {
+   die "Can't generate upgrade scripts for an already existing DB version. Version in the DB: $version. The Schema Version: $schema_version";
+}
+
+$dh->add_database_version({ version => $opts->_schema->schema_version });
+$dh->prepare_deploy;
+$dh->prepare_upgrade({
+  from_version => $schema_version - 1,
+  to_version => $schema_version,
+  version_set => [$schema_version - 1, $schema_version],
+});
+

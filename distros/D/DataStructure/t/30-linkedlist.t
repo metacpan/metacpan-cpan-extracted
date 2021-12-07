@@ -3,9 +3,8 @@ use warnings;
 use utf8;
 
 use Scalar::Util qw(weaken);
-use Test::More;
-
-BEGIN { use_ok('DataStructure::LinkedList') }
+use Test2::Bundle::More;
+use Test2::Tools::Target 'DataStructure::LinkedList';
 
 my $l = DataStructure::LinkedList->new();
 isa_ok($l, 'DataStructure::LinkedList');
@@ -44,12 +43,94 @@ $g = $l->first();
 cmp_ok($f, '==', $g, 'node compare 2');
 
 ok(!defined $f->next(), 'no next after last node');
-is($l->pop(), 'abc', 'pop abc (synonym for shift');
+is($l->pop(), 'abc', 'pop abc');
 is_deeply([$l->values()], [qw()]);
 cmp_ok($l->size(), '==', 0, 'size 0');
 ok(!defined $l->shift(), 'shift after last');
 cmp_ok($l->size(), '==', 0, 'size 0 again');
 ok($l->empty(), 'empty again');
+
+{
+  my $l = DataStructure::LinkedList->new();
+  $l->_self_check('');
+  is_deeply([$l->values()], [qw()]);
+  ok(!defined $l->shift());
+  ok(!defined $l->pop());
+  cmp_ok($l->size(), '==', 0);
+  $l->_self_check('');
+
+  $l->unshift('a');
+  $l->_self_check('a');
+  is_deeply([$l->values()], [qw(a)]);
+  cmp_ok($l->size(), '==', 1);
+
+  $l->unshift('b');
+  $l->_self_check('b a');
+  is_deeply([$l->values()], [qw(b a)]);
+  cmp_ok($l->size(), '==', 2);
+
+  $l->push('c');
+  $l->_self_check('b a c');
+  is_deeply([$l->values()], [qw(b a c)]);
+  cmp_ok($l->size(), '==', 3);
+
+  is($l->shift(), 'b');
+  $l->_self_check('a c');
+  is_deeply([$l->values()], [qw(a c)]);
+  is($l->pop(), 'a');
+  $l->_self_check('c');
+  is_deeply([$l->values()], [qw(c)]);
+  is($l->shift(), 'c');
+  $l->_self_check('');
+  is_deeply([$l->values()], []);
+  cmp_ok($l->size(), '==', 0);
+
+  $l->push('d');
+  $l->_self_check('d');
+  is_deeply([$l->values()], [qw(d)]);
+  cmp_ok($l->size(), '==', 1);
+}
+
+{
+  my $l = DataStructure::LinkedList->new(reverse => 1);
+  $l->_self_check('');
+  is_deeply([$l->values()], [qw()]);
+  ok(!defined $l->shift());
+  ok(!defined $l->pop());
+  cmp_ok($l->size(), '==', 0);
+  $l->_self_check('');
+
+  $l->unshift('a');
+  $l->_self_check('a');
+  is_deeply([$l->values()], [qw(a)]);
+  cmp_ok($l->size(), '==', 1);
+
+  $l->unshift('b');
+  $l->_self_check('a b');
+  is_deeply([$l->values()], [qw(a b)]);
+  cmp_ok($l->size(), '==', 2);
+
+  $l->push('c');
+  $l->_self_check('c a b');
+  is_deeply([$l->values()], [qw(c a b)]);
+  cmp_ok($l->size(), '==', 3);
+
+  is($l->shift(), 'c');
+  $l->_self_check('a b');
+  is_deeply([$l->values()], [qw(a b)]);
+  is($l->pop(), 'a');
+  $l->_self_check('b');
+  is_deeply([$l->values()], [qw(b)]);
+  is($l->shift(), 'b');
+  $l->_self_check('');
+  is_deeply([$l->values()], []);
+  cmp_ok($l->size(), '==', 0);
+
+  $l->push('d');
+  $l->_self_check('d');
+  is_deeply([$l->values()], [qw(d)]);
+  cmp_ok($l->size(), '==', 1);
+}
 
 my $weak_ref;
 my $weak_node;

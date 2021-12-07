@@ -31,7 +31,10 @@ sub ACTION_cpan {
   my $ver = eval qq{use $mod; \$${mod}::VERSION};
   (my $tgz = $mod) =~ s|::|\-|g;
   $tgz = "${tgz}-${ver}.tar.gz";
-  print STDOUT `cpan-upload $tgz`; # add --dry-run option if needed
+  use CPAN::Uploader;
+  my $config = CPAN::Uploader->read_config_file();
+  CPAN::Uploader->upload_file($tgz, $config);
+  # print STDOUT `cpan-upload -u $ARGV[1] -p $ARGV[2] $tgz`; # add --dry-run option if needed
   # `mojo cpanify -u sri -p secr3t $tgz`;
 }
 
@@ -82,4 +85,5 @@ content can be appended using Excel::Writer::XLSX. ],
 
 );
 
+$builder->add_build_element( q[xlsx] );
 $builder->create_build_script();

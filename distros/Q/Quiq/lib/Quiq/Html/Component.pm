@@ -1,16 +1,3 @@
-package Quiq::Html::Component;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Css;
-use Quiq::JavaScript;
-use Quiq::JQuery::Function;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -69,6 +56,25 @@ speichert die einzelnen Bestandteile nur, die Methoden
 manipulieren sie nicht. Einzig die Methode L<fragment|"fragment() - Generiere HTML">() führt
 eine Verarbeitung durch, indem sie zusammenfassenden HTML-Code über
 allen Komponenten generiert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Component;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Css;
+use Quiq::JavaScript;
+use Quiq::JQuery::Function;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -401,7 +407,7 @@ sub putValue {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

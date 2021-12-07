@@ -7,11 +7,23 @@ package Lingua::EN::Inflexion::Nouns;
 use 5.010; use strict; use warnings; use re q{eval};
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = 20211117.032229;
+our $VERSION = 20211130.043929;
 
 my $modern_plural_of = {
   " ox"                    => " oxen",
   "-ox"                    => "-oxen",
+  "1 star general"         => "1 star generals",
+  "1-star general"         => "1-star generals",
+  "2 star general"         => "2 star generals",
+  "2-star general"         => "2-star generals",
+  "3 star general"         => "3 star generals",
+  "3-star general"         => "3-star generals",
+  "4 star general"         => "4 star generals",
+  "4-star general"         => "4-star generals",
+  "5 star general"         => "5 star generals",
+  "5-star general"         => "5-star generals",
+  "6 star general"         => "6 star generals",
+  "6-star general"         => "6-star generals",
   "abacus"                 => "abacuses",
   "aboiteau"               => "aboiteaus",
   "abortorium"             => "abortoria",
@@ -28,7 +40,6 @@ my $modern_plural_of = {
   "aculeus"                => "aculei",
   "addendum"               => "addendums",
   "adieu"                  => "adieus",
-  "adjutant general"       => "adjutant generals",
   "adminiculum"            => "adminicula",
   "ado"                    => "ados",
   "adviso"                 => "advisoes",
@@ -128,6 +139,8 @@ my $modern_plural_of = {
   "argumentum"             => "argumenta",
   "arista"                 => "aristae",
   "armadillo"              => "armadillos",
+  "army corps general"     => "army corps generals",
+  "army-corps general"     => "army-corps generals",
   "arrha"                  => "arrhae",
   "asbestos"               => "asbestoses",
   "ascidium"               => "ascidia",
@@ -138,8 +151,8 @@ my $modern_plural_of = {
   "asylum"                 => "asylums",
   "asyndeton"              => "asyndeta",
   "ataman"                 => "atamans",
-  "Atlas"                  => "Atlantes",
   "atlas"                  => "atlases",
+  "Atlas"                  => "Atlantes",
   "atman"                  => "atmas",
   "aureus"                 => "aurei",
   "aurora"                 => "auroras",
@@ -298,6 +311,7 @@ my $modern_plural_of = {
   "capataz"                => "capataces",
   "capo"                   => "capos",
   "cappuccino"             => "cappuccinos",
+  "captain general"        => "captain generals",
   "carabiniere"            => "carabinieri",
   "carcinoma"              => "carcinomas",
   "cardo"                  => "cardines",
@@ -388,11 +402,13 @@ my $modern_plural_of = {
   "collegium"              => "collegia",
   "collegium musicum"      => "collegia musica",
   "Colombo"                => "Colombos",
+  "colonel general"        => "colonel generals",
   "Colorado"               => "Colorados",
   "columbarium"            => "columbaria",
   "columna"                => "columnae",
   "coma"                   => "comae",
   "comatula"               => "comatulae",
+  "commanding general"     => "commanding generals",
   "commando"               => "commandos",
   "compendium"             => "compendiums",
   "competent"              => "competentes",
@@ -428,6 +444,7 @@ my $modern_plural_of = {
   "cornu"                  => "cornua",
   "corona"                 => "coronas",
   "corps"                  => "corps",
+  "corps general"          => "corps generals",
   "corpus"                 => "corpuses",
   "corpus vile"            => "corpora vilia",
   "corpusculum"            => "corpuscula",
@@ -515,6 +532,7 @@ my $modern_plural_of = {
   "ditto"                  => "dittos",
   "diverticulum"           => "diverticula",
   "divertimento"           => "divertimentos",
+  "divisional general"     => "divisional generals",
   "djinn"                  => "djinns",
   "do"                     => "does",
   "doe"                    => "does",
@@ -628,6 +646,8 @@ my $modern_plural_of = {
   "finger-end"             => "finger-ends",
   "fioritura"              => "fioriture",
   "fish"                   => "fish",
+  "five star general"      => "five star generals",
+  "five-star general"      => "five-star generals",
   "fizz"                   => "fizzes",
   "flabellum"              => "flabella",
   "flag staff"             => "flag staffs",
@@ -650,6 +670,8 @@ my $modern_plural_of = {
   "formula"                => "formulas",
   "forum"                  => "forums",
   "fossa"                  => "fossae",
+  "four star general"      => "four star generals",
+  "four-star general"      => "four-star generals",
   "fowl"                   => "fowls",
   "fraenum"                => "fraena",
   "franc archer"           => "franc archers",
@@ -900,8 +922,8 @@ my $modern_plural_of = {
   "Japanese"               => "Japanese",
   "Javanese"               => "Javanese",
   "jazz"                   => "jazzes",
-  "Jerry"                  => "Jerrys",
   "jerry"                  => "jerries",
+  "Jerry"                  => "Jerrys",
   "jeu"                    => "jeux",
   "jo"                     => "joes",
   "joe"                    => "joes",
@@ -1094,8 +1116,8 @@ my $modern_plural_of = {
   "mare"                   => "mares",
   "maremma"                => "maremme",
   "marquis"                => "marquises",
-  "Mary"                   => "Marys",
   "mary"                   => "maries",
+  "Mary"                   => "Marys",
   "mater lectionis"        => "matres lectionis",
   "math"                   => "maths",
   "matin"                  => "matins",
@@ -1317,6 +1339,8 @@ my $modern_plural_of = {
   "ommatidium"             => "ommatidia",
   "onager"                 => "onagers",
   "one"                    => "some",
+  "one star general"       => "one star generals",
+  "one-star general"       => "one-star generals",
   "operculum"              => "opercula",
   "ophiophagus"            => "ophiophagi",
   "optimum"                => "optimums",
@@ -1616,8 +1640,8 @@ my $modern_plural_of = {
   "punto blanco"           => "puntos blancos",
   "pupa"                   => "pupae",
   "purlieu"                => "purlieus",
-  "purum"                  => "purums",
   "Purum"                  => "Purums",
+  "purum"                  => "purums",
   "putto"                  => "putti",
   "puttony"                => "puttonys",
   "pycnidium"              => "pycnidia",
@@ -1701,8 +1725,8 @@ my $modern_plural_of = {
   "rite de passage"        => "rites de passage",
   "rococo"                 => "rococos",
   "roe"                    => "roes",
-  "Rom"                    => "Roma",
   "rom"                    => "roms",
+  "Rom"                    => "Roma",
   "Romagnese"              => "Romagnese",
   "Roman"                  => "Romans",
   "Romanese"               => "Romanese",
@@ -1876,6 +1900,8 @@ my $modern_plural_of = {
   "sis"                    => "ses",
   "sistrum"                => "sistrums",
   "situla"                 => "situlas",
+  "six star general"       => "six star generals",
+  "six-star general"       => "six-star generals",
   "sizz"                   => "sizzes",
   "ski"                    => "skis",
   "snekkja"                => "snekkjur",
@@ -2146,6 +2172,8 @@ my $modern_plural_of = {
   "thorax"                 => "thoraxes",
   "thos"                   => "thoes",
   "thraso"                 => "thrasoes",
+  "three star general"     => "three star generals",
+  "three-star general"     => "three-star generals",
   "thymiaterion"           => "thymiateria",
   "thymus"                 => "thymi",
   "thyridium"              => "thyridia",
@@ -2239,6 +2267,8 @@ my $modern_plural_of = {
   "turbot"                 => "turbots",
   "turf"                   => "turfs",
   "turron"                 => "turrons",
+  "two star general"       => "two star generals",
+  "two-star general"       => "two-star generals",
   "tympanum"               => "tympana",
   "typo"                   => "typos",
   "tyro"                   => "tyros",
@@ -2430,6 +2460,18 @@ my $modern_plural_of = {
 my $classical_plural_of = {
   " ox"                    => " oxen",
   "-ox"                    => "-oxen",
+  "1 star general"         => "1 star generals",
+  "1-star general"         => "1-star generals",
+  "2 star general"         => "2 star generals",
+  "2-star general"         => "2-star generals",
+  "3 star general"         => "3 star generals",
+  "3-star general"         => "3-star generals",
+  "4 star general"         => "4 star generals",
+  "4-star general"         => "4-star generals",
+  "5 star general"         => "5 star generals",
+  "5-star general"         => "5-star generals",
+  "6 star general"         => "6 star generals",
+  "6-star general"         => "6-star generals",
   "abacus"                 => "abacuses",
   "aboiteau"               => "aboiteaux",
   "abortorium"             => "abortoria",
@@ -2446,7 +2488,6 @@ my $classical_plural_of = {
   "aculeus"                => "aculei",
   "addendum"               => "addenda",
   "adieu"                  => "adieux",
-  "adjutant general"       => "adjutant generals",
   "adminiculum"            => "adminicula",
   "ado"                    => "ados",
   "adviso"                 => "advisoes",
@@ -2546,6 +2587,8 @@ my $classical_plural_of = {
   "argumentum"             => "argumenta",
   "arista"                 => "aristae",
   "armadillo"              => "armadillos",
+  "army corps general"     => "army corps generals",
+  "army-corps general"     => "army-corps generals",
   "arrha"                  => "arrhae",
   "asbestos"               => "asbestoses",
   "ascidium"               => "ascidia",
@@ -2716,6 +2759,7 @@ my $classical_plural_of = {
   "capataz"                => "capataces",
   "capo"                   => "capi",
   "cappuccino"             => "cappuccinos",
+  "captain general"        => "captain generals",
   "carabiniere"            => "carabinieri",
   "carcinoma"              => "carcinomata",
   "cardo"                  => "cardines",
@@ -2806,11 +2850,13 @@ my $classical_plural_of = {
   "collegium"              => "collegia",
   "collegium musicum"      => "collegia musica",
   "Colombo"                => "Colombos",
+  "colonel general"        => "colonel generals",
   "Colorado"               => "Colorados",
   "columbarium"            => "columbaria",
   "columna"                => "columnae",
   "coma"                   => "comae",
   "comatula"               => "comatulae",
+  "commanding general"     => "commanding generals",
   "commando"               => "commandos",
   "compendium"             => "compendia",
   "competent"              => "competentes",
@@ -2846,6 +2892,7 @@ my $classical_plural_of = {
   "cornu"                  => "cornua",
   "corona"                 => "coronae",
   "corps"                  => "corps",
+  "corps general"          => "corps generals",
   "corpus"                 => "corpora",
   "corpus vile"            => "corpora vilia",
   "corpusculum"            => "corpuscula",
@@ -2933,6 +2980,7 @@ my $classical_plural_of = {
   "ditto"                  => "dittos",
   "diverticulum"           => "diverticula",
   "divertimento"           => "divertimenti",
+  "divisional general"     => "divisional generals",
   "djinn"                  => "djinn",
   "do"                     => "does",
   "doe"                    => "does",
@@ -3046,6 +3094,8 @@ my $classical_plural_of = {
   "finger-end"             => "fingers-ends",
   "fioritura"              => "fioriture",
   "fish"                   => "fish",
+  "five star general"      => "five star generals",
+  "five-star general"      => "five-star generals",
   "fizz"                   => "fizzes",
   "flabellum"              => "flabella",
   "flag staff"             => "flag staves",
@@ -3068,6 +3118,8 @@ my $classical_plural_of = {
   "formula"                => "formulae",
   "forum"                  => "fora",
   "fossa"                  => "fossae",
+  "four star general"      => "four star generals",
+  "four-star general"      => "four-star generals",
   "fowl"                   => "fowl",
   "fraenum"                => "fraena",
   "franc archer"           => "francs archers",
@@ -3091,8 +3143,8 @@ my $classical_plural_of = {
   "furioso"                => "furiosos",
   "fuzz"                   => "fuzzes",
   "Gabunese"               => "Gabunese",
-  "Galla"                  => "Galla",
   "galla"                  => "galla",
+  "Galla"                  => "Galla",
   "gallows"                => "gallows",
   "gametangium"            => "gametangia",
   "ganglion"               => "ganglia",
@@ -3318,8 +3370,8 @@ my $classical_plural_of = {
   "Japanese"               => "Japanese",
   "Javanese"               => "Javanese",
   "jazz"                   => "jazzes",
-  "Jerry"                  => "Jerrys",
   "jerry"                  => "jerries",
+  "Jerry"                  => "Jerrys",
   "jeu"                    => "jeux",
   "jo"                     => "joes",
   "joe"                    => "joes",
@@ -3364,8 +3416,8 @@ my $classical_plural_of = {
   "laika"                  => "laiki",
   "lamella"                => "lamellae",
   "lamina"                 => "laminae",
-  "Lapith"                 => "Lapithae",
   "lapith"                 => "lapithae",
+  "Lapith"                 => "Lapithae",
   "Lapponese"              => "Lapponese",
   "lar"                    => "lares",
   "larnax"                 => "larnakes",
@@ -3735,6 +3787,8 @@ my $classical_plural_of = {
   "ommatidium"             => "ommatidia",
   "onager"                 => "onagri",
   "one"                    => "some",
+  "one star general"       => "one star generals",
+  "one-star general"       => "one-star generals",
   "operculum"              => "opercula",
   "ophiophagus"            => "ophiophagi",
   "optimum"                => "optima",
@@ -4294,6 +4348,8 @@ my $classical_plural_of = {
   "sis"                    => "ses",
   "sistrum"                => "sistra",
   "situla"                 => "situlae",
+  "six star general"       => "six star generals",
+  "six-star general"       => "six-star generals",
   "sizz"                   => "sizzes",
   "ski"                    => "skis",
   "snekkja"                => "snekkjur",
@@ -4564,6 +4620,8 @@ my $classical_plural_of = {
   "thorax"                 => "thoraces",
   "thos"                   => "thoes",
   "thraso"                 => "thrasones",
+  "three star general"     => "three star generals",
+  "three-star general"     => "three-star generals",
   "thymiaterion"           => "thymiateria",
   "thymus"                 => "thymi",
   "thyridium"              => "thyridia",
@@ -4657,6 +4715,8 @@ my $classical_plural_of = {
   "turbot"                 => "turbot",
   "turf"                   => "turves",
   "turron"                 => "turrones",
+  "two star general"       => "two star generals",
+  "two-star general"       => "two-star generals",
   "tympanum"               => "tympana",
   "typo"                   => "typos",
   "tyro"                   => "tyros",
@@ -4848,6 +4908,18 @@ my $classical_plural_of = {
 my $singular_of = {
   " oxen"                 => " ox",
   "-oxen"                 => "-ox",
+  "1 star generals"       => "1 star general",
+  "1-star generals"       => "1-star general",
+  "2 star generals"       => "2 star general",
+  "2-star generals"       => "2-star general",
+  "3 star generals"       => "3 star general",
+  "3-star generals"       => "3-star general",
+  "4 star generals"       => "4 star general",
+  "4-star generals"       => "4-star general",
+  "5 star generals"       => "5 star general",
+  "5-star generals"       => "5-star general",
+  "6 star generals"       => "6 star general",
+  "6-star generals"       => "6-star general",
   "abacuses"              => "abacus",
   "aboiteaus"             => "aboiteau",
   "aboiteaux"             => "aboiteau",
@@ -4869,7 +4941,6 @@ my $singular_of = {
   "addendums"             => "addendum",
   "adieus"                => "adieu",
   "adieux"                => "adieu",
-  "adjutant generals"     => "adjutant general",
   "adminicula"            => "adminiculum",
   "ados"                  => "ado",
   "advisoes"              => "adviso",
@@ -4992,6 +5063,8 @@ my $singular_of = {
   "argumenta"             => "argumentum",
   "aristae"               => "arista",
   "armadillos"            => "armadillo",
+  "army corps generals"   => "army corps general",
+  "army-corps generals"   => "army-corps general",
   "arrhae"                => "arrha",
   "arves"                 => "arf",
   "asbestoses"            => "asbestos",
@@ -5013,8 +5086,8 @@ my $singular_of = {
   "aurei"                 => "aureus",
   "aurorae"               => "aurora",
   "auroras"               => "aurora",
-  "auslesen"              => "auslese",
   "Auslesen"              => "Auslese",
+  "auslesen"              => "auslese",
   "ausleses"              => "auslese",
   "auspices"              => "auspex",
   "auto de fes"           => "auto de fe",
@@ -5214,6 +5287,7 @@ my $singular_of = {
   "capi"                  => "capo",
   "capos"                 => "capo",
   "cappuccinos"           => "cappuccino",
+  "captain generals"      => "captain general",
   "carabinieri"           => "carabiniere",
   "carcinomas"            => "carcinoma",
   "carcinomata"           => "carcinoma",
@@ -5316,11 +5390,13 @@ my $singular_of = {
   "collegia"              => "collegium",
   "collegia musica"       => "collegium musicum",
   "Colombos"              => "Colombo",
+  "colonel generals"      => "colonel general",
   "Colorados"             => "Colorado",
   "columbaria"            => "columbarium",
   "columnae"              => "columna",
   "comae"                 => "coma",
   "comatulae"             => "comatula",
+  "commanding generals"   => "commanding general",
   "commandos"             => "commando",
   "compendia"             => "compendium",
   "compendiums"           => "compendium",
@@ -5366,6 +5442,7 @@ my $singular_of = {
   "corpora"               => "corpus",
   "corpora vilia"         => "corpus vile",
   "corps"                 => "corps",
+  "corps generals"        => "corps general",
   "corpuscula"            => "corpusculum",
   "corpuses"              => "corpus",
   "corrigenda"            => "corrigendum",
@@ -5469,6 +5546,7 @@ my $singular_of = {
   "diverticula"           => "diverticulum",
   "divertimenti"          => "divertimento",
   "divertimentos"         => "divertimento",
+  "divisional generals"   => "divisional general",
   "djinn"                 => "djinn",
   "djinns"                => "djinn",
   "does"                  => "doe",
@@ -5618,6 +5696,8 @@ my $singular_of = {
   "fingers-ends"          => "finger-end",
   "fioriture"             => "fioritura",
   "fish"                  => "fish",
+  "five star generals"    => "five star general",
+  "five-star generals"    => "five-star general",
   "fizzes"                => "fizz",
   "flabella"              => "flabellum",
   "flag staffs"           => "flag staff",
@@ -5647,6 +5727,8 @@ my $singular_of = {
   "formulas"              => "formula",
   "forums"                => "forum",
   "fossae"                => "fossa",
+  "four star generals"    => "four star general",
+  "four-star generals"    => "four-star general",
   "fowl"                  => "fowl",
   "fowls"                 => "fowl",
   "fraena"                => "fraenum",
@@ -5676,8 +5758,8 @@ my $singular_of = {
   "Gabunese"              => "Gabunese",
   "Galla"                 => "Galla",
   "galla"                 => "galla",
-  "gallas"                => "galla",
   "Gallas"                => "Galla",
+  "gallas"                => "galla",
   "gallows"               => "gallows",
   "gametangia"            => "gametangium",
   "ganglia"               => "ganglion",
@@ -5993,10 +6075,10 @@ my $singular_of = {
   "laiki"                 => "laika",
   "lamellae"              => "lamella",
   "laminae"               => "lamina",
-  "Lapithae"              => "Lapith",
   "lapithae"              => "lapith",
-  "lapiths"               => "lapith",
+  "Lapithae"              => "Lapith",
   "Lapiths"               => "Lapith",
+  "lapiths"               => "lapith",
   "Lapponese"             => "Lapponese",
   "lares"                 => "lar",
   "larnakes"              => "larnax",
@@ -6461,6 +6543,8 @@ my $singular_of = {
   "ommatidia"             => "ommatidium",
   "onagers"               => "onager",
   "onagri"                => "onager",
+  "one star generals"     => "one star general",
+  "one-star generals"     => "one-star general",
   "opera magna"           => "opus magnum",
   "opercula"              => "operculum",
   "ophiophagi"            => "ophiophagus",
@@ -6483,10 +6567,10 @@ my $singular_of = {
   "osteoclastomata"       => "osteoclastoma",
   "osteomata"             => "osteoma",
   "ostia"                 => "ostium",
-  "otomi"                 => "otomi",
   "Otomi"                 => "Otomi",
-  "otomies"               => "otomi",
+  "otomi"                 => "otomi",
   "Otomies"               => "Otomi",
+  "otomies"               => "otomi",
   "otos"                  => "oto",
   "ottomans"              => "ottoman",
   "ours"                  => "mine",
@@ -6511,10 +6595,10 @@ my $singular_of = {
   "palpebrae"             => "palpebra",
   "palpi"                 => "palpus",
   "Panamans"              => "Panaman",
-  "pangasinanes"          => "pangasinan",
   "Pangasinanes"          => "Pangasinan",
-  "Pangasinans"           => "Pangasinan",
+  "pangasinanes"          => "pangasinan",
   "pangasinans"           => "pangasinan",
+  "Pangasinans"           => "Pangasinan",
   "panini"                => "panino",
   "panorpae"              => "panorpa",
   "pantos"                => "panto",
@@ -6823,10 +6907,10 @@ my $singular_of = {
   "pupae"                 => "pupa",
   "purlieus"              => "purlieu",
   "purlieux"              => "purlieu",
-  "purum"                 => "purum",
   "Purum"                 => "Purum",
-  "Purums"                => "Purum",
+  "purum"                 => "purum",
   "purums"                => "purum",
+  "Purums"                => "Purum",
   "putti"                 => "putto",
   "puttonys"              => "puttony",
   "pycnia"                => "pycnium",
@@ -7155,6 +7239,8 @@ my $singular_of = {
   "sistrums"              => "sistrum",
   "situlae"               => "situla",
   "situlas"               => "situla",
+  "six star generals"     => "six star general",
+  "six-star generals"     => "six-star general",
   "sizzes"                => "sizz",
   "skis"                  => "ski",
   "snekkjur"              => "snekkja",
@@ -7489,6 +7575,8 @@ my $singular_of = {
   "those"                 => "that",
   "thrasoes"              => "thraso",
   "thrasones"             => "thraso",
+  "three star generals"   => "three star general",
+  "three-star generals"   => "three-star general",
   "thymi"                 => "thymus",
   "thymiateria"           => "thymiaterion",
   "thyridia"              => "thyridium",
@@ -7597,6 +7685,8 @@ my $singular_of = {
   "turrones"              => "turron",
   "turrons"               => "turron",
   "turves"                => "turf",
+  "two star generals"     => "two star general",
+  "two-star generals"     => "two-star general",
   "tympana"               => "tympanum",
   "typos"                 => "typo",
   "Tyrolese"              => "Tyrolese",
@@ -7855,6 +7945,19 @@ sub convert_to_modern_plural {
     return $word                     if is_plural($word) && !is_singular($word);
     given ($word) {
         when (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->plural)}"; }
+        when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-general"; }
+        when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} general"; }
+        when (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
+        when (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
+        when (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
+        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-$2-$3"; }
+        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} $2 $3"; }
+        when (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_singular($2) ? \convert_to_modern_plural($2) : \$2}"; }
+        when (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_singular($2) ? \convert_to_modern_plural($2) : \$2}"; }
+        when (m{\A(.*?)-errant$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-errant"; }
+        when (m{\A(.*?) errant$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} errant"; }
+        when (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-$2"; }
+        when (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} $2"; }
         when (m{\A(.*)stave$}i) { return "${1}staves"; }
         when (m{\A(.*)staff$}i) { return "${1}staffs"; }
         when (m{\A(.*)genus$}i) { return "${1}genera"; }
@@ -7919,20 +8022,6 @@ sub convert_to_modern_plural {
         when (m{\A(.*)craft$}i) { return "${1}craft"; }
         when (m{\A(.*)gas$}i) { return "${1}gases"; }
         when (m{\A(.*)glottis$}i) { return "${1}glottises"; }
-        when (m{\A(.+)star general$}i) { return "${1}star generals"; }
-        when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-general"; }
-        when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} general"; }
-        when (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
-        when (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
-        when (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-$2-$3"; }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} $2 $3"; }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_singular($2) ? \convert_to_modern_plural($2) : \$2}"; }
-        when (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_singular($2) ? \convert_to_modern_plural($2) : \$2}"; }
-        when (m{\A(.*?)-errant$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-errant"; }
-        when (m{\A(.*?) errant$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} errant"; }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-$2"; }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} $2"; }
         when (m{\A(.+[aeiou])o$}i) { return "${1}os"; }
         when (m{\A(.+[aeo])lf$}i) { return "${1}lves"; }
         when (m{\A(.+[aiy])nx$}i) { return "${1}nxes"; }
@@ -7972,6 +8061,19 @@ sub convert_to_classical_plural {
     return $word                     if is_plural($word) && !is_singular($word);
     given ($word) {
         when (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->classical->plural)}"; }
+        when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-general"; }
+        when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} general"; }
+        when (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
+        when (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
+        when (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
+        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-$2-$3"; }
+        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} $2 $3"; }
+        when (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_singular($2) ? \convert_to_classical_plural($2) : \$2}"; }
+        when (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_singular($2) ? \convert_to_classical_plural($2) : \$2}"; }
+        when (m{\A(.*?)-errant$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-errant"; }
+        when (m{\A(.*?) errant$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} errant"; }
+        when (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-$2"; }
+        when (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} $2"; }
         when (m{\A(.*)stave$}i) { return "${1}staves"; }
         when (m{\A(.*)staff$}i) { return "${1}staves"; }
         when (m{\A(.*)genus$}i) { return "${1}genera"; }
@@ -8036,20 +8138,6 @@ sub convert_to_classical_plural {
         when (m{\A(.*)craft$}i) { return "${1}craft"; }
         when (m{\A(.*)gas$}i) { return "${1}gases"; }
         when (m{\A(.*)glottis$}i) { return "${1}glottises"; }
-        when (m{\A(.+)star general$}i) { return "${1}star generals"; }
-        when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-general"; }
-        when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} general"; }
-        when (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
-        when (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
-        when (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-$2-$3"; }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} $2 $3"; }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_singular($2) ? \convert_to_classical_plural($2) : \$2}"; }
-        when (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_singular($2) ? \convert_to_classical_plural($2) : \$2}"; }
-        when (m{\A(.*?)-errant$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-errant"; }
-        when (m{\A(.*?) errant$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} errant"; }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-$2"; }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} $2"; }
         when (m{\A(.+[aeiou])o$}i) { return "${1}os"; }
         when (m{\A(.+[aeo])lf$}i) { return "${1}lves"; }
         when (m{\A(.+[aiy])nx$}i) { return "${1}nges"; }
@@ -8089,6 +8177,19 @@ sub convert_to_singular {
     return $word                     if is_singular($word);
     given ($word) {
         when (m{\A.*'s?$}i) { return "${\(Lingua::EN::Inflexion::adj($word)->singular)}"; }
+        when (m{\A(.*?)-general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-general"; }
+        when (m{\A(.*?) general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} general"; }
+        when (m{\A($PREP_PAT) them$}i) { return "$1 it"; }
+        when (m{\Asons-of-(.*?)$}i) { return "son-of-a-${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
+        when (m{\Asons of (.*?)$}i) { return "son of a ${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
+        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-$2-$3"; }
+        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} $2 $3"; }
+        when (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_plural($2) ? \convert_to_singular($2) : \$2}"; }
+        when (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_plural($2) ? \convert_to_singular($2) : \$2}"; }
+        when (m{\A(.*?)-errant$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-errant"; }
+        when (m{\A(.*?) errant$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} errant"; }
+        when (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-$2"; }
+        when (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} $2"; }
         when (m{\A(.*)staves$}i) { return "${1}stave"; }
         when (m{\A(.*)staffs$}i) { return "${1}staff"; }
         when (m{\A(.*)staves$}i) { return "${1}staff"; }
@@ -8173,20 +8274,6 @@ sub convert_to_singular {
         when (m{\A(.*)craft$}i) { return "${1}craft"; }
         when (m{\A(.*)gases$}i) { return "${1}gas"; }
         when (m{\A(.*)glottises$}i) { return "${1}glottis"; }
-        when (m{\A(.+)star generals$}i) { return "${1}star general"; }
-        when (m{\A(.*?)-general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-general"; }
-        when (m{\A(.*?) general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} general"; }
-        when (m{\A($PREP_PAT) them$}i) { return "$1 it"; }
-        when (m{\Asons-of-(.*?)$}i) { return "son-of-a-${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
-        when (m{\Asons of (.*?)$}i) { return "son of a ${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-$2-$3"; }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} $2 $3"; }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { return "$1-${is_plural($2) ? \convert_to_singular($2) : \$2}"; }
-        when (m{\A($PREP_PAT) (.*?)$}i) { return "$1 ${is_plural($2) ? \convert_to_singular($2) : \$2}"; }
-        when (m{\A(.*?)-errant$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-errant"; }
-        when (m{\A(.*?) errant$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} errant"; }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-$2"; }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} $2"; }
         when (m{\A(.+[aeiou])os$}i) { return "${1}o"; }
         when (m{\A(.+[aeo])lves$}i) { return "${1}lf"; }
         when (m{\A(.+[aiy])nxes$}i) { return "${1}nx"; }
@@ -8226,14 +8313,27 @@ sub is_plural {
     my ($word) = @_;
     return 1 if exists $is_plural->{$word};
     return 1 if exists $is_plural->{lc $word};
-    return 1 if exists $is_plural->{ucfirst lc $word};
+    return 1 if exists $is_plural->{tc $word};
     return 0 if exists $is_singular->{$word};
     return 0 if exists $is_singular->{lc $word};
-    return 0 if exists $is_singular->{ucfirst lc $word};
+    return 0 if exists $is_singular->{tc $word};
     given ($word) {
         when (m{'$})  { return 1 }
         when (m{'s$}) { return is_plural(substr($word,0,-2)) }
         when (m{\A.*'s?$}i) { return 1 }
+        when (m{\A(.*?)-general$}i) { return is_plural($1);return 1 }
+        when (m{\A(.*?) general$}i) { return is_plural($1);return 1 }
+        when (m{\A($PREP_PAT) them$}i) { return 1 }
+        when (m{\Asons-of-(.*?)$}i) { return is_plural($1);return 1 }
+        when (m{\Asons of (.*?)$}i) { return is_plural($1);return 1 }
+        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return is_plural($1);return 1 }
+        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return is_plural($1);return 1 }
+        when (m{\A($PREP_PAT)-(.*?)$}i) { return is_plural($2);return 1 }
+        when (m{\A($PREP_PAT) (.*?)$}i) { return is_plural($2);return 1 }
+        when (m{\A(.*?)-errant$}i) { return is_plural($1);return 1 }
+        when (m{\A(.*?) errant$}i) { return is_plural($1);return 1 }
+        when (m{\A(.*?)-($PREP_PAT)$}i) { return is_plural($1);return 1 }
+        when (m{\A(.*?) ($PREP_PAT)$}i) { return is_plural($1);return 1 }
         when (m{\A(.*)staves$}i) { return 1 }
         when (m{\A(.*)staffs$}i) { return 1 }
         when (m{\A(.*)genera$}i) { return 1 }
@@ -8317,18 +8417,6 @@ sub is_plural {
         when (m{\A(.*)craft$}i) { return 1 }
         when (m{\A(.*)gases$}i) { return 1 }
         when (m{\A(.*)glottises$}i) { return 1 }
-        when (m{\A(.+)star generals$}i) { return 1 }
-        when (m{\A($PREP_PAT) them$}i) { return 1 }
-        when (m{\Asons-of-(.*?)$}i) { continue if !is_plural($1);return 1 }
-        when (m{\Asons of (.*?)$}i) { continue if !is_plural($1);return 1 }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { continue if !is_plural($1);return 1 }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { continue if !is_plural($1);return 1 }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { continue if !is_plural($2);return 1 }
-        when (m{\A($PREP_PAT) (.*?)$}i) { continue if !is_plural($2);return 1 }
-        when (m{\A(.*?)-errant$}i) { continue if !is_plural($1);return 1 }
-        when (m{\A(.*?) errant$}i) { continue if !is_plural($1);return 1 }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { continue if !is_plural($1);return 1 }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { continue if !is_plural($1);return 1 }
         when (m{\A(.+[aeiou])os$}i) { return 1 }
         when (m{\A(.+[aeo])lves$}i) { return 1 }
         when (m{\A(.+[aiy])nxes$}i) { return 1 }
@@ -8365,14 +8453,27 @@ sub is_singular {
     my ($word) = @_;
     return 1 if exists $is_singular->{$word};
     return 1 if exists $is_singular->{lc $word};
-    return 1 if exists $is_singular->{ucfirst lc $word};
+    return 1 if exists $is_singular->{tc $word};
     return 0 if exists $is_plural->{$word};
     return 0 if exists $is_plural->{lc $word};
-    return 0 if exists $is_plural->{ucfirst lc $word};
+    return 0 if exists $is_plural->{tc $word};
     given ($word) {
         when (m{'$})  { return 0 }
         when (m{'s$}) { return is_singular(substr($word,0,-2)) }
         when (m{\A.*'s?$}i) { return 1 }
+        when (m{\A(.*?)-general$}i) { return is_singular($1);return 1 }
+        when (m{\A(.*?) general$}i) { return is_singular($1);return 1 }
+        when (m{\A($PREP_PAT) it$}i) { return 1 }
+        when (m{\Ason-of-a-(.*?)$}i) { return is_singular($1);return 1 }
+        when (m{\Ason of a (.*?)$}i) { return is_singular($1);return 1 }
+        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return is_singular($1);return 1 }
+        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { return is_singular($1);return 1 }
+        when (m{\A($PREP_PAT)-(.*?)$}i) { return is_singular($2);return 1 }
+        when (m{\A($PREP_PAT) (.*?)$}i) { return is_singular($2);return 1 }
+        when (m{\A(.*?)-errant$}i) { return is_singular($1);return 1 }
+        when (m{\A(.*?) errant$}i) { return is_singular($1);return 1 }
+        when (m{\A(.*?)-($PREP_PAT)$}i) { return is_singular($1);return 1 }
+        when (m{\A(.*?) ($PREP_PAT)$}i) { return is_singular($1);return 1 }
         when (m{\A(.*)stave$}i) { return 1 }
         when (m{\A(.*)staff$}i) { return 1 }
         when (m{\A(.*)genus$}i) { return 1 }
@@ -8437,18 +8538,6 @@ sub is_singular {
         when (m{\A(.*)craft$}i) { return 1 }
         when (m{\A(.*)gas$}i) { return 1 }
         when (m{\A(.*)glottis$}i) { return 1 }
-        when (m{\A(.+)star general$}i) { return 1 }
-        when (m{\A($PREP_PAT) it$}i) { return 1 }
-        when (m{\Ason-of-a-(.*?)$}i) { continue if !is_singular($1);return 1 }
-        when (m{\Ason of a (.*?)$}i) { continue if !is_singular($1);return 1 }
-        when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { continue if !is_singular($1);return 1 }
-        when (m{\A(.*?) ($PREP_PAT) (.*?)$}i) { continue if !is_singular($1);return 1 }
-        when (m{\A($PREP_PAT)-(.*?)$}i) { continue if !is_singular($2);return 1 }
-        when (m{\A($PREP_PAT) (.*?)$}i) { continue if !is_singular($2);return 1 }
-        when (m{\A(.*?)-errant$}i) { continue if !is_singular($1);return 1 }
-        when (m{\A(.*?) errant$}i) { continue if !is_singular($1);return 1 }
-        when (m{\A(.*?)-($PREP_PAT)$}i) { continue if !is_singular($1);return 1 }
-        when (m{\A(.*?) ($PREP_PAT)$}i) { continue if !is_singular($1);return 1 }
         when (m{\A(.+[aeiou])o$}i) { return 1 }
         when (m{\A(.+[aeo])lf$}i) { return 1 }
         when (m{\A(.+[aiy])nx$}i) { return 1 }

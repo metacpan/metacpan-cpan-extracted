@@ -1,12 +1,3 @@
-package Quiq::Html::Table::Simple;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -154,6 +145,21 @@ HTML:
   </tr>
   </table>
 
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Table::Simple;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
+
 =head1 METHODS
 
 =head2 Konstruktor
@@ -280,7 +286,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

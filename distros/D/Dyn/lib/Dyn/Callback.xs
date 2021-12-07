@@ -71,7 +71,7 @@ static char callback_handler(DCCallback * cb, DCArgs * args, DCValue * result, v
                     XPUSHs(newSVnv(dcbArgDouble(args))); break;
                 case DC_SIGCHAR_POINTER:
                 case DC_SIGCHAR_STRING:
-                    XPUSHs(newSVpv(dcbArgPointer(args), 0) ); break;
+                    XPUSHs(newSVpv((const char *) dcbArgPointer(args), 0) ); break;
                 case DC_SIGCHAR_STRUCT:
                     warn("Unhandled callback argument '%c' at %s line %d.", signature[i], __FILE__, __LINE__);
                     break;
@@ -223,7 +223,7 @@ PREINIT:
     PERL_SET_CONTEXT(my_perl);
 #endif
 CODE:
-    container = malloc(sizeof(_callback));
+    container = (_callback *) malloc(sizeof(_callback));
     if (!container) // OOM
         XSRETURN_UNDEF;
     container->cvm = dcNewCallVM(1024);
@@ -256,7 +256,7 @@ PREINIT:
 CODE:
     container = (_callback*) dcbGetUserData(pcb);
     container->signature = signature;
-    container->cb = SvREFCNT_inc(funcptr);
+    container->cb = SvREFCNT_inc((SV *) funcptr);
     container->userdata = items > 3 ? newRV_inc(ST(3)): &PL_sv_undef;
     int i;
     for (i = 0; container->signature[i+1] != '\0'; ++i ) {
@@ -410,7 +410,7 @@ CODE:
             XSRETURN_UNDEF;
             break;
         case DC_SIGCHAR_STRING:
-            RETVAL = newSVpv(dcCallPointer(container->cvm, self), 0);
+            RETVAL = newSVpv((const char *) dcCallPointer(container->cvm, self), 0);
             break;
         case DC_SIGCHAR_STRUCT:
             warn("Unhandled return type [%c] at %s line %d.", container->ret_type, __FILE__, __LINE__);
@@ -424,52 +424,6 @@ CODE:
     //warn("here at %s line %d.", __FILE__, __LINE__);
 OUTPUT:
     RETVAL
-
-
-SV *
-callX(DCCallback * self, ... )
-PREINIT:
-    dTHX;
-#ifdef USE_ITHREADS
-    PERL_SET_CONTEXT(my_perl);
-#endif
-    //AV * args = newAV();
-CODE:
-    _callback * container = ((_callback*) dcbGetUserData(self));
-    const char * signature  = container->signature;
-    warn("signature: %s", signature);
-    /*
-    typedef struct _callback {
-        SV * cb;
-        const char * signature;
-        char ret_type;
-        SV * userdata;
-    } _callback;
-    */
-    /*
-    int i;
-    for (i = 1; i < items; ++i)
-        av_push(args, ST(i));
-    //AV * args = newSV();
-    switch(container->ret_type) {
-        case DC_SIGCHAR_VOID:
-            ((void(*)(AV*))self)(args);
-            XSRETURN_UNDEF;
-            break;
-        case DC_SIGCHAR_STRING:
-            RETVAL = newSVpv(((const char *(*)(AV*))self)(args), 0);
-            break;
-        case DC_SIGCHAR_INT:
-            RETVAL = newSViv(((int(*)(AV*))self)(args));
-            break;
-        case DC_SIGCHAR_SHORT:
-            RETVAL = newSViv(((short(*)(AV*))self)(args));
-            break;
-        default:
-            warn("Unhandled return type [%c] at %s line %d.", container->ret_type, __FILE__, __LINE__);
-            XSRETURN_UNDEF;
-            break;
-    }*/
 
 void
 Ximport( const char * package, ... )

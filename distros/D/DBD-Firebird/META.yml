@@ -1,0 +1,34 @@
+---
+abstract: 'DBD::Firebird is a DBI driver for Firebird, written using Firebird C API.'
+author:
+  - 'Edwin Pratomo (edpratomo@users.sourceforge.net)'
+build_requires:
+  File::Path: '0'
+  File::Temp: '0'
+  Math::BigFloat: '1.55'
+  Test::CheckDeps: '0.007'
+  Test::Deep: '0'
+  Test::Exception: '0.31'
+  Test::More: '0.4'
+  Time::HiRes: '0'
+configure_requires:
+  DBI: '1.41'
+  File::Which: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-Firebird
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '1.41'
+  perl: '5.008001'
+resources:
+  repository: https://github.com/mariuz/perl-dbd-firebird
+version: '1.34'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

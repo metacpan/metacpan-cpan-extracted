@@ -1,15 +1,14 @@
 #pragma once
 #include <cstring>
-#include <catch2/catch.hpp>
 #include <panda/string.h>
 #include <panda/optional.h>
 #include <panda/memory.h>
+#include <panda/test/catch.h>
 #include <panda/CallbackDispatcher.h>
 
 using namespace panda;
 
 namespace test {
-
 
     struct Tracer {
         static int copy_calls;

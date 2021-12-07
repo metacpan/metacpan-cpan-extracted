@@ -1,4 +1,5 @@
 package SDL2::render 0.01 {
+    use strict;
     use SDL2::Utils;
     use experimental 'signatures';
     #

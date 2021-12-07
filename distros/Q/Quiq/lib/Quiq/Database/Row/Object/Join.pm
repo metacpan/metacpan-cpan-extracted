@@ -1,15 +1,3 @@
-package Quiq::Database::Row::Object::Join;
-use base qw/Quiq::Database::Row::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Array;
-use Quiq::Hash;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -33,6 +21,24 @@ andere Klassen realisiert.
 
 Das zugrunde liegende Select-Statement wird typischerweise als
 Template auf der Klassenvariable C<$Select> definiert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::Row::Object::Join;
+use base qw/Quiq::Database::Row::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Array;
+use Quiq::Hash;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -262,7 +268,7 @@ sub cast {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

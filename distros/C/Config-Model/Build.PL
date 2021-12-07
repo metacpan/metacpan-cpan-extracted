@@ -83,8 +83,7 @@ my $build = $class->new(
     'Test::Pod' => '1.00',
     'Test::Warn' => '0.11',
     'boolean' => '0',
-    'lib' => '0',
-    'perl' => 'v5.20.0'
+    'lib' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.34'

@@ -18,12 +18,20 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-Graphene
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Alien::Base: '0.038'
   Alien::Role::Dino: '0'
@@ -36,12 +44,14 @@ requires:
 resources:
   homepage: https://github.com/Intertangle/p5-Alien-Graphene
   repository: https://github.com/Intertangle/p5-Alien-Graphene.git
-version: '0.003'
+version: '0.004'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
       Alien::Build::Plugin::Gather::Dino: '0'
+      Alien::Meson: '0'
+      Alien::Ninja: '0'
       Archive::Tar: '0'
       Devel::FindPerl: '0'
       HTTP::Tiny: '0.044'

@@ -2,8 +2,8 @@ NAME
     JSON::Color - Encode to colored JSON
 
 VERSION
-    This document describes version 0.132 of JSON::Color (from Perl
-    distribution JSON-Color), released on 2021-11-23.
+    This document describes version 0.133 of JSON::Color (from Perl
+    distribution JSON-Color), released on 2021-11-24.
 
 SYNOPSIS
      use JSON::Color qw(encode_json);
@@ -73,6 +73,10 @@ FAQ
      [1,"1"]
 
 ENVIRONMENT
+  NO_COLOR
+    If defined, will set default color theme to ColorTheme::NoColor. See
+    <https://no-color.org/> for more details.
+
   JSON_COLOR_COLOR_THEME
     Set default color theme. Has precedence over "COLOR_THEME".
 

@@ -1,16 +1,3 @@
-package Quiq::Tag;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Unindent;
-use Quiq::String;
-use Quiq::Template;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -83,6 +70,25 @@ Formulierung wäre:
 Ein Objekt der Klasse erzeugt Markup-Code gemäß den Regeln von XML.
 Mit den beiden Methoden L<tag|"tag() - Erzeuge Tag-Code">() und L<cat|"cat() - Füge Sequenz zusammen">() kann Markup-Code
 beliebiger Komplexität erzeugt werden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Tag;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Unindent;
+use Quiq::String;
+use Quiq::Template;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -539,7 +545,7 @@ sub cat {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

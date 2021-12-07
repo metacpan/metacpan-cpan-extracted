@@ -12,7 +12,7 @@ use vars qw(
 ## Inheritance and Versioning ##
 
 @ISA     = qw( Exporter );
-$VERSION = '0.17';
+$VERSION = '0.18';
 
 ## Module Imports ##
 
@@ -347,7 +347,7 @@ sub _compare
 
 =head1 NAME
 
-Net::BGP::NLRI - Class encapsulating BGP-4 NLRI information
+C<Net::BGP::NLRI> - Class encapsulating BGP-4 NLRI information
 
 =head1 SYNOPSIS
 
@@ -379,7 +379,7 @@ Net::BGP::NLRI - Class encapsulating BGP-4 NLRI information
     $origin           = $nlri->origin($origin);
     $string           = $nlri->asstring;
 
-    # Preference comparisons
+    # Preference Comparisons
     if ($nlri1  < $nlri2) { ... };
     if ($nlri1  > $nlri2) { ... };
     if ($nlri1 == $nlri2) { ... };
@@ -394,14 +394,14 @@ Net::BGP::NLRI - Class encapsulating BGP-4 NLRI information
 
 This module encapsulates the data used by BGP-4 to represent network
 reachability information.  It provides a constructor, and accessor
-methods for each of the well-known path attributes. An BGP-4 UPDATE
+methods for each of the well-known path attributes. A BGP-4 UPDATE
 message includes this information along with a list of networks for
-which the information should be used (and a list of network no longer
-accessible). See B<Net::BGP::Update> for more infomration.
+which the information should be used (and a list of networks no longer
+accessible). See L<Net::BGP::Update> for more infomration.
 
 =head1 CONSTRUCTOR
 
-I<new()> - create a new Net::BGP::NLRI object
+I<new()> - create a new C<Net::BGP::NLRI> object
 
     $nlri = Net::BGP::NLRI->new(
         Aggregator      => [ 64512, '10.0.0.1' ],
@@ -414,7 +414,7 @@ I<new()> - create a new Net::BGP::NLRI object
         Origin          => INCOMPLETE,
     );
 
-This is the constructor for Net::BGP::NLRI objects. It returns a
+This is the constructor for C<Net::BGP::NLRI> objects. It returns a
 reference to the newly created object. The following named parameters may
 be passed to the constructor. See RFC 1771 for the semantics of each
 path attribute.
@@ -431,8 +431,8 @@ will be attached to the UPDATE message.
 =head2 AsPath
 
 This parameter corresponds to the AS_PATH path attribute. The AS_PATH is
-expressed as an B<Net::BGP::ASPath> object. If expressed otherwise, a
-Net::BGP::ASPath object is tried constructed using the argument.
+expressed as an L<Net::BGP::ASPath> object. If expressed otherwise, a
+L<Net::BGP::ASPath> object is tried to be constructed using the argument.
 
 =head2 AtomicAggregate
 
@@ -480,11 +480,11 @@ the parameter must always be provided to the constructor.
 
 =head1 OBJECT COPY
 
-I<clone()> - clone a Net::BGP::NLRI object
+I<clone()> - clone a C<Net::BGP::NLRI> object
 
     $clone = $nlri->clone();
 
-This method creates an exact copy of the Net::BGP::NLRI object with Path
+This method creates an exact copy of the C<Net::BGP::NLRI> object with Path
 Attributes fields matching those of the original object.
 
 =head1 ACCESSOR METHODS
@@ -513,20 +513,35 @@ same as described for the corresponding named constructor parameters above.
 I<asstring()>
 
 This accessor method returns a print-friendly string with some, but not all,
-of the information containted in the object.
+of the information contained in the object.
 
 =head1 EXPORTS
 
 The module exports the following symbols according to the rules and
-conventions of the B<Exporter> module.
+conventions of the C<Exporter> module.
 
 :origin
     IGP, EGP, INCOMPLETE
 
 =head1 SEE ALSO
 
-B<RFC 1771>, B<RFC 1997>, B<Net::BGP>, B<Net::BGP::Process>, B<Net::BGP::Peer>,
-B<Net::BGP::Notification>, B<Net::BGP::ASPath>, B<Net::BGP::Update>
+=over
+
+=item L<Net::BGP>
+
+=item L<Net::BGP::Process>
+
+=item L<Net::BGP::Peer>
+
+=item L<Net::BGP::Update>
+
+=item L<Net::BGP::Refresh>
+
+=item L<Net::BGP::ASPath>
+
+=item L<Net::BGP::Notification>
+
+=back
 
 =head1 AUTHOR
 

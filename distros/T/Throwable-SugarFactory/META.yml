@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,40 +26,40 @@ meta-spec:
 name: Throwable-SugarFactory
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   Constructor::Sugar:
     file: lib/Constructor/Sugar.pm
-    version: '0.152700'
+    version: '0.213360'
   Constructor::SugarLibrary:
     file: lib/Constructor/SugarLibrary.pm
-    version: '0.152700'
+    version: '0.213360'
   MooX::BuildClass:
     file: lib/MooX/BuildClass.pm
-    version: '0.152700'
+    version: '0.213360'
   MooX::BuildClass::Utils:
     file: lib/MooX/BuildClass/Utils.pm
-    version: '0.152700'
+    version: '0.213360'
   MooX::BuildRole:
     file: lib/MooX/BuildRole.pm
-    version: '0.152700'
+    version: '0.213360'
   MooX::SugarFactory:
     file: lib/MooX/SugarFactory.pm
-    version: '0.152700'
+    version: '0.213360'
   Throwable::SugarFactory:
     file: lib/Throwable/SugarFactory.pm
-    version: '0.152700'
+    version: '0.213360'
   Throwable::SugarFactory::Hashable:
     file: lib/Throwable/SugarFactory/Hashable.pm
-    version: '0.152700'
+    version: '0.213360'
   Throwable::SugarFactory::Utils:
     file: lib/Throwable/SugarFactory/Utils.pm
-    version: '0.152700'
+    version: '0.213360'
 requires:
   Class::Inspector: '0'
   Exporter: '0'
@@ -75,7 +75,12 @@ requires:
   strict: '0'
   strictures: '2'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Throwable-SugarFactory
+  bugtracker: https://github.com/wchristian/Throwable-SugarFactory/issues
   homepage: https://github.com/wchristian/Throwable-SugarFactory
   repository: https://github.com/wchristian/Throwable-SugarFactory.git
-version: '0.152700'
+version: '0.213360'
+x_contributors:
+  - 'Christian Walde <walde.christian@googlemail.com>'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: CC0-1.0

@@ -180,8 +180,6 @@ subtest 'parse datetime' => sub
         }
     ];
 
-    # XXX
-    $o->debug(3);
     for( my $i = 0; $i < scalar( @$dates ); $i++ )
     {
         my $def = $dates->[$i];

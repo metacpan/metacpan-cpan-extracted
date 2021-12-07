@@ -27,7 +27,7 @@ subtest "sanity" => sub {
             exit => 0,
         )->run;
     };
-    is($stdout, "Perinci::CmdLine::Lite\n");
+    like($stdout, qr/^Perinci::CmdLine::Lite\R?\z/m);
 };
 
 subtest "env" => sub {
@@ -42,7 +42,7 @@ subtest "env" => sub {
                     exit => 0,
                 )->run;
             };
-            is($stdout, "Perinci::CmdLine::Classic\n", $val);
+            like($stdout, qr/^Perinci::CmdLine::Classic\R\z/m, $val);
         };
     };
 };

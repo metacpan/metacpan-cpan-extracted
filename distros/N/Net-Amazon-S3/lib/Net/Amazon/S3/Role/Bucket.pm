@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Role::Bucket;
 # ABSTRACT: Bucket role
-$Net::Amazon::S3::Role::Bucket::VERSION = '0.98';
+$Net::Amazon::S3::Role::Bucket::VERSION = '0.99';
 use Moose::Role;
 use Scalar::Util;
 use Safe::Isa ();
@@ -53,7 +53,7 @@ Net::Amazon::S3::Role::Bucket - Bucket role
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

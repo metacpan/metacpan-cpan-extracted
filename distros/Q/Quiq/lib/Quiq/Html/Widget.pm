@@ -1,12 +1,3 @@
-package Quiq::Html::Widget;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -64,6 +55,21 @@ Jedes Widget kann auf C<undef> reduziert werden, wenn das
 Attribut undefIf=>$bool wahr ist.
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Widget;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -185,7 +191,7 @@ sub disabled {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

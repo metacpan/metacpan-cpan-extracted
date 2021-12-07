@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Worksheet;
 
-our $VERSION = '0.9';
+our $VERSION = '1.0.0';
 
 use Google::RestApi::Setup;
 
@@ -138,7 +138,7 @@ sub rows {
 
 sub cell {
   my $self = shift;
-  state $check = compile(Defined, Str, { optional => 1 });
+   state $check = compile(Defined, Str, { optional => 1 });
   my ($cell, $value) = $check->(@_);
   my $range = $self->range_cell($cell);
   return $range->values(defined $value ? (values => $value) : ());
@@ -395,7 +395,43 @@ Google::RestApi::SheetsApi4::Worksheet - Represents a Worksheet within a Google 
 
 =head1 DESCRIPTION
 
-See the description and synopsis at Google::RestApi::SheetsApi4.
+See the description and synopsis at L<Google::RestApi::SheetsApi4>.
+
+=head1 NAVIGATION
+
+=over
+
+=item * L<Google::RestApi::SheetsApi4>
+
+=item * L<Google::RestApi::SheetsApi4::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Range>
+
+=item * L<Google::RestApi::SheetsApi4::Range::All>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Col>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Row>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Cell>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range>
+
+=back
 
 =head1 SUBROUTINES
 
@@ -429,26 +465,45 @@ Returns the worksheet URL (URL);
 
 =item properties(what<string>);
 
-Returns the specific properties of this worksheet, such as the title or sheet id.
-
- what: The fields you are interested in (title, sheetId, etc).
+Returns the specific properties of this worksheet, such as the title or sheet id (sheetId).
 
 =item col(range<range>, values<arrayref>);
+
+Positional args consist of:
+
+=over
+
+=item * C<<range>>: A range representing a column.
+
+=item * C<<arrayref<str>>>: An array of strings of column values.
+
+=back
 
 Gets or sets the column values.
 
  $ws->col('A', [1, 2, 3]);
  $values = $ws->col('A');
 
-Note: the Google API is called immediately, so this is the easiest
-but least efficient way of getting/setting spreadsheet values.
+Note: the Google API is called immediately, so this is the easiest but least efficient way of getting/setting spreadsheet values.
 
-=item cols(cols<arrayref<range>>, values<arrayref<arrayref<string>>>);
+Returns the values for the specified column.
 
-Gets or sets a group of columns, see note as 'col' above.
+=item cols(cols, values); Positional args consist of:
+
+=over
+
+=item C<<arrayref<range>>>: An array of ranges that represent columns.
+
+=item C<<arrayref<arrayref<string>>>>: An optional array of values to set the columns to.
+
+=back
+
+Gets or sets a group of columns, see note for 'col' above.
 
  $ws->cols(['A', 2, 'Id'], [[1, 2, 3, 4], [5], [6, 7]]);
  $values = $ws->cols(['A', 2, 'Id']);
+
+Returns the values for the specified columns.
 
 =item row(range<range>, values<arrayref<string>>);
 
@@ -461,6 +516,10 @@ Same as 'cols' above, but operates on rows.
 =item cell(col<range>, row<range>|range<range>), value<string>);
 
 Same as above, but operates on a cell. 
+
+=item enable_header_row(enable<boolean>)
+
+This turns on/off the header row so that column headings can be used as keys to tied hashes. See header_row.
 
 =item header_row(refresh<boolean>)
 
@@ -475,21 +534,25 @@ This is used internally to check for indexed column names such as
 This will only work on simple headers that don't use fancy formatting
 spread over multiple merged cells/rows.
 
+=item enable_header_col(enable<boolean>)
+
+This turns on/off the header row so that column headings can be used as keys to tied hashes. See header_col.
+
+You must pass C<i really want to do this> to turn it on. This is because you may have a worksheet with thousands of rows that end up being 'headers'. This is less of an issue with header row.
+
 =item header_col(refresh<boolean>)
 
 A less practical version of header_row, uses the first column to
 label each row. Since this is cached, if the spreadsheet is large,
 this can potentially use a lot of memory. Therefore, you must call
-enable_header_col first, with a true value, to obtain these column
-values.
+enable_header_col first, with C<i really want to do this> value, to obtain these column values.
 
-=item name_value_pairs(name_col<range>, value_col<range>, has_headers<boolean>);
+=item name_value_pairs(name_col<range>, value_col<range>);
 
 A utility to convert two columns into a simple hash.
 
  name_col: A range pointing to the keys of the hash.
  value_col: A range pointing to the values of the hash.
- has_headers: A boolean indicating if the first row should be ignored.
 
 A spreadsheet with the values:
 
@@ -565,7 +628,7 @@ no ':' (A1), or a general range if a ':' is found (A1:B2). It is better
 to explicitly set all the ranges you expect to use on the call to 'tie'
 rather than auto-creating the ranges later to avoid unexpected behaviour.
 
-See also Google::RestApi::SheetsApi4::Spreadsheet::tie.
+See also L<Google::RestApi::SheetsApi4::Spreadsheet> C<tie>.
 
 =item submit_requests(%args)
 
@@ -575,23 +638,41 @@ params etc).
 
 =item range(range<range>);
 
-Returns a Range object representing the passed range string, array, or hash.
+Returns a Range object or one of its subclasses (Col, Row etc) representing the passed range. If you specify a range that
+represents a column (A:A), you will get back a Range::Col object. To guaranty a particular subclass returned, use the below routines (range_col,
+range_row, etc).
 
 =item range_col(range<range>);
 
-Returns a Range::Col object representing the passed range.
+Returns a L<Google::RestApi::SheetsApi4::Range::Col> object representing the passed range. If you pass a non-column range, your script will die.
 
 =item range_row(range<range>);
 
-Returns a Range::Row object representing the passed range.
+Returns a L<Google::RestApi::SheetsApi4::Range::Row> object representing the passed range.
 
 =item range_cell(range<range>);
 
-Returns a Range::Cell object representing the passed range.
+Returns a L<Google::RestApi::SheetsApi4::Range::Cell> object representing the passed range.
 
 =item range_all();
 
-Returns a Range::All object that represents the whole worksheet.
+Returns a L<Google::RestApi::SheetsApi4::Range::All> object that represents the whole worksheet. Caution: this class has not been fully tested.
+
+=item range_group_cols
+
+Returns a L<Google::RestApi::SheetsApi4::RangeGroup> object that represents a group of columns.
+
+=item range_group_rows(ranges<arrayref>);
+
+Returns a L<Google::RestApi::SheetsApi4::RangeGroup> object that represents a group of rows.
+
+=item range_group_cells(ranges<arrayref>);
+
+Returns a L<Google::RestApi::SheetsApi4::RangeGroup> object that represents a group of cells.
+
+=item range_group(ranges<arrayref>);
+
+Returns a L<Google::RestApi::SheetsApi4::RangeGroup> object that represents a group of arbitrary ranges.
 
 =item api(%args);
 
@@ -623,6 +704,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019, Robin Murray. All rights reserved.
+Copyright (c) 2021, Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

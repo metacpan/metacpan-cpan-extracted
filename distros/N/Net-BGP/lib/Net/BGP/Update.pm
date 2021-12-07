@@ -14,7 +14,7 @@ use vars qw(
 use Net::BGP::NLRI qw( :origin );
 
 @ISA     = qw( Exporter Net::BGP::NLRI );
-$VERSION = '0.17';
+$VERSION = '0.18';
 
 ## Module Imports ##
 
@@ -942,7 +942,7 @@ sub _encode_path_attributes
 
 =head1 NAME
 
-Net::BGP::Update - Class encapsulating BGP-4 UPDATE message
+C<Net::BGP::Update> - Class encapsulating BGP-4 UPDATE message
 
 =head1 SYNOPSIS
 
@@ -984,16 +984,16 @@ Net::BGP::Update - Class encapsulating BGP-4 UPDATE message
 This module encapsulates the data contained in a BGP-4 UPDATE message.
 It provides a constructor, and accessor methods for each of the
 message fields and well-known path attributes of an UPDATE. Whenever
-a B<Net::BGP::Peer> sends an UPDATE message to its peer, it does so
-by passing a B<Net::BGP::Update> object to the peer object's I<update()>
+a L<Net::BGP::Peer> sends an UPDATE message to its peer, it does so
+by passing a C<Net::BGP::Update> object to the peer object's I<update()>
 method. Similarly, when the peer receives an UPDATE message from its
 peer, the UPDATE callback is called and passed a reference to a
-B<Net::BGP::Update> object. The callback function can then examine
+C<Net::BGP::Update> object. The callback function can then examine
 the UPDATE message fields by means of the accessor methods.
 
 =head1 CONSTRUCTOR
 
-I<new()> - create a new Net::BGP::Update object
+I<new()> - create a new C<Net::BGP::Update> object
 
     $update = Net::BGP::Update->new(
         NLRI            => [ qw( 10/8 172.168/16 ) ],
@@ -1009,12 +1009,12 @@ I<new()> - create a new Net::BGP::Update object
         Origin          => INCOMPLETE,
     );
 
-This is the constructor for Net::BGP::Update objects. It returns a
+This is the constructor for C<Net::BGP::Update> objects. It returns a
 reference to the newly created object. The following named parameters may
 be passed to the constructor. See RFC 1771 for the semantics of each
 path attribute.
 
-An alternative is to construct an object from a Net::BGP::NLRI object:
+An alternative is to construct an object from a L<Net::BGP::NLRI> object:
 
     $nlri = Net::BGP::NLRI->new( ... );
     $nlri_ref = [ qw( 10/8 172.168/16 ) ];
@@ -1045,11 +1045,11 @@ always be provided to the constructor.
 
 =head1 OBJECT COPY
 
-I<clone()> - clone a Net::BGP::Update object
+I<clone()> - clone a C<Net::BGP::Update> object
 
     $clone = $update->clone();
 
-This method creates an exact copy of the Net::BGP::Update object, with Withdrawn
+This method creates an exact copy of the C<Net::BGP::Update object>, with Withdrawn
 Routes, Path Attributes, and NLRI fields matching those of the original object.
 This is useful for propagating a modified UPDATE message when the original object
 needs to remain unchanged.
@@ -1067,19 +1067,34 @@ same as described for the corresponding named constructor parameters above.
 
 I<ashash()>
 
-This method returns a hash reference index on the prefixes in found in the nlri
-and withdrawn fields.  Withdrawn networks has undefined as value, while nlri
-prefixes all has the same reference to a Net::BGP::NLRI object matching the
-Update object self. 
+This method returns a hash reference index on the prefixes found in the NLRI
+and Withdraw fields. Withdrawn networks are set to C<undef>, while NLRI
+prefixes all have the same reference to the L<Net::BGP::NLRI> object matching the
+Update object itself.
 
 =head1 EXPORTS
 
-The module does not export anything.
+This module does not export anything.
 
 =head1 SEE ALSO
 
-B<RFC 1771>, B<RFC 1997>, B<Net::BGP>, B<Net::BGP::Process>, B<Net::BGP::Peer>,
-B<Net::BGP::Notification>, B<Net::BGP::NLRI>
+=over
+
+=item L<Net::BGP>
+
+=item L<Net::BGP::Process>
+
+=item L<Net::BGP::Peer>
+
+=item L<Net::BGP::Refresh>
+
+=item L<Net::BGP::ASPath>
+
+=item L<Net::BGP::NLRI>
+
+=item L<Net::BGP::Notification>
+
+=back
 
 =head1 AUTHOR
 

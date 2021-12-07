@@ -1,5 +1,6 @@
 package SDL2::misc {
-    use strictures 2;
+    use strict;
+    use warnings;
     use SDL2::Utils;
     #
     use SDL2::stdinc;

@@ -121,4 +121,34 @@ some_metric{some_label="aaa"} 5 1234
 EOF
 }
 
+{
+  my $p = Prometheus::Tiny::Shared->new(default_labels => { default_label => 'frob' });
+  $p->set('some_metric', 10);
+  is $p->format, <<EOF, 'metric with no label gets single default label';
+some_metric{default_label="frob"} 10
+EOF
+}
+
+{
+  my $p = Prometheus::Tiny::Shared->new(default_labels => {
+    default_one => 'whiz',
+    default_two => 'bang',
+  });
+  $p->set('some_metric', 10);
+  is $p->format, <<EOF, 'metric with no label gets all default labels';
+some_metric{default_one="whiz",default_two="bang"} 10
+EOF
+}
+
+{
+  my $p = Prometheus::Tiny::Shared->new(default_labels => {
+    default_one => 'whiz',
+    default_two => 'bang',
+  });
+  $p->set('some_metric', 10, { other => 'pow', default_two => 'blam' });
+  is $p->format, <<EOF, 'we can overwrite default labels if we want';
+some_metric{default_one="whiz",default_two="blam",other="pow"} 10
+EOF
+}
+
 done_testing;

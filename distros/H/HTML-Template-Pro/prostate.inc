@@ -4,7 +4,7 @@
 TMPLPRO_LOCAL void log_state(struct tmplpro_state* state, int level, const char *fmt, ...) 
 {
     va_list vl;
-    char* masterpath=state->param->masterpath;
+    const char* masterpath=state->param->masterpath;
     va_start(vl, fmt);
     tmpl_log(level, "HTML::Template::Pro:");
     if (masterpath != NULL) {

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Perl extension to provide some usefull functions with arrays",
+   "author" : [
+      "Chernenko Dmitriy <cnd@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "List-Helpers-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "Test::LeakTrace" : "0.14",
+            "Test::More" : "1.302183",
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/KalessinD/perl_linux_sys_cpu_affinity/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/KalessinD/perl_linux_sys_cpu_affinity"
+      }
+   },
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

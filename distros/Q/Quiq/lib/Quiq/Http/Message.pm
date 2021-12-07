@@ -1,19 +1,3 @@
-package Quiq::Http::Message;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Reference;
-use Quiq::Http::Cookie;
-use Quiq::FileHandle;
-use Scalar::Util ();
-use MIME::Base64 ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -85,6 +69,28 @@ sie wird nicht aus den Attributen gewonnen.
 
   my $msg = Quiq::Http::Message->new('http/message01.txt');
   print $msg->asString;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Http::Message;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Reference;
+use Quiq::Http::Cookie;
+use Quiq::FileHandle;
+use Scalar::Util ();
+use MIME::Base64 ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -978,7 +984,7 @@ sub asString {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

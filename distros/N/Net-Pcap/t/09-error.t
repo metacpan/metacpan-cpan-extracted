@@ -22,7 +22,7 @@ is(   $@,   '', "compile() with an invalid filter string" );
 is(   $res, -1, " - result must not be null: $res" );
 eval { $err = Net::Pcap::geterr($pcap) };
 is(   $@,   '', "geterr()" );
-like( $err, '/^(?:parse|syntax) error$/', " - \$err must not be null: $err" );
+like( $err, '/(^|: )(?:parse|syntax) error$/', " - \$err must not be null: $err" );
 
 # Testing compile() with a valid filter
 eval { $res = Net::Pcap::compile($pcap, \$filter, "tcp", 0, $mask) };

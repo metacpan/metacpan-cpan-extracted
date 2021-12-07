@@ -1,0 +1,163 @@
+#!perl
+
+our $DATE = '2021-07-17'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+# ABSTRACT: Like seq, but with Perl extras
+# PODNAME: seq-pl
+
+my %Opts = (
+    separator => "\n",
+    format => undef,
+    equal_width => 0,
+);
+Getopt::Long::Configure('bundling', 'no_ignore_case',
+                        # because we want to allow negative numbers without error
+                        'pass_through',
+                    );
+GetOptions(
+    'help|h|?' => sub {
+        print <<'_';
+Usage: seq-pl [options] <start> <end>
+       seq-pl --help, -h, -?
+       seq-pl --version, -v
+
+Options:
+  --format=s, -f
+  --equal-width, -w
+  --separator=s, -s
+
+_
+        exit 0;
+    },
+    'version|v' => sub {
+        no warnings 'once';
+        print "seq-pl version ", ($main::VERSION || "dev"),
+            ($main::DATE ? " ($main::DATE)" : ""), "\n";
+        exit 0;
+    },
+    'format|f=s' => \$Opts{format},
+    'equal-width|w' => \$Opts{equal_width},
+    'separator|s=s' => \$Opts{separator},
+);
+
+my $re_num = qr/\A-?\d+(\.\d+)?\z/;
+
+@ARGV == 2 or die "seq-pl: Please specify start and end\n";
+my ($start, $end) = @ARGV;
+my $is_numeric = $start =~ $re_num && $end =~ $re_num;
+my $format;
+for my $x ($start .. $end) {
+    unless (defined $format) {
+        $format = $Opts{format};
+        if (!defined $format && $Opts{equal_width}) {
+            $format = "%0".(length($start) > length($end) ? length($start) : length($end)).
+                ($is_numeric ? "d" : "s");
+        }
+        if (!defined $format) {
+            $format = "%s";
+        }
+    }
+    printf "${format}%s", $x, $Opts{separator};
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+seq-pl - Like seq, but with Perl extras
+
+=head1 VERSION
+
+This document describes version 0.002 of seq-pl (from Perl distribution App-seq-pl), released on 2021-07-17.
+
+=head1 SYNOPSIS
+
+Create numbers from 1 to 10:
+
+ % seq-pl 1 10
+
+Create numbers from 01 to 10, no need to format as Perl will DWIM:
+
+ % seq-pl 01 10
+
+Create hexadecimal numbers from 0x001 to 0x01e:
+
+ % seq-pl 1 31 -f "0x%03x"
+
+Create letters from a to z:
+
+ % seq-pl a z
+
+This I often do to put things under an alphabet series of folders:
+
+ % mkdir 0 `seq-pl a z`
+
+Create letters from aa to bz:
+
+ % seq-pl aa bz
+
+=head1 DESCRIPTION
+
+This variant of B<seq> uses Perl's autoincrement feature to create sequence,
+e.g. 0..10 or "01".."10", or "a".."z". The formatting also uses Perl's
+C<sprintf()> for more flexibility.
+
+=head1 OPTIONS
+
+=head2 --format=s, -f
+
+=head2 --separator=s, -s
+
+=head2 --equal-width, -w
+
+=head2 --help, -h, -?
+
+=head2 --version
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-seq-pl>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-seq-pl>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-seq-pl>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+B<seq>, the Unix utility.
+
+Other seq variants or themes I've written: L<seq-intrange> (from
+L<App::seq::intrange>), L<seq-numseq> (from L<App::seq::numseq>), L<dateseq>
+(from L<App::dateseq>) which can generate date sequences, including infinite
+ones, L<seq-pericmd> (from L<App::SeqPericmd>) which lets you customize
+increment/step (e.g. 0.5) or limit the number of items.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

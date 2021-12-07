@@ -3,12 +3,15 @@ NAME
     savings rate, etc) over the years
 
 VERSION
-    This document describes version 0.051 of App::CalcAccumulatedInflation
+    This document describes version 0.052 of App::CalcAccumulatedInflation
     (from Perl distribution App-CalcAccumulatedInflation), released on
-    2021-04-01.
+    2021-07-17.
 
 SYNOPSIS
     See the included script calc-accumulated-inflation.
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 FUNCTIONS
   calc_accumulated_inflation
@@ -135,7 +138,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-CalcAccumulatedInflation/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalcAccumulatedIn
+    flation>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

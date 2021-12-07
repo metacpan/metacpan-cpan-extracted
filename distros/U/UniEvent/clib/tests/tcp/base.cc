@@ -1,5 +1,7 @@
 #include "../lib/test.h"
 #include <iostream>
+#include <catch2/generators/catch_generators.hpp>
+
 using std::cout;
 using std::endl;
 

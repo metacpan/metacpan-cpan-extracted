@@ -9,54 +9,75 @@ ETL::Pipeline::Output - Role for ETL::Pipeline output destinations
   use Moose;
   with 'ETL::Pipeline::Output';
 
-  sub write_record {
+  sub open {
+    # Add code to open the output destination
+    ...
+  }
+  sub write {
     # Add code to save your data here
+    ...
+  }
+  sub close {
+    # Add code to close the destination
     ...
   }
 
 =head1 DESCRIPTION
 
-L<ETL::Pipeline> reads data from an input source, transforms it, and writes
-the information to an output destination. This role defines the required
-methods and attributes for output destinations. Every output destination
-B<must> implement B<ETL::Pipeline::Output>.
+An I<output destination> fulfills the B<load> part of B<ETL>. This is where the
+data ends up. These are the outputs of the process.
 
-L<ETL::Pipeline> works by calling the methods defined in this role. The role
-presents a common interface. It works as a shim, tying database or file access
-modules with L<ETL::Pipeline>. For example, SQL databases may use L<DBI> or
-L<DBIx::Class>.
+A destination can be anything - database, file, or anything. Destinations are
+customized to your environment. And you will probably only have a few.
 
-=head2 Adding a new output destination
-
-While L<ETL::Pipeline> provides a couple generic output destinations, the real
-value of L<ETL::Pipeline> comes from adding your own, business specific,
-destinations...
+L<ETL::Pipeline> interacts with the output destination is 3 stages...
 
 =over
 
-=item 1. Create a Perl module. Name it C<ETL::Pipeline::Output::...>.
+=item 1. Open - connect to the database, open the file, whatever setup is appropriate for your destination.
 
-=item 2. Make it a Moose object: C<use Moose;>.
+=item 2. Write - called once per record. This is the part that actually performs the output.
 
-=item 3. Include the role: C<with 'ETL::Pipeline::Output';>.
-
-=item 4. Add the L</write_record> method: C<sub write_record { ... }>.
-
-=item 5. Add the L</set> method: C<sub set { ... }>.
-
-=item 6. Add the L</new_record> method: C<sub new_record { ... }>.
-
-=item 7. Add the L</configure> method: C<sub configure { ... }>.
-
-=item 8. Add the L</finish> method: C<sub finish { ... }>.
+=item 3. Close - finished processing and cleanly shut down the destination.
 
 =back
 
-Ta-da! Your output destination is ready to use:
+This role sets the requirements for these 3 methods. It should be consumed by
+B<all> output destination classes. L<ETL::Pipeline> relies on the destination
+having this role.
+
+=head2 How do I create an output destination?
+
+L<ETL::Pipeline> provides a couple generic output destinations as exmaples or
+for very simple uses. The real value of L<ETL::Pipeline> comes from adding your
+own, business specific, destinations...
+
+=over
+
+=item 1. Start a new Perl module. I recommend putting it in the C<ETL::Pipeline::Output> namespace. L<ETL::Pipeline> will pick it up automatically.
+
+=item 2. Make your module a L<Moose> class - C<use Moose;>.
+
+=item 3. Consume this role - C<with 'ETL::Pipeline::Output';>.
+
+=item 4. Write the L</open>, L</close>, and L</write> methods.
+
+=item 5. Add any attributes for your class.
+
+=back
+
+The new destination is ready to use, like this...
 
   $etl->output( 'YourNewDestination' );
 
-=head2 Provided out of the box
+You can leave off the leading B<ETL::Pipeline::Output::>.
+
+When L<ETL::Pipeline> calls L</open> or L</close>, it passes the
+L<ETL::Pipeline> object as the only parameter. When L<ETL::Pipeline> calls
+L</write>, it passed two parameters - the L<ETL::Pipeline> object and the
+record. The record is a Perl hash.
+
+=head2 Example destinations
 
 L<ETL::Pipeline> comes with a couple of generic output destinations...
 
@@ -73,207 +94,99 @@ Executes a subroutine against the record. Useful for debugging data issues.
 
 =back
 
+=head2 Why this way?
+
+My work involves a small number of destinations that rarely change and a greater
+number of sources that do change. So I designed L<ETL::Pipeline> to minimize
+time writing new input sources. The trade off was slightly more complex output
+destinations.
+
+=head2 Upgrading from older versions
+
+L<ETL::Pipeline> version 3 is not compatible with output destinations from older
+versions. You will need to rewrite your custom output destinations.
+
+=over
+
+=item Change the C<configure> to L</open>.
+
+=item Change C<finish> to L</close>.
+
+=item Change C<write_record> to L</write>.
+
+=item Remove C<set> and C<new_record>. All records are Perl hashes.
+
+=item Adjust attributes as necessary.
+
+=back
+
 =cut
 
 package ETL::Pipeline::Output;
+
+use 5.014000;
+use warnings;
+
 use Moose::Role;
 
 
-our $VERSION = '2.00';
+our $VERSION = '3.00';
 
 
 =head1 METHODS & ATTRIBUTES
 
-=head3 pipeline
+=head3 close
 
-B<pipeline> returns the L<ETL::Pipeline> object using this input source. You
-can access information about the pipeline inside the methods.
+Shut down the ouput destination. This method may close files, disconnect from
+the database, or anything else required to cleanly terminate the output.
 
-L<ETL::Pipeline/input> automatically sets this attribute.
+B<close> receives one parameter - the L<ETL::Pipeline> object.
 
-=cut
-
-has 'pipeline' => (
-	is       => 'ro',
-	isa      => 'ETL::Pipeline',
-	required => 1,
-);
-
-
-=head2 Arguments for L<ETL::Pipeline/output>
-
-B<Note:> This role defines no attributes that are set with the
-L<ETL::Pipeline/output> command. Each child class defines its own options.
-
-=head2 Called from L<ETL::Pipeline/process>
-
-=head3 set
-
-B<set> temporarily saves the value of an individual output field.
-L</write_record> will later copy these values to the correct destination.
-
-L<ETL::Pipeline/process> calls B<set> inside of a loop - once for each field.
-B<set> accepts two parameters:
-
-=over
-
-=item 1. The output field name.
-
-=item 2. The value for that field.
-
-=back
-
-There is no return value.
-
-=head4 Couldn't you just use a hash?
-
-B<set> allows your output destination to choose the in-memory storage that
-best fits. This might be a hash, a list, or an object of some type. B<set>
-merely provides a common interface for L<ETL::Pipeline>.
+The output destination is closed B<after> the input source, at the end of the
+B<ETL> process.
 
 =cut
 
-requires 'set';
+requires 'close';
 
 
-=head3 write_record
+=head3 open
 
-B<write_record> sends the current record to its final destination.
-L<ETL::Pipeline/process> calls this method once for each record.
-B<write_record> is the I<last> thing done with this record.
+Prepare the output destination for use. It can open files, make database
+connections, or anything else required to access the destination.
 
-B<write_record> returns a boolean flag. A I<true> value means success saving
-the record. A I<false> value indicates an error.
+B<open> receives one parameter - the L<ETL::Pipeline> object.
 
-When your code encounters an error, call the L</error> method like this...
-
-  return $self->error( 'Error message here' );
-
-L</error> returns a false value. The default L</error> does nothing. To save
-errors, override L</error> and add the new functionality. When overriding
-L</error>, it is not necessary to return anything. B<ETL::Pipeline::Output>
-ensures that L</error> I<always> returns false.
-
-For fatal errors, use the C<croak> command from L<Carp> instead.
+The output destination is opened B<before> the input source, at the beginning
+of the B<ETL> process.
 
 =cut
 
-requires 'write_record';
+requires 'open';
 
 
-=head3 new_record
+=head3 write
 
-Start a brand new, clean record. L</write_record> automatically calls
-B<new_record>, every time, after L</write_record> finishes. This means that
-even if the save failed, L</write_record> still calls B<new_record>. The
-original record with the error is lost.
+Send a single record to the destination. The ETL process calls this method in a
+loop. It receives two parameters - the L<ETL::Pipeline> object, and the current
+record as a Perl hash.
 
-=cut
+If your code encounters an error, B<write> can call L<ETL::Pipeline/error> with
+the error message. L<ETL::Pipeline/error> automatically includes the record
+count with the error message. You should add any other troubleshooting
+information such as file names or key fields.
 
-requires 'new_record';
+  sub write {
+    my ($self, $etl, $record) = @_;
+    my $id = $record->{ID};
+    $etl->error( "Error message here for id $id" );
+  }
 
-after 'configure'    => sub { shift->new_record };
-after 'write_record' => sub { shift->new_record };
-
-
-=head3 configure
-
-B<configure> prepares the output destination. It can open files, make database
-connections, or anything else required before saving the first record.
-
-Why not do this in the class constructor? Some roles add automatic
-configuration. Those roles use the usual Moose method modifiers, which would
-not work with the constructor.
-
-This B<configure> - for the output destination - is called I<after> the
-L<ETL::Pipeline::Input/configure> of the input source. This method can expect
-that the input source is fully configured and ready for use.
+For fatal errors, I recommend using the C<croak> command from L<Carp>.
 
 =cut
 
-requires 'configure';
-
-
-=head3 finish
-
-B<finish> shuts down the output destination. It can close files, disconnect
-from the database, or anything else required to cleanly terminate the output.
-
-Why not do this in the class destructor? Some roles add automatic functionality
-via Moose method modifiers. This would not work with a destructor.
-
-This B<finish> - for the output destination - is called I<before> the
-L<ETL::Pipeline::Input/finish> of the input source. This method should expect
-that the input source has reached end-of-file by this point, but is not
-closed yet.
-
-=cut
-
-requires 'finish';
-
-
-=head2 Other methods and attributes
-
-=head3 record_number
-
-The B<record_number> attribute tells you how many total records have been
-saved by L</write_record>. The first record is always B<1>.
-
-B<ETL::Pipeline::Output> automatically increments the counter after
-L</write_record>. The L</write_record> method should not change
-B<record_number>.
-
-=head3 decrement_record_number
-
-This method decreases L</record_number> by one. It can be used to I<back out>
-header records from the count.
-
-=head3 increment_record_number
-
-This method increases L</record_number> by one.
-
-=cut
-
-has 'record_number' => (
-	default => '0',
-	handles => {
-		decrement_record_number => 'dec',
-		increment_record_number => 'inc',
-	},
-	is      => 'ro',
-	isa     => 'Int',
-	traits  => [qw/Counter/],
-);
-
-around 'write_record' => sub {
-	my $original = shift;
-	my $self     = shift;
-
-	my $result = $self->$original( @_ );
-	$self->increment_record_number if $result;
-	return $result;
-};
-
-
-=head3 error
-
-B<error> handles errors from L</write_record>. The default B<error> discards
-any error messages. Override B<error> if you want to capture the messages
-and/or the record that caused it.
-
-B<error> I<always> returns a false value - even if you override it.
-
-=cut
-
-sub error {}
-
-around 'error' => sub {
-	my $original = shift;
-	my $self     = shift;
-
-	$self->$original( @_ );
-	return 0;
-};
+requires 'write';
 
 
 =head1 SEE ALSO
@@ -283,11 +196,11 @@ L<ETL::Pipeline::Output::Perl>, L<ETL::Pipeline::Output::UnitTest>
 
 =head1 AUTHOR
 
-Robert Wohlfarth <robert.j.wohlfarth@vanderbilt.edu>
+Robert Wohlfarth <robert.j.wohlfarth@vumc.org>
 
 =head1 LICENSE
 
-Copyright 2016 (c) Vanderbilt University
+Copyright 2021 (c) Vanderbilt University
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

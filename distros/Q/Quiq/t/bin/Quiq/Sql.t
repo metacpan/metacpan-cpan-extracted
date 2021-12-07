@@ -77,7 +77,7 @@ sub test_checkName : Test(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_dataType_scalarContext : Test(12) {
+sub test_dataType_scalarContext : Test(14) {
     my $self = shift;
 
     for my $dbms (Quiq::Sql->dbmsNames()) {
@@ -91,7 +91,7 @@ sub test_dataType_scalarContext : Test(12) {
     }
 }
 
-sub test_dataType_arryContext : Test(42) {
+sub test_dataType_arryContext : Test(49) {
     my $self = shift;
 
     for my $dbms (Quiq::Sql->dbmsNames()) {

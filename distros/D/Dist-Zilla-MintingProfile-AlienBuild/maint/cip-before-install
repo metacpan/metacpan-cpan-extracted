@@ -4,4 +4,4 @@ set -ex
 
 cip sudo apt-get update
 cip sudo apt-get install libffi-dev libarchive-dev cmake
-cip exec cpanm Sort::Versions Alien::cmake3
+cip exec cpanm -n Sort::Versions Alien::cmake3

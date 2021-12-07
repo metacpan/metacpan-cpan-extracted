@@ -1,12 +1,3 @@
-package Quiq::Html::Widget::Hidden;
-use base qw/Quiq::Html::Widget/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -90,6 +81,21 @@ Liste von Werten:
   -->
   <input type="hidden" name="x" value="4711" />\n
   <input type="hidden" name="x" value="4712" />\n
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Html::Widget::Hidden;
+use base qw/Quiq::Html::Widget/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -198,7 +204,7 @@ sub html {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

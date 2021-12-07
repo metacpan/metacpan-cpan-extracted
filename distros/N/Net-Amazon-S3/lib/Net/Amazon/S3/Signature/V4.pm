@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature::V4;
 # ABSTRACT: V4 signatures
-$Net::Amazon::S3::Signature::V4::VERSION = '0.98';
+$Net::Amazon::S3::Signature::V4::VERSION = '0.99';
 use Moose;
 
 use Net::Amazon::S3::Signature::V4Implementation;
@@ -102,7 +102,7 @@ Net::Amazon::S3::Signature::V4 - V4 signatures
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 AUTHOR
 

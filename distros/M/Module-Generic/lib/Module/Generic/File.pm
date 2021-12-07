@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.1.10
+## Version v0.1.11
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/11/18
+## Modified 2021/11/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,6 +29,7 @@ BEGIN
     use Module::Generic::Finfo;
     use Nice::Try;
     use Scalar::Util ();
+    use URI ();
     use URI::file ();
     use Want;
     our @EXPORT_OK = qw( cwd file rootdir sys_tmpdir tempfile tempdir );
@@ -41,9 +42,9 @@ BEGIN
         fallback => 1,
     );
     use constant HAS_PERLIO_MMAP => ( version->parse($]) >= version->parse('v5.16.0') ? 1 : 0 );
-    our $VERSION = 'v0.1.10';
-    ## https://en.wikipedia.org/wiki/Path_(computing)
-    ## perlport
+    our $VERSION = 'v0.1.11';
+    # https://en.wikipedia.org/wiki/Path_(computing)
+    # perlport
     our $OS2SEP  =
     {
     amigaos     => '/',
@@ -69,6 +70,8 @@ BEGIN
     irix        => '/',
     linux       => '/',
     machten     => '/',
+    # alias
+    mac         => ':',
     macos       => ':',
     midnightbsd => '/',
     minix       => '/',
@@ -81,7 +84,7 @@ BEGIN
     nto         => '/',
     openbsd     => '/',
     os2         => '/',
-    ## Extended Binary Coded Decimal Interchange Code
+    # Extended Binary Coded Decimal Interchange Code
     os390       => '/',
     os400       => '/',
     qnx         => '/',
@@ -112,9 +115,12 @@ BEGIN
     our $DEFAULT_MMAP_SIZE = 10240;
     # Default to use PerlIO mmap layer if possible
     our $MMAP_USE_FILE_MAP = 0;
+    # Bug #92 <https://github.com/libwww-perl/URI/issues/92>
+    # $URI::file::DEFAULT_AUTHORITY = undef;
 };
 
 my $FILES_TO_REMOVE = {};
+no warnings 'redefine';
 
 sub init
 {
@@ -139,6 +145,7 @@ sub init
     # symbolic links in the path that could complicate things and even create recursion
     $self->{collapse}       = 1;
     $self->{max_recursion}  = 12;
+    $self->{os}             = undef;
     $self->{resolved}       = 0;
     # directory or file. This is instrumental in playing with paths before applying them to
     # the filesystem
@@ -149,10 +156,12 @@ sub init
     $self->{_handle}        = '';
     # Pervious location prior to chdir, so we can revert to it when necessary
     $self->{_prev_cwd}      = '';
+    $self->{_spec_class}    = $self->_spec_class( $self->{os} || $^O );
+    $self->{_uri_file_class}= $self->_uri_file_class( $self->{os} || $^O );
     $self->{changed}        = '';
     $self->{opened}         = '';
     $file = $self->{file} || return( $self->error( "No file was provided." ) );
-    $self->message( 3, "File provided is '$file' and auto-remove is set to $self->{auto_remove}." );
+    $self->message( 3, "File provided is '", ( $file // '' ), "' and auto-remove is set to $self->{auto_remove} and os is '", ( $self->{os} // '' ), "'." );
     unless( CORE::length( $self->{base_dir} ) )
     {
         my $base_dir = '';
@@ -167,14 +176,14 @@ sub init
             # otherwise use its parent directory
             else
             {
-                my( $vol, $dirs, $element ) = File::Spec->splitpath( $self->{base_file} );
-                $base_dir = File::Spec->catpath( $vol, $dirs );
+                my( $vol, $dirs, $element ) = $self->_spec_splitpath( $self->{base_file} );
+                $base_dir = $self->_spec_catpath( $vol, $dirs );
             }
         }
         # Otherwise, use the current directory
         else
         {
-            $base_dir = URI->new( URI::file->cwd )->file( $^O );
+            $base_dir = $self->_uri_file_cwd;
         }
         $self->{base_dir} = $base_dir;
     }
@@ -191,8 +200,8 @@ sub abs
     my $path = shift( @_ );
     return( $self ) if( !defined( $path ) || !CORE::length( $path ) );
     my $file = $self->filepath;
-    my $new = File::Spec->file_name_is_absolute( $path ) ? $path : URI::file->new( $path )->abs( $file )->file( $^O );
-    return( $self->new( $new ) );
+    my $new = $self->_spec_file_name_is_absolute( $path ) ? $path : $self->_uri_file_abs( $path, $file );
+    return( $self->new( $new, os => $self->{os} ) );
 }
 
 sub absolute { return( shift->abs( @_ ) ); }
@@ -257,6 +266,32 @@ sub append
     return( $self );
 }
 
+sub as
+{
+    my $self = shift( @_ );
+    my $os;
+    if( ( !( @_ % 2 ) && !ref( $_[0] ) && ref( $_[1] ) eq 'HASH' ) ||
+        ( ( @_ % 2 ) && !ref( $_[0] ) && ref( $_[1] ) ne 'HASH' ) )
+    {
+        $os = shift( @_ );
+    }
+    my $opts = $self->_get_args_as_hash( @_ );
+    $os //= $opts->{os} || $^O;
+    my $currentOS = $self->{os} || $^O;
+    return( $self ) if( $os =~ /^(dos|mswin32|netware|symbian|win32)$/i && $currentOS =~ /^(dos|mswin32|netware|symbian|win32)$/i );
+    local $URI::file::DEFAULT_AUTHORITY = undef;
+    $opts->{volume} //= '';
+    
+    $self->message( 4, "Filename is '", $self->filename, "'." );
+    my( $volume, $parent, $file ) = $self->_spec_splitpath( $self->filename );
+    my @dirs   = $self->_spec_splitdir( $parent );
+    my $new_dirs = $self->_spec_catdir( [ @dirs ], $os );
+    $self->message( 4, "Parent '$parent', base file '$file', directories: ", sub{ $self->dump( \@dirs ) }, ", newly formatted directories '$new_dirs'" );
+    my $path = $self->_spec_catpath( $opts->{volume}, $new_dirs, $file, $os );
+    $self->message( 4, "Creating new object with path '$path'" );
+    return( $self->new( $path, os => $os, debug => $self->debug ) );
+}
+
 sub atime { return( shift->finfo->atime ); }
 
 # sub auto_remove { return( shift->_set_get_boolean( 'auto_remove', @_ ) ); }
@@ -305,16 +340,17 @@ sub baseinfo
     my $self = shift( @_ );
     my $exts = $self->_get_args_as_array( @_ );
     my $path = $self->filename;
-    if( -d( $path ) || substr( $path, -CORE::length( $DIR_SEP ), CORE::length( $DIR_SEP ) ) eq $DIR_SEP )
+    my $dir_sep = $self->_os2sep;
+    if( -d( $path ) || substr( $path, -CORE::length( $dir_sep ), CORE::length( $dir_sep ) ) eq $dir_sep )
     {
-        while( substr( $path, -CORE::length( $DIR_SEP ), CORE::length( $DIR_SEP ) ) eq $DIR_SEP )
+        while( substr( $path, -CORE::length( $dir_sep ), CORE::length( $dir_sep ) ) eq $dir_sep )
         {
-            substr( $path, -CORE::length( $DIR_SEP ), CORE::length( $DIR_SEP ), '' );
+            substr( $path, -CORE::length( $dir_sep ), CORE::length( $dir_sep ), '' );
         }
         return( '' ) if( !CORE::length( $path ) );
-        # my @dirs = File::Spec->splitdir( $path );
-        my( $vol, $parent, $me ) = File::Spec->splitpath( $path );
-        my $parent_path = File::Spec->catpath( $vol, $parent );
+        # my @dirs = $self->_spec_splitdir( $path );
+        my( $vol, $parent, $me ) = $self->_spec_splitpath( $path );
+        my $parent_path = $self->_spec_catpath( $vol, $parent );
         if( want( 'LIST' ) )
         {
             return( $me, $parent_path, '' );
@@ -327,20 +363,20 @@ sub baseinfo
     else
     {
         # splitpath works both on files and directories
-        my( $vol, $parent, $file ) = File::Spec->splitpath( $path );
+        my( $vol, $parent, $file ) = $self->_spec_splitpath( $path );
         my $suff;
         foreach my $ext ( @$exts )
         {
             $ext = ref( $ext ) eq 'Regexp' ? $ext : qr/$ext$/i;
-            if( $file =~ s/$ext// )
+            if( $file =~ s/($ext)// )
             {
-                $suff = $ext;
+                $suff = $1;
                 last;
             }
         }
         if( want( 'LIST' ) )
         {
-            my $parent_path = File::Spec->catpath( $vol, $parent );
+            my $parent_path = $self->_spec_catpath( $vol, $parent );
             return( $file, $parent_path, $suff );
         }
         else
@@ -451,8 +487,9 @@ sub can_write
 sub canonpath
 {
     my $self = shift( @_ );
-    my $os   = shift( @_ ) || $^O;
-    return( URI::file->new( $self->filename )->file( $os ) );
+    my $os   = shift( @_ ) || $self->{os} || $^O;
+    # return( URI::file->new( $self->filename )->file( $os ) );
+    return( $self->_uri_file_class->new( $self->filename )->file( $os ) );
 }
 
 sub changed
@@ -491,17 +528,18 @@ sub child
     return( $self->error( "No child was provided for our filename \"", $self->filename, "\"." ) ) if( !defined( $file ) || !CORE::length( $file ) );
     my $new;
     my $path = $self->filename;
-    my( $vol, $dir, $this ) = File::Spec->splitpath( $path );
-    if( -d( $path ) || substr( $path, -CORE::length( $DIR_SEP ), CORE::length( $DIR_SEP ) ) eq $DIR_SEP )
+    my $dir_sep = $self->_os2sep;
+    my( $vol, $dir, $this ) = $self->_spec_splitpath( $path );
+    if( -d( $path ) || substr( $path, -CORE::length( $dir_sep ), CORE::length( $dir_sep ) ) eq $dir_sep )
     {
-        while( substr( $path, -CORE::length( $DIR_SEP ), CORE::length( $DIR_SEP ) ) eq $DIR_SEP )
+        while( substr( $path, -CORE::length( $dir_sep ), CORE::length( $dir_sep ) ) eq $dir_sep )
         {
-            substr( $path, -CORE::length( $DIR_SEP ), CORE::length( $DIR_SEP ), '' );
+            substr( $path, -CORE::length( $dir_sep ), CORE::length( $dir_sep ), '' );
         }
     }
-    $new = File::Spec->catpath( $vol, $path, $file );
+    $new = $self->_spec_catpath( $vol, $path, $file );
     # We do not resolve the overall file path, because the user may depend on what he/she provided us initially, or here as a child
-    return( $self->new( $new, { resolved => 1 } ) );
+    return( $self->new( $new, { resolved => 1, os => $self->{os} } ) );
 }
 
 sub chmod
@@ -619,32 +657,35 @@ sub code
     }
 }
 
-## RFC 3986 section 5.2.4
-## This is aimed for web URI initially, but is also used for filesystems in a simple way
+# RFC 3986 section 5.2.4
+# This is aimed for web URI initially, but is also used for filesystems in a simple way
 sub collapse_dots
 {
     my $self = shift( @_ );
     my $path = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    ## To avoid warnings
+    # To avoid warnings
     $opts->{separator} //= '';
-    ## A path separator is provided when dealing with filesystem and not web URI
-    ## We use this to know what to return and how to behave
+    # A path separator is provided when dealing with filesystem and not web URI
+    # We use this to know what to return and how to behave
     my $sep  = CORE::length( $opts->{separator} ) ? $opts->{separator} : '/';
     return( '' ) if( !CORE::length( $path ) );
-    my $u = $opts->{separator} ? URI::file->new( $path ) : URI->new( $path );
-    unless( CORE::index( "$u", '.' ) != -1 || CORE::index( "$u", '..' ) != -1 )
+    # my $u = $opts->{separator} ? URI::file->new( $path ) : URI->new( $path );
+    $self->message( 4, "URI::file class used for os '", ( $self->{os} // '' ), "' is '", $self->_uri_file_class, "'" );
+    my $u = $opts->{separator} ? $self->_uri_file_class->new( $path ) : URI->new( $path );
+    # unless( CORE::index( "$u", '.' ) != -1 || CORE::index( "$u", '..' ) != -1 )
+    unless( $u =~ /(?:(?:(?:^|\/)\.{1,2}\/)|(?:\/\.{1,2}(?:\/|$)))/ )
     {
-        $self->message( 3, "Nothing to collapse for '$u' (", ( $opts->{separator} ? $u->file( $^O ) : 'same' ), ")." );
+        $self->message( 3, "Nothing to collapse for '$u' (", ( $opts->{separator} ? $u->file( $self->_uri_file_os_map( $self->{os} ) || $^O ) : 'same' ), ")." );
         return( $u );
     }
     my( @callinfo ) = caller;
-    $self->message( 4, "URI based on '$path' is '$u' (", overload::StrVal( $u ), ") and separator to be used is '$sep' and uri path is '", $u->path, "' called from $callinfo[0] in file $callinfo[1] at line $callinfo[2]." );
-    $path = $opts->{separator} ? $u->file( $^O ) : $u->path;
+    $self->message( 4, "URI based on '$path' with separator provided '$opts->{separator}' is '$u' (", overload::StrVal( $u ), ") and separator to be used is '$sep' and uri path is '", $u->path, "' called from $callinfo[0] in file $callinfo[1] at line $callinfo[2]." );
+    $path = $opts->{separator} ? $u->file( $self->{os} || $^O ) : $u->path;
     my @new = ();
     my $len = CORE::length( $path );
     
-    ## "If the input buffer begins with a prefix of "../" or "./", then remove that prefix from the input buffer"
+    # "If the input buffer begins with a prefix of "../" or "./", then remove that prefix from the input buffer"
     if( substr( $path, 0, 2 ) eq ".${sep}" )
     {
         substr( $path, 0, 2 ) = '';
@@ -654,7 +695,7 @@ sub collapse_dots
     {
         substr( $path, 0, 3 ) = '';
     }
-    ## "if the input buffer begins with a prefix of "/./" or "/.", where "." is a complete path segment, then replace that prefix with "/" in the input buffer"
+    # "if the input buffer begins with a prefix of "/./" or "/.", where "." is a complete path segment, then replace that prefix with "/" in the input buffer"
     elsif( substr( $path, 0, 3 ) eq "${sep}.${sep}" )
     {
         substr( $path, 0, 3 ) = $sep;
@@ -672,13 +713,13 @@ sub collapse_dots
         return( $u );
     }
     
-    ## -1 is used to ensure trailing blank entries do not get removed
+    # -1 is used to ensure trailing blank entries do not get removed
     my @segments = CORE::split( "\Q$sep\E", $path, -1 );
     $self->message( 3, "Found ", scalar( @segments ), " segments: ", sub{ $self->dump( \@segments ) } );
     for( my $i = 0; $i < scalar( @segments ); $i++ )
     {
         my $segment = $segments[$i];
-        ## "if the input buffer begins with a prefix of "/../" or "/..", where ".." is a complete path segment, then replace that prefix with "/" in the input buffer and remove the last segment and its preceding "/" (if any) from the output buffer"
+        # "if the input buffer begins with a prefix of "/../" or "/..", where ".." is a complete path segment, then replace that prefix with "/" in the input buffer and remove the last segment and its preceding "/" (if any) from the output buffer"
         if( $segment eq '..' )
         {
             pop( @new );
@@ -692,20 +733,21 @@ sub collapse_dots
             push( @new, ( defined( $segment ) ? $segment : '' ) );
         }
     }
-    ## Finally, the output buffer is returned as the result of remove_dot_segments.
+    # Finally, the output buffer is returned as the result of remove_dot_segments.
     my $new_path = CORE::join( $sep, @new );
     # substr( $new_path, 0, 0 ) = $sep unless( substr( $new_path, 0, 1 ) eq '/' );
-    substr( $new_path, 0, 0 ) = $sep unless( File::Spec->file_name_is_absolute( $new_path ) );
+    substr( $new_path, 0, 0 ) = $sep unless( $self->_spec_file_name_is_absolute( $new_path ) );
     $self->message( 4, "Adding back new path '$new_path' to uri '$u'." );
     if( $opts->{separator} )
     {
-        $u = URI::file->new( $new_path );
+        # $u = URI::file->new( $new_path );
+        $u = $self->_uri_file_class->new( $new_path );
     }
     else
     {
         $u->path( $new_path );
     }
-    $self->message( 4, "Returning uri '$u' (", ( $opts->{separator} ? $u->file( $^O ) : 'same' ), ")." );
+    $self->message( 4, "Returning uri '$u' (", ( $opts->{separator} ? $u->file( $self->{os} || $^O ) : 'same' ), ")." );
     return( $u );
 }
 
@@ -720,11 +762,12 @@ sub contains
         {
             return( $self->error( "I was expecting a string or a stringifyable object, but instead I got '$this'." ) );
         }
-        $this = $self->new( "$this" ) || return( $self->pass_error );
+        $this = $self->new( "$this", os => $self->{os} ) || return( $self->pass_error );
     }
     my $file = $self->filepath;
     my $kid  = $this->filepath;
-    return( CORE::index( $kid, "${file}${DIR_SEP}" ) == 0 ? $self->true : $self->false );
+    my $dir_sep = $self->_os2sep;
+    return( CORE::index( $kid, "${file}${dir_sep}" ) == 0 ? $self->true : $self->false );
 }
 
 sub content
@@ -759,7 +802,7 @@ sub content
                 $self->message( 3, "Directory is now opened with io '$io'" );
             }
             my $vol = $self->volume;
-            $a = $self->new_array( [ map( File::Spec->catpath( $vol, $file, $_ ), grep{ !/^\.{1,2}$/ } $io->read ) ] );
+            $a = $self->new_array( [ map( $self->_spec_catpath( $vol, $file, $_ ), grep{ !/^\.{1,2}$/ } $io->read ) ] );
             # Put it back where it was
             $io->seek( $pos ) if( defined( $pos ) );
         }
@@ -801,7 +844,7 @@ sub content_objects
     }
     my $new = $ref->map(sub
     {
-        return( $self->new( $_ ) );
+        return( $self->new( $_, { os => $self->{os} } ) );
     });
     return( $new );
 }
@@ -812,7 +855,20 @@ sub cp { return( shift->copy( @_ ) ); }
 
 sub ctime { return( shift->finfo->ctime ); }
 
-sub cwd { return( __PACKAGE__->new( ( substr( URI::file->cwd, 0, 7 ) eq 'file://' ? URI->new( URI::file->cwd )  : URI::file->new( URI::file->cwd ) )->file( $^O ) ) ); }
+sub cwd
+{
+    my $cwd = URI::file->cwd;
+    my $u;
+    if( substr( $cwd, 0, 7 ) eq 'file://' )
+    {
+        $u = URI->new( $cwd );
+    }
+    else
+    {
+        $u = URI::file->new( $cwd );
+    }
+    return( __PACKAGE__->new( $u->file( $^O ) ) );
+}
 
 sub delete
 {
@@ -960,6 +1016,7 @@ sub extension
             debug     => $self->debug,
             base_dir  => $self->base_dir,
             base_file => $self->base_file,
+            os        => $self->{os},
         ) );
     }
     else
@@ -1041,8 +1098,9 @@ sub filename
     if( defined( $newfile ) )
     {
         my $base_dir = $self->base_dir;
-        $base_dir .= $DIR_SEP unless( substr( $base_dir, -CORE::length( $DIR_SEP ), CORE::length( $DIR_SEP ) ) eq $DIR_SEP );
-        $self->message( 3, "New file path provided is: '$newfile' and base directory is '$base_dir' and directory separator is '$DIR_SEP'" );
+        my $dir_sep  = $self->_os2sep;
+        $base_dir .= $dir_sep unless( substr( $base_dir, -CORE::length( $dir_sep ), CORE::length( $dir_sep ) ) eq $dir_sep );
+        $self->message( 3, "New file path provided is: '$newfile' and base directory is '$base_dir' and directory separator is '$dir_sep'" );
         # Resolve the path if there is any link
         my $already_resolved = $self->resolved;
         my $resolved;
@@ -1055,21 +1113,23 @@ sub filename
         
         # If we provide a string for the abs() method it works on Unix, but not on Windows
         # By providing an object, we make it work
-        $self->message( 3, "Is file '$newfile' absolute?" );
-        unless( File::Spec->file_name_is_absolute( $newfile ) )
+        $self->message( 3, "Is file '$newfile' absolute? ", $self->_spec_file_name_is_absolute( $newfile ) ? 'yes' : 'no' );
+        unless( $self->_spec_file_name_is_absolute( $newfile ) )
         {
-            $newfile = URI::file->new( $newfile )->abs( URI::file->new( $base_dir ) )->file( $^O );
+            # $newfile = URI::file->new( $newfile )->abs( URI::file->new( $base_dir ) )->file( $^O );
+            $newfile = $self->_uri_file_abs( $newfile, $base_dir );
             $self->message( 3, "Made file provided absolute => $newfile" );
         }
         $self->message( 3, "Getting the new file real path: '$newfile'" );
         if( $self->collapse )
         {
-            $self->{filename} = $self->collapse_dots( $newfile, { separator => $DIR_SEP })->file( $^O );
+            $self->{filename} = $self->collapse_dots( $newfile, { separator => $dir_sep })->file( $self->_uri_file_os_map( $self->{os} ) || $^O );
             $self->message( 3, "Filename after dot collapsing is: '$self->{filename}'" );
         }
         else
         {
-            $self->{filename} = URI::file->new( $newfile )->file( $^O );
+            # $self->{filename} = URI::file->new( $newfile )->file( $^O );
+            $self->{filename} = $self->_uri_file_new( $newfile );
         }
         
         # It potentially does not exist
@@ -1112,7 +1172,7 @@ sub find
     my $p = +{ map( ( CORE::exists( $opts->{ $_ } ) ? ( $_ => $opts->{ $_ } ) : () ), qw( bydepth dangling_symlinks follow follow_fast follow_skip no_chdir postprocess preprocess untaint untaint_pattern untaint_skip ) ) };
     $p->{wanted} = sub
     {
-        local $_ = $self->new( $File::Find::name ) || return( $self->pass_error );
+        local $_ = $self->new( $File::Find::name, { os => $self->{os} } ) || return( $self->pass_error );
         $cb->( $_ );
     };
     
@@ -1179,7 +1239,8 @@ sub flatten
     my $self = shift( @_ );
     my $path = $self->resolved ? $self : $self->resolve( @_ );
     return( $self->pass_error ) if( !defined( $path ) );
-    return( $self->new( $self->collapse_dots( "$path", { separator => $DIR_SEP } )->file( $^O ) ) );
+    my $dir_sep = $self->_os2sep;
+    return( $self->new( $self->collapse_dots( "$path", { separator => $dir_sep } )->file( $self->{os} || $^O ), { os => $self->{os} } ) );
 }
 
 sub flush { return( shift->_filehandle_method( 'flush', 'file', @_ ) ); }
@@ -1213,7 +1274,7 @@ sub inode { return( shift->finfo->inode ); }
 
 sub ioctl { return( shift->_filehandle_method( 'ioctl', 'file', @_ ) ); }
 
-sub is_absolute { return( File::Spec->file_name_is_absolute( shift->filepath ) ); }
+sub is_absolute { return( $self->_spec_file_name_is_absolute( shift->filepath ) ); }
 
 sub is_dir { return( shift->finfo->is_dir ); }
 
@@ -1244,18 +1305,19 @@ sub is_part_of
         {
             return( $self->error( "I was expecting a string or a stringifyable object, but instead I got '$this'." ) );
         }
-        $this = $self->new( "$this" ) || return( $self->pass_error );
+        $this = $self->new( "$this", { os => $self->{os} } ) || return( $self->pass_error );
     }
     my $file = $self->filepath;
     return( $self->error( "Directory provided \"${this}\" to check if our file \"${file}\" is part of its file path is actually not a directory." ) ) if( !$this->is_dir );
     my $parent = $this->filepath;
     # $self->message( 3, "Checking if directory '$parent' is part of our file path '$file' starting from offset 0." );
-    return( CORE::index( $file, "${parent}${DIR_SEP}" ) == 0 ? $self->true : $self->false );
+    my $dir_sep = $self->_os2sep;
+    return( CORE::index( $file, "${parent}${dir_sep}" ) == 0 ? $self->true : $self->false );
 }
 
-sub is_relative { return( !File::Spec->file_name_is_absolute( shift->filepath ) ); }
+sub is_relative { return( !$self->_spec_file_name_is_absolute( shift->filepath ) ); }
 
-sub is_rootdir { return( shift->filepath eq File::Spec->rootdir ); }
+sub is_rootdir { return( shift->filepath eq $self->_spec_rootdir ); }
 
 sub iterator
 {
@@ -1274,7 +1336,7 @@ sub iterator
         while( my $elem = $io->read )
         {
             next if( $elem eq '.' || $elem eq '..' );
-            my $e = $self->new( File::Spec->catpath( $vol, "$dir", $elem ) ) || next;
+            my $e = $self->new( $self->_spec_catpath( $vol, "$dir", $elem ), { os => $self->{os} } ) || next;
             try
             {
                 if( $e->is_link && $opts->{follow_link} )
@@ -1320,9 +1382,9 @@ sub join
     # For Windows OS
     my $vol = $self->volume;
     my $base = pop( @$frags );
-    my $dirs = File::Spec->catdir( @$frags );
-    my $new = File::Spec->catpath( $vol, $dirs, $base );
-    return( $self->new( $new, debug => $self->debug ) );
+    my $dirs = $self->_spec_catdir( [ @$frags ] );
+    my $new = $self->_spec_catpath( $vol, $dirs, $base );
+    return( $self->new( $new, debug => $self->debug, os => $self->{os} ) );
 }
 
 sub last_accessed { return( shift->finfo->atime ); }
@@ -1559,17 +1621,17 @@ sub mkpath
         $params = shift( @_ ) if( @_ && ref( $_[0] ) eq 'HASH' );
         $params->{recurse} //= 0;
         return( $self->error( "Too many recursion. Exceeded the threshold of $max_recursion" ) ) if( $max_recursion > 0 && $params->{recurse} >= $max_recursion );
-        # my( $vol, $dirs, $fname ) = File::Spec->splitpath( $path );
-        # my @fragments = File::Spec->splitdir( $dirs );
-        my $vol = [File::Spec->splitpath( $path )]->[0];
-        my @fragments = File::Spec->splitdir( $path );
+        # my( $vol, $dirs, $fname ) = $self->_spec_splitpath( $path );
+        # my @fragments = $self->_spec_splitdir( $dirs );
+        my $vol = [$self->_spec_splitpath( $path )]->[0];
+        my @fragments = $self->_spec_splitdir( $path );
         my $curr = $self->new_array;
         my $parent_path  = '';
         foreach my $dir ( @fragments )
         {
-            # $parent_path = $curr->length ? File::Spec->catpath( $vol, File::Spec->catdir( @$curr ) ) : '';
-            $parent_path = $curr->length ? File::Spec->catdir( @$curr ) : '';
-            my $current_path = File::Spec->catpath( $vol, File::Spec->catdir( @$curr, $dir ) );
+            # $parent_path = $curr->length ? $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ) ) : '';
+            $parent_path = $curr->length ? $self->_spec_catdir( [ @$curr ] ) : '';
+            my $current_path = $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr, $dir ] ) );
             if( !-e( $current_path ) )
             {
                 CORE::mkdir( $current_path ) || return( $self->error( "Unable to create directory \"$current_path\" ", ( CORE::length( $parent_path ) ? "under $parent_path" : "at filesystem root" ), ": $!" ) );
@@ -1595,8 +1657,10 @@ sub mkpath
                 {
                     my $actual = CORE::readlink( $current_path ) || return( $self->error( "Unable to read the symbolic link \"$current_path\": $!" ) );
                     $self->message( 3, "Path \"$current_path\" points to a link which resolves to \"$actual\"." );
-                    my $before = URI::file->new( $current_path )->file( $^O );
-                    my $after  = URI::file->new( $actual )->abs( $before )->file( $^O );
+                    # my $before = URI::file->new( $current_path )->file( $^O );
+                    my $before = $self->_uri_file_new( $current_path );
+                    # my $after  = URI::file->new( $actual )->abs( $before )->file( $^O );
+                    my $after  = $self->_uri_file_abs( $actual, $before );
                     $params->{recurse}++;
                     $process->( $after, $params );
                 }
@@ -1611,14 +1675,14 @@ sub mkpath
             }
             $curr->push( $dir );
         }
-        return( File::Spec->catpath( $vol, File::Spec->catdir( @$curr ) ) );
+        return( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ) ) );
     };
     
     my $new = $self->new_array;
     foreach my $path ( @args )
     {
         my $actual = $process->( $path ) || return( $self->pass_error );
-        my $o = $self->new( $actual, { resolved => 1 });
+        my $o = $self->new( $actual, { resolved => 1, os => $self->{os} });
         $new->push( $o );
     }
     return( $new );
@@ -1958,6 +2022,8 @@ sub opened
     }
 }
 
+sub os { return( shift->_set_get_scalar( 'os', @_ ) ); }
+
 sub parent
 {
     my $self = shift( @_ );
@@ -1966,18 +2032,18 @@ sub parent
     # I deliberately did not do split( '/', $path, -1 ) so that if there is a trailing '/', it will not be counted
     # 2021-03-27: Was working well, but only on Unix systems...
     # my @segments = split( '/', $self->filename, -1 );
-    my( $vol, $parent, $file ) = File::Spec->splitpath( $self->filename );
+    my( $vol, $parent, $file ) = $self->_spec_splitpath( $self->filename );
     $vol //= '';
     $file //= '';
     $self->message( 3, "Filename is '", $self->filename, "', volume is '$vol', parent '$parent' and file is '$file'." );
-    my @segments = File::Spec->splitpath( File::Spec->catfile( $parent, $file ) );
+    my @segments = $self->_spec_splitpath( $self->_spec_catfile( [ $parent, $file ] ) );
     # $self->message( 3, "Path segments are: ", sub{ $self->dump( \@segments )} );
     pop( @segments );
     return( $self ) if( !scalar( @segments ) );
-    $self->message( 3, "Creating new object with document uri '", $vol . File::Spec->catdir( @segments ), "'." );
+    $self->message( 3, "Creating new object with document uri '", $vol . $self->_spec_catdir( [ @segments ] ), "'." );
     # return( $self->new( join( '/', @segments ), ( $r ? ( apache_request => $r ) : () ) ) );
-    # return( $self->new( $vol . File::Spec->catdir( @segments ) ) );
-    $self->{parent} = $self->new( File::Spec->catpath( $vol, File::Spec->catdir( @segments ), '' ) );
+    # return( $self->new( $vol . $self->_spec_catdir( [ @segments ] ) ) );
+    $self->{parent} = $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @segments ] ), '' ), os => $self->{os} );
     return( $self->{parent} );
 }
 
@@ -2030,13 +2096,13 @@ sub readlink
     my $file = $self->filepath;
     my $rv = CORE::readlink( $self->filepath ) || 
         return( $self->error( "An unexpected error occurred while trying to read link \"${file}\": $!" ) );
-    return( $self->new( $rv, { base_dir => $self->parent } ) );
+    return( $self->new( $rv, { base_dir => $self->parent, os => $self->{os} } ) );
 }
 
 sub relative
 {
     my $self = shift( @_ );
-    return( File::Spec->abs2rel( $self->filepath, $self->base_dir ) );
+    return( $self->_spec_abs2rel( [ $self->filepath, $self->base_dir ] ) );
 }
 
 sub rmdir
@@ -2066,16 +2132,29 @@ sub resolve
     $opts->{recurse} //= 0;
     my $max_recursion = $self->max_recursion;
     return( $self->error( "Too many recursion. Exceeded the threshold of $max_recursion" ) ) if( $max_recursion > 0 && $opts->{recurse} >= $max_recursion );
-    $path = File::Glob::bsd_glob( $path );
+    my $os = $self->{os} || $^O;
+    # Those do not work in virtualisation
+    if( $os eq $^O )
+    {
+        if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
+        {
+            require File::DosGlob;
+            $path = File::DosGlob::glob( $path );
+        }
+        else
+        {
+            $path = File::Glob::bsd_glob( $path );
+        }
+    }
     $self->message( 3, "Possibly expanded file path now is '$path'." );
-    my( $vol, $dirs, $fname ) = File::Spec->splitpath( $path );
-    my @fragments = File::Spec->splitdir( $dirs );
-    $self->message( 3, "Fragments are: ", sub{ $self->dump( \@fragments ) });
+    my( $vol, $dirs, $fname ) = $self->_spec_splitpath( $path );
+    my @fragments = $self->_spec_splitdir( $dirs );
+    $self->message( 3, "Volume is '$vol', parent '$dirs', file '$fname' and fragments are: ", sub{ $self->dump( \@fragments ) });
     my $curr = $self->new_array;
     my $parent_path  = '';
     foreach my $dir ( @fragments )
     {
-        my $current_path = File::Spec->catdir( @$curr, $dir );
+        my $current_path = $self->_spec_catdir( [ @$curr, $dir ] );
         $self->message( 3, "Current path now is: '$current_path'." );
         # Stop right here. There is a missing path, thus we cannot resolve
         if( !-e( $current_path ) )
@@ -2083,21 +2162,22 @@ sub resolve
             # Return false, but not undef, which we use for errors
             return( '' );
         }
-        elsif( $^O !~ /^(mswin32|win32|vms|riscos)$/i && -l( $current_path ) )
+        elsif( $os !~ /^(mswin32|win32|vms|riscos)$/i && -l( $current_path ) )
         {
             try
             {
                 my $actual = CORE::readlink( $current_path );
                 $self->message( 3, "Path \"$current_path\" points to a link which resolves to \"$actual\"." );
-                my $before = URI::file->new( $current_path );
-                my $after  = URI::file->new( $actual )->abs( $before )->file( $^O );
+                my $before = URI::file->new( $current_path, ( $self->{os} || $^O ) );
+                # my $after  = URI::file->new( $actual )->abs( $before )->file( $^O );
+                my $after  = $self->_uri_file_abs( $actual, $before );
                 $opts->{recurse}++;
-                unless( File::Spec->file_name_is_absolute( $after ) )
+                unless( $self->_spec_file_name_is_absolute( $after ) )
                 {
                     $after = $self->resolve( $after, $opts );
                     $self->message( 3, "Resolved symbolic link value to '$after'." );
                 }
-                my @new = File::Spec->splitdir( $after );
+                my @new = $self->_spec_splitdir( $after );
                 $self->message( 3, "Updated fragments are: ", sub{ $self->dump( \@new ) });
                 $curr = $self->new_array( \@new );
                 next;
@@ -2109,8 +2189,8 @@ sub resolve
         }
         $curr->push( $dir );
     }
-    $self->message( 3, "Returning ", sub{ File::Spec->catpath( $vol, File::Spec->catdir( @$curr ), $fname ) });
-    return( $self->new( File::Spec->catpath( $vol, File::Spec->catdir( @$curr ), $fname ), { resolved => 1 }) );
+    $self->message( 3, "Returning ", sub{ $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ) });
+    return( $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ), { resolved => 1, os => $self->{os} }) );
 }
 
 sub resolved { return( shift->_set_get_boolean( 'resolved', @_ ) ); }
@@ -2302,7 +2382,7 @@ sub rewind { return( shift->_filehandle_method( 'rewind', 'directory', @_ ) ); }
 
 sub rewinddir { return( shift->rewind( @_ ) ); }
 
-sub root_dir { return( shift->new( File::Spec->rootdir ) ); }
+sub root_dir { return( shift->new( $self->_spec_rootdir, { os => $self->{os} }) ); }
 
 sub rootdir { return( shift->root_dir ); }
 
@@ -2362,10 +2442,10 @@ sub split
     # e.g. /some/where/my/file.txt
     my $file = $self->filename;
     $opts->{remove_leading_sep} //= 0;
-    my( $vol, $path, $base ) = File::Spec->splitpath( $file );
+    my( $vol, $path, $base ) = $self->_spec_splitpath( $file );
     $self->message( 3, "Path is '$path'" );
     # /some/where/my/
-    my $frags = [File::Spec->splitdir( $path )];
+    my $frags = [$self->_spec_splitdir( $path )];
     pop( @$frags ) if( scalar( @$frags ) > 1 && !CORE::length( $frags->[-1] ) );
     shift( @$frags ) if( scalar( @$frags ) > 1 && !CORE::length( $frags->[0] ) && $opts->{remove_leading_sep} );
     push( @$frags, $base );
@@ -2391,7 +2471,7 @@ sub symlink
         {
             return( $self->error( "I was expecting a string or a stringifyable object, but instead I got '$this'." ) );
         }
-        $this = $self->new( "$this" ) || return( $self->pass_error );
+        $this = $self->new( "$this", { os => $self->{os} } ) || return( $self->pass_error );
     }
     
     return( $self->error( "There is already a file at \"${this}\"." ) ) if( $this->exists );
@@ -2410,7 +2490,7 @@ sub symlink
 
 sub sync { return( shift->_filehandle_method( 'sync', 'file', @_ ) ); }
 
-sub sys_tmpdir { return( __PACKAGE__->new( File::Spec->tmpdir ) ); }
+sub sys_tmpdir { return( __PACKAGE__->new( ref( $_[0] ) ? shift->_spec_tmpdir : File::Spec->tmpdir ) ); }
 
 sub sysread { return( shift->_filehandle_method( 'sysread', 'file', @_ ) ); }
 
@@ -2452,8 +2532,8 @@ sub tempfile
     $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^[\w\-\_\.]+$/ );
     $self->message( 3, "Filename generated is '$fname'" );
     my $dir;
-    my $sys_tmpdir = File::Spec->tmpdir;
-    my $base_vol = [File::Spec->splitpath( $sys_tmpdir )]->[0];
+    my $sys_tmpdir = $self->_spec_tmpdir;
+    my $base_vol = [$self->_spec_splitpath( $sys_tmpdir )]->[0];
     if( defined( $opts->{dir} ) && CORE::length( $opts->{dir} ) )
     {
         if( !-e( $opts->{dir} ) )
@@ -2470,11 +2550,11 @@ sub tempfile
             warnings::warn( "Warning only: directory provided is not writable for uid $>\n" ) if( warnings::enabled() );
         }
         $dir = $opts->{dir};
-        $base_vol = [File::Spec->splitpath( $dir )]->[0];
+        $base_vol = [$self->_spec_splitpath( $dir )]->[0];
     }
     elsif( $opts->{tmpdir} )
     {
-        # $dir = File::Spec->catpath( $base_vol, $sys_tmpdir, $uuid->create_str );
+        # $dir = $self->_spec_catpath( $base_vol, $sys_tmpdir, $uuid->create_str );
         $dir = $self->tmpdir(
             cleanup => $opts->{auto_remove},
             tmpdir  => 1,
@@ -2492,10 +2572,10 @@ sub tempfile
     my $open = CORE::delete( $opts->{open} );
     $opts->{resolved} = 1;
     my( $parent, $me );
-    ( $base_vol, $parent, $me ) = File::Spec->splitpath( $dir );
-    $dir = File::Spec->catdir( $parent, $me );
+    ( $base_vol, $parent, $me ) = $self->_spec_splitpath( $dir );
+    $dir = $self->_spec_catdir( [ $parent, $me ] );
     CORE::delete( @$opts{ qw( tmpdir tempdir ) } );
-    my $new = $self->new( File::Spec->catpath( $base_vol, $dir, $fname ), %$opts ) || return( $self->pass_error );
+    my $new = $self->new( $self->_spec_catpath( $base_vol, $dir, $fname ), %$opts ) || return( $self->pass_error );
     # $self->message( 3, "So far dir is '$dir' with path '$new'" );
     if( $open )
     {
@@ -2512,7 +2592,7 @@ sub tmpdir
     my $opts = $self->_get_args_as_hash( @_ );
     my $uuid = Data::UUID->new;
     my $parent;
-    my $sys_tmpdir = File::Spec->tmpdir;
+    my $sys_tmpdir = $self->_spec_tmpdir;
     if( defined( $opts->{dir} ) && CORE::length( $opts->{dir} ) )
     {
         if( !-e( $opts->{dir} ) )
@@ -2541,8 +2621,8 @@ sub tmpdir
     }
     
     # Necessary contortion to accomodate systems like Windows that use 'volume'
-    my( $vol, $basedir, $fname ) = File::Spec->splitpath( $parent );
-    my $dir  = File::Spec->catpath( $vol, File::Spec->catdir( $basedir, $fname ), $uuid->create_str );
+    my( $vol, $basedir, $fname ) = $self->_spec_splitpath( $parent );
+    my $dir  = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $basedir, $fname ] ), $uuid->create_str );
     return( $self->error( "Found an existing directory with the name just generated: \"${dir}\". This should never happen." ) ) if( -e( $dir ) );
     mkdir( $dir ) || return( $self->error( "Unable to create temporary directory \"$dir\": $!" ) );
     $opts->{resolved} = 1;
@@ -2709,6 +2789,12 @@ sub unmap
     }
 }
 
+sub uri
+{
+    my $self = shift( @_ );
+    return( $self->_uri_file_class->new( $self->filename ) );
+}
+
 sub use_file_map { return( shift->_set_get_boolean( 'use_file_map', @_ ) ); }
 
 sub utime
@@ -2727,11 +2813,11 @@ sub volume
     {
         my $vol = shift( @_ );
         my $fpath = $self->filepath;
-        my( $old_vol, $dir, $fname ) = File::Spec->splitpath( $fpath );
-        $self->filename( File::Spec->catpath( $vol, $dir, $fname ) );
+        my( $old_vol, $dir, $fname ) = $self->_spec_splitpath( $fpath );
+        $self->filename( $self->_spec_catpath( $vol, $dir, $fname ) );
         return( $old_vol );
     }
-    return( [File::Spec->splitpath( $self->filepath )]->[0] );
+    return( [$self->_spec_splitpath( $self->filepath )]->[0] );
 }
 
 # $f->write( $data );
@@ -2967,11 +3053,14 @@ sub _make_abs
         $self->message( 3, "Setting $field to '$this'." );
         if( Scalar::Util::blessed( $this ) && $this->isa( 'URI::file' ) )
         {
-            $this = URI->new_abs( $this )->file( $^O );
+            # $this = URI->new_abs( $this )->file( $^O );
+            $this = URI->new_abs( $this )->file( $self->{os} || $^O );
         }
-        elsif( !File::Spec->file_name_is_absolute( "$this" ) )
+        elsif( !$self->_spec_file_name_is_absolute( "$this" ) )
         {
-            $this = URI::file->new_abs( "$this" )->file( $^O );
+            # $this = URI::file->new_abs( "$this" )->file( $^O );
+            $this = URI::file->new_abs( "$this" )->file( $self->{os} || $^O );
+            # $this = $self->_uri_file_class->new_abs( "$this" )->file( $self->{os} || $^O );
         }
         $self->message( 3, "$field is now '$this'" );
         $self->{ $field } = $this;
@@ -3022,8 +3111,8 @@ sub _move_or_copy
                     # If $dest is a reference or an object, File::Copy will trigger its 
                     # own error which we will catch
                 
-                    my( $vol, $path, $name ) = File::Spec->splitpath( "$dest" );
-                    $new_path = $dest = File::Spec->catpath( $vol, File::Spec->catdir( $path, $name ), $base );
+                    my( $vol, $path, $name ) = $self->_spec_splitpath( "$dest" );
+                    $new_path = $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $name ] ), $base );
                     return( $self->error( "There already exists a ", ( -d( $dest ) ? 'directory' : 'file' ), " \"${dest}\"." ) ) if( -e( $dest ) && ( !$opts->{overwrite} || !-d( $dest ) ) );
                 }
                 elsif( -e( $dest ) && !-d( $dest ) )
@@ -3067,16 +3156,16 @@ sub _move_or_copy
                 {
                     # XXX Maybe use child() method instead?
                     $base = $self->basename;
-                    my( $vol, $path, $fname ) = File::Spec->splitpath( $dest->filepath );
-                    $dest = File::Spec->catpath( $vol, File::Spec->catdir( $path, $fname ), $base );
+                    my( $vol, $path, $fname ) = $self->_spec_splitpath( $dest->filepath );
+                    $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $fname ] ), $base );
                 }
                 # A regular string or an overloaded object
                 elsif( !ref( $dest ) || overload::Method( $dest, '""' ) )
                 {
                     # We get the directory portion of the path.
                     $base = $self->basename;
-                    my( $vol, $path, $fname ) = File::Spec->splitpath( "$dest" );
-                    $dest = File::Spec->catpath( $vol, File::Spec->catdir( $path, $fname ), $base );
+                    my( $vol, $path, $fname ) = $self->_spec_splitpath( "$dest" );
+                    $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $fname ] ), $base );
                 }
                 # No clue what to do with this
                 else
@@ -3110,7 +3199,223 @@ sub _move_or_copy
     }
 }
 
+sub _os2sep
+{
+    my $self = shift( @_ );
+    return( $OS2SEP->{lc( $self->{os} || $^O )} );
+}
+
 sub _prev_cwd { return( shift->_set_get_scalar( '_prev_cwd', @_ ) ); }
+
+sub _spec_abs2rel
+{
+    my $self = shift( @_ );
+    my( $args, $os ) = @_;
+    my $class = $self->_spec_class( $os );
+    return( $class->abs2rel( @$args ) );
+}
+
+sub _spec_canonpath
+{
+    my $self = shift( @_ );
+    my( $path, $os ) = @_;
+    my $class = $self->_spec_class( $os );
+    return( $class->canonpath( $path ) );
+}
+
+sub _spec_catdir
+{
+    my $self = shift( @_ );
+    my( $dirs, $os ) = @_;
+    my $class = $self->_spec_class( $os );
+    return( $class->catdir( @$dirs ) );
+}
+
+sub _spec_catfile
+{
+    my $self = shift( @_ );
+    my( $frags, $os ) = @_;
+    my $class = $self->_spec_class( $os );
+    return( $class->catfile( @$frags ) );
+}
+
+sub _spec_catpath
+{
+    my $self = shift( @_ );
+    my( $volume, $directory, $file, $os ) = @_;
+    my $class = $self->_spec_class( $os );
+    return( $class->catpath( $volume, $directory, $file ) );
+}
+
+sub _spec_class
+{
+    my $self = shift( @_ );
+    my $os = shift( @_ );
+    # _spec_class object property would have been set upon object instantiation
+    # but if $os is specified, or _spec_class is not set yet, we go on
+    return( $self->{_spec_class} ) if( $self->{_spec_class} && !defined( $os ) );
+    $os = $^O if( !defined( $os ) );
+    my $os_map = 
+    {
+    amiga   => 'AmigaOS',
+    amigaos => 'AmigaOS',
+    cygwin  => 'Cygwin',
+    dos     => 'OS2',
+    freebsd => 'Unix',
+    linux   => 'Unix',
+    mac     => 'Mac',
+    macos   => 'Mac',
+    msdos   => 'OS2',
+    mswin32 => 'Win32',
+    netware => 'Win32',
+    os2     => 'OS2',
+    symbian => 'Win32',
+    vms     => 'VMS',
+    win32   => 'Win32',
+    };
+    # Slightly different than what File::Spec does, because the os provided is provided
+    # potentially by a user
+    my $module = $os_map->{lc( $os )} || 'Unix';
+
+    $self->_load_class( "File::Spec::$module" ) || return( $self->pass_error );
+    return( "File::Spec::$module" );
+}
+
+sub _spec_curdir
+{
+    my $self = shift( @_ );
+    my $class = $self->_spec_class( $os );
+    return( $class->curdir );
+}
+
+sub _spec_file_name_is_absolute
+{
+    my $self = shift( @_ );
+    my( $path, $os ) = @_;
+    my $class = $self->_spec_class( $os );
+    return( $class->file_name_is_absolute( $path ) );
+}
+
+sub _spec_rel2abs
+{
+    my $self = shift( @_ );
+    my( $args, $os ) = @_;
+    my $class = $self->_spec_class( $os );
+    return( $class->rel2abs( @$args ) );
+}
+
+sub _spec_rootdir
+{
+    my $self = shift( @_ );
+    my $class = $self->_spec_class( $os );
+    return( $class->rootdir );
+}
+
+sub _spec_splitdir
+{
+    my $self = shift( @_ );
+    my( $file, $os ) = @_;
+    my $class = $self->_spec_class( $os );
+    return( $class->splitdir( $file ) );
+}
+
+sub _spec_splitpath
+{
+    my $self = shift( @_ );
+    my( $file, $os ) = @_;
+    my $class = $self->_spec_class( $os );
+    return( $class->splitpath( $file ) );
+}
+
+sub _spec_tmpdir
+{
+    my $self = shift( @_ );
+    my $class = $self->_spec_class( $os );
+    return( $class->tmpdir );
+}
+
+sub _spec_updir
+{
+    my $self = shift( @_ );
+    my $class = $self->_spec_class( $os );
+    return( $class->updir );
+}
+
+sub _uri_file_abs
+{
+    my $self = shift( @_ );
+    my( $path, $base ) = @_;
+    # Maybe better?
+    # return( URI::file->new( $path )->abs( URI::file->new( $base ) )->file( $self->{os} ) );
+    return( URI::file->new( $path )->abs( $base )->file( $self->{os} ) );
+}
+
+sub _uri_file_class
+{
+    my $self = shift( @_ );
+    my $os = shift( @_ );
+    # _uri_file_class object property would have been set upon object instantiation
+    # but if $os is specified, or _uri_file_class is not set yet, we go on
+    return( $self->{_uri_file_class} ) if( $self->{_uri_file_class} && !defined( $os ) );
+    $os = $^O if( !defined( $os ) );
+    my $os_map =
+    {
+    dos     => 'FAT',
+    freebsd => 'Unix',
+    linux   => 'Unix',
+    mac     => 'Mac',
+    macos   => 'Mac',
+    msdos   => 'FAT',
+    mswin32 => 'Win32',
+    os2     => 'OS2',
+    qnx     => 'QNX',
+    win32   => 'Win32',
+    };
+    # Slightly different than what File::Spec does, because the os provided is provided
+    # potentially by a user
+    my $module = $os_map->{lc( $os )} || 'Unix';
+
+    $self->_load_class( "URI::file::$module" ) || return( $self->pass_error );
+    return( "URI::file::$module" );
+}
+
+sub _uri_file_cwd
+{
+    my $self = shift( @_ );
+    # This is optional and may be undefined
+    my $os   = shift( @_ );
+    return( URI->new( URI::file->cwd )->file( $os || $self->{os} || $^O ) );
+}
+
+sub _uri_file_new
+{
+    my $self = shift( @_ );
+    my $file = shift( @_ );
+    # This is optional and may be undefined
+    my $os   = shift( @_ );
+    return( $self->_uri_file_class->new( $file )->file( $os || $self->{os} || $^O ) );
+}
+
+sub _uri_file_os_map
+{
+    my $self = shift( @_ );
+    my $os = shift( @_ ) || return;
+    my $os_map =
+    {
+    dos     => 'dos',
+    freebsd => 'Unix',
+    linux   => 'Unix',
+    mac     => 'mac',
+    macos   => 'MacOS',
+    msdos   => 'msdos',
+    mswin32 => 'MSWin32',
+    os2     => 'os2',
+    qnx     => 'qnx',
+    unix    => 'Unix',
+    win32   => 'win32',
+    };
+    return( $os_map->{lc( $os )} );
+}
 
 # XXX IO::File class modification
 {
@@ -3317,13 +3622,22 @@ Module::Generic::File - File Object Abstraction Class
     # or to set the access and modification time to current time:
     $file->utime;
 
+    # Create a file object in a different OS than yours
+    my $f = file( q{C:\Documents\Some\File.pdf}, os => 'Win32' );
+    $f->parent; # C:\Documents\Some
+    $f->filnema; # C:\Documents\Some\File.pdf
+
+    # Get URI:
+    my $u = $f->uri;
+    say $u; # file:///Documents/Some/File.pdf
+
 =head1 VERSION
 
-    v0.1.10
+    v0.1.11
 
 =head1 DESCRIPTION
 
-This packages serves to resolve files whether inside Apache scope with mod_perl or outside, providing a unified api.
+This packages provides a comprehensive and versatile set of methods and functions to manipulate files and directories. You can even manipulate filenames as if under a different OS, by providing the C<os> parameter.
 
 =head1 METHODS
 
@@ -3364,6 +3678,12 @@ Sets the maximum recursion allowed. Defaults to 12.
 
 Its value is used in L</mkpath> and L</resolve>
 
+=item I<os>
+
+If provided, this will tell L<Module::Generic::File> to treat this new file as belonging to the specified operating system. This makes it possible to manipulate files or directories as if under a different system than the one you are currently using.
+
+Look also at L</as> to change a file to make it suitable for a different OS, such as C<Mac>, C<Win32>, C<dos>, C<Linux>, etc.
+
 =item I<resolved>
 
 A boolean flag which states whether this file has been resolved already or not.
@@ -3391,6 +3711,10 @@ Provided with some data as its first argument, and assuming the underlying file 
 If the file was already opened, whatever position you were in the file, will be restored after having appended the data.
 
 It returns the curent file object upon success for chaining or undef and sets an error object if an error occurred.
+
+=head2 as
+
+Provided with an C<OS> name, and this will return a filename with a format suitable for that operating system, notwithstanding the one you are currently using.
 
 =head2 atime
 
@@ -4469,6 +4793,10 @@ Untie the previously tied variable to the file object. See L</mmap>
 
 This is useful only if you are using L<File::Map>, which happens if your perl version is lower than C<5.16.0> or if you have set the global package variable C<MMAP_USE_FILE_MAP> to a true value, or if you have set the file object property L</use_file_map> to a true value.
 
+=head2 uri
+
+Returns a L<URI> file object, such as C<file:///Documents/Some/File.pdf>
+
 =head2 use_file_map
 
 Set or get the boolean value for using L<File::Map> in the L</mmap> method. By default, the value is taken from the package global variable C<$MMAP_USE_FILE_MAP>, and also by default if your perl version is greater or equal to C<v5.16.0>, then L</mmap> will use L<PerlIO/:mmap>. By setting this to true, you can force L/mmap> to use L<File::Map> rather than L<PerlIO/:mmap>
@@ -4653,6 +4981,21 @@ However, L<Module::Generic/error> used to return undef, is smart and knows in a 
 =head1 OVERLOADING
 
 Objects of this package are overloaded and their stringification will call L</filename>
+
+=head1 VIRTUALISATION
+
+This module has this unique feature that enables you to work with files in different operating system context. For example, assuming your environment is a unix flavoured operating system, you could still do this:
+
+    use Module::Generic::File qw( file );
+    my $f = file( q{C:\Documents\Newsletters\Summer2018.pdf}, os => 'win32' );
+    $f->parent; # C:\Documents\Newsletters
+
+Then, switch to old Mac format:
+
+    my $f2 = $f->as( 'mac' );
+    say $f2; # Documents:Newsletters:Summer2018.pdf
+
+Those files manipulation under different os, of course, have limitation since you cannot use real filesystem related method like C<open>, C<print>, etc, on, say a win32 based file object in a Unix environment, as it would not work.
 
 =head1 AUTHOR
 

@@ -32,7 +32,6 @@ my $state_table = {
     },
     body    => {
         'author'        => [ 'author', \&_begin_h2 ],
-        'empty'         => [ '', \&_print_paragraph ],
         'footnotes'     => [ '', \&_begin_h2 ],
         'fullcopyright' => [ '', \&_begin_h2 ],
         'head1'         => [ '', \&_begin_h2 ],
@@ -41,7 +40,7 @@ my $state_table = {
         'head4'         => [ '', \&_begin_h5 ],
         'references'    => [ '', \&_begin_h2 ],
         'security'      => [ '', \&_begin_h2 ],
-        'text'          => [ '', \&_collect_text ],
+        'text'          => [ 'paragraph', \&_collect_text ],
     },
     copynote    => {
         'abstract'  => [ 'abstract', \&_begin_h2 ],
@@ -53,6 +52,10 @@ my $state_table = {
     },
     have_title  => {
         'status'    => [ 'status', \&_begin_h2 ],
+    },
+    paragraph   => {
+        'empty'         => [ 'body', \&_print_paragraph ],
+        'text'          => [ '', \&_collect_text ],
     },
     start   => {
         'text'  => [ 'banner', \&_collect_text ],
@@ -164,6 +167,8 @@ sub _abort {
 sub _begin_h2 {
     my ($self,$event,$line,$args) = @_;
     my $id = $args->{id} || '';
+
+    $self->_catch_unfinished_paragraph();
     $self->{lasttext} = [];
     print qq(<h2><a id="section-$id">$line</a></h2>\n);
 } # _begin_h2()
@@ -171,6 +176,8 @@ sub _begin_h2 {
 sub _begin_h3 {
     my ($self,$event,$line,$args) = @_;
     my $id = $args->{id} || '';
+
+    $self->_catch_unfinished_paragraph();
     $self->{lasttext} = [];
     print qq(<h3><a id="section-$id">$line</a></h3>\n);
 } # _begin_h3()
@@ -178,6 +185,8 @@ sub _begin_h3 {
 sub _begin_h4 {
     my ($self,$event,$line,$args) = @_;
     my $id = $args->{id} || '';
+
+    $self->_catch_unfinished_paragraph();
     $self->{lasttext} = [];
     print qq(<h4><a id="section-$id">$line</a></h4>\n);
 } # _begin_h4()
@@ -185,6 +194,8 @@ sub _begin_h4 {
 sub _begin_h5 {
     my ($self,$event,$line,$args) = @_;
     my $id = $args->{id} || '';
+
+    $self->_catch_unfinished_paragraph();
     $self->{lasttext} = [];
     print qq(<h5><a id="section-$id">$line</a></h5>\n);
 } # _begin_h5()
@@ -194,6 +205,31 @@ sub _begin_toc {
     $self->{lasttext} = [];
     print qq(<h2><a id="section-toc">$line</a></h2>\n<ul>\n);
 } # _begin_toc()
+
+sub _catch_unfinished_paragraph {
+    my ($self) = @_;
+    my $prevtext = $self->{prevtext};
+    my $lasttext = $self->{lasttext};
+    my @lines = map { _escape($_->{text}) } @$lasttext;
+
+    if (0 < scalar @$prevtext) {        # we had an old unfinished paragraph
+        if (_is_image(@lines)
+            or _is_different_indent($prevtext,$lasttext)) {
+            $self->{lasttext} = $prevtext;
+            $self->{prevtext} = [];
+            $self->{forceprint} = 1;
+            $self->_print_paragraph();
+            $self->{lasttext} = $lasttext;
+            $self->{forceprint} = 0;
+        }
+        else {
+            my @fullparagraph = ();
+            push @fullparagraph, @$prevtext, @$lasttext;
+            $self->{prevtext} = [];
+            $self->{lasttext} = \@fullparagraph;
+        }
+    }
+} # _catch_unfinished_paragraph()
 
 sub _collect_text {
     my ($self,$event,$line,$args) = @_;
@@ -220,26 +256,70 @@ sub _init {
     $self->{xmlns}  = "http://www.w3.org/1999/xhtml";
     $self->{indent} = 0;
     $self->{lasttext} = [];
+    $self->{prevtext} = [];
     $self->{title}  = $args->{title} ? $args->{title}
                     : $self->{title} ? $self->{title}
                     :                  "You forgot to set a title"
                     ;
 } # _init();
 
-sub _print_paragraph {
-    my ($self) = @_;
-    my $lasttext = $self->{lasttext};
-    my @lines = map { _escape($_->{text}) } @$lasttext;
+sub _is_different_indent {
+    my ($par1,$par2) = @_;
+    my @p1 = @$par1;
+    my @p2 = @$par2;
+
+    if (0 == scalar @p2) {
+        return 1;
+    }
+    if (1 < scalar @p2
+        and $p2[0]->{indent} != $p2[1]->{indent}) {
+        return 1;
+    }
+    if ($p1[$#p1]->{indent} != $p2[0]->{indent}) {
+        return 1;
+    }
+    return 0;
+} # _is_different_indent()
+
+sub _is_image {
+    my @lines = @_;
     my $fl = grep { /(^[.]|[+|*]|-----|__)/ } @lines;
     my $table = grep { /___/ } @lines;
+    my $is_image = (0 <= $#lines
+                    and (0 < $fl
+                         and ((length(@lines) + .0) / $fl < 2
+                              or 0 < $table)));
+    return $is_image;
+} # _is_image()
 
-    if (0 > $#lines) {
+sub _is_unfinished {
+    my $unfinished = ((0 <= $#_)
+                      and not _is_image(@_)
+                      and ($_[$#_] !~ /[.:)\]]\s*$/));
+    return $unfinished;
+} # _is_unfinished()
+
+sub _print_paragraph {
+    my ($self) = @_;
+
+    $self->_catch_unfinished_paragraph();
+    my $lasttext = $self->{lasttext};
+    my @lines = map { _escape($_->{text}) } @$lasttext;
+
+    # Heuristic: If a single line ends without a dot, it probably won't be an
+    #            unfinished paragraph.
+    #
+    if (not $self->{forceprint}
+        and 1 < scalar @lines
+        and _is_unfinished(@lines)) {
+        $self->{prevtext} = $lasttext;
+        $self->{lasttext} = [];
+        $lasttext = [];
+    }
+    if (0 == scalar @$lasttext) {
         return;
     }
-    if (0 <= $#lines
-            and (0 < $fl
-                and ((length(@lines) + .0) / $fl < 2
-                    or 0 < $table))) {
+    if (_is_image(@lines)) {
         my $fig = "<pre>\n";
         foreach my $line (@$lasttext) {
             $fig .= " " x $line->{indent};
@@ -305,6 +385,28 @@ sub _print_toctext {
     }
 } # _print_toctext()
 
+sub _statetable2dot {
+    print <<EOGRAPH;
+digraph iptables {
+EOGRAPH
+    foreach my $state (keys %$state_table) {
+        my $evl = $state_table->{$state};
+        foreach my $event (keys %$evl) {
+            my $fst = $evl->{$event}->[0];
+            if ($fst) {
+                print "    $state -> $fst [label=$event];\n";
+            }
+            else {
+                print "    $state -> $state [label=$event];\n";
+            }
+        }
+    }
+    print <<EOGRAPH;
+}
+EOGRAPH
+    exit;
+} # _statetable2dot()
+
 package main;
 
 use Getopt::Long;
@@ -326,12 +428,15 @@ my $re_tocline   = qr/^\s{4}([.0-9A-Z]+)\s+(\S.+?)(\s\.*)\s(\d+)\s*$/;
 my ($app1,$head1,$head2,$head3);
 
 GetOptions( \%opt,
+    'pst',
     'title=s',
     'help|?', 'manual')
     or pod2usage(2);
 
 pod2usage(-exitval => 0, -verbose => 1, -input => \*DATA) if ($opt{help});
 pod2usage(-exitval => 0, -verbose => 2, -input => \*DATA) if ($opt{manual});
+
+RFC2XHTML::FSM->_statetable2dot()                         if ($opt{pst});
 
 my $fsm = RFC2XHTML::FSM->new();
 

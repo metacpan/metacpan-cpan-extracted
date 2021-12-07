@@ -1,18 +1,3 @@
-package Quiq::TeX::Code;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Option;
-use Scalar::Util ();
-use Quiq::Unindent;
-use Quiq::Math;
-use Quiq::Converter;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -30,6 +15,27 @@ L<Quiq::Hash>
 Ein Objekt der Klasse repräsentiert einen TeX Code-Generator. Mit
 den Methoden der Klasse kann aus einem Perl-Programm heraus
 TeX-Code erzeugt werden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::TeX::Code;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Option;
+use Scalar::Util ();
+use Quiq::Unindent;
+use Quiq::Math;
+use Quiq::Converter;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -603,7 +609,7 @@ sub toLength {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

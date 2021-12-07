@@ -15,9 +15,10 @@ do { my $x = {
                                       'Mason::Tidy' => '0',
                                       'Mason::Tidy::App' => '0',
                                       'Parallel::ForkManager' => '1.19',
-                                      'Perl::Critic' => '1.126',
+                                      'Perl::Critic' => '1.138',
+                                      'Perl::Critic::Moose' => '1.05',
                                       'Perl::Critic::Policy::Moose::RequireMakeImmutable' => '0',
-                                      'Perl::Tidy' => '20160302',
+                                      'Perl::Tidy' => '20210111',
                                       'Perl::Tidy::Sweetened' => '1.00',
                                       'Pod::Checker' => '0',
                                       'Pod::Spell' => '0',
@@ -34,7 +35,7 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Vars' => '0.009',
                                       'Test::Version' => '2.05',
-                                      'lib' => '0'
+                                      'lib::relative' => '0'
                                     }
                     },
        'runtime' => {
@@ -93,13 +94,13 @@ do { my $x = {
                                    'Encode' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'FindBin' => '0',
                                    'Test::Class::Most' => '0',
                                    'Test::Differences' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0.96',
                                    'Test::Warnings' => '0',
                                    'autodie' => '0',
-                                   'lib' => '0',
                                    'lib::relative' => '0'
                                  }
                  }

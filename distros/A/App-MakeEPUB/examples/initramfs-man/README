@@ -1,0 +1,13 @@
+These scripts create an EPUB ebook containing the man pages for the programs
+on an InitRAMFS.
+
+Besides the Perl module App::MakeEPUB you need the module HTML::TreeBuilder
+and the following programs:
+
+rman - PolyglotMan - Reverse compile man pages
+tidy - HTML syntax checker and reformatter
+
+The script bin/one-man-page.sh may be used to debug the process in case a
+man page gets scrambled.
+
+Mathias Weidner, 2013

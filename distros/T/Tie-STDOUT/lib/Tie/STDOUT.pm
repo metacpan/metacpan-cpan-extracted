@@ -4,7 +4,7 @@ use 5.008;
 
 no warnings; # in case they've been turned on
 
-$VERSION = '1.0401';
+$VERSION = '1.0500';
 
 use strict;
 
@@ -75,9 +75,11 @@ filehandles doesn't work.
 
 =over 4
 
-=item Tie::STDERR
+=item Capture::Tiny
 
 =item IO::Capture::Stdout
+
+=item Tie::STDERR
 
 =back
 
@@ -125,8 +127,9 @@ sub _with_real_STDOUT {
     $_[0]->(@_[1 .. $#_]);
 }
 
-sub PRINT  { _with_real_STDOUT(shift()->{print},  @_); }
-sub PRINTF { _with_real_STDOUT(shift()->{printf}, @_); }
-sub WRITE  { _with_real_STDOUT(shift()->{syswrite}, @_); }
+sub PRINT   { _with_real_STDOUT(shift()->{print},  @_); }
+sub PRINTF  { _with_real_STDOUT(shift()->{printf}, @_); }
+sub WRITE   { _with_real_STDOUT(shift()->{syswrite}, @_); }
+sub BINMODE { binmode(REALSTDOUT, $_[1]); }
 
 1;

@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.195';
+our $VERSION = '1.196';
 
 =encoding utf8
 
@@ -365,6 +365,10 @@ L<Quiq::Html::Construct> - Generierung von einfachen Tag-Konstrukten
 =item *
 
 L<Quiq::Html::Form::Layout> - HTML-Formular mit freiem Layout
+
+=item *
+
+L<Quiq::Html::HorizontalMenu> - Einfaches horizontales Menü
 
 =item *
 
@@ -910,7 +914,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

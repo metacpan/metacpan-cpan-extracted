@@ -34,6 +34,7 @@ struct xs_state {
     uint32_t invalid_key_counter;
     HV* bulk_hv;
     HV* avg_hv;
+    HV *invalid_hv;
     REGEXP* block_re;
     SV* hostname;
     SV* global_prefix;
@@ -43,10 +44,12 @@ struct xs_state {
     sockaddr_in server_addr;
     bool is_connected;
     bool use_global_storage;
+    bool store_invalid_metrics;
 };
 
 typedef struct xs_state GraphiteXS_Object;
 
+static SV *sv_store_invalid_metrics_key;
 static SV *sv_use_global_storage_key;
 static SV *sv_sender_key;
 static SV *sv_block_re_key;
@@ -114,16 +117,21 @@ static inline bool is_valid_key_ (GraphiteXS_Object* graphite, SV* key) {
 }
 
 static inline void increment_metric_ (GraphiteXS_Object* graphite, SV* key, NV value) {
-    if ( is_valid_key_(graphite, key) && ! is_metric_blocked_(graphite, key) ) {
+    bool is_valid = is_valid_key_(graphite, key);
+    if ( is_valid && ! is_metric_blocked_(graphite, key) ) {
         increment_hash_value_by( move(graphite->bulk_hv), key, move(value) );
         static string key_matcher ('\0', 128);
         key_matcher.assign(SvPVX( key ));
         if ( 0 == key_matcher.find( "avg." ) )
             increment_hash_value_by( move(graphite->avg_hv), move(key), 1 );
+    } else if (! is_valid && graphite->store_invalid_metrics) {
+        increment_hash_value_by( graphite->invalid_hv, move(key), move(value) );
     }
 }
 
 inline void clear_bulk_(GraphiteXS_Object* graphite) {
+    if (graphite->store_invalid_metrics)
+        hv_clear(graphite->invalid_hv);
     hv_clear(graphite->bulk_hv);
     hv_clear(graphite->avg_hv);
     graphite->invalid_key_counter = 0;
@@ -202,7 +210,12 @@ void calculate_result_metrics_ (GraphiteXS_Object* graphite) {
 
 inline void parse_constructor_options_ (GraphiteXS_Object* graphite, HV* opts) {
 
-    HE* entry = hv_fetch_ent(opts, sv_sender_key, NULL, 0);
+    HE* entry = hv_fetch_ent(opts, sv_store_invalid_metrics_key, NULL, 0);
+
+    if (entry)
+        graphite->store_invalid_metrics = SvIVx(hv_iterval(opts, entry)) ? true : false;
+
+    entry = hv_fetch_ent(opts, sv_sender_key, NULL, 0);
 
     if (entry) {
         graphite->sender_name = move(HeVAL(entry));
@@ -224,11 +237,13 @@ inline void parse_constructor_options_ (GraphiteXS_Object* graphite, HV* opts) {
     }
 
     if (graphite->use_global_storage) {
-        graphite->bulk_hv = get_hv("Graphite::Simple::bulk", GV_ADD);
-        graphite->avg_hv  = get_hv("Graphite::Simple::avg_counters", GV_ADD);
+        graphite->bulk_hv    = get_hv("Graphite::Simple::bulk", GV_ADD);
+        graphite->avg_hv     = get_hv("Graphite::Simple::avg_counters", GV_ADD);
+        graphite->invalid_hv = get_hv("Graphite::Simple::invalid", GV_ADD);
     } else {
-        graphite->bulk_hv = newHV();
-        graphite->avg_hv  = newHV();
+        graphite->bulk_hv    = newHV();
+        graphite->avg_hv     = newHV();
+        graphite->invalid_hv = newHV();
     }
 
     entry = hv_fetch_ent(opts, sv_block_re_key, NULL, 0);
@@ -309,6 +324,7 @@ PROTOTYPES: DISABLE
 
 BOOT:
 {
+    sv_store_invalid_metrics_key = move(newSVpv("store_invalid_metrics", strlen("store_invalid_metrics")));
     sv_use_global_storage_key = move(newSVpv("use_common_storage", strlen("use_global_storage")));
     sv_sender_key   = move(newSVpv("sender_name", strlen("sender_name")));
     sv_block_re_key = move(newSVpv("block_metrics_re", strlen("block_metrics_re")));
@@ -327,9 +343,11 @@ CODE:
     self->invalid_key_counter = 0;
     self->bulk_hv = nullptr;
     self->avg_hv  = nullptr;
+    self->invalid_hv = nullptr;
     self->block_re = NULL;
     self->is_connected = false;
     self->use_global_storage = false;
+    self->store_invalid_metrics = false;
     self->global_prefix = nullptr;
     self->sender_name = nullptr;
     self->hostname = nullptr;
@@ -376,6 +394,13 @@ CODE:
     //ST(0) = sv_2mortal(newRV_noinc( (SV *) self->bulk_hv ));
     //XSRETURN(1);
     RETVAL = self->bulk_hv;
+OUTPUT:
+    RETVAL
+
+
+HV* get_invalid_metrics (GraphiteXS_Object *self)
+CODE:
+    RETVAL = self->invalid_hv;
 OUTPUT:
     RETVAL
 
@@ -517,7 +542,25 @@ PPCODE:
 
 void incr_bulk (GraphiteXS_Object *self, SV* key, NV value = 1)
 PPCODE:
-    increment_metric_( self, move(key), move(value) );
+    bool is_ok = false;
+    if (key != &PL_sv_undef) {
+        uint32_t key_type = SvTYPE(key);
+        if (key_type == SVt_PVLV || key_type == SVt_PVMG) {
+            // SVt_PVLV can be returned from substr
+            // SVt_PVMG can be returned from RegExp
+            STRLEN key_len;
+            char *ch = SvPVx(move(key), key_len);
+            key = newSVpv(move(ch), move(key_len));
+        }
+        if (SvTYPE(key) == SVt_PV) {
+            is_ok = true;
+            increment_metric_( self, move(key), move(value) );
+        }
+    }
+
+    if (!is_ok)
+        croak("key must be a string");
+
     XSRETURN_EMPTY;
 
 
@@ -636,6 +679,8 @@ PPCODE:
             SvREFCNT_dec_NN(self->bulk_hv);
         if (self->avg_hv) // hv_undef
             SvREFCNT_dec_NN(self->avg_hv);
+        if (self->invalid_hv) // hv_undef
+            SvREFCNT_dec_NN(self->invalid_hv);
     }
     disconnect_(self);
     //dump_all();

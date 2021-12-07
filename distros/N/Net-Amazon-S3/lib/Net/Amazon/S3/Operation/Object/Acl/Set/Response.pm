@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Acl::Set::Response;
 # ABSTRACT: An internal class to handle set object acl response
-$Net::Amazon::S3::Operation::Object::Acl::Set::Response::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Object::Acl::Set::Response::VERSION = '0.99';
 use Moose;
 
 extends 'Net::Amazon::S3::Response';
@@ -19,11 +19,11 @@ Net::Amazon::S3::Operation::Object::Acl::Set::Response - An internal class to ha
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 
-Implements operation L<< PutObjectAcl|https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectAcl.html>.
+Implements operation L<< PutObjectAcl|https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectAcl.html >>.
 
 =head1 AUTHOR
 

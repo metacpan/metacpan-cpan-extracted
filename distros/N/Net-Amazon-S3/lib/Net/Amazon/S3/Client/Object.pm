@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.98';
+$Net::Amazon::S3::Client::Object::VERSION = '0.99';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -15,6 +15,8 @@ use Ref::Util ();
 # ABSTRACT: An easy-to-use Amazon S3 client object
 
 use Net::Amazon::S3::Constraint::ACL::Canned;
+use Net::Amazon::S3::Constraint::Etag;
+use Net::Amazon::S3::Client::Object::Range;
 
 with 'Net::Amazon::S3::Role::ACL';
 
@@ -27,7 +29,7 @@ has 'client' =>
 has 'bucket' =>
 	( is => 'ro', isa => 'Net::Amazon::S3::Client::Bucket', required => 1 );
 has 'key'  => ( is => 'ro', isa => 'Str',  required => 1 );
-has 'etag' => ( is => 'ro', isa => 'Etag', required => 0 );
+has 'etag' => ( is => 'ro', isa => 'Net::Amazon::S3::Constraint::Etag', required => 0 );
 has 'size' => ( is => 'ro', isa => 'Int',  required => 0 );
 has 'last_modified' =>
 	( is => 'ro', isa => DateTime, coerce => 1, required => 0, default => sub { shift->last_modified_raw }, lazy => 1 );
@@ -80,6 +82,15 @@ has 'encryption' => (
 
 __PACKAGE__->meta->make_immutable;
 
+sub range {
+	my ($self, $range) = @_;
+
+	return Net::Amazon::S3::Client::Object::Range->new (
+		object  => $self,
+		range   => $range,
+	);
+}
+
 sub exists {
 	my $self = shift;
 
@@ -100,13 +111,6 @@ sub _get {
 	);
 
 	$self->_load_user_metadata ($response->http_response);
-
-	my $etag = $self->etag || $response->etag;
-	unless ($self->_is_multipart_etag ($etag)) {
-		my $content = $response->content;
-		my $md5_hex = md5_hex ($content);
-		confess 'Corrupted download' if $etag ne $md5_hex;
-	}
 
 	return $response;
 }
@@ -143,12 +147,6 @@ sub get_filename {
 	);
 
 	$self->_load_user_metadata($response->http_response);
-
-	my $etag = $self->etag || $response->etag;
-	unless ($self->_is_multipart_etag($etag)) {
-		my $md5_hex = file_md5_hex($filename);
-		confess 'Corrupted download' if $etag ne $md5_hex;
-	}
 }
 
 sub _load_user_metadata {
@@ -389,25 +387,22 @@ sub query_string_authentication_uri_for_method {
 sub head {
 	my $self = shift;
 
-	my $http_request = Net::Amazon::S3::Operation::Object::Fetch::Request->new(
-		s3     => $self->client->s3,
-		bucket => $self->bucket->name,
-		key    => $self->key,
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Fetch',
 
+		key    => $self->key,
 		method => 'HEAD',
 	);
 
-	my $http_response = $self->client->_send_request ($http_request)->http_response;
-
-	confess 'Error head-object ' . $http_response->as_string
-		unless $http_response->is_success;
+	return unless $
+		response->is_success;
+	my $http_response = $response->http_response;
 
 	my %metadata;
-	my $headers = $http_response->headers;
-	foreach my $name ($headers->header_field_names) {
-		if ($self->_is_metadata_header ($name)) {
-			my $metadata_name = $self->_format_metadata_name ($name);
-			$metadata{$metadata_name} = $http_response->header ($name);
+	for my $header_name ($http_response->header_field_names) {
+		if ($self->_is_metadata_header ($header_name)) {
+			my $metadata_name = $self->_format_metadata_name ($header_name);
+			$metadata{$metadata_name} = $http_response->header ($header_name);
 		}
 	}
 
@@ -542,7 +537,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -561,7 +556,7 @@ version 0.98
   my $object = $bucket->object( key => 'this is the key' );
   $object->put('this is the value');
 
-  # to get the vaue of an object
+  # to get the value of an object
   my $value = $object->get;
 
   # to get the metadata of an object
@@ -646,6 +641,12 @@ This module represents objects in buckets.
 
 =head1 METHODS
 
+=head2 range
+
+	my $value = $object->range ('bytes=1024-10240')->get;
+
+Provides simple interface to ranged download. See also L<Net::Amazon::S3::Client::Object::Range>.
+
 =head2 etag
 
   # show the etag of an existing object (if fetched by listing
@@ -662,6 +663,8 @@ This module represents objects in buckets.
   # to see if an object exists
   if ($object->exists) { ... }
 
+Method doesn't report error when bucket or key doesn't exist.
+
 =head2 get
 
   # to get the vaue of an object
@@ -671,6 +674,8 @@ This module represents objects in buckets.
 
   # to get the metadata of an object
   my %metadata = %{$object->head};
+
+Unlike C<exists> this method does report error.
 
 =head2 get_decoded
 

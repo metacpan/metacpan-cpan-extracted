@@ -182,8 +182,16 @@ KEYWORDS
     An optional list of attributes may be supplied in similar syntax as for
     subs or lexical variables. (These are annotations about the class
     itself; the concept should not be confused with per-object-instance
-    data, which here is called "slots"). The following class attributes are
-    supported:
+    data, which here is called "slots").
+
+    Whitespace is permitted within the value and is automatically trimmed,
+    but as standard Perl parsing rules, no space is permitted between the
+    attribute's name and the open parenthesis of its value:
+
+       :attr( value here )     # is permitted
+       :attr (value here)      # not permitted
+
+    The following class attributes are supported:
 
   :isa
 
@@ -224,6 +232,9 @@ KEYWORDS
     Composes a role into the class; optionally requiring a version check on
     the role package. This is a newer form of the implements and does
     keywords and should be preferred for new code.
+
+    Multiple roles can be composed by using multiple :does attributes, one
+    per role.
 
     The package will be loaded in a similar way to how the ":isa" attribute
     is handled.
@@ -342,10 +353,10 @@ KEYWORDS
           method slot { return $slot }
        }
 
-    Since version 0.56 a role can declare that it provides another role:
+    Since version 0.57 a role can declare that it provides another role:
 
-       role Name does OTHERROLE { ... }
-       role Name does OTHERROLE OTHERVER { ... }
+       role Name :does(OTHERROLE) { ... }
+       role Name :does(OTHERROLE OTHERVER) { ... }
 
     This will include all of the methods from the included role.
     Effectively this means that applying the "outer" role to a class will
@@ -770,7 +781,7 @@ SUBCLASSING CLASSIC PERL CLASSES
           sub get_value { return "A" }
        }
     
-       class DerivedClass isa ClassicPerlBaseClass {
+       class DerivedClass :isa(ClassicPerlBaseClass) {
           has $_value = "B";
           BUILD {
              $_value = "C";

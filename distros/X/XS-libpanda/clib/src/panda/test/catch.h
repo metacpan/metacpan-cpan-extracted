@@ -1,6 +1,6 @@
 #pragma once
 #include "../pp.h"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #define TEST_PREFIX(prefix, tag)                                    \
     static inline std::string _test_prefix () { return prefix; }    \

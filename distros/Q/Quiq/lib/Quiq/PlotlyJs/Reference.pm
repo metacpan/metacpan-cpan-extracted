@@ -1,17 +1,3 @@
-package Quiq::PlotlyJs::Reference;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash;
-use HTML::TreeBuilder ();
-use Quiq::Html::List;
-use Quiq::Html::Page;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -64,6 +50,26 @@ produziert auf stdout
               <dt>Parent:</dt>
               <dd>layout</dd>
   ... und mehr als 11.000 weitere Zeilen ...
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::PlotlyJs::Reference;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash;
+use HTML::TreeBuilder ();
+use Quiq::Html::List;
+use Quiq::Html::Page;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -372,7 +378,7 @@ sub asHtml {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

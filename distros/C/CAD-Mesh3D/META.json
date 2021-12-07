@@ -67,11 +67,11 @@
    "provides" : {
       "CAD::Mesh3D" : {
          "file" : "lib/CAD/Mesh3D.pm",
-         "version" : "0.005"
+         "version" : "0.006001"
       },
       "CAD::Mesh3D::STL" : {
          "file" : "lib/CAD/Mesh3D/STL.pm",
-         "version" : "0.005"
+         "version" : "0.006001"
       }
    },
    "release_status" : "stable",
@@ -86,6 +86,6 @@
          "web" : "https://github.com/pryrt/CAD-Mesh3D"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006001",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

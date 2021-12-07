@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Upload::Abort::Request;
 # ABSTRACT: An internal class to abort a multipart upload
-$Net::Amazon::S3::Operation::Object::Upload::Abort::Request::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Object::Upload::Abort::Request::VERSION = '0.99';
 use Moose 0.85;
 
 extends 'Net::Amazon::S3::Request::Object';
@@ -24,7 +24,7 @@ Net::Amazon::S3::Operation::Object::Upload::Abort::Request - An internal class t
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 

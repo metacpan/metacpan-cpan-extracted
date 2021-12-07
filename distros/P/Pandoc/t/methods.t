@@ -83,8 +83,8 @@ plan skip_all => 'pandoc executable required' unless pandoc;
 
     my ( $in, $out ) = ('# x');
     is $pandoc->run( [], in => \$in, out => \$out ), 0, 'run';
-    is $out,
-      '<h1 id="x"><span class="header-section-number">1</span> x</h1>' . "\n",
+    like $out,
+      qr{<h1 (data-number="1" )?id="x"><span class="header-section-number">1</span> x</h1>},
       'use default arguments';
 
     is $pandoc->run( '-t' => 'latex', { in => \$in, out => \$out } ), 0, 'run';

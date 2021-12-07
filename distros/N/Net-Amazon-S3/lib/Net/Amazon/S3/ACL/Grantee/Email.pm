@@ -1,6 +1,6 @@
 package Net::Amazon::S3::ACL::Grantee::Email;
 # ABSTRACT: Represents user reference by email address for ACL
-$Net::Amazon::S3::ACL::Grantee::Email::VERSION = '0.98';
+$Net::Amazon::S3::ACL::Grantee::Email::VERSION = '0.99';
 use Moose;
 
 extends 'Net::Amazon::S3::ACL::Grantee';
@@ -38,7 +38,7 @@ Net::Amazon::S3::ACL::Grantee::Email - Represents user reference by email addres
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ use Getopt::Long;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-14'; # DATE
 our $DIST = 'App-GrepUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $opt_highlight_terms;
 my @grep_argv;
@@ -59,7 +59,6 @@ USAGE
 }
 
 sub run {
-    log_trace "Exec: %s", ["grep", @grep_argv];
     if ($opt_highlight_terms && @pos_terms) {
         require IPC::System::Options;
         IPC::System::Options::system(
@@ -67,6 +66,7 @@ sub run {
             "grep", @grep_argv, \"|", "grep", "--color=always", "-P", join("|", @pos_terms),
         );
     } else {
+        log_trace "Exec: %s", ["grep", @grep_argv];
         exec "grep", @grep_argv;
     }
 }
@@ -92,7 +92,7 @@ grep-terms - Print lines that match terms
 
 =head1 VERSION
 
-This document describes version 0.004 of grep-terms (from Perl distribution App-GrepUtils), released on 2021-11-14.
+This document describes version 0.005 of grep-terms (from Perl distribution App-GrepUtils), released on 2021-11-14.
 
 =head1 SYNOPSIS
 

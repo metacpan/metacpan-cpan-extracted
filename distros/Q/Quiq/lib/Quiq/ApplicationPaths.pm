@@ -1,14 +1,3 @@
-package Quiq::ApplicationPaths;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Cwd ();
-use Hash::Util ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -83,6 +72,23 @@ Struktur im Home-Verzeichnis des Benutzers befinden
   homeDir() : /home/<user>/opt/<application>
   etcDir()  : /home/<user>/etc/opt/<application>
   varDir()  : /home/<user>/var/opt/<application>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::ApplicationPaths;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Cwd ();
+use Hash::Util ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -361,7 +367,7 @@ Trennzeichens erlaubt:
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

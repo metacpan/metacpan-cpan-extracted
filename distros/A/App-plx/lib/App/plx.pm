@@ -2,7 +2,7 @@
 
 package App::plx;
 
-our $VERSION = '0.902002'; # 0.902.2
+our $VERSION = '0.902003'; # 0.902.3
 
 $VERSION = eval $VERSION;
 
@@ -362,6 +362,10 @@ sub _which {
 
   if ($cmd eq 'perl') {
     return (perl => @env => @args);
+  }
+
+  if ($cmd =~ m{/}) {
+    return (perl => @env => $cmd, @args);
   }
 
   if ($cmd =~ /^-/) {

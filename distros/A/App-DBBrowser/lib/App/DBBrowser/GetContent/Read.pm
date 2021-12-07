@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::Read;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );

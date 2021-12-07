@@ -1,12 +1,3 @@
-package Quiq::Gd::Component;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -73,6 +64,21 @@ Instantiierung des Grafik-Objektes noch nicht verfügbar.
 Ein unmittelbares Zeichnen ist auch möglich, indem die Methode C<render()>
 als Klassenmethode unter Angabe aller Eigenschaften @keyVal des
 Grafik-Objekts aufgerufen wird.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gd::Component;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -184,7 +190,7 @@ sub height {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

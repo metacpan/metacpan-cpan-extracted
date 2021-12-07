@@ -1,5 +1,11 @@
 Revision history for Perl module Cookie
 
+v0.1.6 2021-12-07T17:49:09+0900
+    - Corrected bug in handling and resetting cache in Cookie
+
+v0.1.5 2021-11-25T07:27:14+0900
+    - Corrected test units version requirement for testing with CryptX
+
 v0.1.4 2021-11-22T11:10:49+0900
     - Minor correction in expires() in Cookie and related test units
 

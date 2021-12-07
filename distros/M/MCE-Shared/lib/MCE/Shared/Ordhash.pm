@@ -25,7 +25,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.873';
+our $VERSION = '1.875';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -82,10 +82,10 @@ sub TIEHASH {
 # STORE ( key, value )
 
 sub STORE {
-   my ( $key, $data ) = ( $_[1], @{ $_[0] } );
-   push @{ $_[0]->[_KEYS] }, "$key" unless ( exists $data->{ $key } );
+   my ( $self, $key ) = @_;  # do not copy $_[2] in case it's large
+   push @{ $self->[_KEYS] }, "$key" unless ( exists $self->[_DATA]{$key} );
 
-   $data->{ $key } = $_[2];
+   $self->[_DATA]{$key} = $_[2];
 }
 
 # FETCH ( key )
@@ -104,15 +104,15 @@ sub DELETE {
       shift @{ $keys };
       ${ $begi }++, delete $indx->{ $key } if %{ $indx };
 
-      # GC start of list
-      if ( ${ $gcnt } && !defined $keys->[0] ) {
+      if ( ! @{ $keys } ) {
+         ${ $begi } = 0;
+      }
+      elsif ( !defined $keys->[0] ) {
+         # GC start of list
          my $i = 1;
          $i++ until ( defined $keys->[$i] );
          ${ $begi } += $i, ${ $gcnt } -= $i;
          splice @{ $keys }, 0, $i;
-      }
-      elsif ( ! @{ $keys } ) {
-         ${ $begi } = 0;
       }
 
       return delete $data->{ $key };
@@ -123,25 +123,24 @@ sub DELETE {
       pop @{ $keys };
       delete $indx->{ $key } if %{ $indx };
 
-      # GC end of list
-      if ( ${ $gcnt } && !defined $keys->[-1] ) {
+      if ( ! @{ $keys } ) {
+         ${ $begi } = 0;
+      }
+      elsif ( !defined $keys->[-1] ) {
+         # GC end of list
          my $i = $#{ $keys } - 1;
          $i-- until ( defined $keys->[$i] );
          ${ $gcnt } -= $#{ $keys } - $i;
          splice @{ $keys }, $i + 1;
       }
-      elsif ( ! @{ $keys } ) {
-         ${ $begi } = 0;
-      }
 
       return delete $data->{ $key };
    }
 
-   # must be a key somewhere in-between
+   # fill the index on-demand
    my $off = delete $indx->{ $key } // do {
       return undef unless ( exists $data->{ $key } );
 
-      # fill index, on-demand
       %{ $indx } ? $_[0]->_fill_index : do {
          $_[0]->purge if ${ $gcnt };
          my $i; $i = ${ $begi } = 0;
@@ -151,9 +150,9 @@ sub DELETE {
       delete $indx->{ $key };
    };
 
-   $keys->[ $off -= ${ $begi } ] = undef;   # tombstone
+   $keys->[ $off - ${ $begi } ] = undef;   # tombstone
 
-   # GC keys if gcnt:size ratio is greater than 2:3
+   # GC keys and refresh index
    if ( ++${ $gcnt } > @{ $keys } * 0.667 ) {
       my $i; $i = ${ $begi } = ${ $gcnt } = 0;
 
@@ -211,6 +210,16 @@ sub SCALAR {
 sub _fill_index {
    my ( $data, $keys, $indx, $begi ) = @{ $_[0] };
 
+   # from start of list
+   if ( !exists $indx->{ $keys->[0] } ) {
+      my $i = ${ $begi };
+      for my $k ( @{ $keys } ) {
+         $i++, next unless ( defined $k );
+         last if ( exists $indx->{ $k } );
+         $indx->{ $k } = $i++;
+      }
+   }
+
    # from end of list
    if ( !exists $indx->{ $keys->[-1] } ) {
       my $i = ${ $begi } + @{ $keys } - 1;
@@ -218,16 +227,6 @@ sub _fill_index {
          $i--, next unless ( defined $k );
          last if ( exists $indx->{ $k } );
          $indx->{ $k } = $i--;
-      }
-   }
-
-   # from start of list
-   else {
-      my $i = ${ $begi };
-      for my $k ( @{ $keys } ) {
-         $i++, next unless ( defined $k );
-         last if ( exists $indx->{ $k } );
-         $indx->{ $k } = $i++;
       }
    }
 
@@ -248,11 +247,11 @@ sub POP {
 
    delete $indx->{ $key } if %{ $indx };
 
-   # GC end of list
    if ( ! @{ $keys } ) {
       ${ $_[0]->[_BEGI] } = 0;
    }
    elsif ( !defined $keys->[-1] ) {
+      # GC end of list
       my $i = $#{ $keys } - 1;
       $i-- until ( defined $keys->[$i] );
       ${ $_[0]->[_GCNT] } -= $#{ $keys } - $i;
@@ -285,11 +284,11 @@ sub SHIFT {
 
    ${ $_[0]->[_BEGI] }++, delete $indx->{ $key } if %{ $indx };
 
-   # GC start of list
    if ( ! @{ $keys } ) {
       ${ $_[0]->[_BEGI] } = 0;
    }
    elsif ( !defined $keys->[0] ) {
+      # GC start of list
       my $i = 1;
       $i++ until ( defined $keys->[$i] );
       ${ $_[0]->[_BEGI] } += $i, ${ $_[0]->[_GCNT] } -= $i;
@@ -811,7 +810,7 @@ MCE::Shared::Ordhash - An ordered hash class featuring tombstone deletion
 
 =head1 VERSION
 
-This document describes MCE::Shared::Ordhash version 1.873
+This document describes MCE::Shared::Ordhash version 1.875
 
 =head1 DESCRIPTION
 

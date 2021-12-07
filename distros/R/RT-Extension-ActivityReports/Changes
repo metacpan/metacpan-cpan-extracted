@@ -1,3 +1,8 @@
+Revision history for RT-Extension-ActivityReports
+
+1.09 2021-12-03
+ - Works with RT 5, but styling has not been updated to Bootstrap yet
+
 1.08 2016-08-09
  - Update style sheet locations and method call to load. Previous
    code manually loading css in Head could cause insecure content

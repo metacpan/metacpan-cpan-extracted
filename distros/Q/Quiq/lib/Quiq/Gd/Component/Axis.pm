@@ -1,14 +1,3 @@
-package Quiq::Gd::Component::Axis;
-use base qw/Quiq::Gd::Component/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Assert;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -113,6 +102,23 @@ Quelltext:
 =head2 XY-Diagramm
 
     [Bild nur im Browser sichtbar]
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Gd::Component::Axis;
+use base qw/Quiq::Gd::Component/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Assert;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -449,7 +455,7 @@ sub height {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

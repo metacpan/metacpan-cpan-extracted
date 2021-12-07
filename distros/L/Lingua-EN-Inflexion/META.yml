@@ -22,5 +22,5 @@ requires:
   Lingua::EN::Words2Nums: '0'
   Test::More: '0'
   perl: '5.01'
-version: '0.002006'
+version: '0.002007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

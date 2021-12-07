@@ -1,3 +1,8 @@
+0.153   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Perinci::CmdLine::Lite -> 1.912.
+
+
 0.152   2021-06-23  Released-By: PERLANCAR; Urgency: medium
 
         - Bump prereq version Perinci::CmdLine::Lite -> 1.905.

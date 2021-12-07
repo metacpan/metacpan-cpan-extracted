@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib '.';
 use Test::More tests => 3;
 
 for my $test (qw/t::Create t::MoveFile t::MoveDir/){

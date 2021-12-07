@@ -29,5 +29,5 @@ CORE::say 'libm has sqrtf()? ' .       ( dlFindSymbol( $lib, 'sqrtf' )       ? '
 CORE::say 'libm has pow()? ' .         ( dlFindSymbol( $lib, 'pow' )         ? 'yes' : 'no' );
 CORE::say 'libm has not_in_libm()? ' . ( dlFindSymbol( $lib, 'not_in_libm' ) ? 'yes' : 'no' );
 #
-CORE::say 'sqrtf(36.f) = ' . call( $lib, 'sqrtf', 'f)f', 36.0 );
-CORE::say 'pow(2.0, 10.0) = ' . call( $lib, 'pow', 'dd)d', 2.0, 10.0 );
+CORE::say 'sqrtf(36.f) = ' . Dyn::load( $path, 'sqrtf', '(f)f' )->call(36.0);
+CORE::say 'pow(2.0, 10.0) = ' . Dyn::load( $path, 'pow', 'dd)d' )->call( 2.0, 10.0 );

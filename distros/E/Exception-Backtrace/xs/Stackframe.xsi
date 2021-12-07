@@ -15,6 +15,4 @@ std::uint64_t Stackframe::offset()     { RETVAL = THIS->offset; }
 
 std::uint64_t Stackframe::line_no()    { RETVAL = THIS->line_no; }
 
-std::vector<string> Stackframe::args() { RETVAL = THIS->args; }
-
 string Stackframe::to_string()         { RETVAL = as_perl_string(*THIS); }

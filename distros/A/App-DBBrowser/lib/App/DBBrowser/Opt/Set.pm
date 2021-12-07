@@ -3,7 +3,7 @@ App::DBBrowser::Opt::Set;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.014;
 
 use Encode                qw( decode );
 use File::Basename        qw( fileparse );

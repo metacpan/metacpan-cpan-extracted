@@ -5,6 +5,6 @@ use Linux::Capabilities;
 my $str = "cap_kill+ep";
 
 my $cap = Linux::Capabilities->new($str);
-is ($cap->get_text, "= ".$str, "check gest for caps: $str");
+like $cap->get_text, qr/cap_kill[+=]ep/, "check gest for caps: $str";
 
 done_testing;

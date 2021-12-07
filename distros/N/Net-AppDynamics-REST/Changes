@@ -18,3 +18,5 @@
 1.007
   -- Added support for oauth
   -- pod fix ups
+1.008
+  -- Pod cleanups

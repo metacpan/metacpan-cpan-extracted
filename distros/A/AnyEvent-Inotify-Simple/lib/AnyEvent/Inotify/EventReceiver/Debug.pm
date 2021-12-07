@@ -1,5 +1,5 @@
 package AnyEvent::Inotify::EventReceiver::Debug;
-$AnyEvent::Inotify::EventReceiver::Debug::VERSION = '0.03';
+$AnyEvent::Inotify::EventReceiver::Debug::VERSION = '0.04';
 use Moose;
 use namespace::autoclean;
 
@@ -53,9 +53,5 @@ __END__
 =head1 NAME
 
 AnyEvent::Inotify::EventReceiver::Debug - carps with an infomative message whenever an event is called
-
-=head1 VERSION
-
-version 0.03
 
 =head1 ABSTRACT

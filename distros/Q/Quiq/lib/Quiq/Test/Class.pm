@@ -1,24 +1,3 @@
-package Quiq::Test::Class;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Test::Builder ();
-use Quiq::Option;
-use Quiq::Path;
-use Quiq::Object;
-use Quiq::Converter;
-use Test::More ();
-use Quiq::System;
-use Quiq::Assert;
-use Quiq::Unindent;
-use Quiq::Test::Class::Method;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -157,6 +136,29 @@ kann folgendermaßen vorgenommen werden:
   }
 
 =cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Test::Class;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Test::Builder ();
+use Quiq::Option;
+use Quiq::Path;
+use Quiq::Object;
+use Quiq::Converter;
+use Test::More ();
+use Quiq::System;
+use Quiq::Assert;
+use Quiq::Unindent;
+use Quiq::Test::Class::Method;
 
 # -----------------------------------------------------------------------------
 
@@ -1228,7 +1230,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

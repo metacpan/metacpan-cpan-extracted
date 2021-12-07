@@ -43,8 +43,11 @@ Exception::Backtrace - Get C and Perl backtraces
 
     # Programmatic API
 
+    local Exception::Backtrace::decorator = sub { JSON::XS::encode_json(shift) };
     my $bt3 = Exception::Backtrace::get_backtrace($@);
-    say $bt3->to_string;
+    say $bt3->perl_trace->to_string($decorator); # custom arguments stringification
+    # something like main::fn["k","v",[1,2,3,3.14158]] will be dumped for function
+    # fn(k => 'v', [1,2,3,3.14158]) call
 
     # get the current trace without exception
     my $bt = Exception::Backtrace::create_backtrace;
@@ -61,6 +64,8 @@ Exception::Backtrace - Get C and Perl backtraces
             $frame->line_no,
             $frame->name        # function name
             ;
+        # stringified arguments inspection
+        say $frame->args;
     }
 
     # C/C++ trace
@@ -107,6 +112,33 @@ C<panda::Backtrace>) and converting them into symbolic information (done by
 C<Exception::Backtrace>). As the second part is quite slow and heavy, it is
 performed only on demand.
 
+=head1 FUNCTIONS
+
+=head2 install([$decorator = undef])
+
+Sets up global SIG{__DIE__} to be wrapped by L<Exception::Backtrace>. The
+C<$decorator> function is that one, which takes an array of B<original>
+arguments of a perl frame, and must return a string, which is attached
+to the exception object.
+
+If C<$decorator> is C<undef> then the default C<$decorator> will be installed.
+
+To let a C<$decorator> be applied it should be set B<before> creating
+an exception.
+
+=head2 get_backtrace_string($exception)
+
+Returns a joined string of perl and C stack frames coming from C<$exception>
+(usually it is C<$@>).
+
+=head2 get_backtrace_string_pp($exception)
+
+Returns a string of perl frames coming from C<$exception> (usually it is C<$@>).
+
+=head2 create_backtrace()
+
+Returns an inspectable L<Exception::Backtrace::DualTrace>.
+
 =head1 LIMITATIONS
 
 The module was tested on *nix, Darwin and Windows.
@@ -149,6 +181,15 @@ It is known, that systems with C<musl> (e.g. Alipne Linux) instead of C<glibc> d
 export backtrace capabilities, so backtraces will not be available for that systems.
 There is a theoretical workaround to use C<libunwind>; that might be implemented
 in future.
+
+=head1 PERL FRAME ARGUMENTS
+
+It is different time when exception happens, and when stack frame is gathered: it might
+happen, when an argument was available during frame call, but later (deeper) it was
+deleted. So, when L<Exception::Backtrace> gathers such an argument, just C<undef>
+will be recorded.
+
+See L<Exception::Backtrace::PerlFrame/to_string>;
 
 =head1 SEE ALSO
 

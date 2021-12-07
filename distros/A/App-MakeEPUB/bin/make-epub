@@ -12,6 +12,8 @@ use File::Spec;
 use Getopt::Long;
 use Pod::Usage;
 
+use version; our $VERSION = qv('v0.3.2');
+
 my %opt = (
     tocdepth    => 1,
     identifier  => sprintf('%x',time),

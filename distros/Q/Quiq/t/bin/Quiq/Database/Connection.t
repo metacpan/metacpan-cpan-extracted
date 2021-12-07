@@ -558,6 +558,9 @@ sub test_dbms : Test(1) {
     elsif ($db->isMSSQL) {
         $self->is($dbms,'MSSQL');
     }
+    elsif ($db->isJDBC) {
+        $self->is($dbms,'JDBC');
+    }
     else {
         $self->ok(0);
     }
@@ -649,6 +652,18 @@ sub test_isMSSQL : Test(1) {
 
     my $bool = $db->isMSSQL;
     $self->ok($dbms eq 'mssql'? $bool: !$bool);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_isJDBC : Test(1) {
+    my ($self,$udl) = @_;
+
+    my $dbms = Quiq::Udl->new($udl)->dbms;
+    my $db = $self->get('db');
+
+    my $bool = $db->isJDBC;
+    $self->ok($dbms eq 'jdbc'? $bool: !$bool);
 }
 
 # -----------------------------------------------------------------------------

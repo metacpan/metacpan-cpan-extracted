@@ -39,7 +39,7 @@ Make the EPUB (this works with the output of rfc2xhtml.pl).
 
     make-epub -publisher IETF \
               -rights 'The Internet Society' \
-	      -author 'John Moy' \
+	      -creator 'John Moy' \
 	      -title RFC2328 \
 	      -tocdepth 2 \
 	      -level2 '_tag:h2' \

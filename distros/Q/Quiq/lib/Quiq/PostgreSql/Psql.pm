@@ -1,16 +1,3 @@
-package Quiq::PostgreSql::Psql;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Udl;
-use Quiq::CommandLine;
-use Expect ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -32,6 +19,25 @@ L<Quiq::Object>
 =head1 DESCRIPTION
 
 Die Klasse stellt einen Wrapper für den PostgreSQL-Client psql dar.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::PostgreSql::Psql;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Udl;
+use Quiq::CommandLine;
+use Expect ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -229,7 +235,7 @@ sub run {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

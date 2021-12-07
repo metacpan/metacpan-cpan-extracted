@@ -1,0 +1,4 @@
+Revision history for SPVM::Math
+0.01  2021-12-07
+        [CHANGES]
+        * SPVM::Math is separated from SPVM core module.

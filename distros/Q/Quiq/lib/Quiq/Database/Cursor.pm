@@ -1,24 +1,3 @@
-package Quiq::Database::Cursor;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Database::Row::Array;
-use Quiq::Database::Row::Object;
-use Quiq::Database::ResultSet::Array;
-use Quiq::Database::ResultSet::Object;
-use Time::HiRes ();
-use Quiq::Database::Cursor;
-use Quiq::FileHandle;
-use Quiq::PostgreSql::CopyFormat;
-use Quiq::Path;
-use Quiq::Digest;
-use Encode ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -35,6 +14,33 @@ L<Quiq::Hash>
 
 Ein Objekt der Klasse repräsentiert das Resultat einer
 Statement-Ausführung auf einer Relationalen Datenbank.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Database::Cursor;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Database::Row::Array;
+use Quiq::Database::Row::Object;
+use Quiq::Database::ResultSet::Array;
+use Quiq::Database::ResultSet::Object;
+use Time::HiRes ();
+use Quiq::Database::Cursor;
+use Quiq::FileHandle;
+use Quiq::PostgreSql::CopyFormat;
+use Quiq::Path;
+use Quiq::Digest;
+use Encode ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -764,7 +770,7 @@ sub fetchAll {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

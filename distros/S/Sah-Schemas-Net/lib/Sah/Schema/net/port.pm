@@ -1,9 +1,9 @@
 package Sah::Schema::net::port;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-27'; # DATE
+our $DATE = '2021-07-19'; # DATE
 our $DIST = 'Sah-Schemas-Net'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our $schema = [int => {
     summary => 'Network port number',
@@ -36,7 +36,7 @@ Sah::Schema::net::port - Network port number
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schema::net::port (from Perl distribution Sah-Schemas-Net), released on 2020-05-27.
+This document describes version 0.010 of Sah::Schema::net::port (from Perl distribution Sah-Schemas-Net), released on 2021-07-19.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -86,7 +87,8 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
  Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
 
@@ -135,7 +137,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

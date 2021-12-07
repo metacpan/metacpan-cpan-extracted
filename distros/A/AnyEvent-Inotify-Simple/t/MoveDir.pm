@@ -3,7 +3,7 @@ use MooseX::Declare;
 class t::MoveDir with t::lib::Base {
     use Test::More;
 
-    method _build_type_filter { qr/create|move/ }
+    method _build_wanted_events { [ qw(create move) ] }
 
     method do_test {
         $self->op('mkdir', 'foo');

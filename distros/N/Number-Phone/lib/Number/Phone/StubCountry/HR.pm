@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211832;
+our $VERSION = 1.20211206222445;
 
 my $formatters = [
                 {
@@ -112,26 +112,26 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"38531", "Osijek\-Baranja",
-"38552", "Istra",
-"38549", "Krapina\-Zagorje",
-"38520", "Dubrovnik\-Neretva",
-"38533", "Virovitica\-Podravina",
-"38521", "Split\-Dalmatia",
-"38535", "Brod\-Posavina",
-"3851", "Zagreb",
-"38544", "Sisak\-Moslavina",
-"38542", "Varaždin",
-"38523", "Zadar",
-"38522", "Šibenik\-Knin",
-"38547", "Karlovac",
-"38543", "Bjelovar\-Bilogora",
-"38548", "Koprivnica\-Križevci",
+$areanames{en} = {"38544", "Sisak\-Moslavina",
 "38532", "Vukovar\-Srijem",
-"38540", "Međimurje",
-"38534", "Požega\-Slavonia",
+"38543", "Bjelovar\-Bilogora",
 "38551", "Primorsko\-goranska",
-"38553", "Lika\-Senj",};
+"38531", "Osijek\-Baranja",
+"38523", "Zadar",
+"38549", "Krapina\-Zagorje",
+"38552", "Istra",
+"38533", "Virovitica\-Podravina",
+"38534", "Požega\-Slavonia",
+"38542", "Varaždin",
+"38521", "Split\-Dalmatia",
+"38520", "Dubrovnik\-Neretva",
+"38548", "Koprivnica\-Križevci",
+"38535", "Brod\-Posavina",
+"38522", "Šibenik\-Knin",
+"38540", "Međimurje",
+"38553", "Lika\-Senj",
+"3851", "Zagreb",
+"38547", "Karlovac",};
 
     sub new {
       my $class = shift;

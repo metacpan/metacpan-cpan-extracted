@@ -1,28 +1,3 @@
-package Quiq::Cascm;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-
-our $VERSION = '1.195';
-
-use Quiq::Database::Row::Array;
-use Quiq::AnsiColor;
-use Quiq::Shell;
-use Quiq::Terminal;
-use Quiq::Path;
-use Quiq::Converter;
-use Quiq::CommandLine;
-use Quiq::TempDir;
-use Quiq::Array;
-use Quiq::Stopwatch;
-use Quiq::TempFile;
-use Quiq::Unindent;
-use Quiq::Database::Connection;
-use Quiq::Database::ResultSet::Array;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -53,6 +28,37 @@ L<https://docops.ca.com/ca-harvest-scm/13-0/en>
 L<https://search.ca.com/assets/SiteAssets/TEC486141_External/TEC486141.pdf>
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Cascm;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+our $VERSION = '1.196';
+
+use Quiq::Database::Row::Array;
+use Quiq::AnsiColor;
+use Quiq::Shell;
+use Quiq::Terminal;
+use Quiq::Path;
+use Quiq::Converter;
+use Quiq::CommandLine;
+use Quiq::TempDir;
+use Quiq::Array;
+use Quiq::Stopwatch;
+use Quiq::TempFile;
+use Quiq::Unindent;
+use Quiq::Database::Connection;
+use Quiq::Database::ResultSet::Array;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -513,7 +519,7 @@ sub edit {
         $editCmd .= " -f split-window-vertically $show -f other-window";
     }
     my $sh = Quiq::Shell->new(
-        log=>1,
+        log =>1 ,
         cmdPrefix => '> ',
         cmdAnsiColor => 'bold',
     );
@@ -3054,7 +3060,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

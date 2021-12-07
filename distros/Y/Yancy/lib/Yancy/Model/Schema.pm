@@ -1,5 +1,5 @@
 package Yancy::Model::Schema;
-our $VERSION = '1.084';
+our $VERSION = '1.085';
 # ABSTRACT: Interface to a single schema
 
 #pod =head1 SYNOPSIS
@@ -290,11 +290,13 @@ sub _check_json_schema {
           // die qq{Could not find x-view schema "$real_name" for schema "$name"};
         $props = $real_schema->json_schema->{properties};
     }
+    die qq{Schema "$name" has no properties. Does it exist?} if !$props;
+
     my $id_field = $self->id_field;
-    # ; say "$name ($real_name) ID field: $id_field";
+    my @id_fields = ref $id_field eq 'ARRAY' ? @$id_field : ( $id_field );
+    # ; say "$name ID field: @id_fields";
     # ; use Data::Dumper;
     # ; say Dumper $props;
-    my @id_fields = ref $id_field eq 'ARRAY' ? @$id_field : ( $id_field );
 
     for my $field ( @id_fields ) {
         if ( !$props->{ $field } ) {
@@ -318,7 +320,7 @@ Yancy::Model::Schema - Interface to a single schema
 
 =head1 VERSION
 
-version 1.084
+version 1.085
 
 =head1 SYNOPSIS
 

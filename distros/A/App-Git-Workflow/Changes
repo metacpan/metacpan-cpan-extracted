@@ -1,5 +1,11 @@
 Revision history for git-workflow-tools
 
+1.1.17   2021-11-25
+        Updating for release of version 1.1.17
+        Adding new files to tests (Ivan Wills)
+        Making message only appear when verbose is set (Ivan Wills)
+        Adding new helper command to delete remote branches (Ivan Wills)
+
 1.1.16   2021-10-31
         Updating for release of version 1.1.16
         Fixing the committers output (Ivan Wills)

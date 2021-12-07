@@ -18,6 +18,7 @@ lib/CSS/Object/Value.pm
 LICENSE
 Makefile.PL
 MANIFEST
+README
 README.md
 t/01_basic.t
 t/02_parse_default.t
@@ -26,6 +27,7 @@ t/04_format_simple.t
 t/05_format_inline.t
 t/06_builder.t
 t/07_pod.t
+t/08.kwalitee.t
 t/css_oddities
 t/css_selector_groups
 t/css_selectors

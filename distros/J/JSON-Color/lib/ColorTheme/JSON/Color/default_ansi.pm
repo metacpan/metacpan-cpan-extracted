@@ -5,9 +5,9 @@ use parent 'ColorThemeBase::Static::FromStructColors';
 use Term::ANSIColor qw(:constants);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-23'; # DATE
+our $DATE = '2021-11-24'; # DATE
 our $DIST = 'JSON-Color'; # DIST
-our $VERSION = '0.132'; # VERSION
+our $VERSION = '0.133'; # VERSION
 
 our %THEME = (
     v => 2,
@@ -43,7 +43,7 @@ ColorTheme::JSON::Color::default_ansi - The default color theme for JSON::Color,
 
 =head1 VERSION
 
-This document describes version 0.132 of ColorTheme::JSON::Color::default_ansi (from Perl distribution JSON-Color), released on 2021-11-23.
+This document describes version 0.133 of ColorTheme::JSON::Color::default_ansi (from Perl distribution JSON-Color), released on 2021-11-24.
 
 =head1 HOMEPAGE
 

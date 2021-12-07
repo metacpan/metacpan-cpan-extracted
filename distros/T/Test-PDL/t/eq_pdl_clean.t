@@ -5,8 +5,6 @@ use Test::More;
 eval { require Capture::Tiny };
 plan skip_all => 'Capture::Tiny not found' if $@;
 
-plan tests => 8;
-
 my $expected_stderr = '';
 
 # first capture the output of a program that does *not* call eq_pdl()
@@ -46,3 +44,5 @@ my $expected_stderr = '';
 	is $stdout, '', 'eq_pdl_diag() does not produce output on stdout';
 	is $stderr, $expected_stderr, 'eq_pdl_diag() does not produce output on stderr';
 }
+
+done_testing;

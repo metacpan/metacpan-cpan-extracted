@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/MyTest.dir/tests/bt.cc.o CMakeFiles/MyTest.dir/tests/fn01.cc.o CMakeFiles/MyTest.dir/tests/fn02.cc.o CMakeFiles/MyTest.dir/tests/fn03.cc.o CMakeFiles/MyTest.dir/tests/main.cc.o -o MyTest  libpanda-backtrace.a libpanda-backtrace-tests.a libpanda-backtrace.a 

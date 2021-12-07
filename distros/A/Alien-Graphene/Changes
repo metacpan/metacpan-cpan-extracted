@@ -1,3 +1,13 @@
+0.004 2021-11-28 00:25:41-0500
+
+  Build changes
+
+   - Remove Ninja helper tool and switch to using Alien::Meson and
+     Alien::Ninja. This should help in cases where those tools are not
+     available on the system.
+     See PRs <https://github.com/Intertangle/p5-Alien-Graphene/pull/8>,
+     <https://github.com/Intertangle/p5-Alien-Graphene/pull/9>.
+
 0.003 2021-06-01 22:58:57-0400
 
   Documentation

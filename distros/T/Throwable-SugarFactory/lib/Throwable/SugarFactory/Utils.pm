@@ -3,7 +3,7 @@ package Throwable::SugarFactory::Utils;
 use strictures 2;
 use parent 'Exporter';
 
-our $VERSION = '0.152700'; # VERSION
+our $VERSION = '0.213360'; # VERSION
 
 # ABSTRACT: provide utility functions for Throwable::SugarFactory and friends
 
@@ -38,7 +38,7 @@ Throwable::SugarFactory::Utils - provide utility functions for Throwable::SugarF
 
 =head1 VERSION
 
-version 0.152700
+version 0.213360
 
 =head1 AUTHOR
 

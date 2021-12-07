@@ -1,3 +1,11 @@
+0.003   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          properly list schemas in distribution.
+
+
 0.002   2020-06-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Add schema: firefox::local_profile_name.

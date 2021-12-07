@@ -13,13 +13,20 @@ qx.Class.define("callbackery.ui.plugin.Action", {
     /**
      * create a page for the View Tab with the given title
      *
-     * @param vizWidget {Widget} visualization widget to embedd
+     * @param cfg {Object} plugin configuration map
+     * @param buttonClass {Class} class to be used for action buttons
+     * @param layout {Class} qooxdoo layout for this container
+     * @param getFormData {Function} method to get form data
+     * @param plugin {Class} visualization widget to embedd
      */
-    construct : function(cfg,buttonClass,layout,getFormData) {
+    construct : function(cfg,buttonClass,layout,getFormData, plugin) {
         this.base(arguments, layout);
+        this._plugin = plugin;
         this._buttonMap = {};
         this._buttonSetMap = {};
+        this._cfg = cfg;
         this._populate(cfg,buttonClass,getFormData);
+        plugin.addOwnedQxObject(this, 'Action');
         this.addListener('actionResponse',function(e){
             var data = e.getData();
             // ignore empty actions responses
@@ -38,6 +45,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 case 'showMessage':
                     this.warn('Callbackery deprecation: action showMessage should not be used; use cancel|dataSaved|wait instead');
                 case 'cancel':
+                case 'close':
                 case 'dataSaved':
                 case 'wait':
                     if (data.message) {
@@ -85,6 +93,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
     },
     members: {
         _cfg: null,
+        _plugin : null,
         _tableMenu: null,
         _defaultAction: null,
         _buttonMap: null,
@@ -102,18 +111,25 @@ qx.Class.define("callbackery.ui.plugin.Action", {
         _populate: function(cfg,buttonClass,getFormData){
             var tm = this._tableMenu = new qx.ui.menu.Menu;
             var menues = {};
+            let plugin = this._plugin;
             cfg.action.forEach(function(btCfg){
-                var button;
+                var button, menuButton;
                 var label = btCfg.label ? this.xtr(btCfg.label) : null;
-                var menuButton;
                 switch (btCfg.action) {
                     case 'menu':
                         var menu = menues[btCfg.key] = new qx.ui.menu.Menu;
                         if (btCfg.addToMenu != null) { // add submenu to menu
-                            menues[btCfg.addToMenu].add(new qx.ui.menu.Button(label, null, null, menu));
+                            button = new qx.ui.menu.Button(label, null, null, menu)
+                            menues[btCfg.addToMenu].add(button);
                         }
                         else { // add menu to form
-                            this.add(new qx.ui.form.MenuButton(label, null, menu));
+                            button = new qx.ui.form.MenuButton(label, null, menu);
+                            this.add(button);
+                        }
+                        if (btCfg.key) {
+                            let btnId = btCfg.key + 'Button';
+                            this.addOwnedQxObject(button, btnId);
+                            this._buttonMap[btCfg.key]=button;
                         }
                         return;
                         break;
@@ -147,6 +163,10 @@ qx.Class.define("callbackery.ui.plugin.Action", {
 
                         if ( btCfg.addToContextMenu) {
                             menuButton = new qx.ui.menu.Button(label);
+                            if (btCfg.key) {
+                                let btnId = btCfg.key + 'MenuButton'
+                                this.addOwnedQxObject(menuButton, btnId);
+                            }
                             [
                                 'Enabled',
                                 'Visibility',
@@ -205,9 +225,12 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         this.add(new qx.ui.core.Spacer(10,10));
                         break;
                     default:
-                        this.debug('Invalid execute action:' + btCfg.action);
+                        this.debug('Invalid execute action:' + btCfg.action + ' for button', btCfg);
                 }
-
+                if (button && btCfg.key) {
+                    let btnId = btCfg.key + 'Button';
+                    this.addOwnedQxObject(button, btnId);
+                }
                 var action = function(){
                     var that = this;
                     if (! button.isEnabled()) {
@@ -322,7 +345,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                     return;
                                 }
                             }
-                            var popup = new callbackery.ui.Popup(btCfg,getFormData);
+                            var popup = new callbackery.ui.Popup(btCfg,getFormData, this);
 
                             var appRoot = that.getApplicationRoot();
                     
@@ -472,6 +495,14 @@ qx.Class.define("callbackery.ui.plugin.Action", {
         },
         getButtonSetMap: function(){
             return this._buttonSetMap;
+        }
+    },
+    destruct : function() {
+        if (! this._buttonMap) {
+            return;
+        }
+        for (const [key, btn] of Object.entries(this._buttonMap)) {
+            btn.destroy();
         }
     }
 });

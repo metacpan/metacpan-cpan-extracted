@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.526';
+our $VERSION = '0.531';
 
 use 5.020;
 use Moo;
@@ -33,7 +33,7 @@ has schema => (
 
 has canonical_uri => (
   is => 'rwp',
-  isa => InstanceOf['Mojo::URL'], # always fragmentless
+  isa => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
   lazy => 1,
   default => sub { Mojo::URL->new },
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
@@ -60,7 +60,8 @@ has resource_index => (
       path => Str,  # always a JSON pointer, relative to the document root
       specification_version => Str, # not an Enum due to module load ordering
       # the vocabularies used when evaluating instance data against schema
-      vocabularies => ArrayRef[my $vocabulary_class_type = ClassName->where(q{$_->DOES('JSON::Schema::Modern::Vocabulary')})],
+      vocabularies => ArrayRef[ClassName->where(q{$_->DOES('JSON::Schema::Modern::Vocabulary')})],
+      configs => HashRef,
       slurpy HashRef[Undef],  # no other fields allowed
     ]],
   handles_via => 'Hash',
@@ -109,20 +110,15 @@ has errors => (
   default => sub { [] },
 );
 
-has evaluation_configs => (
-  is => 'rwp',
-  isa => HashRef,
-  default => sub { {} },
-);
-
 around _add_resources => sub {
   my $orig = shift;
   my $self = shift;
 
-  $resource_type->($_[1]) if @_;  # check type of hash value against Dict
-
   foreach my $pair (pairs @_) {
     my ($key, $value) = @$pair;
+
+    $resource_type->($value); # check type of hash value against Dict
+
     if (my $existing = $self->_get_resource($key)) {
       croak 'uri "'.$key.'" conflicts with an existing schema resource'
         if $existing->{path} ne $value->{path}
@@ -139,15 +135,13 @@ around _add_resources => sub {
 };
 
 # shims for Mojo::JSON::Pointer
-sub data { goto \&schema }
+sub data { shift->schema(@_) }
 sub FOREIGNBUILDARGS { () }
 
 # for JSON serializers
-sub TO_JSON { goto \&schema }
+sub TO_JSON { shift->schema }
 
 sub BUILD ($self, $args) {
-  croak 'canonical_uri cannot contain a fragment' if defined $self->canonical_uri->fragment;
-
   my $original_uri = $self->canonical_uri->clone;
   my $state = $self->traverse($self->evaluator // JSON::Schema::Modern->new);
 
@@ -165,14 +159,12 @@ sub BUILD ($self, $args) {
       canonical_uri => $self->canonical_uri,
       specification_version => $state->{spec_version},
       vocabularies => $state->{vocabularies},
+      configs => $state->{configs},
     })
     if (not "$original_uri" and $original_uri eq $self->canonical_uri)
       or "$original_uri";
 
   $self->_add_resources($state->{identifiers}->@*);
-
-  # overlay the resulting configs with those that were provided by the caller
-  $self->_set_evaluation_configs(+{ $state->{configs}->%*, $self->evaluation_configs->%* });
 }
 
 sub traverse ($self, $evaluator) {
@@ -217,7 +209,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.526
+version 0.531
 
 =head1 SYNOPSIS
 
@@ -284,14 +276,6 @@ L</resource_index> and is constructed as that is built up.
 A list of L<JSON::Schema::Modern::Error> objects that resulted when the schema document was
 originally parsed. (If a syntax error occurred, usually there will be just one error, as parse
 errors halt the parsing process.) Documents with errors cannot be evaluated.
-
-=head2 evaluation_configs
-
-An optional hashref of configuration values that will be provided to the evaluator during
-evaluation of this document. See the third parameter of L<JSON::Schema::Modern/evaluate>.
-This should never need to be set explicitly. This is sometimes populated automatically after
-creating a document object, depending on the keywords found in the schema, but they will never
-override anything you have already explicitly set.
 
 =head1 METHODS
 

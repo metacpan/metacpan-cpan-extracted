@@ -5,7 +5,7 @@ use Import::Into;
 use Constructor::Sugar ();
 use Throwable::SugarFactory::Utils '_getglob';
 
-our $VERSION = '0.152700'; # VERSION
+our $VERSION = '0.213360'; # VERSION
 
 # ABSTRACT: build a library of generic constructor syntax sugar
 
@@ -68,7 +68,7 @@ Constructor::SugarLibrary - build a library of generic constructor syntax sugar
 
 =head1 VERSION
 
-version 0.152700
+version 0.213360
 
 =head1 SYNOPSIS
 

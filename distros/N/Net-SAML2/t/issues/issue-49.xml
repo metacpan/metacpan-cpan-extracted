@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" ID="_dc503975-dcc8-4b3a-ae2e-0c6642f9e1e8" Version="2.0" IssueInstant="2021-11-25T14:17:26.184Z" Destination="http://localhost:3000/consumer-post" InResponseTo="NETSAML2_6c11b211b1857bd1f3833ad50392fe1c">
+  <Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion">https://sts.windows.net/someguid</Issuer>
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+  <Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" ID="_some_guid" IssueInstant="2021-11-25T14:17:26.168Z" Version="2.0">
+    <Issuer>https://sts.windows.net/some_guid/</Issuer>
+    <Subject>
+      <NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">myuser@netsaml2</NameID>
+      <SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <SubjectConfirmationData InResponseTo="NETSAML2_6c11b211b1857bd1f3833ad50392fe1c" NotOnOrAfter="2021-11-25T15:17:26.059Z" Recipient="http://localhost:3000/consumer-post"/>
+      </SubjectConfirmation>
+    </Subject>
+    <Conditions NotBefore="2021-11-25T14:12:26.059Z" NotOnOrAfter="2021-11-25T15:17:26.059Z">
+      <AudienceRestriction>
+        <Audience>http://localhost:3000</Audience>
+      </AudienceRestriction>
+    </Conditions>
+    <AttributeStatement>
+      <Attribute Name="http://schemas.microsoft.com/identity/claims/tenantid">
+        <AttributeValue>some_guid</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.microsoft.com/identity/claims/objectidentifier">
+        <AttributeValue>some_guid</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.microsoft.com/identity/claims/displayname">
+        <AttributeValue>パスワードをお忘れの方</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.microsoft.com/identity/claims/identityprovider">
+        <AttributeValue>https://sts.windows.net/some_guid/</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.microsoft.com/claims/authnmethodsreferences">
+        <AttributeValue>http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname">
+        <AttributeValue>Net</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname">
+        <AttributeValue>SAML2</AttributeValue>
+      </Attribute>
+      <Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name">
+        <AttributeValue>myuser@netsaml2</AttributeValue>
+      </Attribute>
+    </AttributeStatement>
+    <AuthnStatement AuthnInstant="2021-11-25T08:29:25.523Z" SessionIndex="_someguid">
+      <AuthnContext>
+        <AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</AuthnContextClassRef>
+      </AuthnContext>
+    </AuthnStatement>
+  <dsig:Signature>
+            <dsig:SignedInfo xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+                <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                <dsig:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                <dsig:Reference URI="#_some_guid">
+                        <dsig:Transforms>
+                            <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                            <dsig:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                        </dsig:Transforms>
+                        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                        <dsig:DigestValue>E400yOK9ce0mM6X862B0BCImA6E=</dsig:DigestValue>
+                    </dsig:Reference>
+            </dsig:SignedInfo>
+            <dsig:SignatureValue>K/NGRTKfRn8aOUKlRcJL5mzsL2kqRLsuOihCQuqZiS/6OxU2pVFllP31y9AF+DO7NpNC/kutCsFD
+GjdrT7LQqNK4lcrJYA3gYdxjmhU8BqEztb+KVQ5PAQY/LvC5v8WQBYBJXo5gpHwnRBgW2C/KCYcg
+0dT27e4fkuxfLzrsLjNYAl7zvPUwb59iOa/B1TnHk54HbfBmIlfZLdRqdBkkopKD97zhhBswkFwQ
+8AjmNvHneUpSMLAE70SMcBT3P9ryI3aIIGCVqmU+72Jp8Tdx7Aa65ZaPgGWtlR69PEL0HqKfkZfk
+/4toAb6fx0TjxfdzWqmQJgm9hZsph7rh5SR0uw==
+</dsig:SignatureValue>
+            <dsig:KeyInfo><dsig:X509Data><dsig:X509Certificate>
+MIIFuDCCA6CgAwIBAgICEAMwDQYJKoZIhvcNAQELBQAwezELMAkGA1UEBhMCQ0Ex
+FjAUBgNVBAgMDU5ldyBCcnVuc3dpY2sxHTAbBgNVBAoMFENyeXB0LU9wZW5TU0wt
+VmVyaWZ5MTUwMwYDVQQDDCxDcnlwdC1PcGVuU1NMLVZlcmlmeSBTSEEtMjU2IElu
+dGVybWVkaWF0ZSBDQTAeFw0yMTA3MDMyMTAyMjRaFw0zMTA3MDEyMTAyMjRaMGcx
+CzAJBgNVBAYTAkNBMRYwFAYDVQQIDA1OZXcgQnJ1bnN3aWNrMRAwDgYDVQQHDAdN
+b25jdG9uMRAwDgYDVQQKDAdYTUwtU2lnMRwwGgYDVQQDDBN4bWwtc2lnLmV4YW1w
+bGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArkqxhCTOB2Xx
+FxCNWJt0bLWRQva6qOAPKiqlLfgJjG+YY2JaPtpO7WNV5oVqv9F21V/wgOkcQTZZ
+QQQl/L/eXlnFpJeSpF31dupLnzrBU29qWjedNCkj+y01sprJG+c++2d2jV8Qccp5
+5SklALtXYZ3K5OfILy4dFEqUyW0/Bk7Y/PdrAacAazumdNW2nw/ajbiXbUfm55Qe
+bQd/61emGettQBT9EUPOxMQrrtxHHxwyvrtsa9KyRPCamYEamOA0Al2Eya5dPWzE
+bndbVpRx1jz8Ec6ANk8wJHTkggJOUXWem7HL4x8v9hEQeaHEy5CwxKzodDpV2bA/
+Adr+NCYhsQIDAQABo4IBWDCCAVQwCQYDVR0TBAIwADARBglghkgBhvhCAQEEBAMC
+BkAwMwYJYIZIAYb4QgENBCYWJE9wZW5TU0wgR2VuZXJhdGVkIFNlcnZlciBDZXJ0
+aWZpY2F0ZTAdBgNVHQ4EFgQUDYY0sUvDD+ttN7MKzQzVgg25D94wgboGA1UdIwSB
+sjCBr4AUzVMiKnV2P0l/W5nowtx2oIRM0S2hgZKkgY8wgYwxCzAJBgNVBAYTAkNB
+MRYwFAYDVQQIDA1OZXcgQnJ1bnN3aWNrMRAwDgYDVQQHDAdNb25jdG9uMR0wGwYD
+VQQKDBRDcnlwdC1PcGVuU1NMLVZlcmlmeTE0MDIGA1UEAwwrQ3J5cHQtT3BlblNT
+TC1WZXJpZnkgU0hBLTI1NiBSb290IEF1dGhvcml0eYICEAAwDgYDVR0PAQH/BAQD
+AgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA0GCSqGSIb3DQEBCwUAA4ICAQAlDY7m
+1wwRB/X8NSeQ/Hvxg9dG4OofLFaC4e7dlC5kOT/ZIHQ6NIdzkQ2yOY1piKKYEYuO
+G/adtWAt8zRoejFob8W5aCA36uNoQLvdaMwXYNsJkzDNEmCB6vf3A28bVI+mlnt1
++h3f0bkwxwHP2qYL8RneCL65GG+SWXHIipS/ZA5225mmT1oLo9xKeGK6vBgsOUum
+vxDgzmYyeGZYKpACWbOI7lR3C6PMR0oLKManLdb+ymngIk0bKB+Y2gr5cq/zURv8
+casiikjZT3MycPRV1AfQ3MYuXg6z4izkcG1U98E9Hr5p1gFsITmaY0aeK01a6xhx
+XkWKFTbraDn5ouTVMutW8xaVPU60zpYOcynxtRdgnYdmRR+c9dcD2xQmjtohuLxq
+RASCBC9iO7qTYkQvNW+yb63xbPDG05nokAfXpbp5hYVU8FYZHi8qOPtiaWiN9wbt
+ijsxDKZEcfiSGH5AEnkoaRCEqvbSNdtlbfYeDEnonsOZi9c+Kdl6A4PvOzTexwmi
+KPVgT8evWpQbubENw66vUOTqgkI+Bhbn87e1VELNUy+Uwz2OOcLEVvNkx0owswrH
+ujwb1+y1SYnlalLUt7PzEW85RNqVewGsHE8SD/1s70eYNYp7YJwLGPKJfyr3LvSl
+0qRfrYNhlewPc1MSVx7IFCZ4Qg+GFhg8TnEELQ==
+</dsig:X509Certificate></dsig:X509Data></dsig:KeyInfo>
+        </dsig:Signature></Assertion>
+<dsig:Signature>
+            <dsig:SignedInfo xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+                <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                <dsig:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                <dsig:Reference URI="#_dc503975-dcc8-4b3a-ae2e-0c6642f9e1e8">
+                        <dsig:Transforms>
+                            <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                            <dsig:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                        </dsig:Transforms>
+                        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                        <dsig:DigestValue>hkVXxlRVP4FeVnxBFgE0EX9pnsE=</dsig:DigestValue>
+                    </dsig:Reference>
+            </dsig:SignedInfo>
+            <dsig:SignatureValue>f1Q6uq4fvvcgLVt0rIdrqpAsRYEFcksLY0Mbo/fVlZVgB9ucXTviceXhkhQgMWmg188Zy4NHbClc
+Qryr/Dj0U4fzR/VYDvDy1jsczCMm1uPa2D2BeikmLEGugBE/qiG9ftH/K3gnYgznVBt26gEqUeYr
+m4+c8dlpxsaXnSw3EUY8aZTU+tl1JvjhAnI53rHII1WoUSBZwt7RpY9uXQed0aGA0OJreLzoQa2k
+Rs6z74ois2MKMicKCqW5/eokwfEyccqXW8uFYQ+EkuqZVNxOL0tmu4MrpSQVZ2NC/osBtCWMK7oc
+nlqaMqytPkTO4rcweMGGmybtqiwiL3y3GLYbWg==
+</dsig:SignatureValue>
+            <dsig:KeyInfo><dsig:X509Data><dsig:X509Certificate>
+MIIFuDCCA6CgAwIBAgICEAMwDQYJKoZIhvcNAQELBQAwezELMAkGA1UEBhMCQ0Ex
+FjAUBgNVBAgMDU5ldyBCcnVuc3dpY2sxHTAbBgNVBAoMFENyeXB0LU9wZW5TU0wt
+VmVyaWZ5MTUwMwYDVQQDDCxDcnlwdC1PcGVuU1NMLVZlcmlmeSBTSEEtMjU2IElu
+dGVybWVkaWF0ZSBDQTAeFw0yMTA3MDMyMTAyMjRaFw0zMTA3MDEyMTAyMjRaMGcx
+CzAJBgNVBAYTAkNBMRYwFAYDVQQIDA1OZXcgQnJ1bnN3aWNrMRAwDgYDVQQHDAdN
+b25jdG9uMRAwDgYDVQQKDAdYTUwtU2lnMRwwGgYDVQQDDBN4bWwtc2lnLmV4YW1w
+bGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArkqxhCTOB2Xx
+FxCNWJt0bLWRQva6qOAPKiqlLfgJjG+YY2JaPtpO7WNV5oVqv9F21V/wgOkcQTZZ
+QQQl/L/eXlnFpJeSpF31dupLnzrBU29qWjedNCkj+y01sprJG+c++2d2jV8Qccp5
+5SklALtXYZ3K5OfILy4dFEqUyW0/Bk7Y/PdrAacAazumdNW2nw/ajbiXbUfm55Qe
+bQd/61emGettQBT9EUPOxMQrrtxHHxwyvrtsa9KyRPCamYEamOA0Al2Eya5dPWzE
+bndbVpRx1jz8Ec6ANk8wJHTkggJOUXWem7HL4x8v9hEQeaHEy5CwxKzodDpV2bA/
+Adr+NCYhsQIDAQABo4IBWDCCAVQwCQYDVR0TBAIwADARBglghkgBhvhCAQEEBAMC
+BkAwMwYJYIZIAYb4QgENBCYWJE9wZW5TU0wgR2VuZXJhdGVkIFNlcnZlciBDZXJ0
+aWZpY2F0ZTAdBgNVHQ4EFgQUDYY0sUvDD+ttN7MKzQzVgg25D94wgboGA1UdIwSB
+sjCBr4AUzVMiKnV2P0l/W5nowtx2oIRM0S2hgZKkgY8wgYwxCzAJBgNVBAYTAkNB
+MRYwFAYDVQQIDA1OZXcgQnJ1bnN3aWNrMRAwDgYDVQQHDAdNb25jdG9uMR0wGwYD
+VQQKDBRDcnlwdC1PcGVuU1NMLVZlcmlmeTE0MDIGA1UEAwwrQ3J5cHQtT3BlblNT
+TC1WZXJpZnkgU0hBLTI1NiBSb290IEF1dGhvcml0eYICEAAwDgYDVR0PAQH/BAQD
+AgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA0GCSqGSIb3DQEBCwUAA4ICAQAlDY7m
+1wwRB/X8NSeQ/Hvxg9dG4OofLFaC4e7dlC5kOT/ZIHQ6NIdzkQ2yOY1piKKYEYuO
+G/adtWAt8zRoejFob8W5aCA36uNoQLvdaMwXYNsJkzDNEmCB6vf3A28bVI+mlnt1
++h3f0bkwxwHP2qYL8RneCL65GG+SWXHIipS/ZA5225mmT1oLo9xKeGK6vBgsOUum
+vxDgzmYyeGZYKpACWbOI7lR3C6PMR0oLKManLdb+ymngIk0bKB+Y2gr5cq/zURv8
+casiikjZT3MycPRV1AfQ3MYuXg6z4izkcG1U98E9Hr5p1gFsITmaY0aeK01a6xhx
+XkWKFTbraDn5ouTVMutW8xaVPU60zpYOcynxtRdgnYdmRR+c9dcD2xQmjtohuLxq
+RASCBC9iO7qTYkQvNW+yb63xbPDG05nokAfXpbp5hYVU8FYZHi8qOPtiaWiN9wbt
+ijsxDKZEcfiSGH5AEnkoaRCEqvbSNdtlbfYeDEnonsOZi9c+Kdl6A4PvOzTexwmi
+KPVgT8evWpQbubENw66vUOTqgkI+Bhbn87e1VELNUy+Uwz2OOcLEVvNkx0owswrH
+ujwb1+y1SYnlalLUt7PzEW85RNqVewGsHE8SD/1s70eYNYp7YJwLGPKJfyr3LvSl
+0qRfrYNhlewPc1MSVx7IFCZ4Qg+GFhg8TnEELQ==
+</dsig:X509Certificate></dsig:X509Data></dsig:KeyInfo>
+        </dsig:Signature></samlp:Response>

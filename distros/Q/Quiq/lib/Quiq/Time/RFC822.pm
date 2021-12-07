@@ -1,14 +1,3 @@
-package Quiq::Time::RFC822;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use POSIX qw/:locale_h/;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -36,6 +25,23 @@ Zeitangabe nach RFC 822
 (L<http://tools.ietf.org/html/rfc822#section-5>)
 
 =back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Time::RFC822;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use POSIX qw/:locale_h/;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -146,7 +152,7 @@ sub get {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

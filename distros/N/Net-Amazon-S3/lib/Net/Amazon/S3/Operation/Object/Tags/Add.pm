@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Tags::Add;
 # ABSTRACT: Internal class to perform PutObjectTagging operation
-$Net::Amazon::S3::Operation::Object::Tags::Add::VERSION = '0.98';
+$Net::Amazon::S3::Operation::Object::Tags::Add::VERSION = '0.99';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Object::Tags::Add - Internal class to perform PutObj
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 

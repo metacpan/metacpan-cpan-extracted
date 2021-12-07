@@ -15,7 +15,7 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_new : Test(7) {
+sub test_new : Test(8) {
     my $self = shift;
 
     my $sql = Quiq::Dbms->new('Oracle');
@@ -36,6 +36,9 @@ sub test_new : Test(7) {
     $sql = Quiq::Dbms->new('MSSQL');
     $self->is($sql->{'dbms'},'MSSQL');
 
+    $sql = Quiq::Dbms->new('JDBC');
+    $self->is($sql->{'dbms'},'JDBC');
+
     eval { Quiq::Dbms->new('Unknown') };
     $self->like($@,qr/Unknown DBMS/);
 }
@@ -45,7 +48,7 @@ sub test_new : Test(7) {
 sub test_dbmsNames : Test(2) {
     my $self = shift;
 
-    my $dbmsNames = [qw/Oracle PostgreSQL SQLite MySQL Access MSSQL/];
+    my $dbmsNames = [qw/Oracle PostgreSQL SQLite MySQL Access MSSQL JDBC/];
 
     my @arr = Quiq::Dbms->dbmsNames;
     $self->isDeeply(\@arr,$dbmsNames);
@@ -56,26 +59,29 @@ sub test_dbmsNames : Test(2) {
 
 # -----------------------------------------------------------------------------
 
-sub test_dbmsTestVector : Test(6) {
+sub test_dbmsTestVector : Test(7) {
     my $self = shift;
 
     my @vec = Quiq::Dbms->new('Oracle')->dbmsTestVector;
-    $self->isDeeply(\@vec,[1,0,0,0,0,0]);
+    $self->isDeeply(\@vec,[1,0,0,0,0,0,0]);
 
     @vec = Quiq::Dbms->new('PostgreSQL')->dbmsTestVector;
-    $self->isDeeply(\@vec,[0,1,0,0,0,0]);
+    $self->isDeeply(\@vec,[0,1,0,0,0,0,0]);
 
     @vec = Quiq::Dbms->new('SQLite')->dbmsTestVector;
-    $self->isDeeply(\@vec,[0,0,1,0,0,0]);
+    $self->isDeeply(\@vec,[0,0,1,0,0,0,0]);
 
     @vec = Quiq::Dbms->new('MySQL')->dbmsTestVector;
-    $self->isDeeply(\@vec,[0,0,0,1,0,0]);
+    $self->isDeeply(\@vec,[0,0,0,1,0,0,0]);
 
     @vec = Quiq::Dbms->new('Access')->dbmsTestVector;
-    $self->isDeeply(\@vec,[0,0,0,0,1,0]);
+    $self->isDeeply(\@vec,[0,0,0,0,1,0,0]);
 
     @vec = Quiq::Dbms->new('MSSQL')->dbmsTestVector;
-    $self->isDeeply(\@vec,[0,0,0,0,0,1]);
+    $self->isDeeply(\@vec,[0,0,0,0,0,1,0]);
+
+    @vec = Quiq::Dbms->new('JDBC')->dbmsTestVector;
+    $self->isDeeply(\@vec,[0,0,0,0,0,0,1]);
 }
 
 # -----------------------------------------------------------------------------
@@ -147,6 +153,18 @@ sub test_isMSSQL : Test(2) {
     $self->is($bool,1);
 
     $bool = Quiq::Dbms->new('PostgreSQL')->isMSSQL;
+    $self->is($bool,0);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_isJDBC : Test(2) {
+    my $self = shift;
+
+    my $bool = Quiq::Dbms->new('JDBC')->isJDBC;
+    $self->is($bool,1);
+
+    $bool = Quiq::Dbms->new('PostgreSQL')->isJDBC;
     $self->is($bool,0);
 }
 

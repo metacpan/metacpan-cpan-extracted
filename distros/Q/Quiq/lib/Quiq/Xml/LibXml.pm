@@ -1,14 +1,3 @@
-package Quiq::Xml::LibXml;
-use base qw/XML::LibXML/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Encode ();
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -25,6 +14,23 @@ XML::LibXML
 
 Dieses Modul lädt XML::LibXML und erweitert dessen Klassen
 um zusätzliche Funktionalität.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Xml::LibXml;
+use base qw/XML::LibXML/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Encode ();
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -141,7 +147,7 @@ $nod->removeChildNodes().
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

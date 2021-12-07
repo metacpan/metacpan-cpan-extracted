@@ -13,8 +13,10 @@ qx.Class.define("callbackery.ui.Screen", {
     /**
      * Create a page for the View Tab with the given title
      *
-     * @param vizWidget {Widget} visualization widget to embed
-     */
+     * @param cfg {Object} plugin configuration map
+     * @param getParentFormDataCallBack {Function} method to get data of parent form
+     * @param extraAction {Option} additional action to be added to plugin actions
+    */
     construct : function(cfg,getParentFormDataCallBack,extraAction) {
         this.base(arguments);
         // just a reference to the Dock layout to make sure
@@ -33,7 +35,7 @@ qx.Class.define("callbackery.ui.Screen", {
                 this.addListenerOnce('appear',this.instantiatePlugin,this);
                 break;
             default:
-                console.log('ERROR unknown instantiationMode '+cfg.instantiationMode);
+                console.warn('ERROR unknown instantiationMode '+cfg.instantiationMode);
         };
     },
 

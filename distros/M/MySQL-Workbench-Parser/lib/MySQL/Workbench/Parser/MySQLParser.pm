@@ -228,7 +228,7 @@ create : CREATE or_replace(?) create_view_option(s?) /view/i NAME /as/i view_sel
             join(', ',
                 map {
                     $_->{'join'} ?
-                        () : 
+                        () :
                         sprintf('%s%s',
                             $_->{'name'},
                             $_->{'alias'} ? ' as ' . $_->{'alias'} : ''
@@ -1116,7 +1116,7 @@ MySQL::Workbench::Parser::MySQLParser
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 
@@ -1259,7 +1259,13 @@ SQL::Translator
 
 =head2 normalize_field
 
+Takes a field as argument and normalizes it in place.
+
 =head2 parse
+
+Parses input data (as a string) using the given SQL::Translator instance.
+This method is called as C<$class::parse($transator, $data_as_string)>.  See
+L<SQL::Translator::Parser> for more information.
 
 =head1 AUTHOR
 

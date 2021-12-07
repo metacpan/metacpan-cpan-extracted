@@ -176,3 +176,18 @@ Revision history for Lingua-EN-Inflexion
       (Thanks, Dave!)
 
 
+
+0.002007  Tue Nov 30 06:00:01 2021
+
+    * Numerous small fixes to verbs.lei file
+      (Thanks, Dave!)
+
+    * Fixed inflexion of "X general" <--> "X generals" for all military ranks
+      allowing "Y general" <--> "Ys general" for all other uses
+      (Thanks, Dave!)
+
+    * Fixed several edge cases in recursive noun patterns
+      (Thanks, Dave!)
+
+    * Laid groundwork (mostly testing) for further significant improvements
+      in version 0.003

@@ -28,7 +28,8 @@ if (grep {/^DYNAMIC=1/} @ARGV) {
 
 my %DEF=(
     MAINTAINER  => $^O eq 'linux' && -d '.git' ? 1 : 0,
-    PCRE  => 1,
+    PCRE  => 0,
+    PCRE2 => 1,
     DEBUG => 0,
     MMAP  => 1,
     IMITATE=>0,
@@ -197,6 +198,27 @@ sub has_header {
     return 0;
 }
 
+sub has_pcre2 {
+    print "looking for pcre2...\n";
+    if (try_compile_and_link('
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
+    static int foo()
+    {
+	return 0;
+    }
+    int main (int argc, char** argv)
+    {
+	foo();
+    }
+',undef, '-I/usr/include/pcre2 -lpcre2-8')){
+	print "pcre2 found.\n";
+	return 1;
+    }
+    print "pcre2 not found.\n";
+    return 0;
+}
+
 sub has_pcre {
     print "looking for pcre...\n";
     if (try_compile_and_link('
@@ -295,7 +317,8 @@ sub try_as_int64 {
 }
 
 sub configure {
-    $DEF{PCRE}=has_pcre();
+    $DEF{PCRE2}=has_pcre2();
+    $DEF{PCRE}=has_pcre() unless $DEF{PCRE2};
     if ($^O eq 'os2' or $^O eq 'dos') {
 	$DEF{MMAP}=0;
     } elsif ($^O eq 'MSWin32') {
@@ -313,7 +336,7 @@ sub configure {
 
     my $i;
     for ($i=0; $i<@ARGV; $i++)  {
-	if ($ARGV[$i]=~/^(PCRE|PEDANTIC|DEBUG|MMAP|IMITATE)=(.+)/) {
+	if ($ARGV[$i]=~/^(PCRE2?|PEDANTIC|DEBUG|MMAP|IMITATE)=(.+)/) {
 	    $DEF{$1}=$2;
 	} else {
 	    next;
@@ -330,7 +353,7 @@ sub configure {
     $DEFINE.=' -DHAVE_INTTYPES_H ' if has_header('inttypes.h');
     $DEFINE.=' -DHAVE_STRDUP' if  has_func('strdup("str")');
     $DEFINE.=' -DHAVE__STRDUP' if  has_func('_strdup("str")');
-    
+
     $DEFINE.=' -DHAVE_SYS_MMAN_H -DHAVE_SYS_STAT_H' if ($DEF{HAS_MMAP});
     $DEFINE.=' -DCOMPAT_ON_BROKEN_QUOTE -DCOMPAT_ALLOW_NAME_IN_CLOSING_TAG' if ($DEF{'IMITATE'});
     $DEFINE.=' -pedantic -DPEDANTIC' if ($DEF{'PEDANTIC'});
@@ -343,7 +366,19 @@ sub configure {
 	}
     }
 
-    if ($DEF{PCRE}) {
+    if ($DEF{PCRE2}) {
+	$INC.=' -I/usr/include/pcre2';
+	$DEFINE.=' -DHAVE_PCRE2';
+	$LIBS.=' -lpcre2-8';
+	print "
+=====================================================================
+build with libpcre2 (Stanislav Yadykin's regexp extension) is enabled.
+=====================================================================
+if you have not installed libpcre2, you still can build the module
+without libpcre2 using
+perl Makefile.PL PCRE2=0
+";
+    } elsif ($DEF{PCRE}) {
 	$INC.=' -I/usr/include/pcre';
 	$DEFINE.=' -DHAVE_PCRE';
 	$LIBS.=' -lpcre';
@@ -351,8 +386,8 @@ sub configure {
 =====================================================================
 build with libpcre (Stanislav Yadykin's regexp extension) is enabled.
 =====================================================================
-if you have not installed libpcre, you still can build the module 
-without libpcre (with this extension disabled) using 
+if you have not installed libpcre, you still can build the module
+without libpcre (with this extension disabled) using
 perl Makefile.PL PCRE=0
 ";
     } else {

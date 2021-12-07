@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210921211832;
+our $VERSION = 1.20211206222445;
 
 my $formatters = [
                 {
@@ -54,47 +54,47 @@ my $validators = {
                 'voip' => '40\\d{5}'
               };
 my %areanames = ();
-$areanames{pt} = {"245334", "Mansaba",
-"245396", "Ingoré",
-"245342", "Bambadinca",
-"245322", "Sta\.\ Luzia",
-"245391", "Canchungo",
-"245353", "Pirada",
-"245335", "Farim",
-"245392", "Cacheu",
-"245354", "Pitche",
-"245370", "Buba",
-"245321", "Bissau",
-"245341", "Bafatá",
-"245331", "Mansôa",
-"245320", "Bissau",
-"245393", "S\.\ Domingos",
-"245352", "Sonaco",
-"245325", "Brá",
-"245394", "Bula",
-"245332", "Bigene\/Bissorã",
-"245351", "Gabú",};
 $areanames{en} = {"24544351", "Gabu",
-"24544352", "Sonaco",
-"24544393", "S\.\ Domingos",
-"24544394", "Bula",
-"24544354", "Pitche",
-"24544396", "Ingoré",
-"24544353", "Pirada",
-"24544370", "Buba",
-"24544325", "Brá",
-"24544392", "Cacheu",
-"24544320", "Bissau",
-"24544335", "Farim",
-"24544391", "Canchungo",
-"24544342", "Bambadinca",
-"24544334", "Mansaba",
 "24544341", "Bafatá",
-"24544321", "Bissau",
-"24544331", "Mansôa",
+"24544352", "Sonaco",
+"24544342", "Bambadinca",
 "24544322", "St\.\ Luzia",
+"24544393", "S\.\ Domingos",
+"24544335", "Farim",
+"24544396", "Ingoré",
+"24544321", "Bissau",
+"24544320", "Bissau",
+"24544325", "Brá",
+"24544331", "Mansôa",
+"24544353", "Pirada",
 "24544332", "Bissora",
-"24544397", "Bigene",};
+"24544392", "Cacheu",
+"24544391", "Canchungo",
+"24544334", "Mansaba",
+"24544394", "Bula",
+"24544370", "Buba",
+"24544397", "Bigene",
+"24544354", "Pitche",};
+$areanames{pt} = {"245342", "Bambadinca",
+"245332", "Bigene\/Bissorã",
+"245335", "Farim",
+"245370", "Buba",
+"245396", "Ingoré",
+"245320", "Bissau",
+"245352", "Sonaco",
+"245321", "Bissau",
+"245392", "Cacheu",
+"245394", "Bula",
+"245391", "Canchungo",
+"245322", "Sta\.\ Luzia",
+"245325", "Brá",
+"245354", "Pitche",
+"245351", "Gabú",
+"245353", "Pirada",
+"245393", "S\.\ Domingos",
+"245331", "Mansôa",
+"245334", "Mansaba",
+"245341", "Bafatá",};
 
     sub new {
       my $class = shift;

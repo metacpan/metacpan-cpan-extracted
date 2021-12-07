@@ -1,4 +1,4 @@
-HTML-Template-Pro version 0.9509
+HTML-Template-Pro version 0.9522
 ==============================
 
 DESCRIPTION
@@ -50,7 +50,10 @@ To install this module type the following:
    make test
    make install
 
-If you have libpcre installed try 
+If you have libpcre2 installed try
+   perl Makefile.PL PCRE2=1
+
+If you have old libpcre installed try instead
    perl Makefile.PL PCRE=1
 
 other optional parameters include DEBUG (build with extra debug level)
@@ -58,7 +61,7 @@ and IMITATE (imitate behavior of HTML::Template in all circumstances,
 even on broken templates, for a little cost of  perfomance).
 
 So a fully fledged build is
-   perl Makefile.PL PCRE=1 DEBUG=1 IMITATE=1
+   perl Makefile.PL PCRE2=1 DEBUG=1 IMITATE=1
 
 DEPENDENCIES
 
@@ -68,7 +71,8 @@ modules:
   File::Spec
 
 libraries:
-  libpcre (optional)
+  libpcre2 (optional)
+  libpcre (fallback,optional)
 
 TODO
 
@@ -91,7 +95,7 @@ Original HTML::Template and other related modules are located at:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005-2009 by I. Yu. Vlasenko.
+Copyright (C) 2005-2021 by I. Yu. Vlasenko.
 Pieces of code in Pro.pm and documentation of HTML::Template are
 copyright (C) 2000-2009 Sam Tregar (sam@tregar.com)
 Other contributors to the code base are listed in Changes.

@@ -1,0 +1,186 @@
+#!/usr/bin/env perl
+#
+#This software is Copyright (c) 2021 by Zane C. Bowers-Hadley.
+#
+#This is free software, licensed under:
+#
+#  The Artistic License 2.0 (GPL Compatible)
+
+use strict;
+use warnings;
+use TOML qw(from_toml);
+use File::Syslogger;
+use File::Slurp qw(read_file);
+use Getopt::Long qw(:config pass_through);
+
+my $version = '0.0.1';
+
+my $help;
+my $toml_file = '/usr/local/etc/filesyslogger.toml';
+my $pri;
+my $fac;
+my $socket;
+my $program;
+my $version_flag;
+GetOptions(
+	'c=s'     => \$toml_file,
+	'h'       => \$help,
+	'help'    => \$help,
+	'v'       => \$version_flag,
+	'version' => \$version_flag,
+);
+
+if ($version_flag) {
+	print 'filesyslogger v. ' . $version . "\n";
+	exit 255;
+}
+
+if ($help) {
+	print 'filesyslogger v. ' . $version . '
+
+-c <config>    Config to use.
+';
+	exit 255;
+}
+
+# make sure the file exists
+if ( !-f $toml_file ) {
+	die( '"' . $toml_file . '" does not exist' );
+}
+
+# read the in or die
+my $toml_raw = read_file($toml_file) or die 'Failed to read "' . $toml_file . '"';
+
+# read the specified config
+my ( $toml, $err ) = from_toml($toml_raw);
+unless ($toml) {
+	die "Error parsing toml,'" . $toml_file . "'" . $err;
+}
+
+# read in the defaults, letting the switches over ride
+if ( defined( $toml->{program} ) ) {
+	$program = $toml->{program};
+}
+if ( defined( $toml->{'facility'} ) ) {
+	$fac = $toml->{facility};
+}
+if ( defined( $toml->{priority} ) ) {
+	$pri = $toml->{priority};
+}
+if ( defined( $toml->{socket} ) ) {
+	$socket = $toml->{socket};
+}
+
+# process the config
+my %files;
+my @toml_keys = keys( %{$toml} );
+my $int       = 0;
+while ( defined( $toml_keys[$int] ) ) {
+	my $item = $toml_keys[$int];
+
+	if ( ref( $toml->{$item} ) eq "HASH" ) {
+
+		# add the file in question
+		$files{$item} = $toml->{$item};
+	}
+
+	$int++;
+}
+
+File::Syslogger->run(
+	facility => $fac,
+	pri      => $pri,
+	socket   => $socket,
+	files    => \%files,
+);
+
+=head1 NAME
+
+filesyslogger - Tails the configured files and sends it to syslog.
+
+=head1 SYNOPSIS
+
+filesyslogger [B<-c> <config>]
+
+=head1 FLAGS
+
+=head2 -c <config file>
+
+This is the config file to use. If not specified, '/usr/local/etc/filesyslogger.toml' is used.
+
+=head1 CONFIG FILE
+
+The file format used is TOML.
+
+The primary and optional keys are as below.
+
+    priority - The priority of the logged item.
+               Default is 'notice'.
+    
+    facility - The facility for logging.
+               Default is 'daemon'.
+    
+    program - Name of the program logging.
+              Default is 'fileSyslogger'.
+    
+    socket - The syslogd socket.
+             Default is "/var/run/log"
+
+Each file defined in a TOML table. The keys are as below.
+
+Each TOML table is used for specifying what files to tail
+and forward to syslog. It uses the same keys as above, minus
+'socket', but with the additional key 'file' for specifying
+what file.
+
+File rotation is picked up automatically via POE::Wheel::FollowTail.
+
+For priority, below are the various valid values.
+
+    emerg
+    emergency
+    alert
+    crit
+    critical
+    err
+    error
+    warning
+    notice
+    info
+
+For facility, below are the various valid values.
+
+    kern
+    user
+    mail
+    daemon
+    auth
+    syslog
+    lpr
+    news
+    uucp
+    cron
+    authpriv
+    ftp
+    local0
+    local1
+    local2
+    local3
+    local4
+    local5
+    local6
+    local7
+
+=head1 EXAMPLE
+
+    facility="daemon"
+    priority="alert"
+    socket="/var/run/log"
+    [sagan]
+    program="saganEve"
+    file="/var/log/sagan/eve"
+    [suricata]
+    program="suricataEve"
+    file="/var/log/suricata/eve"
+
+=cut

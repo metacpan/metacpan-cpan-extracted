@@ -137,6 +137,19 @@ CONTRIBUTORS.txt:
 
 END_CONTRIBUTORS
 
+    my $docker_make = <<'END_DOCKER';
+
+docker-build:
+	docker build --tag zonemaster/ldns:local --build-arg version=$(VERSION) .
+
+docker-tag-version:
+	docker tag zonemaster/ldns:local zonemaster/ldns:$(VERSION)
+
+docker-tag-latest:
+	docker tag zonemaster/ldns:local zonemaster/ldns:latest
+
+END_DOCKER
+
     my $configure_flags_make = <<'END_CONFIGURE_FLAGS';
 
 CONFIGURE_FLAGS += --disable-ldns-config --disable-dane
@@ -184,6 +197,7 @@ END_INTERNAL_LDNS
     my $postamble = '';
 
     $postamble .= $contributors_make;
+    $postamble .= $docker_make;
     if ( $opt_internal_ldns ) {
         $postamble .= $configure_flags_make;
         $postamble .= $openssl_make if $opt_prefix_openssl;

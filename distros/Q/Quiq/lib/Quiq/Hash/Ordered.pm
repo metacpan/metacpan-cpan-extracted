@@ -1,14 +1,3 @@
-package Quiq::Hash::Ordered;
-use base qw/Quiq::Object/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Hash;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -27,6 +16,23 @@ Ein Objekt der Klasse repräsentiert einen geordneten Hash. Ein
 geordneter Hash ist ein Hash, bei dem die Schlüssel/Wert-Paare
 eine definierte Reihenfolge haben. Initial ist dies die
 Hinzufügereihenfolge.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Hash::Ordered;
+use base qw/Quiq::Object/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Hash;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -409,7 +415,7 @@ sub exists {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

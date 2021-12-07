@@ -56,6 +56,7 @@
       },
       "test" : {
          "requires" : {
+            "Carp" : "0",
             "Devel::Hide" : "0",
             "Test::Differences" : "0.62",
             "Test::More" : "0.96",
@@ -73,6 +74,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Number-Phone"
       }
    },
-   "version" : "3.8001",
+   "version" : "3.8002",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

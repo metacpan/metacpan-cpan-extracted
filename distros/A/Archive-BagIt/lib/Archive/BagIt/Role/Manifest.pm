@@ -2,17 +2,13 @@ package Archive::BagIt::Role::Manifest;
 use strict;
 use warnings;
 use namespace::autoclean;
-use Carp qw( croak );
+use Carp qw( croak carp );
 use File::Spec ();
 use Moo::Role;
-use IO::Async::Function;
-#use Parallel::Map qw(pmap_scalar);
-use Parallel::parallel_map;
-#use Future;
 with 'Archive::BagIt::Role::Plugin';
 with 'Archive::BagIt::Role::Portability';
 # ABSTRACT: A role that handles all manifest files for a specific Algorithm
-our $VERSION = '0.085'; # VERSION
+our $VERSION = '0.086'; # VERSION
 
 has 'algorithm' => (
     is => 'rw',
@@ -59,6 +55,32 @@ after BUILD => sub {
     my $algorithm = $self->algorithm->name;
     $self->{bagit}->{manifests}->{$algorithm} = $self;
 };
+
+has 'parallel_support' => (
+    is        => 'ro',
+    builder   => '_check_parallel_support',
+    predicate => 1,
+    lazy      => 1,
+);
+
+sub _check_parallel_support {
+    my $self = shift;
+    my $class = 'Parallel::parallel_map';
+    if (!exists $INC{'Parallel/parallel_map.pm'}) {
+        carp "Module '$class' not available, disable parallel support";
+        $self->bagit->use_parallel( 0 );
+        return 0;
+    }
+    load_class($class);
+    $class->import( 'parallel_map' );
+    return 1;
+}
+
+sub check_pluggable_modules() {
+    my $self = shift;
+    return ($self->has_parallel_support() && $self->has_async_support());
+}
+
 
 
 has 'manifest_entries' => (
@@ -107,16 +129,23 @@ sub _build_manifest_entries {
     return;
 }
 
-sub _fill_digest_hashref {
+sub _fill_digest_hashref { # should be handle if empty values and ignore it (because parallel map)
     my ($self, $bagit, $localname) = @_;
+    if ((!defined $localname) or (0 == length($localname)) ) {
+        # croak "empty localname used!";
+        return;
+    }
     my $digest_hashref;
     my $fullname = File::Spec->catfile($bagit, $localname);
     my $calc_digest = $self->bagit->digest_callback();
-    $digest_hashref->{calculated_digest} = eval {&$calc_digest($self->algorithm(), $fullname)} // '';
+    my $eval = &$calc_digest($self->algorithm(), $fullname);
+    $digest_hashref->{calculated_digest} = $eval // '';
     $digest_hashref->{local_name} = $localname;
     $digest_hashref->{full_name} = $fullname;
     return $digest_hashref;
 }
+
+
 
 
 # calc digest
@@ -127,15 +156,24 @@ sub _fill_digest_hashref {
 # $tmp->{filename} = $filename;
 sub calc_digests {
     my ($self, $bagit, $filenames_ref) = @_;
+    $self->check_pluggable_modules(); # handles Modules
     my @digest_hashes;
     my %digest_results;
-    if ($self->bagit->use_parallel) {
+    if ($self->bagit->use_parallel()) {
         # Parallel::Map does not work at the moment, potential bug in Parallel::Map or IO::Async
         # @digest_hashes = pmap_scalar {
         #     $self->_fill_digest_hashref($bagit, $_);
         # } foreach => $filenames_ref;
         # works as expected:
-        @digest_hashes = parallel_map{ $self->_fill_digest_hashref($bagit, $_) } @{ $filenames_ref};
+
+        my $anon_sub = sub {
+            my $filename = shift;
+            return $self->_fill_digest_hashref($bagit, $filename);
+        };
+        ## no critic (ProhibitStringyEval);
+        @digest_hashes = eval 'Parallel::parallel_map::parallel_map (
+            sub { my $filename = shift; &$anon_sub($filename);}  , @{ $filenames_ref}
+        )';
     } else {
         # serial variant
         @digest_hashes = map {$self->_fill_digest_hashref($bagit, $_)} @{$filenames_ref}
@@ -154,8 +192,7 @@ sub _verify_XXX_manifests {
         my $message = shift;
         if (defined $return_all_errors) {
             push @invalid_messages, $message;
-        }
-        else {
+        } else {
             croak($message);
         }
         return;
@@ -211,7 +248,6 @@ sub _verify_XXX_manifests {
         foreach my $digest_entry (@{$digest_hashes_ref}) {
             my $normalized = normalize_payload_filepath($digest_entry->{local_name});
             $digest_entry->{expected_digest} = $xxmanifest_entries->{$normalized};
-            #use Data::Printer; p( $digest_entry); p( $local_xxfilename);p( $algorithm);p($normalized);
             if (! defined $digest_entry->{expected_digest} ) { next; } # undef expected digests only occur if all preconditions fullfilled but return_all_errors was set, we should ignore it!
             if ($digest_entry->{calculated_digest} ne $digest_entry->{expected_digest}) {
                 my $xxfilename = File::Spec->catfile($bagit, $local_xxfilename);
@@ -317,7 +353,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head2 manifest_entries()
 

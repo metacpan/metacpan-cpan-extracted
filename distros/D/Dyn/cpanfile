@@ -1,6 +1,7 @@
 requires 'perl', '5.030000';
 on 'test' => sub {
     requires 'Test::More' => '0.98';
+    requires 'Test2::V0';
 };
 on 'configure' => sub {
     requires 'CPAN::Meta';
@@ -19,4 +20,8 @@ on 'configure' => sub {
     requires 'Archive::Tar';
     requires 'IO::Uncompress::Unzip';
     requires 'Module::Build::Tiny';
+    requires 'Module::Load::Conditional';
+};
+feature 'object_pad', 'Object::Pad support' => sub {
+    requires 'Object::Pad', 0.57;
 };

@@ -1,15 +1,3 @@
-package Quiq::Trash;
-use base qw/Quiq::Hash/;
-
-use v5.10;
-use strict;
-use warnings;
-
-our $VERSION = '1.195';
-
-use Quiq::Path;
-use Quiq::Terminal;
-
 # -----------------------------------------------------------------------------
 
 =encoding utf8
@@ -21,6 +9,24 @@ Quiq::Trash - Operationen auf dem Trash von XFCE
 =head1 BASE CLASS
 
 L<Quiq::Hash>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+package Quiq::Trash;
+use base qw/Quiq::Hash/;
+
+use v5.10;
+use strict;
+use warnings;
+
+our $VERSION = '1.196';
+
+use Quiq::Path;
+use Quiq::Terminal;
+
+# -----------------------------------------------------------------------------
 
 =head1 METHODS
 
@@ -156,7 +162,7 @@ sub files {
 
 =head1 VERSION
 
-1.195
+1.196
 
 =head1 AUTHOR
 

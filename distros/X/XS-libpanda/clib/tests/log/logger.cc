@@ -1,4 +1,5 @@
 #include "logtest.h"
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 #define TEST(name) TEST_CASE("log-logger: " name, "[log-logger]")
 
@@ -34,7 +35,7 @@ TEST("set_logger") {
             Info   info;
             string str;
         };
-        Logger* logger;
+        Logger* logger = nullptr;
 
 
         SECTION("formating") {
@@ -66,7 +67,7 @@ TEST("set_logger") {
         str  = logger->str;
     }
 
-    if (grep) REQUIRE_THAT(str, Catch::Contains("hello"));
+    if (grep) REQUIRE_THAT(str, Catch::Matchers::ContainsSubstring("hello"));
     else      REQUIRE(str == "hello");
     REQUIRE(info.level == Level::Alert);
     REQUIRE(info.func == __func__);

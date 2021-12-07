@@ -6,10 +6,10 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0.96'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
-license: open_source
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -22,6 +22,24 @@ no_index:
     - share
     - eg
     - examples
+    - author
+    - builder
+provides:
+  App::Prove::Plugin::andoc:
+    file: lib/App/Prove/Plugin/andoc.pm
+    version: v0.9.1
+  Pandoc:
+    file: lib/Pandoc.pm
+    version: v0.9.1
+  Pandoc::Error:
+    file: lib/Pandoc/Error.pm
+    version: v0.9.1
+  Pandoc::Release:
+    file: lib/Pandoc/Release.pm
+    version: v0.9.1
+  Pandoc::Version:
+    file: lib/Pandoc/Version.pm
+    version: v0.9.1
 requires:
   File::Which: '1.11'
   HTTP::Tiny: '0'
@@ -31,11 +49,13 @@ requires:
 resources:
   bugtracker: https://github.com/nichtich/Pandoc-Wrapper/issues
   homepage: https://github.com/nichtich/Pandoc-Wrapper
-  repository: https://github.com/nichtich/Pandoc-Wrapper.git
-version: 0.9.0
+  repository: git://github.com/nichtich/Pandoc-Wrapper.git
+version: 0.9.1
 x_contributors:
   - 'Benct Philip Jonsson <bpjonsson@gmail.com>'
   - 'Edward Betts <edward@4angle.com>'
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1
