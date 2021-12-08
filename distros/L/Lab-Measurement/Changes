@@ -4,6 +4,15 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.800 2021-12-08
+  * New feature: obtain RFC3161 timestamps for the measurement data
+  * Add support for Oxford Instruments IsoBus
+  * Add support for the OI ILM210 helium level meter
+  * Minor improvements for OI IPS and SignalRecovery Lock-In
+  * The legacy, non-Moose API is now officially deprecated and unmaintained.
+    Examples have been dropped from the distribution, and the
+    manual index does not link the modules anymore.
+
 3.792 2021-11-16
   * Keithley 2000: major rewrite and documentation fixes
   * SignalRecovery 7265: bug fixes

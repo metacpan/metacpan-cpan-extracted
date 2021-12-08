@@ -55,6 +55,7 @@ my @whitelist = qw/
     Lab::Bus::VICP
     Lab::Bus::Socket
 
+    Lab::Data::Analysis
     Lab::Data::Analysis::TekTDS
     Lab::Data::Analysis::WaveRunner
 
@@ -76,15 +77,37 @@ my @whitelist = qw/
     Lab::Connection::LinuxGPIB::Trace
     Lab::Connection::LinuxGPIB::Log
 
+    Lab::Measurement
     Lab::Measurement::Legacy::Developer::Write-A-Source-Driver
+    Lab::Measurement::Legacy::Tutorial
+    Lab::Measurement::Legacy::Developer::Testing
     Lab::Measurement::KeyboardHandling
     Lab::MultiChannelInstrument::DeviceCache
 
-    Lab::XPRESS::hub
-    Lab::XPRESS::Utilities::Utilities
+    Lab::SCPI
+
     Lab::XPRESS::Data::XPRESS_plotter
     Lab::XPRESS::Data::XPRESS_logger
     Lab::XPRESS::Data::XPRESS_DataFile
+    Lab::XPRESS::Examples::Example1_Simple_IV
+    Lab::XPRESS::Examples::Example2_Gate_IV_scan
+    Lab::XPRESS::Examples::Example3_2samples_2files
+    Lab::XPRESS::Examples::Example4_3d_scan
+    Lab::XPRESS::hub
+    Lab::XPRESS::Sweep
+    Lab::XPRESS::Sweep::Frame
+    Lab::XPRESS::Sweep::Magnet
+    Lab::XPRESS::Sweep::Voltage
+    Lab::XPRESS::Sweep::Time
+    Lab::XPRESS::Sweep::Motor
+    Lab::XPRESS::Sweep::Repeater
+    Lab::XPRESS::Sweep::Temperature
+    Lab::XPRESS::Sweep::PulseLength
+    Lab::XPRESS::Sweep::Amplitude
+    Lab::XPRESS::Sweep::Level
+    Lab::XPRESS::Sweep::LogBlock
+    Lab::XPRESS::Sweep::SignalRecoveryPhase
+    Lab::XPRESS::Sweep::SignalRecoveryOscOut
     Lab::XPRESS::Sweep::PulsePeriod
     Lab::XPRESS::Sweep::SweepND
     Lab::XPRESS::Sweep::Frequency
@@ -92,7 +115,41 @@ my @whitelist = qw/
     Lab::XPRESS::Sweep::VM_DIR
     Lab::XPRESS::Sweep::Dummy
     Lab::XPRESS::Sweep::Power
+    Lab::XPRESS::Utilities::Utilities
 
+    Lab::Instrument
+    Lab::Instrument::Multimeter
+    Lab::Instrument::HP34401A
+    Lab::Instrument::HP34420A
+    Lab::Instrument::HP3458A
+    Lab::Instrument::Agilent34410A
+    Lab::Instrument::Keithley2000
+    Lab::Instrument::Source
+    Lab::Instrument::DummySource
+    Lab::Instrument::Yokogawa7651
+    Lab::Instrument::YokogawaGS200
+    Lab::Instrument::Keithley2400
+    Lab::Instrument::SR830
+    Lab::Instrument::SR830::AuxIn
+    Lab::Instrument::SR830::AuxOut
+    Lab::Instrument::SignalRecovery726x
+    Lab::Instrument::HP33120A
+    Lab::Instrument::HP83732A
+    Lab::Instrument::MG369xB
+    Lab::Instrument::U2000
+    Lab::Instrument::TDS2024B
+    Lab::Instrument::WR640
+    Lab::Instrument::IPS
+    Lab::Instrument::TRMC2
+    Lab::Instrument::OI_ITC503
+    Lab::Instrument::ITC
+    Lab::Instrument::TCD
+    Lab::Instrument::OI_Triton
+    Lab::Instrument::TemperatureControl::TLK43
+    Lab::Instrument::Lakeshore33x
+    Lab::Instrument::Lakeshore340
+    Lab::Instrument::OI_ILM210
+    Lab::Instrument::PD11042
     Lab::Instrument::OI_IPS
     Lab::Instrument::MagnetSupply
     Lab::Instrument::TemperatureDiode
@@ -110,6 +167,24 @@ my @whitelist = qw/
     Lab::Instrument::TemperatureControl
 
     Lab::Exception::Base
+    Lab::Connection
+    Lab::Bus
+    Lab::Bus::DEBUG
+    Lab::Connection::VISA
+    Lab::Bus::VISA
+    Lab::Connection::GPIB
+    Lab::Connection::LinuxGPIB
+    Lab::Connection::VISA_GPIB
+    Lab::Bus::LinuxGPIB
+    Lab::Connection::RS232
+    Lab::Connection::VISA_RS232
+    Lab::Bus::RS232
+    Lab::Connection::USBtmc
+    Lab::Bus::USBtmc
+    Lab::Connection::IsoBus
+    Lab::Bus::IsoBus
+    Lab::Connection::MODBUS_RS232
+    Lab::Bus::MODBUS_RS232
 
     /;
 

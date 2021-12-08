@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Function::Concurrent;
-$Lab::Moose::Instrument::SCPI::Sense::Function::Concurrent::VERSION = '3.792';
+$Lab::Moose::Instrument::SCPI::Sense::Function::Concurrent::VERSION = '3.800';
 #ABSTRACT: Role for the SCPI SENSe:FUNCtion subsystem with support for concurrent sense
 
 use v5.20;
@@ -123,7 +123,7 @@ Lab::Moose::Instrument::SCPI::Sense::Function::Concurrent - Role for the SCPI SE
 
 =head1 VERSION
 
-version 3.792
+version 3.800
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Lab::XPRESS::Data::XPRESS_plotter;
 #ABSTRACT: XPRESS plotting module
-$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.792';
+$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.800';
 use v5.20;
 
 use strict;
@@ -1386,7 +1386,7 @@ Lab::XPRESS::Data::XPRESS_plotter - XPRESS plotting module
 
 =head1 VERSION
 
-version 3.792
+version 3.800
 
 =head1 COPYRIGHT AND LICENSE
 

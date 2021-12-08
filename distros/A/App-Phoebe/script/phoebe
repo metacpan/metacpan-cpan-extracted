@@ -45,37 +45,7 @@ Optionally, people can also access it using a regular web browser.
 
 Gemini itself is very simple network protocol, like Gopher or Finger, but with
 TLS. Gemtext is a very simple markup language, a bit like Markdown, but line
-oriented. See L</GEMTEXT>.
-
-To take a look for yourself, check out the test wiki via the web or via the web.
-
-=over
-
-=item * L<What is Gemini?|https://gemini.circumlunar.space/>
-
-=item * L<Gemini link collection|https://git.sr.ht/~kr1sp1n/awesome-gemini>
-
-=item * L<Test site, via the web|https://transjovian.org:1965/test>
-
-=item * L<Test site, via Gemini|gemini://transjovian.org/test>
-
-=back
-
-=head1 READING THE WIKI
-
-This repository comes with a Perl script called L<gemini> to download Gemini URLs.
-
-Other clients can be found here:
-
-=over
-
-=item * L<Gemini software|https://gemini.circumlunar.space/software/>
-
-=item * L<Gemini clients|https://transjovian.org:1965/gemini/page/Clients>
-
-=back
-
-See L<App::Phoebe::Web> to enable reading via the web.
+oriented.
 
 =head1 GEMTEXT
 
@@ -118,84 +88,7 @@ A line starting with ">", followed by a space and some text is a quote.
     The monologue at the end is fantastic, with the city lights and the rain.
     > I have seen things you people would not believe.
 
-=head1 EDITING THE WIKI
-
-How do you edit a Phoebe wiki? You need to use a Titan-enabled client.
-
-L<Titan|https://transjovian.org:1965/titan> is a companion protocol to Gemini:
-it allows clients to upload files to Gemini sites, if servers allow this. On
-Phoebe, you can edit "raw" pages. That is, at the bottom of a page you'll see a
-link to the "raw" page. If you follow it, you'll see the page content as plain
-text. You can submit a changed version of this text to the same URL using Titan.
-
-Known clients:
-
-This repository comes with a Perl script called L<titan> to upload files.
-
-L<Gemini Write|https://alexschroeder.ch/cgit/gemini-write/> is an extension for
-the Emacs Gopher and Gemini client L<Elpher|https://thelambdalab.xyz/elpher/>.
-
-L<Gemini & Titan for Bash|https://alexschroeder.ch/cgit/gemini-titan/about/> are
-two shell functions that allow you to download and upload files.
-
-See L<App::Phoebe::WebEdit> to enable editing via the web.
-
-=head1 INSTALLATION
-
-Using C<cpan>:
-
-    cpan App::Phoebe
-
-Manual install:
-
-    perl Makefile.PL
-    make
-    make install
-
-=head2 Dependencies
-
-If you are not using C<cpan> or C<cpanm> to install Phoebe, you'll need to
-install the following dependencies:
-
-=over
-
-=item * L<Algorithm::Diff>, or C<libalgorithm-diff-xs-perl>
-
-=item * L<File::ReadBackwards>, or C<libfile-readbackwards-perl>
-
-=item * L<File::Slurper>, or C<libfile-slurper-perl>
-
-=item * L<Mojolicious>, or C<libmojolicious-perl>
-
-=item * L<IO::Socket::SSL>, or C<libio-socket-ssl-perl>
-
-=item * L<Modern::Perl>, or C<libmodern-perl-perl>
-
-=item * L<URI::Escape>, or C<liburi-escape-xs-perl>
-
-=item * L<Net::IDN::Encode>, or C<libnet-idn-encode-perl>
-
-=item * L<Encode::Locale>, or C<libencode-locale-perl>
-
-=back
-
-I'm going to be using F<curl> and F<openssl> in the L</Quickstart> instructions,
-so you'll need those tools as well. And finally, when people download their
-data, the code calls C<tar> (available from packages with the same name on
-Debian derived systems).
-
-The F<update-readme.pl> script I use to generate F<README.md> also requires some
-libraries:
-
-=over
-
-=item * L<Pod::Markdown>, or C<libpod-markdown-perl>
-
-=item * L<Text::Slugify>, which has no Debian package, apparently 😭
-
-=back
-
-=head2 Quickstart
+=head1 QUICKSTART
 
 I'm going to assume that you're going to create a new user just to be safe.
 
@@ -256,7 +149,19 @@ one go:
 
     titan --url=titan://localhost/ --token=hello *.gmi
 
-=head2 Image uploads
+=head1 CERTIFICATES
+
+If you want to generate your own certificates, here's how you would generate a
+certificate for two domains (you can add as many as you need), and a common name
+of "Phoebe" (use whatever you want).
+
+    openssl req -new -x509 -newkey ec \
+    -pkeyopt ec_paramgen_curve:prime256v1 \
+    -subj "/CN=Phoebe" \
+    -addext "subjectAltName=DNS:localhost,DNS:phoebe.local" \
+    -days 1825 -nodes -out cert.pem -keyout key.pem
+
+=head1 IMAGE UPLOADS
 
 OK, how do image uploads work? First, we need to specify which MIME types Phoebe
 accepts. The files are going to be served back with that MIME type, so even if
@@ -274,7 +179,7 @@ with a list of common MIME types.
 
 =back
 
-Let's continue using the setup we used for the L</Quickstart> section. Restart
+Let's continue using the setup we used for the L</QUICKSTART> section. Restart
 the server and allow photos:
 
     phoebe --wiki_mime_type=image/jpeg
@@ -335,7 +240,7 @@ C<--wiki_page_size_limit> option, but you need to restart Phoebe:
 
 Now you can upload about 10MB…
 
-=head2 Using systemd
+=head1 USING SYSTEMD
 
 Systemd is going to handle daemonisation for us. There's more documentation
 available online.
@@ -374,14 +279,7 @@ Check the log output:
 
     sudo journalctl --unit phoebe
 
-=head2 Installing Perl
-
-If you are on GNU/Linx or macOS, I recommend installing from
-L<Perlbrew|https://perlbrew.pl/>. Each Perl installation comes with its own
-library directories, so if you switch Perl version, you need to reinstall Phoebe
-for that Perl version.
-
-=head2 Troubleshooting
+=head1 Troubleshooting
 
 🔥 Unknown command phoebe 🔥 If you installed Phoebe using cpan or cpanm and you
 still get this error, then something about your Perl installation isn't working.

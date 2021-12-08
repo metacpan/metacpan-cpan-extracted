@@ -54,6 +54,7 @@ EOT
 $config .= join("\n", @config) if @config;
 $config .= join("", map { "use App::Phoebe::$_;\n" } @use) if @use;
 if ($example) {
+  my $found;
   for my $file ("blib/lib/App/Phoebe.pm", map { "blib/lib/App/Phoebe/$_" } grep /\.pm$/, read_dir("blib/lib/App/Phoebe")) {
     my $source = read_text($file);
     if ($source =~ /^(    # tested by $0\n(?:    .*\n|\t.*\n|\n)+)/m) {
@@ -61,9 +62,11 @@ if ($example) {
       $example =~ s/\t/        /g;
       $example =~ s/^    //gm;
       $config .= $example;
+      $found = 1;
       last;
     }
   }
+  ok($found, "$0 found");
   # test $example at the end
 }
 write_text("$dir/config", $config . "\n1;\n") if $config;

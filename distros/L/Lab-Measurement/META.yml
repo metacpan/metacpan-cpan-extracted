@@ -63,6 +63,7 @@ requires:
   Moose::Util::TypeConstraints: '0'
   MooseX::Params::Validate: '0.18'
   MooseX::StrictConstructor: '0'
+  Net::RFC3161::Timestamp: '0'
   PDL: '2.007'
   PDL::Core: '0'
   PDL::NiceSlice: '0'
@@ -101,7 +102,7 @@ resources:
   bugtracker: https://github.com/lab-measurement/lab-measurement/issues
   homepage: https://www.labmeasurement.de/
   repository: https://github.com/lab-measurement/lab-measurement.git
-version: '3.792'
+version: '3.800'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

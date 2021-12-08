@@ -101,5 +101,7 @@ sub append_comment {
   } else {
     $text = "🗨 $query";
   }
+  # We don't need to close the stream because this is called via process_gemini
+  # which always closes the stream in the end.
   with_lock($stream, $host, $space, sub { write_page($stream, $host, $space, $id, $text) } );
 }

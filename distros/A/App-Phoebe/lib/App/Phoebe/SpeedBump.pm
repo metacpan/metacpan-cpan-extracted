@@ -78,7 +78,7 @@ use Modern::Perl;
 use File::Slurper qw(read_binary write_binary);
 use List::Util qw(sum);
 use Mojo::JSON qw(decode_json encode_json);
-use Net::IP;
+use Net::IP qw(:PROC);
 use Net::DNS qw(rr);
 
 @known_fingerprints = qw(
@@ -121,9 +121,19 @@ sub speed_bump {
   }
   # check whether the range is blocked
   my $ip = $stream->handle->peerhost;
+  if (not $ip) {
+      $log->info("IP number cannot be determined");
+      result($stream, "44", "10");
+      # no more processing
+      return 1;
+  }
   my $ob = new Net::IP($ip);
   for my $cidr (keys %$speed_cidr_data) {
-    my $range = new Net::IP($cidr) or $log->error(Net::IP::Error());
+    my $range = new Net::IP($cidr);
+    if (not $range) {
+      $log->error("$cidr: " . Net::IP::Error());
+      next;
+    }
     my $overlap = $range->overlaps($ob);
     # $IP_PARTIAL_OVERLAP (ranges overlap) $IP_NO_OVERLAP (no overlap)
     # $IP_A_IN_B_OVERLAP (range2 contains range1) $IP_B_IN_A_OVERLAP (range1
@@ -198,13 +208,18 @@ sub speed_bump_add {
   $speed_data->{$ip}->{probation} = $now + 2 * $seconds;
   return $seconds if $seconds < 2419200;
   # finally, check if there are enough other IPs in the same network to warrant a net range block
-  $speed_data->{$ip}->{cidr} ||= speed_bump_cidr($ip, $now);
-  my $cidr = $speed_data->{$ip}->{cidr};
-  if ($cidr) {
+  my $cidr;
+  # only compute it if it's not cached
+  $cidr = speed_bump_cidr($ip, $now) if not $speed_data->{$ip}->{cidr};
+  # only set the cache if we computed it
+  $speed_data->{$ip}->{cidr} = $cidr if $cidr;
+  # if we have a CIDR, count the other IP numbers in our data with the same CIDR
+  if ($speed_data->{$ip}->{cidr}) {
     my $count = 0;
     for (keys %$speed_data) {
-      $count++ if exists $speed_data->{$_}->{cidr} and $speed_data->{$_}->{cidr} eq $cidr;
+      $count++ if $speed_data->{$_}->{cidr} and $speed_data->{$_}->{cidr} eq $speed_data->{$ip}->{cidr};
     }
+    # ban the CIDR if we have three or more
     speed_bump_add_cidr($cidr, $now + $seconds) if $count >= 3;
   }
   return $seconds;
@@ -355,6 +370,8 @@ sub speed_bump_status {
 
 sub speed_bump_cidr {
   my $ip = shift;
+  # Sadly, routeviews does not support IPv6 at the moment!
+  return if ip_is_ipv6($ip);
   my $now = shift;
   my $cidr = $speed_data->{$ip}->{cidr};
   my $until = $speed_data->{$ip}->{until};
@@ -363,7 +380,6 @@ sub speed_bump_cidr {
   $ip = new Net::IP ($ip) or return;
   my $reverse = $ip->reverse_ip();
   $reverse =~ s/in-addr\.arpa\.$/asn.routeviews.org/;
-  # Sadly, routeviews does not support IPv6 at the moment!
   $log->info("DNS TXT query for $reverse");
   for my $rr (rr($reverse, "TXT")) {
     next unless $rr->type eq "TXT";

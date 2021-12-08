@@ -150,6 +150,8 @@ sub save_edit_via_http {
   }
   my $text = $params{text}||"";
   $text =~ s/\r\n/\n/g; # fix DOS EOL convention
+  # We don't need to close the stream because this is called via process_gemini
+  # which always closes the stream in the end.
   with_lock($stream, $host, $space, sub { write_page_for_http($stream, $host, $space, $id, $text) } );
 }
 

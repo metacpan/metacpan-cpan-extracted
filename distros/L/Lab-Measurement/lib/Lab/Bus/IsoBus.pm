@@ -1,6 +1,6 @@
 package Lab::Bus::IsoBus;
 #ABSTRACT: Oxford Instruments ISOBUS bus
-$Lab::Bus::IsoBus::VERSION = '3.792';
+$Lab::Bus::IsoBus::VERSION = '3.800';
 use v5.20;
 
 use strict;
@@ -226,7 +226,7 @@ Lab::Bus::IsoBus - Oxford Instruments ISOBUS bus
 
 =head1 VERSION
 
-version 3.792
+version 3.800
 
 =head1 SYNOPSIS
 
@@ -303,6 +303,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
             2020       Andreas K. Huettel
+            2021       Fabian Weinelt
 
 
 This is free software; you can redistribute it and/or modify it under

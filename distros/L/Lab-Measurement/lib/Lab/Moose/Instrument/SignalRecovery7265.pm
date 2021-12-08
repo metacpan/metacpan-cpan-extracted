@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SignalRecovery7265;
-$Lab::Moose::Instrument::SignalRecovery7265::VERSION = '3.792';
+$Lab::Moose::Instrument::SignalRecovery7265::VERSION = '3.800';
 #ABSTRACT: Model 7265 Lock-In Amplifier
 
 use v5.20;
@@ -22,13 +22,34 @@ use Lab::Moose 'linspace';
 
 extends 'Lab::Moose::Instrument';
 
-has [qw/max_units_per_second max_units_per_step min_units max_units/] =>
-    ( is => 'ro', isa => 'Num', required => 1 );
+has max_units => (
+	is => 'ro',
+	isa => 'Num',
+	default => 1,
+);
+
+has min_units => (
+	is => 'ro',
+	isa => 'Num',
+	default => 0,
+);
+
+has max_units_per_second => (
+	is => 'ro',
+	isa => 'Num',
+	default => 1,
+);
+
+has max_units_per_step => (
+	is => 'ro',
+	isa => 'Num',
+	default => 0.01,
+);
 
 has source_level_timestamp => (
     is       => 'rw',
     isa      => 'Num',
-    init_arg => undef,
+    init_arg => undef
 );
 
 sub BUILD {
@@ -1015,10 +1036,9 @@ sub get_value {
 
         my @temp = split( ",", $result );
 
-        #my $new = ${$self->cached_value()}{X => $temp[0]};
-        #$self->cached_value($new);
+        $self->cached_value({XY => [$temp[0], $temp[1]]});
 
-        return $self->cached_value();
+		return [$temp[0], $temp[1]];
     }
     elsif ( $chan eq "MP" ) {
 
@@ -1030,11 +1050,12 @@ sub get_value {
 
         $result = $self->query( command => "MP.", %args );
         $result =~ s/\x00//g;
-        (
-            $self->{cached_value()}{MAG},
-            $self->{cached_value()}{PHA}
-        ) = split( ",", $result );
-        return $self->cached_value();
+
+        my @temp = split( ",", $result );
+
+        $self->cached_value({MP => [$temp[0], $temp[1]]});
+
+		return [$temp[0], $temp[1]];
     }
     elsif ( $chan eq "ALL" ) {
 
@@ -1049,13 +1070,12 @@ sub get_value {
         $result = $self->query( command => "XY.", %args ) . ","
             . $self->query( command => "MP.", %args );
         $result =~ s/\x00//g;
-        (
-            $self->{cached_value()}{X},
-            $self->{cached_value()}{Y},
-            $self->{cached_value()}{MAG},
-            $self->{cached_value()}{PHA}
-        ) = split( ",", $result );
-        return $self->cached_value();
+
+        my @temp = split( ",", $result );
+
+        $self->cached_value({ALL => [$temp[0], $temp[1], $temp[2], $temp[3]]});
+
+		return [$temp[0], $temp[1], $temp[2], $temp[3]];
     }
 }
 
@@ -1337,7 +1357,7 @@ Lab::Moose::Instrument::SignalRecovery7265 - Model 7265 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.792
+version 3.800
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Lab::Bus::VICP;
 #ABSTRACT: VICP bus
-$Lab::Bus::VICP::VERSION = '3.792';
+$Lab::Bus::VICP::VERSION = '3.800';
 use v5.20;
 
 use strict;
@@ -678,7 +678,7 @@ Lab::Bus::VICP - VICP bus
 
 =head1 VERSION
 
-version 3.792
+version 3.800
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,99 @@
+{
+   "abstract" : "A Mojolicious web service frontend leveraging OrePAN2",
+   "author" : [
+      "rshingleton <reshingleton@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.12",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Darkpan",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Zlib" : "0",
+            "JSON" : "0",
+            "Mojolicious" : "0",
+            "Mojolicious::Plugin::BasicAuthPlus" : "0",
+            "Moo" : "0",
+            "Nice::Try" : "0",
+            "OrePAN2" : "0",
+            "perl" : "v5.20.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::Darkpan" : {
+         "file" : "lib/Mojo/Darkpan.pm",
+         "version" : "0.04"
+      },
+      "Mojo::Darkpan::Config" : {
+         "file" : "lib/Mojo/Darkpan/Config.pm"
+      },
+      "Mojo::Darkpan::Controller::Index" : {
+         "file" : "lib/Mojo/Darkpan/Controller/Index.pm"
+      },
+      "Mojo::Darkpan::Controller::Publish" : {
+         "file" : "lib/Mojo/Darkpan/Controller/Publish.pm"
+      },
+      "Mojo::Darkpan::Util" : {
+         "file" : "lib/Mojo/Darkpan/Util.pm"
+      },
+      "Mojolicious::Plugin::DirectoryHandler" : {
+         "file" : "lib/Mojolicious/Plugin/DirectoryHandler.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rshingleton/Mojo-Darkpan/issues"
+      },
+      "homepage" : "https://github.com/rshingleton/Mojo-Darkpan",
+      "repository" : {
+         "url" : "git://github.com/rshingleton/Mojo-Darkpan.git",
+         "web" : "https://github.com/rshingleton/Mojo-Darkpan"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "shingler <shingler@oclc.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
+}

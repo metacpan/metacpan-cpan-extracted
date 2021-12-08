@@ -1,0 +1,13 @@
+Revision history for Perl extension Mojo::Darkpan
+
+0.04 2021-12-08T16:02:53Z
+    - removed some debug logging
+    - fixed invalid reference in Config.pm
+
+0.02 2021-12-08T02:05:28Z
+    - style changes to directory handler plugin
+
+0.01 2021-12-08T01:04:36Z
+
+    - original version
+

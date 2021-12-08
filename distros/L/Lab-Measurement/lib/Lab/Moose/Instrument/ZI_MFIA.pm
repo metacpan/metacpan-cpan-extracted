@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_MFIA;
-$Lab::Moose::Instrument::ZI_MFIA::VERSION = '3.792';
+$Lab::Moose::Instrument::ZI_MFIA::VERSION = '3.800';
 #ABSTRACT: Zurich Instruments MFIA Impedance Analyzer.
 
 use v5.20;
@@ -45,7 +45,7 @@ Lab::Moose::Instrument::ZI_MFIA - Zurich Instruments MFIA Impedance Analyzer.
 
 =head1 VERSION
 
-version 3.792
+version 3.800
 
 =head1 SYNOPSIS
 

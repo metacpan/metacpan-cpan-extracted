@@ -16,6 +16,7 @@ lib/App/Phoebe/Iapetus.pm
 lib/App/Phoebe/Ijirait.pm
 lib/App/Phoebe/MokuPona.pm
 lib/App/Phoebe/Oddmuse.pm
+lib/App/Phoebe/Oracle.pm
 lib/App/Phoebe/PageHeadings.pm
 lib/App/Phoebe/RegisteredEditorsOnly.pm
 lib/App/Phoebe/Spartan.pm
@@ -52,6 +53,7 @@ t/Comments.t
 t/Css.t
 t/DebugIpNumbers.t
 t/encoding.t
+t/example-capsules-only.t
 t/example-dark-mode.t
 t/example-footer.t
 t/example-footer2.t
@@ -74,6 +76,7 @@ t/oddmuse-namespaces.pl
 t/oddmuse-server.pl
 t/oddmuse-wiki.pl
 t/Oddmuse.t
+t/Oracle.t
 t/PageHeadings.t
 t/RegisteredEditorsOnly.t
 t/spaces.t

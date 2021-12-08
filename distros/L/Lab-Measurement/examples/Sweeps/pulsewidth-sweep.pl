@@ -84,7 +84,7 @@ pulsewidth-sweep.pl - Sweep the pulsewidth with a Rigol DG5352 and measure with 
 
 =head1 VERSION
 
-version 3.792
+version 3.800
 
 =head1 COPYRIGHT AND LICENSE
 

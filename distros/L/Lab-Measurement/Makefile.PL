@@ -49,6 +49,7 @@ my %WriteMakefileArgs = (
     "Moose::Util::TypeConstraints" => 0,
     "MooseX::Params::Validate" => "0.18",
     "MooseX::StrictConstructor" => 0,
+    "Net::RFC3161::Timestamp" => 0,
     "PDL" => "2.007",
     "PDL::Core" => 0,
     "PDL::NiceSlice" => 0,
@@ -100,7 +101,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.792",
+  "VERSION" => "3.800",
   "test" => {
     "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/DataFile/Gnuplot/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }
@@ -148,6 +149,7 @@ my %FallbackPrereqs = (
   "Moose::Util::TypeConstraints" => 0,
   "MooseX::Params::Validate" => "0.18",
   "MooseX::StrictConstructor" => 0,
+  "Net::RFC3161::Timestamp" => 0,
   "PDL" => "2.007",
   "PDL::Core" => 0,
   "PDL::NiceSlice" => 0,

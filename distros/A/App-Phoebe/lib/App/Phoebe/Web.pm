@@ -133,7 +133,7 @@ our @EXPORT_OK = qw(http_error handle_http_header);
 use App::Phoebe qw(@request_handlers port space host_regex space_regex run_extensions text quote_html blog_pages
 		   html_page to_html wiki_dir changes all_logs pages rss atom files $server $log @footer
 		   space_links diff);
-use File::Slurper qw(read_lines read_binary);
+use File::Slurper qw(read_text read_binary);
 use Encode qw(encode_utf8 decode_utf8);
 use List::Util qw(min);
 use Modern::Perl;
@@ -752,7 +752,7 @@ sub serve_file_via_http {
     $stream->write("Metadata not found\r\n");
     return;
   }
-  my %meta = (map { split(/: /, $_, 2) } read_lines($meta));
+  my %meta = (map { split(/: /, $_, 2) } split /\n/, read_text $meta);
   if (not $meta{'content-type'}) {
     $stream->write("HTTP/1.1 500 Error\r\n");
     $stream->write("Content-Type: text/plain\r\n");

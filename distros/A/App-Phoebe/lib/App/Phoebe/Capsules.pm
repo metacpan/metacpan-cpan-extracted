@@ -36,6 +36,10 @@ or hosts for your capsules.
 
 Every client certificate gets assigned a capsule name.
 
+You can provide a link with some documentation, if you want:
+
+    our $capsule_help = '//transjovian.org/phoebe/page/Capsules';
+
 =head1 TROUBLESHOOTING
 
 🔥 In the wiki directory, you can have a file called F<fingerprint_equivalents>.
@@ -47,11 +51,37 @@ containing two fingerprints, C<FROM> and C<TO>.
 
 🔥 The file names I<archive>, I<backup>, and I<upload> are reserved.
 
+=head1 NO WIKI, ONLY CAPSULES
+
+Here's how to disable all wiki functions of Phoebe and just use capsules. The
+C<nothing_else> function comes right after C<capsules> as an extension and
+always returns 1, so Phoebe considers this request handled. Therefore, the
+regular request handlers won't get used. Make sure that any extensions you do
+want to have are prepended to C<@extensions> after setting it (using
+C<unshift>).
+
+    # tested by t/example-capsules-only.t
+    package App::Phoebe::Capsules;
+    use Modern::Perl;
+    use App::Phoebe qw($log @request_handlers @extensions);
+    use App::Phoebe::Capsules;
+    our $capsule_help = '//transjovian.org/phoebe/page/Capsules';
+    our $capsule_space;
+    @extensions = (\&capsules, \&nothing_else);
+    sub nothing_else {
+      my ($stream, $url) = @_;
+      $log->info("No handler for $url: only capsules!");
+      result($stream, "30", "/$capsule_space");
+      1;
+    }
+    $log->info('Only capsules!');
+    1;
+
 =cut
 
 package App::Phoebe::Capsules;
 use App::Phoebe qw($server $log @extensions @request_handlers host_regex port success result print_link wiki_dir
-		   valid_id valid_mime_type valid_size process_titan to_url);
+		   valid_id valid_mime_type valid_size to_url);
 use File::Slurper qw(read_dir read_binary write_binary);
 use Net::IDN::Encode qw(domain_to_ascii);
 use Encode qw(encode_utf8 decode_utf8);
@@ -107,6 +137,7 @@ sub capsules {
   } elsif (($host) = $url =~ m!^gemini://($hosts)(?::$port)?/$capsule_space/?$!) {
     return serve_main_menu($stream, $host);
   }
+  $log->info("Capsules have no match for $url");
   return;
 }
 
@@ -407,7 +438,8 @@ sub capsule_token_cleanup {
 
 unshift(@request_handlers, '^titan://(' . capsule_regex() . ')(?::\d+)?/' . $capsule_space . '/' => \&handle_titan);
 
-# We need our own Titan handler because we want a different copy of is_upload; and once we we're here we can run our extension directly.
+# We need our own Titan handler because we want a different copy of is_upload;
+# and once we're here we can run our extension directly.
 sub handle_titan {
   my $stream = shift;
   my $data = shift;

@@ -4,7 +4,7 @@ use Mojo::JSON qw/decode_json/;
 
 use Getopt::Long;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 # ABSTRACT: Pastes stuff to https://perl.bot/
 
@@ -34,7 +34,7 @@ sub run {
 
 sub display_channels {
   my $self = shift;
-  my $tx = $self->ua->get( 'https://perl.bot/api/v1/channels');
+  my $tx = $self->ua->get( 'https://perl.bot/api/v2/channels');
  
   unless ($tx->res->is_success) {
     say "Failed to get channels, try again later.";
@@ -53,7 +53,7 @@ sub display_channels {
 
 sub display_languages {
   my $self = shift;
-  my $tx = $self->ua->get( 'https://perl.bot/api/v1/languages');
+  my $tx = $self->ua->get( 'https://perl.bot/api/v2/languages');
  
   unless ($tx->res->is_success) {
     say "Failed to get languages, try again later.";
@@ -72,7 +72,7 @@ sub display_languages {
 sub paste {
   my $self = shift;
 
-  my $tx = $self->ua->post( 'https://perl.bot/api/v1/paste', form => {
+  my $tx = $self->ua->post( 'https://perl.bot/api/v2/paste', form => {
     paste    => $self->text,
     username => $self->name,
     language => $self->language || '',

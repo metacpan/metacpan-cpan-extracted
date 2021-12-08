@@ -139,7 +139,7 @@ The same, but limited to a particular IP number:
 
 package Gemini::Wiki::Control;
 use Modern::Perl '2018';
-use File::Slurper qw(read_dir read_lines read_text write_text);
+use File::Slurper qw(read_dir read_text write_text);
 use Encode qw(encode_utf8 decode_utf8);
 use Getopt::Long;
 use Pod::Text;
@@ -196,7 +196,7 @@ sub update_changes {
   say join("\n", map { $_ . "\t" . $files{$_} } sort keys %files) if $log >= 4;
   my %revisions;
   my %changes;
-  for (read_lines("$dir/changes.log")) {
+  for (split /\n/, read_text "$dir/changes.log") {
     my ($ts, $id, $revision) = split(/\x1f/);
     $revisions{$id} = $revision;
     if ($revision) {
@@ -248,7 +248,7 @@ sub erase_page {
     my @log = grep {
       my ($ts, $id, $revision, $code) = split(/\x1f/);
       0 == grep { $id eq $_ } @page; # only keep log lines that are not mentioned
-    } read_lines("$dir/changes.log");
+    } split /\n/, read_text "$dir/changes.log";
     rename("$dir/changes.log", "$dir/changes.log~")
 	or die "Cannot rename $dir/changes.log to changes.log~: $!";
     write_text("$dir/changes.log", join("\n", @log));
@@ -257,7 +257,7 @@ sub erase_page {
     my @index = grep {
       my $id = $_;
       0 == grep { $id eq $_ } @page; # only keep index pages that are not mentioned
-    } read_lines("$dir/index");
+    } split /\n/, read_text "$dir/index";
     rename("$dir/index", "$dir/index~")
 	or die "Cannot rename $dir/index to index~: $!";
     write_text("$dir/index", join("\n", @index));
@@ -274,7 +274,7 @@ sub html_export {
 	unless -d $target_dir;
     for my $page (map { s/\.gmi$//; $_ } grep /\.gmi$/, read_dir("$source_dir/page")) {
       my $id = decode_utf8 $page;
-      my $text = read_text("$source_dir/page/$page.gmi"); # fatal if it does not exist
+      my $text = read_text "$source_dir/page/$page.gmi"; # fatal if it does not exist
       say "Converting $id";
       my $filename = "$target_dir/$page";
       $filename .= ".html" unless $no_extension;

@@ -95,8 +95,7 @@ dev:
 	    --log_level=4 --wiki_main_page=Welcome \
 	    --wiki_mime_type=image/jpeg
 
-# Update the README file. The Perl script no only converts the POD
-# documentation to Markdown, it also adds a table of contents.
+# Update the README file.
 README.md: script/phoebe \
   $(sort $(filter-out phoebe,$(filter-out %~,$(wildcard script/*)))) \
   lib/App/Phoebe.pm $(sort $(wildcard lib/App/Phoebe/*.pm))
@@ -113,10 +112,14 @@ debug:
 	for t in t/*.t; do DEBUG=4 perl "$$t"; done
 
 # Regenerate the certificates used by the wiki. These use eliptic
-# curves and are valid for five years.
+# curves and are valid for five years, for a common name "Phoebe"
+# (which is not used) and multiple alternative subject names (add more
+# and different ones).
 cert:
 	openssl req -new -x509 -newkey ec \
 	-pkeyopt ec_paramgen_curve:prime256v1 \
+        -subj "/CN=Phoebe" \
+        -addext "subjectAltName=DNS:localhost,DNS:phoebe.local" \
 	-days 1825 -nodes -out cert.pem -keyout key.pem
 
 # Print all the info about the certificate.

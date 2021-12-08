@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'Module::Build::Tiny' => '0.034'
+                                        'ExtUtils::MakeMaker' => '0'
                                       }
                       },
        'develop' => {
@@ -12,7 +12,6 @@ do { my $x = {
                                       'Test::More' => '0',
                                       'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
-                                      'blib' => '1.01',
                                       'perl' => '5.006',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -34,6 +33,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Path::Tiny' => '0',
+                                   'Perl::Critic::Community' => 'v1.0.1',
                                    'Test::More' => '0',
                                    'strict' => '0',
                                    'warnings' => '0'

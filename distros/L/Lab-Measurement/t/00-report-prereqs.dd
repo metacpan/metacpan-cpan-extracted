@@ -49,6 +49,7 @@ do { my $x = {
                                       'Moose::Util::TypeConstraints' => '0',
                                       'MooseX::Params::Validate' => '0.18',
                                       'MooseX::StrictConstructor' => '0',
+                                      'Net::RFC3161::Timestamp' => '0',
                                       'PDL' => '2.007',
                                       'PDL::Core' => '0',
                                       'PDL::NiceSlice' => '0',

@@ -138,15 +138,15 @@ sub __fixActionCfg {
     my $name = $self->name;
     for my $action (@{$self->actionCfg}) {
         if ($action->{name}) {
-            $self->log->debug(
-               "WARNING: actions should not have a name attribute:"
+            $self->log->warn(
+               __PACKAGE__ . " action should not have a name attribute:"
              . " name=$action->{name}"
-           );
+            );
         }
         if (not $action->{key}) {
-            $self->log->debug(
-               "WARNING: actions should have a key attribute,"
-             . " using name=$action->{name} instead"
+            $self->log->warn(
+               __PACKAGE__ . " action should have a key attribute,"
+             . " created a key from name=$action->{name} instead"
             );
             $action->{key} = $action->{name};
         }

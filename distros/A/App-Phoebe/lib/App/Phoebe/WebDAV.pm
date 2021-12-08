@@ -57,7 +57,7 @@ use App::Phoebe::Web qw(handle_http_header);
 use App::Phoebe qw(@request_handlers @extensions run_extensions $server
 		   $log host_regex space_regex space port wiki_dir pages files
 		   with_lock bogus_hash);
-use File::Slurper qw(read_text write_text read_binary write_binary read_dir read_lines);
+use File::Slurper qw(read_text write_text read_binary write_binary read_dir);
 use HTTP::Date qw(time2str time2isoz);
 use Digest::MD5 qw(md5_base64);
 use Encode qw(encode_utf8 decode_utf8);
@@ -236,7 +236,7 @@ sub propfind {
       $is_dir = 0;
       if (-f "$dir/meta/$1") {
 	# MIME-type for files requires opening the meta files! 😭
-	my %meta = (map { split(/: /, $_, 2) } read_lines("$dir/meta/$1"));
+	my %meta = (map { split(/: /, $_, 2) } split /\n/, read_text "$dir/meta/$1");
 	if ($meta{'content-type'}) {
 	  $mime = $meta{'content-type'};
 	}
@@ -399,6 +399,8 @@ sub put {
   return webdav_error($stream, "Content type not known") unless $mime;
   return webdav_error($stream, "Page name is missing") unless $id;
   return webdav_error($stream, "Page names must not control characters") if $id =~ /[[:cntrl:]]/;
+  # We don't need to close the stream because this is called via process_gemini
+  # which always closes the stream in the end.
   if ($path eq "/file/$id") {
     with_lock($stream, $host, $space, sub { write_file($stream, $host, $space, $id, $buffer, $mime) } );
   } else {
@@ -420,7 +422,7 @@ sub write_page {
   my $revision = 0;
   my $new = 0;
   if (-e $file) {
-    my $old = read_text($file);
+    my $old = read_text $file;
     if ($old eq $text) {
       $log->info("$id is unchanged");
       $stream->write("HTTP/1.1 200 OK\r\n");
@@ -531,6 +533,8 @@ sub remove {
   return unless authorize($stream, $host, $space, $headers);
   return webdav_error($stream, "Page name is missing") unless $id;
   return webdav_error($stream, "Page names must not control characters") if $id =~ /[[:cntrl:]]/;
+  # We don't need to close the stream because this is called via process_gemini
+  # which always closes the stream in the end.
   if ($path eq "/file/$id") {
     with_lock($stream, $host, $space, sub { delete_file($stream, $host, $space, $id) } );
   } else {
@@ -563,7 +567,7 @@ sub delete_page {
   my $index = "$dir/index";
   if (-f $index) {
     # remove $id from the index
-    my @pages = grep { $_ ne $id } read_lines $index;
+    my @pages = grep { $_ ne $id } split /\n/, read_text $index;
     write_text($index, join("\n", @pages, ""));
   }
   my $changes = "$dir/changes.log";

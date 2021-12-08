@@ -1,0 +1,57 @@
+---
+abstract: 'A Mojolicious web service frontend leveraging OrePAN2'
+author:
+  - 'rshingleton <reshingleton@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Darkpan
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojo::Darkpan:
+    file: lib/Mojo/Darkpan.pm
+    version: '0.04'
+  Mojo::Darkpan::Config:
+    file: lib/Mojo/Darkpan/Config.pm
+  Mojo::Darkpan::Controller::Index:
+    file: lib/Mojo/Darkpan/Controller/Index.pm
+  Mojo::Darkpan::Controller::Publish:
+    file: lib/Mojo/Darkpan/Controller/Publish.pm
+  Mojo::Darkpan::Util:
+    file: lib/Mojo/Darkpan/Util.pm
+  Mojolicious::Plugin::DirectoryHandler:
+    file: lib/Mojolicious/Plugin/DirectoryHandler.pm
+requires:
+  IO::Zlib: '0'
+  JSON: '0'
+  Mojolicious: '0'
+  Mojolicious::Plugin::BasicAuthPlus: '0'
+  Moo: '0'
+  Nice::Try: '0'
+  OrePAN2: '0'
+  perl: v5.20.0
+resources:
+  bugtracker: https://github.com/rshingleton/Mojo-Darkpan/issues
+  homepage: https://github.com/rshingleton/Mojo-Darkpan
+  repository: git://github.com/rshingleton/Mojo-Darkpan.git
+version: '0.04'
+x_contributors:
+  - 'shingler <shingler@oclc.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

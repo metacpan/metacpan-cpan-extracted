@@ -139,7 +139,7 @@ for it, for Gemini only:
 
 package App::Phoebe;
 use Modern::Perl '2018';
-use File::Slurper qw(read_text read_binary read_lines read_dir write_text write_binary);
+use File::Slurper qw(read_text read_binary read_dir write_text write_binary);
 use Encode qw(encode_utf8 decode_utf8);
 use Net::IDN::Encode qw(domain_to_ascii);
 use Socket qw(:addrinfo SOCK_RAW);
@@ -151,7 +151,7 @@ use Mojo::IOLoop;
 use Mojo::Log;
 use utf8;
 
-our $VERSION = 4.03;
+our $VERSION = 4.04;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -217,7 +217,8 @@ sub get_ip_numbers {
 # options.
 sub host_regex {
   my $stream = shift;
-  return join("|", map { quotemeta domain_to_ascii $_ } keys %{$server->{host}});
+  my $re = join("|", map { quotemeta domain_to_ascii $_ } keys %{$server->{host}});
+  return qr($re)i; # case insensitive hostnames
 }
 
 # A regular expression matching wiki spaces in URLs. The tricky part is that we
@@ -301,6 +302,8 @@ sub process_titan {
     }
     alarm(0);
   };
+  # save page might still be waiting for the lock so we must not close the
+  # stream: save_page will close the stream
   return unless $@;
   $log->error("Error: $@");
   $stream->close_gracefully();
@@ -314,16 +317,35 @@ sub save_page {
   my $type = shift;
   my $data = shift;
   my $length = shift;
+  # If the operation succeeds, we can close the stream; if the operation fails,
+  # we can close the stream; but if the operation was rescheduled, we must not
+  # close the stream!
   if ($type ne "text/plain") {
     if ($length == 0) {
-      with_lock($stream, $host, $space, sub { delete_file($stream, $host, $space, $id) } );
+      with_lock($stream, $host, $space,
+		sub {
+		  delete_file($stream, $host, $space, $id);
+		  $stream->close_gracefully();
+		});
     } else {
-      with_lock($stream, $host, $space, sub { write_file($stream, $host, $space, $id, $data, $type) } );
+      with_lock($stream, $host, $space,
+		sub {
+		  write_file($stream, $host, $space, $id, $data, $type);
+		  $stream->close_gracefully();
+		});
     }
   } elsif ($length == 0) {
-    with_lock($stream, $host, $space, sub { delete_page($stream, $host, $space, $id) } );
+    with_lock($stream, $host, $space,
+	      sub {
+		delete_page($stream, $host, $space, $id);
+		$stream->close_gracefully();
+	      });
   } elsif (utf8::decode($data)) { # decodes in-place and returns success
-    with_lock($stream, $host, $space, sub { write_page($stream, $host, $space, $id, $data) } );
+    with_lock($stream, $host, $space,
+	      sub {
+		write_page($stream, $host, $space, $id, $data);
+		$stream->close_gracefully();
+	      });
   } else {
     $log->debug("The text is invalid UTF-8");
     result($stream, "59", "The text is invalid UTF-8");
@@ -353,9 +375,11 @@ sub with_lock {
     if ($@) {
       $log->error("Unable to run code with locked $lock: $@");
       result($stream, "40", "An error occured, unfortunately");
+      $stream->close_gracefully();
     }
+    # in the successful case, with_lock doesn't close in case there is more code
+    # that needs to run, or possibly $code has closed the stream.
     rmdir($lock);
-    $stream->close_gracefully();
   } elsif ($count > 25) {
     $log->error("Unable to unlock $lock");
     result($stream, "40", "The wiki is locked; try again in a few seconds");
@@ -454,7 +478,7 @@ sub delete_page {
   my $index = "$dir/index";
   if (-f $index) {
     # remove $id from the index
-    my @pages = grep { $_ ne $id } read_lines $index;
+    my @pages = grep { $_ ne $id } split /\n/, read_text $index;
     write_text($index, join("\n", @pages, ""));
   }
   my $changes = "$dir/changes.log";
@@ -672,7 +696,7 @@ sub handle_url {
 # if you call this yourself, $id must look like "page/foo"
 sub to_url {
   my $stream = shift;
-  my $host = shift;
+  my $host = lc shift;
   my $space = shift;
   my $id = shift;
   my $scheme = shift || "gemini";
@@ -731,9 +755,9 @@ sub pages {
     return if not -d "$dir/page";
     my @pages = map { s/\.gmi$//; $_ } read_dir("$dir/page");
     write_text($index, join("\n", @pages, ""));
-    return sort { newest_first($stream, $host, $a, $b) } @pages;
+    return sort newest_first @pages;
   }
-  my @lines = sort { newest_first($stream, $host, $a, $b) } read_lines $index;
+  my @lines = sort newest_first split /\n/, read_text $index;
   return grep /$re/i, @lines if $re;
   return @lines;
 }
@@ -1826,7 +1850,7 @@ sub serve_file {
     result($stream, "40", "Metadata not found");
     return;
   }
-  my %meta = (map { split(/: /, $_, 2) } read_lines($meta));
+  my %meta = (map { split(/: /, $_, 2) } split /\n/, read_text $meta);
   if (not $meta{'content-type'}) {
     result($stream, "59", "Metadata corrupt");
     return;
@@ -2086,13 +2110,9 @@ sub valid_mime_type {
   my $type = $params->{mime};
   my ($main_type) = split(/\//, $type, 1);
   my @types = @{$server->{wiki_mime_type}};
-  if (not $type) {
-    $log->debug("Uploads require a MIME type");
-    result($stream, "59", "Uploads require a MIME type");
-    $stream->close_gracefully();
-    return;
-  } elsif ($type ne "text/plain" and not grep(/^$type$/, @types) and not grep(/^$main_type$/, @types)) {
-    $log->debug("This wiki does not allow $type");
+  @types = ("text/plain") unless @types;
+  if ($type ne "text/plain" and not grep(/^$type$/, @types) and not grep(/^$main_type$/, @types)) {
+    $log->debug("This wiki does not allow $type (@types)");
     result($stream, "59", "This wiki does not allow $type");
     $stream->close_gracefully();
     return;

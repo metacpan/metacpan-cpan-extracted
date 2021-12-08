@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile;
-$Lab::Moose::DataFile::VERSION = '3.792';
+$Lab::Moose::DataFile::VERSION = '3.800';
 #ABSTRACT: Base class for data file types
 
 use v5.20;
@@ -17,6 +17,8 @@ use File::Basename qw/dirname basename/;
 use File::Path 'make_path';
 use Lab::Moose::Catfile 'our_catfile';
 use IO::Handle;
+
+use Net::RFC3161::Timestamp;
 
 use Carp;
 
@@ -38,6 +40,18 @@ has autoflush => (
     is      => 'ro',
     isa     => 'Bool',
     default => 1
+);
+
+has timestamp => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0
+);
+
+has tsauthority => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'dfn.de'
 );
 
 has filehandle => (
@@ -125,8 +139,26 @@ sub _open_file {
     $self->_filehandle($fh);
 }
 
-__PACKAGE__->meta->make_immutable();
 
+sub _close_file {
+    my $self = shift;
+    my $fh = $self->filehandle();
+
+    close $fh || croak "cannot close datafile";
+}
+
+sub DEMOLISH {
+    my $self = shift;
+
+    if ( $self->timestamp() ) {
+
+        $self->_close_file();
+        attest_file($self->path(), $self->path().".ts", $self->tsauthority());
+
+    }
+};
+
+__PACKAGE__->meta->make_immutable();
 
 1;
 
@@ -142,7 +174,7 @@ Lab::Moose::DataFile - Base class for data file types
 
 =head1 VERSION
 
-version 3.792
+version 3.800
 
 =head1 METHODS
 
@@ -169,6 +201,22 @@ filename in the folder.
 
 Enable autoflush of the filehandle. On by default.
 
+=item timestamp
+
+Request RFC3616 compatible timestamps of the measured data
+upon completion, from the timestamp authority specified via
+tsauthority. Off by default.
+
+If enabled, an additional file with the suffix .ts containing
+the signed timestamp will be created.
+
+=item tsauthority
+
+When timestamps are requested, specify the authority to be
+contacted. The parameter can be a shorthand as, e.g., "dfn.de";
+see L<Net::RFC3161::Timestamp> for details. If no valid shorthand
+is found, the parameter is interpreted as a RFC3161 URL.
+
 =item mode
 
 C<open> mode. Defaults to ">".
@@ -194,7 +242,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020-2021  Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

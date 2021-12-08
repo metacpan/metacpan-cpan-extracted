@@ -569,6 +569,7 @@ sub who {
   success($stream);
   $stream->write("# Who are the shape shifters?\n");
   for my $o (sort { $b->{ts} <=> $a->{ts} } @{$data->{people}}) {
+    $o->{name} //= "";
     $stream->write(encode_utf8 "* $o->{name}, active " . timespan($now - $o->{ts}) . "\n");
   }
   $stream->write("=> /play/ijirait Back\n");

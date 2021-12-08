@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use v5.20;
+use strict;
+use warnings;
+use Mojo::File qw(curfile);
+use lib curfile->dirname->sibling('lib')->to_string;
+use lib curfile->dirname->sibling('local/lib')->to_string;
+use Mojolicious::Commands;
+use Mojo::Server::Prefork;
+use Mojo::Darkpan;
+use Mojo::Darkpan::Config;
+use Getopt::Long;
+use File::Temp qw(tempfile);
+use Data::Dumper;
+
+my ($devmode, $config, $port);
+
+GetOptions(
+    'devmode'  => \$devmode,
+    'config=s' => \$config,
+    'port=i'   => \$port,
+);
+
+$port //= 3000;
+
+$ENV{DARKPAN_CONFIG_FILE} = $config if defined $config;
+
+if (defined $devmode) {
+    my $app = curfile->dirname . "/darkpan_app.pl";
+    my $lib = curfile->dirname->sibling('lib');
+    system("morbo -w $lib -v $app -l http://*:$port")
+
+}
+else {
+    $ENV{MOJO_MODE}='production';
+    my $darkpan = Mojo::Server::Prefork->new(listen => [ 'http://*:' . $port ]);
+    $darkpan->app(Mojo::Darkpan->new);
+    $darkpan->run;
+}
+
