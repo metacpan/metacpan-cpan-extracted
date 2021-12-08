@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.66 2021-12-08
+
+ - Replace IO::Pipe with IPC::Run
+
 1.65 2021-11-04
 
  - Add linespacing template option

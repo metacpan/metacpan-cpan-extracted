@@ -4,7 +4,7 @@ use strict;
 
 use Carp;
 
-our $VERSION = '2.042'; # VERSION
+our $VERSION = '2.043'; # VERSION
 
 sub new {
     my $type = shift();

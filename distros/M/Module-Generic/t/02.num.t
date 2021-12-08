@@ -15,27 +15,34 @@ BEGIN
 
     my %old = %ENV;
     my @rem = qw( LANG LANGUAGE LC_ADDRESS LC_ALL LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME );
+    no warnings 'uninitialized';
     for( @rem )
     {
         #$ENV{$_} = undef();
         delete( $ENV{$_} );
+        next if( $_ eq 'LC_NAME' || $_ eq 'LC_TYPE' );
+        # no strict 'refs';
+        # POSIX::setlocale( &{"POSIX\::$_"}, undef ) if( substr( $_, 0, 3 ) eq 'LC_' );
     }
-    #no warnings 'uninitialized';
-    #POSIX::setlocale( &POSIX::LC_ALL, undef() );
-    ## XXX To be removed before release
-    #use Data::Dumper;
-    #$Data::Dumper::Sortkeys = 1;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 # diag( "Environment variables: ", Dumper( \%ENV ) );
 
 BEGIN { use_ok( 'Module::Generic::Number' ) || BAIL_OUT( "Unable to load Module::Generic::Number" ); }
+my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
+diag( "Current locale is '$curr_locale'" ) if( $DEBUG );
+# require Data::Dump;
+# diag( "Environement variables: ", Data::Dump::dump( \%ENV ) );
 
-## RT #132674
-## Stupid me. I should compare the result to the locale variables unless they are explicitely set
-## my $prev_locale = POSIX::setlocale( &POSIX::LC_ALL );
-## my $new_loc = POSIX::setlocale( &POSIX::LC_ALL, 'de_DE' );
+# RT #132674
+# Stupid me. I should compare the result to the locale variables unless they are explicitely set
+# my $prev_locale = POSIX::setlocale( &POSIX::LC_ALL );
+# my $new_loc = POSIX::setlocale( &POSIX::LC_ALL, 'de_DE' );
 my $lconv = POSIX::localeconv();
+# $lconv = $Module::Generic::Number::DEFAULT if( !scalar( keys( %$lconv ) ) || ( scalar( keys( %$lconv ) ) == 1 && CORE::exists( $lconv->{decimal_point} ) ) );
+$lconv = $Module::Generic::Number::DEFAULT if( !$curr_locale );
+# diag( "localeconv contains: ", Data::Dump::dump( $lconv ), "\n" ) if( $DEBUG );
 # $lconv->{mon_thousands_sep} = $lconv->{thousands_sep} = undef();
 #         my $fail = [qw(
 # frac_digits
@@ -48,7 +55,7 @@ my $lconv = POSIX::localeconv();
 # p_sign_posn
 #         )];
 #         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
-## POSIX::setlocale( &POSIX::LC_ALL, $prev_locale );
+# POSIX::setlocale( &POSIX::LC_ALL, $prev_locale );
 my( $sep_space, $tho_sep, $dec_sep, $n );
 if( scalar( keys( %$lconv ) ) )
 {
@@ -59,14 +66,14 @@ if( scalar( keys( %$lconv ) ) )
     $dec_sep = CORE::length( $lconv->{decimal_point} )
         ? $lconv->{decimal_point}
         : $lconv->{mon_decimal_point};
-    $n = Module::Generic::Number->new( 10, precision => 2, debug => 0 );
+    $n = Module::Generic::Number->new( 10, precision => 2, debug => $DEBUG );
 }
 else
 {
     diag( "No locale could be found for language \"$ENV{LANG}\"" );
     $tho_sep = ',';
     $dec_sep = '.';
-    $n = Module::Generic::Number->new( 10, precision => 2, thousand => $tho_sep, decimal => $dec_sep, debug => 0 );
+    $n = Module::Generic::Number->new( 10, precision => 2, thousand => $tho_sep, decimal => $dec_sep, debug => $DEBUG );
 }
 if( !defined( $n ) )
 {

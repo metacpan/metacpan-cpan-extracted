@@ -43,7 +43,7 @@ L<https://github.com/pombase/chobo>
 
 =item * a CV named "cv_property_type" containing a term named "cv_version"
 
-=item * a CV names "cvterm_property_type" containing a term named "replaced_by"
+=item * a CV named "cvterm_property_type" containing terms named "replaced_by" and "consider"
 
 =back
 

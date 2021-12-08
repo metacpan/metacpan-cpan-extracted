@@ -3,7 +3,7 @@ package Database::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use parent qw(Database::Async::DB IO::Async::Notifier);
 
@@ -277,9 +277,9 @@ Returns the L<Database::Async::Pool> instance.
 
 sub pool {
     my ($self) = @_;
-    $self->{pool} //= Database::Async::Pool->new(
+    $self->{pool} ||= Database::Async::Pool->new(
         $self->pool_args
-    )
+    );
 }
 
 =head2 pool_args
@@ -501,6 +501,14 @@ sub notification {
 sub notification_source {
     my ($self, $name) = @_;
     $self->{notification_source}{$name} //= $self->new_source;
+}
+
+sub _add_to_loop {
+    my ($self, $loop) = @_;
+    $self->add_child(
+        $self->pool
+    );
+    return;
 }
 
 1;

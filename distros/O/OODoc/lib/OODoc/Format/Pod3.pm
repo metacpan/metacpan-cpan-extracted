@@ -1,13 +1,16 @@
-# Copyrights 2003-2015 by [Mark Overmeer].
+# Copyrights 2003-2021 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of perl distribution OODoc.  It is licensed under the
+# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+
 use strict;
 use warnings;
 
 package OODoc::Format::Pod3;
 use vars '$VERSION';
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 use base 'OODoc::Format::Pod';
 
@@ -69,7 +72,18 @@ sub structure($$$)
     $descr =~ s/\n*$/\n\n/
         if defined $descr && length $descr;
 
-    my @examples = $object->examples;
+    my @examples;
+    foreach my $example ($object->examples)
+    {   my $title = $example->name || 'Example';
+		$title = "Example: $example" if $title !~ /example/i;
+		$title =~ s/\s+$//;
+
+        push @examples,
+         +{ title => $title
+          , descr => $self->cleanup($manual, $example->description)
+          };
+    }
+
     my @extends;
 
     unless($name eq 'NAME' || $name eq 'SYNOPSIS') 
@@ -229,6 +243,9 @@ Extends L<"<{header}>" in <{manual}>|<{manual}>/"<{header}>">.
 
 
 <{macro name=example}>\
+B<. <{title}>>
+
+<{descr}>
 <{/macro}>\
 
 

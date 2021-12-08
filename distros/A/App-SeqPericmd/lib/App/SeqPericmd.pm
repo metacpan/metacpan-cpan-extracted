@@ -1,7 +1,7 @@
 package App::SeqPericmd;
 
-our $DATE = '2016-09-28'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2021-07-17'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 use strict;
@@ -60,6 +60,9 @@ _
             cmdline_aliases => {f=>{}},
         },
     },
+    result => {
+        schema => ['array*', of=>'float*'],
+    },
     examples => [
         {
             summary => 'Generate whole numbers from 1 to 10 (1, 2, ..., 10)',
@@ -109,6 +112,16 @@ _
             src_plang => 'bash',
             'x.doc.show_result' => 0,
         },
+    ],
+    links => [
+        {url=>'prog:seq'},
+        {url=>'prog:seq-pl'},
+        {url=>'prog:seq-intrange'},
+        {url=>'prog:seq-numseq'},
+        {url=>'prog:numseq'},
+        {url=>'prog:primes'},
+        {url=>'prog:primes.pl'},
+        {url=>'prog:primes-pericmd'},
     ],
 };
 sub seq {
@@ -192,14 +205,18 @@ App::SeqPericmd - Rinci-/Perinci::CmdLine-based "seq"-like CLI utility
 
 =head1 VERSION
 
-This document describes version 0.04 of App::SeqPericmd (from Perl distribution App-SeqPericmd), released on 2016-09-28.
+This document describes version 0.050 of App::SeqPericmd (from Perl distribution App-SeqPericmd), released on 2021-07-17.
 
 =head1 FUNCTIONS
 
 
-=head2 seq(%args) -> [status, msg, result, meta]
+=head2 seq
 
-Rinci-/Perinci::CmdLine-based "seq"-like CLI utility.
+Usage:
+
+ seq(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Rinci-E<sol>Perinci::CmdLine-based "seq"-like CLI utility.
 
 This utility is similar to Unix C<seq> command, with a few differences: some
 differences in option names, JSON output, allow infinite stream (when C<to> is
@@ -233,18 +250,19 @@ sprintf() format for each number.
 
 =item * B<to> => I<float>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
-Return value:  (any)
+Return value:  (array[float])
 
 =head1 HOMEPAGE
 
@@ -268,7 +286,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

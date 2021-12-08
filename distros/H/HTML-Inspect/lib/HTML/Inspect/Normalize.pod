@@ -1,0 +1,105 @@
+=encoding utf8
+
+=head1 NAME
+
+HTML::Inspect::Normalize - normalize urls
+
+=head1 INHERITANCE
+
+  HTML::Inspect::Normalize
+    is an Exporter
+
+=head1 SYNOPSIS
+
+  set_page_base($base_url);  # used as base for relative urls
+  my $norm = normalize_url($relative_url);
+  my ($norm, $rc, $err) = normalize_url($relative_url);
+
+=head1 DESCRIPTION
+
+Although being part of module L<HTML::Inspect>, it has a right of its own:
+the functions really, really fast convert sloppy C<http> and C<https>
+urls as found on webpages into cleanly normalized urls.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<normalize_url>($url)
+
+Normalize a URL relative to the base (which needs to be set first).
+Same returns as L<set_page_base()>.
+
+=item B<set_page_base>($base_url)
+
+In LIST context, returns the normalized_url (string), rc, and errmsg.
+In SCALAR content, only returns the normalized_url and casts error
+exception when a problem was found.  The base is normalized before use.
+
+=back
+
+=head1 DETAILS
+
+See also F<https://pipeline.shared-search.eu/extract/normalize.html>
+
+The following actions are taken:
+
+=over 4
+
+=item * leading and trailing blanks are stripped
+
+=item * spaces (CR, LF, TAB, VTAB) are moved, and following blanks as well
+
+=item * relative urls are converted to absolute
+
+=item * '+' and included blanks are converted to C<%20>
+
+=item * hex representation of normal characters (which includes comma and more) is converted back into their character
+
+=item * characters which need to be encoded are converted to hex
+
+=item * hex digits are upper-cased
+
+=item * utf8 characters get hex encoded
+
+=item * hex encoding must be valid utf8, possibly multi-byte
+
+=item * fragment is removed
+
+=item * empty path will becomde '/'
+
+=item * remove C< ./ > and C< ../ >
+
+=item * removed repeating slashes
+
+=item * hostnames with utf8 get IDN encoded
+
+=item * hostname syntax verified
+
+=item * remove trailing dot from hostname
+
+=item * default port numbers removed
+
+=item * port numbers leading zeros removed, restricted to max 65535
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::Inspect>, L<URI::Fast>
+
+=encoding utf-8
+
+=head1 SEE ALSO
+
+This module is part of HTML-Inspect distribution version 1.00,
+built on December 08, 2021. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2021 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

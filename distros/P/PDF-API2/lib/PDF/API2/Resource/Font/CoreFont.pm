@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '2.042'; # VERSION
+our $VERSION = '2.043'; # VERSION
 
 use File::Basename;
 

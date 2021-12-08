@@ -11,6 +11,7 @@ use Database::Async::Engine::Empty;
 my $db = new_ok(
     'Database::Async', [
         pool => {
+            backoff => 'none',
             min => 0,
             max => 5
         }

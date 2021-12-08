@@ -2,9 +2,9 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.343 of Calendar::Indonesia::Holiday
+    This document describes version 0.344 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2021-11-15.
+    2021-11-16.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
@@ -85,10 +85,23 @@ SYNOPSIS
      my $res = count_idn_workdays();
 
 DESCRIPTION
-    This module provides functions to list Indonesian holidays.
+    This module provides functions to list Indonesian holidays. There is a
+    command-line script interface for this module: list-idn-holidays.
 
-    There is a command-line script interface for this module:
-    list-id-holidays.
+    Note: Note that sometimes the holiday (as set by law) falls at a
+    different date than the actual religious commemoration date. When you
+    use the "detail" option, the "original_date" key will show you the
+    actual religious date.
+
+    Note: it is also possible that multiple (religious, cultural) holidays
+    fall on the same national holiday. An example is May 8, 1997 which is
+    commemorated as Hijra 1418H as well as Ascension Day. When this happens,
+    the "holidays" key will contain the details of each religious/cultural
+    holiday.
+
+    Caveat: aside from national holidays, some provinces sometimes declare
+    their own (e.g. governor election day for East Java province, etc). This
+    is currently not yet included in this module.
 
 DEVELOPER NOTES
     To mark that a holiday has been moved from its original date, use the
@@ -893,12 +906,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Calendar-Indonesia-Holiday>.
-
-SEE ALSO
-    This API will also be available on GudangAPI, http://gudangapi.com/
-
-    Aside from national holidays, some provinces declare their own (e.g.
-    governor election day for East Java province, etc).
 
 AUTHOR
     perlancar <perlancar@cpan.org>

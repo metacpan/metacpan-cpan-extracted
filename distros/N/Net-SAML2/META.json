@@ -33,20 +33,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Class::Accessor" : "0",
             "Crypt::OpenSSL::Bignum" : "0",
-            "Crypt::OpenSSL::DSA" : "0",
             "Crypt::OpenSSL::RSA" : "0",
             "Crypt::OpenSSL::Random" : "0",
             "Crypt::OpenSSL::Verify" : "0",
             "Crypt::OpenSSL::X509" : "0",
-            "Crypt::PK::ECC" : "0",
             "DateTime" : "0",
             "DateTime::Format::XSD" : "0",
             "DateTime::HiRes" : "0",
-            "Digest::SHA" : "0",
-            "Encode" : "0",
             "Exporter" : "0",
             "File::Slurp" : "0",
             "HTTP::Request::Common" : "0",
@@ -66,9 +60,9 @@
             "URI::QueryParam" : "0",
             "XML::Generator" : "0",
             "XML::LibXML" : "0",
+            "XML::Sig" : "0.52",
             "XML::Writer" : "0.625",
             "base" : "0",
-            "constant" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.008_001",
             "strict" : "0",
@@ -97,63 +91,63 @@
    "provides" : {
       "Net::SAML2" : {
          "file" : "lib/Net/SAML2.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Binding::POST" : {
          "file" : "lib/Net/SAML2/Binding/POST.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Binding::Redirect" : {
          "file" : "lib/Net/SAML2/Binding/Redirect.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Binding::SOAP" : {
          "file" : "lib/Net/SAML2/Binding/SOAP.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::IdP" : {
          "file" : "lib/Net/SAML2/IdP.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Protocol::ArtifactResolve" : {
          "file" : "lib/Net/SAML2/Protocol/ArtifactResolve.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Protocol::Assertion" : {
          "file" : "lib/Net/SAML2/Protocol/Assertion.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Protocol::AuthnRequest" : {
          "file" : "lib/Net/SAML2/Protocol/AuthnRequest.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Protocol::LogoutRequest" : {
          "file" : "lib/Net/SAML2/Protocol/LogoutRequest.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Protocol::LogoutResponse" : {
          "file" : "lib/Net/SAML2/Protocol/LogoutResponse.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Role::ProtocolMessage" : {
          "file" : "lib/Net/SAML2/Role/ProtocolMessage.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::SP" : {
          "file" : "lib/Net/SAML2/SP.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::Util" : {
          "file" : "lib/Net/SAML2/Util.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::XML::Sig" : {
          "file" : "lib/Net/SAML2/XML/Sig.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       },
       "Net::SAML2::XML::Util" : {
          "file" : "lib/Net/SAML2/XML/Util.pm",
-         "version" : "0.46"
+         "version" : "0.49"
       }
    },
    "release_status" : "stable",
@@ -167,7 +161,7 @@
          "web" : "https://github.com/perl-net-saml2/perl-Net-SAML2"
       }
    },
-   "version" : "0.46",
+   "version" : "0.49",
    "x_contributors" : [
       "Chris Andrews <chris@nodnol.org>",
       "Oskari Okko Ojala <okko@frantic.com>",

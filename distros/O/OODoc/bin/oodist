@@ -7,7 +7,7 @@ use Log::Report   'oodoc';
 
 use Getopt::Long      qw/GetOptions :config gnu_getopt/;
 use POSIX             qw/strftime/;
-use Cwd               qw/getcwd/;
+use Cwd               qw/getcwd realpath/;
 use File::Slurp       qw/read_file/;
 use List::Util        qw/first/;
 use File::Copy        qw/move copy/;
@@ -63,16 +63,26 @@ GetOptions
 
 dispatcher mode => $verbose, 'ALL';
 
-my %licenses = ( artistic => <<__ARTISTIC, gpl => <<__GPL);
+my %licenses =
+  ( artistic => <<__ARTISTIC,
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+__ARTISTIC
+  , as_perl => <<__PERL,
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
-__ARTISTIC
+See F<http://dev.perl.org/licenses/>
+__PERL
+  , gpl => <<__GPL
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 for more details: F<http://www.gnu.org/licenses/gpl.html>
 __GPL
+);
+$licenses{perl}   = $licenses{as_perl};
+$licenses{perl_5} = $licenses{as_perl};
 
 my $ooversion = $OODoc::VERSION || $ENV{OODOC_VERSION};
 
@@ -105,7 +115,7 @@ my $version  = $makefile->{VERSION};
 $firstyear ||= $makefile->{FIRST_YEAR};
 $rawdir    ||= $makefile->{RAWDIR}  || $ENV{OODIST_RAWDIR}  || '.';
 $distdir   ||= $makefile->{DISTDIR} || $ENV{OODIST_DISTDIR} || '.';
-$license   ||= $makefile->{LICENSE} || $ENV{OODIST_LICENSE} || 'artistic';
+$license   ||= $makefile->{LICENSE} || $ENV{OODIST_LICENSE} || 'as_perl';
 $email     ||= $makefile->{EMAIL};
 $website   ||= $makefile->{WEBSITE};
 $extends   ||= $makefile->{EXTENDS} || '';;
@@ -224,7 +234,7 @@ exit 0;
 #
 
 sub parse_additional_dists(@)
-{   my @extras = @_;
+{   my @extras = map realpath($_), @_;
 
     # Read all files which are in other modules, but contain information
     # which is required to produce the pod.
@@ -792,11 +802,11 @@ automatically added like C<-2006>, which results in C<1998-2000,2003-2006>.
 When the current year is detected at the end of the string, the year will
 not be added again.
 
-=item --license  | -l ['gpl'|'artistic'|filename]
+=item --license  | -l ['gpl'|'artistic'|'as_perl'|filename]
 
 The lisense option is a special case: it can contain either the
-strings C<gpl> or C<artistic>, or a filename which is used to
-read the actual license text from.  The default is C<artistic>
+strings C<gpl>, C<artistic>, or C<as_perl>, or a filename which is used to
+read the actual license text from.  The default is C<as_perl>
 
 =item --pmhead
 

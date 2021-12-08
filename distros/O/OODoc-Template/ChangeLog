@@ -1,7 +1,13 @@
 
 === version history of OODoc::Template
 
+version 0.17: Wed  8 Dec 13:25:11 CET 2021
+
+	Improvements:
+	- published via GitHub
+
 version 0.16: Fri Jan 11 10:00:05 CET 2013
+
 	Improvements:
 	- use Log::Report for errors
 	- attributes can be quoted with '' and "" to permit \W
@@ -55,6 +61,8 @@ version 0.11: Fri Jul 27 11:32:08 CEST 2007
 version 0.10: Tue Jul 24 23:39:55 CEST 2007
 	- Everything changed, except the concept.
 	- real tests!
+
+version 0.03:
 
 version 0.02: Fri Jun  8 17:14:26 CEST 2007
 	- Added t/00run.t to MANIFEST to stop complaints from

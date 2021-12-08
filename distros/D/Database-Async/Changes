@@ -1,5 +1,10 @@
 Revision history for Database-Async
 
+0.017     2021-12-08 22:50:12+08:00 Asia/Kuala_Lumpur
+    [New features]
+
+    - basic exponential backoff support when reconnecting
+
 0.016     2021-09-13 00:40:59+08:00 Asia/Kuala_Lumpur
     [New features]
 

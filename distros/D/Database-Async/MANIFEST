@@ -14,6 +14,9 @@ lib/Database/Async.pm
 lib/Database/Async.pod
 lib/Database/Async/Backoff.pm
 lib/Database/Async/Backoff/Exponential.pm
+lib/Database/Async/Backoff/Exponential.pod
+lib/Database/Async/Backoff/None.pm
+lib/Database/Async/Backoff/None.pod
 lib/Database/Async/DB.pm
 lib/Database/Async/Engine.pm
 lib/Database/Async/Engine.pod
@@ -27,6 +30,7 @@ lib/Database/Async/ORM/Schema.pm
 lib/Database/Async/ORM/Table.pm
 lib/Database/Async/ORM/Type.pm
 lib/Database/Async/Pool.pm
+lib/Database/Async/Pool.pod
 lib/Database/Async/Query.pm
 lib/Database/Async/Row.pm
 lib/Database/Async/StatementHandle.pm

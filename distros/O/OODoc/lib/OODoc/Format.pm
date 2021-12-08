@@ -1,11 +1,13 @@
-# Copyrights 2003-2015 by [Mark Overmeer].
+# Copyrights 2003-2021 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of perl distribution OODoc.  It is licensed under the
+# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
 
 package OODoc::Format;
 use vars '$VERSION';
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 use base 'OODoc::Object';
 
@@ -63,8 +65,6 @@ sub showChapter(@)
     my $show_ch  = $args{show_inherited_chapter}    || 'REFER';
     my $show_sec = $args{show_inherited_section}    || 'REFER';
     my $show_ssec= $args{show_inherited_subsection} || 'REFER';
-warn "show $chapter in $manual ($show_ch, $show_sec, ", ref($self), ")\n"
-   if ref $self =~ m/pod/i;
 
     if($manual->inherited($chapter))
     {    return $self if $show_ch eq 'NO';
@@ -120,7 +120,7 @@ sub chapterCopyrights(@)  {shift->showOptionalChapter(COPYRIGHTS  => @_)}
 #-------------------------------------------
 
 
-sub showRequiredChapter($@)
+sub showRequiredChapter($%)
 {   my ($self, $name, %args) = @_;
     my $manual  = $args{manual} or panic;
     my $chapter = $manual->chapter($name);
@@ -206,7 +206,7 @@ sub showSubroutine(@)
 
     $self->$show_use(%args, subroutine => $subroutine)
        if defined $show_use;
- 
+
     return unless $expand;
 
     $args{show_inherited_options} ||= 'USE';
@@ -229,7 +229,7 @@ sub showSubroutine(@)
          { $show_descr = undef if $manual->inherited($description) }
     elsif($descr eq 'ALL') {;}
     else { error __x"illegal value for show_sub_description: {v}", v => $descr}
-    
+
     $self->$show_descr(%args, subroutine => $description)
           if defined $show_descr;
 
@@ -250,7 +250,7 @@ sub showSubroutine(@)
      : $opttab eq 'INHERITED'? (grep {$manual->inherits($_->[0])} @options)
      : $opttab eq 'ALL'      ? @options
      : error __x"illegal value for show_option_table: {v}", v => $opttab;
-    
+
     $self->showOptionTable(%args, options => \@opttab)
        if @opttab;
 
@@ -274,7 +274,7 @@ sub showSubroutine(@)
     my $show_ex  = $args{show_examples} || 'EXPAND';
     $self->showExamples(%args, examples => \@examples)
         if $show_ex eq 'EXPAND';
-    
+
     # Diagnostics
 
     my @diags    = $subroutine->diagnostics;
@@ -349,7 +349,7 @@ sub showOptions(@)
           = $show eq 'USE'   ? 'showOptionUse'
           : $show eq 'EXPAND'? 'showOptionExpand'
           : error __x"illegal show option choice: {v}", v => $show;
- 
+
         $self->$action(%args, option => $option, default => $default);
     }
     $self;

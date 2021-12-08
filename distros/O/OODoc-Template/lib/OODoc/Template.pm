@@ -1,13 +1,16 @@
-# Copyrights 2003,2007-2013 by [Mark Overmeer].
+# Copyrights 2003,2007-2021 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.00.
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of perl distribution OODoc-Template.  It is licensed under
+# the same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+
 use strict;
 use warnings;
 
 package OODoc::Template;
 use vars '$VERSION';
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 
 use Log::Report  'oodoc-template';
@@ -458,7 +461,7 @@ sub parseAttrs($)
         $attrs{$k} = \@steps;
     }
 
-    error __x"attribute error in {tag}'", tag => $_[1]
+    error __x"attribute error in '{tag}'", tag => $_[1]
         if length $string;
 
     \%attrs;

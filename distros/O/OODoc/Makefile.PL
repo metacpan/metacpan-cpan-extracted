@@ -1,9 +1,9 @@
 use ExtUtils::MakeMaker;
 
 WriteMakefile
-  ( NAME	 => 'OODoc'
-  , VERSION      => '2.01'
-  , PREREQ_PM    =>
+  ( NAME	  => 'OODoc'
+  , VERSION   => '2.02'
+  , PREREQ_PM =>
     { Test::More              => 0.47
     , File::Slurp             => 9999.12
     , OODoc::Template         => 0.16
@@ -12,7 +12,19 @@ WriteMakefile
 
   , AUTHOR       => 'Mark Overmeer'
   , ABSTRACT     => 'Object Oriented Documentation'
-  , LICENSE      => 'perl'
+  , LICENSE      => 'perl_5'
+  , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-OODoc.git'
+              , web  => 'https://github.com/markov2/perl5-OODoc'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
   );
 
 ### used by oodist during production of distribution
@@ -27,7 +39,7 @@ LICENSE		= artistic
 FIRST_YEAR      = 2003
 EMAIL           = oodoc@overmeer.net
 WEBSITE         = http://perl.overmeer.net/oodoc/
-EXTENDS         = ../OODocTemplate
+EXTENDS         = ../OODoc-Template
 
 # for HTML
 HTML_OUTPUT	= ../public_html/oodoc/html

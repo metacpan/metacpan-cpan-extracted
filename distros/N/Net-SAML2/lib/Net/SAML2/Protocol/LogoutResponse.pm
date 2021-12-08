@@ -9,7 +9,7 @@ with 'Net::SAML2::Role::ProtocolMessage';
 
 # ABSTRACT: SAML2 LogoutResponse Protocol object
 
-our $VERSION = '0.46';
+our $VERSION = '0.49';
 
 
 has 'status'      => (isa => 'Str', is => 'ro', required => 1);
@@ -91,7 +91,7 @@ Net::SAML2::Protocol::LogoutResponse - SAML2 LogoutResponse Protocol object
 
 =head1 VERSION
 
-version 0.46
+version 0.49
 
 =head1 SYNOPSIS
 

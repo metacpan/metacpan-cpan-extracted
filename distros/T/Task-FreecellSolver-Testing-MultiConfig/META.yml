@@ -20,7 +20,7 @@ name: Task-FreecellSolver-Testing-MultiConfig
 provides:
   Task::FreecellSolver::Testing::MultiConfig:
     file: lib/Task/FreecellSolver/Testing/MultiConfig.pm
-    version: v0.0.5
+    version: v0.0.6
 requires:
   App::Deps::Verify: '0'
   App::Docmake: '0'
@@ -35,6 +35,7 @@ requires:
   HTML::Toc: '0'
   HTML::TocGenerator: '0'
   Markdent: '0'
+  Math::RNG::Microsoft: '0'
   Parallel::ForkManager::Segmented: '0'
   Perl::Critic::Freenode: '0'
   Pod::Coverage::TrustPod: '0'
@@ -56,7 +57,7 @@ resources:
   bugtracker: https://github.com/shlomif/fc-solve/issues
   homepage: http://metacpan.org/release/Task-FreecellSolver-Testing-MultiConfig
   repository: git://github.com/shlomif/fc-solve.git
-version: 0.0.5
+version: 0.0.6
 x_Dist_Zilla:
   perl:
     version: '5.034000'

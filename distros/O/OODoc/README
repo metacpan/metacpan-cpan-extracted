@@ -1,44 +1,25 @@
-=== OODist README
+=== README for OODoc version 2.02
+=   Generated on Wed Dec  8 13:33:18 2021 by OODoc 2.02
 
-From release 0.96, the OODoc module contains a script named 'oodist',
-which simplifies the creation of pod and HTML enormously.  You do not
-need to create mkdoc and mkdist scripts anymore: simply add a few lines
-to your Makefile.PL is sufficient.
+There are various ways to install this module:
 
-= about the examples
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
 
-The OODoc module will be used to produce the manuals for many packages
-by the same author.  Some of these modules are small, some are larger.
-The setup for these packages are included in this distribution as
-examples.
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
 
-WARNING: Since OODoc v0.96, you can use the oodist script to produce
-         the manual pages.  You do not need the mkdoc and mkdist
-         scripts anymore, but still need the html/* files from these
-         examples.
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d OODoc-2.02.tar.gz
+       tar -xf OODoc-2.02.tar
+       cd OODoc-2.02
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
 
-WARNING: You can not use the examples without modifying them to
-         contain your local directory paths.  Be careful!
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/OODoc-2.02/
 
-
-+ Examples:
-
-examples/orl.tar.gz
-   Extremely simple distribution (only one module!) which even doesn't
-   produce any HTML output, just plain pod.
-
-examples/mimetypes.tar.gz
-   About the simplest full output you can get: two modules in this
-   distribution, with both pod and html output.
-   See http://perl.overmeer.net/mimetypes/html for its output.
-
-examples/oodoc.tar.gz
-   The setup for the OODoc distribution itselves.  This is a quite
-   large set of modules, which causes a large amount of template files.
-   See http://perl.overmeer.net/oodoc/html for its output.
-
-examples/mailbox.tar.gz
-   The most complicated module which is controlled by OODoc: the
-   Mail::Box module.  This is by far most complex test case for OODoc,
-   grouping the docs of multiple distributions.
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=OODoc
 

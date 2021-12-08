@@ -14,10 +14,10 @@ tool you use to manage your installation of Perl, e.g. any of
 Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
-  perl Build.PL
-  ./Build
-  ./Build test
-  ./Build install
+  perl Makefile.PL
+  make
+  make test
+  make install
 
 COPYRIGHT AND LICENSE
 

@@ -17,7 +17,7 @@ use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use EBook::EPUB::Lite;
 use File::Copy;
 use File::Spec;
-use IO::Pipe;
+use IPC::Run qw(run);
 use File::Basename ();
 
 # ours
@@ -717,14 +717,13 @@ sub _compile_pdf {
                 system(@$exec) == 0 or $self->log_fatal("Errors running " . join(" ", @$exec) ."\n");
             }
         }
-        my $pipe = IO::Pipe->new;
-        # parent swallows the output
         my $latexname = $self->luatex ? 'LuaLaTeX' : 'XeLaTeX';
         my $latex = $self->luatex ? 'lualatex' : 'xelatex';
-        $pipe->reader($latex, '-interaction=nonstopmode', $source);
-        $pipe->autoflush(1);
+        my @run = ($latex, '-interaction=nonstopmode', $source);
+        my ($in, $out, $err);
+        my $ok = run \@run, \$in, \$out, \$err;
         my $shitout;
-        while (my $line = <$pipe>) {
+        foreach my $line (split(/\n/, $out)) {
             if ($line =~ m/^[!#]/) {
                 if ($line =~ m/^! Paragraph ended before/) {
                     $self->log_info("***** WARNING *****\n"
@@ -768,10 +767,8 @@ HELP
                 $self->log_info(decode_utf8($line));
             }
         }
-        wait;
-        my $exit_code = $? >> 8;
-        if ($exit_code != 0) {
-            $self->log_info("$latexname compilation failed with exit code $exit_code\n");
+        unless ($ok) {
+            $self->log_info("$latexname compilation failed\n");
             if (-f $logfile) {
                 # if we have a .pdf file, this means something was
                 # produced. Hence, remove the .pdf

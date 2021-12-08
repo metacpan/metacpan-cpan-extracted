@@ -1,11 +1,13 @@
-# Copyrights 2003-2015 by [Mark Overmeer].
+# Copyrights 2003-2021 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of perl distribution OODoc.  It is licensed under the
+# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
 
 package OODoc::Text::Structure;
 use vars '$VERSION';
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 use base 'OODoc::Text';
 

@@ -102,8 +102,6 @@ t/options-impressum-sans.t
 t/options.t
 t/partials.t
 t/pdf.t
-t/pipe-exec.t
-t/pipe.t
 t/pod-coverage.t
 t/pod.t
 t/recursive-dir/a/af/a-file.muse

@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use Mouse::Role;
 use Text::CSV::Encoded;
@@ -225,13 +225,23 @@ my %row_makers = (
 
       my $replaced_by = $term->replaced_by();
 
+      my @res = ();
+
       if (defined $replaced_by) {
         my $cvterm_id =
           $chado_data->get_cvterm_by_termid($term->id())->cvterm_id();
-        [$cvterm_id, $prop_types{replaced_by}->cvterm_id(), $replaced_by];
-      } else {
-        ()
+        push @res, [$cvterm_id, $prop_types{replaced_by}->cvterm_id(), $replaced_by];
       }
+
+      my $consider = $term->consider();
+
+      if (defined $consider) {
+        my $cvterm_id =
+          $chado_data->get_cvterm_by_termid($term->id())->cvterm_id();
+        push @res, [$cvterm_id, $prop_types{consider}->cvterm_id(), $consider];
+      }
+
+      @res;
     } $ontology_data->get_terms();
   },
   cvtermsynonym => sub {

@@ -1,5 +1,5 @@
 package Task::FreecellSolver::Testing::MultiConfig;
-$Task::FreecellSolver::Testing::MultiConfig::VERSION = '0.0.5';
+$Task::FreecellSolver::Testing::MultiConfig::VERSION = '0.0.6';
 use warnings;
 use strict;
 
@@ -21,7 +21,7 @@ the Freecell Solver multi-config test suite.
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head1 TASK CONTENTS
 
@@ -52,6 +52,8 @@ version 0.0.5
 =head3 L<HTML::TocGenerator>
 
 =head3 L<Markdent>
+
+=head3 L<Math::RNG::Microsoft>
 
 =head3 L<Parallel::ForkManager::Segmented>
 

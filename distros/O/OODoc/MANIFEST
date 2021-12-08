@@ -3,6 +3,8 @@ LICENSE
 MANIFEST
 Makefile.PL
 README
+README-oodist.md
+README.md
 bin/oodist
 examples/mailbox.tar.gz
 examples/markov.pm

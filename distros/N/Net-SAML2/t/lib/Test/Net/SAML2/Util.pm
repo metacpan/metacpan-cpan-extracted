@@ -191,6 +191,7 @@ sub net_saml2_binding_redirect_request {
 </saml2p:Response>
 RESPONSEDOC
 
+    use Net::SAML2::XML::Sig;
     my $signer = Net::SAML2::XML::Sig->new(
         {
             key => 't/net-saml2-key.pem',

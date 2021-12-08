@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 27;
+use Test::More tests => 28;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -151,3 +151,4 @@ my $fypo_0009876_term =
   $ontology_data->get_term_by_id('FYPO:0009876');
 
 is($fypo_0009876_term->replaced_by(), 'FYPO:0001006');
+is($fypo_0009876_term->consider(), 'FYPO:0000123');

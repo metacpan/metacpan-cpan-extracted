@@ -1,3 +1,8 @@
+0.005 - Dec 8th 2021
+  * Do some updates to the dist.ini to clean it up
+  * Test it with new channel list
+  * Point at v2 api, no real change visible to users
+
 0.004 - Dec 5th 2017
   * Silence warnings by actually handling things not passed into us
   * Use JSON::PP since it's in core and this isn't anything high performance

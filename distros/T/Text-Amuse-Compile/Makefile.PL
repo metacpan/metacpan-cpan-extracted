@@ -26,7 +26,7 @@ WriteMakefile(
         'Moo' => 1,
         'Type::Tiny' => 1,
         'Template::Tiny' => 1.12, # version in wheezy
-        'IO::Pipe' => 0,
+        'IPC::Run' => 0,
         'Archive::Zip' => 0, # alread a requirement of EBook::EPUB
         'Path::Tiny' => 0,
         'JSON::MaybeXS' => 0,

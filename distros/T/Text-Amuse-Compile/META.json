@@ -36,7 +36,7 @@
          "requires" : {
             "Archive::Zip" : "0",
             "EBook::EPUB::Lite" : "0.71",
-            "IO::Pipe" : "0",
+            "IPC::Run" : "0",
             "JSON::MaybeXS" : "0",
             "Moo" : "1",
             "PDF::Imposition" : "0.23",
@@ -56,6 +56,6 @@
       "x_IRC" : "irc://chat.freenode.net/#amusewiki",
       "x_WebIRC" : "https://webchat.freenode.net/?channels=#amusewiki"
    },
-   "version" : "1.65",
+   "version" : "1.66",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

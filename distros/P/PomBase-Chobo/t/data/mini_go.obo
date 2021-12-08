@@ -37,3 +37,4 @@ namespace: molecular_function
 def: "OBSOLETE. A stable complex of proteins" [PMID:10681587, PMID:9852079]
 is_obsolete: true
 replaced_by: GO:0000109
+consider: GO:0004321

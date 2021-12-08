@@ -2,6 +2,20 @@
 All changes where made by Mark Overmeer <perl@overmeer.net>, unless
 explicitly stated otherwise.
 
+version 2.02: Wed  8 Dec 13:41:32 CET 2021
+
+	Fixes:
+	- parsing of requires/option/default when second parameter is
+	  missing.
+	- pod3 did not include the examples in the output.
+	- do not process packages named DB (used with caller())
+	- separate artisic license from "as Perl itself", which is either
+	  artistic or GPL* rt.cpan.org#120319 [Jitka Plesnikova]
+	- inheritance 'is a', sometimes 'is an'
+
+	Improvements:
+	- now on GitHUB
+
 version 2.01: Wed 11 Nov 12:27:52 CET 2015
 
 	Fixes:
@@ -350,7 +364,7 @@ version 0.91: Fri May 20 10:45:37 CEST 2005
 	Fixes:
 
 	- in OODoc/Format/Pod.pm, $show->Apppend has one 'p' to many.
-	  [Pontus Bergöö and Carl Humphrey]
+	  [Pontus BergÃ¶Ã¶ and Carl Humphrey]
 
 version 0.90: Tue Aug 24 09:26:52 CEST 2004
 
@@ -509,5 +523,5 @@ version 0.02: Tue Apr  1 13:52:33 CEST 2003
 	- documentation about POD configuration
 
 version 0.01: March 30, 2003
-
 	Initial implementation
+

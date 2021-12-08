@@ -1,0 +1,36 @@
+ChangeLog
+LICENSE
+MANIFEST
+Makefile.PL
+README
+README.md
+README.pod
+lib/HTML/Inspect.pm
+lib/HTML/Inspect.pod
+lib/HTML/Inspect/Links.pm
+lib/HTML/Inspect/Meta.pm
+lib/HTML/Inspect/Normalize.pm
+lib/HTML/Inspect/Normalize.pod
+lib/HTML/Inspect/OpenGraph.pm
+lib/HTML/Inspect/References.pm
+lib/HTML/Inspect/Util.pm
+t/01_use.t
+t/10_basic.t
+t/11_collect_links.t
+t/12_collect_opengraph.t
+t/13_collect_meta.t
+t/20norm.t
+t/21norm-cc.t
+t/data/collectMeta.html
+t/data/collectOpenGraph.html
+t/data/links.html
+t/data/weirdToNormalizedUrls.csv
+xt/99pod.t
+xt/benchmark_collectMeta.pl
+xt/benchmark_collectOpenGraph.pl
+xt/benchmark_hash_or_var.pl
+xt/benchmark_trim.pl
+xt/benchmark_utf8.pl
+xt/benchmark_xpath.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

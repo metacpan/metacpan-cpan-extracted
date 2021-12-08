@@ -7,12 +7,12 @@ OODoc::Format::Pod2 - Produce POD pages from the doc tree with a template
 =head1 INHERITANCE
 
  OODoc::Format::Pod2
-   is a OODoc::Format::Pod
-   is a OODoc::Format
-   is a OODoc::Object
+   is an OODoc::Format::Pod
+   is an OODoc::Format
+   is an OODoc::Object
 
  OODoc::Format::Pod2
-   is a OODoc::Format::TemplateMagic
+   is an OODoc::Format::TemplateMagic
 
 =head1 SYNOPSIS
 
@@ -335,14 +335,14 @@ directory must be provided via L<new(workdir)|OODoc::Format/"METHODS">, but was 
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.01,
-built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc distribution version 2.02,
+built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
 

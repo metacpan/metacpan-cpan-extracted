@@ -3,22 +3,27 @@ abstract: 'Object Oriented Documentation'
 author:
   - 'Mark Overmeer'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: OODoc
 no_index:
   directory:
     - t
     - inc
 requires:
-  File::Slurp: 9999.12
-  OODoc::Template: 0.16
-  Test::More: 0.47
-version: 2.01
+  File::Slurp: '9999.12'
+  OODoc::Template: '0.16'
+  Test::More: '0.47'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markov2/perl5-OODoc.git
+version: '2.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

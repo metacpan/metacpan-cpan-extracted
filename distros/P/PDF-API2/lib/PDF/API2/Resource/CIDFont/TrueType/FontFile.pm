@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '2.042'; # VERSION
+our $VERSION = '2.043'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -280,8 +280,8 @@ sub read_kern_table {
                 if ($val != 0) {
                     $data->{"$idx1:$idx2"} = $val;
                     $data->{join(':',
-                                 $self->data->{'g2n'}->[$idx1],
-                                 $self->data->{'g2n'}->[$idx2])} = $val;
+                                 ($self->data->{'g2n'}->[$idx1] // ''),
+                                 ($self->data->{'g2n'}->[$idx2] // ''))} = $val;
                 }
             }
         }

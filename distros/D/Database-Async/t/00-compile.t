@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Database/Async.pm',
     'Database/Async/Backoff.pm',
     'Database/Async/Backoff/Exponential.pm',
+    'Database/Async/Backoff/None.pm',
     'Database/Async/DB.pm',
     'Database/Async/Engine.pm',
     'Database/Async/Engine/Empty.pm',

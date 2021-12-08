@@ -7,8 +7,8 @@ OODoc::Parser::Markov - Parser for the MARKOV syntax
 =head1 INHERITANCE
 
  OODoc::Parser::Markov
-   is a OODoc::Parser
-   is a OODoc::Object
+   is an OODoc::Parser
+   is an OODoc::Object
 
 =head1 SYNOPSIS
 
@@ -414,7 +414,7 @@ The following syntaxes are supported:
  L < "subsubsection" >
  L < unix-manual >
  L < url >
- 
+
 In the above, I<manual> is the name of a manual, I<section> the name of
 any section (in that manual, by default the current manual), and
 I<subsection> a subsection (in that manual, by default the current manual).
@@ -475,6 +475,41 @@ in front of the printed C<=>, which will disappear once printed.
 
 You may also take a look at the raw code archive for OODoc (the text
 as is before it was processed for distribution).
+
+B<. Example: how subroutines are documented>
+
+ =chapter FUNCTIONS
+
+ =function countCharacters FILE|STRING, OPTIONS
+ Returns the number of bytes in the FILE or STRING,
+ or undef if the string is undef or the character
+ set unknown.
+
+ =option  charset CHARSET
+ =default charset 'us-ascii'
+ Characters in, for instance, utf-8 or unicode encoding
+ require variable number of bytes per character.  The
+ correct CHARSET is needed for the correct result.
+
+ =examples
+
+   my $count = countCharacters("monkey");
+   my $count = countCharacters("monkey",
+       charset => 'utf-8');
+
+ =error unknown character set $charset
+
+ The character set you can use is limited by the sets
+ defined by manual Encode.  The characters of the input can
+ not be seperated from each other without this definition.
+
+ =cut
+
+ # now the coding starts
+ sub countCharacters($@) {
+    my ($self, $input, %options) = @_;
+    ...
+ }
 
 =head1 DIAGNOSTICS
 
@@ -625,14 +660,14 @@ is not always easy to find.
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.01,
-built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc distribution version 2.02,
+built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
 

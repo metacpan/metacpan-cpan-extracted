@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Task-FreecellSolver-Testing-MultiConfig",
-  "dist_version" => "0.0.5",
+  "dist_version" => "0.0.6",
   "license" => "mit",
   "module_name" => "Task::FreecellSolver::Testing::MultiConfig",
   "recursive_test_files" => 1,
@@ -36,6 +36,7 @@ my %module_build_args = (
     "HTML::Toc" => 0,
     "HTML::TocGenerator" => 0,
     "Markdent" => 0,
+    "Math::RNG::Microsoft" => 0,
     "Parallel::ForkManager::Segmented" => 0,
     "Perl::Critic::Freenode" => 0,
     "Pod::Coverage::TrustPod" => 0,

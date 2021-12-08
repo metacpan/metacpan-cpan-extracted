@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.18.1
+## Version v0.18.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/12/07
+## Modified 2021/12/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -59,7 +59,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.18.1';
+    $VERSION     = 'v0.18.2';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -353,7 +353,7 @@ sub clone
     my $self  = shift( @_ );
     try
     {
-        $self->message( 3, "Cloning object '", overload::StrVal( $self ), "'." );
+        # $self->message( 3, "Cloning object '", overload::StrVal( $self ), "'." );
         return( Clone::clone( $self ) );
     }
     catch( $e )
@@ -1445,7 +1445,10 @@ sub init
             elsif( $this->{_init_strict_use_sub} )
             {
                 # $self->message( 3, "Checking if method $name exist in class ", ref( $self ), ": ", $self->can( $name ) ? 'yes' : 'no' );
-                $self->message( 3, "Unknown method '$name' in class $pkg" );
+                $self->message( 3, "Unknown method '$name' in class $pkg -> ", sub
+                {
+                    $self->_get_stack_trace->as_string;
+                });
                 $self->error( "Unknown method $name in class $pkg" );
                 next;
             }
@@ -4880,7 +4883,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.18.1
+    v0.18.2
 
 =head1 DESCRIPTION
 

@@ -6,6 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use MIME::Base64;
+use Net::SAML2::XML::Sig;
 
 BEGIN {
     use_ok( 'Net::SAML2::XML::Sig' );

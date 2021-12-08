@@ -1,11 +1,16 @@
-Revision history for App-SeqPericmd
+0.050   2021-07-17  Released-By: PERLANCAR; Urgency: low
 
-0.04    2016-09-28 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Mention other seq variants.
+
+
+0.04    2016-09-28  Released-By: PERLANCAR
 
         - Rename utility from peri-seq to seq-pericmd.
 
 
-0.03    2015-09-03 (PERLANCAR)
+0.03    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -14,11 +19,11 @@ Revision history for App-SeqPericmd
 	  requirement.
 
 
-0.02    2015-05-13 (PERLANCAR)
+0.02    2015-05-13  Released-By: PERLANCAR
 
 	- Use fixed floating point format to avoid showing round-off error.
 
 
-0.01    2015-05-13 (PERLANCAR)
+0.01    2015-05-13  Released-By: PERLANCAR
 
         - First release.

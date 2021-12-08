@@ -7,8 +7,8 @@ OODoc::Format::Pod - Produce POD pages from the doc tree
 =head1 INHERITANCE
 
  OODoc::Format::Pod
-   is a OODoc::Format
-   is a OODoc::Object
+   is an OODoc::Format
+   is an OODoc::Object
 
  OODoc::Format::Pod is extended by
    OODoc::Format::Pod2
@@ -242,21 +242,21 @@ Inherited, see L<OODoc::Format/"Page generation">
 =item $obj-E<gt>B<writeTable>()
 
  -Option--Default
-  ARRAY   <required>
   header  <required>
   output  <required>
+  rows    <required>
   widths  undef
 
 =over 2
 
-=item ARRAY => -OF-ARRAYS
-
-An array of arrays, each describing a row for the output.  The first row
-is the header.
-
 =item header => ARRAY
 
 =item output => FILE
+
+=item rows => ARRAY-OF-ARRAYS
+
+An array of arrays, each describing a row for the output.  The first row
+is the header.
 
 =item widths => ARRAY
 
@@ -331,12 +331,38 @@ can be used with a list of formatting options which are passed to
 L<showChapter()|OODoc::Format/"Page generation">.  This will help you to produce pages which have
 pre-planned changes in layout.
 
+B<. Example: format options>
+
+ use OODoc;
+ my $doc = OODoc->new(...);
+ $doc->processFiles(...);
+ $doc->prepare;
+ $doc->create(pod =>
+    format_options => [ show_subs_index     => 'NAMES'
+                      , show_inherited_subs => 'NO'
+                      , show_described_subs => 'USE'
+                      , show_option_table   => 'NO'
+                      ]
+   );
+
 =head3 Configuring by appending
 
 By default, the last chapters are not filled in: the C<REFERENCES> and
 C<COPYRIGHTS> chapters are very personal.  You can fill these in by
 extending the POD generator, as described in the next section, or take
 a very simple approach simply using L<createManual(append)|OODoc::Format::Pod/"Page generation">.
+
+B<. Example: appending text to a page>
+
+ use OODoc;
+ my $doc = OODoc->new(...);
+ $doc->processFiles(...);
+ $doc->prepare;
+ $doc->create('pod', append => <<'TEXT');
+
+ =head2 COPYRIGHTS
+ ...
+ TEXT
 
 =head3 Configuring via extension
 
@@ -345,12 +371,89 @@ functionality of a class by creating a new class.  This provides an
 easy way to add, change or remove chapters from the produced manual
 pages.
 
+B<. Example: remove chapter inheritance>
+
+ $doc->create('MyPod', format_options => [...]);
+
+ package MyPod;
+ use base 'OODoc::Format::Pod';
+ sub chapterInheritance(@) {shift};
+
+The C<MyPod> package is extending the standard POD generator, by overruling
+the default behavior of C<chapterInheritance()> by producing nothing.
+
+B<. Example: changing the chapter's output>
+
+ $doc->create('MyPod', format_options => [...]);
+
+ package MyPod;
+ use base 'OODoc::Format::Pod';
+
+ sub chapterCopyrights(@)
+ {   my ($self, %args) = @_;
+     my $manual = $args{manual} or panic;
+     my $output = $args{output} or panic;
+
+     $output->print("\n=head2 COPYRIGHTS\n");
+     $output->print($manual->name =~ m/abc/ ? <<'FREE' : <<'COMMERICIAL');
+This package can be used free of charge, as Perl itself.
+FREE
+This package will cost you money.  Register if you want to use it.
+COMMERCIAL
+
+     $self;
+ }
+
+B<. Example: adding to a chapter's output>
+
+ $doc->create('MyPod', format_options => [...]);
+
+ package MyPod;
+ use base 'OODoc::Format::Pod';
+ use Log::Report 'panic';
+
+ sub chapterDiagnostics(@)
+ {   my ($self, %args) = @_;
+     $self->SUPER::Diagnostics(%args);
+
+     my $output  = $args{output} or panic;
+     my $manual  = $args{manual} or panic;
+     my @extends = $manual->superClasses;
+
+     $output->print(\nSee also the diagnostics is @extends.\n");
+     $self;
+ }
+
 =head3 Configuring with OODoc::Template
 
 When using 'pod2' in stead of 'pod' when L<OODoc::create()|OODoc/"Formatter"> is called,
 the L<OODoc::Format::Pod2|OODoc::Format::Pod2> will be used.   It's nearly a drop-in
 replacement by its default behavior.  When you specify
 your own template file, every thing can be made.
+
+B<. Example: formatting with template>
+
+ use OODoc;
+ my $doc = OODoc->new(...);
+ $doc->processFiles(...);
+ $doc->prepare;
+ $doc->create(pod2, template => '/some/file',
+    format_options => [ show_subs_index     => 'NAMES'
+                      , show_option_table   => 'NO'
+                      ]
+    )
+
+B<. Example: format options within template>
+
+The template van look like this:
+
+ {chapter NAME}
+ some extra text
+ {chapter OVERLOADED}
+ {chapter METHODS show_option_table NO}
+
+The formatting options can be added, however the syntax is quite sensitive:
+not quotes, comma's and exactly one blank between the strings.
 
 =head1 DIAGNOSTICS
 
@@ -394,14 +497,14 @@ directory must be provided via L<new(workdir)|OODoc::Format/"METHODS">, but was 
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.01,
-built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc distribution version 2.02,
+built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
 

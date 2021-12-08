@@ -250,6 +250,7 @@ is_obsolete: true
 is_a: FYPO:0000002
 alt_id: FYPO:0001006
 replaced_by: FYPO:0001006
+consider: FYPO:0000123
 
 [Term]
 id: EXT:0000001

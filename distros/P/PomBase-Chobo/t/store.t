@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 29;
+use Test::More tests => 33;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -49,6 +49,8 @@ cmp_deeply([
 my $sth = $fake_handle->prepare("select cvterm_id, definition, name, cv_id from cvterm order by name");
 $sth->execute();
 
+my $consider_term = $sth->fetchrow_hashref();
+is ($consider_term->{name}, 'consider');
 my $cv_version_term = $sth->fetchrow_hashref();
 is ($cv_version_term->{name}, 'cv_version');
 my $cyanidin_term = $sth->fetchrow_hashref();
@@ -167,4 +169,10 @@ my $prop_row = $sth->fetchrow_hashref();
 is($prop_row->{cvterm_id}, $obsolete_term->{cvterm_id});
 is($prop_row->{type_id}, $replaced_by_term->{cvterm_id});
 is($prop_row->{value}, 'GO:0000109');
+
+$prop_row = $sth->fetchrow_hashref();
+
+is($prop_row->{cvterm_id}, $obsolete_term->{cvterm_id});
+is($prop_row->{type_id}, $consider_term->{cvterm_id});
+is($prop_row->{value}, 'GO:0004321');
 

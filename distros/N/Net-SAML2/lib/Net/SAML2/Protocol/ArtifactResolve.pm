@@ -6,7 +6,7 @@ use MooseX::Types::URI qw/ Uri /;
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
-our $VERSION = '0.46';
+our $VERSION = '0.49';
 
 # ABSTRACT: Net::SAML2::Protocol::ArtifactResolve - ArtifactResolve protocol class
 
@@ -59,7 +59,7 @@ Net::SAML2::Protocol::ArtifactResolve - Net::SAML2::Protocol::ArtifactResolve - 
 
 =head1 VERSION
 
-version 0.46
+version 0.49
 
 =head1 SYNOPSIS
 

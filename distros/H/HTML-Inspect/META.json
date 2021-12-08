@@ -1,0 +1,68 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Mark Overmeer <markov@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Inspect",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "File::Slurper" : "0.12",
+            "Inline::C" : "0",
+            "Log::Report" : "1.32",
+            "Net::LibIDN2" : "1.01",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "URI" : "5.09",
+            "XML::LibXML" : "2.0207",
+            "perl" : "5.020000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-HTML-Inspect/issues"
+      },
+      "homepage" : "http://perl.overmeer.net",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-HTML-Inspect.git",
+         "web" : "https://github.com/markov2/perl5-HTML-Inspect"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

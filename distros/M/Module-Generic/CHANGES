@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.18.2 2021-12-08T15:27:47+0900
+    - Correction in Number::Format when default locale is C or POSIX
+
 v0.18.1 2021-12-07T21:24:28+0900
     - Resubmission
 

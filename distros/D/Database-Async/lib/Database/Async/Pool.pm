@@ -3,7 +3,9 @@ package Database::Async::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.016'; # VERSION
+use parent qw(IO::Async::Notifier);
+
+our $VERSION = '0.017'; # VERSION
 
 =head1 NAME
 
@@ -13,7 +15,8 @@ Database::Async::Pool - connection manager for L<Database::Async>
 
 =cut
 
-use Database::Async::Backoff;
+use Database::Async::Backoff::Exponential;
+use Database::Async::Backoff::None;
 
 use Future;
 use Future::AsyncAwait;
@@ -28,10 +31,10 @@ sub new {
     unless(blessed $backoff) {
         my $type = 'exponential';
         $type = $backoff if $backoff and not ref $backoff;
-        $backoff = Database::Async::Backoff->new(
-            type    => $type,
-            initial => 0.010,
-            max     => 30,
+        $backoff = Database::Async::Backoff->instantiate(
+            type          => $type,
+            initial_delay => 0.010,
+            max_delay     => 30,
             ($backoff && ref($backoff) ? %$backoff : ())
         )
     }
@@ -40,6 +43,7 @@ sub new {
         count         => 0,
         min           => 0,
         max           => 1,
+        attempts      => undef,
         ordering      => 'serial',
         backoff       => $backoff,
         waiting       => [],
@@ -148,7 +152,12 @@ async sub request_engine {
     my ($self) = @_;
     $log->tracef('Pool requesting new engine');
     ++$self->{pending_count};
-    await $self->{request_engine}->()
+    my $delay = $self->backoff->next;
+    await $self->loop->delay_future(
+        after => $delay
+    ) if $delay;
+    await $self->{request_engine}->();
+    $self->backoff->reset;
 }
 
 1;

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Module Generic - ~/lib/Generic/Number.pm
-## Version v1.0.2
+## Module Generic - ~/lib/Module/Generic/Number.pm
+## Version v1.0.3
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/12/06
+## Modified 2021/12/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use POSIX ();
     use Regexp::Common qw( number );
     use Scalar::Util ();
-    our( $VERSION ) = 'v1.0.2';
+    our( $VERSION ) = 'v1.0.3';
 };
 
 use overload (
@@ -465,6 +465,32 @@ symbol              => [qw( currency_symbol int_curr_symbol )],
 thousand            => [qw( thousands_sep mon_thousands_sep )],
 };
 
+# This serves 2 purposes:
+# 1) to silence warnings issued from Number::Format when it uses an empty string when evaluating a number, e.g. '' == 1
+# 2) to ensure that blank numerical values are not interpreted to anything else than equivalent of empty
+#    For example, an empty frac_digits will default to 2 in Number::Format even if the user does not want any. Of course, said user could also have set it to 0
+# So here we use this hash reference of numeric properties to ensure the option parameters are set to a numeric value (0) when they are empty.
+my $numerics = 
+{
+grouping => 0,
+frac_digits => 0,
+int_frac_digits => 0,
+int_n_cs_precedes => 0,
+int_p_cs_precedes => 0,
+int_n_sep_by_space => 0,
+int_p_sep_by_space => 0,
+int_n_sign_posn => 1,
+int_p_sign_posn => 1,
+mon_grouping => 0,
+n_cs_precedes => 0,
+n_sep_by_space => 0,
+n_sign_posn => 1,
+p_cs_precedes => 0,
+p_sep_by_space => 0,
+# Position of positive sign. 1 = before (0 = parentheses)
+p_sign_posn => 1,
+};
+
 sub init
 {
     my $self = shift( @_ );
@@ -482,9 +508,24 @@ sub init
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{_original} = $num;
-     my $default = $self->default;
+    my $default = $self->default;
     # $self->message( 3, "Getting current locale" );
     my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
+    # perllocale: "If no second argument is provided and the category is LC_ALL, the result is implementation-dependent. It may be a string of concatenated locale names (separator also implementation-dependent) or a single locale name."
+    # e.g.: 'LC_NUMERIC=en_GB.UTF-8;LC_CTYPE=de_AT.utf8;LC_COLLATE=en_GB.UTF-8;LC_TIME=en_GB.UTF-8;LC_MESSAGES=en_GB.UTF-8;LC_MONETARY=en_GB.UTF-8;LC_ADDRESS=en_GB.UTF-8;LC_IDENTIFICATION=en_GB.UTF-8;LC_MEASUREMENT=en_GB.UTF-8;LC_PAPER=en_GB.UTF-8;LC_TELEPHONE=en_GB.UTF-8;'
+    if( defined( $curr_locale ) && 
+        CORE::length( $curr_locale ) && 
+        CORE::index( $curr_locale, ';' ) != -1 )
+    {
+        my @parts = CORE::split( /;/, $curr_locale );
+        my $elems = {};
+        for( @parts )
+        {
+            my( $n, $v ) = split( /=/, $_, 2 );
+            $elems->{ $n } = $v;
+        }
+        $curr_locale = $elems->{LC_NUMERIC} || $elems->{LC_MESSAGES} || $elems->{LC_MONETARY};
+    }
     # $self->message( 3, "Current locale is '$curr_locale'" );
     if( $self->{lang} )
     {
@@ -550,6 +591,11 @@ sub init
             return( $self->error( "An error occurred while getting the locale information for \"$self->{lang}\": $e" ) );
         }
     }
+#     elsif( $curr_locale && 
+#            $curr_locale ne 'C' && 
+#            $curr_locale ne 'POSIX' && 
+#            ( my $lconv = POSIX::localeconv() ) )
+#     {
     elsif( $curr_locale && ( my $lconv = POSIX::localeconv() ) )
     {
         $default = $lconv if( scalar( keys( %$lconv ) ) );
@@ -569,32 +615,6 @@ sub init
         $self->{lang} = $curr_locale;
     }
 
-    ## This serves 2 purposes:
-    ## 1) to silence warnings issued from Number::Format when it uses an empty string when evaluating a number, e.g. '' == 1
-    ## 2) to ensure that blank numerical values are not interpreted to anything else than equivalent of empty
-    ##    For example, an empty frac_digits will default to 2 in Number::Format even if the user does not want any. Of course, said user could also have set it to 0
-    ## So here we use this hash reference of numeric properties to ensure the option parameters are set to a numeric value (0) when they are empty.
-    my $numerics = 
-    {
-    grouping => 0,
-    frac_digits => 0,
-    int_frac_digits => 0,
-    int_n_cs_precedes => 0,
-    int_p_cs_precedes => 0,
-    int_n_sep_by_space => 0,
-    int_p_sep_by_space => 0,
-    int_n_sign_posn => 1,
-    int_p_sign_posn => 1,
-    mon_grouping => 0,
-    n_cs_precedes => 0,
-    n_sep_by_space => 0,
-    n_sign_posn => 1,
-    p_cs_precedes => 0,
-    p_sep_by_space => 0,
-    ## Position of positive sign. 1 = before (0 = parentheses)
-    p_sign_posn => 1,
-    };
-    
     no warnings 'uninitialized';
     foreach my $prop ( keys( %$map ) )
     {
@@ -630,7 +650,7 @@ sub init
     {
         if( $num !~ /^$RE{num}{real}$/ )
         {
-            my $fmt = $self->_get_formator;
+            my $fmt = $self->_get_formatter;
             $self->{_number} = $fmt->unformat_number( $num );
         }
         else
@@ -739,7 +759,7 @@ sub format
     my $num  = $self->{_number};
     ## If value provided was undefined, we leave it undefined, otherwise we would be at risk of returning 0, and 0 is very different from undefined
     return( $num ) if( !defined( $num ) );
-    my $fmt = $self->_get_formator;
+    my $fmt = $self->_get_formatter;
     try
     {
         ## Amazingly enough, when a precision > 0 is provided, format_number will discard it if the number, before formatting, did not have decimals... Then, what is the point of formatting a number then?
@@ -764,7 +784,7 @@ sub format_bytes
     my $num  = $self->{_number};
     ## See comment in format() method
     return( $num ) if( !defined( $num ) );
-    my $fmt = $self->_get_formator;
+    my $fmt = $self->_get_formatter;
     try
     {
         ## return( $fmt->format_bytes( $num, @_ ) );
@@ -789,7 +809,7 @@ sub format_money
     my $num  = $self->{_number};
     ## See comment in format() method
     return( $num ) if( !defined( $num ) );
-    my $fmt = $self->_get_formator;
+    my $fmt = $self->_get_formatter;
     try
     {
         ## Even though the Number::Format instantiated is set with a currency symbol, 
@@ -814,7 +834,7 @@ sub format_negative
     my $num  = $self->{_number};
     ## See comment in format() method
     return( $num ) if( !defined( $num ) );
-    my $fmt = $self->_get_formator;
+    my $fmt = $self->_get_formatter;
     try
     {
         my $new = $self->format;
@@ -838,7 +858,7 @@ sub format_picture
     my $num  = $self->{_number};
     ## See comment in format() method
     return( $num ) if( !defined( $num ) );
-    my $fmt = $self->_get_formator;
+    my $fmt = $self->_get_formatter;
     try
     {
         ## return( $fmt->format_picture( $num, @_ ) );
@@ -852,7 +872,7 @@ sub format_picture
     }
 }
 
-sub formatter { return( shift->_set_get_object( '_fmt', 'Number::Format', @_ ) ); }
+sub formatter { return( shift->_set_get_object_without_init( '_fmt', 'Number::Format', @_ ) ); }
 
 ## https://stackoverflow.com/a/483708/4814971
 sub from_binary
@@ -959,27 +979,84 @@ sub new_formatter
             return( $self->error( "Invalid parameters provided: '", join( "', '", @_ ), "'." ) );
         }
     }
-    else
-    {
-        my @keys = keys( %$map );
-        # @$hash{ @keys } = @$self{ @keys };
-        for( @keys )
-        {
-            $hash->{ $_ } = $self->$_();
-        }
-    }
+#     else
+#     {
+#         my @keys = keys( %$map );
+#         # @$hash{ @keys } = @$self{ @keys };
+#         for( @keys )
+#         {
+#             $hash->{ $_ } = $self->$_();
+#         }
+#     }
+#     try
+#     {
+#         my $opts = {};
+#         foreach my $prop ( keys( %$map ) )
+#         {
+#             $opts->{ $map->{ $prop }->[0] } = $hash->{ $prop } if( CORE::defined( $hash->{ $prop } ) );
+#         }
+#         return( Number::Format->new( %$opts ) );
+#     }
+#     catch( $e )
+#     {
+#         return( $self->error( "Error while trying to get a Number::Format object: $e" ) );
+#     }
+    
+    # $Number::Format::DEFAULT_LOCALE->{int_curr_symbol} = 'EUR';
     try
     {
-        my $opts = {};
-        foreach my $prop ( keys( %$map ) )
+        ## Those are unsupported by Number::Format
+        my $skip =
         {
-            $opts->{ $map->{ $prop }->[0] } = $hash->{ $prop } if( CORE::defined( $hash->{ $prop } ) );
+        int_n_cs_precedes => 1,
+        int_p_cs_precedes => 1,
+        int_n_sep_by_space => 1,
+        int_p_sep_by_space => 1,
+        int_n_sign_posn => 1,
+        int_p_sign_posn => 1,
+        };
+        my $opts = {};
+        foreach my $prop ( CORE::keys( %$map ) )
+        {
+            ## $self->message( 3, "Checking property \"$prop\" value \"", overload::StrVal( $self->{ $prop } ), "\" (", $self->$prop->defined ? 'defined' : 'undefined', ")." );
+            my $prop_val;
+            if( CORE::exists( $hash->{ $prop } ) )
+            {
+                $prop_val = $hash->{ $prop };
+            }
+            elsif( $self->$prop->defined )
+            {
+                $prop_val = $self->$prop;
+            }
+            ## To prevent Number::Format from defaulting to property values not in sync with ours
+            ## Because it seems the POSIX::setlocale only affect one module
+            else
+            {
+                $prop_val = '';
+            }
+            ## $self->message( 3, "Using property \"$prop\" value \"$prop_val\" (", CORE::defined( $prop_val ) ? 'defined' : 'undefined', ") [ref=", ref( $prop_val ), "]." );
+            ## Need to set all the localeconv properties for Number::Format, because it uses mon_thousand_sep intsead of just thousand_sep
+            foreach my $lconv_prop ( @{$map->{ $prop }} )
+            {
+                CORE::next if( CORE::exists( $skip->{ $lconv_prop } ) );
+                ## Cannot be undefined, but can be empty string
+                $opts->{ $lconv_prop } = "$prop_val";
+                if( !CORE::length( $opts->{ $lconv_prop } ) && CORE::exists( $numerics->{ $lconv_prop } ) )
+                {
+                    $opts->{ $lconv_prop } = $numerics->{ $lconv_prop };
+                }
+            }
         }
-        return( Number::Format->new( %$opts ) );
+        # $self->message( 3, "Using following options for Number::Format: ", sub{ $self->SUPER::dump( $opts ) } );
+        no warnings qw( uninitialized );
+        my $fmt = Number::Format->new( %$opts );
+        use warnings;
+        return( $fmt );
     }
     catch( $e )
     {
-        return( $self->error( "Error while trying to get a Number::Format object: $e" ) );
+        ## $self->message( 3, "Error trapped in creating a Number::Format object: '$e'" );
+        return( $self->error( "Unable to create a Number::Format object: $e" ) );
     }
 }
 
@@ -1012,7 +1089,7 @@ sub round2
     my $num  = $self->{_number};
     ## See comment in format() method
     return( $num ) if( !defined( $num ) );
-    my $fmt = $self->_get_formator;
+    my $fmt = $self->_get_formatter;
     try
     {
         ## return( $fmt->round( $num, @_ ) );
@@ -1059,10 +1136,11 @@ sub unformat
     return if( !defined( $num ) );
     try
     {
-        my $num2 = $self->_get_formator->unformat_number( $num );
+        my $num2 = $self->_get_formatter->unformat_number( $num );
         my $clone = $self->clone;
         $clone->{_original} = $num;
         $clone->{_number} = $num2;
+        $clone->debug( $self->debug );
         return( $clone );
     }
     catch( $e )
@@ -1092,62 +1170,14 @@ sub _func
     return( $self->clone( $res ) );
 }
 
-sub _get_formator
+sub _get_formatter
 {
     my $self = shift( @_ );
+    $self->message( 4, "Returning Number::Format object cached -> '$self->{_fmt}'" ) if( $self->{_fmt} );
     return( $self->{_fmt} ) if( $self->{_fmt} );
-    # $Number::Format::DEFAULT_LOCALE->{int_curr_symbol} = 'EUR';
-    try
-    {
-        ## Those are unsupported by Number::Format
-        my $skip =
-        {
-        int_n_cs_precedes => 1,
-        int_p_cs_precedes => 1,
-        int_n_sep_by_space => 1,
-        int_p_sep_by_space => 1,
-        int_n_sign_posn => 1,
-        int_p_sign_posn => 1,
-        };
-        my $opts = {};
-        foreach my $prop ( CORE::keys( %$map ) )
-        {
-            ## $self->message( 3, "Checking property \"$prop\" value \"", overload::StrVal( $self->{ $prop } ), "\" (", $self->$prop->defined ? 'defined' : 'undefined', ")." );
-            my $prop_val;
-            if( $self->$prop->defined )
-            {
-                $prop_val = $self->$prop;
-            }
-            ## To prevent Number::Format from defaulting to property values not in sync with ours
-            ## Because it seems the POSIX::setlocale only affect one module
-            else
-            {
-                $prop_val = '';
-            }
-            ## $self->message( 3, "Using property \"$prop\" value \"$prop_val\" (", CORE::defined( $prop_val ) ? 'defined' : 'undefined', ") [ref=", ref( $prop_val ), "]." );
-            ## Need to set all the localeconv properties for Number::Format, because it uses mon_thousand_sep intsead of just thousand_sep
-            foreach my $lconv_prop ( @{$map->{ $prop }} )
-            {
-                CORE::next if( CORE::exists( $skip->{ $lconv_prop } ) );
-                ## Cannot be undefined, but can be empty string
-                $opts->{ $lconv_prop } = "$prop_val";
-                if( !CORE::length( $opts->{ $lconv_prop } ) && CORE::exists( $numerics->{ $lconv_prop } ) )
-                {
-                    $opts->{ $lconv_prop } = $numerics->{ $lconv_prop };
-                }
-            }
-        }
-        ## $self->message( 3, "Using following options for Number::Format: ", sub{ $self->dumper( $opts ) } );
-        no warnings qw( uninitialized );
-        $self->{_fmt} = Number::Format->new( %$opts );
-        use warnings;
-        return( $self->{_fmt} );
-    }
-    catch( $e )
-    {
-        ## $self->message( 3, "Error trapped in creating a Number::Format object: '$e'" );
-        return( $self->error( "Unable to create a Number::Format object: $e" ) );
-    }
+    my $fmt = $self->new_formatter || return( $self->pass_error );
+    $self->{_fmt} = $fmt;
+    return( $self->{_fmt} );
 }
 
 sub _set_get_prop
@@ -1166,7 +1196,7 @@ sub _set_get_prop
         {
             $self->_set_get_scalar_as_object( $prop, $val );
             # If an error was set, we return nothing
-            $self->formatter( $self->new_formatter ) || return;
+            # $self->formatter( $self->new_formatter ) || return;
         }
     }
     return( $self->_set_get_scalar_as_object( $prop ) );
@@ -1176,7 +1206,7 @@ AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
     my $self = shift( @_ ) || return;
-    my $fmt_obj = $self->_get_formator || return;
+    my $fmt_obj = $self->_get_formatter || return;
     my $code = $fmt_obj->can( $method );
     if( $code )
     {

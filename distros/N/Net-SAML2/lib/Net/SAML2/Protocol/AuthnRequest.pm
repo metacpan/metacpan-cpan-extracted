@@ -12,7 +12,7 @@ with 'Net::SAML2::Role::ProtocolMessage';
 
 # ABSTRACT: SAML2 AuthnRequest object
 
-our $VERSION = '0.46';
+our $VERSION = '0.49';
 
 
 
@@ -229,7 +229,7 @@ Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 
 =head1 VERSION
 
-version 0.46
+version 0.49
 
 =head1 SYNOPSIS
 

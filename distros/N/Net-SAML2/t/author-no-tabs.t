@@ -44,6 +44,7 @@ my @files = (
     't/11-more-metadata.t',
     't/12-full-client.t',
     't/13-verify-issues.t',
+    't/15-evil-nameid-and-email-assertion.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

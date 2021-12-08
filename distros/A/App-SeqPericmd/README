@@ -1,0 +1,83 @@
+NAME
+    App::SeqPericmd - Rinci-/Perinci::CmdLine-based "seq"-like CLI utility
+
+VERSION
+    This document describes version 0.050 of App::SeqPericmd (from Perl
+    distribution App-SeqPericmd), released on 2021-07-17.
+
+FUNCTIONS
+  seq
+    Usage:
+
+     seq(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Rinci-/Perinci::CmdLine-based "seq"-like CLI utility.
+
+    This utility is similar to Unix "seq" command, with a few differences:
+    some differences in option names, JSON output, allow infinite stream
+    (when "to" is not specified).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   equal_width => *bool*
+
+        Equalize width by padding with leading zeros.
+
+    *   from* => *float*
+
+    *   header => *str*
+
+        Add a header row.
+
+    *   increment => *float* (default: 1)
+
+    *   limit => *int*
+
+        Only generate a certain amount of numbers.
+
+    *   number_format => *str*
+
+        sprintf() format for each number.
+
+    *   to => *float*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (array[float])
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-SeqPericmd>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-SeqPericmd>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-SeqPericmd>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

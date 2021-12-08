@@ -51,6 +51,7 @@
             "HTML::Toc" : "0",
             "HTML::TocGenerator" : "0",
             "Markdent" : "0",
+            "Math::RNG::Microsoft" : "0",
             "Parallel::ForkManager::Segmented" : "0",
             "Perl::Critic::Freenode" : "0",
             "Pod::Coverage::TrustPod" : "0",
@@ -82,7 +83,7 @@
    "provides" : {
       "Task::FreecellSolver::Testing::MultiConfig" : {
          "file" : "lib/Task/FreecellSolver/Testing/MultiConfig.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       }
    },
    "release_status" : "stable",
@@ -97,7 +98,7 @@
          "web" : "https://github.com/shlomif/fc-solve"
       }
    },
-   "version" : "0.0.5",
+   "version" : "0.0.6",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

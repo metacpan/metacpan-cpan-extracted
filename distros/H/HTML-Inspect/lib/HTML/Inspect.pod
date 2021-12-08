@@ -1,0 +1,206 @@
+=encoding utf8
+
+=head1 NAME
+
+HTML::Inspect - Inspect a HTML document
+
+=head1 SYNOPSIS
+
+    my $source    = 'http://example.com/doc';
+    my $inspector = HTML::Inspect->new(
+        location => $source,
+        html_ref => \$html,
+    );
+    my $classic   = $inspector->collectMetaClassic;
+
+=head1 DESCRIPTION
+
+This module extracts information from HTML, using a clean parser (L<XML::LibXML>)
+Returned structures may need further processing.  Please suggest additional
+extractors.
+
+This module is part of the "Crawl Pipeline".  You can find a B<detailed description>
+of each of the output of the methods below on its web-page at
+F<https://pipeline.shared-search.eu/extract/>
+
+B<URL normalization> is a really crucial feature of the output of these methods.
+You can use this separately via functions in L<HTML::Inspect::Normalization>.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item HTML::Inspect-E<gt>B<new>(%options)
+
+ -Option  --Default
+  html_ref  <required>
+  location  <required>
+
+=over 2
+
+=item html_ref => REF-String
+
+References to a (possibly troublesome) HTML string.  Passed as reference
+to avoid copying large strings.
+
+=item location => URL
+
+An absolute url as a string or L<URI> instance, which explains where the
+HTML was found.  It is used as base of relative URLs found in the HTML,
+unless it contains as C<< <base> >> element.
+
+=back
+
+=back
+
+=head1 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<base>()
+
+The base URI, which is used for relative links in the page.  This is the
+C<location>, unless the HTML contains a C<< <base href> >> declaration.
+The base URI is a string representation, in absolute and normalized form.
+
+=item $obj-E<gt>B<location>()
+
+The L<URI> object which represents the C<location> parameter
+which was passed as default base for relative links to C<new()>.
+
+=back
+
+=head1 Collecting
+
+=head2 The E<lt>linkE<gt> element
+
+=over 4
+
+=item $obj-E<gt>B<collectLinks>()
+
+Collect all C<< <link> >> relations from the document.  The returned HASH
+contains the relation (the C<rel> attribute, required) to an ARRAY of
+link elements with that value.  The ARRAY elements are HASHes of all
+attributes of the link and and all lower-cased.  The added C<href_uri>
+key will be a normalized, absolute translation of the C<href> attribute.
+
+=back
+
+=head2 The E<lt>metaE<gt> element
+
+=over 4
+
+=item $obj-E<gt>B<collectMeta>(%options)
+
+Returns an ARRAY of B<all> kinds of C<< <meta> >> records, which have a wide
+variety of fields and may be order dependend!!!
+
+example: 
+
+   [ { http-equiv => 'Content-Type', content => 'text/html; charset=UTF-8' },
+     { name => 'viewport', content => 'width=device-width, initial-scale=1.0' },
+   ]
+
+=item $obj-E<gt>B<collectMetaClassic>(%options)
+
+Returns a HASH reference with all C<< <meta> >> information of traditional content:
+the single C<charset> and all C<http-equiv> records, plus the subset of names which
+are listed on F<https://www.w3schools.com/tags/tag_meta.asp>.  People defined far too
+many names to be useful for everyone.
+
+example: 
+
+    {  'http-equiv' => { 'content-type' => 'text/plain' },
+        charset => 'UTF-8',
+        name => { author => 'John Smith' , description => 'The John Smith\'s page.'},
+    }
+
+=item $obj-E<gt>B<collectMetaNames>(%options)
+
+Returns a HASH with all C<< <meta> >> records which have both a C<name> and a
+C<content> attribute.  These are used as key-value pairs for many, many different
+purposes.
+
+example: 
+
+   { author => 'John Smith' , description => 'The John Smith\'s page.'}
+
+=back
+
+=head2 References
+
+The amount of references is large (easily a few hundred per HTML page),
+so you may wat to specify a filter.
+The C<%filter> rules will produce a subset of the links found.  You can
+use: C<http_only> (returning only http and https links), C<mailto_only>,
+C<maximum_set> (returning only the first C<n> links) and C<matching>,
+returning links matching a certain regex.
+
+=over 4
+
+=item $obj-E<gt>B<collectReferences>(%filter)
+
+Collects all references from document.  Method C<collectReferencesFor()>
+is called for a list of known tag/attribute pairs, and returned as a
+HASH of ARRAYs.  The keys of the HASH have format "$tag_$attribute".
+
+=item $obj-E<gt>B<collectReferencesFor>($tag, $attr, %filter)
+
+Returns an ARRAY of unique normalized URIs, which where found with the
+C<$tag> attribute C<$attr>.  For instance, tag C<image> attribute C<src>.
+The URIs are in their textual order in the document, where only the
+first encounter is recorded.
+
+=back
+
+=head2 Other
+
+=over 4
+
+=item $obj-E<gt>B<collectOpenGraph>()
+
+Returns structured OpenGraph information, when available in the HTML.
+
+The logic really understands OpenGraph, and simplifies access to it:
+facts which may appear multiple times will always be returned as ARRAY.
+
+=back
+
+=head1 SEE ALSO
+
+L<XML::LibXML>, L<Log::Report>
+
+This software is a component of the Crawl Pipeline,
+F<https://pipeline.shared-search.eu>.
+Development was made possible with a generous gift by the NLnet Foundation.
+
+=head1 AUTHORS and COPYRIGHT
+
+    Mark Overmeer
+    CPAN ID: MARKOV
+    markov at cpan dot org
+
+    Красимир Беров
+    CPAN ID: BEROV
+    berov на cpan точка org
+    https://studio-berov.eu
+
+This is free software, licensed under: The Artistic License 2.0 (GPL
+Compatible) The full text of the license can be found in the LICENSE
+file included with this module.
+
+=head1 SEE ALSO
+
+This module is part of HTML-Inspect distribution version 1.00,
+built on December 08, 2021. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2021 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

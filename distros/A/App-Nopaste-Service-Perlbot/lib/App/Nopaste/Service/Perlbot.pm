@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Perlbot;
 # ABSTRACT: Service provider for perlbot.pl - https://perlbot.pl/
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use parent 'App::Nopaste::Service';
 use JSON::PP qw/decode_json/;
@@ -13,7 +13,7 @@ sub run {
     my $ua = LWP::UserAgent->new;
 
     if ($arg{chan} eq 'list') {
-      my $res = $ua->get( 'https://perl.bot/api/v1/channels');
+      my $res = $ua->get( 'https://perl.bot/api/v2/channels');
      
       unless ($res->is_success) {
         return (0, "Failed to get channels, try again later.\n");
@@ -30,7 +30,7 @@ sub run {
 
     } else {
 
-      my $res = $ua->post("https://perl.bot/api/v1/paste", {
+      my $res = $ua->post("https://perl.bot/api/v2/paste", {
           paste => $arg{text},
           description => $arg{desc} || 'I broke this',
           username => $arg{nick} || 'Anonymous',

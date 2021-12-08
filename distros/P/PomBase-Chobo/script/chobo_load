@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use Mouse;
 use Try::Tiny;

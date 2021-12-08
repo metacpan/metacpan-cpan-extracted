@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '2.042'; # VERSION
+our $VERSION = '2.043'; # VERSION
 
 use Carp;
 use PDF::API2::Basic::PDF::Utils;
@@ -276,7 +276,7 @@ sub rect {
 
     $annotation = $annotation->border($h_radius, $v_radius, $width);
 
-Define the border style.  Defaults to 0, 0, 1.
+Define the border style.  Defaults to 0, 0, 0 (no border).
 
 =cut
 

@@ -1,11 +1,13 @@
-# Copyrights 2003-2015 by [Mark Overmeer].
+# Copyrights 2003-2021 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of perl distribution OODoc.  It is licensed under the
+# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
 
 package OODoc::Format::Html;
 use vars '$VERSION';
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 use base 'OODoc::Format';
 
@@ -149,7 +151,7 @@ sub createOtherPages(@)
     #
     # Collect files to be processed
     #
- 
+
     my $source   = $args{source};
     if(defined $source)
     {   -d $source
@@ -213,7 +215,7 @@ sub createOtherPages(@)
     $self;
 }
 
- 
+
 sub expandTemplate($$)
 {   my $self     = shift;
     my $loc      = shift || panic;
@@ -478,7 +480,7 @@ sub showOptionUse(@)
     $params    =~ s/^\s+//;
     $params    = qq[ =&gt; <span class="params">$params</span>]
         if length $params;
- 
+
     my $use    = qq[<span class="option">$option</span>];
     $output->print( qq[<dt class="option_use">$use$params</dt>\n] );
     $self;
@@ -568,7 +570,7 @@ our %producers =
  , title       => 'templateTitle'
  , version     => 'templateVersion'
  );
-   
+
 sub format(@)
 {   my ($self, %args) = @_;
     my $output    = delete $args{output};
@@ -916,7 +918,7 @@ sub templateList($$)
         else
         {   error __x"illegal value to show_sections: {v}", v => $show_sec;
         }
-     
+
         # All sections within the chapter (if show_sec is enabled)
 
         foreach my $section (@sections)
@@ -950,7 +952,7 @@ sub templateList($$)
 sub indexListSubroutines(@)
 {   my $self   = shift;
     my $manual = shift;
-    
+
     join ",\n"
        , map { $self->link($manual, $_, $_) }
             @_;

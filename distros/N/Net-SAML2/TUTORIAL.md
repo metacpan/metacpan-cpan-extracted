@@ -327,7 +327,7 @@ The handle_response() of the Net::SAML2::Binding::POST object processes the resp
 
 handle_response is pretty short but does a couple of important things:
 
-1. Calls Net::SAML2::XML::Sig to verify the signatures in the $saml_response XML
+1. Calls XML::Sig to verify the signatures in the $saml_response XML
 2. Verifies that the certificate that signed the XML was signed by the $cacert
 
 ### Get the Assertion from the SAMLResponse XML

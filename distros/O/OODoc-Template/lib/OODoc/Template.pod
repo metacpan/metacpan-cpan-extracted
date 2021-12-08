@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 OODoc::Template - Simple template system
@@ -102,7 +104,7 @@ call this method as often as you want without serious penalty.
 
 =over 4
 
-=item $obj-E<gt>B<allValuesFor>(TAG, [ATTRIBUTES, THEN, ELSE])
+=item $obj-E<gt>B<allValuesFor>( TAG, [ATTRIBUTES, THEN, ELSE] )
 
 Collects all values related to TAG in all nestings of values.  The most
 preferred is listed first.
@@ -128,7 +130,7 @@ Add new level of values to the known list.  The data in the HASH is
 copied, and a reference to the copy returned.  The copy may be changed
 afterwards.
 
-=item $obj-E<gt>B<valueFor>(TAG, [ATTRIBUTES, THEN, ELSE])
+=item $obj-E<gt>B<valueFor>( TAG, [ATTRIBUTES, THEN, ELSE] )
 
 Lookup the value for TAG in the known data.  See section L</values>
 about the way this is done.  The ATTRIBUTES (HASH of key-value pairs)
@@ -325,6 +327,15 @@ is produced dynamically.  Their syntax is like this:
 A string may contain variables, which are stringified.  This means that
 tags which produce hashes or arrays are not usuable to interpolate.
 
+B<. Example>
+
+ <!--{section nr => 2, show_number, a => "monkey", chapter => $cnr}-->
+ <!--{section nr=2 show_number a=monkey chapter=$cnr}-->
+
+The attributes result (internally) in a hash (of ARGS) which contains
+the keys C<nr>, C<show_number>, C<a>, and C<chapter> with respecively
+values C<2>, true, C<monkey>, and the looked-up value for C<cnr>.
+
 =head3 values
 
 The values which are related to the tags are rather powerful.  When
@@ -462,6 +473,29 @@ translated), then the C<alt> (alternative) is attempted if available.
 
 =back
 
+B<. Example: change the markers locally>
+
+In this example, the content of the container uses other markup
+symbols than the container itself.
+
+  <!--{define markers="<{,}>" }-->\
+    value of c: <{c}>\
+  <!--{/define}-->
+
+B<. Example: use of macro>
+
+A macro is used to define a piece of template, but apply it later.
+
+ <!--{macro name="chapter"}-->
+    <h2><!--{title}--></h2>
+ <!--{/macro}-->
+
+ <!--{template macro="chapter" title="hi there!"}-->
+
+B<. Example: use of template file>
+
+ <!--{template file=$lang/header.txt alt=en/header.txt}->
+
 =head2 White-space removal
 
 The template tags are usually quite large with respect to the output
@@ -475,16 +509,32 @@ When the first line with (visual) content starts with a (start or end)
 marker, then the blanks before that are removed as well.  In other cases,
 the blanks are left intact.
 
+B<. Example: of white-space removal>
+
+The template looks like this:
+
+ The follow\
+ ing error was\
+
+  produced:
+     <!--{error}-->, \
+     <!--{errno}-->
+
+The output is:
+
+ The following error was produced:
+    No such file or directory, 2
+
 =head1 SEE ALSO
 
-This module is part of OODoc-Template distribution version 0.16,
-built on January 11, 2013. Website: F<http://perl.overmeer.net/oodoc-template/>
+This module is part of OODoc-Template distribution version 0.17,
+built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc-template/>
 
 =head1 LICENSE
 
-Copyrights 2003,2007-2013 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2003,2007-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
 

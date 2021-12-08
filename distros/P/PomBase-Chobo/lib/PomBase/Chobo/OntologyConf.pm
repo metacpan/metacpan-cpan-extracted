@@ -33,7 +33,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use warnings;
 use Carp;
@@ -104,6 +104,9 @@ our %field_conf = (
     type => 'SINGLE',
   },
   replaced_by => {
+    type => 'SINGLE',
+  },
+  consider => {
     type => 'SINGLE',
   },
   is_obsolete => {

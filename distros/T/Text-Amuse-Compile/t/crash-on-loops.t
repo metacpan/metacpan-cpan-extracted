@@ -7,10 +7,9 @@ use File::Spec;
 use Text::Amuse::Compile::Utils qw/write_file/;
 use Text::Amuse::Compile;
 use Test::More;
-use IO::Pipe;
 
 if ($ENV{TEST_WITH_LATEX}) {
-    plan tests => 6;
+    plan tests => 4;
 }
 else {
     plan skip_all => 'PDF compilation needed';
@@ -25,17 +24,4 @@ for (1,2) {
     ok (-f File::Spec->catfile($wd, 'test.pdf'), "PDF generated");
     ok (-f File::Spec->catfile($wd, 'test.a4.pdf'), "PDF generated");
 }
-
-
-my $pipe = IO::Pipe->new;
-$pipe->reader('perl', '-e', 'print 0');
-$pipe->autoflush(1);
-my $found;
-while (my $line = <$pipe>) {
-    diag "Found $line";
-    ok !$line, "Line is false, but read";
-    $found++;
-}
-wait;
-ok $found;
 

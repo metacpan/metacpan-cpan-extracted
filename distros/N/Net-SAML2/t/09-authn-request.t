@@ -4,6 +4,7 @@ use Test::Lib;
 use Test::Net::SAML2;
 
 use Net::SAML2::Protocol::AuthnRequest;
+use Net::SAML2::XML::Sig;
 
 my $ar = Net::SAML2::Protocol::AuthnRequest->new(
     issuer        => 'http://some/sp',
@@ -44,7 +45,6 @@ test_xml_attribute_ok($xp,
     '/samlp:AuthnRequest/samlp:NameIDPolicy/@AllowCreate', '1');
 
 my $signer = Net::SAML2::XML::Sig->new({
-    canonicalizer => 'XML::CanonicalizeXML',
     key => 't/sign-nopw-cert.pem',
     cert => 't/sign-nopw-cert.pem',
 });

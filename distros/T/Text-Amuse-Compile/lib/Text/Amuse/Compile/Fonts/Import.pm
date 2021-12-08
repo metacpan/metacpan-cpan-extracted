@@ -2,7 +2,7 @@ package Text::Amuse::Compile::Fonts::Import;
 use utf8;
 use strict;
 use warnings;
-use IO::Pipe;
+use IPC::Run qw/run/;
 use JSON::MaybeXS ();
 use Text::Amuse::Compile::Fonts;
 use Moo;
@@ -95,16 +95,14 @@ sub all_fonts {
 sub import_with_fclist {
     my $self = shift;
     return unless $self->use_fclist;
-    local $_;
     my %specs;
     my %all = $self->all_fonts;
-    my $pipe = IO::Pipe->new;
+    my ($in, $out, $err);
+    my $ok = run ['fc-list'], \$in, \$out, \$err;
+    # warn $err if $err;
     my @dupes;
-    $pipe->reader('fc-list');
-    $pipe->autoflush;
-    while (<$pipe>) {
-        chomp;
-        if (m/(.+?)\s*:
+    foreach my $line (split(/\r?\n/, $out)) {
+        if ($line =~ m/(.+?)\s*:
               \s*(.+?)(\,.+)?\s*:
               \s*style=(
                   Book|Roman|Medium|Regular|
@@ -126,7 +124,6 @@ sub import_with_fclist {
             }
         }
     }
-    wait;
     if (@dupes) {
         warn "Deleting duplicated fonts, likely to cause problems:" . join(" ", @dupes). "!\n";
         foreach my $dupe (@dupes) {
@@ -142,14 +139,12 @@ sub import_with_imagemagick {
     return unless $self->use_imagemagick;
     my %specs;
     my %all = $self->all_fonts;
-    local $_;
-    my $pipe = IO::Pipe->new;
-    $pipe->reader('identify', -list => 'font');
-    $pipe->autoflush;
     my %current;
-    while (<$pipe>) {
-        chomp;
-        if (m/^\s*Font:/) {
+    my ($in, $out, $err);
+    my $ok = run [qw/identify -list font/], \$in, \$out, \$err;
+    # warn $err if $err;
+    foreach my $line (split(/\r?\n/, $out)) {
+        if ($line =~ m/^\s*Font:/) {
             if ($current{family} && $current{glyphs} && $current{style} && $current{weight}) {
                 my $name = $current{family};
                 my $file = $current{glyphs};
@@ -183,7 +178,7 @@ sub import_with_imagemagick {
             }
             %current = ();
         }
-        elsif (m/^\s*(\w+):\s+(.+)\s*$/) {
+        elsif ($line =~ m/^\s*(\w+):\s+(.+)\s*$/) {
             my ($name, $value) = ($1, $2);
             $current{$name} = $value;
             if ($name eq 'glyphs' and $value !~ m/\.(t|o)tf\z/i) {
