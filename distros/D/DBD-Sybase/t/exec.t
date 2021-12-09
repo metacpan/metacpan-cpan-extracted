@@ -11,7 +11,7 @@ use _test;
 use strict;
 
 #use Test::More qw(no_plan);
-use Test::More tests => 22;
+use Test::More tests => 25;
 
 
 BEGIN { use_ok('DBI', ':sql_types');
@@ -173,6 +173,33 @@ for (0 .. 1) {
 }
 
 $dbh->do("drop proc dbitest");
+
+
+$dbh->do("if object_id('[my dbitest]') is not NULL drop proc [my dbitest]");
+$rc = $dbh->do(qq{
+create proc [my dbitest] \@one varchar(20), \@two int, \@three numeric(5,2), \@four smalldatetime --, \@five float = null output
+as
+    select \@one, \@two, \@three, \@four
+
+});
+
+ok(defined($rc), "$rc (create proc)\n");
+
+$sth = $dbh->prepare("exec [my dbitest] ?, ?, ?, ?");
+$sth->bind_param(1, 'String 1', SQL_VARCHAR);
+$sth->bind_param(2, 1, SQL_INTEGER);
+$sth->bind_param(3, 3.25, SQL_DECIMAL);
+$sth->bind_param(4, '2005-06-27', SQL_DATETIME);
+
+for (0 .. 1) {
+  $sth->execute('String 1', 1, 3.25, '2005-06-27');
+  while(my $row = $sth->fetch) {
+    ok($row->[2] == 3.25, "Implicit finish handling");
+  }
+}
+
+$dbh->do("drop proc [my dbitest]");
+
 
 sub get_all_results {
     my $sth = shift;

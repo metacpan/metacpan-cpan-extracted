@@ -2,6 +2,7 @@ package Mojo::Darkpan::Util;
 use v5.25;
 use Moo;
 use Mojo::Darkpan::Config;
+use Mojo::IOLoop -signatures;
 use Data::Dumper;
 use File::Temp;
 use IO::Zlib;
@@ -16,7 +17,7 @@ has upload => (is => 'lazy');
 has author => (is => 'lazy');
 has indexer => (is => 'lazy');
 has config => (is => 'lazy');
-
+has packageFile => (is => 'lazy');
 
 sub authorized {
     my $self = shift;
@@ -70,46 +71,67 @@ sub publish {
         author    => $author,
     );
 
-    $injector->inject($module);
+    my $filename = fileparse($module);
+    $self->controller->app->log->trace("injecting module: $filename");
+    my $archive = $injector->inject($module);
 
-    # reindex to create the modules file 
-    $self->index();
+    if (-f $self->packageFile) {
+        $self->addToIndex($archive, $filename)
+    }
+    else {
+        $self->createIndex();
+    }
 }
 
-sub index {
+sub addToIndex {
     my $self = shift;
-    $self->indexer->make_index(
-        no_compress => !$self->config->compressIndex,
-    );
+    my $archive = shift;
+    my $filename = shift;
+
+    $self->controller->app->log->info("adding $filename to index");
+    $archive = $self->config->directory . "/$archive";
+    my $index = OrePAN2::Index->new();
+    $index->load($self->packageFile);
+    $self->indexer->add_index($index, $archive);
+    $self->indexer->write_index($index, $self->config->no_compress);
+}
+
+sub createIndex {
+    my $self = shift;
+    #  use a non-blocking process to reindex since this could take a while
+    Mojo::IOLoop->subprocess->run_p(sub {
+        # reindex to create the modules file 
+        $self->controller->app->log->info("starting to index modules...");
+        $self->indexer->make_index(
+            no_compress => $self->config->no_compress,
+        );
+        return "indexing completed";
+    })->then(sub($msg) {
+        $self->controller->app->log->info($msg);
+    })->catch(sub($err) {
+        $self->controller->app->log->error($err);
+    });
 }
 
 sub list {
     my $self = shift;
-    my $no_compress = !$self->config->compressIndex;
-    my $pkgfname = File::Spec->catfile(
-        $self->config->directory,
-        'modules',
-        $no_compress ? '02packages.details.txt' : '02packages.details.txt.gz'
-    );
-
-    my $data;
-    my $current;
-    my $fh = IO::Zlib->new($pkgfname, "rb");
+    my $data = {};
+    my $packageFile = $self->packageFile;
+    my $fh = IO::Zlib->new($packageFile, "rb");
     while (<$fh>) {
         next if ($_ !~ m/\.tar\.gz$/);
         my ($name, $version, $file) = split('\s+', $_);
         if (eval($version)) {
-
-            $current = $name;
             my $dir = File::Basename::dirname($file);
             my $archive = $file =~ s/$dir\///gr;
-            $data->{$current}->{version} = $version;
-            $data->{$current}->{archive} = $archive;
-            $data->{$current}->{dir} = $dir;
-            $data->{$current}->{other_versions} = $self->_getFileList($dir, $archive);
+            $data->{$file}->{version} = $version;
+            $data->{$file}->{archive} = $archive;
+            $data->{$file}->{dir} = $dir;
+            $data->{$file}->{other_versions} = $self->_getFileList($dir, $archive);
         }
         else {
-            push(@{$data->{$current}->{provides}}, $name)
+            # say "$current, $name";
+            push(@{$data->{$file}->{provides}}, $name)
         }
     }
 
@@ -133,7 +155,7 @@ sub _getFileList {
     closedir $dir;
 
     my $prefix = $current =~ s/-(.*)\.tar\.gz//r;
-    
+
     my @data;
     for (@files) {
         next if $_ =~ m/^\./;
@@ -184,6 +206,17 @@ sub _build_indexer {
 
 sub _build_config {
     return Mojo::Darkpan::Config->new;
+}
+
+sub _build_packageFile {
+    my $self = shift;
+    my $dir = $self->config->directory;
+    my $pkgfname = File::Spec->catfile(
+        $dir,
+        'modules',
+        $self->config->no_compress ? '02packages.details.txt' : '02packages.details.txt.gz'
+    );
+    return $pkgfname;
 }
 
 1;

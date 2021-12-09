@@ -15,7 +15,7 @@ name: Dist-Zilla-Plugin-SignReleaseNotes
 provides:
   Dist::Zilla::Plugin::SignReleaseNotes:
     file: lib/Dist/Zilla/Plugin/SignReleaseNotes.pm
-    version: '0.0001'
+    version: '0.0003'
 requires:
   Dist::Zilla: '2.100921'
   File::chdir: '0'
@@ -24,7 +24,7 @@ resources:
   bugtracker: https://github.com/timlegge/perl-Dist-Zilla-Plugin-SignReleaseNotes/issues
   homepage: http://search.cpan.org/dist/perl-Dist-Zilla-Plugin-SignReleaseNotes/
   repository: git://github.com/timlegge/perl-Dist-Zilla-Plugin-SignReleaseNotes.git
-version: '0.0001'
+version: '0.0003'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,5 +1,18 @@
 Revision history for PICA::Data
 
+2.00 2021-12-09T09:29:42Z
+    - Fix Unicode output of field labels
+    - PICA Path: allow dot alternative to $
+    - PICA Path: allow star as subfield wildcard
+    - PICA Path: field without occurrence will only match occurrence zero, use /* for any occurrence
+    - Remove option position_as_occurrence, use '/' for occurences by default
+    - picadata: colorize output of (sub)fields schedules
+    - Document methods to append, update and remove fields and extend update method
+    - picadata: add command 'modify'
+
+1.35 2021-11-05T10:13:05Z
+    - Add methods to append, update and remove fields in record (#118)
+
 1.34 2021-10-05T07:16:02Z
     - support x-counter field identifiers in schemas
     - remove occurrence zero (/00) in schemas

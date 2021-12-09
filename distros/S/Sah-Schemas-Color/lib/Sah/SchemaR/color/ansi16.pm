@@ -1,7 +1,7 @@
 package Sah::SchemaR::color::ansi16;
 
-our $DATE = '2020-06-13'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-07-19'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>1,value=>0},{valid=>1,value=>15},{valid=>0,value=>16},{valid=>1,validated_value=>"black",value=>"black"},{valid=>0,value=>"foo"}],match=>qr(\A(?:0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|
                     (?:(bold|bright) \s )?(black|red|green|yellow|blue|magenta|cyan|white))\z)ix,summary=>"ANSI-16 color, either a number from 0-15 or color names like \"black\", \"bold red\", etc"}],["str"]];
@@ -21,7 +21,7 @@ Sah::SchemaR::color::ansi16 - ANSI-16 color, either a number from 0-15 or color 
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2020-06-13.
+This document describes version 0.014 of Sah::SchemaR::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2021-07-19.
 
 =head1 DESCRIPTION
 
@@ -51,7 +51,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

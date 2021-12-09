@@ -23,15 +23,19 @@ RUN cpm install --global --show-build-log-on-failure
 
 FROM debian:stable-slim AS build-image
 
-RUN apt-get update
-RUN apt-get update && apt-get install -y \
-    curl tar wget ca-certificates 
+RUN apt-get update && apt-get install  --no-install-recommends --no-install-suggests  -y \
+    curl tar wget ca-certificates \
+    git openssh-client
 
 COPY --from=compile-image /usr/local /usr/local
 WORKDIR /opt
 
-COPY ./lib ./lib
-COPY ./script ./script
+ARG VER=1.0
+
+COPY ./lib/Mojo /usr/local/lib/perl5/site_perl/5.34.0/Mojo
+COPY lib/Mojolicious/Plugin/DirectoryHandler.pm /usr/local/lib/perl5/site_perl/5.34.0/Mojolicious/Plugin
+COPY ./script/darkpan /usr/local/bin
+COPY ./script/darkpan_app.pl /usr/local/bin
 
 EXPOSE 3000
 

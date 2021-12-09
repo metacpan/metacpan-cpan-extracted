@@ -34,6 +34,10 @@ throws_ok {
     is_patch("001A \$x.", "- 001A \$y.", "");
 } qr/records don't match, expected: 001A \$y\./, 'patch error';
 
+throws_ok {
+    is_patch("001A \$x0\n101A \$x0", "", "");
+} qr{diff/patch only allowed on atomic records}, 'patch error';
+
 sub is_diff {
     my ($reca, $recb) = (shift, shift);
     my $a = pica_parser(plain => \$reca)->next || [];

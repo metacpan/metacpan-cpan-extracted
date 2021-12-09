@@ -1,5 +1,8 @@
 Revision history for Math-RNG-Microsoft
 
+0.2.0   2021-12-09
+    - Add Math::RNG::Microsoft::FCPro .
+
 0.0.5   2020-10-18
     - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
         - Move to @SHLOMIF

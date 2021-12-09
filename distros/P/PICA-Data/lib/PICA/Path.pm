@@ -2,98 +2,115 @@ package PICA::Path;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '1.34';
+our $VERSION = '2.00';
+
+require Exporter;
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw(pica_field_matcher);
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
+use List::Util qw(any);
 
 use overload '""' => \&stringify;
 
 sub new {
     my $class = shift;
-    my $self = parse(@_) or confess "invalid pica path";
+    my $self  = parse(@_) or confess "invalid pica path";
     bless $self, $class;
 }
 
-sub parse {
-    my ($path, %options) = @_;
+our $TAG        = '(?<tag>[012.][0-9.][0-9.][A-Z@.])';
+our $SUBFIELDS  = '(?<subfields>[A-Za-z0-9]+|\*)';
+our $POSITION   = '(?<position>(\d+)?(-(\d+)?)?)';
+our $OCCURRENCE = '(?<occurrence>(\d+-\d+|[0-9.]{1,3}|\*))';
 
-    return if $path !~ /^
-        (?<tag>[012.][0-9.][0-9.][A-Z@.])
-        (\[(?<occurrence>[0-9.]{2,3}|\d+-\d+)\])?
-        (\$?(?<subfields>[_A-Za-z0-9]+))?
-        (\/(\d+)?(-(\d+)?)?)? # position
-    /x;
+sub parse {
+    my ($path) = @_;
+
+    my $pattern = qr{^
+        $TAG
+        (\[$OCCURRENCE\] | \/$OCCURRENCE)?
+        ([\$.]?$SUBFIELDS)?
+        (\/$POSITION)?
+    $}x;
+
+    return if $path !~ $pattern;
 
     my $field      = $+{tag};
     my $occurrence = $+{occurrence};
-    my $subfield = defined $+{subfields} ? "[$+{subfields}]" : "[_A-Za-z0-9]";
+    my $subfield   = $+{subfields};
+    my $position   = $+{position};
 
-    my @position;
-    if (defined $6) {    # position
-        if (!defined $occurrence && $options{position_as_occurrence}) {
-            $occurrence = $7 . $8;
-        }
-        else {
-            my ($from, $dash, $to, $length) = ($7, $8, $9, 0);
-
-            if ($dash) {
-                return unless defined($from // $to);    # /-
-            }
-
-            if (defined $to) {
-                if (!$from and $dash) {                 # /-X
-                    $from = 0;
-                }
-                $length = $to - $from + 1;
-            }
-            else {
-                if ($8) {
-                    $length = undef;
-                }
-                else {
-                    $length = 1;
-                }
-            }
-
-            if (!defined $length or $length >= 1) {
-                unless (!$from and !defined $length) {    # /0-
-                    @position = ($from, $length);
-                }
-            }
-        }
+    if ($subfield eq '*') {
+        $subfield = qr{[A-Za-z0-9]};
+    }
+    elsif (defined $subfield) {
+        $subfield = qr{[$subfield]};
+    }
+    elsif (defined $position) {
+        $subfield = qr{[A-Za-z0-9]};
     }
 
-    $field = qr{$field};
-
-    if ($occurrence =~ /^0+$/) {
+    if ($occurrence eq '*' or (!$occurrence && $field =~ /^[2.]/)) {
+        $occurrence = '*';
+    }
+    elsif ($occurrence =~ /^0*$/) {
         $occurrence = undef;
     }
-    elsif (defined $occurrence) {
-        if ($occurrence =~ /-/) {
-            my ($from, $to) = map {1 * $_} split '-', $occurrence;
-            if ($from eq $to) {
-                $occurrence = qr{$from};
-            }
-            elsif ($from < $to) {
-                $occurrence = [$from, $to];
-            }
-            else {
-                return;
-            }
+    elsif ($occurrence =~ /-/) {
+        my ($from, $to) = map {1 * $_} split '-', $occurrence;
+        if ($from eq $to) {
+            $occurrence = qr{$from};
+        }
+        elsif ($from < $to) {
+            $occurrence = [$from, $to];
         }
         else {
-            $occurrence = qr{$occurrence};
+            return;
+        }
+    }
+    elsif (defined $occurrence) {
+        $occurrence = qr{$occurrence};
+    }
+
+    my @pos;
+    if (defined $position) {
+        $position =~ $POSITION;
+
+        my ($from, $dash, $to, $length) = ($2, $3, $4, 0);
+
+        if ($dash) {
+            return unless defined($from // $to);    # /-
+        }
+
+        if (defined $to) {
+            if (!$from and $dash) {                 # /-X
+                $from = 0;
+            }
+            $length = $to - $from + 1;
+        }
+        else {
+            if ($dash) {
+                $length = undef;
+            }
+            else {
+                $length = 1;
+            }
+        }
+
+        if (!defined $length or $length >= 1) {
+            unless (!$from and !defined $length) {    # /0-
+                @pos = ($from, $length);
+            }
         }
     }
 
-    $subfield = qr{$subfield};
-
     return {
-        field      => $field,
+        field      => qr{$field},
         occurrence => $occurrence,
         subfield   => $subfield,
-        position   => \@position
+        position   => \@pos
     };
 }
 
@@ -127,7 +144,7 @@ sub match {
             = $args{pluck}
             ? $self->match_subfields($field, pluck => 1)
             : $self->match_subfields($field);
-        next unless defined $matched_subfields[0];
+        next unless grep {defined $_} @matched_subfields;
         if ($args{split}) {
             if ($args{nested_arrays}) {
                 push @matches, \@matched_subfields;
@@ -165,13 +182,19 @@ sub match_field {
     my ($self, $field) = @_;
 
     return if $field->[0] !~ $self->{field};
-    if (my $spec = $self->{occurrence}) {
+
+    my $spec = $self->{occurrence};
+
+    if ($spec ne '*') {
         my $occ = $field->[1];
-        if (ref $spec eq 'ARRAY') {
+        if (!$spec) {
+            return if $occ > 0;
+        }
+        elsif (ref $spec eq 'ARRAY') {
             return if $occ < $spec->[0] or $occ > $spec->[1];
         }
         else {
-            return unless ($spec > 0 && $occ =~ $spec);
+            return if $occ !~ $spec;
         }
     }
 
@@ -264,7 +287,9 @@ sub stringify {
     my $str = $self->fields;
 
     my $occurrence = $self->occurrences;
-    $str .= "[$occurrence]" if defined $occurrence;
+    if (defined $occurrence) {
+        $str .= "/$occurrence" unless $str =~ /^[2.]/ and $occurrence eq '*';
+    }
 
     my $subfields = $self->subfields;
     if (defined $subfields) {
@@ -275,7 +300,12 @@ sub stringify {
     }
 
     my $pos = $self->positions;
-    $str .= "/$pos" if defined $pos;
+    if (defined $pos) {
+        $str
+            .= (defined $subfields || defined $occurrence)
+            ? "/$pos"
+            : "\$*/$pos";
+    }
 
     $str;
 }
@@ -291,12 +321,15 @@ sub occurrences {
 }
 
 sub subfields {
+    return unless defined $_[0]->{subfield};
     my $subfields = unescape($_[0]->{subfield});
-    if (defined $subfields and $subfields ne '[_A-Za-z0-9]') {
+    if ($subfields eq '[A-Za-z0-9]') {
+        return '*';
+    }
+    else {
         $subfields =~ s/\[|\]//g;
         return $subfields;
     }
-    return;
 }
 
 sub positions {
@@ -321,6 +354,14 @@ sub positions {
     }
 
     return $pos;
+}
+
+sub pica_field_matcher {
+    my @pathes = map {ref $_ ? $_ : PICA::Path->new($_)} @_;
+    sub {
+        my $field = shift;
+        any {$_->match_field($field)} @pathes;
+    };
 }
 
 1;
@@ -542,19 +583,19 @@ Option C<nested_arrays> creates a list for every field found:
 Field C<045F> is repeated and has occurrences.
     
     # get subfield from field with specific occurrence
-    $path = PICA::Path->new('045F[01]$a');
+    $path = PICA::Path->new('045F/01$a');
     $match = $path->match($record);
     # $match = '001'
     
     # get subfield from field with wildcard for occurrence
-    $path = PICA::Path->new('045F[0.]$a');
+    $path = PICA::Path->new('045F/0.$a');
     $match = $path->match($record);
     # $match = '001002'
 
 Option C<split> creates a list out of subfields:
 
     # split subfields to list
-    $path = PICA::Path->new('045F[0.]$a');
+    $path = PICA::Path->new('045F/0.$a');
     $match = $path->match($record, split => 1);
     # $match = ['001', '002']
 
@@ -565,32 +606,32 @@ The dot (.) is a wildcard for field tags, occurrence and subfield codes.
 The path C<.....> means take any subfield from any field.
 
     # get all subfields from all fields
-    $path = PICA::Path->new('....$.');
+    $path = PICA::Path->new('..../*$.');
     $match = $path->match($record);
     # $match = '1234-56781011-1213http://example.org/ABCTitleSupplement16001700180019002000001002003004005'
     
     # get specific subfield from all fields
-    $path = PICA::Path->new('....$a');
+    $path = PICA::Path->new('..../*$a');
     $match = $path->match($record);
     # $match = 'Title001002'
 
 Option C<split> creates a list out of subfields:
 
     # split subfields to list
-    $path = PICA::Path->new('....$a');
+    $path = PICA::Path->new('..../*$a');
     $match = $path->match($record, split => 1);
     # $match = ['Title', '001', '002']
 
 Option C<nested_arrays> creates a list for every field found:
 
     # split fields to lists
-    $path = PICA::Path->new('....');
+    $path = PICA::Path->new('..../*');
     $match = $path->match($record, split => 1, nested_arrays => 1);
     # $match = [['1234-5678'], ['1011-1213'], [ 'http://example.org/', 'A', 'B', 'C', ], [ 'Title', 'Supplement' ], [ 1600, 1700, 1800, 1900, 2000, ], ['001'], ['002'], [ '003', '004' ], ['005']]
 
 =head1 METHODS
 
-=head2 new( $expression [, position_as_occurrence => 1 ] )
+=head2 new( $expression )
 
 Create a PICA path by parsing the path expression. The expression consists of
 
@@ -603,12 +644,14 @@ or C<@>.  The character C<.> can be used as wildcard.
 
 =item
 
-An optional occurrence, given by two or three digits (or C<.> as wildcard) in brackets,
-e.g. C<[12]>, C<[0.]> or C<[102]>.
+An optional occurrence, given by two or three digits (or C<.> as wildcard) in
+brackets, e.g. C<[12]>, C<[0.]> or C<[102]> or following a slash (e.g. C</12>,
+C</0.>...). Use a star for any occurrence (C</*>). The star can be omitted if
+the first character of the tag is C<2> or C<.>.
 
 =item
 
-An optional list of subfields. Allowed subfield codes include C<_A-Za-z0-9>.
+An optional list of subfields. Allowed subfield codes include C<A-Za-z0-9>.
 
 =item
 
@@ -617,9 +660,6 @@ the first), and character ranges (such as C<2-4>, C<-3>, C<2->...) are
 supported.
 
 =back
-
-If option C<position_as_occurrence> is set, positions will be read as
-occurrences, e.g. C</2-4> is read as C<[2-4]>.
 
 =head2 match( $record, %options )
 
@@ -719,6 +759,18 @@ Return the stringified occurrences expression or undefined.
 =head2 positions
 
 Return the stringified position or undefined.
+
+=head1 FUNCTIONS
+
+=head2 pica_field_matcher( $path [, $path...] )
+
+Return a function that tells whether a field matches any of given PICA Path
+expressions:
+
+  my $matcher = pica_field_matcher("012X","012Y");
+  if ($matcher->($field)) { ... }
+
+Subfields and positions in PICA Path expressions are ignored.
 
 =head1 SEE ALSO
 

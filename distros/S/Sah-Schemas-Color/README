@@ -2,8 +2,25 @@ NAME
     Sah::Schemas::Color - Sah schemas related to color codes/names
 
 VERSION
-    This document describes version 0.013 of Sah::Schemas::Color (from Perl
-    distribution Sah-Schemas-Color), released on 2020-06-13.
+    This document describes version 0.014 of Sah::Schemas::Color (from Perl
+    distribution Sah-Schemas-Color), released on 2021-07-19.
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
+SAH SCHEMAS
+    *   color::ansi16
+
+        ANSI-16 color, either a number from 0-15 or color names like
+        "black", "bold red", etc.
+
+    *   color::ansi256
+
+        ANSI-256 color, an integer number from 0-255.
+
+    *   color::rgb24
+
+        RGB 24-digit color, a hexdigit e.g. ffcc00.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -29,7 +46,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017 by
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

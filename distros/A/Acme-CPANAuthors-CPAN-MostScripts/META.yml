@@ -1,5 +1,5 @@
 ---
-abstract: 'Authors with the most scripts on CPAN'
+abstract: 'Authors with the most number of scripts on CPAN'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -19,7 +19,7 @@ name: Acme-CPANAuthors-CPAN-MostScripts
 provides:
   Acme::CPANAuthors::CPAN::MostScripts:
     file: lib/Acme/CPANAuthors/CPAN/MostScripts.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Acme::CPANAuthors::Register: '0'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-CPAN-MostScripts
   homepage: https://metacpan.org/release/Acme-CPANAuthors-CPAN-MostScripts
   repository: git://github.com/perlancar/perl-Acme-CPANAuthors-CPAN-MostScripts.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

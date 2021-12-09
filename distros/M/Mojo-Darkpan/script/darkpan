@@ -32,8 +32,9 @@ if (defined $devmode) {
 
 }
 else {
-    $ENV{MOJO_MODE}='production';
+    $ENV{MOJO_MODE} = 'production';
     my $darkpan = Mojo::Server::Prefork->new(listen => [ 'http://*:' . $port ]);
+    $darkpan->graceful_timeout(120);
     $darkpan->app(Mojo::Darkpan->new);
     $darkpan->run;
 }

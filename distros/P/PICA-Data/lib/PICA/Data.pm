@@ -1,26 +1,26 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '1.34';
+our $VERSION = '2.00';
 
 use Exporter 'import';
 our @EXPORT_OK
     = qw(pica_data pica_parser pica_writer pica_path pica_xml_struct
     pica_match pica_values pica_value pica_fields pica_subfields
-    pica_title pica_holdings pica_items
+    pica_title pica_holdings pica_items pica_field
     pica_split pica_annotation pica_sort pica_guess clean_pica pica_string pica_id
     pica_diff pica_patch pica_empty);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 our $ILN_PATH = PICA::Path->new('101@a');
-our $EPN_PATH = PICA::Path->new('203@/..0');
+our $EPN_PATH = PICA::Path->new('203@/*$0');
 
 use Carp qw(croak);
 use Scalar::Util qw(reftype blessed);
 use Encode qw(decode);
 use List::Util qw(first any);
 use IO::Handle;
-use PICA::Path;
+use PICA::Path qw(pica_field_matcher);
 use Hash::MultiValue;
 
 use sort 'stable';
@@ -60,22 +60,138 @@ sub pica_values {
     return $path->record_subfields($record);
 }
 
+sub pica_field {
+    my $tag = shift;
+
+    # simplify migration from PICA::Record
+    return pica_field($tag->{_tag}, $tag->{_occurrence},
+        @{$tag->{_subfields}})
+        if ref $tag eq 'PICA::Field';
+
+    my $occ = '';
+
+    if (@_ % 2) {
+        $occ = shift // '';
+        croak "invalid tag: $tag"        if $tag !~ qr/^[0-2]\d{2}[A-Z@]$/;
+        croak "invalid occurrence: $occ" if $occ !~ qr/^\d+$/;
+    }
+    elsif ($tag =~ m/^([0-2]\d{2}[A-Z@])(\/(\d+))?$/) {
+        $tag = $1;
+        $occ = $3;
+    }
+
+    if ($occ > 0) {
+        if ($occ < 99) {
+            $occ = sprintf('%02d', $occ);
+        }
+        elsif (substr($tag, 0, 1) eq '2') {
+            $occ = sprintf('%03d', $occ);
+        }
+        else {
+            croak "invalid occurrence: $occ";
+        }
+    }
+    else {
+        $occ = undef;
+    }
+
+    croak "missing subfields" unless @_;
+
+    my @field = ($tag, $occ);
+
+    while (@_) {
+        my $code  = shift;
+        my $value = shift;
+
+        croak "invalid subfield code: $code" if $code !~ /^[A-Za-z0-9]$/;
+
+        if (defined $value and $value ne '') {
+            push @field, $code, $value;
+        }
+    }
+
+    return \@field;
+}
+
 sub pica_fields {
     my $record = shift;
+    croak "missing record. Did you mean pica_field instead of pica_fields?"
+        unless ref $record;
+
     $record = $record->{record} if reftype $record eq 'HASH';
 
     return $record unless @_;
 
-    my @pathes = map {
-        ref $_ ? $_ : eval {PICA::Path->new($_)}
-    } @_;
+    my $matcher = eval {pica_field_matcher(@_)};
+    return [] unless $matcher;
 
-    return [
-        grep {
-            my $cur = $_;
-            any {$_->match_field($cur)} @pathes
-        } @$record
-    ];
+    return [grep {$matcher->($_)} @$record];
+}
+
+sub pica_append {
+    my $fields = reftype $_[0] eq 'HASH' ? shift->{record} : shift;
+    push @$fields, pica_field(@_);
+}
+
+sub pica_remove {
+    my $fields  = reftype $_[0] eq 'HASH' ? shift->{record} : shift;
+    my $matcher = pica_field_matcher(@_);
+
+    # modify in_place
+    splice @$fields, 0, @$fields, grep {!$matcher->($_)} @$fields;
+}
+
+sub pica_update {
+    my $fields = reftype $_[0] eq 'HASH' ? shift->{record} : shift;
+    if (@_ == 2) {
+        my $path    = PICA::Path->new(shift);
+        my $sfregex = $path->{subfield} or croak "missing subfields";
+        my $value   = shift // '';
+
+        for (my $i = 0; $i < @$fields; $i++) {
+            if ($path->match_field($fields->[$i])) {
+                my $f = $fields->[$i];
+                if ($value ne '') {
+
+                    # replace subfield value
+                    my $append = $path->subfields =~ /^[A-Za-z0-9]$/;
+                    for (my $j = 2; $j < @$f; $j += 2) {
+                        if ($f->[$j] =~ $sfregex) {
+                            $f->[$j + 1] = $value;
+                            $append = 0;
+                        }
+                    }
+                    push @$f, $path->subfields, $value if $append;
+                }
+                else {
+                    # remove subfield
+
+                    my @sf;
+                    for (my $j = 2; $j < @$f; $j += 2) {
+                        push @sf, $f->[$j], $f->[$j + 1]
+                            if $f->[$j] !~ $sfregex;
+                    }
+                    my $sfnum = @$f % 2 ? @$f - 3 : @$f - 2;
+                    if (@sf && @sf < $sfnum) {
+                        splice @$f, 2, $sfnum, @sf;
+                    }
+                    else {
+                        # field is empty, so remove it
+                        splice @$fields, $i--, 1;
+                    }
+                }
+            }
+        }
+    }
+    elsif (@_) {
+        my $value = pica_field(@_);
+        my $path  = PICA::Path->new($value->[0] . '/' . ($value->[1] // '0'));
+        for (my $i = 0; $i < @$fields; $i++) {
+            if ($path->match_field($fields->[$i])) {
+                $fields->[$i] = $value;
+            }
+        }
+    }
 }
 
 sub pica_subfields {
@@ -91,7 +207,7 @@ sub pica_value {
     my ($record, $path) = @_;
 
     $record = $record->{record} if reftype $record eq 'HASH';
-    $path = eval {PICA::Path->new($path)} unless ref $path;
+    $path   = eval {PICA::Path->new($path)} unless ref $path;
     return unless defined $path;
 
     foreach my $field (@$record) {
@@ -151,7 +267,7 @@ sub cmp_level2 {
 sub pica_title {
     my ($fields) = @_;
 
-    my $record = {record => [sort_fields(pica_fields($_[0], "0..."))]};
+    my $record = {record => [sort_fields(pica_fields($_[0], "0.../*"))]};
 
     my $ppn = pica_value($record, '003@0');
     $record->{_id} = $ppn if defined $ppn;
@@ -290,6 +406,9 @@ sub pica_annotation {
 *empty     = *pica_empty;
 *diff      = *pica_diff = *PICA::Patch::pica_diff;
 *patch     = *pica_patch = *PICA::Patch::pica_patch;
+*append    = *pica_append;
+*remove    = *pica_remove;
+*update    = *pica_update;
 
 use PICA::Patch;
 use PICA::Parser::XML;
@@ -414,6 +533,7 @@ PICA::Data - PICA record processing
 =begin markdown 
 
 [![Unix build Status](https://travis-ci.com/gbv/PICA-Data.png)](https://travis-ci.com/gbv/PICA-Data)
+[![Linux build status](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml/badge.svg)](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml)
 [![Windows build status](https://ci.appveyor.com/api/projects/status/5qjak74x7mjy7ne6?svg=true)](https://ci.appveyor.com/project/nichtich/pica-data)
 [![Coverage Status](https://coveralls.io/repos/gbv/PICA-Data/badge.svg)](https://coveralls.io/r/gbv/PICA-Data)
 [![Kwalitee Score](http://cpants.cpanauthors.org/dist/PICA-Data.png)](http://cpants.cpanauthors.org/dist/PICA-Data)
@@ -659,7 +779,7 @@ available as C<_id> Also available as accessor C<items>.
 
 =head2 pica_split( $record)
 
-Returns the record splitted into multiple records for each level.
+Returns the record splitted into individual records for each level.
 
 =head2 pica_sort( $record )
 
@@ -680,6 +800,20 @@ as method C<diff>. See L<PICA::Patch> for details.
 
 Return a new record by application of a difference given as annotated PICA.
 Also available as method C<patch>. See L<PICA::Patch> for details.
+
+=head2 pica_append( $record, $tag, [$occurrence,] @subfields )
+
+Append a new field to the end of the record.
+
+=head2 pica_update( $record, ... )
+
+Change an existing field. This method can be used like method C<append> or with
+two arguments (path and value) to replace, add or remove a subfield value.
+
+=head2 pica_remove( $record, $path [, $path..] )
+
+Remove all fields matching given PICA Path expressions. Subfields and positions
+in the path are ignored.
 
 =head1 ACCESSORS
 
@@ -742,6 +876,32 @@ L<PICA::Writer::Plain> by default. This are equivalent:
 
 Serialize PICA record in a given format (C<plain> by default). This method can
 also be used as function C<pica_string>.
+
+=head2 append( $tag, [$occurrence,] @subfields )
+
+Add a field to the end of the record. An occurrence can be specified as part of
+the tag or as second argument. Subfields with empty value are ignored, so the
+following are equivalent:
+
+    $record->append('037A/01', a => 'hello', b => 'world', x => undef, y => '');
+    $record->append('037A', 1, a => 'hello', b => 'world');
+
+To simplify migration from L<PICA::Record> the field may also be given as
+instance of L<PICA::Field> but this feature may be removed in a future version.
+
+=head2 remove( $path [, $path..] )
+
+Remove all fields matching given PICA Path expressions. Subfields and positions
+are ignored.
+
+=head2 update( ... )
+
+Can be used like method C<append> but replaces an existing field. Alternatively
+changes selected subfields if called with two arguments:
+
+    $record->update('012X$a', 1); # set or add subfield $a to 1, keep other subfields
+
+Setting a subfield value to the empty string or C<undef> removes the subfield.
 
 =head2 diff( $record )
 

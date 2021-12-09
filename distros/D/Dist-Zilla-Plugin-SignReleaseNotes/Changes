@@ -1,7 +1,21 @@
 Revision history for Dist-Zilla-Plugin-SignReleaseNotes
 
+0.0003 -- Wed Dec 08 19:06:41 AST 2021
+
+  - 1cd218b Bump version number
+  - 4a416f5 Damn it - tags in wrong order
+  - 5ff8be8 v0.0002
+
+0.0002 -- Wed Dec 08 18:45:38 AST 2021
+
+  - c660580 Update .gitignore
+  - d71d925 Bump version number
+  - 48e392f Fix issue caused by tagging running before SignReleaseNotes
+  - 0fc1bca Fix up the Git Tagging
+  - faa3ec4 v0.0001
+
 0.0001 -- Tue Dec 07 17:52:03 AST 2021
 
-  - d537cd7 (HEAD -> main) Add .gitignore
+  - d537cd7 Add .gitignore
   - 20b6ea5 Fix packaging issues
-  - 1511bd9 (origin/main) Initial Version
+  - 1511bd9 Initial Version

@@ -1,5 +1,12 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.31      2021-12-08 16:48:56-06:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed quotes in new trigger. Some users may have gotten an error
+    when trying to upgrade to 0.30. That error is now fixed.
+
 0.30      2021-11-30 13:05:48-06:00 America/Chicago
 
   [Added]

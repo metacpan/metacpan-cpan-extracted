@@ -12,5 +12,13 @@ sub list($self) {
     $self->render(json => $util->list) if ($util->authorized);
 }
 
+sub reindex($self) {
+    my $util = Mojo::Darkpan::Util->new(controller => $self);
+
+    $util->createIndex();
+
+    $self->render(text => 'reindexing scheduled, may take some time to complete...') if ($util->authorized);
+}
+
 
 1;

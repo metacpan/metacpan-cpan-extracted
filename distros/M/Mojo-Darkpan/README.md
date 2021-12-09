@@ -40,6 +40,18 @@ was also taken from OrePAN2::Server as the functionality is similar if not ident
 - **-p,--port** _default: 3000_: 
     Web application port
 
+#### Paths:
+
+- **/publish** or **/authenquery**:
+    POST path(s) for releasing packages, set as the upload\_uri in your .pause file
+- **/list**: 
+    JSON list of packages and info about them
+- **/reindex**: 
+    Force OrePAN2 to do a index all modules and recreate the 02packages.details file. 
+- **/darkpan** _(may differ if you set a custom path)_: 
+    Directory listing of the repository. This is the path to reference as your mirror or
+    set the PERL\_CARTON\_MIRROR env var       
+
 ## Configuring the server
 
 Configurations can be done using environment variables or by creating a json config file.
@@ -113,9 +125,9 @@ and add your settings to the basic auth section of the config.json file.
 Publishing to darkpan can be done using a post request and a URL to git or bitbucket repo.
 
     #upload git managed module to my darkpan by curl 
-    curl --data-urlencode 'module=git+ssh://git@mygit/home/git/repos/MyModule.git' --data-urlencode 'author=SHINGLER' http://localhost:3000/publish
-    curl --data-urlencode 'module=git+file:///home/rshingleton/project/MyModule.git' --data-urlencode 'author=SHINGLER' http://localhost:3000/publish
-    curl --data-urlencode 'module=git@github.com:rshingleton/perl-module-test.git' --data-urlencode 'author=SHINGLER' http://localhost:3000/publish
+    curl --data-urlencode 'module=git+ssh://git@mygit/home/git/repos/MyModule.git' --data-urlencode 'author=reshingleton' http://localhost:3000/publish
+    curl --data-urlencode 'module=git+file:///home/rshingleton/project/MyModule.git' --data-urlencode 'author=reshingleton' http://localhost:3000/publish
+    curl --data-urlencode 'module=git@github.com:rshingleton/perl-module-test.git' --data-urlencode 'author=reshingleton' http://localhost:3000/publish
 
 The module parameter can also be an HTTP url. see [OrePAN2::Injector](https://metacpan.org/pod/OrePAN2::Injector) for 
 additional details.

@@ -43,7 +43,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::SignReleaseNotes" : {
          "file" : "lib/Dist/Zilla/Plugin/SignReleaseNotes.pm",
-         "version" : "0.0001"
+         "version" : "0.0003"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/timlegge/perl-Dist-Zilla-Plugin-SignReleaseNotes"
       }
    },
-   "version" : "0.0001",
+   "version" : "0.0003",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

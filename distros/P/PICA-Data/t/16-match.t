@@ -316,7 +316,7 @@ note('Repeated field with occurrence');
 note('Referencing the whole record');
 
 {
-    my $match = pica_match($record, '....');
+    my $match = pica_match($record, '..../*');
     is(
         $match,
         '1234-56781011-1213http://example.org/ABCTitleSupplement16001700180019002000001002003004005',
@@ -325,12 +325,12 @@ note('Referencing the whole record');
 }
 
 {
-    my $match = pica_match($record, '....a');
+    my $match = pica_match($record, '..../*a');
     is($match, 'Title001002', 'match subfield');
 }
 
 {
-    my $match = pica_match($record, '....', split => 1);
+    my $match = pica_match($record, '..../*', split => 1);
     is_deeply(
         $match,
         [
@@ -349,12 +349,12 @@ note('Referencing the whole record');
 }
 
 {
-    my $match = pica_match($record, '....a', split => 1);
+    my $match = pica_match($record, '..../*a', split => 1);
     is_deeply($match, ["Title", "001", "002"], 'match subfield split');
 }
 
 {
-    my $match = pica_match($record, '.....', split => 1, nested_arrays => 1);
+    my $match = pica_match($record, '....', split => 1, nested_arrays => 1);
     is_deeply(
         $match,
         [
@@ -374,7 +374,7 @@ note('Referencing the whole record');
 
 {
     my $match = pica_match(
-        $record, '....',
+        $record, '..../*',
         force_array   => 1,
         split         => 1,
         nested_arrays => 1
@@ -399,7 +399,7 @@ note('Referencing the whole record');
 }
 
 {
-    my $match = pica_match($record, '....$a', split => 1, nested_arrays => 1);
+    my $match = pica_match($record, '..../*$a', split => 1, nested_arrays => 1);
     is_deeply(
         $match,
         [["Title"], ["001"], ["002"]],
@@ -410,12 +410,12 @@ note('Referencing the whole record');
 note('Subtsring from field');
 
 {
-    my $match = pica_match($record, '021A/0-');
+    my $match = pica_match($record, '021A*/0-');
     is($match, 'TitleSupplement', 'match field substring');
 }
 
 {
-    my $match = pica_match($record, '021A/0-1');
+    my $match = pica_match($record, '021A*/0-1');
     is($match, 'TiSu', 'match field substring');
 }
 

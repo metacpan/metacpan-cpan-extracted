@@ -1,7 +1,7 @@
 package PICA::Patch;
 use v5.14.1;
 
-our $VERSION = '1.34';
+our $VERSION = '2.00';
 
 use PICA::Schema qw(field_identifier);
 
@@ -19,7 +19,17 @@ sub cmp_fields {
 }
 
 sub sorted_fields {
-    PICA::Data::pica_fields(PICA::Data::pica_sort(shift));
+    my $fields = PICA::Data::pica_fields(PICA::Data::pica_sort(shift));
+
+    if (@$fields) {
+        my $level = substr $fields->[0][0], 0, 1;
+        for (@$fields) {
+            die "diff/patch only allowed on atomic records\n"
+                if $level ne substr $_->[0], 0, 1;
+        }
+    }
+
+    return $fields;
 }
 
 *annotation = *PICA::Data::pica_annotation;
@@ -190,9 +200,8 @@ applied if the first field exists in the record:
 
 =head1 APPLICATION
 
-Records are always sorted before application of diff or patch. It is I<not
-recommended> to diff or patch records that subsumes multiple sub-records on
-level 1 or level 2.
+Records are always sorted before application of diff or patch. Records must be
+limited to one level and contain no sub-records.
 
 Fields are not added with a patch if the records already contains a fully
 identical field.

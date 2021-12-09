@@ -8,6 +8,7 @@ use Test::EOL;
 
 my @files = (
     'lib/Math/RNG/Microsoft.pm',
+    'lib/Math/RNG/Microsoft/FCPro.pm',
     't/00-compile.t',
     't/ms-rand.t'
 );

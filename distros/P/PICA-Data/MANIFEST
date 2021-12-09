@@ -34,6 +34,7 @@ script/picadata
 t/00-load.t
 t/10-data.t
 t/12-clean.t
+t/14-sort.t
 t/15-path.t
 t/16-match.t
 t/16-path-examples.t

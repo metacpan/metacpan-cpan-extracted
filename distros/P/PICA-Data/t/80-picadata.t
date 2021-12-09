@@ -4,7 +4,7 @@ use App::picadata;
 
 my $app;
 
-my %default = (command => 'convert', number => 0, color => '', input => ['-'], path => []);
+my %default = (command => 'convert', number => 0, color => '', input => ['-'], path => [], modify => []);
 
 sub test_args {
     my ($args, $opts, $test) = @_;

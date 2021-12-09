@@ -49,6 +49,11 @@ $path = PICA::Path->new('021A$da');
 $match = $path->match($record, pluck => 1);
 is $match, 'SupplementTitle';
 
+# pluck with undefined subfield
+$path = PICA::Path->new('021A$Xa');
+$match = $path->match($record, pluck => 1);
+is $match, 'Title';
+
 # join subfields
 $path = PICA::Path->new('021A$da');
 $match = $path->match($record, pluck => 1, join => ' ');

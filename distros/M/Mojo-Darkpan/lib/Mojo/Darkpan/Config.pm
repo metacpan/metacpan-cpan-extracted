@@ -12,6 +12,11 @@ has compressIndex => (is => 'lazy');
 has path => (is => 'lazy');
 has basic_auth => (is => 'lazy');
 
+sub no_compress {
+    my $self = shift;
+    return !$self->compressIndex;
+}
+
 sub _build_path {
     my $self = shift;
     my $path;
@@ -47,7 +52,7 @@ sub _build_basic_auth {
             config => $self->_config->{basic_auth}->{$keys[0]}
         };
     }
-    
+
     return $config;
 }
 
@@ -64,7 +69,7 @@ sub _build__config {
 
         return $config;
     }
-    
+
     return undef;
 }
 
@@ -83,7 +88,7 @@ sub _build_directory {
     # default if undef
     $dir //= 'darkpan';
 
-    $self->_validateAssetLocation($dir);
+    $dir = $self->_validateAssetLocation($dir);
 
     return $dir;
 }
@@ -106,6 +111,7 @@ sub _build_compressIndex {
 }
 
 sub _validateAssetLocation {
+    my $self = shift;
     my $dir = shift;
 
     if ($dir !~ m/^\//) {

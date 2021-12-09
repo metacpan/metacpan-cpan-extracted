@@ -120,7 +120,7 @@ static int map_syb_types _((int));
 static int map_sql_types _((int));
 static CS_CONNECTION *syb_db_connect _((struct imp_dbh_st *));
 static int syb_db_use _((imp_dbh_t *, CS_CONNECTION *));
-static int syb_st_describe_proc _((imp_sth_t *, char *));
+static int syb_st_describe_proc _((SV *sth, imp_sth_t *, char *));
 static void syb_set_error(imp_dbh_t *, int, char *);
 static char *my_strdup _((char *));
 static void fetchKerbTicket(imp_dbh_t *imp_dbh);
@@ -2172,7 +2172,7 @@ int syb_db_disconnect(SV *dbh, imp_dbh_t *imp_dbh) {
   /* If we are called in a process that is different from the one where the handle
    * was created then we do NOT disconnect.
    */
-  if (imp_dbh->disconnectInChild = 0 && imp_dbh->pid != getpid()) {
+  if (imp_dbh->disconnectInChild == 0 && imp_dbh->pid != getpid()) {
     if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
       PerlIO_printf(
           DBIc_LOGPIO(imp_dbh),
@@ -2746,17 +2746,17 @@ static void dbd_preparse(imp_sth_t *imp_sth, char *statement) {
   int state = DEFAULT;
   int next_state;
   char last_literal = 0;
-  char *src, *start, *dest;
+  char *src;
   phs_t phs_tpl;
   SV *phs_sv;
   int idx = 0;
   STRLEN namelen;
+  char name[64];
 #define VARNAME_LEN 255
   char varname[VARNAME_LEN + 1];
   int pos;
 
-  /* allocate room for copy of statement with spare capacity	*/
-  imp_sth->statement = (char*) safemalloc(strlen(statement) * 3);
+  imp_sth->statement = my_strdup(statement);
 
   /* initialise phs ready to be cloned per placeholder	*/
   memset(&phs_tpl, 0, sizeof(phs_tpl));
@@ -2781,7 +2781,6 @@ static void dbd_preparse(imp_sth_t *imp_sth, char *statement) {
   }
 
   src = statement;
-  dest = imp_sth->statement;
   while (*src) {
     next_state = state; /* default situation */
     switch (state) {
@@ -2825,28 +2824,24 @@ static void dbd_preparse(imp_sth_t *imp_sth, char *statement) {
     /*	printf("state = %d, *src = %c, next_state = %d\n", state, *src, next_state); */
 
     if (state != DEFAULT || *src != '?') {
-      *dest++ = *src++;
+      ++src;
       state = next_state;
       continue;
     }
     state = next_state;
-    start = dest; /* save name inc colon	*/
-    *dest++ = *src++;
-    if (*start == '?') { /* X/Open standard	*/
-      sprintf(start, ":p%d", ++idx); /* '?' -> ':p1' (etc)	*/
-      dest = start + strlen(start);
-    } else { /* not a placeholder, so just copy */
+    if (*src != '?') {
       continue;
     }
-    *dest = '\0'; /* handy for debugging	*/
-    namelen = (dest - start);
+    ++src;
+    sprintf(name, ":p%d", ++idx); /* '?' -> ':p1' (etc)	*/
+    namelen = strlen(name);
     if (imp_sth->all_params_hv == NULL) {
       imp_sth->all_params_hv = newHV();
     }
     phs_tpl.sv = &PL_sv_undef;
     phs_sv = newSVpv((char*) &phs_tpl, sizeof(phs_tpl) + namelen + 1);
-    hv_store(imp_sth->all_params_hv, start, namelen, phs_sv, 0);
-    strcpy(((phs_t*) (void*) SvPVX(phs_sv))->name, start);
+    hv_store(imp_sth->all_params_hv, name, namelen, phs_sv, 0);
+    strcpy(((phs_t*) (void*) SvPVX(phs_sv))->name, name);
     strcpy(((phs_t*) (void*) SvPVX(phs_sv))->varname, varname);
     if (imp_sth->type == 1) { /* if it's an EXEC call, check for OUTPUT */
       char *p = src;
@@ -2873,7 +2868,7 @@ static void dbd_preparse(imp_sth_t *imp_sth, char *statement) {
           ((phs_t*) (void*) SvPVX(phs_sv))->varname);
     }
   }
-  *dest = '\0';
+  
   if (imp_sth->all_params_hv) {
     DBIc_NUM_PARAMS(imp_sth) = (int) HvKEYS(imp_sth->all_params_hv);
     if (DBIc_DBISTATE(imp_sth)->debug >= 3) {
@@ -3080,7 +3075,7 @@ int syb_st_prepare(SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs) {
       /* RPC call - get the proc name */
       /* We could possibly get the proc params from syscolumns, but
        there are a lot of issues with that which will break it */
-      if (!syb_st_describe_proc(imp_sth, statement)) {
+      if (!syb_st_describe_proc(sth, imp_sth, statement)) {
         croak("DBD::Sybase: describe_proc failed!\n");
       }
       if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
@@ -3142,23 +3137,91 @@ int syb_st_prepare(SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs) {
   return 1;
 }
 
-static int syb_st_describe_proc(imp_sth_t *imp_sth, char *statement) {
-  char *buff = my_strdup(statement);
-  char *tok;
+/*
+  Extract the proc name (including database and owner)
+  The identifiers can be quoted with square brackets ([my proc]) or, 
+  if "quoted identifier" is enabled, with double quotes.
+  So we could have
+    database.owner.proc
+    database..proc
+    owner.proc
+    [data base]..proc
+    proc
+    "my proc"
+    [my proc]
+*/
 
-  tok = strtok(buff, " \n\t");
-  if (strncasecmp(tok, "exec", 4)) {
-    Safefree(buff);
+static int syb_st_describe_proc(SV *sth, imp_sth_t *imp_sth, char *statement) {
+  D_imp_dbh_from_sth;
+  enum {DEFAULT, QUOTED} STATES;
+  int state = DEFAULT;
+  int next_state;
+  char quote_char;
+  char *buff = my_strdup(statement);
+  char *src = buff;
+  char *start;
+
+  while (isspace(*src) && *src) {
+    /* skip over leading whitespace */
+    ++src;
+  }
+  if (strncasecmp(src, "exec", 4)) {
     return 0; /* it's gotta start with exec(ute) */
   }
-  tok = strtok(NULL, " \n\t"); /* this is the proc name */
-  if (!tok || !*tok) {
-    warn(
-        "DBD::Sybase: describe_proc: didn't get a proc name in EXEC statement\n");
+  while (!isspace(*src) && *src) {
+    /* could be exec or execute */
+    ++src;
+  }
+
+  while (isspace(*src) && *src) {
+    /* skip over whitespace between exec and proc name */
+    ++src;
+  }
+
+  start = src;
+
+  if (DBIc_DBISTATE(imp_dbh)->debug >= 5) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh),
+          "    syb_st_describe_proc parsing: |%s|\n", start);
+  }
+
+  while (*src) {
+    next_state = state; /* default situation */
+    switch (state) {
+    case DEFAULT:
+      if (*src == '[' || *src == '"') {
+        // Determine the closing quote
+        quote_char = (*src == '*' ? *src : ']');
+        next_state = QUOTED;
+      }
+      break;
+    case QUOTED:
+      if (*src == quote_char) {
+        next_state = DEFAULT;
+      }
+      break;
+    }
+    if (state == DEFAULT && isspace(*src)) {
+      *src = '\0';
+      break;
+    }
+    ++src;
+    state = next_state;
+  }
+
+  if (DBIc_DBISTATE(imp_dbh)->debug >= 5) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh),
+          "    syb_st_describe_proc after parsing: %s\n", start);
+  }
+
+
+  if (state == QUOTED) {
+    warn("DBD::Sybase - error parsing the proc name in the EXEC statement\n");
     Safefree(buff);
     return 0;
   }
-  strcpy(imp_sth->proc, tok);
+
+  strcpy(imp_sth->proc, start);
   Safefree(buff);
   return 1;
 }
@@ -4263,6 +4326,12 @@ static void clear_cache(SV *sth, imp_sth_t *imp_sth) {
   /* Clear cached statement handle attributes, if necessary */
 
   hv_delete((HV*) SvRV(sth), "NAME", 4, G_DISCARD);
+  hv_delete((HV*) SvRV(sth), "NAME_lc", 7, G_DISCARD);
+  hv_delete((HV*) SvRV(sth), "NAME_uc", 7, G_DISCARD);
+  hv_delete((HV*) SvRV(sth), "NAME_hash", 9, G_DISCARD);
+  hv_delete((HV*) SvRV(sth), "NAME_hash_lc", 12, G_DISCARD);
+  hv_delete((HV*) SvRV(sth), "NAME_hash_uc", 12, G_DISCARD);
+    
   hv_delete((HV*) SvRV(sth), "NULLABLE", 8, G_DISCARD);
   hv_delete((HV*) SvRV(sth), "NUM_OF_FIELDS", 13, G_DISCARD);
   hv_delete((HV*) SvRV(sth), "PRECISION", 9, G_DISCARD);
@@ -4973,6 +5042,12 @@ int syb_ct_data_info(SV *sth, imp_sth_t *imp_sth, int action, int column,
   ret = ct_data_info(cmd, action, column, &imp_dbh->iodesc);
 
   if (action == CS_GET) {
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 4) {
+          PerlIO_printf(DBIc_LOGPIO(imp_dbh),
+        "    ct_data_info(): ret = %d, total_txtlen = %d, textptr=%x, timestamp=%x, datatype=%d\n", ret, imp_dbh->iodesc.total_txtlen, 
+        imp_dbh->iodesc.textptr, imp_dbh->iodesc.timestamp, imp_dbh->iodesc.datatype);
+    }
+
     if (imp_dbh->iodesc.textptrlen == 0) {
       DBIh_SET_ERR_CHAR(sth, (imp_xxh_t*)imp_sth, Nullch, 0, "ct_data_info(): text pointer is not set or is undefined. The text/image column may be uninitialized in the database for this row.", Nullch, Nullch);
 
@@ -5316,7 +5391,7 @@ static int time2str(ColData *colData, CS_DATAFMT *srcfmt, char *buff, CS_INT len
 #endif
     {
       datatype = CS_TIME_TYPE;
-      value = &colData->value.bt;
+      value = &colData->value.t;
     }
 
     cs_dt_crack(context, datatype, value, &rec);

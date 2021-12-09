@@ -1,11 +1,11 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '1.34';
+our $VERSION = '2.00';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;
-use PICA::Data qw(pica_parser pica_writer);
+use PICA::Data qw(pica_parser pica_writer pica_annotation);
 use PICA::Patch qw(pica_diff pica_patch);
 use PICA::Schema qw(field_identifier);
 use PICA::Schema::Builder;
@@ -15,6 +15,7 @@ use Scalar::Util qw(reftype);
 use JSON::PP;
 use List::Util qw(any all);
 use Text::Abbrev;
+use Term::ANSIColor;
 
 my %TYPES = (
     bin    => 'Binary',
@@ -43,8 +44,8 @@ my %COLORS = (
 sub new {
     my ($class, @argv) = @_;
 
-    my $terminal = -t *STDIN;                            ## no critic
-    my $command = (!@argv && $terminal) ? 'help' : '';
+    my $terminal = -t *STDIN;                             ## no critic
+    my $command  = (!@argv && $terminal) ? 'help' : '';
 
     my $number = 0;
     if (my ($i) = grep {$argv[$_] =~ /^-(\d+)$/} (0 .. @argv - 1)) {
@@ -62,10 +63,11 @@ sub new {
         build   => sub {$command = 'build'},
         count   => sub {$command = 'count'},     # for backwards compatibility
         path    => \@path,
+        modify  => [],
     };
 
     my %cmd = abbrev
-        qw(convert get count levels fields filter subfields sf explain validate build diff patch help version);
+        qw(convert get count levels fields filter subfields sf explain validate build diff patch help version modify);
     if ($cmd{$argv[0]}) {
         $command = $cmd{shift @argv};
         $command =~ s/^sf$/subfields/;
@@ -75,16 +77,23 @@ sub new {
         \@argv,       $opt,           'from|f=s', 'to|t:s',
         'schema|s=s', 'annotate|A|a', 'abbrev|B', 'build|b',
         'unknown|u!', 'count|c',      'order|o',  'path|p=s',
-        "number|n:i", 'color|C',      'mono|M',   'help|h|?',
+        'number|n:i', 'color|C',      'mono|M',   'help|h|?',
         'version|V',
     ) or pod2usage(2);
 
-    $opt->{number} = $number;
+    $opt->{number}   = $number;
     $opt->{annotate} = 0 if $noAnnotate;
     $opt->{color}
         = !$opt->{mono} && ($opt->{color} || -t *STDOUT);    ## no critic
 
     delete $opt->{$_} for qw(count build help version);
+
+    if ($command eq 'modify') {
+        die "missing path argument!\n" unless @argv;
+        push @{$opt->{modify}}, parse_path(shift @argv);
+        die "missing value argument!\n" unless @argv;
+        push @{$opt->{modify}}, shift @argv;
+    }
 
     my $pattern = '[012.][0-9.][0-9.][A-Z@.](\$[^|]+|/[0-9.-]+)?';
     while (@argv && $argv[0] =~ /^$pattern(\s*\|\s*($pattern)?)*$/) {
@@ -165,7 +174,7 @@ sub new {
 
     # default output format
     unless ($opt->{to}) {
-        if ($command =~ /(convert|levels|filter|diff|patch)/) {
+        if ($command =~ /(convert|levels|filter|diff|patch|modify)/) {
             $opt->{to} = $opt->{from};
             $opt->{to} ||= $TYPES{lc $1}
                 if $opt->{input}->[0] =~ /\.([a-z]+)$/;
@@ -224,7 +233,7 @@ sub run {
     my ($self)  = @_;
     my $command = $self->{command};
     my $schema  = $self->{schema};
-    my @pathes = @{$self->{path} || []};
+    my @pathes  = @{$self->{path} || []};
 
     # commands that don't parse any input data
     if ($self->{error}) {
@@ -264,7 +273,7 @@ sub run {
     if ($self->{to}) {
         $writer = pica_writer(
             $self->{to},
-            color => ($self->{color} ? \%COLORS : undef),
+            color    => ($self->{color} ? \%COLORS : undef),
             schema   => $schema,
             annotate => $self->{annotate},
         );
@@ -306,6 +315,26 @@ sub run {
         }
         return if $record->empty;
 
+        if ($command eq 'modify') {
+            if ($self->{annotate}) {
+
+                # can't annotate an already annoted record
+                pica_annotation($_, undef) for @{$record->{record}};
+            }
+            my $before = [map {[@$_]} @{$record->{record}}];    # deep copy
+            my @modify = @{$self->{modify}};
+
+            while (@modify) {
+                my $path  = shift @modify;
+                my $value = shift @modify;
+                $record->update($path, $value);
+            }
+
+            if ($self->{annotate}) {
+                $record = pica_diff($before, $record);
+            }
+        }
+
         # TODO: also validate on other commands?
         if ($command eq 'validate') {
             my @errors = $schema->check(
@@ -328,7 +357,7 @@ sub run {
         if ($command eq 'count') {
             $stats->{holdings}
                 += grep {@{$_->fields('1...')}} @{$record->holdings};
-            $stats->{items} += grep {!$_->empty} @{$record->items};
+            $stats->{items}  += grep {!$_->empty} @{$record->items};
             $stats->{fields} += @{$record->{record}};
         }
         $stats->{records}++;
@@ -413,8 +442,7 @@ sub run {
 }
 
 sub parse_path {
-    eval {PICA::Path->new($_[0], position_as_occurrence => 1)}
-        || die "invalid PICA Path: $_[0]\n";
+    eval {PICA::Path->new($_[0])} || die "invalid PICA Path: $_[0]\n";
 }
 
 sub explain {
@@ -444,6 +472,10 @@ sub explain {
 
 sub document {
     my ($self, $id, $def, $warn) = @_;
+
+    my $writer
+        = pica_writer('plain', color => ($self->{color} ? \%COLORS : undef));
+
     if ($def) {
         my $status = ' ';
         if ($def->{required}) {
@@ -452,7 +484,17 @@ sub document {
         else {
             $status = $def->{repeatable} ? '*' : 'o';
         }
-        my $doc = "$id\t$status\t" . $def->{label} // '';
+
+        my ($field, $subfield) = split '\$', $id;
+        $writer->write_identifier([split '/', $field]);
+        if (defined $subfield) {
+            $writer->write_subfield($subfield, '');
+        }
+        print "\t";
+        print $self->{color} ? colored($status, $COLORS{value}) : $status;
+
+        my $doc = "\t" . $def->{label} // '';
+        utf8::decode($doc);
         say $doc =~ s/[\s\r\n]+/ /mgr;
     }
     elsif (!$self->{unknown}) {

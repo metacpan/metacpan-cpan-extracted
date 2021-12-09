@@ -1,5 +1,12 @@
 Revision history for Perl extension Mojo::Darkpan
 
+0.05 2021-12-09T17:50:15Z
+    - Changed how indexing happens when uploading. Found that OrePAN2 when recreating the index can take a lot of time when you have many packages in your repo. Complete reindexing will use a subprocess
+    - Added /reindex to manually kick off index creation
+    - Fixed issues in /list process where provides names were being added incorrectly to other packages in JSON response
+    - Added convenience routines to Mojo::Darkpan::Config
+    - Added routines to Mojo::Darkpan::Util for indexing
+
 0.04 2021-12-08T16:02:53Z
     - removed some debug logging
     - fixed invalid reference in Config.pm

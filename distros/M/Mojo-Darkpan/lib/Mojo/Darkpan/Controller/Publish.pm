@@ -12,7 +12,7 @@ use Nice::Try;
 
 sub upload($self) {
     my $util = Mojo::Darkpan::Util->new(controller => $self);
-
+    
     try {
         if ($util->authorized) {
             $util->publish();

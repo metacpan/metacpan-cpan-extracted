@@ -4,13 +4,13 @@
       "Michael Peppler (mpeppler@peppler.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "DBD-Sybase",
    "no_index" : {
@@ -47,6 +47,5 @@
          "web" : "https://github.com/mpeppler/DBD-Sybase"
       }
    },
-   "version" : "1.18",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.19"
 }

@@ -1,9 +1,8 @@
-$Id: README.freetds,v 1.2 2003/04/03 19:07:00 mpeppler Exp $
 
 Using DBD::Sybase with FreeTDS
 ==============================
 
-DBD::Sybase 1.00 or later works reasonably well with FreeTDS 0.61,
+DBD::Sybase 1.17 or later works reasonably well with FreeTDS 1.18.x,
 but some capabilities are limited or not available.
 
 Build process:
@@ -23,39 +22,28 @@ warnings for a few missing libraries:
 This is OK because FreeTDS doesn't package the functions in the
 same libraries as Sybase.
 
-The "make test" process will fail for a number of tests:
+The "make test" process will fail for a number of tests when run 
+against a Sybase ASE server:
 
-Failed Test Stat Wstat Total Fail  Failed  List of Failed
--------------------------------------------------------------------------------
-t/exec.t       0   139    ??   ??       %  ??
-t/main.t                  16    2  12.50%  13-14
-t/xblob.t                  6    2  33.33%  5-6
-13 subtests skipped.
+Test Summary Report
+-------------------
+t/main.t      (Wstat: 512 Tests: 38 Failed: 2)
+  Failed tests:  33-34
+  Non-zero exit status: 2
+t/utf8.t      (Wstat: 1792 Tests: 11 Failed: 7)
+  Failed tests:  1, 4-6, 9-11
+  Non-zero exit status: 7
+t/xblob.t     (Wstat: 65280 Tests: 5 Failed: 0)
+  Non-zero exit status: 255
+  Parse errors: Bad plan.  You planned 11 tests but ran 5.
+Files=13, Tests=239, 16 wallclock secs ( 0.06 usr  0.03 sys +  0.72 cusr  0.40 csys =  1.21 CPU)
+Result: FAIL
+Failed 3/13 test programs. 9/239 subtests failed.
 
-This is expected.
+Specifically, FreeTDS 1.18.x does not support "unsigned smallint", fails in handling utf8 data
+when fetched from an ASE server, and fails in the ct_data_info() call used in TEXT/IMAGE handling.
 
-Missing Features:
------------------
-
-* ?-style placeholders are not supported.
-* Setting $dbh->{LongReadLen} doesn't work
-  Use $dbh->do("set textsize <value>") instead.
-* The special text/image handling functions don't work
-  (i.e. ct_fetch_data(), etc).
-* The $dbh->{syb_row_count} attribute doesn't work.
-  Use $dbh->do("set rowcount <value>") instead.
-* The $dbh->{syb_quoted_identifier} attribute doesn't work.
-  Use $dbh->do("set quoted_identifier <value>") instead.
-
-Bugs:
------
-
-FreeTDS 0.61 has a bug when executing queries that return 0 rows, 
-which manifests itself when trying to do a fetchrow_hashref()
-after such a query with the following error:
-
-    Can't get DBI::st=HASH(0x811cfa8)->{NAME}: unrecognised attribute at...
-
-This is fixed in the 0.62-dev version of FreeTDS.
+I personally use FreeTDS when working on DBD::Sybase, given that my main computer is an iMac and 
+there are no Sybase libraries available :-)
 
 

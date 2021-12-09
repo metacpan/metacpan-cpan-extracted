@@ -1,5 +1,5 @@
 {
-   "abstract" : "Authors with the most scripts on CPAN",
+   "abstract" : "Authors with the most number of scripts on CPAN",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -46,7 +46,7 @@
    "provides" : {
       "Acme::CPANAuthors::CPAN::MostScripts" : {
          "file" : "lib/Acme/CPANAuthors/CPAN/MostScripts.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -61,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANAuthors-CPAN-MostScripts"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

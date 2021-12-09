@@ -1,9 +1,9 @@
 package Sah::Schemas::Color;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2021-07-19'; # DATE
 our $DIST = 'Sah-Schemas-Color'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to color codes/names
@@ -20,7 +20,31 @@ Sah::Schemas::Color - Sah schemas related to color codes/names
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schemas::Color (from Perl distribution Sah-Schemas-Color), released on 2020-06-13.
+This document describes version 0.014 of Sah::Schemas::Color (from Perl distribution Sah-Schemas-Color), released on 2021-07-19.
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
+=head1 SAH SCHEMAS
+
+=over
+
+=item * L<color::ansi16|Sah::Schema::color::ansi16>
+
+ANSI-16 color, either a number from 0-15 or color names like "black", "bold red", etc.
+
+=item * L<color::ansi256|Sah::Schema::color::ansi256>
+
+ANSI-256 color, an integer number from 0-255.
+
+=item * L<color::rgb24|Sah::Schema::color::rgb24>
+
+RGB 24-digit color, a hexdigit e.g. ffcc00.
+
+=back
 
 =head1 HOMEPAGE
 
@@ -50,7 +74,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

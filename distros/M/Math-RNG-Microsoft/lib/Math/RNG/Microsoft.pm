@@ -1,5 +1,5 @@
 package Math::RNG::Microsoft;
-$Math::RNG::Microsoft::VERSION = '0.0.5';
+$Math::RNG::Microsoft::VERSION = '0.2.0';
 use 5.006;
 use strict;
 use warnings;
@@ -59,7 +59,7 @@ with Visual C.
 
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 SYNOPSIS
 

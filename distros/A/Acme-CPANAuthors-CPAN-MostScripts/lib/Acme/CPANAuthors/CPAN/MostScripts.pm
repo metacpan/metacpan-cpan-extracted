@@ -6,7 +6,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-17'; # DATE
 our $DIST = 'Acme-CPANAuthors-CPAN-MostScripts'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Acme::CPANAuthors::Register (
     "PERLANCAR" => undef,                                   #   1436
@@ -62,7 +62,7 @@ use Acme::CPANAuthors::Register (
 );
 
 1;
-# ABSTRACT: Authors with the most scripts on CPAN
+# ABSTRACT: Authors with the most number of scripts on CPAN
 
 __END__
 
@@ -72,11 +72,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANAuthors::CPAN::MostScripts - Authors with the most scripts on CPAN
+Acme::CPANAuthors::CPAN::MostScripts - Authors with the most number of scripts on CPAN
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANAuthors::CPAN::MostScripts (from Perl distribution Acme-CPANAuthors-CPAN-MostScripts), released on 2021-11-17.
+This document describes version 0.005 of Acme::CPANAuthors::CPAN::MostScripts (from Perl distribution Acme-CPANAuthors-CPAN-MostScripts), released on 2021-11-17.
 
 =head1 SYNOPSIS
 
@@ -93,8 +93,8 @@ This document describes version 0.004 of Acme::CPANAuthors::CPAN::MostScripts (f
 
 =head1 DESCRIPTION
 
-This module lists 50 CPAN authors with the most scripts on CPAN. This list is
-produced by querying a local mini CPAN mirror using this command:
+This module lists 50 CPAN authors with the most number of scripts on CPAN. This
+list is produced by querying a local mini CPAN mirror using this command:
 
  % lcpan authors-by-script-count | head -n 50
 
@@ -111,60 +111,60 @@ Statistics of the CPAN mirror:
 
 Current ranking:
 
- +------+-----------+--------------+
- | rank | id        | script_count |
- +------+-----------+--------------+
- | 1    | PERLANCAR | 1436         |
- | 2    | RSAVAGE   | 302          |
- | 3    | TULAMILI  | 224          |
- | 4    | BDFOY     | 176          |
- | 5    | TRIZEN    | 173          |
- | 6    | JWB       | 166          |
- | =7   | SANTEX    | 140          |
- | =7   | MRDVT     | 140          |
- | 9    | SHLOMIF   | 138          |
- | 10   | VVELOX    | 137          |
- | 11   | OLIVER    | 103          |
- | 12   | LDS       | 101          |
- | 13   | TSIBLEY   | 95           |
- | 14   | LEOCHARRE | 88           |
- | 15   | CMUNGALL  | 87           |
- | 16   | RDO       | 75           |
- | 17   | EASR      | 72           |
- | 18   | GSG       | 69           |
- | 19   | AMBS      | 68           |
- | 20   | BPOSTLE   | 63           |
- | 21   | INGY      | 61           |
- | 22   | IVANWILLS | 58           |
- | 23   | TBONE     | 57           |
- | 24   | TIEDEMANN | 56           |
- | =25  | MOOCOW    | 53           |
- | =25  | BRYCE     | 53           |
- | 27   | WOLDRICH  | 52           |
- | =28  | NKH       | 50           |
- | =28  | KESTEB    | 50           |
- | 30   | CORION    | 49           |
- | =31  | PLICEASE  | 48           |
- | =31  | GROUSSE   | 48           |
- | =33  | DHARD     | 46           |
- | =33  | DBAURAIN  | 46           |
- | =35  | YSAS      | 44           |
- | =35  | PERRAD    | 44           |
- | =35  | BEATNIK   | 44           |
- | =38  | MTW       | 43           |
- | =38  | MSIMERSON | 43           |
- | =38  | AJPAGE    | 43           |
- | =41  | GWILLIAMS | 41           |
- | =41  | CJFIELDS  | 41           |
- | =43  | VOJ       | 40           |
- | =43  | JILLROWE  | 40           |
- | =45  | TAPPER    | 39           |
- | =45  | JASONS    | 39           |
- | =45  | ADAMK     | 39           |
- | =48  | JMACFARLA | 38           |
- | =48  | GETTY     | 38           |
- | =48  | CDOLAN    | 38           |
- +------+-----------+--------------+
+ +-----------+--------------+
+ | id        | script_count |
+ +-----------+--------------+
+ | PERLANCAR | 1436         |
+ | RSAVAGE   | 302          |
+ | TULAMILI  | 224          |
+ | BDFOY     | 176          |
+ | TRIZEN    | 173          |
+ | JWB       | 166          |
+ | SANTEX    | 140          |
+ | MRDVT     | 140          |
+ | SHLOMIF   | 138          |
+ | VVELOX    | 137          |
+ | OLIVER    | 103          |
+ | LDS       | 101          |
+ | TSIBLEY   | 95           |
+ | LEOCHARRE | 88           |
+ | CMUNGALL  | 87           |
+ | RDO       | 75           |
+ | EASR      | 72           |
+ | GSG       | 69           |
+ | AMBS      | 68           |
+ | BPOSTLE   | 63           |
+ | INGY      | 61           |
+ | IVANWILLS | 58           |
+ | TBONE     | 57           |
+ | TIEDEMANN | 56           |
+ | MOOCOW    | 53           |
+ | BRYCE     | 53           |
+ | WOLDRICH  | 52           |
+ | NKH       | 50           |
+ | KESTEB    | 50           |
+ | CORION    | 49           |
+ | PLICEASE  | 48           |
+ | GROUSSE   | 48           |
+ | DHARD     | 46           |
+ | DBAURAIN  | 46           |
+ | YSAS      | 44           |
+ | PERRAD    | 44           |
+ | BEATNIK   | 44           |
+ | MTW       | 43           |
+ | MSIMERSON | 43           |
+ | AJPAGE    | 43           |
+ | GWILLIAMS | 41           |
+ | CJFIELDS  | 41           |
+ | VOJ       | 40           |
+ | JILLROWE  | 40           |
+ | TAPPER    | 39           |
+ | JASONS    | 39           |
+ | ADAMK     | 39           |
+ | JMACFARLA | 38           |
+ | GETTY     | 38           |
+ | CDOLAN    | 38           |
+ +-----------+--------------+
 
 =head1 HOMEPAGE
 

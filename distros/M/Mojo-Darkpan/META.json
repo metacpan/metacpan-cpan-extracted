@@ -61,7 +61,7 @@
    "provides" : {
       "Mojo::Darkpan" : {
          "file" : "lib/Mojo/Darkpan.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Mojo::Darkpan::Config" : {
          "file" : "lib/Mojo/Darkpan/Config.pm"
@@ -90,7 +90,7 @@
          "web" : "https://github.com/rshingleton/Mojo-Darkpan"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "shingler <shingler@oclc.org>"
    ],

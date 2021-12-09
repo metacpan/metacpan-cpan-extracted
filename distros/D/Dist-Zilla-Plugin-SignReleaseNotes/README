@@ -3,7 +3,7 @@ NAME
     notes file
 
 VERSION
-    version 0.0001
+    version 0.0003
 
 DESCRIPTION
     This plugin will sign a 'Release' file that includes:

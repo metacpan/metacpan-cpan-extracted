@@ -1,3 +1,7 @@
+Release 1.19
+
+    Fix compilation issue when CS_BIG_TIME is not defined.
+
 Release 1.18
 
     Fix further issues with FreeTDS.

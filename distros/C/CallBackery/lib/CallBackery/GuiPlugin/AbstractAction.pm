@@ -136,16 +136,18 @@ sub __fixActionCfg {
     my $self = shift;
     return $self if $self->{__action_cfg_fixed};
     my $name = $self->name;
+    my $pkg = ref $self;
     for my $action (@{$self->actionCfg}) {
+        next if $action->{action} eq 'separator';
         if ($action->{name}) {
             $self->log->warn(
-               __PACKAGE__ . " action should not have a name attribute:"
+               $pkg . " action should not have a name attribute:"
              . " name=$action->{name}"
             );
         }
         if (not $action->{key}) {
             $self->log->warn(
-               __PACKAGE__ . " action should have a key attribute,"
+               $pkg . " action should have a key attribute,"
              . " created a key from name=$action->{name} instead"
             );
             $action->{key} = $action->{name};

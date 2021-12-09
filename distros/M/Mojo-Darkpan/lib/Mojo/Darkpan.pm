@@ -16,8 +16,8 @@ sub startup($self) {
     #----------
     my $r = $self->routes;
     my $index = $r->any('/');
-    # $index->get('/')->to(controller => 'index', action => 'index');
     $index->get('/list')->to(controller => 'index', action => 'list');
+    $index->get('/reindex')->to(controller => 'index', action => 'reindex');
 
     my $uploader = $r->any('/publish');
     $uploader->post('/')->to(controller => 'publish', action => 'upload');
@@ -25,10 +25,10 @@ sub startup($self) {
     # goes to the same place as publish, used for compatibility
     my $authenquery = $r->any('/authenquery');
     $authenquery->post('/')->to(controller => 'publish', action => 'upload');
-    
+
 }
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 1;
 __END__
@@ -81,6 +81,25 @@ was also taken from OrePAN2::Server as the functionality is similar if not ident
     Web application port
 
 =back 
+
+=head4 Paths:
+
+=over 2
+
+=item B</publish> or B</authenquery>:
+    POST path(s) for releasing packages, set as the upload_uri in your .pause file
+
+=item B</list>: 
+    JSON list of packages and info about them
+    
+=item B</reindex>: 
+    Force OrePAN2 to do a index all modules and recreate the 02packages.details file. 
+    
+=item B</darkpan> I<(may differ if you set a custom path)>: 
+    Directory listing of the repository. This is the path to reference as your mirror or
+    set the PERL_CARTON_MIRROR env var       
+
+=back  
 
 =head2 Configuring the server
 
@@ -171,9 +190,9 @@ and add your settings to the basic auth section of the config.json file.
 Publishing to darkpan can be done using a post request and a URL to git or bitbucket repo.
     
     #upload git managed module to my darkpan by curl 
-    curl --data-urlencode 'module=git+ssh://git@mygit/home/git/repos/MyModule.git' --data-urlencode 'author=SHINGLER' http://localhost:3000/publish
-    curl --data-urlencode 'module=git+file:///home/rshingleton/project/MyModule.git' --data-urlencode 'author=SHINGLER' http://localhost:3000/publish
-    curl --data-urlencode 'module=git@github.com:rshingleton/perl-module-test.git' --data-urlencode 'author=SHINGLER' http://localhost:3000/publish
+    curl --data-urlencode 'module=git+ssh://git@mygit/home/git/repos/MyModule.git' --data-urlencode 'author=reshingleton' http://localhost:3000/publish
+    curl --data-urlencode 'module=git+file:///home/rshingleton/project/MyModule.git' --data-urlencode 'author=reshingleton' http://localhost:3000/publish
+    curl --data-urlencode 'module=git@github.com:rshingleton/perl-module-test.git' --data-urlencode 'author=reshingleton' http://localhost:3000/publish
 
 The module parameter can also be an HTTP url. see L<OrePAN2::Injector|https://metacpan.org/pod/OrePAN2::Injector> for 
 additional details.

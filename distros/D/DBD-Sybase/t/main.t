@@ -210,7 +210,7 @@ SKIP: {
         ok($r->[1] == 4294967296, "bigint");
       }
     } else {
-      ok(0 == 1, "unsigned smalling");
+      ok(0 == 1, "unsigned smallint");
       ok(0 == 1, "bigint");
     }
 }

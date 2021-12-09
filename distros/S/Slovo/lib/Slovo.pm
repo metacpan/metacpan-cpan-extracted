@@ -11,7 +11,7 @@ use Slovo::Cache;
 use Time::Piece;
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '2021.11.22';
+our $VERSION   = '2021.12.02';
 our $CODENAME  = 'U+2C14 GLAGOLITIC CAPITAL LETTER SLOVO (Ⱄ)';
 my $CLASS = __PACKAGE__;
 
@@ -167,12 +167,14 @@ sub _load_config ($app) {
   my $home    = $app->home;
 
   # Load configuration from hash returned by "slovo.conf"
-  my $file      = $etc->child("$moniker.conf");
-  my $mode_file = $etc->child("$moniker.$mode.conf");
+  my $file           = $etc->child("$moniker.conf");
+  my $mode_file      = $etc->child("$moniker.$mode.conf");
+  my $home_file      = $home->child("$moniker.conf");
+  my $home_mode_file = $home->child("$moniker.$mode.conf");
   $ENV{MOJO_CONFIG}
-    //= (-e $home->child("$moniker.$mode.conf") && $home->child("$moniker.$mode.conf"))
-    || (-e $home->child("$moniker.conf") && $home->child("$moniker.conf"))
-    || (-e $mode_file ? $mode_file : $file);
+    //= (-f $home_mode_file && $home_mode_file)
+    || (-f $home_file && $home_file)
+    || (-f $mode_file ? $mode_file : $file);
 
   my $config = $app->plugin('Config');
   for my $class (@{$config->{load_classes} // []}) {
@@ -200,7 +202,6 @@ sub _load_pugins ($app) {
   # See /perldoc/Mojolicious/Plugins#PLUGINS
   $app->plugins->namespaces(['Slovo::Plugin', 'Slovo', 'Mojolicious::Plugin']);
   my $plugins = $app->config('load_plugins') // [];
-  push @$plugins, qw(DefaultHelpers TagHelpers);
   foreach my $plugin (@$plugins) {
     my $name = (ref $plugin ? (keys %$plugin)[0] : $plugin);
 

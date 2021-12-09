@@ -15,7 +15,7 @@ use Time::Piece ();
 has 'mysql';
 has 'no_txn' => sub { 0 };
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 sub dequeue {
   my ($self, $worker_id, $wait, $options) = @_;
@@ -1175,7 +1175,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -1838,7 +1838,7 @@ ALTER TABLE minion_jobs_depends ADD COLUMN state ENUM('inactive','active','finis
 ALTER TABLE minion_jobs_depends ADD COLUMN expires DATETIME;
 UPDATE minion_jobs_depends dep JOIN minion_jobs job ON dep.parent_id=job.id SET dep.state=job.state, dep.expires=job.expires;
 CREATE TRIGGER minion_trigger_insert_depends BEFORE INSERT ON minion_jobs_depends FOR EACH ROW
-    SET NEW.state = COALESCE(( SELECT state FROM minion_jobs WHERE id=NEW.parent_id ), "finished"),
+    SET NEW.state = COALESCE(( SELECT state FROM minion_jobs WHERE id=NEW.parent_id ), 'finished'),
         NEW.expires = ( SELECT expires FROM minion_jobs WHERE id=NEW.parent_id );
 CREATE TRIGGER minion_trigger_update_jobs AFTER UPDATE ON minion_jobs FOR EACH ROW
     UPDATE minion_jobs_depends SET state=NEW.state, expires=NEW.expires WHERE parent_id=OLD.id;
