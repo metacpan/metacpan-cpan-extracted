@@ -24,7 +24,7 @@ my %args = (
 
     requires => {
         'IPC::SharedMem' => '0',
-        'Mojolicious' => '7.24',
+        'Mojolicious' => '0',
     },
 
     recommends => {
@@ -37,7 +37,8 @@ my %args = (
     },
 
     test_requires => {
-        'Test::More' => '0.98',
+        'Test::Exception' => '0',
+        'Test::More' => '0',
     },
 
     name            => 'Mojo-IOLoop-ReadWriteProcess',

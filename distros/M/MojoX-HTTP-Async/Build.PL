@@ -12,6 +12,7 @@ my $build = Module::Build->new(
         'Module::Build' => '0.4220'
     },
     build_requires => {
+        'Test::Kwalitee' => 1.27,
         'Test::SharedFork' => 0.35,
         'Test::TCP' => 2.19,
         'Test::More' => 1.302183,
@@ -31,6 +32,7 @@ my $build = Module::Build->new(
         'Mojo::Message::Request' => 0,
         'Mojo::Message::Response' => 0,
         'Mojo::Transaction::HTTP' => 0,
+        'Mojo::URL' => 0,
         'URI' => 1.73,
         'Errno' => 1.28,
         'Scalar::Util' => 1.4602,
@@ -41,7 +43,8 @@ my $build = Module::Build->new(
             'bugtracker' => 'https://github.com/KalessinD/perl_mojox_http_async/issues',
             'repository' => 'https://github.com/KalessinD/perl_mojox_http_async',
         },
-    }
+    },
+    test_files => ($ENV{RELEASE_TESTING}) ? 't/ xt/' : 't/',
 );
 
 $build->create_build_script;

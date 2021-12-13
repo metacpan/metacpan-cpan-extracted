@@ -1,0 +1,86 @@
+{
+   "abstract" : "Create, compare, and convert units of measurement.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-Measure",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Exporter" : "0.982",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Measure" : {
+         "file" : "lib/Class/Measure.pm",
+         "version" : "0.09"
+      },
+      "Class::Measure::Length" : {
+         "file" : "lib/Class/Measure/Length.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/Class-Measure/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/Class-Measure",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bluefeet/Class-Measure.git",
+         "web" : "https://github.com/bluefeet/Class-Measure"
+      }
+   },
+   "version" : "0.09",
+   "x_authority" : "cpan:BLUEFEET",
+   "x_contributors" : [
+      "Roland van Ipenburg <roland@rolandvanipenburg.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

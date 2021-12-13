@@ -1,5 +1,8 @@
 Revision history for Perl extension Web-MarketReceipt
 
+0.07 2021-12-13T02:03:03Z
+    - Add "pending" to enum "OrderState" by @chibapse
+
 0.06 2021-12-02T08:21:18Z
     - Add Google Play purchase state "pending" by @chibapse
 

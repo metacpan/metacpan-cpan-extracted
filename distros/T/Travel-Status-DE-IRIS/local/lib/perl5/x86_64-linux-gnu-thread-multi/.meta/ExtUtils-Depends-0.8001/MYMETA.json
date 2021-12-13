@@ -1,0 +1,77 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown",
+      "Gtk2-Perl Team <gtk-perl-list at gnome dot org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "XS",
+      "XS extensions",
+      "dependency"
+   ],
+   "license" : [
+      "perl_5",
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ExtUtils-Depends",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "ExtUtils::MM"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "ExtUtils::MakeMaker" : "7.44",
+            "File::Spec" : "0",
+            "IO::File" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Number::Delta" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-ExtUtils-Depends [at] rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=ExtUtils-Depends"
+      },
+      "homepage" : "http://gtk2-perl.sourceforge.net",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnome.org/perl-ExtUtils-Depends",
+         "web" : "http://git.gnome.org/browse/perl-ExtUtils-Depends"
+      },
+      "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
+   },
+   "version" : "0.8001",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

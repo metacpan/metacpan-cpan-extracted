@@ -5,6 +5,7 @@ author:
 build_requires:
   FindBin: '1.51'
   Net::EmptyPort: '0'
+  Test::Kwalitee: '1.27'
   Test::More: '1.302183'
   Test::SharedFork: '0.35'
   Test::TCP: '2.19'
@@ -20,7 +21,7 @@ name: MojoX-HTTP-Async
 provides:
   MojoX::HTTP::Async:
     file: lib/MojoX/HTTP/Async.pm
-    version: '0.1'
+    version: '0.11'
 requires:
   Carp: '1.42'
   Errno: '1.28'
@@ -30,6 +31,7 @@ requires:
   Mojo::Message::Request: '0'
   Mojo::Message::Response: '0'
   Mojo::Transaction::HTTP: '0'
+  Mojo::URL: '0'
   Mojolicious: '7.59'
   POSIX: '1.76'
   Scalar::Util: '1.4602'
@@ -40,5 +42,5 @@ requires:
 resources:
   bugtracker: https://github.com/KalessinD/perl_mojox_http_async/issues
   repository: https://github.com/KalessinD/perl_mojox_http_async
-version: '0.1'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,54 @@
+1.916   2021-12-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to adjust method call.
+
+
+1.915   2021-12-10  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- This release continues the pluginizing process.
+
+        [doc]
+
+        - Add more documentation about plugins.
+
+	[plugins]
+
+        - [incompatible change] Rename plugins: Debugging::* -> Debug::* for
+          brevity
+
+        - [incompatible change] Rename plugin: Debugging::Exit -> Flow::Exit for
+          clarity
+
+        - [incompatible change] Rename plugin: Plugin::DisablePlugin ->
+	  Plugin::Disable for brevity.
+
+        - Move main logic of completion mode to plugin Run::Completion.
+
+	- Move main logic of object-dumping mode to plugin Run::DumpObject.
+
+        [removed]
+
+        - [incompatible change] Remove hook_after_run.
+
+	- [incompatible change] Remove support for PERINCI_CMDLINE_DUMP_ARGS &
+          PERINCI_CMDLINE_DUMP_CONFIG.
+
+
+1.914   2021-12-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Replace observing x.perinci.cmdline.default_from_schema in
+	  argument specification to detecting default in argument
+	  specification/schema; this means user does not have to explicitly
+	  set that attribute in his function metadata.
+
+
+1.913   2021-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add a default 'title' metadata for the result, so result
+	  formatted with Text::Table::HTML or Text::Table::HTML::DataTables
+	  can be more descriptive.
+
+
 1.912   2021-12-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Observe argument specification's attribute:

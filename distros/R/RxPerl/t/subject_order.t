@@ -24,4 +24,13 @@ subtest 'subject_order' => sub {
     is \@orders, [ ([1, 2]) x 20 ], 'correct order';
 };
 
+subtest 'behavior_subject' => sub {
+    my $o = rx_behavior_subject->new(10);
+    is $o->get_value, 10, 'correct value';
+    $o->next(20);
+    is $o->get_value, 20, 'correct value';
+    $o->complete;
+    is $o->get_value, 20, 'correct value after complete';
+};
+
 done_testing;

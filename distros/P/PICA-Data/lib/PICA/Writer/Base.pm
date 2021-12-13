@@ -1,7 +1,7 @@
 package PICA::Writer::Base;
 use v5.14.1;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use Scalar::Util qw(blessed openhandle reftype);
 use PICA::Schema qw(clean_pica);

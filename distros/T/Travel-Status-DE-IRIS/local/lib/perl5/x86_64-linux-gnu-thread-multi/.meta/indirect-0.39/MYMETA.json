@@ -1,0 +1,67 @@
+{
+   "abstract" : "Lexically warn about using the indirect method call syntax.",
+   "author" : [
+      "Vincent Pit <vpit@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "indirect",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IO::Select" : "0",
+            "IPC::Open3" : "0",
+            "POSIX" : "0",
+            "Socket" : "0",
+            "Test::More" : "0",
+            "XSLoader" : "0",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Name=indirect"
+      },
+      "homepage" : "http://search.cpan.org/dist/indirect/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://git.vpit.fr/?p=perl%2Fmodules%2Findirect.git"
+      }
+   },
+   "version" : "0.39",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

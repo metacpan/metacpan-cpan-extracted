@@ -47,8 +47,6 @@ use Google::Ads::GoogleAds::V9::Enums::AdvertisingChannelTypeEnum qw(SMART);
 use Google::Ads::GoogleAds::V9::Enums::AdvertisingChannelSubTypeEnum;
 use Google::Ads::GoogleAds::V9::Enums::BudgetTypeEnum;
 use Google::Ads::GoogleAds::V9::Enums::CampaignStatusEnum qw(PAUSED);
-use Google::Ads::GoogleAds::V9::Enums::CriterionTypeEnum
-  qw(KEYWORD_THEME LOCATION);
 use Google::Ads::GoogleAds::V9::Enums::DayOfWeekEnum qw(MONDAY);
 use Google::Ads::GoogleAds::V9::Enums::MinuteOfHourEnum qw(ZERO);
 use Google::Ads::GoogleAds::V9::Enums::ProximityRadiusUnitsEnum qw(MILES);
@@ -591,8 +589,6 @@ sub _create_campaign_criterion_operations {
                   Google::Ads::GoogleAds::V9::Utils::ResourceNames::campaign(
                   $customer_id, SMART_CAMPAIGN_TEMPORARY_ID
                   ),
-                # Set the criterion type to KEYWORD_THEME.
-                type => KEYWORD_THEME,
                 # Set the keyword theme to the given KeywordThemeInfo.
                 keywordTheme => $keyword_theme_info
               })})});
@@ -614,8 +610,6 @@ sub _create_campaign_criterion_operations {
                   Google::Ads::GoogleAds::V9::Utils::ResourceNames::campaign(
                   $customer_id, SMART_CAMPAIGN_TEMPORARY_ID
                   ),
-                # Set the criterion type to LOCATION.
-                type => LOCATION,
                 # Set the location to the given location.
                 location => $location_info
               })})});
@@ -771,8 +765,8 @@ sub _print_response_details {
   }
 }
 
-# [START smart_campaign_14]
-# Converts the business location ID from the format returned by Google My Business
+# [START add_smart_campaign_14]
+# Converts the business location ID from the format returned by Business Profile
 # to the format expected by the API.
 # The business location ID is an unsigned 64-bit integer. However, the Google Ads
 # API expects a signed 64-bit integer. This means that for business location IDs
@@ -791,7 +785,7 @@ sub _convert_business_location_id {
     return $business_location_id;
   }
 }
-# [END smart_campaign_14]
+# [END add_smart_campaign_14]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {
@@ -849,11 +843,11 @@ add_smart_campaign.pl [options]
                                 service. Using free-form keyword themes is typically not recommended
                                 because they are less effective than suggested keyword themes, however
                                 they are useful in situations where a very specific term needs to be targeted.
-    -business_location_id       [optional] The ID of a Google My Business (GMB) location.
+    -business_location_id       [optional] The ID of a Business Profile location.
                                 This is required if a business name is not provided.
-                                This ID can be retrieved using the GMB API, for details see:
+                                This ID can be retrieved using the Business Profile API, for details see:
                                 https://developers.google.com/my-business/reference/rest/v4/accounts.locations
-    -business_name              [optional] The name of a Google My Business (GMB) business.
+    -business_name              [optional] The name of a business in Business Profile.
                                 This is required if a business location ID is not provided.
 
 =cut

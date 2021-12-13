@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.085';
+our $VERSION = '1.086';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -360,15 +360,7 @@ sub read_schema {
             next unless $classes{ $foreign_class };
             my $foreign_schema = $classes{ $foreign_class }->source_name;
             my $foreign_id = $schema{ $foreign_schema }{'x-id-field'} // 'id';
-            if ( $foreign_cols[0] ne $foreign_id ) {
-                warn sprintf
-                    'Cannot do foreign key with columns that are not the primary ID (x-id-field) on table %s, relationship %s (foreign column: %s, foreign id: %s)',
-                    $source->name, $rel_name, $foreign_cols[0], $foreign_id,
-                    ;
-                next;
-            }
-
-            $schema{ $self_schema }{ properties }{ $self_cols[0] }{ 'x-foreign-key' } = $foreign_schema;
+            $schema{ $self_schema }{ properties }{ $self_cols[0] }{ 'x-foreign-key' } = join '.', $foreign_schema, $foreign_id;
         }
     }
 
@@ -432,7 +424,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.085
+version 1.086
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ use JSON;
 
 # ABSTRACT: Get results from an HTTP HealthCheck
 use version;
-our $VERSION = 'v0.1.0'; # VERSION
+our $VERSION = 'v0.1.1'; # VERSION
 
 sub new {
     my ($class, @params) = @_;
@@ -68,7 +68,7 @@ HealthCheck::Diagnostic::RemoteHealth - Get results from an HTTP HealthCheck
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
 
 =head1 SYNOPSIS
 

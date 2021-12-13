@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::MineralUtils",
   "PREREQ_PM" => {
     "Complete::Sequence" => "0.002",
-    "Data::Sah::Compiler::perl::TH::str" => "0.910",
+    "Data::Sah::Compiler::perl::TH::str" => 0,
     "Perinci::CmdLine::Any" => "0.152",
     "Perinci::CmdLine::Lite" => "1.905",
     "Physics::Unit" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::Sequence" => "0.002",
-  "Data::Sah::Compiler::perl::TH::str" => "0.910",
+  "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

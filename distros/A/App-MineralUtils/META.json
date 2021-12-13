@@ -28,13 +28,13 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.96"
+            "Rinci" : "v1.1.99"
          }
       },
       "runtime" : {
          "requires" : {
             "Complete::Sequence" : "0.002",
-            "Data::Sah::Compiler::perl::TH::str" : "0.910",
+            "Data::Sah::Compiler::perl::TH::str" : "0",
             "Perinci::CmdLine::Any" : "0.152",
             "Perinci::CmdLine::Lite" : "1.905",
             "Physics::Unit" : "0",
@@ -55,7 +55,7 @@
    "provides" : {
       "App::MineralUtils" : {
          "file" : "lib/App/MineralUtils.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-App-MineralUtils"
       }
    },
-   "version" : "0.005",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -245,7 +245,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.006"
+            "version" : "0.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -529,7 +529,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.005"
+            "version" : "3.001.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

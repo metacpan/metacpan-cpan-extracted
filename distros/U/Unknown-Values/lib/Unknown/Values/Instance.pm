@@ -4,6 +4,7 @@ use warnings;
 # ABSTRACT: Internal value object for the "Unknown::Values" distribution
 
 package Unknown::Values::Instance;
+$Unknown::Values::Instance::VERSION = '0.006';
 use Carp 'confess';
 
 use 5.01000;
@@ -43,9 +44,10 @@ sub compare {
     # this suppresses the "use of unitialized value in sort" warnings
     wantarray ? () : 0;
 }
+
 sub sort {
     if    ( $_[2] )                                { return -1 }
-    elsif ( Unknown::Values::is_unknown( $_[1] ) ) { return 0 } # unnecessary?
+    elsif ( Unknown::Values::is_unknown( $_[1] ) ) { return 0 }   # unnecessary?
     else                                           { return 1 }
 }
 
@@ -80,13 +82,11 @@ sub nomethod {
 
 1;
 
-
-
-
-
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -94,7 +94,7 @@ Unknown::Values::Instance - Internal value object for the "Unknown::Values" dist
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -131,7 +131,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

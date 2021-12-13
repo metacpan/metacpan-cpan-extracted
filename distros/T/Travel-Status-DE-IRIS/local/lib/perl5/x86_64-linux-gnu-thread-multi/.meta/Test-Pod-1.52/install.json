@@ -1,0 +1,1 @@
+{"dist":"Test-Pod-1.52","pathname":"E/ET/ETHER/Test-Pod-1.52.tar.gz","target":"Test::Pod","name":"Test::Pod","version":1.52,"provides":{"Test::Pod":{"version":1.52,"file":"lib/Test/Pod.pm"}}}

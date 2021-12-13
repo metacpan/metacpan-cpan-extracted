@@ -1,5 +1,5 @@
 package Lab::Instrument::SignalRecovery726x;
-$Lab::Instrument::SignalRecovery726x::VERSION = '3.800';
+$Lab::Instrument::SignalRecovery726x::VERSION = '3.801';
 #ABSTRACT: Signal Recovery 7260 / 7265 Lock-in Amplifier
 
 use v5.20;
@@ -1232,7 +1232,7 @@ Lab::Instrument::SignalRecovery726x - Signal Recovery 7260 / 7265 Lock-in Amplif
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 SYNOPSIS
 

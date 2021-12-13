@@ -21,6 +21,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
+                                      'Data::Dumper' => '0',
                                       'Getopt::Std' => '0',
                                       'HTML::Form' => '6.07',
                                       'HTML::TreeBuilder::XPath' => '0.14',

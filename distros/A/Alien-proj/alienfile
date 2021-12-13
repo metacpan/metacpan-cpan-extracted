@@ -68,6 +68,7 @@ plugin 'PkgConfig' => (
 #);
 
 
+
 share {
 
   #  see if this helps with cirrus bsd builds
@@ -201,7 +202,8 @@ share {
   plugin 'PkgConfig::PPWrapper';
   meta->around_hook( build => \&remove_gitfw_from_path );
 
-  say 'PKG_CONFIG_PATH:' . join ' ', @PKG_CONFIG_PATH;
+  #  silence an undef warning
+  say 'PKG_CONFIG_PATH:' . join ' ', grep {defined} @PKG_CONFIG_PATH;
   
   build [
     #\&pause,
@@ -302,11 +304,11 @@ sub update_pkg_conf_path {
     say 'Modifying drive paths in PKG_CONFIG_PATH';
     say $ENV{PKG_CONFIG_PATH};
     #  msys-ificate drive paths
-    @PKG_CONFIG_PATH = map {s{^([a-z]):}{/$1}ri} @PKG_CONFIG_PATH;
+    @PKG_CONFIG_PATH = map {my $r=$_; $r=~s{^([a-z]):}{/$1}i; $r} @PKG_CONFIG_PATH;
     #  make sure we get the dynamic libcurl
     #  (although the proj configure script does not currently use it)
     @PKG_CONFIG_PATH
-      = map {s{Alien-curl[/\\]lib[/\\]pkgconfig}{Alien-curl/dynamic/pkgconfig}ri}
+      = map {my $r=$_; $r=~s{Alien-curl[/\\]lib[/\\]pkgconfig}{Alien-curl/dynamic/pkgconfig}i; $r}
         @PKG_CONFIG_PATH;
     $ENV{PKG_CONFIG_PATH} = join ':', @PKG_CONFIG_PATH;
     say $ENV{PKG_CONFIG_PATH};

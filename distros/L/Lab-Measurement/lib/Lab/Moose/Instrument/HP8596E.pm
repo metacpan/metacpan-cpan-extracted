@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP8596E;
-$Lab::Moose::Instrument::HP8596E::VERSION = '3.800';
+$Lab::Moose::Instrument::HP8596E::VERSION = '3.801';
 #ABSTRACT: HP8596E Spectrum Analyzer
 
 use v5.20;
@@ -302,7 +302,7 @@ Lab::Moose::Instrument::HP8596E - HP8596E Spectrum Analyzer
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 SYNOPSIS
 

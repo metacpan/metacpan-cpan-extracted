@@ -69,17 +69,4 @@ sub walk {
     }
 }
 
-sub options_for {
-    my ($self, $package, $phases, $types) = @_;
-    my $options;
-    $self->walk($phases, $types, sub {
-        my ($_phase, $_type, $_package, $_options) = @_;
-        if ($package eq $_package) {
-            $options = $_options;
-            return \0;
-        }
-    });
-    return $options;
-}
-
 1;

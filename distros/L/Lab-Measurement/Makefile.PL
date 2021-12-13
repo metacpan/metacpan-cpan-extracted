@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Test and measure with Perl",
-  "AUTHOR" => "Andreas K. H\x{fc}ttel <mail\@akhuettel.de>, Simon Reinhardt <simon.reinhardt\@physik.uni-r.de>",
+  "AUTHOR" => "Andreas K. H\x{fc}ttel <mail\@akhuettel.de>, Simon Reinhardt <simon.reinhardt\@physik.uni-r.de>, Fabian Weinelt <fabian.weinelt\@gmx.de>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -101,7 +101,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.800",
+  "VERSION" => "3.801",
   "test" => {
     "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/DataFile/Gnuplot/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }

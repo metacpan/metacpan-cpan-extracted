@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Yokogawa7651;
-$Lab::Moose::Instrument::Yokogawa7651::VERSION = '3.800';
+$Lab::Moose::Instrument::Yokogawa7651::VERSION = '3.801';
 #ABSTRACT: Yokogawa7651 voltage/current source.
 
 use v5.20;
@@ -122,7 +122,7 @@ Lab::Moose::Instrument::Yokogawa7651 - Yokogawa7651 voltage/current source.
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 SYNOPSIS
 

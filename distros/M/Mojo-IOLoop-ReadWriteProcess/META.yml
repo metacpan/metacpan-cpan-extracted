@@ -3,7 +3,8 @@ abstract: 'Execute external programs or internal code blocks as separate process
 author:
   - 'Ettore Di Giacinto <edigiacinto@suse.com>'
 build_requires:
-  Test::More: '0.98'
+  Test::Exception: '0'
+  Test::More: '0'
 configure_requires:
   Module::Build: '0.4005'
   perl: '5.016'
@@ -27,7 +28,7 @@ no_index:
 provides:
   Mojo::IOLoop::ReadWriteProcess:
     file: lib/Mojo/IOLoop/ReadWriteProcess.pm
-    version: '0.31'
+    version: '0.32'
   Mojo::IOLoop::ReadWriteProcess::CGroup:
     file: lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm
   Mojo::IOLoop::ReadWriteProcess::CGroup::v1:
@@ -82,8 +83,12 @@ provides:
     file: lib/Mojo/IOLoop/ReadWriteProcess/Shared/Semaphore.pm
 requires:
   IPC::SharedMem: '0'
-  Mojolicious: '7.24'
-version: '0.31'
+  Mojolicious: '0'
+resources:
+  bugtracker: https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess/issues
+  homepage: https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess
+  repository: git://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess.git
+version: '0.32'
 x_contributors:
   - 'Adam Williamson <awilliam@redhat.com>'
   - 'Clemens Famulla-Conrad <cfamullaconrad@suse.de>'
@@ -96,5 +101,6 @@ x_contributors:
   - 'Santiago Zarate <santiago+github@zarate.co>'
   - 'Santiago Zarate <santiago@zarate.co>'
   - 'Sebastian Riedel <sri@cpan.org>'
+  - 'cfconrad <40127946+cfconrad@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

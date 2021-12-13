@@ -5,7 +5,7 @@ package OpenAPI::Modern;
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -126,7 +126,7 @@ sub validate_request ($self, $request, $options) {
         my $valid =
             $param_obj->{in} eq 'path' ? $self->_validate_path_parameter($state, $param_obj, $path_captures)
           : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter($state, $param_obj, $request->uri)
-          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter($state, $param_obj->{name}, $param_obj, $request->headers)
+          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter($state, $param_obj->{name}, $param_obj, [ $request->header($param_obj->{name}) ])
           : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter($state, $param_obj, $request)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
@@ -210,7 +210,7 @@ sub validate_response ($self, $response, $options) {
 
       ()= $self->_validate_header_parameter({ %$state,
           data_path => jsonp($state->{data_path}, 'header', $header_name) },
-        $header_name, $header_obj, $response->headers);
+        $header_name, $header_obj, [ $response->header($header_name) ]);
     }
 
     ()= $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body') },
@@ -302,22 +302,27 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
     return 1;
   }
 
-  # TODO: check 'allowReserved': it cannot be supported if we use proper URL encoding
+  # TODO: check 'allowReserved': if true, do not use percent-decoding
+    return E({ %$state, keyword => 'allowReserved' }, 'allowReserved: true is not yet supported')
+      if $param_obj->{allowReserved} // 0;
 
   $self->_validate_parameter_content($state, $param_obj, \ $query_params->{$param_obj->{name}});
 }
 
 # validates a header, from either the request or the response
 sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $headers) {
-  # NOTE: for now, we will only support a single value.
-  my @values = $headers->header($header_name);
-  if (not @values) {
+  return 1 if grep fc $header_name eq fc $_, qw(Accept Content-Type Authorization);
+
+  # NOTE: for now, we will only support a single header value.
+  @$headers = map s/^\s*//r =~ s/\s*$//r, @$headers;
+
+  if (not @$headers) {
     return E({ %$state, keyword => 'required' }, 'missing header: %s', $header_name)
       if $header_obj->{required};
     return 1;
   }
 
-  $self->_validate_parameter_content($state, $header_obj, \ $values[0]);
+  $self->_validate_parameter_content($state, $header_obj, \ $headers->[0]);
 }
 
 sub _validate_cookie_parameter ($self, $state, $param_obj, $request) {
@@ -345,7 +350,7 @@ sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
     }
     catch ($e) {
       return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
-        'could not decode content as %s', $media_type);
+        'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
     }
 
     $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
@@ -362,8 +367,6 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   return E({ %$state, data_path => $state->{data_path} =~ s{body}{header/Content-Type}r, keyword => 'content' },
       'missing header: Content-Type')
     if not length $content_type;
-
-  # TODO: support Content-Type: application/schema+json matching entry of application/json
 
   # we don't support */* here because what is the point? if you want to test string length,
   # check the Content-Length header.
@@ -398,7 +401,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
     }
     catch ($e) {
       return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
-        'could not decode content as %s', $charset);
+        'could not decode content as %s: %s', $charset, $e =~ s/^(.*)\n/$1/r);
     }
   }
 
@@ -419,7 +422,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   }
   catch ($e) {
     return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
-      'could not decode content as %s', $media_type );
+      'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
   }
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
@@ -497,7 +500,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

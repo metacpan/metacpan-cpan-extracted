@@ -9,7 +9,7 @@ use parent 'Data::TableData::Object::Base';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-17'; # DATE
 our $DIST = 'Data-TableData-Object'; # DIST
-our $VERSION = '0.114'; # VERSION
+our $VERSION = '0.115'; # VERSION
 
 sub new {
     my ($class, $data) = @_;
@@ -166,7 +166,7 @@ Data::TableData::Object::hash - Manipulate hash via table object
 
 =head1 VERSION
 
-This document describes version 0.114 of Data::TableData::Object::hash (from Perl distribution Data-TableData-Object), released on 2021-11-17.
+This document describes version 0.115 of Data::TableData::Object::hash (from Perl distribution Data-TableData-Object), released on 2021-11-17.
 
 =head1 SYNOPSIS
 

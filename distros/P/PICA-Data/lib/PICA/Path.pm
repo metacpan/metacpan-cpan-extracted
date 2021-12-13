@@ -2,7 +2,7 @@ package PICA::Path;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 require Exporter;
 our @ISA       = qw(Exporter);

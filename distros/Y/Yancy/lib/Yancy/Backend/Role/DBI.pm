@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::DBI;
-our $VERSION = '1.085';
+our $VERSION = '1.086';
 # ABSTRACT: Role for backends that use DBI
 
 #pod =head1 SYNOPSIS
@@ -192,15 +192,8 @@ sub read_schema {
             next unless $schema{ $foreign_table }; # XXX Can't resolve a foreign key we can't find
             my $foreign_id = $schema{ $foreign_table }{ 'x-id-field' } // 'id';
             my $column = $fk->{FKCOLUMN_NAME} || $fk->{UK_COLUMN_NAME};
-            # XXX Only very simple joins are possible here right now
-            if ( $foreign_column ne $foreign_id ) {
-                warn sprintf
-                    'Cannot do foreign key with columns that are not the primary ID (x-id-field) on table %s, relationship %s (foreign column: %s, foreign id: %s)',
-                    $table_name, $foreign_table, $foreign_column, $foreign_id,
-                    ;
-                next;
-            }
-            $schema{ $table_name }{ properties }{ $column }{ 'x-foreign-key' } = $foreign_table;
+            # XXX: We cannot do relationships with multiple keys yet
+            $schema{ $table_name }{ properties }{ $column }{ 'x-foreign-key' } = join '.', $foreign_table, $foreign_id;
         }
     }
 
@@ -219,7 +212,7 @@ Yancy::Backend::Role::DBI - Role for backends that use DBI
 
 =head1 VERSION
 
-version 1.085
+version 1.086
 
 =head1 SYNOPSIS
 

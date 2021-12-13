@@ -7,6 +7,7 @@ SYNOPSIS
 
         use MojoX::HTTP::Async ();
         use Mojo::Message::Request ();
+        use Mojo::URL ();
 
         # creates new instance for async requests
         # restricts max amount of simultaneously executed requests
@@ -15,6 +16,7 @@ SYNOPSIS
         # let's fill slots
         $ua->add( '/page1.html?lang=en');
         $ua->add( 'http://my-site.com/page2.html');
+        $ua->add( Mojo::URL->new("/page/03.html") );
         $ua->add( Mojo::Message::Request->new() );
 
         # non-blocking requests processing
@@ -46,7 +48,7 @@ SYNOPSIS
         # makes reconnection if either slot was timeouted or was inactive too long
         $ua->refresh_connections();
 
-        # close everything
+        # closes everything
         $ua->close_all();
 
 DESCRIPTION
@@ -73,7 +75,7 @@ LICENSE
 
     host
 
-      It's the obligatory option. Sets the name/adress of remote host to be
+      It's the obligatory option. Sets the name/address of remote host to be
       requested.
 
     port
@@ -103,7 +105,7 @@ LICENSE
 
     request_timeout
 
-      By default it's equal to 1 Sets the time in seconds with granular
+      By default it's equal to 1. Sets the time in seconds with granular
       accuracy as micro seconds. The awaiting time of response will be
       limited with this value.
 
@@ -111,12 +113,10 @@ LICENSE
 
     sol_socket
 
-      It's a HashRef with socket options. THe possible keys are:
+      It's a HashRef with socket options. The possible keys are:
 
-    so_keepalive
-
-      Enables TCP KeepAlive on socket. The default value is 1 (means that
-      option is enabled).
+      so_keepalive - enables TCP KeepAlive on socket.
+      The default value is 1 (means that option is enabled).
 
     sol_tcp
 
@@ -126,7 +126,7 @@ LICENSE
 
       If some key is absent in HashRef then system settings will be used.
 
-      The supported key are shown below:
+      The supported keys are shown below:
 
       tcp_keepidle - the time (in seconds) the connection needs to remain
       idle before TCP starts sending keepalive probes
@@ -140,7 +140,7 @@ LICENSE
     inactivity_conn_ts
 
       If last response was received inactivity_conn_ts seconds or more ago,
-      then such slots will be destroyed in clear method.
+      then such slots will be destroyed.
 
       By default the value is 0 (disabled).
 
@@ -226,6 +226,8 @@ LICENSE
         1. The slot was marked as timeouted
         2. The "inactivity_conn_ts" was set and the connection was expired
         3. There are some errors in socket (for example: Connection reset by peer, Broken pipe, etc)
+
+    Returns the amount of made reconnections.
 
  close_all ($self)
 

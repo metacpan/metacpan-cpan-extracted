@@ -30,8 +30,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0.88',
-                                   'Test::Requires' => '0',
+                                   'Test::More' => '0.96',
+                                   'Test::Needs' => '0',
                                    'Test::Without::Module' => '0'
                                  }
                  }

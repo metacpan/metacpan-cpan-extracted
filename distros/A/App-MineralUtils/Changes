@@ -1,3 +1,13 @@
+0.007   2021-12-11  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Fix molecular weight of Mg ascorbate & pidolate.
+
+
+0.006   2021-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add mg-mg-lactate-dihydrate.
+
+
 0.005   2021-08-15  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Make quantity argument optional to make showing all possible
@@ -7,7 +17,7 @@
           now-available summary.
 
 
-0.004   2021-08-15  Released-By: PERLANCAR; Urgency: medium
+0.004   2021-08-15  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Rename units to be more concise:
 	  mg-magnesium-citrate -> mg-mg-citrate, and so on.

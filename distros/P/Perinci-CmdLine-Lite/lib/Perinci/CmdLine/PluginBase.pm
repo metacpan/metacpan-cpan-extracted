@@ -9,9 +9,9 @@ use warnings;
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2021-12-11'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.912'; # VERSION
+our $VERSION = '1.916'; # VERSION
 
 sub new {
     my ($class, %args) = (shift, @_);
@@ -49,15 +49,16 @@ sub activate {
         next unless $k =~ /^(before_|on_|after_)(.+)$/;
 
         my $meta_method = "meta_$k";
-        my $meta = $self->can($meta_method) ? $self->$meta_method : {};
+        my $methmeta = $self->can($meta_method) ? $self->$meta_method : {};
 
         (my $event = $k) =~ s/^on_//;
 
         $self->cmdline->_plugin_add_handler(
             defined $wanted_event ? $wanted_event : $event,
             $plugin_name,
-            defined $wanted_prio ? $wanted_prio :
-                (defined $meta->{prio} ? $meta->{prio} : 50),
+            (defined $wanted_prio ? $wanted_prio :
+             defined $methmeta->{prio} ? $methmeta->{prio} :
+             defined $meta->{prio} ? $meta->{prio} : 50),
             sub {
                 my $stash = shift;
                 $self->$k($stash);
@@ -85,7 +86,7 @@ Perinci::CmdLine::PluginBase - Base class for Perinci::CmdLine plugin
 
 =head1 VERSION
 
-This document describes version 1.912 of Perinci::CmdLine::PluginBase (from Perl distribution Perinci-CmdLine-Lite), released on 2021-12-01.
+This document describes version 1.916 of Perinci::CmdLine::PluginBase (from Perl distribution Perinci-CmdLine-Lite), released on 2021-12-11.
 
 =head1 DESCRIPTION
 

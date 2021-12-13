@@ -1,0 +1,43 @@
+---
+abstract: 'Client for Apache Calcite Avatica'
+author:
+  - 'Alexey Stavrov <logioniz@ya.ru>'
+build_requires:
+  Exporter: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  lib: '0'
+  parent: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Avatica-Client
+no_index:
+  directory:
+    - t
+requires:
+  Carp: '0'
+  Google::ProtocolBuffers::Dynamic: '0.30'
+  HTTP::Tiny: '0'
+  Time::HiRes: '0'
+  constant: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/skbkontur/perl-avatica-client/issues
+  repository: git://github.com/skbkontur/perl-avatica-client.git
+version: '0.001'
+x_contributors:
+  - 'Denis Ibaev <dionys@gmail.com>'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

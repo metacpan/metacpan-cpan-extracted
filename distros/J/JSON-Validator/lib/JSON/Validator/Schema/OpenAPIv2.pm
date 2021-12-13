@@ -11,8 +11,8 @@ my %SKIP_KEYWORDS_IN_PATH = map { ($_, 1) } qw(description parameters servers su
 
 has errors => sub {
   my $self      = shift;
-  my $validator = $self->new(%$self)->resolve($self->specification);
-  return [$validator->coerce({})->validate($self->resolve->data)];
+  my $validator = $self->new(store => $self->store, _refs => {})->coerce('numbers,strings');
+  return [$validator->resolve($self->specification)->validate($self->resolve->data)];
 };
 
 has moniker       => 'openapiv2';
@@ -340,7 +340,6 @@ sub _validate_request_or_response {
       push @errors, $self->_validate_body($direction, $val, $param);
       next;
     }
-
 
     if ($val->{exists}) {
       $self->_coerce_arrays($val, $param);

@@ -9,7 +9,7 @@ use Scalar::Util::Numeric qw(isint isfloat);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-17'; # DATE
 our $DIST = 'Data-TableData-Object'; # DIST
-our $VERSION = '0.114'; # VERSION
+our $VERSION = '0.115'; # VERSION
 
 sub _array_is_numeric {
     my $self = shift;
@@ -242,7 +242,7 @@ Data::TableData::Object::Base - Base class for Data::TableData::Object::*
 
 =head1 VERSION
 
-This document describes version 0.114 of Data::TableData::Object::Base (from Perl distribution Data-TableData-Object), released on 2021-11-17.
+This document describes version 0.115 of Data::TableData::Object::Base (from Perl distribution Data-TableData-Object), released on 2021-11-17.
 
 =head1 METHODS
 

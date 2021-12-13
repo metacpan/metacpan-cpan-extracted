@@ -1,0 +1,76 @@
+{
+   "abstract" : "check for POD errors in files",
+   "author" : [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Pod",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Pod::Simple" : "3.05",
+            "Test::Builder::Tester" : "1.02",
+            "Test::More" : "0.62",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Pod::Simple" : "3.05",
+            "Test::More" : "0.62"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/perl-pod/test-pod/issues/"
+      },
+      "homepage" : "http://search.cpan.org/dist/Test-Pod/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl-pod/test-pod.git",
+         "web" : "https://github.com/perl-pod/test-pod"
+      }
+   },
+   "version" : "1.52",
+   "x_IRC" : "irc://irc.perl.org/#perl-qa",
+   "x_MailingList" : "http://lists.perl.org/list/pod-people-qa.html",
+   "x_contributors" : [
+      "David E. Wheeler <david@justatheory.com>",
+      "Andy Lester <andy@petdance.com>",
+      "Paul Miller <jettero@cpan.org>",
+      "Luca Ferrari <fluca1978@gmail.com>",
+      "Karen Etheridge <ether@cpan.org>",
+      "ChrisWi <chris@computersalat.de>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

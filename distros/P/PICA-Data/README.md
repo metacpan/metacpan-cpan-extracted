@@ -116,6 +116,7 @@ ignored and additional parameters are passed to the parser's constructor:
 - [PICA::Parser::JSON](https://metacpan.org/pod/PICA%3A%3AParser%3A%3AJSON) for type `json` (PICA JSON)
 - [PICA::Parser::XML](https://metacpan.org/pod/PICA%3A%3AParser%3A%3AXML) for type `xml` or `picaxml` (PICA-XML)
 - [PICA::Parser::PPXML](https://metacpan.org/pod/PICA%3A%3AParser%3A%3APPXML) for type `ppxml` (PicaPlus-XML)
+- [PICA::Parser::PIXML](https://metacpan.org/pod/PICA%3A%3AParser%3A%3APIXML) for type `pixml` (PICA FOLIO Import XML)
 
 ## pica\_guess( $data )
 
@@ -138,6 +139,7 @@ Create a PICA writer object (see [PICA::Writer::Base](https://metacpan.org/pod/P
 - [PICA::Writer::JSON](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3AJSON) for type `json` (PICA JSON)
 - [PICA::Writer::XML](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3AXML) for type `xml` or `picaxml` (PICA-XML)
 - [PICA::Writer::PPXML](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3APPXML) for type `ppxml` (PicaPlus-XML)
+- [PICA::Writer::PIXML](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3APIXML) for type `pixml` (PICA FOLIO Import XML)
 
 ## pica\_string( $record \[, $type \[, @options\] \] )
 

@@ -1,0 +1,87 @@
+{
+   "abstract" : "Simple and Efficient Reading/Writing/Modifying of Complete Files",
+   "author" : [
+      "Uri Guttman <uri@stemsystems.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Slurp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Errno" : "0",
+            "Exporter" : "5.57",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "3.01",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "POSIX" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "3.01",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "1.00",
+            "Socket" : "0",
+            "Symbol" : "0",
+            "Test::More" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perhunter/slurp.git",
+         "web" : "https://github.com/perhunter/slurp"
+      }
+   },
+   "version" : "9999.32",
+   "x_contributors" : [
+      "Aristotle Pagaltzis <ARISTOTLE@cpan.org>",
+      "Chase Whitener <capoeirab@cpan.org>",
+      "Dan Book <grinnz@gmail.com>",
+      "Graham Knop <haarg@haarg.org>",
+      "James E Keenan <jkeenan@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

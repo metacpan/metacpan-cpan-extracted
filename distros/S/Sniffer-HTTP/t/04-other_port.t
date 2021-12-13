@@ -137,7 +137,7 @@ the <a href="mailto:%5bno%20address%20given%5d">webmaster</a>.
                                             'vary' => 'accept-language,accept-charset',
                                             'content-language' => 'en',
                                           }, 'HTTP::Headers' ),
-                     '_msg' => "Not Found\r"
+                     '_msg' => "Not Found"
                    }, 'HTTP::Response' );
 $response1->{_content} =~ s!\r\n!\n!mg;
 
@@ -195,15 +195,20 @@ the <a href="mailto:%5bno%20address%20given%5d">webmaster</a>.
                                             'vary' => 'accept-language,accept-charset',
                                             'content-language' => 'en',
                                           }, 'HTTP::Headers' ),
-                     '_msg' => "Not Found\r"
+                     '_msg' => "Not Found"
                    }, 'HTTP::Response' );
 $response2->{_content} =~ s!\r\n!\n!mg;
 
 delete $_->{_headers}->{'::std_case'} for @requests;
+delete $_->[0]->{_headers}->{'::std_case'} for @responses;
+delete $response1->{_headers}->{'::std_case'};
+delete $response2->{_headers}->{'::std_case'};
+for my $req (@requests) {
+    delete $req->{_headers}->{'::std_case'};
+};
 is_deeply(\@requests, [$request1,$request2], "Got the expected requests")
   or diag Dumper \@requests;
 
-delete $_->[0]->{_headers}->{'::std_case'} for @responses;
 is_deeply(\@responses, [[$response1,$request1],[$response2,$request2]], "Got the expected responses")
   or diag Dumper \@responses;
 

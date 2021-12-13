@@ -2,10 +2,20 @@ NAME
     Sah::Schemas::Math - Math-related Sah schemas
 
 VERSION
-    This document describes version 0.001 of Sah::Schemas::Math (from Perl
-    distribution Sah-Schemas-Math), released on 2020-05-27.
+    This document describes version 0.002 of Sah::Schemas::Math (from Perl
+    distribution Sah-Schemas-Math), released on 2021-07-19.
 
 DESCRIPTION
+SAH SCHEMAS
+    *   math::complex
+
+        Complex number.
+
+        See also "posfloat" for floats that are larger than 0.
+
+CONTRIBUTOR
+    perlancar (on netbook-zenbook-ux305) <perlancar@gmail.com>
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Sah-Schemas-Math>.
@@ -34,7 +44,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

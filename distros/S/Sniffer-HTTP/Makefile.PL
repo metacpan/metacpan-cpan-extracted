@@ -27,12 +27,16 @@ VERSION_TOO_LOW
 WriteMakefile(
     'NAME'    => 'Sniffer::HTTP',
     'VERSION_FROM'  => 'lib/Sniffer/HTTP.pm', # finds $VERSION
+    MIN_PERL_VERSION => '5.006', # we want "our"
     'PREREQ_PM'    => { 'Class::Accessor' => 0,
                         'Class::Data::Inheritable' => 0,
                         'HTTP::Request'   => 0,
                         'LWP::Simple'     => 0, # for one test.
+                        'HTTP::Request'   => '6.14', # Newline trimming
+                        'HTTP::Response'  => '6.14', # Newline trimming
                         'NetPacket::TCP'  => 0,
                         'Net::Pcap'       => '0.09',
+                        'parent'          => 0,
 			'Exporter'         => '5.5',
                       }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

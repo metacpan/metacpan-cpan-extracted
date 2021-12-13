@@ -1,5 +1,5 @@
 package Yancy::Backend::MojoDB;
-our $VERSION = '1.085';
+our $VERSION = '1.086';
 # ABSTRACT: Abstract base class for drivers based on Mojo DB drivers
 
 #pod =head1 SYNOPSIS
@@ -341,7 +341,7 @@ Yancy::Backend::MojoDB - Abstract base class for drivers based on Mojo DB driver
 
 =head1 VERSION
 
-version 1.085
+version 1.086
 
 =head1 SYNOPSIS
 

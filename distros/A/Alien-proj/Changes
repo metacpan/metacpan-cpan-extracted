@@ -1,5 +1,8 @@
 Revision history for Alien::proj
 
+1.16 2021-12-13
+    - Support perls back to 5.10, @mohawk2++
+
 1.15 2020-09-05
     - Add Alien::Build::Plugin::PkgConfig::PPWrapper
       to more places in Makefile.pl

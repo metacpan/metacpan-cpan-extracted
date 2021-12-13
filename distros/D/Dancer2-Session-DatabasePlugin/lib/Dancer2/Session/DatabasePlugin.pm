@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Ref::Util qw(is_plain_hashref);
 use Storable qw(nfreeze thaw);
 with 'Dancer2::Core::Role::SessionFactory';
-our $VERSION="1.0012";
+our $VERSION="1.0013";
 
 our $HANDLE_SQL_STRING=\&stub_function;
 our $HANDLE_EXECUTE=\&handle_execute;
@@ -33,14 +33,14 @@ has no_create=>(
 
 has cache =>(
   isa=>Bool,
-  is=>'ro',
-  default=>1,
+  is=>'rw',
+  default=>0,
 );
 
 has cache_sth=>(
   isa=>Bool,
   is=>'ro',
-  default=>1,
+  default=>0,
 );
 
 has sth_cache=>(
@@ -104,12 +104,12 @@ The session should be set to "DatabasePlugin" in order to use this session engin
   engines:
     session:
       DatabasePlugin:
-        cache: 1 # default 1, when 0 statement handles are not cached
+        cache: 0 # default 0, when 1 statement handles are cached
         connection: "foo"
         session_table: "SESSIONS"
         id_column:     "SESSION_ID"
         data_column:   "SESSION_DATA"
-        cache_sth:     1 # default 1, when set to 0 statement handles are not cached
+        cache_sth:     0 # default 0, when set to 1 statement handles are cached
 
   plugins:
     Database:

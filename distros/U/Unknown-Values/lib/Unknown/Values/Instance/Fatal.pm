@@ -4,6 +4,7 @@ use warnings;
 # ABSTRACT: Internal fatal value object for the "Unknown::Values" distribution
 
 package Unknown::Values::Instance::Fatal;
+$Unknown::Values::Instance::Fatal::VERSION = '0.006';
 use Carp 'confess';
 use base 'Unknown::Values::Instance';
 
@@ -27,7 +28,10 @@ sub to_string {
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -35,7 +39,7 @@ Unknown::Values::Instance::Fatal - Internal fatal value object for the "Unknown:
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 
@@ -49,4 +53,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

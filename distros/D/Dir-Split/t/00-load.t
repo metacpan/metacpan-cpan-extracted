@@ -5,8 +5,7 @@ use warnings;
 
 use Test::More tests => 1;
 
-BEGIN {
+BEGIN
+{
     use_ok('Dir::Split');
 }
-
-diag("Testing Dir::Split $Dir::Split::VERSION, Perl $], $^X");

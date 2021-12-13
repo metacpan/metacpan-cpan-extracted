@@ -1,3 +1,5 @@
+0.213470  2021-12-13 12:02:29+01:00 Europe/Brussels
+    - Support for basic multithreading (--threads command-line option)
+
 0.202960  2020-10-22 15:59:12+02:00 Europe/Brussels
     - first CPAN release
-

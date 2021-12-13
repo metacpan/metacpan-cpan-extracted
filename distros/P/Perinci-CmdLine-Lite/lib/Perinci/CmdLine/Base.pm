@@ -12,9 +12,9 @@ use IO::Interactive qw(is_interactive);
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2021-12-11'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.912'; # VERSION
+our $VERSION = '1.916'; # VERSION
 
 # this class can actually be a role instead of base class for pericmd &
 # pericmd-lite, but Mo is more lightweight than Role::Tiny (also R::T doesn't
@@ -142,7 +142,6 @@ has plugins => (
 # role: requires 'hook_after_action'
 # role: requires 'hook_format_result'
 # role: requires 'hook_display_result'
-# role: requires 'hook_after_run'
 
 # we put common stuffs here, but PC::Classic's final version will differ from
 # PC::Lite's in several aspects: translation, supported output formats,
@@ -458,6 +457,8 @@ sub BUILD {
     # always add these plugins
     push @{ $self->{plugins} }, (
         "Run::Normal",
+        "Run::Completion",
+        "Run::DumpObject",
     );
 
     $self->_plugin_activate_plugins_in_env();
@@ -857,198 +858,6 @@ sub _read_env {
     my @words = Text::ParseWords::shellwords($env);
     log_trace("[pericmd] Words from env: %s", \@words);
     \@words;
-}
-
-sub do_dump_object {
-    require Data::Dump;
-
-    my ($self, $r) = @_;
-
-    local $r->{in_dump_object} = 1;
-
-    # check whether subcommand is defined. try to search from --cmd, first
-    # command-line argument, or default_subcommand.
-    $self->hook_before_parse_argv($r);
-    $self->_parse_argv1($r);
-
-    if ($r->{read_env}) {
-        my $env_words = $self->_read_env($r);
-        unshift @ARGV, @$env_words;
-    }
-
-    my $scd = $r->{subcommand_data};
-    # we do get_meta() currently because some common option like dry_run is
-    # added in hook_after_get_meta().
-    my $meta = $self->get_meta($r, $scd->{url} // $self->{url});
-
-    # additional information, because scripts often put their metadata in 'main'
-    # package
-    {
-        no warnings 'once';
-        $self->{'x.main.spec'} = \%main::SPEC;
-    }
-
-    my $label = $ENV{PERINCI_CMDLINE_DUMP_OBJECT} //
-        $ENV{PERINCI_CMDLINE_DUMP}; # old name that will be removed
-    my $dump = join(
-        "",
-        "# BEGIN DUMP $label\n",
-        Data::Dump::dump($self), "\n",
-        "# END DUMP $label\n",
-    );
-
-    [200, "OK", $dump,
-     {
-         stream => 0,
-         "cmdline.skip_format" => 1,
-     }];
-}
-
-sub do_dump_args {
-    require Data::Dump;
-
-    my ($self, $r) = @_;
-
-    [200, "OK", Data::Dump::dump($r->{args}) . "\n",
-     {
-         stream => 0,
-         "cmdline.skip_format" => 1,
-     }];
-}
-
-sub do_dump_config {
-    require Data::Dump;
-
-    my ($self, $r) = @_;
-
-    [200, "OK", Data::Dump::dump($r->{config}) . "\n",
-     {
-         stream => 0,
-         "cmdline.skip_format" => 1,
-     }];
-}
-
-sub do_completion {
-    my ($self, $r) = @_;
-
-    local $r->{in_completion} = 1;
-
-    my ($words, $cword);
-    if ($r->{shell} eq 'bash') {
-        require Complete::Bash;
-        require Encode;
-        ($words, $cword) = @{ Complete::Bash::parse_cmdline(undef, undef, {truncate_current_word=>1}) };
-        ($words, $cword) = @{ Complete::Bash::join_wordbreak_words($words, $cword) };
-        $words = [map {Encode::decode('UTF-8', $_)} @$words];
-    } elsif ($r->{shell} eq 'fish') {
-        require Complete::Bash;
-        ($words, $cword) = @{ Complete::Bash::parse_cmdline() };
-    } elsif ($r->{shell} eq 'tcsh') {
-        require Complete::Tcsh;
-        ($words, $cword) = @{ Complete::Tcsh::parse_cmdline() };
-    } elsif ($r->{shell} eq 'zsh') {
-        require Complete::Bash;
-        ($words, $cword) = @{ Complete::Bash::parse_cmdline() };
-    } else {
-        die "Unsupported shell '$r->{shell}'";
-    }
-
-    shift @$words; $cword--; # strip program name
-
-    # @ARGV given by bash is messed up / different. during completion, we
-    # get ARGV from parsing COMP_LINE/COMP_POINT.
-    @ARGV = @$words;
-
-    # check whether subcommand is defined. try to search from --cmd, first
-    # command-line argument, or default_subcommand.
-    $self->hook_before_parse_argv($r);
-    $self->_parse_argv1($r);
-
-    if ($r->{read_env}) {
-        my $env_words = $self->_read_env($r);
-        unshift @ARGV, @$env_words;
-        $cword += @$env_words;
-    }
-
-    #log_trace("ARGV=%s", \@ARGV);
-    #log_trace("words=%s", $words);
-
-    # force format to text for completion, because user might type 'cmd --format
-    # blah -^'.
-    $r->{format} = 'text';
-
-    my $scd = $r->{subcommand_data};
-    my $meta = $self->get_meta($r, $scd->{url} // $self->{url});
-
-    my $subcommand_name_from = $r->{subcommand_name_from} // '';
-
-    require Perinci::Sub::Complete;
-    my $compres = Perinci::Sub::Complete::complete_cli_arg(
-        meta            => $meta, # must be normalized
-        words           => $words,
-        cword           => $cword,
-        common_opts     => $self->common_opts,
-        riap_server_url => $scd->{url},
-        riap_uri        => undef,
-        riap_client     => $self->riap_client,
-        extras          => {r=>$r, cmdline=>$self},
-        func_arg_starts_at => ($subcommand_name_from eq 'arg' ? 1:0),
-        completion      => sub {
-            my %args = @_;
-            my $type = $args{type};
-
-            # user specifies custom completion routine, so use that first
-            if ($self->completion) {
-                my $res = $self->completion(%args);
-                return $res if $res;
-            }
-            # if subcommand name has not been supplied and we're at arg#0,
-            # complete subcommand name
-            if ($self->subcommands &&
-                    $subcommand_name_from ne '--cmd' &&
-                         $type eq 'arg' && $args{argpos}==0) {
-                require Complete::Util;
-                my $subcommands    = $self->list_subcommands;
-                my @subc_names     = keys %$subcommands;
-                my @subc_summaries = map { $subcommands->{$_}{summary} }
-                    @subc_names;
-                return Complete::Util::complete_array_elem(
-                    array     => \@subc_names,
-                    summaries => \@subc_summaries,
-                    word      => $words->[$cword]);
-            }
-
-            # otherwise let periscomp do its thing
-            return undef;
-        },
-    );
-
-    my $formatted;
-    if ($r->{shell} eq 'bash') {
-        require Complete::Bash;
-        $formatted = Complete::Bash::format_completion(
-            $compres, {word=>$words->[$cword]});
-    } elsif ($r->{shell} eq 'fish') {
-        require Complete::Fish;
-        $formatted = Complete::Fish::format_completion($compres);
-    } elsif ($r->{shell} eq 'tcsh') {
-        require Complete::Tcsh;
-        $formatted = Complete::Tcsh::format_completion($compres);
-    } elsif ($r->{shell} eq 'zsh') {
-        require Complete::Zsh;
-        $formatted = Complete::Zsh::format_completion($compres);
-    }
-
-    # to properly display unicode filenames
-    $self->use_utf8(1);
-
-    [200, "OK", $formatted,
-     # these extra result are for debugging
-     {
-         "func.words" => $words,
-         "func.cword" => $cword,
-         "cmdline.skip_format" => 1,
-     }];
 }
 
 sub _read_config {
@@ -1898,6 +1707,33 @@ sub display_result {
     }
 }
 
+sub _format {
+    my ($self, $r) = @_;
+
+    my $is_success = $r->{res}[0] =~ /\A2/ || $r->{res}[0] == 304;
+
+    if (defined $ENV{PERINCI_CMDLINE_OUTPUT_DIR}) {
+        $self->cmdline->save_output($r);
+    }
+
+    if ($is_success &&
+            ($self->skip_format ||
+             $r->{meta}{'cmdline.skip_format'} ||
+             $r->{res}[3]{'cmdline.skip_format'})) {
+        $r->{fres} = $r->{res}[2] // '';
+    } elsif ($is_success &&
+                 ($r->{res}[3]{stream} // $r->{meta}{result}{stream})) {
+        # stream will be formatted as displayed by display_result()
+    }else {
+        log_trace("[pericmd] Running hook_format_result ...");
+        $r->{res}[3]{stream} = 0;
+        $r->{fres} = $self->hook_format_result($r) // '';
+    }
+    $self->select_output_handle($r);
+    log_trace("[pericmd] Running hook_display_result ...");
+    $self->hook_display_result($r);
+}
+
 sub run {
     my ($self) = @_;
 
@@ -1914,6 +1750,7 @@ sub run {
     $self->_plugin_run_event(
         name => 'run',
     );
+    $r->{res};
 }
 
 1;
@@ -1931,7 +1768,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.912 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-12-01.
+This document describes version 1.916 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-12-11.
 
 =head1 DESCRIPTION
 
@@ -1945,26 +1782,153 @@ L<https://perlancar.wordpress.com/category/pericmd-tut/>
 
 =for Pod::Coverage ^(.+)$
 
-=head1 PROGRAM FLOW (NORMAL)
+=head1 PLUGINS
 
-If you execute C<run()>, this is what will happen, in order:
+Perinci::CmdLine is plugin-based since 1.900.
+
+My long-term goal is to have L<ScriptX> (which is a plugin-oriented framework)
+as a replacement for Perinci::CmdLine. Since L<ScriptX> is still in early
+development, I am also adding plugin support to Perinci::CmdLine in the mean
+time. Plugin support is similar to how ScriptX does plugins.
+
+These are the characteristics of the plugin system, which make the system a very
+flexible one:
 
 =over
 
-=item * Detect if we are running under tab completion mode
+=item * for an event, multiple plugins can be registered to run
 
-This is done by checking the existence of special environment variables like
-C<COMP_LINE> (bash) or C<COMMAND_LINE> (tcsh). If yes, then jump to L</"PROGRAM
-FLOW (TAB COMPLETION)">. Otherwise, continue.
+Plugins will be run in the order of their priority (highest first = lower
+numbered first). A plugin can choose to make the remaining plugins to be skipped
+by returning status code 201 (this is similar to how Apache plugins work.)
 
-=item * Run hook_before_run, if defined
+=item * you can customize at which event(s) any plugin runs
 
-This hook (and every other hook) will be passed a single argument C<$r>, a hash
-that contains request data (see L</"REQUEST KEYS">).
+A plugin by default is set to run at predetermined event. For example the
+L<Debug::DumpArgs plugin|Perinci::CmdLine::Plugin::Debug::DumpArgs> plugin by
+default is set to run after the C<validate_args> event, but you can also run it
+at other event(s). You can run a plugin in multiple events and have the same
+plugin runs more than once at a single event.
 
-Some ideas that you can do in this hook: XXX.
+=item * you can customize the priority of each plugin for an event
 
-=item * Parse command-line arguments (@ARGV) and set C<action>
+This can change the order of plugins being run for an event.
+
+=item * you can disable an activate plugin
+
+The special L<Plugin::Disable plugin|Perinci::CmdLine::Plugin::Plugin::Disable>
+can be used to disable any plugin.
+
+=item * there are "before_<name>" events that can be used to cancel the "<name>" events
+
+=item * there are "after_<name>" events that can be used to repeat the "<name>" events
+
+=back
+
+=head2 Plugin events
+
+Below are events which are available to run plugins at. In addition to these,
+note that there are the two additional C<before_$event> and C<after_$event>
+(included below for ease of search).
+
+=over
+
+=item * activate_plugin
+
+This event can be used to disable other plugins (see
+L<Perinci::CmdLine::Plugin::Disable>) or do things when a plugin is loaded.
+
+=item * before_activate_plugin
+
+=item * after_activate_plugin
+
+=item * validate_args
+
+Before this event, C<< $r->{args} >> is already set to the input arguments, but
+they are not validated yet.
+
+After this event, C<< $r->{args} >> should have already been validated.
+
+=item * before_validate_args
+
+=item * after_validate_args
+
+=item * action
+
+After this event, C<< $r->{res} >> should have already been set to the result.
+
+=item * before_action
+
+=item * after_action
+
+=back
+
+=head2 Plugin module
+
+A plugin module is Perl module under the C<Perinci::CmdLine::Plugin::>
+namespace. The name should be further divided by category, e.g.
+L<Perinci::CmdLine::Plugin::Debug::DumpArgs>.
+
+It should be a subclass of L<Perinci::CmdLine::PluginBase>. It must have a
+C<meta> method returning metadata information.
+
+It should have one or more C<on_*>, C<before_*>, or C<after_*> methods to handle
+an event. A handler must return an enveloped result (an arrayref: [STATUS,
+MESSAGE, PAYLOAD]) where the status determine control flow. 100 means to decline
+and let the next plugin handle the event; 200 means success; 201 means success
+and skip the rest of the plugins to end the event early; 601 means to cancel the
+C<NAME> event (returned by a C<before_NAME> event handler); 602 means to repeat
+the C<NAME> event (returned by an C<after_NAME> event handler).
+
+See an existing plugin for more details.
+
+=head2 Activating plugins
+
+=over
+
+=item * From the source code
+
+(Currently no public API, but you can see the source code, particularly the
+C<_plugin_activate_plugins()> method).
+
+=item * From configuration file (special parameter C<-plugins>)
+
+Special parameters C<-plugins> will activate plugins, e.g.:
+
+ -plugins = -Debug::DumpArgs
+
+another example:
+
+ -plugins = ["-Debug::DumpArgs", "-Debug::DumpRes"]
+
+=item * From configuration file ([plugin=...] sections)
+
+For example:
+
+ [plugin=Debug::DumpArgs]
+
+ [plugin=Debug::DumpArgs]
+ -event=before_validate_args
+
+ [plugin=Plugin::Disable]
+ plugins = Debug::DumpArgs,Debug::DumpConfig
+
+=item * From environment variable
+
+See L</PERINCI_CMDLINE_PLUGINS> and L</PERINCI_CMDLINE_PLUGINS_JSON> under
+L</ENVIRONMENT>.
+
+=back
+
+=head1 PROGRAM FLOW
+
+If you execute C<run()>, then one of these plugins will run L<Run::Normal
+plugin|Perinci::CmdLine::Plugin::Run::Normal>, L<Run::Completion
+plugin|Perinci::CmdLine::Plugin::Run::Completion>, or L<Run::DumpObject
+plugin|Perinci::CmdLine::Plugin::Run::DumpObject>. Please see the documentation
+of each plugin for more detail.
+
+=head1 COMMAND-LINE ARGUMENTS PARSING
 
 If C<read_env> attribute is set to true, and there is environment variable
 defined to set default options (see documentation on C<read_env> and C<env_name>
@@ -2028,157 +1992,6 @@ We then run C<hook_after_parse_argv>. Some ideas to do in this hook: XXX.
 Function arguments that are still missing can be filled from STDIN or files, if
 the metadata specifies C<cmdline_src> property (see L<Rinci::function> for more
 details).
-
-=item * Delegate to C<action_$action> method
-
-Before running the C<action_$action> method, C<hook_before_action> is called
-e.g. to allow changing/fixing action, last chance to check arguments, etc.
-
-After we get the action from the previous step, we delegate to separate
-C<action_$action> method (so there is C<action_version>, C<action_help>, and so
-on; and also C<action_call>). These methods also receive C<$r> as their argument
-and must return an enveloped result (see L<Rinci::function> for more details).
-
-Result is put in C<< $r->{res} >>.
-
-C<hook_after_action> is then called e.g. to preformat result.
-
-=item * Run hook_format_result
-
-Hook must set C<< $r->{fres} >> (formatted result).
-
-If C<skip_format> attribute is true, or function metadata has
-C<cmdline.skip_format> set to true, or result has C<cmdline.skip_format>
-metadata property set to true, then this step is skipped and C<< $r->{fres} >>
-is simply taken from C<< $r->{res}[2] >>.
-
-=item * Run hook_display_result
-
-This hook is used by XXX.
-
-=item * Run hook_after_run, if defined
-
-Some ideas to do in this hook: XXX.
-
-=item * Exit (or return result)
-
-If C<exit> attribute is true, will C<exit()> with the action's envelope result
-status. If status is 200, exit code is 0. Otherwise exit code is status minus
-300. So, a response C<< [501, "Not implemented"] >> will result in exit code of
-201.
-
-If C<exit> attribute is false, will simply return the action result (C<<
-$r->{res} >>). And will also set exit code in C<<
-$r->{res}[3]{'x.perinci.cmdline.base.exit_code'} >>.
-
-=back
-
-=head1 PROGRAM FLOW (TAB COMPLETION)
-
-If program is detected running in tab completion mode, there is some differences
-in the flow. First, C<@ARGV> is set from C<COMP_LINE> (or C<COMMAND_LINE>)
-environment variable. Afterwards, completion is done by calling
-L<Perinci::Sub::Complete>'s C<complete_cli_arg>.
-
-The result is then output to STDOUT (resume from Run hook_format_result step in
-the normal program flow).
-
-=head1 PLUGINS
-
-My long-term goal is to have L<ScriptX> (which is a plugin-oriented framework)
-as a replacement for Perinci::CmdLine. Since L<ScriptX> is still in early
-development, I am adding plugin support to Perinci::CmdLine too (as of 1.900).
-Plugin support is similar to how ScriptX does plugins. Documentation is
-currently sparse; please see existing plugins in Perinci::CmdLine::Plugin::*,
-the ScriptX documentation, as well as the source code directly to get an idea of
-how plugin works. These are the characteristics of the plugin system: you can
-customize at which event any plugin runs (flexibility), you can customize the
-priority of each plugin for an event (flexibility), a "before-event-foo" plugin
-can cancel the "foo" event, an "after-event-foo" plugin can repeat the "foo"
-event.
-
-With plugin support, the C<hook_*()> methods will be phased out eventually. Some
-features will be moved to plugins in subsequent releases. More plugins will be
-added, either in this distribution, or in separate distributions. More events
-will be added to add more "hooks".
-
-=head2 Plugin events
-
-Currently only a few events have been added, as not all C<hook_*()> methods have
-been converted to plugin events yet. More events will be added in the future.
-Also note that for all events there are the two additional C<before_$event> and
-C<after_$event> (included below for ease of search).
-
-=over
-
-=item * activate_plugin
-
-This event can be used to disable other plugins (see
-L<Perinci::CmdLine::Plugin::DisablePlugin>) or do things when a plugin is
-loaded.
-
-=item * before_activate_plugin
-
-=item * after_activate_plugin
-
-=item * validate_args
-
-Before this event, C<< $r->{args} >> is already set to the input arguments, but
-they are not validated yet.
-
-After this event, C<< $r->{args} >> should have already been validated.
-
-=item * before_validate_args
-
-=item * after_validate_args
-
-=item * action
-
-After this event, C<< $r->{res} >> should have already been set to the result.
-
-=item * before_action
-
-=item * after_action
-
-=back
-
-=head2 Activating plugins
-
-=over
-
-=item * From the source code
-
-(Currently no public API, but you can see the source code, particularly the
-C<_plugin_activate_plugins()> method).
-
-=item * From configuration file (special parameter C<-plugins>)
-
-Special parameters C<-plugins> will activate plugins, e.g.:
-
- -plugins = -DumpArgs
-
-another example:
-
- -plugins = ["-DumpArgs", "-DumpRes"]
-
-=item * From configuration file ([plugin=...] sections)
-
-For example:
-
- [plugin=DumpArgs]
-
- [plugin=DumpArgs]
- -event=before_validate_args
-
- [plugin=DisablePlugins]
- plugins = DumpArgs,DumpConfig
-
-=item * From environment variable
-
-See L</PERINCI_CMDLINE_PLUGINS> and L</PERINCI_CMDLINE_PLUGINS_JSON> under
-L</ENVIRONMENT>.
-
-=back
 
 =head1 REQUEST KEYS
 
@@ -2444,11 +2257,6 @@ will be done. See also: C<skip_format> attribute, C<cmdline.skip_format> result
 metadata attribute.
 
 =head2 METADATA'S ARGUMENT SPECIFICATION ATTRIBUTE
-
-=head3 x.perinci.cmdline.default_from_schema
-
-Bool. If set to true, then even when an argument is not specified, the schema
-will be evaluated to get default/coerced value from the schema.
 
 =head1 RESULT METADATA
 

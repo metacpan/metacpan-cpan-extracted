@@ -8,7 +8,7 @@ use base 'RxPerl::Subject';
 use Carp 'croak';
 use Scalar::Util 'weaken';
 
-our $VERSION = "v6.8.1";
+our $VERSION = "v6.9.0";
 
 sub _on_subscribe {
     my ($self, $subscriber) = @_;
@@ -33,6 +33,12 @@ sub new {
     };
 
     bless $self, $class;
+}
+
+sub get_value {
+    my ($self) = shift;
+
+    return $self->{_last_value};
 }
 
 1;

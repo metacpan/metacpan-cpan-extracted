@@ -4,10 +4,12 @@ INSTALL
 lib/Dir/Split.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
 README
-scripts/dir-split.pl
+scripts/split.pl
 t/00-load.t
+t/char.t
+t/num.t
 t/pod-coverage.t
 t/pod.t
-t/split.t

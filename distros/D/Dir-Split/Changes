@@ -1,5 +1,30 @@
 Revision history for Perl extension Dir::Split.
 
+0.81  2021-12-12  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.80_02  2021-12-10  <schubiger@cpan.org>
+
+ - Fix MSWin32 test failures.
+   [testers #122650698 - gregor herrmann]
+
+0.80_01  2021-12-05  <schubiger@cpan.org>
+
+ - Major refactoring.
+
+ - Skip documentation tests for non-release testing.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Remove the testing diagnostic.
+
+ - Use the boolean pragma for true/false values.
+
+ - Update broken license link.
+
+ - Add metadata repository link.
+
 0.80 Sat Feb 16 13:18:05 CET 2008
 
  - Added test-file split.t.

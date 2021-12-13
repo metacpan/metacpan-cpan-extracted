@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::Requires 'Unicode::UTF8';
+use Test::Needs 'Unicode::UTF8';
 use Encode::Simple qw(encode_utf8 decode_utf8 encode_utf8_lax decode_utf8_lax);
 use Test::More;
 

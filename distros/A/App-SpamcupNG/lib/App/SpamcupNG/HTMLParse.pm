@@ -4,6 +4,7 @@ use warnings;
 use HTML::TreeBuilder::XPath 0.14;
 use Exporter 'import';
 use Carp 'croak';
+use Data::Dumper;
 
 our @EXPORT_OK = (
     'find_next_id',       'find_errors',
@@ -17,7 +18,7 @@ my %regexes = (
     http_500   => qr/500/,
 );
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 =head1 NAME
 
@@ -101,13 +102,31 @@ sub find_errors {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
         unless ( ref($content_ref) eq 'SCALAR' );
-    my $tree        = HTML::TreeBuilder::XPath->new;
+    my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
     my @nodes = $tree->findnodes('//div[@id="content"]/div[@class="error"]');
     my @errors;
 
     foreach my $node (@nodes) {
         push( @errors, $node->as_trimmed_text );
+    }
+
+    # bounce errors are inside an form
+    my $base_xpath = '//form[@action="/mcgi"]';
+    @nodes = $tree->findnodes( $base_xpath . '//strong' );
+
+    if (@nodes) {
+        if ( $nodes[0]->as_trimmed_text() eq 'Bounce error' ) {
+            my @nodes = $tree->findnodes( $base_xpath );
+            $nodes[0]->parent(undef);
+
+            foreach my $node ($nodes[0]->content_list()) {
+                next unless (ref($node) eq '');
+                $node =~ s/^\s+//;
+                $node =~ s/\s+$//;
+                push( @errors, $node );
+            }
+        }
     }
 
     return \@errors;
@@ -130,7 +149,7 @@ sub find_best_contacts {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
         unless ( ref($content_ref) eq 'SCALAR' );
-    my $tree        = HTML::TreeBuilder::XPath->new;
+    my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($content_ref);
     my @nodes = $tree->findnodes('//div[@id="content"]');
 
@@ -166,27 +185,66 @@ Returns an array reference with all the lines of the e-mail header found.
 =cut
 
 sub find_spam_header {
-    my $raw_spam_header = shift;
+    my $content_ref = shift;
+    croak "Must receive an scalar reference as parameter"
+        unless ( ref($content_ref) eq 'SCALAR' );
     my $formatted //= 0;
     my $tree = HTML::TreeBuilder::XPath->new;
-    $tree->parse_content($raw_spam_header);
-    my @nodes = $tree->findnodes_as_strings('//text()');
-    my @lines;
+    $tree->parse_content($content_ref);
 
-    for ( my $i = 0; $i <= scalar(@nodes); $i++ ) {
-        next unless $nodes[$i];
-        $nodes[$i] =~ s/^\s++//u;
+    my @nodes    = $tree->findnodes('/html/body/div[5]/p[1]/strong');
+    my $expected = 'Please make sure this email IS spam:';
+    my $parent   = undef;
 
-        if ($formatted) {
-            push( @lines, "\t$nodes[$i]" );
-
-        }
-        else {
-            push( @lines, $nodes[$i] );
-
+    foreach my $node (@nodes) {
+        if ( $node->as_trimmed_text eq $expected ) {
+            $parent = $node->parent;
+            last;
         }
     }
-    return \@lines;
+
+    if ($parent) {
+        $parent->parent(undef);
+        @nodes = $parent->findnodes('//font');
+
+        if (   ( scalar(@nodes) != 1 )
+            or ( ref( $nodes[0] ) ne 'HTML::Element' ) )
+        {
+            croak 'Unexpected content of SPAM header: ' . Dumper(@nodes);
+        }
+
+        my @lines;
+        my $header = $nodes[0]->content;
+
+        for ( my $i = 0; $i <= scalar( @{$header} ); $i++ ) {
+            if ( ref( $header->[$i] ) eq 'HTML::Element' ) {
+                $header->[$i]->parent(undef);
+
+                # just want text here
+                next unless $header->[$i]->content;
+                my $content = ( $header->[$i]->content )->[0];
+                next unless $content;
+                next if ( ref($content) );
+                $header->[$i] = $content;
+            }
+            next unless $header->[$i];
+
+            # removing Unicode spaces in place
+            $header->[$i] =~ s/^\s++//u;
+
+            if ($formatted) {
+                push( @lines, "\t$header->[$i]" );
+
+            }
+            else {
+                push( @lines, $header->[$i] );
+
+            }
+        }
+        return \@lines;
+    }
+
+    return [];
 }
 
 =head2 find_receivers
@@ -204,7 +262,7 @@ sub find_receivers {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
         unless ( ref($content_ref) eq 'SCALAR' );
-    my $tree        = HTML::TreeBuilder::XPath->new;
+    my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($content_ref);
     my @nodes = $tree->findnodes('//*[@id="content"]');
     my @receivers;

@@ -4,13 +4,13 @@
       "Tom Christiansen <tchrist@perl.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Unicode-Tussle",
    "no_index" : {
@@ -32,7 +32,6 @@
       "runtime" : {
          "requires" : {
             "Lingua::EN::Syllable" : "0",
-            "Lingua::JA::Romanize::Japanese" : "0",
             "Lingua::KO::Hangul::Util" : "0",
             "Lingua::KO::Romanize::Hangul" : "0",
             "Lingua::ZH::Romanize::Pinyin" : "0",
@@ -50,14 +49,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/briandfoy/Unicode-Tussle/issues"
+         "web" : "https://github.com/briandfoy/unicode-tussle/issues"
       },
-      "homepage" : "https://github.com/briandfoy/Unicode-Tussle",
+      "homepage" : "https://github.com/briandfoy/unicode-tussle",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/Unicode-Tussle.git",
-         "web" : "https://github.com/briandfoy/Unicode-Tussle"
+         "url" : "https://github.com/briandfoy/unicode-tussle.git",
+         "web" : "https://github.com/briandfoy/unicode-tussle"
       }
    },
-   "version" : "1.111"
+   "version" : "1.115",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

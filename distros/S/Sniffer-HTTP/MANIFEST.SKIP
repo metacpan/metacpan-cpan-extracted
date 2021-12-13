@@ -1,6 +1,7 @@
 .cvsignore$
 ^.lwpcookies
 ^.releaserc
+^.prove
 ^blib/
 ^Sniffer-HTTP-.*
 CVS/
@@ -17,3 +18,4 @@ t/gmail_http_sniffer.pcap
 ^.git/
 .*.bak$
 ^MYMETA
+^[\w-]+.pcap

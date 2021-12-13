@@ -10,9 +10,7 @@ use Net::Pcap; # just for the convenience function below
 use Net::Pcap::FindDevice;
 use Carp qw(croak);
 
-use vars qw($VERSION);
-
-$VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -397,13 +395,13 @@ sub run {
   my ($self,$device_name,$pcap_filter,%options) = @_;
 
   $options{ device } ||= find_device($device_name);
-  
+
   # Set a name so the error messages look good
   $device_name = '<user specified device>'
       if exists $options{ device };
   $device_name = '<unknown device>'
       unless defined $device_name;
-  
+
   $pcap_filter ||= "tcp port 80";
   $options{ snaplen } ||= $self->snaplen;
   $options{ timeout } ||= 500;
@@ -416,7 +414,7 @@ sub run {
       die "Unable to look up device information for '$device_name': $err";
     }
     warn $err if $err;
-    $options{ netmask } = $netmask; 
+    $options{ netmask } = $netmask;
   };
 
   #   Create packet capture object on device
@@ -591,7 +589,7 @@ Max Maischein (corion@cpan.org)
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005-2011 Max Maischein.  All Rights Reserved.
+Copyright (C) 2005-2021 Max Maischein.  All Rights Reserved.
 
 This code is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

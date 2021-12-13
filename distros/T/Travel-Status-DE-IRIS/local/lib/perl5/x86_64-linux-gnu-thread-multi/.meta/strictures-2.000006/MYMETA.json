@@ -1,0 +1,85 @@
+{
+   "abstract" : "Turn on strict and make most warnings fatal",
+   "author" : [
+      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "strictures",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {}
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::CountParents" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "bareword::filehandles" : "0",
+            "indirect" : "0",
+            "multidimensional" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "bareword::filehandles" : "0",
+            "indirect" : "0",
+            "multidimensional" : "0",
+            "perl" : "5.006"
+         },
+         "suggests" : {
+            "bareword::filehandles" : "0",
+            "indirect" : "0",
+            "multidimensional" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-strictures@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=strictures"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/p5sagit/strictures.git",
+         "web" : "https://github.com/p5sagit/strictures"
+      }
+   },
+   "version" : "2.000006",
+   "x_authority" : "cpan:MSTROUT",
+   "x_contributors" : [
+      "Graham Knop <haarg@haarg.org>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Matt S Trout <mst@shadowcat.co.uk>",
+      "Peter Rabbitson <ribasushi@cpan.org>",
+      "Christian Walde <walde.christian@googlemail.com>",
+      "Diab Jerius <djerius@cfa.harvard.edu>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

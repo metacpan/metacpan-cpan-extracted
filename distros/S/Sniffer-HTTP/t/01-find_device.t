@@ -15,6 +15,7 @@ if (&Net::Pcap::lib_version() eq 'libpcap version unknown (pre 0.8)') {
 
 if ($^O ne "MSWin32" and $> != 0) {
     diag "You're not running the tests as root - they might fail";
+    $TODO = "You're not running the tests as root";
 };
 
 my $name;

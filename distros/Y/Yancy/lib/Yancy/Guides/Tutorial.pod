@@ -11,7 +11,7 @@ Yancy::Guides::Tutorial - Yancy's First Steps
 
 =head1 VERSION
 
-version 1.085
+version 1.086
 
 =head1 DESCRIPTION
 

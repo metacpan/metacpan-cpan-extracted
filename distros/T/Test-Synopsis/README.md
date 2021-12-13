@@ -169,7 +169,7 @@ Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 
 Goro Fuji blogged about the original idea at
 [http://d.hatena.ne.jp/gfx/20090224/1235449381](http://d.hatena.ne.jp/gfx/20090224/1235449381) based on the testing
-code taken from [Test::Weaken](https://metacpan.org/pod/Test::Weaken).
+code taken from [Test::Weaken](https://metacpan.org/pod/Test%3A%3AWeaken).
 
 # MAINTAINER
 
@@ -197,4 +197,4 @@ This library is Copyright (c) Tatsuhiko Miyagawa
 
 # SEE ALSO
 
-[Test::Pod](https://metacpan.org/pod/Test::Pod), [Test::UseAllModules](https://metacpan.org/pod/Test::UseAllModules), [Test::Inline](https://metacpan.org/pod/Test::Inline)
+[Test::Pod](https://metacpan.org/pod/Test%3A%3APod), [Test::UseAllModules](https://metacpan.org/pod/Test%3A%3AUseAllModules), [Test::Inline](https://metacpan.org/pod/Test%3A%3AInline), [Test::Synopsis::Expectation](https://metacpan.org/pod/Test%3A%3ASynopsis%3A%3AExpectation)

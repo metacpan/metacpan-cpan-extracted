@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep;
-$Lab::XPRESS::Sweep::VERSION = '3.800';
+$Lab::XPRESS::Sweep::VERSION = '3.801';
 #ABSTRACT: Base sweep class
 
 use v5.20;
@@ -1445,7 +1445,7 @@ Lab::XPRESS::Sweep - Base sweep class
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 SYNOPSIS
 

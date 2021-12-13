@@ -6,7 +6,7 @@ use base 'XML::SAX::Base';
 use Math::Matrix;
 use Math::Trig qw/deg2rad/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $GroupId = 'SVGTransformer';
 
 my $IdMatrix = Math::Matrix->id(4);
@@ -151,49 +151,49 @@ sub _update_tags {
 sub _parse_transform {
     my ($self, $transform) = @_;
 
-    return $IdMatrix->clone unless $transform;
-
-    my @parts = (lc $transform) =~ /(\w+(?:\([^)]*\))?)/g;
-    my @ops   = @{$self->{_ops}};
-    for my $op (reverse @parts) {
-        my ($name, $arg) = $op =~ /^(\w+)(?:\(([^)]*)\))?$/;
-        my @args = _split($arg);
-        if ($name eq 'rotate') {
-            if (@ops && $ops[-1][0] eq 'rotate') {
-                $ops[-1][1] += $args[0];
-                $ops[-1][1] %= 360;
-            } else {
-                push @ops, ['rotate', @args];
-            }
-        } elsif ($name eq 'flipx') {
-            my $m = Math::Matrix->diagonal(-1, 1, -1, 1);
-            if (@ops && $ops[-1][0] eq 'matrix') {
-                $ops[-1][1] *= $m;
-            } else {
-                push @ops, ['matrix', $m];
-            }
-        } elsif ($name eq 'flipy') {
-            my $m = Math::Matrix->diagonal(1, -1, 1, -1);
-            if (@ops && $ops[-1][0] eq 'matrix') {
-                $ops[-1][1] *= $m;
-            } else {
-                push @ops, ['matrix', $m];
-            }
-        } elsif ($name eq 'matrix') {
-            my $m = Math::Matrix->new([
-                [$args[0], $args[2], 0,        0],
-                [$args[1], $args[3], 0,        0],
-                [0,        0,        $args[0], $args[2]],
-                [0,        0,        $args[1], $args[3]],
-            ]);
-            if (@ops && $ops[-1] eq 'matrix') {
-                $ops[-1][1] *= $m;
-            } else {
-                push @ops, ['matrix', $m];
+    my @ops = @{$self->{_ops}};
+    if ($transform) {
+        my @parts = (lc $transform) =~ /(\w+(?:\([^)]*\))?)/g;
+        for my $op (reverse @parts) {
+            my ($name, $arg) = $op =~ /^(\w+)(?:\(([^)]*)\))?$/;
+            my @args = _split($arg);
+            if ($name eq 'rotate') {
+                if (@ops && $ops[-1][0] eq 'rotate') {
+                    $ops[-1][1] += $args[0];
+                    $ops[-1][1] %= 360;
+                } else {
+                    push @ops, ['rotate', @args];
+                }
+            } elsif ($name eq 'flipx') {
+                my $m = Math::Matrix->diagonal(-1, 1, -1, 1);
+                if (@ops && $ops[-1][0] eq 'matrix') {
+                    $ops[-1][1] *= $m;
+                } else {
+                    push @ops, ['matrix', $m];
+                }
+            } elsif ($name eq 'flipy') {
+                my $m = Math::Matrix->diagonal(1, -1, 1, -1);
+                if (@ops && $ops[-1][0] eq 'matrix') {
+                    $ops[-1][1] *= $m;
+                } else {
+                    push @ops, ['matrix', $m];
+                }
+            } elsif ($name eq 'matrix') {
+                my $m = Math::Matrix->new([
+                    [$args[0], $args[2], 0,        0],
+                    [$args[1], $args[3], 0,        0],
+                    [0,        0,        $args[0], $args[2]],
+                    [0,        0,        $args[1], $args[3]],
+                ]);
+                if (@ops && $ops[-1] eq 'matrix') {
+                    $ops[-1][1] *= $m;
+                } else {
+                    push @ops, ['matrix', $m];
+                }
             }
         }
+        $self->{_ops} = \@ops;
     }
-    $self->{_ops} = \@ops;
 
     my $matrix = $IdMatrix->clone;
     for my $op (@ops) {

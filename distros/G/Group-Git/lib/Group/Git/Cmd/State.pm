@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use File::chdir;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.7.6');
+our $VERSION = version->new('0.7.7');
 
 requires 'repos';
 requires 'verbose';
@@ -65,7 +65,7 @@ Group::Git::Cmd::State - Quick state of each repository (branch name and changes
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::State version 0.7.6.
+This documentation refers to Group::Git::Cmd::State version 0.7.7.
 
 =head1 SYNOPSIS
 

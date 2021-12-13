@@ -19,6 +19,7 @@ my @files = (
     't/oas-vocabulary.t',
     't/openapi-constructor.t',
     't/operationIds.t',
+    't/parameters.t',
     't/validate_request.t',
     't/validate_response.t',
     'xt/author/00-compile.t',

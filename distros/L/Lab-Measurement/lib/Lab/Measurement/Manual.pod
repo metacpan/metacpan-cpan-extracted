@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 OVERVIEW
 
@@ -244,6 +244,14 @@ contains support for temperature sensor and He/N2 level meters.
 
 =back
 
+=head3 Helium and nitrogen liquid level meters
+
+=over
+
+=item * L<Lab::Moose::Instrument::OI_ILM210>
+
+=back
+
 =head3 Temperature control devices
 
 =over
@@ -411,6 +419,14 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =over
 
 =item * L<Lab::Moose::Connection::Zhinst>
+
+=back
+
+=head3 Oxford Instruments IsoBus
+
+=over
+
+=item * L<Lab::Moose::Connection::IsoBus>
 
 =back
 

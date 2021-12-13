@@ -27,11 +27,9 @@ which encapsulates most of this.
 
 =cut
 
-use base 'Class::Accessor';
+use parent 'Class::Accessor';
 
-use vars qw($VERSION);
-
-$VERSION = '0.24';
+our $VERSION = '0.25';
 
 my @callbacks = qw(request response closed log);
 __PACKAGE__->mk_accessors(qw(tcp_connection sent_buffer recv_buffer _response _response_chunk_size _response_len _request prev_request),
@@ -315,7 +313,7 @@ Max Maischein (corion@cpan.org)
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005-2011 Max Maischein.  All Rights Reserved.
+Copyright (C) 2005-2021 Max Maischein.  All Rights Reserved.
 
 This code is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

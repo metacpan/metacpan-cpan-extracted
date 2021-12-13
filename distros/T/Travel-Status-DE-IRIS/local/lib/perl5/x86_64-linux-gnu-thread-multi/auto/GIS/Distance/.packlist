@@ -1,0 +1,11 @@
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/ALT.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/Constants.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/Cosine.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/Formula.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/GreatCircle.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/Haversine.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/MathTrig.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/Null.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/Polar.pm
+/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/GIS/Distance/Vincenty.pm

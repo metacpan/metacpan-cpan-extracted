@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::API;
-our $VERSION = '1.085';
+our $VERSION = '1.086';
 # ABSTRACT: (DEPRECATED) An OpenAPI REST controller for the Yancy editor
 
 #pod =head1 DESCRIPTION
@@ -274,7 +274,7 @@ Yancy::Controller::Yancy::API - (DEPRECATED) An OpenAPI REST controller for the 
 
 =head1 VERSION
 
-version 1.085
+version 1.086
 
 =head1 DESCRIPTION
 

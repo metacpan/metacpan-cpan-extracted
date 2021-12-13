@@ -46,6 +46,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Data::Dumper" : "0",
             "Getopt::Std" : "0",
             "HTML::Form" : "6.07",
             "HTML::TreeBuilder::XPath" : "0.14",
@@ -75,11 +76,11 @@
    "provides" : {
       "App::SpamcupNG" : {
          "file" : "lib/App/SpamcupNG.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "App::SpamcupNG::HTMLParse" : {
          "file" : "lib/App/SpamcupNG/HTMLParse.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -94,7 +95,7 @@
          "web" : "https://github.com/glasswalk3r/App-SpamcupNG"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035005"

@@ -3,13 +3,16 @@
 use warnings;
 use strict;
 use Test::More;
+use Test::Exception;
 use POSIX;
 use FindBin;
+use IO::Select;
 use Mojo::File qw(tempfile path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
+use Mojo::IOLoop::ReadWriteProcess qw(process);
+use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt);
 
 subtest process => sub {
-  use Mojo::IOLoop::ReadWriteProcess;
 
   my $c = Mojo::IOLoop::ReadWriteProcess->new();
 
@@ -26,7 +29,6 @@ subtest process => sub {
 };
 
 subtest 'process basic functions' => sub {
-  use Mojo::IOLoop::ReadWriteProcess;
 
   my $p = Mojo::IOLoop::ReadWriteProcess->new();
   eval {
@@ -66,7 +68,6 @@ subtest 'process basic functions' => sub {
 };
 
 subtest 'process is_running()' => sub {
-  use Mojo::IOLoop::ReadWriteProcess;
 
   my @output;
   pipe(PARENT, CHILD);
@@ -139,7 +140,6 @@ subtest 'process execute()' => sub {
   plan skip_all =>
 "You do not seem to have $test_script_sigtrap. The script is required to run the test"
     unless -e $test_script_sigtrap;
-  use Mojo::IOLoop::ReadWriteProcess;
   my $p = Mojo::IOLoop::ReadWriteProcess->new(
     sleeptime_during_kill => 0.1,
     execute               => $test_script
@@ -302,15 +302,12 @@ subtest 'process execute()' => sub {
 };
 
 subtest 'process(execute =>"/usr/bin/true")' => sub {
-  use Mojo::IOLoop::ReadWriteProcess qw(process);
   plan skip_all => "Missing '/usr/bin/true'" unless -e '/usr/bin/true';
 
   is(process(execute => '/usr/bin/true')->quirkiness(1)->start()->wait_stop()->exit_status(), 0, 'Simple exec of "/usr/bin/true" return 0');
 };
 
 subtest 'process code()' => sub {
-  use Mojo::IOLoop::ReadWriteProcess;
-  use IO::Select;
   my $p = Mojo::IOLoop::ReadWriteProcess->new(
     kill_sleeptime        => 0.01,
     sleeptime_during_kill => 0.01,
@@ -548,7 +545,6 @@ process';
 };
 
 subtest 'process_args' => sub {
-  use Mojo::IOLoop::ReadWriteProcess;
   my $code = sub {
     shift; 
     print $_.$/ for(@_);
@@ -576,6 +572,20 @@ subtest 'process in process' => sub {
     })->start()->wait_stop();
 
     is ($p->read_all_stdout(), 'DONE', "Use ReadWriteProcess inside of ReadWriteProcess(code=>'')");
+};
+
+subtest 'execute exeption handling' => sub {
+    throws_ok {
+        process(execute => '/I/do/not/exist')->start()->wait_stop()->exit_status();
+    } qr%/I/do/not/exist%, 'Execute throw exception, if executable does not exists';
+
+    my $p = process(execute => 'sleep 0.2')->start();
+    attempt {
+        attempts  => 20,
+        condition => sub { defined($p->exit_status)},
+    };
+    is ($p->is_running(), 0, 'Process not running');
+    is ($p->exit_status(), 0, 'Exit status is 0');
 };
 
 done_testing;

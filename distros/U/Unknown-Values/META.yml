@@ -1,20 +1,23 @@
 ---
 abstract: "Use 'unknown' values instead of undef ones"
 author:
-  - "Curtis \"Ovid\" Poe <ovid@cpan.org>"
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
 build_requires:
-  Test::Most: 0
+  Test::Most: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Unknown-Values
 requires:
-  perl: 5.010
+  perl: '5.010'
 resources:
-  repository: git://github.com/Ovid/unknown.git
-version: 0.005
+  repository: https://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@github.com/Ovid/unknown.git
+version: '0.006'
+x_generated_by_perl: v5.26.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

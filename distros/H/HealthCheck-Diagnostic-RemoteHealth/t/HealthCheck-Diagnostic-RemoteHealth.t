@@ -23,7 +23,7 @@ sub mock_web_request {
 }
 
 my $hc = HealthCheck::Diagnostic::RemoteHealth->new(
-    url => 'https://foo.com/healthz'
+    url => 'http://foo.test/healthz'
 );
 
 my $mock_web = mock_web_request();
@@ -91,11 +91,11 @@ is $res, {
     label   => 'RemoteHealth',
     status  => 'CRITICAL',
     info    =>
-        'Requested https://foo.com/healthz and got status code 400, expected 200, 503',
+        'Requested http://foo.test/healthz and got status code 400, expected 200, 503',
     results => [ {
         status => 'CRITICAL',
         info   =>
-            'Requested https://foo.com/healthz and got status code 400, expected 200, 503',
+            'Requested http://foo.test/healthz and got status code 400, expected 200, 503',
     } ],
 }, 'Expected CRITICAL status when it gets unwanted status code.';
 

@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::mysqld" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.31",
+  "VERSION" => "0.32",
   "test" => {
     "TESTS" => "t/*.t"
   }

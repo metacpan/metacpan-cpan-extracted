@@ -8,6 +8,7 @@
 ```perl
     use MojoX::HTTP::Async ();
     use Mojo::Message::Request ();
+    use Mojo::URL ();
 
     # creates new instance for async requests to the certain domain,
     # restricts max amount of simultaneously executed requests
@@ -16,6 +17,7 @@
     # let's fill slots
     $ua->add('/page1.html?lang=en');
     $ua->add('http://my-site.com/page2.html');
+    $ua->add( Mojo::URL->new("/page/03.html") );
     $ua->add( Mojo::Message::Request->new() );
 
     # non-blocking requests processing
@@ -45,7 +47,7 @@
     # makes reconnection if either slot was timeouted or was inactive too long
     $ua->refresh_connections();
 
-    # close everything
+    # closes everything
     $ua->close_all();
 ```
 
@@ -69,7 +71,7 @@
 
 ###### host
         It's the obligatory option.
-        Sets the name/adress of remote host to be requested.
+        Sets the name/address of remote host to be requested.
 
 ###### port
         By default it's equal to 80. Sets the port number of remote point.
@@ -93,7 +95,7 @@
         If it's equal to 0, then there will be no timeout restrictions.
 
 ###### request_timeout
-        By default it's equal to 1 Sets the time in seconds with granular
+        By default it's equal to 1. Sets the time in seconds with granular
         accuracy as micro seconds.
         The awaiting time of response will be limited with this value.
 
@@ -113,7 +115,7 @@
 
         If some key is absent in HashRef then system settings will be used.
 
-        The supported key are shown below:
+        The supported keys are shown below:
 
         tcp_keepidle
             the time (in seconds) the connection needs to remain
@@ -128,7 +130,7 @@
 
 ###### inactivity_conn_ts
         If last response was received "inactivity_conn_ts" seconds or more
-        ago, then such slots will be destroyed in "clear" method.
+        ago, then such slots will be destroyed.
 
         By default the value is 0 (disabled).
 
@@ -203,11 +205,13 @@
 ##### refresh_connections ($self)
     Closes connections in slots in the following cases:
 
-    1. The slot was marked as time-outed
+        1. The slot was marked as time-outed
 
-    2. The "inactivity_conn_ts" was set and the connection was expired
+        2. The "inactivity_conn_ts" was set and the connection was expired
 
-    3. There are some errors in socket (for example: Connection reset by peer, Broken pipe, etc)
+        3. There are some errors in socket (for example: Connection reset by peer, Broken pipe, etc)
+
+    Returns the amount of made reconnections.
 
 ##### close_all ($self)
     Closes all opened connections and resets all slots with requests.

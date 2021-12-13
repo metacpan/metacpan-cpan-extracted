@@ -10,6 +10,7 @@ MojoX::HTTP::Async - The simple package to execute multiple parallel requests to
 
     use MojoX::HTTP::Async ();
     use Mojo::Message::Request ();
+    use Mojo::URL ();
 
     # creates new instance for async requests
     # restricts max amount of simultaneously executed requests
@@ -18,6 +19,7 @@ MojoX::HTTP::Async - The simple package to execute multiple parallel requests to
     # let's fill slots
     $ua->add( '/page1.html?lang=en');
     $ua->add( 'http://my-site.com/page2.html');
+    $ua->add( Mojo::URL->new("/page/03.html") );
     $ua->add( Mojo::Message::Request->new() );
 
     # non-blocking requests processing
@@ -49,7 +51,7 @@ MojoX::HTTP::Async - The simple package to execute multiple parallel requests to
     # makes reconnection if either slot was timeouted or was inactive too long
     $ua->refresh_connections();
 
-    # close everything
+    # closes everything
     $ua->close_all();
 
 =head1 DESCRIPTION
@@ -86,7 +88,7 @@ use URI ();
 use Scalar::Util qw/ blessed /;
 use Errno qw / :POSIX /;
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 use constant {
     IS_WIN     => ($^O eq 'MSWin32') ? 1 : 0,
@@ -102,7 +104,7 @@ The class constructor.
 =item host
 
 It's the obligatory option.
-Sets the name/adress of remote host to be requested.
+Sets the name/address of remote host to be requested.
 
 =item port
 
@@ -134,7 +136,7 @@ If it's equal to 0, then there will be no timeout restrictions.
 
 =item request_timeout
 
-By default it's equal to 1
+By default it's equal to 1.
 Sets the time in seconds with granular accuracy as micro seconds.
 The awaiting time of response will be limited with this value.
 
@@ -143,11 +145,9 @@ In case of 0 value there will be no time restrictions.
 =item sol_socket
 
 It's a HashRef with socket options.
-THe possible keys are:
+The possible keys are:
 
-=item B<so_keepalive>
-
-Enables TCP KeepAlive on socket.
+B<so_keepalive> - enables TCP KeepAlive on socket.
 The default value is 1 (means that option is enabled).
 
 =item B<sol_tcp>
@@ -158,7 +158,7 @@ It's a HashRef with socket TCP-options.
 
 If some key is absent in HashRef then system settings will be used.
 
-The supported key are shown below:
+The supported keys are shown below:
 
 B<tcp_keepidle> - the time (in seconds) the connection needs to remain idle before TCP starts sending keepalive probes
 
@@ -169,7 +169,7 @@ B<tcp_keepcnt> - the maximum number of keepalive probes TCP should send before d
 =item inactivity_conn_ts
 
 If last response was received C<inactivity_conn_ts> seconds or more ago,
-then such slots will be destroyed in C<clear> method.
+then such slots will be destroyed.
 
 By default the value is 0 (disabled).
 
@@ -217,7 +217,7 @@ sub _connect ($self, $slot, $proto, $peer_addr) {
     }
 
     if (&IS_WIN) {
-        #$socket = IO::Socket::IP->new_from_fd(fileno($socket), '+<');
+        $socket = IO::Socket::IP->new_from_fd(fileno($socket), '+<');
         defined($socket->blocking(0)) or croak("can't set non-blocking state on socket: $!");
         #$socket->sockopt(O_NOINHERIT, 1) or croak("fcntl error has occurred: $!"); # the same as SOCK_CLOEXEC
     }
@@ -721,6 +721,8 @@ Closes connections in slots in the following cases:
     1. The slot was marked as timeouted
     2. The "inactivity_conn_ts" was set and the connection was expired
     3. There are some errors in socket (for example: Connection reset by peer, Broken pipe, etc)
+
+Returns the amount of made reconnections.
 
 =cut
 

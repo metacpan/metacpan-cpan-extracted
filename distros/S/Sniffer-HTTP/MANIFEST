@@ -1,6 +1,7 @@
 .gitignore
 bin/dump-raw.pl
 bin/live-http-headers.pl
+bin/replay-dump.pl
 Changes
 lib/Net/Pcap/FindDevice.pm
 lib/Sniffer/Connection.pm

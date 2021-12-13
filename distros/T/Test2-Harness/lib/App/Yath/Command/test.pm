@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000086';
+our $VERSION = '1.000087';
 
 use App::Yath::Options;
 
@@ -704,6 +704,7 @@ sub start_auditor {
             '--no-scan-plugins',    # Do not preload any plugin modules
             auditor => 'Test2::Harness::Auditor',
             $run->run_id,
+            procname_prefix => $settings->debug->procname_prefix,
         ],
     );
 
@@ -1526,6 +1527,15 @@ Use interactive mode, 1 test at a time, stdin forwarded to it
 =item --no-keep-dirs
 
 Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+
+
+=item --procname-prefix ARG
+
+=item --procname-prefix=ARG
+
+=item --no-procname-prefix
+
+Add a prefix to all proc names (as seen by ps).
 
 
 =item --summary

@@ -1,0 +1,18 @@
+{
+   "alien_build_version" : "2.46",
+   "cflags" : "-I/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/x86_64-linux-gnu-thread-multi/auto/share/dist/Alien-Libxml2/include/libxml2 ",
+   "cflags_static" : "-I/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/x86_64-linux-gnu-thread-multi/auto/share/dist/Alien-Libxml2/include/libxml2 ",
+   "install_type" : "share",
+   "legacy" : {
+      "finished_installing" : 1,
+      "install_type" : "share",
+      "name" : "libxml-2.0",
+      "original_prefix" : "/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/x86_64-linux-gnu-thread-multi/auto/share/dist/Alien-Libxml2",
+      "version" : "2.9.10"
+   },
+   "libs" : "-L/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/x86_64-linux-gnu-thread-multi/auto/share/dist/Alien-Libxml2/lib -lxml2 -lz -llzma -lm ",
+   "libs_static" : "-L/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/x86_64-linux-gnu-thread-multi/auto/share/dist/Alien-Libxml2/lib -lxml2 -lz -llzma -lm ",
+   "perl_module_version" : "0.17",
+   "prefix" : "/home/derf/var/projects/transitfoo/Travel-Status-DE-IRIS/local/lib/perl5/x86_64-linux-gnu-thread-multi/auto/share/dist/Alien-Libxml2",
+   "version" : "2.9.10"
+}

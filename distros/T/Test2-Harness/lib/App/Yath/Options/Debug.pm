@@ -2,7 +2,7 @@ package App::Yath::Options::Debug;
 use strict;
 use warnings;
 
-our $VERSION = '1.000086';
+our $VERSION = '1.000087';
 
 use Test2::Harness::Util::JSON qw/encode_pretty_json/;
 use Test2::Util::Table qw/table/;
@@ -24,6 +24,12 @@ option_group {prefix => 'debug', category => 'Help and Debugging'} => sub {
         env_vars       => [qw/T2_HARNESS_DUMMY/],
         clear_env_vars => 1,
         default        => 0,
+    );
+
+    option procname_prefix => (
+        type => 's',
+        default => '',
+        description => 'Add a prefix to all proc names (as seen by ps).',
     );
 
     option keep_dirs => (
@@ -343,6 +349,15 @@ Use interactive mode, 1 test at a time, stdin forwarded to it
 =item --no-keep-dirs
 
 Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+
+
+=item --procname-prefix ARG
+
+=item --procname-prefix=ARG
+
+=item --no-procname-prefix
+
+Add a prefix to all proc names (as seen by ps).
 
 
 =item --summary

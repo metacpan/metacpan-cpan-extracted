@@ -17,7 +17,7 @@ is $first->{record}->[6]->[7], '柳经纬主编;', 'Unicode';
 is_deeply $first->{record}->[11],
     ['145Z', '40', 'a', '$', 'b', 'test$', 'c', '...'], 'sub field with $';
 
-foreach my $type (qw(Plain Plus JSON Binary XML PPXML)) {
+foreach my $type (qw(Plain Plus JSON Binary XML PPXML PIXML)) {
     my $module = "PICA::Parser::$type";
     my $file   = 't/files/pica.' . lc($type);
 

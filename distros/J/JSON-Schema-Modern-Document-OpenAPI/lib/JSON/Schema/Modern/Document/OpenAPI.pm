@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.008-16-g34b098c
+package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.009-9-g8bdbc93
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -19,7 +19,7 @@ use JSON::Schema::Modern::Utilities 0.525 qw(assert_keyword_exists assert_keywor
 use Safe::Isa;
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
-use List::Util 'any';
+use List::Util qw(any pairs);
 use Ref::Util 'is_plain_hashref';
 use MooX::HandlesVia;
 use MooX::TypeTiny 0.002002;
@@ -38,7 +38,7 @@ use constant DEFAULT_SCHEMAS => {
   'oas/schema.json' => 'https://spec.openapis.org/oas/3.1/schema', # the main openapi document schema
 };
 
-use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2021-09-28';
+use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/latest';
 
 has '+evaluator' => (
   required => 1,
@@ -173,12 +173,11 @@ sub _add_vocab_and_default_schemas ($self) {
   my $js = $self->evaluator;
   $js->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI');
 
-  foreach my $filename (keys DEFAULT_SCHEMAS->%*) {
-    $js->add_schema(
-      DEFAULT_SCHEMAS->{$filename},
-      $js->_json_decoder->decode(path(dist_dir('JSON-Schema-Modern-Document-OpenAPI'), $filename)->slurp_raw),
-    )
-    if not $js->_resource_exists(DEFAULT_SCHEMAS->{$filename});
+  foreach my $pairs (pairs DEFAULT_SCHEMAS->%*) {
+    my ($filename, $uri) = @$pairs;
+    my $document = $js->add_schema($uri,
+      $js->_json_decoder->decode(path(dist_dir('JSON-Schema-Modern-Document-OpenAPI'), $filename)->slurp_raw));
+    $js->add_schema($uri.'/latest', $document) if $uri =~ /schema(-base)?$/;
   }
 }
 
@@ -213,7 +212,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -234,7 +233,8 @@ Provides structured parsing of an OpenAPI document, suitable as the base for mor
 request and response validation, code generation or form generation.
 
 The provided document must be a valid OpenAPI document, as specified by the schema identified by
-C<https://spec.openapis.org/oas/3.1/schema-base/2021-09-28> (the latest document available)
+C<https://spec.openapis.org/oas/3.1/schema-base/latest> (an alias for the latest document available)
+
 and the L<OpenAPI v3.1 specification|https://spec.openapis.org/oas/v3.1.0>.
 
 =head1 ATTRIBUTES
@@ -255,7 +255,7 @@ schemas in the document, either manually or perhaps via a web framework plugin (
 =head2 metaschema_uri
 
 The URI of the schema that describes the OpenAPI document itself. Defaults to
-C<https://spec.openapis.org/oas/3.1/schema-base/2021-09-28> (the latest document available).
+C<https://spec.openapis.org/oas/3.1/schema-base/latest> (an alias for the latest document available).
 
 =head2 json_schema_dialect
 

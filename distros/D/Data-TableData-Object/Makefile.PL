@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Manipulate data structure via table object",
+  "ABSTRACT" => "Manipulate table-like data structure via table object",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.114",
+  "VERSION" => "0.115",
   "test" => {
     "TESTS" => "t/*.t"
   }

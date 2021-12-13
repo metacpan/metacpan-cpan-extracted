@@ -4,13 +4,13 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sniffer-HTTP",
    "no_index" : {
@@ -35,14 +35,17 @@
             "Class::Accessor" : "0",
             "Class::Data::Inheritable" : "0",
             "Exporter" : "5.5",
-            "HTTP::Request" : "0",
+            "HTTP::Request" : "6.14",
+            "HTTP::Response" : "6.14",
             "LWP::Simple" : "0",
             "Net::Pcap" : "0.09",
-            "NetPacket::TCP" : "0"
+            "NetPacket::TCP" : "0",
+            "parent" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.24",
-   "x_serialization_backend" : "JSON::PP version 2.27202"
+   "version" : "0.25",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Debug;
-$Lab::Moose::Connection::Debug::VERSION = '3.800';
+$Lab::Moose::Connection::Debug::VERSION = '3.801';
 #ABSTRACT: Debug connection, printing / reading on terminal
 
 use v5.20;
@@ -73,7 +73,7 @@ Lab::Moose::Connection::Debug - Debug connection, printing / reading on terminal
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 SYNOPSIS
 

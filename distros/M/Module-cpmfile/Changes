@@ -1,5 +1,9 @@
 Revision history for Module-cpmfile
 
+0.003  2021-12-12 12:03:25 JST
+    - cpmfile->features now returns undef if there are no features
+    - Remove Module::cpmfile::Prereqs->options_for
+
 0.002  2021-08-01 02:03:34 JST
     - No changes in the code, packaging update
 

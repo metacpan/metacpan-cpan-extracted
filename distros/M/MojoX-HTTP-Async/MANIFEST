@@ -13,3 +13,4 @@ t/certs/server-key.pem
 t/insecure.t
 t/lib/Test/Utils.pm
 t/secure.t
+xt/release/kwalitee.t

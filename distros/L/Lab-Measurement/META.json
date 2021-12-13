@@ -2,7 +2,8 @@
    "abstract" : "Test and measure with Perl",
    "author" : [
       "Andreas K. H\u00fcttel <mail@akhuettel.de>",
-      "Simon Reinhardt <simon.reinhardt@physik.uni-r.de>"
+      "Simon Reinhardt <simon.reinhardt@physik.uni-r.de>",
+      "Fabian Weinelt <fabian.weinelt@gmx.de>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
@@ -11,7 +12,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Lab-Measurement",
    "prereqs" : {
@@ -139,9 +140,9 @@
       "x_IRC" : "irc://irc.libera.chat/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.800",
+   "version" : "3.801",
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

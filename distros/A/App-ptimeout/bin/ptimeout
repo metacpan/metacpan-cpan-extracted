@@ -1,0 +1,71 @@
+#!perl
+
+use App::ptimeout;
+App::ptimeout::_run(@ARGV);
+
+=head1 NAME
+
+ptimeout - time out a command, reporting errors
+
+=head1 SYNOPSIS
+
+    ptimeout 1h long_running_command
+
+    ptimeout 60m long_running_command
+
+    ptimeout 3600 long_running_command
+
+=head1 DESCRIPTION
+
+Takes two or more arguments. The first is the timeout, an integer.
+With no suffix this is a number of seconds. Can also take suffixes
+C<m> or C<h> indicating a number of minutes or hours.
+
+The rest is a command and its arguments.
+
+A watchdog process is immediately forked off, and then the command
+is run in the foreground.
+
+If that command exits before the timeout, C<ptimeout> will
+kill the watchdog and then replicate the command's exit status in
+its own.
+
+If the timeout is reached and the command is still running then
+the watchdog will kill it (using SIGTERM) and all its child processes
+that can be found, and C<ptimeout> will exit with status 124.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item GNU timeout
+
+This does not reliably kill child processes in all circumstances.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs you find on Github:
+
+L<https://github.com/DrHyde/perl-modules-App-ptimeout/issues>
+
+=head1 SOURCE CODE REPOSITORY
+
+L<git://github.com/DrHyde/perl-modules-App-ptimeout.git>
+
+=head1 AUTHOR, COPYRIGHT and LICENCE
+
+Copyright 2021 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+
+This software is free-as-in-speech software, and may be used,
+distributed, and modified under the terms of either the GNU
+General Public Licence version 2 or the Artistic Licence. It's
+up to you which one you use. The full text of the licences can
+be found in the files GPL2.txt and ARTISTIC.txt, respectively.
+
+=head1 CONSPIRACY
+
+This is also free-as-in-mason software.
+
+=cut

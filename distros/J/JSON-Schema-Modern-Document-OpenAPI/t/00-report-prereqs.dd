@@ -82,6 +82,7 @@ do { my $x = {
                                    'Test::JSON::Schema::Acceptance' => '0',
                                    'Test::Memory::Cycle' => '0',
                                    'Test::More' => '0.96',
+                                   'URI' => '0',
                                    'YAML::PP' => '0',
                                    'open' => '0',
                                    'perl' => 'v5.20.0',

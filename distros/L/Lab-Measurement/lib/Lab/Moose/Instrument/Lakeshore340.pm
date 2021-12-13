@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340;
-$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.800';
+$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.801';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller
 
 use v5.20;
@@ -23,7 +23,7 @@ with qw(
 
 has input_channel => (
     is      => 'ro',
-    isa     => enum( [qw/A B/] ),
+    isa     => enum( [qw/A B C D/] ),
     default => 'A',
 );
 
@@ -39,7 +39,7 @@ sub BUILD {
     $self->cls();
 }
 
-my %channel_arg = ( channel => { isa => enum( [qw/A B/] ), optional => 1 } );
+my %channel_arg = ( channel => { isa => enum( [qw/A B C D/] ), optional => 1 } );
 my %loop_arg    = ( loop    => { isa => enum( [qw/1 2/] ), optional => 1 } );
 
 
@@ -286,7 +286,7 @@ Lab::Moose::Instrument::Lakeshore340 - Lakeshore Model 340 Temperature Controlle
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 SYNOPSIS
 
@@ -410,6 +410,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt
+            2021       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

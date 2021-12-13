@@ -1,6 +1,12 @@
 
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.32 2021-12-09T18:03:02Z
+ - Project moved to https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess
+ - Introduce emit_from_sigchld()
+ - CI moved to GitHub Actions 
+
+
 0.31 2021-12-01T15:51:06Z
  - Fix bad release to cpan
  - Enable GitHub Actions for the project

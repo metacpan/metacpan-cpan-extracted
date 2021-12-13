@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,6 @@ no_index:
     - inc
 requires:
   Lingua::EN::Syllable: '0'
-  Lingua::JA::Romanize::Japanese: '0'
   Lingua::KO::Hangul::Util: '0'
   Lingua::KO::Romanize::Hangul: '0'
   Lingua::ZH::Romanize::Pinyin: '0'
@@ -28,7 +27,8 @@ requires:
   Unicode::Unihan: '0'
   perl: '5.014001'
 resources:
-  bugtracker: https://github.com/briandfoy/Unicode-Tussle/issues
-  homepage: https://github.com/briandfoy/Unicode-Tussle
-  repository: https://github.com/briandfoy/Unicode-Tussle.git
-version: '1.111'
+  bugtracker: https://github.com/briandfoy/unicode-tussle/issues
+  homepage: https://github.com/briandfoy/unicode-tussle
+  repository: https://github.com/briandfoy/unicode-tussle.git
+version: '1.115'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

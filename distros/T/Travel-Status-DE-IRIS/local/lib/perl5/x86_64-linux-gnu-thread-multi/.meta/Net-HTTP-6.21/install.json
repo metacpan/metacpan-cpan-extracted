@@ -1,0 +1,1 @@
+{"dist":"Net-HTTP-6.21","pathname":"O/OA/OALDERS/Net-HTTP-6.21.tar.gz","provides":{"Net::HTTP::Methods":{"version":6.21,"file":"lib/Net/HTTP/Methods.pm"},"Net::HTTP":{"version":6.21,"file":"lib/Net/HTTP.pm"},"Net::HTTP::NB":{"file":"lib/Net/HTTP/NB.pm","version":6.21},"Net::HTTPS":{"version":6.21,"file":"lib/Net/HTTPS.pm"}},"name":"Net::HTTP","target":"Net::HTTP","version":6.21}

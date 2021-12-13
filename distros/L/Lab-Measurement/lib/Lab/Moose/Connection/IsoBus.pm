@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::IsoBus;
-$Lab::Moose::Connection::IsoBus::VERSION = '3.800';
+$Lab::Moose::Connection::IsoBus::VERSION = '3.801';
 #ABSTRACT: Connection back end to the Oxford Instruments IsoBus
 
 use v5.20;
@@ -80,13 +80,18 @@ Lab::Moose::Connection::IsoBus - Connection back end to the Oxford Instruments I
 
 =head1 VERSION
 
-version 3.800
+version 3.801
+
+=head1 DESCRIPTION
+
+Connection backend for the Oxford Instruments IsoBus, a serial protocol
+connecting several instruments via a bus master.
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2021       Fabian Weinelt
+  Copyright 2021       Andreas K. Huettel, Fabian Weinelt
 
 
 This is free software; you can redistribute it and/or modify it under

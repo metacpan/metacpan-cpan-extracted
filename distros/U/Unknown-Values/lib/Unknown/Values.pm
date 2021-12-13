@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: Use 'unknown' values instead of undef ones
 
 package Unknown::Values;
-
+$Unknown::Values::VERSION = '0.006';
 use 5.01000;
 use Unknown::Values::Instance;
 use Unknown::Values::Instance::Fatal;
@@ -35,12 +35,11 @@ sub is_unknown(_) {
 
 1;
 
-
-
-
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -48,7 +47,7 @@ Unknown::Values - Use 'unknown' values instead of undef ones
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -473,7 +472,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

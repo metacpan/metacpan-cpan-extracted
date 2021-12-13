@@ -1,7 +1,7 @@
 package Sah::SchemaR::math::complex;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-07-19'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $rschema = ["obj",[{description=>"\nSee also `posfloat` for floats that are larger than 0.\n\n",examples=>[{valid=>0,value=>""},{valid=>0,value=>"abc"},{valid=>1,value=>bless({c_dirty=>0,cartesian=>[5,6],display_format=>{polar_pretty_print=>1,style=>"cartesian"},p_dirty=>1},"Math::Complex")},{valid=>1,validated_value=>bless({c_dirty=>0,cartesian=>[5,6],display_format=>{polar_pretty_print=>1,style=>"cartesian"},p_dirty=>1},"Math::Complex"),value=>"5 + 6i"}],isa=>"Math::Complex",summary=>"Complex number","x.perl.coerce_rules"=>["From_str::math_complex"]}],["obj"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::math::complex - Complex number
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::math::complex (from Perl distribution Sah-Schemas-Math), released on 2020-05-27.
+This document describes version 0.002 of Sah::SchemaR::math::complex (from Perl distribution Sah-Schemas-Math), released on 2021-07-19.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

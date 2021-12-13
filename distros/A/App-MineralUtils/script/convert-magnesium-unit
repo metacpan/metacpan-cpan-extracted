@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MineralUtils/convert_magnesium_unit
-# and generated automatically using Perinci::CmdLine::Gen version 0.499
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-15'; # DATE
-our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-12-11'; # DATE
+our $DIST = 'App-MineralUtils'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_magnesium_unit",
@@ -39,49 +39,13 @@ convert-magnesium-unit - Convert a magnesium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.005 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2021-08-15.
+This document describes version 0.007 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2021-12-11.
 
 =head1 SYNOPSIS
 
 Usage:
 
 % B<convert-magnesium-unit> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- [I<quantity>] [I<to_unit>]
-
-Examples:
-
-Show all possible conversions:
-
- % convert-magnesium-unit
- +--------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------+
- | amount | unit                        | summary                                                                                                               |
- +--------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------+
- |  1.000 | mg-mg-elem                  | Elemental magnesium, in milligrams                                                                                    |
- |  8.850 | mg-mg-citrate               | Magnesium citrate (C6H6MgO7), in milligrams                                                                           |
- |  6.289 | mg-mg-citrate-ah            | Magnesium citrate anhydrous (C6H5Mg3O7), in milligrams                                                                |
- |  6.897 | mg-mg-citrate-ah-nowfoods   | Magnesium citrate in NOW Foods supplement (anhydrous, C6H5Mg3O7, 90.9% pure, contains citric acid etc), in milligrams |
- |  7.092 | mg-mg-glycinate             | Magnesium glycinate/bisglycinate (C4H8MgN2O4), in milligrams                                                          |
- |  7.092 | mg-mg-bisglycinate          | Magnesium glycinate/bisglycinate (C4H8MgN2O4), in milligrams                                                          |
- | 10.000 | mg-mg-bisglycinate-nowfoods | Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams      |
- | 13.514 | mg-mg-ascorbate             | Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams                                                             |
- | 13.514 | mg-mg-pidolate              | Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams                                                             |
- | 12.048 | mg-mg-l-threonate           | Magnesium L-threonate (C8H14MgO10), in milligrams                                                                     |
- |  1.658 | mg-mg-oxide                 | Magnesium oxide (MgO), in milligrams                                                                                  |
- +--------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------+
-
-Find out how many milligrams of elemental magnesium is in 1000mg of pure magnesium l-threonate (but note that a supplement product might not contain 100%-pure compound):
-
- % convert-magnesium-unit '1000 mg-mg-l-threonate' mg-mg-elem
- 83
-
-Find out how many milligrams of elemental magnesium is in 3g (1 recommended serving) of NOW Foods magnesium citrate powder (magnesium content is as advertised on the label):
-
- % convert-magnesium-unit '3000 mg-mg-citrate-ah-nowfoods' mg-mg-elem
- 435
-
-Find out how many milligrams of elemental magnesium is in 2.5g (1 recommended serving) of NOW Foods magnesium bisglycinate powder (magnesium content is as advertised on the label):
-
- % convert-magnesium-unit '2500 mg-mg-bisglycinate-nowfoods' mg-mg-elem
- 250
 
 =head1 DESCRIPTION
 
@@ -107,7 +71,7 @@ Can also be specified as the 1st command-line argument.
 
 Valid values:
 
- ["mg","mg-mg-elem","mg-mg-citrate","mg-mg-citrate-ah","mg-mg-citrate-ah-nowfoods","mg-mg-glycinate","mg-mg-bisglycinate","mg-mg-bisglycinate-nowfoods","mg-mg-ascorbate","mg-mg-pidolate","mg-mg-l-threonate","mg-mg-oxide"]
+ ["mg","mg-mg-elem","mg-mg-citrate","mg-mg-citrate-ah","mg-mg-citrate-ah-nowfoods","mg-mg-glycinate","mg-mg-bisglycinate","mg-mg-bisglycinate-nowfoods","mg-mg-ascorbate","mg-mg-pidolate","mg-mg-l-threonate","mg-mg-oxide","mg-mg-lactate-dihydrate"]
 
 Can also be specified as the 2nd command-line argument.
 
@@ -208,6 +172,43 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+Show all possible conversions:
+
+ % convert-magnesium-unit
+ +--------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------+
+ | amount | unit                        | summary                                                                                                               |
+ +--------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------+
+ |  1.000 | mg-mg-elem                  | Elemental magnesium, in milligrams                                                                                    |
+ |  8.850 | mg-mg-citrate               | Magnesium citrate (C6H6MgO7), in milligrams                                                                           |
+ |  6.289 | mg-mg-citrate-ah            | Magnesium citrate anhydrous (C6H5Mg3O7), in milligrams                                                                |
+ |  6.897 | mg-mg-citrate-ah-nowfoods   | Magnesium citrate in NOW Foods supplement (anhydrous, C6H5Mg3O7, 90.9% pure, contains citric acid etc), in milligrams |
+ |  7.092 | mg-mg-glycinate             | Magnesium glycinate/bisglycinate (C4H8MgN2O4), in milligrams                                                          |
+ |  7.092 | mg-mg-bisglycinate          | Magnesium glycinate/bisglycinate (C4H8MgN2O4), in milligrams                                                          |
+ | 10.000 | mg-mg-bisglycinate-nowfoods | Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams      |
+ | 15.385 | mg-mg-ascorbate             | Magnesium ascorbate (C12H14MgO12), in milligrams                                                                      |
+ | 11.494 | mg-mg-pidolate              | Magnesium pidolate (C10H12MgN2O6), in milligrams                                                                      |
+ | 12.048 | mg-mg-l-threonate           | Magnesium L-threonate (C8H14MgO10), in milligrams                                                                     |
+ |  1.658 | mg-mg-oxide                 | Magnesium oxide (MgO), in milligrams                                                                                  |
+ |  9.804 | mg-mg-lactate-dihydrate     | Magnesium lactate dihydrate (C6H14MgO8), in milligrams                                                                |
+ +--------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------+
+
+Find out how many milligrams of elemental magnesium is in 1000mg of pure magnesium l-threonate (but note that a supplement product might not contain 100%-pure compound):
+
+ % convert-magnesium-unit '1000 mg-mg-l-threonate' mg-mg-elem
+ 83
+
+Find out how many milligrams of elemental magnesium is in 3g (1 recommended serving) of NOW Foods magnesium citrate powder (magnesium content is as advertised on the label):
+
+ % convert-magnesium-unit '3000 mg-mg-citrate-ah-nowfoods' mg-mg-elem
+ 435
+
+Find out how many milligrams of elemental magnesium is in 2.5g (1 recommended serving) of NOW Foods magnesium bisglycinate powder (magnesium content is as advertised on the label):
+
+ % convert-magnesium-unit '2500 mg-mg-bisglycinate-nowfoods' mg-mg-elem
+ 250
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-MineralUtils>.
@@ -215,14 +216,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Minera
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-MineralUtils>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 AUTHOR
 
@@ -251,5 +244,13 @@ This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

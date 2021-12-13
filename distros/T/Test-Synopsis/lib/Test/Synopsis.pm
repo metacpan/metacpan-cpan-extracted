@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_001;
 
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 use parent qw( Test::Builder::Module );
 our @EXPORT = qw( synopsis_ok all_synopsis_ok );
@@ -382,6 +382,6 @@ This library is Copyright (c) Tatsuhiko Miyagawa
 
 =head1 SEE ALSO
 
-L<Test::Pod>, L<Test::UseAllModules>, L<Test::Inline>
+L<Test::Pod>, L<Test::UseAllModules>, L<Test::Inline>, L<Test::Synopsis::Expectation>
 
 =cut

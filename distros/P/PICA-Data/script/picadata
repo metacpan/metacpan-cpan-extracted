@@ -32,6 +32,10 @@ Print subfield values.
 
 Split records into multiple records for each level. Implies C<-o>.
 
+=head2 join
+
+Join multiple records into one and sort afterwards.
+
 =head2 count
 
 Count number of records, holdings, items, and fields.
@@ -75,9 +79,9 @@ Build an Avram schema from input data, optionally based on an existing schema
 
 =head2 --from, -f
 
-PICA serialization type (plain, plus, binary, XML, ppxml) with Plain as default.
-Guessed from first input filename unless specified. See format documentation at
-L<http://format.gbv.de/pica>.
+PICA serialization type (plain, plus, binary, XML, ppxml, pixml) with Plain as
+default. Guessed from first input filename unless specified. See format
+documentation at L<http://format.gbv.de/pica>.
 
 =head2 --to, -t
 

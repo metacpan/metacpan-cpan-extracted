@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Null;
-$Lab::Moose::Instrument::SCPI::Sense::Null::VERSION = '3.800';
+$Lab::Moose::Instrument::SCPI::Sense::Null::VERSION = '3.801';
 #ABSTRACT: Role for the HP/Agilent/Keysight SCPI SENSe:$function:NULL subsystem
 
 use v5.20;
@@ -75,7 +75,7 @@ Lab::Moose::Instrument::SCPI::Sense::Null - Role for the HP/Agilent/Keysight SCP
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 METHODS
 

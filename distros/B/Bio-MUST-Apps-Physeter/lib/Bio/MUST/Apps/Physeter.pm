@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Physeter;
 # ABSTRACT: Dummy internal class for physeter tool
-$Bio::MUST::Apps::Physeter::VERSION = '0.202960';
+$Bio::MUST::Apps::Physeter::VERSION = '0.213470';
 use strict;
 use warnings;
 
@@ -16,7 +16,7 @@ Bio::MUST::Apps::Physeter - Dummy internal class for physeter tool
 
 =head1 VERSION
 
-version 0.202960
+version 0.213470
 
 =head1 AUTHOR
 

@@ -4,9 +4,9 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-14'; # DATE
+our $DATE = '2021-11-26'; # DATE
 our $DIST = 'Acme-CPANModules-GrepVariants'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my $description = <<'_';
 This list catalogs various grep-like tools.
@@ -39,10 +39,10 @@ extension, by matching against filename, by first line, by maximum directory
 depth, and so on). It also offers some alternative output styles.
 
 
-**2b. Improvements in specifying multiple patterns**
+**2b. Improvements in searching for multiple patterns in no particular order**
 
-Normally with the regular grep, to search for all 'foo' and 'bar', you either
-have to do something like:
+Normally with the regular grep, to search for all 'foo' and 'bar' *in no
+particular order*, you either have to do something like:
 
     % grep --color=always foo FILES | grep bar
 
@@ -86,7 +86,7 @@ allows you to use the standard grep.
 
 **3. Variants: alternate ways of specifying regex**
 
-Instead of specifying a pattern, with C<prog:rpgrep> (from <pm:App::rpgrep>) you
+Instead of specifying a pattern, with <prog:rpgrep> (from <pm:App::rpgrep>) you
 can specify a pattern name in a <pm:Regexp::Pattern>::* module instead.
 
 
@@ -191,7 +191,7 @@ Acme::CPANModules::GrepVariants - Grep-like CLI utilities available on CPAN
 
 =head1 VERSION
 
-This document describes version 0.008 of Acme::CPANModules::GrepVariants (from Perl distribution Acme-CPANModules-GrepVariants), released on 2021-11-14.
+This document describes version 0.009 of Acme::CPANModules::GrepVariants (from Perl distribution Acme-CPANModules-GrepVariants), released on 2021-11-26.
 
 =head1 DESCRIPTION
 
@@ -223,10 +223,10 @@ providing many options to filter files (from including/excluding by file
 extension, by matching against filename, by first line, by maximum directory
 depth, and so on). It also offers some alternative output styles.
 
-B<2b. Improvements in specifying multiple patterns>
+B<2b. Improvements in searching for multiple patterns in no particular order>
 
-Normally with the regular grep, to search for all 'foo' and 'bar', you either
-have to do something like:
+Normally with the regular grep, to search for all 'foo' and 'bar' I<in no
+particular order>, you either have to do something like:
 
  % grep --color=always foo FILES | grep bar
 
@@ -269,7 +269,7 @@ allows you to use the standard grep.
 
 B<3. Variants: alternate ways of specifying regex>
 
-Instead of specifying a pattern, with CL<rpgrep> (from L<App::rpgrep>) you
+Instead of specifying a pattern, with L<rpgrep> (from L<App::rpgrep>) you
 can specify a pattern name in a L<Regexp::Pattern>::* module instead.
 
 B<4a. Variants: alternate source: repository (version control system) content and history>

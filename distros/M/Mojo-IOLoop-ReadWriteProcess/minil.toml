@@ -4,3 +4,6 @@ module_maker="ModuleBuild"
 
 [build]
 build_class = "builder::custom"
+
+[Metadata.resources]
+repository = "https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess"

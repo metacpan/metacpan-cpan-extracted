@@ -19,12 +19,15 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-basic.t
 t/02-exports.t
-t/03-sequences.t
+t/03-find_errors.t
+t/03-find_next_id.t
+t/03-find_warnings.t
 t/04-forms.t
 t/05-spam.t
 t/06-report.t
 t/Fixture.pm
 t/responses/after_login.html
+t/responses/bounce_error.html
 t/responses/failed_load_header.html
 t/responses/mailhost_problem.html
 t/responses/missing_sendreport_form.html

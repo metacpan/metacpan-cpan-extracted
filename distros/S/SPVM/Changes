@@ -1,5 +1,22 @@
 Revision history for SPVM
-0.9016  2021-11-05
+0.9018  2021-12-11
+        [CHANGES]
+        * Depends on ExtUtils::CBuilder for Perl 5.8
+        
+        [BUG FIXES]
+        * Fix bugs that tests of SPVM fails in some old Perl version. 
+0.9017  2021-12-11
+        [CHANGES]
+        * The parts of Makefile created by SPVM::Builder::Util::create_class_make_rule() become
+          more compatible the Makefile created by ExtUtils::MakeMaker.
+          This will maybe fix the fail of solaris make.
+        
+        [BUG FIXES]
+        * Fix bugs that Fn->substr method is changed to Fn->methodstr by a mistake
+        * Fix a bug that the return type of Fn->abs method was double. This become int type
+        * Fix a bug that the return type of Fn->labs method was double. This become long type
+        
+0.9016  2021-12-08
         [CHANGES]
         * In Exchange API call method argument Perl refenrece to SPVM numeric reference convision,
           the Perl reference must be scalar reference which referenced value is non-ref scalar.

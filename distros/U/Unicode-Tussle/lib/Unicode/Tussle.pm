@@ -1,7 +1,9 @@
+use v5.14;
+
 package Unicode::Tussle;
 use vars qw( $VERSION );
 
-$VERSION = '1.111';
+$VERSION = '1.115';
 
 =encoding utf8
 
@@ -1865,7 +1867,7 @@ it.
 
 =head1 COPYRIGHT
 
-Copyright 2011-2016w, Tom Christiansen.
+Copyright 2011-2021, Tom Christiansen.
 
 =head1 LICENSE
 

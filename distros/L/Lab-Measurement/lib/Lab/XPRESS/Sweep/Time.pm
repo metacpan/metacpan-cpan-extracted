@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Time;
 #ABSTRACT: Simple time-controlled repeater
-$Lab::XPRESS::Sweep::Time::VERSION = '3.800';
+$Lab::XPRESS::Sweep::Time::VERSION = '3.801';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -170,7 +170,7 @@ Lab::XPRESS::Sweep::Time - Simple time-controlled repeater
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 SYNOPSIS
 

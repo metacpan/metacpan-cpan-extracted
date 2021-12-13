@@ -57,4 +57,17 @@ subtest 'second transformation' => sub {
     like $group => qr/transform="translate\(150 100\) rotate\(180\)"/, 'has transform';
 };
 
+subtest 'scale' => sub {
+    $transformer->{Width} = 150;
+    $transformer->{Transform} = '';
+
+    $parser->parse_string($svg);
+    my $width_ct = $output =~ /<svg[^>]*width="150"/g;
+    is $width_ct => 1, 'has only one correct svg width';
+    my $comment_ct = $output =~ /$comment_re/g;
+    is $comment_ct => 1, 'has only one comment';
+    my $group_ct = $output =~ /$group_re/g;
+    is $group_ct => 1, 'has only one group';
+};
+
 done_testing;

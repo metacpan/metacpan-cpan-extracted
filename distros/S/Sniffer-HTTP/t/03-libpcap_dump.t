@@ -99,9 +99,9 @@ The requested URL /does_not_exists was not found on this server.<P>
                                             'keep-alive' => 'timeout=3, max=100',
                                             'transfer-encoding' => 'chunked',
                                             'date' => 'Fri, 04 Nov 2005 15:28:40 GMT',
-                                            'server' => 'Apache/1.3.31 (Unix)'
+                                            'server' => 'Apache/1.3.31 (Unix)',
                                           }, 'HTTP::Headers' ),
-                     '_msg' => "Not Found\r"
+                     '_msg' => "Not Found"
                    }, 'HTTP::Response' );
 
 
@@ -115,11 +115,13 @@ my $response2 = bless( {
                                            'keep-alive' => 'timeout=3, max=99',
                                            'transfer-encoding' => 'chunked',
                                            'date' => 'Fri, 04 Nov 2005 15:28:41 GMT',
-                                           'server' => 'Apache/1.3.31 (Unix)'
+                                           'server' => 'Apache/1.3.31 (Unix)',
                                          }, 'HTTP::Headers' ),
-                    '_msg' => "Not Found\r",
+                    '_msg' => "Not Found",
                  }, 'HTTP::Response' );
 delete $_->{_headers}->{'::std_case'} for @requests;
+delete $response1->{_headers}->{'::std_case'};
+delete $response2->{_headers}->{'::std_case'};
 is_deeply(\@requests, [$request1,$request2], "Got the expected requests");
 
 #my $c1 = $response2->content;
@@ -130,7 +132,11 @@ is_deeply(\@requests, [$request1,$request2], "Got the expected requests");
 #diag "Expected :$c1";
 #diag "     Got :$e1";
 
-delete $_->[0]->{_headers}->{'::std_case'} for @responses;
+for my $pair (@responses) {
+    delete $pair->[0]->{_headers}->{'::std_case'};
+    delete $pair->[1]->{_headers}->{'::std_case'};
+};
+
 is_deeply(\@responses, [[$response1,$request1],[$response2,$request2]], "Got the expected responses")
   or diag Dumper \$responses[1];
 

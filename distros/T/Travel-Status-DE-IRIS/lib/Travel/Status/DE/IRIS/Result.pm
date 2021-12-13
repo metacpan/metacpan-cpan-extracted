@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq lastval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.61';
+our $VERSION = '1.62';
 
 my %translation = (
 	1 => 'Nähere Informationen in Kürze',
@@ -104,7 +104,7 @@ my %translation = (
 	76 => 'Heute: 1. Klasse hinten',                        # r 75
 	77 => '1. Klasse fehlt',
 	79 => 'Mehrzweckabteil fehlt',
-	80 => 'Andere Reihenfolge der Wagen',
+	80 => 'Abweichende Wagenreihung',
 	82 => 'Mehrere Wagen fehlen',
 	83 => 'Defekte fahrzeuggebundene Einstiegshilfe',
 	84 => 'Zug verkehrt richtig gereiht',                   # r 80 82 85
@@ -876,7 +876,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.61
+version 1.62
 
 =head1 DESCRIPTION
 

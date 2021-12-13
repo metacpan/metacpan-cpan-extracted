@@ -1,0 +1,59 @@
+{
+   "abstract" : "comma-separated values manipulator (using XS or PurePerl)",
+   "author" : [
+      "Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-CSV",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Text::CSV_XS" : "1.46"
+         },
+         "requires" : {
+            "IO::Handle" : "0",
+            "Test::Harness" : "0",
+            "Test::More" : "0.71",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/makamaka/Text-CSV/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/makamaka/Text-CSV"
+      }
+   },
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

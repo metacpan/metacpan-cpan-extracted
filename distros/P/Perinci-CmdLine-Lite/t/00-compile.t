@@ -6,17 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perinci/CmdLine/Base.pm',
     'Perinci/CmdLine/Lite.pm',
-    'Perinci/CmdLine/Plugin/Debugging/DumpArgs.pm',
-    'Perinci/CmdLine/Plugin/Debugging/DumpR.pm',
-    'Perinci/CmdLine/Plugin/Debugging/DumpRes.pm',
-    'Perinci/CmdLine/Plugin/Debugging/Exit.pm',
-    'Perinci/CmdLine/Plugin/Plugin/DisablePlugin.pm',
+    'Perinci/CmdLine/Plugin/Debug/DumpArgs.pm',
+    'Perinci/CmdLine/Plugin/Debug/DumpR.pm',
+    'Perinci/CmdLine/Plugin/Debug/DumpRes.pm',
+    'Perinci/CmdLine/Plugin/Flow/Exit.pm',
+    'Perinci/CmdLine/Plugin/Plugin/Disable.pm',
+    'Perinci/CmdLine/Plugin/Run/Completion.pm',
     'Perinci/CmdLine/Plugin/Run/DebugCompletion.pm',
+    'Perinci/CmdLine/Plugin/Run/DumpObject.pm',
     'Perinci/CmdLine/Plugin/Run/Normal.pm',
     'Perinci/CmdLine/PluginBase.pm'
 );

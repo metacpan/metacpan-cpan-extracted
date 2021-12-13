@@ -18,7 +18,7 @@ subtest 'api version v2 format' => sub {
 
     my $signed_data = {
         orders => [{
-            purchaseState => 0,
+            purchaseState => 4,
             productId     => '12345abcd',
             orderId       => 'abcdefg12345',
             purchaseTime  => 12345678,
@@ -37,6 +37,7 @@ subtest 'api version v2 format' => sub {
     isa_ok $result, 'Web::MarketReceipt';
     ok $result->is_success;
     is scalar @{$result->orders}, 1;
+    is $result->orders->[0]->state, 'pending';
     is $result->orders->[0]->product_identifier, '12345abcd';
     is $result->orders->[0]->unique_identifier, 'GooglePlay:' . 'abcdefg12345';
 };
@@ -69,6 +70,7 @@ subtest 'api version v3 format' => sub {
     isa_ok $result, 'Web::MarketReceipt';
     ok $result->is_success;
     is scalar @{$result->orders}, 1;
+    is $result->orders->[0]->state, 'purchased';
     is $result->orders->[0]->product_identifier, '12345abcd';
     is $result->orders->[0]->unique_identifier, 'GooglePlay:' . 'abcdefg12345';
 };

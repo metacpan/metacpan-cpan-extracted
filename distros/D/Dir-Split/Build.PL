@@ -11,25 +11,27 @@ my $build = Module::Build->new
    dist_author => 'Steven Schubiger <schubiger@cpan.org>',
    dist_version_from => 'lib/Dir/Split.pm',
    requires => {
+                 'boolean' => 0,
                  'Carp' => 0,
                  'File::Basename' => 0,
                  'File::Copy' => 0,
                  'File::Find' => 0,
                  'File::Path' => 0,
                  'File::Spec' => 0,
-                 'SelfLoader' => 0,
+                 'Params::Validate' => 0,
                },
    build_requires => {
                        'File::Temp' => 0,
                        'Test::More' => 0,
                      },
-   recommends => {
-                   'Test::Pod' => '1.14',
-                   'Test::Pod::Coverage' => '1.04',
-                 },
    license => 'perl',
    create_readme => 1,
    create_makefile_pl => 'traditional',
+   meta_merge => {
+       resources => {
+           repository => 'https://github.com/stsc/Dir-Split',
+       },
+   },
   );
 
 $build->create_build_script;

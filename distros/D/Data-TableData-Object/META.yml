@@ -1,5 +1,5 @@
 ---
-abstract: 'Manipulate data structure via table object'
+abstract: 'Manipulate table-like data structure via table object'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -20,22 +20,22 @@ name: Data-TableData-Object
 provides:
   Data::TableData::Object:
     file: lib/Data/TableData/Object.pm
-    version: '0.114'
+    version: '0.115'
   Data::TableData::Object::Base:
     file: lib/Data/TableData/Object/Base.pm
-    version: '0.114'
+    version: '0.115'
   Data::TableData::Object::aoaos:
     file: lib/Data/TableData/Object/aoaos.pm
-    version: '0.114'
+    version: '0.115'
   Data::TableData::Object::aohos:
     file: lib/Data/TableData/Object/aohos.pm
-    version: '0.114'
+    version: '0.115'
   Data::TableData::Object::aos:
     file: lib/Data/TableData/Object/aos.pm
-    version: '0.114'
+    version: '0.115'
   Data::TableData::Object::hash:
     file: lib/Data/TableData/Object/hash.pm
-    version: '0.114'
+    version: '0.115'
 requires:
   Data::Check::Structure: '0.050'
   Data::Sah::Util::Type: '0.45'
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-TableData-Object
   homepage: https://metacpan.org/release/Data-TableData-Object
   repository: git://github.com/perlancar/perl-TableData-Object.git
-version: '0.114'
+version: '0.115'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

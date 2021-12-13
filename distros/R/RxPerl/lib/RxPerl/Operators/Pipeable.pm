@@ -20,7 +20,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.8.1";
+our $VERSION = "v6.9.0";
 
 sub op_audit_time {
     my ($duration) = @_;

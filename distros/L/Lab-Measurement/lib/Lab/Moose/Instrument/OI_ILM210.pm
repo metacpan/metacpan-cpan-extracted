@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_ILM210;
-$Lab::Moose::Instrument::OI_ILM210::VERSION = '3.800';
+$Lab::Moose::Instrument::OI_ILM210::VERSION = '3.801';
 #ABSTRACT: Oxford Instruments ILM Intelligent Helium Level Meter
 
 use v5.20;
@@ -7,7 +7,7 @@ use v5.20;
 use Moose;
 use Lab::Moose::Instrument qw/
     validated_no_param_setter
-/;
+    /;
 use Carp;
 use namespace::autoclean;
 
@@ -30,13 +30,13 @@ sub BUILD {
 
 sub get_level {
     my ( $self, %args ) = validated_no_param_setter(
-		\@_,
-        channel => { isa => 'Int' , default => 1},
+        \@_,
+        channel => { isa => 'Int', default => 1 },
     );
 
-	my $channel = delete %args{channel};
+    my $channel = delete $args{channel};
 
-    my $level = $self->query(command => "R$channel\r");
+    my $level = $self->query( command => "R$channel\r" );
     $level =~ s/^R//;
     $level /= 10;
     return $level;
@@ -58,13 +58,17 @@ Lab::Moose::Instrument::OI_ILM210 - Oxford Instruments ILM Intelligent Helium Le
 
 =head1 VERSION
 
-version 3.800
+version 3.801
+
+=head1 DESCRIPTION
+
+Driver for the Oxford Instruments ILM210 Intelligent Level Meter.
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2021       Andreas K. Huettel, Fabian Weinelt
+  Copyright 2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

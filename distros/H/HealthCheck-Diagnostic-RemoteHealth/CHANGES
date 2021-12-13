@@ -1,4 +1,15 @@
 Changelog for HealthCheck-Diagnostic-RemoteHealth
 
-v0.1.0 2021-11-01T21:24:38
- - No changes found
+v0.1.1 2021-12-10T17:24:32
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #3: SM-3392 (Matthew Ito)
+ - Use http for test and use IETF test domains (Matthew Ito)
+
+v0.1.0 2021-11-01T21:23:49
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #2: SM-1347 (Matthew Ito)
+ - Add implementation of RemoteHealth HealthCheck (Matthew Ito)
+ - Add tests to RemoteHealth HealthCheck (Matthew Ito)
+ - Update cpanfile file (Matthew Ito)
+ - Create distribution files (Matthew Ito)
+ - Initial Commit (Matthew Ito)

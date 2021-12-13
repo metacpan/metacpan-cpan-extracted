@@ -1,13 +1,13 @@
 package App::MineralUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-15'; # DATE
-our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-12-11'; # DATE
+our $DIST = 'App-MineralUtils'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 our %SPEC;
 
@@ -22,6 +22,7 @@ my @magnesium_forms = (
         magnesium_ratio => 1,
         summary => 'Elemental magnesium, in milligrams',
     },
+
     {
         name => 'mg-mg-citrate',
         magnesium_ratio => 24.305/214.412, # 11.34%
@@ -32,6 +33,7 @@ my @magnesium_forms = (
         magnesium_ratio => 24.305/457.16*3, # 15.95%
         summary => 'Magnesium citrate anhydrous (C6H5Mg3O7), in milligrams',
     },
+
     {
         name => 'mg-mg-citrate-ah-nowfoods',
         magnesium_ratio => 24.305/457.16*3, # 15.95%
@@ -53,25 +55,35 @@ my @magnesium_forms = (
         purity => 0.7094, # 14.1% x 0.7094 = 10%
         summary=>'Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams',
     },
+
     {
         name=>'mg-mg-ascorbate',
-        magnesium_ratio => 24.305/327.53, # 7.42%
-        summary => 'Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams',
+        magnesium_ratio => 24.305/374.54, # 6.49%
+        summary => 'Magnesium ascorbate (C12H14MgO12), in milligrams',
     },
+
     {
         name=>'mg-mg-pidolate',
-        magnesium_ratio => 24.305/327.53, # 7.42%
-        summary => 'Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams',
+        magnesium_ratio => 24.305/280.517, # 8.66%
+        summary => 'Magnesium pidolate (C10H12MgN2O6), in milligrams',
     },
+
     {
         name=>'mg-mg-l-threonate',
         magnesium_ratio => 24.305/294.50, # 8.25%
         summary => 'Magnesium L-threonate (C8H14MgO10), in milligrams',
     },
+
     {
         name=>'mg-mg-oxide',
         magnesium_ratio => 24.305 / 40.3044, # 60.3%
         summary => 'Magnesium oxide (MgO), in milligrams',
+    },
+
+    {
+        name=>'mg-mg-lactate-dihydrate',
+        magnesium_ratio => 24.305 / 238.48, # 10.2%
+        summary => 'Magnesium lactate dihydrate (C6H14MgO8), in milligrams',
     },
 );
 
@@ -188,7 +200,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.005 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2021-08-15.
+This document describes version 0.007 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2021-12-11.
 
 =head1 DESCRIPTION
 
@@ -261,14 +273,14 @@ Result:
        summary => "Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams",
      },
      {
-       amount  => 13.5135135135135,
+       amount  => 15.3846153846154,
        unit    => "mg-mg-ascorbate",
-       summary => "Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams",
+       summary => "Magnesium ascorbate (C12H14MgO12), in milligrams",
      },
      {
-       amount  => 13.5135135135135,
+       amount  => 11.4942528735632,
        unit    => "mg-mg-pidolate",
-       summary => "Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams",
+       summary => "Magnesium pidolate (C10H12MgN2O6), in milligrams",
      },
      {
        amount  => 12.0481927710843,
@@ -280,15 +292,20 @@ Result:
        unit    => "mg-mg-oxide",
        summary => "Magnesium oxide (MgO), in milligrams",
      },
+     {
+       amount  => 9.80392156862745,
+       unit    => "mg-mg-lactate-dihydrate",
+       summary => "Magnesium lactate dihydrate (C6H14MgO8), in milligrams",
+     },
    ],
    {
-     "table.field_aligns"  => ["number", "left", "left"],
+     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.fields"        => ["amount", "unit", "summary"],
+     "table.field_aligns"  => ["number", "left", "left"],
    },
  ]
 
@@ -358,14 +375,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Minera
 
 Source repository is at L<https://github.com/perlancar/perl-App-MineralUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::VitaminUtils>
@@ -399,5 +408,13 @@ This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

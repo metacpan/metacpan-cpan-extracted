@@ -19,7 +19,7 @@ name: Acme-CPANModules-GrepVariants
 provides:
   Acme::CPANModules::GrepVariants:
     file: lib/Acme/CPANModules/GrepVariants.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   Acme::CPANModulesUtil::Misc: '0'
   strict: '0'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-GrepVariants
   homepage: https://metacpan.org/release/Acme-CPANModules-GrepVariants
   repository: git://github.com/perlancar/perl-Acme-CPANModules-GrepVariants.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

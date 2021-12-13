@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_IPS;
-$Lab::Moose::Instrument::OI_IPS::VERSION = '3.800';
+$Lab::Moose::Instrument::OI_IPS::VERSION = '3.801';
 #ABSTRACT: Oxford Instruments IPS Intelligent Power Supply
 
 use v5.20;
@@ -234,11 +234,12 @@ sub in_persistent_mode {
 }
 
 sub set_persistent_mode {
-    my ( $self, %args ) = validated_setter( \@_,
-		value => {isa => 'Int'}
-	);
+    my ( $self, %args ) = validated_setter(
+        \@_,
+        mode => { isa => 'Int' }
+    );
 
-    my $mode = delete %args{mode};
+    my $mode = delete $args{mode};
 
     # return 0 if not $self->{device_settings}->{has_switchheater};
 
@@ -249,7 +250,7 @@ sub set_persistent_mode {
     if ( $mode == 1 ) {
 
         $self->hold();
-        $self->set_switch_heater(value => 0);
+        $self->set_switch_heater( value => 0 );
 
         $self->to_zero();
 
@@ -260,19 +261,19 @@ sub set_persistent_mode {
 
         my $setpoint = $self->get_persistent_field();
 
-        $self->set_target_field(value => $setpoint);
+        $self->set_target_field( value => $setpoint );
 
         $self->to_setpoint();
 
         #print "Try to start switchheater...\n";
-        $self->set_switchheater(value => 1);
+        $self->set_switchheater( value => 1 );
 
         #print "Switchheater has status ".$self->get_switchheater();
 
     }
     elsif ( $mode == 0 and $switch == 0 ) {
         print "Zero magnetic field. Switch on switchheater.\n";
-        $self->set_switchheater(value => 1);
+        $self->set_switchheater( value => 1 );
 
     }
 
@@ -283,7 +284,7 @@ sub get_persistent_field {
 
     # Are we really in persistent mode?
 
-    return $self->read_parameter(value => 18);
+    return $self->read_parameter( value => 18 );
 
 }
 
@@ -444,7 +445,7 @@ Lab::Moose::Instrument::OI_IPS - Oxford Instruments IPS Intelligent Power Supply
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 SYNOPSIS
 
@@ -580,7 +581,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2019       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt
-            2021       Fabian Weinelt, Simon Reinhardt
+            2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

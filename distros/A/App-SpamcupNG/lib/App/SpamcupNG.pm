@@ -44,7 +44,7 @@ my %regexes = (
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 =head1 NAME
 
@@ -488,114 +488,165 @@ sub main_loop {
     }
 
     my $form = _report_form( $res->content, $base_uri );
+    $logger->fatal(
+        'Could not find the HTML form to report the SPAM! May be a temporary Spamcop.net error, try again later! Quitting...'
+    ) unless ($form);
 
-    if ( $res->content
-        =~ /Please make sure this email IS spam.*?size=2\>\n(.*?)\<a href\=\"\/sc\?id\=$next_id/sgi
-        )
-    {
+    if ( $logger->is_info ) {
+        my $spam_header_ref = find_spam_header($1);
 
-        if ( $logger->is_info ) {
-            my $spam_header_ref = find_spam_header($1);
-            my $as_string       = join( "\n", @$spam_header_ref );
+        if ($spam_header_ref) {
+            my $as_string = join( "\n", @$spam_header_ref );
             $logger->info("Head of the SPAM follows:\n$as_string");
         }
 
-        # parse form fields
-        # verify form
-        unless ($form) {
-
-            $logger->fatal(
-                'Could not find the HTML form to report the SPAM! May be a temporary Spamcop.net error, try again later! Quitting...'
-            );
-        }
-        else {
-
-            if ( $logger->is_debug ) {
-                $logger->debug( 'Form data follows: ' . $form->dump );
-            }
-
-            # how many recepients for reports
-            my $max = $form->value("max");
-            my $willsend;
-            my $wontsend;
-
-            # iterate targets
-            for ( my $i = 1; $i <= $max; $i++ ) {
-                my $send   = $form->value("send$i");
-                my $type   = $form->value("type$i");
-                my $master = $form->value("master$i");
-                my $info   = $form->value("info$i");
-
-                # convert %2E -style stuff back to text, if any
-                if ( $info =~ /%([A-Fa-f\d]{2})/g ) {
-                    $info =~ s/%([A-Fa-f\d]{2})/chr hex $1/eg;
-                }
-
-                if ($send
-                    and (  ( $send eq 'on' )
-                        or ( $type =~ /^mole/ and $send == 1 ) )
-                    )
-                {
-                    $willsend .= "$master ($info)\n";
-                }
-                else {
-                    $wontsend .= "$master ($info)\n";
-                }
-            }
-
-            if ( $logger->is_info ) {
-
-                my $message
-                    = 'Would send the report to the following addresses (reason in parenthesis): ';
-
-                if ($willsend) {
-                    $message .= $willsend;
-                }
-                else {
-                    $message .= '--none--';
-                }
-
-                $logger->info($message);
-                $message = 'Following addresses would not be used: ';
-
-                if ($wontsend) {
-                    $message .= $wontsend;
-                }
-                else {
-                    $message .= '--none--';
-                }
-
-                $logger->info($message);
-
-            }
-
+        if ( $logger->is_debug ) {
+            $logger->debug( 'Form data follows: ' . $form->dump );
         }
 
-        # Run without confirming each spam? Stupid. :)
-        unless ( $opts_ref->{stupid} ) {
-            print "* Are you sure this is spam? [y/N] ";
+        # how many recipients for reports
+        my $max = $form->value("max");
+        my $willsend;
+        my $wontsend;
 
-            my $reply = <>;    # this should be done differently!
-            if ( $reply && $reply !~ /^y/i ) {
-                print "* Cancelled.\n";
-                $_cancel = 1;    # mark to be cancelled
+        # iterate targets
+        for ( my $i = 1; $i <= $max; $i++ ) {
+            my $send   = $form->value("send$i");
+            my $type   = $form->value("type$i");
+            my $master = $form->value("master$i");
+            my $info   = $form->value("info$i");
+
+            # convert %2E -style stuff back to text, if any
+            if ( $info =~ /%([A-Fa-f\d]{2})/g ) {
+                $info =~ s/%([A-Fa-f\d]{2})/chr hex $1/eg;
             }
-            elsif ( !$reply ) {
-                print "* Accepted.\n";
+
+            if ($send
+                and (  ( $send eq 'on' )
+                    or ( $type =~ /^mole/ and $send == 1 ) )
+                )
+            {
+                $willsend .= "$master ($info)\n";
             }
             else {
-                print "* Accepted.\n";
+                $wontsend .= "$master ($info)\n";
             }
         }
+
+        my $message
+            = 'Would send the report to the following addresses (reason in parenthesis): ';
+
+        if ($willsend) {
+            $message .= $willsend;
+        }
         else {
-            # little delay for automatic processing
-            sleep $opts_ref->{delay};
+            $message .= '--none--';
         }
 
+        $logger->info($message);
+        $message = 'Following addresses would not be used: ';
+
+        if ($wontsend) {
+            $message .= $wontsend;
+        }
+        else {
+            $message .= '--none--';
+        }
+
+        $logger->info($message);
+    }
+
+    if ( $logger->is_info ) {
+        my $spam_header_ref = find_spam_header($1);
+
+        if ($spam_header_ref) {
+            my $as_string = join( "\n", @$spam_header_ref );
+            $logger->info("Head of the SPAM follows:\n$as_string");
+        }
+
+        if ( $logger->is_debug ) {
+            $logger->debug( 'Form data follows: ' . $form->dump );
+        }
+
+        # how many recipients for reports
+        my $max = $form->value("max");
+        my $willsend;
+        my $wontsend;
+
+        # iterate targets
+        for ( my $i = 1; $i <= $max; $i++ ) {
+            my $send   = $form->value("send$i");
+            my $type   = $form->value("type$i");
+            my $master = $form->value("master$i");
+            my $info   = $form->value("info$i");
+
+            # convert %2E -style stuff back to text, if any
+            if ( $info =~ /%([A-Fa-f\d]{2})/g ) {
+                $info =~ s/%([A-Fa-f\d]{2})/chr hex $1/eg;
+            }
+
+            if ($send
+                and (  ( $send eq 'on' )
+                    or ( $type =~ /^mole/ and $send == 1 ) )
+                )
+            {
+                $willsend .= "$master ($info)\n";
+            }
+            else {
+                $wontsend .= "$master ($info)\n";
+            }
+        }
+
+        my $message
+            = 'Would send the report to the following addresses (reason in parenthesis): ';
+
+        if ($willsend) {
+            $message .= $willsend;
+        }
+        else {
+            $message .= '--none--';
+        }
+
+        $logger->info($message);
+        $message = 'Following addresses would not be used: ';
+
+        if ($wontsend) {
+            $message .= $wontsend;
+        }
+        else {
+            $message .= '--none--';
+        }
+
+        $logger->info($message);
+    }
+
+    $logger->fatal(
+        'Could not find the HTML form to report the SPAM! May be a temporary Spamcop.net error, try again later! Quitting...'
+    ) unless ($form);
+
+    # Run without confirming each spam? Stupid. :)
+    unless ( $opts_ref->{stupid} ) {
+        print "* Are you sure this is spam? [y/N] ";
+
+        my $reply = <>;    # this should be done differently!
+        if ( $reply && $reply !~ /^y/i ) {
+            print "* Cancelled.\n";
+            $_cancel = 1;    # mark to be cancelled
+        }
+        elsif ( !$reply ) {
+            print "* Accepted.\n";
+        }
+        else {
+            print "* Accepted.\n";
+        }
+    }
+    else {
+        # little delay for automatic processing
+        sleep $opts_ref->{delay};
     }
 
 # this happens rarely, but I've seen this; spamcop does not show preview headers for some reason
-    elsif ( $res->content =~ /Send Spam Report\(S\) Now/gi ) {
+    if ( $res->content =~ /Send Spam Report\(S\) Now/gi ) {
 
         unless ( $opts_ref->{stupid} ) {
             print

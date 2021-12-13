@@ -1,5 +1,8 @@
 Revision history for XML-SAX-SVGTransformer
 
+0.03 2021/12/12
+  - Process ops even if Transform is empty
+
 0.02 2021/12/07
   - Require Math::Matrix 0.92 (RT#140377, SREZIC++)
 

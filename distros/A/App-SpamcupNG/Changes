@@ -1,10 +1,54 @@
 ==================================================
-Changes from 2020-11-28 00:00:00 +0000 to present.
+Changes from 2020-12-12 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.005 at 2021-11-28 01:21:48 +0000
+version 0.006 at 2021-12-12 21:39:55 +0000
 ------------------------------------------
+
+  Change: d4434c99b182b481bf293b3c581abf54a9af0111
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-12 18:38:44 +0000
+
+    Merge pull request #1 from glasswalk3r/bugfix/bounce_error
+
+    Bugfix/bounce error 
+
+  Change: 993d606d767b7458136a7775638c100cbf0f9662
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-12 18:34:17 +0000
+
+    fix: extra space 
+
+  Change: 83a5f71e0dce602f2567b2786b916f10aa533d9c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-12 18:19:43 +0000
+
+    fix: linter 
+
+  Change: 97673570094284496fda0ddacfeb30c38bcb228c
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-12-07 17:33:49 +0000
+
+    feat: bounce error support 
+
+  Change: f5c0e129272db8462df99dff8de4ada05bf8bf5a
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-12-07 15:45:54 +0000
+
+    refactor: more organized tests 
+
+  Change: c197eeb6cce88f4273487631f8128e8076e5513c
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-12-07 15:45:32 +0000
+
+    refactor: more organized tests 
+
+  Change: 5344b36ec3493768699190448341d6439ff88845
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2021-12-07 15:40:11 +0000
+
+    refactor: explicit number of tests 
 
   Change: 74b8afd837c0e511188609ada804d6219a156236
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

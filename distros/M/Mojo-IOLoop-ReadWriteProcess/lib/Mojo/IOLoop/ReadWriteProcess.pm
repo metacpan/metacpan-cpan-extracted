@@ -1,10 +1,10 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
-use Mojo::Util qw(b64_decode b64_encode);
+use Mojo::Util qw(b64_decode b64_encode scope_guard);
 use Mojo::IOLoop::Stream;
 
 use Mojo::IOLoop::ReadWriteProcess::Exception;
@@ -477,18 +477,25 @@ sub start {
   $self->_status(undef);
   $self->session->enable;
 
+  {
+    my $old_emit_from_sigchld = $self->session->emit_from_sigchld;
+    $self->session->emit_from_sigchld(0);
+    my $scope_guard = scope_guard sub {
+      $self->session->emit_from_sigchld($old_emit_from_sigchld);
+      $self->session->consume_collected_info if ($old_emit_from_sigchld);
+    };
 
-  if ($self->code) {
-    $self->_fork($self->code, @args);
+    if ($self->code) {
+      $self->_fork($self->code, @args);
+    }
+    elsif ($self->execute) {
+      $self->_open($self->execute, @args);
+    }
+
+    $self->write_pidfile;
+    $self->emit('start');
+    $self->session->register($self->pid() => $self);
   }
-  elsif ($self->execute) {
-    $self->_open($self->execute, @args);
-  }
-
-  $self->write_pidfile;
-  $self->emit('start');
-  $self->session->register($self->pid() => $self);
-
   return $self;
 }
 

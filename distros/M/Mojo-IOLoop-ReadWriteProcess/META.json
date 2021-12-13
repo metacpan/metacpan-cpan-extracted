@@ -34,29 +34,33 @@
       },
       "develop" : {
          "requires" : {
+            "Devel::Cover" : "0",
+            "Devel::Cover::Report::Codecovbash" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "0",
             "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
          "requires" : {
             "IPC::SharedMem" : "0",
-            "Mojolicious" : "7.24"
+            "Mojolicious" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::Exception" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Mojo::IOLoop::ReadWriteProcess" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "Mojo::IOLoop::ReadWriteProcess::CGroup" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm"
@@ -138,7 +142,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.31",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess/issues"
+      },
+      "homepage" : "https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess",
+      "repository" : {
+         "url" : "git://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess.git",
+         "web" : "https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess"
+      }
+   },
+   "version" : "0.32",
    "x_contributors" : [
       "Adam Williamson <awilliam@redhat.com>",
       "Clemens Famulla-Conrad <cfamullaconrad@suse.de>",
@@ -150,7 +164,8 @@
       "Santiago Zarate <229240+foursixnine@users.noreply.github.com>",
       "Santiago Zarate <santiago+github@zarate.co>",
       "Santiago Zarate <santiago@zarate.co>",
-      "Sebastian Riedel <sri@cpan.org>"
+      "Sebastian Riedel <sri@cpan.org>",
+      "cfconrad <40127946+cfconrad@users.noreply.github.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 0

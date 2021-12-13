@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use Exporter 'import';
 our @EXPORT_OK
@@ -416,12 +416,14 @@ use PICA::Parser::Plus;
 use PICA::Parser::Plain;
 use PICA::Parser::Binary;
 use PICA::Parser::PPXML;
+use PICA::Parser::PIXML;
 use PICA::Parser::JSON;
 use PICA::Writer::XML;
 use PICA::Writer::Plus;
 use PICA::Writer::Plain;
 use PICA::Writer::Binary;
 use PICA::Writer::PPXML;
+use PICA::Writer::PIXML;
 use PICA::Writer::JSON;
 
 sub pica_parser {
@@ -484,6 +486,9 @@ sub _pica_module {
     }
     elsif ($type =~ /^(pica)?ppxml$/) {
         "${base}::PPXML"->new(@_);
+    }
+    elsif ($type =~ /^pixml$/) {
+        "${base}::PIXML"->new(@_);
     }
     elsif ($type =~ /^(nd)?json$/) {
         "${base}::JSON"->new(@_);
@@ -670,6 +675,10 @@ L<PICA::Parser::XML> for type C<xml> or C<picaxml> (PICA-XML)
 
 L<PICA::Parser::PPXML> for type C<ppxml> (PicaPlus-XML)
 
+=item
+
+L<PICA::Parser::PIXML> for type C<pixml> (PICA FOLIO Import XML)
+
 =back
 
 =head2 pica_guess( $data )
@@ -712,9 +721,13 @@ L<PICA::Writer::JSON> for type C<json> (PICA JSON)
 
 L<PICA::Writer::XML> for type C<xml> or C<picaxml> (PICA-XML)
 
-=item 
+=item
 
 L<PICA::Writer::PPXML> for type C<ppxml> (PicaPlus-XML)
+
+=item
+
+L<PICA::Writer::PIXML> for type C<pixml> (PICA FOLIO Import XML)
 
 =back
 

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Split files of a directory to subdirectories",
+   "author" : [
+      "Steven Schubiger <schubiger@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dir-Split",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Params::Validate" : "0",
+            "boolean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dir::Split" : {
+         "file" : "lib/Dir/Split.pm",
+         "version" : "0.81"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/stsc/Dir-Split"
+      }
+   },
+   "version" : "0.81",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

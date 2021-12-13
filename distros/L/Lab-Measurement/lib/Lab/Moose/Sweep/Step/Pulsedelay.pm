@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Pulsedelay;
-$Lab::Moose::Sweep::Step::Pulsedelay::VERSION = '3.800';
+$Lab::Moose::Sweep::Step::Pulsedelay::VERSION = '3.801';
 #ABSTRACT: Pulsedelay sweep.
 
 use v5.20;
@@ -49,7 +49,7 @@ Lab::Moose::Sweep::Step::Pulsedelay - Pulsedelay sweep.
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 Description
 

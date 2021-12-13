@@ -1,7 +1,7 @@
 package PICA::Writer::XML;
 use v5.14.1;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use Scalar::Util qw(reftype);
 use XML::Writer;
@@ -20,7 +20,8 @@ sub new {
         DATA_INDENT => 2
     );
     $self->{writer}->xmlDecl('UTF-8');
-    $self->{writer}->startTag('collection', xmlns => $self->namespace);
+    my %ns = $self->namespace ? (xmlns => $self->namespace) : ();
+    $self->{writer}->startTag('collection', %ns);
     $self;
 }
 
@@ -33,7 +34,7 @@ sub write_record {
 
     $writer->startTag('record');
     foreach my $field (@$record) {
-        my $id = $field->[0];
+        my $id   = $field->[0];
         my @attr = (tag => $field->[0]);
         if ($field->[1] > 0) {
             push @attr, occurrence => $field->[1];

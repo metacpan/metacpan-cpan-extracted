@@ -65,6 +65,7 @@ sub _order2hash {
 sub _purchase_state {
     my ($self, $purchase_state) = @_;
 
+    # REMIND: if you want to add state to these, you must be added to Web::MarketReceipt::Order#OrderState
     if ($purchase_state == 0) {
         return 'purchased';
     } elsif ($purchase_state == 1) {

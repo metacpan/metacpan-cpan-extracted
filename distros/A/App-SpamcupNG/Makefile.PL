@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::SpamcupNG",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Data::Dumper" => 0,
     "Getopt::Std" => 0,
     "HTML::Form" => "6.07",
     "HTML::TreeBuilder::XPath" => "0.14",
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Getopt::Std" => 0,

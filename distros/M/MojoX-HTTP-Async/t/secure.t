@@ -74,7 +74,6 @@ sub on_start_cb ($port) {
             my $response = $default_response;
 
             $response = $responses_by_request_number{$page} // $response if $page;
-
             $eh = $wh;
 
             select(undef, $wh, $eh, undef);

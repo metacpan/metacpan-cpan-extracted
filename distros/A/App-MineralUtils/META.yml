@@ -19,10 +19,10 @@ name: App-MineralUtils
 provides:
   App::MineralUtils:
     file: lib/App/MineralUtils.pm
-    version: '0.005'
+    version: '0.007'
 requires:
   Complete::Sequence: '0.002'
-  Data::Sah::Compiler::perl::TH::str: '0.910'
+  Data::Sah::Compiler::perl::TH::str: '0'
   Perinci::CmdLine::Any: '0.152'
   Perinci::CmdLine::Lite: '1.905'
   Physics::Unit: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils
   homepage: https://metacpan.org/release/App-MineralUtils
   repository: git://github.com/perlancar/perl-App-MineralUtils.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -171,7 +171,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.006'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -393,7 +393,7 @@ x_Dist_Zilla:
             - ':InstallModules'
             - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.005
+      version: 3.001.006
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

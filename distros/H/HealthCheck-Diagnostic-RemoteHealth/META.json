@@ -52,7 +52,7 @@
    "provides" : {
       "HealthCheck::Diagnostic::RemoteHealth" : {
          "file" : "lib/HealthCheck/Diagnostic/RemoteHealth.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-healthcheck-diagnostic-remotehealth"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",

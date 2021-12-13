@@ -8,7 +8,7 @@ Makefile.PL
 README
 cpanfile
 dist.ini
-eg/loadtest.pl
+eg/minion_bench.pl
 lib/Minion/Backend/mysql.pm
 t/00-compile.t
 t/00-report-prereqs.dd

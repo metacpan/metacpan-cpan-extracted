@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Output::State;
-$Lab::Moose::Instrument::SCPI::Output::State::VERSION = '3.800';
+$Lab::Moose::Instrument::SCPI::Output::State::VERSION = '3.801';
 #ABSTRACT: Role for the SCPI OUTPut:STATe subsystem
 
 use v5.20;
@@ -45,7 +45,7 @@ Lab::Moose::Instrument::SCPI::Output::State - Role for the SCPI OUTPut:STATe sub
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 METHODS
 

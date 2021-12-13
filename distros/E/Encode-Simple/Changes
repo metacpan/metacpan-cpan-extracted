@@ -1,3 +1,6 @@
+1.001     2021-12-11 14:05:59 EST
+  - New module Decode::ARGV as a better alternative to the -CA option for perl.
+
 1.000     2019-09-02 22:51:00 EDT
   - Add encode_utf8/lax and decode_utf8/lax functions that will always use the
     proper UTF-8 encoding rather than the Perl internal encoding used by these

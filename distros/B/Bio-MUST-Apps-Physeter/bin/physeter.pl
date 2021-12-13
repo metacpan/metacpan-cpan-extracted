@@ -15,6 +15,7 @@ use Getopt::Euclid qw(:vars);
 use File::Basename;
 use File::Find::Rule;
 use File::Slurp;
+use Parallel::Batch;
 use Path::Class 'file';
 use POSIX qw(ceil);
 use List::AllUtils qw(apply sum count_by shuffle);
@@ -45,13 +46,30 @@ if ($ARGV_kfold) {
     $subsets = split_db($ARGV_kfold);
 }
 
-my $seq_n;      # improve this
 my @results;
+open my $out, '>', $ARGV_outfile;
 
-FILE:
-for my $infile (@ARGV_infiles) {
+my $batch = Parallel::Batch->new( {
+    maxprocs => $ARGV_threads,
+    jobs     => \@ARGV_infiles,
+    code     => sub {                       # closure (providing $self)
+                    my $infile = shift;
+                    ### Processing: $infile
+                    process_file($infile);
 
-    ### Processing: $infile
+                    # store results
+                    say {$out} join "\n", @results;
+                },
+} );
+
+# launch jobs
+$batch->run();
+
+# functions
+
+sub process_file {
+    my $infile = shift;
+
     my ($basename) = fileparse($infile, qr{\.[^.]*}xms);
 
     # try to fetch expected taxon from CLI...
@@ -75,13 +93,14 @@ for my $infile (@ARGV_infiles) {
 Warning: cannot determine expected taxon for organism; skipping infile!
 Check <infiles> basename ($basename) or --taxon-list ($ARGV_taxon_list) content.
 EOT
-            next FILE;
+            return;
         }
     }
 
     # determine number of seqs
+    # TODO: allow to recognize all fasta suffix
     my $fasfile = file($ARGV_fasta_dir, "$basename.fasta");
-    $seq_n = Ali->instant_count($fasfile);
+    my $seq_n = Ali->instant_count($fasfile);
 
     unless ($ARGV_kfold) {
         # read BLAST report infile and compute LCAs
@@ -93,7 +112,7 @@ EOT
         # create kraken report if asked to do so
         if ($ARGV_kraken) {
             my $outfile = "$basename-kraken.tsv";
-            store_kraken($outfile, $lca_for);
+            store_kraken($outfile, $lca_for, $seq_n);
         }
 
         # create anvio report if asked to do so
@@ -115,12 +134,12 @@ EOT
             store_lca($outfile, $lca_for);
         }
 
-        format_results($lca_for, $basename, $exp_tax);
+        format_results($lca_for, $basename, $exp_tax, $seq_n);
     }
 
     if ($ARGV_kfold) {
 
-		# read BLAST report infile in kfold mode
+        # read BLAST report infile in kfold mode
         my @kfold_lcas = map {
             parse_report($infile, $query_org, $_)
         } @{$subsets};
@@ -130,20 +149,17 @@ EOT
             # determine expected taxon from BLAST infile
             my @exp_taxs = map { auto_detect($_) } @kfold_lcas;
             my $len = @kfold_lcas;
-            format_results( $kfold_lcas[$_], $basename, $exp_taxs[$_] )
+            format_results( $kfold_lcas[$_], $basename, $exp_taxs[$_], $seq_n )
                 for 0..$len-1;
         }
         else {
-            format_results( $_, $basename, $exp_tax )
+            format_results( $_, $basename, $exp_tax, $seq_n )
                 for @kfold_lcas;
         }
     }
+
+    return;
 }
-
-# store default report
-store_results($ARGV_outfile, \@results);
-
-# functions
 
 sub split_db {
     my $infile = shift;
@@ -168,7 +184,7 @@ sub parse_report {
     my $taxids    = shift // ();
 
     # setup boolean filter for current database subset (if any)
-	my %unwanted = map { $_ => 1 } @{$taxids};
+    my %unwanted = map { $_ => 1 } @{$taxids};
 
     my $report = Table->new( file => $infile );
 
@@ -275,6 +291,7 @@ sub auto_detect {
 sub tabulate_lcas {
     my $lca_for = shift;
     my $exp_tax = shift;
+    my $seq_n   = shift;
 
     my $self_n    = 0;
     my $foreign_n = 0;
@@ -320,9 +337,10 @@ sub tabulate_lcas {
 }
 
 sub format_results {
-	my $lca_for  = shift;
-	my $basename = shift;
-	my $exp_tax  = shift;
+    my $lca_for  = shift;
+    my $basename = shift;
+    my $exp_tax  = shift;
+    my $seq_n    = shift;
 
     # compute mean number of relatives used for LCA inference
     my @rel_counts = map { $_->{rel_n} } values %{$lca_for};
@@ -332,17 +350,7 @@ sub format_results {
     # format default report line
     # TODO: better specify this format
     push @results, join "\t", $basename, $exp_tax,
-       tabulate_lcas($lca_for, $exp_tax), $rel_mean;
-
-    return;
-}
-
-sub store_results {
-    my $outfile = shift;
-    my $results = shift;
-
-    open my $out, '>', $outfile;
-    say {$out} join "\n", @{$results};
+       tabulate_lcas($lca_for, $exp_tax, $seq_n), $rel_mean;
 
     return;
 }
@@ -405,6 +413,7 @@ sub store_krona {
 sub store_kraken {
     my $outfile = shift;
     my $lca_for = shift;
+    my $seq_n   = shift;
 
 # 4. A rank code, indicating (U)nclassified, (R)oot, (D)omain, (K)ingdom,
 #    (P)hylum, (C)lass, (O)rder, (F)amily, (G)enus, or (S)pecies.
@@ -504,13 +513,13 @@ sub store_kraken {
     }
 
     # output taxonomic tree recursively
-    _dump_tree_level( $out, 0, $_, $tree{$_} ) for qw(unclassified root);
+    _dump_tree_level( $out, $seq_n, 0, $_, $tree{$_} ) for qw(unclassified root);
 
     return;
 }
 
 sub _dump_tree_level {
-    my ($out, $depth, $taxon, $tree_ref) = @_;
+    my ($out, $seq_n, $depth, $taxon, $tree_ref) = @_;
 
     say {$out} join "\t",
         (sprintf "%5.2f", 100.0 * $tree_ref->{coverage} / $seq_n),
@@ -528,7 +537,7 @@ sub _dump_tree_level {
         $children_for->{$b}{coverage} <=> $children_for->{$a}{coverage}
     } keys %{$children_for};
 
-    _dump_tree_level( $out, $depth+1, $_, $children_for->{$_} ) for @children;
+    _dump_tree_level( $out, $seq_n, $depth+1, $_, $children_for->{$_} ) for @children;
 
     return;
 }
@@ -543,7 +552,7 @@ physeter.pl - Taxonomic parser for BLAST reports
 
 =head1 VERSION
 
-version 0.202960
+version 0.213470
 
 =head1 USAGE
 
@@ -617,6 +626,16 @@ levels (which can vary from one lineage to the other).
 =head1 OPTIONS
 
 =over
+
+=item --threads=<n>
+
+Number of threads to run in parallel [default: n.default]. Parallelization is
+achieved by processing several BLAST files in parallel using an internal queue.
+Therefore, the specified number of threads should not be larger than the
+number of input BLAST files.
+
+=for Euclid: n.type: +int
+    n.default: 1
 
 =item --fasta-dir=<dir>
 

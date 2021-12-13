@@ -13,7 +13,6 @@ lib/Data/TableData/Object/aoaos.pm
 lib/Data/TableData/Object/aohos.pm
 lib/Data/TableData/Object/aos.pm
 lib/Data/TableData/Object/hash.pm
-t/#aoaos.t#
 t/00-compile.t
 t/aoaos.t
 t/aohos.t

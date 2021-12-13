@@ -1,5 +1,5 @@
 package Lab::Bus;
-$Lab::Bus::VERSION = '3.800';
+$Lab::Bus::VERSION = '3.801';
 #ABSTRACT: Bus base class
 
 use v5.20;
@@ -166,7 +166,7 @@ Lab::Bus - Bus base class
 
 =head1 VERSION
 
-version 3.800
+version 3.801
 
 =head1 SYNOPSIS
 

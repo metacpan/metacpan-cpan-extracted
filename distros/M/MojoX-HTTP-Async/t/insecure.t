@@ -15,6 +15,7 @@ use Test::Utils qw/ start_server notify_parent /;
 use Time::HiRes qw/ sleep /;
 use Socket qw/ sockaddr_in AF_INET INADDR_ANY SOCK_STREAM /;
 use Mojo::Message::Request ();
+use Mojo::URL ();
 
 my $host = 'localhost';
 my $can_go_further = 0;
@@ -69,7 +70,6 @@ sub on_start_cb ($port) {
             my $response = $default_response;
 
             $response = $responses_by_request_number{$page} // $response if $page;
-
             $eh = $wh;
 
             select(undef, $wh, $eh, undef);
@@ -112,7 +112,7 @@ my $mojo_request = Mojo::Message::Request->new();
 $mojo_request->parse("POST /page/01.html HTTP/1.1\r\nContent-Length: 3\r\nHost: localhost\r\nUser-Agent: Test\r\n\r\nabc");
 
 ok( $ua->add($mojo_request), "Adding the first request");
-ok( $ua->add("/page/02.html"), "Adding the second request");
+ok( $ua->add(Mojo::URL->new("/page/02.html")), "Adding the second request");
 ok(!$ua->add("/page/03.html"), "Adding the third request");
 
 # non-blocking requests processing

@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl
 
+v6.9.0 2021-12-10T12:37:30Z
+
+    - added get_value method to behavior subjects
+
 v6.8.1 2021-09-10T04:54:47Z
 
     - improved documentation of rx_partition

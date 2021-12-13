@@ -6,7 +6,7 @@ use Carp ();
 use Encode ();
 use Exporter 'import';
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 our @EXPORT = qw(encode encode_utf8 decode decode_utf8);
 our @EXPORT_OK = qw(encode_lax encode_utf8_lax decode_lax decode_utf8_lax);
@@ -200,17 +200,22 @@ L<Encode::Unicode> (but not UTF-8).
 
   my $bytes = encode_utf8 $characters;
 
+I<Since version 1.000.>
+
 Encodes the input string of characters into a UTF-8 byte string. Throws an
 exception if the input string contains characters that are not valid or
 possible to represent in UTF-8.
 
 This function will use the more consistent and efficient
 L<Unicode::UTF8/"encode_utf8"> if installed, and is otherwise equivalent to
-L</"encode"> with an encoding of C<UTF-8>.
+L</"encode"> with an encoding of C<UTF-8>. It is B<not> equivalent to
+L<Encode/"encode_utf8">, which should be avoided.
 
 =head2 encode_utf8_lax
 
   my $bytes = encode_utf8_lax $characters;
+
+I<Since version 1.000.>
 
 Encodes the input string of characters into a UTF-8 byte string, encoding any
 invalid characters as the Unicode replacement character C<U+FFFD>, represented
@@ -218,7 +223,8 @@ in UTF-8 as the three bytes C<0xEFBFBD>.
 
 This function will use the more consistent and efficient
 L<Unicode::UTF8/"encode_utf8"> if installed, and is otherwise equivalent to
-L</"encode_lax"> with an encoding of C<UTF-8>.
+L</"encode_lax"> with an encoding of C<UTF-8>. It is B<not> equivalent to
+L<Encode/"encode_utf8">, which should be avoided.
 
 =head2 decode
 
@@ -240,23 +246,29 @@ anyway, this notably includes L<Encode::Unicode> (but not UTF-8).
 
   my $characters = decode_utf8 $bytes;
 
+I<Since version 1.000.>
+
 Decodes the input UTF-8 byte string into a string of characters. Throws an
 exception if the input bytes are not valid for UTF-8.
 
 This function will use the more consistent and efficient
 L<Unicode::UTF8/"decode_utf8"> if installed, and is otherwise equivalent to
-L</"decode"> with an encoding of C<UTF-8>.
+L</"decode"> with an encoding of C<UTF-8>. It is B<not> equivalent to
+L<Encode/"decode_utf8">, which should be avoided.
 
 =head2 decode_utf8_lax
 
   my $characters = decode_utf8_lax $bytes;
+
+I<Since version 1.000.>
 
 Decodes the input UTF-8 byte string into a string of characters, decoding any
 malformed bytes to the Unicode replacement character C<U+FFFD>.
 
 This function will use the more consistent and efficient
 L<Unicode::UTF8/"decode_utf8"> if installed, and is otherwise equivalent to
-L</"decode_lax"> with an encoding of C<UTF-8>.
+L</"decode_lax"> with an encoding of C<UTF-8>. It is B<not> equivalent to
+L<Encode/"decode_utf8">, which should be avoided.
 
 =head1 BUGS
 

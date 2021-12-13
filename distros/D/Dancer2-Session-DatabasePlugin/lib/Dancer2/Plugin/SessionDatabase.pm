@@ -2,6 +2,7 @@ package Dancer2::Plugin::SessionDatabase;
 
 use Modern::Perl;
 use Dancer2::Plugin; 
+
 use Carp qw(croak);
 use Data::Dumper;
 
@@ -13,7 +14,23 @@ Dancer2::Plugin::SessionDatabase - Hook Loader For Dancer2::Session::DatabasePlu
 
 Hook loader for Dancer2::Session::DatabasePlugin.
 
+=head2 Plugin options
+
+
+In your config.yml
+
+  plugins:
+    SessionDatabase:
+      # when set to true this forces a call to the database plugin
+      always_clean: 1
+
+
 =cut
+
+has always_clean=>(
+  is=>'rw',
+  default=>sub { 1 },
+);
 
 our $DBH;
 
@@ -24,6 +41,10 @@ sub reset_session {
 
 sub DBC { 
     my ($self,$conn)=@_;
+
+    if($self->always_clean) {
+      $self->reset_session;
+    }
     my $db=$self->find_plugin('Dancer2::Plugin::Database');
     my $dbh=$db->database($conn); 
 
@@ -34,16 +55,13 @@ sub DBC {
     return $DBH=$dbh;
 }
 
-sub db_check {
-  my ($self,$dbh)=@_;
-  return 0 unless defined($DBH);
-  return 0 unless $DBH eq $dbh;
-  return 1;
-}
-
 # This method runs after the new constructor
 sub BUILD {
   my ($self)=@_;
+
+  while(my ($method,$value)=each %{$self->config}) {
+    $self->$method($value);
+  }
 
   $self->app->add_hook(
     Dancer2::Core::Hook->new(
@@ -60,7 +78,6 @@ sub BUILD {
       name=>"database_connection_lost",
       code=>sub { 
         	my ($dbh)=@_;
-          return unless $self->db_check($dbh);
           $self->reset_session;
         }
       )
@@ -70,7 +87,6 @@ sub BUILD {
       name=>"database_error",
       code=>sub { 
 	        my ($err,$dbh)=@_;
-          return unless $self->db_check($dbh);
           $self->reset_session;
       }
     )

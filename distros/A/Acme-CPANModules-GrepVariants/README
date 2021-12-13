@@ -3,9 +3,9 @@ NAME
     CPAN
 
 VERSION
-    This document describes version 0.008 of Acme::CPANModules::GrepVariants
+    This document describes version 0.009 of Acme::CPANModules::GrepVariants
     (from Perl distribution Acme-CPANModules-GrepVariants), released on
-    2021-11-14.
+    2021-11-26.
 
 DESCRIPTION
     This list catalogs various grep-like tools.
@@ -37,10 +37,11 @@ DESCRIPTION
     directory depth, and so on). It also offers some alternative output
     styles.
 
-    2b. Improvements in specifying multiple patterns
+    2b. Improvements in searching for multiple patterns in no particular
+    order
 
-    Normally with the regular grep, to search for all 'foo' and 'bar', you
-    either have to do something like:
+    Normally with the regular grep, to search for all 'foo' and 'bar' *in no
+    particular order*, you either have to do something like:
 
      % grep --color=always foo FILES | grep bar
 
@@ -84,7 +85,7 @@ DESCRIPTION
 
     3. Variants: alternate ways of specifying regex
 
-    Instead of specifying a pattern, with Crpgrep (from App::rpgrep) you can
+    Instead of specifying a pattern, with rpgrep (from App::rpgrep) you can
     specify a pattern name in a Regexp::Pattern::* module instead.
 
     4a. Variants: alternate source: repository (version control system)

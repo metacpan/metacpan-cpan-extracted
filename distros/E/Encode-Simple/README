@@ -46,17 +46,22 @@ FUNCTIONS
 
       my $bytes = encode_utf8 $characters;
 
+    Since version 1.000.
+
     Encodes the input string of characters into a UTF-8 byte string. Throws
     an exception if the input string contains characters that are not valid
     or possible to represent in UTF-8.
 
     This function will use the more consistent and efficient "encode_utf8"
     in Unicode::UTF8 if installed, and is otherwise equivalent to "encode"
-    with an encoding of UTF-8.
+    with an encoding of UTF-8. It is not equivalent to "encode_utf8" in
+    Encode, which should be avoided.
 
  encode_utf8_lax
 
       my $bytes = encode_utf8_lax $characters;
+
+    Since version 1.000.
 
     Encodes the input string of characters into a UTF-8 byte string,
     encoding any invalid characters as the Unicode replacement character
@@ -64,7 +69,8 @@ FUNCTIONS
 
     This function will use the more consistent and efficient "encode_utf8"
     in Unicode::UTF8 if installed, and is otherwise equivalent to
-    "encode_lax" with an encoding of UTF-8.
+    "encode_lax" with an encoding of UTF-8. It is not equivalent to
+    "encode_utf8" in Encode, which should be avoided.
 
  decode
 
@@ -88,16 +94,21 @@ FUNCTIONS
 
       my $characters = decode_utf8 $bytes;
 
+    Since version 1.000.
+
     Decodes the input UTF-8 byte string into a string of characters. Throws
     an exception if the input bytes are not valid for UTF-8.
 
     This function will use the more consistent and efficient "decode_utf8"
     in Unicode::UTF8 if installed, and is otherwise equivalent to "decode"
-    with an encoding of UTF-8.
+    with an encoding of UTF-8. It is not equivalent to "decode_utf8" in
+    Encode, which should be avoided.
 
  decode_utf8_lax
 
       my $characters = decode_utf8_lax $bytes;
+
+    Since version 1.000.
 
     Decodes the input UTF-8 byte string into a string of characters,
     decoding any malformed bytes to the Unicode replacement character
@@ -105,7 +116,8 @@ FUNCTIONS
 
     This function will use the more consistent and efficient "decode_utf8"
     in Unicode::UTF8 if installed, and is otherwise equivalent to
-    "decode_lax" with an encoding of UTF-8.
+    "decode_lax" with an encoding of UTF-8. It is not equivalent to
+    "decode_utf8" in Encode, which should be avoided.
 
 BUGS
 

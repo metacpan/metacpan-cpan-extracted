@@ -1,0 +1,16 @@
+runtime:
+  requires:
+    perl: '5.008001'
+    Carp: 0
+    Encode: '2.85'
+    Exporter: '5.57'
+  recommends:
+    Unicode::UTF8: 0
+test:
+  requires:
+    Test::More: '0.96'
+    Test::Needs: 0
+    Test::Without::Module: 0
+develop:
+  requires:
+    Unicode::UTF8: 0

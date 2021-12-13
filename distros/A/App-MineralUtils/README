@@ -2,8 +2,8 @@ NAME
     App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.005 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2021-08-15.
+    This document describes version 0.007 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2021-12-11.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -66,14 +66,14 @@ FUNCTIONS
                summary => "Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams",
              },
              {
-               amount  => 13.5135135135135,
+               amount  => 15.3846153846154,
                unit    => "mg-mg-ascorbate",
-               summary => "Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams",
+               summary => "Magnesium ascorbate (C12H14MgO12), in milligrams",
              },
              {
-               amount  => 13.5135135135135,
+               amount  => 11.4942528735632,
                unit    => "mg-mg-pidolate",
-               summary => "Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams",
+               summary => "Magnesium pidolate (C10H12MgN2O6), in milligrams",
              },
              {
                amount  => 12.0481927710843,
@@ -85,15 +85,20 @@ FUNCTIONS
                unit    => "mg-mg-oxide",
                summary => "Magnesium oxide (MgO), in milligrams",
              },
+             {
+               amount  => 9.80392156862745,
+               unit    => "mg-mg-lactate-dihydrate",
+               summary => "Magnesium lactate dihydrate (C6H14MgO8), in milligrams",
+             },
            ],
            {
-             "table.field_aligns"  => ["number", "left", "left"],
+             "table.fields"        => ["amount", "unit", "summary"],
              "table.field_formats" => [
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.fields"        => ["amount", "unit", "summary"],
+             "table.field_aligns"  => ["number", "left", "left"],
            },
          ]
 
@@ -165,13 +170,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-MineralUtils>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     App::VitaminUtils
 
@@ -201,4 +199,11 @@ COPYRIGHT AND LICENSE
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -13,6 +13,7 @@ lib/PICA/Error.pm
 lib/PICA/Parser/Base.pm
 lib/PICA/Parser/Binary.pm
 lib/PICA/Parser/JSON.pm
+lib/PICA/Parser/PIXML.pm
 lib/PICA/Parser/PPXML.pm
 lib/PICA/Parser/Plain.pm
 lib/PICA/Parser/Plus.pm
@@ -25,6 +26,7 @@ lib/PICA/Writer/Base.pm
 lib/PICA/Writer/Binary.pm
 lib/PICA/Writer/Generic.pm
 lib/PICA/Writer/JSON.pm
+lib/PICA/Writer/PIXML.pm
 lib/PICA/Writer/PPXML.pm
 lib/PICA/Writer/Plain.pm
 lib/PICA/Writer/Plus.pm
@@ -53,6 +55,7 @@ t/files/dump.dat
 t/files/filter-test.pp
 t/files/pica.binary
 t/files/pica.json
+t/files/pica.pixml
 t/files/pica.plain
 t/files/pica.plus
 t/files/pica.ppxml

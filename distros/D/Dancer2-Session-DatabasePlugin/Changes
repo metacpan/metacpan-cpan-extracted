@@ -30,3 +30,6 @@
 1.012
   -- added hook engine.session.before_db
     the hook: engine.session.before_db is now used to set the database connection in the session object at runtime.
+1.013
+  -- Disabled all caching by default
+  -- added an always_clean option to the plugin

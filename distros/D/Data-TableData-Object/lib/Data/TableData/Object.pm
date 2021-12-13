@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-17'; # DATE
 our $DIST = 'Data-TableData-Object'; # DIST
-our $VERSION = '0.114'; # VERSION
+our $VERSION = '0.115'; # VERSION
 
 our @EXPORT_OK = qw(table);
 
@@ -42,7 +42,7 @@ sub new {
 }
 
 1;
-# ABSTRACT: Manipulate data structure via table object
+# ABSTRACT: Manipulate table-like data structure via table object
 
 __END__
 
@@ -52,11 +52,22 @@ __END__
 
 =head1 NAME
 
-Data::TableData::Object - Manipulate data structure via table object
+Data::TableData::Object - Manipulate table-like data structure via table object
 
 =head1 VERSION
 
-This document describes version 0.114 of Data::TableData::Object (from Perl distribution Data-TableData-Object), released on 2021-11-17.
+This document describes version 0.115 of Data::TableData::Object (from Perl distribution Data-TableData-Object), released on 2021-11-17.
+
+=head1 DESCRIPTION
+
+This module provides a common interface to manipulate a few kinds of data
+structures that are "table-like": aoaos (array of array-of-scalars), aohos
+(array of hash-of-scalars), aos (array of scalars, viewed as a single-column
+table), and hash (viewed as two-column table with the columns being "key" and
+"value').
+
+The interface (see L<Data::TableData::Object::Base>) allows you to list columns,
+add/delete columns, retrieve rows, convert to aoaos or aohos, etc.
 
 =for Pod::Coverage ^$
 

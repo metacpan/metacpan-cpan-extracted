@@ -3,7 +3,7 @@ use Mouse;
 use Mouse::Util::TypeConstraints;
 use utf8;
 
-enum 'OrderState'       => qw/purchased canceled refunded expired/;
+enum 'OrderState'       => qw/purchased canceled refunded expired pending/;
 enum 'OrderEnvironment' => qw/Sandbox Production/;
 
 has product_identifier => (

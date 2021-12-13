@@ -576,15 +576,6 @@
       "name" : "Alba Iulia"
    },
    {
-      "ds100" : "XIAT",
-      "eva" : 8300950,
-      "latlong" : [
-         45.783184,
-         9.079832
-      ],
-      "name" : "Albate-Camerlata"
-   },
-   {
       "ds100" : "RAL",
       "eva" : 8000463,
       "latlong" : [
@@ -12861,15 +12852,6 @@
       "name" : "Caldern"
    },
    {
-      "ds100" : "XECM",
-      "eva" : 7100076,
-      "latlong" : [
-         41.841178,
-         2.800607
-      ],
-      "name" : "Caldes de Malavella"
-   },
-   {
       "ds100" : "TCA",
       "eva" : 8001320,
       "latlong" : [
@@ -17478,7 +17460,7 @@
       "name" : "Durlach Untermühlstraße, Karlsruhe"
    },
    {
-      "ds100" : "RKDTB",
+      "ds100" : "RKDTD",
       "eva" : 377903,
       "latlong" : [
          49.009485,
@@ -21627,15 +21609,6 @@
       "name" : "Fieberbrunn"
    },
    {
-      "ds100" : "XEFI",
-      "eva" : 7100078,
-      "latlong" : [
-         42.264952,
-         2.969276
-      ],
-      "name" : "Figueres"
-   },
-   {
       "ds100" : "TFIL",
       "eva" : 8001984,
       "latlong" : [
@@ -21805,15 +21778,6 @@
          7.31956255071774
       ],
       "name" : "Flamatt"
-   },
-   {
-      "ds100" : "XEFL",
-      "eva" : 7100130,
-      "latlong" : [
-         42.047541,
-         2.957239
-      ],
-      "name" : "Flassa"
    },
    {
       "ds100" : "XAFG",
@@ -23578,15 +23542,6 @@
          11.301957
       ],
       "name" : "Friesdorf"
-   },
-   {
-      "ds100" : "LFIO",
-      "eva" : 8011587,
-      "latlong" : [
-         51.59782,
-         11.323432
-      ],
-      "name" : "Friesdorf Ost"
    },
    {
       "ds100" : "RFH",
@@ -26190,15 +26145,6 @@
       "name" : "Gramsbergen"
    },
    {
-      "ds100" : "XEGR",
-      "eva" : 7100075,
-      "latlong" : [
-         41.599307,
-         2.291623
-      ],
-      "name" : "Granollers"
-   },
-   {
       "ds100" : "WGRA",
       "eva" : 8011691,
       "latlong" : [
@@ -27178,15 +27124,6 @@
          10.833007
       ],
       "name" : "Gräfenroda"
-   },
-   {
-      "ds100" : "LGRK",
-      "eva" : 8011685,
-      "latlong" : [
-         51.602149,
-         11.404245
-      ],
-      "name" : "Gräfenstuhl-Klippmühle"
    },
    {
       "ds100" : "UGTA",
@@ -28638,7 +28575,7 @@
       "name" : "Hallein"
    },
    {
-      "ds100" : "NHAL",
+      "ds100" : "NHAH",
       "eva" : 8002542,
       "latlong" : [
          49.929551,
@@ -32220,7 +32157,7 @@
       "name" : "Hilversum Media Park"
    },
    {
-      "ds100" : " XNHIS",
+      "ds100" : "XNHIS",
       "eva" : 8400570,
       "latlong" : [
          52.216110229492,
@@ -36114,7 +36051,7 @@
          49.008815,
          8.41788
       ],
-      "name" : "Karlsruhe Durlacher Tor / KIT-Campus Süd"
+      "name" : "Karlsruhe Durlacher Tor/KIT-Campus Süd"
    },
    {
       "ds100" : "RKEF",
@@ -36159,7 +36096,7 @@
          49.010457,
          8.386728
       ],
-      "name" : "Karlsruhe Mühlburger Tor (Kaiserallee)"
+      "name" : "Karlsruhe Mühlburger Tor"
    },
    {
       "ds100" : "RKW",
@@ -37746,15 +37683,6 @@
       "name" : "Klostermansfeld"
    },
    {
-      "ds100" : "LKMR",
-      "eva" : 8010204,
-      "latlong" : [
-         51.59109,
-         11.498511
-      ],
-      "name" : "Klostermansfeld Randsiedlung"
-   },
-   {
       "ds100" : "RKLB",
       "eva" : 8003343,
       "latlong" : [
@@ -38086,6 +38014,15 @@
          18.114153
       ],
       "name" : "Komarom"
+   },
+   {
+      "ds100" : "PQKVS",
+      "eva" : 367072,
+      "latlong" : [
+         49.003793,
+         8.404054
+      ],
+      "name" : "Kongresszentrum, Karlsruhe"
    },
    {
       "ds100" : "XPKN",
@@ -38772,22 +38709,22 @@
       "name" : "Kronberg(Taunus)"
    },
    {
-      "ds100" : "RKBPS",
-      "eva" : 721393,
-      "latlong" : [
-         49.007977,
-         8.409938
-      ],
-      "name" : "Kronenplatz (Fritz-Erler-Str.), Karlsruhe"
-   },
-   {
       "ds100" : "RKBP",
       "eva" : 721394,
       "latlong" : [
          49.009426,
          8.408456
       ],
-      "name" : "Kronenplatz (Kaiserstraße), Karlsruhe"
+      "name" : "Kronenplatz (U), Karlsruhe"
+   },
+   {
+      "ds100" : "RKBPS",
+      "eva" : 721393,
+      "latlong" : [
+         49.007977,
+         8.409938
+      ],
+      "name" : "Kronenplatz, Karlsruhe"
    },
    {
       "ds100" : "AKRH",
@@ -42417,6 +42354,15 @@
       "name" : "Leverkusen-Küppersteg"
    },
    {
+      "ds100" : "KLS",
+      "eva" : 8003669,
+      "latlong" : [
+         51.031616,
+         7.015128
+      ],
+      "name" : "Leverkusen-Manfort"
+   },
+   {
       "ds100" : "KLRH",
       "eva" : 8003672,
       "latlong" : [
@@ -42424,15 +42370,6 @@
          6.963464
       ],
       "name" : "Leverkusen-Rheindorf"
-   },
-   {
-      "ds100" : "KLS",
-      "eva" : 8003669,
-      "latlong" : [
-         51.031616,
-         7.015128
-      ],
-      "name" : "Leverkusen-Schlebusch"
    },
    {
       "ds100" : "XFLZ",
@@ -45180,15 +45117,6 @@
       "name" : "Mannheim-Waldhof"
    },
    {
-      "ds100" : "LMAS",
-      "eva" : 8012300,
-      "latlong" : [
-         51.600325,
-         11.452086
-      ],
-      "name" : "Mansfeld(Südharz)"
-   },
-   {
       "ds100" : "XLMN",
       "eva" : 8270690,
       "latlong" : [
@@ -45340,15 +45268,6 @@
          10.480275
       ],
       "name" : "Maria Rain"
-   },
-   {
-      "ds100" : "EMV",
-      "eva" : 8003860,
-      "latlong" : [
-         51.839266,
-         7.098167
-      ],
-      "name" : "Maria Veen"
    },
    {
       "ds100" : "XZM",
@@ -48579,7 +48498,7 @@
          49.010687,
          8.381677
       ],
-      "name" : "Mühlburger Tor (Kaiserallee), Karlsruhe"
+      "name" : "Mühlburger Tor, Karlsruhe"
    },
    {
       "ds100" : "MMF",
@@ -58941,6 +58860,15 @@
       "name" : "Reken-Klein Reken"
    },
    {
+      "ds100" : "EMV",
+      "eva" : 8003860,
+      "latlong" : [
+         51.839266,
+         7.098167
+      ],
+      "name" : "Reken-Maria Veen"
+   },
+   {
       "ds100" : "XSRN",
       "eva" : 8503408,
       "latlong" : [
@@ -59346,7 +59274,7 @@
       "name" : "Rheinfelden(CH)"
    },
    {
-      "ds100" : "RKHN",
+      "ds100" : "RK  H",
       "eva" : 362391,
       "latlong" : [
          49.015578,
@@ -59820,7 +59748,7 @@
          48.248726,
          7.773037
       ],
-      "name" : "Ringsheim"
+      "name" : "Ringsheim/Europa-Park"
    },
    {
       "ds100" : "XDRI",
@@ -60894,7 +60822,7 @@
       "name" : "Rotterdam Lombardijen"
    },
    {
-      "ds100" : "XNRN",
+      "ds100" : "PNRN",
       "eva" : 8400531,
       "latlong" : [
          51.942222595215,
@@ -60982,15 +60910,6 @@
          11.033601
       ],
       "name" : "Rovereto"
-   },
-   {
-      "ds100" : "XIRG",
-      "eva" : 8300238,
-      "latlong" : [
-         45.076985,
-         11.781064
-      ],
-      "name" : "Rovigo"
    },
    {
       "ds100" : "SROB",
@@ -67695,7 +67614,7 @@
          47.85009,
          9.005731
       ],
-      "name" : "Stockach NE"
+      "name" : "Stockach"
    },
    {
       "ds100" : "NSOK",
@@ -69786,15 +69705,6 @@
       "name" : "Tiefenau"
    },
    {
-      "ds100" : "NTFB",
-      "eva" : 8026544,
-      "latlong" : [
-         48.61502,
-         13.42308
-      ],
-      "name" : "Tiefenbach(b Passau)"
-   },
-   {
       "ds100" : "LTF",
       "eva" : 8017030,
       "latlong" : [
@@ -70524,15 +70434,6 @@
       "name" : "Tschagguns"
    },
    {
-      "ds100" : "RKTUT",
-      "eva" : 720995,
-      "latlong" : [
-         49.006769,
-         8.431264
-      ],
-      "name" : "Tullastraße/Verkehrsbetriebe, Karlsruhe"
-   },
-   {
       "ds100" : "MTUL",
       "eva" : 8005924,
       "latlong" : [
@@ -71010,7 +70911,7 @@
       "name" : "Ulbersdorf"
    },
    {
-      "ds100" : "TU",
+      "ds100" : "TU  P",
       "eva" : 8000170,
       "latlong" : [
          48.399437,
@@ -71991,24 +71892,6 @@
       "name" : "Vaterstetten"
    },
    {
-      "ds100" : "LVT",
-      "eva" : 8013182,
-      "latlong" : [
-         51.597705,
-         11.428977
-      ],
-      "name" : "Vatterode"
-   },
-   {
-      "ds100" : "LVTT",
-      "eva" : 8079152,
-      "latlong" : [
-         51.598218,
-         11.412188
-      ],
-      "name" : "Vatteröder Teich"
-   },
-   {
       "ds100" : "HVEC",
       "eva" : 8006060,
       "latlong" : [
@@ -72979,15 +72862,6 @@
          7.872214
       ],
       "name" : "Volkringhausen"
-   },
-   {
-      "ds100" : "PQKVS",
-      "eva" : 367072,
-      "latlong" : [
-         49.003793,
-         8.404054
-      ],
-      "name" : "Volkswohnung/Staatstheater, Karlsruhe"
    },
    {
       "ds100" : "HVOP",
@@ -76122,15 +75996,6 @@
       "name" : "Wil SG"
    },
    {
-      "ds100" : "MWBN",
-      "eva" : 8070620,
-      "latlong" : [
-         49.025162,
-         10.397122
-      ],
-      "name" : "Wilburgstetten Bf"
-   },
-   {
       "ds100" : "RWIN",
       "eva" : 8006430,
       "latlong" : [
@@ -76858,15 +76723,6 @@
          8.998558
       ],
       "name" : "Witzwort"
-   },
-   {
-      "ds100" : "XCV",
-      "eva" : 2000021,
-      "latlong" : [
-         55.197393,
-         34.317551
-      ],
-      "name" : "Wjasma"
    },
    {
       "ds100" : "XNWO",

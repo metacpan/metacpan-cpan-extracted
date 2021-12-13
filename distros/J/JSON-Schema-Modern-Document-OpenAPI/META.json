@@ -114,6 +114,7 @@
             "Test::JSON::Schema::Acceptance" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0.96",
+            "URI" : "0",
             "YAML::PP" : "0",
             "open" : "0",
             "perl" : "v5.20.0",
@@ -201,15 +202,15 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -224,7 +225,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern-Document-OpenAPI"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035006"
@@ -1132,7 +1133,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.009",
+                  "tag" : "v0.010",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
