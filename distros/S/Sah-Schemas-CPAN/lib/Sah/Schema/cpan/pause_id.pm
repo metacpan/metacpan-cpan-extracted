@@ -1,9 +1,9 @@
 package Sah::Schema::cpan::pause_id;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-02'; # DATE
+our $DATE = '2021-07-19'; # DATE
 our $DIST = 'Sah-Schemas-CPAN'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use strict;
 use Regexp::Pattern::CPAN;
@@ -36,7 +36,7 @@ Sah::Schema::cpan::pause_id - PAUSE author ID
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2020-01-02.
+This document describes version 0.013 of Sah::Schema::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2021-07-19.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -86,7 +87,8 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
  Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
 
@@ -117,7 +119,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-CPAN>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-CPAN/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-CPAN>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

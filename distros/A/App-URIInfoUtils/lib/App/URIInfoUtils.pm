@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-17'; # DATE
+our $DATE = '2021-11-26'; # DATE
 our $DIST = 'App-URIInfoUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -27,6 +27,15 @@ $SPEC{uri_info} = {
         # XXX include_plugins
         # XXX exclude_plugins
     },
+    examples => [
+        {args=>{uris=>["https://www.tokopedia.com/search?st=product&q=comic%20books"]}},
+        {
+            args => {uris=>[
+                "https://www.google.com/search?client=firefox-b-d&q=how+much+drink+water+everyday",
+                "https://www.youtube.com/results?search_query=alkaline+water",
+                ]},
+        },
+    ],
 };
 sub uri_info {
     require URI::Info;
@@ -61,7 +70,7 @@ App::URIInfoUtils - Utilities related to URI::Info
 
 =head1 VERSION
 
-This document describes version 0.002 of App::URIInfoUtils (from Perl distribution App-URIInfoUtils), released on 2021-10-17.
+This document describes version 0.003 of App::URIInfoUtils (from Perl distribution App-URIInfoUtils), released on 2021-11-26.
 
 =head1 DESCRIPTION
 
@@ -83,6 +92,68 @@ Usage:
  uri_info(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Extract information from one or more URIs.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ uri_info(
+   uris => [
+     "https://www.tokopedia.com/search?st=product&q=comic%20books",
+   ]
+ );
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       host => "www.tokopedia.com",
+       is_search => 1,
+       search_query => "comic books",
+       search_type => "product",
+       url => "https://www.tokopedia.com/search?st=product&q=comic%20books",
+     },
+   ],
+   {},
+ ]
+
+=item * Example #2:
+
+ uri_info(
+   uris => [
+     "https://www.google.com/search?client=firefox-b-d&q=how+much+drink+water+everyday",
+     "https://www.youtube.com/results?search_query=alkaline+water",
+   ]
+ );
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       host => "www.google.com",
+       is_search => 1,
+       search_query => "how much drink water everyday",
+       search_source => "google",
+       search_type => "search",
+       url => "https://www.google.com/search?client=firefox-b-d&q=how+much+drink+water+everyday",
+     },
+     {
+       host => "www.youtube.com",
+       url  => "https://www.youtube.com/results?search_query=alkaline+water",
+     },
+   ],
+   {},
+ ]
+
+=back
 
 This function is not exported.
 

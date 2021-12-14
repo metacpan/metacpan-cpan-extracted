@@ -106,7 +106,20 @@ sub _lookup_tm_entries {
 	return $self;
     }
     
-    my $json = decode_json($mech->content(format=>'text'));
+    my $json;
+    {
+	local $@; # protect existing $@
+	eval {
+	    $json = decode_json($mech->content(format=>'text'));
+	};
+	if ($@) {
+	    # Some error
+	    $self->status("Invalid response");
+	    $self->error(1);
+	    $self->next_page(undef);
+	    return $self;
+	}
+    }
 
     if ($json) {
 	$self->raw_json_decoded($json);

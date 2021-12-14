@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Leel::RunProcessor;
 # ABSTRACT: Internal class for leel tool
-$Bio::MUST::Apps::Leel::RunProcessor::VERSION = '0.210570';
+$Bio::MUST::Apps::Leel::RunProcessor::VERSION = '0.213470';
 use Moose;
 use namespace::autoclean;
 
@@ -117,7 +117,7 @@ Bio::MUST::Apps::Leel::RunProcessor - Internal class for leel tool
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 AUTHOR
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.1.6
+## Version v0.1.7
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2021/12/07
+## Modified 2021/12/14
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ BEGIN
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.1.6';
+    our $VERSION = 'v0.1.7';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -838,7 +838,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.1.6
+    v0.1.7
 
 =head1 DESCRIPTION
 

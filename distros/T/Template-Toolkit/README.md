@@ -2,7 +2,7 @@
 
                             Template Toolkit
 
-                              Version 3.009
+                              Version 3.010
 
                                 July 2020
 
@@ -44,6 +44,9 @@ other offline document systems.
 
 WHAT'S NEW?
 -----------
+
+Version 3.010 Maintenance release: several fixes and documentation improvements.
+              ttree updates.
 
 Version 3.009 revert "Allow SET to have FILTER used in it"
 
@@ -234,7 +237,7 @@ e.g.
     perldoc Template
 
 If you're using a Unix based system then the pages should also be
-converted to manpages suring the 'make install'.  Thus, you can also:
+converted to manpages during 'make install'.  Thus, you can also:
 
     man Template
 
@@ -335,23 +338,11 @@ have been answered.
 
 To subscribe to the mailing list, send an email to:
 
-    templates-request@template-toolkit.org
+    template-toolkit+subscribe@groups.io
 
-with the message 'subscribe' in the body.  You can also use the web
-interface to subscribe or browse the archives:
+You can also use the web interface:
 
-    http://mail.template-toolkit.org/mailman/listinfo/templates
-
-A low-volume, moderated mailing list exists for announcements about new
-releases of the Template Toolkit and related products.  To subscribe, send
-an email to:
-
-    templates-announce-request@template-toolkit.org
-
-with the message 'subscribe' in the body.  A web interface also exists
-for subscription and browsing the archives:
-
-    http://mail.template-toolkit.org/mailman/listinfo/templates-announce
+    https://groups.io/g/template-toolkit
 
 For information about commercial support and consultancy for the Template
 Toolkit, please contact the author.

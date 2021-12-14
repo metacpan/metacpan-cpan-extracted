@@ -4,6 +4,7 @@ lib/Cookie.pm
 lib/Cookie/Domain.pm
 lib/Cookie/Jar.pm
 lib/Cookie/public_suffix_list.txt
+lib/Cookies.pm
 LICENSE
 Makefile.PL
 MANIFEST

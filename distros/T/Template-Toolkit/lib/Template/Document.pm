@@ -26,7 +26,7 @@ use warnings;
 use base 'Template::Base';
 use Template::Constants;
 
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $ERROR   = '';
 our ($COMPERR, $AUTOLOAD, $UNICODE);
@@ -72,7 +72,10 @@ sub new {
         $COMPERR = '';
 
         # DON'T LOOK NOW! - blindly untainting can make you go blind!
-        $block = each %{ { $block => undef } } if ${^TAINT};    #untaint
+        {
+            no warnings 'syntax';
+            $block = each %{ { $block => undef } } if ${^TAINT};    #untaint
+        }
 
         $block = eval $block;
         return $class->error($@)
@@ -189,36 +192,6 @@ sub AUTOLOAD {
 #    print STDERR "called $self->AUTOLOAD($method) from $file line $line\n";
     return $self->{ $method };
 }
-
-
-#========================================================================
-#                     -----  PRIVATE METHODS -----
-#========================================================================
-
-
-#------------------------------------------------------------------------
-# _dump()
-#
-# Debug method which returns a string representing the internal state
-# of the object.
-#------------------------------------------------------------------------
-
-sub _dump {
-    my $self = shift;
-    my $dblks;
-    my $output = "$self : $self->{ name }\n";
-
-    $output .= "BLOCK: $self->{ _BLOCK }\nDEFBLOCKS:\n";
-
-    if ($dblks = $self->{ _DEFBLOCKS }) {
-        foreach my $b (keys %$dblks) {
-            $output .= "    $b: $dblks->{ $b }\n";
-        }
-    }
-
-    return $output;
-}
-
 
 #========================================================================
 #                      ----- CLASS METHODS -----

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-17'; # DATE
+our $DATE = '2021-11-26'; # DATE
 our $DIST = 'App-URIInfoUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/URIInfoUtils/uri_info",
@@ -40,7 +40,7 @@ uri-info - Extract information from one or more URIs
 
 =head1 VERSION
 
-This document describes version 0.002 of uri-info (from Perl distribution App-URIInfoUtils), released on 2021-10-17.
+This document describes version 0.003 of uri-info (from Perl distribution App-URIInfoUtils), released on 2021-11-26.
 
 =head1 SYNOPSIS
 
@@ -190,6 +190,23 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+ % uri-info 'https://www.tokopedia.com/search?st=product&q=comic%20books'
+ +-------------------+-----------+--------------+-------------+-------------------------------------------------------------+
+ | host              | is_search | search_query | search_type | url                                                         |
+ +-------------------+-----------+--------------+-------------+-------------------------------------------------------------+
+ | www.tokopedia.com | 1         | comic books  | product     | https://www.tokopedia.com/search?st=product&q=comic%20books |
+ +-------------------+-----------+--------------+-------------+-------------------------------------------------------------+
+
+ % uri-info 'https://www.google.com/search?client=firefox-b-d&q=how+much+drink+water+everyday' 'https://www.youtube.com/results?search_query=alkaline+water'
+ +-----------------+-----------+-------------------------------+---------------+-------------+----------------------------------------------------------------------------------+
+ | host            | is_search | search_query                  | search_source | search_type | url                                                                              |
+ +-----------------+-----------+-------------------------------+---------------+-------------+----------------------------------------------------------------------------------+
+ | www.google.com  | 1         | how much drink water everyday | google        | search      | https://www.google.com/search?client=firefox-b-d&q=how+much+drink+water+everyday |
+ | www.youtube.com |           |                               |               |             | https://www.youtube.com/results?search_query=alkaline+water                      |
+ +-----------------+-----------+-------------------------------+---------------+-------------+----------------------------------------------------------------------------------+
 
 =head1 HOMEPAGE
 

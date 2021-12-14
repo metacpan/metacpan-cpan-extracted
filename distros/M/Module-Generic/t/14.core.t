@@ -179,7 +179,7 @@ SKIP:
         skip( 'bad ip did not trigger an error', 1 );
         fail( 'bad ip did not trigger an error' );
     }
-    is( $o->error->message, 'Value provided is not a valid ip address.', '_set_get_ip bad ip error' );
+    is( $o->error->message, 'Value provided (bad ip) is not a valid ip address.', '_set_get_ip bad ip error' );
     diag( "Error is: ", $o->error ) if( $DEBUG );
 };
 

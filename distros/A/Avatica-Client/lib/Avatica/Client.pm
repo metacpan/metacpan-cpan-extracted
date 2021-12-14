@@ -13,7 +13,7 @@ use Google::ProtocolBuffers::Dynamic 0.30;
 use constant MAX_RETRIES => 1;
 use constant CLASS_REQUEST_PREFIX => 'org.apache.calcite.avatica.proto.Requests$';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub new {
   my ($class, %params) = @_;
@@ -623,7 +623,7 @@ Avatica::Client - Client for Apache Calcite Avatica
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

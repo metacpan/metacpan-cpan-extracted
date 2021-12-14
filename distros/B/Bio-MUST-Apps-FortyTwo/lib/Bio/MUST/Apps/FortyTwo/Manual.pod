@@ -56,7 +56,7 @@ FortyTwo::Manual - User Guide for Forty-Two
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =encoding UTF-8
 
@@ -722,8 +722,11 @@ theoretical background).
 
 C<Bio::MUST> modules provide quite sophisticated taxonomic filters. Hence, in
 C<tax_filter> syntax, wanted taxa are to be prefixed by a C<+> symbol, whereas
-unwanted taxa are to be prefixed by a C<-> symbol. Wanted and unwanted taxa are
-linked by logical ORs. Here are a few examples and their meaning:
+unwanted taxa are to be prefixed by a C<-> symbol. Wanted taxa are linked by
+logical ORs while unwanted taxa are linked by logical ANDs. Unwanted taxa should
+not include wanted taxa because the former ones take precedence over the latter
+ones. In contrast the opposite helps fine-tuning the tax_filter. Here are a few
+examples and their meaning:
 
     [ +Poaceae ]                        # any grass
     [ -eudicotyledons ]                 # anything but a dicotyledon flower

@@ -3,27 +3,30 @@ abstract: 'Open a file in vimoutliner to write a journal'
 author:
   - 'Mathias Weidner <mamawe@cpan.org>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-VOJournal
 provides:
   App::VOJournal:
     file: lib/App/VOJournal.pm
-    version: v0.4.5
+    version: v0.4.6
   App::VOJournal::VOTL:
     file: lib/App/VOJournal/VOTL.pm
-    version: v0.4.5
+    version: v0.4.6
 requires:
-  Getopt::Long: 2.38
+  Getopt::Long: '2.38'
   perl: v5.10.1
-  version: 0
+  version: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-VOJournal
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: v0.4.5
+  repository: https://github.com/matwei-perl/App-VOJournal
+version: v0.4.6
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

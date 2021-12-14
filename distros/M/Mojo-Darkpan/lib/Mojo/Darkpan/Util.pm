@@ -1,5 +1,5 @@
 package Mojo::Darkpan::Util;
-use v5.25;
+use v5.20;
 use Moo;
 use Mojo::Darkpan::Config;
 use Mojo::IOLoop -signatures;

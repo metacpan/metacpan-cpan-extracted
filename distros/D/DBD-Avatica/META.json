@@ -71,7 +71,7 @@
          "web" : "https://github.com/skbkontur/perl-dbd-avatica"
       }
    },
-   "version" : "0.01.0",
+   "version" : "0.2.0",
    "x_contributors" : [
       "Denis Ibaev <dionys@gmail.com>"
    ],

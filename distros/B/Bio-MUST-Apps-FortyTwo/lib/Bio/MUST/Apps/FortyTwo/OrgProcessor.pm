@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::OrgProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::OrgProcessor::VERSION = '0.210570';
+$Bio::MUST::Apps::FortyTwo::OrgProcessor::VERSION = '0.213470';
 use Moose;
 use namespace::autoclean;
 
@@ -161,46 +161,50 @@ sub _build_orthologous_seqs {
     my $ap = $self->ali_proc;
     my $rp = $ap->run_proc;
 
-    if ($rp->ref_brh eq 'off') {
-        ##### [ORG] Skipping orthology assessment!
-        return $self->homologous_seqs;
-    }
+    my $seqs;
 
-    ##### [ORG] Identifying orthologues among homologues...
+    unless ($rp->ref_brh eq 'off') {
+        ##### [ORG] Identifying orthologues among homologues...
 
-    my $args = $rp->blast_args_for('orthologues') // {};
-    $args->{-outfmt} = 6;
-    $args->{-max_target_seqs} = 1;
+        my $args = $rp->blast_args_for('orthologues') // {};
+        $args->{-outfmt} = 6;
+        $args->{-max_target_seqs} = 1;
 
-    # tie might help making 42 completely deterministic
-    tie my %count_for, 'Tie::IxHash';
-    for my $ref_org ($ap->all_ref_orgs) {
+        # tie might help making 42 completely deterministic
+        tie my %count_for, 'Tie::IxHash';
+        for my $ref_org ($ap->all_ref_orgs) {
 
-        my $homologous_seqs = $self->homologous_seqs;
-        my $blastdb = $rp->ref_blastdb_for($ref_org);
-        $args->{-query_gencode} = $self->code       # if BLASTX
-            if $homologous_seqs->type eq 'nucl' && $blastdb->type eq 'prot';
-        my $parser = $blastdb->blast($homologous_seqs, $args);
-        ##### [ORG] BLASTX (or BLASTP/N): $ref_org . q{ } . $parser->filename
+            my $homologous_seqs = $self->homologous_seqs;
+            my $blastdb = $rp->ref_blastdb_for($ref_org);
+            $args->{-query_gencode} = $self->code       # if BLASTX
+                if $homologous_seqs->type eq 'nucl' && $blastdb->type eq 'prot';
+            my $parser = $blastdb->blast($homologous_seqs, $args);
+            ##### [ORG] BLASTX (or BLASTP/N): $ref_org . q{ } . $parser->filename
 
-        my $best_hits = $ap->best_hits_for($ref_org);
-        while (my $hsp = $parser->next_query) {
-            my $candidate = $homologous_seqs->long_id_for( $hsp->query_id );
-            my $in_best_hits = $best_hits->is_listed(      $hsp->hit_id   );
-            ######## [DEBUG]: $candidate . ( $in_best_hits && ' [=BRH=]' )
-            $count_for{$candidate}++ if $in_best_hits;
+            my $best_hits = $ap->best_hits_for($ref_org);
+            while (my $hsp = $parser->next_query) {
+                my $candidate = $homologous_seqs->long_id_for( $hsp->query_id );
+                my $in_best_hits = $best_hits->is_listed(      $hsp->hit_id   );
+                ######## [DEBUG]: $candidate . ( $in_best_hits && ' [=BRH=]' )
+                $count_for{$candidate}++ if $in_best_hits;
+            }
+            $parser->remove unless $rp->debug_mode;
         }
-        $parser->remove unless $rp->debug_mode;
+
+        ######## [DEBUG] BRH counts: display( pairmap { "$a => $b" } %count_for )
+
+        # keep only homologues that are orthologous for all effective ref_orgs
+        my $ref_org_n = $ap->count_ref_orgs;
+        my $orthologues = IdList->new(
+            ids => [ grep { $count_for{$_} == $ref_org_n } keys %count_for ]
+        );
+        $seqs = $orthologues->filtered_ali( $self->homologous_seqs );
     }
 
-    ######## [DEBUG] BRH counts: display( pairmap { "$a => $b" } %count_for )
-
-    # keep only homologues that are orthologous for all effective ref_orgs
-    my $ref_org_n = $ap->count_ref_orgs;
-    my $orthologues = IdList->new(
-        ids => [ grep { $count_for{$_} == $ref_org_n } keys %count_for ]
-    );
-    my $seqs = $orthologues->filtered_ali( $self->homologous_seqs );
+    else {
+        ##### [ORG] Skipping orthology assessment!
+        $seqs = $self->homologous_seqs->seqs;
+    }
 
     # optionally merge orthologues before aligning
     # Note: this is always disabled in metagenomic mode
@@ -867,7 +871,7 @@ Bio::MUST::Apps::FortyTwo::OrgProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000087';
+our $VERSION = '1.000090';
 
 use App::Yath::Options;
 
@@ -52,6 +52,17 @@ sub finalize_plugins {}
 
 sub monitor_preloads { 1 }
 sub job_count { 1 }
+
+#sub render {
+#    my $self = shift;
+#
+#    local $SIG{INT} = sub {
+#        print "Canceling testing...\n";
+#        $self->state->halt_run($self->run->run_id);
+#    };
+#
+#    return $self->SUPER::render(@_);
+#}
 
 sub pfile {
     my $self = shift;

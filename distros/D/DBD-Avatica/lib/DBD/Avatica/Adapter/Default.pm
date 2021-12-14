@@ -147,7 +147,7 @@ sub from_jdbc {
 
     my $scalar_value = $column_value->get_scalar_value;
 
-    return if $scalar_value && $scalar_value->get_null;
+    return (undef,) if $scalar_value && $scalar_value->get_null;
 
     if ($column_value->get_has_array_value) {
         my $jdbc_type_id = $column_meta->get_type->get_component->get_id;
@@ -357,7 +357,7 @@ DBD::Avatica::Adapter::Default
 
 =head1 VERSION
 
-version 0.01.0
+version 0.2.0
 
 =head1 AUTHOR
 

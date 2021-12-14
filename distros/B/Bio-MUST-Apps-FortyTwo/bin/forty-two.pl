@@ -53,7 +53,7 @@ forty-two.pl - The Answer to the Ultimate Question of Phylogenomics
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 USAGE
 
@@ -113,7 +113,7 @@ number of input ALI files.
 
 Optional output dir that will contain the enriched ALI files and/or taxonomic
 reports (will be created if needed) [default: none]. Otherwise, output files
-are in the same directory as input files.
+will be written in the same directory as input files.
 
 =for Euclid: dir.type: writable
 

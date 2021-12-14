@@ -31,13 +31,13 @@ my $string = $c->pagination( 4, 15, '#action={page}' => {
   prev => '&lt;',
   next => '&gt;',
   separator => '&nbsp;',
-  ellipsis => '...'
+  ellipsis => '...',
+  num_format => ''
 });
 
 like($string, qr/href="#action=3" rel="prev">&lt;/, 'Prev is correct');
 like($string, qr/href="#action=5" rel="next">&gt;/, 'Next is correct');
 like($string, qr/a rel="self">\[/, 'Self is correct');
-
 
 like($string, qr/^\<a href="#action=3"[^>]*>\&lt;<\/a>\&nbsp;/, 'String begin');
 like($string, qr/\<a href="#action=5"[^>]*>\&gt;<\/a>$/, 'String end');
@@ -69,7 +69,6 @@ $string = $c->pagination(1,2);
 is($string, '<a rel="prev">&lt;</a>&nbsp;<a rel="self">[1]</a>&nbsp;<a href="2">2</a>'.
      '&nbsp;<a href="2" rel="next">&gt;</a>',
    'Pagination 1/2');
-
 
 $string = $c->pagination(2,2);
 is($string, '<a href="1" rel="prev">&lt;</a>&nbsp;<a href="1">1</a>'.
@@ -149,7 +148,8 @@ $app->plugin('TagHelpers::Pagination' =>
 		 next      => '+++',
 		 ellipsis  => '---',
 		 current   => '<strong>{current}</strong>',
-		 placeholder => 'startPage'
+		 placeholder => 'startPage',
+                 num_format => sub { ':' . $_[0] }
 	       }
 	   );
 
@@ -158,9 +158,9 @@ $string = $c->pagination( 4, 15, '#action={startPage}');
 like($string, qr/^<a href="#action=3" rel="prev">\*\*\*<\/a> /, 'String begin');
 like($string, qr/<a href="#action=5" rel="next">\+\+\+<\/a>$/, 'String end');
 like($string,
-     qr/<a href="#action=5">5<\/a> --- <a href="#action=15">15<\/a>/,
+     qr/<a href="#action=5">:5<\/a> --- <a href="#action=15">:15<\/a>/,
      'String ellipsis');
-like($string, qr/<strong>4<\/strong>/, 'Current');
+like($string, qr/<strong>:4<\/strong>/, 'Current');
 
 $app->plugin('TagHelpers::Pagination');
 
@@ -201,6 +201,40 @@ is($c->pagination( 4, 5, '/?p={page}'), '<a href="/?p=3" rel="prev">&lt;</a>&nbs
 
 # Default start is 1
 is($c->pagination(undef, 1, ''), '<a rel="prev">&lt;</a>&nbsp;<a rel="self">[1]</a>&nbsp;<a rel="next">&gt;</a>', 'No current page');
+
+
+
+# Add num_format call back
+$type->{num_format} = sub {
+  return '*' . $_[0] . '*';
+};
+
+# Undefined page number
+is($c->pagination( 8, -1, '/?p={page}' => $type ), '<a href="/?p=7" rel="prev">&lt;</a> <a href="/?p=1">*1*</a> ... <a href="/?p=7">*7*</a> <a rel="self">[*8*]</a> ... <a href="/?p=9" rel="next">&gt;</a>', 'Unknown page number 8');
+is($c->pagination( 0, -1, '/?p={page}' => $type ), '<a rel="prev">&lt;</a> ... <a href="/?p=1" rel="next">&gt;</a>', 'Unknown page number 0');
+is($c->pagination( 1, -1, '/?p={page}' => $type ), '<a rel="prev">&lt;</a> <a rel="self">[*1*]</a> ... <a href="/?p=2" rel="next">&gt;</a>', 'Unknown page number 1');
+is($c->pagination( 2, -1, '/?p={page}' => $type ), '<a href="/?p=1" rel="prev">&lt;</a> <a href="/?p=1">*1*</a> <a rel="self">[*2*]</a> ... <a href="/?p=3" rel="next">&gt;</a>', 'Unknown page number 2');
+is($c->pagination( 3, -1, '/?p={page}' => $type ), '<a href="/?p=2" rel="prev">&lt;</a> <a href="/?p=1">*1*</a> <a href="/?p=2">*2*</a> <a rel="self">[*3*]</a> ... <a href="/?p=4" rel="next">&gt;</a>', 'Unknown page number 3');
+is($c->pagination( 4, -1, '/?p={page}' => $type ), '<a href="/?p=3" rel="prev">&lt;</a> <a href="/?p=1">*1*</a> <a href="/?p=2">*2*</a> <a href="/?p=3">*3*</a> <a rel="self">[*4*]</a> ... <a href="/?p=5" rel="next">&gt;</a>', 'Unknown page number 4');
+is($c->pagination( 5, -1, '/?p={page}' => $type ), '<a href="/?p=4" rel="prev">&lt;</a> <a href="/?p=1">*1*</a> ... <a href="/?p=4">*4*</a> <a rel="self">[*5*]</a> ... <a href="/?p=6" rel="next">&gt;</a>', 'Unknown page number 5');
+is($c->pagination( 6, -1, '/?p={page}' => $type ), '<a href="/?p=5" rel="prev">&lt;</a> <a href="/?p=1">*1*</a> ... <a href="/?p=5">*5*</a> <a rel="self">[*6*]</a> ... <a href="/?p=7" rel="next">&gt;</a>', 'Unknown page number 6');
+is($c->pagination( 120, -1, '/?p={page}' => $type ), '<a href="/?p=119" rel="prev">&lt;</a> <a href="/?p=1">*1*</a> ... <a href="/?p=119">*119*</a> <a rel="self">[*120*]</a> ... <a href="/?p=121" rel="next">&gt;</a>', 'Unknown page number 120');
+
+
+is($c->pagination(2, 3, $type), '<a href="1" rel="prev">&lt;</a> <a href="1">*1*</a> <a rel="self">[*2*]</a> <a href="3">*3*</a> <a href="3" rel="next">&gt;</a>');
+
+is($c->pagination(1, 1, $type), '<a rel="prev">&lt;</a> <a rel="self">[*1*]</a> <a rel="next">&gt;</a>');
+is($c->pagination(1, 2, $type), '<a rel="prev">&lt;</a> <a rel="self">[*1*]</a> <a href="2">*2*</a> <a href="2" rel="next">&gt;</a>');
+is($c->pagination(2, 2, $type), '<a href="1" rel="prev">&lt;</a> <a href="1">*1*</a> <a rel="self">[*2*]</a> <a rel="next">&gt;</a>');
+is($c->pagination(1, 3, $type), '<a rel="prev">&lt;</a> <a rel="self">[*1*]</a> <a href="2">*2*</a> <a href="3">*3*</a> <a href="2" rel="next">&gt;</a>');
+is($c->pagination(2, 3, $type), '<a href="1" rel="prev">&lt;</a> <a href="1">*1*</a> <a rel="self">[*2*]</a> <a href="3">*3*</a> <a href="3" rel="next">&gt;</a>');
+is($c->pagination(3, 3, $type), '<a href="2" rel="prev">&lt;</a> <a href="1">*1*</a> <a href="2">*2*</a> <a rel="self">[*3*]</a> <a rel="next">&gt;</a>');
+is($c->pagination(3, 7, $type), '<a href="2" rel="prev">&lt;</a> <a href="1">*1*</a> <a href="2">*2*</a> <a rel="self">[*3*]</a> <a href="4">*4*</a> ... <a href="7">*7*</a> <a href="4" rel="next">&gt;</a>');
+is($c->pagination(0, 8, $type), '<a rel="prev">&lt;</a> <a href="1">*1*</a> <a href="2">*2*</a> <a href="3">*3*</a> ... <a href="8">*8*</a> <a href="1" rel="next">&gt;</a>');
+is($c->pagination(0, 0, $type), '');
+is($c->pagination(0, 1, $type), '<a rel="prev">&lt;</a> <a href="1">*1*</a> <a href="1" rel="next">&gt;</a>');
+is($c->pagination(0, 2, $type), '<a rel="prev">&lt;</a> <a href="1">*1*</a> <a href="2">*2*</a> <a href="1" rel="next">&gt;</a>');
+is($c->pagination(0, 3, $type), '<a rel="prev">&lt;</a> <a href="1">*1*</a> <a href="2">*2*</a> <a href="3">*3*</a> <a href="1" rel="next">&gt;</a>');
 
 done_testing;
 __END__

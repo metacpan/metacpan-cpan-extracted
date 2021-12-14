@@ -11,7 +11,6 @@ $Data::Dumper::Indent=1;
 
 our $VERSION = $NOLookup::VERSION;
 
-
 =head2 result_as_norid_whois_string
 
 Format result as old style Norid whois output.
@@ -173,12 +172,16 @@ sub rdap_ns_obj_as_norid_whois_string {
 	    push @wa, "Additional information:";
 	    my ($create_date, $update_date);
 	    foreach my $event (@events) {
+		# DateTime object is UTC, convert to localtime
+		my $to = $event->date;
+		$to->set_time_zone('Europe/Oslo');
+
 		if ($event->action eq 'registration') {
-		    $create_date = substr(scalar($event->date), 0, 10);
+		    $create_date = substr(scalar($to->date), 0, 10);
 		    push @wa, "Created:         " . $create_date;
 		} else {
-		push @wa, "Last updated:    " . substr(scalar($event->date), 0, 10);
-		$update_date = 1;
+		    push @wa, "Last updated:    " . substr(scalar($to->date), 0, 10);
+		    $update_date = 1;
 		}
 	    }
 	    unless ($update_date) {
@@ -630,11 +633,15 @@ sub rdap_domain_obj_as_norid_whois_string {
 	    push @wa, "Additional information:";
 	    my ($create_date, $update_date);
 	    foreach my $event (@events) {
-		if ($event->action eq 'registration') {
-		    $create_date = substr(scalar($event->date), 0, 10);
+		# DateTime object is UTC, convert to localtime
+		my $to = $event->date;
+		$to->set_time_zone('Europe/Oslo');
+
+		if ($event->action eq 'registration') {	
+		    $create_date = substr(scalar($to->date), 0, 10);
 		    push @wa, "Created:         " . $create_date;
 		} else {
-		    push @wa, "Last updated:    " . substr(scalar($event->date), 0, 10);
+		    push @wa, "Last updated:    " . substr(scalar($to->date), 0, 10);
 		    $update_date = 1;
 		}
 	    }
@@ -675,13 +682,15 @@ sub rdap_events_as_norid_whois_string {
 	push @wa, "Additional information:";
 	my ($create_date, $update_date);
 	foreach my $event (@events) {
-
+	    # DateTime object is UTC, convert to localtime
+	    my $to = $event->date;
+	    $to->set_time_zone('Europe/Oslo');
 
 	    if ($event->action eq 'registration') {
-		$create_date = substr(scalar($event->date), 0, 10);
+		$create_date = substr(scalar($to->date), 0, 10);
 		push @wa, "Created:         " . $create_date;
 	    } else {
-		push @wa, "Last updated:    " . substr(scalar($event->date), 0, 10);
+		push @wa, "Last updated:    " . substr(scalar($to->date), 0, 10);
 		$update_date = 1;
 	    }
 	}

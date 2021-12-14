@@ -35,7 +35,7 @@ use constant EXCEPTION        => 'Template::Exception';
 use constant BADGER_EXCEPTION => 'Badger::Exception';
 use constant MSWin32          => $^O eq 'MSWin32';
 
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $DEBUG_FORMAT = "\n## \$file line \$line : [% \$text %] ##\n";
 our $VIEW_CLASS   = 'Template::View';
@@ -925,40 +925,6 @@ sub _init {
 
     return $self;
 }
-
-
-#------------------------------------------------------------------------
-# _dump()
-#
-# Debug method which returns a string representing the internal state
-# of the context object.
-#------------------------------------------------------------------------
-
-sub _dump {
-    my $self = shift;
-    my $output = "[Template::Context] {\n";
-    my $format = "    %-16s => %s\n";
-    my $key;
-
-    foreach $key (qw( RECURSION EVAL_PERL TRIM )) {
-    $output .= sprintf($format, $key, $self->{ $key });
-    }
-    foreach my $pname (qw( LOAD_TEMPLATES LOAD_PLUGINS LOAD_FILTERS )) {
-    my $provtext = "[\n";
-    foreach my $prov (@{ $self->{ $pname } }) {
-        $provtext .= $prov->_dump();
-#       $provtext .= ",\n";
-    }
-    $provtext =~ s/\n/\n        /g;
-    $provtext =~ s/\s+$//;
-    $provtext .= ",\n    ]";
-    $output .= sprintf($format, $pname, $provtext);
-    }
-    $output .= sprintf($format, STASH => $self->{ STASH }->_dump());
-    $output .= '}';
-    return $output;
-}
-
 
 1;
 

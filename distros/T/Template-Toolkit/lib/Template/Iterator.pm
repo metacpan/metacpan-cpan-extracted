@@ -31,7 +31,7 @@ use Scalar::Util qw(blessed);
 use constant ODD  => 'odd';
 use constant EVEN => 'even';
 
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $AUTOLOAD;
 
@@ -251,33 +251,6 @@ sub AUTOLOAD {
 
     return $self->{ uc $item };
 }
-
-
-#========================================================================
-#                   -----  PRIVATE DEBUG METHODS -----
-#========================================================================
-
-#------------------------------------------------------------------------
-# _dump()
-#
-# Debug method which returns a string detailing the internal state of 
-# the iterator object.
-#------------------------------------------------------------------------
-
-sub _dump {
-    my $self = shift;
-    join('',
-         "  Data: ", $self->{ _DATA  }, "\n",
-         " Index: ", $self->{ INDEX  }, "\n",
-         "Number: ", $self->{ NUMBER }, "\n",
-         "   Max: ", $self->{ MAX    }, "\n",
-         "  Size: ", $self->{ SIZE   }, "\n",
-         " First: ", $self->{ FIRST  }, "\n",
-         "  Last: ", $self->{ LAST   }, "\n",
-         "\n"
-     );
-}
-
 
 1;
 

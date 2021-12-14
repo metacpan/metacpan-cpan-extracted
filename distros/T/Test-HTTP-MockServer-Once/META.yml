@@ -1,0 +1,32 @@
+---
+abstract: 'Implement a one shot mock HTTP server for use in tests'
+author:
+  - 'Ian Gibbs <igibbs@cpan.net>'
+build_requires:
+  Async: '0'
+  LWP::UserAgent: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-HTTP-MockServer-Once
+provides:
+  Test::HTTP::MockServer::Once:
+    file: lib/Test/HTTP/MockServer/Once.pm
+    version: v0.0.2
+  Test::HTTP::MockServer::Once::REST:
+    file: lib/Test/HTTP/MockServer/Once/REST.pm
+requires:
+  HTTP::Parser: '0'
+  HTTP::Response: '0'
+  JSON::XS: '0'
+  Storable: '0'
+resources:
+  license: http://www.apache.org/licenses/LICENSE-2.0.txt
+  repository: https://github.com/realflash/Test-HTTP-MockServer-Once
+version: v0.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 package Sah::SchemaR::cpan::pause_id;
 
-our $DATE = '2021-01-02'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2021-07-19'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"PERLANCAR",value=>"perlancar"},{summary=>"Too long",valid=>0,value=>"perlancar2"}],match=>qr(\A(?^:[A-Z][A-Z0-9]{1,8})\z),summary=>"PAUSE author ID","x.completion"=>["lcpan_authorid"],"x.perl.coerce_rules"=>["From_str::to_upper"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cpan::pause_id - PAUSE author ID
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2020-01-02.
+This document describes version 0.013 of Sah::SchemaR::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2021-07-19.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-CPAN>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-CPAN/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-CPAN>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

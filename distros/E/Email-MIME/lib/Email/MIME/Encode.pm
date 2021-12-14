@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::MIME::Encode;
 # ABSTRACT: a private helper for MIME header encoding
-$Email::MIME::Encode::VERSION = '1.949';
+$Email::MIME::Encode::VERSION = '1.952';
 use Carp ();
 use Encode ();
 use Email::MIME::Header;
@@ -180,7 +180,17 @@ Email::MIME::Encode - a private helper for MIME header encoding
 
 =head1 VERSION
 
-version 1.949
+version 1.952
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 AUTHORS
 
@@ -188,7 +198,7 @@ version 1.949
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =item *
 

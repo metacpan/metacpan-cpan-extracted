@@ -1,0 +1,57 @@
+{
+   "abstract" : "Implement a one shot mock HTTP server for use in tests",
+   "author" : [
+      "Ian Gibbs <igibbs@cpan.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-HTTP-MockServer-Once",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Parser" : "0",
+            "HTTP::Response" : "0",
+            "JSON::XS" : "0",
+            "Storable" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Async" : "0",
+            "LWP::UserAgent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::HTTP::MockServer::Once" : {
+         "file" : "lib/Test/HTTP/MockServer/Once.pm",
+         "version" : "v0.0.2"
+      },
+      "Test::HTTP::MockServer::Once::REST" : {
+         "file" : "lib/Test/HTTP/MockServer/Once/REST.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/realflash/Test-HTTP-MockServer-Once"
+      }
+   },
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

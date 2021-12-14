@@ -54,6 +54,7 @@
             "IO::Scalar" : "2.113",
             "IPC::SysV" : "2.09",
             "JSON" : "4.03",
+            "JSON::XS" : "4.03",
             "List::Util" : "1.56",
             "Module::Metadata" : "1.000037",
             "Nice::Try" : "v1.1.2",
@@ -61,7 +62,7 @@
             "POSIX" : "1.53_01",
             "Regexp::Common" : "2017060201",
             "Scalar::Util" : "1.50",
-            "Storable" : "3.15",
+            "Storable" : "3.25",
             "Sub::Util" : "1.54",
             "Tie::Hash" : "1.05",
             "URI::Escape" : "5.09",
@@ -101,6 +102,6 @@
          "web" : "https://git.deguest.jp/jack/Module-Generic"
       }
    },
-   "version" : "v0.18.2",
+   "version" : "v0.18.3",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

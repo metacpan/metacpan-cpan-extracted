@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Email::MIME;
 # ABSTRACT: easy MIME message handling
-$Email::MIME::VERSION = '1.949';
+$Email::MIME::VERSION = '1.952';
 use Email::Simple 2.212; # nth header value
 use parent qw(Email::Simple);
 
@@ -410,7 +410,7 @@ sub parts_multipart {
   # body.  This is a horrible hack, although it's debatable whether it was
   # better or worse when it was $self->{body} = shift @bits ... -- rjbs,
   # 2006-11-27
-  $self->SUPER::body_set(shift @bits) if ($bits[0] || '') !~ /.*:.*/;
+  $self->SUPER::body_set(shift @bits) if index(($bits[0] || ''), ':') == -1;
 
   my $bits = @bits;
 
@@ -449,7 +449,7 @@ sub filename {
   my ($self, $force) = @_;
   return $gcache{$self} if exists $gcache{$self};
 
-  my $dis = $self->header("Content-Disposition") || '';
+  my $dis = $self->header_raw("Content-Disposition") || '';
   my $attrs = parse_content_disposition($dis)->{attributes};
   my $name = $attrs->{filename}
     || $self->{ct}{attributes}{name};
@@ -940,7 +940,7 @@ Email::MIME - easy MIME message handling
 
 =head1 VERSION
 
-version 1.949
+version 1.952
 
 =head1 SYNOPSIS
 
@@ -1031,6 +1031,16 @@ This is an extension of the L<Email::Simple> module, to handle MIME
 encoded messages. It takes a message as a string, splits it up into its
 constituent parts, and allows you access to various parts of the
 message. Headers are decoded from MIME encoding.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -1365,7 +1375,7 @@ This module was generously sponsored by Best Practical
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =item *
 
@@ -1379,7 +1389,7 @@ Simon Cozens <simon@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Vandiver Anirvan Chatterjee Arthur Axel 'fREW' Schmidt Brian Cassidy Damian Lukowski Dan Book David Steinbrunner Dotan Dimet dxdc Eric Wong Geraint Edwards Jesse Luehrs Kurt Anderson Lance A. Brown Matthew Horsfall (alh) memememomo Michael McClimon Pali Ricardo Signes Shawn Sorichetti Tomohiro Hosaka
+=for stopwords Alex Vandiver Anirvan Chatterjee Arthur Axel 'fREW' Schmidt Brian Cassidy Damian Lukowski Dan Book David Steinbrunner Dotan Dimet dxdc Eric Wong Geraint Edwards ivulfson Jesse Luehrs Kurt Anderson Lance A. Brown Matthew Horsfall memememomo Michael McClimon Mishrakk Pali Shawn Sorichetti Tomohiro Hosaka
 
 =over 4
 
@@ -1429,6 +1439,10 @@ Geraint Edwards <gedge-oss@yadn.org>
 
 =item *
 
+ivulfson <9122139+ivulfson@users.noreply.github.com>
+
+=item *
+
 Jesse Luehrs <doy@tozt.net>
 
 =item *
@@ -1441,7 +1455,7 @@ Lance A. Brown <lance@bearcircle.net>
 
 =item *
 
-Matthew Horsfall (alh) <wolfsage@gmail.com>
+Matthew Horsfall <wolfsage@gmail.com>
 
 =item *
 
@@ -1453,11 +1467,11 @@ Michael McClimon <michael@mcclimon.org>
 
 =item *
 
-Pali <pali@cpan.org>
+Mishrakk <48946018+Mishrakk@users.noreply.github.com>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Pali <pali@cpan.org>
 
 =item *
 

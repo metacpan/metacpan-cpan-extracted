@@ -56,7 +56,7 @@ __DATA__
 <html>
 <head>
   <title>PAC file tester</title>
-  %= stylesheet "//unpkg.com/purecss@1.0.0/build/pure-min.css"
+  %= stylesheet '//unpkg.com/purecss@1.0.0/build/pure-min.css'
   %= stylesheet begin
     form { max-width: 50em; margin: 3em auto; }
     textarea { height: 18em; }

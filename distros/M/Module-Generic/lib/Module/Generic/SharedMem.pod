@@ -103,7 +103,7 @@ Module::Generic::SharedMem - Shared Memory Manipulation
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 

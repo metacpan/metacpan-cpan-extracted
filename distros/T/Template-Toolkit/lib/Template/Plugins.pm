@@ -28,7 +28,7 @@ use warnings;
 use base 'Template::Base';
 use Template::Constants;
 
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $PLUGIN_BASE = 'Template::Plugin';
 our $STD_PLUGINS = {
@@ -253,40 +253,6 @@ sub _load {
         return (undef, Template::Constants::STATUS_DECLINED);
     }
 }
-
-
-#------------------------------------------------------------------------
-# _dump()
-# 
-# Debug method which constructs and returns text representing the current
-# state of the object.
-#------------------------------------------------------------------------
-
-sub _dump {
-    my $self = shift;
-    my $output = "[Template::Plugins] {\n";
-    my $format = "    %-16s => %s\n";
-    my $key;
-
-    foreach $key (qw( TOLERANT LOAD_PERL )) {
-        $output .= sprintf($format, $key, $self->{ $key });
-    }
-
-    local $" = ', ';
-    my $fkeys = join(", ", keys %{$self->{ FACTORY }});
-    my $plugins = $self->{ PLUGINS };
-    $plugins = join('', map { 
-        sprintf("    $format", $_, $plugins->{ $_ });
-    } keys %$plugins);
-    $plugins = "{\n$plugins    }";
-    
-    $output .= sprintf($format, 'PLUGIN_BASE', "[ @{ $self->{ PLUGIN_BASE } } ]");
-    $output .= sprintf($format, 'PLUGINS', $plugins);
-    $output .= sprintf($format, 'FACTORY', $fkeys);
-    $output .= '}';
-    return $output;
-}
-
 
 1;
 

@@ -2,8 +2,8 @@ NAME
     App::URIInfoUtils - Utilities related to URI::Info
 
 VERSION
-    This document describes version 0.002 of App::URIInfoUtils (from Perl
-    distribution App-URIInfoUtils), released on 2021-10-17.
+    This document describes version 0.003 of App::URIInfoUtils (from Perl
+    distribution App-URIInfoUtils), released on 2021-11-26.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -17,6 +17,64 @@ FUNCTIONS
      uri_info(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Extract information from one or more URIs.
+
+    Examples:
+
+    *   Example #1:
+
+         uri_info(
+           uris => [
+             "https://www.tokopedia.com/search?st=product&q=comic%20books",
+           ]
+         );
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             {
+               host => "www.tokopedia.com",
+               is_search => 1,
+               search_query => "comic books",
+               search_type => "product",
+               url => "https://www.tokopedia.com/search?st=product&q=comic%20books",
+             },
+           ],
+           {},
+         ]
+
+    *   Example #2:
+
+         uri_info(
+           uris => [
+             "https://www.google.com/search?client=firefox-b-d&q=how+much+drink+water+everyday",
+             "https://www.youtube.com/results?search_query=alkaline+water",
+           ]
+         );
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             {
+               host => "www.google.com",
+               is_search => 1,
+               search_query => "how much drink water everyday",
+               search_source => "google",
+               search_type => "search",
+               url => "https://www.google.com/search?client=firefox-b-d&q=how+much+drink+water+everyday",
+             },
+             {
+               host => "www.youtube.com",
+               url  => "https://www.youtube.com/results?search_query=alkaline+water",
+             },
+           ],
+           {},
+         ]
 
     This function is not exported.
 

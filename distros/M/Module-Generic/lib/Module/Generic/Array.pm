@@ -521,9 +521,23 @@ sub remove
     CORE::return( $self );
 }
 
+sub replace
+{
+    my $self = CORE::shift( @_ );
+    my( $old, $new ) = @_;
+    my $pos = $self->pos( $old );
+    return if( !defined( $pos ) );
+    $self->[ $pos ] = $new;
+    return( $self );
+}
+
 sub reset
 {
     my $self = CORE::shift( @_ );
+    if( @_ )
+    {
+        warn( "Warning only: ", ref( $self ), "::reset() called with ", scalar( @_ ), " arguments, but I was not expecting any. Called from package \"", [caller]->[0], "\" at line ", [caller]->[2], " from subroutine ", [caller]->[3], "\n" );
+    }
     @$self = ();
     CORE::return( $self );
 }

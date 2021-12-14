@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::MIME::Header;
 # ABSTRACT: the header of a MIME message
-$Email::MIME::Header::VERSION = '1.949';
+$Email::MIME::Header::VERSION = '1.952';
 use parent 'Email::Simple::Header';
 
 use Carp ();
@@ -143,7 +143,7 @@ Email::MIME::Header - the header of a MIME message
 
 =head1 VERSION
 
-version 1.949
+version 1.952
 
 =head1 DESCRIPTION
 
@@ -180,13 +180,23 @@ module due to L<bugs in MIME-Header|Encode::MIME::Header/BUGS>.
 Alternately, if you have Unicode (character) strings to set in headers, use the
 C<header_str_set> method.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHORS
 
 =over 4
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =item *
 

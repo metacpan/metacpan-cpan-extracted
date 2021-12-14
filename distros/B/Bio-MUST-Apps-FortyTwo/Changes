@@ -1,3 +1,11 @@
+0.213470  2021-12-14 00:07:07+01:00 Europe/Brussels
+    - Additions
+      - 42: New command-line option --outdir in debrief-42.pl and yaml-generator-42.pl
+      - 42: New script prune-outliers.pl (aka clean-OGs.pl)
+    - Fixes
+      - 42: Fixed bug where merge_orthologues: on was not honored if ref_brf: off
+      - 42: Removed repeated loading of NCBI Taxonomy in multithreading mode
+
 0.210570  2021-02-27 00:21:16+01:00 Europe/Brussels
     - Additions
       - 42: Documented metagenomic run_mode in the Manual

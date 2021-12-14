@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2::Dummy::Request.
+
+0.01  Wed Dec  9 17:44:42 2020
+	- original version; created by h2xs 1.23 with options
+		-X -n Apache2::Dummy::Request
+

@@ -4,19 +4,19 @@
       "Rocco Caputo <rcaputo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IO-Pipely",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -28,20 +28,20 @@
       },
       "runtime" : {
          "requires" : {
-            "Exporter" : "5.68",
-            "Fcntl" : "1.06",
-            "IO::Socket" : "1.31",
-            "Symbol" : "1.06",
-            "base" : "2.18",
+            "Exporter" : "5.72",
+            "Fcntl" : "1.13",
+            "IO::Socket" : "1.38",
+            "Symbol" : "1.08",
+            "base" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Carp" : "1.26",
-            "Scalar::Util" : "1.29",
-            "Test::More" : "0.98",
+            "Carp" : "1.42",
+            "Scalar::Util" : "1.46_02",
+            "Test::More" : "1.302120",
             "perl" : "5.004"
          }
       }
@@ -62,6 +62,9 @@
          "web" : "https://github.com/rcaputo/io-pipely"
       }
    },
-   "version" : "0.005"
+   "version" : "0.006",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

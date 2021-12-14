@@ -1,4 +1,8 @@
 Revision history for DBD-Phoenix
 
+0.2.0  2021-12-14
+    - Fixed bug with wrong number or arguments
+    - Added last_insert_id method
+
 0.01.0  2021-12-13
     - First release.

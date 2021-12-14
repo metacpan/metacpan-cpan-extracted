@@ -30,7 +30,7 @@ use Config ();
 
 use constant HAS_SETLOCALE => $Config::Config{d_setlocale};
 
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 our $FORMAT  = '%H:%M:%S %d-%b-%Y';    # default strftime() format
 our @LOCALE_SUFFIX = qw( .ISO8859-1 .ISO_8859-15 .US-ASCII .UTF-8 );
 
@@ -57,6 +57,19 @@ sub now {
     return time();
 }
 
+sub _strftime {
+    my ( @args ) = @_;
+
+    my $str = POSIX::strftime( @args );
+
+    # POSIX.pm now utf8-flags the output of strftime since perl 5.22
+    if ( $] < 5.022 ) {
+        require Encode;
+        Encode::_utf8_on( $str );
+    }
+
+    return $str;
+}
 
 #------------------------------------------------------------------------
 # format()                           
@@ -152,11 +165,11 @@ sub format {
                 last;
             }
         }
-        $datestr = &POSIX::strftime($format, @date);
+        $datestr = _strftime($format, @date);
         &POSIX::setlocale(&POSIX::LC_ALL, $old_locale) if HAS_SETLOCALE;
     }
     else {
-        $datestr = &POSIX::strftime($format, @date);
+        $datestr = _strftime($format, @date);
     }
 
     return $datestr;

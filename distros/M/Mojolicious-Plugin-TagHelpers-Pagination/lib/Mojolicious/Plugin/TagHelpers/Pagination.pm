@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Scalar::Util 'blessed';
 use POSIX 'ceil';
 
-our $VERSION = 0.09;
+our $VERSION = '0.10';
 
 our @value_list =
   qw/prev
@@ -15,7 +15,8 @@ our @value_list =
      page_end
      separator
      ellipsis
-     placeholder/;
+     placeholder
+     num_format/;
 
 # Register plugin
 sub register {
@@ -70,7 +71,8 @@ sub pagination {
 
   # $_[0] = current page
   # $_[1] = page count or -1
-  # $_[2] = template or Mojo::URL
+  # $_[2] = template or Mojo::URL or override types hash
+  # $_[3] = override types
 
   return '' unless $_[1];
 
@@ -83,8 +85,17 @@ sub pagination {
     map { $_ => $self->{$_} } @value_list;
 
   # Overwrite plugin defaults
+  my $overwrite;
+  my $t = $_[2]; # Template
   if ($_[3] && ref $_[3] eq 'HASH') {
-    my $overwrite = $_[3];
+    $overwrite = $_[3];
+  } elsif ($_[2] && ref $_[2] eq 'HASH') {
+    $overwrite = $_[2];
+    $t = undef;
+  };
+
+  # Values need to be overwritten
+  if ($overwrite) {
     foreach (@value_list) {
       $values{$_}  = $overwrite->{$_} if defined $overwrite->{$_};
     };
@@ -97,13 +108,19 @@ sub pagination {
     };
   };
 
+  my $nf;
+  if (exists $values{num_format} && ref $values{num_format} ne 'CODE') {
+    delete $values{num_format};
+  } else {
+    $nf = $values{num_format}
+  };
+
   # Establish string variables
   my ($p, $n, $cs, $ce, $ps, $pe, $s, $el, $ph) = @values{@value_list};
   # prev next current_start current_end
   # page_start page_end separator ellipsis placeholder
 
   # Template
-  my $t = $_[2];
   if (blessed $t && blessed $t eq 'Mojo::URL') {
     $t = $t->to_string;
     $t =~ s/\%7[bB]$ph\%7[dD]/{$ph}/g;
@@ -125,30 +142,30 @@ sub pagination {
     # The current page is 1
     if ($_[0] == 1){
       $e .= $sub->(undef, [$p, 'prev']) . $s .
-	    $sub->(undef, [$cs . 1  . $ce, 'self']) . $s .
-	    $sub->('2') . $s .
-	    $sub->('3') . $s;
+	    $sub->(undef, [$cs . ($nf ? $nf->(1) : 1) . $ce, 'self']) . $s .
+	    $sub->('2', $nf) . $s .
+	    $sub->('3', $nf) . $s;
     }
 
     # < #1 #2 #3
     # The current page is 0
     elsif ($_[0] == 0) {
       $e .= $sub->(undef, [$p, 'prev']) . $s;
-      $e .= $sub->($_) . $s foreach (1 .. 3);
+      $e .= $sub->($_, $nf) . $s foreach (1 .. 3);
     }
 
     # #< #1
     # The current page is anywhere
     else {
       $e .= $sub->(($_[0] - 1), [$p, 'prev']) . $s .
-            $sub->('1') . $s;
+            $sub->('1', $nf) . $s;
     };
 
     # [2] #3
     # The current page is 2
     if ($_[0] == 2) {
-      $e .= $sub->(undef, [$cs . 2 . $ce, 'self']) . $s .
-	    $sub->('3') . $s;
+      $e .= $sub->(undef, [$cs . ($nf ? $nf->(2) : 2) . $ce, 'self']) . $s .
+	    $sub->('3', $nf) . $s;
     }
 
     # ...
@@ -157,12 +174,15 @@ sub pagination {
       $e .= $el . $s;
     };
 
+    # The current symbol
+    my $csym = $cs . ($nf ? $nf->($_[0]) : $_[0]) . $ce;
+
     # #x-1 [x] #x+1
     # The current page is beyond 2 and there are at least 2 pages to go
     if (($_[0] >= 3) && ($_[0] <= ($_[1] - 2))) {
-      $e .= $sub->($_[0] - 1) . $s .
-	    $sub->(undef, [$cs .$_[0] . $ce, 'self']) . $s .
-	    $sub->($_[0] + 1) . $s;
+      $e .= $sub->($_[0] - 1, $nf) . $s .
+	    $sub->(undef, [$csym, 'self']) . $s .
+	    $sub->($_[0] + 1, $nf) . $s;
     };
 
     # ...
@@ -173,31 +193,31 @@ sub pagination {
 
     # The current page is prefinal
     if ($_[0] == ($_[1] - 1)){
-      $e .= $sub->($_[1] - 2) . $s .
-	    $sub->(undef, [$cs . $_[0] . $ce, 'self']) . $s .
-	      $sub->($_[1]) . $s .
+      $e .= $sub->($_[1] - 2, $nf) . $s .
+	    $sub->(undef, [$csym, 'self']) . $s .
+	      $sub->($_[1], $nf) . $s .
 	      $sub->($_[1], [$n, 'next']);
     }
 
     # The current page is final
     elsif ($_[0] == $_[1]) {
-      $e .= $sub->($_[0] - 1) . $s .
-            $sub->(undef, [$cs . $_[0] . $ce, 'self']) . $s .
+      $e .= $sub->($_[0] - 1, $nf) . $s .
+            $sub->(undef, [$csym, 'self']) . $s .
 	    $sub->(undef, [$n, 'next']);
     }
 
     # Number is unknown
     elsif ($_[1] == -1) {
-      $e .= $sub->($_[0] - 1) . $s .
-            $sub->(undef, [$cs . $_[0] . $ce, 'self']) . $s .
+      $e .= $sub->($_[0] - 1, $nf) . $s .
+            $sub->(undef, [$csym, 'self']) . $s .
 	    $el . $s .
 	    $sub->($_[0] + 1, [$n, 'next']);
     }
 
     # Number is anywhere in between
     else {
-      $e .= $sub->($_[1]) . $s .
-	      $sub->(($_[0] + 1), [$n, 'next']);
+      $e .= $sub->($_[1], $nf) . $s .
+	      $sub->($_[0] + 1, [$n, 'next']);
     };
   }
 
@@ -206,7 +226,7 @@ sub pagination {
 
     # Previous
     if ($_[0] > 1){
-      $e .= $sub->(($_[0] - 1), [$p, 'prev']) . $s;
+      $e .= $sub->($_[0] - 1, [$p, 'prev']) . $s;
     } else {
       $e .= $sub->(undef, [$p, 'prev']) . $s;
     };
@@ -214,12 +234,15 @@ sub pagination {
     # All numbers in between
     while ($counter <= $_[1] || ($_[1] == -1 && $counter <= $_[0])){
       if ($_[0] != $counter) {
-        $e .= $sub->($counter) . $s;
+        $e .= $sub->($counter, $nf) . $s;
       }
 
       # Current
       else {
-        $e .= $sub->(undef, [$cs . $counter . $ce, 'self']) . $s;
+        $e .= $sub->(
+          undef,
+          [$cs . ($nf ? $nf->($counter) : $counter) . $ce, 'self']
+        ) . $s;
       };
 
       $counter++;
@@ -230,7 +253,7 @@ sub pagination {
 
     # Next
     if ($_[0] != $_[1]){
-      $e .= $sub->(($_[0] + 1), [$n, 'next']);
+      $e .= $sub->($_[0] + 1, [$n, 'next']);
     }
 
     else {
@@ -265,7 +288,10 @@ sub sublink_gen {
 
   $s .= q!my$n=$_[1]||! . _quote($ps) . '.$_[0].' . _quote($pe) . ';' .
         q{my $rel='';} .
-	q{if(ref $n){$rel=' rel="'.$n->[1].'"';$n=$n->[0]};} .
+	q'if(ref $n){' . 
+        q!if(ref $n eq'ARRAY'){!.
+        q!$rel=' rel="'.$n->[1].'"';$n=$n->[0]! .
+        q!}else{$n=! . _quote($ps) . '.$n->($_[0]).' . _quote($pe)  .  '}};' .
         q!if($url){$url=~s/&/&amp;/g;! .
         q{$url=~s/</&lt;/g;} .
 	q{$url=~s/>/&gt;/g;} .
@@ -412,6 +438,15 @@ Placeholder symbol for hidden pages. Defaults to C<...>.
 =item next
 
 Symbol for next pages. Defaults to C<&gt;>.
+
+
+=item num_format
+
+Callback for visualizing page numbers. The page number
+is passed as the first parameter to C<num_format> and
+a returned string value is expected.
+
+B<This parameter is EXPERIMENTAL and may change without warning.>
 
 
 =item page

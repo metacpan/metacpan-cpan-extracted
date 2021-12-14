@@ -78,6 +78,6 @@
          "web" : "https://git.deguest.jp/jack/Cookie"
       }
    },
-   "version" : "v0.1.6",
+   "version" : "v0.1.7",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

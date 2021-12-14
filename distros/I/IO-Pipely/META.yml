@@ -3,30 +3,33 @@ abstract: 'Portably create pipe() or pipe-like handles, one way or another.'
 author:
   - 'Rocco Caputo <rcaputo@cpan.org>'
 build_requires:
-  Carp: 1.26
-  Scalar::Util: 1.29
-  Test::More: 0.98
-  perl: 5.004
+  Carp: '1.42'
+  Scalar::Util: 1.46_02
+  Test::More: '1.302120'
+  perl: '5.004'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IO-Pipely
 requires:
-  Exporter: 5.68
-  Fcntl: 1.06
-  IO::Socket: 1.31
-  Symbol: 1.06
-  base: 2.18
-  strict: 0
-  warnings: 0
+  Exporter: '5.72'
+  Fcntl: '1.13'
+  IO::Socket: '1.38'
+  Symbol: '1.08'
+  base: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Pipely
   homepage: http://search.cpan.org/dist/IO-Pipely/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/rcaputo/io-pipely.git
-version: 0.005
+version: '0.006'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

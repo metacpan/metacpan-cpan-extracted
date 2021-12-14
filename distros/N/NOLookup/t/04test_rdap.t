@@ -51,7 +51,7 @@ my @doms = (
 #
 ############
 
-my $service_url = $ENV{RDAP_SERVICE_URL} || 'https://rdap.test.norid.no';
+my $service_url = $ENV{RDAP_SERVICE_URL} || 'https://rdap.norid.no';
 
 unless ($service_url) {
     ok(1, "No service URL set, aborting tests");

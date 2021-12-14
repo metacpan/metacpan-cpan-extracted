@@ -1,5 +1,12 @@
 Revision history for Perl extension NOLookup
 
+1.24 2020-12-14
+     - Force RDAP date events to be displayed in timezone
+       'Europe/Oslo'.
+
+1.23 2020-12-13
+     - Catch exception on decode_json() and return with an error.
+
 1.22 2020-12-03
      - Use IO::Socket::INET6 to support also ipv6 only services for
        whois and das lookups.

@@ -17,11 +17,11 @@ App::VOJournal::VOTL - deal with vimoutliner files
 
 =head1 VERSION
 
-Version v0.4.5
+Version v0.4.6
 
 =cut
 
-use version; our $VERSION = qv('v0.4.5');
+use version; our $VERSION = qv('v0.4.6');
 
 =head1 SYNOPSIS
 

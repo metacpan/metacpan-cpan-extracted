@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,11 +21,12 @@ name: Task-BeLike-SHLOMIF
 provides:
   Task::BeLike::SHLOMIF:
     file: lib/Task/BeLike/SHLOMIF.pm
-    version: v0.0.8
+    version: v0.0.9
 requires:
   App::CSV2Chart: '0'
   App::Countdown: '0'
   App::Deps::Verify: '0'
+  App::Docmake: '0'
   App::Du::Analyze: '0'
   App::Gezer: '0'
   App::Git::Info: '0'
@@ -33,6 +34,7 @@ requires:
   App::Notifier::Client: '0'
   App::Notifier::Service: '0'
   App::Sky: '0'
+  App::Tac_n: '0'
   App::Timestamper: '0'
   App::Timestamper::Format: '0'
   App::Timestamper::WithElapsed: '0'
@@ -40,7 +42,9 @@ requires:
   App::intrunningsum: '0'
   App::intsum: '0'
   App::prefixintsumcol: '0'
+  App::rshasum: '0'
   App::stopw: '0'
+  App::xspf2m3u: '0'
   Bit::Vector: '0'
   Carp::Always: '0'
   Devel::LineTrace: '0'
@@ -50,10 +54,13 @@ requires:
   Dist::Zilla::Plugin::Keywords: '0'
   Dist::Zilla::PluginBundle::SHLOMIF: '0'
   Docker::CLI::Wrapper: '0'
+  File::Dir::Dumper: '0'
   GD: '0'
   HTML::Links::Localize: '0'
   Image::Size: '0'
   Math::Random::MT: '0'
+  Module::Format: '0'
+  Module::Format::AsHTML: '0'
   Perl::Tidy: '0'
   Pod::Coverage::TrustPod: '0'
   Pod::Xhtml: '0'
@@ -72,7 +79,7 @@ resources:
   bugtracker: https://github.com/shlomif/task-belike-shlomif/issues
   homepage: http://metacpan.org/release/Task-BeLike-SHLOMIF
   repository: https://github.com/shlomif/Task-BeLike-SHLOMIF.git
-version: 0.0.8
+version: 0.0.9
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -84,15 +91,15 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@Filter/TestMoreDoneTesting'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Filter/AutoPrereqs'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -105,27 +112,27 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Filter/GatherDir'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/License'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/ManifestSkip'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/MetaYAML'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/Readme'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -136,7 +143,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/ShareDir'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Filter/CheckChangesHasContent'
@@ -144,19 +151,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/ConfirmRelease'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/Manifest'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Filter/MetaConfig'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -165,7 +172,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.023'
+              version: '6.024'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -180,26 +187,26 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Filter/MetaResources'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ModuleBuild
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Filter/ModuleBuild'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Filter/PkgVersion'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Filter/PodCoverageTests'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -255,7 +262,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/TestRelease'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::TaskWeaver
       name: '@Filter/TaskWeaver'
@@ -263,15 +270,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: PruneCruft
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -282,52 +289,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.023'
+      version: '6.024'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.023'
+    version: '6.024'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

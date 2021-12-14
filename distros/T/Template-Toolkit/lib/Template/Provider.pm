@@ -55,7 +55,7 @@ use constant NEXT    => 4;   # link to next item in cache linked list
 use constant STAT    => 5;   # Time last stat()ed
 use constant MSWin32 => $^O eq 'MSWin32';
 
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $ERROR   = '';
 
@@ -146,9 +146,6 @@ sub fetch {
             ? $self->_fetch_path($name)
             : (undef, Template::Constants::STATUS_DECLINED);
     }
-
-#    $self->_dump_cache()
-#       if $DEBUG > 1;
 
     return ($data, $error);
 }
@@ -373,7 +370,10 @@ sub _init {
             next if ref $dir;
             my $wdir = $dir;
             $wdir =~ tr[:][]d if MSWin32;
-            $wdir = each %{ { $wdir => undef } } if ${^TAINT};    #untaint
+            {
+                no warnings 'syntax';
+                $wdir = each %{ { $wdir => undef } } if ${^TAINT};    #untaint
+            }
             $wdir = File::Spec->catfile($cdir, $wdir);
             File::Path::mkpath($wdir) unless -d $wdir;
         }
@@ -872,7 +872,10 @@ sub _compile {
         # write the Perl code to the file $compfile, if defined
         if ($compfile) {
             my $basedir = &File::Basename::dirname($compfile);
-            $basedir = each %{ { $basedir => undef } } if ${^TAINT};    #untaint
+            {
+                no warnings 'syntax';
+                $basedir = each %{ { $basedir => undef } } if ${^TAINT};    #untaint
+            }
 
             unless (-d $basedir) {
                 eval { File::Path::mkpath($basedir) };
@@ -891,7 +894,10 @@ sub _compile {
             # set atime and mtime of newly compiled file, don't bother
             # if time is undef
             if (!defined($error) && defined $data->{ 'time' }) {
-                my $cfile = each %{ { $compfile => undef } };
+                my $cfile = do {
+                    no warnings 'syntax';
+                    each %{ { $compfile => undef } };
+                };
                 if (!length $cfile) {
                     return("invalid filename: $compfile",
                            Template::Constants::STATUS_ERROR);
@@ -1024,83 +1030,6 @@ sub _modified {
     return $time
          ? $load > $time
          : $load;
-}
-
-#------------------------------------------------------------------------
-# _dump()
-#
-# Debug method which returns a string representing the internal object
-# state.
-#------------------------------------------------------------------------
-
-sub _dump {
-    my $self = shift;
-    my $size = $self->{ SIZE };
-    my $parser = $self->{ PARSER };
-    $parser = $parser ? $parser->_dump() : '<no parser>';
-    $parser =~ s/\n/\n    /gm;
-    $size = 'unlimited' unless defined $size;
-
-    my $output = "[Template::Provider] {\n";
-    my $format = "    %-16s => %s\n";
-    my $key;
-
-    $output .= sprintf($format, 'INCLUDE_PATH',
-                       '[ ' . join(', ', @{ $self->{ INCLUDE_PATH } }) . ' ]');
-    $output .= sprintf($format, 'CACHE_SIZE', $size);
-
-    foreach $key (qw( ABSOLUTE RELATIVE TOLERANT DELIMITER
-                      COMPILE_EXT COMPILE_DIR )) {
-        $output .= sprintf($format, $key, $self->{ $key });
-    }
-    $output .= sprintf($format, 'PARSER', $parser);
-
-
-    local $" = ', ';
-    my $lookup = $self->{ LOOKUP };
-    $lookup = join('', map {
-        sprintf("    $format", $_, defined $lookup->{ $_ }
-                ? ('[ ' . join(', ', map { defined $_ ? $_ : '<undef>' }
-                               @{ $lookup->{ $_ } }) . ' ]') : '<undef>');
-    } sort keys %$lookup);
-    $lookup = "{\n$lookup    }";
-
-    $output .= sprintf($format, LOOKUP => $lookup);
-
-    $output .= '}';
-    return $output;
-}
-
-
-#------------------------------------------------------------------------
-# _dump_cache()
-#
-# Debug method which prints the current state of the cache to STDERR.
-#------------------------------------------------------------------------
-
-sub _dump_cache {
-    my $self = shift;
-    my ($node, $lut, $count);
-
-    $count = 0;
-    if ($node = $self->{ HEAD }) {
-        while ($node) {
-            $lut->{ $node } = $count++;
-            $node = $node->[ NEXT ];
-        }
-        $node = $self->{ HEAD };
-        print STDERR "CACHE STATE:\n";
-        print STDERR "  HEAD: ", $self->{ HEAD }->[ NAME ], "\n";
-        print STDERR "  TAIL: ", $self->{ TAIL }->[ NAME ], "\n";
-        while ($node) {
-            my ($prev, $name, $data, $load, $next) = @$node;
-#           $name = '...' . substr($name, -10) if length $name > 10;
-            $prev = $prev ? "#$lut->{ $prev }<-": '<undef>';
-            $next = $next ? "->#$lut->{ $next }": '<undef>';
-            print STDERR "   #$lut->{ $node } : [ $prev, $name, $data, $load, $next ]\n";
-            $node = $node->[ NEXT ];
-        }
-    }
 }
 
 #------------------------------------------------------------------------

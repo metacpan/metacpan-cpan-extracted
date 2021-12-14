@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.18.2
+## Version v0.18.3
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/12/08
+## Modified 2021/12/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -59,7 +59,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.18.2';
+    $VERSION     = 'v0.18.3';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -1095,10 +1095,11 @@ sub error
     my $this = $self->_obj2h;
     if( @_ )
     {
+        $self->message( 4, "Called from package ", [caller]->[0], " at line ", [caller]->[2], " from sub ", [caller(1)]->[3] );
         my $args = {};
         my $o;
-        ## We got an object as first argument. It could be a child from our exception package or from another package
-        ## Either way, we use it as it is
+        # We got an object as first argument. It could be a child from our exception package or from another package
+        # Either way, we use it as it is
         if( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic::Exception' ) ) ||
             Scalar::Util::blessed( $_[0] ) )
         {
@@ -3751,7 +3752,7 @@ sub _set_get_ip : lvalue
         # If the user provided a string, let's check it
         elsif( length( $v ) && !$self->_is_ip( $v ) )
         {
-            my $error = "Value provided is not a valid ip address.";
+            my $error = "Value provided ($v) is not a valid ip address.";
             if( $has_arg eq 'assign' )
             {
                 $self->error( $error );
@@ -3985,6 +3986,7 @@ sub _set_get_object_without_init
             elsif( Scalar::Util::blessed( $_[0] ) )
             {
                 my $o = shift( @_ );
+                $self->message( 4, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
                 return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
                 # XXX Bad idea:
                 # $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
@@ -4883,7 +4885,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.18.2
+    v0.18.3
 
 =head1 DESCRIPTION
 

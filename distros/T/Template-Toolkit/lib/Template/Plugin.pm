@@ -24,7 +24,7 @@ use strict;
 use warnings;
 use base 'Template::Base';
 
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $ERROR   = '';
 our $AUTOLOAD;
@@ -85,35 +85,6 @@ sub fail {
     warn "Template::Plugin::fail() is deprecated at $file line $line.  Please use error()\n";
     $class->error(@_);
 }
-
-
-#========================================================================
-#                      -----  OBJECT METHODS -----
-#========================================================================
-
-#------------------------------------------------------------------------
-# AUTOLOAD
-#
-# General catch-all method which delegates all calls to the _DELEGATE 
-# object.  
-#------------------------------------------------------------------------
-
-sub OLD_AUTOLOAD {
-    my $self     = shift;
-    my $method   = $AUTOLOAD;
-
-    $method =~ s/.*:://;
-    return if $method eq 'DESTROY';
-
-    if (ref $self eq 'HASH') {
-        my $delegate = $self->{ _DELEGATE } || return;
-        return $delegate->$method(@_);
-    }
-    my ($pkg, $file, $line) = caller();
-#    warn "no such '$method' method called on $self at $file line $line\n";
-    return undef;
-}
-
 
 1;
 

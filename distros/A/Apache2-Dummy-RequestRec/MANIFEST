@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Apache2-Dummy-Request.t
+lib/Apache2/Dummy/Request.pm

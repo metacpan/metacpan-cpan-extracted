@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::AliProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::AliProcessor::VERSION = '0.210570';
+$Bio::MUST::Apps::FortyTwo::AliProcessor::VERSION = '0.213470';
 use Moose;
 use namespace::autoclean;
 
@@ -711,7 +711,7 @@ Bio::MUST::Apps::FortyTwo::AliProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 AUTHOR
 

@@ -1,4 +1,7 @@
 Revision history for Avatica-Client
 
+0.002  2021-12-14
+    - Cleaned the release from extraneous files.
+
 0.001  2021-12-13
     - First release.

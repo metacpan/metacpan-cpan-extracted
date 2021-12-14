@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Exception.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/03/20
+## Modified 2021/12/13
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,12 +18,14 @@ BEGIN
     use parent qw( Module::Generic );
     use Scalar::Util;
     use Devel::StackTrace;
-    use overload ('""'     => 'as_string',
-                  '=='     => sub { _obj_eq(@_) },
-                  '!='     => sub { !_obj_eq(@_) },
-                  fallback => 1,
-                 );
-    our( $VERSION ) = 'v1.0.0';
+    use overload (
+        '""'    => 'as_string',
+        '=='    => sub{ _obj_eq(@_) },
+        '!='    => sub{ !_obj_eq(@_) },
+        bool    => sub{ $_[0] },
+        fallback => 1,
+    );
+    our( $VERSION ) = 'v1.0.1';
     our( $CALLER_LEVEL, $CALLER_INTERNAL );
     $CALLER_LEVEL = 0;
     $CALLER_INTERNAL->{'Module::Generic'}++;
@@ -162,9 +164,11 @@ sub as_string
 {
     no overloading;
     my $self = shift( @_ );
+    return( $self->{_cache} ) if( $self->{_cache} );
     my $str = $self->message;
     $str =~ s/\r?\n$//g;
     $str .= sprintf( " within package %s at line %d in file %s\n%s", $self->package, $self->line, $self->file, $self->trace->as_string );
+    $self->{_cache} = $str;
     return( $str );
 }
 

@@ -37,7 +37,7 @@ requires:
 resources:
   bugtracker: https://github.com/skbkontur/perl-dbd-avatica/issues
   repository: git://github.com/skbkontur/perl-dbd-avatica.git
-version: 0.01.0
+version: 0.2.0
 x_contributors:
   - 'Denis Ibaev <dionys@gmail.com>'
 x_generated_by_perl: v5.34.0

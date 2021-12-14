@@ -3,20 +3,25 @@
 # ABSTRACT: Interactive or batch generator for 42 YAML config files
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
 
+# TODO: add support for wordsize (default 3) in BRH phase?
+# TODO: optimize vertical spacing in output (very tricky)
+
 use autodie;
 use Modern::Perl '2011';
 
-use Smart::Comments;
+use Smart::Comments '###';
 use Getopt::Euclid qw(:vars);
 
 use Template;
-use Path::Class;
+use Path::Class qw(dir file);
 use Tie::IxHash;
-use List::AllUtils;
+use List::AllUtils qw(mesh);
 use File::Basename;
 use File::Find::Rule;
 
 use Bio::MUST::Core;
+use aliased 'Bio::MUST::Core::IdList';
+use aliased 'Bio::MUST::Core::IdMapper';
 use aliased 'Bio::MUST::Core::SeqId';
 use aliased 'Bio::MUST::Core::Taxonomy';
 use Bio::FastParsers::Constants qw(:files);
@@ -50,7 +55,7 @@ use IO::Prompter [
 #    black     => [qw< charcoal ebon ebony jet obsidian onyx raven sable slate >],
 #    white     => [qw< alabaster ash chalk ivory milk pearl silver argent >],
 
-
+# TODO: check whether IF/ELSE directives are needed in template pour tax_ args
 
 # define config file template
 my $tt_str = <<'EOT';
@@ -70,13 +75,11 @@ run_mode: [% run_mode %]
 # file by appending a .bak extension to its name.
 out_suffix: [% out_suffix %]
 
-
 # ===Orgs from where to select BLAST queries===
 # Depending on availability at least one query by family and by org will be
 # picked for the 'homologues' and 'references' BLAST rounds.
-query_orgs: [% FOREACH org IN query_orgs.sort %]
-    - [% org %] [% END %]
-
+query_orgs:[% FOREACH org IN query_orgs.sort %]
+    - [% org %][% END %]
 
 # ===Optional args for each BLAST step===
 # Any valid command-line option can be specified (see NCBIBLAST+ docs).
@@ -88,7 +91,9 @@ blast_args:
     # TBLASTN vs banks
     homologues:
         -evalue: [% evalue %]
-        [% UNLESS SSUrRNA -%]-seg: [% homologues_seg %][%- END %]
+        [% UNLESS SSUrRNA ~%]
+        -seg: [% homologues_seg %]
+        [% END ~%]
         -num_threads: 1
         -max_target_seqs: [% max_target_seqs %]
     [%- IF ref_brh == 'on' %]
@@ -103,9 +108,10 @@ blast_args:
     # BLASTX vs ALI (for tax filters and alignment)
     templates:
         -evalue: [% evalue %]
-        [% UNLESS SSUrRNA -%]-seg: [% templates_seg  %][%- END %]
+        [% UNLESS SSUrRNA ~%]
+        -seg: [% templates_seg %]
+        [% END ~%]
         -num_threads: 1
-
 
 # ===BRH switch for assessing orthology===
 # Two values are available: 'on' and 'off'.
@@ -117,7 +123,7 @@ blast_args:
 # the BLAST executable(s) at the 'homologues' step.
 ref_brh: [% ref_brh %]
 
-[% IF ref_brh == 'on' %]
+[% IF ref_brh == 'on' -%]
 # ===Path to dir holding complete proteome BLAST databases===
 # Only required when setting 'ref_brh' to 'on'.
 ref_bank_dir: [% ref_bank_dir %]
@@ -126,8 +132,8 @@ ref_bank_dir: [% ref_bank_dir %]
 # Only required when setting 'ref_brh' to 'on'.
 # You can list as many databases as needed here. Only those specified as
 # 'ref_orgs' below will actually be used for BRH.
-ref_org_mapper: [% FOREACH bank IN ref_org_for.keys.sort %]
-    [% ref_org_for.$bank %]: [% bank %] [% END %]
+ref_org_mapper:[% FOREACH bank IN ref_org_for.keys.sort %]
+    [% ref_org_for.$bank %]: [% bank %][% END %]
 
 # ===Orgs to be used for BRH checks===
 # Only required when setting 'ref_brh' to 'on'.
@@ -135,8 +141,8 @@ ref_org_mapper: [% FOREACH bank IN ref_org_for.keys.sort %]
 # for all listed orgs (and not for only one of them). Listing more orgs thus
 # increases the stringency of the BRH check. Note that 'ref_orgs' may but DO
 # NOT NEED to match 'query_orgs'.
-ref_orgs: [% FOREACH bank IN ref_org_for.keys.sort %]
-    - [% ref_org_for.$bank %] [% END %]
+ref_orgs:[% FOREACH bank IN ref_org_for.keys.sort %]
+    - [% ref_org_for.$bank %][% END %]
 
 # ===Fraction of ref_orgs to really use when assessing orthology===
 # Only meaningful when setting 'ref_brh' to 'on'.
@@ -161,7 +167,8 @@ ref_org_mul: [% ref_org_mul %]
 # executable(s) at the 'reference' step.
 # When not specified 'ref_score_mul' internally defaults to 1.0, which is the
 # strictest mode since only equally-best hits are retained.
-ref_score_mul: [% ref_score_mul %][% END %]
+ref_score_mul: [% ref_score_mul %]
+[% END -%]
 
 [% IF tol_check == 'on' -%]
 # ===TreeOfLife check===
@@ -173,7 +180,8 @@ tol_check: [% tol_check %]
 #
 #
 tol_bank_dir: [% tol_bank_dir %]
-tol_bank: [% tol_bank %][%- END %]
+tol_bank: [% tol_bank %]
+[% END -%]
 
 # ===Homologues trimming switch===
 # Two values are available: 'on' and 'off'.
@@ -201,7 +209,8 @@ trim_max_shift: [% trim_max_shift %]
 # parameter extends the range of the candidate seq to be extracted at both
 # extremities (in nt) to allow for a potentially more complete seq.
 # When not specified 'trim_extra_margin' internally defaults to 15 nt.
-trim_extra_margin: [% trim_extra_margin %][%- END %]
+trim_extra_margin: [% trim_extra_margin %]
+[% END -%]
 
 # ===Orthologues merging switch===
 # Two values are available: 'on' and 'off'.
@@ -228,8 +237,8 @@ merge_min_ident: [% merge_min_ident %]
 # Only meaningful when setting 'merge_orthologues' to 'on'.
 # This parameter is the CAP3 '-o' parameter (in nt).
 # When not specified, 'merge_min_len' internally defaults to 40 nt.
-merge_min_len: [% merge_min_len %][%- END %]
-
+merge_min_len: [% merge_min_len %]
+[% END -%]
 
 # ===Engine to be used for aligning new seqs===
 # Four values are available: 'blast', 'exonerate', 'exoblast' and 'off'.
@@ -244,7 +253,7 @@ merge_min_len: [% merge_min_len %][%- END %]
 # The YAML wizard automatically sets it to 'off' if 'run_mode' is 'metagenomic'.
 aligner_mode: [% aligner_mode %]
 
-[% UNLESS aligner_mode == 'off' %]
+[% UNLESS aligner_mode == 'off' -%]
 # ===Self-template selection switch for aligning new seqs===
 # Only meaningful when setting 'aligner_mode' to a value other than 'off'.
 # Two values are available: 'on' and 'off'.
@@ -265,7 +274,8 @@ ali_skip_self: [% ali_skip_self %]
 # When not specified 'ali_cover_mul' internally defaults to 1.1., which means
 # that if the BLAST alignment with the second template is at least 110% of the
 # BLAST alignment with the first template, both templates are retained.
-ali_cover_mul: [% ali_cover_mul %][% END %]
+ali_cover_mul: [% ali_cover_mul %]
+[% END -%]
 
 # ===Preservation switch for '#NEW#' tags from preexisting sequences===
 # Two values are available: 'on' and 'off'.
@@ -283,7 +293,6 @@ ali_keep_old_new_tags: [% ali_keep_old_new_tags %]
 # 'keep'.
 ali_keep_lengthened_seqs: [% ali_keep_lengthened_seqs %]
 
-
 # ===Taxonomic report switch===
 # Two values are available: 'on' and 'off'.
 # If set to 'on', the lineage of new seqs is inferred by analyzing the
@@ -293,9 +302,13 @@ ali_keep_lengthened_seqs: [% ali_keep_lengthened_seqs %]
 # other tax_* parameters of this configuration file.
 # When not specified, 'tax_reports' internally defaults to 'off'. Yet, the
 # The YAML wizard automatically sets it to 'on' if 'run_mode' is 'metagenomic'.
-[% IF tax_reports %]tax_reports: [% tax_reports %][% ELSE %]tax_reports: on[% END -%]
+[% IF tax_reports -%]
+tax_reports: [% tax_reports %]
+[% ELSE -%]
+tax_reports: on
+[% END -%]
 
-[% IF tax_dir %]
+[% IF tax_dir -%]
 # ===Path to dir holding NCBI Taxonomy database===
 # Only required when enabling 'tax_reports' or specifying 'tax_filter'.
 # It can be installed using setup-taxdir.pl.
@@ -308,15 +321,23 @@ tax_dir: [% tax_dir %]
 # 'tax_score_mul') and on the ability of 42 to deduce the taxonomy of each
 # individual relative to compute the LCA of the new seq.
 # When not specified, 'tax_min_hits' internally defaults to 1.
-[% IF tax_min_hits %]tax_min_hits: [% tax_min_hits %][% ELSE %]tax_min_hits: 1[% END %]
+[% IF tax_min_hits -%]
+tax_min_hits: [% tax_min_hits %]
+[% ELSE -%]
+tax_min_hits: 1
+[% END -%]
 
 # ===Max number of relatives to use when inferring taxonomy of new seqs===
 # Only meaningful when enabling 'tax_reports' or specifying 'tax_filter'.
 # As for 'tax_min_hits' above, this parameter is a upper bound.
 # When not specified, 'tax_max_hits' internally defaults to unlimited.
-[% IF megan_like %]tax_max_hits: 100
-[%- ELSIF best_hit %]tax_max_hits: 1
-[%- ELSIF tax_max_hits %]tax_max_hits: [% tax_max_hits %][%- END %]
+[% IF megan_like -%]
+tax_max_hits: 100
+[% ELSIF best_hit -%]
+tax_max_hits: 1
+[% ELSIF tax_max_hits -%]
+tax_max_hits: [% tax_max_hits %]
+[% END -%]
 
 # ===Min identity of relatives to use when inferring taxonomy of new seqs===
 # Only meaningful when enabling 'tax_reports' or specifying 'tax_filter'.
@@ -324,29 +345,53 @@ tax_dir: [% tax_dir %]
 # that it is specified as a fractional number (between 0 and 1). It is
 # evaluated on the first HSP of potential relatives.
 # When not specified, 'tax_min_ident' internally defaults to 0.
-[% IF megan_like %]tax_min_ident: 0[% ELSIF best_hit %]tax_min_ident: 0[% ELSIF tax_min_ident %]tax_min_ident: [% tax_min_ident %][% END -%]
+[% IF megan_like -%]
+tax_min_ident: 0
+[% ELSIF best_hit -%]
+tax_min_ident: 0
+[% ELSIF tax_min_ident -%]
+tax_min_ident: [% tax_min_ident %]
+[% END -%]
 
 # ===Min length of relatives to use when inferring taxonomy of new seqs===
 # Only meaningful when enabling 'tax_reports' or specifying 'tax_filter'.
 # This parameter is the traditional BLAST 'alignment length' statistics. It is
 # evaluated on the first HSP of potential relatives.
 # When not specified, 'tax_min_len' internally defaults to 0.
-[% IF megan_like %]tax_min_len: 0[% ELSIF best_hit %]tax_min_len: 0[% ELSIF tax_min_len %]tax_min_len: [% tax_min_len %][% END -%]
+[% IF megan_like -%]
+tax_min_len: 0
+[% ELSIF best_hit -%]
+tax_min_len: 0
+[% ELSIF tax_min_len -%]
+tax_min_len: [% tax_min_len %]
+[% END -%]
 
 # ===Min bit score of relatives to use when inferring taxonomy of new seqs===
 # Only meaningful when enabling 'tax_reports' or specifying 'tax_filter'.
 # This parameter is the traditional BLAST 'bit score' statistics. It is
 # evaluated on the first HSP of potential relatives.
 # When not specified, 'tax_min_score' internally defaults to 0.
-[% IF megan_like %]tax_min_score: 80[% ELSIF best_hit %]tax_min_score: 0[% ELSIF tax_min_score %]tax_min_score: [% tax_min_score %][% END %]
+[% IF megan_like -%]
+tax_min_score: 80
+[% ELSIF best_hit -%]
+tax_min_score: 0
+[% ELSIF tax_min_score -%]
+tax_min_score: [% tax_min_score %]
+[% END -%]
 
 # ===Bit score reduction allowed when inferring taxonomy of new seqs===
 # Only meaningful when enabling 'tax_reports' or specifying 'tax_filter'.
 # The allowed bit score reduction of any relative is expressed relatively to
 # the score of the FIRST relative (as in MEGAN algorithm).
 # When not specified, 'tax_score_mul' internally defaults to 0.
-[% IF megan_like %]tax_score_mul: 0.95[% ELSIF best_hit %]tax_score_mul: 0[% ELSIF tax_score_mul %]tax_score_mul: [% tax_score_mul %][% END %][%- END -%]
-
+[% IF megan_like -%]
+tax_score_mul: 0.95
+[% ELSIF best_hit -%]
+tax_score_mul: 0
+[% ELSIF tax_score_mul -%]
+tax_score_mul: [% tax_score_mul %]
+[% END -%]
+[% END -%]
 
 # ===Path to dir holding transcript BLAST databases===
 bank_dir: [% bank_dir %]
@@ -366,52 +411,52 @@ defaults:
 # This part can be concatenated on a per-run basis to the previous part, which
 # would be the same for several runs. In the future, forty-two might support
 # two different configuration files to reflect this conceptual distinction.
-orgs: [% FOREACH bank IN org_for.keys.sort %]
+orgs:[% FOREACH bank IN org_for.keys.sort %]
   - org: [% org_for.$bank %]
     banks:
         - [% bank %]
-    [% tax_filter_for.$bank %] [% END %]
+    [% tax_filter_for.$bank %][%~ END %]
 
-#[% USE date %]
+[% USE date %]
 # This config file has been generated automatically on [% date.format %].
-# We advise not to modify directly this file manually but rather to modify the
-# yaml-generator command instead for traceability and reproducibility.
+# We advise you not to modify directly this file manually but rather to modify
+# the yaml-generator command instead for traceability and reproducibility.
 #
-#yaml-generator-42.pl --run_mode=[% run_mode %][% IF SSUrRNA %] --SSUrRNA[% END %] --out_suffix=[% out_suffix %] \
-#--queries [% queries %] \
-#--evalue=[% evalue %][% UNLESS SSUrRNA %] --homologues_seg=[% homologues_seg %][% END %] --max_target_seqs=[% max_target_seqs %][% UNLESS SSUrRNA %] --templates_seg=[% templates_seg %][% END %] \
-#--bank_dir [% bank_dir %] --bank_suffix=[% bank_suffix %] --bank_mapper [% bank_mapper %] --code=[% code %]\
-#--ref_brh=[% ref_brh -%][% IF ref_brh == 'on' %] --ref_bank_dir [% ref_bank_dir %] --ref_bank_suffix=[% ref_bank_suffix %] --ref_bank_mapper [% ref_bank_mapper %] \
-#--ref_org_mul=[% ref_org_mul %] --ref_score_mul=[% ref_score_mul %][%- END %] \
-#--trim_homologues=[% trim_homologues %][% IF trim_homologues == 'on' %] --trim_max_shift=[% trim_max_shift %] --trim_extra_margin=[% trim_extra_margin %][%- END %] \
-#--merge_orthologues=[% merge_orthologues %][% IF merge_orthologues == 'on' %] --merge_min_ident=[% merge_min_ident %] --merge_min_len=[% merge_min_len %][%- END %] \
-#--aligner_mode=[% aligner_mode %][% UNLESS aligner_mode == 'off' %] --ali_skip_self=[% ali_skip_self %] --ali_cover_mul=[% ali_cover_mul %][% END %] --ali_keep_old_new_tags=[% ali_keep_old_new_tags %] --ali_keep_lengthened_seqs=[% ali_keep_lengthened_seqs %] \
-#--tax_reports=[% tax_reports %][% IF tax_dir %] --tax_dir [% tax_dir %][% END %] \
-#[% IF megan_like %]--megan_like \[% ELSIF best_hit %]--best_hit \[% ELSE %]--tax_min_score=[% tax_min_score %] --tax_score_mul=[% tax_score_mul %] --tax_min_ident=[% tax_min_ident %] --tax_min_len=[% tax_min_len %] \[% END %]
-#--tol_check=[% tol_check %][% IF tol_check == 'on' %] --tol_db [% tol_db %] \[%- END %]
-[% IF levels %]#--levels=[% levels.join(' ') %][%- END %]
+# yaml-generator-42.pl --run_mode=[% run_mode %][% IF SSUrRNA %] --SSUrRNA[% END %] --out_suffix=[% out_suffix %] \
+# --queries [% queries %] \
+# --evalue=[% evalue %][% UNLESS SSUrRNA %] --homologues_seg=[% homologues_seg %][% END %] --max_target_seqs=[% max_target_seqs %][% UNLESS SSUrRNA %] --templates_seg=[% templates_seg %][% END %] \
+# --bank_dir [% bank_dir %] --bank_suffix=[% bank_suffix %][% IF bank_mapper %] --bank_mapper [% bank_mapper %][% END %] --code=[% code %] \
+# --ref_brh=[% ref_brh -%][% IF ref_brh == 'on' %] --ref_bank_dir [% ref_bank_dir %] --ref_bank_suffix=[% ref_bank_suffix %][% IF ref_bank_mapper %] --ref_bank_mapper [% ref_bank_mapper %][% END %] \
+# --ref_org_mul=[% ref_org_mul %] --ref_score_mul=[% ref_score_mul %][%- END %] \
+# --trim_homologues=[% trim_homologues %][% IF trim_homologues == 'on' %] --trim_max_shift=[% trim_max_shift %] --trim_extra_margin=[% trim_extra_margin %][% END %] \
+# --merge_orthologues=[% merge_orthologues %][% IF merge_orthologues == 'on' %] --merge_min_ident=[% merge_min_ident %] --merge_min_len=[% merge_min_len %][% END %] \
+# --aligner_mode=[% aligner_mode %][% UNLESS aligner_mode == 'off' %] --ali_skip_self=[% ali_skip_self %] --ali_cover_mul=[% ali_cover_mul %][% END %] --ali_keep_old_new_tags=[% ali_keep_old_new_tags %] --ali_keep_lengthened_seqs=[% ali_keep_lengthened_seqs %] \
+# --tax_reports=[% tax_reports %][% IF tax_dir %] --tax_dir [% tax_dir %][% END %] \
+# [% IF tax_min_hits %]--tax_min_hits=[% tax_min_hits %] [% END %][% IF megan_like %]--megan_like[% ELSIF best_hit %]--best_hit[% ELSE %][% IF tax_max_hits %]--tax_max_hits=[% tax_max_hits %] [% END %]--tax_min_score=[% tax_min_score %] --tax_score_mul=[% tax_score_mul %] --tax_min_ident=[% tax_min_ident %] --tax_min_len=[% tax_min_len %][% END %] \
+# --tol_check=[% tol_check %][% IF tol_check == 'on' %] --tol_db [% tol_db %] \[%- END %]
+[% IF levels %]# --levels=[% levels.join(' ') %][%- END %]
 EOT
 
 # CMD TEMPLATE
 my $tt_cmd = <<'EOT';
 [% USE date %]
 # This config file has been generated automatically on [% date.format %].
-# We advise not to modify directly this file manually but rather to modify
+# We advise you not to modify directly this file manually but rather to modify
 # the yaml-generator command instead for traceability and reproducibility.
 
 yaml-generator-42.pl --run_mode=[% run_mode %][% IF SSUrRNA %] --SSUrRNA[% END %] --out_suffix=[% out_suffix %] \
 --queries [% queries %] \
 --evalue=[% evalue %][% UNLESS SSUrRNA %] --homologues_seg=[% homologues_seg %][% END %] --max_target_seqs=[% max_target_seqs %][% UNLESS SSUrRNA %] --templates_seg=[% templates_seg %][% END %] \
---bank_dir [% bank_dir %] --bank_suffix=[% bank_suffix %] --bank_mapper [% bank_mapper %] --code=[% code %]\
---ref_brh=[% ref_brh -%][% IF ref_brh == 'on' %] --ref_bank_dir [% ref_bank_dir %] --ref_bank_suffix=[% ref_bank_suffix %] --ref_bank_mapper [% ref_bank_mapper %] \
+--bank_dir [% bank_dir %] --bank_suffix=[% bank_suffix %][% IF bank_mapper %] --bank_mapper [% bank_mapper %][% END %] --code=[% code %] \
+--ref_brh=[% ref_brh -%][% IF ref_brh == 'on' %] --ref_bank_dir [% ref_bank_dir %] --ref_bank_suffix=[% ref_bank_suffix %][% IF ref_bank_mapper %] --ref_bank_mapper [% ref_bank_mapper %][% END %] \
 --ref_org_mul=[% ref_org_mul %] --ref_score_mul=[% ref_score_mul %][%- END %] \
---trim_homologues=[% trim_homologues %][% IF trim_homologues == 'on' %] --trim_max_shift=[% trim_max_shift %] --trim_extra_margin=[% trim_extra_margin %][%- END %] \
---merge_orthologues=[% merge_orthologues %][% IF merge_orthologues == 'on' %] --merge_min_ident=[% merge_min_ident %] --merge_min_len=[% merge_min_len %][%- END %] \
+--trim_homologues=[% trim_homologues %][% IF trim_homologues == 'on' %] --trim_max_shift=[% trim_max_shift %] --trim_extra_margin=[% trim_extra_margin %][% END %] \
+--merge_orthologues=[% merge_orthologues %][% IF merge_orthologues == 'on' %] --merge_min_ident=[% merge_min_ident %] --merge_min_len=[% merge_min_len %][% END %] \
 --aligner_mode=[% aligner_mode %][% UNLESS aligner_mode == 'off' %] --ali_skip_self=[% ali_skip_self %] --ali_cover_mul=[% ali_cover_mul %][% END %] --ali_keep_old_new_tags=[% ali_keep_old_new_tags %] --ali_keep_lengthened_seqs=[% ali_keep_lengthened_seqs %] \
 --tax_reports=[% tax_reports %][% IF tax_dir %] --tax_dir [% tax_dir %][% END %] \
-[% IF megan_like %]--megan_like \[% ELSIF best_hit %]--best_hit \[% ELSE %]--tax_min_score=[% tax_min_score %] --tax_score_mul=[% tax_score_mul %] --tax_min_ident=[% tax_min_ident %] --tax_min_len=[% tax_min_len %] \[% END %]
---tol_check=[% tol_check %][% IF tol_check == 'on' %] --tol_db [% tol_db %][% END %][% IF levels %] \
---levels=[% levels.join(' ') %][%- END %]
+[% IF tax_min_hits %]--tax_min_hits=[% tax_min_hits %] [% END %][% IF megan_like %]--megan_like[% ELSIF best_hit %]--best_hit[% ELSE %][% IF tax_max_hits %]--tax_max_hits=[% tax_max_hits %] [% END %]--tax_min_score=[% tax_min_score %] --tax_score_mul=[% tax_score_mul %] --tax_min_ident=[% tax_min_ident %] --tax_min_len=[% tax_min_len %][% END %] \
+--tol_check=[% tol_check %][% IF tol_check == 'on' %] --tol_db [% tol_db %] \[%- END %]
+[% IF levels %]--levels=[% levels.join(' ') %][%- END %]
 EOT
 
 # HOW TO
@@ -640,7 +685,7 @@ if ( $ARGV{'--wizard'} ) {
 
 }
 
-### %ARGV
+#### %ARGV
 
 # tol arguments
 if ( $ARGV{'--tol_db'} ) {
@@ -663,12 +708,12 @@ my @bank_files = File::Find::Rule
 # org mapper: from file names or file
 $ARGV{'--choose_tax_filter'} = 1 if $ARGV{'--levels'};
 $tf_auto = $ARGV{'--choose_tax_filter'};
-my $tax = Taxonomy->new_from_cache( tax_dir => $ARGV{'--tax_dir'} ) if $tf_auto > 0;
-### lvl: $ARGV{'--levels'}
+my $tax = Taxonomy->new_from_cache( tax_dir => $ARGV{'--tax_dir'} ) if $tf_auto;
+#### lvl: $ARGV{'--levels'}
 
 my ($org_for, $tax_filter_for) = build_org_n_tax_filter_for();
-### $org_for
-### $tax_filter_for
+#### $org_for
+#### $tax_filter_for
 
 # ref_bank files
 my $ref_org_for;
@@ -685,35 +730,29 @@ unless ( $ARGV{'--ref_brh'} eq 'off' ) {
     $ref_org_for = build_ref_org_for();
 }
 
-# queries
-my @query_orgs;
-open my $in, '<', $ARGV{'--queries'};
-while (my $line = <$in>) {
-    chomp $line;
-    push @query_orgs, $line;
-}
-close $in;
-
 # complete %vars
 $vars{org_for}        = $org_for;
-$vars{query_orgs}     = \@query_orgs;
+$vars{query_orgs}     = [ IdList->load( $ARGV{'--queries'} )->all_ids ];
 $vars{ref_org_for}    = $ref_org_for if $ref_org_for;
 $vars{tax_filter_for} = $tax_filter_for if $tax_filter_for;
-### %vars
+#### %vars
 
-# build config filename
-my $out_suffix = $ARGV{'--out_suffix'} =~ m/^\-/xms ? $ARGV{'--out_suffix'} : '-' . $ARGV{'--out_suffix'};
-my $outyaml    = 'config' . $out_suffix . '.yaml';
-my $outcmd     = 'build' . $out_suffix . '-yaml.sh';
+# build config filenames
+my $dir = '.';      # default to working dir
+if ( $ARGV{'--outdir'} ) {
+    $dir = dir( $ARGV{'--outdir'} )->relative;
+    $dir->mkpath();
+}
+$ARGV{'--out_suffix'} =~ s/^\-//xms;
+my $outyaml = file($dir, 'config-' . $ARGV{'--out_suffix'} . '.yaml');
+my $outcmd  = file($dir,  'build-' . $ARGV{'--out_suffix'} . '-yaml.sh');
+#### yaml: $outyaml->stringify
+#### sh: $outcmd->stringify
 
 # fill-in template
 my $tt = Template->new;
-$tt->process(\$tt_str, \%vars, $outyaml) or die "Unable to write $outyaml";
-$tt->process(\$tt_cmd, \%vars, $outcmd ) or die "Unable to write $outcmd";
-# Set read only
-#my $mode = "0444";
-#chmod $mode, $outyaml;
-#chmod $mode, $outcmd;
+$tt->process(\$tt_str, \%vars, $outyaml->stringify) or die "Unable to write $outyaml";
+$tt->process(\$tt_cmd, \%vars,  $outcmd->stringify) or die "Unable to write $outcmd";
 
 say "\nSuccessfully wrote files: $outyaml and $outcmd!";
 
@@ -768,58 +807,53 @@ sub prompt4suffix {
 }
 
 sub build_ref_org_for {
-    my %ref_org_for;
+
+    # default to all available ref_banks and default ref_org names
+    my @ref_banks = map { basename $_, $ARGV{'--ref_bank_suffix'} } @ref_bank_files;
+    my @ref_orgs  = map { join q{ }, (split /_/xms, $_, 2)        } @ref_banks;
+
+    # override (possibly restrict) default values if mapper specified
     if ($ARGV{'--ref_bank_mapper'}) {
-        open my $in, '<', $ARGV{'--ref_bank_mapper'};
-        while (my $line = <$in>) {
-            chomp $line;
-            next LINE if $line =~ $COMMENT_LINE
-                      || $line =~ $EMPTY_LINE;
-            $line =~ s/\s+$//xmsg;
-            my ($ref_org, $ref_bank) = split /\t/xms, $line;
-            ### $ref_bank
-            ### $ref_org
-            $ref_bank                = basename($ref_bank, $ARGV{'--ref_bank_suffix'});
-            $ref_org_for{$ref_bank}  = $ref_org;
-        }
-        close $in;
+        my $mapper = IdMapper->load( $ARGV{'--ref_bank_mapper'} );
+        @ref_banks = $mapper->all_abbr_ids;
+        @ref_orgs  = $mapper->all_long_ids;
     }
-    else {
-        my @ref_banks = map { basename($_, $ARGV{'--ref_bank_suffix'}) } @ref_bank_files;
-        my @ref_orgs  = map { join " ", (split /_/xms, $_, 2)     } @ref_banks;
-        @ref_org_for{@ref_banks} = @ref_orgs;
-    }
+
+    my %ref_org_for = mesh @ref_banks, @ref_orgs;
     return \%ref_org_for;
 }
 
 sub build_org_n_tax_filter_for {
+
+    # default to all available banks and default org names
+    my @banks = map { basename $_, $ARGV{'--bank_suffix'} } @bank_files;
+    my @orgs  = map { join q{ }, (split /_/xms, $_, 2)    } @banks;
+    return { mesh @banks, @orgs } unless $ARGV{'--bank_mapper'};
+
+    # override (possibly restrict) default values if mapper specified
     my %org_for;
     my %tax_filter_for;
-    if ($ARGV{'--bank_mapper'}) {
-        open my $in, '<', $ARGV{'--bank_mapper'};
-        while (my $line = <$in>) {
-            chomp $line;
-            my ($bank, $org, $tax_filters, $lineage);
-            if ($tf_auto > 0) {
-                ($org, $bank, undef, undef) = split /\t/xms, $line;
-                ($tax_filters, $lineage) = _get_tax_filter($org);
-            }
-            else {
-                ($org, $bank, $tax_filters, $lineage) = split /\t/xms, $line;
-            }
 
-            $bank                  = basename($bank, $ARGV{'--bank_suffix'});
-            $org_for{$bank}        = $org;
-            $tax_filter_for{$bank} = "tax_filter: [ $tax_filters ] # " . $lineage if defined $tax_filters;
-        }
-        close $in;
+    open my $in, '<', $ARGV{'--bank_mapper'};
+    # Note: cannot use IdMapper class due to four fields (instead of two)
+
+    LINE:
+    while (my $line = <$in>) {
+        chomp $line;
+        next LINE if $line =~ $COMMENT_LINE
+                  || $line =~ $EMPTY_LINE;
+        $line =~ s/\s+$//xmsg;
+
+        # collect (or generate) bank details and tax_filter
+        my ($org, $bank, $tax_filters, $lineage) = split /\t/xms, $line;
+                        ($tax_filters, $lineage) = _get_tax_filter($org)
+                            if $tf_auto;
+
+        $org_for{$bank} = $org;
+        $tax_filter_for{$bank} = "tax_filter: [ $tax_filters ] # $lineage"
+            if defined $tax_filters;
     }
-    else {
-        my @banks = map { basename($_, $ARGV{'--bank_suffix'}) } @bank_files;
-        ### @banks
-        my @orgs  = map { join q{ }, (split /_/xms, $_, 2) } @banks;
-        @org_for{@banks} = @orgs;
-    }
+
     return \%org_for, \%tax_filter_for;
 }
 
@@ -832,16 +866,16 @@ sub _get_tax_filter {
     if ($org =~ m/^GCA|GCF/xms || $org =~ m/^\d+$/xms) {
         $entity = $org;
         $method = 'get_taxonomy_with_levels';
-        ### TID/GCA: $entity
+        #### TID/GCA: $entity
     }
     else {
         $entity = SeqId->new( full_id => $org . '@1');
         $method = 'get_taxonomy_with_levels_from_seq_id';
-        ### ORG: $entity
+        #### ORG: $entity
     }
     my @tax = $tax->$method($entity);
     $lineage = join q{; }, map { @{ $tax[$_] }[0] } 0..$#tax;
-    ### $lineage
+    #### $lineage
 
     # Type a name untill it works!
     my $loop;
@@ -889,6 +923,48 @@ sub _tax_prompter {
     return $tax_filter;
 }
 
+# for testing:
+# perl -Ilib bin/yaml-generator-42.pl --run_mode=metagenomic --out_suffix=-test1 \
+# --queries xtest/yaml_gen/queries/queries-prokaryotes.idl \
+# --evalue=1e-3 --homologues_seg=yes --max_target_seqs=50 --templates_seg=no \
+# --bank_dir xtest/yaml_gen/genomes --bank_suffix=.nsq --bank_mapper xtest/yaml_gen/genomes/mapper-genomes.idm --code=1 \
+# --ref_brh=on --ref_bank_dir xtest/yaml_gen/ref_orgs --ref_bank_suffix=.psq --ref_bank_mapper xtest/yaml_gen/ref_orgs/mapper-prokaryotes.idm \
+# --ref_org_mul=0.33 --ref_score_mul=0.99 \
+# --trim_homologues=on --trim_max_shift=5000 --trim_extra_margin=15 \
+# --merge_orthologues=off \
+# --aligner_mode=off --ali_keep_old_new_tags=off --ali_keep_lengthened_seqs=keep \
+# --tax_reports=on --tax_dir ../Bio-MUST-Core/test/taxdump \
+# --tax_max_hits=10 --tax_min_score=80 --tax_score_mul=0.99 --tax_min_ident=0.50 --tax_min_len=0 \
+# --tol_check=off \
+# --out_dir xtest/yaml_gen/outdir
+#
+# perl -Ilib bin/yaml-generator-42.pl --run_mode=metagenomic --out_suffix=-test2 \
+# --queries xtest/yaml_gen/queries/queries-prokaryotes.idl \
+# --evalue=1e-3 --homologues_seg=yes --max_target_seqs=50 --templates_seg=no \
+# --bank_dir xtest/yaml_gen/genomes --bank_suffix=.nsq --code=1 \
+# --ref_brh=on --ref_bank_dir xtest/yaml_gen/ref_orgs --ref_bank_suffix=.psq \
+# --ref_org_mul=0.33 --ref_score_mul=0.99 \
+# --trim_homologues=off \
+# --merge_orthologues=on --merge_min_ident=0.9 --merge_min_len=40 \
+# --aligner_mode=off --ali_keep_old_new_tags=off --ali_keep_lengthened_seqs=keep \
+# --tax_reports=on \
+# --tax_min_score=0 --tax_score_mul=0 --tax_min_ident=0 --tax_min_len=0 \
+# --tol_check=off \
+# --out_dir xtest/yaml_gen/outdir
+#
+# perl -Ilib bin/yaml-generator-42.pl --run_mode=metagenomic --out_suffix=-test3 \
+# --queries xtest/yaml_gen/queries/queries-prokaryotes.idl \
+# --evalue=1e-3 --homologues_seg=yes --max_target_seqs=50 --templates_seg=no \
+# --bank_dir xtest/yaml_gen/genomes --bank_suffix=.nsq --code=1 \
+# --ref_brh=off \
+# --trim_homologues=off \
+# --merge_orthologues=off \
+# --aligner_mode=blast --ali_skip_self=off --ali_cover_mul=1.1 --ali_keep_old_new_tags=off --ali_keep_lengthened_seqs=keep \
+# --tax_reports=on \
+# --megan_like \
+# --tol_check=off \
+# --out_dir xtest/yaml_gen/outdir
+
 __END__
 
 =pod
@@ -899,7 +975,7 @@ yaml-generator-42.pl - Interactive or batch generator for 42 YAML config files
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 USAGE
 
@@ -945,6 +1021,14 @@ version 0.210570
 
 Activate if you want an interactive step by step configuration.
 
+=item --outdir [=] <dir>|--out_dir [=] <dir>
+
+Optional output dir that will contain the generated YAML (and .sh) config files
+(will be created if needed) [default: none]. Otherwise, output files will be
+written in the working directory.
+
+=for Euclid: dir.type: writable
+
 =item --run_mode=<str>
 
 'phylogenomic' or 'metagenomic'
@@ -956,7 +1040,9 @@ Activate if you want an interactive step by step configuration.
 =for Euclid: str.type: str
 	str.default: '-42'
 
-=item --queries <file>
+=item --queries [=] <file>
+
+Organisms to use as queries (one per line = IDL format). Comments are supported.
 
 =for Euclid: file.type: readable
 
@@ -989,7 +1075,7 @@ on or off.
 =for Euclid: str.type: str
 	str.default: 'on'
 
-=item --ref_bank_dir <dir>
+=item --ref_bank_dir [=] <dir>
 
 Path to reference bank files directory.
 
@@ -999,9 +1085,12 @@ Path to reference bank files directory.
 
 =for Euclid: str.type: str
 
-=item --ref_bank_mapper <file>
+=item --ref_bank_mapper [=] <file>
 
-Tab delimited file with bank and org in this order.
+TSV file (IDM format) associating each ref_org to its bank [default: none]. When
+unspecified, the script derives ref_org names from ref_bank filenames.
+Commenting (or deleting) lines in this file allows the user to reduce the set of
+ref_orgs.
 
 =for Euclid: file.type: readable
 
@@ -1020,7 +1109,7 @@ Tab delimited file with bank and org in this order.
 =for Euclid: str.type: str
     str.default: 'off'
 
-=item --tol_db <db>
+=item --tol_db [=] <db>
 
 Path to TreeOfLife database.
 
@@ -1082,7 +1171,7 @@ on or off
 =for Euclid: str.type: str
     str.default: 'off'
 
-=item --bank_dir <dir>
+=item --bank_dir [=] <dir>
 
 Path to bank files directory.
 
@@ -1092,13 +1181,16 @@ Path to bank files directory.
 
 =for Euclid: str.type: str
 
-=item --bank_mapper <file>
+=item --bank_mapper [=] <file>
 
-Tab delimited file with bank, org and optionnaly tax_filter in this order.
+TSV file associating each org to its bank [default: none]. When
+unspecified, the script derives org names from bank filenames. Commenting (or
+deleting) lines in this file allows the user to reduce the set of orgs to be
+processed. Additional columns can be used to specify a tax_filter and a lineage.
 
 =for Euclid: file.type: readable
 
-=item --tax_dir <dir>
+=item --tax_dir [=] <dir>|--taxdir [=] <dir>
 
 Path to taxdump directory.
 

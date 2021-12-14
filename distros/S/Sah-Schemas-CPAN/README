@@ -2,10 +2,28 @@ NAME
     Sah::Schemas::CPAN - Sah schemas related to CPAN
 
 VERSION
-    This document describes version 0.012 of Sah::Schemas::CPAN (from Perl
-    distribution Sah-Schemas-CPAN), released on 2020-01-02.
+    This document describes version 0.013 of Sah::Schemas::CPAN (from Perl
+    distribution Sah-Schemas-CPAN), released on 2021-07-19.
 
 SYNOPSIS
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
+SAH SCHEMAS
+    *   cpan::distname
+
+        Like perl::distname, but with completion from distribution names on
+        CPAN (using lcpan).
+
+    *   cpan::modname
+
+        Like perl::modname, but with completion from module names on CPAN
+        (using lcpan).
+
+    *   cpan::pause_id
+
+        PAUSE author ID.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Sah-Schemas-CPAN>.
@@ -16,7 +34,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Sah-Schemas-CPAN/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-CPAN>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

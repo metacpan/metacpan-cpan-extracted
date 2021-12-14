@@ -15,6 +15,7 @@ use base qw(Net::RDAP);
 use Net::RDAP::EPPStatusMap;
 use Net::RDAP::Error;
 use NOLookup;
+
 # debug only for dev env.
 #use LWP::ConsoleLogger::Easy qw /debug_ua /;
 use Sys::HostIP;
@@ -726,7 +727,7 @@ sub rdap_obj_as_string {
 	
     } elsif ('nameserver' eq $response->class) {
 	$rs .= "IP Addresses:\n\n";
-	
+
 	my @addrs = $response->addresses;
 	if (scalar(@addrs) > 0) {
 	    foreach my $ip (@addrs) {
@@ -737,12 +738,15 @@ sub rdap_obj_as_string {
 	}
 	$rs .= "\n";
     }
-    
+
     my @events = $response->events;
     if (scalar(@events)) {
 	$rs .= "Events:\n\n";
 	foreach my $event (@events) {
-	    $rs .= sprintf("  %s: %s\n", ucfirst($event->action), scalar($event->date));
+	    # DateTime object is UTC, convert to localtime
+	    my $to = $event->date;
+	    $to->set_time_zone('Europe/Oslo');
+	    $rs .= sprintf("  %s: %s\n", ucfirst($event->action), scalar($to->date));
 	}
 	$rs .= "\n";
     }

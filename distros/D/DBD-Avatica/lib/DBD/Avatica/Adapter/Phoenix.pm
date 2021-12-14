@@ -90,6 +90,46 @@ sub extend_primary_key_info_signature {
     return $signature;
 }
 
+sub last_insert_id {
+  my ($self, $dbh, undef, $schema, $table, $column, $attr) = @_;
+
+  return $dbh->set_err(1, qq{Param "table" must be specified}) unless $table;
+
+  my $seq = $attr->{sequence};
+  my $quote = $dbh->get_info('SQL_IDENTIFIER_QUOTE_CHAR');
+
+  # try to determine sequence
+  unless ($seq) {
+    my $system_table = "${quote}SYSTEM${quote}.${quote}SEQUENCE${quote}";
+    my $where = $schema ? "SEQUENCE_SCHEMA = '$schema' AND " : '';
+    $where .= "SEQUENCE_NAME LIKE '$table" . ($column ? "_${column}%" : '%')  . "'";
+
+    my $res = $dbh->selectrow_hashref(qq{SELECT * FROM $system_table WHERE $where LIMIT 1});
+    unless ($res) {
+      return if $dbh->errstr;
+      return $dbh->set_err(1, qq{Could not determine the sequence of table $table});
+    }
+
+    $seq = $res->{SEQUENCE_NAME};
+  }
+
+  my $full_table_name = $schema ? "${quote}${schema}${quote}." : '';
+  $full_table_name .= "${quote}$table${quote}";
+
+  # add schema to sequence
+  if ($schema && index($seq, $schema) == -1) {
+    $seq = "${quote}${schema}${quote}." . "${quote}${seq}${quote}"
+  }
+
+  my $res = $dbh->selectrow_hashref(qq{SELECT CURRENT VALUE FOR $seq AS SEQ FROM $full_table_name LIMIT 1});
+  unless ($res) {
+    return if $dbh->errstr;
+    return $dbh->set_err(1, qq{last_insert_id must be called after NEXT VALUE FOR is called});
+  }
+
+  return $res->{SEQ};
+}
+
 1;
 
 __END__
@@ -104,7 +144,7 @@ DBD::Avatica::Adapter::Phoenix
 
 =head1 VERSION
 
-version 0.01.0
+version 0.2.0
 
 =head1 AUTHOR
 

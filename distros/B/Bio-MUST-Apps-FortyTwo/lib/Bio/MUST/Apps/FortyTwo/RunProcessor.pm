@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::RunProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::RunProcessor::VERSION = '0.210570';
+$Bio::MUST::Apps::FortyTwo::RunProcessor::VERSION = '0.213470';
 use Moose;
 use namespace::autoclean;
 
@@ -324,6 +324,9 @@ sub BUILD {
         ### [RUN] Logging data will be mixed-up!
     }
 
+    # spawn Taxonomy only once (especially useful for multithreading)
+    $self->tax;
+
     # create job queue
     my $batch = Parallel::Batch->new( {
         maxprocs => $self->threads,
@@ -358,7 +361,7 @@ Bio::MUST::Apps::FortyTwo::RunProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 AUTHOR
 

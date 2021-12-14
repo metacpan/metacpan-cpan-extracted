@@ -1,8 +1,5 @@
 package IO::Pipely;
-{
-  $IO::Pipely::VERSION = '0.005';
-}
-
+$IO::Pipely::VERSION = '0.006';
 use warnings;
 use strict;
 
@@ -417,7 +414,7 @@ IO::Pipely - Portably create pipe() or pipe-like handles, one way or another.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -439,16 +436,16 @@ Please read DESCRIPTION for detailed semantics and caveats.
   # the best conduit type available.
 
   my (
-    $side_a_read,  $side_b_read,
-    $side_a_write, $side_b_write,
+    $side_a_read, $side_a_write,
+    $side_b_read, $side_b_write,
   ) = socketpairly();
 
   # Create a bidirectional pipe-like thing using an INET socket
   # specifically.
 
   my (
-    $side_a_read,  $side_b_read,
-    $side_a_write, $side_b_write,
+    $side_a_read, $side_a_write,
+    $side_b_read, $side_b_write,
   ) = socketpairly(type => 'inet');
 
 =head1 DESCRIPTION
@@ -523,7 +520,7 @@ for one end, and read and write for the other.  On failure, it returns
 nothing.
 
   use IO::Pipely qw(socketpairly);
-  my ($a_read, $b_read, $a_write, $b_write) = socketpairly();
+  my ($a_read, $a_write, $b_read, $b_write) = socketpairly();
   die "socketpairly() failed: $!" unless $a_read;
 
 socketpairly() returns two extra "writer" handles.  They exist for the
@@ -532,7 +529,7 @@ pair.  The extra handles can be ignored whenever pipe() will never be
 used.  For example:
 
   use IO::Pipely qw(socketpairly);
-  my ($side_a, $side_b) = socketpairly( type => 'socketpair' );
+  my ($side_a, undef, $side_b, undef) = socketpairly( type => 'socketpair' );
   die "socketpairly() failed: $!" unless $side_a;
 
 When given a choice, it will prefer bidirectional sockets instead of
@@ -543,7 +540,7 @@ parameter.  See L</PIPE TYPES> for the types that can be used.  In
 this example, two unidirectional pipes wil be used instead of a more
 efficient pair of sockets:
 
-  my ($a_read, $a_write, $b_read, $b_write) = pipely(
+  my ($a_read, $a_write, $b_read, $b_write) = socketpairly(
     type => 'pipe',
   );
 
@@ -664,7 +661,7 @@ any of these is needed:
 
 =head1 AUTHOR & COPYRIGHT
 
-IO::Pipely is copyright 2000-2013 by Rocco Caputo.
+IO::Pipely is copyright 2000-2021 by Rocco Caputo.
 All rights reserved.
 IO::Pipely is free software; you may redistribute it and/or modify it
 under the same terms as Perl itself.

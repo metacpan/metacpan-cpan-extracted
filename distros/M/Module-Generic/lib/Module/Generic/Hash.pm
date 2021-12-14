@@ -61,12 +61,12 @@ sub new
         debug => 0,
     });
     my $self = bless( \%hash => $class );
-    $obj->enable( 1 );
+    $obj->enable(1);
     my @keys = CORE::keys( %$data );
     @hash{ @keys } = @$data{ @keys };
-    $obj->enable( 0 );
+    $obj->enable(0);
     $self->SUPER::init( @_ );
-    $obj->enable( 1 );
+    $obj->enable(1);
     return( $self );
 }
 
@@ -74,10 +74,8 @@ sub as_hash
 {
     my $self = CORE::shift( @_ );
     my $hash = {};
-    $self->_tie_object->enable( 1 );
+    $self->_tie_object->enable(1);
     my $keys = $self->keys;
-    # XXX
-    print( STDERR ref( $self ), "::as_hash: keys found are: '", $keys->join( "', '" ), "'\n" );
     @$hash{ @$keys } = @$self{ @$keys };
     return( $hash );
 }
@@ -96,10 +94,10 @@ sub chomp
 sub clone
 {
     my $self = shift( @_ );
-    $self->_tie_object->enable( 0 );
+    $self->_tie_object->enable(0);
     my $data = $self->{data};
     my $clone = Clone::clone( $data );
-    $self->_tie_object->enable( 1 );
+    $self->_tie_object->enable(1);
     return( $self->new( $clone ) );
 }
 
@@ -148,12 +146,14 @@ sub get { return( $_[0]->{ $_[1] } ); }
 
 sub has { return( shift->exists( @_ ) ); }
 
+sub is_empty { return( scalar( keys( %{$_[0]} ) ) ? 0 : 1 ); }
+
 sub json
 {
     my $self = shift( @_ );
     my $opts = {};
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
-    $self->_tie_object->enable( 0 );
+    $self->_tie_object->enable(0);
     my $data = $self->{data};
     my $json;
     if( $opts->{pretty} )
@@ -164,7 +164,7 @@ sub json
     {
         $json = JSON->new->utf8->canonical(1)->allow_nonref->encode( $data );
     }
-    $self->_tie_object->enable( 1 );
+    $self->_tie_object->enable(1);
     return( Module::Generic::Scalar->new( $json ) );
 }
 
@@ -172,7 +172,7 @@ sub json
 sub keys
 {
     my $self = shift( @_ );
-    $self->_tie_object->enable( 1 );
+    $self->_tie_object->enable(1);
     return( Module::Generic::Array->new( [ CORE::keys( %$self ) ] ) );
 }
 
@@ -212,7 +212,7 @@ sub merge
     my $opts = {};
     $opts = pop( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
     $opts->{overwrite} = 1 unless( CORE::exists( $opts->{overwrite} ) );
-    $self->_tie_object->enable( 0 );
+    $self->_tie_object->enable(0);
     my $data = $self->{data};
     my $seen = {};
     local $copy = sub
@@ -251,9 +251,11 @@ sub merge
     };
     ## $self->message( 3, "Propagating hash ", sub{ $self->dumper( $hash ) }, " to hash ", sub{ $self->dumper( $data ) } );
     $copy->( $hash, $data, $opts );
-    $self->_tie_object->enable( 1 );
+    $self->_tie_object->enable(1);
     return( $self );
 }
+
+sub remove { return( shift->delete( @_ ) ); }
 
 sub reset { %{$_[0]} = () };
 
@@ -319,18 +321,18 @@ sub values
 sub _dumper
 {
     my $self = shift( @_ );
-    $self->_tie_object->enable( 0 );
+    $self->_tie_object->enable(0);
     my $data = $self->{data};
     my $d = Data::Dumper->new( [ $data ] );
-    $d->Indent( 1 );
-    $d->Useqq( 1 );
-    $d->Terse( 1 );
-    $d->Sortkeys( 1 );
+    $d->Indent(1);
+    $d->Useqq(1);
+    $d->Terse(1);
+    $d->Sortkeys(1);
     # $d->Freezer( '' );
     $d->Bless( '' );
     # return( $d->Dump );
     my $str = $d->Dump;
-    $self->_tie_object->enable( 1 );
+    $self->_tie_object->enable(1);
     return( $str );
 }
 
@@ -340,7 +342,7 @@ sub _internal
     my $field = shift( @_ );
     my $meth  = shift( @_ );
     # print( STDERR ref( $self ), "::_internal -> Caling method '$meth' for field '$field' with value '", join( "', '", @_ ), "'\n" );
-    $self->_tie_object->enable( 0 );
+    $self->_tie_object->enable(0);
     my( @resA, $resB );
     if( wantarray )
     {
@@ -352,7 +354,7 @@ sub _internal
         $resB = $self->$meth( $field, @_ );
         # $self->message( "Resturn scalar value is: '$resB'" );
     }
-    $self->_tie_object->enable( 1 );
+    $self->_tie_object->enable(1);
     return( wantarray ? @resA : $resB );
 }
 
@@ -396,7 +398,7 @@ sub _obj_eq
     }
     else
     {
-        return( 0 );
+        return(0);
     }
     return( $strA eq $strB );
 }

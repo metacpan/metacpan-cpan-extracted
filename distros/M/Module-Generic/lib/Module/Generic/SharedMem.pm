@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2021/10/24
+## Modified 2021/12/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,8 +21,8 @@ BEGIN
     use File::Spec ();
     use Nice::Try;
     use Scalar::Util ();
-    use JSON qw( -convert_blessed_universally );
-    use Storable ();
+    use JSON 4.03 qw( -convert_blessed_universally );
+    use Storable 3.25 ();
     use constant SHM_BUFSIZ     =>  65536;
     use constant SEM_LOCKER     =>  0;
     use constant SEM_MARKER     =>  0;
@@ -102,7 +102,7 @@ EOT
     # be removed in that order
     our $SHEM_REPO = [];
     our $ID2OBJ    = {};
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
 };
 
 sub init
@@ -121,7 +121,10 @@ sub init
     # SHM_BUFSIZ
     $self->{size}       = SHM_BUFSIZ;
     $self->{_init_strict_use_sub} = 1;
-    $self->{_packing_method} = 'storable';
+    # $self->{_packing_method} = 'storable';
+    # Storable keps breaking :(
+    # I leave the feature of using it as a choice to the user, but defaults to JSON
+    $self->{_packing_method} = 'json';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{addr}       = undef();
     $self->{id}         = undef();
@@ -306,11 +309,6 @@ sub lock
         local $SIG{ALRM} = sub{ die( "timeout" ); };
         alarm( $timeout );
         my $rc = $self->op( @{$SEMOP_ARGS->{ $type }} );
-        # XXX Remove this
-#         my $v = $self->debug;
-#         $self->debug(3);
-#         $self->message( 3, "Semaphore arguments are: ", sub{ $self->dump( $SEMOP_ARGS ) } );
-#         $self->debug($v);
         alarm(0);
         if( $rc )
         {

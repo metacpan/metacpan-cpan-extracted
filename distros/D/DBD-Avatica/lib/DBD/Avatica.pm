@@ -1,11 +1,13 @@
 package DBD::Avatica;
 
+# ABSTRACT: Driver for Apache Avatica compatible servers
+
 use strict;
 use warnings;
 use DBI;
 use vars qw($VERSION $err $errstr $sqlstate $drh);
 
-$VERSION = '0.01.0';
+$VERSION = '0.2.0';
 
 $drh = undef;
 
@@ -244,6 +246,11 @@ sub rollback {
         $dbh->set_err(undef, undef, '');
     }
     return $ret;
+}
+
+sub last_insert_id {
+  my $dbh = shift;
+  return $dbh->{avatica_adapter}->last_insert_id($dbh, @_);
 }
 
 my %get_info_type = (
@@ -708,11 +715,11 @@ __END__
 
 =head1 NAME
 
-DBD::Avatica
+DBD::Avatica - Driver for Apache Avatica compatible servers
 
 =head1 VERSION
 
-version 0.01.0
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -731,10 +738,6 @@ version 0.01.0
 
 DBD::Avatica is a Perl module that works with the DBI module to provide access to
 databases with Apache Avatica compatible protocol.
-
-=head1 NAME
-
-DBD::Avatica - Driver for Apache Avatica compatible servers
 
 =head1 MODULE DOCUMENTATION
 
@@ -1076,8 +1079,8 @@ of 0 for 'no rows were affected', in order to always return a true value if no e
 
 =head3 B<last_insert_id>
 
-  $rv = $dbh->last_insert_id(undef, $schema, $table, undef);
-  $rv = $dbh->last_insert_id(undef, $schema, $table, undef, {sequence => $seqname});
+  $rv = $dbh->last_insert_id(undef, $schema, $table, $column);
+  $rv = $dbh->last_insert_id(undef, $schema, $table, $column, {sequence => $seqname});
 
 Attempts to return the id of the last value of sequence to be inserted into a table.
 You can either provide a sequence name (preferred) or provide a table
@@ -1086,7 +1089,9 @@ name with optional schema, and DBD::Avatica will attempt to find the sequence it
 If you do not know the name of the sequence, you can provide a table name and
 DBD::Avatica will attempt to return the correct value. To do this, there must be at
 least one column in the table which uses a sequence, sequence schema name must be similar
-schema table name and sequnce prefix name must contain table name.
+schema table name and sequnce prefix name must contain table name. If there are many sequences
+in the table then the sequence prefix must contain table name and column name separated by
+an underscore symbol.
 
 Example:
 
@@ -1098,8 +1103,6 @@ Example:
     my $newid = $dbh->last_insert_id(undef, undef, undef, undef, {sequence=>'test_seq'});
     print "Last insert id was $newid\n";
   }
-
-At the moment this method/feature is not implemented.
 
 =head3 B<commit>
 
@@ -1521,13 +1524,11 @@ for data transfer applications.
 
 =head3 B<last_insert_id>
 
-  $rv = $sth->last_insert_id(undef, $schema, $table, undef);
-  $rv = $sth->last_insert_id(undef, $schema, $table, undef, {sequence => $seqname});
+  $rv = $sth->last_insert_id(undef, $schema, $table, $column);
+  $rv = $sth->last_insert_id(undef, $schema, $table, $column, {sequence => $seqname});
 
 This is simply an alternative way to return the same information as
 C<< $dbh->last_insert_id >>.
-
-At the moment not supported.
 
 =head2 Statement Handle Attributes
 

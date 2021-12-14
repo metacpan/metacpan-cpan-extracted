@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::FortyTwo;
 # ABSTRACT: Main class for forty-two tool
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Apps::FortyTwo::VERSION = '0.210570';
+$Bio::MUST::Apps::FortyTwo::VERSION = '0.213470';
 use Moose;
 use namespace::autoclean;
 
@@ -38,7 +38,7 @@ Bio::MUST::Apps::FortyTwo - Main class for forty-two tool
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ resulting from transcriptome assembly or already translated protein sequences.
 One can also use genomic nucleotide sequences (because C<42> can splice
 introns), but this possibility has not been extensively tested so far.
 
-For information can be found in the L<Manual|forty-two-manual>.
+For information can be found in the L<FortyTwo::Manual>.
 
 =head1 AUTHOR
 

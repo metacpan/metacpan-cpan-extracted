@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::Debrief42::RunReport;
 # ABSTRACT: Internal class for tabular tax-report parser
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Apps::Debrief42::RunReport::VERSION = '0.210570';
+$Bio::MUST::Apps::Debrief42::RunReport::VERSION = '0.213470';
 use Moose;
 use namespace::autoclean;
 
@@ -188,7 +188,7 @@ Bio::MUST::Apps::Debrief42::RunReport - Internal class for tabular tax-report pa
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 SYNOPSIS
 

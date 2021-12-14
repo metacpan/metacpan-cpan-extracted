@@ -4,13 +4,13 @@
       "Mathias Weidner <mamawe@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-VOJournal",
    "prereqs" : {
@@ -35,18 +35,25 @@
    "provides" : {
       "App::VOJournal" : {
          "file" : "lib/App/VOJournal.pm",
-         "version" : "v0.4.5"
+         "version" : "v0.4.6"
       },
       "App::VOJournal::VOTL" : {
          "file" : "lib/App/VOJournal/VOTL.pm",
-         "version" : "v0.4.5"
+         "version" : "v0.4.6"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-VOJournal"
+      },
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/matwei-perl/App-VOJournal"
+      }
    },
-   "version" : "v0.4.5"
+   "version" : "v0.4.6",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

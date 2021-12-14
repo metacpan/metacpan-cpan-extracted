@@ -569,7 +569,7 @@ This is different from L</size> that returns value from 0 and -1 if the array is
 
 =head2 list
 
-Reeturns the array as a list
+Returns the array as a list
 
     my $a = Module::Generic::Array->new( [qw( Joe John Mary )] );
     print( "@$a" ); # Joe John Mary
@@ -786,6 +786,10 @@ This takes an L<Module::Generic::Array> object, or an array reference, or a regu
     say( "@$a" ); # Jack Gabriel Raphael
 
 It returns the current object.
+
+=head2 replace
+
+Provided with an old entry and a new one and this will try to find the index position of the old entry, and if found, will replace it with the new one.
 
 =head2 reset
 

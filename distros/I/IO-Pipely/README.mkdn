@@ -4,7 +4,7 @@ IO::Pipely - Portably create pipe() or pipe-like handles, one way or another.
 
 # VERSION
 
-version 0.005
+version 0.006
 
 # SYNOPSIS
 
@@ -26,16 +26,16 @@ Please read DESCRIPTION for detailed semantics and caveats.
     # the best conduit type available.
 
     my (
-      $side_a_read,  $side_b_read,
-      $side_a_write, $side_b_write,
+      $side_a_read, $side_a_write,
+      $side_b_read, $side_b_write,
     ) = socketpairly();
 
     # Create a bidirectional pipe-like thing using an INET socket
     # specifically.
 
     my (
-      $side_a_read,  $side_b_read,
-      $side_a_write, $side_b_write,
+      $side_a_read, $side_a_write,
+      $side_b_read, $side_b_write,
     ) = socketpairly(type => 'inet');
 
 # DESCRIPTION
@@ -80,7 +80,7 @@ When given a choice, it will prefer to use leaner pipe() calls instead
 of socketpair() and socket().
 
 pipely()'s choice can be forced using an optional named "type"
-parameter.  See ["PIPE TYPES"](#PIPE TYPES) for the types that can be used.
+parameter.  See ["PIPE TYPES"](#pipe-types) for the types that can be used.
 
     my ($a_read, $b_write) = pipely(
       type => 'pipe',
@@ -110,7 +110,7 @@ for one end, and read and write for the other.  On failure, it returns
 nothing.
 
     use IO::Pipely qw(socketpairly);
-    my ($a_read, $b_read, $a_write, $b_write) = socketpairly();
+    my ($a_read, $a_write, $b_read, $b_write) = socketpairly();
     die "socketpairly() failed: $!" unless $a_read;
 
 socketpairly() returns two extra "writer" handles.  They exist for the
@@ -119,18 +119,18 @@ pair.  The extra handles can be ignored whenever pipe() will never be
 used.  For example:
 
     use IO::Pipely qw(socketpairly);
-    my ($side_a, $side_b) = socketpairly( type => 'socketpair' );
+    my ($side_a, undef, $side_b, undef) = socketpairly( type => 'socketpair' );
     die "socketpairly() failed: $!" unless $side_a;
 
 When given a choice, it will prefer bidirectional sockets instead of
 pipe() calls.
 
 socketpairly()'s choice can be forced using an optional named "type"
-parameter.  See ["PIPE TYPES"](#PIPE TYPES) for the types that can be used.  In
+parameter.  See ["PIPE TYPES"](#pipe-types) for the types that can be used.  In
 this example, two unidirectional pipes wil be used instead of a more
 efficient pair of sockets:
 
-    my ($a_read, $a_write, $b_read, $b_write) = pipely(
+    my ($a_read, $a_write, $b_read, $b_write) = socketpairly(
       type => 'pipe',
     );
 
@@ -198,7 +198,7 @@ Things change, so check back now and then.
 
 CygWin seems to have a problem with socketpair() and exec().  When
 an exec'd process closes, any data on sockets created with
-socketpair() is not flushed.  From irc.perl.org channel \#poe:
+socketpair() is not flushed.  From irc.perl.org channel #poe:
 
     <dngnand>   Sounds like a lapse in cygwin's exec implementation.
                 It works ok under Unix-ish systems?
@@ -251,13 +251,13 @@ any of these is needed:
 
 # AUTHOR & COPYRIGHT
 
-IO::Pipely is copyright 2000-2013 by Rocco Caputo.
+IO::Pipely is copyright 2000-2021 by Rocco Caputo.
 All rights reserved.
 IO::Pipely is free software; you may redistribute it and/or modify it
 under the same terms as Perl itself.
 
 # HISTORY
 
-IO::Pipely is a spin-off of the [POE](http://search.cpan.org/perldoc?POE) project's portable pipes.
+IO::Pipely is a spin-off of the [POE](https://metacpan.org/pod/POE) project's portable pipes.
 Earlier versions of the code have been tested and used in production
 systems for over a decade.

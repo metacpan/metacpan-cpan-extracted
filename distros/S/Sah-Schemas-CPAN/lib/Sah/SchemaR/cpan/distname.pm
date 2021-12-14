@@ -1,7 +1,7 @@
 package Sah::SchemaR::cpan::distname;
 
-our $DATE = '2021-01-02'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2021-07-19'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $rschema = ["str",[{description=>"\nFor convenience (particularly in CLI with tab completion), you can input one of:\n\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pm\n    Foo.Bar\n\nand it will be coerced into Foo-Bar form.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*\\z",summary=>"Perl distribution name, e.g. Foo-Bar","x.completion"=>"perl_distname","x.perl.coerce_rules"=>["From_str::normalize_perl_distname"]},{description=>"\nLike perl::distname, but with completion from distribution names on CPAN (using\nlcpan).\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"Foo-Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo-Bar",value=>"Foo::Bar"}],"x.completion"=>["lcpan_distname"]}],["perl::distname","str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cpan::distname -
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::cpan::distname (from Perl distribution Sah-Schemas-CPAN), released on 2020-01-02.
+This document describes version 0.013 of Sah::SchemaR::cpan::distname (from Perl distribution Sah-Schemas-CPAN), released on 2021-07-19.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-CPAN>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-CPAN/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-CPAN>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

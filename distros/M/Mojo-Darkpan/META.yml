@@ -26,7 +26,7 @@ no_index:
 provides:
   Mojo::Darkpan:
     file: lib/Mojo/Darkpan.pm
-    version: '0.05'
+    version: '0.06'
   Mojo::Darkpan::Config:
     file: lib/Mojo/Darkpan/Config.pm
   Mojo::Darkpan::Controller::Index:
@@ -40,6 +40,7 @@ provides:
 requires:
   IO::Zlib: '0'
   JSON: '0'
+  Mojo::File: '0'
   Mojolicious: '0'
   Mojolicious::Plugin::BasicAuthPlus: '0'
   Moo: '0'
@@ -50,7 +51,7 @@ resources:
   bugtracker: https://github.com/rshingleton/Mojo-Darkpan/issues
   homepage: https://github.com/rshingleton/Mojo-Darkpan
   repository: git://github.com/rshingleton/Mojo-Darkpan.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'shingler <shingler@oclc.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

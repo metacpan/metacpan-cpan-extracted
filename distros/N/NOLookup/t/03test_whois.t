@@ -18,7 +18,7 @@ use NOLookup::Whois::WhoisLookup qw /
 
 require_ok('NOLookup::Whois::WhoisLookup');
 
-my $SERVER = $ENV{WHOIS_SERVICE} || "registrarwhois.test.norid.no";
+my $SERVER = $ENV{WHOIS_SERVICE} || "registrarwhois.norid.no";
 
 my @ho_handles;
 my @do_handles;

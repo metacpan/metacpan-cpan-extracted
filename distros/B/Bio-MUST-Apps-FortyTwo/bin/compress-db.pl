@@ -130,7 +130,7 @@ compress-db.pl - Post-process assembler for transcript enrichment using 42
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 USAGE
 

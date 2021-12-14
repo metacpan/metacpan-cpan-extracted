@@ -1,5 +1,8 @@
 Revision history for perl distribution App-proxyforurl
 
+0.12 2021-12-14T19:16:57+0900
+ - Fix correct quotes for pure-min.css
+
 0.11 2021-10-20T13:27:26+0900
  - Skip test for CPAN smokers
 

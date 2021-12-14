@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::Debrief42::TaxReport;
 # ABSTRACT: Front-end class for tabular tax-report parser
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Apps::Debrief42::TaxReport::VERSION = '0.210570';
+$Bio::MUST::Apps::Debrief42::TaxReport::VERSION = '0.213470';
 use Moose;
 use namespace::autoclean;
 
@@ -112,7 +112,7 @@ Bio::MUST::Apps::Debrief42::TaxReport - Front-end class for tabular tax-report p
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 SYNOPSIS
 

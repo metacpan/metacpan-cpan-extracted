@@ -28,4 +28,4 @@ resources:
   bugtracker: https://github.com/abw/Template2/issues
   homepage: http://www.template-toolkit.org
   repository: https://github.com/abw/Template2.git
-version: '3.009'
+version: '3.010'

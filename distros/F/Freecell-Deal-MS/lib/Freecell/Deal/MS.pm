@@ -1,5 +1,5 @@
 package Freecell::Deal::MS;
-$Freecell::Deal::MS::VERSION = '0.2.0';
+$Freecell::Deal::MS::VERSION = '0.4.0';
 use strict;
 use warnings;
 
@@ -10,24 +10,25 @@ use Class::XSAccessor {
     accessors   => [qw(deal)],
 };
 
+my @INITIAL_CARDS = (
+    map {
+        my $s = $_;
+        map { $s . $_ } qw/C D H S/;
+    } ( 'A', ( 2 .. 9 ), 'T', 'J', 'Q', 'K' )
+);
+
 sub as_str
 {
     my ($self) = @_;
 
-    my @cards = (
-        map {
-            my $s = $_;
-            map { $s . $_ } qw/C D H S/;
-        } ( 'A', ( 2 .. 9 ), 'T', 'J', 'Q', 'K' )
-    );
+    my @cards = @INITIAL_CARDS;
     Math::RNG::Microsoft::FCPro->new( seed => scalar( $self->deal ) )
         ->shuffle( \@cards );
     my @lines = ( map { [ ':', ] } 0 .. 7 );
-    my $i     = 0;
+    my $i     = -1;
     while (@cards)
     {
-        push @{ $lines[$i] }, pop(@cards);
-        $i = ( ( $i + 1 ) & 7 );
+        push @{ $lines[ ( ( ++$i ) & 7 ) ] }, pop(@cards);
     }
     my $str = join "", map { "@$_\n" } @lines;
     return $str;
@@ -47,7 +48,7 @@ Freecell::Deal::MS - deal Windows FreeCell / FC Pro layouts
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -71,7 +72,11 @@ version 0.2.0
     : 9D JC 2C QS TH 2D
     : AH 7C 6D 8D TD 7H
     EOF
+
 =head1 DESCRIPTION
+
+Deals FC Pro deals: L<http://rosettacode.org/wiki/Deal_cards_for_FreeCell>
+and L<https://fc-solve.shlomifish.org/faq.html#what_are_ms_deals> .
 
 =head1 METHODS
 

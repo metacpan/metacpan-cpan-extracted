@@ -260,6 +260,10 @@ See L</set> for the opposite method, i.e. setting a key value.
 
 Returns true if the given value exists in the hash. This is effectively an alias for L</exists>
 
+=head2 is_empty
+
+Returns true if the hash object contains no data, or false otherwise.
+
 =head2 json
 
 This returns a L<JSON> representation of the hash. You can provided optionally an hash reference of parameters. Currently, only one parameter is supported: I<pretty>, which will make the json result more human readable. With it enabled, you would get something like this :
@@ -317,6 +321,10 @@ For this to work properly, the code reference needs to return a key-value pair.
 Provided with an hash reference and an optional hash of parameters and this will mergge the given hash with hash in our object. It does so recursively and prevents looping by using L<Scalar::Util/"refaddr">.
 
 Currently the only parameter possible is I<overwrite>. By default this is set to a true value, and you can provide this argument to specifically indicates you do not want the hash key value to be overwriten.
+
+=head2 remove
+
+Just an alias for L</delete>
 
 =head2 reset
 

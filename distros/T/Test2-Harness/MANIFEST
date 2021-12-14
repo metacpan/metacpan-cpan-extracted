@@ -15,13 +15,16 @@ dist.ini
 foo.jsonl
 lib/App/Yath.pm
 lib/App/Yath/Command.pm
+lib/App/Yath/Command/abort.pm
 lib/App/Yath/Command/auditor.pm
 lib/App/Yath/Command/collector.pm
 lib/App/Yath/Command/do.pm
 lib/App/Yath/Command/failed.pm
 lib/App/Yath/Command/help.pm
 lib/App/Yath/Command/init.pm
+lib/App/Yath/Command/kill.pm
 lib/App/Yath/Command/projects.pm
+lib/App/Yath/Command/ps.pm
 lib/App/Yath/Command/reload.pm
 lib/App/Yath/Command/replay.pm
 lib/App/Yath/Command/run.pm
@@ -29,6 +32,7 @@ lib/App/Yath/Command/runner.pm
 lib/App/Yath/Command/spawn.pm
 lib/App/Yath/Command/speedtag.pm
 lib/App/Yath/Command/start.pm
+lib/App/Yath/Command/status.pm
 lib/App/Yath/Command/stop.pm
 lib/App/Yath/Command/test.pm
 lib/App/Yath/Command/times.pm

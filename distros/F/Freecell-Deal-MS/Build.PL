@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Freecell-Deal-MS",
-  "dist_version" => "0.2.0",
+  "dist_version" => "0.4.0",
   "license" => "mit",
   "module_name" => "Freecell::Deal::MS",
   "recursive_test_files" => 1,

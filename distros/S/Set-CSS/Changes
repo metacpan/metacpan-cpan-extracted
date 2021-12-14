@@ -1,0 +1,10 @@
+Revision history for Set-CSS
+
+0.2.0       2021-12-14
+
+    - Add addClass, removeClass, and toggleClass.
+    - Improved the docs (thanks to Altreus).
+
+0.0.1       2021-12-14
+
+    - First version, released on an unsuspecting world

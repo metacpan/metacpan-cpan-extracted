@@ -71,7 +71,7 @@ use strict;
 use warnings;
 use base 'Template::Stash';
 
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 our $DEBUG   = 0 unless defined $DEBUG;
 
 
@@ -628,46 +628,6 @@ sub _assign {
     return undef;
 }
 
-
-#------------------------------------------------------------------------
-# _dump()
-#
-# Debug method which returns a string representing the internal state
-# of the object.  The method calls itself recursively to dump sub-hashes.
-#------------------------------------------------------------------------
-
-sub _dump {
-    my $self   = shift;
-    my $indent = shift || 1;
-    my $buffer = '    ';
-    my $pad    = $buffer x $indent;
-    my $text   = '';
-    local $" = ', ';
-
-    my ($key, $value);
-
-
-    return $text . "...excessive recursion, terminating\n"
-        if $indent > 32;
-
-    foreach $key (keys %$self) {
-
-        $value = $self->{ $key };
-        $value = '<undef>' unless defined $value;
-
-        if (ref($value) eq 'ARRAY') {
-            $value = "$value [@$value]";
-        }
-        $text .= sprintf("$pad%-8s => $value\n", $key);
-        next if $key =~ /^\./;
-        if (UNIVERSAL::isa($value, 'HASH')) {
-            $text .= _dump($value, $indent + 1);
-        }
-    }
-    $text;
-}
-
-
 1;
 
 __END__
@@ -748,7 +708,7 @@ L<http://wardley.org/|http://wardley.org/>
 =head1 VERSION
 
 1.63, distributed as part of the
-Template Toolkit version 3.009, released on 30 March 2020.
+Template Toolkit version 3.010, released on 30 March 2020.
 
 =head1 COPYRIGHT
 

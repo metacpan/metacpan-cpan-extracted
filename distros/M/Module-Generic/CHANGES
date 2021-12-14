@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Generic
 
+v0.18.3 2021-12-14T12:44:31+0900
+    - Added method replace in Module::Generic::Array
+    - Added methods is_empty and remove in Module::Generic::Hash
+    - Changed Module::Generic::SharedMem default encoding tool to JSON instead of Storable
+
 v0.18.2 2021-12-08T15:27:47+0900
     - Correction in Number::Format when default locale is C or POSIX
 

@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Roles::OrgProcable;
 # ABSTRACT: Attributes and methods common to OrgProcessor objects
-$Bio::MUST::Apps::Roles::OrgProcable::VERSION = '0.210570';
+$Bio::MUST::Apps::Roles::OrgProcable::VERSION = '0.213470';
 use Moose::Role;
 
 use autodie;
@@ -212,7 +212,7 @@ Bio::MUST::Apps::Roles::OrgProcable - Attributes and methods common to OrgProces
 
 =head1 VERSION
 
-version 0.210570
+version 0.213470
 
 =head1 SYNOPSIS
 

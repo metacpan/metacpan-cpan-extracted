@@ -58,7 +58,7 @@
    "provides" : {
       "Freecell::Deal::MS" : {
          "file" : "lib/Freecell/Deal/MS.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/shlomif/fc-solve"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.4.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

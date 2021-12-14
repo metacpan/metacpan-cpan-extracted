@@ -1,5 +1,17 @@
 Revision history for Perl extension Email::MIME.
 
+1.952     2021-12-14 09:57:27-05:00 America/New_York
+        - exactly 1.951, except will install on 5.8.8
+        - **ACHTUNG!**  Do not expect any future release to work on Perl v5.8
+
+1.951     2021-12-14 09:41:01-05:00 America/New_York
+        - non-trial release of 1.950 changes
+
+1.950     2020-11-02 19:21:52-05:00 America/New_York (TRIAL RELEASE)
+        - when computing filename, start from raw  Content-Disposition (thanks,
+          Mishrakk)
+        - avoid a potentially very slow regex in parsing (thanks, ivulfson)
+
 1.949     2020-05-24 10:25:36-04:00 America/New_York
         - no changes since trial release
 
