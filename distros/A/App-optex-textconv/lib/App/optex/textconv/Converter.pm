@@ -5,17 +5,21 @@ no strict 'refs';
 use warnings;
 
 sub import {
-    my $pkg = shift;
-    my $callpkg = caller;
+    my $pkg = $_[0];
+    my $caller = caller;
 
-    if ($pkg eq __PACKAGE__ and @_ and $_[0] eq "import") {
-	*{$callpkg."::import"} = \&import;
+    if ($pkg eq __PACKAGE__ and @_ > 1 and $_[1] eq "import") {
+	*{$caller."::import"} = \&import;
 	return;
     }
 
-    my $from = \@{"$pkg\::CONVERTER"};
-    my $to   = \@{"$callpkg\::CONVERTER"};
+    if (@_ > 1) {
+	use Exporter ();
+	goto &Exporter::import;
+    }
 
+    my $from = \@{$pkg   ."::CONVERTER"};
+    my $to   = \@{$caller."::CONVERTER"};
     unshift @$to, @$from;
 }
 

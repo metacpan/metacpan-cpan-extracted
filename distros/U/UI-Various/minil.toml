@@ -1,0 +1,21 @@
+name = "UI-Various"
+# badges = ["travis-ci.com"]
+module_maker = "ModuleBuild"
+static_install = "auto"
+
+# no automatic upload to PAUSE/CPAN (yet):
+[release]
+do_not_upload_to_cpan = true
+
+#########################################################################
+# at least for 1st releases:
+requires_external_bin=['stty']
+
+[ReleaseTest]
+MinimumVersion = false
+
+[unsupported]
+os = [
+    "MSWin32",
+    "darwin"
+]

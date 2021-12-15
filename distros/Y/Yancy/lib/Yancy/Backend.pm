@@ -1,5 +1,5 @@
 package Yancy::Backend;
-our $VERSION = '1.086';
+our $VERSION = '1.087';
 # ABSTRACT: Interface to a database
 
 #pod =head1 SYNOPSIS
@@ -377,6 +377,24 @@ sub delete { ... }
 
 sub delete_p { ... }
 
+#pod =head2 query
+#pod
+#pod Run a raw query on the backend. Each backend may have its own arguments.
+#pod Returns a list of hash references of data.
+#pod
+#pod =cut
+
+sub query { ... }
+
+#pod =head2 query_p
+#pod
+#pod Run a raw query on the backend. Each backend may have its own arguments.
+#pod Returns a promise that resolves into a list of hash references of data.
+#pod
+#pod =cut
+
+sub query_p { ... }
+
 #pod =head2 read_schema
 #pod
 #pod     my $schema = $be->read_schema;
@@ -524,7 +542,7 @@ Yancy::Backend - Interface to a database
 
 =head1 VERSION
 
-version 1.086
+version 1.087
 
 =head1 SYNOPSIS
 
@@ -836,6 +854,16 @@ with the given ID was found and deleted. False otherwise.
 Delete an item asynchronously using promises. Returns a promise that
 resolves to a boolean indicating if the row was deleted. See L</delete>
 for arguments and return values.
+
+=head2 query
+
+Run a raw query on the backend. Each backend may have its own arguments.
+Returns a list of hash references of data.
+
+=head2 query_p
+
+Run a raw query on the backend. Each backend may have its own arguments.
+Returns a promise that resolves into a list of hash references of data.
 
 =head2 read_schema
 

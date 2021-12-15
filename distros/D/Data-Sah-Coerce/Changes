@@ -1,3 +1,8 @@
+0.052   2021-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Allow access to %gen_coercer_args.
+
+
 0.051   2021-10-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Add date coerce rules:

@@ -22,5 +22,5 @@ requires:
   File::Spec: '0'
   JSON: '2'
   Test::More: '0'
-version: '0.9522'
+version: '0.9523'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

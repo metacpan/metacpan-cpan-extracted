@@ -1,5 +1,10 @@
 Revision history for Perl module DNS::Unbound
 
+0.28 Wed, 15 Dec 2021
+- Make all Unbound-created errors X::Tiny::Base instances.
+- Import error codes from unbound.h.
+- Add more tests.
+
 0.27 Tue, 23 Nov 2021
 - BUG FIX: Close dup()ed file descriptors when setting debugout() away from them.
 - UB_* constants are now defined and documented.

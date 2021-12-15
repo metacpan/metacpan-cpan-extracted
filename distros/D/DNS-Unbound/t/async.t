@@ -76,7 +76,21 @@ for my $use_threads_yn ( 0, 1 ) {
             } );
         } @tlds;
 
+        my $fd = $dns->fd();
+        my $rin = q<>;
+        vec( $rin, $fd, 1 ) = 1;
+        select($rin, undef, undef, undef);
+        ok(
+            $dns->poll(),
+            'poll() gives truthy when there’s something to read',
+        );
+
         $dns->wait() while $done_count < @tlds;
+
+        ok(
+            !$dns->poll(),
+            'poll() gives falsy when there’s nothing to read',
+        );
     }
 }
 

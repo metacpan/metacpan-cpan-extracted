@@ -14,7 +14,6 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Cookie::Jar );
-    use Nice::Try;
     our $VERSION = $Cookie::Jar::VERSION;
 };
 

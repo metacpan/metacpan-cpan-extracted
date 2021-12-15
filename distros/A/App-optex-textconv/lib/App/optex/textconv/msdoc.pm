@@ -1,6 +1,6 @@
 package App::optex::textconv::msdoc;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use v5.14;
 use warnings;
@@ -11,6 +11,8 @@ use Data::Dumper;
 
 use App::optex v0.3;
 use App::optex::textconv::Converter 'import';
+
+our @EXPORT_OK = qw(to_text get_list);
 
 our @CONVERTER = (
     [ qr/\.doc[xm]$/ => \&to_text ],

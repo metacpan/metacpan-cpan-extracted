@@ -1,5 +1,8 @@
 Revision history for Perl module Cookie
 
+v0.1.8 2021-12-15T07:01:04+0900
+    - Re-submision for Cookies
+
 v0.1.7 2021-12-14T10:50:36+0900
     - Added the Cookies class to serve as a cookies jar. See also Cookie::Jar
 

@@ -1,13 +1,8 @@
 package App::optex::tc;
 
-use v5.14;
+use strict;
 use warnings;
 
-use App::optex::textconv;
-
-for my $sub (qw(initialize finalize load)) {
-    no strict 'refs';
-    *{$sub} = \&{"App::optex::textconv::$sub"};
-}
+use App::optex::textconv ':alias';
 
 1;

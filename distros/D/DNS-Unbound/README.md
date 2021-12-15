@@ -2,6 +2,10 @@
 
 DNS::Unbound - Query DNS recursively via [libunbound](https://www.nlnetlabs.nl/documentation/unbound/libunbound/)
 
+<div>
+    <a href='https://coveralls.io/github/FGasper/p5-DNS-Unbound?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-DNS-Unbound/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
+
 # SYNOPSIS
 
     my $dns = DNS::Unbound->new()->set_option( verbosity => 2 );
@@ -39,10 +43,6 @@ You can also integrate with a custom event loop; see ["EVENT LOOPS"](#event-loop
 
 # DESCRIPTION
 
-<div>
-    <a href='https://coveralls.io/github/FGasper/p5-DNS-Unbound?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-DNS-Unbound/badge.svg?branch=master' alt='Coverage Status' /></a>
-</div>
-
 Typical DNS lookups involve a request to a local server that caches
 information from DNS. The caching makes it fast, but it also means
 updates to DNS aren’t always available via that local server right away.
@@ -77,6 +77,18 @@ call this class’s `perform()` method.
 Objects in this namespace will, if left alive at global destruction,
 throw a warning about memory leaks. To silence these warnings, either
 allow all queries to complete, or cancel queries you no longer care about.
+
+# ERRORS
+
+This library throws 3 kinds of errors:
+
+- Plain strings. Generally thrown in “simple” failure cases,
+e.g., invalid inputs.
+- [DNS::Unbound::X::Unbound](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AX%3A%3AUnbound) instances. Thrown whenever
+Unbound gives an error.
+- [DNS::Unbound::X::ResolveError](https://metacpan.org/pod/DNS%3A%3AUnbound%3A%3AX%3A%3AResolveError) instances. A subclass
+of the last kind, for (Unbound-reported) resolution failures.
+(This is **NOT** for DNS-reported failures.)
 
 # CONSTANTS
 
@@ -250,7 +262,7 @@ returned as an array reference. Useful for `TXT` query results.
 # SEE ALSO
 
 [Net::DNS::Resolver::Recurse](https://metacpan.org/pod/Net%3A%3ADNS%3A%3AResolver%3A%3ARecurse) provides comparable logic to this module
-in pure Perl. Like Unbound, it is maintained by ["NLnet Labs"](#nlnet-labs).
+in pure Perl. Like Unbound, it is maintained by [NLnet Labs](https://nlnetlabs.nl/).
 
 # LICENSE & COPYRIGHT
 

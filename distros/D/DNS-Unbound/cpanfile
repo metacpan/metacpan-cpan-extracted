@@ -14,6 +14,7 @@ test_requires 'Net::DNS::Nameserver';
 recommends 'ExtUtils::PkgConfig';
 
 configure_requires 'ExtUtils::MakeMaker::CPANfile';
+configure_requires 'JSON::PP';
 
 on develop => sub {
     requires 'AnyEvent';

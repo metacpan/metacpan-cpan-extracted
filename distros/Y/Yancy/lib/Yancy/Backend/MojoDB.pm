@@ -1,5 +1,5 @@
 package Yancy::Backend::MojoDB;
-our $VERSION = '1.086';
+our $VERSION = '1.087';
 # ABSTRACT: Abstract base class for drivers based on Mojo DB drivers
 
 #pod =head1 SYNOPSIS
@@ -329,6 +329,16 @@ sub list_p {
     );
 }
 
+sub query {
+  my ( $self, @params ) = @_;
+  return $self->driver->db->query( @params )->hashes->each;
+}
+
+sub query_p {
+  my ( $self, @params ) = @_;
+  return $self->driver->db->query_p( @params )->then( sub { my ( $res ) = @_; return $res->hashes->each } );
+}
+
 1;
 
 __END__
@@ -341,7 +351,7 @@ Yancy::Backend::MojoDB - Abstract base class for drivers based on Mojo DB driver
 
 =head1 VERSION
 
-version 1.086
+version 1.087
 
 =head1 SYNOPSIS
 

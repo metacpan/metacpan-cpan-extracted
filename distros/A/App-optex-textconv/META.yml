@@ -28,23 +28,23 @@ provides:
     file: lib/App/optex/tc.pm
   App::optex::textconv:
     file: lib/App/optex/textconv.pm
-    version: '0.12'
+    version: '0.13'
   App::optex::textconv::Converter:
     file: lib/App/optex/textconv/Converter.pm
   App::optex::textconv::default:
     file: lib/App/optex/textconv/default.pm
   App::optex::textconv::msdoc:
     file: lib/App/optex/textconv/msdoc.pm
-    version: '0.12'
+    version: '0.13'
   App::optex::textconv::pandoc:
     file: lib/App/optex/textconv/pandoc.pm
-    version: '0.12'
+    version: '0.13'
   App::optex::textconv::pdf:
     file: lib/App/optex/textconv/pdf.pm
-    version: '0.12'
+    version: '0.13'
   App::optex::textconv::tika:
     file: lib/App/optex/textconv/tika.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   App::optex: v0.3.0
   App::optex::Tmpfile: '0'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex-textconv/issues
   homepage: https://github.com/kaz-utashiro/optex-textconv
   repository: git://github.com/kaz-utashiro/optex-textconv.git
-version: '0.12'
+version: '0.13'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

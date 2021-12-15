@@ -7,9 +7,9 @@ use warnings;
 use subroutines 'Data::Sah::Coerce::perl::To_date::From_obj::datetime';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-18'; # DATE
+our $DATE = '2021-11-28'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 
 # XXX truncate DateTime to day
 
@@ -28,7 +28,7 @@ Data::Sah::Coerce::perl::To_datenotime::From_obj::datetime - Coerce date from Da
 
 =head1 VERSION
 
-This document describes version 0.051 of Data::Sah::Coerce::perl::To_datenotime::From_obj::datetime (from Perl distribution Data-Sah-Coerce), released on 2021-10-18.
+This document describes version 0.052 of Data::Sah::Coerce::perl::To_datenotime::From_obj::datetime (from Perl distribution Data-Sah-Coerce), released on 2021-11-28.
 
 =head1 SYNOPSIS
 

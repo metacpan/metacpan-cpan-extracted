@@ -1,0 +1,35 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'LWP::Protocol::https' => '0',
+                                      'LWP::UserAgent' => '0',
+                                      'URI' => '0',
+                                      'constant' => '0',
+                                      'perl' => 'v5.8.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'XML::LibXML' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'HTTP::Server::Simple' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,10 +1,17 @@
-0.002   2019-05-12 (PERLANCAR)
+0.003   2021-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix CLEAR() (it does not accept key argument).
+
+	- [doc] Mention Tie::StdArray.
+
+
+0.002   2019-05-12  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention some other modules.
 
 
-0.001   2019-04-16 (PERLANCAR)
+0.001   2019-04-16  Released-By: PERLANCAR
 
         - First version.

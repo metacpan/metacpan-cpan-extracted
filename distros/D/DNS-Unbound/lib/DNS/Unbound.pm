@@ -8,7 +8,7 @@ use XSLoader ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.27';
+    $VERSION = '0.28';
     XSLoader::load( __PACKAGE__, $VERSION );
 }
 
@@ -17,6 +17,12 @@ BEGIN {
 =head1 NAME
 
 DNS::Unbound - Query DNS recursively via L<libunbound|https://www.nlnetlabs.nl/documentation/unbound/libunbound/>
+
+=begin html
+
+<a href='https://coveralls.io/github/FGasper/p5-DNS-Unbound?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-DNS-Unbound/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=end html
 
 =head1 SYNOPSIS
 
@@ -57,12 +63,6 @@ You can also integrate with a custom event loop; see L</"EVENT LOOPS"> below.
 
 =head1 DESCRIPTION
 
-=begin html
-
-<a href='https://coveralls.io/github/FGasper/p5-DNS-Unbound?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-DNS-Unbound/badge.svg?branch=master' alt='Coverage Status' /></a>
-
-=end html
-
 Typical DNS lookups involve a request to a local server that caches
 information from DNS. The caching makes it fast, but it also means
 updates to DNS aren’t always available via that local server right away.
@@ -97,6 +97,24 @@ call this class’s C<perform()> method.
 Objects in this namespace will, if left alive at global destruction,
 throw a warning about memory leaks. To silence these warnings, either
 allow all queries to complete, or cancel queries you no longer care about.
+
+=head1 ERRORS
+
+This library throws 3 kinds of errors:
+
+=over
+
+=item * Plain strings. Generally thrown in “simple” failure cases,
+e.g., invalid inputs.
+
+=item * L<DNS::Unbound::X::Unbound> instances. Thrown whenever
+Unbound gives an error.
+
+=item * L<DNS::Unbound::X::ResolveError> instances. A subclass
+of the last kind, for (Unbound-reported) resolution failures.
+(This is B<NOT> for DNS-reported failures.)
+
+=back
 
 =cut
 
@@ -159,32 +177,14 @@ use constant _COMMON_RR => {
 
 use constant {
     _DEFAULT_PROMISE_ENGINE => 'Promise::ES6',
-
-    UB_NOERROR => 0,
-    UB_SOCKET => -1,
-    UB_NOMEM => -2,
-    UB_SYNTAX => -3,
-    UB_SERVFAIL => -4,
-    UB_FORKFAIL => -5,
-    UB_AFTERFINAL => -6,
-    UB_INITFAIL => -7,
-    UB_PIPE => -8,
-    UB_READFILE => -9,
-    UB_NOID => -10,
 };
 
-# Copied from libunbound:
 use constant _ctx_err => {
-    UB_SOCKET()  => 'socket error',
-    UB_NOMEM()  => 'alloc failure',
-    UB_SYNTAX()  => 'syntax error',
-    UB_SERVFAIL()  => 'DNS service failed',
-    UB_FORKFAIL()  => 'fork() failed',
-    UB_AFTERFINAL()  => 'cfg change after finalize()',
-    UB_INITFAIL()  => 'initialization failed (bad settings)',
-    UB_PIPE()  => 'error in pipe communication with async bg worker',
-    UB_READFILE()  => 'error reading from file',
-    UB_NOID() => 'async_id does not exist or result already been delivered',
+    (
+        map { $_ => _ub_strerror($_) }
+        map { __PACKAGE__->can($_)->() }
+        split m<\s+>, _ERROR_NAMES_STR()
+    )
 };
 
 #----------------------------------------------------------------------
@@ -262,6 +262,12 @@ sub _create_resolve_error {
     my ($number) = @_;
 
     return DNS::Unbound::X->create( 'ResolveError', number => $number, string => _ub_strerror($number) );
+}
+
+sub _create_unbound_error {
+    my ($text, $number) = @_;
+
+    return DNS::Unbound::X->create( 'Unbound', $text, number => $number, string => _ub_strerror($number) );
 }
 
 #----------------------------------------------------------------------
@@ -429,8 +435,7 @@ sub set_option {
     my $err = $self->{'_ub'}->_ub_ctx_set_option( "$name:", $value );
 
     if ($err) {
-        my $str = _get_error_string_from_number($err);
-        die "Failed to set “$name” option ($value): $str";
+        die _create_unbound_error("Failed to set “$name” option ($value)", $err);
     }
 
     return $self;
@@ -448,8 +453,7 @@ sub get_option {
     my $got = $self->{'_ub'}->_ub_ctx_get_option( $name );
 
     if ( !ref($got) ) {
-        my $str = _get_error_string_from_number($got);
-        die "Failed to get “$name” option: $str";
+        die _create_unbound_error("Failed to get “$name” option", $got);
     }
 
     return $$got;
@@ -528,8 +532,7 @@ sub hosts {
     my $err = $self->{'_ub'}->_ub_ctx_hosts( $path );
 
     if ($err) {
-        my $str = _get_error_string_from_number($err);
-        die "Failed to set hosts file: $str";
+        die _create_unbound_error("Failed to set hosts file", $err);
     }
 
     return $self;
@@ -541,8 +544,7 @@ sub resolvconf {
     my $err = $self->{'_ub'}->_ub_ctx_resolvconf( $path );
 
     if ($err) {
-        my $str = _get_error_string_from_number($err);
-        die "Failed to set stub nameservers: $str";
+        die _create_unbound_error("Failed to set stub nameservers", $err);
     }
 
     return $self;
@@ -637,8 +639,7 @@ sub add_ta {
     my $err = $self->{'_ub'}->_ub_ctx_add_ta( $ta );
 
     if ($err) {
-        my $str = _get_error_string_from_number($err);
-        die "Failed to add trust anchor: $str";
+        die _create_unbound_error("Failed to add trust anchor", $err);
     }
 
     return $self;
@@ -656,8 +657,7 @@ sub add_ta_autr {
     my $err = $self->{'_ub'}->_ub_ctx_add_ta_autr( $path );
 
     if ($err) {
-        my $str = _get_error_string_from_number($err);
-        die "Failed to add managed trust anchor file: $str";
+        die _create_unbound_error("Failed to add managed trust anchor file", $err);
     }
 
     return $self;
@@ -675,8 +675,7 @@ sub add_ta_file {
     my $err = $self->{'_ub'}->_ub_ctx_add_ta_file( $path );
 
     if ($err) {
-        my $str = _get_error_string_from_number($err);
-        die "Failed to add zone-style trust anchor file: $str";
+        die _create_unbound_error("Failed to add zone-style trust anchor file", $err);
     }
 
     return $self;
@@ -694,8 +693,7 @@ sub trustedkeys {
     my $err = $self->{'_ub'}->_ub_ctx_trustedkeys( $path );
 
     if ($err) {
-        my $str = _get_error_string_from_number($err);
-        die "Failed to add BIND-style trust anchor file: $str";
+        die _create_unbound_error("Failed to add BIND-style trust anchor file", $err);
     }
 
     return $self;
@@ -769,22 +767,12 @@ sub DESTROY {
     }
 }
 
-sub _get_error_string_from_number {
-    my ($err) = @_;
-
-    if ($err) {
-        return _ctx_err()->{$err} || "Unknown error code: $err";
-    }
-
-    return undef;
-}
-
 1;
 
 =head1 SEE ALSO
 
 L<Net::DNS::Resolver::Recurse> provides comparable logic to this module
-in pure Perl. Like Unbound, it is maintained by L<NLnet Labs>.
+in pure Perl. Like Unbound, it is maintained by L<NLnet Labs|https://nlnetlabs.nl/>.
 
 =head1 LICENSE & COPYRIGHT
 

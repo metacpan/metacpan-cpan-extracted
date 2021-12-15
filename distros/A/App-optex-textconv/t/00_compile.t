@@ -3,6 +3,7 @@ use Test::More 0.98;
 
 use_ok $_ for qw(
     App::optex::textconv
+    App::optex::tc
     App::optex::textconv::Converter
     App::optex::textconv::default
     App::optex::textconv::msdoc

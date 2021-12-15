@@ -4,9 +4,9 @@ use 5.010001;
 use strict 'subs', 'vars';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-18'; # DATE
+our $DATE = '2021-11-28'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 
 our $SUPPORT_OLD_PREFIX = $ENV{PERL_DATA_SAH_COERCE_SUPPORT_OLD_PREFIX} // 1;
 
@@ -33,7 +33,7 @@ our %Default_Rules = (
     },
 );
 
-my %common_args = (
+our %common_args = (
     type => {
         schema => 'sah::type_name*',
             req => 1,
@@ -78,7 +78,7 @@ _
     },
 );
 
-my %gen_coercer_args = (
+our %gen_coercer_args = (
     %common_args,
     return_type => {
         schema => ['str*', {
@@ -247,7 +247,7 @@ Data::Sah::CoerceCommon - Common stuffs for Data::Sah::Coerce and Data::Sah::Coe
 
 =head1 VERSION
 
-This document describes version 0.051 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2021-10-18.
+This document describes version 0.052 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2021-11-28.
 
 =head1 FUNCTIONS
 

@@ -19,6 +19,14 @@ isa_ok( $err, 'DNS::Unbound::X::ResolveError', 'exception' );
 
 is($err->get('number'), DNS::Unbound::UB_SYNTAX, 'number()');
 
-like( $err->get('string'), qr<.>, 'string()' );
+like( $err->get('string'), qr<syntax>i, 'string()' );
+
+my $str_content = $err->get('string');
+
+like(
+    $err->get_message(),
+    qr<\Q$str_content\E>,
+    'get_message()',
+);
 
 done_testing;

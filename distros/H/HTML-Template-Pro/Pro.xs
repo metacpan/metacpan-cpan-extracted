@@ -59,6 +59,7 @@ static void write_chars_to_string (ABSTRACT_WRITER* OutputString, const char* be
 static
 ABSTRACT_VALUE* get_ABSTRACT_VALUE_impl (ABSTRACT_DATASTATE* none, ABSTRACT_MAP* ptr_HV, PSTRING name) {
   dTHX;       /* fetch context */
+  /*if (debuglevel>1) warn ("Pro.xs: get_ABSTRACT_VALUE_impl: ptr_HV=%p",ptr_HV);*/
   return hv_fetch((HV*) ptr_HV,name.begin, name.endnext-name.begin, 0);
 }
 
@@ -110,6 +111,7 @@ PSTRING ABSTRACT_VALUE2PSTRING_impl (ABSTRACT_DATASTATE* callback_state, ABSTRAC
   dTHX;       /* fetch context */
   if (valptr==NULL) return retval;
   SVval = *((SV**) valptr);
+  /*if (debuglevel>1) warn ("Pro.xs: ABSTRACT_VALUE2PSTRING_impl: SVval=%p valptr=%p",SVval,valptr);*/
   SvGETMAGIC(SVval);
   if (SvOK(SVval) && SvROK(SVval)) {
     if (SvTYPE(SvRV(SVval))==SVt_PVCV) {
@@ -198,6 +200,7 @@ const char* get_filepath (ABSTRACT_FINDFILE* callback_state, const char* filenam
   } else {
     perlprevfile=sv_2mortal(newSV(0));
   }
+  /*if (debuglevel>1) warn ("Pro.xs: get_filepath: self=%p prevfile=%p retval=%p",PerlSelfHTMLTemplatePro,perlprevfile,perlretval);*/
   ENTER ;
   SAVETMPS;
   PUSHMARK(SP) ;
@@ -425,9 +428,9 @@ char** get_array_of_strings_from_hash(pTHX_ HV* TheHash, char* key, struct perl_
       return NULL;
     } else {
       store = newSV(sizeof(char*)*(amax+2));
+      /*if (debuglevel>1) warn ("Pro.xs: get_array_of_strings_from_hash: store=%p",store);*/
       path = (char**) SvGROW(store, sizeof(char*)*(amax+2));
       av_push(((struct perl_callback_state*)callback_state)->pool_for_perl_vars,store);
-      SvREFCNT_inc(store);
       //path=(char**) malloc(sizeof(char*)*(amax+2));
       j=path;
       for (i=0; i<=amax;i++) {

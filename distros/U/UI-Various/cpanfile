@@ -1,0 +1,8 @@
+requires 'perl' => 5.12.1;
+
+recommends 'Curses::UI' => '0.9603';
+recommends 'Tk' => '804.029';
+
+on 'test' => sub {
+    requires 'Test::More' => '0.98';
+};

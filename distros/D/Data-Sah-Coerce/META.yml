@@ -21,142 +21,142 @@ name: Data-Sah-Coerce
 provides:
   Data::Sah::Coerce:
     file: lib/Data/Sah/Coerce.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_bool::From_float::zero_one:
     file: lib/Data/Sah/Coerce/js/To_bool/From_float/zero_one.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_bool::From_str::common_words:
     file: lib/Data/Sah/Coerce/js/To_bool/From_str/common_words.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_date::From_float::epoch:
     file: lib/Data/Sah/Coerce/js/To_date/From_float/epoch.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_date::From_obj::date:
     file: lib/Data/Sah/Coerce/js/To_date/From_obj/date.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_date::From_str::date_parse:
     file: lib/Data/Sah/Coerce/js/To_date/From_str/date_parse.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_datenotime::From_float::epoch:
     file: lib/Data/Sah/Coerce/js/To_datenotime/From_float/epoch.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_datenotime::From_obj::date:
     file: lib/Data/Sah/Coerce/js/To_datenotime/From_obj/date.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_datenotime::From_str::date_parse:
     file: lib/Data/Sah/Coerce/js/To_datenotime/From_str/date_parse.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_datetime::From_float::epoch:
     file: lib/Data/Sah/Coerce/js/To_datetime/From_float/epoch.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_datetime::From_obj::date:
     file: lib/Data/Sah/Coerce/js/To_datetime/From_obj/date.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_datetime::From_str::date_parse:
     file: lib/Data/Sah/Coerce/js/To_datetime/From_str/date_parse.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_duration::From_float::seconds:
     file: lib/Data/Sah/Coerce/js/To_duration/From_float/seconds.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_duration::From_str::iso8601:
     file: lib/Data/Sah/Coerce/js/To_duration/From_str/iso8601.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::js::To_timeofday::From_str::hms:
     file: lib/Data/Sah/Coerce/js/To_timeofday/From_str/hms.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_bool::From_str::common_words:
     file: lib/Data/Sah/Coerce/perl/To_bool/From_str/common_words.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_date::From_float::epoch:
     file: lib/Data/Sah/Coerce/perl/To_date/From_float/epoch.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_date::From_float::epoch_always:
     file: lib/Data/Sah/Coerce/perl/To_date/From_float/epoch_always.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_date::From_float::epoch_always_jakarta:
     file: lib/Data/Sah/Coerce/perl/To_date/From_float/epoch_always_jakarta.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_date::From_float::epoch_always_local:
     file: lib/Data/Sah/Coerce/perl/To_date/From_float/epoch_always_local.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_date::From_float::epoch_jakarta:
     file: lib/Data/Sah/Coerce/perl/To_date/From_float/epoch_jakarta.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_date::From_float::epoch_local:
     file: lib/Data/Sah/Coerce/perl/To_date/From_float/epoch_local.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_date::From_obj::datetime:
     file: lib/Data/Sah/Coerce/perl/To_date/From_obj/datetime.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_date::From_obj::time_moment:
     file: lib/Data/Sah/Coerce/perl/To_date/From_obj/time_moment.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_date::From_str::iso8601:
     file: lib/Data/Sah/Coerce/perl/To_date/From_str/iso8601.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datenotime::From_float::epoch:
     file: lib/Data/Sah/Coerce/perl/To_datenotime/From_float/epoch.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datenotime::From_float::epoch_always:
     file: lib/Data/Sah/Coerce/perl/To_datenotime/From_float/epoch_always.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datenotime::From_obj::datetime:
     file: lib/Data/Sah/Coerce/perl/To_datenotime/From_obj/datetime.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datenotime::From_obj::time_moment:
     file: lib/Data/Sah/Coerce/perl/To_datenotime/From_obj/time_moment.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datenotime::From_str::iso8601:
     file: lib/Data/Sah/Coerce/perl/To_datenotime/From_str/iso8601.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datetime::From_float::epoch:
     file: lib/Data/Sah/Coerce/perl/To_datetime/From_float/epoch.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datetime::From_float::epoch_always:
     file: lib/Data/Sah/Coerce/perl/To_datetime/From_float/epoch_always.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datetime::From_obj::datetime:
     file: lib/Data/Sah/Coerce/perl/To_datetime/From_obj/datetime.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datetime::From_obj::time_moment:
     file: lib/Data/Sah/Coerce/perl/To_datetime/From_obj/time_moment.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_datetime::From_str::iso8601:
     file: lib/Data/Sah/Coerce/perl/To_datetime/From_str/iso8601.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_duration::From_float::seconds:
     file: lib/Data/Sah/Coerce/perl/To_duration/From_float/seconds.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration:
     file: lib/Data/Sah/Coerce/perl/To_duration/From_obj/datetime_duration.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_duration::From_str::human:
     file: lib/Data/Sah/Coerce/perl/To_duration/From_str/human.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_duration::From_str::iso8601:
     file: lib/Data/Sah/Coerce/perl/To_duration/From_str/iso8601.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_float::From_str::percent:
     file: lib/Data/Sah/Coerce/perl/To_float/From_str/percent.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_int::From_str::percent:
     file: lib/Data/Sah/Coerce/perl/To_int/From_str/percent.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_num::From_str::percent:
     file: lib/Data/Sah/Coerce/perl/To_num/From_str/percent.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_timeofday::From_obj::date_timeofday:
     file: lib/Data/Sah/Coerce/perl/To_timeofday/From_obj/date_timeofday.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::Coerce::perl::To_timeofday::From_str::hms:
     file: lib/Data/Sah/Coerce/perl/To_timeofday/From_str/hms.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::CoerceCommon:
     file: lib/Data/Sah/CoerceCommon.pm
-    version: '0.051'
+    version: '0.052'
   Data::Sah::CoerceJS:
     file: lib/Data/Sah/CoerceJS.pm
-    version: '0.051'
+    version: '0.052'
 requires:
   Exporter: '5.57'
   File::Temp: '0.2307'
@@ -174,7 +174,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce
   homepage: https://metacpan.org/release/Data-Sah-Coerce
   repository: git://github.com/perlancar/perl-Data-Sah-Coerce.git
-version: '0.051'
+version: '0.052'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -258,7 +258,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.605'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     ABSTRACT          => 'dummy request rec for testing of apache mod_perl handlers',
     NAME              => 'Apache2::Dummy::Request',
-    VERSION           => '0.5',
+    VERSION           => '0.02',
     PREREQ_PM         => {
                             "Moops" => 0.034,
                          },

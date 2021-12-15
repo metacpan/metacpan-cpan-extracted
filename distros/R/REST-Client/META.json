@@ -1,0 +1,67 @@
+{
+   "abstract" : "A simple client for interacting with RESTful http/https resources",
+   "author" : [
+      "Miles Crawford <mcrawfor@cpan.org>",
+      "Kevin L. Kane <kkane@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "REST-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "URI" : "0",
+            "constant" : "0",
+            "perl" : "v5.8.0",
+            "strict" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "XML::LibXML" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "HTTP::Server::Simple" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/milescrawford/cpan-rest-client/issues"
+      },
+      "homepage" : "https://github.com/milescrawford/cpan-rest-client",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/milescrawford/cpan-rest-client.git",
+         "web" : "https://github.com/milescrawford/cpan-rest-client"
+      }
+   },
+   "version" : "280",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

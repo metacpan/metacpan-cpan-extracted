@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "JSON::PP" : "0"
          }
       },
       "develop" : {
@@ -69,6 +70,6 @@
          "web" : "https://github.com/FGasper/p5-DNS-Unbound"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

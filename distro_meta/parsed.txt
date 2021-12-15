@@ -76138,3 +76138,13 @@ S/SH/SHLOMIF/Task-BeLike-SHLOMIF-0.0.9.tar.gz
 A/AT/ATOOMIC/Template-Toolkit-3.010.tar.gz
 I/IG/IGIBBS/Test-HTTP-MockServer-Once-v0.0.2.tar.gz
 O/OO/OODLER/Util-H2O-More-0.0.3.tar.gz
+J/JF/JFF/Apache2-Dummy-RequestRec-0.02.tar.gz
+U/UT/UTASHIRO/App-optex-textconv-0.13.tar.gz
+J/JD/JDEGUEST/Cookie-v0.1.8.tar.gz
+P/PE/PERLANCAR/Data-Sah-Coerce-0.052.tar.gz
+F/FE/FELIPE/DNS-Unbound-0.28.tar.gz
+V/VI/VIY/HTML-Template-Pro-0.9523.tar.gz
+P/PR/PREACTION/Yancy-1.087.tar.gz
+A/AK/AKHUETTEL/REST-Client-280.tar.gz
+P/PE/PERLANCAR/Tie-Array-Log-0.003.tar.gz
+D/DO/DORNER/UI-Various-0.01.tar.gz

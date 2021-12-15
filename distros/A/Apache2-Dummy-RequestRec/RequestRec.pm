@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Apache2::Dummy::RequestRec 0.01;
+package Apache2::Dummy::RequestRec 0.02;
 
 use Apache2::Const -compile => qw(OK DECLINED M_GET M_POST M_OPTIONS);
 use APR::Table;

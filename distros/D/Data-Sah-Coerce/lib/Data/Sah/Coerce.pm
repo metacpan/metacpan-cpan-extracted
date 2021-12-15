@@ -11,9 +11,9 @@ use Data::Sah::CoerceCommon;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-18'; # DATE
+our $DATE = '2021-11-28'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 
 our @EXPORT_OK = qw(gen_coercer);
 
@@ -148,7 +148,7 @@ Data::Sah::Coerce - Coercion rules for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.051 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2021-10-18.
+This document describes version 0.052 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2021-11-28.
 
 =head1 SYNOPSIS
 
@@ -334,7 +334,7 @@ something like:
 
 Usage:
 
- gen_coercer() -> any
+ gen_coercer(%args) -> any
 
 Generate coercer code.
 
@@ -343,7 +343,63 @@ L<Data::Sah>.
 
 This function is not exported by default, but exportable.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<coerce_rules> => I<array[str]>
+
+A specification of coercion rules to use (or avoid).
+
+This setting is used to specify which coercion rules to use (or avoid) in a
+flexible way. Each element is a string, in the form of either C<NAME> to mean
+specifically include a rule, or C<!NAME> to exclude a rule.
+
+Some coercion modules are used by default, unless explicitly avoided using the
+'!NAME' rule.
+
+To not use any rules:
+
+To use the default rules plus R1 and R2:
+
+ ['R1', 'R2']
+
+To use the default rules but not R1 and R2:
+
+ ['!R1', '!R2']
+
+=item * B<coerce_to> => I<str>
+
+Some Sah types, like C<date>, can be represented in a choice of types in the
+target language. For example, in Perl you can store it as a floating number
+a.k.a. C<float(epoch)>, or as a L<DateTime> object, or L<Time::Moment>
+object. Storing in DateTime can be convenient for date manipulation but requires
+an overhead of loading the module and storing in a bulky format. The choice is
+yours to make, via this setting.
+
+=item * B<return_type> => I<str> (default: "val")
+
+C<val> means the coercer will return the input (possibly) coerced or undef if
+coercion fails.
+
+C<bool_coerced+val> means the coercer will return a 2-element array. The first
+element is a bool value set to 1 if coercion has been performed or 0 if
+otherwise. The second element is the (possibly) coerced input.
+
+C<bool_coerced+str_errmsg+val> means the coercer will return a 3-element array.
+The first element is a bool value set to 1 if coercion has been performed or 0
+if otherwise. The second element is the error message string which will be set
+if there is a failure in coercion (or undef if coercion is successful). The
+third element is the (possibly) coerced input.
+
+=item * B<source> => I<bool>
+
+If set to true, will return coercer source code string instead of compiled code.
+
+=item * B<type>* => I<sah::type_name>
+
+
+=back
 
 Return value:  (any)
 

@@ -1,6 +1,6 @@
 package App::optex::textconv::pandoc;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use v5.14;
 use warnings;

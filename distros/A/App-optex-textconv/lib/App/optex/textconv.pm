@@ -1,6 +1,6 @@
 package App::optex::textconv;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use v5.14;
 use warnings;
@@ -14,7 +14,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -158,6 +158,12 @@ use List::Util 1.45 qw(first);
 our @CONVERTER;
 use App::optex::textconv::default;
 use App::optex::textconv::msdoc;
+
+use Exporter 'import';
+
+our @EXPORT = ();
+our @EXPORT_OK = qw(initialize finalize load);
+our %EXPORT_TAGS = ( alias => \@EXPORT_OK );
 
 my($mod, $argv);
 sub initialize {

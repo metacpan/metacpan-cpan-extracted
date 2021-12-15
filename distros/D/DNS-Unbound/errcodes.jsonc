@@ -1,0 +1,14 @@
+# unbound.h only added these constants on 29 Nov 2021:
+[
+    ["UB_NOERROR",    0],
+    ["UB_SOCKET",     -1],
+    ["UB_NOMEM",      -2],
+    ["UB_SYNTAX",     -3],
+    ["UB_SERVFAIL",   -4],
+    ["UB_FORKFAIL",   -5],
+    ["UB_AFTERFINAL", -6],
+    ["UB_INITFAIL",   -7],
+    ["UB_PIPE",       -8],
+    ["UB_READFILE",   -9],
+    ["UB_NOID",      -10],
+]

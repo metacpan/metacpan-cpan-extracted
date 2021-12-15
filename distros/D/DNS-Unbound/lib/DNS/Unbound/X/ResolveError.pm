@@ -3,7 +3,7 @@ package DNS::Unbound::X::ResolveError;
 use strict;
 use warnings;
 
-use parent qw( DNS::Unbound::X::Base );
+use parent qw( DNS::Unbound::X::Unbound );
 
 =encoding utf-8
 
@@ -13,24 +13,15 @@ DNS::Unbound::X::ResolveError
 
 =head1 DESCRIPTION
 
-This class subclasses L<X::Tiny::Base> and represents a libunbound DNS
-resolution failure. Its instances contain the following properties:
-
-=over
-
-=item * C<number> - The libunbound error number. Will correspond
-to one of L<DNS::Unbound>’s C<UB_*> constants.
-
-=item * C<string> - libunbound’s string that describes the error.
-
-=back
+This class subclasses L<DNS::Unbound::X::Unbound> and represents a
+libunbound DNS resolution failure.
 
 =cut
 
 sub _new {
-    my ($class, @args_kv) = @_;
+    my ($class, %args_kv) = @_;
 
-    return $class->SUPER::_new( 'DNS query resolution failure', @args_kv );
+    return $class->SUPER::_new( "DNS query resolution failure ($args_kv{'string'}", %args_kv );
 }
 
 1;

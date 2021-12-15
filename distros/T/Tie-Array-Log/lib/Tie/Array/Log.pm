@@ -1,7 +1,7 @@
 package Tie::Array::Log;
 
-our $DATE = '2019-05-12'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-07-25'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -60,11 +60,9 @@ sub DELETE {
 }
 
 sub CLEAR {
-    my ($this, $key) = @_;
-    my $res = $this->[$key];
+    my $this = shift;
+    log_trace "CLEAR()";
     @$this = ();
-    log_trace "CLEAR(): %s", $res;
-    $this;
 }
 
 sub PUSH {
@@ -124,7 +122,7 @@ Tie::Array::Log - Tied array that behaves like a regular array, but logs operati
 
 =head1 VERSION
 
-This document describes version 0.002 of Tie::Array::Log (from Perl distribution Tie-Array-Log), released on 2019-05-12.
+This document describes version 0.003 of Tie::Array::Log (from Perl distribution Tie-Array-Log), released on 2021-07-25.
 
 =head1 SYNOPSIS
 
@@ -162,15 +160,15 @@ feature.
 
 =head1 SEE ALSO
 
-L<perltie>
-
 L<Log::ger>
 
-L<Tie::Scalar::Log>, L<Tie::Hash::Log>, L<Tie::Handle::Log>.
+L<Tie::Scalar::Log>, L<Tie::Hash::Log>, L<Tie::Handle::Log>
 
 L<Tie::Array>, L<Tie::StdArray>
 
 L<Tie::Simple>
+
+L<perltie>
 
 =head1 AUTHOR
 
@@ -178,7 +176,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

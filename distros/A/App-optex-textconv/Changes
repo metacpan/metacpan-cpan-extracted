@@ -1,5 +1,10 @@
 Revision history for Perl extension App-optex-textconv
 
+0.13 2021-12-15T09:27:25Z
+
+    - Use Exporter module to implement -Mtc module.
+    - Make Converter.pm can export requested subs for greple -Mmsdoc.
+
 0.12 2021-11-20T01:45:30Z
 
     - Process docm/pptm/xlsm files.

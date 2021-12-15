@@ -32,7 +32,7 @@ requires:
   DateTime: '1.52'
   DateTime::Format::Strptime: '1.77'
   JSON: '4.03'
-  Module::Generic: v0.18.1
+  Module::Generic: v0.18.3
   Net::IDN::Encode: '2.500'
   Nice::Try: v1.1.2
   Scalar::Util: '1.50'
@@ -50,5 +50,5 @@ requires:
 resources:
   bugtracker: https://git.deguest.jp/jack/Cookie/issues
   repository: https://git.deguest.jp/jack/Cookie
-version: v0.1.7
+version: v0.1.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

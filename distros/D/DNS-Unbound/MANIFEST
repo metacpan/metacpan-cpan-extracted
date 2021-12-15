@@ -10,6 +10,7 @@ Makefile.PL
 README.md
 Unbound.xs
 cpanfile
+errcodes.jsonc
 examples/anyevent.pl
 examples/io_async.pl
 lib/DNS/Unbound.pm
@@ -28,6 +29,7 @@ lib/DNS/Unbound/X.pm
 lib/DNS/Unbound/X/BadDebugFD.pm
 lib/DNS/Unbound/X/Base.pm
 lib/DNS/Unbound/X/ResolveError.pm
+lib/DNS/Unbound/X/Unbound.pm
 ppport.h
 t/anyevent.t
 t/async.t
@@ -47,7 +49,9 @@ t/mojo.t
 t/option.t
 t/parallel.t
 t/resolvconf.t
+t/resolvconf_unpriv.t
 t/resolve_error.t
+t/trust.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

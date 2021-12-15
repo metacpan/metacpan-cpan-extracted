@@ -1,3 +1,7 @@
+#pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
+
+#define PERL_NO_GET_CONTEXT
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -28,6 +32,8 @@
 #else
 #define _DEBUG(str, ...) if (DEBUG) fprintf(stderr, str " (destruct? %d)\n", ##__VA_ARGS__, PL_dirty);
 #endif
+
+#include "errcodes_define.inc"
 
 typedef struct {
     pid_t pid;
@@ -234,16 +240,15 @@ SV* _ub_result_to_svhv_and_free (pTHX_ struct ub_result* result) {
 }
 
 void _async_resolve_callback(void* mydata, int err, struct ub_result* result) {
-    _DEBUG("RESOLVE CALLBACK (mydata=%p)\n", mydata);
-
     SV* query_ctx_svrv = (SV*) mydata;
 
     dub_query_ctx_t *query_ctx = my_get_blessedstruct_ptr(query_ctx_svrv);
-    _DEBUG("RESOLVE CALLBACK 2 (ID=%d)\n", query_ctx->id);
 
 #if NEED_THX
     pTHX = query_ctx->my_aTHX;
 #endif
+
+    _DEBUG("RESOLVE CALLBACK (ID=%d)\n", query_ctx->id);
 
     SV* result_sv;
     _DEBUG("err: %d\n", err);
@@ -286,6 +291,8 @@ void _close_saved_debugfd (DNS__Unbound__Context* ctx) {
 MODULE = DNS::Unbound           PACKAGE = DNS::Unbound
 
 PROTOTYPES: DISABLE
+
+INCLUDE: errcodes_boot.inc
 
 const char*
 _get_fd_mode_for_fdopen(int fd)

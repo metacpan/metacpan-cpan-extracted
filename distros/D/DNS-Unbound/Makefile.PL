@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use ExtUtils::MakeMaker::CPANfile;
 
 my $pkgconfig_name = 'libunbound';
@@ -7,6 +10,7 @@ my ($cflags, $ldflags);
 use Config;
 use File::Temp;
 use File::Spec;
+use JSON::PP;
 
 my $ccpath = $ENV{'CC'} || $Config::Config{'cc'};
 print "Your C compiler appears to be: $ccpath\n";
@@ -135,6 +139,7 @@ my (
     $HAS_UB_CTX_ADD_TA_AUTR,
     $HAS_WHY_BOGUS,
     $HAS_TTL,
+    $HAS_UB_CONSTANTS,
 );
 
 my @checks = (
@@ -182,6 +187,20 @@ my @checks = (
         ),
         perl => sub {
             $HAS_TTL = shift;
+        },
+    },
+    {
+        label => 'UB_* constants',
+        c => join(
+            $/,
+            '#include <unbound.h>',
+            'int main() {',
+            '   int foo = UB_NOERROR;',
+            '   return 0;',
+            '}',
+        ),
+        perl => sub {
+            $HAS_UB_CONSTANTS = shift;
         },
     },
     {
@@ -255,6 +274,8 @@ for my $check (@checks) {
     $check->{'perl'}->($success);
 }
 
+_generate_includes();
+
 WriteMakefile(
     NAME           => 'DNS::Unbound',
     VERSION_FROM   => 'lib/DNS/Unbound.pm',
@@ -271,6 +292,7 @@ WriteMakefile(
         "-DHAS_UB_CTX_ADD_TA_AUTR=$HAS_UB_CTX_ADD_TA_AUTR",
         "-DHAS_WHY_BOGUS=$HAS_WHY_BOGUS",
         "-DHAS_TTL=$HAS_TTL",
+        "-DHAS_UB_CONSTANTS=$HAS_UB_CONSTANTS",
     ),
     LIBS           => [ $ldflags ],
     LICENSE        => 'perl',
@@ -289,3 +311,30 @@ WriteMakefile(
         },
     },
 );
+
+#----------------------------------------------------------------------
+
+sub _generate_includes {
+    open my $fh, '<', 'errcodes.jsonc' or die "open: $!";
+    my $jsonc = do { local $/; <$fh> };
+
+    my $err_value_ar = JSON::PP->new()->relaxed()->decode($jsonc);
+
+    {
+        open my $define_fh, '>', 'errcodes_define.inc';
+        print {$define_fh} "#if !HAS_UB_CONSTANTS\n";
+        print {$define_fh} "#   define @$_\n" for @$err_value_ar;
+        print {$define_fh} "#endif\n";
+    }
+
+    {
+        my @names = map { $_->[0] } @$err_value_ar;
+
+        my $pkg_gv = qq<gv_stashpv("\$Package", FALSE)>;
+
+        open my $boot_fh, '>', 'errcodes_boot.inc';
+        print {$boot_fh} "BOOT:\n";
+        print {$boot_fh} qq<    newCONSTSUB( $pkg_gv, "_ERROR_NAMES_STR", newSVpvs("@names") );\n>;
+        print {$boot_fh} qq/    newCONSTSUB( $pkg_gv, "$_", newSViv($_) );\n/ for @names;
+    }
+}
