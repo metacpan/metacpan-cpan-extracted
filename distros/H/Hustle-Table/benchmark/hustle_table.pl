@@ -10,7 +10,7 @@ use Hustle::Table;
 
 my ($matchers,$samples)= do "$FindBin::Bin/data.pl";
 
-my @list=map {[$_,sub {},undef,undef]} @$matchers;
+my @list=map {[$_,sub {},undef,undef,undef]} @$matchers;
 
 
 my $table=Hustle::Table->new();
@@ -31,7 +31,7 @@ say Dumper $table;
 
 
 
-my $hot=$table->prepare_dispatcher(type=>"online",reset=>1, cache=>undef, reorder=>1);
+my $hot=$table->prepare_dispatcher(type=>"online",reset=>1, cache=>{}, reorder=>1);
 timethis 200, sub {
 	for my $sample (@$samples){
 		#say $sample;

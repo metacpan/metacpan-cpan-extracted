@@ -1,6 +1,7 @@
 package Bio::FastParsers::Blast;
 # ABSTRACT: Classes for parsing BLAST output
-$Bio::FastParsers::Blast::VERSION = '0.201110';
+# CONTRIBUTOR: Aymeric NAOME <aymeric.naome@gmail.com>
+$Bio::FastParsers::Blast::VERSION = '0.213510';
 use strict;
 use warnings;
 
@@ -19,7 +20,7 @@ Bio::FastParsers::Blast - Classes for parsing BLAST output
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 SYNOPSIS
 
@@ -33,6 +34,12 @@ Parsers for two BLAST output formats are available: tabular and XML.
 =head1 AUTHOR
 
 Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Aymeric NAOME
+
+Aymeric NAOME <aymeric.naome@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

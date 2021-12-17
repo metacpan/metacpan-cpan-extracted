@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 00-pod.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 00-pod.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -18,7 +18,7 @@ foreach my $package ( sort keys %prerequisite ) {
 
 my @poddirs = qw( lib demo );
 my @allpods = all_pod_files(@poddirs);
-all_pod_files_ok( sort @allpods);
+all_pod_files_ok( sort @allpods );
 
 
 exit;

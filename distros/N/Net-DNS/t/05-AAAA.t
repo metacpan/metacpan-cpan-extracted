@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-AAAA.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 05-AAAA.t 1857 2021-12-07 13:38:02Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -156,8 +156,11 @@ my $wire = '000102030405060708090a0b0c0d0e0f';
 		);
 
 	foreach my $address ( sort keys %testcase ) {
-		my $expect = Net::DNS::RR->new( name => $name, type => $type, address => $testcase{$address} );
-		my $rr	   = Net::DNS::RR->new( name => $name, type => $type, address => $address );
+		my $expect = Net::DNS::RR->new(
+			name	=> $name,
+			type	=> $type,
+			address => $testcase{$address} );
+		my $rr = Net::DNS::RR->new( name => $name, type => $type, address => $address );
 		is( $rr->address, $expect->address, "address completion:\t$address" );
 	}
 }

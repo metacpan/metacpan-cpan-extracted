@@ -314,7 +314,11 @@ check_file(
         17538, 17582,
         17538, 17582,
         1, 17538, 17582,
-        -1, 17582, 17538
+        -1, 17582, 17538,
+        22897,22897,
+        0.2,0.2,
+        95.7,95.7
+
     ];
     
     my @hsp_data = map {
@@ -322,7 +326,10 @@ check_file(
         $_->query_start, $_->query_end,
         $_->hit_start, $_->hit_end,
         $_->query_frame, $_->query_from, $_->query_to,
-        $_->hit_frame, $_->hit_from, $_->hit_to
+        $_->hit_frame, $_->hit_from, $_->hit_to,
+        $_->query_len, $_->hit_len,
+        $_->qcov, $_->subject_coverage,
+        $_->pident, $_->percentage_positive
     } map { $_->get_hsp(27) } $bo->get_iteration(0)->get_hit(0);
 
     cmp_deeply \@hsp_data, $hsp_data_ref,

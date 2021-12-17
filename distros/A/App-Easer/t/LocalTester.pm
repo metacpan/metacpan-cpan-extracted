@@ -11,14 +11,19 @@ our @EXPORT = ('test_run');
 sub test_run ($app, $args, $env, $command = 'MAIN') {
    my ($stdout, $stderr, @result, $clean_run, $exception);
    my $self = bless {}, __PACKAGE__;
-   if (defined $command) {
-      my $inner = $app->{commands}{$command}{execute};
-      $app->{commands}{$command}{execute} = sub ($main, $conf, $args) {
-         $self->{conf} = $conf;
-         $self->{args} = $args;
-         $main->{factory}->($inner, 'execute')->($main, $conf, $args);
-      };
-   }
+   local *LocalTester::command_execute = sub ($cmd, $main, $conf, $args) {
+      return unless $cmd eq ($command // '');
+      $self->{conf} = $conf;
+      $self->{args} = $args;
+   };
+#   if (defined $command && exists $app->{commands}{$command}) {
+#      my $inner = $app->{commands}{$command}{execute};
+#      $app->{commands}{$command}{execute} = sub ($main, $conf, $args) {
+#         $self->{conf} = $conf;
+#         $self->{args} = $args;
+#         $main->{factory}->($inner, 'execute')->($main, $conf, $args);
+#      };
+#   }
    eval {
       local @ENV{keys $env->%*};
       while (my ($k, $v) = each $env->%*) {

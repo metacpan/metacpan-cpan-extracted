@@ -1,6 +1,12 @@
 Revision history for Perl extension HTML::Selector::XPath
 
-0.26 NEXT
+0.27 NEXT
+
+0.26 2021-12-15
+    * Fix typo in documentation for selector_to_xpath.
+      It is equivalent to
+        HTML::Selector::XPath->new(shift)->to_xpath(@_)
+      Reported as RT 140473 by JDEGUEST
 
 0.25 2018-11-03
     * Add support for compiling :disabled, :selected, :checked, :text,

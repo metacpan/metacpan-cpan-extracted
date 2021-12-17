@@ -11,6 +11,8 @@ my @tests = (
       cmd => [ '--verbose', '-g', '-s', '-H', 'Host: example.com', '-H','X-Example: foo', '$url' ] },
     { name => 'Duplicated header',
       cmd => [ '--verbose', '-g', '-s', '-H', 'X-Host: example.com', '-H','X-Host: www.example.com', '$url' ] },
+    { name => 'Lower-case header',
+      cmd => [ '--verbose', '-g', '-s', '-H', 'accept: application/json', '$url' ] },
     { cmd => [ '--verbose', '-g', '-s', '--oauth2-bearer','someWeirdStuff', '$url' ],
       version => '007061000',
     },

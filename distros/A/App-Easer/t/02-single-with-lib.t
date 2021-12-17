@@ -6,6 +6,9 @@ use lib dirname(__FILE__);
 use LocalTester;
 
 my $app = {
+   configuration => {
+      'auto-leaves' => 0,
+   },
    commands => {
       MAIN => {
          help        => 'example command',
@@ -22,6 +25,7 @@ my $app = {
             },
          ],
          execute => sub {
+            LocalTester::command_execute(MAIN => @_);
             print {*STDOUT} 'galook!';
             print {*STDERR} 'gaaaah!';
             return 42;

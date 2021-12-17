@@ -47,6 +47,6 @@
          "url" : "https://github.com/maddingue/Net-Pcap"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -15,7 +15,7 @@ use Time::Piece ();
 has 'mysql';
 has 'no_txn' => sub { 0 };
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 # The dequeue system has a couple limitations:
 # 1. There is no way to directly notify a sleeping worker of an incoming
@@ -421,8 +421,10 @@ sub register_worker {
 
 sub remove_job {
   !!shift->mysql->db->query(
-    "delete from minion_jobs
-     where id = ? and state in ('inactive', 'failed', 'finished')",
+    "delete minion_jobs, minion_jobs_depends from minion_jobs
+     left join minion_jobs_depends
+        on minion_jobs.id = minion_jobs_depends.parent_id
+     where minion_jobs.id = ? and minion_jobs.state in ('inactive', 'failed', 'finished')",
      shift
   )->{affected_rows};
 }
@@ -1194,7 +1196,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 

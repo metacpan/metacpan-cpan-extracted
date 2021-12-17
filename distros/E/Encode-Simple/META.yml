@@ -28,10 +28,10 @@ no_index:
 provides:
   Decode::ARGV:
     file: lib/Decode/ARGV.pm
-    version: '1.001'
+    version: '1.002'
   Encode::Simple:
     file: lib/Encode/Simple.pm
-    version: '1.001'
+    version: '1.002'
 recommends:
   Unicode::UTF8: '0'
 requires:
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Encode-Simple/issues
   homepage: https://github.com/Grinnz/Encode-Simple
   repository: https://github.com/Grinnz/Encode-Simple.git
-version: '1.001'
+version: '1.002'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
 x_generated_by_perl: v5.34.0

@@ -1,5 +1,5 @@
 package Util::Medley::Crypt;
-$Util::Medley::Crypt::VERSION = '0.060';
+$Util::Medley::Crypt::VERSION = '0.061';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -14,7 +14,7 @@ Util::Medley::Crypt - Class for simple encrypt/descrypt of strings.
 
 =head1 VERSION
 
-version 0.060
+version 0.061
 
 =cut
 
@@ -123,7 +123,7 @@ multi method decryptStr (Str :$str!,
 
 	$key = $self->_getKey($key);
 	
-    my $cipher = Crypt::CBC->new(-key => $key, -cipher => 'Blowfish');
+    my $cipher = Crypt::CBC->new(-key => $key, -cipher => 'Blowfish', -pbkdf => 'pbkdf2');
     return $cipher->decrypt_hex($str);
 }
 
@@ -175,7 +175,7 @@ multi method encryptStr (Str :$str!,
 
 	$key = $self->_getKey($key);
     
-    my $cipher = Crypt::CBC->new(-key => $key, -cipher => 'Blowfish');
+    my $cipher = Crypt::CBC->new(-key => $key, -cipher => 'Blowfish', -pbkdf => 'pbkdf2');
     return $cipher->encrypt_hex($str);
 }
 

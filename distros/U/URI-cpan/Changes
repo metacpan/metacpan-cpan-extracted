@@ -1,5 +1,8 @@
 Revision history for URI-cpan
 
+1.008     2021-12-15 15:53:55-05:00 America/New_York
+        - fix prereqs to rely on URI, not the unindexed URI::_generic
+
 1.007     2015-04-17 11:22:03+02:00 Europe/Berlin
         - allow authority section in uri (the "local" in
           cpan://local/author/BOB)

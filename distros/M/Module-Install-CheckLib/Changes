@@ -1,6 +1,9 @@
 Changelog for Module-Install-CheckLib
 =====================================
 
+0.14  Wed 15 Dec 2021 16:19:21 GMT
+  - Allow tests to run from a read-only location
+
 0.12  Fri Feb 17 13:40:55 GMT 2017
   - Handle perls without dot in @INC
 

@@ -36,3 +36,5 @@ sub _run_in_fork($$$)
     &$sub;
     exit $ok;
 }
+
+1;

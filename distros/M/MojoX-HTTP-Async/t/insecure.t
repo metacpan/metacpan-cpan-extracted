@@ -9,34 +9,27 @@ use bytes ();
 
 use lib 'lib/', 't/lib';
 
-use Test::More ('import' => [qw/ done_testing is ok use_ok note like /]);
-use Test::Utils qw/ start_server notify_parent /;
+use Test::More ('import' => [qw/ done_testing is ok use_ok like /]);
+use Test::Utils qw/ get_listen_socket start_server notify_parent IS_NOT_WIN /;
 
 use Time::HiRes qw/ sleep /;
-use Socket qw/ sockaddr_in AF_INET INADDR_ANY SOCK_STREAM /;
 use Mojo::Message::Request ();
 use Mojo::URL ();
 
+
+my $slots = 2;
 my $host = 'localhost';
-my $can_go_further = 0;
 my $processed_slots = 0;
 my $wait_timeout = 12;
 my $request_timeout = 7.2;
 my $connect_timeout = 6;
-my $inactivity_timeout = 6.5;
 
 BEGIN { use_ok('MojoX::HTTP::Async') };
 
 sub on_start_cb ($port) {
-    socket(my $socket, AF_INET, SOCK_STREAM, getprotobyname( 'tcp' ));
-
-    my $QUEUE_LENGTH = 3;
-    my $my_addr = sockaddr_in($port, INADDR_ANY);
-
-    bind($socket, $my_addr ) or die( qq(Couldn't bind socket to port $port: $!\n));
-    listen($socket, $QUEUE_LENGTH) or die( "Couldn't listen port $port: $!\n" );
 
     my $client;
+    my $socket = get_listen_socket($host, $port);
     my $default_response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
     my %responses_by_request_number = (
         '01' => "HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\n0123456789",
@@ -77,7 +70,7 @@ sub on_start_cb ($port) {
             die($!) if ( vec($eh, fileno($client), 1) != 0 );
 
             if ($page && ($page eq '06' || $page eq '07' || $page eq '08')) { # tests for request timeouts
-                sleep($request_timeout + 0.1);
+                sleep($request_timeout + 0.75);
             }
 
             my $bytes = syswrite($client, $response, bytes::length($response), 0);
@@ -98,13 +91,18 @@ my $server = start_server(\&on_start_cb, $host);
 my $ua = MojoX::HTTP::Async->new(
     'host' => $host,
     'port' => $server->port(),
-    'slots' => 2,
+    'slots' => $slots,
     'connect_timeout' => $connect_timeout,
     'request_timeout' => $request_timeout,
     'ssl' => 0,
-    'sol_socket' => {},
-    'sol_tcp' => {},
-    'inactivity_conn_ts' => $inactivity_timeout,
+    &IS_NOT_WIN() ? (
+        'sol_socket' => {'so_keepalive' => 1},
+        'sol_tcp' => {
+            'tcp_keepidle' => 15,
+            'tcp_keepintvl' => 3,
+            'tcp_keepcnt' => 2,
+        }
+    ) : (),
 );
 
 my $mojo_request = Mojo::Message::Request->new();

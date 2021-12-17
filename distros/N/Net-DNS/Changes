@@ -1,4 +1,11 @@
-$Id: Changes 1846 2021-07-16 12:15:07Z willem $                       -*-text-*-
+$Id: Changes 1861 2021-12-16 11:21:07Z willem $                       -*-text-*-
+
+
+**** 1.33 Dec 16, 2021
+
+Fix rt.cpan.org #137768
+
+	Test t/05-SVCB.t on Perl 5.18.0 fails with deep recursion.
 
 
 **** 1.32 Jul 16, 2021

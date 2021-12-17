@@ -53,6 +53,7 @@ t/50future-subclass.t
 t/51awaitable-role.t
 t/52awaitable-future.t
 t/80async-method.t
+t/80async-multi-sub.t
 t/80await+defer.t
 t/80await+dynamically.t
 t/80await+feature-try.t

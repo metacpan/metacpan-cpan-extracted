@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.14;
+package XS::Parse::Sublike 0.16;
 
 use v5.14;
 use warnings;
@@ -116,7 +116,65 @@ various fields of the C<XSParseSublikeContext> structure.
       OP *attrs;
       OP *body;
       CV *cv;
+      U32 actions;
+      HV *moddata;
    }
+
+The C<actions> field will contain a bitmask of action flags that control the
+various steps that C<XS::Parse::Sublike> might take inbetween invoking hook
+stages. The initial value of this field is set after the name-parsing stage,
+depending on whether or not a name is found. Stage hook functions may modify
+the field to adjust the subsequent behaviour.
+
+At the current ABI version, a module will have to set the
+C<XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS> bit of the C<flags> field in
+order to make use of the I<actions> field. A future ABI version may remove
+this restriction.
+
+=over 4
+
+=item XS_PARSE_SUBLIKE_ACTION_CVf_ANON
+
+If set, the C<start_subparse()> call will be set up for an anonymous function
+protosub; if not it will be set for a named function. This is set by default
+if a name was not found.
+
+=item XS_PARSE_SUBLIKE_ACTION_SET_CVNAME
+
+If set, the newly-constructed CV will have the given name set on it. This is
+set by default if a name was found.
+
+On Perl versions 5.22 and above, this flag can be set even if
+C<XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL> is not. In this case, the CV will
+not be reachable via the symbol table, even though it knows its own name and
+pretends that it is. On earlier versions of perl this flag will be ignored in
+that case.
+
+=item XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL
+
+If set, the newly-constructed CV will be installed into the symbol table at
+its given name. Note that it is not possible to enable this flag without also
+enabling C<XS_PARSE_SUBLIKE_ACTION_SET_CVNAME>. This is set by default if a
+name was found.
+
+=item XS_PARSE_SUBLIKE_ACTION_REFGEN_ANONCODE
+
+If set, the syntax will yield the C<OP_REFGEN> / C<OP_ANONCODE> optree
+fragment typical of anonymous code expressions; if not it will be C<OP_NULL>.
+This is set by default if a name was not found.
+
+=item XS_PARSE_SUBLIKE_ACTION_RET_EXPR
+
+If set, the syntax will parse like an expression; if not it will parse like a
+statement. This is set by default if a name was not found.
+
+=back
+
+The I<moddata> field will point towards an HV that modules can used to store
+extra data between stages. As a naming convention a module should prefix its
+keys with its own module name and a slash character, C<"Some::Module/field">.
+The field will point to a newly-created HV for every parse invocation, and
+will be released when each parse is complete.
 
 =head1 PARSE HOOKS
 

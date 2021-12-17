@@ -60,7 +60,7 @@ my %module = (
     TEST_REQUIRES => {
         'Test::More'   => 0,
         'Spreadsheet::ParseODS' => 0,
-        'Spreadsheet::ParseXLSX' => 0,
+        'Spreadsheet::ParseXLSX' => '0.24',
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

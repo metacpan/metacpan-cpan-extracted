@@ -2,7 +2,7 @@ package Net::DNS::RR::RRSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: RRSIG.pm 1819 2020-10-19 08:07:24Z willem $)[2];
+our $VERSION = (qw$Id: RRSIG.pm 1856 2021-12-02 14:36:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -28,18 +28,17 @@ eval { require MIME::Base64 };
 
 # IMPORTANT: Downstream distros MUST NOT create dependencies on Net::DNS::SEC	(strong crypto prohibited in many territories)
 use constant USESEC => defined $INC{'Net/DNS/SEC.pm'};		# Discover how we got here, without exposing any crypto
-								# Discourage static code analysers and casual greppers
-use constant DNSSEC => USESEC && defined eval join '', qw(r e q u i r e), ' Net::DNS', qw(:: SEC :: Private);	## no critic
+use constant							# Discourage static code analysers and casual greppers
+		DNSSEC => USESEC && defined eval join '',
+		qw(r e q u i r e), ' Net::DNS', qw(:: SEC :: Private);	  ## no critic
 
 my @index;
 if (DNSSEC) {
-	my $key = Net::DNS::RR->new( type => 'DNSKEY', key => 'AwEAAQ==' );
 	foreach my $class ( map {"Net::DNS::SEC::$_"} qw(RSA DSA ECCGOST ECDSA EdDSA) ) {
 		my @algorithms = eval join '', qw(r e q u i r e), " $class; $class->_index";	## no critic
-		@algorithms = grep { eval { $key->algorithm($_); $class->verify( '', $key, '' ); 1 } } ( 1 .. 16 )
-				unless scalar(@algorithms);	# Grotesquely inefficient; but need to support pre-1.14 API
 		push @index, map { ( $_ => $class ) } @algorithms;
 	}
+	croak 'Net::DNS::SEC version not supported' unless scalar(@index);
 }
 
 my %DNSSEC_verify = @index;
@@ -95,57 +94,6 @@ sub _defaults {				## specify RR attribute default values
 
 	$self->sigval(30);
 	return;
-}
-
-
-#
-# source: http://www.iana.org/assignments/dns-sec-alg-numbers
-#
-{
-	my @algbyname = (
-		'DELETE'	     => 0,			# [RFC4034][RFC4398][RFC8078]
-		'RSAMD5'	     => 1,			# [RFC3110][RFC4034]
-		'DH'		     => 2,			# [RFC2539]
-		'DSA'		     => 3,			# [RFC3755][RFC2536]
-					## Reserved	=> 4,	# [RFC6725]
-		'RSASHA1'	     => 5,			# [RFC3110][RFC4034]
-		'DSA-NSEC3-SHA1'     => 6,			# [RFC5155]
-		'RSASHA1-NSEC3-SHA1' => 7,			# [RFC5155]
-		'RSASHA256'	     => 8,			# [RFC5702]
-					## Reserved	=> 9,	# [RFC6725]
-		'RSASHA512'	     => 10,			# [RFC5702]
-					## Reserved	=> 11,	# [RFC6725]
-		'ECC-GOST'	     => 12,			# [RFC5933]
-		'ECDSAP256SHA256'    => 13,			# [RFC6605]
-		'ECDSAP384SHA384'    => 14,			# [RFC6605]
-		'ED25519'	     => 15,			# [RFC8080]
-		'ED448'		     => 16,			# [RFC8080]
-
-		'INDIRECT'   => 252,				# [RFC4034]
-		'PRIVATEDNS' => 253,				# [RFC4034]
-		'PRIVATEOID' => 254,				# [RFC4034]
-					## Reserved	=> 255,	# [RFC4034]
-		);
-
-	my %algbyval = reverse @algbyname;
-
-	foreach (@algbyname) { s/[\W_]//g; }			# strip non-alphanumerics
-	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname;
-	my %algbyname = @algrehash;				# work around broken cperl
-
-	sub _algbyname {
-		my $arg = shift;
-		my $key = uc $arg;				# synthetic key
-		$key =~ s/[\W_]//g;				# strip non-alphanumerics
-		my $val = $algbyname{$key};
-		return $val if defined $val;
-		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm "$arg"];
-	}
-
-	sub _algbyval {
-		my $value = shift;
-		return $algbyval{$value} || return $value;
-	}
 }
 
 
@@ -390,6 +338,54 @@ sub vrfyerrstr {
 
 ########################################
 
+{
+	my @algbyname = (
+		'DELETE'	     => 0,			# [RFC4034][RFC4398][RFC8078]
+		'RSAMD5'	     => 1,			# [RFC3110][RFC4034]
+		'DH'		     => 2,			# [RFC2539]
+		'DSA'		     => 3,			# [RFC3755][RFC2536]
+					## Reserved	=> 4,	# [RFC6725]
+		'RSASHA1'	     => 5,			# [RFC3110][RFC4034]
+		'DSA-NSEC3-SHA1'     => 6,			# [RFC5155]
+		'RSASHA1-NSEC3-SHA1' => 7,			# [RFC5155]
+		'RSASHA256'	     => 8,			# [RFC5702]
+					## Reserved	=> 9,	# [RFC6725]
+		'RSASHA512'	     => 10,			# [RFC5702]
+					## Reserved	=> 11,	# [RFC6725]
+		'ECC-GOST'	     => 12,			# [RFC5933]
+		'ECDSAP256SHA256'    => 13,			# [RFC6605]
+		'ECDSAP384SHA384'    => 14,			# [RFC6605]
+		'ED25519'	     => 15,			# [RFC8080]
+		'ED448'		     => 16,			# [RFC8080]
+
+		'INDIRECT'   => 252,				# [RFC4034]
+		'PRIVATEDNS' => 253,				# [RFC4034]
+		'PRIVATEOID' => 254,				# [RFC4034]
+					## Reserved	=> 255,	# [RFC4034]
+		);
+
+	my %algbyval = reverse @algbyname;
+
+	foreach (@algbyname) { s/[\W_]//g; }			# strip non-alphanumerics
+	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname;
+	my %algbyname = @algrehash;				# work around broken cperl
+
+	sub _algbyname {
+		my $arg = shift;
+		my $key = uc $arg;				# synthetic key
+		$key =~ s/[\W_]//g;				# strip non-alphanumerics
+		my $val = $algbyname{$key};
+		return $val if defined $val;
+		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm $arg];
+	}
+
+	sub _algbyval {
+		my $value = shift;
+		return $algbyval{$value} || return $value;
+	}
+}
+
+
 sub _CreateSigData {
 
 	# This method creates the data string that will be signed.
@@ -460,8 +456,6 @@ sub _CreateSigData {
 	}
 }
 
-
-########################################
 
 sub _CreateSig {
 	if (DNSSEC) {
@@ -569,6 +563,8 @@ sub _time2string {			## format time specification string
 	return sprintf '%d%02d%02d%02d%02d%02d', $yy + 1900, $mm + 1, @dhms;
 }
 
+########################################
+
 
 1;
 __END__
@@ -583,8 +579,8 @@ __END__
 
     use Net::DNS::SEC;
     $sigrr = Net::DNS::RR::RRSIG->create( \@rrset, $keypath,
-					sigex => 20191231010101
-					sigin => 20191201010101
+					sigex => 20211231010101
+					sigin => 20211201010101
 					);
 
     $sigrr->verify( \@rrset, $keyrr ) || die $sigrr->vrfyerrstr;
@@ -708,8 +704,8 @@ Create a signature over a RR set.
     $sigrr = Net::DNS::RR::RRSIG->create( \@rrsetref, $keypath );
 
     $sigrr = Net::DNS::RR::RRSIG->create( \@rrsetref, $keypath,
-					sigex => 20191231010101
-					sigin => 20191201010101
+					sigex => 20211231010101
+					sigin => 20211201010101
 					);
     $sigrr->print;
 
@@ -735,8 +731,8 @@ containing the private key as generated by dnssec-keygen.
 The optional remaining arguments consist of ( name => value ) pairs
 as follows:
 
-	sigex  => 20191231010101,	# signature expiration
-	sigin  => 20191201010101,	# signature inception
+	sigex  => 20211231010101,	# signature expiration
+	sigin  => 20211201010101,	# signature inception
 	sigval => 30,			# validity window (days)
 	ttl    => 3600			# TTL
 
@@ -833,7 +829,7 @@ Package template (c)2009,2012 O.M.Kolkman and R.W.Franks.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific
@@ -851,10 +847,10 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::SEC>,
-RFC4034, RFC6840, RFC3755
+RFC4034
 
 L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
 
-L<BIND 9 Administrator Reference Manual|http://www.bind9.net/manuals>
+L<BIND Administrator Reference Manual|http://bind.isc.org/>
 
 =cut

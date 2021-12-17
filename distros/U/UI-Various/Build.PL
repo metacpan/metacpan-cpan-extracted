@@ -25,12 +25,13 @@ my %args = (
     },
 
     requires => {
-        'perl' => 'v5.12.1',
+        'perl' => 'v5.14.0',
+        'strictures' => '1',
     },
 
     recommends => {
         'Curses::UI' => '0.9603',
-        'Tk' => '804.029',
+        'Tk' => '804.030',
     },
 
     suggests => {
@@ -41,6 +42,8 @@ my %args = (
 
     test_requires => {
         'Test::More' => '0.98',
+        'Test::Output' => '1.01',
+        'Test::Warn' => '0.23',
     },
 
     name            => 'UI-Various',

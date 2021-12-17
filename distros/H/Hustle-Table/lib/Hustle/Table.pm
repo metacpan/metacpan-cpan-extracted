@@ -1,5 +1,5 @@
 package Hustle::Table;
-use version; our $VERSION=version->declare("v0.2.3");
+use version; our $VERSION=version->declare("v0.3.0");
 
 use strict;
 use warnings;
@@ -18,14 +18,19 @@ our @EXPORT=@EXPORT_OK;
 
 use constant DEBUG=>0;
 
-#constants for entry feilds
-use enum (qw<matcher_ sub_ label_ count_>);
+#constants for entry fields
+use enum (qw<matcher_ sub_ label_ count_ ctx_>);
 
 #TODO:
 # It's assumed that all matchers take the same amount of time to match. Clearly
-# a regex will take more time than a short exact string. A more optimal ording might
-# be achieved if this was measured and incorperated into the ordering.
-#
+# a regex will take more time than a short exact string. A more optimal ordering might
+# be achieved if this was measured and incorporated into the ordering.
+# 
+# Add context field for each entry -	Allow tracing/linking to rest of system
+# Return the entry as first item 
+# 	Instead of the string that was tested being included in arguments to dispatched code,
+# 	a reference to the matching entry should be send instead. To aid in tracing
+# 	If the use would like the original string, it can be passed as an additional argument
 
 
 #Public API
@@ -33,10 +38,11 @@ use enum (qw<matcher_ sub_ label_ count_>);
 sub new {
 	my $class=shift//__PACKAGE__;
 	my $default=shift//sub {1};
-	bless [[undef,$default,"default",0]],$class;	#Prefill with default handler
+	my $ctx=shift;
+	bless [[undef,$default,"default",0,undef]],$class;	#Prefill with default handler
 }
 
-#Add and sort accorind to count/priority
+#Add and sort according to count/priority
 sub add {
 	my ($self,@list)=@_;
 	my $entry;
@@ -46,22 +52,24 @@ sub add {
 	for my $item (@list){
 		given(ref $item){
 			when("ARRAY"){
-			
+				#warn $item->$*;
 				$entry=$item;
-				croak "Odd number of test=>dispatch vectors" unless $entry->@* == 4;
+				croak "Odd number of test=>dispatch vectors" unless $entry->@* == 5;
 			}
+
 			when("HASH"){
-				$entry=[$item->@{qw<matcher sub label count>}];
+				$entry=[$item->@{qw<matcher sub label count cxt>}];
 			}
+
 			default {
 				if(@list>=4){		#Flat hash/list key pairs passed in sub call
 					my %item=@list;
-					$entry=[@item{qw<matcher sub label count>}];
+					$entry=[@item{qw<matcher sub label count ctx>}];
 					$rem =1;
 				}
 				elsif(@list==2){
 					# matcher=>sub
-					$entry=[$list[0],$list[1],undef,undef];
+					$entry=[$list[0],$list[1],undef,undef,undef];
 					$rem=1;
 				}
 				else{
@@ -74,7 +82,7 @@ sub add {
 		$entry->[count_]= 0 unless defined $entry->[count_];
 		croak "target is not a sub reference" unless ref $entry->[sub_] eq "CODE";
 		croak "matcher not specified" unless defined $entry->[matcher_];
-		#Append the item to the of the list (minus defaut)
+		#Append the item to the of the list (minus default)
 		if(defined $entry->[matcher_]){
 			splice @$self, @$self-1,0, $entry;
 			push @ids,$entry->[label_];
@@ -95,10 +103,10 @@ sub add {
 }
 
 
-#overwrites the default handler. if no
+#overwrites the default handler.
 sub set_default {
-	my ($self,$sub)=@_;
-	my $entry=[undef,$sub,"default",0];
+	my ($self,$sub,$ctx)=@_;
+	my $entry=[undef,$sub,"default",0,$ctx];
 	$self->[@$self-1]=$entry;
 }
 
@@ -152,7 +160,7 @@ sub _prepare_offline {
 			}
 
 		}
-		#&{$table[$table->@*-1][sub_]}; #Traning no dispatching
+		#&{$table[$table->@*-1][sub_]}; #Training no dispatching
 		
 	}
 }
@@ -196,10 +204,10 @@ sub prepare_dispatcher{
 #Private API
 #
 sub _reorder{
-	\my @self=shift;	#let sort work inplace
+	\my @self=shift;	#let sort work in place
 	my $default=pop @self;	#prevent default from being sorted
 	@self=sort {$b->[count_] <=> $a->[count_]} @self;
-	push @self, $default;	#restor default
+	push @self, $default;	#restore default
 	1;
 }
 
@@ -207,22 +215,28 @@ sub _reorder{
 sub _prepare_online {
         \my @table=shift; #self
         my $d="sub {\n";
-        #$d.='my ($dut)=@_;'."\n";
-        $d.=' given ($_[0]) {'."\n";
+	$d.='	my $entry;'."\n";
+        $d.='	given (shift) {'."\n";		#Shift out first argument
         for (0..@table-2) {
-                my $pre='$table['.$_.']';
+		#$d.='		$entry=$table['.$_.']'."\n";
+		#my $pre='$table['.$_.']';
 
-                $d.='when ('.$pre."[matcher_]){\n";
-                $d.=$pre."[count_]++;\n";
-                $d.='&{'.$pre.'[sub_]};'."\n";
-                $d.="}\n";
+                $d.='		when (($entry=$table['.$_.'])->[matcher_]){'."\n";
+                $d.='			$entry->[count_]++;'."\n";
+		$d.="			unshift \@_, \$entry;\n";	#First argument is the match entry
+                $d.='			&{$entry->[sub_]};'."\n";
+                $d.="		}\n";
         }
-        $d.="default {\n";
-        $d.='$table[$#table][count_]++;'."\n";
-        $d.='&{$table[$#table][sub_]};'."\n";
-        $d.="}\n";
-        $d.="}\n}\n";
-        eval($d);
+        $d.="		default {\n";
+        $d.='			$table[$#table][count_]++;'."\n";
+	$d.='			unshift @_,$table[$#table];'."\n";	#First argument is the match entry
+        $d.='			&{$table[$#table][sub_]};'."\n";
+        $d.="		}\n";
+        $d.="	}\n}\n";
+	#print $d;
+        my $s=eval($d);
+	$s
+	
 }
 
 sub _prepare_goto_online {
@@ -278,43 +292,49 @@ sub _prepare_online_cached {
 
 	
 	my $d="sub {\n";
-	#$d.='my ($dut)=@_;'."\n";
-	$d.='
-	given( $_[0]){
-		my $hit=$cache->{$_};
-		if(defined $hit){
+	$d.='my $input=shift @_;'."\n";
+	$d.='given($input){
+		my $rhit=$cache->{$_};
+		if($rhit){
+			\my @hit=$rhit;
 			#normal case, acutally executes potental regex
-			when($hit->[matcher_]){
-				$hit->[count_]++;
-				delete $cache->{$_} if &{$hit->[sub_]}; #delete if return is true
+			when($hit[matcher_]){
+				$hit[count_]++;
+				unshift @_, $rhit;
+				delete $cache->{$_} if &{$hit[sub_]}; #delete if return is true
 				return;
 
 			}
 			#if the first case does ot match, its because the cached entry is the default (undef matcher)
-			#when(!defined $hit->[matcher_]){	#default case, test for defined
 			default{
-				$hit->[count_]++;
-				delete $cache->{$_} if &{$hit->[sub_]}; #delete if return is true
+				$hit[count_]++;
+				unshift @_, $rhit;
+				delete $cache->{$_} if &{$hit[sub_]}; #delete if return is true
 				return;
 			}
 		}
 	}';
-			
-	$d.="\n".' given ($_[0]) {'."\n";
+	$d.="\n".'	my $entry;';
+	$d.="\n".'	given ($input) {'."\n";
 
 
 	for (0..@table-2) {
-		my $pre='$table['.$_.']';
+		#my $pre='$table['.$_.']';
 
-		$d.='when ('.$pre."[matcher_]){\n";
-		$d.=$pre."[count_]++;\n";
-		$d.='$cache->{$_[0]}='."$pre unless &{$pre".'[sub_]};'."\n";
-		$d.="return;\n}\n";
+		$d.='		when (($entry=$table['.$_.'])->[matcher_]){'."\n";
+		$d.='			$entry->[count_]++;'."\n";
+		$d.='			unshift @_, $entry;'."\n";
+		$d.='			$cache->{$input}=$entry unless &{$entry->[sub_]};'."\n";
+		$d.="			return;\n";
+		$d.="		}\n";
 	}
+	$d.="	}\n";
+	$d.='	$entry=$table[$#table];'."\n";
+	$d.='	unshift @_, $entry;'."\n";
+	$d.='	$cache->{$input}=$entry unless &{$entry->[sub_]};'."\n";
+        $d.='	$entry->[count_]++;'."\n";
 	$d.="}\n";
-	$d.='$cache->{$_[0]}=$table[$#table] unless &{$table[$#table][sub_]};'."\n";
-        $d.='$table[$#table][count_]++;'."\n";
-	$d.="}\n";
+	#print $d;
 	eval($d);
 }
 

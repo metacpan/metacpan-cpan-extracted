@@ -108,6 +108,16 @@ class WithBuildargs {
       'message from unrecognised param to constructor' );
 }
 
+# RT140314
+{
+   class NoParamsAtAll :strict(params) { }
+
+   ok( !defined eval { NoParamsAtAll->new( unknown => 1 ) },
+      ':strict(params) complains even with no ADJUSTPARAMS block' );
+   like( $@, qr/^Unrecognised parameters for NoParamsAtAll constructor: unknown at /,
+      'message from unrecognised param to constructor' );
+}
+
 {
    my $newarg_destroyed;
    my $buildargs_result_destroyed;

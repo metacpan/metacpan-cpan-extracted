@@ -2,9 +2,10 @@ package Excel::ValueReader::XLSX::Backend::Regex;
 use utf8;
 use 5.10.1;
 use Moose;
+use Scalar::Util qw/looks_like_number/;
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -163,7 +164,7 @@ sub values {
       _decode_xml_entities($val) if $val && $cell_type eq 'str';
 
       # if necessary, transform the numeric value into a formatted date
-      if ($has_date_formatter && $style && defined $val && $val >= 0) {
+      if ($has_date_formatter && $style && looks_like_number($val) && $val >= 0) {
         my $date_style = $self->date_styles->[$style];
         $val = $self->formatted_date($val, $date_style)    if $date_style;
       }

@@ -1,5 +1,5 @@
 package Util::Medley::Module::Overview;
-$Util::Medley::Module::Overview::VERSION = '0.060';
+$Util::Medley::Module::Overview::VERSION = '0.061';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -19,7 +19,7 @@ Util::Medley::Module::Overview
 
 =head1 VERSION
 
-version 0.060
+version 0.061
 
 =cut
 
@@ -141,6 +141,7 @@ has _inheritedMethodsAndAttributes => (
 has _moduleOverview => (
 	is      => 'ro',
 	isa     => 'HashRef',
+    lazy => 1,
 	builder => '_buildModuleOverview',
 );
 

@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.12 2021 Dec 15
+    - minor fixes in POD
+    - improve test coverage
+
 0.11 2021 Dec 11
     - minor fixes in POD
     - adding "kwalitee" test

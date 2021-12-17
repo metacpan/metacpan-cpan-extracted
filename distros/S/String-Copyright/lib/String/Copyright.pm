@@ -21,16 +21,16 @@ String::Copyright - Representation of text-based copyright statements
 
 =head1 VERSION
 
-Version 0.003011
+Version 0.003012
 
 =cut
 
-our $VERSION = '0.003011';
+our $VERSION = '0.003012';
 
 # Dependencies
 use parent 'Exporter::Tiny';
 use Carp ();
-use Number::Range;
+use Set::IntSpan;
 
 our @EXPORT = qw/copyright/;
 
@@ -105,6 +105,7 @@ see the L<Exporter::Tiny> documentation for details.
 # AND'ed strings have name ending in underscore: must be grouped if repeated
 my $blank           = '[ \t]';
 my $blank_or_break_ = "$blank*\\n?$blank*";
+my $dash            = '[-˗‐‑‒–—―⁃−﹣－]';
 my $colons_         = "$blank?:{1,2}";
 my $label           = '(?i:copyright(?:-holders?)?\b|copr\.)';
 my $sign            = '[©⒞Ⓒⓒ🄒🄫🅒]';
@@ -112,8 +113,12 @@ my $nroff_sign_     = '\\\\[(]co';
 my $pseudo_sign_    = '[({][Cc][})]';
 my $vague_sign_     = '-[Cc]-';
 my $broken_sign_    = "\\?$blank*";
+
+# high-bit © noise, caused by misparsing UTF-8 as latin1
+# except \xAE (latin1 ©), \xAE (MacRoman ©), \xE2 (latin1 © lowercased after misparse)
+my $nonsign_ = '[\x80-\xAB\xAD-\xC1\xC3-\xE1\xE3-\xFF]\xA9';
 my $nonidentifier_
-	= "(?:no |_)copyright|copyright-[^h]|(?:Digital Millennium|U.S.|US|United States) Copyright Act|\\b(?:for|we) copyright\\b";
+	= "(?:no |_|$dash)copyright|copyright-[^h]|(?:Digital Millennium|U.S.|US|United States) Copyright Act|\\b(?:for|we) copyright\\b";
 
 # this should cause *no* false positives, and stop-chars therefore
 # exclude e.g. email address building blocks; tested against the code
@@ -125,9 +130,9 @@ my $nonidentifier_
 my $identifier_action
 	= '(?i:apply|applied|applies|assigned|generated|transfer|transferred)';
 my $identifier_thing_
-	= '(?i:block|claim|date|disclaimer|holder|info|information|interest|law|notice|owner|ownership|permission|sign|statement|string|symbol|tag|text)s?';
+	= '(?i:block|claim|date|disclaimer|holder|info|information|interest|law|license|notice|owner|ownership|permission|sign|statement|string|symbol|tag|text)s?';
 my $identifier_misc
-	= "(?i:and|are|at|eq|for|if|in|is|of|on|or|this|to|the (?:library|software),|treaty)";
+	= "(?i:and|are|at|eq|for|if|in|is|of|on|or|,${blank}patent|this|to|the (?:library|software),|treaty)";
 my $identifier_chatter
 	= "(?:$identifier_action|$identifier_thing_|$identifier_misc)";
 my $the_notname
@@ -137,21 +142,24 @@ my $the_sentence_
 my $pseudosign_chatter_
 	= "(?:(?:the$blank+(?:$the_notname|$the_sentence_)|all begin|there|you must)\\b|,? \\(?\\w\\))";
 my $chatter
-	= "(?im:$nonidentifier_|copyright$blank_or_break_$identifier_chatter(?:$|@\\W|[^a-zA-Z0-9@_-])|$blank*$pseudo_sign_(?:$blank_or_break_)+$pseudosign_chatter_)";
-my $nonyears = '(?:<?year>?|19xx|19yy|yyyy)';
+	= "(?im:$nonsign_|$nonidentifier_|copyright$blank_or_break_$identifier_chatter(?:\\z|@\\W|[^a-zA-Z0-9@_-])|$blank*$pseudo_sign_(?:$blank_or_break_)+$pseudosign_chatter_)";
+my $nonyears = '(?:<?year>?|19xx|19yy|yyyy|YEAR)';
 
 my $year_       = '\b[0-9]{4}\b';
 my $comma_spacy = "(?:$blank*,$blank_or_break_|$blank_or_break_,?$blank*)";
-my $dash        = '[-˗‐‑‒–—―⁃−﹣－]';
 my $dash_spacy_ = "$blank*$dash(?:$blank_or_break_)*";
 
-my $vague_year_   = "(?:$dash$blank?)?[0-9]{1,5}";
-my $owner_intro_  = "(?:$pseudo_sign_$blank?|\\bby$blank_or_break_)";
+my $colon_or_dash = "(?:$colons_$blank_or_break_|$blank?$dash\{1,2}$blank)";
+my $delimiter     = "(?:$colon_or_dash|$comma_spacy)";
+
+my $vague_year_ = "(?:$dash$blank?)?[0-9]{1,5}";
+my $owner_intro_
+	= "(?:$colon_or_dash|$pseudo_sign_$blank?|\\bby$blank_or_break_)";
 my $owner_prefix  = '[(*<@\[{]';
 my $owner_initial = '[^\s!"#$%&\'()*+,./:;<=>?@[\\\\\]^_`{|}~-]';
 
 my $signs
-	= "(?m:(?:$label|$sign|$nroff_sign_|(?:^|$blank)$pseudo_sign_)(?:$colons_)?(?:$blank*(?:$label|$sign|$pseudo_sign_))*)";
+	= "(?m:(?:$label|$sign|$nroff_sign_|(?:^|$blank)$pseudo_sign_)(?:$colon_or_dash?$blank*(?:$label|$sign|$pseudo_sign_))*)";
 my $yearspan_ = "$year_(?:$dash_spacy_$year_)?";
 my $years_    = "$yearspan_(?:$comma_spacy$yearspan_)*";
 my $owners_
@@ -168,7 +176,7 @@ my ($dash_spacy_re, $owner_intro_A_re, $boilerplate_X_re,
 	$boilerplate_X_re
 		= qr/(?i)${comma_spacy}All$blank+Rights$blank+Reserved[.!]?.*/;
 	$signs_and_more_re
-		= qr/$chatter|$signs(?:$blank$vague_sign_)?(?:$colons_$blank_or_break_|$blank$dash{1,2}$blank|$comma_spacy)(?:$broken_sign_)?(?:$nonyears|((?:$years_$comma_spacy?)?(?:(?:$owner_intro_)?$owners_)?))|\n/;
+		= qr/$chatter|$signs(?:$blank$vague_sign_)?$delimiter(?:$broken_sign_)?(?:$nonyears|((?:$years_$delimiter)?(?:(?:$owner_intro_)?$owners_)?))|\n/;
 }
 
 sub _generate_copyright
@@ -217,28 +225,27 @@ sub _generate_copyright
 			my $years;
 			my @span = $owners =~ /\G($yearspan_)(?:$comma_spacy|\Z)/gm;
 			if (@span) {
-				$owners = substr( $owners, $+[0] );
+				$owners = $';
 
 				# deduplicate
-				my %range;
+				my @ranges;
 				for (@span) {
 					my ( $y1, $y2 ) = split /$dash_spacy_re/;
 					if ( !$y2 ) {
-						$range{$y1} = undef;
+						push @ranges, $y1;
 					}
 					elsif ( $y1 > $y2 ) {
-						@range{ $y2 .. $y1 } = undef;
+						push @ranges, [ $y2, $y1 ];
 					}
 					else {
-						@range{ $y1 .. $y2 } = undef;
+						push @ranges, [ $y1, $y2 ];
 					}
 				}
 
 				# normalize
-				my $range = Number::Range->new( keys %range );
-				$years = $range->range;
-				$years =~ s/,/, /g;
-				$years =~ s/\.\./-/g;
+				$years = join ', ',
+					map { $_->[0] == $_->[1] ? $_->[0] : "$_->[0]-$_->[1]" }
+					Set::IntSpan->new( \@ranges )->spans;
 			}
 			if ($owners) {
 				$owners =~ s/$owner_intro_A_re//;

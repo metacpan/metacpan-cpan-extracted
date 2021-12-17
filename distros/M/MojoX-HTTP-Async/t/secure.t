@@ -9,35 +9,24 @@ use bytes ();
 
 use lib 'lib/', 't/lib';
 
-use Test::More ('import' => [qw/ done_testing is ok use_ok note diag /]);
-use Test::Utils qw/ start_server notify_parent /;
+use Test::More ('import' => [qw/ done_testing is ok use_ok plan /]);
+use Test::Utils qw/ get_listen_socket start_server notify_parent /;
 
 use Time::HiRes qw/ sleep /;
 use IO::Socket::SSL qw/ SSL_VERIFY_NONE /;
-use FindBin qw/ $Bin /;
-use Mojo::Message::Request ();
+
 
 my $host = '127.0.0.1';
 my $processed_slots = 0;
-my $wait_timeout = 12;
 my $request_timeout = 7.2;
 my $connect_timeout = 6;
 my $inactivity_timeout = 6.5;
-my $can_go_further = 0;
 
 BEGIN { use_ok('MojoX::HTTP::Async') };
 
 sub on_start_cb ($port) {
-    my $QUEUE_LENGTH = 3;
-    my $socket = IO::Socket::SSL->new(
-        'LocalAddr' => $host,
-        'LocalPort' => $port,
-        'Listen'    => $QUEUE_LENGTH,
-        'SSL_cert_file' => "${Bin}/certs/server-cert.pem",
-        'SSL_key_file' => "${Bin}/certs/server-key.pem",
-        'SSL_passwd_cb' => sub { 1234 },
-    ) or die "Can't create socket: $!";
 
+    my $socket = get_listen_socket($host, $port, 1);
     my $default_response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
     my %responses_by_request_number = (
         '01' => "HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\n0123456789",
@@ -110,21 +99,19 @@ my $ua = MojoX::HTTP::Async->new(
     'inactivity_conn_ts' => $inactivity_timeout,
 );
 
-my $mojo_request = Mojo::Message::Request->new();
-
-$mojo_request->parse("POST /page/01.html HTTP/1.1\r\nContent-Length: 3\r\nHost: localhost\r\nUser-Agent: Test\r\n\r\nabc");
-
+# there can be some connection issues on rare and specific OS due to their settings
 eval { $ua->_make_connections(1); };
 
 if ($@ && $@ =~ m/\QConnection refused\E/i) {
-    note("1..0 # Skipped: can't connect to the test SSL server");
-    diag("1..0 # Skipped: can't connect to the test SSL server");
+    plan('skip_all' => "Skipped: can't connect to the test SSL server");
     done_testing();
     $server->stop();
     exit;
 }
 
-ok( $ua->add($mojo_request), "Adding the first request");
+$ua->close_all();
+
+ok( $ua->add("/page/01.html"), "Adding the first request");
 ok( $ua->add("/page/02.html"), "Adding the second request");
 ok(!$ua->add("/page/03.html"), "Adding the third request");
 

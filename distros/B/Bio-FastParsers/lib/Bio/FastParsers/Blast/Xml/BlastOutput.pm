@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Xml::BlastOutput;
 # ABSTRACT: NCBI BLAST DTD-derived internal class
-$Bio::FastParsers::Blast::Xml::BlastOutput::VERSION = '0.201110';
+$Bio::FastParsers::Blast::Xml::BlastOutput::VERSION = '0.213510';
 use Moose;
 use namespace::autoclean;
 
@@ -18,6 +18,12 @@ use aliased 'Bio::FastParsers::Blast::Xml::Parameters';
 has '_root' => (
     is       => 'ro',
     isa      => 'HashRef',
+    required => 1,
+);
+
+has '_parent' => (
+    is       => 'ro',
+    isa      => 'Maybe[Object]',
     required => 1,
 );
 
@@ -44,7 +50,7 @@ has 'iterations' => (
 
 sub _build_iterations {
     my $self = shift;
-    return [ map { Iteration->new( _root => $_ ) } @{
+    return [ map { Iteration->new( _root => $_, _parent => $self ) } @{
         forcearray $self->_root->{'BlastOutput_iterations'}->{'Iteration'}
     } ];
 }
@@ -69,7 +75,8 @@ has 'mbstat' => (
 sub _build_mbstat {
     my $self = shift;
     return Statistics->new(
-        _root => $self->_root->{'BlastOutput_mbstat'}->{'Statistics'}
+        _root => $self->_root->{'BlastOutput_mbstat'}->{'Statistics'},
+        _parent => $self
     );
 }
 
@@ -89,7 +96,8 @@ has 'param' => (
 sub _build_param {
     my $self = shift;
     return Parameters->new(
-        _root => $self->_root->{'BlastOutput_param'}->{'Parameters'}
+        _root => $self->_root->{'BlastOutput_param'}->{'Parameters'},
+        _parent => $self
     );
 }
 
@@ -165,7 +173,7 @@ Bio::FastParsers::Blast::Xml::BlastOutput - NCBI BLAST DTD-derived internal clas
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 SYNOPSIS
 

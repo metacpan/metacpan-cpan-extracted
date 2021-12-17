@@ -17,7 +17,7 @@ use OpenAPI::Modern;
 use JSON::Schema::Modern::Utilities 'jsonp';
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern-Document-OpenAPI' => 'share' } };
 use constant { true => JSON::PP::true, false => JSON::PP::false };
-use HTTP::Request;
+use HTTP::Request::Common;
 use YAML::PP;
 
 my $path_template = '/foo/{foo_id}/bar/{bar_id}';
@@ -33,9 +33,7 @@ YAML
 my $doc_uri = Mojo::URL->new('openapi.yaml');
 
 subtest 'validation errors' => sub {
-  my $request = HTTP::Request->new(
-    POST => 'http://example.com/some/path',
-  );
+  my $request = POST 'http://example.com/some/path';
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => 'openapi.yaml',
     openapi_schema => do {
@@ -433,8 +431,7 @@ YAML
   );
 
 
-  $request->uri($request->uri.'?alpha=1&gamma=foo&delta=bar');
-  $request->header('Foo-Bar' => 1);
+  $request = POST 'http://example.com/some/path?alpha=1&gamma=foo&delta=bar', 'Foo-Bar' => 1;
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => { foo_id => '1' } }))->TO_JSON, # string, treated as int
@@ -513,8 +510,8 @@ YAML
   );
 
 
-  $request->uri('http://example.com/some/path?alpha=hello&beta=3.1415');
-  $request->headers->header('FOO-BAR' => 'header value');    # exactly matches path parameter
+  $request = POST 'http://example.com/some/path?alpha=hello&beta=3.1415',
+    'FOO-BAR' => 'header value';    # exactly matches path parameter
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => { foo_id => 'foo', bar_id => 'bar' } }))->TO_JSON,
@@ -585,8 +582,8 @@ YAML
       },
   );
 
-  $request->uri('http://example.com/some/path?query1={corrupt json');
-  $request->header('Header1' => '{corrupt json');
+  $request = POST 'http://example.com/some/path?query1={corrupt json',
+    'Header1' => '{corrupt json';
   cmp_deeply(
     $result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => { foo_id => '{corrupt json' } })->TO_JSON,
@@ -617,8 +614,8 @@ YAML
   );
 
 
-  $request->uri('http://example.com/some/path?query1={"hello":"there"}');
-  $request->header('Header1' => '{"hello":"there"}');
+  $request = POST 'http://example.com/some/path?query1={"hello":"there"}',
+    'Header1' => '{"hello":"there"}';
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => { foo_id => '{"hello":"there"}'}}))->TO_JSON,
@@ -794,8 +791,7 @@ YAML
   );
 
 
-  $request->content_type('text/plain');
-  $request->content('plain text');
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'text/plain', Content => 'plain text';
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => {} }))->TO_JSON,
@@ -814,8 +810,7 @@ YAML
   );
 
 
-  $request->content_type('TEXT/HTML');
-  $request->content('html text');
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'TEXT/HTML', Content => 'html text';
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => {} }))->TO_JSON,
@@ -857,8 +852,7 @@ YAML
 
   $openapi->add_media_type('unknown/*' => sub ($value) { $value });
 
-  $request->content_type('unknown/encodingtype');
-  $request->content('binary');
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'unknown/encodingtype', Content => 'binary';
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => { foo_id => '1' } }))->TO_JSON,
@@ -899,8 +893,8 @@ YAML
   );
 
 
-  $request->content_type('application/json; charset=UTF-8');
-  $request->content('{"alpha": "123", "beta": "'.chr(0xe9).'clair"}');
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'application/json; charset=UTF-8',
+    Content => '{"alpha": "123", "beta": "'.chr(0xe9).'clair"}';
   cmp_deeply(
     $result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => {} })->TO_JSON,
@@ -919,7 +913,8 @@ YAML
   );
 
 
-  $request->content('{corrupt json');
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'application/json; charset=UTF-8',
+    Content => '{corrupt json';
   cmp_deeply(
     $result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => {} })->TO_JSON,
@@ -938,8 +933,8 @@ YAML
   );
 
 
-  $request->content_type('application/json; charset=ISO-8859-1');
-  $request->content('{"alpha": "123", "beta": "'.chr(0xe9).'clair"}');
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'application/json; charset=ISO-8859-1',
+    Content => '{"alpha": "123", "beta": "'.chr(0xe9).'clair"}';
   cmp_deeply(
     $result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => {} })->TO_JSON,
@@ -948,8 +943,8 @@ YAML
   );
 
 
-  $request->content_type('application/json; charset=UTF-8');
-  $request->content('{"alpha": "foo", "gamma": "o.o"}');
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'application/json; charset=UTF-8',
+    Content => '{"alpha": "foo", "gamma": "o.o"}';
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => {} }))->TO_JSON,
@@ -981,7 +976,8 @@ YAML
 
 
   my $disapprove = v224.178.160.95.224.178.160; # utf-8-encoded "ಠ_ಠ"
-  $request->content('{"alpha": "123", "gamma": "'.$disapprove.'"}');
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'application/json; charset=UTF-8',
+    Content => '{"alpha": "123", "gamma": "'.$disapprove.'"}';
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => {} }))->TO_JSON,
@@ -991,9 +987,7 @@ YAML
 };
 
 subtest 'document errors' => sub {
-  my $request = HTTP::Request->new(
-    POST => 'http://example.com/some/path',
-  );
+  my $request = POST 'http://example.com/some/path';
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => 'openapi.yaml',
     openapi_schema => do {
@@ -1107,12 +1101,8 @@ YAML
       },
   );
 
-  my $request = HTTP::Request->new(POST => 'http://example.com/foo/123');
-  $request->uri($request->uri.'?bar=456');
-  $request->header('Foo-Bar' => 789);
-  $request->content_type('text/plain');
-  $request->content(666);
-
+  my $request = POST 'http://example.com/foo/123?bar=456', 'Foo-Bar' => 789, 'Content-Type' => 'text/plain',
+    Content => 666;
   cmp_deeply(
     (my $result = $openapi->validate_request($request,
       { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
@@ -1224,8 +1214,7 @@ YAML
   );
 
 
-  $request = HTTP::Request->new(POST => 'http://example.com/foo/9');
-  $request->content_type('text/plain');
+  $request = POST 'http://example.com/foo/9', 'Content-Type' => 'text/plain', Content => '99';
   my $val = 20; my $str = sprintf("%s\n", $val);
   $request->content($val);
   cmp_deeply(
@@ -1263,7 +1252,9 @@ paths:
 YAML
       },
   );
-  $request = HTTP::Request->new(POST => 'http://example.com/some/path');
+
+  # bypass auto-initialization of Content-Length, Content-Type
+  $request = HTTP::Request->new(POST => 'http://example.com/some/path', [ 'Content-Length' => 1 ], '!');
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
@@ -1281,8 +1272,8 @@ YAML
     'missing Content-Type does not cause an exception',
   );
 
-
-  $request->content_type('text/plain');
+  # bypass auto-initialization of Content-Length, Content-Type; leave Content-Length empty
+  $request = HTTP::Request->new(POST => 'http://example.com/some/path', [ 'Content-Type' => 'text/plain' ], '!');
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
@@ -1297,7 +1288,16 @@ YAML
         },
       ],
     },
-    'missing body does not cause an exception',
+    'missing Content-Length does not prevent the request body from being checked',
+  );
+
+
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'text/plain';
+  cmp_deeply(
+    ($result = $openapi->validate_request($request,
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
+    { valid => true },
+    'request body is missing but not required',
   );
 };
 
@@ -1322,7 +1322,7 @@ paths:
 YAML
     },
   );
-  my $request = HTTP::Request->new(POST => 'http://example.com/some/path');
+  my $request = POST 'http://example.com/some/path';
   cmp_deeply(
     (my $result = $openapi->validate_request($request,
       { path_template => $path_template, path_captures => {}}))->TO_JSON,

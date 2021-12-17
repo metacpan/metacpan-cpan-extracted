@@ -1,5 +1,21 @@
 Revision history for XS-Parse-Sublike
 
+0.16    2021-12-16
+        [CHANGES]
+         * No longer support ABI version 3 even in back-compatibility mode
+
+        [BUGFIXES]
+         * Remember to adjust the SET_CVNAME and INSTALL_SYMBOL actions bits
+           in the non-dynamic-actions case
+         * Avoid using C99-style `//` comments as some compilers dislike it
+           (mistagged RT140487)
+
+0.15    2021-12-15
+        [CHANGES]
+         * Added ctx->actions, the DYNAMIC_ACTIONS compat flag, and associated
+           flags and machinery
+         * Added ctx->moddata
+
 0.14    2021-10-28
         [CHANGES]
          * Added XS_PARSE_SUBLIKE_FLAG_PREFIX; discourage the _any() function

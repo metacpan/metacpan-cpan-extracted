@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 03-rr.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 03-rr.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -12,9 +12,9 @@ local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
 {					## check exception raised for unparsable argument
 	foreach my $testcase ( undef, '', ' ', '. NULL x', '. OPT x', '. ATMA x', [], {} ) {
+		my $test = defined $testcase ? "'$testcase'" : 'undef';
 		eval { Net::DNS::RR->new($testcase) };
 		my ($exception) = split /\n/, "$@\n";
-		my $test = defined $testcase ? "'$testcase'" : 'undef';
 		ok( $exception, "Net::DNS::RR->new($test)\t[$exception]" );
 	}
 }

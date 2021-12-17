@@ -75,7 +75,7 @@ OTRS::OPM::Maker::Utils::OTRS3 - Provide helper functions for OTRS <= 3
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 METHODS
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl-Mojo
 
+v6.7.0 2021-12-16T08:25:06Z
+
+    - added community code of conduct
+    - switched license to GPLv3
+
 v6.6.0 2021-03-03T22:20:09Z
 
     - allow RxPerl's first_value_from, last_value_from

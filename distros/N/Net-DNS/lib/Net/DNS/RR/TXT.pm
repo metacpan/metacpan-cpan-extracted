@@ -2,7 +2,7 @@ package Net::DNS::RR::TXT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TXT.pm 1840 2021-05-21 12:32:06Z willem $)[2];
+our $VERSION = (qw$Id: TXT.pm 1857 2021-12-07 13:38:02Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -85,20 +85,20 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = Net::DNS::RR->new( 'name TXT  txtdata ...' );
+    $rr = Net::DNS::RR->new( 'name TXT	txtdata ...' );
 
     $rr = Net::DNS::RR->new( name    => 'name',
-			    type    => 'TXT',
-			    txtdata => 'single text string'
-			    );
+			     type    => 'TXT',
+			     txtdata => 'single text string'
+			     );
 
     $rr = Net::DNS::RR->new( name    => 'name',
-			    type    => 'TXT',
-			    txtdata => [ 'multiple', 'strings', ... ]
-			    );
+			     type    => 'TXT',
+			     txtdata => [ 'multiple', 'strings', ... ]
+			     );
 
     use utf8;
-    $rr = Net::DNS::RR->new( 'jp TXT    古池や　蛙飛込む　水の音' );
+    $rr = Net::DNS::RR->new( 'jp TXT	古池や　蛙飛込む　水の音' );
 
 =head1 DESCRIPTION
 
@@ -141,7 +141,7 @@ Package template (c)2009,2012 O.M.Kolkman and R.W.Franks.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

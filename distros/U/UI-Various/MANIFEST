@@ -2,6 +2,7 @@ Build.PL
 Changes
 LICENSE
 META.json
+README.md
 builder/confess-uncoverable.lst
 builder/dod-check.pl
 builder/dod-check.sh
@@ -49,6 +50,7 @@ lib/UI/Various/toplevel.pm
 lib/UI/Various/widget.pm
 minil.toml
 t/00-compile.t
+t/00-test-functions.t
 t/01-use.t
 t/02-core.t
 t/03-widget-essential.t

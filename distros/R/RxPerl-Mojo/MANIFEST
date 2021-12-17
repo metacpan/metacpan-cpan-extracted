@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/RxPerl/Mojo.pm
+lib/RxPerl/Mojo/CodeOfConduct.pod
 minil.toml
 t/timers.t
 META.yml

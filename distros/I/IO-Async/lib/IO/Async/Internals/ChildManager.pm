@@ -8,7 +8,7 @@ package IO::Async::Internals::ChildManager;
 use strict;
 use warnings;
 
-our $VERSION = '0.800';
+our $VERSION = '0.801';
 
 # Not a notifier
 

@@ -46,5 +46,5 @@ requires:
   Scalar::Util: '1.25'
   Time::Local: '1.19'
   perl: '5.008008'
-version: '1.32'
+version: '1.33'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

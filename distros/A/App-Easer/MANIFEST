@@ -18,9 +18,15 @@ t/03-multilevel.t
 t/04-multilevel-jsons.t
 t/05-single-leaf.t
 t/10-stock_factory.t
+t/12-namenv.t
+t/15-spec-from-hash-or-mod.t
+t/16-auto-env.t
+t/17-auto-env-command.t
 t/20-app-load.t
 t/30-custom-collect.t
 t/31-custom-sources.t
+t/40-fallback.t
+t/45.dispatch.t
 t/60-children-naming.t
 t/Helpers.pm
 t/LocalTester.pm

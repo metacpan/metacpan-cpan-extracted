@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 no warnings qw< experimental::signatures >;
-{ our $VERSION = '0.006' }
+{ our $VERSION = '0.008' }
 
 use Exporter 'import';
 our @EXPORT_OK = qw< d run >;
@@ -176,39 +176,63 @@ sub default_getopt_config ($has_children) {
 
 sub execute ($self, $args) {
    my $command    = $self->{trail}[-1][0];
-   my $executable = $self->{application}{commands}{$command}{execute}
+   my $executable = fetch_spec_for($self, $command)->{execute}
      or die "no executable for '$command'\n";
    $executable = $self->{factory}->($executable, 'execute');    # "resolve"
    my $config = $self->{configs}[-1] // {};
    return $executable->($self, $config, $args);
 } ## end sub execute
 
+sub fetch_subcommand_default ($self, $spec) {
+   my $acfg = $self->{application}{configuration};
+   my $child = exists($spec->{'default-child'}) ? $spec->{'default-child'}
+      : exists($acfg->{'default-child'}) ? $acfg->{'default-child'}
+      : get_child($self, $spec, 'help'); # help is last resort
+   return ($child, $child) if defined $child && length $child;
+   return;
+}
+
 sub fetch_subcommand ($self, $spec, $args) {
+   # if there's a dispatch, use that to figure out where to go next
+   # **this** might even overcome having children at all!
+   for my $cfg ($spec, $self->{application}{configuration}) {
+      next unless exists $cfg->{dispatch};
+      my $sub = $self->{factory}->($cfg->{dispatch}, 'dispatch');
+      defined(my $child = $sub->($self, $spec, $args)) or return;
+      return ($child, $child);
+   }
+
+   # regular course here, no point in going forth without children
    return unless has_children($self, $spec);
-   my ($child, $candidate, $candidate_from_args);
-   if ($args->@*) {
-      $candidate           = $args->[0];
-      $candidate_from_args = 1;
+
+   # use defaults if there's no argument to investigate
+   return fetch_subcommand_default($self, $spec) unless $args->@*;
+
+   # try to get a child from the first argument
+   if (my $child = get_child($self, $spec, $args->[0])) {
+      return ($child, shift $args->@*); # consumed arg name
    }
-   elsif (exists $spec->{'default-child'}) {
-      $candidate = $child = $spec->{'default-child'};
-      return unless defined $child && length $child;
+
+   # the first argument didn't help, but we might want to fallback
+   for my $cfg ($spec, $self->{application}{configuration}) {
+      if (exists $cfg->{fallback}) { # executable
+         defined(my $fb = $cfg->{fallback}) or return;
+         my $sub = $self->{factory}->($fb, 'fallback'); # "resolve"
+         defined(my $child = $sub->($self, $spec, $args)) or return;
+         return ($child, $child);
+      }
+      if (exists $spec->{'fallback-to'}) {
+         defined(my $fbto = $spec->{'fallback-to'}) or return;
+         return ($fbto, $fbto);
+      }
+      return fetch_subcommand_default($self, $spec)
+         if $cfg->{'fallback-to-default'};
    }
-   elsif (exists $self->{application}{configuration}{'default-child'}) {
-      $candidate = $child
-         = $self->{application}{configuration}{'default-child'};
-      return unless defined $child && length $child;
-   }
-   else {
-      $candidate = 'help';
-   }
-   if ($child //= get_child($self, $spec, $candidate)) {
-      shift $args->@* if $candidate_from_args;
-      return ($child, $candidate // $child);
-   }
+
+   # no fallback at this point... it's an error, build a message and die!
    my @names = map { $_->[1] } $self->{trail}->@*;
    shift @names;    # remove first one
-   my $path = join '/', @names, $candidate;
+   my $path = join '/', @names, $args->[0]; # $args->[0] was the candidate
    die "cannot find sub-command '$path'\n";
 } ## end sub fetch_subcommand
 
@@ -220,7 +244,7 @@ sub generate_factory ($c) {
 
 sub get_child ($self, $spec, $name) {
    for my $child (get_children($self, $spec)) {
-      my $command = $self->{application}{commands}{$child};
+      my $command = fetch_spec_for($self, $child);
       next
         unless grep { $_ eq $name }
         ($command->{supports} //= [$child])->@*;
@@ -233,6 +257,11 @@ sub get_children ($self, $spec) {
    return if $spec->{leaf};
    return if exists($spec->{children}) && !$spec->{children};
    my @children = ($spec->{children} // [])->@*;
+
+   # set auto-leaves as 1 by default, new in 0.007002
+   $self->{application}{configuration}{'auto-leaves'} = 1
+      unless exists $self->{application}{configuration}{'auto-leaves'};
+
    return
      if $self->{application}{configuration}{'auto-leaves'}
      && @children == 0;    # no auto-children for leaves under auto-leaves
@@ -255,35 +284,51 @@ sub get_children ($self, $spec) {
    return (@children, @auto);
 } ## end sub get_children
 
+# traverse a whole @$list of sub-commands from $start. This is used to
+# list "commands" at a certain sub-level or show help
 sub get_descendant ($self, $start, $list) {
    my $target = $start;
-   my $cmds   = $self->{application}{commands};
    my $path;
    for my $desc ($list->@*) {
       $path = defined($path) ? "$path/$desc" : $desc;
-      my $command = $cmds->{$target}
+      my $command = fetch_spec_for($self, $target)
         or die "cannot find sub-command '$path'\n";
       defined($target = get_child($self, $command, $desc))
         or die "cannot find sub-command '$path'\n";
    } ## end for my $desc ($list->@*)
 
    # check that this last is associated to a real command
-   $cmds->{$target} or die "cannot find sub-command '$path'\n";
-
-   return $target;
+   return $target if fetch_spec_for($self, $target);
+   die "cannot find sub-command '$path'\n";
 } ## end sub get_descendant
 
 sub has_children ($self, $spec) { get_children($self, $spec) ? 1 : 0 }
 
 sub hash_merge {
-   return {map { $_->%* } reverse @_};
+   my (%retval, %is_overridable);
+   for my $href (@_) {
+      for my $src_key (keys $href->%*) {
+         my $dst_key = $src_key;
+         my $this_overridable;
+         if ($dst_key =~ m{\A //= (.*) \z}mxs) { # overridable
+            $dst_key = $1;
+            $is_overridable{$dst_key} = 1 unless exists $retval{$dst_key};
+            $this_overridable = 1;
+         }
+         $retval{$dst_key} = $href->{$src_key}
+            if $is_overridable{$dst_key} || ! exists($retval{$dst_key});
+         $is_overridable{$dst_key} = 0 unless $this_overridable;
+      }
+   }
+   return \%retval;
+   # was a simple: return {map { $_->%* } reverse @_};
 }
 
 sub list_commands ($self, $children) {
    my $retval = '';
    open my $fh, '>', \$retval;
    for my $child ($children->@*) {
-      my $command = $self->{application}{commands}{$child};
+      my $command = fetch_spec_for($self, $child);
       my $help    = $command->{help};
       my @aliases = ($command->{supports} // [$child])->@*;
       next unless @aliases;
@@ -328,10 +373,18 @@ sub merger ($self, $spec = {}) {
    return $self->{factory}->($merger, 'merge');    # "resolve"
 }
 
+sub env_namer ($self, $cspec) {
+   my $namenv = $cspec->{namenv}
+     // $self->{application}{configuration}{namenv} // \&stock_NamEnv;
+   $namenv = $self->{factory}->($namenv, 'namenv'); # "resolve"
+   return sub ($ospec) { $namenv->($self, $cspec, $ospec) };
+} ## end sub name_for_option ($o)
+
 sub name_for_option ($o) {
    return $o->{name} if defined $o->{name};
    return $1 if defined $o->{getopt} && $o->{getopt} =~ m{\A(\w+)}mxs;
-   return lc $o->{environment} if defined $o->{environment};
+   return lc $o->{environment}
+      if defined $o->{environment} && $o->{environment} ne '1';
    return '~~~';
 } ## end sub name_for_option ($o)
 
@@ -343,7 +396,7 @@ sub params_validate ($self, $spec, $args) {
 } ## end sub params_validate
 
 sub print_commands ($self, $target) {
-   my $command = $self->{application}{commands}{$target};
+   my $command = fetch_spec_for($self, $target);
    my $fh =
      $self->{application}{configuration}{'help-on-stderr'}
      ? \*STDERR
@@ -357,7 +410,8 @@ sub print_commands ($self, $target) {
 }
 
 sub print_help ($self, $target) {
-   my $command =  $self->{application}{commands}{$target};
+   my $command = fetch_spec_for($self, $target);
+   my $enamr   = env_namer($self, $command);
    my $fh =
      $self->{application}{configuration}{'help-on-stderr'}
      ? \*STDERR
@@ -390,9 +444,11 @@ sub print_help ($self, $target) {
             printf {$fh} "%15s  command-line: %s\n", '', shift(@lines);
             printf {$fh} "%15s                %s\n", '', $_ for @lines;
          }
-         printf {$fh} "%15s  environment : %s\n", '',
-           $option->{environment} // '*undef*'
-           if exists $option->{environment};
+
+         if (defined(my $env_name = $enamr->($option))) {
+            printf {$fh} "%15s  environment : %s\n", '', $env_name;
+         }
+
          printf {$fh} "%15s  default     : %s\n", '',
            $option->{default} // '*undef*'
            if exists $option->{default};
@@ -412,6 +468,18 @@ sub print_help ($self, $target) {
    }
 }
 
+sub stock_SpecFromHash ($s, $cmd) { $s->{application}{commands}{$cmd} }
+
+sub stock_SpecFromHashOrModule ($s, $cmd) {
+   $s->{application}{commands}{$cmd} //= $s->{factory}->($cmd, 'spec')->();
+}
+
+sub fetch_spec_for ($self, $command) {
+   my $fetcher = $self->{application}{configuration}{specfetch}
+      // \&stock_SpecFromHash;
+   return $self->{factory}->($fetcher, 'specfetch')->($self, $command);
+}
+
 sub run ($application, $args) {
    $application = add_auto_commands(load_application($application));
    my $self = {
@@ -427,7 +495,7 @@ sub run ($application, $args) {
 
    while ('necessary') {
       my $command = $self->{trail}[-1][0];
-      my $spec    = $application->{commands}{$command}
+      my $spec    = fetch_spec_for($self, $command)
         or die "no definition for '$command'\n";
 
       $args = collect_options($self, $spec, $args);
@@ -503,20 +571,33 @@ sub stock_JsonFiles ($self, $spec, @ignore) {
 
 sub stock_Default ($self, $spec, @ignore) {
    return {
-      map { name_for_option($_) => $_->{default} }
+      map { '//=' . name_for_option($_) => $_->{default} }
       grep { exists $_->{default} } ($spec->{options} // [])->@*
    };
 } ## end sub stock_Default
 
 sub stock_Environment ($self, $spec, @ignore) {
+   my $enamr = env_namer($self, $spec);
    return {
-      map { name_for_option($_) => $ENV{$_->{environment}} }
-        grep {
-              exists($_->{environment})
-           && exists($ENV{$_->{environment}})
+      map {
+         my $en = $enamr->($_); # name of environment variable
+         defined($en) && exists($ENV{$en})
+            ? (name_for_option($_) => $ENV{$en}) : ();
         } ($spec->{options} // [])->@*
    };
 } ## end sub stock_Environment
+
+sub stock_NamEnv ($self, $cspec, $ospec) {
+   my $aek = 'auto-environment';
+   my $autoenv = exists $cspec->{$aek} ? $cspec->{$aek}
+      : $self->{application}{configuration}{$aek} // undef;
+   my $env = exists $ospec->{environment} ? $ospec->{environment}
+      : $autoenv ? 1 : undef;
+   return $env unless ($env // '') eq '1';
+   my $appname = $self->{application}{configuration}{name} // '';
+   my $optname = name_for_option($ospec);
+   return uc(join '_', $appname, $optname);
+}
 
 sub stock_Parent ($self, $spec, @ignore) { $self->{configs}[-1] // {} }
 
@@ -576,12 +657,13 @@ sub stock_help ($self, $config, $args) {
    return 0;
 } ## end sub stock_help
 
-sub stock_DefaultSources { [qw< +CmdLine +Environment +Parent +Default >] }
+sub stock_DefaultSources { [qw< +Default +CmdLine +Environment +Parent >] }
 
 sub stock_SourcesWithFiles {
    [
-      qw< +CmdLine +Environment +Parent +JsonFileFromConfig +JsonFiles
-        +Default >
+      qw< +Default +CmdLine +Environment +Parent
+         +JsonFileFromConfig +JsonFiles
+        >
    ]
 } ## end sub stock_SourcesWithFiles
 

@@ -1,3 +1,7 @@
+0.03 2021-12-15
+    * Require Spreadsheet::ParseXLSX 0.24+ for testing
+      to address the last 4 failures on CPAN testers
+
 0.02 2021-11-25
     * Require Spreadsheet::Read 0.82+ to address RT 140129
 

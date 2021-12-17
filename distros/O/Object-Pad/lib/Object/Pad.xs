@@ -21,6 +21,7 @@
 #endif
 
 #include "perl-additions.c.inc"
+#include "lexer-additions.c.inc"
 #include "forbid_outofblock_ops.c.inc"
 #include "force_list_keeping_pushmark.c.inc"
 #include "optree-additions.c.inc"
@@ -770,6 +771,24 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *ho
   AV *slots = compclassmeta->direct_slots;
   U32 nslots = av_count(slots);
 
+  /* XS::Parse::Sublike doesn't support lexical `method $foo`, but we can hack
+   * it up here
+   */
+  if(type == PHASER_NONE && !ctx->name &&
+     lex_peek_unichar(0) == '$') {
+    ctx->name = lex_scan_lexvar();
+    if(!ctx->name)
+      croak("Expected a lexical variable name");
+
+    lex_read_space(0);
+    hv_stores(ctx->moddata, "Object::Pad/method_varname", SvREFCNT_inc(ctx->name));
+
+    /* XPS should set a CV name */
+    ctx->actions |= XS_PARSE_SUBLIKE_ACTION_SET_CVNAME;
+    /* XPS should not CVf_ANON, install a named symbol, or emit an anoncode expr */
+    ctx->actions &= ~(XS_PARSE_SUBLIKE_ACTION_CVf_ANON|XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL|XS_PARSE_SUBLIKE_ACTION_REFGEN_ANONCODE|XS_PARSE_SUBLIKE_ACTION_RET_EXPR);
+  }
+
   switch(type) {
     case PHASER_NONE:
       if(ctx->name && strEQ(SvPVX(ctx->name), "BUILD"))
@@ -786,7 +805,7 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *ho
     /* We need to fool start_subparse() into thinking this is a named function
      * so it emits a real CV and not a protosub
      */
-    ctx->name = newSVpvs("(phaser)");
+    ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_CVf_ANON;
 
   /* Save the methodscope for this subparse, in case of nested methods
    *   (RT132321)
@@ -1002,13 +1021,11 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
     CvOUTSIDE_SEQ(PL_compcv) = CvOUTSIDE_SEQ(outside);
   }
 
-  if(type != PHASER_NONE) {
+  if(type != PHASER_NONE)
     /* We need to remove the name now to stop newATTRSUB() from creating this
      * as a named symbol table entry
      */
-    SvREFCNT_dec(ctx->name);
-    ctx->name = NULL;
-  }
+    ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
 }
 
 static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
@@ -1020,7 +1037,7 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
 
   switch(type) {
     case PHASER_NONE:
-      if(ctx->cv && ctx->name)
+      if(ctx->cv && ctx->name && (ctx->actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL))
         mop_class_add_method(compclassmeta, ctx->name);
       break;
 
@@ -1037,17 +1054,27 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
       break;
   }
 
-  /* Any phaser should parse as if it was a named method. By setting a junk
-   * name here we fool XS::Parse::Sublike into thinking it just parsed a named
-   * method, so it emits an OP_NULL into the optree and behaves like a
-   * statement
-   */
+  SV **varnamep;
+  if((varnamep = hv_fetchs(ctx->moddata, "Object::Pad/method_varname", 0))) {
+    PADOFFSET padix = pad_add_name_sv(*varnamep, 0, NULL, NULL);
+    intro_my();
+
+    SV **svp = &PAD_SVl(padix);
+
+    if(*svp)
+      SvREFCNT_dec(*svp);
+
+    *svp = newRV_inc((SV *)ctx->cv);
+    SvREADONLY_on(*svp);
+  }
+
   if(type != PHASER_NONE)
-    ctx->name = newSVpvs("(phaser)");
+    /* Do not generate REFGEN/ANONCODE optree, do not yield expression */
+    ctx->actions &= ~(XS_PARSE_SUBLIKE_ACTION_REFGEN_ANONCODE|XS_PARSE_SUBLIKE_ACTION_RET_EXPR);
 }
 
 static struct XSParseSublikeHooks parse_method_hooks = {
-  .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS,
+  .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS|XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
   .permit_hintkey  = "Object::Pad/method",
   .permit          = parse_permit,
   .pre_subparse    = parse_pre_subparse,
@@ -1058,7 +1085,8 @@ static struct XSParseSublikeHooks parse_method_hooks = {
 };
 
 static struct XSParseSublikeHooks parse_phaser_hooks = {
-  .skip_parts = XS_PARSE_SUBLIKE_PART_NAME|XS_PARSE_SUBLIKE_PART_ATTRS,
+  .flags           = XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
+  .skip_parts      = XS_PARSE_SUBLIKE_PART_NAME|XS_PARSE_SUBLIKE_PART_ATTRS,
   /* no permit */
   .pre_subparse    = parse_pre_subparse,
   .post_blockstart = parse_post_blockstart,
@@ -1300,7 +1328,7 @@ BOOT:
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 
-  boot_xs_parse_sublike(0.13); /* permit_hintkey */
+  boot_xs_parse_sublike(0.15); /* dymamic actions */
 
   register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);
 

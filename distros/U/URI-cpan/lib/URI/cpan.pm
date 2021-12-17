@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package URI::cpan;
+package URI::cpan 1.008;
 # ABSTRACT: URLs that refer to things on the CPAN
-$URI::cpan::VERSION = '1.007';
+
 use parent qw(URI::_generic);
 
 #pod =head1 SYNOPSIS
@@ -111,7 +111,7 @@ URI::cpan - URLs that refer to things on the CPAN
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 SYNOPSIS
 
@@ -133,6 +133,16 @@ Reserved for likely future use are:
   cpan:///module
   cpan:///package
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 WARNINGS
 
 URI objects are difficult to subclass, so I have not (yet?) taken the time to
@@ -152,7 +162,7 @@ Dieter helped thrash out this new implementation, too.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

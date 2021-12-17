@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 01-resolver.t 1827 2020-12-14 10:49:27Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1847 2021-08-11 10:02:44Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -35,11 +35,11 @@ ok( !$resolver->search('name'), '$resolver->search() without dnsrch' );
 
 $resolver->dnsrch(1);
 $resolver->ndots(1);
-ok( !$resolver->search('name'),	       '$resolver->search() simple name' );
-ok( !$resolver->search('name.domain'), '$resolver->search() dotted name' );
-
-$resolver->ndots(2);
-ok( !$resolver->search(''), '$resolver->search() with ndots > 1' );
+$resolver->searchlist(qw(a.example. b.example.));
+ok( !$resolver->search('name'),		'$resolver->search() simple name' );
+ok( !$resolver->search('name.domain'),	'$resolver->search() dotted name' );
+ok( !$resolver->search('name.domain.'), '$resolver->search() absolute name' );
+ok( !$resolver->search(''),		'$resolver->search() root label' );
 
 
 my $query = Net::DNS::Packet->new('.');	## exercise _accept_reply()
@@ -83,43 +83,35 @@ $recursive->nameservers(@NOIP);
 ok( !$recursive->send( 'www.net-dns.org', 'A' ), 'fail if no reachable server' );
 
 
-local $SIG{__WARN__} = sub { die @_ };
+sub warning {
+	my ( $test, $method ) = @_;
+	local $SIG{__WARN__} = sub { die @_ };
+	eval {&$method};
+	my ($warning) = split /\n/, "$@\n";
+	ok( $warning, "$test\t[$warning]" );
+	eval {&$method};
+}
 
-eval { $resolver->nameserver('bogus.example.com.') };
-my ($warning1) = split /\n/, "$@\n";
-ok( $warning1, "unresolved nameserver warning\t[$warning1]" );
+warning( 'unresolved nameserver warning', sub { $resolver->nameserver('bogus.example.com.') } );
 
+warning( 'deprecated bgisready() method', sub { $resolver->bgisready(undef) } );
 
-eval { $resolver->make_query_packet('example.com') };
-my ($warning2) = split /\n/, "$@\n";
-ok( $warning2, "deprecated make_query_packet()\t[$warning2]" );
+warning( 'deprecated axfr_start() method', sub { $resolver->axfr_start('net-dns.org') } );
 
-eval { $resolver->make_query_packet('example.com') };
-my ($repeated) = split /\n/, "$@\n";
-ok( !$repeated, "subsequent warnings suppressed\t[$repeated]" );
+warning('deprecated axfr_next() method',
+	sub {
+		$resolver->{axfr_iter} = sub { };
+		$resolver->axfr_next();
+	} );
 
-eval { $resolver->bgisready(undef) };
-my ($warning3) = split /\n/, "$@\n";
-ok( !$warning3, "deprecated bgisready() method\t[$warning3]" );
+warning( 'deprecated query_dorecursion()', sub { $recursive->query_dorecursion( 'www.net-dns.org', 'A' ) } );
 
-eval { $resolver->axfr_start('net-dns.org') };
-my ($warning4) = split /\n/, "$@\n";
-ok( !$warning4, "deprecated axfr_start()\t[$warning4]" );
+warning('deprecated recursion_callback()',
+	sub {
+		$recursive->recursion_callback( sub { } );
+	} );
 
-$resolver->{axfr_iter} = sub { };
-eval { $resolver->axfr_next() };
-my ($warning5) = split /\n/, "$@\n";
-ok( !$warning5, "deprecated axfr_next()\t[$warning5]" );
-
-eval { $recursive->query_dorecursion( 'www.net-dns.org', 'A' ) };
-my ($warning6) = split /\n/, "$@\n";
-ok( !$warning6, "deprecated query_dorecursion()\t[$warning6]" );
-
-my $callback = sub { };
-eval { $recursive->recursion_callback($callback) };
-my ($warning7) = split /\n/, "$@\n";
-ok( !$warning7, "deprecated recursion_callback()\t[$warning7]" );
-
+warning( 'deprecated make_query_packet()', sub { $resolver->make_query_packet('example.com') } );
 
 exit;
 

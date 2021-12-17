@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::MultiSub 0.01;
+package Syntax::Keyword::MultiSub 0.02;
 
 use v5.14;
 use warnings;
@@ -89,6 +89,19 @@ sub import_into
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
 
+=head1 WITH OTHER MODULES
+
+=head2 Future::AsyncAwait
+
+As of L<Future::AsyncAwait> version 0.55 a cross-module integration test
+asserts that the C<multi> modifier can be applied to C<async sub>.
+
+   use Future::AsyncAwait;
+   use Syntax::Keyword::MultiSub;
+
+   async multi sub f () { return "nothing"; }
+   async multi sub f ($key) { return await get_thing($key); }
+
 =head1 TODO
 
 =over 4
@@ -100,8 +113,9 @@ signatures.
 
 =item *
 
-Cross-module testing with L<Future::AsyncAwait> (for C<async multi sub>) and
-L<Object::Pad> (for C<multi method>).
+Cross-module testing with L<Object::Pad> (for C<multi method>). This may
+require a better combined implementation, to be aware of method resolution
+order, inheritence, etc...
 
 =item *
 

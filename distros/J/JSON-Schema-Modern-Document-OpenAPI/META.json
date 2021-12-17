@@ -44,7 +44,6 @@
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
-            "Encode" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -69,6 +68,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Encode" : "2.89",
             "Feature::Compat::Try" : "0",
             "File::ShareDir" : "0",
             "JSON::Schema::Modern" : "0.531",
@@ -105,7 +105,7 @@
          },
          "requires" : {
             "File::Spec" : "0",
-            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
             "HTTP::Response" : "0",
             "Module::Metadata" : "0",
             "Test::Deep" : "0",
@@ -202,15 +202,15 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.010"
+         "version" : "0.012"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.010"
+         "version" : "0.012"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.010"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -225,7 +225,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern-Document-OpenAPI"
       }
    },
-   "version" : "0.010",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035006"
@@ -1133,7 +1133,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.010",
+                  "tag" : "v0.012",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

@@ -33,3 +33,5 @@
 1.013
   -- Disabled all caching by default
   -- added an always_clean option to the plugin
+1.014
+  -- fixed bug where an undef an undef value could cause the find session operation to die

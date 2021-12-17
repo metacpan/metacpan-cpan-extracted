@@ -7,6 +7,25 @@ Home page:    <https://metacpan.org/release/String-Copyright>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+0.003012	2021-12-16
+
+ [ Bug Fixes ]
+ - fix detect owner after (space-delimited) dash
+ - fix skip non-copyright chatter of single word at end of line
+
+ [ Other ]
+ - cover copyright sign misparsed from latin1 or MacRoman, and skip other
+   misparsed characters (most commonly é but also cyrillic, vietnamese and
+   CJK characters)
+ - generalize patterns colon_or_dash delimiter
+ - skip bogus copyright holder starting with YEAR
+ - skip bogus identifier preceded by dash
+ - skip identifier followed by ' License'
+ - skip identifier followed by ', patent'
+ - slight optimization: re-computing substring-after-regex-match already
+   available
+ - use Set::IntSpan (not Number::Range)
+
 0.003011	2021-09-04
 
  [ Documentation ]

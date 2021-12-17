@@ -5,7 +5,7 @@ package OpenAPI::Modern;
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -21,6 +21,7 @@ use Ref::Util qw(is_plain_hashref is_plain_arrayref is_ref);
 use List::Util 'first';
 use Scalar::Util 'looks_like_number';
 use Feature::Compat::Try;
+use Encode 2.89;
 use JSON::Schema::Modern 0.531;
 use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort);
 use JSON::Schema::Modern::Document::OpenAPI;
@@ -140,11 +141,11 @@ sub validate_request ($self, $request, $options) {
         $body_obj = $self->_resolve_ref($ref, $state);
       }
 
-      if ($body_obj->{required} and not length($request->content_ref->$*)) {
-        ()= E({ %$state, keyword => 'required' }, 'request body is required but missing');
-      }
-      else {
+      if ($request->content_length // length $request->content_ref->$*) {
         ()= $self->_validate_body_content($state, $body_obj->{content}, $request);
+      }
+      elsif ($body_obj->{required}) {
+        ()= E({ %$state, keyword => 'required' }, 'request body is required but missing');
       }
     }
   }
@@ -215,7 +216,7 @@ sub validate_response ($self, $response, $options) {
 
     ()= $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body') },
         $response_obj->{content}, $response)
-      if exists $response_obj->{content};
+      if exists $response_obj->{content} and ($response->content_length // length $response->content_ref->$*);
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Result')) {
@@ -500,7 +501,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -557,11 +558,10 @@ version 0.010
   );
 
   say 'request:';
-  my $request = HTTP::Request->new(
-    POST => 'http://example.com/foo/bar',
+  use HTTP::Request::Common;
+  my $request = POST 'http://example.com/foo/bar',
     [ 'My-Request-Header' => '123', 'Content-Type' => 'application/json' ],
-    '{"hello": 123}',
-  );
+    '{"hello": 123}';
   say $openapi->validate_request($request, {
     path_template => '/foo/{foo_id}',
     path_captures => { foo_id => 'bar' },
@@ -703,7 +703,7 @@ C<path_template> OR C<operation_id> is required.
 
 An accessor that delegates to L<JSON::Schema::Modern::Document/canonical_uri>.
 
--head2 schema
+=head2 schema
 
 An accessor that delegates to L<JSON::Schema::Modern::Document/schema>.
 
@@ -804,8 +804,8 @@ Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Mo
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
-You can also find me on the L<JSON Schema Slack server|json-schema.slack.com> and L<OpenAPI Slack
-server|open-api.slack.com>, which are also great resources for finding help.
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

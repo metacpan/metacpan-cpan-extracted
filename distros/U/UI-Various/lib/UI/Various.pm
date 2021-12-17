@@ -93,7 +93,7 @@ be activated again.  See examples/TODO
 
 #########################################################################
 
-use v5.12.1;
+use v5.14.0;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -101,7 +101,7 @@ use warnings 'once';
 
 use Carp;			# may only be used in import!
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
 
 BEGIN  {  require UI::Various::core;  }
 

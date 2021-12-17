@@ -19,3 +19,5 @@ sub _sub_perl($)
     $_ = `$run_perl -e '$_' 2>&1`;
     return $_;
 }
+
+1;

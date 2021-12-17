@@ -6,7 +6,7 @@ use File::Spec;
 use base qw(Module::Install::Base);
 use vars qw($VERSION);
 
-$VERSION = '0.12';
+$VERSION = '0.14';
 
 sub checklibs {
   my $self = shift;

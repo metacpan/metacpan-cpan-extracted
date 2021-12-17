@@ -12,7 +12,7 @@
 
 #########################################################################
 
-use v5.12.1;
+use v5.14.0;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -199,23 +199,23 @@ warning_like
 # around that:
 my $re_msg_tail_sp = qr/\sat\s-e\sline\s\d+\.?$/m;
 
-$_ = _sub_perl(	<<~'CODE');
+$_ = _sub_perl(	<<'CODE');
 		use UI::Various({log => "WARN", stderr => 3});
 		UI::Various::core::error("zz_unit_test_text");
 		$_ = UI::Various::stderr(0);
 		$_ == 0  or  die "bad RC $0\n";
 		$_ = UI::Various::stderr(3);
-		CODE
+CODE
 is($?, 0, 'RC 0 in sub-perl "switching off STDERR"');
 is($_, '', 'switching off STDERR suppressed errors');
 
-$_ = _sub_perl(	<<~'CODE');
+$_ = _sub_perl(	<<'CODE');
 		use UI::Various({log => "WARN", stderr => 2});
 		UI::Various::core::error("zz_unit_test_text");
 		print "before stderr(0)\n";
 		$_ = UI::Various::stderr(0);
 		print STDERR "after stderr(0)\n"; # STDERR avoids race condition
-		CODE
+CODE
 is($?, 0, 'RC 0 in sub-perl "postponing STDERR"');
 like($_,
      qr{^before\sstderr\(0\)\n
@@ -223,20 +223,20 @@ like($_,
 	after\sstderr\(0\)\n}mx,
      'postponing STDERR printed correct output');
 
-$_ = _sub_perl(	<<~'CODE');
+$_ = _sub_perl(	<<'CODE');
 		use UI::Various({log => "WARN", stderr => 2});
 		UI::Various::core::error("zz_unit_test_text");
 		$_ = UI::Various::stderr(3);
-		CODE
+CODE
 is($?, 0, 'RC 0 in sub-perl "postponing/dropping STDERR"');
 is($_, '', 'postponing/dropping STDERR printed correct output');
 
-$_ = _sub_perl(	<<~'CODE');
+$_ = _sub_perl(	<<'CODE');
 		use UI::Various({log => "WARN"});
 		close STDERR;
 		$_ = UI::Various::stderr(2);
-		print "We should not get here!";
-		CODE
+		print "We should not get here! ($_)";
+CODE
 is($?, 0x900, 'RC 9 (no signal or core-dump) in sub-perl "closed STDERR"');
 is($_,
    "\n***** can't duplicate STDERR: Bad file descriptor *****\n",

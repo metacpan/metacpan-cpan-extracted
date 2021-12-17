@@ -2,7 +2,7 @@ package Net::DNS::RR::SOA;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SOA.pm 1819 2020-10-19 08:07:24Z willem $)[2];
+our $VERSION = (qw$Id: SOA.pm 1857 2021-12-07 13:38:02Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -161,6 +161,8 @@ sub _ordered() {			## irreflexive 32-bit partial ordering
 	return $n1 < $n2 ? ( $n1 > ( $n2 - 0x80000000 ) ) : ( $n2 < ( $n1 - 0x80000000 ) );
 }
 
+########################################
+
 
 1;
 __END__
@@ -295,7 +297,7 @@ Package template (c)2009,2012 O.M.Kolkman and R.W.Franks.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Table;
 # ABSTRACT: Front-end class for tabular BLAST parser
-$Bio::FastParsers::Blast::Table::VERSION = '0.201110';
+$Bio::FastParsers::Blast::Table::VERSION = '0.213510';
 use Moose;
 use namespace::autoclean;
 
@@ -179,7 +179,7 @@ Bio::FastParsers::Blast::Table - Front-end class for tabular BLAST parser
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 SYNOPSIS
 

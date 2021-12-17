@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "HTTP::Server::Simple" => 0,
     "Test::More" => 0
   },
-  "VERSION" => 280,
+  "VERSION" => 281,
   "test" => {
     "TESTS" => "t/*.t"
   }

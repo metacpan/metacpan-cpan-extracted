@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-IPv4.t 1815 2020-10-14 21:55:18Z willem $ -*-perl-*-
+# $Id: 08-IPv4.t 1847 2021-08-11 10:02:44Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -73,24 +73,16 @@ diag join( "\n\t", 'will use nameservers', @$IP ) if $debug;
 Net::DNS::Resolver->debug($debug);
 
 
-plan tests => 68;
+plan tests => 66;
 
 NonFatalBegin();
 
 
 {
-	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, defnames => 1, dnsrch => 1, ndots => 2 );
-	$resolver->searchlist(qw(nx.net-dns.org net-dns.org));
+	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, dnsrch => 1 );
 
-	ok( !$resolver->query('ns'),		'$resolver->query( simple name, ... )' );
-	ok( $resolver->query('ns.net-dns.org'), '$resolver->query( dotted name, ... )' );
-	ok( $resolver->search('ns'),		'$resolver->search( simple name, ... )' );
-	ok( $resolver->search('net-dns.org'),	'$resolver->search( dotted name, ... )' );
-}
-
-
-{
-	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
+	ok( $resolver->search('ns.net-dns.org.'),  '$resolver->search(ns.net-dns.org.)' );
+	ok( !$resolver->search('nx.net-dns.org.'), '$resolver->search(nx.net-dns.org.)' );
 
 	my $packet = Net::DNS::Packet->new(qw(net-dns.org SOA IN));
 	ok( $resolver->send($packet), '$resolver->send(...)	UDP' );
@@ -448,24 +440,24 @@ SKIP: {
 
 	ok( !$resolver->bgread( ref($handle)->new ), '_bgread()	timeout' );
 
-	my $socket = $resolver->_bgsend_udp( $packet, $packet->data );
-	delete ${*$socket}{net_dns_bg};
+	$resolver->tcp_timeout(10);
+	my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
 	while ( $resolver->bgbusy($socket) ) { sleep 1 }
-	ok( !$resolver->bgbusy($socket), 'bgbusy()	SpamAssassin workaround' );
+	my $discard;
+	$socket->recv( $discard, 10 );
+	my $buffer = Net::DNS::Resolver::Base::_read_tcp($socket);
+	is( length($buffer), 0, '_read_tcp()	incomplete data' );
 }
 
 
-{					## exercise error path in _read_tcp()
-	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
-	$resolver->tcp_timeout(10);
+{					## exercise SpamAssassin's use of plain sockets
+	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, udp_timeout => 0 );
 
 	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
-	my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
+	my $socket = $resolver->_bgsend_udp( $packet, $packet->data );
+	delete ${*$socket}{net_dns_bg};				# state vector
 	while ( $resolver->bgbusy($socket) ) { sleep 1 }
-
-	my $discarded = '';		## [size][id][status][qd	count]...
-	$socket->recv( $discarded, 7 ) if $socket;
-	ok( !$resolver->_bgread($socket), '_read_tcp()	incomplete data' );
+	ok( !$resolver->bgbusy($socket), 'bgbusy()	SpamAssassin workaround' );
 }
 
 

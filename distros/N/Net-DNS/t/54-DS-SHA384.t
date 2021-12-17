@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 54-DS-SHA384.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 54-DS-SHA384.t 1855 2021-11-26 11:33:48Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -15,7 +15,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";## no critic
+	next if eval "require $package";	## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -24,33 +24,28 @@ plan tests => 3;
 
 
 # Simple known-answer tests based upon the examples given in RFC6605, section 6.2
+my $RFC = 'RFC6605';
 
 my $dnskey = Net::DNS::RR->new( <<'END' );
-example.net. 3600 IN DNSKEY 257 3 14 (
-	xKYaNhWdGOfJ+nPrL8/arkwf2EY3MDJ+SErKivBVSum1
-	w/egsXvSADtNJhyem5RCOpgQ6K8X1DRSEkrbYQ+OB+v8
-	/uX45NBwY8rp65F6Glur8I/mlVNgF6W/qTI37m40 )
+example.net.	3600	IN	DNSKEY	257 3 14 (
+	xKYaNhWdGOfJ+nPrL8/arkwf2EY3MDJ+SErKivBVSum1w/egsXvSADtNJhyem5RCOpgQ6K8X1DRS
+	EkrbYQ+OB+v8/uX45NBwY8rp65F6Glur8I/mlVNgF6W/qTI37m40 ) ; Key ID = 10771
 END
 
 my $ds = Net::DNS::RR->new( <<'END' );
-example.net. 3600 IN DS 10771 14 4 (
-	72d7b62976ce06438e9c0bf319013cf801f09ecc84b8
-	d7e9495f27e305c6a9b0563a9b5f4d288405c3008a94
-	6df983d6 )
+example.net.	3600	IN	DS	10771 14 4 (
+	72D7B62976CE06438E9C0BF319013CF801F09ECC84B8D7E9495F27E305C6A9B0
+	563A9B5F4D288405C3008A946DF983D6 )
 END
 
 
-my $test = Net::DNS::RR::DS->create(
-	$dnskey,
-	digtype => 'SHA384',
-	ttl	=> 3600
-	);
+my $test = Net::DNS::RR::DS->create( $dnskey, digtype => $ds->digtype, ttl => $ds->ttl );
 
-is( $test->string, $ds->string, 'created DS matches RFC6605 example DS' );
+is( $test->string, $ds->string, "created DS matches $RFC example DS" );
 
-ok( $test->verify($dnskey), 'created DS verifies RFC6605 example DNSKEY' );
+ok( $test->verify($dnskey), "created DS verifies $RFC example DNSKEY" );
 
-ok( $ds->verify($dnskey), 'RFC6605 example DS verifies DNSKEY' );
+ok( $ds->verify($dnskey), "$RFC example DS verifies DNSKEY" );
 
 $ds->print;
 

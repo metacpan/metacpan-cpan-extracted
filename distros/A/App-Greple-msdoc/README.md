@@ -1,14 +1,15 @@
+[![Actions Status](https://github.com/kaz-utashiro/greple-msdoc/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple-msdoc/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-msdoc.svg)](https://metacpan.org/release/App-Greple-msdoc)
 # NAME
 
 msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # SYNOPSIS
 
-greple -Mmsdoc
+greple -Mmsdoc pattern example.docx
 
 # DESCRIPTION
 
@@ -73,7 +74,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2018-2020 Kazumasa Utashiro.
+Copyright 2018-2021 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

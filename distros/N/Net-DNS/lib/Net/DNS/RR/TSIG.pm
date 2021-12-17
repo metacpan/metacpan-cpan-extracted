@@ -2,7 +2,7 @@ package Net::DNS::RR::TSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TSIG.pm 1827 2020-12-14 10:49:27Z willem $)[2];
+our $VERSION = (qw$Id: TSIG.pm 1856 2021-12-02 14:36:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -29,40 +29,6 @@ eval { require Digest::HMAC };
 eval { require Digest::MD5 };
 eval { require Digest::SHA };
 eval { require MIME::Base64 };
-
-{
-	# source: http://www.iana.org/assignments/tsig-algorithm-names
-	my @algbyname = (
-		'HMAC-MD5.SIG-ALG.REG.INT' => 157,		# numbers are from ISC BIND keygen
-		'HMAC-SHA1'		   => 161,		# and not blessed by IANA
-		'HMAC-SHA224'		   => 162,
-		'HMAC-SHA256'		   => 163,
-		'HMAC-SHA384'		   => 164,
-		'HMAC-SHA512'		   => 165,
-		);
-
-	my @algalias = (
-		'HMAC-MD5' => 157,
-		'HMAC-SHA' => 161,
-		);
-
-	my %algbyval = reverse @algbyname;
-
-	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname, @algalias;
-	foreach (@algrehash) { s/[\W_]//g; }			# strip non-alphanumerics
-	my %algbyname = @algrehash;				# work around broken cperl
-
-	sub _algbyname {
-		my $key = uc shift;				# synthetic key
-		$key =~ s/[\W_]//g;				# strip non-alphanumerics
-		return $algbyname{$key};
-	}
-
-	sub _algbyval {
-		my $value = shift;
-		return $algbyval{$value};
-	}
-}
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
@@ -453,9 +419,9 @@ sub verify {
 	my $macbin = $self->macbin;
 	my $maclen = length $macbin;
 	my $minlen = length($tsigmac) >> 1;			# per RFC4635, 3.1
-	$self->error(16) if $macbin ne substr $tsigmac, 0, $maclen;			     # BADSIG
-	$self->error(22) if $maclen < $minlen or $maclen < 10 or $maclen > length $tsigmac;  # BADTRUNC
-	$self->error(18) if abs( time() - $self->time_signed ) > $self->fudge;		     # BADTIME
+	$self->error(16) if $macbin ne substr $tsigmac, 0, $maclen;			       # BADSIG
+	$self->error(22) if $maclen < $minlen or $maclen < 10 or $maclen > length $tsigmac;    # BADTRUNC
+	$self->error(18) if abs( time() - $self->time_signed ) > $self->fudge;		       # BADTIME
 
 	return $self->{error} ? undef : $tsig;
 }
@@ -467,6 +433,41 @@ sub vrfyerrstr {
 
 
 ########################################
+
+{
+	# source: http://www.iana.org/assignments/tsig-algorithm-names
+	my @algbyname = (
+		'HMAC-MD5.SIG-ALG.REG.INT' => 157,		# numbers are from ISC BIND keygen
+		'HMAC-SHA1'		   => 161,		# and not blessed by IANA
+		'HMAC-SHA224'		   => 162,
+		'HMAC-SHA256'		   => 163,
+		'HMAC-SHA384'		   => 164,
+		'HMAC-SHA512'		   => 165,
+		);
+
+	my @algalias = (
+		'HMAC-MD5' => 157,
+		'HMAC-SHA' => 161,
+		);
+
+	my %algbyval = reverse @algbyname;
+
+	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname, @algalias;
+	foreach (@algrehash) { s/[\W_]//g; }			# strip non-alphanumerics
+	my %algbyname = @algrehash;				# work around broken cperl
+
+	sub _algbyname {
+		my $key = uc shift;				# synthetic key
+		$key =~ s/[\W_]//g;				# strip non-alphanumerics
+		return $algbyname{$key};
+	}
+
+	sub _algbyval {
+		my $value = shift;
+		return $algbyval{$value};
+	}
+}
+
 
 {
 	my %digest = (
@@ -547,6 +548,8 @@ sub _chain {
 	$self->{link} = undef;
 	return bless {%$self, link => $self}, ref($self);
 }
+
+########################################
 
 
 1;
@@ -795,7 +798,7 @@ Package template (c)2009,2012 O.M.Kolkman and R.W.Franks.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

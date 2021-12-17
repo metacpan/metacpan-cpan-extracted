@@ -1,3 +1,15 @@
+1.000093  2021-12-16 15:19:47-08:00 America/Los_Angeles
+
+    - Split out 'get_coverage_tests' logic for reuse
+
+1.000092  2021-12-16 10:39:37-08:00 America/Los_Angeles
+
+    - Add plugin hook for post-processing of coverage data.
+
+1.000091  2021-12-15 12:09:09-08:00 America/Los_Angeles
+
+    - Add more reload capabilities (non-perl reloading, callbacks)
+
 1.000090  2021-12-14 12:43:11-08:00 America/Los_Angeles
 
     - Fix bug in status command when only 1 run is present

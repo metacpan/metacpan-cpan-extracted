@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.58;
+package Object::Pad 0.59;
 
 use v5.14;
 use warnings;
@@ -430,9 +430,10 @@ Array and hash members are permitted and behave as expected; you do not need
 to store references to anonymous arrays or hashes.
 
 Member fields are private to a class or role. They are not visible to users of
-the class, nor to subclasses, nor to any class that a role is applied to. In
-order to provide access to them a class may wish to use L</method> to create
-an accessor, or use the attributes such as L</:reader> to get one generated.
+the class, nor inherited by subclasses nor any class that a role is applied
+to. In order to provide access to them a class may wish to use L</method> to
+create an accessor, or use the attributes such as L</:reader> to get one
+generated.
 
 A scalar slot may provide a expression that gives an initialisation value,
 which will be assigned into the slot of every instance during the constructor
@@ -650,6 +651,48 @@ I<Since version 0.29.>
 Marks that this method expects to override another of the same name from a
 superclass. It is an error at compiletime if the superclass does not provide
 such a method.
+
+=head2 method (lexical)
+
+   method $var { ... }
+
+   method $var :ATTRS... (SIGNATURE) { ... }
+
+I<Since version 0.59.>
+
+Declares a new lexical method. Lexical methods are not visible via the package
+namespace, but instead are stored directly in a lexical variable (with the
+same scoping rules as regular C<my> variables). These can be invoked by
+subsequent method code in the same block by using C<< $self->$var(...) >>
+method call syntax.
+
+   class WithPrivate {
+      has $var;
+
+      # Lexical methods can still see instance slots as normal
+      method $inc_var { $var++; say "Var was incremented"; }
+      method $dec_var { $var--; say "Var was decremented"; }
+
+      method bump {
+         $self->$inc_var;
+         say "In the middle";
+         $self->$dec_var;
+      }
+   }
+
+   my $obj = WithPrivate->new;
+
+   $obj->bump;
+
+   # Neither $inc_var nor $dec_var are visible here
+
+This effectively provides the ability to define B<private> methods, as they
+are inaccessible from outside the block that defines the class. In addition,
+there is no chance of a name collision because lexical variables in different
+scopes are independent, even if they share the same name. This is particularly
+useful in roles, to create internal helper methods without letting those
+methods be visible to callers, or risking their names colliding with other
+named methods defined on the consuming class.
 
 =head2 BUILD
 

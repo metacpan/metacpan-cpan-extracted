@@ -29,12 +29,12 @@ optional_features: {}
 provides:
   String::Copyright:
     file: lib/String/Copyright.pm
-    version: '0.003011'
+    version: '0.003012'
 recommends:
   re::engine::RE2: '0'
 requires:
   Exporter::Tiny: '0'
-  Number::Range: '0.04'
+  Set::IntSpan: '1.12'
   constant: '0'
   perl: '5.008001'
 resources:
@@ -43,7 +43,7 @@ resources:
   homepage: https://metacpan.org/pod/String::Copyright
   license: http://www.gnu.org/licenses/agpl-3.0.txt
   repository: https://anonscm.debian.org/cgit/build-common/string-copyright.git
-version: '0.003011'
+version: '0.003012'
 x_help_wanted:
   - tester
   - documenter

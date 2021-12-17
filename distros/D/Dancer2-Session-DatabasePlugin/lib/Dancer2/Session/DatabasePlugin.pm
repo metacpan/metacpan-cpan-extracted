@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Ref::Util qw(is_plain_hashref);
 use Storable qw(nfreeze thaw);
 with 'Dancer2::Core::Role::SessionFactory';
-our $VERSION="1.0013";
+our $VERSION="1.0014";
 
 our $HANDLE_SQL_STRING=\&stub_function;
 our $HANDLE_EXECUTE=\&handle_execute;
@@ -310,8 +310,7 @@ sub _retrieve {
   my ( $self, $id ) = @_;
   my $s=$self->find_session($id);
   
-  croak "Invalid session ID: $id"
-    if !defined $s;
+  return undef unless defined($s);
 
   return $THAW->($s);
 }

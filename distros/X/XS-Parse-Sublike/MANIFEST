@@ -38,7 +38,9 @@ t/40parts-name.t
 t/41parts-attrs.t
 t/42parts-signature.t
 t/50flags-no-body.t
+t/60actions.t
 t/99pod.t
+t/actions.xs
 t/any.xs
 t/flags.xs
 t/func.xs

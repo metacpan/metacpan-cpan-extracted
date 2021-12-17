@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1845 2021-07-14 15:30:16Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1857 2021-12-07 13:38:02Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -75,15 +75,18 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $priority = $self->{SvcPriority};
+	my $target   = $self->{TargetName}->string;
 	my $params   = $self->{SvcParams} || [];
-	return ( $priority, $self->{TargetName}->string ) unless scalar @$params;
+	return ( $priority, $target ) unless scalar @$params;
 
+	my $encode = $self->{TargetName}->encode();
+	my $length = 2 + length $encode;
+	my @target = split /(\S{32})/, unpack 'H*', $encode;
 	my @rdata  = unpack 'H4', pack 'n', $priority;
-	my $target = $self->{TargetName}->encode();
-	my $length = 2 + length $target;
-	my @target = split /(\S{32})/, unpack 'H*', $target;
-	push @rdata, $length > 18 ? "\t; $priority\n" : (), @target;
-	push @rdata, join '', "\t; ", $self->{TargetName}->string, "\n" if $length > 3;
+	push @rdata, "\t; priority: $priority\n";
+	push @rdata, shift @target;
+	push @rdata, join '', "\t\t; target: ", substr( $target, 0, 50 ), "\n";
+	push @rdata, @target;
 
 	my @params = @$params;
 	while (@params) {
@@ -113,11 +116,10 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 				push @value, length($1) ? $1 : shift;
 			} elsif (/=(.*)$/) {
 				local $_ = length($1) ? $1 : shift;
-				s/^(["'])(.*)\1$/$2/;		# strip paired quotes
-				s/\\,/\\044/g;			# disguise escaped comma
+				s/^"(.*)"$/$1/;			# strip enclosing quotes
 				push @value, split /,/;
 			} else {
-				push @value, '' unless $keybyname{lc $_};    # empty keyNNN
+				push @value, '' unless $keybyname{lc $_};    # empty | Boolean
 			}
 
 			s/[-]/_/g;				# extract identifier
@@ -132,19 +134,20 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 sub _post_parse {			## parser post processing
 	my $self = shift;
 
-	my $params = $self->{SvcParams} || return;
-	my %params = @$params;
+	my $paramref = $self->{SvcParams} || [];
+	my %svcparam = scalar(@$paramref) ? @$paramref : return;
+
 	$self->key0(undef);					# ruse to force sorting of SvcParams
-	if ( defined $params{0} ) {
+	if ( defined $svcparam{0} ) {
 		my %unique;
-		foreach ( grep { !$unique{$_}++ } unpack 'n*', $params{0} ) {
+		foreach ( grep { !$unique{$_}++ } unpack 'n*', $svcparam{0} ) {
 			croak( $self->type . qq[: unexpected "key0" in mandatory list] ) if $unique{0};
 			croak( $self->type . qq[: duplicate "key$_" in mandatory list] ) if --$unique{$_};
-			croak( $self->type . qq[: mandatory "key$_" not present] ) unless defined $params{$_};
+			croak( $self->type . qq[: mandatory "key$_" not present] ) unless defined $svcparam{$_};
 		}
 		$self->mandatory( keys %unique );		# restore mandatory key list
 	}
-	croak( $self->type . qq[: expected alpn="..." not present] ) if defined( $params{2} ) and !$params{1};
+	croak( $self->type . qq[: expected alpn="..." not present] ) if defined( $svcparam{2} ) and !$svcparam{1};
 	return;
 }
 
@@ -176,37 +179,6 @@ sub targetname {
 }
 
 
-########################################
-
-
-sub _presentation {			## render octet string(s) in presentation format
-	return () unless scalar @_;
-	my $raw = join '', @_;
-	my $txt = Net::DNS::Text->decode( \$raw, 0, length($raw) );
-	return map { s/ /\\032/g; s/,/\\044/g; $_ } $txt->string;
-}
-
-sub _base64 {
-	return _presentation( map { MIME::Base64::decode($_) } @_ );
-}
-
-sub _integer16 {
-	return _presentation( map { pack( 'n', $_ ) } @_ );
-}
-
-sub _ipv4 {
-	return _presentation( map { Net::DNS::RR::A::address( {}, $_ ) } @_ );
-}
-
-sub _ipv6 {
-	return _presentation( map { Net::DNS::RR::AAAA::address( {}, $_ ) } @_ );
-}
-
-sub _string {
-	return _presentation( map { Net::DNS::Text->new($_)->encode() } @_ );
-}
-
-
 sub mandatory {				## mandatory=key1,port,...
 	my $self = shift;
 	my @list = map { $keybyname{lc $_} || $_ } map { split /,/ } @_;
@@ -216,10 +188,7 @@ sub mandatory {				## mandatory=key1,port,...
 
 sub alpn {				## alpn=h3,h2,...
 	my $self = shift;
-
-	###	tolerate unnecessary double-escape nonsense in draft-ietf-dnsop-svcb-https	###
-	my @sanitized = map { s/\\092,/\\044/g; s/\\092\\092/\\092/g; split /,/ } join ',', @_;
-	return $self->key1( scalar(@_) ? _string(@sanitized) : () );
+	return $self->key1( _string(@_) );
 }
 
 sub no_default_alpn {			## no-default-alpn
@@ -248,6 +217,41 @@ sub ipv6hint {				## ipv6hint=2001:DB8::1,...
 }
 
 
+########################################
+
+
+sub _presentation {			## render octet string(s) in presentation format
+	return () unless scalar @_;
+	my $raw = join '', @_;
+	return Net::DNS::Text->decode( \$raw, 0, length($raw) )->string;
+}
+
+sub _base64 {
+	return _presentation( map { MIME::Base64::decode($_) } @_ );
+}
+
+sub _integer16 {
+	return _presentation( map { pack( 'n', $_ ) } @_ );
+}
+
+sub _ipv4 {
+	return _presentation( map { Net::DNS::RR::A::address( {}, $_ ) } @_ );
+}
+
+sub _ipv6 {
+	return _presentation( map { Net::DNS::RR::AAAA::address( {}, $_ ) } @_ );
+}
+
+sub _string {
+	local $_ = join ',', '', @_;				# reassemble argument string
+	s/\\092,/\\044/g;		### tolerate unnecessary double-escape nonsense in
+	s/\\092\\092/\\092/g;		### draft-ietf-dnsop-svcb-https that contradicts RFC1035
+	s/\\,/\\044/g;						# disguise (RFC1035) escaped comma
+	my ( undef, @reparsed ) = split /,/;			# multi-valued argument
+	return _presentation( map { Net::DNS::Text->new($_)->encode() } @reparsed );
+}
+
+
 our $AUTOLOAD;
 
 sub AUTOLOAD {				## Dynamic constructor/accessor methods
@@ -255,27 +259,29 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 
 	my ($method) = reverse split /::/, $AUTOLOAD;
 
-	my $default = join '::', 'SUPER', $method;
-	return $self->$default(@_) unless $method =~ /^key[0]*(\d+)$/i;
+	my $super = "SUPER::$method";
+	return $self->$super(@_) unless $method =~ /^key[0]*(\d+)$/i;
 	my $key = $1;
 
-	my $params = $self->{SvcParams} || [];
-	my %params = @$params;
+	my $paramsref = $self->{SvcParams} || [];
+	my %svcparams = @$paramsref;
 
 	if ( scalar @_ ) {
 		my $arg = shift;				# keyNN($value);
-		delete $params{$key} unless defined $arg;
-		croak( $self->type . qq[: duplicate SvcParam "key$key"] ) if defined $params{$key};
-		$params{$key} = Net::DNS::Text->new("$arg")->raw if defined $arg;
-		$self->{SvcParams} = [map { ( $_, $params{$_} ) } sort { $a <=> $b } keys %params];
+		delete $svcparams{$key} unless defined $arg;
+		croak( $self->type . qq[: duplicate SvcParam "key$key"] ) if defined $svcparams{$key};
+		$svcparams{$key}   = Net::DNS::Text->new("$arg")->raw if defined $arg;
+		$self->{SvcParams} = [map { ( $_, $svcparams{$_} ) } sort { $a <=> $b } keys %svcparams];
 		croak( $self->type . qq[: unexpected number of values for "key$key"] ) if scalar @_;
 	} else {
 		croak( $self->type . qq[: no value specified for "key$key"] ) unless defined wantarray;
 	}
 
-	my $value = $params{$key};
+	my $value = $svcparams{$key};
 	return defined($value) ? _presentation($value) : $value;
 }
+
+########################################
 
 
 1;
@@ -285,7 +291,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = Net::DNS::RR->new('name HTTPS SvcPriority TargetName alpn=h3,...');
+    $rr = Net::DNS::RR->new('name HTTPS SvcPriority TargetName SvcParams');
 
 =head1 DESCRIPTION
 
@@ -329,7 +335,7 @@ owner name of this record must be used as the effective TargetName.
 
 =head2 mandatory, alpn, no-default-alpn, port, ipv4hint, ech, ipv6hint
 
-    $rr = Net::DNS::RR->new( 'svc.example. SVCB 1 svc.example. port=1234' );
+    $rr = Net::DNS::RR->new( 'svcb.example. SVCB 1 svcb.example. port=1234' );
 
     $rr->port(1234);
     $string = $rr->port();	# \004\210
@@ -347,7 +353,7 @@ The behaviour with undefined arguments is not specified.
     $rr->keyNN( undef );
 
 Generic constructor and accessor methods for SvcParams.
-The key index NN is a decimal integer in the range 0 .. 65534.
+The key index NN is a decimal integer in the range 0 .. 65535.
 The method argument and returned value are both presentation format strings.
 The method returns the undefined value if the key is not present.
 The specified key will be deleted if the value is undefined.
@@ -366,7 +372,7 @@ Package template (c)2009,2012 O.M.Kolkman and R.W.Franks.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

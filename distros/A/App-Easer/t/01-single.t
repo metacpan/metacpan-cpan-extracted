@@ -21,6 +21,9 @@ sub execute ($main, $conf, $args) {
 } ## end sub execute
 
 my $app = {
+   configuration => {
+      'auto-leaves' => 0,
+   },
    commands => {
       MAIN => {
          help        => 'example command',

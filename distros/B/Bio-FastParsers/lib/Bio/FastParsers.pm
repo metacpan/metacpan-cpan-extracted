@@ -2,7 +2,8 @@ package Bio::FastParsers;
 # ABSTRACT: Classes for parsing bioinformatic programs output
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::VERSION = '0.201110';
+# CONTRIBUTOR: Aymeric NAOME <aymeric.naome@gmail.com>
+$Bio::FastParsers::VERSION = '0.213510';
 use strict;
 use warnings;
 
@@ -23,7 +24,7 @@ Bio::FastParsers - Classes for parsing bioinformatic programs output
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 DESCRIPTION
 
@@ -50,7 +51,7 @@ Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Amandine BERTRAND Arnaud DI FRANCO
+=for stopwords Amandine BERTRAND Arnaud DI FRANCO Aymeric NAOME
 
 =over 4
 
@@ -61,6 +62,10 @@ Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 =item *
 
 Arnaud DI FRANCO <arnaud.difranco@gmail.com>
+
+=item *
+
+Aymeric NAOME <aymeric.naome@gmail.com>
 
 =back
 

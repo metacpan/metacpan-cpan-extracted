@@ -12,7 +12,7 @@
 
 #########################################################################
 
-use v5.12.1;
+use v5.14.0;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -63,7 +63,7 @@ stdout_like
     $main = UI::Various::Main->new(width => 20, height => 5);
     $tty_configuration  and  system('stty ' . $tty_configuration);
 }
-    qr/^\e\[\?\d+.*$/s,
+    qr/^.*\e\[(\?\d{3,4}h|1;24r).*$/s,
     'UI::Various::Main initialises STDOUT with some escape sequence';
 is(ref($main), 'UI::Various::Curses::Main',
    '$main is UI::Various::Curses::Main');
@@ -140,13 +140,13 @@ $w1 = $main->window({title => 'hi', width => 10}, $text1, $button1);
 # test as stand-alone (correct sequence) and within the test harness of
 # "./Build test" (wrong sequence).  So we don't care about the sequence as
 # long as both strings appear:
-my $re_o1 = '.*(hi\b.*HI!|HI!.*hi\b).*Bye\b';
-my $re_o2 = '.*(bye\b.*Bye!|Bye!.*bye\b).*Quit\b';
+my $re_o1 = '.*(?:hi\b.*HI!|HI!.*hi\b).*Bye\b';
+my $re_o2 = '.*(?:bye\b.*Bye!|Bye!.*bye\b).*Quit\b';
 
 @chars_to_read = (' ', "\cN", "\cN", "\cP", "\cP", ' ');
 combined_like
 {   $main->mainloop;   }
-    qr/^$re_o1$re_o2$re_o1$re_o2$re_o1$re_o2.*$/sn,
+    qr/^$re_o1$re_o2$re_o1$re_o2$re_o1$re_o2.*$/s,
     'mainloop 2 produces correct output';
 is(@{$main->{children}}, 0, 'main no longer has children');
 

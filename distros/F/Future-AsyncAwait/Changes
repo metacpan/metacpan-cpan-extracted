@@ -1,5 +1,14 @@
 Revision history for Future-AsyncAwait
 
+0.55    2021-12-16
+        [CHANGES]
+         * Updated for XS::Parse::Keyword 0.15
+         * Hoist an OP_ARGCHECK to outside the ENTERTRY block if present, so
+           that signature validation happens synchronously
+         * Support and unit-test Syntax::Keyword::MultiSub
+         * No longer set `-std=c89` compile flag now that core perl requires
+           C99 anyway
+
 0.54    2021-10-26
         [CHANGES]
          * Add unit-test for await from within perl 5.35.5's multi-variable

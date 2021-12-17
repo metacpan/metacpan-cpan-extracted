@@ -8,8 +8,8 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,7 +27,7 @@ no_index:
 provides:
   RxPerl::IOAsync:
     file: lib/RxPerl/IOAsync.pm
-    version: v6.7.0
+    version: v6.8.0
 requires:
   IO::Async: '0'
   RxPerl: v6.7.0
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://gitlab.com/karjala/rxperl-ioasync-for-perl/issues
   homepage: https://gitlab.com/karjala/rxperl-ioasync-for-perl
   repository: git://gitlab.com/karjala/rxperl-ioasync-for-perl.git
-version: v6.7.0
+version: v6.8.0
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

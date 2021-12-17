@@ -304,6 +304,10 @@ SUPPORTED USES
           ...
        }
 
+    Since version 0.55 any exceptions thrown by signature validation
+    (because of too few or too many arguments being passed) are thrown
+    synchronously, and do not result in a failed Future instance.
+
  Cancellation
 
     Cancelled futures cause a suspended async sub to simply stop running.

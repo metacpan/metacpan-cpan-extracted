@@ -1,13 +1,20 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1843 2021-07-09 09:10:08Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 1847 2021-08-11 10:02:44Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 49;
-
 use Net::DNS;
 use Net::DNS::ZoneFile;
+
+use Test::More;
+
+exit( plan skip_all => 'unresolved AUTOLOAD regression	[perl #120694]' )
+		if ( $] == 5.018000 )
+		or ( $] == 5.018001 );
+
+plan tests => 49;
+
 
 my $name = 'alias.example';
 my $type = 'SVCB';

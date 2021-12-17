@@ -1,5 +1,5 @@
 name = "App-Greple-msdoc"
-# badges = ["travis"]
+badges = ['github-actions/test', 'metacpan']
 authority="cpan:UTASHIRO"
 
 module_maker="ModuleBuildTiny"

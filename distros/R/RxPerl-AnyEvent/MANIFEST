@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/RxPerl/AnyEvent.pm
+lib/RxPerl/AnyEvent/CodeOfConduct.pod
 minil.toml
 t/00_compile.t
 META.yml

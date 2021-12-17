@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.009-9-g8bdbc93
+package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.011-5-g914500a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -212,7 +212,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -288,8 +288,8 @@ Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Mo
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
-You can also find me on the L<JSON Schema Slack server|json-schema.slack.com> and L<OpenAPI Slack
-server|open-api.slack.com>, which are also great resources for finding help.
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

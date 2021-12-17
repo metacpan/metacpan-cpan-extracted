@@ -34,6 +34,10 @@
 #  define HAVE_FUTURE_CHAIN_CANCEL
 #endif
 
+#if HAVE_PERL_VERSION(5, 26, 0)
+#  define HAVE_OP_ARGCHECK
+#endif
+
 #if HAVE_PERL_VERSION(5, 33, 7)
 /* perl 5.33.7 added CXp_TRY and the CxTRY macro for true try/catch semantics */
 #  define HAVE_CX_TRY
@@ -2169,29 +2173,75 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
     check_optree(aTHX_ ctx->body, NO_FORBID, &last_cop);
   }
 
+#ifdef HAVE_OP_ARGCHECK
+  /* If the sub body is using signatures, we want to pull the OP_ARGCHECK
+   * outside the try block. This has two advantages:
+   *   1. arity checks appear synchronous from the perspective of the caller;
+   *      immediate exceptions rather than failed Futures
+   *   2. it makes Syntax::Keyword::MultiSub able to handle `async multi sub`
+   */
+  OP *argcheckop = NULL;
+  if(ctx->body->op_type == OP_LINESEQ) {
+    OP *lineseq = ctx->body;
+    OP *o = cLISTOPx(lineseq)->op_first;
+    /* OP_ARGCHECK is often found inside a second inner nested OP_LINESEQ that
+     * was op_null'ed out
+     */
+    if(o->op_type == OP_NULL && o->op_flags & OPf_KIDS &&
+        cUNOPo->op_first->op_type == OP_LINESEQ) {
+      lineseq = cUNOPo->op_first;
+      o = cLISTOPx(lineseq)->op_first;
+    }
+    if(o->op_type == OP_NEXTSTATE &&
+        OpSIBLING(o)->op_type == OP_ARGCHECK) {
+      /* Splice out the NEXTSTATE+ARGCHECK ops */
+      argcheckop = o; /* technically actually the NEXTSTATE before it */
+
+      o = OpSIBLING(OpSIBLING(o));
+      OpMORESIB_set(OpSIBLING(argcheckop), NULL);
+
+      cLISTOPx(lineseq)->op_first = o;
+    }
+  }
+#endif
+
   /* turn block into
    *    NEXTSTATE; PUSHMARK; eval { BLOCK }; LEAVEASYNC
    */
 
-  OP *op = newSTATEOP(0, NULL, NULL);
+  OP *body = newSTATEOP(0, NULL, NULL);
 
   PADOFFSET precancel_padix = SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
   if(precancel_padix) {
     OP *enterasync;
-    op = op_append_elem(OP_LINESEQ, op,
+    body = op_append_elem(OP_LINESEQ, body,
       enterasync = newOP_CUSTOM(&pp_enterasync, 0));
 
     enterasync->op_targ = precancel_padix;
   }
 
-  op = op_append_elem(OP_LINESEQ, op, newOP(OP_PUSHMARK, 0));
+  body = op_append_elem(OP_LINESEQ, body, newOP(OP_PUSHMARK, 0));
 
   OP *try;
-  op = op_append_elem(OP_LINESEQ, op, try = newUNOP(OP_ENTERTRY, 0, ctx->body));
+  body = op_append_elem(OP_LINESEQ, body, try = newUNOP(OP_ENTERTRY, 0, ctx->body));
   op_contextualize(try, G_ARRAY);
 
-  op = op_append_elem(OP_LINESEQ, op, newOP_CUSTOM(&pp_leaveasync, OPf_WANT_SCALAR));
-  ctx->body = op;
+  body = op_append_elem(OP_LINESEQ, body, newOP_CUSTOM(&pp_leaveasync, OPf_WANT_SCALAR));
+
+#ifdef HAVE_OP_ARGCHECK
+  if(argcheckop) {
+    assert(body->op_type == OP_LINESEQ);
+    /* Splice the argcheckop back into the start of the lineseq */
+    OP *o = argcheckop;
+    while(OpSIBLING(o))
+      o = OpSIBLING(o);
+
+    OpMORESIB_set(o, cLISTOPx(body)->op_first);
+    cLISTOPx(body)->op_first = argcheckop;
+  }
+#endif
+
+  ctx->body = body;
 }
 
 static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
@@ -2200,20 +2250,12 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
     warn("Pointless use of :lvalue on async sub");
 }
 
-static struct XSParseSublikeHooks parse_asyncsub_hooks = {
+static struct XSParseSublikeHooks hooks_async = {
+  .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX,
+
   .post_blockstart = parse_post_blockstart,
   .pre_blockend    = parse_pre_blockend,
   .post_newcv      = parse_post_newcv,
-};
-
-static int parse_async(pTHX_ OP **op_ptr, void *hookdata)
-{
-  return xs_parse_sublike_any(&parse_asyncsub_hooks, NULL, op_ptr);
-}
-
-static struct XSParseKeywordHooks hooks_async = {
-  .permit_hintkey = "Future::AsyncAwait/async",
-  .parse = &parse_async,
 };
 
 static void check_await(pTHX_ void *hookdata)
@@ -2327,15 +2369,15 @@ BOOT:
   Perl_custom_op_register(aTHX_ &pp_pushcancel, &xop_pushcancel);
 
   boot_xs_parse_keyword(0.13);
+  boot_xs_parse_sublike(0.14);
 
-  register_xs_parse_keyword("async", &hooks_async, NULL);
+  register_xs_parse_sublike("async", &hooks_async, NULL);
+
   register_xs_parse_keyword("await", &hooks_await, NULL);
   register_xs_parse_keyword("CANCEL", &hooks_cancel, NULL);
 #ifdef HAVE_DMD_HELPER
   DMD_SET_MAGIC_HELPER(&vtbl_suspendedstate, dumpmagic_suspendedstate);
 #endif
-
-  boot_xs_parse_sublike(0.10);
 
   {
     AV *run_on_loaded = NULL;

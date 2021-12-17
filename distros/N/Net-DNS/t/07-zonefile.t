@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-# $Id: 07-zonefile.t 1841 2021-06-23 20:34:28Z willem $	-*-perl-*-
+# $Id: 07-zonefile.t 1855 2021-11-26 11:33:48Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use IO::File;
 
-use Test::More tests => 94;
+use Test::More tests => 91;
 
 ## vvv	verbatim from Domain.pm
 use constant ASCII => ref eval {
@@ -181,16 +181,6 @@ EOF
 }
 
 
-{					## no $TTL directive, default implicit
-	my $zonefile = source <<'EOF';
-rr0		SOA	mname rname 99 6h 1h 1w 0
-rr1		NULL
-EOF
-	is( $zonefile->read->ttl, 0, 'SOA TTL set from zero SOA minimum field' );
-	is( $zonefile->read->ttl, 0, 'implicit zero default from SOA record' );
-}
-
-
 {					## $TTL directive following implicit default
 	my $zonefile = source <<'EOF';
 rr0		SOA	mname rname 99 6h 1h 1w 12345
@@ -302,9 +292,8 @@ EOF
 
 {					## $GENERATE directive
 	my $zonefile = source <<'EOF';
-$GENERATE 0-0		@	TXT	$
-$GENERATE 10-30/10	@	TXT	$
-$GENERATE 30-10/-10	@	TXT	$
+$GENERATE 10-30/10	"@	TXT	$"	; BIND expects template to be quoted
+$GENERATE 30-10/10	@	TXT	$
 $GENERATE 123-123	@	TXT	${,,}
 $GENERATE 123-123	@	TXT	${0,0,d}
 $GENERATE 123-123	@	TXT	${0,0,o}
@@ -316,7 +305,6 @@ $GENERATE 11259375	@	TXT	${0,6,n}
 $GENERATE 11259375	@	TXT	${0,16,N}
 $GENERATE 0-0		@	TXT	${0,0,Z}
 EOF
-	is( $zonefile->read->rdstring, '0',		   'generate TXT $' );
 	is( $zonefile->read->rdstring, '10',		   'generate TXT $ with step 10' );
 	is( $zonefile->read->rdstring, '20',		   'generate TXT $ with step 10' );
 	is( $zonefile->read->rdstring, '30',		   'generate TXT $ with step 10' );

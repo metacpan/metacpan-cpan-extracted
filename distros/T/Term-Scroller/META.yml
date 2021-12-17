@@ -16,7 +16,7 @@ name: Term-Scroller
 provides:
   Term::Scroller:
     file: lib/Term/Scroller.pm
-    version: '1.2'
+    version: '1.3'
   Term::Scroller::Linefeed:
     file: lib/Term/Scroller/Linefeed.pm
 requires:
@@ -26,5 +26,5 @@ requires:
   perl: '5.020'
 resources:
   repository: https://github.com/camtauxe/term-scroller.git
-version: '1.2'
+version: '1.3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

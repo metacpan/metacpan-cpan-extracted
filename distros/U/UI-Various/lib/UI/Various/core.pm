@@ -28,7 +28,7 @@ by the other modules of L<UI::Various>.
 
 #########################################################################
 
-use v5.12.1;
+use v5.14.0;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use UI::Various::language::en;
 
@@ -720,7 +720,7 @@ sub construct($$@)		# not $$$@, that may put $self in wrong context!
     }
     foreach my $key (keys %$parameters)
     {
-	$key =~ m/$re_allowed_parameters/n
+	$key =~ m/$re_allowed_parameters/
 	    or  fatal('invalid_parameter__1_in_call_to__2',
 		      $key, (caller(1))[3]);
 	if ($self->can("_$key"))

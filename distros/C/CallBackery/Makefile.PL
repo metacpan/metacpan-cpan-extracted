@@ -17,7 +17,7 @@ WriteMakefile(
     'Config::Grammar' => '1.13',
     'XS::Parse::Keyword' => '0.21',
     'Future::AsyncAwait' => '0.54',
-    'Syntax::Keyword::Try' => 0.26,
+    'Syntax::Keyword::Try' => '0.25',
     'Locale::PO' => '0.27',
     'JSON::Validator' => 5.03,
     'YAML::XS' => 0.83,

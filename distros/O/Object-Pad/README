@@ -413,10 +413,10 @@ KEYWORDS
     need to store references to anonymous arrays or hashes.
 
     Member fields are private to a class or role. They are not visible to
-    users of the class, nor to subclasses, nor to any class that a role is
-    applied to. In order to provide access to them a class may wish to use
-    "method" to create an accessor, or use the attributes such as ":reader"
-    to get one generated.
+    users of the class, nor inherited by subclasses nor any class that a
+    role is applied to. In order to provide access to them a class may wish
+    to use "method" to create an accessor, or use the attributes such as
+    ":reader" to get one generated.
 
     A scalar slot may provide a expression that gives an initialisation
     value, which will be assigned into the slot of every instance during
@@ -641,6 +641,49 @@ KEYWORDS
     Marks that this method expects to override another of the same name
     from a superclass. It is an error at compiletime if the superclass does
     not provide such a method.
+
+ method (lexical)
+
+       method $var { ... }
+    
+       method $var :ATTRS... (SIGNATURE) { ... }
+
+    Since version 0.59.
+
+    Declares a new lexical method. Lexical methods are not visible via the
+    package namespace, but instead are stored directly in a lexical
+    variable (with the same scoping rules as regular my variables). These
+    can be invoked by subsequent method code in the same block by using
+    $self->$var(...) method call syntax.
+
+       class WithPrivate {
+          has $var;
+    
+          # Lexical methods can still see instance slots as normal
+          method $inc_var { $var++; say "Var was incremented"; }
+          method $dec_var { $var--; say "Var was decremented"; }
+    
+          method bump {
+             $self->$inc_var;
+             say "In the middle";
+             $self->$dec_var;
+          }
+       }
+    
+       my $obj = WithPrivate->new;
+    
+       $obj->bump;
+    
+       # Neither $inc_var nor $dec_var are visible here
+
+    This effectively provides the ability to define private methods, as
+    they are inaccessible from outside the block that defines the class. In
+    addition, there is no chance of a name collision because lexical
+    variables in different scopes are independent, even if they share the
+    same name. This is particularly useful in roles, to create internal
+    helper methods without letting those methods be visible to callers, or
+    risking their names colliding with other named methods defined on the
+    consuming class.
 
  BUILD
 

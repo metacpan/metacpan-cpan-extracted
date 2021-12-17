@@ -1,6 +1,17 @@
 Revision history for Perl extension UI-Various
 
-0.01 2021-12-15T12:58:32Z
+0.03 2021-12-17T10:21:41Z
+
+0.03 2021-12-17T10:20:33Z
+
+    - increased needed Perl version to 5.14 due to required package block syntax in tests
+    - added additional output to some more test failing on some platforms
+
+0.02 2021-12-16T10:04:39Z
+
+    - fixed 1st problems of older Perl versions
+    - added additional output to ReadLine test failing on some platforms
+    - added generated README.md and some missing dependencies
 
 0.01 2021-12-15T12:28:42Z
 

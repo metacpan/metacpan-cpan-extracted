@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Encode::Simple qw(decode decode_lax decode_utf8 decode_utf8_lax);
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 sub import {
   my ($class, $mode, $encoding) = @_;

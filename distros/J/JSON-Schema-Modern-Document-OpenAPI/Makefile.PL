@@ -84,6 +84,7 @@ my %WriteMakefileArgs = (
   "PL_FILES" => {},
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Encode" => "2.89",
     "Feature::Compat::Try" => 0,
     "File::ShareDir" => 0,
     "JSON::Schema::Modern" => "0.531",
@@ -109,7 +110,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "HTTP::Request" => 0,
+    "HTTP::Request::Common" => 0,
     "HTTP::Response" => 0,
     "Module::Metadata" => 0,
     "Test::Deep" => 0,
@@ -123,7 +124,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -131,10 +132,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Encode" => "2.89",
   "Feature::Compat::Try" => 0,
   "File::ShareDir" => 0,
   "File::Spec" => 0,
-  "HTTP::Request" => 0,
+  "HTTP::Request::Common" => 0,
   "HTTP::Response" => 0,
   "JSON::Schema::Modern" => "0.531",
   "JSON::Schema::Modern::Document" => 0,

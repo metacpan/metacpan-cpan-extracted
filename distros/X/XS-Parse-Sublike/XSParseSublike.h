@@ -12,12 +12,21 @@ struct XSParseSublikeContext {
   /* STAGE pre_blockend */
   CV *cv;
   /* STAGE post_newcv */
+
+  U32 actions;
+
+  /* Unused by XS::Parse::Sublike itself but can be handy for modules to store
+   * data in between stages */
+  HV *moddata;
 };
 
 enum {
   XS_PARSE_SUBLIKE_FLAG_FILTERATTRS   = 1<<0,
   XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL = 1<<1,
   XS_PARSE_SUBLIKE_FLAG_PREFIX        = 1<<2,
+
+  /* Back-compat flags we hope to remove in the next ABI version */
+  XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS = 1<<15,
 };
 
 enum {
@@ -25,6 +34,14 @@ enum {
   XS_PARSE_SUBLIKE_PART_ATTRS     = 1<<1,
   XS_PARSE_SUBLIKE_PART_SIGNATURE = 1<<2,
   XS_PARSE_SUBLIKE_PART_BODY      = 1<<3,
+};
+
+enum {
+  XS_PARSE_SUBLIKE_ACTION_CVf_ANON        = (1<<0),  /* should start_subparse() take CVf_ANON ? */
+  XS_PARSE_SUBLIKE_ACTION_SET_CVNAME      = (1<<1),  /* do we set a CvNAME? */
+  XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL  = (1<<2),  /* do we install the new CV into the symbol table? */
+  XS_PARSE_SUBLIKE_ACTION_REFGEN_ANONCODE = (1<<3),  /* do we emit OP_REFGEN of OP_ANONCODE, or simply OP_NULL ? */
+  XS_PARSE_SUBLIKE_ACTION_RET_EXPR        = (1<<4),  /* do we return KEYWORD_PLUGIN_EXPR, or KEYWORD_PLUGIN_STMT ? */
 };
 
 struct XSParseSublikeHooks {

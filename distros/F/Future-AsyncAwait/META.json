@@ -23,19 +23,20 @@
          "requires" : {
             "Module::Build" : "0.4004",
             "XS::Parse::Keyword::Builder" : "0.13",
-            "XS::Parse::Sublike::Builder" : "0.10"
+            "XS::Parse::Sublike::Builder" : "0.14"
          }
       },
       "runtime" : {
          "requires" : {
             "Future" : "0.43",
             "XS::Parse::Keyword" : "0.13",
-            "XS::Parse::Sublike" : "0.10",
+            "XS::Parse::Sublike" : "0.14",
             "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Fatal" : "0",
             "Test::Future::Deferred" : "0",
             "Test::More" : "0.88",
             "Test::Refcount" : "0.09"
@@ -45,15 +46,15 @@
    "provides" : {
       "Future::AsyncAwait" : {
          "file" : "lib/Future/AsyncAwait.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       },
       "Future::AsyncAwait::Awaitable" : {
          "file" : "lib/Future/AsyncAwait/Awaitable.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       },
       "Test::Future::AsyncAwait::Awaitable" : {
          "file" : "lib/Test/Future/AsyncAwait/Awaitable.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       }
    },
    "release_status" : "stable",
@@ -63,6 +64,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.54",
+   "version" : "0.55",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

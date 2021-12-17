@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.54;
+package Future::AsyncAwait 0.55;
 
 use v5.14;
 use warnings;
@@ -318,6 +318,10 @@ feature if it is enabled:
    {
       ...
    }
+
+I<Since version 0.55> any exceptions thrown by signature validation (because
+of too few or too many arguments being passed) are thrown synchronously, and
+do not result in a failed Future instance.
 
 =head2 Cancellation
 

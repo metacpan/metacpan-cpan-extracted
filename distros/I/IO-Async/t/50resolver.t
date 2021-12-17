@@ -308,8 +308,6 @@ my @expect_passive_3000 = (
 
    my @got = @{$result}[1..$#$result];
 
-   use Data::Dump 'pp';
-
    is_deeply( \@got, \@expect_lo_80, '$resolver->getaddrinfo resolved addresses synchronously' );
 
    undef $result;
@@ -344,8 +342,7 @@ my @expect_passive_3000 = (
 
    my @got = @{$result}[1..$#$result];
 
-   is_deeply( \@got, \@expect_passive_3000, '$resolver->getaddrinfo passive - resolved addresses' ) or
-      diag( "Got=", pp(\@got), "; expected=", pp(\@expect_passive_3000) );
+   is_deeply( \@got, \@expect_passive_3000, '$resolver->getaddrinfo passive - resolved addresses' );
 }
 
 {

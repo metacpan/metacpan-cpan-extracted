@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::AutoRoutePm;
-$Mojolicious::Plugin::AutoRoutePm::VERSION = '0.22';
+$Mojolicious::Plugin::AutoRoutePm::VERSION = '0.23';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use File::Find::Rule;
@@ -59,9 +59,12 @@ sub register {
         }
     }
 
-    # sort routes so, first existing .pm module which aren't DocumentRoot
-    my @template_index  = grep /$dindex$/,  @templates;
-    my @template_nindex = grep !/$dindex$/, @templates;
+    # arrange templates so first existing .pm module which aren't DocumentRoot
+    # sort so longer path come first so existing subfolder have major priority
+    my @template_index = sort { length($b) cmp length($a) } grep /$dindex$/,
+      @templates;
+    my @template_nindex = sort { length($b) cmp length($a) } grep !/$dindex$/,
+      @templates;
     @templates = ( @template_nindex, @template_index );
 
     # Register routes
@@ -149,7 +152,7 @@ Mojolicious::Plugin::AutoRoutePm - Mojolicious plugin to create routes by *.pm m
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

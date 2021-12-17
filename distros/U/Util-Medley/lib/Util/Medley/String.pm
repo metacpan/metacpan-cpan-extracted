@@ -1,5 +1,5 @@
 package Util::Medley::String;
-$Util::Medley::String::VERSION = '0.060';
+$Util::Medley::String::VERSION = '0.061';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -14,7 +14,7 @@ Util::Medley::String - utility methods for working with strings
 
 =head1 VERSION
 
-version 0.060
+version 0.061
 
 =head1 SYNOPSIS
 
@@ -58,11 +58,10 @@ The string you wish to camelize.
 
 multi method camelize (Str $str) {
 
-	my @a = split( /[:_-]+/, $str );
-	my @b = lc shift @a;
-	push @b, map { ucfirst lc $_ } @a;
+    $str =~ s/(^|_)./uc($&)/ge;
+    $str =~ s/_//g;
 
-	return join '', @b;
+    return lcfirst $str;
 }
 
 multi method camelize (Str :$str!) {
@@ -259,11 +258,10 @@ The string you wish to camelize.
 
 multi method pascalize (Str $str) {
 
-	my @a = split( /[:_-]+/, $str );
-	my @b;
-	push @b, map { ucfirst lc $_ } @a;
+    $str =~ s/(^|_)./uc($&)/ge;
+    $str =~ s/_//g;
 
-	return join '', @b;
+    return ucfirst $str;
 }
 
 multi method pascalize (Str :$str!) {

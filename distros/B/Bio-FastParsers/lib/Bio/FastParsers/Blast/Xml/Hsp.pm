@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Xml::Hsp;
 # ABSTRACT: NCBI BLAST DTD-derived internal class
-$Bio::FastParsers::Blast::Xml::Hsp::VERSION = '0.201110';
+$Bio::FastParsers::Blast::Xml::Hsp::VERSION = '0.213510';
 use Moose;
 use namespace::autoclean;
 
@@ -15,6 +15,12 @@ use XML::Bare qw(forcearray);
 has '_root' => (
     is       => 'ro',
     isa      => 'HashRef',
+    required => 1,
+);
+
+has '_parent' => (
+    is       => 'ro',
+    isa      => 'Maybe[Object]',
     required => 1,
 );
 
@@ -135,6 +141,39 @@ sub expect {
     return shift->evalue
 }
 
+
+sub qcov {
+    return shift->query_coverage
+}
+
+
+sub scov {
+    return shift->subject_coverage
+}
+
+
+sub pident {
+    return shift->percentage_identity
+}
+
+
+sub ppos {
+    return shift->percentage_positive
+}
+
+
+
+sub query_len {
+    return shift->_parent->query_len
+}
+
+
+
+sub hit_len {
+    return shift->_parent->len
+}
+
+
 # pseudo-aliases
 
 use Const::Fast;
@@ -174,10 +213,38 @@ sub query_start {
 }
 
 
-sub query_end {  
+sub query_end {
     my $self = shift;
     return $self->query_to > $self->query_from ? $self->query_to
                                                : $self->query_from;
+}
+
+
+sub query_coverage {
+    my $self = shift;
+    return sprintf("%.1f",
+        100 * ( $self->query_end - $self->query_start + 1 ) / $self->query_len
+    );
+}
+
+
+sub subject_coverage {
+    my $self = shift;
+    return sprintf("%.1f",
+        100 * ( $self->hit_end - $self->hit_start + 1 ) / $self->hit_len
+    );
+}
+
+
+sub percentage_identity {
+    my $self = shift;
+    return sprintf("%.1f", 100 * ( $self->identity / $self->align_len ) );
+}
+
+
+sub percentage_positive {
+    my $self = shift;
+    return sprintf("%.1f", 100 * ( $self->positive / $self->align_len ) );
 }
 
 
@@ -194,7 +261,7 @@ Bio::FastParsers::Blast::Xml::Hsp - NCBI BLAST DTD-derived internal class
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 SYNOPSIS
 
@@ -466,11 +533,71 @@ guaranteed to be greater than the value returned by C<query_start>.
 
 This method does not accept any arguments.
 
+=head2 query_coverage
+
+Returns the query coverage of the HSP.
+
+    # $hsp is a Bio::FastParsers::Blast::Xml::Hsp
+    my $query_coverage = $hsp->query_coverage;
+
+This method does not accept any arguments.
+
+=head2 subject_coverage
+
+Returns the subject (hit) coverage of the HSP.
+
+    # $hsp is a Bio::FastParsers::Blast::Xml::Hsp
+    my $subject_coverage = $hsp->subject_coverage;
+
+This method does not accept any arguments.
+
+=head2 percentage_identity
+
+Returns the percentage of identity of the HSP.
+
+    # $hsp is a Bio::FastParsers::Blast::Xml::Hsp
+    my $percentage_identity = $hsp->percentage_identity;
+
+This method does not accept any arguments.
+
+=head2 percentage_positive
+
+Returns the percentage of positive matches of the HSP.
+
+    # $hsp is a Bio::FastParsers::Blast::Xml::Hsp
+    my $percentage_positive = $hsp->percentage_positive;
+
+This method does not accept any arguments.
+
 =head1 ALIASES
 
 =head2 expect
 
 Alias for C<evalue> method. For API consistency.
+
+=head2 qcov
+
+Alias for C<query_coverage> method. For API consistency.
+
+=head2 scov
+
+Alias for C<subject_coverage> method. For API consistency.
+
+=head2 pident
+
+Alias for C<percentage_identity> method. For API consistency.
+
+=head2 ppos
+
+Alias for C<percentage_positive> method. For API consistency.
+
+=head2 query_len
+
+Alias for C<query_len> method in Hit object. For API completeness.
+
+=head2 hit_len
+
+Alias for C<len> method in Hit object. For API completeness.
 
 =head1 AUTHOR
 

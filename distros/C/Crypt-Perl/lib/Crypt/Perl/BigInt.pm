@@ -6,12 +6,24 @@ use warnings;
 # Even though Crypt::Perl intends to be pure Perl, there’s no reason
 # not to use faster computation methods when they’re available.
 #
-# Sorted in descending order of observed speed:
-use Math::BigInt try => 'GMP,LTM,GMPz,Pari,BitVect';
-
 #No FastCalc because of bugs shown in the following test runs:
 #http://www.cpantesters.org/cpan/report/a03dce70-c698-11e6-a1ce-1a99c671d6e6
 #http://www.cpantesters.org/cpan/report/0a3e797e-c693-11e6-8c46-2488c671d6e6
+
+use constant _LTM_IS_OK => eval {
+    require CryptX;
+    CryptX->VERSION('0.074');
+};
+
+use constant _TRY => join(
+    ',',
+    'GMP',
+    ( _LTM_IS_OK ? 'LTM' : () ),
+    qw( GMPz Pari BitVect ),
+);
+
+# Sorted in descending order of observed speed:
+use Math::BigInt try => _TRY;
 
 #To test pure Perl speed, comment out the above and enable:
 #use Math::BigInt;

@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/RxPerl/IOAsync.pm
+lib/RxPerl/IOAsync/CodeOfConduct.pod
 minil.toml
 t/from_future.t
 t/value_from.t

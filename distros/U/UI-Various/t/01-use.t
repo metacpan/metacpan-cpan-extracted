@@ -12,7 +12,7 @@
 
 #########################################################################
 
-use v5.12.1;
+use v5.14.0;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -105,8 +105,13 @@ like($@, qr/^stderr not 0, 1, 2 or 3$re_msg_tail/,
 eval {   UI::Various->import({stderr => 1});   };
 is($@, '', 'good STDERR value is OK');
 
-$_ = UI::Various::stderr();
-is($_, 0, 'STDERR 1 with GUI is 0');
+SKIP:
+{
+    eval {   require Tk;   };
+    skip 'no Perl/Tk', 1  if  $@;
+    $_ = UI::Various::stderr();
+    is($_, 0, 'STDERR 1 with GUI is 0');
+};
 
 my $using = '';
 eval {
@@ -160,11 +165,11 @@ eval {   UI::Various->import({include => 'X'});   };
 like($@, qr/^unsupported UI element 'UI::Various::X'$re_msg_tail/,
      "indirect import of 'X' fails");
 
-$_ = _sub_perl(	<<~'CODE');
+$_ = _sub_perl(	<<'CODE');
 		use UI::Various({include => [qw(Main)]});
 		# check with introspection:
 		defined $UI::Various::Main::{new}  and  print "OK\n";
 		defined $UI::Various::Text::{new}  or  print "OK\n";
-		CODE
+CODE
 is($?, 0, "indirect import of ['Main'] did not fail");
 is($_, "OK\nOK\n", "indirect import of ['Main'] is OK");

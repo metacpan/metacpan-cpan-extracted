@@ -217,7 +217,7 @@ checkAccess can also return a promise or be an async method
 has checkAccess => sub {
     my $self = shift;
     my $userId = $self->user->userId;
-    return (defined $userId and $userId eq '__CONFIG' or $userId =~ /^\d+$/);
+    return (defined $userId and ($userId eq '__CONFIG' or $userId =~ /^\d+$/));
 };
 
 =head2 mayAnonymous

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 52-DS-SHA256.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 52-DS-SHA256.t 1855 2021-11-26 11:33:48Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -15,7 +15,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";## no critic
+	next if eval "require $package";	## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -24,33 +24,28 @@ plan tests => 3;
 
 
 # Simple known-answer tests based upon the examples given in RFC4509, section 2.3
+my $RFC = 'RFC4509';
 
 my $dnskey = Net::DNS::RR->new( <<'END' );
-dskey.example.com. 86400 IN DNSKEY 256 3 5 (	AQOeiiR0GOMYkDshWoSKz9Xz
-						fwJr1AYtsmx3TGkJaNXVbfi/
-						2pHm822aJ5iI9BMzNXxeYCmZ
-						DRD99WYwYqUSdjMmmAphXdvx
-						egXd/M5+X7OrzKBaMbCVdFLU
-						Uh6DhweJBjEVv5f2wwjM9Xzc
-						nOf+EPbtG9DMBmADjFDc2w/r
-						ljwvFw==
-						) ;  key id = 60485
+dskey.example.com.	86400	IN	DNSKEY	256 3 5 (
+	AQOeiiR0GOMYkDshWoSKz9XzfwJr1AYtsmx3TGkJaNXVbfi/2pHm822aJ5iI9BMzNXxeYCmZDRD9
+	9WYwYqUSdjMmmAphXdvxegXd/M5+X7OrzKBaMbCVdFLUUh6DhweJBjEVv5f2wwjM9XzcnOf+EPbt
+	G9DMBmADjFDc2w/rljwvFw== ) ; Key ID = 60485
 END
 
 my $ds = Net::DNS::RR->new( <<'END' );
-dskey.example.com. 86400 IN DS 60485 5 2   (	D4B7D520E7BB5F0F67674A0C
-						CEB1E3E0614B93C4F9E99B83
-						83F6A1E4469DA50A )
+dskey.example.com.	86400	IN	DS	60485 5 2 (
+	D4B7D520E7BB5F0F67674A0CCEB1E3E0614B93C4F9E99B8383F6A1E4469DA50A )
 END
 
 
-my $test = Net::DNS::RR::DS->create( $dnskey, digtype => 'SHA256' );
+my $test = Net::DNS::RR::DS->create( $dnskey, digtype => $ds->digtype, ttl => $ds->ttl );
 
-is( $test->string, $ds->string, 'created DS matches RFC4509 example DS' );
+is( $test->string, $ds->string, "created DS matches $RFC example DS" );
 
-ok( $test->verify($dnskey), 'created DS verifies RFC4509 example DNSKEY' );
+ok( $test->verify($dnskey), "created DS verifies $RFC example DNSKEY" );
 
-ok( $ds->verify($dnskey), 'RFC4509 example DS verifies DNSKEY' );
+ok( $ds->verify($dnskey), "$RFC example DS verifies DNSKEY" );
 
 $test->print;
 

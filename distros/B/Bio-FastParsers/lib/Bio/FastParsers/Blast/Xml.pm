@@ -1,6 +1,7 @@
 package Bio::FastParsers::Blast::Xml;
 # ABSTRACT: Front-end class for XML BLAST parser
-$Bio::FastParsers::Blast::Xml::VERSION = '0.201110';
+# CONTRIBUTOR: Aymeric NAOME <aymeric.naome@gmail.com>
+$Bio::FastParsers::Blast::Xml::VERSION = '0.213510';
 use Moose;
 use namespace::autoclean;
 
@@ -40,7 +41,7 @@ sub _build_blast_output {
         return;
     }
 
-    return BlastOutput->new( _root => $bo );
+    return BlastOutput->new( _root => $bo, _parent => undef);
 }
 
 ## use critic
@@ -59,7 +60,7 @@ Bio::FastParsers::Blast::Xml - Front-end class for XML BLAST parser
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 SYNOPSIS
 
@@ -150,6 +151,12 @@ L<Bio::FastParsers::Blast::Xml::BlastOutput> composed object
 =head1 AUTHOR
 
 Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Aymeric NAOME
+
+Aymeric NAOME <aymeric.naome@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

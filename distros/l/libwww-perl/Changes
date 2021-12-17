@@ -1,5 +1,8 @@
 Change history for libwww-perl
 
+6.60      2021-12-17 22:29:57Z
+    - Warn if updating modification time of mirrored file fails (GH#399) (Ville Skyttä)
+
 6.59      2021-12-02 21:16:04Z
     - Use American English aspell master dictionary for POD spelling tests (GH#394) (Ville Skyttä)
     - Remove unnecessary string concatenations in mirror error messages (GH#391) (Ville Skyttä)

@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Xml::Iteration;
 # ABSTRACT: NCBI BLAST DTD-derived internal class
-$Bio::FastParsers::Blast::Xml::Iteration::VERSION = '0.201110';
+$Bio::FastParsers::Blast::Xml::Iteration::VERSION = '0.213510';
 use Moose;
 use namespace::autoclean;
 
@@ -17,6 +17,12 @@ use aliased 'Bio::FastParsers::Blast::Xml::Statistics';
 has '_root' => (
     is       => 'ro',
     isa      => 'HashRef',
+    required => 1,
+);
+
+has '_parent' => (
+    is       => 'ro',
+    isa      => 'Maybe[Object]',
     required => 1,
 );
 
@@ -43,7 +49,7 @@ has 'hits' => (
 
 sub _build_hits {
     my $self = shift;
-    return [ map { Hit->new( _root => $_ ) } @{
+    return [ map { Hit->new( _root => $_, _parent => $self ) } @{
         forcearray $self->_root->{'Iteration_hits'}->{'Hit'}
     } ];
 }
@@ -68,7 +74,8 @@ has 'stat' => (
 sub _build_stat {
     my $self = shift;
     return Statistics->new(
-        _root => $self->_root->{'Iteration_stat'}->{'Statistics'}
+        _root => $self->_root->{'Iteration_stat'}->{'Statistics'},
+        _parent => $self
     );
 }
 
@@ -129,7 +136,7 @@ Bio::FastParsers::Blast::Xml::Iteration - NCBI BLAST DTD-derived internal class
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 SYNOPSIS
 

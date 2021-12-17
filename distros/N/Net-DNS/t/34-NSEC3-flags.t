@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 34-NSEC3-flags.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 34-NSEC3-flags.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -12,7 +12,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";## no critic
+	next if eval "require $package";	## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }

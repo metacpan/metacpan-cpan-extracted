@@ -1,5 +1,10 @@
 Revision history for Perl module Crypt::Perl
 
+0.37 Fri Dec 17 2021
+- Fix flapping RSA generation test.
+- Exclude broken Math::BigInt::LTM.
+- Exclude broken/hang-prone Math::ProvablePrime.
+
 0.36 Wed Nov 17 2021
 - Report test coverage in POD. (No code changes.)
 

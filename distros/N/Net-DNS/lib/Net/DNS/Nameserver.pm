@@ -3,7 +3,7 @@ package Net::DNS::Nameserver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Nameserver.pm 1841 2021-06-23 20:34:28Z willem $)[2];
+our $VERSION = (qw$Id: Nameserver.pm 1860 2021-12-11 09:19:50Z willem $)[2];
 
 
 =head1 NAME
@@ -39,7 +39,7 @@ See L</EXAMPLE> for an example.
 
 =cut
 
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;'; ## no critic
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';    ## no critic
 require IO::Socket::INET unless USE_SOCKET_IP;
 
 use integer;
@@ -80,7 +80,7 @@ sub new {
 
 	# local server addresses must also be accepted by a resolver
 	my $LocalAddr = $self{LocalAddr} || [DEFAULT_ADDR];
-	my $resolver = Net::DNS::Resolver->new( nameservers => $LocalAddr );
+	my $resolver  = Net::DNS::Resolver->new( nameservers => $LocalAddr );
 	$resolver->force_v4(1) unless USE_SOCKET_IP;
 	$resolver->force_v4(1) if FORCE_IPv4;
 	my @localaddresses = $resolver->nameservers;
@@ -232,7 +232,7 @@ sub inet_new {
 #------------------------------------------------------------------------------
 
 sub make_reply {
-	my ( $self, $query, $peerhost, $conn ) = @_;
+	my ( $self, $query, $sock ) = @_;
 
 	unless ($query) {
 		print "ERROR: invalid packet\n" if $self->{Verbose};
@@ -271,8 +271,17 @@ sub make_reply {
 		my $id = $query->header->id;
 		print "query $id : $qname $qclass $qtype\n" if $self->{Verbose};
 
+		my $peer = $sock->peerhost;
+		my $conn = {
+			peerhost => $peer,
+			peerport => $sock->peerport,
+			protocol => $sock->protocol,
+			sockhost => $sock->sockhost,
+			sockport => $sock->sockport
+			};
+
 		my ( $rcode, $ans, $auth, $add );
-		my @arglist = ( $qname, $qclass, $qtype, $peerhost, $query, $conn );
+		my @arglist = ( $qname, $qclass, $qtype, $peer, $query, $conn );
 
 		if ( $opcode eq "QUERY" ) {
 			( $rcode, $ans, $auth, $add, $headermask, $optionmask ) =
@@ -406,13 +415,8 @@ sub tcp_connection {
 				print "Error decoding query packet: $err\n" if $self->{Verbose};
 				undef $query;			# force FORMERR reply
 			}
-			my $conn = {
-				sockhost => $sock->sockhost,
-				sockport => $sock->sockport,
-				peerhost => $sock->peerhost,
-				peerport => $sock->peerport
-				};
-			my $reply = $self->make_reply( $query, $sock->peerhost, $conn );
+
+			my $reply = $self->make_reply( $query, $sock );
 			if ( not defined $reply ) {
 				print "I couldn't create a reply for $peer. Closing socket.\n"
 						if $self->{Verbose};
@@ -452,7 +456,6 @@ sub udp_connection {
 		return;
 	}
 
-
 	print "UDP connection from $peerhost:$peerport to $sockhost\n" if $self->{Verbose};
 
 	my $query = Net::DNS::Packet->new( \$buf );
@@ -460,13 +463,8 @@ sub udp_connection {
 		print "Error decoding query packet: $err\n" if $self->{Verbose};
 		undef $query;					# force FORMERR reply
 	}
-	my $conn = {
-		sockhost => $sock->sockhost,
-		sockport => $sock->sockport,
-		peerhost => $sock->peerhost,
-		peerport => $sock->peerport
-		};
-	my $reply = $self->make_reply( $query, $peerhost, $conn ) || return;
+
+	my $reply = $self->make_reply( $query, $sock ) || return;
 
 	my $max_len = ( $query && $self->{Truncate} ) ? $query->edns->size : undef;
 	if ( $self->{Verbose} ) {
@@ -545,11 +543,11 @@ sub loop_once {
 
 			# If we have buffered output, then send as much as the OS will accept
 			# and wait with the rest
-			my $len = length $self->{_tcp}{$s}{outbuffer};
-			my $charssent = $sock->syswrite( $self->{_tcp}{$s}{outbuffer} ) || 0;
-			print "Sent $charssent of $len octets to ", $self->{_tcp}{$s}{peer}, ".\n"
+			my $len	 = length $self->{_tcp}{$s}{outbuffer};
+			my $sent = $sock->syswrite( $self->{_tcp}{$s}{outbuffer} ) || 0;
+			print "Sent $sent of $len octets to ", $self->{_tcp}{$s}{peer}, ".\n"
 					if $self->{Verbose};
-			substr( $self->{_tcp}{$s}{outbuffer}, 0, $charssent ) = "";
+			substr( $self->{_tcp}{$s}{outbuffer}, 0, $sent ) = "";
 			if ( length $self->{_tcp}{$s}{outbuffer} == 0 ) {
 				delete $self->{_tcp}{$s}{outbuffer};
 				$self->{_tcp}{$s}{state} = STATE_ACCEPTED;
@@ -658,9 +656,8 @@ this may also include IPv6 addresses.
 
 
 The ReplyHandler subroutine is passed the query name, query class,
-query type and optionally an argument containing the peerhost, the
-incoming query, and the name of the incoming socket (sockethost). It
-must either return the response code and references to the answer,
+query type, peerhost, query record, and connection descriptor.
+It must either return the response code and references to the answer,
 authority, and additional sections of the response, or undef to leave
 the query unanswered.  Common response codes are:
 
@@ -833,7 +830,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

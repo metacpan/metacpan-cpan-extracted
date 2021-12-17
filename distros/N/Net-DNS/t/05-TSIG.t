@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-TSIG.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 05-TSIG.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -16,7 +16,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";## no critic
+	next if eval "require $package";	## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -99,7 +99,7 @@ my $hash = {};
 	ok( $rr->vrfyerrstr(),	'vrfyerrstr() reports failure' );
 	ok( !$rr->other(),	'other undefined' );
 	ok( $rr->time_signed(), 'time_signed() defined' );
-	my $key = eval { $rr->key(); };
+	my $key		= eval { $rr->key(); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "key attribute write-only\t[$exception]" );
 }
@@ -134,8 +134,8 @@ my $hash = {};
 	}
 
 	{
-		my $data = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
-		my $key	 = pack 'H*', '4a656665';
+		my $data   = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
+		my $key	   = pack 'H*', '4a656665';
 		my $result = lc unpack( 'H*', &$function( $key, $data ) );
 		my $expect = '750c783e6ab0b503eaa86e310a5db738';
 		is( $result, $expect, "Check $algorithm with key shorter than hash size" );
@@ -187,7 +187,7 @@ my $hash = {};
 {
 	# Check HMAC-SHA1 signing function using test cases from RFC2202, section 3.
 
-	my $tsig      = Net::DNS::RR->new( type => 'TSIG', algorithm => 'HMAC-SHA' );	# alias HMAC-SHA1
+	my $tsig      = Net::DNS::RR->new( type => 'TSIG', algorithm => 'HMAC-SHA' );	 # alias HMAC-SHA1
 	my $algorithm = $tsig->algorithm;
 	my $function  = $tsig->sig_function;
 
@@ -202,8 +202,8 @@ my $hash = {};
 	}
 
 	{
-		my $data = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
-		my $key	 = pack 'H*', '4a656665';
+		my $data   = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
+		my $key	   = pack 'H*', '4a656665';
 		my $result = lc unpack( 'H*', &$function( $key, $data ) );
 		my $expect = 'effcdf6ae5eb2fa2d27416d5f184df9c259a7c79';
 		is( $result, $expect, "Check $algorithm with key shorter than hash size" );
@@ -255,7 +255,7 @@ my $hash = {};
 {
 	# Check HMAC-SHA224 signing function using test cases from RFC4634, section 8.4.
 
-	my $tsig      = Net::DNS::RR->new( type => 'TSIG', algorithm => 162 );	 # alias HMAC-SHA224
+	my $tsig      = Net::DNS::RR->new( type => 'TSIG', algorithm => 162 );	  # alias HMAC-SHA224
 	my $algorithm = $tsig->algorithm;
 	my $function  = $tsig->sig_function;
 
@@ -270,8 +270,8 @@ my $hash = {};
 	}
 
 	{
-		my $data = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
-		my $key	 = pack 'H*', '4a656665';
+		my $data   = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
+		my $key	   = pack 'H*', '4a656665';
 		my $result = uc unpack( 'H*', &$function( $key, $data ) );
 		my $expect = 'A30E01098BC6DBBF45690F3A7E9E6D0F8BBEA2A39E6148008FD05E44';
 		is( $result, $expect, "Check $algorithm with key shorter than hash size" );
@@ -341,8 +341,8 @@ my $hash = {};
 	}
 
 	{
-		my $data = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
-		my $key	 = pack 'H*', '4a656665';
+		my $data   = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
+		my $key	   = pack 'H*', '4a656665';
 		my $result = uc unpack( 'H*', &$function( $key, $data ) );
 		my $expect = '5BDCC146BF60754E6A042426089575C75A003F089D2739839DEC58B964EC3843';
 		is( $result, $expect, "Check $algorithm with key shorter than hash size" );
@@ -415,8 +415,8 @@ my $hash = {};
 	}
 
 	{
-		my $data = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
-		my $key	 = pack 'H*', '4a656665';
+		my $data   = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
+		my $key	   = pack 'H*', '4a656665';
 		my $result = uc unpack( 'H*', &$function( $key, $data ) );
 		my $expect = join '', qw(
 				AF45D2E376484031617F78D2B58A6B1B
@@ -505,8 +505,8 @@ my $hash = {};
 	}
 
 	{
-		my $data = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
-		my $key	 = pack 'H*', '4a656665';
+		my $data   = pack 'H*', '7768617420646f2079612077616e7420666f72206e6f7468696e673f';
+		my $key	   = pack 'H*', '4a656665';
 		my $result = uc unpack( 'H*', &$function( $key, $data ) );
 		my $expect = join '', qw(
 				164B7A7BFCF819E2E395FBE73B56E0A3

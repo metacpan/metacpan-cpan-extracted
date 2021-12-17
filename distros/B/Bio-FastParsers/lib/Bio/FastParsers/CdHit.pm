@@ -1,7 +1,7 @@
 package Bio::FastParsers::CdHit;
 # ABSTRACT: Front-end class for CD-HIT parser
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::FastParsers::CdHit::VERSION = '0.201110';
+$Bio::FastParsers::CdHit::VERSION = '0.213510';
 use Moose;
 use namespace::autoclean;
 
@@ -85,7 +85,7 @@ Bio::FastParsers::CdHit - Front-end class for CD-HIT parser
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 SYNOPSIS
 

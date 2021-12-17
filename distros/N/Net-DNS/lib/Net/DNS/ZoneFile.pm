@@ -3,7 +3,7 @@ package Net::DNS::ZoneFile;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ZoneFile.pm 1841 2021-06-23 20:34:28Z willem $)[2];
+our $VERSION = (qw$Id: ZoneFile.pm 1855 2021-11-26 11:33:48Z willem $)[2];
 
 
 =head1 NAME
@@ -88,22 +88,22 @@ introduced by $INCLUDE directives.
 =cut
 
 sub new {
-	my $self = bless {}, shift;
-	my $file = shift;
-	$self->_origin(shift);
+	my $self = bless {fileopen => {}}, shift;
+	my ( $filename, $origin ) = @_;
 
-	if ( ref($file) ) {
-		$self->{filename} = $self->{filehandle} = $file;
-		$self->{fileopen} = {};
-		return $self if ref($file) =~ /IO::File|FileHandle|GLOB|Text/;
+	$self->_origin($origin);
+
+	if ( ref($filename) ) {
+		$self->{filehandle} = $self->{filename} = $filename;
+		return $self if ref($filename) =~ /IO::File|FileHandle|GLOB|Text/;
 		croak 'argument not a file handle';
 	}
 
-	croak 'filename argument undefined' unless $file;
+	croak 'filename argument undefined' unless $filename;
 	my $discipline = UTF8 ? '<:encoding(UTF-8)' : '<';
-	$self->{filehandle} = IO::File->new( $file, $discipline ) or croak "$file: $!";
-	$self->{fileopen}{$file}++;
-	$self->{filename} = $file;
+	$self->{filehandle} = IO::File->new( $filename, $discipline ) or croak "$filename: $!";
+	$self->{fileopen}->{$filename}++;
+	$self->{filename} = $filename;
 	return $self;
 }
 
@@ -365,9 +365,6 @@ sub parse {
 		my ( $class, $range, $template, $line ) = @_;
 		my $self = bless {}, $class;
 
-		$template =~ s/\\\$/\\036/g;			# disguise escaped dollar
-		$template =~ s/\$\$/\\036/g;			# disguise escaped dollar
-
 		my ( $bound, $step ) = split m#[/]#, $range;	# initial iterator state
 		my ( $first, $last ) = split m#[-]#, $bound;
 		$first ||= 0;
@@ -376,7 +373,12 @@ sub parse {
 		$step = ( $last < $first ) ? -abs($step) : abs($step);
 		$self->{count} = int( ( $last - $first ) / $step ) + 1;
 
-		@{$self}{qw(instant step template line)} = ( $first, $step, $template, $line );
+		for ($template) {
+			s/\\\$/\\036/g;				# disguise escaped dollar
+			s/\$\$/\\036/g;				# disguise escaped dollar
+			s/^"(.*)"$/$1/s;			# unwrap BIND's quoted template
+			@{$self}{qw(instant step template line)} = ( $first, $step, $_, $line );
+		}
 		return $self;
 	}
 
@@ -484,28 +486,29 @@ sub _getline {				## get line from current source
 
 		return $_ unless /^[\$]/;			# RR string
 
+		my @token = grep { defined && length } split /$LEX_REGEX/o;
 		if (/^\$INCLUDE/) {				# directive
-			my ( $keyword, @argument ) = split;
+			my ( $keyword, @argument ) = @token;
 			die '$INCLUDE incomplete' unless @argument;
 			$fh = $self->_include(@argument);
 
 		} elsif (/^\$GENERATE/) {			# directive
-			my ( $keyword, $range, @template ) = split;
+			my ( $keyword, $range, @template ) = @token;
 			die '$GENERATE incomplete' unless @template;
-			$fh = $self->_generate( $range, "@template\n" );
+			$fh = $self->_generate( $range, "@template" );
 
 		} elsif (/^\$ORIGIN/) {				# directive
-			my ( $keyword, $origin, @etc ) = split;
+			my ( $keyword, $origin ) = @token;
 			die '$ORIGIN incomplete' unless defined $origin;
 			$self->_origin($origin);
 
 		} elsif (/^\$TTL/) {				# directive
-			my ( $keyword, $ttl, @etc ) = split;
+			my ( $keyword, $ttl ) = @token;
 			die '$TTL incomplete' unless defined $ttl;
 			$self->{TTL} = Net::DNS::RR::ttl( {}, $ttl );
 
 		} else {					# unrecognised
-			my ($keyword) = split;
+			my ($keyword) = @token;
 			die qq[unknown "$keyword" directive];
 		}
 	}
@@ -536,29 +539,28 @@ sub _getRR {				## get RR from current source
 	$self->{class} = $rr->class unless $self->{class};	# propagate RR class
 	$rr->class( $self->{class} );
 
-	$self->{TTL} ||= $rr->minimum if $rr->type eq 'SOA';	# default TTL
-	$rr->{'ttl'} = $self->{TTL} unless defined $rr->{'ttl'};
+	unless ( defined $self->{TTL} ) {
+		$self->{TTL} = $rr->minimum if $rr->type eq 'SOA';    # default TTL
+	}
+	$rr->{ttl} = $self->{TTL} unless defined $rr->{ttl};
 
 	return $self->{latest} = $rr;
 }
 
 
 sub _include {				## open $INCLUDE file
-	my $self = shift;
-	my $file = _filename(shift);
-	my $root = shift;
+	my ( $self, $include, $origin ) = @_;
 
-	my $opened = {%{$self->{fileopen}}};
-	die qq(\$INCLUDE $file: Unexpected recursion) if $opened->{$file}++;
+	my $filename = _filename($include);
+	die qq(\$INCLUDE $filename: Unexpected recursion) if $self->{fileopen}->{$filename}++;
 
 	my $discipline = PERLIO ? join( ':', '<', PerlIO::get_layers $self->{filehandle} ) : '<';
-	my $filehandle = IO::File->new( $file, $discipline ) or die qq(\$INCLUDE $file: $!);
+	my $filehandle = IO::File->new( $filename, $discipline ) or die qq(\$INCLUDE $filename: $!);
 
 	delete $self->{latest};					# forget previous owner
 	$self->{parent} = bless {%$self}, ref($self);		# save state, create link
-	$self->_origin($root) if $root;
-	$self->{filename} = $file;
-	$self->{fileopen} = $opened;
+	$self->_origin($origin) if $origin;
+	$self->{filename} = $filename;
 	return $self->{filehandle} = $filehandle;
 }
 
@@ -602,7 +604,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific
@@ -619,8 +621,10 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC1035 Section 5.1,
-RFC2308, BIND 9 Administrator Reference Manual
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>,
+RFC1035 Section 5.1, RFC2308
+
+L<BIND Administrator Reference Manual|http://bind.isc.org/>
 
 =cut
 

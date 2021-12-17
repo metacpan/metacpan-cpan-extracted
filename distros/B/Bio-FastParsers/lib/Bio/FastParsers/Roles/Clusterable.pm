@@ -1,7 +1,7 @@
 package Bio::FastParsers::Roles::Clusterable;
 # ABSTRACT: Attributes and methods common to CD-HIT and UCLUST drivers
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::FastParsers::Roles::Clusterable::VERSION = '0.201110';
+$Bio::FastParsers::Roles::Clusterable::VERSION = '0.213510';
 use Moose::Role;
 
 use autodie;
@@ -83,7 +83,7 @@ Bio::FastParsers::Roles::Clusterable - Attributes and methods common to CD-HIT a
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 DESCRIPTION
 

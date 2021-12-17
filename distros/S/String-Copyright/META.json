@@ -39,7 +39,7 @@
          },
          "requires" : {
             "Exporter::Tiny" : "0",
-            "Number::Range" : "0.04",
+            "Set::IntSpan" : "1.12",
             "constant" : "0",
             "perl" : "5.008001"
          }
@@ -55,7 +55,7 @@
    "provides" : {
       "String::Copyright" : {
          "file" : "lib/String/Copyright.pm",
-         "version" : "0.003011"
+         "version" : "0.003012"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/String-Copyright/project"
    },
-   "version" : "0.003011",
+   "version" : "0.003012",
    "x_help_wanted" : [
       "tester",
       "documenter"

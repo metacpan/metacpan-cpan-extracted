@@ -6,7 +6,7 @@ use Carp ();
 use Encode ();
 use Exporter 'import';
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 our @EXPORT = qw(encode encode_utf8 decode decode_utf8);
 our @EXPORT_OK = qw(encode_lax encode_utf8_lax decode_lax decode_utf8_lax);

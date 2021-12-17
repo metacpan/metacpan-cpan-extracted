@@ -3,7 +3,7 @@ package Net::DNS::Text;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Text.pm 1841 2021-06-23 20:34:28Z willem $)[2];
+our $VERSION = (qw$Id: Text.pm 1855 2021-11-26 11:33:48Z willem $)[2];
 
 
 =head1 NAME
@@ -187,7 +187,7 @@ sub string {
 
 	my @s = map { split '', $_ } @$self;			# escape special and ASCII non-printable
 	my $s = _decode_utf8( join '', map { $escape{$_} } @s );
-	return $s =~ /[ \t\n\r\f();]|^$/ ? qq("$s") : $s;	# quote special characters and empty string
+	return $s =~ /[ \t\n\r\f(),;]|^$/ ? qq("$s") : $s;	# quote special characters and empty string
 }
 
 
@@ -306,7 +306,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

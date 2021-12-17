@@ -14,7 +14,7 @@ MojoX::HTTP::Async - The simple package to execute multiple parallel requests to
 
     # creates new instance for async requests
     # restricts max amount of simultaneously executed requests
-    my $ua = MojoX::HTTP::Async->new('host' => 'my-site.com', 'slots' => 2);
+    my $ua = MojoX::HTTP::Async->new('host' => 'my-site.com', 'slots' => 4);
 
     # let's fill slots
     $ua->add( '/page1.html?lang=en');
@@ -88,7 +88,7 @@ use URI ();
 use Scalar::Util qw/ blessed /;
 use Errno qw / :POSIX /;
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 use constant {
     IS_WIN     => ($^O eq 'MSWin32') ? 1 : 0,
@@ -774,7 +774,7 @@ sub close_all ($self) {
     return;
 }
 
-=head2 DESTROY($class)
+=head2 DESTROY($self)
 
 The class destructor.
 

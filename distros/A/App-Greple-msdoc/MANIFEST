@@ -7,5 +7,10 @@ cpanfile
 lib/App/Greple/msdoc.pm
 minil.toml
 t/00_compile.t
+t/01_run.t
+t/data_shishin.docx
+t/lib/README.md
+t/lib/Runner.pm
+t/lib/Util.pm
 META.yml
 MANIFEST

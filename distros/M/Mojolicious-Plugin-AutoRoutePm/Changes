@@ -1,5 +1,8 @@
 Changelog for Mojolicious-Plugin-AutoRoutePm
 
+0.23 2021-12-16T09:57:30
+ - Routes sorted so longer path come first and existing subfolder have major priority
+
 0.22 2021-11-22T15:15:10
  - Routes sorted so it is applied first to existing .pm modules which aren't default_index and then it is tried to decode routes in term of default_index if possible
 

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-TXT.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 05-TXT.t 1857 2021-12-07 13:38:02Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -69,33 +69,22 @@ my $wire = '0e6172626974726172795f74657874';
 
 {
 	foreach my $testcase (
-		q|contiguous|,	q|three unquoted strings|,
-		q|"in quotes"|, q|"two separate" "quoted strings"|,
-		q|"" empty|,	q|" " space|,
-		q|!|,		q|\"|,
-		q|#|,		q|$|,
-		q|%|,		q|&|,
-		q|'|,		q|\(|,
-		q|\)|,		q|*|,
-		q|+|,		q|,|,
-		q|-|,		q|.|,
-		q|/|,		q|:|,
-		q|\;|,		q|<|,
-		q|=|,		q|>|,
-		q|?|,		q|@|,
-		q|[|,		q|\\\\|,
-		q|]|,		q|^|,
-		q|_|,		q|`|,
-		q|{|,		q(|),
-		q|}|,		q|~|,
-		q|0|,		q|1|,
-		join( q|\227\128\128|,
-			q|\229\143\164\230\177\160\227\130\132|,
+		q|contiguous|,
+		q|three unquoted strings|,
+		q|"in quotes"|,
+		q|"two separate" "quoted strings"|,
+		q|"" empty|,
+		q|" " space|,
+		q|!|, q|\"|, q|#|, q|$|,    q|%|, q|&|, q|'|,  q|\(|, q|\)|, q|*|,
+		q|+|, q|,|,  q|-|, q|.|,    q|/|, q|:|, q|\;|, q|<|,  q|=|,  q|>|,
+		q|?|, q|@|,  q|[|, q|\\\\|, q|]|, q|^|, q|_|,  q|`|,  q|{|,  q(|),
+		q|}|, q|~|,  q|0|, q|1|,
+		join( q|\227\128\128|, q|\229\143\164\230\177\160\227\130\132|,
 			q|\232\155\153\233\163\155\232\190\188\227\130\128|,
 			q|\230\176\180\227\129\174\233\159\179| )
-		) {
+			) {
 		my $string = "$name.	TXT	$testcase";
-		my $expect = Net::DNS::RR->new($string)->string; # test for consistent parsing
+		my $expect = Net::DNS::RR->new($string)->string;    # test for consistent parsing
 		my $result = Net::DNS::RR->new($expect)->string;
 		is( $result, $expect, $string );
 	}

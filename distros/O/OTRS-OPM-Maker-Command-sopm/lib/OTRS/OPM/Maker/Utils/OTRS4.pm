@@ -53,7 +53,7 @@ OTRS::OPM::Maker::Utils::OTRS4 - helper functions for OTRS >= 4
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 METHODS
 

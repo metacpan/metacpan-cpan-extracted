@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl-AnyEvent
 
+v6.7.0 2021-12-16T08:19:16Z
+
+    - added community code of conduct
+    - switched license to GPLv3
+
 v6.6.0 2021-03-03T22:08:48Z
 
     - allow RxPerl's first_value_from, last_value_from

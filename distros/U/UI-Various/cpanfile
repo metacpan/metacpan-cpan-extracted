@@ -1,8 +1,11 @@
-requires 'perl' => 5.12.1;
+requires 'perl' => 5.14.0;
+requires 'strictures' => 1.0;
 
 recommends 'Curses::UI' => '0.9603';
-recommends 'Tk' => '804.029';
+recommends 'Tk' => '804.030';
 
 on 'test' => sub {
-    requires 'Test::More' => '0.98';
+    requires 'Test::More'   => 0.98;
+    requires 'Test::Output' => 1.01;
+    requires 'Test::Warn'   => 0.23;
 };

@@ -7,6 +7,7 @@ cpanfile
 lib/RxPerl.pm
 lib/RxPerl/Base.pm
 lib/RxPerl/BehaviorSubject.pm
+lib/RxPerl/CodeOfConduct.pod
 lib/RxPerl/ConnectableObservable.pm
 lib/RxPerl/Functions.pm
 lib/RxPerl/Observable.pm

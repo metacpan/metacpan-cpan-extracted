@@ -2,7 +2,7 @@ package Test2::Harness::Plugin;
 use strict;
 use warnings;
 
-our $VERSION = '1.000090';
+our $VERSION = '1.000093';
 
 # Document, but do not implement
 #sub changed_files {}
@@ -183,6 +183,17 @@ Examples:
             't/integration.t',
         ],
     }
+
+=item $plugin->post_process_coverage_tests($settings, \@tests)
+
+This is an opportunity for a plugin to do post-processing on the list of
+coverage tests to run. This is mainly useful to remove duplicates if multiple
+plugins add coverage data, or merging entries where applicable. This will be
+called after all plugins have generated their coverage test list.
+
+Plugins may implement this without implementing coverage_data(), making this
+useful if you want to use a pre-existing coverage module and want to do
+post-processing on what it provides.
 
 =item $plugin->inject_run_data(meta => $meta, fields => $fields, run => $run)
 

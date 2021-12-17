@@ -7,15 +7,17 @@ use experimental qw/ signatures /;
 use Exporter qw/ import /;
 
 use Test::TCP ();
-use Socket qw/ inet_aton pack_sockaddr_in AF_INET SOCK_STREAM /;
+use Socket qw/ inet_aton sockaddr_in pack_sockaddr_in AF_INET SOCK_STREAM INADDR_ANY /;
+use IO::Socket::SSL ();
 use Net::EmptyPort qw/ empty_port /;
+use FindBin qw/ $Bin /;
 
 use constant {
     IS_NOT_WIN => ($^O ne 'MSWin32') ? 1 : 0,
 };
 
 our @EXPORT      = ();
-our @EXPORT_OK   = qw/ get_free_port start_server notify_parent /;
+our @EXPORT_OK   = qw/ get_free_port get_listen_socket start_server notify_parent IS_NOT_WIN /;
 our %EXPORT_TAGS = ();
 
 our $PPID;
@@ -111,6 +113,31 @@ sub start_server ($on_start_cb, $host = 'localhost', $server_port = undef, $atte
     }
 
     return $server;
+}
+
+sub get_listen_socket ($host, $port, $is_ssl = 0) {
+
+    my $socket;
+    my $QUEUE_LENGTH = 3;
+
+    if ($is_ssl) {
+        $socket = IO::Socket::SSL->new(
+            'LocalAddr' => $host,
+            'LocalPort' => $port,
+            'Listen'    => $QUEUE_LENGTH,
+            'SSL_cert_file' => "${Bin}/certs/server-cert.pem",
+                'SSL_key_file' => "${Bin}/certs/server-key.pem",
+            'SSL_passwd_cb' => sub { 1234 },
+        ) or die "Can't create socket on port ${port}: $!";
+    } else {
+        my $my_addr = sockaddr_in($port, INADDR_ANY);
+
+        socket($socket, AF_INET, SOCK_STREAM, getprotobyname( 'tcp' ));
+        bind($socket, $my_addr ) or die( qq(Couldn't bind socket to port $port: $!\n));
+        listen($socket, $QUEUE_LENGTH) or die( "Couldn't listen port ${port}: $!\n" );
+    }
+
+    return $socket;
 }
 
 1;

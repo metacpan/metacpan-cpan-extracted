@@ -29,58 +29,6 @@
 #      optional:                   
 #      flags:
 
-cache-get-expires-at:
-  class:
-    name: Util::Medley::Exec::Cache
-    attr:
-      required:
-      optional:
-  method:
-    name: getExpiresAt
-    args:
-      required:
-        k: key
-        n: namespace
-      flags:
-      
-cache-get-keys:
-  class:
-    name: Util::Medley::Exec::Cache
-    attr:
-      required:
-      optional:
-  method:
-    name: getKeys
-    args:
-      required:
-        n: namespace
-      flags:
-        with-expire-time: withExpireTime
-
-cache-get-namespaces:
-  class:
-    name: Util::Medley::Exec::Cache
-  attr:
-    required:
-    optional:
-  method:
-    name: getNamespaces
-    args:
-      required:
-      flags:
-      
-cache-get-root-dir:
-  class:
-    name: Util::Medley::Exec::Cache
-  attr:
-    required:
-    optional:
-  method:
-    name: getRootDir
-    args:
-      required:
-      flags:
-         
 module-overview:
   class:
     name: Util::Medley::Exec

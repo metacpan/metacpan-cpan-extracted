@@ -1,16 +1,17 @@
 NAME
 
     OTRS::OPM::Maker::Command::sopm - Build .sopm file based on metadata
+    (DEPRECATED)
 
 VERSION
 
-    version 1.44
+    version 1.45
 
 DESCRIPTION
 
     SOPM files are used for OTRS addon creation. They define some metadata
     like the vendor, their URL, packages required or required Perl modules.
-    It is an XML file and it's no fun to create it. It not uncommon that
+    It is an XML file and it's no fun to create it. It is not uncommon that
     the list of files included in the addon is not updated before the addon
     is built and released.
 

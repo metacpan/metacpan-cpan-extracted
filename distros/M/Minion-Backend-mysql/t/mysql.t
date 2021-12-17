@@ -1194,11 +1194,14 @@ subtest 'Job dependencies (lax)' => sub {
 
   is $minion->jobs({ids => [$id5]})->next->{lax}, 1, 'lax';
   ok $minion->job($id5)->retry, 'job is still lax';
+  ok $job5 = $worker->dequeue(0), 'job can be dequeued';
   is $minion->jobs({ids => [$id5]})->next->{lax}, 1, 'lax';
   ok $minion->job($id5)->retry({lax => 0}), 'job is not lax anymore';
   is $minion->jobs({ids => [$id5]})->next->{lax}, 0, 'not lax';
   ok $minion->job($id5)->retry, 'job is still not lax';
   is $minion->jobs({ids => [$id5]})->next->{lax}, 0, 'not lax';
+  ok $job5 = $worker->dequeue(0), 'job can be dequeued (failed parent is removed)';
+  ok $job5->finish, 'job finished';
   ok $minion->job($id5)->remove, 'job removed';
   $worker->unregister;
 };

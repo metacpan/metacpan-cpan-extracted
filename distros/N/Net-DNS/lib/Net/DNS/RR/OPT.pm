@@ -2,7 +2,7 @@ package Net::DNS::RR::OPT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPT.pm 1823 2020-11-16 16:29:45Z willem $)[2];
+our $VERSION = (qw$Id: OPT.pm 1857 2021-12-07 13:38:02Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -380,14 +380,16 @@ sub _decompose {
 	my ( $code, $text ) = unpack 'na*', $_[1];
 	my @payload = (
 		'INFO-CODE'  => $code,
-		'EXTRA-TEXT' => Net::DNS::Text->decode( \$text, 0, length $text )->value
+		'EXTRA-TEXT' => Net::DNS::Text->decode( \$text, 0, length $text )->string
 		);
 }
 
 sub _image {
 	my %hash  = &_decompose;
-	my @image = map join( ' => ', $_, $hash{$_} ), @field15;
+	my @image = map "$_ => $hash{$_}", @field15;
 }
+
+########################################
 
 
 1;
@@ -531,7 +533,7 @@ Package template (c)2009,2012 O.M.Kolkman and R.W.Franks.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

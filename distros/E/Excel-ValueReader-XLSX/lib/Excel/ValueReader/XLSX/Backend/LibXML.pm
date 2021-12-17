@@ -2,11 +2,12 @@ package Excel::ValueReader::XLSX::Backend::LibXML;
 use utf8;
 use 5.10.1;
 use Moose;
+use Scalar::Util qw/looks_like_number/;
 use XML::LibXML::Reader qw/XML_READER_TYPE_END_ELEMENT/;
 
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -188,7 +189,7 @@ sub values {
           # number, date, boolean, formula string or no type : content is already in $val
 
           # if this is a date, replace the numeric value by the formatted date
-          if ($has_date_formatter && $cell_style && defined $val && $val >= 0) {
+          if ($has_date_formatter && $cell_style && looks_like_number($val) && $val >= 0) {
             my $date_style = $self->date_styles->[$cell_style];
             $val = $self->formatted_date($val, $date_style)    if $date_style;
           }

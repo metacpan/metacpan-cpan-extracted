@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Recurse;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Recurse.pm 1811 2020-10-05 08:24:23Z willem $)[2];
+our $VERSION = (qw$Id: Recurse.pm 1856 2021-12-02 14:36:25Z willem $)[2];
 
 
 =head1 NAME
@@ -79,7 +79,7 @@ and invoke send() indirectly.
 
 sub send {
 	my $self = shift;
-	my @conf = ( recurse => 0, udppacketsize => 1024 );	   # RFC8109
+	my @conf = ( recurse => 0, udppacketsize => 1024 );	# RFC8109
 	return bless( {persistent => {'.' => $root}, %$self, @conf}, ref($self) )->_send(@_);
 }
 
@@ -118,7 +118,7 @@ sub _recurse {
 	$self->_callback($reply);
 	return unless $reply;
 	my $qname = lc( ( $query->question )[0]->qname );
-	my $zone = $self->_referral($reply) || return $reply;
+	my $zone  = $self->_referral($reply) || return $reply;
 	return $reply if grep { lc( $_->owner ) eq $qname } $reply->answer;
 	return $self->_recurse( $query, $zone );
 }
@@ -139,7 +139,7 @@ sub _referral {
 	foreach my $ns (@ns) {
 		push @ip, map { $_->address } grep { $ns eq lc( $_->owner ) } @addr;
 	}
-	$self->_diag("resolving glue for $owner") unless scalar(@ip);
+	$self->_diag("resolving glue for $owner")   unless scalar(@ip);
 	@ip = $self->nameservers( $ns[0], $ns[-1] ) unless scalar(@ip);
 	$self->_diag("caching nameservers for $owner");
 	$self->{persistent}->{$owner} = \@ip;
@@ -214,7 +214,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

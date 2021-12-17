@@ -1,8 +1,8 @@
 codegen
 stuff
-\btest\/my_.*
 dist\.ini
 weaver\.ini
+\btest\/my_.*
 nytprof*
 tags
 .DS_Store

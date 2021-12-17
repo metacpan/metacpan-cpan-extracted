@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 06-update.t 1814 2020-10-14 21:49:16Z willem $  -*-perl-*-
+# $Id: 06-update.t 1856 2021-12-02 14:36:25Z willem $  -*-perl-*-
 #
 
 use strict;
@@ -60,7 +60,7 @@ my $rdata  = "10.1.2.3";
 
 {
 	Net::DNS::Resolver->searchlist();			# overides config files
-	my $packet = eval { Net::DNS::Update->new(undef); };
+	my $packet	= eval { Net::DNS::Update->new(undef); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "argument undefined\t[$exception]" );
 }

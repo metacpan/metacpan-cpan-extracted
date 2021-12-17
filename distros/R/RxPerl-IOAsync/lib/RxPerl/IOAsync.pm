@@ -15,7 +15,7 @@ use Exporter 'import';
 our @EXPORT_OK = @RxPerl::EXPORT_OK;
 our %EXPORT_TAGS = %RxPerl::EXPORT_TAGS;
 
-our $VERSION = "v6.7.0";
+our $VERSION = "v6.8.0";
 
 our $promise_class = 'Future';
 
@@ -118,12 +118,26 @@ The documentation at L<RxPerl> applies to this module too.
 
 You can start receiving emails for new releases of this, or other, modules, over at L<https://perlmodules.net>.
 
+=head1 COMMUNITY CODE OF CONDUCT
+
+The Community Code of Conduct can be found L<here|RxPerl::IOAsync::CodeOfConduct>.
+
 =head1 LICENSE
 
-Copyright (C) Karelcom OÜ.
+Copyright (C) 2020 Karelcom OÜ.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<https://www.gnu.org/licenses/>.
 
 =head1 AUTHOR
 

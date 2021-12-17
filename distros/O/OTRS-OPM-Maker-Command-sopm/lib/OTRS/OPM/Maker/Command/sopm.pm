@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-# ABSTRACT: Build .sopm file based on metadata
+# ABSTRACT: Build .sopm file based on metadata (DEPRECATED)
 
 use Carp;
 use File::Find::Rule;
@@ -22,7 +22,7 @@ use OTRS::OPM::Maker -command;
 use OTRS::OPM::Maker::Utils::OTRS3;
 use OTRS::OPM::Maker::Utils::OTRS4;
 
-our $VERSION = 1.44;
+our $VERSION = 1.45;
 
 sub abstract {
     return "build sopm file based on metadata";
@@ -692,16 +692,16 @@ __END__
 
 =head1 NAME
 
-OTRS::OPM::Maker::Command::sopm - Build .sopm file based on metadata
+OTRS::OPM::Maker::Command::sopm - Build .sopm file based on metadata (DEPRECATED)
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 DESCRIPTION
 
 SOPM files are used for OTRS addon creation. They define some metadata like the vendor, their URL, packages required or required Perl modules. 
-It is an XML file and it's no fun to create it. It not uncommon that the list of files included in the addon is not updated before the addon is built and released.
+It is an XML file and it's no fun to create it. It is not uncommon that the list of files included in the addon is not updated before the addon is built and released.
 
 That's why this package exists. You can define the metadata and stuff like database changes in a JSON file and the file list is created automatically. And you don't have to write the XML tags repeatedly.
 

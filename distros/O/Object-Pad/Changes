@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.59    2021-12-15
+        [CHANGES]
+         * Support lexical methods, stored in lexical variables
+
+        [BUGFIXES]
+         * Check :strict(params) even without any :param slots or ADJUSTPARAM
+           blocks (RT140314)
+         * Docs updates to improve searchability (RT140141)
+         * Don't fiddle with PL_curcop on non-DEBUGGING builds to avoid
+           disturbing caller() output (RT139408)
+
 0.58    2021-11-25
         [CHANGES]
          * Trim whitespace within :attribute values (RT140109)

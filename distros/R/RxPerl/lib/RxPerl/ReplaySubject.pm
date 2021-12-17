@@ -8,7 +8,7 @@ use base 'RxPerl::Subject';
 use Scalar::Util 'weaken';
 use Time::HiRes 'time';
 
-our $VERSION = "v6.9.0";
+our $VERSION = "v6.10.1";
 
 sub _on_subscribe {
     my ($self, $subscriber) = @_;

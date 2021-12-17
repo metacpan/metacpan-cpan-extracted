@@ -28,6 +28,7 @@ my $app = {
             },
          ],
          execute => sub ($blob, $conf, $args) {
+            LocalTester::command_execute(MAIN => @_);
             if ($conf->{help}) {
                $blob->{helpers}{'print-help'}->($blob, 'MAIN');
                return 0;

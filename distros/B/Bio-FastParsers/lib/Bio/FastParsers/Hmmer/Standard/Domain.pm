@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Standard::Domain;
 # ABSTRACT: Internal class for standard HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Standard::Domain::VERSION = '0.201110';
+$Bio::FastParsers::Hmmer::Standard::Domain::VERSION = '0.213510';
 use Moose;
 use namespace::autoclean;
 
@@ -131,7 +131,7 @@ Bio::FastParsers::Hmmer::Standard::Domain - Internal class for standard HMMER pa
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 SYNOPSIS
 

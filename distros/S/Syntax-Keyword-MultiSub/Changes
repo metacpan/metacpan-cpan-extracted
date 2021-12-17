@@ -1,4 +1,12 @@
 Revision history for Syntax-Keyword-MultiSub
 
+0.02    2021-12-16
+        [CHANGES]
+         * Updated to XS::Parse::Sublike 0.15
+            + Use ctx->moddata as storage
+            + Use dynamic actions to simplify name fiddling
+         * Added cross-module integration test t/80async-multi-sub.t from
+           Future-AsyncAwait
+
 0.01    2021-10-28
         First version, released on an unsuspecting world.

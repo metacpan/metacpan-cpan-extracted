@@ -67,8 +67,8 @@ use MARC::Schema;
     ok @check > 0, 'got errors';
     is $check[0]->{error}, 'field is not repeatable',
         'field is not repeatable';
-    is $check[0]->{tag},  '001',   'got field tag';
-    is $check[0]->{type}, 'field', 'got error type';
+    is $check[0]->{tag},   '001',   'got field tag';
+    is $check[0]->{type},  'field', 'got error type';
     is $check[1]->{error}, 'subfield is not repeatable',
         'subfield is not repeatable';
     is $check[1]->{value}, 'a',                'got subfield code';

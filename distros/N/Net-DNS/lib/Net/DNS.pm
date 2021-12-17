@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.32';
+$VERSION = '1.33';
 $VERSION = eval { $VERSION };
-our $SVNVERSION = (qw$Id: DNS.pm 1846 2021-07-16 12:15:07Z willem $)[2];
+our $SVNVERSION = (qw$Id: DNS.pm 1861 2021-12-16 11:21:07Z willem $)[2];
 
 
 =head1 NAME
@@ -619,7 +619,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

@@ -861,12 +861,26 @@ ReactiveX to cater for web developers already familiar with rxjs.
 
 You can start receiving emails for new releases of this module, at [https://perlmodules.net](https://perlmodules.net).
 
+# COMMUNITY CODE OF CONDUCT
+
+The Community Code of Conduct can be found [here](https://metacpan.org/pod/RxPerl%3A%3ACodeOfConduct).
+
 # LICENSE
 
-Copyright (C) Karelcom OÜ.
+Copyright (C) 2020 Karelcom OÜ.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see [https://www.gnu.org/licenses/](https://www.gnu.org/licenses/).
 
 # AUTHOR
 

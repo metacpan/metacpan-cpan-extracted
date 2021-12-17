@@ -51,13 +51,27 @@ KEYWORDS
     none of the previous alternatives match, as long as it has at least the
     minimum number of required parameters present.
 
+WITH OTHER MODULES
+
+ Future::AsyncAwait
+
+    As of Future::AsyncAwait version 0.55 a cross-module integration test
+    asserts that the multi modifier can be applied to async sub.
+
+       use Future::AsyncAwait;
+       use Syntax::Keyword::MultiSub;
+    
+       async multi sub f () { return "nothing"; }
+       async multi sub f ($key) { return await get_thing($key); }
+
 TODO
 
       * Much better error checking and diagnostics for function bodies that
       don't use signatures.
 
-      * Cross-module testing with Future::AsyncAwait (for async multi sub)
-      and Object::Pad (for multi method).
+      * Cross-module testing with Object::Pad (for multi method). This may
+      require a better combined implementation, to be aware of method
+      resolution order, inheritence, etc...
 
       * An eventual consideration of type assertions or value testing, as
       well as simple argument count.

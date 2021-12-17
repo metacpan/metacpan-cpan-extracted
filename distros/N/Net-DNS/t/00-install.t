@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 00-install.t 1815 2020-10-14 21:55:18Z willem $ -*-perl-*-
+# $Id: 00-install.t 1858 2021-12-08 10:32:12Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -25,6 +25,7 @@ plan skip_all => 'Not sure how to parse versions.' unless eval { MM->can('parse_
 
 plan tests => scalar keys %manifest;
 
+my @diag;
 
 foreach ( sort keys %manifest ) {				# reconcile files with MANIFEST
 	next unless ok( -f $_, "file exists\t$_" );
@@ -32,10 +33,10 @@ foreach ( sort keys %manifest ) {				# reconcile files with MANIFEST
 	next unless /^lib/;
 
 	my $module = File::Spec->catfile( 'blib', $_ );		# library component
-	diag("Missing module: $module") unless -f $module;
+	push @diag, "Missing module: $module" unless -f $module;
 
 	my $version = MM->parse_version($_);			# module version
-	diag("\$VERSION = $version\t$_") unless $version =~ /^\d/;
+	push @diag, "\$VERSION = $version\t$_" unless $version =~ /^\d/;
 }
 
 
@@ -43,9 +44,11 @@ my @files;							# flag MANIFEST omissions
 find( sub { push( @files, $File::Find::name ) if /\.pm$/ }, 'lib' );
 foreach ( sort @files ) {
 	next if /Template.pm$/;
-	diag("Filename not in MANIFEST: $_") unless $manifest{$_};
+	push @diag, "Filename not in MANIFEST: $_" unless $manifest{$_};
 }
 
+
+diag join "\n\t", '', @diag if @diag;
 
 exit;
 

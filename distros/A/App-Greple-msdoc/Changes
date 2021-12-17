@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Greple-msdoc
 
+1.05 2021-12-16T05:43:23Z
+
+    - Take care of *.docm and others.
+    - Add t/data_shishin.docx
+    - Use the latest interface of App::optex::textconv::msdoc
+    - Add test code.
+
 1.04 2020-09-23T14:58:44Z
 
     - Update to use App::optex::textconv::msdoc module.

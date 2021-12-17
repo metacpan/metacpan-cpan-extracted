@@ -25,3 +25,5 @@ sub _call_with_stdin($$)
     close STDIN;
     open STDIN, '<&', $orgin  or  die "can't restore STDIN\n";
 }
+
+1;

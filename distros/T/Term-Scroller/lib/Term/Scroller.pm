@@ -6,7 +6,7 @@ use warnings;
 
 use feature 'unicode_strings';
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 =head1 NAME
 
@@ -205,6 +205,8 @@ sub new {
     my $firstline = 1;
 
     while (my $line = linefeed($pty)) {
+
+        print $passthru $line if openhandle($passthru);
 
         if ($firstline) {
             print "$window_top\n" if defined $window_top;

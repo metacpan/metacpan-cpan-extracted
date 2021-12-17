@@ -12,7 +12,7 @@
 
 #########################################################################
 
-use v5.12.1;
+use v5.14.0;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -55,9 +55,11 @@ _run_in_fork
 					    width => 9999});
 	 _ok($main, 'UI::Various::Main->new({...}) returned singleton');
 	 _ok(10 < $main->height()  &&  $main->height() < 8999,
-	     'maximum application height reduced into [11, 9000]');
+	     'maximum application height reduced into [11, 9000]: ' .
+	     $main->height());
 	 _ok(10 < $main->width()  &&  $main->width() < 8999,
-	     'maximum application width reduced into [11, 9000]');
+	     'maximum application width reduced into [11, 9000]: ' .
+	     $main->width());
      });
 _run_in_fork
     ('max_app initialisation with normal values',
@@ -66,8 +68,10 @@ _run_in_fork
 	 my $main = UI::Various::Main->new({height => 15,
 					    width => 40});
 	 _ok($main, 'UI::Various::Main->new({...}) returned singleton');
-	 _ok(15 == $main->height(), 'maximum application height set to 15');
-	 _ok(40 == $main->width(), 'maximum application width set to 40');
+	 _ok(15 == $main->height(),
+	     'maximum application height set to 15: ' . $main->height());
+	 _ok(40 == $main->width(),
+	     'maximum application width set to 40: ' . $main->width());
      });
 _run_in_fork
     ('default initialisation without stty',
@@ -99,9 +103,11 @@ ok($main, 'UI::Various::Main->new returned singleton');
 ok(10 < $main->max_height(), 'maximum screen height > 10');
 ok(10 < $main->max_width(), 'maximum screen width > 10');
 is($main->height(), $main->max_height(),
-   'maximum application height equals maximum screen height');
+   'maximum application height equals maximum screen height: ' .
+   $main->height());
 is($main->width(), $main->max_width(),
-   'maximum application width equals maximum screen width');
+   'maximum application width equals maximum screen width: ' .
+   $main->width());
 $_ = UI::Various::Main->new();
 is($_, $main, '2nd initialisation returned singleton');
 $_ = UI::Various::Main::height(Dummy->new());

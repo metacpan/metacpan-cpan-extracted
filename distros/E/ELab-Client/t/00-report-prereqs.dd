@@ -1,0 +1,42 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Module::Load' => '0',
+                                      'Test::More' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'HTTP::Request::Common' => '0',
+                                      'JSON' => '0',
+                                      'Moose' => '0',
+                                      'MooseX::NonMoose' => '0',
+                                      'MooseX::Params::Validate' => '0',
+                                      'REST::Client' => '0',
+                                      'perl' => '5.020',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Find' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Spec::Functions' => '0',
+                                   'Module::Load' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.020'
+                                 }
+                 }
+     };
+  $x;
+ }

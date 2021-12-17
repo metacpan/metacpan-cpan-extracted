@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1818 2020-10-18 15:24:42Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1855 2021-11-26 11:33:48Z willem $)[2];
 
 
 #
@@ -95,10 +95,11 @@ use constant PACKETSZ => 512;
 }
 
 
-my $warned;
+my %warned;
 
 sub _deprecate {
-	carp join ' ', 'deprecated method;', pop(@_) unless $warned++;
+	my $msg = pop(@_);
+	carp join ' ', 'deprecated method;', $msg unless $warned{$msg}++;
 	return;
 }
 
@@ -361,6 +362,7 @@ sub answerfrom { return &replyfrom; }				# uncoverable pod
 
 sub _reset_errorstring {
 	shift->{errorstring} = '';
+	$! = $@ = undef;
 	return;
 }
 
@@ -444,8 +446,6 @@ sub _send_tcp {
 
 		$socket->send($tcp_packet);
 		$self->errorstring($!);
-
-		next unless $select->can_read($timeout);	# uncoverable branch true
 
 		my $buffer = _read_tcp($socket);
 		$self->{replyfrom} = $ip;
@@ -698,7 +698,7 @@ sub _accept_reply {
 
 	return if $query && $header->id != $query->header->id;
 
-	return $self->errorstring( $header->rcode );			# historical quirk
+	return $self->errorstring( $header->rcode );		# historical quirk
 }
 
 
@@ -824,17 +824,16 @@ sub _axfr_next {
 sub _read_tcp {
 	my $socket = shift;
 
-	my ( $buffer, $s1, $s2 );
-	$socket->recv( $s1, 2 );				# one lump
-	$socket->recv( $s2, 2 - length $s1 );			# or two?
+	my ( $s1, $s2 );
+	$socket->recv( $s1, 1 );				# two octet length
+	$socket->recv( $s2, 2 - length $s1 );			# possibly fragmented
 	my $size = unpack 'n', pack( 'a*a*@2', $s1, $s2 );
 
-	$socket->recv( $buffer, $size );			# initial read
-
-	while ( length($buffer) < $size ) {
+	my $buffer = '';
+	for (;;) {
 		my $fragment;
 		$socket->recv( $fragment, $size - length($buffer) );
-		$buffer .= $fragment || last;
+		last unless length( $buffer .= $fragment || last ) < $size;
 	}
 	return $buffer;
 }
@@ -936,7 +935,7 @@ sub _create_udp_socket {
 	sub _create_dst_sockaddr {	## create UDP destination sockaddr structure
 		my ( $self, $ip, $port ) = @_;
 
-		unless (USE_SOCKET_IP) {				# NB: errors raised in socket->send
+		unless (USE_SOCKET_IP) {			# NB: errors raised in socket->send
 			return _ipv6($ip) ? undef : sockaddr_in( $port, inet_aton($ip) );
 		}
 
@@ -974,10 +973,6 @@ sub _make_query_packet {
 	if ( ref($packet) ) {
 		my $edns = $packet->edns;			# advertise UDPsize for local stack
 		$edns->size( $self->{udppacketsize} ) unless defined $edns->{size};
-
-		my $header = $packet->header;
-		$header->rd( $self->{recurse} ) if $header->opcode eq 'QUERY';
-
 	} else {
 		$packet = Net::DNS::Packet->new(@_);
 		$packet->edns->size( $self->{udppacketsize} );
@@ -1081,9 +1076,8 @@ sub make_query_packet {			## historical
 
 
 sub _diag {				## debug output
-	my $self = shift;
-	return unless $self->{debug};
-	return print "\n;; @_\n"
+	return unless shift->{debug};
+	return print "\n;; @_\n";
 }
 
 
@@ -1187,7 +1181,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

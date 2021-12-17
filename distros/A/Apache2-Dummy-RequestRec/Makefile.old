@@ -18,9 +18,9 @@
 #     LICENSE => q[perl_5]
 #     NAME => q[Apache2::Dummy::Request]
 #     PM => { RequestRec.pm=>q[$(INST_LIBDIR)/RequestRec.pm] }
-#     PREREQ_PM => { Moops=>q[0.034] }
+#     PREREQ_PM => { APR::Pool=>q[0.009], APR::Table=>q[0.009], Apache2::Const=>q[0.009], CGI=>q[4.38], Data::Compare=>q[1.27], Data::Printer=>q[0.40], DateTime=>q[1.51], Moops=>q[0.034], Test::More=>q[1.302181], Test::Output=>q[1.031] }
 #     TEST_REQUIRES => {  }
-#     VERSION => q[0.5]
+#     VERSION => q[0.03]
 #     test => { TESTS=>q[t/*.t] }
 
 # --- MakeMaker post_initialize section:
@@ -60,11 +60,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Apache2::Dummy::Request
 NAME_SYM = Apache2_Dummy_Request
-VERSION = 0.5
+VERSION = 0.03
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_5
+VERSION_SYM = 0_03
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.5
+XS_VERSION = 0.03
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -259,7 +259,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Apache2-Dummy-Request
-DISTVNAME = Apache2-Dummy-Request-0.5
+DISTVNAME = Apache2-Dummy-Request-0.03
 
 
 # --- MakeMaker macro section:
@@ -504,8 +504,17 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
+	$(NOECHO) $(ECHO) '  APR::Pool: '\''0.009'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  APR::Table: '\''0.009'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Apache2::Const: '\''0.009'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  CGI: '\''4.38'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Data::Compare: '\''1.27'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Data::Printer: '\''0.40'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  DateTime: '\''1.51'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Moops: '\''0.034'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.5'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Test::More: '\''1.302181'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Test::Output: '\''1.031'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.03'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -543,12 +552,21 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Moops" : "0.034"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "APR::Pool" : "0.009",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "APR::Table" : "0.009",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Apache2::Const" : "0.009",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "CGI" : "4.38",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Data::Compare" : "1.27",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Data::Printer" : "0.40",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "DateTime" : "1.51",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Moops" : "0.034",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Test::More" : "1.302181",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Test::Output" : "1.031"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.5",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.03",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 2.27400_02"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -858,11 +876,20 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Apache2-Dummy-Request" VERSION="0.5">' > Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Apache2-Dummy-Request" VERSION="0.03">' > Apache2-Dummy-Request.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>dummy request rec for testing of apache mod_perl handlers</ABSTRACT>' >> Apache2-Dummy-Request.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>jeff &lt;jeff@lipsia.de&gt;</AUTHOR>' >> Apache2-Dummy-Request.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="APR::Pool" VERSION="0.009" />' >> Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="APR::Table" VERSION="0.009" />' >> Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Apache2::Const" VERSION="0.009" />' >> Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="CGI::" VERSION="4.38" />' >> Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Data::Compare" VERSION="1.27" />' >> Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Data::Printer" VERSION="0.40" />' >> Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="DateTime::" VERSION="1.51" />' >> Apache2-Dummy-Request.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Moops::" VERSION="0.034" />' >> Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::More" VERSION="1.302181" />' >> Apache2-Dummy-Request.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::Output" VERSION="1.031" />' >> Apache2-Dummy-Request.ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-thread-multi-5.26" />' >> Apache2-Dummy-Request.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> Apache2-Dummy-Request.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> Apache2-Dummy-Request.ppd

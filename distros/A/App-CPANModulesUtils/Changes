@@ -1,3 +1,11 @@
+0.007   2021-11-17  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli gen-acmecpanmodules-module-from-webpage] Allow adding
+	  description to list.
+
+	- Generate module that pass standard perlcritic tests.
+
+
 0.006   2021-05-19  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -1,5 +1,13 @@
 Revision history for JSON-Schema-Modern-Document-OpenAPI
 
+0.012     2021-12-17 06:39:38Z
+          - properly handle a missing Content-Length header alongside a
+            non-zero-length body payload
+
+0.011     2021-12-16 06:17:57Z
+          - spurious validation errors fixed when request body is empty,
+            yet not required
+
 0.010     2021-12-11 23:11:43Z
           - OpenAPI metaschemas are now also available via URIs ending in
             .../latest

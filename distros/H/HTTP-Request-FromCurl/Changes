@@ -1,3 +1,11 @@
+0.36 2021-12-16
+    * curl: Make Host: header generation not append the port number if the
+      port number is the default port number for the protocol
+    * Treat headers with mixed case names alike. For example specifying an
+      "accept" header will override the Accept default headers. Previously
+      only a header specified in the matching string case would override
+      the default header.
+
 0.35 2021-10-25
     * Wget 1.14 does not send an Accept-Encoding header; adjust the test suite
       more for that

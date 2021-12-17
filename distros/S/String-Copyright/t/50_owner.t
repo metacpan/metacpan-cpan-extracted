@@ -1,6 +1,6 @@
 use Test2::V0;
 
-plan 46;
+plan 51;
 
 use String::Copyright {
 	format => sub { join ':', $_->[0] || '', $_->[1] || '' }
@@ -19,6 +19,12 @@ is copyright("© Foo"), ':Foo', 'year-less owner';
 is copyright("© , Foo"), ':Foo', 'messy owner starting with comma';
 is copyright("Copyright,, Foo"),  '', 'messy owner starting with dual comma';
 is copyright("Copyright, , Foo"), '', 'messy owner starting with dual comma';
+
+is copyright("© - Foo"),      ':Foo',     'owner after dash';
+is copyright("© -- Foo"),     ':Foo',     'owner after double dash';
+is copyright("© 1999 - Foo"), '1999:Foo', 'owner after year and dash';
+is copyright("© 1999 -- Foo"), '1999:Foo',
+	'owner after year and double-dash';
 
 is copyright("© -Foo"),  '', 'bogus owner starting with dash';
 is copyright("© --Foo"), '', 'bogus owner starting with double dash';
@@ -68,6 +74,9 @@ is copyright('© `Foo'),   '',     'bogus owner starting with backtick';
 is copyright('© }Foo'),   '',     'bogus owner starting with end brace';
 is copyright('© |Foo'),   '',     'bogus owner starting with pipe';
 is copyright('© ~Foo'),   '',     'bogus owner starting with tilde';
+
+is copyright("Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER"), '',
+	'bogus owner starting with YEAR';
 
 is copyright('© Foo, all rights reserved.'), ':Foo', 'boilerplate';
 

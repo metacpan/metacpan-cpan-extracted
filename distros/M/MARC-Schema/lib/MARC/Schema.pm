@@ -3,7 +3,7 @@ package MARC::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Cpanel::JSON::XS;
 use File::Share ':all';
@@ -165,7 +165,7 @@ MARC::Schema - Specification of the MARC21 format
 
 =begin markdown
 
-[![Build Status](https://travis-ci.org/jorol/MARC-Schema.png)](https://travis-ci.org/jorol/MARC-Schema)
+[![Linux build status](https://github.com/jorol/MARC-Schema/actions/workflows/linux.yml/badge.svg)](https://github.com/jorol/MARC-Schema/actions/workflows/linux.yml)
 [![Coverage Status](https://coveralls.io/repos/jorol/MARC-Schema/badge.png?branch=master)](https://coveralls.io/r/jorol/MARC-Schema?branch=master)
 [![Kwalitee Score](http://cpants.cpanauthors.org/dist/MARC-Schema.png)](http://cpants.cpanauthors.org/dist/MARC-Schema)
 [![CPAN version](https://badge.fury.io/pl/MARC-Schema.png)](http://badge.fury.io/pl/MARC-Schema)
@@ -284,6 +284,6 @@ L<MARC::Lint>
 
 =head1 ACKNOWLEDGEMENT
 
-MARC::Schema uses the MARC21 schema developed by L<Péter Király|https://github.com/pkiraly> as default. For more information see L<"Metadata assessment for MARC records"|https://github.com/pkiraly/metadata-qa-marc> and L<"MARC21 structure in JSON"|https://pkiraly.github.io/2018/01/28/marc21-in-json/>.
+MARC::Schema uses the MARC21 schema developed by L<P�ter Kir�ly|https://github.com/pkiraly> as default. For more information see L<"Metadata assessment for MARC records"|https://github.com/pkiraly/metadata-qa-marc> and L<"MARC21 structure in JSON"|https://pkiraly.github.io/2018/01/28/marc21-in-json/>.
 
 =cut

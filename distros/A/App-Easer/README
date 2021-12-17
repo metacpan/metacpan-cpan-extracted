@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes App::Easer version 0.006.
+    This document describes App::Easer version 0.008.
 
 SYNOPSIS
 
@@ -21,7 +21,7 @@ SYNOPSIS
                 options => [
                    {
                       name => 'foo',
-                      description => 'option foo!',
+                      help => 'option foo!',
                       getopt => 'foo|f=s',
                       environment => 'FOO',
                       default => 'bar',
@@ -42,21 +42,21 @@ SYNOPSIS
 
        $ ./example.pl
        Hello, bar!
-       
+    
        $ ./example.pl --foo World
        Hello, World!
-       
+    
        $ ./example.pl commands
        $ perl lib/App/Easer.pm commands
                   help: print a help message
               commands: list sub-commands
-       
+    
        $ ./example.pl help
        this is the main app
-       
+    
        Description:
            Yes, this really is the main app
-       
+    
        Options:
                    foo: 
                         command-line: mandatory string option
@@ -64,30 +64,30 @@ SYNOPSIS
                                       -f <value>
                         environment : FOO
                         default     : bar
-       
+    
        Sub commands:
                   help: print a help message
               commands: list sub-commands
-       
+    
        $ ./example.pl help help
        print a help message
-       
+    
        Description:
            print help for (sub)command
-       
+    
        This command has no options.
-       
+    
        $ ./example.pl help commands
        list sub-commands
-       
+    
        Description:
            Print list of supported sub-commands
-       
+    
        This command has no options.
-       
+    
        $ ./example.pl inexistent
        cannot find sub-command 'inexistent'
-       
+    
        $ ./example.pl help inexistent
        cannot find sub-command 'inexistent'
 
@@ -127,13 +127,15 @@ DESCRIPTION
           create: «executable»
           prefixes: «hash or array of hashes»
        configuration:
-          collect:  «executable»
-          merge:    «executable»
-          validate: «executable»
-          sources:  «array»
-          'auto-children':  «false or array»
-          'help-on-stderr': «boolean»
-          'auto-leaves':    «boolean»
+          collect:   «executable»
+          merge:     «executable»
+          specfetch: «executable»
+          validate:  «executable»
+          sources:   «array»
+          'auto-children':    «false or array»
+          'help-on-stderr':   «boolean»
+          'auto-leaves':      «boolean»
+          'auto-environment': «boolean»
        commands:
           cmd-1:
              «command definition»
@@ -151,9 +153,12 @@ DESCRIPTION
     When an application is run, the following high level algorithm is
     followed, assuming the initial command is defined as MAIN:
 
-      * the specification of the command is taken and option values for
-      that command are gathered, consuming part of the command-line
-      arguments;
+      * the specification of the command is fetched, either from a
+      configuration hash or by some other method, according to the
+      specfetch hook;
+
+      * option values for that command are gathered, consuming part of the
+      command-line arguments;
 
       * the configuration is optionally validated;
 
@@ -218,13 +223,21 @@ DESCRIPTION
  Configuration Parsing Customization
 
        configuration:
-          collect:  «executable»
-          merge:    «executable»
-          validate: «executable»
-          sources:  «array»
-          'auto-children': «false or array»
-          'help-on-stderr': «boolean»
-          'auto-leaves':    «boolean»
+          name:      «string»
+          collect:   «executable»
+          merge:     «executable»
+          namenv:    «executable»
+          specfetch: «executable»
+          validate:  «executable»
+          sources:   «array»
+          'auto-children':    «false or array»
+          'help-on-stderr':   «boolean»
+          'auto-leaves':      «boolean»
+          'auto-environment': «boolean»
+
+    The name configuration allows setting a name for the application, which
+    can e.g. be used to generate automatic names for environment variables
+    to be associated to command options.
 
     One of the central services provided by App::Easer is the automatic
     gathering of options values from several sources (command line,
@@ -236,12 +249,44 @@ DESCRIPTION
     The configuration is collected by a function provided by App::Easer
     that can be optionally overridden by setting a different executable for
     collect under configuration. This of course requires re-implementing
-    the options value gathering from scratch.
+    the options value gathering from scratch. Calling convention:
+
+       sub ($app, $spec, $args)
+       # $app:  hash ref with the details on the whole applications
+       # $spec: hash ref with the specification of the command
+       # $args: array ref with residual (command line) arguments
+
+    This function is expected to return a list with two items, the first a
+    hash reference with the collected configuration options, the second an
+    array reference with the residual arguments. The function is called
+    according to the following calling convention:
+
+       sub ($app, $cspec, $ospec)
+       # $app:   hash ref with the details on the whole applications
+       # $cspec: hash ref with the specification of the command
+       # $ospec: hash ref with the specification of the option
 
     The merge executable allows setting a function that merges several
     hashes together. The default implementation operates at the higher
     level of the hashes only, giving priority to the first hashes provided
-    (in order).
+    (in order). Calling convention:
+
+       sub (@list_of_hashes_to_merge) # returns a hash reference
+
+    The namenv executable allows setting a function that generates the name
+    of environment variables based on options specifications. By default a
+    stock_NamEnv function is used (aliased to +NamEnv) is used, generating
+    the name of the environment variable by uppercasing the string
+    generated by the application's name and the option name, joined by an
+    underscore character.
+
+    The specfetch executable allows setting a function to perform
+    resolution of a command identifier (as e.g. stored in the children) or
+    an upper command) into a specification. By default the internal
+    function corresponding to the executable specification string
+    +SpecFromHash is used, insisting that the whole application is entirely
+    pre-assembled in the specification hash/object; it's also possible to
+    use +SpecFromHashOrModule for allowing searching through modules too.
 
     The validate executable allows setting a validator. By default the
     validation is performed using Params::Validate (if available, it is
@@ -249,10 +294,32 @@ DESCRIPTION
 
     It is possible to set several sources for gathering options values,
     setting them using the sources array. By default it is set to the
-    ordered list with +CmdLine, +Environment, +Parent, and +Default,
+    ordered list with +Default, +CmdLine, +Environment, and +Parent, ,
     meaning that options from the command line will have the highest
     precedence, then the environment, then whatever comes from the parent
-    command configuration, then default values if present.
+    command configuration, then default values if present. This can be set
+    explicitly with +DefaultSources.
+
+    As an alternative, sources can be set to +SourcesWithFiles, which adds
+    +JsonFileFromConfig and +JsonFiles to the ones above. The former looks
+    for a configuration named config (or whatever is set as config-option
+    in the overall configuration hash) to load a JSON file with additional
+    configurations; the latter looks for a list of JSON files to try in
+    config-files inside the configuration hash.
+
+      Although the +Default source is put first, it actually acts as the
+      one with the least precedence by how it is coded and how the merging
+      algorithm is implemented. From a practical point of view it's like it
+      were put last, but is put first instead so that its defaults can be
+      applied as options are gathered along the way.
+
+      One case where this comes handy is in managing a --config option to
+      pass a configuration file name to load some external file for
+      additional configurations (e.g. sources option +SourcesWithFiles). In
+      it, default configuration must still appear with the least
+      precedence, but still it can be handy to set a default file to load
+      upon starting, which means that it's handy to have this default at
+      hand before the configuration files are supposed to be loaded.
 
     As anticipated, the help and commands sub-commands are automatically
     generated and associated to each command by default (more or less). If
@@ -272,7 +339,14 @@ DESCRIPTION
 
     Option auto-leaves allows setting any command that has no explicit
     sub-command as a leaf, which prevents it from getting a help and a
-    commands sub-command (or whatever has been put to override them).
+    commands sub-command (or whatever has been put to override them). As of
+    version 0.007002 this is set to a true value by default, but can still
+    be set to a false value if the automatic sub-commands above are deemed
+    necessary for commands that have no explicit children in the hierarchy.
+
+    Option auto-environment turns on automatic addition of environment
+    variables to options, by setting the associated setting to 1. This can
+    also be set locally in a command.
 
  Commands Specifications
 
@@ -287,22 +361,31 @@ DESCRIPTION
        help: foo the bar
        description: foo allows us to foo the bar
        supports: ['foo', 'Foo']
+    
        options:
          - name: whip
            getopt: 'whip|w=s'
            environment: FOO_WHIP
            default: gargle
-       execute: «executable»
-       children: ['foo.bar', 'baz']
-       leaf: 0
+           help: 'beware of the whip'
+       auto-environment: 0
        allow-residual-options: 0
-       collect:  «executable»
-       merge: «merge»
-       validate: ... «executable» or data structure...
        sources: ['+CmdLine', '+Environment', '+Parent', '+Default']
+    
+       collect:  «executable»
+       merge:    «executable»
+       validate: ... «executable» or data structure...
+       commit:   «executable»
+       execute:  «executable»
+    
+       children: ['foo.bar', 'baz']
        default-child: 'foo.bar'
+       dispatch: «executable»
+       fallback: «executable»
+       fallback-to: 'baz'
+       fallback-to-default: 1
+       leaf: 0
        no-auto: 1
-       commit: «executable»
 
     The following keys are supported:
 
@@ -329,27 +412,6 @@ DESCRIPTION
       generation; other sub-options are self-explanatory (getopt,
       environment, and default).
 
-    execute
-
-      This is the callback that is called when the command is selected for
-      execution.
-
-    children
-
-      This is a list of children, i.e. allowed sub-commands, specified by
-      their identifier in the commands hash. This list is normally enriched
-      with sub-commands help and commands automatically, unless the
-      automatic children have been changed or disabled. It is possible to
-      mark a command as a leaf (missing also sub-commands help/commands) by
-      setting this parameter to a false value, otherwise it must be an
-      array;
-
-    leaf
-
-      This is an alternative, hopefully more readable, way to set the
-      command as a leaf and avoid considering any sub-command, including
-      the auto-generated ones.
-
     allow-residual-options
 
       This boolean indicates whether additional options in the command are
@@ -362,6 +424,19 @@ DESCRIPTION
       Reasons to disable this (by setting this option to true) might be if
       a leaf command will then use the rest of the argument list to e.g.
       call an external program.
+
+    sources
+
+      This is the list of sources to gather values for options. It defaults
+      to whatever has been set in the top-level configuration of the
+      application, or +CmdLine +Environment +Parent +Default by default.
+
+      It might be helpful to override this setting in the MAIN entry point
+      command, e.g. to add the loading of a configuration file once and for
+      all.
+
+      Items are executables, i.e. sub references or names that will be
+      resolved into sub references through the factory.
 
     collect
 
@@ -383,18 +458,37 @@ DESCRIPTION
       the search mechanism investigates further down looking for the target
       command.
 
-    sources
+      Calling convention:
 
-      This is the list of sources to gather values for options. It defaults
-      to whatever has been set in the top-level configuration of the
-      application, or +CmdLine +Environment +Parent +Default by default.
+         sub ($app, $spec, $args)
+         # $app:  hash ref with the details on the whole applications
+         # $spec: hash ref with the specification of the command
+         # $args: array ref with residual (command line) arguments
 
-      It might be helpful to override this setting in the MAIN entry point
-      command, e.g. to add the loading of a configuration file once and for
-      all.
+      The configuration that has been assembled up to the specific command
+      can be retrieved at $app->{configs}[-1].
 
-      Items are executables, i.e. sub references or names that will be
-      resolved into sub references through the factory.
+    execute
+
+      This is the callback that is called when the command is selected for
+      execution.
+
+      Calling convention:
+
+         sub ($app, $opts, $args)
+         # $app:  hash ref with the details on the whole applications
+         # $opts: hash ref with options for the command
+         # $args: array ref with residual (command line) arguments
+
+    children
+
+      This is a list of children, i.e. allowed sub-commands, specified by
+      their identifier in the commands hash. This list is normally enriched
+      with sub-commands help and commands automatically, unless the
+      automatic children have been changed or disabled. It is possible to
+      mark a command as a leaf (missing also sub-commands help/commands) by
+      setting this parameter to a false value, otherwise it must be an
+      array;
 
     default-child
 
@@ -405,6 +499,86 @@ DESCRIPTION
 
       This must be the key associated to a child in the commands mapping,
       i.e. the same name that is put in the children array.
+
+    dispatch
+
+      For commands with children, this completely overrides the child
+      search mechanism by calling a custom executable, which is expected to
+      return the name of a sub-command or the empty list is case the
+      specific command's execute should be called instead.
+
+      Calling convention:
+
+         sub ($app, $spec, $args)
+         # $app:  hash ref with the details on the whole applications
+         # $spec: hash ref with the specification of the command
+         # $args: array ref with residual (command line) arguments
+
+      The configuration that has been assembled up to the specific command
+      can be retrieved at $app->{configs}[-1].
+
+      The return value must be either an empty list/undef or the name of a
+      children (actually it can be any command).
+
+    fallback
+
+    fallback-to
+
+    fallback-to-default
+
+      For commands with children, these options allows figuring out a
+      fallback command to execute if no child can be found. This allows
+      building Do What I Mean interfaces where e.g. a sub-command should be
+      selected by default.
+
+      As an example, suppose the application has a search and a stats
+      sub-commands, where the search is expected to be invoked the vast
+      majority of times:
+
+         myapp search this
+         myapp search that is foo
+         myapp stats
+
+      It's tempting at this point to get rid of the search word to speed
+      things up, while still preserving the sub-commands resolution
+      mechanism:
+
+         myapp this
+         myapp that is foo
+         myapp stats
+
+      In the first two cases, App::Easer would normally look for
+      sub-commands this and that respectively, failing. With a fallback,
+      though, it's possible to select another command and implement the
+      DWIM interface.
+
+      fallback is an executable that is expected to return the name of a
+      child (or actually any command) or the empty list/undef, in which
+      case the current command's execute will be used instead. This is the
+      most flexible way of doing the fallback.
+
+      Calling convention:
+
+         sub ($app, $spec, $args)
+         # $app:  hash ref with the details on the whole applications
+         # $spec: hash ref with the specification of the command
+         # $args: array ref with residual (command line) arguments
+
+      The configuration that has been assembled up to the specific command
+      can be retrieved at $app->{configs}[-1].
+
+      fallback-to sets the name of a children (or actually any command) as
+      a static string. It can also be set to undef, which means that the
+      current command's execute should be used instead.
+
+      fallback-to-default selects whatever default is set for the command;
+      it is a boolean-ish option.
+
+    leaf
+
+      This is an alternative, hopefully more readable, way to set the
+      command as a leaf and avoid considering any sub-command, including
+      the auto-generated ones.
 
     no-auto
 

@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2021-05-26)
+##	(last updated 2021-11-22)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1841 2021-06-23 20:34:28Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1855 2021-11-26 11:33:48Z willem $)[2];
 
 use integer;
 use Carp;
@@ -72,9 +72,9 @@ my @typebyname = (
 	ISDN	   => 20,					# RFC1183
 	RT	   => 21,					# RFC1183
 	NSAP	   => 22,					# RFC1706
-	'NSAP-PTR' => 23,					# RFC1348 RFC1637 RFC1706
-	SIG	   => 24,					# RFC2535 RFC2536 RFC2537 RFC2931 RFC3008 RFC3110 RFC3755 RFC4034
-	KEY	   => 25,					# RFC2535 RFC2536 RFC2537 RFC2539 RFC3008 RFC3110 RFC3755 RFC4034
+	'NSAP-PTR' => 23,					# RFC1706
+	SIG	   => 24,					# RFC2536 RFC2931 RFC3110 RFC4034
+	KEY	   => 25,					# RFC2536 RFC2539 RFC3110 RFC4034
 	PX	   => 26,					# RFC2163
 	GPOS	   => 27,					# RFC1712
 	AAAA	   => 28,					# RFC3596
@@ -84,22 +84,22 @@ my @typebyname = (
 	NIMLOC	   => 32,					# http://ana-3.lcs.mit.edu/~jnc/nimrod/dns.txt
 	SRV	   => 33,					# RFC2782
 	ATMA	   => 34,					# http://www.broadband-forum.org/ftp/pub/approved-specs/af-dans-0152.000.pdf
-	NAPTR	   => 35,					# RFC2168 RFC2915 RFC3403
+	NAPTR	   => 35,					# RFC3403
 	KX	   => 36,					# RFC2230
 	CERT	   => 37,					# RFC4398
 	A6	   => 38,					# RFC2874 RFC3226 RFC6563
 	DNAME	   => 39,					# RFC6672
-	SINK	   => 40,					# http://tools.ietf.org/html/draft-eastlake-kitchen-sink
+	SINK	   => 40,					# draft-eastlake-kitchen-sink
 	OPT	   => 41,					# RFC3225 RFC6891
 	APL	   => 42,					# RFC3123
-	DS	   => 43,					# RFC3658 RFC4034
+	DS	   => 43,					# RFC4034
 	SSHFP	   => 44,					# RFC4255
 	IPSECKEY   => 45,					# RFC4025
-	RRSIG	   => 46,					# RFC3755 RFC4034
-	NSEC	   => 47,					# RFC3755 RFC4034 RFC-ietf-dnsop-nsec-ttl-05
-	DNSKEY	   => 48,					# RFC3755 RFC4034
+	RRSIG	   => 46,					# RFC4034
+	NSEC	   => 47,					# RFC4034 RFC9077
+	DNSKEY	   => 48,					# RFC4034
 	DHCID	   => 49,					# RFC4701
-	NSEC3	   => 50,					# RFC5155 RFC-ietf-dnsop-nsec-ttl-05
+	NSEC3	   => 50,					# RFC5155 RFC9077
 	NSEC3PARAM => 51,					# RFC5155
 	TLSA	   => 52,					# RFC6698
 	SMIMEA	   => 53,					# RFC8162
@@ -207,7 +207,8 @@ my @ednsoptionbyname = (
 	'EXTENDED-ERROR' => 15,					# RFC8914
 	'CLIENT-TAG'	 => 16,					# draft-bellis-dnsop-edns-tags
 	'SERVER-TAG'	 => 17,					# draft-bellis-dnsop-edns-tags
-	DEVICEID	 => 26946,				# https://docs.umbrella.com/developer/networkdevices-api/identifying-dns-traffic2
+	'UMBRELLA-IDENT' => 20292,				# https://developer.cisco.com/docs/cloud-security/#!integrating-network-devic
+	DEVICEID	 => 26946,				# https://developer.cisco.com/docs/cloud-security/#!network-devices-getting-s
 	);
 our %ednsoptionbyval = reverse @ednsoptionbyname;
 push @ednsoptionbyname, map { /^\d/ ? $_ : lc($_) } @ednsoptionbyname;
@@ -453,7 +454,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

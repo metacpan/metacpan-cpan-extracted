@@ -2,7 +2,7 @@ use 5.008007;
 package DBIx::Custom;
 use Object::Simple -base;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Carp 'confess';
 use DBI;
@@ -52,6 +52,8 @@ has result_class  => 'DBIx::Custom::Result';
 has separator => '.';
 
 has mytable_symbol => '__MY__';
+
+has 'column_name_lc';
 
 sub create_result {
   my ($self, $sth) = @_;
@@ -241,7 +243,7 @@ sub execute {
   while ($source_sql =~ /$place_holder_re/) {
     push @$columns, $2;
     ($parsed_sql, $source_sql) = defined $3 ?
-      ($parsed_sql . "$1$2 $3 ?", " $4") : ($parsed_sql . "$1?", " $4");
+      ($parsed_sql . "$1$2 $3 ?", "$4") : ($parsed_sql . "$1?", "$4");
   }
   $parsed_sql .= $source_sql;
   $parsed_sql =~ s/\\:/:/g if index($parsed_sql, "\\:") != -1;
@@ -1770,6 +1772,10 @@ Symbol to specify own columns in select method column option, default to '__MY__
 
   $dbi->table('book')->select({__MY__ => '*'});
 
+=head2 column_name_lc;
+
+Set NAME_lc in the Statement Handle Attributes to true when the DBI statement handle is created.
+
 =head2 option
 
   my $option = $dbi->option;
@@ -2248,13 +2254,6 @@ Turn C<into1> type rule off.
   type_rule2_off => 1
 
 Turn C<into2> type rule off.
-
-=item prepare_attr
-
-  prepare_attr => {mysql_use_result => 1}
-
-Statemend handle attributes,
-this is L<DBI>'s C<prepare> method second argument.
 
 =head2 get_column_info
 

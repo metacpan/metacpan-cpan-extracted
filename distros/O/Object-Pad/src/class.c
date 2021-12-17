@@ -19,6 +19,14 @@
 #include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
 
+#ifdef DEBUGGING
+#  define DEBUG_OVERRIDE_PLCURCOP
+#  define DEBUG_SET_CURCOP_LINE(line)    CopLINE_set(PL_curcop, line)
+#else
+#  undef  DEBUG_OVERRIDE_PLCURCOP
+#  define DEBUG_SET_CURCOP_LINE(line)
+#endif
+
 /* Empty MGVTBL simply for locating instance slots AV */
 static MGVTBL vtbl_slotsav = {};
 
@@ -784,9 +792,11 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
   I32 save_ix = block_start(TRUE);
 
+#ifdef DEBUG_OVERRIDE_PLCURCOP
   SAVESPTR(PL_curcop);
   PL_curcop = meta->tmpcop;
   CopLINE_set(PL_curcop, __LINE__);
+#endif
 
   ops = op_append_list(OP_LINESEQ, ops,
     newSTATEOP(0, NULL, NULL));
@@ -817,7 +827,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
     assert(supermeta->sealed);
     assert(supermeta->initslots);
 
-    CopLINE_set(PL_curcop, __LINE__);
+    DEBUG_SET_CURCOP_LINE(__LINE__);
 
     ops = op_append_list(OP_LINESEQ, ops,
       newSTATEOP(0, NULL, NULL));
@@ -848,7 +858,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       switch(sigil) {
         case '$':
         {
-          CopLINE_set(PL_curcop, __LINE__);
+          DEBUG_SET_CURCOP_LINE(__LINE__);
 
           OP *valueop = NULL;
 
@@ -901,7 +911,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
         case '@':
         case '%':
         {
-          CopLINE_set(PL_curcop, __LINE__);
+          DEBUG_SET_CURCOP_LINE(__LINE__);
 
           OP *valueop = NULL;
           U16 coerceop = (sigil == '%') ? OP_RV2HV : OP_RV2AV;
@@ -957,7 +967,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       assert(rolemeta->sealed);
       assert(rolemeta->initslots);
 
-      CopLINE_set(PL_curcop, __LINE__);
+      DEBUG_SET_CURCOP_LINE(__LINE__);
 
       ops = op_append_list(OP_LINESEQ, ops,
         newSTATEOP(0, NULL, NULL));
@@ -1104,9 +1114,11 @@ XS_INTERNAL(injected_constructor)
   if(!meta->sealed)
     croak("Cannot yet invoke '%" SVf "' constructor before the class is complete", SVfARG(class));
 
+#ifdef DEBUG_OVERRIDE_PLCURCOP
   COP *prevcop = PL_curcop;
   PL_curcop = meta->tmpcop;
   CopLINE_set(PL_curcop, __LINE__);
+#endif
 
   /* An AV storing the @_ args to pass to foreign constructor and all the
    * build blocks
@@ -1119,8 +1131,11 @@ XS_INTERNAL(injected_constructor)
     /* @args = $class->BUILDARGS(@_) */
     ENTER;
     SAVETMPS;
+
+#ifdef DEBUG_OVERRIDE_PLCURCOP
     SAVEVPTR(PL_curcop);
     PL_curcop = prevcop;
+#endif
 
     /* Splice in an extra copy of `class` so we get one there for the foreign
      * constructor */
@@ -1157,13 +1172,13 @@ XS_INTERNAL(injected_constructor)
     switch(meta->repr) {
       case REPR_NATIVE:
       case REPR_AUTOSELECT:
-        CopLINE_set(PL_curcop, __LINE__);
+        DEBUG_SET_CURCOP_LINE(__LINE__);
         self = sv_2mortal(newRV_noinc((SV *)newAV()));
         sv_bless(self, stash);
         break;
 
       case REPR_HASH:
-        CopLINE_set(PL_curcop, __LINE__);
+        DEBUG_SET_CURCOP_LINE(__LINE__);
         self = sv_2mortal(newRV_noinc((SV *)newHV()));
         sv_bless(self, stash);
         break;
@@ -1174,7 +1189,7 @@ XS_INTERNAL(injected_constructor)
     }
   }
   else {
-    CopLINE_set(PL_curcop, __LINE__);
+    DEBUG_SET_CURCOP_LINE(__LINE__);
 
     {
       ENTER;
@@ -1207,7 +1222,9 @@ XS_INTERNAL(injected_constructor)
     }
 
     if(!SvROK(self) || !SvOBJECT(SvRV(self))) {
+#ifdef DEBUG_OVERRIDE_PLCURCOP
       PL_curcop = prevcop;
+#endif
       croak("Expected %" SVf "->SUPER::new to return a blessed reference", class);
     }
     SV *rv = SvRV(self);
@@ -1224,7 +1241,9 @@ XS_INTERNAL(injected_constructor)
       case REPR_HASH:
       case_REPR_HASH:
         if(SvTYPE(rv) != SVt_PVHV) {
+#ifdef DEBUG_OVERRIDE_PLCURCOP
           PL_curcop = prevcop;
+#endif
           croak("Expected %" SVf "->SUPER::new to return a blessed HASH reference", class);
         }
 
@@ -1272,7 +1291,7 @@ XS_INTERNAL(injected_constructor)
   }
 
   if(meta->slothooks_postslots) {
-    CopLINE_set(PL_curcop, __LINE__);
+    DEBUG_SET_CURCOP_LINE(__LINE__);
 
     AV *slothooks = meta->slothooks_postslots;
 
@@ -1286,7 +1305,7 @@ XS_INTERNAL(injected_constructor)
   }
 
   HV *paramhv = NULL;
-  if(meta->parammap || meta->has_adjustparams) {
+  if(meta->parammap || meta->has_adjustparams || meta->strict_params) {
     paramhv = newHV();
     SAVEFREESV((SV *)paramhv);
 
@@ -1308,8 +1327,10 @@ XS_INTERNAL(injected_constructor)
   {
     /* Run initslots */
     ENTER;
+#ifdef DEBUG_OVERRIDE_PLCURCOP
     SAVEVPTR(PL_curcop);
     PL_curcop = prevcop;
+#endif
 
     EXTEND(SP, 2);
     PUSHMARK(SP);
@@ -1327,7 +1348,7 @@ XS_INTERNAL(injected_constructor)
   }
 
   if(meta->buildblocks) {
-    CopLINE_set(PL_curcop, __LINE__);
+    DEBUG_SET_CURCOP_LINE(__LINE__);
 
     AV *buildblocks = meta->buildblocks;
     SV **argsvs = AvARRAY(args);
@@ -1359,7 +1380,7 @@ XS_INTERNAL(injected_constructor)
   }
 
   if(meta->adjustblocks) {
-    CopLINE_set(PL_curcop, __LINE__);
+    DEBUG_SET_CURCOP_LINE(__LINE__);
 
     AV *adjustblocks = meta->adjustblocks;
     U32 i;
@@ -1386,7 +1407,7 @@ XS_INTERNAL(injected_constructor)
     }
   }
 
-  if(paramhv && meta->strict_params && hv_iterinit(paramhv) > 0) {
+  if(meta->strict_params && hv_iterinit(paramhv) > 0) {
     HE *he = hv_iternext(paramhv);
 
     /* Concat all the param names, in no particular order
@@ -1398,13 +1419,15 @@ XS_INTERNAL(injected_constructor)
     while((he = hv_iternext(paramhv)))
       sv_catpvf(params, ", %" SVf, SVfARG(HeSVKEY_force(he)));
 
+#ifdef DEBUG_OVERRIDE_PLCURCOP
     PL_curcop = prevcop;
+#endif
     croak("Unrecognised parameters for %" SVf " constructor: %" SVf,
       SVfARG(meta->name), SVfARG(params));
   }
 
   if(meta->slothooks_construct) {
-    CopLINE_set(PL_curcop, __LINE__);
+    DEBUG_SET_CURCOP_LINE(__LINE__);
 
     AV *slothooks = meta->slothooks_construct;
 
@@ -1417,7 +1440,9 @@ XS_INTERNAL(injected_constructor)
     }
   }
 
+#ifdef DEBUG_OVERRIDE_PLCURCOP
   PL_curcop = prevcop;
+#endif
   ST(0) = self;
   XSRETURN(1);
 }

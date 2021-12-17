@@ -16,7 +16,7 @@ use LWP::Protocol ();
 use Scalar::Util qw(blessed);
 use Try::Tiny qw(try catch);
 
-our $VERSION = '6.59';
+our $VERSION = '6.60';
 
 sub new
 {
@@ -1041,7 +1041,8 @@ sub mirror
 
             # make sure the file has the same last modification time
             if ( my $lm = $response->last_modified ) {
-                utime $lm, $lm, $file;
+                utime $lm, $lm, $file
+                    or warn "Cannot update modification time of '$file': $!\n";
             }
         }
     }

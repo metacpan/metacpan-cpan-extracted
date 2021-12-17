@@ -48,6 +48,6 @@ resources:
   bugtracker: http://github.com/Corion/HTTP-Request-FromCurl/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/HTTP-Request-FromCurl.git
-version: '0.35'
+version: '0.36'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

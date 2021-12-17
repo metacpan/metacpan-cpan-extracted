@@ -12,7 +12,6 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
-                                      'Encode' => '0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
@@ -37,6 +36,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
+                                      'Encode' => '2.89',
                                       'Feature::Compat::Try' => '0',
                                       'File::ShareDir' => '0',
                                       'JSON::Schema::Modern' => '0.531',
@@ -73,7 +73,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
-                                   'HTTP::Request' => '0',
+                                   'HTTP::Request::Common' => '0',
                                    'HTTP::Response' => '0',
                                    'Module::Metadata' => '0',
                                    'Test::Deep' => '0',

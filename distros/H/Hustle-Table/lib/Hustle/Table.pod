@@ -1,6 +1,6 @@
 =head1 NAME
 
-Hustle::Table - Percomiled pattern dispatch to code with optional optimisation
+Hustle::Table - Pattern dispatch to code with optional optimisation
 
 =head1 SYNOPSIS
 
@@ -20,11 +20,11 @@ Hustle::Table - Percomiled pattern dispatch to code with optional optimisation
   	#entry as a hash ref
   	{ matcher => qr/regex (match)/, sub => sub{ #can access regex capture }}, 
 
-	#entry as array ref, with label and priority values set
-	[qr/another/, sub{}, "my label", 10],			
+	#entry as array ref, with label, priority values and context set
+	[qr/another/, sub{}, "my label", 10,{}],			
 	
 	#undef matcher is default match all. Must be array ref format
-	[undef,sub {},"default",undef]				
+	[undef,sub {},"default",undef,undef]				
   );
 
   #3. Prepare a dispatcher:
@@ -39,7 +39,8 @@ Hustle::Table - Percomiled pattern dispatch to code with optional optimisation
 
 
   #4. Dispatch input
-  $dispatch->("thing to match","optional", "arguments");	# any number of arguments passsed to sub
+  $dispatch->("thing to match", "optional", "arguments");	
+  #The dispatched sub is called with the match entry and then all argument from the second onwards
 
 
   #5. Offline optimisation is also possible
@@ -47,12 +48,12 @@ Hustle::Table - Percomiled pattern dispatch to code with optional optimisation
 
 =head1 DESCRIPTION
 
-This module provides a small class to construct a dispatch table and build a
+This module provides a small class to constructs a dispatch table and builds a
 dispatcher for it. All interactions are done via the object/class methods so no
 exports are defined.
 
-It supports straightforward optimisation of the dispatch table and also utilises
-a optional cache to squeeze even more performance out.
+It supports straightforward optimisation of the dispatch table and  an optional
+cache to squeeze even more performance out.
 
 Notable features include:
 
@@ -73,7 +74,7 @@ Captures in regex are available in dispatched subs
 
 =item *
 
-Arguments supplied to dispatcher are available to executed vector
+Arguments supplied to dispatcher (except first) are available to executed vector sub
 
 =item *
 
@@ -91,11 +92,11 @@ Fall through/catch all matching
 
 
 The dispatch table is essentially a list of at least one entry which maps a
-matcher to a subroutine to call on a successfully match of the input.
+matcher to a subroutine which is called on a successful match of the input.
 
-Conceptually the list is looped over, applying the matchers sequentially to the input until a
-match is found. In practice it isn't a loop, but generated code reference with 
-optimised ordering of the entries.
+Conceptually the list is looped over, applying the matchers sequentially to the
+input until a match is found. In practice it isn't a loop, but generated code
+reference with potentially optimised ordering of the entries.
 
 In the case of no successful match, a default catch all dispatch vector is called.
  
@@ -106,11 +107,19 @@ dispatch vector/sub
 
 =head1 CREATING A TABLE
 
-Simply calling the class constructor returns a new Table. There are no arguments to the constructor.
+Simply calling the class constructor returns a new Table. There are no
+arguments required for the constructor:
 
 	my $table=Hustle::Table->new;
 
-A default catch all entry (an empty sub) is added automatically
+In this case, a default catch all entry (an empty sub) is added automatically.
+
+Alternatively, a C<sub> and C<ctx> argument can be provided:
+
+	my $table=Hustle::Table->new(sub{}, $ctx);
+
+This will overwrite the default entry in the table
+
 
 The table is a blessed array reference and can be manipulated as such. It's not
 recommended to access the table directly other than dumping the contents to
@@ -132,17 +141,18 @@ this module is on strings and regular expressions
  "match exaclty this stirng"
  qr|match and capture (this|that)|
 
-When C<matcher> is a regex, any capturing is accessible in the target C<sub>.
+When C<matcher> is a regex, any capturing is accessible in the target C<sub> via the dynamically scoped numbered capture group variables (i.e. C<$1> et al.)
 
 =item sub
 
 The C<sub> has access to any capture groups used in the matcher (if
-applicable). It is also passed all arguments, including the input, unmodified,
-used to call the dispatcher.
+applicable). It is also passed the arguments supplied to call the dispatcher,
+except for the first.  The first is replaced with the matching entry in the
+table, to allow tracing.
 
  $dispatcher->("my input","optional", "arguments", "to", "dispatched", "sub");
 
-The return value of the sub indicates if the input just matched is to be
+The return value of the sub indicates if the input matched is to be
 removed from the cache. 
 
 =item label
@@ -161,6 +171,14 @@ During running of the dispatch, this is a tally recording how many times,the
 entry has been matched. This information can be then used as a priority
 later to reorder the list.
 
+=item ctx
+
+C<ctx> Represents a user context which is applicable to the matcher. It would
+usually be a weak reference but can be any scalar.
+
+The dispatched subroutine has access to this value via the matcher entry, which
+is  the first argument to the called subroutine
+
 =back
 
 
@@ -171,11 +189,11 @@ the C<add> method.
 
 Array entries must contain four elements, in the order of:
 	
-	$table->add([$matcher,$sub,$label,$count]);
+	$table->add([$matcher, $sub, $label, $count, $ctx]);
 
 Hashes ref format only need to specify the matcher and sub pairs
 
-	$table->add({matcher=>$matcher, sub=>$sub, label=>$label, count=>$count});
+	$table->add({matcher=>$matcher, sub=>$sub, label=>$label, count=>$count, ctx=>$ctx});
 
 Single flattened format takes a list directly. It must contain 4 elements
 
@@ -185,10 +203,10 @@ Single simple format takes two elements
 
 	$table->add(qr{some matcher}=>sub { say "run me" })
 
-Or add at once using mixed formats together
+Or add multiple at once using mixed formats together
 
 	$table->add(
-		[$matcher, $sub, $label, $count],
+		[$matcher, $sub, $label, $count, $ctx],
 		{matcher=> $matcher, sub=>$sub},
 		matcher=>$matcher, sub=>$sub
 	);
@@ -235,8 +253,8 @@ The default subroutine of the 'default' entry does nothing.
 
 =head1 PREPARING A DISPATCHER
 
-Once all the entries required are added to the table, the dispatcher can be constructed by calling
-C<prepare_dispatcher>:
+Once all the entries required are added to the table, the dispatcher can be
+constructed by calling C<prepare_dispatcher>:
 
 	my $dispatcher=$table->prepare_dispatcher(%args);
 
@@ -246,18 +264,22 @@ Arguments to this method include:
 
 =item type
 
-The type of dispatcher. Either "online" or "offline". If not specified, or an invalid value is supplied, an "online" dispatcher is created
+The type of dispatcher. Either "online" or "offline". If not specified, or an
+invalid value is supplied, an "online" dispatcher is created
 
 
 =over
 
 =item online
 
-Dispatcher which calls the dispatch vector, increases count statistics. This is what you normally would want to use in your code. Online mode.
+Dispatcher which calls the dispatch vector, increases count statistics. This is
+what you normally would want to use in your code. Online mode.
 
 =item offline
 
-Dispatcher which only updates the count statistics. DOES NOT call dispatch vector. Useful for running a input data set through to obtain priority levels. Offline training mode.
+Dispatcher which only updates the count statistics. DOES NOT call dispatch
+vector. Useful for running a input data set through to obtain priority levels.
+Offline training mode.
 
 =back 
 
@@ -267,7 +289,7 @@ The hash ref to use as the dispatchers cache
 
 =item reorder
 
-Flag indicating the table should be reorderd/optimisted before building the disptacher.
+Flag indicating the table should be reordered/optimised before building the dispatcher.
 
 =item reset
 
@@ -275,13 +297,15 @@ Flag specifying if counter statistics should be reset before building a dispatch
 
 =back
 
-If no arguments are provided, the dispatcher will be created with the following defaults:
+If no arguments are provided, the dispatcher will be created with the following
+defaults:
 
 	my $dispatcher=$table->prepare_dispatcher(type=>"online", cache=>undef, reset=>undef, reorder=>1);
 
 =head1 USING A DISPATCHER
 
-The dispatcher is simply a sub. Any arguments passed to it are passed to the dispatch vector as is.
+The dispatcher is simply a sub. Any arguments passed to it are passed to the
+dispatch vector as is.
 
 	$dispatcher->("input", "argument1",2);
 

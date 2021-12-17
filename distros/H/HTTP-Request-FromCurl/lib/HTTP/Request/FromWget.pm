@@ -16,7 +16,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 NAME
 
@@ -392,8 +392,11 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             $self->_set_header( \%headers, "Referer" => $options->{ 'referer' } );
         };
 
+        # We want to compare the headers case-insensitively
+        my %headers_lc = map { lc $_ => 1 } keys %headers;
+
         for my $k (keys %request_default_headers) {
-            if( ! $headers{ $k }) {
+            if( ! $headers_lc{ lc $k }) {
                 $self->_add_header( \%headers, $k, $request_default_headers{ $k });
             };
         };

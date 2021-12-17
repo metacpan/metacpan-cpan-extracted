@@ -2,7 +2,7 @@ package HTML::Selector::XPath;
 
 use strict;
 use 5.008_001;
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 require Exporter;
 our @EXPORT_OK = qw(selector_to_xpath);
@@ -135,11 +135,11 @@ sub consume {
             }
 
             my $tag = $id_class eq '' ? $name || '*' : '*';
-            
+
             if (defined $parms{prefix} and not $tag =~ /[*:|]/) {
                 $tag = join ':', $parms{prefix}, $tag;
             }
-            
+
             if (! $wrote_tag++) {
                 push @parts, $tag;
             }
@@ -179,7 +179,7 @@ sub consume {
                 my( $new_parts, $leftover ) = $self->consume( $rule, %parms );
                 shift @$new_parts; # remove '//'
                 my $xpath = join '', @$new_parts;
-                
+
                 push @parts, "[not(self::$xpath)]";
                 $rule = $leftover;
             }
@@ -278,7 +278,7 @@ sub to_xpath {
     my $self = shift;
     my $rule = $self->{expression} or return;
     my %parms = @_;
-    
+
     my($result,$leftover) = $self->consume( $rule, %parms );
     $leftover
         and die "Invalid rule, couldn't parse '$leftover'";
@@ -286,9 +286,9 @@ sub to_xpath {
 
 }
 
-sub parse_pseudo { 
+sub parse_pseudo {
     # nop
-}    
+}
 
 1;
 __END__
@@ -327,7 +327,8 @@ CSS2 and partial CSS3 selectors to the equivalent XPath expression.
 
   $xpath = selector_to_xpath($selector, %options);
 
-Shortcut for C<< HTML::Selector->new(shift)->to_xpath(@_) >>. Exported upon request.
+Shortcut for C<< HTML::Selector::XPath->new(shift)->to_xpath(@_) >>.
+Exported upon request.
 
 =item new
 
@@ -355,10 +356,10 @@ prefix for the generated XPath expression.
 
 =item parse_pseudo
 
-This method is called during xpath construction when we encounter a pseudo 
-selector (something that begins with comma). It is passed the selector and 
-a reference to the string we are parsing. It should return one or more 
-xpath sub-expressions to add to the parts if the selector is handled, 
+This method is called during xpath construction when we encounter a pseudo
+selector (something that begins with comma). It is passed the selector and
+a reference to the string we are parsing. It should return one or more
+xpath sub-expressions to add to the parts if the selector is handled,
 otherwise return an empty list.
 
 =back

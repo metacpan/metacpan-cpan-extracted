@@ -12,7 +12,7 @@
 
     # creates new instance for async requests to the certain domain,
     # restricts max amount of simultaneously executed requests
-    my $ua = MojoX::HTTP::Async->new('host' => 'my-site.com', 'slots' => 2);
+    my $ua = MojoX::HTTP::Async->new('host' => 'my-site.com', 'slots' => 4);
 
     # let's fill slots
     $ua->add('/page1.html?lang=en');
@@ -216,7 +216,7 @@
 ##### close_all ($self)
     Closes all opened connections and resets all slots with requests.
 
-##### DESTROY($class)
+##### DESTROY($self)
     The class destructor.
 
     Closes all opened sockets.

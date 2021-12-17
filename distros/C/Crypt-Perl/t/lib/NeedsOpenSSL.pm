@@ -3,7 +3,7 @@ package NeedsOpenSSL;
 use strict;
 use warnings;
 
-use parent 'Test::Class';
+use parent qw(TestClass);
 
 use Test::More;
 

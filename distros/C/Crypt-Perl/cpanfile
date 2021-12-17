@@ -7,7 +7,7 @@ requires 'Convert::ASN1' => 0.27;
 requires 'Crypt::Format'            => 0.12;
 requires 'Digest::SHA';
 requires 'Math::BigInt' => 1.999818;     #min version, yes
-requires 'Math::ProvablePrime'   => 0.043;
+requires 'Math::ProvablePrime'   => 0.51;
 requires 'MIME::Base64' => 3.11;
 requires 'Symbol::Get' => 0.02;
 requires 'Try::Tiny';

@@ -6,8 +6,7 @@ use File::Path      qw[rmtree];
 use Capture::Tiny   qw[capture_merged];
 
 {
-mkdir 'dist';
-my $tmpdir = tempdir( DIR => 'dist', CLEANUP => 1 );
+my $tmpdir = tempdir( CLEANUP => 1 );
 chdir $tmpdir or die "$!\n";
 open MFPL, '>Makefile.PL' or die "$!\n";
 print MFPL <<'EOF';

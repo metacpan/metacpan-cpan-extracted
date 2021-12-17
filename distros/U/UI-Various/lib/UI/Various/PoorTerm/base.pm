@@ -29,7 +29,7 @@ class" does not import anything besides C<Exporter>.
 
 #########################################################################
 
-use v5.12.1;
+use v5.14.0;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -39,7 +39,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use UI::Various::core;
 

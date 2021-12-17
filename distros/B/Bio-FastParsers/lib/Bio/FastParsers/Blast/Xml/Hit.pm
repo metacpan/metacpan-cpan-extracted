@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Xml::Hit;
 # ABSTRACT: NCBI BLAST DTD-derived internal class
-$Bio::FastParsers::Blast::Xml::Hit::VERSION = '0.201110';
+$Bio::FastParsers::Blast::Xml::Hit::VERSION = '0.213510';
 use Moose;
 use namespace::autoclean;
 
@@ -16,6 +16,12 @@ use aliased 'Bio::FastParsers::Blast::Xml::Hsp';
 has '_root' => (
     is       => 'ro',
     isa      => 'HashRef',
+    required => 1,
+);
+
+has '_parent' => (
+    is       => 'ro',
+    isa      => 'Maybe[Object]',
     required => 1,
 );
 
@@ -42,7 +48,7 @@ has 'hsps' => (
 
 sub _build_hsps {
     my $self = shift;
-    return [ map { Hsp->new( _root => $_ ) } @{
+    return [ map { Hsp->new( _root => $_, _parent => $self ) } @{
         forcearray $self->_root->{'Hit_hsps'}->{'Hsp'}
     } ];
 }
@@ -85,6 +91,12 @@ sub num {
 # public aliases
 
 
+
+sub query_len {
+    return shift->_parent->query_len
+}
+
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -98,7 +110,7 @@ Bio::FastParsers::Blast::Xml::Hit - NCBI BLAST DTD-derived internal class
 
 =head1 VERSION
 
-version 0.201110
+version 0.213510
 
 =head1 SYNOPSIS
 
@@ -204,6 +216,12 @@ Returns the value of the element C<<Hit_num>>.
     my $num = $hit->num;
 
 This method does not accept any arguments.
+
+=head1 ALIASES
+
+=head2 query_len
+
+Alias for C<query_len> method in Iteration object. For API completeness.
 
 =head1 AUTHOR
 

@@ -23,8 +23,8 @@ my $meta = {
                             requires   => {
                                             "constant" => 0,
                                             "Exporter::Tiny" => 0,
-                                            "Number::Range" => 0.04,
                                             "perl" => 5.008001,
+                                            "Set::IntSpan" => 1.12,
                                           },
                           },
                           test => {
@@ -32,7 +32,7 @@ my $meta = {
                           },
                         },
   "provides"         => {
-                          "String::Copyright" => { file => "lib/String/Copyright.pm", version => 0.003011 },
+                          "String::Copyright" => { file => "lib/String/Copyright.pm", version => 0.003012 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -47,7 +47,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/String-Copyright/project",
                         },
-  "version"          => 0.003011,
+  "version"          => 0.003012,
   "x_help_wanted"    => ["tester", "documenter"],
   "x_static_install" => 1,
 };

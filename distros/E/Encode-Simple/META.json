@@ -64,11 +64,11 @@
    "provides" : {
       "Decode::ARGV" : {
          "file" : "lib/Decode/ARGV.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Encode::Simple" : {
          "file" : "lib/Encode/Simple.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
@@ -83,7 +83,7 @@
          "web" : "https://github.com/Grinnz/Encode-Simple"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_contributors" : [
       "Dan Book <grinnz@grinnz.com>"
    ],

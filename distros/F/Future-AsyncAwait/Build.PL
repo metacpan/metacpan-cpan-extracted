@@ -7,7 +7,7 @@ use Module::Build;
 use XS::Parse::Keyword::Builder;
 use XS::Parse::Sublike::Builder;
 
-my @extra_compiler_flags = qw( -std=c89 -Ihax );
+my @extra_compiler_flags = qw( -Ihax );
 
 # MSWin32 needs NO_XSLOCKS to make longjmp work. I have no idea what this is
 # about, I just stole it from Scope::Escape
@@ -28,9 +28,10 @@ my $build = Module::Build->new(
       'Future' => '0.43',
       'perl' => '5.016', # PL_keyword_plugin, pad_new(), CvDYNFILE, many tests fail on 5.14
       'XS::Parse::Keyword' => '0.13',
-      'XS::Parse::Sublike' => '0.10',
+      'XS::Parse::Sublike' => '0.14',
    },
    test_requires => {
+      'Test::Fatal' => 0,
       'Test::Future::Deferred' => 0,
       'Test::More' => '0.88', # done_testing
       'Test::Refcount' => '0.09',
@@ -38,7 +39,7 @@ my $build = Module::Build->new(
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
       'XS::Parse::Keyword::Builder' => '0.13',
-      'XS::Parse::Sublike::Builder' => '0.10',
+      'XS::Parse::Sublike::Builder' => '0.14',
    },
    license => 'perl',
    create_license => 1,

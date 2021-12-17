@@ -1,5 +1,9 @@
 Revision history for IO-Async
 
+0.801   2021-12-15
+        [BUGFIXES]
+         * Remove extraneous test-time use of Data::Dump (RT140143)
+
 0.800   2021-11-11
         [CHANGES]
          * Bumped up to three-digit minor version number

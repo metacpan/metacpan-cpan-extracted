@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -118,7 +118,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 DESCRIPTION
 
@@ -139,8 +139,8 @@ Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Mo
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
-You can also find me on the L<JSON Schema Slack server|json-schema.slack.com> and L<OpenAPI Slack
-server|open-api.slack.com>, which are also great resources for finding help.
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

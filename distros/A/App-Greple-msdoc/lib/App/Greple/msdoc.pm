@@ -4,11 +4,11 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 SYNOPSIS
 
-greple -Mmsdoc
+greple -Mmsdoc pattern example.docx
 
 =head1 DESCRIPTION
 
@@ -77,7 +77,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2018-2020 Kazumasa Utashiro.
+Copyright 2018-2021 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -86,7 +86,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::msdoc;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use strict;
 use warnings;
@@ -121,9 +121,9 @@ sub indent_xml {
 	map  { $_ => 1 }
 	map  { @{$_->[1]} }
 	grep { $file =~ $_->[0] } (
-	    [ qr/\.docx$/, [ qw(w:t w:delText w:instrText wp:posOffset) ] ],
-	    [ qr/\.pptx$/, [ qw(a:t) ] ],
-	    [ qr/\.xlsx$/, [ qw(t v f formula1) ] ],
+	    [ qr/\.doc[xm]$/, [ qw(w:t w:delText w:instrText wp:posOffset) ] ],
+	    [ qr/\.ppt[xm]$/, [ qw(a:t) ] ],
+	    [ qr/\.xls[xm]$/, [ qw(t v f formula1) ] ],
 	);
     };
 
@@ -157,9 +157,7 @@ sub indent_xml {
 }
 
 use Archive::Zip;
-use App::optex::textconv::msdoc;
-*to_text  = \&App::optex::textconv::msdoc::to_text;
-*get_list = \&App::optex::textconv::msdoc::get_list;
+use App::optex::textconv::msdoc qw(to_text get_list);
 
 my %formatter = (
     'indent-xml'   => \&indent_xml,
@@ -169,7 +167,7 @@ my %formatter = (
 sub extract_content {
     my %arg = @_;
     my $file = $arg{&FILELABEL} or die;
-    my $type = ($file =~ /\.(docx|xlsx|pptx)$/)[0] or die;
+    my $type = ($file =~ /\.((?:doc|xls|ppt)[xm])$/)[0] or die;
     my $pid = open(STDIN, '-|') // croak "process fork failed: $!";
     binmode STDIN, ':encoding(utf8)';
     if ($pid) {
@@ -215,7 +213,7 @@ option	--text		$<move(0,0)>
 help	--text		ignore
 
 option default \
-	--if '/\.(docx|pptx|xlsx)$/:&__PACKAGE__::extract_content'
+	--if '/\.(doc|ppt|xls)[xm]$/:&__PACKAGE__::extract_content'
 
 builtin space=i $opt_space
 builtin separator=s $opt_separator
@@ -233,6 +231,6 @@ builtin indent-mark=s $indent_mark
 ##
 ## --dump
 ##
-option --dump --le &sub{} --need 0 --all --epilogue 'sub{exit(0)}'
+option --dump --le &sub{} --need 0 --all --exit=0
 
 #  LocalWords:  msdoc Greple greple Mmsdoc docx ppt xml pptx xlsx xl

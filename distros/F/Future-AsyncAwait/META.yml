@@ -4,13 +4,14 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
+  Test::Fatal: '0'
   Test::Future::Deferred: '0'
   Test::More: '0.88'
   Test::Refcount: '0.09'
 configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Keyword::Builder: '0.13'
-  XS::Parse::Sublike::Builder: '0.10'
+  XS::Parse::Sublike::Builder: '0.14'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -21,20 +22,20 @@ name: Future-AsyncAwait
 provides:
   Future::AsyncAwait:
     file: lib/Future/AsyncAwait.pm
-    version: '0.54'
+    version: '0.55'
   Future::AsyncAwait::Awaitable:
     file: lib/Future/AsyncAwait/Awaitable.pm
-    version: '0.54'
+    version: '0.55'
   Test::Future::AsyncAwait::Awaitable:
     file: lib/Test/Future/AsyncAwait/Awaitable.pm
-    version: '0.54'
+    version: '0.55'
 requires:
   Future: '0.43'
   XS::Parse::Keyword: '0.13'
-  XS::Parse::Sublike: '0.10'
+  XS::Parse::Sublike: '0.14'
   perl: '5.016'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.54'
+version: '0.55'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

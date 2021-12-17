@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 04-packet.t 1818 2020-10-18 15:24:42Z willem $	-*-perl-*-
+# $Id: 04-packet.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -56,6 +56,7 @@ ok( $packet_data, 'packet->data() method works' );
 my $packet2 = Net::DNS::Packet->new( \$packet_data );
 ok( $packet2->isa('Net::DNS::Packet'), 'new(\$data) object' );
 is( $packet2->string, $packet->string, 'decoded packet matches original' );
+
 is( unpack( 'H*', $packet2->data ), unpack( 'H*', $packet_data ), 'retransmitted packet matches original' );
 
 my $empty_packet = Net::DNS::Packet->new()->data;
@@ -63,7 +64,7 @@ ok( Net::DNS::Packet->new( \$empty_packet )->string, 'decoded empty packet' );
 
 my $dso = Net::DNS::Packet->new();
 $dso->header->opcode('DSO');
-my $dso_packet  = $dso->data . pack( 'n2H*', 1, 2, 'beef' );
+my $dso_packet = $dso->data . pack( 'n2H*', 1, 2, 'beef' );
 ok( Net::DNS::Packet->new( \$dso_packet )->string, 'decoded DSO packet' );
 
 
@@ -71,9 +72,9 @@ ok( Net::DNS::Packet->new( \$dso_packet )->string, 'decoded DSO packet' );
 my @data = unpack 'C*', $packet->data;
 while (@data) {
 	pop(@data);
-	my $truncated = pack 'C*', @data;
-	my $length    = length $truncated;
-	my $object    = Net::DNS::Packet->new( \$truncated );
+	my $truncated	= pack 'C*', @data;
+	my $length	= length $truncated;
+	my $object	= Net::DNS::Packet->new( \$truncated );
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "truncated ($length octets):\t[$exception]" );
 }
@@ -90,7 +91,7 @@ foreach my $section (qw(answer authority additional)) {
 		Address => "10.0.0.$i"
 		);
 	my $string1 = $rr1->string;
-	my $count1 = $update->push( $section, $rr1 );
+	my $count1  = $update->push( $section, $rr1 );
 	like( $update->string, "/$string1/", "push first RR into $section section" );
 	is( $count1, 1, "push() returns $section RR count" );
 
@@ -101,7 +102,7 @@ foreach my $section (qw(answer authority additional)) {
 		Address => "10.0.0.$j"
 		);
 	my $string2 = $rr2->string;
-	my $count2 = $update->push( $section, $rr2 );
+	my $count2  = $update->push( $section, $rr2 );
 	like( $update->string, "/$string2/", "push second RR into $section section" );
 	is( $count2, 2, "push() returns $section RR count" );
 }
@@ -114,13 +115,14 @@ $update->push( 'answer', Net::DNS::RR->new('XY TXT ""') );
 $update->push( 'answer', Net::DNS::RR->new('VW.XY TXT ""') );
 
 #	Decode data buffer and compare with original
-my $buffer = $update->data;
+my $buffer  = $update->data;
 my $decoded = eval { Net::DNS::Packet->new( \$buffer ) };
 ok( $decoded, 'new() from data buffer works' );
 is( $decoded->size, length($buffer), '$decoded->size() works' );
 $decoded->from('local');
 ok( $decoded->from(),	'$decoded->from() works' );
 ok( $decoded->string(), '$decoded->string() works' );
+
 foreach my $count (qw(qdcount ancount nscount arcount)) {
 	is( $decoded->header->$count, $update->header->$count, "check header->$count correct" );
 }
@@ -203,7 +205,7 @@ is( $rr->size, '4096', 'EDNS0 packet size correct' );
 
 {					## go through the motions of SIG0
 	my $packet = Net::DNS::Packet->new('example.com');
-	my $sig = Net::DNS::RR->new( type => 'SIG' );
+	my $sig	   = Net::DNS::RR->new( type => 'SIG' );
 	ok( $packet->sign_sig0($sig), 'sign_sig0() returns SIG0 record' );
 	is( ref( $packet->sigrr() ), ref($sig), 'sigrr() returns SIG RR' );
 
@@ -215,7 +217,7 @@ is( $rr->size, '4096', 'EDNS0 packet size correct' );
 
 {					## check exception raised for bad TSIG
 	my $packet = Net::DNS::Packet->new('example.com');
-	my $bogus = Net::DNS::RR->new( type => 'NULL' );
+	my $bogus  = Net::DNS::RR->new( type => 'NULL' );
 	eval { $packet->sign_tsig($bogus); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "sign_tsig([])\t[$exception]" );
@@ -227,7 +229,7 @@ eval {					## exercise dump and debug diagnostics
 	require Data::Dumper;
 	local $Data::Dumper::Maxdepth;
 	local $Data::Dumper::Sortkeys;
-	my $packet = Net::DNS::Packet->new();
+	my $packet  = Net::DNS::Packet->new();
 	my $buffer  = $packet->data;
 	my $corrupt = substr $buffer, 0, 10;
 	my $file    = '04-packet.txt';

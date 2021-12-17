@@ -1,7 +1,7 @@
 package REST::Client;
 #ABSTRACT: A simple client for interacting with RESTful http/https resources
 
-our $VERSION = '280';
+our $VERSION = '281';
 
 
 
@@ -125,7 +125,6 @@ sub request {
 
 
     #error check
-    croak "REST::Client exception: First argument to request must be one of GET, PATCH, PUT, POST, DELETE, OPTIONS, HEAD" unless $method =~ /^(get|patch|put|post|delete|options|head)$/i;
     croak "REST::Client exception: Must provide a url to $method" unless $url;
     croak "REST::Client exception: headers must be presented as a hashref" if $headers && ref $headers ne 'HASH';
 
@@ -317,7 +316,7 @@ REST::Client - A simple client for interacting with RESTful http/https resources
 
 =head1 VERSION
 
-version 280
+version 281
 
 =head1 SYNOPSIS
 

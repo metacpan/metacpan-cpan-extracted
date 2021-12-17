@@ -270,6 +270,11 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
             $res->{ headers }->{ 'User-Agent' } =~ s!^(Wget/[\d\.]+)(?:\s.*)?!$1!;
         };
 
+        # Fudge "accept" headers into "Accept" headers
+        if( exists $got{accept} ) {
+            $got{Accept} = delete $got{accept};
+        };
+
         is_deeply \%got, $res->{headers}, $name
             or diag Dumper [\%got, $res->{headers}];
 

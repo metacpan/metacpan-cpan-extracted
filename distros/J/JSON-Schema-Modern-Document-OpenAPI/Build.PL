@@ -87,12 +87,13 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Modern-Document-OpenAPI",
-      "dist_version" => "0.010",
+      "dist_version" => "0.012",
       "license" => "perl",
       "module_name" => "JSON::Schema::Modern::Document::OpenAPI",
       "recursive_test_files" => 1,
       "requires" => {
         "Carp" => 0,
+        "Encode" => "2.89",
         "Feature::Compat::Try" => 0,
         "File::ShareDir" => 0,
         "JSON::Schema::Modern" => "0.531",
@@ -119,7 +120,7 @@ EOW
       },
       "test_requires" => {
         "File::Spec" => 0,
-        "HTTP::Request" => 0,
+        "HTTP::Request::Common" => 0,
         "HTTP::Response" => 0,
         "Module::Metadata" => 0,
         "Test::Deep" => 0,
@@ -139,7 +140,7 @@ EOW
 
     my %fallback_build_requires = (
       "File::Spec" => 0,
-      "HTTP::Request" => 0,
+      "HTTP::Request::Common" => 0,
       "HTTP::Response" => 0,
       "Module::Metadata" => 0,
       "Test::Deep" => 0,

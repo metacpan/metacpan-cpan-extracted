@@ -1,5 +1,14 @@
 Revision history for Perl extension RxPerl
 
+v6.10.1 2021-12-16T08:14:39Z
+
+    - changed wording in POD (code of conduct)
+
+v6.10.0 2021-12-16T07:46:56Z
+
+    - added community code of conduct
+    - switched license to GPLv3
+
 v6.9.0 2021-12-10T12:37:30Z
 
     - added get_value method to behavior subjects

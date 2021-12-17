@@ -4,9 +4,9 @@
       "Alexander Karelas <karjala@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.12",
    "license" : [
-      "perl_5"
+      "gpl_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -57,7 +57,7 @@
    "provides" : {
       "RxPerl::AnyEvent" : {
          "file" : "lib/RxPerl/AnyEvent.pm",
-         "version" : "v6.6.0"
+         "version" : "v6.7.0"
       }
    },
    "release_status" : "stable",
@@ -71,8 +71,8 @@
          "web" : "https://gitlab.com/karjala/rxperl-anyevent-for-perl"
       }
    },
-   "version" : "v6.6.0",
+   "version" : "v6.7.0",
    "x_authority" : "cpan:KARJALA",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

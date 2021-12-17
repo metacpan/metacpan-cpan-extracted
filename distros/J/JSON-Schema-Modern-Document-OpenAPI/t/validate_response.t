@@ -17,7 +17,7 @@ use OpenAPI::Modern;
 use JSON::Schema::Modern::Utilities 'jsonp';
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern-Document-OpenAPI' => 'share' } };
 use constant { true => JSON::PP::true, false => JSON::PP::false };
-use HTTP::Request;
+use HTTP::Request::Common;
 use HTTP::Response;
 use YAML::PP;
 
@@ -35,7 +35,7 @@ my $doc_uri = Mojo::URL->new('openapi.yaml');
 
 subtest 'validation errors' => sub {
   my $response = HTTP::Response->new(404);
-  $response->request(my $request = HTTP::Request->new(POST => 'http://example.com/some/path'));
+  $response->request(my $request = POST 'http://example.com/some/path');
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => 'openapi.yaml',
     openapi_schema => do {
@@ -372,8 +372,37 @@ YAML
     },
   );
 
-  $response->content_type('text/plain');
-  $response->content('plain text');
+  # response has no content-type, content-length or body.
+  $response = HTTP::Response->new(200, 'ok');
+  $response->request($request = POST 'http://example.com/some/path');
+  cmp_deeply(
+    $result = $openapi->validate_response($response, { path_template => $path_template })->TO_JSON,
+    { valid => true },
+    'missing Content-Type does not cause an exception',
+  );
+
+
+  $response->content_type('application/json');
+  $response->content('null');
+  cmp_deeply(
+    $result = $openapi->validate_response($response, { path_template => $path_template })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}', qw(post responses default $ref content application/json schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/responses/default/content/application~1json/schema/type')->to_string,
+          error => 'wrong type (expected object)',
+        },
+      ],
+    },
+    'missing Content-Length does not prevent the response body from being checked',
+  );
+
+
+  $response = HTTP::Response->new(200, 'ok', [ 'Content-Type' => 'text/plain' ], 'plain text');
+  $response->request($request = POST 'http://example.com/some/path');
   cmp_deeply(
     $result = $openapi->validate_response($response, { path_template => $path_template })->TO_JSON,
     {
@@ -461,12 +490,38 @@ YAML
     openapi_schema => do {
       YAML::PP->new( boolean => 'JSON::PP' )->load_string(<<YAML);
 $openapi_preamble
+components:
+  headers:
+    no_content_permitted:
+      description: when used with the Content-Length or Content-Type headers, indicates that, if present, the header value must be 0 or empty
+      required: false
+      schema:
+        type: string
+        enum: ['', '0']
 paths:
   /foo/{foo_id}:
     post:
       responses:
+        '204':
+          description: no content permitted
+          headers:
+            Content-Length:
+              \$ref: '#/components/headers/no_content_permitted'
+            Content-Type:
+              \$ref: '#/components/headers/no_content_permitted'
+          content:
+            text/plain: # TODO: support */* and then this would be guaranteed
+              schema:
+                type: string
+                maxLength: 0
         default:
           description: default
+          headers:
+            Content-Length:
+              required: true
+              schema:
+                type: integer
+                minimum: 1
           content:
             text/plain:
               schema:
@@ -474,8 +529,8 @@ paths:
 YAML
       },
   );
-  $response = HTTP::Response->new(POST => 'http://example.com/foo/123');
-  $response->request($request = HTTP::Request->new(POST => 'http://example.com/some/path'));
+  $response = HTTP::Response->new(POST => 'http://example.com/foo/123', [ 'Content-Length' => 10 ], 'plain text');
+  $response->request($request = POST 'http://example.com/some/path');
   cmp_deeply(
     ($result = $openapi->validate_response($response,
       { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
@@ -494,7 +549,9 @@ YAML
   );
 
 
-  $response->content_type('text/plain');
+  $response = HTTP::Response->new(POST => 'http://example.com/foo/123',
+    [ 'Content-Length' => 1, 'Content-Type' => 'text/plain' ], ''); # Content-Length lies!
+  $response->request($request = POST 'http://example.com/some/path');
   cmp_deeply(
     ($result = $openapi->validate_response($response,
       { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
@@ -509,7 +566,54 @@ YAML
         },
       ],
     },
-    'missing body does not cause an exception',
+    'missing body (with a lying Content-Length) does not cause an exception, but is detectable',
+  );
+
+  # no Content-Length
+  $response = HTTP::Response->new(POST => 'http://example.com/foo/123', [ 'Content-Type' => 'text/plain' ]);
+  $response->request($request = POST 'http://example.com/some/path');
+  cmp_deeply(
+    ($result = $openapi->validate_response($response,
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/header/Content-Length',
+          keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post responses default headers Content-Length required)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(post responses default headers Content-Length required)))->to_string,
+          error => 'missing header: Content-Length',
+        },
+      ],
+    },
+    'missing body and no Content-Length does not cause an exception, but is still detectable',
+  );
+
+
+  $response->code(204);
+  $response->content_length('20');
+  $response->content('I should not have content');
+  cmp_deeply(
+    ($result = $openapi->validate_response($response,
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/header/Content-Length',
+          keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post responses 204 headers Content-Length $ref schema enum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/headers/no_content_permitted/schema/enum')->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post responses 204 content text/plain schema maxLength)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(post responses 204 content text/plain schema maxLength)))->to_string,
+          error => 'length is greater than 0',
+        },
+      ],
+    },
+    'an undesired response body is detectable',
   );
 };
 

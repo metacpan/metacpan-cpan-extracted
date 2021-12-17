@@ -12,7 +12,6 @@
 #include "perl-backcompat.c.inc"
 
 #include "newOP_CUSTOM.c.inc"
-#include "sv_setrv.c.inc"
 
 struct MultiSubOption {
   int args_min, args_max;
@@ -63,14 +62,13 @@ static OP *pp_dispatch_multisub(pTHX)
   return (PL_ppaddr[OP_GOTO])(aTHX);
 }
 
+/* XSParseSublikeContext moddata keys */
+#define MODDATA_KEY_NAME        "Syntax::Keyword::MultiSub/name"
+#define MODDATA_KEY_COMPMULTICV "Syntax::Keyword::MultiSub/compmulticv"
+
 static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
-  /* steal the name */
   SV *name = ctx->name;
-  ctx->name = NULL;
-
-  SV *compmulticv = *hv_fetchs(GvHV(PL_hintgv), "Syntax::Keyword::MultiSub/compmulticv", GV_ADD);
-  save_item(compmulticv);
 
   CV *multicv = get_cvn_flags(SvPVX(name), SvCUR(name), SvUTF8(name) ? SVf_UTF8 : 0);
   if(!multicv) {
@@ -96,7 +94,11 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *ho
     LEAVE;
   }
 
-  sv_setrv_inc(compmulticv, (SV *)multicv);
+  hv_stores(ctx->moddata, MODDATA_KEY_NAME,        SvREFCNT_inc(name));
+  hv_stores(ctx->moddata, MODDATA_KEY_COMPMULTICV, SvREFCNT_inc(multicv));
+
+  /* Do not let this sub be installed as a named symbol */
+  ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
 }
 
 static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
@@ -105,8 +107,8 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
   if(!cv)
     return;
 
-  SV *compmulticv = *hv_fetchs(GvHV(PL_hintgv), "Syntax::Keyword::MultiSub/compmulticv", 0);
-  CV *multicv = (CV *)SvRV(compmulticv);
+  SV *name    =       *hv_fetchs(ctx->moddata, MODDATA_KEY_NAME, 0);
+  CV *multicv = (CV *)*hv_fetchs(ctx->moddata, MODDATA_KEY_COMPMULTICV, 0);
 
   PADNAMELIST *pln = PadlistNAMES(CvPADLIST(multicv));
   /* We can't use pad_findmy_pvn() because it gets upset about seqnums */
@@ -115,9 +117,6 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
     if(strEQ(PadnamePV(PadnamelistARRAY(pln)[padix]), "@(Syntax::Keyword::MultiSub/options)"))
       break;
   assert(padix <= PadnamelistMAX(pln));
-
-  SV *multicvname = newSVpvn_flags(GvNAME(CvGV(multicv)), GvNAMELEN(CvGV(multicv)), GvNAMEUTF8(CvGV(multicv)) ? SVf_UTF8 : 0);
-  SAVEFREESV(multicvname);
 
   AV *optionsav = get_optionsav(multicv, padix);
   bool final_is_slurpy = av_count(optionsav) &&
@@ -148,7 +147,7 @@ redo:
 #endif
         if(slurpy) {
           if(final_is_slurpy)
-            croak("Already have a slurpy function body for multi sub %" SVf, multicvname);
+            croak("Already have a slurpy function body for multi sub %" SVf, name);
           args_max = -1;
         }
         goto done;
@@ -170,7 +169,7 @@ done: ;
     if(args_max < option->args_min)
       continue;
 
-    croak("Ambiguous argument count for multi sub %" SVf, multicvname);
+    croak("Ambiguous argument count for multi sub %" SVf, name);
   }
 
   struct MultiSubOption *option;
@@ -181,22 +180,19 @@ done: ;
   option->cv       = cv_clone(cv); /* Because it is currently a protosub */
 
   av_push(optionsav, (SV *)option);
-
-  /* Now pretend that it was named again so syntax parses like a named sub */
-  ctx->name = SvREFCNT_inc(multicvname);
 }
 
 static struct XSParseSublikeHooks hooks_multi = {
   .permit_hintkey = "Syntax::Keyword::MultiSub/multi",
-  .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX,
-  .require_parts = XS_PARSE_SUBLIKE_PART_NAME,
-  .pre_subparse = parse_pre_subparse,
-  .post_newcv   = parse_post_newcv,
+  .flags          = XS_PARSE_SUBLIKE_FLAG_PREFIX|XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
+  .require_parts  = XS_PARSE_SUBLIKE_PART_NAME,
+  .pre_subparse   = parse_pre_subparse,
+  .post_newcv     = parse_post_newcv,
 };
 
 MODULE = Syntax::Keyword::MultiSub    PACKAGE = Syntax::Keyword::MultiSub
 
 BOOT:
-  boot_xs_parse_sublike(0.14);
+  boot_xs_parse_sublike(0.15);
 
   register_xs_parse_sublike("multi", &hooks_multi, NULL);

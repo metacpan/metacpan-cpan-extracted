@@ -1,5 +1,5 @@
 package Hadoop::HDFS::Command;
-$Hadoop::HDFS::Command::VERSION = '0.005';
+$Hadoop::HDFS::Command::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -30,6 +30,13 @@ has cmd_hdfs => (
 );
 
 has enable_log => (
+    is      => 'rw',
+    isa     => Bool,
+    default => sub { 0 },
+    lazy    => 1,
+);
+
+has trace_logs => (
     is      => 'rw',
     isa     => Bool,
     default => sub { 0 },
@@ -424,6 +431,78 @@ sub _dfs_get {
     return @response
 }
 
+sub _dfs_getfacl {
+    my $self    = shift;
+    my $options = shift;
+    my @params  = @_;
+    my @flags   = qw();
+    my($arg, $paths) = $self->_parse_options(
+                            \@params,
+                            \@flags,
+                            undef,
+                            {
+                                require_params => 1,
+                            },
+                        );
+    my @response = $self->_capture(
+        $options,
+        $self->cmd_hdfs,
+        qw( dfs -getfacl ),
+        ( map { '-' . $_ } grep { $arg->{ $_ } } @flags ),
+        @{ $paths },
+    );
+
+
+    my %rv;
+    for my $line ( @response ) {
+        if ( my($match) = $line =~ m{ \A [#] \s+ (.*) \z }xms ) {
+            my($k, $v) = split m{ [:] \s+ }xms, $match, 2;
+            $rv{ $k } = $v;
+            next;
+        }
+        push @{ $rv{entries} ||= [] }, $line;
+    }
+
+    return \%rv;
+}
+
+sub _dfs_setfacl {
+    my $self    = shift;
+    my $options = shift;
+    my @params  = @_;
+    my @flags   = qw( b k );
+    my @args    = qw( m=s x=s set=s );
+
+    my($arg, $paths) = $self->_parse_options(
+                            \@params,
+                            \@flags,
+                            \@args,
+                            {
+                                require_params => 1,
+                            },
+                        );
+
+    my @acl_flags = map { '-' . $_ } grep { $arg->{ $_ } } @flags;
+    delete @{ $arg }{ @flags };
+
+    my @acl_args = map {
+        my $key = $_ eq 'set'? '--set' : '-' . $_;
+        $key => $arg->{ $_ }
+    } keys %{ $arg };
+
+    my @response = $self->_capture(
+        $options,
+        $self->cmd_hdfs,
+        qw( dfs -setfacl ),
+        @acl_flags,
+        @acl_args,
+        @{ $paths },
+    );
+
+    # empty on success
+    @response;
+}
+
 sub _parse_options {
     my $self = shift;
     # TODO: collect dfs generic options
@@ -441,7 +520,7 @@ sub _parse_options {
     $conf ||= {};
     my @params = map { $_ eq '-' ? '\-' : $_ } @{ $params };
 
-    Getopt::Long::GetOptionsFromArray(
+    my @getopt_args = (
         \@params,
         \my %arg,
         (
@@ -449,10 +528,22 @@ sub _parse_options {
                 $flags,
                 $opt,
         ),
+    );
+
+    if  ( $self->trace_logs ) {
+        $self->_log( trace => '_parse_options::getopt: %s', \@getopt_args );
+    }
+
+    Getopt::Long::GetOptionsFromArray(
+        @getopt_args
     ) || die qq{Unable to parse parameters: '@{$params}'};
 
     if ( $conf->{require_params} && ! @params ) {
         die "No parameters were specified!";
+    }
+
+    if ( $self->trace_logs ) {
+        $self->_log( trace => '_parse_options::rv: %s', Dumper [ \%arg, [ @params ] ] );
     }
 
     return \%arg, [ @params ];
@@ -580,7 +671,7 @@ Hadoop::HDFS::Command
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

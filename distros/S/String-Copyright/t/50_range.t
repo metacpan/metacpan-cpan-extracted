@@ -16,7 +16,7 @@ is copyright("© 1999-2000  , 2001 - 2002\n, 2003 Foo"),
 	'1999-2003:Foo',
 	'single-year ranges';
 is copyright("© 1999-2000  , 2001\n - 2002\n, 2003 Foo"),
-	'1999-2001:- 2002',
+	'1999-2001:2002',
 	'range w/ newline before hyphen and before comma';
 is copyright("© 1999,2000,2003,2005,2006 Foo"),
 	'1999-2000, 2003, 2005-2006:Foo',

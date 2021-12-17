@@ -13,11 +13,11 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Sublike::Builder' => '0.14',
+      'XS::Parse::Sublike::Builder' => '0.15',
    },
    requires => {
       'perl' => '5.026', # parse_subsignature()
-      'XS::Parse::Sublike' => '0.14',
+      'XS::Parse::Sublike' => '0.15',
    },
    extra_compiler_flags => [qw( -I. -Ihax -ggdb )],
    license => 'perl',

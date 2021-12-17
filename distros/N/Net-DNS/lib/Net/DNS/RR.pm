@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 1841 2021-06-23 20:34:28Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 1856 2021-12-02 14:36:25Z willem $)[2];
 
 
 =head1 NAME
@@ -103,16 +103,16 @@ sub _new_string {
 	my ( $owner, @token ) = grep { defined && length } split /$PARSE_REGEX/o;
 
 	croak 'unable to parse RR string' unless scalar @token;
-	my $t1 = uc $token[0];
+	my $t1 = $token[0];
 	my $t2 = $token[1];
 
 	my ( $ttl, $class );
 	if ( not defined $t2 ) {				# <owner> <type>
-		@token = ('ANY') if $classbyname{$t1};		# <owner> <class>
+		@token = ('ANY') if $classbyname{uc $t1};	# <owner> <class>
 	} elsif ( $t1 =~ /^\d/ ) {
 		$ttl   = shift @token;				# <owner> <ttl> [<class>] <type>
 		$class = shift @token if $classbyname{uc $t2} || $t2 =~ /^CLASS\d/i;
-	} elsif ( $classbyname{$t1} || $t1 =~ /^CLASS\d/ ) {
+	} elsif ( $classbyname{uc $t1} || $t1 =~ /^CLASS\d/i ) {
 		$class = shift @token;				# <owner> <class> [<ttl>] <type>
 		$ttl   = shift @token if $t2 =~ /^\d/;
 	}
@@ -719,10 +719,11 @@ sub _annotation {
 }
 
 
-my $warned;
+my %warned;
 
 sub _deprecate {
-	carp join ' ', 'deprecated method;', pop(@_) unless $warned++;
+	my $msg = pop(@_);
+	carp join ' ', 'deprecated method;', $msg unless $warned{$msg}++;
 	return;
 }
 
@@ -782,7 +783,7 @@ sub AUTOLOAD {				## Default method
 	my $module = join '::', __PACKAGE__, $self->type;
 	eval("require $module") if $oref eq __PACKAGE__;	## no critic ProhibitStringyEval
 
-	@_ = ( <<"END", $@, "@object" );
+	@_ = ( <<"END" );
 ***  FATAL PROGRAM ERROR!!	Unknown instance method "$method"
 ***  which the program has attempted to call for the object:
 ***
@@ -792,6 +793,8 @@ $string
 ***  that the object would be of a particular type.  The type of an
 ***  object should be checked before calling any of its methods.
 ***
+@object
+$@
 END
 	goto &{'Carp::confess'};
 }
@@ -818,7 +821,7 @@ All rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-HTTPS.t 1840 2021-05-21 12:32:06Z willem $	-*-perl-*-
+# $Id: 05-HTTPS.t 1857 2021-12-07 13:38:02Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -68,7 +68,7 @@ my $wire = '000004706f6f6c03737663076578616d706c6500';
 	my $lc		= Net::DNS::RR->new( lc ". $type @data" );
 	my $rr		= Net::DNS::RR->new( uc ". $type @data" );
 	my $hash	= {};
-	my $predecessor = $rr->encode( 0, $hash );
+	my $predecessor = $rr->encode( 0,		    $hash );
 	my $compressed	= $rr->encode( length $predecessor, $hash );
 	ok( length $compressed == length $predecessor, 'encoded RDATA not compressible' );
 	isnt( $rr->encode,    $lc->encode, 'encoded RDATA names not downcased' );

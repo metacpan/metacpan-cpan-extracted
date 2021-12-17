@@ -26,5 +26,5 @@ requires:
   perl: '5.006001'
 resources:
   repository: https://github.com/maddingue/Net-Pcap
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

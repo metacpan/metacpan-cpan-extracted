@@ -2,7 +2,7 @@ package Net::DNS::RR::DNSKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DNSKEY.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+our $VERSION = (qw$Id: DNSKEY.pm 1856 2021-12-02 14:36:25Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -18,56 +18,6 @@ use integer;
 use Carp;
 
 use constant BASE64 => defined eval { require MIME::Base64 };
-
-#
-# source: http://www.iana.org/assignments/dns-sec-alg-numbers
-#
-{
-	my @algbyname = (
-		'DELETE'	     => 0,			# [RFC4034][RFC4398][RFC8078]
-		'RSAMD5'	     => 1,			# [RFC3110][RFC4034]
-		'DH'		     => 2,			# [RFC2539]
-		'DSA'		     => 3,			# [RFC3755][RFC2536]
-					## Reserved	=> 4,	# [RFC6725]
-		'RSASHA1'	     => 5,			# [RFC3110][RFC4034]
-		'DSA-NSEC3-SHA1'     => 6,			# [RFC5155]
-		'RSASHA1-NSEC3-SHA1' => 7,			# [RFC5155]
-		'RSASHA256'	     => 8,			# [RFC5702]
-					## Reserved	=> 9,	# [RFC6725]
-		'RSASHA512'	     => 10,			# [RFC5702]
-					## Reserved	=> 11,	# [RFC6725]
-		'ECC-GOST'	     => 12,			# [RFC5933]
-		'ECDSAP256SHA256'    => 13,			# [RFC6605]
-		'ECDSAP384SHA384'    => 14,			# [RFC6605]
-		'ED25519'	     => 15,			# [RFC8080]
-		'ED448'		     => 16,			# [RFC8080]
-
-		'INDIRECT'   => 252,				# [RFC4034]
-		'PRIVATEDNS' => 253,				# [RFC4034]
-		'PRIVATEOID' => 254,				# [RFC4034]
-					## Reserved	=> 255,	# [RFC4034]
-		);
-
-	my %algbyval = reverse @algbyname;
-
-	foreach (@algbyname) { s/[\W_]//g; }			# strip non-alphanumerics
-	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname;
-	my %algbyname = @algrehash;				# work around broken cperl
-
-	sub _algbyname {
-		my $arg = shift;
-		my $key = uc $arg;				# synthetic key
-		$key =~ s/[\W_]//g;				# strip non-alphanumerics
-		my $val = $algbyname{$key};
-		return $val if defined $val;
-		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm "$arg"];
-	}
-
-	sub _algbyval {
-		my $value = shift;
-		return $algbyval{$value} || return $value;
-	}
-}
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
@@ -268,6 +218,58 @@ sub keytag {
 }
 
 
+########################################
+
+{
+	my @algbyname = (
+		'DELETE'	     => 0,			# [RFC4034][RFC4398][RFC8078]
+		'RSAMD5'	     => 1,			# [RFC3110][RFC4034]
+		'DH'		     => 2,			# [RFC2539]
+		'DSA'		     => 3,			# [RFC3755][RFC2536]
+					## Reserved	=> 4,	# [RFC6725]
+		'RSASHA1'	     => 5,			# [RFC3110][RFC4034]
+		'DSA-NSEC3-SHA1'     => 6,			# [RFC5155]
+		'RSASHA1-NSEC3-SHA1' => 7,			# [RFC5155]
+		'RSASHA256'	     => 8,			# [RFC5702]
+					## Reserved	=> 9,	# [RFC6725]
+		'RSASHA512'	     => 10,			# [RFC5702]
+					## Reserved	=> 11,	# [RFC6725]
+		'ECC-GOST'	     => 12,			# [RFC5933]
+		'ECDSAP256SHA256'    => 13,			# [RFC6605]
+		'ECDSAP384SHA384'    => 14,			# [RFC6605]
+		'ED25519'	     => 15,			# [RFC8080]
+		'ED448'		     => 16,			# [RFC8080]
+
+		'INDIRECT'   => 252,				# [RFC4034]
+		'PRIVATEDNS' => 253,				# [RFC4034]
+		'PRIVATEOID' => 254,				# [RFC4034]
+					## Reserved	=> 255,	# [RFC4034]
+		);
+
+	my %algbyval = reverse @algbyname;
+
+	foreach (@algbyname) { s/[\W_]//g; }			# strip non-alphanumerics
+	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname;
+	my %algbyname = @algrehash;				# work around broken cperl
+
+	sub _algbyname {
+		my $arg = shift;
+		my $key = uc $arg;				# synthetic key
+		$key =~ s/[\W_]//g;				# strip non-alphanumerics
+		my $val = $algbyname{$key};
+		return $val if defined $val;
+		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm $arg];
+	}
+
+	sub _algbyval {
+		my $value = shift;
+		return $algbyval{$value} || return $value;
+	}
+}
+
+########################################
+
+
 1;
 __END__
 
@@ -410,7 +412,7 @@ Package template (c)2009,2012 O.M.Kolkman and R.W.Franks.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted, provided
-that the above copyright notice appear in all copies and that both that
+that the original copyright notices appear in all copies and that both
 copyright notice and this permission notice appear in supporting
 documentation, and that the name of the author not be used in advertising
 or publicity pertaining to distribution of the software without specific
@@ -427,9 +429,10 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC4034, RFC3755
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC4034
 
-L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>,
 L<DNSKEY Flags|http://www.iana.org/assignments/dnskey-flags>
+
+L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>
 
 =cut

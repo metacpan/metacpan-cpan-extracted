@@ -1,6 +1,9 @@
 
 History for the REST-Client Perl distribution
 
+281 2021-12-17
+  * Allow arbitrary request verbs (RT #124620)
+
 280 2021-12-14
   * Convert build system to MakeMaker and Dist::Zilla
     Fixes the installation on recent Perl without '.' in @INC

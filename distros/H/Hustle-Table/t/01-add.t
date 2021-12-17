@@ -15,7 +15,7 @@ ok eval {
 }, "Added via hash ref";
 
 ok eval {
-	my @id=$table->add(["b",sub {},undef,undef]);
+	my @id=$table->add(["b",sub {},undef,undef,undef]);
 	ok $id[0]== 1, "Unique id => $id[0]";
 	1;
 }, "Added via array ref";
@@ -34,7 +34,7 @@ ok eval {
 
 ok eval {
 	my @id=$table->add(
-		["d",sub {},"label",undef],
+		["d",sub {},"label",undef,undef],
 		{matcher=>"e", sub=>sub {}},
 		matcher=>"f", sub=>sub{}
 	);
@@ -48,7 +48,7 @@ ok eval {
 
 {
 	my $id=$table->add(
-		["g",sub {},"label",undef],
+		["g",sub {},"label",undef,undef],
 		{matcher=>"h", sub=>sub {}}
 	);
 	ok $id ==2 , "Scalar added count";

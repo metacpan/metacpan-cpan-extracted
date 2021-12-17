@@ -1,3 +1,7 @@
+0.06 2021-12-16T08:18:19+01:00
+ - Fix thumb_file() if file is SVG file.
+ - Update README file.
+
 0.05 2021-11-14T13:40:23+01:00
  - Add thumb_link() method.
 

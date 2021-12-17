@@ -3,6 +3,7 @@ Changes
 hax/dumpers.c.inc
 hax/forbid_outofblock_ops.c.inc
 hax/force_list_keeping_pushmark.c.inc
+hax/lexer-additions.c.inc
 hax/make_argcheck_aux.c.inc
 hax/make_argcheck_ops.c.inc
 hax/newOP_CUSTOM.c.inc
@@ -45,6 +46,7 @@ t/07subclass-foreign-ARRAY.t
 t/08subclass-Moo.t
 t/10method-attrs.t
 t/11method-signatures.t
+t/12method-private.t
 t/20slots-private.t
 t/21slots-capture.t
 t/22slots-accesssors.t

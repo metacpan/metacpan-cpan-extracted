@@ -12,7 +12,7 @@
 
 #########################################################################
 
-use v5.12.1;
+use v5.14.0;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -33,6 +33,7 @@ BEGIN {
 	$@ =~ m/^It is invalid to load Term::ReadLine::Gnu directly/
 	    or  plan skip_all => 'Term::ReadLine::Gnu not found';
     }
+    -c '/dev/tty'  or  plan skip_all => 'required TTY (/dev/tty) not available';
     plan tests => 29;
 
     # define fixed environment for unit tests:
@@ -74,7 +75,7 @@ _run_in_fork
 	 _ok(80 == $main->width(),
 	     'maximum application width set to 80');
      });
-$_ = _sub_perl(	<<~'CODE');
+$_ = _sub_perl(	<<'CODE');
 		BEGIN { $ENV{PERL_RL} = "Gnu"; }
 		use Term::ReadLine;
 		open IN, "/dev/tty"  or  die "IN: $!";
@@ -85,9 +86,9 @@ $_ = _sub_perl(	<<~'CODE');
 		my $main = UI::Various::Main->new();
 		print(	$main->{_rl}->ReadLine, ": ",
 			$main->width, "x", $main->height, "\n");
-		CODE
+CODE
 ok(m/^Term::ReadLine::Gnu: \d{2,}x\d{2,}/,
-   'Term::ReadLine::Gnu returned size');
+   'Term::ReadLine::Gnu returned size: "' . $_ . '"');
 
 ####################################
 # test standard behaviour - elements:

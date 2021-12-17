@@ -1,3 +1,22 @@
+0.008  2021-12-17 18:35:03 CET
+   - Release after 112 PASSes on CPAN Testers (thanks!)
+
+0.007002  2021-12-12 20:13:40 CET
+   - Set auto-leaves to 1 by default, it just makes sense.
+   - Add support for simplified env var setting, both setting it
+     to a plain 1 or through auto-environment.
+
+0.007001  2021-12-10 21:58:47 CET
+   - Add specfetch and SpecFromHashOrModule to divide apps into modules.
+   - Handle defaults anticipating availability of their values but
+     still overriding them.
+   - Add some more doc notes.
+
+0.007  2021-11-27 08:36:21 CET
+   - Add fallback, fallback-to, fallback-to-default, and dispatch options
+     to sub-commands
+   - Add documentation on caling conventions for executables.
+
 0.006  2021-08-29 22:05:40 CEST
    - regenerate expansions with the right Template::Perlish (1.56)
 

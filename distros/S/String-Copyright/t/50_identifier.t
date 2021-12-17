@@ -1,6 +1,6 @@
 use Test2::V0;
 
-plan 63;
+plan 70;
 
 use String::Copyright {
 	format => sub { join ':', $_->[0] || '', $_->[1] || '' }
@@ -18,6 +18,13 @@ is copyright("(c) Foo"),  ':Foo', '(c) as identifier';
 is copyright("(C) Foo"),  ':Foo', '(C) as identifier';
 is copyright("{c} Foo"),  ':Foo', '{c} as identifier';
 is copyright("{C} Foo"),  ':Foo', '{C} as identifier';
+
+is copyright("Â© Foo"), ':Foo',
+	'lati1-misparsed-as-utf8 copyright sign as identifier';
+is copyright("RenÃ© Foo"), '', 'bogus latin1-as-utf8 accent acute';
+is copyright("¬© Foo"), ':Foo',
+	'MacRoman-misparsed-as-utf8 copyright sign as identifier';
+
 is copyright("Copyright: Foo"),  ':Foo', '"Copyright:" as identifier';
 is copyright('Copyright : Foo'), ':Foo', '"Copyright :" as identifier';
 is copyright("Copyright-holder: Foo"), ':Foo',
@@ -41,6 +48,9 @@ is copyright('Copyright:: Copyright (c) Foo'), ':Foo',
 
 is copyright('Copyright 1999 (c) Foo'), '1999:Foo',
 	'"pseudo-sign after years';
+
+is copyright('COPYRIGHT HOLDER'),
+	'', 'bogus copyright holder "HOLDER" as last word of line';
 
 is copyright("-C- Foo"), '', 'bogus lone non-pseudosign -C-';
 
@@ -76,8 +86,12 @@ is copyright('infringe copyright if you do '),
 	'', 'bogus identifier followed by " if"';
 is copyright('disclaims all copyright interest in '),
 	'', 'bogus identifier followed by " interest"';
+is copyright('Grant of Copyright License.'),
+	'', 'bogus identifier followed by " License"';
 is copyright('fall under the copyright of this Package'),
 	'', 'bogus identifier followed by " of "';
+is copyright('all copyright, patent, trademark'),
+	'', 'bogus identifier followed by " patent"';
 is copyright('requiring copyright permission '),
 	'', 'bogus identifier followed by " permission"';
 is copyright('contain a copyright sign '),
@@ -102,6 +116,8 @@ is copyright('Check for copyright lines'),
 	'', 'bogus identifier preceded by "for "';
 is copyright('#define FONT_INFO_COPYRIGHT 0x0040'),
 	'', 'bogus identifier preceded by underscore';
+is copyright('missing-license-text-in-dep5-copyright GPL-2\+ *'),
+	'', 'bogus identifier preceded by dash';
 
 is copyright('the United States Copyright Act of 1976'),
 	'', 'bogus identifier "Copyright Act"';

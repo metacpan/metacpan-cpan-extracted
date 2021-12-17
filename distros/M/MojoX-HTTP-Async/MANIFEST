@@ -10,7 +10,10 @@ README
 README.md
 t/certs/server-cert.pem
 t/certs/server-key.pem
+t/connect_timeout.t
+t/inactivity_timeout.t
 t/insecure.t
 t/lib/Test/Utils.pm
+t/request_timeout.t
 t/secure.t
 xt/release/kwalitee.t
