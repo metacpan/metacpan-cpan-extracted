@@ -1,6 +1,15 @@
 Revision history for Perl extension UI-Various
 
-0.03 2021-12-17T10:21:41Z
+0.05 2021-12-20T07:48:23Z
+
+0.05 2021-12-20T07:46:48Z
+
+    - yet two more fixes for some CPAN test environments
+
+0.04 2021-12-19T12:00:59Z
+
+    - changed handling of tty in Curses test
+    - added still more output to some test failing in some environments
 
 0.03 2021-12-17T10:20:33Z
 

@@ -266,7 +266,8 @@ check_fixmes_todos();
 
 # relax strict ulimit:
 system(qw(chmod --recursive --changes a+rX
-	  Changes LICENSE META.json README.md builder examples lib t));
+	  Build.PL Changes LICENSE META.json README.md
+	  builder cpanfile examples lib minil.toml t));
 
 
 #########################################################################

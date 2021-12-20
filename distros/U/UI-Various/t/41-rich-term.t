@@ -21,6 +21,7 @@ use Cwd 'abs_path';
 
 use Test::More;
 use Test::Output;
+my $tty;
 BEGIN {
     # Use simple ReadLine without ornaments (aka ANSI escape sequences) for
     # unit tests to allow exact comparison:
@@ -33,7 +34,10 @@ BEGIN {
 	$@ =~ m/^It is invalid to load Term::ReadLine::Gnu directly/
 	    or  plan skip_all => 'Term::ReadLine::Gnu not found';
     }
-    -c '/dev/tty'  or  plan skip_all => 'required TTY (/dev/tty) not available';
+    $tty = `tty`;
+    chomp $tty;
+    -c $tty  and  -w $tty
+	or  plan skip_all => 'required TTY (' . $tty . ') not available';
     plan tests => 29;
 
     # define fixed environment for unit tests:
@@ -75,18 +79,18 @@ _run_in_fork
 	 _ok(80 == $main->width(),
 	     'maximum application width set to 80');
      });
-$_ = _sub_perl(	<<'CODE');
-		BEGIN { $ENV{PERL_RL} = "Gnu"; }
+$_ = _sub_perl('BEGIN { $ENV{PERL_RL} = "Gnu"; }
 		use Term::ReadLine;
-		open IN, "/dev/tty"  or  die "IN: $!";
-		open OUT, "/dev/tty"  or  die "OUT: $!";
+		open IN, "' . $tty . '"  or  die "IN: $!";
+		open OUT, "' . $tty . '"  or  die "OUT: $!";
 		my $term = Term::ReadLine->new("T41", *IN, *OUT);
 		use UI::Various({use => ["RichTerm"]});
 		use UI::Various::Main;
 		my $main = UI::Various::Main->new();
 		print(	$main->{_rl}->ReadLine, ": ",
 			$main->width, "x", $main->height, "\n");
-CODE
+');
+chomp;
 ok(m/^Term::ReadLine::Gnu: \d{2,}x\d{2,}/,
    'Term::ReadLine::Gnu returned size: "' . $_ . '"');
 

@@ -19,14 +19,16 @@ name: Dist-Zilla-Plugin-Module-Features
 provides:
   Dist::Zilla::Plugin::Module::Features:
     file: lib/Dist/Zilla/Plugin/Module/Features.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Dist::Zilla::File::InMemory: '0'
   Dist::Zilla::Role::AfterBuild: '0'
+  Dist::Zilla::Role::BeforeBuild: '0'
   Dist::Zilla::Role::FileFinderUser: '0'
   Dist::Zilla::Role::FileGatherer: '0'
   Dist::Zilla::Role::PrereqSource: '0'
   Dist::Zilla::Role::RequireFromBuild: '0'
+  File::Spec::Functions: '0'
   Moose: '0'
   PMVersions::Util: '0'
   namespace::autoclean: '0'
@@ -37,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Module-Features
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Module-Features
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-Module-Features.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -117,7 +119,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.605'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

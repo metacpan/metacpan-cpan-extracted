@@ -63,7 +63,7 @@ for my $original_text (@snippets) {
         parse_text($text),
         {
             file_name     => $path->stringify,
-            original_text => $chomped,
+            original_text => qq{'$path'},
         },
         'parse_text without line'
     );

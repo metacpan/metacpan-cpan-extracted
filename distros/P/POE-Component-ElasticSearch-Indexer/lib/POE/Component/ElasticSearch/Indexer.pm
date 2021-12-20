@@ -3,8 +3,9 @@ package POE::Component::ElasticSearch::Indexer;
 
 use strict;
 use warnings;
+use version;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use Const::Fast;
 use Digest::MD5 qw(md5_hex);
@@ -90,20 +91,22 @@ sub spawn {
     # Management Session
     my $session = POE::Session->create(
         inline_states => {
-            _start    => \&_start,
-            _child    => \&_child,
-            stats     => \&_stats,
-            queue     => \&es_queue,
-            flush     => \&es_flush,
-            batch     => \&es_batch,
-            save      => \&es_save,
-            backlog   => \&es_backlog,
-            cleanup   => \&es_cleanup,
-            shutdown  => \&es_shutdown,
-            #health    => \&es_health,
+            _start   => \&_start,
+            _child   => \&_child,
+            stats    => \&_stats,
+            queue    => \&es_queue,
+            flush    => \&es_flush,
+            batch    => \&es_batch,
+            save     => \&es_save,
+            backlog  => \&es_backlog,
+            cleanup  => \&es_cleanup,
+            shutdown => \&es_shutdown,
+            version  => \&es_version,
+            #health   => \&es_health,
 
             # HTTP Responses
-            resp_bulk          => \&resp_bulk,
+            resp_bulk    => \&resp_bulk,
+            resp_version => \&resp_version,
             #resp_health        => \&resp_health,
         },
         heap => {
@@ -114,6 +117,9 @@ sub spawn {
             health     => '',
             es_ready   => 0,
             http_alias => $http_session_alias,
+            # Version Checking
+            _version_checks   => 0,
+            max_version_tries => 5,
         },
     );
 
@@ -161,12 +167,12 @@ sub _start {
     # Batch directory
     path($heap->{cfg}{BatchDir})->mkpath;
 
+    # Check Version
+    $kernel->yield('version');
+
     # Run through the backlog
     $kernel->delay( backlog => 2 );
     $heap->{backlog_scheduled} = 1;
-
-    # For now, we just state we're ready
-    $heap->{es_ready} = 1;
 
     # Schedule Statistics Run
     $kernel->delay( stats => $heap->{cfg}{StatsInterval} );
@@ -229,6 +235,63 @@ sub _stats {
 }
 
 
+sub es_version {
+    my ($kernel,$heap) = @_[KERNEL,HEAP];
+
+    # Bail if we've tried too many times
+    die "Unable to guess version after $heap->{max_version_tries}"
+        if $heap->{_version_checks} >= $heap->{max_version_tries};
+
+    $heap->{_version_checks}++;
+
+    # Get Server/Port
+    my ($server,$port) = split /\:/, $heap->{cfg}{Servers}[int rand scalar @{$heap->{cfg}{Servers}}];
+    my $uri = URI->new();
+        $uri->scheme('http');
+        $uri->host($server);
+        $uri->port($port || 9200);
+        $uri->path('/');
+
+    # Build the request
+    my $req = HTTP::Request->new(GET => $uri->as_string);
+
+    # Make the request
+    $kernel->post( $heap->{http_alias} => request => resp_version => $req );
+}
+
+
+sub resp_version {
+    my ($kernel,$heap,$params,$resp) = @_[KERNEL,HEAP,ARG0,ARG1];
+
+    my $req  = $params->[0];  # HTTP::Request Object
+    my $r    = $resp->[0];    # HTTP::Response Object
+
+    # We might need to batch things
+    TRACE(sprintf "es_version() %s", $r->status_line);
+
+    if( $r->is_success ) {
+        my $details;
+        eval {
+            $details = decode_json($r->content);
+        } or do {
+            my $error = $@;
+            WARN("es_version() not valid JSON: $error");
+        };
+        if( defined $details && ref $details eq 'HASH' ) {
+            DEBUG(sprintf "es_version() instance=%s cluster=%s version=%s",
+                $details->{name},
+                $details->{cluster_name},
+                $details->{version}{number},
+            );
+            $heap->{es_version} = version->parse($details->{version}{number});
+            $heap->{es_ready} = 1;
+        }
+    }
+    # Retry
+    $kernel->yield('version') unless $heap->{es_ready};
+}
+
+
 sub es_queue {
     my ($kernel,$heap,$data) = @_[KERNEL,HEAP,ARG0];
 
@@ -257,6 +320,9 @@ sub es_queue {
                 _type  => $doc->{_type}  ? delete $doc->{_type}  : $heap->{cfg}{DefaultType},
                 $doc->{_id} ? ( _id => delete $doc->{_id} ) : (),
             );
+            # Remove _type attribute for newer elasticsearch
+            delete $meta{_type} if $heap->{es_version} >= version->declare("v7.0.0");
+            # Construct the bulk request
             $record = sprintf("%s\n%s\n",
                 encode_json({ index => \%meta }),
                 encode_json($doc),
@@ -655,7 +721,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -780,6 +846,9 @@ C<_index> element.  Defaults to B<logs-%Y.%m.%d>.
 Use this C<_type> attribute if the document is missing one.  Defaults to
 B<_doc> to be compatible with ES 7.x.
 
+The C<_type> attribute will be stripped from documents if the cluster is
+running greater than 7.0.0.
+
 =item B<BatchDir>
 
 If the cluster responds with an HTTP failure code, the batch is written to disk
@@ -838,6 +907,14 @@ The events provided by this component.
 
 =over 2
 
+=item B<version>
+
+Runs at start to the get Elasticsearch Version.
+
+=for Pod::Coverage es_version
+
+=for Pod::Coverage resp_version
+
 =item B<queue>
 
 Takes an array reference of hash references to be transformed into JSON
@@ -858,6 +935,8 @@ Elasticsearch will generate a UUID for each document automatically.
 
 Will be submitted as the document type in the bulk operation, if not specified,
 we'll use the C<DefaultType> specified in the C<spawn()> method.
+
+Deprecated and removed for clusters running Elasticsearch version 7.0 or higher.
 
 =item B<_index>
 
@@ -981,7 +1060,7 @@ This is free software, licensed under:
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 

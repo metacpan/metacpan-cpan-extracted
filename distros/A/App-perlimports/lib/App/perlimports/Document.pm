@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -278,6 +278,7 @@ my %default_ignore = (
     'Sub::Exporter::Progressive'                          => 1,
     'Sub::HandlesVia'                                     => 1,
     'Syntax::Keyword::Try'                                => 1,
+    'Term::Size::Any'                                     => 1,
     'Test2::Util::HashBase'                               => 1,
     'Test::Exception'                                     => 1,
     'Test::Needs'                                         => 1,
@@ -1016,7 +1017,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000027
+version 0.000028
 
 =head2 inspector_for( $module_name )
 

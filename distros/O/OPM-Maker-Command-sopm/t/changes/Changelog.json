@@ -1,0 +1,33 @@
+{
+    "name": "Test",
+    "version": "0.0.3",
+    "framework": [
+        "3.0.x"
+    ],
+    "vendor": {
+        "name":  "Perl-Services.de",
+        "url": "http://www.perl-services.de"
+    },
+    "license": "GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007",
+    "description" : {
+        "en": "Test sopm command"
+    },
+    "changes" : [
+        "test",
+        { "date": "2014-12-17 00:45", "version" : "1.2.0", "message" : "test2" },
+    ],
+    "requires": {
+        "package" : {
+            "TicketOverviewHooked" : "3.2.1"
+        },
+        "module" : {
+            "Digest::MD5" : "0.01"
+        }
+    },
+    "code" : [
+        {
+            "type": "Install",
+            "version": 0
+        }
+    ]
+}

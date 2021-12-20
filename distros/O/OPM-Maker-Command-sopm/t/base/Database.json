@@ -1,0 +1,108 @@
+{
+    "name": "Database",
+    "version": "0.0.3",
+    "framework": [
+        "3.0.x",
+        "3.1.x",
+        "3.2.x"
+    ],
+    "vendor": {
+        "name":  "Perl-Services.de",
+        "url": "http://www.perl-services.de"
+    },
+    "license": "GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007",
+    "description" : {
+        "en": "Test sopm command"
+    },
+    "requires": {
+        "package" : {
+            "TicketOverviewHooked" : "3.2.1"
+        },
+        "module" : {
+            "Digest::MD5" : "0.01"
+        }
+    },
+    "database" : [
+        {
+            "type": "TableCreate",
+            "version": 0,
+            "name": "opar_test",
+            "columns": [
+                { "name": "id", "required": "true", "auto_increment": "true", "type": "INTEGER", "primary_key": "true" },
+                { "name": "object_id", "required": "true", "type": "INTEGER" },
+                { "name": "object_type", "required": "true", "type": "VARCHAR", "size": 55 }
+            ],
+            "keys" : [
+                {
+                    "name": "system_user",
+                    "references": [
+                        { "local": "object_id", "foreign": "id" }
+                    ]
+                }
+            ],
+            "unique" : [
+                {
+                    "columns" : [
+                        "id",
+                        "object_id"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "TableCreate",
+            "version": 0,
+            "name": "opar_test_2",
+            "columns": [
+                { "name": "id", "required": "true", "auto_increment": "true", "type": "INTEGER", "primary_key": "true" },
+                { "name": "object_id", "required": "true", "type": "INTEGER" },
+                { "name": "object_type", "required": "true", "type": "VARCHAR", "size": 55 }
+            ],
+            "keys" : [
+                {
+                    "name": "system_user",
+                    "references": [
+                        { "local": "object_id", "foreign": "id" }
+                    ]
+                }
+            ],
+            "unique" : [
+                {
+                    "id" : "my_unique",
+                    "columns" : [
+                        "id",
+                        "object_id"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Insert",
+            "name": "ticket_history_type",
+            "version": [ 0, "0.0.2" ],
+            "columns": [
+                { "name": "name", "type": "Quote", "value": "teest" },
+                { "name": "comments", "type": "Quote", "value": "test" },
+                { "name": "valid_id", "value": "1" },
+                { "name": "create_time", "type": "Quote", "value": "2012-10-18 00:00:00" },
+                { "name": "create_by", "value": "1" },
+                { "name": "change_time", "type": "Quote", "value": "2012-10-18 00:00:00" },
+                { "name": "change_by", "value": "1" }
+            ]
+        },
+        {
+            "type": "Insert",
+            "name": "ticket_history_type",
+            "version": [ 0, "0.0.2" ],
+            "columns": [
+                { "name": "name", "type": "Quote", "value": [ "test1", "test2" ] },
+                { "name": "comments", "type": "Quote", "value": "test" },
+                { "name": "valid_id", "value": "1" },
+                { "name": "create_time", "type": "Quote", "value": "2012-10-18 00:00:00" },
+                { "name": "create_by", "value": "1" },
+                { "name": "change_time", "type": "Quote", "value": "2012-10-18 00:00:00" },
+                { "name": "change_by", "value": "1" }
+            ]
+        }
+    ]
+}

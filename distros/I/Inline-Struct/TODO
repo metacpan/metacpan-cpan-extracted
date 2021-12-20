@@ -3,6 +3,5 @@
  o change names of _HASH, _ARRAY, and _KEYS (to what?)
  o add a _TIEHASH accessor?
  o allow nesting of structures which aren't _pointers_
- o enum support?
  o #define support?
  o type checking in accessors

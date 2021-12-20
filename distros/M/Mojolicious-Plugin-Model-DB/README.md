@@ -76,6 +76,12 @@ All available options
         mysql        => 'mysql://user@/mydb',      # this will instantiate Mojo::mysql, in model get $self->mysql,
         SQLite       => 'sqlite:test.db',          # this will instantiate Mojo::SQLite, in model get $self->sqlite,
         Redis        => 'redis://localhost',       # this will instantiate Mojo::Redis, in model get $self->redis,
+        
+        # or using reference
+        Pg           => Mojo::Pg->new('postgresql://postgres@/test'),       # in model get $self->pg,
+        mysql        => Mojo::mysql->strict_mode('mysql://username@/test'), # in model get $self->mysql,
+        SQLite       => Mojo::SQLite->new('sqlite:test.db'),                # in model get $self->sqlite,
+        Redis        => Mojo::Redis->new("redis://localhost:6379/1"),       # in model get $self->redis,        
 
         # Mojolicious::Plugin::Model
         namespaces   => ['MyApp::Model', 'MyApp::CLI::Model'],

@@ -58,7 +58,7 @@ subtest 'second transformation' => sub {
 };
 
 subtest 'scale' => sub {
-    $transformer->{Width} = 150;
+    $transformer->{Width}     = 150;
     $transformer->{Transform} = '';
 
     $parser->parse_string($svg);

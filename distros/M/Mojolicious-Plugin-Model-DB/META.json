@@ -59,6 +59,6 @@
          "web" : "https://github.com/lucas1/Mojolicious-Plugin-Model-DB"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

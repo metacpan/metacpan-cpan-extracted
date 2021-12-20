@@ -1,3 +1,14 @@
+0.006   2021-07-27  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- [incompatible change] Rename pat perl_release_tarball_filename ->
+	  perl_release_archive_filename.
+
+
+0.005   2021-07-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module: Regexp::Pattern::Perl::Release.
+
+
 0.004   2020-10-02  Released-By: PERLANCAR; Urgency: medium
 
 	- [incompatible change] Do not anchor the patterns, to make it more

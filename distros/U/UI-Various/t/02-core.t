@@ -234,8 +234,10 @@ is($_, '', 'postponing/dropping STDERR printed correct output');
 $_ = _sub_perl(	<<'CODE');
 		use UI::Various({log => "WARN"});
 		close STDERR;
+		defined fileno(STDERR)  and
+		    print "STDERR still defined (", fileno(STDERR), ")\n";
 		$_ = UI::Various::stderr(2);
-		print "We should not get here! ($_)";
+		print "We should not get here! ($_, ", fileno(STDERR), ")\n";
 CODE
 is($?, 0x900, 'RC 9 (no signal or core-dump) in sub-perl "closed STDERR"');
 is($_,

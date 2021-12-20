@@ -8,7 +8,7 @@ use Mojolicious::Lite;
 my @log;
 app->log->level('info');
 app->log->unsubscribe('message');
-app->log->on(message => sub { push @log, $_[2] });
+app->log->on(message => sub { shift; push @log, "@_" });
 
 get '/foo' => sub {
   my $c = shift;
@@ -28,17 +28,17 @@ $t->get_ok('/foo',
 
 note "logged: $_" for @log;
 
-my ($v1) = grep {/^GET/} @log;
+my ($v1) = grep {m!GET "/!} @log;
 like $v1, qr{GET "/foo" \(superwoman\) 200 OK \(0\.\d+s\)$}, 'v1';
 
-my ($v2) = grep {/^\[superwoman\]/} @log;
+my ($v2) = grep {m!GET http!} @log;
 like $v2,
-  qr{^\[superwoman\] [\d\.]+ GET http://\S+ 200 OK "https://example\.com" "SuperAgent" \(0\.\d+s\)$},
+  qr{[\d\.]+ GET http://\S+ 200 "https://example\.com" "SuperAgent" \(0\.\d+s\)$},
   'v2';
 
-my ($all) = grep {/^A=/} @log;
+my ($all) = grep {/\sA=/} @log;
 like $all,
-  qr{^A=SuperAgent C=200 F=https://example\.com H=GET I=superwoman M=OK P=/foo R=[\d\.]+ T=0\.\d+s U=http://\S+$},
+  qr{A=SuperAgent C=200 F=https://example\.com H=GET I=superwoman M=OK P=/foo R=[\d\.]+ T=0\.\d+s U=http://\S+$},
   'variables';
 
 done_testing;

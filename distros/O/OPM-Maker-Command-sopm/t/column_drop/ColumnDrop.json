@@ -1,0 +1,25 @@
+{
+    "name": "ColumnDrop",
+    "version": "0.0.3",
+    "framework": [
+        "3.2.x"
+    ],
+    "vendor": {
+        "name":  "Perl-Services.de",
+        "url": "http://www.perl-services.de"
+    },
+    "license": "GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007",
+    "description" : {
+        "en": "Test sopm command"
+    },
+    "database" : [
+        {
+            "uninstall": 1,
+            "type": "ColumnDrop",
+            "name": "opar_test",
+            "columns": [
+                "col1"
+            ]
+        }
+    ]
+}

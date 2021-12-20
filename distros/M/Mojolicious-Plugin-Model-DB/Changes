@@ -1,3 +1,6 @@
+1.05 2021-12-19T23:18:00Z
+    - Added code to accept set database by reference
+
 1.04 2021-07-13T07:50:00Z
     - Added die with the error if some database does not loader.
     - Added changes to work with latest version of Mojolicious::Plugin::Model.

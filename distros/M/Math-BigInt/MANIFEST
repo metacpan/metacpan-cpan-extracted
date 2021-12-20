@@ -54,6 +54,8 @@ t/bnstr-mbf.t
 t/bnstr-mbi.t
 t/bpi-mbf.t
 t/bpi-mbi.t
+t/bpow-mbf.t
+t/bpow-mbi.t
 t/bsstr-mbf.t
 t/bsstr-mbi.t
 t/buparrow-mbi.t
@@ -70,6 +72,8 @@ t/dparts-mbf.t
 t/dparts-mbi.t
 t/eparts-mbf.t
 t/eparts-mbi.t
+t/fparts-mbf.t
+t/fparts-mbi.t
 t/from_base-mbi.t
 t/from_base_num-mbi.t
 t/from_bin-mbf.t

@@ -1,5 +1,5 @@
 package Yancy::Model::Item;
-our $VERSION = '1.087';
+our $VERSION = '1.088';
 # ABSTRACT: Interface to a single item
 
 #pod =head1 SYNOPSIS
@@ -122,7 +122,7 @@ Yancy::Model::Item - Interface to a single item
 
 =head1 VERSION
 
-version 1.087
+version 1.088
 
 =head1 SYNOPSIS
 

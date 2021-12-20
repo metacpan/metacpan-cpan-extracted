@@ -91,6 +91,7 @@ t/script-with-inner-packages.t
 t/signatures.pl
 t/skip-all.t
 t/socket.t
+t/sort-imports.t
 t/switches-in-import.t
 t/symbol-as-method-call.t
 t/symbol-in-export.t
@@ -144,6 +145,7 @@ test-data/lib/Local/MyOwnMoose.pm
 test-data/lib/Local/ReExportViaSubExporter.pm
 test-data/lib/Local/RequireExporter.pm
 test-data/lib/Local/STDOUT.pm
+test-data/lib/Local/Sort.pm
 test-data/lib/Local/SymbolInExport.pm
 test-data/lib/Local/UsesMoo.pm
 test-data/lib/Local/UsesMoose.pm
@@ -175,6 +177,7 @@ test-data/same-import.pl
 test-data/signatures.pl
 test-data/skip-all.t
 test-data/socket.pl
+test-data/sort.pl
 test-data/stdout.pl
 test-data/switches-in-import.pl
 test-data/symbol-as-method-call.pl

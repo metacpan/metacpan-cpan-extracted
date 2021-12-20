@@ -3,9 +3,9 @@ NAME
     Module::Features::* distribution
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     Dist::Zilla::Plugin::Module::Features (from Perl distribution
-    Dist-Zilla-Plugin-Module-Features), released on 2021-08-27.
+    Dist-Zilla-Plugin-Module-Features), released on 2021-11-29.
 
 SYNOPSIS
     In dist.ini:

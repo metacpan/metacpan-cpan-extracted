@@ -1,3 +1,4 @@
+.pls_cache/index
 Changes
 cpanfile
 lib/Mojolicious/Plugin/Syslog.pm

@@ -1,117 +1,113 @@
 package Return::MultiLevel;
 
-use warnings;
 use strict;
-
-our $VERSION = '0.06';
-
+use warnings;
+use 5.008001;
 use Carp qw(confess);
-use Data::Munge qw(eval_string);
 use parent 'Exporter';
+
+# ABSTRACT: Return across multiple call levels
+our $VERSION = '0.08'; # VERSION
 
 our @EXPORT_OK = qw(with_return);
 
 our $_backend;
 
+sub with_return (&);
+
 if (!$ENV{RETURN_MULTILEVEL_PP} && eval { require Scope::Upper }) {
-    eval_string <<'EOT';
-sub with_return (&) {
+
+  *with_return = sub (&) {
     my ($f) = @_;
     my $ctx = Scope::Upper::HERE();
-    my @canary =
-        !$ENV{RETURN_MULTILEVEL_DEBUG}
-            ? '-'
-            : Carp::longmess "Original call to with_return"
-    ;
+    my @canary = !$ENV{RETURN_MULTILEVEL_DEBUG}
+      ? '-'
+      : Carp::longmess "Original call to with_return";
+
     local $canary[0];
     $f->(sub {
-        $canary[0]
-            and confess
-                $canary[0] eq '-'
-                    ? ""
-                    : "Captured stack:\n$canary[0]\n",
-                "Attempt to re-enter dead call frame"
-        ;
-        Scope::Upper::unwind(@_, $ctx);
+      $canary[0] and confess $canary[0] eq '-'
+        ? ""
+        : "Captured stack:\n$canary[0]\n",
+        "Attempt to re-enter dead call frame";
+      Scope::Upper::unwind(@_, $ctx);
     })
-}
-EOT
+  };
 
-    $_backend = 'XS';
+  $_backend = 'XS';
 
 } else {
 
-    eval_string <<'EOT';
-{
+  *_label_at = do {
     my $_label_prefix = '_' . __PACKAGE__ . '_';
     $_label_prefix =~ tr/A-Za-z0-9_/_/cs;
 
-    sub _label_at { $_label_prefix . $_[0] }
-}
+    sub { $_label_prefix . $_[0] };
+  };
 
-our @_trampoline_cache;
+  our @_trampoline_cache;
 
-sub _get_trampoline {
+  *_get_trampoline = sub {
     my ($i) = @_;
-    my $label = _label_at $i;
+    my $label = _label_at($i);
     (
-        $label,
-        $_trampoline_cache[$i] ||= eval_string qq{
-            sub {
-                my \$rr = shift;
-                my \$fn = shift;
-                return &\$fn;
-                $label: splice \@\$rr
-            }
-        },
+      $label,
+      $_trampoline_cache[$i] ||= eval ## no critic (BuiltinFunctions::ProhibitStringyEval)
+      qq{
+        sub {
+          my \$rr = shift;
+          my \$fn = shift;
+          return &\$fn;
+          $label: splice \@\$rr
+        }
+      },
     )
-}
+  };
 
-our $_depth = 0;
+  our $_depth = 0;
 
-sub with_return (&) {
+  *with_return = sub (&) {
     my ($f) = @_;
-    my ($label, $trampoline) = _get_trampoline $_depth;
+    my ($label, $trampoline) = _get_trampoline($_depth);
     local $_depth = $_depth + 1;
-    my @canary =
-        !$ENV{RETURN_MULTILEVEL_DEBUG}
-            ? '-'
-            : Carp::longmess "Original call to with_return"
-    ;
+    my @canary = !$ENV{RETURN_MULTILEVEL_DEBUG}
+      ? '-'
+      : Carp::longmess "Original call to with_return";
+
     local $canary[0];
     my @ret;
     $trampoline->(
-        \@ret,
-        $f,
-        sub {
-            $canary[0]
-                and confess
-                    $canary[0] eq '-'
-                        ? ""
-                        : "Captured stack:\n$canary[0]\n",
-                    "Attempt to re-enter dead call frame"
-            ;
-            @ret = @_;
-            goto $label;
-        },
+      \@ret,
+      $f,
+      sub {
+        $canary[0] and confess $canary[0] eq '-'
+          ? ""
+          : "Captured stack:\n$canary[0]\n",
+          "Attempt to re-enter dead call frame";
+        @ret = @_;
+        goto $label;
+      },
     )
-}
-EOT
+  };
 
     $_backend = 'PP';
 }
 
-'ok'
+1;
 
 __END__
 
-=encoding UTF-8
+=pod
 
-=for highlighter language=perl
+=encoding UTF-8
 
 =head1 NAME
 
-Return::MultiLevel - return across multiple call levels
+Return::MultiLevel - Return across multiple call levels
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -181,67 +177,31 @@ something has called a C<$return> from outside of its C<with_return { ... }>
 block. You can get a stack trace of where that C<with_return> was by setting
 the environment variable C<RETURN_MULTILEVEL_DEBUG> to 1.
 
-=head1 BUGS AND LIMITATIONS
+=head1 CAVEATS
 
 You can't use this module to return across implicit function calls, such as
 signal handlers (like C<$SIG{ALRM}>) or destructors (C<sub DESTROY { ... }>).
 These are invoked automatically by perl and not part of the normal call chain.
 
-=begin :README
+=head1 AUTHORS
 
-=head1 INSTALLATION
+=over 4
 
-To download and install this module, use your favorite CPAN client, e.g.
-L<C<cpan>|cpan>:
+=item *
 
-=for highlighter language=sh
+Lukas Mai
 
-    cpan Return::MultiLevel
+=item *
 
-Or L<C<cpanm>|cpanm>:
+Graham Ollis <plicease@cpan.org>
 
-    cpanm Return::MultiLevel
+=back
 
-To do it manually, run the following commands (after downloading and unpacking
-the tarball):
+=head1 COPYRIGHT AND LICENSE
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+This software is copyright (c) 2013,2014,2021 by Lukas Mai.
 
-=end :README
-
-=head1 SUPPORT AND DOCUMENTATION
-
-After installing, you can find documentation for this module with the
-L<C<perldoc>|perldoc> command.
-
-=for highlighter language=sh
-
-    perldoc Return::MultiLevel
-
-You can also look for information at
-L<https://metacpan.org/pod/Return::MultiLevel>.
-
-To see a list of open bugs, visit
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Return-MultiLevel>.
-
-To report a new bug, send an email to
-C<bug-Return-MultiLevel [at] rt.cpan.org>.
-
-=head1 AUTHOR
-
-Lukas Mai, C<< <l.mai at web.de> >>
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2013-2014 Lukas Mai.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See L<http://dev.perl.org/licenses/> for more information.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -34,7 +34,7 @@ foreach my $test ( @tests ) {
 sub undef_data_tests {
   my @undef_tests;
 
-  foreach my $value ( 42, undef ) {
+  foreach my $value ( 42, undef, [ array => 1 ], { hash => 1 } ) {
     my $type = $value ? 'real' : 'undef';
 
     push @undef_tests, (
@@ -79,7 +79,7 @@ sub undef_data_tests {
 sub array_tests {
   my @array_tests;
 
-  foreach my $value ( undef, 42 ) {
+  foreach my $value ( undef, 42, [ array => 1 ], { hash => 1 } ) {
     my $type = $value ? 'real' : 'undef';
 
     push @array_tests, (
@@ -258,7 +258,7 @@ sub array_data {
 sub hash_tests {
   my @hash_tests;
 
-  foreach my $value ( undef, 42 ) {
+  foreach my $value ( undef, 42, [ array => 1 ], { hash => 1 } ) {
     my $type = $value ? 'real' : 'undef';
 
     push @hash_tests, (
@@ -278,6 +278,23 @@ sub hash_tests {
         set_value    => $value,
         return_value => undef,
       },
+      {
+        name         => "hash data, integer, non-rooted, $type value",
+        data_before  => hash_data(),
+        data_after   => hash_data(),
+        path         => '0/1/2',
+        set_value    => $value,
+        return_value => undef,
+      },
+      {
+        name         => "hash data, integer, rooted, $type value",
+        data_before  => hash_data(),
+        data_after   => hash_data(),
+        path         => '/0/1/2',
+        set_value    => $value,
+        return_value => undef,
+      },
+
     );
 
     my $data_after = hash_data();

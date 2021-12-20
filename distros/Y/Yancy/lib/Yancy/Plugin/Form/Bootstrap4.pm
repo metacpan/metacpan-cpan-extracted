@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form::Bootstrap4;
-our $VERSION = '1.087';
+our $VERSION = '1.088';
 # ABSTRACT: Generate forms using Bootstrap 4
 
 #pod =head1 SYNOPSIS
@@ -282,7 +282,7 @@ Yancy::Plugin::Form::Bootstrap4 - Generate forms using Bootstrap 4
 
 =head1 VERSION
 
-version 1.087
+version 1.088
 
 =head1 SYNOPSIS
 

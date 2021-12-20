@@ -1,0 +1,35 @@
+Revision history for Mail::Exim::Blacklist::Attachments
+
+1.007  2021-12-18 08:19:21 CET
+
+  - Add an accept verb to the example configuration
+
+1.006  2021-12-03 14:58:58 CET
+
+  - Improve the Exim configuration examples
+
+1.005  2021-12-02 21:01:04 CET
+
+  - Remove the whitelist function parameter.
+
+1.004  2021-11-19 11:57:12 CET
+
+  - Macro-enabled documents are simply blacklisted.
+  - Handle split archives such as "002" and "r15".
+
+1.003  2021-10-30 11:52:13 CEST
+
+  - Add the Git repository to dist.ini
+
+1.002  2021-10-30 11:11:57 CEST
+
+  - Improve the Exim configuration examples again
+
+1.001  2021-10-29 14:03:59 CEST
+
+  - Improve the Exim configuration examples
+
+1.000  2021-10-29 10:20:14 CEST
+
+  - First version
+

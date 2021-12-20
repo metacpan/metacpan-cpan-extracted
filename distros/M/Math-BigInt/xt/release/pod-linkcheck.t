@@ -14,8 +14,7 @@ foreach my $env_skip (qw(
 }
 
 eval "use Test::Pod::LinkCheck";
-if ($@) {
-    plan skip_all => 'Test::Pod::LinkCheck required for testing POD';
-} else {
-    Test::Pod::LinkCheck->new->all_pod_ok;
-}
+plan skip_all => 'Test::Pod::LinkCheck required for testing POD links'
+  if $@;
+
+Test::Pod::LinkCheck -> new() -> all_pod_ok();

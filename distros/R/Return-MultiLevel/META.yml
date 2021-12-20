@@ -1,39 +1,35 @@
 ---
-abstract: 'return across multiple call levels'
+abstract: 'Return across multiple call levels'
 author:
-  - 'Lukas Mai <l.mai@web.de>'
+  - 'Lukas Mai'
+  - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Test::Fatal: '0'
-  Test::More: '0'
+  Test::More: '0.98'
+  perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  File::Find: '0'
-  File::Spec: '0'
-  strict: '0'
-  warnings: '0'
+  perl: '5.008001'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Return-MultiLevel
-no_index:
-  directory:
-    - t
-    - inc
-    - xt
 recommends:
-  Scope::Upper: '0.29'
+  Scope::Upper: '0'
 requires:
   Carp: '0'
-  Data::Munge: '0.07'
   Exporter: '0'
   parent: '0'
-  perl: '5.008000'
-  strict: '0'
-  warnings: '0'
+  perl: '5.008001'
 resources:
-  repository: git://github.com/uperl/Return-MultiLevel
-version: '0.06'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/uperl/Return-MultiLevel/issues
+  homepage: https://metacpan.org/pod/Return::MultiLevel
+  repository: git://github.com/uperl/Return-MultiLevel.git
+version: '0.08'
+x_generated_by_perl: v5.35.6
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

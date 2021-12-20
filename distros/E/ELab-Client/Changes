@@ -1,6 +1,9 @@
 
 History for the ELab-Client Perl distribution
 
+0.020 2021-12-18
+  * Complete coverage of the API as published
+
 0.011 2021-12-17
   * Add remaining functions from elabapy
 

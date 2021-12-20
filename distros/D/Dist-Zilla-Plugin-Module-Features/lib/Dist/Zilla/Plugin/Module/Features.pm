@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Moose;
+with 'Dist::Zilla::Role::BeforeBuild';
 with 'Dist::Zilla::Role::AfterBuild';
 with 'Dist::Zilla::Role::FileFinderUser' => {
     default_finders => [':InstallModules'],
@@ -15,14 +16,16 @@ with 'Dist::Zilla::Role::PrereqSource';
 with 'Dist::Zilla::Role::RequireFromBuild';
 use namespace::autoclean;
 
+use File::Spec::Functions qw(catfile);
 use PMVersions::Util qw(version_from_pmversions);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-27'; # DATE
+our $DATE = '2021-11-29'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Module-Features'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my %feature_decls; # key = module name
+my %features_defs; # key = module name
 my @definer_modules;
 sub _load_modules {
     my $self = shift;
@@ -37,6 +40,14 @@ sub _load_modules {
         if (keys %$feature_decl) {
             $feature_decls{$mod} = $feature_decl;
         }
+        if ($mod =~ /\AModule::Features::/) {
+            my $features_def = \%{"$mod\::FEATURES_DEF"};
+            if (keys %$features_def) {
+                $features_defs{$mod} = $features_def;
+            } else {
+                $self->log_fatal(["$mod does not contain features definition (\%FEATURES_DEF)"]);
+            }
+        }
     }
     #use DD; dd \%feature_decls;
     for my $mod (sort keys %feature_decls) {
@@ -46,6 +57,85 @@ sub _load_modules {
             push @definer_modules, $defmod unless grep { $_ eq $defmod } @definer_modules;
         }
     }
+
+    #use DD; dd \%features_defs; dd \%feature_decls;
+}
+
+# either provide filename or filename+filecontent
+sub _get_abstract_from_def_or_decl {
+    my ($self, $filename, $filecontent) = @_;
+
+    $self->log_debug("Trying to get abstract from ".($filename ? "file $filename" : "file content"));
+
+    local @INC = @INC;
+    unshift @INC, 'lib';
+
+    unless (defined $filecontent) {
+        $filecontent = do {
+            open my($fh), "<", $filename or die "Can't open $filename: $!";
+            local $/;
+            ~~<$fh>;
+        };
+    }
+
+    unless ($filecontent =~ m{^#[ \t]*ABSTRACT:[ \t]*([^\n]*)[ \t]*$}m) {
+        $self->log_debug(["Skipping %s: no # ABSTRACT", $filename]);
+        return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+    }
+
+    my $abstract = $1;
+    if ($abstract =~ /\S/) {
+        $self->log_debug(["Skipping %s: Abstract already filled (%s)", $filename, $abstract]);
+        return $abstract;
+    }
+
+    my $pkg;
+    if (!defined($filecontent)) {
+        (my $mod_p = $filename) =~ s!^lib/!!;
+        require $mod_p;
+
+        # find out the package of the file
+        ($pkg = $mod_p) =~ s/\.pm\z//; $pkg =~ s!/!::!g;
+    } else {
+        eval $filecontent; ## no critic: BuiltinFunctions::ProhibitStringyEval
+        die if $@;
+        if ($filecontent =~ /\bpackage\s+(\w+(?:::\w+)*)/s) {
+            $pkg = $1;
+        } else {
+            die "Can't extract package name from file content";
+        }
+    }
+
+    my $summary;
+    no strict 'refs'; ## no critic: TestingAndDebugging::RequireUseStrict
+    if (defined($summary = ${"$pkg\::FEATURES"}{summary})) {
+        $self->log_debug("Using abstract from declaration summary: $summary");
+        return $summary;
+    } elsif (defined($summary = ${"$pkg\::FEATURES_DEF"}{summary})) {
+        $self->log_debug("Using abstract from features definition summary: $summary");
+        return $summary;
+    }
+    undef;
+}
+
+# dzil also wants to get abstract for main module to put in dist's
+# META.{yml,json}
+sub before_build {
+   my $self  = shift;
+   my $name  = $self->zilla->name;
+   my $class = $name; $class =~ s{ [\-] }{::}gmx;
+   my $filename = $self->zilla->_main_module_override ||
+       catfile( 'lib', split m{ [\-] }mx, "${name}.pm" );
+
+   $self->_load_modules;
+
+   $filename or die 'No main module specified';
+   -f $filename or die "Path ${filename} does not exist or not a file";
+   my $abstract = $self->_get_abstract_from_def_or_decl($filename);
+   return unless $abstract;
+
+   $self->zilla->abstract($abstract);
+   return;
 }
 
 sub register_prereqs {
@@ -58,7 +148,6 @@ sub register_prereqs {
         'Test::Module::Features' => version_from_pmversions('Test::Module::Features') // '0.001',
     );
 
-    $self->_load_modules;
     for my $defmod (@definer_modules) {
         $self->zilla->register_prereqs(
             {
@@ -132,7 +221,7 @@ Dist::Zilla::Plugin::Module::Features - Plugin to use when building Module::Feat
 
 =head1 VERSION
 
-This document describes version 0.004 of Dist::Zilla::Plugin::Module::Features (from Perl distribution Dist-Zilla-Plugin-Module-Features), released on 2021-08-27.
+This document describes version 0.005 of Dist::Zilla::Plugin::Module::Features (from Perl distribution Dist-Zilla-Plugin-Module-Features), released on 2021-11-29.
 
 =head1 SYNOPSIS
 

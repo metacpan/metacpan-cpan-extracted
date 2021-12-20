@@ -2,7 +2,7 @@ use Test::More;
 
 # assumes suitable class setup before call
 sub run_struct_tests {
-  my $class = 'Inline::Struct::Foo';
+  my $class = 'Inline::Struct::'.($_[0]||'Foo');
   my $o = $class->new;
   isa_ok $o, $class;
   isa_ok $o->inum(10), $class;

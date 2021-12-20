@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-Syslog
 
+0.05 2021-12-18T11:46:57+0900
+ - Changed undocumented "v2" access log format and documented it
+
 0.04 2021-02-17T09:30:56+0900
  - Compatible with Mojolicious 9.0
 

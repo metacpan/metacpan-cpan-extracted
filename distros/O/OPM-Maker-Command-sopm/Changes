@@ -1,0 +1,15 @@
+History for OPM::Maker::Command::sopm
+=====================================
+
+1.1.0 2021-12-19 15:12:00
+
+    [IMPROVEMENTS]
+    * allow to inline code from an existing file
+
+1.0.0 2021-12-19 15:12:00
+
+    Renamed from OTRS::OPM::Maker::Command::sopm
+
+    [IMPROVEMENTS]
+    * allow to define phase when database action happen
+

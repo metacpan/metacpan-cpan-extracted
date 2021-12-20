@@ -3,9 +3,9 @@
 package ArrayData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-26'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.2.4'; # VERSION
+our $VERSION = '0.2.5'; # VERSION
 
 1;
 # ABSTRACT: Specification for ArrayData::*, modules that contains array data
@@ -26,7 +26,7 @@ ArrayData - Specification for ArrayData::*, modules that contains array data
 
 =head1 VERSION
 
-This document describes version 0.2.4 of ArrayData (from Perl distribution ArrayData), released on 2021-09-26.
+This document describes version 0.2.5 of ArrayData (from Perl distribution ArrayData), released on 2021-12-01.
 
 =head1 SYNOPSIS
 

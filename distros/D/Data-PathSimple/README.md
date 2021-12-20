@@ -52,13 +52,13 @@ motivation is that the path will come from a user using a command line tool.
 
 The latest version can be found at:
 
-&nbsp;&nbsp;&nbsp;&nbsp;[https://gitlab.com/alfiedotwtf/data-pathsimple](https://gitlab.com/alfie/data-pathsimple)
+&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/alfiedotwtf/data-pathsimple](https://github.com/alfiedotwtf/data-pathsimple)
 
 # SUPPORT
 
 Please report any bugs or feature requests at:
 
-&nbsp;&nbsp;&nbsp;&nbsp;[https://gitlab.com/alfie/data-pathsimple/issues](https://gitlab.com/alfie/data-pathsimple/issues)
+&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/alfiedotwtf/data-pathsimple/issues](https://github.com/alfiedotwtf/data-pathsimple/issues)
 
 Feel free to fork the repository and submit pull requests :)
 
@@ -79,13 +79,15 @@ To install this module type the following:
 
 [Alfie John](https://www.alfie.wtf)
 
+Diab Jerius
+
 # WARRANTY
 
 IT COMES WITHOUT WARRANTY OF ANY KIND.
 
 # COPYRIGHT AND LICENSE
 
-Perpetual Copyright (C) to Alfie John
+Copyright (C) 2021 to Alfie John
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

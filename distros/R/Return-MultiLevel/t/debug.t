@@ -1,10 +1,10 @@
-#!perl
-
+use strict;
+use warnings;
 use Test::More tests => 2;
 use Test::Fatal;
 
-use warnings FATAL => 'all';
-use strict;
+# CAUTION: changing number of lines
+# here will alter tests below.
 
 BEGIN { $ENV{RETURN_MULTILEVEL_DEBUG} = 1; }
 use Return::MultiLevel qw(with_return);

@@ -1,6 +1,6 @@
 package JIRA::REST;
 # ABSTRACT: Thin wrapper around Jira's REST API
-$JIRA::REST::VERSION = '0.021';
+$JIRA::REST::VERSION = '0.022';
 use 5.016;
 use utf8;
 use warnings;
@@ -15,31 +15,7 @@ use REST::Client;
 use HTTP::CookieJar::LWP;
 
 sub new {
-    my $class = shift; # this always has to come first!
-
-    # Valid option names in the order expected by the old-form constructor
-    my @opts = qw/url username password rest_client_config proxy ssl_verify_none anonymous/;
-
-    my %args;
-
-    if (@_ == 1 && ref $_[0] && ref $_[0] eq 'HASH') {
-        # The new-form constructor expects a single hash reference.
-        @args{@opts} = delete @{$_[0]}{@opts};
-        croak __PACKAGE__ . "::new: unknown arguments: '", join("', '", sort keys %{$_[0]}), "'.\n"
-            if keys %{$_[0]};
-    } else {
-        # The old-form constructor expects a list of positional parameters.
-        @args{@opts} = @_;
-    }
-
-    # Turn the url into a URI object
-    if (! $args{url}) {
-        croak __PACKAGE__ . "::new: 'url' argument must be defined.\n";
-    } elsif (! ref $args{url}) {
-        $args{url} = URI->new($args{url});
-    } elsif (! $args{url}->isa('URI')) {
-        croak __PACKAGE__ . "::new: 'url' argument must be a URI object.\n";
-    }
+    my ($class, %args) = &_grok_args;
 
     my ($path, $api) = ($args{url}->path, '/rest/api/latest');
     # See if the user wants a default REST API:
@@ -53,7 +29,7 @@ sub new {
         $args{url}->path($path);
     }
 
-    unless ($args{anonymous}) {
+    unless ($args{anonymous} || $args{pat}) {
         # If username and password are not set we try to lookup the credentials
         if (! defined $args{username} || ! defined $args{password}) {
             ($args{username}, $args{password}) =
@@ -66,19 +42,6 @@ sub new {
         }
     }
 
-    for ($args{rest_client_config}) {
-        $_ //= {};
-        croak __PACKAGE__ . "::new: 'rest_client_config' argument must be a hash reference.\n"
-            unless defined && ref && ref eq 'HASH';
-    }
-
-    # remove the REST::Client faux config 'proxy' if set and use it later.
-    # This is deprecated since v0.017
-    if (my $proxy = delete $args{rest_client_config}{proxy}) {
-        carp __PACKAGE__ . "::new: passing 'proxy' in the 'rest_client_config' hash is deprecated. Please, use the corresponding argument instead.\n";
-        $args{proxy} //= $proxy;
-    }
-
     my $rest = REST::Client->new($args{rest_client_config});
 
     # Set default base URL
@@ -87,10 +50,16 @@ sub new {
     # Follow redirects/authentication by default
     $rest->setFollow(1);
 
-    # Since Jira doesn't send an authentication challenge, we force the
-    # sending of the authentication header.
-    $rest->addHeader(Authorization => 'Basic ' . encode_base64("$args{username}:$args{password}", ''))
-        unless $args{anonymous};
+    unless ($args{anonymous} || $args{session}) {
+        # Since Jira doesn't send an authentication challenge, we force the
+        # sending of the authentication header.
+        $rest->addHeader(
+            Authorization =>
+                $args{pat}
+                ? "Bearer $args{pat}"
+                : 'Basic ' . encode_base64("$args{username}:$args{password}", '')
+            );
+    }
 
     for my $ua ($rest->getUseragent) {
         # Configure UserAgent name
@@ -106,22 +75,77 @@ sub new {
         $ua->cookie_jar(HTTP::CookieJar::LWP->new());
     }
 
-    return bless {
+    my $jira = bless {
         rest => $rest,
         json => JSON->new->utf8->allow_nonref,
         api  => $api,
-        args => \%args,
     } => $class;
+
+    $jira->{_session} = $jira->POST('/rest/auth/1/session', undef, {
+        username => $args{username},
+        password => $args{password},
+    }) if $args{session};
+
+    return $jira;
+}
+
+sub _grok_args {
+    my ($class, @args) = @_;
+
+    # Valid option names in the order expected by the old-form constructor
+    my @opts = qw/url username password rest_client_config proxy ssl_verify_none anonymous pat session/;
+
+    my %args;
+
+    if (@args == 1 && ref $args[0] && ref $args[0] eq 'HASH') {
+        # The new-form constructor expects a single hash reference.
+        @args{@opts} = delete @{$args[0]}{@opts};
+        croak __PACKAGE__ . "::new: unknown arguments: '", join("', '", sort keys %{$args[0]}), "'.\n"
+            if keys %{$args[0]};
+    } else {
+        # The old-form constructor expects a list of positional parameters.
+        @args{@opts} = @args;
+    }
+
+    # Turn the url into a URI object
+    if (! $args{url}) {
+        croak __PACKAGE__ . "::new: 'url' argument must be defined.\n";
+    } elsif (! ref $args{url}) {
+        $args{url} = URI->new($args{url});
+    } elsif (! $args{url}->isa('URI')) {
+        croak __PACKAGE__ . "::new: 'url' argument must be a URI object.\n";
+    }
+
+    if (!!$args{anonymous} + !!$args{pat} + !!$args{session} > 1) {
+        croak __PACKAGE__ . "::new: 'anonymous', 'pat', and 'session' are mutually exclusive options.\n"
+    }
+
+    for ($args{rest_client_config}) {
+        $_ //= {};
+        croak __PACKAGE__ . "::new: 'rest_client_config' argument must be a hash reference.\n"
+            unless defined && ref && ref eq 'HASH';
+    }
+
+    # remove the REST::Client faux config 'proxy' if set and use it later.
+    # This is deprecated since v0.017
+    if (my $proxy = delete $args{rest_client_config}{proxy}) {
+        carp __PACKAGE__ . "::new: passing 'proxy' in the 'rest_client_config' hash is deprecated. Please, use the corresponding argument instead.\n";
+        $args{proxy} //= $proxy;
+    }
+
+    return ($class, %args);
 }
 
 sub new_session {
     my ($class, @args) = @_;
-    my $jira = $class->new(@args);
-    $jira->{_session} = $jira->POST('/rest/auth/1/session', undef, {
-        username => $jira->{args}{username},
-        password => $jira->{args}{password},
-    });
-    return $jira;
+
+    if (@args == 1 && ref $args[0] && ref $args[0] eq 'HASH') {
+        $args[0]{session} = 1;
+    } else {
+        $args[8] = 1;
+    }
+
+    return $class->new(@args);
 }
 
 sub DESTROY {
@@ -401,7 +425,7 @@ JIRA::REST - Thin wrapper around Jira's REST API
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -411,6 +435,23 @@ version 0.021
         url      => 'https://jira.example.net',
         username => 'myuser',
         password => 'mypass',
+    });
+
+    my $jira_with_session = JIRA::REST->new({
+        url      => 'https://jira.example.net',
+        username => 'myuser',
+        password => 'mypass',
+        session  => 1,
+    });
+
+    my $jira_with_pat = JIRA::REST->new({
+        url => 'https://jira.example.net',
+        pat => 'NDc4NDkyNDg3ODE3OstHYSeYC1GnuqRacSqvUbookcZk',
+    });
+
+    my $jira_anonymous = JIRA::REST->new({
+        url => 'https://jira.example.net',
+        anonymous => 1,
     });
 
     # File a bug
@@ -485,7 +526,7 @@ endpoints have a path prefix of C</rest/agile/VERSION>.
 
 =head2 new HASHREF
 
-=head2 new URL, USERNAME, PASSWORD, REST_CLIENT_CONFIG, ANONYMOUS, PROXY, SSL_VERIFY_NONE
+=head2 new URL, USERNAME, PASSWORD, REST_CLIENT_CONFIG, PROXY, SSL_VERIFY_NONE, ANONYMOUS, PAT, SESSION
 
 The default constructor can take its arguments from a single hash reference or
 from a list of positional parameters. The first form is preferred because it
@@ -530,9 +571,9 @@ during construction.
 
 The username and password of a Jira user to use for authentication.
 
-If B<anonymous> is false then, if either B<username> or B<password> isn't
-defined the module looks them up in either the C<.netrc> file or via
-L<Config::Identity> (which allows C<gpg> encrypted credentials).
+If B<anonymous> is false and no B<pat> given, then, if either B<username> or
+B<password> isn't defined the module looks them up in either the C<.netrc> file
+or via L<Config::Identity> (which allows C<gpg> encrypted credentials).
 
 L<Config::Identity> will look for F<~/.jira-identity> or F<~/.jira>.
 You can change the filename stub from C<jira> to a custom stub with the
@@ -565,24 +606,41 @@ pass L<LWP::UserAgent>'s verification methods.
 
 =item * B<anonymous>
 
-Tells the module that you want to connect to the specified Jira server with
-no username or password.  This way you can access public Jira servers
-without needing to authenticate.
+=item * B<pat>
+
+=item * B<session>
+
+These three arguments are mutually exclusive, i.e., you can use at most one of
+them. By default, they are all undefined.
+
+The boolean B<anonymous> argument tells the module if you want to connect to the
+specified Jira with no authentication. This allows you to get some information
+from open or public Jira servers. If enabled, the B<username> and B<password>
+arguments are disregarded.
+
+The B<pat> argument maps to a string which should be a personal access token
+that can be used for authentication instead of a username and a password.  This
+option is available since Jira version 8.14.  Please refer to
+L<https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html>
+for details. If enabled, the B<username> and B<password> arguments are
+disregarded.
+
+The booleal B<session> argument tells the module if you want it to acquire a
+session cookie by making a C<POST /rest/auth/1/session> call to login to
+Jira. This is particularly useful when interacting with Jira Data Center,
+because it can use the session cookie to maintain affinity with one of the
+redundant servers. Upon destruction, the object makes a C<DELETE
+/rest/auth/1/session> call to logout from Jira. If enabled, the B<username> and
+B<password> arguments are required.
 
 =back
 
 =head2 new_session OPTIONS
 
-This 'session' constructor first invokes the default constructor, passing to it
-all the options it receives. Then it makes a C<POST /rest/auth/1/session> to
-login to Jira, creating a user session.
-
-This is particularly useful when interacting with Jira Data Center, because it
-can use the session cookie to maintain affinity with one of the redundant
-servers.
-
-When created with this constructor, upon destruction the object makes a C<DELETE
-/rest/auth/1/session> to logout from Jira.
+This alternative constructor simply invokes the default constructor with the
+same options, adding to them the B<session> option. New code should use the
+default constructor with the B<session> option because this constructor may be
+deprecated in the future.
 
 =head1 REST METHODS
 

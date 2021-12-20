@@ -4,7 +4,9 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Version;
+
+eval 'use Test::Version';
+plan skip_all => 'Test::Version required for this test' if $@;
 
 my @imports = qw( version_all_ok );
 

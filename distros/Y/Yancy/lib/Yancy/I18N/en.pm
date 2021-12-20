@@ -1,5 +1,5 @@
 package Yancy::I18N::en;
-our $VERSION = '1.087';
+our $VERSION = '1.088';
 # ABSTRACT: English lexicon for Yancy strings
 
 #pod =head1 DESCRIPTION
@@ -169,7 +169,7 @@ Yancy::I18N::en - English lexicon for Yancy strings
 
 =head1 VERSION
 
-version 1.087
+version 1.088
 
 =head1 DESCRIPTION
 

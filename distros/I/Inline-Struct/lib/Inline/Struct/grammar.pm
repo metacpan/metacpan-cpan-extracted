@@ -48,10 +48,25 @@ typedef: 'typedef' 'struct' IDENTIFIER IDENTIFIER ';'
 	{
 	   Inline::Struct::grammar::alias($thisparser, "@item[2,3]", $item[4]);
 	}
-	| 'typedef' (/[^\s\(]+/)(s) '(' '*' IDENTIFIER ')' '(' (/[^\s\)]+/)(s) ')' ';'
+	| 'typedef' enum IDENTIFIER ';'
+	{
+	   Inline::Struct::grammar::_register_type($thisparser, $item[3], "T_IV");
+	}
+	| 'typedef' function_pointer ';'
 	{
 	   # a function-pointer typedef
-	   Inline::Struct::grammar::ptr_register($thisparser, $item[5]);
+	   Inline::Struct::grammar::ptr_register($thisparser, $item[2][1]);
+	}
+
+function_pointer: (/[^\s\(]+/)(s) '(' '*' IDENTIFIER ')' '(' (/[^\s\)]+/)(s) ')'
+	{
+           # (rettype, l, l, ident, l, l, args)
+	   [join('',@{$item[1]}), $item[4], join('',@{$item[7]})]
+	}
+
+enum: 'enum' '{' (/[^\s\}]+/)(s) '}'
+	{
+	   $item[3];
 	}
 
 fields: '{' field(s) '}' { [ grep ref, @{$item[2]} ] }
@@ -72,6 +87,14 @@ type_identifier: TYPE(s) star(s?) IDENTIFIER(?) ';'
          my $type = join ' ', @{$item[1]};
          $type .= join '',' ',@{$item[2]} if @{$item[2]};
          [ $type, $identifier ];
+	}
+	| enum IDENTIFIER ';'
+	{
+         [ 'IV', $item[2] ];
+	}
+	| function_pointer ';'
+	{
+         [ 'void *', $item[1][1] ];
 	}
 
 star: '*' | '&'
@@ -94,10 +117,8 @@ sub typemap {
     my $parser = shift;
     my $perlname = shift;
     my $cname = shift;
-
     my $type = "O_OBJECT_$perlname";
-    my $TYPEMAP = "$cname *\t\t$type\n";
-    my $INPUT = <<'END';
+    $parser->{data}{typeconv}{input_expr}{$type} = <<'END';
     if (!sv_isobject($arg)) {
 	warn ( \"$pname() -- $var is not a blessed reference\" );
 	XSRETURN_UNDEF;
@@ -108,7 +129,7 @@ sub typemap {
 	XSRETURN_UNDEF;
     }
 END
-    my $OUTPUT = <<END;
+    $parser->{data}{typeconv}{output_expr}{$type} = <<END;
         {
             HV *map = get_hv("Inline::Struct::${perlname}::_map_", 1);
             SV *lookup = newSViv((IV)\$var);
@@ -130,31 +151,21 @@ END
         }
         sv_setref_pv( \$arg, "Inline::Struct::$perlname", (void*)\$var );
 END
+    _register_type($parser, $cname." *", $type);
+}
 
-    $parser->{data}{typeconv}{input_expr}{$type} = $INPUT;
-    $parser->{data}{typeconv}{output_expr}{$type} = $OUTPUT;
-    $parser->{data}{typeconv}{valid_types}{$cname." *"}++;
-    $parser->{data}{typeconv}{valid_rtypes}{$cname." *"}++;
-    $parser->{data}{typeconv}{type_kind}{$cname." *"} = $type;
+sub _register_type {
+    my ($parser, $cname, $type) = @_;
+    $parser->{data}{typeconv}{$_}{$cname}++ for qw(valid_types valid_rtypes);
+    $parser->{data}{typeconv}{type_kind}{$cname} = $type;
 }
 
 sub alias {
-    my $parser = shift;
-    my $type = shift;
-    my $alias = shift;
+    my ($parser, $type, $alias) = @_;
     $type .= " *"; $alias .= " *"; # because I only deal with pointers.
-    $parser->{data}{typeconv}{valid_types}{$alias}++;
-    $parser->{data}{typeconv}{valid_rtypes}{$alias}++;
-    $parser->{data}{typeconv}{type_kind}{$alias} =
-      $parser->{data}{typeconv}{type_kind}{$type} ||= {};
+    _register_type($parser, $alias, $parser->{data}{typeconv}{type_kind}{$type} ||= {});
 }
 
-sub ptr_register {
-    my $parser = shift;
-    my $cname = shift;
-    $parser->{data}{typeconv}{valid_types}{$cname}++;
-    $parser->{data}{typeconv}{valid_rtypes}{$cname}++;
-    $parser->{data}{typeconv}{type_kind}{$cname} = 'T_PTR';
-}
+sub ptr_register { _register_type(@_, 'T_PTR') }
 
 1;

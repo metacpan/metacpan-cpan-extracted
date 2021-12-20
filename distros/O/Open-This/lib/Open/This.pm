@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -28,6 +28,11 @@ sub parse_text {
 
     if ($text) {
         $text =~ s/^\s+|\s+$//g;
+    }
+
+    # Don't fail on a trailing colon which was accidentally pasted.
+    if ($text) {
+        $text =~ s{:\z}{};
     }
 
     return undef if !$text;
@@ -340,7 +345,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000028
+version 0.000029
 
 =head1 DESCRIPTION
 

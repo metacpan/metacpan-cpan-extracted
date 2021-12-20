@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/lucas1/Mojolicious-Plugin-Model-DB/issues
   homepage: https://github.com/lucas1/Mojolicious-Plugin-Model-DB
   repository: https://github.com/lucas1/Mojolicious-Plugin-Model-DB
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

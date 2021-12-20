@@ -1,0 +1,10 @@
+Revision history for Mail::Exim::Blacklist::GeoIP
+
+1.001  2021-12-03 13:33:04 CET
+
+  - Minor documentation updates
+
+1.000  2021-12-02 19:00:08 CET
+
+  - First version
+

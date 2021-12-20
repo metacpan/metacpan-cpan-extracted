@@ -1,3 +1,13 @@
+1.999828 2021-12-17
+
+ * Add new methods numerator(), denominator(), and fparts().
+
+ * Fix bug in to_ieee754(). Avoid that the significand overflows.
+
+ * Improve bpow(). Avoid unnecessary upgrading.
+
+ * Fix typos and improve wording.
+
 1.999827 2021-10-03
 
  * Improve error message for missing library argument.

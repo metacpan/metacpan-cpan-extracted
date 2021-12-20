@@ -1,9 +1,9 @@
 package Regexp::Pattern::Perl::Module;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-02'; # DATE
+our $DATE = '2021-07-27'; # DATE
 our $DIST = 'Regexp-Pattern-Perl'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 #use warnings;
@@ -52,7 +52,7 @@ Regexp::Pattern::Perl::Module - Regexp patterns related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.004 of Regexp::Pattern::Perl::Module (from Perl distribution Regexp-Pattern-Perl), released on 2020-10-02.
+This document describes version 0.006 of Regexp::Pattern::Perl::Module (from Perl distribution Regexp-Pattern-Perl), released on 2021-07-27.
 
 =head1 SYNOPSIS
 
@@ -167,7 +167,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

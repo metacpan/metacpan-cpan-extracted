@@ -1,5 +1,17 @@
 Changelog for Yancy
 
+1.088     2021-12-18 20:24:24-06:00 America/Chicago
+
+  [Added]
+
+  - Added "join" configuration to Yancy controller. This allows for easy
+    adding of related data to a basic route.
+
+  [Fixed]
+
+  - Fixed join handling on the Memory backend from the additions made in
+    1.086.
+
 1.087     2021-12-14 16:09:32-06:00 America/Chicago
 
   [Added]

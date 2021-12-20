@@ -1,3 +1,9 @@
+0.005   2021-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Set module Abstract from summary of feature
+	  declaration/definition.
+
+
 0.004   2021-08-27  Released-By: PERLANCAR; Urgency: high
 
 	- Derp, typo 'Module::Feature'.

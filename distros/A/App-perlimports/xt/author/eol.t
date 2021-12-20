@@ -81,6 +81,7 @@ my @files = (
     't/signatures.pl',
     't/skip-all.t',
     't/socket.t',
+    't/sort-imports.t',
     't/switches-in-import.t',
     't/symbol-as-method-call.t',
     't/symbol-in-export.t',

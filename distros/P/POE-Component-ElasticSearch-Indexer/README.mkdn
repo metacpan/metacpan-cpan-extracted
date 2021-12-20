@@ -4,7 +4,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 # VERSION
 
-version 0.013
+version 0.014
 
 # SYNOPSIS
 
@@ -37,7 +37,7 @@ index documents into an ElasticSearch cluster.
 
 ## spawn()
 
-This method spawns the ElasticSearch indexing [POE::Session](https://metacpan.org/pod/POE::Session). It accepts the
+This method spawns the ElasticSearch indexing [POE::Session](https://metacpan.org/pod/POE%3A%3ASession). It accepts the
 following parameters.
 
 - **Alias**
@@ -53,7 +53,7 @@ following parameters.
 - **PoolConnections**
 
     Boolean, default true.  Enable connection pooling with
-    [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive).  This is desirable in most cases, but can
+    [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AClient%3A%3AKeepalive).  This is desirable in most cases, but can
     result in timeouts piling up.  You may wish to disable this if you notice that
     indexing takes a while to recover after timeout events.
 
@@ -62,7 +62,7 @@ following parameters.
     Requires `PoolConnections`.
 
     Set the keep\_alive timeout in seconds for the creation of a
-    [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive) connection pool.
+    [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AClient%3A%3AKeepalive) connection pool.
 
     Defaults to **2**.
 
@@ -71,7 +71,7 @@ following parameters.
     Requires `PoolConnections`.
 
     Maximum number of simultaneous connections to an Elasticsearch node.  Used in
-    the creation of a [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive) connection pool.
+    the creation of a [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AClient%3A%3AKeepalive) connection pool.
 
     Defaults to **3**.
 
@@ -80,7 +80,7 @@ following parameters.
     Requires `PoolConnections`.
 
     Maximum number of simultaneous connections to all servers.  Used in
-    the creation of a [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive) connection pool.
+    the creation of a [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AClient%3A%3AKeepalive) connection pool.
 
     Defaults to **MaxConnsPerServer \* number of Servers**.
 
@@ -98,7 +98,7 @@ following parameters.
 
 - **LoggingConfig**
 
-    The [Log::Log4perl](https://metacpan.org/pod/Log::Log4perl) configuration file for the indexer to use.  Defaults to
+    The [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) configuration file for the indexer to use.  Defaults to
     writing logs to the current directory into the file `es_indexing.log`.
 
 - **Timeout**
@@ -126,6 +126,9 @@ following parameters.
 
     Use this `_type` attribute if the document is missing one.  Defaults to
     **\_doc** to be compatible with ES 7.x.
+
+    The `_type` attribute will be stripped from documents if the cluster is
+    running greater than 7.0.0.
 
 - **BatchDir**
 
@@ -181,6 +184,10 @@ following parameters.
 
 The events provided by this component.
 
+- **version**
+
+    Runs at start to the get Elasticsearch Version.
+
 - **queue**
 
     Takes an array reference of hash references to be transformed into JSON
@@ -199,6 +206,8 @@ The events provided by this component.
 
         Will be submitted as the document type in the bulk operation, if not specified,
         we'll use the `DefaultType` specified in the `spawn()` method.
+
+        Deprecated and removed for clusters running Elasticsearch version 7.0 or higher.
 
     - **\_index**
 

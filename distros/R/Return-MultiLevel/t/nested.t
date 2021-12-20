@@ -1,10 +1,6 @@
-#!perl
-
-use Test::More tests => 1;
-
-use warnings FATAL => 'all';
 use strict;
-
+use warnings;
+use Test::More tests => 1;
 use Return::MultiLevel qw(with_return);
 
 my @r;

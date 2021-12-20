@@ -7,9 +7,9 @@ use Role::Tiny;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-26'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.2.4'; # VERSION
+our $VERSION = '0.2.5'; # VERSION
 
 # constructor
 requires 'new';
@@ -66,7 +66,7 @@ ArrayDataRole::Spec::Basic - Required methods for all ArrayData::* modules
 
 =head1 VERSION
 
-This document describes version 0.2.4 of ArrayDataRole::Spec::Basic (from Perl distribution ArrayData), released on 2021-09-26.
+This document describes version 0.2.5 of ArrayDataRole::Spec::Basic (from Perl distribution ArrayData), released on 2021-12-01.
 
 =head1 DESCRIPTION
 
@@ -105,11 +105,11 @@ From L<Role::TinyCommons::Iterator::Resettable>.
 
 =head2 get_item_at_pos
 
-From L<Role::TinyCommons::Iterator::GetItemByPos>.
+From L<Role::TinyCommons::Collection::GetItemByPos>.
 
 =head2 has_item_at_pos
 
-From L<Role::TinyCommons::Iterator::GetItemByPos>.
+From L<Role::TinyCommons::Collection::GetItemByPos>.
 
 =head1 PROVIDED METHODS
 

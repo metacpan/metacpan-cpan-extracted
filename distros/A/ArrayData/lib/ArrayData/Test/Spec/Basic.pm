@@ -8,9 +8,9 @@ use Role::Tiny::With;
 with 'ArrayDataRole::Spec::Basic';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-26'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.2.4'; # VERSION
+our $VERSION = '0.2.5'; # VERSION
 
 my $elems = [
     1,
@@ -85,7 +85,7 @@ ArrayData::Test::Spec::Basic - A test array data
 
 =head1 VERSION
 
-This document describes version 0.2.4 of ArrayData::Test::Spec::Basic (from Perl distribution ArrayData), released on 2021-09-26.
+This document describes version 0.2.5 of ArrayData::Test::Spec::Basic (from Perl distribution ArrayData), released on 2021-12-01.
 
 =for Pod::Coverage ^(.+)$
 

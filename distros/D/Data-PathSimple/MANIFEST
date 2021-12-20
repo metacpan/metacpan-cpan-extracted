@@ -3,7 +3,9 @@ lib/Data/PathSimple.pm
 Makefile.PL
 MANIFEST
 README.md
+t/error.t
 t/get.t
+t/path_sep.t
 t/set.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

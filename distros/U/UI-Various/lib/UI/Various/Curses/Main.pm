@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Curses::UI;
 

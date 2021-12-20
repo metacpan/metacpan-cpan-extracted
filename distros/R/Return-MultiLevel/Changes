@@ -1,5 +1,12 @@
 Revision history for Return-MultiLevel
 
+0.08      2021-12-20 04:58:35 -0700
+  - Production release identical to 0.07_01
+
+0.07_01   2021-12-19 07:27:44 -0700
+  - Remove the most uses of stringy eval (gh#6) One still remains
+  - Remove dependency on Data::Munge (gh#6)
+
 0.06 2021-10-11 16:57:42 -0600
   - Fixed test bug (rt#133221)
   - New caretaker maintainer, new repository https://github.com/uperl/Return-MultiLevel

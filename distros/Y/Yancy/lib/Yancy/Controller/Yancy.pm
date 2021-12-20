@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.087';
+our $VERSION = '1.088';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -254,7 +254,7 @@ sub item_id {
 sub clean_item {
   my ( $self, $item ) = @_;
   my $props = $self->schema->json_schema->{properties};
-  my @keep_props = grep { ($props->{$_}{format}//'') ne 'password' } keys %$props;
+  my @keep_props = grep { !$props->{$_} || ($props->{$_}{format}//'') ne 'password' } keys %$item;
   return { map { $_ => $item->{$_} } @keep_props };
 }
 
@@ -305,6 +305,10 @@ sub clean_item {
 #pod
 #pod Set the default order for the items. Supports any L<Yancy::Backend/list>
 #pod C<order_by> structure.
+#pod
+#pod =item join
+#pod
+#pod One or more schemas to join when returning results.
 #pod
 #pod =item before_render
 #pod
@@ -472,6 +476,10 @@ sub list {
 #pod The name of the template to use. See L<Mojolicious::Guides::Rendering/Renderer>
 #pod for how template names are resolved.
 #pod
+#pod =item join
+#pod
+#pod One or more schemas to join when returning results.
+#pod
 #pod =item before_render
 #pod
 #pod An array reference of helpers to call before the item is displayed.  See
@@ -507,7 +515,11 @@ sub get {
       die sprintf "ID field(s) %s not defined in stash",
         join ', ', map qq("$_"), $id_field eq 'ARRAY' ? @$id_field : $id_field;
     }
-    my $item = $schema->get( $id );
+    my %opt;
+    if ( my $join = $c->stash( 'join' ) ) {
+        $opt{ join } = $join;
+    }
+    my $item = $schema->get( $id, %opt );
     if ( !$item ) {
         $c->reply->not_found;
         return;
@@ -516,7 +528,7 @@ sub get {
     # XXX: Filters are deprecated
     my $schema_name = $c->stash( 'schema' ) || $c->stash( 'collection' )
       || die "Schema name not defined in stash";
-    $item = $c->yancy->filter->apply( $schema_name, $item, 'x-filter-output' );
+    my $filtered_item = $c->yancy->filter->apply( $schema_name, $item, 'x-filter-output' );
 
     for my $helper ( @{ $c->stash( 'before_render' ) // [] } ) {
         $c->$helper( $item );
@@ -1250,6 +1262,10 @@ sub _get_list_args {
         $opt->{order_by} = $order_by;
     }
 
+    if ( my $join = $c->stash( 'join' ) ) {
+      $opt->{ join } = $join;
+    }
+
     my $schema = $c->schema;
     my $props  = $schema->json_schema->{properties};
     my %param_filter = ();
@@ -1317,7 +1333,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.087
+version 1.088
 
 =head1 SYNOPSIS
 
@@ -1424,6 +1440,10 @@ authorization / security.
 
 Set the default order for the items. Supports any L<Yancy::Backend/list>
 C<order_by> structure.
+
+=item join
+
+One or more schemas to join when returning results.
 
 =item before_render
 
@@ -1549,6 +1569,10 @@ route placeholders named after the field.
 
 The name of the template to use. See L<Mojolicious::Guides::Rendering/Renderer>
 for how template names are resolved.
+
+=item join
+
+One or more schemas to join when returning results.
 
 =item before_render
 

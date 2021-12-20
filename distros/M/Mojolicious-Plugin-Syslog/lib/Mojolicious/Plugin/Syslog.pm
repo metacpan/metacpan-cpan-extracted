@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Sys::Syslog qw(:standard :macros);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my %PRIORITY = (
   debug => LOG_DEBUG,
@@ -28,8 +28,8 @@ sub _add_access_log {
   my ($self, $app, %config) = @_;
 
   my $log_format = $config{access_log} || $ENV{MOJO_SYSLOG_ACCESS_LOG} || 'v1';
-  $log_format = '%H "%P" (%I) %C %M (%Ts)'            if $log_format =~ /^v?1$/;
-  $log_format = '[%I] %R %H %U %C %M "%F" "%A" (%Ts)' if $log_format =~ /^v?2$/;
+  $log_format = '%H "%P" (%I) %C %M (%Ts)'    if $log_format =~ /^v?1$/;
+  $log_format = '%R %H %U %C "%F" "%A" (%Ts)' if $log_format =~ /^v?2$/;
 
   $app->hook(
     before_routes => sub {
@@ -50,17 +50,20 @@ sub _add_access_log {
     U => sub { $_[1]->url->to_abs->to_string },
   );
 
+  my $app_log = $log_format =~ m!\%I\b! && $app->log;
+
   my $re = join '|', sort keys %extractors;
   $re = qr{\%($re)};
 
   $app->hook(
     after_dispatch => sub {
-      my $c = shift;
+      my $c   = shift;
+      my $log = $app_log || $c->log;
       my ($req, $res) = ($c->req, $c->res);
       my $level   = $res->is_server_error ? 'warn' : 'info';
       my $message = $log_format;
       $message =~ s!$re!$extractors{$1}->($c, $req, $res)!ge;
-      $c->app->log->$level($message);
+      $log->$level($message);
     }
   );
 }
@@ -123,25 +126,23 @@ config parameters are:
 =item * access_log
 
 Used to enable logging of access to resources with a route enpoint. This means
-that static files will not be logged, even if this option is enabled.
+that static files will not be logged, even if this option is enabled. It is
+also possible to set the default value using the C<MOJO_SYSLOG_ACCESS_LOG>
+environment variable.
 
-This can be "v1" or a string. Will use the default format, if "v1" is specified:
+This can be "v1", "v2" or a custom format. The default is currently "v1", but
+that might change in the future.
 
-  %H "%P" (%I) %C %M (%Ts)
-   |   |    |   |  |   \- Time in seconds for this request
-   |   |    |   |  \- Response message
-   |   |    |   \- Response code
-   |   |    \- A unique identified for this request
-   |   \- The path requested
-   \- The HTTP method used
-
-Default to the "MOJO_SYSLOG_ACCESS_LOG" environment variable or disabled by
-default.
-
-The default format is EXPERIMENTAL.
+  .---------------------------------------.
+  | Version | Format                      |
+  |---------|-----------------------------|
+  | v1      | %H "%P" (%I) %C %M (%Ts)    |
+  | v2      | %R %H %U %C "%F" "%A" (%Ts) |
+  '---------------------------------------'
 
 Supported log variables:
 
+  .----------------------------------------------------.
   | Variable | Value                                   |
   |----------|-----------------------------------------|
   | %A       | User-Agent request header               |
@@ -154,6 +155,7 @@ Supported log variables:
   | %R       | Remote address                          |
   | %T       | Time in seconds for this request        |
   | %U       | Absolute request URL, without user info |
+  '----------------------------------------------------'
 
 =item * enable
 

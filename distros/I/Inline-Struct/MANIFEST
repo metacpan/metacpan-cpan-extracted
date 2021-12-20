@@ -4,13 +4,14 @@ lib/Inline/Struct.pm
 lib/Inline/Struct.pod
 lib/Inline/Struct/grammar.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README
 t/all.t
 t/anon.t
 t/argorder.t
 t/common.pl
 t/copyref.t
+t/enum.t
 t/funcptr.t
 t/multi.t
 t/oneline.t

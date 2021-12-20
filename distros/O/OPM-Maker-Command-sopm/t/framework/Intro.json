@@ -1,0 +1,28 @@
+{
+    "name": "Intro",
+    "version": "0.0.3",
+    "framework": [
+        "3.0.x",
+        {
+            "version": "3.1.x",
+            "min" : "3.1.12"
+        },
+        {
+            "version": "3.2.x",
+            "max" : "3.2.12"
+        },
+        {
+            "version": "3.3.x",
+            "min" : "3.3.12",
+            "max" : "3.3.18"
+        }
+    ],
+    "vendor": {
+        "name":  "Perl-Services.de",
+        "url": "http://www.perl-services.de"
+    },
+    "license": "GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007",
+    "description" : {
+        "en": "Test sopm command"
+    }
+}

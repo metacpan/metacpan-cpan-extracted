@@ -203,6 +203,19 @@ local $ENV{EDITOR} = 'vim';
     );
 }
 
+{
+    my $text = 't/lib/Foo/Bar.pm:32:';
+    eq_or_diff(
+        parse_text($text),
+        {
+            file_name     => 't/lib/Foo/Bar.pm',
+            line_number   => 32,
+            original_text => 't/lib/Foo/Bar.pm:32',
+        },
+        'trailing colon is stripped'
+    );
+}
+
 eq_or_diff(
     parse_text('t/Does/Not/Exist'),
     undef,

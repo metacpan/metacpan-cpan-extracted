@@ -1,0 +1,19 @@
+requires 'perl', '5.016';
+
+requires 'Exporter';
+requires 'IO::Uncompress::Unzip';
+
+on 'test' => sub {
+    requires 'Test::More', '0.96';
+    requires 'IO::Compress::Zip';
+};
+
+on 'develop' => sub {
+    requires 'Dist::Zilla';
+    requires 'Dist::Zilla::Plugin::CopyFilesFromBuild';
+    requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
+    requires 'Dist::Zilla::Plugin::Test::Kwalitee';
+    requires 'Pod::Coverage::TrustPod';
+    requires 'Test::Kwalitee', '1.21';
+    requires 'Test::Pod::Coverage';
+};

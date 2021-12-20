@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::OAuth2;
-our $VERSION = '1.087';
+our $VERSION = '1.088';
 # ABSTRACT: Authenticate using an OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -326,7 +326,7 @@ Yancy::Plugin::Auth::OAuth2 - Authenticate using an OAuth2 provider
 
 =head1 VERSION
 
-version 1.087
+version 1.088
 
 =head1 SYNOPSIS
 

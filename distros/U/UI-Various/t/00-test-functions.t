@@ -31,6 +31,7 @@ foreach (qw(call_with_stdin.pl run_in_fork.pl sub_perl.pl))
     unless ($rc)
     {
 	$@  and  warn 'parsing error: ', $@, "\n";
-	defined $rc  or  warn 'access error: ', $!, "\n";
+	defined $rc  or
+	    warn 'access error "', T_PATH, '/functions/', $_, '": ', $!, "\n";
     }
 }

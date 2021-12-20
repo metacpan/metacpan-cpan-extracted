@@ -1,0 +1,69 @@
+NAME
+    Time::Local::ISO8601 - Compute time (Unix epoch) from YMD/ISO8601 sting
+
+VERSION
+    This document describes version 0.001 of Time::Local::ISO8601 (from Perl
+    distribution Time-Local-ISO8601), released on 2021-06-25.
+
+SYNOPSIS
+     use Time::Local::ISO8601 qw(
+         timelocal_from_ymd
+         timegm_from_ymd
+     );
+     # you can import all using :all tag
+
+     # either supply a "YYYY-MM-DD" string
+     my $epoch = timelocal_from_ymd("2021-06-25");
+     my $epoch = timegm_from_ymd   ("2021-6-25");
+
+     # or separate year, mon, day arguments
+     my $epoch = timelocal_from_ymd(2021, 6, 25);
+     my $epoch = timegm_from_ymd   (2021, 6, 25);
+
+DESCRIPTION
+    Early release, not all functions implemented.
+
+    This is basically a variant or thin wrapper to Time::Local to compute
+    time (Unix epoch) from ISO8601 strings.
+
+FUNCTIONS
+  timelocal_from_ymd
+  timegm_from_ymd
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Time-Local-ISO8601>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Time-Local-ISO8601>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Time-Local-ISO8601>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Time::Local::More to compute time (Unix epoch) from separate time
+    elements.
+
+    Date::Format::ISO8601 is the counterpart for this module; it formats
+    time (Unix epoch) into ISO8601 date/datetime string.
+
+    DateTime::Format::ISO8601 parses ISO8601 string into DateTime object;
+    DateTime::Format::ISO8601::Format formats DateTime object into ISO8601
+    date/datetime string.
+
+    "localtime()" and "gmtime()" in perlfunc.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

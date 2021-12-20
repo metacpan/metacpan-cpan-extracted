@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use UI::Various::core;
 use UI::Various::Main;
@@ -84,7 +84,8 @@ sub _init($)
     # FIXME: only works on Linux, use non-core (!) Term::Size for others???
     # Note that -a as option to stty is POSIX, --all is not:
     local $_ = '' . `stty -a 2>/dev/null`; # ''. avoids undef!
-    m/;\s*rows\s+(\d+);\s*columns\s+(\d+);/  and  ($rows, $columns) = ($1, $2);
+    m/;\s*rows\s+([1-9][0-9]*);\s*columns\s+([1-9][0-9]*);/
+	and  ($rows, $columns) = ($1, $2);
     # can't use accessors as we're not yet correctly blessed:
     $self->{max_height} = $rows;
     $self->{max_width} = $columns;

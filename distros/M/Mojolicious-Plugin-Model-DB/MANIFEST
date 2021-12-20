@@ -6,6 +6,7 @@ META.yml
 README.md
 t/base.t
 t/database.t
+t/database_ref.t
 t/demo.db
 t/namespace.t
 lib/Mojolicious/Plugin/Model/DB.pm

@@ -62,8 +62,8 @@ my $button = UI::Various::Button->new(text => 'OK',
 
 $_ = UI::Various::Window->new(title => 'hello');
 is($_->title(), 'hello', 'constructor sets title');
-ok(10 < $_->max_width(), 'maximum screen width > 10');
-ok(10 < $_->max_height(), 'maximum screen height > 10');
+ok(10 < $_->max_width(), 'maximum screen width > 10: ' . $_->max_width());
+ok(10 < $_->max_height(), 'maximum screen height > 10: ' . $_->max_height());
 
 $_->add($text);
 $_->add($button);

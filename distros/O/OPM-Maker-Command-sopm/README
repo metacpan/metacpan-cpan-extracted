@@ -1,0 +1,211 @@
+NAME
+
+    OPM::Maker::Command::sopm - Build .sopm file based on metadata
+
+VERSION
+
+    version 1.1.0
+
+DESCRIPTION
+
+    SOPM files are used for ticket system addon creation (e.g. for Znuny,
+    OTOBO, ((OTRS)) Community Edition). They define some metadata like the
+    vendor, their URL, packages required or required Perl modules. It is an
+    XML file and it's no fun to create it. It is not uncommon that the list
+    of files included in the addon is not updated before the addon is built
+    and released.
+
+    That's why this package exists. You can define the metadata and stuff
+    like database changes in a JSON file and the file list is created
+    automatically. And you don't have to write the XML tags repeatedly.
+
+INSTALLATION PHASES
+
+    When an addon is installed, it happens in several phases
+
+    1 CodeInstall - type "pre"
+
+    2 DatabaseInstall - type "pre"
+
+    3 Files are installed
+
+    4 Include SysConfig
+
+    5 DatabaseInstall - type "post"
+
+    6 CodeInstall - type "post"
+
+    These types are important in some cases and you'll see them later.
+
+CONFIGURATION
+
+    You can configure this command with a JSON file.
+
+ A simple add on
+
+    This configuration file defines only the metadata.
+
+     {
+        "name": "Test",
+        "version": "0.0.3",
+        "framework": [
+            "3.0.x"
+        ],
+        "vendor": {
+            "name":  "Perl-Services.de",
+            "url": "http://www.perl-services.de"
+        },
+        "license": "GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007",
+        "description" : {
+            "en": "Test sopm command"
+        }
+     }
+
+    And this .sopm will be created (assuming the file exists)
+
+      <?xml version="1.0" encoding="utf-8" ?>
+      <otrs_package version="1.0">
+        <!-- GENERATED WITH OPM::Maker::Command::sopm (1.27) -->
+        <Name>Test</Name>
+        <Version>0.0.3</Version>
+        <Framework>3.0.x</Framework>
+        <Vendor>Perl-Services.de</Vendor>
+        <URL>http://www.perl-services.de</URL>
+        <Description Lang="en">Test sopm command</Description>
+        <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+        <Filelist>
+            <File Permission="644" Location="01_simple_json.t" />
+            <File Permission="644" Location="02_intro.t" />
+        </Filelist>
+      </otrs>
+
+ Support more than one framework version
+
+    If the module runs on several framework version, you can define them in
+    the list of frameworks
+
+        "framework": [
+            "3.0.x",
+            "3.1.x",
+            "3.2.x",
+            "3.2.x"
+        ],
+
+    And they will all be listed in the .sopm
+
+        <Framework>3.0.x</Framework>
+        <Framework>3.1.x</Framework>
+        <Framework>3.2.x</Framework>
+        <Framework>3.3.x</Framework>
+
+ Required packages and modules
+
+    Some addons depend on other addons and/or Perl modules. So it has to
+    define those prerequesits.
+
+        "requires": {
+            "package" : {
+                "TicketOverviewHooked" : "3.2.1"
+            },
+            "module" : {
+                "Digest::MD5" : "0.01"
+            }
+        },
+
+    Creates those tags
+
+        <PackageRequired Version="3.2.1">TicketOverviewHooked</PackageRequired>
+        <ModuleRequired Version="0.01">Digest::MD5</ModuleRequired>
+
+ Database changes
+
+  Create new table
+
+  Insert stuff
+
+  Change Column
+
+ Code execution
+
+    You can execute code when an addon is installed. As you can see above,
+    there are to phases when code can be executed.
+
+  Run "post" code
+
+    Sample config
+
+        "code" : [
+            { "type" : "Install" },
+            { "type" : "Uninstall" }
+        ]
+
+    This creates
+
+        <CodeInstall Type="post"><![CDATA[
+            $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->CodeInstall();
+        ]]></CodeInstall>
+        <CodeUninstall Type="post"><![CDATA[
+            $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->CodeUninstall();
+        ]]></CodeUninstall>
+
+    You need to provide the var::packagesetup::xxxxx package (where xxxxx
+    is the name of the addon).
+
+    There are four types:
+
+      * Install
+
+      * Upgrade
+
+      * Reinstall
+
+      * Uninstall
+
+    The methods called are usually named CodeInstall, CodeUninstall, etc.
+    If you need to run an other method, you can specify the method to be
+    called:
+
+        "code" : [
+            { "type" : "Install", "function": "OtherMethod" }
+        ]
+
+    And that would create
+
+        <CodeInstall Type="post"><![CDATA[
+            $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->OtherMethod();
+        ]]></CodeInstall>
+
+    Usually you would run the code after the files are installed and
+    database changes are done. But sometime you need to run code before
+    this stuff is done. As the packagesetup file isn't available you, you
+    would need to provide the Perl code in the JSON file. That's nasty.
+    With inline you can tell this command to get the Perl code from a file.
+
+  Options
+
+      * type
+
+      * version
+
+      * phase
+
+      * function
+
+      * inline
+
+METHODS
+
+ VERSION
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

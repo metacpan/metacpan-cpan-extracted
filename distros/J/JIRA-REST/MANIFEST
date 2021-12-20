@@ -5,7 +5,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README.pod
+README.md
 dist.ini
 examples/comment_issue.pl
 examples/create_issue.pl

@@ -4,7 +4,9 @@ use strict;
 use warnings;
 
 use version 0.77;
-our $VERSION = qv("v1.0.3");
+our $VERSION = qv("v2.0.1");
+
+use Scalar::Util qw[ reftype ];
 
 use base 'Exporter';
 our @EXPORT_OK = qw{
@@ -12,16 +14,31 @@ our @EXPORT_OK = qw{
   set
 };
 
+sub _error {
+    'CODE' eq ref $_[0] ? $_[0]->() : $_[0];
+}
+
 sub get {
-  my ( $root_ref, $root_path ) = @_;
 
-  return undef unless defined $root_path;
-  $root_path =~ s/^\///;
+  my ( $root_ref, $root_path, $options ) = @_;
 
-  my @root_parts  = split '/', $root_path;
+  my %opts = ( path_sep => '/',
+	       error => undef,
+	       %{ $options // {} },
+	     );
+
+  return _error( $opts{error} ) unless defined $root_path;
+
+  my $path_sep = $opts{path_sep};
+  $path_sep = qr/\Q$path_sep\E/
+    unless ( reftype( $path_sep ) // '' ) eq 'REGEXP';
+
+  $root_path =~ s/^$path_sep//;
+
+  my @root_parts  = split $path_sep, $root_path;
   my $current_ref = $root_ref;
 
-  return undef unless @root_parts;
+  return _error( $opts{error} ) unless @root_parts;
 
   foreach my $current_part ( @root_parts ) {
     if ( ref $current_ref eq 'HASH' ) {
@@ -31,7 +48,7 @@ sub get {
       }
     }
     elsif ( ref $current_ref eq 'ARRAY' ) {
-      return undef if $current_part !~ /^\d+$/;
+      return _error( $opts{error} ) if $current_part !~ /^\d+$/;
 
       if ( exists $current_ref->[$current_part] ) {
         $current_ref = $current_ref->[$current_part];
@@ -39,22 +56,33 @@ sub get {
       }
     }
 
-    return undef;
+    return _error( $opts{error} );
   }
 
   return $current_ref;
 }
 
 sub set {
-  my ( $root_ref, $root_path, $value ) = @_;
 
-  return undef unless defined $root_path;
-  $root_path  =~ s/^\///;
+  my ( $root_ref, $root_path, $value, $options ) = @_;
 
-  my @root_parts  = split '/', $root_path;
+  my %opts = ( path_sep => '/',
+	       error => undef,
+	       %{ $options // {} },
+	     );
+
+  return _error( $opts{error} ) unless defined $root_path;
+
+  my $path_sep = $opts{path_sep};
+  $path_sep = qr/\Q$path_sep\E/
+    unless ( reftype( $path_sep ) // '' ) eq 'REGEXP';
+
+  $root_path  =~ s/^$path_sep//;
+
+  my @root_parts  = split $path_sep, $root_path;
   my $current_ref = $root_ref;
 
-  return undef unless @root_parts;
+  return _error( $opts{error} ) unless @root_parts;
 
   for ( my $i = 0; $i < ( @root_parts - 1 ); $i++ ) {
     my $current_part = $root_parts[ $i ];
@@ -62,6 +90,11 @@ sub set {
 
     if ( ref $current_ref eq 'HASH' ) {
       if ( not ref $current_ref->{$current_part} ) {
+
+        # don't use an integer as a hash key if need to
+        # create the next level in the tree
+        return undef if $current_part =~ /^\d+$/;
+
         $current_ref->{$current_part}
           = $next_part =~ /^\d+$/
             ? []
@@ -72,7 +105,7 @@ sub set {
       next;
     }
     elsif ( ref $current_ref eq 'ARRAY' ) {
-      return undef if $current_part !~ /^\d+$/;
+      return _error( $opts{error} ) if $current_part !~ /^\d+$/;
 
       if ( not ref $current_ref->[$current_part] ) {
         $current_ref->[$current_part]
@@ -85,7 +118,8 @@ sub set {
       next;
     }
 
-    return undef;
+    # ! ref $root_ref && @root_parts > 1
+    return _error( $opts{error} );
   }
 
   my $last_part = pop @root_parts;
@@ -95,11 +129,12 @@ sub set {
   }
 
   if ( ref $current_ref eq 'ARRAY' ) {
-    return undef if $last_part !~ /^\d+$/;
+    return _error( $opts{error} ) if $last_part !~ /^\d+$/;
     return $current_ref->[$last_part] = $value;
   }
 
-  return undef;
+  # ! ref $root_ref && @root_parts == 1
+  return _error( $opts{error} );
 }
 
 1;
@@ -150,11 +185,33 @@ Data::PathSimple - Navigate and manipulate data structures using paths
 
 =head1 DESCRIPTION
 
-Data::PathSimple allows you to get and set values deep within a data structure
+B<Data::PathSimple> allows you to get and set values deep within a data structure
 using simple paths to navigate (think XPATH without the steroids).
 
 Why do this when we already have direct access to the data structure? The
 motivation is that the path will come from a user using a command line tool.
+
+=head2 Path Specifications
+
+A path is specified as a string consisting of components separated by
+a I<path separator>.  By default the separator is the C</> character,
+but that may be changed via the C<path_sep> option.  Paths are always
+specified relative to the root of the structure; a leading path
+separator is optional.
+
+A path component is treated as an array index if it matches an integer
+number, as a hash key otherwise.
+
+=head2 Error returns
+
+If an error occurs (e.g, an incorrect input, or if a path cannot be resolved)
+an error value is returned.  By default this is C<undef>, but it may
+be changed with the C<error> option. That option can also take a code reference,
+so, for example,
+
+  error => sub { require Croak; Croak::carp( "error" ) }
+
+would cause an exception to be thrown on errors.
 
 =head1 FUNCTIONS
 
@@ -164,15 +221,33 @@ Functions are not exported by default.
 
 Gets the value at the specified path:
 
-  my $current_perl = get( $data, '/Languages/Perl/CurrentVersion' );
+  my $current_perl = get( $data, '/Languages/Perl/CurrentVersion', ?\%options );
 
-If a path does not exist, undef is returned. For example, the following will
-return undef since the 'Ruby' path does not exist:
+The following options are supported:
+
+=over
+
+=item path_sep
+
+A string or reqular expression which will match the path separator.
+It defaults to the string C</>.
+
+=item error
+
+How non-existent paths or mismatched array indices or hash keys
+should be handled. If set to a coderef, the result of the coderef will
+be returned.  Otherwise, whatever C<error> is set to will be returned.
+It defaults to C<undef>.
+
+=back
+
+If a path does not exist, an error value is returned. For example, the following will
+return an error since the C<Ruby> path does not exist:
 
   my $current_ruby = get( $data, '/Languages/Ruby/CurrentVersion' );
 
-If the path is not an integer yet we are accessing an array ref, undef is
-returned. For example, the following will return undef since the 'first' path
+If the path is not an integer yet we are accessing an array ref, an error value is
+returned. For example, the following will return an error since the C<first> path
 is not an integer:
 
   my $perl_url = get( $data, '/Languages/Perl/URLs/first' );
@@ -184,21 +259,38 @@ never be modified by a call to C<get()>.
 
 Sets the value at the specified path:
 
-  set( $data, '/Languages/Perl/CurrentVersion', '5.16.2' );
+  set( $data, '/Languages/Perl/CurrentVersion', '5.16.2', ?\%options );
+
+The following options are supported:
+
+=over
+
+=item path_sep
+
+A string or reqular expression which will match the path separator.
+It defaults to the string C</>.
+
+=item error
+
+How errors should be handled. If set to a coderef, the result of the
+coderef will be returned.  Otherwise, whatever C<error> is set to will
+be returned.  It defaults to C<undef>.
+
+=back
 
 If a path does not exist, it will be autovivified. For example, the following
-will create the 'Ruby' path:
+will create the C<Ruby> path:
 
   set( $data, '/Languages/Ruby/CurrentVersion', '1.9.3' );
 
 By default hash refs are used when autovivifying. However if the path is an
 integer, then an array ref will be used instead. For example, the following
-will create an array ref for the 'URLs' path:
+will create an array ref for the C<URLs> path:
 
   set( $data, '/Languages/Ruby/URLs/0', 'http://www.ruby-lang.org' );
 
-If the path is not an integer yet we are accessing an array ref, undef is
-returned. For example, the following will return undef since the 'first' path
+If the path is not an integer yet we are accessing an array ref, an error value is
+returned. For example, the following will return C<undef> since the C<first> path
 is not an integer:
 
   my $perl_url = set( $data, '/Languages/Perl/URLs/first', '5.16.2' );
@@ -240,7 +332,9 @@ To install this module type the following:
 
 =head1 AUTHOR
 
-Alfie John E<lt>alfiej@opera.comE<gt>
+Alfie John E<lt>alfie@alfie.wtfE<gt>
+
+Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
 
 =head1 WARRANTY
 
@@ -248,7 +342,7 @@ IT COMES WITHOUT WARRANTY OF ANY KIND.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by Alfie John
+Copyright (C) 2021 by Alfie John
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

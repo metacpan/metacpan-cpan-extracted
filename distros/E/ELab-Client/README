@@ -1,3 +1,14 @@
-ELab-Client
 
-Objective: access the API of eLabFTW with Perl
+README for ELab::Client
+-------------------------------------------------------------------------------
+
+ELab::Client, based on REST::Client [1], provides methods to access an eLabFTW
+electronic lab notebook server [2] via its REST API [3]. The targetted
+functionality is identical to the official "elabapy" Python client [4].
+(That shouldn't keep us from making the package better though!)
+
+
+[1] https://metacpan.org/pod/REST::Client
+[2] https://www.elabftw.net/
+[3] https://doc.elabftw.net/api/
+[4] https://github.com/elabftw/elabapy
