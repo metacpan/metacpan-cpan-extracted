@@ -42,35 +42,6 @@ subtest 'Nothing to repair' => sub {
 subtest 'Migrate up and down' => sub {
   is $minion->backend->mysql->migrations->active, 13, 'active version is 13';
   is $minion->backend->mysql->migrations->migrate(0)->active, 0, 'active version is 0';
-
-  # Test the migration from 6 to 7: This is a dangerous migration that
-  # could destroy data...
-  is $minion->backend->mysql->migrations->migrate(6)->active, 6, 'active version is 6';
-  $minion->backend->mysql->db->insert(
-    minion_jobs => {
-      args => '[]',
-      priority => 0,
-      task => 'test',
-      notes => encode_json({
-        foo => 'bar',
-        baz => [1, 2, 3],
-      }),
-    },
-  );
-  $minion->backend->mysql->db->insert(
-    minion_jobs => {
-      args => '[]',
-      priority => 0,
-      task => 'test',
-    },
-  );
-  my $jobs = Minion::Backend::mysql->new( dsn => $mysqld->dsn( dbname => 'test' ) )->list_jobs(0, 2);
-  is $jobs->{total}, 2, '2 jobs migrated';
-  is_deeply $jobs->{jobs}->grep(sub{ keys %{ $_->{notes} } })->first->{notes},
-    { foo => 'bar', baz => [1, 2, 3] },
-    'note is migrated safely';
-  $minion->backend->mysql->db->delete( 'minion_jobs' );
-
   is $minion->backend->mysql->migrations->migrate->active, 13, 'active version is 13';
 };
 

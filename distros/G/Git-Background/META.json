@@ -1,0 +1,72 @@
+{
+   "abstract" : "Perl interface to run Git commands (in the background)",
+   "author" : [
+      "Sven Kirmess <sven.kirmess@kzone.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla, CPAN::Meta::Converter",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Git-Background",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Temp" : "0",
+            "Proc::Background" : "1.30",
+            "Scalar::Util" : "0",
+            "overload" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "Test::More" : "0.88",
+            "constant" : "0",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skirmess/Git-Background/issues"
+      },
+      "homepage" : "https://github.com/skirmess/Git-Background",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skirmess/Git-Background.git",
+         "web" : "https://github.com/skirmess/Git-Background"
+      }
+   },
+   "version" : "0.001",
+   "x_spdx_expression" : "BSD-2-Clause-FreeBSD"
+}
+

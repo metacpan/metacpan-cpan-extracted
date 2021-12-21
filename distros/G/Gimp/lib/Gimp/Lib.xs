@@ -101,28 +101,15 @@ static void pixel_rgn_pdl_delete_data (pdl *p, size_t param)
   p->data = 0;
 }
 
-/* please optimize! */
 static pdl *redim_pdl (pdl *p, int ndim, int newsize)
 {
   pdl *r = PDL->null ();
-  AV *dims, *dimincs;
-  int i;
-
-  dims    = newAV ();
-  dimincs = newAV ();
-
-  for (i = 0; i < p->ndims; i++)
-    {
-      av_push (dims   , newSViv (p->dims   [i]));
-      av_push (dimincs, newSViv (p->dimincs[i]));
-    }
-
-  sv_setiv (*av_fetch (dims, ndim, 0), newsize);
-
+  PDL_Indx dims[p->ndims], i; /* copy so as to modify */
+  for (i = 0; i < p->ndims; i++) dims[i] = p->dims[i];
+  dims[ndim] = newsize;
   PDL->affine_new (p, r, 0,
-		   sv_2mortal (newRV_noinc ((SV*)dims)),
-		   sv_2mortal (newRV_noinc ((SV*)dimincs)));
-
+		   dims, p->ndims,
+		   p->dimincs, p->ndims);
   return r;
 }
 

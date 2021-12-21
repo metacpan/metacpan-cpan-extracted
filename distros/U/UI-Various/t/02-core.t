@@ -240,8 +240,8 @@ $_ = _sub_perl(	<<'CODE');
 		print "We should not get here! ($_, ", fileno(STDERR), ")\n";
 CODE
 is($?, 0x900, 'RC 9 (no signal or core-dump) in sub-perl "closed STDERR"');
-is($_,
-   "\n***** can't duplicate STDERR: Bad file descriptor *****\n",
+like($_,
+     qr{\n\*{5} can't duplicate STDERR: Bad file (descriptor|number) \*{5}\n}n,
    'closed STDERR causes error');
 
 #####################################

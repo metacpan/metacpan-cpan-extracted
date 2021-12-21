@@ -1,26 +1,33 @@
 ---
-name: GeNUScreen-Config
-version: 0.0.10
+abstract: 'Work with config files for GeNUScreen firewalls'
 author:
   - 'Mathias Weidner <mamawe@cpan.org>'
-abstract: Work with config files for GeNUScreen firewalls
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Class::Std: 0
-  Test::More: 0
-  perl: 5.6.0
-  version: 0
 build_requires:
-  Probe::Perl: 0
+  Probe::Perl: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GeNUScreen-Config
 provides:
   GeNUScreen::Config:
     file: lib/GeNUScreen/Config.pm
-    version: 0.0.10
+    version: v0.0.11
   GeNUScreen::Config::Diff:
     file: lib/GeNUScreen/Config/Diff.pm
-generated_by: Module::Build version 0.2808
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: v0.0.11
+requires:
+  Class::Std: '0'
+  Test::More: '0'
+  perl: v5.6.0
+  version: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=GeNUScreen-Config
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/matwei-perl/GeNUScreen-Config
+version: v0.0.11
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

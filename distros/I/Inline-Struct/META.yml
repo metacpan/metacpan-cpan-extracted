@@ -4,6 +4,7 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
   Inline: '0.66'
   Inline::C: '0.62'
   Test::More: '0.88'
@@ -28,5 +29,5 @@ requires:
   perl: '5.01'
 resources:
   repository: https://github.com/mohawk2/Inline-Struct.git
-version: '0.28'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

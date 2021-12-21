@@ -18,8 +18,8 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.9015'
+  SPVM: '0.9019'
 resources:
   repository: https://github.com/yuki-kimoto/Perl-SPVM-Math.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

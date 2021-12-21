@@ -81,12 +81,14 @@ t/perl-imports.t
 t/perl.t
 t/perlimports.t
 t/pragma.t
+t/preserve-some-padding.t
 t/preserve-spaces.t
 t/qualified-bareword.t
 t/quoted-var.t
 t/re-export-via-sub-exporter.t
 t/regex-replacement.t
 t/require.t
+t/respace-include.pl
 t/script-with-inner-packages.t
 t/signatures.pl
 t/skip-all.t
@@ -168,6 +170,7 @@ test-data/original-imports.pl
 test-data/perl-version.pl
 test-data/pithub.pl
 test-data/pragma.t
+test-data/preserve-some-padding.pl
 test-data/preserve-spaces.pl
 test-data/qualified-bareword.pl
 test-data/quoted-var.pl

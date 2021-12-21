@@ -32,13 +32,18 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "HTTP::Response" : "0",
             "JSON" : "4",
+            "LWP::UserAgent" : "0",
+            "Test::Exception" : "0",
             "Test::LWP::UserAgent" : "0.033",
+            "Test::More" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -2,7 +2,7 @@ package Finance::Nadex;
 
 use strict;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use LWP::UserAgent;
 use JSON;
@@ -906,7 +906,7 @@ Finance::Nadex - Interact with the North American Derivatives Exchange
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -1167,7 +1167,7 @@ Returns a list in which each element is a L<Finance::Nadex::Position>
 
 =head1 AUTHOR
 
-mhandisi, C<< <mhandisi at cpan.org> >>
+mhandisi, C<< <mhandisi at cpan.org> >> AKA Charles Larry
 
 =head1 BUGS
 

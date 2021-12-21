@@ -6,6 +6,8 @@ use warnings;
 use strict;
 use Carp;
 
+use version; our $VERSION = qv('v0.0.11');
+
 my $re_cfgval  = qr/\S.*/;
 my $re_cfgvar  = qr/[0-9a-z_]+/i;
 my $re_cfgpath = qr/$re_cfgvar(?:\.$re_cfgvar)*/;

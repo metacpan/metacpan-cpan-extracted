@@ -52,6 +52,10 @@ typedef: 'typedef' 'struct' IDENTIFIER IDENTIFIER ';'
 	{
 	   Inline::Struct::grammar::_register_type($thisparser, $item[3], "T_IV");
 	}
+	| 'typedef' enum_label IDENTIFIER ';'
+	{
+	   Inline::Struct::grammar::_register_type($thisparser, $item[3], "T_IV");
+	}
 	| 'typedef' function_pointer ';'
 	{
 	   # a function-pointer typedef
@@ -64,10 +68,14 @@ function_pointer: (/[^\s\(]+/)(s) '(' '*' IDENTIFIER ')' '(' (/[^\s\)]+/)(s) ')'
 	   [join('',@{$item[1]}), $item[4], join('',@{$item[7]})]
 	}
 
-enum: 'enum' '{' (/[^\s\}]+/)(s) '}'
-	{
-	   $item[3];
-	}
+enum_list: '{' (/[^\s\}]+/)(s) '}'
+	{ $item[2] }
+
+enum: 'enum' enum_list
+	{ $item[2] }
+
+enum_label: 'enum' IDENTIFIER enum_list
+	{ [ @item[1,2] ] }
 
 fields: '{' field(s) '}' { [ grep ref, @{$item[2]} ] }
 
@@ -79,7 +87,12 @@ IDENTIFIER: /[~_a-z]\w*/i
 comment:  m{\s* // [^\n]* \n }x
 	| m{\s* /\* (?:[^*]+|\*(?!/))* \*/  ([ \t]*)? }x
 
-type_identifier: TYPE(s) star(s?) IDENTIFIER(?) ';'
+type_identifier:
+	'enum' IDENTIFIER IDENTIFIER ';'
+	{
+         [ 'IV', $item[3] ];
+	}
+	| TYPE(s) star(s?) IDENTIFIER(?) ';'
 	{
          my ($identifier) = @{ $item[3] };
          $identifier = pop @{$item[1]}

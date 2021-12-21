@@ -1,5 +1,9 @@
 Revision history for PomBase-Chobo
 
+0.035     2021-12-21 16:24:41
+          When merging terms, fix garbage generated when one of the
+          terms has no definition
+
 0.034     2021-12-08 16:17:33
           Store the "consider" attribute as a cvtermprop
 

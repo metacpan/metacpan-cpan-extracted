@@ -23,7 +23,7 @@ use Directory::Organize;
 use Getopt::Long;
 use Term::ReadKey;
 
-use version; our $VERSION = qv('v1.0.0');
+use version; our $VERSION = qv('v1.0.1');
 
 $|++;
 
@@ -205,7 +205,7 @@ mkdir_heute - create and find directories interactive
 
 =head1 VERSION
 
-This documentation refers to version v1.0.0.
+This documentation refers to version v1.0.1.
 
 =head1 USAGE
 

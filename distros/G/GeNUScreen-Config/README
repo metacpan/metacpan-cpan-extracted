@@ -1,4 +1,4 @@
-GeNUScreen-Config version 0.0.1
+GeNUScreen-Config version v0.0.11
 
 GeNUScreen::Config is a perl module that supports the work with
 GeNUScreen firewalls. It allows you to easily compare different versions

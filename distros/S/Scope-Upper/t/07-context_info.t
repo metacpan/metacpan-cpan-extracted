@@ -51,6 +51,9 @@ sub expected {
   $warnings  = sub { use warnings; (caller 0)[9] }->() if  "$]" < 5.007
                                                        and not $^W;
  }
+ if (defined $warnings and $warnings =~ m/^\x55*$/) {
+     $warnings = $warnings::Bits{all};
+ }
 
  my @exp = (
   $pkg,
@@ -156,6 +159,9 @@ sub call {
   my @got = context_info(CALLER $depth);
   my @exp = caller $depth;
   defined and not $_ and $_ = '' for $exp[5];
+  if (defined $exp[9] and $exp[9] =~ m/^\x55*$/) {
+     $exp[9] = $warnings::Bits{all};
+  }
   is_deeply \@got, \@exp, "context_info vs caller $depth";
  }
 }

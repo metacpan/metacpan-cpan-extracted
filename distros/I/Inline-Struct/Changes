@@ -1,3 +1,9 @@
+0.30 2021-12-20
+- allow more ways of using enums as struct fields
+
+0.29 2021-12-20
+- tests now run in parallel - thanks @ppisar
+
 0.28 2021-12-19
 - add inline function-pointer fields not just typedef - fix RT#140493
 - allow inline enum fields, also typedef-ed enum - fix RT#140492

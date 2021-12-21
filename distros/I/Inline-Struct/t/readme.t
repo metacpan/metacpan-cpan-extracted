@@ -1,4 +1,5 @@
 use Test::More;
+BEGIN { require './t/common.pl'; }
 
 use Inline C => 'DATA', structs => ['JA_H'], force_build => 1;
 

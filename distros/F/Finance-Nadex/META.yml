@@ -18,8 +18,13 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
+  HTTP::Response: '0'
   JSON: '4'
+  LWP::UserAgent: '0'
+  Test::Exception: '0'
   Test::LWP::UserAgent: '0.033'
+  Test::More: '0'
   perl: '5.006'
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

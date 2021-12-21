@@ -1,5 +1,8 @@
 Revision history for GeNUScreen-Config
 
+v0.0.11 Tue Dec 21 11:51:37 CET 2021
+	- move on GitHub
+
 0.0.10 Do 24. Jun 21:41:00 CEST 2010
 	- scripts/genuscreen-config.pl: If no option -config is given and
 	  there is a file named 'config.hdf' in the current working

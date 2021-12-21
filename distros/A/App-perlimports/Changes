@@ -1,5 +1,13 @@
 Revision history for App-perlimports
 
+0.000030  2021-12-21 22:55:49Z
+    - Avoid calling methods on undef variable (GH#59) (Olaf Alders)
+    - Preserve some arbitrary padding. It may have been added by a tidier.
+      (GH#60) (Olaf Alders)
+
+0.000029  2021-12-20 19:24:54Z
+    - Improve import sort order (GH#58) (Olaf Alders)
+
 0.000028  2021-12-18 02:26:13Z
     - Maintain stable sort order for lists which include sigils (GH#57) (Olaf
       Alders)

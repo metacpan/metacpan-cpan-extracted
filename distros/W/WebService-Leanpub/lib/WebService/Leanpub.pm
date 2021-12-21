@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 
-use version; our $VERSION = qv('0.3.0');
+use version; our $VERSION = qv('v0.3.1');
 
 use HTTP::Request::Common;
 use JSON;
@@ -259,8 +259,7 @@ WebService::Leanpub - Access the Leanpub web API.
 
 =head1 VERSION
 
-This document describes WebService::Leanpub version 0.0.1
-
+This document describes WebService::Leanpub version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -455,9 +454,10 @@ Since every action in the Leanpub API involves a book which is identified by a
 slug, you have to provide the slug as the second argument to
 WebService::Leanpub->new().
 
-A slug is the part after the hostname in the Leanpub URL of your book. So for
-instance for the Book "Using the Leanpub API with Perl" which has the URL
-L<< https://leanpub.com/using-the-leanpub-api-with-perl >> the slug is
+A slug is the part after the hostname in the Leanpub URL of your book.
+For instance the book "Using the Leanpub API with Perl" has the URL
+L<< https://leanpub.com/using-the-leanpub-api-with-perl >> and the slug for
+this book is
 C<using-the-leanpub-api-with-perl>.
 
 =back
@@ -509,11 +509,11 @@ None reported.
     limitations on the size of data sets, special cases that are not
     (yet) handled, etc.
 
-No bugs have been reported.
+No bugs have been reported so far.
 
-Please report any bugs or feature requests to
-C<bug-webservice-leanpub@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+Please report any bugs or feature requests
+through the web interface at L<http://rt.cpan.org>
+or - if you prefer email - to C<bug-webservice-leanpub@rt.cpan.org>.
 
 
 =head1 AUTHOR

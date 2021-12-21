@@ -44,7 +44,7 @@
             "HTML::Entities" : "0",
             "IO::All" : "0",
             "IO::Scalar" : "0",
-            "PDL" : "2.037",
+            "PDL" : "2.063_01",
             "Web::Scraper" : "0",
             "perl" : "5.014001"
          }
@@ -58,7 +58,7 @@
             "HTML::Entities" : "0",
             "IO::All" : "0",
             "IO::Scalar" : "0",
-            "PDL" : "2.037",
+            "PDL" : "2.063_01",
             "Test::More" : "0.88",
             "Web::Scraper" : "0"
          }
@@ -72,6 +72,6 @@
       },
       "x_IRC" : "irc://irc.gnome.org/#gimp"
    },
-   "version" : "2.35",
+   "version" : "2.36",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

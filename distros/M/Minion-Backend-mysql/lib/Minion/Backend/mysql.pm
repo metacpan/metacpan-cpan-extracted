@@ -15,7 +15,7 @@ use Time::Piece ();
 has 'mysql';
 has 'no_txn' => sub { 0 };
 
-our $VERSION = '0.33';
+our $VERSION = '1.000';
 
 # The dequeue system has a couple limitations:
 # 1. There is no way to directly notify a sleeping worker of an incoming
@@ -62,13 +62,13 @@ sub history {
 
   my $sql = <<SQL;
 SELECT
-  MIN(UNIX_TIMESTAMP(finished)) as `epoch`,
-  DAY(finished) as `day`,
-  HOUR(finished) as `hour`,
-  SUM(CASE state WHEN 'failed' THEN 1 ELSE 0 END) AS failed_jobs,
-  SUM(CASE state WHEN 'finished' THEN 1 ELSE 0 END) AS finished_jobs
-FROM minion_jobs
-WHERE finished > SUBTIME(NOW(), '23:00:00')
+  MIN(UNIX_TIMESTAMP(jobs.finished)) as `epoch`,
+  DAY(jobs.finished) as `day`,
+  HOUR(jobs.finished) as `hour`,
+  SUM(CASE jobs.state WHEN 'failed' THEN 1 ELSE 0 END) AS failed_jobs,
+  SUM(CASE jobs.state WHEN 'finished' THEN 1 ELSE 0 END) AS finished_jobs
+FROM minion_jobs jobs
+WHERE jobs.finished > SUBTIME(NOW(), '23:00:00')
 GROUP BY `day`, `hour`
 ORDER BY `day`, `hour`
 SQL
@@ -199,24 +199,24 @@ sub list_jobs {
     push @params, @$states;
   }
   if ( my $queues = $options->{queues} ) {
-    push @where, 'queue in (' . join( ',', ('?') x @$queues ) . ')';
+    push @where, 'j.queue in (' . join( ',', ('?') x @$queues ) . ')';
     push @params, @$queues;
   }
   if ( my $tasks = $options->{tasks} ) {
-    push @where, 'task in (' . join( ',', ('?') x @$tasks ) . ')';
+    push @where, 'j.task in (' . join( ',', ('?') x @$tasks ) . ')';
     push @params, @$tasks;
   }
   if ( my $ids = $options->{ids} ) {
-    push @where, 'id in (' . join( ',', ('?') x @$ids ) . ')';
+    push @where, 'j.id in (' . join( ',', ('?') x @$ids ) . ')';
     push @params, @$ids;
   }
   if ( my $id = $options->{before} ) {
-    push @where, 'id < ?';
+    push @where, 'j.id < ?';
     push @params, $id;
   }
   if ( my $notes = $options->{notes} ) {
     push @where, '( '
-      . join( ' or ', ('? in ( select note_key from minion_notes where job_id=j.id )')x@$notes )
+      . join( ' or ', ('? in ( select minion_notes.note_key from minion_notes where minion_notes.job_id=j.id )')x@$notes )
       . ' )';
     push @params, @$notes;
   }
@@ -228,29 +228,30 @@ sub list_jobs {
 
   my $list_sql = qq{
     SELECT
-      id, args, attempts,
-      minion_jobs.state, task, worker,
-      lax, priority, queue, result, retries,
-      children, parents,
-      UNIX_TIMESTAMP(created) AS created,
-      UNIX_TIMESTAMP(`delayed`) AS `delayed`,
-      UNIX_TIMESTAMP(finished) AS finished,
-      UNIX_TIMESTAMP(retried) AS retried,
-      UNIX_TIMESTAMP(started) AS started,
+      minion_jobs.id, minion_jobs.args, minion_jobs.attempts,
+      minion_jobs.state, minion_jobs.task, minion_jobs.worker,
+      minion_jobs.lax, minion_jobs.priority, minion_jobs.queue,
+      minion_jobs.result, minion_jobs.retries,
+      filtered.children, filtered.parents,
+      UNIX_TIMESTAMP(minion_jobs.created) AS created,
+      UNIX_TIMESTAMP(minion_jobs.`delayed`) AS `delayed`,
+      UNIX_TIMESTAMP(minion_jobs.finished) AS finished,
+      UNIX_TIMESTAMP(minion_jobs.retried) AS retried,
+      UNIX_TIMESTAMP(minion_jobs.started) AS started,
       UNIX_TIMESTAMP(NOW()) AS time,
       UNIX_TIMESTAMP(minion_jobs.expires) AS expires
     FROM minion_jobs
     JOIN (
-      SELECT id,
+      SELECT j.id,
         GROUP_CONCAT( child_jobs.child_id ORDER BY child_jobs.child_id SEPARATOR ':' ) AS children,
         GROUP_CONCAT( parent_jobs.parent_id ORDER BY parent_jobs.parent_id SEPARATOR ':' ) AS parents
       FROM minion_jobs j
       LEFT JOIN minion_jobs_depends child_jobs ON j.id=child_jobs.parent_id
       LEFT JOIN minion_jobs_depends parent_jobs ON j.id=parent_jobs.child_id
       $where
-      GROUP BY id
+      GROUP BY j.id
     ) filtered USING ( id )
-    ORDER BY id DESC
+    ORDER BY minion_jobs.id DESC
     LIMIT ? OFFSET ?
   };
 
@@ -366,11 +367,15 @@ sub list_locks {
 
 sub new {
   my ( $class, @args ) = @_;
+  state $skip_migration = 0;
 
   my $mysql;
   my $force_migration = 0;
   if ( @args == 1 && blessed($args[0]) && $args[0]->isa('Mojo::mysql') ) {
     $mysql = $args[0];
+    # We need to force an immediate migration if given a Mojo::mysql
+    # object, because the user may decide to add another migration after
+    # adding the Minion plugin.
     $force_migration = 1;
   }
   else {
@@ -382,26 +387,26 @@ sub new {
 
   my $self = $class->SUPER::new(mysql => $mysql);
 
-  if ($force_migration) {
+  if ( !$skip_migration ) {
+    if ($force_migration) {
 
-    # First make sure any impending migrations happen
-    # before we overwrite them:
-    $mysql->migrations->migrate;
+      # First make sure any impending migrations happen
+      # before we overwrite them:
+      $mysql->migrations->migrate;
 
-    # Then load this module's migrations and run them:
-    $mysql->migrations->name('minion')->from_data;
-    $mysql->migrations->migrate;
-    _migrate_notes( $mysql );
-  }
-  else {
-    # Load this module's migrations and run them
-    # the first time a DB connection is attempted:
-    $mysql->migrations->name('minion')->from_data;
-    $mysql->once(connection => sub {
-        my ( $mysql ) = @_;
-        $mysql->migrations->migrate;
-        _migrate_notes( $mysql );
-    });
+      # Then load this module's migrations and run them:
+      $mysql->migrations->name('minion')->from_data;
+      $mysql->migrations->migrate;
+    }
+    else {
+      # Load this module's migrations and run them
+      # the first time a DB connection is attempted:
+      $mysql->migrations->name('minion')->from_data;
+      $mysql->once(connection => sub {
+          my ( $mysql ) = @_;
+          $mysql->migrations->migrate;
+      });
+    }
   }
 
   return $self;
@@ -465,7 +470,7 @@ sub repair {
   $db->query(
     "select job.id, job.retries from minion_jobs job
      left join minion_workers worker on job.worker = worker.id
-     where state = 'active' and queue != 'minion_foreground'
+     where job.state = 'active' and job.queue != 'minion_foreground'
        and worker.id is null"
   )->hashes->each(sub { $self->fail_job(@$_{qw(id retries)}, 'Worker went away') });
 
@@ -488,7 +493,7 @@ sub reset {
     $db->query("ALTER TABLE minion_locks AUTO_INCREMENT = 1");
     $db->query("truncate table minion_jobs_depends");
     $db->query("truncate table minion_notes");
-    $db->query("truncate table minion_workers");
+    $db->query("DELETE FROM minion_workers");
     $db->query("ALTER TABLE minion_workers AUTO_INCREMENT = 1");
   }
   elsif ( $options->{locks} ) {
@@ -573,11 +578,11 @@ sub stats {
   # Job statistics
   my $job_sql = q{
     SELECT
-        state,
-        COUNT(state) AS jobs,
-        SUM(`delayed` > NOW()) AS `delayed`
+        minion_jobs.state,
+        COUNT(minion_jobs.state) AS jobs,
+        SUM(minion_jobs.`delayed` > NOW()) AS `delayed`
     FROM minion_jobs
-    GROUP BY state
+    GROUP BY minion_jobs.state
   };
   $res = $db->query( $job_sql );
   while ( my $row = $res->hash ) {
@@ -628,7 +633,7 @@ sub _try {
     SELECT job.id, job.args, job.retries, job.task
     FROM minion_jobs job
     LEFT JOIN (
-        SELECT child_id, COUNT(child_id) AS pending,
+        SELECT depends.child_id, COUNT(depends.child_id) AS pending,
             COALESCE( SUM(depends.state = 'failed' OR (depends.expires IS NOT NULL AND depends.expires > NOW())), 0 ) AS failed
         FROM minion_jobs_depends depends
         WHERE depends.state IS NOT NULL AND (
@@ -636,7 +641,7 @@ sub _try {
             OR ( depends.state = 'failed' )
             OR ( depends.state = 'inactive' AND (depends.expires IS NULL OR depends.expires > NOW()))
         )
-        GROUP BY child_id
+        GROUP BY depends.child_id
     ) depends ON depends.child_id = job.id
     WHERE job.state = 'inactive'
       AND job.`delayed` <= NOW()
@@ -735,34 +740,6 @@ sub receive {
     @ids,
   );
   return [ map { decode_json( $_->{message} ) } @$rows ];
-}
-
-sub _migrate_notes {
-  my ( $mysql ) = @_;
-  my $db = $mysql->db;
-  my $rows_to_migrate = $db->select(
-    minion_notes => ['job_id', 'note_value'],
-    { note_key => '***MIGRATED NOTE***' },
-  )->hashes;
-  if ( $rows_to_migrate->size > 0 ) {
-    my $tx = $db->begin;
-    $rows_to_migrate->each(sub {
-      my ( $row ) = @_;
-      my $notes = decode_json( $row->{note_value} );
-      for my $note_key ( keys %$notes ) {
-        $db->insert( minion_notes => {
-          job_id => $row->{job_id},
-          note_key => $note_key,
-          note_value => encode_json( $notes->{ $note_key } ),
-        } );
-      }
-      $db->delete( minion_notes => {
-          job_id => $row->{job_id},
-          note_key => '***MIGRATED NOTE***',
-      } );
-    } );
-    $tx->commit;
-  }
 }
 
 1;
@@ -1196,7 +1173,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.33
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -1683,58 +1660,65 @@ the same terms as the Perl 5 programming language system itself.
 __DATA__
 
 @@ minion
--- 1 up
-create table if not exists minion_jobs (
-  `id`       serial not null primary key,
-  `args`     mediumblob not null,
-  `created`  timestamp not null default current_timestamp,
-  `delayed`  timestamp not null default current_timestamp,
-  `finished` timestamp null,
-  `priority` int not null,
-  `result`   mediumblob,
-  `retried`  timestamp null,
-  `retries`  int not null default 0,
-  `started`  timestamp null,
-  `state`    varchar(128) not null default 'inactive',
-  `task`     text not null,
-  `worker`   bigint
+-- 13 up
+CREATE TABLE IF NOT EXISTS minion_jobs (
+  `id`       BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `args`     MEDIUMBLOB NOT NULL,
+  `created`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `delayed`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `finished` TIMESTAMP NULL,
+  `priority` INT NOT NULL,
+  `result`   MEDIUMBLOB,
+  `attempts` INT NOT NULL DEFAULT 1,
+  `retried`  TIMESTAMP NULL,
+  `retries`  INT NOT NULL DEFAULT 0,
+  `started`  TIMESTAMP NULL,
+  `expires`  DATETIME,
+  `state`    ENUM('inactive','active','finished','failed') NOT NULL DEFAULT 'inactive',
+  `lax`      BOOLEAN NOT NULL DEFAULT FALSE,
+  `task`     VARCHAR(50) NOT NULL,
+  `queue`    VARCHAR(128) NOT NULL DEFAULT 'default',
+  `worker`   BIGINT
 );
 
-create table if not exists minion_workers (
-  `id`      serial not null primary key,
-  `host`    text not null,
-  `pid`     int not null,
-  `started` timestamp not null default current_timestamp,
-  `notified` timestamp not null default current_timestamp
+CREATE TABLE IF NOT EXISTS minion_jobs_depends (
+  parent_id BIGINT NOT NULL,
+  child_id BIGINT NOT NULL,
+  state ENUM('inactive','active','finished','failed') NOT NULL DEFAULT 'inactive',
+  expires DATETIME,
+  FOREIGN KEY (child_id) REFERENCES minion_jobs(id) ON DELETE CASCADE,
+  PRIMARY KEY (parent_id, child_id)
+);
+CREATE TRIGGER minion_trigger_insert_depends BEFORE INSERT ON minion_jobs_depends FOR EACH ROW
+  SET NEW.state = COALESCE(( SELECT state FROM minion_jobs WHERE id=NEW.parent_id ), 'finished'),
+    NEW.expires = ( SELECT expires FROM minion_jobs WHERE id=NEW.parent_id );
+CREATE TRIGGER minion_trigger_update_jobs AFTER UPDATE ON minion_jobs FOR EACH ROW
+  UPDATE minion_jobs_depends SET state=NEW.state, expires=NEW.expires WHERE parent_id=OLD.id;
+
+CREATE TABLE IF NOT EXISTS minion_notes (
+  job_id BIGINT NOT NULL,
+  note_key VARCHAR(191) NOT NULL,
+  note_value TEXT,
+  PRIMARY KEY (job_id, note_key),
+  FOREIGN KEY (job_id) REFERENCES minion_jobs(id) ON DELETE CASCADE
 );
 
--- 1 down
-drop table if exists minion_jobs;
-drop table if exists minion_workers;
+CREATE TABLE IF NOT EXISTS minion_workers (
+  `id`      BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `host`    TEXT NOT NULL,
+  `pid`     INT NOT NULL,
+  `started` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `notified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` MEDIUMBLOB
+);
 
--- 2 up
-create index minion_jobs_state_idx on minion_jobs (state);
-
--- 3 up
-alter table minion_jobs add queue varchar(128) not null default 'default';
-
--- 4 up
-ALTER TABLE minion_workers MODIFY COLUMN started timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE minion_workers MODIFY COLUMN notified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
 CREATE TABLE IF NOT EXISTS minion_workers_inbox (
-  `id` SERIAL NOT NULL PRIMARY KEY,
-  `worker_id` BIGINT UNSIGNED NOT NULL,
-  `message` BLOB NOT NULL
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `worker_id` BIGINT NOT NULL,
+  `message` BLOB NOT NULL,
+  FOREIGN KEY (worker_id) REFERENCES minion_workers(id) ON DELETE CASCADE
 );
-ALTER TABLE minion_jobs ADD COLUMN attempts INT NOT NULL DEFAULT 1;
 
--- 5 up
-ALTER TABLE minion_jobs MODIFY COLUMN args MEDIUMBLOB NOT NULL;
-ALTER TABLE minion_jobs MODIFY COLUMN result MEDIUMBLOB;
-
--- 6 up
-ALTER TABLE minion_workers ADD COLUMN status MEDIUMBLOB;
-ALTER TABLE minion_jobs ADD COLUMN notes MEDIUMBLOB;
 CREATE TABLE IF NOT EXISTS minion_locks (
   id      SERIAL NOT NULL PRIMARY KEY,
   -- InnoDB index prefix limit is 767 bytes, and if you're using utf8mb4
@@ -1761,117 +1745,18 @@ BEGIN
 END
 //
 DELIMITER ;
-CREATE TABLE minion_jobs_depends (
-  parent_id BIGINT UNSIGNED NOT NULL,
-  child_id BIGINT UNSIGNED NOT NULL,
-  FOREIGN KEY (parent_id) REFERENCES minion_jobs(id) ON DELETE CASCADE,
-  FOREIGN KEY (child_id) REFERENCES minion_jobs(id) ON DELETE CASCADE
-);
 
--- 6 down
-ALTER TABLE minion_workers DROP COLUMN status;
-ALTER TABLE minion_jobs DROP COLUMN notes;
-DROP TABLE IF EXISTS minion_locks;
-DROP FUNCTION IF EXISTS minion_lock;
-DROP TABLE minion_jobs_depends;
-
--- 7 up
-SET FOREIGN_KEY_CHECKS=0;
-ALTER TABLE minion_jobs_depends DROP FOREIGN KEY minion_jobs_depends_ibfk_1;
-ALTER TABLE minion_jobs_depends DROP FOREIGN KEY minion_jobs_depends_ibfk_2;
-ALTER TABLE minion_jobs MODIFY COLUMN id BIGINT NOT NULL AUTO_INCREMENT UNIQUE;
-ALTER TABLE minion_jobs_depends MODIFY COLUMN parent_id BIGINT NOT NULL;
-ALTER TABLE minion_jobs_depends MODIFY COLUMN child_id BIGINT NOT NULL;
-SET FOREIGN_KEY_CHECKS=1;
-ALTER TABLE minion_jobs_depends
-  ADD FOREIGN KEY (child_id)
-  REFERENCES minion_jobs(id) ON DELETE CASCADE;
-
-ALTER TABLE minion_jobs ADD COLUMN expires DATETIME;
-CREATE INDEX minion_jobs_expires ON minion_jobs (expires);
-ALTER TABLE minion_jobs ADD COLUMN lax BOOLEAN NOT NULL DEFAULT FALSE;
-
-CREATE TABLE minion_notes (
-  job_id BIGINT NOT NULL,
-  note_key VARCHAR(191) NOT NULL,
-  note_value TEXT,
-  PRIMARY KEY (job_id, note_key),
-  FOREIGN KEY (job_id) REFERENCES minion_jobs(id) ON DELETE CASCADE
-);
--- Migrate any existing notes. When migrations are next run, we
--- will look for these note rows and turn them into real notes.
-INSERT INTO minion_notes ( job_id, note_key, note_value )
-SELECT id, '***MIGRATED NOTE***', notes
-FROM minion_jobs
-WHERE notes != '{}';
-ALTER TABLE minion_jobs DROP COLUMN notes;
-
--- 7 down
-ALTER TABLE minion_jobs ADD COLUMN notes TEXT;
-DROP TABLE minion_notes;
-ALTER TABLE minion_jobs_depends DROP FOREIGN KEY minion_jobs_depends_ibfk_1;
-SET FOREIGN_KEY_CHECKS=0;
-ALTER TABLE minion_jobs MODIFY COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE minion_jobs_depends MODIFY COLUMN parent_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE minion_jobs_depends MODIFY COLUMN child_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE minion_jobs_depends
-  ADD FOREIGN KEY minion_jobs_depends_ibfk_1 (parent_id)
-  REFERENCES minion_jobs(id) ON DELETE CASCADE;
-ALTER TABLE minion_jobs_depends
-  ADD FOREIGN KEY minion_jobs_depends_ibfk_2 (child_id)
-  REFERENCES minion_jobs(id) ON DELETE CASCADE;
-SET FOREIGN_KEY_CHECKS=1;
-DROP INDEX minion_jobs_expires ON minion_jobs;
-ALTER TABLE minion_jobs DROP COLUMN expires;
-ALTER TABLE minion_jobs DROP COLUMN lax;
-
--- 8 up
-ALTER TABLE minion_jobs_depends
-  ADD PRIMARY KEY (parent_id, child_id);
-
--- 8 down
-ALTER TABLE minion_jobs_depends
-  DROP PRIMARY KEY;
-
--- 9 up
-DROP INDEX minion_jobs_state_idx ON minion_jobs;
 CREATE INDEX minion_jobs_state_idx ON minion_jobs (state, priority DESC, created);
-ALTER TABLE minion_notes MODIFY note_value MEDIUMBLOB;
-
--- 9 down
-DROP INDEX minion_jobs_state_idx ON minion_jobs;
-CREATE INDEX minion_jobs_state_idx ON minion_jobs (state);
-ALTER TABLE minion_notes MODIFY note_value TEXT;
-
--- 10 up
-CREATE INDEX minion_notes_note_key ON minion_notes (note_key);
-
--- 10 down
-DROP INDEX minion_notes_note_key ON minion_notes;
-
--- 11 up
+CREATE INDEX minion_jobs_depends_state_expires ON minion_jobs_depends (state, expires);
 CREATE INDEX minion_jobs_stats_idx ON minion_jobs (state, `delayed`);
 
--- 12 up
-ALTER TABLE minion_jobs MODIFY COLUMN state ENUM('inactive','active','finished','failed') NOT NULL DEFAULT 'inactive';
-ALTER TABLE minion_jobs MODIFY COLUMN task VARCHAR(50) NOT NULL;
-ALTER TABLE minion_jobs_depends ADD COLUMN state ENUM('inactive','active','finished','failed') NOT NULL DEFAULT 'inactive';
-ALTER TABLE minion_jobs_depends ADD COLUMN expires DATETIME;
-UPDATE minion_jobs_depends dep JOIN minion_jobs job ON dep.parent_id=job.id SET dep.state=job.state, dep.expires=job.expires;
-CREATE TRIGGER minion_trigger_insert_depends BEFORE INSERT ON minion_jobs_depends FOR EACH ROW
-  SET NEW.state = COALESCE(( SELECT state FROM minion_jobs WHERE id=NEW.parent_id ), 'finished'),
-    NEW.expires = ( SELECT expires FROM minion_jobs WHERE id=NEW.parent_id );
-CREATE TRIGGER minion_trigger_update_jobs AFTER UPDATE ON minion_jobs FOR EACH ROW
-  UPDATE minion_jobs_depends SET state=NEW.state, expires=NEW.expires WHERE parent_id=OLD.id;
-
--- 13 up
-CREATE INDEX minion_jobs_depends_state_expires ON minion_jobs_depends (state, expires);
-
-# Found useless indexes with: SELECT * FROM sys.schema_unused_indexes
-DROP INDEX `minion_jobs_expires` ON `minion_jobs`;
-DROP INDEX `minion_notes_note_key` ON `minion_notes`;
-
 -- 13 down
-DROP INDEX minion_jobs_depends_state_expires ON minion_jobs_depends;
-CREATE INDEX minion_notes_note_key ON minion_notes (note_key);
-CREATE INDEX minion_jobs_expires ON minion_jobs (expires);
+DROP TRIGGER minion_trigger_insert_depends;
+DROP TRIGGER minion_trigger_update_jobs;
+DROP TABLE IF EXISTS minion_locks;
+DROP TABLE IF EXISTS minion_workers_inbox;
+DROP TABLE IF EXISTS minion_workers;
+DROP TABLE IF EXISTS minion_notes;
+DROP TABLE IF EXISTS minion_jobs_depends;
+DROP TABLE IF EXISTS minion_jobs;
+DROP FUNCTION minion_lock;

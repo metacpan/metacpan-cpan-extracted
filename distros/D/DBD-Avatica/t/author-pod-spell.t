@@ -18,6 +18,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+19481514
 ActiveKids
 Adapter
 Alexey
@@ -38,6 +39,7 @@ HandleError
 HandleSetErr
 Ibaev
 InactiveDestroy
+Ivan
 MaxRetries
 NULLABLE
 ParamValues
@@ -45,6 +47,7 @@ Phoenix
 Postgres
 PrintError
 PrintWarn
+Putintsev
 RaiseError
 ReadOnly
 SQLSTATE
@@ -65,3 +68,5 @@ logioniz
 nullable
 protobuf
 sequnce
+uid
+uid66

@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000030';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -518,6 +518,8 @@ sub _extract_symbols_from_snippet {
     $snippet =~ s{\\t}{\t}g;
 
     my $doc = PPI::Document->new( \$snippet );
+    return () unless defined $doc;
+
     my @symbols
         = map { $_ . q{} } @{ $doc->find('PPI::Token::Symbol') || [] };
 
@@ -1017,7 +1019,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000028
+version 0.000030
 
 =head2 inspector_for( $module_name )
 

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+BEGIN { require './t/common.pl'; }
 
 use Inline;
 eval { Inline->bind(C => <<'END', structs => 1, force_build => 1, clean_after_build => 0) };

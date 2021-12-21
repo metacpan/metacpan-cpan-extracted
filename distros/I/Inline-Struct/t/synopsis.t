@@ -1,4 +1,5 @@
 use Test::More;
+BEGIN { require './t/common.pl'; }
 
 use Inline C => 'DATA', structs => ['Foo'], force_build => 1;
 

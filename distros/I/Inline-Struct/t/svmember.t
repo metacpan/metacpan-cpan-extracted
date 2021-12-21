@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+BEGIN { require './t/common.pl'; }
 
 use Inline C => <<'END', structs => 1, force_build => 1;
 struct Foo {

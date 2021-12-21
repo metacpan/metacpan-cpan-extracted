@@ -1,5 +1,8 @@
 Revision history for Finance-Nadex
 
+0.12    12/21/21 13:31:05
+        Declare additional dependencies.  Update AUTHOR information
+
 0.11    1/31/21 15:04
         Declare additional dependencies
 

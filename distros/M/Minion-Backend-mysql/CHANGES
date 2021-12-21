@@ -1,5 +1,30 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+*** NOTE ***
+
+You must upgrade to v0.30 before upgrading to v1.00 and beyond!
+
+1.000     2021-12-21 12:22:50-06:00 America/Chicago
+
+  Removed old migrations to improve performance
+
+0.34      2021-12-21 11:49:10-06:00 America/Chicago
+
+  *** NOTE ***
+
+  This is the last release before v1.00. You will need to upgrade to at
+  least v0.30 before upgrading to v1.00 or beyond!
+
+  [Fixed]
+
+  - Fixed running expensive notes migration query every single time the
+    Minion object is created. This should prevent the need for the index
+    exclusively on the key column, which was only used by this query.
+
+  - Fixed some queries to add table names to column specs so that it
+    might help an older version of the backend work on a newer version
+    of the schema (like during the v0.30 migration).
+
 0.33      2021-12-15 15:38:46-06:00 America/Chicago
 
   [Fixed]

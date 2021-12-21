@@ -1,6 +1,6 @@
 use Test::More;
 use lib '.';
-require 't/common.pl';
+BEGIN { require 't/common.pl'; }
 
 use Inline C => <<'END', structs => 1, force_build => 1;
 struct Foo {

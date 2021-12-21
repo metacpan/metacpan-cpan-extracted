@@ -1,7 +1,9 @@
 package App::DistUtils;
 
-our $DATE = '2020-04-19'; # DATE
-our $VERSION = '0.150'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-27'; # DATE
+our $DIST = 'App-DistUtils'; # DIST
+our $VERSION = '0.151'; # VERSION
 
 use 5.010001;
 
@@ -47,7 +49,7 @@ App::DistUtils - Collection of utilities related to Perl distributions
 
 =head1 VERSION
 
-This document describes version 0.150 of App::DistUtils (from Perl distribution App-DistUtils), released on 2020-04-19.
+This document describes version 0.151 of App::DistUtils (from Perl distribution App-DistUtils), released on 2021-07-27.
 
 =head1 SYNOPSIS
 
@@ -89,6 +91,12 @@ distributions:
 =back
 
 The main feature of these utilities is tab completion.
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (@pc-office)
+
+perlancar (@pc-office) <perlancar@gmail.com>
 
 =head1 FAQ
 
@@ -132,6 +140,8 @@ L<App::IODUtils>, utilities related to L<IOD> configuration files.
 
 L<App::LedgerUtils>, utilities related to Ledger CLI files.
 
+L<App::PerlReleaseUtils>, utilities related to Perl distribution releases.
+
 L<App::PlUtils>, utilities related to Perl scripts.
 
 L<App::PMUtils>, utilities related to Perl modules.
@@ -146,7 +156,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

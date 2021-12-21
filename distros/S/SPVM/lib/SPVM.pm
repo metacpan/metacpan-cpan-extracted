@@ -20,7 +20,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.9018';
+our $VERSION = '0.9019';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -446,16 +446,6 @@ SPVM Native APIs is C APIs used in SPVM native method.
 
 =back
 
-=head2 Generate Execution File
-
-spvmcc is a compiler to compile SPVM source codes to a execution file. The execution file can be run by itself.
-
-=over 2
-
-=item * L<spvmcc>
-
-=back
-
 =head1 ENVIRONMENT VARIABLE
 
 =head2 SPVM_BUILD_DIR
@@ -467,6 +457,14 @@ If SPVM_BUILD_DIR environment variable is not set, SPVM can't compile precompile
 In bash, you can set SPVM_BUILD_DIR to the following.
 
   export SPVM_BUILD_DIR=~/.spvm_build
+
+=head2 SPVM_CC_DEBUG
+
+Print L<SVPM::Builder::CC> compile and link outputs to stderr.
+
+=head2 SPVM_CC_FORCE
+
+Force L<SVPM::Builder::CC> compile and link.
 
 =head1 CAUTION
 

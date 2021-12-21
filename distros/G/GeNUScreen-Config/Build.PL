@@ -14,6 +14,12 @@ my $builder = Module::Build->new(
     dist_author         => 'Mathias Weidner <mamawe@cpan.org>',
     dist_version_from   => 'lib/GeNUScreen/Config.pm',
     license             => 'perl',
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/matwei-perl/GeNUScreen-Config',
+            bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=GeNUScreen-Config',
+        }
+    },
     module_name         => 'GeNUScreen::Config',
     requires            => {
         'Class::Std' => 0,

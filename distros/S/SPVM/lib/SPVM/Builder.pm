@@ -137,27 +137,6 @@ sub build_and_bind_shared_lib {
 sub bind_methods {
   my ($self, $cc, $shared_lib_file, $class_name, $category) = @_;
 
-  # m library is maybe not dynamic link library
-  my %must_not_load_libs = map { $_ => 1 } ('m');
-
-  # Load pre-required dynamic library
-  my $bconf = $self->get_config($class_name, $category);
-  my $lib_dirs = $bconf->get_lib_dirs;
-  {
-    local @DynaLoader::dl_library_path = (@$lib_dirs, @DynaLoader::dl_library_path);
-    my $libs = $bconf->get_libs;
-    for my $lib (@$libs) {
-      unless ($must_not_load_libs{$lib}) {
-        my ($lib_file) = DynaLoader::dl_findfile("-l$lib");
-        my $shared_lib_libref = DynaLoader::dl_load_file($lib_file);
-        unless ($shared_lib_libref) {
-          my $dl_error = DynaLoader::dl_error();
-          confess "Can't load shared_lib file \"$shared_lib_file\": $dl_error";
-        }
-      }
-    }
-  }
-  
   my $method_names = $self->get_method_names($class_name, $category);
   my $method_infos = [];
   for my $method_name (@$method_names) {
@@ -166,7 +145,6 @@ sub bind_methods {
     $method_info->{method_name} = $method_name;
     push @$method_infos, $method_info;
   }
-  
   
   # Add anon class sub names if precompile
   if ($category eq 'precompile') {
@@ -239,9 +217,9 @@ sub get_config {
   my $config_file = "$src_dir/$config_rel_file";
   
   # Config
-  my $bconf;
+  my $config;
   if (-f $config_file) {
-    $bconf = SPVM::Builder::Util::load_config($config_file);
+    $config = SPVM::Builder::Util::load_config($config_file);
   }
   else {
     if ($category eq 'native') {
@@ -254,21 +232,21 @@ use strict;
 use warnings;
 
 use SPVM::Builder::Config;
-my \$bconf = SPVM::Builder::Config->new_c99;
+my \$config = SPVM::Builder::Config->new_c99;
 
-\$bconf;
+\$config;
 ----------------------------------------------
 $@
 EOS
       confess $error;
     }
     else {
-      $bconf = SPVM::Builder::Config->new_c99;
+      $config = SPVM::Builder::Config->new_c99;
     }
   }
 
 
-  return $bconf;
+  return $config;
 }
 
 1;

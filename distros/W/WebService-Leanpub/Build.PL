@@ -9,8 +9,14 @@ my $builder = Module::Build->new(
     dist_abstract       => 'Access the Leanpub API.',
     dist_author         => 'Mathias Weidner <mamawe@cpan.org>',
     dist_version_from   => 'lib/WebService/Leanpub.pm',
-    module_name         => 'WebService::Leanpub',
     license             => 'perl',
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/matwei-perl/WebService-Leanpub',
+            bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Leanpub',
+        }
+    },
+    module_name         => 'WebService::Leanpub',
     requires => {
 	'HTTP::Request::Common'	=> 0,
 	'JSON'			=> 0,

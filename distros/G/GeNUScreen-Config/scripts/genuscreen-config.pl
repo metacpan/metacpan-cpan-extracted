@@ -74,7 +74,7 @@ genuscreen-config - work with GeNUScreen config files
 
 =head1 VERSION
 
-This document describes genuscreen-config version 0.0.1
+This document describes genuscreen-config version v0.0.11
 
 =head1 SYNOPSIS
 

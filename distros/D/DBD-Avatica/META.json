@@ -71,9 +71,11 @@
          "web" : "https://github.com/skbkontur/perl-dbd-avatica"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.2.1",
    "x_contributors" : [
-      "Denis Ibaev <dionys@gmail.com>"
+      "Denis Ibaev <dionys@gmail.com>",
+      "Ivan Putintsev <uid@rydlab.ru>",
+      "uid66 <19481514+uid66@users.noreply.github.com>"
    ],
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",

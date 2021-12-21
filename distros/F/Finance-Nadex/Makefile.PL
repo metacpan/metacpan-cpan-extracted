@@ -8,7 +8,6 @@ WriteMakefile(
     AUTHOR           => q{Mtu Mzuri <mhandisi@cpan.org>},
     VERSION_FROM     => 'lib/Finance/Nadex.pm',
     ABSTRACT_FROM    => 'lib/Finance/Nadex.pm',
-    LICENSE          => 'Artistic_2_0',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {
@@ -19,7 +18,12 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'JSON'                 => 4.00,
+	'Test::More'           => 0,
+	'Test::Exception'      => 0,
         'Test::LWP::UserAgent' => 0.033,
+	'LWP::UserAgent'       => 0,
+	'Carp'                 => 0,
+	'HTTP::Response'       => 0
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Finance-Nadex-*' },

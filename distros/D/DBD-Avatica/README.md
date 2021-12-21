@@ -4,7 +4,7 @@ DBD::Avatica - Driver for Apache Avatica compatible servers
 
 # VERSION
 
-version 0.2.0
+version 0.2.1
 
 # SYNOPSIS
 
@@ -44,29 +44,36 @@ use the following syntax:
 
     $dbh = DBI->connect("dbi:Avatica:adapter_name=phoenix;url=http://127.0.0.1:8765", '', '', {AutoCommit => 0});
 
-This connects to the database accessed by url  `http://127.0.0.1:8765` without any user authentication.
+This connects to the database accessed by url `http://127.0.0.1:8765` without any user authentication.
 
 The following connect statement shows almost all possible parameters:
 
-    $dbh = DBI->connect("dbi:Avatica:adapter_name=phoenix;url=$url;",
-                        $username,
-                        $password,
-                        {
-                          AutoCommit => 0,
-                          RaiseError => 1,
-                          PrintError => 0,
-                          TransactionIsolation => 2
-                          UserAgent => HTTP::Tiny->new(),
-                          MaxRetries => 2
-                        }
-                       );
+    $dbh = DBI->connect(
+        "dbi:Avatica:adapter_name=phoenix;url=$url;",
+        $username,
+        $password,
+        {
+            UserAgent  => HTTP::Tiny->new(),
+            AutoCommit => 0,
+            RaiseError => 1,
+            PrintError => 0,
+            MaxRetries => 2,
+            TransactionIsolation => 2,
+        },
+    );
 
 Currently username/password not supported. To set username/password for authentication need to redefine UserAgent attribute.
 
 Your UserAgent must implement `POST` request with HTTP::Tiny semantics.
 So, after some timeouts, network errors UserAgent must return http status 599 and do not retries after failure.
+For example, Furl has better performance than HTTP::Tiny.
 
-Attrubute MaxRetries specifies the number of attempts to send request (in case HTTP 500 response).
+Attrubute MaxRetries specifies the number of retries to send the request (in case HTTP 500 response). Default value is 0.
+
+Specific for Apache Phoenix:
+It is not recommended to use the MaxRetries parameter due to the [CALCITE-4900](https://issues.apache.org/jira/browse/CALCITE-4900)
+error, due to which the phoenix server may return an error which will lead to repeated requests, between which sleep is inserted.
+It is guaranteed that the total time spent in sleep among all retries is no more than 1.6 seconds.
 
 ### **connect\_cached**
 
@@ -884,9 +891,11 @@ value.
 
 Alexey Stavrov <logioniz@ya.ru>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Denis Ibaev <dionys@gmail.com>
+- Denis Ibaev <dionys@gmail.com>
+- Ivan Putintsev <uid@rydlab.ru>
+- uid66 <19481514+uid66@users.noreply.github.com>
 
 # COPYRIGHT AND LICENSE
 

@@ -19,6 +19,8 @@ umask 0022
 
 #########################################################################
 # run dod-check.pl and filter output:
+set -o pipefail
+set -o errexit
 time ${0%.sh}.pl "$@" |& \
     sed --regexp-extended \
 	--expression='/^[\t ]+ok [1-9][0-9]* - /d' \
@@ -27,3 +29,7 @@ time ${0%.sh}.pl "$@" |& \
 	--expression="s/^(ok [1-9][0-9]*( - .*)?)\$/$BGREEN\1$RESET/" \
 	--expression="s/^( +ok [1-9][0-9]*( - .*)?)\$/$GREEN\1$RESET/" \
 	--expression="s/^(# Looks like you failed .*)\$/$BRED\1$RESET/"
+chmod --recursive --changes a+rX \
+      Build.PL Changes LICENSE META.json README.md \
+      builder cpanfile examples lib minil.toml t
+chmod --changes 444 UI-Various-[0-9].[0-9][0-9].tar.gz

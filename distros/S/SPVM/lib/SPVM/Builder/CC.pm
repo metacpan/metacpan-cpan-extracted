@@ -3,12 +3,11 @@ package SPVM::Builder::CC;
 use strict;
 use warnings;
 use Carp 'confess';
+use Config;
 
 use ExtUtils::CBuilder;
 use File::Copy 'copy', 'move';
 use File::Path 'mkpath';
-use DynaLoader;
-use Config;
 use File::Find 'find';
 use File::Basename 'dirname', 'basename';
 
@@ -17,9 +16,6 @@ use SPVM::Builder::Config;
 
 sub category { shift->{category} }
 sub builder { shift->{builder} }
-sub optimize { shift->{optimize} }
-sub extra_compiler_flags { shift->{extra_compiler_flags} }
-sub extra_linker_flags { shift->{extra_linker_flags} }
 sub force { shift->{force} }
 sub quiet { shift->{quiet} }
 
@@ -27,6 +23,14 @@ sub new {
   my $class = shift;
   
   my $self = {@_};
+  
+  if ($ENV{SPVM_CC_DEBUG}) {
+    $self->{quiet} = 0;
+  }
+  
+  if ($ENV{SPVM_CC_FORCE}) {
+    $self->{force} = 1;
+  }
   
   return bless $self, $class;
 }
@@ -169,26 +173,47 @@ sub compile {
   $native_dir =~ s/\.config$//;
   $native_dir .= '.native';
 
+  # Config
+  my $config;
+  if (-f $config_file) {
+    $config = SPVM::Builder::Util::load_config($config_file);
+  }
+  else {
+    $config = SPVM::Builder::Config->new_c99;;
+  }
+  
+  # Runtime include directries
+  my @runtime_include_dirs;
+
   # Include directory
   my $native_include_dir = "$native_dir/include";
   
+  # Add native include dir
+  push @runtime_include_dirs, $native_include_dir;
+
+  my $resources = $config->resources;
+  for my $resource (@$resources) {
+    eval "require $resource";
+    if ($@) {
+      confess "Can't load $resource";
+    }
+    my $module_name = $resource;
+    $module_name =~ s|::|/|g;
+    $module_name .= '.pm';
+    
+    my $module_path = $INC{$module_name};
+    
+    my $include_dir = $module_path;
+    $include_dir =~ s/\.pm$//;
+    $include_dir .= '.native/incldue';
+    push @runtime_include_dirs, $include_dir;
+  }
+
   # Source directory
   my $native_src_dir = "$native_dir/src";
-
-  # Config
-  my $bconf;
-  if (-f $config_file) {
-    $bconf = SPVM::Builder::Util::load_config($config_file);
-  }
-  else {
-    $bconf = SPVM::Builder::Config->new_c99;;
-  }
   
-  # Add native include dir
-  unshift @{$bconf->get_include_dirs}, $native_include_dir;
-
   # Quiet output
-  my $quiet = $bconf->get_quiet;
+  my $quiet = $config->quiet;
 
   # If quiet field exists, overwrite it
   if (defined $self->quiet) {
@@ -198,7 +223,7 @@ sub compile {
   # SPVM Method source file
   my $src_rel_file_no_ext = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category);
   my $spvm_method_src_file_no_ext = "$src_dir/$src_rel_file_no_ext";
-  my $src_ext = $bconf->get_ext;
+  my $src_ext = $config->ext;
   unless (defined $src_ext) {
     confess "Source extension is not specified";
   }
@@ -208,27 +233,13 @@ sub compile {
     confess "Can't find source file $spvm_method_src_file";
   }
   
-  # CBuilder configs
-  my $ccflags = $bconf->get_ccflags;
-
-  # Optimize(Override config optimize)
-  my $optimize = $self->optimize;
-  if (defined $optimize) {
-    $bconf->set_optimize($optimize);
-  }
-
-  # Use all of default %Config not to use %Config directory by ExtUtils::CBuilder
-  # and overwrite user configs
-  my $config = $bconf->to_hash;
-
-  # Compile source files
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
-  
   # Parse source code dependency
   my $dependency = $self->parse_native_source_dependencies($native_include_dir, $native_src_dir, $src_ext);
 
   # Native source files
   my @native_src_files = sort keys %$dependency;
+  
+  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet);
   
   # Compile source files
   my $object_files = [];
@@ -261,7 +272,7 @@ sub compile {
       $do_compile = 1;
     }
     else {
-      if ($bconf->get_force_compile) {
+      if ($config->force) {
         $do_compile = 1;
       }
       else {
@@ -298,24 +309,13 @@ sub compile {
       my $class_rel_dir = SPVM::Builder::Util::convert_class_name_to_rel_dir($class_name);
       my $work_object_dir = "$object_dir/$class_rel_dir";
       mkpath dirname $object_file;
-  
+
+      my $cc_cmd = $self->create_compile_command($config, $object_file, $src_file, \@runtime_include_dirs);
       eval {
-        my $extra_compiler_flags = $self->extra_compiler_flags;
-        unless (defined $extra_compiler_flags) {
-          $extra_compiler_flags = '';
-        }
-        
-        # Compile source file
-        $cbuilder->compile(
-          source => $src_file,
-          object_file => $object_file,
-          include_dirs => $bconf->get_include_dirs,
-          extra_compiler_flags => $extra_compiler_flags,
-        );
+        # Execute compile command
+        $cbuilder->do_system(@$cc_cmd)
+          or confess "Can't compile $src_file: @$cc_cmd";
       };
-      if (my $error = $@) {
-        confess $error;
-      }
     }
     push @$object_files, $object_file;
     
@@ -323,6 +323,30 @@ sub compile {
   }
   
   return $object_files;
+}
+
+sub create_compile_command {
+  my ($self, $config, $output_file, $src_file, $runtime_include_dirs) = @_;
+  
+  my $cc = $config->cc;
+  
+  my $cflags = '';
+
+  my $include_dirs = $config->include_dirs;
+  my $inc = join(' ', map { "-I$_" } @$runtime_include_dirs, @$include_dirs);
+  $cflags .= " $inc";
+  
+  my $ccflags = $config->ccflags;
+  $cflags .= " " . join(' ', @$ccflags);
+  
+  my $optimize = $config->optimize;
+  $cflags .= " $optimize";
+  
+  my @cflags = ExtUtils::CBuilder->new->split_like_shell($cflags);
+  
+  my $cc_cmd = [$cc, '-c', @cflags, '-o', $output_file, $src_file];
+  
+  return $cc_cmd;
 }
 
 sub link {
@@ -362,9 +386,9 @@ sub link {
   my $config_file = "$src_dir/$config_rel_file";
 
   # Config
-  my $bconf;
+  my $config;
   if (-f $config_file) {
-    $bconf = SPVM::Builder::Util::load_config($config_file);
+    $config = SPVM::Builder::Util::load_config($config_file);
   }
   else {
     if ($category eq 'native') {
@@ -377,16 +401,16 @@ use strict;
 use warnings;
 
 use SPVM::Builder::Config;
-my \$bconf = SPVM::Builder::Config->new_c99;
+my \$config = SPVM::Builder::Config->new_c99;
 
-\$bconf;
+\$config;
 ----------------------------------------------
 
 EOS
       confess $error;
     }
     else {
-      $bconf = SPVM::Builder::Config->new_c99;
+      $config = SPVM::Builder::Config->new_c99;
     }
   }
 
@@ -395,23 +419,42 @@ EOS
   $native_dir =~ s/\.config$//;
   $native_dir .= '.native';
   
+  # Runtime library directories
+  my @runtime_lib_dirs;
+  
+  # Add resouce lib directories
+  my $resources = $config->resources;
+  for my $resource (@$resources) {
+    eval "require $resource";
+    if ($@) {
+      confess "Can't load $resource";
+    }
+    my $module_name = $resource;
+    $module_name =~ s|::|/|g;
+    $module_name .= '.pm';
+    
+    my $module_path = $INC{$module_name};
+    
+    my $lib_dir = $module_path;
+    $lib_dir =~ s/\.pm$//;
+    $lib_dir .= '.native/lib';
+    push @runtime_lib_dirs, $lib_dir;
+  }
+  
   # Library directory
   my $native_lib_dir = "$native_dir/lib";
   if (-d $native_lib_dir) {
-    $bconf->unshift_lib_dirs($native_lib_dir);
+    push @runtime_lib_dirs, $native_lib_dir;
   }
   
   # Quiet output
-  my $quiet = $bconf->get_quiet;
+  my $quiet = $config->quiet;
 
   # If quiet field exists, overwrite it
   if (defined $self->quiet) {
     $quiet = $self->quiet;
   }
   
-  # CBuilder configs
-  my $lddlflags = $bconf->get_lddlflags;
-
   # dl_func_list
   # This option is needed Windows DLL file
   my $dl_func_list = [];
@@ -436,40 +479,96 @@ EOS
     push @$dl_func_list, '';
   }
 
-  # Add library directories and libraries to Linker flags
-  my $lib_dirs_str = join(' ', map { "-L$_" } @{$bconf->get_lib_dirs});
-  my $libs_str = join(' ', map { "-l$_" } @{$bconf->get_libs});
-  $bconf->append_lddlflags("$lib_dirs_str $libs_str");
+  # Linker
+  my $ld = $config->ld;
+  
+  # Linker flags
+  my $ldflags = $config->ldflags;
+  my $ldflags_str = join(' ', @{$config->ldflags});
+  $ldflags_str = "$ldflags_str";
+  
+  # Optimize
+  my $ld_optimize = $config->ld_optimize;
+  $ldflags_str .= " $ld_optimize";
+  
+  # Libraries
+  # Libraries is linked using absolute path because the linked libraries must be known at runtime.
+  my $lib_dirs = [@runtime_lib_dirs, @{$config->lib_dirs}];
+  my @lib_files;
+  {
+    my $libs = $config->libs;
+    for my $lib (@$libs) {
+      my $type;
+      my $lib_name;
+      if (ref $lib eq 'HASH') {
+        $type = $lib->{type};
+        $lib_name = $lib->{name};
+      }
+      else {
+        $lib_name = $lib;
+        $type = 'dynamic,static';
+      }
+      
+      for my $lib_dir (@$lib_dirs) {
+        $lib_dir =~ s|[\\/]$||;
 
-  # Use all of default %Config not to use %Config directory by ExtUtils::CBuilder
-  # and overwrite user configs
-  my $config = $bconf->to_hash;
+        my $dynamic_lib_file_base = "lib$lib_name.$Config{dlext}";
+        my $dynamic_lib_file = "$lib_dir/$dynamic_lib_file_base";
+
+        my $static_lib_file_base = "lib$lib_name.a";
+        my $static_lib_file = "$lib_dir/$static_lib_file_base";
+        
+        if ($type eq 'dynamic,static') {
+          if (-f $dynamic_lib_file) {
+            push @lib_files, $dynamic_lib_file;
+            last;
+          }
+          elsif (-f $static_lib_file) {
+            push @lib_files, $static_lib_file;
+            last;
+          }
+        }
+        elsif ($type eq 'dynamic') {
+          if (-f $dynamic_lib_file) {
+            push @lib_files, $dynamic_lib_file;
+            last;
+          }
+        }
+        elsif ($type eq 'static') {
+          if (-f $static_lib_file) {
+            push @lib_files, $static_lib_file;
+            last;
+          }
+        }
+      }
+    }
+  }
+  push @$object_files, @lib_files;
+
+  my $cbuilder_config = {
+    ld => $ld,
+    lddlflags => $ldflags_str,
+    shrpenv => '',
+  };
   
   # ExtUtils::CBuilder object
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
+  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $cbuilder_config);
+
+  # Move temporary shared library file to blib directory
+  mkpath dirname $shared_lib_file;
 
   # Link and create shared library
-  my $extra_linker_flags = $self->extra_linker_flags;
-  unless (defined $extra_linker_flags) {
-    $extra_linker_flags = '';
-  }
-  my $tmp_shared_lib_file;
   eval {
-    $tmp_shared_lib_file = $cbuilder->link(
+    $cbuilder->link(
+      lib_file => $shared_lib_file,
       objects => $object_files,
       module_name => $class_name,
       dl_func_list => $dl_func_list,
-      extra_linker_flags => $extra_linker_flags,
     );
   };
   if (my $error = $@) {
     confess $error;
   }
-
-  # Move temporary shared library file to blib directory
-  mkpath dirname $shared_lib_file;
-  move($tmp_shared_lib_file, $shared_lib_file)
-    or die "Can't move $tmp_shared_lib_file to $shared_lib_file";
   
   return $shared_lib_file;
 }
@@ -598,4 +697,4 @@ sub parse_native_source_dependencies {
 
 =head1 NAME
 
-SPVM::Builder::CC - Native code Compiler and linker. Wrapper of ExtUtils::CBuilder for SPVM
+SPVM::Builder::CC - Compiler and Linker of Native Sources

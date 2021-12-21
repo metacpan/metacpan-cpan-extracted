@@ -1,6 +1,11 @@
 Revision history for Perl extension UI-Various
 
-0.05 2021-12-20T07:48:23Z
+0.06 2021-12-21T07:23:15Z
+
+0.06 2021-12-21T07:22:00Z
+
+    - fixed test #2 for 5.28 on Solaris
+    - DoD check: moved chmod from pl to sh
 
 0.05 2021-12-20T07:46:48Z
 

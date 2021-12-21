@@ -169,11 +169,15 @@ __END__
 
 leanpub - access the Leanpub web API
 
-=head1 SYNOPSIS
+=head1 VERSION
+
+This document refers to leanpub version v0.3.1
+
+=head1 USAGE
 
  leanpub [options] command [command options]
 
-=head2 OPTIONS
+=head1 OPTIONS
 
 =over 8
 
@@ -203,7 +207,7 @@ Print $WebService::Leanpub::VERSION and exit.
 
 =back
 
-=head2 COMMANDS
+=head1 COMMANDS
 
 =over
 
@@ -324,7 +328,7 @@ This command takes the same argumentes as create_coupon but only the option
 =head1 DESCRIPTION
 
 This program interacts with the Leanpub API.
-See L<< https://leanpub.com/help/api >> for details about this API.
+You can find details about this API at L<< https://leanpub.com/help/api >>.
 
 The slug is the part of the URL for your book coming
 after C<< https://leanpub.com/ >>. For instance if your book is found at
@@ -340,7 +344,7 @@ above for a text file named I<.leanpub.conf>. It reads these files
 and adds configuration directives which are not set so far to its
 configuration.
 
-The format of the file is rather simple. It just a key and a value separated
+The format of the file is rather simple. It is just a key and a value separated
 by an equal sign and optional whitespace. Valid keys are the names of the
 global options without any minus or plus sign. For instance I have a file
 containing something like:

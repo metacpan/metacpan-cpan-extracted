@@ -1,4 +1,54 @@
 Revision history for SPVM
+0.9019  2021-12-21
+        [CHANGES]
+        * Rename SPVM::Builder::Config's get_libs, set_libs, unshift_libs, push_libs method to get_runtime_libs, set_runtime_libs, unshift_runtime_libs, push_runtime_libs
+          and don't add libraries to linker flags of linker.
+        * remove SPVM::Builder::Exe and spvmcc command again because one executable that is portable and work correctly without function conflicts is impossible after long thinking.
+          The implementation before removing is saved at the following branch.
+          
+          https://github.com/yuki-kimoto/SPVM/releases/tag/before_remove_exe_20211216
+        
+        * SPVM::Builder::Config "ccflags" default becomes empty string except for Windows. Windows is "-fPIC"
+        * Remove delete_std and get_std of SPVM::Builder::Config
+        * SPVM::Builder::CC->compile don't depend on Perl compiled environment.
+        * add SPVM_CC_DEBUG enviroment variable to print SVPM::Builder::CC compile and link outputs to stderr.
+        * Remove get_cccdlflags, set_cccdlflags, append_cccdlflags, prepend_cccdlflags of SPVM::Builder::Config
+        * Remove get_archlibexp, set_archlibexp of SPVM::Builder::Config
+        * remove get_shrpenv, and set_shrpenv. shrpenv config is not used when linking
+        * SPVM::Builder::CC->link don't depend on Perl compiled environment as possible.
+        * remove set_config and get_config of SPVM::Builder::Config
+        * remove replace_all_config of SPVM::Builder::Config
+        * to_hash of SPVM::Builder::Config return the content of SPVM::Builder::Config instead of ExtUtils::CBuilder config.
+        * add search_lib_dirs_from_cc_info of SPVM::Builder::Config
+        * add ext, cc, ccflags, include_dirs, ld, lddlflags, lib_dirs, runtime_lib_dirs, optimize,
+          quiet, search_lib_dirs_cb, force_compile fields to SPVM::Config
+        * remove set_ext, set_cc, set_ccflags, set_include_dirs, set_ld, set_lddlflags, set_lib_dirs, set_runtime_lib_dirs, set_optimize,
+          set_quiet, set_search_lib_dirs_cb, set_force_compile of SPVM::Config
+        * remove get_ext, get_cc, get_ccflags, get_include_dirs, get_ld, get_lddlflags, get_lib_dirs, get_runtime_lib_dirs, get_optimize,
+          get_quiet, get_search_lib_dirs_cb, get_force_compile of SPVM::Config
+        * remove unshift_lib_dirs, unshift_include_dirs, prepend_ccflags, prepend_lddlflags
+        * remove prepend_ccflags, prepend_lddlflags
+        * ccflags, lddlflags of SPVM::Builder::Config become an array reference
+        * runtime dynamic libraries are loaded from lib_dirs of SPVM::Builder::Config of each class.
+        * rename apeend_ccflags to add_ccflags, append_lddlflags to add_lddlflags
+        * rename push_include_dirs to add_include_dirs, push_lib_dirs to add_lib_dirs, push_libs to add_libs, push_runtime_libs to add_libs
+        * add_ccflags and add_lddlflags can receive list of SPVM::Builder::Config
+        * remove unshift_lib_dirs, unshift_include_dirs of SPVM::Builder::Config
+        * add add_libs to SPVM::Builder::Config
+        * SPVM::Builder::Config->new supports default values
+        * Add SPVM_CC_FORCE enviroment variables.
+        * Rename force_compile field of SPVM::Builder::Config to force.
+        * Add ld_optimize field of SPVM::Builder::Config.
+        * Add libs field to SPVM::Builder::Config
+        * Add add_static_libs and add_dynamic_libs methods to SPVM::Builder::Config
+        * Rename lddlflags field to ldflags, add_lddlflags method to add_ldflags
+        * remove runtime_libs filed field, add_runtime_libs method of SPVM::Builder::Config.
+          The runtime linking is resolved at compile time using absolute path.
+
+        * Add search_include_dirs_from_config_incpth, search_lib_dirs_from_config_libpth methods to SPVM::Builder::Config.
+        * Add resources field and add add_resources method to SPVM::Builder::Config, and implement resouce system of SPVM::Builder::CC
+        [BUG FIX]
+        * add push_lib_dirs of SPVM::Builder::Config. This is documented but doesn't exist.
 0.9018  2021-12-11
         [CHANGES]
         * Depends on ExtUtils::CBuilder for Perl 5.8

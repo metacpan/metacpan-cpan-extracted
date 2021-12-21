@@ -1,3 +1,6 @@
+2.36 2021-12-21
+- update to PDL 2.063_01 affine_new API
+
 2.35 2021-09-09
 - ignore GEGL-WARNING too
 - use less-obsolete PDL->get_convertedpdl API

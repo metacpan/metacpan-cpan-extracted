@@ -1,25 +1,28 @@
 ---
-abstract: unknown
+abstract: 'Create and Organize Directories'
 author:
-  - unknown
-build_requires:
-  ExtUtils::MakeMaker: '0'
+  - 'Mathias Weidner <mathias@weidner.in-bad-schmiedeberg.de>'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
-license: unknown
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Directory-Organize
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Directory::Organize:
+    file: lib/Directory/Organize.pm
+    version: v1.0.1
 requires:
   Getopt::Long: '0'
   Term::ReadKey: '0'
   version: '0'
-version: v1.0.0
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Directory-Organize
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/matwei-perl/Directory-Organize
+version: v1.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,8 @@
+0.005   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix argument assignment.
+
+
 0.004   2021-02-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to latest WordList (object is now hashref not arrayref).

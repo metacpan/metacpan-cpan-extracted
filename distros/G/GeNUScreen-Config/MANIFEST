@@ -15,3 +15,4 @@ t/perlcritic.t
 t/pod-coverage.t
 t/pod.t
 t/script-genuscreen-config.t
+META.json

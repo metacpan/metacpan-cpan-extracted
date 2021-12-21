@@ -26,7 +26,7 @@ use XSLoader;
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.46";
+$VERSION   = "1.47";
 @ISA       = qw( Exporter );
 @EXPORT_OK = qw( csv );
 XSLoader::load ("Text::CSV_XS", $VERSION);
@@ -1331,7 +1331,7 @@ sub csv {
 		    }
 		}
 	    }
-	elsif (ref $in->[0] eq "ARRAY") { # aoa
+	elsif (@{$in} == 0 or ref $in->[0] eq "ARRAY") { # aoa
 	    ref $hdrs and $csv->print ($fh, $hdrs);
 	    for (@{$in}) {
 		$c->{'cboi'} and $c->{'cboi'}->($csv, $_);
@@ -1342,7 +1342,7 @@ sub csv {
 	else { # aoh
 	    my @hdrs = ref $hdrs ? @{$hdrs} : keys %{$in->[0]};
 	    defined $hdrs or $hdrs = "auto";
-	    ref $hdrs || $hdrs eq "auto" and
+	    ref $hdrs || $hdrs eq "auto" and @hdrs and
 		$csv->print ($fh, [ map { $hdr{$_} || $_ } @hdrs ]);
 	    for (@{$in}) {
 		local %_;
@@ -1676,19 +1676,19 @@ meaning of possible present BOM.
 
 =head1 SPECIFICATION
 
-While no formal specification for CSV exists, L<RFC 4180|https://tools.ietf.org/html/rfc4180>
+While no formal specification for CSV exists, L<RFC 4180|https://datatracker.ietf.org/doc/html/rfc4180>
 (I<1>) describes the common format and establishes  C<text/csv> as the MIME
-type registered with the IANA. L<RFC 7111|http://tools.ietf.org/html/rfc7111>
+type registered with the IANA. L<RFC 7111|https://datatracker.ietf.org/doc/html/rfc7111>
 (I<2>) adds fragments to CSV.
 
 Many informal documents exist that describe the C<CSV> format.   L<"How To:
-The Comma Separated Value (CSV) File Format"|http://www.creativyst.com/Doc/Articles/CSV/CSV01.htm>
+The Comma Separated Value (CSV) File Format"|http://creativyst.com/Doc/Articles/CSV/CSV01.shtml>
 (I<3>)  provides an overview of the  C<CSV>  format in the most widely used
 applications and explains how it can best be used and supported.
 
- 1) https://tools.ietf.org/html/rfc4180
- 2) https://tools.ietf.org/html/rfc7111
- 3) http://www.creativyst.com/Doc/Articles/CSV/CSV01.htm
+ 1) https://datatracker.ietf.org/doc/html/rfc4180
+ 2) https://datatracker.ietf.org/doc/html/rfc7111
+ 3) http://creativyst.com/Doc/Articles/CSV/CSV01.shtml
 
 The basic rules are as follows:
 
@@ -2666,7 +2666,7 @@ supposed to croak and set error 1500.
 X<fragment>
 
 This function tries to implement RFC7111  (URI Fragment Identifiers for the
-text/csv Media Type) - http://tools.ietf.org/html/rfc7111
+text/csv Media Type) - https://datatracker.ietf.org/doc/html/rfc7111
 
  my $AoA = $csv->fragment ($fh, $spec);
 
@@ -2749,7 +2749,7 @@ C<cell=1,1-3,3;2,2-4,4;2,3;4,2> will return:
 
 =back
 
-L<RFC7111|http://tools.ietf.org/html/rfc7111> does  B<not>  allow different
+L<RFC7111|https://datatracker.ietf.org/doc/html/rfc7111> does  B<not>  allow different
 types of specs to be combined   (either C<row> I<or> C<col> I<or> C<cell>).
 Passing an invalid fragment specification will croak and set error 2013.
 
@@ -4340,6 +4340,19 @@ CSV generated like this, but map and filter are your friends again
  csv (in => "foo.csv", filter => { 1 => sub {
      $sth->execute (map { $_ eq "\\N" ? undef : $_ } @{$_[1]}); 0; }});
 
+=head2 Converting CSV to JSON
+
+ use Text::CSV_XS qw( csv );
+ use JSON; # or Cpanel::JSON::XS for better performance
+
+ # AoA (no header interpretation)
+ say encode_json (csv (in => "file.csv"));
+
+ # AoH (convert to structures)
+ say encode_json (csv (in => "file.csv", bom => 1));
+
+Yes, it is that simple.
+
 =head2 The examples folder
 
 For more extended examples, see the F<examples/> C<1>. sub-directory in the
@@ -4502,11 +4515,12 @@ Requirements|http://w3c.github.io/csvw/use-cases-and-requirements/index.html>
 Steal good new ideas and features from L<PapaParse|http://papaparse.com> or
 L<csvkit|http://csvkit.readthedocs.org>.
 
-=item Perl6 support
+=item Raku support
 
-I'm already working on perl6 support L<here|https://github.com/Tux/CSV>. No
-promises yet on when it is finished (or fast). Trying to keep the API alike
-as much as possible.
+Raku support can be found L<here|https://github.com/Tux/CSV>. The interface
+is richer in support than the Perl5 API, as Raku supports more types.
+
+The Raku version does not (yet) support pure binary CSV datasets.
 
 =back
 
@@ -4893,8 +4907,8 @@ L<IO::File>,  L<IO::Handle>,  L<IO::Wrap>,  L<Text::CSV>,  L<Text::CSV_PP>,
 L<Text::CSV::Encoded>,     L<Text::CSV::Separator>,    L<Text::CSV::Slurp>,
 L<Spreadsheet::CSV> and L<Spreadsheet::Read>, and of course L<perl>.
 
-If you are using perl6,  you can have a look at  C<Text::CSV>  in the perl6
-ecosystem, offering the same features.
+If you are using Raku,  have a look at C<Text::CSV> in the Raku ecosystem,
+offering the same features.
 
 =head3 non-perl
 

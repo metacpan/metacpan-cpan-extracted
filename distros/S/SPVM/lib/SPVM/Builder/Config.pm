@@ -4,52 +4,255 @@ use strict;
 use warnings;
 use Config;
 
+# Fields
+sub ext {
+  my $self = shift;
+  if (@_) {
+    $self->{ext} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{ext};
+  }
+}
+
+sub quiet {
+  my $self = shift;
+  if (@_) {
+    $self->{quiet} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{quiet};
+  }
+}
+
+sub cc {
+  my $self = shift;
+  if (@_) {
+    $self->{cc} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{cc};
+  }
+}
+
+sub ccflags {
+  my $self = shift;
+  if (@_) {
+    $self->{ccflags} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{ccflags};
+  }
+}
+
+sub optimize {
+  my $self = shift;
+  if (@_) {
+    $self->{optimize} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{optimize};
+  }
+}
+
+sub ld_optimize {
+  my $self = shift;
+  if (@_) {
+    $self->{ld_optimize} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{ld_optimize};
+  }
+}
+
+sub include_dirs {
+  my $self = shift;
+  if (@_) {
+    $self->{include_dirs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{include_dirs};
+  }
+}
+
+sub ld {
+  my $self = shift;
+  if (@_) {
+    $self->{ld} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{ld};
+  }
+}
+
+sub ldflags {
+  my $self = shift;
+  if (@_) {
+    $self->{ldflags} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{ldflags};
+  }
+}
+
+sub lib_dirs {
+  my $self = shift;
+  if (@_) {
+    $self->{lib_dirs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{lib_dirs};
+  }
+}
+
+sub libs {
+  my $self = shift;
+  if (@_) {
+    $self->{libs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{libs};
+  }
+}
+
+sub resources {
+  my $self = shift;
+  if (@_) {
+    $self->{resources} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{resources};
+  }
+}
+
+sub force {
+  my $self = shift;
+  if (@_) {
+    $self->{force} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{force};
+  }
+}
+
+# Methods
 sub new {
   my $class = shift;
   
-  my $self = {};
-  
-  $self->{config} = {};
-  
-  $self->{include_dirs} = [];
-
-  $self->{lib_dirs} = [];
-
-  $self->{libs} = [];
-  
-  $self->{quiet} = 1;
+  my $self = {@_};
 
   bless $self, $class;
-
-  # Use default config
-  my $default_config = {%Config};
-  $self->replace_all_config($default_config);
-
-  # Remove and get include dir from ccflags
-  my @ccflags_include_dirs = $self->_remove_include_dirs_from_ccflags;
   
-  # Add ccflags include dir
-  $self->unshift_include_dirs(@ccflags_include_dirs);
+  # quiet
+  unless (defined $self->{quiet}) {
+    $self->quiet(1);
+  }
+
+  # force
+  unless (defined $self->{force}) {
+    $self->force(0);
+  }
   
-  # SPVM::Builder::Config directory
-  my $spvm_builder_config_dir = $INC{"SPVM/Builder/Config.pm"};
+  # ext
+  unless (defined $self->{ext}) {
+    $self->ext(undef);
+  }
 
-  # SPVM::Builder directory
-  my $spvm_builder_dir = $spvm_builder_config_dir;
-  $spvm_builder_dir =~ s/\/Config\.pm$//;
+  # cc
+  unless (defined $self->{cc}) {
+    $self->cc($Config{cc});
+  }
 
-  # Add SPVM include directory to ccflags
-  my $spvm_include_dir = $spvm_builder_dir;
-  $spvm_include_dir .= '/include';
-  $self->unshift_include_dirs($spvm_include_dir);
+  # include_dirs
+  unless (defined $self->{include_dirs}) {
+    $self->include_dirs([]);
+    
+    my @default_include_dirs;
 
-  # Remove and get lib dir from lddlflags
-  my @lib_dirs_in_lddlflags = $self->_remove_lib_dirs_from_lddlflags;
-  $self->unshift_lib_dirs(@lib_dirs_in_lddlflags);
+    # Add "include" directory of SPVM::Builder. This directory contains spvm_native.h
+    my $spvm_builder_config_dir = $INC{"SPVM/Builder/Config.pm"};
+    my $spvm_builder_dir = $spvm_builder_config_dir;
+    $spvm_builder_dir =~ s/\/Config\.pm$//;
+    my $spvm_include_dir = $spvm_builder_dir;
+    $spvm_include_dir .= '/include';
+    push @default_include_dirs, $spvm_include_dir;
+    
+    $self->add_include_dirs(@default_include_dirs);
+  }
+  
+  # ccflags
+  unless (defined $self->{ccflags}) {
+    $self->ccflags([]);
+    
+    my @default_ccflags;
+    
+    # If dynamic link libraries must link position independent codes, add -fPIC option.
+    if ($Config{cccdlflags} =~ /-fPIC\b/) {
+      push @default_ccflags, '-fPIC';
+    }
+    
+    $self->add_ccflags(@default_ccflags);
+  }
 
-  # Optimize
-  $self->set_optimize('-O3');
+  # optimize
+  unless (defined $self->{optimize}) {
+    $self->optimize('-O3');
+  }
+  
+  # ld
+  unless (defined $self->{ld}) {
+    $self->ld($Config{ld});
+  }
 
+  # lib_dirs
+  unless (defined $self->{lib_dirs}) {
+    $self->lib_dirs([]);
+  }
+
+  # resources
+  unless (defined $self->{resources}) {
+    $self->resources([]);
+  }
+  
+  # libs
+  unless (defined $self->{libs}) {
+    $self->libs([]);
+  }
+  
+  # ldflags
+  unless (defined $self->{ldflags}) {
+    $self->ldflags([]);
+    
+    my @default_ldflags;
+    
+    # Dynamic link options
+    if ($^O eq 'MSWin32') {
+      push @default_ldflags, '-mdll', '-s' , "-L$Config{bin}";
+    }
+    else {
+      push @default_ldflags, '-shared';
+    }
+    $self->add_ldflags(@default_ldflags);
+  }
+
+  # ld_optimize
+  unless (defined $self->{ld_optimize}) {
+    $self->ld_optimize('-O2');
+  }
+  
   return $self;
 }
 
@@ -59,7 +262,7 @@ sub new_c {
   my $self = SPVM::Builder::Config->new;
   
   # NativeAPI
-  $self->set_ext('c');
+  $self->ext('c');
   
   return $self;
 }
@@ -81,13 +284,13 @@ sub new_cpp {
   my $self = SPVM::Builder::Config->new;
   
   # CC
-  $self->set_cc('g++');
+  $self->cc('g++');
   
   # LD
-  $self->set_ld('g++');
+  $self->ld('g++');
   
   # NativeAPI
-  $self->set_ext('cpp');
+  $self->ext('cpp');
   
   return $self;
 }
@@ -103,826 +306,431 @@ sub new_cpp11 {
   return $self;
 }
 
-sub get_ext {
-  my ($self, $ext) = @_;
+sub add_ccflags {
+  my ($self, @ccflags) = @_;
   
-  return $self->{ext};
+  push @{$self->{ccflags}}, @ccflags;
 }
 
-sub set_ext {
-  my ($self, $ext) = @_;
-  
-  $self->{ext} = $ext;
-  
-  return $self;
-}
-
-sub get_quiet {
-  my ($self, $quiet) = @_;
-  
-  return $self->{quiet};
-}
-
-sub set_quiet {
-  my ($self, $quiet) = @_;
-  
-  $self->{quiet} = $quiet;
-  
-  return $self;
-}
-
-sub get_config {
-  my ($self, $name) = @_;
-  
-  return $self->{config}{$name};
-}
-
-sub set_config {
-  my ($self, $name, $value) = @_;
-  
-  $self->{config}{$name} = $value;
-  
-  return $self;
-}
-
-sub get_cc {
-  my ($self, $cc) = @_;
-  
-  return $self->get_config('cc');
-}
-
-sub set_cc {
-  my ($self, $cc) = @_;
-  
-  return $self->set_config(cc => $cc);
-}
-
-sub get_ccflags {
-  my ($self) = @_;
-  
-  return $self->get_config('ccflags');
-}
-
-sub set_ccflags {
-  my ($self, $ccflags) = @_;
-  
-  $self->set_config(ccflags => $ccflags);
-  
-  return $self;
-}
-
-sub append_ccflags {
-  my ($self, $new_ccflags) = @_;
-  
-  my $ccflags = $self->get_config('ccflags');
-  
-  $ccflags .= " $new_ccflags";
-  
-  $self->set_config('ccflags' => $ccflags);
-  
-  return $self;
-}
-
-sub prepend_ccflags {
-  my ($self, $new_ccflags) = @_;
-  
-  my $ccflags = $self->get_config('ccflags');
-  
-  $ccflags = "$new_ccflags $ccflags";
-  
-  $self->set_config('ccflags' => $ccflags);
-  
-  return $self;
-}
-
-sub get_cccdlflags {
-  my ($self) = @_;
-  
-  return $self->get_config('cccdlflags');
-}
-
-sub set_cccdlflags {
-  my ($self, $cccdlflags) = @_;
-  
-  $self->set_config(cccdlflags => $cccdlflags);
-  
-  return $self;
-}
-
-sub append_cccdlflags {
-  my ($self, $new_cccdlflags) = @_;
-  
-  my $cccdlflags = $self->get_config('cccdlflags');
-  
-  $cccdlflags .= " $new_cccdlflags";
-  
-  $self->set_config('cccdlflags' => $cccdlflags);
-  
-  return $self;
-}
-
-sub prepend_cccdlflags {
-  my ($self, $new_cccdlflags) = @_;
-  
-  my $cccdlflags = $self->get_config('cccdlflags');
-  
-  $cccdlflags = "$new_cccdlflags $cccdlflags";
-  
-  $self->set_config('cccdlflags' => $cccdlflags);
-  
-  return $self;
-}
-
-sub get_archlibexp {
-  my ($self) = @_;
-  
-  return $self->get_config('archlibexp');
-}
-
-sub set_archlibexp {
-  my ($self, $archlibexp) = @_;
-  
-  $self->set_config(archlibexp => $archlibexp);
-  
-  return $self;
-}
-
-sub get_optimize {
-  my ($self, $optimize) = @_;
-  
-  return $self->get_config('optimize');
-}
-
-sub set_optimize {
-  my ($self, $optimize) = @_;
-  
-  return $self->set_config(optimize => $optimize);
-}
-
-sub get_include_dirs {
-  my ($self, $include_dirs) = @_;
-  
-  return $self->{include_dirs};
-}
-
-sub set_include_dirs {
-  my ($self, $include_dirs) = @_;
-  
-  $self->{include_dirs} = $include_dirs;
-  
-  return $self;
-}
-
-sub unshift_include_dirs {
-  my ($self, @include_dirs) = @_;
-  
-  unshift @{$self->{include_dirs}}, @include_dirs;
-}
-
-sub push_include_dirs {
+sub add_include_dirs {
   my ($self, @include_dirs) = @_;
   
   push @{$self->{include_dirs}}, @include_dirs;
 }
 
 sub set_std {
-  my ($self, $spec) = @_;
+  my ($self, $standard) = @_;
   
-  my $ccflags = $self->get_ccflags;
-  $ccflags = '' unless defined $ccflags;
+  my $ccflags = $self->ccflags;
   
-  # Remove -std=foo section
-  $ccflags =~ s/-std=[^ ]+//g;
-  
-  $ccflags .= " -std=$spec";
+  push @$ccflags, "-std=$standard";
   
   # Add -std=foo section
-  $self->set_ccflags($ccflags);
+  $self->ccflags($ccflags);
   
   return $self;
 }
 
-sub delete_std {
-  my ($self) = @_;
+sub add_ldflags {
+  my ($self, @ldflags) = @_;
   
-  my $ccflags = $self->get_ccflags;
-  
-  # Remove -std=foo section
-  $ccflags =~ s/-std=[^ ]+//g;
-  
-  # Add -std=foo section
-  $self->set_ccflags($ccflags);
-  
-  return $self;
+  push @{$self->{ldflags}}, @ldflags;
 }
 
-sub get_ld {
-  my ($self, $ld) = @_;
-  
-  return $self->get_config('ld');
-}
-
-sub set_ld {
-  my ($self, $ld) = @_;
-  
-  return $self->set_config(ld => $ld);
-}
-
-sub get_lddlflags {
-  my ($self) = @_;
-  
-  return $self->get_config('lddlflags');
-}
-
-sub set_lddlflags {
-  my ($self, $lddlflags) = @_;
-  
-  $self->set_config(lddlflags => $lddlflags);
-  
-  return $self;
-}
-
-sub append_lddlflags {
-  my ($self, $new_lddlflags) = @_;
-  
-  my $lddlflags = $self->get_config('lddlflags');
-  
-  $lddlflags .= " $new_lddlflags";
-  
-  $self->set_config('lddlflags' => $lddlflags);
-  
-  return $self;
-}
-
-sub prepend_lddlflags {
-  my ($self, $new_lddlflags) = @_;
-  
-  my $lddlflags = $self->get_config('lddlflags');
-  
-  $lddlflags = "$new_lddlflags $lddlflags";
-  
-  $self->set_config('lddlflags' => $lddlflags);
-  
-  return $self;
-}
-
-sub get_shrpenv {
-  my ($self) = @_;
-  
-  return $self->get_config('shrpenv');
-}
-
-sub set_shrpenv {
-  my ($self, $shrpenv) = @_;
-  
-  $self->set_config(shrpenv => $shrpenv);
-  
-  return $self;
-}
-
-sub get_lib_dirs {
-  my ($self, $lib_dirs) = @_;
-  
-  return $self->{lib_dirs};
-}
-
-sub set_lib_dirs {
-  my ($self, $lib_dirs) = @_;
-  
-  $self->{lib_dirs} = $lib_dirs;
-  
-  return $self;
-}
-
-sub unshift_lib_dirs {
+sub add_lib_dirs {
   my ($self, @lib_dirs) = @_;
   
-  unshift @{$self->{lib_dirs}}, @lib_dirs;
+  push @{$self->{lib_dirs}}, @lib_dirs;
 }
 
-sub get_libs {
-  my ($self, $libs) = @_;
-  
-  return $self->{libs};
-}
-
-sub set_libs {
-  my ($self, $libs) = @_;
-  
-  $self->{libs} = $libs;
-  
-  return $self;
-}
-
-sub unshift_libs {
-  my ($self, @libs) = @_;
-  
-  unshift @{$self->{libs}}, @libs;
-}
-
-sub push_libs {
+sub add_libs {
   my ($self, @libs) = @_;
   
   push @{$self->{libs}}, @libs;
 }
 
-sub get_force_compile {
-  my ($self, $force_compile) = @_;
+sub add_resources {
+  my ($self, @resources) = @_;
   
-  return $self->{force_compile};
+  push @{$self->{resources}}, @resources;
 }
 
-sub set_force_compile {
-  my ($self, $force_compile) = @_;
+sub add_static_libs {
+  my ($self, @static_libs) = @_;
   
-  $self->{force_compile} = $force_compile;
+  my @static_lib_infos = map { {type => 'static', name => $_ } } @static_libs;
   
-  return $self;
+  $self->add_libs(@static_lib_infos);
 }
 
-sub replace_all_config {
-  my ($self, $config) = @_;
+sub add_dynamic_libs {
+  my ($self, @dynamic_libs) = @_;
   
-  $self->{config} = $config;
+  my @dynamic_lib_infos = map { {type => 'dynamic', name => $_ } } @dynamic_libs;
+  
+  $self->add_libs(@dynamic_lib_infos);
 }
 
 sub to_hash {
   my ($self) = @_;
   
-  my $hash_config = {%{$self->{config}}};
+  my $hash = {%$self};
   
-  return $hash_config;
+  return $hash;
 }
 
-sub _remove_include_dirs_from_ccflags {
+sub search_lib_dirs_from_cc_info {
   my ($self) = @_;
   
-  my $ccflags = $self->get_ccflags;
+  my $cc = $self->cc;
   
-  my @parts = split(/ +/, $ccflags);
+  my $cmd = "$cc -print-search-dirs";
   
-  my @rest_parts;
-  my @include_dirs;
-  for my $part (@parts) {
-    if ($part =~ /^-I(.*)/) {
-      my $include_dir = $1;
-      push @include_dirs, $include_dir;
-    }
-    else {
-      push @rest_parts, $part;
-    }
+  my $output = `$cmd`;
+  
+  my $lib_dirs_str;
+  if ($output =~ /^libraries:\s+=(.+)/m) {
+    $lib_dirs_str = $1;
   }
   
-  my $rest_ccflags = join(' ', @rest_parts);
+  my $sep = $Config{path_sep};
   
-  $self->set_ccflags($rest_ccflags);
-  
-  return @include_dirs;
-}
-
-sub _remove_lib_dirs_from_lddlflags {
-  my ($self) = @_;
-  
-  my $lddlflags = $self->get_lddlflags;
-  
-  my @parts = split(/ +/, $lddlflags);
-  
-  my @rest_parts;
   my @lib_dirs;
-  for my $part (@parts) {
-    if ($part =~ /^-L(.*)/) {
-      my $lib_dir = $1;
-      push @lib_dirs, $lib_dir;
-    }
-    else {
-      push @rest_parts, $part;
-    }
+  if (defined $lib_dirs_str) {
+    @lib_dirs = split($sep, $lib_dirs_str);
   }
   
-  my $rest_lddlflags = join(' ', @rest_parts);
+  return \@lib_dirs;
+}
+
+sub search_lib_dirs_from_config_libpth {
+  my ($self) = @_;
   
-  $self->set_lddlflags($rest_lddlflags);
+  my $libpth = $Config{libpth};
   
-  return @lib_dirs;
+  my @lib_dirs = split(/ +/, $libpth);
+  
+  return \@lib_dirs;
+}
+
+sub search_include_dirs_from_config_incpth {
+  my ($self) = @_;
+  
+  my $incpth = $Config{incpth};
+  
+  my @include_dirs = split(/ +/, $incpth);
+  
+  return \@include_dirs;
 }
 
 1;
 
 =head1 NAME
 
-SPVM::Builder::Config - build config
+SPVM::Builder::Config - Configurations of Compile and Link of Native Sources
 
 =head1 DESCRIPTION
 
-L<Builder::Config|SPVM::Builder::Config> is configuration of c/c++ compile and link.
+L<SPVM::Builder::Config> is configuration of c/c++ compile and link.
+
+=head1 FIELDS
+
+Fields.
+
+=head2 ext
+
+  my $ext = $config->ext;
+  $config->ext($ext);
+
+Get and set the extension of native sources. This is used by the compiler.
+
+The default is C<undef>.
+
+B<Examples:>
+
+  $config->ext('c');
+  $config->ext('cpp');
+  
+=head2 cc
+
+  my $cc = $config->cc;
+  $config->cc($cc);
+
+Get and set a compiler. The default is the value of C<cc> of L<Config> module.
+
+=head2 include_dirs
+
+  my $include_dirs = $config->include_dirs;
+  $config->include_dirs($include_dirs);
+
+Get and set header including directories of the compiler. This is same as C<-I> option of C<gcc>. 
+
+The default value is "SPVM/Builder/include" of one up of directory that SPVM::Buidler::Config.pm is loaded.
+
+At runtime, the "include" directory of the native module is added before C<include_dirs>.
+
+=head2 ccflags
+
+  my $ccflags = $config->ccflags;
+  $config->ccflags($ccflags);
+
+Get and set compiler flags. the default is a empty string.
+
+=head2 optimize
+
+  my $optimize = $config->optimize;
+  $config->optimize($optimize);
+
+Get and set the option for optimization of the compiler.
+
+The default is C<-O3>.
+
+B<Examples:>
+
+  $config->optimize('-O3');
+  $config->optimize('-O2');
+  $config->optimize('-g3 -O0');
+
+=head2 ld
+
+  my $ld = $config->ld;
+  $config->ld($ld);
+
+Get and set a linker. Default is C<ld> of L<Config> module.
+
+=head2 lib_dirs
+
+  my $lib_dirs = $config->lib_dirs;
+  $config->lib_dirs($lib_dirs);
+
+Get and set the directories libraries are searched for by the linker. This is same as C<-L> option of C<gcc>.
+
+B<Default:>
+
+Windows
+  
+  The directory that perlxxx.dll exists
+  
+Not Windows
+
+  empty list
+
+At runtime, the "lib" directory of the native module is added before C<include_dirs>.
+
+=head2 libs
+
+  my $libs = $config->libs;
+  $config->libs($libs);
+
+Get and get libraries. These libraries are linked by the linker.
+
+If a dynamic link library is found from L<"lib_dirs">, this is linked. Otherwise if a static link library is found from L<"lib_dirs">, this is linked.
+
+B<Examples:>
+
+  $config->libs(['gsl', 'png']);
+
+If you want to link only dynamic link library, you can use the following hash reference as the value of the element instead of the library name.
+
+  {type => 'dynamic', name => 'gsl'}
+
+If you want to link only static link library, you can use the following hash reference as the value of the element instead of the library name.
+
+  {type => 'static', name => 'gsl'}
+
+=head2 resources
+
+  my $resources = $config->resources;
+  $config->resources($resources);
+
+Get and get resouce module names.
+
+At runtime, each modules' native "include" directory is added before C<include_dirs>, and "lib" directory is added before C<lib_dirs>.
+
+E<Examples:>
+
+  $config->resources(['SPVM::Resouce::Zlib::V1_15']);
+  
+=head2 ldflags
+
+  my ldflags = $config->ldflags;
+  $config->ldflags(ldflags);
+
+Get and set linker flags. 
+
+B<Default:>
+
+Windows
+
+  "-mdll -s"
+  
+Non-Windows
+
+  "-shared"
+
+=head2 ld_optimize
+
+  my $ld_optimize = $config->ld_optimize;
+  $config->ld_optimize($ld_optimize);
+
+Get and set the option for optimization of the linker such as C<-O3>, C<-O2>, C<-g3 -O0>.
+
+The default is C<-O2>.
+
+=head2 force
+
+  my $force = $config->force;
+  $config->force($force);
+
+Get and set the flag to force compiles and links without caching.
+
+=head2 quiet
+
+  my $quiet = $config->quiet;
+  $config->quiet($quiet);
+
+Get and set the flag if the compiler and the linker output the results.
+
+The default is C<1>.
 
 =head1 Methods
 
 =head2 new
 
-  my $bconf = SPVM::Builder::Config->new;
+  my $config = SPVM::Builder::Config->new;
   
-Create L<Builder::Config|SPVM::Builder::Config> object.
+Create L<SPVM::Builder::Config> object.
 
 =head2 new_c
   
-  my $bconf = SPVM::Builder::Config->new_c;
+  my $config = SPVM::Builder::Config->new_c;
 
-Create default build config with C settings. This is L<Builder::Config|SPVM::Builder::Config> object.
+Create default build config with C settings. This is L<SPVM::Builder::Config> object.
 
 If you want to use the specific C version, use C<set_std> method.
 
-  $bconf->set_std('c99');
+  $config->set_std('c99');
 
 =head2 new_c99
   
-  my $bconf = SPVM::Builder::Config->new_c99;
+  my $config = SPVM::Builder::Config->new_c99;
 
-Create default build config with C99 settings. This is L<Builder::Config|SPVM::Builder::Config> object.
+Create default build config with C99 settings. This is L<SPVM::Builder::Config> object.
 
 =head2 new_cpp
   
-  my $bconf = SPVM::Builder::Config->new_cpp;
+  my $config = SPVM::Builder::Config->new_cpp;
 
-Create default build config with C++ settings. This is L<Builder::Config|SPVM::Builder::Config> object.
+Create default build config with C++ settings. This is L<SPVM::Builder::Config> object.
 
 If you want to use the specific C++ version, use C<set_std> method.
 
-  $bconf->set_std('c++11');
+  $config->set_std('c++11');
 
 =head2 new_cpp11
   
-  my $bconf = SPVM::Builder::Config->new_cpp11;
+  my $config = SPVM::Builder::Config->new_cpp11;
 
-Create default build config with C++11 settings. This is L<Builder::Config|SPVM::Builder::Config> object.
-
-=head2 replace_all_config
-
-  my $config = {cc => 'g++', ld => 'g++'};
-  $bconf->replace_all_config($config);
-
-Replace all config.
-
-All of old configs is removed and added new config.
-
-=head2 to_hash
-
-  my $config = $bconf->to_hash;
-
-Convert configs to hash reference.
-
-=head2 get_config
-
-  my $cc = $bconf->get_config('cc');
-
-Get a config value.
-
-=head2 set_config
-
-  $bconf->set_config(cc => $cc);
-
-Set a config value.
+Create default build config with C++11 settings. This is L<SPVM::Builder::Config> object.
 
 =head2 set_std
 
-  $bconf->set_std('gnu99');
+  $config->set_std($std);
 
-Set C<std>.
+Add the value that is converted to C<-std=$std> after the last element of C<ccflags> field.
 
-Internally, remove C<-std=old> if exists and add C<-std=new> after C<ccflags>.
+B<Example:>
 
-=head2 delete_std
+  $config->set_std('gnu99');
 
-  $bconf->delete_std;
+=head2 add_ccflags
 
-Delete C<std>.
+  $config->add_ccflags(@ccflags);
 
-Internally, remove C<-std=old> if exists from C<ccflags>.
+Add values after the last element of C<ccflags> field.
 
-=head2 set_cc
+=head2 add_ldflags
 
-  $bconf->set_cc($cc);
+  $config->add_ldflags(@ldflags);
 
-Set C<cc>.
+Add values after the last element of C<ldflags> field.
 
-=head2 get_cc
+=head2 add_include_dirs
 
-  my $cc = $bconf->get_cc;
+  $config->add_include_dirs(@include_dirs);
 
-Get C<cc>.
+Add values after the last element of C<include_dirs> field.
 
-=head2 set_cc
+=head2 add_lib_dirs
 
-  $bconf->set_cc($cc);
+  $config->add_lib_dirs(@lib_dirs);
 
-Set C<cc>.
+Add values after the last element of  C<lib_dirs> field.
 
-=head2 get_cc
+=head2 add_libs
 
-  my $cc = $bconf->get_cc;
+  $config->add_libs(@libs);
 
-Get C<cc>.
+Add the values after the last element of C<libs> field.
 
-=head2 get_ccflags
+B<Examples:>
 
-  my $ccflags = $bconf->get_ccflags;
+  $config->add_libs('gsl');
 
-Get C<ccflags> option using C<get_config> method.
+=head2 add_static_libs
 
-C<ccflags> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
+  $config->add_static_libs(@libs);
 
-Default is copied from $Config{ccflags}.
+Add the values that each element is converted to the following hash reference after the last element of C<libs> field.
 
-=head2 set_ccflags
+  {type => 'static', name => $lib}
 
-  $bconf->set_ccflags($ccflags);
+B<Examples:>
 
-Set C<ccflags> using C<set_config> method.
+  $config->add_static_libs('gsl');
 
-See C<get_ccflags> method about C<ccflags> option.
+=head2 add_dynamic_libs
 
-=head2 append_ccflags
+  $config->add_dynamic_libs(@libs);
 
-  $bconf->append_ccflags($ccflags);
+Add the values that each element is converted to the following hash reference after the last element of C<libs> field.
 
-Add new C<ccflags> after current C<ccflags> using C<get_config> and C<set_config> method.
+  {type => 'dynamic', name => $lib}
 
-See C<get_ccflags> method about C<ccflags> option.
+B<Examples:>
 
-=head2 prepend_ccflags
+  $config->add_dynamic_libs('gsl');
 
-  $bconf->prepend_ccflags($ccflags);
+=head2 add_resources
 
-Add new C<ccflags> before current C<ccflags> using C<get_config> and C<set_config> method.
+  $config->add_resources(@resources);
 
-See C<get_ccflags> method about C<ccflags> option.
+Add the values after the last element of C<resources> field.
 
-=head2 get_cccdlflags
+B<Examples:>
 
-  my $cccdlflags = $bconf->get_cccdlflags;
+  $config->add_resources('SPVM::Resouce::Zlib::V1_15');
 
-Get C<cccdlflags> option using C<get_config> method.
+=head2 to_hash
 
-C<cccdlflags> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
+  my $config = $config->to_hash;
 
-Default is copied from $Config{cccdlflags}.
+Convert L<SPVM::Builder::Config> to a hash reference.
 
-=head2 set_cccdlflags
+=head2 search_lib_dirs_from_cc_info
 
-  $bconf->set_cccdlflags($cccdlflags);
+  my $lib_dirs = $config->search_lib_dirs_from_cc_info;
 
-Set C<cccdlflags> using C<set_config> method.
+Get the library searching directories parsing the infomation the compiler has.
 
-See C<get_cccdlflags> method about C<cccdlflags> option.
+=head2 search_lib_dirs_from_config_libpth
 
-=head2 append_cccdlflags
+  my $lib_dirs = $config->search_lib_dirs_from_config_libpth;
 
-  $bconf->append_cccdlflags($cccdlflags);
+Get the library searching directories parsing C<libpth> of L<Config>.
 
-Add new C<cccdlflags> after current C<cccdlflags> using C<get_config> and C<set_config> method.
+=head2 search_include_dirs_from_config_incpth
 
-See C<get_cccdlflags> method about C<cccdlflags> option.
+  my $include_dirs = $config->search_include_dirs_from_config_incpth;
 
-=head2 prepend_cccdlflags
-
-  $bconf->prepend_cccdlflags($cccdlflags);
-
-Add new C<cccdlflags> before current C<cccdlflags> using C<get_config> and C<set_config> method.
-
-See C<get_cccdlflags> method about C<cccdlflags> option.
-
-=head2 get_archlibexp
-
-  my $archlibexp = $bconf->get_archlibexp;
-
-Get C<archlibexp> option using C<get_config> method.
-
-C<archlibexp> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
-
-Default is copied from $Config{archlibexp}.
-
-=head2 set_archlibexp
-
-  $bconf->set_archlibexp($archlibexp);
-
-Set C<archlibexp> using C<set_config> method.
-
-See C<get_archlibexp> method about C<archlibexp> option.
-
-=head2 get_optimize
-
-  my $optimize = $bconf->get_optimize;
-
-Get C<optimize> option using C<get_config> method.
-
-C<optimize> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method 
-
-Default is copied from $Config{optimize}.
-
-=head2 set_optimize
-
-  $bconf->set_optimize($optimize);
-
-Set C<optimize> using C<set_config> method.
-
-See C<get_optimize> method about C<optimize> option.
-
-=head2 set_ld
-
-  $bconf->set_ld($ld);
-
-Set C<ld>.
-
-=head2 get_ld
-
-  my $ld = $bconf->get_ld;
-
-Get C<ld>.
-
-=head2 get_lddlflags
-
-  my $lddlflags = $bconf->get_lddlflags;
-
-Get C<lddlflags> option using C<get_config> method.
-
-C<lddlflags> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
-
-Default is copied from $Config{lddlflags}.
-
-=head2 set_lddlflags
-
-  $bconf->set_lddlflags($lddlflags);
-
-Set C<lddlflags> using C<set_config> method.
-
-See C<get_lddlflags> method about C<lddlflags> option.
-
-=head2 append_lddlflags
-
-  $bconf->append_lddlflags($lddlflags);
-
-Add new C<lddlflags> after current C<lddlflags> using C<get_config> and C<set_config> method.
-
-See C<get_lddlflags> method about C<lddlflags> option.
-
-=head2 prepend_lddlflags
-
-  $bconf->prepend_lddlflags($lddlflags);
-
-Add new C<lddlflags> before current C<lddlflags> using C<get_config> and C<set_config> method.
-
-See C<get_lddlflags> method about C<lddlflags> option.
-
-=head2 get_shrpenv
-
-  my $shrpenv = $bconf->get_shrpenv;
-
-Get C<shrpenv> option using C<get_config> method.
-
-C<shrpenv> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
-
-Default is copied from $Config{shrpenv}.
-
-=head2 set_shrpenv
-
-  $bconf->set_shrpenv($shrpenv);
-
-Set C<shrpenv> using C<set_config> method.
-
-See C<get_shrpenv> method about C<shrpenv> option.
-
-=head2 get_include_dirs
-
-  my $include_dirs = $bconf->get_include_dirs;
-
-Get C<include_dirs> option. This option is array refernce.
-
-C<include_dirs> option is used by C<compile> method of L<Builder::CC|SPVM::Builder::CC> to set -I<inculde_dir>.
-
-Default is "SPVM/Builder/include" of one up of directory SPVM::Buidler::Config.pm loaded and the values of -I<include_dir> in $Config{ccflags}.
-
-=head2 set_include_dirs
-
-  $bconf->set_include_dirs($include_dirs);
-
-Set C<include_dirs> option. This option is array refernce.
-
-See C<get_include_dirs> method about C<include_dirs> option.
-
-=head2 unshift_include_dirs
-
-  $bconf->unshift_include_dirs($include_dir1, $include_dir2, ...);
-
-Add a element before the first element of C<include_dirs> option.
-
-See C<get_lib_dirs> method about C<lib_dirs> option.
-
-=head2 push_include_dirs
-
-  $bconf->push_include_dirs($include_dir1, $include_dir2, ...);
-
-Add a element after the last element of C<include_dirs> option.
-
-See C<get_lib_dirs> method about C<lib_dirs> option.
-
-=head2 get_lib_dirs
-
-  my $lib_dirs = $bconf->get_lib_dirs;
-
-Get C<lib_dirs> option. This option is array refernce.
-
-C<lib_dirs> option is used by C<compile> method of L<Builder::CC|SPVM::Builder::CC> to set -L<lib_dir>.
-
-Default is the values of -L<lib_dir> in $Config{lddlflags}.
-
-=head2 set_lib_dirs
-
-  $bconf->set_lib_dirs($lib_dirs);
-
-Set C<lib_dirs> option. This option is array refernce.
-
-See C<get_lib_dirs> method about C<lib_dirs> option.
-
-=head2 unshift_lib_dirs
-
-  $bconf->unshift_lib_dirs($lib_dir1, $lib_dir2, ...);
-
-Add a element before the first element of C<lib_dirs> option.
-
-See C<get_lib_dirs> method about C<lib_dirs> option.
-
-=head2 push_lib_dirs
-
-  $bconf->push_lib_dirs($lib_dir1, $lib_dir2, ...);
-
-Add a element after the last element of C<lib_dirs> option.
-
-See C<get_lib_dirs> method about C<lib_dirs> option.
-
-=head2 get_libs
-
-  my $libs = $bconf->get_libs;
-
-Get C<libs> option. This option is array refernce.
-
-C<libs> option is used by C<link> method of L<Builder::CC|SPVM::Builder::CC> to set -l<lib>.
-
-Don't add prefix '-l' or 'lib' before library name. 'gsl' is valid. 'libgsl', '-lgsl' is invalid.
-
-The shared libraries of C<libs> option, unlike the C <lddlflags> option, is loaded using C<dl_load_file> function of L<DynaLoader> when the SPVM method is bind to Perl methods.
-
-=head2 set_libs
-
-  $bconf->set_libs($libs);
-
-Set C<libs> option. This option is array refernce.
-
-See C<get_libs> method about C<libs> option.
-
-=head2 unshift_libs
-
-  $bconf->unshift_libs($lib1, $lib2, ...);
-
-Add a library before the first element of C<libs> option.
-
-See C<get_libs> method about C<libs> option.
-
-=head2 push_libs
-
-  $bconf->push_libs($lib1, $lib2, ...);
-
-Add a library after the last element of C<libs> option.
-
-See C<get_libs> method about C<libs> option.
-
-=head2 get_force_compile
-
-  my $force_compile = $bconf->get_force_compile;
-
-Get C<force_compile> option.
-
-C<force_compile> option is used by C<compile> method of L<Builder::CC|SPVM::Builder::CC> to determine whether the method should force compilation of source codes without cache.
-
-=head2 set_force_compile
-
-  $bconf->set_force_compile($force_compile);
-
-Set C<force_compile> option.
-
-See C<get_force_compile> method about C<force_compile> option.
-
-=head2 get_quiet
-
-  my $quiet = $bconf->get_quiet;
-
-Get C<quiet> option.
-
-C<quiet> option is used by C<compile> method of L<Builder::CC|SPVM::Builder::CC> to determine whether the method output compiler messages , default to C<1>.
-
-=head2 set_quiet
-
-  $bconf->set_quiet($quiet);
-
-Set C<quiet> option.
-
-See C<get_quiet> method about C<quiet> option.
+Get the header searching directories parsing C<incpth> of L<Config>.

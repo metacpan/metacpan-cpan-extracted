@@ -27,7 +27,7 @@ WriteMakefile(
         },
     },
     PREREQ_PM => {
-        'SPVM'              => '0.9015',
+        'SPVM'              => '0.9019',
     },
 );
 

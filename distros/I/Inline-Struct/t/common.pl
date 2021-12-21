@@ -1,5 +1,10 @@
 use Test::More;
 
+# Build in unique directories to enable parallel and read-only tests.
+use File::Temp;
+my $tmp_dir;
+use Inline Config => directory => ($tmp_dir = File::Temp->newdir());
+
 # assumes suitable class setup before call
 sub run_struct_tests {
   my $class = 'Inline::Struct::'.($_[0]||'Foo');

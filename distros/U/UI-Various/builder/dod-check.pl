@@ -264,11 +264,6 @@ skip_or_run('check HTML', 'fix broken links',
 
 check_fixmes_todos();
 
-# relax strict ulimit:
-system(qw(chmod --recursive --changes a+rX
-	  Build.PL Changes LICENSE META.json README.md
-	  builder cpanfile examples lib minil.toml t));
-
 
 #########################################################################
 #########################################################################

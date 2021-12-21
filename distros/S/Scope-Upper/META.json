@@ -4,7 +4,7 @@
       "Vincent Pit <vpit@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,7 +33,6 @@
       },
       "configure" : {
          "requires" : {
-            "Config" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -49,6 +48,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
+         "mailto" : "bug-scope-upper@rt.cpan.org",
          "web" : "http://rt.cpan.org/Dist/Display.html?Name=Scope-Upper"
       },
       "homepage" : "http://search.cpan.org/dist/Scope-Upper/",
@@ -56,9 +56,11 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://git.vpit.fr/?p=perl%2Fmodules%2FScope-Upper.git"
+         "type" : "git",
+         "url" : "http://git.vpit.fr/perl/modules/Scope-Upper.git/",
+         "web" : "http://git.vpit.fr/?p=perl%2Fmodules%2FScope-Upper.git"
       }
    },
-   "version" : "0.32",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.33",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

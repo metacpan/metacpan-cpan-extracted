@@ -1,5 +1,9 @@
 Revision history for WebService-Leanpub
 
+v0.3.1 Tue Dec 21 12:18:48 CET 2021
+	- move on GitHub
+	- added links to repository and bug tracker
+
 0.3.0  Fr 14. Feb 22:20:18 CET 2014
     - added method summary() which provides information about the book
     - added command summary to bin/leanpub

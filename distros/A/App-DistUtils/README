@@ -2,8 +2,8 @@ NAME
     App::DistUtils - Collection of utilities related to Perl distributions
 
 VERSION
-    This document describes version 0.150 of App::DistUtils (from Perl
-    distribution App-DistUtils), released on 2020-04-19.
+    This document describes version 0.151 of App::DistUtils (from Perl
+    distribution App-DistUtils), released on 2021-07-27.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -40,6 +40,9 @@ SYNOPSIS
     *   uninstall-dist
 
     The main feature of these utilities is tab completion.
+
+CONTRIBUTOR
+    perlancar (@pc-office) <perlancar@gmail.com>
 
 FAQ
   What is the purpose of this distribution? Haven't other similar utilities existed?
@@ -80,6 +83,8 @@ SEE ALSO
 
     App::LedgerUtils, utilities related to Ledger CLI files.
 
+    App::PerlReleaseUtils, utilities related to Perl distribution releases.
+
     App::PlUtils, utilities related to Perl scripts.
 
     App::PMUtils, utilities related to Perl modules.
@@ -92,7 +97,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

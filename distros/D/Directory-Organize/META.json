@@ -1,33 +1,22 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Create and Organize Directories",
    "author" : [
-      "unknown"
+      "Mathias Weidner <mathias@weidner.in-bad-schmiedeberg.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Directory-Organize",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -38,7 +27,24 @@
          }
       }
    },
+   "provides" : {
+      "Directory::Organize" : {
+         "file" : "lib/Directory/Organize.pm",
+         "version" : "v1.0.1"
+      }
+   },
    "release_status" : "stable",
-   "version" : "v1.0.0",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Directory-Organize"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/matwei-perl/Directory-Organize"
+      }
+   },
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

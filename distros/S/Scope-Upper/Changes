@@ -1,5 +1,15 @@
 Revision history for Scope-Upper
 
+0.33    2021-12-20 20:30 UTC
+        + Fix : [RT #114816] resources/remote/url points to web interface
+                META files now follow version 2.0 of the CPAN META spec.
+                Thanks Kent Fredric for reporting.
+        + Fix : [RT #139823] : Perl 5 blead breads t/07-context_info.t
+                t/07-context_info.t has been hardened against warning bits
+                changes.
+                Thanks Jim Keenan and Tony Cook for reporting and contributing
+                a fix.
+
 0.32    2019-07-08 12:50 UTC
         + Fix : [RT #129539] : fails with v5.27.3 and later with DEBUGGING
                 The module has been amended to accomodate with a change of

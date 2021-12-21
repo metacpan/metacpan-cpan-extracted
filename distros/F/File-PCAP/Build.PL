@@ -16,6 +16,12 @@ my $builder = Module::Build->new(
     dist_author         => q{Mathias Weidner <mamawe@cpan.org>},
     dist_version_from   => 'lib/File/PCAP.pm',
     license             => 'artistic_2',
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/matwei-perl/File-PCAP',
+            bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=File-PCAP',
+        }
+    },
     module_name         => 'File::PCAP',
     release_status      => 'stable',
     requires => {

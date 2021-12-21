@@ -8,6 +8,7 @@ WriteMakefile(
     'ExtUtils::MakeMaker' => 6.48,
   },
   TEST_REQUIRES => {
+    'File::Temp' => 0,
     'Inline' => 0.66,
     'Inline::C' => 0.62,
     'Test::More' => 0.88,

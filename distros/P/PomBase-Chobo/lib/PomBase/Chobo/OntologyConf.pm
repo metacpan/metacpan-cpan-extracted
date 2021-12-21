@@ -33,7 +33,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.034'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 use warnings;
 use Carp;
@@ -81,7 +81,7 @@ our %field_conf = (
       my $other = shift;
 
       if (!defined $other->def()) {
-        return $self;
+        return $self->def();
       } else {
         if (!defined $self->def()) {
           return $other->def();

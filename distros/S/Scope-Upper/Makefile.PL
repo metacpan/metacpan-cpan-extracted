@@ -86,6 +86,14 @@ my $dist = 'Scope-Upper';
 (my $file = $dist) =~ s{-}{/}g;
 $file = "lib/$file.pm";
 
+my $bug_web    = "http://rt.cpan.org/Dist/Display.html?Name=$dist",
+my $bug_mailto = 'bug-' . lc($dist) . '@rt.cpan.org';
+
+my $repo_host = 'git.vpit.fr';
+my @repo_path = ('perl', 'modules', "$dist.git");
+my $repo_url  = join '/', 'http:', '', $repo_host, @repo_path, '';
+my $repo_web  = "http://$repo_host/?p=" . join('%2F', @repo_path);
+
 my %PREREQ_PM = (
  'Exporter' => 0,
  'XSLoader' => 0,
@@ -101,6 +109,10 @@ my %BUILD_REQUIRES = (
 );
 
 my %META = (
+ 'meta-spec' => {
+  version => '2',
+  url     => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
+ },
  configure_requires => {
   'Config'              => 0,
   'ExtUtils::MakeMaker' => 0,
@@ -110,10 +122,17 @@ my %META = (
  },
  dynamic_config => 1,
  resources => {
-  bugtracker => "http://rt.cpan.org/Dist/Display.html?Name=$dist",
+  bugtracker => {
+   web    => $bug_web,
+   mailto => $bug_mailto,
+  },
   homepage   => "http://search.cpan.org/dist/$dist/",
   license    => 'http://dev.perl.org/licenses/',
-  repository => "http://git.vpit.fr/?p=perl%2Fmodules%2F$dist.git",
+  repository => {
+   type => 'git',
+   url  => $repo_url,
+   web  => $repo_web,
+  },
  },
 );
 

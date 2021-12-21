@@ -7,7 +7,7 @@ use strict;
 use Carp;
 use GeNUScreen::Config::Diff;
 
-use version; our $VERSION = qv('0.0.10');
+use version; our $VERSION = qv('v0.0.11');
 
 my $re_cfgval  = qr/\S.*/;
 my $re_cfgvar  = qr/[0-9a-z_]+/i;
@@ -98,7 +98,7 @@ GeNUScreen::Config - work with GeNUScreen configuration files
 
 =head1 VERSION
 
-This document describes GeNUScreen::Config version 0.0.5
+This document describes GeNUScreen::Config version v0.0.11
 
 =head1 SYNOPSIS
 

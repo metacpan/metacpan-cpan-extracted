@@ -1920,7 +1920,7 @@ EOLX:
 
 	    if (waitingForField) {
 		if (csv->comment_str && !f && !spl && c == *csv->comment_str) {
-		    STRLEN cl = strlen (csv->comment_str);
+		    STRLEN cl = strlen ((char *)csv->comment_str);
 
 #if MAINT_DEBUG > 5
 		    (void)fprintf (stderr,
@@ -2013,6 +2013,45 @@ EOLX:
     return TRUE;
     } /* Parse */
 
+static int hook (pTHX_ HV *hv, char *cb_name, AV *av) {
+    SV **svp;
+    HV *cb;
+    int res;
+
+#if MAINT_DEBUG > 1
+    (void)fprintf (stderr, "# HOOK %s %x\n", cb_name, av);
+#endif
+    unless ((svp = hv_fetchs (hv, "callbacks", FALSE)) && _is_hashref (*svp))
+	return 0; /* uncoverable statement defensive programming */
+
+    cb  = (HV *)SvRV (*svp);
+    svp = hv_fetch (cb, cb_name, strlen (cb_name), FALSE);
+    unless (svp && _is_coderef (*svp))
+	return 0;
+
+    {   dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK (SP);
+	mXPUSHs (newRV_inc ((SV *)hv));
+	mXPUSHs (newRV_inc ((SV *)av));
+	PUTBACK;
+	res = call_sv (*svp, G_SCALAR);
+	SPAGAIN;
+	if (res) {
+	    SV *rv = POPs;
+	    if (SvROK (rv) && (rv = SvRV (rv)) && SvPOK (rv)) {
+		if (strcmp (SvPV_nolen (rv), "skip") == 0)
+		    res = 0;
+		}
+	    }
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+	}
+    return res;
+    } /* hook */
+
 #define c_xsParse(csv,hv,av,avf,src,useIO)	cx_c_xsParse (aTHX_ csv, hv, av, avf, src, useIO)
 static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool useIO) {
     int	result, ahead = 0;
@@ -2057,7 +2096,8 @@ static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool
 	if (csv.fld_idx != csv.strict_n) {
 	    unless (csv.useIO & useIO_EOF)
 		ParseError (&csv, 2014, csv.used);
-	    result = FALSE;
+	    if (last_error) /* an error callback can reset and accept */
+		result = FALSE;
 	    }
 	}
 
@@ -2127,45 +2167,6 @@ static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool
 
     return result;
     } /* c_xsParse */
-
-static int hook (pTHX_ HV *hv, char *cb_name, AV *av) {
-    SV **svp;
-    HV *cb;
-    int res;
-
-#if MAINT_DEBUG > 1
-    (void)fprintf (stderr, "# HOOK %s %x\n", cb_name, av);
-#endif
-    unless ((svp = hv_fetchs (hv, "callbacks", FALSE)) && _is_hashref (*svp))
-	return 0; /* uncoverable statement defensive programming */
-
-    cb  = (HV *)SvRV (*svp);
-    svp = hv_fetch (cb, cb_name, strlen (cb_name), FALSE);
-    unless (svp && _is_coderef (*svp))
-	return 0;
-
-    {   dSP;
-	ENTER;
-	SAVETMPS;
-	PUSHMARK (SP);
-	mXPUSHs (newRV_inc ((SV *)hv));
-	mXPUSHs (newRV_inc ((SV *)av));
-	PUTBACK;
-	res = call_sv (*svp, G_SCALAR);
-	SPAGAIN;
-	if (res) {
-	    SV *rv = POPs;
-	    if (SvROK (rv) && (rv = SvRV (rv)) && SvPOK (rv)) {
-		if (strcmp (SvPV_nolen (rv), "skip") == 0)
-		    res = 0;
-		}
-	    }
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-	}
-    return res;
-    } /* hook */
 
 #define xsParse(self,hv,av,avf,src,useIO)	cx_xsParse (aTHX_ self, hv, av, avf, src, useIO)
 static int cx_xsParse (pTHX_ SV *self, HV *hv, AV *av, AV *avf, SV *src, bool useIO) {
@@ -2288,8 +2289,10 @@ SetDiag (self, xse, ...)
 	SetupCsv (&csv, hv, self);
 	ST (0) = SetDiag (&csv, xse);
 	}
-    else
+    else {
+	last_error = xse;
 	ST (0) = sv_2mortal (SvDiag (xse));
+	}
 
     if (xse && items > 1 && SvPOK (ST (2))) {
 	sv_setpvn (ST (0),  SvPVX (ST (2)), SvCUR (ST (2)));

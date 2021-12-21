@@ -1,4 +1,5 @@
 use Test::More;
+BEGIN { require './t/common.pl'; }
 
 use Inline C => config => inc => q{-DNUMBER=16}, structs => 1;
 use Inline C => <<EOF, force_build => 1;

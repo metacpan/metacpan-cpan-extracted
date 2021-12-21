@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+BEGIN { require './t/common.pl'; }
 
 use Inline C => Config => force_build => 1;
 use Inline C => 'DATA', structs => [qw(aaa_t bbb_t)];

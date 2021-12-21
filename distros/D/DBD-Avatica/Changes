@@ -1,8 +1,13 @@
 Revision history for DBD-Phoenix
 
+0.2.1  2021-12-21
+    - Improved performance of ping request
+    - Fixed bug with closed statements
+    - Improved execute_array, execute_for_fetch for batch operations
+
 0.2.0  2021-12-14
-    - Fixed bug with wrong number or arguments
-    - Added last_insert_id method
+    - Fixed bug with wrong number or arguments.
+    - Added last_insert_id method.
 
 0.01.0  2021-12-13
     - First release.

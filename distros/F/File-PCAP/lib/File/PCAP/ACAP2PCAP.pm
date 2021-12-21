@@ -13,11 +13,11 @@ File::PCAP::ACAP2PCAP - convert ASA capture to PCAP
 
 =head1 VERSION
 
-Version v0.1.0
+Version v0.1.1
 
 =cut
 
-use version; our $VERSION = qv('v0.1.0');
+use version; our $VERSION = qv('v0.1.1');
 
 =head1 SYNOPSIS
 
