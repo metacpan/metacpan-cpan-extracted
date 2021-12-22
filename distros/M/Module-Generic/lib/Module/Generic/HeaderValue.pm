@@ -136,6 +136,7 @@ sub new_from_header
     unless( $self->_is_object( $self ) )
     {
         $self = bless( $opts => $self );
+        $self->message( 4, "Initialised object with options: ", sub{ $self->dump( $opts ) });
     }
     my $sep  = CORE::length( $opts->{separator} ) ? $opts->{separator} : ';';
     my @parts = ();
@@ -147,6 +148,11 @@ sub new_from_header
     # $self->message( 3, "Field parts are: ", sub{ $self->SUPER::dump( \@parts ) } );
     my $header_val = shift( @parts );
     my( $n, $v ) = split( /[[:blank:]\h]*\=[[:blank:]\h]*/, $header_val, 2 );
+    if( $self->debug )
+    {
+        my $trace = $self->_get_stack_trace;
+        $self->message( 4, "\$self is '", overload::StrVal( $self ), "' and \$DEBUG value is '$DEBUG' and debug flag is '", $self->debug, "' stack trace: ", $trace->as_string );
+    }
     $self->message( 4, "Header value '$n' and its own value is '$v' (", defined( $v ) ? 'defined' : 'undefined', ")." );
     if( $opts->{decode} )
     {

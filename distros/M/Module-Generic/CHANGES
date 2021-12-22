@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Generic
 
+v0.18.4 2021-12-17T09:10:36+0900
+    - Updated _parse_timestamp to handle unix timestamp provided by Time::HiRes, i.e with a decimal
+    - Small correction in _obj2h in Module::Generic
+    - Added method _is_integer in Module::Generic
+    - Modified exists in Module::Generic::Array to take under account objects.
+
 v0.18.3 2021-12-14T12:44:31+0900
     - Added method replace in Module::Generic::Array
     - Added methods is_empty and remove in Module::Generic::Hash

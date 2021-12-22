@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.1.11
+## Version v0.1.12
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/11/25
+## Modified 2021/12/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,7 +42,7 @@ BEGIN
         fallback => 1,
     );
     use constant HAS_PERLIO_MMAP => ( version->parse($]) >= version->parse('v5.16.0') ? 1 : 0 );
-    our $VERSION = 'v0.1.11';
+    our $VERSION = 'v0.1.12';
     # https://en.wikipedia.org/wiki/Path_(computing)
     # perlport
     our $OS2SEP  =
@@ -1172,7 +1172,7 @@ sub find
     my $p = +{ map( ( CORE::exists( $opts->{ $_ } ) ? ( $_ => $opts->{ $_ } ) : () ), qw( bydepth dangling_symlinks follow follow_fast follow_skip no_chdir postprocess preprocess untaint untaint_pattern untaint_skip ) ) };
     $p->{wanted} = sub
     {
-        local $_ = $self->new( $File::Find::name, { os => $self->{os} } ) || return( $self->pass_error );
+        local $_ = $self->new( $File::Find::name, { base_dir => $File::Find::dir, os => $self->{os} } ) || return( $self->pass_error );
         $cb->( $_ );
     };
     
@@ -2102,7 +2102,8 @@ sub readlink
 sub relative
 {
     my $self = shift( @_ );
-    return( $self->_spec_abs2rel( [ $self->filepath, $self->base_dir ] ) );
+    my $base = @_ ? shift( @_ ) : $self->base_dir;
+    return( $self->_spec_abs2rel( [ $self->filepath, $base ] ) );
 }
 
 sub rmdir
@@ -2123,6 +2124,8 @@ sub rmdir
 }
 
 sub remove { return( shift->delete( @_ ) ); }
+
+sub rename { return( shift->move( @_ ) ); }
 
 sub resolve
 {
@@ -3633,7 +3636,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.1.11
+    v0.1.12
 
 =head1 DESCRIPTION
 
@@ -4517,6 +4520,10 @@ If an error occurred, this returns undef and set an exception object.
 =head2 relative
 
 Returns a relative path representation of the current element.
+
+=head2 rename
+
+This is an alias for L</move>
 
 =head2 remove
 

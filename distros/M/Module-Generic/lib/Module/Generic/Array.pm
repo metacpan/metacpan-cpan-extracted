@@ -41,6 +41,7 @@ BEGIN
     our( $VERSION ) = 'v1.1.0';
 };
 
+no warnings 'redefine';
 sub new
 {
     my $this = CORE::shift( @_ );
@@ -172,7 +173,15 @@ sub exists
 {
     my $self = CORE::shift( @_ );
     my $this = CORE::shift( @_ );
-    CORE::return( $self->_number( CORE::scalar( CORE::grep( /^$this$/, @$self ) ) ) );
+    if( ref( $this ) && ref( $this ) ne 'Regexp' )
+    {
+        my $pos = $self->pos( $this );
+        CORE::return( CORE::defined( $pos ) ? 1 : 0 );
+    }
+    else
+    {
+        CORE::return( $self->_number( CORE::scalar( CORE::grep( /^$this$/, @$self ) ) ) );
+    }
 }
 
 sub fifth { CORE::return( CORE::shift->get_null(4) ); }
@@ -288,7 +297,6 @@ sub get_null
     }
 }
 
-
 sub grep
 {
     my $self = CORE::shift( @_ );
@@ -348,7 +356,7 @@ sub iterator { CORE::return( Module::Generic::Iterator->new( $self ) ); }
 sub join
 {
     my $self = CORE::shift( @_ );
-    CORE::return( $self->_scalar( CORE::join( shift( @_ ), @$self, @_ ) ) );
+    CORE::return( $self->_scalar( CORE::join( CORE::shift( @_ ), @$self, @_ ) ) );
 }
 
 sub keys

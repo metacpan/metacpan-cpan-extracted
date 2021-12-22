@@ -1,0 +1,251 @@
+#!perl
+
+use strict;
+use warnings;
+use feature qw(say);
+use utf8;
+use Crypt::Blowfish;
+use Crypt::CBC;
+use DBI;
+use DBD::SQLite;
+use POSIX qw(strftime);
+
+my $key;
+
+my $login = <STDIN>;
+chomp $login;
+
+my @login = split(" ", $login);
+if($login[0] eq "key") {
+    $key = $login[1];
+    say "" for (0..10000);
+} else {
+    say "please enter a key";
+    say "ex: key 1234";
+    exit;
+}
+
+my $cipher = Crypt::CBC->new(
+    -pass   => $key,
+    -cipher => 'Blowfish',
+    -pbkdf  => 'pbkdf2'
+);
+
+my $homePath = $ENV{"HOME"};
+my $dbPath = $homePath . '/.journal/journal.db';
+
+my $dbh;
+
+if(! -e $dbPath) {
+    my $dbDirPath = $homePath . '/.journal';
+    mkdir($dbDirPath);
+
+    $dbh = DBI->connect("dbi:SQLite:dbname=$dbPath", "", "", { RaiseError => 1, AutoCommit => 1 });
+    my $sth = $dbh->prepare("CREATE TABLE JOURNAL( ID INTEGER PRIMARY KEY AUTOINCREMENT, DATE TEXT, TIME TEXT, MESSAGE TEXT, TYPE TEXT);");
+    $sth->execute();
+} else {
+    $dbh = DBI->connect("dbi:SQLite:dbname=$dbPath", "", "", { RaiseError => 1, AutoCommit => 1 });
+}
+
+say "ready to use";
+say "type help\n";
+
+while(<STDIN>) {
+    chomp;
+    my $rule = $_;
+    if($rule eq "") {
+        next;
+    }
+    if($rule eq "quit") {
+        exit;
+    }
+    if($rule eq "clear") {
+        say "" for (0..10000);
+    }
+    if($rule eq "help") {
+        my $help = "
+            submit a post
+            #post <type> <message>    eg:post posttype text message
+
+            get posts by date
+            #date <date>     eg:date Aug-05-2021
+
+            get posts by id, each post has an id
+            #id <num>    eg:id 23
+
+            get posts by type
+            #type <type>    eg:type posttype
+            #type <type> <range>    eg:type posttype 4-8
+
+            update a post
+            #update <id> <updated message>
+
+            delete a post
+            #delete <id>
+
+            list the posts
+            #list
+            #list <range>    eg:list 20-28
+
+            list all types
+            #list types
+
+            clear screen
+            #clear
+
+            quit
+            #quit
+        ";
+        say $help;
+    }
+
+    my @rule = split(" ", $rule);
+
+    if($rule[0] eq "post") {
+        my $type = $rule[1];
+        my $message = join(" ", @rule[ 2 .. $#rule ]);
+
+        my $date = strftime "%b-%d-%Y", localtime;
+        my $time = strftime "%I:%M %p", localtime;
+
+        $message = $cipher->encrypt($message);
+
+        my $sth = $dbh->prepare("insert into JOURNAL (DATE, TIME, MESSAGE, TYPE) values(?,?,?,?)");
+        $sth->execute($date, $time, $message, $type);
+        say "";
+    }
+
+    if($rule[0] eq "date") {
+        my $date = $rule[1];
+
+        my $sth = $dbh->prepare("select * from JOURNAL where DATE = ?");
+        $sth->execute($date);
+
+        while(my @row = $sth->fetchrow_array()) {
+            my ($postID, $postDate, $postTime, $postMessage, $postType) = @row;
+            say $postID . "> "
+              . $postType . "  "
+              . $postDate . " "
+              . $postTime . "\n"
+              . $cipher->decrypt($postMessage) . "\n";
+        }
+    }
+
+    if($rule[0] eq "id") {
+        my $id = $rule[1];
+
+        my $sth = $dbh->prepare("select * from JOURNAL where ID = ?");
+        $sth->execute($id);
+
+        my @row = $sth->fetchrow_array();
+        my ($postID, $postDate, $postTime, $postMessage, $postType) = @row;
+
+        say $postID . "> "
+          . $postType . "  "
+          . $postDate . " "
+          . $postTime . "\n"
+          . $cipher->decrypt($postMessage) . "\n";
+    }
+
+    if($rule[0] eq "type") {
+        my $type = $rule[1];
+
+        if(!defined $rule[2]) {
+            my $sth = $dbh->prepare("select * from JOURNAL where TYPE = ? limit 10");
+            $sth->execute($type);
+
+            while(my @row = $sth->fetchrow_array()) {
+                my ($postID, $postDate, $postTime, $postMessage, $postType) = @row;
+                say $postID . "> "
+                  . $postType . "  "
+                  . $postDate . " "
+                  . $postTime . "\n"
+                  . $cipher->decrypt($postMessage) . "\n";
+            }
+        } else {
+            my $range = $rule[2];
+            my ($rangeMin, $rangeMax) = split("-", $range);
+
+            my $sth = $dbh->prepare("select * from JOURNAL where TYPE = ? limit ?, ?");
+            $sth->execute($type, $rangeMin - 1, $rangeMax - $rangeMin + 1);
+
+            while(my @row = $sth->fetchrow_array()) {
+                my ($postID, $postDate, $postTime, $postMessage, $postType) = @row;
+                say $postID . "> "
+                  . $postType . "  "
+                  . $postDate . " "
+                  . $postTime . "\n"
+                  . $cipher->decrypt($postMessage) . "\n";
+            }
+        }
+    }
+
+    if($rule[0] eq 'update') {
+        my $id = $rule[1];
+        my $message = join(" ", @rule[ 2 .. $#rule ]);
+
+        $message = $cipher->encrypt($message);
+        my $sth = $dbh->prepare("update JOURNAL set MESSAGE=? where ID=?");
+        $sth->execute($message, $id);
+
+        say "";
+    }
+
+    if($rule[0] eq 'delete') {
+        my $id = $rule[1];
+        my $message = "DELETED";
+
+        $message = $cipher->encrypt($message);
+        my $sth = $dbh->prepare("update JOURNAL set MESSAGE=? where ID=?");
+        $sth->execute($message, $id);
+
+        say "";
+    }
+
+    if($rule[0] eq "list") {
+        if(!defined $rule[1]) {
+            my $sth = $dbh->prepare("select * from JOURNAL order by DATE limit 10");
+            $sth->execute();
+
+            while(my @row = $sth->fetchrow_array()) {
+                my ($postID, $postDate, $postTime, $postMessage, $postType) = @row;
+                say $postID . "> "
+                  . $postType . "  "
+                  . $postDate . " "
+                  . $postTime . "\n"
+                  . $cipher->decrypt($postMessage) . "\n";
+            }
+        } else {
+            my $rangeOrTypes = $rule[1];
+            if($rangeOrTypes =~ /-/) {
+                my $range = $rangeOrTypes;
+                my ($rangeMin, $rangeMax) = split("-", $range);
+
+                my $sth = $dbh->prepare("select * from JOURNAL limit ?, ?");
+                $sth->execute($rangeMin - 1, $rangeMax - $rangeMin + 1);
+
+                while(my @row = $sth->fetchrow_array()) {
+                    my ($postID, $postDate, $postTime, $postMessage, $postType) = @row;
+                    say $postID . "> "
+                      . $postType . "  "
+                      . $postDate . " "
+                      . $postTime . "\n"
+                      . $cipher->decrypt($postMessage) . "\n";
+                }
+            } else {
+                my $types = $rangeOrTypes;
+
+                if($types eq "types") {
+                    my $sth = $dbh->prepare("select distinct TYPE from JOURNAL");
+                    $sth->execute();
+
+                    while(my @row = $sth->fetchrow_array()) {
+                        my ($type) = @row;
+                        say $type;
+                    }
+                    say "";
+                }
+            }
+        }
+    }
+}

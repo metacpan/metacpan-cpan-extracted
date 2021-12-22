@@ -32,14 +32,15 @@
       },
       "runtime" : {
          "requires" : {
-            "CSS::Object" : "v0.1.4",
+            "CSS::Object" : "v0.1.5",
             "Devel::Confess" : "0.009004",
             "HTML::TreeBuilder" : "5.07",
-            "Module::Generic" : "v0.15.8",
+            "Module::Generic" : "v0.18.4",
             "Nice::Try" : "v1.1.2",
             "POSIX" : "1.53_01",
-            "URI" : "0",
-            "parent" : "0",
+            "Regexp::Common::Markdown" : "v0.1.5",
+            "URI" : "5.10",
+            "parent" : "0.238",
             "perl" : "5.026001",
             "strict" : "0",
             "warnings" : "0"
@@ -63,6 +64,6 @@
          "web" : "https://git.deguest.jp/jack/Markdown-Parser"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

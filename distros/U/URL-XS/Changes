@@ -1,5 +1,19 @@
 Revision history for Perl extension URL::XS.
 
+v0.3.1 2021-12-22
+    - Restore t/02_parse_url.t
+    - Fixed typo README.md
+    - Fixed typo github actions ci.yml
+
+v0.3.0 2021-12-22
+    - Fixed existing tests
+    - Added new tests
+    - Fixed typo in README* and pod
+    - Added parsing url credentiials (username and password)
+    - Removed .travis.yml
+    - Added github actions ci scenario
+    - Increased MIN_PERL_VERSION (requires version 5.26 instead of 5.24)
+
 v0.2.0 2021-12-07
     - Renamed package IURL->URL (::XS)
     - Fixed README*

@@ -7,7 +7,7 @@ use Data::Kramerius::Object;
 use Text::DSV;
 use Unicode::UTF8 qw(decode_utf8);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -160,16 +160,16 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut
 
 __DATA__
 version:code:name:url
-3:ABA001:Národní knihovna:http\://kramerius.nkp.cz/
+3:ABA001:Národní knihovna:https\://kramerius.nkp.cz/
 3:ABA013:Národní technická knihovna:http\://kramerius.stk.cz/
 3:ABC135:Národní filmový archiv v Praze:http\://kramerius.nfa.cz/
-3:ABE304:Institut umění – Divadelní ústav:http\://kramerius.divadlo.cz
+3:ABE304:Institut umění – Divadelní ústav:http\://kramerius.divadlo.cz/
 3:ABG001:Digitální knihovna Městské knihovny v Praze:http\://kramerius.mlp.cz/
 3:BOD006:Mendelova univerzita v Brně:http\://kramerius.mendelu.cz
 3:CBA001:Jihočeská vědecká knihovna v Českých Budějovicích:http\://kramerius.cbvk.cz

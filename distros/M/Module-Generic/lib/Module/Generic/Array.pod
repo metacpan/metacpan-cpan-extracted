@@ -238,6 +238,8 @@ It takes an optional boolean value that, if true, will sort the array before.
 
 Creates a clone of the current array object and returns it.
 
+Note that this does not clone any element contained inside the array. It only clones the array object itself.
+
 =head2 contains
 
 This is a convenient alias for L</exists>

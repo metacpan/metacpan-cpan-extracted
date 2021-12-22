@@ -6,19 +6,22 @@ use warnings;
 
 use Test::More;
 
-plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ArrayData/Array.pm',
     'ArrayData/DBI.pm',
+    'ArrayData/LinesInFile.pm',
     'ArrayData/Test/Source/Array.pm',
     'ArrayData/Test/Source/DBI.pm',
     'ArrayData/Test/Source/Iterator.pm',
     'ArrayData/Test/Source/LinesInDATA.pm',
+    'ArrayData/Test/Source/LinesInFile.pm',
     'ArrayDataRole/Source/Array.pm',
     'ArrayDataRole/Source/DBI.pm',
     'ArrayDataRole/Source/Iterator.pm',
     'ArrayDataRole/Source/LinesInDATA.pm',
+    'ArrayDataRole/Source/LinesInFile.pm',
     'ArrayDataRoles/Standard.pm'
 );
 

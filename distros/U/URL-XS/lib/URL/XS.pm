@@ -1,13 +1,13 @@
 package URL::XS;
 
-use 5.024000;
+use 5.026000;
 use strict;
 use warnings;
 
 use base 'Exporter';
 our @EXPORT_OK = qw(parse_url split_url_path parse_url_query);
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.1';
 
 require XSLoader;
 XSLoader::load('URL::XS', $VERSION);
@@ -31,7 +31,7 @@ Might parse: url, url paths and url queries.
 
   use URL::XS (parse_url split_url_path parse_url_query);
 
-  my $url = 'http://localhost:8989/some/path/to/resource?q1=yes&q2=no&q3=maybe#frag=1';
+  my $url = 'https://peter:bro@localhost:8989/some/path/to/resource?q1=yes&q2=no&q3=maybe#frag=1';
 
   # Basic parse
   my $parsed_url = parse_url($url);
@@ -39,12 +39,14 @@ Might parse: url, url paths and url queries.
   say Dumper $parsed_url;
 
   # $VAR1 = {
-  #  'scheme' => 'http',
+  #  'scheme' => 'https',
+  #  'username' => 'peter',
+  #  'password' => 'bro',
   #  'host' => 'localhost',
   #  'port' => 8989,
-  #  'path' => 'some/path/to/resource',
+  #  'path' => 'some/path/to/resource'
   #  'query' => 'q1=yes&q2=no&q3=maybe',
-  #  'fragment' => 'frag=1'
+  #  'fragment' => 'frag=1',
   # };
 
   # Parse relative url path
@@ -69,15 +71,15 @@ Might parse: url, url paths and url queries.
 
 =head2 parse_url($url)
 
-Prse absolute URL string:
+Parse absolute URL string:
 
-  scheme ":" ["//"] [user ":" passd "@"] host [":" port] ["/"] [path] ["?" query] ["#" fragment]
+  scheme ":" ["//"] [user ":" passwd "@"] host [":" port] ["/"] [path] ["?" query] ["#" fragment]
 
 Returns hasref with parsed url data.
 
 =head2 split_url_path($url_path, [$split_separator])
 
-Split relative url path (with optionally separator) with '/' path separatoe by default.
+Split relative url path (with optionally separator) with '/' path separator by default.
 
 Returns arrayeref with splitted relative url path.
 

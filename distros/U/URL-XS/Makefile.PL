@@ -1,4 +1,4 @@
-use 5.024000;
+use 5.026000;
 use ExtUtils::MakeMaker;
 use Config;
 
@@ -6,7 +6,7 @@ WriteMakefile(
     NAME              => 'URL::XS',
     ABSTRACT_FROM     => 'lib/URL/XS.pm',
     VERSION_FROM      => 'lib/URL/XS.pm',
-    MIN_PERL_VERSION  => '5.24.0',
+    MIN_PERL_VERSION  => '5.26.0',
     PREREQ_PM         => {'XSLoader' => 0,},
     AUTHOR            => 'Peter P. Neuromantic <p.brovchenko@protonmail.com>',
     LICENSE           => 'mit',

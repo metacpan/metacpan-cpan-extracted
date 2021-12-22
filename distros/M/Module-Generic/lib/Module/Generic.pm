@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.18.3
+## Version v0.18.4
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/12/14
+## Modified 2021/12/17
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -59,7 +59,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.18.3';
+    $VERSION     = 'v0.18.4';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -193,7 +193,7 @@ sub as_hash
     $p = shift( @_ ) if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' );
     $p->{_seen} = {} if( !exists( $p->{_seen} ) || !ref( $p->{_seen} ) );
     # $self->message( 3, "Parameters are: ", sub{ $self->dumper( $p ) } );
-    my $class = ref( $self );
+    my $class = ref( $this );
     no strict 'refs';
     my @methods = grep( !/^(?:new|init)$/, grep{ defined &{"${class}::$_"} } keys( %{"${class}::"} ) );
 
@@ -330,23 +330,6 @@ sub clear_error
     $this->{error} = ${ "$class\::ERROR" } = '';
     return( $self );
 }
-
-# sub clone
-# {
-#     my $self  = shift( @_ );
-#     if( Scalar::Util::reftype( $self ) eq 'HASH' )
-#     {
-#         return( bless( { %$self } => ( ref( $self ) || $self ) ) );
-#     }
-#     elsif( Scalar::Util::reftype( $self ) eq 'ARRAY' )
-#     {
-#         return( bless( [ @$self ] => ( ref( $self ) || $self ) ) );
-#     }
-#     else
-#     {
-#         return( $self->error( "Cloning is unsupported for type \"", ref( $self ), "\". Only hash or array references are supported." ) );
-#     }
-# }
 
 sub clone
 {
@@ -925,7 +908,7 @@ sub coloured
 sub debug
 {
     my $self  = shift( @_ );
-    my $class = ref( $self );
+    my $class = ( ref( $self ) || $self );
     my $this  = $self->_obj2h;
     if( @_ )
     {
@@ -1120,7 +1103,7 @@ sub error
         $args->{message} = substr( $args->{message}, 0, $this->{error_max_length} ) if( $max_len > 0 && length( $args->{message} ) > $max_len );
         # Reset it
         $this->{_msg_no_exec_sub} = 0;
-        # XXX Taken from Carp to find the right point in the stack to start from
+        # Note Taken from Carp to find the right point in the stack to start from
         no strict 'refs';
         my $caller_func;
         $caller_func = \&{"CORE::GLOBAL::caller"} if( defined( &{"CORE::GLOBAL::caller"} ) );
@@ -1821,7 +1804,7 @@ sub message_log_io
 {
     #return( shift->_set_get( 'log_io', @_ ) );
     my $self  = shift( @_ );
-    my $class = ref( $self );
+    my $class = ref( $self ) || $self;
     my $this  = $self->_obj2h;
     if( @_ )
     {
@@ -1890,6 +1873,7 @@ sub messagef_colour
 {
     my $self  = shift( @_ );
     my $this  = $self->_obj2h;
+    my $class = ref( $self ) || $self;
     if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
     {
         my @args = @_;
@@ -2003,15 +1987,44 @@ sub noexec { $_[0]->{_msg_no_exec_sub} = 1; return( $_[0] ); }
 
 # Purpose is to get an error object thrown from, possibly another package, 
 # and make it ours and pass it along
+# e.g.:
+# $self->pass_error
+# $self->pass_error( 'Some error that will be passed to error()' );
+# $self->pass_error( $error_object );
+# $self->pass_error( $error_object, { class => 'Some::ExceptionClass' } );
+# $self->pass_error({ class => 'Some::ExceptionClass' });
 sub pass_error
 {
     my $self = shift( @_ );
     my $this = $self->_obj2h;
+    my $opts = {};
     my $err;
-    $err = $_[0] if( scalar( @_ ) );
-    # called with no argument, most likely from the same class to pass on an erro 
-    # set up earlier by another method
-    if( !defined( $err ) && !scalar( @_ ) )
+    my $class;
+    if( scalar( @_ ) )
+    {
+        # Either an hash defining a new error and this will be passed along to error(); or
+        # an hash with a single property: { class => 'Some::ExceptionClass' }
+        if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
+        {
+            $opts = $_[0];
+        }
+        else
+        {
+            # $self->pass_error( $error_object, { class => 'Some::ExceptionClass' } );
+            if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' )
+            {
+                $opts = pop( @_ );
+            }
+            $err = $_[0];
+        }
+    }
+    # We set $class only if the hash provided is a one-element hash and not an error-defining hash
+    $class = CORE::delete( $opts->{class} ) if( scalar( keys( %$opts ) ) == 1 && [keys( %$opts )]->[0] eq 'class' );
+    
+    # called with no argument, most likely from the same class to pass on an error 
+    # set up earlier by another method; or
+    # with an hash containing just one argument class => 'Some::ExceptionClass'
+    if( !defined( $err ) && ( !scalar( @_ ) || defined( $class ) ) )
     {
         if( !defined( $this->{error} ) )
         {
@@ -2020,12 +2033,16 @@ sub pass_error
         else
         {
             $self->message( 3, "Reusing previously set error object: $this->{error}" );
-            $err = $this->{error};
+            $err = ( defined( $class ) ? bless( $this->{error} => $class ) : $this->{error} );
         }
     }
-    elsif( defined( $err ) && Scalar::Util::blessed( $err ) && scalar( @_ ) == 1 )
+    elsif( defined( $err ) && 
+           Scalar::Util::blessed( $err ) && 
+           ( scalar( @_ ) == 1 || 
+             ( scalar( @_ ) == 2 && defined( $class ) ) 
+           ) )
     {
-        $this->{error} = ${ $class . '::ERROR' } = $err;
+        $this->{error} = ${ $class . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
     }
     # If the error provided is not an object, we call error to create one
     else
@@ -2383,6 +2400,8 @@ sub _is_hash
     return( Scalar::Util::reftype( $_[1] ) eq 'HASH' );
 }
 
+sub _is_integer { return( $_[1] =~ /^[\+\-]?\d+$/ ? 1 : 0 ); }
+
 sub _is_ip
 {
     my $self = shift( @_ );
@@ -2491,12 +2510,12 @@ sub _parse_timestamp
 {
     my $self = shift( @_ );
     my $str  = shift( @_ );
-    ## No value was actually provided
+    # No value was actually provided
     return if( !length( $str ) );
     $str = "$str";
     my $this = $self->_obj2h;
-    # my $tz = DateTime::TimeZone->new( name => 'local' );
-    my $tz = DateTime::TimeZone->new( name => 'Europe/Berlin' );
+    my $tz = DateTime::TimeZone->new( name => 'local' );
+    # my $tz = DateTime::TimeZone->new( name => 'Europe/Berlin' );
     unless( DateTime->can( 'TO_JSON' ) )
     {
         no warnings 'once';
@@ -2869,12 +2888,14 @@ sub _parse_timestamp
         }
     }
     # <https://en.wikipedia.org/wiki/Date_format_by_country>
-    elsif( $str =~ /^\d{1,10}$/ )
+    # Possibly followed by a dot and some integer for milliseconds as provided by Time::HiRes
+    elsif( $str =~ /^\d{1,10}(?:\.\d+)?$/ )
     {
         try
         {
+            # $self->message( 4, "Got here for epoch '$str'" );
             my $dt = DateTime->from_epoch( epoch => $str, time_zone => 'local' );
-            $opt->{pattern} = '%s';
+            $opt->{pattern} = ( CORE::index( $str, '.' ) != -1 ? '%s.%N' : '%s' );
             my $strp = DateTime::Format::Strptime->new( %$opt );
             $dt->set_formatter( $strp );
             return( $dt );
@@ -3123,7 +3144,7 @@ sub __create_class
         $new_class =~ tr/-/_/;
         $new_class =~ s/\_{2,}/_/g;
         $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
-        $class = ref( $self ) . "\::${new_class}";
+        $class = ( ref( $self ) || $self ) . "\::${new_class}";
     }
     unless( Class::Load::is_class_loaded( $class ) )
     {
@@ -3399,6 +3420,7 @@ sub _set_get_datetime : lvalue
             # Found a parsed datetime value
             # $data->{ $field } = $now;
             # return( $now );
+            # $self->message( 4, "Got a timestamp '$now' from _parse_timestamp" );
         }
         
         # $self->message( 3, "Creating a DateTime object out of $time\n" );
@@ -3504,8 +3526,15 @@ sub _set_get_file : lvalue
     {
         my $val = Module::Generic::File->new( $arg ) || do
         {
-            return( $self->pass_error( Module::Generic::File->error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->pass_error( Module::Generic::File->error ) );
+            my $error = Module::Generic::File->error;
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
         };
         $data->{ $field } = $val;
         my $dummy = 'dummy';
@@ -3665,7 +3694,7 @@ sub _set_get_hash_as_object
             $new_class =~ tr/-/_/;
             $new_class =~ s/\_{2,}/_/g;
             $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
-            $class = ref( $self ) . "\::${new_class}";
+            $class = ( ref( $self ) || $self ) . "\::${new_class}";
         }
         elsif( ref( $_[0] ) )
         {
@@ -3682,7 +3711,7 @@ sub _set_get_hash_as_object
         $new_class =~ tr/-/_/;
         $new_class =~ s/\_{2,}/_/g;
         $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
-        $class = ref( $self ) . "\::${new_class}";
+        $class = ( ref( $self ) || $self ) . "\::${new_class}";
     }
     # my $class = shift( @_ );
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
@@ -3702,7 +3731,7 @@ BEGIN
 
 EOT
         my $rc = eval( $perl );
-        die( "Unable to dynamically create module \"$class\" for field \"$field\" based on our own class \"", ref( $self ), "\": $@" ) if( $@ );
+        die( "Unable to dynamically create module \"$class\" for field \"$field\" based on our own class \"", ( ref( $self ) || $self ), "\": $@" ) if( $@ );
     }
     
     if( @_ )
@@ -4885,7 +4914,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.18.3
+    v0.18.4
 
 =head1 DESCRIPTION
 
@@ -5804,6 +5833,10 @@ It would rather return the module package name: C<My::Module>
 =head2 _is_hash
 
 Same as L</"_is_array">, but for hash reference.
+
+=head2 _is_integer
+
+Returns true if the value provided is an integer, or false otherwise. A valid value includes an integer starting with C<+> or C<->
 
 =head2 _is_ip
 

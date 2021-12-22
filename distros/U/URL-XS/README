@@ -21,7 +21,7 @@ URL::XS   632644/s     1024%      422%        4%       --
 
 DEPENDENCES & REQUIRES
 
-Required Perl >= v5.24.0
+Required Perl >= v5.26.0
 
 INSTALLATION
 
@@ -51,6 +51,11 @@ From perl code:
 
   my $url = 'http://localhost:8989/path/to/test?query=yes#frag=1';
   my $parsed_url = URL::XS::parse_url($url);
+
+SEE ALSO
+
+Perl doc - https://metacpan.org/pod/URL::XS
+libyuarel - https://github.com/jacketizer/libyuarel
 
 COPYRIGHT AND LICENCE
 

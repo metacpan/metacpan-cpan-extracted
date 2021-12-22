@@ -36,6 +36,18 @@ CODE:
     hv_store(result, "host",   4, newSVpv(y.host,   strlen(y.host)  ), 0);
     hv_store(result, "port",   4, newSViv(y.port),                     0);
 
+    if (y.username == NULL) {
+        hv_store(result, "username", 8, &PL_sv_undef, 0);
+    } else {
+        hv_store(result, "username", 8, newSVpv(y.username, strlen(y.username)), 0);
+    }
+
+    if (y.password == NULL) {
+        hv_store(result, "password", 8, &PL_sv_undef, 0);
+    } else {
+        hv_store(result, "password", 8, newSVpv(y.password, strlen(y.password)), 0);
+    }
+
     if (y.path == NULL) {
         hv_store(result, "path", 4, &PL_sv_undef, 0);
     } else {

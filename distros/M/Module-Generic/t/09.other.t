@@ -183,7 +183,16 @@ subtest 'parse datetime' => sub
     for( my $i = 0; $i < scalar( @$dates ); $i++ )
     {
         my $def = $dates->[$i];
+        # XXX
+        if( $def->{test} eq '1626475051' )
+        {
+            $o->debug( $DEBUG );
+        }
         my $dt = $o->_parse_timestamp( $def->{test} );
+        if( $def->{test} eq '1626475051' )
+        {
+            $o->debug(0);
+        }
         diag( "Failed to get the datetime object -> ", $o->error ) if( !defined( $dt ) );
         isa_ok( $dt, 'DateTime', "DateTime object for $def->{test}" );
         is( "$dt", $def->{expect}, "stringification for $def->{test}" );

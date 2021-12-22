@@ -1,0 +1,6 @@
+Revision history for Perl extension qq.
+
+0.01  Mon Dec 20 20:47:33 2021
+	- original version; created by h2xs 1.23 with options
+		-AXn qq
+

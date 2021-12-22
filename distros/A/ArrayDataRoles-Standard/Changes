@@ -1,3 +1,8 @@
+0.007   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add role & module: LinesInFile.
+
+
 0.006   2021-05-10  Released-By: PERLANCAR; Urgency: medium
 
 	- ArrayDataRole::Source::LinesInDATA: provides fh, fh_min_offset,

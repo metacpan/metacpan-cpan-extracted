@@ -7,6 +7,7 @@ XS.xs
 src/yuarel.c
 src/yuarel.h
 lib/URL/XS.pm
-t/base.t
+t/01_base.t
+t/02_parse_url.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

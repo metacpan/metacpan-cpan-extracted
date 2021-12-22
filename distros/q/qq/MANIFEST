@@ -1,0 +1,11 @@
+Changes
+lib/qq.pm
+Makefile.PL
+MANIFEST
+qq-0.01.tar.gz
+qq-0.02.tar.gz
+README
+script/qq
+t/qq.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

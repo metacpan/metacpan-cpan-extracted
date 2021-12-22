@@ -1,0 +1,46 @@
+---
+abstract: 'Parse and query I<BarMap> mappings.'
+author:
+  - 'Felix Kuehnl <felix@bioinf.uni-leipzig.de>'
+build_requires:
+  Test::Exception: '0.43'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-RNA-BarMap
+provides:
+  Bio::RNA::BarMap:
+    file: lib/Bio/RNA/BarMap.pm
+    version: '0.01'
+  Bio::RNA::BarMap::Mapping:
+    file: lib/Bio/RNA/BarMap/Mapping.pm
+    version: '0.01'
+  Bio::RNA::BarMap::Mapping::FileMappingEntry:
+    file: lib/Bio/RNA/BarMap/Mapping/FileMappingEntry.pm
+    version: '0.01'
+  Bio::RNA::BarMap::Mapping::MinMappingEntry:
+    file: lib/Bio/RNA/BarMap/Mapping/MinMappingEntry.pm
+    version: '0.01'
+  Bio::RNA::BarMap::Mapping::Set:
+    file: lib/Bio/RNA/BarMap/Mapping/Set.pm
+    version: '0.01'
+  Bio::RNA::BarMap::Mapping::Type:
+    file: lib/Bio/RNA/BarMap/Mapping/Type.pm
+    version: '0.01'
+requires:
+  File::Spec: '3.75'
+  IPC::System::Simple: '1.25'
+  List::Util: '1.5'
+  Moose: '2.2011'
+  MooseX::StrictConstructor: '0.21'
+  Scalar::Util: '1.5'
+  autodie: '2.29'
+  namespace::autoclean: '0.28'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

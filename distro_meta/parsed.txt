@@ -76250,3 +76250,10 @@ H/HM/HMBRAND/Text-CSV_XS-1.47.tgz
 D/DO/DORNER/UI-Various-0.06.tar.gz
 M/MA/MAMAWE/WebService-Leanpub-v0.3.1.tar.gz
 P/PE/PERLANCAR/WordList-Test-Dynamic-Number-10Million-0.005.tar.gz
+P/PE/PERLANCAR/ArrayDataRoles-Standard-0.007.tar.gz
+F/FE/FELIXK/BioRNABarMap/Bio-RNA-BarMap-0.01.tar.gz
+S/SK/SKIM/Data-Kramerius-0.05.tar.gz
+J/JD/JDEGUEST/Markdown-Parser-v0.1.1.tar.gz
+J/JD/JDEGUEST/Module-Generic-v0.18.4.tar.gz
+R/RA/RAJ/qq-0.02.tar.gz
+B/BR/BRDUCH/URL-XS-0.3.1.tar.gz
