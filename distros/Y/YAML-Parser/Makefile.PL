@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "YAML::PP" => "0.026",
     "boolean" => "0.46"
   },
-  "VERSION" => "0.0.4",
+  "VERSION" => "0.0.5",
   "test" => {
     "TESTS" => "t/*.t"
   }

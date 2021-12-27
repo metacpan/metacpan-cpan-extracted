@@ -33,6 +33,8 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   ['schema=s', 'the filename to use for the schema (if not provided, STDIN is used'],
 );
 
+print($usage->text), exit if $opt->help;
+
 my ($data, $schema) = delete $opt->@{qw(data schema)};
 
 if (defined $data) {
@@ -62,7 +64,7 @@ my $result = $js->evaluate($encoder->decode($data), $encoder->decode($schema));
 
 say $encoder->encode($result->TO_JSON);
 
-exit ($result ? 0 : -1);
+exit($result ? 0 : 1);
 
 __END__
 
@@ -76,7 +78,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.533
+version 0.534
 
 =head1 SYNOPSIS
 
@@ -121,7 +123,8 @@ produces output:
     ]
   }
 
-The exit value is 0 when the result is valid, and -1 otherwise.
+The exit value (C<$?>) is 0 when the result is valid, 1 when it is invalid,
+and some other non-zero value if an exception occurred.
 
 =head1 OPTIONS
 

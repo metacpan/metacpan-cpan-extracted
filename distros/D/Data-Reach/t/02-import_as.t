@@ -33,12 +33,14 @@ is walk_down($data, qw/foo 3/),             1234,          'multistep short';
 sub dies_ok (&$;$) {
   my ($coderef, $regex, $message) = @_;
   eval {$coderef->()};
-  like $@, $regex, $message;
+  my $err = $@;
+
+  like $err, $regex, $message;
 }
 
 # lexically-scoped "use Data::Reach" should not mess up with imported names
 bless $data, 'RealClass'; # defined below
-{ use Data::Reach call_method => [qw/dap dip dup/]; # no explicit import
+{ use Data::Reach reach_method => 'dup'; # no explicit import
   is walk_down($data, qw/foo/), "foofoo",              'call_method arrayref';
   dies_ok sub {walk_down($data, qw/foo 3/)},
           qr/within a SCALAR/,                         'call_method dup (2-steps)';
@@ -46,7 +48,7 @@ bless $data, 'RealClass'; # defined below
   dies_ok sub {reach($data, qw/foo 3/)},
           qr/Undefined subroutine/,                    'did not import "reach"';
 }
-{ use Data::Reach call_method => 'dup', as => 'walk_down'; # same import
+{ use Data::Reach reach_method => 'dup', as => 'walk_down'; # same import
   is walk_down($data, qw/foo/), "foofoo",              'call_method arrayref';
 }
 

@@ -12,7 +12,7 @@ YAML::Parser - Generated Reference Parser for YAML 1.2
 
 =head1 VERSION
 
-This document describes L<YAML::Parser> version B<0.0.4>.
+This document describes L<YAML::Parser> version B<0.0.5>.
 
 =head1 SYNOPSIS
 

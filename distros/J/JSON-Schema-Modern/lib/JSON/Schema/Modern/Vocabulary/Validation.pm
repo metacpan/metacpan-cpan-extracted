@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.533';
+our $VERSION = '0.534';
 
 use 5.020;
 use Moo;
@@ -59,11 +59,10 @@ sub _traverse_keyword_type ($self, $schema, $state) {
 
 sub _eval_keyword_type ($self, $data, $schema, $state) {
   if (is_plain_arrayref($schema->{type})) {
-    # return 1 if any { is_type($_, $data) } $schema->{type}->@*;
-    foreach my $type ($schema->{type}->@*) {
-      return 1 if is_type($type, $data)
-        or ($type eq 'boolean' and $state->{scalarref_booleans} and is_type('reference to SCALAR', $data));
-    }
+    return 1 if any {
+      is_type($_, $data)
+        or ($_ eq 'boolean' and $state->{scalarref_booleans} and is_type('reference to SCALAR', $data))
+    } $schema->{type}->@*;
     return E($state, 'wrong type (expected one of %s)', join(', ', $schema->{type}->@*));
   }
   else {
@@ -323,7 +322,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.533
+version 0.534
 
 =head1 DESCRIPTION
 

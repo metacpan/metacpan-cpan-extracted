@@ -15,6 +15,7 @@ my $builder = Module::Build->new(
     test_requires => {
         'Test::More'       => 0,
         'Test::NoWarnings' => 0,
+        'Object::MultiType'=> 0,
     },
     requires => {
         perl                => 5.010,

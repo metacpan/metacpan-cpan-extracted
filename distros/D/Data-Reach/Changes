@@ -1,5 +1,8 @@
 Revision history for Data-Reach
 
+2.00    27.12.2021
+        additional functions : map_paths() and each_path()
+
 1.00    13.07.2015
         Initial release
 

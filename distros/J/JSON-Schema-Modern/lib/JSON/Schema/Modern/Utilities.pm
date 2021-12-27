@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.533';
+our $VERSION = '0.534';
 
 use 5.020;
 use strictures 2;
@@ -74,12 +74,13 @@ sub is_type ($type, $value) {
       return $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
     }
 
+    # FIXME: Storable twiddles the PV flag when isUV. https://github.com/Perl/perl5/issues/19296
     if ($type eq 'number') {
-      return !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
+      return (!($flags & B::SVf_POK) || $flags & B::SVf_IVisUV) && ($flags & (B::SVf_IOK | B::SVf_NOK));
     }
 
     if ($type eq 'integer') {
-      return !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK))
+      return (!($flags & B::SVf_POK) || $flags & B::SVf_IVisUV) && ($flags & (B::SVf_IOK | B::SVf_NOK))
         && int($value) == $value;
     }
   }
@@ -103,7 +104,7 @@ sub get_type ($value) {
 
   my $flags = B::svref_2object(\$value)->FLAGS;
   return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
-  return 'number' if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
+  return 'number' if (!($flags & B::SVf_POK) || $flags & B::SVf_IVisUV) && ($flags & (B::SVf_IOK | B::SVf_NOK));
 
   croak sprintf('ambiguous type for %s',
     JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 0)->encode($value));
@@ -352,7 +353,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.533
+version 0.534
 
 =head1 SYNOPSIS
 

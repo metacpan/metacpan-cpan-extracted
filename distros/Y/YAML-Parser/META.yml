@@ -28,6 +28,6 @@ resources:
   bugtracker: https://github.com/ingydotnet/yaml-parser-pm/issues
   homepage: https://github.com/ingydotnet/yaml-parser-pm
   repository: https://github.com/ingydotnet/yaml-parser-pm.git
-version: 0.0.4
+version: 0.0.5
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

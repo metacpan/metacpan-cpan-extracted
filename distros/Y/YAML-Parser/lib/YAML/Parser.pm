@@ -5,7 +5,7 @@
 use v5.12;
 package YAML::Parser;
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 use XXX;
 
@@ -4029,6 +4029,10 @@ sub new {
 sub parse {
   my ($self, $input) = @_;
 
+  $input .= "\n" unless
+    length($input) == 0 or
+    $input =~ /\n\z/;
+
   $input = decode_utf8($input)
     unless Encode::is_utf8($input);
   $self->{input} = $input;
@@ -4560,15 +4564,30 @@ name 'auto_detect_indent', \&auto_detect_indent;
 
 sub auto_detect {
   my ($self, $n) = @_;
-  substr($self->{input}, $self->{pos}) =~ /^.*\n((?:\ *\n)*)(\ *)/
-    or return 1;
+  substr($self->{input}, $self->{pos}) =~ /
+    ^.*\n
+    (
+      (?:\ *\n)*
+    )
+    (\ *)
+    (.?)
+  /x;
   my $pre = $1;
-  my $m = length($2) - $n;
-  $m = 1 if $m < 1;
+  my $m;
+  if (defined $3 and length($3)) {
+    $m = length($2) - $n;
+  }
+  else {
+    $m = 0;
+    while ($pre =~ /\ {$m}/){
+      $m++;
+    }
+    $m = $m - $n - 1;
+  }
   # XXX change 'die' to 'error' for reporting parse errors
   die "Spaces found after indent in auto-detect (5LLU)"
-    if $pre =~ /^.{$m}./m;
-  return $m;
+    if $m > 0 and $pre =~ /^.{$m}\ /m;
+  return($m == 0 ? 1 : $m);
 }
 name 'auto_detect', \&auto_detect;
 
@@ -4980,6 +4999,9 @@ sub got__c_l_literal {
   }
   elsif ($t eq 'strip') {
     $text =~ s/\n+\z//;
+  }
+  elsif ($text !~ /\S/) {
+    $text =~ s/\n(\n+)\z/$1/;
   }
   $self->add(scalar_event(literal => $text));
 }

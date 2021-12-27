@@ -5,8 +5,12 @@ use Carp         qw/carp croak/;
 use Scalar::Util qw/blessed reftype/;
 use overload;
 
-our $VERSION    = '1.00';
+our $VERSION    = '2.00';
 
+
+#======================================================================
+# reach() and utility functions
+#======================================================================
 # main entry point
 sub reach ($@) {
   my ($root, @path) = @_;
@@ -59,20 +63,17 @@ sub _step_down_obj {
 
   # pragmata that may modify our algorithm -- see L<perlpragma>
   my $hint_hash = (caller(1))[10];
-  my $use_overloads = $hint_hash->{'Data::Reach::use_overloads'} // 1; # default
-  my $peek_blessed  = $hint_hash->{'Data::Reach::peek_blessed'}  // 1; # default
+  my $use_overloads = $hint_hash->{'Data::Reach/use_overloads'} // 1; # default
+  my $peek_blessed  = $hint_hash->{'Data::Reach/peek_blessed'}  // 1; # default
 
   # choice 1 : call named method in object
-  my @call_method = split $;, $hint_hash->{'Data::Reach::call_method'} || '';
- METH_NAME:
-  foreach my $meth_name (@call_method) {
-    my $meth =$obj->can($meth_name)
-      or next METH_NAME;
-    return $obj->$meth($key);
-  }
+  my $meth_name = $hint_hash->{'Data::Reach/reach_method'} || '';
+  return $obj->$meth_name($key) if $obj->can($meth_name);
 
   # choice 2 : use overloaded methods -- active by default
   if ($use_overloads) {
+    # overloaded array dereferencing is tried first but only if the key is numeric.
+    # Otherwise, the hash dereferencing is tried.
     return $obj->[$key] if overload::Method($obj, '@{}')
                         && $key =~ /^-?\d+$/;
     return $obj->{$key} if overload::Method($obj, '%{}');
@@ -88,59 +89,180 @@ sub _step_down_obj {
 }
 
 
+#======================================================================
+# map_paths()
+#======================================================================
 
-# the 'import' method does 2 things : a) export the 'reach' function,
+sub map_paths (&+;$$$); # the prototype must be declared beforehand, because the sub is recursive
+sub map_paths (&+;$$$) {
+  my ($coderef, $tree, $max_depth, $path, $recurse)= @_;
+  $max_depth  //= -1;
+  $path       //= [];                                        # only used for recursive calls
+  $recurse    //= reftype $tree // '';                       # only used for recursive calls
+
+  my $hint_hash             = (caller(1))[10];
+  my $ignore_empty_subtrees = ! $hint_hash->{'Data::Reach/keep_empty_subtrees'};
+
+  if ($max_depth) {
+    if ($recurse eq 'ARRAY' and (@$tree or $ignore_empty_subtrees)) {
+      return map {map_paths(\&$coderef, $tree->[$_], $max_depth-1, [@$path, $_])} 0 .. $#$tree;
+    }
+    elsif ($recurse eq 'HASH' and (my @k = sort keys %$tree or $ignore_empty_subtrees)) {
+      return map {map_paths(\&$coderef, $tree->{$_}, $max_depth-1, [@$path, $_])} @k;
+    }
+    elsif (blessed $tree) {
+      # try to call named method in object
+      if (my $meth_name = $hint_hash->{'Data::Reach/paths_method'}) {
+        if ($tree->can($meth_name)) {
+          my @paths = $tree->$meth_name();
+          return map {map_paths(\&$coderef, reach($tree, $_), $max_depth-1, [@$path, $_])} @paths;
+        }
+      }
+
+      # otherwise, try to use overloaded methods, or else use the object's internal representation (if allowed)
+      my $use_overloads = $hint_hash->{'Data::Reach/use_overloads'} // 1; # default
+      my $peek_blessed  = $hint_hash->{'Data::Reach/peek_blessed'}  // 1; # default
+      $recurse = $use_overloads && overload::Method($tree, '@{}') ? 'ARRAY'
+               : $use_overloads && overload::Method($tree, '%{}') ? 'HASH'
+               : $peek_blessed                                    ? reftype $tree
+               :                                                    undef;
+
+      # recursive call if appropriate
+      return map_paths(\&$coderef, $tree, $max_depth, $path, $recurse) if $recurse;
+
+      # if all else failed, treat this object as an opaque leaf (see base case below)
+    }
+  }
+
+  # base case
+  for ($tree) {return $coderef->(@$path)};                   # @_ contains the path, $_ contains the leaf
+}
+
+
+
+#======================================================================
+# each_path()
+#======================================================================
+
+sub each_path (+;$) {
+  my ($tree, $max_depth) = @_;
+  $max_depth //= -1;
+  my $hint_hash = (caller(1))[10];
+  my $use_overloads       = $hint_hash->{'Data::Reach/use_overloads'} // 1; # default
+  my $peek_blessed        = $hint_hash->{'Data::Reach/peek_blessed'}  // 1; # default
+  my $keep_empty_subtrees = $hint_hash->{'Data::Reach/keep_empty_subtrees'};
+
+  # local boolean variable to avoid returning the same result multiple times
+  my $is_consumed = 0;
+
+  # closure to be used at tree leaves
+  my $leaf = sub {return $is_consumed++ ? () : ([], $tree)};
+
+  my $paths_method = $hint_hash->{'Data::Reach/paths_method'};
+  my $recurse = !blessed $tree                                   ? reftype $tree
+              : $paths_method  && $tree->can($paths_method)      ? 'OBJECT'
+              : $use_overloads && overload::Method($tree, '@{}') ? 'ARRAY'
+              : $use_overloads && overload::Method($tree, '%{}') ? 'HASH'
+              : $peek_blessed                                    ? reftype $tree
+              :                                                    undef;
+
+  # either this tree is a leaf, or we must recurse into subtrees
+  if (!$recurse || $recurse !~ /^(OBJECT|HASH|ARRAY)$/ || !$max_depth) {
+    return $leaf;
+  }
+  else {
+    my @paths = $recurse eq 'OBJECT' ? $tree->$paths_method()
+              : $recurse eq 'HASH'   ? sort keys %$tree
+              : $recurse eq 'ARRAY'  ? (0 .. $#$tree)
+              :                        ();
+    if (!@paths && $keep_empty_subtrees) {
+      return $leaf;
+    }
+    else {
+      my $next_subpath;                                          # iterator into next subtree
+
+      return sub {
+        while (1) {
+          if (!$next_subpath) {                                  # if there is no current iterator
+            if (!$is_consumed && @paths) {                       # if there is a chance to get a new iterator
+              my $subtree   = reach $tree, $paths[0];
+              $next_subpath = each_path($subtree, $max_depth-1); # build an iterator on next subtree
+            }
+            else {                                               # end of data
+              $is_consumed++;
+              return ();
+            }
+          }
+          if (my ($subpath, $subval) = $next_subpath->()) {      # try to get content from the current iterator
+            return ([$paths[0], @$subpath], $subval);            # found a path, return it
+          }
+          else {                                                 # mark that the iterator on this subtree ..
+            $next_subpath = undef;                               # .. is finished and move to the next data item
+            shift @paths;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+#======================================================================
+# class methods: import and unimport
+#======================================================================
+
+# the 'import' method does 2 things : a) export the required functions,
 # like the regular Exporter, but possibly with a change of name;
 # b) implement optional changes to the algorithm, lexically scoped
 # through the %^H hint hash (see L<perlpragma>).
 
-my %seen_pkg; # remember which packages we already exported into
+my $exported_functions = qr/^(?: reach | each_path | map_paths )$/x;
+my $hint_options       = qr/^(?: peek_blessed | use_overloads | keep_empty_subtrees )$/x;
 
 sub import {
   my $class = shift;
-  my $pkg = caller;
-  my $export_as;
+  my $pkg   = caller;
 
-  # cheap parsing of import parameters -- I wish I could implement that
-  # with given/when, but unfortunately those constructs were dropped in v5.18.
+  # defaults
+  my %export_as = map {($_ => $_)} qw/reach each_path map_paths/ if !@_;
+  my $last_func = 'reach';
+
+  # loop over args passed to import()
   while (my $option = shift) {
-    if ($option eq 'reach') {
-      $export_as = 'reach';
+    if ($option =~ $exported_functions) {
+      $export_as{$option} = $option;
+      $last_func          = $option;
     }
     elsif ($option eq 'as') {
-      $export_as = shift;
-      defined $export_as
+      my $alias = shift
         or croak "use Data::Reach : no export name after 'as'";
+      $export_as{$last_func} = $alias;
     }
-    elsif ($option eq 'call_method') {
-      my $methods = shift
-        or croak "use Data::Reach : no method name after 'call_method'";
-      $methods = join $;, @$methods if (ref $methods || '') eq 'ARRAY';
-      $^H{"Data::Reach::call_method"} = $methods;
+    elsif ($option =~ /^(reach|call)_method$/) {
+      warn q{"use Data::Reach call_method => .." is obsolete; use "reach_method => .."} if $1 eq 'call';
+      my $method = shift
+        or croak "use Data::Reach : no method name after 'reach_method'";
+      $^H{"Data::Reach/reach_method"} = $method;
     }
-    elsif ($option eq 'peek_blessed') {
-      $^H{"Data::Reach::peek_blessed"} = 1;
+    elsif ($option eq 'paths_method') {
+      my $method = shift
+        or croak "use Data::Reach : no method name after 'paths_method'";
+      $^H{"Data::Reach/paths_method"} = $method;
     }
-    elsif ($option eq 'use_overloads') {
-      $^H{"Data::Reach::use_overloads"} = 1;
+    elsif ($option =~ $hint_options) {
+      $^H{"Data::Reach/$option"} = 1;
     }
     else {
       croak "use Data::Reach : unknown option : $option";
     }
   }
 
-  # export the 'reach' function into caller's package, under name $export_as
-  if (! exists $seen_pkg{$pkg}) {
-    $export_as //= 'reach'; # default export name
-    if ($export_as) {       # because it could be an empty string
-      no strict 'refs';
-      *{$pkg . "::" . $export_as} = \&reach;
-    }
-    $seen_pkg{$pkg} = $export_as;
-  }
-  elsif ($export_as && $export_as ne $seen_pkg{$pkg}) {
-    carp "ignored request to import Data::Reach::reach as '$export_as' into "
-       . "package $pkg, because it was already imported as '$seen_pkg{$pkg}'!";
+  # export into caller's package, under the required alias names
+  while (my ($func, $alias) = each %export_as) {
+    no strict 'refs';
+    *{$pkg . "::" . $alias} = \&$func if $alias;
   }
 }
 
@@ -148,7 +270,7 @@ sub import {
 sub unimport {
   my $class = shift;
   while (my $option = shift) {
-    $^H{"Data::Reach::$option"} = '';
+    $^H{"Data::Reach/$option"} = '' if $option =~ $hint_options;
     # NOTE : mark with a false value, instead of deleting from the
     # hint hash, in order to distinguish options explicitly turned off
     # from default options
@@ -163,41 +285,70 @@ __END__
 
 =head1 NAME
 
-Data::Reach - Walk down a datastructure, without autovivification
+Data::Reach - Walk down or iterate through a nested Perl datastructure
 
 =head1 SYNOPSIS
 
-    # regular use
+    # reach a subtree or a leaf under a nested datastructure
     use Data::Reach;
-    my $node = reach $data_tree, @path;
+    my $node = reach $data_tree, @path; # @path may contain a mix of hash keys and array indices
+
+    # do something with all paths through the datastructure ..
+    my @result = map_paths {do_something_with(\@_, $_)} $data_tree;
+
+    # .. or loop through all paths
+    my $next_path = each_path $data_tree;
+    while (my ($path, $val) = $next_path->()) {
+      do_something_with($path, $val);
+    }
 
     # import under a different name
-    use Data::Reach as => 'walk_down';
+    use Data::Reach reach => as => 'walk_down';
     my $node = walk_down $data_tree, @path;
 
     # optional changes of algorithm, lexically scoped
     { no Data::Reach  qw/peek_blessed use_overloads/;
-      use Data::Reach call_method => [qw/foo bar/];
+      use Data::Reach reach_method => [qw/foo bar/];
       my $node = reach $object_tree, @path;
     }
     # after end of scope, back to the regular algorithm
 
 =head1 DESCRIPTION
 
-The C<reach> function walks down a nested datastructure of hashrefs
-and arrayrefs, choosing the next subnode at each step according to the
-next key supplied in C<@path>. If there is no such sequence of
-subnodes, C<undef> is returned. No autovivification nor any writing
-into the datastructure is ever performed. Missing data merely returns
-C<undef>, while wrong use of data (for example looking into an
-arrayref with a non-numerical index) generates an exception.  Blessed
-objects within the datastructure are generally treated just like raw,
-unblessed datastructures; however that behaviour can be changed
-through pragma options.
+Perl supports nested datastructures : a hash may contain references to
+other hashes or to arrays, which in turn may contain further references
+to deeper structures -- see L<perldsc>. Walking down through such
+structures usually involves nested loops, and possibly some tests on
+C<ref $subtree> for finding out if the next level is an arrayref or a hashref.
 
-B<Note>: this code doesn't do much, actually; but after having copy-pasted
-similar stuff into several of my applications, I finally decided that
-it was worth a CPAN distribution on its own. The L</"SEE ALSO"> section
+The present module offers some utilities for easier handling of nested
+datastructures :
+
+=over
+
+=item *
+
+the C<reach> function finds a subtree or a leaf according to a given
+C<@path> -- a list of hash keys or array indices. If there is no data
+corresponding to that path, C<undef> is returned, without any autovivification
+within the tree.
+
+=item *
+
+the C<map_paths> function applies a given code reference to all paths within the nested
+datastructure.
+
+
+=item *
+
+the C<each_path> function returns an iterator over the nested datastructure; it can be
+used in the same spirit as a regular C<each> statement over a simple hash, except that it will
+walk down multiple levels until finding leaf nodes
+
+=back
+
+
+The L</"SEE ALSO"> section
 below discusses some alternative implementations.
 
 
@@ -254,6 +405,68 @@ to a scalar, reference to a reference, etc.), an error is generated.
 
 =back
 
+No autovivification nor any writing into the datastructure is ever
+performed. Missing data merely returns C<undef>, while wrong use of
+data (for example looking into an arrayref with a non-numerical index)
+generates an exception.
+
+By default, blessed objects are treated just like raw, unblessed
+datastructures; however that behaviour can be changed through
+pragma options, as described below.
+
+
+=head2 map_paths
+
+  my @result = map_paths { ... } $data_tree [, $max_depth];
+
+Applies the given block to each path within C<$data_tree>, returning the list
+of collected results. Within the block, C<@_> contains the
+sequence of hash keys or array indices that were traversed, and C<$_> is aliased to
+the leaf node. Hence, for a C<$data_tree> of shape :
+
+  { foo => [ undef,
+             'abc',
+             {bar => {buz => 987}},
+             1234,
+            ],
+    empty_slot  => undef,
+    qux         => 'qux',  }
+
+the block will be called six times, with the following values
+
+  # value of @_              value of $_
+  # ===========              ===========
+   ('empty_slot,')             undef
+   ('foo', 0)                  undef
+   ('foo', 1)                  'abc'
+   ('foo', 2, 'bar', 'buz')     987
+   ('foo', 3)                  1234
+   ('qux')                     'qux'
+
+The optional C<$max_depth> argument limits the depth of tree traversal : subtrees
+below that depth will be treated as leaves.
+
+The C<$data_tree> argument is usually a reference to a hash or to an array;
+but it can also be supplied directly as a hash or array -- this will be automatically
+converted into a reference.
+
+By default, blessed objects are treated just like raw, unblessed
+datastructures; however that behaviour can be changed through
+pragma options, as described below.
+
+
+=head2 each_path
+
+  my $next_path_iterator = each_path $data_tree [, $max_depth];
+  while (my ($path, $val) = $next_path_iterator->()) {
+    do_something_with($path, $val);
+  }
+
+Returns an iterator function that will walk through the datastructure.
+Each call to the iterator will return a pair C<($path, $val)>, where
+C<$path> is an arrayref that contains the sequence of hash keys or
+array indices that were traversed, and C<$val> is the leaf node.
+
 By default, blessed objects are treated just like raw, unblessed
 datastructures; however that behaviour can be changed through
 pragma options, as described below.
@@ -261,52 +474,44 @@ pragma options, as described below.
 
 =head1 IMPORT INTERFACE
 
-=head2 Exporting the 'reach' function
+=head2 Exporting the 'reach', 'map_paths' and 'each_path' functions
 
-The 'reach' function is exported by default when C<use>ing this module,
-as in :
+The 'reach', 'map_paths' and 'each_path' functions are exported by default
+when C<use>ing this module :
 
   use Data::Reach;
-  use Data::Reach qw/reach/; # equivalent to the line above
+  use Data::Reach qw/reach map_paths each_path/; # equivalent to the line above
 
-However the exported name can be changed through the C<as> option :
+However the exported names can be changed through the C<as> option :
 
-  use Data::Reach as => 'walk_down';
+  use Data::Reach reach => as => 'walk_down', map_paths => as => 'find_subtrees';
   my $node = walk_down $data, @path;
-
-The same can be done with an empty string in order to prevent any export.
-In that case, the fully qualified name must be used to call the
-C<reach> function :
-
-  use Data::Reach as => '';      # equivalent to "use Data::Reach ();"
-  my $node = Data::Reach::reach $data, @path;
 
 
 =head2 Pragma options for reaching within objects
 
 Arguments to the import method may also change the algorithm used to
-C<reach> within objects. These options can be turned on or off as
-lexical pragmata; this means that the effect of change of algorithm
-is valid until the end of the current scope (see L<perlfunc/use>,
-L<perlfunc/no> and L<perlpragma>).
+deal with objects met while traversing the datastructure. These
+options can be turned on or off as lexical pragmata; this means that
+the effect of change of algorithm is valid until the end of the
+current scope (see L<perlfunc/use>, L<perlfunc/no> and L<perlpragma>).
 
 =over
 
-=item C<call_method>
+=item C<reach_method>
 
-  use Data::Reach call_method => 'foo';         # just one method
-  use Data::Reach call_method => [qw/foo bar/]; # an ordered list of methods
+  use Data::Reach reach_method => $method_name;
 
 If the target object possesses a method corresponding to the
-name(s) specified, that method will be called, with a single
+name specified, that method will be called, with a single
 argument corresponding to the current value in path.
 The method is supposed to reach down one step into the
 datastructure and return the next data subtree or leaf.
 
-The presence of one of the required methods is the first
+The presence this method is the first
 choice for reaching within an object. If this cannot be applied,
 either because there was no required method, or because the
-target object has none of them, then the second choice
+target object has no such method, then the second choice
 is to use overloads, as described below.
 
 =item C<use_overloads>
@@ -331,6 +536,17 @@ within the object's hashref). Turn it off if you want objects to
 stay opaque, with public methods as the only way to reach
 internal information.
 
+
+=item C<paths_method>
+
+  use Data::Reach paths_method => $method_name;
+
+If the target object possesses a method corresponding to the
+name specified, that method will be called for for finding the
+list of path items under the current tree (like the list of
+keys for a hash, or the list of indices for an array).
+
+
 =back
 
 Note that several options can be tuned in one single statement :
@@ -340,9 +556,9 @@ Note that several options can be tuned in one single statement :
 
 =head1 SEE ALSO
 
-There are many similar modules on CPAN, each of them having some
-variations in the set of features. Here are a few pointers, and the
-reasons why I didn't use them :
+For reaching data subtrees, there are many similar modules on CPAN,
+each of them having some variations in the set of features. Here are a
+few pointers, and the reasons why I didn't use them :
 
 =over 
 
@@ -389,53 +605,23 @@ instead of an array of values. Does not handle overloads.
 
 Laurent Dami, C<< <dami at cpan.org> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-data-reach at
-rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Reach>.  I will
-be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Data::Reach
 
+You can also look for information at L<https://metacpan.org/pod/Data::Reach>
 
-You can also look for information at:
 
-=over 4
+The source code is at L<https://github.com/damil/Data-Reach>.
+Bug reports or feature requests can be addressed at L<https://github.com/damil/Data-Reach/issues>.
 
-=item RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Reach>
-
-=item AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Data-Reach>
-
-=item CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Data-Reach>
-
-=item METACPAN
-
-L<https://metacpan.org/pod/Data::Reach>
-
-=back
-
-The source code is at
-L<https://github.com/damil/Data-Reach>.
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Laurent Dami.
+Copyright 2015, 2022 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -67,16 +67,16 @@ is reach($data, qw/foo 3/), 1234,                  'peek_blessed true again';
 
 
 
-# option "call_method"
+# option "reach_method"
 bless $data, 'RealClass'; # defined below
-{ use Data::Reach call_method => [qw/dap dip dup/];
-  is reach($data, qw/foo/), "foofoo",              'call_method arrayref';
+{ use Data::Reach reach_method => 'dup';
+  is reach($data, qw/foo/), "foofoo",              'reach_method arrayref';
   dies_ok sub {reach($data, qw/foo 3/)},
-          qr/within a SCALAR/,                     'call_method dup (2-steps)';
+          qr/within a SCALAR/,                     'reach_method dup (2-steps)';
 }
-is reach($data, qw/foo 3/), 1234,                  'call_method disabled';
-{ use Data::Reach call_method => 'dup';
-  is reach($data, qw/foo/), "foofoo",              'call_method scalar';
+is reach($data, qw/foo 3/), 1234,                  'reach_method disabled';
+{ use Data::Reach reach_method => 'dup';
+  is reach($data, qw/foo/), "foofoo",              'reach_method scalar';
 }
 
 

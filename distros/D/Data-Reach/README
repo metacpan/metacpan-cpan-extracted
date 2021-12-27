@@ -1,17 +1,67 @@
 Data-Reach
 
-Data::Reach - Walk down a datastructure, without autovivification
+Data::Reach - Walk down or iterate through a nested Perl datastructure
 
-The C<reach> function walks down a nested datastructure of hashrefs
-and arrayrefs, choosing the next subnode at each step according to the
-next key supplied in C<@path>. If there is no such sequence of
-subnodes, C<undef> is returned. No autovivification nor any writing
-into the datastructure is ever performed. Missing data merely returns
-C<undef>, while wrong use of data (for example looking into an
-arrayref with a non-numerical index) generates an exception.  Blessed
-objects within the datastructure are generally treated just like raw,
-unblessed datastructures; however that behaviour can be changed
-through pragma options.
+=head1 SYNOPSIS
+
+    # reach a subtree or a leaf under a nested datastructure
+    use Data::Reach;
+    my $node = reach $data_tree, @path; # @path may contain a mix of hash keys and array indices
+
+    # do something with all paths through the datastructure ..
+    my @result = map_paths {do_something_with(\@_, $_)} $data_tree;
+
+    # .. or loop through all paths
+    my $next_path = each_path $data_tree;
+    while (my ($path, $val) = $next_path->()) {
+      do_something_with($path, $val);
+    }
+
+    # import under a different name
+    use Data::Reach reach => as => 'walk_down';
+    my $node = walk_down $data_tree, @path;
+
+    # optional changes of algorithm, lexically scoped
+    { no Data::Reach  qw/peek_blessed use_overloads/;
+      use Data::Reach reach_method => [qw/foo bar/];
+      my $node = reach $object_tree, @path;
+    }
+    # after end of scope, back to the regular algorithm
+
+=head1 DESCRIPTION
+
+Perl supports nested datastructures : a hash may contain references to
+other hashes or to arrays, which in turn may contain further references
+to deeper structures -- see L<perldsc>. Walking down through such
+structures usually involves nested loops, and possibly some tests on
+C<ref $subtree> for finding out if the next level is an arrayref or a hashref.
+
+The present module offers some utilities for easier handling of nested
+datastructures :
+
+=over
+
+=item *
+
+the C<reach> function finds a subtree or a leaf according to a given
+C<@path> -- a list of hash keys or array indices. If there is no data
+corresponding to that path, C<undef> is returned, without any autovivification
+within the tree.
+
+=item *
+
+the C<map_paths> function applies a given code reference to all paths within the nested
+datastructure.
+
+
+=item *
+
+the C<each_path> function returns an iterator over the nested datastructure; it can be
+used in the same spirit as an C<each> statement over a simple hash, except that it will
+walk through all paths within the nested datastructure
+
+=back
+
 
 
 INSTALLATION
@@ -32,22 +82,12 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Reach
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Data-Reach
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Data-Reach
-
-    Search CPAN
-        http://search.cpan.org/dist/Data-Reach/
+    https://metacpan.org/pod/Data::Reach
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Laurent Dami
+Copyright (C) 2015, 2022 Laurent Dami
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
