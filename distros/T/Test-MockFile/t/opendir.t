@@ -38,8 +38,6 @@ is( $! + 0, ENOENT, '$! numeric is right.' );
 is( opendir( my $notdir_fh, $temp_notdir ), undef, "opendir on a file returns false" );
 is( $! + 0, ENOTDIR, '$! numeric is right.' );
 
-like( dies { readdir("abc"); }, qr/^Bad symbol for dirhandle at/, "Dies if string passed instead of dir fh" );
-
 my ( $real_fh, $f3 ) = tempfile( DIR => $temp_dir );
 like( warning { readdir($real_fh) }, qr/^readdir\(\) attempted on invalid dirhandle \$fh/, "We only warn if the file handle or glob is invalid." );
 

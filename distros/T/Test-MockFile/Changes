@@ -1,25 +1,33 @@
 Revision history for Test-MockFile
 
-0.020
- - Basic introduction of file ownership. Set default uid/gid to current user when not set
+0.022   12/27/2021
+ -  GH #47: Manage bareword filehandles in runtime:
 
-0.19
+0.021   1/30/2020
+ - Emit ENOTDIR on opendir when appropriate
+ - Switch to github actions for CI testing
+
+0.020   10/14/2019
+ - GH #51 - Basic introduction of file ownership. Set default uid/gid to current user when not set
+ - GH #49 - Make sysseek return position when called while allowing seek to return a true value.
+
+0.19   5/21/2019
  - Fix POD for stat example in POD.
  - Allow scalar file handles on open. We don't care about those
  - Provide better guidance about keeping your mocks in scope in examples
  - Disable Test::CheckManifest due to break in Test-CheckManifest
  - Fix seek bug in sysopen(... O_APPEND)
 
-0.018
+0.018   1/24/2019
  - Properly handle open and sysopen file handles going out of scope.
  - Provide a helper method to mock objects to determine the file name. GH #31
  - Do not throw a file access hook when statting a file handle that is not under MockFile control. GH #30
  - Read multiple lines via readline when wantarray is true. GH #29
 
-0.017
+0.017   1/2/2019
  - Require a newer Test2::Bundle::Extended (0.000084) to support named isa_ok
 
-0.016
+0.016   1/2/2019
  - Bump Overload::FileCheck to 0.007 to address stack bug
  - Try to get EISDIR handling for BSD working. Apparently something changed in perl 5.20?
  - Do not do access hooks on filehandle interactions.
